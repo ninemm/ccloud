@@ -1,0 +1,134 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	
+	<parent>
+		<groupId>org.ccloud</groupId>
+		<artifactId>ccloud</artifactId>
+		<version>0.0.1</version>
+	</parent>
+	
+	<artifactId>ccloud-web-core</artifactId>
+	<packaging>war</packaging>
+	<name>ccloud-web-core</name>
+	<description>核心配置模块</description>
+	
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.freemarker</groupId>
+			<artifactId>freemarker</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>javax.mail-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.jfinal</groupId>
+			<artifactId>jfinal-weixin</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sf.ehcache</groupId>
+			<artifactId>ehcache</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.ccloud</groupId>
+			<artifactId>ccloud-model</artifactId>
+			<version>0.0.1</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>
+		
+		<!-- <dependency>
+			<groupId>org.ccloud</groupId>
+			<artifactId>jpress-cron</artifactId>
+			<version>1.0</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency> -->
+
+		<!-- <dependency>
+			<groupId>org.ccloud</groupId>
+			<artifactId>ccloud-message</artifactId>
+			<version>0.0.1</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency> -->
+
+		<!-- <dependency>
+			<groupId>io.jpress</groupId>
+			<artifactId>jpress-search-api</artifactId>
+			<version>1.0</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency> -->
+		
+		<dependency>
+			<groupId>org.ccloud</groupId>
+			<artifactId>ccloud-cache</artifactId>
+			<version>0.0.1</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>
+		
+	</dependencies>
+
+	<build>
+		<finalName>${project.artifactId}-${project.version}</finalName>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>**/*.*</include>
+				</includes>
+				<filtering>false</filtering>
+			</resource>
+			<resource>
+				<directory>src/main/language</directory>
+				<includes>
+					<include>**/*.*</include>
+				</includes>
+				<filtering>false</filtering>
+			</resource>
+		</resources>
+
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<attachClasses>true</attachClasses>
+				</configuration>
+				<executions>
+				</executions>
+			</plugin>
+			
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+
+		</plugins>
+	</build>
+</project>

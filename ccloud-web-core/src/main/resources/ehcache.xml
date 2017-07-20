@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="ehcache.xsd"
+         updateCheck="false" 
+         monitoring="autodetect"
+         dynamicConfig="true">
+         
+	<!-- 
+    <diskStore path="java.io.tmpdir"/>
+	-->
+	<!-- 
+	属性简介：
+		maxElementsInMemory：缓存最大个数
+		eternal：对象是否永久有效，一但设置了，timeout将不起作用
+		timeToIdleSeconds：设置对象在失效前的允许闲置时间（单位：秒）
+		timeToLiveSeconds：设置对象在失效前允许存活时间（单位：秒）
+		overflowToDisk：当内存中对象数量达到maxElementsInMemory时，Ehcache将会对象写到磁盘中
+		diskPersistent：是否缓存虚拟机重启期数据
+		diskExpiryThreadIntervalSeconds：磁盘失效线程运行时间间隔，默认是120秒
+		memoryStoreEvictionPolicy：当达到maxElementsInMemory限制时，Ehcache将会根据指定的策略去清理内存；默认策略是LRU（最近最少使用），你可以设置为FIFO（先进先出）或是LFU（较少使用）
+		clearOnFlush：内存数量最大时是否清除
+	-->
+    <cache name="jpress"
+		maxEntriesLocalHeap="500"
+		eternal="false"
+		overflowToDisk="true"
+		timeToIdleSeconds="300"
+		timeToLiveSeconds="600"
+		diskPersistent="true"
+		diskExpiryThreadIntervalSeconds="1"
+		memoryStoreEvictionPolicy="LFU"
+	/>
+    
+    <cache name="session"
+		maxElementsInMemory="10000"
+		maxElementsOnDisk="100000000"
+		eternal="false"
+		timeToIdleSeconds="3600"
+		timeToLiveSeconds="0"
+		overflowToDisk="true"
+		diskPersistent="true"
+	/>
+  		 
+    <cache name="action"
+		maxElementsInMemory="10000"
+		maxElementsOnDisk="100000000"
+		eternal="false"
+		timeToIdleSeconds="3600"
+		timeToLiveSeconds="0"
+		overflowToDisk="true"
+		diskPersistent="true"
+	/>
+	
+    <cache name="action_wechat"
+		maxElementsInMemory="10000"
+		maxElementsOnDisk="100000000"
+		eternal="false"
+		timeToIdleSeconds="3600"
+		timeToLiveSeconds="0"
+		overflowToDisk="true"
+		diskPersistent="true"
+	/>
+  		 
+    <cache name="action_mobile"
+		maxElementsInMemory="10000"
+		maxElementsOnDisk="100000000"
+		eternal="false"
+		timeToIdleSeconds="3600"
+		timeToLiveSeconds="0"
+		overflowToDisk="true"
+		diskPersistent="true"
+	/>
+    
+    <cache name="token"
+		maxElementsInMemory="10000"
+		maxElementsOnDisk="1000000000"
+		eternal="false"
+		timeToIdleSeconds="3600"
+		timeToLiveSeconds="0"
+		overflowToDisk="true"
+		diskPersistent="true"
+	/>
+    
+    <cache name="option"
+		maxEntriesLocalHeap="5000"
+		eternal="true"
+		overflowToDisk="true"
+		diskPersistent="true"
+		memoryStoreEvictionPolicy="FIFO"
+	/>
+    
+     <cache name="content"
+         maxEntriesLocalHeap="10000"
+         maxEntriesLocalDisk="100000"
+         eternal="false"
+         overflowToDisk="true"
+         diskSpoolBufferSizeMB="20"
+         timeToIdleSeconds="300"
+         timeToLiveSeconds="600"
+         memoryStoreEvictionPolicy="LFU"
+         transactionalMode="off"
+	/>
+          
+     <cache name="content_list"
+         maxEntriesLocalHeap="10000"
+         maxEntriesLocalDisk="100000"
+         eternal="false"
+         overflowToDisk="true"
+         diskSpoolBufferSizeMB="20"
+         timeToIdleSeconds="300"
+         timeToLiveSeconds="600"
+         memoryStoreEvictionPolicy="LFU"
+         transactionalMode="off"
+	/>
+     
+	<cache name="metadata"
+         maxEntriesLocalHeap="10000"
+         maxEntriesLocalDisk="100000"
+         eternal="false"
+         overflowToDisk="true"
+         diskSpoolBufferSizeMB="20"
+         timeToIdleSeconds="300"
+         timeToLiveSeconds="600"
+         memoryStoreEvictionPolicy="LFU"
+         transactionalMode="off"
+	/>
+     
+	<cache name="user"
+         maxEntriesLocalHeap="10000"
+         maxEntriesLocalDisk="100000"
+         eternal="false"
+         overflowToDisk="true"
+         diskSpoolBufferSizeMB="20"
+         timeToIdleSeconds="300"
+         timeToLiveSeconds="600"
+         memoryStoreEvictionPolicy="LFU"
+         transactionalMode="off"
+	/>
+          
+	<cache name="taxonomy"
+         maxEntriesLocalHeap="10000"
+         maxEntriesLocalDisk="100000"
+         eternal="false"
+         overflowToDisk="true"
+         diskSpoolBufferSizeMB="20"
+         timeToIdleSeconds="300"
+         timeToLiveSeconds="600"
+         memoryStoreEvictionPolicy="LFU"
+         transactionalMode="off"
+	/>
+          
+    <cache name="taxonomy_list"
+         maxEntriesLocalHeap="10000"
+         maxEntriesLocalDisk="100000"
+         eternal="false"
+         overflowToDisk="true"
+         diskSpoolBufferSizeMB="20"
+         timeToIdleSeconds="300"
+         timeToLiveSeconds="600"
+         memoryStoreEvictionPolicy="LFU"
+         transactionalMode="off"
+	/>
+          
+	<cache name="comment"
+         maxEntriesLocalHeap="10000"
+         maxEntriesLocalDisk="100000"
+         eternal="false"
+         overflowToDisk="true"
+         diskSpoolBufferSizeMB="20"
+         timeToIdleSeconds="300"
+         timeToLiveSeconds="600"
+         memoryStoreEvictionPolicy="LFU"
+         transactionalMode="off"
+	/>
+          
+	<cache name="mapping"
+         maxEntriesLocalHeap="10000"
+         maxEntriesLocalDisk="100000"
+         eternal="false"
+         overflowToDisk="true"
+         diskSpoolBufferSizeMB="20"
+         timeToIdleSeconds="300"
+         timeToLiveSeconds="600"
+         memoryStoreEvictionPolicy="LFU"
+         transactionalMode="off"
+	/>
+          
+	<cache name="attachment"
+         maxEntriesLocalHeap="10000"
+         maxEntriesLocalDisk="100000"
+         eternal="false"
+         overflowToDisk="true"
+         diskSpoolBufferSizeMB="20"
+         timeToIdleSeconds="300"
+         timeToLiveSeconds="600"
+         memoryStoreEvictionPolicy="LFU"
+         transactionalMode="off"
+	/>
+          
+   	<cache name="wechat_dkf"
+        maxEntriesLocalHeap="10000"
+        eternal="false"
+        overflowToDisk="false"
+        timeToIdleSeconds="300"
+        timeToLiveSeconds="300"
+        memoryStoreEvictionPolicy="LFU"
+        transactionalMode="off"
+	/>
+         
+   	<cache name="visitor_counter"
+        maxEntriesLocalHeap="10000"
+        eternal="true"
+        overflowToDisk="true"
+        memoryStoreEvictionPolicy="LFU"
+        transactionalMode="off"
+	/>
+         
+    <cache name="role"
+        maxEntriesLocalHeap="10000"
+        eternal="false"
+        overflowToDisk="true"
+        timeToIdleSeconds="300"
+        timeToLiveSeconds="300"
+        memoryStoreEvictionPolicy="LFU"
+        transactionalMode="off"
+	/>         
+         
+	<cache name="res"
+        maxEntriesLocalHeap="10000"
+        eternal="false"
+        overflowToDisk="true"
+        timeToIdleSeconds="300"
+        timeToLiveSeconds="300"
+        memoryStoreEvictionPolicy="LFU"
+        transactionalMode="off"
+	/>  
+         
+    <cache name="res_list"
+        maxEntriesLocalHeap="10000"
+        eternal="false"
+        overflowToDisk="true"
+        timeToIdleSeconds="300"
+        timeToLiveSeconds="300"
+        memoryStoreEvictionPolicy="LFU"
+        transactionalMode="off"
+	/>  
+                    
+    <cache name="dict"
+        maxEntriesLocalHeap="10000"
+        eternal="false"
+        overflowToDisk="true"
+        timeToIdleSeconds="300"
+        timeToLiveSeconds="300"
+        memoryStoreEvictionPolicy="LFU"
+        transactionalMode="off"
+	/>
+         
+    <cache name="area"
+        maxEntriesLocalHeap="10000"
+        eternal="false"
+        overflowToDisk="true"
+        timeToIdleSeconds="300"
+        timeToLiveSeconds="300"
+        memoryStoreEvictionPolicy="LFU"
+        transactionalMode="off"
+	/>
+         
+    <cache name="area_list"
+        maxEntriesLocalHeap="10000"
+        eternal="false"
+        overflowToDisk="true"
+        timeToIdleSeconds="300"
+        timeToLiveSeconds="300"
+        memoryStoreEvictionPolicy="LFU"
+        transactionalMode="off"
+	/>          
+         
+	<cache name="tourise_store"
+        maxEntriesLocalHeap="10000"
+        eternal="false"
+        overflowToDisk="true"
+        timeToIdleSeconds="300"
+        timeToLiveSeconds="300"
+        memoryStoreEvictionPolicy="LFU"
+        transactionalMode="off"
+	/>
+         
+    <cache name="tour_route"
+        maxEntriesLocalHeap="10000"
+        eternal="false"
+        overflowToDisk="false"
+        timeToIdleSeconds="300"
+        timeToLiveSeconds="300"
+        memoryStoreEvictionPolicy="LFU"
+        transactionalMode="off"
+	/>
+         
+    <cache name="tour_group"
+        maxEntriesLocalHeap="10000"
+        eternal="false"
+        overflowToDisk="false"
+        timeToIdleSeconds="300"
+        timeToLiveSeconds="300"
+        memoryStoreEvictionPolicy="LFU"
+        transactionalMode="off"
+	/>     
+              
+	<cache name="tour_supplier"
+        maxEntriesLocalHeap="10000"
+        eternal="false"
+        overflowToDisk="false"
+        timeToIdleSeconds="300"
+        timeToLiveSeconds="300"
+        memoryStoreEvictionPolicy="LFU"
+        transactionalMode="off"
+	/>
+         
+	<cache name="tour_activity"
+        maxEntriesLocalHeap="10000"
+        eternal="false"
+        overflowToDisk="false"
+        timeToIdleSeconds="300"
+        timeToLiveSeconds="300"
+        memoryStoreEvictionPolicy="LFU"
+        transactionalMode="off"
+	/>                      
+    
+    <cache name="tour_promoter"
+        maxEntriesLocalHeap="10000"
+        eternal="false"
+        overflowToDisk="false"
+        timeToIdleSeconds="300"
+        timeToLiveSeconds="300"
+        memoryStoreEvictionPolicy="LFU"
+        transactionalMode="off"
+	/>
+         
+	<cache name="tour_order"
+        maxEntriesLocalHeap="10000"
+        eternal="false"
+        overflowToDisk="false"
+        timeToIdleSeconds="300"
+        timeToLiveSeconds="300"
+        memoryStoreEvictionPolicy="LFU"
+        transactionalMode="off"
+	/>         
+    
+</ehcache>

@@ -1,0 +1,69 @@
+<!-- Content Header (Page header) -->
+<section class="content-header">
+	<h1>字典信息</h1>
+</section>
+<!-- Main content -->
+<section class="content">
+	<form action="${CPATH}/admin/dict/save" method="post" id="form">
+	<input type="hidden" name="dict.id" value="${(dict.id)!}">
+	<div class="col-xs-12 ">
+		<div class="row">
+			<ul class="list-unstyled">
+				<li class="jp-set-pad">
+					<div class="col-sm-3 jp-common-pad  jp-set-info">字典名称 (必填)</div>
+					<div class="col-sm-9 jp-common-pad ">
+						<div class="col-sm-6  ">
+							<input class="form-control input-md" type="text" name="dict.name" value="${(dict.name)!}">
+						</div>
+					</div>
+					<div class="clr"></div>
+				</li>
+				<li class="jp-set-pad">
+					<div class="col-sm-3 jp-common-pad  jp-set-info">字典类型 (必填)</div>
+					<div class="col-sm-9 jp-common-pad ">
+						<div class="col-sm-6  ">
+							<input class="form-control input-md" type="text" name="dict.type" value="${(dict.type)!}">
+						</div>
+					</div>
+					<div class="clr"></div>
+				</li>
+				<li class="jp-set-pad">
+					<div class="col-sm-3 jp-common-pad  jp-set-info">字典编码  (必填)</div>
+					<div class="col-sm-9 jp-common-pad ">
+						<div class="col-sm-6  ">
+							<input class="form-control input-md" type="text" name="dict.key" value="${(dict.key)!}">
+						</div>
+					</div>
+					<div class="clr"></div>
+				</li>
+				<li class="jp-set-pad">
+					<div class="col-sm-3 jp-common-pad  jp-set-info">字典值 (必填)</div>
+					<div class="col-sm-9 jp-common-pad ">
+						<div class="col-sm-6  ">
+							<input class="form-control input-md" type="text" name="dict.value" value="${(dict.value)!}">
+						</div>
+					</div>
+					<div class="clr"></div>
+				</li>
+				<li class="jp-set-pad">
+					<div class="col-sm-3 jp-common-pad  jp-set-info">字典图标</div>
+					<div class="col-sm-9 jp-common-pad ">
+						<div class="col-sm-6  ">
+							<input class="form-control input-md" type="text" name="dict.icon" value="${(dict.icon)!}">
+						</div>
+					</div>
+					<div class="clr"></div>
+				</li>
+			</ul>
+			
+		</div>
+	</div>
+	
+	<div class="row">
+		<div class="col-xs-12"> 
+			<button type="button" onclick="doSubmit()" class="btn btn-primary">保存更改</button>
+			<input type="button" class="btn btn-primary" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
+		</div>
+		</div>
+	</form>
+</section>

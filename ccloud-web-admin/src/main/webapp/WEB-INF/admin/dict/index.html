@@ -1,0 +1,35 @@
+<#include "../_inc/_layout.html"/> 
+
+<#macro script>
+function batchAction() {
+	var $form = $("#form");
+	var action = $("#action").val();
+	if (!action) {
+		toastr.warning('请选择操作动作','操作失败');
+		return ;
+	} else if (action == 'delete') {
+		$form.attr("action", "${CPATH}/admin/dict/batchDelete?c=${c!}&p=${p!}");
+	}
+ 	$form.ajaxSubmit({
+		type : "post",
+		dataType : "json",
+		success : function(result) { 
+			if (result.errorCode > 0) {
+				toastr.error(result.message, '操作失败');
+			} else {
+				location.reload();
+			}
+		},
+		error : function() {
+			toastr.error("信息提交错误", '操作失败');
+		}
+	});
+}
+</#macro>
+
+<@layout active_id=p child_active_id=c>
+<#include include/>
+</@layout>
+
+
+
