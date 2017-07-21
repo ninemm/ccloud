@@ -20,7 +20,7 @@
 		memoryStoreEvictionPolicy：当达到maxElementsInMemory限制时，Ehcache将会根据指定的策略去清理内存；默认策略是LRU（最近最少使用），你可以设置为FIFO（先进先出）或是LFU（较少使用）
 		clearOnFlush：内存数量最大时是否清除
 	-->
-    <cache name="jpress"
+    <cache name="ccloud"
 		maxEntriesLocalHeap="500"
 		eternal="false"
 		overflowToDisk="true"
@@ -89,30 +89,6 @@
 		memoryStoreEvictionPolicy="FIFO"
 	/>
     
-     <cache name="content"
-         maxEntriesLocalHeap="10000"
-         maxEntriesLocalDisk="100000"
-         eternal="false"
-         overflowToDisk="true"
-         diskSpoolBufferSizeMB="20"
-         timeToIdleSeconds="300"
-         timeToLiveSeconds="600"
-         memoryStoreEvictionPolicy="LFU"
-         transactionalMode="off"
-	/>
-          
-     <cache name="content_list"
-         maxEntriesLocalHeap="10000"
-         maxEntriesLocalDisk="100000"
-         eternal="false"
-         overflowToDisk="true"
-         diskSpoolBufferSizeMB="20"
-         timeToIdleSeconds="300"
-         timeToLiveSeconds="600"
-         memoryStoreEvictionPolicy="LFU"
-         transactionalMode="off"
-	/>
-     
 	<cache name="metadata"
          maxEntriesLocalHeap="10000"
          maxEntriesLocalDisk="100000"
@@ -137,43 +113,7 @@
          transactionalMode="off"
 	/>
           
-	<cache name="taxonomy"
-         maxEntriesLocalHeap="10000"
-         maxEntriesLocalDisk="100000"
-         eternal="false"
-         overflowToDisk="true"
-         diskSpoolBufferSizeMB="20"
-         timeToIdleSeconds="300"
-         timeToLiveSeconds="600"
-         memoryStoreEvictionPolicy="LFU"
-         transactionalMode="off"
-	/>
-          
-    <cache name="taxonomy_list"
-         maxEntriesLocalHeap="10000"
-         maxEntriesLocalDisk="100000"
-         eternal="false"
-         overflowToDisk="true"
-         diskSpoolBufferSizeMB="20"
-         timeToIdleSeconds="300"
-         timeToLiveSeconds="600"
-         memoryStoreEvictionPolicy="LFU"
-         transactionalMode="off"
-	/>
-          
 	<cache name="comment"
-         maxEntriesLocalHeap="10000"
-         maxEntriesLocalDisk="100000"
-         eternal="false"
-         overflowToDisk="true"
-         diskSpoolBufferSizeMB="20"
-         timeToIdleSeconds="300"
-         timeToLiveSeconds="600"
-         memoryStoreEvictionPolicy="LFU"
-         transactionalMode="off"
-	/>
-          
-	<cache name="mapping"
          maxEntriesLocalHeap="10000"
          maxEntriesLocalDisk="100000"
          eternal="false"
@@ -225,26 +165,6 @@
         transactionalMode="off"
 	/>         
          
-	<cache name="res"
-        maxEntriesLocalHeap="10000"
-        eternal="false"
-        overflowToDisk="true"
-        timeToIdleSeconds="300"
-        timeToLiveSeconds="300"
-        memoryStoreEvictionPolicy="LFU"
-        transactionalMode="off"
-	/>  
-         
-    <cache name="res_list"
-        maxEntriesLocalHeap="10000"
-        eternal="false"
-        overflowToDisk="true"
-        timeToIdleSeconds="300"
-        timeToLiveSeconds="300"
-        memoryStoreEvictionPolicy="LFU"
-        transactionalMode="off"
-	/>  
-                    
     <cache name="dict"
         maxEntriesLocalHeap="10000"
         eternal="false"
@@ -274,75 +194,5 @@
         memoryStoreEvictionPolicy="LFU"
         transactionalMode="off"
 	/>          
-         
-	<cache name="tourise_store"
-        maxEntriesLocalHeap="10000"
-        eternal="false"
-        overflowToDisk="true"
-        timeToIdleSeconds="300"
-        timeToLiveSeconds="300"
-        memoryStoreEvictionPolicy="LFU"
-        transactionalMode="off"
-	/>
-         
-    <cache name="tour_route"
-        maxEntriesLocalHeap="10000"
-        eternal="false"
-        overflowToDisk="false"
-        timeToIdleSeconds="300"
-        timeToLiveSeconds="300"
-        memoryStoreEvictionPolicy="LFU"
-        transactionalMode="off"
-	/>
-         
-    <cache name="tour_group"
-        maxEntriesLocalHeap="10000"
-        eternal="false"
-        overflowToDisk="false"
-        timeToIdleSeconds="300"
-        timeToLiveSeconds="300"
-        memoryStoreEvictionPolicy="LFU"
-        transactionalMode="off"
-	/>     
-              
-	<cache name="tour_supplier"
-        maxEntriesLocalHeap="10000"
-        eternal="false"
-        overflowToDisk="false"
-        timeToIdleSeconds="300"
-        timeToLiveSeconds="300"
-        memoryStoreEvictionPolicy="LFU"
-        transactionalMode="off"
-	/>
-         
-	<cache name="tour_activity"
-        maxEntriesLocalHeap="10000"
-        eternal="false"
-        overflowToDisk="false"
-        timeToIdleSeconds="300"
-        timeToLiveSeconds="300"
-        memoryStoreEvictionPolicy="LFU"
-        transactionalMode="off"
-	/>                      
-    
-    <cache name="tour_promoter"
-        maxEntriesLocalHeap="10000"
-        eternal="false"
-        overflowToDisk="false"
-        timeToIdleSeconds="300"
-        timeToLiveSeconds="300"
-        memoryStoreEvictionPolicy="LFU"
-        transactionalMode="off"
-	/>
-         
-	<cache name="tour_order"
-        maxEntriesLocalHeap="10000"
-        eternal="false"
-        overflowToDisk="false"
-        timeToIdleSeconds="300"
-        timeToLiveSeconds="300"
-        memoryStoreEvictionPolicy="LFU"
-        transactionalMode="off"
-	/>         
     
 </ehcache>
