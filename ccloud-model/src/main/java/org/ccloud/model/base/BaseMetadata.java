@@ -15,8 +15,6 @@
  */
 package org.ccloud.model.base;
 
-import java.math.BigInteger;
-
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.Metadata;
 import org.ccloud.model.core.JModel;
@@ -129,16 +127,12 @@ public abstract class BaseMetadata<M extends BaseMetadata<M>> extends JModel<M> 
 		return update;
 	}
 
-	public void setId(java.math.BigInteger id) {
+	public void setId(java.lang.String id) {
 		set("id", id);
 	}
 
-	public java.math.BigInteger getId() {
-		Object id = get("id");
-		if (id == null)
-			return null;
-
-		return id instanceof BigInteger ? (BigInteger)id : new BigInteger(id.toString());
+	public java.lang.String getId() {
+		return get("id");
 	}
 
 	public void setMetaKey(java.lang.String metaKey) {
@@ -165,11 +159,11 @@ public abstract class BaseMetadata<M extends BaseMetadata<M>> extends JModel<M> 
 		return get("object_type");
 	}
 
-	public void setObjectId(java.math.BigInteger objectId) {
+	public void setObjectId(java.lang.String objectId) {
 		set("object_id", objectId);
 	}
 
-	public java.math.BigInteger getObjectId() {
+	public java.lang.String getObjectId() {
 		return get("object_id");
 	}
 

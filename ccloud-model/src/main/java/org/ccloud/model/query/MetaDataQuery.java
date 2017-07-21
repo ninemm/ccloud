@@ -15,7 +15,6 @@
  */
 package org.ccloud.model.query;
 
-import java.math.BigInteger;
 import java.util.List;
 
 import org.ccloud.model.Metadata;
@@ -29,7 +28,7 @@ public class MetaDataQuery extends JBaseQuery {
 		return QUERY;
 	}
 
-	public List<Metadata> findListByTypeAndId(String type, BigInteger id) {
+	public List<Metadata> findListByTypeAndId(String type, String id) {
 		return DAO.doFind("object_type = ? and object_id = ?", type, id);
 	}
 
@@ -45,7 +44,7 @@ public class MetaDataQuery extends JBaseQuery {
 
 	}
 
-	public Metadata findByTypeAndIdAndKey(String type, BigInteger id, String key) {
+	public Metadata findByTypeAndIdAndKey(String type, String id, String key) {
 		String cachekey = type + id + key;
 		return DAO.doFindFirstByCache(Metadata.CACHE_NAME, cachekey,
 				"object_type = ? and object_id = ? and meta_key = ? ", type, id, key);

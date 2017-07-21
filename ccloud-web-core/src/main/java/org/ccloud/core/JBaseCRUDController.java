@@ -17,7 +17,6 @@ package org.ccloud.core;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.math.BigInteger;
 
 import org.ccloud.model.core.JModel;
 
@@ -62,8 +61,8 @@ public class JBaseCRUDController<M extends JModel<? extends JModel<?>>> extends 
 	}
 
 	public void edit() {
-		BigInteger id = getParaToBigInteger("id");
-		if (id != null) {
+		String id = getPara("id");
+		if (StrKit.notBlank(id)) {
 			setAttr(StrKit.firstCharToLowerCase(mClazz.getSimpleName()), getDao().findById(id));
 		}
 		render("edit.html");
@@ -91,8 +90,8 @@ public class JBaseCRUDController<M extends JModel<? extends JModel<?>>> extends 
 	}
 
 	public void delete() {
-		BigInteger id = getParaToBigInteger("id");
-		if (id != null) {
+		String id = getPara("id");
+		if (StrKit.notBlank(id)) {
 			getDao().deleteById(id);
 			renderAjaxResultForSuccess("删除成功");
 		} else {

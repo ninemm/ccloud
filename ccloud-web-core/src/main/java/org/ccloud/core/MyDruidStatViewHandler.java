@@ -15,8 +15,6 @@
  */
 package org.ccloud.core;
 
-import java.math.BigInteger;
-
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -47,7 +45,7 @@ public class MyDruidStatViewHandler extends DruidStatViewHandler {
 
 			String userId = CookieUtils.getFromCookieInfo(encrypt_key, cookieInfo);
 			if (StringUtils.isNotBlank(userId)) {
-				User user = UserQuery.me().findById(new BigInteger(userId));
+				User user = UserQuery.me().findById(userId);
 				if (user != null && user.isAdministrator()) {
 					super.handle(target, request, response, isHandled);
 					return;

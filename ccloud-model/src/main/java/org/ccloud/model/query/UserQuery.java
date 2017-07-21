@@ -15,7 +15,6 @@
  */
 package org.ccloud.model.query;
 
-import java.math.BigInteger;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -63,7 +62,7 @@ public class UserQuery extends JBaseQuery {
 //		return DAO.findFirstFromMetadata(key, value);
 		Metadata md = MetaDataQuery.me().findFirstByTypeAndValue(User.METADATA_TYPE, key, value);
 		if (md != null) {
-			BigInteger id = md.getObjectId();
+			String id = md.getObjectId();
 			return findById(id);
 		}
 		return null;
@@ -116,7 +115,7 @@ public class UserQuery extends JBaseQuery {
 		return DAO.doFindCount(" role = ? ", "administrator");
 	}
 
-	public User findById(final BigInteger userId) {
+	public User findById(final String userId) {
 		return DAO.getCache(userId, new IDataLoader() {
 			@Override
 			public Object load() {
@@ -170,7 +169,7 @@ public class UserQuery extends JBaseQuery {
 		return user.update();
 	}
 
-	public int batchDelete(User loginedUser, BigInteger... ids) {
+	public int batchDelete(User loginedUser, String... ids) {
 		if (ids != null && ids.length > 0) {
 			int deleteCount = 0;
 			for (int i = 0; i < ids.length; i++) {
@@ -183,7 +182,7 @@ public class UserQuery extends JBaseQuery {
 		return 0;
 	}
 	
-	public boolean deleteById(User loginedUser, BigInteger id) {
+	public boolean deleteById(User loginedUser, String id) {
 		User user = findById(id);
 		if (user != null && !"admin".equals(user.getUsername()) 
 				&& !user.getUsername().equals(loginedUser.getUsername()))

@@ -86,7 +86,7 @@ public class _DictController extends JBaseCRUDController<Dict> {
 		}
 		
 		if (dict.getId() == null)
-			dict.setCreateTime(new Date());
+			dict.setCreateDate(new Date());
 
 		if (dict.saveOrUpdate()) {
 			renderAjaxResultForSuccess("ok");

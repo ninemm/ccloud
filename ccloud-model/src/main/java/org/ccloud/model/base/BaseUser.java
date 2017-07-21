@@ -15,8 +15,6 @@
  */
 package org.ccloud.model.base;
 
-import java.math.BigInteger;
-
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.core.JModel;
 
@@ -93,16 +91,12 @@ public abstract class BaseUser<M extends BaseUser<M>> extends JModel<M> implemen
 		return update;
 	}
 
-	public void setId(java.math.BigInteger id) {
+	public void setId(java.lang.String id) {
 		set("id", id);
 	}
 
-	public java.math.BigInteger getId() {
-		Object id = get("id");
-		if (id == null)
-			return null;
-
-		return id instanceof BigInteger ? (BigInteger)id : new BigInteger(id.toString());
+	public java.lang.String getId() {
+		return get("id");
 	}
 
 	public void setUsername(java.lang.String username) {

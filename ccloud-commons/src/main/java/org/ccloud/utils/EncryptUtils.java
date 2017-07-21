@@ -15,7 +15,6 @@
  */
 package org.ccloud.utils;
 
-import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
@@ -44,7 +43,7 @@ public class EncryptUtils extends HashKit {
 		return userPassword.equals(encryptPassword(password, userSalt));
 	}
 
-	public static String generateUcode(BigInteger id,String salt) {
+	public static String generateUcode(String id, String salt) {
 		return md5(id + salt);
 	}
 

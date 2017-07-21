@@ -15,8 +15,6 @@
  */
 package org.ccloud.interceptor;
 
-import java.math.BigInteger;
-
 import org.ccloud.Consts;
 import org.ccloud.model.User;
 import org.ccloud.model.query.UserQuery;
@@ -32,7 +30,7 @@ public class InterUtils {
 
 		String userId = CookieUtils.get(inv.getController(), Consts.COOKIE_LOGINED_USER);
 		if (StringUtils.isNotBlank(userId)) {
-			return UserQuery.me().findById(new BigInteger(userId));
+			return UserQuery.me().findById(userId);
 		}
 
 		return null;

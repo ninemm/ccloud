@@ -15,8 +15,6 @@
  */
 package org.ccloud.model.base;
 
-import java.math.BigInteger;
-
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.Metadata;
 import org.ccloud.model.core.JModel;
@@ -129,16 +127,12 @@ public abstract class BaseAttachment<M extends BaseAttachment<M>> extends JModel
 		return update;
 	}
 
-	public void setId(java.math.BigInteger id) {
+	public void setId(java.lang.String id) {
 		set("id", id);
 	}
 
-	public java.math.BigInteger getId() {
-		Object id = get("id");
-		if (id == null)
-			return null;
-
-		return id instanceof BigInteger ? (BigInteger)id : new BigInteger(id.toString());
+	public java.lang.String getId() {
+		return get("id");
 	}
 
 	public void setTitle(java.lang.String title) {
@@ -149,11 +143,11 @@ public abstract class BaseAttachment<M extends BaseAttachment<M>> extends JModel
 		return get("title");
 	}
 
-	public void setUserId(java.math.BigInteger userId) {
+	public void setUserId(java.lang.String userId) {
 		set("user_id", userId);
 	}
 
-	public java.math.BigInteger getUserId() {
+	public java.lang.String getUserId() {
 		return get("user_id");
 	}
 
