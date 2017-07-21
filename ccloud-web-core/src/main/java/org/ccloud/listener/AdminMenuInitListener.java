@@ -207,7 +207,7 @@ public class AdminMenuInitListener implements MessageListener {
 			group.addMenuItem(new MenuItem("group", "/admin/group", "分组"));
 			group.addMenuItem(new MenuItem("role", "/admin/role", "角色"));
 			group.addMenuItem(new MenuItem("station", "/admin/station", "岗位"));
-			group.addMenuItem(new MenuItem("system", "/admin/system", "系统"));
+			group.addMenuItem(new MenuItem("systems", "/admin/systems", "系统"));
 			group.addMenuItem(new MenuItem("operation", "/admin/operation", "功能"));
 			group.addMenuItem(new MenuItem("department", "/admin/department", "组织机构"));
 		}
