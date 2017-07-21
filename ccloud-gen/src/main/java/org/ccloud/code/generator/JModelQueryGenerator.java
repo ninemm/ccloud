@@ -47,12 +47,9 @@ public class JModelQueryGenerator extends ModelGenerator {
 				+ " */%n"
 				+"package %s;%n%n";
 		
-		this.importTemplate = "import java.util.List;%n"
-				+ "import java.util.LinkedList%n"
-				+ "import org.ccloud.utils.StringUtils;%n%n"
+		this.importTemplate = "import java.util.LinkedList;%n"
 				+ "import org.ccloud.model.%s;%n%n"
 				+ "import com.jfinal.plugin.activerecord.Page;%n"
-				+ "import com.jfinal.plugin.ehcache.CacheKit;%n"
 				+ "import com.jfinal.plugin.ehcache.IDataLoader;%n%n";
 		
 		this.classDefineTemplate = "/**%n"

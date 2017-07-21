@@ -25,6 +25,7 @@ import com.jfinal.plugin.druid.DruidPlugin;
 
 public class JGenerator {
 
+	private final String outputPath;
 	private final String basePackage;
 	private final String dbHost;
 	private final String dbName;
@@ -32,9 +33,9 @@ public class JGenerator {
 	private final String dbPassword;
 	
 	
-	public JGenerator(String basePackage, String dbHost, String dbName,
+	public JGenerator(String outputPath, String basePackage, String dbHost, String dbName,
 			String dbUser, String dbPassword) {
-		
+		this.outputPath = outputPath;
 		this.basePackage = basePackage;
 		this.dbHost = dbHost;
 		this.dbName = dbName;
@@ -50,10 +51,10 @@ public class JGenerator {
 		String modelQueryPackage = basePackage + ".model.query";
 //		String viewPackage = basePackage + ".view.admin";
 		
-		String modelDir = "E:/src/main/java/" + modelPackage.replace(".", "/");
-		String baseModelDir = "E:/src/main/java/" + baseModelPackage.replace(".", "/");
-		String adminControllerDir = "E:/src/main/java/" + adminControllerPackage.replace(".", "/");
-		String modelQueryDir = "E:/src/main/java/" + modelQueryPackage.replace(".", "/");
+		String modelDir = outputPath + modelPackage.replace(".", "/");
+		String baseModelDir = outputPath + baseModelPackage.replace(".", "/");
+		String adminControllerDir = outputPath + adminControllerPackage.replace(".", "/");
+		String modelQueryDir = outputPath + modelQueryPackage.replace(".", "/");
 		
 		System.out.println("start generate...");
 		System.out.println("Generate dir:" + modelDir);

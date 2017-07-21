@@ -76,42 +76,42 @@ public class JBaseModelGenerator extends BaseModelGenerator {
 				+ "\t}%n%n"
 				
 		
-				+ "\tpublic Metadata createMetadata(){%n"
-				+ "\t\tMetadata md = new Metadata();%n"
-				+ "\t\tmd.setObjectId(getId());%n"
-				+ "\t\tmd.setObjectType(METADATA_TYPE);%n"
-				+ "\t\treturn md;%n"
-				+ "\t}%n%n"
-				
-				
-				+ "\tpublic Metadata createMetadata(String key,String value){%n"
-				+ "\t\tMetadata md = new Metadata();%n"
-				+ "\t\tmd.setObjectId(getId());%n"
-				+ "\t\tmd.setObjectType(METADATA_TYPE);%n"
-				+ "\t\tmd.setMetaKey(key);%n"
-				+ "\t\tmd.setMetaValue(value);%n"
-				+ "\t\treturn md;%n"
-				+ "\t}%n%n"
-	
-
-				+ "\tpublic boolean saveOrUpdateMetadta(String key,String value){%n"
-				+ "\t\tMetadata metadata = MetaDataQuery.me().findByTypeAndIdAndKey(METADATA_TYPE, getId(), key);%n"
-				+ "\t\tif (metadata == null) {%n"
-				+ "\t\t\tmetadata = createMetadata(key, value);%n"
-				+ "\t\t\treturn metadata.save();%n"
-				+ "\t\t}%n"
-				+ "\t\tmetadata.setMetaValue(value);%n"
-				+ "\t\treturn metadata.update();%n"
-				+ "\t}%n%n"
-				
-				
-				+ "\tpublic String metadata(String key) {%n"
-				+ "\t\tMetadata m = MetaDataQuery.me().findByTypeAndIdAndKey(METADATA_TYPE, getId(), key);%n"
-				+ "\t\tif (m != null) {%n"
-				+ "\t\t\treturn m.getMetaValue();%n"
-				+ "\t\t}%n"
-				+ "\t\treturn null;%n"
-				+ "\t}%n%n"
+//				+ "\tpublic Metadata createMetadata(){%n"
+//				+ "\t\tMetadata md = new Metadata();%n"
+//				+ "\t\tmd.setObjectId(getId());%n"
+//				+ "\t\tmd.setObjectType(METADATA_TYPE);%n"
+//				+ "\t\treturn md;%n"
+//				+ "\t}%n%n"
+//				
+//				
+//				+ "\tpublic Metadata createMetadata(String key,String value){%n"
+//				+ "\t\tMetadata md = new Metadata();%n"
+//				+ "\t\tmd.setObjectId(getId());%n"
+//				+ "\t\tmd.setObjectType(METADATA_TYPE);%n"
+//				+ "\t\tmd.setMetaKey(key);%n"
+//				+ "\t\tmd.setMetaValue(value);%n"
+//				+ "\t\treturn md;%n"
+//				+ "\t}%n%n"
+//	
+//
+//				+ "\tpublic boolean saveOrUpdateMetadta(String key,String value){%n"
+//				+ "\t\tMetadata metadata = MetaDataQuery.me().findByTypeAndIdAndKey(METADATA_TYPE, getId(), key);%n"
+//				+ "\t\tif (metadata == null) {%n"
+//				+ "\t\t\tmetadata = createMetadata(key, value);%n"
+//				+ "\t\t\treturn metadata.save();%n"
+//				+ "\t\t}%n"
+//				+ "\t\tmetadata.setMetaValue(value);%n"
+//				+ "\t\treturn metadata.update();%n"
+//				+ "\t}%n%n"
+//				
+//				
+//				+ "\tpublic String metadata(String key) {%n"
+//				+ "\t\tMetadata m = MetaDataQuery.me().findByTypeAndIdAndKey(METADATA_TYPE, getId(), key);%n"
+//				+ "\t\tif (m != null) {%n"
+//				+ "\t\t\treturn m.getMetaValue();%n"
+//				+ "\t\t}%n"
+//				+ "\t\treturn null;%n"
+//				+ "\t}%n%n"
 		
 				
 				+ "\t@Override%n"

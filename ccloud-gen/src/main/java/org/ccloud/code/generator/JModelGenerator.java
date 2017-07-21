@@ -41,7 +41,7 @@ public class JModelGenerator extends ModelGenerator {
 				+ " */%n"
 				+ "package %s;%n%n";
 		
-		this.importTemplate = "import io.jpress.model.core.Table;%n"
+		this.importTemplate = "import org.ccloud.model.core.Table;%n"
 				+ "import %s.%s;%n%n";
 		
 		this.classDefineTemplate =
@@ -58,7 +58,8 @@ public class JModelGenerator extends ModelGenerator {
 	
 	@Override
 	protected void genClassDefine(TableMeta tableMeta, StringBuilder ret) {
-		ret.append(String.format(classDefineTemplate, tableMeta.name,tableMeta.primaryKey,tableMeta.modelName, tableMeta.baseModelName, tableMeta.modelName));
+		ret.append(String.format(classDefineTemplate, tableMeta.name,
+			tableMeta.primaryKey, tableMeta.modelName, tableMeta.baseModelName, tableMeta.modelName));
 	}
 
 }
