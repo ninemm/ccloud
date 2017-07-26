@@ -43,12 +43,15 @@ public class SystemsQuery extends JBaseQuery {
 		});
 	}
 
-	public Page<Systems> paginate(int pageNumber, int pageSize, String orderby) {
+	public Page<Systems> paginate(int pageNumber, int pageSize, String keyword, String orderby) {
 		String select = "select * ";
 		StringBuilder fromBuilder = new StringBuilder("from `systems` ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
+		appendIfNotEmptyWithLike(fromBuilder, "name", keyword, params, true);
 
+		fromBuilder.append("order by " + orderby);
+		
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
