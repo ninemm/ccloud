@@ -41,6 +41,21 @@ jQuery.mm = {
 		
 	},
 	
+	initValidator: function(formId, fields) {
+		formId = formId || '#form';
+		$(formId).bootstrapValidator({
+			excluded: [':disabled'],
+	    	group: '.validata-box',
+	        message: '请输入正确的值',
+	        feedbackIcons: {
+	            valid: 'glyphicon glyphicon-ok',
+	            invalid: 'glyphicon glyphicon-remove',
+	            validating: 'glyphicon glyphicon-refresh'
+	        },
+	        fields: fields
+		});
+	},
+	
 	initEditTable : function(tableId, url, queryParams, fields, editableSaveFunc, clickCellFunc) {
 		
 		tableId = tableId || "_table";
