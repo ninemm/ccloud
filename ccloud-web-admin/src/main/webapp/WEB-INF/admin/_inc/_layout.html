@@ -76,15 +76,16 @@
 <script src="${CPATH}/static/plugins/toastr/toastr.js"></script>
 <@script_import />
 <script>
-<@script />   
-$(document).ready(function(){
+<@script />
+
+$(document).ready(function() {
 	initTree();
 	fix();
 	initUrls();
 	initToast();
 });
 
-function initTree(){
+function initTree() {
 <#if active_id!="" && active_id??>
 	var pActive = $("#${active_id}[class='treeview']");
 	pActive.attr("class","treeview active");

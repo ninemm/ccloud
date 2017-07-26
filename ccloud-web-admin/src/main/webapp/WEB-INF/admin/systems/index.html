@@ -1,0 +1,118 @@
+<#include "../_inc/_layout.html"/> 
+
+<#macro script>
+function batchAction() {
+	var $form = $("#form");
+	var action = $("#action").val();
+	if (!action) {
+		toastr.warning('请选择操作动作','操作失败');
+		return ;
+	} else if (action == 'delete') {
+		$form.attr("action", "${CPATH}/admin/systems/batchDelete?c=${c!}&p=${p!}");
+	}
+ 	$form.ajaxSubmit({
+		type : "post",
+		dataType : "json",
+		success : function(result) { 
+			if (result.errorCode > 0) {
+				toastr.error(result.message, '操作失败');
+			} else {
+				location.reload();
+			}
+		},
+		error : function() {
+			toastr.error("信息提交错误", '操作失败');
+		}
+	});
+}
+</#macro>
+
+<@layout active_id=p child_active_id=c>
+
+<section class="content-header">
+	<h1>系统管理</h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+       	<li><a href="#">权限管理</a></li>
+       	<li class="active">系统管理</li>
+	</ol>
+</section>
+<!-- Main content -->
+<section class="content">
+	<div class="row content-row">
+		<form class="form-horizontal" style="float: right" action="${CPATH}/admin/dict?c=${c!}&p=${p!}" method="post">
+			<div class="input-group input-group-sm">
+				<input id="post-search-input" class="form-control" type="search" value="${k!}" name="k" placeholder="搜索">&nbsp; 
+				<input id="search-submit" class="btn btn-default btn-sm" type="submit" value="搜索">
+			</div>
+		</form>
+	</div>
+	<div class="row content-row">
+		<div class="jp-left">
+			<select style="width: 120px" class="form-control input-sm" name="action" id="action">
+				<option value="">==批量操作==</option>
+				<option value="delete">删除</option>
+			</select>
+		</div>
+		
+		<div class="jp-left">
+			<button class="btn btn-sm btn-default" type="button" onclick="batchAction()">&nbsp;应用</button>
+		</div>
+		
+		<div class="jp-right">
+			<a href="${CPATH}/admin/systems/edit?c=${c!}&p=${p!}" class="btn btn-sm btn-primary"> 新增 </a>
+		</div>
+	</div>
+	<div class="box ">
+		<!-- /.box-header -->
+		<div class="box-body jp-common-pad">
+			<form action="" method="POST" id="form">
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th style="width: 20px">
+							<label class="jp-common-pad "> 
+								<input class="jp-common-pad " id="dataItem" onclick="checkAll(this)" title="全选" type="checkbox">
+							</label>
+						</th>
+						<th style="width: 20%">系统名称</th>
+						<th>系统编号</th>
+						<th>排序</th>
+						<th>操作</th>
+					</tr>
+				</thead>
+				<tbody>
+					<#if page??> <#list page.getList() as bean>
+					<tr class="jp-onmouse">
+						<td>
+							<label class="jp-common-pad"> 
+								<input class="jp-common-pad" name="dataItem" type="checkbox" value="${(bean.id)!}">
+							</label>
+						</td>
+						<td>
+							<strong><a href="${CPATH}/admin/systems/edit?id=${bean.id}&c=${c!}&p=${p!}">${bean.name!}</a></strong>
+						</td>
+						<td>${bean.code!}</td>
+						<td>${bean.orderList!}</td>
+						<td>
+							<a href="${CPATH}/admin/systems/edit?id=${bean.id}&c=${c!}&p=${p!}" class="btn btn-xs bg-olive btn-flat">编辑</a>
+							<a href="${CPATH}/admin/systems/delete?id=${bean.id}&c=${c!}&p=${p!}" class="btn btn-xs btn-danger btn-flat">删除</a>
+							<a href="${CPATH}/admin/systems/edit?id=${bean.id}&c=${c!}&p=${p!}" class="btn btn-xs btn-primary btn-flat">模块</a>
+							<a href="${CPATH}/admin/systems/delete?id=${bean.id}&c=${c!}&p=${p!}" class="btn btn-xs btn-primary btn-flat">菜单</a>
+						</td>
+					</tr>
+					</#list> </#if>
+				</tbody>
+
+			</table>
+			</form>
+		</div>
+		<!-- /.box-body -->
+	</div>
+	<!-- /.box -->
+
+	<div class="cf">
+		<div class="pull-right"><#include "../_inc/_paginate_wrapper.html" /></div>
+	</div>
+</section>	
+</@layout>
