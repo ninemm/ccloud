@@ -201,14 +201,14 @@ public class AdminMenuInitListener implements MessageListener {
 	}
 	
 	private MenuGroup createRoleResMenuGroup() {
-		MenuGroup group = new MenuGroup("permission", "fa fa-cog", "权限管理");
+		MenuGroup group = new MenuGroup("permission", "fa fa-cog", "用户权限");
 		{
-			group.addMenuItem(new MenuItem("user", "/admin/user", "用户"));
-			group.addMenuItem(new MenuItem("group", "/admin/group", "分组"));
-			group.addMenuItem(new MenuItem("role", "/admin/role", "角色"));
-			group.addMenuItem(new MenuItem("station", "/admin/station", "岗位"));
-			group.addMenuItem(new MenuItem("systems", "/admin/systems", "系统"));
-			group.addMenuItem(new MenuItem("operation", "/admin/operation", "功能"));
+			group.addMenuItem(new MenuItem("user", "/admin/user", "用户管理"));
+			group.addMenuItem(new MenuItem("group", "/admin/group", "分组管理"));
+			group.addMenuItem(new MenuItem("role", "/admin/role", "角色管理"));
+			group.addMenuItem(new MenuItem("station", "/admin/station", "岗位管理"));
+			group.addMenuItem(new MenuItem("systems", "/admin/systems", "系统管理"));
+			group.addMenuItem(new MenuItem("operation", "/admin/operation", "功能管理"));
 			group.addMenuItem(new MenuItem("department", "/admin/department", "组织机构"));
 		}
 		
