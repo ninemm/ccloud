@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.jfinal.core.JFinal;
+import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Model;
 import com.jfinal.plugin.activerecord.Page;
@@ -163,6 +164,7 @@ public class JModel<M extends JModel<M>> extends Model<M> {
 
 	public boolean saveOrUpdate() {
 		if (null == get(getPrimaryKey())) {
+			set("id", StrKit.getRandomUUID());
 			return this.save();
 		}
 		return this.update();
