@@ -1,0 +1,125 @@
+<#include "../_inc/_layout.html"/>
+
+<#macro script_import>
+	<!-- bootstrapvalidator -->
+ 	<script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
+</#macro>
+
+<#macro css_import>
+	<!-- bootstrapvalidator -->
+    <link rel="stylesheet" href="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.css">
+</#macro>
+
+<#macro script>
+
+var $form = $("#form");
+
+$(function() {
+
+	jQuery.mm.initValidator('#form', validatorFields)
+
+});
+
+var validatorFields = {
+	'group.group_name': {
+		validators: {
+            notEmpty: { message: '分组名称不能为空' },
+            stringLength: { max: 15, message: '分组名称最大长度是15字符，请重新输入' }
+        }
+	},
+	'group.group_code': {
+		validators: {
+			notEmpty: { message: '分组编号不能为空' },
+	        stringLength: { min: 2, max: 20, message: '分组编号最大长度是20字符，请重新输入' }
+        }
+	}
+};
+
+function doSubmit(){
+	$form.ajaxSubmit({
+		beforeSubmit: function() {
+			var validate = $form.data('bootstrapValidator');
+			validate.validate();
+			return validate.isValid();
+		},
+		type : "post",
+		dataType : "json",
+		success : function(data) {
+			if(data.errorCode == 0) {
+				//location.reload();
+				toastr.success(data.message, '操作成功');
+			} else {
+				toastr.error(data.message,'操作失败');
+			}
+		},
+		error : function() {
+			alert("信息提交错误");
+		}
+	});
+}
+</#macro>
+
+<@layout active_id=p child_active_id=c>
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+	<h1><#if (group.id) ??>修改<#else>新增</#if>分组信息</h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+       	<li><a href="#">用户权限</a></li>
+       	<li class="active"><#if (group.id) ??>修改<#else>新增</#if>分组信息</li>
+	</ol>
+</section>
+<!-- Main content -->
+<section class="content">
+	<div class="box box-default">
+		<div class="box-header with-border">
+			<h3 class="box-title">分组信息</h3>
+			<div class="box-tools">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse">
+					<i class="fa fa-minus"></i>
+				</button>
+			</div>
+		</div>
+		<form action="${CPATH}/admin/group/save" method="post" id="form" class="form-horizontal" >
+		<input type="hidden" name="group.id" value="${(group.id)!}">
+		<div class="box-body">
+			<div class="col-sm-12 ">
+				<div class="row">
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">名称:</label>
+						<div class="input-group col-md-4 col-sm-10">
+		                 	<input class="form-control input-sm" type="text" name="group.group_name" value="${(group.group_name)!}" placeholder="1-15个任意字符">
+		               	</div>
+					</div>
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">编号:</label>
+						<div class="input-group col-md-4 col-sm-10">
+		                 	<input class="form-control input-sm" type="text" name="group.group_code" value="${(group.group_code)!}" placeholder="2-20个任意字母数字">
+		               	</div>
+					</div>
+					<div class="form-group col-sm-12">
+						<label class="control-label col-sm-2">排序:</label>
+						<div class="input-group col-md-4 col-sm-10">
+		                 	<input class="form-control input-sm" type="number" name="group.order_list" value="${(group.order_list)!10}">
+		               	</div>
+					</div>
+          <div class="form-group col-sm-12">
+						<label class="control-label col-sm-2">描述:</label>
+						<div class="input-group col-md-4 col-sm-10">
+		                 	<textarea class="form-control input-sm" type="text" name="group.description" value="${(group.description)!}"></textarea>
+		               	</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="box-footer">
+			<button type="button" onclick="doSubmit()" class="btn btn-primary">保存更改</button>
+			<input type="button" class="btn btn-primary" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
+		</div>
+	</form>
+	</div>
+</section>
+
+</@layout>
