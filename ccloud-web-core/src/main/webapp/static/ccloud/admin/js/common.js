@@ -15,6 +15,9 @@ function checkAll(checkbox) {
 
 
 jQuery.mm = { 
+	
+		
+		
 	alert : function(){
 		window.alert("test");
 	},
@@ -37,7 +40,61 @@ jQuery.mm = {
 		});
 	},
 	
-	ajax : function(){
+	ajax : function() {
+		
+	},
+	
+	ajaxSubmit: function(formId) {
+		$(formId).ajaxSubmit({
+			type: "post",
+			dataType: "json",
+			success: function(result) { 
+				if (result.errorCode > 0) {
+					toastr.error(result.message, '操作失败');
+				} else {
+					location.reload();
+				}
+			},
+			error: function() {
+				toastr.error("信息提交错误", '操作失败');
+			}
+		});
+		
+	},
+	
+	batchAction: function(formId, message) {
+		var count = $('input[name="dataItem"]:checked').length;
+		if (count == 0) {
+			toastr.warning(message);
+		} else {
+			layer.confirm('确认批量删除吗?', {
+				btn: ['确认', '取消']
+			}, function() {
+				layer.close();
+				jQuery.mm.ajaxSubmit(formId);
+			}, function() {
+				layer.close();
+			});
+		}
+	},
+	
+	del: function(url) {
+		layer.confirm('确定删除吗？', 
+			{btn : ['确定', '取消']},
+			function() {
+				layer.close();
+				$.get(url, function(result){
+					if (result.errorCode > 0) {
+						toastr.error(result.message, '操作失败');
+					} else {
+						location.reload();
+					}
+				});
+			},
+			function() {
+				layer.close();
+			}
+		);
 		
 	},
 	
@@ -70,7 +127,7 @@ jQuery.mm = {
 			classes: 'table-no-bordered',
 			cache: false,					// 是否使用缓存
 			pagination: true,				// 是否显示分页
-			queryParams: queryParams,	// 传递参数
+			queryParams: queryParams,		// 传递参数
 			sidePagination: 'server', 		//分页方式：client客户端分页，server服务端分页（*）
 			paginationLoop: false,
 			paginationPreText: '上一页',
