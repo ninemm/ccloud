@@ -16,6 +16,7 @@
 package org.ccloud.model.query;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import org.ccloud.model.Systems;
 
@@ -41,6 +42,10 @@ public class SystemsQuery extends JBaseQuery {
 				return DAO.findById(id);
 			}
 		});
+	}
+	
+	public List<Systems> findAll() {
+		return DAO.doFind();
 	}
 
 	public Page<Systems> paginate(int pageNumber, int pageSize, String keyword, String orderby) {

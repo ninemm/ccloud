@@ -16,10 +16,7 @@
 package org.ccloud.model.base;
 
 import org.ccloud.message.MessageKit;
-import org.ccloud.model.Metadata;
 import org.ccloud.model.core.JModel;
-import org.ccloud.model.query.MetaDataQuery;
-import java.math.BigInteger;
 
 import com.jfinal.plugin.activerecord.IBean;
 import com.jfinal.plugin.ehcache.CacheKit;
