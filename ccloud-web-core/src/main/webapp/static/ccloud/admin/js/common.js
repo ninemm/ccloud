@@ -182,7 +182,7 @@ jQuery.mm = {
 			//classes: 'table-no-bordered',
 			cache: false,					// 是否使用缓存
 			queryParams: {parentId: parentId},		// 传递参数
-			//sidePagination: 'server', 		//分页方式：client客户端分页，server服务端分页（*）
+			sidePagination: 'server', 		//分页方式：client客户端分页，server服务端分页（*）
 			undefinedText: '',
 			columns: fields,
 			onExpandRow: function (index, row, $detail) {
