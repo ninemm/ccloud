@@ -38,16 +38,34 @@
 	});
 	
 	var validatorFields = {
-		'systems.name': {
+		'menu.system_id': {
 			validators: {
-	            notEmpty: { message: '系统名称不能为空' },
-	            stringLength: { max: 15, message: '系统名称最大长度是15字符，请重新输入' }
+	            notEmpty: { message: '所属系统不能为空' }
 	        }
 		},
-		'systems.code': {
+		'menu.name': {
 			validators: {
-				notEmpty: { message: '系统编码不能为空' },
-		        stringLength: { min: 2, max: 20, message: '系统编码最大长度是20字符，请重新输入' }
+	            notEmpty: { message: '菜单名称不能为空' },
+	            stringLength: { min: 2, max: 15, message: '菜单名称最大长度是15字符，请重新输入' }
+	        }
+		},
+		'menu.level': {
+			validators: {
+	            notEmpty: { message: '层级不能为空' },
+	            integer: {message: '请输入正整数'},
+	            greaterThan: { value: 1, message: '最小层级为1，请重新输入' },
+	            lessThan: { value: 5, message: '最大层级为5，请重新输入' }
+	        }
+		},
+		'menu.order_list': {
+			validators: {
+	            notEmpty: { message: '序号不能为空' },
+	            integer: {message: '请输入正整数'}
+	        }
+		},
+		'parentName': {
+			validators: {
+				notEmpty: { message: '上级菜单不能为空' }
 	        }
 		}
 	};
@@ -118,6 +136,7 @@
 						<label class="control-label col-sm-2">所属系统:</label>
 						<div class="input-group col-md-4 col-sm-10">
 							<select class="form-control input-sm" name="menu.system_id">
+								<option value="">--请选择--</option>
 								<#list list as system >
 									<option value="${system.id}">${system.name}</option>
 								</#list>
@@ -129,8 +148,7 @@
 						<div class="input-group col-md-4 col-sm-10">
 							<div class="input-group">
 								<input type="hidden" name="menu.parent_id" id="parent_id" value="${(menu.parentId)!}">
-			                 	<input class="form-control input-sm" type="text" id="parent_name" name="parentName" value="${(menu.parent_name)!}" placeholder="2-20个任意字母数字">
-		                 		<!-- <a href="javascript:void(0);" onclick="grant();" class="btn btn-primary btn-sm">选择</a> -->
+			                 	<input class="form-control input-sm" type="text" id="parent_name" name="parentName" value="${(menu.parent_name)!}" placeholder="父菜单" readonly>
 		                 		<div class="input-group-addon" id="_menu_tree">
 		                 			<i class="fa fa-search"></i> 选择
 								</div>
@@ -144,24 +162,24 @@
 		               	</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">
-						<label class="control-label col-sm-2">菜单图标:</label>
-						<div class="input-group col-md-4 col-sm-10">
-		                 	<input class="form-control input-sm" type="text" name="menu.icon" value="${(menu.icon)!}" placeholder="菜单图标">
-		               	</div>
-					</div>
-					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">层级:</label>
 						<div class="input-group col-md-4 col-sm-10">
 		                 	<input class="form-control input-sm" type="number" name="menu.level" value="${(menu.level)!1}" placeholder="层级级别">
 		               	</div>
 					</div>
-					<div class="form-group col-sm-12 validata-box">
+					<div class="form-group col-sm-12">
+						<label class="control-label col-sm-2">菜单图标:</label>
+						<div class="input-group col-md-4 col-sm-10">
+		                 	<input class="form-control input-sm" type="text" name="menu.icon" value="${(menu.icon)!}" placeholder="菜单图标 如 fa fa-conf">
+		               	</div>
+					</div>
+					<div class="form-group col-sm-12">
 						<label class="control-label col-sm-2">参数:</label>
 						<div class="input-group col-md-4 col-sm-10">
 		                 	<input class="form-control input-sm" type="text" name="menu.param" value="${(menu.param)!}" placeholder="菜单参数">
 		               	</div>
 					</div>
-					<div class="form-group col-sm-12">
+					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">排序:</label>
 						<div class="input-group col-md-4 col-sm-10">
 		                 	<input class="form-control input-sm" type="number" name="menu.order_list" value="${(menu.orderList)!10}">
