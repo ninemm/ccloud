@@ -62,6 +62,10 @@ public class _MenuController extends JBaseCRUDController<Menu> {
 	public void edit() {
 		List<Systems> list = SystemsQuery.me().findAll();
 		setAttr("list", list);
+		
+		String id = getPara("id");
+		Menu menu = MenuQuery.me().findById(id);
+		setAttr("menu", menu);
 	}
 	
 	@Override
@@ -79,14 +83,6 @@ public class _MenuController extends JBaseCRUDController<Menu> {
 	public void menu_tree() {
 		List<Map<String, Object>> list = MenuQuery.me().findMenuListAsTree(1);
 		setAttr("treeData", JSON.toJSON(list));
-	}
-	
-	public void findParentMenu() {
-		
-	}
-	
-	public void findChildMenu() {
-		
 	}
 	
 }

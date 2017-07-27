@@ -107,6 +107,7 @@ public class MenuQuery extends JBaseQuery {
 	}
 	
 	public List<Map<String, Object>> findMenuListAsTree(Integer enable) {
+		
 		List<Menu> list = findMenuList(null, "order_list asc");
 		ModelSorter.tree(list);
 		List<Map<String, Object>> resTreeList = new ArrayList<>();
@@ -116,6 +117,7 @@ public class MenuQuery extends JBaseQuery {
 		map.put("nodes", doBuild(list)); 
 		resTreeList.add(map);
 		return resTreeList;
+		
 	}
 	
 	private List<Map<String, Object>> doBuild(List<Menu> list) {
