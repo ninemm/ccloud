@@ -80,6 +80,19 @@ public class _MenuController extends JBaseCRUDController<Menu> {
 			renderAjaxResultForError("修改失败!");
 	}
 	
+	@Before(UCodeInterceptor.class)
+	public void batchDelete() {
+		
+		String[] ids = getParaValues("dataItem");
+		int count = MenuQuery.me().batchDelete(ids);
+		if (count > 0) {
+			renderAjaxResultForSuccess("删除成功");
+		} else {
+			renderAjaxResultForError("删除失败!");
+		}
+		
+	}
+	
 	public void menu_tree() {
 		List<Map<String, Object>> list = MenuQuery.me().findMenuListAsTree(1);
 		setAttr("treeData", JSON.toJSON(list));

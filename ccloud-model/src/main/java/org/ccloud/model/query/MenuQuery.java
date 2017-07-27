@@ -45,7 +45,12 @@ public class MenuQuery extends JBaseQuery {
 		return DAO.getCache(id, new IDataLoader() {
 			@Override
 			public Object load() {
-				return DAO.findById(id);
+				
+				StringBuilder sqlBuilder = new StringBuilder("select m.*, p.name as parent_name ");
+				sqlBuilder.append("from `menu` m ");
+				sqlBuilder.append("join `menu` p on p.id = m.parent_id ");
+				sqlBuilder.append("where m.id = ?");
+				return DAO.findFirst(sqlBuilder.toString(), id);
 			}
 		});
 	}
