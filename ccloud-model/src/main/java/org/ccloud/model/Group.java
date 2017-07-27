@@ -23,5 +23,7 @@ import org.ccloud.model.base.BaseGroup;
  */
 @Table(tableName="group",primaryKey="id")
 public class Group extends BaseGroup<Group> {
+
+	private static final long serialVersionUID = 1L;
 	
 }

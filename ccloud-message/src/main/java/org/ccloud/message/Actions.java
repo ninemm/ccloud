@@ -24,6 +24,8 @@ public class Actions {
 
 	public static final String CONTENT_COUNT_UPDATE = "content:count_update";
 	
+	public static final String MENU_ADD = "menu:add";
+	
 	public static final String CCLOUD_STARTED = "ccloud:started";
 	
 
