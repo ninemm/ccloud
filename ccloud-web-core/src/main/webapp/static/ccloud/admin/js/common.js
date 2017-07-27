@@ -16,8 +16,6 @@ function checkAll(checkbox) {
 
 jQuery.mm = { 
 	
-		
-		
 	alert : function(){
 		window.alert("test");
 	},
@@ -96,6 +94,34 @@ jQuery.mm = {
 			}
 		);
 		
+	},
+	
+	initTreeView: function(treeId, data, nodeSelectedFunc, nodeUnselectedFunc) {
+		treeId = treeId || '#tree';
+		
+		$(treeId).treeview({
+			data : data,
+			levels : 3,
+			showBorder : false,
+			showCheckbox : true,
+			multiSelect : false,
+			onNodeSelected: nodeSelectedFunc || function(event, node) {
+				$(treeId).treeview('checkNode', [node, { silent: true }]);
+				$(treeId).treeview('selectNode', [node, { silent: true }]);
+			},
+			onNodeUnselected: nodeUnselectedFunc || function(event, node) {
+				$(treeId).treeview('uncheckNode', [node, { silent: true }]);
+				$(treeId).treeview('unselectNode', [node, { silent: true }]);
+			},
+			onNodeChecked: nodeSelectedFunc || function(event, node) {
+				$(treeId).treeview('checkNode', [node, { silent: true }]);
+				$(treeId).treeview('selectNode', [node, { silent: true }]);
+			},
+			onNodeUnchecked: nodeUnselectedFunc || function(event, node) {
+				$(treeId).treeview('uncheckNode', [node, { silent: true }]);
+				$(treeId).treeview('unselectNode', [node, { silent: true }]);
+			}
+		});
 	},
 	
 	initValidator: function(formId, fields) {
