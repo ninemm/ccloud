@@ -25,6 +25,7 @@ import org.ccloud.model.Menu;
 import org.ccloud.model.ModelSorter;
 
 import com.google.common.collect.Lists;
+import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
@@ -49,12 +50,14 @@ public class MenuQuery extends JBaseQuery {
 		});
 	}
 	
-	public List<Menu> findMenuList(String orderby) {
+	public List<Menu> findMenuList(String parentId, String orderby) {
 		final StringBuilder sqlBuilder = new StringBuilder("SELECT * FROM menu m ");
 		sqlBuilder.append("where m.id <> '0' ");
-		sqlBuilder.append("order by " + orderby);
 		
 		final List<Object> params = new LinkedList<Object>();
+		appendIfNotEmpty(sqlBuilder, "parent_id", parentId, params, false);
+		buildOrderBy(orderby, sqlBuilder);
+		
 		String key = buildKey(null, null, null, null, orderby);
 		
 		List<Menu> data = DAO.getFromListCache(key, new IDataLoader() {
@@ -82,13 +85,20 @@ public class MenuQuery extends JBaseQuery {
 		return keyBuffer.toString().replace(" ", "");
 	}
 
-	public Page<Menu> paginate(int pageNumber, int pageSize, String orderby) {
+	public Page<Menu> paginate(int pageNumber, int pageSize, String parentId, String keyword, String orderby) {
+		
 		String select = "select m.*, s.name as sys_name, me.name as parent_name ";
+		
 		StringBuilder fromBuilder = new StringBuilder("from `menu` m ");
 		fromBuilder.append("join `systems` s on s.id = m.system_id ");
 		fromBuilder.append("join `menu` me on me.id = m.parent_id ");
 
+		boolean needWhere = true;
 		LinkedList<Object> params = new LinkedList<Object>();
+		needWhere = appendIfNotEmpty(fromBuilder, "m.parent_id", parentId, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "m.name", keyword, params, needWhere);
+		
+		buildOrderBy(orderby, fromBuilder);
 
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
@@ -97,7 +107,7 @@ public class MenuQuery extends JBaseQuery {
 	}
 	
 	public List<Map<String, Object>> findMenuListAsTree(Integer enable) {
-		List<Menu> list = findMenuList("parent_id asc");
+		List<Menu> list = findMenuList(null, "order_list asc");
 		ModelSorter.tree(list);
 		List<Map<String, Object>> resTreeList = new ArrayList<>();
 		Map<String, Object> map = new HashMap<>();
@@ -145,5 +155,24 @@ public class MenuQuery extends JBaseQuery {
 		return 0;
 	}
 
-	
+	protected void buildOrderBy(String orderBy, StringBuilder fromBuilder) {
+		
+		fromBuilder.append(" order by ");
+		
+		if (StrKit.isBlank(orderBy)) {
+			fromBuilder.append("m.order_list asc ");
+			return ;
+		}
+		
+		String orderbyInfo[] = orderBy.trim().split("\\s+");
+		orderBy = orderbyInfo[0];
+		
+		fromBuilder.append("m.order_list ");
+		
+		if (orderbyInfo.length == 1) {
+			fromBuilder.append("desc");
+		} else {
+			fromBuilder.append(orderbyInfo[1]);
+		}
+	}
 }

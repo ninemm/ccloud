@@ -139,6 +139,58 @@ jQuery.mm = {
 		});
 	},
 	
+	initParentTable: function(tableId, url, queryParams, fields, subUrl) {
+		tableId = tableId || "_table";
+		
+		$(tableId).bootstrapTable({
+			url: url,
+			method: 'get',
+			editable: false,//开启编辑模式
+			clickToSelect: true,
+			uniqueId: 'id',
+			striped: true,
+			detailView: true,//父子表
+			classes: 'table-no-bordered',
+			cache: false,					// 是否使用缓存
+			pagination: true,				// 是否显示分页
+			queryParams: queryParams,		// 传递参数
+			sidePagination: 'server', 		//分页方式：client客户端分页，server服务端分页（*）
+			paginationLoop: false,
+			paginationPreText: '上一页',
+			paginationNextText: '下一页',
+			pageNumber: 1,
+			pageSize: 10,
+			smartDisplay: false,
+			undefinedText: '',
+			columns: fields,
+			onExpandRow: function (index, row, $detail) {
+                jQuery.mm.initSubTable(index, row, $detail, fields, url);
+            }
+		});
+	},
+	
+	initSubTable: function(index, row, $detail, fields, url) {
+		var parentId = row.id;
+		var sub_table = $detail.html('<table></table>').find('table');
+		$(sub_table).bootstrapTable({
+			url: url,
+			method: 'get',
+			clickToSelect: true,
+			uniqueId: 'id',
+			striped: true,
+			detailView: true,//父子表
+			//classes: 'table-no-bordered',
+			cache: false,					// 是否使用缓存
+			queryParams: {parentId: parentId},		// 传递参数
+			//sidePagination: 'server', 		//分页方式：client客户端分页，server服务端分页（*）
+			undefinedText: '',
+			columns: fields,
+			onExpandRow: function (index, row, $detail) {
+                jQuery.mm.initSubTable(index, row, $detail, fields);
+            }
+		});
+	},
+	
 	initEditTable : function(tableId, url, queryParams, fields, editableSaveFunc, clickCellFunc) {
 		
 		tableId = tableId || "_table";
