@@ -101,25 +101,26 @@ jQuery.mm = {
 		
 		$(treeId).treeview({
 			data : data,
-			levels : 3,
+			levels : 2,
 			showBorder : false,
 			showCheckbox : true,
 			multiSelect : false,
-			onNodeSelected: nodeSelectedFunc || function(event, node) {
-				$(treeId).treeview('checkNode', [node, { silent: true }]);
-				$(treeId).treeview('selectNode', [node, { silent: true }]);
+			//showTags: true,
+			onNodeSelected: nodeSelectedFunc || function(event, data) {
+				$(treeId).treeview('checkNode', [data.nodeId, { silent: true }]);
+				$(treeId).treeview('selectNode', [data.nodeId, { silent: true }]);
 			},
-			onNodeUnselected: nodeUnselectedFunc || function(event, node) {
-				$(treeId).treeview('uncheckNode', [node, { silent: true }]);
-				$(treeId).treeview('unselectNode', [node, { silent: true }]);
+			onNodeUnselected: nodeUnselectedFunc || function(event, data) {
+				$(treeId).treeview('uncheckNode', [data.nodeId, { silent: true }]);
+				$(treeId).treeview('unselectNode', [data.nodeId, { silent: true }]);
 			},
-			onNodeChecked: nodeSelectedFunc || function(event, node) {
-				$(treeId).treeview('checkNode', [node, { silent: true }]);
-				$(treeId).treeview('selectNode', [node, { silent: true }]);
+			onNodeChecked: nodeSelectedFunc || function(event, data) {
+				$(treeId).treeview('checkNode', [data.nodeId, { silent: true }]);
+				$(treeId).treeview('selectNode', [data.nodeId, { silent: true }]);
 			},
-			onNodeUnchecked: nodeUnselectedFunc || function(event, node) {
-				$(treeId).treeview('uncheckNode', [node, { silent: true }]);
-				$(treeId).treeview('unselectNode', [node, { silent: true }]);
+			onNodeUnchecked: nodeUnselectedFunc || function(event, data) {
+				$(treeId).treeview('uncheckNode', [data.nodeId, { silent: true }]);
+				$(treeId).treeview('unselectNode', [data.nodeId, { silent: true }]);
 			}
 		});
 	},
