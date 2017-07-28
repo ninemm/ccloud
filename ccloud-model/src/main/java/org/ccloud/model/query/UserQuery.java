@@ -224,4 +224,8 @@ public class UserQuery extends JBaseQuery {
 		}
 	}
 
+	public List<User> findByDeptId(String deptId) {
+		return DAO.doFind("department_id = ?", deptId);
+	}
+
 }

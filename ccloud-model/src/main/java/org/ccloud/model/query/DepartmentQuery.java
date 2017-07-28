@@ -46,9 +46,10 @@ public class DepartmentQuery extends JBaseQuery {
 			@Override
 			public Object load() {
 				
-				StringBuilder sqlBuilder = new StringBuilder("select d.*,a.dept_name as parent_name ");
+				StringBuilder sqlBuilder = new StringBuilder("select d.*,a.dept_name as parent_name,b.realname as user_realname ");
 				sqlBuilder.append("from `department` d  ");
 				sqlBuilder.append("left join (select id,dept_name from department) a on d.parent_id = a.id ");
+				sqlBuilder.append("left join `user` b on b.id = d.principal_user_id ");
 				sqlBuilder.append("where d.id = ?");
 				return DAO.findFirst(sqlBuilder.toString(), id);
 			}
@@ -89,9 +90,10 @@ public class DepartmentQuery extends JBaseQuery {
 	}	
 
 	public Page<Department> paginate(int pageNumber, int pageSize, String keyword, String orderby) {
-		String select = "select d.*,a.dept_name as parent_name ";
+		String select = "select d.*,a.dept_name as parent_name,b.realname as user_realname ";
 		StringBuilder fromBuilder = new StringBuilder("from `department` d ");
 		fromBuilder.append("left join (select id,dept_name from department) a on d.parent_id = a.id ");
+		fromBuilder.append("left join `user` b on b.id = d.principal_user_id ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
 		appendIfNotEmptyWithLike(fromBuilder, "dept_name", keyword, params, true);
@@ -106,10 +108,11 @@ public class DepartmentQuery extends JBaseQuery {
 	
 	public Page<Department> paginate(int pageNumber, int pageSize, String parentId, String keyword, String orderby) {
 		
-		String select = "select d.*,a.dept_name as parent_name ";
+		String select = "select d.*,a.dept_name as parent_name,b.realname as user_realname ";
 		
 		StringBuilder fromBuilder = new StringBuilder("from `department` d ");
 		fromBuilder.append("left join (select id,dept_name from department) a on d.parent_id = a.id ");
+		fromBuilder.append("left join `user` b on b.id = d.principal_user_id ");
 
 		boolean needWhere = true;
 		LinkedList<Object> params = new LinkedList<Object>();

@@ -26,7 +26,9 @@ import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.template.TemplateManager;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Department;
+import org.ccloud.model.User;
 import org.ccloud.model.query.DepartmentQuery;
+import org.ccloud.model.query.UserQuery;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
@@ -62,6 +64,8 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 		String id = getPara("id");
 		if (id != null) {
 			setAttr("dept", DepartmentQuery.me().findById(id));
+			List<User> list = UserQuery.me().findByDeptId(id);
+			setAttr("list", list);
 		}
 
 		String templateHtml = "admin_user_edit.html";
