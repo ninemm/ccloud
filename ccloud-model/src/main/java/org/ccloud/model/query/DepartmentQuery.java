@@ -15,9 +15,17 @@
  */
 package org.ccloud.model.query;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
-import org.ccloud.model.Department;
+import java.util.List;
+import java.util.Map;
 
+import org.ccloud.model.Department;
+import org.ccloud.model.ModelSorter;
+
+import com.google.common.collect.Lists;
+import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
@@ -37,16 +45,78 @@ public class DepartmentQuery extends JBaseQuery {
 		return DAO.getCache(id, new IDataLoader() {
 			@Override
 			public Object load() {
-				return DAO.findById(id);
+				
+				StringBuilder sqlBuilder = new StringBuilder("select d.*,a.dept_name as parent_name ");
+				sqlBuilder.append("from `department` d  ");
+				sqlBuilder.append("left join (select id,dept_name from department) a on d.parent_id = a.id ");
+				sqlBuilder.append("where d.id = ?");
+				return DAO.findFirst(sqlBuilder.toString(), id);
 			}
 		});
 	}
+	
+	public List<Department> findDeptList(String orderby) {
+		final StringBuilder sqlBuilder = new StringBuilder("SELECT * FROM department d ");
+		sqlBuilder.append("where d.id <> '0' ");
+		sqlBuilder.append("order by " + orderby);
+		
+		final List<Object> params = new LinkedList<Object>();
+		String key = buildKey(null, null, null, null, orderby);
+		
+		List<Department> data = DAO.getFromListCache(key, new IDataLoader() {
+			@Override
+			public Object load() {
+				if (params.isEmpty()) {
+					return DAO.find(sqlBuilder.toString());
+				}
+				return DAO.find(sqlBuilder.toString(), params.toArray());
+			}
+		});
+		
+		if (data == null)
+			return null;
+		return new ArrayList<Department>(data);
+	}
+	
+	private String buildKey(String module, Object... params) {
+		StringBuffer keyBuffer = new StringBuffer(module == null ? "" : "module:" + module);
+		if (params != null && params.length > 0) {
+			for (int i = 0; i < params.length; i++) {
+				keyBuffer.append("-p").append(i).append(":").append(params[i]);
+			}
+		}
+		return keyBuffer.toString().replace(" ", "");
+	}	
 
-	public Page<Department> paginate(int pageNumber, int pageSize, String orderby) {
-		String select = "select * ";
-		StringBuilder fromBuilder = new StringBuilder("from `department` ");
+	public Page<Department> paginate(int pageNumber, int pageSize, String keyword, String orderby) {
+		String select = "select d.*,a.dept_name as parent_name ";
+		StringBuilder fromBuilder = new StringBuilder("from `department` d ");
+		fromBuilder.append("left join (select id,dept_name from department) a on d.parent_id = a.id ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
+		appendIfNotEmptyWithLike(fromBuilder, "dept_name", keyword, params, true);
+		
+		fromBuilder.append("order by " + orderby);
+
+		if (params.isEmpty())
+			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+
+		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+	
+	public Page<Department> paginate(int pageNumber, int pageSize, String parentId, String keyword, String orderby) {
+		
+		String select = "select d.*,a.dept_name as parent_name ";
+		
+		StringBuilder fromBuilder = new StringBuilder("from `department` d ");
+		fromBuilder.append("left join (select id,dept_name from department) a on d.parent_id = a.id ");
+
+		boolean needWhere = true;
+		LinkedList<Object> params = new LinkedList<Object>();
+		needWhere = appendIfNotEmpty(fromBuilder, "d.parent_id", parentId, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "d.dept_name", keyword, params, needWhere);
+		
+		buildOrderBy(orderby, fromBuilder);
 
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
@@ -67,5 +137,52 @@ public class DepartmentQuery extends JBaseQuery {
 		return 0;
 	}
 
+	public List<Map<String, Object>> findDeptListAsTree(int i) {
+		List<Department> list = findDeptList("parent_id asc");
+		List<Map<String, Object>> resTreeList = new ArrayList<>();
+		ModelSorter.tree(list);
+		Map<String, Object> map = new HashMap<>();
+		map.put("text", "总部");// 父子表第一级名称,以后可以存储在字典表或字典类
+		map.put("tags", Lists.newArrayList(0));
+		map.put("nodes", doBuild(list)); 
+		resTreeList.add(map);
+		return resTreeList;
+	}
+	
+	private List<Map<String, Object>> doBuild(List<Department> list) {
+		List<Map<String, Object>> resTreeList = new ArrayList<>();
+		for(Department dept : list) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("text", dept.getDeptName());
+			map.put("tags", Lists.newArrayList(dept.getId()));
+				resTreeList.add(map);
+			
+			if(dept.getChildList() != null && dept.getChildList().size() > 0) {
+				map.put("nodes", doBuild(dept.getChildList()));
+			}
+		}
+		return resTreeList;
+	}
+
+	protected void buildOrderBy(String orderBy, StringBuilder fromBuilder) {
+		
+		fromBuilder.append(" order by ");
+		
+		if (StrKit.isBlank(orderBy)) {
+			fromBuilder.append("d.order_list asc ");
+			return ;
+		}
+		
+		String orderbyInfo[] = orderBy.trim().split("\\s+");
+		orderBy = orderbyInfo[0];
+		
+		fromBuilder.append("d.order_list ");
+		
+		if (orderbyInfo.length == 1) {
+			fromBuilder.append("desc");
+		} else {
+			fromBuilder.append(orderbyInfo[1]);
+		}
+	}
 	
 }

@@ -28,5 +28,7 @@ public class Actions {
 	
 	public static final String CCLOUD_STARTED = "ccloud:started";
 	
+	public static final String DEPT_ADD = "department:add";
+	
 
 }
