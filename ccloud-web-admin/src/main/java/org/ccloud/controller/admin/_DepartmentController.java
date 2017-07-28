@@ -15,7 +15,6 @@
  */
 package org.ccloud.controller.admin;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -23,7 +22,6 @@ import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
-import org.ccloud.template.TemplateManager;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Department;
 import org.ccloud.model.User;
@@ -68,37 +66,12 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 			setAttr("list", list);
 		}
 
-		String templateHtml = "admin_user_edit.html";
-		if (TemplateManager.me().existsFile(templateHtml)) {
-			setAttr("include", TemplateManager.me().currentTemplatePath() + "/" + templateHtml);
-			return;
-		}
-
 	}
 
 	@Override
 	public void save() {
 		
 		final Department dept = getModel(Department.class);
-
-		if (StringUtils.isBlank(dept.getDeptName())) {
-			renderAjaxResultForError("部门名称不能为空");
-			return;
-		}
-		if (dept.getDeptLevel() == null) {
-			renderAjaxResultForError("部门等级不能为空");
-			return;
-		}
-		if (dept.getPrincipalUserId() == null) {
-			renderAjaxResultForError("部门负责人不能为空");
-			return;
-		}
-		
-		if (dept.getId() == null) {
-			dept.setCreateDate(new Date());
-		}else {
-			dept.setModifyDate(new Date());
-		}
 		
 		dept.setIsParent(0);
 		if (dept.saveOrUpdate()) {
@@ -119,16 +92,6 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 			}
 		}
 		renderAjaxResultForError();
-	}
-	
-	public void batchDelete() {
-		String [] ids = getParaValues("dataItem");
-		int count = DepartmentQuery.me().batchDelete(ids);
-		if (count > 0) {
-			renderAjaxResultForSuccess("success");
-		} else {
-			renderAjaxResultForError("batch delete error!");
-		}
 	}
 	
 	public void department_tree() {

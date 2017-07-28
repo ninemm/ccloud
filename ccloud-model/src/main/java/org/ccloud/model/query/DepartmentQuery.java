@@ -187,5 +187,11 @@ public class DepartmentQuery extends JBaseQuery {
 			fromBuilder.append(orderbyInfo[1]);
 		}
 	}
+
+	public Integer childNumById(String parentId) {
+		Integer num = DAO.doFindCount("parent_id = ?", parentId).intValue();
+		return num;
+		
+	}
 	
 }

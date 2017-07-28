@@ -34,5 +34,9 @@ public class Actions {
 	
 	public static final String DEPT_ADD = "department:add";
 	
+	public static final String DEPT_UPDATE = "department:update";
+	
+	public static final String DEPT_DELETE = "department:delete";
+	
 
 }

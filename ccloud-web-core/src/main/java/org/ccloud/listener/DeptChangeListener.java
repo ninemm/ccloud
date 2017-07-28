@@ -23,8 +23,8 @@ import org.ccloud.model.Department;
 import org.ccloud.model.core.JModel;
 import org.ccloud.model.query.DepartmentQuery;
 
-@Listener(action = Actions.DEPT_ADD)
-public class DeptAddListener implements MessageListener {
+@Listener(action = {Actions.DEPT_ADD, Actions.DEPT_UPDATE, Actions.DEPT_DELETE})
+public class DeptChangeListener implements MessageListener {
 
 	@Override
 	public void onMessage(Message message) {
@@ -33,12 +33,19 @@ public class DeptAddListener implements MessageListener {
 		if (temp != null && temp instanceof JModel) {
 			Department dept = (Department) temp;
 			Department parentDept = DepartmentQuery.me().findById(dept.getParentId());
-			if (parentDept.getIsParent() == null || parentDept.getIsParent() == 0) {
-				parentDept.setIsParent(1);
-				parentDept.update();
+			Integer childNum = DepartmentQuery.me().childNumById(dept.getParentId());
+			if (childNum > 0) {
+				if (parentDept.getIsParent() == 0) {
+					parentDept.setIsParent(1);
+					parentDept.update();
+				}
+			} else {
+				if (parentDept.getIsParent() > 0) {
+					parentDept.setIsParent(0);
+					parentDept.update();
+				}
 			}
 		}
-		
 	}
 
 }

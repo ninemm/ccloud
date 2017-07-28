@@ -44,12 +44,16 @@ public class Department extends BaseDepartment<Department> implements ISortModel
 	@Override
 	public boolean save() {
 		
+		clearList();
+		
 		CacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
 		return super.save();
 	}
 
 	@Override
 	public boolean saveOrUpdate() {
+		
+		clearList();
 		
 		removeCache(getId());
 		CacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
@@ -60,6 +64,8 @@ public class Department extends BaseDepartment<Department> implements ISortModel
 	@Override
 	public boolean update() {
 		
+		clearList();
+		
 		removeCache(getId());
 		CacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
 		
@@ -68,6 +74,8 @@ public class Department extends BaseDepartment<Department> implements ISortModel
 
 	@Override
 	public boolean delete() {
+		
+		clearList();
 		
 		removeCache(getId());
 		CacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
@@ -78,6 +86,8 @@ public class Department extends BaseDepartment<Department> implements ISortModel
 	@Override
 	public boolean deleteById(Object idValue) {
 		
+		clearList();
+		
 		removeCache(idValue);
 		CacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
 		
@@ -85,7 +95,7 @@ public class Department extends BaseDepartment<Department> implements ISortModel
 	}
 
 	public <T> T getFromListCache(Object key, IDataLoader dataloader) {
-		Set<String> inCacheKeys = CacheKit.get(CACHE_NAME, "cachekeys");
+		Set<String> inCacheKeys = CacheKit.get(CACHE_NAME, "cacheDeptkeys");
 
 		Set<String> cacheKeyList = new HashSet<String>();
 		if (inCacheKeys != null) {
@@ -93,7 +103,7 @@ public class Department extends BaseDepartment<Department> implements ISortModel
 		}
 
 		cacheKeyList.add(key.toString());
-		CacheKit.put(CACHE_NAME, "cachekeys", cacheKeyList);
+		CacheKit.put(CACHE_NAME, "cacheDeptkeys", cacheKeyList);
 
 		return CacheKit.get("dept_list", key, dataloader);
 	}
@@ -134,6 +144,18 @@ public class Department extends BaseDepartment<Department> implements ISortModel
 		}
 		return layerString;
 	}
+	
+    public void clearList() {
+        Set<String> list = CacheKit.get(CACHE_NAME, "cacheDeptkeys");
+        if (list != null && list.size() > 0) {
+            for (String key : list) {
+
+                // 过滤
+
+                CacheKit.remove("dept_list", key);
+            }
+        }
+    }
 	
 	
 }
