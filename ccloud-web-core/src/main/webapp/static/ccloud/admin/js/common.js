@@ -187,7 +187,7 @@ jQuery.mm = {
 			undefinedText: '',
 			columns: fields,
 			onExpandRow: function (index, row, $detail) {
-                jQuery.mm.initSubTable(index, row, $detail, fields);
+                jQuery.mm.initSubTable(index, row, $detail, fields, url);
             }
 		});
 	},
