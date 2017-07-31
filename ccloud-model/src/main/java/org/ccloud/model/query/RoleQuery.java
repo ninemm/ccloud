@@ -75,10 +75,12 @@ public class RoleQuery extends JBaseQuery {
 
 	public List<Role> queryRoleGroupRelation(String roleId, String groupId) {
 		StringBuilder sqlBuilder = new StringBuilder("select * ");
+
 		sqlBuilder.append("from `role` r ");
 		sqlBuilder.append("join `group_role_rel` gr on gr.role_id = r.id ");
 		sqlBuilder.append("join `group` g on g.id = gr.group_id ");
 		sqlBuilder.append("where r.id = ? and g.id = ? ");
+
 		return DAO.find(sqlBuilder.toString(), roleId, groupId);
 	}
 

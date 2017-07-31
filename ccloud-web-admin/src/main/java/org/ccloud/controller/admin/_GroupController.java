@@ -52,7 +52,6 @@ public class _GroupController extends JBaseCRUDController<Group> {
         String keyword = getPara("k");
         if (StrKit.notBlank(keyword)) setAttr("k", keyword);
 
-
         Page<Group> page = GroupQuery.me().paginate(getPageNumber(), getPageSize(), keyword, "order_list");
         if (page != null) {
             setAttr("page", page);
@@ -61,22 +60,29 @@ public class _GroupController extends JBaseCRUDController<Group> {
     }
 
     public  void getRole() {
+
         String id = getPara("groupid");
         List<Role> roles = RoleQuery.me().findAll();
         List<Map<String, Object>> list = new ArrayList<>();
+
         for (Role role : roles) {
             Map<String, Object> map = new HashMap<>();
+
             map.put("id", role.getId());
             map.put("name", role.getRoleName());
+
             if (RoleQuery.me().queryRoleGroupRelation(role.getId(), id).size() == 0) map.put("isvalid", 0);
             else map.put("isvalid", 1);
+
             list.add(map);
         }
+
         renderJson(list);
+
     }
 
-    public void saveGroupAndGroupRoleRel()  {
-        boolean bl = Db.tx(new IAtom() {
+    public void saveGroupAndGroupRoleRel() {
+        boolean isSave = Db.tx(new IAtom() {
             @Override
             public boolean run() throws SQLException {
                 Group group = getModel(Group.class);
@@ -84,52 +90,53 @@ public class _GroupController extends JBaseCRUDController<Group> {
                 String roleList = getPara("roleList");
                 String[] roleId = roleList.split(",");
 
-//        更新
-                if (group.saveOrUpdate()) {
-                    String groupId = group.getId();
-
-//            先删除GroupRoleRel表中的groupId的所有数据
-                    List<GroupRoleRel> groupRoleRelList = GroupRoleRelQuery.me().findIdsByGroupId(groupId);
-                    String[] ids = new String[groupRoleRelList.size()];
-                    for (int i = 0; i < groupRoleRelList.size(); i++)
-                        ids[i] = groupRoleRelList.get(i).getId();
-
-                    if (GroupRoleRelQuery.me().batchDelete(ids) != ids.length) return false ;
-//            添加新的关系
-                    for (int i = 0; i < roleId.length; i++) {
-                        GroupRoleRel groupRoleRel = getModel(GroupRoleRel.class);
-                        groupRoleRel.setGroupId(groupId);
-                        groupRoleRel.setRoleId(roleId[i]);
-                        if (!groupRoleRel.saveOrUpdate()) return false;
-                    }
-                } else {
+                if (!group.saveOrUpdate())
                     return false;
+
+                String groupId = group.getId();
+
+                GroupRoleRelQuery.me().deleteByGroupId(groupId);
+
+                List<GroupRoleRel> groupRoleRelList = new ArrayList<>();
+
+                for (int i = 0; i < roleId.length; i++) {
+                    GroupRoleRel groupRoleRel = getModel(GroupRoleRel.class);
+
+                    groupRoleRel.setGroupId(groupId);
+                    groupRoleRel.setRoleId(roleId[i]);
+                    groupRoleRelList.add(groupRoleRel);
+                    groupRoleRel.setId(StrKit.getRandomUUID());
+
                 }
+
+                Db.batchSave(groupRoleRelList, groupRoleRelList.size());
                 return true;
             }
         });
-        if (bl) renderAjaxResultForSuccess();
+
+        if (isSave) renderAjaxResultForSuccess();
         else renderAjaxResultForError();
     }
 
     @Override
     @Before(UCodeInterceptor.class)
     public void delete() {
-        boolean bl = Db.tx(new IAtom() {
+        boolean isDelete = Db.tx(new IAtom() {
             @Override
             public boolean run() throws SQLException {
+
                 String id = getPara("id");
-                try {
-                    GroupRoleRelQuery.me().deleteByGroupId(id);
-                    _GroupController.super.delete();
-                    return true;
-                }catch (Exception e) {
-                    return false;
-                }
+                GroupRoleRelQuery.me().deleteByGroupId(id);
+
+                if (!GroupQuery.me().delete(id)) return false;
+
+                return true;
             }
         });
-        if(bl) renderAjaxResultForSuccess();
+
+        if(isDelete) renderAjaxResultForSuccess();
         else renderAjaxResultForError();
+
     }
 
     @Before(UCodeInterceptor.class)

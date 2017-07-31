@@ -74,7 +74,11 @@ public class GroupQuery extends JBaseQuery {
 		return 0;
 	}
 
-	public List<Group> findAll() {
-		return DAO.doFind();
+    public List<Group> findAll() {
+        return DAO.doFind();
+    }
+
+	public boolean delete(String id) {
+		return DAO.deleteById(id);
 	}
 }

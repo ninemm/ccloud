@@ -16,7 +16,6 @@
 package org.ccloud.model.query;
 
 import java.util.LinkedList;
-import java.util.List;
 
 import org.ccloud.model.GroupRoleRel;
 
@@ -42,13 +41,6 @@ public class GroupRoleRelQuery extends JBaseQuery {
                 return DAO.findById(id);
             }
         });
-    }
-
-    public List<GroupRoleRel> findIdsByGroupId(final  String groupId) {
-        StringBuilder sql = new StringBuilder("select id ");
-        sql.append("from `group_role_rel` ");
-        sql.append("where group_id = ? ");
-        return DAO.find(sql.toString(), groupId);
     }
 
     public Page<GroupRoleRel> paginate(int pageNumber, int pageSize, String orderby) {
