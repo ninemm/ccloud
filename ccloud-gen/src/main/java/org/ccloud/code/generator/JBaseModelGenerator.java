@@ -158,10 +158,10 @@ public class JBaseModelGenerator extends BaseModelGenerator {
 				;
 		
 		this.importTemplate = "import org.ccloud.message.MessageKit;%n"
-				+ "import org.ccloud.model.Metadata;%n"
+				//+ "import org.ccloud.model.Metadata;%n"
 				+ "import org.ccloud.model.core.JModel;%n"
-				+ "import org.ccloud.model.query.MetaDataQuery;%n"
-				+ "import java.math.BigInteger;%n%n"
+				//+ "import org.ccloud.model.query.MetaDataQuery;%n"
+				//+ "import java.math.BigInteger;%n%n"
 				+ "import com.jfinal.plugin.activerecord.IBean;%n"
 				+ "import com.jfinal.plugin.ehcache.CacheKit;%n"
 				+ "import com.jfinal.plugin.ehcache.IDataLoader;%n%n";
