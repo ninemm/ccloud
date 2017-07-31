@@ -21,16 +21,10 @@ import java.util.Map;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
-import org.ccloud.model.Menu;
 import org.ccloud.model.Module;
 import org.ccloud.model.Operation;
-import org.ccloud.model.Role;
-import org.ccloud.model.Systems;
-import org.ccloud.model.query.MenuQuery;
 import org.ccloud.model.query.ModuleQuery;
 import org.ccloud.model.query.OperationQuery;
-import org.ccloud.model.query.RoleQuery;
-import org.ccloud.model.query.SystemsQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
@@ -47,57 +41,45 @@ import com.jfinal.plugin.activerecord.Page;
 @RouterNotAllowConvert
 public class _OperationController extends JBaseCRUDController<Operation> { 
 
-	public void list() {
-			
-			String keyword = getPara("k", "");
-			if (StrKit.notBlank(keyword)) {
-				keyword = StringUtils.urlDecode(keyword);
-				setAttr("k", keyword);
+		public void list() {
+				
+				String keyword = getPara("k", "");
+				if (StrKit.notBlank(keyword)) {
+					keyword = StringUtils.urlDecode(keyword);
+					setAttr("k", keyword);
+				}
+				
+				
+				Page<Operation> page = OperationQuery.me().paginate(getPageNumber(), getPageSize() , keyword, null);
+				Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
+				renderJson(map);
+				
 			}
-			
-			
-			Page<Operation> page = OperationQuery.me().paginate(getPageNumber(), getPageSize() , keyword, null);
-			Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
-			renderJson(map);
-			
-		}
 
 	
 	
-	@Override
-	public void edit() {
-		
-		List<Module> list = ModuleQuery.me().findAll();
-		setAttr("list", list);
-				
-		String id = getPara("id");
-		Operation operation = OperationQuery.me().findById(id);
-		setAttr("operation", operation);
-	}
-	
-	
-	@Override
-	@Before(UCodeInterceptor.class)
-	public void save() {
-		
-		Operation operation = getModel(Operation.class);
-		if (operation.saveOrUpdate())
-			renderAjaxResultForSuccess("新增成功");
-		else
-			renderAjaxResultForError("修改失败!");
-	}
-	
-	
-	@Before(UCodeInterceptor.class)
-	public void batchDelete() {
-		
-		String[] ids = getParaValues("dataItem");
-		int count = RoleQuery.me().batchDelete(ids);
-		if (count > 0) {
-			renderAjaxResultForSuccess("删除成功");
-		} else {
-			renderAjaxResultForError("删除失败!");
+		@Override
+		public void edit() {
+			
+			List<Module> list = ModuleQuery.me().findAll();
+			setAttr("list", list);
+					
+			String id = getPara("id");
+			Operation operation = OperationQuery.me().findById(id);
+			setAttr("operation", operation);
 		}
-		
-	}
+	
+	
+		@Override
+		@Before(UCodeInterceptor.class)
+		public void save() {
+			
+			Operation operation = getModel(Operation.class);
+			if (operation.saveOrUpdate())
+				renderAjaxResultForSuccess("新增成功");
+			else
+				renderAjaxResultForError("修改失败!");
+		}
+	
+	
 }

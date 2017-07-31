@@ -22,7 +22,9 @@ import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
 import org.ccloud.model.Module;
+import org.ccloud.model.Systems;
 import org.ccloud.model.query.ModuleQuery;
+import org.ccloud.model.query.SystemsQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
@@ -42,21 +44,21 @@ public class _ModuleController extends JBaseCRUDController<Module> {
 
 	
 	
-public void list() {
-		
-		String keyword = getPara("k", "");
-		if (StrKit.notBlank(keyword)) {
-			keyword = StringUtils.urlDecode(keyword);
-			setAttr("k", keyword);
-		}
-		
-		String parentId = getPara("parentId", "0");
-		
-		Page<Module> page = ModuleQuery.me().paginate(getPageNumber(), getPageSize(), parentId, keyword, null);
-		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
-		renderJson(map);
-		
-	}
+		public void list() {
+				
+				String keyword = getPara("k", "");
+				if (StrKit.notBlank(keyword)) {
+					keyword = StringUtils.urlDecode(keyword);
+					setAttr("k", keyword);
+				}
+				
+				String parentId = getPara("parentId", "0");
+				
+				Page<Module> page = ModuleQuery.me().paginate(getPageNumber(), getPageSize(), parentId, keyword, null);
+				Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
+				renderJson(map);
+				
+			}
 	
 		@Override
 		@Before(UCodeInterceptor.class)
@@ -69,9 +71,20 @@ public void list() {
 			else
 				renderAjaxResultForError("修改失败!");
 		}
+		
+		
+		@Override
+		public void edit() {
+			List<Systems> list = SystemsQuery.me().findAll();
+			setAttr("list", list);
+			
+			String id = getPara("id");
+			Module module = ModuleQuery.me().findById(id);
+			setAttr("module", module);
+		}
 	
-	public void module_tree() {
-		List<Map<String, Object>> list = ModuleQuery.me().findModuleListAsTree(1);
-		setAttr("treeData", JSON.toJSON(list));
-	}
+		public void module_tree() {
+			List<Map<String, Object>> list = ModuleQuery.me().findModuleListAsTree(1);
+			setAttr("treeData", JSON.toJSON(list));
+		}
 }

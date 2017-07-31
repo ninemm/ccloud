@@ -50,7 +50,12 @@ public class ModuleQuery extends JBaseQuery {
 		return DAO.getCache(id, new IDataLoader() {
 			@Override
 			public Object load() {
-				return DAO.findById(id);
+				
+				StringBuilder sqlBuilder = new StringBuilder("select m.*, p.module_name as parent_name ");
+				sqlBuilder.append("from `module` m ");
+				sqlBuilder.append("join `module` p on p.id = m.parent_id ");
+				sqlBuilder.append("where m.id = ?");
+				return DAO.findFirst(sqlBuilder.toString(), id);
 			}
 		});
 	}
@@ -76,34 +81,22 @@ public class ModuleQuery extends JBaseQuery {
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
-	public int batchDelete(String... ids) {
-		if (ids != null && ids.length > 0) {
-			int deleteCount = 0;
-			for (int i = 0; i < ids.length; i++) {
-				if (DAO.deleteById(ids[i])) {
-					++deleteCount;
-				}
+	
+	
+	
+		public List<Map<String, Object>> findModuleListAsTree(Integer enable) {
+				
+				List<Module> list = findModuleList(null, "order_list asc");
+				ModelSorter.tree(list);
+				List<Map<String, Object>> resTreeList = new ArrayList<>();
+				Map<String, Object> map = new HashMap<>();
+				map.put("text", "功能根节点");
+				map.put("tags", Lists.newArrayList(0));
+				map.put("nodes", doBuild(list)); 
+				resTreeList.add(map);
+				return resTreeList;
+				
 			}
-			return deleteCount;
-		}
-		return 0;
-	}
-
-	
-	
-public List<Map<String, Object>> findModuleListAsTree(Integer enable) {
-		
-		List<Module> list = findModuleList(null, "order_list asc");
-		ModelSorter.tree(list);
-		List<Map<String, Object>> resTreeList = new ArrayList<>();
-		Map<String, Object> map = new HashMap<>();
-		map.put("text", "功能根节点");
-		map.put("tags", Lists.newArrayList(0));
-		map.put("nodes", doBuild(list)); 
-		resTreeList.add(map);
-		return resTreeList;
-		
-	}
 	
 
 
