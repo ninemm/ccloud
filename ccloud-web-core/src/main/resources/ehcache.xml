@@ -252,5 +252,35 @@
 		   memoryStoreEvictionPolicy="LFU"
 		   transactionalMode="off"
 	/>
+	
+	<cache name="operation"
+		   maxEntriesLocalHeap="10000"
+		   eternal="false"
+		   overflowToDisk="true"
+		   timeToIdleSeconds="300"
+		   timeToLiveSeconds="300"
+		   memoryStoreEvictionPolicy="LFU"
+		   transactionalMode="off"
+	/>
+	
+	<cache name="module"
+		   maxEntriesLocalHeap="10000"
+		   eternal="false"
+		   overflowToDisk="true"
+		   timeToIdleSeconds="300"
+		   timeToLiveSeconds="300"
+		   memoryStoreEvictionPolicy="LFU"
+		   transactionalMode="off"
+	/>
+
+	<cache name="module_list"
+		   maxEntriesLocalHeap="10000"
+		   eternal="false"
+		   overflowToDisk="true"
+		   timeToIdleSeconds="300"
+		   timeToLiveSeconds="300"
+		   memoryStoreEvictionPolicy="LFU"
+		   transactionalMode="off"
+	/>
 
 </ehcache>
