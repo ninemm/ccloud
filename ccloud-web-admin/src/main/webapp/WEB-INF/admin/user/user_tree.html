@@ -32,13 +32,14 @@
 			let parentId = nodes[0].tags[0];
 			let parentName = nodes[0].text;
 			
-			parent.$("#parent_id").val(parentId);
-			parent.$("#parent_name").val(parentName);
+			if (${treeType} == 1) {
+				parent.$("#department_id").val(parentId);
+				parent.$("#department_name").val(parentName);
+			} else {
+				parent.$("#station_id").val(parentId);
+				parent.$("#station_name").val(parentName);					
+			}
 			
-			parent.$('#form').data('bootstrapValidator')
-			.updateStatus('parentName', 'NOT_VALIDATED', null)
-			.validateField('parentName');
-						
 			let index = parent.layer.getFrameIndex(window.name); //获取窗口索引
 			parent.layer.close(index);
 			

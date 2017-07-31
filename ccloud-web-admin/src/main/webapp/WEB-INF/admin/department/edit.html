@@ -42,6 +42,11 @@ var validatorFields = {
 	        stringLength: { min: 1, max: 2, message: '部门等级最大长度是2字符，请重新输入' }
         }
 	},
+	'parentName': {
+		validators: {
+			notEmpty: { message: '上级部门不能为空' }
+        }
+	}	
 };
 
 function doSubmit(){

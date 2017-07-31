@@ -18,13 +18,13 @@
 
 <#macro script>
 
-	var $table = $("#_menu_table");
+	var $table = $("#_dept_table");
 	
 	$(function() {
 			
 		var url = '${CPATH}/admin/department/list';
 		
-		jQuery.mm.initParentTable('#_menu_table', url, initParams, initFields(), null);
+		jQuery.mm.initParentTable('#_dept_table', url, initParams, initFields(), null);
 		
 		$("#search-submit").click(function() {
 			$table.bootstrapTable('refresh');
@@ -111,7 +111,7 @@
 		</form>
 	</div>
 	<div class="box">
-		<table class="table table-striped table-hover table-condensed" id="_menu_table" ></table>
+		<table class="table table-striped table-hover table-condensed" id="_dept_table" ></table>
 	</div>
 </section>
 

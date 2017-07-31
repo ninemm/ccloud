@@ -139,6 +139,19 @@ public class DepartmentQuery extends JBaseQuery {
 		}
 		return 0;
 	}
+	
+	public int batchDelete(List<String> ids) {
+		if (ids != null && ids.size() > 0) {
+			int deleteCount = 0;
+			for (int i = 0; i < ids.size(); i++) {
+				if (DAO.deleteById(ids.get(i))) {
+					++deleteCount;
+				}
+			}
+			return deleteCount;
+		}
+		return 0;
+	}	
 
 	public List<Map<String, Object>> findDeptListAsTree(int i) {
 		List<Department> list = findDeptList("parent_id asc");
@@ -192,6 +205,10 @@ public class DepartmentQuery extends JBaseQuery {
 		Integer num = DAO.doFindCount("parent_id = ?", parentId).intValue();
 		return num;
 		
+	}
+
+	public List<Department> findByParentId(String id) {
+		return DAO.doFind("parent_id = ?", id);
 	}
 	
 }

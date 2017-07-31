@@ -15,29 +15,36 @@
  */
 package org.ccloud.listener;
 
-import java.util.Date;
 
 import org.ccloud.message.Actions;
 import org.ccloud.message.Message;
 import org.ccloud.message.MessageListener;
 import org.ccloud.message.annotation.Listener;
+import org.ccloud.model.Department;
 import org.ccloud.model.User;
+import org.ccloud.model.query.DepartmentQuery;
 
 @Listener(action = { Actions.USER_LOGINED, User.ACTION_ADD })
 public class UserActionListener implements MessageListener {
 
 	@Override
 	public void onMessage(Message message) {
-		if (message.getAction().equals(Actions.USER_LOGINED)) {
-			User user = message.getData();
-			user.setLogged(new Date());
-			user.update();
-		}
+//		if (message.getAction().equals(Actions.USER_LOGINED)) {
+//			User user = message.getData();
+//			user.setLogged(new Date());
+//			user.update();
+//		}
 
-		else if (message.getAction().equals(User.ACTION_ADD)) {
+		if (message.getAction().equals(User.ACTION_ADD)) {
 			User user = message.getData();
-			user.setLogged(new Date());
-			user.update();
+			Department dept = DepartmentQuery.me().findById(user.getDepartmentId());
+			String ids = user.getId() + ";";
+			if (dept.getChildIds() != null) {
+				ids = dept.getChildIds() + ids;
+			}
+			dept.setChildIds(ids);
+			dept.update();
+			
 		}
 	}
 

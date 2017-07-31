@@ -15,6 +15,7 @@
  */
 package org.ccloud.controller.admin;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -86,12 +87,21 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 		String id = getPara("id");
 		final Department r = DepartmentQuery.me().findById(id);
 		if (r != null) {
-			if (r.delete()) {
-				renderAjaxResultForSuccess();
-				return;
+            List<String> ids = new ArrayList<>();
+            ids.add(id);
+			if (r.getIsParent() > 0) {
+                List<Department> deptList = DepartmentQuery.me().findByParentId(id);
+                for (Department department : deptList) {
+					ids.add(department.getId());
+				}
 			}
+            int count = DepartmentQuery.me().batchDelete(ids);
+            if (count > 0) {
+                renderAjaxResultForSuccess("删除成功");
+            } else {
+                renderAjaxResultForError("删除失败");
+            }
 		}
-		renderAjaxResultForError();
 	}
 	
 	public void department_tree() {
