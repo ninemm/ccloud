@@ -95,7 +95,7 @@ public class Department extends BaseDepartment<Department> implements ISortModel
 	}
 
 	public <T> T getFromListCache(Object key, IDataLoader dataloader) {
-		Set<String> inCacheKeys = CacheKit.get(CACHE_NAME, "cacheDeptkeys");
+		Set<String> inCacheKeys = CacheKit.get(CACHE_NAME, "cachekeys");
 
 		Set<String> cacheKeyList = new HashSet<String>();
 		if (inCacheKeys != null) {
@@ -103,7 +103,7 @@ public class Department extends BaseDepartment<Department> implements ISortModel
 		}
 
 		cacheKeyList.add(key.toString());
-		CacheKit.put(CACHE_NAME, "cacheDeptkeys", cacheKeyList);
+		CacheKit.put(CACHE_NAME, "cachekeys", cacheKeyList);
 
 		return CacheKit.get("dept_list", key, dataloader);
 	}
@@ -117,16 +117,17 @@ public class Department extends BaseDepartment<Department> implements ISortModel
 	}
 	
 	public void addChild(Department child) {
-		if (null == childList) {
-			childList = new ArrayList<>();
-			if (!childList.contains(child)) {
-				childList.add(child);
-			}
-		}
+        if (null == childList) {
+        	childList = new ArrayList<>();
+        }
+
+        if (!childList.contains(child)) {
+            childList.add(child);
+        }
 	}	
 
 	public List<Department> getChildList() {
-		return childList;
+		return this.childList;
 	}
 
 	public void setChildList(List<Department> childList) {

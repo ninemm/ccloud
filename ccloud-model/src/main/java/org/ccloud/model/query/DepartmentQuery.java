@@ -154,7 +154,7 @@ public class DepartmentQuery extends JBaseQuery {
 	}	
 
 	public List<Map<String, Object>> findDeptListAsTree(int i) {
-		List<Department> list = findDeptList("parent_id asc");
+		List<Department> list = findDeptList("order_list asc");
 		List<Map<String, Object>> resTreeList = new ArrayList<>();
 		ModelSorter.tree(list);
 		Map<String, Object> map = new HashMap<>();

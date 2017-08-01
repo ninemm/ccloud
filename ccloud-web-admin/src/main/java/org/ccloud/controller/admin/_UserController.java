@@ -143,6 +143,8 @@ public class _UserController extends JBaseCRUDController<User> {
                 		map.put("isvalid", 0);
                 	}
                 }
+            } else {
+            	map.put("isvalid", 0);
             }
             list.add(map);
         }

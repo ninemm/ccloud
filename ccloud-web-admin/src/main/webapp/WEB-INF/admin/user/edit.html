@@ -75,7 +75,12 @@ var validatorFields = {
 
 function doSubmit(){
 	
-	var count=$("#station_option").select2("data").length;
+	var count = $("#station_option").select2("data").length;
+	var list = $("#station_option").select2("val");
+	var ids = "";
+	if (list != null && list.length > 0) {
+		ids = list.toString();
+	}
 	var name = "";
 	for(var i=0;i<count;i++){
 		if($("station_option").selected = true)  
@@ -96,7 +101,7 @@ function doSubmit(){
 		},
 		type : "post", 
 		data : {
-		"stationList":$("#station_option").select2("val").toString(),
+		"stationList":ids,
 		"stationName":name
 		},
 		dataType : "json", 
