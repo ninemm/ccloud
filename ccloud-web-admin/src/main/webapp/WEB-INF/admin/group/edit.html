@@ -20,86 +20,67 @@
 
 	$(function() {
 
-	jQuery.mm.initValidator('#form', validatorFields);
-	$.ajax({
-	url:"${CPATH}/admin/group/getRole",
-	type:"post",
-	data:{"groupid":'${(group.id)!}'},
-	dataType:"json",
-	success:function(data)
-	{
-	for (var i = 0; i < data.length; i++) {
-	if (data[i].isvalid == 0 ) {
-	$("#assignRole").append("<option value=" + data[i].id + ">" + data[i].name + "</option>");
-	} else {
-	$("#assignRole").append("<option value=" + data[i].id + " selected >" + data[i].name + "</option>");
-	}
-	}
-	}
-	});
+		jQuery.mm.initValidator('#form', validatorFields);
+		$.ajax({
+			url:"${CPATH}/admin/group/getRole",
+			type:"post",
+			data:{"groupid":'${(group.id)!}'},
+			dataType:"json",
+			success:function(data) {
+				for (var i = 0; i < data.length; i++) {
+					if (data[i].isvalid == 0 ) {
+						$("#assignRole").append("<option value=" + data[i].id + ">" + data[i].name + "</option>");
+					} else {
+						$("#assignRole").append("<option value=" + data[i].id + " selected >" + data[i].name + "</option>");
+					}
+				}
+			}
+		});
 	});
 
 	var validatorFields = {
-	'group.group_name': {
-	validators: {
-	notEmpty: { message: '分组名称不能为空' },
-	stringLength: { max: 15, message: '分组名称最大长度是15字符，请重新输入' }
-	}
-	},
-	'group.group_code': {
-	validators: {
-	notEmpty: { message: '分组编号不能为空' },
-	stringLength: { min: 2, max: 20, message: '分组编号最大长度是20字符，请重新输入' }
-	}
-	}
+		'group.group_name': {
+			validators: {
+				notEmpty: { message: '分组名称不能为空' },
+				stringLength: { max: 15, message: '分组名称最大长度是15字符，请重新输入' }
+			}
+		},
+		'group.group_code': {
+			validators: {
+				notEmpty: { message: '分组编号不能为空' },
+				stringLength: { min: 2, max: 20, message: '分组编号最大长度是20字符，请重新输入' }
+			}
+		}
 	};
 
-	<!--function doSubmit(){-->
-	<!--$form.ajaxSubmit({-->
-	<!--beforeSubmit: function() {-->
-	<!--var validate = $form.data('bootstrapValidator');-->
-	<!--validate.validate();-->
-	<!--return validate.isValid();-->
-	<!--},-->
-	<!--type : "post",-->
-	<!--dataType : "json",-->
-	<!--success : function(data) {-->
-	<!--if(data.errorCode == 0) {-->
-	<!--//location.reload();-->
-	<!--toastr.success(data.message, '操作成功');-->
-	<!--} else {-->
-	<!--toastr.error(data.message,'操作失败');-->
-	<!--}-->
-	<!--},-->
-	<!--error : function() {-->
-	<!--alert("信息提交错误");-->
-	<!--}-->
-	<!--});-->
-	<!--}-->
 	function doSubmit(){
-	$form.ajaxSubmit({
-	beforeSubmit: function() {
-	var validate = $form.data('bootstrapValidator');
-	validate.validate();
-	return validate.isValid();
-	},
-	url:"${CPATH}/admin/group/saveGroupAndGroupRoleRel",
-	type : "post",
-	data : {
-	"roleList":$("#assignRole").select2("val").toString()},
-	dataType : "json",
-	success : function(data) {
-	if(data.errorCode == 0) {
-	//location.reload();
-	toastr.success(data.message, '操作成功');
-	} else {
-	toastr.error(data.message,'操作失败');
-	}
-	},
-	error : function() {
-	alert("信息提交错误");
-	}
-	});
+		var list = $("#assignRole").select2("val");
+		var ids = "";
+		if (list != null && list.length > 0) {
+			ids = list.toString();
+		}
+		var roleList = $("#assignRole").select2("val");
+		$form.ajaxSubmit({
+			beforeSubmit: function() {
+				var validate = $form.data('bootstrapValidator');
+				validate.validate();
+				return validate.isValid();
+			},
+			url:"${CPATH}/admin/group/saveGroupAndGroupRoleRel",
+			type : "post",
+			data : { "roleList":ids },
+			dataType : "json",
+			success : function(data) {
+				if(data.errorCode == 0) {
+					toastr.success(data.message, '操作成功');
+				} else {
+					toastr.error(data.message,'操作失败');
+				}
+			},
+			error : function() {
+				alert("信息提交错误");
+			}
+	    });
 	}
 </#macro>
 

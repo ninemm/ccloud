@@ -60,6 +60,23 @@ public class OperationQuery extends JBaseQuery {
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
+	public Page<Operation> queryModuleAndOperation(int pageNumber, int pageSize, String keyword, String orderby) {
+		String select = "select m.*, s.name as sys_name, me.module_name as parent_name, o.operation_name, o.id as operation_Id, o.description ";
+
+		StringBuilder fromBuilder = new StringBuilder("from `module` m ");
+		fromBuilder.append("join `systems` s on s.id = m.system_id ");
+		fromBuilder.append("join `module` me on me.id = m.parent_id ");
+		fromBuilder.append("left join `operation` o on o.module_id = m.id ");
+
+		LinkedList<Object> params = new LinkedList<Object>();
+
+		fromBuilder.append("GROUP BY m.id, o.id ");
+
+		if (params.isEmpty())
+			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+
+		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
 	
 	protected void buildOrderBy(String orderBy, StringBuilder fromBuilder) {
 		

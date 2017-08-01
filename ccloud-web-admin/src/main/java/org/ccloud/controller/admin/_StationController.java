@@ -22,6 +22,9 @@ import com.jfinal.plugin.activerecord.Page;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
+import org.ccloud.model.Operation;
+import org.ccloud.model.query.OperationQuery;
+import org.ccloud.model.query.StationOperationRelQuery;
 import org.ccloud.model.query.StationQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
@@ -31,6 +34,7 @@ import com.jfinal.aop.Before;
 import org.ccloud.utils.StringUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -121,6 +125,57 @@ public class _StationController extends JBaseCRUDController<Station> {
     public void station_tree() {
         List<Map<String, Object>> list = StationQuery.me().findStationListAsTree(1);
         setAttr("treeData", JSON.toJSON(list));
+    }
+
+    public void assign() {
+        setAttr("id", getPara("id"));
+    }
+    public void initAssign() {
+        String keyword = getPara("k");
+        if (StrKit.notBlank(keyword)) {
+            keyword = StringUtils.urlDecode(keyword);
+            setAttr("k", keyword);
+        }
+
+        String stationId = getPara("id");
+
+        Page<Operation> page = OperationQuery.me().queryModuleAndOperation(1, 100, keyword, null);
+
+        List<Object> rowList = new ArrayList<>();
+        int i = 0;
+
+        while (i < page.getTotalRow()) {
+            List<Object> objectList = new ArrayList<>();
+
+            while (i + 1 < page.getTotalRow() && page.getList().get(i + 1).get("id").equals(page.getList().get(i).get("id"))) {
+                Map<String, Object> m = new HashMap<>();
+                m.put("operationName", page.getList().get(i).get("operation_name"));
+                m.put("operationId", page.getList().get(i).get("operation_Id"));
+
+                if (StationOperationRelQuery.me().isValid(stationId, page.getList().get(i).get("operation_Id").toString()).size() == 0) m.put("isValid", 0);
+                else m.put("isValid", 1);
+                objectList.add(m);
+
+                i++;
+            }
+
+            Map<String, Object> m = new HashMap<>();
+            m.put("operationName", page.getList().get(i).get("operation_name"));
+            m.put("operationId", page.getList().get(i).get("operation_Id"));
+
+            if (StationOperationRelQuery.me().isValid(stationId, page.getList().get(i).get("operation_Id").toString()).size() == 0) m.put("isValid", 0);
+            else m.put("isValid", 1);
+            objectList.add(m);
+
+            page.getList().get(i).set("description", objectList);
+            rowList.add(page.getList().get(i));
+
+            i++;
+        }
+
+        Map<String, Object> map = ImmutableMap.of("total", rowList.size(), "rows", rowList);
+        renderJson(map);
+
     }
 	
 }
