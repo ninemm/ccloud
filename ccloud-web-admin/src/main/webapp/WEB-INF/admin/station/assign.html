@@ -21,7 +21,7 @@
 
 	var url = '${CPATH}/admin/station/initAssign?id=${id}';
 
-	jQuery.mm.initEditTable('#_assign_table', url, initParams, initFields(), null);
+	jQuery.mm.initUnPageEditTable('#_assign_table', url, initParams, initFields(), null);
 
 	$("#search-submit").click(function() {
 		$table.bootstrapTable('refresh');

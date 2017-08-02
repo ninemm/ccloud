@@ -139,7 +139,7 @@ public class _StationController extends JBaseCRUDController<Station> {
 
         String stationId = getPara("id");
 
-        Page<Operation> page = OperationQuery.me().queryModuleAndOperation(1, 100, keyword, null);
+        Page<Operation> page = OperationQuery.me().queryModuleAndOperation(1, 10000, keyword, null);
 
         List<Object> rowList = new ArrayList<>();
         int i = 0;
@@ -149,23 +149,29 @@ public class _StationController extends JBaseCRUDController<Station> {
 
             while (i + 1 < page.getTotalRow() && page.getList().get(i + 1).get("id").equals(page.getList().get(i).get("id"))) {
                 Map<String, Object> m = new HashMap<>();
-                m.put("operationName", page.getList().get(i).get("operation_name"));
-                m.put("operationId", page.getList().get(i).get("operation_Id"));
+                if (page.getList().get(i).get("operation_Id")!= null) {
+                    m.put("operationName", page.getList().get(i).get("operation_name"));
+                    m.put("operationId", page.getList().get(i).get("operation_Id"));
 
-                if (StationOperationRelQuery.me().isValid(stationId, page.getList().get(i).get("operation_Id").toString()).size() == 0) m.put("isValid", 0);
-                else m.put("isValid", 1);
-                objectList.add(m);
+                    if (StationOperationRelQuery.me().isValid(stationId, page.getList().get(i).get("operation_Id").toString()).size() == 0)
+                        m.put("isValid", 0);
+                    else m.put("isValid", 1);
+                    objectList.add(m);
+                }
 
                 i++;
             }
 
             Map<String, Object> m = new HashMap<>();
-            m.put("operationName", page.getList().get(i).get("operation_name"));
-            m.put("operationId", page.getList().get(i).get("operation_Id"));
+            if (page.getList().get(i).get("operation_Id")!= null) {
+                m.put("operationName", page.getList().get(i).get("operation_name"));
+                m.put("operationId", page.getList().get(i).get("operation_Id"));
 
-            if (StationOperationRelQuery.me().isValid(stationId, page.getList().get(i).get("operation_Id").toString()).size() == 0) m.put("isValid", 0);
-            else m.put("isValid", 1);
-            objectList.add(m);
+                if (StationOperationRelQuery.me().isValid(stationId, page.getList().get(i).get("operation_Id").toString()).size() == 0)
+                    m.put("isValid", 0);
+                else m.put("isValid", 1);
+                objectList.add(m);
+            }
 
             page.getList().get(i).set("description", objectList);
             rowList.add(page.getList().get(i));

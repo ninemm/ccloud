@@ -221,6 +221,32 @@ jQuery.mm = {
 		});
 		
 	},
+
+    initUnPageEditTable : function(tableId, url, queryParams, fields, editableSaveFunc, clickCellFunc) {
+
+        tableId = tableId || "_table";
+
+        $(tableId).bootstrapTable({
+            url: url,
+            method: 'get',
+            editable: true,//开启编辑模式
+            clickToSelect: true,
+            uniqueId: 'id',
+            striped: true,
+            classes: 'table-no-bordered',
+            cache: false,					// 是否使用缓存
+            pagination: false,				// 是否显示分页
+            queryParams: queryParams,		// 传递参数
+            sidePagination: 'server', 		//分页方式：client客户端分页，server服务端分页（*）
+            paginationLoop: false,
+            smartDisplay: false,
+            undefinedText: '',
+            columns: fields,
+            onEditableSave: editableSaveFunc,
+            onClickCell: clickCellFunc || function () {}
+        });
+
+    },
 	
 	initDatetimepicker: function(formId, fieldId, fieldName, format, minView, maxView, startView) {
 		$(fieldId).datetimepicker({

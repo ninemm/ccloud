@@ -68,7 +68,9 @@ public class OperationQuery extends JBaseQuery {
 		fromBuilder.append("join `module` me on me.id = m.parent_id ");
 		fromBuilder.append("left join `operation` o on o.module_id = m.id ");
 
+		boolean needWhere = true;
 		LinkedList<Object> params = new LinkedList<Object>();
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "m.module_name", keyword, params, needWhere);
 
 		fromBuilder.append("GROUP BY m.id, o.id ");
 
