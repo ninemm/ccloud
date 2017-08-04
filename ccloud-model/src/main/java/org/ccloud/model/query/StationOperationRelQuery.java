@@ -82,4 +82,19 @@ public class StationOperationRelQuery extends JBaseQuery {
 		return DAO.doDelete(sql.toString(), stationId, operationId);
 	}
 
+	public int deleteByStationId(String stationId) {
+
+		return DAO.doDelete(" station_id = ?", stationId);
+	}
+
+	public int batchDeleteByStationId(List<String> ids) {
+		if (ids != null && ids.size() > 0) {
+			int deleteCount = 0;
+			for (int i = 0; i < ids.size(); i++)
+				deleteCount = deleteCount + DAO.doDelete("station_id = ? ", ids.get(i).toString());
+			return deleteCount;
+		}
+		return 0;
+	}
+
 }

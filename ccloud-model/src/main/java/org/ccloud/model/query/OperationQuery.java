@@ -61,7 +61,7 @@ public class OperationQuery extends JBaseQuery {
 	}
 
 	public Page<Operation> queryModuleAndOperation(int pageNumber, int pageSize, String keyword, String orderby) {
-		String select = "select m.*, s.name as sys_name, me.module_name as parent_name, o.operation_name, o.id as operation_Id, o.description ";
+		String select = "select m.id, m.module_name, s.name as sys_name, me.module_name as parent_name, GROUP_CONCAT(o.id) as operation_code, GROUP_CONCAT(o.operation_name) as operation_name, null as operationList ";
 
 		StringBuilder fromBuilder = new StringBuilder("from `module` m ");
 		fromBuilder.append("join `systems` s on s.id = m.system_id ");
@@ -72,7 +72,7 @@ public class OperationQuery extends JBaseQuery {
 		LinkedList<Object> params = new LinkedList<Object>();
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "m.module_name", keyword, params, needWhere);
 
-		fromBuilder.append("GROUP BY m.id, o.id ");
+		fromBuilder.append("GROUP BY m.id");
 
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());

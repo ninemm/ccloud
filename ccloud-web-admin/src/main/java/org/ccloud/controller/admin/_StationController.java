@@ -18,6 +18,8 @@ package org.ccloud.controller.admin;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.kit.StrKit;
+import com.jfinal.plugin.activerecord.Db;
+import com.jfinal.plugin.activerecord.IAtom;
 import com.jfinal.plugin.activerecord.Page;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
@@ -33,6 +35,7 @@ import org.ccloud.model.Station;
 import com.jfinal.aop.Before;
 import org.ccloud.utils.StringUtils;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -84,42 +87,51 @@ public class _StationController extends JBaseCRUDController<Station> {
     @Override
     @Before(UCodeInterceptor.class)
     public void delete() {
-        Station station = getModel(Station.class);
+        boolean isDelete = Db.tx(new IAtom() {
+            @Override
+            public boolean run() throws SQLException {
+                Station station = getModel(Station.class);
 
-        String id = getPara("id");
-        if (StrKit.notBlank(id)) {
-            Station station1 = StationQuery.me().findById(id);
-            //若是叶子节点则直接删除（删除的时候做了监听处理其父节点的is_parent）
-            if(station1.getIsParent() == 0) {
-                if (station.deleteById(id)) {
-                    renderAjaxResultForSuccess("删除成功");
-                } else {
-                    renderAjaxResultForError("删除失败");
-                }
-            } else {
-                //若非叶子节点，寻找其所有叶子节点id做删除
-                List<String> ids = new ArrayList<>();
-                ids.add(id);
-                int k = 0;
-                //寻找所有叶子节点id
-                while (k < ids.size()) {
-                    List<Station> stationList = StationQuery.me().findByParentId(ids.get(k));
-                    if (stationList != null) {
-                        for(int i = 0; i < stationList.size(); i++)
-                            ids.add(stationList.get(i).getId());
+                String id = getPara("id");
+                if (StrKit.notBlank(id)) {
+                    Station station1 = StationQuery.me().findById(id);
+                    //若是叶子节点则直接删除（删除的时候做了监听处理其父节点的is_parent）
+                    if(station1.getIsParent() == 0) {
+
+                        StationOperationRelQuery.me().deleteByStationId(station1.getId());
+                        if (!station.deleteById(id)) return false;
+                        return true;
+
+                    } else {
+                        //若非叶子节点，寻找其所有叶子节点id做删除
+                        List<String> ids = new ArrayList<>();
+                        ids.add(id);
+                        int k = 0;
+                        //寻找所有叶子节点id
+                        while (k < ids.size()) {
+                            List<Station> stationList = StationQuery.me().findByParentId(ids.get(k));
+                            if (stationList != null) {
+                                for(int i = 0; i < stationList.size(); i++)
+                                    ids.add(stationList.get(i).getId());
+                            }
+                            k++;
+                        }
+                        int count = StationQuery.me().batchDelete(ids);
+
+                        StationOperationRelQuery.me().batchDeleteByStationId(ids);
+
+                        if(count <= 0) return false;
+                        return true;
                     }
-                    k++;
-                }
-                int count = StationQuery.me().batchDelete(ids);
-                if (count > 0) {
-                    renderAjaxResultForSuccess("删除成功");
                 } else {
-                    renderAjaxResultForError("删除失败");
+                    return false;
                 }
             }
-        } else {
-            renderAjaxResultForError("删除失败");
-        }
+        });
+
+        if (isDelete) renderAjaxResultForSuccess("删除成功");
+        else renderAjaxResultForError("删除失败");
+
     }
 
     public void station_tree() {
@@ -129,6 +141,7 @@ public class _StationController extends JBaseCRUDController<Station> {
 
     public void assign() {
         setAttr("id", getPara("id"));
+        setAttr("station_name", getPara("stationName"));
     }
     public void initAssign() {
         String keyword = getPara("k");
@@ -142,46 +155,30 @@ public class _StationController extends JBaseCRUDController<Station> {
         Page<Operation> page = OperationQuery.me().queryModuleAndOperation(1, 10000, keyword, null);
 
         List<Object> rowList = new ArrayList<>();
-        int i = 0;
 
-        while (i < page.getTotalRow()) {
-            List<Object> objectList = new ArrayList<>();
+        for (int i = 0; i < page.getTotalRow(); i++) {
+            if(page.getList().get(i).get("operation_code")!=null) {
+                String[] operationId = page.getList().get(i).get("operation_code").toString().split(",");
+                String[] operationName = page.getList().get(i).get("operation_name").toString().split(",");
 
-            while (i + 1 < page.getTotalRow() && page.getList().get(i + 1).get("id").equals(page.getList().get(i).get("id"))) {
-                Map<String, Object> m = new HashMap<>();
-                if (page.getList().get(i).get("operation_Id")!= null) {
-                    m.put("operationName", page.getList().get(i).get("operation_name"));
-                    m.put("operationId", page.getList().get(i).get("operation_Id"));
+                List<Object> objectList = new ArrayList<>();
+                for (int j = 0; j < operationId.length; j++) {
+                    Map<String, Object> m = new HashMap<>();
 
-                    if (StationOperationRelQuery.me().isValid(stationId, page.getList().get(i).get("operation_Id").toString()).size() == 0)
-                        m.put("isValid", 0);
+                    m.put("operationName", operationName[j]);
+                    m.put("operationId", operationId[j]);
+
+                    if (StationOperationRelQuery.me().isValid(stationId, operationId[j]).size() == 0) m.put("isValid", 0);
                     else m.put("isValid", 1);
                     objectList.add(m);
                 }
-
-                i++;
+                page.getList().get(i).set("operation_code", objectList);
             }
-
-            Map<String, Object> m = new HashMap<>();
-            if (page.getList().get(i).get("operation_Id")!= null) {
-                m.put("operationName", page.getList().get(i).get("operation_name"));
-                m.put("operationId", page.getList().get(i).get("operation_Id"));
-
-                if (StationOperationRelQuery.me().isValid(stationId, page.getList().get(i).get("operation_Id").toString()).size() == 0)
-                    m.put("isValid", 0);
-                else m.put("isValid", 1);
-                objectList.add(m);
-            }
-
-            page.getList().get(i).set("description", objectList);
-            rowList.add(page.getList().get(i));
-
-            i++;
         }
 
-        Map<String, Object> map = ImmutableMap.of("total", rowList.size(), "rows", rowList);
-        renderJson(map);
+        Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 
+        renderJson(map);
     }
 	
 }

@@ -183,5 +183,23 @@ private String buildKey(String module, Object... params) {
 	}
 	return keyBuffer.toString().replace(" ", "");
 }
+	public List<Module> findByParentId(final String id) {
+		StringBuilder sqlBuilder = new StringBuilder("select * ");
+		sqlBuilder.append("from `module` ");
+		sqlBuilder.append("where parent_id = ? ");
+		return  DAO.find(sqlBuilder.toString(),id);
+	}
 
+	public int batchDelete(List<String> ids) {
+		if (ids != null && ids.size() > 0) {
+			int deleteCount = 0;
+			for (int i = 0; i < ids.size(); i++) {
+				if (DAO.deleteById(ids.get(i))) {
+					++deleteCount;
+				}
+			}
+			return deleteCount;
+		}
+		return 0;
+	}
 }
