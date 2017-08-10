@@ -1,0 +1,15 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.ccloud</groupId>
+		<artifactId>ccloud-bi</artifactId>
+		<version>0.0.1</version>
+	</parent>
+	
+	<artifactId>ccloud-bi-templates</artifactId>
+	<packaging>war</packaging>
+	<name>ccloud-bi-templates</name>
+	<description>BI 数据呈现模块</description>
+	
+</project>

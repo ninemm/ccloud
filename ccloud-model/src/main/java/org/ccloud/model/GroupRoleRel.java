@@ -25,7 +25,10 @@ import org.ccloud.model.base.BaseGroupRoleRel;
  */
 @Table(tableName="group_role_rel",primaryKey="id")
 public class GroupRoleRel extends BaseGroupRoleRel<GroupRoleRel> {
-    @Override
+
+	private static final long serialVersionUID = 1L;
+
+	@Override
     public boolean saveOrUpdate() {
 
         if (null == get(getPrimaryKey())) {

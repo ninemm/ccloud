@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ccloud.model;
+package org.ccloud.upms.model;
 
 import org.ccloud.model.core.Table;
 import org.ccloud.model.base.BaseStationOperationRel;

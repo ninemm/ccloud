@@ -15,11 +15,7 @@
  */
 package org.ccloud.ui.freemarker.tag;
 
-import java.util.List;
-
 import org.ccloud.core.render.freemarker.JTag;
-import org.ccloud.model.User;
-import org.ccloud.model.query.UserQuery;
 
 public class UsersTag extends JTag {
 	public static final String TAG_NAME = "cc.users";

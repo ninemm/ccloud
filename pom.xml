@@ -10,16 +10,22 @@
 	<description>渠道云基础平台</description>
 	
 	<modules>
-		<module>ccloud-web-auth</module>
+		<module>ccloud-gen</module>
 		<module>ccloud-model</module>
 		<module>ccloud-cache</module>
 		<module>ccloud-commons</module>
 		<module>ccloud-message</module>
-		<module>ccloud-web-admin</module>
-		<module>ccloud-web-core</module>
 		<module>ccloud-oauth2</module>
 		<module>ccloud-scheduler</module>
-		<module>ccloud-gen</module>
+		
+		<module>ccloud-bi</module>
+		<module>ccloud-upms</module>
+		
+		<module>ccloud-web-admin</module>
+		<module>ccloud-web-core</module>
+		<module>ccloud-web-auth</module>
+		<module>ccloud-web-templates</module>
+		
 	</modules>
 	
 	<properties>
