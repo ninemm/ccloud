@@ -40,7 +40,7 @@ public class AdminMenuInitListener implements MessageListener {
 		}
 
 		MenuManager menuManager = (MenuManager) temp;
-		//initModuleMenuGroup(menuManager);
+		initModuleMenuGroup(menuManager);
 
 		menuManager.addMenuGroup(0, createOrderMenuGroup());
 		menuManager.addMenuGroup(1, createStoreMenuGroup());
@@ -51,7 +51,7 @@ public class AdminMenuInitListener implements MessageListener {
 		
 		menuManager.addMenuGroup(MenuGroup.createBlockGroup());
 		
-		/*menuManager.addMenuGroup(createTemplateMenuGroup());*/
+		menuManager.addMenuGroup(createTemplateMenuGroup());
 		/*menuManager.addMenuGroup(createAddonMenuGroup());*/
 		menuManager.addMenuGroup(createRoleResMenuGroup());
 		menuManager.addMenuGroup(createDataMenuGroup());
@@ -171,7 +171,7 @@ public class AdminMenuInitListener implements MessageListener {
 		{
 			group.addMenuItem(new MenuItem("list", "/admin/template", "所有模板"));
 			group.addMenuItem(new MenuItem("install", "/admin/template/install", "模板安装"));
-			group.addMenuItem(new MenuItem("menu", "/admin/template/menu", "菜单"));
+//			group.addMenuItem(new MenuItem("menu", "/admin/template/menu", "菜单"));
 			group.addMenuItem(new MenuItem("setting", "/admin/template/setting", "设置"));
 			group.addMenuItem(new MenuItem("edit", "/admin/template/edit", "编辑"));
 		}

@@ -90,13 +90,13 @@
 			<scope>compile</scope>
 		</dependency> -->
 		
-		<!-- <dependency>
+		<dependency>
 			<groupId>org.ccloud</groupId>
-			<artifactId>ccloud-web-template-wap</artifactId>
+			<artifactId>ccloud-web-templates</artifactId>
 			<version>${project.version}</version>
 			<type>war</type>
 			<scope>compile</scope>
-		</dependency> -->
+		</dependency>
 		<dependency>
 	    	<groupId>com.jfinal</groupId>
 	    	<artifactId>jetty-server</artifactId>
@@ -167,10 +167,10 @@
 							<groupId>org.ccloud</groupId>
 							<artifactId>ccloud-web-front</artifactId>
 						</overlay> -->
-						<!-- <overlay>
-							<groupId>org.9mm</groupId>
-							<artifactId>ccloud-web-template-shop</artifactId>
-						</overlay> -->
+						<overlay>
+							<groupId>org.ccloud</groupId>
+							<artifactId>ccloud-web-templates</artifactId>
+						</overlay>
 					</overlays>
 				</configuration>
 			</plugin>
