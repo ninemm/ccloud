@@ -52,7 +52,7 @@ public class JModelGenerator extends ModelGenerator {
 				"public class %s extends %s<%s> {%n";
 		
 		
-		this.daoTemplate = "\tprivate static final long serialVersionUID = 1L;%n%n";
+		this.daoTemplate = "%n\tprivate static final long serialVersionUID = 1L;%n%n";
 		
 	}
 	
@@ -60,6 +60,11 @@ public class JModelGenerator extends ModelGenerator {
 	protected void genClassDefine(TableMeta tableMeta, StringBuilder ret) {
 		ret.append(String.format(classDefineTemplate, tableMeta.name,
 			tableMeta.primaryKey, tableMeta.modelName, tableMeta.baseModelName, tableMeta.modelName));
+	}
+
+	@Override
+	protected void genDao(TableMeta tableMeta, StringBuilder ret) {
+		ret.append(String.format(daoTemplate));
 	}
 
 }

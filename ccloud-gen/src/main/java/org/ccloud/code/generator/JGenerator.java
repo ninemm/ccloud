@@ -65,7 +65,9 @@ public class JGenerator {
 		List<TableMeta> tableMetaList = mb.build();
 		
 		new JBaseModelGenerator(baseModelPackage, baseModelDir).generate(tableMetaList);
-		new JModelGenerator(modelPackage, baseModelPackage, modelDir).generate(tableMetaList);
+		JModelGenerator jmodelGenerator = new JModelGenerator(modelPackage, baseModelPackage, modelDir);
+		jmodelGenerator.setGenerateDaoInModel(true);
+		jmodelGenerator.generate(tableMetaList);
 		new JModelQueryGenerator(modelQueryPackage, baseModelPackage, modelQueryDir).generate(tableMetaList);
 		new JControllerGenerator(adminControllerPackage, baseModelPackage, adminControllerDir).generate(tableMetaList);
 		
