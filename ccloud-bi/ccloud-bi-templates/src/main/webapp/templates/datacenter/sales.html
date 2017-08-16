@@ -1,0 +1,186 @@
+<#include "_inc/_layout.html"/>
+
+<#macro css>
+
+</#macro>
+
+<#macro script>
+    $(function() {
+    FastClick.attach(document.body);
+    var ITEM_ON = "bar__item--on";
+
+    var showTab = function(a) {
+    var $a = $(a);
+    if ($a.hasClass(ITEM_ON)) return;
+    var href = $a.attr("href");
+
+    if (!/^#/.test(href)) return;
+
+    $a.parent().find("." + ITEM_ON).removeClass(ITEM_ON);
+    $a.addClass(ITEM_ON);
+    console.log($a);
+    var bd = $a.parents(".tab").find(".tab__bd");
+
+    bd.find(".tab__bd-item--active").removeClass("tab__bd-item--active");
+
+    $(href).addClass("tab__bd-item--active");
+    }
+
+    $.showTab = showTab;
+
+    $(document).on("click", ".navbar__item", function(e) {
+    var $a = $(e.currentTarget);
+    var href = $a.attr("href");
+    if ($a.hasClass(ITEM_ON)) return;
+    if (!/^#/.test(href)) return;
+
+    e.preventDefault();
+
+    showTab($a);
+    });
+
+    $(".date").click(function(e) {
+    var $a = $(e.currentTarget);
+    $a.parent().find(".date").removeClass("active-date");
+    $a.addClass("active-date");
+    });
+    });
+</#macro>
+<layout>
+<section>
+    <div class="weui-tab">
+        <div class="weui-tab__bd">
+            <div id="tab1" class="weui-tab__bd-item weui-tab__bd-item--active">
+                <div class="date-div">
+                    <a class="date active-date">最近一天</a>
+                    <a class="date">最近一周</a>
+                    <a class="date">最近一月</a>
+                </div>
+                <div class="map">
+                    <p>2017-08-15销售情况</p>
+                    <img src="static/images/map.png">
+                </div>
+                <!-- 容器 -->
+                <div class="tab report">
+                    <div class="navbar">
+                        <a class="navbar__item bar__item--on" href="#tab3">
+                            销售报表
+                        </a>
+                        <a class="navbar__item" href="#tab4">
+                            库存报表
+                        </a>
+                    </div>
+                    <div class="tab__bd">
+                        <div id="tab3" class="tab__bd-item tab__bd-item--active report-table">
+                            <div class="sales-gather">
+                                <p>全国销售汇总</p>
+                                <div class="gather fl">
+                                    <img src="static/images/money.png">
+                                    <p>
+                                        总销售额：24.93万元
+                                    </p>
+                                </div>
+                                <div class="gather fr">
+                                    <img src="static/images/order.png">
+                                    <p>
+                                        订单总数：565笔
+                                    </p>
+                                </div>
+                            </div>
+                            <div>
+                                <p>全国产品销售前5名</p>
+                                <img src="static/images/sale_top5.png">
+                            </div>
+                            <div>
+                                <p>全国客户销售情况比较</p>
+                                <img src="static/images/customer_top5.png">
+                            </div>
+                            <div>
+                                <p>全国销售前5名</p>
+                                <img src="static/images/country_top5.png">
+                            </div>
+                        </div>
+                        <div id="tab4" class="tab__bd-item report-table">
+                            <div>
+                                <p>全国最新库存</p>
+                                <img src="static/images/inventory.png">
+                            </div>
+                            <div>
+                                <p>全国库存趋势</p>
+                                <img src="static/images/tendency.png">
+                                <img src="static/images/tendency.png">
+                                <img src="static/images/tendency.png">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="tab2" class="weui-tab__bd-item">
+                <div class="date-div">
+                    <a class="date active-date">最近一天</a>
+                    <a class="date">最近一周</a>
+                    <a class="date">最近一月</a>
+                </div>
+                <div class="map">
+                    <p>2017-08-15物流情况</p>
+                    <img src="static/images/map.png">
+                </div>
+                <!-- 容器 -->
+                <div class="tab report">
+                    <div class="navbar">
+                        <a class="navbar__item bar__item--on" href="#tab5">
+                            物流报表
+                        </a>
+                        <a class="navbar__item" href="#tab6">
+                            物流库存报表
+                        </a>
+                    </div>
+                    <div class="tab__bd">
+                        <div id="tab5" class="tab__bd-item tab__bd-item--active report-table">
+                            <div class="sales-gather">
+                                <p>全国物流汇总</p>
+                                <div class="gather fl">
+                                    <img src="static/images/money.png">
+                                    <p>
+                                        总销售额：24.93万元
+                                    </p>
+                                </div>
+                                <div class="gather fr">
+                                    <img src="static/images/order.png">
+                                    <p>
+                                        订单总数：565笔
+                                    </p>
+                                </div>
+                            </div>
+                            <div>
+                                <p>全国产品销售前5名</p>
+                                <img src="static/images/sale_top5.png">
+                            </div>
+                            <div>
+                                <p>全国客户销售情况比较</p>
+                                <img src="static/images/customer_top5.png">
+                            </div>
+                            <div>
+                                <p>全国销售前5名</p>
+                                <img src="static/images/country_top5.png">
+                            </div>
+                        </div>
+                        <div id="tab6" class="tab__bd-item report-table">
+                            <div>
+                                <p>全国最新库存</p>
+                                <img src="static/images/inventory.png">
+                            </div>
+                            <div>
+                                <p>全国库存趋势</p>
+                                <img src="static/images/tendency.png">
+                                <img src="static/images/tendency.png">
+                                <img src="static/images/tendency.png">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</layout>

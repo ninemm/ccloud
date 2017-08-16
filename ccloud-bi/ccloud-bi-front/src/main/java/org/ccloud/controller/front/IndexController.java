@@ -42,6 +42,10 @@ public class IndexController extends BaseFrontController {
 		}
 	}
 
+	public void sales(){
+			render("sales.html");
+	}
+
 	private void doRender() {
 		setGlobleAttrs();
 
