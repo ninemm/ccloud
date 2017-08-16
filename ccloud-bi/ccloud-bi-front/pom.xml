@@ -7,7 +7,7 @@
 		<version>0.0.1</version>
 	</parent>
 	<artifactId>ccloud-bi-front</artifactId>
-	<packaging>jar</packaging>
+	<packaging>war</packaging>
 	<name>ccloud-bi-front</name>
 	<description>前台接口</description>
 	
@@ -73,7 +73,7 @@
 
 		<dependency>
 			<groupId>org.ccloud</groupId>
-			<artifactId>ccloud-web-templates</artifactId>
+			<artifactId>ccloud-bi-templates</artifactId>
 			<version>${project.version}</version>
 			<type>war</type>
 			<scope>compile</scope>
@@ -124,7 +124,7 @@
 						</overlay>
 						<overlay>
 							<groupId>org.ccloud</groupId>
-							<artifactId>ccloud-web-template</artifactId>
+							<artifactId>ccloud-bi-templates</artifactId>
 						</overlay>
 					</overlays>
 				</configuration>

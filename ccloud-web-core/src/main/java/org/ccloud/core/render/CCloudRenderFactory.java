@@ -33,13 +33,13 @@ public class CCloudRenderFactory extends RenderFactory {
 	public Render getRender(String view) {
 		// front url
 		if (view.startsWith("/templates")) {
-/*			String renderType = TemplateManager.me().currentTemplate().getRenderType();
+			String renderType = TemplateManager.me().currentTemplate().getRenderType();
 
 			if (renderType == null) {
 				return new JFreemarkerRender(view, true);
 			}
 
-			if (renderType.equalsIgnoreCase("freemarker")) {
+			/*			if (renderType.equalsIgnoreCase("freemarker")) {
 				return new JFreemarkerRender(view, true);
 			}
 

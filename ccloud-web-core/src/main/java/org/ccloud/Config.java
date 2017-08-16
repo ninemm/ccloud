@@ -33,7 +33,7 @@ import com.jfinal.template.Engine;
 public class Config extends CCloudConfig {
 
 	@Override
-	public void onJPressStarted() {
+	public void onCCloudStarted() {
 
 //		CCloud.addTag(ModulesTag.TAG_NAME, new ModulesTag());
 //		CCloud.addTag(UsersTag.TAG_NAME, new UsersTag());

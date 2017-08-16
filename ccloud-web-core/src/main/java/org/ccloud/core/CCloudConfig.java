@@ -210,7 +210,7 @@ public abstract class CCloudConfig extends JFinalConfig {
 		}
 
 		CCloud.renderImmediately();
-		onJPressStarted();
+		onCCloudStarted();
 
 		log.info("CCloud is started!");
 	}
@@ -240,7 +240,7 @@ public abstract class CCloudConfig extends JFinalConfig {
 		 CacheManager.getInstance().shutdown();
 	}
 
-	public void onJPressStarted() {
+	public void onCCloudStarted() {
 	}
 
 }
