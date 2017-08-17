@@ -499,6 +499,8 @@
 		myChart.setOption(option, true);
 	}
 
+	console.log('${totalOrderCount!}');
+
 	var sales = new CountUp("sales",0,249300000);
 	sales.start();
     var orderTotal = new CountUp("order-total",0,56675535);
@@ -507,6 +509,7 @@
 
 <@layout>
 <section>
+
 	<div class="bi-body">
 	    <div class="location">
 	        <i class="icon-map-marker txt-color-green"></i> 湖北省 > 武汉市 > 洪山区

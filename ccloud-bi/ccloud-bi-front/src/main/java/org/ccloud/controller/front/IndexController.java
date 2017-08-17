@@ -15,101 +15,21 @@
  */
 package org.ccloud.controller.front;
 
-import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
-import org.ccloud.core.addon.HookInvoker;
-import org.ccloud.core.cache.ActionCache;
-import org.ccloud.model.query.OptionQuery;
 import org.ccloud.model.query.SalesFactQuery;
 import org.ccloud.route.RouterMapping;
-import org.ccloud.utils.StringUtils;
-
-import com.jfinal.render.Render;
 
 @RouterMapping(url = "/")
 public class IndexController extends BaseFrontController {
 
-	@ActionCache
 	public void index() {
-		try {
-			Render render = onRenderBefore();
-			if (render != null) {
-				render(render);
-			} else {
-				doRender();
-			}
-		} finally {
-			onRenderAfter();
-		}
-	}
-
-	private void doRender() {
-		setGlobleAttrs();
-
-		String para = getPara();
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
 		String countryName = getPara("countryName", "").trim();
-
-		if (StringUtils.isBlank(para)) {
-			
-			setAttr("totalOrderCount", SalesFactQuery.me().findOrderCount());
-			setAttr("totalOrderAmount", SalesFactQuery.me().findTotalAmount(provName, cityName, countryName));
-			
-			//setAttr(IndexPageTag.TAG_NAME, new IndexPageTag(getRequest(), null, 1, null));
-			render("index.html");
-			return;
-		}
-
-		String[] paras = para.split("-");
-		if (paras.length == 1) {
-			if (StringUtils.isNumeric(para.trim())) {
-				//setAttr(IndexPageTag.TAG_NAME, new IndexPageTag(getRequest(), null, StringUtils.toInt(para.trim(), 1), null));
-				render("index.html");
-			} else {
-				//setAttr(IndexPageTag.TAG_NAME, new IndexPageTag(getRequest(), para.trim(), 1, null));
-				render("page_" + para + ".html");
-			}
-		} else if (paras.length == 2) {
-			String pageName = paras[0];
-			String pageNumber = paras[1];
-
-			if (!StringUtils.isNumeric(pageNumber)) {
-				renderError(404);
-			}
-
-			//setAttr(IndexPageTag.TAG_NAME, new IndexPageTag(getRequest(), pageName, StringUtils.toInt(pageNumber, 1), null));
-			render("page_" + pageName + ".html");
-		} else {
-			renderError(404);
-		}
-
-	}
-
-	private void setGlobleAttrs() {
-		String title = OptionQuery.me().findValue("seo_index_title");
-		String keywords = OptionQuery.me().findValue("seo_index_keywords");
-		String description = OptionQuery.me().findValue("seo_index_description");
-
-		if (StringUtils.isNotBlank(title)) {
-			setAttr(Consts.ATTR_GLOBAL_WEB_TITLE, title);
-		}
-
-		if (StringUtils.isNotBlank(keywords)) {
-			setAttr(Consts.ATTR_GLOBAL_META_KEYWORDS, keywords);
-		}
-
-		if (StringUtils.isNotBlank(description)) {
-			setAttr(Consts.ATTR_GLOBAL_META_DESCRIPTION, description);
-		}
-	}
-
-	private Render onRenderBefore() {
-		return HookInvoker.indexRenderBefore(this);
-	}
-
-	private void onRenderAfter() {
-		HookInvoker.indexRenderAfter(this);
+		setAttr("totalOrderCount", SalesFactQuery.me().findOrderCount());
+		setAttr("totalOrderAmount", SalesFactQuery.me().findTotalAmount(provName, cityName, countryName));
+		
+		render("index.html");
 	}
 
 }
