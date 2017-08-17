@@ -655,6 +655,16 @@ header {
     line-height: 1.5rem;
 }
 
+/*分类*/
+.weui-grid__icon {
+	width: 10vw;
+	height: 10vw;	
+}
+
+.classify-icon {
+	font-size: 10vw;
+}
+
 /*
 * 销售  ***********************************************************
 */
@@ -773,7 +783,7 @@ img {
 
 .gather span {
     color: #259fe8;
-    font-size: 48px;
+    font-size: 11vw;
     position: relative;
 }
 

@@ -31,5 +31,9 @@ public class IndexController extends BaseFrontController {
 		
 		render("index.html");
 	}
+	
+	public void renderSales() {
+	    render("sales.html");
+	}
 
 }
