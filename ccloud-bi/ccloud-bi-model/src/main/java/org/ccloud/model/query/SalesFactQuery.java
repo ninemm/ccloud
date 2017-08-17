@@ -111,7 +111,7 @@ public class SalesFactQuery extends JBaseQuery {
             sqlBuilder.append(" provName");
         }
 		
-		sqlBuilder.append(", TRUNCATE(SUM(totalSales)/100000, 2) as totalAmount");
+		sqlBuilder.append(", TRUNCATE(SUM(totalSales)/1000000, 2) as totalAmount");
 		
 		sqlBuilder.append(" from sales_fact");
 		
@@ -154,7 +154,7 @@ public class SalesFactQuery extends JBaseQuery {
 		
 		StringBuilder sqlBuilder = new StringBuilder("select customerTypeName");
 		
-		sqlBuilder.append(", TRUNCATE(SUM(totalSales)/100, 2) as totalAmount");
+		sqlBuilder.append(", TRUNCATE(SUM(totalSales)/1000000, 2) as totalAmount");
 		
 		sqlBuilder.append(" from sales_fact");
 		
@@ -176,11 +176,48 @@ public class SalesFactQuery extends JBaseQuery {
 			sqlBuilder.append(" and idate <= ?");
 			params.add(endDate);
 		}
+		sqlBuilder.append(" and customerType != 7");
 		
 		sqlBuilder.append(" group by customerType");
+		sqlBuilder.append(" order by totalAmount desc");
 		
 		return Db.query(sqlBuilder.toString(), params.toArray());
 	}
 	
-	
+	   public List<Map<String, Object>> findProductList(String provName, String cityName, String countryName, Date startDate, Date endDate) {
+	        
+	        LinkedList<Object> params = new LinkedList<Object>();
+	        
+	        StringBuilder sqlBuilder = new StringBuilder("select cInvName");
+	        
+	        sqlBuilder.append(", TRUNCATE(SUM(totalSmallAmount/cInvMNum), 2) as totalNum");
+	        sqlBuilder.append(", TRUNCATE(SUM(totalSales)/1000000, 2) as totalAmount");
+	        
+	        sqlBuilder.append(" from sales_fact");
+	        
+	        boolean needWhere = true;
+	        needWhere = appendIfNotEmpty(sqlBuilder, "provName", provName, params, needWhere);
+	        needWhere = appendIfNotEmpty(sqlBuilder, "cityName", cityName, params, needWhere);
+	        needWhere = appendIfNotEmpty(sqlBuilder, "countryName", countryName, params, needWhere);
+	        
+	        if (needWhere) {
+	            sqlBuilder.append(" where 1 = 1");
+	            sqlBuilder.append(" and type != 7");
+	        }
+	        
+	        if (startDate != null) {
+	            sqlBuilder.append(" and idate >= ?");
+	            params.add(startDate);
+	        }
+	        
+	        if (endDate != null) {
+	            sqlBuilder.append(" and idate <= ?");
+	            params.add(endDate);
+	        }
+	        
+	        sqlBuilder.append(" group by cInvCode");
+	        sqlBuilder.append(" order by totalAmount desc");
+	        
+	        return Db.query(sqlBuilder.toString(), params.toArray());
+	    }
 }

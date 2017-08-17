@@ -2,8 +2,14 @@
 <#macro script_import>
 	
  	<script src="${CPATH}/templates/datacenter/js/echarts.min.js"></script>
+ 	<!-- <script src="${CPATH}/templates/datacenter/js/bootstrap.min.js"></script> -->
 	
 </#macro>
+<#macro css_import>
+
+    <link rel="stylesheet" href="${CPATH}/templates/datacenter/css/bootstrap.min.css">
+    	
+</#macro> 
 <#macro css>
     #customer_rank{
         width: 100%;
@@ -14,32 +20,10 @@
         width: 100%;
         height:14rem;
     }
-    
-    /* Table Head */
-	#product_rank thead th {
-	background-color: rgb(81, 130, 187);
-	color: #fff;
-	border-bottom-width: 0;
-	}
-	
-	/* Column Style */
-	#product_rank td {
-	color: #000;
-	}
-	/* Heading and Column Style */
-	#product_rank tr, #product_rank th {
-	border-width: 1px;
-	border-style: solid;
-	border-color: rgb(81, 130, 187);
-	}
-	
-	/* Padding and font style */
-	#product_rank td, #product_rank th {
-	padding: 5px 10px;
-	font-size: 12px;
-	font-family: Verdana;
-	font-weight: bold;
-	}
+    .table{
+        font-size:0.3rem;
+    } 
+   
 </#macro>
 <#macro script>
     $(function() { 
@@ -52,6 +36,7 @@
       
 		customer_rank();
 		area_rank();
+		product_rank();
     });
     var sales = new CountUp("sales",0,249300000);
 	sales.start();
@@ -60,51 +45,60 @@
 	
 	//客户
 	function customer_rank(){
+	    $.ajax({
+			url:"${CPATH}/sales/customerType",
+			type:"post",
+			data:{"provName": "湖北省", "cityName": "武汉市",countryName:""},
+			dataType:"json"
+		}).done(function(data){
+		
+			var crSeriesData = [];
+			var length = data.length > 5 ? 5 : data.length;
+		    
+		    for(var i = 0; i < length; i++){
+                crSeriesData.push({
+                    name: data[i][0] + '(' + data[i][1] + ')',
+                    value: data[i][1]
+                });
+		    }
 	      	
-		var crTitle = '客户销售情况前五名(单位/万元)';
+			var crTitle = '客户销售情况前五名(金额/万元)';
+			
 		
-		var crSeriesData = [
-		               {value:335, name:'餐饮（直供）(335)'},
-		               {value:310, name:'团购直销(310)'},
-		               {value:234, name:'其他(234)'},
-		               {value:135, name:'餐饮(135)'},
-		               {value:1548, name:'零售终端(1548)'}
-		               ];
-	
-		var customer_rank = document.getElementById('customer_rank');
-		var $customer_rank = $(customer_rank);
-		
-		var customerRankChart = echarts.init(customer_rank);
-		var crOption = {
-		    title: [{
-		        text: crTitle,
-		        textStyle: {
-		            fontWeight: 'normal',
-		            fontSize: 16
-		        }
-		    }],
-		    color: ['#fd9173', '#f36f8a', '#5f71d2', '#AF89D6', '#4ac7f5'],
-		    series: [
-		        {
-		            name:crTitle,
-		            type:'pie',
-		            radius: ['25%', '45%'],
-		            center: ['50%', '60%'], 
-		            avoidLabelOverlap: false,
-		            label: {
-		                normal: {
-		                    textStyle: {
-		                        fontSize: 10
-		                    }
-		                }
-		            },
-		            data:crSeriesData
-		        }
-		    ]
-		};
-		customerRankChart.resize();
-		customerRankChart.setOption(crOption,true);  
-	
+			var customer_rank = document.getElementById('customer_rank');
+			var $customer_rank = $(customer_rank);
+			
+			var customerRankChart = echarts.init(customer_rank);
+			var crOption = {
+			    title: [{
+			        text: crTitle,
+			        textStyle: {
+			            fontWeight: 'normal',
+			            fontSize: 16
+			        }
+			    }],
+			    color: ['#4ac7f5', '#f36f8a', '#fd9173', '#AF89D6', '#5f71d2'],
+			    series: [
+			        {
+			            name:crTitle,
+			            type:'pie',
+			            radius: ['25%', '45%'],
+			            center: ['50%', '60%'], 
+			            avoidLabelOverlap: false,
+			            label: {
+			                normal: {
+			                    textStyle: {
+			                        fontSize: 10
+			                    }
+			                }
+			            },
+			            data:crSeriesData
+			        }
+			    ]
+			};
+			customerRankChart.resize();
+			customerRankChart.setOption(crOption,true);  
+		});
 	} 
 	
 	//区域
@@ -120,11 +114,11 @@
 		    var length = data.length > 5 ? 5 : data.length;
 		    
 		    for(var i = 0; i < length; i++){
-                areaYData[i] = data[i][0];
-                areaSeriesData[i] = data[i][1];
+                areaYData.push(data[i][0]) ;
+                areaSeriesData.push(data[i][1]);
 		    }
 		    
-		    var areaTitle = '销售情况前五名(单位/万元)';
+		    var areaTitle = '销售情况前五名(金额/万元)';
 			
 			var area_rank = document.getElementById('area_rank');
 			var $area_rank = $(area_rank);
@@ -182,6 +176,23 @@
 		});
 
     }
+    
+    //产品
+    function product_rank(){
+		$.ajax({
+			url:"${CPATH}/sales/product",
+			type:"post",
+			data:{"provName": "湖北省", "cityName": "武汉市",countryName:""},
+			dataType:"json"
+		}).done(function(data){
+			var length = data.length > 5 ? 5 : data.length;
+		    
+		    for(var i = 0; i < length; i++){
+                $(".table tbody").append("<tr><td>" + data[i][0] + "</td><td>" + data[i][1] + "</td><td>" + data[i][2] + "</td></tr>")
+		    }
+		
+		});
+	}	
 	
 </#macro>
 <section>
@@ -229,19 +240,14 @@
                       </div>
                       <div id="area_rank">
                       </div>
-                      <div id="product_rank">
-                          <table>
-                            <thead>全国产品销售前5名</thead>
+                      <div>
+                          <table class="table">
+                            <thead>产品销售前五名(金额/万元)</thead>
                             <tbody>
                               <tr>
                                 <th>产品</th>
                                 <th>数量(件)</th>
                                 <th>金额</th>
-                              </tr>
-                              <tr>
-                                <td>1</td>
-                                <td>2</td>
-                                <td>3</td>
                               </tr>
                             </tbody>
                           </table>
