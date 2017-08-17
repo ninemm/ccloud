@@ -8,6 +8,7 @@
     #customer_rank{
         width: 100%;
         height:11.5rem;
+        margin-top:.5rem;
     }
     
     #area_rank{
@@ -53,10 +54,6 @@
 		customer_rank();
 		area_rank();
     });
-    var sales = new CountUp("sales",0,249300000);
-	sales.start();
-    var orderTotal = new CountUp("order-total",0,56675535);
-	orderTotal.start();
 	
 	//客户
 	function customer_rank(){
@@ -201,23 +198,6 @@
             </div>
             <div class="weui-tab__bd">
                 <div id="tab1" class="weui-tab__bd-item weui-tab__bd-item--active report-table">
-                    <p class="title">销售汇总</p>
-				      <div class="sales-gather">
-				          <div class="gather">
-				              <img src="${CTPATH}/images/money.png">
-				              <p>
-				                  总销售额(元):<br/><span id="sales"></span>
-				              </p>
-				              <div class="clearfix"></div>
-				          </div>
-				          <div class="gather">
-				              <img src="${CTPATH}/images/order.png">
-				              <p>
-				                  订单总数(笔):<br/><span id="order-total"></span>
-				              </p>
-				              <div class="clearfix"></div>
-				          </div>
-				      </div>
                       <div id="customer_rank">
                           
                       </div>

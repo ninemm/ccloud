@@ -683,7 +683,7 @@ header {
     display: block;
     font-size: 14px;
     background: #f0f2f5;
-    width: 5rem;
+    width: 30%;
     text-align: center;
     height: 1.2rem;
     line-height: 1.2rem;
@@ -723,9 +723,12 @@ img {
 }
 
 /*报表*/
+.weui-navbar__item {
+	padding: 6px 0;
+}
 
-.weui-bar__item--on {
-    background: linear-gradient(#e0e0e0, #c8c8c8, #e0e0e0);
+.weui-navbar + .weui-tab__bd {
+	padding-top: 36px;
 }
 
 .report {
