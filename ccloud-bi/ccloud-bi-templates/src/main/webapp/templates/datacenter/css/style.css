@@ -634,10 +634,11 @@ header,
 header {
     background: #fff;
     padding: .5rem 2rem .5rem 2rem;
+    box-sizing: border-box;
 }
 
 .position {
-    width: 14rem;
+    width: 100%;
     background: rgba(200,200,200,0.8);
     padding-left: .5rem;
     border-radius: 10px;
