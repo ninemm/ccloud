@@ -220,4 +220,33 @@ public class SalesFactQuery extends JBaseQuery {
 	        
 	        return Db.query(sqlBuilder.toString(), params.toArray());
 	    }
+
+		public List<SalesFact> queryMapData(String provName, String cityName, String countryName, String beginDate, String endDate) {
+				StringBuilder sql = new StringBuilder("SELECT provName, cityName, countryName, TRUNCATE(SUM(totalSales)/1000000, 2) as totalAmount ");
+				sql.append(" FROM `sales_Fact` ");
+
+				if(StrKit.notBlank(cityName)) {
+
+						sql.append(" where provName = ? and cityName = ? and iDate >= ? and iDate <= ? ");
+						sql.append(" GROUP BY countryName ");
+
+						return DAO.find(sql.toString(), provName, cityName, beginDate, endDate);
+
+				} else if(StrKit.notBlank(provName)) {
+
+						sql.append(" where provName = ? and iDate >= ? and iDate <= ? ");
+						sql.append("GROUP BY cityName ");
+
+						return DAO.find(sql.toString(), provName, beginDate, endDate);
+
+				} else {
+
+						sql.append(" where iDate >= ? and iDate <= ? ");
+						sql.append("GROUP BY provName ");
+
+						return DAO.find(sql.toString(), beginDate, endDate);
+
+				}
+		}
+
 }
