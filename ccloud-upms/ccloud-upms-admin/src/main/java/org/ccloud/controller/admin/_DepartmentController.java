@@ -23,11 +23,11 @@ import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
+import org.ccloud.upms.model.Department;
+import org.ccloud.upms.model.User;
+import org.ccloud.upms.model.query.DepartmentQuery;
+import org.ccloud.upms.model.query.UserQuery;
 import org.ccloud.utils.StringUtils;
-import org.ccloud.model.Department;
-import org.ccloud.model.User;
-import org.ccloud.model.query.DepartmentQuery;
-import org.ccloud.model.query.UserQuery;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;

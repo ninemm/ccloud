@@ -21,12 +21,12 @@ import java.util.Map;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
-import org.ccloud.model.Module;
-import org.ccloud.model.Operation;
-import org.ccloud.model.query.ModuleQuery;
-import org.ccloud.model.query.OperationQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
+import org.ccloud.upms.model.Module;
+import org.ccloud.upms.model.Operation;
+import org.ccloud.upms.model.query.ModuleQuery;
+import org.ccloud.upms.model.query.OperationQuery;
 import org.ccloud.utils.StringUtils;
 
 import com.google.common.collect.ImmutableMap;

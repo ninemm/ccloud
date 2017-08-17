@@ -17,8 +17,8 @@ package org.ccloud.upms.model.query;
 
 import java.util.LinkedList;
 
-import org.ccloud.model.Operation;
 import org.ccloud.model.query.JBaseQuery;
+import org.ccloud.upms.model.Operation;
 
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;

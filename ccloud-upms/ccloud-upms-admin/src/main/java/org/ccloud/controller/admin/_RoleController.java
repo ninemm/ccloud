@@ -18,10 +18,10 @@ package org.ccloud.controller.admin;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
-import org.ccloud.model.Role;
-import org.ccloud.model.query.RoleQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
+import org.ccloud.upms.model.Role;
+import org.ccloud.upms.model.query.RoleQuery;
 
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;

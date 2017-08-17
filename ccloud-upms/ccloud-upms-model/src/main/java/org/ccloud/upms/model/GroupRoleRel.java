@@ -15,9 +15,10 @@
  */
 package org.ccloud.upms.model;
 
-import com.jfinal.kit.StrKit;
 import org.ccloud.model.core.Table;
-import org.ccloud.model.base.BaseGroupRoleRel;
+import org.ccloud.upms.model.base.BaseGroupRoleRel;
+
+import com.jfinal.kit.StrKit;
 
 
 /**

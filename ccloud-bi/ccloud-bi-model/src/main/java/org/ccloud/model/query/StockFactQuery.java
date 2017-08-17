@@ -16,6 +16,7 @@
 package org.ccloud.model.query;
 
 import java.util.LinkedList;
+
 import org.ccloud.model.StockFact;
 
 import com.jfinal.plugin.activerecord.Page;

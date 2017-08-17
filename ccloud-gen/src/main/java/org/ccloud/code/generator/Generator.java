@@ -23,7 +23,7 @@ public class Generator {
 		String outputPath = "E:/cloudwork/new/";
 		
 		String dbHost = "120.76.29.52";//外网开发数据库IP
-		String dbName = "ccloud_v2";
+		String dbName = "qdy_wh";
 		String dbUser = "qdy";
 		String dbPassword = "123@!QAZ";
 		

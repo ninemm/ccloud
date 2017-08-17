@@ -18,8 +18,8 @@ package org.ccloud.upms.model.query;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.ccloud.model.User;
 import org.ccloud.model.query.JBaseQuery;
+import org.ccloud.upms.model.User;
 
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.ehcache.IDataLoader;

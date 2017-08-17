@@ -21,12 +21,12 @@ import java.util.Map;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
-import org.ccloud.model.Menu;
-import org.ccloud.model.Systems;
-import org.ccloud.model.query.MenuQuery;
-import org.ccloud.model.query.SystemsQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
+import org.ccloud.upms.model.Menu;
+import org.ccloud.upms.model.Systems;
+import org.ccloud.upms.model.query.MenuQuery;
+import org.ccloud.upms.model.query.SystemsQuery;
 import org.ccloud.utils.StringUtils;
 
 import com.alibaba.fastjson.JSON;
