@@ -61,7 +61,7 @@
 	//客户
 	function customer_rank(){
 	      	
-		var crTitle = '客户销售情况(单位/万元)';
+		var crTitle = '客户销售情况前五名(单位/万元)';
 		
 		var crSeriesData = [
 		               {value:335, name:'餐饮（直供）(335)'},
@@ -112,15 +112,19 @@
 		$.ajax({
 			url:"${CPATH}/sales/area",
 			type:"post",
-			//data:{'provName:' + "" + ",cityName:" + "" + ",countryName:" + ""},
+			data:{"provName": "湖北省", "cityName": "武汉市",countryName:""},
 			dataType:"json"
 		}).done(function(data){
-		    //alert();
-		});
-			var areaTitle = '销售情况(单位/万元)';
-		
-			var areaYData = ['武昌区','江汉区','硚口区','青山区','汉阳区'];
-			var areaSeriesData = [335, 310, 234, 135, 1548];
+		    var areaYData = [];
+			var areaSeriesData = [];
+		    var length = data.length > 5 ? 5 : data.length;
+		    
+		    for(var i = 0; i < length; i++){
+                areaYData[i] = data[i][0];
+                areaSeriesData[i] = data[i][1];
+		    }
+		    
+		    var areaTitle = '销售情况前五名(单位/万元)';
 			
 			var area_rank = document.getElementById('area_rank');
 			var $area_rank = $(area_rank);
@@ -154,14 +158,14 @@
 			    yAxis : [
 			    {
 			        type : 'category',
-			        data : areaYData
+			        data : areaYData.reverse()
 			    }
 			    ],
 			    series : [
 			    {
 			        type:'bar',
 			        barWidth: 25,
-			        data:areaSeriesData,
+			        data:areaSeriesData.reverse(),
 			        label:{
 			            normal:{
 			                show:true,
@@ -175,7 +179,9 @@
 			};
 			areaRankChart.resize();
 			areaRankChart.setOption(option,true);
-		}
+		});
+
+    }
 	
 </#macro>
 <section>

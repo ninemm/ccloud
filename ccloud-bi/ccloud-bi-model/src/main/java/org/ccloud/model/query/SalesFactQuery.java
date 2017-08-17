@@ -101,9 +101,17 @@ public class SalesFactQuery extends JBaseQuery {
 		
 		LinkedList<Object> params = new LinkedList<Object>();
 		
-		StringBuilder sqlBuilder = new StringBuilder("select provName");
+		StringBuilder sqlBuilder = new StringBuilder("select ");
 		
-		sqlBuilder.append(", TRUNCATE(SUM(totalSales)/100, 2) as totalAmount");
+        if (StrKit.notBlank(cityName)) {
+            sqlBuilder.append(" countryName");
+        }else if(StrKit.notBlank(provName)){
+            sqlBuilder.append(" cityName");
+        }else{
+            sqlBuilder.append(" provName");
+        }
+		
+		sqlBuilder.append(", TRUNCATE(SUM(totalSales)/100000, 2) as totalAmount");
 		
 		sqlBuilder.append(" from sales_fact");
 		
@@ -127,13 +135,14 @@ public class SalesFactQuery extends JBaseQuery {
 		}
 		
 		sqlBuilder.append(" group by provName");
-		if (StrKit.notBlank(cityName)) {
+		if (StrKit.notBlank(provName)) {
 			sqlBuilder.append(", cityName");
 		}
 		
-		if (StrKit.notBlank(countryName)) {
+		if (StrKit.notBlank(cityName)) {
 			sqlBuilder.append(", countryName");
 		}
+		sqlBuilder.append(" order by totalAmount desc");
 		
 		return Db.query(sqlBuilder.toString(), params.toArray());
 		
