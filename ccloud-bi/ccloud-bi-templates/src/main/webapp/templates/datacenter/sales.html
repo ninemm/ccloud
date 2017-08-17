@@ -1,17 +1,187 @@
 <#include "_inc/_layout.html"/>
+<#macro script_import>
+	
+ 	<script src="${CPATH}/templates/datacenter/js/echarts.min.js"></script>
+	
+</#macro>
 <#macro css>
+    #customer_rank{
+        width: 100%;
+        height:11.5rem;
+    }
+    
+    #area_rank{
+        width: 100%;
+        height:14rem;
+    }
+    
+    /* Table Head */
+	#product_rank thead th {
+	background-color: rgb(81, 130, 187);
+	color: #fff;
+	border-bottom-width: 0;
+	}
+	
+	/* Column Style */
+	#product_rank td {
+	color: #000;
+	}
+	/* Heading and Column Style */
+	#product_rank tr, #product_rank th {
+	border-width: 1px;
+	border-style: solid;
+	border-color: rgb(81, 130, 187);
+	}
+	
+	/* Padding and font style */
+	#product_rank td, #product_rank th {
+	padding: 5px 10px;
+	font-size: 12px;
+	font-family: Verdana;
+	font-weight: bold;
+	}
 </#macro>
 <#macro script>
-    $(function() { FastClick.attach(document.body); $(".date").click(function(e) { var $a = $(e.currentTarget); $a.parent().find(".date").removeClass("active-date"); $a.addClass("active-date"); }); });
+    $(function() { 
+        FastClick.attach(document.body); 
+        $(".date").click(function(e) { 
+            var $a = $(e.currentTarget); 
+            $a.parent().find(".date").removeClass("active-date"); 
+            $a.addClass("active-date"); 
+        }); 
+      
+		customer_rank();
+		area_rank();
+    });
     var sales = new CountUp("sales",0,249300000);
 	sales.start();
     var orderTotal = new CountUp("order-total",0,56675535);
 	orderTotal.start();
+	
+	//客户
+	function customer_rank(){
+	      	
+		var crTitle = '客户销售情况(单位/万元)';
+		
+		var crSeriesData = [
+		               {value:335, name:'餐饮（直供）(335)'},
+		               {value:310, name:'团购直销(310)'},
+		               {value:234, name:'其他(234)'},
+		               {value:135, name:'餐饮(135)'},
+		               {value:1548, name:'零售终端(1548)'}
+		               ];
+	
+		var customer_rank = document.getElementById('customer_rank');
+		var $customer_rank = $(customer_rank);
+		
+		var customerRankChart = echarts.init(customer_rank);
+		var crOption = {
+		    title: [{
+		        text: crTitle,
+		        textStyle: {
+		            fontWeight: 'normal',
+		            fontSize: 16
+		        }
+		    }],
+		    color: ['#fd9173', '#f36f8a', '#5f71d2', '#AF89D6', '#4ac7f5'],
+		    series: [
+		        {
+		            name:crTitle,
+		            type:'pie',
+		            radius: ['25%', '45%'],
+		            center: ['50%', '60%'], 
+		            avoidLabelOverlap: false,
+		            label: {
+		                normal: {
+		                    textStyle: {
+		                        fontSize: 10
+		                    }
+		                }
+		            },
+		            data:crSeriesData
+		        }
+		    ]
+		};
+		customerRankChart.resize();
+		customerRankChart.setOption(crOption,true);  
+	
+	} 
+	
+	//区域
+    function area_rank(){
+		$.ajax({
+			url:"${CPATH}/sales/area",
+			type:"post",
+			//data:{'provName:' + "" + ",cityName:" + "" + ",countryName:" + ""},
+			dataType:"json"
+		}).done(function(data){
+		    //alert();
+		});
+			var areaTitle = '销售情况(单位/万元)';
+		
+			var areaYData = ['武昌区','江汉区','硚口区','青山区','汉阳区'];
+			var areaSeriesData = [335, 310, 234, 135, 1548];
+			
+			var area_rank = document.getElementById('area_rank');
+			var $area_rank = $(area_rank);
+			
+			var areaRankChart = echarts.init(area_rank);
+			var option = {
+			    title: [{
+			        text: areaTitle,
+			        textStyle: {
+			            fontWeight: 'normal',
+			            fontSize: 16
+			        }
+			    }],
+			    color: ['#4ac7f5'],
+			    grid: {
+			        left: '2%',
+			        right: '15%',
+			        bottom: 15,
+			        top: 60,
+			        containLabel: true
+			    },
+			    calculable : true,
+			    xAxis : [
+			    {
+			        show : false,
+			        name : '金额/万元',
+			        type : 'value',
+			        boundaryGap: [0, 0.01]
+			    }
+			    ],
+			    yAxis : [
+			    {
+			        type : 'category',
+			        data : areaYData
+			    }
+			    ],
+			    series : [
+			    {
+			        type:'bar',
+			        barWidth: 25,
+			        data:areaSeriesData,
+			        label:{
+			            normal:{
+			                show:true,
+			                position:'right'
+			            }
+			        }
+			
+			    }
+			    ]
+			
+			};
+			areaRankChart.resize();
+			areaRankChart.setOption(option,true);
+		}
+	
 </#macro>
 <section>
     <div class="bi-body">
         <div class="date-div">
-            <a class="date active-date">最近一天</a>
+            <a class="date active-date">最近一天</a>	
             <a class="date">最近一周</a>
             <a class="date">最近一月</a>
         </div>
@@ -32,34 +202,44 @@
             <div class="weui-tab__bd">
                 <div id="tab1" class="weui-tab__bd-item weui-tab__bd-item--active report-table">
                     <p class="title">销售汇总</p>
-        <div class="sales-gather">
-            <div class="gather">
-                <img src="${CTPATH}/images/money.png">
-                <p>
-                    总销售额(元):<br/><span id="sales"></span>
-                </p>
-                <div class="clearfix"></div>
-            </div>
-            <div class="gather">
-                <img src="${CTPATH}/images/order.png">
-                <p>
-                    订单总数(笔):<br/><span id="order-total"></span>
-                </p>
-                <div class="clearfix"></div>
-            </div>
-        </div>
-                    <div>
-                        <p class="title">全国产品销售前5名</p>
-                        <img src="static/images/sale_top5.png">
-                    </div>
-                    <div>
-                        <p class="title">全国客户销售情况比较</p>
-                        <img src="static/images/customer_top5.png">
-                    </div>
-                    <div>
-                        <p class="title">全国销售前5名</p>
-                        <img src="static/images/country_top5.png">
-                    </div>
+				      <div class="sales-gather">
+				          <div class="gather">
+				              <img src="${CTPATH}/images/money.png">
+				              <p>
+				                  总销售额(元):<br/><span id="sales"></span>
+				              </p>
+				              <div class="clearfix"></div>
+				          </div>
+				          <div class="gather">
+				              <img src="${CTPATH}/images/order.png">
+				              <p>
+				                  订单总数(笔):<br/><span id="order-total"></span>
+				              </p>
+				              <div class="clearfix"></div>
+				          </div>
+				      </div>
+                      <div id="customer_rank">
+                          
+                      </div>
+                      <div id="area_rank">
+                      </div>
+                      <div id="product_rank">
+                          <table>
+                            <thead>全国产品销售前5名</thead>
+                            <tbody>
+                              <tr>
+                                <th>产品</th>
+                                <th>数量(件)</th>
+                                <th>金额</th>
+                              </tr>
+                              <tr>
+                                <td>1</td>
+                                <td>2</td>
+                                <td>3</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                      </div>
                 </div>
                 <div id="tab2" class="weui-tab__bd-item report-table">
                     <div>
