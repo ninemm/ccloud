@@ -811,7 +811,7 @@ img {
 }
 
 .sales-gather {
-    overflow: hidden;
+    position: relative;
 }
 
 .gather {
@@ -822,6 +822,7 @@ img {
     box-sizing: border-box;
     position: relative;
     height: 5rem;
+    padding: 0;
 }
 
 .gather:nth-child(2) {
@@ -832,15 +833,16 @@ img {
     width: 30%;
     position: absolute;
     top: 20%;
+    left: 5%;
 }
 
 .gather>p {
     display: inline-block;
-    width: 50%;
-    padding-right: 15px;
+    width: 55%;
     top: 25%;
     position: absolute;
     right: 0;
+    padding: 0;
 }
 
 .weui-tabbar {
