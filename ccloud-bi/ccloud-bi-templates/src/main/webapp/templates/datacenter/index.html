@@ -24,7 +24,8 @@
 		text-align: center;
 		color: #ccc;
 		font-size: .7rem;
-		margin-bottom: .4rem;
+		background: #fff;
+		padding: .2rem 0;
 	}
 	
 	.stat-title {
@@ -33,45 +34,6 @@
 		height: 2rem;
 		background: #f2f2f2;
 	}
-	
-	.sales-gather {
-    height: 6rem;
-}
-
-.gather {
-    background: #fff;
-    padding: .2rem 15px;
-    width: 50%;
-    display: inline-block;
-    box-sizing: border-box;
-    position: relative;
-    height: 5rem;
-}
-
-.gather:first-child {
-     border-right: 1px solid #aaa;
-}
-
-.gather img {
-    width: 30%;
-    position: absolute;
-    top: 20%;
-}
-
-.gather>p {
-    display: inline-block;
-    width: 50%;
-    padding-right: 15px;
-    top: 25%;
-    position: absolute;
-    right: 0;
-    font-size: 14px;
-}
-
-.gather span {
-    color: red;
-    font-size: 28px;
-}
 </#macro>
 
 <#macro script_import>
@@ -536,76 +498,78 @@
 	if (option && typeof option === "object") {
 		myChart.setOption(option, true);
 	}
-	
-	var sales = new CountUp("sales",0,24.93,2);
+
+	var sales = new CountUp("sales",0,249300000);
 	sales.start();
-    var orderTotal = new CountUp("order-total",0,565);
+    var orderTotal = new CountUp("order-total",0,56675535);
 	orderTotal.start();
 </#macro>
 
 <@layout>
 <section>
-	
-    <div class="location">
-        <i class="icon-map-marker txt-color-green"></i> 湖北省 > 武汉市 > 洪山区 
-    </div>
-    <div class="map-wrapper">
-    	<div id="map" class="maps"></div>
-    </div>
-    <div class="map-desc">
-    	图1 产品货物流向
-    </div>
-    
-    <div class="stat-title">
-    	销售汇总
-    </div>
-    <div class="sales-gather">
-        <div class="gather fl">
-            <img src="${CTPATH}/images/money.png">
-            <p>
-                总销售额：<br/><span id="sales">24.93</span>&nbsp;万元
-            </p>
-        </div>
-        <div class="gather fr">
-            <img src="${CTPATH}/images/order.png">
-            <p>
-                订单总数：<br/><span id="order-total">565</span>&nbsp;笔
-            </p>
-        </div>
-    </div>
-    
-    <div class="stat-title">
-    	<h3>统计类别</h3>
-    </div>
-    <div class="weui-grids">
-        <a href="${CPATH}/sales" class="weui-grid js_grid">
-            <div class="weui-grid__icon" style="text-align: center">
-                <span class="icon-help2" style="color: orangered;font-size: 1rem;text-align: center;"></span>
-			</div>
-            <p class="weui-grid__label">
-                	销售
-            </p>
-            </a>
-            <a href="" class="weui-grid js_grid">
-                <div class="weui-grid__icon" style="text-align: center">
-                    <span class="icon-group" style="color: lightskyblue; font-size: 1rem;"></span>
-                </div>
-                <p class="weui-grid__label">
-                   	 客户
+
+	<div class="bi-body">
+	    <div class="location">
+	        <i class="icon-map-marker txt-color-green"></i> 湖北省 > 武汉市 > 洪山区
+	    </div>
+	    <div class="map-wrapper">
+	    	<div id="map" class="maps"></div>
+	    </div>
+	    <div class="map-desc">
+	    	图1 产品出库图
+	    </div>
+
+	    <p class="title">销售汇总</p>
+        <div class="sales-gather">
+            <div class="gather">
+                <img src="${CTPATH}/images/money.png">
+                <p>
+                    总销售额(元):<br/><span id="sales"></span>
                 </p>
-            </a>
-            <a href="" class="weui-grid js_grid">
-                <div class="weui-grid__icon" style="text-align: center">
-                    <span class="icon-box2" style="color: greenyellow; font-size: 1rem;"></span>
-                </div>
-                <p class="weui-grid__label">
-                    	产品
+                <div class="clearfix"></div>
+            </div>
+            <div class="gather">
+                <img src="${CTPATH}/images/order.png">
+                <p>
+                    订单总数(笔):<br/><span id="order-total"></span>
                 </p>
-            </a>
+                <div class="clearfix"></div>
+            </div>
         </div>
-        <div class="weui-footer">
-            <p class="weui-footer__text">武汉市珈研信息科技有限公司</p>
-        </div>
-    </div>
+
+	    <div class="title">
+	    	<h3>统计类别</h3>
+	    </div>
+	    <div class="weui-grids">
+	        <a href="${CPATH}/sales" class="weui-grid js_grid">
+	            <div class="weui-grid__icon" style="text-align: center">
+	                <span class="icon-help2" style="color: orangered;font-size: 1rem;text-align: center;"></span>
+				</div>
+	            <p class="weui-grid__label">
+	                	销售
+	            </p>
+	            </a>
+	            <a href="" class="weui-grid js_grid">
+	                <div class="weui-grid__icon" style="text-align: center">
+	                    <span class="icon-group" style="color: lightskyblue; font-size: 1rem;"></span>
+	                </div>
+	                <p class="weui-grid__label">
+	                   	 客户
+	                </p>
+	            </a>
+	            <a href="" class="weui-grid js_grid">
+	                <div class="weui-grid__icon" style="text-align: center">
+	                    <span class="icon-box2" style="color: greenyellow; font-size: 1rem;"></span>
+	                </div>
+	                <p class="weui-grid__label">
+	                    	产品
+	                </p>
+	            </a>
+	        </div>
+	        <div class="weui-footer">
+	            <p class="weui-footer__text">武汉市珈研信息科技有限公司</p>
+	        </div>
+	    </div>
+	</div>
 </section>
 </@layout>
