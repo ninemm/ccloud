@@ -15,6 +15,7 @@
  */
 package org.ccloud.model.query;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +73,7 @@ public class SalesFactQuery extends JBaseQuery {
 		return 0;
 	}
 	
-	public List<Map<String, Object>> findAreaList(String provName, String cityName, String countryName) {
+	public List<Map<String, Object>> findAreaList(String provName, String cityName, String countryName, Date startDate, Date endDate) {
 		
 		LinkedList<Object> params = new LinkedList<Object>();
 		
@@ -87,6 +88,20 @@ public class SalesFactQuery extends JBaseQuery {
 		needWhere = appendIfNotEmpty(sqlBuilder, "cityName", cityName, params, needWhere);
 		needWhere = appendIfNotEmpty(sqlBuilder, "countryName", countryName, params, needWhere);
 		
+		if (needWhere) {
+			sqlBuilder.append(" where 1 = 1");
+		}
+		
+		if (startDate != null) {
+			sqlBuilder.append(" and idate >= ?");
+			params.add(startDate);
+		}
+		
+		if (endDate != null) {
+			sqlBuilder.append(" and idate <= ?");
+			params.add(endDate);
+		}
+		
 		sqlBuilder.append(" group by provName");
 		if (StrKit.notBlank(cityName)) {
 			sqlBuilder.append(", cityName");
@@ -100,5 +115,39 @@ public class SalesFactQuery extends JBaseQuery {
 		
 	}
 
+	public List<Map<String, Object>> findCustomerTypeList(String provName, String cityName, String countryName, Date startDate, Date endDate) {
+		
+		LinkedList<Object> params = new LinkedList<Object>();
+		
+		StringBuilder sqlBuilder = new StringBuilder("select customerTypeName");
+		
+		sqlBuilder.append(", TRUNCATE(SUM(totalSales)/100, 2) as totalAmount");
+		
+		sqlBuilder.append(" from sales_fact");
+		
+		boolean needWhere = true;
+		needWhere = appendIfNotEmpty(sqlBuilder, "provName", provName, params, needWhere);
+		needWhere = appendIfNotEmpty(sqlBuilder, "cityName", cityName, params, needWhere);
+		needWhere = appendIfNotEmpty(sqlBuilder, "countryName", countryName, params, needWhere);
+		
+		if (needWhere) {
+			sqlBuilder.append(" where 1 = 1");
+		}
+		
+		if (startDate != null) {
+			sqlBuilder.append(" and idate >= ?");
+			params.add(startDate);
+		}
+		
+		if (endDate != null) {
+			sqlBuilder.append(" and idate <= ?");
+			params.add(endDate);
+		}
+		
+		sqlBuilder.append(" group by customerType");
+		
+		return Db.query(sqlBuilder.toString(), params.toArray());
+	}
+	
 	
 }

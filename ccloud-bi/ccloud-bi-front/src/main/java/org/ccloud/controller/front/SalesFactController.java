@@ -20,7 +20,9 @@ public class SalesFactController extends BaseFrontController {
 		String cityName = getPara("cityName", "").trim();
 		String countryName = getPara("countryName", "").trim();
 		
-		List<Map<String, Object>> result = SalesFactQuery.me().findAreaList(provName, cityName, countryName);
+		String type = getPara("type");// 0: 昨天， 1: 最近1周， 2: 最近1月
+		
+		List<Map<String, Object>> result = SalesFactQuery.me().findAreaList(provName, cityName, countryName, null, null);
 		
 		renderJson(result);
 		
