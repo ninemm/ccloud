@@ -16,9 +16,13 @@
 package org.ccloud.model.query;
 
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import org.ccloud.model.SalesFact;
 
+import com.jfinal.kit.StrKit;
+import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
@@ -66,6 +70,34 @@ public class SalesFactQuery extends JBaseQuery {
 			return deleteCount;
 		}
 		return 0;
+	}
+	
+	public List<Map<String, Object>> findAreaList(String provName, String cityName, String countryName) {
+		
+		LinkedList<Object> params = new LinkedList<Object>();
+		
+		StringBuilder sqlBuilder = new StringBuilder("select provName");
+		
+		sqlBuilder.append(", TRUNCATE(SUM(totalSales)/100, 2) as totalAmount");
+		
+		sqlBuilder.append(" from sales_fact");
+		
+		boolean needWhere = true;
+		needWhere = appendIfNotEmpty(sqlBuilder, "provName", provName, params, needWhere);
+		needWhere = appendIfNotEmpty(sqlBuilder, "cityName", cityName, params, needWhere);
+		needWhere = appendIfNotEmpty(sqlBuilder, "countryName", countryName, params, needWhere);
+		
+		sqlBuilder.append(" group by provName");
+		if (StrKit.notBlank(cityName)) {
+			sqlBuilder.append(", cityName");
+		}
+		
+		if (StrKit.notBlank(countryName)) {
+			sqlBuilder.append(", countryName");
+		}
+		
+		return Db.query(sqlBuilder.toString(), params.toArray());
+		
 	}
 
 	
