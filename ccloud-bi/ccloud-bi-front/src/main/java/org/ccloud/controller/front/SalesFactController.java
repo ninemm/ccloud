@@ -28,4 +28,5 @@ public class SalesFactController extends BaseFrontController {
 		
 	}
 	
+	
 }

@@ -20,6 +20,7 @@ import org.ccloud.core.BaseFrontController;
 import org.ccloud.core.addon.HookInvoker;
 import org.ccloud.core.cache.ActionCache;
 import org.ccloud.model.query.OptionQuery;
+import org.ccloud.model.query.SalesFactQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.StringUtils;
 
@@ -46,8 +47,15 @@ public class IndexController extends BaseFrontController {
 		setGlobleAttrs();
 
 		String para = getPara();
+		String provName = getPara("provName", "").trim();
+		String cityName = getPara("cityName", "").trim();
+		String countryName = getPara("countryName", "").trim();
 
 		if (StringUtils.isBlank(para)) {
+			
+			setAttr("totalOrderCount", SalesFactQuery.me().findOrderCount());
+			setAttr("totalOrderAmount", SalesFactQuery.me().findTotalAmount(provName, cityName, countryName));
+			
 			//setAttr(IndexPageTag.TAG_NAME, new IndexPageTag(getRequest(), null, 1, null));
 			render("index.html");
 			return;

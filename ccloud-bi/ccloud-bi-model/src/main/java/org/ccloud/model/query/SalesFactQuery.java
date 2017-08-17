@@ -73,6 +73,30 @@ public class SalesFactQuery extends JBaseQuery {
 		return 0;
 	}
 	
+	// 订单记录总数
+	public Long findOrderCount() {
+		
+		StringBuilder sql = new StringBuilder("select count(*) from (");
+		sql.append(" select stockId from sales_fact group by stockId) as sales");
+		return Db.queryLong(sql.toString());
+		
+	}
+	
+	// 订单总金额
+	public Double findTotalAmount(String provName, String cityName, String countryName) {
+		
+		LinkedList<Object> params = new LinkedList<Object>();
+		StringBuilder sqlBuilder = new StringBuilder("select TRUNCATE(SUM(totalSales)/100, 2) as totalAmount");
+		sqlBuilder.append(" from sales_fact");
+		
+		boolean needWhere = true;
+		needWhere = appendIfNotEmpty(sqlBuilder, "provName", provName, params, needWhere);
+		needWhere = appendIfNotEmpty(sqlBuilder, "cityName", cityName, params, needWhere);
+		needWhere = appendIfNotEmpty(sqlBuilder, "countryName", countryName, params, needWhere);
+		
+		return Db.queryDouble(sqlBuilder.toString());
+	}
+	
 	public List<Map<String, Object>> findAreaList(String provName, String cityName, String countryName, Date startDate, Date endDate) {
 		
 		LinkedList<Object> params = new LinkedList<Object>();
