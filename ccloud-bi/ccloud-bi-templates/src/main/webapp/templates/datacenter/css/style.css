@@ -627,7 +627,7 @@ header,
 /*
 * 首页  ***********************************************************
 */
-#bi-index {
+.bi-body {
     background: #f3f3f3;
 }
 
@@ -659,70 +659,6 @@ header {
 * 销售  ***********************************************************
 */
 
-.gather {
-    background: #fff;
-    padding: .2rem 15px;
-    width: 50%;
-    display: inline-block;
-    box-sizing: border-box;
-    position: relative;
-    height: 5rem;
-}
-
-.gather:first-child {
-     border-right: 1px solid #aaa;
-}
-
-.gather {
-    background: #fff;
-    padding: .2rem 15px;
-    width: 50%;
-    display: inline-block;
-    box-sizing: border-box;
-    position: relative;
-    height: 5rem;
-}
-
-.gather:first-child {
-     border-right: 1px solid #aaa;
-}
-
-.gather img {
-    width: 30%;
-    position: absolute;
-    top: 20%;
-}
-
-.gather>p {
-    display: inline-block;
-    width: 50%;
-    padding-right: 15px;
-    top: 25%;
-    position: absolute;
-    right: 0;
-    font-size: 14px;
-}
-
-.gather img {
-    width: 30%;
-    position: absolute;
-    top: 20%;
-}
-
-.gather>p {
-    display: inline-block;
-    width: 50%;
-    padding-right: 15px;
-    top: 25%;
-    position: absolute;
-    right: 0;
-    font-size: 14px;
-}
-
-.gather span {
-    color: red;
-    font-size: 28px;
-}
 
 /*日期*/
 
@@ -741,13 +677,14 @@ header {
     text-align: center;
     height: 1.2rem;
     line-height: 1.2rem;
+    border-radius: 5px;
+    border: 1px solid #f0f2f5;
 }
 
 .date-div .active-date {
     background: #fff;
     border: 1px solid #f23030;
     color: #f23030;
-    border-radius: 5px;
 }
 
 /*地图*/
@@ -759,18 +696,26 @@ header {
 }
 
 .map p, .title {
-    background: #efeff4;
+    background: #f2f2f2;
     height: 2rem;
     line-height: 2rem;
     width: 100%;
-    padding-left: .5rem;
     font-size: 16px;
-    box-sizing: border-box;
     text-align: center;
+}
+
+.map p {
+    border-bottom: 1px solid #e0e0e0;
 }
 
 img {
     width: 100%;
+}
+
+/*报表*/
+
+.weui-bar__item--on {
+    background: linear-gradient(#e0e0e0, #c8c8c8, #e0e0e0);
 }
 
 .report {
@@ -800,49 +745,36 @@ img {
     color: #000;
 }
 
-.report-table>div {
-    padding: .2rem 15px;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.report-table>div p {
-    margin-bottom: .2rem;
-}
-
-.sales-gather {
-    position: relative;
-}
-
 .gather {
     background: #fff;
-    padding: .2rem 15px;
-    width: 50%;
-    display: inline-block;
-    box-sizing: border-box;
-    position: relative;
     height: 5rem;
-    padding: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
 }
 
-.gather:nth-child(2) {
-    border-right: 1px solid #aaa;
+.gather:first-child {
+    border-bottom: 1px solid #e0e0e0;
 }
 
 .gather img {
-    width: 30%;
-    position: absolute;
-    top: 20%;
-    left: 5%;
+     width: 15%;
+    margin-left: 15px;
 }
 
 .gather>p {
     display: inline-block;
-    width: 55%;
-    top: 25%;
-    position: absolute;
-    right: 0;
-    padding: 0;
+    height: 5rem;
+    width: 60%;
+    padding-top: .5rem;
+    box-sizing: border-box;
+}
+
+.gather span {
+    color: #0039bd;
+    font-size: 48px;
+    position: relative;
 }
 
 .weui-tabbar {
