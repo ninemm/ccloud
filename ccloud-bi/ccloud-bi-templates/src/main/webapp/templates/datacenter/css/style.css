@@ -624,124 +624,104 @@ header,
 .wy-news-info{color:#333;}
 .commg{margin:0; font-size:14px;}
 .weui-cells.commg:before{display:none;}
-
-/*commom*/
-body
-{
-    font-family: Arial, Helvetica, 'Microsoft YaHei';
-
-    color: #000;
-    background: #f3f3f3;
-}
-
-a
-{
-    color: #232323;
-}
-
-em
-{
-    font-style: normal;
-}
-
-label
-{
-    color: #232323;
-}
-
-ul,
-ol,
-li,
-dl,
-dd
-{
-    margin: 0;
-    padding: 0;
-}
-
-ul,
-ol
-{
-    list-style: none outside none;
-}
-
-input,
-select,
-textarea
-{
-    font: .4rem Arial, Helvetica, 'Microsoft YaHei';
-
-    border: none 0;
-    outline: none;
-    background: none;
-
-    -webkit-appearance: none;
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-}
-
-::-webkit-input-placeholder
-{
-    color: #aaa;
-}
-
-::-moz-placeholder
-{
-    color: #aaa;
-}
-
-:-ms-input-placeholder
-{
-    color: #aaa;
-}
-
-input:-moz-placeholder
-{
-    color: #aaa;
-}
-
-input::-ms-input-placeholder
-{
-    text-align: center;
-}
-
-input::-webkit-input-placeholder
-{
-    text-align: center;
-}
-
-.fl {
-    float: left;
-}
-
-.fr {
-    float:  right;
-}
-
 /*
 * 首页  ***********************************************************
 */
+#bi-index {
+    background: #f3f3f3;
+}
+
+header {
+    background: #fff;
+    padding: .5rem 2rem .5rem 2rem;
+}
+
 .position {
     width: 14rem;
     background: rgba(200,200,200,0.8);
     padding-left: .5rem;
-    margin: .5rem 2rem .5rem 2rem;
     border-radius: 10px;
     font-size: 14px;
     box-sizing: border-box;
 }
 
-.position i {
-    color: #f23030;
+.weui-grids {
+    background: #fff;
 }
 
-.weui-grids {
-    margin-top: 1rem;
-    background: #fff;
+.weui-footer {
+    height: 1.5rem;
+    line-height: 1.5rem;
 }
 
 /*
 * 销售  ***********************************************************
 */
+
+.gather {
+    background: #fff;
+    padding: .2rem 15px;
+    width: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    position: relative;
+    height: 5rem;
+}
+
+.gather:first-child {
+     border-right: 1px solid #aaa;
+}
+
+.gather {
+    background: #fff;
+    padding: .2rem 15px;
+    width: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    position: relative;
+    height: 5rem;
+}
+
+.gather:first-child {
+     border-right: 1px solid #aaa;
+}
+
+.gather img {
+    width: 30%;
+    position: absolute;
+    top: 20%;
+}
+
+.gather>p {
+    display: inline-block;
+    width: 50%;
+    padding-right: 15px;
+    top: 25%;
+    position: absolute;
+    right: 0;
+    font-size: 14px;
+}
+
+.gather img {
+    width: 30%;
+    position: absolute;
+    top: 20%;
+}
+
+.gather>p {
+    display: inline-block;
+    width: 50%;
+    padding-right: 15px;
+    top: 25%;
+    position: absolute;
+    right: 0;
+    font-size: 14px;
+}
+
+.gather span {
+    color: red;
+    font-size: 28px;
+}
 
 /*日期*/
 
@@ -777,7 +757,7 @@ input::-webkit-input-placeholder
     box-sizing: border-box;
 }
 
-.map p {
+.map p, .title {
     background: #efeff4;
     height: 2rem;
     line-height: 2rem;
@@ -830,7 +810,7 @@ img {
 }
 
 .sales-gather {
-    height: 7rem;
+    overflow: hidden;
 }
 
 .gather {
