@@ -120,7 +120,7 @@ public class StockFactQuery extends JBaseQuery {
         }
         sqlBuilder.append(" and cInvCode = ?");
         params.add(cInvCode);
-        
+        sqlBuilder.append(" group by idate  ");
         sqlBuilder.append(" order by idate asc");
         
         return Db.query(sqlBuilder.toString(), params.toArray());
