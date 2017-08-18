@@ -629,6 +629,7 @@ header,
 */
 .bi-body {
     background: #f3f3f3;
+    overflow: hidden;
 }
 
 header {
@@ -734,6 +735,7 @@ img {
 
 .weui-navbar + .weui-tab__bd {
 	padding-top: 36px;
+	height: auto;
 }
 
 .report {

@@ -49,6 +49,9 @@
      }
      #tab1,#tab2 {
        width: 50%;
+       height: fit-content;
+       height: -webkit-fit-content;
+       height: -moz-fit-content;
      }
      .active {
        left: -100%;
@@ -79,10 +82,6 @@
                   countryName = addComp.district;
                   provName = provName.substring(0, provName.length - 1);
 
-                  console.log(provName + "");
-                  console.log(cityName.toString());
-                  console.log(typeof countryName);
-
                   if(countryName.length != 0) {
                     clickCity({"name": cityName}, provName);
                     mapRender(false);
@@ -104,39 +103,40 @@
             $a.parent().find(".date").removeClass("active-date");
             $a.addClass("active-date");
         });
+        
 
-	var ITEM_ON = "weui-bar__item--on";
+      	var ITEM_ON = "weui-bar__item--on";
 
-    var showTab = function(a) {
-        var $a = $(a);
-        if ($a.hasClass(ITEM_ON)) return;
-        var href = $a.attr("href");
+        var showTab = function(a) {
+            var $a = $(a);
+            if ($a.hasClass(ITEM_ON)) return;
+            var href = $a.attr("href");
 
-        if (!/^#/.test(href)) return;
+            if (!/^#/.test(href)) return;
 
-        $a.parent().find("." + ITEM_ON).removeClass(ITEM_ON);
-        $a.addClass(ITEM_ON);
+            $a.parent().find("." + ITEM_ON).removeClass(ITEM_ON);
+            $a.addClass(ITEM_ON);
 
-        if (href == "#tab2") {
-            $(".weui-tab__bd").addClass("active");
-        } else {
-            $(".weui-tab__bd").removeClass("active");
+            if (href == "#tab2") {
+                $(".weui-tab__bd").addClass("active").height($("#tab2").height());
+            } else {
+                $(".weui-tab__bd").removeClass("active").height($("#tab1").height());
+            }
+
+
         }
 
+        $.showTab = showTab;
 
-    }
+        $(".weui-navbar__item").click(function(e) {
+            var $a = $(e.currentTarget);
+            var href = $a.attr("href");
+            if ($a.hasClass(ITEM_ON)) return;
+            if (!/^#/.test(href)) return;
 
-    $.showTab = showTab;
-
-    $(".weui-navbar__item").click(function(e) {
-        var $a = $(e.currentTarget);
-        var href = $a.attr("href");
-        if ($a.hasClass(ITEM_ON)) return;
-        if (!/^#/.test(href)) return;
-
-        e.preventDefault();
-        showTab($a);
-    })
+            e.preventDefault();
+            showTab($a);
+        })
 
       customer_rank();
       area_rank();
@@ -581,13 +581,13 @@
   			dataType:"json"
   		}).done(function(data){
   			var length = data.length > 5 ? 5 : data.length;
-
             var $tbody = $("#product_rank tbody");
             $tbody.empty();
             $tbody.append("<tr><th>产品</th><th>数量(件)</th><th>金额</th></tr>");
             for(var i = 0; i < length; i++){
                 $tbody.append("<tr><td>" + data[i].cInvName + "</td><td>" + data[i].totalNum + "</td><td>" + data[i].totalAmount + "</td></tr>");
             }
+            $(".weui-tab__bd").height($("#tab1").height());
        });
     }
 
