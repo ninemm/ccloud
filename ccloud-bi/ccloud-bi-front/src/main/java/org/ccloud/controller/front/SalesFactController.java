@@ -11,6 +11,8 @@ import org.ccloud.model.SalesFact;
 import org.ccloud.model.query.SalesFactQuery;
 import org.ccloud.route.RouterMapping;
 
+import com.jfinal.plugin.activerecord.Record;
+
 @RouterMapping(url = "/sales")
 public class SalesFactController extends BaseFrontController {
 
@@ -26,7 +28,7 @@ public class SalesFactController extends BaseFrontController {
 		
 		String type = getPara("type");// 0: 昨天， 1: 最近1周， 2: 最近1月
 		
-		List<Map<String, Object>> result = SalesFactQuery.me().findAreaList(provName, cityName, countryName, null, null);
+		List<Record> result = SalesFactQuery.me().findAreaList(provName, cityName, countryName, null, null);
 		
 		renderJson(result);
 		

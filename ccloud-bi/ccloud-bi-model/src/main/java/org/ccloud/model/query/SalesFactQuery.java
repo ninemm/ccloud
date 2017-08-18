@@ -25,6 +25,7 @@ import org.ccloud.model.SalesFact;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
 /**
@@ -97,7 +98,7 @@ public class SalesFactQuery extends JBaseQuery {
 		return Db.queryBigDecimal(sqlBuilder.toString()).doubleValue();
 	}
 	
-	public List<Map<String, Object>> findAreaList(String provName, String cityName, String countryName, Date startDate, Date endDate) {
+	public List<Record> findAreaList(String provName, String cityName, String countryName, Date startDate, Date endDate) {
 		
 		LinkedList<Object> params = new LinkedList<Object>();
 		
@@ -144,7 +145,7 @@ public class SalesFactQuery extends JBaseQuery {
 		}
 		sqlBuilder.append(" order by totalAmount desc");
 		
-		return Db.query(sqlBuilder.toString(), params.toArray());
+		return Db.find(sqlBuilder.toString(), params.toArray());
 		
 	}
 
