@@ -505,6 +505,13 @@
     sales.start();
     var orderTotal = new CountUp("order-total",0,56675535);
     orderTotal.start();
+    
+    setTimeout(function() {
+		$("#sales").addClass('animated pulse');
+		setTimeout(function() {
+		$("#order-total").addClass('animated pulse');
+		}, 1000);
+	}, 2000);
 </#macro>
 
 <@layout>

@@ -9,7 +9,6 @@
 <#macro css_import>
 
     <link rel="stylesheet" href="${CPATH}/templates/datacenter/css/bootstrap.min.css">
-    <link rel="stylesheet" href="${CPATH}/templates/datacenter/css/animate.min.css">
 
 </#macro>
 <#macro css>
@@ -38,23 +37,23 @@
       height:14rem;
     }
     .table{
-        font-size:0.3rem;
+      font-size:0.3rem;
     }
     
     .weui-tab__bd {
-            width: 200%;
-            position: relative;
-            left: 0;
-            display: flex;
-            transition: .3s all linear;
-        }
-        #tab1,#tab2 {
-            width: 50%;
-        }
-        .active {
-            left: -100%;
-            transition: .3s all linear;
-        }
+       width: 200%;
+       position: relative;
+       left: 0;
+       display: flex;
+       transition: .3s all linear;
+     }
+     #tab1,#tab2 {
+       width: 50%;
+     }
+     .active {
+       left: -100%;
+       transition: .3s all linear;
+     }
 
 </#macro>
 <#macro script>
@@ -101,7 +100,7 @@
             $a.addClass("active-date");
         });
 
-var ITEM_ON = "weui-bar__item--on";
+	var ITEM_ON = "weui-bar__item--on";
 
     var showTab = function(a) {
         var $a = $(a);
