@@ -25,6 +25,7 @@ import org.ccloud.model.StockFact;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
 /**
@@ -73,7 +74,7 @@ public class StockFactQuery extends JBaseQuery {
 		return 0;
 	}
 	
-    public List<Map<String, Object>> findAreaList(String provName, String cityName, String countryName, Date startDate, Date endDate) {
+    public List<Record> findAreaList(String provName, String cityName, String countryName, Date startDate, Date endDate) {
         
         LinkedList<Object> params = new LinkedList<Object>();
         
@@ -96,17 +97,17 @@ public class StockFactQuery extends JBaseQuery {
         sqlBuilder.append(" group by cInvCode");
         sqlBuilder.append(" order by totalNum asc");
         
-        return Db.query(sqlBuilder.toString(), params.toArray());
+        return Db.find(sqlBuilder.toString(), params.toArray());
         
      }
     
-     public List<Map<String, Object>> findDateList(String provName, String cityName, String countryName, String cInvCode) {
+     public List<Record> findDateList(String provName, String cityName, String countryName, String cInvCode) {
         
         LinkedList<Object> params = new LinkedList<Object>();
         
         StringBuilder sqlBuilder = new StringBuilder("select idate");
         
-        sqlBuilder.append(", TRUNCATE(SUM(totalSmallAmount/cInvMNum), 2) as totalNum");
+        sqlBuilder.append(", TRUNCATE(SUM(totalSmallAmount/cInvMNum), 0) as totalNum");
         
         sqlBuilder.append(" from stock_fact");
         
@@ -123,7 +124,7 @@ public class StockFactQuery extends JBaseQuery {
         sqlBuilder.append(" group by idate  ");
         sqlBuilder.append(" order by idate asc");
         
-        return Db.query(sqlBuilder.toString(), params.toArray());
+        return Db.find(sqlBuilder.toString(), params.toArray());
         
      }
 	

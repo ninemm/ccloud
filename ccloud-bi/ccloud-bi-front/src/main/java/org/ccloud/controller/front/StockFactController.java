@@ -1,12 +1,12 @@
 package org.ccloud.controller.front;
 
 import java.util.List;
-import java.util.Map;
 
 import org.ccloud.core.BaseFrontController;
-import org.ccloud.model.query.SalesFactQuery;
 import org.ccloud.model.query.StockFactQuery;
 import org.ccloud.route.RouterMapping;
+
+import com.jfinal.plugin.activerecord.Record;
 
 @RouterMapping(url = "/stock")
 public class StockFactController extends BaseFrontController {
@@ -23,7 +23,7 @@ public class StockFactController extends BaseFrontController {
 		
 		String type = getPara("type");// 0: 昨天， 1: 最近1周， 2: 最近1月
 		
-		List<Map<String, Object>> result = StockFactQuery.me().findAreaList(provName, cityName, countryName, null, null);
+		List<Record> result = StockFactQuery.me().findAreaList(provName, cityName, countryName, null, null);
 		
 		renderJson(result);
 		
@@ -36,7 +36,7 @@ public class StockFactController extends BaseFrontController {
         String countryName = getPara("countryName", "").trim();
         String cInvCode = getPara("cInvCode", "").trim();
         
-        List<Map<String, Object>> result = StockFactQuery.me().findDateList(provName, cityName, countryName, cInvCode);
+        List<Record> result = StockFactQuery.me().findDateList(provName, cityName, countryName, cInvCode);
         
         renderJson(result);
         

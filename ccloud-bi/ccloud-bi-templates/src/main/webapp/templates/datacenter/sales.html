@@ -138,11 +138,13 @@
         showTab($a);
     })
 
-        customer_rank();
-   		  area_rank();
-   		  product_rank();
-   		  stock_rank();
-        stock(125,"za000053");
+      customer_rank();
+      area_rank();
+      product_rank();
+      stock_rank();
+      stock(125,"125ml35度中国劲酒","za000053");
+      stock(258,"258ml35度中国劲酒","zzgj2715");
+      stock(520,"520ml35度中国劲酒","zzgj1012");
       });
 
     //回到中国地图界面
@@ -171,7 +173,9 @@
       area_rank();
       product_rank();
       stock_rank();
-      stock(125,"za000053");
+      stock(125,"125ml35度中国劲酒","za000053");
+      stock(258,"258ml35度中国劲酒","zzgj2715");
+      stock(520,"520ml35度中国劲酒","zzgj1012");
       mapRender(false);
       var cityNameCopy = cityName;
       clickProv({"name": provName.substring(0, provName.length - 1)}, false);
@@ -600,13 +604,13 @@
             $tbody.empty();
 	        $tbody.append("<tr><th>产品</th><th>数量(件)</th></tr>");
 	        for(var i = 0; i < length; i++){
-                $tbody.append("<tr><td>" + data[i][0] + "</td><td>" + data[i][1] + "</td></tr>");
+                $tbody.append("<tr><td>" + data[i].cInvName + "</td><td>" + data[i].totalNum + "</td></tr>");
 	        }
         });
     }
 
     //库存趋势
-    function stock(name,cInvCode){
+    function stock(name,tn,cInvCode){
 		$.ajax({
 			url:"${CPATH}/stock/date",
 			type:"post",
@@ -618,11 +622,11 @@
 		    var length = data.length > 5 ? 5 : data.length;
 
 		    for(var i = 0; i < data.length; i++){
-                xData.push(data[i][0]) ;
-                seriesData.push(data[i][1]);
+                xData.push(data[i].idate) ;
+                seriesData.push(data[i].totalNum);
             }
 
-			var title = '客户库存趋势情况(单位/件)';
+			var title = tn + '库存趋势情况(单位/件)';
 
 			var stock = document.getElementById('stock'+'_'+name);
 			var $stock = $(stock);
@@ -633,14 +637,11 @@
                     text: title
                 },
                   tooltip : {
-                      trigger: 'axis',
-                      formatter:function(v){
-                          return v[0].name+":"+ v[0].data.toString().replace(/(\d)(?=(\d{3})+(\.|$))/g, '$1,');
-		              }
+
                   },
 				  grid: {
-				       left: '13%',
-				       right: '14%',
+				       left: '14%',
+				       right: '15%',
 				       top:'30%'
 				  },
 				  xAxis: {
@@ -661,11 +662,6 @@
 				          data : [
 				              {type : 'max', name: '最大值'},
 				              {type : 'min', name: '最小值'}
-				              ]
-				          },
-				          markLine: {
-				              data: [
-				                  {type: 'average', name: '平均值'}
 				              ]
 				          },
 				          data:seriesData
