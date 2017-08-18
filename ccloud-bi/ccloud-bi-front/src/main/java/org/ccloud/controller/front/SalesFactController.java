@@ -12,6 +12,7 @@ import org.ccloud.model.query.SalesFactQuery;
 import org.ccloud.route.RouterMapping;
 
 import com.jfinal.plugin.activerecord.Record;
+import org.joda.time.DateTime;
 
 @RouterMapping(url = "/sales")
 public class SalesFactController extends BaseFrontController {
@@ -71,30 +72,27 @@ public class SalesFactController extends BaseFrontController {
 				String beginDate;
 				String endDate;
 
-				SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-				Calendar calendar = Calendar.getInstance();
-
-				calendar.setTime(new Date());
-
-				calendar.add(Calendar.DATE, - 1);
-				endDate = format.format(calendar.getTime());
+				endDate = getDate(-1);
 
 				if(dateType.equals("0")) {
 
-						beginDate = format.format(calendar.getTime());
+					beginDate = getDate(-1);
 
 				} else if(dateType.equals("1")) {
 
-						calendar.add(Calendar.DATE, - 7);
-						beginDate = format.format(calendar.getTime());
+					beginDate = getDate(-7);
 
 				} else {
 
-						calendar.add(Calendar.DATE, - 30);
-						beginDate = format.format(calendar.getTime());
+					beginDate = getDate(-30);
 
 				}
 				List<SalesFact> salesFactList = SalesFactQuery.me().queryMapData(provName, cityName, countryName, beginDate, endDate);
 				renderJson(salesFactList);
+		}
+
+		private String getDate(int days) {
+			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+			return format.format(DateTime.now().plusDays(days).toDate());
 		}
 }

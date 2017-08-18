@@ -1,8 +1,8 @@
-                              <#include "_inc/_layout.html"/>
+<#include "_inc/_layout.html"/>
 <#macro script_import>
 
  	<script src="${CPATH}/templates/datacenter/js/echarts.min.js"></script>
-    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=su3AmHLUcBprpnOLmVHo7r8AljbW8X6t"></script>
+  <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=su3AmHLUcBprpnOLmVHo7r8AljbW8X6t"></script>
  	<!-- <script src="${CPATH}/templates/datacenter/js/bootstrap.min.js"></script> -->
 
 </#macro>
@@ -40,7 +40,7 @@
     .table{
         font-size:0.3rem;
     }
-    
+
     .weui-tab__bd {
             width: 200%;
             position: relative;
@@ -66,7 +66,6 @@
     var city_data = [];
     var country_data = [];
     $(function() {
-        mapRender();
         var MapSet = {
           GetLocation:function(){
             var geolocation = new BMap.Geolocation();
@@ -82,12 +81,14 @@
                   provName = provName.substring(0, provName.length - 1);
 
                   if(countryName.length != 0) {
-                    clickProv({"name": provName});
+                    clickCity({"name": cityName}, provName);
+                    mapRender(false);
+                    clickProv({"name": provName}, false);
                     cityName = addComp.city;
-                    clickCity({"name": cityName}, provName.substring(0, provName.length -1));
                   } else if(cityName.length !=0){
-                    clickProv({"name": provName});
-                  }
+                    mapRender(false);
+                    clickProv({"name": provName}, true);
+                  } else mapRender(true);
                 });
               }
             },{enableHighAccuracy: true})
@@ -133,7 +134,7 @@ var ITEM_ON = "weui-bar__item--on";
         e.preventDefault();
         showTab($a);
     })
-		
+
         customer_rank();
    		  area_rank();
    		  product_rank();
@@ -141,6 +142,7 @@ var ITEM_ON = "weui-bar__item--on";
         stock(125,"za000053");
       });
 
+    //回到中国地图界面
     function goBackChinaMap() {
       $('#china_map').css('display','block');
       $('#city_map').css('display','none');
@@ -150,6 +152,7 @@ var ITEM_ON = "weui-bar__item--on";
     	$('#city').css('visibility','hidden');
     }
 
+    //回到省界面
     function goBackProvMap() {
       $('#prov_map').css('display','block');
   		$('#china_map').css('display','none');
@@ -158,6 +161,7 @@ var ITEM_ON = "weui-bar__item--on";
   		$('#city').css('visibility','hidden');
   	}
 
+    //做时间的切换选择
     function setDateType(type){
       dateType = type;
       customer_rank();
@@ -165,13 +169,14 @@ var ITEM_ON = "weui-bar__item--on";
       product_rank();
       stock_rank();
       stock(125,"za000053");
-      mapRender();
+      mapRender(false);
       var cityNameCopy = cityName;
-      clickProv({"name": provName.substring(0, provName.length - 1)});
+      clickProv({"name": provName.substring(0, provName.length - 1)}, false);
       clickCity({"name": cityNameCopy}, provName.substring(0, provName.length - 1));
     }
 
-    function clickProv (result) {
+    //点击地图上的省
+    function clickProv (result, isRender) {
       cityName = '';
       if(result.name == '北京' || result.name == '上海' || result.name == '天津' || result.name == '台湾' || result.name == '重庆'){
         provName = result.name + '市';
@@ -182,6 +187,7 @@ var ITEM_ON = "weui-bar__item--on";
       var maxData = 0;
       var url = "${CPATH}/sales/queryMapData?provName=" + provName + "&cityName=&countryName=&dateType=" +dateType;
       $.get(url,function(data){
+          city_data = [];
         for(var i = 0; i < data.length; i++)
         {
           city_data.push({"name": data[i].cityName, "value": data[i].totalAmount});
@@ -191,9 +197,11 @@ var ITEM_ON = "weui-bar__item--on";
           $('#prov_view').text(result.name);
           $('#prov').css('visibility','visible');
 
-          $('#china_map').css('display','none');
-          $('#city_map').css('display','none');
-          $('#prov_map').css('display','block');
+          if (isRender) {
+            $('#china_map').css('display','none');
+            $('#city_map').css('display','none');
+            $('#prov_map').css('display','block');
+          }
         }, 500);
         //选择省的单击事件
         var selectProv = result.name;
@@ -206,6 +214,7 @@ var ITEM_ON = "weui-bar__item--on";
           myChartProv.setOption({
             tooltip: {
               trigger: 'item',
+              textStyle: {fontSize: 9},
               formatter: function loadData(result){
                 if(isNaN(result.value)) return result.name + '<br />总金额: 0';
                 else return result.name+'<br />总金额:'+result.value + '万元';
@@ -226,7 +235,8 @@ var ITEM_ON = "weui-bar__item--on";
             series: [{
               type: 'map',
               map: selectProv ,//要和echarts.registerMap（）中第一个参数一致
-              scaleLimit: { min: 0.8, max: 1.9 },//缩放
+              roam: 'scale',
+              scaleLimit: { min: 1, max: 4 },//缩放
               mapLocation:{
                 y:60
               },
@@ -251,11 +261,13 @@ var ITEM_ON = "weui-bar__item--on";
       });
     }
 
+    //点击地图上的市
     function clickCity(rel, selectProv) {
       var maxData = 0;
       cityName = rel.name;
       var url = "${CPATH}/sales/queryMapData?provName=" + provName + "&cityName=" + cityName + "&countryName=&dateType=" +dateType;
       $.get(url,function(data){
+          country_data = [];
         for(var i = 0; i < data.length; i++)
         {
           country_data.push({"name": data[i].countryName, "value": data[i].totalAmount});
@@ -304,6 +316,7 @@ var ITEM_ON = "weui-bar__item--on";
         myChartCity.setOption({
           tooltip: {
             trigger: 'item',
+            textStyle: {fontSize: 9},
             formatter: function loadData(result){
               if(isNaN(result.value)) return result.name + '<br />总金额: 0';
               else return result.name+'<br />总金额:'+result.value + '万元';
@@ -324,7 +337,8 @@ var ITEM_ON = "weui-bar__item--on";
           series: [{
             type: 'map',
             map: selectCity ,//要和echarts.registerMap（）中第一个参数一致
-            scaleLimit: { min: 0.8, max: 1.9 },//缩放
+            roam: 'scale',
+            scaleLimit: { min: 1, max: 4 },//缩放
             mapLocation:{
               y:60
             },
@@ -348,24 +362,35 @@ var ITEM_ON = "weui-bar__item--on";
         })
       });
     }
-
-    function mapRender() {
+    //中国地图渲染
+    function mapRender(isRender) {
       /*echarts*/
       var maxData = 0;
       var url = "${CPATH}/sales/queryMapData?provName=&cityName=&countryName=&dateType=" +dateType;
       $.get(url,function(data){
+          prov_data = [];
         for(var i = 0; i < data.length; i++)
         {
           prov_data.push({"name": data[i].provName.substring(0, data[i].provName.length -1), "value": data[i].totalAmount});
           if (data[i].totalAmount > maxData) maxData = data[i].totalAmount;
         }
+        setTimeout(function () {
+
+          if (isRender) {
+            $('#china_map').css('display','block');
+            $('#city_map').css('display','none');
+            $('#prov_map').css('display','none');
+          }
+        }, 500);
       $.get('${CTPATH}/json/china.json', function (mapJson) {
         echarts.registerMap('china', mapJson);
         var chart = echarts.init(document.getElementById('china_map'));//在id为mainMap的dom元素中显示地图
+        $(document.getElementById('china_map')).width(400);
         chart.resize();
         chart.setOption({
           tooltip: {
             trigger: 'item',
+            textStyle: {fontSize: 9},
             formatter: function (result){
               if(isNaN(result.value)) return result.name + '<br />总金额: 0';
               else return result.name+'<br />总金额:'+result.value + '万元';
@@ -386,7 +411,8 @@ var ITEM_ON = "weui-bar__item--on";
           series: [{
             type: 'map',
             map: 'china',//要和echarts.registerMap（）中第一个参数一致
-            scaleLimit: { min: 0.8, max: 1.9 },//缩放
+            roam: 'scale',
+            scaleLimit: { min: 1, max: 4 },//缩放
             mapLocation:{
               y:60
             },
@@ -395,10 +421,12 @@ var ITEM_ON = "weui-bar__item--on";
             },
             label: {
               normal: {
-                show: true
+                show: true,
+                textStyle: {fontSize: 9},
               },
               emphasis: {
-                show: true
+                show: true,
+                textStyle: {fontSize: 9},
               }
             },
             data : prov_data.reverse()
@@ -406,7 +434,7 @@ var ITEM_ON = "weui-bar__item--on";
         }),
 
         chart.on('click', function(result) {
-          clickProv(result);
+          clickProv(result, true);
         });
       });
      });
@@ -664,13 +692,13 @@ var ITEM_ON = "weui-bar__item--on";
         <div class="map" style="width: 100%;height:20rem;background: #efeff4">
             <p>2017-08-15销售情况</p>
             <div>
-                        <span id="china"style="visibility:visible;">  <a href ="javascript:void(0);" onclick="goBackChinaMap()" > 全国</a></span>
-                        <span id="prov" style="visibility:hidden;" > > <a href ="javascript:void(0);" onclick="goBackProvMap()" id="prov_view"></a></span>
-                        <span id="city" style="visibility:hidden;"> > <a herf = "javascript:void(0);" id="city_view"></a></span>
-                    </div>
-                    <div id="china_map" style="width: 100%;height:16rem;margin:0 auto;position: relative;display: block;"></div>
-                    <div id="prov_map"  style="width: 100%;height:16rem;margin:0 auto;position: relative;display: none;"></div>
-                    <div id="city_map"  style="width: 100%;height:16rem;margin:0 auto;position: relative;display: none;"></div>
+              <span id="china"style="visibility:visible;">  <a href ="javascript:void(0);" onclick="goBackChinaMap()" > 全国</a></span>
+              <span id="prov" style="visibility:hidden;" > > <a href ="javascript:void(0);" onclick="goBackProvMap()" id="prov_view"></a></span>
+              <span id="city" style="visibility:hidden;"> > <a herf = "javascript:void(0);" id="city_view"></a></span>
+            </div>
+            <div id="china_map" style="width: 100%;height:16rem;margin:0 auto;position: relative;display: none;"></div>
+            <div id="prov_map"  style="width: 100%;height:16rem;margin:0 auto;position: relative;display: none;"></div>
+            <div id="city_map"  style="width: 100%;height:16rem;margin:0 auto;position: relative;display: none;"></div>
         </div>
         <!-- 容器 -->
         <div class="weui-tab report">
