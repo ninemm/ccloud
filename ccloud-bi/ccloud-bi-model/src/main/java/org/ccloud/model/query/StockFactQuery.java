@@ -77,17 +77,9 @@ public class StockFactQuery extends JBaseQuery {
         
         LinkedList<Object> params = new LinkedList<Object>();
         
-        StringBuilder sqlBuilder = new StringBuilder("select ");
+        StringBuilder sqlBuilder = new StringBuilder("select cInvName");
         
-        if (StrKit.notBlank(cityName)) {
-            sqlBuilder.append(" countryName");
-        }else if(StrKit.notBlank(provName)){
-            sqlBuilder.append(" cityName");
-        }else{
-            sqlBuilder.append(" provName");
-        }
-        
-        sqlBuilder.append(", TRUNCATE(SUM(totalSales)/1000000, 2) as totalAmount");
+        sqlBuilder.append(", TRUNCATE(SUM(totalSmallAmount/cInvMNum), 2) as totalNum");
         
         sqlBuilder.append(" from sales_fact");
         
@@ -99,26 +91,10 @@ public class StockFactQuery extends JBaseQuery {
         if (needWhere) {
             sqlBuilder.append(" where 1 = 1");
         }
+        sqlBuilder.append(" and idate = DATE_SUB(CURDATE(), INTERVAL 1 DAY) ");
         
-        if (startDate != null) {
-            sqlBuilder.append(" and idate >= ?");
-            params.add(startDate);
-        }
-        
-        if (endDate != null) {
-            sqlBuilder.append(" and idate <= ?");
-            params.add(endDate);
-        }
-        
-        sqlBuilder.append(" group by provName");
-        if (StrKit.notBlank(provName)) {
-            sqlBuilder.append(", cityName");
-        }
-        
-        if (StrKit.notBlank(cityName)) {
-            sqlBuilder.append(", countryName");
-        }
-        sqlBuilder.append(" order by totalAmount desc");
+        sqlBuilder.append(" group by cInvCode");
+        sqlBuilder.append(" order by totalNum asc");
         
         return Db.query(sqlBuilder.toString(), params.toArray());
         
