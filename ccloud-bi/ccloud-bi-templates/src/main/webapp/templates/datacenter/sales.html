@@ -90,7 +90,16 @@
                   } else if(cityName.length !=0){
                     mapRender(false);
                     clickProv({"name": provName}, true);
-                  } else mapRender(true);
+                  } else { 
+                    mapRender(true);
+                  }
+                  customer_rank(provName, cityName, countryName);
+                  area_rank(provName, cityName, countryName);
+                  product_rank(provName, cityName, countryName);
+                  stock_rank(provName, cityName, countryName);
+                  stock(125,"125ml35度中国劲酒","za000053",provName, cityName, countryName);
+                  stock(258,"258ml35度中国劲酒","zzgj2715",provName, cityName, countryName);
+                  stock(520,"520ml35度中国劲酒","zzgj1012",provName, cityName, countryName);
                 });
               }
             },{enableHighAccuracy: true})
@@ -137,15 +146,6 @@
             e.preventDefault();
             showTab($a);
         })
-
-
-      customer_rank(provName, cityName, countryName);
-      area_rank(provName, cityName, countryName);
-      product_rank(provName, cityName, countryName);
-      stock_rank(provName, cityName, countryName);
-      stock(125,"125ml35度中国劲酒","za000053",provName, cityName, countryName);
-      stock(258,"258ml35度中国劲酒","zzgj2715",provName, cityName, countryName);
-      stock(520,"520ml35度中国劲酒","zzgj1012",provName, cityName, countryName);
       });
 
     //回到中国地图界面
@@ -621,6 +621,16 @@
 			data:{"provName": provName, "cityName": cityName, countryName: countryName},
 			dataType:"json"
 		}).done(function(data){
+		  	var srTitle = '库存情况';
+            if((provName + cityName + countryName).trim() != '' ){
+			    srTitle = provName + cityName + countryName + srTitle;
+			} else {
+			    srTitle = '全国' + srTitle
+			}
+			var $thead = $("#stock_rank thead");
+			$thead.empty();
+			$thead.text(srTitle);
+			
 			var length = data.length > 5 ? 5 : data.length;
             var $tbody = $("#stock_rank tbody");
             $tbody.empty();
@@ -639,6 +649,17 @@
 			data:{"provName": provName, "cityName": cityName, countryName: countryName, cInvCode: cInvCode},
 			dataType:"json"
 		}).done(function(data){
+		
+			var sTitle = '库存趋势';
+            if((provName + cityName + countryName).trim() != '' ){
+			    sTitle = provName + cityName + countryName + sTitle;
+			} else {
+			    sTitle = '全国' + sTitle
+			}
+			var $title = $(".title");
+			$title.empty();
+			$title.text(sTitle);
+			
             var xData = [];
 			var seriesData = [];
 		    var length = data.length > 5 ? 5 : data.length;
@@ -745,7 +766,7 @@
                 <div id="tab2" class="weui-tab__bd-item weui-tab__bd-item--active">
                     <div>
                         <table id="stock_rank" class="table">
-                          <thead>库存排行</thead>
+                          <thead></thead>
                           <tbody>
                             <tr>
                               <th>产品</th>
@@ -754,7 +775,7 @@
                           </tbody>
                         </table>
                     </div>
-                    <p class="title">全国库存趋势</p>
+                    <p class="title">库存趋势</p>
                     <div>
                       <div id="stock_125">
 
