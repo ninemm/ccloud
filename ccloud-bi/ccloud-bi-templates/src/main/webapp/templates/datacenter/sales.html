@@ -1,4 +1,4 @@
-<#include "_inc/_layout.html"/>
+                              <#include "_inc/_layout.html"/>
 <#macro script_import>
 
  	<script src="${CPATH}/templates/datacenter/js/echarts.min.js"></script>
@@ -73,8 +73,9 @@
         });
 
         customer_rank();
-    		area_rank();
-    		product_rank();
+   		area_rank();
+   		product_rank();
+   		stock_rank();
         });
 
         function goBackChinaMap() {
@@ -473,9 +474,32 @@
 			dataType:"json"
 		}).done(function(data){
 			var length = data.length > 5 ? 5 : data.length;
-
+			
+            var $tbody = $("#product_rank tbody");
+            $tbody.empty();
+		    $tbody.append("<tr><th>产品</th><th>数量(件)</th><th>金额</th></tr>");
 		    for(var i = 0; i < length; i++){
-                $(".table tbody").append("<tr><td>" + data[i][0] + "</td><td>" + data[i][1] + "</td><td>" + data[i][2] + "</td></tr>")
+                $tbody.append("<tr><td>" + data[i][0] + "</td><td>" + data[i][1] + "</td><td>" + data[i][2] + "</td></tr>");
+		    }
+
+		});
+	}
+	
+	//库存
+    function stock_rank(){
+		$.ajax({
+			url:"${CPATH}/stock/area",
+			type:"post",
+			data:{"provName": "湖北省", "cityName": "武汉市",countryName:""},
+			dataType:"json"
+		}).done(function(data){
+			var length = data.length > 5 ? 5 : data.length;
+			
+            var $tbody = $("#stock_rank tbody");
+            $tbody.empty();
+		    $tbody.append("<tr><th>产品</th><th>数量(件)</th></tr>");
+		    for(var i = 0; i < length; i++){
+                $tbody.append("<tr><td>" + data[i][0] + "</td><td>" + data[i][1] + "</td></tr>");
 		    }
 
 		});
@@ -518,7 +542,7 @@
                       <div id="area_rank">
                       </div>
                       <div>
-                          <table class="table">
+                          <table id="product_rank" class="table">
                             <thead>产品销售前五名(金额/万元)</thead>
                             <tbody>
                               <tr>
@@ -532,8 +556,15 @@
                 </div>
                 <div id="tab2" class="weui-tab__bd-item report-table">
                     <div>
-                        <p class="title mg-t-0">全国最新库存</p>
-                        <img src="static/images/inventory.png">
+                        <table id="stock_rank" class="table">
+                          <thead>库存排行</thead>
+                          <tbody>
+                            <tr>
+                              <th>产品</th>
+                              <th>数量(件)</th>
+                            </tr>
+                          </tbody>
+                        </table>
                     </div>
                     <div>
                         <p class="title">全国库存趋势</p>

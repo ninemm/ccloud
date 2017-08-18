@@ -15,10 +15,15 @@
  */
 package org.ccloud.model.query;
 
+import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import org.ccloud.model.StockFact;
 
+import com.jfinal.kit.StrKit;
+import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
@@ -67,6 +72,56 @@ public class StockFactQuery extends JBaseQuery {
 		}
 		return 0;
 	}
-
+	
+    public List<Map<String, Object>> findAreaList(String provName, String cityName, String countryName, Date startDate, Date endDate) {
+        
+        LinkedList<Object> params = new LinkedList<Object>();
+        
+        StringBuilder sqlBuilder = new StringBuilder("select ");
+        
+        if (StrKit.notBlank(cityName)) {
+            sqlBuilder.append(" countryName");
+        }else if(StrKit.notBlank(provName)){
+            sqlBuilder.append(" cityName");
+        }else{
+            sqlBuilder.append(" provName");
+        }
+        
+        sqlBuilder.append(", TRUNCATE(SUM(totalSales)/1000000, 2) as totalAmount");
+        
+        sqlBuilder.append(" from sales_fact");
+        
+        boolean needWhere = true;
+        needWhere = appendIfNotEmpty(sqlBuilder, "provName", provName, params, needWhere);
+        needWhere = appendIfNotEmpty(sqlBuilder, "cityName", cityName, params, needWhere);
+        needWhere = appendIfNotEmpty(sqlBuilder, "countryName", countryName, params, needWhere);
+        
+        if (needWhere) {
+            sqlBuilder.append(" where 1 = 1");
+        }
+        
+        if (startDate != null) {
+            sqlBuilder.append(" and idate >= ?");
+            params.add(startDate);
+        }
+        
+        if (endDate != null) {
+            sqlBuilder.append(" and idate <= ?");
+            params.add(endDate);
+        }
+        
+        sqlBuilder.append(" group by provName");
+        if (StrKit.notBlank(provName)) {
+            sqlBuilder.append(", cityName");
+        }
+        
+        if (StrKit.notBlank(cityName)) {
+            sqlBuilder.append(", countryName");
+        }
+        sqlBuilder.append(" order by totalAmount desc");
+        
+        return Db.query(sqlBuilder.toString(), params.toArray());
+        
+     }
 	
 }
