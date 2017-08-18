@@ -722,8 +722,14 @@ img {
 }
 
 /*报表*/
+.report .weui-bar__item--on {
+	border-bottom: 1px solid #ea6f5a;
+	background-color: #eee;
+}
+
 .weui-navbar__item {
 	padding: 6px 0;
+	background-color: #eee;
 }
 
 .weui-navbar + .weui-tab__bd {
@@ -762,6 +768,7 @@ img {
 }
 
 .gather span {
+	display: inline-block;
     color: #259fe8;
     font-size: 11vw;
     position: relative;
