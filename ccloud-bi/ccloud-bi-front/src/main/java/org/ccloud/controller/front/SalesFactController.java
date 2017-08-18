@@ -2,6 +2,7 @@ package org.ccloud.controller.front;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Map;
 
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.SalesFact;
@@ -26,7 +27,7 @@ public class SalesFactController extends BaseFrontController {
 		
 		String type = getPara("type");// 0: 昨天， 1: 最近1周， 2: 最近1月
 		
-		List<Record> result = SalesFactQuery.me().findAreaList(provName, cityName, countryName, null, null);
+		List<Map<String, Object>> result = SalesFactQuery.me().findAreaList(provName, cityName, countryName, null, null);
 		
 		renderJson(result);
 		

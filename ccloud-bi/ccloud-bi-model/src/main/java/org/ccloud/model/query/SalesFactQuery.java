@@ -18,6 +18,7 @@ package org.ccloud.model.query;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.ccloud.model.SalesFact;
 
@@ -97,7 +98,7 @@ public class SalesFactQuery extends JBaseQuery {
 		return Db.queryBigDecimal(sqlBuilder.toString()).doubleValue();
 	}
 	
-	public List<Record> findAreaList(String provName, String cityName, String countryName, Date startDate, Date endDate) {
+	public List<Map<String, Object>> findAreaList(String provName, String cityName, String countryName, Date startDate, Date endDate) {
 		
 		LinkedList<Object> params = new LinkedList<Object>();
 		
@@ -133,6 +134,7 @@ public class SalesFactQuery extends JBaseQuery {
 			sqlBuilder.append(" and idate <= ?");
 			params.add(endDate);
 		}
+	    sqlBuilder.append(" and customerType != 7");
 		
 		sqlBuilder.append(" group by provName");
 		if (StrKit.notBlank(provName)) {
@@ -144,7 +146,7 @@ public class SalesFactQuery extends JBaseQuery {
 		}
 		sqlBuilder.append(" order by totalAmount desc");
 		
-		return Db.find(sqlBuilder.toString(), params.toArray());
+		return Db.query(sqlBuilder.toString(), params.toArray());
 		
 	}
 
@@ -202,7 +204,6 @@ public class SalesFactQuery extends JBaseQuery {
 	        
 	        if (needWhere) {
 	            sqlBuilder.append(" where 1 = 1");
-	            sqlBuilder.append(" and type != 7");
 	        }
 	        
 	        if (startDate != null) {
@@ -214,6 +215,7 @@ public class SalesFactQuery extends JBaseQuery {
 	            sqlBuilder.append(" and idate <= ?");
 	            params.add(endDate);
 	        }
+	        sqlBuilder.append(" and customerType != 7");
 	        
 	        sqlBuilder.append(" group by cInvCode");
 	        sqlBuilder.append(" order by totalAmount desc");

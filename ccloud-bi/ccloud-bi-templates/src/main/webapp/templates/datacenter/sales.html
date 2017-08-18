@@ -139,13 +139,13 @@
         })
 
 
-      customer_rank();
-      area_rank();
-      product_rank();
-      stock_rank();
-      stock(125,"125ml35度中国劲酒","za000053");
-      stock(258,"258ml35度中国劲酒","zzgj2715");
-      stock(520,"520ml35度中国劲酒","zzgj1012");
+      customer_rank(provName, cityName, countryName);
+      area_rank(provName, cityName, countryName);
+      product_rank(provName, cityName, countryName);
+      stock_rank(provName, cityName, countryName);
+      stock(125,"125ml35度中国劲酒","za000053",provName, cityName, countryName);
+      stock(258,"258ml35度中国劲酒","zzgj2715",provName, cityName, countryName);
+      stock(520,"520ml35度中国劲酒","zzgj1012",provName, cityName, countryName);
       });
 
     //回到中国地图界面
@@ -170,13 +170,13 @@
     //做时间的切换选择
     function setDateType(type){
       dateType = type;
-      customer_rank();
-      area_rank();
-      product_rank();
-      stock_rank();
-      stock(125,"125ml35度中国劲酒","za000053");
-      stock(258,"258ml35度中国劲酒","zzgj2715");
-      stock(520,"520ml35度中国劲酒","zzgj1012");
+      customer_rank(provName, cityName, countryName);
+      area_rank(provName, cityName, countryName);
+      product_rank(provName, cityName, countryName);
+      stock_rank(provName, cityName, countryName);
+      stock(125,"125ml35度中国劲酒","za000053",provName, cityName, countryName);
+      stock(258,"258ml35度中国劲酒","zzgj2715",provName, cityName, countryName);
+      stock(520,"520ml35度中国劲酒","zzgj1012",provName, cityName, countryName);
       mapRender(false);
       var cityNameCopy = cityName;
       clickProv({"name": provName.substring(0, provName.length - 1)}, false);
@@ -449,11 +449,11 @@
     }
 
 	  //客户
-	  function customer_rank(){
+	  function customer_rank(provName, cityName, countryName){
 	    $.ajax({
 			url:"${CPATH}/sales/customerType",
 			type:"post",
-			data:{"provName": "湖北省", "cityName": "武汉市",countryName:""},
+			data:{"provName": provName, "cityName": cityName, countryName: countryName},
 			dataType:"json"
 		}).done(function(data){
 
@@ -466,8 +466,12 @@
                     value: data[i].totalAmount
                 });
 		    }
-
-			var crTitle = '客户销售情况前五名(金额/万元)';
+            var crTitle = '客户销售情况前五名(金额/万元)';
+            if((provName + cityName + countryName).trim() != '' ){
+			    crTitle = provName + cityName + countryName + crTitle;
+			} else {
+			    crTitle = '全国' + crTitle
+			}
 
 
 			var customer_rank = document.getElementById('customer_rank');
@@ -507,11 +511,11 @@
 	}
 
 	 //区域
-    function area_rank(){
+    function area_rank(provName, cityName, countryName){
       $.ajax({
   			url:"${CPATH}/sales/area",
   			type:"post",
-  			data:{"provName": "湖北省", "cityName": "武汉市",countryName:""},
+  			data:{"provName": provName, "cityName": cityName, countryName: countryName},
   			dataType:"json"
   		}).done(function(data){
             var areaYData = [];
@@ -519,11 +523,16 @@
 		    var length = data.length > 5 ? 5 : data.length;
 
 		    for(var i = 0; i < length; i++){
-                areaYData.push(data[i].countryName) ;
-                areaSeriesData.push(data[i].totalAmount);
+                areaYData.push(data[i][0]) ;
+                areaSeriesData.push(data[i][1]);
 		    }
 
 		    var areaTitle = '销售情况前五名(金额/万元)';
+		    if((provName + cityName + countryName).trim() != '' ){
+			    areaTitle = provName + cityName + countryName + areaTitle;
+			} else {
+			    areaTitle = '全国' + areaTitle
+			}
 
             var area_rank = document.getElementById('area_rank');
 			var $area_rank = $(area_rank);
@@ -574,17 +583,29 @@
     }
 
     //产品
-    function product_rank(){
+    function product_rank(provName, cityName, countryName){
   		$.ajax({
   			url:"${CPATH}/sales/product",
   			type:"post",
-  			data:{"provName": "湖北省", "cityName": "武汉市",countryName:""},
+  			data:{"provName": provName, "cityName": cityName, countryName: countryName},
   			dataType:"json"
   		}).done(function(data){
+  		
+  		    var prTitle = '产品销售情况前五名';
+            if((provName + cityName + countryName).trim() != '' ){
+			    prTitle = provName + cityName + countryName + prTitle;
+			} else {
+			    prTitle = '全国' + prTitle
+			}
+			var $thead = $("#product_rank thead");
+			$thead.empty();
+			$thead.text(prTitle);
+			
   			var length = data.length > 5 ? 5 : data.length;
+  			
             var $tbody = $("#product_rank tbody");
             $tbody.empty();
-            $tbody.append("<tr><th>产品</th><th>数量(件)</th><th>金额</th></tr>");
+            $tbody.append("<tr><th>产品</th><th>数量(件)</th><th>金额(万元)</th></tr>");
             for(var i = 0; i < length; i++){
                 $tbody.append("<tr><td>" + data[i].cInvName + "</td><td>" + data[i].totalNum + "</td><td>" + data[i].totalAmount + "</td></tr>");
             }
@@ -593,11 +614,11 @@
     }
 
 	//库存
-    function stock_rank(){
+    function stock_rank(provName, cityName, countryName){
         $.ajax({
 	        url:"${CPATH}/stock/area",
 			type:"post",
-			data:{"provName": "湖北省", "cityName": "武汉市",countryName:""},
+			data:{"provName": provName, "cityName": cityName, countryName: countryName},
 			dataType:"json"
 		}).done(function(data){
 			var length = data.length > 5 ? 5 : data.length;
@@ -611,11 +632,11 @@
     }
 
     //库存趋势
-    function stock(name,tn,cInvCode){
+    function stock(name, tn, cInvCode, provName, cityName, countryName){
 		$.ajax({
 			url:"${CPATH}/stock/date",
 			type:"post",
-			data:{"provName": "湖北省", "cityName": "武汉市", countryName:"", cInvCode: cInvCode},
+			data:{"provName": provName, "cityName": cityName, countryName: countryName, cInvCode: cInvCode},
 			dataType:"json"
 		}).done(function(data){
             var xData = [];
@@ -710,7 +731,7 @@
                       </div>
                       <div>
                           <table id="product_rank" class="table">
-                            <thead>产品销售前五名(金额/万元)</thead>
+                            <thead></thead>
                             <tbody>
                               <tr>
                                 <th>产品</th>
