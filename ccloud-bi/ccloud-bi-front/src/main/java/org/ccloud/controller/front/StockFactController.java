@@ -28,30 +28,15 @@ public class StockFactController extends BaseFrontController {
 		renderJson(result);
 		
 	}
-	
-    public void customerType() {
-        
-        String provName = getPara("provName", "").trim();
-        String cityName = getPara("cityName", "").trim();
-        String countryName = getPara("countryName", "").trim();
-        
-        String type = getPara("type");// 0: 昨天， 1: 最近1周， 2: 最近1月
-        
-        List<Map<String, Object>> result = SalesFactQuery.me().findCustomerTypeList(provName, cityName, countryName, null, null);
-        
-        renderJson(result);
-        
-     }
     
-    public void product() {
+    public void date() {
         
         String provName = getPara("provName", "").trim();
         String cityName = getPara("cityName", "").trim();
         String countryName = getPara("countryName", "").trim();
+        String cInvCode = getPara("cInvCode", "").trim();
         
-        String type = getPara("type");// 0: 昨天， 1: 最近1周， 2: 最近1月
-        
-        List<Map<String, Object>> result = SalesFactQuery.me().findProductList(provName, cityName, countryName, null, null);
+        List<Map<String, Object>> result = StockFactQuery.me().findDateList(provName, cityName, countryName, cInvCode);
         
         renderJson(result);
         

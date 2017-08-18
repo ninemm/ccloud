@@ -99,5 +99,32 @@ public class StockFactQuery extends JBaseQuery {
         return Db.query(sqlBuilder.toString(), params.toArray());
         
      }
+    
+     public List<Map<String, Object>> findDateList(String provName, String cityName, String countryName, String cInvCode) {
+        
+        LinkedList<Object> params = new LinkedList<Object>();
+        
+        StringBuilder sqlBuilder = new StringBuilder("select idate");
+        
+        sqlBuilder.append(", TRUNCATE(SUM(totalSmallAmount/cInvMNum), 2) as totalNum");
+        
+        sqlBuilder.append(" from stock_fact");
+        
+        boolean needWhere = true;
+        needWhere = appendIfNotEmpty(sqlBuilder, "provName", provName, params, needWhere);
+        needWhere = appendIfNotEmpty(sqlBuilder, "cityName", cityName, params, needWhere);
+        needWhere = appendIfNotEmpty(sqlBuilder, "countryName", countryName, params, needWhere);
+        
+        if (needWhere) {
+            sqlBuilder.append(" where 1 = 1");
+        }
+        sqlBuilder.append(" and cInvCode = ?");
+        params.add(cInvCode);
+        
+        sqlBuilder.append(" order by idate asc");
+        
+        return Db.query(sqlBuilder.toString(), params.toArray());
+        
+     }
 	
 }
