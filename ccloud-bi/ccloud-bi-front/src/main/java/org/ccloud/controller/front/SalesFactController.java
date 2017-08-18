@@ -1,18 +1,15 @@
 package org.ccloud.controller.front;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.SalesFact;
 import org.ccloud.model.query.SalesFactQuery;
 import org.ccloud.route.RouterMapping;
+import org.joda.time.DateTime;
 
 import com.jfinal.plugin.activerecord.Record;
-import org.joda.time.DateTime;
 
 @RouterMapping(url = "/sales")
 public class SalesFactController extends BaseFrontController {
@@ -43,7 +40,7 @@ public class SalesFactController extends BaseFrontController {
         
         String type = getPara("type");// 0: 昨天， 1: 最近1周， 2: 最近1月
         
-        List<Map<String, Object>> result = SalesFactQuery.me().findCustomerTypeList(provName, cityName, countryName, null, null);
+        List<Record> result = SalesFactQuery.me().findCustomerTypeList(provName, cityName, countryName, null, null);
         
         renderJson(result);
         
@@ -57,7 +54,7 @@ public class SalesFactController extends BaseFrontController {
         
         String type = getPara("type");// 0: 昨天， 1: 最近1周， 2: 最近1月
         
-        List<Map<String, Object>> result = SalesFactQuery.me().findProductList(provName, cityName, countryName, null, null);
+        List<Record> result = SalesFactQuery.me().findProductList(provName, cityName, countryName, null, null);
         
         renderJson(result);
         

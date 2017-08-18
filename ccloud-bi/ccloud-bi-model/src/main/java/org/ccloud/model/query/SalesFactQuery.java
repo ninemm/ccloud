@@ -18,7 +18,6 @@ package org.ccloud.model.query;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.ccloud.model.SalesFact;
 
@@ -149,7 +148,7 @@ public class SalesFactQuery extends JBaseQuery {
 		
 	}
 
-	public List<Map<String, Object>> findCustomerTypeList(String provName, String cityName, String countryName, Date startDate, Date endDate) {
+	public List<Record> findCustomerTypeList(String provName, String cityName, String countryName, Date startDate, Date endDate) {
 		
 		LinkedList<Object> params = new LinkedList<Object>();
 		
@@ -182,10 +181,10 @@ public class SalesFactQuery extends JBaseQuery {
 		sqlBuilder.append(" group by customerType");
 		sqlBuilder.append(" order by totalAmount desc");
 		
-		return Db.query(sqlBuilder.toString(), params.toArray());
+		return Db.find(sqlBuilder.toString(), params.toArray());
 	}
 	
-	   public List<Map<String, Object>> findProductList(String provName, String cityName, String countryName, Date startDate, Date endDate) {
+	   public List<Record> findProductList(String provName, String cityName, String countryName, Date startDate, Date endDate) {
 	        
 	        LinkedList<Object> params = new LinkedList<Object>();
 	        
@@ -219,7 +218,7 @@ public class SalesFactQuery extends JBaseQuery {
 	        sqlBuilder.append(" group by cInvCode");
 	        sqlBuilder.append(" order by totalAmount desc");
 	        
-	        return Db.query(sqlBuilder.toString(), params.toArray());
+	        return Db.find(sqlBuilder.toString(), params.toArray());
 	    }
 
 		public List<SalesFact> queryMapData(String provName, String cityName, String countryName, String beginDate, String endDate) {
