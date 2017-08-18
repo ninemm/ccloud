@@ -682,17 +682,16 @@ header {
 .date-div .date {
     display: block;
     font-size: 14px;
-    background: #f0f2f5;
     width: 30%;
     text-align: center;
     height: 1.2rem;
     line-height: 1.2rem;
     border-radius: 5px;
-    border: 1px solid #f0f2f5;
+    border: 1px solid #999;
+    color: #999;
 }
 
 .date-div .active-date {
-    background: #fff;
     border: 1px solid #f23030;
     color: #f23030;
 }
@@ -733,6 +732,7 @@ img {
 
 .report {
     margin-top: 1rem;
+    overflow-x: hidden;
 }
 
 .gather {
