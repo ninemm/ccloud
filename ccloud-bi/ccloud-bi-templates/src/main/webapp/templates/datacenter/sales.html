@@ -457,8 +457,8 @@
 
 		    for(var i = 0; i < length; i++){
                 crSeriesData.push({
-                    name: data[i][0] + '(' + data[i][1] + ')',
-                    value: data[i][1]
+                    name: data[i].customerTypeName + '(' + data[i].totalAmount + ')',
+                    value: data[i].totalAmount
                 });
 		    }
 
@@ -509,70 +509,64 @@
   			data:{"provName": "湖北省", "cityName": "武汉市",countryName:""},
   			dataType:"json"
   		}).done(function(data){
-        var areaYData = [];
-        var areaSeriesData = [];
+            var areaYData = [];
+            var areaSeriesData = [];
 		    var length = data.length > 5 ? 5 : data.length;
 
 		    for(var i = 0; i < length; i++){
-          areaYData.push(data[i][0]) ;
-          areaSeriesData.push(data[i][1]);
+                areaYData.push(data[i].countryName) ;
+                areaSeriesData.push(data[i].totalAmount);
 		    }
 
 		    var areaTitle = '销售情况前五名(金额/万元)';
 
-        var area_rank = document.getElementById('area_rank');
-			  var $area_rank = $(area_rank);
+            var area_rank = document.getElementById('area_rank');
+			var $area_rank = $(area_rank);
 
-        var areaRankChart = echarts.init(area_rank);
-			  var option = {
+            var areaRankChart = echarts.init(area_rank);
+			var option = {
 			    title: [{
-            text: areaTitle,
-            textStyle: {
-              fontWeight: 'normal',
-              fontSize: 16
-			      }
+                    text: areaTitle,
+                    textStyle: {
+                        fontWeight: 'normal',
+                        fontSize: 16
+			        }
 			    }],
 			    color: ['#4ac7f5'],
 			    grid: {
-            left: '2%',
-            right: '15%',
-            bottom: 15,
-            top: 60,
-            containLabel: true
+                    left: '2%',
+                    right: '15%',
+                    bottom: 15,
+                    top: 60,
+                    containLabel: true
 			    },
 			    calculable : true,
-			    xAxis : [
-			    {
-			      show : false,
-			      name : '金额/万元',
-	          type : 'value',
-		        boundaryGap: [0, 0.01]
-			    }
-			    ],
-			    yAxis : [
-			    {
-		        type : 'category',
-		        data : areaYData.reverse()
-			    }
-			    ],
-			    series : [
-			    {
-		        type:'bar',
-		        barWidth: 25,
-		        data:areaSeriesData.reverse(),
-		        label:{
-	            normal:{
-                show:true,
-                position:'right'
-	            }
-		        }
-          }
-			   ]
-       };
-       areaRankChart.resize();
-       areaRankChart.setOption(option,true);
-     });
-   }
+			    xAxis : [{
+			        show : false,
+			        name : '金额/万元',
+	                type : 'value',
+		            boundaryGap: [0, 0.01]
+			    }],
+			    yAxis : [{
+		            type : 'category',
+		            data : areaYData.reverse()
+			    }],
+			    series : [{
+		            type:'bar',
+		            barWidth: 25,
+		            data:areaSeriesData.reverse(),
+		            label:{
+	                    normal:{
+                            show:true,
+                            position:'right'
+	                    }
+		            }
+                }]
+           };
+           areaRankChart.resize();
+           areaRankChart.setOption(option,true);
+       });
+    }
 
     //产品
     function product_rank(){
@@ -584,32 +578,32 @@
   		}).done(function(data){
   			var length = data.length > 5 ? 5 : data.length;
 
-        var $tbody = $("#product_rank tbody");
-        $tbody.empty();
-        $tbody.append("<tr><th>产品</th><th>数量(件)</th><th>金额</th></tr>");
-        for(var i = 0; i < length; i++){
-          $tbody.append("<tr><td>" + data[i][0] + "</td><td>" + data[i][1] + "</td><td>" + data[i][2] + "</td></tr>");
-        }
-      });
+            var $tbody = $("#product_rank tbody");
+            $tbody.empty();
+            $tbody.append("<tr><th>产品</th><th>数量(件)</th><th>金额</th></tr>");
+            for(var i = 0; i < length; i++){
+                $tbody.append("<tr><td>" + data[i].cInvName + "</td><td>" + data[i].totalNum + "</td><td>" + data[i].totalAmount + "</td></tr>");
+            }
+       });
     }
 
 	//库存
-  function stock_rank(){
-    $.ajax({
-			url:"${CPATH}/stock/area",
+    function stock_rank(){
+        $.ajax({
+	        url:"${CPATH}/stock/area",
 			type:"post",
 			data:{"provName": "湖北省", "cityName": "武汉市",countryName:""},
 			dataType:"json"
 		}).done(function(data){
 			var length = data.length > 5 ? 5 : data.length;
-      var $tbody = $("#stock_rank tbody");
-      $tbody.empty();
-	    $tbody.append("<tr><th>产品</th><th>数量(件)</th></tr>");
-	    for(var i = 0; i < length; i++){
-        $tbody.append("<tr><td>" + data[i][0] + "</td><td>" + data[i][1] + "</td></tr>");
-	    }
-    });
-	}
+            var $tbody = $("#stock_rank tbody");
+            $tbody.empty();
+	        $tbody.append("<tr><th>产品</th><th>数量(件)</th></tr>");
+	        for(var i = 0; i < length; i++){
+                $tbody.append("<tr><td>" + data[i][0] + "</td><td>" + data[i][1] + "</td></tr>");
+	        }
+        });
+    }
 
     //库存趋势
     function stock(name,cInvCode){
@@ -619,19 +613,16 @@
 			data:{"provName": "湖北省", "cityName": "武汉市", countryName:"", cInvCode: cInvCode},
 			dataType:"json"
 		}).done(function(data){
-            var areaYData = [];
-			var areaSeriesData = [];
+            var xData = [];
+			var seriesData = [];
 		    var length = data.length > 5 ? 5 : data.length;
 
-		    for(var i = 0; i < length; i++){
-                areaYData.push(data[i][0]) ;
-                areaSeriesData.push(data[i][1]);
+		    for(var i = 0; i < data.length; i++){
+                xData.push(data[i][0]) ;
+                seriesData.push(data[i][1]);
             }
 
 			var title = '客户库存趋势情况(单位/件)';
-
-			var seriesData = [12320.23, 12812.2, 13223.91, 33323.34, 22120, 23330, 12233.10];
-
 
 			var stock = document.getElementById('stock'+'_'+name);
 			var $stock = $(stock);
@@ -641,19 +632,19 @@
                 title: {
                     text: title
                 },
-                 tooltip : {
-                   //  trigger: 'axis',
-                   //  formatter:function(v){
-                   //     return v[0].name+":"+ v[0].data.toString().replace(/(\d)(?=(\d{3})+(\.|$))/g, '$1,');
-		      //  }
-                 },
+                  tooltip : {
+                      trigger: 'axis',
+                      formatter:function(v){
+                          return v[0].name+":"+ v[0].data.toString().replace(/(\d)(?=(\d{3})+(\.|$))/g, '$1,');
+		              }
+                  },
 				  grid: {
 				       left: '13%',
 				       right: '14%',
 				       top:'30%'
 				  },
 				  xAxis: {
-				       data: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+				       data: xData
 			      },
 				  yAxis: {},
 				  series: [{
