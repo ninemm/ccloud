@@ -79,6 +79,10 @@
                   countryName = addComp.district;
                   provName = provName.substring(0, provName.length - 1);
 
+                  console.log(provName + "");
+                  console.log(cityName.toString());
+                  console.log(typeof countryName);
+
                   if(countryName.length != 0) {
                     clickCity({"name": cityName}, provName);
                     mapRender(false);

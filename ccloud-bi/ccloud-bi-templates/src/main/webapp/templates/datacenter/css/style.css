@@ -738,7 +738,11 @@ img {
 
 .report {
     margin-top: 1rem;
-    overflow-x: hidden;
+    height: auto;
+}
+
+.weui-tab__bd .weui-tab__bd-item {
+	overflow: visible;
 }
 
 .gather {
