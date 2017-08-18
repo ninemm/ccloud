@@ -81,7 +81,7 @@ public class StockFactQuery extends JBaseQuery {
         
         sqlBuilder.append(", TRUNCATE(SUM(totalSmallAmount/cInvMNum), 2) as totalNum");
         
-        sqlBuilder.append(" from sales_fact");
+        sqlBuilder.append(" from stock_fact");
         
         boolean needWhere = true;
         needWhere = appendIfNotEmpty(sqlBuilder, "provName", provName, params, needWhere);
