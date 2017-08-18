@@ -15,9 +15,18 @@
  */
 package org.ccloud.controller.front;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.query.SalesFactQuery;
 import org.ccloud.route.RouterMapping;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.jfinal.kit.StrKit;
+import com.jfinal.plugin.activerecord.Record;
 
 @RouterMapping(url = "/")
 public class IndexController extends BaseFrontController {
@@ -30,6 +39,33 @@ public class IndexController extends BaseFrontController {
 		setAttr("totalOrderAmount", SalesFactQuery.me().findTotalAmount(provName, cityName, countryName));
 		
 		render("index.html");
+	}
+	
+	public void orderAmount() {
+		String provName = getPara("provName", "").trim();
+		String cityName = getPara("cityName", "").trim();
+		String countryName = getPara("countryName", "").trim();
+		
+		List<LinkedList<Map<String, Object>>> result = Lists.newLinkedList();
+		List<Record> list = SalesFactQuery.me().findAreaList(provName, cityName, null, null, null);
+		for (Record map : list) {
+			
+			if (! StrKit.equals(countryName, map.getStr("countryName"))) {
+				LinkedList<Map<String, Object>> linkedList = new LinkedList<>();
+				Map<String, Object> fromMap = Maps.newHashMap();
+				fromMap.put("name", countryName);
+				linkedList.add(fromMap);
+				
+				Map<String, Object> toMap = Maps.newHashMap();
+				toMap.put("name", map.get("countryName"));
+				toMap.put("value", map.get("totalAmount"));
+				linkedList.add(toMap);
+				
+				result.add(linkedList);
+			}
+		}
+		
+		renderJson(result);
 	}
 	
 	public void renderSales() {

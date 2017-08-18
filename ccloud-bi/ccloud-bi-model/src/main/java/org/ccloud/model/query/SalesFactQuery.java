@@ -25,6 +25,7 @@ import org.ccloud.model.SalesFact;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
 /**
@@ -97,7 +98,7 @@ public class SalesFactQuery extends JBaseQuery {
 		return Db.queryBigDecimal(sqlBuilder.toString()).doubleValue();
 	}
 	
-	public List<Map<String, Object>> findAreaList(String provName, String cityName, String countryName, Date startDate, Date endDate) {
+	public List<Record> findAreaList(String provName, String cityName, String countryName, Date startDate, Date endDate) {
 		
 		LinkedList<Object> params = new LinkedList<Object>();
 		
@@ -111,7 +112,7 @@ public class SalesFactQuery extends JBaseQuery {
             sqlBuilder.append(" provName");
         }
 		
-		sqlBuilder.append(", TRUNCATE(SUM(totalSales)/100000, 2) as totalAmount");
+		sqlBuilder.append(", TRUNCATE(SUM(totalSales)/1000000, 2) as totalAmount");
 		
 		sqlBuilder.append(" from sales_fact");
 		
@@ -144,7 +145,7 @@ public class SalesFactQuery extends JBaseQuery {
 		}
 		sqlBuilder.append(" order by totalAmount desc");
 		
-		return Db.query(sqlBuilder.toString(), params.toArray());
+		return Db.find(sqlBuilder.toString(), params.toArray());
 		
 	}
 
@@ -154,7 +155,7 @@ public class SalesFactQuery extends JBaseQuery {
 		
 		StringBuilder sqlBuilder = new StringBuilder("select customerTypeName");
 		
-		sqlBuilder.append(", TRUNCATE(SUM(totalSales)/100, 2) as totalAmount");
+		sqlBuilder.append(", TRUNCATE(SUM(totalSales)/1000000, 2) as totalAmount");
 		
 		sqlBuilder.append(" from sales_fact");
 		
@@ -176,11 +177,77 @@ public class SalesFactQuery extends JBaseQuery {
 			sqlBuilder.append(" and idate <= ?");
 			params.add(endDate);
 		}
+		sqlBuilder.append(" and customerType != 7");
 		
 		sqlBuilder.append(" group by customerType");
+		sqlBuilder.append(" order by totalAmount desc");
 		
 		return Db.query(sqlBuilder.toString(), params.toArray());
 	}
 	
-	
+	   public List<Map<String, Object>> findProductList(String provName, String cityName, String countryName, Date startDate, Date endDate) {
+	        
+	        LinkedList<Object> params = new LinkedList<Object>();
+	        
+	        StringBuilder sqlBuilder = new StringBuilder("select cInvName");
+	        
+	        sqlBuilder.append(", TRUNCATE(SUM(totalSmallAmount/cInvMNum), 2) as totalNum");
+	        sqlBuilder.append(", TRUNCATE(SUM(totalSales)/1000000, 2) as totalAmount");
+	        
+	        sqlBuilder.append(" from sales_fact");
+	        
+	        boolean needWhere = true;
+	        needWhere = appendIfNotEmpty(sqlBuilder, "provName", provName, params, needWhere);
+	        needWhere = appendIfNotEmpty(sqlBuilder, "cityName", cityName, params, needWhere);
+	        needWhere = appendIfNotEmpty(sqlBuilder, "countryName", countryName, params, needWhere);
+	        
+	        if (needWhere) {
+	            sqlBuilder.append(" where 1 = 1");
+	            sqlBuilder.append(" and type != 7");
+	        }
+	        
+	        if (startDate != null) {
+	            sqlBuilder.append(" and idate >= ?");
+	            params.add(startDate);
+	        }
+	        
+	        if (endDate != null) {
+	            sqlBuilder.append(" and idate <= ?");
+	            params.add(endDate);
+	        }
+	        
+	        sqlBuilder.append(" group by cInvCode");
+	        sqlBuilder.append(" order by totalAmount desc");
+	        
+	        return Db.query(sqlBuilder.toString(), params.toArray());
+	    }
+
+		public List<SalesFact> queryMapData(String provName, String cityName, String countryName, String beginDate, String endDate) {
+				StringBuilder sql = new StringBuilder("SELECT provName, cityName, countryName, TRUNCATE(SUM(totalSales)/1000000, 2) as totalAmount ");
+				sql.append(" FROM `sales_Fact` ");
+
+				if(StrKit.notBlank(cityName)) {
+
+						sql.append(" where provName = ? and cityName = ? and iDate >= ? and iDate <= ? ");
+						sql.append(" GROUP BY countryName ");
+
+						return DAO.find(sql.toString(), provName, cityName, beginDate, endDate);
+
+				} else if(StrKit.notBlank(provName)) {
+
+						sql.append(" where provName = ? and iDate >= ? and iDate <= ? ");
+						sql.append("GROUP BY cityName ");
+
+						return DAO.find(sql.toString(), provName, beginDate, endDate);
+
+				} else {
+
+						sql.append(" where iDate >= ? and iDate <= ? ");
+						sql.append("GROUP BY provName ");
+
+						return DAO.find(sql.toString(), beginDate, endDate);
+
+				}
+		}
+
 }
