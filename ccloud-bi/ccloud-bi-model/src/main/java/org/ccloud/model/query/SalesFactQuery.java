@@ -222,6 +222,58 @@ public class SalesFactQuery extends JBaseQuery {
 	        
 	        return Db.find(sqlBuilder.toString(), params.toArray());
 	    }
+	   
+	    public List<Record> findOrderAmount(String provName, String cityName, String countryName, Date startDate, Date endDate) {
+	        
+	        LinkedList<Object> params = new LinkedList<Object>();
+	        
+	        StringBuilder sqlBuilder = new StringBuilder("select ");
+	        
+	        if (StrKit.notBlank(cityName)) {
+	            sqlBuilder.append(" countryName");
+	        }else if(StrKit.notBlank(provName)){
+	            sqlBuilder.append(" cityName");
+	        }else{
+	            sqlBuilder.append(" provName");
+	        }
+	        
+	        sqlBuilder.append(", TRUNCATE(SUM(totalSales)/1000000, 2) as totalAmount");
+	        
+	        sqlBuilder.append(" from sales_fact");
+	        
+	        boolean needWhere = true;
+	        needWhere = appendIfNotEmpty(sqlBuilder, "provName", provName, params, needWhere);
+	        needWhere = appendIfNotEmpty(sqlBuilder, "cityName", cityName, params, needWhere);
+	        needWhere = appendIfNotEmpty(sqlBuilder, "countryName", countryName, params, needWhere);
+	        
+	        if (needWhere) {
+	            sqlBuilder.append(" where 1 = 1");
+	        }
+	        
+	        if (startDate != null) {
+	            sqlBuilder.append(" and idate >= ?");
+	            params.add(startDate);
+	        }
+	        
+	        if (endDate != null) {
+	            sqlBuilder.append(" and idate <= ?");
+	            params.add(endDate);
+	        }
+	        sqlBuilder.append(" and customerType != 7");
+	        
+	        sqlBuilder.append(" group by provName");
+	        if (StrKit.notBlank(provName)) {
+	            sqlBuilder.append(", cityName");
+	        }
+	        
+	        if (StrKit.notBlank(cityName)) {
+	            sqlBuilder.append(", countryName");
+	        }
+	        sqlBuilder.append(" order by totalAmount desc");
+	        
+	        return Db.find(sqlBuilder.toString(), params.toArray());
+	        
+	    }
 
 		public List<SalesFact> queryMapData(String provName, String cityName, String countryName, String beginDate, String endDate) {
 				StringBuilder sql = new StringBuilder("SELECT provName, cityName, countryName, TRUNCATE(SUM(totalSales)/1000000, 2) as totalAmount ");

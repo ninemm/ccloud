@@ -47,7 +47,7 @@ public class IndexController extends BaseFrontController {
 		String countryName = getPara("countryName", "").trim();
 		
 		List<LinkedList<Map<String, Object>>> result = Lists.newLinkedList();
-		List<Record> list = SalesFactQuery.me().findAreaList(provName, cityName, null, null, null);
+		List<Record> list = SalesFactQuery.me().findOrderAmount(provName, cityName, null, null, null);
 		for (Record map : list) {
 			
 			if (! StrKit.equals(countryName, map.getStr("countryName"))) {
