@@ -9,6 +9,7 @@
 <#macro css_import>
 
     <link rel="stylesheet" href="${CPATH}/templates/datacenter/css/bootstrap.min.css">
+    <link rel="stylesheet" href="${CPATH}/templates/datacenter/css/animate.min.css">
 
 </#macro>
 <#macro css>
@@ -85,6 +86,65 @@
             $a.addClass("active-date");
         });
 
+var ITEM_ON = "weui-bar__item--on";
+
+    var showTab = function(a) {
+        var $a = $(a);
+        if ($a.hasClass(ITEM_ON)) return;
+        var href = $a.attr("href");
+
+        if (!/^#/.test(href)) return;
+
+        var ohref = "#tab1"
+        if (href == "#tab2") {
+            $(ohref).addClass('animated slideOutLeft');
+            $a.parent().find("." + ITEM_ON).removeClass(ITEM_ON);
+            $a.addClass(ITEM_ON);
+
+            var bd = $a.parents(".weui-tab").find(".weui-tab__bd");
+            setTimeout(function() {
+                bd.find(".weui-tab__bd-item--active").removeClass("weui-tab__bd-item--active");
+                $(href).addClass("weui-tab__bd-item--active");
+                $(href).addClass('animated slideInRight');
+                setTimeout(function() {
+                    $(ohref).removeClass('slideOutLeft');
+                    $(href).removeClass('slideInRight');
+                }, 1000);
+            }, 100)
+        } else {
+            ohref = "#tab2";
+            $(ohref).addClass('animated slideOutRight');
+            $a.parent().find("." + ITEM_ON).removeClass(ITEM_ON);
+            $a.addClass(ITEM_ON);
+
+            var bd = $a.parents(".weui-tab").find(".weui-tab__bd");
+            setTimeout(function() {
+                bd.find(".weui-tab__bd-item--active").removeClass("weui-tab__bd-item--active");
+                $(href).addClass("weui-tab__bd-item--active");
+                $(href).addClass('animated slideInLeft');
+                setTimeout(function() {
+                    $(ohref).removeClass('slideOutRight');
+                    $(href).removeClass('slideInLeft');
+                }, 1000);
+            }, 100)
+        }
+
+
+    };
+
+    $.showTab = showTab;
+
+    $(".weui-navbar__item").click(function(e) {
+        var $a = $(e.currentTarget);
+        var href = $a.attr("href");
+        if ($a.hasClass(ITEM_ON)) return;
+        if (!/^#/.test(href)) return;
+
+        e.preventDefault();
+        console.log(1);
+        showTab($a);
+    });
+		
         customer_rank();
    		area_rank();
    		product_rank();
@@ -626,7 +686,7 @@
                 </a>
             </div>
             <div class="weui-tab__bd">
-                <div id="tab1" class="weui-tab__bd-item weui-tab__bd-item--active report-table">
+                <div id="tab1" class="weui-tab__bd-item weui-tab__bd-item--active">
                       <div id="customer_rank">
 
                       </div>
@@ -645,7 +705,7 @@
                           </table>
                       </div>
                 </div>
-                <div id="tab2" class="weui-tab__bd-item report-table">
+                <div id="tab2" class="weui-tab__bd-item">
                     <div>
                         <table id="stock_rank" class="table">
                           <thead>库存排行</thead>
@@ -658,7 +718,7 @@
                         </table>
                     </div>
                     <p class="title">全国库存趋势</p>
-                    <div s>
+                    <div>
 	                    <div id="stock_125">
 	
 	                    </div>
