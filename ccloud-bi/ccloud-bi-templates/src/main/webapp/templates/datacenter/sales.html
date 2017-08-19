@@ -237,7 +237,7 @@
             series: [{
               type: 'map',
               map: selectProv ,//要和echarts.registerMap（）中第一个参数一致
-              roam: 'scale',
+              roam: true,
               scaleLimit: { min: 1, max: 4 },//缩放
               mapLocation:{
                 y:60
@@ -342,7 +342,7 @@
           series: [{
             type: 'map',
             map: selectCity ,//要和echarts.registerMap（）中第一个参数一致
-            roam: 'scale',
+            roam: true,
             scaleLimit: { min: 1, max: 4 },//缩放
             mapLocation:{
               y:60
@@ -416,7 +416,7 @@
           series: [{
             type: 'map',
             map: 'china',//要和echarts.registerMap（）中第一个参数一致
-            roam: 'scale',
+            roam: true,
             scaleLimit: { min: 1, max: 4 },//缩放
             mapLocation:{
               y:60
