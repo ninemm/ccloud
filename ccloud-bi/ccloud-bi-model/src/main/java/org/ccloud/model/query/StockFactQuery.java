@@ -15,14 +15,11 @@
  */
 package org.ccloud.model.query;
 
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.ccloud.model.StockFact;
 
-import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
@@ -74,7 +71,7 @@ public class StockFactQuery extends JBaseQuery {
 		return 0;
 	}
 	
-    public List<Record> findAreaList(String provName, String cityName, String countryName, Date startDate, Date endDate) {
+    public List<Record> findAreaList(String provName, String cityName, String countryName) {
         
         LinkedList<Object> params = new LinkedList<Object>();
         
