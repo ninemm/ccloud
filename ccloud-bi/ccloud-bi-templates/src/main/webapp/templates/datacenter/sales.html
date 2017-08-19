@@ -2,7 +2,7 @@
 <#macro script_import>
 
  	<script src="${CPATH}/templates/datacenter/js/echarts.min.js"></script>
-  <script src="${CTPATH}/mapdata/china-main-city-map.js"></script>
+  <script src="${CTPATH}/json/china-main-city-map.js"></script>
   <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=su3AmHLUcBprpnOLmVHo7r8AljbW8X6t"></script>
  	<!-- <script src="${CPATH}/templates/datacenter/js/bootstrap.min.js"></script> -->
 
@@ -208,7 +208,7 @@
         //选择省的单击事件
         var selectProv = result.name.toString();
         //    调取后台数据
-        $.get('${CTPATH}/mapdata/'+cityMap[selectProv]+'/'+cityMap[selectProv]+'.json', function (Citymap) {
+        $.get('${CTPATH}/json/'+cityMap[selectProv]+'/'+cityMap[selectProv]+'.json', function (Citymap) {
           echarts.registerMap(selectProv, Citymap);
           var myChartProv = echarts.init(document.getElementById('prov_map'));
           $(document.getElementById('prov_map')).width(400);
@@ -313,7 +313,7 @@
     }
 
     function countryMapRender(selectProv, selectCity, maxData) {
-      $.get('${CTPATH}/mapdata/'+cityMap[selectProv]+'/'+cityMap[selectCity]+'.json', function (Citymap) {
+      $.get('${CTPATH}/json/'+cityMap[selectProv]+'/'+cityMap[selectCity]+'.json', function (Citymap) {
         echarts.registerMap(selectCity, Citymap);
         var myChartCity = echarts.init(document.getElementById('city_map'));
         $(document.getElementById('city_map')).width(400);
@@ -387,7 +387,7 @@
             $('#prov_map').css('display','none');
           }
         }, 500);
-      $.get('${CTPATH}/mapdata/china.json', function (mapJson) {
+      $.get('${CTPATH}/json/china.json', function (mapJson) {
         echarts.registerMap('china', mapJson);
         var chart = echarts.init(document.getElementById('china_map'));//在id为mainMap的dom元素中显示地图
         $(document.getElementById('china_map')).width(400);
