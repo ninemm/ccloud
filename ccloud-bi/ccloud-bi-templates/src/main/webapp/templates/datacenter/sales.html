@@ -2,6 +2,7 @@
 <#macro script_import>
 
  	<script src="${CPATH}/templates/datacenter/js/echarts.min.js"></script>
+  <script src="${CTPATH}/mapdata/china-main-city-map.js"></script>
   <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=su3AmHLUcBprpnOLmVHo7r8AljbW8X6t"></script>
  	<!-- <script src="${CPATH}/templates/datacenter/js/bootstrap.min.js"></script> -->
 
@@ -84,13 +85,10 @@
 
                   if(countryName.length != 0) {
                     clickCity({"name": cityName}, provName);
-                    mapRender(false);
-                    clickProv({"name": provName}, false);
-                    cityName = addComp.city;
+                    provName = provName + "省";
                   } else if(cityName.length !=0){
-                    mapRender(false);
                     clickProv({"name": provName}, true);
-                  } else { 
+                  } else {
                     mapRender(true);
                   }
                   customer_rank(provName, cityName, countryName);
@@ -112,7 +110,7 @@
             $a.parent().find(".date").removeClass("active-date");
             $a.addClass("active-date");
         });
-        
+
 
       	var ITEM_ON = "weui-bar__item--on";
 
@@ -150,20 +148,17 @@
 
     //回到中国地图界面
     function goBackChinaMap() {
-      $('#china_map').css('display','block');
-      $('#city_map').css('display','none');
-      $('#prov_map').css('display','none');
 
       $('#prov').css('visibility','hidden');
     	$('#city').css('visibility','hidden');
+      mapRender(true);
     }
 
     //回到省界面
     function goBackProvMap() {
-      $('#prov_map').css('display','block');
-  		$('#china_map').css('display','none');
-  		$('#city_map').css('display','none');
 
+      provName = provName.substring(0, provName.length - 1);
+      clickProv({"name": provName}, true);
   		$('#city').css('visibility','hidden');
   	}
 
@@ -177,10 +172,9 @@
       stock(125,"125ml35度中国劲酒","za000053",provName, cityName, countryName);
       stock(258,"258ml35度中国劲酒","zzgj2715",provName, cityName, countryName);
       stock(520,"520ml35度中国劲酒","zzgj1012",provName, cityName, countryName);
-      mapRender(false);
-      var cityNameCopy = cityName;
-      clickProv({"name": provName.substring(0, provName.length - 1)}, false);
-      clickCity({"name": cityNameCopy}, provName.substring(0, provName.length - 1));
+      if (document.getElementById('china_map').style.display == 'block') mapRender(false);
+      if (document.getElementById('prov_map').style.display == 'block') clickProv({"name": provName.substring(0, provName.length - 1)}, false);
+      if (document.getElementById('city_map').style.display == 'block') clickCity({"name": cityName}, provName.substring(0, provName.length - 1));
     }
 
     //点击地图上的省
@@ -194,7 +188,7 @@
 
       var maxData = 0;
       var url = "${CPATH}/sales/queryMapData?provName=" + provName + "&cityName=&countryName=&dateType=" +dateType;
-      $.get(url,function(data){
+      $.post(url,function(data){
           city_data = [];
         for(var i = 0; i < data.length; i++)
         {
@@ -212,9 +206,9 @@
           }
         }, 500);
         //选择省的单击事件
-        var selectProv = result.name;
+        var selectProv = result.name.toString();
         //    调取后台数据
-        $.get('${CTPATH}/json/'+selectProv+'/'+selectProv+'.json', function (Citymap) {
+        $.get('${CTPATH}/mapdata/'+cityMap[selectProv]+'/'+cityMap[selectProv]+'.json', function (Citymap) {
           echarts.registerMap(selectProv, Citymap);
           var myChartProv = echarts.init(document.getElementById('prov_map'));
           $(document.getElementById('prov_map')).width(400);
@@ -274,7 +268,7 @@
       var maxData = 0;
       cityName = rel.name;
       var url = "${CPATH}/sales/queryMapData?provName=" + provName + "&cityName=" + cityName + "&countryName=&dateType=" +dateType;
-      $.get(url,function(data){
+      $.post(url,function(data){
           country_data = [];
         for(var i = 0; i < data.length; i++)
         {
@@ -293,6 +287,9 @@
           }
           var arr = new Array('北京','上海','天津','台湾','重庆');
           if(contains(arr,selectProv)==false){
+            $('#prov_view').text(selectProv);
+            $('#prov').css('visibility','visible');
+
             $('#city_view').text(rel.name);
             $('#city').css('visibility','visible');
 
@@ -316,7 +313,7 @@
     }
 
     function countryMapRender(selectProv, selectCity, maxData) {
-      $.get('${CTPATH}/json/'+selectProv+'/'+selectCity+'.json', function (Citymap) {
+      $.get('${CTPATH}/mapdata/'+cityMap[selectProv]+'/'+cityMap[selectCity]+'.json', function (Citymap) {
         echarts.registerMap(selectCity, Citymap);
         var myChartCity = echarts.init(document.getElementById('city_map'));
         $(document.getElementById('city_map')).width(400);
@@ -375,7 +372,7 @@
       /*echarts*/
       var maxData = 0;
       var url = "${CPATH}/sales/queryMapData?provName=&cityName=&countryName=&dateType=" +dateType;
-      $.get(url,function(data){
+      $.post(url,function(data){
           prov_data = [];
         for(var i = 0; i < data.length; i++)
         {
@@ -390,7 +387,7 @@
             $('#prov_map').css('display','none');
           }
         }, 500);
-      $.get('${CTPATH}/json/china.json', function (mapJson) {
+      $.get('${CTPATH}/mapdata/china.json', function (mapJson) {
         echarts.registerMap('china', mapJson);
         var chart = echarts.init(document.getElementById('china_map'));//在id为mainMap的dom元素中显示地图
         $(document.getElementById('china_map')).width(400);
@@ -590,7 +587,7 @@
   			data:{"provName": provName, "cityName": cityName, countryName: countryName},
   			dataType:"json"
   		}).done(function(data){
-  		
+
   		    var prTitle = '产品销售情况前五名';
             if((provName + cityName + countryName).trim() != '' ){
 			    prTitle = provName + cityName + countryName + prTitle;
@@ -600,9 +597,9 @@
 			var $thead = $("#product_rank thead");
 			$thead.empty();
 			$thead.text(prTitle);
-			
+
   			var length = data.length > 5 ? 5 : data.length;
-  			
+
             var $tbody = $("#product_rank tbody");
             $tbody.empty();
             $tbody.append("<tr><th>产品</th><th>数量(件)</th><th>金额(万元)</th></tr>");
@@ -630,7 +627,7 @@
 			var $thead = $("#stock_rank thead");
 			$thead.empty();
 			$thead.text(srTitle);
-			
+
 			var length = data.length > 5 ? 5 : data.length;
             var $tbody = $("#stock_rank tbody");
             $tbody.empty();
@@ -649,7 +646,7 @@
 			data:{"provName": provName, "cityName": cityName, countryName: countryName, cInvCode: cInvCode},
 			dataType:"json"
 		}).done(function(data){
-		
+
 			var sTitle = '库存趋势';
             if((provName + cityName + countryName).trim() != '' ){
 			    sTitle = provName + cityName + countryName + sTitle;
@@ -659,7 +656,7 @@
 			var $title = $(".title");
 			$title.empty();
 			$title.text(sTitle);
-			
+
             var xData = [];
 			var seriesData = [];
 		    var length = data.length > 5 ? 5 : data.length;
