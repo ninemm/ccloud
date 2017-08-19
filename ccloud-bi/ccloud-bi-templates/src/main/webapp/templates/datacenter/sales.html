@@ -91,10 +91,10 @@
                   } else {
                     mapRender(true);
                   }
-                  customer_rank(provName, cityName, countryName);
-                  area_rank(provName, cityName, countryName);
-                  product_rank(provName, cityName, countryName);
-                  stock_rank(provName, cityName, countryName);
+                  customer_rank(provName, cityName, countryName, dateType);
+                  area_rank(provName, cityName, countryName, dateType);
+                  product_rank(provName, cityName, countryName, dateType);
+                  stock_rank(provName, cityName, countryName, dateType);
                   stock(125,"125ml35度中国劲酒","za000053",provName, cityName, countryName);
                   stock(258,"258ml35度中国劲酒","zzgj2715",provName, cityName, countryName);
                   stock(520,"520ml35度中国劲酒","zzgj1012",provName, cityName, countryName);
@@ -165,9 +165,9 @@
     //做时间的切换选择
     function setDateType(type){
       dateType = type;
-      customer_rank(provName, cityName, countryName);
-      area_rank(provName, cityName, countryName);
-      product_rank(provName, cityName, countryName);
+      customer_rank(provName, cityName, countryName, dateType);
+      area_rank(provName, cityName, countryName, dateType);
+      product_rank(provName, cityName, countryName, dateType);
       stock_rank(provName, cityName, countryName);
       stock(125,"125ml35度中国劲酒","za000053",provName, cityName, countryName);
       stock(258,"258ml35度中国劲酒","zzgj2715",provName, cityName, countryName);
@@ -446,11 +446,11 @@
     }
 
 	  //客户
-	  function customer_rank(provName, cityName, countryName){
+	  function customer_rank(provName, cityName, countryName, dateType){
 	    $.ajax({
 			url:"${CPATH}/sales/customerType",
 			type:"post",
-			data:{"provName": provName, "cityName": cityName, countryName: countryName},
+			data:{"provName": provName, "cityName": cityName, countryName: countryName, dateType: dateType},
 			dataType:"json"
 		}).done(function(data){
 
@@ -508,11 +508,11 @@
 	}
 
 	 //区域
-    function area_rank(provName, cityName, countryName){
+    function area_rank(provName, cityName, countryName, dateType){
       $.ajax({
   			url:"${CPATH}/sales/area",
   			type:"post",
-  			data:{"provName": provName, "cityName": cityName, countryName: countryName},
+  			data:{"provName": provName, "cityName": cityName, countryName: countryName, dateType: dateType},
   			dataType:"json"
   		}).done(function(data){
             var areaYData = [];
@@ -580,11 +580,11 @@
     }
 
     //产品
-    function product_rank(provName, cityName, countryName){
+    function product_rank(provName, cityName, countryName, dateType){
   		$.ajax({
   			url:"${CPATH}/sales/product",
   			type:"post",
-  			data:{"provName": provName, "cityName": cityName, countryName: countryName},
+  			data:{"provName": provName, "cityName": cityName, countryName: countryName, dateType: dateType},
   			dataType:"json"
   		}).done(function(data){
 

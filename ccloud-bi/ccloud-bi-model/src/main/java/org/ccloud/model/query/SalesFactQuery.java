@@ -98,7 +98,7 @@ public class SalesFactQuery extends JBaseQuery {
 		return Db.queryBigDecimal(sqlBuilder.toString()).doubleValue();
 	}
 	
-	public List<Map<String, Object>> findAreaList(String provName, String cityName, String countryName, Date startDate, Date endDate) {
+	public List<Map<String, Object>> findAreaList(String provName, String cityName, String countryName, String startDate, String endDate) {
 		
 		LinkedList<Object> params = new LinkedList<Object>();
 		
@@ -150,7 +150,7 @@ public class SalesFactQuery extends JBaseQuery {
 		
 	}
 
-	public List<Record> findCustomerTypeList(String provName, String cityName, String countryName, Date startDate, Date endDate) {
+	public List<Record> findCustomerTypeList(String provName, String cityName, String countryName, String startDate, String endDate) {
 		
 		LinkedList<Object> params = new LinkedList<Object>();
 		
@@ -186,7 +186,7 @@ public class SalesFactQuery extends JBaseQuery {
 		return Db.find(sqlBuilder.toString(), params.toArray());
 	}
 	
-	   public List<Record> findProductList(String provName, String cityName, String countryName, Date startDate, Date endDate) {
+	   public List<Record> findProductList(String provName, String cityName, String countryName, String startDate, String endDate) {
 	        
 	        LinkedList<Object> params = new LinkedList<Object>();
 	        

@@ -25,9 +25,12 @@ public class SalesFactController extends BaseFrontController {
 		String cityName = getPara("cityName", "").trim();
 		String countryName = getPara("countryName", "").trim();
 		
-		String type = getPara("type");// 0: 昨天， 1: 最近1周， 2: 最近1月
+		String dateType = getPara("dateType", "").trim();;// 0: 昨天， 1: 最近1周， 2: 最近1月
 		
-		List<Map<String, Object>> result = SalesFactQuery.me().findAreaList(provName, cityName, countryName, null, null);
+        String beginDate = getDateByType(dateType);
+        String endDate = getDate(-1) ;
+		
+		List<Map<String, Object>> result = SalesFactQuery.me().findAreaList(provName, cityName, countryName, beginDate, endDate);
 		
 		renderJson(result);
 		
@@ -39,9 +42,12 @@ public class SalesFactController extends BaseFrontController {
         String cityName = getPara("cityName", "").trim();
         String countryName = getPara("countryName", "").trim();
         
-        String type = getPara("type");// 0: 昨天， 1: 最近1周， 2: 最近1月
+        String dateType = getPara("dateType", "").trim();;// 0: 昨天， 1: 最近1周， 2: 最近1月
         
-        List<Record> result = SalesFactQuery.me().findCustomerTypeList(provName, cityName, countryName, null, null);
+        String beginDate = getDateByType(dateType);
+        String endDate = getDate(-1) ;
+        
+        List<Record> result = SalesFactQuery.me().findCustomerTypeList(provName, cityName, countryName, beginDate, endDate);
         
         renderJson(result);
         
@@ -53,9 +59,12 @@ public class SalesFactController extends BaseFrontController {
         String cityName = getPara("cityName", "").trim();
         String countryName = getPara("countryName", "").trim();
         
-        String type = getPara("type");// 0: 昨天， 1: 最近1周， 2: 最近1月
+        String dateType = getPara("dateType", "").trim();;// 0: 昨天， 1: 最近1周， 2: 最近1月
         
-        List<Record> result = SalesFactQuery.me().findProductList(provName, cityName, countryName, null, null);
+        String beginDate = getDateByType(dateType);
+        String endDate = getDate(-1) ;
+        
+        List<Record> result = SalesFactQuery.me().findProductList(provName, cityName, countryName, beginDate, endDate);
         
         renderJson(result);
         
@@ -67,24 +76,9 @@ public class SalesFactController extends BaseFrontController {
 				String countryName = getPara("countryName", "").trim();
 				String dateType = getPara("dateType", "").trim();
 
-				String beginDate;
-				String endDate;
+				String beginDate = getDateByType(dateType);
+				String endDate = getDate(-1) ;
 
-				endDate = getDate(-1);
-
-				if(dateType.equals("0")) {
-
-					beginDate = getDate(-1);
-
-				} else if(dateType.equals("1")) {
-
-					beginDate = getDate(-7);
-
-				} else {
-
-					beginDate = getDate(-30);
-
-				}
 				List<SalesFact> salesFactList = SalesFactQuery.me().queryMapData(provName, cityName, countryName, beginDate, endDate);
 				renderJson(salesFactList);
 		}
@@ -92,5 +86,21 @@ public class SalesFactController extends BaseFrontController {
 		private String getDate(int days) {
 			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 			return format.format(DateTime.now().plusDays(days).toDate());
+		}
+		
+		private String getDateByType(String dateType) {
+            if(dateType.equals("0")) {
+                return getDate(-1);
+            }
+
+            if(dateType.equals("1")) {
+                return getDate(-7);
+            } 
+            
+            if(dateType.equals("2")) {
+                return getDate(-30);
+            }
+		    
+		    return getDate(0);
 		}
 }

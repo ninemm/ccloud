@@ -21,9 +21,7 @@ public class StockFactController extends BaseFrontController {
 		String cityName = getPara("cityName", "").trim();
 		String countryName = getPara("countryName", "").trim();
 		
-		String type = getPara("type");// 0: 昨天， 1: 最近1周， 2: 最近1月
-		
-		List<Record> result = StockFactQuery.me().findAreaList(provName, cityName, countryName, null, null);
+		List<Record> result = StockFactQuery.me().findAreaList(provName, cityName, countryName);
 		
 		renderJson(result);
 		
