@@ -187,8 +187,12 @@
       }
 
       var maxData = 0;
-      var url = "${CPATH}/sales/queryMapData?provName=" + provName + "&cityName=&countryName=&dateType=" +dateType;
-      $.post(url,function(data){
+        $.ajax({
+        url:"${CPATH}/sales/queryMapData",
+        type:"post",
+        data:{"provName": provName, "cityName": '', countryName: '', dateType: dateType},
+        dataType:"json"
+        }).done(function(data){
           city_data = [];
         for(var i = 0; i < data.length; i++)
         {
@@ -267,8 +271,12 @@
     function clickCity(rel, selectProv) {
       var maxData = 0;
       cityName = rel.name;
-      var url = "${CPATH}/sales/queryMapData?provName=" + provName + "&cityName=" + cityName + "&countryName=&dateType=" +dateType;
-      $.post(url,function(data){
+        $.ajax({
+        url:"${CPATH}/sales/queryMapData",
+        type:"post",
+        data:{"provName": provName, "cityName": cityName, countryName: '', dateType: dateType},
+        dataType:"json"
+        }).done(function(data){
           country_data = [];
         for(var i = 0; i < data.length; i++)
         {
@@ -371,8 +379,12 @@
     function mapRender(isRender) {
       /*echarts*/
       var maxData = 0;
-      var url = "${CPATH}/sales/queryMapData?provName=&cityName=&countryName=&dateType=" +dateType;
-      $.post(url,function(data){
+        $.ajax({
+        url:"${CPATH}/sales/queryMapData",
+        type:"post",
+        data:{"provName": '', "cityName": '', countryName: '', dateType: dateType},
+        dataType:"json"
+        }).done(function(data){
           prov_data = [];
         for(var i = 0; i < data.length; i++)
         {
