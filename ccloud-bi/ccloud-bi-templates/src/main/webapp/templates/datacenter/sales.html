@@ -38,7 +38,7 @@
       height:14rem;
     }
     .table{
-      font-size:0.3rem;
+      font-size:0.6rem;
     }
 
     .weui-tab__bd {
@@ -144,6 +144,7 @@
             e.preventDefault();
             showTab($a);
         })
+       $(".map p").text(new Date().toLocaleDateString() + '销售情况');
       });
 
     //回到中国地图界面
@@ -495,6 +496,7 @@
 
 	  //客户
 	  function customer_rank(provName, cityName, countryName, dateType){
+	    countryName = '';
 	    $.ajax({
 			url:"${CPATH}/sales/customerType",
 			type:"post",
@@ -557,6 +559,7 @@
 
 	 //区域
     function area_rank(provName, cityName, countryName, dateType){
+      countryName = '';
       $.ajax({
   			url:"${CPATH}/sales/area",
   			type:"post",
@@ -629,6 +632,7 @@
 
     //产品
     function product_rank(provName, cityName, countryName, dateType){
+        countryName = '';
   		$.ajax({
   			url:"${CPATH}/sales/product",
   			type:"post",
@@ -660,6 +664,7 @@
 
 	//库存
     function stock_rank(provName, cityName, countryName){
+        countryName = '';
         $.ajax({
 	        url:"${CPATH}/stock/area",
 			type:"post",
@@ -688,6 +693,7 @@
 
     //库存趋势
     function stock(name, tn, cInvCode, provName, cityName, countryName){
+        countryName = '';
 		$.ajax({
 			url:"${CPATH}/stock/date",
 			type:"post",
