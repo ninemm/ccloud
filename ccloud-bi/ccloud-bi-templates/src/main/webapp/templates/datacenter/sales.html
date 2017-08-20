@@ -152,6 +152,17 @@
       $('#prov').css('visibility','hidden');
     	$('#city').css('visibility','hidden');
       mapRender(true);
+      
+      provName = '';
+      cityName = '';
+  	  countryName = '';
+  	  customer_rank(provName, cityName, countryName, dateType);
+      area_rank(provName, cityName, countryName, dateType);
+      product_rank(provName, cityName, countryName, dateType);
+      stock_rank(provName, cityName, countryName);
+      stock(125,"125ml35度中国劲酒","za000053",provName, cityName, countryName);
+      stock(258,"258ml35度中国劲酒","zzgj2715",provName, cityName, countryName);
+      stock(520,"520ml35度中国劲酒","zzgj1012",provName, cityName, countryName);
     }
 
     //回到省界面
@@ -160,6 +171,16 @@
       provName = provName.substring(0, provName.length - 1);
       clickProv({"name": provName}, true);
   		$('#city').css('visibility','hidden');
+  	  
+  	  cityName = '';
+  	  countryName = '';
+  	  customer_rank(provName, cityName, countryName, dateType);
+      area_rank(provName, cityName, countryName, dateType);
+      product_rank(provName, cityName, countryName, dateType);
+      stock_rank(provName, cityName, countryName);
+      stock(125,"125ml35度中国劲酒","za000053",provName, cityName, countryName);
+      stock(258,"258ml35度中国劲酒","zzgj2715",provName, cityName, countryName);
+      stock(520,"520ml35度中国劲酒","zzgj1012",provName, cityName, countryName);
   	}
 
     //做时间的切换选择
@@ -265,6 +286,13 @@
           });
         });
       });
+      customer_rank(provName, cityName, countryName, dateType);
+      area_rank(provName, cityName, countryName, dateType);
+      product_rank(provName, cityName, countryName, dateType);
+      stock_rank(provName, cityName, countryName, dateType);
+      stock(125,"125ml35度中国劲酒","za000053",provName, cityName, countryName);
+      stock(258,"258ml35度中国劲酒","zzgj2715",provName, cityName, countryName);
+      stock(520,"520ml35度中国劲酒","zzgj1012",provName, cityName, countryName);
     }
 
     //点击地图上的市
@@ -318,6 +346,14 @@
         //    调取后台数据
         countryMapRender(selectProv, selectCity, maxData);
       });
+      
+      customer_rank(provName, cityName, countryName, dateType);
+      area_rank(provName, cityName, countryName, dateType);
+      product_rank(provName, cityName, countryName, dateType);
+      stock_rank(provName, cityName, countryName, dateType);
+      stock(125,"125ml35度中国劲酒","za000053",provName, cityName, countryName);
+      stock(258,"258ml35度中国劲酒","zzgj2715",provName, cityName, countryName);
+      stock(520,"520ml35度中国劲酒","zzgj1012",provName, cityName, countryName);
     }
 
     function countryMapRender(selectProv, selectCity, maxData) {
