@@ -150,41 +150,81 @@ public class SalesFactQuery extends JBaseQuery {
 		
 	}
 
+
 	public List<Record> findCustomerTypeList(String provName, String cityName, String countryName, String startDate, String endDate) {
-		
-		LinkedList<Object> params = new LinkedList<Object>();
-		
-		StringBuilder sqlBuilder = new StringBuilder("select customerTypeName");
-		
-		sqlBuilder.append(", TRUNCATE(SUM(totalSales)/1000000, 2) as totalAmount");
-		
-		sqlBuilder.append(" from sales_fact");
-		
-		boolean needWhere = true;
-		needWhere = appendIfNotEmpty(sqlBuilder, "provName", provName, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "cityName", cityName, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "countryName", countryName, params, needWhere);
-		
-		if (needWhere) {
-			sqlBuilder.append(" where 1 = 1");
-		}
-		
-		if (startDate != null) {
-			sqlBuilder.append(" and idate >= ?");
-			params.add(startDate);
-		}
-		
-		if (endDate != null) {
-			sqlBuilder.append(" and idate <= ?");
-			params.add(endDate);
-		}
-		sqlBuilder.append(" and customerType != 7");
-		
-		sqlBuilder.append(" group by customerType");
-		sqlBuilder.append(" order by totalAmount desc");
-		
-		return Db.find(sqlBuilder.toString(), params.toArray());
-	}
+	        
+	        LinkedList<Object> params = new LinkedList<Object>();
+	        
+	        StringBuilder sqlBuilder = new StringBuilder("select customerTypeName,customerType");
+	        
+	        sqlBuilder.append(", TRUNCATE(SUM(totalSales)/1000000, 2) as totalAmount");
+	        
+	        sqlBuilder.append(" from sales_fact");
+	        
+	        boolean needWhere = true;
+	        needWhere = appendIfNotEmpty(sqlBuilder, "provName", provName, params, needWhere);
+	        needWhere = appendIfNotEmpty(sqlBuilder, "cityName", cityName, params, needWhere);
+	        needWhere = appendIfNotEmpty(sqlBuilder, "countryName", countryName, params, needWhere);
+	        
+	        if (needWhere) {
+	            sqlBuilder.append(" where 1 = 1");
+	        }
+	        
+	        if (startDate != null) {
+	            sqlBuilder.append(" and idate >= ?");
+	            params.add(startDate);
+	        }
+	        
+	        if (endDate != null) {
+	            sqlBuilder.append(" and idate <= ?");
+	            params.add(endDate);
+	        }
+	        sqlBuilder.append(" and customerType != 7");
+	        
+	        sqlBuilder.append(" group by customerType");
+	        sqlBuilder.append(" order by totalAmount desc");
+	        
+	        return Db.find(sqlBuilder.toString(), params.toArray());
+	    }
+	
+	   public List<Record> findProductListByCustomerType(String provName, String cityName, String countryName, String startDate, String endDate,
+	           int customerType) {
+	        
+	        LinkedList<Object> params = new LinkedList<Object>();
+	        
+	        StringBuilder sqlBuilder = new StringBuilder("select customerTypeName, cInvName");
+	        
+	        sqlBuilder.append(", TRUNCATE(SUM(totalSales)/1000000, 2) as totalAmount");
+	        
+	        sqlBuilder.append(" from sales_fact");
+	        
+	        boolean needWhere = true;
+	        needWhere = appendIfNotEmpty(sqlBuilder, "provName", provName, params, needWhere);
+	        needWhere = appendIfNotEmpty(sqlBuilder, "cityName", cityName, params, needWhere);
+	        needWhere = appendIfNotEmpty(sqlBuilder, "countryName", countryName, params, needWhere);
+	        
+	        if (needWhere) {
+	            sqlBuilder.append(" where 1 = 1");
+	        }
+	        
+	        if (startDate != null) {
+	            sqlBuilder.append(" and idate >= ?");
+	            params.add(startDate);
+	        }
+	        
+	        if (endDate != null) {
+	            sqlBuilder.append(" and idate <= ?");
+	            params.add(endDate);
+	        }
+	        sqlBuilder.append(" and customerType = ?");
+	        params.add(customerType);
+	        
+	        sqlBuilder.append(" group by cInvCode");
+	        sqlBuilder.append(" order by totalAmount desc");
+	        
+	        return Db.find(sqlBuilder.toString(), params.toArray());
+	   }
+	    
 	
 	   public List<Record> findProductList(String provName, String cityName, String countryName, String startDate, String endDate) {
 	        

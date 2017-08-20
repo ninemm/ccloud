@@ -554,7 +554,12 @@
 			};
 			customerRankChart.resize();
 			customerRankChart.setOption(crOption,true);
+			customerRankChart.on('click', customerClick);
 		});
+	}
+	function customerClick(param) {
+	    countryName = '';
+	    window.location.href = "${CPATH}/sales/productByCustomerType?provName=" + provName + "&cityName=" + cityName + "&countryName=" + countryName + "&dateType=" + dateType;
 	}
 
 	 //区域
@@ -627,8 +632,13 @@
            };
            areaRankChart.resize();
            areaRankChart.setOption(option,true);
+           areaRankChart.on('click', areaClick);
        });
     }
+    
+    function areaClick(param) {
+	
+	}
 
     //产品
     function product_rank(provName, cityName, countryName, dateType){

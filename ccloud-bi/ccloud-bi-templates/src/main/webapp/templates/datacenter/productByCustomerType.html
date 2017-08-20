@@ -1,0 +1,39 @@
+<#include "_inc/_layout.html"/>
+<#macro script_import>
+
+ 	<!-- <script src="${CPATH}/templates/datacenter/js/bootstrap.min.js"></script> -->
+
+</#macro>
+<#macro css_import>
+
+    <link rel="stylesheet" href="${CPATH}/templates/datacenter/css/bootstrap.min.css">
+
+</#macro>
+<#macro css>
+    .table{
+      font-size:0.6rem;
+    }
+
+</#macro>
+<#macro script>
+
+</#macro>
+<section>
+
+    <p>2017-08-15销售情况</p>
+    <table>
+	<tr>
+	  <th>客户类型</th>
+	  <th>产品</th>
+	  <th>销售额(万元)</th>
+	</tr>
+    <#list rows as row>
+	<tr>
+	  ${row}
+	</tr>
+	</#list>
+	<a href="<a href="javascript :history.back(-1)">返回上一页</a>
+</table>
+</section>
+<@layout>
+</@layout>
