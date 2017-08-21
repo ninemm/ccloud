@@ -11,6 +11,7 @@ import org.ccloud.model.query.SalesFactQuery;
 import org.ccloud.route.RouterMapping;
 import org.joda.time.DateTime;
 
+import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Record;
 
 @RouterMapping(url = "/sales")
@@ -36,6 +37,37 @@ public class SalesFactController extends BaseFrontController {
 		renderJson(result);
 		
 	}
+	
+    public void productByArea() {
+        
+        String provName = getPara("provName", "").trim();
+        String cityName = getPara("cityName", "").trim();
+        String countryName = getPara("countryName", "").trim();
+        
+        String dateType = getPara("dateType", "").trim();;// 0: 昨天， 1: 最近1周， 2: 最近1月
+        
+        String beginDate = getDateByType(dateType);
+        String endDate = getDate(-1);
+        
+        List<List<Record>> rows = new ArrayList<List<Record>>();
+        List<Map<String, Object>> countryResult = SalesFactQuery.me().findAreaList(provName, cityName, countryName, beginDate, endDate);
+        
+        for(Map<String, Object> map : countryResult){
+            if (StrKit.notBlank(getPara("cityName", "").trim())) {
+                countryName = (String) map.get(0);
+            } else if (StrKit.notBlank(getPara("provName", "").trim())) {
+                cityName = (String) map.get(0);
+            } else {
+                provName = (String) map.get(0);
+            }
+            List<Record> result = SalesFactQuery.me().findProductList(provName, cityName, countryName, beginDate, endDate);
+            rows.add(result);
+        }
+        
+        setAttr("rows", rows);
+        renderFreeMarker("productByArea.html");
+        
+    }
 	
     public void customerType() {
         
@@ -74,7 +106,7 @@ public class SalesFactController extends BaseFrontController {
             rows.add(result);
         }
         setAttr("rows", rows);
-        render("productByCustomerType.html");
+        renderFreeMarker("productByCustomerType.html");
         
      }
     
