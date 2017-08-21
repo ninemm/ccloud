@@ -1,0 +1,39 @@
+<#include "_inc/_layout.html"/>
+<#macro script_import>
+
+ 	<!-- <script src="${CPATH}/templates/datacenter/js/bootstrap.min.js"></script> -->
+
+</#macro>
+<#macro css_import>
+
+    <link rel="stylesheet" href="${CPATH}/templates/datacenter/css/bootstrap.min.css">
+
+</#macro>
+<#macro css>
+    .table{
+      font-size:0.6rem;
+    }
+
+</#macro>
+<#macro script>
+</#macro>
+<@layout>
+<section>
+
+    <p>区域销售情况</p>
+    <table class="table">
+	<tr>
+	  <th>区域</th>
+	  <th>产品</th>
+	  <th>销售额(万元)</th>
+	</tr>
+	<tr>
+      <td>${rows[0][0].provName}</td>
+      <td>${rows[0][0].cInvName}</td>
+      <td>${rows[0][0].totalAmount}</td>
+	</tr>
+</table>
+	<a href="${CPATH}/renderSales">返回上一页</a>
+</section>
+
+</@layout>
