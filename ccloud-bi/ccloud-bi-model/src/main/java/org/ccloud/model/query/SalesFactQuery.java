@@ -273,7 +273,7 @@ public class SalesFactQuery extends JBaseQuery {
            
            LinkedList<Object> params = new LinkedList<Object>();
            
-           StringBuilder sqlBuilder = new StringBuilder("select provName,cityName,countryName,cInvName");
+           StringBuilder sqlBuilder = new StringBuilder("select cInvName");
            
            if (StrKit.notBlank(countryName)) {
                sqlBuilder.append(", countryName");

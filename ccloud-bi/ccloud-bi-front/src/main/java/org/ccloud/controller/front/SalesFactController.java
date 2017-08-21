@@ -64,6 +64,9 @@ public class SalesFactController extends BaseFrontController {
         }
         
         setAttr("rows", rows);
+        setAttr("provName", getPara("provName", "").trim());
+        setAttr("cityName", getPara("cityName", "").trim());
+        setAttr("dateType", dateType);
         render("productByArea.html");
         
     }
