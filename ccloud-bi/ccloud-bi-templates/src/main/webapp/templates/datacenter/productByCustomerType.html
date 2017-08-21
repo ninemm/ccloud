@@ -18,6 +18,7 @@
 <#macro script>
 
 </#macro>
+<@layout>
 <section>
 
     <p>销售情况</p>
@@ -28,12 +29,14 @@
 	  <th>销售额(万元)</th>
 	</tr>
     <#list rows as row>
-	<tr>
-	  ${row}
-	</tr>
+	        <tr>
+	        <td>${row[0]}</td>
+        	<td></td>
+	        <td></td>
+	        </tr>
 	</#list>
 </table>
 	<a href="<a href="javascript :history.back(-1)">返回上一页</a>
 </section>
-<@layout>
+
 </@layout>

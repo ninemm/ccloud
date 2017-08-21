@@ -65,7 +65,7 @@ public class SalesFactController extends BaseFrontController {
         }
         
         setAttr("rows", rows);
-        renderFreeMarker("productByArea.html");
+        render("productByArea.html");
         
     }
 	
@@ -106,7 +106,7 @@ public class SalesFactController extends BaseFrontController {
             rows.add(result);
         }
         setAttr("rows", rows);
-        renderFreeMarker("productByCustomerType.html");
+        render("productByCustomerType.html");
         
      }
     
