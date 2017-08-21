@@ -559,7 +559,14 @@
 	}
 	function customerClick(param) {
 	    countryName = '';
-	    window.location.href = "${CPATH}/sales/productByCustomerType?provName=" + provName + "&cityName=" + cityName + "&countryName=" + countryName + "&dateType=" + dateType;
+	    $.ajax({
+  			url:"${CPATH}/sales/productByCustomerType",
+  			type:"post",
+  			data:{"provName": provName, "cityName": cityName, countryName: countryName, dateType: dateType},
+  			dataType:"json"
+  		})
+	    //window.location.href = "${CPATH}/sales/productByCustomerType?provName=" + provName + "&cityName=" + cityName + "&countryName=" + countryName + "&dateType=" + dateType;
+	    //window.location.href = "${CPATH}/sales/productByCustomerType?" + provName + "-" + cityName + "-" + countryName + "-" + dateType;
 	}
 
 	 //区域
@@ -639,7 +646,7 @@
     function areaClick(param) {
 	
 	}
-
+    var $prTR;
     //产品
     function product_rank(provName, cityName, countryName, dateType){
         countryName = '';
@@ -660,18 +667,38 @@
 			$thead.empty();
 			$thead.text(prTitle);
 
-  			var length = data.length > 5 ? 5 : data.length;
-
             var $tbody = $("#product_rank tbody");
             $tbody.empty();
             $tbody.append("<tr><th>产品</th><th>数量(件)</th><th>金额(万元)</th></tr>");
-            for(var i = 0; i < length; i++){
+            for(var i = 0; i < data.length; i++){
                 $tbody.append("<tr><td>" + data[i].cInvName + "</td><td>" + data[i].totalNum + "</td><td>" + data[i].totalAmount + "</td></tr>");
+            }
+            $prTR = $("#product_rank tbody tr:gt(5)");
+            if($prTR.length > 0){
+                $prTR.hide();
+                $("#prTrOpen").show();
+                $("#prTrClose").hide();
+            }else {
+                $("#prTrOpen").hide();
+                $("#prTrClose").hide();
             }
             $(".weui-tab__bd").height($("#tab1").height());
        });
     }
+    $("#prTrOpen").click(function() {
+        $prTR.show();
+        $("#prTrOpen").hide();
+        $("#prTrClose").show();
+        $(".weui-tab__bd").height($("#tab1").height());
+    });
+    $("#prTrClose").click(function() {
+        $prTR.hide();
+        $("#prTrOpen").show();
+        $("#prTrClose").hide();
+        $(".weui-tab__bd").height($("#tab1").height());
+    });
 
+    var $sTR;
 	//库存
     function stock_rank(provName, cityName, countryName){
         countryName = '';
@@ -691,15 +718,35 @@
 			$thead.empty();
 			$thead.text(srTitle);
 
-			var length = data.length > 5 ? 5 : data.length;
             var $tbody = $("#stock_rank tbody");
             $tbody.empty();
 	        $tbody.append("<tr><th>产品</th><th>数量(件)</th></tr>");
-	        for(var i = 0; i < length; i++){
+	        for(var i = 0; i < data.length; i++){
                 $tbody.append("<tr><td>" + data[i].cInvName + "</td><td>" + data[i].totalNum + "</td></tr>");
 	        }
+	        $sTR = $("#stock_rank tbody tr:gt(5)");
+            if($sTR.length > 0){
+                $sTR.hide();
+                $("#sTrOpen").show();
+                $("#sTrClose").hide();
+            }else {
+                $("#sTrOpen").hide();
+                $("#sTrClose").hide();
+            }
         });
     }
+    $("#sTrOpen").click(function() {
+        $sTR.show();
+        $("#sTrOpen").hide();
+        $("#sTrClose").show();
+        $(".weui-tab__bd").height($("#tab2").height());
+    });
+    $("#sTrClose").click(function() {
+        $sTR.hide();
+        $("#sTrOpen").show();
+        $("#sTrClose").hide();
+        $(".weui-tab__bd").height($("#tab2").height());
+    });
 
     //库存趋势
     function stock(name, tn, cInvCode, provName, cityName, countryName){
@@ -822,6 +869,8 @@
                               </tr>
                             </tbody>
                           </table>
+                          <button id ="prTrOpen" style="float:right">更多</button>
+                          <button id ="prTrClose" style="float:right">收起</button>
                       </div>
                 </div>
                 <div id="tab2" class="weui-tab__bd-item weui-tab__bd-item--active">
@@ -835,6 +884,8 @@
                             </tr>
                           </tbody>
                         </table>
+                        <button id ="sTrOpen" style="float:right">更多</button>
+                        <button id ="sTrClose" style="float:right">收起</button>
                     </div>
                     <p class="title">库存趋势</p>
                     <div>
