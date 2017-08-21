@@ -561,28 +561,7 @@
 	    countryName = '';
 
         post('${CPATH}/sales/productByCustomerType', {"provName" : provName, "cityName" : cityName, "countryName" : countryName, "dateType" : dateType});
-	    //window.location.href = "${CPATH}/sales/productByCustomerType?provName=" + provName + "&cityName=" + cityName + "&countryName=" + countryName + "&dateType=" + dateType;
-	    //window.location.href = "${CPATH}/sales/productByCustomerType?" + provName + "-" + cityName + "-" + countryName + "-" + dateType;
 	}
-	
-	function post(URL, PARAMS)
-	{ 
-	var temp = document.createElement("form"); 
-	temp.action = URL; 
-	temp.method = "post"; 
-	temp.style.display = "none"; 
-	for (var x in PARAMS)
-	{ 
-	var opt = document.createElement("textarea"); 
-	opt.name = x; 
-	opt.value = PARAMS[x]; 
-	temp.appendChild(opt); 
-	} 
-	document.body.appendChild(temp); 
-	temp.submit(); 
-	return temp; 
-	} 
-
 
 	 //区域
     function area_rank(provName, cityName, countryName, dateType){
@@ -659,7 +638,9 @@
     }
     
     function areaClick(param) {
+        countryName = '';
 	
+	    post('${CPATH}/sales/productByArea', {"provName" : provName, "cityName" : cityName, "countryName" : countryName, "dateType" : dateType});
 	}
     var $prTR;
     //产品
@@ -837,6 +818,25 @@
 			stockChart.setOption(option,true);
 		});
     }
+    //共通post
+    function post(URL, PARAMS)
+	{ 
+	var temp = document.createElement("form"); 
+	temp.action = URL; 
+	temp.method = "post"; 
+	temp.style.display = "none"; 
+	for (var x in PARAMS)
+	{ 
+	var opt = document.createElement("textarea"); 
+	opt.name = x; 
+	opt.value = PARAMS[x]; 
+	temp.appendChild(opt); 
+	} 
+	document.body.appendChild(temp); 
+	temp.submit(); 
+	return temp; 
+	} 
+    
 </#macro>
 <section>
     <div class="bi-body">

@@ -32,7 +32,7 @@ public class SalesFactController extends BaseFrontController {
         String beginDate = getDateByType(dateType);
         String endDate = getDate(-1) ;
 		
-		List<Map<String, Object>> result = SalesFactQuery.me().findAreaList(provName, cityName, countryName, beginDate, endDate);
+		List<Map<String,Object>> result = SalesFactQuery.me().findAreaList(provName, cityName, countryName, beginDate, endDate);
 		
 		renderJson(result);
 		
@@ -50,17 +50,16 @@ public class SalesFactController extends BaseFrontController {
         String endDate = getDate(-1);
         
         List<List<Record>> rows = new ArrayList<List<Record>>();
-        List<Map<String, Object>> countryResult = SalesFactQuery.me().findAreaList(provName, cityName, countryName, beginDate, endDate);
-        
-        for(Map<String, Object> map : countryResult){
+        List<Record> countryResult = SalesFactQuery.me().findArea(provName, cityName, countryName, beginDate, endDate);
+        for(int i=0; i<countryResult.size(); i++){
             if (StrKit.notBlank(getPara("cityName", "").trim())) {
-                countryName = (String) map.get(0);
+                countryName = countryResult.get(i).getStr("countryName");
             } else if (StrKit.notBlank(getPara("provName", "").trim())) {
-                cityName = (String) map.get(0);
+                cityName = countryResult.get(i).getStr("cityName");
             } else {
-                provName = (String) map.get(0);
+                provName = countryResult.get(i).getStr("provName");
             }
-            List<Record> result = SalesFactQuery.me().findProductList(provName, cityName, countryName, beginDate, endDate);
+            List<Record> result = SalesFactQuery.me().findProductListByArea(provName, cityName, countryName, beginDate, endDate);
             rows.add(result);
         }
         

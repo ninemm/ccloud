@@ -16,27 +16,49 @@
 
 </#macro>
 <#macro script>
-
 </#macro>
 <@layout>
 <section>
 
-    <p>销售情况</p>
+    <p>客户销售情况</p>
     <table class="table">
 	<tr>
 	  <th>客户类型</th>
 	  <th>产品</th>
 	  <th>销售额(万元)</th>
 	</tr>
-    <#list rows as row>
-	        <tr>
-	        <td>${row[0]}</td>
-        	<td></td>
-	        <td></td>
-	        </tr>
-	</#list>
+	<tr>
+      <td rowspan="4">${rows[0][0].customerTypeName}</td>
+      <td>${rows[0][0].cInvName}</td>
+      <td>${rows[0][0].totalAmount}</td>
+	</tr>
+	<tr>
+      <td>${rows[0][1].cInvName}</td>
+      <td>${rows[0][1].totalAmount}</td>
+	</tr>
+	<tr>
+      <td>${rows[0][2].cInvName}</td>
+      <td>${rows[0][2].totalAmount}</td>
+	</tr>
+	<tr>
+      <td>${rows[0][3].cInvName}</td>
+      <td>${rows[0][3].totalAmount}</td>
+	</tr>
+    <tr>
+      <td rowspan="3">${rows[1][0].customerTypeName}</td>
+      <td>${rows[1][0].cInvName}</td>
+      <td>${rows[1][0].totalAmount}</td>
+	</tr>
+	<tr>
+      <td>${rows[1][1].cInvName}</td>
+      <td>${rows[1][1].totalAmount}</td>
+	</tr>
+	<tr>
+      <td>${rows[1][2].cInvName}</td>
+      <td>${rows[1][2].totalAmount}</td>
+	</tr>
 </table>
-	<a href="<a href="javascript :history.back(-1)">返回上一页</a>
+	<a href="${CPATH}/renderSales">返回上一页</a>
 </section>
 
 </@layout>
