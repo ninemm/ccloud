@@ -38,6 +38,11 @@
 			<groupId>com.jfinal</groupId>
 			<artifactId>jfinal-weixin</artifactId>
 		</dependency>
+		
+		<dependency>
+            <groupId>com.jfinal</groupId>
+            <artifactId>jfinal-qyweixin</artifactId>
+        </dependency>
 
 		<dependency>
 			<groupId>net.sf.ehcache</groupId>
