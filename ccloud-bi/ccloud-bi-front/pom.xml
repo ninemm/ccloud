@@ -51,6 +51,11 @@
 		  	<artifactId>ECharts</artifactId>
 		  	<version>3.0.0</version>
 		</dependency>
+		
+		<dependency>
+            <groupId>com.jfinal</groupId>
+            <artifactId>jfinal-qyweixin</artifactId>
+        </dependency>
 	
 		<dependency>
 			<groupId>org.ccloud</groupId>

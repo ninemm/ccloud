@@ -39,10 +39,76 @@
 
 <#macro script_import>
     <script type='text/javascript' src="${CTPATH}/js/echarts.min.js"></script>
-    <!-- <script type='text/javascript' src="${CTPATH}/js/china.js"></script> -->
     <script type='text/javascript' src="${CTPATH}/js/countUp.js"></script>
+    <script type="text/javascript" src="${CTPATH}/json/china-main-city-map.js"></script>
+    <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=su3AmHLUcBprpnOLmVHo7r8AljbW8X6t"></script>
+    <script type='text/javascript' src="${CTPATH}/js/common.js"></script>
 </#macro>
 <#macro script>
+
+    var $prov = $("#prov");
+    var $city = $("#city");
+
+    wx.config({
+	    debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+	    appId: '${appId!}', // 必填，公众号的唯一标识
+	    timestamp: '${timestamp!}', // 必填，生成签名的时间戳
+	    nonceStr: '${nonceStr!}', // 必填，生成签名的随机串
+	    signature: '${signature!}',// 必填，签名，见附录1
+	    jsApiList: ['checkJsApi', 'getLocation'] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+	});
+	
+	wx.ready(function() {
+        wx.checkJsApi({
+	        jsApiList: [
+		        'checkJsApi',
+		        'getLocation'
+	        ],
+            success: function (res) {
+                alert(JSON.stringify(res.checkResult.getLocation));
+                if (res.checkResult.getLocation == false) {
+		            alert('你的微信版本太低，不支持微信JS接口，请升级到最新的微信版本！');
+		            return;
+		        } else {
+                    alert(11);
+		            wx.getLocation({
+		                type: 'wgs84', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
+		                success: function (res) {
+	                        console.log(JOSN.stringify(res));
+		                    var latitude = res.latitude; // 纬度，浮点数，范围为90 ~ -90
+		                    var longitude = res.longitude; // 经度，浮点数，范围为180 ~ -180。
+		                    var speed = res.speed; // 速度，以米/每秒计
+		                    var accuracy = res.accuracy; // 位置精度
+		                    console.log(latitude, longitude)
+		                }
+		            });
+	            }
+            }
+        });
+	});
+	
+	wx.error(function(res) {
+	   console.log(JOSN.stringify(res));
+	});
+    
+    var provName = localStorage.provName;
+    var cityName = localStorage.cityName;
+    var countryName = localStorage.countryName;
+
+    if (provName == null || cityName == null || countryName == null) {
+        var baiduMap = new BaiduMap();
+        baiduMap.getLocation();
+    }
+    
+    // console.log(provName, cityName + '-' + countryName);
+    
+    provName = localStorage.provName;
+    cityName = localStorage.cityName;
+    countryName = localStorage.countryName;
+    
+    $prov.text(provName);
+    $city.text(cityName);
 
     var $map = document.getElementById("map");
     var myChart = echarts.init($map);
@@ -55,17 +121,24 @@
     var provName = '湖北省';
     var cityName = '武汉市';
     
+    var curProvName = null;
+    if (provName.indexOf('省') != -1) {
+        curProvName = provName.substring(0, provName.length - 1);
+    }
+    
+    var mapDataUrl = '${CTPATH}/json/'+cityMap[curProvName]+'/'+cityMap[cityName]+'.json';
+    //console.log(mapDataUrl);
+    
     $.ajax({
         type: 'post',
         url: '${CPATH}/orderAmount',
-        data: {provName: '湖北省', cityName: '武汉市', countryName: '江岸区'},
+        data: {provName: provName, cityName: cityName, countryName: countryName},
         success: function(data) {
 
             option = {
                 backgroundColor: '#404a59',
                 title: {
-                    text: '货物流向',
-                    /*subtext: '数据纯属虚构',*/
+                    text: '劲酒货物流向图',
                     left: 'left',
                     textStyle: {
                         color: '#fff'
@@ -104,7 +177,6 @@
                 },
                 series: series
             };
-            
             getMapData(data);
         
         },
@@ -114,7 +186,7 @@
     
     function getMapData(areaData) {
     
-        $.getJSON('${CTPATH}/json/HuBei/WuHan.json', function(data) {
+        $.getJSON(mapDataUrl, function(data) {
             
             echarts.registerMap('wuhan', data);
             
@@ -181,7 +253,9 @@
                     }
                 },
                 symbolSize: function(val) {
-                    return val[2] / 200;
+                    console.log(val[2])
+                    //return val[2] / 100;
+                    return val[2] / 8;
                 },
                 itemStyle: {
                     normal: {
@@ -230,9 +304,20 @@
     setTimeout(function() {
 		$("#sales").addClass('animated pulse');
 		setTimeout(function() {
-		$("#order-total").addClass('animated pulse');
+		  $("#order-total").addClass('animated pulse');
 		}, 1000);
 	}, 2000);
+	
+	$(".area").on('click', function() {
+	   var name = $(this).text();
+	   
+	   
+	});
+	
+	function onSelectedArea() {
+	
+	}
+	
 </#macro>
 
 <@layout>
@@ -240,7 +325,7 @@
 
     <div class="bi-body">
         <div class="location">
-            <i class="icon-map-marker txt-color-green"></i> 湖北省 > 武汉市 > 洪山区
+            <i class="icon-map-marker txt-color-green"></i> <a href="javascript:void(0);" class="area">全国</a> > <a href="javascript:void(0);" id="prov" class="area">湖北省</a> > <a href="javascript:void(0);" id="city" class="area">武汉市</a>
         </div>
         <div class="map-wrapper">
             <div id="map" class="maps"></div>

@@ -67,15 +67,46 @@
 
 </#macro>
 <#macro script>
-    var provName = '';
-    var cityName = '';
-    var countryName = '';
+    //var provName = '';
+    //var cityName = '';
+    //var countryName = '';
+    var provName = localStorage.provName;
+    var cityName = localStorage.cityName;
+    var countryName = localStorage.countryName;
     var dateType = 0;
     var prov_data = [];
     var city_data = [];
     var country_data = [];
     $(function() {
-        var MapSet = {
+	
+	    if (provName == null || cityName == null || countryName == null) {
+	        var baiduMap = new BaiduMap();
+	        baiduMap.getLocation();
+	    }
+	    
+	    provName = localStorage.provName;
+	    cityName = localStorage.cityName;
+	    countryName = localStorage.countryName;
+	    
+	    provName = provName.substring(0, provName.length - 1);
+	    
+	    if(countryName.length != 0) {
+            clickCity({"name": cityName}, provName);
+            provName = provName + "省";
+        } else if(cityName.length !=0){
+            clickProv({"name": provName}, true);
+        } else {
+            mapRender(true);
+        }
+        customer_rank(provName, cityName, countryName, dateType);
+        area_rank(provName, cityName, countryName, dateType);
+        product_rank(provName, cityName, countryName, dateType);
+        stock_rank(provName, cityName, countryName, dateType);
+        stock(125,"125ml35度中国劲酒","za000053",provName, cityName, countryName);
+        stock(258,"258ml35度中国劲酒","zzgj2715",provName, cityName, countryName);
+        stock(520,"520ml35度中国劲酒","zzgj1012",provName, cityName, countryName);
+    
+        /*var MapSet = {
           GetLocation:function(){
             var geolocation = new BMap.Geolocation();
             geolocation.getCurrentPosition(function(r) {
@@ -108,9 +139,9 @@
               }
             },{enableHighAccuracy: true})
           }
-        };
-        MapSet.GetLocation();
-        FastClick.attach(document.body);
+        };*/
+        //MapSet.GetLocation();
+        
         $(".date").click(function(e) {
             var $a = $(e.currentTarget);
             $a.parent().find(".date").removeClass("active-date");
@@ -149,275 +180,295 @@
 
             e.preventDefault();
             showTab($a);
-        })
-       $(".map p").text(new Date().toLocaleDateString() + '销售情况');
-      });
+        });
+        
+        
+        $(".map p").text(new Date().toLocaleDateString() + '销售情况');
+    });
 
     //回到中国地图界面
     function goBackChinaMap() {
 
-      $('#prov').css('visibility','hidden');
+        $('#prov').css('visibility','hidden');
     	$('#city').css('visibility','hidden');
-      mapRender(true);
+        
+        mapRender(true);
       
-      provName = '';
-      cityName = '';
-  	  countryName = '';
-  	  customer_rank(provName, cityName, countryName, dateType);
-      area_rank(provName, cityName, countryName, dateType);
-      product_rank(provName, cityName, countryName, dateType);
-      stock_rank(provName, cityName, countryName);
-      stock(125,"125ml35度中国劲酒","za000053",provName, cityName, countryName);
-      stock(258,"258ml35度中国劲酒","zzgj2715",provName, cityName, countryName);
-      stock(520,"520ml35度中国劲酒","zzgj1012",provName, cityName, countryName);
+        provName = '';
+        cityName = '';
+        countryName = '';
+        customer_rank(provName, cityName, countryName, dateType);
+        
+        area_rank(provName, cityName, countryName, dateType);
+        product_rank(provName, cityName, countryName, dateType);
+        stock_rank(provName, cityName, countryName);
+        stock(125, "125ml35度中国劲酒","za000053",provName, cityName, countryName);
+        
+        stock(258,"258ml35度中国劲酒","zzgj2715",provName, cityName, countryName);
+        stock(520,"520ml35度中国劲酒","zzgj1012",provName, cityName, countryName);
     }
 
     //回到省界面
     function goBackProvMap() {
 
-      provName = provName.substring(0, provName.length - 1);
-      clickProv({"name": provName}, true);
+        provName = provName.substring(0, provName.length - 1);
+        clickProv({"name": provName}, true);
   		$('#city').css('visibility','hidden');
   	  
-  	  cityName = '';
-  	  countryName = '';
-  	  customer_rank(provName, cityName, countryName, dateType);
-      area_rank(provName, cityName, countryName, dateType);
-      product_rank(provName, cityName, countryName, dateType);
-      stock_rank(provName, cityName, countryName);
-      stock(125,"125ml35度中国劲酒","za000053",provName, cityName, countryName);
-      stock(258,"258ml35度中国劲酒","zzgj2715",provName, cityName, countryName);
-      stock(520,"520ml35度中国劲酒","zzgj1012",provName, cityName, countryName);
+        cityName = '';
+        countryName = '';
+        customer_rank(provName, cityName, countryName, dateType);
+        area_rank(provName, cityName, countryName, dateType);
+        
+        product_rank(provName, cityName, countryName, dateType);
+        stock_rank(provName, cityName, countryName);
+        stock(125,"125ml35度中国劲酒","za000053",provName, cityName, countryName);
+        stock(258,"258ml35度中国劲酒","zzgj2715",provName, cityName, countryName);
+        stock(520,"520ml35度中国劲酒","zzgj1012",provName, cityName, countryName);
   	}
 
     //做时间的切换选择
     function setDateType(type){
-      dateType = type;
-      customer_rank(provName, cityName, countryName, dateType);
-      area_rank(provName, cityName, countryName, dateType);
-      product_rank(provName, cityName, countryName, dateType);
-      stock_rank(provName, cityName, countryName);
-      stock(125,"125ml35度中国劲酒","za000053",provName, cityName, countryName);
-      stock(258,"258ml35度中国劲酒","zzgj2715",provName, cityName, countryName);
-      stock(520,"520ml35度中国劲酒","zzgj1012",provName, cityName, countryName);
-      if (document.getElementById('china_map').style.display == 'block') mapRender(false);
-      if (document.getElementById('prov_map').style.display == 'block') clickProv({"name": provName.substring(0, provName.length - 1)}, false);
-      if (document.getElementById('city_map').style.display == 'block') clickCity({"name": cityName}, provName.substring(0, provName.length - 1));
+        dateType = type;
+        customer_rank(provName, cityName, countryName, dateType);
+        area_rank(provName, cityName, countryName, dateType);
+        product_rank(provName, cityName, countryName, dateType);
+        
+        stock_rank(provName, cityName, countryName);
+        stock(125,"125ml35度中国劲酒","za000053",provName, cityName, countryName);
+        stock(258,"258ml35度中国劲酒","zzgj2715",provName, cityName, countryName);
+        stock(520,"520ml35度中国劲酒","zzgj1012",provName, cityName, countryName);
+        
+        if (document.getElementById('china_map').style.display == 'block') mapRender(false);
+        if (document.getElementById('prov_map').style.display == 'block') clickProv({"name": provName.substring(0, provName.length - 1)}, false);
+        if (document.getElementById('city_map').style.display == 'block') clickCity({"name": cityName}, provName.substring(0, provName.length - 1));
     }
 
     //点击地图上的省
     function clickProv (result, isRender) {
-      cityName = '';
-      if(result.name == '北京' || result.name == '上海' || result.name == '天津' || result.name == '台湾' || result.name == '重庆'){
-        provName = result.name + '市';
-      } else {
-        provName = result.name + '省';
-      }
-
-      var maxData = 0;
-        $.ajax({
-        url:"${CPATH}/sales/queryMapData",
-        type:"post",
-        data:{"provName": provName, "cityName": '', countryName: '', dateType: dateType},
-        dataType:"json"
-        }).done(function(data){
-          city_data = [];
-        for(var i = 0; i < data.length; i++)
-        {
-          city_data.push({"name": data[i].cityName, "value": data[i].totalAmount});
-          if(data[i].totalAmount > maxData) maxData = data[i].totalAmount;
+        
+        cityName = '';
+        var maxData = 0;
+        
+        if(result.name == '北京' || result.name == '上海' || result.name == '天津' || result.name == '台湾' || result.name == '重庆'){
+            provName = result.name + '市';
+        } else {
+            provName = result.name + '省';
         }
-        setTimeout(function () {
-          $('#prov_view').text(result.name);
-          $('#prov').css('visibility','visible');
+        
+        $.ajax({
+	        url:"${CPATH}/sales/queryMapData",
+	        type:"post",
+	        data:{"provName": provName, "cityName": '', countryName: '', dateType: dateType},
+	        dataType:"json"
+        }).done(function(data) {
+            city_data = [];
+            for(var i = 0; i < data.length; i++) {
+	            city_data.push({"name": data[i].cityName, "value": data[i].totalAmount});
+	            if(data[i].totalAmount > maxData) maxData = data[i].totalAmount;
+	        }
+	        
+            setTimeout(function () {
+                $('#prov_view').text(result.name);
+                $('#prov').css('visibility','visible');
 
-          if (isRender) {
-            $('#china_map').css('display','none');
-            $('#city_map').css('display','none');
-            $('#prov_map').css('display','block');
-          }
-        }, 500);
-        //选择省的单击事件
-        var selectProv = result.name.toString();
-        //    调取后台数据
-        $.get('${CTPATH}/json/'+cityMap[selectProv]+'/'+cityMap[selectProv]+'.json', function (Citymap) {
-          echarts.registerMap(selectProv, Citymap);
-          var myChartProv = echarts.init(document.getElementById('prov_map'));
-          $(document.getElementById('prov_map')).width(400);
-          myChartProv.resize();
-          myChartProv.setOption({
-            tooltip: {
-              trigger: 'item',
-              textStyle: {fontSize: 9},
-              formatter: function loadData(result){
-                if(isNaN(result.value)) return result.name + '<br />总金额: 0';
-                else return result.name+'<br />总金额:'+result.value + '万元';
-              }
-            },
-            visualMap:{
-              min:0,
-              max:maxData+1,
-              splitNumber:0,
-              text:['高','低'],
-              realtime:false,
-              selectedMode:false,
-              realtime:false,
-              show:true,
-              itemWidth:20,
-              itemHeight:120
-            },
-            series: [{
-              type: 'map',
-              map: selectProv ,//要和echarts.registerMap（）中第一个参数一致
-              roam: true,
-              scaleLimit: { min: 1, max: 4 },//缩放
-              mapLocation:{
-                y:60
-              },
-              itemSytle:{
-                emphasis:{label:{show:false}}
-              },
-              label: {
-                normal: {
-                  show: true
-                },
-                emphasis: {
-                  show: true
+                if (isRender) {
+                    $('#china_map').css('display','none');
+                    $('#city_map').css('display','none');
+                    $('#prov_map').css('display','block');
                 }
-              },
-              data : city_data.reverse()
-            }]
-          })
-          myChartProv.on('click', function(rel){
-            clickCity(rel, selectProv);
-          });
+            }, 500);
+            
+            // 选择省的单击事件
+            var selectProv = result.name.toString();
+            // 调取后台数据
+            $.get('${CTPATH}/json/' + cityMap[selectProv] + '/'+cityMap[selectProv] + '.json', function (Citymap) {
+                echarts.registerMap(selectProv, Citymap);
+                var myChartProv = echarts.init(document.getElementById('prov_map'));
+                $(document.getElementById('prov_map')).width(400);
+                myChartProv.resize();
+                myChartProv.setOption({
+	                tooltip: {
+	                    trigger: 'item',
+	                    textStyle: {fontSize: 9},
+	                    formatter: function loadData(result){
+	                        if(isNaN(result.value)) return result.name + '<br />总金额: 0';
+	                        else return result.name+'<br />总金额:'+result.value + '万元';
+	                    }
+	                },
+	                visualMap:{
+	                    min: 0,
+	                    max: maxData+1,
+	                    splitNumber: 0,
+	                    text: ['高','低'],
+	                    realtime: false,
+	                    selectedMode: false,
+	                    realtime: false,
+	                    show: true,
+	                    itemWidth: 20,
+	                    itemHeight: 120
+	                },
+	                series: [{
+		                type: 'map',
+		                map: selectProv ,//要和echarts.registerMap（）中第一个参数一致
+		                roam: true,
+		                scaleLimit: { min: 1, max: 4 },//缩放
+		                mapLocation:{
+		                    y:60
+		                },
+		                itemSytle:{
+		                    emphasis:{label:{show:false}}
+		                },
+		                label: {
+			                normal: {
+			                    show: true
+			                },
+			                emphasis: {
+			                    show: true
+			                }
+		                },
+		                data : city_data.reverse()
+	                }]
+	            });
+	            
+	            myChartProv.on('click', function(rel){
+	                clickCity(rel, selectProv);
+	            });
+            });
         });
-      });
-      customer_rank(provName, cityName, countryName, dateType);
-      area_rank(provName, cityName, countryName, dateType);
-      product_rank(provName, cityName, countryName, dateType);
-      stock_rank(provName, cityName, countryName, dateType);
-      stock(125,"125ml35度中国劲酒","za000053",provName, cityName, countryName);
-      stock(258,"258ml35度中国劲酒","zzgj2715",provName, cityName, countryName);
-      stock(520,"520ml35度中国劲酒","zzgj1012",provName, cityName, countryName);
+        
+        customer_rank(provName, cityName, countryName, dateType);
+        area_rank(provName, cityName, countryName, dateType);
+        product_rank(provName, cityName, countryName, dateType);
+        stock_rank(provName, cityName, countryName, dateType);
+        
+        stock(125, "125ml35度中国劲酒", "za000053", provName, cityName, countryName);
+        stock(258, "258ml35度中国劲酒", "zzgj2715", provName, cityName, countryName);
+        stock(520, "520ml35度中国劲酒", "zzgj1012", provName, cityName, countryName);
     }
 
     //点击地图上的市
     function clickCity(rel, selectProv) {
-      var maxData = 0;
-      cityName = rel.name;
+        var maxData = 0;
+        cityName = rel.name;
         $.ajax({
-        url:"${CPATH}/sales/queryMapData",
-        type:"post",
-        data:{"provName": provName, "cityName": cityName, countryName: '', dateType: dateType},
-        dataType:"json"
-        }).done(function(data){
-          country_data = [];
-        for(var i = 0; i < data.length; i++)
-        {
-          country_data.push({"name": data[i].countryName, "value": data[i].totalAmount});
-          if (data[i].totalAmount > maxData) maxData = data[i].totalAmount;
-        }
-        setTimeout(function () {
-          function contains(arr, obj) {
-            var i = arr.length;
-            while (i--) {
-              if (arr[i] === obj) {
-                return true;
-              }
-            }
-            return false;
-          }
-          var arr = new Array('北京','上海','天津','台湾','重庆');
-          if(contains(arr,selectProv)==false){
-            $('#prov_view').text(selectProv);
-            $('#prov').css('visibility','visible');
+	        url:"${CPATH}/sales/queryMapData",
+	        type:"post",
+	        data:{"provName": provName, "cityName": cityName, countryName: '', dateType: dateType},
+	        dataType:"json"
+        }).done(function(data) {
+            country_data = [];
+            for(var i = 0; i < data.length; i++)
+	        {
+	            country_data.push({"name": data[i].countryName, "value": data[i].totalAmount});
+	            if (data[i].totalAmount > maxData) maxData = data[i].totalAmount;
+	        }
+	        
+            setTimeout(function () {
+	            function contains(arr, obj) {
+		            var i = arr.length;
+		            while (i--) {
+		                if (arr[i] === obj) {
+		                    return true;
+		                }
+		            }
+		            return false;
+	            }
+                
+                var arr = new Array('北京','上海','天津','台湾','重庆');
+                
+                if(contains(arr,selectProv) == false) {
+                
+                    $('#prov_view').text(selectProv);
+                    $('#prov').css('visibility','visible');
+                    $('#city_view').text(rel.name);
+                    $('#city').css('visibility','visible');
 
-            $('#city_view').text(rel.name);
-            $('#city').css('visibility','visible');
+                    $('#china_map').css('display','none');
+                    $('#prov_map').css('display','none');
+                    $('#city_map').css('display','block');
+                    
+                } else {
+	                $('#china_map').css('display','none');
+	                $('#prov_map').css('display','block');
+	                $('#city_map').css('display','none');
+                }
+            }, 500);
+        
+            // 选择市的单击事件
+            var selectCity = rel.name;
 
-            $('#china_map').css('display','none');
-            $('#prov_map').css('display','none');
-            $('#city_map').css('display','block');
-          }
-          else{
-            $('#china_map').css('display','none');
-            $('#prov_map').css('display','block');
-            $('#city_map').css('display','none');
-          }
-
-        }, 500);
-        //选择市的单击事件
-        var selectCity = rel.name;
-
-        //    调取后台数据
-        countryMapRender(selectProv, selectCity, maxData);
-      });
+            // 调取后台数据
+            countryMapRender(selectProv, selectCity, maxData);
+        });
       
-      customer_rank(provName, cityName, countryName, dateType);
-      area_rank(provName, cityName, countryName, dateType);
-      product_rank(provName, cityName, countryName, dateType);
-      stock_rank(provName, cityName, countryName, dateType);
-      stock(125,"125ml35度中国劲酒","za000053",provName, cityName, countryName);
-      stock(258,"258ml35度中国劲酒","zzgj2715",provName, cityName, countryName);
-      stock(520,"520ml35度中国劲酒","zzgj1012",provName, cityName, countryName);
+        customer_rank(provName, cityName, countryName, dateType);
+        area_rank(provName, cityName, countryName, dateType);
+        product_rank(provName, cityName, countryName, dateType);
+        
+        stock_rank(provName, cityName, countryName, dateType);
+        stock(125,"125ml35度中国劲酒","za000053",provName, cityName, countryName);
+        stock(258,"258ml35度中国劲酒","zzgj2715",provName, cityName, countryName);
+        stock(520,"520ml35度中国劲酒","zzgj1012",provName, cityName, countryName);
     }
 
     function countryMapRender(selectProv, selectCity, maxData) {
-      $.get('${CTPATH}/json/'+cityMap[selectProv]+'/'+cityMap[selectCity]+'.json', function (Citymap) {
-        echarts.registerMap(selectCity, Citymap);
-        var myChartCity = echarts.init(document.getElementById('city_map'));
-        $(document.getElementById('city_map')).width(400);
-        myChartCity.resize();
-        myChartCity.setOption({
-          tooltip: {
-            trigger: 'item',
-            textStyle: {fontSize: 9},
-            formatter: function loadData(result){
-              if(isNaN(result.value)) return result.name + '<br />总金额: 0';
-              else return result.name+'<br />总金额:'+result.value + '万元';
-            }
-          },
-          visualMap:{
-            min:0,
-            max:maxData+1,
-            splitNumber:0,
-            text:['高','低'],
-            realtime:false,
-            selectedMode:false,
-            realtime:false,
-            show:true,
-            itemWidth:20,
-            itemHeight:120
-          },
-          series: [{
-            type: 'map',
-            map: selectCity ,//要和echarts.registerMap（）中第一个参数一致
-            roam: true,
-            scaleLimit: { min: 1, max: 4 },//缩放
-            mapLocation:{
-              y:60
-            },
-            itemSytle:{
-              emphasis:{label:{show:false}}
-            },
-            label: {
-              normal: {
-                show: true
-              },
-              emphasis: {
-                show: true
-              }
-            },
-            data : country_data.reverse()
-          }]
-        })
-        myChartCity.on('click',function(rel){
-          setTimeout(function () {
-          }, 500);
-        })
-      });
+        $.get('${CTPATH}/json/'+cityMap[selectProv]+'/'+cityMap[selectCity]+'.json', function (Citymap) {
+	        echarts.registerMap(selectCity, Citymap);
+	        var myChartCity = echarts.init(document.getElementById('city_map'));
+	        $(document.getElementById('city_map')).width(400);
+	        myChartCity.resize();
+	        myChartCity.setOption({
+                tooltip: {
+	                trigger: 'item',
+		            textStyle: {fontSize: 9},
+		            formatter: function loadData(result) {
+	                    if(isNaN(result.value)) return result.name + '<br />总金额: 0';
+	                    else return result.name+'<br />总金额:'+result.value + '万元';
+	                }
+	            },
+	            visualMap:{
+		            min: 0,
+		            max: maxData+1,
+		            splitNumber: 0,
+		            text: ['高','低'],
+		            realtime: false,
+		            selectedMode: false,
+		            realtime: false,
+		            show: true,
+		            itemWidth: 20,
+		            itemHeight: 120
+	            },
+	            series: [{
+		            type: 'map',
+		            map: selectCity ,//要和echarts.registerMap（）中第一个参数一致
+		            roam: true,
+		            scaleLimit: { min: 1, max: 4 },//缩放
+		            mapLocation: {
+		               y:60
+		            },
+		            itemSytle: {
+		               emphasis: {label: {show: false} }
+		            },
+		            label: {
+		               normal: {
+		                   show: true
+		               },
+		               emphasis: {
+		                   show: true
+		               }
+		            },
+		            data: country_data.reverse()
+	            }]
+            });
+            
+            myChartCity.on('click', function(rel) {
+                setTimeout(function () {
+                }, 500);
+            });
+        });
     }
+    
     //中国地图渲染
     function mapRender(isRender) {
       /*echarts*/
@@ -569,7 +620,7 @@
         post('${CPATH}/sales/productByCustomerType', {"provName" : provName, "cityName" : cityName, "countryName" : countryName, "dateType" : dateType});
 	}
 
-	 //区域
+    //区域
     function area_rank(provName, cityName, countryName, dateType){
       countryName = '';
       $.ajax({
@@ -828,23 +879,24 @@
 			stockChart.setOption(option,true);
 		});
     }
+    
     //共通post
     function post(URL, PARAMS)
 	{ 
-	var temp = document.createElement("form"); 
-	temp.action = URL; 
-	temp.method = "post"; 
-	temp.style.display = "none"; 
-	for (var x in PARAMS)
-	{ 
-	var opt = document.createElement("textarea"); 
-	opt.name = x; 
-	opt.value = PARAMS[x]; 
-	temp.appendChild(opt); 
-	} 
-	document.body.appendChild(temp); 
-	temp.submit(); 
-	return temp; 
+		var temp = document.createElement("form"); 
+		temp.action = URL; 
+		temp.method = "post"; 
+		temp.style.display = "none"; 
+		for (var x in PARAMS)
+		{ 
+			var opt = document.createElement("textarea"); 
+			opt.name = x; 
+			opt.value = PARAMS[x]; 
+			temp.appendChild(opt); 
+		} 
+		document.body.appendChild(temp); 
+		temp.submit(); 
+		return temp; 
 	} 
     
 </#macro>
