@@ -58,6 +58,12 @@
        left: -100%;
        transition: .3s all linear;
      }
+     th {
+     	text-align: center;
+     }
+     #prTrOpen, #prTrClose {
+      display:none;
+     }
 
 </#macro>
 <#macro script>
@@ -659,7 +665,7 @@
 			} else {
 			    prTitle = '全国' + prTitle
 			}
-			var $thead = $("#product_rank thead");
+			var $thead = $("#product_rank thead th");
 			$thead.empty();
 			$thead.text(prTitle);
 
@@ -674,9 +680,11 @@
                 $prTR.hide();
                 $("#prTrOpen").show();
                 $("#prTrClose").hide();
+                $("#product_rank tfoot").show();
             }else {
                 $("#prTrOpen").hide();
                 $("#prTrClose").hide();
+                $("#product_rank tfoot").hide();
             }
             $(".weui-tab__bd").height($("#tab1").height());
        });
@@ -710,7 +718,7 @@
 			} else {
 			    srTitle = '全国' + srTitle
 			}
-			var $thead = $("#stock_rank thead");
+			var $thead = $("#stock_rank thead th");
 			$thead.empty();
 			$thead.text(srTitle);
 
@@ -725,9 +733,11 @@
                 $sTR.hide();
                 $("#sTrOpen").show();
                 $("#sTrClose").hide();
+                $("#stock_rank tfoot").show();
             }else {
                 $("#sTrOpen").hide();
                 $("#sTrClose").hide();
+                 $("#stock_rank tfoot").hide();
             }
         });
     }
@@ -875,8 +885,12 @@
                       <div id="area_rank">
                       </div>
                       <div>
-                          <table id="product_rank" class="table">
-                            <thead></thead>
+                          <table id="product_rank" class="table table-striped table-bordered">
+                            <thead>
+                              <tr>
+                                <th colspan="3"></th>
+                              </tr>
+                            </thead>
                             <tbody>
                               <tr>
                                 <th>产品</th>
@@ -884,24 +898,40 @@
                                 <th>金额</th>
                               </tr>
                             </tbody>
+                            <tfoot>
+                              <tr>
+                                <th colspan="3">
+                                  <span id ="prTrOpen" class="fr">更多</span>
+                                  <span id ="prTrClose" class="fr">收起</span>
+                                </th>
+                              </tr>
+                            </tfoot>
                           </table>
-                          <button id ="prTrOpen" style="float:right">更多</button>
-                          <button id ="prTrClose" style="float:right">收起</button>
                       </div>
                 </div>
                 <div id="tab2" class="weui-tab__bd-item weui-tab__bd-item--active">
                     <div>
-                        <table id="stock_rank" class="table">
-                          <thead></thead>
+                        <table id="stock_rank" class="table table-striped table-bordered">
+                          <thead>
+                            <tr>
+                              <th colspan="3"></th>
+                            </tr>
+                          </thead>
                           <tbody>
                             <tr>
                               <th>产品</th>
                               <th>数量(件)</th>
                             </tr>
                           </tbody>
+                          <tfoot>
+                            <tr>
+                              <th colspan="3">
+                                <span id ="sTrOpen" class="fr">更多</span>
+                                <span id ="sTrClose" class="fr">收起</span>
+                              </th>
+                            </tr>
+                          </tfoot>
                         </table>
-                        <button id ="sTrOpen" style="float:right">更多</button>
-                        <button id ="sTrClose" style="float:right">收起</button>
                     </div>
                     <p class="title">库存趋势</p>
                     <div>
