@@ -553,9 +553,9 @@ header {
 
 .date-div .active-date {
     border: 1px solid #ea6f5a;
-    color: #fff;
     background: #ea6f5a;
     font-weight: 600;
+    color: #ea6f5a;
 }
 
 /*地图*/

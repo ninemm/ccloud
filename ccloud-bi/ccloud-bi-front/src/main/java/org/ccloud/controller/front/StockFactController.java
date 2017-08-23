@@ -11,34 +11,35 @@ import com.jfinal.plugin.activerecord.Record;
 @RouterMapping(url = "/stock")
 public class StockFactController extends BaseFrontController {
 
-	public void index() {
-		
-	}
-	
-	public void area() {
-		
-		String provName = getPara("provName", "").trim();
-		String cityName = getPara("cityName", "").trim();
-		String countryName = getPara("countryName", "").trim();
-		
-		List<Record> result = StockFactQuery.me().findAreaList(provName, cityName, countryName);
-		
-		renderJson(result);
-		
-	}
-    
+    public void index() {
+
+    }
+
+    public void area() {
+
+        String provName = getPara("provName", "").trim();
+        String cityName = getPara("cityName", "").trim();
+        String countryName = getPara("countryName", "").trim();
+
+        List<Record> result = StockFactQuery.me().findAreaList(provName, cityName, countryName);
+
+        renderJson(result);
+
+    }
+
     public void date() {
-        
+
         String provName = getPara("provName", "").trim();
         String cityName = getPara("cityName", "").trim();
         String countryName = getPara("countryName", "").trim();
         String cInvCode = getPara("cInvCode", "").trim();
-        
-        List<Record> result = StockFactQuery.me().findDateList(provName, cityName, countryName, cInvCode);
-        
+
+        List<Record> result =
+                StockFactQuery.me().findDateList(provName, cityName, countryName, cInvCode);
+
         renderJson(result);
-        
-     }
-	
-	
+
+    }
+
+
 }
