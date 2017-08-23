@@ -8,7 +8,7 @@
 </#macro>
 <#macro css_import>
 
-    <link rel="stylesheet" href="${CTPATH}/static/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="${CPATH}/templates/datacenter/css/bootstrap.min.css">
 
 </#macro>
 <#macro css>
@@ -903,9 +903,10 @@
 <section>
     <div class="bi-body">
         <div class="date-div">
-            <a class="date active-date" onclick="setDateType(0)">最近一天</a>
-            <a class="date"onclick="setDateType(1)">最近一周</a>
-            <a class="date"onclick="setDateType(2)">最近一月</a>
+            <a class="date active-date" onclick="setDateType(0)">近一天</a>
+            <a class="date"onclick="setDateType(1)">近一周</a>
+            <a class="date"onclick="setDateType(2)">近一月</a>
+            <!-- <a class="date"onclick="setDateType(3)">近一年</a> -->
         </div>
         <div class="map" style="width: 100%;height:20rem;background: #efeff4">
             <p>2017-08-15销售情况</p>
