@@ -83,6 +83,18 @@ public class IndexController extends BaseFrontController {
 	    render("sales.html");
 	}
 	
+	public void area() {
+		render("area.html");
+	}
+	
+	public void customer() {
+		render("customer.html");
+	}
+	
+	public void product() {
+		render("product.html");
+	}
+	
 	public ApiConfig getApiConfig() {
 		ApiConfig ac = new ApiConfig();
 		
