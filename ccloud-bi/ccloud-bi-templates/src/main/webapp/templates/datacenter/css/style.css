@@ -54,8 +54,9 @@ ul, ol { list-style: none outside none; }
 .clearfix{clear:both; display:block;}
 .clear:after,.clear:before{clear:both; display:block; content:"";}
 .num{font-family:Arial, Helvetica, sans-serif;}
-.t-c{text-align:center;}
-.t-r{text-align:right;}
+.t-l{text-align: left;}
+.t-c{text-align: center;}
+.t-r{text-align: right;}
 
 
 .txt-color-ml{color:#586c94;}
@@ -75,7 +76,7 @@ ul, ol { list-style: none outside none; }
 .font-13{font-size: .6rem;}
 .font-14{font-size: .7rem; font-weight:normal;}
 .font-15{font-size: .75rem;}
-.font-16{font-size: .8rem;}
+.font-16{font-size: .8rem; font-weight:normal;}
 .font-20{font-size: 1rem;}
 .font-28{font-size: 1.4rem;}
 .mg-tb-5{margin:5px 0 !important;}
@@ -134,12 +135,6 @@ header,
 .news-icon-laba{width:18px; height:18px; display:inline-block; position:absolute; left:10px; top:10px; background:url(../images/news-icon.png) no-repeat; background-size:18px;}
 .news-icon-more{width:18px; height:18px; display:inline-block; position:absolute; right:10px; top:10px; background:url(../images/icon-more.png) no-repeat; background-size:18px;}
 
-.tour-activity {
-	display: block;
-	position: relative;
-	float: left;
-}
-
 .img-bg {    
 	background: rgba(0,0,0,0.2);
     width: 100%;
@@ -161,12 +156,6 @@ header,
     color: #fff;
     font-weight: 700;
     z-index: 10;
-}
-
-.tour-activity img {
-	position: relative;
-	overflow: hidden;
-	width: 100%;
 }
 
 /*首页模块*/
@@ -268,149 +257,16 @@ header,
     color: green;
 }
 
-/**线路详情*/
-.route_img_wrapper {
-    height: auto;
-    position: relative;
-}
-.route_img_wrapper .route_img {
-    width: 100%;
-    height: auto;
-    overflow: hidden;
-    position: relative;
-}
-.weui-flex .route_img img{
-    width: 100%;
-    height: 100%;
-}
-
-.weui-flex .route_title {    
-    position: absolute;
-    z-index: 1;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    color: #fff;
-    background: rgba(0,0,0,0.4);
-    height: 2rem;
-    line-height: 2rem;
-    overflow: hidden;
-}
-
-.weui-flex .route_title span {
-    line-height: 1.5rem;
-    margin: .25rem 0;
-    padding-left: .5rem;
-    float: left;
-    width: 90%;
-    font-size: .8rem;
-    overflow: hidden;
-}
-
-.swiper-join .join-num {
-    position: absolute;
-    z-index: 1;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    color: #fff;
-    background: rgba(0,0,0,0.4);
-    height: .8rem;
-    line-height: .8rem;
-    overflow: hidden;
-}
-
-.swiper-join .join-num span {
-    line-height: .6rem;
-    margin: .1rem 0;
-    padding-left: .5rem;
-    float: left;
-    width: 2.5rem;
-    font-size: .6rem;
-    overflow: hidden;
-    text-align: center;
-}
-
-/**线路详情每日详情*/
-.route_detail_wrapper {
-    width: 100%;
-    background-color: #fff;
-}
-
-.route_detail_wrapper .main {
-    background: url("../images/line-bg.png") repeat-y 100px 0;
-}
-
-.route_detail_wrapper .main .list{
-    margin: 10px 0;
-    position:relative;
-    overflow:hidden;
-    -webkit-transition:height 1s cubic-bezier(0.025,0.025,0.000,1.115),opacity 1s;
-    -moz-transition:height 1s cubic-bezier(0.025,0.025,0.000,1.115),opacity 1s;
-    -ms-transition:height 1s cubic-bezier(0.025,0.025,0.000,1.115),opacity 1s;
-    -o-transition:height 1s cubic-bezier(0.025,0.025,0.000,1.115),opacity 1s;
-    transition:height 1s cubic-bezier(0.025,0.025,0.000,1.115),opacity 1s
-}
-.route_detail_wrapper .main .list ul {
-    bottom: 0;
-}
-.route_detail_wrapper .main .list ul li {
-    /*background: url("../images/circle.png") no-repeat 86px 21px;*/
-    padding-top: 1rem;
-    color: #a1a4b8;
-}
-
 .cls {
     zoom: 1;
 }
+
 .cls:after {
     content: ".";
     display: block;
     height: 0;
     clear: both;
     visibility: hidden;
-}
-.route_detail_wrapper .main .list ul li.highlight .date, 
-.route_detail_wrapper .main .list ul li.highlight .intro {
-    color: #ec6a13;
-}
-.route_detail_wrapper .main .list ul li .date,
-.route_detail_wrapper .main .list ul li .version{
-    float:left;
-    display:block;
-    clear:left;
-    width:4rem;
-    line-height:24px;
-    text-align:right
-}
-.route_detail_wrapper .main .list ul li .date{
-    font-size:.8rem;
-    line-height:1.2rem;
-    color:#bec1d5
-}
-.route_detail_wrapper .main .list ul li .point{
-    width: .5rem;
-    height: .5rem;
-    border-radius: 50%;
-    background: #63d029;
-    position: absolute;
-    left: 25.5%;
-    /*top: 1.2rem;*/
-    margin-top: .3rem;
-}
-.route_detail_wrapper .main .list ul li .intro, 
-.route_detail_wrapper .main .list ul li .more {
-    float: left;
-    display: block;
-    width: 68%;
-    margin-left: 1.6rem;
-    line-height: 1.2rem;
-    font-size: .7rem;
-}
-.route_detail_wrapper .main .list ul li .intro {
-    font-size: .8rem;
-    line-height: 1.2rem;
-    color: #63d029;
 }
 
 /*商品详情tab切换*/
@@ -628,7 +484,7 @@ header,
 * 首页  ***********************************************************
 */
 .bi-body {
-    background: #f3f3f3;
+    /* background: #f3f3f3; */
     overflow: hidden;
 }
 
@@ -676,25 +532,30 @@ header {
 .date-div {
     display: flex;
     justify-content: space-between;
-    padding: .5rem 20px;
+    padding: .5rem 1rem;
+    line-height: 2.4rem;
+    height: 2.4rem;
     background: #fff;
 }
 
 .date-div .date {
     display: block;
-    font-size: 14px;
-    width: 30%;
+    font-size: .7rem;
+    width: 22%;
     text-align: center;
-    height: 1.2rem;
-    line-height: 1.2rem;
-    border-radius: 5px;
-    border: 1px solid #999;
+    height: 1.4rem;
+    line-height: 1.4rem;
+    border-radius: 0px;
+    border: 1px solid #f2f2f2;
     color: #666;
+    background: #f2f2f2;
 }
 
 .date-div .active-date {
-    border: 1px solid #f23030;
-    color: #f23030;
+    border: 1px solid #ea6f5a;
+    color: #fff;
+    background: #ea6f5a;
+    font-weight: 600;
 }
 
 /*地图*/
@@ -714,8 +575,10 @@ header {
     text-align: center;
 }
 
-.map p {
+#date-title {
     border-bottom: 1px solid #e0e0e0;
+    font-size: .8rem;
+    font-weight: 600;
 }
 
 img {
@@ -725,12 +588,12 @@ img {
 /*报表*/
 .report .weui-bar__item--on {
 	border-bottom: 1px solid #ea6f5a;
-	background-color: #eee;
+	background-color: #f2f2f2;
 }
 
 .weui-navbar__item {
 	padding: 6px 0;
-	background-color: #eee;
+	background-color: #f2f2f2;
 }
 
 .weui-navbar + .weui-tab__bd {
@@ -738,10 +601,10 @@ img {
 	height: auto;
 }
 
-.report {
+/* .report {
     margin-top: 1rem;
     height: auto;
-}
+} */
 
 .weui-tab__bd .weui-tab__bd-item {
 	overflow: visible;

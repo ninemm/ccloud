@@ -131,9 +131,37 @@ public class DateUtils {
 		return startDate.isBefore(startDate.getMillis());
 	}
 	
+	/**
+	 * 功能描述：给指定日期添加天数
+	 * @param date	日期
+	 * @param day	天数
+	 * @return
+	 * 返回类型：Date
+	 * 创建人：eric
+	 * 日期：2017年6月10日
+	 */
+	public static Date plusDays(Date date, int day) {
+		
+		DateTime dateTime = new DateTime(date);
+		return dateTime.plusDays(day).toDate();
+		
+	}
+	
 	public static void main(String[] args) throws ParseException {
 		Date date = sdf.parse("2016-7-20 00:00:00");
 		System.out.println(getDayDiff(new Date(), date));
+		
+		DateTime dateTime = DateTime.now();
+		
+		System.out.println(dateTime.plusDays(-1).toString(DateUtils.DEFAULT_NORMAL_FORMATTER));
+		
+		System.out.println(dateTime.plusWeeks(-1).toString(DateUtils.DEFAULT_NORMAL_FORMATTER));
+		
+		System.out.println(dateTime.plusMonths(-1).toString(DateUtils.DEFAULT_NORMAL_FORMATTER));
+		
+		System.out.println(dateTime.plusYears(-1).toString(DateUtils.DEFAULT_NORMAL_FORMATTER));
+		
+		
 	}
 
 }
