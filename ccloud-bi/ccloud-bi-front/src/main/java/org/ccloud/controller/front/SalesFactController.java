@@ -2,6 +2,7 @@ package org.ccloud.controller.front;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.SalesFact;
@@ -30,7 +31,7 @@ public class SalesFactController extends BaseFrontController {
 		String beginDate = getDateByType(dateType);
 		String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
 
-		List<Record> result = SalesFactQuery.me().findAreaList(provName, cityName, countryName, beginDate,
+		List<Map<String, Object>> result = SalesFactQuery.me().findAreaArray(provName, cityName, countryName, beginDate,
 				endDate);
 
 		renderJson(result);
@@ -122,6 +123,7 @@ public class SalesFactController extends BaseFrontController {
 
         String startDate = getDateByType(dateType);
         String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+        
         List<Record> result = SalesFactQuery.me().findProductList(provName, cityName, countryName,
                 startDate, endDate);
 
