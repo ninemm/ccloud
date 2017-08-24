@@ -1,5 +1,6 @@
 
 Utils = {
+	devMode: 'dev',	
 	rootName: '大冶市',
 	cp: [114.974842,30.098804]
 }

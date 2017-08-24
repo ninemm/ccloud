@@ -1,0 +1,55 @@
+<#include "_inc/_layout.html"/>
+<#macro script_import>
+
+ 	<!-- <script src="${CPATH}/templates/datacenter/js/bootstrap.min.js"></script> -->
+
+</#macro>
+<#macro css_import>
+
+    <link rel="stylesheet" href="${CPATH}/templates/datacenter/css/bootstrap.min.css">
+
+</#macro>
+<#macro css>
+    .table{
+      font-size:0.6rem;
+    }
+    
+    th {
+  		text-align: center;
+  		vertical-align: middle!important;
+  	}
+
+</#macro>
+<#macro script>
+</#macro>
+<@layout>
+<section>
+
+  <p class="title">客户销售情况</p>
+  <table class="table table-striped table-bordered">
+  	<tr>
+  	  <th>客户类型</th>
+  	  <th>产品</th>
+  	  <th>金额(万元)</th>
+  	</tr>
+      <#list rows as row> 
+        <#list row as ro>
+          <#if ro_index == 0>
+          <tr>
+            <td rowspan="${row?size}" style="text-align: center;vertical-align: middle;">${ro.customerTypeName}</td>
+            <td>${ro.cInvName}</td>
+            <td>${ro.totalAmount}</td>
+  	    </tr>
+  	    <#else>
+  	    <tr>
+  	      <td>${ro.cInvName}</td>
+            <td>${ro.totalAmount}</td>
+          </tr>  
+  	    </#if>
+        </#list> 
+  	</#list>
+  </table>
+	<a href="${CPATH}/area">返回上一页</a>
+</section>
+
+</@layout>

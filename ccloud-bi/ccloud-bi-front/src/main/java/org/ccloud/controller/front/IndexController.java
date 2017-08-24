@@ -96,6 +96,7 @@ public class IndexController extends BaseFrontController {
 	}
 	
 	public ApiConfig getApiConfig() {
+		PropKit.use("ccloud.properties");
 		ApiConfig ac = new ApiConfig();
 		
 		// 配置微信 API 相关常量
