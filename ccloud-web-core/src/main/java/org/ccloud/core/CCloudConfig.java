@@ -56,6 +56,7 @@ import com.jfinal.plugin.activerecord.Model;
 import com.jfinal.plugin.cron4j.Cron4jPlugin;
 import com.jfinal.plugin.druid.DruidPlugin;
 import com.jfinal.plugin.ehcache.EhCachePlugin;
+import com.jfinal.qyweixin.sdk.api.ApiConfigKit;
 import com.jfinal.render.ViewType;
 import com.mysql.jdbc.AbandonedConnectionCleanupThread;
 
@@ -84,6 +85,8 @@ public abstract class CCloudConfig extends JFinalConfig {
 		constants.setRenderFactory(new CCloudRenderFactory());
 
 		// constants.setTokenCache(new JTokenCache());
+		
+		ApiConfigKit.setDevMode(PropKit.getBoolean("dev_mode", false));
 	}
 
 	@SuppressWarnings("unchecked")

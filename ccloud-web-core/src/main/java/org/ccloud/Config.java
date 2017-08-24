@@ -28,6 +28,9 @@ import org.ccloud.ui.freemarker.function.OptionSelected;
 import org.ccloud.ui.freemarker.function.OptionValue;
 import org.ccloud.ui.freemarker.tag.DictTag;
 
+import com.jfinal.kit.PropKit;
+import com.jfinal.qyweixin.sdk.api.ApiConfig;
+import com.jfinal.qyweixin.sdk.api.ApiConfigKit;
 import com.jfinal.template.Engine;
 
 public class Config extends CCloudConfig {
@@ -50,10 +53,32 @@ public class Config extends CCloudConfig {
 		CCloud.addFunction("METADATA_SELECTED", new MetadataSelected());
 
 		MessageKit.sendMessage(Actions.CCLOUD_STARTED);
+		
+		ApiConfigKit.putApiConfig(getApiConfig());
 	}
 
 	@Override
 	public void configEngine(Engine me) {
 		
+	}
+	
+	public ApiConfig getApiConfig() {
+
+		ApiConfig ac = new ApiConfig();
+		
+		// 配置微信 API 相关常量
+		ac.setToken(PropKit.get("token"));
+		ac.setCorpId(PropKit.get("corpId"));
+		ac.setCorpSecret(PropKit.get("secret"));
+		ac.setAgentId(PropKit.get("agentId"));		
+		
+		/**
+		 *  是否对消息进行加密，对应于微信平台的消息加解密方式：
+		 *  1：true进行加密且必须配置 encodingAesKey
+		 *  2：false采用明文模式，同时也支持混合模式
+		 */
+		ac.setEncryptMessage(PropKit.getBoolean("encryptMessage", false));
+		ac.setEncodingAesKey(PropKit.get("encodingAesKey", "setting it in config file"));
+		return ac;
 	}
 }

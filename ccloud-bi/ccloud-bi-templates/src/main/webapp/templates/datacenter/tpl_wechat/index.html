@@ -38,11 +38,13 @@
 </#macro>
 
 <#macro script_import>
+    <script type='text/javascript' src="${CTPATH}/js/jquery.cookie.js"></script>
     <script type='text/javascript' src="${CTPATH}/js/echarts.min.js"></script>
     <script type='text/javascript' src="${CTPATH}/js/countUp.js"></script>
     <script type="text/javascript" src="${CTPATH}/json/china-main-city-map.js"></script>
     <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
     <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=su3AmHLUcBprpnOLmVHo7r8AljbW8X6t"></script>
+    <script type="text/javascript" src="${CTPATH}/js/convertor.js"></script>
     <script type='text/javascript' src="${CTPATH}/js/vconsole.min.js"></script>
     <script type='text/javascript' src="${CTPATH}/js/common.js"></script>
 </#macro>
@@ -50,9 +52,29 @@
 
     var $prov = $("#prov");
     var $city = $("#city");
-    /*
+    
+    var provName = '湖北省';
+    var cityName = '武汉市';
+    var countryName = null;
+    var curProvName = null;
+    
+    var series = [];
+    var option = null;
+    var geoCoordMap = {};
+    var color = ['#a6c84c', '#ffa022', '#46bee9'];
+    
+    var mapDataUrl = '';
+    
+    var $map = document.getElementById("map");
+    var myChart = echarts.init($map);
+    
+    /*layer.open({
+	    type: 2,
+	    content: '加载中'
+    });*/
+    
     wx.config({
-	    debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+	    debug: Utils.devMode, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
 	    appId: '${appId!}', // 必填，公众号的唯一标识
 	    timestamp: '${timestamp!}', // 必填，生成签名的时间戳
 	    nonceStr: '${nonceStr!}', // 必填，生成签名的随机串
@@ -67,123 +89,127 @@
 		        'getLocation'
 	        ],
             success: function (res) {
-                alert(JSON.stringify(res.checkResult.getLocation));
                 if (res.checkResult.getLocation == false) {
 		            alert('你的微信版本太低，不支持微信JS接口，请升级到最新的微信版本！');
 		            return;
 		        } else {
-                    alert(11);
-		            wx.getLocation({
-		                type: 'wgs84', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
-		                success: function (res) {
-	                        console.log(JOSN.stringify(res));
-		                    var latitude = res.latitude; // 纬度，浮点数，范围为90 ~ -90
-		                    var longitude = res.longitude; // 经度，浮点数，范围为180 ~ -180。
-		                    var speed = res.speed; // 速度，以米/每秒计
-		                    var accuracy = res.accuracy; // 位置精度
-		                    console.log(latitude, longitude)
-		                }
-		            });
+                    
+                    provName = $.cookie(Utils.provCacheName);
+                    cityName = $.cookie(Utils.cityCacheName);
+                    countryName = $.cookie(Utils.countryCacheName);
+                    
+                    console.log(provName, cityName + '-' + countryName);
+                    
+                    if (provName == null || cityName == null || countryName == null) {
+			            wx.getLocation({
+			                type: 'wgs84', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
+			                success: function (res) {
+	
+			                    var latitude = res.latitude;                      // 纬度，浮点数，范围为90 ~ -90
+			                    var longitude = res.longitude;                    // 经度，浮点数，范围为180 ~ -180。
+			                    var speed = res.speed;                            // 速度，以米/每秒计
+			                    var accuracy = res.accuracy;                      // 位置精度
+			                    
+			                    //var map = new BMap.Map("allmap");               //初始化百度地图
+			                    var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
+			                    var geoc = new BMap.Geocoder();                   //获取百度地址解析器  
+			                    
+	                            translateCallback = function (point) {            // 回调函数
+		                            geoc.getLocation(point, function(rs) {
+		                                var addComp = rs.addressComponents;
+		                                //var Address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
+		                                provName = addComp.province;
+									    cityName = addComp.city;
+									    countryName = addComp.district;
+									    
+		                                $.cookie(Utils.provCacheName, provName, { expires: 7 });
+					                    $.cookie(Utils.cityCacheName, cityName, { expires: 7 });
+					                    $.cookie(Utils.countryCacheName, countryName, { expires: 7 });
+					                    
+		                            });
+	                            }
+	                            
+	                            setTimeout(function() {
+	                                BMap.Convertor.translate(point, 0, translateCallback);//真实经纬度转成百度坐标
+	                            }, 200);
+			                }
+			            });
+		            }
+		            $prov.text(provName);
+                    $city.text(cityName);
+                    
+                    if (provName.indexOf('省') != -1) {
+                        curProvName = provName.substring(0, provName.length - 1);
+                    }
+		            mapDataUrl = '${CTPATH}/json/'+cityMap[curProvName]+'/'+cityMap[cityName]+'.json';
+		            loadOrderData();
 	            }
             }
         });
 	});
 	
 	wx.error(function(res) {
-	   console.log(JOSN.stringify(res));
+	   //console.log(JOSN.stringify(res));
 	});
-    */
-    var provName = localStorage.provName;
-    var cityName = localStorage.cityName;
-    var countryName = localStorage.countryName;
-
-    if (provName == null || cityName == null || countryName == null) {
-        var baiduMap = new BaiduMap();
-        baiduMap.getLocation();
+    
+    //provName = localStorage.provName;
+    //cityName = localStorage.cityName;
+    //countryName = localStorage.countryName;
+    
+    function loadOrderData() {
+        $.ajax({
+	        type: 'post',
+	        url: '${CPATH}/orderAmount',
+	        data: {provName: provName, cityName: cityName, countryName: countryName},
+	        dataType: 'json',
+	        success: function(data) {
+	
+	            option = {
+	                backgroundColor: '#404a59',
+	                title: {
+	                    text: '劲酒货物流向图',
+	                    left: 'left',
+	                    textStyle: {
+	                        color: '#fff'
+	                    }
+	                },
+	                tooltip: {
+	                    trigger: 'item'
+	                },
+	                legend: {
+	                    orient: 'vertical',
+	                    top: 'bottom',
+	                    left: 'right',
+	                    data: [cityName + ' Top10'],
+	                    textStyle: {
+	                        color: '#fff'
+	                    },
+	                    selectedMode: 'single'
+	                },
+	                geo: {
+	                    map: 'wuhan',
+	                    label: {
+	                        emphasis: {
+	                            show: false
+	                        }
+	                    },
+	                    roam: true,
+	                    itemStyle: {
+	                        normal: {
+	                            areaColor: '#323c48',
+	                            borderColor: '#404a59'
+	                        },
+	                        emphasis: {
+	                            areaColor: '#2a333d'
+	                        }
+	                    }
+	                },
+	                series: series
+	            };
+	            getMapData(data);
+	        }
+	    });
     }
-    
-    // console.log(provName, cityName + '-' + countryName);
-    
-    provName = localStorage.provName;
-    cityName = localStorage.cityName;
-    countryName = localStorage.countryName;
-    
-    $prov.text(provName);
-    $city.text(cityName);
-
-    var $map = document.getElementById("map");
-    var myChart = echarts.init($map);
-    var option = null;
-    
-    var geoCoordMap = {};
-    var color = ['#a6c84c', '#ffa022', '#46bee9'];
-    var series = [];
-    
-    var provName = '湖北省';
-    var cityName = '武汉市';
-    
-    var curProvName = null;
-    if (provName.indexOf('省') != -1) {
-        curProvName = provName.substring(0, provName.length - 1);
-    }
-    
-    var mapDataUrl = '${CTPATH}/json/'+cityMap[curProvName]+'/'+cityMap[cityName]+'.json';
-    //console.log(mapDataUrl);
-    
-    $.ajax({
-        type: 'post',
-        url: '${CPATH}/orderAmount',
-        data: {provName: provName, cityName: cityName, countryName: countryName},
-        success: function(data) {
-
-            option = {
-                backgroundColor: '#404a59',
-                title: {
-                    text: '劲酒货物流向图',
-                    left: 'left',
-                    textStyle: {
-                        color: '#fff'
-                    }
-                },
-                tooltip: {
-                    trigger: 'item'
-                },
-                legend: {
-                    orient: 'vertical',
-                    top: 'bottom',
-                    left: 'right',
-                    data: [cityName + ' Top10'],
-                    textStyle: {
-                        color: '#fff'
-                    },
-                    selectedMode: 'single'
-                },
-                geo: {
-                    map: 'wuhan',
-                    label: {
-                        emphasis: {
-                            show: false
-                        }
-                    },
-                    roam: true,
-                    itemStyle: {
-                        normal: {
-                            areaColor: '#323c48',
-                            borderColor: '#404a59'
-                        },
-                        emphasis: {
-                            areaColor: '#2a333d'
-                        }
-                    }
-                },
-                series: series
-            };
-            getMapData(data);
-        
-        },
-        dataType: 'json'
-    });
-    
     
     function getMapData(areaData) {
     
@@ -226,7 +252,7 @@
                     show: true,
                     period: 6,
                     trailLength: 0,
-                    symbol: planePath,
+                    symbol: Utils.planePath,
                     symbolSize: 15
                 },
                 lineStyle: {
@@ -254,7 +280,6 @@
                     }
                 },
                 symbolSize: function(val) {
-                    console.log(val[2])
                     //return val[2] / 100;
                     return val[2] / 8;
                 },
@@ -274,10 +299,10 @@
             if (option && typeof option === "object") {
                 myChart.setOption(option, true);
             }
+            
+            //layer.closeAll();
         });
     }
-    
-    var planePath = 'path://M1705.06,1318.313v-89.254l-319.9-221.799l0.073-208.063c0.521-84.662-26.629-121.796-63.961-121.491c-37.332-0.305-64.482,36.829-63.961,121.491l0.073,208.063l-319.9,221.799v89.254l330.343-157.288l12.238,241.308l-134.449,92.931l0.531,42.034l175.125-42.917l175.125,42.917l0.531-42.034l-134.449-92.931l12.238-241.308L1705.06,1318.313z';
     
     var convertData = function(data) {
         var res = [];

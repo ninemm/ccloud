@@ -27,11 +27,9 @@ import org.ccloud.route.RouterMapping;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.jfinal.kit.HashKit;
-import com.jfinal.kit.PropKit;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.ehcache.CacheKit;
-import com.jfinal.qyweixin.sdk.api.ApiConfig;
 import com.jfinal.qyweixin.sdk.api.ApiConfigKit;
 import com.jfinal.qyweixin.sdk.api.JsTicket;
 import com.jfinal.qyweixin.sdk.api.JsTicketApi;
@@ -47,7 +45,7 @@ public class IndexController extends BaseFrontController {
 		setAttr("totalOrderCount", SalesFactQuery.me().findOrderCount());
 		setAttr("totalOrderAmount", SalesFactQuery.me().findTotalAmount(provName, cityName, countryName));
 		
-		//initWechatConfig();
+		initWechatConfig();
 		
 		render("index.html");
 	}
@@ -95,26 +93,6 @@ public class IndexController extends BaseFrontController {
 		render("product.html");
 	}
 	
-	public ApiConfig getApiConfig() {
-		PropKit.use("ccloud.properties");
-		ApiConfig ac = new ApiConfig();
-		
-		// 配置微信 API 相关常量
-		ac.setToken(PropKit.get("token"));
-		ac.setCorpId(PropKit.get("corpId"));
-		ac.setCorpSecret(PropKit.get("secret"));
-				
-		
-		/**
-		 *  是否对消息进行加密，对应于微信平台的消息加解密方式：
-		 *  1：true进行加密且必须配置 encodingAesKey
-		 *  2：false采用明文模式，同时也支持混合模式
-		 */
-		ac.setEncryptMessage(PropKit.getBoolean("encryptMessage", false));
-		//ac.setEncodingAesKey(PropKit.get("encodingAesKey", "setting it in config file"));
-		return ac;
-	}
-	
 	public void initWechatConfig() {
 		
 		String jsapi_ticket = CacheKit.get("ccloud", "jsapi_ticket");
@@ -127,8 +105,8 @@ public class IndexController extends BaseFrontController {
 		String nonce_str = create_nonce_str();
 		// 注意 URL 一定要动态获取，不能 hardcode.
 		String url = "http://" + getRequest().getServerName() // 服务器地址
-				 + ":"
-				 + getRequest().getServerPort() //端口号
+//				 + ":"
+//				 + getRequest().getServerPort() //端口号
 				+ getRequest().getContextPath() // 项目名称
 				+ getRequest().getServletPath();// 请求页面或其他地址
 		String qs = getRequest().getQueryString(); // 参数
