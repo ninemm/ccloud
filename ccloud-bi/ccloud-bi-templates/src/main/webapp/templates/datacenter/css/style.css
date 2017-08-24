@@ -357,7 +357,8 @@ header,
 .promotion-foot-menu-collection{background:url(../images/icon-collection.png) no-repeat; background-size:22px;}
 .promotion-foot-menu-label{line-height:40px; font-size:15px; color:#fff;}
 /*返回顶部*/
-#gotop, .goback{z-index:10;display:block;position:fixed;width:36px;height:36px;right:10px;bottom:60px;cursor:pointer;background-image:url(../images/tophovertree.gif);opacity:0.9;display:none}
+#gotop, .goback{z-index:10;display:block;position:fixed;width:1.5rem;height:1.5rem;right:.5rem;bottom:1rem;cursor:pointer;border-radius:50%;background-color: #ea6f5a;;opacity:0.9;display:none;text-align:center;}
+#gotop i {font-size: 1.4rem;color: #fff;}
 #gohome{z-index:10;display:block;position:fixed;width:36px;height:36px;right:10px;bottom:60px;cursor:pointer;background-image:url(../images/back.png);opacity:0.9;display:none}
 
 
@@ -490,7 +491,7 @@ header,
 
 header {
     background: #fff;
-    padding: .5rem 2rem .5rem 2rem;
+    /* padding: .5rem 2rem .5rem 2rem; */
     box-sizing: border-box;
 }
 
@@ -562,11 +563,11 @@ header {
 
 .map {
     width: 100%;
-    border: 1px solid #e0e0e0;
+    height: 20rem;
     box-sizing: border-box;
 }
 
-.map p, .title {
+.title {
     background: #f2f2f2;
     height: 2rem;
     line-height: 2rem;
@@ -575,10 +576,19 @@ header {
     text-align: center;
 }
 
+.stock-title {
+	background: #f2f2f2;
+    height: 2rem;
+    line-height: 2rem;
+    width: 100%;
+    font-size: .8rem;
+    text-align: center;
+}
+
 #date-title {
-    border-bottom: 1px solid #e0e0e0;
     font-size: .8rem;
     font-weight: 600;
+    text-align: center;
 }
 
 img {

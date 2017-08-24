@@ -1,10 +1,9 @@
 <#include "_inc/_layout.html"/>
 <#macro script_import>
-
- 	<script src="${CPATH}/templates/datacenter/js/echarts.min.js"></script>
-    <script src="${CTPATH}/json/china-main-city-map.js"></script>
+ 	<script type="text/javascript" src="${CPATH}/templates/datacenter/js/echarts.min.js"></script>
+    <script type="text/javascript" src="${CTPATH}/json/china-main-city-map.js"></script>
     <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=su3AmHLUcBprpnOLmVHo7r8AljbW8X6t"></script>
-
+    <script type="text/javascript" src="${CPATH}/templates/datacenter/js/topHovertree.js"></script>
 </#macro>
 
 <#macro css_import>
@@ -22,12 +21,21 @@
       width: 100%;
       height: 14rem;
     }
+    
+    .map-nav {
+        height: 1.5rem;
+        line-height: 1.5rem;
+        padding-left: .5rem;
+        font-size: .8rem;
+        color: #999;
+    }
 
     .divide-line {
         height: .5rem;
         width: 100%;
         background: #f3f3f3;
     }
+    
     .table {
       margin-bottom: 0;
     }
@@ -56,11 +64,15 @@
     .pro-title {
         padding: .4rem .4rem .4rem .1rem;
     }
+    
+    .wy-header {
+        background: #f2f2f2;
+    }
      
      #prTrOpen, #prTrClose {
         display:none;
      }
-
+     
 </#macro>
 <#macro script>
     
@@ -136,6 +148,12 @@
         });
         
         $dateTitle.text('近一天销售统计');
+        
+        initTopHoverTree("gotop", 100, 10, 50);
+        
+        $('#goback').on('click', function() {
+            historyUtils.back();
+        });
     });
 
     //回到中国地图界面
@@ -880,15 +898,21 @@
     
 </#macro>
 <@layout>
+
 <section>
+    
     <div class="bi-body">
         <#include "_inc/_search_box.html"/>
-        <div class="map" style="width: 100%; height: 20rem; background: #efeff4">
-            <p id="date-title"></p>
-            <div>
-              <span id="china" style="visibility:visible;">  <a href ="javascript:void(0);" onclick="goBackChinaMap()" > 全国</a></span>
-              <span id="prov" style="visibility:hidden;" > > <a href ="javascript:void(0);" onclick="goBackProvMap()" id="prov_view"></a></span>
-              <span id="city" style="visibility:hidden;"> > <a herf = "javascript:void(0);" id="city_view"></a></span>
+        
+        <div class="map">
+            <header class="wy-header">
+			    <div id="goback" class="wy-header-icon-back"><span></span></div>
+			    <div id="date-title" class="wy-header-title"></div>
+			</header>
+            <div class="map-nav">
+                <span id="china" style="visibility:visible;"> <a href="javascript:void(0);" onclick="goBackChinaMap()"> 全国</a></span>
+                <span id="prov" style="visibility:hidden;"> > <a href="javascript:void(0);" onclick="goBackProvMap()" id="prov_view"></a></span>
+                <span id="city" style="visibility:hidden;"> > <a herf="javascript:void(0);" id="city_view"></a></span>
             </div>
             <div id="china_map" style="width: 100%;height:16rem;margin:0 auto;position: relative;display: none;"></div>
             <div id="prov_map"  style="width: 100%;height:16rem;margin:0 auto;position: relative;display: none;"></div>
@@ -926,7 +950,7 @@
                             <tfoot>
                               <tr>
                                 <th colspan="3">
-                                  <span id="prTrOpen" class="fr txt-color-red"><i class="icon-arrow-down2"></i> 更多</span>
+                                  <span id="prTrOpen" class="fr txt-color-red"><i class="icon-arrow-down2"></i> 查看更多</span>
                                   <span id="prTrClose" class="fr txt-color-red"><i class="icon-arrow-up2"></i> 收起</span>
                                 </th>
                               </tr>
@@ -951,14 +975,14 @@
                           <tfoot>
                             <tr>
                               <th colspan="3">
-                                <span id="sTrOpen" class="fr txt-color-red"><i class="icon-arrow-down2"></i> 更多</span>
+                                <span id="sTrOpen" class="fr txt-color-red"><i class="icon-arrow-down2"></i> 查看更多</span>
                                 <span id="sTrClose" class="fr txt-color-red"><i class="icon-arrow-up2"></i> 收起</span>
                               </th>
                             </tr>
                           </tfoot>
                         </table>
                     </div>
-                    <p class="title">库存趋势</p>
+                    <p class="stock-title">库存趋势</p>
                     <div>
                         <div id="stock_125">
                         </div>
@@ -974,4 +998,5 @@
         </div>
     </div>
 </section>
+<span id="gotop" title="返回顶部"><i class="icon-arrow-up2"></i></div>
 </@layout>
