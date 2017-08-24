@@ -131,7 +131,7 @@ public class SalesFactController extends BaseFrontController {
 
     }
 
-    public void productByArea() {
+    public void productByAreaList() {
 
         String provName = getPara("provName", "").trim();
         String cityName = getPara("cityName", "").trim();
@@ -167,7 +167,7 @@ public class SalesFactController extends BaseFrontController {
     }
 
 
-	public void productByCustomerType() {
+	public void productByCustomerTypeList() {
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
@@ -191,6 +191,31 @@ public class SalesFactController extends BaseFrontController {
 		render("productByCustomerType.html");
 
 	}
+	
+	   public void productByCustomerType() {
+
+	        String provName = getPara("provName", "").trim();
+	        String cityName = getPara("cityName", "").trim();
+	        String countryName = getPara("countryName", "").trim();
+	        String dateType = getPara("dateType", "0").trim(); // 0: 昨天， 1: 最近1周， 2: 最近1月
+
+	        String beginDate = getDateByType(dateType);
+	        String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+
+	        List<List<Record>> rows = new ArrayList<List<Record>>();
+	        List<Record> typeResult = SalesFactQuery.me().findCustomerTypeList(provName, cityName, countryName, beginDate,
+	                endDate);
+
+	        for (Record rec : typeResult) {
+	            int customerType = rec.get("customerType");
+	            List<Record> result = SalesFactQuery.me().findProductListByCustomerType(provName, cityName, countryName,
+	                    beginDate, endDate, customerType);
+	            rows.add(result);
+	        }
+	        setAttr("rows", rows);
+	        render("productByCustomerType.html");
+
+	    }
 
 	public void queryMapData() {
 

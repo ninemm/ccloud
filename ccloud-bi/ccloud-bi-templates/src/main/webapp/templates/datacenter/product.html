@@ -23,6 +23,10 @@
 	table a {
 		text-decoration: underline;
 	}
+	th {
+		vertical-align: middle!important;
+		text-align: center!important;
+	}
 	td {
 		vertical-align: middle!important;
 	}
@@ -30,18 +34,18 @@
 		line-height: 1.5rem;
 		height: 1.5rem;
 	}
-    #area_rank{
-        width: 100%;
-        height:4rem;
-    }
-    #customer_rank{
-        width: 100%;
-        height:8rem;
-    }
+	#area_rank{
+		width: 100%;
+		height:4rem;
+	}
+	#customer_rank{
+		width: 100%;
+		height:8rem;
+	}
 </#macro>
 <#macro script>
     $(function() {
-        product('', '', '', dateType, );
+        product('', '', '', dateType);
         area_rank('', '', '', dateType, cInvCode, cInvName);
         customer_rank('', '', '', dateType, cInvCode, cInvName);
     });
@@ -57,6 +61,7 @@
     });
     function setDateType(type){
         dateType = type;
+        product('', '', '', dateType);
         area_rank('', '', '', dateType, cInvCode, cInvName);
         customer_rank('', '', '', dateType, cInvCode, cInvName);
     }
@@ -82,7 +87,7 @@
             if((provName + cityName + countryName).trim() != '' ){
 			    prTitle = provName + cityName + countryName + prTitle;
 			} else {
-			    prTitle = '全国' + prTitle
+			    prTitle = '全国' + prTitle;
 			}
 			var $p = $("#p_product_rank");
 			$p.empty();
@@ -130,7 +135,7 @@
 		    if((provName + cityName + countryName).trim() != '' ){
 			    areaTitle = provName + cityName + countryName + areaTitle;
 			} else {
-			    areaTitle = '' + areaTitle
+			    areaTitle = '' + areaTitle;
 			}
 			var $p = $("#p_area_rank");
 			$p.empty();
@@ -139,7 +144,7 @@
 
             var areaRankChart = echarts.init(area_rank);
 			var option = {
-
+                backgroundColor: '#f2f2f2',
 			    color: ['#4ac7f5'],
 			    grid: {
                     left: '2%',
@@ -182,8 +187,8 @@
        });
     }
     
-      //客户
-	  function customer_rank(provName, cityName, countryName, dateType, cInvCode, cInvName){
+    //客户
+    function customer_rank(provName, cityName, countryName, dateType, cInvCode, cInvName){
 	    $.ajax({
 			url:"${CPATH}/sales/customerTypeByProduct",
 			type:"post",
@@ -203,7 +208,7 @@
             if((provName + cityName + countryName).trim() != '' ){
 			    crTitle = provName + cityName + countryName + crTitle;
 			} else {
-			    crTitle = '' + crTitle
+			    crTitle = '' + crTitle;
 			}
 			var $p = $("#p_customer_rank");
 			$p.empty();
@@ -214,7 +219,7 @@
 
 			var customerRankChart = echarts.init(customer_rank);
 			var crOption = {
-
+                backgroundColor: '#f2f2f2',
 			    color: ['#4ac7f5', '#f36f8a', '#fd9173', '#AF89D6', '#5f71d2'],
 			    series: [
 			        {
@@ -243,11 +248,7 @@
 <@layout>
 <section>
     <div class="bi-body">
-   	   	<div class="date-div">
-            <a class="date active-date" onclick="setDateType(0)">最近一天</a>
-            <a class="date"onclick="setDateType(1)">最近一周</a>
-            <a class="date"onclick="setDateType(2)">最近一月</a>
-        </div>
+   	   	<#include "_inc/_search_box.html"/>
         <p class="title" id="p_product_rank" >全国产品销售排行</p>
    		<div class="weui-cells weui-cells_form">
    			<div class="weui-cell" style="padding: 0">
@@ -268,7 +269,6 @@
    		        </table>
    	        </div>
    	   	</div>
-
    	   	<p class="title" id="p_area_rank"></p>
         <div id="area_rank">
         </div>

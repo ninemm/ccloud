@@ -563,7 +563,7 @@
 	}
 	function customerClick(param) {
 	    countryName = '';
-        post('${CPATH}/sales/productByCustomerType', {"provName" : provName, "cityName" : cityName, "countryName" : countryName, "dateType" : dateType});
+        post('${CPATH}/sales/productByCustomerTypeList', {"provName" : provName, "cityName" : cityName, "countryName" : countryName, "dateType" : dateType});
 	}
 
     //区域
@@ -643,7 +643,7 @@
     
     function areaClick(param) {
         countryName = '';
-	    post('${CPATH}/sales/productByArea', {"provName" : provName, "cityName" : cityName, "countryName" : countryName, "dateType" : dateType});
+	    post('${CPATH}/sales/productByAreaList', {"provName" : provName, "cityName" : cityName, "countryName" : countryName, "dateType" : dateType});
 	}
 	
     var $prTR;

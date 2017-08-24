@@ -40,7 +40,7 @@
 	return temp; 
 	} 
 	function search(provName,cityName,countryName,dateType){
-	    post('${CPATH}/sales/productByArea', {"provName" : provName, "cityName" : cityName, "countryName" : countryName, "dateType" : dateType});
+	    post('${CPATH}/sales/productByAreaList', {"provName" : provName, "cityName" : cityName, "countryName" : countryName, "dateType" : dateType});
     }
 </#macro>
 <@layout>
@@ -76,7 +76,7 @@
       </#list> 
 	</#list>
 </table>
-	<a href="${CPATH}/renderSales">返回上一页</a>
+	<a href="${CPATH}/area">返回上一页</a>
 </section>
 
 </@layout>
