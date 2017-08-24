@@ -80,6 +80,7 @@
     var provName = localStorage.provName;
     var cityName = localStorage.cityName;
     var countryName = localStorage.countryName;
+    var color = ['#a6c84c', '#ffa022', '#46bee9'];
     var dateType = 0;
     var prov_data = [];
     var city_data = [];
@@ -776,7 +777,7 @@
     });
 
     //库存趋势
-    function stock(name, tn, cInvCode, provName, cityName, countryName){
+    function stock(name, tn, cInvCode, provName, cityName, countryName, color){
         countryName = '';
 		$.ajax({
 			url:"${CPATH}/stock/date",
@@ -808,13 +809,13 @@
 			var title = tn + '库存趋势(单位/件)';
 
 			var stock = document.getElementById('stock'+'_'+name);
-			var $stock = $(stock);
+			//var $stock = $(stock);
 
 			var stockChart = echarts.init(stock);
 			var option = {
                 title: {
                     left: 'center',
-                    top: 'bottom',
+                    top: 'top',
                     text: title,
                     textStyle: {
                         fontWeight: 'normal',
@@ -823,12 +824,11 @@
                     }
                 },
                 tooltip : {
-
                 },
                 grid: {
-                    left: '15%',
+                    left: '20%',
                     right: '15%',
-                    top: '20%'
+                    top: '25%'
                 },
                 xAxis: {
                     data: xData
@@ -837,6 +837,12 @@
                 series: [{
                     name: title,
                     type: 'line',
+                    itemStyle: {
+                        normal: {color: color}
+                    },
+                    lineStyle: {
+                        normal: {color: color}
+                    },
                     markPoint: {
                         label: {
                             normal: {
@@ -854,7 +860,7 @@
                 }]
             };
             stockChart.resize();
-			stockChart.setOption(option,true);
+			stockChart.setOption(option, true);
 		});
     }
     
@@ -881,9 +887,9 @@
 	function refreshStockData(provName, cityName, countryName) {
 	
         stock_rank(provName, cityName, countryName);
-        stock(125, "125ml35度中国劲酒", "za000053", provName, cityName, countryName);
-        stock(258, "258ml35度中国劲酒", "zzgj2715", provName, cityName, countryName);
-        stock(520, "520ml35度中国劲酒", "zzgj1012", provName, cityName, countryName);
+        stock(125, "125ml35度中国劲酒", "za000053", provName, cityName, countryName, color[0]);
+        stock(258, "258ml35度中国劲酒", "zzgj2715", provName, cityName, countryName, color[1]);
+        stock(520, "520ml35度中国劲酒", "zzgj1012", provName, cityName, countryName, color[2]);
         
 	}
 	
@@ -984,14 +990,11 @@
                     </div>
                     <p class="stock-title">库存趋势</p>
                     <div>
-                        <div id="stock_125">
-                        </div>
+                        <div id="stock_125"></div>
                         <div class="divide-line"></div>
-                        <div id="stock_258">
-                        </div>
+                        <div id="stock_258"></div>
                         <div class="divide-line"></div>
-                        <div id="stock_520">
-                        </div>
+                        <div id="stock_520"></div>
                     </div>
                 </div>
             </div>
