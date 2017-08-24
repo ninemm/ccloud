@@ -196,7 +196,7 @@ public class SalesFactQuery extends JBaseQuery {
     }
 
     public List<Record> findAreaListByCustomerType(String provName, String cityName,
-            String countryName, String startDate, String endDate, int customerType) {
+            String countryName, String startDate, String endDate, String customerTypeName) {
 
         LinkedList<Object> params = new LinkedList<Object>();
 
@@ -215,7 +215,7 @@ public class SalesFactQuery extends JBaseQuery {
         sqlBuilder.append(" from sales_fact");
 
         boolean needWhere = true;
-        needWhere = appendIfNotEmpty(sqlBuilder, "customerType", customerType, params, needWhere);
+        needWhere = appendIfNotEmpty(sqlBuilder, "customerTypeName", customerTypeName, params, needWhere);
         needWhere = appendIfNotEmpty(sqlBuilder, "provName", provName, params, needWhere);
         needWhere = appendIfNotEmpty(sqlBuilder, "cityName", cityName, params, needWhere);
         needWhere = appendIfNotEmpty(sqlBuilder, "countryName", countryName, params, needWhere);
@@ -464,7 +464,7 @@ public class SalesFactQuery extends JBaseQuery {
     }
 
     public List<Record> findProductListByCustomerType(String provName, String cityName,
-            String countryName, String startDate, String endDate, int customerType) {
+            String countryName, String startDate, String endDate, String customerTypeName) {
 
         LinkedList<Object> params = new LinkedList<Object>();
 
@@ -476,7 +476,7 @@ public class SalesFactQuery extends JBaseQuery {
         sqlBuilder.append(" from sales_fact");
 
         boolean needWhere = true;
-        needWhere = appendIfNotEmpty(sqlBuilder, "customerType", customerType, params, needWhere);
+        needWhere = appendIfNotEmpty(sqlBuilder, "customerTypeName", customerTypeName, params, needWhere);
         needWhere = appendIfNotEmpty(sqlBuilder, "provName", provName, params, needWhere);
         needWhere = appendIfNotEmpty(sqlBuilder, "cityName", cityName, params, needWhere);
         needWhere = appendIfNotEmpty(sqlBuilder, "countryName", countryName, params, needWhere);

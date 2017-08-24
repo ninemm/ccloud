@@ -43,7 +43,7 @@ public class SalesFactController extends BaseFrontController {
         String provName = getPara("provName", "").trim();
         String cityName = getPara("cityName", "").trim();
         String countryName = getPara("countryName", "").trim();
-        Integer customerType = getParaToInt("customerType");
+        String customerTypeName = getPara("customerTypeName", "").trim();
 
         String dateType = getPara("dateType", "0").trim();;// 0: 昨天， 1: 最近1周， 2: 最近1月
 
@@ -51,7 +51,7 @@ public class SalesFactController extends BaseFrontController {
         String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
 
         List<Record> result = SalesFactQuery.me().findAreaListByCustomerType(provName, cityName,
-                countryName, startDate, endDate, customerType);
+                countryName, startDate, endDate, customerTypeName);
 
         renderJson(result);
 
@@ -182,9 +182,9 @@ public class SalesFactController extends BaseFrontController {
                 countryName, startDate, endDate);
 
         for (Record rec : typeResult) {
-            int customerType = rec.get("customerType");
+            String customerTypeName = rec.get("customerTypeName");
             List<Record> result = SalesFactQuery.me().findProductListByCustomerType(provName,
-                    cityName, countryName, startDate, endDate, customerType);
+                    cityName, countryName, startDate, endDate, customerTypeName);
             rows.add(result);
         }
         setAttr("rows", rows);
@@ -197,14 +197,14 @@ public class SalesFactController extends BaseFrontController {
         String provName = getPara("provName", "").trim();
         String cityName = getPara("cityName", "").trim();
         String countryName = getPara("countryName", "").trim();
-        Integer customerType = getParaToInt("customerType");
+        String customerTypeName = getPara("customerTypeName", "").trim();
         String dateType = getPara("dateType", "0").trim(); // 0: 昨天， 1: 最近1周， 2: 最近1月
 
         String startDate = getDateByType(dateType);
         String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
 
         List<Record> result = SalesFactQuery.me().findProductListByCustomerType(provName, cityName,
-                countryName, startDate, endDate, customerType);
+                countryName, startDate, endDate, customerTypeName);
 
         renderJson(result);
 
