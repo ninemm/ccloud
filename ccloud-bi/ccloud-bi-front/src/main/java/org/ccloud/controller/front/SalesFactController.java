@@ -23,18 +23,18 @@ public class SalesFactController extends BaseFrontController {
 
     public void area() {
 
-    	String provName = getPara("provName", "").trim();
-		String cityName = getPara("cityName", "").trim();
-		String countryName = getPara("countryName", "").trim();
-		String dateType = getPara("dateType", "0").trim();// 0: 近一周， 1: 近一月， 2: 近一年
+        String provName = getPara("provName", "").trim();
+        String cityName = getPara("cityName", "").trim();
+        String countryName = getPara("countryName", "").trim();
+        String dateType = getPara("dateType", "0").trim();// 0: 近一周， 1: 近一月， 2: 近一年
 
-		String beginDate = getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+        String startDate = getDateByType(dateType);
+        String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
 
-		List<Map<String, Object>> result = SalesFactQuery.me().findAreaArray(provName, cityName, countryName, beginDate,
-				endDate);
+        List<Map<String, Object>> result = SalesFactQuery.me().findAreaArray(provName, cityName,
+                countryName, startDate, endDate);
 
-		renderJson(result);
+        renderJson(result);
 
     }
 
@@ -44,7 +44,7 @@ public class SalesFactController extends BaseFrontController {
         String cityName = getPara("cityName", "").trim();
         String countryName = getPara("countryName", "").trim();
         Integer customerType = getParaToInt("customerType");
-        
+
         String dateType = getPara("dateType", "0").trim();;// 0: 昨天， 1: 最近1周， 2: 最近1月
 
         String startDate = getDateByType(dateType);
@@ -56,7 +56,7 @@ public class SalesFactController extends BaseFrontController {
         renderJson(result);
 
     }
-    
+
     public void areaByProduct() {
 
         String provName = getPara("provName", "").trim();
@@ -100,7 +100,7 @@ public class SalesFactController extends BaseFrontController {
         String cityName = getPara("cityName", "").trim();
         String countryName = getPara("countryName", "").trim();
         String cInvCode = getPara("cInvCode", "").trim();
-        
+
         String dateType = getPara("dateType", "0").trim();// 0: 昨天， 1: 最近1周， 2: 最近1月
 
         String startDate = getDateByType(dateType);
@@ -123,7 +123,7 @@ public class SalesFactController extends BaseFrontController {
 
         String startDate = getDateByType(dateType);
         String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
-        
+
         List<Record> result = SalesFactQuery.me().findProductList(provName, cityName, countryName,
                 startDate, endDate);
 
@@ -144,7 +144,7 @@ public class SalesFactController extends BaseFrontController {
         List<List<Record>> rows = new ArrayList<List<Record>>();
         List<Record> countryResult = SalesFactQuery.me().findAreaList(provName, cityName,
                 countryName, startDate, endDate);
-        
+
         for (int i = 0; i < countryResult.size(); i++) {
             if (StrKit.notBlank(getPara("cityName", "").trim())) {
                 countryName = countryResult.get(i).getStr("countryName");
@@ -167,83 +167,76 @@ public class SalesFactController extends BaseFrontController {
     }
 
 
-	public void productByCustomerTypeList() {
+    public void productByCustomerTypeList() {
 
-		String provName = getPara("provName", "").trim();
-		String cityName = getPara("cityName", "").trim();
-		String countryName = getPara("countryName", "").trim();
-		String dateType = getPara("dateType", "0").trim(); // 0: 昨天， 1: 最近1周， 2: 最近1月
+        String provName = getPara("provName", "").trim();
+        String cityName = getPara("cityName", "").trim();
+        String countryName = getPara("countryName", "").trim();
+        String dateType = getPara("dateType", "0").trim(); // 0: 昨天， 1: 最近1周， 2: 最近1月
 
-		String beginDate = getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+        String startDate = getDateByType(dateType);
+        String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
 
-		List<List<Record>> rows = new ArrayList<List<Record>>();
-		List<Record> typeResult = SalesFactQuery.me().findCustomerTypeList(provName, cityName, countryName, beginDate,
-				endDate);
+        List<List<Record>> rows = new ArrayList<List<Record>>();
+        List<Record> typeResult = SalesFactQuery.me().findCustomerTypeList(provName, cityName,
+                countryName, startDate, endDate);
 
-		for (Record rec : typeResult) {
-			int customerType = rec.get("customerType");
-			List<Record> result = SalesFactQuery.me().findProductListByCustomerType(provName, cityName, countryName,
-					beginDate, endDate, customerType);
-			rows.add(result);
-		}
-		setAttr("rows", rows);
-		render("productByCustomerType.html");
+        for (Record rec : typeResult) {
+            int customerType = rec.get("customerType");
+            List<Record> result = SalesFactQuery.me().findProductListByCustomerType(provName,
+                    cityName, countryName, startDate, endDate, customerType);
+            rows.add(result);
+        }
+        setAttr("rows", rows);
+        render("productByCustomerType.html");
 
-	}
-	
-	   public void productByCustomerType() {
+    }
 
-	        String provName = getPara("provName", "").trim();
-	        String cityName = getPara("cityName", "").trim();
-	        String countryName = getPara("countryName", "").trim();
-	        String dateType = getPara("dateType", "0").trim(); // 0: 昨天， 1: 最近1周， 2: 最近1月
+    public void productByCustomerType() {
 
-	        String beginDate = getDateByType(dateType);
-	        String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+        String provName = getPara("provName", "").trim();
+        String cityName = getPara("cityName", "").trim();
+        String countryName = getPara("countryName", "").trim();
+        Integer customerType = getParaToInt("customerType");
+        String dateType = getPara("dateType", "0").trim(); // 0: 昨天， 1: 最近1周， 2: 最近1月
 
-	        List<List<Record>> rows = new ArrayList<List<Record>>();
-	        List<Record> typeResult = SalesFactQuery.me().findCustomerTypeList(provName, cityName, countryName, beginDate,
-	                endDate);
+        String startDate = getDateByType(dateType);
+        String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
 
-	        for (Record rec : typeResult) {
-	            int customerType = rec.get("customerType");
-	            List<Record> result = SalesFactQuery.me().findProductListByCustomerType(provName, cityName, countryName,
-	                    beginDate, endDate, customerType);
-	            rows.add(result);
-	        }
-	        setAttr("rows", rows);
-	        render("productByCustomerType.html");
+        List<Record> result = SalesFactQuery.me().findProductListByCustomerType(provName, cityName,
+                countryName, startDate, endDate, customerType);
 
-	    }
+        renderJson(result);
 
-	public void queryMapData() {
+    }
 
-		String provName = getPara("provName", "").trim();
-		String cityName = getPara("cityName", "").trim();
-		String countryName = getPara("countryName", "").trim();
-		String dateType = getPara("dateType", "0").trim();
+    public void queryMapData() {
 
-		String beginDate = getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+        String provName = getPara("provName", "").trim();
+        String cityName = getPara("cityName", "").trim();
+        String countryName = getPara("countryName", "").trim();
+        String dateType = getPara("dateType", "0").trim();
 
-		List<SalesFact> salesFactList = SalesFactQuery.me().queryMapData(provName, cityName, countryName, beginDate,
-				endDate);
-		renderJson(salesFactList);
-	}
+        String startDate = getDateByType(dateType);
+        String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
 
-	private String getDateByType(String dateType) {
-		
-		DateTime dateTime = DateTime.now();
-		
-		if (dateType.equals("0")) {// 最近一天
-			return dateTime.plusDays(-1).toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
-		} else if (dateType.equals("1")) {// 近一周
-			return dateTime.plusWeeks(-1).toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
-		} else if (dateType.equals("2")) {// 近一月
-			return dateTime.plusMonths(-1).toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
-		} else {// 近一年
-			return dateTime.plusYears(-1).toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
-		}
-	}
+        List<SalesFact> salesFactList = SalesFactQuery.me().queryMapData(provName, cityName,
+                countryName, startDate, endDate);
+        renderJson(salesFactList);
+    }
+
+    private String getDateByType(String dateType) {
+
+        DateTime dateTime = DateTime.now();
+
+        if (dateType.equals("0")) {// 最近一天
+            return dateTime.plusDays(-1).toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+        } else if (dateType.equals("1")) {// 近一周
+            return dateTime.plusWeeks(-1).toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+        } else if (dateType.equals("2")) {// 近一月
+            return dateTime.plusMonths(-1).toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+        } else {// 近一年
+            return dateTime.plusYears(-1).toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+        }
+    }
 }

@@ -14,7 +14,7 @@
 	.weui-cells {
 		margin-top: 0;
 		background: inherit;
-		font-size: 14px;
+		font-size: 0.6rem;
 	}
 	table {
 		background: #fff;
@@ -54,6 +54,19 @@
     var customerType = '5';
     var customerTypeName = '零售终端';
     
+    //做时间的切换选择
+    $(".date").click(function(e) {
+        var $a = $(e.currentTarget);
+        $a.parent().find(".date").removeClass("active-date");
+        $a.addClass("active-date");
+    });
+    function setDateType(type){
+        dateType = type;
+       //customer('', '', '', dateType);
+       product_rank('', '', '', dateType, customerType, customerTypeName);
+       // area_rank('', '', '', dateType, customerType, customerTypeName);
+    }
+    
     
     
     //产品
@@ -64,7 +77,7 @@
   			data:{provName: provName, cityName: cityName, countryName: countryName, dateType: dateType, customerType: customerType},
   			dataType:"json"
   		}).done(function(data){
-  		    var prTitle = customerTypeName + '产品分布';
+  		    var prTitle = customerTypeName + '产品销售排行';
             if((provName + cityName + countryName).trim() != '' ){
 			    prTitle = provName + cityName + countryName + prTitle;
 			} else {

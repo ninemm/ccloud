@@ -470,6 +470,7 @@ public class SalesFactQuery extends JBaseQuery {
 
         StringBuilder sqlBuilder = new StringBuilder("select customerTypeName, cInvName");
 
+        sqlBuilder.append(", TRUNCATE(SUM(totalSmallAmount/cInvMNum), 2) as totalNum");
         sqlBuilder.append(", TRUNCATE(SUM(totalSales)/1000000, 2) as totalAmount");
 
         sqlBuilder.append(" from sales_fact");
