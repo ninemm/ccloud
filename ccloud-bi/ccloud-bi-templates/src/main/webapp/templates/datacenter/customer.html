@@ -50,9 +50,9 @@
 </#macro>
 <#macro script>
     $(function() {
-        customer('', '', '', dateType);
-        product_rank('', '', '', dateType, customerTypeName);
-        area_rank('', '', '', dateType, customerTypeName);
+        customer(provName, cityName, '', dateType);
+        product_rank(provName, cityName, '', dateType, customerTypeName);
+        area_rank(provName, cityName, '', dateType, customerTypeName);
         
         initTopHoverTree("gotop", 100, 10, 50);
         
@@ -60,6 +60,9 @@
             historyUtils.back();
         });
     });
+    var provName = localStorage.provName;
+    var cityName = localStorage.cityName;
+    var countryName = localStorage.countryName;
     var dateType = 0;
     var customerTypeName = '零售终端';
     
@@ -71,9 +74,9 @@
     });
     function setDateType(type){
         dateType = type;
-        customer('', '', '', dateType);
-        product_rank('', '', '', dateType, customerTypeName);
-        area_rank('', '', '', dateType, customerTypeName);
+        customer(provName, cityName, '', dateType);
+        product_rank(provName, cityName, '', dateType, customerTypeName);
+        area_rank(provName, cityName, '', dateType, customerTypeName);
     }
     
   	var customer_rank = document.getElementById('customer_rank');
@@ -101,11 +104,11 @@
                 });
 		    }
             var crTitle = '客户分布';
-            if((provName + cityName + countryName).trim() != '' ){
-			    crTitle = provName + cityName + countryName + crTitle;
-			} else {
-			    crTitle = '' + crTitle;
-			}
+            //if((provName + cityName + countryName).trim() != '' ){
+			//    crTitle = provName + cityName + countryName + crTitle;
+			//} else {
+			//    crTitle = '' + crTitle;
+			//}
 			var $p = $("#p_customer_rank");
 			$p.empty();
 			$p.text(crTitle);
@@ -172,8 +175,8 @@
         }
         customerTypeName = typeName.slice(0, typeName.lastIndexOf('('));
         
-        product_rank('', '', '', dateType, customerTypeName);
-        area_rank('', '', '', dateType, customerTypeName);
+        product_rank(provName, cityName, '', dateType, customerTypeName);
+        area_rank(provName, cityName, '', dateType, customerTypeName);
     }
     
     
@@ -186,11 +189,11 @@
   			dataType:"json"
   		}).done(function(data){
   		    var prTitle = customerTypeName + '产品销售排行';
-            if((provName + cityName + countryName).trim() != '' ){
-			    prTitle = provName + cityName + countryName + prTitle;
-			} else {
-			    prTitle = '' + prTitle;
-			}
+            //if((provName + cityName + countryName).trim() != '' ){
+			//    prTitle = provName + cityName + countryName + prTitle;
+			//} else {
+			//    prTitle = '' + prTitle;
+			//}
 			var $p = $("#p_product_rank");
 			$p.empty();
 			$p.text(prTitle);
@@ -233,11 +236,11 @@
 		    }
 
 		    var areaTitle = customerTypeName + '销售分布';
-		    if((provName + cityName + countryName).trim() != '' ){
-			    areaTitle = provName + cityName + countryName + areaTitle;
-			} else {
-			    areaTitle = '' + areaTitle;
-			}
+		    //if((provName + cityName + countryName).trim() != '' ){
+			//    areaTitle = provName + cityName + countryName + areaTitle;
+			//} else {
+			//    areaTitle = '' + areaTitle;
+			//}
 			var $p = $("#p_area_rank");
 			$p.empty();
 			$p.text(areaTitle);
