@@ -1,6 +1,7 @@
 package org.ccloud.controller.front;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -206,6 +207,50 @@ public class SalesFactController extends BaseFrontController {
         List<Record> result = SalesFactQuery.me().findProductListByCustomerType(provName, cityName,
                 countryName, startDate, endDate, customerTypeName);
 
+        renderJson(result);
+
+    }
+    
+    public void dealer() {
+
+        String provName = getPara("provName", "").trim();
+        String cityName = getPara("cityName", "").trim();
+        String countryName = getPara("countryName", "").trim();
+        
+        String dateType = getPara("dateType", "0").trim(); // 0: 昨天， 1: 最近1周， 2: 最近1月
+
+        String startDate = getDateByType(dateType);
+        String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+
+        List<Record> result = SalesFactQuery.me().findsalesList(provName, cityName, countryName,
+                null, startDate, endDate);
+
+        renderJson(result);
+
+    }
+    
+    public void dealerDetail() {
+
+        String provName = getPara("provName", "").trim();
+        String cityName = getPara("cityName", "").trim();
+        String countryName = getPara("countryName", "").trim();
+        String dealerCode = getPara("dealerCode", "").trim();
+        String dateType = getPara("dateType", "0").trim(); // 0: 昨天， 1: 最近1周， 2: 最近1月
+
+        String startDate = getDateByType(dateType);
+        String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+
+        Map<String, Object> result = new HashMap<String, Object>();
+
+        List<Record> sellerList = SalesFactQuery.me().findsalesList(provName, cityName, countryName,
+                dealerCode, startDate, endDate);
+
+        List<Record> productList = SalesFactQuery.me().findProductListByDealer(provName, cityName,
+                countryName, dealerCode, startDate, endDate);
+
+        result.put("sellerList", sellerList);
+        result.put("productList", productList);
+        
         renderJson(result);
 
     }

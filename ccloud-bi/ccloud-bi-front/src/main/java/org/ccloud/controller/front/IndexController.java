@@ -95,6 +95,10 @@ public class IndexController extends BaseFrontController {
 		render("product.html");
 	}
 	
+    public void dealer() {
+        render("dealer.html");
+    }
+	
 	public void initWechatConfig() {
 		
 		String jsapi_ticket = CacheKit.get("ccloud", "jsapi_ticket");
