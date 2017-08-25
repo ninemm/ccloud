@@ -1,5 +1,7 @@
-<#include "_inc/_layout.html"/> 
+<#include "_inc/_layout.html"/>
+
 <#macro script_import>
+    <script type="text/javascript" src="${CPATH}/templates/datacenter/js/topHovertree.js"></script>
 </#macro>
 
 <#macro css_import>
@@ -17,13 +19,15 @@
 	} 
 </#macro> 
 <#macro script>
+    
+    initTopHoverTree("gotop", 100, 10, 50);
+
     $('#goback').on('click', function() {
         historyUtils.back();
     });
 </#macro> 
 <@layout>
 <section>
-	<!-- <p class="title">客户销售情况</p> -->
 	<header class="wy-header">
         <div id="goback" class="wy-header-icon-back"><span></span></div>
         <div id="date-title" class="wy-header-title">客户销售情况</div>
@@ -38,12 +42,12 @@
 		<tr>
 			<td rowspan="${row?size}" style="text-align: center; vertical-align: middle;">${ro.customerTypeName}</td>
 			<td>${ro.cInvName}</td>
-			<td>${ro.totalAmount}</td>
+			<td class="t-r">${ro.totalAmount}</td>
 		</tr>
 		<#else>
 		<tr>
 			<td>${ro.cInvName}</td>
-			<td>${ro.totalAmount}</td>
+			<td class="t-r">${ro.totalAmount}</td>
 		</tr>
 		</#if> </#list> </#list>
 	</table>
