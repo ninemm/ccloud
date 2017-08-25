@@ -96,6 +96,16 @@ public class SalesFactQuery extends JBaseQuery {
 
         return Db.queryBigDecimal(sqlBuilder.toString()).doubleValue();
     }
+    
+    // 订单客户总数
+    public Long findCustomerCount() {
+
+        StringBuilder sql = new StringBuilder("select count(*) from (");
+        sql.append(" select customerId from sales_fact group by customerId) as customer");
+        return Db.queryLong(sql.toString());
+
+    }
+    
 
     public List<Map<String, Object>> findAreaArray(String provName, String cityName,
             String countryName, String startDate, String endDate) {
