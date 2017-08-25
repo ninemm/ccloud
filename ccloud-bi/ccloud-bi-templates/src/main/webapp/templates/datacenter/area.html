@@ -80,11 +80,16 @@
     var provName = localStorage.provName;
     var cityName = localStorage.cityName;
     var countryName = localStorage.countryName;
-    var color = ['#a6c84c', '#ffa022', '#46bee9'];
-    var dateType = 0;
+    var curProvTitle = null;
+    
+    var dateType = 0;// 日期搜索按钮类型
     var prov_data = [];
     var city_data = [];
     var country_data = [];
+    
+    var color = ['#a6c84c', '#ffa022', '#46bee9'];
+    
+    
     $(function() {
 	
 	    if (provName == null || cityName == null || countryName == null) {
@@ -96,20 +101,16 @@
 	    cityName = localStorage.cityName;
 	    countryName = localStorage.countryName;
 	    
-	    provName = provName.substring(0, provName.length - 1);
+	    curProvTitle = provName.substring(0, provName.length - 1);
 	    
 	    if(countryName.length != 0) {
-            clickCity({"name": cityName}, provName);
-            provName = provName + "省";
+            renderCityMap({"name": cityName}, curProvTitle);
+            //provName = provName + "省";
         } else if(cityName.length !=0){
-            clickProv({"name": provName}, true);
+            renderProvMap({"name": curProvTitle}, true);
         } else {
-            mapRender(true);
+            renderChinaMap(true);
         }
-        
-        initData(provName, cityName, countryName, dateType);
-        
-        refreshStockData(provName, cityName, countryName);
         
         $(".date").click(function(e) {
             var $a = $(e.currentTarget);
@@ -119,15 +120,16 @@
 
       	var ITEM_ON = "weui-bar__item--on";
 
-        var showTab = function(a) {
-            var $a = $(a);
-            if ($a.hasClass(ITEM_ON)) return;
-            var href = $a.attr("href");
+        var showTab = function(tabId) {
+            var $tabItem = $(tabId);
+            if ($tabItem.hasClass(ITEM_ON)) 
+                return;
+            var href = $tabItem.attr("href");
 
-            if (!/^#/.test(href)) return;
-
-            $a.parent().find("." + ITEM_ON).removeClass(ITEM_ON);
-            $a.addClass(ITEM_ON);
+            if (!/^#/.test(href)) 
+                return;
+            $tabItem.parent().find("." + ITEM_ON).removeClass(ITEM_ON);
+            $tabItem.addClass(ITEM_ON);
 
             if (href == "#tab2") {
                 $(".weui-tab__bd").addClass("active").height($("#tab2").height());
@@ -136,14 +138,16 @@
             }
         }
 
-        $.showTab = showTab;
+        // $.showTab = showTab;
 
         $(".weui-navbar__item").click(function(e) {
             var $a = $(e.currentTarget);
             var href = $a.attr("href");
-            if ($a.hasClass(ITEM_ON)) return;
-            if (!/^#/.test(href)) return;
-
+            if ($a.hasClass(ITEM_ON)) 
+                return;
+                
+            if (!/^#/.test(href)) 
+                return;
             e.preventDefault();
             showTab($a);
         });
@@ -163,14 +167,13 @@
         $('#prov').css('visibility','hidden');
     	$('#city').css('visibility','hidden');
         
-        mapRender(true);
+        renderChinaMap(true);
       
         provName = '';
         cityName = '';
         countryName = '';
         
         initData(provName, cityName, countryName, dateType);
-        
         refreshStockData(provName, cityName, countryName);
     }
 
@@ -181,25 +184,26 @@
         countryName = '';
 
         provName = provName.substring(0, provName.length - 1);
-        clickProv({"name": provName}, true);
+        renderProvMap({"name": provName}, true);
   		$('#city').css('visibility','hidden');
   	  
         initData(provName, cityName, countryName, dateType);
-        
         refreshStockData(provName, cityName, countryName);
   	}
 
     //做时间的切换选择
     function setDateType(type) {
+    
         dateType = type;
+        //initData(provName, cityName, countryName, dateType);
+        //refreshStockData(provName, cityName, countryName);
         
-        initData(provName, cityName, countryName, dateType);
-        
-        refreshStockData(provName, cityName, countryName);
-        
-        if (document.getElementById('china_map').style.display == 'block') mapRender(false);
-        if (document.getElementById('prov_map').style.display == 'block') clickProv({"name": provName.substring(0, provName.length - 1)}, false);
-        if (document.getElementById('city_map').style.display == 'block') clickCity({"name": cityName}, provName.substring(0, provName.length - 1));
+        if (document.getElementById('china_map').style.display == 'block') 
+            renderChinaMap(false);
+        if (document.getElementById('prov_map').style.display == 'block') 
+            renderProvMap({"name": provName.substring(0, provName.length - 1)}, false);
+        if (document.getElementById('city_map').style.display == 'block') 
+            renderCityMap({"name": cityName}, provName.substring(0, provName.length - 1));
         
         if (dateType == 0) {
             $dateTitle.text('近一天销售统计');
@@ -213,7 +217,7 @@
     }
 
     //点击地图上的省
-    function clickProv (result, isRender) {
+    function renderProvMap (result, isRender) {
         
         cityName = '';
         var maxData = 0;
@@ -249,7 +253,7 @@
             
             // 选择省的单击事件
             var selectProv = result.name.toString();
-            // 调取后台数据
+            // 从json获取地图数据
             $.get('${CTPATH}/json/' + cityMap[selectProv] + '/'+cityMap[selectProv] + '.json', function (Citymap) {
                 echarts.registerMap(selectProv, Citymap);
                 var myChartProv = echarts.init(document.getElementById('prov_map'));
@@ -300,18 +304,17 @@
 	            });
 	            
 	            myChartProv.on('click', function(rel){
-	                clickCity(rel, selectProv);
+	                renderCityMap(rel, selectProv);
 	            });
             });
         });
         
         initData(provName, cityName, countryName, dateType);
-        
         refreshStockData(provName, cityName, countryName);
     }
 
     //点击地图上的市
-    function clickCity(rel, selectProv) {
+    function renderCityMap(rel, selectProv) {
         var maxData = 0;
         cityName = rel.name;
         $.ajax({
@@ -340,7 +343,7 @@
                 
                 var arr = new Array('北京','上海','天津','台湾','重庆');
                 
-                if(contains(arr,selectProv) == false) {
+                if(contains(arr, selectProv) == false) {
                 
                     $('#prov_view').text(selectProv);
                     $('#prov').css('visibility','visible');
@@ -366,7 +369,6 @@
         });
       
         initData(provName, cityName, countryName, dateType);
-        
         refreshStockData(provName, cityName, countryName);
     }
 
@@ -428,15 +430,16 @@
     }
     
     //中国地图渲染
-    function mapRender(isRender) {
+    function renderChinaMap(isRender) {
+    
         var maxData = 0;
         
         $.ajax({
             url: "${CPATH}/sales/queryMapData",
 	        type: "post",
-	        data: {"provName": '', "cityName": '', countryName: '', dateType: dateType},
+	        data: {dateType: dateType},
 	        dataType:"json"
-        }).done(function(data){
+        }).done(function(data) {
             prov_data = [];
             for(var i = 0; i < data.length; i++) {
                 prov_data.push({
@@ -448,19 +451,20 @@
                     maxData = data[i].totalAmount;
             }
             
-	        setTimeout(function () {
-	            if (isRender) {
-	                $('#china_map').css('display','block');
-	                $('#city_map').css('display','none');
-	                $('#prov_map').css('display','none');
-	            }
-	        }, 500);
+            if (isRender) {
+                setTimeout(function () {
+                    $('#china_map').css('display','block');
+                    $('#city_map').css('display','none');
+                    $('#prov_map').css('display','none');
+                }, 100);
+            }
 	        
             $.get('${CTPATH}/json/china.json', function (mapJson) {
             
                 echarts.registerMap('china', mapJson);
-                var chart = echarts.init(document.getElementById('china_map'));//在id为mainMap的dom元素中显示地图
-                $(document.getElementById('china_map')).width(400);
+                var chinaMap = document.getElementById('china_map');
+                $(chinaMap).width(400);
+                var chart = echarts.init(chinaMap);//在id为mainMap的dom元素中显示地图
                 chart.resize();
                 
                 chart.setOption({
@@ -512,9 +516,11 @@
                 });
 
                 chart.on('click', function(result) {
-                    clickProv(result, true);
+                    renderProvMap(result, true);
                 });
             });
+            initData(provName, cityName, countryName, dateType);
+            refreshStockData(provName, cityName, countryName);
         });
     }
 
@@ -545,7 +551,7 @@
 			}
 
 			var customer_rank = document.getElementById('customer_rank');
-			var $customer_rank = $(customer_rank);
+			//var $customer_rank = $(customer_rank);
 
 			var customerRankChart = echarts.init(customer_rank);
 			var crOption = {

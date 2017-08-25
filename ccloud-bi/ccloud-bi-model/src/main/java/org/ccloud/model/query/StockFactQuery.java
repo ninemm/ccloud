@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.ccloud.model.StockFact;
 
+import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
@@ -117,11 +118,50 @@ public class StockFactQuery extends JBaseQuery {
         }
         sqlBuilder.append(" and cInvCode = ?");
         params.add(cInvCode);
+        
         sqlBuilder.append(" group by idate  ");
         sqlBuilder.append(" order by idate asc");
 
         return Db.find(sqlBuilder.toString(), params.toArray());
 
+    }
+    
+    public List<Record> findListByInvCode(String provName, String cityName, String countryName,
+            String cInvCode) {
+    	
+    	StringBuilder sqlBuilder = new StringBuilder("select idate, cInvCode");
+        sqlBuilder.append(", TRUNCATE(SUM(totalSmallAmount/cInvMNum), 0) as totalNum");
+        sqlBuilder.append(" from stock_fact");
+        
+        LinkedList<Object> params = new LinkedList<Object>();
+        boolean needWhere = true;
+        needWhere = appendIfNotEmpty(sqlBuilder, "provName", provName, params, needWhere);
+        needWhere = appendIfNotEmpty(sqlBuilder, "cityName", cityName, params, needWhere);
+        needWhere = appendIfNotEmpty(sqlBuilder, "countryName", countryName, params, needWhere);
+
+        if (needWhere) {
+            sqlBuilder.append(" where 1 = 1");
+        }
+        
+        if (StrKit.notBlank(cInvCode)) {
+        	String[] codes = cInvCode.split(",");
+        	if (codes.length == 1) {
+        		sqlBuilder.append(" and cInvCode = ?");
+        		params.add(cInvCode);
+        	} else {
+        		sqlBuilder.append(" and cInvCode in (");
+	        	for (String code : codes) {
+	        		sqlBuilder.append("'" + code + "',");
+	        	}
+	        	sqlBuilder.deleteCharAt(sqlBuilder.lastIndexOf(","));
+	        	sqlBuilder.append(")");
+        	}
+        }
+        
+        sqlBuilder.append(" group by idate, cInvCode");
+        sqlBuilder.append(" order by idate asc, totalNum desc");
+        
+        return Db.find(sqlBuilder.toString(), params.toArray());
     }
 
 }

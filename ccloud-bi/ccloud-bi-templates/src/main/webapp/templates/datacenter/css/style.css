@@ -43,6 +43,12 @@ h1, h2, h3, h4, h5, h6, p, figure, form, blockquote { margin: 0; }
 ul, ol, li, dl, dd { margin: 0; padding: 0; }
 ul, ol { list-style: none outside none; }
 
+a {text-decoration: none;}
+a:link {text-decoration: none;}
+a:hover {text-decoration: none;}
+a:active {text-decoration: none;}
+a:visited {text-decoration:overline; cursor:pointer}
+
 .pd-10{padding:10px;}
 
 .mg-t-10{margin-top:10px;}

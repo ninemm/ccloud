@@ -45,13 +45,18 @@
     <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
     <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=su3AmHLUcBprpnOLmVHo7r8AljbW8X6t"></script>
     <script type="text/javascript" src="${CTPATH}/js/convertor.js"></script>
-    <script type='text/javascript' src="${CTPATH}/js/vconsole.min.js"></script>
-    <script type='text/javascript' src="${CTPATH}/js/common.js"></script>
 </#macro>
 <#macro script>
 
+    layer.open({
+        type: 2,
+        content: '加载中...'
+    });
+    
     var $prov = $("#prov");
     var $city = $("#city");
+    var $body = $("body");
+    //$body.hide();
     
     var provName = '湖北省';
     var cityName = '武汉市';
@@ -67,11 +72,6 @@
     
     var $map = document.getElementById("map");
     var myChart = echarts.init($map);
-    
-    /*layer.open({
-	    type: 2,
-	    content: '加载中'
-    });*/
     
     wx.config({
 	    debug: Utils.devMode, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
@@ -98,7 +98,7 @@
                     cityName = $.cookie(Utils.cityCacheName);
                     countryName = $.cookie(Utils.countryCacheName);
                     
-                    console.log(provName, cityName + '-' + countryName);
+                    //console.log(provName, cityName + '-' + countryName);
                     
                     if (provName == null || cityName == null || countryName == null) {
 			            wx.getLocation({
@@ -135,12 +135,13 @@
 			                }
 			            });
 		            }
-		            $prov.text(provName);
-                    $city.text(cityName);
                     
                     if (provName.indexOf('省') != -1) {
                         curProvName = provName.substring(0, provName.length - 1);
                     }
+                    $prov.text(curProvName);
+                    $city.text(cityName);
+                    
 		            mapDataUrl = '${CTPATH}/json/'+cityMap[curProvName]+'/'+cityMap[cityName]+'.json';
 		            loadOrderData();
 	            }
@@ -300,7 +301,8 @@
                 myChart.setOption(option, true);
             }
             
-            //layer.closeAll();
+            layer.closeAll();
+            // $body.show();
         });
     }
     
@@ -348,10 +350,9 @@
 
 <@layout>
 <section>
-
     <div class="bi-body">
         <div class="location">
-            <i class="icon-map-marker txt-color-green"></i> <a href="javascript:void(0);" class="area">全国</a> > <a href="javascript:void(0);" id="prov" class="area">湖北省</a> > <a href="javascript:void(0);" id="city" class="area">武汉市</a>
+            <i class="icon-map-marker txt-color-green"></i> <a href="javascript:void(0);" class="area">全国</a> > <a href="javascript:void(0);" id="prov" class="area"></a> > <a href="javascript:void(0);" id="city" class="area"></a>
         </div>
         <div class="map-wrapper">
             <div id="map" class="maps"></div>
