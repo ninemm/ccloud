@@ -301,11 +301,16 @@
     sales.start();
     var orderTotal = new CountUp("order-total",0, parseInt('${totalOrderCount!}'));
     orderTotal.start();
+    var customerTotal = new CountUp("customer",0, parseInt('${totalCustomerCount!}'));
+    customerTotal.start();
     
     setTimeout(function() {
 		$("#sales").addClass('animated pulse');
 		setTimeout(function() {
 		  $("#order-total").addClass('animated pulse');
+		  	setTimeout(function() {
+		      $("#customer").addClass('animated pulse');
+		    }, 1000);
 		}, 1000);
 	}, 2000);
 	
@@ -350,6 +355,13 @@
                 <img src="${CTPATH}/images/order.png">
                 <p>
                     订单总数(笔):<br/><span id="order-total"></span>
+                </p>
+                <div class="clearfix"></div>
+            </div>
+            <div class="gather">
+                <img src="${CTPATH}/images/customer.png">
+                <p>
+                    客户总数(个):<br/><span id="customer"></span>
                 </p>
                 <div class="clearfix"></div>
             </div>
