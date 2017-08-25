@@ -80,22 +80,27 @@ public class IndexController extends BaseFrontController {
 	}
 	
 	public void renderSales() {
+		
 	    render("sales.html");
 	}
 	
 	public void area() {
+		setAttr("cur_nav", "area");
 		render("area.html");
 	}
 	
 	public void customer() {
+		setAttr("cur_nav", "customer");
 		render("customer.html");
 	}
 	
 	public void product() {
+		setAttr("cur_nav", "product");
 		render("product.html");
 	}
 	
     public void dealer() {
+    	setAttr("cur_nav", "dealer");
         render("dealer.html");
     }
 	

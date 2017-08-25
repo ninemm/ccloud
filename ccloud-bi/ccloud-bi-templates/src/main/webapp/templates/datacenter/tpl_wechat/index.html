@@ -5,8 +5,8 @@
     }
     
     .location-wrapper {
-        height: 2rem;
-        line-height: 2rem;
+        height: 1.5rem;
+        line-height: 1.5rem;
         width: 100%;
         padding: .2rem .5rem;
         color: #999;
@@ -14,6 +14,7 @@
         position: fixed;
         background: #fff;
         z-index: 10;
+        border-bottom: 1px solid #f0f0f0;
     }
     
     .relocation {
@@ -446,6 +447,15 @@
                             产品
                     </p>
                 </a>
+                <a href="${CPATH}/dealer" class="weui-grid js_grid">
+                    <div class="weui-grid__icon" style="text-align: center">
+                        <i class="icon-sitemap" style="color: DarkOrange;font-size: 10vw;text-align: center;"></i>
+                        <!-- <span class="icon-box2" style="color: greenyellow; font-size: 10vw;"></span> -->
+                    </div>
+                    <p class="weui-grid__label">
+                            经销商
+                    </p>
+                </a>
             </div>
             <div class="weui-footer">
                 <p class="weui-footer__text">武汉市珈研信息科技有限公司</p>
@@ -453,4 +463,5 @@
         </div>
     </div>
 </section>
+<#include "_inc/_nav_box.html"/>
 </@layout>
