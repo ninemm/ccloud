@@ -42,6 +42,8 @@ public class IndexController extends BaseFrontController {
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
 		String countryName = getPara("countryName", "").trim();
+		
+		setAttr("totalCustomerCount", SalesFactQuery.me().findCustomerCount());
 		setAttr("totalOrderCount", SalesFactQuery.me().findOrderCount());
 		setAttr("totalOrderAmount", SalesFactQuery.me().findTotalAmount(provName, cityName, countryName));
 		

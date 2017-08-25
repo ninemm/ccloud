@@ -49,9 +49,9 @@
 </#macro>
 <#macro script>
     $(function() {
-        product('', '', '', dateType);
-        area_rank('', '', '', dateType, cInvCode, cInvName);
-        customer_rank('', '', '', dateType, cInvCode, cInvName);
+        product(provName, cityName, '', dateType);
+        area_rank(provName, cityName, '', dateType, cInvCode, cInvName);
+        customer_rank(provName, cityName, '', dateType, cInvCode, cInvName);
         
         initTopHoverTree("gotop", 100, 10, 50);
         
@@ -59,6 +59,9 @@
             historyUtils.back();
         });
     });
+    var provName = localStorage.provName;
+    var cityName = localStorage.cityName;
+    var countryName = localStorage.countryName;
     var dateType = 0;
     var cInvCode = 'za000053';
     var cInvName = '125ml35度中国劲酒（醇化液）_1*24';
@@ -71,17 +74,17 @@
     });
     function setDateType(type){
         dateType = type;
-        product('', '', '', dateType);
-        area_rank('', '', '', dateType, cInvCode, cInvName);
-        customer_rank('', '', '', dateType, cInvCode, cInvName);
+        product(provName, cityName, '', dateType);
+        area_rank(provName, cityName, '', dateType, cInvCode, cInvName);
+        customer_rank(provName, cityName, '', dateType, cInvCode, cInvName);
     }
     
     //产品选择
     function setProduct(Code, Name){
         cInvCode = Code;
         cInvName = Name;
-        area_rank('', '', '', dateType, cInvCode, cInvName);
-        customer_rank('', '', '', dateType, cInvCode, cInvName);
+        area_rank(provName, cityName, '', dateType, cInvCode, cInvName);
+        customer_rank(provName, cityName, '', dateType, cInvCode, cInvName);
     }
     
     //产品
@@ -94,11 +97,11 @@
   		}).done(function(data){
 
   		    var prTitle = '产品销售排行';
-            if((provName + cityName + countryName).trim() != '' ){
-			    prTitle = provName + cityName + countryName + prTitle;
-			} else {
-			    prTitle = '' + prTitle;
-			}
+            //if((provName + cityName + countryName).trim() != '' ){
+			//    prTitle = provName + cityName + countryName + prTitle;
+			//} else {
+			//    prTitle = '' + prTitle;
+			//}
 			var $p = $("#p_product_rank");
 			$p.empty();
 			$p.text(prTitle);
@@ -142,11 +145,11 @@
 		    }
 
 		    var areaTitle = cInvName + '销售情况';
-		    if((provName + cityName + countryName).trim() != '' ){
-			    areaTitle = provName + cityName + countryName + areaTitle;
-			} else {
-			    areaTitle = '' + areaTitle;
-			}
+		    //if((provName + cityName + countryName).trim() != '' ){
+			//    areaTitle = provName + cityName + countryName + areaTitle;
+			//} else {
+			//    areaTitle = '' + areaTitle;
+			//}
 			var $p = $("#p_area_rank");
 			$p.empty();
 			$p.text(areaTitle);
@@ -214,11 +217,11 @@
                 });
 		    }
             var crTitle = cInvName +'客户分布';
-            if((provName + cityName + countryName).trim() != '' ){
-			    crTitle = provName + cityName + countryName + crTitle;
-			} else {
-			    crTitle = '' + crTitle;
-			}
+            //if((provName + cityName + countryName).trim() != '' ){
+			//    crTitle = provName + cityName + countryName + crTitle;
+			//} else {
+			//    crTitle = '' + crTitle;
+			//}
 			var $p = $("#p_customer_rank");
 			$p.empty();
 			$p.text(crTitle);
