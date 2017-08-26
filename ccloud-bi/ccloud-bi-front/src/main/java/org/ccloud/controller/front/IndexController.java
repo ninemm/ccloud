@@ -125,7 +125,7 @@ public class IndexController extends BaseFrontController {
 			url = url + "?" + (getRequest().getQueryString());
 		}
 		// url="http://javen.tunnel.mobi/my_weixin/_front/share.jsp";
-		System.out.println("url>>>>" + url);
+		//System.out.println("url>>>>" + url);
 		String timestamp = create_timestamp();
 		// 这里参数的顺序要按照 key 值 ASCII 码升序排序
 		// 注意这里参数名必须全部小写，且必须有序
@@ -136,12 +136,12 @@ public class IndexController extends BaseFrontController {
 
 		String signature = HashKit.sha1(str);
 
-		System.out.println("corpId " + ApiConfigKit.getApiConfig().getCorpId()
-				+ "  nonceStr " + nonce_str + " timestamp " + timestamp);
-		System.out.println("url " + url + " signature " + signature);
-		System.out.println("nonceStr " + nonce_str + " timestamp " + timestamp);
-		System.out.println(" jsapi_ticket " + jsapi_ticket);
-		System.out.println("nonce_str  " + nonce_str);
+//		System.out.println("corpId " + ApiConfigKit.getApiConfig().getCorpId()
+//				+ "  nonceStr " + nonce_str + " timestamp " + timestamp);
+//		System.out.println("url " + url + " signature " + signature);
+//		System.out.println("nonceStr " + nonce_str + " timestamp " + timestamp);
+//		System.out.println(" jsapi_ticket " + jsapi_ticket);
+//		System.out.println("nonce_str  " + nonce_str);
 		setAttr("appId", ApiConfigKit.getApiConfig().getCorpId());
 		setAttr("nonceStr", nonce_str);
 		setAttr("timestamp", timestamp);
