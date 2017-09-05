@@ -1,5 +1,6 @@
 
 Utils = {
+	context: '',	
 	devMode: false,
 	provCacheName: 'PROV_CACHE_NAME',
 	cityCacheName: 'CITY_CACHE_NAME',
@@ -68,7 +69,7 @@ function Map() {
 
 function BaiduMap() {
 	
-	var getLocation = function() {
+	var getLocation = function(loadOrderData) {
 		
 		var geolocation = new BMap.Geolocation();
 		geolocation.getCurrentPosition(function(r) {
@@ -89,17 +90,21 @@ function BaiduMap() {
 					$.cookie(Utils.cityCacheName, cityName, { expires: 7 });
 					$.cookie(Utils.countryCacheName, countryName, { expires: 7 });
 					
-					//provName = provName.substring(0, provName.length - 1);
+					provName = provName.substring(0, provName.length - 1);
 					//alert(countryName);
 					//console.log(provName, cityName + '-' + countryName);
 					
-					if(countryName.length != 0) {
+					/*if(countryName.length != 0) {
 						//clickCity({"name": cityName}, provName);
 						//provName = provName + "省";
 					} else if(cityName.length != 0){
 						//clickProv({"name": provName}, true);
 					} else {
 						mapRender(true);
+					}*/
+					if (loadOrderData) {
+						mapDataUrl = Utils.context + '/json/'+cityMap[provName]+'/'+cityMap[cityName]+'.json';
+						loadOrderData(cityName);
 					}
               });
 			}
@@ -108,6 +113,29 @@ function BaiduMap() {
 	}
 	
 	this.getLocation = getLocation;
+}
+
+function StrKit() {
+	var convertProvName = function(provName) {
+		
+		if (provName.indexOf('省') != -1) {
+			return provName.substring(0, provName.length - 1);
+		} else if (provName.indexOf('自治区') != -1) {
+			if (provName.indexOf('新疆') > -1)
+				return '新疆';
+			else if (provName.indexOf('宁夏') > -1)
+				return '宁夏';
+			else if (provName.indexOf('广西') > -1)
+				return '广西';
+			else if (provName.indexOf('西藏') > -1)
+				return '西藏';
+			else if (provName.indexOf('内蒙古') > -1)
+				return '内蒙古';
+		}
+		return provName;
+	}
+	
+	this.convertProvName = convertProvName;
 }
 
 var MapSet = {

@@ -1,7 +1,7 @@
 <#include "_inc/_layout.html"/>
 <#macro script_import>
     <script type="text/javascript" src="${CPATH}/templates/datacenter/js/echarts.min.js"></script>
-    <script type="text/javascript" src="${CTPATH}/json/china-main-city-map.js"></script>
+    <script type="text/javascript" src="${CTPATH}/json/china-city-map.js"></script>
     <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=su3AmHLUcBprpnOLmVHo7r8AljbW8X6t"></script>
     <script type="text/javascript" src="${CPATH}/templates/datacenter/js/topHovertree.js"></script>
 </#macro>
@@ -77,10 +77,12 @@
 </#macro>
 <#macro script>
     
+    var strKit = new StrKit();
+    
     var $dateTitle = $('#date-title');
-    var provName = localStorage.provName;
-    var cityName = localStorage.cityName;
-    var countryName = localStorage.countryName;
+    var provName = $.cookie(Utils.provCacheName);
+    var cityName = $.cookie(Utils.cityCacheName);
+    var countryName = $.cookie(Utils.countryCacheName);
     var curProvTitle = null;
     
     var dateType = 0;// 日期搜索按钮类型
@@ -92,21 +94,20 @@
     
     $(function() {
     
-        if (provName == null || cityName == null || countryName == null) {
+        /*if (provName == null || cityName == null || countryName == null) {
             var baiduMap = new BaiduMap();
             baiduMap.getLocation();
-        }
+        }*/
         
-        provName = localStorage.provName;
-        cityName = localStorage.cityName;
-        countryName = localStorage.countryName;
-        
-        curProvTitle = provName.substring(0, provName.length - 1);
+        //provName = localStorage.provName;
+        //cityName = localStorage.cityName;
+        //countryName = localStorage.countryName;
+        curProvTitle = strKit.convertProvName(provName);
         
         if(countryName.length != 0) {
             renderCityMap({"name": cityName}, curProvTitle);
             //provName = provName + "省";
-        } else if(cityName.length !=0){
+        } else if(cityName.length != 0){
             renderProvMap({"name": curProvTitle}, true);
         } else {
             renderChinaMap(true);
@@ -182,8 +183,8 @@
         
         cityName = '';
         countryName = '';
-
-        provName = provName.substring(0, provName.length - 1);
+        
+        provName = strKit.convertProvName(provName);
         renderProvMap({"name": provName}, true);
         $('#city').css('visibility','hidden');
       
@@ -201,7 +202,7 @@
         if (document.getElementById('china_map').style.display == 'block') 
             renderChinaMap(false);
         if (document.getElementById('prov_map').style.display == 'block') 
-            renderProvMap({"name": provName.substring(0, provName.length - 1)}, false);
+            renderProvMap({"name": strKit.convertProvName(provName)}, false);
         if (document.getElementById('city_map').style.display == 'block') 
             renderCityMap({"name": cityName}, provName.substring(0, provName.length - 1));
         
@@ -240,26 +241,36 @@
                 if(data[i].totalAmount > maxData) maxData = data[i].totalAmount;
             }
             
-            setTimeout(function () {
-                $('#prov_view').text(result.name);
-                $('#prov').css('visibility','visible');
+            //setTimeout(function () {
+            $('#prov_view').text(result.name);
+            $('#prov').css('visibility', 'visible');
 
-                if (isRender) {
-                    $('#china_map').css('display','none');
-                    $('#city_map').css('display','none');
-                    $('#prov_map').css('display','block');
-                }
-            }, 500);
+            if (isRender) {
+                $('#china_map').css('display','none');
+                $('#prov_map').css('display','block');
+                $('#city_map').css('display','none');
+            }
+            //}, 500);
             
+            var _provMap = document.getElementById('prov_map');
+            var provChart = echarts.init(_provMap);
+            $(_provMap).width(400);
             // 选择省的单击事件
             var selectProv = result.name.toString();
+            
+            provChart.showLoading({
+	            text: '加载中...',
+	            effect: 'whirling'
+	        });
+            
             // 从json获取地图数据
-            $.get('${CTPATH}/json/' + cityMap[selectProv] + '/'+cityMap[selectProv] + '.json', function (Citymap) {
-                echarts.registerMap(selectProv, Citymap);
-                var myChartProv = echarts.init(document.getElementById('prov_map'));
-                $(document.getElementById('prov_map')).width(400);
-                myChartProv.resize();
-                myChartProv.setOption({
+            $.get('${CTPATH}/json/' + cityMap[selectProv] + '/'+cityMap[selectProv] + '.json', function (data) {
+                echarts.registerMap(selectProv, data);
+                
+                provChart.hideLoading();
+                provChart.resize();
+                
+                provChart.setOption({
                     tooltip: {
                         trigger: 'item',
                         textStyle: {fontSize: 9},
@@ -303,7 +314,7 @@
                     }]
                 });
                 
-                myChartProv.on('click', function(rel){
+                provChart.on('click', function(rel){
                     renderCityMap(rel, selectProv);
                 });
             });
@@ -372,13 +383,24 @@
         refreshStockData(provName, cityName, countryName);
     }
 
+    // 城市地图(市)
     function countryMapRender(selectProv, selectCity, maxData) {
-        $.get('${CTPATH}/json/'+cityMap[selectProv]+'/'+cityMap[selectCity]+'.json', function (Citymap) {
-            echarts.registerMap(selectCity, Citymap);
-            var myChartCity = echarts.init(document.getElementById('city_map'));
-            $(document.getElementById('city_map')).width(400);
-            myChartCity.resize();
-            myChartCity.setOption({
+        var _cityMap = document.getElementById('city_map');
+        var cityChart = echarts.init(_cityMap);
+        $(_cityMap).width(400);
+        
+        cityChart.showLoading({
+            text: '加载中...',
+            effect: 'whirling'
+        });
+    
+        $.get('${CTPATH}/json/'+cityMap[selectProv]+'/'+cityMap[selectCity]+'.json', function (data) {
+            
+            echarts.registerMap(selectCity, data);
+            cityChart.hideLoading();
+            cityChart.resize();
+            
+            cityChart.setOption({
                 tooltip: {
                     trigger: 'item',
                     textStyle: {fontSize: 9},
@@ -422,10 +444,10 @@
                 }]
             });
             
-            myChartCity.on('click', function(rel) {
+            /*cityChart.on('click', function(rel) {
                 setTimeout(function () {
                 }, 500);
-            });
+            });*/
         });
     }
     
@@ -452,19 +474,25 @@
             }
             
             if (isRender) {
-                setTimeout(function () {
+                //setTimeout(function () {
                     $('#china_map').css('display','block');
                     $('#city_map').css('display','none');
                     $('#prov_map').css('display','none');
-                }, 100);
+                //}, 100);
             }
             
-            $.get('${CTPATH}/json/china.json', function (mapJson) {
+            var _chinaMap = document.getElementById('china_map');
+            $(_chinaMap).width(400);
+            var chart = echarts.init(_chinaMap);                     // 在id为china_map的dom元素中显示地图
+            chart.showLoading({
+	            text: '加载中...',
+	            effect: 'whirling'
+	        });
             
+            $.get('${CTPATH}/json/china.json', function (mapJson) {
+                
                 echarts.registerMap('china', mapJson);
-                var chinaMap = document.getElementById('china_map');
-                $(chinaMap).width(400);
-                var chart = echarts.init(chinaMap);//在id为mainMap的dom元素中显示地图
+                chart.hideLoading();
                 chart.resize();
                 
                 chart.setOption({
@@ -475,7 +503,7 @@
                             if(isNaN(result.value)) 
                                 return result.name + '<br />总金额: 0';
                             else 
-                                return result.name+'<br />总金额:'+result.value + '万元';
+                                return result.name + '<br />总金额:' + result.value + '万元';
                         }
                     },
                     visualMap: {
@@ -492,9 +520,9 @@
                     },
                     series: [{
                         type: 'map',
-                        map: 'china',//要和echarts.registerMap（）中第一个参数一致
+                        map: 'china',                   // 要和echarts.registerMap（）中第一个参数一致
                         roam: true,
-                        scaleLimit: { min: 1, max: 4},//缩放
+                        scaleLimit: { min: 1, max: 4},  // 缩放
                         mapLocation:{
                             y:60
                         },

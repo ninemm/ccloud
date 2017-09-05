@@ -75,13 +75,16 @@
     
     var mapDataUrl = '';
     
+    var baiduMap = new BaiduMap();
+    var strKit = new StrKit();
+    
     var $map = document.getElementById("map");
     var myChart = echarts.init($map);
     
-    layer.open({
+    /*layer.open({
         type: 2,
         content: '加载中'
-    });
+    });*/
     
     wx.config({
         debug: Utils.devMode, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
@@ -168,7 +171,7 @@
     var countryName = localStorage.countryName;
 
     if (provName == null || cityName == null || countryName == null) {
-        var baiduMap = new BaiduMap();
+        //var baiduMap = new BaiduMap();
         baiduMap.getLocation();
     }
     
@@ -176,16 +179,16 @@
     cityName = localStorage.cityName;
     countryName = localStorage.countryName;
     
-    $city.text(cityName);
-    //if (provName.indexOf('省') != -1) {
-    //    curProvName = provName.substring(0, provName.length - 1);
-    //}
-    //alert(provName);
-    //alert(cityMap[provName]);
-    mapDataUrl = '${CTPATH}/json/'+cityMap[provName]+'/'+cityMap[cityName]+'.json';
-    loadOrderData();
+    curProvName = strKit.convertProvName(provName);
     
-    function loadOrderData() {
+    mapDataUrl = '${CTPATH}/json/'+cityMap[curProvName]+'/'+cityMap[cityName]+'.json';
+    loadOrderData(cityName);
+    
+    function loadOrderData(cityName) {
+        myChart.showLoading({
+	        text: '加载中...',
+	        effect: 'whirling'
+	    });
         $.ajax({
             type: 'post',
             url: '${CPATH}/orderAmount',
@@ -235,6 +238,7 @@
                     },
                     series: series
                 };
+                $city.text(cityName);
                 getMapData(data);
             }
         });
@@ -324,11 +328,10 @@
                 })
             });
             
+            myChart.hideLoading();
             if (option && typeof option === "object") {
                 myChart.setOption(option, true);
             }
-            
-            layer.closeAll();
         });
     }
     
@@ -373,13 +376,22 @@
             $("#city-name").text(displayValues[1]);
         },
         onClose: function (picker) {
+            myChart.clear();
+            
             provName = picker.displayValue[0];
             cityName = picker.displayValue[1];
             countryName = picker.displayValue[2];
+            provName = strKit.convertProvName(provName);
+            
             mapDataUrl = '${CTPATH}/json/'+cityMap[provName]+'/'+cityMap[cityName]+'.json';
             //console.log(picker.displayValue[0], picker.displayValue[1]);
             loadOrderData();
         }
+    });
+    
+    $("#relocation").on('click', function() {
+        var baiduMap = new BaiduMap();
+        baiduMap.getLocation(loadOrderData);
     });
     
 </#macro>
@@ -390,8 +402,9 @@
     <div class="bi-body">
         <div class="location-wrapper">
             <span id="location"><em id="city-name"></em> <i class="icon-chevron-down txt-color-green" id="drop-down"></i></span>
-            <div class="relocation fr"><i class="icon-map-marker txt-color-green"></i> 定位</div>
+            <div id="relocation" class="relocation fr"><i class="icon-map-marker txt-color-green"></i> 定位</div>
         </div>
+        <div class="foot-black"></div>
         <div class="map-wrapper">
             <div id="map" class="maps"></div>
         </div>
@@ -473,6 +486,5 @@
 <div class="weui-footer">
     <p class="weui-footer__text">Copyright &copy; 2017 武汉珈研</p>
 </div>
-<div class="foot-black"></div>
 <#include "_inc/_nav_box.html"/>
 </@layout>

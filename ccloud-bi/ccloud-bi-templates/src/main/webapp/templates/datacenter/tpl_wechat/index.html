@@ -5,8 +5,8 @@
     }
     
     .location-wrapper {
-        height: 1.5rem;
-        line-height: 1.5rem;
+        height: 2rem;
+        line-height: 2rem;
         width: 100%;
         padding: .2rem .5rem;
         color: #999;
@@ -55,7 +55,7 @@
     <script type='text/javascript' src="${CTPATH}/js/countUp.js"></script>
     <script type="text/javascript" src="${CTPATH}/js/city-data.js"></script>
     <script type="text/javascript" src="${CTPATH}/js/city-picker.js"></script>
-    <script type="text/javascript" src="${CTPATH}/json/china-main-city-map.js"></script>
+    <script type="text/javascript" src="${CTPATH}/json/china-city-map.js"></script>
     <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
     <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=su3AmHLUcBprpnOLmVHo7r8AljbW8X6t"></script>
     <script type="text/javascript" src="${CTPATH}/js/convertor.js"></script>
@@ -79,10 +79,7 @@
     var $map = document.getElementById("map");
     var myChart = echarts.init($map);
     
-    layer.open({
-        type: 2,
-        content: '加载中'
-    });
+    var strKit = new StrKit();
     
     mapLocation();
     
@@ -103,20 +100,35 @@
         }, 1000);
     }, 2000);
     
-    $("#location").cityPicker({
-        title: "请选择当前位置",
+    $("#drop-down").cityPicker({
+        title: "请选择位置",
         showDistrict: false,
         onChange: function (picker, values, displayValues) {
-            //console.log(values, displayValues);
             $("#city-name").text(displayValues[1]);
+        },
+        onClose: function (picker) {
+            myChart.clear();
+            
+            provName = picker.displayValue[0];
+            cityName = picker.displayValue[1];
+            countryName = picker.displayValue[2];
+            provName = strKit.convertProvName(provName);
+            
+            mapDataUrl = '${CTPATH}/json/'+cityMap[provName]+'/'+cityMap[cityName]+'.json';
+            loadOrderData();
         }
     });
     
-    $('.relocation').on("click", function() {
+    $("#relocation").on('click', function() {
         mapLocation();
     });
     
     function mapLocation() {
+        
+        myChart.showLoading({
+            text: '加载中...',
+            effect: 'whirling'
+        });
         
         provName = $.cookie(Utils.provCacheName);
         cityName = $.cookie(Utils.cityCacheName);
@@ -178,10 +190,10 @@
 		                   });
 		                   
 		                   $city.text(cityName);
-		                   
-		                   if (provName.indexOf('省') != -1) {
+		                   curProvName = strKit.convertProvName(provName);
+		                   /*if (provName.indexOf('省') != -1) {
 		                       curProvName = provName.substring(0, provName.length - 1);
-		                   }
+		                   }*/
 		                   mapDataUrl = '${CTPATH}/json/'+cityMap[curProvName]+'/'+cityMap[cityName]+'.json';
 		                   loadOrderData();
 		               }
@@ -195,17 +207,15 @@
 	    } else {
 	       $city.text(cityName);
                            
-           if (provName.indexOf('省') != -1) {
+           curProvName = strKit.convertProvName(provName);                
+           /*if (provName.indexOf('省') != -1) {
                curProvName = provName.substring(0, provName.length - 1);
-           }
+           }*/
            mapDataUrl = '${CTPATH}/json/'+cityMap[curProvName]+'/'+cityMap[cityName]+'.json';
            loadOrderData();
 	    }
     }
     
-    //provName = localStorage.provName;
-    //cityName = localStorage.cityName;
-    //countryName = localStorage.countryName;
     
     function loadOrderData() {
         $.ajax({
@@ -349,8 +359,8 @@
             if (option && typeof option === "object") {
                 myChart.setOption(option, true);
             }
-            
-            layer.closeAll();
+            myChart.hideLoading();
+            //layer.closeAll();
         });
     }
     
@@ -371,7 +381,7 @@
         }
         return res;
     };
-
+    
 </#macro>
 
 <@layout>
@@ -379,9 +389,10 @@
 
     <div class="bi-body">
         <div class="location-wrapper">
-            <span id="location"><em id="city-name"></em> <i class="icon-chevron-down txt-color-green"></i></span>
-            <div class="relocation fr"><i class="icon-map-marker txt-color-green"></i> 定位</div>
+            <span id="location"><em id="city-name"></em> <i class="icon-chevron-down txt-color-green" id="drop-down"></i></span>
+            <div id="relocation" class="relocation fr"><i class="icon-map-marker txt-color-green"></i> 定位</div>
         </div>
+        <div class="foot-black"></div>
         <div class="map-wrapper">
             <div id="map" class="maps"></div>
         </div>
@@ -458,11 +469,10 @@
                 </a>
             </div> -->
             <div class="weui-footer">
-                <p class="weui-footer__text">武汉市珈研信息科技有限公司</p>
+                <p class="weui-footer__text">Copyright &copy; 2017 武汉珈研</p>
             </div>
         </div>
     </div>
 </section>
-<div class="foot-black"></div>
 <#include "_inc/_nav_box.html"/>
 </@layout>
