@@ -54,7 +54,7 @@
     <script type='text/javascript' src="${CTPATH}/js/countUp.js"></script>
     <script type="text/javascript" src="${CTPATH}/js/city-data.js"></script>
     <script type="text/javascript" src="${CTPATH}/js/city-picker.js"></script>
-    <script type="text/javascript" src="${CTPATH}/json/china-main-city-map.js"></script>
+    <script type="text/javascript" src="${CTPATH}/json/china-city-map.js"></script>
     <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
     <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=su3AmHLUcBprpnOLmVHo7r8AljbW8X6t"></script>
     <script type="text/javascript" src="${CTPATH}/js/convertor.js"></script>
@@ -163,9 +163,27 @@
        //console.log(JOSN.stringify(res));
     });
     
-    //provName = localStorage.provName;
-    //cityName = localStorage.cityName;
-    //countryName = localStorage.countryName;
+    provName = localStorage.provName;
+    cityName = localStorage.cityName;
+    var countryName = localStorage.countryName;
+
+    if (provName == null || cityName == null || countryName == null) {
+        var baiduMap = new BaiduMap();
+        baiduMap.getLocation();
+    }
+    
+    provName = localStorage.provName;
+    cityName = localStorage.cityName;
+    countryName = localStorage.countryName;
+    
+    $city.text(cityName);
+    //if (provName.indexOf('省') != -1) {
+    //    curProvName = provName.substring(0, provName.length - 1);
+    //}
+    //alert(provName);
+    //alert(cityMap[provName]);
+    mapDataUrl = '${CTPATH}/json/'+cityMap[provName]+'/'+cityMap[cityName]+'.json';
+    loadOrderData();
     
     function loadOrderData() {
         $.ajax({
@@ -349,11 +367,18 @@
         }, 1000);
     }, 2000);
     
-    $("#location").cityPicker({
-        title: "请选择当前位置",
+    $("#drop-down").cityPicker({
+        title: "请选择位置",
         onChange: function (picker, values, displayValues) {
-            //console.log(values, displayValues);
             $("#city-name").text(displayValues[1]);
+        },
+        onClose: function (picker) {
+            provName = picker.displayValue[0];
+            cityName = picker.displayValue[1];
+            countryName = picker.displayValue[2];
+            mapDataUrl = '${CTPATH}/json/'+cityMap[provName]+'/'+cityMap[cityName]+'.json';
+            //console.log(picker.displayValue[0], picker.displayValue[1]);
+            loadOrderData();
         }
     });
     
@@ -364,7 +389,7 @@
 
     <div class="bi-body">
         <div class="location-wrapper">
-            <span id="location"><em id="city-name"></em> <i class="icon-chevron-down txt-color-green"></i></span>
+            <span id="location"><em id="city-name"></em> <i class="icon-chevron-down txt-color-green" id="drop-down"></i></span>
             <div class="relocation fr"><i class="icon-map-marker txt-color-green"></i> 定位</div>
         </div>
         <div class="map-wrapper">
@@ -401,14 +426,14 @@
             </div>
         </div>
 
-        <div class="title">
+        <!-- <div class="title">
             <h3>统计类别</h3>
         </div>
         <div class="weui-grids">
             <a href="${CPATH}/area" class="weui-grid js_grid">
                 <div class="weui-grid__icon" style="text-align: center">
                     <i class="icon-map" style="color: orangered;font-size: 10vw;text-align: center;"></i>
-                    <!-- <span class="icon-map classify-icon" style="color: orangered;font-size: 10vw;text-align: center;"></span> -->
+                    <span class="icon-map classify-icon" style="color: orangered;font-size: 10vw;text-align: center;"></span>
                 </div>
                 <p class="weui-grid__label">
                         地区
@@ -417,7 +442,7 @@
                 <a href="${CPATH}/customer" class="weui-grid js_grid">
                     <div class="weui-grid__icon" style="text-align: center">
                         <i class="icon-users" style="color: lightskyblue;font-size: 10vw;text-align: center;"></i>
-                        <!-- <span class="icon-group" style="color: lightskyblue; font-size: 10vw;"></span> -->
+                        <span class="icon-group" style="color: lightskyblue; font-size: 10vw;"></span>
                     </div>
                     <p class="weui-grid__label">
                          客户
@@ -426,7 +451,7 @@
                 <a href="${CPATH}/product" class="weui-grid js_grid">
                     <div class="weui-grid__icon" style="text-align: center">
                         <i class="icon-box2" style="color: greenyellow;font-size: 10vw;text-align: center;"></i>
-                        <!-- <span class="icon-box2" style="color: greenyellow; font-size: 10vw;"></span> -->
+                        <span class="icon-box2" style="color: greenyellow; font-size: 10vw;"></span>
                     </div>
                     <p class="weui-grid__label">
                             产品
@@ -435,18 +460,19 @@
                 <a href="${CPATH}/dealer" class="weui-grid js_grid">
                     <div class="weui-grid__icon" style="text-align: center">
                         <i class="icon-sitemap" style="color: DarkOrange;font-size: 10vw;text-align: center;"></i>
-                        <!-- <span class="icon-box2" style="color: greenyellow; font-size: 10vw;"></span> -->
+                        <span class="icon-box2" style="color: greenyellow; font-size: 10vw;"></span>
                     </div>
                     <p class="weui-grid__label">
                             经销商
                     </p>
                 </a>
-            </div>
+            </div> -->
         </div>
     </div>
 </section>
 <div class="weui-footer">
-    <p class="weui-footer__text">武汉市珈研信息科技有限公司</p>
+    <p class="weui-footer__text">Copyright &copy; 2017 武汉珈研</p>
 </div>
+<div class="foot-black"></div>
 <#include "_inc/_nav_box.html"/>
 </@layout>

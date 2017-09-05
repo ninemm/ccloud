@@ -89,13 +89,13 @@ function BaiduMap() {
 					$.cookie(Utils.cityCacheName, cityName, { expires: 7 });
 					$.cookie(Utils.countryCacheName, countryName, { expires: 7 });
 					
-					provName = provName.substring(0, provName.length - 1);
+					//provName = provName.substring(0, provName.length - 1);
 					//alert(countryName);
 					//console.log(provName, cityName + '-' + countryName);
 					
 					if(countryName.length != 0) {
 						//clickCity({"name": cityName}, provName);
-						provName = provName + "省";
+						//provName = provName + "省";
 					} else if(cityName.length != 0){
 						//clickProv({"name": provName}, true);
 					} else {
