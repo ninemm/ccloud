@@ -570,6 +570,26 @@ header {
     color: #fff;
 }
 
+/*位置*/
+.location-wrapper {
+    height: 2rem;
+    line-height: 2rem;
+    width: 100%;
+    padding: .2rem .5rem;
+    color: #999;
+    font-size: .8rem;
+    position: fixed;
+    background: #fff;
+    z-index: 10;
+}
+
+.relocation {
+    clear: both;
+    width: 20%;
+    display: inline-block;
+    cursor: pointer;
+}
+
 /*地图*/
 
 .map {

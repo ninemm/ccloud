@@ -60,9 +60,9 @@
             historyUtils.back();
         });
     });
-    var provName = localStorage.provName;
-    var cityName = localStorage.cityName;
-    var countryName = localStorage.countryName;
+    var provName = $.cookie(Utils.provCacheName);
+    var cityName = $.cookie(Utils.cityCacheName);
+    var countryName = $.cookie(Utils.countryCacheName);
     var dateType = 0;
     var cInvCode = 'za000053';
     var cInvName = '125ml35度中国劲酒（醇化液）_1*24';
@@ -98,11 +98,11 @@
         }).done(function(data){
 
             var prTitle = '产品销售排行';
-            //if((provName + cityName + countryName).trim() != '' ){
-            //    prTitle = provName + cityName + countryName + prTitle;
-            //} else {
-            //    prTitle = '' + prTitle;
-            //}
+            if((provName + cityName + countryName).trim() != '' ){
+                prTitle = provName + cityName + countryName + prTitle;
+            } else {
+                prTitle = '' + prTitle;
+            }
             var $p = $("#p_product_rank");
             $p.empty();
             $p.text(prTitle);

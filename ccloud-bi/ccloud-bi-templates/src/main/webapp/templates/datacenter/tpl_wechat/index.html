@@ -4,26 +4,6 @@
         background: #fff;
     }
     
-    .location-wrapper {
-        height: 2rem;
-        line-height: 2rem;
-        width: 100%;
-        padding: .2rem .5rem;
-        color: #999;
-        font-size: .8rem;
-        position: fixed;
-        background: #fff;
-        z-index: 10;
-        border-bottom: 1px solid #f0f0f0;
-    }
-    
-    .relocation {
-        clear: both;
-        width: 20%;
-        display: inline-block;
-        cursor: pointer;
-    }
-    
     .map-wrapper {
         width: 100%;
         height: 20rem;
@@ -40,13 +20,6 @@
         font-size: .7rem;
         background: #fff;
         padding: .2rem 0;
-    }
-    
-    .stat-title {
-        text-align: center;
-        line-height: 2rem;
-        height: 2rem;
-        background: #f2f2f2;
     }
 </#macro>
 
@@ -66,8 +39,8 @@
     
     var provName = '湖北省';
     var cityName = '武汉市';
-    var countryName = null;
-    var curProvName = null;
+    var countryName = '';
+    var curProvName = '';
     
     var series = [];
     var option = null;
@@ -112,29 +85,41 @@
             provName = picker.displayValue[0];
             cityName = picker.displayValue[1];
             countryName = picker.displayValue[2];
-            provName = strKit.convertProvName(provName);
+
+            $.cookie(Utils.provCacheName, provName, { expires: 7 });
+            $.cookie(Utils.cityCacheName, cityName, { expires: 7 });
+            $.cookie(Utils.countryCacheName, countryName, { expires: 7 });
+
+            curProvName = strKit.convertProvName(provName);
             
-            mapDataUrl = '${CTPATH}/json/'+cityMap[provName]+'/'+cityMap[cityName]+'.json';
+            mapDataUrl = '${CTPATH}/json/'+cityMap[curProvName]+'/'+cityMap[cityName]+'.json';
             loadOrderData();
         }
     });
     
     $("#relocation").on('click', function() {
-        mapLocation();
+        mapLocation(true);
     });
-    
-    function mapLocation() {
+
+    function mapLocation(flg) {
         
         myChart.showLoading({
             text: '加载中...',
             effect: 'whirling'
         });
         
-        provName = $.cookie(Utils.provCacheName);
-        cityName = $.cookie(Utils.cityCacheName);
-        countryName = $.cookie(Utils.countryCacheName);
-        
-        if (provName == null || cityName == null || countryName == null) {
+        //如果点击定位清空位置信息
+        if(flg){
+            provName = '';
+            cityName = '';
+            countryName = '';
+        } else {
+            provName = $.cookie(Utils.provCacheName);
+            cityName = $.cookie(Utils.cityCacheName);
+            countryName = $.cookie(Utils.countryCacheName);
+        }
+
+        if (provName == '' || cityName == '' || countryName == '') {
         
             wx.config({
                 debug: Utils.devMode, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
@@ -179,7 +164,12 @@
                                            $.cookie(Utils.provCacheName, provName, { expires: 7 });
                                            $.cookie(Utils.cityCacheName, cityName, { expires: 7 });
                                            $.cookie(Utils.countryCacheName, countryName, { expires: 7 });
-                                           
+
+                                           curProvName = strKit.convertProvName(provName);
+
+                                           $city.text(cityName);
+                                           mapDataUrl = '${CTPATH}/json/'+cityMap[curProvName]+'/'+cityMap[cityName]+'.json';
+                                           loadOrderData();
                                        });
                                    }
                                    
@@ -188,19 +178,10 @@
                                    }, 100);
                                }
                            });
-                           
-                           $city.text(cityName);
-                           curProvName = strKit.convertProvName(provName);
-                           /*if (provName.indexOf('省') != -1) {
-                               curProvName = provName.substring(0, provName.length - 1);
-                           }*/
-                           mapDataUrl = '${CTPATH}/json/'+cityMap[curProvName]+'/'+cityMap[cityName]+'.json';
-                           loadOrderData();
                        }
                    }
                 });
             });
-    
             wx.error(function(res) {
                //console.log(JOSN.stringify(res));
             });
@@ -215,7 +196,6 @@
            loadOrderData();
         }
     }
-    
     
     function loadOrderData() {
         $.ajax({
@@ -382,16 +362,14 @@
         return res;
     };
     
+
 </#macro>
 
 <@layout>
 <section>
 
     <div class="bi-body">
-        <div class="location-wrapper">
-            <span id="location"><em id="city-name"></em> <i class="icon-chevron-down txt-color-green" id="drop-down"></i></span>
-            <div id="relocation" class="relocation fr"><i class="icon-map-marker txt-color-green"></i> 定位</div>
-        </div>
+        <#include "_inc/_location_box.html"/>
         <div class="foot-black"></div>
         <div class="map-wrapper">
             <div id="map" class="maps"></div>

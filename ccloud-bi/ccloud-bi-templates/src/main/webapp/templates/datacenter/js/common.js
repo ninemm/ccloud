@@ -90,7 +90,7 @@ function BaiduMap() {
 					$.cookie(Utils.cityCacheName, cityName, { expires: 7 });
 					$.cookie(Utils.countryCacheName, countryName, { expires: 7 });
 					
-					provName = provName.substring(0, provName.length - 1);
+					curProvName = provName.substring(0, provName.length - 1);
 					//alert(countryName);
 					//console.log(provName, cityName + '-' + countryName);
 					
@@ -103,8 +103,9 @@ function BaiduMap() {
 						mapRender(true);
 					}*/
 					if (loadOrderData) {
-						mapDataUrl = Utils.context + '/json/'+cityMap[provName]+'/'+cityMap[cityName]+'.json';
-						loadOrderData(cityName);
+						mapDataUrl = Utils.context + '/json/'+cityMap[curProvName]+'/'+cityMap[cityName]+'.json';
+						loadOrderData();
+						$city.text(cityName);
 					}
               });
 			}

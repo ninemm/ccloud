@@ -59,9 +59,9 @@
             historyUtils.back();
         });
     });
-    var provName = localStorage.provName;
-    var cityName = localStorage.cityName;
-    var countryName = localStorage.countryName;
+    var provName = $.cookie(Utils.provCacheName);
+    var cityName = $.cookie(Utils.cityCacheName);
+    var countryName = $.cookie(Utils.countryCacheName);
     var dateType = 0;
     var dealerCode = '02701002';
     var dealerName = '武昌区启光商贸有限公司';
@@ -95,11 +95,11 @@
         }).done(function(data){
 
             var drTitle = '经销商销售排行';
-            //if((provName + cityName + countryName).trim() != '' ){
-            //    drTitle = provName + cityName + countryName + drTitle;
-            //} else {
-            //    drTitle = '' + drTitle;
-            //}
+            if((provName + cityName + countryName).trim() != '' ){
+                drTitle = provName + cityName + countryName + drTitle;
+            } else {
+                drTitle = '' + drTitle;
+            }
             var $p = $("#p_dealer_rank");
             $p.empty();
             $p.text(drTitle);
