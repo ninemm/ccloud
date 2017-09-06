@@ -1,9 +1,9 @@
 <#include "_inc/_layout.html"/>
 <#macro script_import>
 
- 	<script src="${CPATH}/templates/datacenter/js/echarts.min.js"></script>
- 	<!-- <script src="${CPATH}/static/bootstrap/js/bootstrap.min.js"></script> -->
- 	<script type="text/javascript" src="${CPATH}/templates/datacenter/js/topHovertree.js"></script>
+    <script src="${CPATH}/templates/datacenter/js/echarts.min.js"></script>
+    <!-- <script src="${CPATH}/static/bootstrap/js/bootstrap.min.js"></script> -->
+    <script type="text/javascript" src="${CPATH}/templates/datacenter/js/topHovertree.js"></script>
 
 </#macro>
 <#macro css_import>
@@ -12,41 +12,41 @@
 
 </#macro>
 <#macro css>
-	.weui-cells {
-		margin-top: 0;
-		background: inherit;
-		font-size: 0.6rem;
-	}
-	table {
-		background: #fff;
-		margin-bottom: 0!important;
-	}
-	table a {
-		text-decoration: underline;
-	}
-	th {
-		vertical-align: middle!important;
-		text-align: center!important;
-	}
-	td {
-		vertical-align: middle!important;
-	}
-	tr {
-		line-height: 1.5rem;
-		height: 1.5rem;
-	}
-	.wy-header {
+    .weui-cells {
+        margin-top: 0;
+        background: inherit;
+        font-size: 0.6rem;
+    }
+    table {
+        background: #fff;
+        margin-bottom: 0!important;
+    }
+    table a {
+        text-decoration: underline;
+    }
+    th {
+        vertical-align: middle!important;
+        text-align: center!important;
+    }
+    td {
+        vertical-align: middle!important;
+    }
+    tr {
+        line-height: 1.5rem;
+        height: 1.5rem;
+    }
+    .wy-header {
         background: #f2f2f2;
         margin-top: 2.4rem;
     }
-	#seller_rank{
-		width: 100%;
-		height:4rem;
-	}
-	#customer_rank{
-		width: 100%;
-		height:8rem;
-	}
+    #seller_rank{
+        width: 100%;
+        height:4rem;
+    }
+    #customer_rank{
+        width: 100%;
+        height:8rem;
+    }
 </#macro>
 <#macro script>
     $(function() {
@@ -87,22 +87,22 @@
     
     //经销商
     function dealer(provName, cityName, countryName, dateType){
-  		$.ajax({
-  			url:"${CPATH}/sales/dealer",
-  			type:"post",
-  			data:{"provName": provName, "cityName": cityName, countryName: countryName, dateType: dateType},
-  			dataType:"json"
-  		}).done(function(data){
+        $.ajax({
+            url:"${CPATH}/sales/dealer",
+            type:"post",
+            data:{"provName": provName, "cityName": cityName, countryName: countryName, dateType: dateType},
+            dataType:"json"
+        }).done(function(data){
 
-  		    var drTitle = '经销商销售排行';
+            var drTitle = '经销商销售排行';
             //if((provName + cityName + countryName).trim() != '' ){
-			//    drTitle = provName + cityName + countryName + drTitle;
-			//} else {
-			//    drTitle = '' + drTitle;
-			//}
-			var $p = $("#p_dealer_rank");
-			$p.empty();
-			$p.text(drTitle);
+            //    drTitle = provName + cityName + countryName + drTitle;
+            //} else {
+            //    drTitle = '' + drTitle;
+            //}
+            var $p = $("#p_dealer_rank");
+            $p.empty();
+            $p.text(drTitle);
 
             var $tbody = $("#dealer_rank tbody");
             $tbody.empty();
@@ -117,23 +117,23 @@
     //直营商和产品
     function dealer_detail(provName, cityName, countryName, dateType, dealerCode, dealerName){
       $.ajax({
-  			url:"${CPATH}/sales/dealerDetail",
-  			type:"post",
-  			data:{provName: provName, cityName: cityName, countryName: countryName, dateType: dateType, dealerCode: dealerCode},
-  			dataType:"json"
-  		}).done(function(data){
-  		    //直营商
-  		    var sellerTitle = dealerName + '销售情况';
-			var $p = $("#p_seller_rank");
-			$p.empty();
-			$p.text(sellerTitle);
-  		    
+            url:"${CPATH}/sales/dealerDetail",
+            type:"post",
+            data:{provName: provName, cityName: cityName, countryName: countryName, dateType: dateType, dealerCode: dealerCode},
+            dataType:"json"
+        }).done(function(data){
+            //直营商
+            var sellerTitle = dealerName + '销售情况';
+            var $p = $("#p_seller_rank");
+            $p.empty();
+            $p.text(sellerTitle);
+            
             seller_rank(data.sellerList);
             
             var prTitle = dealerName + '产品销售排行';
-			var $p = $("#p_product_rank");
-			$p.empty();
-			$p.text(prTitle);
+            var $p = $("#p_product_rank");
+            $p.empty();
+            $p.text(prTitle);
             
             //产品
             product_rank(data.productList);
@@ -144,54 +144,54 @@
         var sellerYData = [];
         var sellerSeriesData = [];
         var seller_rank = document.getElementById('seller_rank');
- 	    var $seller_rank = $(seller_rank);
-			
-		$seller_rank.height(80);
-	    for(var i = 0; i < sellerList.length; i++){
-	        var height = $seller_rank.height();
+        var $seller_rank = $(seller_rank);
+            
+        $seller_rank.height(80);
+        for(var i = 0; i < sellerList.length; i++){
+            var height = $seller_rank.height();
             $seller_rank.height(height += 16);
-		    
+            
             sellerYData.push(sellerList[i].sellerName);
             sellerSeriesData.push(sellerList[i].totalAmount);
-	    }
+        }
 
 
         var sellerRankChart = echarts.init(seller_rank);
-		var option = {
-		    color: ['#4ac7f5'],
-		    grid: {
+        var option = {
+            color: ['#4ac7f5'],
+            grid: {
                    left: '2%',
                    right: '15%',
                    bottom: 15,
                    top: 15,
                    containLabel: true
-		    },
-		    calculable : true,
-		    xAxis : {
-		        show : false,
-		        name : '金额/万元',
+            },
+            calculable : true,
+            xAxis : {
+                show : false,
+                name : '金额/万元',
                 type : 'value',
-	            boundaryGap: [0, 0.01]
-		    },
-		    yAxis : {
-	            type : 'category',
-	            data : sellerYData.reverse(),
-	            axisLabel : {
-	                interval : 0,
-	                fontSize : 8
+                boundaryGap: [0, 0.01]
+            },
+            yAxis : {
+                type : 'category',
+                data : sellerYData.reverse(),
+                axisLabel : {
+                    interval : 0,
+                    fontSize : 8
                    }
-		    },
-		    series : {
-	            type:'bar',
-	            barWidth:15,
-	            data:sellerSeriesData.reverse(),
-	            label:{
+            },
+            series : {
+                type:'bar',
+                barWidth:15,
+                data:sellerSeriesData.reverse(),
+                label:{
                     normal:{
                            show:true,
                            position:'right',
                            formatter: '{c}万元'
                     }
-	            }
+                }
                }
           };
           sellerRankChart.resize();
@@ -215,51 +215,51 @@
 <@layout>
 <section>
     <div class="bi-body">
-   	   	<#include "_inc/_search_box.html"/>
-   	   	<header class="wy-header">
-		    <div id="goback" class="wy-header-icon-back"><span></span></div>
-		    <div id="p_dealer_rank" class="wy-header-title"></div>
-		</header>
-   		<div class="weui-cells weui-cells_form">
-   			<div class="weui-cell" style="padding: 0">
-   		        <table class="table table-striped table-bordered" id="dealer_rank">
-	   		        <tbody>
-	   		        	<tr>
-		        			<th>
-		        				经销商
-		        			</th>
-		        			<th>
-		        				金额(万元)
-		        			</th>
-	   		        	</tr>
-	   		        </tbody>
-   		        </table>
-   	        </div>
-   	   	</div>
-   	   	<p class="title" id="p_seller_rank"></p>
+        <#include "_inc/_search_box.html"/>
+        <header class="wy-header">
+            <div id="goback" class="wy-header-icon-back"><span></span></div>
+            <div id="p_dealer_rank" class="wy-header-title"></div>
+        </header>
+        <div class="weui-cells weui-cells_form">
+            <div class="weui-cell" style="padding: 0">
+                <table class="table table-striped table-bordered" id="dealer_rank">
+                    <tbody>
+                        <tr>
+                            <th>
+                                经销商
+                            </th>
+                            <th>
+                                金额(万元)
+                            </th>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <p class="title" id="p_seller_rank"></p>
         <div id="seller_rank">
         </div>
         <p class="title" id="p_product_rank"></p>
-   		<div class="weui-cells weui-cells_form">
-   			<div class="weui-cell" style="padding: 0">
-   		        <table class="table table-striped table-bordered" id="product_rank">
-	   		        <tbody>
-	   		        	<tr>
-		        			<th>
-		        				经销商
-		        			</th>
-		        			<th>
-		        				数量(件)
-		        			</th>
-		        			<th>
-		        				金额(万元)
-		        			</th>
-	   		        	</tr>
-	   		        </tbody>
-   		        </table>
-   	        </div>
-   	   	</div>
-	</div>
+        <div class="weui-cells weui-cells_form">
+            <div class="weui-cell" style="padding: 0">
+                <table class="table table-striped table-bordered" id="product_rank">
+                    <tbody>
+                        <tr>
+                            <th>
+                                经销商
+                            </th>
+                            <th>
+                                数量(件)
+                            </th>
+                            <th>
+                                金额(万元)
+                            </th>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </section>
 <#include "_inc/_nav_box.html"/>
 <span id="gotop" title="返回顶部"><i class="icon-arrow-up2"></i></div>

@@ -1,6 +1,6 @@
 <#include "_inc/_layout.html"/>
 <#macro script_import>
- 	<script type="text/javascript" src="${CPATH}/templates/datacenter/js/echarts.min.js"></script>
+    <script type="text/javascript" src="${CPATH}/templates/datacenter/js/echarts.min.js"></script>
     <script type="text/javascript" src="${CTPATH}/json/china-city-map.js"></script>
     <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=su3AmHLUcBprpnOLmVHo7r8AljbW8X6t"></script>
     <script type="text/javascript" src="${CPATH}/templates/datacenter/js/topHovertree.js"></script>
@@ -58,7 +58,7 @@
        transition: .3s all linear;
      }
      th {
-     	text-align: center;
+        text-align: center;
      }
      
     .pro-title {
@@ -77,10 +77,12 @@
 </#macro>
 <#macro script>
     
+    var strKit = new StrKit();
+    
     var $dateTitle = $('#date-title');
-    var provName = localStorage.provName;
-    var cityName = localStorage.cityName;
-    var countryName = localStorage.countryName;
+    var provName = $.cookie(Utils.provCacheName);
+    var cityName = $.cookie(Utils.cityCacheName);
+    var countryName = $.cookie(Utils.countryCacheName);
     var curProvTitle = null;
     
     var dateType = 0;// 日期搜索按钮类型
@@ -91,22 +93,21 @@
     var color = ['#a6c84c', '#ffa022', '#46bee9'];
     
     $(function() {
-	
-	    if (provName == null || cityName == null || countryName == null) {
-	        var baiduMap = new BaiduMap();
-	        baiduMap.getLocation();
-	    }
-	    
-	    provName = localStorage.provName;
-	    cityName = localStorage.cityName;
-	    countryName = localStorage.countryName;
-	    
-	    curProvTitle = provName.substring(0, provName.length - 1);
-	    
-	    if(countryName.length != 0) {
+    
+        /*if (provName == null || cityName == null || countryName == null) {
+            var baiduMap = new BaiduMap();
+            baiduMap.getLocation();
+        }*/
+        
+        //provName = localStorage.provName;
+        //cityName = localStorage.cityName;
+        //countryName = localStorage.countryName;
+        curProvTitle = strKit.convertProvName(provName);
+        
+        if(countryName.length != 0) {
             renderCityMap({"name": cityName}, curProvTitle);
             //provName = provName + "省";
-        } else if(cityName.length !=0){
+        } else if(cityName.length != 0){
             renderProvMap({"name": curProvTitle}, true);
         } else {
             renderChinaMap(true);
@@ -118,7 +119,7 @@
             $a.addClass("active-date");
         });
 
-      	var ITEM_ON = "weui-bar__item--on";
+        var ITEM_ON = "weui-bar__item--on";
 
         var showTab = function(tabId) {
             var $tabItem = $(tabId);
@@ -165,7 +166,7 @@
     function goBackChinaMap() {
 
         $('#prov').css('visibility','hidden');
-    	$('#city').css('visibility','hidden');
+        $('#city').css('visibility','hidden');
         
         renderChinaMap(true);
       
@@ -182,14 +183,14 @@
         
         cityName = '';
         countryName = '';
-
-        provName = provName.substring(0, provName.length - 1);
+        
+        provName = strKit.convertProvName(provName);
         renderProvMap({"name": provName}, true);
-  		$('#city').css('visibility','hidden');
-  	  
+        $('#city').css('visibility','hidden');
+      
         initData(provName, cityName, countryName, dateType);
         refreshStockData(provName, cityName, countryName);
-  	}
+    }
 
     //做时间的切换选择
     function setDateType(type) {
@@ -201,7 +202,7 @@
         if (document.getElementById('china_map').style.display == 'block') 
             renderChinaMap(false);
         if (document.getElementById('prov_map').style.display == 'block') 
-            renderProvMap({"name": provName.substring(0, provName.length - 1)}, false);
+            renderProvMap({"name": strKit.convertProvName(provName)}, false);
         if (document.getElementById('city_map').style.display == 'block') 
             renderCityMap({"name": cityName}, provName.substring(0, provName.length - 1));
         
@@ -229,83 +230,93 @@
         }
         
         $.ajax({
-	        url:"${CPATH}/sales/queryMapData",
-	        type:"post",
-	        data:{"provName": provName, "cityName": '', countryName: '', dateType: dateType},
-	        dataType:"json"
+            url:"${CPATH}/sales/queryMapData",
+            type:"post",
+            data:{"provName": provName, "cityName": '', countryName: '', dateType: dateType},
+            dataType:"json"
         }).done(function(data) {
             city_data = [];
             for(var i = 0; i < data.length; i++) {
-	            city_data.push({"name": data[i].cityName, "value": data[i].totalAmount});
-	            if(data[i].totalAmount > maxData) maxData = data[i].totalAmount;
-	        }
-	        
-            setTimeout(function () {
-                $('#prov_view').text(result.name);
-                $('#prov').css('visibility','visible');
-
-                if (isRender) {
-                    $('#china_map').css('display','none');
-                    $('#city_map').css('display','none');
-                    $('#prov_map').css('display','block');
-                }
-            }, 500);
+                city_data.push({"name": data[i].cityName, "value": data[i].totalAmount});
+                if(data[i].totalAmount > maxData) maxData = data[i].totalAmount;
+            }
             
+            //setTimeout(function () {
+            $('#prov_view').text(result.name);
+            $('#prov').css('visibility', 'visible');
+
+            if (isRender) {
+                $('#china_map').css('display','none');
+                $('#prov_map').css('display','block');
+                $('#city_map').css('display','none');
+            }
+            //}, 500);
+            
+            var _provMap = document.getElementById('prov_map');
+            var provChart = echarts.init(_provMap);
+            $(_provMap).width(400);
             // 选择省的单击事件
             var selectProv = result.name.toString();
+            
+            provChart.showLoading({
+                text: '加载中...',
+                effect: 'whirling'
+            });
+            
             // 从json获取地图数据
-            $.get('${CTPATH}/json/' + cityMap[selectProv] + '/'+cityMap[selectProv] + '.json', function (Citymap) {
-                echarts.registerMap(selectProv, Citymap);
-                var myChartProv = echarts.init(document.getElementById('prov_map'));
-                $(document.getElementById('prov_map')).width(400);
-                myChartProv.resize();
-                myChartProv.setOption({
-	                tooltip: {
-	                    trigger: 'item',
-	                    textStyle: {fontSize: 9},
-	                    formatter: function loadData(result){
-	                        if(isNaN(result.value)) return result.name + '<br />总金额: 0';
-	                        else return result.name+'<br />总金额:'+result.value + '万元';
-	                    }
-	                },
-	                visualMap:{
-	                    min: 0,
-	                    max: maxData+1,
-	                    splitNumber: 0,
-	                    text: ['高','低'],
-	                    realtime: false,
-	                    selectedMode: false,
-	                    realtime: false,
-	                    show: true,
-	                    itemWidth: 20,
-	                    itemHeight: 120
-	                },
-	                series: [{
-		                type: 'map',
-		                map: selectProv,                  // 要和echarts.registerMap（）中第一个参数一致
-		                roam: true,
-		                scaleLimit: { min: 1, max: 4 },   // 缩放
-		                mapLocation:{
-		                    y:60
-		                },
-		                itemSytle:{
-		                    emphasis:{label:{show:false}}
-		                },
-		                label: {
-			                normal: {
-			                    show: true
-			                },
-			                emphasis: {
-			                    show: true
-			                }
-		                },
-		                data : city_data.reverse()
-	                }]
-	            });
-	            
-	            myChartProv.on('click', function(rel){
-	                renderCityMap(rel, selectProv);
-	            });
+            $.get('${CTPATH}/json/' + cityMap[selectProv] + '/'+cityMap[selectProv] + '.json', function (data) {
+                echarts.registerMap(selectProv, data);
+                
+                provChart.hideLoading();
+                provChart.resize();
+                
+                provChart.setOption({
+                    tooltip: {
+                        trigger: 'item',
+                        textStyle: {fontSize: 9},
+                        formatter: function loadData(result){
+                            if(isNaN(result.value)) return result.name + '<br />总金额: 0';
+                            else return result.name+'<br />总金额:'+result.value + '万元';
+                        }
+                    },
+                    visualMap:{
+                        min: 0,
+                        max: maxData+1,
+                        splitNumber: 0,
+                        text: ['高','低'],
+                        realtime: false,
+                        selectedMode: false,
+                        realtime: false,
+                        show: true,
+                        itemWidth: 20,
+                        itemHeight: 120
+                    },
+                    series: [{
+                        type: 'map',
+                        map: selectProv,                  // 要和echarts.registerMap（）中第一个参数一致
+                        roam: true,
+                        scaleLimit: { min: 1, max: 4 },   // 缩放
+                        mapLocation:{
+                            y:60
+                        },
+                        itemSytle:{
+                            emphasis:{label:{show:false}}
+                        },
+                        label: {
+                            normal: {
+                                show: true
+                            },
+                            emphasis: {
+                                show: true
+                            }
+                        },
+                        data : city_data.reverse()
+                    }]
+                });
+                
+                provChart.on('click', function(rel){
+                    renderCityMap(rel, selectProv);
+                });
             });
         });
         
@@ -318,28 +329,28 @@
         var maxData = 0;
         cityName = rel.name;
         $.ajax({
-	        url:"${CPATH}/sales/queryMapData",
-	        type:"post",
-	        data:{"provName": provName, "cityName": cityName, countryName: '', dateType: dateType},
-	        dataType:"json"
+            url:"${CPATH}/sales/queryMapData",
+            type:"post",
+            data:{"provName": provName, "cityName": cityName, countryName: '', dateType: dateType},
+            dataType:"json"
         }).done(function(data) {
             country_data = [];
             for(var i = 0; i < data.length; i++)
-	        {
-	            country_data.push({"name": data[i].countryName, "value": data[i].totalAmount});
-	            if (data[i].totalAmount > maxData) maxData = data[i].totalAmount;
-	        }
-	        
+            {
+                country_data.push({"name": data[i].countryName, "value": data[i].totalAmount});
+                if (data[i].totalAmount > maxData) maxData = data[i].totalAmount;
+            }
+            
             setTimeout(function () {
-	            function contains(arr, obj) {
-		            var i = arr.length;
-		            while (i--) {
-		                if (arr[i] === obj) {
-		                    return true;
-		                }
-		            }
-		            return false;
-	            }
+                function contains(arr, obj) {
+                    var i = arr.length;
+                    while (i--) {
+                        if (arr[i] === obj) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
                 
                 var arr = new Array('北京','上海','天津','台湾','重庆');
                 
@@ -355,9 +366,9 @@
                     $('#city_map').css('display','block');
                     
                 } else {
-	                $('#china_map').css('display','none');
-	                $('#prov_map').css('display','block');
-	                $('#city_map').css('display','none');
+                    $('#china_map').css('display','none');
+                    $('#prov_map').css('display','block');
+                    $('#city_map').css('display','none');
                 }
             }, 500);
         
@@ -372,60 +383,71 @@
         refreshStockData(provName, cityName, countryName);
     }
 
+    // 城市地图(市)
     function countryMapRender(selectProv, selectCity, maxData) {
-        $.get('${CTPATH}/json/'+cityMap[selectProv]+'/'+cityMap[selectCity]+'.json', function (Citymap) {
-	        echarts.registerMap(selectCity, Citymap);
-	        var myChartCity = echarts.init(document.getElementById('city_map'));
-	        $(document.getElementById('city_map')).width(400);
-	        myChartCity.resize();
-	        myChartCity.setOption({
+        var _cityMap = document.getElementById('city_map');
+        var cityChart = echarts.init(_cityMap);
+        $(_cityMap).width(400);
+        
+        cityChart.showLoading({
+            text: '加载中...',
+            effect: 'whirling'
+        });
+    
+        $.get('${CTPATH}/json/'+cityMap[selectProv]+'/'+cityMap[selectCity]+'.json', function (data) {
+            
+            echarts.registerMap(selectCity, data);
+            cityChart.hideLoading();
+            cityChart.resize();
+            
+            cityChart.setOption({
                 tooltip: {
-	                trigger: 'item',
-		            textStyle: {fontSize: 9},
-		            formatter: function loadData(result) {
-	                    if(isNaN(result.value)) return result.name + '<br />总金额: 0';
-	                    else return result.name+'<br />总金额:'+result.value + '万元';
-	                }
-	            },
-	            visualMap:{
-		            min: 0,
-		            max: maxData+1,
-		            splitNumber: 0,
-		            text: ['高','低'],
-		            realtime: false,
-		            selectedMode: false,
-		            realtime: false,
-		            show: true,
-		            itemWidth: 20,
-		            itemHeight: 120
-	            },
-	            series: [{
-		            type: 'map',
-		            map: selectCity ,//要和echarts.registerMap（）中第一个参数一致
-		            roam: true,
-		            scaleLimit: { min: 1, max: 4 },//缩放
-		            mapLocation: {
-		               y:60
-		            },
-		            itemSytle: {
-		               emphasis: {label: {show: false} }
-		            },
-		            label: {
-		               normal: {
-		                   show: true
-		               },
-		               emphasis: {
-		                   show: true
-		               }
-		            },
-		            data: country_data.reverse()
-	            }]
+                    trigger: 'item',
+                    textStyle: {fontSize: 9},
+                    formatter: function loadData(result) {
+                        if(isNaN(result.value)) return result.name + '<br />总金额: 0';
+                        else return result.name+'<br />总金额:'+result.value + '万元';
+                    }
+                },
+                visualMap:{
+                    min: 0,
+                    max: maxData+1,
+                    splitNumber: 0,
+                    text: ['高','低'],
+                    realtime: false,
+                    selectedMode: false,
+                    realtime: false,
+                    show: true,
+                    itemWidth: 20,
+                    itemHeight: 120
+                },
+                series: [{
+                    type: 'map',
+                    map: selectCity ,//要和echarts.registerMap（）中第一个参数一致
+                    roam: true,
+                    scaleLimit: { min: 1, max: 4 },//缩放
+                    mapLocation: {
+                       y:60
+                    },
+                    itemSytle: {
+                       emphasis: {label: {show: false} }
+                    },
+                    label: {
+                       normal: {
+                           show: true
+                       },
+                       emphasis: {
+                           show: true
+                       }
+                    },
+                    data: country_data.reverse()
+                }]
             });
             
-            myChartCity.on('click', function(rel) {
+            /*cityChart.on('click', function(rel) {
                 setTimeout(function () {
                 }, 500);
-            });
+            });*/
         });
     }
     
@@ -436,9 +458,9 @@
         
         $.ajax({
             url: "${CPATH}/sales/queryMapData",
-	        type: "post",
-	        data: {dateType: dateType},
-	        dataType:"json"
+            type: "post",
+            data: {dateType: dateType},
+            dataType:"json"
         }).done(function(data) {
             prov_data = [];
             for(var i = 0; i < data.length; i++) {
@@ -452,19 +474,25 @@
             }
             
             if (isRender) {
-                setTimeout(function () {
+                //setTimeout(function () {
                     $('#china_map').css('display','block');
                     $('#city_map').css('display','none');
                     $('#prov_map').css('display','none');
-                }, 100);
+                //}, 100);
             }
-	        
-            $.get('${CTPATH}/json/china.json', function (mapJson) {
             
+            var _chinaMap = document.getElementById('china_map');
+            $(_chinaMap).width(400);
+            var chart = echarts.init(_chinaMap);                     // 在id为china_map的dom元素中显示地图
+            chart.showLoading({
+                text: '加载中...',
+                effect: 'whirling'
+            });
+            
+            $.get('${CTPATH}/json/china.json', function (mapJson) {
+                
                 echarts.registerMap('china', mapJson);
-                var chinaMap = document.getElementById('china_map');
-                $(chinaMap).width(400);
-                var chart = echarts.init(chinaMap);//在id为mainMap的dom元素中显示地图
+                chart.hideLoading();
                 chart.resize();
                 
                 chart.setOption({
@@ -475,44 +503,44 @@
                             if(isNaN(result.value)) 
                                 return result.name + '<br />总金额: 0';
                             else 
-                                return result.name+'<br />总金额:'+result.value + '万元';
+                                return result.name + '<br />总金额:' + result.value + '万元';
                         }
                     },
                     visualMap: {
                         min: 0,
-		                max: maxData + 1,
-		                splitNumber: 0,
-		                text: ['高','低'],
-		                realtime: false,
-		                selectedMode: false,
-		                realtime: false,
-		                show: true,
-		                itemWidth: 20,
-		                itemHeight: 120
+                        max: maxData + 1,
+                        splitNumber: 0,
+                        text: ['高','低'],
+                        realtime: false,
+                        selectedMode: false,
+                        realtime: false,
+                        show: true,
+                        itemWidth: 20,
+                        itemHeight: 120
                     },
                     series: [{
-		                type: 'map',
-		                map: 'china',//要和echarts.registerMap（）中第一个参数一致
-		                roam: true,
-		                scaleLimit: { min: 1, max: 4},//缩放
-		                mapLocation:{
-		                    y:60
-		                },
-		                itemSytle: {
-		                    emphasis: {label: {show: false}}
-		                },
-		                label: {
-			                normal: {
-			                    show: true,
-			                    textStyle: {fontSize: 9},
-			                },
-			                emphasis: {
-			                    show: true,
-			                    textStyle: {fontSize: 9},
-			                }
-		                },
-		                data: prov_data.reverse()
-		            }]
+                        type: 'map',
+                        map: 'china',                   // 要和echarts.registerMap（）中第一个参数一致
+                        roam: true,
+                        scaleLimit: { min: 1, max: 4},  // 缩放
+                        mapLocation:{
+                            y:60
+                        },
+                        itemSytle: {
+                            emphasis: {label: {show: false}}
+                        },
+                        label: {
+                            normal: {
+                                show: true,
+                                textStyle: {fontSize: 9},
+                            },
+                            emphasis: {
+                                show: true,
+                                textStyle: {fontSize: 9},
+                            }
+                        },
+                        data: prov_data.reverse()
+                    }]
                 });
 
                 chart.on('click', function(result) {
@@ -526,137 +554,137 @@
 
     // 客户
     function customer_rank(provName, cityName, countryName, dateType) {
-	    countryName = '';
-	    $.ajax({
-			url:"${CPATH}/sales/customerType",
-			type:"post",
-			data:{"provName": provName, "cityName": cityName, countryName: countryName, dateType: dateType},
-			dataType:"json"
-		}).done(function(data){
+        countryName = '';
+        $.ajax({
+            url:"${CPATH}/sales/customerType",
+            type:"post",
+            data:{"provName": provName, "cityName": cityName, countryName: countryName, dateType: dateType},
+            dataType:"json"
+        }).done(function(data){
 
-			var crSeriesData = [];
-			var length = data.length > 5 ? 5 : data.length;
+            var crSeriesData = [];
+            var length = data.length > 5 ? 5 : data.length;
 
-		    for(var i = 0; i < length; i++){
+            for(var i = 0; i < length; i++){
                 crSeriesData.push({
                     name: data[i].customerTypeName + '(' + data[i].totalAmount + ')',
                     value: data[i].totalAmount
                 });
-		    }
+            }
             var crTitle = '客户销售统计排行Top5(金额/万元)';
             if((provName + cityName + countryName).trim() != '' ){
-			    crTitle = provName + cityName + countryName + crTitle;
-			} else {
-			    crTitle = '全国' + crTitle
-			}
+                crTitle = provName + cityName + countryName + crTitle;
+            } else {
+                crTitle = '全国' + crTitle
+            }
 
-			var customer_rank = document.getElementById('customer_rank');
-			//var $customer_rank = $(customer_rank);
+            var customer_rank = document.getElementById('customer_rank');
+            //var $customer_rank = $(customer_rank);
 
-			var customerRankChart = echarts.init(customer_rank);
-			var crOption = {
-			    title: [{
-			        text: crTitle,
-			        textStyle: {
-			            fontWeight: 'normal',
-			            fontSize: 16
-			        }
-			    }],
-			    color: ['#4ac7f5', '#f36f8a', '#fd9173', '#AF89D6', '#5f71d2'],
-			    series: [
-			        {
-			            name:crTitle,
-			            type:'pie',
-			            radius: ['25%', '45%'],
-			            center: ['50%', '60%'],
-			            avoidLabelOverlap: false,
-			            label: {
-			                normal: {
-			                    textStyle: {
-			                        fontSize: 10
-			                    }
-			                }
-			            },
-			            data:crSeriesData
-			        }
-			    ]
-			};
-			customerRankChart.resize();
-			customerRankChart.setOption(crOption,true);
-			customerRankChart.on('click', customerClick);
-		});
-	}
-	function customerClick(param) {
-	    countryName = '';
+            var customerRankChart = echarts.init(customer_rank);
+            var crOption = {
+                title: [{
+                    text: crTitle,
+                    textStyle: {
+                        fontWeight: 'normal',
+                        fontSize: 16
+                    }
+                }],
+                color: ['#4ac7f5', '#f36f8a', '#fd9173', '#AF89D6', '#5f71d2'],
+                series: [
+                    {
+                        name:crTitle,
+                        type:'pie',
+                        radius: ['25%', '45%'],
+                        center: ['50%', '60%'],
+                        avoidLabelOverlap: false,
+                        label: {
+                            normal: {
+                                textStyle: {
+                                    fontSize: 10
+                                }
+                            }
+                        },
+                        data:crSeriesData
+                    }
+                ]
+            };
+            customerRankChart.resize();
+            customerRankChart.setOption(crOption,true);
+            customerRankChart.on('click', customerClick);
+        });
+    }
+    function customerClick(param) {
+        countryName = '';
         post('${CPATH}/sales/productByCustomerTypeList', {"provName" : provName, "cityName" : cityName, "countryName" : countryName, "dateType" : dateType});
-	}
+    }
 
     //区域
     function area_rank(provName, cityName, countryName, dateType){
         countryName = '';
         $.ajax({
-  			url:"${CPATH}/sales/area",
-  			type:"post",
-  			data:{"provName": provName, "cityName": cityName, countryName: countryName, dateType: dateType},
-  			dataType:"json"
-  		}).done(function(data){
+            url:"${CPATH}/sales/area",
+            type:"post",
+            data:{"provName": provName, "cityName": cityName, countryName: countryName, dateType: dateType},
+            dataType:"json"
+        }).done(function(data){
             var areaYData = [];
             var areaSeriesData = [];
-		    var length = data.length > 5 ? 5 : data.length;
+            var length = data.length > 5 ? 5 : data.length;
 
-		    for(var i = 0; i < length; i++){
+            for(var i = 0; i < length; i++){
                 areaYData.push(data[i][0]) ;
                 areaSeriesData.push(data[i][1]);
-		    }
+            }
 
-		    var areaTitle = '区域销售统计Top5(金额/万元)';
-		    if((provName + cityName + countryName).trim() != '' ){
-			    areaTitle = provName + cityName + countryName + areaTitle;
-			} else {
-			    areaTitle = '全国' + areaTitle
-			}
+            var areaTitle = '区域销售统计Top5(金额/万元)';
+            if((provName + cityName + countryName).trim() != '' ){
+                areaTitle = provName + cityName + countryName + areaTitle;
+            } else {
+                areaTitle = '全国' + areaTitle
+            }
 
             var area_rank = document.getElementById('area_rank');
-			var $area_rank = $(area_rank);
+            var $area_rank = $(area_rank);
 
             var areaRankChart = echarts.init(area_rank);
-			var option = {
-			    title: [{
+            var option = {
+                title: [{
                     text: areaTitle,
                     textStyle: {
                         fontWeight: 'normal',
                         fontSize: 16
-			        }
-			    }],
-			    color: ['#4ac7f5'],
-			    grid: {
+                    }
+                }],
+                color: ['#4ac7f5'],
+                grid: {
                     left: '2%',
                     right: '15%',
                     bottom: 15,
                     top: 60,
                     containLabel: true
-			    },
-			    calculable : true,
-			    xAxis : [{
-			        show : false,
-			        name : '金额/万元',
-	                type : 'value',
-		            boundaryGap: [0, 0.01]
-			    }],
-			    yAxis : [{
-		            type : 'category',
-		            data : areaYData.reverse()
-			    }],
-			    series : [{
-		            type: 'bar',
-		            barWidth: 20,
-		            data: areaSeriesData.reverse(),
-		            label: {
-	                    normal: {
+                },
+                calculable : true,
+                xAxis : [{
+                    show : false,
+                    name : '金额/万元',
+                    type : 'value',
+                    boundaryGap: [0, 0.01]
+                }],
+                yAxis : [{
+                    type : 'category',
+                    data : areaYData.reverse()
+                }],
+                series : [{
+                    type: 'bar',
+                    barWidth: 20,
+                    data: areaSeriesData.reverse(),
+                    label: {
+                        normal: {
                             show: true,
                             position: 'right'
-	                    }
-		            }
+                        }
+                    }
                 }]
            };
            
@@ -668,29 +696,29 @@
     
     function areaClick(param) {
         countryName = '';
-	    post('${CPATH}/sales/productByAreaList', {"provName" : provName, "cityName" : cityName, "countryName" : countryName, "dateType" : dateType});
-	}
-	
+        post('${CPATH}/sales/productByAreaList', {"provName" : provName, "cityName" : cityName, "countryName" : countryName, "dateType" : dateType});
+    }
+    
     var $prTR;
     //产品
     function product_rank(provName, cityName, countryName, dateType){
         countryName = '';
-  		$.ajax({
-  			url:"${CPATH}/sales/product",
-  			type:"post",
-  			data:{"provName": provName, "cityName": cityName, countryName: countryName, dateType: dateType},
-  			dataType:"json"
-  		}).done(function(data){
+        $.ajax({
+            url:"${CPATH}/sales/product",
+            type:"post",
+            data:{"provName": provName, "cityName": cityName, countryName: countryName, dateType: dateType},
+            dataType:"json"
+        }).done(function(data){
 
-  		    var prTitle = '产品销售排行Top5';
+            var prTitle = '产品销售排行Top5';
             if((provName + cityName + countryName).trim() != '' ){
-			    prTitle = provName + cityName + countryName + prTitle;
-			} else {
-			    prTitle = '全国' + prTitle
-			}
-			var $thead = $("#product_rank thead th");
-			$thead.empty();
-			$thead.text(prTitle);
+                prTitle = provName + cityName + countryName + prTitle;
+            } else {
+                prTitle = '全国' + prTitle
+            }
+            var $thead = $("#product_rank thead th");
+            $thead.empty();
+            $thead.text(prTitle);
 
             var $tbody = $("#product_rank tbody");
             $tbody.empty();
@@ -728,33 +756,33 @@
     });
 
     var $sTR;
-	//库存
+    //库存
     function stock_rank(provName, cityName, countryName){
         countryName = '';
         $.ajax({
-	        url:"${CPATH}/stock/area",
-			type:"post",
-			data:{"provName": provName, "cityName": cityName, countryName: countryName},
-			dataType:"json"
-		}).done(function(data){
-		  	var srTitle = '库存情况';
+            url:"${CPATH}/stock/area",
+            type:"post",
+            data:{"provName": provName, "cityName": cityName, countryName: countryName},
+            dataType:"json"
+        }).done(function(data){
+            var srTitle = '库存情况';
             if((provName + cityName + countryName).trim() != '' ){
-			    srTitle = provName + cityName + countryName + srTitle;
-			} else {
-			    srTitle = '全国' + srTitle
-			}
-			
-			var $thead = $("#stock_rank thead th");
-			$thead.empty();
-			$thead.text(srTitle);
+                srTitle = provName + cityName + countryName + srTitle;
+            } else {
+                srTitle = '全国' + srTitle
+            }
+            
+            var $thead = $("#stock_rank thead th");
+            $thead.empty();
+            $thead.text(srTitle);
 
             var $tbody = $("#stock_rank tbody");
             $tbody.empty();
-	        $tbody.append("<tr><th>产品</th><th>数量(件)</th></tr>");
-	        for(var i = 0; i < data.length; i++){
+            $tbody.append("<tr><th>产品</th><th>数量(件)</th></tr>");
+            for(var i = 0; i < data.length; i++){
                 $tbody.append('<tr><td>' + data[i].cInvName + '</td><td class="t-r">' + data[i].totalNum + '</td></tr>');
-	        }
-	        $sTR = $("#stock_rank tbody tr:gt(5)");
+            }
+            $sTR = $("#stock_rank tbody tr:gt(5)");
             if($sTR.length > 0){
                 $sTR.hide();
                 $("#sTrOpen").show();
@@ -785,40 +813,40 @@
     //库存趋势
     function stock(name, tn, cInvCode, provName, cityName, countryName, color){
         countryName = '';
-		$.ajax({
-			url:"${CPATH}/stock/date",
-			type:"post",
-			data:{"provName": provName, "cityName": cityName, countryName: countryName, cInvCode: cInvCode},
-			dataType:"json"
-		}).done(function(data){
+        $.ajax({
+            url:"${CPATH}/stock/date",
+            type:"post",
+            data:{"provName": provName, "cityName": cityName, countryName: countryName, cInvCode: cInvCode},
+            dataType:"json"
+        }).done(function(data){
 
-			var sTitle = '库存趋势';
+            var sTitle = '库存趋势';
             if((provName + cityName + countryName).trim() != '' ){
-			    sTitle = provName + cityName + countryName + sTitle;
-			} else {
-			    sTitle = '全国' + sTitle
-			}
-			
-			var $title = $(".title");
-			$title.empty();
-			$title.text(sTitle);
+                sTitle = provName + cityName + countryName + sTitle;
+            } else {
+                sTitle = '全国' + sTitle
+            }
+            
+            var $title = $(".title");
+            $title.empty();
+            $title.text(sTitle);
 
             var xData = [];
-			var seriesData = [];
-		    var length = data.length > 5 ? 5 : data.length;
+            var seriesData = [];
+            var length = data.length > 5 ? 5 : data.length;
 
-		    for(var i = 0; i < data.length; i++){
+            for(var i = 0; i < data.length; i++){
                 xData.push(data[i].idate) ;
                 seriesData.push(data[i].totalNum);
             }
 
-			var title = tn + '库存趋势(单位/件)';
+            var title = tn + '库存趋势(单位/件)';
 
-			var stock = document.getElementById('stock'+'_'+name);
-			//var $stock = $(stock);
+            var stock = document.getElementById('stock'+'_'+name);
+            //var $stock = $(stock);
 
-			var stockChart = echarts.init(stock);
-			var option = {
+            var stockChart = echarts.init(stock);
+            var option = {
                 title: {
                     left: 'center',
                     top: 'top',
@@ -866,47 +894,47 @@
                 }]
             };
             stockChart.resize();
-			stockChart.setOption(option, true);
-		});
+            stockChart.setOption(option, true);
+        });
     }
     
     //共通post
     function post(URL, PARAMS)
-	{ 
-		var temp = document.createElement("form"); 
-		temp.action = URL; 
-		temp.method = "post"; 
-		temp.style.display = "none"; 
-		for (var x in PARAMS)
-		{ 
-			var opt = document.createElement("textarea"); 
-			opt.name = x; 
-			opt.value = PARAMS[x]; 
-			temp.appendChild(opt); 
-		} 
-		document.body.appendChild(temp); 
-		temp.submit(); 
-		return temp; 
-	}
-	
-	// 更新库存数据
-	function refreshStockData(provName, cityName, countryName) {
-	
+    { 
+        var temp = document.createElement("form"); 
+        temp.action = URL; 
+        temp.method = "post"; 
+        temp.style.display = "none"; 
+        for (var x in PARAMS)
+        { 
+            var opt = document.createElement("textarea"); 
+            opt.name = x; 
+            opt.value = PARAMS[x]; 
+            temp.appendChild(opt); 
+        } 
+        document.body.appendChild(temp); 
+        temp.submit(); 
+        return temp; 
+    }
+    
+    // 更新库存数据
+    function refreshStockData(provName, cityName, countryName) {
+    
         stock_rank(provName, cityName, countryName);
         stock(125, "125ml35度中国劲酒", "za000053", provName, cityName, countryName, color[0]);
         stock(258, "258ml35度中国劲酒", "zzgj2715", provName, cityName, countryName, color[1]);
         stock(520, "520ml35度中国劲酒", "zzgj1012", provName, cityName, countryName, color[2]);
         
-	}
-	
-	function initData(provName, cityName, countryName, dateType) {
+    }
+    
+    function initData(provName, cityName, countryName, dateType) {
         // 客户类型
         customer_rank(provName, cityName, countryName, dateType);
         // 客户区域
         area_rank(provName, cityName, countryName, dateType);
         // 产品
         product_rank(provName, cityName, countryName, dateType);
-	}
+    }
     
 </#macro>
 <@layout>
@@ -918,9 +946,9 @@
         
         <div class="map">
             <header class="wy-header">
-			    <div id="goback" class="wy-header-icon-back"><span></span></div>
-			    <div id="date-title" class="wy-header-title"></div>
-			</header>
+                <div id="goback" class="wy-header-icon-back"><span></span></div>
+                <div id="date-title" class="wy-header-title"></div>
+            </header>
             <div class="map-nav">
                 <span id="china" style="visibility:visible;"> <a href="javascript:void(0);" onclick="goBackChinaMap()"> 全国</a></span>
                 <span id="prov" style="visibility:hidden;"> > <a href="javascript:void(0);" onclick="goBackProvMap()" id="prov_view"></a></span>

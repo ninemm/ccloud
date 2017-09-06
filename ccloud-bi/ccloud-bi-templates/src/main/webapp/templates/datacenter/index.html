@@ -14,6 +14,7 @@
         position: fixed;
         background: #fff;
         z-index: 10;
+        border-bottom: 1px solid #f0f0f0;
     }
     
     .relocation {
@@ -75,120 +76,148 @@
     
     var mapDataUrl = '';
     
-    var baiduMap = new BaiduMap();
-    var strKit = new StrKit();
-    
     var $map = document.getElementById("map");
     var myChart = echarts.init($map);
     
-    /*layer.open({
-        type: 2,
-        content: '加载中'
-    });*/
+    var strKit = new StrKit();
     
-    wx.config({
-        debug: Utils.devMode, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
-        appId: '${appId!}', // 必填，公众号的唯一标识
-        timestamp: '${timestamp!}', // 必填，生成签名的时间戳
-        nonceStr: '${nonceStr!}', // 必填，生成签名的随机串
-        signature: '${signature!}',// 必填，签名，见附录1
-        jsApiList: ['checkJsApi', 'getLocation'] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+    mapLocation();
+    
+    var sales = new CountUp("sales", 0, parseInt('${totalOrderAmount!}'));
+    sales.start();
+    var orderTotal = new CountUp("order-total",0, parseInt('${totalOrderCount!}'));
+    orderTotal.start();
+    var customerTotal = new CountUp("customer",0, parseInt('${totalCustomerCount!}'));
+    customerTotal.start();
+    
+    setTimeout(function() {
+        $("#sales").addClass('animated pulse');
+        setTimeout(function() {
+            $("#order-total").addClass('animated pulse');
+            setTimeout(function() {
+                $("#customer").addClass('animated pulse');
+            }, 1000);
+        }, 1000);
+    }, 2000);
+    
+    $("#drop-down").cityPicker({
+        title: "请选择位置",
+        showDistrict: false,
+        onChange: function (picker, values, displayValues) {
+            $("#city-name").text(displayValues[1]);
+        },
+        onClose: function (picker) {
+            myChart.clear();
+            
+            provName = picker.displayValue[0];
+            cityName = picker.displayValue[1];
+            countryName = picker.displayValue[2];
+            provName = strKit.convertProvName(provName);
+            
+            mapDataUrl = '${CTPATH}/json/'+cityMap[provName]+'/'+cityMap[cityName]+'.json';
+            loadOrderData();
+        }
     });
     
-    wx.ready(function() {
-        wx.checkJsApi({
-            jsApiList: [
-                'checkJsApi',
-                'getLocation'
-            ],
-            success: function (res) {
-                if (res.checkResult.getLocation == false) {
-                    alert('你的微信版本太低，不支持微信JS接口，请升级到最新的微信版本！');
-                    return;
-                } else {
-                    
-                    provName = $.cookie(Utils.provCacheName);
-                    cityName = $.cookie(Utils.cityCacheName);
-                    countryName = $.cookie(Utils.countryCacheName);
-                    
-                    //console.log(provName, cityName + '-' + countryName);
-                    
-                    if (provName == null || cityName == null || countryName == null) {
-                        wx.getLocation({
-                            type: 'wgs84', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
-                            success: function (res) {
+    $("#relocation").on('click', function() {
+        mapLocation();
+    });
     
-                                var latitude = res.latitude;                      // 纬度，浮点数，范围为90 ~ -90
-                                var longitude = res.longitude;                    // 经度，浮点数，范围为180 ~ -180。
-                                var speed = res.speed;                            // 速度，以米/每秒计
-                                var accuracy = res.accuracy;                      // 位置精度
-                                
-                                //var map = new BMap.Map("allmap");               //初始化百度地图
-                                var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
-                                var geoc = new BMap.Geocoder();                   //获取百度地址解析器  
-                                
-                                translateCallback = function (point) {            // 回调函数
-                                    geoc.getLocation(point, function(rs) {
-                                        var addComp = rs.addressComponents;
-                                        //var Address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
-                                        provName = addComp.province;
-                                        cityName = addComp.city;
-                                        countryName = addComp.district;
-                                        
-                                        $.cookie(Utils.provCacheName, provName, { expires: 7 });
-                                        $.cookie(Utils.cityCacheName, cityName, { expires: 7 });
-                                        $.cookie(Utils.countryCacheName, countryName, { expires: 7 });
-                                        
-                                    });
-                                }
-                                
-                                setTimeout(function() {
-                                    BMap.Convertor.translate(point, 0, translateCallback);//真实经纬度转成百度坐标
-                                }, 200);
-                            }
-                        });
-                    }
-                    //$prov.text(provName);
-                    
-                    $city.text(cityName);
-                    
-                    if (provName.indexOf('省') != -1) {
-                        curProvName = provName.substring(0, provName.length - 1);
-                    }
-                    mapDataUrl = '${CTPATH}/json/'+cityMap[curProvName]+'/'+cityMap[cityName]+'.json';
-                    loadOrderData();
-                }
-            }
+    function mapLocation() {
+        
+        myChart.showLoading({
+            text: '加载中...',
+            effect: 'whirling'
         });
-    });
+        
+        provName = $.cookie(Utils.provCacheName);
+        cityName = $.cookie(Utils.cityCacheName);
+        countryName = $.cookie(Utils.countryCacheName);
+        
+        if (provName == null || cityName == null || countryName == null) {
+        
+            wx.config({
+                debug: Utils.devMode, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+                appId: '${appId!}', // 必填，公众号的唯一标识
+                timestamp: '${timestamp!}', // 必填，生成签名的时间戳
+                nonceStr: '${nonceStr!}', // 必填，生成签名的随机串
+                signature: '${signature!}',// 必填，签名，见附录1
+                jsApiList: ['checkJsApi', 'getLocation'] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+            });
+            
+            wx.ready(function() {
+               wx.checkJsApi({
+                   jsApiList: [
+                       'checkJsApi',
+                       'getLocation'
+                   ],
+                   success: function (res) {
+                       if (res.checkResult.getLocation == false) {
+                           alert('你的微信版本太低，不支持微信JS接口，请升级到最新的微信版本！');
+                           return;
+                       } else {
+                           wx.getLocation({
+                               type: 'wgs84', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
+                               success: function (res) {
+        
+                                   var latitude = res.latitude;                      // 纬度，浮点数，范围为90 ~ -90
+                                   var longitude = res.longitude;                    // 经度，浮点数，范围为180 ~ -180。
+                                   var speed = res.speed;                            // 速度，以米/每秒计
+                                   var accuracy = res.accuracy;                      // 位置精度
+                                   
+                                   var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
+                                   var geoc = new BMap.Geocoder();                   //获取百度地址解析器  
+                                   
+                                   translateCallback = function (point) {            // 回调函数
+                                       geoc.getLocation(point, function(rs) {
+                                           var addComp = rs.addressComponents;
+                                           //var Address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
+                                           provName = addComp.province;
+                                           cityName = addComp.city;
+                                           countryName = addComp.district;
+                                           
+                                           $.cookie(Utils.provCacheName, provName, { expires: 7 });
+                                           $.cookie(Utils.cityCacheName, cityName, { expires: 7 });
+                                           $.cookie(Utils.countryCacheName, countryName, { expires: 7 });
+                                           
+                                       });
+                                   }
+                                   
+                                   setTimeout(function() {
+                                       BMap.Convertor.translate(point, 0, translateCallback);//真实经纬度转成百度坐标
+                                   }, 100);
+                               }
+                           });
+                           
+                           $city.text(cityName);
+                           curProvName = strKit.convertProvName(provName);
+                           /*if (provName.indexOf('省') != -1) {
+                               curProvName = provName.substring(0, provName.length - 1);
+                           }*/
+                           mapDataUrl = '${CTPATH}/json/'+cityMap[curProvName]+'/'+cityMap[cityName]+'.json';
+                           loadOrderData();
+                       }
+                   }
+                });
+            });
     
-    wx.error(function(res) {
-       //console.log(JOSN.stringify(res));
-    });
-    
-    provName = localStorage.provName;
-    cityName = localStorage.cityName;
-    var countryName = localStorage.countryName;
-
-    if (provName == null || cityName == null || countryName == null) {
-        //var baiduMap = new BaiduMap();
-        baiduMap.getLocation();
+            wx.error(function(res) {
+               //console.log(JOSN.stringify(res));
+            });
+        } else {
+           $city.text(cityName);
+                           
+           curProvName = strKit.convertProvName(provName);                
+           /*if (provName.indexOf('省') != -1) {
+               curProvName = provName.substring(0, provName.length - 1);
+           }*/
+           mapDataUrl = '${CTPATH}/json/'+cityMap[curProvName]+'/'+cityMap[cityName]+'.json';
+           loadOrderData();
+        }
     }
     
-    provName = localStorage.provName;
-    cityName = localStorage.cityName;
-    countryName = localStorage.countryName;
     
-    curProvName = strKit.convertProvName(provName);
-    
-    mapDataUrl = '${CTPATH}/json/'+cityMap[curProvName]+'/'+cityMap[cityName]+'.json';
-    loadOrderData(cityName);
-    
-    function loadOrderData(cityName) {
-        myChart.showLoading({
-	        text: '加载中...',
-	        effect: 'whirling'
-	    });
+    function loadOrderData() {
         $.ajax({
             type: 'post',
             url: '${CPATH}/orderAmount',
@@ -238,13 +267,12 @@
                     },
                     series: series
                 };
-                $city.text(cityName);
                 getMapData(data);
             }
         });
     }
     
-    function getMapData(areaData) {
+    var getMapData = function(areaData) {
     
         $.getJSON(mapDataUrl, function(data) {
             
@@ -328,10 +356,11 @@
                 })
             });
             
-            myChart.hideLoading();
             if (option && typeof option === "object") {
                 myChart.setOption(option, true);
             }
+            myChart.hideLoading();
+            //layer.closeAll();
         });
     }
     
@@ -352,47 +381,6 @@
         }
         return res;
     };
-
-    var sales = new CountUp("sales", 0, parseInt('${totalOrderAmount!}'));
-    sales.start();
-    var orderTotal = new CountUp("order-total",0, parseInt('${totalOrderCount!}'));
-    orderTotal.start();
-    var customerTotal = new CountUp("customer",0, parseInt('${totalCustomerCount!}'));
-    customerTotal.start();
-    
-    setTimeout(function() {
-        $("#sales").addClass('animated pulse');
-        setTimeout(function() {
-            $("#order-total").addClass('animated pulse');
-            setTimeout(function() {
-                $("#customer").addClass('animated pulse');
-            }, 1000);
-        }, 1000);
-    }, 2000);
-    
-    $("#drop-down").cityPicker({
-        title: "请选择位置",
-        onChange: function (picker, values, displayValues) {
-            $("#city-name").text(displayValues[1]);
-        },
-        onClose: function (picker) {
-            myChart.clear();
-            
-            provName = picker.displayValue[0];
-            cityName = picker.displayValue[1];
-            countryName = picker.displayValue[2];
-            provName = strKit.convertProvName(provName);
-            
-            mapDataUrl = '${CTPATH}/json/'+cityMap[provName]+'/'+cityMap[cityName]+'.json';
-            //console.log(picker.displayValue[0], picker.displayValue[1]);
-            loadOrderData();
-        }
-    });
-    
-    $("#relocation").on('click', function() {
-        var baiduMap = new BaiduMap();
-        baiduMap.getLocation(loadOrderData);
-    });
     
 </#macro>
 
@@ -480,11 +468,11 @@
                     </p>
                 </a>
             </div> -->
+            <div class="weui-footer">
+                <p class="weui-footer__text">Copyright &copy; 2017 武汉珈研</p>
+            </div>
         </div>
     </div>
 </section>
-<div class="weui-footer">
-    <p class="weui-footer__text">Copyright &copy; 2017 武汉珈研</p>
-</div>
 <#include "_inc/_nav_box.html"/>
 </@layout>

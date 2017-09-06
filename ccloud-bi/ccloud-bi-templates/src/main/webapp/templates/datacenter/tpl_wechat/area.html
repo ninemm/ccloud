@@ -259,9 +259,9 @@
             var selectProv = result.name.toString();
             
             provChart.showLoading({
-	            text: '加载中...',
-	            effect: 'whirling'
-	        });
+                text: '加载中...',
+                effect: 'whirling'
+            });
             
             // 从json获取地图数据
             $.get('${CTPATH}/json/' + cityMap[selectProv] + '/'+cityMap[selectProv] + '.json', function (data) {
@@ -485,9 +485,9 @@
             $(_chinaMap).width(400);
             var chart = echarts.init(_chinaMap);                     // 在id为china_map的dom元素中显示地图
             chart.showLoading({
-	            text: '加载中...',
-	            effect: 'whirling'
-	        });
+                text: '加载中...',
+                effect: 'whirling'
+            });
             
             $.get('${CTPATH}/json/china.json', function (mapJson) {
                 

@@ -1,9 +1,9 @@
 <#include "_inc/_layout.html"/>
 <#macro script_import>
 
- 	<script src="${CPATH}/templates/datacenter/js/echarts.min.js"></script>
- 	<!-- <script src="${CPATH}/static/bootstrap/js/bootstrap.min.js"></script> -->
- 	<script type="text/javascript" src="${CPATH}/templates/datacenter/js/topHovertree.js"></script>
+    <script src="${CPATH}/templates/datacenter/js/echarts.min.js"></script>
+    <!-- <script src="${CPATH}/static/bootstrap/js/bootstrap.min.js"></script> -->
+    <script type="text/javascript" src="${CPATH}/templates/datacenter/js/topHovertree.js"></script>
 
 </#macro>
 <#macro css_import>
@@ -12,41 +12,41 @@
 
 </#macro>
 <#macro css>
-	.weui-cells {
-		margin-top: 0;
-		background: inherit;
-		font-size: 0.6rem;
-	}
-	table {
-		background: #fff;
-		margin-bottom: 0!important;
-	}
-	table a {
-		text-decoration: underline;
-	}
-	th {
-		vertical-align: middle!important;
-		text-align: center!important;
-	}
-	td {
-		vertical-align: middle!important;
-	}
-	tr {
-		line-height: 1.5rem;
-		height: 1.5rem;
-	}
-	.wy-header {
+    .weui-cells {
+        margin-top: 0;
+        background: inherit;
+        font-size: 0.6rem;
+    }
+    table {
+        background: #fff;
+        margin-bottom: 0!important;
+    }
+    table a {
+        text-decoration: underline;
+    }
+    th {
+        vertical-align: middle!important;
+        text-align: center!important;
+    }
+    td {
+        vertical-align: middle!important;
+    }
+    tr {
+        line-height: 1.5rem;
+        height: 1.5rem;
+    }
+    .wy-header {
         background: #f2f2f2;
         margin-top: 2.4rem;
     }
-	#area_rank{
-		width: 100%;
-		height:4rem;
-	}
-	#customer_rank{
-		width: 100%;
-		height:8rem;
-	}
+    #area_rank{
+        width: 100%;
+        height:4rem;
+    }
+    #customer_rank{
+        width: 100%;
+        height:8rem;
+    }
 </#macro>
 <#macro script>
     $(function() {
@@ -90,22 +90,22 @@
     
     //产品
     function product(provName, cityName, countryName, dateType){
-  		$.ajax({
-  			url:"${CPATH}/sales/product",
-  			type:"post",
-  			data:{"provName": provName, "cityName": cityName, countryName: countryName, dateType: dateType},
-  			dataType:"json"
-  		}).done(function(data){
+        $.ajax({
+            url:"${CPATH}/sales/product",
+            type:"post",
+            data:{"provName": provName, "cityName": cityName, countryName: countryName, dateType: dateType},
+            dataType:"json"
+        }).done(function(data){
 
-  		    var prTitle = '产品销售排行';
+            var prTitle = '产品销售排行';
             //if((provName + cityName + countryName).trim() != '' ){
-			//    prTitle = provName + cityName + countryName + prTitle;
-			//} else {
-			//    prTitle = '' + prTitle;
-			//}
-			var $p = $("#p_product_rank");
-			$p.empty();
-			$p.text(prTitle);
+            //    prTitle = provName + cityName + countryName + prTitle;
+            //} else {
+            //    prTitle = '' + prTitle;
+            //}
+            var $p = $("#p_product_rank");
+            $p.empty();
+            $p.text(prTitle);
 
             var $tbody = $("#product_rank tbody");
             $tbody.empty();
@@ -120,21 +120,21 @@
     //区域
     function area_rank(provName, cityName, countryName, dateType, cInvCode, cInvName){
       $.ajax({
-  			url:"${CPATH}/sales/areaByProduct",
-  			type:"post",
-  			data:{provName: provName, cityName: cityName, countryName: countryName, dateType: dateType, cInvCode: cInvCode},
-  			dataType:"json"
-  		}).done(function(data){
+            url:"${CPATH}/sales/areaByProduct",
+            type:"post",
+            data:{provName: provName, cityName: cityName, countryName: countryName, dateType: dateType, cInvCode: cInvCode},
+            dataType:"json"
+        }).done(function(data){
             var areaYData = [];
             var areaSeriesData = [];
             var area_rank = document.getElementById('area_rank');
-			var $area_rank = $(area_rank);
-			
-		    $area_rank.height(80);
-		    for(var i = 0; i < data.length; i++){
-		        var height = $area_rank.height();
+            var $area_rank = $(area_rank);
+            
+            $area_rank.height(80);
+            for(var i = 0; i < data.length; i++){
+                var height = $area_rank.height();
                 $area_rank.height(height += 16);
-		    
+            
                 if (cityName.trim() != '') {
                     areaYData.push(data[i].countryName);
                 }else if(provName.trim() != ''){
@@ -143,55 +143,55 @@
                     areaYData.push(data[i].provName);
                 }
                 areaSeriesData.push(data[i].totalNum);
-		    }
+            }
 
-		    var areaTitle = cInvName + '销售情况';
-		    //if((provName + cityName + countryName).trim() != '' ){
-			//    areaTitle = provName + cityName + countryName + areaTitle;
-			//} else {
-			//    areaTitle = '' + areaTitle;
-			//}
-			var $p = $("#p_area_rank");
-			$p.empty();
-			$p.text(areaTitle);
+            var areaTitle = cInvName + '销售情况';
+            //if((provName + cityName + countryName).trim() != '' ){
+            //    areaTitle = provName + cityName + countryName + areaTitle;
+            //} else {
+            //    areaTitle = '' + areaTitle;
+            //}
+            var $p = $("#p_area_rank");
+            $p.empty();
+            $p.text(areaTitle);
 
 
             var areaRankChart = echarts.init(area_rank);
-			var option = {
-			    color: ['#4ac7f5'],
-			    grid: {
+            var option = {
+                color: ['#4ac7f5'],
+                grid: {
                     left: '2%',
                     right: '15%',
                     bottom: 15,
                     top: 15,
                     containLabel: true
-			    },
-			    calculable : true,
-			    xAxis : {
-			        show : false,
-			        name : '数量/件',
-	                type : 'value',
-		            boundaryGap: [0, 0.01]
-			    },
-			    yAxis : {
-		            type : 'category',
-		            data : areaYData.reverse(),
-		            axisLabel : {
-		                interval : 0,
-		                fontSize : 8
+                },
+                calculable : true,
+                xAxis : {
+                    show : false,
+                    name : '数量/件',
+                    type : 'value',
+                    boundaryGap: [0, 0.01]
+                },
+                yAxis : {
+                    type : 'category',
+                    data : areaYData.reverse(),
+                    axisLabel : {
+                        interval : 0,
+                        fontSize : 8
                     }
-			    },
-			    series : {
-		            type:'bar',
-		            barWidth:15,
-		            data:areaSeriesData.reverse(),
-		            label:{
-	                    normal:{
+                },
+                series : {
+                    type:'bar',
+                    barWidth:15,
+                    data:areaSeriesData.reverse(),
+                    label:{
+                        normal:{
                             show:true,
                             position:'right',
                             formatter: '{c}件'
-	                    }
-		            }
+                        }
+                    }
                 }
            };
            areaRankChart.resize();
@@ -202,95 +202,95 @@
     
     //客户
     function customer_rank(provName, cityName, countryName, dateType, cInvCode, cInvName){
-	    $.ajax({
-			url:"${CPATH}/sales/customerTypeByProduct",
-			type:"post",
-			data:{"provName": provName, "cityName": cityName, countryName: countryName, dateType: dateType, cInvCode: cInvCode},
-			dataType:"json"
-		}).done(function(data){
+        $.ajax({
+            url:"${CPATH}/sales/customerTypeByProduct",
+            type:"post",
+            data:{"provName": provName, "cityName": cityName, countryName: countryName, dateType: dateType, cInvCode: cInvCode},
+            dataType:"json"
+        }).done(function(data){
 
-			var crSeriesData = [];
+            var crSeriesData = [];
 
-		    for(var i = 0; i < data.length; i++){
+            for(var i = 0; i < data.length; i++){
                 crSeriesData.push({
                     name: data[i].customerTypeName + '(' + data[i].totalAmount + '万元)',
                     value: data[i].totalAmount
                 });
-		    }
+            }
             var crTitle = cInvName +'客户分布';
             //if((provName + cityName + countryName).trim() != '' ){
-			//    crTitle = provName + cityName + countryName + crTitle;
-			//} else {
-			//    crTitle = '' + crTitle;
-			//}
-			var $p = $("#p_customer_rank");
-			$p.empty();
-			$p.text(crTitle);
+            //    crTitle = provName + cityName + countryName + crTitle;
+            //} else {
+            //    crTitle = '' + crTitle;
+            //}
+            var $p = $("#p_customer_rank");
+            $p.empty();
+            $p.text(crTitle);
 
-			var customer_rank = document.getElementById('customer_rank');
-			var $customer_rank = $(customer_rank);
+            var customer_rank = document.getElementById('customer_rank');
+            var $customer_rank = $(customer_rank);
 
-			var customerRankChart = echarts.init(customer_rank);
-			var crOption = {
-			    color: ['#4ac7f5', '#f36f8a', '#fd9173', '#AF89D6', '#5f71d2'],
-			    series: [
-			        {
-			            name:crTitle,
-			            type:'pie',
-			            radius: ['30%', '50%'],
-			            center: ['50%', '50%'],
-			            avoidLabelOverlap: false,
-			            label: {
-			                normal: {
-			                    textStyle: {
-			                        fontSize: 9
-			                    }
-			                }
-			            },
-			            data:crSeriesData
-			        }
-			    ]
-			};
-			customerRankChart.resize();
-			customerRankChart.setOption(crOption,true);
-			//customerRankChart.on('click', customerClick);
-		});
-	}
+            var customerRankChart = echarts.init(customer_rank);
+            var crOption = {
+                color: ['#4ac7f5', '#f36f8a', '#fd9173', '#AF89D6', '#5f71d2'],
+                series: [
+                    {
+                        name:crTitle,
+                        type:'pie',
+                        radius: ['30%', '50%'],
+                        center: ['50%', '50%'],
+                        avoidLabelOverlap: false,
+                        label: {
+                            normal: {
+                                textStyle: {
+                                    fontSize: 9
+                                }
+                            }
+                        },
+                        data:crSeriesData
+                    }
+                ]
+            };
+            customerRankChart.resize();
+            customerRankChart.setOption(crOption,true);
+            //customerRankChart.on('click', customerClick);
+        });
+    }
 </#macro>
 <@layout>
 <section>
     <div class="bi-body">
-   	   	<#include "_inc/_search_box.html"/>
-   	   	<header class="wy-header">
-		    <div id="goback" class="wy-header-icon-back"><span></span></div>
-		    <div id="p_product_rank" class="wy-header-title"></div>
-		</header>
-   		<div class="weui-cells weui-cells_form">
-   			<div class="weui-cell" style="padding: 0">
-   		        <table class="table table-striped table-bordered" id="product_rank">
-	   		        <tbody>
-	   		        	<tr>
-		        			<th>
-		        				产品
-		        			</th>
-		        			<th>
-		        				省份
-		        			</th>
-		        			<th>
-		        				数量(件)
-		        			</th>
-	   		        	</tr>
-	   		        </tbody>
-   		        </table>
-   	        </div>
-   	   	</div>
-   	   	<p class="title" id="p_area_rank"></p>
+        <#include "_inc/_search_box.html"/>
+        <header class="wy-header">
+            <div id="goback" class="wy-header-icon-back"><span></span></div>
+            <div id="p_product_rank" class="wy-header-title"></div>
+        </header>
+        <div class="weui-cells weui-cells_form">
+            <div class="weui-cell" style="padding: 0">
+                <table class="table table-striped table-bordered" id="product_rank">
+                    <tbody>
+                        <tr>
+                            <th>
+                                产品
+                            </th>
+                            <th>
+                                省份
+                            </th>
+                            <th>
+                                数量(件)
+                            </th>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <p class="title" id="p_area_rank"></p>
         <div id="area_rank">
         </div>
         <p class="title" id="p_customer_rank"></p>
         <div id="customer_rank" id="p_customer_rank">
         </div>
-	</div>
+    </div>
 </section>
 <#include "_inc/_nav_box.html"/>
 <span id="gotop" title="返回顶部"><i class="icon-arrow-up2"></i></div>

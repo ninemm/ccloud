@@ -9,14 +9,14 @@
 </#macro>
 
 <#macro css>
-	.table { 
-	   font-size: 0.6rem; 
-	}
-	
-	th {
-	   text-align: center; 
-	   vertical-align: middle!important; 
-	} 
+    .table { 
+       font-size: 0.6rem; 
+    }
+    
+    th {
+       text-align: center; 
+       vertical-align: middle!important; 
+    } 
 </#macro> 
 <#macro script>
     
@@ -28,30 +28,30 @@
 </#macro> 
 <@layout>
 <section>
-	<header class="wy-header">
+    <header class="wy-header">
         <div id="goback" class="wy-header-icon-back"><span></span></div>
         <div id="date-title" class="wy-header-title">客户销售情况</div>
     </header>
-	<table class="table table-striped table-bordered">
-		<tr>
-			<th>客户类型</th>
-			<th>产品</th>
-			<th width="22%">金额(万元)</th>
-		</tr>
-		<#list rows as row> <#list row as ro> <#if ro_index == 0>
-		<tr>
-			<td rowspan="${row?size}" style="text-align: center; vertical-align: middle;">${ro.customerTypeName}</td>
-			<td>${ro.cInvName}</td>
-			<td class="t-r">${ro.totalAmount}</td>
-		</tr>
-		<#else>
-		<tr>
-			<td>${ro.cInvName}</td>
-			<td class="t-r">${ro.totalAmount}</td>
-		</tr>
-		</#if> </#list> </#list>
-	</table>
-	<!-- <a href="${CPATH}/area">返回上一页</a> -->
+    <table class="table table-striped table-bordered">
+        <tr>
+            <th>客户类型</th>
+            <th>产品</th>
+            <th width="22%">金额(万元)</th>
+        </tr>
+        <#list rows as row> <#list row as ro> <#if ro_index == 0>
+        <tr>
+            <td rowspan="${row?size}" style="text-align: center; vertical-align: middle;">${ro.customerTypeName}</td>
+            <td>${ro.cInvName}</td>
+            <td class="t-r">${ro.totalAmount}</td>
+        </tr>
+        <#else>
+        <tr>
+            <td>${ro.cInvName}</td>
+            <td class="t-r">${ro.totalAmount}</td>
+        </tr>
+        </#if> </#list> </#list>
+    </table>
+    <!-- <a href="${CPATH}/area">返回上一页</a> -->
 </section>
 <span id="gotop" title="返回顶部"><i class="icon-arrow-up2"></i></div>
 </@layout>
