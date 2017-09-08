@@ -37,9 +37,9 @@
 
     var $city = $("#city-name");
     
-    var provName = '湖北省';
-    var cityName = '武汉市';
-    var countryName = '';
+    var provName = $.cookie(Utils.provCacheName);
+    var cityName = $.cookie(Utils.cityCacheName);
+    var countryName = $.cookie(Utils.countryCacheName);
     var curProvName = '';
     
     var series = [];
@@ -53,10 +53,20 @@
     var myChart = echarts.init($map);
     
     var strKit = new StrKit();
-    
     var baiduMap = new BaiduMap();
-    baiduMap.getLocation(loadOrderData);
-    //mapLocation();
+    
+    if(provName == '' || cityName == '' || countryName == '' || provName == null || cityName == null || countryName == null) {
+
+        baiduMap.getLocation(loadOrderData);
+        //mapLocation();
+
+    }else{
+        $city.text(cityName);
+                        
+        curProvName = strKit.convertProvName(provName);                
+        mapDataUrl = '${CTPATH}/json/'+cityMap[curProvName]+'/'+cityMap[cityName]+'.json';
+        loadOrderData();
+    }
     
     var sales = new CountUp("sales", 0, parseInt('${totalOrderAmount!}'));
     sales.start();
@@ -77,7 +87,7 @@
     
     $("#drop-down").cityPicker({
         title: "请选择位置",
-        showDistrict: false,
+        //showDistrict: false,
         onChange: function (picker, values, displayValues) {
             $("#city-name").text(displayValues[1]);
         },
@@ -116,13 +126,9 @@
             provName = '';
             cityName = '';
             countryName = '';
-        } else {
-            provName = $.cookie(Utils.provCacheName);
-            cityName = $.cookie(Utils.cityCacheName);
-            countryName = $.cookie(Utils.countryCacheName);
         }
 
-        if (provName == '' || cityName == '' || countryName == '') {
+        if (provName == '' || cityName == '' || countryName == '' || provName == null || cityName == null || countryName == null) {
         
             wx.config({
                 debug: Utils.devMode, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
@@ -164,6 +170,9 @@
                                            cityName = addComp.city;
                                            countryName = addComp.district;
                                            
+                                           $.cookie(Utils.longitudeCache, rs.point.lng, { expires: 7 });
+                                           $.cookie(Utils.latitudeCache, rs.point.lat, { expires: 7 });
+                                           
                                            $.cookie(Utils.provCacheName, provName, { expires: 7 });
                                            $.cookie(Utils.cityCacheName, cityName, { expires: 7 });
                                            $.cookie(Utils.countryCacheName, countryName, { expires: 7 });
@@ -179,6 +188,26 @@
                                    setTimeout(function() {
                                        BMap.Convertor.translate(point, 0, translateCallback);//真实经纬度转成百度坐标
                                    }, 100);
+                               },
+                               fail: function(rs){
+                                  console.log(rs);
+                                  provName = '湖北省';
+                                  cityName = '武汉市';
+                                  countryName = '武昌区';
+                                  
+                                  $.cookie(Utils.longitudeCache, 114.362938, { expires: 7 });
+                                  $.cookie(Utils.latitudeCache, 30.533494, { expires: 7 });
+                                  
+                                  $.cookie(Utils.provCacheName, provName, { expires: 7 });
+                                  $.cookie(Utils.cityCacheName, cityName, { expires: 7 });
+                                  $.cookie(Utils.countryCacheName, countryName, { expires: 7 });
+                                  
+                                  curProvName = strKit.convertProvName(provName);
+                                  
+                                  $city.text(cityName);
+                                  mapDataUrl = '${CTPATH}/json/'+cityMap[curProvName]+'/'+cityMap[cityName]+'.json';
+                                  loadOrderData();
+                                  alert("定位失败！请检查是否开启定位，暂时將为您显示武汉信息");
                                }
                            });
                        }
@@ -192,9 +221,6 @@
            $city.text(cityName);
                            
            curProvName = strKit.convertProvName(provName);                
-           /*if (provName.indexOf('省') != -1) {
-               curProvName = provName.substring(0, provName.length - 1);
-           }*/
            mapDataUrl = '${CTPATH}/json/'+cityMap[curProvName]+'/'+cityMap[cityName]+'.json';
            loadOrderData();
         }

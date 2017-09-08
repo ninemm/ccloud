@@ -5,6 +5,8 @@ Utils = {
 	provCacheName: 'PROV_CACHE_NAME',
 	cityCacheName: 'CITY_CACHE_NAME',
 	countryCacheName: 'COUNTRY_CACHE_NAME',
+	longitudeCache: 'LONGITUDE_CACHE',
+	latitudeCache: 'LATITUDE_CACHE',
 	rootName: '大冶市',
 	cp: [114.974842,30.098804],
 	loading: function() {
