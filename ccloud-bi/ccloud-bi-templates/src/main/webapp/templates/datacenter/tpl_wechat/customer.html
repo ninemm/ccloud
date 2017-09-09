@@ -3,6 +3,7 @@
 
     <script src="${CPATH}/templates/datacenter/js/echarts.min.js"></script>
     <script type="text/javascript" src="${CPATH}/templates/datacenter/js/topHovertree.js"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=su3AmHLUcBprpnOLmVHo7r8AljbW8X6t"></script>
 </#macro>
 <#macro css_import>
 
@@ -37,6 +38,10 @@
         background: #f2f2f2;
         margin-top: 2.4rem;
     }
+    #allmap{
+        width:100%;
+        height: 18rem;
+    }
     #customer_rank{
         width: 100%;
         height:8rem;
@@ -49,6 +54,7 @@
 </#macro>
 <#macro script>
     $(function() {
+        lMap(dateType);
         customer(provName, cityName, '', dateType);
         product_rank(provName, cityName, '', dateType, customerTypeName);
         area_rank(provName, cityName, '', dateType, customerTypeName);
@@ -76,17 +82,91 @@
     });
     function setDateType(type){
         dateType = type;
+        lMap(dateType);
         customer(provName, cityName, '', dateType);
         product_rank(provName, cityName, '', dateType, customerTypeName);
         area_rank(provName, cityName, '', dateType, customerTypeName);
     }
 
+    var map = new BMap.Map("allmap");
+
+    //地图
+    function lMap(dateType){
+
+        var longitude = $.cookie(Utils.longitudeCache);
+        var latitude = $.cookie(Utils.latitudeCache);
+        
+        map.centerAndZoom(new BMap.Point(longitude,latitude),13);
+        map.enableScrollWheelZoom(true);
+        
+        map.clearOverlays();
+        
+        $.ajax({
+            url:"${CPATH}/sales/aroundCustomerSales",
+            type:"post",
+            data:{dateType: dateType, longitude: longitude, latitude: latitude, dist: 10},
+            dataType:"json"
+        }).done(function(data){
+            for(var i = 0; i < data.length; i++) {
+                var new_point = new BMap.Point(data[i].longitude,data[i].latitude);
+                var myIcon = new BMap.Icon("${CTPATH}/images/marker.png", new BMap.Size(20, 20)); 
+                var marker=new BMap.Marker(new_point, {icon:myIcon});  //创建标注
+                map.addOverlay(marker);              // 将标注添加到地图中
+                var opts = {
+                    width : 240,     // 信息窗口宽度
+                    height: 80,     // 信息窗口高度
+                    title : '客户名称：' + data[i].customerName , // 信息窗口标题
+                    enableMessage:true//设置允许信息窗发送短息
+                };
+                var content = '联系人：' + data[i].contacts + ' ' + data[i].phone;
+                content = content + '<br>' + '金额：' + data[i].totalAmount + '元';
+                content = content + '<br>' + '地址：' + data[i].address;
+                addClickHandler(content,marker,opts);
+            }
+        });
+    }
+    
+    function addClickHandler(content,marker,opts){
+        marker.addEventListener("click",function(e){
+            openInfo(content,e,opts)}
+        );
+    }
+    
+    function openInfo(content,e,opts){
+        var p = e.target;
+        var point = new BMap.Point(p.getPosition().lng, p.getPosition().lat);
+        var infoWindow = new BMap.InfoWindow(content,opts);  // 创建信息窗口对象 
+        map.openInfoWindow(infoWindow,point); //开启信息窗口
+    }
+    
+    //终端产品详细
+    function terminal_product(dateType, customerId, customerName){
+      $.ajax({
+            url:"${CPATH}/sales/terminal_product",
+            type:"post",
+            data:{dateType: dateType, customerId: customerId},
+            dataType:"json"
+        }).done(function(data){
+            var tpTitle = customerName + '销售情况';
+            var $p = $("#p_terminal_product");
+            $p.empty();
+            $p.text(prTitle);
+
+            var $tbody = $("#product_rank tbody");
+            $tbody.empty();
+            $tbody.append("<tr><th>产品</th><th>数量(件)</th><th>金额(万元)</th></tr>");
+            for(var i = 0; i < data.length; i++){
+                $tbody.append("<tr><td>" + data[i].cInvName + "</td><td class='t-r'>" + data[i].totalNum + "</td><td class='t-r'>" + data[i].totalAmount + "</td></tr>");
+            }
+       });
+    }
+    
+
+    //客户
     var customer_rank = document.getElementById('customer_rank');
     var $customer_rank = $(customer_rank);
-
     var customerRankChart = echarts.init(customer_rank);
     
-    //客户
     function customer(provName, cityName, countryName, dateType){
         $.ajax({
             url:"${CPATH}/sales/customerType",
@@ -300,8 +380,22 @@
         <#include "_inc/_search_box.html"/>
         <header class="wy-header">
             <div id="goback" class="wy-header-icon-back"><span></span></div>
-            <div id="p_customer_rank" class="wy-header-title"></div>
+            <div class="wy-header-title">我附近的终端分布</div>
         </header>
+        <div id="allmap"></div>
+        
+        <p id="p_terminal_product"></p>
+        <div class="weui-cells weui-cells_form">
+            <div class="weui-cell" style="padding: 0">
+                <table class="table table-striped table-bordered" id="terminal_product">
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <p class="title" id="p_customer_rank"></p>
         <div id="customer_rank" id="customer_rank">
         </div> 
 

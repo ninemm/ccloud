@@ -55,7 +55,7 @@ public class AroundCustomerSalesCallback implements ICallback {
 
             while (resultSet.next()) {
                 Map<String, Object> map = Maps.newHashMap();
-                map.put("num", resultSet.getString("customerId"));
+                map.put("customerId", resultSet.getString("customerId"));
                 map.put("customerName", resultSet.getString("customerName"));
                 map.put("type", resultSet.getInt("type"));
                 map.put("contacts", resultSet.getString("contacts"));

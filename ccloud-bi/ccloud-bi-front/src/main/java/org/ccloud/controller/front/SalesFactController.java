@@ -274,6 +274,7 @@ public class SalesFactController extends BaseFrontController {
         renderJson(salesFactList);
     }
 
+    @SuppressWarnings("unchecked")
     public void aroundCustomerSales() throws SQLException {
 
         double longitude = Double.parseDouble(getPara("longitude"));
@@ -292,10 +293,11 @@ public class SalesFactController extends BaseFrontController {
         callback.setEndDate(endDate);
 
         Connection conn = null;
+        List<Map<String, Object>> result = null;
 
         try {
             conn = DbKit.getConfig().getConnection();
-            callback.call(conn);
+            result = (List<Map<String, Object>>) callback.call(conn);
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -303,6 +305,8 @@ public class SalesFactController extends BaseFrontController {
                 conn.close();
             }
         }
+
+        renderJson(result);
     }
 
     private String getDateByType(String dateType) {

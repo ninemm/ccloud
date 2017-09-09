@@ -89,6 +89,9 @@
             provName = picker.displayValue[0];
             cityName = picker.displayValue[1];
             countryName = picker.displayValue[2];
+            
+            $.cookie(Utils.longitudeCache, 114.362938, { expires: 7 });
+            $.cookie(Utils.latitudeCache, 30.533494, { expires: 7 });
 
             $.cookie(Utils.provCacheName, provName, { expires: 7 });
             $.cookie(Utils.cityCacheName, cityName, { expires: 7 });

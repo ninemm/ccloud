@@ -88,6 +88,9 @@ function BaiduMap() {
 					localStorage.cityName = cityName;
 					localStorage.countryName = countryName;
 					
+		            $.cookie(Utils.longitudeCache, rs.point.lng, { expires: 7 });
+		            $.cookie(Utils.latitudeCache, rs.point.lat, { expires: 7 });
+					
 					$.cookie(Utils.provCacheName, provName, { expires: 7 });
 					$.cookie(Utils.cityCacheName, cityName, { expires: 7 });
 					$.cookie(Utils.countryCacheName, countryName, { expires: 7 });
