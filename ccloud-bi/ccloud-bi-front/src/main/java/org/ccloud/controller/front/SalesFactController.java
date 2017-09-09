@@ -1,5 +1,7 @@
 package org.ccloud.controller.front;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,12 +9,14 @@ import java.util.Map;
 
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.SalesFact;
+import org.ccloud.model.callback.AroundCustomerSalesCallback;
 import org.ccloud.model.query.SalesFactQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DateUtils;
 import org.joda.time.DateTime;
 
 import com.jfinal.kit.StrKit;
+import com.jfinal.plugin.activerecord.DbKit;
 import com.jfinal.plugin.activerecord.Record;
 
 @RouterMapping(url = "/sales")
@@ -210,13 +214,13 @@ public class SalesFactController extends BaseFrontController {
         renderJson(result);
 
     }
-    
+
     public void dealer() {
 
         String provName = getPara("provName", "").trim();
         String cityName = getPara("cityName", "").trim();
         String countryName = getPara("countryName", "").trim();
-        
+
         String dateType = getPara("dateType", "0").trim(); // 0: 昨天， 1: 最近1周， 2: 最近1月
 
         String startDate = getDateByType(dateType);
@@ -228,7 +232,7 @@ public class SalesFactController extends BaseFrontController {
         renderJson(result);
 
     }
-    
+
     public void dealerDetail() {
 
         String provName = getPara("provName", "").trim();
@@ -250,7 +254,7 @@ public class SalesFactController extends BaseFrontController {
 
         result.put("sellerList", sellerList);
         result.put("productList", productList);
-        
+
         renderJson(result);
 
     }
@@ -268,6 +272,37 @@ public class SalesFactController extends BaseFrontController {
         List<SalesFact> salesFactList = SalesFactQuery.me().queryMapData(provName, cityName,
                 countryName, startDate, endDate);
         renderJson(salesFactList);
+    }
+
+    public void aroundCustomerSales() throws SQLException {
+
+        double longitude = Double.parseDouble(getPara("longitude"));
+        double latitude = Double.parseDouble(getPara("latitude"));
+        double dist = Double.parseDouble(getPara("dist"));
+        String dateType = getPara("dateType", "0").trim();
+
+        String startDate = getDateByType(dateType);
+        String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+
+        AroundCustomerSalesCallback callback = new AroundCustomerSalesCallback();
+        callback.setLongitude(longitude);
+        callback.setLatitude(latitude);
+        callback.setDist(dist);
+        callback.setStartDate(startDate);
+        callback.setEndDate(endDate);
+
+        Connection conn = null;
+
+        try {
+            conn = DbKit.getConfig().getConnection();
+            callback.call(conn);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (conn != null) {
+                conn.close();
+            }
+        }
     }
 
     private String getDateByType(String dateType) {
