@@ -116,7 +116,9 @@
                     width : 240,     // 信息窗口宽度
                     height: 80,     // 信息窗口高度
                     title : '客户名称：' + data[i].customerName , // 信息窗口标题
-                    enableMessage:true//设置允许信息窗发送短息
+                    enableMessage:true,//设置允许信息窗发送短息
+                    customerId: data[i].customerId,
+                    customerName: data[i].customerName
                 };
                 var content = '联系人：' + data[i].contacts + ' ' + data[i].phone;
                 content = content + '<br>' + '金额：' + data[i].totalAmount + '元';
@@ -137,24 +139,25 @@
         var point = new BMap.Point(p.getPosition().lng, p.getPosition().lat);
         var infoWindow = new BMap.InfoWindow(content,opts);  // 创建信息窗口对象 
         map.openInfoWindow(infoWindow,point); //开启信息窗口
+        product_customerId(dateType,opts.customerId,opts.customerName);
     }
     
     //终端产品详细
-    function terminal_product(dateType, customerId, customerName){
+    function product_customerId(dateType, customerId, customerName){
       $.ajax({
-            url:"${CPATH}/sales/terminal_product",
+            url:"${CPATH}/sales/productByCustomerId",
             type:"post",
             data:{dateType: dateType, customerId: customerId},
             dataType:"json"
         }).done(function(data){
-            var tpTitle = customerName + '销售情况';
-            var $p = $("#p_terminal_product");
+            var tpTitle = customerName + '产品销售情况';
+            var $p = $("#p_customerId_product");
             $p.empty();
-            $p.text(prTitle);
+            $p.text(tpTitle);
 
-            var $tbody = $("#product_rank tbody");
+            var $tbody = $("#customerId_product tbody");
             $tbody.empty();
-            $tbody.append("<tr><th>产品</th><th>数量(件)</th><th>金额(万元)</th></tr>");
+            $tbody.append("<tr><th>产品</th><th>数量(件)</th><th>金额(元)</th></tr>");
             for(var i = 0; i < data.length; i++){
                 $tbody.append("<tr><td>" + data[i].cInvName + "</td><td class='t-r'>" + data[i].totalNum + "</td><td class='t-r'>" + data[i].totalAmount + "</td></tr>");
             }
@@ -384,10 +387,10 @@
         </header>
         <div id="allmap"></div>
         
-        <p id="p_terminal_product"></p>
+        <p id="p_customerId_product"></p>
         <div class="weui-cells weui-cells_form">
             <div class="weui-cell" style="padding: 0">
-                <table class="table table-striped table-bordered" id="terminal_product">
+                <table class="table table-striped table-bordered" id="customerId_product">
                     <tbody>
 
                     </tbody>

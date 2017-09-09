@@ -96,7 +96,7 @@ public class SalesFactQuery extends JBaseQuery {
 
         return Db.queryBigDecimal(sqlBuilder.toString()).doubleValue();
     }
-    
+
     // 订单客户总数
     public Long findCustomerCount() {
 
@@ -105,7 +105,7 @@ public class SalesFactQuery extends JBaseQuery {
         return Db.queryLong(sql.toString());
 
     }
-    
+
 
     public List<Map<String, Object>> findAreaArray(String provName, String cityName,
             String countryName, String startDate, String endDate) {
@@ -593,14 +593,14 @@ public class SalesFactQuery extends JBaseQuery {
 
         }
     }
-    
+
     public List<Record> findsalesList(String provName, String cityName, String countryName,
             String dealerCode, String startDate, String endDate) {
 
         LinkedList<Object> params = new LinkedList<Object>();
 
         StringBuilder sqlBuilder = new StringBuilder("select ");
-        
+
         if (StrKit.notBlank(dealerCode)) {
             sqlBuilder.append(" sellerCode, sellerName");
         } else {
@@ -643,14 +643,14 @@ public class SalesFactQuery extends JBaseQuery {
         return Db.find(sqlBuilder.toString(), params.toArray());
 
     }
-    
+
     public List<Record> findProductListByDealer(String provName, String cityName, String countryName,
             String dealerCode, String startDate, String endDate) {
 
         LinkedList<Object> params = new LinkedList<Object>();
 
         StringBuilder sqlBuilder = new StringBuilder("select cInvName");
-        
+
         sqlBuilder.append(", TRUNCATE(SUM(totalSmallAmount/cInvMNum), 2) as totalNum");
         sqlBuilder.append(", TRUNCATE(SUM(totalSales)/1000000, 2) as totalAmount");
 
@@ -682,6 +682,41 @@ public class SalesFactQuery extends JBaseQuery {
 
         return Db.find(sqlBuilder.toString(), params.toArray());
 
+    }
+
+    public List<Record> findProductListByCustomerId(String customerId, String startDate,
+            String endDate) {
+
+        LinkedList<Object> params = new LinkedList<Object>();
+
+        StringBuilder sqlBuilder = new StringBuilder("select customerTypeName, cInvName");
+
+        sqlBuilder.append(", TRUNCATE(SUM(totalSmallAmount/cInvMNum), 2) as totalNum");
+        sqlBuilder.append(", TRUNCATE(SUM(totalSales)/100, 2) as totalAmount");
+
+        sqlBuilder.append(" from sales_fact");
+
+        boolean needWhere = true;
+        needWhere = appendIfNotEmpty(sqlBuilder, "customerId", customerId, params, needWhere);
+
+        if (needWhere) {
+            sqlBuilder.append(" where 1 = 1");
+        }
+
+        if (startDate != null) {
+            sqlBuilder.append(" and idate >= ?");
+            params.add(startDate);
+        }
+
+        if (endDate != null) {
+            sqlBuilder.append(" and idate <= ?");
+            params.add(endDate);
+        }
+
+        sqlBuilder.append(" group by cInvCode");
+        sqlBuilder.append(" order by totalAmount desc");
+
+        return Db.find(sqlBuilder.toString(), params.toArray());
     }
 
 }

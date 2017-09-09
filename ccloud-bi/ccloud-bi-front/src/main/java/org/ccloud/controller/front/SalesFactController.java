@@ -309,6 +309,21 @@ public class SalesFactController extends BaseFrontController {
         renderJson(result);
     }
 
+    public void productByCustomerId() {
+
+        String customerId = getPara("customerId", "").trim();
+        String dateType = getPara("dateType", "0").trim(); // 0: 昨天， 1: 最近1周， 2: 最近1月
+
+        String startDate = getDateByType(dateType);
+        String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+
+        List<Record> result =
+                SalesFactQuery.me().findProductListByCustomerId(customerId, startDate, endDate);
+
+        renderJson(result);
+
+    }
+
     private String getDateByType(String dateType) {
 
         DateTime dateTime = DateTime.now();
