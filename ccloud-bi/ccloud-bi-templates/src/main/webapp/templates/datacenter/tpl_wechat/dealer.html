@@ -109,7 +109,7 @@
             $tbody.append("<tr><th>经销商</th><th>金额(万元)</th></tr>");
             for(var i = 0; i < data.length; i++){
                 var fun = "setDealer('" + data[i].dealerCode + "'" + "," + "'" + data[i].dealerName + "')";
-                $tbody.append("<tr onclick=" + fun +"><td>" + data[i].dealerName + "</td><td class='t-r'>" + data[i].totalAmount + "</td></tr>");
+                $tbody.append("<tr onclick=" + fun +"><td><a href=\"javascript:void();\">" + data[i].dealerName + "</a></td><td class='t-r'>" + data[i].totalAmount + "</td></tr>");
             }
        });
     }

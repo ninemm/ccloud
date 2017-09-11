@@ -50,6 +50,7 @@
 </#macro>
 <#macro script>
     $(function() {
+        Utils.loading();
         product(provName, cityName, '', dateType);
         area_rank(provName, cityName, '', dateType, cInvCode, cInvName);
         customer_rank(provName, cityName, '', dateType, cInvCode, cInvName);
@@ -59,6 +60,7 @@
         $('#goback').on('click', function() {
             historyUtils.back();
         });
+        Utils.close();
     });
     var provName = $.cookie(Utils.provCacheName);
     var cityName = $.cookie(Utils.cityCacheName);
@@ -112,7 +114,7 @@
             $tbody.append("<tr><th>产品</th><th>数量(件)</th><th>金额(万元)</th></tr>");
             for(var i = 0; i < data.length; i++){
                 var fun = "setProduct('" + data[i].cInvCode + "'" + "," + "'" + data[i].cInvName + "')";
-                $tbody.append("<tr onclick=" + fun +"><td>" + data[i].cInvName + "</td><td class='t-r'>" + data[i].totalNum + "</td><td class='t-r'>" + data[i].totalAmount + "</td></tr>");
+                $tbody.append("<tr onclick=" + fun +"><td><a href=\"javascript:void();\">" + data[i].cInvName + "</a></td><td class='t-r'>" + data[i].totalNum + "</td><td class='t-r'>" + data[i].totalAmount + "</td></tr>");
             }
        });
     }

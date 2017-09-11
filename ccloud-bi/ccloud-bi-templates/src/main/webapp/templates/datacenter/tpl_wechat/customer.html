@@ -150,10 +150,13 @@
             data:{dateType: dateType, customerId: customerId},
             dataType:"json"
         }).done(function(data){
-            var tpTitle = customerName + '产品销售情况';
+            var tpTitle = customerName + '销售统计';
             var $p = $("#p_customerId_product");
-            $p.empty();
-            $p.text(tpTitle);
+            var $customerName = $("#customer-name");
+            $customerName.empty();
+            $customerName.text(customerName);
+            $p.attr('class', 'title');
+            $p.show();
 
             var $tbody = $("#customerId_product tbody");
             $tbody.empty();
@@ -386,8 +389,7 @@
             <div class="wy-header-title">我附近的终端分布</div>
         </header>
         <div id="allmap"></div>
-        
-        <p id="p_customerId_product"></p>
+        <p id="p_customerId_product" style="display:none;" class="txt-color-red"><span id="customer-name"></span><span>销售统计</span></p>
         <div class="weui-cells weui-cells_form">
             <div class="weui-cell" style="padding: 0">
                 <table class="table table-striped table-bordered" id="customerId_product">

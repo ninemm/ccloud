@@ -42,6 +42,8 @@
     var countryName = $.cookie(Utils.countryCacheName);
     var curProvName = '';
     
+    console.log(provName, cityName)
+    
     var series = [];
     var option = null;
     var geoCoordMap = {};
@@ -54,11 +56,7 @@
     
     var strKit = new StrKit();
     
-    if(provName == '' || cityName == '' || countryName == '' || provName == null || cityName == null || countryName == null) {
-
-        mapLocation();
-
-    }
+    mapLocation(false);
     
     var sales = new CountUp("sales", 0, parseInt('${totalOrderAmount!}'));
     sales.start();
@@ -108,7 +106,7 @@
         mapLocation(true);
     });
 
-    function mapLocation(flg) {
+    function mapLocation(isRelocation) {
         
         myChart.showLoading({
             text: '加载中...',
@@ -116,7 +114,7 @@
         });
         
         //如果点击定位清空位置信息
-        if(flg){
+        if (isRelocation) {
             provName = '';
             cityName = '';
             countryName = '';
@@ -154,7 +152,7 @@
                                    var accuracy = res.accuracy;                      // 位置精度
                                    
                                    var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
-                                   var geoc = new BMap.Geocoder();                   //获取百度地址解析器  
+                                   var geoc = new BMap.Geocoder();                   // 获取百度地址解析器  
                                    
                                    translateCallback = function (point) {            // 回调函数
                                        geoc.getLocation(point, function(rs) {
@@ -164,6 +162,8 @@
                                            cityName = addComp.city;
                                            countryName = addComp.district;
                                            
+                                           console.log(11)
+                                           
                                            $.cookie(Utils.longitudeCache, rs.point.lng, { expires: 7 });
                                            $.cookie(Utils.latitudeCache, rs.point.lat, { expires: 7 });
                                            
@@ -172,7 +172,7 @@
                                            $.cookie(Utils.countryCacheName, countryName, { expires: 7 });
 
                                            curProvName = strKit.convertProvName(provName);
-
+                                            console.log(22)
                                            $city.text(cityName);
                                            mapDataUrl = '${CTPATH}/json/'+cityMap[curProvName]+'/'+cityMap[cityName]+'.json';
                                            loadOrderData();
@@ -182,7 +182,7 @@
                                    setTimeout(function() {
                                        BMap.Convertor.translate(point, 0, translateCallback);//真实经纬度转成百度坐标
                                    }, 100);
-                               },
+                               }/*,
                                fail: function(rs){
                                   console.log(rs);
                                   provName = '湖北省';
@@ -202,7 +202,7 @@
                                   mapDataUrl = '${CTPATH}/json/'+cityMap[curProvName]+'/'+cityMap[cityName]+'.json';
                                   loadOrderData();
                                   alert("定位失败！请检查是否开启定位，暂时將为您显示武汉信息");
-                               }
+                               }*/
                            });
                        }
                    }
@@ -213,8 +213,8 @@
             });
         } else {
            $city.text(cityName);
-                           
-           curProvName = strKit.convertProvName(provName);                
+           curProvName = strKit.convertProvName(provName);
+           console.log(curProvName)                
            mapDataUrl = '${CTPATH}/json/'+cityMap[curProvName]+'/'+cityMap[cityName]+'.json';
            loadOrderData();
         }

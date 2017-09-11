@@ -53,6 +53,12 @@
 
 </#macro>
 <#macro script>
+    var provName = $.cookie(Utils.provCacheName);
+    var cityName = $.cookie(Utils.cityCacheName);
+    var countryName = $.cookie(Utils.countryCacheName);
+    var dateType = 0;
+    var customerTypeName = '零售终端';
+
     $(function() {
         lMap(dateType);
         customer(provName, cityName, '', dateType);
@@ -65,14 +71,6 @@
             historyUtils.back();
         });
     });
-    var $city = $("#city-name");
-    var provName = $.cookie(Utils.provCacheName);
-    var cityName = $.cookie(Utils.cityCacheName);
-    var countryName = $.cookie(Utils.countryCacheName);
-    var dateType = 0;
-    var customerTypeName = '零售终端';
-
-    $city.text(cityName);
 
     //做时间的切换选择
     $(".date").click(function(e) {
@@ -150,10 +148,12 @@
             data:{dateType: dateType, customerId: customerId},
             dataType:"json"
         }).done(function(data){
-            var tpTitle = customerName + '产品销售情况';
             var $p = $("#p_customerId_product");
-            $p.empty();
-            $p.text(tpTitle);
+            var $customerName = $("#customer-name");
+            $customerName.empty();
+            $customerName.text(customerName);
+            $p.attr('class', 'title');
+            $p.show();
 
             var $tbody = $("#customerId_product tbody");
             $tbody.empty();
@@ -387,7 +387,7 @@
         </header>
         <div id="allmap"></div>
         
-        <p id="p_customerId_product"></p>
+        <p id="p_customerId_product" style="display:none;" class="txt-color-red"><span id="customer-name"></span><span>销售统计</span></p>
         <div class="weui-cells weui-cells_form">
             <div class="weui-cell" style="padding: 0">
                 <table class="table table-striped table-bordered" id="customerId_product">
