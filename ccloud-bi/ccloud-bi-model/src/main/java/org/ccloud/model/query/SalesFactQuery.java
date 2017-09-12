@@ -94,6 +94,11 @@ public class SalesFactQuery extends JBaseQuery {
         needWhere = appendIfNotEmpty(sqlBuilder, "cityName", cityName, params, needWhere);
         needWhere = appendIfNotEmpty(sqlBuilder, "countryName", countryName, params, needWhere);
 
+        if (needWhere) {
+            sqlBuilder.append(" where 1 = 1");
+        }
+        sqlBuilder.append(" and customerType != 7");
+
         return Db.queryBigDecimal(sqlBuilder.toString()).doubleValue();
     }
 
