@@ -147,6 +147,29 @@ public class DateUtils {
 		
 	}
 	
+	/**
+	 * 功能描述：通过类型返回时期
+	 * @param dateType	类型
+	 * @return
+	 * 返回类型：String
+	 * 创建人：chen.xuebing
+	 * 日期：2017年9月11日
+	 */
+	public static String getDateByType(String dateType) {
+
+		DateTime dateTime = DateTime.now();
+
+		if (dateType.equals("0")) {// 最近一天
+			return dateTime.plusDays(-1).toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+		} else if (dateType.equals("1")) {// 近一周
+			return dateTime.plusWeeks(-1).toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+		} else if (dateType.equals("2")) {// 近一月
+			return dateTime.plusMonths(-1).toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+		} else {// 近一年
+			return dateTime.plusYears(-1).toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+		}
+	}
+	
 	public static void main(String[] args) throws ParseException {
 		Date date = sdf.parse("2016-7-20 00:00:00");
 		System.out.println(getDayDiff(new Date(), date));

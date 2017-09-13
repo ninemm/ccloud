@@ -15,6 +15,7 @@
  */
 package org.ccloud.controller.front;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,8 @@ import java.util.UUID;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.query.SalesFactQuery;
 import org.ccloud.route.RouterMapping;
+import org.ccloud.utils.DateUtils;
+import org.joda.time.DateTime;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -39,17 +42,31 @@ import com.jfinal.qyweixin.sdk.api.JsTicketApi.JsApiType;
 public class IndexController extends BaseFrontController {
 
 	public void index() {
+
+		initWechatConfig();
+
+		render("index.html");
+	}
+	
+	public void total() {
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
 		String countryName = getPara("countryName", "").trim();
+		String dateType = getPara("dateType", "0").trim(); // 0: 昨天， 1: 最近1周， 2: 最近1月
+
+		String startDate = DateUtils.getDateByType(dateType);
+		String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("totalCustomerCount", SalesFactQuery.me().findCustomerCount(provName, cityName,
+				countryName, startDate, endDate));
+		result.put("totalOrderCount", SalesFactQuery.me().findOrderCount(provName, cityName,
+				countryName, startDate, endDate));
+		result.put("totalOrderAmount", SalesFactQuery.me().findTotalAmount(provName, cityName,
+				countryName, startDate, endDate));
 		
-		setAttr("totalCustomerCount", SalesFactQuery.me().findCustomerCount());
-		setAttr("totalOrderCount", SalesFactQuery.me().findOrderCount());
-		setAttr("totalOrderAmount", SalesFactQuery.me().findTotalAmount(provName, cityName, countryName));
-		
-		initWechatConfig();
-		
-		render("index.html");
+		renderJson(result);
+
 	}
 	
 	public void orderAmount() {

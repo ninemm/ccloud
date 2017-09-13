@@ -13,14 +13,7 @@
         width: 100%;
         height: 100%;
     }
-    
-    .map-desc {
-        text-align: center;
-        color: #ccc;
-        font-size: .7rem;
-        background: #fff;
-        padding: .2rem 0;
-    }
+
 </#macro>
 
 <#macro script_import>
@@ -67,7 +60,21 @@
         mapDataUrl = '${CTPATH}/json/'+cityMap[curProvName]+'/'+cityMap[cityName]+'.json';
         loadOrderData();
     }
-    
+
+    //做时间的切换选择
+    $(".date").click(function(e) {
+        var $a = $(e.currentTarget);
+        $a.parent().find(".date").removeClass("active-date");
+        $a.addClass("active-date");
+    });
+    function setDateType(type){
+        dateType = type;
+        lMap(dateType);
+        customer(provName, cityName, '', dateType);
+        product_rank(provName, cityName, '', dateType, customerTypeName);
+        area_rank(provName, cityName, '', dateType, customerTypeName);
+    }
+
     var sales = new CountUp("sales", 0, parseInt('${totalOrderAmount!}'));
     sales.start();
     var orderTotal = new CountUp("order-total",0, parseInt('${totalOrderCount!}'));
@@ -163,7 +170,7 @@
                                    var accuracy = res.accuracy;                      // 位置精度
                                    
                                    var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
-                                   var geoc = new BMap.Geocoder();                   //获取百度地址解析器  
+                                   var geoc = new BMap.Geocoder();                   // 获取百度地址解析器  
                                    
                                    translateCallback = function (point) {            // 回调函数
                                        geoc.getLocation(point, function(rs) {
@@ -401,13 +408,11 @@
 <section>
 
     <div class="bi-body">
+        <#include "_inc/_search_box.html"/>
         <#include "_inc/_location_box.html"/>
         <div class="foot-black"></div>
         <div class="map-wrapper">
             <div id="map" class="maps"></div>
-        </div>
-        <div class="map-desc">
-            图1 劲酒市场流向图
         </div>
 
         <div class="title">
@@ -477,10 +482,10 @@
                             经销商
                     </p>
                 </a>
-            </div> -->
+            </div> 
             <div class="weui-footer">
                 <p class="weui-footer__text">Copyright &copy; 2017 武汉珈研</p>
-            </div>
+            </div> -->
         </div>
     </div>
 </section>

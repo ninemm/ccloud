@@ -72,17 +72,9 @@ public class SalesFactQuery extends JBaseQuery {
         return 0;
     }
 
-    // 订单记录总数
-    public Long findOrderCount() {
-
-        StringBuilder sql = new StringBuilder("select count(*) from (");
-        sql.append(" select stockId from sales_fact group by stockId) as sales");
-        return Db.queryLong(sql.toString());
-
-    }
-
     // 订单总金额
-    public Double findTotalAmount(String provName, String cityName, String countryName) {
+    public Double findTotalAmount(String provName, String cityName, String countryName,
+            String startDate, String endDate) {
 
         LinkedList<Object> params = new LinkedList<Object>();
         StringBuilder sqlBuilder =
@@ -97,20 +89,85 @@ public class SalesFactQuery extends JBaseQuery {
         if (needWhere) {
             sqlBuilder.append(" where 1 = 1");
         }
+
+        if (startDate != null) {
+            sqlBuilder.append(" and idate >= ?");
+            params.add(startDate);
+        }
+
+        if (endDate != null) {
+            sqlBuilder.append(" and idate <= ?");
+            params.add(endDate);
+        }
         sqlBuilder.append(" and customerType != 7");
 
-        return Db.queryBigDecimal(sqlBuilder.toString()).doubleValue();
+        return Db.queryBigDecimal(sqlBuilder.toString(), params.toArray()).doubleValue();
+    }
+
+    // 订单记录总数
+    public Long findOrderCount(String provName, String cityName, String countryName,
+            String startDate, String endDate) {
+
+        LinkedList<Object> params = new LinkedList<Object>();
+        StringBuilder sqlBuilder = new StringBuilder("select count(1) from (");
+        sqlBuilder.append(" select stockId from sales_fact ");
+
+        boolean needWhere = true;
+        needWhere = appendIfNotEmpty(sqlBuilder, "provName", provName, params, needWhere);
+        needWhere = appendIfNotEmpty(sqlBuilder, "cityName", cityName, params, needWhere);
+        needWhere = appendIfNotEmpty(sqlBuilder, "countryName", countryName, params, needWhere);
+
+        if (needWhere) {
+            sqlBuilder.append(" where 1 = 1");
+        }
+
+        if (startDate != null) {
+            sqlBuilder.append(" and idate >= ?");
+            params.add(startDate);
+        }
+
+        if (endDate != null) {
+            sqlBuilder.append(" and idate <= ?");
+            params.add(endDate);
+        }
+        sqlBuilder.append(" and customerType != 7 ");
+        sqlBuilder.append(" group by stockId) as sales ");
+
+        return Db.queryLong(sqlBuilder.toString(), params.toArray());
+
     }
 
     // 订单客户总数
-    public Long findCustomerCount() {
+    public Long findCustomerCount(String provName, String cityName, String countryName,
+            String startDate, String endDate) {
 
-        StringBuilder sql = new StringBuilder("select count(*) from (");
-        sql.append(" select customerId from sales_fact group by customerId) as customer");
-        return Db.queryLong(sql.toString());
+        LinkedList<Object> params = new LinkedList<Object>();
+        StringBuilder sqlBuilder = new StringBuilder("select count(1) from (");
+        sqlBuilder.append(" select customerId from sales_fact ");
+
+        boolean needWhere = true;
+        needWhere = appendIfNotEmpty(sqlBuilder, "provName", provName, params, needWhere);
+        needWhere = appendIfNotEmpty(sqlBuilder, "cityName", cityName, params, needWhere);
+        needWhere = appendIfNotEmpty(sqlBuilder, "countryName", countryName, params, needWhere);
+
+        if (needWhere) {
+            sqlBuilder.append(" where 1 = 1");
+        }
+
+        if (startDate != null) {
+            sqlBuilder.append(" and idate >= ?");
+            params.add(startDate);
+        }
+
+        if (endDate != null) {
+            sqlBuilder.append(" and idate <= ?");
+            params.add(endDate);
+        }
+        sqlBuilder.append(" and customerType != 7 ");
+        sqlBuilder.append(" group by customerId) as customer");
+        return Db.queryLong(sqlBuilder.toString(), params.toArray());
 
     }
-
 
     public List<Map<String, Object>> findAreaArray(String provName, String cityName,
             String countryName, String startDate, String endDate) {

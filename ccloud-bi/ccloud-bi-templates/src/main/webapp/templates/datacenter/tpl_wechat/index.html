@@ -3,7 +3,22 @@
     section {
         background: #fff;
     }
-    
+    .location-wrapper {
+        background: #f2f2f2;
+        margin-top: 2.4rem;
+    }
+    #location{
+        display:inline;
+    }
+    .wy-header-title{
+        display:inline;
+        margin: 0 0px 0 50px;
+        line-height: 2rem;
+        color: #999;
+    }
+    #relocation{
+        display:inline;
+    }
     .map-wrapper {
         width: 100%;
         height: 20rem;
@@ -13,14 +28,7 @@
         width: 100%;
         height: 100%;
     }
-    
-    .map-desc {
-        text-align: center;
-        color: #ccc;
-        font-size: .7rem;
-        background: #fff;
-        padding: .2rem 0;
-    }
+
 </#macro>
 
 <#macro script_import>
@@ -41,8 +49,7 @@
     var cityName = $.cookie(Utils.cityCacheName);
     var countryName = $.cookie(Utils.countryCacheName);
     var curProvName = '';
-    
-    console.log(provName, cityName)
+    var dateType = '0';
     
     var series = [];
     var option = null;
@@ -58,22 +65,44 @@
     
     mapLocation(false);
     
-    var sales = new CountUp("sales", 0, parseInt('${totalOrderAmount!}'));
-    sales.start();
-    var orderTotal = new CountUp("order-total",0, parseInt('${totalOrderCount!}'));
-    orderTotal.start();
-    var customerTotal = new CountUp("customer",0, parseInt('${totalCustomerCount!}'));
-    customerTotal.start();
-    
-    setTimeout(function() {
-        $("#sales").addClass('animated pulse');
-        setTimeout(function() {
-            $("#order-total").addClass('animated pulse');
+    //做时间的切换选择
+    $(".date").click(function(e) {
+        var $a = $(e.currentTarget);
+        $a.parent().find(".date").removeClass("active-date");
+        $a.addClass("active-date");
+    });
+    function setDateType(type){
+        dateType = type;
+        total(provName, cityName, countryName, dateType);
+    }
+
+    function total(provName, cityName, countryName, dateType){
+        countryName = '';
+        $.ajax({
+            url:"${CPATH}/total",
+            type:"post",
+            data:{"provName": provName, "cityName": cityName, countryName: countryName, dateType: dateType},
+            dataType:"json"
+        }).done(function(data){
+
+            var sales = new CountUp("sales", 0, parseInt(data.totalOrderAmount));
+            sales.start();
+            var orderTotal = new CountUp("order-total",0, parseInt(data.totalOrderCount));
+            orderTotal.start();
+            var customerTotal = new CountUp("customer",0, parseInt(data.totalCustomerCount));
+            customerTotal.start();
+            
             setTimeout(function() {
-                $("#customer").addClass('animated pulse');
-            }, 1000);
-        }, 1000);
-    }, 2000);
+                $("#sales").addClass('animated pulse');
+                setTimeout(function() {
+                    $("#order-total").addClass('animated pulse');
+                    setTimeout(function() {
+                        $("#customer").addClass('animated pulse');
+                    }, 1000);
+                }, 1000);
+            }, 2000);
+       });
+    }
     
     $("#drop-down").cityPicker({
         title: "请选择位置",
@@ -87,13 +116,15 @@
             provName = picker.displayValue[0];
             cityName = picker.displayValue[1];
             countryName = picker.displayValue[2];
-            
+
             $.cookie(Utils.longitudeCache, 114.362938, { expires: 7 });
             $.cookie(Utils.latitudeCache, 30.533494, { expires: 7 });
 
             $.cookie(Utils.provCacheName, provName, { expires: 7 });
             $.cookie(Utils.cityCacheName, cityName, { expires: 7 });
             $.cookie(Utils.countryCacheName, countryName, { expires: 7 });
+
+            total(provName, cityName, countryName, dateType);
 
             curProvName = strKit.convertProvName(provName);
             
@@ -121,7 +152,7 @@
         }
 
         if (provName == '' || cityName == '' || countryName == '' || provName == null || cityName == null || countryName == null) {
-        
+
             wx.config({
                 debug: Utils.devMode, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
                 appId: '${appId!}', // 必填，公众号的唯一标识
@@ -130,7 +161,7 @@
                 signature: '${signature!}',// 必填，签名，见附录1
                 jsApiList: ['checkJsApi', 'getLocation'] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
             });
-            
+                                   console.log("wx.config");
             wx.ready(function() {
                wx.checkJsApi({
                    jsApiList: [
@@ -162,8 +193,6 @@
                                            cityName = addComp.city;
                                            countryName = addComp.district;
                                            
-                                           console.log(11)
-                                           
                                            $.cookie(Utils.longitudeCache, rs.point.lng, { expires: 7 });
                                            $.cookie(Utils.latitudeCache, rs.point.lat, { expires: 7 });
                                            
@@ -171,8 +200,10 @@
                                            $.cookie(Utils.cityCacheName, cityName, { expires: 7 });
                                            $.cookie(Utils.countryCacheName, countryName, { expires: 7 });
 
+                                           total(provName, cityName, countryName, dateType);
+
                                            curProvName = strKit.convertProvName(provName);
-                                            console.log(22)
+
                                            $city.text(cityName);
                                            mapDataUrl = '${CTPATH}/json/'+cityMap[curProvName]+'/'+cityMap[cityName]+'.json';
                                            loadOrderData();
@@ -182,7 +213,7 @@
                                    setTimeout(function() {
                                        BMap.Convertor.translate(point, 0, translateCallback);//真实经纬度转成百度坐标
                                    }, 100);
-                               }/*,
+                               },
                                fail: function(rs){
                                   console.log(rs);
                                   provName = '湖北省';
@@ -196,13 +227,15 @@
                                   $.cookie(Utils.cityCacheName, cityName, { expires: 7 });
                                   $.cookie(Utils.countryCacheName, countryName, { expires: 7 });
                                   
+                                  total(provName, cityName, countryName, dateType);
+                                  
                                   curProvName = strKit.convertProvName(provName);
                                   
                                   $city.text(cityName);
                                   mapDataUrl = '${CTPATH}/json/'+cityMap[curProvName]+'/'+cityMap[cityName]+'.json';
                                   loadOrderData();
                                   alert("定位失败！请检查是否开启定位，暂时將为您显示武汉信息");
-                               }*/
+                               }
                            });
                        }
                    }
@@ -213,8 +246,10 @@
             });
         } else {
            $city.text(cityName);
+           total(provName, cityName, countryName, dateType);
+
            curProvName = strKit.convertProvName(provName);
-           console.log(curProvName)                
+
            mapDataUrl = '${CTPATH}/json/'+cityMap[curProvName]+'/'+cityMap[cityName]+'.json';
            loadOrderData();
         }
@@ -230,13 +265,13 @@
     
                 option = {
                     backgroundColor: '#404a59',
-                    title: {
+                    /*title: {
                         text: '劲酒货物流向图',
-                        left: 'left',
+                        left: 'center',
                         textStyle: {
                             color: '#fff'
                         }
-                    },
+                    },*/
                     tooltip: {
                         trigger: 'item'
                     },
@@ -392,13 +427,16 @@
 <section>
 
     <div class="bi-body">
-        <#include "_inc/_location_box.html"/>
-        <div class="foot-black"></div>
+        <#include "_inc/_search_box.html"/>
+
+         <div class="location-wrapper">
+             <span id="location"><em id="city-name"></em> <i class="icon-chevron-down txt-color-green" id="drop-down"></i></span>
+             <div class="wy-header-title">劲酒货物流向图</div>
+             <div id="relocation" class="relocation fr"><i class="icon-map-marker txt-color-green"></i> 定位</div>
+         </div>
+
         <div class="map-wrapper">
             <div id="map" class="maps"></div>
-        </div>
-        <div class="map-desc">
-            图1 劲酒市场流向图
         </div>
 
         <div class="title">
@@ -468,10 +506,10 @@
                             经销商
                     </p>
                 </a>
-            </div> -->
+            </div> 
             <div class="weui-footer">
                 <p class="weui-footer__text">Copyright &copy; 2017 武汉珈研</p>
-            </div>
+            </div> -->
         </div>
     </div>
 </section>
