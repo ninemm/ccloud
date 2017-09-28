@@ -30,6 +30,19 @@
         width: 100%;
         height: 100%;
     }
+    .compare .gather {
+    	display: inline-block;
+    	width: 49%;
+    	border: 0;
+    }
+    .compare .gather:first-child {
+    	border-right: 1px solid #e0e0e0;
+    }
+    .compare .gather p,.compare .gather span {
+    	display: block;
+    	width: 100%;
+    	text-align: center;
+    }
 
 </#macro>
 
@@ -440,12 +453,12 @@
         <#include "_inc/_search_box.html"/>
         
         <div class="compare">
-            <div class="gather fl">
+            <div class="gather">
                 <p>
                     总客户数(个):<br/><span id="all-customer"></span>
                 </p>
             </div>
-            <div class="gather fr">
+            <div class="gather">
                 <p>
                     下单客户数(个):<br/><span id="top-customer"></span>
                 </p>
