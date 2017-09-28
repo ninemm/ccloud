@@ -58,6 +58,8 @@ public class IndexController extends BaseFrontController {
 		String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
 
 		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("totalAllCustomerCount", SalesFactQuery.me().findAllCustomerCount(provName, 
+				cityName, countryName));
 		result.put("totalCustomerCount", SalesFactQuery.me().findCustomerCount(provName, cityName,
 				countryName, startDate, endDate));
 		result.put("totalOrderCount", SalesFactQuery.me().findOrderCount(provName, cityName,
@@ -107,6 +109,7 @@ public class IndexController extends BaseFrontController {
 	}
 	
 	public void customer() {
+		initWechatConfig();
 		setAttr("cur_nav", "customer");
 		render("customer.html");
 	}

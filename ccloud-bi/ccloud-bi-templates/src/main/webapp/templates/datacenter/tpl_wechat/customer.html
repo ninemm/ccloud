@@ -3,6 +3,7 @@
 
     <script src="${CPATH}/templates/datacenter/js/echarts.min.js"></script>
     <script type="text/javascript" src="${CPATH}/templates/datacenter/js/topHovertree.js"></script>
+    <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
     <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=su3AmHLUcBprpnOLmVHo7r8AljbW8X6t"></script>
 </#macro>
 <#macro css_import>
@@ -37,6 +38,12 @@
     .wy-header {
         background: #f2f2f2;
         margin-top: 2.4rem;
+    }
+    .relocation{
+        position: absolute;
+        right: 0;
+        top: 12px;
+        width: 50px;
     }
     #allmap{
         width:100%;
@@ -87,6 +94,12 @@
         product_rank(provName, cityName, '', dateType, customerTypeName);
         area_rank(provName, cityName, '', dateType, customerTypeName);
     }
+
+    //定位
+    $("#relocation").on('click', function() {
+        WxLocation();
+        lMap(dateType)
+    });
 
     var map = new BMap.Map("allmap");
     var myPosition = new BMap.Icon("${CTPATH}/images/position.png", new BMap.Size(20, 20)); 
@@ -380,8 +393,6 @@
            //areaRankChart.on('click', areaClick);
        });
     }
-
-    
 </#macro>
 <@layout>
 <section>
@@ -390,6 +401,7 @@
         <header class="wy-header">
             <div id="goback" class="wy-header-icon-back"><span></span></div>
             <div class="wy-header-title">我附近的终端分布</div>
+            <div id="relocation" class="relocation"><i class="icon-map-marker txt-color-blue"></i> 定位</div>
         </header>
         <div id="allmap"></div>
         <p id="p_customerId_product" style="display:none;" class="txt-color-red"><span id="customer-name"></span><span>销售统计</span></p>

@@ -3,16 +3,18 @@
     section {
         background: #fff;
     }
+    .compare{
+        margin-top: 2.4rem;
+    }
     .location-wrapper {
         background: #f2f2f2;
-        margin-top: 2.4rem;
     }
     #location{
         display:inline;
     }
     .wy-header-title{
         display:inline;
-        margin: 0 0px 0 50px;
+        margin: 0 0 0 3.2rem;
         line-height: 2rem;
         color: #999;
     }
@@ -84,20 +86,28 @@
             data:{"provName": provName, "cityName": cityName, countryName: countryName, dateType: dateType},
             dataType:"json"
         }).done(function(data){
+        
+            var allCustomerTotal = new CountUp("all-customer",0, parseInt(data.totalAllCustomerCount));
+            allCustomerTotal.start();
+            var topCustomerTotal = new CountUp("top-customer",0, parseInt(data.totalCustomerCount));
+            topCustomerTotal.start();
 
-            var sales = new CountUp("sales", 0, parseInt(data.totalOrderAmount));
-            sales.start();
+            var salesTotal = new CountUp("order-sales", 0, parseInt(data.totalOrderAmount));
+            salesTotal.start();
             var orderTotal = new CountUp("order-total",0, parseInt(data.totalOrderCount));
             orderTotal.start();
-            var customerTotal = new CountUp("customer",0, parseInt(data.totalCustomerCount));
+            var customerTotal = new CountUp("order-customer",0, parseInt(data.totalCustomerCount));
             customerTotal.start();
+
             
             setTimeout(function() {
-                $("#sales").addClass('animated pulse');
+                $("#All-customer").addClass('animated pulse');
+                $("#order-sales").addClass('animated pulse');
                 setTimeout(function() {
+                    $("#top-customer").addClass('animated pulse');
                     $("#order-total").addClass('animated pulse');
                     setTimeout(function() {
-                        $("#customer").addClass('animated pulse');
+                        $("#order-customer").addClass('animated pulse');
                     }, 1000);
                 }, 1000);
             }, 2000);
@@ -117,8 +127,8 @@
             cityName = picker.displayValue[1];
             countryName = picker.displayValue[2];
 
-            $.cookie(Utils.longitudeCache, 114.362938, { expires: 7 });
-            $.cookie(Utils.latitudeCache, 30.533494, { expires: 7 });
+            //$.cookie(Utils.longitudeCache, 114.362938, { expires: 7 });
+            //$.cookie(Utils.latitudeCache, 30.533494, { expires: 7 });
 
             $.cookie(Utils.provCacheName, provName, { expires: 7 });
             $.cookie(Utils.cityCacheName, cityName, { expires: 7 });
@@ -428,6 +438,20 @@
 
     <div class="bi-body">
         <#include "_inc/_search_box.html"/>
+        
+        <div class="compare">
+            <div class="gather fl">
+                <p>
+                    总客户数(个):<br/><span id="all-customer"></span>
+                </p>
+            </div>
+            <div class="gather fr">
+                <p>
+                    下单客户数(个):<br/><span id="top-customer"></span>
+                </p>
+            </div>
+            <div class="clearfix"></div>
+        </div>
 
          <div class="location-wrapper">
              <span id="location"><em id="city-name"></em> <i class="icon-chevron-down txt-color-green" id="drop-down"></i></span>
@@ -446,7 +470,7 @@
             <div class="gather">
                 <img src="${CTPATH}/images/money.png">
                 <p>
-                    总销售额(元):<br/><span id="sales"></span>
+                    总销售额(元):<br/><span id="order-sales"></span>
                 </p>
                 <div class="clearfix"></div>
             </div>
@@ -460,7 +484,7 @@
             <div class="gather">
                 <img src="${CTPATH}/images/customer.png">
                 <p>
-                    客户总数(个):<br/><span id="customer"></span>
+                    客户总数(个):<br/><span id="order-customer"></span>
                 </p>
                 <div class="clearfix"></div>
             </div>

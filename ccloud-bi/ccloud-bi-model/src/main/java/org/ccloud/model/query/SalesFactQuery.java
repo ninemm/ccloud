@@ -168,6 +168,23 @@ public class SalesFactQuery extends JBaseQuery {
         return Db.queryLong(sqlBuilder.toString(), params.toArray());
 
     }
+    
+    // 客户总数
+    public Long findAllCustomerCount(String provName, String cityName, String countryName) {
+
+        LinkedList<Object> params = new LinkedList<Object>();
+        StringBuilder sqlBuilder = new StringBuilder("select count(1) from (");
+        sqlBuilder.append(" select customerId from customer_info ");
+
+        boolean needWhere = true;
+        needWhere = appendIfNotEmpty(sqlBuilder, "provName", provName, params, needWhere);
+        needWhere = appendIfNotEmpty(sqlBuilder, "cityName", cityName, params, needWhere);
+        needWhere = appendIfNotEmpty(sqlBuilder, "countryName", countryName, params, needWhere);
+
+        sqlBuilder.append(" group by customerId) as customer");
+        return Db.queryLong(sqlBuilder.toString(), params.toArray());
+
+    }
 
     public List<Map<String, Object>> findAreaArray(String provName, String cityName,
             String countryName, String startDate, String endDate) {
