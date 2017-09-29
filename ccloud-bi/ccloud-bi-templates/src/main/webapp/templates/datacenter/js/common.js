@@ -72,6 +72,74 @@ function Map() {
 	this.isEmpty = isEmpty;
 }
 
+function wxLocation() {
+    var df = $.Deferred();
+    wx.ready(function() {
+        wx.checkJsApi({
+            jsApiList: [
+            'checkJsApi',
+            'getLocation'
+            ],
+            success: function (res) {
+                if (res.checkResult.getLocation == false) {
+                    alert('你的微信版本太低，不支持微信JS接口，请升级到最新的微信版本！');
+                    return;
+                } else {
+                    wx.getLocation({
+                                type: 'wgs84', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
+                                success: function (res) {
+
+                                    var latitude = res.latitude;                      // 纬度，浮点数，范围为90 ~ -90
+                                    var longitude = res.longitude;                    // 经度，浮点数，范围为180 ~ -180。
+                                    var speed = res.speed;                            // 速度，以米/每秒计
+                                    var accuracy = res.accuracy;                      // 位置精度
+
+                                    var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
+                                    var geoc = new BMap.Geocoder();                   // 获取百度地址解析器  
+
+                                translateCallback = function (point) {            // 回调函数
+                                    geoc.getLocation(point, function(rs) {
+                                        var addComp = rs.addressComponents;
+                                            //var Address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
+
+                                            $.cookie(Utils.longitudeCache, rs.point.lng, { expires: 7 });
+                                            $.cookie(Utils.latitudeCache, rs.point.lat, { expires: 7 });
+
+                                            $.cookie(Utils.provCacheName, addComp.province, { expires: 7 });
+                                            $.cookie(Utils.cityCacheName, addComp.city, { expires: 7 });
+                                            $.cookie(Utils.countryCacheName, addComp.district, { expires: 7 });
+
+                                            df.resolve();
+
+                                        });
+                                };
+                                setTimeout(function() {
+                                        BMap.Convertor.translate(point, 0, translateCallback);//真实经纬度转成百度坐标
+                                    }, 100);
+                            },
+                            fail: function(rs){
+
+                                $.cookie(Utils.longitudeCache, 114.362938, { expires: 7 });
+                                $.cookie(Utils.latitudeCache, 30.533494, { expires: 7 });
+
+                                $.cookie(Utils.provCacheName, '湖北省', { expires: 7 });
+                                $.cookie(Utils.cityCacheName, '武汉市', { expires: 7 });
+                                $.cookie(Utils.countryCacheName, '武昌区', { expires: 7 });
+
+                                alert("定位失败！请检查是否开启定位，暂时將为您显示武汉信息");
+                            }
+                        });
+                }
+            }
+        });
+    });
+    wx.error(function(res) {
+        console.log(JSON.stringify(res));
+    });
+
+    return df.promise();;
+}
+
 function BaiduMap() {
 	
 	var getLocation = function(loadOrderData) {
@@ -124,78 +192,6 @@ function BaiduMap() {
 	}
 	
 	this.getLocation = getLocation;
-}
-
-function WxLocation() {
-
-	wx.config({
-				debug: Utils.devMode, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
-				appId: '${appId!}', // 必填，公众号的唯一标识
-				timestamp: '${timestamp!}', // 必填，生成签名的时间戳
-				nonceStr: '${nonceStr!}', // 必填，生成签名的随机串
-				signature: '${signature!}',// 必填，签名，见附录1
-				jsApiList: ['checkJsApi', 'getLocation'] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
-			});
-	wx.ready(function() {
-		wx.checkJsApi({
-			jsApiList: [
-			'checkJsApi',
-			'getLocation'
-			],
-			success: function (res) {
-				if (res.checkResult.getLocation == false) {
-					alert('你的微信版本太低，不支持微信JS接口，请升级到最新的微信版本！');
-					return;
-				} else {
-					wx.getLocation({
-								type: 'wgs84', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
-								success: function (res) {
-
-									var latitude = res.latitude;                      // 纬度，浮点数，范围为90 ~ -90
-									var longitude = res.longitude;                    // 经度，浮点数，范围为180 ~ -180。
-									var speed = res.speed;                            // 速度，以米/每秒计
-									var accuracy = res.accuracy;                      // 位置精度
-
-									var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
-									var geoc = new BMap.Geocoder();                   // 获取百度地址解析器  
-
-								translateCallback = function (point) {            // 回调函数
-									geoc.getLocation(point, function(rs) {
-										var addComp = rs.addressComponents;
-											//var Address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
-
-											$.cookie(Utils.longitudeCache, rs.point.lng, { expires: 7 });
-											$.cookie(Utils.latitudeCache, rs.point.lat, { expires: 7 });
-
-											$.cookie(Utils.provCacheName, addComp.province, { expires: 7 });
-											$.cookie(Utils.cityCacheName, addComp.city, { expires: 7 });
-											$.cookie(Utils.countryCacheName, addComp.district, { expires: 7 });
-
-										});
-								};
-								setTimeout(function() {
-										BMap.Convertor.translate(point, 0, translateCallback);//真实经纬度转成百度坐标
-									}, 100);
-							},
-							fail: function(rs){
-
-								$.cookie(Utils.longitudeCache, 114.362938, { expires: 7 });
-								$.cookie(Utils.latitudeCache, 30.533494, { expires: 7 });
-
-								$.cookie(Utils.provCacheName, '湖北省', { expires: 7 });
-								$.cookie(Utils.cityCacheName, '武汉市', { expires: 7 });
-								$.cookie(Utils.countryCacheName, '武昌区', { expires: 7 });
-
-								alert("定位失败！请检查是否开启定位，暂时將为您显示武汉信息");
-							}
-						});
-				}
-			}
-		});
-	});
-	wx.error(function(res) {
-		console.log(JSON.stringify(res));
-	});
 }
 
 function StrKit() {

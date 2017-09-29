@@ -148,6 +148,22 @@ public class DateUtils {
 	}
 	
 	/**
+	 * 功能描述：给指定日期添加天数
+	 * @param date	日期
+	 * @param day	天数
+	 * @return
+	 * 返回类型：String
+	 * 创建人：chen.xuebing
+	 * 日期：2017年9月29日
+	 */
+	public static String plusDays(String date, int day) {
+		
+		DateTime dateTime = new DateTime(date);
+		return dateTime.plusDays(day).toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+		
+	}
+	
+	/**
 	 * 功能描述：通过类型返回时期
 	 * @param dateType	类型
 	 * @return

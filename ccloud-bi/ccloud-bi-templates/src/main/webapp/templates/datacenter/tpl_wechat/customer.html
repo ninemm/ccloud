@@ -5,6 +5,7 @@
     <script type="text/javascript" src="${CPATH}/templates/datacenter/js/topHovertree.js"></script>
     <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
     <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=su3AmHLUcBprpnOLmVHo7r8AljbW8X6t"></script>
+    <script type="text/javascript" src="${CTPATH}/js/convertor.js"></script>
 </#macro>
 <#macro css_import>
 
@@ -63,8 +64,6 @@
     $(function() {
         lMap(dateType);
         customer(provName, cityName, '', dateType);
-        product_rank(provName, cityName, '', dateType, customerTypeName);
-        area_rank(provName, cityName, '', dateType, customerTypeName);
         
         initTopHoverTree("gotop", 100, 10, 50);
         
@@ -77,7 +76,7 @@
     var cityName = $.cookie(Utils.cityCacheName);
     var countryName = $.cookie(Utils.countryCacheName);
     var dateType = 0;
-    var customerTypeName = '零售终端';
+    var customerTypeName = '';
 
     $city.text(cityName);
 
@@ -91,15 +90,33 @@
         dateType = type;
         lMap(dateType);
         customer(provName, cityName, '', dateType);
-        product_rank(provName, cityName, '', dateType, customerTypeName);
-        area_rank(provName, cityName, '', dateType, customerTypeName);
     }
 
     //定位
     $("#relocation").on('click', function() {
-        WxLocation();
-        lMap(dateType)
+        wxConfig();
+        var df = wxLocation();
+
+        df.done(function(){
+            provName = $.cookie(Utils.provCacheName);
+            cityName = $.cookie(Utils.cityCacheName);
+            countryName = $.cookie(Utils.countryCacheName);
+            lMap(dateType)
+            customer(provName, cityName, '', dateType);
+        });
+
     });
+    
+    function wxConfig() {
+        wx.config({
+            debug: Utils.devMode, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+            appId: '${appId!}', // 必填，公众号的唯一标识
+            timestamp: '${timestamp!}', // 必填，生成签名的时间戳
+            nonceStr: '${nonceStr!}', // 必填，生成签名的随机串
+            signature: '${signature!}',// 必填，签名，见附录1
+            jsApiList: ['checkJsApi', 'getLocation'] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+        });
+    }
 
     var map = new BMap.Map("allmap");
     var myPosition = new BMap.Icon("${CTPATH}/images/position.png", new BMap.Size(20, 20)); 
@@ -224,8 +241,8 @@
                      //selectedMode:false,
                      orient: 'vertical',
                      x: 'right',
-                     top : '1%',
-                     bottom : '1%',
+                     top : '0%',
+                     bottom : '0%',
                      data:crLegendData
                  },
                  series: [
@@ -252,6 +269,10 @@
             customerRankChart.resize();
             customerRankChart.setOption(crOption,true);
             customerRankChart.on('legendselectchanged', customerClick);
+            
+            //调用其他纬度
+            product_rank(provName, cityName, '', dateType, data[0].customerTypeName);
+            area_rank(provName, cityName, '', dateType, data[0].customerTypeName);
         });
     }
     
@@ -308,6 +329,8 @@
             for(var i = 0; i < data.length; i++){
                 $tbody.append("<tr><td>" + data[i].cInvName + "</td><td class='t-r'>" + data[i].totalNum + "</td><td class='t-r'>" + data[i].totalAmount + "</td></tr>");
             }
+            
+            
        });
     }
     

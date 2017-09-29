@@ -180,9 +180,53 @@ public class SalesFactQuery extends JBaseQuery {
         needWhere = appendIfNotEmpty(sqlBuilder, "provName", provName, params, needWhere);
         needWhere = appendIfNotEmpty(sqlBuilder, "cityName", cityName, params, needWhere);
         needWhere = appendIfNotEmpty(sqlBuilder, "countryName", countryName, params, needWhere);
+        
+        if (needWhere) {
+            sqlBuilder.append(" where 1 = 1");
+        }
 
+        sqlBuilder.append(" and type != 7 ");
         sqlBuilder.append(" group by customerId) as customer");
         return Db.queryLong(sqlBuilder.toString(), params.toArray());
+
+    }
+    
+    // 订单平均金额
+    public List<Record> findOrderAvgAmountList(String provName, String cityName, String countryName,
+            String startDate, String endDate) {
+
+        LinkedList<Object> params = new LinkedList<Object>();
+
+        StringBuilder sqlBuilder = new StringBuilder("select idate");
+
+        sqlBuilder.append(", TRUNCATE(SUM(totalSales)/(COUNT(DISTINCT stockId) * 100), 2) as avgAmount");
+
+        sqlBuilder.append(" from sales_fact");
+
+        boolean needWhere = true;
+        needWhere = appendIfNotEmpty(sqlBuilder, "provName", provName, params, needWhere);
+        needWhere = appendIfNotEmpty(sqlBuilder, "cityName", cityName, params, needWhere);
+        needWhere = appendIfNotEmpty(sqlBuilder, "countryName", countryName, params, needWhere);
+
+        if (needWhere) {
+            sqlBuilder.append(" where 1 = 1");
+        }
+
+        if (startDate != null) {
+            sqlBuilder.append(" and idate >= ?");
+            params.add(startDate);
+        }
+
+        if (endDate != null) {
+            sqlBuilder.append(" and idate <= ?");
+            params.add(endDate);
+        }
+
+        sqlBuilder.append(" and customerType != 7 ");
+        sqlBuilder.append(" group by idate  ");
+        sqlBuilder.append(" order by idate asc");
+
+        return Db.find(sqlBuilder.toString(), params.toArray());
 
     }
 

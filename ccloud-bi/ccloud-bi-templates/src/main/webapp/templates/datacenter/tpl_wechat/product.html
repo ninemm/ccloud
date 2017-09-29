@@ -52,11 +52,9 @@
     $(function() {
         Utils.loading();
         product(provName, cityName, '', dateType);
-        area_rank(provName, cityName, '', dateType, cInvCode, cInvName);
-        customer_rank(provName, cityName, '', dateType, cInvCode, cInvName);
-        
+
         initTopHoverTree("gotop", 100, 10, 50);
-        
+
         $('#goback').on('click', function() {
             historyUtils.back();
         });
@@ -66,9 +64,9 @@
     var cityName = $.cookie(Utils.cityCacheName);
     var countryName = $.cookie(Utils.countryCacheName);
     var dateType = 0;
-    var cInvCode = 'za000053';
-    var cInvName = '125ml35度中国劲酒（醇化液）_1*24';
-    
+    var cInvCode = '';
+    var cInvName = '';
+
     //做时间的切换选择
     $(".date").click(function(e) {
         var $a = $(e.currentTarget);
@@ -78,8 +76,6 @@
     function setDateType(type){
         dateType = type;
         product(provName, cityName, '', dateType);
-        area_rank(provName, cityName, '', dateType, cInvCode, cInvName);
-        customer_rank(provName, cityName, '', dateType, cInvCode, cInvName);
     }
     
     //产品选择
@@ -116,6 +112,10 @@
                 var fun = "setProduct('" + data[i].cInvCode + "'" + "," + "'" + data[i].cInvName + "')";
                 $tbody.append("<tr onclick=" + fun +"><td><a href=\"javascript:void();\">" + data[i].cInvName + "</a></td><td class='t-r'>" + data[i].totalNum + "</td><td class='t-r'>" + data[i].totalAmount + "</td></tr>");
             }
+
+            //调用其他纬度
+            area_rank(provName, cityName, '', dateType, data[0].cInvCode, data[0].cInvName);
+            customer_rank(provName, cityName, '', dateType, data[0].cInvCode, data[0].cInvName);
        });
     }
     

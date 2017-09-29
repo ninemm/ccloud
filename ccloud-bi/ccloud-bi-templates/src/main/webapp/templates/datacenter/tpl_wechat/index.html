@@ -3,10 +3,8 @@
     section {
         background: #fff;
     }
-    .compare{
-        margin-top: 2.4rem;
-    }
     .location-wrapper {
+        margin-top: 2.4rem;
         background: #f2f2f2;
     }
     #location{
@@ -21,6 +19,24 @@
     #relocation{
         display:inline;
     }
+    .compare .gather {
+        display: inline-block;
+        width: 49%;
+        border: 0;
+    }
+    .compare .gather:first-child {
+        border-right: 1px solid #e0e0e0;
+    }
+    .compare .gather p,.compare .gather span {
+        display: block;
+        width: 100%;
+        text-align: center;
+    }
+    #orderAvg {
+      width: 100%;
+      height: 14rem;
+    }
+
     .map-wrapper {
         width: 100%;
         height: 20rem;
@@ -29,19 +45,6 @@
     .maps {
         width: 100%;
         height: 100%;
-    }
-    .compare .gather {
-    	display: inline-block;
-    	width: 49%;
-    	border: 0;
-    }
-    .compare .gather:first-child {
-    	border-right: 1px solid #e0e0e0;
-    }
-    .compare .gather p,.compare .gather span {
-    	display: block;
-    	width: 100%;
-    	text-align: center;
     }
 
 </#macro>
@@ -57,6 +60,11 @@
     <script type="text/javascript" src="${CTPATH}/js/convertor.js"></script>
 </#macro>
 <#macro script>
+
+    $(function() {
+        mapLocation(false);
+        topTotal(provName, cityName, countryName);
+    });
 
     var $city = $("#city-name");
     
@@ -78,8 +86,6 @@
     
     var strKit = new StrKit();
     
-    mapLocation(false);
-    
     //做时间的切换选择
     $(".date").click(function(e) {
         var $a = $(e.currentTarget);
@@ -90,6 +96,104 @@
         dateType = type;
         total(provName, cityName, countryName, dateType);
     }
+    
+    //顶部统计
+    function topTotal(provName, cityName, countryName){
+        countryName = '';
+        $.ajax({
+            url:"${CPATH}/topTotal",
+            type:"post",
+            data:{"provName": provName, "cityName": cityName, countryName: countryName},
+            dataType:"json"
+        }).done(function(data){
+        
+            var allCustomerTotal = new CountUp("all-customer",0, parseInt(data.totalAllCustomerCount));
+            allCustomerTotal.start();
+            var topCustomerTotal = new CountUp("all-order-customer",0, parseInt(data.totalCustomerCount));
+            topCustomerTotal.start();
+
+            setTimeout(function() {
+                $("#all-customer").addClass('animated pulse');
+                setTimeout(function() {
+                    $("#all-order-customer").addClass('animated pulse');
+                }, 1000);
+            }, 2000);
+
+       });
+    }
+
+    //订单平均金额
+    function orderAvg(data, countryName){
+
+        var oTitle = '订单平均金额(单位/元)';
+        if((provName + cityName + countryName).trim() != '' ){
+            oTitle = provName + cityName + countryName + oTitle;
+        } else {
+            oTitle = '全国' + oTitle
+        }
+
+        var xData = [];
+        var seriesData = [];
+
+        for(var i = 0; i < data.length; i++){
+            xData.push(data[i].idate) ;
+            seriesData.push(data[i].avgAmount);
+        }
+
+        var orderAvg = document.getElementById('orderAvg');
+        //var $stock = $(stock);
+
+        var orderAvgChart = echarts.init(orderAvg);
+        var option = {
+            title: {
+                left: 'center',
+                top: 'top',
+                text: oTitle,
+                textStyle: {
+                    fontWeight: 'normal',
+                    color: '#ea6f5a',
+                    fontSize: '.7rem'
+                }
+            },
+            tooltip : {
+            },
+            grid: {
+                left: '13%',
+                right: '8%',
+                top: '25%'
+            },
+            xAxis: {
+                data: xData
+            },
+            yAxis: {},
+            series: [{
+                name: oTitle,
+                type: 'line',
+                itemStyle: {
+                    normal: {color: '#a6c84c'}
+                },
+                lineStyle: {
+                    normal: {color: '#a6c84c'}
+                },
+                markPoint: {
+                    label: {
+                        normal: {
+                            textStyle: {
+                                color: '#000',
+                            }
+                        }
+                    },
+                    data : [
+                        {type: 'max', name: '最大值'},
+                        {type: 'min', name: '最小值'}
+                    ]
+                },
+                data:seriesData
+            }]
+        };
+        orderAvgChart.resize();
+        orderAvgChart.setOption(option, true);
+    }
 
     function total(provName, cityName, countryName, dateType){
         countryName = '';
@@ -99,11 +203,8 @@
             data:{"provName": provName, "cityName": cityName, countryName: countryName, dateType: dateType},
             dataType:"json"
         }).done(function(data){
-        
-            var allCustomerTotal = new CountUp("all-customer",0, parseInt(data.totalAllCustomerCount));
-            allCustomerTotal.start();
-            var topCustomerTotal = new CountUp("top-customer",0, parseInt(data.totalCustomerCount));
-            topCustomerTotal.start();
+
+            orderAvg(data.orderAvg, countryName);
 
             var salesTotal = new CountUp("order-sales", 0, parseInt(data.totalOrderAmount));
             salesTotal.start();
@@ -114,10 +215,8 @@
 
             
             setTimeout(function() {
-                $("#All-customer").addClass('animated pulse');
                 $("#order-sales").addClass('animated pulse');
                 setTimeout(function() {
-                    $("#top-customer").addClass('animated pulse');
                     $("#order-total").addClass('animated pulse');
                     setTimeout(function() {
                         $("#order-customer").addClass('animated pulse');
@@ -126,7 +225,7 @@
             }, 2000);
        });
     }
-    
+
     $("#drop-down").cityPicker({
         title: "请选择位置",
         //showDistrict: false,
@@ -140,13 +239,24 @@
             cityName = picker.displayValue[1];
             countryName = picker.displayValue[2];
 
-            //$.cookie(Utils.longitudeCache, 114.362938, { expires: 7 });
-            //$.cookie(Utils.latitudeCache, 30.533494, { expires: 7 });
+            $.ajax({
+                async: false,
+                type: "GET",
+                dataType: 'jsonp',
+                jsonp: 'callback',
+                jsonpCallback: 'callbackfunction',
+                url: "http://api.map.baidu.com/geocoder/v2/?city="+ cityName +"&address=" + countryName +"&output=json&ak=su3AmHLUcBprpnOLmVHo7r8AljbW8X6t&callback=showLocation",
+                contentType: "application/json;utf-8"
+            }).done(function(data){
+                 $.cookie(Utils.longitudeCache, data.result.location.lng, { expires: 7 });
+                 $.cookie(Utils.latitudeCache, data.result.location.lat, { expires: 7 });
+            });
 
             $.cookie(Utils.provCacheName, provName, { expires: 7 });
             $.cookie(Utils.cityCacheName, cityName, { expires: 7 });
             $.cookie(Utils.countryCacheName, countryName, { expires: 7 });
 
+            topTotal(provName, cityName, countryName);
             total(provName, cityName, countryName, dateType);
 
             curProvName = strKit.convertProvName(provName);
@@ -218,7 +328,7 @@
                                            
                                            $.cookie(Utils.longitudeCache, rs.point.lng, { expires: 7 });
                                            $.cookie(Utils.latitudeCache, rs.point.lat, { expires: 7 });
-                                           
+
                                            $.cookie(Utils.provCacheName, provName, { expires: 7 });
                                            $.cookie(Utils.cityCacheName, cityName, { expires: 7 });
                                            $.cookie(Utils.countryCacheName, countryName, { expires: 7 });
@@ -282,19 +392,19 @@
         $.ajax({
             type: 'post',
             url: '${CPATH}/orderAmount',
-            data: {provName: provName, cityName: cityName, countryName: countryName},
+            data: {provName: provName, cityName: cityName, countryName: "武昌区"},
             dataType: 'json',
             success: function(data) {
     
                 option = {
                     backgroundColor: '#404a59',
-                    /*title: {
+                    title: {
                         text: '劲酒货物流向图',
                         left: 'center',
                         textStyle: {
                             color: '#fff'
                         }
-                    },*/
+                    },
                     tooltip: {
                         trigger: 'item'
                     },
@@ -452,6 +562,11 @@
     <div class="bi-body">
         <#include "_inc/_search_box.html"/>
         
+        <div class="location-wrapper">
+             <span id="location"><em id="city-name"></em> <i class="icon-chevron-down txt-color-green" id="drop-down"></i></span>
+             <div id="relocation" class="relocation fr"><i class="icon-map-marker txt-color-green"></i> 定位</div>
+         </div>
+        
         <div class="compare">
             <div class="gather">
                 <p>
@@ -460,17 +575,15 @@
             </div>
             <div class="gather">
                 <p>
-                    下单客户数(个):<br/><span id="top-customer"></span>
+                    总下单客户数(个):<br/><span id="all-order-customer"></span>
                 </p>
             </div>
             <div class="clearfix"></div>
         </div>
-
-         <div class="location-wrapper">
-             <span id="location"><em id="city-name"></em> <i class="icon-chevron-down txt-color-green" id="drop-down"></i></span>
-             <div class="wy-header-title">劲酒货物流向图</div>
-             <div id="relocation" class="relocation fr"><i class="icon-map-marker txt-color-green"></i> 定位</div>
-         </div>
+        
+        <div class="divide-line"></div>
+        <div id="orderAvg"></div>
+        <div class="divide-line"></div>
 
         <div class="map-wrapper">
             <div id="map" class="maps"></div>
@@ -483,21 +596,21 @@
             <div class="gather">
                 <img src="${CTPATH}/images/money.png">
                 <p>
-                    总销售额(元):<br/><span id="order-sales"></span>
+                    销售额(元):<br/><span id="order-sales"></span>
                 </p>
                 <div class="clearfix"></div>
             </div>
             <div class="gather">
                 <img src="${CTPATH}/images/order.png">
                 <p>
-                    订单总数(笔):<br/><span id="order-total"></span>
+                    订单数(笔):<br/><span id="order-total"></span>
                 </p>
                 <div class="clearfix"></div>
             </div>
             <div class="gather">
                 <img src="${CTPATH}/images/customer.png">
                 <p>
-                    客户总数(个):<br/><span id="order-customer"></span>
+                    客户数(个):<br/><span id="order-customer"></span>
                 </p>
                 <div class="clearfix"></div>
             </div>

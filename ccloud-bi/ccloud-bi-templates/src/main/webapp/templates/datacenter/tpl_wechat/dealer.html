@@ -51,7 +51,6 @@
 <#macro script>
     $(function() {
         dealer(provName, cityName, '', dateType);
-        dealer_detail(provName, cityName, '', dateType, dealerCode, dealerName);
         
         initTopHoverTree("gotop", 100, 10, 50);
         
@@ -75,7 +74,6 @@
     function setDateType(type){
         dateType = type;
         dealer(provName, cityName, '', dateType);
-        dealer_detail(provName, cityName, '', dateType, dealerCode, dealerName);
     }
     
     //经销商选择
@@ -111,6 +109,9 @@
                 var fun = "setDealer('" + data[i].dealerCode + "'" + "," + "'" + data[i].dealerName + "')";
                 $tbody.append("<tr onclick=" + fun +"><td><a href=\"javascript:void();\">" + data[i].dealerName + "</a></td><td class='t-r'>" + data[i].totalAmount + "</td></tr>");
             }
+
+            //调用其他纬度
+            dealer_detail(provName, cityName, '', dateType, data[0].dealerCode, data[0].dealerName);
        });
     }
     
