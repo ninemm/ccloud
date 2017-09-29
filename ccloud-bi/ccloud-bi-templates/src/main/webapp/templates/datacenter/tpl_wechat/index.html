@@ -251,8 +251,10 @@
                 url: "http://api.map.baidu.com/geocoder/v2/?city="+ cityName +"&address=" + countryName +"&output=json&ak=su3AmHLUcBprpnOLmVHo7r8AljbW8X6t&callback=showLocation",
                 contentType: "application/json;utf-8"
             }).done(function(data){
-                 $.cookie(Utils.longitudeCache, data.result.location.lng, { expires: 7 });
-                 $.cookie(Utils.latitudeCache, data.result.location.lat, { expires: 7 });
+                if(data.status == 0){
+                    $.cookie(Utils.longitudeCache, data.result.location.lng, { expires: 7 });
+                    $.cookie(Utils.latitudeCache, data.result.location.lat, { expires: 7 });
+                }
             });
 
             $.cookie(Utils.provCacheName, provName, { expires: 7 });
@@ -395,7 +397,7 @@
         $.ajax({
             type: 'post',
             url: '${CPATH}/orderAmount',
-            data: {provName: provName, cityName: cityName, countryName: "武昌区"},
+            data: {provName: provName, cityName: "武汉市", countryName: "武昌区"},
             dataType: 'json',
             success: function(data) {
     
@@ -448,7 +450,7 @@
     
     var getMapData = function(areaData) {
     
-        $.getJSON(mapDataUrl, function(data) {
+        $.getJSON('${CTPATH}/json/HuBei/WuHan.json', function(data) {
             
             echarts.registerMap('wuhan', data);
             
