@@ -238,6 +238,9 @@
             provName = picker.displayValue[0];
             cityName = picker.displayValue[1];
             countryName = picker.displayValue[2];
+            if(cityName == "全部"){
+                cityName = ''
+            }
 
             $.ajax({
                 async: false,
@@ -400,7 +403,7 @@
                     backgroundColor: '#404a59',
                     title: {
                         text: '劲酒货物流向图',
-                        left: 'center',
+                        left: 'left',
                         textStyle: {
                             color: '#fff'
                         }

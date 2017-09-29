@@ -78,7 +78,7 @@ public class SalesFactQuery extends JBaseQuery {
 
         LinkedList<Object> params = new LinkedList<Object>();
         StringBuilder sqlBuilder =
-                new StringBuilder("select TRUNCATE(SUM(totalSales)/100, 2) as totalAmount");
+                new StringBuilder("select COALESCE(TRUNCATE(SUM(totalSales)/100, 2), 0) as totalAmount");
         sqlBuilder.append(" from sales_fact");
 
         boolean needWhere = true;

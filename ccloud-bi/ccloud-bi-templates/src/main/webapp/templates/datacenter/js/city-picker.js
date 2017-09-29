@@ -173,7 +173,7 @@
       var p = $.extend({}, params, config);
       //计算value
       var val = $(this).val();
-      if (!val) val = '北京 北京市 东城区';
+      if (!val) val = '湖北省 武汉市 武昌区';
       currentProvince = val.split(" ")[0];
       currentCity = val.split(" ")[1];
       currentDistrict= val.split(" ")[2];
