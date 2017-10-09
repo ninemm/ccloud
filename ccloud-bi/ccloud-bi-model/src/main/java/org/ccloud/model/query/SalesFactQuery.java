@@ -807,6 +807,46 @@ public class SalesFactQuery extends JBaseQuery {
 
     }
 
+    public List<Record> findProductListBySeller(String provName, String cityName, String countryName,
+            String sellerCode, String startDate, String endDate) {
+
+        LinkedList<Object> params = new LinkedList<Object>();
+
+        StringBuilder sqlBuilder = new StringBuilder("select cInvName");
+
+        sqlBuilder.append(", TRUNCATE(SUM(totalSmallAmount/cInvMNum), 2) as totalNum");
+        sqlBuilder.append(", TRUNCATE(SUM(totalSales)/1000000, 2) as totalAmount");
+
+        sqlBuilder.append(" from sales_fact");
+
+        boolean needWhere = true;
+        needWhere = appendIfNotEmpty(sqlBuilder, "provName", provName, params, needWhere);
+        needWhere = appendIfNotEmpty(sqlBuilder, "cityName", cityName, params, needWhere);
+        needWhere = appendIfNotEmpty(sqlBuilder, "countryName", countryName, params, needWhere);
+        needWhere = appendIfNotEmpty(sqlBuilder, "sellerCode", sellerCode, params, needWhere);
+
+        if (needWhere) {
+            sqlBuilder.append(" where 1 = 1");
+        }
+
+        if (startDate != null) {
+            sqlBuilder.append(" and idate >= ?");
+            params.add(startDate);
+        }
+
+        if (endDate != null) {
+            sqlBuilder.append(" and idate <= ?");
+            params.add(endDate);
+        }
+        sqlBuilder.append(" and customerType != 7");
+
+        sqlBuilder.append(" group by cInvCode");
+        sqlBuilder.append(" order by totalNum desc");
+
+        return Db.find(sqlBuilder.toString(), params.toArray());
+
+    }
+
     public List<Record> findProductListByCustomerId(String customerId, String startDate,
             String endDate) {
 

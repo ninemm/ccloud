@@ -259,6 +259,24 @@ public class SalesFactController extends BaseFrontController {
 
     }
 
+    public void productBySeller() {
+
+        String provName = getPara("provName", "").trim();
+        String cityName = getPara("cityName", "").trim();
+        String countryName = getPara("countryName", "").trim();
+        String sellerCode = getPara("sellerCode", "").trim();
+        String dateType = getPara("dateType", "0").trim(); // 0: 昨天， 1: 最近1周， 2: 最近1月
+
+        String startDate = DateUtils.getDateByType(dateType);
+        String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+
+        List<Record> result = SalesFactQuery.me().findProductListBySeller(provName, cityName,
+                countryName, sellerCode, startDate, endDate);
+
+        renderJson(result);
+
+    }
+
     public void queryMapData() {
 
         String provName = getPara("provName", "").trim();
