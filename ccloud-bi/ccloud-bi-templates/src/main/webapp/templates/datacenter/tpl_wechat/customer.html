@@ -183,18 +183,21 @@
             data:{dateType: dateType, customerId: customerId},
             dataType:"json"
         }).done(function(data){
-            var tpTitle = customerName + '销售统计';
+            var tpTitle = customerName + '销售情况';
             var $p = $("#p_customerId_product");
             var $customerName = $("#customer-name");
             $customerName.empty();
-            $customerName.text(customerName);
+            $customerName.text(tpTitle);
             $p.attr('class', 'title');
             $p.show();
 
             var $tbody = $("#customerId_product tbody");
             $tbody.empty();
-            $tbody.append("<tr><th>产品</th><th>数量(件)</th><th>金额(元)</th></tr>");
             for(var i = 0; i < data.length; i++){
+                if(i == 0 || data[i].idate != data[i-1].idate) {
+                    $tbody.append("<tr><th colspan='3'>日期：" + data[i].idate + "</th></tr>");
+                    $tbody.append("<tr><th>产品</th><th>数量(件)</th><th>金额(元)</th></tr>");
+                }
                 $tbody.append("<tr><td>" + data[i].cInvName + "</td><td class='t-r'>" + data[i].totalNum + "</td><td class='t-r'>" + data[i].totalAmount + "</td></tr>");
             }
        });
@@ -234,15 +237,15 @@
             $p.empty();
             $p.text(crTitle);
 
-
             var crOption = {
-                 color: ['#4ac7f5', '#f36f8a', '#fd9173', '#AF89D6', '#5f71d2'],
+                 color: ['#4ac7f5', '#f36f8a', '#fd9173', '#AF89D6', '#5f71d2', '#a6c84c', '#ffa022', '#46bee9'],
                  legend: {
                      //selectedMode:false,
                      orient: 'vertical',
                      x: 'right',
                      top : '0%',
                      bottom : '0%',
+                     itemGap : 1,
                      data:crLegendData
                  },
                  series: [
@@ -427,7 +430,7 @@
             <div id="relocation" class="relocation"><i class="icon-map-marker txt-color-blue"></i> 定位</div>
         </header>
         <div id="allmap"></div>
-        <p id="p_customerId_product" style="display:none;" class="txt-color-red"><span id="customer-name"></span><span>销售统计</span></p>
+        <p id="p_customerId_product" style="display:none;" class="txt-color-red"><span id="customer-name"></span></p>
         <div class="weui-cells weui-cells_form">
             <div class="weui-cell" style="padding: 0">
                 <table class="table table-striped table-bordered" id="customerId_product">

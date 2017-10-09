@@ -185,6 +185,7 @@ public class SalesFactQuery extends JBaseQuery {
             sqlBuilder.append(" where 1 = 1");
         }
 
+        sqlBuilder.append(" and isValid = 1 ");
         sqlBuilder.append(" and type != 7 ");
         sqlBuilder.append(" group by customerId) as customer");
         return Db.queryLong(sqlBuilder.toString(), params.toArray());
@@ -852,7 +853,7 @@ public class SalesFactQuery extends JBaseQuery {
 
         LinkedList<Object> params = new LinkedList<Object>();
 
-        StringBuilder sqlBuilder = new StringBuilder("select customerTypeName, cInvName");
+        StringBuilder sqlBuilder = new StringBuilder("select idate, customerTypeName, cInvName");
 
         sqlBuilder.append(", TRUNCATE(SUM(totalSmallAmount/cInvMNum), 2) as totalNum");
         sqlBuilder.append(", TRUNCATE(SUM(totalSales)/100, 2) as totalAmount");
@@ -876,8 +877,8 @@ public class SalesFactQuery extends JBaseQuery {
             params.add(endDate);
         }
 
-        sqlBuilder.append(" group by cInvCode");
-        sqlBuilder.append(" order by totalAmount desc");
+        sqlBuilder.append(" group by idate, cInvCode");
+        sqlBuilder.append(" order by idate desc, totalAmount desc");
 
         return Db.find(sqlBuilder.toString(), params.toArray());
     }
