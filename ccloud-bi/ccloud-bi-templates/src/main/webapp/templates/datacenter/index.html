@@ -3,7 +3,36 @@
     section {
         background: #fff;
     }
-    
+    .location-wrapper {
+        margin-top: 2.4rem;
+    }
+    .wy-header-title{
+        display:inline;
+        margin: 0 0 0 3.2rem;
+        line-height: 2rem;
+        color: #999;
+    }
+    #relocation{
+        display:inline;
+    }
+    .compare .gather {
+        display: inline-block;
+        width: 49%;
+        border: 0;
+    }
+    .compare .gather:first-child {
+        border-right: 1px solid #e0e0e0;
+    }
+    .compare .gather p,.compare .gather span {
+        display: block;
+        width: 100%;
+        text-align: center;
+    }
+    #orderAvg {
+      width: 100%;
+      height: 14rem;
+    }
+
     .map-wrapper {
         width: 100%;
         height: 20rem;
@@ -27,6 +56,22 @@
     <script type="text/javascript" src="${CTPATH}/js/convertor.js"></script>
 </#macro>
 <#macro script>
+    var baiduMap = new BaiduMap();
+    $(function() {
+        if(provName == '' || cityName == '' || countryName == '' || provName == null || cityName == null || countryName == null) {
+
+            baiduMap.getLocation(loadOrderData);
+
+        }else{
+            $city.text(cityName);
+
+            curProvName = strKit.convertProvName(provName);                
+            mapDataUrl = '${CTPATH}/json/'+cityMap[curProvName]+'/'+cityMap[cityName]+'.json';
+            loadOrderData();
+        }
+        topTotal(provName, cityName, countryName);
+        total(provName, cityName, countryName, dateType);
+    });
 
     var $city = $("#city-name");
     
@@ -34,32 +79,15 @@
     var cityName = $.cookie(Utils.cityCacheName);
     var countryName = $.cookie(Utils.countryCacheName);
     var curProvName = '';
+    var dateType = '0';
     
-    var series = [];
     var option = null;
     var geoCoordMap = {};
     var color = ['#a6c84c', '#ffa022', '#46bee9'];
     
     var mapDataUrl = '';
     
-    var $map = document.getElementById("map");
-    var myChart = echarts.init($map);
-    
     var strKit = new StrKit();
-    var baiduMap = new BaiduMap();
-    
-    if(provName == '' || cityName == '' || countryName == '' || provName == null || cityName == null || countryName == null) {
-
-        baiduMap.getLocation(loadOrderData);
-        //mapLocation();
-
-    }else{
-        $city.text(cityName);
-                        
-        curProvName = strKit.convertProvName(provName);                
-        mapDataUrl = '${CTPATH}/json/'+cityMap[curProvName]+'/'+cityMap[cityName]+'.json';
-        loadOrderData();
-    }
 
     //做时间的切换选择
     $(".date").click(function(e) {
@@ -69,29 +97,139 @@
     });
     function setDateType(type){
         dateType = type;
-        lMap(dateType);
-        customer(provName, cityName, '', dateType);
-        product_rank(provName, cityName, '', dateType, customerTypeName);
-        area_rank(provName, cityName, '', dateType, customerTypeName);
+        total(provName, cityName, countryName, dateType);
+        loadOrderData()
+    }
+    
+    //顶部统计
+    function topTotal(provName, cityName, countryName){
+        countryName = '';
+        $.ajax({
+            url:"${CPATH}/topTotal",
+            type:"post",
+            data:{"provName": provName, "cityName": cityName, countryName: countryName},
+            dataType:"json"
+        }).done(function(data){
+        
+            var allCustomerTotal = new CountUp("all-customer",0, parseInt(data.totalAllCustomerCount));
+            allCustomerTotal.start();
+            var topCustomerTotal = new CountUp("all-order-customer",0, parseInt(data.totalCustomerCount));
+            topCustomerTotal.start();
+
+            setTimeout(function() {
+                $("#all-customer").addClass('animated pulse');
+                setTimeout(function() {
+                    $("#all-order-customer").addClass('animated pulse');
+                }, 1000);
+            }, 2000);
+
+       });
     }
 
-    var sales = new CountUp("sales", 0, parseInt('${totalOrderAmount!}'));
-    sales.start();
-    var orderTotal = new CountUp("order-total",0, parseInt('${totalOrderCount!}'));
-    orderTotal.start();
-    var customerTotal = new CountUp("customer",0, parseInt('${totalCustomerCount!}'));
-    customerTotal.start();
-    
-    setTimeout(function() {
-        $("#sales").addClass('animated pulse');
-        setTimeout(function() {
-            $("#order-total").addClass('animated pulse');
+    //订单平均金额
+    function orderAvg(data, countryName){
+
+        var oTitle = '订单平均金额(单位/元)';
+        if((provName + cityName + countryName).trim() != '' ){
+            oTitle = provName + cityName + countryName + oTitle;
+        } else {
+            oTitle = '全国' + oTitle
+        }
+
+        var xData = [];
+        var seriesData = [];
+
+        for(var i = 0; i < data.length; i++){
+            xData.push(data[i].idate) ;
+            seriesData.push(data[i].avgAmount);
+        }
+
+        var orderAvg = document.getElementById('orderAvg');
+        //var $stock = $(stock);
+
+        var orderAvgChart = echarts.init(orderAvg);
+        var option = {
+            title: {
+                left: 'center',
+                top: 'top',
+                text: oTitle,
+                textStyle: {
+                    fontWeight: 'normal',
+                    color: '#ea6f5a',
+                    fontSize: '.7rem'
+                }
+            },
+            tooltip : {
+            },
+            grid: {
+                left: '13%',
+                right: '8%',
+                top: '25%'
+            },
+            xAxis: {
+                data: xData
+            },
+            yAxis: {},
+            series: [{
+                name: oTitle,
+                type: 'line',
+                itemStyle: {
+                    normal: {color: '#a6c84c'}
+                },
+                lineStyle: {
+                    normal: {color: '#a6c84c'}
+                },
+                markPoint: {
+                    label: {
+                        normal: {
+                            textStyle: {
+                                color: '#000',
+                            }
+                        }
+                    },
+                    data : [
+                        {type: 'max', name: '最大值'},
+                        {type: 'min', name: '最小值'}
+                    ]
+                },
+                data:seriesData
+            }]
+        };
+        orderAvgChart.resize();
+        orderAvgChart.setOption(option, true);
+    }
+
+    function total(provName, cityName, countryName, dateType){
+        countryName = '';
+        $.ajax({
+            url:"${CPATH}/total",
+            type:"post",
+            data:{"provName": provName, "cityName": cityName, countryName: countryName, dateType: dateType},
+            dataType:"json"
+        }).done(function(data){
+
+            orderAvg(data.orderAvg, countryName);
+
+            var salesTotal = new CountUp("order-sales", 0, parseInt(data.totalOrderAmount));
+            salesTotal.start();
+            var orderTotal = new CountUp("order-total",0, parseInt(data.totalOrderCount));
+            orderTotal.start();
+            var customerTotal = new CountUp("order-customer",0, parseInt(data.totalCustomerCount));
+            customerTotal.start();
+
+            
             setTimeout(function() {
-                $("#customer").addClass('animated pulse');
-            }, 1000);
-        }, 1000);
-    }, 2000);
-    
+                $("#order-sales").addClass('animated pulse');
+                setTimeout(function() {
+                    $("#order-total").addClass('animated pulse');
+                    setTimeout(function() {
+                        $("#order-customer").addClass('animated pulse');
+                    }, 1000);
+                }, 1000);
+            }, 2000);
+       });
+    }
+
     $("#drop-down").cityPicker({
         title: "请选择位置",
         //showDistrict: false,
@@ -99,151 +237,70 @@
             $("#city-name").text(displayValues[1]);
         },
         onClose: function (picker) {
-            myChart.clear();
             
             provName = picker.displayValue[0];
             cityName = picker.displayValue[1];
             countryName = picker.displayValue[2];
+            if(cityName == "全部"){
+                cityName = ''
+            }
 
-            //$.cookie(Utils.longitudeCache, 114.362938, { expires: 7 });
-            //$.cookie(Utils.latitudeCache, 30.533494, { expires: 7 });
+            $.ajax({
+                async: false,
+                type: "GET",
+                dataType: 'jsonp',
+                jsonp: 'callback',
+                jsonpCallback: 'callbackfunction',
+                url: "http://api.map.baidu.com/geocoder/v2/?city="+ cityName +"&address=" + countryName +"&output=json&ak=su3AmHLUcBprpnOLmVHo7r8AljbW8X6t&callback=showLocation",
+                contentType: "application/json;utf-8"
+            }).done(function(data){
+                if(data.status == 0){
+                    $.cookie(Utils.longitudeCache, data.result.location.lng, { expires: 7 });
+                    $.cookie(Utils.latitudeCache, data.result.location.lat, { expires: 7 });
+                }
+            });
 
             $.cookie(Utils.provCacheName, provName, { expires: 7 });
             $.cookie(Utils.cityCacheName, cityName, { expires: 7 });
             $.cookie(Utils.countryCacheName, countryName, { expires: 7 });
 
+            topTotal(provName, cityName, countryName);
+            total(provName, cityName, countryName, dateType);
+
             curProvName = strKit.convertProvName(provName);
             
-            mapDataUrl = '${CTPATH}/json/'+cityMap[curProvName]+'/'+cityMap[cityName]+'.json';
+            mapDataUrl = '${CTPATH}/json/'+cityMap[curProvName]+'/'+ (cityMap[cityName] != undefined ? cityMap[cityName] : cityMap[curProvName]) +'.json';
             loadOrderData();
         }
     });
     
     $("#relocation").on('click', function() {
         baiduMap.getLocation(loadOrderData);
-        //mapLocation(true);
+        topTotal(provName, cityName, countryName);
     });
 
-    function mapLocation(flg) {
-        
+    function loadOrderData() {
+        var myChart = echarts.init(document.getElementById("map"));
+        var series = [];
         myChart.showLoading({
             text: '加载中...',
             effect: 'whirling'
         });
-        
-        //如果点击定位清空位置信息
-        if(flg){
-            provName = '';
-            cityName = '';
-            countryName = '';
+
+        var point = '武昌区';
+        if(cityName == '黄石市') {
+          point = '大冶市'
+        } else if(cityName == '') {
+          point = '黄石市';
         }
 
-        if (provName == '' || cityName == '' || countryName == '' || provName == null || cityName == null || countryName == null) {
-        
-            wx.config({
-                debug: Utils.devMode, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
-                appId: '${appId!}', // 必填，公众号的唯一标识
-                timestamp: '${timestamp!}', // 必填，生成签名的时间戳
-                nonceStr: '${nonceStr!}', // 必填，生成签名的随机串
-                signature: '${signature!}',// 必填，签名，见附录1
-                jsApiList: ['checkJsApi', 'getLocation'] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
-            });
-            
-            wx.ready(function() {
-               wx.checkJsApi({
-                   jsApiList: [
-                       'checkJsApi',
-                       'getLocation'
-                   ],
-                   success: function (res) {
-                       if (res.checkResult.getLocation == false) {
-                           alert('你的微信版本太低，不支持微信JS接口，请升级到最新的微信版本！');
-                           return;
-                       } else {
-                           wx.getLocation({
-                               type: 'wgs84', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
-                               success: function (res) {
-        
-                                   var latitude = res.latitude;                      // 纬度，浮点数，范围为90 ~ -90
-                                   var longitude = res.longitude;                    // 经度，浮点数，范围为180 ~ -180。
-                                   var speed = res.speed;                            // 速度，以米/每秒计
-                                   var accuracy = res.accuracy;                      // 位置精度
-                                   
-                                   var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
-                                   var geoc = new BMap.Geocoder();                   // 获取百度地址解析器  
-                                   
-                                   translateCallback = function (point) {            // 回调函数
-                                       geoc.getLocation(point, function(rs) {
-                                           var addComp = rs.addressComponents;
-                                           //var Address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
-                                           provName = addComp.province;
-                                           cityName = addComp.city;
-                                           countryName = addComp.district;
-                                           
-                                           $.cookie(Utils.longitudeCache, rs.point.lng, { expires: 7 });
-                                           $.cookie(Utils.latitudeCache, rs.point.lat, { expires: 7 });
-                                           
-                                           $.cookie(Utils.provCacheName, provName, { expires: 7 });
-                                           $.cookie(Utils.cityCacheName, cityName, { expires: 7 });
-                                           $.cookie(Utils.countryCacheName, countryName, { expires: 7 });
-
-                                           curProvName = strKit.convertProvName(provName);
-
-                                           $city.text(cityName);
-                                           mapDataUrl = '${CTPATH}/json/'+cityMap[curProvName]+'/'+cityMap[cityName]+'.json';
-                                           loadOrderData();
-                                       });
-                                   }
-                                   
-                                   setTimeout(function() {
-                                       BMap.Convertor.translate(point, 0, translateCallback);//真实经纬度转成百度坐标
-                                   }, 100);
-                               },
-                               fail: function(rs){
-                                  console.log(rs);
-                                  provName = '湖北省';
-                                  cityName = '武汉市';
-                                  countryName = '武昌区';
-                                  
-                                  $.cookie(Utils.longitudeCache, 114.362938, { expires: 7 });
-                                  $.cookie(Utils.latitudeCache, 30.533494, { expires: 7 });
-                                  
-                                  $.cookie(Utils.provCacheName, provName, { expires: 7 });
-                                  $.cookie(Utils.cityCacheName, cityName, { expires: 7 });
-                                  $.cookie(Utils.countryCacheName, countryName, { expires: 7 });
-                                  
-                                  curProvName = strKit.convertProvName(provName);
-                                  
-                                  $city.text(cityName);
-                                  mapDataUrl = '${CTPATH}/json/'+cityMap[curProvName]+'/'+cityMap[cityName]+'.json';
-                                  loadOrderData();
-                                  alert("定位失败！请检查是否开启定位，暂时將为您显示武汉信息");
-                               }
-                           });
-                       }
-                   }
-                });
-            });
-            wx.error(function(res) {
-               //console.log(JOSN.stringify(res));
-            });
-        } else {
-           $city.text(cityName);
-                           
-           curProvName = strKit.convertProvName(provName);                
-           mapDataUrl = '${CTPATH}/json/'+cityMap[curProvName]+'/'+cityMap[cityName]+'.json';
-           loadOrderData();
-        }
-    }
-    
-    function loadOrderData() {
         $.ajax({
             type: 'post',
             url: '${CPATH}/orderAmount',
-            data: {provName: provName, cityName: cityName, countryName: countryName},
+            data: {provName: provName, cityName: cityName, countryName: point, dateType: dateType},
             dataType: 'json',
             success: function(data) {
-    
+
                 option = {
                     backgroundColor: '#404a59',
                     title: {
@@ -286,13 +343,13 @@
                     },
                     series: series
                 };
-                getMapData(data);
+                getMapData(data, series, myChart);
             }
         });
     }
     
-    var getMapData = function(areaData) {
-    
+    var getMapData = function(areaData, series, myChart) {
+
         $.getJSON(mapDataUrl, function(data) {
             
             echarts.registerMap('wuhan', data);
@@ -376,6 +433,8 @@
             });
             
             if (option && typeof option === "object") {
+                myChart.clear();
+                myChart.resize();
                 myChart.setOption(option, true);
             }
             myChart.hideLoading();
@@ -410,8 +469,26 @@
     <div class="bi-body">
         <#include "_inc/_search_box.html"/>
         <#include "_inc/_location_box.html"/>
-        <div class="foot-black"></div>
-        <div class="map-wrapper">
+
+        <div class="compare">
+            <div class="gather">
+                <p>
+                    总客户数(个):<br/><span id="all-customer"></span>
+                </p>
+            </div>
+            <div class="gather">
+                <p>
+                    总下单客户数(个):<br/><span id="all-order-customer"></span>
+                </p>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        
+        <div class="divide-line"></div>
+        <div id="orderAvg"></div>
+        <div class="divide-line"></div>
+
+        <div id="map-wrapper" class="map-wrapper">
             <div id="map" class="maps"></div>
         </div>
 
@@ -422,21 +499,21 @@
             <div class="gather">
                 <img src="${CTPATH}/images/money.png">
                 <p>
-                    总销售额(元):<br/><span id="sales"></span>
+                    销售额(元):<br/><span id="order-sales"></span>
                 </p>
                 <div class="clearfix"></div>
             </div>
             <div class="gather">
                 <img src="${CTPATH}/images/order.png">
                 <p>
-                    订单总数(笔):<br/><span id="order-total"></span>
+                    订单数(笔):<br/><span id="order-total"></span>
                 </p>
                 <div class="clearfix"></div>
             </div>
             <div class="gather">
                 <img src="${CTPATH}/images/customer.png">
                 <p>
-                    客户总数(个):<br/><span id="customer"></span>
+                    客户数(个):<br/><span id="order-customer"></span>
                 </p>
                 <div class="clearfix"></div>
             </div>
