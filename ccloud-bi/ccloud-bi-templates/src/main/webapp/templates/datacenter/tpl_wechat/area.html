@@ -83,17 +83,17 @@
     var provName = $.cookie(Utils.provCacheName);
     var cityName = $.cookie(Utils.cityCacheName);
     var countryName = $.cookie(Utils.countryCacheName);
+    var curProvTitle = null;
     
     var dateType = 0;// 日期搜索按钮类型
     var prov_data = [];
     var city_data = [];
     var country_data = [];
     
-    var curProvTitle = null;
     var color = ['#a6c84c', '#ffa022', '#46bee9'];
     
     $(function() {
-        //Utils.loading();
+        Utils.loading();
         /*if (provName == null || cityName == null || countryName == null) {
             var baiduMap = new BaiduMap();
             baiduMap.getLocation();
@@ -161,7 +161,7 @@
             historyUtils.back();
         });
         
-        Utils.close(); 
+        Utils.close();
     });
 
     //回到中国地图界面

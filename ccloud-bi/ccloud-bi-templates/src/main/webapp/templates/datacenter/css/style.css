@@ -69,6 +69,7 @@ a:visited {text-decoration:overline; cursor:pointer}
 /*.txt-color-red{color:#ea6f5a;}*/
 .txt-color-red{color: #ea6f5a!important;}
 .txt-color-green {color: #8bc34a;}
+.txt-color-blue {color: #7198e0;}
 .yellow-color{background-color:#ffb03f;}
 .gray-color{background-color:#ddd;}
 .red-color{background-color:#ea6f5a;}
@@ -529,6 +530,12 @@ header {
 	font-size: 10vw;
 }
 
+.divide-line {
+    height: .5rem;
+    width: 100%;
+    background: #f3f3f3;
+}
+
 /*
 * 销售  ***********************************************************
 */
@@ -541,7 +548,6 @@ header {
     width: 100%;
     display: flex;
     justify-content: space-between;
-    padding: .5rem 1rem;
     line-height: 2.4rem;
     height: 2.4rem;
     background: #fff;
@@ -551,7 +557,7 @@ header {
 }
 
 .date-div .date {
-    display: block;
+    display: inline;
     font-size: .7rem;
     width: 22%;
     text-align: center;
@@ -561,6 +567,7 @@ header {
     border: 1px solid #f2f2f2;
     color: #666;
     background: #f2f2f2;
+    margin: .5rem .3rem;
 }
 
 .date-div .active-date {
@@ -575,19 +582,22 @@ header {
     height: 2rem;
     line-height: 2rem;
     width: 100%;
-    padding: .2rem .5rem;
     color: #999;
-    font-size: .8rem;
-    position: fixed;
-    background: #fff;
+    font-size: .7rem;
+    background: #f2f2f2;
     z-index: 10;
 }
 
-.relocation {
+.location-wrapper .location{
+    display:inline;
+    margin-left: .5rem;
+}
+
+.location-wrapper .relocation {
     clear: both;
-    width: 20%;
     display: inline-block;
     cursor: pointer;
+    margin-right: .5rem;
 }
 
 /*地图*/

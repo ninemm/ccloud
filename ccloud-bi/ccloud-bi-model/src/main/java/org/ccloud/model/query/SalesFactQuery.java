@@ -13,7 +13,6 @@
  */
 package org.ccloud.model.query;
 
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -72,21 +71,13 @@ public class SalesFactQuery extends JBaseQuery {
         return 0;
     }
 
-    // 订单记录总数
-    public Long findOrderCount() {
-
-        StringBuilder sql = new StringBuilder("select count(*) from (");
-        sql.append(" select stockId from sales_fact group by stockId) as sales");
-        return Db.queryLong(sql.toString());
-
-    }
-
     // 订单总金额
-    public Double findTotalAmount(String provName, String cityName, String countryName) {
+    public Double findTotalAmount(String provName, String cityName, String countryName,
+            String startDate, String endDate) {
 
         LinkedList<Object> params = new LinkedList<Object>();
         StringBuilder sqlBuilder =
-                new StringBuilder("select TRUNCATE(SUM(totalSales)/100, 2) as totalAmount");
+                new StringBuilder("select COALESCE(TRUNCATE(SUM(totalSales)/100, 2), 0) as totalAmount");
         sqlBuilder.append(" from sales_fact");
 
         boolean needWhere = true;
@@ -94,18 +85,150 @@ public class SalesFactQuery extends JBaseQuery {
         needWhere = appendIfNotEmpty(sqlBuilder, "cityName", cityName, params, needWhere);
         needWhere = appendIfNotEmpty(sqlBuilder, "countryName", countryName, params, needWhere);
 
-        return Db.queryBigDecimal(sqlBuilder.toString()).doubleValue();
+        if (needWhere) {
+            sqlBuilder.append(" where 1 = 1");
+        }
+
+        if (startDate != null) {
+            sqlBuilder.append(" and idate >= ?");
+            params.add(startDate);
+        }
+
+        if (endDate != null) {
+            sqlBuilder.append(" and idate <= ?");
+            params.add(endDate);
+        }
+        sqlBuilder.append(" and customerType != 7");
+
+        return Db.queryBigDecimal(sqlBuilder.toString(), params.toArray()).doubleValue();
+    }
+
+    // 订单记录总数
+    public Long findOrderCount(String provName, String cityName, String countryName,
+            String startDate, String endDate) {
+
+        LinkedList<Object> params = new LinkedList<Object>();
+        StringBuilder sqlBuilder = new StringBuilder("select count(1) from (");
+        sqlBuilder.append(" select stockId from sales_fact ");
+
+        boolean needWhere = true;
+        needWhere = appendIfNotEmpty(sqlBuilder, "provName", provName, params, needWhere);
+        needWhere = appendIfNotEmpty(sqlBuilder, "cityName", cityName, params, needWhere);
+        needWhere = appendIfNotEmpty(sqlBuilder, "countryName", countryName, params, needWhere);
+
+        if (needWhere) {
+            sqlBuilder.append(" where 1 = 1");
+        }
+
+        if (startDate != null) {
+            sqlBuilder.append(" and idate >= ?");
+            params.add(startDate);
+        }
+
+        if (endDate != null) {
+            sqlBuilder.append(" and idate <= ?");
+            params.add(endDate);
+        }
+        sqlBuilder.append(" and customerType != 7 ");
+        sqlBuilder.append(" group by stockId) as sales ");
+
+        return Db.queryLong(sqlBuilder.toString(), params.toArray());
+
     }
 
     // 订单客户总数
-    public Long findCustomerCount() {
+    public Long findCustomerCount(String provName, String cityName, String countryName,
+            String startDate, String endDate) {
 
-        StringBuilder sql = new StringBuilder("select count(*) from (");
-        sql.append(" select customerId from sales_fact group by customerId) as customer");
-        return Db.queryLong(sql.toString());
+        LinkedList<Object> params = new LinkedList<Object>();
+        StringBuilder sqlBuilder = new StringBuilder("select count(1) from (");
+        sqlBuilder.append(" select customerId from sales_fact ");
+
+        boolean needWhere = true;
+        needWhere = appendIfNotEmpty(sqlBuilder, "provName", provName, params, needWhere);
+        needWhere = appendIfNotEmpty(sqlBuilder, "cityName", cityName, params, needWhere);
+        needWhere = appendIfNotEmpty(sqlBuilder, "countryName", countryName, params, needWhere);
+
+        if (needWhere) {
+            sqlBuilder.append(" where 1 = 1");
+        }
+
+        if (startDate != null) {
+            sqlBuilder.append(" and idate >= ?");
+            params.add(startDate);
+        }
+
+        if (endDate != null) {
+            sqlBuilder.append(" and idate <= ?");
+            params.add(endDate);
+        }
+        sqlBuilder.append(" and customerType != 7 ");
+        sqlBuilder.append(" group by customerId) as customer");
+        return Db.queryLong(sqlBuilder.toString(), params.toArray());
 
     }
+    
+    // 客户总数
+    public Long findAllCustomerCount(String provName, String cityName, String countryName) {
 
+        LinkedList<Object> params = new LinkedList<Object>();
+        StringBuilder sqlBuilder = new StringBuilder("select count(1) from (");
+        sqlBuilder.append(" select customerId from customer_info ");
+
+        boolean needWhere = true;
+        needWhere = appendIfNotEmpty(sqlBuilder, "provName", provName, params, needWhere);
+        needWhere = appendIfNotEmpty(sqlBuilder, "cityName", cityName, params, needWhere);
+        needWhere = appendIfNotEmpty(sqlBuilder, "countryName", countryName, params, needWhere);
+        
+        if (needWhere) {
+            sqlBuilder.append(" where 1 = 1");
+        }
+
+        sqlBuilder.append(" and isValid = 1 ");
+        sqlBuilder.append(" and type != 7 ");
+        sqlBuilder.append(" group by customerId) as customer");
+        return Db.queryLong(sqlBuilder.toString(), params.toArray());
+
+    }
+    
+    // 订单平均金额
+    public List<Record> findOrderAvgAmountList(String provName, String cityName, String countryName,
+            String startDate, String endDate) {
+
+        LinkedList<Object> params = new LinkedList<Object>();
+
+        StringBuilder sqlBuilder = new StringBuilder("select idate");
+
+        sqlBuilder.append(", TRUNCATE(SUM(totalSales)/(COUNT(DISTINCT stockId) * 100), 2) as avgAmount");
+
+        sqlBuilder.append(" from sales_fact");
+
+        boolean needWhere = true;
+        needWhere = appendIfNotEmpty(sqlBuilder, "provName", provName, params, needWhere);
+        needWhere = appendIfNotEmpty(sqlBuilder, "cityName", cityName, params, needWhere);
+        needWhere = appendIfNotEmpty(sqlBuilder, "countryName", countryName, params, needWhere);
+
+        if (needWhere) {
+            sqlBuilder.append(" where 1 = 1");
+        }
+
+        if (startDate != null) {
+            sqlBuilder.append(" and idate >= ?");
+            params.add(startDate);
+        }
+
+        if (endDate != null) {
+            sqlBuilder.append(" and idate <= ?");
+            params.add(endDate);
+        }
+
+        sqlBuilder.append(" and customerType != 7 ");
+        sqlBuilder.append(" group by idate  ");
+        sqlBuilder.append(" order by idate asc");
+
+        return Db.find(sqlBuilder.toString(), params.toArray());
+
+    }
 
     public List<Map<String, Object>> findAreaArray(String provName, String cityName,
             String countryName, String startDate, String endDate) {
@@ -512,7 +635,7 @@ public class SalesFactQuery extends JBaseQuery {
     }
 
     public List<Record> findOrderAmount(String provName, String cityName, String countryName,
-            Date startDate, Date endDate) {
+            String startDate, String endDate,int divideFlg) {
 
         LinkedList<Object> params = new LinkedList<Object>();
 
@@ -525,8 +648,14 @@ public class SalesFactQuery extends JBaseQuery {
         } else {
             sqlBuilder.append(" provName");
         }
-
-        sqlBuilder.append(", TRUNCATE(SUM(totalSales)/1000000, 2) as totalAmount");
+        
+        if(divideFlg == 1) {
+            sqlBuilder.append(", TRUNCATE(SUM(totalSales)/1000000, 2) as totalAmount");
+        } else if(divideFlg == 2){
+            sqlBuilder.append(", TRUNCATE(SUM(totalSales)/4000000, 2) as totalAmount");
+        } else if(divideFlg == 3){
+            sqlBuilder.append(", TRUNCATE(SUM(totalSales)/2000000, 2) as totalAmount");
+        } 
 
         sqlBuilder.append(" from sales_fact");
 
@@ -539,12 +668,12 @@ public class SalesFactQuery extends JBaseQuery {
             sqlBuilder.append(" where 1 = 1");
         }
 
-        if (startDate != null) {
+        if (StrKit.notBlank(startDate)) {
             sqlBuilder.append(" and idate >= ?");
             params.add(startDate);
         }
 
-        if (endDate != null) {
+        if (StrKit.notBlank(endDate)) {
             sqlBuilder.append(" and idate <= ?");
             params.add(endDate);
         }
@@ -684,12 +813,52 @@ public class SalesFactQuery extends JBaseQuery {
 
     }
 
+    public List<Record> findProductListBySeller(String provName, String cityName, String countryName,
+            String sellerCode, String startDate, String endDate) {
+
+        LinkedList<Object> params = new LinkedList<Object>();
+
+        StringBuilder sqlBuilder = new StringBuilder("select cInvName");
+
+        sqlBuilder.append(", TRUNCATE(SUM(totalSmallAmount/cInvMNum), 2) as totalNum");
+        sqlBuilder.append(", TRUNCATE(SUM(totalSales)/1000000, 2) as totalAmount");
+
+        sqlBuilder.append(" from sales_fact");
+
+        boolean needWhere = true;
+        needWhere = appendIfNotEmpty(sqlBuilder, "provName", provName, params, needWhere);
+        needWhere = appendIfNotEmpty(sqlBuilder, "cityName", cityName, params, needWhere);
+        needWhere = appendIfNotEmpty(sqlBuilder, "countryName", countryName, params, needWhere);
+        needWhere = appendIfNotEmpty(sqlBuilder, "sellerCode", sellerCode, params, needWhere);
+
+        if (needWhere) {
+            sqlBuilder.append(" where 1 = 1");
+        }
+
+        if (startDate != null) {
+            sqlBuilder.append(" and idate >= ?");
+            params.add(startDate);
+        }
+
+        if (endDate != null) {
+            sqlBuilder.append(" and idate <= ?");
+            params.add(endDate);
+        }
+        sqlBuilder.append(" and customerType != 7");
+
+        sqlBuilder.append(" group by cInvCode");
+        sqlBuilder.append(" order by totalNum desc");
+
+        return Db.find(sqlBuilder.toString(), params.toArray());
+
+    }
+
     public List<Record> findProductListByCustomerId(String customerId, String startDate,
             String endDate) {
 
         LinkedList<Object> params = new LinkedList<Object>();
 
-        StringBuilder sqlBuilder = new StringBuilder("select customerTypeName, cInvName");
+        StringBuilder sqlBuilder = new StringBuilder("select idate, customerTypeName, cInvName");
 
         sqlBuilder.append(", TRUNCATE(SUM(totalSmallAmount/cInvMNum), 2) as totalNum");
         sqlBuilder.append(", TRUNCATE(SUM(totalSales)/100, 2) as totalAmount");
@@ -713,8 +882,8 @@ public class SalesFactQuery extends JBaseQuery {
             params.add(endDate);
         }
 
-        sqlBuilder.append(" group by cInvCode");
-        sqlBuilder.append(" order by totalAmount desc");
+        sqlBuilder.append(" group by idate, cInvCode");
+        sqlBuilder.append(" order by idate desc, totalAmount desc");
 
         return Db.find(sqlBuilder.toString(), params.toArray());
     }

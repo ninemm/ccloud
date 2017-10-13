@@ -84,14 +84,11 @@
     <!-- <script type='text/javascript' src="${CTPATH}/js/vconsole.min.js"></script> -->
 	
 	<script type="text/javascript">
-        if (Utils.devMode) {
-            document.write("<script type=\"text/javascript\" src=\"" + '${CTPATH}' + "/js/vconsole.min.js\">" + "<\/script>");
-        }
-	
 		$(function() {
-			
+			if (Utils.devMode) {
+	            document.write("<script type=\"text/javascript\" src=\"" + '${CTPATH}' + "/js/vconsole.min.js\">" + "<\/script>");
+	        }
         	FastClick.attach(document.body);
-        	
         	Utils.context = '${CTPATH}';
 		});	
 	</script>
