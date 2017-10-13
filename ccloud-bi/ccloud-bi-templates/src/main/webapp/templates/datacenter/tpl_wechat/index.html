@@ -70,15 +70,11 @@
     var curProvName = '';
     var dateType = '0';
     
-    var series = [];
     var option = null;
     var geoCoordMap = {};
     var color = ['#a6c84c', '#ffa022', '#46bee9'];
     
     var mapDataUrl = '';
-    
-    var $map = document.getElementById("map");
-    var myChart = echarts.init($map);
     
     var strKit = new StrKit();
     
@@ -91,6 +87,7 @@
     function setDateType(type){
         dateType = type;
         total(provName, cityName, countryName, dateType);
+        loadOrderData()
     }
     
     //顶部统计
@@ -229,7 +226,6 @@
             $("#city-name").text(displayValues[1]);
         },
         onClose: function (picker) {
-            myChart.clear();
             
             provName = picker.displayValue[0];
             cityName = picker.displayValue[1];
@@ -262,7 +258,7 @@
 
             curProvName = strKit.convertProvName(provName);
             
-            mapDataUrl = '${CTPATH}/json/'+cityMap[curProvName]+'/'+cityMap[cityName]+'.json';
+            mapDataUrl = '${CTPATH}/json/'+cityMap[curProvName]+'/'+ (cityMap[cityName] != undefined ? cityMap[cityName] : cityMap[curProvName]) +'.json';
             loadOrderData();
         }
     });
@@ -273,11 +269,6 @@
     });
 
     function mapLocation(isRelocation) {
-        
-        myChart.showLoading({
-            text: '加载中...',
-            effect: 'whirling'
-        });
         
         //如果点击定位清空位置信息
         if (isRelocation) {
@@ -391,13 +382,27 @@
     }
     
     function loadOrderData() {
+        var myChart = echarts.init(document.getElementById("map"));
+        var series = [];
+        myChart.showLoading({
+            text: '加载中...',
+            effect: 'whirling'
+        });
+
+        var point = '武昌区';
+        if(cityName == '黄石市') {
+          point = '大冶市'
+        } else if(cityName == '') {
+          point = '黄石市';
+        }
+
         $.ajax({
             type: 'post',
             url: '${CPATH}/orderAmount',
-            data: {provName: provName, cityName: "武汉市", countryName: "武昌区"},
+            data: {provName: provName, cityName: cityName, countryName: point, dateType: dateType},
             dataType: 'json',
             success: function(data) {
-    
+
                 option = {
                     backgroundColor: '#404a59',
                     title: {
@@ -440,14 +445,14 @@
                     },
                     series: series
                 };
-                getMapData(data);
+                getMapData(data, series, myChart);
             }
         });
     }
     
-    var getMapData = function(areaData) {
-    
-        $.getJSON('${CTPATH}/json/HuBei/WuHan.json', function(data) {
+    var getMapData = function(areaData, series, myChart) {
+
+        $.getJSON(mapDataUrl, function(data) {
             
             echarts.registerMap('wuhan', data);
             
@@ -530,6 +535,8 @@
             });
             
             if (option && typeof option === "object") {
+                myChart.clear();
+                myChart.resize();
                 myChart.setOption(option, true);
             }
             myChart.hideLoading();
@@ -583,7 +590,7 @@
         <div id="orderAvg"></div>
         <div class="divide-line"></div>
 
-        <div class="map-wrapper">
+        <div id="map-wrapper" class="map-wrapper">
             <div id="map" class="maps"></div>
         </div>
 

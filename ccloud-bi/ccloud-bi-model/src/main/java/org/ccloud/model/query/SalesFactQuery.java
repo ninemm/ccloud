@@ -13,7 +13,6 @@
  */
 package org.ccloud.model.query;
 
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -636,7 +635,7 @@ public class SalesFactQuery extends JBaseQuery {
     }
 
     public List<Record> findOrderAmount(String provName, String cityName, String countryName,
-            Date startDate, Date endDate) {
+            String startDate, String endDate,int divideFlg) {
 
         LinkedList<Object> params = new LinkedList<Object>();
 
@@ -649,8 +648,14 @@ public class SalesFactQuery extends JBaseQuery {
         } else {
             sqlBuilder.append(" provName");
         }
-
-        sqlBuilder.append(", TRUNCATE(SUM(totalSales)/1000000, 2) as totalAmount");
+        
+        if(divideFlg == 1) {
+            sqlBuilder.append(", TRUNCATE(SUM(totalSales)/1000000, 2) as totalAmount");
+        } else if(divideFlg == 2){
+            sqlBuilder.append(", TRUNCATE(SUM(totalSales)/4000000, 2) as totalAmount");
+        } else if(divideFlg == 3){
+            sqlBuilder.append(", TRUNCATE(SUM(totalSales)/2000000, 2) as totalAmount");
+        } 
 
         sqlBuilder.append(" from sales_fact");
 
@@ -663,12 +668,12 @@ public class SalesFactQuery extends JBaseQuery {
             sqlBuilder.append(" where 1 = 1");
         }
 
-        if (startDate != null) {
+        if (StrKit.notBlank(startDate)) {
             sqlBuilder.append(" and idate >= ?");
             params.add(startDate);
         }
 
-        if (endDate != null) {
+        if (StrKit.notBlank(endDate)) {
             sqlBuilder.append(" and idate <= ?");
             params.add(endDate);
         }

@@ -90,25 +90,36 @@ public class IndexController extends BaseFrontController {
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
 		String countryName = getPara("countryName", "").trim();
+		String dateType = getPara("dateType", "0").trim(); // 0: 昨天， 1: 最近1周， 2: 最近1月
+
+		String startDate = DateUtils.getDateByType(dateType);
+		String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+		
+		String str = "countryName";
+		int devideFlg = 1;
+		if(StrKit.isBlank(cityName)){
+			str = "cityName";
+			devideFlg = 2;
+		}else if("3".equals(dateType)) {
+			devideFlg = 3;
+		}
 
 		List<LinkedList<Map<String, Object>>> result = Lists.newLinkedList();
 		List<Record> list =
-				SalesFactQuery.me().findOrderAmount(provName, cityName, null, null, null);
+				SalesFactQuery.me().findOrderAmount(provName, cityName, null, startDate, endDate, devideFlg);
 		for (Record map : list) {
 
-			if (!StrKit.equals(countryName, map.getStr("countryName"))) {
 				LinkedList<Map<String, Object>> linkedList = new LinkedList<>();
 				Map<String, Object> fromMap = Maps.newHashMap();
 				fromMap.put("name", countryName);
 				linkedList.add(fromMap);
 
 				Map<String, Object> toMap = Maps.newHashMap();
-				toMap.put("name", map.get("countryName"));
+				toMap.put("name", map.get(str));
 				toMap.put("value", map.get("totalAmount"));
 				linkedList.add(toMap);
 
 				result.add(linkedList);
-			}
 		}
 
 		renderJson(result);
