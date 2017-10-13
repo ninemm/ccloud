@@ -51,7 +51,6 @@
 <#macro script>
     $(function() {
         dealer(provName, cityName, '', dateType);
-        dealer_detail(provName, cityName, '', dateType, dealerCode, dealerName);
         
         initTopHoverTree("gotop", 100, 10, 50);
         
@@ -63,8 +62,8 @@
     var cityName = $.cookie(Utils.cityCacheName);
     var countryName = $.cookie(Utils.countryCacheName);
     var dateType = 0;
-    var dealerCode = '02701002';
-    var dealerName = '武昌区启光商贸有限公司';
+    var dealerCode = '';
+    var dealerName = '';
     
     //做时间的切换选择
     $(".date").click(function(e) {
@@ -75,7 +74,6 @@
     function setDateType(type){
         dateType = type;
         dealer(provName, cityName, '', dateType);
-        dealer_detail(provName, cityName, '', dateType, dealerCode, dealerName);
     }
     
     //经销商选择
@@ -111,6 +109,9 @@
                 var fun = "setDealer('" + data[i].dealerCode + "'" + "," + "'" + data[i].dealerName + "')";
                 $tbody.append("<tr onclick=" + fun +"><td><a href=\"javascript:void();\">" + data[i].dealerName + "</a></td><td class='t-r'>" + data[i].totalAmount + "</td></tr>");
             }
+
+            //调用其他纬度
+            dealer_detail(provName, cityName, '', dateType, data[0].dealerCode, data[0].dealerName);
        });
     }
     
@@ -140,7 +141,9 @@
        });
     }
     
+    var sellerOption;
     function seller_rank(sellerList){
+        var sellerCodeData = [];
         var sellerYData = [];
         var sellerSeriesData = [];
         var seller_rank = document.getElementById('seller_rank');
@@ -151,13 +154,13 @@
             var height = $seller_rank.height();
             $seller_rank.height(height += 16);
             
+            sellerCodeData.push(sellerList[i].sellerCode);
             sellerYData.push(sellerList[i].sellerName);
             sellerSeriesData.push(sellerList[i].totalAmount);
         }
 
-
         var sellerRankChart = echarts.init(seller_rank);
-        var option = {
+        sellerOption = {
             color: ['#4ac7f5'],
             grid: {
                    left: '2%',
@@ -179,7 +182,7 @@
                 axisLabel : {
                     interval : 0,
                     fontSize : 8
-                   }
+                }
             },
             series : {
                 type:'bar',
@@ -191,12 +194,20 @@
                            position:'right',
                            formatter: '{c}万元'
                     }
-                }
-               }
-          };
-          sellerRankChart.resize();
-          sellerRankChart.setOption(option,true);
-    
+                },
+                sellerCodeData : sellerCodeData.reverse()
+            }
+        };
+        sellerRankChart.resize();
+        sellerRankChart.setOption(sellerOption,true);
+        sellerRankChart.on('click',sellerClick);
+    }
+    function sellerClick(param) {
+        if (typeof param.seriesIndex != 'undefined') {
+            var sellerName = param.name;
+            var sellerCode = sellerOption.series.sellerCodeData[param.dataIndex];
+            seller_product(provName, cityName, '', dateType, sellerCode, sellerName);
+        }
     }
     
     //产品
@@ -209,6 +220,25 @@
             $tbody.append("<tr><td>" + productList[i].cInvName + "</td><td class='t-r'>" + productList[i].totalNum + "</td><td class='t-r'>" + productList[i].totalAmount + "</td></tr>");
         }
       
+    }
+    
+    //直营商产品
+    function seller_product(provName, cityName, countryName, dateType, sellerCode, sellerName){
+      $.ajax({
+            url:"${CPATH}/sales/productBySeller",
+            type:"post",
+            data:{provName: provName, cityName: cityName, countryName: countryName, dateType: dateType, sellerCode: sellerCode},
+            dataType:"json"
+        }).done(function(data){
+
+            var prTitle = sellerName + '产品销售排行';
+            var $p = $("#p_product_rank");
+            $p.empty();
+            $p.text(prTitle);
+            
+            //产品
+            product_rank(data);
+       });
     }
 
 </#macro>
