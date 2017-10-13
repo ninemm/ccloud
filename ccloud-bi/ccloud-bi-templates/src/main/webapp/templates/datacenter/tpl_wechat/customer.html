@@ -216,6 +216,14 @@
             data:{"provName": provName, "cityName": cityName, countryName: countryName, dateType: dateType},
             dataType:"json"
         }).done(function(data){
+            
+            if(data.length > 6){
+                var height = 160 + (data.length -6) * 40;
+                $customer_rank.height(height);
+            }else{
+                $customer_rank.height(160);
+            }
+
 
             var crLegendData = [];
             var crSeriesData = [];
