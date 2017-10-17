@@ -53,6 +53,7 @@ public class AdminMenuInitListener implements MessageListener {
 		
 		menuManager.addMenuGroup(createTemplateMenuGroup());
 		/*menuManager.addMenuGroup(createAddonMenuGroup());*/
+		menuManager.addMenuGroup(createGoodsMenuGroup());
 		menuManager.addMenuGroup(createRoleResMenuGroup());
 		menuManager.addMenuGroup(createDataMenuGroup());
 		menuManager.addMenuGroup(createSettingMenuGroup());
@@ -240,5 +241,21 @@ public class AdminMenuInitListener implements MessageListener {
 		}
 		return group;
 	}
+	
+	private MenuGroup createGoodsMenuGroup() {
+		MenuGroup group = new MenuGroup("goods", "fa fa-shopping-bag", "商品管理");
+
+		{
+			group.addMenuItem(new MenuItem("supplier", "/admin/supplier", "供应商管理"));
+			group.addMenuItem(new MenuItem("specification", "/admin/specification", "商品规格"));
+			group.addMenuItem(new MenuItem("specificationValue", "/admin/specificationValue", "商品规格值"));
+			group.addMenuItem(new MenuItem("goodsType", "/admin/goodsType", "商品类型"));
+			group.addMenuItem(new MenuItem("category", "/admin/category", "商品分类"));
+			group.addMenuItem(new MenuItem("brand", "/admin/brand", "品牌管理"));
+			group.addMenuItem(new MenuItem("goods", "/admin/goods", "商品信息管理"));
+			
+		}
+		return group;
+	}	
 
 }
