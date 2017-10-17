@@ -1,0 +1,165 @@
+<#include "../_inc/_layout.html"/>
+
+<#macro script_import>
+	<!-- bootstrapvalidator -->
+ 	<script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
+</#macro>
+
+<#macro css_import>
+	<!-- bootstrapvalidator -->
+    <link rel="stylesheet" href="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.css">
+</#macro>
+ 
+<#macro script>
+
+var $form = $("#form");
+
+$(function() {
+	
+	jQuery.mm.initValidator('#form', validatorFields)
+	
+	var show = "${(ccGoodsSpecificationValue.image_path)!}";
+	if (show != "") {
+		$("#chooseImage").html("修改图片");
+		$("#image").show();
+	}
+	$("#choose").change(function() {
+		var type = $("#choose").find("option:selected").data("type");
+		if (type != undefined && type == 1) {
+			$("#image").show();
+		} else {
+			$("#image").hide();
+		}
+	});
+	
+});
+
+var validatorFields = {
+	'ccGoodsSpecificationValue.name': {
+		validators: {
+            notEmpty: { message: '规格值不能为空' },
+            stringLength: { max: 15, message: '规格值最大长度是15字符，请重新输入' }
+        }
+	},
+	'ccGoodsSpecificationValue.goods_specification_id': {
+		validators: {
+			notEmpty: { message: '规格不能为空' },
+        }
+	},
+	'ccGoodsSpecificationValue.order_list': {
+		validators: {
+			integer: {message: '请输入正整数'}
+		}
+	}	
+};
+
+function doSubmit(){
+	$form.ajaxSubmit({
+		beforeSubmit: function() {
+			var validate = $form.data('bootstrapValidator');
+			validate.validate();
+			return validate.isValid();
+		},
+		type : "post", 
+		dataType : "json", 
+		success : function(data) { 
+			if (data.errorCode == 0) {
+				//location.reload();
+				toastr.success(data.message, '操作成功');
+			} else {
+				toastr.error(data.message,'操作失败');
+			}
+		},
+		error : function() {
+			alert("信息提交错误");
+		}
+	});
+}
+
+function preview(file) {
+    var prevDiv = document.getElementById('upload');
+    $("#imagePath").hide();
+    if (file.files && file.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(evt) {
+            $("#chooseImage").html('<img class="img-responsive" alt="Responsive image" src="' + evt.target.result + '" />');
+        }
+        reader.readAsDataURL(file.files[0]);
+    } else {
+        prevDiv.innerHTML = '<div class="img" style="filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale,src=\'' + file.value + '\'"></div>';
+    }
+}
+</#macro>
+
+<@layout active_id=p child_active_id=c>
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+	<h1><#if (ccGoodsSpecificationValue.id) ??>修改<#else>新增</#if>规格值信息</h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+       	<li><a href="#">商品管理</a></li>
+       	<li class="active"><#if (ccGoodsSpecificationValue.id) ??>修改<#else>新增</#if>规格值信息</li>
+	</ol>
+</section>
+<!-- Main content -->
+<section class="content">
+	<div class="box box-default">
+		<div class="box-header with-border">
+			<h3 class="box-title">规格值信息</h3>
+			<div class="box-tools">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse">
+					<i class="fa fa-minus"></i>
+				</button>
+			</div>
+		</div>
+		<form action="${CPATH}/admin/specificationValue/save" enctype="multipart/form-data" id="form" class="form-horizontal" >
+		<input type="hidden" name="ccGoodsSpecificationValue.id" value="${(ccGoodsSpecificationValue.id)!}">
+		<div class="box-body">
+			<div class="col-sm-12 ">
+				<div class="row">
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">规格值:</label>
+						<div class="input-group col-md-4 col-sm-10">
+		                 	<input class="form-control input-sm" type="text" name="ccGoodsSpecificationValue.name" value="${(ccGoodsSpecificationValue.name)!}" placeholder="1-15个任意字符">
+		               	</div>
+					</div>
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">规格:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<select class="form-control input-sm" name="ccGoodsSpecificationValue.goods_specification_id" id="choose">
+								<option value="">--请选择--</option>
+								<#list (list)! as specification >
+									<option data-type="${specification.type!}" value="${specification.id!}" <#if (ccGoodsSpecificationValue.goods_specification_id)! == (specification.id)!>selected="selected"</#if>>${(specification.name)!}</option>
+								</#list>
+							</select>
+		               	</div>
+					</div>
+					<div class="form-group col-sm-12">
+						<label class="control-label col-sm-2">排序:</label>
+						<div class="input-group col-md-4 col-sm-10">
+		                 	<input class="form-control input-sm" type="number" name="ccGoodsSpecificationValue.order_list" value="${(ccGoodsSpecificationValue.order_list)!10}">
+		               	</div>
+					</div>
+					<div class="form-group col-sm-12" id="image" style="display:none;">
+					    <label class="control-label col-sm-2">上传图片</label>
+					    <div class="input-group col-md-4 col-sm-10" id="upload">
+					    	<input type="file" name="file" id="exampleInputFile" style="padding-top: 5px;" onchange="preview(this)">
+					    	<span id='chooseImage'>选择图片</span>
+					    	<br>
+					    	<img src="<#if ccGoodsSpecificationValue??>${CPATH}${(ccGoodsSpecificationValue.image_path)!}</#if>" class="img-responsive" id="imagePath">
+					    </div>
+					</div>														
+				</div>
+			</div>
+		</div>
+	
+		<div class="box-footer"> 
+			<button type="button" onclick="doSubmit()" class="btn btn-primary">保存更改</button>
+			<input type="button" class="btn btn-primary" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
+		</div>
+	</form>
+	</div>
+</section>
+
+</@layout>
