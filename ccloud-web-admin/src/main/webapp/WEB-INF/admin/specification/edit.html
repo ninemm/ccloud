@@ -9,6 +9,37 @@
 	<!-- bootstrapvalidator -->
     <link rel="stylesheet" href="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.css">
 </#macro>
+<#macro css>
+/* preview */
+.preview{cursor:pointer}
+.preview:hover span{
+	display:block;
+	transform-origin:100% 0%;
+	-webkit-animation:fadeIn 0.3s ease-in-out;
+	animation:fadeIn 0.3s ease-in-out;
+	z-index: 10;
+	
+}
+.preview span{display:none;background-color:#1E2021;padding:10px;position:absolute;border-radius:3px;box-shadow:1px 1px 1px rgba(0, 0, 0, 0.2);right:10px;}
+.preview span:before{position:absolute;content:'';width:0;height:0;border:6px solid transparent;border-bottom-color:#1E2021;right:10px;top:-12px;}
+.preview span:after{width:100%;height:40px;content:'';position:absolute;top:-40px;left:0;}
+
+@-webkit-keyframes fadeIn {
+	0% {
+		opacity:0; 
+		transform:scale(0.6);
+	}
+
+	100% {
+		opacity:100%;
+		transform:scale(1);
+	}
+}
+
+@keyframes fadeIn {
+	0% { opacity:0; }
+	100% { opacity:100%; }
+</#macro> 
  
 <#macro script>
 
@@ -43,9 +74,9 @@ $(function() {
 	            //add input box
 	            var select =  $("#showType").val();
 	            if (select == 1) {
-					$(InputsWrapper).append('<tr><td class="col-xs-4"><input class="form-control input-sm" type="text" name="mytext[]" id="field_'+ FieldCount +'"/><input type="hidden" name="childId[]" id="child_'+ FieldCount +'"/></td><td class="image"><input type="file" name="file[]" onChange="checkValue()"/></td><td class="col-xs-2"><input class="form-control input-sm" type="number" name="order[]" id="order_'+ FieldCount +'"></td><td><a href="#" class="removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><tr>');					            
+					$(InputsWrapper).append('<tr><td class="col-xs-4"><input class="form-control input-sm" type="text" name="mytext[]" id="field_'+ FieldCount +'"/><input type="hidden" name="childId[]" id="child_'+ FieldCount +'"/></td><td class="image"><input type="file" name="file[]" onChange="checkValue()"/></td><td class="col-xs-2"><input class="form-control input-sm" type="text" name="order[]" id="order_'+ FieldCount +'"></td><td><a href="#" class="removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><tr>');					            
 	            } else {
-	            	$(InputsWrapper).append('<tr><td class="col-xs-4"><input class="form-control input-sm" type="text" name="mytext[]" id="field_'+ FieldCount +'"/><input type="hidden" name="childId[]" id="child_'+ FieldCount +'"/></td><td class="image" style="display:none"></td><td class="col-xs-2"><input class="form-control input-sm" type="number" name="order[]" id="order_'+ FieldCount +'"></td><td><a href="#" class="removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><tr>');
+	            	$(InputsWrapper).append('<tr><td class="col-xs-4"><input class="form-control input-sm" type="text" name="mytext[]" id="field_'+ FieldCount +'"/><input type="hidden" name="childId[]" id="child_'+ FieldCount +'"/></td><td class="image" style="display:none"></td><td class="col-xs-2"><input class="form-control input-sm" type="text" name="order[]" id="order_'+ FieldCount +'"></td><td><a href="#" class="removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><tr>');
 	            }
 	            x++; //text box increment  
 	        }  
@@ -116,6 +147,8 @@ function checkImage() {
 	    		imageStatus = true;
 	    	}
 	  	});	
+	} else {
+		imageStatus = true;
 	}
 }
 
@@ -222,8 +255,9 @@ function doSubmit(){
 							<tr>
 								<td class="col-xs-4"><input class="form-control input-sm" type="text" name="mytext[]" id="field_${child_index}" value="${child.name}"><input type="hidden" name="childId[]" id="child_${child_index}" value="${child.id}"></td>
 								<td class="image" style="display:none"></td>
-								<td class="preview" style="display:none"><a>预览</a></td>
-								<td class="col-xs-2"><input class="form-control input-sm" type="number" name="order[]" id="order_${child_index}" value="${(child.orderList)!}"></td>
+								<td class="preview" style="display:none; position:relative;"><a>预览</a>
+								<span><img src="${CPATH}${(child.image_path)!}" width="150"/></span></td>
+								<td class="col-xs-2"><input class="form-control input-sm" type="text" name="order[]" id="order_${child_index}" value="${(child.orderList)!}"></td>
 								<td><a href="#" class="removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td>
 							<tr>
 							</#list>
@@ -231,16 +265,16 @@ function doSubmit(){
 							<tr>
 								<td class="col-xs-4"><input class="form-control input-sm" type="text" name="mytext[]" id="field_1"><input type="hidden" name="childId[]" id="child_1"></td>
 								<td class="image" style="display:none"></td>
-								<td class="col-xs-2"><input class="form-control input-sm" type="number" name="order[]" id="order_1"></td>
+								<td class="col-xs-2"><input class="form-control input-sm" type="text" name="order[]" id="order_1"></td>
 								<td><a href="#" class="removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td>
 							<tr>								
 							</#if>
 							</#if>
-							<#if (childList)! = "">							
+							<#if (childList)! = "">				
 							<tr>
 								<td class="col-xs-4"><input class="form-control input-sm" type="text" name="mytext[]" id="field_1"><input type="hidden" name="childId[]" id="child_1"></td>
 								<td class="image" style="display:none"></td>
-								<td class="col-xs-2"><input class="form-control input-sm" type="number" name="order[]" id="order_1"></td>
+								<td class="col-xs-2"><input class="form-control input-sm" type="text" name="order[]" id="order_1"></td>
 								<td><a href="#" class="removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td>
 							<tr>
 							</#if>

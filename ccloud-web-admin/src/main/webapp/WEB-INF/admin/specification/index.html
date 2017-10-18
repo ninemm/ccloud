@@ -64,8 +64,11 @@
    				},
 				{field: "childList", title: "规格值", align: "center", width: '20%',
 					formatter: function(value, row, rowIndex) {
-						var str = value;
-				        return str;					
+						var str = "";
+				        $.each(value, function (i, item) {
+							str = str + "[" + item.name + "]";
+				        });
+				        return str;
 					},
 				edit: false
 				},							

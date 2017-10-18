@@ -21,19 +21,19 @@ $(function() {
 });
 
 var validatorFields = {
-	'ccSupplier.name': {
+	'supplier.name': {
 		validators: {
             notEmpty: { message: '供应商名称不能为空' },
             stringLength: { max: 15, message: '系统名称最大长度是15字符，请重新输入' }
         }
 	},
-	'ccSupplier.code': {
+	'supplier.code': {
 		validators: {
 			notEmpty: { message: '供应商编码不能为空' },
 	        stringLength: { min: 2, max: 20, message: '供应商编码最少2个字符，最多20字符，请重新输入' }
         }
 	},
-	'ccSupplier.is_enable': {
+	'supplier.is_enable': {
 		validators: {
 			notEmpty: { message: '请选择启用状态' },
         }
@@ -68,11 +68,11 @@ function doSubmit(){
 
 <!-- Content Header (Page header) -->
 <section class="content-header">
-	<h1><#if (ccSupplier.id) ??>修改<#else>新增</#if>供应商信息</h1>
+	<h1><#if (supplier.id) ??>修改<#else>新增</#if>供应商信息</h1>
 	<ol class="breadcrumb">
 		<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
        	<li><a href="#">商品管理</a></li>
-       	<li class="active"><#if (ccSupplier.id) ??>修改<#else>新增</#if>供应商信息</li>
+       	<li class="active"><#if (supplier.id) ??>修改<#else>新增</#if>供应商信息</li>
 	</ol>
 </section>
 <!-- Main content -->
@@ -87,54 +87,54 @@ function doSubmit(){
 			</div>
 		</div>
 		<form action="${CPATH}/admin/supplier/save" method="post" id="form" class="form-horizontal" >
-		<input type="hidden" name="ccSupplier.id" value="${(ccSupplier.id)!}">
+		<input type="hidden" name="supplier.id" value="${(supplier.id)!}">
 		<div class="box-body">
 			<div class="col-sm-12 ">
 				<div class="row">
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">名称:</label>
 						<div class="input-group col-md-4 col-sm-10">
-		                 	<input class="form-control input-sm" type="text" name="ccSupplier.name" value="${(ccSupplier.name)!}" placeholder="1-15个任意字符">
+		                 	<input class="form-control input-sm" type="text" name="supplier.name" value="${(supplier.name)!}" placeholder="1-15个任意字符">
 		               	</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">编号:</label>
 						<div class="input-group col-md-4 col-sm-10">
-		                 	<input class="form-control input-sm" type="text" name="ccSupplier.code" value="${(ccSupplier.code)!}" placeholder="2-20个任意字母数字">
+		                 	<input class="form-control input-sm" type="text" name="supplier.code" value="${(supplier.code)!}" placeholder="2-20个任意字母数字">
 		               	</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">联系人:</label>
 						<div class="input-group col-md-4 col-sm-10">
-		                 	<input class="form-control input-sm" type="text" name="ccSupplier.contact" value="${(ccSupplier.contact)!}" placeholder="2-20个任意字母数字">
+		                 	<input class="form-control input-sm" type="text" name="supplier.contact" value="${(supplier.contact)!}" placeholder="2-20个任意字母数字">
 		               	</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">电话:</label>
 						<div class="input-group col-md-4 col-sm-10">
-		                 	<input class="form-control input-sm" type="text" name="ccSupplier.mobile" value="${(ccSupplier.mobile)!}" placeholder="2-20个任意字母数字">
+		                 	<input class="form-control input-sm" type="text" name="supplier.mobile" value="${(supplier.mobile)!}" placeholder="2-20个任意字母数字">
 		               	</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">qq:</label>
 						<div class="input-group col-md-4 col-sm-10">
-		                 	<input class="form-control input-sm" type="text" name="ccSupplier.qq" value="${(ccSupplier.qq)!}" placeholder="2-20个任意字母数字">
+		                 	<input class="form-control input-sm" type="text" name="supplier.qq" value="${(supplier.qq)!}" placeholder="2-20个任意字母数字">
 		               	</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">微信:</label>
 						<div class="input-group col-md-4 col-sm-10">
-		                 	<input class="form-control input-sm" type="text" name="ccSupplier.wechat" value="${(ccSupplier.wechat)!}" placeholder="2-20个任意字母数字">
+		                 	<input class="form-control input-sm" type="text" name="supplier.wechat" value="${(supplier.wechat)!}" placeholder="2-20个任意字母数字">
 		               	</div>
 					</div>																				
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">供应商状态:</label>
 						<div class="input-group col-md-4 col-sm-10">
 							<label class="radio-inline">
-		                 		<input type="radio" name="ccSupplier.is_enable" value="1" <#if ccSupplier?? && ccSupplier.isEnable == 1>checked</#if>>启用
+		                 		<input type="radio" name="supplier.is_enable" value="1" <#if supplier?? && supplier.isEnable == 1>checked</#if>>启用
 		                 	</label>
 		                 	<label class="radio-inline">
-		                 		<input type="radio" name="ccSupplier.is_enable" value="0" <#if ccSupplier?? && ccSupplier.isEnable == 0>checked</#if>>停用
+		                 		<input type="radio" name="supplier.is_enable" value="0" <#if supplier?? && supplier.isEnable == 0>checked</#if>>停用
 							</label>		                 		
 		               	</div>
 					</div>
