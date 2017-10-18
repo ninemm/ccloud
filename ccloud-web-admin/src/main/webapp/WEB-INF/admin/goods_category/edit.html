@@ -47,13 +47,13 @@ $(function() {
 });
 
 var validatorFields = {
-	'ccGoodsCategory.name': {
+	'goodsCategory.name': {
 		validators: {
             notEmpty: { message: '分类名称不能为空' },
             stringLength: { max: 15, message: '分类名称最大长度是15字符，请重新输入' }
         }
 	},
-	'ccGoodsCategory.code': {
+	'goodsCategory.code': {
 		validators: {
 			notEmpty: { message: '分类编码不能为空' },
 	        stringLength: { min: 1, max: 20, message: '分类编码最大长度是20字符，请重新输入' }
@@ -64,28 +64,28 @@ var validatorFields = {
 			notEmpty: { message: '上级部门不能为空' }
         }
 	},
-	'ccGoodsCategory.grade': {
+	'goodsCategory.grade': {
 		validators: {
 			notEmpty: { message: '层级不能为空' },
 			integer: {message: '请输入正整数'}
         }
 	},
-	'ccGoodsCategory.supplier_id': {
+	'goodsCategory.supplier_id': {
 		validators: {
 			notEmpty: { message: '供应商不能为空' }
         }
 	},
-	'ccGoodsCategory.brand_id': {
+	'goodsCategory.brand_id': {
 		validators: {
 			notEmpty: { message: '品牌不能为空' }
         }
 	},
-	'ccGoodsCategory.state': {
+	'goodsCategory.state': {
 		validators: {
 			notEmpty: { message: '请选择有效状态' }
         }	
 	},
-	'ccGoodsCategory.order_list': {
+	'goodsCategory.order_list': {
 		validators: {
 			integer: {message: '请输入正整数'}
 		}
@@ -120,11 +120,11 @@ function doSubmit(){
 
 <!-- Content Header (Page header) -->
 <section class="content-header">
-	<h1><#if (ccGoodsCategory.id) ??>修改<#else>新增</#if>商品分类</h1>
+	<h1><#if (goodsCategory.id) ??>修改<#else>新增</#if>商品分类</h1>
 	<ol class="breadcrumb">
 		<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
        	<li>商品管理</li>
-       	<li class="active"><#if (ccGoodsCategory.id) ??>修改<#else>新增</#if>商品分类</li>
+       	<li class="active"><#if (goodsCategory.id) ??>修改<#else>新增</#if>商品分类</li>
 	</ol>
 </section>
 <!-- Main content -->
@@ -139,35 +139,35 @@ function doSubmit(){
 			</div>
 		</div>
 		<form action="${CPATH}/admin/category/save" method="post" id="form" class="form-horizontal" >
-		<input type="hidden" name="ccGoodsCategory.id" value="${(ccGoodsCategory.id)!}">
+		<input type="hidden" name="goodsCategory.id" value="${(goodsCategory.id)!}">
 		<div class="box-body">
 			<div class="col-sm-12 ">
 				<div class="row">
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">分类名称:</label>
 						<div class="input-group col-md-4 col-sm-10">
-		                 	<input class="form-control input-sm" type="text" name="ccGoodsCategory.name" value="${(ccGoodsCategory.name)!}" placeholder="1-15个任意字符">
+		                 	<input class="form-control input-sm" type="text" name="goodsCategory.name" value="${(goodsCategory.name)!}" placeholder="1-15个任意字符">
 		               	</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">分类编码:</label>
 						<div class="input-group col-md-4 col-sm-10">
-		                 	<input class="form-control input-sm" type="text" name="ccGoodsCategory.code" value="${(ccGoodsCategory.code)!}" placeholder="1-15个任意字符">
+		                 	<input class="form-control input-sm" type="text" name="goodsCategory.code" value="${(goodsCategory.code)!}" placeholder="1-15个任意字符">
 		               	</div>
 					</div>					
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">分类层级:</label>
 						<div class="input-group col-md-4 col-sm-10">
-		                 	<input class="form-control input-sm" type="number" name="ccGoodsCategory.grade" value="${(ccGoodsCategory.grade)!}" placeholder="2-2个任意数字">
+		                 	<input class="form-control input-sm" type="number" name="goodsCategory.grade" value="${(goodsCategory.grade)!}" placeholder="2-2个任意数字">
 		               	</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">供应商:</label>
 						<div class="input-group col-md-4 col-sm-10">
-							<select class="form-control input-sm" name="ccGoodsCategory.supplier_id" id="company">
+							<select class="form-control input-sm" name="goodsCategory.supplier_id" id="company">
 								<option value="">--请选择--</option>
 								<#list (list)! as supplier >
-									<option value="${supplier.id}" <#if ccGoodsCategory?? && supplier.id == ccGoodsCategory.supplier_id>selected="selected"</#if>>${(supplier.name)!}</option>
+									<option value="${supplier.id}" <#if goodsCategory?? && supplier.id == goodsCategory.supplier_id>selected="selected"</#if>>${(supplier.name)!}</option>
 								</#list>
 							</select>
 		               	</div>
@@ -175,10 +175,10 @@ function doSubmit(){
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">品牌:</label>
 						<div class="input-group col-md-4 col-sm-10">
-							<select class="form-control input-sm" name="ccGoodsCategory.brand_id" id="brand_op">
+							<select class="form-control input-sm" name="goodsCategory.brand_id" id="brand_op">
 								<option value="">--请选择--</option>
 								<#list (blist)! as brand >
-									<option value="${brand.id}" <#if ccGoodsCategory?? && brand.id == ccGoodsCategory.brand_id>selected="selected"</#if>>${(brand.name)!}</option>
+									<option value="${brand.id}" <#if goodsCategory?? && brand.id == goodsCategory.brand_id>selected="selected"</#if>>${(brand.name)!}</option>
 								</#list>								
 							</select>
 		               	</div>
@@ -187,8 +187,8 @@ function doSubmit(){
 						<label class="control-label col-sm-2">上级分类:</label>
 						<div class="input-group col-md-4 col-sm-10">
 							<div class="input-group">
-								<input type="hidden" name="ccGoodsCategory.parent_id" id="parent_id" value="${(ccGoodsCategory.parent_id)!}">
-			                 	<input class="form-control input-sm" type="text" id="parent_name" name="parentName" value="${(ccGoodsCategory.parent_name)!}">
+								<input type="hidden" name="goodsCategory.parent_id" id="parent_id" value="${(goodsCategory.parent_id)!}">
+			                 	<input class="form-control input-sm" type="text" id="parent_name" name="parentName" value="${(goodsCategory.parent_name)!}">
 		                 		<div class="input-group-addon" id="_category_tree" style="cursor:pointer;">
 		                 			<i class="fa fa-search"></i> 选择
 								</div>
@@ -199,17 +199,17 @@ function doSubmit(){
 						<label class="control-label col-sm-2">有效状态:</label>
 						<div class="input-group col-md-4 col-sm-10">
 							<label class="radio-inline">
-		                 		<input type="radio" name="ccGoodsCategory.state" value="1" <#if ccGoodsCategory?? && ccGoodsCategory.state == 1>checked</#if>>有效
+		                 		<input type="radio" name="goodsCategory.state" value="1" <#if goodsCategory?? && goodsCategory.state == 1>checked</#if>>有效
 		                 	</label>
 		                 	<label class="radio-inline">
-		                 		<input type="radio" name="ccGoodsCategory.state" value="0" <#if ccGoodsCategory?? && ccGoodsCategory.state == 0>checked</#if>>无效
+		                 		<input type="radio" name="goodsCategory.state" value="0" <#if goodsCategory?? && goodsCategory.state == 0>checked</#if>>无效
 							</label>		                 		
 		               	</div>
 					</div>					
 					<div class="form-group col-sm-12">
 						<label class="control-label col-sm-2">排序:</label>
 						<div class="input-group col-md-4 col-sm-10">
-		                 	<input class="form-control input-sm" type="number" name="ccGoodsCategory.order_list" value="${(ccGoodsCategory.orderList)!10}">
+		                 	<input class="form-control input-sm" type="number" name="goodsCategory.order_list" value="${(goodsCategory.orderList)!10}">
 		               	</div>
 					</div>
 				</div>

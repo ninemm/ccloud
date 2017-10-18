@@ -79,7 +79,7 @@ public class _GoodsCategoryController extends JBaseCRUDController<GoodsCategory>
 		String id = getPara("id");
 		if (id != null) {
 			GoodsCategory category = GoodsCategoryQuery.me().findById(id);
-			setAttr("ccGoodsCategory", category);
+			setAttr("goodsCategory", category);
 			
 			List<Brand> list = BrandQuery.me().findBySupplierId(category.getSupplierId());
 			setAttr("blist", list);

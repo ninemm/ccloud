@@ -90,18 +90,18 @@ $(function() {
 });
 
 var validatorFields = {
-	'ccGoodsSpecification.name': {
+	'goodsSpecification.name': {
 		validators: {
             notEmpty: { message: '规格名称不能为空' },
             stringLength: { max: 15, message: '规格名称最大长度是15字符，请重新输入' }
         }
 	},
-	'ccGoodsSpecification.type': {
+	'goodsSpecification.type': {
 		validators: {
 			notEmpty: { message: '请选择规格类型' },
         }
 	},
-	'ccGoodsSpecification.show_type': {
+	'goodsSpecification.show_type': {
 		validators: {
 			notEmpty: { message: '请选择显示方式' },
         }
@@ -139,7 +139,7 @@ function checkImage() {
 	    	var x = $(this).find("input").val();
 	    	if (!x) {
 				if ($("#warnImage").html() == undefined) {
-					$("#valueTable").after('<small style="color:#a94442;" id="warnImage" class="help-block" data-bv-validator="notEmpty" data-bv-for="ccGoodsSpecification.show_type" data-bv-result="INVALID">您有未选择的图片</small>');
+					$("#valueTable").after('<small style="color:#a94442;" id="warnImage" class="help-block" data-bv-validator="notEmpty" data-bv-for="goodsSpecification.show_type" data-bv-result="INVALID">您有未选择的图片</small>');
 				}	    	
 	    		return false;
 	    	}
@@ -184,11 +184,11 @@ function doSubmit(){
 
 <!-- Content Header (Page header) -->
 <section class="content-header">
-	<h1><#if (ccGoodsSpecification.id) ??>修改<#else>新增</#if>规格信息</h1>
+	<h1><#if (goodsSpecification.id) ??>修改<#else>新增</#if>规格信息</h1>
 	<ol class="breadcrumb">
 		<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
        	<li><a href="#">商品管理</a></li>
-       	<li class="active"><#if (ccGoodsSpecification.id) ??>修改<#else>新增</#if>规格信息</li>
+       	<li class="active"><#if (goodsSpecification.id) ??>修改<#else>新增</#if>规格信息</li>
 	</ol>
 </section>
 <!-- Main content -->
@@ -203,33 +203,33 @@ function doSubmit(){
 			</div>
 		</div>
 		<form action="${CPATH}/admin/specification/save" method="post" id="form" class="form-horizontal" enctype="multipart/form-data">
-		<input type="hidden" name="ccGoodsSpecification.id" value="${(ccGoodsSpecification.id)!}">
+		<input type="hidden" name="goodsSpecification.id" value="${(goodsSpecification.id)!}">
 		<div class="box-body">
 			<div class="col-sm-12 ">
 				<div class="row">
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">名称:</label>
 						<div class="input-group col-md-4 col-sm-10">
-		                 	<input class="form-control input-sm" type="text" name="ccGoodsSpecification.name" value="${(ccGoodsSpecification.name)!}" placeholder="1-15个任意字符">
+		                 	<input class="form-control input-sm" type="text" name="goodsSpecification.name" value="${(goodsSpecification.name)!}" placeholder="1-15个任意字符">
 		               	</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">类型:</label>
 						<div class="input-group col-md-4 col-sm-10">
-							<select class="form-control input-sm" name="ccGoodsSpecification.type" onChange="addImage()" id="showType">
+							<select class="form-control input-sm" name="goodsSpecification.type" onChange="addImage()" id="showType">
 								<option value="">--请选择--</option>
-								<option value="0" <#if (ccGoodsSpecification.type)! == "0">selected="selected"</#if>>文字类型</option>
-								<option value="1" <#if (ccGoodsSpecification.type)! == "1">selected="selected"</#if>>图片类型</option>
+								<option value="0" <#if (goodsSpecification.type)! == "0">selected="selected"</#if>>文字类型</option>
+								<option value="1" <#if (goodsSpecification.type)! == "1">selected="selected"</#if>>图片类型</option>
 							</select>
 		               	</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">显示方式:</label>
 						<div class="input-group col-md-4 col-sm-10">
-							<select class="form-control input-sm" name="ccGoodsSpecification.show_type">
+							<select class="form-control input-sm" name="goodsSpecification.show_type">
 								<option value="">--请选择--</option>
-								<option value="0" <#if (ccGoodsSpecification.show_type)! == "0">selected="selected"</#if>>平铺显示</option>
-								<option value="1" <#if (ccGoodsSpecification.show_type)! == "1">selected="selected"</#if>>下拉显示</option>
+								<option value="0" <#if (goodsSpecification.show_type)! == "0">selected="selected"</#if>>平铺显示</option>
+								<option value="1" <#if (goodsSpecification.show_type)! == "1">selected="selected"</#if>>下拉显示</option>
 							</select>
 		               	</div>
 					</div>

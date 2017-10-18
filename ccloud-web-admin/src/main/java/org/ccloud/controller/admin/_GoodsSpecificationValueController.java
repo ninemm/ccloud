@@ -153,8 +153,8 @@ public class _GoodsSpecificationValueController extends JBaseCRUDController<Good
 	public void edit() {
 		String id = getPara("id");
 		if (id != null) {
-			GoodsSpecificationValue ccGoodsSpecificationValue = GoodsSpecificationValueQuery.me().findById(id);
-			setAttr("ccGoodsSpecificationValue", ccGoodsSpecificationValue);
+			GoodsSpecificationValue goodsSpecificationValue = GoodsSpecificationValueQuery.me().findById(id);
+			setAttr("goodsSpecificationValue", goodsSpecificationValue);
 		}
 		List<GoodsSpecification> list = GoodsSpecificationQuery.me().findAll();
 		setAttr("list", list);

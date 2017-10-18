@@ -21,7 +21,7 @@ $(function() {
 });
 
 var validatorFields = {
-	'ccGoodsType.name': {
+	'goodsType.name': {
 		validators: {
             notEmpty: { message: '类型名称不能为空' },
             stringLength: { max: 15, message: '系统名称最大长度是15字符，请重新输入' }
@@ -57,11 +57,11 @@ function doSubmit(){
 
 <!-- Content Header (Page header) -->
 <section class="content-header">
-	<h1><#if (ccGoodsType.id) ??>修改<#else>新增</#if>类型信息</h1>
+	<h1><#if (goodsType.id) ??>修改<#else>新增</#if>类型信息</h1>
 	<ol class="breadcrumb">
 		<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
        	<li><a href="#">商品管理</a></li>
-       	<li class="active"><#if (ccGoodsType.id) ??>修改<#else>新增</#if>类型信息</li>
+       	<li class="active"><#if (goodsType.id) ??>修改<#else>新增</#if>类型信息</li>
 	</ol>
 </section>
 <!-- Main content -->
@@ -76,14 +76,14 @@ function doSubmit(){
 			</div>
 		</div>
 		<form action="${CPATH}/admin/goodsType/save" method="post" id="form" class="form-horizontal" >
-		<input type="hidden" name="ccGoodsType.id" value="${(ccGoodsType.id)!}">
+		<input type="hidden" name="goodsType.id" value="${(goodsType.id)!}">
 		<div class="box-body">
 			<div class="col-sm-12 ">
 				<div class="row">
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">名称:</label>
 						<div class="input-group col-md-4 col-sm-10">
-		                 	<input class="form-control input-sm" type="text" name="ccGoodsType.name" value="${(ccGoodsType.name)!}" placeholder="1-15个任意字符">
+		                 	<input class="form-control input-sm" type="text" name="goodsType.name" value="${(goodsType.name)!}" placeholder="1-15个任意字符">
 		               	</div>
 					</div>
 				</div>

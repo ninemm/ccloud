@@ -59,8 +59,8 @@ public class _BrandController extends JBaseCRUDController<Brand> {
 	public void edit() {
 		String id = getPara("id");
 		if (id != null) {
-			Brand ccBrand = BrandQuery.me().findById(id);
-			setAttr("ccBrand", ccBrand);
+			Brand brand = BrandQuery.me().findById(id);
+			setAttr("brand", brand);
 		}
 		List<Supplier> list = SupplierQuery.me().findAll();
 		setAttr("list", list);

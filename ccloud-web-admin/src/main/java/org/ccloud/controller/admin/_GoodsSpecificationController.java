@@ -163,10 +163,10 @@ public class _GoodsSpecificationController extends JBaseCRUDController<GoodsSpec
 	public void edit() {
 		String id = getPara("id");
 		if (id != null) {
-			GoodsSpecification ccGoodsSpecification = GoodsSpecificationQuery.me().findById(id);
-			setAttr("ccGoodsSpecification", ccGoodsSpecification);
+			GoodsSpecification goodsSpecification = GoodsSpecificationQuery.me().findById(id);
+			setAttr("goodsSpecification", goodsSpecification);
 			
-			List<GoodsSpecificationValue> childList = GoodsSpecificationValueQuery.me().findByParentId(ccGoodsSpecification.getId());
+			List<GoodsSpecificationValue> childList = GoodsSpecificationValueQuery.me().findByParentId(goodsSpecification.getId());
 			setAttr("childList", childList);
 		}
 	}
