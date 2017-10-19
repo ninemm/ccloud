@@ -1,0 +1,129 @@
+<#include "../_inc/_layout.html"/>
+
+<#macro script_import>
+	<!-- bootstrapvalidator -->
+ 	<script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
+</#macro>
+
+<#macro css_import>
+	<!-- bootstrapvalidator -->
+    <link rel="stylesheet" href="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.css">
+</#macro>
+ 
+<#macro script>
+
+var $form = $("#form");
+
+$(function() {
+	
+	jQuery.mm.initValidator('#form', validatorFields)
+	
+});
+
+var validatorFields = {
+	'brand.name': {
+		validators: {
+            notEmpty: { message: '品牌名称不能为空' },
+            stringLength: { max: 15, message: '品牌名称最大长度是15字符，请重新输入' }
+        }
+	},
+	'brand.code': {
+		validators: {
+			notEmpty: { message: '品牌编码不能为空' },
+	        stringLength: { min: 2, max: 20, message: '品牌编码最少2个字符，最多20字符，请重新输入' }
+        }
+	},
+	'brand.supplier_id': {
+		validators: {
+			notEmpty: { message: '供应商不能为空' },
+        }
+	}	
+};
+
+function doSubmit(){
+	$form.ajaxSubmit({
+		beforeSubmit: function() {
+			var validate = $form.data('bootstrapValidator');
+			validate.validate();
+			return validate.isValid();
+		},
+		type : "post", 
+		dataType : "json", 
+		success : function(data) { 
+			if (data.errorCode == 0) {
+				//location.reload();
+				toastr.success(data.message, '操作成功');
+			} else {
+				toastr.error(data.message,'操作失败');
+			}
+		},
+		error : function() {
+			alert("信息提交错误");
+		}
+	});
+}
+</#macro>
+
+<@layout active_id=p child_active_id=c>
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+	<h1><#if (brand.id) ??>修改<#else>新增</#if>品牌信息</h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+       	<li><a href="#">商品管理</a></li>
+       	<li class="active"><#if (brand.id) ??>修改<#else>新增</#if>品牌信息</li>
+	</ol>
+</section>
+<!-- Main content -->
+<section class="content">
+	<div class="box box-default">
+		<div class="box-header with-border">
+			<h3 class="box-title">品牌信息</h3>
+			<div class="box-tools">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse">
+					<i class="fa fa-minus"></i>
+				</button>
+			</div>
+		</div>
+		<form action="${CPATH}/admin/brand/save" method="post" id="form" class="form-horizontal" >
+		<input type="hidden" name="brand.id" value="${(brand.id)!}">
+		<div class="box-body">
+			<div class="col-sm-12 ">
+				<div class="row">
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">名称:</label>
+						<div class="input-group col-md-4 col-sm-10">
+		                 	<input class="form-control input-sm" type="text" name="brand.name" value="${(brand.name)!}" placeholder="1-15个任意字符">
+		               	</div>
+					</div>
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">编号:</label>
+						<div class="input-group col-md-4 col-sm-10">
+		                 	<input class="form-control input-sm" type="text" name="brand.code" value="${(brand.code)!}" placeholder="2-20个任意字母数字">
+		               	</div>
+					</div>
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">供应商:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<select class="form-control input-sm" name="brand.supplier_id">
+								<option value="">--请选择--</option>
+								<#list (list)! as supplier >
+									<option value="${supplier.id!}" <#if (brand.supplier_id)! == (supplier.id)!>selected="selected"</#if>>${(supplier.name)!}</option>
+								</#list>
+							</select>
+		               	</div>
+					</div>					
+				</div>
+			</div>
+		</div>
+	
+		<div class="box-footer"> 
+			<button type="button" onclick="doSubmit()" class="btn btn-primary">保存更改</button>
+			<input type="button" class="btn btn-primary" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
+		</div>
+	</form>
+	</div>
+</section>
+
+</@layout>

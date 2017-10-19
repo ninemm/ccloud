@@ -38,5 +38,11 @@ public class Actions {
 	
 	public static final String DEPT_DELETE = "department:delete";
 	
+	public static final String CATEGORY_ADD = "cc_goods_category:add";
+	
+	public static final String CATEGORY_UPDATE = "cc_goods_category:update";
+	
+	public static final String CATEGORY_DELETE = "cc_goods_category:delete";	
+	
 
 }
