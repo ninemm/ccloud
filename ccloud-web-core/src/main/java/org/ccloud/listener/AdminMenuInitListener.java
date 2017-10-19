@@ -48,11 +48,13 @@ public class AdminMenuInitListener implements MessageListener {
 		menuManager.addMenuGroup(3, createAttachmentMenuGroup());
 		menuManager.addMenuGroup(4, createWechatMenuGroup());
 		menuManager.addMenuGroup(5, createStatMenuGroup());
+		menuManager.addMenuGroup(6, createWorkFlowMenuGroup());
 		
 		menuManager.addMenuGroup(MenuGroup.createBlockGroup());
 		
 		menuManager.addMenuGroup(createTemplateMenuGroup());
 		/*menuManager.addMenuGroup(createAddonMenuGroup());*/
+		menuManager.addMenuGroup(createGoodsMenuGroup());
 		menuManager.addMenuGroup(createRoleResMenuGroup());
 		menuManager.addMenuGroup(createDataMenuGroup());
 		menuManager.addMenuGroup(createSettingMenuGroup());
@@ -212,8 +214,16 @@ public class AdminMenuInitListener implements MessageListener {
 			group.addMenuItem(new MenuItem("operation", "/admin/operation", "功能管理"));
 			group.addMenuItem(new MenuItem("department", "/admin/department", "组织机构"));
 			group.addMenuItem(new MenuItem("module", "/admin/module", "模块管理"));
-
-			
+		}
+		
+		return group;
+	}
+	
+	private MenuGroup createWorkFlowMenuGroup() {
+		MenuGroup group = new MenuGroup("process", "fa fa-database", "流程管理");
+		{
+			group.addMenuItem(new MenuItem("workflow", "/admin/workflow", "流程管理"));
+			group.addMenuItem(new MenuItem("model", "/admin/model", "模型管理"));
 		}
 		
 		return group;
@@ -240,5 +250,21 @@ public class AdminMenuInitListener implements MessageListener {
 		}
 		return group;
 	}
+	
+	private MenuGroup createGoodsMenuGroup() {
+		MenuGroup group = new MenuGroup("goods", "fa fa-shopping-bag", "商品管理");
+
+		{
+			group.addMenuItem(new MenuItem("supplier", "/admin/supplier", "供应商管理"));
+			group.addMenuItem(new MenuItem("specification", "/admin/specification", "商品规格"));
+			group.addMenuItem(new MenuItem("specificationValue", "/admin/specificationValue", "商品规格值"));
+			group.addMenuItem(new MenuItem("goodsType", "/admin/goodsType", "商品类型"));
+			group.addMenuItem(new MenuItem("category", "/admin/category", "商品分类"));
+			group.addMenuItem(new MenuItem("brand", "/admin/brand", "品牌管理"));
+			group.addMenuItem(new MenuItem("goods", "/admin/goods", "商品信息管理"));
+			
+		}
+		return group;
+	}	
 
 }
