@@ -256,6 +256,7 @@ function doSubmit(){
 								<td class="col-xs-4"><input class="form-control input-sm" type="text" name="mytext[]" id="field_${child_index}" value="${child.name}"><input type="hidden" name="childId[]" id="child_${child_index}" value="${child.id}"></td>
 								<td class="image" style="display:none"></td>
 								<td class="preview" style="display:none; position:relative;"><a>预览</a>
+								<input type="hidden" name="imageUrl[]" value="">
 								<span><img src="${CPATH}${(child.image_path)!}" width="150"/></span></td>
 								<td class="col-xs-2"><input class="form-control input-sm" type="text" name="order[]" id="order_${child_index}" value="${(child.orderList)!}"></td>
 								<td><a href="#" class="removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td>

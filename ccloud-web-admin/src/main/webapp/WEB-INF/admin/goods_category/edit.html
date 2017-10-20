@@ -199,7 +199,7 @@ function doSubmit(){
 						<label class="control-label col-sm-2">有效状态:</label>
 						<div class="input-group col-md-4 col-sm-10">
 							<label class="radio-inline">
-		                 		<input type="radio" name="goodsCategory.state" value="1" <#if goodsCategory?? && goodsCategory.state == 1>checked</#if>>有效
+		                 		<input type="radio" name="goodsCategory.state" value="1" <#if !goodsCategory?? || goodsCategory.state == 1>checked</#if>>有效
 		                 	</label>
 		                 	<label class="radio-inline">
 		                 		<input type="radio" name="goodsCategory.state" value="0" <#if goodsCategory?? && goodsCategory.state == 0>checked</#if>>无效

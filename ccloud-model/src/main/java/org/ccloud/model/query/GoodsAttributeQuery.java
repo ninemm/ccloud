@@ -16,6 +16,8 @@
 package org.ccloud.model.query;
 
 import java.util.LinkedList;
+import java.util.List;
+
 import org.ccloud.model.GoodsAttribute;
 
 import com.jfinal.plugin.activerecord.Page;
@@ -42,11 +44,16 @@ public class GoodsAttributeQuery extends JBaseQuery {
 		});
 	}
 
-	public Page<GoodsAttribute> paginate(int pageNumber, int pageSize, String orderby) {
-		String select = "select * ";
-		StringBuilder fromBuilder = new StringBuilder("from `cc_goods_attribute` ");
+	public Page<GoodsAttribute> paginate(int pageNumber, int pageSize, String keyword, String orderby) {
+		String select = "select cc.*, ct.name as type_name ";
+		StringBuilder fromBuilder = new StringBuilder("from `cc_goods_attribute` cc ");
+		fromBuilder.append("join `cc_goods_type` ct on cc.goods_type_id = ct.id ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
+		
+		appendIfNotEmptyWithLike(fromBuilder, "name", keyword, params, true);
+		
+		fromBuilder.append("order by " + orderby);		
 
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
@@ -65,6 +72,10 @@ public class GoodsAttributeQuery extends JBaseQuery {
 			return deleteCount;
 		}
 		return 0;
+	}
+
+	public List<GoodsAttribute> findByTypeId(String typeId) {
+		return DAO.doFind("goods_type_id = ? And is_enabled = 1", typeId);
 	}
 
 	

@@ -1,0 +1,498 @@
+@charset "utf-8";
+
+.input .body {
+	padding-bottom: 30px;
+}
+
+.input .tab {
+	height: 30px;
+	padding-left: 160px;
+	margin: 10px 0px 5px 0px;
+	background: url(../images/admin_x_bg.gif) 0px -120px repeat-x;
+}
+
+.input .tab li {
+	float: left;
+	margin-right: 5px;
+}
+
+.input .tab li input {
+	width: 100px;
+	height: 30px;
+	line-height: 30px;
+	text-align: center;
+	color: #666666;
+	cursor: pointer;
+	outline: none;
+	border: none;
+	background: url(../images/admin_button.gif) -120px -30px no-repeat;
+}
+
+.input .tab li input:hover {
+	color: #ff9b1f;
+}
+
+.input ul.tab li input.current {
+	color: #000000;
+	background: url(../images/admin_button.gif) 0px -30px no-repeat;
+}
+
+.input .tabContent {
+}
+
+.input .inputTable {
+	width: 100%;
+	word-break: break-all;
+}
+
+.input .inputTable th {
+	width: 150px;
+	line-height: 25px;
+	padding: 5px 10px 5px 6px;
+	font-weight: normal;
+	color: #333333;
+	border-bottom: 1px solid #dde9f5;
+	background-color: #f9fbfd;
+}
+
+.input .inputTable tr:hover {
+	background-color: #f6fafd;
+}
+
+.input .inputTable tr:hover th {
+	background-color: #ecf3f9;
+}
+
+.input .inputTable .title th {
+	text-align: left;
+	padding-left: 5px;
+}
+
+.input .inputTable td {
+	line-height: 25px;
+	padding: 5px;
+	color: #666666;
+	border-bottom: 1px solid #dde9f5;
+}
+
+.input .tableItem {
+	padding: 10px;
+}
+
+.input .tableItem .inputTable {
+	border: 1px solid #bfcce2;
+}
+
+.input .tableItem .inputTable .title {
+	font-weight: bold;
+	background-color: #ecf3f9;
+}
+
+.input .ke-container tr:hover {
+	background-color: #f0f0ee;
+}
+
+.input .ke-container td {
+	padding: 0px;
+	margin: 0px;
+	border: none;
+}
+
+.input .buttonArea {
+	padding: 10px 0px 10px 165px;
+	line-height: 25px;
+}
+
+.input .fieldTitle {
+	height: 29px;
+	line-height: 29px;
+	padding-right: 5px;
+}
+
+/* ---------- Category ---------- */
+
+.firstCategory {
+	padding-left: 10px;
+	background: url(../images/admin_icon.gif) 0px -300px no-repeat;
+}
+
+.category {
+	padding-left: 10px;
+	background: url(../images/admin_icon.gif) 0px -360px no-repeat;
+}
+
+/* ---------- Goods Specification ---------- */
+
+.goodsSpecification .goodsSpecificationValueTable {
+	border: 1px solid #e1e1e1;
+}
+
+.goodsSpecification .goodsSpecificationValueTable tr th {
+	padding: 5px;
+	text-align: left;
+}
+
+.goodsSpecification .goodsSpecificationValueTable tr td {
+	height: 35px;
+	line-height: 35px;
+	border: 1px solid #e1e1e1;
+}
+
+.goodsSpecification .goodsSpecificationValueTable tr .upGoodsSpecificationValue, .goodsSpecification .goodsSpecificationValueTable tr .downGoodsSpecificationValue, .goodsSpecification .goodsSpecificationValueTable tr .deleteGoodsSpecificationValue {
+	margin: 0px 5px;
+}
+
+.goodsSpecification .goodsSpecificationValueImage .goodsSpecificationValueImagePreview {
+	width: 30px;
+	height: 30px;
+	line-height: 30px;
+	float: left;
+	margin: 0px 10px;
+	position: static;
+	color: #969696;
+	overflow: hidden;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale);
+	border: 1px solid #cfcfcf;
+}
+
+.goodsSpecification .goodsSpecificationValueImage .goodsSpecificationValueImagePreview:hover {
+	border: 1px solid #ff6600;
+}
+
+.goodsSpecification .goodsSpecificationValueImage .goodsSpecificationValueImagePreview img {
+	width: 30px;
+	height: 30px;
+}
+
+.goodsSpecification .goodsSpecificationValueImage .goodsSpecificationValueImageUploadButton {
+	width: 74px;
+	height: 22px;
+	line-height: 22px;
+	display: block;
+	float: left;
+	overflow: hidden;
+	position: relative;
+	top: 5px;
+	left: 0px;
+	outline: none;
+	cursor: pointer;
+	border: none;
+	background: url(../images/admin_button.gif) no-repeat 0px -90px;
+}
+
+.goodsSpecification .goodsSpecificationValueImage input {
+	width: 74px;
+	height: 22px;
+	line-height: 22px;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	z-index: 1;
+	opacity: 0;
+	filter: alpha(opacity = 0);
+	font-size: 40px;
+	direction: rtl;
+	cursor: pointer;
+}
+
+.goodsSpecification .goodsSpecificationValueImage div {
+	width: 74px;
+	height: 22px;
+	line-height: 22px;
+	text-align: center;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	z-index: 0;
+	cursor: pointer;
+}
+
+/* ---------- Goods ---------- */
+
+.goods .goodsImageArea {
+	height: 180px;
+}
+
+.goods .goodsImageArea .example {
+	width: 130px;
+	height: 130px;
+	float: left;
+	margin-right: 10px;
+	background: url(../images/admin_bg.gif) no-repeat -60px -60px;
+}
+
+.goods .goodsImageArea .prev {
+	width: 8px;
+	height: 130px;
+	display: block;
+	float: left;
+	margin-right: 5px;
+	outline: none;
+	border: 1px solid #ededed;
+	background: url(../images/admin_bg.gif) 0px -60px #fafafa no-repeat;
+}
+
+.goods .goodsImageArea .prev:hover {
+	border: 1px solid #cccccc;
+	background-color: #f3f3f3;
+}
+
+.goods .goodsImageArea .next {
+	width: 8px;
+	height: 130px;
+	display: block;
+	float: left;
+	margin-left: 5px;
+	outline: none;
+	border: 1px solid #ededed;
+	background: url(../images/admin_bg.gif) -30px -60px #fafafa no-repeat;
+}
+
+.goods .goodsImageArea .next:hover {
+	border: 1px solid #cccccc;
+	background-color: #f3f3f3;
+}
+
+.goods .goodsImageArea .scrollable {
+	width: 502px;
+	height: 130px;
+	line-height: 130px;
+	float: left;
+	overflow: hidden;
+	position: relative;
+	border: 1px solid #cccccc;
+}
+
+.goods .goodsImageArea .items {
+	width: 20000em;
+	position: absolute;
+}
+
+.goods .goodsImageArea li {
+	width: 90px;
+	height: 90px;
+	display: block;
+	float: left;
+	margin: 5px;
+	text-align: center;
+}
+
+.goods .goodsImageArea .goodsImageBox {
+	position: relative;
+}
+
+.goods .goodsImageArea .goodsImageBox .goodsImagePreview {
+	width: 90px;
+	height: 90px;
+	line-height: 90px;
+	color: #969696;
+	overflow: hidden;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	z-index: 0;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale);
+	border: 1px solid #cfcfcf;
+}
+
+.goods .goodsImageArea .goodsImageBox .goodsImagePreview:hover {
+	border: 1px solid #ffc097;
+}
+
+.goods .goodsImageArea .goodsImageBox .goodsImagePreview img {
+	width: 90px;
+	height: 90px;
+}
+
+.goods .goodsImageArea .goodsImageBox .goodsImageOperate {
+	width: 90px;
+	height: 25px;
+	display: none;
+	padding-top: 3px;
+	padding-left: 13px;
+	position: absolute;
+	top: 66px;
+	left: 1px;
+	z-index: 1;
+	background: url(../images/goods_image_operate_bg.png) no-repeat 0px 0px;
+}
+
+.goods .goodsImageArea .goodsImageBox .goodsImageOperate .left {
+	width: 19px;
+	height: 19px;
+	display: block;
+	float: left;
+	margin-right: 1px;
+	overflow: hidden;
+	outline: none;
+}
+
+.goods .goodsImageArea .goodsImageBox .goodsImageOperate .right {
+	width: 19px;
+	height: 19px;
+	display: block;
+	float: left;
+	margin-right: 1px;
+	overflow: hidden;
+	outline: none;
+}
+
+.goods .goodsImageArea .goodsImageBox .goodsImageOperate .delete {
+	width: 19px;
+	height: 19px;
+	display: block;
+	float: left;
+	overflow: hidden;
+	outline: none;
+}
+
+.goods .goodsImageArea .goodsImageBox .goodsImageUploadButton {
+	width: 74px;
+	height: 22px;
+	line-height: 22px;
+	display: block;
+	overflow: hidden;
+	position: relative;
+	top: 97px;
+	left: 0px;
+	outline: none;
+	cursor: pointer;
+	border: none;
+	background: url(../images/admin_button.gif) no-repeat 0px -90px;
+}
+
+.goods .goodsImageArea .goodsImageBox .goodsImageUploadButton input {
+	width: 74px;
+	height: 22px;
+	line-height: 22px;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	z-index: 1;
+	opacity: 0;
+	filter: alpha(opacity = 0);
+	font-size: 40px;
+	direction: rtl;
+	cursor: pointer;
+}
+
+.goods .goodsImageArea .goodsImageBox .goodsImageUploadButton div {
+	width: 74px;
+	height: 22px;
+	line-height: 22px;
+	text-align: center;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	z-index: 0;
+	cursor: pointer;
+}
+
+.goods .goodsSpecificationTable {
+	border: 1px solid #e1e1e1;
+}
+
+.goods .goodsSpecificationArea {
+	height: 120px;
+	padding: 5px;
+	overflow-y: scroll;
+	border: 1px solid #cccccc;
+}
+
+.goods .goodsSpecificationPreview {
+	height: 120px;
+	padding: 5px;
+	overflow-y: scroll;
+	cursor: default;
+	border: 1px solid #cccccc;
+}
+
+.goods .goodsSpecificationPreview ul .text {
+	float: left;
+	padding: 0px 5px;
+	margin-top: 5px;
+	margin-right: 5px;
+	border: 1px solid #cccccc;
+}
+
+.goods .goodsSpecificationPreview ul .image {
+	width: 22px;
+	height: 22px;
+	float: left;
+	padding: 1px;
+	margin-top: 5px;
+	margin-right: 5px;
+	border: 1px solid #cccccc;
+}
+
+.goods .goodsSpecificationPreview ul .image img {
+	width: 22px;
+	height: 22px;
+	margin-top: -11px;
+	margin-left: -2px;	
+}
+
+.goods .goodsSpecificationValueSelect span {
+	width: 60px;
+	height: 29px;
+	line-height: 21px;
+	display: block;
+	padding: 3px 0px;
+	text-align: center;
+	cursor: pointer;
+	border: 1px dotted #cccccc;
+}
+
+.goods .goodsSpecificationValueSelect span:hover {
+	border: 1px dotted #ff6600;
+}
+
+.goods .goodsSpecificationValueSelect span img {
+	width: 22px;
+	height: 22px;
+}
+
+.goods .goodsSpecificationValueSelect .goodsSpecificationValueSelected {
+	border: 1px solid #ff8a00;
+}
+
+.goods .goodsSpecificationValueSelect ul {
+	width: 215px;
+	display: none;
+	padding: 0px 5px 5px 5px;
+	position: absolute;
+	z-index: 1;
+	border: 1px solid #ff8a00;
+	background-color: #ffffd4;
+}
+
+.goods .goodsSpecificationValueSelect ul .text {
+	float: left;
+	padding: 0px 5px;
+	margin-top: 5px;
+	margin-right: 5px;
+	cursor: pointer;
+	border: 1px solid #cccccc;
+	background-color: #ffffff;
+}
+
+.goods .goodsSpecificationValueSelect ul .image {
+	float: left;
+	padding: 1px;
+	margin-top: 5px;
+	margin-right: 5px;
+	cursor: pointer;
+	border: 1px solid #cccccc;
+	background-color: #ffffff;
+}
+
+.goods .goodsSpecificationValueSelect ul .image img {
+	width: 22px;
+	height: 22px;
+	display: block;
+}
+
+.goods .goodsSpecificationValueSelect ul .notAllowed {
+	cursor: not-allowed;
+	color: #cccccc;
+}

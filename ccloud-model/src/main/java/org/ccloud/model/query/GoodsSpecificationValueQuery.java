@@ -15,11 +15,14 @@
  */
 package org.ccloud.model.query;
 
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.ccloud.model.GoodsSpecificationValue;
+import org.ccloud.utils.StringUtils;
 
+import com.jfinal.kit.PathKit;
 import com.jfinal.plugin.activerecord.Page;
 
 /**
@@ -84,5 +87,24 @@ public class GoodsSpecificationValueQuery extends JBaseQuery {
 		}
 		return 0;
 	}
+	
+	public int batchDeleteAndFile(List<GoodsSpecificationValue> ids) {
+		if (ids != null && ids.size() > 0) {
+			int deleteCount = 0;
+			for (int i = 0; i < ids.size(); i++) {
+				if (StringUtils.isNotBlank(ids.get(i).getImagePath())) {
+					File file1 = new File(PathKit.getWebRootPath()+ids.get(i).getImagePath());
+					if (file1.exists() && file1.isFile()) {
+						file1.delete();
+					}
+				}
+				if (DAO.deleteById(ids.get(i))) {
+					++deleteCount;
+				}
+			}
+			return deleteCount;
+		}
+		return 0;
+	}	
 	
 }

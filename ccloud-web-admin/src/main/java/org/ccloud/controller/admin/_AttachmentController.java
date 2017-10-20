@@ -39,6 +39,7 @@ import org.ccloud.utils.ImageUtils;
 import com.alibaba.fastjson.JSONObject;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.PathKit;
+import com.jfinal.kit.StrKit;
 import com.jfinal.log.Log;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.upload.UploadFile;
@@ -116,6 +117,7 @@ public class _AttachmentController extends JBaseCRUDController<Attachment> {
 			User user = getLoginedUser();
 
 			Attachment attachment = new Attachment();
+			attachment.setId(StrKit.getRandomUUID());
 			attachment.setUserId(user.getId());
 			attachment.setCreated(new Date());
 			attachment.setTitle(uploadFile.getOriginalFileName());

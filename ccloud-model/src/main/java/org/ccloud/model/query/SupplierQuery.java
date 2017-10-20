@@ -74,8 +74,12 @@ public class SupplierQuery extends JBaseQuery {
 	}
 
 	public List<Supplier> findAll() {
-		return DAO.doFind();
+		return DAO.getFromListCache("all", new IDataLoader() {
+			@Override
+			public Object load() {
+				return DAO.doFind();
+			}
+		});
 	}
 
-	
 }
