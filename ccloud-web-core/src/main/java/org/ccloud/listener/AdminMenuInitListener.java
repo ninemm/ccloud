@@ -48,6 +48,7 @@ public class AdminMenuInitListener implements MessageListener {
 		menuManager.addMenuGroup(3, createAttachmentMenuGroup());
 		menuManager.addMenuGroup(4, createWechatMenuGroup());
 		menuManager.addMenuGroup(5, createStatMenuGroup());
+		menuManager.addMenuGroup(6, createWorkFlowMenuGroup());
 		
 		menuManager.addMenuGroup(MenuGroup.createBlockGroup());
 		
@@ -214,8 +215,16 @@ public class AdminMenuInitListener implements MessageListener {
 			group.addMenuItem(new MenuItem("operation", "/admin/operation", "功能管理"));
 			group.addMenuItem(new MenuItem("department", "/admin/department", "组织机构"));
 			group.addMenuItem(new MenuItem("module", "/admin/module", "模块管理"));
-
-			
+		}
+		
+		return group;
+	}
+	
+	private MenuGroup createWorkFlowMenuGroup() {
+		MenuGroup group = new MenuGroup("process", "fa fa-database", "流程管理");
+		{
+			group.addMenuItem(new MenuItem("workflow", "/admin/workflow", "流程管理"));
+			group.addMenuItem(new MenuItem("model", "/admin/model", "模型管理"));
 		}
 		
 		return group;
