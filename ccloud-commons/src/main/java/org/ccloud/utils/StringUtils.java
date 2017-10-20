@@ -163,7 +163,7 @@ public class StringUtils {
 		return text.replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#x27;").replace("/", "&#x2F;");
 	}
 	
-	public String getArrayFirst(String [] value) {
+	public static String getArrayFirst(String [] value) {
 		if (value == null || StringUtils.isBlank(value[0])) {
 			return null;
 		}
