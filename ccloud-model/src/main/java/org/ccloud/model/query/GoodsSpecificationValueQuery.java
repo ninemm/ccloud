@@ -98,7 +98,7 @@ public class GoodsSpecificationValueQuery extends JBaseQuery {
 						file1.delete();
 					}
 				}
-				if (DAO.deleteById(ids.get(i))) {
+				if (DAO.deleteById(ids.get(i).getId())) {
 					++deleteCount;
 				}
 			}

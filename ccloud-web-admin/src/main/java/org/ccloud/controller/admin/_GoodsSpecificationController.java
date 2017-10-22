@@ -82,6 +82,7 @@ public class _GoodsSpecificationController extends JBaseCRUDController<GoodsSpec
 		String [] valueName = getParaValues("mytext[]");
 		String [] orderList = getParaValues("order[]");
 		String [] childIdList = getParaValues("childId[]");
+		String [] imageUrl = getParaValues("imageUrl[]");
 		if (ccGoodsSpecification.getId() == null) {
 			ccGoodsSpecification.saveOrUpdate();
 		} else {
@@ -93,6 +94,7 @@ public class _GoodsSpecificationController extends JBaseCRUDController<GoodsSpec
  			GoodsSpecificationValueQuery.me().batchDeleteAndFile(deleteIds);
 			ccGoodsSpecification.saveOrUpdate();
 		}
+		int update = 0;
 		if (valueName != null) {
 			for (int i = 0; i < valueName.length; i++) {
 				if (StringUtils.isBlank(valueName[i])) {
@@ -103,8 +105,15 @@ public class _GoodsSpecificationController extends JBaseCRUDController<GoodsSpec
 				if (StringUtils.isNotBlank(childIdList[i])) {
 					value.setId(childIdList[i]);
 				}
-				if (uploadFiles.size() > 0) {
-					value.setImagePath(AttachmentUtils.moveFile(uploadFiles.get(i)).replace("\\", "/"));
+				if (imageUrl.length > 0) {
+					if (StringUtils.isNotBlank(imageUrl[i]) && imageUrl[i].equals("add")) {
+						value.setImagePath(AttachmentUtils.moveFile(uploadFiles.get(update)).replace("\\", "/"));
+						update++;
+					}
+				} else {
+					if (uploadFiles.size() > 0) {
+						value.setImagePath(AttachmentUtils.moveFile(uploadFiles.get(i)).replace("\\", "/"));
+					}
 				}
 				if (StringUtils.isNotBlank(orderList[i])) {
 					if (StringUtils.isNumeric(orderList[i])) {
