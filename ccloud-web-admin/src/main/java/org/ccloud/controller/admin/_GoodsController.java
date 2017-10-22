@@ -95,10 +95,15 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
 			getGoodsChild(goods);
 			setAttr("goods", goods);
 			
+    		String imgList = goods.getProductImageListStore();
+			JSONArray jsonArray = JSONArray.parseArray(imgList);
+			List<ImageJson> imageList = jsonArray.toJavaList(ImageJson.class);		
+			setAttr("imageList", imageList);
+			
 			List<GoodsCategory> clist = GoodsCategoryQuery.me().findCategoryByBrandId(goods.getBrandId());
 			setAttr("clist", clist);
 			
-			List<Record> attributeList = GoodsGoodsAttributeMapStoreQuery.me().findByGoodsId(id);
+			List<Record> attributeList = GoodsGoodsAttributeMapStoreQuery.me().findByGoodsId(goods);
 			setAttr("attributeList", attributeList);
 		}
 		List<Brand> blist = BrandQuery.me().findAll();
@@ -148,11 +153,15 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
 		if (StringUtils.isNotBlank(tinymce)) {
 			ccGoods.setContent(tinymce);
 		}
+		String [] imagePath = getParaValues("imageUrl[]");
+		String [] title = getParaValues("title[]");
 		if (StringUtils.isBlank(ccGoods.getId())) {
 			ccGoods.setId(StrKit.getRandomUUID());
+			this.setImagePath(imagePath, title, ccGoods);
 			ccGoods.setCreateDate(new Date());
 			ccGoods.save();
 		} else {
+			this.setImagePath(imagePath, title, ccGoods);
 			ccGoods.saveOrUpdate();
 		}
 		Map<String, String[]> map = getParaMap();
@@ -270,6 +279,18 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
 		List<String> ids = getDiffrent(oldList, newProIds);
 		ProductQuery.me().batchDelete(ids);
 		ProductGoodsSpecificationValueQuery.me().batchDeleteByProIds(ids);
+	}
+	
+	private void setImagePath(String [] path, String [] title, Goods goods) {
+		List<ImageJson> imageList = new ArrayList<>();
+		for (int i = 0;i < path.length;i++) {
+			ImageJson imageJson = new ImageJson();
+			imageJson.setImgName(title[i]);
+			imageJson.setSavePath(path[i].replace("\\", "/"));
+			imageList.add(imageJson);
+		}
+		String json = JSON.toJSONString(imageList);
+		goods.setProductImageListStore(json);
 	}
 	
 	//map key模糊查询

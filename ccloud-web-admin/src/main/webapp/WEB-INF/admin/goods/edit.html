@@ -360,7 +360,7 @@ function imgChoose(){
 	    content: '${CPATH}/admin/attachment/choose_layer',
 	    end:function(){
 	    	if(''!=data.url && null != data.url){
-	    		$("#imageDiv").append("<li><img src="+ data.url +" path=${CPATH}"+ data.url +" class='jp-grids-photos img-responsive' ></li>");
+	    		$("#imageDiv").append("<li><img src="+ data.url +" path=${CPATH}"+ data.url +" class='jp-grids-photos img-responsive' ><input type='hidden' name='imageUrl[]' value="+ data.url +"><input type='hidden' name='title[]' value="+ data.alt +"></li>");
 	    	}
 	    }
 	});
@@ -513,10 +513,21 @@ function doSubmit(){
 								<div class="input-group col-md-4 col-sm-10">
 				                 	<span class="btn btn-default" id="chooseImg" onClick="imgChoose()">选择图片</span>
 				               	</div>
-								<ul class="list-inline list-unstyled" id="imageDiv">
-									
-								</ul>				               	
-							</div>							
+							</div>
+							<div class="form-group col-sm-12 validata-box">
+								<label class="control-label col-sm-2"></label>
+								<div class="input-group col-md-4 col-sm-10">
+									<ul class="list-inline list-unstyled" id="imageDiv">
+										<#list (imageList)! as img>
+											<li>
+												<img src="${img.savePath}" class='jp-grids-photos img-responsive' >
+												<input type='hidden' name='imageUrl[]' value="${img.savePath}">
+												<input type='hidden' name='title[]' value="${img.imgName}">
+											</li>
+										</#list>
+									</ul>									
+				               	</div>
+							</div>														
 							<div class="form-group col-sm-12 validata-box">
 								<label class="control-label col-sm-2">是否上架:</label>
 								<div class="input-group col-md-4 col-sm-10">

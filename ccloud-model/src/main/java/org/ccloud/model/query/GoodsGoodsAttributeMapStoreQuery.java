@@ -18,6 +18,7 @@ package org.ccloud.model.query;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.ccloud.model.Goods;
 import org.ccloud.model.GoodsGoodsAttributeMapStore;
 
 import com.jfinal.plugin.activerecord.Db;
@@ -78,12 +79,13 @@ public class GoodsGoodsAttributeMapStoreQuery extends JBaseQuery {
 		}
 	}
 
-	public List<Record> findByGoodsId(String id) {
+	public List<Record> findByGoodsId(Goods goods) {
  		StringBuilder fromBuilder = new StringBuilder("select cc.name, cc.id, b.goods_attribute_map_store_element as value ");
 		fromBuilder.append("from cc_goods_attribute cc ");
 		fromBuilder.append("left join (SELECT * FROM cc_goods_goods_attribute_map_store b where b.goods_id = ?) b ");
-		fromBuilder.append("ON cc.id = b.goods_attribute_map_store_mapkey_id");
-		List<Record> list = Db.find(fromBuilder.toString(), id);
+		fromBuilder.append("ON cc.id = b.goods_attribute_map_store_mapkey_id ");
+		fromBuilder.append("where cc.goods_type_id = ? ");
+		List<Record> list = Db.find(fromBuilder.toString(), goods.getId(), goods.getGoodsTypeId());
 		return list;
 	}
 
