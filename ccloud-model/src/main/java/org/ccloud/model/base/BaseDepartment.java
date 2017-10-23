@@ -178,5 +178,13 @@ public abstract class BaseDepartment<M extends BaseDepartment<M>> extends JModel
 	public java.util.Date getModifyDate() {
 		return get("modify_date");
 	}
+	
+	public void setDataArea(java.lang.String dataArea) {
+		set("data_area", dataArea);
+	}
+	
+	public java.lang.String getDataArea() {
+		return get("data_area");
+	}
 
 }

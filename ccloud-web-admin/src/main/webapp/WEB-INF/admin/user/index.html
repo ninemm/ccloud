@@ -85,6 +85,7 @@ function batchAction() {
 							<td>
 								<a href="${CPATH}/admin/user/edit?id=${bean.id}&c=${c!}&p=${p!}" class="btn btn-xs bg-olive btn-flat">编辑</a>
 								<a href="javascript:void(0);" onclick="del('${bean.id}')" class="btn btn-xs btn-danger btn-flat">删除</a>
+								<a href="javascript:void(0);" onclick="enable('${bean.id}')" class="btn btn-xs btn-danger btn-flat"><#if bean.status == 0><#else></#if></a>
 							</td>
 						</tr>
 						</#list> </#if>

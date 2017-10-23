@@ -210,5 +210,23 @@ public class DepartmentQuery extends JBaseQuery {
 	public List<Department> findByParentId(String id) {
 		return DAO.doFind("parent_id = ?", id);
 	}
+
+	public void updateParents(Department dept) {
+		if (dept != null && dept.getParentId() != "0") {
+			Department parentDept = DepartmentQuery.me().findById(dept.getParentId());
+			Integer childNum = DepartmentQuery.me().childNumById(dept.getParentId());
+			if (childNum > 0) {
+				if (parentDept.getIsParent() == 0) {
+					parentDept.setIsParent(1);
+					parentDept.update();
+				}
+			} else {
+				if (parentDept.getIsParent() > 0) {
+					parentDept.setIsParent(0);
+					parentDept.update();
+				}
+			}
+		}
+	}
 	
 }

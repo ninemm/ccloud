@@ -49,9 +49,12 @@ public class _GoodsAttributeController extends JBaseCRUDController<GoodsAttribut
 		if (StrKit.notBlank(keyword)) setAttr("k", keyword);
 		
 		String type = getPara("type");
+		String typeName = getPara("typeName");
 		try {
-			String typeName = new String(getPara("typeName").getBytes("ISO-8859-1"),"UTF-8");
-			if (StrKit.notBlank(typeName)) setAttr("typeName", typeName);
+			if (StrKit.notBlank(typeName)) {
+				typeName = new String(typeName.getBytes("ISO-8859-1"),"UTF-8");
+				setAttr("typeName", typeName);
+			}
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}

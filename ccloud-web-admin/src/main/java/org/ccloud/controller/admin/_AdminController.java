@@ -78,6 +78,8 @@ public class _AdminController extends JBaseController {
 			renderAjaxResultForError("没有该用户");
 			return;
 		}
+		
+		setSessionAttr("user", user);
 
 		if (EncryptUtils.verlifyUser(user.getPassword(), user.getSalt(), password)) {
 

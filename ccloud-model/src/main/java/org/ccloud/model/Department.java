@@ -147,7 +147,7 @@ public class Department extends BaseDepartment<Department> implements ISortModel
 	}
 	
     public void clearList() {
-        Set<String> list = CacheKit.get(CACHE_NAME, "cacheDeptkeys");
+        Set<String> list = CacheKit.get(CACHE_NAME, "cachekeys");
         if (list != null && list.size() > 0) {
             for (String key : list) {
 
