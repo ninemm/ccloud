@@ -62,7 +62,7 @@ $(function() {
 		$(".image").show();
 		$("#previewImage").show();
 		$(".preview").show();
-		var str = "<input type='file' name='file[]' onChange='checkValue()'/>";
+		var str = "<input type='file' name='file[]' onChange='checkValue(this)'/>";
 		$(".image").append(str);    	
     }	
 	var FieldCount=1; //to keep track of text box added  
@@ -73,8 +73,13 @@ $(function() {
 	            FieldCount++; //text box added increment  
 	            //add input box
 	            var select =  $("#showType").val();
+	            var child = ${(childList?size)!0}
 	            if (select == 1) {
-					$(InputsWrapper).append('<tr><td class="col-xs-4"><input class="form-control input-sm" type="text" name="mytext[]" id="field_'+ FieldCount +'"/><input type="hidden" name="childId[]" id="child_'+ FieldCount +'"/></td><td class="image"><input type="file" name="file[]" onChange="checkValue()"/></td><td class="col-xs-2"><input class="form-control input-sm" type="text" name="order[]" id="order_'+ FieldCount +'"></td><td><a href="#" class="removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><tr>');					            
+	            	if (child > 0) {
+	            		$(InputsWrapper).append('<tr><td class="col-xs-4"><input class="form-control input-sm" type="text" name="mytext[]" id="field_'+ FieldCount +'"/><input type="hidden" name="childId[]" id="child_'+ FieldCount +'"/></td><td class="image"><input type="file" name="file[]" onChange="checkValue(this)"/></td><td class="preview"><input type="hidden" name="imageUrl[]"/></td><td class="col-xs-2"><input class="form-control input-sm" type="text" name="order[]" id="order_'+ FieldCount +'"></td><td><a href="#" class="removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><tr>');
+	            	} else {
+	            		$(InputsWrapper).append('<tr><td class="col-xs-4"><input class="form-control input-sm" type="text" name="mytext[]" id="field_'+ FieldCount +'"/><input type="hidden" name="childId[]" id="child_'+ FieldCount +'"/></td><td class="image"><input type="file" name="file[]" onChange="checkValue(this)"/></td><td class="col-xs-2"><input class="form-control input-sm" type="text" name="order[]" id="order_'+ FieldCount +'"></td><td><a href="#" class="removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><tr>');
+	            	}
 	            } else {
 	            	$(InputsWrapper).append('<tr><td class="col-xs-4"><input class="form-control input-sm" type="text" name="mytext[]" id="field_'+ FieldCount +'"/><input type="hidden" name="childId[]" id="child_'+ FieldCount +'"/></td><td class="image" style="display:none"></td><td class="col-xs-2"><input class="form-control input-sm" type="text" name="order[]" id="order_'+ FieldCount +'"></td><td><a href="#" class="removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><tr>');
 	            }
@@ -113,7 +118,7 @@ function addImage(obj) {
 	if (select == "1") {
 		$("#imageFile").show();
 		$(".image").show();
-		var str = "<input type='file' name='file[]' onChange='checkValue()'/>";
+		var str = "<input type='file' name='file[]' onChange='checkValue(this)'/>";
 		$(".image").append(str);
 	} else {
 		$("#imageFile").hide();
@@ -124,7 +129,8 @@ function addImage(obj) {
 
 var imageStatus = false;
 
-function checkValue() {
+function checkValue(obj) {
+	$(obj).parent().parent().find("input[name='imageUrl[]']").val("add");
 	checkImage();
 	if(imageStatus) {
 		$("#warnImage").remove();
@@ -134,19 +140,36 @@ function checkValue() {
 function checkImage() {
 	var imageList = $(".image");
 	var select =  $("#showType").val();
+	var preview = $(".preview");
+	var child = ${(childList?size)!0}
 	if (select == 1) {
-		imageList.each(function(index,element){
-	    	var x = $(this).find("input").val();
-	    	if (!x) {
-				if ($("#warnImage").html() == undefined) {
-					$("#valueTable").after('<small style="color:#a94442;" id="warnImage" class="help-block" data-bv-validator="notEmpty" data-bv-for="goodsSpecification.show_type" data-bv-result="INVALID">您有未选择的图片</small>');
-				}	    	
-	    		return false;
-	    	}
-	    	if (index == imageList.length-1) {
-	    		imageStatus = true;
-	    	}
-	  	});	
+		if (child == 0) {
+			imageList.each(function(index,element){
+		    	var x = $(this).find("input").val();
+		    	if (!x) {
+					if ($("#warnImage").html() == undefined) {
+						$("#valueTable").after('<small style="color:#a94442;" id="warnImage" class="help-block" data-bv-validator="notEmpty" data-bv-for="goodsSpecification.show_type" data-bv-result="INVALID">您有未选择的图片</small>');
+					}	    	
+		    		return false;
+		    	}
+		    	if (index == imageList.length-1) {
+		    		imageStatus = true;
+		    	}
+		  	});		
+		} else {
+			preview.each(function(index,element){
+		    	var x = $(this).find("input").val();
+		    	if (!x) {
+					if ($("#warnImage").html() == undefined) {
+						$("#valueTable").after('<small style="color:#a94442;" id="warnImage" class="help-block" data-bv-validator="notEmpty" data-bv-for="goodsSpecification.show_type" data-bv-result="INVALID">您有未选择的图片</small>');
+					}	    	
+		    		return false;
+		    	}
+		    	if (index == imageList.length-1) {
+		    		imageStatus = true;
+		    	}
+		  	});
+		}
 	} else {
 		imageStatus = true;
 	}
@@ -155,6 +178,7 @@ function checkImage() {
 function doSubmit(){
 	checkImage();
 	if (!imageStatus) {
+		toastr.error(data.message,"请选择图片");
 		return false;
 	}
 	$form.ajaxSubmit({
@@ -256,6 +280,7 @@ function doSubmit(){
 								<td class="col-xs-4"><input class="form-control input-sm" type="text" name="mytext[]" id="field_${child_index}" value="${child.name}"><input type="hidden" name="childId[]" id="child_${child_index}" value="${child.id}"></td>
 								<td class="image" style="display:none"></td>
 								<td class="preview" style="display:none; position:relative;"><a>预览</a>
+								<input type="hidden" name="imageUrl[]" value="${(child.image_path)!}">
 								<span><img src="${CPATH}${(child.image_path)!}" width="150"/></span></td>
 								<td class="col-xs-2"><input class="form-control input-sm" type="text" name="order[]" id="order_${child_index}" value="${(child.orderList)!}"></td>
 								<td><a href="#" class="removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td>

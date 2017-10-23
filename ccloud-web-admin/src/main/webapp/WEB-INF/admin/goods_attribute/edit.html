@@ -1,0 +1,159 @@
+<#include "../_inc/_layout.html"/>
+
+<#macro script_import>
+	<!-- bootstrapvalidator -->
+ 	<script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
+</#macro>
+
+<#macro css_import>
+	<!-- bootstrapvalidator -->
+    <link rel="stylesheet" href="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.css">
+</#macro>
+ 
+<#macro script>
+
+var $form = $("#form");
+
+$(function() {
+	
+	jQuery.mm.initValidator('#form', validatorFields)
+	
+});
+
+var validatorFields = {
+	'goodsAttribute.name': {
+		validators: {
+            notEmpty: { message: '属性名称不能为空' },
+            stringLength: { max: 15, message: '属性名称最大长度是15字符，请重新输入' }
+        }
+	},
+	'goodsAttribute.goods_type_id': {
+		validators: {
+			notEmpty: { message: '属性类型不能为空' },
+        }
+	}
+};
+
+function doSubmit(){
+	$form.ajaxSubmit({
+		beforeSubmit: function() {
+			var validate = $form.data('bootstrapValidator');
+			validate.validate();
+			return validate.isValid();
+		},
+		type : "post", 
+		dataType : "json", 
+		success : function(data) { 
+			if (data.errorCode == 0) {
+				//location.reload();
+				toastr.success(data.message, '操作成功');
+			} else {
+				toastr.error(data.message,'操作失败');
+			}
+		},
+		error : function() {
+			alert("信息提交错误");
+		}
+	});
+}
+</#macro>
+
+<@layout active_id=p child_active_id=c>
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+	<h1><#if (goodsAttribute.id) ??>修改<#else>新增</#if>商品属性</h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+       	<li><a href="#">商品管理</a></li>
+       	<li class="active"><#if (goodsAttribute.id) ??>修改<#else>新增</#if>商品属性</li>
+	</ol>
+</section>
+<!-- Main content -->
+<section class="content">
+	<div class="box box-default">
+		<div class="box-header with-border">
+			<h3 class="box-title">商品属性</h3>
+			<div class="box-tools">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse">
+					<i class="fa fa-minus"></i>
+				</button>
+			</div>
+		</div>
+		<form action="${CPATH}/admin/goodsAttribute/save" method="post" id="form" class="form-horizontal" >
+		<input type="hidden" name="goodsAttribute.id" value="${(goodsAttribute.id)!}">
+		<div class="box-body">
+			<div class="col-sm-12 ">
+				<div class="row">
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">商品类型:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<select class="form-control input-sm" name="goodsAttribute.goods_type_id">
+								<option value="">--请选择--</option>
+								<#list (typeList)! as type >
+									<option value="${type.id!}" <#if (goodsAttribute.goods_type_id)! == (type.id)!>selected="selected"</#if>>${(type.name)!}</option>
+								</#list>
+							</select>
+		               	</div>
+					</div>				
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">名称:</label>
+						<div class="input-group col-md-4 col-sm-10">
+		                 	<input class="form-control input-sm" type="text" name="goodsAttribute.name" value="${(goodsAttribute.name)!}" placeholder="1-15个任意字符">
+		               	</div>
+					</div>
+					<!--<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">属性类型:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<select class="form-control input-sm" name="goodsAttribute.attribute_type">
+								<option value="">--请选择--</option>
+								<option value="1" <#if (goodsAttribute.attribute_type)! == "1">selected="selected"</#if>>文本</option>
+								<option value="2" <#if (goodsAttribute.attribute_type)! == "2">selected="selected"</#if>>数字</option>
+								<option value="3" <#if (goodsAttribute.attribute_type)! == "3">selected="selected"</#if>>字母</option>
+								<option value="4" <#if (goodsAttribute.attribute_type)! == "4">selected="selected"</#if>>单选项</option>
+								<option value="5" <#if (goodsAttribute.attribute_type)! == "5">selected="selected"</#if>>多选项</option>
+								<option value="6" <#if (goodsAttribute.attribute_type)! == "6">selected="selected"</#if>>日期</option>
+							</select>
+		               	</div>
+					</div>-->				
+					<div class="form-group col-sm-12">
+						<label class="control-label col-sm-2">排序:</label>
+						<div class="input-group col-md-4 col-sm-10">
+		                 	<input class="form-control input-sm" type="number" name="goodsAttribute.order_list" value="${(goodsAttribute.orderList)!10}">
+		               	</div>
+					</div>
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">是否必填:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<label class="radio-inline">
+		                 		<input type="radio" name="goodsAttribute.is_required" value="1" <#if goodsAttribute?? && goodsAttribute.is_required == 1>checked</#if>>是
+		                 	</label>
+		                 	<label class="radio-inline">
+		                 		<input type="radio" name="goodsAttribute.is_required" value="0" <#if !goodsAttribute?? || goodsAttribute.is_required == 0>checked</#if>>否
+							</label>		                 		
+		               	</div>
+					</div>
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">是否启用:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<label class="radio-inline">
+		                 		<input type="radio" name="goodsAttribute.is_enabled" value="1" <#if !goodsAttribute?? || goodsAttribute.is_enabled == 1>checked</#if>>是
+		                 	</label>
+		                 	<label class="radio-inline">
+		                 		<input type="radio" name="goodsAttribute.is_enabled" value="0" <#if goodsAttribute?? && goodsAttribute.is_enabled == 0>checked</#if>>否
+							</label>		                 		
+		               	</div>
+					</div>										
+				</div>
+			</div>
+		</div>
+	
+		<div class="box-footer"> 
+			<button type="button" onclick="doSubmit()" class="btn btn-primary">保存更改</button>
+			<input type="button" class="btn btn-primary" onclick="javascript:window.location.href='index'" value="返  回" hidefocus="true" />
+		</div>
+	</form>
+	</div>
+</section>
+
+</@layout>

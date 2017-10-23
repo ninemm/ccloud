@@ -16,6 +16,13 @@
 package org.ccloud.model;
 
 import org.ccloud.model.core.Table;
+
+import com.jfinal.plugin.ehcache.CacheKit;
+import com.jfinal.plugin.ehcache.IDataLoader;
+
+import java.util.HashSet;
+import java.util.Set;
+
 import org.ccloud.model.base.BaseSupplier;
 
 /**
@@ -25,5 +32,85 @@ import org.ccloud.model.base.BaseSupplier;
 public class Supplier extends BaseSupplier<Supplier> {
 
 	private static final long serialVersionUID = 1L;
+	
+	public static final String CACHE_KEY = "supplier_list";
+	
+	@Override
+	public boolean save() {
+		
+		clearList();
+		
+		CacheKit.remove(Supplier.CACHE_NAME, CACHE_KEY);
+		return super.save();
+	}
 
+	@Override
+	public boolean saveOrUpdate() {
+		
+		clearList();
+		
+		removeCache(getId());
+		CacheKit.remove(Supplier.CACHE_NAME, CACHE_KEY);
+		
+		return super.saveOrUpdate();
+	}
+	
+	@Override
+	public boolean update() {
+		
+		clearList();
+		
+		removeCache(getId());
+		CacheKit.remove(Supplier.CACHE_NAME, CACHE_KEY);
+		
+		return super.update();
+	}
+
+	@Override
+	public boolean delete() {
+		
+		clearList();
+		
+		removeCache(getId());
+		CacheKit.remove(Supplier.CACHE_NAME, CACHE_KEY);
+		
+		return super.delete();
+	}
+	
+	@Override
+	public boolean deleteById(Object idValue) {
+		
+		clearList();
+		
+		removeCache(idValue);
+		CacheKit.remove(Supplier.CACHE_NAME, CACHE_KEY);
+		
+		return super.deleteById(idValue);
+	}
+
+	public <T> T getFromListCache(Object key, IDataLoader dataloader) {
+		Set<String> inCacheKeys = CacheKit.get(CACHE_NAME, "cachekeys");
+
+		Set<String> cacheKeyList = new HashSet<String>();
+		if (inCacheKeys != null) {
+			cacheKeyList.addAll(inCacheKeys);
+		}
+
+		cacheKeyList.add(key.toString());
+		CacheKit.put(CACHE_NAME, "cachekeys", cacheKeyList);
+
+		return CacheKit.get(CACHE_KEY, key, dataloader);
+	}
+	
+    public void clearList() {
+        Set<String> list = CacheKit.get(CACHE_NAME, "cachekeys");
+        if (list != null && list.size() > 0) {
+            for (String key : list) {
+
+                // 过滤
+
+                CacheKit.remove(CACHE_KEY, key);
+            }
+        }
+    }
 }

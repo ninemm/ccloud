@@ -25,5 +25,20 @@ import org.ccloud.model.base.BaseBrand;
 public class Brand extends BaseBrand<Brand> {
 
 	private static final long serialVersionUID = 1L;
-
+	
+	@Override
+	public boolean saveOrUpdate() {
+		
+		removeCache(getId());
+		
+		return super.saveOrUpdate();
+	}
+	
+	@Override
+	public boolean update() {
+		
+		removeCache(getId());
+		
+		return super.update();
+	}
 }

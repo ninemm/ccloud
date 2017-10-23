@@ -1,0 +1,807 @@
+<#include "../_inc/_layout.html"/>
+
+<#macro script_import>
+	<!-- bootstrapvalidator -->
+ 	<script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
+ 	<script src="${CPATH}/static/plugins/jquery/jquery.metadata.js"></script>
+ 	<script src="${CPATH}/static/tinymce/tinymce.min.js"></script>
+</#macro>
+
+<#macro css_import>
+	<!-- bootstrapvalidator -->
+    <link rel="stylesheet" href="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.css">
+    <link rel="stylesheet" href="${CPATH}/static/plugins/goods/goods.css">
+</#macro>
+ 
+<#macro script>
+
+var $form = $("#form");
+
+$(function() {
+	
+	jQuery.mm.initValidator('#form', validatorFields)
+	
+	tinymce.init({
+        selector: '#content',
+        height: 365,
+        language: 'zh_CN',
+        menubar: false,
+        automatic_uploads: true,
+        paste_data_images: true,
+        convert_urls: false,
+        relative_urls : false,
+        toolbar_items_size: 'small', 
+        imagetools_toolbar: "rotateleft rotateright | flipv fliph | editimage imageoptions",
+        imagetools_proxy: '${CPATH}/admin/tinymce/image/proxy',
+        images_upload_url: '${CPATH}/admin/tinymce/image/upload',
+        wordcount_countregex: /[\u4e00-\u9fa5_a-zA-Z0-9]/g,
+		file_picker_callback: function(callback, value, meta) {
+		 	layer.open({
+			    type: 2,
+			    title: '选择图片',
+			    shadeClose: true,
+			    shade: 0.8,
+			    area: ['92%', '90%'],
+			    content: '${CPATH}/admin/attachment/choose_layer',
+			    end:function(){
+			    	if(''!=data.url && null != data.url){
+			    		callback(data.url, {alt: data.alt});
+			    	}
+			    }
+			}); 
+		 },
+        plugins: [
+		    "advlist autolink autosave link image media imagetools lists charmap print preview hr anchor pagebreak spellchecker",
+		    "searchreplace wordcount visualblocks visualchars code codesample fullscreen insertdatetime media nonbreaking",
+		    "table contextmenu directionality emoticons template paste fullpage textcolor colorpicker textpattern"
+		  ],
+        toolbar1: '  bold italic underline strikethrough removeformat | blockquote hr table image media codesample | anchor link unlink | alignleft aligncenter alignright alignjustify | outdent indent  | undo redo fullscreen',
+        toolbar2: '  formatselect | fontselect | fontsizeselect | forecolor backcolor | bullist numlist | code'
+	});	
+	var $goodsSpecificationIds = $("input[name='goodsSpecificationIds']");
+	var $goodsSpecificationPreview = $("#goodsSpecificationPreview");
+	var $addProductButton = $("#addProductButton");
+
+	// 选择商品规格
+	var goodsSpecificationDatas = {};
+	var goodsSpecificationValueSelectedDatas = {};
+	var $goodsPrice = $("#goodsPrice");
+	var $goodsCost = $("#goodsCost");
+	var $goodsMarketPrice = $("#goodsMarketPrice");
+	var $goodsProductSn = $("#goodsProductSn");
+	var $goodsWeight = $("#goodsWeight");
+	var $goodsWeightUnit = $("#goodsWeightUnit");
+	var $goodsStore = $("#goodsStore");
+	
+	<#if goods?exists && goods.specificationList?exists>
+		<#list (pList)! as list>
+			goodsSpecificationValueSelectedDatas[${list_index}] = "<#list goods.specificationList as goodsSpecification><#list goodsSpecification.childList as goodsSpecificationValue><#if list.goodsSpecificationValueSet.contains(goodsSpecificationValue)>${goodsSpecificationValue.id}</#if></#list></#list>";
+		</#list>
+	</#if>
+	goodsSpecificationValueSelectedDatas	
+	
+	$goodsSpecificationIds.click( function() {
+		$this = $(this);
+		var id = $this.val();
+		var data = goodsSpecificationDatas[id];
+		if(typeof(data) == "undefined") {
+			$goodsSpecificationPreview.html('<span class="loadingIcon">&nbsp;</span>正在加载...');
+			$.ajax({
+				url: "${CPATH}/admin/goods/getSpValue",
+				dataType: "json",
+				data: {id: id},
+				async: false,
+				success: function(datas) {
+					data = datas.bean;
+					data.goodsSpecificationValueSet = datas.child;
+					goodsSpecificationDatas[id] = data;
+				}
+			});
+		}
+		var showType;
+		if (data.show_type == 0) {
+			showType = "平铺显示";
+		} else {
+			showType = "下拉显示";
+		}
+		var goodsSpecificationPreviewHtml = '<p><strong>' + data.name + '</strong></p><p>' + ' [显示类型：' + showType + ']</p>';
+		var goodsSpecificationValueLiHtml = "";
+		
+		if(data.type == 0) {
+			$.each(data.goodsSpecificationValueSet, function(i) {
+				goodsSpecificationValueLiHtml += ('<li class="text {goodsSpecificationValueId: \'' + data.goodsSpecificationValueSet[i].id + '\'}" title="' + data.goodsSpecificationValueSet[i].name + '">' + data.goodsSpecificationValueSet[i].name + '</li>');
+			})
+		} else {
+			$.each(data.goodsSpecificationValueSet, function(i) {
+				goodsSpecificationValueLiHtml += ('<li class="image {goodsSpecificationValueId: \'' + data.goodsSpecificationValueSet[i].id + '\'}"><img src="${CPATH}' + data.goodsSpecificationValueSet[i].image_path + '" title="' + data.goodsSpecificationValueSet[i].name + '" />' + '</li>');
+			})
+		}
+		goodsSpecificationPreviewHtml += '<ul>' + goodsSpecificationValueLiHtml + '</ul>'
+		$goodsSpecificationPreview.html(goodsSpecificationPreviewHtml);
+		if ($this.get(0).checked == true) {
+			$("#goodsSpecificationTable .goodsSpecificationInsertTh").before('<th class="' + data.id + '">' + data.name + '</th>');
+			$("#goodsSpecificationTable tr:gt(0)").each(function() {
+				var index = $(this).metadata().index;
+				if (index == "-1") {
+					$(this).find(".goodsSpecificationInsertTd").before('<td class="' + data.id + '"><div class="goodsSpecificationValueSelect"><input type="hidden" name="' + data.id + '[' + index + ']" class="{required: true, messages: {required: \'商品规格值信息不完整!\'}}" disabled /><span>-请选择-</span><ul>' + goodsSpecificationValueLiHtml + '</ul></div></td>');
+				} else {
+					$(this).find(".goodsSpecificationInsertTd").before('<td class="' + data.id + '"><div class="goodsSpecificationValueSelect"><input type="hidden" name="' + data.id + '[' + index + ']" class="{required: true, messages: {required: \'商品规格值信息不完整!\'}}" /><span>-请选择-</span><ul>' + goodsSpecificationValueLiHtml + '</ul></div></td>');
+				}
+			});
+		} else {
+			$("." + id).remove();
+			$.each(goodsSpecificationValueSelectedDatas, function(i) {
+				$.each(goodsSpecificationDatas[id].goodsSpecificationValueSet, function(k) {
+					if (goodsSpecificationValueSelectedDatas[i] != null) {
+						goodsSpecificationValueSelectedDatas[i] = goodsSpecificationValueSelectedDatas[i].replace(goodsSpecificationDatas[id].goodsSpecificationValueSet[k].id, "");
+					}
+				});
+			});
+		}
+		showOrHideGoodsInput();
+	});
+	
+	// 添加货品
+	var index = ${(pList?size)!0};
+	$addProductButton.click( function() {
+		if ($goodsSpecificationIds.filter(":checked").length == 0) {
+			toastr.error("请选择商品规格",'操作失败');
+			return false;
+		}
+		var $goodsSpecificationTableTr = $("#goodsSpecificationTable tr:eq(1)").clone().removeClass("hidden");
+		
+		$goodsSpecificationTableTr.find("input[name='productList[-1].price']").val($goodsPrice.val());
+		$goodsSpecificationTableTr.find("input[name='productList[-1].cost']").val($goodsCost.val());
+		$goodsSpecificationTableTr.find("input[name='productList[-1].marketPrice']").val($goodsMarketPrice.val());
+		$goodsSpecificationTableTr.find("input[name='productList[-1].weight']").val($goodsWeight.val());
+		$goodsSpecificationTableTr.find("select[name='productList[-1].weightUnit']").val($goodsWeightUnit.val());
+		$goodsSpecificationTableTr.find("input[name='productList[-1].store']").val($goodsStore.val());
+		$goodsSpecificationTableTr.find("input[name='productList[-1].storePlace']").val("0");
+		$goodsSpecificationTableTr.find(":input").attr("disabled", false);
+		var goodsSpecificationTableTrHtml = '<tr class="{\'index\': \'' + index + '\'}">' + $goodsSpecificationTableTr.html().replace(/\[(\-?)(\d+)\]/ig, "[" + index + "]") + '</tr>';
+		$("#goodsSpecificationTable tr:last").after(goodsSpecificationTableTrHtml);
+		var name = 'productList[' + index + '].productSn';
+        $('#form').data('bootstrapValidator').addField(name,{
+               validators: {  
+                   notEmpty: {  
+                       message: '请输入商品货号'
+                   }  
+               }  
+        });
+		index ++;
+		showOrHideGoodsInput();
+	});
+	
+	// 根据商品规格显示/隐藏商品销售价、市场价、成本价等表单
+	function showOrHideGoodsInput() {
+		if ($goodsSpecificationIds.filter(":checked").length > 0 && $("#goodsSpecificationTable tr").length > 2) {
+			
+			$goodsPrice.attr("disabled", true);
+			$goodsCost.attr("disabled", true);
+			$goodsMarketPrice.attr("disabled", true);
+			$goodsProductSn.attr("disabled", true);
+			$goodsWeight.attr("disabled", true);
+			$goodsWeightUnit.attr("disabled", true);
+			$goodsStore.attr("disabled", true);
+			$("#goodsSpecificationTable tr:gt(1) :input").attr("disabled", false);
+			
+		} else {
+			
+			$goodsPrice.attr("disabled", false);
+			$goodsCost.attr("disabled", false);
+			$goodsMarketPrice.attr("disabled", false);
+			$goodsProductSn.attr("disabled", false);
+			$goodsWeight.attr("disabled", false);
+			$goodsWeightUnit.attr("disabled", false);
+			$goodsStore.attr("disabled", false);
+			$("#goodsSpecificationTable tr:gt(1) :input").attr("disabled", true);
+			
+		}
+	}
+	
+	// 显示规格值
+	$("body").on("click", ".goodsSpecificationValueSelect span", function(){
+		var $this = $(this);
+		var $thisUl = $this.siblings("ul");
+		var $thisInput = $this.siblings("input");
+		$(".goodsSpecificationValueSelect ul").hide();
+		$thisUl.css({"top": + $this.position().top + 33 + "px", "left": + $this.position().left - 1 + "px"}).show();
+		
+		var index = $this.parent().parent().parent().metadata().index;
+		$thisUl.find("li").each(function() {
+			var $thisLi = $(this);
+			var goodsSpecificationValueSelectedDatasString = "";
+			$this.parent().parent().parent().find(".goodsSpecificationValueSelect input").each(function() {
+				if ($(this).attr("name") == $thisInput.attr("name")) {
+					goodsSpecificationValueSelectedDatasString += $thisLi.metadata().goodsSpecificationValueId;
+				} else {
+					goodsSpecificationValueSelectedDatasString += $(this).val();
+				}
+			});
+			var isExist = false;
+			$.each(goodsSpecificationValueSelectedDatas, function(i) {
+				if (index != i && goodsSpecificationValueSelectedDatas[i] == goodsSpecificationValueSelectedDatasString) {
+					isExist = true;
+					return false;
+				}
+			});
+			if (isExist) {
+				$thisLi.addClass("notAllowed");
+			} else {
+				$thisLi.removeClass("notAllowed");
+			}
+		});
+	});
+	
+	// 选择规格值
+	$("body").on("click", ".goodsSpecificationValueSelect ul li", function(){
+		$this = $(this);
+		$parent = $this.parent();
+		var $thisInput = $parent.siblings("input");
+		if ($this.hasClass("notAllowed")) {
+			return false;
+		}
+		
+		var index = $this.parent().parent().parent().parent().metadata().index;
+		var goodsSpecificationValueSelectedDatasString = "";
+		$parent.parent().parent().parent().find(".goodsSpecificationValueSelect input").each(function() {
+			if ($(this).attr("name") == $thisInput.attr("name")) {
+				goodsSpecificationValueSelectedDatasString += $this.metadata().goodsSpecificationValueId;
+			} else {
+				goodsSpecificationValueSelectedDatasString += $(this).val();
+			}
+		});
+		
+		goodsSpecificationValueSelectedDatas[index] = goodsSpecificationValueSelectedDatasString;
+		
+		$parent.hide();
+		$thisInput.val($this.metadata().goodsSpecificationValueId);
+		$parent.siblings("span").addClass("goodsSpecificationValueSelected").html($this.html());
+	});
+	
+	// 删除规格
+	$("body").on("click", ".glyphicon-remove", function(){
+		var $this = $(this);
+		if (confirm("您确定要删除吗？") == true) {
+			$this.parent().parent().remove();
+			var index = $this.parent().parent().metadata().index;
+			if(goodsSpecificationValueSelectedDatas[index] != null) {
+				goodsSpecificationValueSelectedDatas[index] = null;
+			}
+			showOrHideGoodsInput();
+		}
+	});	
+	
+	$("#brand_id").change(function() {
+		var brandId = $("#brand_id").find("option:selected").val(); 
+		$("#category_id").empty().append("<option value=''>--请选择--</option>");
+		$.ajax({
+			url:"${CPATH}/admin/goods/getCategory",
+			type:"post",
+			data:{"brandId":brandId},
+			dataType:"json",
+			success:function(data) {
+				for (var i = 0; i < data.length; i++) {
+					$("#category_id").append("<option value=" + data[i].id + ">" + data[i].name + "</option>");
+				}
+			}
+		});
+	});
+	
+	$("#typeChoose").change(function() {
+		var type = $("#typeChoose").find("option:selected").val(); 
+		$("#attribute").empty();
+		$.ajax({
+			url:"${CPATH}/admin/goodsAttribute/getAttributeInput",
+			type:"post",
+			data:{"typeId":type},
+			dataType:"json",
+			success:function(data) {
+				for (var i = 0; i < data.length; i++) {
+					$("#attribute").append("<div class='form-group col-sm-12 validata-box'><label class='control-label col-sm-2'>" + data[i].name + ":</label><div class='input-group col-md-4 col-sm-10'><input class='form-control input-sm' type='text' name=" + data[i].id + "></div></div>");
+					if (data[i].is_required == 1) {
+				         $('#form').data('bootstrapValidator').addField(data[i].id,{
+				                validators: {  
+				                    notEmpty: {  
+				                        message: '请输入商品属性值'
+				                    }  
+				                }  
+		           	      });						
+					}
+				}
+			}
+		});
+	});
+	
+});
+
+var validatorFields = {
+	'goods.name': {
+		validators: {
+            notEmpty: { message: '商品名称不能为空' },
+            stringLength: { max: 15, message: '商品名称最大长度是15字符，请重新输入' }
+        }
+	},
+	'goods.code': {
+		validators: {
+			notEmpty: { message: '商品编码不能为空' },
+	        stringLength: { min: 2, max: 20, message: '商品编码最少2个字符，最多20字符，请重新输入' }
+        }
+	},
+	'goods.brand_id': {
+		validators: {
+			notEmpty: { message: '请选择品牌' },
+        }
+	},
+	'goods.goods_category_id': {
+		validators: {
+			notEmpty: { message: '请选择分类' },
+        }
+	},
+	'goods.goods_type_id': {
+		validators: {
+			notEmpty: { message: '请选择类型' },
+        }
+	},
+	'goods.state': {
+		validators: {
+			notEmpty: { message: '请选择是否上架' },
+        }	
+	}
+};
+
+function imgChoose(){
+ 	layer.open({
+	    type: 2,
+	    title: '选择图片',
+	    shadeClose: true,
+	    shade: 0.8,
+	    area: ['92%', '90%'],
+	    content: '${CPATH}/admin/attachment/choose_layer',
+	    end:function(){
+	    	if(''!=data.url && null != data.url){
+	    		$("#imageDiv").append("<li><img src="+ data.url +" path=${CPATH}"+ data.url +" class='jp-grids-photos img-responsive' ><input type='hidden' name='imageUrl[]' value="+ data.url +"><input type='hidden' name='title[]' value="+ data.alt +"></li>");
+	    	}
+	    }
+	});
+}
+
+function doSubmit(){
+	$form.ajaxSubmit({
+		beforeSubmit: function() {
+			var validate = $form.data('bootstrapValidator');
+			validate.validate();
+			return validate.isValid();
+		},
+		type : "post", 
+		data:{"tinymce": tinyMCE.get('content').getContent()},
+		dataType : "json", 
+		success : function(data) { 
+			if (data.errorCode == 0) {
+				//location.reload();
+				toastr.success(data.message, '操作成功');
+			} else {
+				toastr.error(data.message,'操作失败');
+			}
+		},
+		error : function() {
+			alert("信息提交错误");
+		}
+	});
+}
+</#macro>
+
+<@layout active_id=p child_active_id=c>
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+	<h1><#if (goods.id) ??>修改<#else>新增</#if>商品信息</h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+       	<li><a href="#">商品管理</a></li>
+       	<li class="active"><#if (goods.id) ??>修改<#else>新增</#if>商品信息</li>
+	</ol>
+</section>
+<!-- Main content -->
+<section class="content">
+	<div class="box box-default">
+		<div class="box-header with-border">
+			<h3 class="box-title">商品信息</h3>
+			<div class="box-tools">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse">
+					<i class="fa fa-minus"></i>
+				</button>
+			</div>
+		</div>
+	    <ul id="myTab" class="nav nav-tabs">  
+	        <li class="active"><a href="#A" data-toggle="tab">商品基本信息</a></li>  
+	        <li><a href="#B" data-toggle="tab">商品规格</a></li>  
+	        <li><a href="#C" data-toggle="tab">商品描述</a></li>
+	        <li><a href="#D" data-toggle="tab">商品属性</a></li>
+	    </ul>
+		<form action="${CPATH}/admin/goods/save" method="post" id="form" class="form-horizontal" >
+		<input type="hidden" name="goods.id" value="${(goods.id)!}">	    
+	    <div id="myTabContent" class="tab-content">  
+	        <div class="tab-pane fade in active" id="A">  
+				<div class="box-body">
+					<div class="col-sm-12 ">
+						<div class="row">
+							<div class="form-group col-sm-12 validata-box">
+								<label class="control-label col-sm-2">名称:</label>
+								<div class="input-group col-md-4 col-sm-10">
+				                 	<input class="form-control input-sm" type="text" name="goods.name" value="${(goods.name)!}" placeholder="1-15个任意字符">
+				               	</div>
+							</div>
+							<div class="form-group col-sm-12 validata-box">
+								<label class="control-label col-sm-2">编号:</label>
+								<div class="input-group col-md-4 col-sm-10">
+				                 	<input class="form-control input-sm" type="text" name="goods.code" value="${(goods.code)!}" placeholder="2-20个任意字母数字">
+				               	</div>
+							</div>
+							<div class="form-group col-sm-12 validata-box">
+								<label class="control-label col-sm-2">品牌:</label>
+								<div class="input-group col-md-4 col-sm-10">
+									<select class="form-control input-sm" name="goods.brand_id" id="brand_id">
+										<option value="">--请选择--</option>
+										<#list (blist)! as brand >
+											<option value="${brand.id}" <#if goods?? && brand.id == goods.brand_id>selected="selected"</#if>>${(brand.name)!}</option>
+										</#list>
+									</select>
+				               	</div>
+							</div>
+							<div class="form-group col-sm-12 validata-box">
+								<label class="control-label col-sm-2">分类:</label>
+								<div class="input-group col-md-4 col-sm-10">
+									<select class="form-control input-sm" name="goods.goods_category_id" id="category_id">
+										<option value="">--请选择--</option>
+										<#list (clist)! as category >
+											<option value="${category.id}" <#if goods?? && category.id == goods.goods_category_id>selected="selected"</#if>>${(category.name)!}</option>
+										</#list>								
+									</select>
+				               	</div>
+							</div>
+							<div class="form-group col-sm-12 validata-box">
+								<label class="control-label col-sm-2">大单位价格:</label>
+								<div class="input-group col-md-4 col-sm-10">
+				                 	<input class="form-control input-sm" type="text" name="goods.big_price" value="${(goods.big_price)!}" placeholder="2-20个任意字母数字">
+				               	</div>
+							</div>
+							<div class="form-group col-sm-12 validata-box">
+								<label class="control-label col-sm-2">小单位价格:</label>
+								<div class="input-group col-md-4 col-sm-10">
+				                 	<input class="form-control input-sm" type="text" name="goods.small_price" value="${(goods.small_price)!}" placeholder="2-20个任意字母数字">
+				               	</div>
+							</div>
+							<div class="form-group col-sm-12 validata-box">
+								<label class="control-label col-sm-2">大单位:</label>
+								<div class="input-group col-md-4 col-sm-10">
+				                 	<input class="form-control input-sm" type="text" name="goods.big_unit" value="${(goods.big_unit)!}" placeholder="2-20个任意字母数字">
+				               	</div>
+							</div>
+							<div class="form-group col-sm-12 validata-box">
+								<label class="control-label col-sm-2">小单位:</label>
+								<div class="input-group col-md-4 col-sm-10">
+				                 	<input class="form-control input-sm" type="text" name="goods.small_unit" value="${(goods.small_unit)!}" placeholder="2-20个任意字母数字">
+				               	</div>
+							</div>
+							<div class="form-group col-sm-12 validata-box">
+								<label class="control-label col-sm-2">单位换算:</label>
+								<div class="input-group col-md-4 col-sm-10">
+				                 	<input class="form-control input-sm" type="text" name="goods.convert_relate" value="${(goods.convert_relate)!}" placeholder="2-20个任意字母数字">
+				               	</div>
+							</div>					
+							<div class="form-group col-sm-12 validata-box">
+								<label class="control-label col-sm-2">简介:</label>
+								<div class="input-group col-md-4 col-sm-10">
+				                 	<input class="form-control input-sm" type="text" name="goods.summary" value="${(goods.summary)!}" placeholder="2-20个任意字母数字">
+				               	</div>
+							</div>
+							<div class="form-group col-sm-12 validata-box">
+								<label class="control-label col-sm-2">页面关键词:</label>
+								<div class="input-group col-md-4 col-sm-10">
+				                 	<input class="form-control input-sm" type="text" name="goods.meta_keywords" value="${(goods.meta_keywords)!}" placeholder="2-20个任意字母数字">
+				               	</div>
+							</div>
+							<div class="form-group col-sm-12 validata-box">
+								<label class="control-label col-sm-2">页面描述:</label>
+								<div class="input-group col-md-4 col-sm-10">
+				                 	<textarea class="form-control" rows="3" name="goods.meta_description" value="${(goods.meta_description)!}" placeholder="2-20个任意字母数字">${(goods.meta_description)!}</textarea>
+				               	</div>
+							</div>
+							<div class="form-group col-sm-12 validata-box">
+								<label class="control-label col-sm-2">商品图片:</label>
+								<div class="input-group col-md-4 col-sm-10">
+				                 	<span class="btn btn-default" id="chooseImg" onClick="imgChoose()">选择图片</span>
+				               	</div>
+							</div>
+							<div class="form-group col-sm-12 validata-box">
+								<label class="control-label col-sm-2"></label>
+								<div class="input-group col-md-4 col-sm-10">
+									<ul class="list-inline list-unstyled" id="imageDiv">
+										<#list (imageList)! as img>
+											<li>
+												<img src="${img.savePath}" class='jp-grids-photos img-responsive' >
+												<input type='hidden' name='imageUrl[]' value="${img.savePath}">
+												<input type='hidden' name='title[]' value="${img.imgName}">
+											</li>
+										</#list>
+									</ul>									
+				               	</div>
+							</div>														
+							<div class="form-group col-sm-12 validata-box">
+								<label class="control-label col-sm-2">是否上架:</label>
+								<div class="input-group col-md-4 col-sm-10">
+									<label class="radio-inline">
+				                 		<input type="radio" name="goods.state" value="1" <#if !goods?? || goods.state == 1>checked</#if>>上架
+				                 	</label>
+				                 	<label class="radio-inline">
+				                 		<input type="radio" name="goods.state" value="0" <#if goods?? && goods.state == 0>checked</#if>>下架
+									</label>		                 		
+				               	</div>
+							</div>																														
+						</div>
+					</div>
+				</div>
+	        </div>  
+	        <div class="tab-pane fade" id="B">
+			<table class="inputTable tabContent">
+				<tr>
+					<td colspan="2">
+						<table class="inputTable goodsSpecificationTable">
+							<tr>
+								<th style="width: 30%;padding-left:10px">
+									请选择规格
+								</th>
+								<th style="width: 70%;padding-left:10px">
+									规格预览
+								</th>
+							</tr>
+							<tr>
+								<td>
+									<div class="goodsSpecificationArea">
+										<ul>
+											<#list (goodsSpecificationList)! as list>
+												<li>
+													<label>
+														<input type="checkbox" name="goodsSpecificationIds" value="${list.id}" <#if (goods?exists) && (goods.specificationList?exists) && (goods.specificationList.contains(list) == true)> checked="checked"</#if>/>&nbsp${list.name}
+													</label>
+												</li>
+											</#list>
+										</ul>
+									</div>
+								</td>
+								<td>
+									<div id="goodsSpecificationPreview" class="goodsSpecificationPreview">
+										<span class="warnInfo"><span class="icon">&nbsp;</span>请在左侧列表选择规格!</span>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<tr>
+									<td colspan="2">
+										<input type="button" id="addProductButton" class="btn btn-default" value="添加货品" />
+									</td>
+								</tr>
+								<td colspan="2">
+									<table id="goodsSpecificationTable" class="inputTable goodsSpecificationTable">
+										<tr>
+											<th>
+												货号
+											</th>
+											<#list (goods.specificationList)! as goodsSpecificationList>
+												<th class="${goodsSpecificationList.id}">
+													${goodsSpecificationList.name}
+												</th>
+											</#list>
+											<th class="goodsSpecificationInsertTh">
+												销售价
+											</th>
+											<th>
+												成本价
+											</th>
+											<th>
+												市场价
+											</th>
+											<th>
+												重量
+											</th>
+											<th>
+												重量单位
+											</th>
+											<th>
+												库存
+											</th>
+											<th>
+												货位
+											</th>
+											<th>
+												上架
+											</th>
+											<th>
+												操作
+											</th>
+										</tr>
+										<tr class="hidden {index: -1}">
+											<td>
+												<div class="form-group validata-box" style="margin: 0;">
+												<div class="input-group col-md-4 col-sm-10">
+													<input type="text" name="productList[-1].productSn" class="form-control" style="width: 50px;padding:0;height:27px;" disabled />
+												</div>
+											</td>
+											<#list (goods.specificationList)! as goodsSpecificationList>
+												<td class="${goodsSpecificationList.id}">
+													<div class="goodsSpecificationValueSelect">
+														<input type="hidden" name="${goodsSpecificationList.id}[-1]" class="{required: true, messages: {required: '商品规格值信息不完整!'}}" disabled />
+														<span>-请选择-</span>
+														<ul>
+															<#if goodsSpecificationList.type == "0">
+																<#list goodsSpecificationList.childList as goodsSpecificationValueList>
+																	<li class="text {goodsSpecificationValueId: '${goodsSpecificationValueList.id}'}" title="${goodsSpecificationValueList.name}">${goodsSpecificationValueList.name}</li>
+																</#list>
+															<#else>
+																<#list goodsSpecificationList.goodsSpecificationValueSet as goodsSpecificationValueList>
+																	<li class="image {goodsSpecificationValueId: '${goodsSpecificationValueList.id}'}"><img src="${base}${goodsSpecificationValueList.image_path}" title="${goodsSpecificationValueList.name}" /></li>
+																</#list>
+															</#if>
+														</ul>
+													</div>
+												</td>
+											</#list>
+											<td class="goodsSpecificationInsertTd">
+												<input type="text" name="productList[-1].price" style="width: 50px;" disabled />
+											</td>
+											<td>
+												<input type="text" name="productList[-1].cost" style="width: 50px;" disabled />
+											</td>
+											<td>
+												<input type="text" name="productList[-1].marketPrice" style="width: 50px;" disabled />
+											</td>
+											<td>
+												<input type="text" name="productList[-1].weight" style="width: 30px;" disabled />
+											</td>
+											<td>
+												<input type="text" name="productList[-1].weightUnit" style="width: 30px;" disabled />
+											</td>
+											<td>
+												<input type="text" name="productList[-1].store" style="width: 30px;" disabled />
+											</td>
+											<td>
+												<input type="text" name="productList[-1].storePlace" style="width: 30px;" disabled />
+											</td>
+											<td>
+												<input type="checkbox" name="productList[-1].isMarketable" value="true" checked disabled />
+											</td>
+											<td>
+												<span class="glyphicon glyphicon-remove" style="color:#0c78b6;cursor:pointer;" title="删除"></span>
+											</td>
+										</tr>
+										<#list (pList)! as list>
+											<tr class="{index: ${list_index}}">
+												<td>
+													<input type="hidden" name="productList[${list_index}].id" value="${list.id}" />
+													<input type="text" name="productList[${list_index}].productSn" class="formText" style="width: 50px;" value="${list.productSn}" />
+												</td>
+												<#list (goods.specificationList)! as goodsSpecification>
+													<td class="${goodsSpecification.id}">
+														<div class="goodsSpecificationValueSelect">
+															<input type="hidden" name="${goodsSpecification.id}[${list_index}]" class="{required: true, messages: {required: '商品规格值信息不完整!'}}" value="<#list goodsSpecification.childList as goodsSpecificationValue><#if list.goodsSpecificationValueSet.contains(goodsSpecificationValue)>${goodsSpecificationValue.id}</#if></#list>" />
+															<span>
+																<#if goodsSpecification.type == "0">
+																	<#list goodsSpecification.childList as goodsSpecificationValue>
+																		<#if list.goodsSpecificationValueSet.contains(goodsSpecificationValue)>
+																			${goodsSpecificationValue.name}
+																		</#if>
+																	</#list>
+																<#else>
+																	<#list goodsSpecification.goodsSpecificationValueSet as goodsSpecificationValue>
+																		<#if list.goodsSpecificationValueSet.contains(goodsSpecificationValue)>
+																			<img src="${base}${goodsSpecificationValue.image_path}" title="${goodsSpecificationValue.name}" /></li>
+																		</#if>
+																	</#list>
+																</#if>
+															</span>
+															<ul>
+																<#if goodsSpecification.type == "0">
+																	<#list goodsSpecification.childList as goodsSpecificationValue>
+																		<li class="text {goodsSpecificationValueId: '${goodsSpecificationValue.id}'}" title="${goodsSpecificationValue.name}">${goodsSpecificationValue.name}</li>
+																	</#list>
+																<#else>
+																	<#list goodsSpecification.childList as goodsSpecificationValue>
+																		<li class="image {goodsSpecificationValueId: '${goodsSpecificationValue.id}'}"><img src="${base}${goodsSpecificationValue.image_path}" title="${goodsSpecificationValue.name}" /></li>
+																	</#list>
+																</#if>
+															</ul>
+														</div>
+													</td>
+												</#list>
+												<td class="goodsSpecificationInsertTd">
+													<input type="text" name="productList[${list_index}].price" class="formText {required: true, min: 0, messages: {required: '货品销售价信息不完整!', min: '货品销售价不允许小于0!'}}" style="width: 50px;" value="${list.price}" />
+												</td>
+												<td>
+													<input type="text" name="productList[${list_index}].cost" class="formText {min: 0, messages: {min: '货品成本价信息不允许小于0!'}}" style="width: 50px;" value="${list.cost}" />
+												</td>
+												<td>
+													<input type="text" name="productList[${list_index}].marketPrice" class="formText {required: true, min: 0, messages: {required: '货品市场价信息不完整!', min: '货品市场价不允许小于0!'}}" style="width: 50px;" value="${list.marketPrice}" />
+												</td>
+												<td>
+													<input type="text" name="productList[${list_index}].weight" class="formText {required: true, min: 0, messages: {required: '货品重量信息不完整!', min: '货品重量不允许小于0!'}}" style="width: 30px;" value="${(list.weight)!}" />
+												</td>
+												<td>
+													<input type="text" name="productList[${list_index}].weightUnit" class="formText {required: true, min: 0, messages: {required: '货品重量信息不完整!', min: '货品重量不允许小于0!'}}" style="width: 30px;" value="${(list.weightUnit)!}" />
+												</td>
+												<td>
+													<input type="text" name="productList[${list_index}].store" class="formText {digits: true, messages: {digits: '货品库存必须为正整数!'}}" style="width: 30px;" value="${(list.store)!}" />
+												</td>
+												<td>
+													<input type="text" name="productList[${list_index}].storePlace" class="formText" style="width: 30px;" value="${(list.storePlace)!}" />
+												</td>
+												<td>
+													<input type="checkbox" name="productList[${list_index}].isMarketable" value="true" <#if list.isMarketable>checked</#if> />
+												</td>
+												<td>
+													<#assign isAllowDelete = true>
+													<#list (list.orderItemSet)! as orderItem>
+														<#if orderItem.orderStatus != "completed" && orderItem.orderStatus != "invalid">
+															<#assign isAllowDelete = false>
+															<#break />
+														</#if>
+													</#list>
+													<#if isAllowDelete = true>
+														<span class="glyphicon glyphicon-remove" style="color:#0c78b6;cursor:pointer;" title="删除">&nbsp;</span>
+													<#else>
+														<span class="deleteIcon" title="此货品订单处理未完成，无法删除!">&nbsp;</span>
+													</#if>
+												</td>
+											</tr>
+										</#list>
+									</table>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+				</table>	        
+	        </div>
+	        <div class="tab-pane fade" id="C">  
+				<div class="form-group col-sm-12 validata-box">
+					<label class="control-label col-sm-2">商品详情:</label>
+					<div class="input-group col-md-6 col-sm-10">
+	                 	<textarea id="content" name="content" style="width:100%;height:400px;">${(goods.content)!}</textarea>
+	               	</div>
+				</div>
+	        </div> 
+	        <div class="tab-pane fade" id="D">
+		        <div class="box-body">
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">类型:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<select class="form-control input-sm" name="goods.goods_type_id" id="typeChoose">
+								<option value="">--请选择--</option>
+								<#list (tlist)! as type >
+									<option value="${type.id}" <#if goods?? && type.id == goods.goods_type_id>selected="selected"</#if>>${(type.name)!}</option>
+								</#list>
+							</select>
+		               	</div>
+					</div>
+					<div id="attribute">
+					<#list (attributeList)! as attributeMap >
+						<div class="form-group col-sm-12 validata-box">
+							<label class="control-label col-sm-2">${(attributeMap.name)!}:</label>
+							<div class="input-group col-md-4 col-sm-10">
+			                 	<input class="form-control input-sm" type="text" name="${(attributeMap.id)!}" value="${(attributeMap.value)!}" placeholder="1-15个任意字符">
+			               	</div>
+						</div>
+					</#list>					
+					</div>
+				</div>
+	        </div> 	        	        
+	    </div>
+		<div class="box-footer"> 
+			<button type="button" onclick="doSubmit()" class="btn btn-primary">保存更改</button>
+			<input type="button" class="btn btn-primary" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
+		</div>
+	</form>	      		
+	</div>
+</section>
+
+</@layout>

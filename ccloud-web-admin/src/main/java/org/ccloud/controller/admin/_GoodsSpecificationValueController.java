@@ -88,6 +88,7 @@ public class _GoodsSpecificationValueController extends JBaseCRUDController<Good
 		}
 	}
 	
+	@SuppressWarnings("unused")
 	private void processImage(String newPath) {
 		if (!AttachmentUtils.isImage(newPath))
 			return;

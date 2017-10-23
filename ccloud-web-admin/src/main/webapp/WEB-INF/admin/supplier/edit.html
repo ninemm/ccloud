@@ -131,7 +131,7 @@ function doSubmit(){
 						<label class="control-label col-sm-2">供应商状态:</label>
 						<div class="input-group col-md-4 col-sm-10">
 							<label class="radio-inline">
-		                 		<input type="radio" name="supplier.is_enable" value="1" <#if supplier?? && supplier.isEnable == 1>checked</#if>>启用
+		                 		<input type="radio" name="supplier.is_enable" value="1" <#if !supplier?? || supplier.isEnable == 1>checked</#if>>启用
 		                 	</label>
 		                 	<label class="radio-inline">
 		                 		<input type="radio" name="supplier.is_enable" value="0" <#if supplier?? && supplier.isEnable == 0>checked</#if>>停用

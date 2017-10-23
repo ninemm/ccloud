@@ -82,6 +82,7 @@ public class _GoodsSpecificationController extends JBaseCRUDController<GoodsSpec
 		String [] valueName = getParaValues("mytext[]");
 		String [] orderList = getParaValues("order[]");
 		String [] childIdList = getParaValues("childId[]");
+		String [] imageUrl = getParaValues("imageUrl[]");
 		if (ccGoodsSpecification.getId() == null) {
 			ccGoodsSpecification.saveOrUpdate();
 		} else {
@@ -89,10 +90,11 @@ public class _GoodsSpecificationController extends JBaseCRUDController<GoodsSpec
 			if (childIdList == null) {
 				childIdList = new String[] {}; 
 			}
-			List<String> deleteIds = getDiffrent(oldIdList, childIdList);
- 			GoodsSpecificationValueQuery.me().batchDelete(deleteIds);
+			List<GoodsSpecificationValue> deleteIds = getDiffrent(oldIdList, childIdList);
+ 			GoodsSpecificationValueQuery.me().batchDeleteAndFile(deleteIds);
 			ccGoodsSpecification.saveOrUpdate();
 		}
+		int update = 0;
 		if (valueName != null) {
 			for (int i = 0; i < valueName.length; i++) {
 				if (StringUtils.isBlank(valueName[i])) {
@@ -103,8 +105,15 @@ public class _GoodsSpecificationController extends JBaseCRUDController<GoodsSpec
 				if (StringUtils.isNotBlank(childIdList[i])) {
 					value.setId(childIdList[i]);
 				}
-				if (uploadFiles.size() > 0) {
-					value.setImagePath(AttachmentUtils.moveFile(uploadFiles.get(i)).replace("\\", "/"));
+				if (imageUrl.length > 0) {
+					if (StringUtils.isNotBlank(imageUrl[i]) && imageUrl[i].equals("add")) {
+						value.setImagePath(AttachmentUtils.moveFile(uploadFiles.get(update)).replace("\\", "/"));
+						update++;
+					}
+				} else {
+					if (uploadFiles.size() > 0) {
+						value.setImagePath(AttachmentUtils.moveFile(uploadFiles.get(i)).replace("\\", "/"));
+					}
 				}
 				if (StringUtils.isNotBlank(orderList[i])) {
 					if (StringUtils.isNumeric(orderList[i])) {
@@ -127,7 +136,8 @@ public class _GoodsSpecificationController extends JBaseCRUDController<GoodsSpec
 	 * @param list2 
 	 * @return 
 	 */  
-	private static List<String> getDiffrent(List<GoodsSpecificationValue> csvList, String [] childIdList) {
+	private static List<GoodsSpecificationValue> getDiffrent(List<GoodsSpecificationValue> csvList, String [] childIdList) {
+		List<GoodsSpecificationValue> diffValueList = new ArrayList<>();
 		List<String> list1 = new ArrayList<String>();
 		List<String> list2 = Arrays.asList(childIdList);
 		for (GoodsSpecificationValue csv : csvList) {
@@ -155,8 +165,16 @@ public class _GoodsSpecificationController extends JBaseCRUDController<GoodsSpec
 	        if(entry.getValue()==1) {  
 	            diff.add(entry.getKey());  
 	        }  
-	    }  
-	    return diff;  
+	    }
+	    
+	    for (String string : diff) {
+			for (GoodsSpecificationValue bean : csvList) {
+				if (string == bean.getId()) {
+					diffValueList.add(bean);
+				}
+			}
+		}
+	    return diffValueList;  
 	}  	
 	
 	@Override

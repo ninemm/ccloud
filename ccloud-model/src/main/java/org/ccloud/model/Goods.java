@@ -16,6 +16,7 @@
 package org.ccloud.model;
 
 import org.ccloud.model.core.Table;
+
 import org.ccloud.model.base.BaseGoods;
 
 /**
@@ -26,4 +27,19 @@ public class Goods extends BaseGoods<Goods> {
 
 	private static final long serialVersionUID = 1L;
 
+	@Override
+	public boolean saveOrUpdate() {
+		
+		removeCache(getId());
+		
+		return super.saveOrUpdate();
+	}
+	
+	@Override
+	public boolean update() {
+		
+		removeCache(getId());
+		
+		return super.update();
+	}
 }

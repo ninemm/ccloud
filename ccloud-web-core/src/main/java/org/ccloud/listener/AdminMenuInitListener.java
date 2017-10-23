@@ -163,7 +163,8 @@ public class AdminMenuInitListener implements MessageListener {
 		MenuGroup group = new MenuGroup("customer", "fa fa-user", "客户管理");
 
 		{
-			group.addMenuItem(new MenuItem("list", "/admin/customer", "客户列表"));
+			group.addMenuItem(new MenuItem("customer", "/admin/customer", "客户列表"));
+			group.addMenuItem(new MenuItem("customerType", "/admin/customerType", "客户类型"));
 		}
 		return group;
 	}
@@ -261,6 +262,7 @@ public class AdminMenuInitListener implements MessageListener {
 			group.addMenuItem(new MenuItem("goodsType", "/admin/goodsType", "商品类型"));
 			group.addMenuItem(new MenuItem("category", "/admin/category", "商品分类"));
 			group.addMenuItem(new MenuItem("brand", "/admin/brand", "品牌管理"));
+			group.addMenuItem(new MenuItem("goodsAttribute", "/admin/goodsAttribute", "商品属性"));
 			group.addMenuItem(new MenuItem("goods", "/admin/goods", "商品信息管理"));
 			
 		}
