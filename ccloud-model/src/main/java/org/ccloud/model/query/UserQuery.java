@@ -63,6 +63,9 @@ public class UserQuery extends JBaseQuery {
 		if (ids != null && ids.length > 0) {
 			int deleteCount = 0;
 			for (int i = 0; i < ids.length; i++) {
+				if (ids[i].equals("0")) {
+					continue;
+				}
 				if (DAO.deleteById(ids[i])) {
 					++deleteCount;
 				}

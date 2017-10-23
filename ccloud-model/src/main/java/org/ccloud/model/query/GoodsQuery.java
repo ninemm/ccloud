@@ -112,6 +112,7 @@ public class GoodsQuery extends JBaseQuery {
 				deleteCount++;
 			}
 		}
+		GoodsGoodsAttributeMapStoreQuery.me().deleteAllByGoodsId(goods.getId());
 		return deleteCount;
 	}
 
