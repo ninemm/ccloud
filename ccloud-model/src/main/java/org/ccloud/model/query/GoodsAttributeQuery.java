@@ -44,7 +44,7 @@ public class GoodsAttributeQuery extends JBaseQuery {
 		});
 	}
 
-	public Page<GoodsAttribute> paginate(int pageNumber, int pageSize, String keyword, String orderby) {
+	public Page<GoodsAttribute> paginate(int pageNumber, int pageSize, String keyword, String type, String orderby) {
 		String select = "select cc.*, ct.name as type_name ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_goods_attribute` cc ");
 		fromBuilder.append("join `cc_goods_type` ct on cc.goods_type_id = ct.id ");
@@ -52,6 +52,8 @@ public class GoodsAttributeQuery extends JBaseQuery {
 		LinkedList<Object> params = new LinkedList<Object>();
 		
 		appendIfNotEmptyWithLike(fromBuilder, "name", keyword, params, true);
+		
+		appendIfNotEmpty(fromBuilder, "goods_type_id", type, params, true);
 		
 		fromBuilder.append("order by " + orderby);		
 

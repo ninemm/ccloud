@@ -496,3 +496,13 @@
 	cursor: not-allowed;
 	color: #cccccc;
 }
+
+.delete {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    width: 32px;
+    height: 33px;
+    background:url(image/delete_1.png) repeat-x;
+    cursor:pointer;
+}

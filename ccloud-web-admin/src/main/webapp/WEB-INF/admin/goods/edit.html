@@ -12,6 +12,13 @@
     <link rel="stylesheet" href="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.css">
     <link rel="stylesheet" href="${CPATH}/static/plugins/goods/goods.css">
 </#macro>
+
+<#macro css>
+.imgDiv {
+    display: inline-block;
+    position: relative;
+}
+</#macro>
  
 <#macro script>
 
@@ -160,14 +167,50 @@ $(function() {
 		$goodsSpecificationTableTr.find(":input").attr("disabled", false);
 		var goodsSpecificationTableTrHtml = '<tr class="{\'index\': \'' + index + '\'}">' + $goodsSpecificationTableTr.html().replace(/\[(\-?)(\d+)\]/ig, "[" + index + "]") + '</tr>';
 		$("#goodsSpecificationTable tr:last").after(goodsSpecificationTableTrHtml);
-		var name = 'productList[' + index + '].productSn';
-        $('#form').data('bootstrapValidator').addField(name,{
+		var productSn = 'productList[' + index + '].productSn';
+		var price = 'productList[' + index + '].price';
+		var cost = 'productList[' + index + '].cost';
+		var marketPrice = 'productList[' + index + '].marketPrice';
+        $('#form').data('bootstrapValidator').addField(productSn,{
                validators: {  
                    notEmpty: {  
                        message: '请输入商品货号'
                    }  
                }  
         });
+        $('#form').data('bootstrapValidator').addField(price,{
+               validators: {  
+                   notEmpty: {  
+                       message: '请输入商品销售价'
+                   },
+                   regexp: {
+					    regexp: /^[0-9\.]+$/,
+					    message: '请输入正确的数字'
+				   }
+               }  
+        });
+        $('#form').data('bootstrapValidator').addField(cost,{
+               validators: {  
+                   notEmpty: {  
+                       message: '请输入商品成本价'
+                   },
+                   regexp: {
+					    regexp: /^[0-9\.]+$/,
+					    message: '请输入正确的数字'
+				   }
+               }  
+        });
+        $('#form').data('bootstrapValidator').addField(marketPrice,{
+               validators: {  
+                   notEmpty: {  
+                       message: '请输入商品市场价'
+                   },
+                   regexp: {
+					    regexp: /^[0-9\.]+$/,
+					    message: '请输入正确的数字'
+				   }
+               }  
+        });                        
 		index ++;
 		showOrHideGoodsInput();
 	});
@@ -313,6 +356,13 @@ $(function() {
 		});
 	});
 	
+	$("body").on("click", ".delete", function(){
+		var $this = $(this);
+		if (confirm("您确定要删除吗？") == true) {
+			$this.parent().parent().remove();
+		}
+	});		
+	
 });
 
 var validatorFields = {
@@ -360,13 +410,38 @@ function imgChoose(){
 	    content: '${CPATH}/admin/attachment/choose_layer',
 	    end:function(){
 	    	if(''!=data.url && null != data.url){
-	    		$("#imageDiv").append("<li><img src="+ data.url +" path=${CPATH}"+ data.url +" class='jp-grids-photos img-responsive' ><input type='hidden' name='imageUrl[]' value="+ data.url +"><input type='hidden' name='title[]' value="+ data.alt +"></li>");
+	    		$("#imageDiv").append("<li><div class='imgDiv'><img src="+ data.url +" path=${CPATH}"+ data.url +" class='jp-grids-photos img-responsive' ><input type='hidden' name='imageUrl[]' value="+ data.url +"><input type='hidden' name='title[]' value="+ data.alt +"><div class='delete'></div></div></li>");
+	    		data.url = "";
 	    	}
 	    }
 	});
 }
 
+function checkSpValue() {
+	var spValue = $(".goodsSpecificationValueSelect");
+	var check = false;
+	if (spValue.length == 0) {
+		check = true;
+	}
+	spValue.each(function(index,element){
+		if (index != 0) {
+		  	var x = $(this).find("input").val();
+		  	if (!x) {
+				return false;
+		 	}
+		}
+    	if (index == spValue.length-1) {
+    		check = true;
+    	}		
+	});
+	return check;
+}
+
 function doSubmit(){
+	if(!checkSpValue()) {
+		toastr.error(data.message,'请选择规格值');
+		return false;
+	}
 	$form.ajaxSubmit({
 		beforeSubmit: function() {
 			var validate = $form.data('bootstrapValidator');
@@ -516,13 +591,16 @@ function doSubmit(){
 							</div>
 							<div class="form-group col-sm-12 validata-box">
 								<label class="control-label col-sm-2"></label>
-								<div class="input-group col-md-4 col-sm-10">
+								<div class="input-group col-md-10 col-sm-10">
 									<ul class="list-inline list-unstyled" id="imageDiv">
 										<#list (imageList)! as img>
 											<li>
-												<img src="${img.savePath}" class='jp-grids-photos img-responsive' >
-												<input type='hidden' name='imageUrl[]' value="${img.savePath}">
-												<input type='hidden' name='title[]' value="${img.imgName}">
+												<div class="imgDiv">
+													<img src="${img.savePath}" class='jp-grids-photos img-responsive' >
+													<input type='hidden' name='imageUrl[]' value="${img.savePath}">
+													<input type='hidden' name='title[]' value="${img.imgName}">
+													<div class="delete"></div>
+												</div>											
 											</li>
 										</#list>
 									</ul>									
@@ -648,13 +726,22 @@ function doSubmit(){
 												</td>
 											</#list>
 											<td class="goodsSpecificationInsertTd">
-												<input type="text" name="productList[-1].price" style="width: 50px;" disabled />
+												<div class="form-group validata-box" style="margin: 0;">
+												<div class="input-group col-md-4 col-sm-10">
+													<input type="text" name="productList[-1].price" style="width: 50px;" disabled />
+												</div>
 											</td>
 											<td>
-												<input type="text" name="productList[-1].cost" style="width: 50px;" disabled />
+												<div class="form-group validata-box" style="margin: 0;">
+												<div class="input-group col-md-4 col-sm-10">
+													<input type="text" name="productList[-1].cost" style="width: 50px;" disabled />
+												</div>											
 											</td>
 											<td>
-												<input type="text" name="productList[-1].marketPrice" style="width: 50px;" disabled />
+												<div class="form-group validata-box" style="margin: 0;">
+												<div class="input-group col-md-4 col-sm-10">
+													<input type="text" name="productList[-1].marketPrice" style="width: 50px;" disabled />
+												</div>												
 											</td>
 											<td>
 												<input type="text" name="productList[-1].weight" style="width: 30px;" disabled />

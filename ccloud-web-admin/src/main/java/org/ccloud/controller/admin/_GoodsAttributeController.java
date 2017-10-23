@@ -15,6 +15,7 @@
  */
 package org.ccloud.controller.admin;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,7 +48,15 @@ public class _GoodsAttributeController extends JBaseCRUDController<GoodsAttribut
 		String keyword = getPara("k");
 		if (StrKit.notBlank(keyword)) setAttr("k", keyword);
 		
-		Page<GoodsAttribute> page = GoodsAttributeQuery.me().paginate(getPageNumber(), getPageSize(), keyword, "order_list");
+		String type = getPara("type");
+		try {
+			String typeName = new String(getPara("typeName").getBytes("ISO-8859-1"),"UTF-8");
+			if (StrKit.notBlank(typeName)) setAttr("typeName", typeName);
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		
+		Page<GoodsAttribute> page = GoodsAttributeQuery.me().paginate(getPageNumber(), getPageSize(), keyword, type, "order_list");
 		if (page != null) {
 			setAttr("page", page);
 		}

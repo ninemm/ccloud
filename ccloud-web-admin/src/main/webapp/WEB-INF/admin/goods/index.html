@@ -63,7 +63,8 @@
 				formatter: function(value, row, rowIndex) {
 					var url = '${CPATH}/admin/goods/edit?id=' + row.id + '&c=${c}&p=${p}';
 					var url2 = '${CPATH}/admin/goods/imageManager?id=' + row.id + '&goodsName=' + row.name + '&c=${c}&p=${p}';
-					var strHtml = '<a href="' + url + '" class="btn btn-sm" title="编辑"><i class="fa fa-edit"></i></a> <a href="javascript:void(0);" class="btn btn-sm" onclick="del(\''+row.id+'\')" title="删除"><i class="fa fa-trash-o"></i></a><a href="' + url2 + '" class="btn btn-sm" title="图片管理"><i class="fa fa-file-image-o"></i></a>';
+					var image = '<a href="' + url2 + '" class="btn btn-sm" title="图片管理"><i class="fa fa-file-image-o"></i></a>';
+					var strHtml = '<a href="' + url + '" class="btn btn-sm" title="编辑"><i class="fa fa-edit"></i></a> <a href="javascript:void(0);" class="btn btn-sm" onclick="del(\''+row.id+'\')" title="删除"><i class="fa fa-trash-o"></i></a>';
 					return strHtml;
 				},
 				edit:false
