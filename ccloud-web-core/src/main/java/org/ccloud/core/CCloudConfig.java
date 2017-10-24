@@ -33,8 +33,11 @@ import org.ccloud.message.plugin.MessagePlugin;
 import org.ccloud.model.core.JModelMapping;
 import org.ccloud.model.core.Table;
 import org.ccloud.route.RouterMapping;
+import org.ccloud.shiro.core.ShiroInterceptor;
+import org.ccloud.shiro.core.ShiroPlugin;
 import org.ccloud.utils.ClassUtils;
 import org.ccloud.utils.StringUtils;
+import org.ccloud.workflow.plugin.ActivitiPlugin;
 
 import com.alibaba.druid.filter.stat.StatFilter;
 import com.jfinal.config.Constants;
@@ -68,6 +71,8 @@ import net.sf.ehcache.config.DiskStoreConfiguration;
 public abstract class CCloudConfig extends JFinalConfig {
 
 	static Log log = Log.getLog(CCloudConfig.class);
+	
+	Routes routes;
 
 	public void configConstant(Constants constants) {
 
@@ -85,7 +90,6 @@ public abstract class CCloudConfig extends JFinalConfig {
 		constants.setRenderFactory(new CCloudRenderFactory());
 
 		// constants.setTokenCache(new JTokenCache());
-		
 		ApiConfigKit.setDevMode(PropKit.getBoolean("dev_mode", false));
 	}
 
@@ -104,6 +108,8 @@ public abstract class CCloudConfig extends JFinalConfig {
 				}
 			}
 		}
+		
+		this.routes = routes;
 	}
 
 	public void configPlugin(Plugins plugins) {
@@ -129,6 +135,11 @@ public abstract class CCloudConfig extends JFinalConfig {
 			// plugins.add(createCron4jPlugin());
 
 			plugins.add(new MessagePlugin());
+			
+			plugins.add(new ActivitiPlugin());
+			
+			ShiroPlugin shiroPlugin = createShiroPlugin();
+			plugins.add(shiroPlugin);
 		}
 	}
 
@@ -191,12 +202,22 @@ public abstract class CCloudConfig extends JFinalConfig {
 		Cron4jPlugin cron4jPlugin = new Cron4jPlugin(PropKit.use("ccloud.properties"));
 		return cron4jPlugin;
 	}
+	
+	public ShiroPlugin createShiroPlugin() {
+		ShiroPlugin shiroPlugin = new ShiroPlugin(this.routes);
+	    shiroPlugin.setLoginUrl("/admin/login");//登陆url：未验证成功跳转
+	    shiroPlugin.setSuccessUrl("/admin/index");//登陆成功url：验证成功自动跳转
+	    shiroPlugin.setUnauthorizedUrl("/admin/login/needPermission");//授权url：未授权成功自动跳转
+	    
+	    return shiroPlugin;
+	}
 
 	public void configInterceptor(Interceptors interceptors) {
 		interceptors.add(new JI18nInterceptor());
 		interceptors.add(new GlobelInterceptor());
 		interceptors.add(new AdminInterceptor());
 		interceptors.add(new HookInterceptor());
+		interceptors.add(new ShiroInterceptor());
 	}
 
 	public void configHandler(Handlers handlers) {
