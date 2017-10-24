@@ -96,6 +96,24 @@ public class _UserController extends JBaseCRUDController<User> {
 		}
 		List<Group> list = GroupQuery.me().findAll();
 		setAttr("list", list);
+	}
+	
+	@Override
+	public void delete() {
+		String id = getPara("id");
+		final User r = UserQuery.me().findById(id);
+		if (r != null) {
+			if (r.getUsername().equals("admin")) {
+				renderAjaxResultForError("无法删除管理员!");
+			} else {
+				boolean success = r.delete();
+	            if (success) {
+	                renderAjaxResultForSuccess("删除成功");
+	            } else {
+	                renderAjaxResultForError("删除失败");
+	            }
+			}
+		}
 	}	
 	
 	@Before(UCodeInterceptor.class)

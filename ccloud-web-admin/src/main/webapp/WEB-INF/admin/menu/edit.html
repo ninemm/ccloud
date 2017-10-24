@@ -138,7 +138,7 @@
 							<select class="form-control input-sm" name="menu.system_id">
 								<option value="">--请选择--</option>
 								<#list list as system >
-									<option value="${system.id}">${system.name}</option>
+									<option value="${system.id}" <#if (menu.system_id)! == (system.id)!>selected="selected"</#if>>${system.name}</option>
 								</#list>
 							</select>
 		               	</div>

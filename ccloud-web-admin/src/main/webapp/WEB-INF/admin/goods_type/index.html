@@ -48,6 +48,13 @@
 			[
       			{field: "id", title: "ID", align: "center", visible:false, edit:false},
       			{field: "name", title: "类型名称", align: "center", width: '10%', edit:false},
+				{field: "action", title: "属性", align: "center", width: '20%',
+					formatter: function(value, row, rowIndex) {
+						var url = '${CPATH}/admin/goodsAttribute/index?type=' + row.id +'&typeName=' + row.name + '&c=${c}&p=${p}';
+						var strHtml = '<a href="' + url + '">[属性列表]</a>';
+						return strHtml;
+					}
+				},      			
 				{field: "action", title: "操作", align: "center", width: '20%',
 				formatter: function(value, row, rowIndex) {
 					var url = '${CPATH}/admin/goodsType/edit?id=' + row.id + '&c=${c}&p=${p}';

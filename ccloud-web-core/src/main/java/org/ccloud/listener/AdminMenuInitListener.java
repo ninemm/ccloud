@@ -163,8 +163,8 @@ public class AdminMenuInitListener implements MessageListener {
 		MenuGroup group = new MenuGroup("customer", "fa fa-user", "客户管理");
 
 		{
-			group.addMenuItem(new MenuItem("customer", "/admin/customer", "客户列表"));
-			group.addMenuItem(new MenuItem("customerType", "/admin/customerType", "客户类型"));
+			group.addMenuItem(new MenuItem("list", "/admin/customer", "客户列表"));
+			group.addMenuItem(new MenuItem("type", "/admin/customerType", "客户类型"));
 		}
 		return group;
 	}

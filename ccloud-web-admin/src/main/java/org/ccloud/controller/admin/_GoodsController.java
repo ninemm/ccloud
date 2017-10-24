@@ -149,7 +149,9 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
 	@Before(Tx.class)
 	public void save() {
 		final Goods ccGoods = getModel(Goods.class);
-		String tinymce = getPara("tinymce");
+		Map<String, String[]> map = getParaMap();
+		String tinymce = StringUtils.getArrayFirst(map.get("tinymce"));
+		boolean update = false;
 		if (StringUtils.isNotBlank(tinymce)) {
 			ccGoods.setContent(tinymce);
 		}
@@ -162,19 +164,28 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
 			ccGoods.save();
 		} else {
 			this.setImagePath(imagePath, title, ccGoods);
+			update = true;
 			ccGoods.saveOrUpdate();
 		}
-		Map<String, String[]> map = getParaMap();
-		saveProductInfo(map, ccGoods);
-		renderAjaxResultForSuccess("ok");
+		boolean status = saveProductInfo(map, ccGoods, update);
+		
+		if (status) {
+			renderAjaxResultForSuccess("ok");
+		} else {
+			renderAjaxResultForError("货号有重复,请重新填写");
+		}
 	}
 	
-	private void saveProductInfo(Map<String, String[]> map, Goods goods) {
+	private boolean saveProductInfo(Map<String, String[]> map, Goods goods, boolean update) {
 		List<Product> oldList = ProductQuery.me().findByGoodId(goods.getId());
 		int productSize = getLikeByMap(map, "product"); //map取出产品属性信息数量
 		int loop = productSize / 9; //算出产品数量与循环次数
 		int loopEnd = 0;
 		List<String> newProIds = new ArrayList<>();
+		//rollback
+		List<String> rollBackProId = new ArrayList<>();
+		List<String> rollBackProSpId = new ArrayList<>();
+		List<GoodsGoodsSpecification> rollbackGoodsSp = new ArrayList<>();
 		if (loop > 0) {
 			for (int i = 0; i >= 0; i++) {
 				Product product = new Product();
@@ -199,9 +210,9 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
 				}
 				product.setId(productId);
 				product.setProductSn(productSn);
-				product.setPrice(productPrice == null? null : new BigDecimal(productPrice));
-				product.setCost(productCost == null? null : new BigDecimal(productCost));
-				product.setMarketPrice(productMarketPrice == null? null : new BigDecimal(productMarketPrice));
+				product.setPrice(StringUtils.isNumeric(productPrice)? new BigDecimal(productPrice) : new BigDecimal(0));
+				product.setCost(StringUtils.isNumeric(productCost)? new BigDecimal(productCost) : new BigDecimal(0));
+				product.setMarketPrice(StringUtils.isNumeric(productMarketPrice)? new BigDecimal(productMarketPrice) : new BigDecimal(0));
 				product.setWeight(productWeight == null ? null : Double.valueOf(productWeight));
 				product.setWeightUnit(productWeightUnit == null ? null : Integer.parseInt(productWeightUnit));
 				product.setStore(productStore == null ? null : Integer.parseInt(productStore));
@@ -220,8 +231,14 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
 						product.saveOrUpdate();
 					}
 				} catch (Exception e) {
-					renderAjaxResultForError("货号重复请重新填写!");
+					//手动rollback
+					if (!update) {goods.delete();}
+					GoodsGoodsSpecificationQuery.me().batchDeleteByBean(rollbackGoodsSp);
+					ProductQuery.me().batchDelete(rollBackProId);
+					ProductGoodsSpecificationValueQuery.me().batchDeleteByProIds(rollBackProSpId);
+					return false;
 				}
+				rollBackProId.add(product.getId());
 				
 				List<ProductGoodsSpecificationValue> cpsvList = ProductGoodsSpecificationValueQuery.me().findByPId(product.getId());
 				for (ProductGoodsSpecificationValue ccProductGoodsSpecificationValue : cpsvList) {
@@ -244,12 +261,15 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
 						pgsValue.setGoodsSpecificationValueSetId(spvalueId);
 						pgsValue.setProductSetId(product.getId());
 						pgsValue.save();
+						rollBackProSpId.add(pgsValue.getProductSetId());
 						
 						GoodsGoodsSpecification cggs = new GoodsGoodsSpecification();
 						cggs.setGoodsSpecificationId(spId);
 						cggs.setGoodsId(goods.getId());
 						cggs.save();
+						rollbackGoodsSp.add(cggs);
 					} catch (Exception e) {
+						e.printStackTrace();
 						continue;
 					}
 				}
@@ -279,15 +299,18 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
 		List<String> ids = getDiffrent(oldList, newProIds);
 		ProductQuery.me().batchDelete(ids);
 		ProductGoodsSpecificationValueQuery.me().batchDeleteByProIds(ids);
+		return true;
 	}
 	
 	private void setImagePath(String [] path, String [] title, Goods goods) {
 		List<ImageJson> imageList = new ArrayList<>();
-		for (int i = 0;i < path.length;i++) {
-			ImageJson imageJson = new ImageJson();
-			imageJson.setImgName(title[i]);
-			imageJson.setSavePath(path[i].replace("\\", "/"));
-			imageList.add(imageJson);
+		if (path != null) {
+			for (int i = 0;i < path.length;i++) {
+				ImageJson imageJson = new ImageJson();
+				imageJson.setImgName(title[i]);
+				imageJson.setSavePath(path[i].replace("\\", "/"));
+				imageList.add(imageJson);
+			}
 		}
 		String json = JSON.toJSONString(imageList);
 		goods.setProductImageListStore(json);

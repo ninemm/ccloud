@@ -73,5 +73,27 @@ public class GoodsGoodsSpecificationQuery extends JBaseQuery {
 		return DAO.doFind("goods_id = ?", id);
 	}
 
+	public int batchDeleteByGoodsIds(List<String> ids) {
+		if (ids != null && ids.size() > 0) {
+			int deleteCount = 0;
+			for (String id : ids) {
+				List<GoodsGoodsSpecification> list = this.findByGoodsId(id);
+				for (GoodsGoodsSpecification model : list) {
+					if (model.delete()) {
+						++deleteCount;
+					}
+				}
+			}
+			return deleteCount;
+		}
+		return 0;
+	}
+
+	public void batchDeleteByBean(List<GoodsGoodsSpecification> rollbackGoodsSp) {
+		for (GoodsGoodsSpecification goodsGoodsSpecification : rollbackGoodsSp) {
+			goodsGoodsSpecification.delete();
+		}
+	}
+
 	
 }

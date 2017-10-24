@@ -68,11 +68,12 @@ public class _GoodsCategoryController extends JBaseCRUDController<GoodsCategory>
 		final GoodsCategory category = getModel(GoodsCategory.class);
 		category.setIsParent(0);
 		if (category.saveOrUpdate()) {
+			GoodsCategoryQuery.me().updateParent(category);
 			renderAjaxResultForSuccess("ok");
 		} else {
 			renderAjaxResultForError("false");
 		}
-	}	
+	}
 	
 	@Override
 	public void edit() {
@@ -86,7 +87,7 @@ public class _GoodsCategoryController extends JBaseCRUDController<GoodsCategory>
 		}
 		List<Supplier> list = SupplierQuery.me().findAll();
 		setAttr("list", list);
-	}	
+	}
 	
 	@Before(UCodeInterceptor.class)
 	public void batchDelete() {
@@ -120,6 +121,7 @@ public class _GoodsCategoryController extends JBaseCRUDController<GoodsCategory>
                 renderAjaxResultForError("删除失败");
             }
 		}
+		GoodsCategoryQuery.me().updateParent(category);
 	}
 	
 	public void category_tree() {
