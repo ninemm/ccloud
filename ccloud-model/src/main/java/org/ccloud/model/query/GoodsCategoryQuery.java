@@ -21,7 +21,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.ccloud.model.Department;
 import org.ccloud.model.GoodsCategory;
 import org.ccloud.model.ModelSorter;
 
@@ -199,7 +198,7 @@ public class GoodsCategoryQuery extends JBaseQuery {
 	}
 
 	public List<GoodsCategory> findCategoryByBrandId(String id) {
-		return DAO.doFind("brand_id = ?", id);
+		return DAO.doFind("brand_id = ? And state = 1", id);
 	}
 
 	public void updateParent(GoodsCategory category) {

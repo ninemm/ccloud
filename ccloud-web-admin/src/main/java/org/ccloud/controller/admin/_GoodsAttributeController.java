@@ -105,4 +105,17 @@ public class _GoodsAttributeController extends JBaseCRUDController<GoodsAttribut
         }
         renderJson(list);
 	}
+	
+	public void enable() {
+		String id = getPara("id");
+		GoodsAttribute attribute = GoodsAttributeQuery.me().findById(id);
+		if (attribute.getIsEnabled() == 0) {
+			attribute.setIsEnabled(1);
+		} else {
+			attribute.setIsEnabled(0);
+		}
+		attribute.update();
+		renderAjaxResultForSuccess("更新成功");
+	}
+	
 }

@@ -15,6 +15,7 @@
  */
 package org.ccloud.controller.admin;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -36,6 +37,7 @@ import org.ccloud.model.vo.GoodsSpecificationInfo;
 
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Before;
+import com.jfinal.kit.PathKit;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.upload.UploadFile;
@@ -199,6 +201,12 @@ public class _GoodsSpecificationController extends JBaseCRUDController<GoodsSpec
             List<String> ids = new ArrayList<>();
             List<GoodsSpecificationValue> cgsList = GoodsSpecificationValueQuery.me().findByParentId(id);
             for (GoodsSpecificationValue spv : cgsList) {
+				if (StringUtils.isNotBlank(spv.getImagePath())) {
+					File file1 = new File(PathKit.getWebRootPath()+spv.getImagePath());
+					if (file1.exists() && file1.isFile()) {
+						file1.delete();
+					}
+				}            	
 				ids.add(spv.getId());
 			}
             if (ids.size() > 0) {
