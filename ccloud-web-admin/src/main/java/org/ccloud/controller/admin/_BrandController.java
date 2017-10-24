@@ -62,7 +62,7 @@ public class _BrandController extends JBaseCRUDController<Brand> {
 			Brand brand = BrandQuery.me().findById(id);
 			setAttr("brand", brand);
 		}
-		List<Supplier> list = SupplierQuery.me().findAll();
+		List<Supplier> list = SupplierQuery.me().findEnable();
 		setAttr("list", list);
 	}	
 	

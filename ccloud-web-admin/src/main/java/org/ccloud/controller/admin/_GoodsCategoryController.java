@@ -146,4 +146,13 @@ public class _GoodsCategoryController extends JBaseCRUDController<GoodsCategory>
         renderJson(list);
 	}
 	
+	public void enable() {
+		String id = getPara("id");
+		int state = getParaToInt("state");
+		GoodsCategory goodsCategory = GoodsCategoryQuery.me().findById(id);
+		goodsCategory.setState(state);
+		goodsCategory.update();
+		renderAjaxResultForSuccess("更新成功");
+	}	
+	
 }

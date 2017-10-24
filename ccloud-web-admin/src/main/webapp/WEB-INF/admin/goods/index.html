@@ -65,6 +65,11 @@
 					var url2 = '${CPATH}/admin/goods/imageManager?id=' + row.id + '&goodsName=' + row.name + '&c=${c}&p=${p}';
 					var image = '<a href="' + url2 + '" class="btn btn-sm" title="图片管理"><i class="fa fa-file-image-o"></i></a>';
 					var strHtml = '<a href="' + url + '" class="btn btn-sm" title="编辑"><i class="fa fa-edit"></i></a> <a href="javascript:void(0);" class="btn btn-sm" onclick="del(\''+row.id+'\')" title="删除"><i class="fa fa-trash-o"></i></a>';
+					if(row.state == 1){
+						strHtml = strHtml + '<a href="javascript:void(0);" class="btn btn-sm" onclick="enable(\''+row.id+'\'' + ',0' + ')" title="下架"><i class="fa fa-arrow-circle-o-down"></i></a>';
+					} else {
+						strHtml = strHtml + '<a href="javascript:void(0);" class="btn btn-sm" onclick="enable(\''+row.id+'\'' + ',1' + ')" title="上架"><i class="fa fa-arrow-circle-o-up"></i></a>';
+					}					
 					return strHtml;
 				},
 				edit:false
@@ -72,6 +77,19 @@
    			];
    		return fields;
 	}
+	
+	function enable(id, state) {
+		$.get('${CPATH}/admin/goods/enable?ucode=${ucode}&id=' + id + '&state=' + state,
+			function(result){
+				if (result.errorCode > 0) {
+					toastr.error(result.message, '操作失败');
+				} else {
+					$table.bootstrapTable('refresh');
+					toastr.success(result.message, '操作成功');
+				}
+			}
+		);
+	}	
 
 	function del(id) {
 		jQuery.mm.del('${CPATH}/admin/goods/delete?ucode=${ucode}&id=' + id);

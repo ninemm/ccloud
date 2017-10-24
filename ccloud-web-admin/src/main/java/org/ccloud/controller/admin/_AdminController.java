@@ -79,13 +79,13 @@ public class _AdminController extends JBaseController {
 			return;
 		}
 		
-		setSessionAttr("user", user);
-
 		if (EncryptUtils.verlifyUser(user.getPassword(), user.getSalt(), password)) {
 
 			MessageKit.sendMessage(Actions.USER_LOGINED, user);
 
 			CookieUtils.put(this, Consts.COOKIE_LOGINED_USER, user.getId().toString());
+			
+			setSessionAttr("user", user);
 
 			renderAjaxResultForSuccess("登录成功");
 		} else {

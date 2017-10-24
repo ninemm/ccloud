@@ -82,4 +82,8 @@ public class SupplierQuery extends JBaseQuery {
 		});
 	}
 
+	public List<Supplier> findEnable() {
+		return DAO.doFind("is_enable = 1");
+	}
+
 }

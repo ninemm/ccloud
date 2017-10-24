@@ -6,6 +6,27 @@ function del(id) {
 	jQuery.mm.del('${CPATH}/admin/user/delete?ucode=${ucode}&id=' + id);
 }
 
+function enable(obj,id) {
+	$.ajax({
+		url:"${CPATH}/admin/user/enable",
+		type:"post",
+		data:{"id":id},
+		dataType:"json",
+		success:function(data) {
+			if(data.errorCode == 0) {
+				toastr.success(data.message, '操作成功');
+				if ($(obj).html() == "停用") {
+					$(obj).html("启用");
+				} else {
+					$(obj).html("停用");
+				}
+			} else {
+				toastr.error(data.message,'操作失败');
+			}			
+		}
+	});
+}
+
 function batchAction() {
 	var $form = $("#form");
 	$form.attr("action", "${CPATH}/admin/user/batchDelete?ucode=${ucode}&c=${c!}&p=${p!}");
@@ -85,7 +106,7 @@ function batchAction() {
 							<td>
 								<a href="${CPATH}/admin/user/edit?id=${bean.id}&c=${c!}&p=${p!}" class="btn btn-xs bg-olive btn-flat">编辑</a>
 								<a href="javascript:void(0);" onclick="del('${bean.id}')" class="btn btn-xs btn-danger btn-flat">删除</a>
-								<a href="javascript:void(0);" onclick="enable('${bean.id}')" class="btn btn-xs btn-danger btn-flat"><#if bean.status == 0><#else></#if></a>
+								<a href="javascript:void(0);" onclick="enable(this,'${bean.id}')" class="btn btn-xs btn-info btn-flat"><#if bean.status == 1>停用<#else>启用</#if></a>
 							</td>
 						</tr>
 						</#list> </#if>

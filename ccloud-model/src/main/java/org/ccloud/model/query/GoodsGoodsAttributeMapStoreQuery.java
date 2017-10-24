@@ -84,7 +84,7 @@ public class GoodsGoodsAttributeMapStoreQuery extends JBaseQuery {
 		fromBuilder.append("from cc_goods_attribute cc ");
 		fromBuilder.append("left join (SELECT * FROM cc_goods_goods_attribute_map_store b where b.goods_id = ?) b ");
 		fromBuilder.append("ON cc.id = b.goods_attribute_map_store_mapkey_id ");
-		fromBuilder.append("where cc.goods_type_id = ? ");
+		fromBuilder.append("where cc.goods_type_id = ? And cc.is_enabled = 1");
 		List<Record> list = Db.find(fromBuilder.toString(), goods.getId(), goods.getGoodsTypeId());
 		return list;
 	}

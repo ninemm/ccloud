@@ -182,10 +182,13 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
 		int loop = productSize / 9; //算出产品数量与循环次数
 		int loopEnd = 0;
 		List<String> newProIds = new ArrayList<>();
+		int market = 0;
+		
 		//rollback
 		List<String> rollBackProId = new ArrayList<>();
 		List<String> rollBackProSpId = new ArrayList<>();
 		List<GoodsGoodsSpecification> rollbackGoodsSp = new ArrayList<>();
+		
 		if (loop > 0) {
 			for (int i = 0; i >= 0; i++) {
 				Product product = new Product();
@@ -218,6 +221,9 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
 				product.setStore(productStore == null ? null : Integer.parseInt(productStore));
 				product.setStorePlace(productStorePlace);
 				product.setIsMarketable(Boolean.valueOf(productIsMarketable));
+				if (product.getIsMarketable()) {
+					market++;
+				}
 				product.setGoodsId(goods.getId());
 				product.setName(goods.getName());
 				product.setFreezeStore(0);
@@ -278,6 +284,11 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
 					break;
 				}
 			}
+		}
+		
+		if (market > 0 && goods.getState() == 0) {
+			goods.setState(1);
+			goods.update();
 		}
 		
 		GoodsGoodsAttributeMapStoreQuery.me().deleteAllByGoodsId(goods.getId());
@@ -494,5 +505,21 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
 		goods.update();
 		renderAjaxResultForSuccess("删除成功");
     }
+    
+	public void enable() {
+		String id = getPara("id");
+		int state = getParaToInt("state");
+		Goods goods = GoodsQuery.me().findById(id);
+		List<Product> list = ProductQuery.me().findByGoodId(id);
+		for (Product product : list) {
+			if (state == 0 && product.getIsMarketable()) {
+				product.setIsMarketable(false);
+				product.update();
+			}
+		}
+		goods.setState(state);
+		goods.update();
+		renderAjaxResultForSuccess("更新成功");
+	}
 	
 }

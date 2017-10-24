@@ -64,6 +64,11 @@
 				formatter: function(value, row, rowIndex) {
 					var url = '${CPATH}/admin/supplier/edit?id=' + row.id + '&c=${c}&p=${p}';
 					var strHtml = '<a href="' + url + '" class="btn btn-sm" title="编辑"><i class="fa fa-edit"></i></a> <a href="javascript:void(0);" class="btn btn-sm" onclick="del(\''+row.id+'\')" title="删除"><i class="fa fa-trash-o"></i></a>';
+					if(row.is_enable == 1){
+						strHtml = strHtml + '<a href="javascript:void(0);" class="btn btn-sm" onclick="enable(\''+row.id+'\'' + ',0' + ')" title="停用"><i class="fa fa-ban"></i></a>';
+					} else {
+						strHtml = strHtml + '<a href="javascript:void(0);" class="btn btn-sm" onclick="enable(\''+row.id+'\'' + ',1' + ')" title="启用"><i class="fa fa-check-circle-o"></i></a>';
+					}
 					return strHtml;
 				},
 				edit:false
@@ -72,6 +77,19 @@
    		return fields;
 	}
 
+	function enable(id, isEnabled) {
+		$.get('${CPATH}/admin/supplier/enable?ucode=${ucode}&id=' + id + '&isEnabled=' + isEnabled,
+			function(result){
+				if (result.errorCode > 0) {
+					toastr.error(result.message, '操作失败');
+				} else {
+					$table.bootstrapTable('refresh');
+					toastr.success(result.message, '操作成功');
+				}
+			}
+		);
+	}
+	
 	function del(id) {
 		jQuery.mm.del('${CPATH}/admin/supplier/delete?ucode=${ucode}&id=' + id);
 	}
