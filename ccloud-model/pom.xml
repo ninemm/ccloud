@@ -7,7 +7,7 @@
 		<version>0.0.1</version>
 	</parent>
 	
-	<artifactId>ccloud-model</artifactId>
+	<artifactId>ccloud-model-core</artifactId>
 	<name>ccloud-model</name>
 	<description>实体模型模板</description>
 
@@ -55,7 +55,7 @@
 
 		<dependency>
 			<groupId>org.ccloud</groupId>
-			<artifactId>ccloud-message</artifactId>
+			<artifactId>ccloud-model-core</artifactId>
 			<version>${project.version}</version>
 			<type>jar</type>
 			<scope>compile</scope>

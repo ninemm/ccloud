@@ -33,7 +33,6 @@ import org.ccloud.message.plugin.MessagePlugin;
 import org.ccloud.model.core.JModelMapping;
 import org.ccloud.model.core.Table;
 import org.ccloud.route.RouterMapping;
-import org.ccloud.shiro.core.ShiroInterceptor;
 import org.ccloud.shiro.core.ShiroPlugin;
 import org.ccloud.utils.ClassUtils;
 import org.ccloud.utils.StringUtils;
@@ -138,8 +137,8 @@ public abstract class CCloudConfig extends JFinalConfig {
 			
 			plugins.add(new ActivitiPlugin());
 			
-			ShiroPlugin shiroPlugin = createShiroPlugin();
-			plugins.add(shiroPlugin);
+			//ShiroPlugin shiroPlugin = createShiroPlugin();
+			//plugins.add(shiroPlugin);
 		}
 	}
 
@@ -206,7 +205,7 @@ public abstract class CCloudConfig extends JFinalConfig {
 	public ShiroPlugin createShiroPlugin() {
 		ShiroPlugin shiroPlugin = new ShiroPlugin(this.routes);
 	    shiroPlugin.setLoginUrl("/admin/login");//登陆url：未验证成功跳转
-	    shiroPlugin.setSuccessUrl("/admin/index");//登陆成功url：验证成功自动跳转
+	    shiroPlugin.setSuccessUrl("/admin");//登陆成功url：验证成功自动跳转
 	    shiroPlugin.setUnauthorizedUrl("/admin/login/needPermission");//授权url：未授权成功自动跳转
 	    
 	    return shiroPlugin;
@@ -217,7 +216,7 @@ public abstract class CCloudConfig extends JFinalConfig {
 		interceptors.add(new GlobelInterceptor());
 		interceptors.add(new AdminInterceptor());
 		interceptors.add(new HookInterceptor());
-		interceptors.add(new ShiroInterceptor());
+		//interceptors.add(new ShiroInterceptor());
 	}
 
 	public void configHandler(Handlers handlers) {

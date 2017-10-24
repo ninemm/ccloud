@@ -4,6 +4,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
+import org.ccloud.shiro.SimpleUser;
 
 
 /**
@@ -92,7 +93,7 @@ public class ShiroKit {
 	 * 获取登陆用户信息
 	 * @return
 	 */
-	/*public static SimpleUser getLoginUser(){
+	public static SimpleUser getLoginUser(){
 		Subject subject = SecurityUtils.getSubject();
 		if(subject!=null){
 			return (SimpleUser)subject.getPrincipal();
@@ -101,31 +102,31 @@ public class ShiroKit {
 			return null;
 		}
 	}
-	*//***
+	/***
 	 * 获取登陆用户主键
 	 * @return
-	 *//*
+	 */
 	public static String getUserId(){
 		SimpleUser user = ShiroKit.getLoginUser();
 		return user.getId();
 	}
-	*//***
+	/***
 	 * 获取登陆用户id
 	 * @return
-	 *//*
+	 */
 	public static String getUsername(){
 		SimpleUser user = ShiroKit.getLoginUser();
 		return user.getUsername();
 	}
 	
-	*//***
+	/***
 	 * 获取用户名称
 	 * @return
-	 *//*
+	 */
 	public static String getUserName(){
 		SimpleUser user = ShiroKit.getLoginUser();
 		return user.getName();
-	}*/
+	}
 	
 	/***
 	 * 判断是否有资源权限

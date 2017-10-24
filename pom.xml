@@ -27,6 +27,7 @@
 		<module>ccloud-web-templates</module>
 
 		<module>ccloud-workflow</module>
+		<module>ccloud-model-core</module>
 	</modules>
 	
 	<properties>
