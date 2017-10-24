@@ -40,6 +40,26 @@
 		   overflowToDisk="true"
 		   diskPersistent="true"
 	/>
+	
+	<cache name="_shiro_active_session_cache"
+           maxElementsInMemory="10000"
+           maxElementsOnDisk="100000000"
+           eternal="false"
+           timeToIdleSeconds="3600"
+           timeToLiveSeconds="0"
+           overflowToDisk="true"
+           diskPersistent="true"
+    />
+    
+    <cache name="_shiro_authorization_cache"
+           maxElementsInMemory="10000"
+           maxElementsOnDisk="100000000"
+           eternal="false"
+           timeToIdleSeconds="3600"
+           timeToLiveSeconds="0"
+           overflowToDisk="true"
+           diskPersistent="true"
+    />
 
 	<cache name="action"
 		   maxElementsInMemory="10000"

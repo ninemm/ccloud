@@ -8,7 +8,7 @@
 	</parent>
 	
 	<artifactId>ccloud-web-auth</artifactId>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<name>ccloud-web-auth</name>
 	<description>认证中心</description>
 	
@@ -29,11 +29,6 @@
 			<groupId>com.jfinal</groupId>
 			<artifactId>cos</artifactId>
 			<version>26Dec2008</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.freemarker</groupId>
-			<artifactId>freemarker</artifactId>
 		</dependency>
 		
 		<dependency>
@@ -63,24 +58,14 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>com.jfinal</groupId>
-			<artifactId>jfinal-qyweixin</artifactId>
-		</dependency>
-		
-		<dependency>
 			<groupId>net.sf.ehcache</groupId>
 			<artifactId>ehcache</artifactId>
 		</dependency>
 		
 		<dependency>
-			<groupId>com.alibaba</groupId>
-			<artifactId>druid</artifactId>
-		</dependency>
-		
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-		</dependency>	
+             <groupId>org.apache.shiro</groupId>
+             <artifactId>shiro-web</artifactId>
+        </dependency>
 		
 		<dependency>
 			<groupId>org.ccloud</groupId>
