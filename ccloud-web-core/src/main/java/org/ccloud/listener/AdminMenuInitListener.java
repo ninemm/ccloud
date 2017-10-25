@@ -118,6 +118,7 @@ public class AdminMenuInitListener implements MessageListener {
 			group.addMenuItem(new MenuItem("init", "/admin/promoter", "初始化"));
 			group.addMenuItem(new MenuItem("setting", "/admin/promoter/setting", "出库管理"));
 			group.addMenuItem(new MenuItem("commission", "/admin/promoter/commission", "入库管理"));
+			group.addMenuItem(new MenuItem("warehouse", "/admin/warehouse", "仓库管理"));
 			
 		}
 		
@@ -235,6 +236,7 @@ public class AdminMenuInitListener implements MessageListener {
 		{
 			group.addMenuItem(new MenuItem("dict", "/admin/dict", "数据字典"));
 			group.addMenuItem(new MenuItem("area", "/admin/area", "地区"));
+			
 		}
 		
 		return group;
