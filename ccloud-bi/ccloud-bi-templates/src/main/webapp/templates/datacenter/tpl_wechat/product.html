@@ -49,8 +49,8 @@
     }
 </#macro>
 <#macro script>
+    Utils.loading();
     $(function() {
-        Utils.loading();
         product(provName, cityName, '', dateType);
 
         initTopHoverTree("gotop", 100, 10, 50);
@@ -58,7 +58,6 @@
         $('#goback').on('click', function() {
             historyUtils.back();
         });
-        Utils.close();
     });
     var provName = $.cookie(Utils.provCacheName);
     var cityName = $.cookie(Utils.cityCacheName);
@@ -94,6 +93,7 @@
             data:{"provName": provName, "cityName": cityName, countryName: countryName, dateType: dateType},
             dataType:"json"
         }).done(function(data){
+            Utils.close();
 
             var prTitle = '产品销售排行';
             if((provName + cityName + countryName).trim() != '' ){
@@ -127,6 +127,8 @@
             data:{provName: provName, cityName: cityName, countryName: countryName, dateType: dateType, cInvCode: cInvCode},
             dataType:"json"
         }).done(function(data){
+            Utils.close();
+
             var areaYData = [];
             var areaSeriesData = [];
             var area_rank = document.getElementById('area_rank');
