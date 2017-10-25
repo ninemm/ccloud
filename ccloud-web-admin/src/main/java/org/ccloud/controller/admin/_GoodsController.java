@@ -522,4 +522,10 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
 		renderAjaxResultForSuccess("更新成功");
 	}
 	
+	public void category_tree() {
+		String id = getPara("id");
+		List<Map<String, Object>> list = GoodsCategoryQuery.me().findCategoryListAsTreeByBrand(1, id);
+		setAttr("treeData", JSON.toJSON(list));
+	}
+	
 }

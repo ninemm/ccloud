@@ -15,6 +15,7 @@
  */
 package org.ccloud.model.query;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -82,6 +83,26 @@ public class RoleQuery extends JBaseQuery {
 		sqlBuilder.append("where r.id = ? and g.id = ? ");
 
 		return DAO.find(sqlBuilder.toString(), roleId, groupId);
+	}
+
+	public List<String> getPermissions(String groupId) {
+		List<String> roleIds = new ArrayList<>();
+		List<Role> list = RoleQuery.me().findByGroupId(groupId);
+		for (Role role : list) {
+			roleIds.add(role.get("role_id").toString());
+		}
+		return roleIds;
+	}
+
+	public List<Role> findByGroupId(String groupId) {
+		StringBuilder sqlBuilder = new StringBuilder("select * ");
+
+		sqlBuilder.append("from `role` r ");
+		sqlBuilder.append("join `group_role_rel` gr on gr.role_id = r.id ");
+		sqlBuilder.append("join `group` g on g.id = gr.group_id ");
+		sqlBuilder.append("where g.id = ? ");
+
+		return DAO.find(sqlBuilder.toString(), groupId);
 	}
 
 }
