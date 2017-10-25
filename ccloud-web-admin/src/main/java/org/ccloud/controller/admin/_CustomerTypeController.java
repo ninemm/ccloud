@@ -19,8 +19,8 @@ import java.util.Map;
 
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
-import org.ccloud.model.CcCustomerType;
-import org.ccloud.model.query.CcCustomerTypeQuery;
+import org.ccloud.model.CustomerType;
+import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
@@ -36,7 +36,7 @@ import com.jfinal.plugin.activerecord.Page;
 @RouterMapping(url = "/admin/customerType", viewPath = "/WEB-INF/admin/customer_type")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
-public class _CcCustomerTypeController extends JBaseCRUDController<CcCustomerType> {
+public class _CustomerTypeController extends JBaseCRUDController<CustomerType> {
 
 	@Override
 	public void index() {
@@ -51,7 +51,7 @@ public class _CcCustomerTypeController extends JBaseCRUDController<CcCustomerTyp
 		}
 		String show = getPara("show");
 
-		Page<CcCustomerType> page = CcCustomerTypeQuery.me().paginate(getPageNumber(), getPageSize(), keyword, "create_date", show);
+		Page<CustomerType> page = CustomerTypeQuery.me().paginate(getPageNumber(), getPageSize(), keyword, "create_date", show);
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
 
@@ -62,7 +62,7 @@ public class _CcCustomerTypeController extends JBaseCRUDController<CcCustomerTyp
 		String id = getPara("id");
 		int show = getParaToInt("show");
 
-		if (CcCustomerTypeQuery.me().enable(id, show)) {
+		if (CustomerTypeQuery.me().enable(id, show)) {
 			renderAjaxResultForSuccess();
 		} else {
 			renderAjaxResultForError();

@@ -49,6 +49,7 @@
     }
 </#macro>
 <#macro script>
+    Utils.loading();
     $(function() {
         dealer(provName, cityName, '', dateType);
         
@@ -212,6 +213,7 @@
     
     //产品
     function product_rank(productList){
+        Utils.close();
 
         var $tbody = $("#product_rank tbody");
         $tbody.empty();
