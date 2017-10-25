@@ -35,14 +35,14 @@ $(function() {
 	
 	selector.setCityVal([
 		{
-			'id': '${ccCustomer.prov_code!}',
-			'name': '${ccCustomer.prov_name!}'
+			'id': '${customer.prov_code!}',
+			'name': '${customer.prov_name!}'
 		}, {
-			'id': '${ccCustomer.city_code!}',
-			'name': '${ccCustomer.city_name!}'
+			'id': '${customer.city_code!}',
+			'name': '${customer.city_name!}'
 		}, {
-			'id': '${ccCustomer.country_code!}',
-			'name': '${ccCustomer.country_name!}'
+			'id': '${customer.country_code!}',
+			'name': '${customer.country_name!}'
 		}
 	]);
 	
@@ -60,25 +60,25 @@ $(function() {
 });
 
 var validatorFields = {
-	'ccCustomer.customer_name': {
+	'customer.customer_name': {
 		validators: {
 			notEmpty: { message: '客户名称不能为空' },
 			stringLength: { max: 25, message: '客户名称最大长度是25字符，请重新输入' }
 		}
 	},
-	'ccCustomer.customer_code': {
+	'customer.customer_code': {
 		validators: {
 			notEmpty: { message: '客户编码不能为空' },
 			stringLength: { max: 15, message: '客户编码最大长度是15字符，请重新输入' }
 		}
 	},
-	'ccCustomer.contact': {
+	'customer.contact': {
 		validators: {
 			notEmpty: { message: '联系人不能为空' },
 			stringLength: { max: 15, message: '客户名称最大长度是15字符，请重新输入' }
 		}
 	},
-	'ccCustomer.mobile': {
+	'customer.mobile': {
 		validators: {
 			notEmpty: { message: '手机号不能为空' },
 			stringLength: { min: 11, max: 11, message: '请输入11位手机号' },
@@ -127,7 +127,7 @@ var validatorFields = {
 			} 
 		}
 	},
-	'ccCustomer.address': {
+	'customer.address': {
 		validators: {
 			notEmpty: { message: '地址不能为空' },
 			stringLength: { max: 50, message: '地址最大长度是15字符，请重新输入' }
@@ -191,32 +191,32 @@ function doSubmit(){
 			</div>
 		</div>
 		<form action="${CPATH}/admin/customer/save" method="post" id="form" class="form-horizontal" >
-		<input type="hidden" name="ccCustomer.id" value="${(ccCustomer.id)!}">
+		<input type="hidden" name="customer.id" value="${(customer.id)!}">
 		<div class="box-body">
 			<div class="col-sm-12 ">
 				<div class="row">
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">客户名称:</label>
 						<div class="input-group col-md-4 col-sm-10">
-							<input class="form-control input-sm" type="text" name="ccCustomer.customer_name" value="${(ccCustomer.customer_name)!}" placeholder="1-25个任意字母数字">
+							<input class="form-control input-sm" type="text" name="customer.customer_name" value="${(customer.customer_name)!}" placeholder="1-25个任意字母数字">
 						</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">客户编码:</label>
 						<div class="input-group col-md-4 col-sm-10">
-							<input class="form-control input-sm" type="text" name="ccCustomer.customer_code" value="${(ccCustomer.customer_code)!}" placeholder="1-15个任意字母数字">
+							<input class="form-control input-sm" type="text" name="customer.customer_code" value="${(customer.customer_code)!}" placeholder="1-15个任意字母数字">
 						</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">联系人:</label>
 						<div class="input-group col-md-4 col-sm-10">
-							<input class="form-control input-sm" type="text" name="ccCustomer.contact" value="${(ccCustomer.contact)!}" placeholder="1-15个任意字母数字">
+							<input class="form-control input-sm" type="text" name="customer.contact" value="${(customer.contact)!}" placeholder="1-15个任意字母数字">
 						</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">手机号:</label>
 						<div class="input-group col-md-4 col-sm-10">
-							<input class="form-control input-sm" type="text" name="ccCustomer.mobile" value="${(ccCustomer.mobile)!}" placeholder="11位数字">
+							<input class="form-control input-sm" type="text" name="customer.mobile" value="${(customer.mobile)!}" placeholder="11位数字">
 						</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">
@@ -231,7 +231,7 @@ function doSubmit(){
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">详细地址:</label>
 						<div class="input-group col-md-4 col-sm-10">
-							<input class="form-control input-sm" type="text" name="ccCustomer.address" value="${(ccCustomer.address)!}" placeholder="1-50个任意字母数字">
+							<input class="form-control input-sm" type="text" name="customer.address" value="${(customer.address)!}" placeholder="1-50个任意字母数字">
 						</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">

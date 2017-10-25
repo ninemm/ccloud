@@ -56,7 +56,7 @@
     <script type="text/javascript" src="${CTPATH}/js/convertor.js"></script>
 </#macro>
 <#macro script>
-
+    Utils.loading();
     $(function() {
         mapLocation(false);
         topTotal(provName, cityName, countryName);
@@ -92,6 +92,7 @@
     
     //顶部统计
     function topTotal(provName, cityName, countryName){
+
         countryName = '';
         $.ajax({
             url:"${CPATH}/topTotal",
@@ -196,6 +197,8 @@
             data:{"provName": provName, "cityName": cityName, countryName: countryName, dateType: dateType},
             dataType:"json"
         }).done(function(data){
+
+            Utils.close();
 
             orderAvg(data.orderAvg, countryName);
 

@@ -21,11 +21,11 @@ import java.util.Map;
 
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
-import org.ccloud.model.CcCustomer;
-import org.ccloud.model.query.CcCustomerJoinCustomerTypeQuery;
-import org.ccloud.model.query.CcCustomerQuery;
-import org.ccloud.model.query.CcCustomerTypeQuery;
-import org.ccloud.model.query.CcUserJoinCustomerQuery;
+import org.ccloud.model.Customer;
+import org.ccloud.model.query.CustomerJoinCustomerTypeQuery;
+import org.ccloud.model.query.CustomerQuery;
+import org.ccloud.model.query.CustomerTypeQuery;
+import org.ccloud.model.query.UserJoinCustomerQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
@@ -42,7 +42,7 @@ import com.jfinal.plugin.activerecord.tx.Tx;
 @RouterMapping(url = "/admin/customer", viewPath = "/WEB-INF/admin/customer")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
-public class _CcCustomerController extends JBaseCRUDController<CcCustomer> {
+public class _CustomerController extends JBaseCRUDController<Customer> {
 
 	@Override
 	public void index() {
@@ -57,7 +57,7 @@ public class _CcCustomerController extends JBaseCRUDController<CcCustomer> {
 			keyword = StringUtils.urlDecode(keyword);
 		}
 
-		Page<Record> page = CcCustomerQuery.me().paginate(getPageNumber(), getPageSize(), keyword, "create_date",
+		Page<Record> page = CustomerQuery.me().paginate(getPageNumber(), getPageSize(), keyword, "create_date",
 				paraMap, null, null);//TODO
 		List<Record> customerList = page.getList();
 
@@ -71,7 +71,7 @@ public class _CcCustomerController extends JBaseCRUDController<CcCustomer> {
 		String id = getPara("id");
 		int isEnabled = getParaToInt("isEnabled");
 
-		if (CcCustomerQuery.me().enable(id, isEnabled)) {
+		if (CustomerQuery.me().enable(id, isEnabled)) {
 			renderAjaxResultForSuccess();
 		} else {
 			renderAjaxResultForError();
@@ -83,12 +83,12 @@ public class _CcCustomerController extends JBaseCRUDController<CcCustomer> {
 	public void edit() {
 		String id = getPara("id");
 		if (StrKit.notBlank(id)) {
-			setAttr("ccCustomer", CcCustomerQuery.me().findById(id));
-			setAttr("cTypeList", CcCustomerJoinCustomerTypeQuery.me().findCustomerTypeListByCustomerId(id));
-			setAttr("cUserIdList", CcUserJoinCustomerQuery.me().findUserListByCustomerId(id, null, null));//TODO
+			setAttr("customer", CustomerQuery.me().findById(id));
+			setAttr("cTypeList", CustomerJoinCustomerTypeQuery.me().findCustomerTypeListByCustomerId(id));
+			setAttr("cUserIdList", UserJoinCustomerQuery.me().findUserListByCustomerId(id, null, null));//TODO
 		}
-		setAttr("customerTypeList", CcCustomerTypeQuery.me().findCustomerTypeList());
-		setAttr("userIdList", CcUserJoinCustomerQuery.me().findUserListByCustomerId(id, null, null));
+		setAttr("customerTypeList", CustomerTypeQuery.me().findCustomerTypeList());
+		setAttr("userIdList", UserJoinCustomerQuery.me().findUserListByCustomerId(id, null, null));
 		render("edit.html");
 	}
 	
@@ -96,7 +96,7 @@ public class _CcCustomerController extends JBaseCRUDController<CcCustomer> {
 	@Before(Tx.class)
 	public void save() {
 
-		CcCustomer customer = getModel(CcCustomer.class);
+		Customer customer = getModel(Customer.class);
 		String customerId = customer.getId();
 		customer.setProvCode(getPara("userProvinceId"));
 		customer.setProvName(getPara("userProvinceText"));
@@ -107,8 +107,8 @@ public class _CcCustomerController extends JBaseCRUDController<CcCustomer> {
 		String[] customerTypes = getParaValues("customerTypes");
 		String[] userIds = getParaValues("userIds");
 
-		CcCustomerJoinCustomerTypeQuery.me().deleteByCustomerId(customerId);
-		CcUserJoinCustomerQuery.me().deleteByCustomerId(customerId);
+		CustomerJoinCustomerTypeQuery.me().deleteByCustomerId(customerId);
+		UserJoinCustomerQuery.me().deleteByCustomerId(customerId);
 
 		if (StrKit.isBlank(customerId)) {
 			customerId = StrKit.getRandomUUID();
@@ -121,12 +121,12 @@ public class _CcCustomerController extends JBaseCRUDController<CcCustomer> {
 		}
 
 		for (String customerType : customerTypes) {
-			CcCustomerJoinCustomerTypeQuery.me().insert(customerId, customerType);
+			CustomerJoinCustomerTypeQuery.me().insert(customerId, customerType);
 		}
 
 		if (userIds != null) {
 			for (String userId : userIds) {
-				CcUserJoinCustomerQuery.me().insert(customerId, userId, null, null);// TODO
+				UserJoinCustomerQuery.me().insert(customerId, userId, null, null);// TODO
 			}
 		}
 

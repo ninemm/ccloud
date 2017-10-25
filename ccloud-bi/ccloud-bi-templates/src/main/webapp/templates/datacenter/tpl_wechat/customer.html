@@ -61,6 +61,7 @@
 
 </#macro>
 <#macro script>
+    Utils.loading();
     $(function() {
         lMap(dateType);
         customer(provName, cityName, '', dateType);
@@ -141,6 +142,8 @@
             data:{dateType: dateType, longitude: longitude, latitude: latitude, dist: 10},
             dataType:"json"
         }).done(function(data){
+            Utils.close();
+
             for(var i = 0; i < data.length; i++) {
                 var new_point = new BMap.Point(data[i].longitude,data[i].latitude);
                 var marker = new BMap.Marker(new_point, {icon:myIcon});  //创建标注
