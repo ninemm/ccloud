@@ -42,7 +42,11 @@ public class GoodsQuery extends JBaseQuery {
 		return DAO.getCache(id, new IDataLoader() {
 			@Override
 			public Object load() {
-				return DAO.findById(id);
+				StringBuilder sqlBuilder = new StringBuilder("select cc.*, ca.name as parent_name ");
+				sqlBuilder.append("from `cc_goods` cc ");
+				sqlBuilder.append("join `cc_goods_category` ca on cc.goods_category_id = ca.id ");
+				sqlBuilder.append("where cc.id = ?");
+				return DAO.findFirst(sqlBuilder.toString(), id);
 			}
 		});		
 	}
