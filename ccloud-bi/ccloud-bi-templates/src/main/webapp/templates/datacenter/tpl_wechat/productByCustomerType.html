@@ -19,8 +19,12 @@
     } 
 </#macro> 
 <#macro script>
-    
-    initTopHoverTree("gotop", 100, 10, 50);
+    $(function(){
+        Utils.close();
+
+        initTopHoverTree("gotop", 100, 10, 50);
+    });
+
 
     $('#goback').on('click', function() {
         historyUtils.back();

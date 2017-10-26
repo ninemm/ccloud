@@ -85,6 +85,7 @@
     
     //经销商
     function dealer(provName, cityName, countryName, dateType){
+        Utils.loading();
         $.ajax({
             url:"${CPATH}/sales/dealer",
             type:"post",
@@ -96,7 +97,7 @@
             if((provName + cityName + countryName).trim() != '' ){
                 drTitle = provName + cityName + countryName + drTitle;
             } else {
-                drTitle = '' + drTitle;
+                drTitle = '全国' + drTitle;
             }
             var $p = $("#p_dealer_rank");
             $p.empty();
@@ -117,6 +118,7 @@
     
     //直营商和产品
     function dealer_detail(provName, cityName, countryName, dateType, dealerCode, dealerName){
+      Utils.loading();
       $.ajax({
             url:"${CPATH}/sales/dealerDetail",
             type:"post",
@@ -212,6 +214,7 @@
     
     //产品
     function product_rank(productList){
+        Utils.close();
 
         var $tbody = $("#product_rank tbody");
         $tbody.empty();
@@ -224,6 +227,7 @@
     
     //直营商产品
     function seller_product(provName, cityName, countryName, dateType, sellerCode, sellerName){
+      Utils.loading();
       $.ajax({
             url:"${CPATH}/sales/productBySeller",
             type:"post",
