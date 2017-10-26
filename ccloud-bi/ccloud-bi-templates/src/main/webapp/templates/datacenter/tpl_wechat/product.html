@@ -49,7 +49,6 @@
     }
 </#macro>
 <#macro script>
-    Utils.loading();
     $(function() {
         product(provName, cityName, '', dateType);
 
@@ -79,6 +78,7 @@
     
     //产品选择
     function setProduct(Code, Name){
+        Utils.loading();
         cInvCode = Code;
         cInvName = Name;
         area_rank(provName, cityName, '', dateType, cInvCode, cInvName);
@@ -87,6 +87,7 @@
     
     //产品
     function product(provName, cityName, countryName, dateType){
+        Utils.loading();
         $.ajax({
             url:"${CPATH}/sales/product",
             type:"post",
@@ -99,7 +100,7 @@
             if((provName + cityName + countryName).trim() != '' ){
                 prTitle = provName + cityName + countryName + prTitle;
             } else {
-                prTitle = '' + prTitle;
+                prTitle = '全国' + prTitle;
             }
             var $p = $("#p_product_rank");
             $p.empty();
@@ -212,6 +213,7 @@
             data:{"provName": provName, "cityName": cityName, countryName: countryName, dateType: dateType, cInvCode: cInvCode},
             dataType:"json"
         }).done(function(data){
+            Utils.close();
 
             var crSeriesData = [];
 

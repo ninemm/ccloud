@@ -61,7 +61,6 @@
 
 </#macro>
 <#macro script>
-    Utils.loading();
     $(function() {
         lMap(dateType);
         customer(provName, cityName, '', dateType);
@@ -125,6 +124,7 @@
 
     //地图
     function lMap(dateType){
+        Utils.loading();
 
         var longitude = $.cookie(Utils.longitudeCache);
         var latitude = $.cookie(Utils.latitudeCache);
@@ -180,12 +180,15 @@
     
     //终端产品详细
     function product_customerId(dateType, customerId, customerName){
+      Utils.loading();
       $.ajax({
             url:"${CPATH}/sales/productByCustomerId",
             type:"post",
             data:{dateType: dateType, customerId: customerId},
             dataType:"json"
         }).done(function(data){
+            Utils.close();
+
             var tpTitle = customerName + '销售情况';
             var $p = $("#p_customerId_product");
             var $customerName = $("#customer-name");
@@ -213,6 +216,7 @@
     var customerRankChart = echarts.init(customer_rank);
     
     function customer(provName, cityName, countryName, dateType){
+        Utils.loading();
         $.ajax({
             url:"${CPATH}/sales/customerType",
             type:"post",
@@ -242,7 +246,7 @@
             if((provName + cityName + countryName).trim() != '' ){
                 crTitle = provName + cityName + countryName + crTitle;
             } else {
-                crTitle = '' + crTitle;
+                crTitle = '全国' + crTitle;
             }
             var $p = $("#p_customer_rank");
             $p.empty();
@@ -291,6 +295,7 @@
     }
     
     function customerClick(obj){
+        Utils.loading();
         var selected = obj.selected;
         var typeName = obj.name;
 
@@ -327,11 +332,13 @@
             data:{provName: provName, cityName: cityName, countryName: countryName, dateType: dateType, customerTypeName: customerTypeName},
             dataType:"json"
         }).done(function(data){
+            Utils.close();
+
             var prTitle = customerTypeName + '产品销售排行';
             if((provName + cityName + countryName).trim() != '' ){
                 prTitle = provName + cityName + countryName + prTitle;
             } else {
-                prTitle = '' + prTitle;
+                prTitle = '全国' + prTitle;
             }
             var $p = $("#p_product_rank");
             $p.empty();
@@ -356,6 +363,8 @@
             data:{provName: provName, cityName: cityName, countryName: countryName, dateType: dateType, customerTypeName: customerTypeName},
             dataType:"json"
         }).done(function(data){
+            Utils.close();
+
             var areaYData = [];
             var areaSeriesData = [];
             var area_rank = document.getElementById('area_rank');
@@ -380,7 +389,7 @@
             if((provName + cityName + countryName).trim() != '' ){
                 areaTitle = provName + cityName + countryName + areaTitle;
             } else {
-                areaTitle = '' + areaTitle;
+                areaTitle = '全国' + areaTitle;
             }
             var $p = $("#p_area_rank");
             $p.empty();

@@ -50,7 +50,6 @@
 </#macro>
 <#macro script>
     $(function() {
-        Utils.loading();
         product(provName, cityName, '', dateType);
 
         initTopHoverTree("gotop", 100, 10, 50);
@@ -58,7 +57,6 @@
         $('#goback').on('click', function() {
             historyUtils.back();
         });
-        Utils.close();
     });
     var provName = $.cookie(Utils.provCacheName);
     var cityName = $.cookie(Utils.cityCacheName);
@@ -80,6 +78,7 @@
     
     //产品选择
     function setProduct(Code, Name){
+        Utils.loading();
         cInvCode = Code;
         cInvName = Name;
         area_rank(provName, cityName, '', dateType, cInvCode, cInvName);
@@ -88,18 +87,20 @@
     
     //产品
     function product(provName, cityName, countryName, dateType){
+        Utils.loading();
         $.ajax({
             url:"${CPATH}/sales/product",
             type:"post",
             data:{"provName": provName, "cityName": cityName, countryName: countryName, dateType: dateType},
             dataType:"json"
         }).done(function(data){
+            Utils.close();
 
             var prTitle = '产品销售排行';
             if((provName + cityName + countryName).trim() != '' ){
                 prTitle = provName + cityName + countryName + prTitle;
             } else {
-                prTitle = '' + prTitle;
+                prTitle = '全国' + prTitle;
             }
             var $p = $("#p_product_rank");
             $p.empty();
@@ -127,6 +128,8 @@
             data:{provName: provName, cityName: cityName, countryName: countryName, dateType: dateType, cInvCode: cInvCode},
             dataType:"json"
         }).done(function(data){
+            Utils.close();
+
             var areaYData = [];
             var areaSeriesData = [];
             var area_rank = document.getElementById('area_rank');
@@ -210,6 +213,7 @@
             data:{"provName": provName, "cityName": cityName, countryName: countryName, dateType: dateType, cInvCode: cInvCode},
             dataType:"json"
         }).done(function(data){
+            Utils.close();
 
             var crSeriesData = [];
 

@@ -652,8 +652,10 @@ public class SalesFactQuery extends JBaseQuery {
         if(divideFlg == 1) {
             sqlBuilder.append(", TRUNCATE(SUM(totalSales)/1000000, 2) as totalAmount");
         } else if(divideFlg == 2){
-            sqlBuilder.append(", TRUNCATE(SUM(totalSales)/4000000, 2) as totalAmount");
+            sqlBuilder.append(", TRUNCATE(SUM(totalSales)/10000000, 2) as totalAmount");
         } else if(divideFlg == 3){
+            sqlBuilder.append(", TRUNCATE(SUM(totalSales)/4000000, 2) as totalAmount");
+        } else if(divideFlg == 4){
             sqlBuilder.append(", TRUNCATE(SUM(totalSales)/2000000, 2) as totalAmount");
         } 
 

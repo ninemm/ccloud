@@ -76,10 +76,8 @@
      
 </#macro>
 <#macro script>
-    Utils.loading();
-
     var strKit = new StrKit();
-    
+
     var $dateTitle = $('#date-title');
     var provName = $.cookie(Utils.provCacheName);
     var cityName = $.cookie(Utils.cityCacheName);
@@ -95,7 +93,7 @@
     
     $(function() {
         curProvTitle = strKit.convertProvName(provName);
-        
+
         if(countryName.length != 0) {
             renderCityMap({"name": cityName}, curProvTitle);
             //provName = provName + "省";
@@ -455,7 +453,6 @@
             data: {dateType: dateType},
             dataType:"json"
         }).done(function(data) {
-
             prov_data = [];
             for(var i = 0; i < data.length; i++) {
                 prov_data.push({
@@ -923,6 +920,7 @@
     }
     
     function initData(provName, cityName, countryName, dateType) {
+        Utils.loading();
         // 客户类型
         customer_rank(provName, cityName, countryName, dateType);
         // 客户区域
