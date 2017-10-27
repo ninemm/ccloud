@@ -15,22 +15,31 @@
  */
 package org.ccloud.controller.admin;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.Customer;
+import org.ccloud.model.Department;
+import org.ccloud.model.ModelSorter;
+import org.ccloud.model.User;
 import org.ccloud.model.query.CustomerJoinCustomerTypeQuery;
 import org.ccloud.model.query.CustomerQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
+import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.UserJoinCustomerQuery;
+import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
 
+import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
@@ -57,8 +66,10 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 			keyword = StringUtils.urlDecode(keyword);
 		}
 
+		User user = getSessionAttr("user");
+
 		Page<Record> page = CustomerQuery.me().paginate(getPageNumber(), getPageSize(), keyword, "create_date",
-				paraMap, null, null);//TODO
+				paraMap, user.getDepartmentId(), user.getDataArea());
 		List<Record> customerList = page.getList();
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", customerList);
@@ -82,14 +93,76 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 	@Override
 	public void edit() {
 		String id = getPara("id");
+
+		User user = getSessionAttr("user");
+
 		if (StrKit.notBlank(id)) {
 			setAttr("customer", CustomerQuery.me().findById(id));
 			setAttr("cTypeList", CustomerJoinCustomerTypeQuery.me().findCustomerTypeListByCustomerId(id));
-			setAttr("cUserIdList", UserJoinCustomerQuery.me().findUserListByCustomerId(id, null, null));//TODO
+
+			StringBuilder cUserIds = new StringBuilder();
+			StringBuilder cUserNames = new StringBuilder();
+			List<Record> list = UserJoinCustomerQuery.me().findUserListByCustomerId(id, user.getDepartmentId(),
+					user.getDataArea());
+			for (Record record : list) {
+				if (cUserIds.length() != 0 || cUserIds.length() != 0) {
+					cUserIds.append(",");
+					cUserNames.append(",");
+				}
+				cUserIds.append(record.get("user_id"));
+				cUserNames.append(record.get("realname"));
+
+			}
+			setAttr("cUserIds", cUserIds);
+			setAttr("cUserNames", cUserNames);
 		}
 		setAttr("customerTypeList", CustomerTypeQuery.me().findCustomerTypeList());
-		setAttr("userIdList", UserJoinCustomerQuery.me().findUserListByCustomerId(id, null, null));
+
 		render("edit.html");
+	}
+	
+	public void user_tree() {
+		
+		List<Department> list = DepartmentQuery.me().findDeptList("order_list asc");
+		List<Map<String, Object>> resTreeList = new ArrayList<Map<String, Object>>();
+		ModelSorter.tree(list);
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("text", "总部");// 父子表第一级名称,以后可以存储在字典表或字典类
+		map.put("tags", Lists.newArrayList(0));
+		map.put("nodes", doBuild(list)); 
+		resTreeList.add(map);
+		
+		setAttr("treeData", JSON.toJSON(resTreeList));
+	}
+	
+	private List<Map<String, Object>> doBuild(List<Department> list) {
+		List<Map<String, Object>> resTreeList = new ArrayList<Map<String, Object>>();
+		for(Department dept : list) {
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("text", dept.getDeptName());
+			map.put("tags", Lists.newArrayList(dept.getId()));
+			resTreeList.add(map);
+
+			map.put("nodes", addUser(dept.getId()));
+			
+			if(dept.getChildList() != null && dept.getChildList().size() > 0) {
+				map.put("nodes", doBuild(dept.getChildList()));
+			}
+		}
+		return resTreeList;
+	}
+	
+	private List<Map<String, Object>> addUser(String deptId) {
+		List<Map<String, Object>> resTreeList = new ArrayList<Map<String, Object>>();
+		List<User> list = UserQuery.me().findByDeptId(deptId);
+		for(User user : list) {
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("text", user.getRealname());
+			map.put("tags", Lists.newArrayList(user.getId(), "user"));
+			resTreeList.add(map);
+			
+		}
+		return resTreeList;
 	}
 	
 	@Override
@@ -105,7 +178,10 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 		customer.setCountryCode(getPara("userDistrictId"));
 		customer.setCountryName(getPara("userDistrictText"));
 		String[] customerTypes = getParaValues("customerTypes");
-		String[] userIds = getParaValues("userIds");
+		String userId = getPara("userIds");
+		String[] userIds = userId.split(",");
+		
+//		User user = getSessionAttr("user");
 
 		CustomerJoinCustomerTypeQuery.me().deleteByCustomerId(customerId);
 		UserJoinCustomerQuery.me().deleteByCustomerId(customerId);
@@ -125,12 +201,17 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 		}
 
 		if (userIds != null) {
-			for (String userId : userIds) {
-				UserJoinCustomerQuery.me().insert(customerId, userId, null, null);// TODO
+			for (String id : userIds) {
+				User user = UserQuery.me().findById(id);
+				UserJoinCustomerQuery.me().insert(customerId, id, user.getDepartmentId(), user.getDataArea());
 			}
 		}
 
 		renderAjaxResultForSuccess();
 
 	}
+
+//	private void setUserJoinCustomer() {
+//		UserJoinCustomerQuery.me().insert(customerId, userId, user.getDepartmentId(), user.getDataArea());
+//	}
 }
