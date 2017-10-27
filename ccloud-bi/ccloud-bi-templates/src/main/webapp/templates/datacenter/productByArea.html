@@ -15,8 +15,13 @@ center; vertical-align: middle!important; }
 
 <#macro script>
 
+    $(function(){
+        Utils.close();
+
+        initTopHoverTree("gotop", 100, 10, 50);
+    });
+
     $('#goback').on('click', function() { historyUtils.back(); });
-    initTopHoverTree("gotop", 100, 10, 50);
     
     //共通post
     function post(URL, PARAMS)

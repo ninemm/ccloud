@@ -56,7 +56,6 @@
     <script type="text/javascript" src="${CTPATH}/js/convertor.js"></script>
 </#macro>
 <#macro script>
-    Utils.loading();
     $(function() {
         mapLocation(false);
         topTotal(provName, cityName, countryName);
@@ -71,7 +70,6 @@
     var dateType = '0';
     
     var option = null;
-    var geoCoordMap = {};
     var color = ['#a6c84c', '#ffa022', '#46bee9'];
     
     var mapDataUrl = '';
@@ -190,6 +188,7 @@
     }
 
     function total(provName, cityName, countryName, dateType){
+        Utils.loading();
         countryName = '';
         $.ajax({
             url:"${CPATH}/total",
@@ -197,7 +196,6 @@
             data:{"provName": provName, "cityName": cityName, countryName: countryName, dateType: dateType},
             dataType:"json"
         }).done(function(data){
-
             Utils.close();
 
             orderAvg(data.orderAvg, countryName);
@@ -226,14 +224,22 @@
         title: "请选择位置",
         //showDistrict: false,
         onChange: function (picker, values, displayValues) {
-            $("#city-name").text(displayValues[1]);
+            if(displayValues[1] == ''|| displayValues[1] == '全省'){
+                $("#city-name").text(displayValues[0]);
+            } else {
+                $("#city-name").text(displayValues[1]);
+            }
         },
         onClose: function (picker) {
             
             provName = picker.displayValue[0];
             cityName = picker.displayValue[1];
             countryName = picker.displayValue[2];
-            if(cityName == "全部"){
+            if(provName == "全国"){
+                provName = ''
+            }
+            
+            if(cityName == "全省"){
                 cityName = ''
             }
 
@@ -260,8 +266,8 @@
             total(provName, cityName, countryName, dateType);
 
             curProvName = strKit.convertProvName(provName);
-            
-            mapDataUrl = '${CTPATH}/json/'+cityMap[curProvName]+'/'+ (cityMap[cityName] != undefined ? cityMap[cityName] : cityMap[curProvName]) +'.json';
+
+            mapDataUrl = getMapDataUrl();
             loadOrderData();
         }
     });
@@ -393,8 +399,12 @@
         });
 
         var point = '武昌区';
-        if(cityName == '黄石市') {
-          point = '大冶市'
+        if(provName == '') {
+          point = '湖北省'
+        } else if(cityName == '黄石市') {
+          point = '大冶市';
+        } else if(cityName == '长沙市') {
+          point = '雨花区';
         } else if(cityName == '') {
           point = '黄石市';
         }
@@ -454,6 +464,7 @@
     }
     
     var getMapData = function(areaData, series, myChart) {
+        var geoCoordMap = {};
 
         $.getJSON(mapDataUrl, function(data) {
             
@@ -485,7 +496,7 @@
                         curveness: 0.2
                     }
                 },
-                data: convertData(areaData)
+                data: convertData(areaData, geoCoordMap)
             }, {
                 name: cityName + ' Top10',
                 type: 'lines',
@@ -505,7 +516,7 @@
                         curveness: 0.2
                     }
                 },
-                data: convertData(areaData)
+                data: convertData(areaData, geoCoordMap)
             }, {
                 name: cityName + ' Top10',
                 type: 'effectScatter',
@@ -530,9 +541,10 @@
                     }
                 },
                 data: areaData.map(function(dataItem) {
+                    var name = strKit.convertProvName(dataItem[1].name);
                     return {
-                        name: dataItem[1].name,
-                        value: geoCoordMap[dataItem[1].name].concat([dataItem[1].value])
+                        name: name,
+                        value: geoCoordMap[name].concat([dataItem[1].value])
                     };
                 })
             });
@@ -547,7 +559,7 @@
         });
     }
     
-    var convertData = function(data) {
+    var convertData = function(data, geoCoordMap) {
         var res = [];
         for (var i = 0; i < data.length; i++) {
             var dataItem = data[i];
@@ -564,6 +576,15 @@
         }
         return res;
     };
+    
+    function getMapDataUrl() {
+
+        if(cityMap[curProvName] == undefined){
+            return '${CTPATH}/json/china.json';
+        }
+
+        return '${CTPATH}/json/'+cityMap[curProvName]+'/'+ (cityMap[cityName] != undefined ? cityMap[cityName] : cityMap[curProvName]) +'.json';
+    }
     
 
 </#macro>

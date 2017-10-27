@@ -89,5 +89,8 @@ public class ProductGoodsSpecificationValueQuery extends JBaseQuery {
 		return 0;
 	}
 
-	
+	public int deleteByPId(String id) {
+		return DAO.doDelete("product_set_id = ?", id);
+	}
+
 }

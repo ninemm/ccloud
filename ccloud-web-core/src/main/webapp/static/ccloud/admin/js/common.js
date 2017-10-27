@@ -205,6 +205,63 @@ jQuery.mm = {
 		});
 	},	
 	
+	initMultiTreeView: function(treeId, data, nodeSelectedFunc, nodeUnselectedFunc) {
+		treeId = treeId || '#tree';
+		
+		$(treeId).treeview({
+			data : data,
+			levels : 2,
+			showBorder : false,
+			showCheckbox : true,
+			multiSelect : true,
+			//showTags: true,
+			onNodeSelected: nodeSelectedFunc || function(event, data) {
+				$(treeId).treeview('checkNode', [data.nodeId, { silent: true }]);
+				$(treeId).treeview('selectNode', [data.nodeId, { silent: true }]);
+				if(data.nodes != null) {
+					var arrayInfo = data.nodes;
+					for (var i = 0; i < arrayInfo.length; i++) {
+						$(treeId).treeview('toggleNodeChecked', [ arrayInfo[i].nodeId, { silent: true } ]);
+						$(treeId).treeview('toggleNodeSelected', [ arrayInfo[i].nodeId, { silent: true } ]);
+					}
+				}
+			},
+			onNodeUnselected: nodeUnselectedFunc || function(event, data) {
+				$(treeId).treeview('uncheckNode', [data.nodeId, { silent: true }]);
+				$(treeId).treeview('unselectNode', [data.nodeId, { silent: true }]);
+				if(data.nodes != null) {
+					var arrayInfo = data.nodes;
+					for (var i = 0; i < arrayInfo.length; i++) {
+						$(treeId).treeview('toggleNodeChecked', [ arrayInfo[i].nodeId, { silent: true } ]);
+						$(treeId).treeview('toggleNodeSelected', [ arrayInfo[i].nodeId, { silent: true } ]);
+					}
+				}
+			},
+			onNodeChecked: nodeSelectedFunc || function(event, data) {
+				$(treeId).treeview('checkNode', [data.nodeId, { silent: true }]);
+				$(treeId).treeview('selectNode', [data.nodeId, { silent: true }]);
+				if(data.nodes != null) {
+					var arrayInfo = data.nodes;
+					for (var i = 0; i < arrayInfo.length; i++) {
+						$(treeId).treeview('toggleNodeChecked', [ arrayInfo[i].nodeId, { silent: true } ]);
+						$(treeId).treeview('toggleNodeSelected', [ arrayInfo[i].nodeId, { silent: true } ]);
+					}
+				}
+			},
+			onNodeUnchecked: nodeUnselectedFunc || function(event, data) {
+				$(treeId).treeview('uncheckNode', [data.nodeId, { silent: true }]);
+				$(treeId).treeview('unselectNode', [data.nodeId, { silent: true }]);
+				if(data.nodes != null) {
+					var arrayInfo = data.nodes;
+					for (var i = 0; i < arrayInfo.length; i++) {
+						$(treeId).treeview('toggleNodeChecked', [ arrayInfo[i].nodeId, { silent: true } ]);
+						$(treeId).treeview('toggleNodeSelected', [ arrayInfo[i].nodeId, { silent: true } ]);
+					}
+				}
+			}
+		});
+	},	
+	
 	initValidator: function(formId, fields) {
 		formId = formId || '#form';
 		$(formId).bootstrapValidator({

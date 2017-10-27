@@ -40,6 +40,7 @@
         }
       }
     }
+    return []
   };
 
   var parseInitValue = function (val) {

@@ -107,14 +107,16 @@ public class _GoodsSpecificationController extends JBaseCRUDController<GoodsSpec
 				if (StringUtils.isNotBlank(childIdList[i])) {
 					value.setId(childIdList[i]);
 				}
-				if (imageUrl.length > 0) {
-					if (StringUtils.isNotBlank(imageUrl[i]) && imageUrl[i].equals("add")) {
-						value.setImagePath(AttachmentUtils.moveFile(uploadFiles.get(update)).replace("\\", "/"));
-						update++;
-					}
-				} else {
-					if (uploadFiles.size() > 0) {
-						value.setImagePath(AttachmentUtils.moveFile(uploadFiles.get(i)).replace("\\", "/"));
+				if (ccGoodsSpecification.getType().equals("1")) {
+					if (imageUrl.length > 0) {
+						if (StringUtils.isNotBlank(imageUrl[i]) && imageUrl[i].equals("add")) {
+							value.setImagePath(AttachmentUtils.moveFile(uploadFiles.get(update)).replace("\\", "/"));
+							update++;
+						}
+					} else {
+						if (uploadFiles.size() > 0) {
+							value.setImagePath(AttachmentUtils.moveFile(uploadFiles.get(i)).replace("\\", "/"));
+						}
 					}
 				}
 				if (StringUtils.isNotBlank(orderList[i])) {

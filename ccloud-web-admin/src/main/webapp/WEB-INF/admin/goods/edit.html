@@ -28,6 +28,21 @@ $(function() {
 	
 	jQuery.mm.initValidator('#form', validatorFields)
 	
+	$('#_category_tree').click(function() {
+		var brandId = $("#brand_id").find("option:selected").val();
+		if (brandId != null && brandId != "") {
+			layer.open({
+				title:'上级分类',
+			    type: 2,
+			    area: ['580px', '530px'],
+			    fix: false, //不固定
+			    content: '${CPATH}/admin/goods/category_tree?id='+brandId
+			});			
+		} else {
+			toastr.error(data.message,'请选择品牌!');
+		}
+	});	
+	
 	tinymce.init({
         selector: '#content',
         height: 365,
@@ -315,22 +330,6 @@ $(function() {
 		}
 	});	
 	
-	$("#brand_id").change(function() {
-		var brandId = $("#brand_id").find("option:selected").val(); 
-		$("#category_id").empty().append("<option value=''>--请选择--</option>");
-		$.ajax({
-			url:"${CPATH}/admin/goods/getCategory",
-			type:"post",
-			data:{"brandId":brandId},
-			dataType:"json",
-			success:function(data) {
-				for (var i = 0; i < data.length; i++) {
-					$("#category_id").append("<option value=" + data[i].id + ">" + data[i].name + "</option>");
-				}
-			}
-		});
-	});
-	
 	$("#typeChoose").change(function() {
 		var type = $("#typeChoose").find("option:selected").val(); 
 		$("#attribute").empty();
@@ -383,11 +382,6 @@ var validatorFields = {
 			notEmpty: { message: '请选择品牌' },
         }
 	},
-	'goods.goods_category_id': {
-		validators: {
-			notEmpty: { message: '请选择分类' },
-        }
-	},
 	'goods.goods_type_id': {
 		validators: {
 			notEmpty: { message: '请选择类型' },
@@ -397,6 +391,11 @@ var validatorFields = {
 		validators: {
 			notEmpty: { message: '请选择是否上架' },
         }	
+	},
+	'parentName': {
+		validators: {
+			notEmpty: { message: '商品分类不能为空' }
+        }
 	}
 };
 
@@ -527,12 +526,13 @@ function doSubmit(){
 							<div class="form-group col-sm-12 validata-box">
 								<label class="control-label col-sm-2">分类:</label>
 								<div class="input-group col-md-4 col-sm-10">
-									<select class="form-control input-sm" name="goods.goods_category_id" id="category_id">
-										<option value="">--请选择--</option>
-										<#list (clist)! as category >
-											<option value="${category.id}" <#if goods?? && category.id == goods.goods_category_id>selected="selected"</#if>>${(category.name)!}</option>
-										</#list>								
-									</select>
+									<div class="input-group">
+										<input type="hidden" name="goods.goods_category_id" id="parent_id" value="${(goods.goods_category_id)!}">
+					                 	<input class="form-control input-sm" type="text" id="parent_name" name="parentName" readOnly value="${(goods.parent_name)!}">
+				                 		<div class="input-group-addon" id="_category_tree" style="cursor:pointer;">
+				                 			<i class="fa fa-search"></i> 选择
+										</div>
+				                 	</div>
 				               	</div>
 							</div>
 							<div class="form-group col-sm-12 validata-box">
@@ -850,11 +850,13 @@ function doSubmit(){
 				</table>	        
 	        </div>
 	        <div class="tab-pane fade" id="C">  
-				<div class="form-group col-sm-12 validata-box">
-					<label class="control-label col-sm-2">商品详情:</label>
-					<div class="input-group col-md-6 col-sm-10">
-	                 	<textarea id="content" name="content" style="width:100%;height:400px;">${(goods.content)!}</textarea>
-	               	</div>
+		        <div class="box-body">
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">商品详情:</label>
+						<div class="input-group col-md-6 col-sm-10">
+		                 	<textarea id="content" name="content" style="width:100%;height:400px;">${(goods.content)!}</textarea>
+		               	</div>
+					</div>
 				</div>
 	        </div> 
 	        <div class="tab-pane fade" id="D">

@@ -27,6 +27,7 @@ import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
+import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.StringUtils;
 
 import com.alibaba.fastjson.JSON;
@@ -74,7 +75,9 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 	public void save() {
 
 		final Department dept = getModel(Department.class);
-		this.dataAreaSet(dept);// 生成数据域
+		Department parent = DepartmentQuery.me().findById(dept.getParentId());
+		String dataArea = DataAreaUtil.dataAreaSetByDept(dept.getDeptLevel(), parent.getDataArea());
+		dept.setDataArea(dataArea);// 生成数据域
 		dept.setIsParent(0);
 
 		if (dept.saveOrUpdate()) {
@@ -83,12 +86,6 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 		} else {
 			renderAjaxResultForError("false");
 		}
-	}
-	
-	private void dataAreaSet(Department department) {
-		Department parent = DepartmentQuery.me().findById(department.getParentId());
-		String dataArea = String.format("%02d", parent.getDeptLevel()) + String.format("%02d", department.getDeptLevel());
-		department.setDataArea(dataArea);
 	}
 
 	@Override

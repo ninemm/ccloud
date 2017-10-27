@@ -19,16 +19,14 @@
 <#macro script>
 
 	var $table = $("#_customer_table");
+	var url = '${CPATH}/admin/customer/list';
 
 	$(function() {
-
-		var url = '${CPATH}/admin/customer/list';
-
 		jQuery.mm.initEditTable('#_customer_table', url, initParams, initFields(), null);
-		$("#search-submit").click(function() {
-			$table.bootstrapTable('refresh');
-		});
+	});
 
+	$("#search-submit").click(function() {
+		$table.bootstrapTable('refresh');
 	});
 
 	var initParams = function(params) {
