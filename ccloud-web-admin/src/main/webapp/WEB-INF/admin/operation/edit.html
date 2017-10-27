@@ -3,11 +3,13 @@
 <#macro script_import>
 	<!-- bootstrapvalidator -->
  	<script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
+ 	<script src="${CPATH}/static/plugins/select2/js/select2.js"></script>
 </#macro>
 
 <#macro css_import>
 	<!-- bootstrapvalidator -->
     <link rel="stylesheet" href="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.css">
+    <link rel="stylesheet" href="${CPATH}/static/plugins/select2/css/select2.css">
 </#macro>
 
 <#macro css>
@@ -18,12 +20,29 @@
 </#macro>
 
 <#macro script>
+	$("#assignRole").select2();
+	$("#assignStation").select2();
 
 	var $form = $("#form");
 	$(function() {
 	
 	jQuery.mm.initValidator('#form', validatorFields)
-	
+	$.ajax({
+		url:"${CPATH}/admin/operation/getRoleAndStation",
+		type:"post",
+		data:{"id":'${(operation.id)!}'},
+		dataType:"json",
+		success:function(data) {
+			var role = data.roles;
+			for (var i = 0; i < role.length; i++) {
+				if (role[i].isvalid == 0 ) {
+					$("#assignRole").append("<option value=" + role[i].id + ">" + role[i].name + "</option>");
+				} else {
+					$("#assignRole").append("<option value=" + role[i].id + " selected >" + role[i].name + "</option>");
+				}
+			}
+		}
+	});	
 	
 	$('#_module_tree').click(function() {
 			layer.open({
@@ -35,7 +54,15 @@
 			});
 		});
 		
-	
+	$('#_station_tree').click(function() {
+		layer.open({
+			title:'岗位资源',
+			type: 2,
+			area: ['580px', '530px'],
+			fix: false, //不固定
+			content: '${CPATH}/admin/operation/station_tree'
+		});
+	});	
 	
 });
 	
@@ -46,6 +73,11 @@
 	            notEmpty: { message: '所属模块不能为空' }
 	        }
 		},
+		'operation.station_name': {
+			validators: {
+	            notEmpty: { message: '岗位不能为空' }
+	        }
+		},		
 		'operation.operation_name': {
 			validators: {
 	            notEmpty: { message: '功能名称不能为空' },
@@ -63,6 +95,12 @@
 	
 
 	function doSubmit(){
+		var rlist = $("#assignRole").select2("val");
+		var roleIds = "";
+		if (rlist != null && rlist.length > 0) {
+			roleIds = rlist.toString();
+		}
+		
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
 				var validate = $form.data('bootstrapValidator');
@@ -70,6 +108,7 @@
 				return validate.isValid();
 			},
 			type : "post", 
+			data : { "roleList":roleIds },
 			dataType : "json", 
 			success : function(data) { 
 				if(data.errorCode == 0) {
@@ -125,6 +164,27 @@
 								</div>
 		                 	</div>
 		               	</div>
+					</div>
+					
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">岗位:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<div class="input-group">
+								<input type="hidden" name="station_id" id="station_id" value="${(station.parentId)!}">
+								<input class="form-control input-sm" type="text" id="station_name" name="station_name" value="${(station.parent_name)!}" placeholder="请选择上级岗位"readonly>
+								<div class="input-group-addon" id="_station_tree">
+									<i class="fa fa-search"></i> 选择
+								</div>
+							</div>
+						</div>
+					</div>					
+					
+					<div class="form-group col-sm-12">
+						<label class="control-label col-sm-2">分配角色:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<select class="form-control input-sm" id="assignRole" multiple="multiple" >
+							</select>
+						</div>
 					</div>
 					
 					<div class="form-group col-sm-12 validata-box">
