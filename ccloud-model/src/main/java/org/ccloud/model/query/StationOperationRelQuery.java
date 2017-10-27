@@ -97,4 +97,8 @@ public class StationOperationRelQuery extends JBaseQuery {
 		return 0;
 	}
 
+	public int deleteByOperationId(String operationId) {
+		return DAO.doDelete(" operation_id = ?", operationId);
+	}
+
 }
