@@ -22,7 +22,13 @@ public class ActReProcdefQuery {
 	 * @param pagesize
 	 * @return
 	 */
-	public Page<ActReProcdef> getDefPage(Integer curr , Integer pagesize){
-		return DAO.paginate(curr, pagesize, "select * ", " from (select def.*,dep.DEPLOY_TIME_ from act_re_procdef def ,act_re_deployment dep where def.DEPLOYMENT_ID_=dep.ID_ ORDER BY VERSION_ DESC) a group by KEY_");
+	public Page<ActReProcdef> getDefPage(Integer pageNumber , Integer pageSize) {
+		
+		String select = "select def.*, dep.DEPLOY_TIME_";
+		StringBuilder fromBuilder = new StringBuilder("from `act_re_procdef` def ");
+		fromBuilder.append("left join `act_re_deployment` dep on def.DEPLOYMENT_ID_=dep.ID_ ");
+		fromBuilder.append("ORDER BY VERSION_ DESC");
+		
+		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 	}
 }

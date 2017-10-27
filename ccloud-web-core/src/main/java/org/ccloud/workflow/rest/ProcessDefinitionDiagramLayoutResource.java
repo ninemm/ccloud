@@ -13,14 +13,18 @@
 
 package org.ccloud.workflow.rest;
 
+import org.ccloud.route.RouterMapping;
+import org.ccloud.workflow.rest.BaseProcessDefinitionDiagramLayoutResource;
+
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class ProcessDefinitionDiagramLayoutResource extends BaseProcessDefinitionDiagramLayoutResource  {
+@RouterMapping(url = "/admin/process-definition/diagram-layout")
+public class ProcessDefinitionDiagramLayoutResource extends BaseProcessDefinitionDiagramLayoutResource {
 
-  public void getDiagram() {
-	  String processDefinitionId = getPara("processDefinitionId");
-	  String callback = getPara("callback").toString();
-	  ObjectNode node = getDiagramNode(null, processDefinitionId);
-	  renderJson(callback+"("+node.toString()+")");
-  }
+	public void getDiagram() {
+		String processDefinitionId = getPara("processDefinitionId");
+		String callback = getPara("callback").toString();
+		ObjectNode node = getDiagramNode(null, processDefinitionId);
+		renderJson(callback + "(" + node.toString() + ")");
+	}
 }

@@ -13,11 +13,15 @@
 
 package org.ccloud.workflow.rest;
 
-public class ProcessInstanceDiagramLayoutResource extends BaseProcessDefinitionDiagramLayoutResource {
+import org.ccloud.route.RouterMapping;
+import org.ccloud.workflow.rest.BaseProcessDefinitionDiagramLayoutResource;
 
-  public void getDiagram() {
-	  String processInstanceId = getPara("processInstanceId");
-	  String callback = getPara("callback").toString();
-	  renderJson(callback+"("+getDiagramNode(processInstanceId, null).toString()+")");
-  }
+@RouterMapping(url = "/admin/process-instance/diagram-layout")
+public class ProcessInstanceDiagramLayoutResourceController extends BaseProcessDefinitionDiagramLayoutResource {
+
+	public void getDiagram() {
+		String processInstanceId = getPara("processInstanceId");
+		String callback = getPara("callback").toString();
+		renderJson(callback + "(" + getDiagramNode(processInstanceId, null).toString() + ")");
+	}
 }
