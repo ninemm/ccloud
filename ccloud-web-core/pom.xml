@@ -68,7 +68,7 @@
 		<dependency>
 			<groupId>org.ccloud</groupId>
 			<artifactId>ccloud-model</artifactId>
-			<version>0.0.1</version>
+			<version>${project.version}</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
