@@ -46,6 +46,10 @@ public class Consts {
 	public static final String ATTR_GLOBAL_META_DESCRIPTION = "META_DESCRIPTION";
 
 	public static final String SESSION_WECHAT_USER = "_wechat_user";
+	public static final String SESSION_WECHAT_ACCESS_TOKEN = "_wechat_access_token";
+	public static final String SESSION_WECHAT_OPEN_ID = "_wechat_open_id";
+	public static final String ATTR_USER_OBJECT = "_user_object";
+	public static final String SESSION_WECHAT_JSAPI_TICKET = "_jsapi_ticket";
 
 	public static final String MODULE_ARTICLE = "article"; // 文章模型
 	public static final String MODULE_PAGE = "page"; // 页面模型

@@ -58,7 +58,8 @@ public class AdminMenuInitListener implements MessageListener {
 		menuManager.addMenuGroup(createRoleResMenuGroup());
 		menuManager.addMenuGroup(createDataMenuGroup());
 		menuManager.addMenuGroup(createSettingMenuGroup());
-		menuManager.addMenuGroup(createToolsMenuGroup()); 
+		//menuManager.addMenuGroup(createToolsMenuGroup());
+		
 	}
 
 	public void initModuleMenuGroup(MenuManager menuMnager) {
@@ -131,7 +132,7 @@ public class AdminMenuInitListener implements MessageListener {
 			group.addMenuItem(new MenuItem("outline", "/admin/stat/outline", "统计概要"));
 			group.addMenuItem(new MenuItem("in", "/admin/stat", "入库明细"));
 			group.addMenuItem(new MenuItem("out", "/admin/stat", "出库明细"));
-			
+			group.addMenuItem(new MenuItem("druid", "/admin/monitor/sql", "SQL分析"));
 		}
 		
 		return group;
@@ -240,17 +241,17 @@ public class AdminMenuInitListener implements MessageListener {
 		return group;
 	}
 
-	private MenuGroup createToolsMenuGroup() {
-		MenuGroup group = new MenuGroup("tools", "fa fa-wrench", "工具");
-
-		{
-			group.addMenuItem(new MenuItem("import", "/admin/tools/_import", "导入"));
-			group.addMenuItem(new MenuItem("export", "/admin/tools/export", "导出"));
-			group.addMenuItem(new MenuItem("sync", "/admin/tools/sync", "同步"));
-			
-		}
-		return group;
-	}
+//	private MenuGroup createToolsMenuGroup() {
+//		MenuGroup group = new MenuGroup("tools", "fa fa-wrench", "工具");
+//
+//		{
+//			group.addMenuItem(new MenuItem("import", "/admin/tools/_import", "导入"));
+//			group.addMenuItem(new MenuItem("export", "/admin/tools/export", "导出"));
+//			group.addMenuItem(new MenuItem("sync", "/admin/tools/sync", "同步"));
+//			
+//		}
+//		return group;
+//	}
 	
 	private MenuGroup createGoodsMenuGroup() {
 		MenuGroup group = new MenuGroup("goods", "fa fa-shopping-bag", "商品管理");
@@ -267,6 +268,6 @@ public class AdminMenuInitListener implements MessageListener {
 			
 		}
 		return group;
-	}	
-
+	}
+	
 }

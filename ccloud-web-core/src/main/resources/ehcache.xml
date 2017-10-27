@@ -100,6 +100,28 @@
 		   overflowToDisk="true"
 		   diskPersistent="true"
 	/>
+	
+	<cache name="content"
+           maxEntriesLocalHeap="500"
+           eternal="false"
+           overflowToDisk="true"
+           timeToIdleSeconds="300"
+           timeToLiveSeconds="600"
+           diskPersistent="true"
+           diskExpiryThreadIntervalSeconds="1"
+           memoryStoreEvictionPolicy="LFU"
+    />
+    
+    <cache name="content_list"
+           maxEntriesLocalHeap="500"
+           eternal="false"
+           overflowToDisk="true"
+           timeToIdleSeconds="300"
+           timeToLiveSeconds="600"
+           diskPersistent="true"
+           diskExpiryThreadIntervalSeconds="1"
+           memoryStoreEvictionPolicy="LFU"
+    />
 
 	<cache name="option"
 		   maxEntriesLocalHeap="5000"
