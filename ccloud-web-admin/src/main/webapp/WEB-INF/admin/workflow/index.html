@@ -90,20 +90,24 @@
     
     //删除
     function deleteDeployment(deployid) {
-        //pointLion.confimMsg("您是否要删除所选信息 ?<br/>删除流程定义,<span style='color:red;'>将清空所有用户发起的流程实例！！！</span>请慎重您的选择！！！ <br/>点击确认进行删除 , 点击取消取消该操作",null,function(){
-        jQuery.mm.del('${CPATH}/admin/workflow/deleteDeployment?ucode=${ucode}&deployid=' + deployid);
+        var message = "您是否要删除所选信息 ?<br/>删除流程定义,<span style='color:red;'>将清空所有用户发起的流程实例！！！</span>请慎重您的选择！！！ <br/>点击确认进行删除 , 点击取消取消该操作";
+        var url = '${CPATH}/admin/workflow/deleteDeployment?ucode=${ucode}';
+        var data = {"deployid": deployid};
+        jQuery.mm.update(message, url, data);
     };
     
     //挂起激活
     function updateState(state, defid) {
         var message = "" 
-        if (state=="suspend") {
+        if (state == "suspend") {
             message = "您是否要将该流程挂起 ?<br/>挂起流程,<span style='color:red;'>该流程对应的业务将暂时使用！！！</span>请慎重您的选择！！！ <br/>点击确认进行挂起 , 点击取消取消该操作";
         } else {
             message = "您将要激活该流程！<br/>激活流程,<span style='color:green;'>该流程对应的业务将开启使用！！！</span> <br/>点击确认进行激活 , 点击取消取消该操作";
         }
         
-        jQuery.mm.ajax("${CPATH}/admin/workflow/updateState", {"state":state, "defid": defid}, "json", null);
+        var url = '${CPATH}/admin/workflow/updateState?ucode=${ucode}';
+        var data = {"state": state, "defid": defid};
+        jQuery.mm.update(message, url, data);
     }
 	
 	function batchAction() {
@@ -118,7 +122,7 @@
 <@layout active_id=p child_active_id=c>
 
 <section class="content-header">
-	<h1>模块管理</h1>
+	<h1>流程管理</h1>
 	<ol class="breadcrumb">
 		<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
        	<li><a href="#">工作流</a></li>

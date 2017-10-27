@@ -37,6 +37,7 @@ var pb1;
 $(document).ready(function(){
   var query_string = {};
   var query = window.location.search.substring(1);
+  console.log("query=" + query)
   var vars = query.split("&");
   for (var i=0;i<vars.length;i++) {
     var pair = vars[i].split("=");
@@ -109,7 +110,8 @@ $(document).ready(function(){
   var baseUrl = window.document.location.protocol + "//" + window.document.location.host + "/";
   var shortenedUrl = window.document.location.href.replace(baseUrl, "");
   baseUrl = baseUrl + shortenedUrl.substring(0, shortenedUrl.indexOf("/"));
-  
+  baseUrl = baseUrl.replace("/static", "");
+
   ActivitiRest.options = {
     processInstanceHighLightsUrl: baseUrl + "/admin/process-instance/highlights/getHighlighted?processDefinitionId="+processDefinitionId+"&processInstanceId="+processInstanceId,
     processDefinitionUrl: baseUrl +       "/admin/process-definition/diagram-layout/getDiagram?processDefinitionId="+processDefinitionId+"&processInstanceId="+processInstanceId,
