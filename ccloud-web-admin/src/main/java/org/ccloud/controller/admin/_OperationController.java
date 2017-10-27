@@ -28,6 +28,7 @@ import org.ccloud.model.Module;
 import org.ccloud.model.Operation;
 import org.ccloud.model.Role;
 import org.ccloud.model.RoleOperationRel;
+import org.ccloud.model.Station;
 import org.ccloud.model.StationOperationRel;
 import org.ccloud.model.query.ModuleQuery;
 import org.ccloud.model.query.OperationQuery;
@@ -77,6 +78,20 @@ public class _OperationController extends JBaseCRUDController<Operation> {
 
 		String id = getPara("id");
 		Operation operation = OperationQuery.me().findById(id);
+		List<Station> slist = StationQuery.me().findByOperationId(id);
+		String stationName = "";
+		String stationId = "";
+		for (int i = 0; i < slist.size(); i++) {
+			if (i == 0) {
+				stationName = slist.get(i).getStationName();
+				stationId = slist.get(i).getId();
+			} else {
+				stationName = stationName + "," + slist.get(i).getStationName();
+				stationId = stationId + "," + slist.get(i).getId();
+			}
+		}
+		setAttr("stationName", stationName);
+		setAttr("stationId", stationId);
 		setAttr("operation", operation);
 	}
 

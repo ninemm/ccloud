@@ -15,7 +15,9 @@
  */
 package org.ccloud.model.query;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.ccloud.model.Operation;
 
@@ -99,6 +101,15 @@ public class OperationQuery extends JBaseQuery {
 		} else {
 			fromBuilder.append(orderbyInfo[1]);
 		}
+	}
+
+	public List<String> getPermissions(List<String> roles) {
+		List<String> permission = new ArrayList<>();
+		for (String string : roles) {
+			List<String> list = RoleOperationRelQuery.me().findUrlByRoleId(string);
+			permission.addAll(list);
+		}
+		return permission;
 	}
 	
 	
