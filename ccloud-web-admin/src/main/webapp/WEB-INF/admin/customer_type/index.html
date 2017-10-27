@@ -19,16 +19,14 @@
 <#macro script>
 
 	var $table = $("#_customerType_table");
+	var url = '${CPATH}/admin/customerType/list';
 
 	$(function() {
-
-		var url = '${CPATH}/admin/customerType/list';
-
 		jQuery.mm.initEditTable('#_customerType_table', url, initParams, initFields(), null);
-		$("#search-submit").click(function() {
-			$table.bootstrapTable('refresh');
-		});
-		
+	});
+
+	$("#search-submit").click(function() {
+		$table.bootstrapTable('refresh');
 	});
 
 	var initParams = function(params) {
@@ -82,13 +80,6 @@
 				}
 			}
 		);
-	}
-
-	function batchAction() {
-		var $form = $("#form");
-		$form.attr("action", "${CPATH}/admin/customerType/batchDelete?ucode=${ucode}&c=${c!}&p=${p!}");
-
-		jQuery.mm.batchAction('#form', '请选择类型记录');
 	}
 
 </#macro>

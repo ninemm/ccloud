@@ -22,6 +22,7 @@ import org.ccloud.model.UserJoinCustomer;
 
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
 /**
@@ -36,18 +37,19 @@ public class UserJoinCustomerQuery extends JBaseQuery {
 		return QUERY;
 	}
 
-	public List<Integer> findUserListByCustomerId(String customerId, String dataOrg, String orgId) {
+	public List<Record> findUserListByCustomerId(String customerId, String dataOrg, String orgId) {
 		LinkedList<Object> params = new LinkedList<Object>();
 
-		StringBuilder sqlBuilder = new StringBuilder(" select c.user_id ");
+		StringBuilder sqlBuilder = new StringBuilder(" select c.user_id, i.realname ");
 		sqlBuilder.append(" from `cc_user_join_customer` c ");
+		sqlBuilder.append(" join `user` i on c.user_id = i.id ");
 		sqlBuilder.append(" where c.customer_id = ? ");
 		params.add(customerId);
 
 		appendIfNotEmpty(sqlBuilder, "c.data_org", dataOrg, params, false);
 		appendIfNotEmpty(sqlBuilder, "c.org_id", orgId, params, false);
 
-		return Db.query(sqlBuilder.toString(), params.toArray());
+		return Db.find(sqlBuilder.toString(), params.toArray());
 	}
 
 	public UserJoinCustomer findById(final String id) {

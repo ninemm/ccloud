@@ -12,45 +12,43 @@
 
 <#macro script>
 
-var $form = $("#form");
+	var $form = $("#form");
 
-$(function() {
-	
-	jQuery.mm.initValidator('#form', validatorFields)
-	
-});
-
-var validatorFields = {
-	'customerType.name': {
-		validators: {
-			notEmpty: { message: '类型名称不能为空' },
-			stringLength: { max: 15, message: '系统名称最大长度是15字符，请重新输入' }
-		}
-	}
-};
-
-function doSubmit(){
-	$form.ajaxSubmit({
-		beforeSubmit: function() {
-			var validate = $form.data('bootstrapValidator');
-			validate.validate();
-			return validate.isValid();
-		},
-		type : "post", 
-		dataType : "json", 
-		success : function(data) { 
-			if (data.errorCode == 0) {
-				//location.reload();
-				toastr.success(data.message, '操作成功');
-			} else {
-				toastr.error(data.message,'操作失败');
-			}
-		},
-		error : function() {
-			alert("信息提交错误");
-		}
+	$(function() {
+		jQuery.mm.initValidator('#form', validatorFields)
 	});
-}
+	
+	var validatorFields = {
+		'customerType.name': {
+			validators: {
+				notEmpty: { message: '类型名称不能为空' },
+				stringLength: { max: 15, message: '系统名称最大长度是15字符，请重新输入' }
+			}
+		}
+	};
+
+	function doSubmit(){
+		$form.ajaxSubmit({
+			beforeSubmit: function() {
+				var validate = $form.data('bootstrapValidator');
+				validate.validate();
+				return validate.isValid();
+			},
+			type : "post", 
+			dataType : "json", 
+			success : function(data) { 
+				if (data.errorCode == 0) {
+					//location.reload();
+					toastr.success(data.message, '操作成功');
+				} else {
+					toastr.error(data.message,'操作失败');
+				}
+			},
+			error : function() {
+				alert("信息提交错误");
+			}
+		});
+	}
 </#macro>
 
 <@layout active_id=p child_active_id=c>
