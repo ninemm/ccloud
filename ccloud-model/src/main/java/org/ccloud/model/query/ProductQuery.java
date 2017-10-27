@@ -75,7 +75,7 @@ public class ProductQuery extends JBaseQuery {
 	}
 
 	public List<Product> findByGoodId(String id) {
-		return DAO.doFind("goods_id = ?", id);
+		return DAO.doFind("goods_id = ? order by create_date", id);
 	}
 
 	public int batchDelete(List<String> ids) {

@@ -72,11 +72,8 @@ public class GoodsGoodsAttributeMapStoreQuery extends JBaseQuery {
 		return 0;
 	}
 
-	public void deleteAllByGoodsId(String id) {
-		List<GoodsGoodsAttributeMapStore> list = DAO.doFind("goods_id = ?", id);
-		for (GoodsGoodsAttributeMapStore goodsGoodsAttributeMapStore : list) {
-			goodsGoodsAttributeMapStore.delete();
-		}
+	public int deleteAllByGoodsId(String id) {
+		return DAO.doDelete("goods_id = ?", id);
 	}
 
 	public List<Record> findByGoodsId(Goods goods) {
