@@ -128,9 +128,14 @@
 		},
 		'customerTypes': {
 			validators: {
-				notEmpty: { message: '客户类型不能为空' },
+				notEmpty: { message: '客户类型不能为空' }
 			}
 		},
+		'userIds': {
+			validators: {
+				notEmpty: { message: '负责人不能为空' }
+			}
+		}
 	};
 
 	$('#_menu_tree').click(function() {
@@ -199,31 +204,31 @@
 			<div class="col-sm-12 ">
 				<div class="row">
 					<div class="form-group col-sm-12 validata-box">
-						<label class="control-label col-sm-2">客户名称:</label>
+						<label class="control-label col-sm-2">*客户名称:</label>
 						<div class="input-group col-md-4 col-sm-10">
 							<input class="form-control input-sm" type="text" name="customer.customer_name" value="${(customer.customer_name)!}" placeholder="1-25个任意字母数字">
 						</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">
-						<label class="control-label col-sm-2">客户编码:</label>
+						<label class="control-label col-sm-2">*客户编码:</label>
 						<div class="input-group col-md-4 col-sm-10">
 							<input class="form-control input-sm" type="text" name="customer.customer_code" value="${(customer.customer_code)!}" placeholder="1-15个任意字母数字">
 						</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">
-						<label class="control-label col-sm-2">联系人:</label>
+						<label class="control-label col-sm-2">*联系人:</label>
 						<div class="input-group col-md-4 col-sm-10">
 							<input class="form-control input-sm" type="text" name="customer.contact" value="${(customer.contact)!}" placeholder="1-15个任意字母数字">
 						</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">
-						<label class="control-label col-sm-2">手机号:</label>
+						<label class="control-label col-sm-2">*手机号:</label>
 						<div class="input-group col-md-4 col-sm-10">
 							<input class="form-control input-sm" type="text" name="customer.mobile" value="${(customer.mobile)!}" placeholder="11位数字">
 						</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">
-						<label class="control-label col-sm-2">省-市-区:</label>
+						<label class="control-label col-sm-2">*省-市-区:</label>
 						<div class="input-group col-md-4 col-sm-10">
 							<div class="city-picker-selector" id="city-picker-selector"></div>
 							<input type="hidden" name="userProvinceText" id="userProvinceText" value="" />
@@ -232,13 +237,13 @@
 						</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">
-						<label class="control-label col-sm-2">详细地址:</label>
+						<label class="control-label col-sm-2">*详细地址:</label>
 						<div class="input-group col-md-4 col-sm-10">
 							<input class="form-control input-sm" type="text" name="customer.address" value="${(customer.address)!}" placeholder="1-50个任意字母数字">
 						</div>
-					</div>
+					</div>	
 					<div class="form-group col-sm-12 validata-box">
-						<label class="control-label col-sm-2">客户类型:</label>
+						<label class="control-label col-sm-2">*客户类型:</label>
 						<div class="input-group col-md-4 col-sm-10">
 							<select class="form-control input-sm" name="customerTypes" id ="customerTypes" multiple="multiple" >
 								<#list (customerTypeList)! as customerType >
@@ -248,7 +253,7 @@
 						</div>
 					</div>
  					<div class="form-group col-sm-12 validata-box">
-						<label class="control-label col-sm-2">负责人:</label>
+						<label class="control-label col-sm-2">*负责人:</label>
 						<div class="input-group col-md-4 col-sm-10">
 							<div class="input-group">
 								<input type="hidden" name="userIds" id="userIds" value="${cUserIds!}">

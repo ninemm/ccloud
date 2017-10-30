@@ -46,6 +46,10 @@
 		parent.$("#userIds").val(userIds);
 		parent.$("#userNames").val(userNames);
 
+		parent.$('#form').data('bootstrapValidator')
+			.updateStatus('userIds', 'NOT_VALIDATED', null)
+			.validateField('userIds');
+
 		let index = parent.layer.getFrameIndex(window.name); //获取窗口索引
 		parent.layer.close(index);
 		

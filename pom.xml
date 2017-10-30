@@ -60,6 +60,9 @@
 		<shiro.version>1.2.4</shiro.version>
 		<cron4j.version>2.2.5</cron4j.version>
 		<activiti.version>5.21.0</activiti.version>
+
+		<easypoi.version>3.0.3</easypoi.version>
+
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	
@@ -237,7 +240,18 @@
 	            <artifactId>activiti-process-validation</artifactId>
 	            <version>${activiti.version}</version>
 	        </dependency>
-			
+
+			<dependency>
+				<groupId>cn.afterturn</groupId>
+				<artifactId>easypoi-base</artifactId>
+				<version>${easypoi.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>cn.afterturn</groupId>
+				<artifactId>easypoi-annotation</artifactId>
+				<version>${easypoi.version}</version>
+			</dependency>
+
 		</dependencies>
 	</dependencyManagement>
 	
