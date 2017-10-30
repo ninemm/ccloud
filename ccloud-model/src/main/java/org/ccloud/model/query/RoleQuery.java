@@ -89,7 +89,7 @@ public class RoleQuery extends JBaseQuery {
 		List<String> roleIds = new ArrayList<>();
 		List<Role> list = RoleQuery.me().findByGroupId(groupId);
 		for (Role role : list) {
-			roleIds.add(role.get("role_id").toString());
+			roleIds.add(role.getRoleCode());
 		}
 		return roleIds;
 	}
@@ -103,6 +103,17 @@ public class RoleQuery extends JBaseQuery {
 		sqlBuilder.append("where g.id = ? ");
 
 		return DAO.find(sqlBuilder.toString(), groupId);
+	}
+
+	public List<Role> queryRoleOperation(String roleId, String operationId) {
+		StringBuilder sqlBuilder = new StringBuilder("select * ");
+
+		sqlBuilder.append("from `role` r ");
+		sqlBuilder.append("join `role_operation_rel` gr on gr.role_id = r.id ");
+		sqlBuilder.append("join `operation` g on g.id = gr.operation_id ");
+		sqlBuilder.append("where r.id = ? and g.id = ? ");
+
+		return DAO.find(sqlBuilder.toString(), roleId, operationId);
 	}
 
 }

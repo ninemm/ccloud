@@ -179,4 +179,30 @@ public class StationQuery extends JBaseQuery {
 			fromBuilder.append(orderbyInfo[1]);
 		}
 	}
+
+	public List<Station> queryStationOperation(String stationId, String operationId) {
+		StringBuilder sqlBuilder = new StringBuilder("select * ");
+
+		sqlBuilder.append("from `station` s ");
+		sqlBuilder.append("join `station_operation_rel` gr on gr.station_id = s.id ");
+		sqlBuilder.append("join `operation` g on g.id = gr.operation_id ");
+		sqlBuilder.append("where s.id = ? and g.id = ? ");
+
+		return DAO.find(sqlBuilder.toString(), stationId, operationId);
+	}
+
+	public List<Station> findStation() {
+		return DAO.doFind("id != 0");
+	}
+
+	public List<Station> findByOperationId(String id) {
+		StringBuilder sqlBuilder = new StringBuilder("select * ");
+
+		sqlBuilder.append("from `station` s ");
+		sqlBuilder.append("join `station_operation_rel` gr on gr.station_id = s.id ");
+		sqlBuilder.append("join `operation` g on g.id = gr.operation_id ");
+		sqlBuilder.append("where g.id = ? ");
+		
+		return DAO.find(sqlBuilder.toString(), id);
+	}
 }

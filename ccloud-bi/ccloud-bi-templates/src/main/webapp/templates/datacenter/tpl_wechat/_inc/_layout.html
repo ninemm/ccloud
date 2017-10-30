@@ -13,7 +13,7 @@
 <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
 <head>
-  	<title>${WEB_TITLE!WEB_NAME!} - ${WEB_SUBTITLE!'数据中心'}</title>
+  	<title>${WEB_TITLE!WEB_NAME!} ${WEB_SUBTITLE!'数据中心'}</title>
   	<meta name="keywords" content="${META_KEYWORDS!}">
   	<meta name="description" content="${META_DESCRIPTION!}">
   	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -84,12 +84,10 @@
     <!-- <script type='text/javascript' src="${CTPATH}/js/vconsole.min.js"></script> -->
 	
 	<script type="text/javascript">
+		Utils.loading();
 		$(function() {
-			if (Utils.devMode) {
-	            document.write("<script type=\"text/javascript\" src=\"" + '${CTPATH}' + "/js/vconsole.min.js\">" + "<\/script>");
-	        }
-        	FastClick.attach(document.body);
-        	Utils.context = '${CTPATH}';
+			FastClick.attach(document.body);
+			Utils.context = '${CTPATH}';
 		});	
 	</script>
 	

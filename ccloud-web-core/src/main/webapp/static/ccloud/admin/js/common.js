@@ -20,6 +20,10 @@ jQuery.mm = {
 		window.alert("test");
 	},
 	
+	confirm: function(msg, size, callback) {
+		
+	},
+	
 	submit : function (formId, resultFunc){
 		formId = formId || "form";
 		resultFunc = resultFunc || function() {
@@ -38,8 +42,28 @@ jQuery.mm = {
 		});
 	},
 	
-	ajax : function() {
-		
+	ajax: function(url, data, dataType, callback) {
+
+		$.ajax({
+			type : "post",
+			url : url,
+			data : data,
+			dataType : dataType || 'json',
+			contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+			async: false,
+			cache: false,
+			success:function(data){
+				//result = response;
+				toastr.success(data.message, '操作成功');
+				//扩展回调函数
+				if( callback != null ){
+					callback();
+				}
+			},
+			error : function(data) {
+				toastr.error(data.message,'错误');
+			}
+		});
 	},
 	
 	ajaxSubmit: function(formId) {
@@ -93,7 +117,37 @@ jQuery.mm = {
 				layer.close();
 			}
 		);
-		
+	},
+	
+	update: function(message, url, data, dataType) {
+		layer.confirm(message, 
+			{btn : ['确定', '取消']},
+			function() {
+				layer.close();
+				$.ajax({
+					type : "post",
+					url : url,
+					data : data,
+					dataType : dataType || "json",
+					contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+					async: false,
+					cache: false,
+					success: function(data) {
+						if (data.errorCode > 0) {
+							toast.error(data.message, '操作失败');
+						} else {
+							location.reload();
+						}
+					},
+					error: function(data) {
+						toastr.error(data.message, '错误');
+					}
+				});
+			},
+			function() {
+				layer.close();
+			}
+		);
 	},
 	
 	initTreeView: function(treeId, data, nodeSelectedFunc, nodeUnselectedFunc) {
@@ -124,6 +178,120 @@ jQuery.mm = {
 			}
 		});
 	},
+	
+	initMultiTreeView: function(treeId, data, nodeSelectedFunc, nodeUnselectedFunc) {
+		treeId = treeId || '#tree';
+		
+		$(treeId).treeview({
+			data : data,
+			levels : 2,
+			showBorder : false,
+			showCheckbox : true,
+			multiSelect : true,
+			//showTags: true,
+			onNodeSelected: nodeSelectedFunc || function(event, data) {
+				$(treeId).treeview('checkNode', [data.nodeId, { silent: true }]);
+				$(treeId).treeview('selectNode', [data.nodeId, { silent: true }]);
+				if(data.nodes != null) {
+					var arrayInfo = data.nodes;
+					for (var i = 0; i < arrayInfo.length; i++) {
+						$(treeId).treeview('toggleNodeChecked', [ arrayInfo[i].nodeId, { silent: true } ]);
+						$(treeId).treeview('toggleNodeSelected', [ arrayInfo[i].nodeId, { silent: true } ]);
+					}
+				}
+			},
+			onNodeUnselected: nodeUnselectedFunc || function(event, data) {
+				$(treeId).treeview('uncheckNode', [data.nodeId, { silent: true }]);
+				$(treeId).treeview('unselectNode', [data.nodeId, { silent: true }]);
+				if(data.nodes != null) {
+					var arrayInfo = data.nodes;
+					for (var i = 0; i < arrayInfo.length; i++) {
+						$(treeId).treeview('toggleNodeChecked', [ arrayInfo[i].nodeId, { silent: true } ]);
+						$(treeId).treeview('toggleNodeSelected', [ arrayInfo[i].nodeId, { silent: true } ]);
+					}
+				}
+			},
+			onNodeChecked: nodeSelectedFunc || function(event, data) {
+				$(treeId).treeview('checkNode', [data.nodeId, { silent: true }]);
+				$(treeId).treeview('selectNode', [data.nodeId, { silent: true }]);
+				if(data.nodes != null) {
+					var arrayInfo = data.nodes;
+					for (var i = 0; i < arrayInfo.length; i++) {
+						$(treeId).treeview('toggleNodeChecked', [ arrayInfo[i].nodeId, { silent: true } ]);
+						$(treeId).treeview('toggleNodeSelected', [ arrayInfo[i].nodeId, { silent: true } ]);
+					}
+				}
+			},
+			onNodeUnchecked: nodeUnselectedFunc || function(event, data) {
+				$(treeId).treeview('uncheckNode', [data.nodeId, { silent: true }]);
+				$(treeId).treeview('unselectNode', [data.nodeId, { silent: true }]);
+				if(data.nodes != null) {
+					var arrayInfo = data.nodes;
+					for (var i = 0; i < arrayInfo.length; i++) {
+						$(treeId).treeview('toggleNodeChecked', [ arrayInfo[i].nodeId, { silent: true } ]);
+						$(treeId).treeview('toggleNodeSelected', [ arrayInfo[i].nodeId, { silent: true } ]);
+					}
+				}
+			}
+		});
+	},	
+	
+	initMultiTreeView: function(treeId, data, nodeSelectedFunc, nodeUnselectedFunc) {
+		treeId = treeId || '#tree';
+		
+		$(treeId).treeview({
+			data : data,
+			levels : 2,
+			showBorder : false,
+			showCheckbox : true,
+			multiSelect : true,
+			//showTags: true,
+			onNodeSelected: nodeSelectedFunc || function(event, data) {
+				$(treeId).treeview('checkNode', [data.nodeId, { silent: true }]);
+				$(treeId).treeview('selectNode', [data.nodeId, { silent: true }]);
+				if(data.nodes != null) {
+					var arrayInfo = data.nodes;
+					for (var i = 0; i < arrayInfo.length; i++) {
+						$(treeId).treeview('toggleNodeChecked', [ arrayInfo[i].nodeId, { silent: true } ]);
+						$(treeId).treeview('toggleNodeSelected', [ arrayInfo[i].nodeId, { silent: true } ]);
+					}
+				}
+			},
+			onNodeUnselected: nodeUnselectedFunc || function(event, data) {
+				$(treeId).treeview('uncheckNode', [data.nodeId, { silent: true }]);
+				$(treeId).treeview('unselectNode', [data.nodeId, { silent: true }]);
+				if(data.nodes != null) {
+					var arrayInfo = data.nodes;
+					for (var i = 0; i < arrayInfo.length; i++) {
+						$(treeId).treeview('toggleNodeChecked', [ arrayInfo[i].nodeId, { silent: true } ]);
+						$(treeId).treeview('toggleNodeSelected', [ arrayInfo[i].nodeId, { silent: true } ]);
+					}
+				}
+			},
+			onNodeChecked: nodeSelectedFunc || function(event, data) {
+				$(treeId).treeview('checkNode', [data.nodeId, { silent: true }]);
+				$(treeId).treeview('selectNode', [data.nodeId, { silent: true }]);
+				if(data.nodes != null) {
+					var arrayInfo = data.nodes;
+					for (var i = 0; i < arrayInfo.length; i++) {
+						$(treeId).treeview('toggleNodeChecked', [ arrayInfo[i].nodeId, { silent: true } ]);
+						$(treeId).treeview('toggleNodeSelected', [ arrayInfo[i].nodeId, { silent: true } ]);
+					}
+				}
+			},
+			onNodeUnchecked: nodeUnselectedFunc || function(event, data) {
+				$(treeId).treeview('uncheckNode', [data.nodeId, { silent: true }]);
+				$(treeId).treeview('unselectNode', [data.nodeId, { silent: true }]);
+				if(data.nodes != null) {
+					var arrayInfo = data.nodes;
+					for (var i = 0; i < arrayInfo.length; i++) {
+						$(treeId).treeview('toggleNodeChecked', [ arrayInfo[i].nodeId, { silent: true } ]);
+						$(treeId).treeview('toggleNodeSelected', [ arrayInfo[i].nodeId, { silent: true } ]);
+					}
+				}
+			}
+		});
+	},	
 	
 	initValidator: function(formId, fields) {
 		formId = formId || '#form';
@@ -216,7 +384,7 @@ jQuery.mm = {
 			smartDisplay: false,
 			undefinedText: '',
 			columns: fields,
-			onEditableSave: editableSaveFunc,
+			onEditableSave: editableSaveFunc || function () {},
 			onClickCell: clickCellFunc || function () {}
 		});
 		

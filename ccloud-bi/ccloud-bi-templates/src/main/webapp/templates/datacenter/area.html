@@ -76,9 +76,8 @@
      
 </#macro>
 <#macro script>
-    
     var strKit = new StrKit();
-    
+
     var $dateTitle = $('#date-title');
     var provName = $.cookie(Utils.provCacheName);
     var cityName = $.cookie(Utils.cityCacheName);
@@ -93,17 +92,8 @@
     var color = ['#a6c84c', '#ffa022', '#46bee9'];
     
     $(function() {
-        Utils.loading();
-        /*if (provName == null || cityName == null || countryName == null) {
-            var baiduMap = new BaiduMap();
-            baiduMap.getLocation();
-        }*/
-        
-        //provName = localStorage.provName;
-        //cityName = localStorage.cityName;
-        //countryName = localStorage.countryName;
         curProvTitle = strKit.convertProvName(provName);
-        
+
         if(countryName.length != 0) {
             renderCityMap({"name": cityName}, curProvTitle);
             //provName = provName + "省";
@@ -160,8 +150,7 @@
         $('#goback').on('click', function() {
             historyUtils.back();
         });
-        
-        Utils.close();
+
     });
 
     //回到中国地图界面
@@ -563,6 +552,7 @@
             data:{"provName": provName, "cityName": cityName, countryName: countryName, dateType: dateType},
             dataType:"json"
         }).done(function(data){
+            Utils.close();
 
             var crSeriesData = [];
             var length = data.length > 5 ? 5 : data.length;
@@ -930,6 +920,7 @@
     }
     
     function initData(provName, cityName, countryName, dateType) {
+        Utils.loading();
         // 客户类型
         customer_rank(provName, cityName, countryName, dateType);
         // 客户区域

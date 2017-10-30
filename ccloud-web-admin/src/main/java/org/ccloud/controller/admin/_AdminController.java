@@ -15,6 +15,10 @@
  */
 package org.ccloud.controller.admin;
 
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.subject.Subject;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
@@ -78,6 +82,15 @@ public class _AdminController extends JBaseController {
 			renderAjaxResultForError("没有该用户");
 			return;
 		}
+
+//	    Subject subject = SecurityUtils.getSubject();
+//	    UsernamePasswordToken token = new UsernamePasswordToken(username, password);
+//	    try {
+//	        subject.login(token);
+//	        renderAjaxResultForSuccess("登录成功");
+//	    } catch (AuthenticationException e) {
+//	    	renderAjaxResultForError("用户名或密码错误");
+//	    }
 		
 		if (EncryptUtils.verlifyUser(user.getPassword(), user.getSalt(), password)) {
 
@@ -96,6 +109,8 @@ public class _AdminController extends JBaseController {
 	@Before(UCodeInterceptor.class)
 	public void logout() {
 		CookieUtils.remove(this, Consts.COOKIE_LOGINED_USER);
+	    Subject subject = SecurityUtils.getSubject();
+	    subject.logout();
 		redirect("/admin");
 	}
 

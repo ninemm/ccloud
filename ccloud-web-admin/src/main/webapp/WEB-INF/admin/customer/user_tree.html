@@ -17,34 +17,38 @@
 	var $rootNodeId = 0;
 	
 	$(document).ready(function() {
+		jQuery.mm.initMultiTreeView('#tree', JSON.parse('${treeData!}'));
+	});
 	
-		jQuery.mm.initTreeView('#tree', JSON.parse('${treeData!}'));
-	
-		$saveBtn.click(function() {
-			$saveBtn.attr("disabled", "disabled");
-			let nodes = $tree.treeview("getSelected", $rootNodeId);
-			if (nodes.length == 0) {// 未选中资源
-				$saveBtn.removeAttr("disabled");
-				layer.alert("请选择父菜单!", {icon: 2});
-				return ;
+	$saveBtn.click(function() {
+		$saveBtn.attr("disabled", "disabled");
+		let nodes = $tree.treeview("getSelected", $rootNodeId);
+		if (nodes.length == 0) {// 未选中资源
+			$saveBtn.removeAttr("disabled");
+			layer.alert("请选择父菜单!", {icon: 2});
+			return ;
+		}
+		
+		var userIds = "";
+		var userNames = "";
+		$.each(nodes, function(idx, obj) {
+			if (obj.tags.length == 2 && obj.tags[1] == 'user') {
+				if (userIds == "") {
+					userIds = obj.tags[0];
+					userNames = obj.text;
+				} else {
+					userIds = userIds + "," + obj.tags[0];
+					userNames = userNames  + "," + obj.text;
+				}
 			}
-			
-			let parentId = nodes[0].tags[0];
-			let parentName = nodes[0].text;
-			
-			if (${treeType} == 1) {
-				parent.$("#department_id").val(parentId);
-				parent.$("#department_name").val(parentName);
-			} else {
-				parent.$("#station_id").val(parentId);
-				parent.$("#station_name").val(parentName);					
-			}
-			
-			let index = parent.layer.getFrameIndex(window.name); //获取窗口索引
-			parent.layer.close(index);
-			
 		});
-	  	
+
+		parent.$("#userIds").val(userIds);
+		parent.$("#userNames").val(userNames);
+
+		let index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+		parent.layer.close(index);
+		
 	});
 	
 	// 递归获取所有的子节点nodeId

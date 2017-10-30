@@ -35,6 +35,8 @@ public class JHandler extends Handler {
 	public void handle(String target, HttpServletRequest request, HttpServletResponse response, boolean[] isHandled) {
 		if (target.startsWith("/websocket")) {
 			return;
+		} else if (target.contains("/processEditor")) {
+			return ;
 		}
 		
 		String CPATH = request.getContextPath();

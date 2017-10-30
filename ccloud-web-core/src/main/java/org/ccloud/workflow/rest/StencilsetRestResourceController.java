@@ -10,27 +10,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ccloud.workflow.main;
+package org.ccloud.workflow.rest;
 
 import java.io.InputStream;
 
 import org.activiti.engine.ActivitiException;
 import org.apache.commons.io.IOUtils;
+import org.ccloud.route.RouterMapping;
 
 import com.jfinal.core.Controller;
 
 /**
  * @author Tijs Rademakers
  */
-public class StencilsetRestResource extends Controller{
-  
-//  @RequestMapping(value="/editor/stencilset", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
-  public void getStencilset() {
-    InputStream stencilsetStream = this.getClass().getClassLoader().getResourceAsStream("/stencilset.json");
-    try {
-      renderJson( IOUtils.toString(stencilsetStream, "utf-8"));
-    } catch (Exception e) {
-      throw new ActivitiException("Error while loading stencil set", e);
-    }
-  }
+@RouterMapping(url = "/admin/editor/stencilset")
+public class StencilsetRestResourceController extends Controller {
+
+	// @RequestMapping(value="/editor/stencilset", method = RequestMethod.GET,
+	// produces = "application/json;charset=utf-8")
+	public void getStencilset() {
+		InputStream stencilsetStream = this.getClass().getClassLoader().getResourceAsStream("/stencilset.json");
+		try {
+			renderJson(IOUtils.toString(stencilsetStream, "utf-8"));
+		} catch (Exception e) {
+			throw new ActivitiException("Error while loading stencil set", e);
+		}
+	}
 }

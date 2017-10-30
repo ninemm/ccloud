@@ -23,6 +23,7 @@ import java.util.Map;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
+import org.ccloud.model.Department;
 import org.ccloud.model.Group;
 import org.ccloud.model.Station;
 import org.ccloud.model.User;
@@ -32,6 +33,7 @@ import org.ccloud.model.query.StationQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
+import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.EncryptUtils;
 import org.ccloud.utils.StringUtils;
 
@@ -68,8 +70,13 @@ public class _UserController extends JBaseCRUDController<User> {
 		final User user = getModel(User.class);
 		String stationList = getPara("stationList");
 		String stationName = getPara("stationName");
+		String deptName = getPara("parentName");
+		user.setDepartmentName(deptName);
 		user.setStationId(stationList);
 		user.setStationName(stationName);
+		Department dept = DepartmentQuery.me().findById(user.getDepartmentId());
+		String dataArea = DataAreaUtil.dataAreaSetByUser(dept.getDataArea());
+		user.setDataArea(dataArea);
 
 		if (user.getId() == null) {
 			user.setSalt(EncryptUtils.salt());

@@ -330,22 +330,6 @@ $(function() {
 		}
 	});	
 	
-<!--$("#brand_id").change(function() {
-		var brandId = $("#brand_id").find("option:selected").val(); 
-		$("#category_id").empty().append("<option value=''>--请选择--</option>");
-		$.ajax({
-			url:"${CPATH}/admin/goods/getCategory",
-			type:"post",
-			data:{"brandId":brandId},
-			dataType:"json",
-			success:function(data) {
-				for (var i = 0; i < data.length; i++) {
-					$("#category_id").append("<option value=" + data[i].id + ">" + data[i].name + "</option>");
-				}
-			}
-		});
-	});-->
-	
 	$("#typeChoose").change(function() {
 		var type = $("#typeChoose").find("option:selected").val(); 
 		$("#attribute").empty();
@@ -398,11 +382,6 @@ var validatorFields = {
 			notEmpty: { message: '请选择品牌' },
         }
 	},
-	'goods.goods_category_id': {
-		validators: {
-			notEmpty: { message: '请选择分类' },
-        }
-	},
 	'goods.goods_type_id': {
 		validators: {
 			notEmpty: { message: '请选择类型' },
@@ -412,6 +391,11 @@ var validatorFields = {
 		validators: {
 			notEmpty: { message: '请选择是否上架' },
         }	
+	},
+	'parentName': {
+		validators: {
+			notEmpty: { message: '商品分类不能为空' }
+        }
 	}
 };
 

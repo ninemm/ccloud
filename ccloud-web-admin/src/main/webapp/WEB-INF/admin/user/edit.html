@@ -49,19 +49,9 @@ $(function() {
 		    type: 2,
 		    area: ['580px', '530px'],
 		    fix: false, //不固定
-		    content: '${CPATH}/admin/user/user_tree?treeType=1'
+		    content: '${CPATH}/admin/department/department_tree'
 		});
 	});	
-	
-	$('#_station_tree').click(function() {
-		layer.open({
-			title:'所属组群',
-		    type: 2,
-		    area: ['580px', '530px'],
-		    fix: false, //不固定
-		    content: '${CPATH}/admin/user/user_tree?treeType=2'
-		});
-	});		
 });
 
 var validatorFields = {
@@ -95,7 +85,7 @@ var validatorFields = {
             notEmpty: { message: '用户分组不能为空' },
         }
 	},
-	'user.department_name': {
+	'parentName': {
 		validators: {
             notEmpty: { message: '用户部门不能为空' },
         }
@@ -242,8 +232,8 @@ function doSubmit(){
 						<label class="control-label col-sm-2">所属部门:</label>
 						<div class="input-group col-md-4 col-sm-10">
 							<div class="input-group">
-								<input type="hidden" name="user.department_id" id="department_id" value="${(user.department_id)!}">
-			                 	<input class="form-control input-sm" type="text" id="department_name" name="user.department_name" value="${(user.department_name)!}">
+								<input type="hidden" name="user.department_id" id="parent_id" value="${(user.department_id)!}">
+			                 	<input class="form-control input-sm" type="text" id="parent_name" name="parentName" value="${(user.department_name)!}">
 		                 		<div class="input-group-addon" id="_dept_tree" style="cursor:pointer;">
 		                 			<i class="fa fa-search"></i> 选择
 								</div>
