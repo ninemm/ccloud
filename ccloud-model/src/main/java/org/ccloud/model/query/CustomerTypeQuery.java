@@ -80,6 +80,10 @@ public class CustomerTypeQuery extends JBaseQuery {
 		return Db.find(sqlBuilder.toString());
 	}
 
+	public String findIdByName(String name) {
+		return Db.queryStr("select id from cc_customer_type where name = ?", name);
+	}
+
 	public int batchDelete(String... ids) {
 		if (ids != null && ids.length > 0) {
 			int deleteCount = 0;
