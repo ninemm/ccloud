@@ -55,6 +55,7 @@ import org.ccloud.model.query.GoodsTypeQuery;
 import org.ccloud.model.query.ProductGoodsSpecificationValueQuery;
 import org.ccloud.model.query.ProductQuery;
 import org.ccloud.model.vo.ImageJson;
+import org.ccloud.model.vo.ProductInfo;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -524,6 +525,11 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
 		String id = getPara("id");
 		List<Map<String, Object>> list = GoodsCategoryQuery.me().findCategoryListAsTreeByBrand(1, id);
 		setAttr("treeData", JSON.toJSON(list));
+	}
+	
+	public List<ProductInfo> getProductInfo() {
+		List<ProductInfo> list = ProductQuery.me().getAllProductInfo();
+		return list;
 	}
 	
 }
