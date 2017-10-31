@@ -76,6 +76,7 @@
 				if (result.errorCode > 0) {
 					toastr.error(result.message, '操作失败');
 				} else {
+					toastr.success(result.message, '操作成功');
 					$table.bootstrapTable('refresh');
 				}
 			}
@@ -110,7 +111,9 @@
 				</select>
 			</div>
 			<div class="input-group input-group-sm">
-				<input id="post-search-input" class="form-control" type="search" value="${k!}" name="k" placeholder="搜索名称">&nbsp;
+				&nbsp;
+				<input id="post-search-input" class="form-control" type="search" value="${k!}" name="k" placeholder="搜索名称">
+				&nbsp;
 				<input id="search-submit" class="btn btn-default btn-sm btn-flat" type="button" value="搜索">
 			</div>
 		</form>

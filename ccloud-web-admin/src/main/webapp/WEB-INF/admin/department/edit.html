@@ -43,7 +43,7 @@ var validatorFields = {
 	        stringLength: { min: 1, max: 2, message: '部门等级最大长度是2字符，请重新输入' }
         }
 	},
-	'parentName': {
+	'parent_name': {
 		validators: {
 			notEmpty: { message: '上级部门不能为空' }
         }
@@ -129,7 +129,7 @@ function doSubmit(){
 						<div class="input-group col-md-4 col-sm-10">
 							<div class="input-group">
 								<input type="hidden" name="department.parent_id" id="parent_id" value="${(dept.parentId)!}">
-			                 	<input class="form-control input-sm" readOnly type="text" id="parent_name" name="parentName" value="${(dept.parent_name)!}">
+			                 	<input class="form-control input-sm" readOnly type="text" id="parent_name" name="parent_name" value="${(dept.parent_name)!}">
 		                 		<div class="input-group-addon" id="_menu_tree" style="cursor:pointer;">
 		                 			<i class="fa fa-search"></i> 选择
 								</div>

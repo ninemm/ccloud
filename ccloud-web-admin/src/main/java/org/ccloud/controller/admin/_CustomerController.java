@@ -16,12 +16,16 @@
 package org.ccloud.controller.admin;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.poi.ss.usermodel.Workbook;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.Customer;
@@ -48,7 +52,9 @@ import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.tx.Tx;
 
+import cn.afterturn.easypoi.excel.ExcelExportUtil;
 import cn.afterturn.easypoi.excel.ExcelImportUtil;
+import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.afterturn.easypoi.excel.entity.ImportParams;
 
 /**
@@ -273,5 +279,70 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 			User user = UserQuery.me().findById(id);
 			UserJoinCustomerQuery.me().insert(customerId, id, user.getDepartmentId(), user.getDataArea());
 		}
+	}
+	
+	public void download() {
+
+		render("download.html");
+	}
+	
+	public void downloading() throws UnsupportedEncodingException {
+		Map<String, String[]> paraMap = getParaMap();
+		String depatName = getPara("parent_name");
+		if (StrKit.notBlank(depatName)) {
+			depatName = StringUtils.urlRedirectToUTF8(depatName);
+		}
+		String depatId = getPara("parent_id");
+		
+		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\customer\\" + depatName + "客户资料.xlsx";
+
+		Page<Record> page = CustomerQuery.me().paginate(1, Integer.MAX_VALUE, null, "create_date", paraMap,
+				depatId, "");
+		List<Record> customerList = page.getList();
+
+		List<CustomerExcel> excellist = Lists.newArrayList();
+		for (Record record : customerList) {
+
+			CustomerExcel excel = new CustomerExcel();
+			excel.setCustomerName((String) record.get("customer_name"));
+			excel.setCustomerCode((String) record.get("customer_code"));
+			excel.setContact((String) record.get("contact"));
+			excel.setMobile((String) record.get("mobile"));
+			excel.setEmail((String) record.get("email"));
+			excel.setProvName((String) record.get("prov_name"));
+			excel.setCityName((String) record.get("city_name"));
+			excel.setCountyName((String) record.get("country_name"));
+			excel.setAddress((String) record.get("address"));
+			excel.setCustomerTypeName((String) record.get("customerTypeNames"));
+
+			excellist.add(excel);
+		}
+
+		ExportParams params = new ExportParams();
+		Workbook wb = ExcelExportUtil.exportBigExcel(params, CustomerExcel.class, excellist);
+		File file = new File(filePath);
+		FileOutputStream out = null;
+		try {
+			out = new FileOutputStream(file);
+			wb.write(out);
+			out.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		renderFile(new File(filePath));
+	}
+	
+	@Before(Tx.class)
+	public void batchSetUser() {
+		String[] customerIds = getParaValues("dataItem");
+		String[] userIds = getParaValues("userIds");
+		for (String customerId : customerIds) {
+			UserJoinCustomerQuery.me().deleteByCustomerId(customerId);
+			for (String userId : userIds)
+				this.insertUserJoinCustomer(customerId, userId);
+		}
+
+		renderAjaxResultForSuccess();
 	}
 }

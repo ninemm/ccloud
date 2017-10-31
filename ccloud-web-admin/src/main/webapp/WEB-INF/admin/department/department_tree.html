@@ -36,8 +36,8 @@
 			parent.$("#parent_name").val(parentName);
 			
 			parent.$('#form').data('bootstrapValidator')
-			.updateStatus('parentName', 'NOT_VALIDATED', null)
-			.validateField('parentName');
+			.updateStatus('parent_name', 'NOT_VALIDATED', null)
+			.validateField('parent_name');
 						
 			let index = parent.layer.getFrameIndex(window.name); //获取窗口索引
 			parent.layer.close(index);

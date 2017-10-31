@@ -1,9 +1,9 @@
 <#include "../_inc/_layout.html"/>
 
 <#macro script_import>
-	<!-- bootstrapvalidator -->
+	<!-- bootstrapValidator -->
 	<script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
-	<!-- bootstrapvalidator -->
+	<!-- select2 -->
 	<script src="${CPATH}/static/plugins/select2/js/select2.js"></script>
 	<!-- cityPicker -->
 	<script src="${CPATH}/static/plugins/cityPicker/js/citydata.js"></script>
@@ -11,9 +11,9 @@
 </#macro>
 
 <#macro css_import>
-	<!-- bootstrapvalidator -->
+	<!-- bootstrapValidator -->
 	<link rel="stylesheet" href="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.css">
-	<!-- bootstrapvalidator -->
+	<!-- select2 -->
 	<link rel="stylesheet" href="${CPATH}/static/plugins/select2/css/select2.css">
 	<!-- cityPicker -->
 	<link rel="stylesheet" href="${CPATH}/static/plugins/cityPicker/css/city-picker.css">
@@ -199,80 +199,79 @@
 			</div>
 		</div>
 		<form action="${CPATH}/admin/customer/save" method="post" id="form" class="form-horizontal" >
-		<input type="hidden" name="customer.id" value="${(customer.id)!}">
-		<div class="box-body">
-			<div class="col-sm-12 ">
-				<div class="row">
-					<div class="form-group col-sm-12 validata-box">
-						<label class="control-label col-sm-2">*客户名称:</label>
-						<div class="input-group col-md-4 col-sm-10">
-							<input class="form-control input-sm" type="text" name="customer.customer_name" value="${(customer.customer_name)!}" placeholder="1-25个任意字母数字">
+			<input type="hidden" name="customer.id" value="${(customer.id)!}">
+			<div class="box-body">
+				<div class="col-sm-12 ">
+					<div class="row">
+						<div class="form-group col-sm-12 validata-box">
+							<label class="control-label col-sm-2">*客户名称:</label>
+							<div class="input-group col-md-4 col-sm-10">
+								<input class="form-control input-sm" type="text" name="customer.customer_name" value="${(customer.customer_name)!}" placeholder="1-25个任意字母数字">
+							</div>
 						</div>
-					</div>
-					<div class="form-group col-sm-12 validata-box">
-						<label class="control-label col-sm-2">*客户编码:</label>
-						<div class="input-group col-md-4 col-sm-10">
-							<input class="form-control input-sm" type="text" name="customer.customer_code" value="${(customer.customer_code)!}" placeholder="1-15个任意字母数字">
+						<div class="form-group col-sm-12 validata-box">
+							<label class="control-label col-sm-2">*客户编码:</label>
+							<div class="input-group col-md-4 col-sm-10">
+								<input class="form-control input-sm" type="text" name="customer.customer_code" value="${(customer.customer_code)!}" placeholder="1-15个任意字母数字">
+							</div>
 						</div>
-					</div>
-					<div class="form-group col-sm-12 validata-box">
-						<label class="control-label col-sm-2">*联系人:</label>
-						<div class="input-group col-md-4 col-sm-10">
-							<input class="form-control input-sm" type="text" name="customer.contact" value="${(customer.contact)!}" placeholder="1-15个任意字母数字">
+						<div class="form-group col-sm-12 validata-box">
+							<label class="control-label col-sm-2">*联系人:</label>
+							<div class="input-group col-md-4 col-sm-10">
+								<input class="form-control input-sm" type="text" name="customer.contact" value="${(customer.contact)!}" placeholder="1-15个任意字母数字">
+							</div>
 						</div>
-					</div>
-					<div class="form-group col-sm-12 validata-box">
-						<label class="control-label col-sm-2">*手机号:</label>
-						<div class="input-group col-md-4 col-sm-10">
-							<input class="form-control input-sm" type="text" name="customer.mobile" value="${(customer.mobile)!}" placeholder="11位数字">
+						<div class="form-group col-sm-12 validata-box">
+							<label class="control-label col-sm-2">*手机号:</label>
+							<div class="input-group col-md-4 col-sm-10">
+								<input class="form-control input-sm" type="text" name="customer.mobile" value="${(customer.mobile)!}" placeholder="11位数字">
+							</div>
 						</div>
-					</div>
-					<div class="form-group col-sm-12 validata-box">
-						<label class="control-label col-sm-2">*省-市-区:</label>
-						<div class="input-group col-md-4 col-sm-10">
-							<div class="city-picker-selector" id="city-picker-selector"></div>
-							<input type="hidden" name="userProvinceText" id="userProvinceText" value="" />
-							<input type="hidden" name="userCityText" id="userCityText" value="" />
-							<input type="hidden" name="userDistrictText" id="userDistrictText" value="" />
+						<div class="form-group col-sm-12 validata-box">
+							<label class="control-label col-sm-2">*省-市-区:</label>
+							<div class="input-group col-md-4 col-sm-10">
+								<div class="city-picker-selector" id="city-picker-selector"></div>
+								<input type="hidden" name="userProvinceText" id="userProvinceText" value="" />
+								<input type="hidden" name="userCityText" id="userCityText" value="" />
+								<input type="hidden" name="userDistrictText" id="userDistrictText" value="" />
+							</div>
 						</div>
-					</div>
-					<div class="form-group col-sm-12 validata-box">
-						<label class="control-label col-sm-2">*详细地址:</label>
-						<div class="input-group col-md-4 col-sm-10">
-							<input class="form-control input-sm" type="text" name="customer.address" value="${(customer.address)!}" placeholder="1-50个任意字母数字">
+						<div class="form-group col-sm-12 validata-box">
+							<label class="control-label col-sm-2">*详细地址:</label>
+							<div class="input-group col-md-4 col-sm-10">
+								<input class="form-control input-sm" type="text" name="customer.address" value="${(customer.address)!}" placeholder="1-50个任意字母数字">
+							</div>
+						</div>	
+						<div class="form-group col-sm-12 validata-box">
+							<label class="control-label col-sm-2">*客户类型:</label>
+							<div class="input-group col-md-4 col-sm-10">
+								<select class="form-control input-sm" name="customerTypes" id ="customerTypes" multiple="multiple" >
+									<#list (customerTypeList)! as customerType >
+										<option value="${customerType.id}" <#if cTypeList??&&cTypeList?contains(customerType.id)>selected="selected"</#if>>${(customerType.name)!}</option>
+									</#list>
+								</select>
+							</div>
 						</div>
-					</div>	
-					<div class="form-group col-sm-12 validata-box">
-						<label class="control-label col-sm-2">*客户类型:</label>
-						<div class="input-group col-md-4 col-sm-10">
-							<select class="form-control input-sm" name="customerTypes" id ="customerTypes" multiple="multiple" >
-								<#list (customerTypeList)! as customerType >
-									<option value="${customerType.id}" <#if cTypeList??&&cTypeList?contains(customerType.id)>selected="selected"</#if>>${(customerType.name)!}</option>
-								</#list>
-							</select>
-						</div>
-					</div>
- 					<div class="form-group col-sm-12 validata-box">
-						<label class="control-label col-sm-2">*负责人:</label>
-						<div class="input-group col-md-4 col-sm-10">
-							<div class="input-group">
-								<input type="hidden" name="userIds" id="userIds" value="${cUserIds!}">
-								<input class="form-control input-sm" type="text" id="userNames" name="userNames" value="${cUserNames!}" disabled="disabled">
-								<div class="input-group-addon" id="_menu_tree" style="cursor:pointer;">
-									<i class="fa fa-search"></i> 选择
+	 					<div class="form-group col-sm-12 validata-box">
+							<label class="control-label col-sm-2">*负责人:</label>
+							<div class="input-group col-md-4 col-sm-10">
+								<div class="input-group">
+									<input type="hidden" name="userIds" id="userIds" value="${cUserIds!}">
+									<input class="form-control input-sm" type="text" id="userNames" name="userNames" value="${cUserNames!}" disabled="disabled">
+									<div class="input-group-addon" id="_menu_tree" style="cursor:pointer;">
+										<i class="fa fa-search"></i> 选择
+									</div>
 								</div>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-	
+		</form>
 		<div class="box-footer"> 
 			<button type="button" onclick="doSubmit()" class="btn btn-primary">保存更改</button>
 			<input type="button" class="btn btn-primary" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
 		</div>
-	</form>
 	</div>
 </section>
 

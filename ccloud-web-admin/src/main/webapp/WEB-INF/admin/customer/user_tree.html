@@ -22,10 +22,10 @@
 	
 	$saveBtn.click(function() {
 		$saveBtn.attr("disabled", "disabled");
-		let nodes = $tree.treeview("getSelected", $rootNodeId);
+		var nodes = $tree.treeview("getSelected", $rootNodeId);
 		if (nodes.length == 0) {// 未选中资源
 			$saveBtn.removeAttr("disabled");
-			layer.alert("请选择父菜单!", {icon: 2});
+			layer.alert("请选择!", {icon: 2});
 			return ;
 		}
 		
@@ -42,16 +42,37 @@
 				}
 			}
 		});
-
+		
 		parent.$("#userIds").val(userIds);
 		parent.$("#userNames").val(userNames);
+		var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+		
+		if(parent.batchFlg){
+			parent.$('#form').attr("action", "${CPATH}/admin/customer/batchSetUser");
+			parent.$('#form').ajaxSubmit({
+				type : "post",
+				dataType : "json",
+				success : function(result) { 
+					if (result.errorCode > 0) {
+						parent.toastr.error(result.message, '操作失败');
+					} else {
+						parent.toastr.success(result.message, '操作成功');
+						parent.$table.bootstrapTable('refresh');
+						parent.layer.close(index);
+					}
+				},
+				error : function() {
+					parent.toastr.error("信息提交错误", '操作失败');
+				}
+			});
+		} else {
+			parent.$('#form').data('bootstrapValidator')
+				.updateStatus('userIds', 'NOT_VALIDATED', null)
+				.validateField('userIds');
+			parent.layer.close(index);
+		}
 
-		parent.$('#form').data('bootstrapValidator')
-			.updateStatus('userIds', 'NOT_VALIDATED', null)
-			.validateField('userIds');
 
-		let index = parent.layer.getFrameIndex(window.name); //获取窗口索引
-		parent.layer.close(index);
 		
 	});
 	
