@@ -17,6 +17,8 @@ package org.ccloud.controller.admin;
 
 import java.util.Map;
 
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
@@ -36,6 +38,7 @@ import com.jfinal.plugin.activerecord.Page;
 @RouterMapping(url = "/admin/goodsType", viewPath = "/WEB-INF/admin/goods_type")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
+@RequiresPermissions(value={"goodsType:view","admin:all"},logical=Logical.OR)
 public class _GoodsTypeController extends JBaseCRUDController<GoodsType> { 
 
 	public void list() {
@@ -52,7 +55,18 @@ public class _GoodsTypeController extends JBaseCRUDController<GoodsType> {
 		
 	}
 	
+	@Override
+	@RequiresPermissions(value={"goodsType:edit","admin:all"},logical=Logical.OR)
+	public void edit() {
+		String id = getPara("id");
+		if (id != null) {
+			GoodsType goodsType = GoodsTypeQuery.me().findById(id);
+			setAttr("goodsType", goodsType);
+		}
+	}	
+	
 	@Before(UCodeInterceptor.class)
+	@RequiresPermissions(value={"goodsType:edit","admin:all"},logical=Logical.OR)
 	public void batchDelete() {
 		
 		String[] ids = getParaValues("dataItem");

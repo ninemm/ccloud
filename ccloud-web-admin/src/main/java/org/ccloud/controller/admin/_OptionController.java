@@ -18,6 +18,8 @@ package org.ccloud.controller.admin;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.core.JBaseController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
@@ -33,6 +35,7 @@ import com.jfinal.aop.Before;
 @RouterMapping(url = "/admin/option", viewPath = "/WEB-INF/admin/option")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
+@RequiresPermissions(value={"option:all","admin:all"},logical=Logical.OR)
 public class _OptionController extends JBaseController {
 
 	public void index() {

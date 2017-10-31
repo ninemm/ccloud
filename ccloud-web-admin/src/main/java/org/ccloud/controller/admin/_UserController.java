@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
@@ -48,6 +50,7 @@ import com.jfinal.plugin.activerecord.Page;
 @RouterMapping(url = "/admin/user", viewPath = "/WEB-INF/admin/user")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
+@RequiresPermissions(value={"user:view","admin:all"},logical=Logical.OR)
 public class _UserController extends JBaseCRUDController<User> {
 
 	@Override
@@ -91,6 +94,7 @@ public class _UserController extends JBaseCRUDController<User> {
 	}
 
 	@Override
+	@RequiresPermissions(value={"user:edit","admin:all"},logical=Logical.OR)
 	public void edit() {
 		String id = getPara("id");
 		if (id != null) {
@@ -102,6 +106,7 @@ public class _UserController extends JBaseCRUDController<User> {
 	}
 
 	@Override
+	@RequiresPermissions(value={"user:edit","admin:all"},logical=Logical.OR)
 	public void delete() {
 		String id = getPara("id");
 		final User r = UserQuery.me().findById(id);
@@ -120,6 +125,7 @@ public class _UserController extends JBaseCRUDController<User> {
 	}
 
 	@Before(UCodeInterceptor.class)
+	@RequiresPermissions(value={"user:edit","admin:all"},logical=Logical.OR)
 	public void batchDelete() {
 		String[] ids = getParaValues("dataItem");
 		int count = UserQuery.me().batchDelete(ids);
@@ -175,6 +181,7 @@ public class _UserController extends JBaseCRUDController<User> {
 		renderJson(list);
 	}
 
+	@RequiresPermissions(value={"user:edit","admin:all"},logical=Logical.OR)
 	public void enable() {
 		String id = getPara("id");
 		User user = UserQuery.me().findById(id);

@@ -15,6 +15,7 @@
  */
 package org.ccloud.model.query;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -22,6 +23,7 @@ import org.ccloud.model.RoleOperationRel;
 
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
 /**
@@ -74,19 +76,18 @@ public class RoleOperationRelQuery extends JBaseQuery {
 		return DAO.doDelete(" operation_id = ?", operationId);
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<String> findUrlByRoleId(String string) {
+		List<String> list = new ArrayList<>();
 		StringBuilder fromBuilder = new StringBuilder("select o.url from ");
-		fromBuilder.append("from `role_operation_rel` r ");
-		fromBuilder.append("left join `operation_rel` o ");
+		fromBuilder.append("`role_operation_rel` r ");
+		fromBuilder.append("left join `operation` o ");
 		fromBuilder.append("on r.operation_id = o.id ");
-		fromBuilder.append("where r.operation_id = ? ");
-		Object obj = Db.find(fromBuilder.toString(), string);
-		if (obj != null) {
-			return (List<String>) obj;
-		} else {
-			return null;
+		fromBuilder.append("where r.role_id = ? ");
+		List<Record> records = Db.find(fromBuilder.toString(), string);
+		for (Record record : records) {
+			list.add(record.getStr("url"));
 		}
+		return list;
 	}
 
 	

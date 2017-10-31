@@ -15,12 +15,15 @@
  */
 package org.ccloud.model.query;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.ccloud.model.StationOperationRel;
 
+import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
 /**
@@ -99,6 +102,20 @@ public class StationOperationRelQuery extends JBaseQuery {
 
 	public int deleteByOperationId(String operationId) {
 		return DAO.doDelete(" operation_id = ?", operationId);
+	}
+
+	public List<String> findUrlByStationId(String string) {
+		List<String> list = new ArrayList<>();
+		StringBuilder fromBuilder = new StringBuilder("select o.url from ");
+		fromBuilder.append("`station_operation_rel` r ");
+		fromBuilder.append("left join `operation` o ");
+		fromBuilder.append("on r.operation_id = o.id ");
+		fromBuilder.append("where r.station_id = ? ");
+		List<Record> records = Db.find(fromBuilder.toString(), string);
+		for (Record record : records) {
+			list.add(record.getStr("url"));
+		}
+		return list;
 	}
 
 }

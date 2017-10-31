@@ -103,7 +103,7 @@ public class OperationQuery extends JBaseQuery {
 		}
 	}
 
-	public List<String> getPermissions(List<String> roles) {
+	public List<String> getPermissionsByRole(List<String> roles) {
 		List<String> permission = new ArrayList<>();
 		for (String string : roles) {
 			List<String> list = RoleOperationRelQuery.me().findUrlByRoleId(string);
@@ -111,6 +111,17 @@ public class OperationQuery extends JBaseQuery {
 		}
 		return permission;
 	}
-	
-	
+
+	public List<String> getPermissionsByStation(String stationId) {
+		List<String> permission = new ArrayList<>();
+		if (stationId != null) {
+			String[] stationIds = stationId.split(",");	
+			for (int i = 0, len = stationIds.length; i < len; i++) {
+				List<String> list = StationOperationRelQuery.me().findUrlByStationId(stationIds[i]);
+				permission.addAll(list);
+			}
+		}
+		return permission;
+	}
+
 }

@@ -64,10 +64,11 @@
 			<artifactId>easypoi-annotation</artifactId>
 		</dependency> 
 		
-<!-- 		<dependency>
+ 		<dependency>
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-core</artifactId>
-		</dependency> -->
+            <version>1.2.4</version>
+		</dependency>
 		
 		<dependency>
             <groupId>org.apache.shiro</groupId>

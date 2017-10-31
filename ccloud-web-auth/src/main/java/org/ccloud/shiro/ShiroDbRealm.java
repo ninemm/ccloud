@@ -6,7 +6,6 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
-import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.cache.Cache;
@@ -20,7 +19,7 @@ import org.ccloud.model.query.UserQuery;
 import org.ccloud.utils.EncryptUtils;
 
 public class ShiroDbRealm extends AuthorizingRealm {
-
+	
 	public ShiroDbRealm(){
         setAuthenticationTokenClass(CaptchaUsernamePasswordToken.class);
     }
@@ -33,7 +32,9 @@ public class ShiroDbRealm extends AuthorizingRealm {
 	    User userInPrincipal = (User) principals.getPrimaryPrincipal();
 	    //根据用户获取权限
 	    List<String> roles = RoleQuery.me().getPermissions(userInPrincipal.getGroupId());
-	    List<String> stringPermissions = OperationQuery.me().getPermissions(roles);
+	    List<String> stringPermissions = OperationQuery.me().getPermissionsByRole(roles); //通过角色获取权限
+	    List<String> stringPermissions1 = OperationQuery.me().getPermissionsByStation(userInPrincipal.getStationId()); //通过岗位获取权限
+	    stringPermissions.addAll(stringPermissions1);
 	    SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
 	    info.addRoles(roles);
 	    info.addStringPermissions(stringPermissions);
@@ -45,14 +46,14 @@ public class ShiroDbRealm extends AuthorizingRealm {
      */ 
 	@Override
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
-	    UsernamePasswordToken authcToken = (UsernamePasswordToken) token;
+		CaptchaUsernamePasswordToken authcToken = (CaptchaUsernamePasswordToken) token;
 	    User user = UserQuery.me().findUserByUsername(authcToken.getUsername());
 	    if (user != null) {
 	    	String password = EncryptUtils.encryptPassword(new String(authcToken.getPassword()), user.getSalt());
 	        if(!user.getPassword().equals(password)){
 	            throw new AuthenticationException("密码错误");
 	        }
-	        return new SimpleAuthenticationInfo(user, user.getPassword(),user.getUsername());
+	        return new SimpleAuthenticationInfo(user, user.getPassword(), getName());
 	    } else {
 	        throw new AuthenticationException("用户不存在");
 	    }
@@ -77,4 +78,13 @@ public class ShiroDbRealm extends AuthorizingRealm {
             }
         }
     }
+    
+    /** 
+     * 认证密码匹配调用方法 
+     */  
+    @Override  
+    protected void assertCredentialsMatch(AuthenticationToken authcToken,  
+            AuthenticationInfo info) throws AuthenticationException {
+    	return;
+    }      
 }

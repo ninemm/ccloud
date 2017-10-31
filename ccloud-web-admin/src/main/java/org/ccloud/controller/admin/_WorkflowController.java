@@ -5,6 +5,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.workflow.model.ActReProcdef;
@@ -15,6 +17,7 @@ import com.google.common.collect.ImmutableMap;
 import com.jfinal.plugin.activerecord.Page;
 
 @RouterMapping(url = "/admin/workflow", viewPath = "/WEB-INF/admin/workflow")
+@RequiresPermissions(value={"workflow:all","admin:all"},logical=Logical.OR)
 public class _WorkflowController extends JBaseCRUDController<ActReProcdef> {
 
 	public void list() {

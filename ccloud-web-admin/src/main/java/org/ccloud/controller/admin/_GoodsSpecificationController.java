@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
@@ -47,6 +49,7 @@ import com.jfinal.upload.UploadFile;
 @RouterMapping(url = "/admin/specification", viewPath = "/WEB-INF/admin/specification")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
+@RequiresPermissions(value={"specification:view","admin:all"},logical=Logical.OR)
 public class _GoodsSpecificationController extends JBaseCRUDController<GoodsSpecification> { 
 
 	public void list() {
@@ -182,6 +185,7 @@ public class _GoodsSpecificationController extends JBaseCRUDController<GoodsSpec
 	}  	
 	
 	@Override
+	@RequiresPermissions(value={"specification:edit","admin:all"},logical=Logical.OR)
 	public void edit() {
 		String id = getPara("id");
 		if (id != null) {
@@ -194,6 +198,7 @@ public class _GoodsSpecificationController extends JBaseCRUDController<GoodsSpec
 	}
 	
 	@Override
+	@RequiresPermissions(value={"specification:edit","admin:all"},logical=Logical.OR)
 	public void delete() {
 		String id = getPara("id");
 		final GoodsSpecification ccGoodsSpecification = GoodsSpecificationQuery.me().findById(id);
@@ -223,6 +228,7 @@ public class _GoodsSpecificationController extends JBaseCRUDController<GoodsSpec
 	}	
 	
 	@Before(UCodeInterceptor.class)
+	@RequiresPermissions(value={"specification:edit","admin:all"},logical=Logical.OR)
 	public void batchDelete() {
 		
 		String[] ids = getParaValues("dataItem");

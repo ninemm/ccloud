@@ -18,6 +18,8 @@ package org.ccloud.controller.admin;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
@@ -40,6 +42,7 @@ import com.jfinal.plugin.activerecord.Page;
 @RouterMapping(url = "/admin/menu", viewPath = "/WEB-INF/admin/menu")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
+@RequiresPermissions(value={"menu:view","admin:all"},logical=Logical.OR)
 public class _MenuController extends JBaseCRUDController<Menu> { 
 
 	public void list() {
@@ -59,6 +62,7 @@ public class _MenuController extends JBaseCRUDController<Menu> {
 	}
 	
 	@Override
+	@RequiresPermissions(value={"menu:edit","admin:all"},logical=Logical.OR)
 	public void edit() {
 		List<Systems> list = SystemsQuery.me().findAll();
 		setAttr("list", list);
@@ -81,6 +85,7 @@ public class _MenuController extends JBaseCRUDController<Menu> {
 	}
 	
 	@Before(UCodeInterceptor.class)
+	@RequiresPermissions(value={"menu:edit","admin:all"},logical=Logical.OR)
 	public void batchDelete() {
 		
 		String[] ids = getParaValues("dataItem");
@@ -92,6 +97,20 @@ public class _MenuController extends JBaseCRUDController<Menu> {
 		}
 		
 	}
+	
+	@Override
+	@RequiresPermissions(value={"menu:edit","admin:all"},logical=Logical.OR)
+	public void delete() {
+		String id = getPara("id");
+		final Menu r = MenuQuery.me().findById(id);
+		if (r != null) {
+			if (r.delete()) {
+				renderAjaxResultForSuccess("删除成功");
+				return;
+			}
+		}
+		renderAjaxResultForError("删除失败");
+	}	
 	
 	public void menu_tree() {
 		List<Map<String, Object>> list = MenuQuery.me().findMenuListAsTree(1);

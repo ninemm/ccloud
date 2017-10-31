@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.Department;
@@ -42,6 +44,7 @@ import com.jfinal.plugin.activerecord.Page;
 @RouterMapping(url = "/admin/department", viewPath = "/WEB-INF/admin/department")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
+@RequiresPermissions(value={"department:view","admin:all"},logical=Logical.OR)
 public class _DepartmentController extends JBaseCRUDController<Department> {
 
 	public void list() {
@@ -61,6 +64,7 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 	}
 
 	@Override
+	@RequiresPermissions(value={"department:edit","admin:all"},logical=Logical.OR)
 	public void edit() {
 		String id = getPara("id");
 		if (id != null) {
@@ -89,6 +93,7 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 	}
 
 	@Override
+	@RequiresPermissions(value={"department:edit","admin:all"},logical=Logical.OR)
 	public void delete() {
 		String id = getPara("id");
 		final Department r = DepartmentQuery.me().findById(id);

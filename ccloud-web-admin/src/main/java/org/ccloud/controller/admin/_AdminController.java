@@ -17,7 +17,6 @@ package org.ccloud.controller.admin;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseController;
@@ -30,8 +29,8 @@ import org.ccloud.model.User;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
+import org.ccloud.shiro.CaptchaUsernamePasswordToken;
 import org.ccloud.utils.CookieUtils;
-import org.ccloud.utils.EncryptUtils;
 import org.ccloud.utils.StringUtils;
 
 import com.jfinal.aop.Before;
@@ -70,40 +69,30 @@ public class _AdminController extends JBaseController {
 	public void login() {
 		String username = getPara("username");
 		String password = getPara("password");
+		String rememberMeStr = getPara("remember_me");
+        boolean rememberMe = false;
+        if (rememberMeStr != null && rememberMeStr.equals("on")) {
+            rememberMe = true;
+        }		
 
 		if (!StringUtils.areNotEmpty(username, password)) {
 			render("login.html");
 			return;
 		}
 
-		User user = UserQuery.me().findUserByUsername(username);
-
-		if (null == user) {
-			renderAjaxResultForError("没有该用户");
-			return;
-		}
-
-//	    Subject subject = SecurityUtils.getSubject();
-//	    UsernamePasswordToken token = new UsernamePasswordToken(username, password);
-//	    try {
-//	        subject.login(token);
-//	        renderAjaxResultForSuccess("登录成功");
-//	    } catch (AuthenticationException e) {
-//	    	renderAjaxResultForError("用户名或密码错误");
-//	    }
-		
-		if (EncryptUtils.verlifyUser(user.getPassword(), user.getSalt(), password)) {
-
+	    Subject subject = SecurityUtils.getSubject();
+	    CaptchaUsernamePasswordToken token = new CaptchaUsernamePasswordToken(username, password, rememberMe, "", "");
+	    try {
+	        subject.login(token);
+	        User user = UserQuery.me().findUserByUsername(username);
 			MessageKit.sendMessage(Actions.USER_LOGINED, user);
-
 			CookieUtils.put(this, Consts.COOKIE_LOGINED_USER, user.getId().toString());
-			
-			setSessionAttr("user", user);
-
-			renderAjaxResultForSuccess("登录成功");
-		} else {
-			renderAjaxResultForError("密码错误");
-		}
+			setSessionAttr("user", user);	        
+	        renderAjaxResultForSuccess("登录成功");
+	    } catch (AuthenticationException e) {
+	    	e.printStackTrace();
+	    	renderAjaxResultForError("用户名或密码错误");
+	    }
 	}
 
 	@Before(UCodeInterceptor.class)
@@ -112,6 +101,10 @@ public class _AdminController extends JBaseController {
 	    Subject subject = SecurityUtils.getSubject();
 	    subject.logout();
 		redirect("/admin");
+	}
+	
+	public void checkRole() {
+		render("404.html");
 	}
 
 }

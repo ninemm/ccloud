@@ -18,6 +18,8 @@ package org.ccloud.controller.admin;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
@@ -40,6 +42,7 @@ import com.jfinal.plugin.activerecord.Page;
 @RouterMapping(url = "/admin/module", viewPath = "/WEB-INF/admin/module")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
+@RequiresPermissions(value={"module:view","admin:all"},logical=Logical.OR)
 public class _ModuleController extends JBaseCRUDController<Module> {
 	public void list() {
 		String keyword = getPara("k", "");
@@ -70,6 +73,7 @@ public class _ModuleController extends JBaseCRUDController<Module> {
 
 
 	@Override
+	@RequiresPermissions(value={"module:edit","admin:all"},logical=Logical.OR)
 	public void edit() {
 		List<Systems> list = SystemsQuery.me().findAll();
 		setAttr("list", list);

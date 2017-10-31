@@ -30,6 +30,17 @@
 			<version>2017.5</version>
 		</dependency>
 		
+ 		<dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-core</artifactId>
+            <version>1.2.4</version>
+		</dependency>
+		
+		<dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-web</artifactId>
+        </dependency>		
+		
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
@@ -89,7 +100,22 @@
 			<type>war</type>
 			<scope>compile</scope>
 		</dependency> -->
+		<!-- <dependency>
+			<groupId>org.ccloud</groupId>
+			<artifactId>ccloud-web-auth</artifactId>
+			<version>${project.version}</version>
+			<type>jar</type>
+			<classifier>classes</classifier>
+			<scope>provided</scope>
+		</dependency> -->
 		
+		<dependency>
+			<groupId>org.ccloud</groupId>
+			<artifactId>ccloud-web-auth</artifactId>
+			<version>${project.version}</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.ccloud</groupId>
 			<artifactId>ccloud-web-templates</artifactId>

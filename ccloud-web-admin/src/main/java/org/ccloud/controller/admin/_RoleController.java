@@ -15,6 +15,9 @@
  */
 package org.ccloud.controller.admin;
 
+
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
@@ -32,6 +35,7 @@ import com.jfinal.plugin.activerecord.Page;
 @RouterMapping(url = "/admin/role", viewPath = "/WEB-INF/admin/role")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
+@RequiresPermissions(value={"role:view","admin:all"},logical=Logical.OR)
 public class _RoleController extends JBaseCRUDController<Role> { 
 
 	
@@ -48,9 +52,19 @@ public class _RoleController extends JBaseCRUDController<Role> {
 		}
 		
 	}
-
 	
+	@Override
+	@RequiresPermissions(value={"role:edit","admin:all"},logical=Logical.OR)
+	public void edit() {
+		String id = getPara("id");
+		if (id != null) {
+			Role role = RoleQuery.me().findById(id);
+			setAttr("role", role);
+		}
+	}
+
 	@Before(UCodeInterceptor.class)
+	@RequiresPermissions(value={"role:edit","admin:all"},logical=Logical.OR)
 	public void batchDelete() {
 		
 		String[] ids = getParaValues("dataItem");

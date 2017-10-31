@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
@@ -47,6 +49,7 @@ import com.jfinal.plugin.activerecord.Page;
 @RouterMapping(url = "/admin/station", viewPath = "/WEB-INF/admin/station")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
+@RequiresPermissions(value={"station:view","admin:all"},logical=Logical.OR)
 public class _StationController extends JBaseCRUDController<Station> {
 
     public void list() {
@@ -62,6 +65,7 @@ public class _StationController extends JBaseCRUDController<Station> {
 
     }
     @Override
+    @RequiresPermissions(value={"station:edit","admin:all"},logical=Logical.OR)
     public void edit() {
         List<Station> list = StationQuery.me().findAll();
         setAttr("list", list);
@@ -86,6 +90,7 @@ public class _StationController extends JBaseCRUDController<Station> {
 
     @Override
     @Before(UCodeInterceptor.class)
+    @RequiresPermissions(value={"station:edit","admin:all"},logical=Logical.OR)
     public void delete() {
         boolean isDelete = Db.tx(new IAtom() {
             @Override

@@ -18,6 +18,8 @@ package org.ccloud.controller.admin;
 import java.math.BigInteger;
 import java.util.Date;
 
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.Dict;
@@ -33,6 +35,7 @@ import com.jfinal.plugin.activerecord.Page;
 @RouterMapping(url = "/admin/dict", viewPath = "/WEB-INF/admin/dict")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
+@RequiresPermissions(value={"dict:view","admin:all"},logical=Logical.OR)
 public class _DictController extends JBaseCRUDController<Dict> {
 
 	public void index() {
@@ -52,6 +55,7 @@ public class _DictController extends JBaseCRUDController<Dict> {
 	}
 
 	@Override
+	@RequiresPermissions(value={"dict:edit","admin:all"},logical=Logical.OR)
 	public void edit() {
 		BigInteger id = getParaToBigInteger("id");
 		if (id != null) {
@@ -96,6 +100,7 @@ public class _DictController extends JBaseCRUDController<Dict> {
 	}
 
 	@Override
+	@RequiresPermissions(value={"dict:edit","admin:all"},logical=Logical.OR)
 	public void delete() {
 		BigInteger id = getParaToBigInteger("id");
 		final Dict r = DictQuery.me().findById(id);
@@ -108,6 +113,7 @@ public class _DictController extends JBaseCRUDController<Dict> {
 		renderAjaxResultForError();
 	}
 	
+	@RequiresPermissions(value={"dict:edit","admin:all"},logical=Logical.OR)
 	public void batchDelete() {
 		BigInteger[] ids = getParaValuesToBigInteger("dataItem");
 		int count = DictQuery.me().batchDelete(ids);

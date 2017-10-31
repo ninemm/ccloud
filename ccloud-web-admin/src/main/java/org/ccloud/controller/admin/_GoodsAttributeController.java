@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
@@ -40,6 +42,7 @@ import com.jfinal.plugin.activerecord.Page;
 @RouterMapping(url = "/admin/goodsAttribute", viewPath = "/WEB-INF/admin/goods_attribute")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
+@RequiresPermissions(value={"goodsAttribute:view","admin:all"},logical=Logical.OR)
 public class _GoodsAttributeController extends JBaseCRUDController<GoodsAttribute> { 
 
 	@Override
@@ -67,6 +70,7 @@ public class _GoodsAttributeController extends JBaseCRUDController<GoodsAttribut
 	}
 	
 	@Override
+	@RequiresPermissions(value={"goodsAttribute:edit","admin:all"},logical=Logical.OR)
 	public void edit() {
 		String id = getPara("id");
 		if (id != null) {
@@ -78,6 +82,7 @@ public class _GoodsAttributeController extends JBaseCRUDController<GoodsAttribut
 	}	
 	
 	@Before(UCodeInterceptor.class)
+	@RequiresPermissions(value={"goodsAttribute:edit","admin:all"},logical=Logical.OR)
 	public void batchDelete() {
 		
 		String[] ids = getParaValues("dataItem");
@@ -89,6 +94,20 @@ public class _GoodsAttributeController extends JBaseCRUDController<GoodsAttribut
 		}
 		
 	}
+	
+	@Override
+	@RequiresPermissions(value={"goodsAttribute:edit","admin:all"},logical=Logical.OR)
+	public void delete() {
+		String id = getPara("id");
+		final GoodsAttribute r = GoodsAttributeQuery.me().findById(id);
+		if (r != null) {
+			if (r.delete()) {
+				renderAjaxResultForSuccess("删除成功");
+				return;
+			}
+		}
+		renderAjaxResultForError("删除失败");
+	}	
 	
 	public void getAttributeInput() {
 		String typeId = getPara("typeId");
@@ -106,6 +125,7 @@ public class _GoodsAttributeController extends JBaseCRUDController<GoodsAttribut
         renderJson(list);
 	}
 	
+	@RequiresPermissions(value={"goodsAttribute:edit","admin:all"},logical=Logical.OR)
 	public void enable() {
 		String id = getPara("id");
 		GoodsAttribute attribute = GoodsAttributeQuery.me().findById(id);

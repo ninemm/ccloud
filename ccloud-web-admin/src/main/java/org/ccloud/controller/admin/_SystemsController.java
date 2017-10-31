@@ -15,6 +15,8 @@
  */
 package org.ccloud.controller.admin;
 
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
@@ -33,6 +35,7 @@ import com.jfinal.plugin.activerecord.Page;
 @RouterMapping(url = "/admin/systems", viewPath = "/WEB-INF/admin/systems")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
+@RequiresPermissions(value={"systems:view","admin:all"},logical=Logical.OR)
 public class _SystemsController extends JBaseCRUDController<Systems> { 
 
 	@Override
@@ -49,7 +52,32 @@ public class _SystemsController extends JBaseCRUDController<Systems> {
 		
 	}
 	
+	@Override
+	@RequiresPermissions(value={"systems:edit","admin:all"},logical=Logical.OR)
+	public void edit() {
+		String id = getPara("id");
+		if (id != null) {
+			Systems systems = SystemsQuery.me().findById(id);
+			setAttr("systems", systems);
+		}
+	}	
+	
+	@Override
+	@RequiresPermissions(value={"systems:edit","admin:all"},logical=Logical.OR)
+	public void delete() {
+		String id = getPara("id");
+		final Systems r = SystemsQuery.me().findById(id);
+		if (r != null) {
+			if (r.delete()) {
+				renderAjaxResultForSuccess("删除成功");
+				return;
+			}
+		}
+		renderAjaxResultForError("删除失败");
+	}
+	
 	@Before(UCodeInterceptor.class)
+	@RequiresPermissions(value={"systems:edit","admin:all"},logical=Logical.OR)
 	public void batchDelete() {
 		
 		String[] ids = getParaValues("dataItem");

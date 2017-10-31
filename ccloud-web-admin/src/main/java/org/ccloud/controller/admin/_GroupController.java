@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
@@ -45,6 +47,7 @@ import com.jfinal.plugin.activerecord.Page;
 @RouterMapping(url = "/admin/group", viewPath = "/WEB-INF/admin/group")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
+@RequiresPermissions(value={"group:view","admin:all"},logical=Logical.OR)
 public class _GroupController extends JBaseCRUDController<Group> {
     @Override
     public void index() {
@@ -58,6 +61,16 @@ public class _GroupController extends JBaseCRUDController<Group> {
         }
 
     }
+    
+	@Override
+	@RequiresPermissions(value={"group:edit","admin:all"},logical=Logical.OR)
+	public void edit() {
+		String id = getPara("id");
+		if (id != null) {
+			Group group = GroupQuery.me().findById(id);
+			setAttr("group", group);
+		}
+	}    
 
     public  void getRole() {
 
@@ -120,6 +133,7 @@ public class _GroupController extends JBaseCRUDController<Group> {
 
     @Override
     @Before(UCodeInterceptor.class)
+    @RequiresPermissions(value={"group:edit","admin:all"},logical=Logical.OR)
     public void delete() {
         boolean isDelete = Db.tx(new IAtom() {
             @Override
@@ -140,6 +154,7 @@ public class _GroupController extends JBaseCRUDController<Group> {
     }
 
     @Before(UCodeInterceptor.class)
+    @RequiresPermissions(value={"group:edit","admin:all"},logical=Logical.OR)
     public void batchDelete() {
 
         String[] ids = getParaValues("dataItem");
