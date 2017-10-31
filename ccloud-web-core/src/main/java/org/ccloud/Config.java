@@ -19,6 +19,7 @@ import org.ccloud.core.CCloud;
 import org.ccloud.core.CCloudConfig;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
+import org.ccloud.shiro.tag.ShiroTags;
 import org.ccloud.ui.freemarker.function.DictBox;
 import org.ccloud.ui.freemarker.function.DictName;
 import org.ccloud.ui.freemarker.function.MetadataChecked;
@@ -31,6 +32,7 @@ import org.ccloud.ui.freemarker.tag.DictTag;
 import com.jfinal.kit.PropKit;
 import com.jfinal.qyweixin.sdk.api.ApiConfig;
 import com.jfinal.qyweixin.sdk.api.ApiConfigKit;
+import com.jfinal.render.FreeMarkerRender;
 import com.jfinal.template.Engine;
 
 public class Config extends CCloudConfig {
@@ -52,6 +54,8 @@ public class Config extends CCloudConfig {
 		CCloud.addFunction("METADATA_CHECKED", new MetadataChecked());
 		CCloud.addFunction("METADATA_SELECTED", new MetadataSelected());
 
+		FreeMarkerRender.getConfiguration().setSharedVariable(ShiroTags.TAG_NAME, new ShiroTags());
+		
 		MessageKit.sendMessage(Actions.CCLOUD_STARTED);
 		
 		ApiConfigKit.putApiConfig(getApiConfig());

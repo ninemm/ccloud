@@ -88,7 +88,7 @@ public abstract class CCloudConfig extends JFinalConfig {
 		constants.setEncoding(Consts.CHARTSET_UTF8);
 		constants.setMaxPostSize(1024 * 1024 * 200);
 		constants.setRenderFactory(new CCloudRenderFactory());
-
+		
 		// constants.setTokenCache(new JTokenCache());
 		ApiConfigKit.setDevMode(PropKit.getBoolean("dev_mode", false));
 	}
