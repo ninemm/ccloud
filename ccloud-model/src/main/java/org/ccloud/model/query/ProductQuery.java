@@ -92,7 +92,7 @@ public class ProductQuery extends JBaseQuery {
 	}
 	
 	public List<ProductInfo> getAllProductInfo() {
- 		StringBuilder fromBuilder = new StringBuilder("SELECT p.create_date as createDate, p.cost, p.is_marketable as isMarketable, p.market_price as marketPrice, p.`name`, p.price, ");
+ 		StringBuilder fromBuilder = new StringBuilder("SELECT p.create_date as createDate,p.id as productId, p.cost, p.is_marketable as isMarketable, p.market_price as marketPrice, p.`name`, p.price, ");
 		fromBuilder.append("p.product_sn as productSn, p.store, p.store_place, p.weight, p.weight_unit as weightUnit, g.`code`, b.`name` as brandName, c.`name` as categoryName ");
 		fromBuilder.append("FROM cc_product p ");
 		fromBuilder.append("LEFT JOIN cc_goods g ON p.goods_id = g.id ");
@@ -116,6 +116,7 @@ public class ProductQuery extends JBaseQuery {
 			pro.setStorePlace(record.getStr("storePlace"));
 			pro.setWeight(record.getStr("weight"));
 			pro.setWeightUnit(record.getStr("weightUnit"));
+			pro.setProductId(record.getStr("productId"));
 			List<GoodsSpecificationValue> slist = GoodsSpecificationValueQuery.me().findByProductId(pro.getProductSn());
 			pro.setSpecificationList(slist);
 			plist.add(pro);

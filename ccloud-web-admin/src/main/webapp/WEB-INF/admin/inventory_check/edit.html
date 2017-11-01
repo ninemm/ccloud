@@ -91,7 +91,7 @@ function addNew() {
 var index = 1;
 function addTr(tid, productList, optionArr) {
 	var firstProduct = productList[0].productList;
-	var goodsCode = firstProduct.code;
+	var goodsCode = firstProduct.productId;
 	var goodsName = firstProduct.name;
 	var specification = firstProduct.categoryName;
 	var big_unit = firstProduct.weightUnit;
@@ -130,7 +130,7 @@ function addTr(tid, productList, optionArr) {
     <!--切换商品的方法  -->
     $tbody.find("tr:last>td>select.pro-slc2").change(function(){
      var result = productMap[$(this).val()].productList;   
-     var cgoodsCode = result.code;
+     var cgoodsCode = result.productId;
      var cgoodsName = result.name;
      var cspecification = result.categoryName;
      var cbig_unit = result.weightUnit;
