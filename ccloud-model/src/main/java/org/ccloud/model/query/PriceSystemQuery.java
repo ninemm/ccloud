@@ -46,13 +46,19 @@ public class PriceSystemQuery extends JBaseQuery {
 		});
 	}
 
-	public Page<PriceSystem> paginate(int pageNumber, int pageSize, String keyword, String orderby) {
+	public Page<PriceSystem> paginate(int pageNumber, int pageSize, String keyword, String orderby, String dataArea,
+			String deptId, boolean isSuperAdmin) {
 		String select = "select * ";
-		StringBuilder fromBuilder = new StringBuilder("from `cc_price_system` ");
+		StringBuilder fromBuilder = new StringBuilder(" from `cc_price_system` ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
 
-		appendIfNotEmptyWithLike(fromBuilder, "name", keyword, params, true);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "name", keyword, params, needWhere);
+		if (!isSuperAdmin) {
+			needWhere = appendIfNotEmpty(fromBuilder, "dept_id", deptId, params, needWhere);
+			needWhere = appendIfNotEmpty(fromBuilder, "data_area", dataArea, params, needWhere);
+		}
 
 		fromBuilder.append("order by " + orderby);
 

@@ -122,12 +122,12 @@ public abstract class BasePriceSystem<M extends BasePriceSystem<M>> extends JMod
 		return get("dept_id");
 	}
 
-	public void setDataOrg(java.lang.String dataOrg) {
-		set("data_org", dataOrg);
+	public void setDataArea(java.lang.String dataArea) {
+		set("data_area", dataArea);
 	}
 
-	public java.lang.String getDataOrg() {
-		return get("data_org");
+	public java.lang.String getDataArea() {
+		return get("data_area");
 	}
 
 	public void setCreateDate(java.util.Date createDate) {

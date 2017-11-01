@@ -22,7 +22,7 @@
 		'priceSystem.name': {
 			validators: {
 				notEmpty: { message: '名称不能为空' },
-				stringLength: { max: 15, message: '系统名称最大长度是15字符，请重新输入' }
+				stringLength: { max: 15, message: '名称最大长度是15字符，请重新输入' }
 			}
 		},
 		'priceSystem.factor': {
@@ -30,8 +30,23 @@
 				notEmpty: { message: '基准价格倍数不能为空' },
 				numeric: { max: 15, message: '基准价格倍数最大长度是15数字，请重新输入' }
 			}
+		},
+		'parent_name': {
+			validators: {
+				notEmpty: { message: '部门不能为空' },
+			}
 		}
 	};
+	
+	$('#_department_tree').click(function() {
+		layer.open({
+			title:'部门',
+			type: 2,
+			area: ['580px', '530px'],
+			fix: false, //不固定
+			content: '${CPATH}/admin/department/department_tree'
+		});
+	});
 
 	function doSubmit(){
 		$form.ajaxSubmit({
@@ -94,6 +109,19 @@
 						<input class="form-control input-sm" type="text" name="priceSystem.factor" value="${(priceSystem.factor)!}" placeholder="1-15个任意数字">
 					</div>
 				</div>
+				
+				<div class="form-group col-sm-12 validata-box">
+					<label class="control-label col-sm-2">*部门:</label>
+					<div class="input-group col-md-4 col-sm-10">
+						<input type="hidden" name="parent_id" id="parent_id" value="">
+						<input type="hidden" name="data_area" id="data_area" value="">
+						<input class="form-control input-sm" type="text" id="parent_name" name="parent_name" value="" readonly>
+						<div class="input-group-addon" id="_department_tree" style="cursor:pointer;">
+							<i class="fa fa-search"></i> 选择
+						</div>
+					</div>
+				</div>
+				
 			</div>
 
 			<div class="box-footer"> 
