@@ -73,7 +73,7 @@ public class _UserController extends JBaseCRUDController<User> {
 		final User user = getModel(User.class);
 		String stationList = getPara("stationList");
 		String stationName = getPara("stationName");
-		String deptName = getPara("parentName");
+		String deptName = getPara("parent_name");
 		user.setDepartmentName(deptName);
 		user.setStationId(stationList);
 		user.setStationName(stationName);

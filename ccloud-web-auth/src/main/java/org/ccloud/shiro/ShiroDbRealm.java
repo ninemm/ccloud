@@ -1,6 +1,7 @@
 package org.ccloud.shiro;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -31,13 +32,13 @@ public class ShiroDbRealm extends AuthorizingRealm {
 	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
 	    User userInPrincipal = (User) principals.getPrimaryPrincipal();
 	    //根据用户获取权限
-	    List<String> roles = RoleQuery.me().getPermissions(userInPrincipal.getGroupId());
-	    List<String> stringPermissions = OperationQuery.me().getPermissionsByRole(roles); //通过角色获取权限
-	    List<String> stringPermissions1 = OperationQuery.me().getPermissionsByStation(userInPrincipal.getStationId()); //通过岗位获取权限
-	    stringPermissions.addAll(stringPermissions1);
+	    Map<String, List<String>> map = RoleQuery.me().getPermissions(userInPrincipal.getGroupId());
+	    List<String> rolePermissions = OperationQuery.me().getPermissionsByRole(map.get("roleIds")); //通过角色获取权限
+	    List<String> stationPermissions = OperationQuery.me().getPermissionsByStation(userInPrincipal.getStationId()); //通过岗位获取权限
+	    rolePermissions.addAll(stationPermissions);
 	    SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
-	    info.addRoles(roles);
-	    info.addStringPermissions(stringPermissions);
+	    info.addRoles(map.get("roleCodes"));
+	    info.addStringPermissions(rolePermissions);
 	    return info;
 	}
 

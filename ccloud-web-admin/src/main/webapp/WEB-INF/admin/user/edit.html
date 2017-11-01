@@ -85,7 +85,7 @@ var validatorFields = {
             notEmpty: { message: '用户分组不能为空' },
         }
 	},
-	'parentName': {
+	'parent_name': {
 		validators: {
             notEmpty: { message: '用户部门不能为空' },
         }
@@ -233,7 +233,7 @@ function doSubmit(){
 						<div class="input-group col-md-4 col-sm-10">
 							<div class="input-group">
 								<input type="hidden" name="user.department_id" id="parent_id" value="${(user.department_id)!}">
-			                 	<input class="form-control input-sm" type="text" id="parent_name" name="parentName" value="${(user.department_name)!}">
+			                 	<input class="form-control input-sm" type="text" id="parent_name" name="parent_name" value="${(user.department_name)!}">
 		                 		<div class="input-group-addon" id="_dept_tree" style="cursor:pointer;">
 		                 			<i class="fa fa-search"></i> 选择
 								</div>

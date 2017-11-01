@@ -16,8 +16,10 @@
 package org.ccloud.model.query;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.ccloud.model.Role;
 
@@ -79,21 +81,26 @@ public class RoleQuery extends JBaseQuery {
 		return DAO.find(sqlBuilder.toString(), roleId, groupId);
 	}
 
-	public List<String> getPermissions(String groupId) {
+	public Map<String, List<String>> getPermissions(String groupId) {
+		Map<String, List<String>> map = new HashMap<>();
 		List<String> roleIds = new ArrayList<>();
+		List<String> roleCodes = new ArrayList<>();
 		List<Role> list = RoleQuery.me().findByGroupId(groupId);
 		for (Role role : list) {
-			roleIds.add(role.getRoleCode());
+			roleCodes.add(role.getRoleCode());
+			roleIds.add(role.getId());
 		}
-		return roleIds;
+		map.put("roleIds", roleIds);
+		map.put("roleCodes", roleCodes);
+		return map;
 	}
 
 	public List<Role> findByGroupId(String groupId) {
-		StringBuilder sqlBuilder = new StringBuilder("select * ");
+		StringBuilder sqlBuilder = new StringBuilder("select r.* ");
 
 		sqlBuilder.append("from `role` r ");
-		sqlBuilder.append("join `group_role_rel` gr on gr.role_id = r.id ");
-		sqlBuilder.append("join `group` g on g.id = gr.group_id ");
+		sqlBuilder.append("left join `group_role_rel` gr on gr.role_id = r.id ");
+		sqlBuilder.append("left join `group` g on g.id = gr.group_id ");
 		sqlBuilder.append("where g.id = ? ");
 
 		return DAO.find(sqlBuilder.toString(), groupId);
