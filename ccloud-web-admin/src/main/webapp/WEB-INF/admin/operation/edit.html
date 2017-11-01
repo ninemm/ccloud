@@ -81,13 +81,19 @@
 		'operation.operation_name': {
 			validators: {
 	            notEmpty: { message: '功能名称不能为空' },
-	            stringLength: { min: 2, max: 15, message: '功能名称最大长度必须在2到30字符之间，请重新输入' }
+	            stringLength: { min: 2, max: 30, message: '功能名称最大长度必须在2到30字符之间，请重新输入' }
 	        }
 		},
 		'operation.operation_code': {
 			validators: {
 	            notEmpty: { message: '功能编码不能为空' },
-	            stringLength: { min: 2, max: 15, message: '功能名称最大长度必须在2到30字符之间，请重新输入' }
+	            stringLength: { min: 2, max: 30, message: '功能编码最大长度必须在2到30字符之间，请重新输入' }
+	        }
+		},
+		'operation.url': {
+			validators: {
+	            notEmpty: { message: 'URL不能为空' },
+	            stringLength: { min: 2, max: 30, message: 'URL最大长度必须在2到30字符之间，请重新输入' }
 	        }
 		}
 		
@@ -203,7 +209,7 @@
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">URL:</label>
 						<div class="input-group col-md-4 col-sm-10">
-		                 	<input class="form-control input-sm" type="text" name="operation.url" value="${(operation.url)!}">
+		                 	<input class="form-control input-sm" type="text" name="operation.url" value="${(operation.url)!}" placeholder="2-30个任意字符">
 		               	</div>
 					</div>
 					

@@ -22,12 +22,12 @@
 
 	$saveBtn.click(function() {
 		let nodes = $tree.treeview("getSelected", $rootNodeId);
-		if (nodes.length == 0) {
+		//if (nodes.length == 0) {
 			// 未选中资源
-			$saveBtn.removeAttr("disabled");
-			layer.alert("请选择父菜单!", {icon: 2});
-			return ;
-		}
+		//	$saveBtn.removeAttr("disabled");
+		//	layer.alert("请选择父菜单!", {icon: 2});
+		//	return ;
+		//}
 		let stationId = "";
 		let stationName = "";
 		$.each(nodes, function(idx, obj) {
