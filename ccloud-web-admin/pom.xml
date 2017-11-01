@@ -111,24 +111,17 @@
 		
 		<dependency>
 			<groupId>org.ccloud</groupId>
-			<artifactId>ccloud-web-auth</artifactId>
-			<version>${project.version}</version>
-			<type>jar</type>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.ccloud</groupId>
 			<artifactId>ccloud-web-templates</artifactId>
 			<version>${project.version}</version>
 			<type>war</type>
 			<scope>compile</scope>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 	    	<groupId>com.jfinal</groupId>
 	    	<artifactId>jetty-server</artifactId>
 	    	<version>8.1.8</version>
 	    	<scope>provided</scope>
-	    </dependency>
+	    </dependency> -->
 	    
 	    
 	</dependencies>

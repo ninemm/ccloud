@@ -115,11 +115,10 @@
 		
 		<dependency>
             <groupId>org.ccloud</groupId>
-            <artifactId>ccloud-web-auth</artifactId>
+            <artifactId>ccloud-shiro</artifactId>
             <version>${project.version}</version>
-            <type>jar</type>
-            <classifier>classes</classifier>
-            <scope>provided</scope>
+            <type>jar</type> 
+            <scope>compile</scope>
         </dependency>
 		
 		<dependency>

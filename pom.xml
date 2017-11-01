@@ -28,6 +28,7 @@
 
 		<module>ccloud-workflow</module>
 		<module>ccloud-model-core</module>
+		<module>ccloud-shiro</module>
 	</modules>
 	
 	<properties>
