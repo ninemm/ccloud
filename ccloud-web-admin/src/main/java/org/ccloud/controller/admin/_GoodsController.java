@@ -527,9 +527,15 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
 		setAttr("treeData", JSON.toJSON(list));
 	}
 	
-	public List<ProductInfo> getProductInfo() {
-		List<ProductInfo> list = ProductQuery.me().getAllProductInfo();
-		return list;
+	public void getProductInfo() {
+		List<ProductInfo> productList = ProductQuery.me().getAllProductInfo();
+        List<Map<String, Object>> list = new ArrayList<>();
+        for (ProductInfo productInfo : productList) {
+           Map<String, Object> map = new HashMap<>();
+            map.put("productList", productInfo);
+            list.add(map);
+		}
+        renderJson(list);
 	}
 	
 }

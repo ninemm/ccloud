@@ -106,7 +106,7 @@ public class ProductQuery extends JBaseQuery {
 			pro.setCategoryName(record.getStr("categoryName"));
 			pro.setCode(record.getStr("code"));
 			pro.setCost(record.getBigDecimal("cost"));
-			pro.setCreateDate(record.getStr("createDate"));
+			pro.setCreateDate(record.getDate("createDate"));
 			pro.setIsMarketable(record.getBoolean("isMarketable"));
 			pro.setMarketPrice(record.getBigDecimal("marketPrice"));
 			pro.setName(record.getStr("name"));

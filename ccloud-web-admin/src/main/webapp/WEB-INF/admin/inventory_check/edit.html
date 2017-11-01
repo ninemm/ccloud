@@ -53,27 +53,23 @@ function doSubmit(){
 }
 
 function initProduct(){
-var p1 = {goodsCode:"1",goodsName:"125ml42度毛铺苦荞酒（金荞）_1*24",specification:"1*12",big_unit:"件"};
-var p2 = {goodsCode:"2",goodsName:"520ml35度中国劲酒（盒装）_1*6",specification:"1*6",big_unit:"箱"};
-var p3 = {goodsCode:"3",goodsName:"520ml35度金标劲酒",specification:"1*12",big_unit:"件"};
-var p4 = {goodsCode:"4",goodsName:"258ml35度金标劲酒",specification:"1*12",big_unit:"提"};
-var p5 = {goodsCode:"5",goodsName:"1.5L35度金标劲酒",specification:"1*12",big_unit:"件"};
-
-productList[0] = p1;
-productList[1] = p2;
-productList[2] = p3;
-productList[3] = p4;
-productList[4] = p5;
-
+         $.ajax({
+				url: "${CPATH}/admin/goods/getProductInfo",
+				dataType: "json",
+				async: false,
+				success: function(data) {
+					productList = data;
+				}
+			});
 
 	if(productList) {
 			$.each(productList, function(idx, item) {
 				var option = {
-					id: item.goodsCode,
-					text: item.goodsName
+					id: item.productList.code,
+					text: item.productList.name
 				}
 				productOptionArr.push(option);
-				productMap[item.goodsCode] = item;
+				productMap[item.productList.code] = item;
 			});
 		}
 
@@ -92,24 +88,29 @@ function removeTr(obj) {
 function addNew() {
 	addTr("#dataTable", productList, productOptionArr);
 }
+var index = 1;
 function addTr(tid, productList, optionArr) {
-	var firstProduct = productList[0];
-	var goodsCode = firstProduct.goodsCode;
-	var goodsName = firstProduct.goodsName;
-	var specification = firstProduct.specification;
-	var big_unit = firstProduct.big_unit;
+	var firstProduct = productList[0].productList;
+	var goodsCode = firstProduct.code;
+	var goodsName = firstProduct.name;
+	var specification = firstProduct.categoryName;
+	var big_unit = firstProduct.weightUnit;
 
-	var $tbody = $(tid + " tbody");
-	$tr = $tbody.find("tr:eq(0)");
-	var lastTrIndex = $tbody.find("tr:last").index();
-	var newTrIndex = lastTrIndex + 1;
+	var $tbody = $(tid + " tbody"),
+	$tr = $tbody.find("tr:eq(0)"),
+	lastTrIdx = $tbody.find("tr:last").index(),
+	newTrIdx = lastTrIdx + 1,
 	trHtml = $tr.html();
-	$tbody.append("<tr id='tr" + newTrIndex+ "'>" +trHtml+ "</tr>");
-  
-    $tbody.find("tr:last>td>#goodsCode").after("<input type='hidden' id='goodsCode' value='" + goodsCode + "' /><span style='display:none' id='goodsName'>" + goodsName + "</span>");
+
+	$tbody.append("<tr id='tr" + newTrIdx + "'>" +trHtml+ "</tr>");
+    $tbody.find("tr:last>td>#goodsCode").attr("name","iCheckDetailList["+ index +"].goods_id");
+    $tbody.find("tr:last>td>#stock").attr("name","iCheckDetailList["+ index +"].goods_count"); 
+    $tbody.find("tr:last>td>#remarks").attr("name","iCheckDetailList["+ index +"].remark");           
     $tbody.find("tr:last>td>#goodsCode").val(goodsCode);
     $tbody.find("tr:last>td>#specification").text(specification);
     $tbody.find("tr:last>td>#big_unit").text(big_unit);
+    $tbody.find("tr:last>td>#factIndex").val(index);
+    
 
     $tbody.find("tr:last>td>select.pro-slc2").select2({
        data:optionArr,
@@ -119,24 +120,26 @@ function addTr(tid, productList, optionArr) {
     $tbody.find("tr:last>td>.hide").text($tbody.find("tr:last>td>select").find("option:selected").val());
     $tbody.find("tr:last>td>select>pro-slc2").focus();
 
+             index++;          
+
     <!--添加商品的移除-->
     $tbody.find("tr:last>td>.removeTr").click(function(){
-      $("#tr" + newTrIndex).remove();  
+      $("#tr" + newTrIdx).remove();  
     });
 
     <!--切换商品的方法  -->
     $tbody.find("tr:last>td>select.pro-slc2").change(function(){
-     var result = productMap[$(this).val()];   
-     var cgoodsCode = result.goodsCode;
-     var cgoodsName = result.goodsName;
-     var cspecification = result.specification;
-     var cbig_unit = result.big_unit;
+     var result = productMap[$(this).val()].productList;   
+     var cgoodsCode = result.code;
+     var cgoodsName = result.name;
+     var cspecification = result.categoryName;
+     var cbig_unit = result.weightUnit;
      var $tr = $(this).parent().parent();
      $tbody.find("tr:last>td>#goodsCode").val(cgoodsCode);
-	 $tbody.find("tr:last>td>#goodsName").html(cgoodsName);
+     $tbody.find("tr:last>td>#goodsName").html(cgoodsName); 
 	 $tbody.find("tr:last>td>#specification").text(cspecification);
      $tbody.find("tr:last>td>#big_unit").text(cbig_unit);
-     });
+     });  
 }
 
 </#macro>
@@ -207,7 +210,7 @@ function addTr(tid, productList, optionArr) {
 													<a class="btn btn-danger btn-xs removeTr" data-toggle="modal" data-target="#deleteBackProModal"><span class="glyphicon glyphicon-remove"></span></a>
 												</td>
 												<td class="text-left">
-													<input type="hidden" id="goodsCode" />
+													<input type="hidden" id="goodsCode" name="iCheckDetailList[0].goods_id"/>
 													<select class="pro-slc2">
 													</select>
 												</td>
@@ -218,11 +221,12 @@ function addTr(tid, productList, optionArr) {
 													<span class="big_unit" id="big_unit"></span>
 												</td>
 												<td class="text-center">
-												<input type="text" id="stock" class="stock"/>
+												<input type="text" id="stock" class="stock" name="iCheckDetailList[0].goods_count"/>
 												</td>
 												<td class="text-left">
-													<input type="text"  class="remarks" id="remarks">
+													<input type="text"  class="remarks" id="remarks" name="iCheckDetailList[0].remark">
 												</td>
+										   <input type="hidden"  id="factIndex" name="factIndex" value="">
 											</tr>
 										</tbody>
 										<tfoot>
