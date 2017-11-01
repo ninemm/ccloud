@@ -13,7 +13,7 @@ import com.jfinal.qyweixin.sdk.api.JsTicketApi;
 import com.jfinal.qyweixin.sdk.api.JsTicketApi.JsApiType;
 import com.jfinal.qyweixin.sdk.jfinal.ApiController;
 
-@RouterMapping(url = "wechat")
+@RouterMapping(url = "jssdk")
 public class QyJssdkController extends ApiController {
 
 	public ApiConfig getApiConfig() {
