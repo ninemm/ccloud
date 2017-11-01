@@ -17,9 +17,10 @@ import freemarker.template.TemplateModelException;
 @SuppressWarnings("rawtypes")
 public abstract class BaseShiroDirectiveTag implements TemplateDirectiveModel {
 
-	public void execute(Environment arg0, Map arg1, TemplateModel[] arg2, TemplateDirectiveBody arg3)
+	public void execute(Environment env, Map params, TemplateModel[] loopVars, TemplateDirectiveBody body)
 			throws TemplateException, IOException {
-
+		verifyParameters(params);
+		render(env, params, body);
 	}
 
 	public abstract void render(Environment env, Map params, TemplateDirectiveBody body)
