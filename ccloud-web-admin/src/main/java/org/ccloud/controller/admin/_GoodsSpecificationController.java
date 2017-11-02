@@ -51,6 +51,11 @@ import com.jfinal.upload.UploadFile;
 @RouterNotAllowConvert
 @RequiresPermissions(value={"/admin/specification","/admin/all"},logical=Logical.OR)
 public class _GoodsSpecificationController extends JBaseCRUDController<GoodsSpecification> { 
+	
+	@Override
+	public void index() {
+		render("index.html");
+	}	
 
 	public void list() {
 		

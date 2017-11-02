@@ -79,6 +79,11 @@ import com.jfinal.upload.UploadFile;
 @RequiresPermissions(value={"/admin/goods","/admin/all"},logical=Logical.OR)
 public class _GoodsController extends JBaseCRUDController<Goods> { 
 	
+	@Override
+	public void index() {
+		render("index.html");
+	}	
+	
 	public void list() {
 		
         String keyword = getPara("k");

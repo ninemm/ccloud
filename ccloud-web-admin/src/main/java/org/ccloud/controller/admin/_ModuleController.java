@@ -44,6 +44,12 @@ import com.jfinal.plugin.activerecord.Page;
 @RouterNotAllowConvert
 @RequiresPermissions(value={"/admin/module","/admin/all"},logical=Logical.OR)
 public class _ModuleController extends JBaseCRUDController<Module> {
+	
+	@Override
+	public void index() {
+		render("index.html");
+	}
+	
 	public void list() {
 		String keyword = getPara("k", "");
 		if (StrKit.notBlank(keyword)) {

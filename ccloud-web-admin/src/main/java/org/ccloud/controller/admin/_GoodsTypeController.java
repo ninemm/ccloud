@@ -40,6 +40,11 @@ import com.jfinal.plugin.activerecord.Page;
 @RouterNotAllowConvert
 @RequiresPermissions(value={"/admin/goodsType","/admin/all"},logical=Logical.OR)
 public class _GoodsTypeController extends JBaseCRUDController<GoodsType> { 
+	
+	@Override
+	public void index() {
+		render("index.html");
+	}	
 
 	public void list() {
 		

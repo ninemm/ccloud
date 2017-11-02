@@ -46,7 +46,12 @@ import com.jfinal.plugin.activerecord.Page;
 @RouterNotAllowConvert
 @RequiresPermissions(value={"/admin/department","/admin/all"},logical=Logical.OR)
 public class _DepartmentController extends JBaseCRUDController<Department> {
-
+	
+	@Override
+	public void index() {
+		render("index.html");
+	}
+	
 	public void list() {
 
 		String keyword = getPara("k", "");

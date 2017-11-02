@@ -47,7 +47,12 @@ import com.jfinal.plugin.activerecord.Page;
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
 @RequiresPermissions(value={"/admin/category","/admin/all"},logical=Logical.OR)
-public class _GoodsCategoryController extends JBaseCRUDController<GoodsCategory> { 
+public class _GoodsCategoryController extends JBaseCRUDController<GoodsCategory> {
+	
+	@Override
+	public void index() {
+		render("index.html");
+	}	
 
 	public void list() {
         String keyword = getPara("k");
