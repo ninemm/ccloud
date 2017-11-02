@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.Customer;
@@ -66,10 +68,12 @@ import cn.afterturn.easypoi.excel.entity.ImportParams;
 public class _CustomerController extends JBaseCRUDController<Customer> {
 
 	@Override
+	@RequiresPermissions(value = { "/admin/customer/view", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void index() {
 		render("index.html");
 	}
 
+	@RequiresPermissions(value = { "/admin/customer/view", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void list() {
 
 		Map<String, String[]> paraMap = getParaMap();
@@ -89,6 +93,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 
 	}
 
+	@RequiresPermissions(value = { "/admin/customer/edit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void enable() {
 
 		String id = getPara("id");
@@ -103,6 +108,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 	}
 
 	@Override
+	@RequiresPermissions(value = { "/admin/customer/edit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void edit() {
 		String id = getPara("id");
 
@@ -133,6 +139,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 		render("edit.html");
 	}
 
+	@RequiresPermissions(value = { "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void user_tree() {
 
 		List<Department> list = DepartmentQuery.me().findDeptList("order_list asc");
@@ -179,6 +186,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 
 	@Override
 	@Before(Tx.class)
+	@RequiresPermissions(value = { "/admin/customer/edit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void save() {
 
 		Customer customer = getModel(Customer.class);
@@ -217,17 +225,20 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 
 	}
 
+	@RequiresPermissions(value = { "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void upload() {
 
 		render("upload.html");
 	}
 
+	@RequiresPermissions(value = { "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void customerTemplate() {
 		String realPath = getSession().getServletContext().getRealPath("\\");
 		renderFile(new File(realPath + "\\WEB-INF\\admin\\customer\\customerTemplate.xlsx"));
 	}
 
 	@Before(Tx.class)
+	@RequiresPermissions(value = { "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void uploading() {
 
 		File file = getFile().getFile();
@@ -286,6 +297,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 		render("download.html");
 	}
 	
+	@RequiresPermissions(value = { "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void downloading() throws UnsupportedEncodingException {
 		Map<String, String[]> paraMap = getParaMap();
 		String depatName = getPara("parent_name");
@@ -334,6 +346,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 	}
 	
 	@Before(Tx.class)
+	@RequiresPermissions(value = { "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void batchSetUser() {
 		String[] customerIds = getParaValues("dataItem");
 		String[] userIds = getParaValues("userIds");
