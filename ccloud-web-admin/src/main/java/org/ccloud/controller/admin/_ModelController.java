@@ -20,6 +20,11 @@ import com.jfinal.plugin.activerecord.Page;
 @RouterMapping(url = "/admin/model", viewPath = "/WEB-INF/admin/model")
 @RequiresPermissions(value={"/admin/model","/admin/all"},logical=Logical.OR)
 public class _ModelController extends JBaseCRUDController<ActReModel> {
+	
+	@Override
+	public void index() {
+		render("index.html");
+	}	
 
 	public void list() {
 		Page<ActReModel> page = ActReModelQuery.me().getModelPage(getPageNumber(), getPageSize());

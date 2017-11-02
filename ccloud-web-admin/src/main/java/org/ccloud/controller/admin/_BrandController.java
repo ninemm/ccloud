@@ -44,6 +44,11 @@ import com.jfinal.plugin.activerecord.Page;
 @RequiresPermissions(value={"/admin/brand","/admin/all"},logical=Logical.OR)
 public class _BrandController extends JBaseCRUDController<Brand> { 
 
+	@Override
+	public void index() {
+		render("index.html");
+	}	
+	
 	public void list() {
 		
         String keyword = getPara("k");

@@ -44,6 +44,11 @@ import com.jfinal.plugin.activerecord.Page;
 @RouterNotAllowConvert
 @RequiresPermissions(value={"/admin/menu","/admin/all"},logical=Logical.OR)
 public class _MenuController extends JBaseCRUDController<Menu> { 
+	
+	@Override
+	public void index() {
+		render("index.html");
+	}	
 
 	public void list() {
 		

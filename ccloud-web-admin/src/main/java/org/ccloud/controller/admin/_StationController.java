@@ -51,6 +51,11 @@ import com.jfinal.plugin.activerecord.Page;
 @RouterNotAllowConvert
 @RequiresPermissions(value={"/admin/station","/admin/all"},logical=Logical.OR)
 public class _StationController extends JBaseCRUDController<Station> {
+	
+	@Override
+	public void index() {
+		render("index.html");
+	}	
 
     public void list() {
         String keyword = getPara("k");

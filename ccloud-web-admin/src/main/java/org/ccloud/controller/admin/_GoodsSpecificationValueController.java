@@ -56,6 +56,11 @@ import com.jfinal.upload.UploadFile;
 @RequiresPermissions(value={"/admin/specificationValue","/admin/all"},logical=Logical.OR)
 public class _GoodsSpecificationValueController extends JBaseCRUDController<GoodsSpecificationValue> {
 	private static final Log log = Log.getLog(_GoodsSpecificationValueController.class);
+	
+	@Override
+	public void index() {
+		render("index.html");
+	}
 
 	public void list() {
 

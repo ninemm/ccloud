@@ -58,6 +58,11 @@ import com.jfinal.plugin.activerecord.Page;
 @RouterNotAllowConvert
 @RequiresPermissions(value={"/admin/operation","/admin/all"},logical=Logical.OR)
 public class _OperationController extends JBaseCRUDController<Operation> {
+	
+	@Override
+	public void index() {
+		render("index.html");
+	}	
 
 	public void list() {
 

@@ -41,6 +41,11 @@ import com.jfinal.plugin.activerecord.Page;
 @RouterNotAllowConvert
 @RequiresPermissions(value={"/admin/supplier","/admin/all"},logical=Logical.OR)
 public class _SupplierController extends JBaseCRUDController<Supplier> {
+	
+	@Override
+	public void index() {
+		render("index.html");
+	}	
 
 	public void list() {
 
