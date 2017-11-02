@@ -35,7 +35,7 @@ import com.jfinal.aop.Before;
 @RouterMapping(url = "/admin/option", viewPath = "/WEB-INF/admin/option")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
-@RequiresPermissions(value={"option:all","admin:all"},logical=Logical.OR)
+@RequiresPermissions(value={"/admin/option","/admin/all"},logical=Logical.OR)
 public class _OptionController extends JBaseController {
 
 	public void index() {

@@ -170,7 +170,10 @@ public class DepartmentQuery extends JBaseQuery {
 		for(Department dept : list) {
 			Map<String, Object> map = new HashMap<>();
 			map.put("text", dept.getDeptName());
-			map.put("tags", Lists.newArrayList(dept.getId()));
+			ArrayList<String> newArrayList = Lists.newArrayList();
+			newArrayList.add(dept.getId());
+			newArrayList.add(dept.getDataArea());
+			map.put("tags", newArrayList);
 				resTreeList.add(map);
 			
 			if(dept.getChildList() != null && dept.getChildList().size() > 0) {

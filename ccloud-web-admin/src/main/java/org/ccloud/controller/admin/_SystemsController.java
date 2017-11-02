@@ -35,7 +35,7 @@ import com.jfinal.plugin.activerecord.Page;
 @RouterMapping(url = "/admin/systems", viewPath = "/WEB-INF/admin/systems")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
-@RequiresPermissions(value={"systems:view","admin:all"},logical=Logical.OR)
+@RequiresPermissions(value={"/admin/systems","/admin/all"},logical=Logical.OR)
 public class _SystemsController extends JBaseCRUDController<Systems> { 
 
 	@Override

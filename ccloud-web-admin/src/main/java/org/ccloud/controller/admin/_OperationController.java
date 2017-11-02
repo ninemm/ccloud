@@ -56,7 +56,7 @@ import com.jfinal.plugin.activerecord.Page;
 @RouterMapping(url = "/admin/operation", viewPath = "/WEB-INF/admin/operation")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
-@RequiresPermissions(value={"operation:view","admin:all"},logical=Logical.OR)
+@RequiresPermissions(value={"/admin/operation","/admin/all"},logical=Logical.OR)
 public class _OperationController extends JBaseCRUDController<Operation> {
 
 	public void list() {
@@ -74,7 +74,7 @@ public class _OperationController extends JBaseCRUDController<Operation> {
 	}
 
 	@Override
-	@RequiresPermissions(value={"operation:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/operation/edit","/admin/all"},logical=Logical.OR)
 	public void edit() {
 
 		List<Module> list = ModuleQuery.me().findAll();
@@ -156,7 +156,7 @@ public class _OperationController extends JBaseCRUDController<Operation> {
 	}
 	
 	@Override
-	@RequiresPermissions(value={"operation:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/operation/edit","/admin/all"},logical=Logical.OR)
 	public void delete() {
 		String id = getPara("id");
 		final Operation r = OperationQuery.me().findById(id);

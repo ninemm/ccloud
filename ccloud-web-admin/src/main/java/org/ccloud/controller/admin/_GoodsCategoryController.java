@@ -46,7 +46,7 @@ import com.jfinal.plugin.activerecord.Page;
 @RouterMapping(url = "/admin/category", viewPath = "/WEB-INF/admin/goods_category")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
-@RequiresPermissions(value={"category:view","admin:all"},logical=Logical.OR)
+@RequiresPermissions(value={"/admin/category","/admin/all"},logical=Logical.OR)
 public class _GoodsCategoryController extends JBaseCRUDController<GoodsCategory> { 
 
 	public void list() {
@@ -79,7 +79,7 @@ public class _GoodsCategoryController extends JBaseCRUDController<GoodsCategory>
 	}
 	
 	@Override
-	@RequiresPermissions(value={"category:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/category/edit","/admin/all"},logical=Logical.OR)
 	public void edit() {
 		String id = getPara("id");
 		if (id != null) {
@@ -94,7 +94,7 @@ public class _GoodsCategoryController extends JBaseCRUDController<GoodsCategory>
 	}
 	
 	@Before(UCodeInterceptor.class)
-	@RequiresPermissions(value={"category:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/category/edit","/admin/all"},logical=Logical.OR)
 	public void batchDelete() {
 		String[] ids = getParaValues("dataItem");
 		int count = GoodsCategoryQuery.me().batchDelete(ids);
@@ -107,7 +107,7 @@ public class _GoodsCategoryController extends JBaseCRUDController<GoodsCategory>
 	}
 	
 	@Override
-	@RequiresPermissions(value={"category:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/category/edit","/admin/all"},logical=Logical.OR)
 	public void delete() {
 		String id = getPara("id");
 		final GoodsCategory category = GoodsCategoryQuery.me().findById(id);
@@ -152,7 +152,7 @@ public class _GoodsCategoryController extends JBaseCRUDController<GoodsCategory>
         renderJson(list);
 	}
 	
-	@RequiresPermissions(value={"category:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/category/edit","/admin/all"},logical=Logical.OR)
 	public void enable() {
 		String id = getPara("id");
 		int state = getParaToInt("state");

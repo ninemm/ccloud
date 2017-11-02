@@ -40,7 +40,7 @@ import com.jfinal.upload.UploadFile;
 @RouterMapping(url = "/admin/template", viewPath = "/WEB-INF/admin/template")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
-@RequiresPermissions(value={"template:view","admin:all"},logical=Logical.OR)
+@RequiresPermissions(value={"/admin/template","/admin/all"},logical=Logical.OR)
 public class _TemplateController extends JBaseController {
 
 	public void index() {
@@ -49,7 +49,7 @@ public class _TemplateController extends JBaseController {
 		setAttr("currentTemplate", TemplateManager.me().currentTemplate());
 	}
 
-	@RequiresPermissions(value={"template:view","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/template/edit","/admin/all"},logical=Logical.OR)
 	public void enable() {
 		String id = getPara("id");
 
@@ -108,7 +108,7 @@ public class _TemplateController extends JBaseController {
 		}
 	}
 
-	@RequiresPermissions(value={"template:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/template/edit","/admin/all"},logical=Logical.OR)
 	public void edit() {
 		keepPara();
 		String path = TemplateManager.me().currentTemplatePath();

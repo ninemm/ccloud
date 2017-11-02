@@ -42,7 +42,7 @@ import com.jfinal.plugin.activerecord.Page;
 @RouterMapping(url = "/admin/menu", viewPath = "/WEB-INF/admin/menu")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
-@RequiresPermissions(value={"menu:view","admin:all"},logical=Logical.OR)
+@RequiresPermissions(value={"/admin/menu","/admin/all"},logical=Logical.OR)
 public class _MenuController extends JBaseCRUDController<Menu> { 
 
 	public void list() {
@@ -62,7 +62,7 @@ public class _MenuController extends JBaseCRUDController<Menu> {
 	}
 	
 	@Override
-	@RequiresPermissions(value={"menu:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/menu/edit","/admin/all"},logical=Logical.OR)
 	public void edit() {
 		List<Systems> list = SystemsQuery.me().findAll();
 		setAttr("list", list);
@@ -85,7 +85,7 @@ public class _MenuController extends JBaseCRUDController<Menu> {
 	}
 	
 	@Before(UCodeInterceptor.class)
-	@RequiresPermissions(value={"menu:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/menu/edit","/admin/all"},logical=Logical.OR)
 	public void batchDelete() {
 		
 		String[] ids = getParaValues("dataItem");
@@ -99,7 +99,7 @@ public class _MenuController extends JBaseCRUDController<Menu> {
 	}
 	
 	@Override
-	@RequiresPermissions(value={"menu:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/menu/edit","/admin/all"},logical=Logical.OR)
 	public void delete() {
 		String id = getPara("id");
 		final Menu r = MenuQuery.me().findById(id);

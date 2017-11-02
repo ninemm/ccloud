@@ -42,7 +42,7 @@ import com.jfinal.plugin.activerecord.Page;
 @RouterMapping(url = "/admin/goodsAttribute", viewPath = "/WEB-INF/admin/goods_attribute")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
-@RequiresPermissions(value={"goodsAttribute:view","admin:all"},logical=Logical.OR)
+@RequiresPermissions(value={"/admin/goodsAttribute","/admin/all"},logical=Logical.OR)
 public class _GoodsAttributeController extends JBaseCRUDController<GoodsAttribute> { 
 
 	@Override

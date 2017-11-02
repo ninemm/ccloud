@@ -76,7 +76,7 @@ import com.jfinal.upload.UploadFile;
 @RouterMapping(url = "/admin/goods", viewPath = "/WEB-INF/admin/goods")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
-@RequiresPermissions(value={"goods:view","admin:all"},logical=Logical.OR)
+@RequiresPermissions(value={"/admin/goods","/admin/all"},logical=Logical.OR)
 public class _GoodsController extends JBaseCRUDController<Goods> { 
 	
 	public void list() {
@@ -94,7 +94,7 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
 	}
 	
 	@Override
-	@RequiresPermissions(value={"goods:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/goods/edit","/admin/all"},logical=Logical.OR)
 	public void edit() {
 		String id = getPara("id");
 		if (id != null) {
@@ -419,7 +419,7 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
 	}
 	
 	@Override
-	@RequiresPermissions(value={"goods:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/goods/edit","/admin/all"},logical=Logical.OR)
 	public void delete() {
 		String id = getPara("id");
 		final Goods r = GoodsQuery.me().findById(id);

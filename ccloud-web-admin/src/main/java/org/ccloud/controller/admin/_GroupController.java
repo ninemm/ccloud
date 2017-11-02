@@ -47,7 +47,7 @@ import com.jfinal.plugin.activerecord.Page;
 @RouterMapping(url = "/admin/group", viewPath = "/WEB-INF/admin/group")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
-@RequiresPermissions(value={"group:view","admin:all"},logical=Logical.OR)
+@RequiresPermissions(value={"/admin/group","/admin/all"},logical=Logical.OR)
 public class _GroupController extends JBaseCRUDController<Group> {
     @Override
     public void index() {
@@ -63,7 +63,7 @@ public class _GroupController extends JBaseCRUDController<Group> {
     }
     
 	@Override
-	@RequiresPermissions(value={"group:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/group/edit","/admin/all"},logical=Logical.OR)
 	public void edit() {
 		String id = getPara("id");
 		if (id != null) {
@@ -133,7 +133,7 @@ public class _GroupController extends JBaseCRUDController<Group> {
 
     @Override
     @Before(UCodeInterceptor.class)
-    @RequiresPermissions(value={"group:edit","admin:all"},logical=Logical.OR)
+    @RequiresPermissions(value={"/admin/group/edit","/admin/all"},logical=Logical.OR)
     public void delete() {
         boolean isDelete = Db.tx(new IAtom() {
             @Override
@@ -154,7 +154,7 @@ public class _GroupController extends JBaseCRUDController<Group> {
     }
 
     @Before(UCodeInterceptor.class)
-    @RequiresPermissions(value={"group:edit","admin:all"},logical=Logical.OR)
+    @RequiresPermissions(value={"/admin/group/edit","/admin/all"},logical=Logical.OR)
     public void batchDelete() {
 
         String[] ids = getParaValues("dataItem");
