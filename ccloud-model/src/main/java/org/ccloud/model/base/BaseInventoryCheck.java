@@ -15,6 +15,8 @@
  */
 package org.ccloud.model.base;
 
+import java.util.Date;
+
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.core.JModel;
 
@@ -123,8 +125,8 @@ public abstract class BaseInventoryCheck<M extends BaseInventoryCheck<M>> extend
 		return getStr("biz_user_id");
 	}
 
-	public void setBizDate(java.util.Date bizDate) {
-		set("biz_date", bizDate);
+	public void setBizDate(Date date) {
+		set("biz_date", date);
 	}
 
 	public java.util.Date getBizDate() {

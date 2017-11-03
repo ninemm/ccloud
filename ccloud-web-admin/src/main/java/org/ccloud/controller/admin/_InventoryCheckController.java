@@ -27,9 +27,12 @@ import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
 import org.ccloud.model.InventoryCheck;
 import org.ccloud.model.InventoryCheckDetail;
+import org.ccloud.model.User;
 import org.ccloud.model.Warehouse;
+import org.ccloud.model.query.InventoryCheckDetailQuery;
 import org.ccloud.model.query.InventoryCheckQuery;
 import org.ccloud.model.query.WarehouseQuery;
+import org.ccloud.model.vo.inventoryCheckInfo;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
@@ -57,7 +60,7 @@ public class _InventoryCheckController extends JBaseCRUDController<InventoryChec
 			setAttr("k", keyword);
 		}
 
-		Page<InventoryCheck> page = InventoryCheckQuery.me().paginate(getPageNumber(), getPageSize(), keyword, "create_date");
+		Page<InventoryCheck> page = InventoryCheckQuery.me().paginate(getPageNumber(), getPageSize(), keyword, "c.create_date");
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
 
@@ -89,7 +92,6 @@ public class _InventoryCheckController extends JBaseCRUDController<InventoryChec
 	}
 	
 	public void edit() {	
-		
 		String id = getPara("id");
 		if (id != null) {
 			InventoryCheck inventoryCheck = InventoryCheckQuery.me().findById(id);
@@ -97,21 +99,29 @@ public class _InventoryCheckController extends JBaseCRUDController<InventoryChec
 		}
 		List<Warehouse> wlist = WarehouseQuery.me().findAll();
 		setAttr("wlist", wlist);
+		
+		List<inventoryCheckInfo> ilist = InventoryCheckDetailQuery.me().findByiCheckDetailId(id);
+		setAttr("ilist", ilist);
+		
 	}
 	
 	
-	@SuppressWarnings("unused")
+	
+	
+	
 	@Override
 	public void save() {		
 	 InventoryCheck inventoryCheck = getModel(InventoryCheck.class);
+	  User user = getSessionAttr("user");
+	  inventoryCheck.setBillSn("Y20171101001");
+	  inventoryCheck.setDeptId(user.getDepartmentId());
+	  inventoryCheck.setDataArea(user.getDataArea());
+	  inventoryCheck.setInputUserId(user.getId());
 	 Map<String, String[]> map = getParaMap();
 	 boolean update = false;
 	  if (StringUtils.isBlank(inventoryCheck.getId())) {
 		  inventoryCheck.setId(StrKit.getRandomUUID());
 		  inventoryCheck.setCreateDate(new Date());
-		  inventoryCheck.setBillSn("Y20171101001");
-		  inventoryCheck.setDeptId("9ec18b144c1d46ea91b3d30f0e91f41b");
-		  inventoryCheck.setDataArea("0102bcb2");
 		  inventoryCheck.setBizDate(new Date());
 	    }else {
 	    	update = true;
@@ -137,27 +147,27 @@ public class _InventoryCheckController extends JBaseCRUDController<InventoryChec
 				List<InventoryCheckDetail> iSaveList = new ArrayList<>();
 				String[] factIndex = map.get("factIndex");
         		int loopEnd = 1;
-				 for (int i = 1; i<factIndex.length; i++) {
+				 for (int i = 0; i<factIndex.length; i++) {
 					 InventoryCheckDetail inventoryCheckDetail = getModel(InventoryCheckDetail.class);
-					 String goodsId = StringUtils.getArrayFirst(map.get("iCheckDetailList[" + i +"].goods_id"));
-					 String goodsCount = StringUtils.getArrayFirst(map.get("iCheckDetailList[" + i + "].goods_count"));
+					 String productId = StringUtils.getArrayFirst(map.get("iCheckDetailList[" + i +"].product_id"));
+					 String goodsCount = StringUtils.getArrayFirst(map.get("iCheckDetailList[" + i + "].product_count"));
 					 String remark = StringUtils.getArrayFirst(map.get("iCheckDetailList[" + i + "].remark"));
 					 
-				     inventoryCheckDetail.setGoodsId(goodsId);
-				     inventoryCheckDetail.setGoodsCount(Integer.parseInt(goodsCount));
+				     inventoryCheckDetail.setProductId(productId);
+				     inventoryCheckDetail.setProductCount(Integer.parseInt(goodsCount));
 				     inventoryCheckDetail.setRemark(remark);
 				     inventoryCheckDetail.setInventoryCheckId(inventoryCheck.getId());
 				     inventoryCheckDetail.setId(StrKit.getRandomUUID());
-				     inventoryCheckDetail.setGoodsAmount(BigDecimal.valueOf(10000));
+				     inventoryCheckDetail.setProductAmount(BigDecimal.valueOf(10000));
 				     inventoryCheckDetail.setDeptId(inventoryCheck.getDeptId());
 				     inventoryCheckDetail.setDataArea(inventoryCheck.getDataArea());
+				     inventoryCheckDetail.setCreateDate(new Date());
 				     iSaveList.add(inventoryCheckDetail);
  					loopEnd++;
  					if (loopEnd == factIndex.length) {
     					break;
     				}
 				  }
-				
                 try {
 					Db.batchSave(iSaveList, iSaveList.size());
 				} catch (Exception e) {
@@ -165,11 +175,19 @@ public class _InventoryCheckController extends JBaseCRUDController<InventoryChec
 					return false;
 				}
 				return true;
-                
 			}
 		});				
 		return isSave;
 		
 	}
-		
+
+	@Override
+	public void delete() {
+		String id = getPara("id");
+		final InventoryCheck inventoryCheck = InventoryCheckQuery.me().findById(id);
+		boolean status = InventoryCheckQuery.me().deleteAbout(inventoryCheck);
+		if (status) {
+			renderAjaxResultForSuccess("ok");
+		}
+	}
 }

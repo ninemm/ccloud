@@ -15,10 +15,17 @@
  */
 package org.ccloud.model.query;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
-import org.ccloud.model.InventoryCheckDetail;
+import java.util.List;
 
+import org.ccloud.model.InventoryCheckDetail;
+import org.ccloud.model.vo.ProductInfo;
+import org.ccloud.model.vo.inventoryCheckInfo;
+
+import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
 /**
@@ -68,4 +75,35 @@ public class InventoryCheckDetailQuery extends JBaseQuery {
 	}
 
 	
+	public List<inventoryCheckInfo> findByiCheckDetailId(String id) {
+		
+ 	StringBuilder fromBuilder = new StringBuilder("select c1.bill_sn,c1.warehouse_id,c1.biz_user_id,c1.biz_date,c1.`status`,c1.create_date, ");
+ 	fromBuilder.append("c2.product_id,c2.product_amount,c2.product_count,c2.remark");
+ 	fromBuilder.append(" FROM cc_inventory_check c1 ");
+ 	fromBuilder.append(" inner JOIN cc_inventory_check_detail c2 ON c1.id = c2.inventory_check_id ");
+ 	fromBuilder.append(" WHERE c2.inventory_check_id = ?");
+	List<Record> list = Db.find(fromBuilder.toString(), id);
+	List<inventoryCheckInfo> iList = new ArrayList<>();
+	for (Record record : list) {
+		inventoryCheckInfo inventoryCheckInfo = new inventoryCheckInfo();
+		inventoryCheckInfo.setBillSn(record.getStr("bill_sn"));
+		inventoryCheckInfo.setWarehouseId(record.getStr("warehouse_id"));
+		inventoryCheckInfo.setBizUserId(record.getStr("biz_user_id"));
+		inventoryCheckInfo.setBizDate(record.getDate("biz_date"));
+		inventoryCheckInfo.setStatus(record.getInt("status"));
+		inventoryCheckInfo.setProductId(record.getStr("product_id"));
+		inventoryCheckInfo.setProductAmount(record.getBigDecimal("product_amount"));
+		inventoryCheckInfo.setProductCount(record.getInt("product_count"));
+		inventoryCheckInfo.setRemark(record.getStr("remark"));
+		List<ProductInfo> ProductInfo = ProductQuery.me().getAllProductInfoById(inventoryCheckInfo.getProductId());
+		inventoryCheckInfo.setProductInfos(ProductInfo);
+		iList.add(inventoryCheckInfo);
+	}
+	return iList;
+	}
+	
+	
+	public List<InventoryCheckDetail> deleteByICheckId(String id) {
+		return DAO.doFind("inventory_check_id = ?", id);
+	}
 }

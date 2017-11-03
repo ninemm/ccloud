@@ -15,10 +15,15 @@
  */
 package org.ccloud.model.query;
 
+import java.sql.SQLException;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.ccloud.model.InventoryCheck;
+import org.ccloud.model.InventoryCheckDetail;
 
+import com.jfinal.plugin.activerecord.Db;
+import com.jfinal.plugin.activerecord.IAtom;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
@@ -44,12 +49,13 @@ public class InventoryCheckQuery extends JBaseQuery {
 	}
 
 	public Page<InventoryCheck> paginate(int pageNumber, int pageSize,String keyword, String orderby) {
-		String select = "select * ";
-		StringBuilder fromBuilder = new StringBuilder("from `cc_inventory_check` ");
-
+		String select = "select c.id, c.bill_sn,w.name,c.biz_date,u.realname,c.status";
+		StringBuilder fromBuilder = new StringBuilder("from `cc_inventory_check`  c ");
+		fromBuilder.append("INNER JOIN cc_warehouse w on c.warehouse_id = w.id ");
+		fromBuilder.append("INNER JOIN `user`  u on c.input_user_id = u.id ");
 		LinkedList<Object> params = new LinkedList<Object>();
-		appendIfNotEmptyWithLike(fromBuilder, "name", keyword, params, true);
-		
+		appendIfNotEmptyWithLike(fromBuilder, "w.name", keyword, params, true);
+		fromBuilder.append("order by " + orderby);		
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
@@ -67,6 +73,27 @@ public class InventoryCheckQuery extends JBaseQuery {
 			return deleteCount;
 		}
 		return 0;
+	}
+	
+	
+	public boolean deleteAbout(final InventoryCheck inventoryCheck) {
+		boolean isDelete = Db.tx(new IAtom() {
+			@Override
+			public boolean run() throws SQLException {
+		        inventoryCheck.delete();
+		        try {
+		        	List<InventoryCheckDetail> list = InventoryCheckDetailQuery.me().deleteByICheckId(inventoryCheck.getId());
+			        for (InventoryCheckDetail inventoryCheckDetail : list) {
+						inventoryCheckDetail.delete();
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+                   return false;
+				}
+				return true;
+			}
+		});		      
+		return isDelete;
 	}
 	
 }

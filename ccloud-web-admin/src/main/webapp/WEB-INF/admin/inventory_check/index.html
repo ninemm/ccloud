@@ -48,9 +48,9 @@
 			[
       			{field: "id", title: "ID", align: "center", visible:false, edit:false},
       			{field: "bill_sn", title: "单号", align: "center", width: '10%', edit:false},
-      			{field: "warehouse_id", title: "盘点仓库", align: "center", width: '10%', edit:false},
+      			{field: "name", title: "盘点仓库", align: "center", width: '10%', edit:false},
       			{field: "biz_date", title: "业务日期", align: "center", width: '10%', edit:false},
-   				{field: "input_user_id", title: "录单人", align: "center", width: '10%', edit:false},
+   				{field: "realname", title: "录单人", align: "center", width: '10%', edit:false},
    				{field: "status", title: "是否已盘点", align: "center", width: '10%',
    					formatter: function(value, row, rowIndex) {
    						if (value == 1) return '是';
@@ -65,7 +65,7 @@
 					if(row.is_enable == 1){
 						strHtml = strHtml + '<a href="javascript:void(0);" class="btn btn-sm" onclick="enable(\''+row.id+'\'' + ',0' + ')" title="停用"><i class="fa fa-ban"></i></a>';
 					} else {
-						strHtml = strHtml + '<a href="javascript:void(0);" class="btn btn-sm" onclick="enable(\''+row.id+'\'' + ',1' + ')" title="启用"><i class="fa fa-check-circle-o"></i></a>';
+						strHtml = strHtml + '<a href="javascript:void(0);" class="btn btn-sm" onclick="enable(\''+row.id+'\'' + ',1' + ')" title="提交"><i class="fa fa-check-circle-o"></i></a>';
 					}
 					return strHtml;
 				},

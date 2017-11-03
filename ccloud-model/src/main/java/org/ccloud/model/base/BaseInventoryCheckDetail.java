@@ -106,28 +106,28 @@ public abstract class BaseInventoryCheckDetail<M extends BaseInventoryCheckDetai
 		return getStr("inventory_check_id");
 	}
 
-	public void setGoodsId(java.lang.String goodsId) {
-		set("goods_id", goodsId);
+	public void setProductId(java.lang.String productId) {
+		set("product_id", productId);
 	}
 
 	public java.lang.String getGoodsId() {
-		return getStr("goods_id");
+		return getStr("product_id");
 	}
 
-	public void setGoodsCount(java.lang.Integer goodsCount) {
-		set("goods_count", goodsCount);
+	public void setProductCount(java.lang.Integer productCount) {
+		set("product_count", productCount);
 	}
 
 	public java.lang.Integer getGoodsCount() {
-		return getInt("goods_count");
+		return getInt("product_count");
 	}
 
-	public void setGoodsAmount(java.math.BigDecimal goodsAmount) {
-		set("goods_amount", goodsAmount);
+	public void setProductAmount(java.math.BigDecimal productAmount) {
+		set("product_amount", productAmount);
 	}
 
 	public java.math.BigDecimal getGoodsAmount() {
-		return get("goods_amount");
+		return get("product_amount");
 	}
 
 	public void setOrderList(java.lang.Integer orderList) {
