@@ -54,7 +54,6 @@ function batchAction() {
 							<th style="width: 20%">系统名称</th>
 							<th>系统编号</th>
 							<th>系统版本</th>
-							<th>描述</th>							
 							<th>排序</th>
 							<th>操作</th>
 						</tr>
@@ -72,7 +71,6 @@ function batchAction() {
 							</td>
 							<td>${bean.code!}</td>
 							<td>${bean.version!}</td>
-							<td>${bean.description!}</td>
 							<td>${bean.orderList!}</td>
 							<td>
 								<a href="${CPATH}/admin/systems/edit?id=${bean.id}&c=${c!}&p=${p!}" class="btn btn-xs bg-olive btn-flat">编辑</a>

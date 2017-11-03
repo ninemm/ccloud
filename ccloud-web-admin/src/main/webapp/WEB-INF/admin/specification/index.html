@@ -55,18 +55,19 @@
    					},
    					edit: false
    				},
-   				{field: "type", title: "显示方式", align: "center", width: '10%',
+   				{field: "show_type", title: "显示方式", align: "center", width: '10%',
    					formatter: function(value, row, rowIndex) {
    						if (value == 1) return '下拉显示';
    						else return '平铺显示';
    					},
    					edit: false
    				},
-				{field: "childList", title: "规格值", align: "center", width: '20%',
+				{field: "valueName", title: "规格值", align: "center", width: '20%',
 					formatter: function(value, row, rowIndex) {
 						var str = "";
-				        $.each(value, function (i, item) {
-							str = str + "[" + item.name + "]";
+						var name = value.split(",");
+				        $.each(name, function (i, item) {
+							str = str + "[" + item + "]";
 				        });
 				        return str;
 					},

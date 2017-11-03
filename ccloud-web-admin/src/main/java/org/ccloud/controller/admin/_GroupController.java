@@ -26,6 +26,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
+import org.ccloud.menu.MenuManager;
 import org.ccloud.model.Group;
 import org.ccloud.model.GroupRoleRel;
 import org.ccloud.model.Role;
@@ -127,8 +128,12 @@ public class _GroupController extends JBaseCRUDController<Group> {
             }
         });
 
-        if (isSave) renderAjaxResultForSuccess();
-        else renderAjaxResultForError();
+        if (isSave) {
+        	MenuManager.clearAllList();
+        	renderAjaxResultForSuccess();
+        } else { 
+        	renderAjaxResultForError();
+        }
     }
 
     @Override
