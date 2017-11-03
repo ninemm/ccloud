@@ -107,13 +107,13 @@ public class GoodsSpecificationValueQuery extends JBaseQuery {
 		return 0;
 	}
 
-	public List<GoodsSpecificationValue> findByProductId(String productSn) {
+	public List<GoodsSpecificationValue> findByProductId(String productId) {
  		StringBuilder fromBuilder = new StringBuilder("SELECT c.* ");
 		fromBuilder.append("FROM cc_goods_specification_value c ");
 		fromBuilder.append("LEFT JOIN cc_product_goods_specification_value s ON s.goods_specification_value_set_id = c.id ");
 		fromBuilder.append("LEFT JOIN cc_product p ON p.id = s.product_set_id ");
 		fromBuilder.append("where p.id = ?");
-		return DAO.find(fromBuilder.toString(), productSn);
+		return DAO.find(fromBuilder.toString(), productId);
 	}	
 	
 }
