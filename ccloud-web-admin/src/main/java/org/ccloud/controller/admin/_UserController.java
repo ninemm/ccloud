@@ -40,7 +40,6 @@ import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.EncryptUtils;
 import org.ccloud.utils.StringUtils;
 
-import com.alibaba.fastjson.JSON;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
@@ -60,8 +59,10 @@ public class _UserController extends JBaseCRUDController<User> {
 		String keyword = getPara("k");
 		if (StrKit.notBlank(keyword))
 			setAttr("k", keyword);
-
-		Page<User> page = UserQuery.me().paginate(getPageNumber(), getPageSize(), keyword, "create_date");
+		
+		String dataArea = getSessionAttr("DeptDataArea");
+		
+		Page<User> page = UserQuery.me().paginate(getPageNumber(), getPageSize(), keyword, dataArea, "create_date");
 		if (page != null) {
 			setAttr("page", page);
 		}
@@ -103,7 +104,8 @@ public class _UserController extends JBaseCRUDController<User> {
 			User user = UserQuery.me().findById(id);
 			setAttr("user", user);
 		}
-		List<Group> list = GroupQuery.me().findAll();
+		String dataArea = getSessionAttr("DeptDataArea");
+		List<Group> list = GroupQuery.me().findByDept(dataArea);
 		setAttr("list", list);
 	}
 
@@ -141,22 +143,10 @@ public class _UserController extends JBaseCRUDController<User> {
 
 	}
 
-	public void user_tree() {
-		String treeType = getPara("treeType");
-		keepPara();
-		if (treeType.equals("1")) {
-			List<Map<String, Object>> list = DepartmentQuery.me().findDeptListAsTree(1);
-			setAttr("treeData", JSON.toJSON(list));
-		} else {
-			List<Map<String, Object>> list = StationQuery.me().findStationListAsTree(1);
-			setAttr("treeData", JSON.toJSON(list));
-		}
-
-	}
-
 	public void getStation() {
 		String id = getPara("userid");
-		List<Station> stations = StationQuery.me().findAll();
+		String dataArea = getSessionAttr("DeptDataArea");
+		List<Station> stations = StationQuery.me().findByDept(dataArea);
 		List<Map<String, Object>> list = new ArrayList<>();
 		for (Station station : stations) {
 			if (station.getId().equals("0")) {

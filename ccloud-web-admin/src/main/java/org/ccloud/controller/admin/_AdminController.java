@@ -30,6 +30,7 @@ import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.shiro.CaptchaUsernamePasswordToken;
 import org.ccloud.utils.CookieUtils;
+import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.StringUtils;
 
 import com.jfinal.aop.Before;
@@ -84,6 +85,10 @@ public class _AdminController extends JBaseController {
 	    try {
 	        subject.login(token);
 	        User user = (User) subject.getPrincipal();
+			if (user != null) {
+				String dataArea = DataAreaUtil.getUserDeptDataArea(user.getDataArea()) + "%";
+				setSessionAttr("DeptDataArea", dataArea);
+			}	        
 			MessageKit.sendMessage(Actions.USER_LOGINED, user);
 			CookieUtils.put(this, Consts.COOKIE_LOGINED_USER, user.getId().toString());
 			setSessionAttr("user", user);	        

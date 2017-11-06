@@ -119,7 +119,7 @@ function doSubmit(){
 							<select class="form-control input-sm" name="department.principal_user_id">
 								<option value="">--请选择--</option>
 								<#list (list)! as user >
-									<option value="${user.id}" <#if user.id == dept.principalUserId>selected="selected"</#if>>${(user.realname)!}</option>
+									<option value="${user.id}" <#if user.id == dept.principalUserId!>selected="selected"</#if>>${(user.realname)!}</option>
 								</#list>
 							</select>
 		               	</div>

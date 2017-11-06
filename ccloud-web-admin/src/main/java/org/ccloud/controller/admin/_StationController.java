@@ -15,6 +15,7 @@
  */
 package org.ccloud.controller.admin;
 
+import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,8 +64,10 @@ public class _StationController extends JBaseCRUDController<Station> {
             keyword = StringUtils.urlDecode(keyword);
             setAttr("k", keyword);
         }
+        
+        String dataArea = getSessionAttr("DeptDataArea");
 
-        Page<Station> page = StationQuery.me().paginate(getPageNumber(), getPageSize(),keyword, "order_list");
+        Page<Station> page = StationQuery.me().paginate(getPageNumber(), getPageSize(),keyword, dataArea, "order_list");
         Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);
 
@@ -72,9 +75,6 @@ public class _StationController extends JBaseCRUDController<Station> {
     @Override
     @RequiresPermissions(value={"/admin/station/edit","/admin/all"},logical=Logical.OR)
     public void edit() {
-        List<Station> list = StationQuery.me().findAll();
-        setAttr("list", list);
-
         String id = getPara("id");
         Station station = StationQuery.me().findById(id);
         setAttr("station", station);
@@ -145,13 +145,18 @@ public class _StationController extends JBaseCRUDController<Station> {
     }
 
     public void station_tree() {
-        List<Map<String, Object>> list = StationQuery.me().findStationListAsTree(1);
+    	String dataArea = getSessionAttr("DeptDataArea");
+        List<Map<String, Object>> list = StationQuery.me().findStationListAsTree(1, dataArea);
         setAttr("treeData", JSON.toJSON(list));
     }
 
     public void assign() {
         setAttr("id", getPara("id"));
-        setAttr("station_name", getPara("stationName"));
+        try {
+			setAttr("station_name", new String(getPara("stationName").getBytes("ISO-8859-1"),"UTF-8"));
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
     }
     public void initAssign() {
         String keyword = getPara("k");

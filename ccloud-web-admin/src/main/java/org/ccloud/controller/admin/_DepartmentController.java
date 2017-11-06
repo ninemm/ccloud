@@ -61,8 +61,9 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 		}
 
 		String parentId = getPara("parentId", "0");
+		String dataArea = getSessionAttr("DeptDataArea");
 
-		Page<Department> page = DepartmentQuery.me().paginate(getPageNumber(), getPageSize(), parentId, keyword, null);
+		Page<Department> page = DepartmentQuery.me().paginate(getPageNumber(), getPageSize(), parentId, keyword, dataArea, null);
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
 
@@ -122,7 +123,8 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 	}
 
 	public void department_tree() {
-		List<Map<String, Object>> list = DepartmentQuery.me().findDeptListAsTree(1);
+		String dataArea = getSessionAttr("DeptDataArea");
+		List<Map<String, Object>> list = DepartmentQuery.me().findDeptListAsTree(1, dataArea);
 		setAttr("treeData", JSON.toJSON(list));
 	}
 

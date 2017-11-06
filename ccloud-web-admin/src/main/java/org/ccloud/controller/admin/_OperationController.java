@@ -73,7 +73,7 @@ public class _OperationController extends JBaseCRUDController<Operation> {
 			keyword = StringUtils.urlDecode(keyword);
 			setAttr("k", keyword);
 		}
-
+		
 		Page<Operation> page = OperationQuery.me().paginate(getPageNumber(), getPageSize(), keyword, null);
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
@@ -183,7 +183,8 @@ public class _OperationController extends JBaseCRUDController<Operation> {
 	
 	public void getRoleAndStation() {
         String id = getPara("id");
-        List<Role> roles = RoleQuery.me().findAll();
+        String dataArea = getSessionAttr("DeptDataArea");
+        List<Role> roles = RoleQuery.me().findBydept(dataArea);
         List<Map<String, Object>> roleList = new ArrayList<>();
 
         for (Role role : roles) {
@@ -204,7 +205,8 @@ public class _OperationController extends JBaseCRUDController<Operation> {
 	}
 	
     public void station_tree() {
-        List<Map<String, Object>> list = StationQuery.me().findStationListAsTree(1);
+    	String dataArea = getSessionAttr("DeptDataArea");
+        List<Map<String, Object>> list = StationQuery.me().findStationListAsTree(1, dataArea);
         setAttr("treeData", JSON.toJSON(list));
     }
     

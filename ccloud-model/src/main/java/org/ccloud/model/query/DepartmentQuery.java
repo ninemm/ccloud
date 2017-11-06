@@ -56,12 +56,13 @@ public class DepartmentQuery extends JBaseQuery {
 		});
 	}
 	
-	public List<Department> findDeptList(String orderby) {
+	public List<Department> findDeptList(String dataArea, String orderby) {
 		final StringBuilder sqlBuilder = new StringBuilder("SELECT * FROM department d ");
 		sqlBuilder.append("where d.id <> '0' ");
-		sqlBuilder.append("order by " + orderby);
 		
 		final List<Object> params = new LinkedList<Object>();
+		appendIfNotEmptyWithLike(sqlBuilder, "d.data_area", dataArea, params, false);
+		buildOrderBy(orderby, sqlBuilder);
 		String key = buildKey(null, null, null, null, orderby);
 		
 		List<Department> data = DAO.getFromListCache(key, new IDataLoader() {
@@ -106,7 +107,7 @@ public class DepartmentQuery extends JBaseQuery {
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 	
-	public Page<Department> paginate(int pageNumber, int pageSize, String parentId, String keyword, String orderby) {
+	public Page<Department> paginate(int pageNumber, int pageSize, String parentId, String keyword, String dataArea, String orderby) {
 		
 		String select = "select d.*,a.dept_name as parent_name,b.realname as user_realname ";
 		
@@ -118,6 +119,7 @@ public class DepartmentQuery extends JBaseQuery {
 		LinkedList<Object> params = new LinkedList<Object>();
 		needWhere = appendIfNotEmpty(fromBuilder, "d.parent_id", parentId, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "d.dept_name", keyword, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "d.data_area", dataArea, params, needWhere);
 		
 		buildOrderBy(orderby, fromBuilder);
 
@@ -153,8 +155,8 @@ public class DepartmentQuery extends JBaseQuery {
 		return 0;
 	}	
 
-	public List<Map<String, Object>> findDeptListAsTree(int i) {
-		List<Department> list = findDeptList("order_list asc");
+	public List<Map<String, Object>> findDeptListAsTree(int i, String dataArea) {
+		List<Department> list = findDeptList(dataArea, "order_list asc");
 		List<Map<String, Object>> resTreeList = new ArrayList<>();
 		ModelSorter.tree(list);
 		Map<String, Object> map = new HashMap<>();

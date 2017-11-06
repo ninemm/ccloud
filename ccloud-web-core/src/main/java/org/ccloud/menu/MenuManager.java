@@ -68,6 +68,8 @@ public class MenuManager {
 		
 	    Map<String, List<String>> map = RoleQuery.me().getPermissions(user.getGroupId());
 	    List<String> rolePermissions = OperationQuery.me().getPermissionsByRole(map.get("roleIds"));
+	    List<String> stationPermissions = OperationQuery.me().getPermissionsByStation(user.getStationId());
+	    rolePermissions.addAll(stationPermissions);
 		
 		StringBuilder htmlBuilder = new StringBuilder();
 		for (MenuGroup group : menuGroups) {

@@ -44,13 +44,14 @@ public class UserQuery extends JBaseQuery {
 		});
 	}
 
-	public Page<User> paginate(int pageNumber, int pageSize, String keyword , String orderby) {
+	public Page<User> paginate(int pageNumber, int pageSize, String keyword, String dataArea, String orderby) {
 		String select = "select * ";
 		StringBuilder fromBuilder = new StringBuilder(" from user u ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
 		appendIfNotEmptyWithLike(fromBuilder, "username", keyword, params, true);
-
+		appendIfNotEmptyWithLike(fromBuilder, "data_area", dataArea, params, true);
+		
 		fromBuilder.append("order by " + orderby);
 		
 		if (params.isEmpty())

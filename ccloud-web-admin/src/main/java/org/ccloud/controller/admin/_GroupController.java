@@ -55,8 +55,10 @@ public class _GroupController extends JBaseCRUDController<Group> {
 
         String keyword = getPara("k");
         if (StrKit.notBlank(keyword)) setAttr("k", keyword);
+        
+        String dataArea = getSessionAttr("DeptDataArea");
 
-        Page<Group> page = GroupQuery.me().paginate(getPageNumber(), getPageSize(), keyword, "order_list");
+        Page<Group> page = GroupQuery.me().paginate(getPageNumber(), getPageSize(), keyword, dataArea, "order_list");
         if (page != null) {
             setAttr("page", page);
         }
@@ -76,7 +78,8 @@ public class _GroupController extends JBaseCRUDController<Group> {
     public  void getRole() {
 
         String id = getPara("groupid");
-        List<Role> roles = RoleQuery.me().findAll();
+        String dataArea = getSessionAttr("DeptDataArea");
+        List<Role> roles = RoleQuery.me().findBydept(dataArea);
         List<Map<String, Object>> list = new ArrayList<>();
 
         for (Role role : roles) {

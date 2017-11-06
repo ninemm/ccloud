@@ -44,12 +44,13 @@ public class RoleQuery extends JBaseQuery {
 		return DAO.doFind();
 	}
 
-	public Page<Role> paginate(int pageNumber, int pageSize, String keyword, String orderby) {
+	public Page<Role> paginate(int pageNumber, int pageSize, String keyword, String dataArea, String orderby) {
 		String select = "select * ";
 		StringBuilder fromBuilder = new StringBuilder("from `role` ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
 		appendIfNotEmptyWithLike(fromBuilder, "role_name", keyword, params, true);
+		appendIfNotEmptyWithLike(fromBuilder, "data_area", dataArea, params, true);
 		fromBuilder.append("order by " + orderby);
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
@@ -115,6 +116,17 @@ public class RoleQuery extends JBaseQuery {
 		sqlBuilder.append("where r.id = ? and g.id = ? ");
 
 		return DAO.find(sqlBuilder.toString(), roleId, operationId);
+	}
+
+	public List<Role> findBydept(String dataArea) {
+		StringBuilder sqlBuilder = new StringBuilder("select * ");
+		sqlBuilder.append("from `role` r ");
+		final List<Object> params = new LinkedList<Object>();
+		appendIfNotEmptyWithLike(sqlBuilder, "r.data_area", dataArea, params, true);
+		if (params.isEmpty()) {
+			return DAO.find(sqlBuilder.toString());
+		}
+		return DAO.find(sqlBuilder.toString(), params.toArray());
 	}
 
 }

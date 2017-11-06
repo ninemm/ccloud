@@ -37,7 +37,14 @@ public abstract class BasePermissionTag extends BaseShiroDirectiveTag {
 	}
 	
 	protected boolean isPermitted(String permission) {
-		return getSubject() != null && getSubject().isPermitted(permission);
+		String [] permissions = permission.split(",");
+		for (int i = 0; i < permissions.length; i++) {
+			boolean status = getSubject().isPermitted(permissions[i]);
+			if (status) {
+				return getSubject() != null && status;
+			}
+		}
+		return false;
 	}
 
 	protected abstract boolean showTagBody(String permission);
