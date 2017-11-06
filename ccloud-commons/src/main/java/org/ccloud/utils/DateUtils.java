@@ -62,6 +62,26 @@ public class DateUtils {
 	 * 功能描述：日期输出为指定格式的字符串
 	 * @param format	格式
 	 * @param date		日期
+	 * @return	
+	 * 返回类型：String
+	 * 创建人：eric
+	 * 日期：2017年2月15日
+	 */
+	public static String dateToStr(Date date, String format) {
+		
+		if (date == null)
+			return null;
+		
+		if (StrKit.isBlank(format))
+			format = DEFAULT_FORMATTER;
+		
+		return new DateTime(date).toString(format);
+	}
+	
+	/**
+	 * 功能描述：日期输出为指定格式的字符串
+	 * @param format	格式
+	 * @param date		日期
 	 * @return
 	 * 返回类型：String
 	 * 创建人：eric
