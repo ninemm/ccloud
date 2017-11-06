@@ -240,11 +240,11 @@ function addTr(tid, productList, optionArr) {
 													<input type="hidden" id="goodsCode" name="iCheckDetailList[${list_index}].product_id"  value="${list.productId}" />
 													<input type="text" id="goodsName" name="goodsName"  value="${plist.name}" disabled="disabled"/>
 												</td>
-												
+												<#list (plist.specificationList)! as slist>
 												<td class="text-center">
-													<input name="specification" id="specification" value="${plist.productSn}" disabled="disabled"></input>
+													<input name="specification" id="specification" value="${slist.name!}" disabled="disabled"></input>
 												</td>
-												
+												</#list>
 												<td class="text-center">
 													<input name="big_unit" id="big_unit" value="${plist.weightUnit!}" disabled="disabled"></input>
 												</td>
