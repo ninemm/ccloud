@@ -17,6 +17,8 @@ package org.ccloud.controller.admin;
 
 import java.util.Map;
 
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.CustomerType;
@@ -36,6 +38,7 @@ import com.jfinal.plugin.activerecord.Page;
 @RouterMapping(url = "/admin/customerType", viewPath = "/WEB-INF/admin/customer_type")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
+@RequiresPermissions(value = { "/admin/customerType", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 public class _CustomerTypeController extends JBaseCRUDController<CustomerType> {
 
 	@Override
@@ -51,7 +54,8 @@ public class _CustomerTypeController extends JBaseCRUDController<CustomerType> {
 		}
 		String show = getPara("show");
 
-		Page<CustomerType> page = CustomerTypeQuery.me().paginate(getPageNumber(), getPageSize(), keyword, "create_date", show);
+		Page<CustomerType> page = CustomerTypeQuery.me().paginate(getPageNumber(), getPageSize(), keyword,
+				"create_date", show);
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
 

@@ -48,6 +48,14 @@
 		</dependency>
 		
 		<dependency>
+            <groupId>org.ccloud</groupId>
+            <artifactId>ccloud-shiro</artifactId>
+            <version>${project.version}</version>
+            <type>jar</type> 
+            <scope>compile</scope>
+        </dependency>		
+		
+		<dependency>
 			<groupId>org.ccloud</groupId>
 			<artifactId>ccloud-web-core</artifactId>
 			<version>${project.version}</version>

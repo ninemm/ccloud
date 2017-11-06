@@ -30,10 +30,12 @@
 			}
 			
 			let parentId = nodes[0].tags[0];
+			let dataArea = nodes[0].tags[1];
 			let parentName = nodes[0].text;
 			
 			parent.$("#parent_id").val(parentId);
 			parent.$("#parent_name").val(parentName);
+			parent.$("#data_area").val(dataArea);
 			
 			parent.$('#form').data('bootstrapValidator')
 			.updateStatus('parent_name', 'NOT_VALIDATED', null)

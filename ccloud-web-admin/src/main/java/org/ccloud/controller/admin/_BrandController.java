@@ -41,9 +41,14 @@ import com.jfinal.plugin.activerecord.Page;
 @RouterMapping(url = "/admin/brand", viewPath = "/WEB-INF/admin/brand")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
-@RequiresPermissions(value={"brand:view","admin:all"},logical=Logical.OR)
+@RequiresPermissions(value={"/admin/brand","/admin/all"},logical=Logical.OR)
 public class _BrandController extends JBaseCRUDController<Brand> { 
 
+	@Override
+	public void index() {
+		render("index.html");
+	}	
+	
 	public void list() {
 		
         String keyword = getPara("k");
@@ -59,7 +64,7 @@ public class _BrandController extends JBaseCRUDController<Brand> {
 	}
 	
 	@Override
-	@RequiresPermissions(value={"brand:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/brand/edit","/admin/all"},logical=Logical.OR)
 	public void edit() {
 		String id = getPara("id");
 		if (id != null) {
@@ -71,7 +76,7 @@ public class _BrandController extends JBaseCRUDController<Brand> {
 	}
 	
 	@Override
-	@RequiresPermissions(value={"brand:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/brand/edit","/admin/all"},logical=Logical.OR)
 	public void delete() {
 		String id = getPara("id");
 		final Brand r = BrandQuery.me().findById(id);

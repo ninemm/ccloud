@@ -46,20 +46,27 @@ public class PriceSystemQuery extends JBaseQuery {
 		});
 	}
 
-	public Page<PriceSystem> paginate(int pageNumber, int pageSize, String keyword, String orderby) {
-		String select = "select * ";
-		StringBuilder fromBuilder = new StringBuilder("from `cc_price_system` ");
+	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String deptId, String dataArea, 
+			boolean isSuperAdmin) {
+		String select = "select c.id, c.name, c.factor, d.dept_name ";
+		StringBuilder fromBuilder = new StringBuilder(" from `cc_price_system` c ");
+		fromBuilder.append(" left join department d on c.dept_id = d.id ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
 
-		appendIfNotEmptyWithLike(fromBuilder, "name", keyword, params, true);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "c.name", keyword, params, needWhere);
+		if (!isSuperAdmin) {
+			needWhere = appendIfNotEmpty(fromBuilder, "c.dept_id", deptId, params, needWhere);
+			needWhere = appendIfNotEmpty(fromBuilder, "c.data_area", dataArea, params, needWhere);
+		}
 
-		fromBuilder.append("order by " + orderby);
+		fromBuilder.append("order by " + "c.create_date");
 
 		if (params.isEmpty())
-			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
-		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
 	public List<Record> findPriceSystemList() {

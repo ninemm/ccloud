@@ -92,34 +92,26 @@
 		</div>
 		<form action="${CPATH}/admin/customer/uploading" enctype="multipart/form-data" method="post" id="form" class="form-horizontal" >
 			<div class="box-body">
-				<div class="col-sm-12 ">
-					<div class="row">
-						<div class="form-group col-sm-12 validata-box">
-							<label class="control-label col-sm-2">下载模版:</label>
-							<div class="input-group col-md-4 col-sm-4-offset-2">
-								<a href="${CPATH}/admin/customer/customerTemplate" target="_black">请点击下载模板</a>
-							</div>
+				<div class="form-group col-sm-12 validata-box">
+					<label class="control-label col-sm-2">下载模版:</label>
+					<div class="input-group col-md-4 col-sm-4-offset-2">
+						<a href="${CPATH}/admin/customer/customerTemplate" target="_black">请点击下载模板</a>
+					</div>
+				</div>
+				<div class="form-group col-sm-12 validata-box">
+					<label class="control-label col-sm-2">*负责人:</label>
+					<div class="input-group col-md-4 col-sm-10">
+						<input type="hidden" name="userIds" id="userIds" value="">
+						<input class="form-control input-sm" type="text" id="userNames" name="userNames" value="" readonly>
+						<div class="input-group-addon" id="_user_tree" style="cursor:pointer;">
+							<i class="fa fa-search"></i> 选择
 						</div>
-						<div class="form-group col-sm-12 validata-box">
-							<label class="control-label col-sm-2">*负责人:</label>
-							<div class="input-group col-md-4 col-sm-10">
-								<div class="input-group">
-									<input type="hidden" name="userIds" id="userIds" value="">
-									<input class="form-control input-sm" type="text" id="userNames" name="userNames" value="" readonly>
-									<div class="input-group-addon" id="_user_tree" style="cursor:pointer;">
-										<i class="fa fa-search"></i> 选择
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="form-group col-sm-12 validata-box">
-							<label class="control-label col-sm-2">*上传文件:</label>
-							<div class="input-group col-md-4 col-sm-10">
-								<div class="input-group">
-									<input type="file" id="file" name="file" value="">
-								</div>
-							</div>
-						</div>
+					</div>
+				</div>
+				<div class="form-group col-sm-12 validata-box">
+					<label class="control-label col-sm-2">*上传文件:</label>
+					<div class="input-group col-md-4 col-sm-10">
+						<input type="file" id="file" name="file" value="">
 					</div>
 				</div>
 			</div>

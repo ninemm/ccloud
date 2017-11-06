@@ -39,8 +39,13 @@ import com.jfinal.plugin.activerecord.Page;
 @RouterMapping(url = "/admin/supplier", viewPath = "/WEB-INF/admin/supplier")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
-@RequiresPermissions(value={"supplier:view","admin:all"},logical=Logical.OR)
+@RequiresPermissions(value={"/admin/supplier","/admin/all"},logical=Logical.OR)
 public class _SupplierController extends JBaseCRUDController<Supplier> {
+	
+	@Override
+	public void index() {
+		render("index.html");
+	}	
 
 	public void list() {
 
@@ -57,7 +62,7 @@ public class _SupplierController extends JBaseCRUDController<Supplier> {
 	}
 	
 	@Override
-	@RequiresPermissions(value={"supplier:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/supplier/edit","/admin/all"},logical=Logical.OR)
 	public void edit() {
 		String id = getPara("id");
 		if (id != null) {
@@ -67,7 +72,7 @@ public class _SupplierController extends JBaseCRUDController<Supplier> {
 	}
 	
 	@Override
-	@RequiresPermissions(value={"supplier:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/supplier/edit","/admin/all"},logical=Logical.OR)
 	public void delete() {
 		String id = getPara("id");
 		final Supplier r = SupplierQuery.me().findById(id);
@@ -81,7 +86,7 @@ public class _SupplierController extends JBaseCRUDController<Supplier> {
 	}
 
 	@Before(UCodeInterceptor.class)
-	@RequiresPermissions(value={"supplier:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/supplier/edit","/admin/all"},logical=Logical.OR)
 	public void batchDelete() {
 
 		String[] ids = getParaValues("dataItem");
@@ -94,7 +99,7 @@ public class _SupplierController extends JBaseCRUDController<Supplier> {
 
 	}
 
-	@RequiresPermissions(value={"supplier:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/supplier/edit","/admin/all"},logical=Logical.OR)
 	public void enable() {
 		String id = getPara("id");
 		int isEnabled = getParaToInt("isEnabled");

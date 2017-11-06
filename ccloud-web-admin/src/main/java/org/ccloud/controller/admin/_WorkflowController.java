@@ -17,8 +17,13 @@ import com.google.common.collect.ImmutableMap;
 import com.jfinal.plugin.activerecord.Page;
 
 @RouterMapping(url = "/admin/workflow", viewPath = "/WEB-INF/admin/workflow")
-@RequiresPermissions(value={"workflow:all","admin:all"},logical=Logical.OR)
+@RequiresPermissions(value={"/admin/workflow","/admin/all"},logical=Logical.OR)
 public class _WorkflowController extends JBaseCRUDController<ActReProcdef> {
+	
+	@Override
+	public void index() {
+		render("index.html");
+	}
 
 	public void list() {
 		Page<ActReProcdef> page = ActReProcdefQuery.me().getDefPage(getPageNumber(), getPageSize());

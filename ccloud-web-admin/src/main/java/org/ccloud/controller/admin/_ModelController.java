@@ -18,8 +18,13 @@ import com.jfinal.aop.Before;
 import com.jfinal.plugin.activerecord.Page;
 
 @RouterMapping(url = "/admin/model", viewPath = "/WEB-INF/admin/model")
-@RequiresPermissions(value={"model:view","admin:all"},logical=Logical.OR)
+@RequiresPermissions(value={"/admin/model","/admin/all"},logical=Logical.OR)
 public class _ModelController extends JBaseCRUDController<ActReModel> {
+	
+	@Override
+	public void index() {
+		render("index.html");
+	}	
 
 	public void list() {
 		Page<ActReModel> page = ActReModelQuery.me().getModelPage(getPageNumber(), getPageSize());
@@ -28,7 +33,7 @@ public class _ModelController extends JBaseCRUDController<ActReModel> {
 	}
 	
 	@Override
-	@RequiresPermissions(value={"model:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/model/edit","/admin/all"},logical=Logical.OR)
 	public void edit() {
 		String id = getPara("id");
 		if (id != null) {
@@ -54,7 +59,7 @@ public class _ModelController extends JBaseCRUDController<ActReModel> {
 		}
 	}
 	
-	@RequiresPermissions(value={"model:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/model/edit","/admin/all"},logical=Logical.OR)
 	public void deploy() {
 		String id = getPara("id");
 		WorkFlowService service = WorkFlowService.me();
@@ -62,7 +67,7 @@ public class _ModelController extends JBaseCRUDController<ActReModel> {
 		renderAjaxResultForSuccess(message);
 	}
 	
-	@RequiresPermissions(value={"model:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/model/edit","/admin/all"},logical=Logical.OR)
 	public void delete() {
 		String id = getPara("id");
 		WorkFlowService service = new WorkFlowService();

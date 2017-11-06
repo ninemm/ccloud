@@ -55,18 +55,19 @@
    					},
    					edit: false
    				},
-   				{field: "type", title: "显示方式", align: "center", width: '10%',
+   				{field: "show_type", title: "显示方式", align: "center", width: '10%',
    					formatter: function(value, row, rowIndex) {
    						if (value == 1) return '下拉显示';
    						else return '平铺显示';
    					},
    					edit: false
    				},
-				{field: "childList", title: "规格值", align: "center", width: '20%',
+				{field: "valueName", title: "规格值", align: "center", width: '20%',
 					formatter: function(value, row, rowIndex) {
 						var str = "";
-				        $.each(value, function (i, item) {
-							str = str + "[" + item.name + "]";
+						var name = value.split(",");
+				        $.each(name, function (i, item) {
+							str = str + "[" + item + "]";
 				        });
 				        return str;
 					},
@@ -117,7 +118,7 @@
 		<form class="form-horizontal" style="float: right" action="${CPATH}/admin/specification?c=${c!}&p=${p!}" method="post">
 			<div class="input-group input-group-sm">
 				<input id="post-search-input" class="form-control" type="search" value="${k!}" name="k" placeholder="搜索名称">&nbsp;
-				<input id="search-submit" class="btn btn-default btn-sm btn-flat" type="submit" value="搜索">
+				<input id="search-submit" class="btn btn-default btn-sm btn-flat" type="button" value="搜索">
 			</div>
 		</form>
 	</div>

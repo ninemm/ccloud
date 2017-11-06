@@ -16,6 +16,12 @@
 package org.ccloud.model;
 
 import org.ccloud.model.core.Table;
+
+import com.jfinal.plugin.ehcache.CacheKit;
+import com.jfinal.plugin.ehcache.IDataLoader;
+
+import java.util.List;
+
 import org.ccloud.model.base.BaseRoleOperationRel;
 
 /**
@@ -25,5 +31,16 @@ import org.ccloud.model.base.BaseRoleOperationRel;
 public class RoleOperationRel extends BaseRoleOperationRel<RoleOperationRel> {
 
 	private static final long serialVersionUID = 1L;
+	public static final String CACHE_KEY = "role_permission_list";
 
+	@SuppressWarnings("unchecked")
+	public List<String> getFromListCache(Object key, IDataLoader dataloader) {
+		Object data = CacheKit.get(CACHE_KEY, key);
+		if (data == null) {
+			data = dataloader.load();
+			CacheKit.put(CACHE_KEY, key, data);
+		}
+		return (List<String>)data;
+	}
+	
 }

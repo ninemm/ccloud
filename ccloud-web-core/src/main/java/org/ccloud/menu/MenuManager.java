@@ -15,19 +15,25 @@
  */
 package org.ccloud.menu;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.ccloud.core.addon.HookInvoker;
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.User;
+import org.ccloud.model.query.OperationQuery;
+import org.ccloud.model.query.RoleQuery;
 import org.ccloud.utils.StringUtils;
 
 import com.google.common.collect.Lists;
+import com.jfinal.plugin.ehcache.CacheKit;
 
 public class MenuManager {
 
 	public static final String ACTION_INIT_MENU = "_INIT_MENU";
+	public static final String CACHE_NAME = "user_menu";
 
 	static MenuManager manager = new MenuManager();
 	static final LinkedList<MenuGroup> menuGroups = new LinkedList<MenuGroup>();
@@ -60,27 +66,28 @@ public class MenuManager {
 		
 		HookInvoker.menuInitBefore(this);
 		
-		//Set<String> set = ResQuery.me().findPermissionSet(user.getRoleRes());
+	    Map<String, List<String>> map = RoleQuery.me().getPermissions(user.getGroupId());
+	    List<String> rolePermissions = OperationQuery.me().getPermissionsByRole(map.get("roleIds"));
 		
 		StringBuilder htmlBuilder = new StringBuilder();
 		for (MenuGroup group : menuGroups) {
 			List<MenuItem> menuList = Lists.newArrayList();
-//			List<MenuItem> list = group.getMenuItems();
-//			if (list != null) {
-//				for (Iterator<MenuItem> it = list.iterator(); it.hasNext();) {
-//					MenuItem menuItem = it.next();
-//					String url = menuItem.getUrl();
-//					
-//					int pos = url.indexOf("?");
-//					if (pos != -1) {
-//						url = url.substring(0, pos);
-//					}
-//					
-//					if (set.contains(url)) {
-//						menuList.add(menuItem);
-//					}
-//				}
-//			}
+			List<MenuItem> list = group.getMenuItems();
+			if (list != null) {
+				for (Iterator<MenuItem> it = list.iterator(); it.hasNext();) {
+					MenuItem menuItem = it.next();
+					String url = menuItem.getUrl();
+					
+					int pos = url.indexOf("?");
+					if (pos != -1) {
+						url = url.substring(0, pos);
+					}
+					
+					if (rolePermissions.contains(url) || rolePermissions.contains("/admin/all")) {
+						menuList.add(menuItem);
+					}
+				}
+			}
 			
 			if (menuList.size() > 0) {
 				MenuGroup menuGroup = group;
@@ -91,7 +98,7 @@ public class MenuManager {
 		}
 
 		HookInvoker.menuInitAfter(this);
-
+		CacheKit.put(CACHE_NAME, user.getId(), htmlBuilder.toString());
 		return htmlBuilder.toString();
 		
 		
@@ -140,6 +147,41 @@ public class MenuManager {
 
 	public LinkedList<MenuGroup> getMenuGroups() {
 		return menuGroups;
+	}
+	
+	@SuppressWarnings("unchecked")
+    public static void clearAllList() {
+        List<String> list = CacheKit.getKeys(CACHE_NAME);
+        if (list != null && list.size() > 0) {
+            for (String key : list) {
+
+                // 过滤
+
+                CacheKit.remove(CACHE_NAME, key);
+            }
+        }
+    }
+	
+    public static void clearListByKey(String userId) {
+        String htmlBuilder = CacheKit.get(CACHE_NAME, userId);
+        if (htmlBuilder != null) {
+        	CacheKit.remove(CACHE_NAME, userId);
+        }
+        
+    }
+
+	public static void clearListByKeys(String[] ids) {
+		if (ids != null && ids.length > 0) {
+			for (int i = 0; i < ids.length; i++) {
+				if (ids[i].equals("0")) {
+					continue;
+				}
+		        String htmlBuilder = CacheKit.get(CACHE_NAME, ids[i]);
+		        if (htmlBuilder != null) {
+		        	CacheKit.remove(CACHE_NAME, ids[i]);
+		        }
+			}
+		}
 	}
 
 }

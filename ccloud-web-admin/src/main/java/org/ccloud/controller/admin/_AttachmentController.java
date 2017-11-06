@@ -49,7 +49,7 @@ import com.jfinal.upload.UploadFile;
 @RouterMapping(url = "/admin/attachment", viewPath = "/WEB-INF/admin/attachment")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
-@RequiresPermissions(value={"attachment:all","admin:all"},logical=Logical.OR)
+@RequiresPermissions(value={"/admin/attachment/","/admin/all"},logical=Logical.OR)
 public class _AttachmentController extends JBaseCRUDController<Attachment> {
 	private static final Log log = Log.getLog(_AttachmentController.class);
 

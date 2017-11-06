@@ -44,9 +44,14 @@ import com.jfinal.plugin.activerecord.Page;
 @RouterMapping(url = "/admin/department", viewPath = "/WEB-INF/admin/department")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
-@RequiresPermissions(value={"department:view","admin:all"},logical=Logical.OR)
+@RequiresPermissions(value={"/admin/department","/admin/all"},logical=Logical.OR)
 public class _DepartmentController extends JBaseCRUDController<Department> {
-
+	
+	@Override
+	public void index() {
+		render("index.html");
+	}
+	
 	public void list() {
 
 		String keyword = getPara("k", "");
@@ -64,7 +69,7 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 	}
 
 	@Override
-	@RequiresPermissions(value={"department:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/department/edit","/admin/all"},logical=Logical.OR)
 	public void edit() {
 		String id = getPara("id");
 		if (id != null) {
@@ -93,7 +98,7 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 	}
 
 	@Override
-	@RequiresPermissions(value={"department:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/department/edit","/admin/all"},logical=Logical.OR)
 	public void delete() {
 		String id = getPara("id");
 		final Department r = DepartmentQuery.me().findById(id);

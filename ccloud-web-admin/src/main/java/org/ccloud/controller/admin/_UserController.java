@@ -25,6 +25,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
+import org.ccloud.menu.MenuManager;
 import org.ccloud.model.Department;
 import org.ccloud.model.Group;
 import org.ccloud.model.Station;
@@ -50,7 +51,7 @@ import com.jfinal.plugin.activerecord.Page;
 @RouterMapping(url = "/admin/user", viewPath = "/WEB-INF/admin/user")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
-@RequiresPermissions(value={"user:view","admin:all"},logical=Logical.OR)
+@RequiresPermissions(value={"/admin/user","/admin/all"},logical=Logical.OR)
 public class _UserController extends JBaseCRUDController<User> {
 
 	@Override
@@ -87,6 +88,7 @@ public class _UserController extends JBaseCRUDController<User> {
 		}
 
 		if (user.saveOrUpdate()) {
+			MenuManager.clearListByKey(user.getId());
 			renderAjaxResultForSuccess("ok");
 		} else {
 			renderAjaxResultForError("false");
@@ -94,7 +96,7 @@ public class _UserController extends JBaseCRUDController<User> {
 	}
 
 	@Override
-	@RequiresPermissions(value={"user:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/user/edit","/admin/all"},logical=Logical.OR)
 	public void edit() {
 		String id = getPara("id");
 		if (id != null) {
@@ -106,7 +108,7 @@ public class _UserController extends JBaseCRUDController<User> {
 	}
 
 	@Override
-	@RequiresPermissions(value={"user:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/user/edit","/admin/all"},logical=Logical.OR)
 	public void delete() {
 		String id = getPara("id");
 		final User r = UserQuery.me().findById(id);
@@ -116,6 +118,7 @@ public class _UserController extends JBaseCRUDController<User> {
 			} else {
 				boolean success = r.delete();
 				if (success) {
+					MenuManager.clearListByKey(id);
 					renderAjaxResultForSuccess("删除成功");
 				} else {
 					renderAjaxResultForError("删除失败");
@@ -125,11 +128,12 @@ public class _UserController extends JBaseCRUDController<User> {
 	}
 
 	@Before(UCodeInterceptor.class)
-	@RequiresPermissions(value={"user:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/user/edit","/admin/all"},logical=Logical.OR)
 	public void batchDelete() {
 		String[] ids = getParaValues("dataItem");
 		int count = UserQuery.me().batchDelete(ids);
 		if (count > 0) {
+			MenuManager.clearListByKeys(ids);				
 			renderAjaxResultForSuccess("删除成功");
 		} else {
 			renderAjaxResultForError("删除失败!");
@@ -181,7 +185,7 @@ public class _UserController extends JBaseCRUDController<User> {
 		renderJson(list);
 	}
 
-	@RequiresPermissions(value={"user:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/user/edit","/admin/all"},logical=Logical.OR)
 	public void enable() {
 		String id = getPara("id");
 		User user = UserQuery.me().findById(id);

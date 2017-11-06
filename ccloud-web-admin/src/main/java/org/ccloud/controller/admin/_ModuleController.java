@@ -42,8 +42,14 @@ import com.jfinal.plugin.activerecord.Page;
 @RouterMapping(url = "/admin/module", viewPath = "/WEB-INF/admin/module")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
-@RequiresPermissions(value={"module:view","admin:all"},logical=Logical.OR)
+@RequiresPermissions(value={"/admin/module","/admin/all"},logical=Logical.OR)
 public class _ModuleController extends JBaseCRUDController<Module> {
+	
+	@Override
+	public void index() {
+		render("index.html");
+	}
+	
 	public void list() {
 		String keyword = getPara("k", "");
 		if (StrKit.notBlank(keyword)) {
@@ -73,7 +79,7 @@ public class _ModuleController extends JBaseCRUDController<Module> {
 
 
 	@Override
-	@RequiresPermissions(value={"module:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/module/edit","/admin/all"},logical=Logical.OR)
 	public void edit() {
 		List<Systems> list = SystemsQuery.me().findAll();
 		setAttr("list", list);

@@ -29,9 +29,9 @@
 		}
 	};
 
-	$('#_user_tree').click(function() {
+	$('#_department_tree').click(function() {
 		layer.open({
-			title:'负责人',
+			title:'部门',
 			type: 2,
 			area: ['580px', '530px'],
 			fix: false, //不固定
@@ -74,19 +74,13 @@
 		</div>
 		<form id="form" class="form-horizontal" >
 			<div class="box-body">
-				<div class="col-sm-12 ">
-					<div class="row">
-						<div class="form-group col-sm-12 validata-box">
-							<label class="control-label col-sm-2">*部门:</label>
-							<div class="input-group col-md-4 col-sm-10">
-								<div class="input-group">
-									<input type="hidden" name="parent_id" id="parent_id" value="">
-									<input class="form-control input-sm" type="text" id="parent_name" name="parent_name" value="" readonly>
-									<div class="input-group-addon" id="_user_tree" style="cursor:pointer;">
-										<i class="fa fa-search"></i> 选择
-									</div>
-								</div>
-							</div>
+				<div class="form-group col-sm-12 validata-box">
+					<label class="control-label col-sm-2">*部门:</label>
+					<div class="input-group col-md-4 col-sm-10">
+						<input type="hidden" name="parent_id" id="parent_id" value="">
+						<input class="form-control input-sm" type="text" id="parent_name" name="parent_name" value="" readonly>
+						<div class="input-group-addon" id="_department_tree" style="cursor:pointer;">
+							<i class="fa fa-search"></i> 选择
 						</div>
 					</div>
 				</div>

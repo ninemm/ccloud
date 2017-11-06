@@ -58,11 +58,15 @@
    					},
    					edit: false
    				},
-   				{field: "description", title: "描述", align: "center", width: '15%', edit:false},
    				{field: "action", title: "操作", align: "center", width: '10%', 
    					formatter: function(value, row, rowIndex) {
    						var url = '${CPATH}/admin/operation/edit?id=' + row.id + '&c=${c}&p=${p}';
-   						var strHtml = '<a href="' + url + '" class="btn btn-sm" title="编辑"><i class="fa fa-edit"></i></a> <a href="javascript:void(0);" class="btn btn-sm" onclick="del(\''+row.id+'\')" title="删除"><i class="fa fa-trash-o"></i></a>';
+   						var strHtml = '<a href="' + url + '" class="btn btn-xs bg-olive btn-flat">编辑</a> <a href="javascript:void(0);" class="btn btn-xs btn-danger btn-flat" onclick="del(\''+row.id+'\')">删除</a> ';
+   						if (row.is_privilege == 0) {
+   							strHtml = strHtml + '<a href="javascript:void(0);" onclick="enable(\''+row.id+'\')" class="btn btn-xs btn-info btn-flat">开启验证</a>';
+   						} else {
+   							strHtml = strHtml + '<a href="javascript:void(0);" onclick="enable(\''+row.id+'\')" class="btn btn-xs btn-info btn-flat">关闭验证</a>';
+   						}
     					return strHtml;
    					},
    					edit:false
@@ -82,6 +86,23 @@
 		
 		jQuery.mm.batchAction('#form', '请选择功能记录');
 	}
+	
+	function enable(id) {
+		$.ajax({
+			url:"${CPATH}/admin/operation/enable",
+			type:"post",
+			data:{"id":id},
+			dataType:"json",
+			success:function(data) {
+				if(data.errorCode == 0) {
+					toastr.success(data.message, '操作成功');
+					$table.bootstrapTable('refresh');
+				} else {
+					toastr.error(data.message,'操作失败');
+				}			
+			}
+		});
+	}	
 	
 </#macro>
 

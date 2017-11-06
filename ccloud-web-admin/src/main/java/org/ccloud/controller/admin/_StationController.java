@@ -49,8 +49,13 @@ import com.jfinal.plugin.activerecord.Page;
 @RouterMapping(url = "/admin/station", viewPath = "/WEB-INF/admin/station")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
-@RequiresPermissions(value={"station:view","admin:all"},logical=Logical.OR)
+@RequiresPermissions(value={"/admin/station","/admin/all"},logical=Logical.OR)
 public class _StationController extends JBaseCRUDController<Station> {
+	
+	@Override
+	public void index() {
+		render("index.html");
+	}	
 
     public void list() {
         String keyword = getPara("k");
@@ -65,7 +70,7 @@ public class _StationController extends JBaseCRUDController<Station> {
 
     }
     @Override
-    @RequiresPermissions(value={"station:edit","admin:all"},logical=Logical.OR)
+    @RequiresPermissions(value={"/admin/station/edit","/admin/all"},logical=Logical.OR)
     public void edit() {
         List<Station> list = StationQuery.me().findAll();
         setAttr("list", list);
@@ -90,7 +95,7 @@ public class _StationController extends JBaseCRUDController<Station> {
 
     @Override
     @Before(UCodeInterceptor.class)
-    @RequiresPermissions(value={"station:edit","admin:all"},logical=Logical.OR)
+    @RequiresPermissions(value={"/admin/station/edit","/admin/all"},logical=Logical.OR)
     public void delete() {
         boolean isDelete = Db.tx(new IAtom() {
             @Override

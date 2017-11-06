@@ -26,7 +26,6 @@ import org.ccloud.interceptor.UCodeInterceptor;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.User;
-import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.shiro.CaptchaUsernamePasswordToken;
@@ -84,7 +83,7 @@ public class _AdminController extends JBaseController {
 	    CaptchaUsernamePasswordToken token = new CaptchaUsernamePasswordToken(username, password, rememberMe, "", "");
 	    try {
 	        subject.login(token);
-	        User user = UserQuery.me().findUserByUsername(username);
+	        User user = (User) subject.getPrincipal();
 			MessageKit.sendMessage(Actions.USER_LOGINED, user);
 			CookieUtils.put(this, Consts.COOKIE_LOGINED_USER, user.getId().toString());
 			setSessionAttr("user", user);	        

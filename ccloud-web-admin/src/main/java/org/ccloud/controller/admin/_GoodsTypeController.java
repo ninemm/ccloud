@@ -38,8 +38,13 @@ import com.jfinal.plugin.activerecord.Page;
 @RouterMapping(url = "/admin/goodsType", viewPath = "/WEB-INF/admin/goods_type")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
-@RequiresPermissions(value={"goodsType:view","admin:all"},logical=Logical.OR)
+@RequiresPermissions(value={"/admin/goodsType","/admin/all"},logical=Logical.OR)
 public class _GoodsTypeController extends JBaseCRUDController<GoodsType> { 
+	
+	@Override
+	public void index() {
+		render("index.html");
+	}	
 
 	public void list() {
 		
@@ -56,7 +61,7 @@ public class _GoodsTypeController extends JBaseCRUDController<GoodsType> {
 	}
 	
 	@Override
-	@RequiresPermissions(value={"goodsType:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/goodsType/edit","/admin/all"},logical=Logical.OR)
 	public void edit() {
 		String id = getPara("id");
 		if (id != null) {
@@ -66,7 +71,7 @@ public class _GoodsTypeController extends JBaseCRUDController<GoodsType> {
 	}	
 	
 	@Before(UCodeInterceptor.class)
-	@RequiresPermissions(value={"goodsType:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/goodsType/edit","/admin/all"},logical=Logical.OR)
 	public void batchDelete() {
 		
 		String[] ids = getParaValues("dataItem");
