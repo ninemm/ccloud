@@ -239,7 +239,39 @@
 					<div class="input-group col-md-4 col-sm-10">
 						<input class="form-control input-sm" type="text" name="customer.address" value="${(customer.address)!}" placeholder="1-50个任意字母数字">
 					</div>
-				</div>	
+				</div>
+
+				
+				<@shiro.hasPermission name="/admin/all"> 
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">*负责人:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<div class="input-group">
+								<input type="hidden" name="userIds" id="userIds" value="${cUserIds!}">
+								<input class="form-control input-sm" type="text" id="userNames" name="userNames" value="${cUserNames!}" disabled="disabled">
+								<div class="input-group-addon" id="_menu_tree" style="cursor:pointer;">
+									<i class="fa fa-search"></i> 选择
+								</div>
+							</div>
+						</div>
+					</div>
+				</@shiro.hasPermission>
+				
+				<@shiro.hasPermission name="/admin/dealer/all"> 
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">*负责人:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<div class="input-group">
+								<input type="hidden" name="userIds" id="userIds" value="${cUserIds!}">
+								<input class="form-control input-sm" type="text" id="userNames" name="userNames" value="${cUserNames!}" disabled="disabled">
+								<div class="input-group-addon" id="_menu_tree" style="cursor:pointer;">
+									<i class="fa fa-search"></i> 选择
+								</div>
+							</div>
+						</div>
+					</div>
+				</@shiro.hasPermission>
+				
 				<div class="form-group col-sm-12 validata-box">
 					<label class="control-label col-sm-2">*客户类型:</label>
 					<div class="input-group col-md-4 col-sm-10">
@@ -250,18 +282,7 @@
 						</select>
 					</div>
 				</div>
-					<div class="form-group col-sm-12 validata-box">
-					<label class="control-label col-sm-2">*负责人:</label>
-					<div class="input-group col-md-4 col-sm-10">
-						<div class="input-group">
-							<input type="hidden" name="userIds" id="userIds" value="${cUserIds!}">
-							<input class="form-control input-sm" type="text" id="userNames" name="userNames" value="${cUserNames!}" disabled="disabled">
-							<div class="input-group-addon" id="_menu_tree" style="cursor:pointer;">
-								<i class="fa fa-search"></i> 选择
-							</div>
-						</div>
-					</div>
-				</div>
+
 			</div>
 		</form>
 		<div class="box-footer"> 

@@ -26,8 +26,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.subject.Subject;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.Customer;
@@ -43,11 +45,13 @@ import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.vo.CustomerExcel;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
+import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.StringUtils;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
@@ -82,15 +86,40 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 			keyword = StringUtils.urlDecode(keyword);
 		}
 
-		User user = getSessionAttr("user");
+		Map<String, String> deptIdAndDataArea = this.getDeptIdAndDataArea();
+		String deptId = deptIdAndDataArea.get("deptId");
+		String dataArea = deptIdAndDataArea.get("dataArea");
 
-		Page<Record> page = CustomerQuery.me().paginate(getPageNumber(), getPageSize(), keyword, "create_date", paraMap,
-				user.getDepartmentId(), user.getDataArea());
+		Page<Record> page = CustomerQuery.me().paginate(getPageNumber(), getPageSize(), keyword, paraMap, deptId,
+				dataArea);
 		List<Record> customerList = page.getList();
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", customerList);
 		renderJson(map);
 
+	}
+
+	private Map<String, String> getDeptIdAndDataArea() {
+
+		Map<String, String> map = Maps.newHashMap();
+		User user = getSessionAttr("user");
+		Subject subject = SecurityUtils.getSubject();
+
+		if (subject.isPermitted("/admin/all")) {
+			map.put("deptId", "");
+			map.put("dataArea", "");
+
+		} else if (subject.isPermitted("/admin/dealer/all")) {
+			map.put("deptId", user.getDepartmentId());
+			map.put("dataArea", DataAreaUtil.getUserDeptDataArea(user.getDataArea()) + "%");
+
+		} else {
+			map.put("deptId", user.getDepartmentId());
+			map.put("dataArea", DataAreaUtil.getUserDeptDataArea(user.getDataArea()));
+
+		}
+
+		return map;
 	}
 
 	@RequiresPermissions(value = { "/admin/customer/edit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
@@ -112,29 +141,42 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 	public void edit() {
 		String id = getPara("id");
 
-		User user = getSessionAttr("user");
+		boolean notBlank = StrKit.notBlank(id);
+		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/all");
+		boolean isDealerAdmin = SecurityUtils.getSubject().isPermitted("/admin/dealer/all");
 
-		if (StrKit.notBlank(id)) {
+		Map<String, String> deptIdAndDataArea = this.getDeptIdAndDataArea();
+		String deptId = deptIdAndDataArea.get("deptId");
+		String dataArea = deptIdAndDataArea.get("dataArea");
+
+		StringBuilder cUserIds = new StringBuilder();
+		StringBuilder cUserNames = new StringBuilder();
+
+		if (notBlank) {// 超级管理员修改
 			setAttr("customer", CustomerQuery.me().findById(id));
-			setAttr("cTypeList", CustomerJoinCustomerTypeQuery.me().findCustomerTypeListByCustomerId(id));
+			setAttr("cTypeList",
+					CustomerJoinCustomerTypeQuery.me().findCustomerTypeListByCustomerId(id, deptId, dataArea));
 
-			StringBuilder cUserIds = new StringBuilder();
-			StringBuilder cUserNames = new StringBuilder();
-			List<Record> list = UserJoinCustomerQuery.me().findUserListByCustomerId(id, user.getDepartmentId(),
-					user.getDataArea());
-			for (Record record : list) {
-				if (cUserIds.length() != 0 || cUserIds.length() != 0) {
-					cUserIds.append(",");
-					cUserNames.append(",");
+			if (isSuperAdmin || isDealerAdmin) {
+				List<Record> list = UserJoinCustomerQuery.me().findUserListByCustomerId(id, deptId, dataArea);
+				for (Record record : list) {
+					if (cUserIds.length() != 0 || cUserIds.length() != 0) {
+						cUserIds.append(",");
+						cUserNames.append(",");
+					}
+					cUserIds.append(record.get("user_id"));
+					cUserNames.append(record.get("realname"));
+
 				}
-				cUserIds.append(record.get("user_id"));
-				cUserNames.append(record.get("realname"));
-
+				setAttr("cUserIds", cUserIds);
+				setAttr("cUserNames", cUserNames);
 			}
-			setAttr("cUserIds", cUserIds);
-			setAttr("cUserNames", cUserNames);
+
 		}
-		setAttr("customerTypeList", CustomerTypeQuery.me().findCustomerTypeList());
+
+		if (!isSuperAdmin) {
+			setAttr("customerTypeList", CustomerTypeQuery.me().findCustomerTypeList(deptId, dataArea));
+		}
 
 		render("edit.html");
 	}
@@ -148,24 +190,41 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("text", "总部");// 父子表第一级名称,以后可以存储在字典表或字典类
 		map.put("tags", Lists.newArrayList(0));
-		map.put("nodes", doBuild(list));
+		map.put("nodes", doBuild(list, true));
 		resTreeList.add(map);
 
 		setAttr("treeData", JSON.toJSON(resTreeList));
 	}
 
-	private List<Map<String, Object>> doBuild(List<Department> list) {
+	@RequiresPermissions(value = { "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
+	public void department_tree() {
+
+		List<Department> list = DepartmentQuery.me().findDeptList("order_list asc");
+		List<Map<String, Object>> resTreeList = new ArrayList<Map<String, Object>>();
+		ModelSorter.tree(list);
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("text", "总部");// 父子表第一级名称,以后可以存储在字典表或字典类
+		map.put("tags", Lists.newArrayList(0));
+		map.put("nodes", doBuild(list, false));
+		resTreeList.add(map);
+
+		setAttr("treeData", JSON.toJSON(resTreeList));
+	}
+
+	private List<Map<String, Object>> doBuild(List<Department> list, boolean addUserFlg) {
 		List<Map<String, Object>> resTreeList = new ArrayList<Map<String, Object>>();
 		for (Department dept : list) {
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("text", dept.getDeptName());
-			map.put("tags", Lists.newArrayList(dept.getId()));
+			map.put("tags", Lists.newArrayList(dept.getId(), dept.getDataArea()));
 			resTreeList.add(map);
 
-			map.put("nodes", addUser(dept.getId()));
+			if (addUserFlg) {
+				map.put("nodes", addUser(dept.getId()));
+			}
 
 			if (dept.getChildList() != null && dept.getChildList().size() > 0) {
-				map.put("nodes", doBuild(dept.getChildList()));
+				map.put("nodes", doBuild(dept.getChildList(), addUserFlg));
 			}
 		}
 		return resTreeList;
@@ -249,7 +308,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 
 		for (CustomerExcel excel : list) {
 			String customerId = StrKit.getRandomUUID();
-			
+
 			this.insertCustomer(customerId, excel);
 			this.insertCustomerJoinCustomerType(customerId, excel);
 			this.insertUserJoinCustomer(customerId, userId);
@@ -283,7 +342,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 			CustomerJoinCustomerTypeQuery.me().insert(customerId, id);
 		}
 	}
-	
+
 	private void insertUserJoinCustomer(String customerId, String userId) {
 		String[] userIds = userId.split(",");
 		for (String id : userIds) {
@@ -291,12 +350,12 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 			UserJoinCustomerQuery.me().insert(customerId, id, user.getDepartmentId(), user.getDataArea());
 		}
 	}
-	
+
 	public void download() {
 
 		render("download.html");
 	}
-	
+
 	@RequiresPermissions(value = { "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void downloading() throws UnsupportedEncodingException {
 		Map<String, String[]> paraMap = getParaMap();
@@ -305,11 +364,11 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 			depatName = StringUtils.urlRedirectToUTF8(depatName);
 		}
 		String depatId = getPara("parent_id");
-		
-		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\customer\\" + depatName + "客户资料.xlsx";
 
-		Page<Record> page = CustomerQuery.me().paginate(1, Integer.MAX_VALUE, null, "create_date", paraMap,
-				depatId, "");
+		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\customer\\"
+				+ depatName + "客户资料.xlsx";
+
+		Page<Record> page = CustomerQuery.me().paginate(1, Integer.MAX_VALUE, null, paraMap, depatId, "");
 		List<Record> customerList = page.getList();
 
 		List<CustomerExcel> excellist = Lists.newArrayList();
@@ -344,7 +403,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 
 		renderFile(new File(filePath));
 	}
-	
+
 	@Before(Tx.class)
 	@RequiresPermissions(value = { "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void batchSetUser() {

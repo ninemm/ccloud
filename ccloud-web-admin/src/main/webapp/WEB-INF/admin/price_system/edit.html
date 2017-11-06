@@ -44,7 +44,7 @@
 			type: 2,
 			area: ['580px', '530px'],
 			fix: false, //不固定
-			content: '${CPATH}/admin/department/department_tree'
+			content: '${CPATH}/admin/customer/department_tree'
 		});
 	});
 
@@ -95,7 +95,7 @@
 			</div>
 		</div>
 		<form action="${CPATH}/admin/priceSystem/save" method="post" id="form" class="form-horizontal" >
-			<input type="hidden" name="customerType.id" value="${(priceSystem.id)!}">
+			<input type="hidden" name="priceSystem.id" value="${(priceSystem.id)!}">
 			<div class="box-body">
 				<div class="form-group col-sm-12 validata-box">
 					<label class="control-label col-sm-2">*名称:</label>
@@ -114,9 +114,9 @@
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">*部门:</label>
 						<div class="input-group col-md-4 col-sm-10">
-							<input type="hidden" name="parent_id" id="parent_id" value="">
-							<input type="hidden" name="data_area" id="data_area" value="">
-							<input class="form-control input-sm" type="text" id="parent_name" name="parent_name" value="" readonly>
+							<input type="hidden" name="parent_id" id="parent_id" value="${(priceSystem.dept_id)!}">
+							<input type="hidden" name="data_area" id="data_area" value="${(priceSystem.data_area)!}">
+							<input class="form-control input-sm" type="text" id="parent_name" name="parent_name" value="${(priceSystem.dept_name)!}" readonly>
 							<div class="input-group-addon" id="_department_tree" style="cursor:pointer;">
 								<i class="fa fa-search"></i> 选择
 							</div>
