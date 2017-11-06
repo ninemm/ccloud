@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.ccloud.model.GoodsSpecificationValue;
 import org.ccloud.model.Product;
+import org.ccloud.model.vo.GoodsSpecificationValueInfo;
 import org.ccloud.model.vo.ProductInfo;
 
 import com.jfinal.plugin.activerecord.Db;
@@ -92,13 +92,13 @@ public class ProductQuery extends JBaseQuery {
 	}
 	
 	public List<ProductInfo> getAllProductInfo() {
- 		StringBuilder fromBuilder = new StringBuilder("SELECT p.create_date as createDate, p.cost, p.is_marketable as isMarketable, p.market_price as marketPrice, p.`name`, p.price, ");
+ 		StringBuilder fromBuilder = new StringBuilder("SELECT p.create_date as createDate,p.id as productId, p.cost, p.is_marketable as isMarketable, p.market_price as marketPrice, p.`name`, p.price, ");
 		fromBuilder.append("p.product_sn as productSn, p.store, p.store_place, p.weight, p.weight_unit as weightUnit, g.`code`, b.`name` as brandName, c.`name` as categoryName ");
 		fromBuilder.append("FROM cc_product p ");
 		fromBuilder.append("LEFT JOIN cc_goods g ON p.goods_id = g.id ");
 		fromBuilder.append("LEFT JOIN cc_brand b ON g.brand_id = b.id ");
 		fromBuilder.append("LEFT JOIN cc_goods_category c ON g.goods_category_id = c.id ");
-		List<Record> list = Db.find(fromBuilder.toString());
+		List<Record> list = Db.find(fromBuilder.toString());	
 		List<ProductInfo> plist = new ArrayList<>();
 		for (Record record : list) {
 			ProductInfo pro = new ProductInfo();
@@ -106,7 +106,7 @@ public class ProductQuery extends JBaseQuery {
 			pro.setCategoryName(record.getStr("categoryName"));
 			pro.setCode(record.getStr("code"));
 			pro.setCost(record.getBigDecimal("cost"));
-			pro.setCreateDate(record.getStr("createDate"));
+			pro.setCreateDate(record.getDate("createDate"));
 			pro.setIsMarketable(record.getBoolean("isMarketable"));
 			pro.setMarketPrice(record.getBigDecimal("marketPrice"));
 			pro.setName(record.getStr("name"));
@@ -116,10 +116,49 @@ public class ProductQuery extends JBaseQuery {
 			pro.setStorePlace(record.getStr("storePlace"));
 			pro.setWeight(record.getStr("weight"));
 			pro.setWeightUnit(record.getStr("weightUnit"));
-			List<GoodsSpecificationValue> slist = GoodsSpecificationValueQuery.me().findByProductId(pro.getProductSn());
+			pro.setProductId(record.getStr("productId"));
+			List<GoodsSpecificationValueInfo> slist = GoodsSpecificationValueQuery.me().findByProductId(pro.getProductId());
 			pro.setSpecificationList(slist);
 			plist.add(pro);
 		}
 		return plist;
 	}
+	
+	
+	
+	public List<ProductInfo> getAllProductInfoById(String id) {
+ 		StringBuilder fromBuilder = new StringBuilder("SELECT p.create_date as createDate,p.id as productId, p.cost, p.is_marketable as isMarketable, p.market_price as marketPrice, p.`name`, p.price, ");
+		fromBuilder.append("p.product_sn as productSn, p.store, p.store_place, p.weight, p.weight_unit as weightUnit, g.`code`, b.`name` as brandName, c.`name` as categoryName ");
+		fromBuilder.append("FROM cc_product p ");
+		fromBuilder.append("LEFT JOIN cc_goods g ON p.goods_id = g.id ");
+		fromBuilder.append("LEFT JOIN cc_brand b ON g.brand_id = b.id ");
+		fromBuilder.append("LEFT JOIN cc_goods_category c ON g.goods_category_id = c.id ");
+	 	fromBuilder.append(" WHERE p.id = ?");
+		List<Record> list = Db.find(fromBuilder.toString(), id);	
+		List<ProductInfo> plist = new ArrayList<>();
+		for (Record record : list) {
+			ProductInfo pro = new ProductInfo();
+			pro.setBrandName(record.getStr("brandName"));
+			pro.setCategoryName(record.getStr("categoryName"));
+			pro.setCode(record.getStr("code"));
+			pro.setCost(record.getBigDecimal("cost"));
+			pro.setCreateDate(record.getDate("createDate"));
+			pro.setIsMarketable(record.getBoolean("isMarketable"));
+			pro.setMarketPrice(record.getBigDecimal("marketPrice"));
+			pro.setName(record.getStr("name"));
+			pro.setPrice(record.getBigDecimal("price"));
+			pro.setProductSn(record.getStr("productSn"));
+			pro.setStore(record.getStr("store"));
+			pro.setStorePlace(record.getStr("storePlace"));
+			pro.setWeight(record.getStr("weight"));
+			pro.setWeightUnit(record.getStr("weightUnit"));
+			pro.setProductId(record.getStr("productId"));
+			List<GoodsSpecificationValueInfo> slist = GoodsSpecificationValueQuery.me().findByProductId(id);
+			pro.setSpecificationList(slist);
+			plist.add(pro);
+		}
+		return plist;
+	}
+	
+	
 }

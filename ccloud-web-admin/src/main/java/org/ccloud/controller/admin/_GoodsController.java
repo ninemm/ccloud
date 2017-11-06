@@ -25,8 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.shiro.authz.annotation.Logical;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
@@ -76,13 +74,7 @@ import com.jfinal.upload.UploadFile;
 @RouterMapping(url = "/admin/goods", viewPath = "/WEB-INF/admin/goods")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
-@RequiresPermissions(value={"/admin/goods","/admin/all"},logical=Logical.OR)
 public class _GoodsController extends JBaseCRUDController<Goods> { 
-	
-	@Override
-	public void index() {
-		render("index.html");
-	}	
 	
 	public void list() {
 		
@@ -99,7 +91,6 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
 	}
 	
 	@Override
-	@RequiresPermissions(value={"/admin/goods/edit","/admin/all"},logical=Logical.OR)
 	public void edit() {
 		String id = getPara("id");
 		if (id != null) {
@@ -393,7 +384,6 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
 	}
 	
 	@Before(UCodeInterceptor.class)
-	@RequiresPermissions(value={"goods:edit","admin:all"},logical=Logical.OR)
 	public void batchDelete() {
 		
 		String[] ids = getParaValues("dataItem");
@@ -424,7 +414,6 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
 	}
 	
 	@Override
-	@RequiresPermissions(value={"/admin/goods/edit","/admin/all"},logical=Logical.OR)
 	public void delete() {
 		String id = getPara("id");
 		final Goods r = GoodsQuery.me().findById(id);
@@ -516,7 +505,6 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
 		renderAjaxResultForSuccess("删除成功");
     }
     
-    @RequiresPermissions(value={"goods:edit","admin:all"},logical=Logical.OR)
 	public void enable() {
 		String id = getPara("id");
 		int state = getParaToInt("state");
@@ -539,9 +527,16 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
 		setAttr("treeData", JSON.toJSON(list));
 	}
 	
-	public List<ProductInfo> getProductInfo() {
-		List<ProductInfo> list = ProductQuery.me().getAllProductInfo();
-		return list;
+	public void getProductInfo() {
+		List<ProductInfo> productList = ProductQuery.me().getAllProductInfo();
+        List<Map<String, Object>> list = new ArrayList<>();
+        for (ProductInfo productInfo : productList) {
+           Map<String, Object> map = new HashMap<>();
+            map.put("productList", productInfo);
+            list.add(map);
+		}
+        renderJson(list);
 	}
 	
 }
+
