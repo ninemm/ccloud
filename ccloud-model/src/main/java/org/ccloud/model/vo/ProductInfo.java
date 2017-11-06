@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-import org.ccloud.model.GoodsSpecificationValue;
-
 public class ProductInfo {
 	private Date createDate;
 	private BigDecimal cost;
@@ -21,7 +19,7 @@ public class ProductInfo {
 	private String code;
 	private String brandName;
 	private String categoryName;
-	private List<GoodsSpecificationValue> specificationList;
+	private List<GoodsSpecificationValueInfo> specificationList;
 	private String productId;
 
 	
@@ -138,11 +136,13 @@ public class ProductInfo {
 		this.categoryName = categoryName;
 	}
 
-	public List<GoodsSpecificationValue> getSpecificationList() {
+
+
+	public List<GoodsSpecificationValueInfo> getSpecificationList() {
 		return specificationList;
 	}
 
-	public void setSpecificationList(List<GoodsSpecificationValue> specificationList) {
+	public void setSpecificationList(List<GoodsSpecificationValueInfo> specificationList) {
 		this.specificationList = specificationList;
 	}
 

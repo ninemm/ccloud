@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.ccloud.model.GoodsSpecificationValue;
 import org.ccloud.model.Product;
+import org.ccloud.model.vo.GoodsSpecificationValueInfo;
 import org.ccloud.model.vo.ProductInfo;
 
 import com.jfinal.plugin.activerecord.Db;
@@ -117,7 +117,7 @@ public class ProductQuery extends JBaseQuery {
 			pro.setWeight(record.getStr("weight"));
 			pro.setWeightUnit(record.getStr("weightUnit"));
 			pro.setProductId(record.getStr("productId"));
-			List<GoodsSpecificationValue> slist = GoodsSpecificationValueQuery.me().findByProductId(pro.getProductId());
+			List<GoodsSpecificationValueInfo> slist = GoodsSpecificationValueQuery.me().findByProductId(pro.getProductId());
 			pro.setSpecificationList(slist);
 			plist.add(pro);
 		}
@@ -153,7 +153,7 @@ public class ProductQuery extends JBaseQuery {
 			pro.setWeight(record.getStr("weight"));
 			pro.setWeightUnit(record.getStr("weightUnit"));
 			pro.setProductId(record.getStr("productId"));
-			List<GoodsSpecificationValue> slist = GoodsSpecificationValueQuery.me().findByProductId(id);
+			List<GoodsSpecificationValueInfo> slist = GoodsSpecificationValueQuery.me().findByProductId(id);
 			pro.setSpecificationList(slist);
 			plist.add(pro);
 		}
