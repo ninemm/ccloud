@@ -113,7 +113,7 @@ function addTr(tid, productList, optionArr) {
     $tbody.find("tr:last>td>#goodsCode").val(goodsCode);
     $tbody.find("tr:last>td>#specification").text(specification);
     $tbody.find("tr:last>td>#big_unit").text(big_unit);
-    $tbody.find("tr:last>td>#factIndex").val(index);
+    $tbody.find("tr:last>td>#factIndex").attr("value",lastTrIdx);
     $tbody.find("tr:last").find(":input").attr("disabled",false);
 
     $tbody.find("tr:last>td>select.pro-slc2").select2({
@@ -213,6 +213,7 @@ function addTr(tid, productList, optionArr) {
 												</td>
 												<td class="text-left">
 													<input type="hidden" id="goodsCode" name="iCheckDetailList[-1].product_id" disabled="true" />
+												   <input type="hidden"  id="factIndex" name="factIndex" value="-1"/>
 													<select class="pro-slc2">
 													</select>
 												</td>
@@ -228,7 +229,6 @@ function addTr(tid, productList, optionArr) {
 												<td class="text-left">
 													<input type="text"  class="remarks" id="remarks" name="iCheckDetailList[-1].remark" disabled="true">
 												</td>
-										   <input type="hidden"  id="factIndex" name="factIndex" value="">
 											</tr>
 											<#list (ilist)! as list>
                                        <tr id="tr${list_index+1}">
@@ -239,6 +239,7 @@ function addTr(tid, productList, optionArr) {
 												<td class="text-left">
 													<input type="hidden" id="goodsCode" name="iCheckDetailList[${list_index}].product_id"  value="${list.productId}" />
 													<input type="text" id="goodsName" name="goodsName"  value="${plist.name}" disabled="disabled"/>
+												   <input type="hidden"  id="factIndex" name="factIndex" value="${list_index}"/>
 												</td>
 												<#list (plist.specificationList)! as slist>
 												<td class="text-center">
@@ -253,9 +254,8 @@ function addTr(tid, productList, optionArr) {
 												<input type="text" id="stock" class="stock" name="iCheckDetailList[${list_index}].product_count"  value="${list.productCount}" />
 												</td>
 												<td class="text-left">
-													<input type="text"  class="remarks" id="remarks" name="iCheckDetailList[${list_index}].remark" value="${list.remark}">
+													<input type="text"  class="remarks" id="remarks" name="iCheckDetailList[${list_index}].remark" value="${list.remark!}">
 												</td>
-										   <input type="hidden"  id="factIndex" name="factIndex" value="">
                         	           </tr>
                         	              </#list>
 										</tbody>
