@@ -26,103 +26,113 @@ import com.jfinal.plugin.activerecord.ICallback;
 
 public class AroundCustomerSalesCallback implements ICallback {
 
-    private ResultSet resultSet = null;
+	private ResultSet resultSet = null;
 
-    private double longitude;
-    private double latitude;
-    private double dist;
-    private String startDate;
-    private String endDate;
+	private double longitude;
+	private double latitude;
+	private double dist;
+	private String startDate;
+	private String endDate;
+	private String dealerCode;
 
-    @Override
-    public Object call(Connection conn) {
-        CallableStatement proc = null;
+	@Override
+	public Object call(Connection conn) {
+		CallableStatement proc = null;
 
-        List<Map<String, Object>> result = Lists.newArrayList();
+		List<Map<String, Object>> result = Lists.newArrayList();
 
-        try {
-            proc = conn.prepareCall("{ call around_customer_sales(?, ?, ?, ?, ?) }");
+		try {
+			proc = conn.prepareCall("{ call around_customer_sales(?, ?, ?, ?, ?, ?) }");
 
-            proc.setDouble(1, getLongitude());
-            proc.setDouble(2, getLatitude());
-            proc.setDouble(3, getDist());
-            proc.setString(4, getStartDate());
-            proc.setString(5, getEndDate());
+			proc.setDouble(1, getLongitude());
+			proc.setDouble(2, getLatitude());
+			proc.setDouble(3, getDist());
+			proc.setString(4, getStartDate());
+			proc.setString(5, getEndDate());
+			proc.setString(6, getDealerCode());
 
-            proc.execute();
+			proc.execute();
 
-            resultSet = proc.getResultSet();
+			resultSet = proc.getResultSet();
 
-            while (resultSet.next()) {
-                Map<String, Object> map = Maps.newHashMap();
-                map.put("customerId", resultSet.getString("customerId"));
-                map.put("customerName", resultSet.getString("customerName"));
-                map.put("type", resultSet.getInt("type"));
-                map.put("contacts", resultSet.getString("contacts"));
-                map.put("phone", resultSet.getString("phone"));
-                map.put("provName", resultSet.getString("provName"));
-                map.put("cityName", resultSet.getString("cityName"));
-                map.put("countyName", resultSet.getString("countyName"));
-                map.put("address", resultSet.getString("address"));
-                map.put("dist", resultSet.getDouble("dist"));
-                map.put("longitude", resultSet.getDouble("longitude"));
-                map.put("latitude", resultSet.getDouble("latitude"));
-                map.put("totalAmount", resultSet.getLong("totalAmount"));
-                result.add(map);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+			while (resultSet.next()) {
+				Map<String, Object> map = Maps.newHashMap();
+				map.put("customerId", resultSet.getString("customerId"));
+				map.put("customerName", resultSet.getString("customerName"));
+				map.put("type", resultSet.getInt("type"));
+				map.put("contacts", resultSet.getString("contacts"));
+				map.put("phone", resultSet.getString("phone"));
+				map.put("provName", resultSet.getString("provName"));
+				map.put("cityName", resultSet.getString("cityName"));
+				map.put("countyName", resultSet.getString("countyName"));
+				map.put("address", resultSet.getString("address"));
+				map.put("dist", resultSet.getDouble("dist"));
+				map.put("longitude", resultSet.getDouble("longitude"));
+				map.put("latitude", resultSet.getDouble("latitude"));
+				map.put("totalAmount", resultSet.getLong("totalAmount"));
+				result.add(map);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 
-        return result;
-    }
+		return result;
+	}
 
-    public ResultSet getResultSet() {
-        return resultSet;
-    }
+	public ResultSet getResultSet() {
+		return resultSet;
+	}
 
-    public void setResultSet(ResultSet resultSet) {
-        this.resultSet = resultSet;
-    }
+	public void setResultSet(ResultSet resultSet) {
+		this.resultSet = resultSet;
+	}
 
-    public double getLongitude() {
-        return longitude;
-    }
+	public double getLongitude() {
+		return longitude;
+	}
 
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
-    }
+	public void setLongitude(double longitude) {
+		this.longitude = longitude;
+	}
 
-    public double getLatitude() {
-        return latitude;
-    }
+	public double getLatitude() {
+		return latitude;
+	}
 
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
-    }
+	public void setLatitude(double latitude) {
+		this.latitude = latitude;
+	}
 
-    public double getDist() {
-        return dist;
-    }
+	public double getDist() {
+		return dist;
+	}
 
-    public void setDist(double dist) {
-        this.dist = dist;
-    }
+	public void setDist(double dist) {
+		this.dist = dist;
+	}
 
-    public String getStartDate() {
-        return startDate;
-    }
+	public String getStartDate() {
+		return startDate;
+	}
 
-    public void setStartDate(String startDate) {
-        this.startDate = startDate;
-    }
+	public void setStartDate(String startDate) {
+		this.startDate = startDate;
+	}
 
-    public String getEndDate() {
-        return endDate;
-    }
+	public String getEndDate() {
+		return endDate;
+	}
 
-    public void setEndDate(String endDate) {
-        this.endDate = endDate;
-    }
+	public void setEndDate(String endDate) {
+		this.endDate = endDate;
+	}
+
+	public String getDealerCode() {
+		return dealerCode;
+	}
+
+	public void setDealerCode(String dealerCode) {
+		this.dealerCode = dealerCode;
+	}
 
 }
