@@ -60,7 +60,7 @@ public class _UserController extends JBaseCRUDController<User> {
 		if (StrKit.notBlank(keyword))
 			setAttr("k", keyword);
 		
-		String dataArea = getSessionAttr("DeptDataArea");
+		String dataArea = getSessionAttr("DeptDataAreaLike");
 		
 		Page<User> page = UserQuery.me().paginate(getPageNumber(), getPageSize(), keyword, dataArea, "create_date");
 		if (page != null) {
@@ -104,7 +104,7 @@ public class _UserController extends JBaseCRUDController<User> {
 			User user = UserQuery.me().findById(id);
 			setAttr("user", user);
 		}
-		String dataArea = getSessionAttr("DeptDataArea");
+		String dataArea = getSessionAttr("DeptDataAreaLike");
 		List<Group> list = GroupQuery.me().findByDept(dataArea);
 		setAttr("list", list);
 	}
@@ -145,7 +145,7 @@ public class _UserController extends JBaseCRUDController<User> {
 
 	public void getStation() {
 		String id = getPara("userid");
-		String dataArea = getSessionAttr("DeptDataArea");
+		String dataArea = getSessionAttr("DeptDataAreaLike");
 		List<Station> stations = StationQuery.me().findByDept(dataArea);
 		List<Map<String, Object>> list = new ArrayList<>();
 		for (Station station : stations) {
