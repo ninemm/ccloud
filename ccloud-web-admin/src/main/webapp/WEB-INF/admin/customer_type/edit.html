@@ -16,6 +16,7 @@
 
 	$(function() {
 		jQuery.mm.initValidator('#form', validatorFields)
+
 	});
 	
 	var validatorFields = {
@@ -24,8 +25,36 @@
 				notEmpty: { message: '类型名称不能为空' },
 				stringLength: { max: 15, message: '类型名称最大长度是15字符，请重新输入' }
 			}
+		},
+		'parent_name': {
+			validators: {
+				notEmpty: { message: '部门不能为空' },
+			}
 		}
 	};
+	
+	$('#_department_tree').click(function() {
+		layer.open({
+			title:'部门',
+			type: 2,
+			area: ['580px', '530px'],
+			fix: false, //不固定
+			content: '${CPATH}/admin/customer/department_tree'
+		});
+	});
+	
+	function layerEvent(){
+		$.post('${CPATH}/admin/priceSystem/findPriceSystemByDeptId', { parent_id: $("#parent_id").val(), data_area: $("#data_area").val() },
+			function(data){
+				var $price_system_id = $('#price_system_id');
+				$price_system_id.empty();
+				$price_system_id.append('<option value="">--请选择--</option>');
+				$.each(data, function(index, obj){
+					$price_system_id.append("<option value='" + obj.id + "'>" + obj.name + "</option>");
+				});
+			}
+		);
+	}
 
 	function doSubmit(){
 		$form.ajaxSubmit({
@@ -82,8 +111,35 @@
 						<input class="form-control input-sm" type="text" name="customerType.name" value="${(customerType.name)!}" placeholder="1-15个任意字符">
 					</div>
 				</div>
+				
+				<@shiro.hasPermission name="/admin/all"> 
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">*部门:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<input type="hidden" name="parent_id" id="parent_id" value="${(customerType.dept_id)!}">
+							<input type="hidden" name="data_area" id="data_area" value="${(customerType.data_area)!}">
+							<input class="form-control input-sm" type="text" id="parent_name" name="parent_name" value="${(customerType.dept_name)!}" readonly>
+							<div class="input-group-addon" id="_department_tree" style="cursor:pointer;">
+								<i class="fa fa-search"></i> 选择
+							</div>
+						</div>
+					</div>
+				</@shiro.hasPermission>
+				
+				<div class="form-group col-sm-12 validata-box">
+					<label class="control-label col-sm-2">价格体系:</label>
+					<div class="input-group col-md-4 col-sm-10">
+						<select class="form-control input-sm" name="customerType.price_system_id" id="price_system_id">
+							<option value="">--请选择--</option>
+							<#list (priceSystemList)! as priceSystem >
+								<option value="${(priceSystem.id)!}" <#if (priceSystem.id)! == (customerType.price_system_id)!>selected="selected"</#if>>${(priceSystem.name)!}</option>
+							</#list>
+						</select>
+					</div>
+				</div>
+
 			</div>
-		
+
 			<div class="box-footer"> 
 				<button type="button" onclick="doSubmit()" class="btn btn-primary">保存更改</button>
 				<input type="button" class="btn btn-primary" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />

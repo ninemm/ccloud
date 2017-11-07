@@ -19,34 +19,19 @@
 	});
 	
 	var validatorFields = {
-		'priceSystem.name': {
+		'printTemplate.template_name': {
 			validators: {
 				notEmpty: { message: '名称不能为空' },
 				stringLength: { max: 15, message: '名称最大长度是15字符，请重新输入' }
 			}
 		},
-		'priceSystem.factor': {
+		'printTemplate.url': {
 			validators: {
 				notEmpty: { message: '基准价格倍数不能为空' },
-				numeric: { max: 15, message: '基准价格倍数最大长度是15数字，请重新输入' }
-			}
-		},
-		'parent_name': {
-			validators: {
-				notEmpty: { message: '部门不能为空' },
+				stringLength: { max: 30, message: 'url最大长度是15数字，请重新输入' }
 			}
 		}
 	};
-	
-	$('#_department_tree').click(function() {
-		layer.open({
-			title:'部门',
-			type: 2,
-			area: ['580px', '530px'],
-			fix: false, //不固定
-			content: '${CPATH}/admin/customer/department_tree'
-		});
-	});
 
 	function doSubmit(){
 		$form.ajaxSubmit({
@@ -76,11 +61,11 @@
 
 <!-- Content Header (Page header) -->
 <section class="content-header">
-	<h1><#if (customerType.id) ??>修改<#else>新增</#if>价格体系</h1>
+	<h1><#if (printTemplate.id) ??>修改<#else>新增</#if>打印模版</h1>
 	<ol class="breadcrumb">
 		<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-		<li><a href="#">客户管理</a></li>
-		<li class="active"><#if (customerType.id) ??>修改<#else>新增</#if>价格体系</li>
+		<li><a href="#">经销商管理</a></li>
+		<li class="active"><#if (printTemplate.id) ??>修改<#else>新增</#if>打印模版</li>
 	</ol>
 </section>
 <!-- Main content -->
@@ -94,35 +79,27 @@
 				</button>
 			</div>
 		</div>
-		<form action="${CPATH}/admin/priceSystem/save" method="post" id="form" class="form-horizontal" >
-			<input type="hidden" name="priceSystem.id" value="${(priceSystem.id)!}">
+		<form action="${CPATH}/admin/printTemplate/save" method="post" id="form" class="form-horizontal" >
+			<input type="hidden" name="priceSystem.id" value="${(printTemplate.id)!}">
 			<div class="box-body">
 				<div class="form-group col-sm-12 validata-box">
-					<label class="control-label col-sm-2">*名称:</label>
+					<label class="control-label col-sm-2">*模板名称:</label>
 					<div class="input-group col-md-4 col-sm-10">
-						<input class="form-control input-sm" type="text" name="priceSystem.name" value="${(priceSystem.name)!}" placeholder="1-15个任意字符">
+						<input class="form-control input-sm" type="text" name="printTemplate.template_name" value="${(printTemplate.template_name)!}" placeholder="1-15个任意字符">
 					</div>
 				</div>
 				<div class="form-group col-sm-12 validata-box">
-					<label class="control-label col-sm-2">*基准价格倍数:</label>
+					<label class="control-label col-sm-2">*url:</label>
 					<div class="input-group col-md-4 col-sm-10">
-						<input class="form-control input-sm" type="text" name="priceSystem.factor" value="${(priceSystem.factor)!}" placeholder="1-15个任意数字">
+						<input class="form-control input-sm" type="text" name="printTemplate.url" value="${(printTemplate.url)!}" placeholder="1-30个任意字符">
 					</div>
 				</div>
-				
-				<@shiro.hasPermission name="/admin/all"> 
-					<div class="form-group col-sm-12 validata-box">
-						<label class="control-label col-sm-2">*部门:</label>
-						<div class="input-group col-md-4 col-sm-10">
-							<input type="hidden" name="parent_id" id="parent_id" value="${(priceSystem.dept_id)!}">
-							<input type="hidden" name="data_area" id="data_area" value="${(priceSystem.data_area)!}">
-							<input class="form-control input-sm" type="text" id="parent_name" name="parent_name" value="${(priceSystem.dept_name)!}" readonly>
-							<div class="input-group-addon" id="_department_tree" style="cursor:pointer;">
-								<i class="fa fa-search"></i> 选择
-							</div>
-						</div>
+				<div class="form-group col-sm-12 validata-box">
+					<label class="control-label col-sm-2">模板内容:</label>
+					<div class="input-group col-md-4 col-sm-10">
+						<input class="form-control input-sm" type="text" name="printTemplate.context" value="${(printTemplate.context)!}">
 					</div>
-				</@shiro.hasPermission>
+				</div>
 				
 			</div>
 

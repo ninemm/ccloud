@@ -38,34 +38,37 @@ public class CustomerQuery extends JBaseQuery {
 		return QUERY;
 	}
 
-	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String orderby,
-			Map<String, String[]> paraMap, String dataArea, String deptId) {
+	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, Map<String, String[]> paraMap,
+			String deptId, String dataArea) {
 
-		String select = "select c.*, t1.customerTypeNames, t2.realnames";
+		String select = "select c.id, c.customer_code, c.customer_name, c.contact, c.mobile, c.customer_kind, c.is_enabled, c.is_archive, "
+				+ " c.prov_name, c.city_name, c.country_name, c.prov_code, c.city_code, c.country_code, c.address, t1.customerTypeNames, t2.realnames";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_customer` c ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 
-		fromBuilder.append(" JOIN ( SELECT c1.id, GROUP_CONCAT(ct. NAME) AS customerTypeNames ");
-		fromBuilder
-				.append(" FROM cc_customer c1 JOIN cc_customer_join_customer_type cjct ON c1.id = cjct.customer_id ");
-		fromBuilder.append(" JOIN cc_customer_type ct ON cjct.customer_type_id = ct.id ");
+		fromBuilder.append(" LEFT JOIN ( SELECT c1.id, GROUP_CONCAT(ct. NAME) AS customerTypeNames ");
+		fromBuilder.append(
+				" FROM cc_customer c1 LEFT JOIN cc_customer_join_customer_type cjct ON c1.id = cjct.customer_id ");
+		fromBuilder.append(" LEFT JOIN cc_customer_type ct ON cjct.customer_type_id = ct.id ");
 		needWhere = appendIfNotEmpty(fromBuilder, "cjct.customer_type_id",
 				StringUtils.getArrayFirst(paraMap.get("customerTypeId")), params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "ct.dept_id", deptId, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "ct.data_area", dataArea, params, needWhere);
 		fromBuilder.append(" GROUP BY c1.id ");
 		fromBuilder.append(" ) t1 ON c.id = t1.id");
 
 		needWhere = true;
-		if(StrKit.isBlank(deptId)) {
+		if (StrKit.isBlank(deptId)) {
 			fromBuilder.append(" LEFT JOIN (SELECT c2.id, GROUP_CONCAT(u.realname) AS realnames ");
 		} else {
 			fromBuilder.append(" JOIN (SELECT c2.id, GROUP_CONCAT(u.realname) AS realnames ");
 		}
 		fromBuilder.append(" FROM cc_customer c2 JOIN cc_user_join_customer ujc ON c2.id = ujc.customer_id ");
 		fromBuilder.append(" JOIN USER u ON ujc.user_id = u.id ");
-		needWhere = appendIfNotEmpty(fromBuilder, "ujc.data_area", dataArea, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "ujc.dept_id", deptId, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "ujc.data_area", dataArea, params, needWhere);
 		fromBuilder.append(" GROUP BY c2.id ");
 		fromBuilder.append(" ) t2 ON c.id = t2.id ");
 
@@ -73,13 +76,14 @@ public class CustomerQuery extends JBaseQuery {
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "c.customer_name", keyword, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "c.customer_kind",
 				StringUtils.getArrayFirst(paraMap.get("customerKind")), params, needWhere);
+
 		needWhere = appendIfNotEmpty(fromBuilder, "c.is_enabled", StringUtils.getArrayFirst(paraMap.get("isEnabled")),
 				params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "c.is_archive", StringUtils.getArrayFirst(paraMap.get("isArchive")),
 				params, needWhere);
 
 		fromBuilder.append(" GROUP BY c.id ");
-		fromBuilder.append(" order by " + orderby);
+		fromBuilder.append(" order by c.create_date ");
 
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());

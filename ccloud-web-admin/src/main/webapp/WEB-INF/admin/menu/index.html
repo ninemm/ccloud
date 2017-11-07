@@ -59,6 +59,7 @@
    				},
    				{field: "level", title: "层级", align: "center", width: '10%', edit:false},
    				{field: "order_list", title: "序号", align: "center", width: '10%', edit:false},
+   				<@shiro.hasPermission name="/admin/menu/edit,/admin/all">
    				{field: "action", title: "操作", align: "center", width: '10%', 
    					formatter: function(value, row, rowIndex) {
    						var url = '${CPATH}/admin/menu/edit?id=' + row.id + '&c=${c}&p=${p}';
@@ -67,6 +68,7 @@
    					},
    					edit:false
    				}
+   				</@shiro.hasPermission>
    			];
    		return fields;	
 	}
@@ -98,8 +100,10 @@
 <section class="content">
 	<div class="row content-row">
 		<div class="jp-left">
+		<@shiro.hasPermission name="/admin/menu/edit,/admin/all">
 			<a href="${CPATH}/admin/menu/edit?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-plus"></i> 新增 </a>
 			<!-- <a href="javascript:void(0);" onclick="batchAction()" class="btn btn-sm btn-danger btn-flat"><i class="fa fa-remove"></i> 删除 </a> -->
+		</@shiro.hasPermission>	
 		</div>
 		<form class="form-horizontal" style="float: right" action="${CPATH}/admin/menu/list?c=${c!}&p=${p!}" method="post">
 			<div class="input-group input-group-sm">

@@ -38,13 +38,14 @@ public class GroupQuery extends JBaseQuery {
 		return DAO.findById(id);
 	}
 
-	public Page<Group> paginate(int pageNumber, int pageSize,String keyword, String orderby) {
+	public Page<Group> paginate(int pageNumber, int pageSize,String keyword, String dataArea, String orderby) {
 		String select = "select * ";
 		StringBuilder fromBuilder = new StringBuilder("from `group` ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
 
 		appendIfNotEmptyWithLike(fromBuilder, "`group_name`", keyword, params, true);
+		appendIfNotEmptyWithLike(fromBuilder, "data_area", dataArea, params, true);
 
 		fromBuilder.append("order by " + orderby);
 
@@ -74,5 +75,17 @@ public class GroupQuery extends JBaseQuery {
 
 	public boolean delete(String id) {
 		return DAO.deleteById(id);
+	}
+
+	public List<Group> findByDept(String dataArea) {
+		StringBuilder sqlBuilder = new StringBuilder("select * ");
+
+		sqlBuilder.append("from `group` g ");
+		final List<Object> params = new LinkedList<Object>();
+		appendIfNotEmptyWithLike(sqlBuilder, "g.data_area", dataArea, params, true);
+		if (params.isEmpty()) {
+			return DAO.find(sqlBuilder.toString());
+		}
+		return DAO.find(sqlBuilder.toString(), params.toArray());
 	}
 }

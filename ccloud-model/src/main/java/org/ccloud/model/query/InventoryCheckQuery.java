@@ -96,4 +96,9 @@ public class InventoryCheckQuery extends JBaseQuery {
 		return isDelete;
 	}
 	
+	  public List<InventoryCheck> findByBillSn(String date){
+			return DAO.doFind("biz_date = ?", date);
+	  }
+	
+	
 }

@@ -15,6 +15,7 @@
  */
 package org.ccloud.controller.admin;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.shiro.SecurityUtils;
@@ -56,16 +57,35 @@ public class _PriceSystemController extends JBaseCRUDController<PriceSystem> {
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
 		}
-		User user = getSessionAttr("user");
 
-		Page<Record> page = PriceSystemQuery.me().paginate(getPageNumber(), getPageSize(), keyword,
-				user.getDepartmentId(), DataAreaUtil.getUserDeptDataArea(user.getDataArea()),
-				SecurityUtils.getSubject().isPermitted("/admin/all"));
+		Page<Record> page = null;
+		if (SecurityUtils.getSubject().isPermitted("/admin/all")) {
+			page = PriceSystemQuery.me().paginate(getPageNumber(), getPageSize(), keyword, null, null);
+		} else {
+			User user = getSessionAttr("user");
+			page = PriceSystemQuery.me().paginate(getPageNumber(), getPageSize(), keyword, user.getDepartmentId(),
+					DataAreaUtil.getUserDeptDataArea(user.getDataArea()));
+		}
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 
 		renderJson(map);
 
+	}
+
+	@Override
+	public void edit() {
+		String id = getPara("id");
+
+		if (StrKit.notBlank(id)) {
+			if (SecurityUtils.getSubject().isPermitted("/admin/all")) {
+				setAttr("priceSystem", PriceSystemQuery.me().findMoreById(id));
+			} else {
+				setAttr("priceSystem", PriceSystemQuery.me().findById(id));
+			}
+		}
+
+		render("edit.html");
 	}
 
 	@Override
@@ -85,6 +105,14 @@ public class _PriceSystemController extends JBaseCRUDController<PriceSystem> {
 		priceSystem.saveOrUpdate();
 
 		renderAjaxResultForSuccess();
+
+	}
+
+	public void findPriceSystemByDeptId() {
+		List<Record> priceSystemList = PriceSystemQuery.me().findPriceSystemByDeptId(getPara("parent_id"),
+				getPara("data_area"));
+
+		renderJson(priceSystemList);
 
 	}
 }

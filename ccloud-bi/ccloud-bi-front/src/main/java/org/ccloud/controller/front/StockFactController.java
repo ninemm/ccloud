@@ -14,64 +14,72 @@ import com.jfinal.plugin.activerecord.Record;
 @RouterMapping(url = "/stock")
 public class StockFactController extends BaseFrontController {
 
-    public void index() {
+	public void index() {
 
-    	String provName = getPara("provName", "").trim();
-        String cityName = getPara("cityName", "").trim();
-        String countryName = getPara("countryName", "").trim();
-        String cInvCode = getPara("cInvCode", "").trim();
-        
-        List<Record> stock125List = Lists.newArrayList();
-        List<Record> stock258List = Lists.newArrayList();
-        List<Record> stock512List = Lists.newArrayList();
-        
-        if (StrKit.notBlank(cInvCode)) {
-        	String[] codes = cInvCode.split(",");
-        		
-    		List<Record> result = StockFactQuery.me().findListByInvCode(provName, cityName, countryName, cInvCode);
-    		for (Record record : result) {
-    			
-    			if (codes[0].equals(record.getStr("cInvCode"))) {
-    				stock125List.add(record);
-    			} else if (codes[1].equals(record.getStr("cInvCode"))) {
-    				stock258List.add(record);
-    			} else {
-    				stock512List.add(record);
-    			}
-    			
-    		}
-        		
-        	Kv data = Kv.create().set("_stock125", stock125List).set("_stock258", stock258List).set("_stock512", stock512List);
-        	renderJson(data);
-        	return ;
-        }
-        
-        renderJson();
-    }
+		String dealerCode = getSessionAttr("dealerCode");
 
-    public void area() {
+		String provName = getPara("provName", "").trim();
+		String cityName = getPara("cityName", "").trim();
+		String countryName = getPara("countryName", "").trim();
+		String cInvCode = getPara("cInvCode", "").trim();
 
-        String provName = getPara("provName", "").trim();
-        String cityName = getPara("cityName", "").trim();
-        String countryName = getPara("countryName", "").trim();
+		List<Record> stock125List = Lists.newArrayList();
+		List<Record> stock258List = Lists.newArrayList();
+		List<Record> stock512List = Lists.newArrayList();
 
-        List<Record> result = StockFactQuery.me().findAreaList(provName, cityName, countryName);
+		if (StrKit.notBlank(cInvCode)) {
+			String[] codes = cInvCode.split(",");
 
-        renderJson(result);
+			List<Record> result = StockFactQuery.me().findListByInvCode(dealerCode, provName, cityName, countryName,
+					cInvCode);
+			for (Record record : result) {
 
-    }
+				if (codes[0].equals(record.getStr("cInvCode"))) {
+					stock125List.add(record);
+				} else if (codes[1].equals(record.getStr("cInvCode"))) {
+					stock258List.add(record);
+				} else {
+					stock512List.add(record);
+				}
 
-    public void date() {
+			}
 
-        String provName = getPara("provName", "").trim();
-        String cityName = getPara("cityName", "").trim();
-        String countryName = getPara("countryName", "").trim();
-        String cInvCode = getPara("cInvCode", "").trim();
+			Kv data = Kv.create().set("_stock125", stock125List).set("_stock258", stock258List).set("_stock512",
+					stock512List);
+			renderJson(data);
+			return;
+		}
 
-        List<Record> result = StockFactQuery.me().findDateList(provName, cityName, countryName, cInvCode);
+		renderJson();
+	}
 
-        renderJson(result);
+	public void area() {
 
-    }
-    
+		String dealerCode = getSessionAttr("dealerCode");
+
+		String provName = getPara("provName", "").trim();
+		String cityName = getPara("cityName", "").trim();
+		String countryName = getPara("countryName", "").trim();
+
+		List<Record> result = StockFactQuery.me().findAreaList(dealerCode, provName, cityName, countryName);
+
+		renderJson(result);
+
+	}
+
+	public void date() {
+
+		String dealerCode = getSessionAttr("dealerCode");
+
+		String provName = getPara("provName", "").trim();
+		String cityName = getPara("cityName", "").trim();
+		String countryName = getPara("countryName", "").trim();
+		String cInvCode = getPara("cInvCode", "").trim();
+
+		List<Record> result = StockFactQuery.me().findDateList(dealerCode, provName, cityName, countryName, cInvCode);
+
+		renderJson(result);
+
+	}
+
 }

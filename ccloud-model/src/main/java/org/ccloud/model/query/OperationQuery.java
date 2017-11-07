@@ -105,21 +105,18 @@ public class OperationQuery extends JBaseQuery {
 
 	public List<String> getPermissionsByRole(List<String> roles) {
 		List<String> permission = new ArrayList<>();
-		for (String string : roles) {
-			List<String> list = RoleOperationRelQuery.me().findUrlByRoleId(string);
-			permission.addAll(list);
-		}
+		String[] roleIds = roles.toArray(new String[roles.size()]); 
+		List<String> list = RoleOperationRelQuery.me().findUrlByRoleId(roleIds);
+		permission.addAll(list);
 		return permission;
 	}
 
 	public List<String> getPermissionsByStation(String stationId) {
 		List<String> permission = new ArrayList<>();
 		if (stationId != null) {
-			String[] stationIds = stationId.split(",");	
-			for (int i = 0, len = stationIds.length; i < len; i++) {
-				List<String> list = StationOperationRelQuery.me().findUrlByStationId(stationIds[i]);
-				permission.addAll(list);
-			}
+			String[] stationIds = stationId.split(",");
+			List<String> list = StationOperationRelQuery.me().findUrlByStationId(stationIds);
+			permission.addAll(list);
 		}
 		return permission;
 	}

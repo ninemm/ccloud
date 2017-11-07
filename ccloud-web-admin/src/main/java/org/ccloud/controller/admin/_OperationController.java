@@ -29,7 +29,6 @@ import org.ccloud.interceptor.UCodeInterceptor;
 import org.ccloud.menu.MenuManager;
 import org.ccloud.model.Module;
 import org.ccloud.model.Operation;
-import org.ccloud.model.Role;
 import org.ccloud.model.RoleOperationRel;
 import org.ccloud.model.Station;
 import org.ccloud.model.StationOperationRel;
@@ -50,6 +49,7 @@ import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.IAtom;
 import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.tx.Tx;
 
 /**
@@ -73,7 +73,7 @@ public class _OperationController extends JBaseCRUDController<Operation> {
 			keyword = StringUtils.urlDecode(keyword);
 			setAttr("k", keyword);
 		}
-
+		
 		Page<Operation> page = OperationQuery.me().paginate(getPageNumber(), getPageSize(), keyword, null);
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
@@ -183,16 +183,17 @@ public class _OperationController extends JBaseCRUDController<Operation> {
 	
 	public void getRoleAndStation() {
         String id = getPara("id");
-        List<Role> roles = RoleQuery.me().findAll();
+        String dataArea = getSessionAttr("DeptDataAreaLike");
+        List<Record> roles = RoleQuery.me().findBydeptAndOperation(dataArea, id);
         List<Map<String, Object>> roleList = new ArrayList<>();
 
-        for (Role role : roles) {
+        for (Record record : roles) {
             Map<String, Object> map = new HashMap<>();
 
-            map.put("id", role.getId());
-            map.put("name", role.getRoleName());
+            map.put("id", record.getStr("id"));
+            map.put("name", record.getStr("role_name"));
 
-            if (RoleQuery.me().queryRoleOperation(role.getId(), id).size() == 0) map.put("isvalid", 0);
+            if (record.getStr("role_id") == null) map.put("isvalid", 0);
             else map.put("isvalid", 1);
 
             roleList.add(map);
@@ -204,7 +205,8 @@ public class _OperationController extends JBaseCRUDController<Operation> {
 	}
 	
     public void station_tree() {
-        List<Map<String, Object>> list = StationQuery.me().findStationListAsTree(1);
+    	String dataArea = getSessionAttr("DeptDataAreaLike");
+        List<Map<String, Object>> list = StationQuery.me().findStationListAsTree(1, dataArea);
         setAttr("treeData", JSON.toJSON(list));
     }
     

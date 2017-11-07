@@ -114,9 +114,12 @@
                 $tbody.append("<tr onclick=" + fun +"><td><a href=\"javascript:void();\">" + data[i].cInvName + "</a></td><td class='t-r'>" + data[i].totalNum + "</td><td class='t-r'>" + data[i].totalAmount + "</td></tr>");
             }
 
+            var dataCInvCode = (data[0] != undefined ? data[0].cInvCode : '');
+            var dataCInvName = (data[0] != undefined ? data[0].cInvName : '');
+
             //调用其他纬度
-            area_rank(provName, cityName, '', dateType, data[0].cInvCode, data[0].cInvName);
-            customer_rank(provName, cityName, '', dateType, data[0].cInvCode, data[0].cInvName);
+            area_rank(provName, cityName, '', dateType, dataCInvCode, dataCInvName);
+            customer_rank(provName, cityName, '', dateType, dataCInvCode, dataCInvName);
        });
     }
     

@@ -41,28 +41,42 @@ public class IndexController extends BaseFrontController {
 
 	public void index() {
 
+		String dealerCode = "";
+
+		dealerCode = getSessionAttr("dealerCode");
+		if (StrKit.isBlank(dealerCode)) {
+			dealerCode = getPara(0);
+			setSessionAttr("dealerCode", dealerCode);
+		}
+
 		initWechatConfig();
 
 		render("index.html");
 	}
 
-	//顶部统计
+	// 顶部统计
 	public void topTotal() {
+
+		String dealerCode = getSessionAttr("dealerCode");
+
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
 		String countryName = getPara("countryName", "").trim();
 
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("totalAllCustomerCount",
-				SalesFactQuery.me().findAllCustomerCount(provName, cityName, countryName));
+				SalesFactQuery.me().findAllCustomerCount(dealerCode, provName, cityName, countryName));
 		result.put("totalCustomerCount",
-				SalesFactQuery.me().findCustomerCount(provName, cityName, countryName, null, null));
+				SalesFactQuery.me().findCustomerCount(dealerCode, provName, cityName, countryName, null, null));
 
 		renderJson(result);
 
 	}
 
 	public void total() {
+
+		String dealerCode = getSessionAttr("dealerCode");
+
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
 		String countryName = getPara("countryName", "").trim();
@@ -72,21 +86,24 @@ public class IndexController extends BaseFrontController {
 		String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
 
 		Map<String, Object> result = new HashMap<String, Object>();
-		result.put("orderAvg", SalesFactQuery.me().findOrderAvgAmountList(provName, cityName,
-				countryName, DateUtils.plusDays(startDate, -2), endDate));
+		result.put("orderAvg", SalesFactQuery.me().findOrderAvgAmountList(dealerCode, provName, cityName, countryName,
+				DateUtils.plusDays(startDate, -2), endDate));
 
-		result.put("totalCustomerCount", SalesFactQuery.me().findCustomerCount(provName, cityName,
-				countryName, startDate, endDate));
-		result.put("totalOrderCount", SalesFactQuery.me().findOrderCount(provName, cityName,
-				countryName, startDate, endDate));
-		result.put("totalOrderAmount", SalesFactQuery.me().findTotalAmount(provName, cityName,
-				countryName, startDate, endDate));
+		result.put("totalCustomerCount",
+				SalesFactQuery.me().findCustomerCount(dealerCode, provName, cityName, countryName, startDate, endDate));
+		result.put("totalOrderCount",
+				SalesFactQuery.me().findOrderCount(dealerCode, provName, cityName, countryName, startDate, endDate));
+		result.put("totalOrderAmount",
+				SalesFactQuery.me().findTotalAmount(dealerCode, provName, cityName, countryName, startDate, endDate));
 
 		renderJson(result);
 
 	}
 
 	public void orderAmount() {
+
+		String dealerCode = getSessionAttr("dealerCode");
+
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
 		String countryName = getPara("countryName", "").trim();
@@ -108,8 +125,8 @@ public class IndexController extends BaseFrontController {
 		}
 
 		List<LinkedList<Map<String, Object>>> result = Lists.newLinkedList();
-		List<Record> list = SalesFactQuery.me().findOrderAmount(provName, cityName, null, startDate, endDate,
-				devideFlg);
+		List<Record> list = SalesFactQuery.me().findOrderAmount(dealerCode, provName, cityName, null, startDate,
+				endDate, devideFlg);
 		for (Record map : list) {
 
 			LinkedList<Map<String, Object>> linkedList = new LinkedList<>();
@@ -179,8 +196,8 @@ public class IndexController extends BaseFrontController {
 		String timestamp = create_timestamp();
 		// 这里参数的顺序要按照 key 值 ASCII 码升序排序
 		// 注意这里参数名必须全部小写，且必须有序
-		String str = "jsapi_ticket=" + jsapi_ticket + "&noncestr=" + nonce_str + "&timestamp="
-				+ timestamp + "&url=" + url;
+		String str = "jsapi_ticket=" + jsapi_ticket + "&noncestr=" + nonce_str + "&timestamp=" + timestamp + "&url="
+				+ url;
 
 		String signature = HashKit.sha1(str);
 

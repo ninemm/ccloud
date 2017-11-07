@@ -65,7 +65,7 @@ public class StationQuery extends JBaseQuery {
 		return DAO.doFind();
 	}
 
-	public Page<Station> paginate(int pageNumber, int pageSize,String keyword, String orderby) {
+	public Page<Station> paginate(int pageNumber, int pageSize,String keyword, String dataArea, String orderby) {
 		String select = "select s.*, s.station_name as station_name, st.station_name as parent_name ";
 
 		StringBuilder fromBuilder = new StringBuilder("from `station` s ");
@@ -74,6 +74,7 @@ public class StationQuery extends JBaseQuery {
 		LinkedList<Object> params = new LinkedList<Object>();
 
 		appendIfNotEmptyWithLike(fromBuilder, "s.station_name", keyword, params, true);
+		appendIfNotEmptyWithLike(fromBuilder, "s.data_area", dataArea, params, true);
 
 		fromBuilder.append("order by " + orderby);
 
@@ -84,8 +85,8 @@ public class StationQuery extends JBaseQuery {
 
 	}
 
-	public List<Map<String, Object>> findStationListAsTree(Integer enable) {
-		List<Station> list = findStationList(null,"order_list asc");
+	public List<Map<String, Object>> findStationListAsTree(Integer enable, String dataArea) {
+		List<Station> list = findStationList(null, dataArea, "order_list asc");
 		ModelSorter.tree(list);
 		List<Map<String, Object>> resTreeList = new ArrayList<>();
 		Map<String, Object> map = new HashMap<>();
@@ -108,13 +109,14 @@ public class StationQuery extends JBaseQuery {
 		}
 		return 0;
 	}
-	public List<Station> findStationList(String parentId, String orderby) {
+	public List<Station> findStationList(String parentId, String dataArea, String orderby) {
 		final StringBuilder sqlBuilder = new StringBuilder("SELECT * FROM station s ");
 		sqlBuilder.append("where s.id <> '0' ");
 
 		final List<Object> params = new LinkedList<Object>();
 
 		appendIfNotEmpty(sqlBuilder, "parent_id", parentId, params, false);
+		appendIfNotEmptyWithLike(sqlBuilder, "s.data_area", dataArea, params, false);
 
 		buildOrderBy(orderby, sqlBuilder);
 
@@ -204,5 +206,17 @@ public class StationQuery extends JBaseQuery {
 		sqlBuilder.append("where g.id = ? ");
 		
 		return DAO.find(sqlBuilder.toString(), id);
+	}
+
+	public List<Station> findByDept(String dataArea) {
+		StringBuilder sqlBuilder = new StringBuilder("select * ");
+
+		sqlBuilder.append("from `station` s ");
+		final List<Object> params = new LinkedList<Object>();
+		appendIfNotEmptyWithLike(sqlBuilder, "s.data_area", dataArea, params, true);
+		if (params.isEmpty()) {
+			return DAO.find(sqlBuilder.toString());
+		}
+		return DAO.find(sqlBuilder.toString(), params.toArray());
 	}
 }

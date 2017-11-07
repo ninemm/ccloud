@@ -56,6 +56,7 @@ public class AdminMenuInitListener implements MessageListener {
 		menuManager.addMenuGroup(createTemplateMenuGroup());
 		/*menuManager.addMenuGroup(createAddonMenuGroup());*/
 		menuManager.addMenuGroup(createGoodsMenuGroup());
+		menuManager.addMenuGroup(createSellerMenuGroup());
 		menuManager.addMenuGroup(createRoleResMenuGroup());
 		menuManager.addMenuGroup(createDataMenuGroup());
 		menuManager.addMenuGroup(createSettingMenuGroup());
@@ -269,6 +270,17 @@ public class AdminMenuInitListener implements MessageListener {
 			group.addMenuItem(new MenuItem("goodsAttribute", "/admin/goodsAttribute", "商品属性"));
 			group.addMenuItem(new MenuItem("goods", "/admin/goods", "商品信息管理"));
 			
+		}
+		return group;
+	}
+	
+	private MenuGroup createSellerMenuGroup() {
+		MenuGroup group = new MenuGroup("seller", "fa fa-university", "经销商管理");
+
+		{
+			group.addMenuItem(new MenuItem("seller", "/admin/seller", "经销商管理"));
+			group.addMenuItem(new MenuItem("printTemplate", "/admin/printTemplate", "打印模版管理"));
+
 		}
 		return group;
 	}

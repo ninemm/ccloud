@@ -70,7 +70,7 @@ public class _GoodsAttributeController extends JBaseCRUDController<GoodsAttribut
 	}
 	
 	@Override
-	@RequiresPermissions(value={"goodsAttribute:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/goodsAttribute/edit","/admin/all"},logical=Logical.OR)
 	public void edit() {
 		String id = getPara("id");
 		if (id != null) {
@@ -82,7 +82,7 @@ public class _GoodsAttributeController extends JBaseCRUDController<GoodsAttribut
 	}	
 	
 	@Before(UCodeInterceptor.class)
-	@RequiresPermissions(value={"goodsAttribute:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/goodsAttribute/edit","/admin/all"},logical=Logical.OR)
 	public void batchDelete() {
 		
 		String[] ids = getParaValues("dataItem");
@@ -96,7 +96,7 @@ public class _GoodsAttributeController extends JBaseCRUDController<GoodsAttribut
 	}
 	
 	@Override
-	@RequiresPermissions(value={"goodsAttribute:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/goodsAttribute/edit","/admin/all"},logical=Logical.OR)
 	public void delete() {
 		String id = getPara("id");
 		final GoodsAttribute r = GoodsAttributeQuery.me().findById(id);
@@ -125,7 +125,7 @@ public class _GoodsAttributeController extends JBaseCRUDController<GoodsAttribut
         renderJson(list);
 	}
 	
-	@RequiresPermissions(value={"goodsAttribute:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/goodsAttribute/edit","/admin/all"},logical=Logical.OR)
 	public void enable() {
 		String id = getPara("id");
 		GoodsAttribute attribute = GoodsAttributeQuery.me().findById(id);
