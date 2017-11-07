@@ -47,7 +47,7 @@ public class PrintTemplateQuery extends JBaseQuery {
 		StringBuilder fromBuilder = new StringBuilder("from `cc_print_template` ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
-		appendIfNotEmptyWithLike(fromBuilder, "c.name", keyword, params, true);
+		appendIfNotEmptyWithLike(fromBuilder, "template_name", keyword, params, true);
 
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
