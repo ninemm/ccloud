@@ -17,6 +17,7 @@ package org.ccloud.controller.admin;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -51,6 +52,7 @@ import com.jfinal.plugin.activerecord.Page;
 @RouterNotAllowConvert
 public class _InventoryCheckController extends JBaseCRUDController<InventoryCheck> { 
 
+	 public static final String BILLTYPE = "IC";
 	
 	public void list() {
 
@@ -113,7 +115,6 @@ public class _InventoryCheckController extends JBaseCRUDController<InventoryChec
 	public void save() {		
 	 InventoryCheck inventoryCheck = getModel(InventoryCheck.class);
 	  User user = getSessionAttr("user");
-	  inventoryCheck.setBillSn("Y20171101001");
 	  inventoryCheck.setDeptId(user.getDepartmentId());
 	  inventoryCheck.setDataArea(user.getDataArea());
 	  inventoryCheck.setInputUserId(user.getId());
@@ -123,6 +124,8 @@ public class _InventoryCheckController extends JBaseCRUDController<InventoryChec
 		  inventoryCheck.setId(StrKit.getRandomUUID());
 		  inventoryCheck.setCreateDate(new Date());
 		  inventoryCheck.setBizDate(new Date());
+		  String billno = this.getBillSn();
+		  inventoryCheck.setBillSn(billno);
 	    }else {
 	    	update = true;
 		}
@@ -227,5 +230,54 @@ public class _InventoryCheckController extends JBaseCRUDController<InventoryChec
 		}
 	}
 		
+	    //通过数据库查最大的单据号加1返回去
+	  public String getBillSn() {
+		int newNo = 0; 
+		List<Integer> list = new ArrayList<>();
+	    String startNo = "001";
+		StringBuilder sBuilder = new StringBuilder(BILLTYPE);
+		SimpleDateFormat s = new SimpleDateFormat("yyyyMMdd"); 
+        String Number = s.format(new Date());
+		//查询数据库当天最大的单据号，并在此基础上加1
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd"); 
+		String today = null;
+		today = sdf.format(new Date());
+		sBuilder.append(Number);
+		List<InventoryCheck> inventoryChecks = InventoryCheckQuery.me().findByBillSn(today);
+		//如果为空说明是每天的第一次插入数据，则后三位的话从1开始，即001开始
+		if (inventoryChecks.size() == 0) {
+			sBuilder.append(startNo);
+			return sBuilder.toString();
+		}
+		//获取当天的所有单据号，并截取后三位来进行比大小，找出最大的那位
+		for (InventoryCheck inventoryCheck : inventoryChecks) {
+			inventoryCheck.setBillSn(inventoryCheck.getBillSn().substring(10));
+			list.add(Integer.valueOf(inventoryCheck.getBillSn()));
+		}	
+		Integer arr[]=new Integer[list.size()];
+		for(int i=0;i<list.size();i++){
+			arr[i]=list.get(i);
+		}
+		//比较找出单据号最大的那位
+		int max=arr[0];
+		for (int i = 0; i < arr.length; i++) {
+			if (arr[i]>max) {
+				max = arr[i];
+			}
+		}
+		newNo = max + 1;
+		//如果单据号是个位数，前面要补一个0
+		if (newNo<=9) {
+			sBuilder.append("00");
+			sBuilder.append(String.valueOf(newNo));
+		}else if (newNo<=99) {
+			sBuilder.append("0");
+			sBuilder.append(String.valueOf(newNo));
+		}else {
+			sBuilder.append(String.valueOf(newNo));
+		}
+		
+		return sBuilder.toString();
+	}
 	
 }
