@@ -287,10 +287,11 @@
             customerRankChart.resize();
             customerRankChart.setOption(crOption,true);
             customerRankChart.on('legendselectchanged', customerClick);
-            
+
+            var dataCustomerTypeName = (data[0] != undefined ? data[0].customerTypeName : '');
             //调用其他纬度
-            product_rank(provName, cityName, '', dateType, data[0].customerTypeName);
-            area_rank(provName, cityName, '', dateType, data[0].customerTypeName);
+            product_rank(provName, cityName, '', dateType, dataCustomerTypeName);
+            area_rank(provName, cityName, '', dateType, dataCustomerTypeName);
         });
     }
     

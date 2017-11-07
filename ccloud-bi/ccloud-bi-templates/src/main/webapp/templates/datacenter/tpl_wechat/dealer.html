@@ -110,9 +110,12 @@
                 var fun = "setDealer('" + data[i].dealerCode + "'" + "," + "'" + data[i].dealerName + "')";
                 $tbody.append("<tr onclick=" + fun +"><td><a href=\"javascript:void();\">" + data[i].dealerName + "</a></td><td class='t-r'>" + data[i].totalAmount + "</td></tr>");
             }
+            
+            var dataDealerCode = (data[0] != undefined ? data[0].dealerCode : '');
+            var dataDealerName = (data[0] != undefined ? data[0].dealerName : '');
 
             //调用其他纬度
-            dealer_detail(provName, cityName, '', dateType, data[0].dealerCode, data[0].dealerName);
+            dealer_detail(provName, cityName, '', dateType, dataDealerCode, dataDealerName);
        });
     }
     
