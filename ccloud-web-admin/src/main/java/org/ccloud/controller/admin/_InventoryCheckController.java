@@ -138,49 +138,85 @@ public class _InventoryCheckController extends JBaseCRUDController<InventoryChec
 			@Override
 			public boolean run() throws SQLException {
 				if (update) {
-					inventoryCheck.saveOrUpdate();
+					List<InventoryCheckDetail> iSaveList = new ArrayList<>();
+	        		int loopEnd = 1;
+	               //先根据主表ID，删除盘点单子表相关记录
+	        		List<InventoryCheckDetail> list = InventoryCheckDetailQuery.me().deleteByICheckId(inventoryCheck.getId());
+			        for (InventoryCheckDetail inventoryCheckDetail : list) {
+						inventoryCheckDetail.delete();
+					}				 
+			        //再把修改的内容插入子表
+					String[] factIndex = map.get("factIndex");
+					for (int i = 1; i < factIndex.length; i++) {
+						InventoryCheckDetail inventoryCheckDetail = getModel(InventoryCheckDetail.class);
+						 String productId = StringUtils.getArrayFirst(map.get("iCheckDetailList[" + factIndex[i] +"].product_id"));
+						 String goodsCount = StringUtils.getArrayFirst(map.get("iCheckDetailList[" + factIndex[i] + "].product_count"));
+						 String remark = StringUtils.getArrayFirst(map.get("iCheckDetailList[" + factIndex[i] + "].remark"));
+						 
+					     inventoryCheckDetail.setProductId(productId);
+					     inventoryCheckDetail.setProductCount(Integer.parseInt(goodsCount));
+					     inventoryCheckDetail.setRemark(remark);
+					     inventoryCheckDetail.setInventoryCheckId(inventoryCheck.getId());
+					     inventoryCheckDetail.setId(StrKit.getRandomUUID());
+					     inventoryCheckDetail.setProductAmount(BigDecimal.valueOf(10000));
+					     inventoryCheckDetail.setDeptId(inventoryCheck.getDeptId());
+					     inventoryCheckDetail.setDataArea(inventoryCheck.getDataArea());
+					     inventoryCheckDetail.setCreateDate(inventoryCheck.getCreateDate());
+					     inventoryCheckDetail.setModifyDate(new Date());
+					     iSaveList.add(inventoryCheckDetail);
+					     loopEnd++;
+					     if (loopEnd == factIndex.length) {
+		    					break;
+		    				}
+					}
+					 try {
+							Db.batchSave(iSaveList, iSaveList.size());
+						} catch (Exception e) {
+							e.printStackTrace();
+							return false;
+						}
 				}else {
 					inventoryCheck.save();
-				}
-				
-				//存储盘点单子表信息
-				List<InventoryCheckDetail> iSaveList = new ArrayList<>();
-				String[] factIndex = map.get("factIndex");
-        		int loopEnd = 1;
-				 for (int i = 0; i<factIndex.length; i++) {
-					 InventoryCheckDetail inventoryCheckDetail = getModel(InventoryCheckDetail.class);
-					 String productId = StringUtils.getArrayFirst(map.get("iCheckDetailList[" + i +"].product_id"));
-					 String goodsCount = StringUtils.getArrayFirst(map.get("iCheckDetailList[" + i + "].product_count"));
-					 String remark = StringUtils.getArrayFirst(map.get("iCheckDetailList[" + i + "].remark"));
-					 
-				     inventoryCheckDetail.setProductId(productId);
-				     inventoryCheckDetail.setProductCount(Integer.parseInt(goodsCount));
-				     inventoryCheckDetail.setRemark(remark);
-				     inventoryCheckDetail.setInventoryCheckId(inventoryCheck.getId());
-				     inventoryCheckDetail.setId(StrKit.getRandomUUID());
-				     inventoryCheckDetail.setProductAmount(BigDecimal.valueOf(10000));
-				     inventoryCheckDetail.setDeptId(inventoryCheck.getDeptId());
-				     inventoryCheckDetail.setDataArea(inventoryCheck.getDataArea());
-				     inventoryCheckDetail.setCreateDate(new Date());
-				     iSaveList.add(inventoryCheckDetail);
- 					loopEnd++;
- 					if (loopEnd == factIndex.length) {
-    					break;
-    				}
-				  }
-                try {
-					Db.batchSave(iSaveList, iSaveList.size());
-				} catch (Exception e) {
-					e.printStackTrace();
-					return false;
-				}
+					//存储盘点单子表信息
+					List<InventoryCheckDetail> iSaveList = new ArrayList<>();
+					String[] factIndex = map.get("factIndex");
+	        		int loopEnd = 1;
+					 for (int i = 0; i<factIndex.length; i++) {
+						 InventoryCheckDetail inventoryCheckDetail = getModel(InventoryCheckDetail.class);
+						 String productId = StringUtils.getArrayFirst(map.get("iCheckDetailList[" + i +"].product_id"));
+						 String goodsCount = StringUtils.getArrayFirst(map.get("iCheckDetailList[" + i + "].product_count"));
+						 String remark = StringUtils.getArrayFirst(map.get("iCheckDetailList[" + i + "].remark"));
+						 
+					     inventoryCheckDetail.setProductId(productId);
+					     inventoryCheckDetail.setProductCount(Integer.parseInt(goodsCount));
+					     inventoryCheckDetail.setRemark(remark);
+					     inventoryCheckDetail.setInventoryCheckId(inventoryCheck.getId());
+					     inventoryCheckDetail.setId(StrKit.getRandomUUID());
+					     inventoryCheckDetail.setProductAmount(BigDecimal.valueOf(10000));
+					     inventoryCheckDetail.setDeptId(inventoryCheck.getDeptId());
+					     inventoryCheckDetail.setDataArea(inventoryCheck.getDataArea());
+					     inventoryCheckDetail.setCreateDate(new Date());
+					     iSaveList.add(inventoryCheckDetail);
+	 					loopEnd++;
+	 					if (loopEnd == factIndex.length) {
+	    					break;
+	    				}
+					  }
+	                try {
+						Db.batchSave(iSaveList, iSaveList.size());
+					} catch (Exception e) {
+						e.printStackTrace();
+						return false;
+					}
+				}				
 				return true;
 			}
 		});				
-		return isSave;
-		
+		return isSave;		
 	}
 
+	
+	//删除盘点单主表及其子表的信息
 	@Override
 	public void delete() {
 		String id = getPara("id");
@@ -190,4 +226,6 @@ public class _InventoryCheckController extends JBaseCRUDController<InventoryChec
 			renderAjaxResultForSuccess("ok");
 		}
 	}
+		
+	
 }
