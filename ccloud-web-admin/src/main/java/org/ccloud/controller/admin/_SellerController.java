@@ -16,7 +16,6 @@
 package org.ccloud.controller.admin;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.shiro.authz.annotation.Logical;
@@ -27,18 +26,8 @@ import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Seller;
-import org.ccloud.model.Customer;
-import org.ccloud.model.Goods;
-import org.ccloud.model.Group;
-import org.ccloud.model.Product;
 import org.ccloud.model.User;
 import org.ccloud.model.query.SellerQuery;
-import org.ccloud.model.query.CustomerJoinCustomerTypeQuery;
-import org.ccloud.model.query.GoodsQuery;
-import org.ccloud.model.query.GroupQuery;
-import org.ccloud.model.query.ProductQuery;
-import org.ccloud.model.query.UserJoinCustomerQuery;
-import org.ccloud.model.query.UserQuery;
 
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Before;

@@ -29,6 +29,7 @@ import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
+import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.StringUtils;
 
 import com.alibaba.fastjson.JSON;
@@ -60,9 +61,8 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 		}
 
 		String parentId = getPara("parentId", "0");
-		String dataArea = getSessionAttr("DeptDataAreaLike");
 
-		Page<Department> page = DepartmentQuery.me().paginate(getPageNumber(), getPageSize(), parentId, keyword, dataArea, null);
+		Page<Department> page = DepartmentQuery.me().paginate(getPageNumber(), getPageSize(), parentId, keyword, null);
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
 
@@ -84,17 +84,9 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 	public void save() {
 
 		final Department dept = getModel(Department.class);
-		if (!StringUtils.isNotBlank(dept.getId())) {
-			String parentDataArea = getPara("parentDataArea");
-			String dataArea = null;
-			List<Department> list = DepartmentQuery.me().findByParentId(dept.getParentId());
-			if (list.size() > 0) {
-				dataArea = "00" + String.valueOf(Integer.parseInt(list.get(0).getDataArea()) + 1);
-			} else {
-				dataArea = parentDataArea + "001";
-			}
-			dept.setDataArea(dataArea);// 生成数据域	
-		}
+		Department parent = DepartmentQuery.me().findById(dept.getParentId());
+		String dataArea = DataAreaUtil.dataAreaSetByDept(dept.getDeptLevel(), parent.getDataArea());
+		dept.setDataArea(dataArea);// 生成数据域
 		dept.setIsParent(0);
 
 		if (dept.saveOrUpdate()) {
@@ -110,11 +102,6 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 	public void delete() {
 		String id = getPara("id");
 		final Department r = DepartmentQuery.me().findById(id);
-		List<User> list = UserQuery.me().findByDeptDataArea(r.getDataArea() + "%");
-		if (list.size() > 0) {
-			renderAjaxResultForError("已有用户处于部门下或删除失败");
-			return;
-		}
 		if (r != null) {
 			List<String> ids = new ArrayList<>();
 			ids.add(id);
@@ -138,5 +125,5 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 		List<Map<String, Object>> list = DepartmentQuery.me().findDeptListAsTree(1);
 		setAttr("treeData", JSON.toJSON(list));
 	}
-	
+
 }
