@@ -15,7 +15,10 @@
  */
 package org.ccloud.controller.admin;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.shiro.authz.annotation.Logical;
@@ -25,8 +28,14 @@ import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
+import org.ccloud.model.Brand;
+import org.ccloud.model.Department;
 import org.ccloud.model.Seller;
+import org.ccloud.model.SellerBrand;
 import org.ccloud.model.User;
+import org.ccloud.model.query.BrandQuery;
+import org.ccloud.model.query.DepartmentQuery;
+import org.ccloud.model.query.SellerBrandQuery;
 import org.ccloud.model.query.SellerQuery;
 
 import com.google.common.collect.ImmutableMap;
@@ -60,9 +69,9 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 	public void edit() {
 		String id = getPara("id");
 		if (id != null) {
-			Seller ccSeller = SellerQuery.me().findById(id);
+			Seller seller = SellerQuery.me().findById(id);
 	
-			setAttr("seller", ccSeller);
+			setAttr("seller", seller);
 		}
 		
 	}
@@ -70,29 +79,86 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 	//保存经销商信息
 	public void save() {
 
-		final Seller ccSeller = getModel(Seller.class);
-		String sellerId = ccSeller.getId();
-		ccSeller.setProvCode(getPara("userProvinceId"));
-		ccSeller.setProvName(getPara("userProvinceText"));
-		ccSeller.setCityCode(getPara("userCityId"));
-		ccSeller.setCityName(getPara("userCityText"));
-		ccSeller.setCountryCode(getPara("userDistrictId"));
-		ccSeller.setCountryName(getPara("userDistrictText"));
-
+		final Seller seller = getModel(Seller.class);
+		final SellerBrand sellerBrand = getModel(SellerBrand.class);
+		String brandList =getPara("brandList");
+		String deptId =getPara("deptId");
+		String sellerId = seller.getId();
+		seller.setProvCode(getPara("userProvinceId"));
+		seller.setProvName(getPara("userProvinceText"));
+		seller.setCityCode(getPara("userCityId"));
+		seller.setCityName(getPara("userCityText"));
+		seller.setCountryCode(getPara("userDistrictId"));
+		seller.setCountryName(getPara("userDistrictText"));
+		
+		String [] brandIds= brandList.split(",");
+		
+		Department department=DepartmentQuery.me().findById(deptId);
 		User user=getSessionAttr("user");
 		if (StrKit.isBlank(sellerId)) {
 			sellerId = StrKit.getRandomUUID();
-			ccSeller.set("id", sellerId);
-			ccSeller.set("create_date", new Date());
-			ccSeller.set("modify_user_id", user.getId());
-			ccSeller.save();
+			seller.set("id", sellerId);
+			seller.set("create_date", new Date());
+			seller.set("modify_user_id", user.getId());
+			seller.save();
+			for(int i=0;i<brandIds.length;i++){
+				String sellerBrandId = StrKit.getRandomUUID();
+				sellerBrand.set("id",sellerBrandId);
+				sellerBrand.set("brand_id", brandIds[i]);
+				sellerBrand.set("seller_id",sellerId);
+				sellerBrand.set("data_area",department.getDataArea());
+				sellerBrand.set("dept_id", deptId);
+				sellerBrand.save();
+			}
 		} else {
-			ccSeller.set("modify_date", new Date());
-			ccSeller.set("modify_user_id", user.getId());
-			ccSeller.update();
+			seller.set("modify_date", new Date());
+			seller.set("modify_user_id", user.getId());
+			seller.update();
+			SellerBrandQuery.deleteByDeptId(deptId);
+			for(int i=0;i<brandIds.length;i++){
+				String sellerBrandId = StrKit.getRandomUUID();
+				sellerBrand.set("id",sellerBrandId);
+				sellerBrand.set("brand_id", brandIds[i]);
+				sellerBrand.set("seller_id",sellerId);
+				sellerBrand.set("data_area",department.getDataArea());
+				sellerBrand.set("dept_id", deptId);
+				sellerBrand.save();
+			}
 		}
-
 		renderAjaxResultForSuccess();
-
+	}
+	
+	public void getBrand() {
+		String id = getPara("id");
+		String deptId="";
+		if (id != null) {
+			Seller seller = SellerQuery.me().findById(id);
+			deptId = seller.getDeptId();
+		}
+		List<Brand> brands = BrandQuery.me().findAll();
+		List<Map<String, Object>> list = new ArrayList<>();
+		for (Brand brand : brands) {
+			if (brand.getId().equals("")) {
+				continue;
+			}
+			Map<String, Object> map = new HashMap<>();
+			List<SellerBrand> sellerBrands = SellerBrandQuery.me().findByDeptId(deptId);
+			map.put("id", brand.getId());
+			map.put("name",brand.getName());
+			if (!StringUtils.isBlank(id)) {
+				for (int i = 0, len = sellerBrands.size(); i < len; i++) {
+					if(brand.getId().equals(sellerBrands.get(i).getBrandId().toString())){
+						map.put("isvalid", 1);
+						break;
+					} else {
+						map.put("isvalid", 0);
+					}
+				}
+			} else {
+				map.put("isvalid", 0);
+			}
+			list.add(map);
+		}
+		renderJson(list);
 	}
 }
