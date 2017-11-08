@@ -128,5 +128,9 @@ public class RequestUtils {
 	public static String getUserAgent(HttpServletRequest request) {
 		return request.getHeader("User-Agent");
 	}
+	
+	public static String getRequestURIWithParam(HttpServletRequest request) {
+		return request.getRequestURI() + (request.getQueryString() == null ? "" : "?" + request.getQueryString());
+	}
 
 }

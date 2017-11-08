@@ -60,8 +60,8 @@ public class JGenerator {
 		System.out.println("Generate dir:" + modelDir);
 		
 		MetaBuilder mb = new MetaBuilder(getDataSource());
-		mb.setRemovedTableNamePrefixes("temp_");
-		mb.addExcludedTable("temp_dimbanrd", "temp_dimcustomer", "temp_dimcustomer_type", "temp_dimdealer", "temp_dimproduct", "temp_dimseller", "temp_marketarea", "temp_sales_fact", "temp_stock_fact");
+		mb.setRemovedTableNamePrefixes("cc_");
+		mb.addExcludedTable("v_tasklist", "v_tasklist_candidate", "v_tasklist_candidate_d");
 		List<TableMeta> tableMetaList = mb.build();
 		
 		new JBaseModelGenerator(baseModelPackage, baseModelDir).generate(tableMetaList);
