@@ -274,7 +274,6 @@
     
     $("#relocation").on('click', function() {
         mapLocation(true);
-        topTotal(provName, cityName, countryName);
     });
 
     function mapLocation(isRelocation) {
@@ -335,6 +334,7 @@
                                            $.cookie(Utils.cityCacheName, cityName, { expires: 7 });
                                            $.cookie(Utils.countryCacheName, countryName, { expires: 7 });
 
+                                           topTotal(provName, cityName, countryName);
                                            total(provName, cityName, countryName, dateType);
 
                                            curProvName = strKit.convertProvName(provName);
@@ -362,6 +362,7 @@
                                   $.cookie(Utils.cityCacheName, cityName, { expires: 7 });
                                   $.cookie(Utils.countryCacheName, countryName, { expires: 7 });
                                   
+                                  topTotal(provName, cityName, countryName);
                                   total(provName, cityName, countryName, dateType);
                                   
                                   curProvName = strKit.convertProvName(provName);
@@ -381,6 +382,7 @@
             });
         } else {
            $city.text(cityName);
+           topTotal(provName, cityName, countryName);
            total(provName, cityName, countryName, dateType);
 
            curProvName = strKit.convertProvName(provName);
@@ -405,6 +407,8 @@
           point = '大冶市';
         } else if(cityName == '长沙市') {
           point = '雨花区';
+        } else if(cityName == '新余市') {
+          point = '渝水区';
         } else if(cityName == '') {
           point = '黄石市';
         }
