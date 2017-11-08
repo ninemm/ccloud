@@ -1,0 +1,353 @@
+<#include "../_inc/_layout.html"/>
+
+<#macro script_import>
+	<!-- bootstrapValidator -->
+	<script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
+	<!-- select2 -->
+	<script src="${CPATH}/static/plugins/select2/js/select2.js"></script>
+	<!-- cityPicker -->
+	<script src="${CPATH}/static/plugins/cityPicker/js/citydata.js"></script>
+	<script src="${CPATH}/static/plugins/cityPicker/js/cityPicker-1.1.4.js"></script>
+</#macro>
+
+<#macro css_import>
+	<!-- bootstrapValidator -->
+	<link rel="stylesheet" href="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.css">
+	<!-- select2 -->
+	<link rel="stylesheet" href="${CPATH}/static/plugins/select2/css/select2.css">
+	<!-- cityPicker -->
+	<link rel="stylesheet" href="${CPATH}/static/plugins/cityPicker/css/city-picker.css">
+</#macro>
+
+<#macro script>
+
+	var $form = $("#form");
+
+	$(function() {
+		
+		var selector = $('#city-picker-selector').cityPicker({
+			dataJson: cityData,
+			renderMode: false
+		});
+		
+		<#if seller?exists>
+			selector.setCityVal([
+				{
+					'id': '${seller.prov_code!}',
+					'name': '${seller.prov_name!}'
+				}, {
+					'id': '${seller.city_code!}',
+					'name': '${seller.city_name!}'
+				}, {
+					'id': '${seller.country_code!}',
+					'name': '${seller.country_name!}'
+				}
+			]);
+		</#if>
+		$('#_dept_tree').click(function() {
+		layer.open({
+			title:'所属部门',
+		    type: 2,
+		    area: ['580px', '530px'],
+		    fix: false, //不固定
+		    content: '${CPATH}/admin/department/department_tree'
+		});
+	});	
+		
+		jQuery.mm.initValidator('#form', validatorFields)
+		
+	});
+
+	var validatorFields = {
+		'seller.seller_name': {
+			validators: {
+				notEmpty: { message: '经销商名称不能为空' },
+				stringLength: { max: 25, message: '经销商名称最大长度是25字符，请重新输入' }
+			}
+		},
+		'seller.seller_code': {
+			validators: {
+				notEmpty: { message: '经销商编码不能为空' },
+				stringLength: { max: 15, message: '经销商编码最大长度是15字符，请重新输入' }
+			}
+		},
+		'seller.contact': {
+			validators: {
+				notEmpty: { message: '联系人不能为空' },
+				stringLength: { max: 15, message: '联系人名称最大长度是15字符，请重新输入' }
+			}
+		},
+		'seller.jywx_open_id': {
+			validators: {
+				notEmpty: { message: '带*的企业微信号不能为空' },
+				stringLength: { max: 15, message: '企业微信号最大长度是15字符，请重新输入' }
+			}
+		},
+		'seller.product_type_store': {
+			validators: {
+				notEmpty: { message: '产品类型不能为空' },
+				stringLength: { max: 15, message: '产品类型最大长度是15字符，请重新输入' }
+			}
+		},
+		'seller.phone': {
+			validators: {
+				notEmpty: { message: '手机号不能为空' },
+				stringLength: { min: 11, max: 11, message: '请输入11位手机号' },
+				regexp:{regexp:/^1[3|5|7|8]{1}[0-9]{9}$/, message:'请输入正确的手机号码' }
+			}
+		},
+		
+		'seller.seller_type': {
+			validators: {
+				notEmpty: { message: '产品类型不能为空' }
+			}
+		},
+		'userProvinceId': {
+			validators: {
+				notEmpty: { message: '省不能为空' },
+				callback: {  
+					message: '省不能为空',  
+					callback: function(value, validator) {
+						if(value == '请选择省份'){
+							return false;
+						}
+						return true;
+					}
+				} 
+			}
+		},
+		'userCityId': {
+			validators: {
+				notEmpty: { message: '市不能为空' },
+				callback: {  
+					message: '市不能为空',  
+					callback: function(value, validator) {
+						if(value == '请选择城市'){
+							return false;
+						}
+						return true;
+					}
+				} 
+			}
+		},
+		'userDistrictId': {
+			validators: {
+				notEmpty: { message: '区不能为空' },
+				callback: {  
+					message: '区不能为空',  
+					callback: function(value, validator) {
+						if(value == '请选择区县'){
+							return false;
+						}
+						return true;
+					}
+				} 
+			}
+		},
+		'seller.market_name': {
+			validators: {
+				notEmpty: { message: '市场名称不能为空' },
+				stringLength: { max: 50, message: '市场名称最大长度是15字符，请重新输入' }
+			}
+		},
+		'seller.market_code': {
+			validators: {
+				notEmpty: { message: '市场代码不能为空' },
+				stringLength: { max: 50, message: '市场代码最大长度是15字符，请重新输入' }
+			}
+		},
+		'parent_name':{
+			validators: {
+				notEmpty: { message: '组织机构不能为空' },
+			}
+		},
+	};
+
+	function doSubmit(){
+		$("#userProvinceText").val($("select[name='userProvinceId']").find("option:selected").text()); 
+		$("#userCityText").val($("select[name='userCityId']").find("option:selected").text()); 
+		$("#userDistrictText").val($("select[name='userDistrictId']").find("option:selected").text()); 
+	
+		$form.ajaxSubmit({
+			beforeSubmit: function() {
+				var validate = $form.data('bootstrapValidator');
+				validate.validate();
+				return validate.isValid()
+			},
+			type : "post", 
+			dataType : "json", 
+			success : function(data) { 
+				if(data.errorCode == 0) {
+					//location.reload();
+					toastr.success(data.message, '操作成功');
+				} else {
+					toastr.error(data.message,'操作失败');
+				}
+			},
+			error : function() {
+				alert("信息提交错误");
+			}
+		});
+	}
+</#macro>
+
+<@layout active_id=p child_active_id=c>
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+	<h1><#if (customer.id) ??>修改<#else>新增</#if>经销商</h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+	<li>经销商管理</li>
+		<li class="active"><#if (customer.id) ??>修改<#else>新增</#if>经销商信息</li>
+	</ol>
+</section>
+<!-- Main content -->
+<section class="content">
+	<div class="box box-default">
+		<div class="box-header with-border">
+			<h3 class="box-title">经销商信息</h3>
+			<div class="box-tools">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse">
+					<i class="fa fa-minus"></i>
+				</button>
+			</div>
+		</div>
+		<form action="${CPATH}/admin/seller/save" method="post" id="form" class="form-horizontal" >
+			<input type="hidden" name="seller.id" value="${(seller.id)!}">
+			<div class="box-body">
+				<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">所属部门组织:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<div class="input-group">
+								<input type="hidden" name="seller.dept_id" id="parent_id" value="${(seller.dept_id)!}">
+			                 	<input class="form-control input-sm" type="text" id="parent_name" name="parent_name" value="${(seller.deptname)!}">
+		                 		<div class="input-group-addon" id="_dept_tree" style="cursor:pointer;">
+		                 			<i class="fa fa-search"></i> 选择
+								</div>
+		                 	</div>
+		               	</div>
+					</div>
+				<div class="form-group col-sm-12 validata-box">
+					<label class="control-label col-sm-2">*经销商名称:</label>
+					<div class="input-group col-md-4 col-sm-10">
+						<input class="form-control input-sm" type="text" name="seller.seller_name" value="${(seller.seller_name)!}" placeholder="1-25个任意字母数字">
+					</div>
+				</div>
+				<div class="form-group col-sm-12 validata-box">
+					<label class="control-label col-sm-2">*经销商编码:</label>
+					<div class="input-group col-md-4 col-sm-10">
+						<input class="form-control input-sm" type="text" name="seller.seller_code" value="${(seller.seller_code)!}" placeholder="1-15个任意字母数字">
+					</div>
+				</div>
+				<div class="form-group col-sm-12 validata-box">
+					<label class="control-label col-sm-2">*联系人:</label>
+					<div class="input-group col-md-4 col-sm-10">
+						<input class="form-control input-sm" type="text" name="seller.contact" value="${(seller.contact)!}" placeholder="1-15个任意字母数字">
+					</div>
+				</div>
+				<div class="form-group col-sm-12 validata-box">
+					<label class="control-label col-sm-2">*手机号:</label>
+					<div class="input-group col-md-4 col-sm-10">
+						<input class="form-control input-sm" type="text" name="seller.phone" value="${(seller.phone)!}" placeholder="11位数字">
+					</div>
+				</div>
+				<div class="form-group col-sm-12 validata-box">
+								<label class="control-label col-sm-2">是否创建账套:</label>
+								<div class="input-group col-md-4 col-sm-10">
+									<label class="radio-inline">
+				                 		<input type="radio" name="seller.is_inited" value="1" <#if !seller?? || seller.is_inited == 1>checked</#if>>是
+				                 	</label>
+				                 	<label class="radio-inline">
+				                 		<input type="radio" name="seller.is_inited" value="0" <#if seller?? && seller.is_inited == 0>checked</#if>>否
+									</label>		                 		
+				               	</div>
+				</div>	
+				<div class="form-group col-sm-12 validata-box">
+								<label class="control-label col-sm-2">是否启用:</label>
+								<div class="input-group col-md-4 col-sm-10">
+									<label class="radio-inline">
+				                 		<input type="radio" name="seller.is_enabled" value="1" <#if !seller?? || seller.is_enabled == 1>checked</#if>>是
+				                 	</label>
+				                 	<label class="radio-inline">
+				                 		<input type="radio" name="seller.is_enabled" value="0" <#if seller?? && seller.is_enabled == 0>checked</#if>>否
+									</label>		                 		
+				               	</div>
+				</div>
+				<div class="form-group col-sm-12 validata-box">
+								<label class="control-label col-sm-2">是否为总部销售商:</label>
+								<div class="input-group col-md-4 col-sm-10">
+									<label class="radio-inline">
+				                 		<input type="radio" name="seller.is_headquarter" value="1" <#if !seller?? || (seller.is_headquarter)! == 1>checked</#if>>是
+				                 	</label>
+				                 	<label class="radio-inline">
+				                 		<input type="radio" name="seller.is_headquarter" value="0" <#if seller?? && seller.is_headquarter == 0>checked</#if>>否
+									</label>		                 		
+				               	</div>
+				</div>
+				<div class="form-group col-sm-12 validata-box">
+								<label class="control-label col-sm-2">*销售商类型:</label>
+								<div class="input-group col-md-4 col-sm-10">
+									<select class="form-control input-sm" name="seller.seller_type" id="seller_type">
+										<option value="">--请选择--</option>
+										<option value="1" <#if !seller?? || seller.seller_type! == 1>selected="selected"</#if> >经销商</option>
+										<option value="0" <#if !seller?? || seller.seller_type! == 0>selected="selected"</#if>>直营商</option>
+									</select>
+				               	</div>
+							</div>
+				<div class="form-group col-sm-12 validata-box">
+					<label class="control-label col-sm-2">*省-市-区:</label>
+					<div class="input-group col-md-4 col-sm-10">
+						<div class="city-picker-selector" id="city-picker-selector"></div>
+						<input type="hidden" name="userProvinceText" id="userProvinceText" value="" />
+						<input type="hidden" name="userCityText" id="userCityText" value="" />
+						<input type="hidden" name="userDistrictText" id="userDistrictText" value="" />
+					</div>
+				</div>
+				<div class="form-group col-sm-12 validata-box">
+					<label class="control-label col-sm-2">*市场名称:</label>
+					<div class="input-group col-md-4 col-sm-10">
+						<input class="form-control input-sm" type="text" name="seller.market_name" value="${(seller.market_name)!}" placeholder="1-25个任意字母数字">
+					</div>
+				</div>
+				<div class="form-group col-sm-12 validata-box">
+					<label class="control-label col-sm-2">*市场代码:</label>
+					<div class="input-group col-md-4 col-sm-10">
+						<input class="form-control input-sm" type="text" name="seller.market_code" value="${(seller.market_code)!}" placeholder="1-25个任意字母数字">
+					</div>
+				</div>
+				<div class="form-group col-sm-12 validata-box">
+					<label class="control-label col-sm-2">*企业微信号ID1:</label>
+					<div class="input-group col-md-4 col-sm-10">
+						<input class="form-control input-sm" type="text" name="seller.jywx_open_id" value="${(seller.jywx_open_id)!}" placeholder="1-25个任意字母数字">
+					</div>
+				</div>
+				<div class="form-group col-sm-12 validata-box">
+					<label class="control-label col-sm-2">企业微信号ID2:</label>
+					<div class="input-group col-md-4 col-sm-10">
+						<input class="form-control input-sm" type="text" name="seller.jpwx_open_id" value="${(seller.jpwx_open_id)!}" placeholder="1-25个任意字母数字">
+					</div>
+				</div>
+				<div class="form-group col-sm-12 validata-box">
+					<label class="control-label col-sm-2">*产品类型:</label>
+					<div class="input-group col-md-4 col-sm-10">
+						<input class="form-control input-sm" type="text" name="seller.product_type_store" value="${(seller.product_type_store)!}" placeholder="1-50个任意字母数字">
+					</div>
+				</div>
+				<div class="form-group col-sm-12 validata-box">
+								<label class="control-label col-sm-2">备注:</label>
+								<div class="input-group col-md-4 col-sm-10">
+				                 	<textarea class="form-control" rows="3" name="seller.remark" value="${(seller.remark)!}" placeholder="2-20个任意字母数字">${(seller.remark)!}</textarea>
+				               	</div>
+							</div>
+
+			</div>
+		</form>
+		<div class="box-footer"> 
+			<button type="button" onclick="doSubmit()" class="btn btn-primary">保存更改</button>
+			<input type="button" class="btn btn-primary" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
+		</div>
+	</div>
+</section>
+
+</@layout>
