@@ -104,6 +104,9 @@ public class _GroupController extends JBaseCRUDController<Group> {
             @Override
             public boolean run() throws SQLException {
                 Group group = getModel(Group.class);
+                User user = getSessionAttr("user");
+            	group.setDeptId(user.getDepartmentId());
+            	group.setDataArea(getSessionAttr("DeptDataArea").toString());
 
                 String roleList = getPara("roleList");
                 String[] roleId = roleList.split(",");
@@ -174,7 +177,7 @@ public class _GroupController extends JBaseCRUDController<Group> {
         String[] ids = getParaValues("dataItem");
         List<User> list = UserQuery.me().findByGroupIds(ids);
         if (list.size() > 0) {
-        	renderAjaxResultForError("分组下有用户或删除失败");
+        	renderAjaxResultForError("分组下有用户");
         	return;
         }
         int count = GroupQuery.me().batchDelete(ids);

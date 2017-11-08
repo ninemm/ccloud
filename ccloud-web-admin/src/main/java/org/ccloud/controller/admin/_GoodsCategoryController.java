@@ -29,10 +29,12 @@ import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Brand;
+import org.ccloud.model.Goods;
 import org.ccloud.model.GoodsCategory;
 import org.ccloud.model.Supplier;
 import org.ccloud.model.query.BrandQuery;
 import org.ccloud.model.query.GoodsCategoryQuery;
+import org.ccloud.model.query.GoodsQuery;
 import org.ccloud.model.query.SupplierQuery;
 
 import com.alibaba.fastjson.JSON;
@@ -118,13 +120,11 @@ public class _GoodsCategoryController extends JBaseCRUDController<GoodsCategory>
 		final GoodsCategory category = GoodsCategoryQuery.me().findById(id);
 		if (category != null) {
             List<String> ids = new ArrayList<>();
-            ids.add(id);
-			if (category.getIsParent() > 0) {
-                List<GoodsCategory> categoryList = GoodsCategoryQuery.me().findByParentId(id);
-                for (GoodsCategory categoryInfo : categoryList) {
-					ids.add(categoryInfo.getId());
-				}
-			}
+            boolean status = this.deleteCheck(category, ids);
+            if (!status) {
+            	renderAjaxResultForError("分类下已有商品");
+            	return;
+            }
             int count = GoodsCategoryQuery.me().batchDelete(ids);
             if (count > 0) {
                 renderAjaxResultForSuccess("删除成功");
@@ -133,6 +133,25 @@ public class _GoodsCategoryController extends JBaseCRUDController<GoodsCategory>
             }
 		}
 		GoodsCategoryQuery.me().updateParent(category);
+	}
+	
+	//递归获取所有子节点ID并判断分类下是否含有商品
+	private boolean deleteCheck(GoodsCategory categoryInfo, List<String> ids) {
+		List<Goods> list = GoodsQuery.me().findByCategory(categoryInfo.getId());
+		if (list.size() > 0) {
+			return false;
+		}
+		ids.add(categoryInfo.getId());
+		if (categoryInfo.getIsParent() > 0) {
+			List<GoodsCategory> categoryList = GoodsCategoryQuery.me().findByParentId(categoryInfo.getId());
+			for (GoodsCategory goodsCategory : categoryList) {
+				boolean status = this.deleteCheck(goodsCategory, ids);
+				if (!status) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 	
 	public void category_tree() {

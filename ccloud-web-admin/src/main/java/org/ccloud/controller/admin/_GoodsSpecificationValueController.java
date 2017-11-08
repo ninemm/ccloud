@@ -35,9 +35,11 @@ import org.ccloud.utils.ImageUtils;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.model.GoodsSpecification;
 import org.ccloud.model.GoodsSpecificationValue;
+import org.ccloud.model.ProductGoodsSpecificationValue;
 import org.ccloud.model.query.GoodsSpecificationQuery;
 import org.ccloud.model.query.GoodsSpecificationValueQuery;
 import org.ccloud.model.query.OptionQuery;
+import org.ccloud.model.query.ProductGoodsSpecificationValueQuery;
 
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Before;
@@ -164,6 +166,11 @@ public class _GoodsSpecificationValueController extends JBaseCRUDController<Good
 	@RequiresPermissions(value={"/admin/specificationValue/edit","/admin/all"},logical=Logical.OR)
 	public void delete() {
 		String id = getPara("id");
+		List<ProductGoodsSpecificationValue> list = ProductGoodsSpecificationValueQuery.me().findBySId(id);
+		if (list.size() > 0) {
+			renderAjaxResultForError("已有货品拥有此规格值");
+			return;
+		}
 		final GoodsSpecificationValue r = GoodsSpecificationValueQuery.me().findById(id);
 		if (r != null) {
 			if (StringUtils.isNotBlank(r.getImagePath())) {

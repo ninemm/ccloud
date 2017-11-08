@@ -162,5 +162,21 @@ public abstract class BaseStation<M extends BaseStation<M>> extends JModel<M> im
 	public java.util.Date getModifyDate() {
 		return get("modify_date");
 	}
+	
+	public void setDeptId(String deptId) {
+		set("dept_id", deptId);
+	}
+
+	public String getDeptId() {
+		return get("dept_id");
+	}
+	
+	public void setDataArea(String dataArea) {
+		set("data_area", dataArea);
+	}
+
+	public String getDataArea() {
+		return get("data_area");
+	}	
 
 }

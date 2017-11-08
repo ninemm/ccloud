@@ -58,6 +58,20 @@ public class _RoleController extends JBaseCRUDController<Role> {
 	}
 	
 	@Override
+	@Before(UCodeInterceptor.class)
+	public void save() {
+		
+		Role role = getModel(Role.class);
+        User user = getSessionAttr("user");
+        role.setDeptId(user.getDepartmentId());
+        role.setDataArea(getSessionAttr("DeptDataArea").toString());
+		if (role.saveOrUpdate())
+			renderAjaxResultForSuccess("新增成功");
+		else
+			renderAjaxResultForError("修改失败!");
+	}	
+	
+	@Override
 	@RequiresPermissions(value={"/admin/role/edit","/admin/all"},logical=Logical.OR)
 	public void edit() {
 		String id = getPara("id");
@@ -74,7 +88,7 @@ public class _RoleController extends JBaseCRUDController<Role> {
 		final Role r = RoleQuery.me().findById(id);
 		List<User> list = UserQuery.me().findByRoleId(id);
 		if (list.size() > 0) {
-			renderAjaxResultForError("已有用户拥有此角色或删除失败");
+			renderAjaxResultForError("已有用户拥有此角色");
 			return;
 		} else {
 			if (r != null) {
@@ -94,7 +108,7 @@ public class _RoleController extends JBaseCRUDController<Role> {
 		String[] ids = getParaValues("dataItem");
 		List<User> list = UserQuery.me().findByRoleIds(ids);
 		if (list.size() > 0) {
-			renderAjaxResultForError("已有用户拥有此角色或删除失败");
+			renderAjaxResultForError("已有用户拥有此角色");
 			return;
 		}
 		int count = RoleQuery.me().batchDelete(ids);

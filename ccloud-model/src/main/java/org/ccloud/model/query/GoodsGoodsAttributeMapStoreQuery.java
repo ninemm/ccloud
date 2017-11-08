@@ -86,5 +86,26 @@ public class GoodsGoodsAttributeMapStoreQuery extends JBaseQuery {
 		return list;
 	}
 
+	public List<GoodsGoodsAttributeMapStore> findByAttribute(String id) {
+		return DAO.doFind("goods_attribute_map_store_mapkey_id = ?", id);
+	}
+
+	public List<GoodsGoodsAttributeMapStore> findByAttributeIds(String[] ids) {
+		StringBuilder sqlBuilder = new StringBuilder("select * ");
+		LinkedList<Object> params = new LinkedList<Object>();
+		sqlBuilder.append("from `cc_goods_goods_attribute_map_store` cc ");
+		if (ids.length > 0) {
+			sqlBuilder.append("where cc.goods_attribute_map_store_mapkey_id in (?");
+			params.add(ids[0]);
+			for (int i = 1; i < ids.length; i++) {
+				sqlBuilder.append(",?");
+				params.add(ids[i]);
+			}
+
+			sqlBuilder.append(") ");
+		}
+		return DAO.find(sqlBuilder.toString(), params.toArray());
+	}
+
 	
 }

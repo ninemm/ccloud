@@ -27,8 +27,10 @@ import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Brand;
+import org.ccloud.model.GoodsCategory;
 import org.ccloud.model.Supplier;
 import org.ccloud.model.query.BrandQuery;
+import org.ccloud.model.query.GoodsCategoryQuery;
 import org.ccloud.model.query.SupplierQuery;
 
 import com.google.common.collect.ImmutableMap;
@@ -79,6 +81,11 @@ public class _BrandController extends JBaseCRUDController<Brand> {
 	@RequiresPermissions(value={"/admin/brand/edit","/admin/all"},logical=Logical.OR)
 	public void delete() {
 		String id = getPara("id");
+		List<GoodsCategory> list = GoodsCategoryQuery.me().findCategoryByBrandId(id);
+		if (list.size() > 0) {
+			renderAjaxResultForError("已有分类在此品牌下");
+			return;
+		}
 		final Brand r = BrandQuery.me().findById(id);
 		if (r != null) {
 			if (r.delete()) {

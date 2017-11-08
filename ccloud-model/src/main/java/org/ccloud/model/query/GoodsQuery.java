@@ -19,9 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.ccloud.model.Goods;
-import org.ccloud.model.GoodsGoodsSpecification;
 import org.ccloud.model.Product;
-import org.ccloud.model.ProductGoodsSpecificationValue;
 
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.ehcache.IDataLoader;
@@ -97,27 +95,28 @@ public class GoodsQuery extends JBaseQuery {
 		if (goods.delete()) {
 			deleteCount++;
 		}
-		List<GoodsGoodsSpecification> gsList = GoodsGoodsSpecificationQuery.me().findByGoodsId(goods.getId());
-		for (GoodsGoodsSpecification ccGoodsGoodsSpecification : gsList) {
-			if(ccGoodsGoodsSpecification.delete()) {
-				deleteCount++;
-			}
-		}
+		deleteCount = deleteCount + GoodsGoodsSpecificationQuery.me().deleteByGoodsId(goods.getId());
 		List<Product> proList = ProductQuery.me().findByGoodId(goods.getId());
 		for (Product ccProduct : proList) {
-			List<ProductGoodsSpecificationValue> cpsList = ProductGoodsSpecificationValueQuery.
-					me().findByPId(ccProduct.getId());
-			for (ProductGoodsSpecificationValue ccProductGoodsSpecificationValue : cpsList) {
-				if (ccProductGoodsSpecificationValue.delete()) {
-					deleteCount++;
-				}
-			}
+			deleteCount = deleteCount + ProductGoodsSpecificationValueQuery.me().deleteByPId(ccProduct.getId());
 			if (ccProduct.delete()) {
 				deleteCount++;
 			}
 		}
-		GoodsGoodsAttributeMapStoreQuery.me().deleteAllByGoodsId(goods.getId());
+		deleteCount = deleteCount + GoodsGoodsAttributeMapStoreQuery.me().deleteAllByGoodsId(goods.getId());
 		return deleteCount;
+	}
+
+	public List<Goods> findByType(String id) {
+		return DAO.doFind("goods_type_id = ?", id);
+	}
+
+	public List<Goods> findByCategory(String id) {
+		return DAO.doFind("goods_category_id = ?", id);
+	}
+
+	public List<Goods> findByBrand(String id) {
+		return DAO.doFind("brand_id = ?", id);
 	}
 
 	
