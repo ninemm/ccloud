@@ -52,7 +52,10 @@ import com.jfinal.plugin.activerecord.Page;
 @RouterNotAllowConvert
 public class _InventoryCheckController extends JBaseCRUDController<InventoryCheck> { 
 
-	 public static final String BILLTYPE = "IC";
+	 public static final String BILLTYPE = "ST";
+	 //目前系统还没有企业编号，先创建一个100000占位
+	 public static final String COMPANYCODE = "100000";
+	 
 	
 	public void list() {
 
@@ -85,12 +88,17 @@ public class _InventoryCheckController extends JBaseCRUDController<InventoryChec
 		String id = getPara("id");
 		int isEnabled = getParaToInt("isEnabled");
 		InventoryCheck inventoryCheck = InventoryCheckQuery.me().findById(id);
-		inventoryCheck.setStatus(isEnabled);
-		if (inventoryCheck.saveOrUpdate()) {
-			renderAjaxResultForSuccess("更新成功");
-		} else {
-			renderAjaxResultForError("更新失败");
+		if (inventoryCheck.getStatus() == 1) {
+			renderAjaxResultForError("该单子已盘点");
+		}else {
+			inventoryCheck.setStatus(isEnabled);
+			if (inventoryCheck.saveOrUpdate()) {
+				renderAjaxResultForSuccess("更新成功");
+			} else {
+				renderAjaxResultForError("更新失败");
+			}
 		}
+		
 	}
 	
 	public void edit() {	
@@ -234,8 +242,9 @@ public class _InventoryCheckController extends JBaseCRUDController<InventoryChec
 	  public String getBillSn() {
 		int newNo = 0; 
 		List<Integer> list = new ArrayList<>();
-	    String startNo = "001";
+	    String startNo = "000001";
 		StringBuilder sBuilder = new StringBuilder(BILLTYPE);
+		sBuilder.append(COMPANYCODE);
 		SimpleDateFormat s = new SimpleDateFormat("yyyyMMdd"); 
         String Number = s.format(new Date());
 		//查询数据库当天最大的单据号，并在此基础上加1
@@ -268,10 +277,10 @@ public class _InventoryCheckController extends JBaseCRUDController<InventoryChec
 		newNo = max + 1;
 		//如果单据号是个位数，前面要补一个0
 		if (newNo<=9) {
-			sBuilder.append("00");
+			sBuilder.append("00000");
 			sBuilder.append(String.valueOf(newNo));
 		}else if (newNo<=99) {
-			sBuilder.append("0");
+			sBuilder.append("0000");
 			sBuilder.append(String.valueOf(newNo));
 		}else {
 			sBuilder.append(String.valueOf(newNo));
