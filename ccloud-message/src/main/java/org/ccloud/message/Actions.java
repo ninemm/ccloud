@@ -42,7 +42,11 @@ public class Actions {
 	
 	public static final String CATEGORY_UPDATE = "cc_goods_category:update";
 	
-	public static final String CATEGORY_DELETE = "cc_goods_category:delete";	
+	public static final String CATEGORY_DELETE = "cc_goods_category:delete";
+	
+	public class System {
+		public static final String ACTION_LOG = "action:log";
+	}
 	
 
 }

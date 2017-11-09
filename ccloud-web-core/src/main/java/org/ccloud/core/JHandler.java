@@ -15,27 +15,39 @@
  */
 package org.ccloud.core;
 
+import java.util.Date;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.ccloud.Consts;
 import org.ccloud.install.InstallUtils;
+import org.ccloud.log.SystemLogThread;
+import org.ccloud.model.SystemLog;
 import org.ccloud.model.query.OptionQuery;
 import org.ccloud.route.RouterManager;
 import org.ccloud.template.TemplateManager;
 import org.ccloud.utils.FileUtils;
+import org.ccloud.utils.RequestUtils;
 import org.ccloud.utils.StringUtils;
+import org.joda.time.DateTime;
 
 import com.jfinal.handler.Handler;
 import com.jfinal.kit.HandlerKit;
+import com.jfinal.kit.StrKit;
 
 public class JHandler extends Handler {
 
 	@Override
 	public void handle(String target, HttpServletRequest request, HttpServletResponse response, boolean[] isHandled) {
+		
+		SystemLog systemLog = initSysLog(request);
+		long startTime = DateTime.now().getMillis();
+		systemLog.setStartDate(new Date(startTime));
+		
 		if (target.startsWith("/websocket")) {
 			return;
-		} else if (target.contains("/processEditor")) {
+		} else if (target.contains("/processEditor")) { // 流程引擎
 			return ;
 		}
 		
@@ -83,7 +95,21 @@ public class JHandler extends Handler {
 		}
 
 		next.handle(target, request, response, isHandled);
-
+		
+		long endTime = DateTime.now().getMillis();
+		systemLog.setEndDate(new Date(endTime));
+		
+		systemLog.setTotalCostTime(endTime - startTime);
+		
+		// 视图耗时
+		long viewCostTime = 0;
+		Object renderTime = request.getAttribute("renderTime");
+		if (renderTime != null) {
+			viewCostTime = (Long) renderTime;
+		}
+		systemLog.setViewCostTime(viewCostTime);
+		systemLog.setActionCostTime(endTime - startTime - viewCostTime);
+		SystemLogThread.add(systemLog);
 	}
 
 	private void processNotInstall(HttpServletRequest request, HttpServletResponse response, boolean[] isHandled) {
@@ -134,6 +160,38 @@ public class JHandler extends Handler {
 		request.setAttribute(Consts.ATTR_GLOBAL_WEB_SUBTITLE, OptionQuery.me().findValue("web_subtitle"));
 		request.setAttribute(Consts.ATTR_GLOBAL_META_KEYWORDS, OptionQuery.me().findValue("meta_keywords"));
 		request.setAttribute(Consts.ATTR_GLOBAL_META_DESCRIPTION, OptionQuery.me().findValue("meta_description"));
+	}
+	
+	private SystemLog initSysLog(HttpServletRequest request) {
+		
+		String requestPath = RequestUtils.getRequestURIWithParam(request);
+		String ip = RequestUtils.getIpAddress(request);
+		String referer = request.getHeader("Referer"); 
+		String userAgent = request.getHeader("User-Agent");
+		String cookie = request.getHeader("Cookie");
+		String method = request.getMethod();
+		String xRequestedWith = request.getHeader("X-Requested-With");
+		String host = request.getHeader("Host");
+		String acceptLang = request.getHeader("Accept-Language");
+		String acceptEncoding = request.getHeader("Accept-Encoding");
+		String accept = request.getHeader("Accept");
+		String connection = request.getHeader("Connection");
+		
+		SystemLog systemLog = new SystemLog();
+		systemLog.setId(StrKit.getRandomUUID());
+		systemLog.setIp(ip);
+		systemLog.setRequestPath(requestPath);
+		systemLog.setReferer(referer);
+		systemLog.setAccept(accept);
+		systemLog.setAcceptEncoding(acceptEncoding);
+		systemLog.setAcceptLang(acceptLang);
+		systemLog.setUserAgent(userAgent);
+		systemLog.setCookie(cookie);
+		systemLog.setMethod(method);
+		systemLog.setXrequestedwith(xRequestedWith);
+		systemLog.setHost(host);
+		systemLog.setConnection(connection);
+		return systemLog;
 	}
 
 }

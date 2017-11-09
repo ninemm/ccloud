@@ -36,7 +36,7 @@
 		<junit.version>4.11</junit.version>
 		<mysql.version>5.1.40</mysql.version>
 		
-		<jfinal.version>3.1</jfinal.version>
+		<jfinal.version>3.2</jfinal.version>
 		<jfinal.weixin.version>1.9</jfinal.weixin.version>
 		<jfinal.qyweixin.version>1.0</jfinal.qyweixin.version>
 		<druid.version>1.0.22</druid.version>

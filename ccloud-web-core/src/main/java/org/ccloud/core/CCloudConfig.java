@@ -29,6 +29,7 @@ import org.ccloud.core.interceptor.JI18nInterceptor;
 import org.ccloud.core.render.CCloudRenderFactory;
 import org.ccloud.interceptor.AdminInterceptor;
 import org.ccloud.interceptor.GlobelInterceptor;
+import org.ccloud.log.SystemLogThread;
 import org.ccloud.message.plugin.MessagePlugin;
 import org.ccloud.model.core.JModelMapping;
 import org.ccloud.model.core.Table;
@@ -48,6 +49,7 @@ import com.jfinal.config.Plugins;
 import com.jfinal.config.Routes;
 import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
+import com.jfinal.ext.handler.UrlSkipHandler;
 import com.jfinal.kit.PathKit;
 import com.jfinal.kit.Prop;
 import com.jfinal.kit.PropKit;
@@ -222,6 +224,8 @@ public abstract class CCloudConfig extends JFinalConfig {
 
 	public void configHandler(Handlers handlers) {
 		handlers.add(new ActionCacheHandler());
+		handlers.add(new UrlSkipHandler("/ca/.*|/se/.*|.*.jsp|.*.htm|.*.html|.*.js|.*.css|.*.json|.*.png"
+				+ "|.*.gif|.*.jpg|.*.jpeg|.*.bmp|.*.ico|.*.exe|.*.txt|.*.zip|.*.rar|.*.7z", false));
 		handlers.add(new JHandler());
 		MyDruidStatViewHandler druidViewHandler = new MyDruidStatViewHandler();
 		handlers.add(druidViewHandler);
@@ -235,7 +239,8 @@ public abstract class CCloudConfig extends JFinalConfig {
 
 		CCloud.renderImmediately();
 		onCCloudStarted();
-
+		SystemLogThread.start();
+		
 		log.info("CCloud is started!");
 	}
 

@@ -94,7 +94,7 @@ public class ContentQuery extends JBaseQuery {
 			params.add(month);
 		}
 
-		sql.append(" group by c.id");
+//		sql.append(" group by c.id");
 		sql.append(" ORDER BY c.created DESC");
 
 		String select = "select c.*, u.username, u.nickname";
@@ -136,7 +136,7 @@ public class ContentQuery extends JBaseQuery {
 			}
 		}
 
-		sql.append(" group by c.id");
+//		sql.append(" group by c.id");
 
 		if (orderBy != null && orderBy.startsWith("meta:")) {
 			sql.append(" order by meta.`meta_value` + 0 desc ");
@@ -145,10 +145,10 @@ public class ContentQuery extends JBaseQuery {
 		}
 
 		if (params.isEmpty()) {
-			return DAO.paginate(page, pagesize, true, select, sql.toString());
+			return DAO.paginate(page, pagesize, false, select, sql.toString());
 		}
 
-		return DAO.paginate(page, pagesize, true, select, sql.toString(), params.toArray());
+		return DAO.paginate(page, pagesize, false, select, sql.toString(), params.toArray());
 	}
 
 	public Page<Content> paginate(int page, int pagesize, String module, String keyword, String status,
