@@ -121,4 +121,8 @@ public class OperationQuery extends JBaseQuery {
 		return permission;
 	}
 
+	public List<Operation> findByModule(String id) {
+		return DAO.doFind("module_id = ?", id);
+	}
+
 }

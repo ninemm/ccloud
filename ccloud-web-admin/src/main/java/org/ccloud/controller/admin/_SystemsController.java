@@ -15,12 +15,18 @@
  */
 package org.ccloud.controller.admin;
 
+import java.util.List;
+
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
+import org.ccloud.model.Menu;
+import org.ccloud.model.Module;
 import org.ccloud.model.Systems;
+import org.ccloud.model.query.MenuQuery;
+import org.ccloud.model.query.ModuleQuery;
 import org.ccloud.model.query.SystemsQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
@@ -66,6 +72,12 @@ public class _SystemsController extends JBaseCRUDController<Systems> {
 	@RequiresPermissions(value={"/admin/systems/edit","/admin/all"},logical=Logical.OR)
 	public void delete() {
 		String id = getPara("id");
+		List<Menu> list1 = MenuQuery.me().findBySystem(id);
+		List<Module> list2 = ModuleQuery.me().findBySystem(id);
+		if ((list1.size() + list2.size()) > 0) {
+			renderAjaxResultForError("此系统下已有菜单或模块无法删除");
+			return;
+		}
 		final Systems r = SystemsQuery.me().findById(id);
 		if (r != null) {
 			if (r.delete()) {
@@ -81,6 +93,12 @@ public class _SystemsController extends JBaseCRUDController<Systems> {
 	public void batchDelete() {
 		
 		String[] ids = getParaValues("dataItem");
+		List<Menu> list1 = MenuQuery.me().findBySystemIds(ids);
+		List<Module> list2 = ModuleQuery.me().findBySystemIds(ids);
+		if ((list1.size() + list2.size()) > 0) {
+			renderAjaxResultForError("此系统下已有菜单或模块无法删除");
+			return;
+		}
 		int count = SystemsQuery.me().batchDelete(ids);
 		if (count > 0) {
 			renderAjaxResultForSuccess("删除成功");

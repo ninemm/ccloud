@@ -161,6 +161,19 @@ public class MenuQuery extends JBaseQuery {
 		}
 		return 0;
 	}
+	
+	public int batchDelete(List<String> ids) {
+		if (ids != null && ids.size() > 0) {
+			int deleteCount = 0;
+			for (int i = 0; i < ids.size(); i++) {
+				if (DAO.deleteById(ids.get(i))) {
+					++deleteCount;
+				}
+			}
+			return deleteCount;
+		}
+		return 0;
+	}
 
 	protected void buildOrderBy(String orderBy, StringBuilder fromBuilder) {
 		
@@ -181,5 +194,53 @@ public class MenuQuery extends JBaseQuery {
 		} else {
 			fromBuilder.append(orderbyInfo[1]);
 		}
+	}
+
+	public List<Menu> findBySystem(String id) {
+		return DAO.doFind("system_id = ?", id);
+	}
+
+	public List<Menu> findBySystemIds(String[] ids) {
+		StringBuilder sqlBuilder = new StringBuilder("select * ");
+		LinkedList<Object> params = new LinkedList<Object>();
+		sqlBuilder.append("from `menu` m ");
+		if (ids.length > 0) {
+			sqlBuilder.append("where m.system_id in (?");
+			params.add(ids[0]);
+			for (int i = 1; i < ids.length; i++) {
+				sqlBuilder.append(",?");
+				params.add(ids[i]);
+			}
+
+			sqlBuilder.append(") ");
+		}
+		return DAO.find(sqlBuilder.toString(), params.toArray());
+	}
+
+	public List<Menu> findByParent(String id) {
+		return DAO.doFind("parent_id = ?", id);
+	}
+
+	public void updateParent(Menu menu) {
+		if (menu != null && !menu.getParentId().equals("0")) {
+			Menu parent = MenuQuery.me().findById(menu.getParentId());
+			Integer childNum = MenuQuery.me().childNumById(menu.getParentId());
+			if (parent != null && childNum > 0) {
+				if (parent.getIsParent() == 0) {
+					parent.setIsParent(1);
+					parent.update();
+				}
+			} else {
+				if (parent.getIsParent() > 0) {
+					parent.setIsParent(0);
+					parent.update();
+				}
+			}
+		}		
+	}
+
+	private Integer childNumById(String parentId) {
+		Integer num = DAO.doFindCount("parent_id = ?", parentId).intValue();
+		return num;
 	}
 }

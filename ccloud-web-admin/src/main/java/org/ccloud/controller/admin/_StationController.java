@@ -91,10 +91,12 @@ public class _StationController extends JBaseCRUDController<Station> {
         station.setDeptId(user.getDepartmentId());
         station.setDataArea(getSessionAttr("DeptDataArea").toString());
         station.setIsParent(0);
-        if (station.saveOrUpdate())
-            renderAjaxResultForSuccess("新增成功");
-        else
-            renderAjaxResultForError("修改失败!");
+        if (station.saveOrUpdate()) {
+        	StationQuery.me().updateParent(station);
+        	renderAjaxResultForSuccess("新增成功");
+        } else {
+        	renderAjaxResultForError("修改失败!");
+        }
     }
 
     @Override
@@ -116,9 +118,12 @@ public class _StationController extends JBaseCRUDController<Station> {
                     if(station1.getIsParent() == 0) {
 
                         StationOperationRelQuery.me().deleteByStationId(station1.getId());
-                        if (!station.deleteById(id)) return false;
-                        return true;
-
+                        if (!station.deleteById(id)) {
+                        	return false;
+                        } else {
+                        	StationQuery.me().updateParent(station1);
+                        	return true;
+                        }
                     } else {
                         //若非叶子节点，寻找其所有叶子节点id做删除
                         List<String> ids = new ArrayList<>();
@@ -141,7 +146,7 @@ public class _StationController extends JBaseCRUDController<Station> {
                         int count = StationQuery.me().batchDelete(ids);
 
                         StationOperationRelQuery.me().batchDeleteByStationId(ids);
-
+                        StationQuery.me().updateParent(station1);
                         if(count <= 0) return false;
                         return true;
                     }
@@ -153,7 +158,6 @@ public class _StationController extends JBaseCRUDController<Station> {
 
         if (isDelete) renderAjaxResultForSuccess("删除成功");
         else renderAjaxResultForError("已有用户拥有此岗位或删除失败");
-
     }
 
     public void station_tree() {
