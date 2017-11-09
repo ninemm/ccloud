@@ -87,7 +87,9 @@ public class _StationController extends JBaseCRUDController<Station> {
     public void save() {
 
         Station station = getModel(Station.class);
-
+        User user = getSessionAttr("user");
+        station.setDeptId(user.getDepartmentId());
+        station.setDataArea(getSessionAttr("DeptDataArea").toString());
         station.setIsParent(0);
         if (station.saveOrUpdate())
             renderAjaxResultForSuccess("新增成功");
@@ -126,8 +128,13 @@ public class _StationController extends JBaseCRUDController<Station> {
                         while (k < ids.size()) {
                             List<Station> stationList = StationQuery.me().findByParentId(ids.get(k));
                             if (stationList != null) {
-                                for(int i = 0; i < stationList.size(); i++)
+                                for(int i = 0; i < stationList.size(); i++) {
                                     ids.add(stationList.get(i).getId());
+	                                List<User> ulist = UserQuery.me().findByStation(stationList.get(i).getId());
+	                                if (ulist.size() > 0) {
+	                                	return false;
+	                                }
+                                }
                             }
                             k++;
                         }

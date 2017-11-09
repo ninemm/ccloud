@@ -15,6 +15,7 @@
  */
 package org.ccloud.controller.admin;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.shiro.authz.annotation.Logical;
@@ -25,7 +26,11 @@ import org.ccloud.interceptor.UCodeInterceptor;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
+import org.ccloud.model.Goods;
+import org.ccloud.model.GoodsAttribute;
 import org.ccloud.model.GoodsType;
+import org.ccloud.model.query.GoodsAttributeQuery;
+import org.ccloud.model.query.GoodsQuery;
 import org.ccloud.model.query.GoodsTypeQuery;
 
 import com.google.common.collect.ImmutableMap;
@@ -68,7 +73,28 @@ public class _GoodsTypeController extends JBaseCRUDController<GoodsType> {
 			GoodsType goodsType = GoodsTypeQuery.me().findById(id);
 			setAttr("goodsType", goodsType);
 		}
-	}	
+	}
+	
+	@Override
+	@RequiresPermissions(value={"/admin/role/edit","/admin/all"},logical=Logical.OR)
+	public void delete() {
+		String id = getPara("id");
+		final GoodsType r = GoodsTypeQuery.me().findById(id);
+		List<Goods> glist = GoodsQuery.me().findByType(id);
+		List<GoodsAttribute> alist = GoodsAttributeQuery.me().findByTypeId(id);
+		if (glist.size() > 0 || alist.size() > 0) {
+			renderAjaxResultForError("此类型下已有商品或属性");
+			return;
+		} else {
+			if (r != null) {
+				if (r.delete()) {
+					renderAjaxResultForSuccess("删除成功");
+					return;
+				}
+			}
+			renderAjaxResultForError("删除失败");
+		}
+	}		
 	
 	@Before(UCodeInterceptor.class)
 	@RequiresPermissions(value={"/admin/goodsType/edit","/admin/all"},logical=Logical.OR)

@@ -99,5 +99,9 @@ public class GoodsGoodsSpecificationQuery extends JBaseQuery {
 		return DAO.doDelete("goods_id = ?", id);
 	}
 
+	public List<GoodsGoodsSpecification> findBySpecification(String id) {
+		return DAO.doFind("goods_specification_id = ?", id);
+	}
+
 	
 }

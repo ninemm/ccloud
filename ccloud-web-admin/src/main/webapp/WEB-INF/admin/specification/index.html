@@ -65,10 +65,12 @@
 				{field: "valueName", title: "规格值", align: "center", width: '20%',
 					formatter: function(value, row, rowIndex) {
 						var str = "";
-						var name = value.split(",");
-				        $.each(name, function (i, item) {
-							str = str + "[" + item + "]";
-				        });
+						if (value != null) {
+							var name = value.split(",");
+					        $.each(name, function (i, item) {
+								str = str + "[" + item + "]";
+					        });						
+						}
 				        return str;
 					},
 				edit: false

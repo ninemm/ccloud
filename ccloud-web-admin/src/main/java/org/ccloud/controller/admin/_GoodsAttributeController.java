@@ -29,8 +29,10 @@ import org.ccloud.interceptor.UCodeInterceptor;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.model.GoodsAttribute;
+import org.ccloud.model.GoodsGoodsAttributeMapStore;
 import org.ccloud.model.GoodsType;
 import org.ccloud.model.query.GoodsAttributeQuery;
+import org.ccloud.model.query.GoodsGoodsAttributeMapStoreQuery;
 import org.ccloud.model.query.GoodsTypeQuery;
 
 import com.jfinal.aop.Before;
@@ -86,6 +88,11 @@ public class _GoodsAttributeController extends JBaseCRUDController<GoodsAttribut
 	public void batchDelete() {
 		
 		String[] ids = getParaValues("dataItem");
+		List<GoodsGoodsAttributeMapStore> list = GoodsGoodsAttributeMapStoreQuery.me().findByAttributeIds(ids);
+		if (list.size() > 0) {
+			renderAjaxResultForError("已有商品有此属性值");
+			return;
+		}		
 		int count = GoodsAttributeQuery.me().batchDelete(ids);
 		if (count > 0) {
 			renderAjaxResultForSuccess("删除成功");
@@ -99,6 +106,11 @@ public class _GoodsAttributeController extends JBaseCRUDController<GoodsAttribut
 	@RequiresPermissions(value={"/admin/goodsAttribute/edit","/admin/all"},logical=Logical.OR)
 	public void delete() {
 		String id = getPara("id");
+		List<GoodsGoodsAttributeMapStore> list = GoodsGoodsAttributeMapStoreQuery.me().findByAttribute(id);
+		if (list.size() > 0) {
+			renderAjaxResultForError("已有商品有此属性值");
+			return;
+		}
 		final GoodsAttribute r = GoodsAttributeQuery.me().findById(id);
 		if (r != null) {
 			if (r.delete()) {
