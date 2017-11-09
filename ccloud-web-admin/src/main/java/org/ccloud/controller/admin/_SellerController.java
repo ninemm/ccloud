@@ -82,7 +82,6 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		final Seller seller = getModel(Seller.class);
 		final SellerBrand sellerBrand = getModel(SellerBrand.class);
 		String brandList =getPara("brandList");
-		String deptId =getPara("deptId");
 		String sellerId = seller.getId();
 		seller.setProvCode(getPara("userProvinceId"));
 		seller.setProvName(getPara("userProvinceText"));
@@ -93,7 +92,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		
 		String [] brandIds= brandList.split(",");
 		
-		Department department=DepartmentQuery.me().findById(deptId);
+		Department department=DepartmentQuery.me().findById(seller.getDeptId());
 		User user=getSessionAttr("user");
 		if (StrKit.isBlank(sellerId)) {
 			sellerId = StrKit.getRandomUUID();
@@ -102,27 +101,31 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			seller.set("modify_user_id", user.getId());
 			seller.save();
 			for(int i=0;i<brandIds.length;i++){
-				String sellerBrandId = StrKit.getRandomUUID();
-				sellerBrand.set("id",sellerBrandId);
-				sellerBrand.set("brand_id", brandIds[i]);
-				sellerBrand.set("seller_id",sellerId);
-				sellerBrand.set("data_area",department.getDataArea());
-				sellerBrand.set("dept_id", deptId);
-				sellerBrand.save();
+				if(!brandIds[i].equals("")){
+					String sellerBrandId = StrKit.getRandomUUID();
+					sellerBrand.set("id",sellerBrandId);
+					sellerBrand.set("brand_id", brandIds[i]);
+					sellerBrand.set("seller_id",sellerId);
+					sellerBrand.set("data_area",department.getDataArea());
+					sellerBrand.set("dept_id", seller.getDeptId());
+					sellerBrand.save();
+				}
 			}
 		} else {
 			seller.set("modify_date", new Date());
 			seller.set("modify_user_id", user.getId());
 			seller.update();
-			SellerBrandQuery.deleteByDeptId(deptId);
+			SellerBrandQuery.me().deleteBySellertId(sellerId);
 			for(int i=0;i<brandIds.length;i++){
 				String sellerBrandId = StrKit.getRandomUUID();
-				sellerBrand.set("id",sellerBrandId);
-				sellerBrand.set("brand_id", brandIds[i]);
-				sellerBrand.set("seller_id",sellerId);
-				sellerBrand.set("data_area",department.getDataArea());
-				sellerBrand.set("dept_id", deptId);
-				sellerBrand.save();
+				if(!brandIds[i].equals("")){
+					sellerBrand.set("id",sellerBrandId);
+					sellerBrand.set("brand_id", brandIds[i]);
+					sellerBrand.set("seller_id",sellerId);
+					sellerBrand.set("data_area",department.getDataArea());
+					sellerBrand.set("dept_id", seller.getDeptId());
+					sellerBrand.save();
+				}
 			}
 		}
 		renderAjaxResultForSuccess();
@@ -130,11 +133,6 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 	
 	public void getBrand() {
 		String id = getPara("id");
-		String deptId="";
-		if (id != null) {
-			Seller seller = SellerQuery.me().findById(id);
-			deptId = seller.getDeptId();
-		}
 		List<Brand> brands = BrandQuery.me().findAll();
 		List<Map<String, Object>> list = new ArrayList<>();
 		for (Brand brand : brands) {
@@ -142,7 +140,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				continue;
 			}
 			Map<String, Object> map = new HashMap<>();
-			List<SellerBrand> sellerBrands = SellerBrandQuery.me().findByDeptId(deptId);
+			List<SellerBrand> sellerBrands = SellerBrandQuery.me().findBySellerId(id);
 			map.put("id", brand.getId());
 			map.put("name",brand.getName());
 			if (!StringUtils.isBlank(id)) {
@@ -160,5 +158,23 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			list.add(map);
 		}
 		renderJson(list);
+	}
+	
+	//删除数据--删除销售商和销售商品牌链接（cc_seller_brand0）的数据
+	public void delete(){
+		String id = getPara("id");
+		final Seller s = SellerQuery.me().findById(id);
+		List<SellerBrand> list = SellerBrandQuery.me().findBySellerId(id);
+		if (s != null) {
+			if(list != null){
+				SellerBrandQuery.me().deleteBySellertId(id);
+			}
+			boolean success = s.delete();
+			if(success){
+				renderAjaxResultForSuccess("删除成功");
+			} else {
+				renderAjaxResultForError("删除失败");
+			}
+		}
 	}
 }

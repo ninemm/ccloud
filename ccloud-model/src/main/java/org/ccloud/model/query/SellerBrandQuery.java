@@ -44,9 +44,9 @@ public class SellerBrandQuery extends JBaseQuery {
 		});
 	}
 	
-	public List<SellerBrand> findByDeptId (String id){
+	public List<SellerBrand> findBySellerId (String id){
 		StringBuilder sqlBuilder = new StringBuilder("select *from cc_seller_brand ");
-		sqlBuilder.append("where dept_id = ?");
+		sqlBuilder.append("where seller_id = ?");
 		return DAO.find(sqlBuilder.toString(), id);
 	}
 
@@ -75,7 +75,7 @@ public class SellerBrandQuery extends JBaseQuery {
 		return 0;
 	}
 
-		public static int deleteByDeptId(String deptId){
-			return DAO.doDelete("dept_id = ?", deptId);
+		public int deleteBySellertId(String id){
+			return DAO.doDelete("seller_id = ?", id);
 		}
 }

@@ -183,24 +183,11 @@
 		$("#userCityText").val($("select[name='userCityId']").find("option:selected").text()); 
 		$("#userDistrictText").val($("select[name='userDistrictId']").find("option:selected").text()); 
 		
-		var deptId = $("#parent_id").val();
-		var count = $("#brand_option").select2("data").length;
 		var list = $("#brand_option").select2("val");
 		var ids = "";
 		if (list != null && list.length > 0) {
 			ids = list.toString();
 		}
-		var name = "";
-		for(var i=0;i<count;i++){
-			if($("brand_option").selected = true)  
-			{
-				if (i == count-1) {
-					name = name + $("#brand_option").select2("data")[i].text;
-					break;
-				}
-				name = name + $("#brand_option").select2("data")[i].text + ",";
-			}  
-		}	
 	
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
@@ -210,8 +197,7 @@
 			},
 			type : "post", 
 			data : {
-				"brandList":ids,
-				"deptId":deptId},
+				"brandList":ids},
 			dataType : "json", 
 			success : function(data) { 
 				if(data.errorCode == 0) {
@@ -250,14 +236,8 @@
 				</button>
 			</div>
 		</div>
-		<ul id="myTab" class="nav nav-tabs">
-			<li class="active"><a href="#A" data-toggle="tab">经销商基本信息</a></li>
-			<li><a href="#B" data-toggle="tab">品牌管理</a></li>
-		</ul>
 		<form action="${CPATH}/admin/seller/save" method="post" id="form" class="form-horizontal" >
 			<input type="hidden" name="seller.id" value="${(seller.id)!}">
-			<div id="myTabContent" class="tab-content">
-				<div class="tab-pane fade in active" id="A">
 					<div class="box-body">
 						<div class="form-group col-sm-12 validata-box">
 								<label class="control-label col-sm-2">所属部门组织:</label>
@@ -378,25 +358,19 @@
 							</div>
 						</div>
 						<div class="form-group col-sm-12 validata-box">
-										<label class="control-label col-sm-2">备注:</label>
-										<div class="input-group col-md-4 col-sm-10">
-						                 	<textarea class="form-control" rows="3" name="seller.remark" value="${(seller.remark)!}" placeholder="2-20个任意字母数字">${(seller.remark)!}</textarea>
-						               	</div>
-									</div>
-						</div>
-					</div>
-					<div class="tab-pane fade" id="B">
-					<div class="box-body">
-						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">品牌管理:</label>
 							<div class="input-group col-md-4 col-sm-10" style="width=300px;">
 								<select class="form-control input-sm" name="brand" id="brand_option" multiple="multiple" >
 								</select>
 							</div>
+						</div>
+						<div class="form-group col-sm-12 validata-box">
+										<label class="control-label col-sm-2">备注:</label>
+										<div class="input-group col-md-4 col-sm-10">
+						                 	<textarea class="form-control" rows="3" name="seller.remark" value="${(seller.remark)!}" placeholder="2-20个任意字母数字">${(seller.remark)!}</textarea>
+						               	</div>
+						</div>
 					</div>
-					</div>
-				</div>
-				</div>	
 		<div class="box-footer"> 
 			<button type="button" onclick="doSubmit()" class="btn btn-primary">保存更改</button>
 			<input type="button" class="btn btn-primary" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
