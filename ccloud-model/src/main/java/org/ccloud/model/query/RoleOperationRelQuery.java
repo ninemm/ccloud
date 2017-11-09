@@ -76,17 +76,27 @@ public class RoleOperationRelQuery extends JBaseQuery {
 		return DAO.doDelete(" operation_id = ?", operationId);
 	}
 
-	public List<String> findUrlByRoleId(final String string) {
+	public List<String> findUrlByRoleId(final String[] string) {
 //		return DAO.getFromListCache(string, new IDataLoader() {
 //			@Override
 //			public Object load() {
 				List<String> list = new ArrayList<>();
+				LinkedList<Object> params = new LinkedList<Object>();
 				StringBuilder fromBuilder = new StringBuilder("select o.url from ");
 				fromBuilder.append("`role_operation_rel` r ");
 				fromBuilder.append("left join `operation` o ");
 				fromBuilder.append("on r.operation_id = o.id ");
-				fromBuilder.append("where r.role_id = ? ");
-				List<Record> records = Db.find(fromBuilder.toString(), string);
+				if (string.length > 0) {
+					fromBuilder.append("where r.role_id in (?");
+					params.add(string[0]);
+					for (int i = 1; i < string.length; i++) {
+						fromBuilder.append(",?");
+						params.add(string[i]);
+					}
+
+					fromBuilder.append(") ");
+				}				
+				List<Record> records = Db.find(fromBuilder.toString(), params.toArray());
 				for (Record record : records) {
 					list.add(record.getStr("url"));
 				}

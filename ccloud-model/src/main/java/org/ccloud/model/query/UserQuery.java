@@ -89,5 +89,78 @@ public class UserQuery extends JBaseQuery {
 		return DAO.doFind("department_id = ?", deptId);
 	}
 
+	public List<User> findByGroupId(String id) {
+		return DAO.doFind("group_id = ?", id);
+	}
+
+	public List<User> findByRoleId(String id) {
+		StringBuilder sqlBuilder = new StringBuilder("select * ");
+		sqlBuilder.append("from `user` u ");
+		sqlBuilder.append("where u.group_id in ");
+		sqlBuilder.append("(SELECT gr.group_id FROM group_role_rel gr where gr.role_id= ?)");
+		return DAO.find(sqlBuilder.toString(), id);
+	}
+
+	public List<User> findByStation(String id) {
+		StringBuilder sqlBuilder = new StringBuilder("select * ");
+
+		sqlBuilder.append("from `user` u ");
+		final List<Object> params = new LinkedList<Object>();
+		appendIfNotEmptyWithLike(sqlBuilder, "u.station_id", id, params, true);
+		if (params.isEmpty()) {
+			return DAO.find(sqlBuilder.toString());
+		}
+		return DAO.find(sqlBuilder.toString(), params.toArray());
+	}
+
+	public List<User> findByDeptDataArea(String dataArea) {
+		StringBuilder sqlBuilder = new StringBuilder("select * ");
+
+		sqlBuilder.append("from `user` u ");
+		final List<Object> params = new LinkedList<Object>();
+		appendIfNotEmptyWithLike(sqlBuilder, "u.data_area", dataArea, params, true);
+		if (params.isEmpty()) {
+			return DAO.find(sqlBuilder.toString());
+		}
+		return DAO.find(sqlBuilder.toString(), params.toArray());
+	}
+
+	public List<User> findByRoleIds(String[] ids) {
+		StringBuilder sqlBuilder = new StringBuilder("select * ");
+		LinkedList<Object> params = new LinkedList<Object>();
+		sqlBuilder.append("from `user` u ");
+		sqlBuilder.append("where u.group_id in ");
+		sqlBuilder.append("(SELECT gr.group_id FROM group_role_rel gr ");
+		if (ids.length > 0) {
+			sqlBuilder.append("where gr.role_id in (?");
+			params.add(ids[0]);
+			for (int i = 1; i < ids.length; i++) {
+				sqlBuilder.append(",?");
+				params.add(ids[i]);
+			}
+
+			sqlBuilder.append(") ");
+		}
+		sqlBuilder.append(") ");
+		return DAO.find(sqlBuilder.toString(), params.toArray());
+	}
+
+	public List<User> findByGroupIds(String[] ids) {
+		StringBuilder sqlBuilder = new StringBuilder("select * ");
+		LinkedList<Object> params = new LinkedList<Object>();
+		sqlBuilder.append("from `user` u ");
+		if (ids.length > 0) {
+			sqlBuilder.append("where u.group_id in (?");
+			params.add(ids[0]);
+			for (int i = 1; i < ids.length; i++) {
+				sqlBuilder.append(",?");
+				params.add(ids[i]);
+			}
+
+			sqlBuilder.append(") ");
+		}
+		return DAO.find(sqlBuilder.toString(), params.toArray());
+	}
+
 	
 }

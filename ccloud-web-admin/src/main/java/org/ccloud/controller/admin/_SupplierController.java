@@ -15,6 +15,7 @@
  */
 package org.ccloud.controller.admin;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.shiro.authz.annotation.Logical;
@@ -25,7 +26,9 @@ import org.ccloud.interceptor.UCodeInterceptor;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
+import org.ccloud.model.Brand;
 import org.ccloud.model.Supplier;
+import org.ccloud.model.query.BrandQuery;
 import org.ccloud.model.query.SupplierQuery;
 
 import com.google.common.collect.ImmutableMap;
@@ -75,6 +78,11 @@ public class _SupplierController extends JBaseCRUDController<Supplier> {
 	@RequiresPermissions(value={"/admin/supplier/edit","/admin/all"},logical=Logical.OR)
 	public void delete() {
 		String id = getPara("id");
+		List<Brand> list = BrandQuery.me().findBySupplierId(id);
+		if (list.size() > 0) {
+			renderAjaxResultForError("已有品牌在此供应商下");
+			return;
+		}
 		final Supplier r = SupplierQuery.me().findById(id);
 		if (r != null) {
 			if (r.delete()) {

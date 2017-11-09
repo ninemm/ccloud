@@ -104,14 +104,25 @@ public class StationOperationRelQuery extends JBaseQuery {
 		return DAO.doDelete(" operation_id = ?", operationId);
 	}
 
-	public List<String> findUrlByStationId(String string) {
+	public List<String> findUrlByStationId(String[] stringArray) {
 		List<String> list = new ArrayList<>();
+		LinkedList<Object> params = new LinkedList<Object>();
 		StringBuilder fromBuilder = new StringBuilder("select o.url from ");
 		fromBuilder.append("`station_operation_rel` r ");
 		fromBuilder.append("left join `operation` o ");
 		fromBuilder.append("on r.operation_id = o.id ");
-		fromBuilder.append("where r.station_id = ? ");
-		List<Record> records = Db.find(fromBuilder.toString(), string);
+		
+		if (stringArray.length > 0) {
+			fromBuilder.append("where r.station_id in (?");
+			params.add(stringArray[0]);
+			for (int i = 1; i < stringArray.length; i++) {
+				fromBuilder.append(",?");
+				params.add(stringArray[i]);
+			}
+
+			fromBuilder.append(") ");
+		}
+		List<Record> records = Db.find(fromBuilder.toString(), params.toArray());
 		for (Record record : records) {
 			list.add(record.getStr("url"));
 		}

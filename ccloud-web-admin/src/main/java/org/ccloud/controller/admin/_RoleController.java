@@ -16,13 +16,17 @@
 package org.ccloud.controller.admin;
 
 
+import java.util.List;
+
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
 import org.ccloud.model.Role;
+import org.ccloud.model.User;
 import org.ccloud.model.query.RoleQuery;
+import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 
@@ -44,7 +48,7 @@ public class _RoleController extends JBaseCRUDController<Role> {
 		
 		String keyword = getPara("k");
 		if (StrKit.notBlank(keyword)) setAttr("k", keyword);
-		String dataArea = getSessionAttr("DeptDataArea");
+		String dataArea = getSessionAttr("DeptDataAreaLike");
 		
 		Page<Role> page = RoleQuery.me().paginate(getPageNumber(), getPageSize(), keyword, dataArea, "order_list");
 		if (page != null) {
@@ -52,6 +56,20 @@ public class _RoleController extends JBaseCRUDController<Role> {
 		}
 		
 	}
+	
+	@Override
+	@Before(UCodeInterceptor.class)
+	public void save() {
+		
+		Role role = getModel(Role.class);
+        User user = getSessionAttr("user");
+        role.setDeptId(user.getDepartmentId());
+        role.setDataArea(getSessionAttr("DeptDataArea").toString());
+		if (role.saveOrUpdate())
+			renderAjaxResultForSuccess("新增成功");
+		else
+			renderAjaxResultForError("修改失败!");
+	}	
 	
 	@Override
 	@RequiresPermissions(value={"/admin/role/edit","/admin/all"},logical=Logical.OR)
@@ -62,12 +80,37 @@ public class _RoleController extends JBaseCRUDController<Role> {
 			setAttr("role", role);
 		}
 	}
+	
+	@Override
+	@RequiresPermissions(value={"/admin/role/edit","/admin/all"},logical=Logical.OR)
+	public void delete() {
+		String id = getPara("id");
+		final Role r = RoleQuery.me().findById(id);
+		List<User> list = UserQuery.me().findByRoleId(id);
+		if (list.size() > 0) {
+			renderAjaxResultForError("已有用户拥有此角色");
+			return;
+		} else {
+			if (r != null) {
+				if (r.delete()) {
+					renderAjaxResultForSuccess("删除成功");
+					return;
+				}
+			}
+			renderAjaxResultForError("删除失败");
+		}
+	}	
 
 	@Before(UCodeInterceptor.class)
 	@RequiresPermissions(value={"/admin/role/edit","/admin/all"},logical=Logical.OR)
 	public void batchDelete() {
 		
 		String[] ids = getParaValues("dataItem");
+		List<User> list = UserQuery.me().findByRoleIds(ids);
+		if (list.size() > 0) {
+			renderAjaxResultForError("已有用户拥有此角色");
+			return;
+		}
 		int count = RoleQuery.me().batchDelete(ids);
 		if (count > 0) {
 			renderAjaxResultForSuccess("删除成功");

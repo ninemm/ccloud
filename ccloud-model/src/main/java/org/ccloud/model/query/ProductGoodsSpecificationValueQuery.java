@@ -93,4 +93,8 @@ public class ProductGoodsSpecificationValueQuery extends JBaseQuery {
 		return DAO.doDelete("product_set_id = ?", id);
 	}
 
+	public List<ProductGoodsSpecificationValue> findBySId(String id) {
+		return DAO.doFind("goods_specification_value_set_id = ?", id);
+	}
+
 }

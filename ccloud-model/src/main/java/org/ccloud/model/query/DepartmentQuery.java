@@ -161,7 +161,10 @@ public class DepartmentQuery extends JBaseQuery {
 		ModelSorter.tree(list);
 		Map<String, Object> map = new HashMap<>();
 		map.put("text", "总部");// 父子表第一级名称,以后可以存储在字典表或字典类
-		map.put("tags", Lists.newArrayList(0));
+		ArrayList<String> newArrayList = Lists.newArrayList();
+		newArrayList.add("0");
+		newArrayList.add("0");		
+		map.put("tags", newArrayList);
 		map.put("nodes", doBuild(list)); 
 		resTreeList.add(map);
 		return resTreeList;
@@ -213,7 +216,7 @@ public class DepartmentQuery extends JBaseQuery {
 	}
 
 	public List<Department> findByParentId(String id) {
-		return DAO.doFind("parent_id = ?", id);
+		return DAO.doFind("parent_id = ? ORDER BY data_area desc", id);
 	}
 
 	public void updateParents(Department dept) {

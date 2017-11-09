@@ -104,7 +104,7 @@ jQuery.mm = {
 		layer.confirm('确定删除吗？', 
 			{btn : ['确定', '取消']},
 			function() {
-				layer.close();
+				layer.closeAll();
 				$.get(url, function(result){
 					if (result.errorCode > 0) {
 						toastr.error(result.message, '操作失败');

@@ -53,7 +53,7 @@ public class _SystemsController extends JBaseCRUDController<Systems> {
 	}
 	
 	@Override
-	@RequiresPermissions(value={"systems:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/systems/edit","/admin/all"},logical=Logical.OR)
 	public void edit() {
 		String id = getPara("id");
 		if (id != null) {
@@ -63,7 +63,7 @@ public class _SystemsController extends JBaseCRUDController<Systems> {
 	}	
 	
 	@Override
-	@RequiresPermissions(value={"systems:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/systems/edit","/admin/all"},logical=Logical.OR)
 	public void delete() {
 		String id = getPara("id");
 		final Systems r = SystemsQuery.me().findById(id);
@@ -77,7 +77,7 @@ public class _SystemsController extends JBaseCRUDController<Systems> {
 	}
 	
 	@Before(UCodeInterceptor.class)
-	@RequiresPermissions(value={"systems:edit","admin:all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/systems/edit","/admin/all"},logical=Logical.OR)
 	public void batchDelete() {
 		
 		String[] ids = getParaValues("dataItem");

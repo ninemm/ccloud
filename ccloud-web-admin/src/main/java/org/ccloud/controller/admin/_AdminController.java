@@ -86,9 +86,10 @@ public class _AdminController extends JBaseController {
 	        subject.login(token);
 	        User user = (User) subject.getPrincipal();
 			if (user != null) {
-				String dataArea = DataAreaUtil.getUserDeptDataArea(user.getDataArea()) + "%";
+				String dataArea = DataAreaUtil.getUserDeptDataArea(user.getDataArea());
+				setSessionAttr("DeptDataAreaLike", dataArea + "%");
 				setSessionAttr("DeptDataArea", dataArea);
-			}	        
+			}
 			MessageKit.sendMessage(Actions.USER_LOGINED, user);
 			CookieUtils.put(this, Consts.COOKIE_LOGINED_USER, user.getId().toString());
 			setSessionAttr("user", user);	        

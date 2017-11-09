@@ -29,9 +29,11 @@ import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
 import org.ccloud.model.Operation;
 import org.ccloud.model.Station;
+import org.ccloud.model.User;
 import org.ccloud.model.query.OperationQuery;
 import org.ccloud.model.query.StationOperationRelQuery;
 import org.ccloud.model.query.StationQuery;
+import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
@@ -65,7 +67,7 @@ public class _StationController extends JBaseCRUDController<Station> {
             setAttr("k", keyword);
         }
         
-        String dataArea = getSessionAttr("DeptDataArea");
+        String dataArea = getSessionAttr("DeptDataAreaLike");
 
         Page<Station> page = StationQuery.me().paginate(getPageNumber(), getPageSize(),keyword, dataArea, "order_list");
         Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
@@ -85,7 +87,9 @@ public class _StationController extends JBaseCRUDController<Station> {
     public void save() {
 
         Station station = getModel(Station.class);
-
+        User user = getSessionAttr("user");
+        station.setDeptId(user.getDepartmentId());
+        station.setDataArea(getSessionAttr("DeptDataArea").toString());
         station.setIsParent(0);
         if (station.saveOrUpdate())
             renderAjaxResultForSuccess("新增成功");
@@ -101,8 +105,11 @@ public class _StationController extends JBaseCRUDController<Station> {
             @Override
             public boolean run() throws SQLException {
                 Station station = getModel(Station.class);
-
                 String id = getPara("id");
+                List<User> list = UserQuery.me().findByStation(id);
+                if (list.size() > 0) {
+                	return false;
+                }
                 if (StrKit.notBlank(id)) {
                     Station station1 = StationQuery.me().findById(id);
                     //若是叶子节点则直接删除（删除的时候做了监听处理其父节点的is_parent）
@@ -121,8 +128,13 @@ public class _StationController extends JBaseCRUDController<Station> {
                         while (k < ids.size()) {
                             List<Station> stationList = StationQuery.me().findByParentId(ids.get(k));
                             if (stationList != null) {
-                                for(int i = 0; i < stationList.size(); i++)
+                                for(int i = 0; i < stationList.size(); i++) {
                                     ids.add(stationList.get(i).getId());
+	                                List<User> ulist = UserQuery.me().findByStation(stationList.get(i).getId());
+	                                if (ulist.size() > 0) {
+	                                	return false;
+	                                }
+                                }
                             }
                             k++;
                         }
@@ -140,12 +152,12 @@ public class _StationController extends JBaseCRUDController<Station> {
         });
 
         if (isDelete) renderAjaxResultForSuccess("删除成功");
-        else renderAjaxResultForError("删除失败");
+        else renderAjaxResultForError("已有用户拥有此岗位或删除失败");
 
     }
 
     public void station_tree() {
-    	String dataArea = getSessionAttr("DeptDataArea");
+    	String dataArea = getSessionAttr("DeptDataAreaLike");
         List<Map<String, Object>> list = StationQuery.me().findStationListAsTree(1, dataArea);
         setAttr("treeData", JSON.toJSON(list));
     }
