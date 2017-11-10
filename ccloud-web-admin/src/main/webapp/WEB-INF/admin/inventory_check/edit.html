@@ -97,7 +97,7 @@ function addTr(tid, productList, optionArr) {
 	var firstProduct = productList[0].productList;
 	var goodsCode = firstProduct.productId;
 	var goodsName = firstProduct.name;
-	var specification = firstProduct.specificationList[0].name;
+	var specification = firstProduct.specificationValue;
 	var big_unit = firstProduct.weightUnit;
 
 	var $tbody = $(tid + " tbody"),
@@ -118,6 +118,7 @@ function addTr(tid, productList, optionArr) {
 
     $tbody.find("tr:last>td>select.pro-slc2").select2({
        data:optionArr,
+       width: "100%",
        language: "zh-CN"
     });
 
@@ -134,7 +135,7 @@ function addTr(tid, productList, optionArr) {
      var result = productMap[$(this).val()].productList;   
      var cgoodsCode = result.productId;
      var cgoodsName = result.name;
-     var cspecification = result.specificationList[0].name;
+     var cspecification = result.specificationValue;
      var cbig_unit = firstProduct.weightUnit;
      var $tr = $(this).parent().parent();
      $tbody.find("tr:last>td>#goodsCode").val(cgoodsCode);
@@ -199,7 +200,7 @@ function addTr(tid, productList, optionArr) {
 										<thead>
 											<tr>
 												<th class="col-sm-1 center">序号</th>
-												<th class="col-sm-3 center">商品名称</th>
+												<th class="col-sm-2 center">商品名称</th>
 												<th class="col-sm-1 center">规格</th>
 												<th class="col-sm-1 center">单位</th>
 												<th class="col-sm-1 center">盘点后库存数量</th>
@@ -241,11 +242,9 @@ function addTr(tid, productList, optionArr) {
 													<input type="text" id="goodsName" name="goodsName"  value="${plist.name}" disabled="disabled"/>
 												   <input type="hidden"  id="factIndex" name="factIndex" value="${list_index}"/>
 												</td>
-												<#list (plist.specificationList)! as slist>
 												<td class="text-center">
-													<input name="specification" id="specification" value="${slist.name!}" disabled="disabled"></input>
+													<input name="specification" id="specification" value="${plist.specificationValue!}" disabled="disabled"></input>
 												</td>
-												</#list>
 												<td class="text-center">
 													<input name="big_unit" id="big_unit" value="${plist.weightUnit!}" disabled="disabled"></input>
 												</td>

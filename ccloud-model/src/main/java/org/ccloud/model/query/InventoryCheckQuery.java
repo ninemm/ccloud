@@ -49,7 +49,7 @@ public class InventoryCheckQuery extends JBaseQuery {
 	}
 
 	public Page<InventoryCheck> paginate(int pageNumber, int pageSize,String keyword, String orderby) {
-		String select = "select c.id, c.bill_sn,w.name,c.biz_date,u.realname,c.status";
+		String select = "select c.id, c.bill_sn,w.name,c.biz_date,u.realname,c.status,c.create_date";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_inventory_check`  c ");
 		fromBuilder.append("INNER JOIN cc_warehouse w on c.warehouse_id = w.id ");
 		fromBuilder.append("INNER JOIN `user`  u on c.input_user_id = u.id ");
