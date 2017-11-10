@@ -20,7 +20,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.ccloud.model.Product;
-import org.ccloud.model.vo.GoodsSpecificationValueInfo;
 import org.ccloud.model.vo.ProductInfo;
 
 import com.jfinal.plugin.activerecord.Db;
@@ -93,11 +92,13 @@ public class ProductQuery extends JBaseQuery {
 	
 	public List<ProductInfo> getAllProductInfo() {
  		StringBuilder fromBuilder = new StringBuilder("SELECT p.create_date as createDate,p.id as productId, p.cost, p.is_marketable as isMarketable, p.market_price as marketPrice, p.`name`, p.price, ");
-		fromBuilder.append("p.product_sn as productSn, p.store, p.store_place, p.weight, p.weight_unit as weightUnit, g.`code`, b.`name` as brandName, c.`name` as categoryName ");
+		fromBuilder.append("p.product_sn as productSn, p.store, p.store_place, p.weight, p.weight_unit as weightUnit, g.`code`, b.`name` as brandName, c.`name` as categoryName, t1.valueName ");
 		fromBuilder.append("FROM cc_product p ");
 		fromBuilder.append("LEFT JOIN cc_goods g ON p.goods_id = g.id ");
 		fromBuilder.append("LEFT JOIN cc_brand b ON g.brand_id = b.id ");
 		fromBuilder.append("LEFT JOIN cc_goods_category c ON g.goods_category_id = c.id ");
+		fromBuilder.append("LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
+		fromBuilder.append("RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = p.id ");
 		List<Record> list = Db.find(fromBuilder.toString());	
 		List<ProductInfo> plist = new ArrayList<>();
 		for (Record record : list) {
@@ -117,8 +118,7 @@ public class ProductQuery extends JBaseQuery {
 			pro.setWeight(record.getStr("weight"));
 			pro.setWeightUnit(record.getStr("weightUnit"));
 			pro.setProductId(record.getStr("productId"));
-			List<GoodsSpecificationValueInfo> slist = GoodsSpecificationValueQuery.me().findByProductId(pro.getProductId());
-			pro.setSpecificationList(slist);
+			pro.setSpecificationValue(record.getStr("valueName"));
 			plist.add(pro);
 		}
 		return plist;
@@ -128,12 +128,14 @@ public class ProductQuery extends JBaseQuery {
 	
 	public List<ProductInfo> getAllProductInfoById(String id) {
  		StringBuilder fromBuilder = new StringBuilder("SELECT p.create_date as createDate,p.id as productId, p.cost, p.is_marketable as isMarketable, p.market_price as marketPrice, p.`name`, p.price, ");
-		fromBuilder.append("p.product_sn as productSn, p.store, p.store_place, p.weight, p.weight_unit as weightUnit, g.`code`, b.`name` as brandName, c.`name` as categoryName ");
+		fromBuilder.append("p.product_sn as productSn, p.store, p.store_place, p.weight, p.weight_unit as weightUnit, g.`code`, b.`name` as brandName, c.`name` as categoryName, t1.valueName ");
 		fromBuilder.append("FROM cc_product p ");
 		fromBuilder.append("LEFT JOIN cc_goods g ON p.goods_id = g.id ");
 		fromBuilder.append("LEFT JOIN cc_brand b ON g.brand_id = b.id ");
 		fromBuilder.append("LEFT JOIN cc_goods_category c ON g.goods_category_id = c.id ");
-	 	fromBuilder.append(" WHERE p.id = ?");
+		fromBuilder.append("LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
+		fromBuilder.append("RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = p.id ");		
+	 	fromBuilder.append("WHERE p.id = ?");
 		List<Record> list = Db.find(fromBuilder.toString(), id);	
 		List<ProductInfo> plist = new ArrayList<>();
 		for (Record record : list) {
@@ -153,8 +155,7 @@ public class ProductQuery extends JBaseQuery {
 			pro.setWeight(record.getStr("weight"));
 			pro.setWeightUnit(record.getStr("weightUnit"));
 			pro.setProductId(record.getStr("productId"));
-			List<GoodsSpecificationValueInfo> slist = GoodsSpecificationValueQuery.me().findByProductId(id);
-			pro.setSpecificationList(slist);
+			pro.setSpecificationValue(record.getStr("valueName"));
 			plist.add(pro);
 		}
 		return plist;

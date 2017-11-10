@@ -2,7 +2,6 @@ package org.ccloud.model.vo;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
 
 public class ProductInfo {
 	private Date createDate;
@@ -19,10 +18,8 @@ public class ProductInfo {
 	private String code;
 	private String brandName;
 	private String categoryName;
-	private List<GoodsSpecificationValueInfo> specificationList;
+	private String specificationValue;
 	private String productId;
-
-	
 
 	public Date getCreateDate() {
 		return createDate;
@@ -136,22 +133,24 @@ public class ProductInfo {
 		this.categoryName = categoryName;
 	}
 
-
-
-	public List<GoodsSpecificationValueInfo> getSpecificationList() {
-		return specificationList;
-	}
-
-	public void setSpecificationList(List<GoodsSpecificationValueInfo> specificationList) {
-		this.specificationList = specificationList;
-	}
-
 	public String getProductId() {
 		return productId;
 	}
 
 	public void setProductId(String productId) {
 		this.productId = productId;
+	}
+
+	public String getSpecificationValue() {
+		return specificationValue;
+	}
+
+	public void setSpecificationValue(String specificationValue) {
+		this.specificationValue = specificationValue;
+	}
+
+	public void setMarketable(boolean isMarketable) {
+		this.isMarketable = isMarketable;
 	}
 
 	
