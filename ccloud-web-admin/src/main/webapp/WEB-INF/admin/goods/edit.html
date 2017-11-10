@@ -5,12 +5,15 @@
  	<script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
  	<script src="${CPATH}/static/plugins/jquery/jquery.metadata.js"></script>
  	<script src="${CPATH}/static/tinymce/tinymce.min.js"></script>
+ 	<script src="${CPATH}/static/ladda/spin.min.js"></script>
+ 	<script src="${CPATH}/static/ladda/ladda.min.js"></script>
 </#macro>
 
 <#macro css_import>
 	<!-- bootstrapvalidator -->
     <link rel="stylesheet" href="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.css">
     <link rel="stylesheet" href="${CPATH}/static/plugins/goods/goods.css">
+    <link rel="stylesheet" href="${CPATH}/static/ladda/ladda-themeless.min.css">
 </#macro>
 
 <#macro css>
@@ -423,12 +426,12 @@ function checkSpValue() {
 		check = true;
 	}
 	spValue.each(function(index,element){
-		if (index != 0) {
+		if (!$(this).find("input").prop("disabled")) {
 		  	var x = $(this).find("input").val();
 		  	if (!x) {
 				return false;
 		 	}
-		}
+	 	}
     	if (index == spValue.length-1) {
     		check = true;
     	}		
@@ -441,16 +444,21 @@ function doSubmit(){
 		toastr.error(data.message,'请选择规格值');
 		return false;
 	}
+	var l = Ladda.create( document.querySelector( '.ladda-button' ) );
 	$form.ajaxSubmit({
 		beforeSubmit: function() {
 			var validate = $form.data('bootstrapValidator');
 			validate.validate();
+			if (validate.isValid()) {
+				l.start();
+			}
 			return validate.isValid();
 		},
 		type : "post", 
 		data:{"tinymce": tinyMCE.get('content').getContent()},
 		dataType : "json", 
 		success : function(data) { 
+			l.stop();
 			if (data.errorCode == 0) {
 				//location.reload();
 				toastr.success(data.message, '操作成功');
@@ -459,6 +467,7 @@ function doSubmit(){
 			}
 		},
 		error : function() {
+			l.stop();
 			alert("信息提交错误");
 		}
 	});
@@ -886,7 +895,7 @@ function doSubmit(){
 	        </div> 	        	        
 	    </div>
 		<div class="box-footer"> 
-			<button type="button" onclick="doSubmit()" class="btn btn-primary">保存更改</button>
+			<button type="button" onclick="doSubmit()" class="btn btn-primary ladda-button" data-style="expand-right"><span class="ladda-label">保存更改</span></button>
 			<input type="button" class="btn btn-primary" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
 		</div>
 	</form>	      		
