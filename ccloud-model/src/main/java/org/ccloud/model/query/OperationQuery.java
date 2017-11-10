@@ -123,7 +123,11 @@ public class OperationQuery extends JBaseQuery {
 	}
 	
 	public String findIdByUrl(String url) {
-
 		return Db.queryStr("select id from operation where url = ?", url);
 	}
+
+	public List<Operation> findByModule(String id) {
+		return DAO.doFind("module_id = ?", id);
+	}
+
 }

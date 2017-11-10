@@ -92,7 +92,7 @@ jQuery.mm = {
 			layer.confirm('确认批量删除吗?', {
 				btn: ['确认', '取消']
 			}, function() {
-				layer.close();
+				layer.closeAll();
 				jQuery.mm.ajaxSubmit(formId);
 			}, function() {
 				layer.close();

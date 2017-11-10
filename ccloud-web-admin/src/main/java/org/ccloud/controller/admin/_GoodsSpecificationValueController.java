@@ -47,6 +47,7 @@ import com.jfinal.kit.PathKit;
 import com.jfinal.kit.StrKit;
 import com.jfinal.log.Log;
 import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.tx.Tx;
 import com.jfinal.upload.UploadFile;
 
 /**
@@ -164,6 +165,7 @@ public class _GoodsSpecificationValueController extends JBaseCRUDController<Good
 	
 	@Override
 	@RequiresPermissions(value={"/admin/specificationValue/edit","/admin/all"},logical=Logical.OR)
+	@Before(Tx.class)
 	public void delete() {
 		String id = getPara("id");
 		List<ProductGoodsSpecificationValue> list = ProductGoodsSpecificationValueQuery.me().findBySId(id);

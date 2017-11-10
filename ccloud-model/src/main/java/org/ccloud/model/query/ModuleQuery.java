@@ -202,4 +202,52 @@ private String buildKey(String module, Object... params) {
 		}
 		return 0;
 	}
+
+
+	public List<Module> findBySystem(String id) {
+		return DAO.doFind("system_id = ?", id);
+	}
+
+
+	public List<Module> findBySystemIds(String[] ids) {
+		StringBuilder sqlBuilder = new StringBuilder("select * ");
+		LinkedList<Object> params = new LinkedList<Object>();
+		sqlBuilder.append("from `module` m ");
+		if (ids.length > 0) {
+			sqlBuilder.append("where m.system_id in (?");
+			params.add(ids[0]);
+			for (int i = 1; i < ids.length; i++) {
+				sqlBuilder.append(",?");
+				params.add(ids[i]);
+			}
+
+			sqlBuilder.append(") ");
+		}
+		return DAO.find(sqlBuilder.toString(), params.toArray());
+	}
+
+
+	public void updateParent(Module module) {
+		if (module != null && !module.getParentId().equals("0")) {
+			Module parent = ModuleQuery.me().findById(module.getParentId());
+			Integer childNum = ModuleQuery.me().childNumById(module.getParentId());
+			if (parent != null && childNum > 0) {
+				if (parent.getIsParent() == 0) {
+					parent.setIsParent(1);
+					parent.update();
+				}
+			} else {
+				if (parent.getIsParent() > 0) {
+					parent.setIsParent(0);
+					parent.update();
+				}
+			}
+		}
+	}
+
+
+	private Integer childNumById(String parentId) {
+		Integer num = DAO.doFindCount("parent_id = ?", parentId).intValue();
+		return num;
+	}
 }
