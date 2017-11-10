@@ -17,6 +17,7 @@ package org.ccloud.shiro.core;
 
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.UnauthenticatedException;
+import org.ccloud.Consts;
 import org.ccloud.model.SystemLog;
 import org.ccloud.model.User;
 import org.ccloud.model.query.OperationQuery;
@@ -36,7 +37,7 @@ public class ShiroInterceptor implements Interceptor {
 		User user = controller.getSessionAttr("user");
 		String operationId = OperationQuery.me().findIdByUrl(actionKey);
 
-		SystemLog systemlog = controller.getAttr("systemLog");
+		SystemLog systemlog = controller.getAttr(Consts.ATTR_GLOBAL_SYSTEM_LOG);
 		if (user != null) {
 			systemlog.setUserId(user.getId());
 		}

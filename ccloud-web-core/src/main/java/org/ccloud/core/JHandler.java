@@ -44,7 +44,7 @@ public class JHandler extends Handler {
 		SystemLog systemLog = initSysLog(request);
 		long startTime = DateTime.now().getMillis();
 		systemLog.setStartDate(new Date(startTime));
-		request.setAttribute("systemLog", systemLog);
+		request.setAttribute(Consts.ATTR_GLOBAL_SYSTEM_LOG, systemLog);
 		
 		if (target.startsWith("/websocket")) {
 			return;
