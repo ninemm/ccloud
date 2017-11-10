@@ -22,6 +22,7 @@ import java.util.List;
 import org.ccloud.model.Operation;
 
 import com.jfinal.kit.StrKit;
+import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 
 /**
@@ -120,5 +121,9 @@ public class OperationQuery extends JBaseQuery {
 		}
 		return permission;
 	}
+	
+	public String findIdByUrl(String url) {
 
+		return Db.queryStr("select id from operation where url = ?", url);
+	}
 }

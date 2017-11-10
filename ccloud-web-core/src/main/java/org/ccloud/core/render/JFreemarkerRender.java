@@ -31,6 +31,7 @@ import org.ccloud.core.CCloud;
 import org.ccloud.core.cache.ActionCacheManager;
 import org.ccloud.model.query.OptionQuery;
 import org.ccloud.utils.StringUtils;
+import org.joda.time.DateTime;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -54,6 +55,7 @@ public class JFreemarkerRender extends FreeMarkerRender {
 	@Override
 	public void render() {
 
+		long startTime = DateTime.now().getMillis();
 		Map<String, Object> jpTags = new HashMap<String, Object>();
 		jpTags.putAll(CCloud.ccloudTags);
 
@@ -81,6 +83,9 @@ public class JFreemarkerRender extends FreeMarkerRender {
 
 		WriterHtml(htmlContent, getContentType(), false);
 
+		long endTime = DateTime.now().getMillis();
+		
+		request.setAttribute("renderTime",endTime - startTime);
 	}
 
 	private void WriterHtml(String htmlContent, String contentType, boolean isPutToCache) {

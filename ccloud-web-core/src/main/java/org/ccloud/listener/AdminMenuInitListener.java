@@ -136,6 +136,7 @@ public class AdminMenuInitListener implements MessageListener {
 			group.addMenuItem(new MenuItem("in", "/admin/stat", "入库明细"));
 			group.addMenuItem(new MenuItem("out", "/admin/stat", "出库明细"));
 			group.addMenuItem(new MenuItem("druid", "/admin/monitor/sql", "SQL分析"));
+			group.addMenuItem(new MenuItem("systemLog", "/admin/systemLog", "系统日志"));
 		}
 		
 		return group;
