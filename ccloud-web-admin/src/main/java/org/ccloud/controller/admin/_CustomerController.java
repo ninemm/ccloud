@@ -72,12 +72,12 @@ import cn.afterturn.easypoi.excel.entity.ImportParams;
 public class _CustomerController extends JBaseCRUDController<Customer> {
 
 	@Override
-	@RequiresPermissions(value = { "/admin/customer/view", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
+	@RequiresPermissions(value = { "/admin/customer/list", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void index() {
 		render("index.html");
 	}
 
-	@RequiresPermissions(value = { "/admin/customer/view", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
+	@RequiresPermissions(value = { "/admin/customer/list", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void list() {
 
 		Map<String, String[]> paraMap = getParaMap();
@@ -219,11 +219,12 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("text", dept.getDeptName());
 			map.put("tags", Lists.newArrayList(dept.getId(), dept.getDataArea()));
-			resTreeList.add(map);
 
 			if (addUserFlg) {
 				map.put("nodes", addUser(dept.getId()));
 			}
+
+			resTreeList.add(map);
 
 			if (dept.getChildList() != null && dept.getChildList().size() > 0) {
 				map.put("nodes", doBuild(dept.getChildList(), addUserFlg));
@@ -353,12 +354,14 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 		}
 	}
 
+	@RequiresPermissions(value = { "/admin/customer/downloading","/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void download() {
 
 		render("download.html");
 	}
 
-	@RequiresPermissions(value = { "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
+	@RequiresPermissions(value = { "/admin/customer/downloading", "/admin/dealer/all",
+			"/admin/all" }, logical = Logical.OR)
 	public void downloading() throws UnsupportedEncodingException {
 		Map<String, String[]> paraMap = getParaMap();
 		String depatName = getPara("parent_name");
@@ -407,7 +410,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 	}
 
 	@Before(Tx.class)
-	@RequiresPermissions(value = { "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
+	@RequiresPermissions(value = { "/admin/customer/batchSetUser", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void batchSetUser() {
 		String[] customerIds = getParaValues("dataItem");
 		String[] userIds = getParaValues("userIds");
