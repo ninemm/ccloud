@@ -74,7 +74,7 @@ public class _OperationController extends JBaseCRUDController<Operation> {
 			setAttr("k", keyword);
 		}
 		
-		Page<Operation> page = OperationQuery.me().paginate(getPageNumber(), getPageSize(), keyword, null);
+		Page<Operation> page = OperationQuery.me().paginate(getPageNumber(), getPageSize(), keyword, "o.module_id");
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
 
@@ -132,6 +132,9 @@ public class _OperationController extends JBaseCRUDController<Operation> {
                 List<StationOperationRel> sRelList = new ArrayList<>();
 
                 for (int i = 0; i < roleId.length; i++) {
+                	if (StringUtils.isBlank(roleId[i])) {
+                		continue;
+                	}
                 	RoleOperationRel roleOperationRel = getModel(RoleOperationRel.class);
 
                 	roleOperationRel.setOperationId(operationId);;
@@ -141,6 +144,9 @@ public class _OperationController extends JBaseCRUDController<Operation> {
                 }
 
                 for (int i = 0; i < stationId.length; i++) {
+                	if (StringUtils.isBlank(stationId[i])) {
+                		continue;
+                	}                	
                 	StationOperationRel stationOperationRel = getModel(StationOperationRel.class);
 
                 	stationOperationRel.setOperationId(operationId);;
