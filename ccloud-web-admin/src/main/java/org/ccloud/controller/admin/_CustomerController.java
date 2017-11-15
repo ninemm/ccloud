@@ -72,12 +72,12 @@ import cn.afterturn.easypoi.excel.entity.ImportParams;
 public class _CustomerController extends JBaseCRUDController<Customer> {
 
 	@Override
-	@RequiresPermissions(value = { "/admin/customer/list", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
+	@RequiresPermissions(value = { "/admin/customer", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void index() {
 		render("index.html");
 	}
 
-	@RequiresPermissions(value = { "/admin/customer/list", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
+	@RequiresPermissions(value = { "/admin/customer", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void list() {
 
 		Map<String, String[]> paraMap = getParaMap();
@@ -181,7 +181,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 		render("edit.html");
 	}
 
-	@RequiresPermissions(value = { "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
+	@RequiresPermissions(value = { "/admin/customer/edit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void user_tree() {
 
 		String dataArea = getSessionAttr("DeptDataAreaLike");
@@ -197,7 +197,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 		setAttr("treeData", JSON.toJSON(resTreeList));
 	}
 
-	@RequiresPermissions(value = { "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
+	@RequiresPermissions(value = { "/admin/customer/edit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void department_tree() {
 
 		String dataArea = getSessionAttr("DeptDataAreaLike");
@@ -290,20 +290,20 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 
 	}
 
-	@RequiresPermissions(value = { "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
+	@RequiresPermissions(value = { "/admin/customer/uploading", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void upload() {
 
 		render("upload.html");
 	}
 
-	@RequiresPermissions(value = { "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
+	@RequiresPermissions(value = { "/admin/customer/uploading", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void customerTemplate() {
 		String realPath = getSession().getServletContext().getRealPath("\\");
 		renderFile(new File(realPath + "\\WEB-INF\\admin\\customer\\customerTemplate.xlsx"));
 	}
 
 	@Before(Tx.class)
-	@RequiresPermissions(value = { "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
+	@RequiresPermissions(value = { "/admin/customer/uploading", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void uploading() {
 
 		File file = getFile().getFile();

@@ -44,14 +44,15 @@ import com.jfinal.plugin.activerecord.Record;
 @RouterMapping(url = "/admin/customerType", viewPath = "/WEB-INF/admin/customer_type")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
-@RequiresPermissions(value = { "/admin/customerType", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 public class _CustomerTypeController extends JBaseCRUDController<CustomerType> {
 
 	@Override
+	@RequiresPermissions(value = { "/admin/customerType", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void index() {
 		render("index.html");
 	}
 
+	@RequiresPermissions(value = { "/admin/customerType", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void list() {
 
 		String keyword = getPara("k");
@@ -73,6 +74,7 @@ public class _CustomerTypeController extends JBaseCRUDController<CustomerType> {
 
 	}
 
+	@RequiresPermissions(value = { "/admin/customerType/edit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void enable() {
 
 		String id = getPara("id");
@@ -86,6 +88,7 @@ public class _CustomerTypeController extends JBaseCRUDController<CustomerType> {
 	}
 
 	@Override
+	@RequiresPermissions(value = { "/admin/customerType/edit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void edit() {
 		String id = getPara("id");
 
@@ -114,6 +117,7 @@ public class _CustomerTypeController extends JBaseCRUDController<CustomerType> {
 	}
 
 	@Override
+	@RequiresPermissions(value = { "/admin/customerType/edit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void save() {
 
 		CustomerType customerType = getModel(CustomerType.class);
@@ -130,6 +134,15 @@ public class _CustomerTypeController extends JBaseCRUDController<CustomerType> {
 		customerType.saveOrUpdate();
 
 		renderAjaxResultForSuccess();
+
+	}
+	
+	@RequiresPermissions(value = { "/admin/customerType/edit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
+	public void findPriceSystemByDeptId() {
+		List<Record> priceSystemList = PriceSystemQuery.me().findPriceSystemByDeptId(getPara("parent_id"),
+				getPara("data_area"));
+
+		renderJson(priceSystemList);
 
 	}
 }

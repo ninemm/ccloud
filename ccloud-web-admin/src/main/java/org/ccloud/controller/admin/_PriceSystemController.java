@@ -15,7 +15,6 @@
  */
 package org.ccloud.controller.admin;
 
-import java.util.List;
 import java.util.Map;
 
 import org.apache.shiro.SecurityUtils;
@@ -43,14 +42,15 @@ import com.jfinal.plugin.activerecord.Record;
 @RouterMapping(url = "/admin/priceSystem", viewPath = "/WEB-INF/admin/price_system")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
-@RequiresPermissions(value = { "/admin/priceSystem", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 public class _PriceSystemController extends JBaseCRUDController<PriceSystem> {
 
 	@Override
+	@RequiresPermissions(value = { "/admin/priceSystem", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void index() {
 		render("index.html");
 	}
 
+	@RequiresPermissions(value = { "/admin/priceSystem", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void list() {
 
 		String keyword = getPara("k");
@@ -74,6 +74,7 @@ public class _PriceSystemController extends JBaseCRUDController<PriceSystem> {
 	}
 
 	@Override
+	@RequiresPermissions(value = { "/admin/priceSystem/edit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void edit() {
 		String id = getPara("id");
 
@@ -89,6 +90,7 @@ public class _PriceSystemController extends JBaseCRUDController<PriceSystem> {
 	}
 
 	@Override
+	@RequiresPermissions(value = { "/admin/priceSystem/edit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void save() {
 
 		PriceSystem priceSystem = getModel(PriceSystem.class);
@@ -105,14 +107,6 @@ public class _PriceSystemController extends JBaseCRUDController<PriceSystem> {
 		priceSystem.saveOrUpdate();
 
 		renderAjaxResultForSuccess();
-
-	}
-
-	public void findPriceSystemByDeptId() {
-		List<Record> priceSystemList = PriceSystemQuery.me().findPriceSystemByDeptId(getPara("parent_id"),
-				getPara("data_area"));
-
-		renderJson(priceSystemList);
 
 	}
 }

@@ -38,7 +38,7 @@ import com.jfinal.plugin.activerecord.Record;
 @RouterMapping(url = "/admin/saleRefund", viewPath = "/WEB-INF/admin/sales_refund")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
-public class _SalesRefundInstockController extends JBaseCRUDController<SalesRefundInstock> { 
+public class _SalesRefundController extends JBaseCRUDController<SalesRefundInstock> { 
 
 	@Override
 	public void index() {
