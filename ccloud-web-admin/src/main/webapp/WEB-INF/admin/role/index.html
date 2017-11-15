@@ -72,7 +72,7 @@ function batchAction() {
 							<th>角色编号</th>
 							<th>排序</th>
 							<@shiro.hasPermission name="/admin/role/edit,/admin/all">
-							<th>操作</th>
+							<th style="width: 20%">操作</th>
 							</@shiro.hasPermission>
 						</tr>
 					</thead>
@@ -93,8 +93,7 @@ function batchAction() {
 							<@shiro.hasPermission name="/admin/role/edit,/admin/all">
 								<a href="${CPATH}/admin/role/edit?id=${bean.id}&c=${c!}&p=${p!}" class="btn btn-xs bg-olive btn-flat">编辑</a>
 								<a href="javascript:void(0);" onclick="del('${bean.id}')" class="btn btn-xs btn-danger btn-flat">删除</a>
-<!-- 								<a href="${CPATH}/admin/role/edit?id=${bean.id}&c=${c!}&p=${p!}" class="btn btn-xs btn-primary btn-flat">模块</a> -->
-<!-- 								<a href="${CPATH}/admin/role/delete?id=${bean.id}&c=${c!}&p=${p!}" class="btn btn-xs btn-primary btn-flat">菜单</a> -->
+								<a href="${CPATH}/admin/role/permission?id=${bean.id}&roleName=${bean.role_name}&c=${c!}&p=${p!}" class="btn btn-xs btn-primary btn-flat">分配权限</a>
 							</@shiro.hasPermission>
 							</td>
 						</tr>

@@ -105,4 +105,9 @@ public class RoleOperationRelQuery extends JBaseQuery {
 //		});		
 	}
 
+	public int delete(String roleId, String operationId) {
+		StringBuilder sql = new StringBuilder(" role_id = ? and operation_id = ? ");
+		return DAO.doDelete(sql.toString(), roleId, operationId);
+	}
+
 }

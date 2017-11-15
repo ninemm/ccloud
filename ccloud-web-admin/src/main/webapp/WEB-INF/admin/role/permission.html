@@ -11,10 +11,10 @@
 		var operation = $(obj)[0];
 		var url;
 		if (operation.checked) {
-			url = '${CPATH}/admin/station_operation_rel/save?station_id=${id}&operation_id=' + operation.value;
+			url = '${CPATH}/admin/role_operation_rel/save?role_id=${id}&operation_id=' + operation.value;
 		}
 		else {
-			url = '${CPATH}/admin/station_operation_rel/delete?station_id=${id}&operation_id=' + operation.value;
+			url = '${CPATH}/admin/role_operation_rel/delete?role_id=${id}&operation_id=' + operation.value;
 		}
 		$.ajax({
 			url:url,
@@ -38,11 +38,11 @@
 <@layout active_id=p child_active_id=c>
 
 <section class="content-header">
-	<h1>岗位权限管理(${station_name!})</h1>
+	<h1>角色权限管理(${role_name!})</h1>
 	<ol class="breadcrumb">
 		<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
        	<li><a href="#">用户权限</a></li>
-       	<li class="active">岗位权限管理</li>
+       	<li class="active">角色权限管理</li>
 	</ol>
 </section>
 <!-- Main content -->

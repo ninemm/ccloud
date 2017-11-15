@@ -225,7 +225,7 @@ public class _StationController extends JBaseCRUDController<Station> {
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
-        List<Record> list = OperationQuery.me().queryOperation(stationId);
+        List<Record> list = OperationQuery.me().queryStationOperation(stationId);
         List<SystemVo> systemList = new ArrayList<>();
         int count = list.size();
         for (Record record : list) {

@@ -131,7 +131,7 @@ public class OperationQuery extends JBaseQuery {
 		return DAO.doFind("module_id = ?", id);
 	}
 
-	public List<Record> queryOperation(String id) {
+	public List<Record> queryStationOperation(String id) {
 		StringBuilder sqlBuilder = new StringBuilder("select m.id, m.module_name, s.name as sys_name, ");
 		sqlBuilder.append("me.module_name as parent_name, GROUP_CONCAT(o.id) as operation_code, GROUP_CONCAT(o.operation_name) ");
 		sqlBuilder.append("as operation_name,GROUP_CONCAT(IFNULL(b.station_id,'0')) as station_id ");
@@ -142,5 +142,17 @@ public class OperationQuery extends JBaseQuery {
 		sqlBuilder.append("WHERE operation_code is not null GROUP BY m.id ORDER BY sys_name, parent_name,module_name");
 		return Db.find(sqlBuilder.toString(), id);
 	}
+	
+	public List<Record> queryRoleOperation(String id) {
+		StringBuilder sqlBuilder = new StringBuilder("select m.id, m.module_name, s.name as sys_name, ");
+		sqlBuilder.append("me.module_name as parent_name, GROUP_CONCAT(o.id) as operation_code, GROUP_CONCAT(o.operation_name) ");
+		sqlBuilder.append("as operation_name,GROUP_CONCAT(IFNULL(b.role_id,'0')) as station_id ");
+		sqlBuilder.append("from `module` m join `systems` s on s.id = m.system_id join `module` me on me.id = m.parent_id ");
+		sqlBuilder.append("left join `operation` o on o.module_id = m.id ");
+		sqlBuilder.append("left join (SELECT sr.role_id,sr.operation_id FROM role_operation_rel sr WHERE sr.role_id = ?) ");
+		sqlBuilder.append("b ON b.operation_id = o.id ");
+		sqlBuilder.append("WHERE operation_code is not null GROUP BY m.id ORDER BY sys_name, parent_name,module_name");
+		return Db.find(sqlBuilder.toString(), id);
+	}	
 
 }
