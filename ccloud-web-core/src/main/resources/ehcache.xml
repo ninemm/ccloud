@@ -425,6 +425,16 @@
 		   transactionalMode="off"
 	/>
 	
+	<cache name="cc_transfer_bill"
+		   maxEntriesLocalHeap="10000"
+		   eternal="false"
+		   overflowToDisk="true"
+		   timeToIdleSeconds="300"
+		   timeToLiveSeconds="300"
+		   memoryStoreEvictionPolicy="LFU"
+		   transactionalMode="off"
+	/>
+	
 	<cache name="user_menu"
 		   maxEntriesLocalHeap="10000"
 		   eternal="false"
