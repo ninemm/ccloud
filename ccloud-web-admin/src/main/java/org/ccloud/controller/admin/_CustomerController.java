@@ -183,7 +183,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 
 	@RequiresPermissions(value = { "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void user_tree() {
-		
+
 		String dataArea = getSessionAttr("DeptDataAreaLike");
 		List<Department> list = DepartmentQuery.me().findDeptList(dataArea, "order_list asc");
 		List<Map<String, Object>> resTreeList = new ArrayList<Map<String, Object>>();
@@ -199,7 +199,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 
 	@RequiresPermissions(value = { "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void department_tree() {
-		
+
 		String dataArea = getSessionAttr("DeptDataAreaLike");
 		List<Department> list = DepartmentQuery.me().findDeptList(dataArea, "order_list asc");
 		List<Map<String, Object>> resTreeList = new ArrayList<Map<String, Object>>();
@@ -220,30 +220,33 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 			map.put("text", dept.getDeptName());
 			map.put("tags", Lists.newArrayList(dept.getId(), dept.getDataArea()));
 
-			if (addUserFlg) {
-				map.put("nodes", addUser(dept.getId()));
-			}
-
-			resTreeList.add(map);
+			List<Map<String, Object>> childList = new ArrayList<Map<String, Object>>();
 
 			if (dept.getChildList() != null && dept.getChildList().size() > 0) {
-				map.put("nodes", doBuild(dept.getChildList(), addUserFlg));
+				childList = doBuild(dept.getChildList(), addUserFlg);
 			}
+
+			if (addUserFlg) {
+				childList = addUser(dept.getId(), childList);
+			}
+
+			map.put("nodes", childList);
+
+			resTreeList.add(map);
 		}
 		return resTreeList;
 	}
 
-	private List<Map<String, Object>> addUser(String deptId) {
-		List<Map<String, Object>> resTreeList = new ArrayList<Map<String, Object>>();
+	private List<Map<String, Object>> addUser(String deptId, List<Map<String, Object>> childList) {
 		List<User> list = UserQuery.me().findByDeptId(deptId);
 		for (User user : list) {
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("text", user.getRealname());
 			map.put("tags", Lists.newArrayList(user.getId(), "user"));
-			resTreeList.add(map);
+			childList.add(map);
 
 		}
-		return resTreeList;
+		return childList;
 	}
 
 	@Override
@@ -354,7 +357,8 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 		}
 	}
 
-	@RequiresPermissions(value = { "/admin/customer/downloading","/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
+	@RequiresPermissions(value = { "/admin/customer/downloading", "/admin/dealer/all",
+			"/admin/all" }, logical = Logical.OR)
 	public void download() {
 
 		render("download.html");
@@ -410,7 +414,8 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 	}
 
 	@Before(Tx.class)
-	@RequiresPermissions(value = { "/admin/customer/batchSetUser", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
+	@RequiresPermissions(value = { "/admin/customer/batchSetUser", "/admin/dealer/all",
+			"/admin/all" }, logical = Logical.OR)
 	public void batchSetUser() {
 		String[] customerIds = getParaValues("dataItem");
 		String[] userIds = getParaValues("userIds");
