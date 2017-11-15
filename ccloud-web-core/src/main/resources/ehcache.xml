@@ -415,7 +415,7 @@
 		   transactionalMode="off"
 	/>	
 	
-	<cache name="cc_inventory_check"
+	<cache name="cc_stock_taking"
 		   maxEntriesLocalHeap="10000"
 		   eternal="false"
 		   overflowToDisk="true"
