@@ -4,9 +4,9 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-public class inventoryCheckInfo {
+public class StockTakingInfo {
 
-	private String billSn;
+	private String stockTakingSn;
     private String warehouseId;
     private String bizUserId;
     private Date bizDate;
@@ -17,11 +17,12 @@ public class inventoryCheckInfo {
     private Integer productCount;
     private String remark;
 	private List<ProductInfo> productInfos;
-	public String getBillSn() {
-		return billSn;
+	
+	public String getStockTakingSn() {
+		return stockTakingSn;
 	}
-	public void setBillSn(String billSn) {
-		this.billSn = billSn;
+	public void setStockTakingSn(String stockTakingSn) {
+		this.stockTakingSn = stockTakingSn;
 	}
 	public String getWarehouseId() {
 		return warehouseId;
