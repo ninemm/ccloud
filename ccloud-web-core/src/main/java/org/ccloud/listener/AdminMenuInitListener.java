@@ -120,6 +120,7 @@ public class AdminMenuInitListener implements MessageListener {
 		{
 			group.addMenuItem(new MenuItem("init", "/admin/promoter", "初始化"));
 			group.addMenuItem(new MenuItem("stockTaking", "/admin/stockTaking", "库存盘点"));
+			group.addMenuItem(new MenuItem("transferBill", "/admin/transferBill", "库间调拨"));
 			group.addMenuItem(new MenuItem("setting", "/admin/promoter/setting", "出库管理"));
 			group.addMenuItem(new MenuItem("commission", "/admin/promoter/commission", "入库管理"));
 			group.addMenuItem(new MenuItem("warehouse", "/admin/warehouse", "仓库管理"));			
