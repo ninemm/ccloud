@@ -138,11 +138,9 @@ public class _RoleController extends JBaseCRUDController<Role> {
 		}
         List<Record> list = OperationQuery.me().queryRoleOperation(roleId);
         List<SystemVo> systemList = new ArrayList<>();
-        int count = list.size();
         for (Record record : list) {
         	SystemVo systemVo = new SystemVo();
         	systemVo.setName(record.getStr("sys_name"));
-        	systemVo.setOperationCount(count);
         	List<ParentModule> parentModules = new ArrayList<>();
         	ParentModule parentModule = new ParentModule();
         	parentModule.setName(record.getStr("parent_name"));
@@ -170,6 +168,7 @@ public class _RoleController extends JBaseCRUDController<Role> {
             parentModule.setList(moduleInfos);
             parentModules.add(parentModule);
             systemVo.setList(parentModules);
+            systemVo.setOperationCount(operationInfos.size());
             this.checkList(systemList, systemVo);
 		}
         setAttr("systemList", systemList);
@@ -187,6 +186,7 @@ public class _RoleController extends JBaseCRUDController<Role> {
     
     private void checkParent(SystemVo vo, ParentModule parentModule) {
     	List<ParentModule> list = vo.getList();
+    	vo.setOperationCount(vo.getOperationCount() + parentModule.getList().size());
     	for (ParentModule parentModule2 : list) {
 			if (parentModule2.getName().equals(parentModule.getName())) {
 				this.checkModule(parentModule2, parentModule.getList().get(0));
