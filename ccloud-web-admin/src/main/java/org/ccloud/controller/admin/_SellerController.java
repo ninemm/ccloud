@@ -310,7 +310,10 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		List<SellerGoods> imageList = jsonArray.toJavaList(SellerGoods.class);
 		for (SellerGoods sellerGood : imageList) {
 			  SellerGoods isSellerGoods = SellerGoodsQuery.me().findByProductId(sellerGood.getProductId());
-			if(isSellerGoods!=null){
+			if(isSellerGoods!=null ){
+				if(isSellerGoods.equals("")){
+					isSellerGoods.set("warehouse_id", "");
+				}
 				isSellerGoods.set("warehouse_id", warehouseId);
 				isSellerGoods.set("modify_date", new Date());
 				result=isSellerGoods.update();

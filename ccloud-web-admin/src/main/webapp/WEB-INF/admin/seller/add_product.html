@@ -45,9 +45,9 @@
 	var initFields = function() {
 		var fields =
 			[
-				{field: "", title: "全选", align: "center", width: '5%',
+				{field: "", title: "<input type='checkbox' onclick='checkAll(this)' id='dataItem' value=''/>", align: "center", width: '5%',
 				formatter: function(value, row, rowIndex) {
-					var strHtml = '<input type="checkbox" name="row" id="id_name" value="'+row.id+'"/>';
+					var strHtml = '<input type="checkbox" name="dataItem" id="id_name" value="'+row.id+'"/>';
 					return strHtml;
 				},
 				edit:false
@@ -92,13 +92,13 @@
 	function savePro(){
 		 var orderItems = new Array();
 		 var flang = true;
-		 var checklist = $('input[name="row"]:checked').parent().parent();
+		 var checklist = $('input[name="dataItem"]:checked').parent().parent();
 		 if(checklist.length == 0){
 			alert("未选中任何数据!");
 			flang=false;
 			return;		 
 		 }
-		 $('input[name="row"]:checked').parent().parent().each(function(idx, item) {
+		 $('input[name="dataItem"]:checked').parent().parent().each(function(idx, item) {
 		 	
 		  	var obj = {
 								"productId": $(this).find('td').eq(0).find("input").val(),
