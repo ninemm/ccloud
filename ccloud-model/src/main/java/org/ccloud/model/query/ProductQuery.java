@@ -47,7 +47,7 @@ public class ProductQuery extends JBaseQuery {
 			}
 		});
 	}
-
+	
 	public Page<Product> paginate(int pageNumber, int pageSize, String orderby) {
 		String select = "select * ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_product` ");
@@ -59,6 +59,7 @@ public class ProductQuery extends JBaseQuery {
 
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
+
 
 	public int batchDelete(String... ids) {
 		if (ids != null && ids.length > 0) {

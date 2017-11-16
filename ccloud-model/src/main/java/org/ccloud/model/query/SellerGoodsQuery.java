@@ -40,18 +40,21 @@ public class SellerGoodsQuery extends JBaseQuery {
 		return DAO.findFirst(sql.toString(), productId);
 	}
 
-	public Page<SellerGoods> paginate(int pageNumber, int pageSize, String orderby) {
+	public Page<SellerGoods> paginate(int pageNumber, int pageSize,String keyword, String orderby) {
 		String select = "select * ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_seller_goods` ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
+		
+		appendIfNotEmptyWithLike(fromBuilder, "name", keyword, params, true);
+		
+		fromBuilder.append("order by " + orderby);	
 
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
-
 	
 	public int batchDelete(String... ids) {
 		if (ids != null && ids.length > 0) {

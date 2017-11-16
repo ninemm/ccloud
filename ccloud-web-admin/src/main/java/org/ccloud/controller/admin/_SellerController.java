@@ -258,7 +258,51 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 	}
 	
 	//保存产品信息
-	public void savePro(){
+		public void savePro(){
+			final SellerGoods sellerGoods= getModel(SellerGoods.class);
+			String ds = getPara("orderItems");
+			boolean result=false;
+			JSONArray jsonArray = JSONArray.parseArray(ds);
+			List<SellerGoods> imageList = jsonArray.toJavaList(SellerGoods.class);
+			for (SellerGoods sellerGood : imageList) {
+				  SellerGoods isSellerGoods = SellerGoodsQuery.me().findById(sellerGood.getId());
+				if(isSellerGoods==null){
+					String Id = StrKit.getRandomUUID();
+					sellerGoods.set("id",Id);
+					sellerGoods.set("product_id",sellerGood.getProductId());
+					sellerGoods.set("seller_id",sellerGood.getSellerId());
+					sellerGoods.set("custom_name",sellerGood.getCustomName());
+					sellerGoods.set("store_count",sellerGood.getStoreCount());
+					sellerGoods.set("price", sellerGood.getPrice());
+					sellerGoods.set("cost", sellerGood.getCost());
+					sellerGoods.set("market_price", sellerGood.getMarketPrice());
+					sellerGoods.set("is_enable", sellerGood.getIsEnable());
+					sellerGoods.set("order_list", sellerGood.getOrderList());
+					sellerGoods.set("create_date", new Date());
+					result=sellerGoods.save();
+				}else{
+					isSellerGoods.set("custom_name",sellerGood.getCustomName());
+					isSellerGoods.set("store_count",sellerGood.getStoreCount());
+					isSellerGoods.set("seller_id",sellerGood.getSellerId());
+					isSellerGoods.set("price", sellerGood.getPrice());
+					isSellerGoods.set("cost", sellerGood.getCost());
+					isSellerGoods.set("market_price", sellerGood.getMarketPrice());
+					isSellerGoods.set("modify_date", new Date());
+					isSellerGoods.set("is_enable", isSellerGoods.getIsEnable());
+					isSellerGoods.set("order_list", isSellerGoods.getOrderList());
+					isSellerGoods.update();
+				}
+			}
+			if(result){
+				renderAjaxResultForSuccess("添加成功");
+				setAttr("data", "添加成功!");
+			} else {
+				renderAjaxResultForError("添加失败");
+				setAttr("data", "添加失败!");
+			}
+		}		
+			
+	public void saveProductWarehouse(){
 		String ds = getPara("orderItems");
 		boolean result = false;
 		String warehouseId = getPara("warehouseId");
@@ -266,7 +310,10 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		List<SellerGoods> imageList = jsonArray.toJavaList(SellerGoods.class);
 		for (SellerGoods sellerGood : imageList) {
 			  SellerGoods isSellerGoods = SellerGoodsQuery.me().findByProductId(sellerGood.getProductId());
-			if(isSellerGoods!=null){
+			if(isSellerGoods!=null ){
+				if(isSellerGoods.equals("")){
+					isSellerGoods.set("warehouse_id", "");
+				}
 				isSellerGoods.set("warehouse_id", warehouseId);
 				isSellerGoods.set("modify_date", new Date());
 				result=isSellerGoods.update();
