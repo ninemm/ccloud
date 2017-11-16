@@ -150,7 +150,7 @@
 							orderItems.push(obj);
 						})
 		$.ajax({
-			url:"${CPATH}/admin/seller/savePro",
+			url:"${CPATH}/admin/seller/saveProductWarehouse",
 			type:"post",
 			dataType:"json",
 			data : {orderItems : JSON.stringify(orderItems), warehouseId :warehouseId},
