@@ -213,7 +213,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 	            setAttr("k", keyword);
 	        }
 	        
-	        Page<SellerGoods> page = SellerGoodsQuery.me().paginate(getPageNumber(), getPageSize(),keyword,id);
+	        Page<SellerGoods> page = SellerGoodsQuery.me().paginate_sel(getPageNumber(), getPageSize(),keyword,id);
 
 	        Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 	        renderJson(map);
@@ -251,7 +251,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
             setAttr("k", keyword);
         }
         
-        Page<Product> page = ProductQuery.me().paginate(getPageNumber(), getPageSize(),keyword,  "cp.id",sellerId);
+        Page<Product> page = ProductQuery.me().paginate_pro(getPageNumber(), getPageSize(),keyword,  "cp.id",sellerId);
 
         Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);
