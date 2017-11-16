@@ -276,17 +276,6 @@
 							</div>
 						</div>
 						<div class="form-group col-sm-12 validata-box">
-										<label class="control-label col-sm-2">是否创建账套:</label>
-										<div class="input-group col-md-4 col-sm-10">
-											<label class="radio-inline">
-						                 		<input type="radio" name="seller.is_inited" value="1" <#if !seller?? || seller.is_inited == 1>checked</#if>>是
-						                 	</label>
-						                 	<label class="radio-inline">
-						                 		<input type="radio" name="seller.is_inited" value="0" <#if seller?? && seller.is_inited == 0>checked</#if>>否
-											</label>		                 		
-						               	</div>
-						</div>	
-						<div class="form-group col-sm-12 validata-box">
 										<label class="control-label col-sm-2">是否启用:</label>
 										<div class="input-group col-md-4 col-sm-10">
 											<label class="radio-inline">
@@ -294,17 +283,6 @@
 						                 	</label>
 						                 	<label class="radio-inline">
 						                 		<input type="radio" name="seller.is_enabled" value="0" <#if seller?? && seller.is_enabled == 0>checked</#if>>否
-											</label>		                 		
-						               	</div>
-						</div>
-						<div class="form-group col-sm-12 validata-box">
-										<label class="control-label col-sm-2">是否为总部销售商:</label>
-										<div class="input-group col-md-4 col-sm-10">
-											<label class="radio-inline">
-						                 		<input type="radio" name="seller.is_headquarter" value="1" <#if !seller?? || (seller.is_headquarter)! == 1>checked</#if>>是
-						                 	</label>
-						                 	<label class="radio-inline">
-						                 		<input type="radio" name="seller.is_headquarter" value="0" <#if seller?? && seller.is_headquarter == 0>checked</#if>>否
 											</label>		                 		
 						               	</div>
 						</div>

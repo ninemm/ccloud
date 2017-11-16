@@ -16,6 +16,8 @@
 package org.ccloud.model.query;
 
 import java.util.LinkedList;
+import java.util.List;
+
 import org.ccloud.model.Seller;
 
 import com.jfinal.plugin.activerecord.Page;
@@ -40,6 +42,11 @@ public class SellerQuery extends JBaseQuery {
 		sqlBuilder.append("where cc.id = ?");
 		return DAO.findFirst(sqlBuilder.toString(), id);
 		//return DAO.findById(id);
+	}
+	
+	public List<Seller> findByDeptId(String id){
+		String sql="SELECT cs.* from cc_seller cs LEFT JOIN  user u on u.department_id=cs.dept_id where u.id= ?";
+		return DAO.find(sql,id);
 	}
 
 	public int deleteByCcSellerId(String sellerId) {

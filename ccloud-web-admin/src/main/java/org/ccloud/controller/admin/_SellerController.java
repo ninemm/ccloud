@@ -21,8 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.shiro.authz.annotation.Logical;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.route.RouterMapping;
@@ -30,14 +28,21 @@ import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Brand;
 import org.ccloud.model.Department;
+import org.ccloud.model.Product;
 import org.ccloud.model.Seller;
 import org.ccloud.model.SellerBrand;
+import org.ccloud.model.SellerGoods;
 import org.ccloud.model.User;
+import org.ccloud.model.Warehouse;
 import org.ccloud.model.query.BrandQuery;
 import org.ccloud.model.query.DepartmentQuery;
+import org.ccloud.model.query.ProductQuery;
 import org.ccloud.model.query.SellerBrandQuery;
+import org.ccloud.model.query.SellerGoodsQuery;
 import org.ccloud.model.query.SellerQuery;
+import org.ccloud.model.query.WarehouseQuery;
 
+import com.alibaba.fastjson.JSONArray;
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
@@ -49,7 +54,12 @@ import com.jfinal.plugin.activerecord.Page;
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
 public class _SellerController extends JBaseCRUDController<Seller> { 
-
+	
+	@Override
+	public void index() {
+		render("index.html");
+	}
+	
 	public void list() {
 		
         String keyword = getPara("k");
@@ -65,7 +75,6 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 	}
 	
 	@Override
-	@RequiresPermissions(value={"/admin/seller/edit","/admin/all"},logical=Logical.OR)
 	public void edit() {
 		String id = getPara("id");
 		if (id != null) {
@@ -99,7 +108,11 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			seller.set("id", sellerId);
 			seller.set("create_date", new Date());
 			seller.set("modify_user_id", user.getId());
+			seller.set("is_inited", 1);
 			seller.save();
+			
+			
+			
 			for(int i=0;i<brandIds.length;i++){
 				if(!brandIds[i].equals("")){
 					String sellerBrandId = StrKit.getRandomUUID();
@@ -177,4 +190,100 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			}
 		}
 	}
+	
+	public void productManage(){
+		String id = getPara("id");
+		setAttr("sellerId", id);
+		render("show_product.html");
+	}	
+	
+	
+	//添加产品信息
+	public void show_product(){
+		User user=getSessionAttr("user");
+		List<Seller> list=SellerQuery.me().findByDeptId(user.getId());
+		renderJson(list);
+	}
+	
+	public void showProduct(){
+		String keyword = getPara("k");
+		String id = getPara("seller_id");
+	        if (StrKit.notBlank(keyword)) {
+	            keyword = StringUtils.urlDecode(keyword);
+	            setAttr("k", keyword);
+	        }
+	        
+	        Page<SellerGoods> page = SellerGoodsQuery.me().paginate(getPageNumber(), getPageSize(),keyword,id);
+
+	        Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
+	        renderJson(map);
+	}
+	
+	public void change(){
+		String id = getPara("id");
+		int isEnable =Integer.parseInt(getPara("is_enable"));
+		if(isEnable == 1){
+			isEnable = 0;
+		}else{
+			isEnable = 1;
+		}
+		SellerGoods sellerGoods = SellerGoodsQuery.me().findById(id);
+		sellerGoods.set("is_enable", isEnable);
+		if(sellerGoods!=null){
+			sellerGoods.set("modify_date", new Date());
+			sellerGoods.update();
+		}
+		setAttr("sellerId", sellerGoods.getSellerId());
+		render("show_product.html");
+	}
+	
+	public void addProduct(){
+			String sellerId = getPara("sellerId");
+			setAttr("sellerId", sellerId);
+			render("add_product.html");
+	}
+	
+	public void productList(){
+        String keyword = getPara("k");
+        String sellerId = getPara("sellerId");
+        if (StrKit.notBlank(keyword)) {
+            keyword = StringUtils.urlDecode(keyword);
+            setAttr("k", keyword);
+        }
+        
+        Page<Product> page = ProductQuery.me().paginate(getPageNumber(), getPageSize(),keyword,  "cp.id",sellerId);
+
+        Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
+        renderJson(map);
+	}
+	
+	//保存产品信息
+	public void savePro(){
+		String ds = getPara("orderItems");
+		boolean result = false;
+		String warehouseId = getPara("warehouseId");
+		JSONArray jsonArray = JSONArray.parseArray(ds);
+		List<SellerGoods> imageList = jsonArray.toJavaList(SellerGoods.class);
+		for (SellerGoods sellerGood : imageList) {
+			  SellerGoods isSellerGoods = SellerGoodsQuery.me().findByProductId(sellerGood.getProductId());
+			if(isSellerGoods!=null){
+				isSellerGoods.set("warehouse_id", warehouseId);
+				isSellerGoods.set("modify_date", new Date());
+				result=isSellerGoods.update();
+				if(result == false){
+					break;
+				}
+			}
+		}
+		renderJson(result);
+		
+	}
+	
+	public void show_warehouse(){
+		String sellerId = getPara("sellerId");
+		List<Warehouse> list = WarehouseQuery.me().findBySellerId(sellerId);
+		renderJson(list);
+	}
+	
 }
+
