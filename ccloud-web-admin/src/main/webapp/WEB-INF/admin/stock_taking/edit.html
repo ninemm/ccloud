@@ -27,8 +27,12 @@ $(function() {
 });
 
 var validatorFields = {
+	'stockTaking.warehouse_id': {
+		validators: {
+            notEmpty: { message: '盘点仓库不能为空' },
+        }
+	}
 };
-
 function doSubmit(){
 	$form.ajaxSubmit({
 		beforeSubmit: function() {
@@ -115,7 +119,7 @@ function addTr(tid, productList, optionArr) {
     $tbody.find("tr:last>td>#big_unit").text(big_unit);
     $tbody.find("tr:last>td>#factIndex").attr("value",lastTrIdx);
     $tbody.find("tr:last").find(":input").attr("disabled",false);
-
+    var productCount = 'stockTakingList['+ lastTrIdx +'].product_coun';
     $tbody.find("tr:last>td>select.pro-slc2").select2({
        data:optionArr,
        width: "100%",
@@ -138,10 +142,11 @@ function addTr(tid, productList, optionArr) {
      var cspecification = result.specificationValue;
      var cbig_unit = firstProduct.weightUnit;
      var $tr = $(this).parent().parent();
-     $tbody.find("tr:last>td>#goodsCode").val(cgoodsCode);
-     $tbody.find("tr:last>td>#goodsName").html(cgoodsName); 
-	 $tbody.find("tr:last>td>#specification").text(cspecification);
-     $tbody.find("tr:last>td>#big_unit").text(cbig_unit);
+     
+     $tr.find("td>#goodsCode").val(cgoodsCode);
+     $tr.find("td>#goodsName").html(cgoodsName); 
+     $tr.find("td>#specification").text(cspecification);
+     $tr.find("td>#big_unit").text(cbig_unit);
      });  
 }
 
@@ -225,9 +230,11 @@ function addTr(tid, productList, optionArr) {
 												<td class="text-center">
 													<span class="big_unit" id="big_unit"></span>
 												</td>
+												<div class="form-group">
 												<td class="text-center">
 												<input type="text" id="stock" class="stock" name="stockTakingList[-1].product_count" disabled="true" />
 												</td>
+												</div>
 												<td class="text-left">
 													<input type="text"  class="remarks" id="remarks" name="stockTakingList[-1].remark" disabled="true">
 												</td>

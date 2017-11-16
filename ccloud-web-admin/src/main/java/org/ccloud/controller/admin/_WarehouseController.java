@@ -15,11 +15,13 @@
  */
 package org.ccloud.controller.admin;
 
+import java.util.Date;
 import java.util.Map;
 
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
+import org.ccloud.model.User;
 import org.ccloud.model.Warehouse;
 import org.ccloud.model.query.WarehouseQuery;
 import org.ccloud.route.RouterMapping;
@@ -46,7 +48,7 @@ public class _WarehouseController extends JBaseCRUDController<Warehouse> {
 			setAttr("k", keyword);
 		}
 
-		Page<Warehouse> page = WarehouseQuery.me().paginate(getPageNumber(), getPageSize(), keyword, "create_date");
+		Page<Warehouse> page = WarehouseQuery.me().paginate(getPageNumber(), getPageSize(), keyword, "c.create_date");
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
 
@@ -76,5 +78,22 @@ public class _WarehouseController extends JBaseCRUDController<Warehouse> {
 			renderAjaxResultForError("更新失败");
 		}
 
+	}
+
+	@Override
+	public void save() {
+	  Warehouse warehouse = getModel(Warehouse.class); 
+	  User user = getSessionAttr("user");
+	  warehouse.setDeptId(user.getDepartmentId());
+	  warehouse.setDataArea(user.getDataArea());
+	  if (StringUtils.isBlank(warehouse.getId())) {
+		warehouse.setId(StrKit.getRandomUUID());
+		warehouse.setCreateDate(new Date());
+		warehouse.save();
+		renderAjaxResultForSuccess("保存成功！");
+	  }else {
+		warehouse.saveOrUpdate();
+		renderAjaxResultForSuccess("修改成功！");
+	   }
 	}
 }

@@ -98,7 +98,7 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 	@Override
 	public void save() {
 		StockTaking stockTaking = getModel(StockTaking.class);
-		if (stockTaking.getStatus() == 0) {
+		if (stockTaking.getStatus() == null || stockTaking.getStatus() == 0) {
 			User user = getSessionAttr("user");
 			stockTaking.setDeptId(user.getDepartmentId());
 			stockTaking.setDataArea(user.getDataArea());
@@ -109,6 +109,7 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 				stockTaking.setId(StrKit.getRandomUUID());
 				stockTaking.setCreateDate(new Date());
 				stockTaking.setBizDate(new Date());
+				stockTaking.setStatus(0);
 				String billno = this.getBillSn();
 				stockTaking.setStockTakingSn(billno);
 			} else {
@@ -129,7 +130,7 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 			@Override
 			public boolean run() throws SQLException {
 				if (update) {
-					stockTaking.update();
+					stockTaking.saveOrUpdate();
 					List<StockTakingDetail> iSaveList = new ArrayList<>();
 					int loopEnd = 1;
 					// 先根据主表ID，删除盘点单子表相关记录

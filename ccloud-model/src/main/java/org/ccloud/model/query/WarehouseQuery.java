@@ -45,12 +45,12 @@ public class WarehouseQuery extends JBaseQuery {
 	}
 
 	public Page<Warehouse> paginate(int pageNumber, int pageSize,String keyword, String orderby) {
-		String select = "select * ";
-		StringBuilder fromBuilder = new StringBuilder("from `cc_warehouse` ");
-
+		String select = "select c.id,c.name,c.code,c.contact,c.phone,c.is_inited,c.is_enabled,d.dept_name as deptName ";
+		StringBuilder fromBuilder = new StringBuilder("from `cc_warehouse` c ");
+        fromBuilder.append("inner join department d on c.dept_id = d.id ");
 		LinkedList<Object> params = new LinkedList<Object>();
 
-		appendIfNotEmptyWithLike(fromBuilder, "name", keyword, params, true);
+		appendIfNotEmptyWithLike(fromBuilder, "c.name", keyword, params, true);
 		
 		fromBuilder.append("order by " + orderby);
 		

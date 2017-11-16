@@ -87,7 +87,7 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 	@Override
 	public void save() {		
 	 TransferBill transferBill = getModel(TransferBill.class);
-	 if (transferBill.getStatus() == 0) {
+	 if (transferBill.getStatus() == null || transferBill.getStatus() == 0) {
 	  User user = getSessionAttr("user");
 	  transferBill.setDeptId(user.getDepartmentId());
 	  transferBill.setDataArea(user.getDataArea());
@@ -98,6 +98,7 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 		  transferBill.setId(StrKit.getRandomUUID());
 		  transferBill.setCreateDate(new Date());
 		  transferBill.setBizDate(new Date());
+		  transferBill.setStatus(0);
 		  String billno = this.getBillSn();
 		  transferBill.setTransferBillSn(billno);
 	    }else {
@@ -118,7 +119,7 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 			@Override
 			public boolean run() throws SQLException {
 				if (update) {
-					transferBill.update();
+					transferBill.saveOrUpdate();
 					List<TransferBillDetail> iSaveList = new ArrayList<>();
 	        		int loopEnd = 1;
 	               //先根据主表ID，删除调拨单子表相关记录

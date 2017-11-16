@@ -27,9 +27,20 @@ $(function() {
 });
 
 var validatorFields = {
+	'transferBill.from_warehouse_id': {
+		validators: {
+            notEmpty: { message: '调出仓库不能为空' },
+        }
+	},
+	'transferBill.to_warehouse_id': {
+		validators: {
+            notEmpty: { message: '调入仓库不能为空' },
+        }
+	}
 };
 
 function doSubmit(){
+
 	$form.ajaxSubmit({
 		beforeSubmit: function() {
 			var validate = $form.data('bootstrapValidator');
@@ -51,6 +62,13 @@ function doSubmit(){
 		}
 	});
 }
+
+<!-- 调拨数量不能为空 -->
+function checkStock(){
+
+
+}
+
 
 function initProduct(){
          $.ajax({
@@ -114,7 +132,8 @@ function addTr(tid, productList, optionArr) {
     $tbody.find("tr:last>td>#big_unit").text(big_unit);
     $tbody.find("tr:last>td>#factIndex").attr("value",lastTrIdx);
     $tbody.find("tr:last").find(":input").attr("disabled",false);
-
+  
+        
     $tbody.find("tr:last>td>select.pro-slc2").select2({
        data:optionArr,
        width: "100%",
@@ -137,10 +156,10 @@ function addTr(tid, productList, optionArr) {
      var cspecification = result.specificationValue;
      var cbig_unit = firstProduct.weightUnit;
      var $tr = $(this).parent().parent();
-     $tbody.find("tr:last>td>#productId").val(cproductId);
-     $tbody.find("tr:last>td>#goodsName").html(cgoodsName); 
-	 $tbody.find("tr:last>td>#specification").text(cspecification);
-     $tbody.find("tr:last>td>#big_unit").text(cbig_unit);
+     $tr.find("td>#goodsCode").val(cgoodsCode);
+     $tr.find("td>#goodsName").html(cgoodsName); 
+     $tr.find("td>#specification").text(cspecification);
+     $tr.find("td>#big_unit").text(cbig_unit);
      });  
 }
 
@@ -215,7 +234,7 @@ function addTr(tid, productList, optionArr) {
 												<th class="col-sm-2 center">商品名称</th>
 												<th class="col-sm-1 center">规格</th>
 												<th class="col-sm-1 center">单位</th>
-												<th class="col-sm-1 center">调出数量</th>
+												<th class="col-sm-1 center">调拨数量</th>
 											</tr>
 										</thead>
 										<tbody id="sProdBody">

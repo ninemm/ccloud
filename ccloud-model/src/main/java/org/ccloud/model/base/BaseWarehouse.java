@@ -17,7 +17,6 @@ package org.ccloud.model.base;
 
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.core.JModel;
-
 import com.jfinal.plugin.activerecord.IBean;
 import com.jfinal.plugin.ehcache.CacheKit;
 import com.jfinal.plugin.ehcache.IDataLoader;
@@ -96,7 +95,7 @@ public abstract class BaseWarehouse<M extends BaseWarehouse<M>> extends JModel<M
 	}
 
 	public java.lang.String getId() {
-		return get("id");
+		return getStr("id");
 	}
 
 	public void setCode(java.lang.String code) {
@@ -104,7 +103,7 @@ public abstract class BaseWarehouse<M extends BaseWarehouse<M>> extends JModel<M
 	}
 
 	public java.lang.String getCode() {
-		return get("code");
+		return getStr("code");
 	}
 
 	public void setName(java.lang.String name) {
@@ -112,7 +111,7 @@ public abstract class BaseWarehouse<M extends BaseWarehouse<M>> extends JModel<M
 	}
 
 	public java.lang.String getName() {
-		return get("name");
+		return getStr("name");
 	}
 
 	public void setIsInited(java.lang.Integer isInited) {
@@ -120,7 +119,7 @@ public abstract class BaseWarehouse<M extends BaseWarehouse<M>> extends JModel<M
 	}
 
 	public java.lang.Integer getIsInited() {
-		return get("is_inited");
+		return getInt("is_inited");
 	}
 
 	public void setInitDate(java.util.Date initDate) {
@@ -136,23 +135,7 @@ public abstract class BaseWarehouse<M extends BaseWarehouse<M>> extends JModel<M
 	}
 
 	public java.lang.String getPinying() {
-		return get("pinying");
-	}
-
-	public void setDataOrg(java.lang.String dataOrg) {
-		set("data_org", dataOrg);
-	}
-
-	public java.lang.String getDataOrg() {
-		return get("data_org");
-	}
-
-	public void setOrgId(java.lang.String orgId) {
-		set("org_id", orgId);
-	}
-
-	public java.lang.String getOrgId() {
-		return get("org_id");
+		return getStr("pinying");
 	}
 
 	public void setIsEnabled(java.lang.Integer isEnabled) {
@@ -160,7 +143,7 @@ public abstract class BaseWarehouse<M extends BaseWarehouse<M>> extends JModel<M
 	}
 
 	public java.lang.Integer getIsEnabled() {
-		return get("is_enabled");
+		return getInt("is_enabled");
 	}
 
 	public void setType(java.lang.String type) {
@@ -168,7 +151,7 @@ public abstract class BaseWarehouse<M extends BaseWarehouse<M>> extends JModel<M
 	}
 
 	public java.lang.String getType() {
-		return get("type");
+		return getStr("type");
 	}
 
 	public void setContact(java.lang.String contact) {
@@ -176,7 +159,7 @@ public abstract class BaseWarehouse<M extends BaseWarehouse<M>> extends JModel<M
 	}
 
 	public java.lang.String getContact() {
-		return get("contact");
+		return getStr("contact");
 	}
 
 	public void setPhone(java.lang.String phone) {
@@ -184,7 +167,7 @@ public abstract class BaseWarehouse<M extends BaseWarehouse<M>> extends JModel<M
 	}
 
 	public java.lang.String getPhone() {
-		return get("phone");
+		return getStr("phone");
 	}
 
 	public void setIsDefault(java.lang.Integer isDefault) {
@@ -192,7 +175,7 @@ public abstract class BaseWarehouse<M extends BaseWarehouse<M>> extends JModel<M
 	}
 
 	public java.lang.Integer getIsDefault() {
-		return get("is_default");
+		return getInt("is_default");
 	}
 
 	public void setParentId(java.lang.String parentId) {
@@ -200,7 +183,7 @@ public abstract class BaseWarehouse<M extends BaseWarehouse<M>> extends JModel<M
 	}
 
 	public java.lang.String getParentId() {
-		return get("parent_id");
+		return getStr("parent_id");
 	}
 
 	public void setProductType(java.lang.String productType) {
@@ -208,7 +191,7 @@ public abstract class BaseWarehouse<M extends BaseWarehouse<M>> extends JModel<M
 	}
 
 	public java.lang.String getProductType() {
-		return get("product_type");
+		return getStr("product_type");
 	}
 
 	public void setRemark(java.lang.String remark) {
@@ -216,7 +199,23 @@ public abstract class BaseWarehouse<M extends BaseWarehouse<M>> extends JModel<M
 	}
 
 	public java.lang.String getRemark() {
-		return get("remark");
+		return getStr("remark");
+	}
+
+	public void setDeptId(java.lang.String deptId) {
+		set("dept_id", deptId);
+	}
+
+	public java.lang.String getDeptId() {
+		return getStr("dept_id");
+	}
+
+	public void setDataArea(java.lang.String dataArea) {
+		set("data_area", dataArea);
+	}
+
+	public java.lang.String getDataArea() {
+		return getStr("data_area");
 	}
 
 	public void setCreateDate(java.util.Date createDate) {
