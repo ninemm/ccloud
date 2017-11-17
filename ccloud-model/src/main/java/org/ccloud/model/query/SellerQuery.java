@@ -82,5 +82,8 @@ public class SellerQuery extends JBaseQuery {
 		return 0;
 	}
 
+	public List<Seller> querySellIdByUser(String departmentId) {
+		return DAO.doFind("dept_id = ? and is_enabled = 1", departmentId);
+	}
 	
 }
