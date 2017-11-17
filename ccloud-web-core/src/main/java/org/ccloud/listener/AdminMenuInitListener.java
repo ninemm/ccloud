@@ -283,6 +283,7 @@ public class AdminMenuInitListener implements MessageListener {
 			group.addMenuItem(new MenuItem("seller", "/admin/seller", "销售商管理"));
 			group.addMenuItem(new MenuItem("productManage", "/admin/seller/productManage", "产品管理"));
 			group.addMenuItem(new MenuItem("printTemplate", "/admin/printTemplate", "打印模版管理"));
+			group.addMenuItem(new MenuItem("combination", "/admin/productComposition", "组合商品管理"));
 
 		}
 		return group;
