@@ -221,7 +221,7 @@ public class _ProductCompositionController extends JBaseCRUDController<ProductCo
 		List<Seller> sellerList = getSessionAttr("sellerList");
 		if (sellerList.size() > 0) {
 			String sellerId = sellerList.get(0).getId();
-			List<SellerProduct> list = SellerProductQuery.me().findBySellerId(sellId);
+			List<SellerProduct> list = SellerProductQuery.me().findBySellerId(sellerId);
 			renderJson(list);
 		}
 //		String sellerId = "4e9de81102104e5db5149dfefd904d6c";

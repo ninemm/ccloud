@@ -22,8 +22,24 @@
 <#macro script>
 
 	var $form = $("#form");
+	$("#brand_option").select2();
 	$(function() {
-		
+		$.ajax({
+			url:"${CPATH}/admin/seller/getBrand",
+			type:"post",
+			dataType:"json",
+			data:{"id":'${(seller.id)!}'},
+			success:function(data)
+			{
+				for (var i = 0; i < data.length; i++) {
+					if (data[i].isvalid == 0 ) {
+						$("#brand_option").append("<option value=" + data[i].id + ">" + data[i].name + "</option>");
+					} else {
+						$("#brand_option").append("<option value=" + data[i].id + " selected >" + data[i].name + "</option>");
+					}
+				}
+			}
+		});
 		var selector = $('#city-picker-selector').cityPicker({
 			dataJson: cityData,
 			renderMode: false
@@ -60,14 +76,14 @@
 	var validatorFields = {
 		'seller.seller_name': {
 			validators: {
-				notEmpty: { message: '经销商名称不能为空' },
-				stringLength: { max: 25, message: '经销商名称最大长度是25字符，请重新输入' }
+				notEmpty: { message: '销售商名称不能为空' },
+				stringLength: { max: 25, message: '销售商名称最大长度是25字符，请重新输入' }
 			}
 		},
 		'seller.seller_code': {
 			validators: {
-				notEmpty: { message: '经销商编码不能为空' },
-				stringLength: { max: 15, message: '经销商编码最大长度是15字符，请重新输入' }
+				notEmpty: { message: '销售商编码不能为空' },
+				stringLength: { max: 15, message: '销售商编码最大长度是15字符，请重新输入' }
 			}
 		},
 		'seller.contact': {
@@ -166,6 +182,12 @@
 		$("#userProvinceText").val($("select[name='userProvinceId']").find("option:selected").text()); 
 		$("#userCityText").val($("select[name='userCityId']").find("option:selected").text()); 
 		$("#userDistrictText").val($("select[name='userDistrictId']").find("option:selected").text()); 
+		
+		var list = $("#brand_option").select2("val");
+		var ids = "";
+		if (list != null && list.length > 0) {
+			ids = list.toString();
+		}
 	
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
@@ -174,6 +196,8 @@
 				return validate.isValid()
 			},
 			type : "post", 
+			data : {
+				"brandList":ids},
 			dataType : "json", 
 			success : function(data) { 
 				if(data.errorCode == 0) {
@@ -190,23 +214,22 @@
 	}
 </#macro>
 
-
 <@layout active_id=p child_active_id=c>
 
 <!-- Content Header (Page header) -->
 <section class="content-header">
-	<h1><#if (customer.id) ??>修改<#else>新增</#if>经销商</h1>
+	<h1><#if (customer.id) ??>修改<#else>新增</#if>销售商</h1>
 	<ol class="breadcrumb">
 		<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-	<li>经销商管理</li>
-		<li class="active"><#if (customer.id) ??>修改<#else>新增</#if>经销商信息</li>
+	<li>销售商管理</li>
+		<li class="active"><#if (customer.id) ??>修改<#else>新增</#if>销售商信息</li>
 	</ol>
 </section>
 <!-- Main content -->
 <section class="content">
 	<div class="box box-default">
 		<div class="box-header with-border">
-			<h3 class="box-title">经销商信息</h3>
+			<h3 class="box-title">销售商信息</h3>
 			<div class="box-tools">
 				<button type="button" class="btn btn-box-tool" data-widget="collapse">
 					<i class="fa fa-minus"></i>
@@ -229,13 +252,13 @@
 				               	</div>
 							</div>
 						<div class="form-group col-sm-12 validata-box">
-							<label class="control-label col-sm-2">*经销商名称:</label>
+							<label class="control-label col-sm-2">*销售商名称:</label>
 							<div class="input-group col-md-4 col-sm-10">
 								<input class="form-control input-sm" type="text" name="seller.seller_name" value="${(seller.seller_name)!}" placeholder="1-25个任意字母数字">
 							</div>
 						</div>
 						<div class="form-group col-sm-12 validata-box">
-							<label class="control-label col-sm-2">*经销商编码:</label>
+							<label class="control-label col-sm-2">*销售商编码:</label>
 							<div class="input-group col-md-4 col-sm-10">
 								<input class="form-control input-sm" type="text" name="seller.seller_code" value="${(seller.seller_code)!}" placeholder="1-15个任意字母数字">
 							</div>
