@@ -22,9 +22,24 @@
 <#macro script>
 
 	var $form = $("#form");
-	$("#station_option").select2();
+	$("#brand_option").select2();
 	$(function() {
-		
+		$.ajax({
+			url:"${CPATH}/admin/seller/getBrand",
+			type:"post",
+			dataType:"json",
+			data:{"id":'${(seller.id)!}'},
+			success:function(data)
+			{
+				for (var i = 0; i < data.length; i++) {
+					if (data[i].isvalid == 0 ) {
+						$("#brand_option").append("<option value=" + data[i].id + ">" + data[i].name + "</option>");
+					} else {
+						$("#brand_option").append("<option value=" + data[i].id + " selected >" + data[i].name + "</option>");
+					}
+				}
+			}
+		});
 		var selector = $('#city-picker-selector').cityPicker({
 			dataJson: cityData,
 			renderMode: false
@@ -52,23 +67,6 @@
 		    fix: false, //不固定
 		    content: '${CPATH}/admin/department/department_tree'
 		});
-		jQuery.mm.initValidator('#form', validatorFields)
-	
-		$.ajax({
-		url:"${CPATH}/admin/seller/getBrand",
-		type:"post",
-		data:{"id":'${(seller.id)!}'},
-		dataType:"json",
-		success:function(data)
-		{
-			for (var i = 0; i < data.length; i++) {
-				if (data[i].isvalid == 0 ) {
-					$("#station_option").append("<option value=" + data[i].id + ">" + data[i].name + "</option>");
-				} else {
-					$("#station_option").append("<option value=" + data[i].id + " selected >" + data[i].name + "</option>");
-				}
-			}
-		}
 	});	
 		
 		jQuery.mm.initValidator('#form', validatorFields)
@@ -78,14 +76,14 @@
 	var validatorFields = {
 		'seller.seller_name': {
 			validators: {
-				notEmpty: { message: '经销商名称不能为空' },
-				stringLength: { max: 25, message: '经销商名称最大长度是25字符，请重新输入' }
+				notEmpty: { message: '销售商名称不能为空' },
+				stringLength: { max: 25, message: '销售商名称最大长度是25字符，请重新输入' }
 			}
 		},
 		'seller.seller_code': {
 			validators: {
-				notEmpty: { message: '经销商编码不能为空' },
-				stringLength: { max: 15, message: '经销商编码最大长度是15字符，请重新输入' }
+				notEmpty: { message: '销售商编码不能为空' },
+				stringLength: { max: 15, message: '销售商编码最大长度是15字符，请重新输入' }
 			}
 		},
 		'seller.contact': {
@@ -178,11 +176,6 @@
 				notEmpty: { message: '组织机构不能为空' },
 			}
 		},
-		'brand': {
-			validators: {
-	            notEmpty: { message: '产品不能为空' },
-	        }
-		}
 	};
 
 	function doSubmit(){
@@ -190,24 +183,12 @@
 		$("#userCityText").val($("select[name='userCityId']").find("option:selected").text()); 
 		$("#userDistrictText").val($("select[name='userDistrictId']").find("option:selected").text()); 
 		
-		var count = $("#station_option").select2("data").length;
-		var list = $("#station_option").select2("val");
+		var list = $("#brand_option").select2("val");
 		var ids = "";
 		if (list != null && list.length > 0) {
 			ids = list.toString();
 		}
-		var name = "";
-		for(var i=0;i<count;i++){
-			if($("station_option").selected = true)  
-			{
-				if (i == count-1) {
-					name = name + $("#station_option").select2("data")[i].text;
-					break;
-				}
-				name = name + $("#station_option").select2("data")[i].text + ",";
-			}  
-		}	
-		
+	
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
 				var validate = $form.data('bootstrapValidator');
@@ -215,6 +196,8 @@
 				return validate.isValid()
 			},
 			type : "post", 
+			data : {
+				"brandList":ids},
 			dataType : "json", 
 			success : function(data) { 
 				if(data.errorCode == 0) {
@@ -230,7 +213,6 @@
 		});
 	}
 </#macro>
-
 
 <@layout active_id=p child_active_id=c>
 
@@ -345,13 +327,6 @@
 							<label class="control-label col-sm-2">企业微信号ID2:</label>
 							<div class="input-group col-md-4 col-sm-10">
 								<input class="form-control input-sm" type="text" name="seller.jpwx_open_id" value="${(seller.jpwx_open_id)!}" placeholder="1-25个任意字母数字">
-							</div>
-						</div>
-						<div class="form-group col-sm-12 validata-box">
-							<label class="control-label col-sm-2">售卖的品牌:</label>
-							<div class="input-group col-md-4 col-sm-10">
-								<select class="form-control input-sm" name="seller" id="station_option" multiple="multiple" >
-								</select>
 							</div>
 						</div>
 						<div class="form-group col-sm-12 validata-box">
