@@ -191,8 +191,8 @@ public class JBaseModelGenerator extends BaseModelGenerator {
 //			ret.append(String.format(idGetterTemplate));
 //		} else {
 			String getterMethodName = "get" + StrKit.firstCharToUpperCase(columnMeta.attrName);
-		String getterOfModel = getGetterOfModel(columnMeta.javaType);
-			String getter = String.format(getterTemplate, columnMeta.javaType, getterMethodName,getterOfModel, columnMeta.name);
+//			String getterOfModel = getGetterOfModel(columnMeta.javaType);
+			String getter = String.format(getterTemplate, columnMeta.javaType, getterMethodName, columnMeta.name);
 			ret.append(getter);
 //		}
 	}

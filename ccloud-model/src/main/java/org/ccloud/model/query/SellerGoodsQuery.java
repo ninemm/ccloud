@@ -16,6 +16,7 @@
 package org.ccloud.model.query;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import org.ccloud.model.SellerGoods;
 import com.jfinal.plugin.activerecord.Page;
@@ -86,4 +87,13 @@ public class SellerGoodsQuery extends JBaseQuery {
 		
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
+	
+	public List<SellerGoods> findBySellerId(String sellId) {
+ 		StringBuilder fromBuilder = new StringBuilder("select cg.*,t1.valueName from cc_seller_goods cg ");
+		fromBuilder.append("LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
+		fromBuilder.append("RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = cg.product_id ");
+		fromBuilder.append("WHERE cg.seller_id = ? ");
+		return DAO.find(fromBuilder.toString(), sellId);
+	}
+	
 }

@@ -20,12 +20,12 @@ public class Generator {
 	public static void main(String[] args) {
 		
 		String modelPackage = "org.ccloud";
-		String outputPath = "D:/ccloud/";
+		String outputPath = "D:/ccloud/src/main/java/";
 		
-		String dbHost = "127.0.0.1";//外网开发数据库IP
+		String dbHost = "120.76.29.52";//外网开发数据库IP
 		String dbName = "ccloud_v2";
-		String dbUser = "root";
-		String dbPassword = "sys";
+		String dbUser = "qdy";
+		String dbPassword = "123@!QAZ";
 		
 		new JGenerator(outputPath, modelPackage, dbHost, dbName, dbUser, dbPassword).doGenerate();
 

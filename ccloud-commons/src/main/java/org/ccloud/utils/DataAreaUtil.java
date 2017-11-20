@@ -19,4 +19,13 @@ public class DataAreaUtil {
 		return deptDataArea;
 	}
 	
+	public static String getUserDealerDataArea(String userDataArea) {
+		if (userDataArea.length() >= 13) {
+			String dealerDataArea = userDataArea.substring(0,9);
+			return dealerDataArea;
+		} else {
+			return null;
+		}
+	}
+	
 }

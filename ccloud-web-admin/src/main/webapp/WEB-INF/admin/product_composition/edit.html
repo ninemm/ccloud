@@ -1,0 +1,367 @@
+<#include "../_inc/_layout.html"/>
+
+<#macro script_import>
+	<!-- bootstrapvalidator -->
+ 	<script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
+ 	<!--select2  -->
+ 	<script src="${CPATH}/static/plugins/select2/js/select2.js"></script>
+ 	
+</#macro>
+
+<#macro css_import>
+	<!-- bootstrapvalidator -->
+    <link rel="stylesheet" href="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.css">
+    <!-- select2 -->
+    <link rel="stylesheet" href="${CPATH}/static/plugins/select2/css/select2.css">
+</#macro>
+ 
+<#macro script>
+
+var $form = $("#form");
+
+$(function() {
+	
+	jQuery.mm.initValidator('#form', validatorFields)
+	initProduct();
+	<#if list?size = 0>
+		addNew();
+		addNew();
+	</#if>
+	
+	var $tbody = $("#dataTable" + " tbody");
+	<#list (list)! as list>
+		<#if list_index = 0>
+		    $tbody.find("#tr1>.text-left>.pro-slc2").select2({
+		       data:productOptionArr,
+		       width: "100%",
+		       language: "zh-CN"
+		    });	
+		$("#select_${list_index}").val(['${list.seller_product_id}']).trigger('change');
+	    $tbody.find("#tr1>.text-left>.pro-slc2").change(function(){
+	     var result = productMap[$(this).val()];   
+	     var cgoodsCode = result.id;
+	     var cgoodsName = result.customName;
+	     var cspecification = result.valueName;
+	     var $tr = $(this).parent().parent();
+	     $tr.find("td>#goodsCode").val(cgoodsCode);
+	     $tr.find("td>#goodsName").html(cgoodsName); 
+		 $tr.find("td>#specification").text(cspecification);
+	     });		
+		</#if>
+	</#list>
+	
+	<#list (list)! as list>
+	    $tbody.find("#tr${list_index+2}>.text-left>.pro-slc2").select2({
+	       data:productOptionArr,
+	       width: "100%",
+	       language: "zh-CN"
+	    });	
+	    $("#select_${list_index+1}").val(['${list.sub_seller_product_id}']).trigger('change');
+	    $tbody.find("#tr${list_index+2}>.text-left>.pro-slc2").change(function(){
+	     var result = productMap[$(this).val()];   
+	     var cgoodsCode = result.id;
+	     var cgoodsName = result.customName;
+	     var cspecification = result.valueName;
+	     var $tr = $(this).parent().parent();
+	     $tr.find("td>#goodsCode").val(cgoodsCode);
+	     $tr.find("td>#goodsName").html(cgoodsName); 
+		 $tr.find("td>#specification").text(cspecification);
+	     });
+		 var count = "productComposition[${list_index+1}].product_count";
+        $('#form').data('bootstrapValidator').addField(count,{
+               validators: {  
+                   notEmpty: {  
+                       message: '请输入商品数量'
+                   }  
+               }  
+        }); 	         
+	</#list>	
+	
+});
+
+var validatorFields = {
+};
+
+function doSubmit(){
+	$form.ajaxSubmit({
+		beforeSubmit: function() {
+			var validate = $form.data('bootstrapValidator');
+			validate.validate();
+			return validate.isValid();
+		},
+		type : "post", 
+		dataType : "json", 
+		success : function(data) { 
+			if (data.errorCode == 0) {
+				//location.reload();
+				toastr.success(data.message, '操作成功');
+			} else {
+				toastr.error(data.message,'操作失败');
+			}
+		},
+		error : function() {
+			alert("信息提交错误");
+		}
+	});
+}
+
+function initProduct(){
+         $.ajax({
+				url: "${CPATH}/admin/productComposition/getProductInfo",
+				dataType: "json",
+				async: false,
+				success: function(data) {
+					productList = data;
+					
+				}
+			});
+
+	if(productList) {
+			$.each(productList, function(idx, item) {
+				var option = {
+					id: item.id,
+					text: item.custom_name
+				}
+				productOptionArr.push(option);
+				productMap[item.id] = item;
+			});
+		}
+
+}
+
+<!--商品列表 -->
+var productList = new Array();
+var productOptionArr = new Array();
+var productMap = new Map();
+
+function removeTr(obj) {
+	$(obj).parent().parent().remove();
+}
+
+function deleteTr(obj){
+  $(obj).parent().parent().remove();
+  var id =$(obj).parent().parent().attr("id");
+  var delIndex = parseInt(id.substr(id.length-1,1))-1;
+  var countName = "productComposition["+ delIndex +"].product_count";
+  $('#form').data('bootstrapValidator').enableFieldValidators(countName, false);  
+}
+
+function addNew() {
+	addTr("#dataTable", productList, productOptionArr);
+}
+var index = 1;
+function addTr(tid, productList, optionArr) {
+	var firstProduct = productList[0];
+	var goodsCode = firstProduct.id;
+	var goodsName = firstProduct.customName;
+	var specification = firstProduct.valueName;
+
+	var $tbody = $(tid + " tbody"),
+	$tr = $tbody.find("tr:eq(0)"),
+	lastTrIdx = $tbody.find("tr:last").index(),
+	newTrIdx = lastTrIdx + 1,
+	trHtml = $tr.html();
+
+	$tbody.append("<tr id='tr" + newTrIdx + "'>" +trHtml+ "</tr>");
+    $tbody.find("tr:last>td>#goodsCode").attr("name","productComposition["+ lastTrIdx +"].id");
+    $tbody.find("tr:last>td>div>div>#stock").attr("name","productComposition["+ lastTrIdx +"].product_count");
+    $tbody.find("tr:last>td>#compositionId").attr("name","composition["+ lastTrIdx +"].id");
+    $tbody.find("tr:last>td>#goodsCode").val(goodsCode);
+    $tbody.find("tr:last>td>#specification").text(specification);
+    $tbody.find("tr:last>td>#factIndex").attr("value",lastTrIdx);
+    $tbody.find("tr:last").find(":input").attr("disabled",false);
+    
+    $tbody.find("tr:last>td>select.pro-slc2").select2({
+       data:optionArr,
+       width: "100%",
+       language: "zh-CN"
+    });
+
+    $tbody.find("tr:last>td>.hide").text($tbody.find("tr:last>td>select").find("option:selected").val());
+    $tbody.find("tr:last>td>select>pro-slc2").focus();
+    
+    if (lastTrIdx == 0) {
+    	$tbody.find("#tr1>.text-right:first-child").prepend("主商品&nbsp;");
+    	$tbody.find("#tr1>.text-center:last-child>div>div>input").attr("disabled","disabled");
+    	$tbody.find("#tr1>.text-right>a").remove();
+    } else {
+		var count = "productComposition["+ lastTrIdx +"].product_count";
+        $('#form').data('bootstrapValidator').addField(count,{
+               validators: {  
+                   notEmpty: {  
+                       message: '请输入商品数量'
+                   }  
+               }  
+        });    
+    }
+    
+    if (lastTrIdx == 1) {
+    	$tbody.find("#tr2>.text-right>a").remove();
+    }
+
+    <!--添加商品的移除-->
+    $tbody.find("tr:last>td>.removeTr").click(function(){
+      var delIndex = newTrIdx - 1;
+      var countName = "productComposition["+ delIndex +"].product_count";
+      $('#form').data('bootstrapValidator').enableFieldValidators(countName, false);
+	  $("#tr" + newTrIdx).remove();
+	});
+    
+    <!--切换商品的方法  -->
+    $tbody.find("tr:last>td>select.pro-slc2").change(function(){
+     var result = productMap[$(this).val()];   
+     var cgoodsCode = result.id;
+     var cgoodsName = result.customName;
+     var cspecification = result.valueName;
+     var $tr = $(this).parent().parent();
+     $tr.find("td>#goodsCode").val(cgoodsCode);
+     $tr.find("td>#goodsName").html(cgoodsName); 
+	 $tr.find("td>#specification").text(cspecification);
+     });  
+}
+
+</#macro>
+
+<@layout active_id=p child_active_id=c>
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+	<h1><#if (list) ??>修改<#else>新增</#if>组合商品</h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+       	<li><a href="#">组合商品管理</a></li>
+       	<li class="active"><#if (list) ??>修改<#else>新增</#if>组合商品</li>
+	</ol>
+</section>
+<!-- Main content -->
+<section class="content">
+	<div class="box box-default">
+		<div class="box-header with-border">
+			<h3 class="box-title">组合商品</h3>
+			<div class="box-tools">
+				<button type="button" class="btn btn-box-tool"
+					data-widget="collapse">
+					<i class="fa fa-minus"></i>
+				</button>
+			</div>
+		</div>
+		<form action="${CPATH}/admin/productComposition/save" method="post" id="form"
+			class="form-horizontal">
+			<input type="hidden" name="ucode" value="${(ucode)!}">
+			<input type="hidden" name="parentId" value="${(parentId)!}">
+			<div class="box-body">
+				<div style="padding: 5px; clear: both;">
+					<table id="dataTable" class="table table-striped table-bordered"
+						width="100%">
+						<thead>
+							<tr>
+								<th class="col-sm-1 center">操作</th>
+								<th class="col-sm-2 center">商品名称</th>
+								<th class="col-sm-1 center">规格</th>
+								<th class="col-sm-1 center">子商品数量</th>
+							</tr>
+						</thead>
+						<tbody id="sProdBody">
+							<tr class="hide-always hide">
+								<td class="center text-right"><a
+									class="btn btn-danger btn-xs removeTr" data-toggle="modal"
+									data-target="#deleteBackProModal"><span
+										class="glyphicon glyphicon-remove"></span></a></td>
+								<td class="text-left"><input type="hidden" id="goodsCode"
+									name="productComposition[-1].id" disabled="true" />
+									<input type="hidden" id="compositionId"
+									name="composition[-1].id" disabled="true" /> <input
+									type="hidden" id="factIndex" name="factIndex" value="-1" /> <select
+									class="pro-slc2">
+								</select></td>
+								<td class="text-center"><span class="specification"
+									id="specification"></span></td>
+								<td class="text-center">
+								<div class="form-group validata-box" style="margin: 0;">
+								<div class="input-group col-md-4 col-sm-10">
+									<input type="text" id="stock"
+									class="stock" name="productComposition[-1].product_count"
+									disabled="disabled" />									
+								</div>								
+								</td>									
+							</tr>
+							<#list (list)! as list>
+							<#if list_index = 0>
+							<tr id="tr${list_index+1}">
+								<td class="center text-right">主商品&nbsp;</td>
+								<td class="text-left"><input type="hidden" id="goodsCode"
+									name="productComposition[${list_index}].id"
+									value="${list.seller_product_id}" /> <input type="hidden" id="compositionId"
+									name="composition[${list_index}].id" value=""/> <input
+									type="hidden" id="factIndex" name="factIndex"
+									value="${list_index}" /> <select
+									class="pro-slc2" id="select_${list_index}">
+								</select></td>
+								<td class="text-center"><span class="specification"
+									id="specification">${list.product_sp!}</span></td>								
+								<td class="text-center">
+								<div class="form-group validata-box" style="margin: 0;">
+								<div class="input-group col-md-4 col-sm-10">								
+								<input type="text" id="stock"
+									class="stock"
+									name="productComposition[${list_index}].product_count"
+									value="" disabled="true"/></div></td>										
+							</tr>
+							</#if>
+							</#list>
+							<#list (list)! as list>
+							<tr id="tr${list_index+2}">
+								<#if list_index = 0>
+								<td class="center text-right"></td>
+								<#else>
+								<td class="center text-right"><a
+									class="btn btn-danger btn-xs removeTr" data-toggle="modal"
+									data-target="#deleteBackProModal" onclick="deleteTr(this)"><span
+										class="glyphicon glyphicon-remove"></span></a></td>								
+								</#if>
+								<td class="text-left"><input type="hidden" id="goodsCode"
+									name="productComposition[${list_index+1}].id"
+									value="${list.sub_seller_product_id}" /> <input type="hidden" id="compositionId"
+									name="composition[${list_index+1}].id" value="${list.id}"/> <input
+									type="hidden" id="factIndex" name="factIndex"
+									value="${list_index+1}" /> <select
+									class="pro-slc2" id="select_${list_index+1}">
+								</select></td>
+								<td class="text-center"><span class="specification"
+									id="specification">${list.sub_product_sp!}</span></td>
+								<td class="text-center">
+								<div class="form-group validata-box" style="margin: 0;">
+								<div class="input-group col-md-4 col-sm-10">								
+								<input type="text" id="stock"
+									class="stock"
+									name="productComposition[${list_index+1}].product_count"
+									value="${list.sub_product_count}" />
+								</div>
+								</td>
+							</tr>															
+							</#list>
+						</tbody>
+						<tfoot>
+							<tr>
+								<td colspan="6">
+									<button id="btnAddProd" type="button"
+										class="btn btn-xs btn-info" style="width: 80px;"
+										onclick="addNew()">添加商品</button>
+								</td>
+							</tr>
+						</tfoot>
+					</table>
+				</div>
+			</div>
+
+			<div class="box-footer">
+				<button type="button" onclick="doSubmit()" class="btn btn-primary">保存更改</button>
+				<input type="button" class="btn btn-primary"
+					onclick="javascript:window.location.href='index'" value="返  回"
+					hidefocus="true" />
+			</div>
+		</form>
+	</div>
+</section>
+
+</@layout>

@@ -15,6 +15,8 @@
  */
 package org.ccloud.controller.admin;
 
+import java.util.List;
+
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.subject.Subject;
@@ -25,7 +27,9 @@ import org.ccloud.interceptor.AdminInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
+import org.ccloud.model.Seller;
 import org.ccloud.model.User;
+import org.ccloud.model.query.SellerQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.shiro.CaptchaUsernamePasswordToken;
@@ -87,8 +91,12 @@ public class _AdminController extends JBaseController {
 	        User user = (User) subject.getPrincipal();
 			if (user != null) {
 				String dataArea = DataAreaUtil.getUserDeptDataArea(user.getDataArea());
+				String dealerDataArea = DataAreaUtil.getUserDealerDataArea(user.getDataArea());
+				List<Seller> sellerList = SellerQuery.me().querySellIdByUser(user.getDepartmentId());
 				setSessionAttr("DeptDataAreaLike", dataArea + "%");
 				setSessionAttr("DeptDataArea", dataArea);
+				setSessionAttr("sellerList", sellerList);
+				setSessionAttr("dealerDataArea", dealerDataArea);
 			}
 			MessageKit.sendMessage(Actions.USER_LOGINED, user);
 			CookieUtils.put(this, Consts.COOKIE_LOGINED_USER, user.getId().toString());
