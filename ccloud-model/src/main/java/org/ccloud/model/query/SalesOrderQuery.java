@@ -16,6 +16,7 @@
 package org.ccloud.model.query;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import org.ccloud.model.SalesOrder;
 
@@ -77,6 +78,56 @@ public class SalesOrderQuery extends JBaseQuery {
 
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
+
+	public List<Record> findProductListBySeller(String sellerId) {
+		StringBuilder fromBuilder = new StringBuilder(
+				" SELECT sg.product_id, sg.custom_name, sg.store_count, sg.price, GROUP_CONCAT(gsv.name) AS spe_name, p.big_unit, p.small_unit, p.convert_relate ");
+		fromBuilder.append(" FROM cc_seller_goods sg ");
+		fromBuilder.append(" LEFT JOIN cc_product p ON sg.product_id = p.id ");
+		fromBuilder
+				.append(" LEFT JOIN cc_product_goods_specification_value pgsv ON sg.product_id = pgsv.product_set_id ");
+		fromBuilder.append(
+				" LEFT JOIN cc_goods_specification_value gsv ON pgsv.goods_specification_value_set_id = gsv.goods_specification_id ");
+		fromBuilder.append(" WHERE sg.is_enable = 1 ");
+
+		LinkedList<Object> params = new LinkedList<Object>();
+		appendIfNotEmpty(fromBuilder, "sg.seller_id", sellerId, params, false);
+
+		fromBuilder.append(" GROUP BY sg.product_id ");
+		fromBuilder.append(" ORDER BY sg.order_list ");
+
+		return Db.find(fromBuilder.toString(), params.toArray());
+	}
+
+	public List<Record> findCustomerListByUser(String userId) {
+		StringBuilder fromBuilder = new StringBuilder(
+				" select c.id, c.customer_name, c.contact, c.mobile, c.prov_name, c.city_name, c.country_name, c.address ");
+		fromBuilder.append(" from `cc_customer` c ");
+		fromBuilder.append(" JOIN cc_user_join_customer ujc ON c.id = ujc.customer_id ");
+		fromBuilder.append(" WHERE c.customer_kind = '1' ");
+		fromBuilder.append(" AND c.is_enabled = 1 ");
+
+		LinkedList<Object> params = new LinkedList<Object>();
+		appendIfNotEmpty(fromBuilder, "ujc.user_id", userId, params, false);
+
+		fromBuilder.append(" order by c.create_date ");
+		
+		return Db.find(fromBuilder.toString(), params.toArray());
+	}
+	
+	public List<Record> findCustomerTypeListByCustomerId(String customerId, String dataArea) {
+		LinkedList<Object> params = new LinkedList<Object>();
+
+		StringBuilder sqlBuilder = new StringBuilder("select c.id , c.name ");
+		sqlBuilder.append(" from `cc_customer_join_customer_type` cj ");
+		sqlBuilder.append(" join `cc_customer_type` c on cj.customer_type_id = c.id ");
+		sqlBuilder.append(" where c.is_show = 1 ");
+		appendIfNotEmpty(sqlBuilder, "cj.customer_id", customerId, params, false);
+		appendIfNotEmpty(sqlBuilder, "c.data_area", dataArea, params, false);
+
+		return Db.find(sqlBuilder.toString(), params.toArray());
+	}
+
 
 	public int batchDelete(String... ids) {
 		if (ids != null && ids.length > 0) {

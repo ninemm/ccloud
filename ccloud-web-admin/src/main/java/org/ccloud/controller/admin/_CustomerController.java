@@ -154,8 +154,8 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 
 		if (notBlank) {// 超级管理员修改
 			setAttr("customer", CustomerQuery.me().findById(id));
-			setAttr("cTypeList",
-					CustomerJoinCustomerTypeQuery.me().findCustomerTypeListByCustomerId(id, deptId, dataArea));
+			setAttr("cTypeList", CustomerJoinCustomerTypeQuery.me().findCustomerTypeListByCustomerId(id,
+					DataAreaUtil.getUserDealerDataArea(dataArea)));
 
 			if (isSuperAdmin || isDealerAdmin) {
 				List<Record> list = UserJoinCustomerQuery.me().findUserListByCustomerId(id, deptId, dataArea);
@@ -175,7 +175,8 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 		}
 
 		if (!isSuperAdmin) {
-			setAttr("customerTypeList", CustomerTypeQuery.me().findCustomerTypeList(deptId, dataArea));
+			setAttr("customerTypeList",
+					CustomerTypeQuery.me().findCustomerTypeList(DataAreaUtil.getUserDealerDataArea(dataArea)));
 		}
 
 		render("edit.html");
@@ -290,21 +291,26 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 
 	}
 
-	@RequiresPermissions(value = { "/admin/customer/uploading", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
+	@RequiresPermissions(value = { "/admin/customer/uploading", "/admin/dealer/all",
+			"/admin/all" }, logical = Logical.OR)
 	public void upload() {
 
 		render("upload.html");
 	}
 
-	@RequiresPermissions(value = { "/admin/customer/uploading", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
+	@RequiresPermissions(value = { "/admin/customer/uploading", "/admin/dealer/all",
+			"/admin/all" }, logical = Logical.OR)
 	public void customerTemplate() {
 		String realPath = getSession().getServletContext().getRealPath("\\");
 		renderFile(new File(realPath + "\\WEB-INF\\admin\\customer\\customerTemplate.xlsx"));
 	}
 
 	@Before(Tx.class)
-	@RequiresPermissions(value = { "/admin/customer/uploading", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
+	@RequiresPermissions(value = { "/admin/customer/uploading", "/admin/dealer/all",
+			"/admin/all" }, logical = Logical.OR)
 	public void uploading() {
+
+		User user = getSessionAttr("user");
 
 		File file = getFile().getFile();
 		String userId = getPara("userIds");
@@ -316,7 +322,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 			String customerId = StrKit.getRandomUUID();
 
 			this.insertCustomer(customerId, excel);
-			this.insertCustomerJoinCustomerType(customerId, excel);
+			this.insertCustomerJoinCustomerType(customerId, excel, user);
 			this.insertUserJoinCustomer(customerId, userId);
 
 		}
@@ -340,11 +346,13 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 		customer.save();
 	}
 
-	private void insertCustomerJoinCustomerType(String customerId, CustomerExcel excel) {
+	private void insertCustomerJoinCustomerType(String customerId, CustomerExcel excel, User user) {
+
 		String customerTypeName = excel.getCustomerTypeName();
 		String[] customerTypeNames = customerTypeName.split(",");
 		for (String typeName : customerTypeNames) {
-			String id = CustomerTypeQuery.me().findIdByName(typeName);
+			String id = CustomerTypeQuery.me().findIdByName(typeName,
+					DataAreaUtil.getUserDealerDataArea(user.getDataArea()));
 			CustomerJoinCustomerTypeQuery.me().insert(customerId, id);
 		}
 	}
