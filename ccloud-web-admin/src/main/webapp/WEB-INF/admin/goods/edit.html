@@ -30,6 +30,52 @@ var $form = $("#form");
 $(function() {
 	
 	jQuery.mm.initValidator('#form', validatorFields)
+	<#list (pList)! as list>
+		var productSn = 'productList[' + ${list_index} + '].productSn';
+		var price = 'productList[' + ${list_index} + '].price';
+		var cost = 'productList[' + ${list_index} + '].cost';
+		var marketPrice = 'productList[' + ${list_index} + '].marketPrice';
+        $('#form').data('bootstrapValidator').addField(productSn,{
+               validators: {  
+                   notEmpty: {  
+                       message: '请输入商品货号'
+                   }  
+               }  
+        });
+        $('#form').data('bootstrapValidator').addField(price,{
+               validators: {  
+                   notEmpty: {  
+                       message: '请输入商品销售价'
+                   },
+                   regexp: {
+					    regexp: /^[0-9\.]+$/,
+					    message: '请输入正确的数字'
+				   }
+               }  
+        });
+        $('#form').data('bootstrapValidator').addField(cost,{
+               validators: {  
+                   notEmpty: {  
+                       message: '请输入商品成本价'
+                   },
+                   regexp: {
+					    regexp: /^[0-9\.]+$/,
+					    message: '请输入正确的数字'
+				   }
+               }  
+        });
+        $('#form').data('bootstrapValidator').addField(marketPrice,{
+               validators: {  
+                   notEmpty: {  
+                       message: '请输入商品市场价'
+                   },
+                   regexp: {
+					    regexp: /^[0-9\.]+$/,
+					    message: '请输入正确的数字'
+				   }
+               }  
+        });		
+	</#list>
 	
 	$('#_category_tree').click(function() {
 		var brandId = $("#brand_id").find("option:selected").val();
@@ -329,6 +375,14 @@ $(function() {
 			if(goodsSpecificationValueSelectedDatas[index] != null) {
 				goodsSpecificationValueSelectedDatas[index] = null;
 			}
+			var productSn = 'productList[' + index + '].productSn';
+			var price = 'productList[' + index + '].price';
+			var cost = 'productList[' + index + '].cost';
+			var marketPrice = 'productList[' + index + '].marketPrice';
+   			$("form").bootstrapValidator('removeField',productSn);
+   			$("form").bootstrapValidator('removeField',price); 
+   			$("form").bootstrapValidator('removeField',cost); 
+   			$("form").bootstrapValidator('removeField',marketPrice); 
 			showOrHideGoodsInput();
 		}
 	});	
@@ -775,7 +829,10 @@ function doSubmit(){
 											<tr class="{index: ${list_index}}">
 												<td>
 													<input type="hidden" name="productList[${list_index}].id" value="${list.id}" />
+													<div class="form-group validata-box" style="margin: 0;">
+													<div class="input-group col-md-4 col-sm-10">													
 													<input type="text" name="productList[${list_index}].productSn" class="formText" style="width: 50px;" value="${list.productSn}" />
+													</div>
 												</td>
 												<#list (goods.specificationList)! as goodsSpecification>
 													<td class="${goodsSpecification.id}">
@@ -811,13 +868,22 @@ function doSubmit(){
 													</td>
 												</#list>
 												<td class="goodsSpecificationInsertTd">
+												<div class="form-group validata-box" style="margin: 0;">
+												<div class="input-group col-md-4 col-sm-10">												
 													<input type="text" name="productList[${list_index}].price" class="formText {required: true, min: 0, messages: {required: '货品销售价信息不完整!', min: '货品销售价不允许小于0!'}}" style="width: 50px;" value="${list.price}" />
+												</div>
 												</td>
 												<td>
+												<div class="form-group validata-box" style="margin: 0;">
+												<div class="input-group col-md-4 col-sm-10">												
 													<input type="text" name="productList[${list_index}].cost" class="formText {min: 0, messages: {min: '货品成本价信息不允许小于0!'}}" style="width: 50px;" value="${list.cost}" />
+												</div>
 												</td>
 												<td>
+												<div class="form-group validata-box" style="margin: 0;">
+												<div class="input-group col-md-4 col-sm-10">												
 													<input type="text" name="productList[${list_index}].marketPrice" class="formText {required: true, min: 0, messages: {required: '货品市场价信息不完整!', min: '货品市场价不允许小于0!'}}" style="width: 50px;" value="${list.marketPrice}" />
+												</div>	
 												</td>
 												<td>
 													<input type="text" name="productList[${list_index}].weight" class="formText {required: true, min: 0, messages: {required: '货品重量信息不完整!', min: '货品重量不允许小于0!'}}" style="width: 30px;" value="${(list.weight)!}" />

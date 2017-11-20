@@ -63,26 +63,41 @@
 					</tr>
 				</thead>
 				<tbody>
-					<#list systemList as bean>
-					<tr class="jp-onmouse">
-						<td rowspan="${bean.operationCount + (bean.list)?size + 1}" class="zh">${bean.name!}</td>
-					</tr>
-						<#list bean.list as parent>
-						<tr class="jp-onmouse">
-							<td rowspan="${(parent.list?size)+1}" class="zh">${parent.name!}</td>
-						</tr>
-							<#list parent.list as module>
-								<tr>
-									<td rowspan="1">${module.moduleName!}</td>
-									<td>
-									<#list module.list as operation>
+					<#list moduleList as bean>
+					    <#if bean.systemName??>  
+					    	<tr>
+						        <td rowspan="${bean.systemRowSpan}" class="zh">${bean.systemName}</td>
+						        <td rowspan="${bean.parentRowSpan}" class="zh">${bean.parentModuleName}</td>
+						        <td>${bean.moduleName}</td>
+						        <td>
+									<#list bean.list as operation>
 										<input type="checkbox" name="operationList" id="operaionList" <#if operation.isChecked == 1>checked</#if> value='${operation.operationCode!}' onchange="changeCheckbox(this)">
 										${operation.operationName!}
 									</#list>
-									</td>									
-								</tr>
-							</#list>							
-						</#list>			
+						        </td>
+					    	</tr>
+					    <#elseif bean.parentModuleName??>  
+					    	<tr>
+						        <td rowspan="${bean.parentRowSpan}" class="zh">${bean.parentModuleName}</td>
+						        <td>${bean.moduleName}</td>
+						        <td>
+									<#list bean.list as operation>
+										<input type="checkbox" name="operationList" id="operaionList" <#if operation.isChecked == 1>checked</#if> value='${operation.operationCode!}' onchange="changeCheckbox(this)">
+										${operation.operationName!}
+									</#list>
+						        </td>
+					    	</tr>					    
+					    <#else>  
+					    	<tr>
+						        <td>${bean.moduleName}</td>
+						        <td>
+									<#list bean.list as operation>
+										<input type="checkbox" name="operationList" id="operaionList" <#if operation.isChecked == 1>checked</#if> value='${operation.operationCode!}' onchange="changeCheckbox(this)">
+										${operation.operationName!}
+									</#list>
+						        </td>
+					    	</tr>					        
+					    </#if>  											
 					</#list>
 				</tbody>
 			</table>
