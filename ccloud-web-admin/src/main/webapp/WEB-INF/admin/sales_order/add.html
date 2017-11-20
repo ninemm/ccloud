@@ -1,0 +1,412 @@
+<#include "../_inc/_layout.html"/>
+
+<#macro script_import>
+	<!-- bootstrapvalidator -->
+	<script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
+	<!--select2  -->
+	<script src="${CPATH}/static/plugins/select2/js/select2.js"></script>
+	<!-- bootstrap-datetimepicker -->
+	<script src="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.min.js"></script>
+	<script src="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.zh-CN.js"></script>
+</#macro>
+
+<#macro css_import>
+	<!-- bootstrapvalidator -->
+	<link rel="stylesheet" href="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.css">
+	<!-- select2 -->
+	<link rel="stylesheet" href="${CPATH}/static/plugins/select2/css/select2.css">
+	<!-- bootstrap-datetimepicker -->
+	<link rel="stylesheet" href="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.min.css">
+</#macro>
+
+<#macro script>
+	$(function() {
+		addProduct();
+		initCustomer();
+		jQuery.mm.initDatetimepicker('form', '#deliveryDate', 'deliveryDate', 'yyyy-MM-dd', 2, 4, 2);
+		jQuery.mm.initValidator('#form', validatorFields);
+	});
+
+	var $form = $("#form");
+	var productInfoMap = ${productInfoMap!}
+	var productOptionList = ${productOptionList!}
+	var customerInfoMap = ${customerInfoMap!}
+	var customerOptionList = ${customerOptionList!}
+	
+	var validatorFields = {
+		'bigPrice': {
+			validators: {
+				notEmpty: { message: '价格不能为空' },
+				regexp:{regexp:/^[0-9]+(.[0-9]{1,3})?$/, message:'请输入正确的价格' }
+			}
+		},
+		'bigNum': {
+			validators: {
+				notEmpty: { message: '数量不能为空' },
+				regexp:{regexp:/^[0-9]\d*$/, message:'请输入正确的数量' }
+			}
+		},
+		'smallPrice': {
+			validators: {
+				notEmpty: { message: '价格不能为空' },
+				regexp:{regexp:/^[0-9]+(.[0-9]{1,3})?$/, message:'请输入正确的价格' }
+			}
+		},
+		'smallNum': {
+			validators: {
+				notEmpty: { message: '数量不能为空' },
+				regexp:{regexp:/^[0-9]\d*$/, message:'请输入正确的数量' }
+			}
+		},
+		'deliveryAddress': {
+			validators: {
+				notEmpty: { message: '配送地址不能为空' },
+				stringLength: { max: 50, message: '配送地址最大长度是50字符，请重新输入' }
+			}
+		},
+		'deliveryDate': {
+			validators: {
+				date : { format : 'YYYY-MM-DD', message : '日期格式不正确' }
+			}
+		}
+	};
+
+	function addProduct(){
+
+		var $tbody = $("#table tbody");
+
+		var newTrHtml = $tbody.find("tr:first").html();
+		var newTrIdx = $tbody.find("tr:last").index() + 1;
+		$tbody.append("<tr id='tr" + newTrIdx + "'>" + newTrHtml + "</tr>");
+
+		$tbody.find("tr:last #row").text(newTrIdx);
+		var $productSelect = $tbody.find("tr:last #productId")
+
+		$productSelect.select2({
+			data: productOptionList,
+			width: "100%",
+			language: "zh-CN"
+		});
+
+		<!--切换商品的方法  -->
+		$productSelect.change(function(){
+			productChange($(this));
+		});
+
+		<!--触发一次 -->
+		productChange($productSelect);
+		
+	}
+	
+	function productChange(obj){
+			var product = productInfoMap[obj.val()].columns;
+
+			var $tr = obj.parent().parent();
+
+			$tr.find("#specification").text(product.spe_name);
+			$tr.find("#stock").text(product.store_count);
+
+			var convert = product.convert_relate;
+			$tr.find("#convert").val(convert);
+
+			var smallPrice = product.price;
+			var smallUnit = product.small_unit;
+
+			var bigPrice = smallPrice*convert;
+	
+			$tr.find("#bigPrice").val(bigPrice);
+			$tr.find("#bigPrice-span").text(bigPrice);
+			$tr.find("#bigUnit-span").text(product.big_unit + "(x" + convert + smallUnit + ")");
+			
+			$tr.find("#smallPrice").val(product.price);
+			$tr.find("#smallPrice-span").text(product.price);
+			$tr.find("#smallUnit-span").text(smallUnit);
+			
+			rowTotal(obj);
+	}
+	
+	function deleteTr(obj){
+		$(obj).parent().parent().remove();
+		total();
+	}
+	
+	function initCustomer(){
+		var $customerSelect = $("#customerId");
+
+		$customerSelect.select2({
+			data: customerOptionList,
+			width: "100%",
+			language: "zh-CN"
+		});
+		
+		<!--切换客户的方法  -->
+		$customerSelect.change(function(){
+			customerChange($(this));
+		});
+
+		<!--触发一次 -->
+		customerChange($customerSelect);
+	
+	}
+
+	function customerChange(obj){
+		var customer = customerInfoMap[obj.val()].columns;
+
+		$("#contact").val(customer.contact);
+		$("#mobile").val(customer.mobile);
+
+		var address = customer.prov_name + customer.city_name + customer.country_name + " " + customer.address
+		$("#address").val(address);
+		$("#deliveryAddress").val(address);
+		
+		var $customerSelect = $("#customerId");
+		
+		$.post('${CPATH}/admin/salesOrder/customerTypeById', { customerId: $("#customerId").val() },
+			function(data){
+				var $customerTypeSelect = $("#customerType");
+				$customerTypeSelect.empty();
+				$.each(data, function(index, obj){
+					$customerTypeSelect.append("<option value='" + obj.id + "'>" + obj.name + "</option>");
+				});
+			}
+		);
+
+	}
+	
+	function changeBigPrice(obj){
+		var $curTr = $(obj).parent().parent();
+		var bigPrice = $(obj).val();
+		var convert = $curTr.find("#convert").val();
+
+		var smallPrice = (bigPrice / convert).toFixed(2);
+		$curTr.find("#smallPrice").val(smallPrice);
+
+		rowTotal(obj);
+	}
+
+	function changeSmallPrice(obj){
+		var $curTr = $(obj).parent().parent();
+		var smallPrice = $(obj).val();
+		var convert = $curTr.find("#convert").val();
+
+		var bigPrice = (smallPrice * convert).toFixed(2);
+		$curTr.find("#bigPrice").val(bigPrice);
+
+		rowTotal(obj);
+	}
+
+	function rowTotal(obj){
+		var $curTr = $(obj).parent().parent();
+		var rowTotal = 0;
+
+		var isCheck = $curTr.find("input[type='checkbox']").is(':checked');
+		if (!isCheck) {
+			var bigPrice = $curTr.find("#bigPrice").val();
+			var bigNum = $curTr.find("#bigNum").val();
+			var smallPrice = $curTr.find("#smallPrice").val();
+			var smallNum = $curTr.find("#smallNum").val();
+			rowTotal = Number(bigPrice) * Number(bigNum) + Number(smallPrice) * Number(smallNum);
+			rowTotal.toFixed(2);
+		}
+		$curTr.find(".rowTotal").text(rowTotal);
+
+		total();
+	}
+
+	function total() {
+		var rows = $(".rowTotal");
+		var total = 0;
+		$.each(rows, function(index, item) {
+			total += Number($(item).text());
+		});
+		total.toFixed(2);
+		$("#total").text(total);
+	}
+
+	function doSubmit(){
+		$form.ajaxSubmit({
+			beforeSubmit: function() {
+				var validate = $form.data('bootstrapValidator');
+				validate.validate();
+				return validate.isValid();
+			},
+			type : "post", 
+			dataType : "json", 
+			success : function(data) { 
+				if (data.errorCode == 0) {
+					//location.reload();
+					toastr.success(data.message, '操作成功');
+				} else {
+					toastr.error(data.message,'操作失败');
+				}
+			},
+			error : function() {
+				alert("信息提交错误");
+			}
+		});
+	}
+</#macro>
+
+<@layout active_id=p child_active_id=c>
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+	<h1>新增订货单</h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+		<li><a href="#">订单管理</a></li>
+		<li class="active">新增订货单</li>
+	</ol>
+</section>
+<!-- Main content -->
+<section class="content">
+	<div class="box box-default">
+		<div class="box-header with-border">
+			<h3 class="box-title">价格体系信息</h3>
+			<div class="box-tools">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse">
+					<i class="fa fa-minus"></i>
+				</button>
+			</div>
+		</div>
+		<form action="${CPATH}/admin/salesOrder/save" method="post" id="form" class="form-horizontal" >
+			<div class="box-body">
+				<table id="table" class="table table-bordered table-hover text-center" width="100%">
+					<thead>
+						<tr>
+							<th width="2%"></th>
+							<th width="5%">序号</th>
+							<th width="20%">商品名称</th>
+							<th width="8%">规格</th>
+							<th width="8%">库存</th>
+							<th width="23%">大单位数量</th>
+							<th width="22%">小单位数量</th>
+							<th width="5%">赠品</th>
+							<th width="7%">小计</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="hide">
+							<td>
+								<a class="btn btn-danger btn-xs" onclick="deleteTr(this)"><span class="glyphicon glyphicon-remove"></span></a>
+							</td>
+							<td>
+								<span id="row">1</span>
+							</td>
+							<td>
+								<select id="productId" name="productId" class="form-control">
+								</select>
+							</td>
+							
+							<td>
+								<span id="stock"></span>
+							</td>
+							<td>
+								<span id="specification"></span>
+							</td>
+							<td>
+							<input type="hidden" id="convert" value="" />
+								<div class = "validata-box">
+									￥<input type="text" id="bigPrice" name="bigPrice" style="width: 20%" onblur="changeBigPrice(this)" value="0"  />
+									(<span id="bigPrice-span"></span>) X
+									<input type="text" id="bigNum" name="bigNum" style="width: 20%" onblur="rowTotal(this)" value="1" />
+									<span id="bigUnit-span"></span>
+								</div>
+							</td>
+							<td>
+								<div class = "validata-box">
+									￥<input type="text" id="smallPrice" name="smallPrice" style="width: 20%" onblur="changeSmallPrice(this)" value="0"/>
+									(<span id="smallPrice-span"></span>) X
+									<input type="text" id="smallNum" name="smallNum" style="width: 20%" onblur="rowTotal(this)" value="0" />
+									<span id="smallUnit-span"></span>
+								</div>
+							</td>
+							<td>
+								<input type="checkbox" id="isGift" name="isGift" onclick="rowTotal(this)"/>
+							</td>
+							<td>￥<span class="rowTotal">0</span></td>
+						</tr>
+					</tbody>
+					<tfoot>
+						<tr>
+							<td>
+								<button class="btn btn-xs btn-info" onclick="addProduct()" ><span class="glyphicon glyphicon-plus"></span></button>
+							</td>
+							<th colspan="7" style="text-align:right">合计:</th>
+							<th>￥<span id="total">0</span></th>
+						</tr>
+					</tfoot>
+				</table>
+
+				<div class="form-group col-sm-12"></div>
+
+				<div id="customer">
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">*客户名称:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<select id="customerId" name="customerId" class="form-control">
+							</select>
+							<button id="addCustomer" class="form-control btn btn-sm ">添加客户</button>
+						</div>
+					</div>
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">*联系人:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<input class="form-control input-sm" type="text" id="contact" name="contact" value="" readonly>
+						</div>
+					</div>
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">*手机号:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<input class="form-control input-sm" type="text" id="mobile" name="mobile" value="" readonly>
+						</div>
+					</div>
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">*客户类型:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<select id="customerType" name="customerType" class="form-control">
+							</select>
+						</div>
+					</div>
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">*配送地址:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<input  type="hidden" id="address" name="address" value="" >
+							<input class="form-control input-sm" type="text" id="deliveryAddress" name="deliveryAddress" value="" placeholder="1-50个任意字母数字">
+						</div>
+					</div>
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">*配送时间:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<input class="form-control input-sm" type="text" id="deliveryDate" name="deliveryDate" value="${deliveryDate!}"  >
+						</div>
+					</div>
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">收款方式:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<label class="radio-inline">
+								<input type="radio" name="receiveType" value="1" checked>现结
+							</label>
+							<label class="radio-inline">
+								<input class="minimal" type="radio" name="receiveType" value="0" >应收账款
+							</label>
+						</div>
+					</div>
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">备注:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<textarea class="form-control input-sm" id="remark" name="remark" type="text" ></textarea>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="box-footer"> 
+				<button type="button" onclick="doSubmit()" class="btn btn-primary">提交订单</button>
+				<input type="button" class="btn btn-primary" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
+			</div>
+		</form>
+	</div>
+</section>
+
+</@layout>

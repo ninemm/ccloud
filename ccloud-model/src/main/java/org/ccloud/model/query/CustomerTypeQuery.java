@@ -86,21 +86,28 @@ public class CustomerTypeQuery extends JBaseQuery {
 		return ccCustomerType.saveOrUpdate();
 	}
 
-	public List<Record> findCustomerTypeList(String deptId, String dataArea) {
+	public List<Record> findCustomerTypeList(String dataArea) {
 		LinkedList<Object> params = new LinkedList<Object>();
 
 		StringBuilder sqlBuilder = new StringBuilder(" select c.id, c.name ");
 		sqlBuilder.append(" from `cc_customer_type` c ");
 		sqlBuilder.append(" where c.is_show = 1 ");
-		appendIfNotEmpty(sqlBuilder, "c.dept_id", deptId, params, false);
 		appendIfNotEmptyWithLike(sqlBuilder, "c.data_area", dataArea, params, false);
 		sqlBuilder.append(" order by c.create_date ");
 
 		return Db.find(sqlBuilder.toString(), params.toArray());
 	}
 
-	public String findIdByName(String name) {
-		return Db.queryStr("select id from cc_customer_type where name = ?", name);
+	public String findIdByName(String name, String dataArea) {
+		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
+
+		StringBuilder sqlBuilder = new StringBuilder(" select c.id ");
+		sqlBuilder.append(" from `cc_customer_type` c ");
+		needWhere = appendIfNotEmpty(sqlBuilder, "c.name", name, params, needWhere);
+		needWhere = appendIfNotEmpty(sqlBuilder, "c.data_area", dataArea, params, needWhere);
+
+		return Db.queryStr(sqlBuilder.toString(), params.toArray());
 	}
 
 	public int batchDelete(String... ids) {
