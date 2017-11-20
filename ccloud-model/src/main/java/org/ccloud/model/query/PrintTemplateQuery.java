@@ -54,6 +54,23 @@ public class PrintTemplateQuery extends JBaseQuery {
 
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
+	
+	public Page<PrintTemplate> paginateSellerJoinTemplate(int pageNumber, int pageSize, String keyword,String sellerId, String orderby) {
+		String select = "select * ";
+		StringBuilder fromBuilder = new StringBuilder("from `cc_print_template` ");
+
+		LinkedList<Object> params = new LinkedList<Object>();
+		if(!keyword.equals("")){
+			appendIfNotEmptyWithLike(fromBuilder, ".template_name", keyword, params, true);
+			fromBuilder.append(" and  id not in (select print_template_id from cc_seller_join_template where seller_id='"+sellerId+"')");
+		}else{
+			fromBuilder.append(" where id not in (select print_template_id from cc_seller_join_template where seller_id='"+sellerId+"')");
+		}
+		if (params.isEmpty())
+			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+
+		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
 
 	public int batchDelete(String... ids) {
 		if (ids != null && ids.length > 0) {

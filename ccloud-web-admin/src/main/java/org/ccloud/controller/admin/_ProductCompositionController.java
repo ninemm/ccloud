@@ -30,9 +30,9 @@ import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.model.ProductComposition;
-import org.ccloud.model.SellerGoods;
+import org.ccloud.model.SellerProduct;
 import org.ccloud.model.query.ProductCompositionQuery;
-import org.ccloud.model.query.SellerGoodsQuery;
+import org.ccloud.model.query.SellerProductQuery;
 
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
@@ -210,7 +210,7 @@ public class _ProductCompositionController extends JBaseCRUDController<ProductCo
 //			renderJson(list);
 //		}
 		String sellerId = "4e9de81102104e5db5149dfefd904d6c";
-		List<SellerGoods> list = SellerGoodsQuery.me().findBySellerId(sellerId);
+		List<SellerProduct> list = SellerProductQuery.me().findBySellerId(sellerId);
 		renderJson(list);		
 	}
 	

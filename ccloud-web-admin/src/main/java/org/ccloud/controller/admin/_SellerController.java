@@ -31,14 +31,14 @@ import org.ccloud.model.Department;
 import org.ccloud.model.Product;
 import org.ccloud.model.Seller;
 import org.ccloud.model.SellerBrand;
-import org.ccloud.model.SellerGoods;
+import org.ccloud.model.SellerProduct;
 import org.ccloud.model.User;
 import org.ccloud.model.Warehouse;
 import org.ccloud.model.query.BrandQuery;
 import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.ProductQuery;
 import org.ccloud.model.query.SellerBrandQuery;
-import org.ccloud.model.query.SellerGoodsQuery;
+import org.ccloud.model.query.SellerProductQuery;
 import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.WarehouseQuery;
 
@@ -213,7 +213,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 	            setAttr("k", keyword);
 	        }
 	        
-	        Page<SellerGoods> page = SellerGoodsQuery.me().paginate_sel(getPageNumber(), getPageSize(),keyword,id);
+	        Page<SellerProduct> page = SellerProductQuery.me().paginate_sel(getPageNumber(), getPageSize(),keyword,id);
 
 	        Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 	        renderJson(map);
@@ -227,7 +227,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		}else{
 			isEnable = 1;
 		}
-		SellerGoods sellerGoods = SellerGoodsQuery.me().findById(id);
+		SellerProduct sellerGoods = SellerProductQuery.me().findById(id);
 		sellerGoods.set("is_enable", isEnable);
 		if(sellerGoods!=null){
 			sellerGoods.set("modify_date", new Date());
@@ -259,13 +259,13 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 	
 	//保存产品信息
 		public void savePro(){
-			final SellerGoods sellerGoods= getModel(SellerGoods.class);
+			final SellerProduct sellerGoods= getModel(SellerProduct.class);
 			String ds = getPara("orderItems");
 			boolean result=false;
 			JSONArray jsonArray = JSONArray.parseArray(ds);
-			List<SellerGoods> imageList = jsonArray.toJavaList(SellerGoods.class);
-			for (SellerGoods sellerGood : imageList) {
-				  SellerGoods isSellerGoods = SellerGoodsQuery.me().findById(sellerGood.getId());
+			List<SellerProduct> imageList = jsonArray.toJavaList(SellerProduct.class);
+			for (SellerProduct sellerGood : imageList) {
+				  SellerProduct isSellerGoods = SellerProductQuery.me().findById(sellerGood.getId());
 				if(isSellerGoods==null){
 					String Id = StrKit.getRandomUUID();
 					sellerGoods.set("id",Id);
@@ -280,6 +280,9 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 					sellerGoods.set("order_list", sellerGood.getOrderList());
 					sellerGoods.set("create_date", new Date());
 					result=sellerGoods.save();
+					if(result == false){
+						break;
+					}
 				}else{
 					isSellerGoods.set("custom_name",sellerGood.getCustomName());
 					isSellerGoods.set("store_count",sellerGood.getStoreCount());
@@ -290,16 +293,13 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 					isSellerGoods.set("modify_date", new Date());
 					isSellerGoods.set("is_enable", isSellerGoods.getIsEnable());
 					isSellerGoods.set("order_list", isSellerGoods.getOrderList());
-					isSellerGoods.update();
+					result=isSellerGoods.update();
+					if(result == false){
+						break;
+					}
 				}
 			}
-			if(result){
-				renderAjaxResultForSuccess("添加成功");
-				setAttr("data", "添加成功!");
-			} else {
-				renderAjaxResultForError("添加失败");
-				setAttr("data", "添加失败!");
-			}
+			renderJson(result);
 		}		
 			
 	public void saveProductWarehouse(){
@@ -307,9 +307,9 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		boolean result = false;
 		String warehouseId = getPara("warehouseId");
 		JSONArray jsonArray = JSONArray.parseArray(ds);
-		List<SellerGoods> imageList = jsonArray.toJavaList(SellerGoods.class);
-		for (SellerGoods sellerGood : imageList) {
-			  SellerGoods isSellerGoods = SellerGoodsQuery.me().findByProductId(sellerGood.getProductId());
+		List<SellerProduct> imageList = jsonArray.toJavaList(SellerProduct.class);
+		for (SellerProduct sellerGood : imageList) {
+			  SellerProduct isSellerGoods = SellerProductQuery.me().findByProductId(sellerGood.getProductId());
 			if(isSellerGoods!=null ){
 				if(isSellerGoods.equals("")){
 					isSellerGoods.set("warehouse_id", "");

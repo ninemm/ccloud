@@ -21,6 +21,7 @@
 	var $table = $("#_sellerJoinTemplate_table");
 	
 	$("#sellerId").change(function(){
+			$('#post-search-input').val("");
 			$("#_sellerJoinTemplate_table").bootstrapTable('destroy');
 			var url = '${CPATH}/admin/sellerJoinTemplate/list?seller_id=' + this.value;
 			jQuery.mm.initEditTable('#_sellerJoinTemplate_table', url, initParams, initFields(), null);
@@ -53,12 +54,12 @@
 			});
 	});
 
-	$("#search-submit").click(function() {
+	function refresh(){
+		$('#post-search-input').val("");
 		$table.bootstrapTable('refresh');
-	});
+	}
 
 	var initParams = function(params) {
-
 		var keyword = $('#post-search-input').val();
 		if (keyword) keyword = encodeURIComponent(keyword);
 		var param = {
@@ -87,10 +88,11 @@
 			items[i].checked = checkbox.checked;
 		}
 	}
-	
 	var $tables = $("#_printTemplate_table");
-	var _url = '${CPATH}/admin/printTemplate/list';
 	$('#exampleModal').on('show.bs.modal', function (event) {
+		$("#_printTemplate_table").bootstrapTable('destroy');
+		var sellerId = $("#sellerId").find("option:selected").val();
+		var _url = '${CPATH}/admin/sellerJoinTemplate/listTemplate?sellerId='+ sellerId;
 		jQuery.mm.initEditTable('#_printTemplate_table', _url, initParamss, initFieldss(), null);
 	})
 	$("#_search-submit").click(function() {
@@ -165,11 +167,13 @@
 					data : {orderItems : JSON.stringify(orderItems)},
 					success:function(data){
 						if(data==true){
-							alert("操作成功！");
+							toastr.success(data.message,'操作成功');
 						}else{
-							alert("操作失败！");
+							toastr.error(data.message,'操作失败');
 						}
+						setTimeout( function(){
 						location.reload();
+								}, 2 * 1000 );
 					}
 				});
 			}
@@ -179,7 +183,7 @@
 		jQuery.mm.del('${CPATH}/admin/sellerJoinTemplate/delete?ucode=${ucode}&id=' + id);
 	}
 	function saveTemplate(){
-		var id = $("#sellerId").find("option:selected").val();
+	var sellerId = $("#sellerId").find("option:selected").val();
 		var orderItems = new Array();
 		 var checklist = $('input[name="data"]:checked').parent().parent();
 		 if(checklist.length == 0){
@@ -198,12 +202,12 @@
 			url:"${CPATH}/admin/sellerJoinTemplate/saveTemplate",
 			type:"post",
 			dataType:"json",
-			data : {orderItems : JSON.stringify(orderItems),sellerId:id},
+			data : {orderItems : JSON.stringify(orderItems),sellerId:sellerId},
 			success:function(data){
 				if(data==true){
-					alert("添加成功！");
+					toastr.success(data.message,'操作成功');
 				}else{
-					alert("添加失败！");
+					toastr.error(data.message,'操作失败');
 				}
 			}
 		});
@@ -217,7 +221,7 @@
 	<h1>销售商模版管理</h1>
 	<div class="input-group col-md-2 col-sm-8" style="padding-top:10px;">
 		<select class="form-control input-sm" name="id" id="sellerId" >
-			<option value="">----请选择经销商----</option>
+			<option value="">----请选择销售商----</option>
 		</select>
     </div>
 	<ol class="breadcrumb">
@@ -232,10 +236,12 @@
 		<div class="jp-left">
 			<button type="button" class="btn btn-sm btn-primary" id="product_warehouse"  data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo"><i class="fa fa-plus"></i>新增</button>
 			<a href="javascript:void(0);" onclick="saveAll()" class="btn btn-sm btn-primary"><i class="fa fa-check-square-o"></i> 批量保存 </a>
+			<a  onclick="refresh()" class="btn btn-sm btn-primary"><i class="fa fa-refresh"></i> 刷新 </a>
+			
 		</div>
 		<form class="form-inline jp-right">
 			<div class="input-group input-group-sm ">
-				<input id="post-search-input" class="form-control" type="search" value="${k!}" name="k" placeholder="搜索名称">
+				<input id="post-search-input" class="form-control" type="search" value="${k!}" name="k" placeholder="搜索模板名称">
 				&nbsp;
 				<input id="search-submit" class="btn btn-default btn-sm btn-flat" type="button" value="搜索">
 			</div>
@@ -254,7 +260,7 @@
 		<section class="content">
 			<div class="row content-row">
 				<div class="jp-left">
-					<a onclick="saveTemplate()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-plus"></i> 保存 </a>
+					<button type="button" class="btn btn-primary" onclick="saveTemplate()">保存</button>
 					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
 				</div>
 				<form class="form-inline jp-right">

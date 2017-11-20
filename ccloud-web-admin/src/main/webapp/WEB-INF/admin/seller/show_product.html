@@ -155,9 +155,9 @@
 			data : {orderItems : JSON.stringify(orderItems), warehouseId :warehouseId},
 			success:function(data){
 				if(data==true){
-					alert("添加成功！");
+					toastr.success(data.message, '操作成功');
 				}else{
-					alert("添加失败！");
+					toastr.error(data.message,'操作失败');
 				}
 			}
 		});
@@ -184,7 +184,7 @@
 	<div class="row content-row">
 		<div class="jp-left">
 			<a onclick="getA()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-plus"></i> 新增 </a>
-			<button type="button" class="btn btn-sm btn-primary" id="product_warehouse"  data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">产品入库</button>
+			<button type="button" class="btn btn-sm btn-primary" id="product_warehouse"  data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">批量设置仓库</button>
 			<!-- <a onclick="savePro()" class="btn btn-sm btn-primary btn-flat" ><i class="fa fa-check-square-o fa-1x"></i><span style="font-size:12px;"> 保存</span> </a> -->
 		</div>
 		<form class="form-horizontal" style="float: right" action="${CPATH}/admin/seller/show_product?c=${c!}&p=${p!}" method="post">
@@ -204,7 +204,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="exampleModalLabel">产品入库操作</h4>
+        <h4 class="modal-title" id="exampleModalLabel">设置仓库操作</h4>
       </div>
       <div class="modal-body">
         <form>
