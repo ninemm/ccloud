@@ -22,10 +22,7 @@
 <#macro script>
 
 	var $form = $("#form");
-<<<<<<< HEAD
-=======
-
->>>>>>> refs/heads/larry_lll
+	$("#station_option").select2();
 	$(function() {
 		
 		var selector = $('#city-picker-selector').cityPicker({
@@ -55,6 +52,23 @@
 		    fix: false, //不固定
 		    content: '${CPATH}/admin/department/department_tree'
 		});
+		jQuery.mm.initValidator('#form', validatorFields)
+	
+		$.ajax({
+		url:"${CPATH}/admin/seller/getBrand",
+		type:"post",
+		data:{"id":'${(seller.id)!}'},
+		dataType:"json",
+		success:function(data)
+		{
+			for (var i = 0; i < data.length; i++) {
+				if (data[i].isvalid == 0 ) {
+					$("#station_option").append("<option value=" + data[i].id + ">" + data[i].name + "</option>");
+				} else {
+					$("#station_option").append("<option value=" + data[i].id + " selected >" + data[i].name + "</option>");
+				}
+			}
+		}
 	});	
 		
 		jQuery.mm.initValidator('#form', validatorFields)
@@ -164,13 +178,36 @@
 				notEmpty: { message: '组织机构不能为空' },
 			}
 		},
+		'brand': {
+			validators: {
+	            notEmpty: { message: '产品不能为空' },
+	        }
+		}
 	};
 
 	function doSubmit(){
 		$("#userProvinceText").val($("select[name='userProvinceId']").find("option:selected").text()); 
 		$("#userCityText").val($("select[name='userCityId']").find("option:selected").text()); 
 		$("#userDistrictText").val($("select[name='userDistrictId']").find("option:selected").text()); 
-	
+		
+		var count = $("#station_option").select2("data").length;
+		var list = $("#station_option").select2("val");
+		var ids = "";
+		if (list != null && list.length > 0) {
+			ids = list.toString();
+		}
+		var name = "";
+		for(var i=0;i<count;i++){
+			if($("station_option").selected = true)  
+			{
+				if (i == count-1) {
+					name = name + $("#station_option").select2("data")[i].text;
+					break;
+				}
+				name = name + $("#station_option").select2("data")[i].text + ",";
+			}  
+		}	
+		
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
 				var validate = $form.data('bootstrapValidator');
@@ -193,27 +230,24 @@
 		});
 	}
 </#macro>
-<<<<<<< HEAD
 
-=======
->>>>>>> refs/heads/larry_lll
 
 <@layout active_id=p child_active_id=c>
 
 <!-- Content Header (Page header) -->
 <section class="content-header">
-	<h1><#if (customer.id) ??>修改<#else>新增</#if>经销商</h1>
+	<h1><#if (customer.id) ??>修改<#else>新增</#if>销售商</h1>
 	<ol class="breadcrumb">
 		<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-	<li>经销商管理</li>
-		<li class="active"><#if (customer.id) ??>修改<#else>新增</#if>经销商信息</li>
+	<li>销售商管理</li>
+		<li class="active"><#if (customer.id) ??>修改<#else>新增</#if>销售商信息</li>
 	</ol>
 </section>
 <!-- Main content -->
 <section class="content">
 	<div class="box box-default">
 		<div class="box-header with-border">
-			<h3 class="box-title">经销商信息</h3>
+			<h3 class="box-title">销售商信息</h3>
 			<div class="box-tools">
 				<button type="button" class="btn btn-box-tool" data-widget="collapse">
 					<i class="fa fa-minus"></i>
@@ -236,13 +270,13 @@
 				               	</div>
 							</div>
 						<div class="form-group col-sm-12 validata-box">
-							<label class="control-label col-sm-2">*经销商名称:</label>
+							<label class="control-label col-sm-2">*销售商名称:</label>
 							<div class="input-group col-md-4 col-sm-10">
 								<input class="form-control input-sm" type="text" name="seller.seller_name" value="${(seller.seller_name)!}" placeholder="1-25个任意字母数字">
 							</div>
 						</div>
 						<div class="form-group col-sm-12 validata-box">
-							<label class="control-label col-sm-2">*经销商编码:</label>
+							<label class="control-label col-sm-2">*销售商编码:</label>
 							<div class="input-group col-md-4 col-sm-10">
 								<input class="form-control input-sm" type="text" name="seller.seller_code" value="${(seller.seller_code)!}" placeholder="1-15个任意字母数字">
 							</div>
@@ -311,6 +345,13 @@
 							<label class="control-label col-sm-2">企业微信号ID2:</label>
 							<div class="input-group col-md-4 col-sm-10">
 								<input class="form-control input-sm" type="text" name="seller.jpwx_open_id" value="${(seller.jpwx_open_id)!}" placeholder="1-25个任意字母数字">
+							</div>
+						</div>
+						<div class="form-group col-sm-12 validata-box">
+							<label class="control-label col-sm-2">售卖的品牌:</label>
+							<div class="input-group col-md-4 col-sm-10">
+								<select class="form-control input-sm" name="seller" id="station_option" multiple="multiple" >
+								</select>
 							</div>
 						</div>
 						<div class="form-group col-sm-12 validata-box">

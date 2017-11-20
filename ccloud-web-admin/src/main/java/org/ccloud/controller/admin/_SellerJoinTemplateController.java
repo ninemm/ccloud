@@ -23,7 +23,9 @@ import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
+import org.ccloud.model.PrintTemplate;
 import org.ccloud.model.SellerJoinTemplate;
+import org.ccloud.model.query.PrintTemplateQuery;
 import org.ccloud.model.query.SellerJoinTemplateQuery;
 
 import com.alibaba.fastjson.JSONArray;
@@ -67,10 +69,10 @@ public class _SellerJoinTemplateController extends JBaseCRUDController<SellerJoi
 		List<SellerJoinTemplate> imageList = jsonArray.toJavaList(SellerJoinTemplate.class);
 		for (SellerJoinTemplate sellerJoinTemplate : imageList) {
 			String sellerJoinTemplateId = StrKit.getRandomUUID();
-			SellerJoinTemplate sellerJoinTemplate2 = SellerJoinTemplateQuery.me().findByTemplateId(sellerJoinTemplate.getPrintTemplateId());
+			SellerJoinTemplate sellerJoinTemplate2 = SellerJoinTemplateQuery.me().findByTemplateId(sellerJoinTemplate.getPrintTemplateId(),sellerId);
 			
 			if(sellerJoinTemplate2 !=null){
-				SellerJoinTemplateQuery.me().deleteByTemplateId(sellerJoinTemplate2.getPrintTemplateId());
+				continue;
 			}
 			template.set("id", sellerJoinTemplateId);
 			template.set("seller_id", sellerId);
@@ -118,5 +120,18 @@ public class _SellerJoinTemplateController extends JBaseCRUDController<SellerJoi
 			}
 		}
 		renderJson(result);
+	}
+	
+	public void listTemplate(){
+		String keyword = getPara("k");
+		String sellerId = getPara("sellerId");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+		}
+
+		Page<PrintTemplate> page = PrintTemplateQuery.me().paginateSellerJoinTemplate(getPageNumber(), getPageSize(), keyword,sellerId, "cp.create_date");
+
+		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
+		renderJson(map);
 	}
 }

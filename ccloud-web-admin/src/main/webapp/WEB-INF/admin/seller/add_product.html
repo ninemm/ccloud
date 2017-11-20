@@ -75,19 +75,6 @@
    		return fields;
 	}
 	
-	/*function enable(id, is_enabled) {
-		$.get('${CPATH}/admin/seller/enable?ucode=${ucode}&id=' + id + '&is_enabled=' + is_enabled,
-			function(result){
-				if (result.errorCode > 0) {
-					toastr.error(result.message, '操作失败');
-				} else {
-					$table.bootstrapTable('refresh');
-					toastr.success(result.message, '操作成功');
-				}
-			}
-		);
-	}	
-	*/
 	
 	function savePro(){
 		 var orderItems = new Array();
@@ -120,9 +107,10 @@
 					dataType:"json",
 					data : {orderItems : JSON.stringify(orderItems)},
 					success:function(data){
-						//toastr.success(result.message, '操作成功');
-						alert("操作成功！");
+						toastr.success(data.message,'操作成功');
+						setTimeout( function(){
 						location.reload();
+								}, 2 * 1000 );
 					}
 				});
 			}

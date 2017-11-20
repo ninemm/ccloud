@@ -20,10 +20,10 @@ public class Generator {
 	public static void main(String[] args) {
 		
 		String modelPackage = "org.ccloud";
-		String outputPath = "D:/ccloud/src/main/java/";
+		String outputPath = "D:/ccloud/";
 		
 		String dbHost = "127.0.0.1";//外网开发数据库IP
-		String dbName = "cloud";
+		String dbName = "ccloud_v2";
 		String dbUser = "root";
 		String dbPassword = "sys";
 		

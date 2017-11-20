@@ -76,13 +76,9 @@ public class SellerJoinTemplateQuery extends JBaseQuery {
 		return 0;
 	}
 
-	public SellerJoinTemplate findByTemplateId(String printTemplateId){
-		String sql = "select * from cc_seller_join_template where print_template_id =?";
-		return DAO.findFirst(sql, printTemplateId);
-	}
-	
-	public int deleteByTemplateId(String printTemplateId){
-		return DAO.doDelete("print_template_id = ?", printTemplateId);
+	public SellerJoinTemplate findByTemplateId(String printTemplateId,String sellerId){
+		String sql = "select * from cc_seller_join_template where print_template_id = '"+printTemplateId+"' and seller_id = '"+sellerId+"'";
+		return DAO.findFirst(sql);
 	}
 	
 	public SellerJoinTemplate findAllById(String id){
