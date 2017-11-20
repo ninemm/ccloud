@@ -80,7 +80,7 @@ public class SellerGoodsQuery extends JBaseQuery {
 		}else{
 			fromBuilder.append(" where cs.seller_id='"+sellerId+"' ");
 		}
-		fromBuilder.append(" GROUP BY cp.id ORDER BY cs.is_enable desc,cs.order_list ");
+		fromBuilder.append(" GROUP BY cs.id ORDER BY cs.is_enable desc,cs.order_list ");
 		
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
