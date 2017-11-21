@@ -6,17 +6,20 @@
  	<script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table.js"></script>
  	<!-- <script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table-edit.js"></script> -->
  	<script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table-zh-CN.js"></script>
-
+	<!-- select2 -->
+	<script src="${CPATH}/static/plugins/select2/js/select2.js"></script>
 </#macro>
 
 <#macro css_import>
 
 	<!-- bootstrap-table-->
     <link rel="stylesheet" href="${CPATH}/static/plugins/bootstrap-table/bootstrap-table.css">
-
+	<!-- select2 -->
+	<link rel="stylesheet" href="${CPATH}/static/plugins/select2/css/select2.css">
 </#macro>
 
 <#macro script>
+	$("#brand_option").select2();
 	var $table = $("#_seller_product_table");
 	$("#sellerId").change(function(){
 			$("#_seller_product_table").bootstrapTable('destroy');
@@ -37,23 +40,21 @@
 	})
 		$('#exampleModal').on('show.bs.modal', function (event) {
 		  var id = $("#sellerId").find("option:selected").val();
-		  $("#group_id").find("option").remove(); 
-		  var Html = '<option value="">----请选择----</option>';
-		  $("#group_id").append(Html);
-		  $.ajax({
-				url:"${CPATH}/admin/seller/show_warehouse",
-				type:"post",
-				dataType:"json",
-				data: {sellerId : id},
-				success:function(data){
-					$.each(data,function(index, item) {
-						var html='<option value="'+item.id+'">'+item.name+'</option>';
-						$("#group_id").append(html);
-					});
+			$.ajax({
+			url:"${CPATH}/admin/seller/show_warehouse",
+			type:"post",
+			dataType:"json",
+			data:{sellerId : id},
+			success:function(data)
+			{
+				$("#brand_option").html("");
+				for (var i = 0; i < data.length; i++) {
+						$("#brand_option").append("<option value=" + data[i].id + ">" + data[i].name + "</option>");
 				}
-			});
+			}
+		});
 				 
-			})
+		})
 	
 		
 	$(function() {
@@ -92,26 +93,37 @@
 			[	
 				{field: "", title: "<input type='checkbox' onclick='checkAll(this)' id='dataItem' value=''/>", align: "center", width: '5%',
 				formatter: function(value, row, rowIndex) {
-					var strHtml = '<input type="checkbox" name="dataItem" id="dataItem" value="'+row.product_id+'"/>';
+					var strHtml = '<input type="checkbox" name="dataItem" id="dataItem" value="'+row.id+'"/>';
 					return strHtml;
 				},
 				edit:false
 				},
       			{field: "custom_name", title: "产品名称", align: "center", width: '10%',edit:false},
-      			{field: "cps_name", title: "产品规格", align: "center", width: '20%',edit:false},
-      			{field: "store_count", title: "库存数量", align: "center", width: '8%',edit:false},
+      			{field: "cps_name", title: "产品规格", align: "center", width: '15%',edit:false},
+      			{field: "store_count", title: "库存数量", align: "center", width: '5%',edit:false},
+      			{field: "safeInventoryCount", title: "安全存量", align: "center", width: '5%',
+      			formatter: function(value, row, rowIndex) {
+      				if(row.safeInventoryCount==null){
+						var strHtml = '<input type="text" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="safeCount" id="safeCount" value="" size = "5"/>';
+      				}else{
+						var strHtml = '<input type="text" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="safeCount" id="safeCount" value="'+row.safeInventoryCount+'" size = "5"/>';
+					}
+					return strHtml;
+				},
+      			edit:false},
       			{field: "price", title: "销售价格", align: "center", width: '8%',edit:false},
-      			{field: "cost", title: "成本价", align: "center", width: '8%',edit:false},
-      			{field: "market_price", title: "市场价", align: "center", width: '8%',edit:false},
-      			{field: "is_enable", title: "是否上架", align: "center", width: '8%',
+      			{field: "warehouse_name", title: "已选仓库", align: "center", width: '25%',
+      			
+      			edit:false},
+      			{field: "is_enable", title: "是否上架", align: "center", width: '5%',
       				formatter: function(value, row, rowIndex) {
    						if (value == 1) return '是';
    						else return '否';
    					},
       				edit:false
       			},
-   				{field: "order_list", title: "排序", align: "center", width: '8%', edit: false},   
-				{field: "action", title: "操作", align: "center", width: '10%',
+   				{field: "order_list", title: "排序", align: "center", width: '5%', edit: false},   
+				{field: "action", title: "操作", align: "center", width: '5%',
 				formatter: function(value, row, rowIndex) {
 					var url2 = '${CPATH}/admin/seller/change?id=' + row.id +'&is_enable='+row.is_enable+ '&c=${c}&p=${p}';
 					var strHtml = '<a onclick="savePro(\''+row.id+'\')" name="row" class="btn btn-sm" title="保存"><i class="fa fa-check-square"></i></a>'
@@ -128,6 +140,11 @@
    		return fields;
 	}
 	
+	function refresh(){
+		$('#post-search-input').val("");
+		$table.bootstrapTable('refresh');
+	}
+	
 	function getA(){
 		var id = $("#sellerId").find("option:selected").val();
 		var url = '${CPATH}/admin/seller/addProduct?sellerId='+id+'&c=${c!}&p=${p!}';
@@ -135,7 +152,12 @@
 	}
 
 	function saveWarehouse(){
-		var warehouseId = $("#group_id").find("option:selected").val();
+		var id = $("#sellerId").find("option:selected").val();
+		var list = $("#brand_option").select2("val");
+		var ids = "";
+		if (list != null && list.length > 0) {
+			ids = list.toString();
+		}
 		var orderItems = new Array();
 		 var checklist = $('input[name="dataItem"]:checked').parent().parent();
 		 if(checklist.length == 0){
@@ -144,7 +166,8 @@
 		 }
 		 $('input[name="dataItem"]:checked').parent().parent().each(function(idx, item) {
 		  	var obj = {
-								"productId":  $(this).find('td').eq(0).find("input").val(),
+								"id":  $(this).find('td').eq(0).find("input").val(),
+								"safeInventoryCount":  $(this).find('td').eq(4).find("input").val(),
 						};
 							orderItems.push(obj);
 		});
@@ -152,10 +175,11 @@
 			url:"${CPATH}/admin/seller/saveProductWarehouse",
 			type:"post",
 			dataType:"json",
-			data : {orderItems : JSON.stringify(orderItems), warehouseId :warehouseId},
+			data : {orderItems : JSON.stringify(orderItems), warehouselist :ids,sellerId :id},
 			success:function(data){
 				if(data==true){
 					toastr.success(data.message, '操作成功');
+					$(this).dialog('close');
 				}else{
 					toastr.error(data.message,'操作失败');
 				}
@@ -185,7 +209,7 @@
 		<div class="jp-left">
 			<a onclick="getA()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-plus"></i> 新增 </a>
 			<button type="button" class="btn btn-sm btn-primary" id="product_warehouse"  data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">批量设置仓库</button>
-			<!-- <a onclick="savePro()" class="btn btn-sm btn-primary btn-flat" ><i class="fa fa-check-square-o fa-1x"></i><span style="font-size:12px;"> 保存</span> </a> -->
+			<a  onclick="refresh()" class="btn btn-sm btn-primary"><i class="fa fa-refresh"></i> 刷新 </a>
 		</div>
 		<form class="form-horizontal" style="float: right" action="${CPATH}/admin/seller/show_product?c=${c!}&p=${p!}" method="post">
 			<div class="input-group input-group-sm">
@@ -207,13 +231,18 @@
         <h4 class="modal-title" id="exampleModalLabel">设置仓库操作</h4>
       </div>
       <div class="modal-body">
-        <form>
-          <div class="form-group">
-            <label for="recipient-name" class="control-label">选择仓库:</label>
-            <select class="form-control input-sm" name="user.group_id" id="group_id">
-			</select>
-          </div>
-        </form>
+       <form action="${CPATH}/admin/seller/save" method="post" id="form" class="form-horizontal" >
+			<input type="hidden" name="seller.id" value="${(seller.id)!}">
+					<div class="box-body">
+						<div class="form-group col-sm-12 validata-box">
+							<label class="control-label col-sm-2">品牌管理:</label>
+							<div class="input-group col-md-4 col-sm-10" style="width=300px;">
+								<select class="form-control input-sm" name="brand" id="brand_option" multiple="multiple" >
+								</select>
+							</div>
+						</div>
+					</div>
+		</form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" onclick="saveWarehouse()">保存</button>

@@ -29,6 +29,7 @@ import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Brand;
 import org.ccloud.model.Department;
 import org.ccloud.model.Product;
+import org.ccloud.model.ProductSafeInventory;
 import org.ccloud.model.Seller;
 import org.ccloud.model.SellerBrand;
 import org.ccloud.model.SellerProduct;
@@ -37,6 +38,7 @@ import org.ccloud.model.Warehouse;
 import org.ccloud.model.query.BrandQuery;
 import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.ProductQuery;
+import org.ccloud.model.query.ProductSafeInventoryQuery;
 import org.ccloud.model.query.SellerBrandQuery;
 import org.ccloud.model.query.SellerProductQuery;
 import org.ccloud.model.query.SellerQuery;
@@ -269,7 +271,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				if(isSellerGoods==null){
 					String Id = StrKit.getRandomUUID();
 					sellerGoods.set("id",Id);
-					sellerGoods.set("product_id",sellerGood.getProductId());
+					sellerGoods.set("product_id",sellerGood.getId());
 					sellerGoods.set("seller_id",sellerGood.getSellerId());
 					sellerGoods.set("custom_name",sellerGood.getCustomName());
 					sellerGoods.set("store_count",sellerGood.getStoreCount());
@@ -303,24 +305,57 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		}		
 			
 	public void saveProductWarehouse(){
+		final ProductSafeInventory productSafeInventory = getModel(ProductSafeInventory.class);
+		String warehouselist =getPara("warehouselist");
+		String sellerId = getPara("sellerId");
+		Department department = DepartmentQuery.me().findBySellerId(sellerId);
+		String [] warehouselists= warehouselist.split(",");
 		String ds = getPara("orderItems");
 		boolean result = false;
-		String warehouseId = getPara("warehouseId");
 		JSONArray jsonArray = JSONArray.parseArray(ds);
-		List<SellerProduct> imageList = jsonArray.toJavaList(SellerProduct.class);
-		for (SellerProduct sellerGood : imageList) {
-			  SellerProduct isSellerGoods = SellerProductQuery.me().findByProductId(sellerGood.getProductId());
-			if(isSellerGoods!=null ){
-				if(isSellerGoods.equals("")){
-					isSellerGoods.set("warehouse_id", "");
+		List<ProductSafeInventory> imageList = jsonArray.toJavaList(ProductSafeInventory.class);
+		for (ProductSafeInventory sellerGood : imageList) {
+			List<String> s=new ArrayList<String>();
+			for(String w :warehouselists){
+				s.add(w);
+			}
+			List<ProductSafeInventory> inventory = ProductSafeInventoryQuery.me().findByWarehouseId(sellerGood.getId());
+			boolean flang = false;
+			if(inventory!=null){
+				for (ProductSafeInventory inventory2 :inventory){
+					for(int i=0;i<s.size();i++){
+			 				if(!s.get(i).equals(inventory2.getWarehouseId())){
+								flang = false;
+							}else{
+								flang = true;
+								inventory2.set("safe_inventory_count", sellerGood.getSafeInventoryCount());
+								inventory2.set("modify_date", new Date());
+								result=inventory2.update();
+								s.remove(s.get(i));
+								break;
+								}
+			 			}
+					if(flang == false){
+						ProductSafeInventoryQuery.me().deleteById(inventory2.getId());
+						}
 				}
-				isSellerGoods.set("warehouse_id", warehouseId);
-				isSellerGoods.set("modify_date", new Date());
-				result=isSellerGoods.update();
-				if(result == false){
-					break;
+				for (int j=0;j<s.size();j++){
+					String Id = StrKit.getRandomUUID();
+					productSafeInventory.set("id", Id);
+					productSafeInventory.set("product_id",sellerGood.getId());
+					productSafeInventory.set("warehouse_id", s.get(j));
+					productSafeInventory.set("safe_inventory_count", sellerGood.getSafeInventoryCount());
+					productSafeInventory.set("data_area", department.getDataArea());
+					productSafeInventory.set("dept_id", department.getId());
+					productSafeInventory.set("create_date", new Date());
+					result=productSafeInventory.save();
+					if(result == false){
+						break;
+					}
+					
 				}
 			}
+
 		}
 		renderJson(result);
 		
@@ -328,7 +363,17 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 	
 	public void show_warehouse(){
 		String sellerId = getPara("sellerId");
-		List<Warehouse> list = WarehouseQuery.me().findBySellerId(sellerId);
+		List<Warehouse> Warehouses = WarehouseQuery.me().findBySellerId(sellerId);
+		List<Map<String, Object>> list = new ArrayList<>();
+		for (Warehouse Warehouse : Warehouses) {
+			if (Warehouse.getId().equals("")) {
+				continue;
+			}
+			Map<String, Object> map = new HashMap<>();
+			map.put("id", Warehouse.getId());
+			map.put("name",Warehouse.getName());
+			list.add(map);
+		}
 		renderJson(list);
 	}
 	
