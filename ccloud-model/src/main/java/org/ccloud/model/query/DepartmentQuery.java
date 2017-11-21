@@ -237,4 +237,10 @@ public class DepartmentQuery extends JBaseQuery {
 		}
 	}
 	
+	
+	public Department findBySellerId(String sellerId){
+		String sql = "select d.* from department d left join cc_seller cs on cs.dept_id = d.id where cs.id =?";
+		return DAO.findFirst(sql, sellerId);
+	}
+	
 }
