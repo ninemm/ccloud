@@ -26,12 +26,17 @@
 						<!-- User image -->
 						<li class="user-header">
 							<img src="${CPATH}${(USER.avatar)!'/static/ccloud/admin/image/avatar.jpg'}" style="border-radius: 50%;" >
-							<p>${USER.nickname!USER.username} - 超级管理员</p>
+							<p>${USER.nickname!USER.username} - ${(session['sellerName'])!}</p>
 							</li>
 						<li class="user-footer">
 							<div class="pull-left">
 								<a href="${CPATH}/admin/user/info?p=user&c=info" class="btn btn-default btn-flat">资料</a>
 							</div>
+							<#if session['sellerList']?? && session['sellerList']?size gt 1>
+							<div class="pull-left" style="margin-left: 12px">
+								<a data-toggle="modal" data-target="#gridSystemModal" class="btn btn-default btn-flat">切换账套</a>
+							</div>	
+							</#if>						
 							<div class="pull-right">
 								<a href="${CPATH}/admin/logout?ucode=${ucode!}" class="btn btn-default btn-flat">退出</a>
 							</div>

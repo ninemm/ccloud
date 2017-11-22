@@ -377,5 +377,12 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		renderJson(list);
 	}
 	
+	public void changeSeller() {
+		String id = getPara("sellerId");
+		String name = getPara("sellerName");
+		setSessionAttr("sellerId", id);
+		setSessionAttr("sellerName", name);
+		renderAjaxResultForSuccess("切换成功");
+	}
 }
 

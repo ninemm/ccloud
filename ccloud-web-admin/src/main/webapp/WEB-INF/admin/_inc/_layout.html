@@ -47,8 +47,40 @@
 			<#nested>  
 	  	</div>
 	  	<!-- /.content-wrapper -->
-	
-	  	<footer class="main-footer">
+		<div class="modal fade" tabindex="-1" role="dialog"
+			aria-labelledby="gridSystemModalLabel" id="gridSystemModal">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						<h4 class="modal-title" id="gridSystemModalLabel">切换账套</h4>
+					</div>
+					<div class="modal-body">
+						<div class="form-group col-sm-12 validata-box">
+							<label class="control-label col-sm-2">账套:</label>
+							<div class="input-group col-md-6 col-sm-10">					
+								<select class="form-control input-sm" id="seller_id">
+									<#list (session['sellerList'])! as seller >
+										<option value="${seller.id}" <#if (Session.sellerId)! == seller.id!>selected="selected"</#if>>${(seller.sellerName)!}</option>
+									</#list>
+								</select>
+							</div>	
+						</div>						
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+						<button type="button" class="btn btn-primary" onclick="changeSeller();">切换</button>
+					</div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal-dialog -->
+		</div>
+		<!-- /.modal -->
+		<footer class="main-footer">
 		    <div class="pull-right hidden-xs">
 		      <b>渠道云平台</b> ${JPRESS_VERSION!}
 		    </div>
@@ -151,6 +183,25 @@ function initToast(){
 	  "showMethod": "fadeIn",
 	  "hideMethod": "fadeOut"
 	}
+}
+
+function changeSeller() {
+	var sellerId = $("#seller_id").find("option:selected").val();
+	var sellerName = $("#seller_id").find("option:selected").text();
+	$.ajax({
+		url:"${CPATH}/admin/seller/changeSeller",
+		type:"post",
+		data:{
+			"sellerId":sellerId,
+			"sellerName":sellerName	
+		},
+		dataType:"json",
+		success:function(data) {
+			$('#gridSystemModal').modal('hide');
+			toastr.success(data.message, '操作成功');
+			$(".navbar-custom-menu").load(location.href+" .navbar-nav");
+		}
+	});
 }
 </script>
 </body>

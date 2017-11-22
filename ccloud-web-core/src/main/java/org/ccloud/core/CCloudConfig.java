@@ -29,6 +29,7 @@ import org.ccloud.core.interceptor.JI18nInterceptor;
 import org.ccloud.core.render.CCloudRenderFactory;
 import org.ccloud.interceptor.AdminInterceptor;
 import org.ccloud.interceptor.GlobelInterceptor;
+import org.ccloud.interceptor.PublicInterceptor;
 import org.ccloud.log.SystemLogThread;
 import org.ccloud.message.plugin.MessagePlugin;
 import org.ccloud.model.core.JModelMapping;
@@ -220,6 +221,7 @@ public abstract class CCloudConfig extends JFinalConfig {
 		interceptors.add(new AdminInterceptor());
 		interceptors.add(new HookInterceptor());
 		interceptors.add(new ShiroInterceptor());
+		interceptors.add(new PublicInterceptor());
 	}
 
 	public void configHandler(Handlers handlers) {
