@@ -901,17 +901,10 @@ function doSubmit(){
 													<input type="checkbox" name="productList[${list_index}].isMarketable" value="true" <#if list.isMarketable>checked</#if> />
 												</td>
 												<td>
-													<#assign isAllowDelete = true>
-													<#list (list.orderItemSet)! as orderItem>
-														<#if orderItem.orderStatus != "completed" && orderItem.orderStatus != "invalid">
-															<#assign isAllowDelete = false>
-															<#break />
-														</#if>
-													</#list>
-													<#if isAllowDelete = true>
+													<#if list.count == 0>
 														<span class="glyphicon glyphicon-remove" style="color:#0c78b6;cursor:pointer;" title="删除">&nbsp;</span>
 													<#else>
-														<span class="deleteIcon" title="此货品订单处理未完成，无法删除!">&nbsp;</span>
+														<span class="glyphicon glyphicon-ban-circle" title="此货品已有经销商在售，无法删除!">&nbsp;</span>
 													</#if>
 												</td>
 											</tr>

@@ -109,16 +109,16 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
 			
 			List<Record> attributeList = GoodsGoodsAttributeMapStoreQuery.me().findByGoodsId(goods);
 			setAttr("attributeList", attributeList);
+			
+			List<Product> pList = ProductQuery.me().findByGoodId(id);
+			getProductSpValue(pList);
+			setAttr("pList", pList);			
 		}
 		List<Brand> blist = BrandQuery.me().findAll();
 		setAttr("blist", blist);
 		
 		List<GoodsType> tlist = GoodsTypeQuery.me().findAll();
 		setAttr("tlist", tlist);
-		
-		List<Product> pList = ProductQuery.me().findByGoodId(id);
-		getProductSpValue(pList);
-		setAttr("pList", pList);
 		
 		List<GoodsSpecification> goodsSpecificationList = GoodsSpecificationQuery.me().findAll();
 		setAttr("goodsSpecificationList", goodsSpecificationList);

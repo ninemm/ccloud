@@ -75,7 +75,9 @@ public class ProductQuery extends JBaseQuery {
 	}
 
 	public List<Product> findByGoodId(String id) {
-		return DAO.doFind("goods_id = ? order by create_date", id);
+		StringBuilder fromBuilder = new StringBuilder("SELECT a.*, (SELECT COUNT(*) FROM cc_seller_product b WHERE b.product_id = a.id) as count ");
+		fromBuilder.append("FROM cc_product a where a.goods_id = ? ");
+		return DAO.find(fromBuilder.toString(), id);
 	}
 
 	public int batchDelete(List<String> ids) {

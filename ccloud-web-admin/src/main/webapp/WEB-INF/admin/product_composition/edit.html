@@ -179,8 +179,12 @@ function addTr(tid, productList, optionArr) {
 
 	var $tbody = $(tid + " tbody"),
 	$tr = $tbody.find("tr:eq(0)"),
-	lastTrIdx = $tbody.find("tr:last").index(),
-	newTrIdx = lastTrIdx + 1,
+	id = $tbody.find("tr:last").attr("id");
+	if (!id) {
+		id = 'tr0';
+	}
+	var lastTrIdx = parseInt(id.substr(id.length-1,1)),
+	newTrIdx = lastTrIdx+1;
 	trHtml = $tr.html();
 
 	$tbody.append("<tr id='tr" + newTrIdx + "'>" +trHtml+ "</tr>");
