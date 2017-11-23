@@ -14,7 +14,16 @@
     <!-- select2 -->
     <link rel="stylesheet" href="${CPATH}/static/plugins/select2/css/select2.css">
 </#macro>
- 
+<#macro css>
+	.zh {
+		text-align:center;
+		vertical-align:middle !important;
+	}
+	.zr {
+		text-align:right;
+		vertical-align:middle !important;
+	}	
+</#macro> 
 <#macro script>
 
 var $form = $("#form");
@@ -80,6 +89,18 @@ $(function() {
 });
 
 var validatorFields = {
+	'productComposition.name': {
+		validators: {
+            notEmpty: { message: '商品名称不能为空' },
+            stringLength: { max: 15, message: '商品名称最大长度是15字符，请重新输入' }
+        }
+	},
+	'productComposition.price': {
+		validators: {
+			notEmpty: { message: '金额不能为空' },
+			integer: {message: '请输入正整数'}
+		}
+	}
 };
 
 function doSubmit(){
@@ -250,14 +271,26 @@ function addTr(tid, productList, optionArr) {
 			<input type="hidden" name="ucode" value="${(ucode)!}">
 			<input type="hidden" name="parentId" value="${(parentId)!}">
 			<div class="box-body">
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">组合商品名称:</label>
+						<div class="input-group col-md-4 col-sm-10">
+		                 	<input class="form-control input-sm" type="text" name="productComposition.name" value="${(productCompositionName)!}">
+		               	</div>
+					</div>
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">组合商品价格:</label>
+						<div class="input-group col-md-4 col-sm-10">
+		                 	<input class="form-control input-sm" type="text" name="productComposition.price" value="${(productCompositionPrice)!}">
+		               	</div>
+					</div>								
 				<div style="padding: 5px; clear: both;">
 					<table id="dataTable" class="table table-striped table-bordered"
 						width="100%">
 						<thead>
 							<tr>
-								<th class="col-sm-1 center">操作</th>
-								<th class="col-sm-2 center">商品名称</th>
-								<th class="col-sm-1 center">规格</th>
+								<th class="col-sm-1 center zr">操作</th>
+								<th class="col-sm-2 center zh">商品名称</th>
+								<th class="col-sm-1 center zh">规格</th>
 								<th class="col-sm-1 center">子商品数量</th>
 							</tr>
 						</thead>
@@ -281,7 +314,7 @@ function addTr(tid, productList, optionArr) {
 								<div class="input-group col-md-4 col-sm-10">
 									<input type="text" id="stock"
 									class="stock" name="productComposition[-1].product_count"
-									disabled="disabled" />									
+									value="1" disabled="disabled" />									
 								</div>								
 								</td>									
 							</tr>
@@ -305,7 +338,7 @@ function addTr(tid, productList, optionArr) {
 								<input type="text" id="stock"
 									class="stock"
 									name="productComposition[${list_index}].product_count"
-									value="" disabled="true"/></div></td>										
+									value="1" disabled="true"/></div></td>										
 							</tr>
 							</#if>
 							</#list>
@@ -345,7 +378,7 @@ function addTr(tid, productList, optionArr) {
 							<tr>
 								<td colspan="6">
 									<button id="btnAddProd" type="button"
-										class="btn btn-xs btn-info" style="width: 80px;"
+										class="btn btn-primary" style="width: 80px;"
 										onclick="addNew()">添加商品</button>
 								</td>
 							</tr>

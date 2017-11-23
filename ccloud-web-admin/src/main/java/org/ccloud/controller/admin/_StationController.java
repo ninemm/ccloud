@@ -36,8 +36,6 @@ import org.ccloud.model.query.StationQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.vo.ModuleInfo;
 import org.ccloud.model.vo.OperationInfo;
-import org.ccloud.model.vo.ParentModule;
-import org.ccloud.model.vo.SystemVo;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
@@ -226,20 +224,45 @@ public class _StationController extends JBaseCRUDController<Station> {
 			e.printStackTrace();
 		}
         List<Record> list = OperationQuery.me().queryStationOperation(stationId);
-        List<SystemVo> systemList = new ArrayList<>();
+        List<ModuleInfo> moduleList = new ArrayList<>();
+        List<String> system = new ArrayList<>();
+        List<String> parentModule = new ArrayList<>();
+        int loop = 0;
+        int rowSpan = 1;
+        int sysRowSpan = 1;
         for (Record record : list) {
-        	SystemVo systemVo = new SystemVo();
-        	systemVo.setName(record.getStr("sys_name"));
-        	List<ParentModule> parentModules = new ArrayList<>();
-        	ParentModule parentModule = new ParentModule();
-        	parentModule.setName(record.getStr("parent_name"));
-        	List<ModuleInfo> moduleInfos = new ArrayList<>();
             String[] operationId = record.get("operation_code").toString().split(",");
             String[] operationName = record.get("operation_name").toString().split(",");
             String[] stationIds = record.get("station_id").toString().split(",");
         	ModuleInfo moduleInfo = new ModuleInfo();
         	moduleInfo.setModuleId(record.getStr("id"));
         	moduleInfo.setModuleName(record.getStr("module_name"));
+        	if (!system.contains(record.getStr("sys_name"))) {
+        		moduleInfo.setSystemName(record.getStr("sys_name"));
+        		if (loop > 0) {
+        			this.checkSystemRowSpan(moduleList, system, sysRowSpan);
+        			sysRowSpan = 1;
+        		}
+        		system.add(moduleInfo.getSystemName());
+        	} else {
+        		sysRowSpan++;
+        		if (loop == list.size()-1) {
+        			this.checkSystemRowSpan(moduleList, system, sysRowSpan);
+        		}        		
+        	}
+        	if (!parentModule.contains(record.getStr("parent_name"))) {
+        		moduleInfo.setParentModuleName(record.getStr("parent_name"));
+        		if (loop > 0) {
+        			this.checkRowSpan(moduleList, parentModule, rowSpan);
+        			rowSpan = 1;
+        		}
+        		parentModule.add(moduleInfo.getParentModuleName());
+        	} else {
+        		rowSpan++;
+        		if (loop == list.size()-1) {
+        			this.checkRowSpan(moduleList, parentModule, rowSpan);
+        		}
+        	}
         	List<OperationInfo> operationInfos = new ArrayList<>();
             for (int i = 0; i < operationId.length; i++) {
             	OperationInfo info = new OperationInfo();
@@ -253,40 +276,30 @@ public class _StationController extends JBaseCRUDController<Station> {
             	operationInfos.add(info);
             }
             moduleInfo.setList(operationInfos);
-            moduleInfos.add(moduleInfo);
-            parentModule.setList(moduleInfos);
-            parentModules.add(parentModule);
-            systemVo.setList(parentModules);
-            systemVo.setOperationCount(operationInfos.size());
-            this.checkList(systemList, systemVo);
+            moduleList.add(moduleInfo);
+            loop++;
 		}
-        setAttr("systemList", systemList);
+        setAttr("moduleList", moduleList);
     }
     
-    private void checkList(List<SystemVo> systemList, SystemVo systemVo) {
-    	for (SystemVo vo : systemList) {
-			if (vo.getName().equals(systemVo.getName())) {
-				this.checkParent(vo, systemVo.getList().get(0));
-				return;
+    private void checkRowSpan(List<ModuleInfo> moduleList, List<String> system, int rowSpan) {
+    	for (ModuleInfo moduleInfo : moduleList) {
+			if (moduleInfo.getParentModuleName() != null && 
+					moduleInfo.getParentModuleName().equals(system.get(system.size()-1))) {
+				moduleInfo.setParentRowSpan(rowSpan);
+				break;
 			}
 		}
-    	systemList.add(systemVo);
     }
     
-    private void checkParent(SystemVo vo, ParentModule parentModule) {
-    	List<ParentModule> list = vo.getList();
-    	vo.setOperationCount(vo.getOperationCount() + parentModule.getList().size());
-    	for (ParentModule parentModule2 : list) {
-			if (parentModule2.getName().equals(parentModule.getName())) {
-				this.checkModule(parentModule2, parentModule.getList().get(0));
-				return;
+    private void checkSystemRowSpan(List<ModuleInfo> moduleList, List<String> parentModule, int rowSpan) {
+    	for (ModuleInfo moduleInfo : moduleList) {
+			if (moduleInfo.getSystemName() != null && 
+					moduleInfo.getSystemName().equals(parentModule.get(parentModule.size()-1))) {
+				moduleInfo.setSystemRowSpan(rowSpan);
+				break;
 			}
 		}
-    	vo.getList().add(parentModule);
-    }
-
-	private void checkModule(ParentModule parentModule2, ModuleInfo moduleInfo) {
-		parentModule2.getList().add(moduleInfo);
-	}
+    }  
 	
 }

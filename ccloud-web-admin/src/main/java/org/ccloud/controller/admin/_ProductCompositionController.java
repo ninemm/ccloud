@@ -15,6 +15,7 @@
  */
 package org.ccloud.controller.admin;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,6 +31,7 @@ import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.model.ProductComposition;
+import org.ccloud.model.Seller;
 import org.ccloud.model.SellerProduct;
 import org.ccloud.model.query.ProductCompositionQuery;
 import org.ccloud.model.query.SellerProductQuery;
@@ -85,6 +87,10 @@ public class _ProductCompositionController extends JBaseCRUDController<ProductCo
 					String[] factIndex = map.get("factIndex");
 					String productId = StringUtils
 							.getArrayFirst(map.get("productComposition[0].id"));
+					String name = StringUtils
+							.getArrayFirst(map.get("productComposition.name"));
+					String price = StringUtils
+							.getArrayFirst(map.get("productComposition.price"));						
 					List<ProductComposition> oldList = new ArrayList<>();
 					if (mainId != null) {
 						oldList = ProductCompositionQuery.me().findByParentId(mainId);
@@ -97,6 +103,8 @@ public class _ProductCompositionController extends JBaseCRUDController<ProductCo
 						String subProductCount = StringUtils
 								.getArrayFirst(map.get("productComposition[" + factIndex[i] + "].product_count"));						
 						ProductComposition composition = new ProductComposition();
+						composition.setName(name);
+						composition.setPrice(new BigDecimal(price));
 						composition.setSellerProductId(productId);
 						composition.setSubProductCount(subProductCount);
 						composition.setSubSellerProductId(subProductId);
@@ -171,7 +179,14 @@ public class _ProductCompositionController extends JBaseCRUDController<ProductCo
 	@RequiresPermissions(value={"/admin/productComposition/edit","/admin/all"},logical=Logical.OR)
 	public void edit() {
 		String id = getPara("id");
-		List<ProductComposition> list = ProductCompositionQuery.me().findDetailByProductId(id);
+		List<ProductComposition> list = new ArrayList<>();
+		if (StringUtils.isNotBlank(id)) {
+			list = ProductCompositionQuery.me().findDetailByProductId(id);
+			String name = list.get(0).getName();
+			BigDecimal price = list.get(0).getPrice();
+			setAttr("productCompositionName", name);
+			setAttr("productCompositionPrice", price);
+		}
 		setAttr("list", list);
 		setAttr("parentId", id);
 	}
@@ -203,15 +218,15 @@ public class _ProductCompositionController extends JBaseCRUDController<ProductCo
 	}	
 	
 	public void getProductInfo() {
-//		List<Seller> sellerList = getSessionAttr("sellerList");
-//		if (sellList.size() > 0) {
-//			String sellerId = sellList.get(0).getId();
-//			List<SellerGoods> list = SellerGoodsQuery.me().findBySellerId(sellId);
-//			renderJson(list);
-//		}
-		String sellerId = "4e9de81102104e5db5149dfefd904d6c";
-		List<SellerProduct> list = SellerProductQuery.me().findBySellerId(sellerId);
-		renderJson(list);		
+		List<Seller> sellerList = getSessionAttr("sellerList");
+		if (sellerList.size() > 0) {
+			String sellerId = sellerList.get(0).getId();
+			List<SellerProduct> list = SellerProductQuery.me().findBySellerId(sellerId);
+			renderJson(list);
+		}
+//		String sellerId = "4e9de81102104e5db5149dfefd904d6c";
+//		List<SellerProduct> list = SellerProductQuery.me().findBySellerId(sellerId);
+//		renderJson(list);		
 	}
 	
 }

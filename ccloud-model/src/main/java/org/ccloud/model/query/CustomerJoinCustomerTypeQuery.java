@@ -36,7 +36,7 @@ public class CustomerJoinCustomerTypeQuery extends JBaseQuery {
 		return QUERY;
 	}
 
-	public List<Integer> findCustomerTypeListByCustomerId(String customerId, String deptId, String dataArea) {
+	public List<Integer> findCustomerTypeListByCustomerId(String customerId, String dataArea) {
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 
@@ -44,8 +44,7 @@ public class CustomerJoinCustomerTypeQuery extends JBaseQuery {
 		sqlBuilder.append(" from `cc_customer_join_customer_type` cj ");
 		sqlBuilder.append(" join `cc_customer_type` c on cj.customer_type_id = c.id ");
 		needWhere = appendIfNotEmpty(sqlBuilder, "cj.customer_id", customerId, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "c.dept_id", deptId, params, needWhere);
-		needWhere = appendIfNotEmptyWithLike(sqlBuilder, "c.data_area", dataArea, params, needWhere);
+		needWhere = appendIfNotEmpty(sqlBuilder, "c.data_area", dataArea, params, needWhere);
 
 		return Db.query(sqlBuilder.toString(), params.toArray());
 	}
