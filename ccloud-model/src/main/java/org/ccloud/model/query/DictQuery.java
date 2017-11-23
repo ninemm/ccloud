@@ -124,4 +124,8 @@ public class DictQuery extends JBaseQuery {
 			fromBuilder.append(" ORDER BY `create_time` desc");
 		}
 	}
+
+	public List<Dict> findByCode(String dictUnitCode) {
+		return DAO.doFind("dict.key = ?", dictUnitCode);
+	}
 }

@@ -69,4 +69,6 @@ public class Consts {
 	public static final String TAXONOMY_TEMPLATE_PREFIX = "for$";
 	
 	public static final String QRCODE_PATH = "/qrcode/";// 二维码生成路径
+	
+	public static final String DICT_UNIT_CODE = "unit";//单位类型字典编码
 }

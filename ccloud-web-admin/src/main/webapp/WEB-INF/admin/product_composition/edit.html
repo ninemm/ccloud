@@ -22,7 +22,10 @@
 	.zr {
 		text-align:right;
 		vertical-align:middle !important;
-	}	
+	}
+	.tz {
+		text-align: center;
+	}
 </#macro> 
 <#macro script>
 
@@ -42,7 +45,7 @@ $(function() {
 		<#if list_index = 0>
 		    $tbody.find("#tr1>.text-left>.pro-slc2").select2({
 		       data:productOptionArr,
-		       width: "100%",
+		       width: "50%",
 		       language: "zh-CN"
 		    });	
 		$("#select_${list_index}").val(['${list.seller_product_id}']).trigger('change');
@@ -62,7 +65,7 @@ $(function() {
 	<#list (list)! as list>
 	    $tbody.find("#tr${list_index+2}>.text-left>.pro-slc2").select2({
 	       data:productOptionArr,
-	       width: "100%",
+	       width: "50%",
 	       language: "zh-CN"
 	    });	
 	    $("#select_${list_index+1}").val(['${list.sub_seller_product_id}']).trigger('change');
@@ -198,7 +201,7 @@ function addTr(tid, productList, optionArr) {
     
     $tbody.find("tr:last>td>select.pro-slc2").select2({
        data:optionArr,
-       width: "100%",
+       width: "50%",
        language: "zh-CN"
     });
 
@@ -304,7 +307,7 @@ function addTr(tid, productList, optionArr) {
 									class="btn btn-danger btn-xs removeTr" data-toggle="modal"
 									data-target="#deleteBackProModal"><span
 										class="glyphicon glyphicon-remove"></span></a></td>
-								<td class="text-left"><input type="hidden" id="goodsCode"
+								<td class="text-left tz"><input type="hidden" id="goodsCode"
 									name="productComposition[-1].id" disabled="true" />
 									<input type="hidden" id="compositionId"
 									name="composition[-1].id" disabled="true" /> <input
@@ -326,7 +329,7 @@ function addTr(tid, productList, optionArr) {
 							<#if list_index = 0>
 							<tr id="tr${list_index+1}">
 								<td class="center text-right">主商品&nbsp;</td>
-								<td class="text-left"><input type="hidden" id="goodsCode"
+								<td class="text-left tz"><input type="hidden" id="goodsCode"
 									name="productComposition[${list_index}].id"
 									value="${list.seller_product_id}" /> <input type="hidden" id="compositionId"
 									name="composition[${list_index}].id" value=""/> <input
@@ -356,7 +359,7 @@ function addTr(tid, productList, optionArr) {
 									data-target="#deleteBackProModal" onclick="deleteTr(this)"><span
 										class="glyphicon glyphicon-remove"></span></a></td>								
 								</#if>
-								<td class="text-left"><input type="hidden" id="goodsCode"
+								<td class="text-left tz"><input type="hidden" id="goodsCode"
 									name="productComposition[${list_index+1}].id"
 									value="${list.sub_seller_product_id}" /> <input type="hidden" id="compositionId"
 									name="composition[${list_index+1}].id" value="${list.id}"/> <input
@@ -366,7 +369,7 @@ function addTr(tid, productList, optionArr) {
 								</select></td>
 								<td class="text-center"><span class="specification"
 									id="specification">${list.sub_product_sp!}</span></td>
-								<td class="text-center">
+								<td class="text-center zh">
 								<div class="form-group validata-box" style="margin: 0;">
 								<div class="input-group col-md-4 col-sm-10">								
 								<input type="text" id="stock"

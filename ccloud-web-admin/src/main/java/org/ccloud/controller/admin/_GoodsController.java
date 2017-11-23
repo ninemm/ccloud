@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
@@ -33,6 +34,7 @@ import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.AttachmentUtils;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Brand;
+import org.ccloud.model.Dict;
 import org.ccloud.model.Goods;
 import org.ccloud.model.GoodsAttribute;
 import org.ccloud.model.GoodsCategory;
@@ -44,6 +46,7 @@ import org.ccloud.model.GoodsType;
 import org.ccloud.model.Product;
 import org.ccloud.model.ProductGoodsSpecificationValue;
 import org.ccloud.model.query.BrandQuery;
+import org.ccloud.model.query.DictQuery;
 import org.ccloud.model.query.GoodsAttributeQuery;
 import org.ccloud.model.query.GoodsCategoryQuery;
 import org.ccloud.model.query.GoodsGoodsAttributeMapStoreQuery;
@@ -120,6 +123,9 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
 		List<GoodsType> tlist = GoodsTypeQuery.me().findAll();
 		setAttr("tlist", tlist);
 		
+		List<Dict> dlist = DictQuery.me().findByCode(Consts.DICT_UNIT_CODE);
+		setAttr("dlist", dlist);		
+		
 		List<GoodsSpecification> goodsSpecificationList = GoodsSpecificationQuery.me().findAll();
 		setAttr("goodsSpecificationList", goodsSpecificationList);
 	}
@@ -187,7 +193,7 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
         		}
         		List<Product> oldList = ProductQuery.me().findByGoodId(goods.getId());
         		int productSize = getLikeByMap(map, "product"); //map取出产品属性信息数量
-        		int loop = productSize / 9; //算出产品数量与循环次数
+        		int loop = productSize / 8; //算出产品数量与循环次数
         		int loopEnd = 0;
         		List<String> newProIds = new ArrayList<>();
         		int market = 0; //上架判断
@@ -209,10 +215,9 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
         					loopEnd++;
         				}
         				String productPrice = StringUtils.getArrayFirst(map.get("productList[" + i + "].price"));
-        				String productCost = StringUtils.getArrayFirst(map.get("productList[" + i + "].cost"));
-        				String productMarketPrice = StringUtils.getArrayFirst(map.get("productList[" + i + "].marketPrice"));
-        				String productWeight = StringUtils.getArrayFirst(map.get("productList[" + i + "].weight"));
-        				String productWeightUnit = StringUtils.getArrayFirst(map.get("productList[" + i + "].weightUnit"));
+        				String bigUnit = StringUtils.getArrayFirst(map.get("productList[" + i + "].bigUnit"));
+        				String relate = StringUtils.getArrayFirst(map.get("productList[" + i + "].relate"));
+        				String smallUnit = StringUtils.getArrayFirst(map.get("productList[" + i + "].smallUnit"));
         				String productStore = StringUtils.getArrayFirst(map.get("productList[" + i + "].store"));
         				String productStorePlace = StringUtils.getArrayFirst(map.get("productList[" + i + "].storePlace"));
         				String productIsMarketable = StringUtils.getArrayFirst(map.get("productList[" + i + "].isMarketable"));
@@ -223,10 +228,11 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
         				product.setId(productId);
         				product.setProductSn(productSn);
         				product.setPrice(StringUtils.isNumeric(productPrice)? new BigDecimal(productPrice) : new BigDecimal(0));
-        				product.setCost(StringUtils.isNumeric(productCost)? new BigDecimal(productCost) : new BigDecimal(0));
-        				product.setMarketPrice(StringUtils.isNumeric(productMarketPrice)? new BigDecimal(productMarketPrice) : new BigDecimal(0));
-        				product.setWeight(productWeight == null ? null : Double.valueOf(productWeight));
-        				product.setWeightUnit(productWeightUnit == null ? null : Integer.parseInt(productWeightUnit));
+        				product.setCost(StringUtils.isNumeric(productPrice)? new BigDecimal(productPrice) : new BigDecimal(0));
+        				product.setMarketPrice(StringUtils.isNumeric(productPrice)? new BigDecimal(productPrice) : new BigDecimal(0));
+        				product.setBigUnit(bigUnit);
+        				product.setConvertRelate(relate == null ? null : Integer.parseInt(relate));
+        				product.setSmallUnit(smallUnit);
         				product.setStore(productStore == null ? null : Integer.parseInt(productStore));
         				product.setStorePlace(productStorePlace);
         				product.setIsMarketable(Boolean.valueOf(productIsMarketable));

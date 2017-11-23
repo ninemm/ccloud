@@ -33,8 +33,7 @@ $(function() {
 	<#list (pList)! as list>
 		var productSn = 'productList[' + ${list_index} + '].productSn';
 		var price = 'productList[' + ${list_index} + '].price';
-		var cost = 'productList[' + ${list_index} + '].cost';
-		var marketPrice = 'productList[' + ${list_index} + '].marketPrice';
+		var relate = 'productList[' + ${list_index} + '].relate';
         $('#form').data('bootstrapValidator').addField(productSn,{
                validators: {  
                    notEmpty: {  
@@ -53,28 +52,17 @@ $(function() {
 				   }
                }  
         });
-        $('#form').data('bootstrapValidator').addField(cost,{
+        $('#form').data('bootstrapValidator').addField(relate,{
                validators: {  
                    notEmpty: {  
-                       message: '请输入商品成本价'
+                       message: '请输入换算关系'
                    },
                    regexp: {
 					    regexp: /^[0-9\.]+$/,
 					    message: '请输入正确的数字'
 				   }
                }  
-        });
-        $('#form').data('bootstrapValidator').addField(marketPrice,{
-               validators: {  
-                   notEmpty: {  
-                       message: '请输入商品市场价'
-                   },
-                   regexp: {
-					    regexp: /^[0-9\.]+$/,
-					    message: '请输入正确的数字'
-				   }
-               }  
-        });		
+        });        
 	</#list>
 	
 	$('#_category_tree').click(function() {
@@ -233,8 +221,7 @@ $(function() {
 		$("#goodsSpecificationTable tr:last").after(goodsSpecificationTableTrHtml);
 		var productSn = 'productList[' + index + '].productSn';
 		var price = 'productList[' + index + '].price';
-		var cost = 'productList[' + index + '].cost';
-		var marketPrice = 'productList[' + index + '].marketPrice';
+		var relate = 'productList[' + index + '].relate';
         $('#form').data('bootstrapValidator').addField(productSn,{
                validators: {  
                    notEmpty: {  
@@ -253,28 +240,17 @@ $(function() {
 				   }
                }  
         });
-        $('#form').data('bootstrapValidator').addField(cost,{
+        $('#form').data('bootstrapValidator').addField(relate,{
                validators: {  
                    notEmpty: {  
-                       message: '请输入商品成本价'
+                       message: '请输入换算关系'
                    },
                    regexp: {
 					    regexp: /^[0-9\.]+$/,
 					    message: '请输入正确的数字'
 				   }
                }  
-        });
-        $('#form').data('bootstrapValidator').addField(marketPrice,{
-               validators: {  
-                   notEmpty: {  
-                       message: '请输入商品市场价'
-                   },
-                   regexp: {
-					    regexp: /^[0-9\.]+$/,
-					    message: '请输入正确的数字'
-				   }
-               }  
-        });                        
+        });                                
 		index ++;
 		showOrHideGoodsInput();
 	});
@@ -377,12 +353,10 @@ $(function() {
 			}
 			var productSn = 'productList[' + index + '].productSn';
 			var price = 'productList[' + index + '].price';
-			var cost = 'productList[' + index + '].cost';
-			var marketPrice = 'productList[' + index + '].marketPrice';
+			var relate = 'productList[' + index + '].relate';
    			$("form").bootstrapValidator('removeField',productSn);
    			$("form").bootstrapValidator('removeField',price); 
-   			$("form").bootstrapValidator('removeField',cost); 
-   			$("form").bootstrapValidator('removeField',marketPrice); 
+   			$("form").bootstrapValidator('removeField',relate); 
 			showOrHideGoodsInput();
 		}
 	});	
@@ -598,7 +572,7 @@ function doSubmit(){
 				                 	</div>
 				               	</div>
 							</div>
-							<div class="form-group col-sm-12 validata-box">
+						<!--<div class="form-group col-sm-12 validata-box">
 								<label class="control-label col-sm-2">大单位价格:</label>
 								<div class="input-group col-md-4 col-sm-10">
 				                 	<input class="form-control input-sm" type="text" name="goods.big_price" value="${(goods.big_price)!}" placeholder="2-20个任意字母数字">
@@ -627,7 +601,7 @@ function doSubmit(){
 								<div class="input-group col-md-4 col-sm-10">
 				                 	<input class="form-control input-sm" type="text" name="goods.convert_relate" value="${(goods.convert_relate)!}" placeholder="2-20个任意字母数字">
 				               	</div>
-							</div>					
+							</div>-->				
 							<div class="form-group col-sm-12 validata-box">
 								<label class="control-label col-sm-2">简介:</label>
 								<div class="input-group col-md-4 col-sm-10">
@@ -738,16 +712,13 @@ function doSubmit(){
 												销售价
 											</th>
 											<th>
-												成本价
+												大单位
 											</th>
 											<th>
-												市场价
+												换算关系
 											</th>
 											<th>
-												重量
-											</th>
-											<th>
-												重量单位
+												小单位
 											</th>
 											<th>
 												库存
@@ -797,20 +768,28 @@ function doSubmit(){
 											<td>
 												<div class="form-group validata-box" style="margin: 0;">
 												<div class="input-group col-md-4 col-sm-10">
-													<input type="text" name="productList[-1].cost" style="width: 50px;" disabled />
-												</div>											
+													<select name="productList[-1].bigUnit" disabled>
+														<#list (dlist)! as dict >
+															<option value="${dict.name!}">${(dict.name)!}</option>
+														</#list>
+													</select>
+												</div>
+											</td>
+											<td>
+												<div class="form-group validata-box" style="margin: 0;">
+												<div class="input-group col-md-4 col-sm-10">											
+													<input type="text" name="productList[-1].relate" style="width: 30px;" disabled />
+												</div>
 											</td>
 											<td>
 												<div class="form-group validata-box" style="margin: 0;">
 												<div class="input-group col-md-4 col-sm-10">
-													<input type="text" name="productList[-1].marketPrice" style="width: 50px;" disabled />
+													<select name="productList[-1].smallUnit" disabled>
+														<#list (dlist)! as dict >
+															<option value="${dict.name!}">${(dict.name)!}</option>
+														</#list>
+													</select>										
 												</div>												
-											</td>
-											<td>
-												<input type="text" name="productList[-1].weight" style="width: 30px;" disabled />
-											</td>
-											<td>
-												<input type="text" name="productList[-1].weightUnit" style="width: 30px;" disabled />
 											</td>
 											<td>
 												<input type="text" name="productList[-1].store" style="width: 30px;" disabled />
@@ -875,22 +854,30 @@ function doSubmit(){
 												</td>
 												<td>
 												<div class="form-group validata-box" style="margin: 0;">
-												<div class="input-group col-md-4 col-sm-10">												
-													<input type="text" name="productList[${list_index}].cost" class="formText {min: 0, messages: {min: '货品成本价信息不允许小于0!'}}" style="width: 50px;" value="${list.cost}" />
+												<div class="input-group col-md-4 col-sm-10">
+													<select name="productList[${list_index}].bigUnit">
+														<#list (dlist)! as dict >
+															<option value="${dict.name!}"<#if (list.bigUnit)! == (dict.name)!>selected="selected"</#if>>${(dict.name)!}</option>
+														</#list>
+													</select>
 												</div>
 												</td>
 												<td>
 												<div class="form-group validata-box" style="margin: 0;">
 												<div class="input-group col-md-4 col-sm-10">												
-													<input type="text" name="productList[${list_index}].marketPrice" class="formText {required: true, min: 0, messages: {required: '货品市场价信息不完整!', min: '货品市场价不允许小于0!'}}" style="width: 50px;" value="${list.marketPrice}" />
+													<input type="text" name="productList[${list_index}].relate" class="formText {required: true, min: 0, messages: {required: '货品市场价信息不完整!', min: '货品市场价不允许小于0!'}}" style="width: 50px;" value="${list.convertRelate}" />
 												</div>	
 												</td>
 												<td>
-													<input type="text" name="productList[${list_index}].weight" class="formText {required: true, min: 0, messages: {required: '货品重量信息不完整!', min: '货品重量不允许小于0!'}}" style="width: 30px;" value="${(list.weight)!}" />
-												</td>
-												<td>
-													<input type="text" name="productList[${list_index}].weightUnit" class="formText {required: true, min: 0, messages: {required: '货品重量信息不完整!', min: '货品重量不允许小于0!'}}" style="width: 30px;" value="${(list.weightUnit)!}" />
-												</td>
+												<div class="form-group validata-box" style="margin: 0;">
+												<div class="input-group col-md-4 col-sm-10">
+													<select name="productList[${list_index}].smallUnit">
+														<#list (dlist)! as dict >
+															<option value="${dict.name!}"<#if (list.smallUnit)! == (dict.name)!>selected="selected"</#if>>${(dict.name)!}</option>
+														</#list>
+													</select>
+												</div>	
+												</td>												
 												<td>
 													<input type="text" name="productList[${list_index}].store" class="formText {digits: true, messages: {digits: '货品库存必须为正整数!'}}" style="width: 30px;" value="${(list.store)!}" />
 												</td>

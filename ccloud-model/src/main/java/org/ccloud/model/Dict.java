@@ -42,8 +42,11 @@ public class Dict extends BaseDict<Dict> {
 		
 		removeCache(getId());
 		CacheKit.remove(Dict.CACHE_NAME, CACHE_KEY);
-		
-		return super.saveOrUpdate();
+		if (getId() != null) {
+			return super.update();
+		} else {
+			return super.save();
+		}
 	}
 	
 	@Override

@@ -234,5 +234,29 @@ public abstract class BaseProduct<M extends BaseProduct<M>> extends JModel<M> im
 	public java.lang.String getGoodsId() {
 		return get("goods_id");
 	}
+	
+	public void setBigUnit(java.lang.String bigUnit) {
+		set("big_unit", bigUnit);
+	}
+
+	public java.lang.String getBigUnit() {
+		return get("big_unit");
+	}
+
+	public void setSmallUnit(java.lang.String smallUnit) {
+		set("small_unit", smallUnit);
+	}
+
+	public java.lang.String getSmallUnit() {
+		return get("small_unit");
+	}
+
+	public void setConvertRelate(java.lang.Integer convertRelate) {
+		set("convert_relate", convertRelate);
+	}
+
+	public java.lang.Integer getConvertRelate() {
+		return get("convert_relate");
+	}	
 
 }
