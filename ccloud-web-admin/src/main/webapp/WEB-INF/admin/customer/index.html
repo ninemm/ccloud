@@ -169,13 +169,19 @@
 		
 		<div class="row content-row">
 			<div class="jp-left">
-				<label class="control-label">批量操作:</label>
-				<button class="btn btn-sm btn-default" type="button" onclick="batchAction('setUser')"> 设置负责人 </button>
+				<@shiro.hasPermission name="/admin/customer/batchSetUser, /admin/dealer/all, /admin/all"> 
+					<label class="control-label">批量操作:</label>
+					<button class="btn btn-sm btn-default" type="button" onclick="batchAction('setUser')"> 设置负责人 </button>
+				</@shiro.hasPermission>
 			</div>
 			
 			<div class="jp-right">
-				<a href="${CPATH}/admin/customer/upload?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-upload"></i> 导入</a>
-				<a href="${CPATH}/admin/customer/download?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-download"></i> 导出</a>
+				<@shiro.hasPermission name="/admin/customer/uploading, /admin/dealer/all, /admin/all"> 
+					<a href="${CPATH}/admin/customer/upload?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-upload"></i> 导入</a>
+				</@shiro.hasPermission>
+				<@shiro.hasPermission name="/admin/customer/downloading, /admin/dealer/all, /admin/all"> 
+					<a href="${CPATH}/admin/customer/download?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-download"></i> 导出</a>
+				</@shiro.hasPermission>
 				<a href="${CPATH}/admin/customer/edit?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-plus"></i> 新增 </a>
 			</div>
 		</div>
