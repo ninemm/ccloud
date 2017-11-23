@@ -184,4 +184,17 @@ public class ProductQuery extends JBaseQuery {
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 	
+	public List<Product> findAll(String userId){
+		String sql = "SELECT cp.id as id,cp.name as name,cp.price as price,GROUP_CONCAT(DISTINCT cgs.`name`) AS cps_name FROM cc_product cp "
+				+ "LEFT JOIN cc_product_goods_specification_value cpg ON cp.id = cpg.product_set_id "
+				+ "LEFT JOIN cc_goods_specification_value cgs ON cpg.goods_specification_value_set_id = cgs.id "
+				+ "LEFT JOIN cc_product_safe_inventory cpsi ON cpsi.product_id = cp.id "
+				+ "LEFT JOIN `user` u on u.department_id = cpsi.dept_id "
+				+ "where u.id =? GROUP BY cp.id,cpsi.safe_inventory_count,cp.name,cp.price";
+		return DAO.find(sql, userId);
+	}
+	
+	public Product findByPId(String id){
+		return DAO.findById(id);
+	}
 }

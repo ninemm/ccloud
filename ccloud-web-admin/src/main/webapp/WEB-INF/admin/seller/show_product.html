@@ -91,9 +91,9 @@
 	var initFields = function() {
 		var fields =
 			[	
-				{field: "", title: "<input type='checkbox' onclick='checkAll(this)' id='dataItem' value=''/>", align: "center", width: '5%',
+				{field: "", title: "<input type='checkbox' onclick='checkAll(this)' name='dataItem1' value=''/>", align: "center", width: '5%',
 				formatter: function(value, row, rowIndex) {
-					var strHtml = '<input type="checkbox" name="dataItem" id="dataItem" value="'+row.id+'"/>';
+					var strHtml = '<input type="checkbox" name="dataItem" id="dataItem" value="'+row.product_id+'"/>';
 					return strHtml;
 				},
 				edit:false
@@ -126,11 +126,10 @@
 				{field: "action", title: "操作", align: "center", width: '5%',
 				formatter: function(value, row, rowIndex) {
 					var url2 = '${CPATH}/admin/seller/change?id=' + row.id +'&is_enable='+row.is_enable+ '&c=${c}&p=${p}';
-					var strHtml = '<a onclick="savePro(\''+row.id+'\')" name="row" class="btn btn-sm" title="保存"><i class="fa fa-check-square"></i></a>'
 					if(row.is_enable == 0){
-					  strHtml = '<a href="' + url2 + '" class="btn btn-sm" title="上架"><i class="fa fa-arrow-circle-o-up"></i></a>';
+					  var strHtml = '<a href="' + url2 + '" class="btn btn-sm" title="上架"><i class="fa fa-arrow-circle-o-up"></i></a>';
 					}else{
-					  strHtml = '<a href="' + url2 + '" class="btn btn-sm" title="下架"><i class="fa fa-arrow-circle-o-down"></i></a>';
+					  var strHtml = '<a href="' + url2 + '" class="btn btn-sm" title="下架"><i class="fa fa-arrow-circle-o-down"></i></a>';
 					}
 					return strHtml;
 				},
@@ -141,6 +140,7 @@
 	}
 	
 	function refresh(){
+		$("[name = dataItem1]:checkbox").attr("checked", false);
 		$('#post-search-input').val("");
 		$table.bootstrapTable('refresh');
 	}
@@ -166,7 +166,7 @@
 		 }
 		 $('input[name="dataItem"]:checked').parent().parent().each(function(idx, item) {
 		  	var obj = {
-								"id":  $(this).find('td').eq(0).find("input").val(),
+								"productId":  $(this).find('td').eq(0).find("input").val(),
 								"safeInventoryCount":  $(this).find('td').eq(4).find("input").val(),
 						};
 							orderItems.push(obj);
@@ -179,7 +179,6 @@
 			success:function(data){
 				if(data==true){
 					toastr.success(data.message, '操作成功');
-					$(this).dialog('close');
 				}else{
 					toastr.error(data.message,'操作失败');
 				}

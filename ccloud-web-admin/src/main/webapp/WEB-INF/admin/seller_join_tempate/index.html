@@ -55,6 +55,7 @@
 	});
 
 	function refresh(){
+		$("[name = data]:checkbox").attr("checked", false);
 		$('#post-search-input').val("");
 		$table.bootstrapTable('refresh');
 	}
@@ -101,7 +102,7 @@
 	var initFieldss = function() {
 		var fields =
 			[
-				{field: "", title: "<input type='checkbox' onclick='checkA(this)' id='data' value=''/>", align: "center", width: '5%',
+				{field: "", title: "<input type='checkbox' onclick='checkA(this)' name='data' value=''/>", align: "center", width: '5%',
 				formatter: function(value, row, rowIndex) {
 					var strHtml = '<input type="checkbox" name="data" id="data" value="'+row.id+'"/>';
 					return strHtml;

@@ -271,7 +271,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				if(isSellerGoods==null){
 					String Id = StrKit.getRandomUUID();
 					sellerGoods.set("id",Id);
-					sellerGoods.set("product_id",sellerGood.getId());
+					sellerGoods.set("product_id",sellerGood.getProductId());
 					sellerGoods.set("seller_id",sellerGood.getSellerId());
 					sellerGoods.set("custom_name",sellerGood.getCustomName());
 					sellerGoods.set("store_count",sellerGood.getStoreCount());
@@ -319,7 +319,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			for(String w :warehouselists){
 				s.add(w);
 			}
-			List<ProductSafeInventory> inventory = ProductSafeInventoryQuery.me().findByWarehouseId(sellerGood.getId());
+			List<ProductSafeInventory> inventory = ProductSafeInventoryQuery.me().findByWarehouseId(sellerGood.getProductId());
 			boolean flang = false;
 			if(inventory!=null){
 				for (ProductSafeInventory inventory2 :inventory){
@@ -342,7 +342,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				for (int j=0;j<s.size();j++){
 					String Id = StrKit.getRandomUUID();
 					productSafeInventory.set("id", Id);
-					productSafeInventory.set("product_id",sellerGood.getId());
+					productSafeInventory.set("product_id",sellerGood.getProductId());
 					productSafeInventory.set("warehouse_id", s.get(j));
 					productSafeInventory.set("safe_inventory_count", sellerGood.getSafeInventoryCount());
 					productSafeInventory.set("data_area", department.getDataArea());

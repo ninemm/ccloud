@@ -190,10 +190,11 @@ public class JBaseModelGenerator extends BaseModelGenerator {
 //		if("id".equals(columnMeta.attrName)){
 //			ret.append(String.format(idGetterTemplate));
 //		} else {
-//			String getterMethodName = "get" + StrKit.firstCharToUpperCase(columnMeta.attrName);
-//			String getterOfModel = getGetterOfModel(columnMeta.javaType);
-//			String getter = String.format(getterTemplate, columnMeta.javaType, getterMethodName, columnMeta.name);
-//			ret.append(getter);
+		
+			String getterMethodName = "get" + StrKit.firstCharToUpperCase(columnMeta.attrName);
+			String getterOfModel = getGetterOfModel(columnMeta.javaType);
+			String getter = String.format(getterTemplate, columnMeta.javaType, getterMethodName,getterOfModel, columnMeta.name);
+			ret.append(getter);
 //		}
 	}
 
