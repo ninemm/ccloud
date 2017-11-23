@@ -15,10 +15,13 @@
  */
 package org.ccloud.model.query;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.ccloud.model.SalesOrder;
+import org.ccloud.utils.StringUtils;
 
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
@@ -82,7 +85,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	public List<Record> findProductListBySeller(String sellerId) {
 		StringBuilder fromBuilder = new StringBuilder(
 				" SELECT sg.product_id, sg.custom_name, sg.store_count, sg.price, GROUP_CONCAT(gsv.name) AS spe_name, p.big_unit, p.small_unit, p.convert_relate ");
-		fromBuilder.append(" FROM cc_seller_goods sg ");
+		fromBuilder.append(" FROM cc_seller_product sg ");
 		fromBuilder.append(" LEFT JOIN cc_product p ON sg.product_id = p.id ");
 		fromBuilder
 				.append(" LEFT JOIN cc_product_goods_specification_value pgsv ON sg.product_id = pgsv.product_set_id ");
@@ -111,10 +114,10 @@ public class SalesOrderQuery extends JBaseQuery {
 		appendIfNotEmpty(fromBuilder, "ujc.user_id", userId, params, false);
 
 		fromBuilder.append(" order by c.create_date ");
-		
+
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}
-	
+
 	public List<Record> findCustomerTypeListByCustomerId(String customerId, String dataArea) {
 		LinkedList<Object> params = new LinkedList<Object>();
 
@@ -128,6 +131,24 @@ public class SalesOrderQuery extends JBaseQuery {
 		return Db.find(sqlBuilder.toString(), params.toArray());
 	}
 
+	public boolean insert(Map<String, String[]> paraMap, String orderSn, String sellerId, String userId, Date date,
+			String deptId, String dataArea) {
+		DAO.set("order_sn", orderSn);
+		DAO.set("seller_id", sellerId);
+		DAO.set("biz_user_id", userId);
+		DAO.set("customer_id", StringUtils.getArrayFirst(paraMap.get("customerId")));
+		DAO.set("contact", StringUtils.getArrayFirst(paraMap.get("mobile")));
+		DAO.set("address", StringUtils.getArrayFirst(paraMap.get("address")));
+		DAO.set("total_amount", StringUtils.getArrayFirst(paraMap.get("total")));
+		DAO.set("receive_type", StringUtils.getArrayFirst(paraMap.get("receiveType")));
+		DAO.set("delivery_address", StringUtils.getArrayFirst(paraMap.get("deliveryAddress")));
+		DAO.set("delivery_date", StringUtils.getArrayFirst(paraMap.get("deliveryDate")));
+		DAO.set("remark", StringUtils.getArrayFirst(paraMap.get("remark")));
+		DAO.set("create_date", date);
+		DAO.set("dept_id", deptId);
+		DAO.set("data_area", dataArea);
+		return DAO.save();
+	}
 
 	public int batchDelete(String... ids) {
 		if (ids != null && ids.length > 0) {

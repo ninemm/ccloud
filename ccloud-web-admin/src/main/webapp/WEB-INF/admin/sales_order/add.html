@@ -21,43 +21,21 @@
 
 <#macro script>
 	$(function() {
+		jQuery.mm.initValidator('#form', validatorFields);
+		jQuery.mm.initDatetimepicker('form', '#deliveryDate', 'deliveryDate', 'yyyy-MM-dd', 2, 4, 2);
 		addProduct();
 		initCustomer();
-		jQuery.mm.initDatetimepicker('form', '#deliveryDate', 'deliveryDate', 'yyyy-MM-dd', 2, 4, 2);
-		jQuery.mm.initValidator('#form', validatorFields);
 	});
-
+	
 	var $form = $("#form");
 	var productInfoMap = ${productInfoMap!}
 	var productOptionList = ${productOptionList!}
 	var customerInfoMap = ${customerInfoMap!}
 	var customerOptionList = ${customerOptionList!}
+	//标志
+	var newTrIdx = 0;
 	
 	var validatorFields = {
-		'bigPrice': {
-			validators: {
-				notEmpty: { message: '价格不能为空' },
-				regexp:{regexp:/^[0-9]+(.[0-9]{1,3})?$/, message:'请输入正确的价格' }
-			}
-		},
-		'bigNum': {
-			validators: {
-				notEmpty: { message: '数量不能为空' },
-				regexp:{regexp:/^[0-9]\d*$/, message:'请输入正确的数量' }
-			}
-		},
-		'smallPrice': {
-			validators: {
-				notEmpty: { message: '价格不能为空' },
-				regexp:{regexp:/^[0-9]+(.[0-9]{1,3})?$/, message:'请输入正确的价格' }
-			}
-		},
-		'smallNum': {
-			validators: {
-				notEmpty: { message: '数量不能为空' },
-				regexp:{regexp:/^[0-9]\d*$/, message:'请输入正确的数量' }
-			}
-		},
 		'deliveryAddress': {
 			validators: {
 				notEmpty: { message: '配送地址不能为空' },
@@ -72,15 +50,15 @@
 	};
 
 	function addProduct(){
-
 		var $tbody = $("#table tbody");
 
 		var newTrHtml = $tbody.find("tr:first").html();
-		var newTrIdx = $tbody.find("tr:last").index() + 1;
-		$tbody.append("<tr id='tr" + newTrIdx + "'>" + newTrHtml + "</tr>");
+		newTrIdx = newTrIdx + 1;
+		var newTrId = 'tr' + newTrIdx;
+		$tbody.append("<tr id='" + newTrId + "'>" + newTrHtml + "</tr>");
 
-		$tbody.find("tr:last #row").text(newTrIdx);
-		var $productSelect = $tbody.find("tr:last #productId")
+		var $newTr = $("#" + newTrId);
+		var $productSelect = $newTr.find("#productId")
 
 		$productSelect.select2({
 			data: productOptionList,
@@ -96,12 +74,58 @@
 		<!--触发一次 -->
 		productChange($productSelect);
 		
+		<!--添加validate -->
+		var bigPriceName = "bigPrice" + newTrIdx;
+		$newTr.find("#bigPrice").attr("name", bigPriceName)
+		$form.data('bootstrapValidator').addField(bigPriceName,
+			{
+				validators: {
+					notEmpty: { message: '价格不能为空' },
+					regexp:{regexp:/^[0-9]+(.[0-9]{1,3})?$/, message:'请输入正确的价格' }
+				}
+		});
+		
+		var bigNumName = "bigNum" + newTrIdx;
+		$newTr.find("#bigNum").attr("name", bigNumName)
+		$form.data('bootstrapValidator').addField(bigNumName,
+			{
+				validators: {
+					notEmpty: { message: '数量不能为空' },
+					regexp:{regexp:/^[0-9]\d*$/, message:'请输入正确的数量' }
+				}
+		});
+		
+		var smallPriceName = "smallPrice" + newTrIdx;
+		$newTr.find("#smallPrice").attr("name", smallPriceName)
+		$form.data('bootstrapValidator').addField(smallPriceName,
+			{
+				validators: {
+					notEmpty: { message: '价格不能为空' },
+					regexp:{regexp:/^[0-9]+(.[0-9]{1,3})?$/, message:'请输入正确的价格' }
+				}
+		});
+		
+		var smallNumName = "smallNum" + newTrIdx;
+		$newTr.find("#smallNum").attr("name", smallNumName)
+		$form.data('bootstrapValidator').addField(smallNumName,
+			{
+				validators: {
+					notEmpty: { message: '数量不能为空' },
+					regexp:{regexp:/^[0-9]\d*$/, message:'请输入正确的数量' }
+				}
+		});
+		
+		$newTr.find("#productId").attr("name", "productId" + newTrIdx);
+		$newTr.find("#isGift").attr("name", "isGift" + newTrIdx);
+		$newTr.find("#inputRowTotal").attr("name", "inputRowTotal" + newTrIdx);
+
+		orderNum();
 	}
 	
 	function productChange(obj){
 			var product = productInfoMap[obj.val()].columns;
 
-			var $tr = obj.parent().parent();
+			var $tr = obj.parent().parent().parent();
 
 			$tr.find("#specification").text(product.spe_name);
 			$tr.find("#stock").text(product.store_count);
@@ -122,12 +146,29 @@
 			$tr.find("#smallPrice-span").text(product.price);
 			$tr.find("#smallUnit-span").text(smallUnit);
 			
-			rowTotal(obj);
+			rowTotalF(obj);
 	}
 	
 	function deleteTr(obj){
-		$(obj).parent().parent().remove();
-		total();
+		var $tr = $(obj).parent().parent();
+		var trIndex = $tr.attr("id").replace("tr", "");
+		$form.bootstrapValidator('removeField', 'bigPrice' + trIndex);
+		$form.bootstrapValidator('removeField', 'bigNum' + trIndex);
+		$form.bootstrapValidator('removeField', 'smallPrice' + trIndex);
+		$form.bootstrapValidator('removeField', 'smallNum' + trIndex);
+		
+		$tr.remove();
+		
+		totalF();
+		orderNum();
+	}
+	
+	function orderNum(){
+		var $rowNum = $(".rowNum");
+		
+		$rowNum.each(function(index, el){
+			$(el).text(index);
+		});
 	}
 	
 	function initCustomer(){
@@ -174,29 +215,29 @@
 	}
 	
 	function changeBigPrice(obj){
-		var $curTr = $(obj).parent().parent();
+		var $curTr = $(obj).parent().parent().parent();
 		var bigPrice = $(obj).val();
 		var convert = $curTr.find("#convert").val();
 
 		var smallPrice = (bigPrice / convert).toFixed(2);
 		$curTr.find("#smallPrice").val(smallPrice);
 
-		rowTotal(obj);
+		rowTotalF(obj);
 	}
 
 	function changeSmallPrice(obj){
-		var $curTr = $(obj).parent().parent();
+		var $curTr = $(obj).parent().parent().parent();
 		var smallPrice = $(obj).val();
 		var convert = $curTr.find("#convert").val();
 
 		var bigPrice = (smallPrice * convert).toFixed(2);
 		$curTr.find("#bigPrice").val(bigPrice);
 
-		rowTotal(obj);
+		rowTotalF(obj);
 	}
 
-	function rowTotal(obj){
-		var $curTr = $(obj).parent().parent();
+	function rowTotalF(obj){
+		var $curTr = $(obj).parent().parent().parent();
 		var rowTotal = 0;
 
 		var isCheck = $curTr.find("input[type='checkbox']").is(':checked');
@@ -209,11 +250,12 @@
 			rowTotal.toFixed(2);
 		}
 		$curTr.find(".rowTotal").text(rowTotal);
+		$curTr.find("#inputRowTotal").val(rowTotal);
 
-		total();
+		totalF();
 	}
 
-	function total() {
+	function totalF() {
 		var rows = $(".rowTotal");
 		var total = 0;
 		$.each(rows, function(index, item) {
@@ -221,6 +263,7 @@
 		});
 		total.toFixed(2);
 		$("#total").text(total);
+		$("#inputTotal").val(total);
 	}
 
 	function doSubmit(){
@@ -277,10 +320,12 @@
 							<th width="2%"></th>
 							<th width="5%">序号</th>
 							<th width="20%">商品名称</th>
-							<th width="8%">规格</th>
+							<th width="9%">规格</th>
 							<th width="8%">库存</th>
-							<th width="23%">大单位数量</th>
-							<th width="22%">小单位数量</th>
+							<th width="11%">大单位价格</th>
+							<th width="12%">大单位数量</th>
+							<th width="11%">小单位价格</th>
+							<th width="11%">小单位数量</th>
 							<th width="5%">赠品</th>
 							<th width="7%">小计</th>
 						</tr>
@@ -291,11 +336,13 @@
 								<a class="btn btn-danger btn-xs" onclick="deleteTr(this)"><span class="glyphicon glyphicon-remove"></span></a>
 							</td>
 							<td>
-								<span id="row">1</span>
+								<span class="rowNum">0</span>
 							</td>
 							<td>
-								<select id="productId" name="productId" class="form-control">
-								</select>
+								<div class = "validata-box">
+									<select id="productId" name="productId" class="form-control">
+									</select>
+								</div>
 							</td>
 							
 							<td>
@@ -305,26 +352,36 @@
 								<span id="specification"></span>
 							</td>
 							<td>
-							<input type="hidden" id="convert" value="" />
+								<input type="hidden" id="convert" value="" />
 								<div class = "validata-box">
-									￥<input type="text" id="bigPrice" name="bigPrice" style="width: 20%" onblur="changeBigPrice(this)" value="0"  />
-									(<span id="bigPrice-span"></span>) X
-									<input type="text" id="bigNum" name="bigNum" style="width: 20%" onblur="rowTotal(this)" value="1" />
-									<span id="bigUnit-span"></span>
+									￥<input type="text" id="bigPrice" name="bigPrice" style="width: 60%" onblur="changeBigPrice(this)" value="0" />
+									</br>(<span id="bigPrice-span"></span>)
 								</div>
 							</td>
 							<td>
 								<div class = "validata-box">
-									￥<input type="text" id="smallPrice" name="smallPrice" style="width: 20%" onblur="changeSmallPrice(this)" value="0"/>
-									(<span id="smallPrice-span"></span>) X
-									<input type="text" id="smallNum" name="smallNum" style="width: 20%" onblur="rowTotal(this)" value="0" />
-									<span id="smallUnit-span"></span>
+									<input type="text" id="bigNum" name="bigNum" style="width: 60%" onblur="rowTotalF(this)" value="1" />
+									</br><span id="bigUnit-span"></span>
 								</div>
 							</td>
 							<td>
-								<input type="checkbox" id="isGift" name="isGift" onclick="rowTotal(this)"/>
+								<div class = "validata-box">
+									￥<input type="text" id="smallPrice" name="smallPrice" style="width: 60%" onblur="changeSmallPrice(this)" value="0"/>
+									</br>(<span id="smallPrice-span"></span>)
+								</div>
 							</td>
-							<td>￥<span class="rowTotal">0</span></td>
+							<td>
+								<div class = "validata-box">
+									<input type="text" id="smallNum" name="smallNum" style="width: 60%" onblur="rowTotalF(this)" value="0" />
+									</br><span id="smallUnit-span"></span>
+								</div>
+							</td>
+							<td>
+								<div class = "validata-box">
+									<input type="checkbox" id="isGift" name="isGift" onclick="rowTotalF(this)"/>
+								</div>
+							</td>
+							<td>￥<span class="rowTotal">0</span> <input type="hidden" name="rowTotal" id="inputRowTotal" value="0" /></td>
 						</tr>
 					</tbody>
 					<tfoot>
@@ -332,8 +389,8 @@
 							<td>
 								<button class="btn btn-xs btn-info" onclick="addProduct()" ><span class="glyphicon glyphicon-plus"></span></button>
 							</td>
-							<th colspan="7" style="text-align:right">合计:</th>
-							<th>￥<span id="total">0</span></th>
+							<th colspan="9" style="text-align:right">合计:</th>
+							<th>￥<span id="total">0</span> <input type="hidden" name="total" id="inputTotal" value="0" /></th>
 						</tr>
 					</tfoot>
 				</table>

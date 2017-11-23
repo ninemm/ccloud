@@ -264,9 +264,12 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 		customer.setCountryCode(getPara("userDistrictId"));
 		customer.setCountryName(getPara("userDistrictText"));
 		String[] customerTypes = getParaValues("customerTypes");
-		String userId = getPara("userIds");
+		String userIds = getPara("userIds");
 
-		// User user = getSessionAttr("user");
+		if (StrKit.isBlank(userIds)) {
+			User user = getSessionAttr("user");
+			userIds = user.getId();
+		}
 
 		CustomerJoinCustomerTypeQuery.me().deleteByCustomerId(customerId);
 		UserJoinCustomerQuery.me().deleteByCustomerId(customerId);
@@ -285,7 +288,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 			CustomerJoinCustomerTypeQuery.me().insert(customerId, customerType);
 		}
 
-		this.insertUserJoinCustomer(customerId, userId);
+		this.insertUserJoinCustomer(customerId, userIds);
 
 		renderAjaxResultForSuccess();
 
@@ -357,9 +360,9 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 		}
 	}
 
-	private void insertUserJoinCustomer(String customerId, String userId) {
-		String[] userIds = userId.split(",");
-		for (String id : userIds) {
+	private void insertUserJoinCustomer(String customerId, String userIds) {
+		String[] userIdArray = userIds.split(",");
+		for (String id : userIdArray) {
 			User user = UserQuery.me().findById(id);
 			UserJoinCustomerQuery.me().insert(customerId, id, user.getDepartmentId(), user.getDataArea());
 		}
