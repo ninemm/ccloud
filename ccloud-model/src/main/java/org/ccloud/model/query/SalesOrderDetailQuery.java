@@ -15,8 +15,12 @@
  */
 package org.ccloud.model.query;
 
+import java.util.Date;
 import java.util.LinkedList;
+import java.util.Map;
+
 import org.ccloud.model.SalesOrderDetail;
+import org.ccloud.utils.StringUtils;
 
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.ehcache.IDataLoader;
@@ -31,6 +35,20 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 
 	public static SalesOrderDetailQuery me() {
 		return QUERY;
+	}
+	
+	public boolean insert(Map<String, String[]> paraMap, String orderSn, String sellerId, String userId, Date date,
+			String deptId, String dataArea) {
+		DAO.set("order_id", orderSn);
+		DAO.set("product_id", StringUtils.getArrayFirst(paraMap.get("productId")));
+		DAO.set("product_count", StringUtils.getArrayFirst(paraMap.get("total")));
+		DAO.set("product_amount", StringUtils.getArrayFirst(paraMap.get("rowTotal")));
+		DAO.set("product_price", StringUtils.getArrayFirst(paraMap.get("price")));
+		DAO.set("is_gift", StringUtils.getArrayFirst(paraMap.get("isGift")));
+		DAO.set("create_date", date);
+		DAO.set("dept_id", deptId);
+		DAO.set("data_area", dataArea);
+		return DAO.save();
 	}
 
 	public SalesOrderDetail findById(final String id) {
