@@ -99,6 +99,7 @@ public class _AdminController extends JBaseController {
 				setSessionAttr("dealerDataArea", dealerDataArea);
 				if (sellerList.size() > 0) {
 					setSessionAttr("sellerId", sellerList.get(0).getId());
+					setSessionAttr("sellerCode", sellerList.get(0).getSellerCode());
 					setSessionAttr("sellerName", sellerList.get(0).getSellerName());
 				}
 			}
@@ -115,6 +116,7 @@ public class _AdminController extends JBaseController {
 	@Before(UCodeInterceptor.class)
 	public void logout() {
 		removeSessionAttr("sellerId");
+		removeSessionAttr("sellerCode");
 		removeSessionAttr("sellerName");
 		CookieUtils.remove(this, Consts.COOKIE_LOGINED_USER);
 	    Subject subject = SecurityUtils.getSubject();

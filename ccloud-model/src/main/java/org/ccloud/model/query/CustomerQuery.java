@@ -102,6 +102,18 @@ public class CustomerQuery extends JBaseQuery {
 		return DAO.findById(id);
 	}
 
+	public Integer findByNameAndMobile(String name, String mobile) {
+		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
+
+		StringBuilder sqlBuilder = new StringBuilder(" select count(1) ");
+		sqlBuilder.append(" from `cc_customer` c ");
+		needWhere = appendIfNotEmpty(sqlBuilder, "c.customer_name", name, params, needWhere);
+		needWhere = appendIfNotEmpty(sqlBuilder, "c.mobile", mobile, params, needWhere);
+
+		return Db.queryInt(sqlBuilder.toString(), params.toArray());
+	}
+
 	public int batchDelete(String... ids) {
 		if (ids != null && ids.length > 0) {
 			int deleteCount = 0;

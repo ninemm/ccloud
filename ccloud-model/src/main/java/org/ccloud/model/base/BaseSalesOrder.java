@@ -106,14 +106,6 @@ public abstract class BaseSalesOrder<M extends BaseSalesOrder<M>> extends JModel
 		return getStr("order_sn");
 	}
 
-	public void setWarehouseId(java.lang.String warehouseId) {
-		set("warehouse_id", warehouseId);
-	}
-
-	public java.lang.String getWarehouseId() {
-		return getStr("warehouse_id");
-	}
-
 	public void setSellerId(java.lang.String sellerId) {
 		set("seller_id", sellerId);
 	}
@@ -128,6 +120,14 @@ public abstract class BaseSalesOrder<M extends BaseSalesOrder<M>> extends JModel
 
 	public java.lang.String getCustomerId() {
 		return getStr("customer_id");
+	}
+
+	public void setCustomerTypeId(java.lang.String customerTypeId) {
+		set("customer_type_id", customerTypeId);
+	}
+
+	public java.lang.String getCustomerTypeId() {
+		return getStr("customer_type_id");
 	}
 
 	public void setContact(java.lang.String contact) {
