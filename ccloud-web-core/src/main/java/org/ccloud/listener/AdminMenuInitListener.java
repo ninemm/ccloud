@@ -109,6 +109,7 @@ public class AdminMenuInitListener implements MessageListener {
 			group.addMenuItem(new MenuItem("salesOrder", "/admin/salesOrder", "订货单"));
 			group.addMenuItem(new MenuItem("saleRefund", "/admin/saleRefund", "退货单"));
 			group.addMenuItem(new MenuItem("confirmed", "/admin/order?s=101503", "订单指派"));
+			group.addMenuItem(new MenuItem("purchaseOrder", "/admin/purchaseOrder", "采购订单"));
 		}
 		
 		return group;
