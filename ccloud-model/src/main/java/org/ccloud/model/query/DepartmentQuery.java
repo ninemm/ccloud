@@ -431,8 +431,4 @@ public class DepartmentQuery extends JBaseQuery {
 		return resTreeList;
 	}
 	
-	public Department findByUserId(String userId){
-		String sql = "select d.* from department d LEFT JOIN user u on u.department_id=d.id where u.id=?";
-		return DAO.findFirst(sql, userId);
-	}
 }
