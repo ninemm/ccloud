@@ -16,6 +16,7 @@
 package org.ccloud.model.query;
 
 import java.util.LinkedList;
+
 import org.ccloud.model.PurchaseOrder;
 
 import com.jfinal.kit.StrKit;
@@ -71,11 +72,9 @@ public class PurchaseOrderQuery extends JBaseQuery {
 	}
 
 	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate,String id) {
-		String select =  "SELECT DISTINCT cpo.*, cs.`name` as supplier_name,d.dept_name deptName,(SELECT realname	FROM `user`	WHERE id = (SELECT	cp.biz_user_id	FROM cc_purchase_order cp	LEFT JOIN `user` us ON us.department_id = cp.dept_id WHERE us.id = '"+id+"')) as biz_user,"
-				+ "(SELECT realname	FROM `user`	WHERE id = (SELECT	cp.confirm_user_id	FROM cc_purchase_order cp	LEFT JOIN `user` us ON us.department_id = cp.dept_id WHERE us.id = '"+id+"')) as confirm_user "
-				+ ",(SELECT realname	FROM `user`	WHERE id = (SELECT	cp.input_user_id FROM cc_purchase_order cp	LEFT JOIN `user` us ON us.department_id = cp.dept_id WHERE us.id = '"+id+"')) as input_user ";
-		StringBuilder fromBuilder = new StringBuilder("from cc_purchase_order cpo ");
-		fromBuilder.append("LEFT JOIN cc_supplier cs ON cs.id = cpo.supplier_id LEFT JOIN `user` u ON u.department_id = cpo.dept_id LEFT JOIN department d ON d.id = cpo.dept_id ");
+		String select =  "SELECT cpo.id, cpo.porder_sn,cs.`name` as supplier_name,user1.realname as biz_user,user2.realname as confirm_user,user3.realname as input_user,cpo.create_date,cpo.payment_type,cpo.confirm_date,cpo.`status` ";
+		StringBuilder fromBuilder = new StringBuilder("FROM cc_purchase_order cpo ");
+		fromBuilder.append("LEFT JOIN (SELECT b.realname,b.id FROM `user` b) user1 ON user1.id = cpo.biz_user_id LEFT JOIN (SELECT b.realname,b.id FROM `user` b) user2 ON user2.id = cpo.confirm_user_id LEFT JOIN (SELECT b.realname,b.id FROM `user` b) user3 ON user3.id = cpo.input_user_id LEFT JOIN cc_supplier cs on cs.id=cpo.supplier_id ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
@@ -95,7 +94,7 @@ public class PurchaseOrderQuery extends JBaseQuery {
 			fromBuilder.append(" and cpo.create_date <= ?");
 			params.add(endDate);
 		}
-		fromBuilder.append(" and u.id='"+id+"' ");
+		fromBuilder.append(" and user1.id='"+id+"' ");
 		fromBuilder.append(" order by cpo.create_date ");
 
 		if (params.isEmpty())
@@ -104,14 +103,10 @@ public class PurchaseOrderQuery extends JBaseQuery {
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 	
-	public PurchaseOrder findByAll(String id,String userId){
-		String sql = "SELECT DISTINCT cpo.*, cs.`name` as supplier_name,cs.contact supplierContact,cs.mobile supplierMobile,d.dept_name deptName,(SELECT realname	FROM `user`	WHERE id = (SELECT	cp.biz_user_id	FROM cc_purchase_order cp	LEFT JOIN `user` us ON us.department_id = cp.dept_id WHERE us.id = '"+userId+"')) as biz_user,"
-				+ "(SELECT realname	FROM `user`	WHERE id = (SELECT	cp.confirm_user_id	FROM cc_purchase_order cp	LEFT JOIN `user` us ON us.department_id = cp.dept_id WHERE us.id = '"+userId+"')) as confirm_user "
-						+ ",(SELECT realname	FROM `user`	WHERE id = (SELECT	cp.input_user_id FROM cc_purchase_order cp	LEFT JOIN `user` us ON us.department_id = cp.dept_id WHERE us.id = '"+userId+"')) as input_user "
-				+ "FROM	cc_purchase_order cpo "
-				+ "LEFT JOIN cc_supplier cs ON cs.id = cpo.supplier_id "
-				+ "LEFT JOIN `user` u ON u.department_id = cpo.dept_id "
-				+ "LEFT JOIN department d ON d.id = cpo.dept_id WHERE cpo.id = '"+id+"'";
-		return DAO.findFirst(sql);
+	public int findByUserId(String userId){
+		String sql = "select c.* from cc_purchase_order c LEFT JOIN user u on c.dept_id=u.department_id where u.id=?";
+		return DAO.find(sql, userId).size();
 	}
+	
+
 }

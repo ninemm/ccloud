@@ -115,7 +115,6 @@ public class CustomerQuery extends JBaseQuery {
 		return Db.queryInt(sqlBuilder.toString(), params.toArray());
 	}
 
-	
 	public int batchDelete(String... ids) {
 		if (ids != null && ids.length > 0) {
 			int deleteCount = 0;

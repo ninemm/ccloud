@@ -26,6 +26,7 @@ import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.SalesOrder;
 import org.ccloud.model.User;
+import org.ccloud.model.query.SalesOrderDetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
@@ -154,6 +155,23 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 		SalesOrderQuery.me().insert(paraMap, orderSn, sellerId, user.getId(), date, user.getDepartmentId(),
 				user.getDataArea());
+
+		String productNumStr = StringUtils.getArrayFirst(paraMap.get("productNum"));
+		Integer productNum = Integer.valueOf(productNumStr);
+		Integer count = 0;
+		Integer index = 0;
+
+		while (productNum > count) {
+			index++;
+			String productId = StringUtils.getArrayFirst(paraMap.get("productId" + index));
+			if (StrKit.notBlank(productId)) {
+				SalesOrderDetailQuery.me().insert(paraMap, orderSn, sellerId, user.getId(), date,
+						user.getDepartmentId(), user.getDataArea(), index);
+
+				count++;
+			}
+
+		}
 
 		renderAjaxResultForSuccess();
 

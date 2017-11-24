@@ -68,7 +68,7 @@
 					},
 					edit:false
 				},
-				{field: "", title: "退货单号/下单时间", align: "center", width: '10%',
+				{field: "", title: "退货单号/创建时间", align: "center", width: '10%',
 					formatter: function(value, row, rowIndex) {
 						return row.refundInstock_sn + '<br>' + row.biz_date;
 					},
@@ -137,6 +137,7 @@
 		<div class="row content-row">
 			<div class="jp-left">
 				<button class="btn btn-sm btn-primary" type="button" onclick="batchAction()"><i class="fa fa-gavel"></i> 批量审核 </button>
+				<a href="${CPATH}/admin/salesOrder/add?c=${c!}&p=${p!}" class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> 新建销售退货单 </a>
 			</div>
 			<div class="form-group" style="float: right">
 				<div class="form-group validata-box">

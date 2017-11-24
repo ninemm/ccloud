@@ -1,0 +1,1396 @@
+html,
+body {
+  height: 100%;
+  background: #f7f7f7;
+  width: 100%;
+}
+
+iframe {
+  position: absolute;
+  bottom: 0;
+}
+
+input {
+  border-radius: 0;
+  outline: none;
+}
+
+input[type=number] {
+  height: 0.9rem;
+  line-height: 0.9rem;
+  border: 0;
+  border-top: 1px solid #bbb;
+  border-bottom: 1px solid #bbb;
+  width: 1.5rem;
+  text-align: center;
+  -webkit-appearance: none;
+}
+
+input[type=checkbox] {
+  height: inherit;
+}
+
+hr {
+  margin: 0.5rem 0;
+  border-top: #bbb 1px solid;
+}
+
+select {
+  padding: 0 0.4rem;
+  border-radius: 0.3rem;
+  color: #888;
+}
+
+textarea {
+  width: 100%;
+  font-size: 0.65rem;
+  border: none;
+  padding: 0.25rem 0;
+  resize: none;
+  height: 3rem;
+  outline: none;
+}
+
+li {
+  list-style-type: none;
+}
+
+main {
+  position: absolute;
+  width: 100%;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+a {
+  color: #000;
+}
+
+.t-c {
+  text-align: center;
+}
+
+.t-r {
+  text-align: right;
+}
+
+.fl {
+  float: left;
+}
+
+.fr {
+  float: right;
+}
+
+.weui-tabbar__item.weui-bar__item--on .weui-tabbar__label,
+.weui-tabbar__item.weui-bar__item--on .weui-tabbar__icon i {
+  color: #35b8f0;
+}
+
+.weui-footer {
+  height: 2.25rem;
+  line-height: 2.25rem;
+  bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  z-index: 1000;
+  position: absolute;
+}
+
+.weui-grids {
+  background: #fff;
+}
+
+.weui-cells {
+  font-size: 0.7rem;
+}
+
+.weui-cell__ft {
+  font-size: 0.6rem;
+}
+
+.weui-badge {
+  background: #ff7043;
+}
+
+.toolbar .title {
+  margin: 0;
+}
+
+.empty-badge {
+  min-width: 0.5rem;
+  height: 0.5rem;
+  padding: 0;
+}
+
+.left-top-tag {
+  position: absolute;
+  top: 0.1rem;
+  left: 0.1rem;
+  border-radius: 0.1rem;
+  padding: 0;
+}
+
+.weui-tab__bd-item {
+  position: relative;
+}
+
+.blue {
+  color: #35b8f0!important;
+}
+
+.white {
+  color: #fff!important;
+}
+
+.black {
+  color: #101010;
+}
+
+.red {
+  color: #e51c23;
+}
+
+.green {
+  color: #8bc34a;
+}
+
+.orange {
+  color: #ff5722;
+}
+
+.bg-blue {
+  background: #35b8f0!important;
+}
+
+.bg-white {
+  background: #fff!important;
+}
+
+.bg-gray {
+  background: #f7f7f7!important;
+}
+
+.relative {
+  position: relative;
+}
+
+.gray {
+  color: #bbb!important;
+}
+
+.ft30 {
+  font-size: 1.5rem!important;
+}
+
+.ft14 {
+  font-size: 0.7rem!important;
+}
+
+.ft12 {
+  font-size: 0.6rem!important;
+}
+
+.ft13 {
+  font-size: 0.65rem;
+}
+
+.ft16 {
+  font-size: 0.8rem!important;
+}
+
+.ft20 {
+  font-size: 1rem;
+}
+
+.ft24 {
+  font-size: 1.2rem!important;
+}
+
+.require {
+  color: #ff5722;
+}
+
+.none {
+  display: none;
+}
+
+.block {
+  display: block
+}
+
+.space-between {
+  justify-content: space-between;
+}
+
+.width-100 {
+  width: 100%!important;
+}
+
+.width-50 {
+  width: 50%!important;
+}
+
+.width-40 {
+  width: 40%;
+}
+
+.flex-grow2 {
+  flex-grow: 2;
+}
+
+.p-l-15 {
+  padding-left: 0.75rem;
+}
+
+.m-r-10 {
+  margin-right: 0.5rem;
+}
+
+.m-r-15 {
+  margin-right: 0.75rem;
+}
+
+.button {
+  border-radius: 0.2rem;
+  height: 1.5rem;
+  line-height: 1.5rem;
+  text-align: center;
+  width: 22.222222%;
+  min-width: 4rem;
+}
+
+.white-button {
+  background: #fff;
+  color: #666;
+  border: 1px solid #bbb;
+}
+
+.gray-button {
+  background: #bbb;
+  color: #fff!important;
+}
+
+.blue-button {
+  background: #35b8f0!important;
+  color: #fff!important;
+}
+
+.green-button {
+  background: #8bc34a!important;
+  color: #fff!important;
+}
+
+.yellow-button {
+  background: #ff9800!important;
+  color: #fff!important;
+}
+
+.navy-button {
+  background: #3f51b5!important;
+  color: #fff!important;
+}
+
+.red-button {
+  background: #e51c23!important;
+  color: #fff!important;
+}
+
+
+/* 菜单 */
+
+.hidden-menu {
+  z-index: 20001;
+  position: fixed;
+  right: 5%;
+  bottom: 10%;
+}
+
+.hidden-menu ul {
+  display: none;
+}
+
+.hidden-menu li a{
+  display: inline-block;
+  color: #fff;
+  height: 1.5rem;
+  line-height: 1.5rem;
+  font-size: 0.6rem;
+  width: 4rem;
+}
+.hidden-menu li {
+  position: relative;
+}
+
+.hidden-menu li i {
+  font-size: 1rem;
+  top: 0.15rem;
+  position: absolute;
+  right: 0;
+}
+
+.hidden-menu>i {
+  font-size: 2rem;
+}
+
+#button {
+  transform: rotate(0deg);
+  transition: all .3s;
+}
+
+.close-button {
+  transform: rotate(45deg)!important;
+}
+
+.layer {
+  height: 200%;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  opacity: 0;
+  visibility: hidden;
+  z-index: 20000;
+  position: fixed;
+}
+
+.layer-show {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* 弹出的input */
+.pop-input {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 80%;
+  margin-left: -40%;
+  height: 6rem;
+  margin-top: -3rem;
+  background: #fff;
+  z-index: 30001;
+}
+
+.pop-input input {
+  width: 80%;
+  position: absolute;
+  left: 50%;
+  margin-left: -40%;
+  height: 2rem;
+  top: 20%;
+  border: 1px solid #000;
+}
+
+.pop-button {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  text-align: center;
+  height: 2rem;
+  line-height: 2rem;
+}
+.pop-button a {
+  display: inline-block;
+}
+
+.layer-pop-show {
+  opacity: 1;
+  visibility: visible;
+  z-index: 30000;
+}
+
+/* 首页 */
+
+#home {
+  font-size: 0.7rem;
+  height: 100%;
+  position: relative;
+}
+
+#home .weui-grid,
+#my .weui-grid {
+  width: 25%;
+}
+
+#home i,
+#my i {
+  font-size: 1.5rem;
+}
+
+#home .weui-footer {
+  background: #fff;
+  height: 1.5rem;
+  line-height: 1.5rem;
+  padding: 0 0.75rem;
+  bottom: 0;
+  z-index: 500;
+  position: absolute;
+}
+
+#home .weui-footer i {
+  font-size: 0.6rem;
+}
+
+.empty-badge {
+  position: absolute;
+  right: 20%;
+  top: 15%;
+}
+
+#home .weui-cells__title {
+  height: 2rem;
+  margin: 0;
+  padding: 0 0.75rem;
+  line-height: 2rem;
+  position: relative;
+}
+
+.check-pass {
+  flex: 1;
+  color: #8bc34a;
+  text-align: center;
+}
+
+.check-refuse {
+  flex: 1;
+  color: #e51c23;
+  text-align: center;
+}
+
+.menu {
+  display: inline-block;
+  background: #35b8f0;
+  color: #fff;
+  height: 1.25rem;
+  line-height: 1.25rem;
+  vertical-align: middle;
+  width: 15.2778%;
+  text-align: center;
+  margin: 0 0.25rem;
+}
+
+.menu:first-child {
+  margin-left: 1.25rem;
+}
+
+.message {
+  height: 100%;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+
+/* 产品页 */
+
+#product {
+  font-size: 0.7rem;
+}
+#product .product_bUnit,
+#product .product_mUnit{
+  width: 80%;
+}
+
+.menu-left,
+.menu-right {
+  position: absolute;
+  top: 44px;
+  bottom: 0;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.menu-left {
+  width: 22.222222%;
+  background: #f7f7f7;
+}
+
+.menu-left li {
+  height: 2rem;
+  line-height: 2rem;
+  text-align: center;
+  color: #8c8c8c;
+}
+
+.menu-left li.active {
+  background: #fff;
+  color: #35b8f0;
+}
+
+.menu-right {
+  right: 0;
+  margin-left: 22.222222%;
+  width: 77.777778%;
+}
+
+.product_detail {
+  background: #fff;
+  margin-top: 10px;
+  padding: 0 0.5rem 0.5rem;
+  font-size: 0.6rem;
+  position: relative;
+}
+
+.product_detail:first-child{
+  margin-top: 0;
+}
+
+.product_detail>div>div:last-child {
+  color: #bbb;
+}
+
+.spinner{
+  width: 3.5rem;
+  position: absolute;
+  right: 1rem;
+  top: 0.25rem;
+}
+.spinner input {
+  vertical-align: middle;
+}
+.product_name {
+  height: 2rem;
+  line-height: 2rem;
+  font-size: 0.7rem;
+}
+
+.product_unit {
+  height: 1.25rem;
+  line-height: 1.25rem;
+}
+
+.product_bUnit,
+.product_mUnit {
+  height: 1.5rem;
+  line-height: 1.5rem;
+  font-size: 0;
+  position: relative;
+}
+
+.product_bUnit *,
+.product_mUnit * {
+  font-size: 0.6rem;
+}
+
+.product_unit span {
+  display: inline-block;
+  margin: 0 0.25rem;
+  padding: 0 0.25rem;
+  background: #f2f2f2;
+}
+
+.price {
+  color: #e6292f;
+  font-weight: 600;
+  display: inline-block;
+  width: 2rem;
+}
+
+.operate {
+  display: inline-block;
+  width: 0.9rem;
+  height: 0.9rem;
+  line-height: inherit;
+  background: #f7f7f7;
+  border: 1px solid #bbb;
+  color: #555;
+  font-size: 0.9rem;
+  vertical-align: middle;
+  font-size: 0;
+}
+
+.operate i {
+  font-size: 0.9rem!important;
+}
+
+.unit {
+  margin-right: 10%;
+}
+
+.enter-shopping-cart {
+  color: #35b8f0;
+  font-size: 1.6rem;
+  position: absolute;
+  right: 5%;
+}
+
+
+/* 购物车 */
+
+#shopping-cart {
+  font-size: 0.6rem;
+  position: absolute;
+  top: 0;
+  bottom: 2.25rem;
+  width: 100%;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+#shopping-cart .weui-panel {
+  padding: 0 0.75rem;
+  margin-top: 0.5rem;
+}
+
+#shopping-cart .spinner{
+  right: 45%;
+}
+.total {
+  color: #bbb;
+  display: inline-block;
+  width: 72.222222%;
+}
+
+.place-order {
+  display: inline-block;
+  width: 27.777778%;
+}
+
+.gift-tag {
+  display: inline-block;
+  position: absolute;
+  right: 0.75rem;
+  top: 0.5rem;
+  background: #e51c23;
+  height: 1rem;
+  line-height: 1rem;
+  padding: 0 0.25rem;
+  color: #fff;
+  font-size: 0.6rem;
+}
+
+.gift {
+  padding-left: 1.25rem;
+  padding-bottom: 0.5rem;
+  position: relative;
+}
+
+.gift>div:not(:last-child) {
+  line-height: 1rem;
+  height: 1rem;
+}
+
+.goods,
+.number {
+  font-size: 0;
+  clear: both;
+}
+
+.goods *,
+.number * {
+  font-size: 0.6rem;
+}
+
+.gift input[name=add-gift] {
+  position: absolute;
+  left: 0;
+  height: inherit;
+}
+
+.gift span:first-child {
+  margin-right: 2rem;
+}
+
+.gift .goods select {
+  width: 5rem;
+}
+
+.gift .number {
+  margin-top: 0.25rem;
+  position: relative;
+}
+
+.gift .spinner{
+  width: 5rem;
+  top: 0;
+  left: 3.2rem!important;
+}
+.gift input[type=number] {
+  width: 3rem;
+}
+.gift .number select {
+  margin-left: 7.246377%;
+  width: 3rem;
+  position: absolute;
+  top: 0;
+  left: 8.2rem;
+}
+
+.gift .goods input[type=checkbox] {
+  margin-left: 7.246377%;
+  margin-right: 3.888889%;
+  position: relative;
+  top: 0.1rem;
+}
+
+.street-value {
+  border: 1px solid #bbb!important;
+  margin-left: 7.246377%;
+  position: absolute;
+  right: 25%;
+  top: 0.25rem;
+}
+
+
+/* 订单 */
+
+#order article {
+  position: absolute;
+  top: 0;
+  bottom: 2.25rem;
+  width: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+#order .weui-panel {
+  margin-top: 0.5rem;
+}
+
+#order .weui-cell {
+  padding: 0 0.75rem;
+}
+
+#order .weui-cell__bd {
+  height: 2.25rem;
+  line-height: 2.25rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+#order .spinner {
+  right: 45%;
+}
+#order .gift .number select{
+  left: 3.2rem;
+}
+.remark .weui-cell__bd {
+  height: auto!important;
+}
+
+.order-customer-info input,
+.delivery-info input,
+.activity-detail-item input {
+  font-size: 0.7rem;
+  height: inherit;
+  line-height: inherit;
+  width: 70%;
+  text-align: right;
+}
+
+#order input::-webkit-input-placeholder {
+  text-align: right;
+}
+
+.order-customer-info-title {
+  width: 4rem;
+  text-align: right;
+  display: inline-block;
+}
+
+.goods-detail {
+  display: block;
+  padding: 0 0.75rem;
+  font-size: 0.6rem;
+}
+
+.goods-detail select {
+  width: 5rem!important;
+  margin-left: 0!important;
+}
+
+
+/* 客户 */
+
+.head-search {
+  height: 40px;
+  display: flex;
+  background: #fff;
+  font-size: 0.7rem;
+  color: #9b9b9b;
+}
+
+.head-search div {
+  position: relative;
+  border-bottom: 1px solid #bbb;
+}
+
+.head-search input {
+  text-align: center;
+  height: 100%;
+  line-height: 100%;
+}
+
+.head-search i {
+  height: 1rem;
+  top: 0.5rem;
+  border-right: 1px solid #bbb;
+  padding-right: 5%;
+  position: absolute;
+  right: 0;
+}
+
+.head-search div:last-child i {
+  border: none;
+}
+
+.has-th-list {
+  display: flex;
+}
+
+.has-th-list>div:first-child {
+  width: 88.888889%;
+}
+
+.has-th-list>div:last-child {
+  width: 11.111111%;
+  color: #9b9b9b;
+  border-bottom: 1px solid #bbb;
+  position: relative;
+  background: #fff;
+}
+
+.has-th-list>div:last-child i {
+  position: absolute;
+  width: 100%;
+  top: 50%;
+  margin-top: -0.4rem;
+  text-align: center;
+}
+
+.customer article {
+  position: absolute;
+  top: 84px;
+  bottom: 0;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+}
+
+.customer .weui-panel {
+  padding: 0 0.75rem 0.5rem 0.75rem;
+  font-size: 0.6rem;
+}
+
+.customer p {
+  height: 1rem;
+  line-height: 1rem;
+  margin-top: 0.5rem;
+  color: #000;
+}
+
+.customer-href i {
+  font-size: 0.8rem;
+  position: relative;
+  top: 0.5rem;
+  right: 0.25rem;
+}
+
+.customer-href .weui-flex__item:last-child i {
+  position: absolute;
+  top: 60%;
+  left: 60%;
+}
+
+.customer-href .weui-flex__item {
+  text-align: right;
+}
+
+
+/* 新增客户 */
+
+#customer-add main {
+  top: 0;
+  bottom: 2.25rem;
+}
+
+input[name=sex] {
+  width: auto;
+}
+
+.order-customer-info label {
+  width: 18%;
+  font-size: 0.7rem;
+  margin-top: 0.15rem;
+}
+
+
+/* 历史订单 */
+
+#history header,
+#activity-list header {
+  height: 2rem;
+  line-height: 2rem;
+  color: #999;
+  margin: 0 0.75rem;
+}
+
+#history .weui-panel,
+#my-order .weui-panel {
+  padding: 0.25rem 0.75rem;
+}
+
+#history p,
+#my-order p {
+  height: 1.25rem;
+  line-height: 1.25rem;
+}
+
+#history .button,
+#my-order .button {
+  border-radius: 0.5rem;
+  height: 1.25rem;
+  line-height: 1.25rem;
+  width: 19.444444%;
+  box-sizing: border-box;
+}
+
+#history main {
+  top: 2rem;
+  bottom: 0;
+}
+
+.tag {
+  background: #ff9800;
+  color: #fff;
+  font-size: 0.6rem;
+  padding: 0 0.15rem;
+  margin-right: 0.25rem;
+}
+
+
+/* 订单详情 */
+
+#order-detail main {
+  margin-bottom: 2.25rem;
+}
+
+#order-detail .weui-panel {
+  padding: 0.5rem 0.75rem;
+  margin-top: 0.5rem;
+}
+
+#order-detail p {
+  height: 1rem;
+  line-height: 1rem;
+}
+
+#order-detail .weui-cell {
+  padding: 0;
+}
+
+
+/* 订单操作记录 */
+
+#operate-history .weui-cell {
+  display: block;
+  padding-left: 12%;
+  margin-left: 0.75rem;
+  border-left: 1px solid #e5e5e5;
+  font-size: 0.6rem;
+}
+
+#operate-history .weui-cell::before {
+  left: 9%;
+}
+
+#operate-history .weui-cell::after {
+  content: ' ';
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 100%;
+  background: #fff;
+  border: 1px solid #bbb;
+  position: absolute;
+  top: 45%;
+  left: -0.3rem;
+}
+
+#operate-history .weui-cell:last-child::after {
+  background: #35b8f0;
+  border: 1px solid #35b8f0;
+  box-shadow: 0 0.15rem 0.3rem rgba(34, 34, 34, 0.21), 0 0.3rem 0.3rem rgba(34, 34, 34, 0.26);
+}
+
+#operate-history .weui-cell:first-child div {
+  height: 50%;
+  position: absolute;
+  width: 1px;
+  top: 0;
+  left: -1px;
+  border-left: 1px solid #fff;
+}
+
+#operate-history .weui-cell:last-child div {
+  height: 50%;
+  position: absolute;
+  width: 1px;
+  bottom: 0;
+  left: -1px;
+  border-left: 1px solid #fff;
+}
+
+
+/* 订单统计 */
+
+#order-statistics header {
+  font-size: 0.6rem;
+  padding: 0 0.75rem;
+  height: 1.5rem;
+  line-height: 1.5rem;
+}
+
+#order-statistics .weui-cells {
+  margin-top: 0;
+  font-size: 0.6rem;
+}
+
+.circle-tab {
+  height: 2.25rem;
+  width: 2.25rem;
+  line-height: 2.25rem;
+  text-align: center;
+  border-radius: 100%;
+}
+
+
+/* 我的 */
+#my {
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  height: 100%;
+}
+
+#my header {
+  height: 3.75rem;
+  background: #8cc152;
+  box-shadow: 0 0.15rem 0.3rem rgba(34, 34, 34, 0.21), 0 0.3rem 0.3rem rgba(34, 34, 34, 0.26);
+  padding: 0.75rem 1.5rem;
+  box-sizing: border-box;
+  display: flex;
+}
+
+#my header div:first-child {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+#my header div:nth-child(2) {
+  font-size: 0.6rem;
+  color: #fff;
+  position: relative;
+  left: 5%;
+  top: -0.25rem;
+}
+
+#my header img {
+  border-radius: 100%;
+}
+
+
+/* 我的订单 */
+
+#my-order main {
+  top: 40px;
+  bottom: 0;
+}
+
+
+/* 商品库存 */
+
+#inventory main {
+  top: 44px;
+  bottom: 0;
+}
+
+#inventory .menu-left,
+#inventory .menu-right {
+  top: 40px;
+}
+
+#inventory .menu-right span {
+  display: inline-block;
+  width: 2.5rem;
+  height: 1.2rem;
+  line-height: 1.2rem;
+  background: #f2f2f2;
+  text-align: center;
+  margin-top: 0.15rem;
+  float: right;
+}
+
+#inventory .menu-right .weui-flex__item {
+  text-align: right;
+  height: 1.5rem;
+  line-height: 1.5rem;
+}
+
+#inventory .product_detail>div:last-child {
+  color: #000;
+}
+
+
+/* 活动列表*/
+
+#activity-list .weui-cells {
+  margin-top: 0;
+}
+
+#activity-list .weui-cell__bd {
+  margin-left: 10%;
+}
+
+
+/* 申请记录 */
+
+#application-record main {
+  top: 40px;
+  bottom: 2.25rem;
+}
+
+#application-record section>div:nth-child(2),
+#fee-audit-list section>div:nth-child(2) {
+  margin: 0 0.4rem;
+  border-radius: 0.3rem;
+  background: #fff;
+}
+
+#application-record section .weui-cells__title,
+#fee-audit-list section .weui-cells__title {
+  font-size: 0.6rem;
+  padding-left: 0.4rem;
+}
+
+#application-record section .weui-cell,
+#fee-audit-list section .weui-cell {
+  color: #fff;
+  border-radius: 0.3rem 0.3rem 0 0;
+}
+
+#application-record section .weui-cell__ft,
+#fee-audit-list section .weui-cell__ft {
+  font-size: 0.8rem;
+  color: #fff;
+}
+
+#application-record section i,
+#fee-audit-list section i {
+  font-size: 1.2rem;
+  position: relative;
+  margin-right: 0.5rem;
+}
+
+#application-record section .weui-cell_access .weui-cell__ft:after,
+#fee-audit-list section .weui-cell_access .weui-cell__ft:after {
+  height: 0.4rem;
+  width: 0.4rem;
+  border-color: #fff;
+}
+
+#application-record section .weui-flex,
+#fee-audit-list section .weui-flex {
+  text-align: center;
+  padding: 0.5rem 0.5rem;
+}
+
+#application-record .weui-flex,
+#fee-audit-list .weui-flex {
+  justify-content: space-between;
+}
+
+#application-record .weui-flex__item p:first-child,
+#fee-audit-list .weui-flex__item p:first-child {
+  font-size: 0.65rem;
+  color: #d4d4d4;
+}
+
+.checking .weui-cell {
+  background: #fda470;
+}
+
+.passed .weui-cell {
+  background: #a8e067;
+}
+
+.failed .weui-cell {
+  background: #ff6b6b;
+}
+
+.widthdraw .weui-cell {
+  background: #d4d4d4;
+}
+
+.checking .weui-flex__item:last-child p:last-child,
+.passed .weui-flex__item:last-child p:last-child {
+  color: #ff5722;
+}
+
+.failed .weui-flex,
+.widthdraw .weui-flex {
+  color: #d4d4d4;
+}
+
+
+/* 费用申请 */
+
+input[name=input-type] {
+  width: auto;
+}
+
+#fee-application main {
+  top: 0;
+  bottom: 2.25rem;
+}
+
+#fee-application textarea {
+  width: 70%;
+}
+
+#fee-application .icon-plus-circle {
+  font-size: 1rem;
+  position: relative;
+  margin-right: 0.5rem;
+  top: 0.2rem;
+}
+
+.activity-detail-item .weui-cell:first-child input {
+  margin-left: 0.25rem;
+  text-align: left!important;
+  width: 40%;
+  color: #35b8f0;
+}
+
+.activity-detail-item .weui-cell:first-child input::-webkit-input-placeholder {
+  text-align: left;
+  color: #35b8f0;
+}
+
+.activity-detail-item .weui-cell:first-child i {
+  color: #35b8f0;
+  position: relative;
+  top: -0.2rem;
+}
+
+.activity-detail-item .weui-cell:first-child p {
+  position: absolute;
+  right: 0.75rem;
+}
+
+
+/* 费用申请查询 */
+
+#fee-application-detail header {
+  box-shadow: 0 1px 0.1rem rgba(194, 194, 194, 0.15), 0 0.1rem 0.1rem rgba(194, 194, 194, 0.24);
+}
+
+#fee-application-detail main {
+  bottom: 2.25rem;
+  top: 3.2rem;
+}
+
+#fee-application-detail .weui-panel,
+#fee-application-approval-list .weui-panel {
+  margin-top: 0.5rem;
+}
+
+#fee-application-detail section p,
+#fee-application-approval-list section p {
+  height: 1.5rem;
+  line-height: 1.5rem;
+  position: relative;
+  width: 100%;
+}
+
+#fee-application-detail section p:last-child,
+#fee-application-approval-list section p:last-child {
+  height: 3rem;
+}
+
+#fee-application-detail section .weui-cell:nth-child(2) span,
+#fee-application-approval-list section .weui-cell:nth-child(2) span {
+  color: #101010;
+  position: absolute;
+  left: 22%;
+}
+
+#fee-application-detail img,
+#fee-application-approval-list img {
+  width: 2.5rem;
+  top: 0.5rem;
+  position: relative;
+}
+
+#fee-application-detail .weui-footer {
+  border-top: 1px solid #bbb;
+  background: #fff;
+}
+
+#fee-application-detail .weui-footer i {
+  position: relative;
+  top: 0.15rem;
+}
+
+
+/* 拜访记录 */
+
+#visit-record main {
+  top: 40px;
+  bottom: 2.25rem;
+  background: #fff;
+}
+
+#visit-record main p,
+#visit-audit-lisi main p {
+  height: 1.5rem;
+  line-height: 1.5rem;
+  width: 95%;
+}
+
+
+/* 客户审核 */
+
+#customer-audit main {
+  top: 84px;
+  bottom: 0;
+}
+
+
+/* 费用审核清单 */
+
+#fee-audit-list main {
+  top: 40px;;
+  bottom: 0;
+}
+
+
+/* 费用审核详情 */
+#fee-application-approval-list main {
+  top: 0;
+  bottom: 2.25rem;
+}
+/* 拜访审核清单 */
+#visit-audit-list main {
+  top: 40px;
+  bottom: 0;
+  background: #fff;
+}
+
+/* 拜访记录审核 */
+#visit-record-audit main {
+  top: 0;
+   bottom: 2.25rem;
+}
+#visit-record-audit img{
+  width: 2.5rem;
+}
+/* 媒体查询 */
+
+@media screen and (max-width:320px) {
+  .order-customer-info-title {
+    width: 25%;
+    font-size: 0.7rem;
+  }
+}

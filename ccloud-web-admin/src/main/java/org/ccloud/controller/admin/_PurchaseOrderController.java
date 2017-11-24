@@ -16,6 +16,7 @@
 package org.ccloud.controller.admin;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.time.DateFormatUtils;
@@ -25,7 +26,9 @@ import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.model.PurchaseOrder;
+import org.ccloud.model.PurchaseOrderDetail;
 import org.ccloud.model.User;
+import org.ccloud.model.query.PurchaseOrderDetailQuery;
 import org.ccloud.model.query.PurchaseOrderQuery;
 
 import com.google.common.collect.ImmutableMap;
@@ -70,11 +73,9 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 	}
 	
 	public void show(){
-		String id = getPara("id");
-		User user=getSessionAttr("user");
-		PurchaseOrder purchaseOrder = PurchaseOrderQuery.me().findByAll(id,user.getId());
-		setAttr("purchaseOrder", purchaseOrder);
-		render("show.html");
+		String id = getPara("purchaseOrderId");
+		List<PurchaseOrderDetail> list = PurchaseOrderDetailQuery.me().findByAll(id);
+		renderJson(list);
 	}
 	
 }

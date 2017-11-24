@@ -263,6 +263,12 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 		customer.setCityName(getPara("userCityText"));
 		customer.setCountryCode(getPara("userDistrictId"));
 		customer.setCountryName(getPara("userDistrictText"));
+		customer.setIsArchive(1);
+		
+		if(!this.checkCustomerNameAndMobile(customer)) {
+			renderAjaxResultForError("该客户已存在");
+		}
+		
 		String[] customerTypes = getParaValues("customerTypes");
 		String userIds = getPara("userIds");
 
@@ -292,6 +298,15 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 
 		renderAjaxResultForSuccess();
 
+	}
+	
+	
+	private boolean checkCustomerNameAndMobile(Customer customer) {
+		Integer cnt = CustomerQuery.me().findByNameAndMobile(customer.getCustomerName(), customer.getMobile());
+		if (cnt > 1) {
+			return false;
+		}
+		return true;
 	}
 
 	@RequiresPermissions(value = { "/admin/customer/uploading", "/admin/dealer/all",

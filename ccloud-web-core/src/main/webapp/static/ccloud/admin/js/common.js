@@ -410,8 +410,8 @@ jQuery.mm = {
 			  onNodeUnchecked: function (event, node) {
 			  }
 		}); 
-	},	
-	
+	},    
+    
 	initValidator: function(formId, fields) {
 		formId = formId || '#form';
 		$(formId).bootstrapValidator({
@@ -576,6 +576,184 @@ jQuery.mm = {
 			// 指定延时毫米数后，才真正向后台请求数据，默认：500
 			delay: 500 
 		});
+	}
+}
+
+/*function checkChildNode(treeId,event,node,data){
+    for (var i = 0; i < node.length; i++) {
+        if(data.state.checked == node[i].state.checked
+            &&data.state.selected ==node[i].state.selected)continue;
+        node[i].state.checked = false;
+        node[i].state.selected = false;
+        $(treeId).treeview('checkNode', [ node[i], { silent: true } ]);
+        $(treeId).treeview('selectNode', [ node[i], { silent: true } ]);
+        if(node[i].nodes!=null){
+            checkChildNode(treeId,event,node[i].nodes,node[i]);
+		}
+    }
+}*/
+
+/*function unCheckChildNode(treeId,node,data){
+    for (var i = 0; i < node.length; i++) {
+        node[i].state.checked = true;
+        node[i].state.selected = true;
+        $(treeId).treeview('uncheckNode', [ node[i], { silent: true } ]);
+        $(treeId).treeview('unselectNode', [ node[i], { silent: true } ]);
+        if(node[i].nodes!=null){
+            unCheckChildNode(treeId,node[i].nodes,node[i]);
+		}
+    }
+}*/
+/*
+function unSelectChildNode(treeId,node,data){
+    for (var i = 0; i < node.length; i++) {
+        node[i].state.checked = true;
+        node[i].state.selected = true;
+        $(treeId).treeview('uncheckNode', [ node[i], { silent: true } ]);
+        $(treeId).treeview('unselectNode', [ node[i], { silent: true } ]);
+        if(node[i].nodes!=null){
+            unCheckChildNode(treeId,node[i].nodes,node[i]);
+        }
+    }
+}*/
+
+/*function selectParentNode(treeId,data){
+    var treeNodeList = $(treeId).treeview('getNodes', data);
+    if(data.parentId != null&&treeNodeList!=undefined) {
+        var allSelect = true;
+        var otherOption = $(treeId).treeview('getSiblings', data);
+        var allSelectCount = data.state.selected==true?1:0;
+        for(var i = 0;i<otherOption.length;i++){
+            if(data.state.selected != otherOption[i].state.selected){
+                allSelect = false;
+                break;
+            }
+        }
+        var parentNode = null;
+        for(var i = 0;i<treeNodeList.length;i++){
+            if(treeNodeList[i].nodeId == data.parentId){
+                parentNode = treeNodeList[i];
+                break;
+            }
+        }
+        for(var i = 0;i<otherOption.length;i++){
+            if(otherOption[i].state.selected==true)allSelectCount++;
+        }
+        if(allSelect==true&&parentNode!=undefined
+			&&(data.state.selected==true)&&allSelectCount==otherOption.length+1){
+            parentNode.state.checked = false;
+            //parentNode.state.selected = false;
+            $(treeId).treeview('checkNode', [parentNode, { silent: true }]);
+            $(treeId).treeview('selectNode', [parentNode, { silent: true }]);
+        }
+    }
+}*/
+
+/*function checkParentNode(treeId,data){
+    var treeNodeList = $(treeId).treeview('getNodes', data);
+    if(data.parentId != null&&treeNodeList!=undefined) {
+        var allSelect = true;
+        var otherOption = $(treeId).treeview('getSiblings', data);
+        var allSelectCount = data.state.checked==true?1:0;
+        for(var i = 0;i<otherOption.length;i++){
+            if(data.state.checked != otherOption[i].state.checked){
+                allSelect = false;
+                break;
+            }
+        }
+        var parentNode = null;
+        for(var i = 0;i<treeNodeList.length;i++){
+            if(treeNodeList[i].nodeId == data.parentId){
+                parentNode = treeNodeList[i];
+                break;
+            }
+        }
+        for(var i = 0;i<otherOption.length;i++){
+            if(otherOption[i].state.checked==true)allSelectCount++;
+        }
+        if(allSelect==true&&parentNode!=undefined
+            &&(data.state.checked==true)&&allSelectCount==otherOption.length+1){
+            parentNode.state.checked = false;
+            parentNode.state.selected = false;
+            $(treeId).treeview('checkNode', [parentNode, { silent: true }]);
+            $(treeId).treeview('selectNode', [parentNode, { silent: true }]);
+        }
+        if(parentNode.parentId!=null){
+            checkParentNode(treeId,parentNode);
+        }
+    }
+}*/
+
+/*function unCheckParentNode(treeId,data){
+    var treeNodeList = $(treeId).treeview('getNodes', data);
+    if(data.parentId != null&&treeNodeList!=undefined) {
+        var parentNode = null;
+        for (var i = 0; i < treeNodeList.length; i++) {
+            if (treeNodeList[i].nodeId == data.parentId) {
+                parentNode = treeNodeList[i];
+                break;
+            }
+        }
+        if(parentNode != null){
+            parentNode.state.checked = true;
+            $(treeId).treeview('uncheckNode', [parentNode, {silent: true}]);
+            parentNode.state.selected = true;
+            $(treeId).treeview('unselectNode', [parentNode, {silent: true}]);
+        }
+        if(parentNode.parentId!=null)
+        unCheckParentNode(treeId,parentNode);
+    }
+
+}*/
+
+// 递归获取所有的节点Id
+function getSubNodesByParent(node) {
+	var ts = [];
+	if (node.nodes) {
+		ts.push(node.nodeId);
+		for (i in node.nodes) {
+			ts.push(node.nodes[i].nodeId);
+			if (node.nodes[i].nodes) {
+				var parentNode = getSubNodesByParent(node.nodes[i]);
+				for (j in parentNode) {
+					ts.push(parentNode[j]);
+				}
+			}
+		}
+	} else {
+		ts.push(node.nodeId);
+	}
+	return ts;
+}
+
+function checkParentNode(treeId,data){
+    var siblingsNode = $(treeId).treeview('getSiblings',data);
+    if(data.parentId!=undefined||(siblingsNode!=undefined&&siblingsNode.length>0)){
+        var allSelect = true;
+        for(var i =0;i<siblingsNode.length;i++){
+            if(siblingsNode[i].state.selected == false){
+                allSelect = false;
+                break;
+            }
+        }
+        if(allSelect==true){
+            $(treeId).treeview('checkNode', [data.parentId, { silent: true }]);
+            $(treeId).treeview('selectNode', [data.parentId, { silent: true }]);
+            var parentNode = $(treeId).treeview('getParent', [data.nodeId, { silent: true }]);
+            if(parentNode!=undefined&&parentNode.parentId!=null){
+                checkParentNode(treeId,parentNode);
+            }
+        }
+	}
+}
+function unCheckParentNode(treeId,data){
+	if(data.parentId!=undefined){
+        $(treeId).treeview('uncheckNode', [data.parentId, { silent: true }]);
+        $(treeId).treeview('unselectNode', [data.parentId, { silent: true }]);
+        var parentNode = $(treeId).treeview('getParent', [data.nodeId, { silent: true }]);
+        if(parentNode!=undefined&&parentNode.parentId!=null){
+            unCheckParentNode(treeId,parentNode);
+		}
 	}
 }
 
