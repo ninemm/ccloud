@@ -149,7 +149,7 @@ jQuery.mm = {
 			}
 		);
 	},
-	
+	//单选树
 	initTreeView: function(treeId, data, nodeSelectedFunc, nodeUnselectedFunc) {
 		treeId = treeId || '#tree';
 		
@@ -161,30 +161,182 @@ jQuery.mm = {
 			multiSelect : false,
 			//showTags: true,
 			onNodeSelected: nodeSelectedFunc || function(event, data) {
-				$(treeId).treeview('checkNode', [data.nodeId, { silent: true }]);
-				$(treeId).treeview('selectNode', [data.nodeId, { silent: true }]);
+/*                var selectNode = getSubNodesByParent(data);
+                if(selectNode){
+                    $(treeId).treeview('unselectNode', [selectNode, { silent: true }]);
+                    $(treeId).treeview('uncheckNode', [selectNode, { silent: true }]);
+                    $(treeId).treeview('selectNode', [selectNode, { silent: true }]);
+                    $(treeId).treeview('checkNode', [selectNode, { silent: true }]);
+				}*/
+                $(treeId).treeview('selectNode', [data.nodeId, { silent: true }]);
+                $(treeId).treeview('checkNode', [data.nodeId, { silent: true }]);
+
+/*                var checked = $(treeId).treeview('getChecked',data);
+                for(var i = 0;i<checked.length;i++){
+                	if(checked[i].nodeId!=data.nodeId){
+                        checked[i].state.selected = true;
+                        $(treeId).treeview('unselectNode', [checked[i], { silent: true }]);
+                        checked[i].state.checked = true;
+                        $(treeId).treeview('uncheckNode', [checked[i], { silent: true }]);
+					}
+                }*/
+
 			},
 			onNodeUnselected: nodeUnselectedFunc || function(event, data) {
-				$(treeId).treeview('uncheckNode', [data.nodeId, { silent: true }]);
-				$(treeId).treeview('unselectNode', [data.nodeId, { silent: true }]);
+                var selectNode = getSubNodesByParent(data);
+                if(selectNode){
+                    $(treeId).treeview('unselectNode', [selectNode, { silent: true }]);
+                    $(treeId).treeview('uncheckNode', [selectNode, { silent: true }]);
+				}
+
+/*                $(treeId).treeview('unselectNode', [data, { silent: true }]);
+                data.state.checked = true;
+                $(treeId).treeview('uncheckNode', [data, { silent: true }]);*/
 			},
 			onNodeChecked: nodeSelectedFunc || function(event, data) {
-				$(treeId).treeview('checkNode', [data.nodeId, { silent: true }]);
-				$(treeId).treeview('selectNode', [data.nodeId, { silent: true }]);
+                $(treeId).treeview('selectNode', [data.nodeId, { silent: true }]);
+                $(treeId).treeview('checkNode', [data.nodeId, { silent: true }]);
+
+/*                var checked = $(treeId).treeview('getChecked',data);
+                var selected = $(treeId).treeview('getSelected',data);
+				for(var i = 0;i<selected.length;i++){
+					if(selected[i].nodeId!==data.nodeId){
+                        selected[i].state.selected = true;
+                        $(treeId).treeview('unselectNode', [selected[i], { silent: true }]);
+                        selected[i].state.checked = true;
+                        $(treeId).treeview('uncheckNode', [selected[i], { silent: true }]);
+					}
+				}
+                for(var i = 0;i<checked.length;i++){
+                    if(checked[i].nodeId!==data.nodeId){
+                        checked[i].state.selected = true;
+                        $(treeId).treeview('unselectNode', [checked[i], { silent: true }]);
+                        checked[i].state.checked = true;
+                        $(treeId).treeview('uncheckNode', [checked[i], { silent: true }]);
+                    }
+                }*/
+
+
 			},
 			onNodeUnchecked: nodeUnselectedFunc || function(event, data) {
-				$(treeId).treeview('uncheckNode', [data.nodeId, { silent: true }]);
-				$(treeId).treeview('unselectNode', [data.nodeId, { silent: true }]);
+/*				if(data.state.selected==false){
+                    data.state.selected = true;
+				}
+                $(treeId).treeview('unselectNode', [data, { silent: true }]);
+                data.state.checked = true;
+                $(treeId).treeview('uncheckNode', [data, { silent: true }]);*/
+
+                var selectNode = getSubNodesByParent(data);
+                if(selectNode){
+                    $(treeId).treeview('unselectNode', [selectNode, { silent: true }]);
+                    $(treeId).treeview('uncheckNode', [selectNode, { silent: true }]);
+				}
+
 			}
 		});
 	},
+    //多选树
+    initMultiTreeView: function(treeId, data, nodeSelectedFunc, nodeUnselectedFunc) {
+        treeId = treeId || '#tree';
+        $(treeId).treeview({
+            data : data,
+            levels : 3,
+            showBorder : false,
+            showCheckbox : true,
+            multiSelect : true,
+            //showTags: true,
+            onNodeSelected: nodeSelectedFunc || function(event, data) {
+                var selectNode = getSubNodesByParent(data);
+                if(selectNode){
+                    $(treeId).treeview('checkNode', [selectNode, { silent: true }]);
+                    $(treeId).treeview('selectNode', [selectNode, { silent: true }]);
+                }
+/*				var siblingsNode = $(treeId).treeview('getSiblings',data);
+                var allSelect = true;
+                for(var i =0;i<siblingsNode.length;i++){
+					if(siblingsNode[i].state.selected == false){
+                        allSelect = false;
+                        break;
+					}
+				}
+				if(allSelect==true){
+                    $(treeId).treeview('checkNode', [data.parentId, { silent: true }]);
+                    $(treeId).treeview('selectNode', [data.parentId, { silent: true }]);
+				}*/
+                checkParentNode(treeId,data);
+
+				/*				data.state.checked = false;
+				 data.state.selected = false;
+				 $(treeId).treeview('checkNode', [data, { silent: true }]);
+				 $(treeId).treeview('selectNode', [data, { silent: true }]);
+				 if(data.nodes != null) {
+				 checkChildNode(treeId,event,data.nodes,data);
+				 }
+				 selectParentNode(treeId,data);*/
+            },
+            onNodeUnselected: nodeUnselectedFunc || function(event, data) {
+                var unSelectNode = getSubNodesByParent(data);
+                if(unSelectNode){
+                    $(treeId).treeview('uncheckNode', [unSelectNode, { silent: true }]);
+                    $(treeId).treeview('unselectNode', [unSelectNode, { silent: true }]);
+                }
+                unCheckParentNode(treeId,data);
+/*                $(treeId).treeview('uncheckNode', [data.parentId, { silent: true }]);
+                $(treeId).treeview('unselectNode', [data.parentId, { silent: true }]);*/
+				/*				data.state.checked = true;
+				 data.state.selected = true;
+				 $(treeId).treeview('uncheckNode', [data, { silent: true }]);
+				 $(treeId).treeview('unselectNode', [data, { silent: true }]);
+				 if(data.nodes != null) {
+				 unSelectChildNode(treeId,data.nodes,data);
+				 }
+				 unCheckParentNode(treeId,data);*/
+            },
+            onNodeChecked: nodeSelectedFunc || function(event, data) {
+                var checkNode = getSubNodesByParent(data);
+                if(checkNode){
+                    $(treeId).treeview('checkNode', [checkNode, { silent: true }]);
+                    $(treeId).treeview('selectNode', [checkNode, { silent: true }]);
+                }
+                checkParentNode(treeId,data);
+
+				/*                data.state.checked = false;
+				 data.state.selected = false;
+				 $(treeId).treeview('checkNode', [data, { silent: true }]);
+				 $(treeId).treeview('selectNode', [data, { silent: true }]);
+				 if(data.nodes != null) {
+				 checkChildNode(treeId,data.nodes,data);
+				 }
+				 checkParentNode(treeId,data);*/
+            },
+            onNodeUnchecked: nodeUnselectedFunc || function(event, data) {
+                var unCheckNode = getSubNodesByParent(data);
+                if(unCheckNode){
+                    $(treeId).treeview('uncheckNode', [unCheckNode, { silent: true }]);
+                    $(treeId).treeview('unselectNode', [unCheckNode, { silent: true }]);
+                }
+                unCheckParentNode(treeId,data);
+/*                $(treeId).treeview('uncheckNode', [data.parentId, { silent: true }]);
+                $(treeId).treeview('unselectNode', [data.parentId, { silent: true }]);*/
+
+				/*                data.state.checked=true;
+				 $(treeId).treeview('uncheckNode', [data, { silent: true }]);
+				 data.state.selected=true;
+				 $(treeId).treeview('unselectNode', [data, { silent: true }]);
+				 if(data.nodes != null) {
+				 unCheckChildNode(treeId,data.nodes,data);
+				 }
+				 unCheckParentNode(treeId,data);*/
+            }
+        });
+    },
 	
-	initMultiTreeView: function(treeId, data, nodeSelectedFunc, nodeUnselectedFunc) {
+/*	initMultiTreeView: function(treeId, data, nodeSelectedFunc, nodeUnselectedFunc) {
 		treeId = treeId || '#tree';
 		
 		$(treeId).treeview({
 			data : data,
-			levels : 2,
+			levels : 3,
 			showBorder : false,
 			showCheckbox : true,
 			multiSelect : true,
@@ -234,64 +386,7 @@ jQuery.mm = {
 				}
 			}
 		});
-	},	
-	
-	initMultiTreeView: function(treeId, data, nodeSelectedFunc, nodeUnselectedFunc) {
-		treeId = treeId || '#tree';
-		
-		$(treeId).treeview({
-			data : data,
-			levels : 2,
-			showBorder : false,
-			showCheckbox : true,
-			multiSelect : true,
-			//showTags: true,
-			onNodeSelected: nodeSelectedFunc || function(event, data) {
-				$(treeId).treeview('checkNode', [data.nodeId, { silent: true }]);
-				$(treeId).treeview('selectNode', [data.nodeId, { silent: true }]);
-				if(data.nodes != null) {
-					var arrayInfo = data.nodes;
-					for (var i = 0; i < arrayInfo.length; i++) {
-						$(treeId).treeview('toggleNodeChecked', [ arrayInfo[i].nodeId, { silent: true } ]);
-						$(treeId).treeview('toggleNodeSelected', [ arrayInfo[i].nodeId, { silent: true } ]);
-					}
-				}
-			},
-			onNodeUnselected: nodeUnselectedFunc || function(event, data) {
-				$(treeId).treeview('uncheckNode', [data.nodeId, { silent: true }]);
-				$(treeId).treeview('unselectNode', [data.nodeId, { silent: true }]);
-				if(data.nodes != null) {
-					var arrayInfo = data.nodes;
-					for (var i = 0; i < arrayInfo.length; i++) {
-						$(treeId).treeview('toggleNodeChecked', [ arrayInfo[i].nodeId, { silent: true } ]);
-						$(treeId).treeview('toggleNodeSelected', [ arrayInfo[i].nodeId, { silent: true } ]);
-					}
-				}
-			},
-			onNodeChecked: nodeSelectedFunc || function(event, data) {
-				$(treeId).treeview('checkNode', [data.nodeId, { silent: true }]);
-				$(treeId).treeview('selectNode', [data.nodeId, { silent: true }]);
-				if(data.nodes != null) {
-					var arrayInfo = data.nodes;
-					for (var i = 0; i < arrayInfo.length; i++) {
-						$(treeId).treeview('toggleNodeChecked', [ arrayInfo[i].nodeId, { silent: true } ]);
-						$(treeId).treeview('toggleNodeSelected', [ arrayInfo[i].nodeId, { silent: true } ]);
-					}
-				}
-			},
-			onNodeUnchecked: nodeUnselectedFunc || function(event, data) {
-				$(treeId).treeview('uncheckNode', [data.nodeId, { silent: true }]);
-				$(treeId).treeview('unselectNode', [data.nodeId, { silent: true }]);
-				if(data.nodes != null) {
-					var arrayInfo = data.nodes;
-					for (var i = 0; i < arrayInfo.length; i++) {
-						$(treeId).treeview('toggleNodeChecked', [ arrayInfo[i].nodeId, { silent: true } ]);
-						$(treeId).treeview('toggleNodeSelected', [ arrayInfo[i].nodeId, { silent: true } ]);
-					}
-				}
-			}
-		});
-	},	
+	},*/
 	
 	initValidator: function(formId, fields) {
 		formId = formId || '#form';
@@ -457,6 +552,184 @@ jQuery.mm = {
 			// 指定延时毫米数后，才真正向后台请求数据，默认：500
 			delay: 500 
 		});
+	}
+}
+
+/*function checkChildNode(treeId,event,node,data){
+    for (var i = 0; i < node.length; i++) {
+        if(data.state.checked == node[i].state.checked
+            &&data.state.selected ==node[i].state.selected)continue;
+        node[i].state.checked = false;
+        node[i].state.selected = false;
+        $(treeId).treeview('checkNode', [ node[i], { silent: true } ]);
+        $(treeId).treeview('selectNode', [ node[i], { silent: true } ]);
+        if(node[i].nodes!=null){
+            checkChildNode(treeId,event,node[i].nodes,node[i]);
+		}
+    }
+}*/
+
+/*function unCheckChildNode(treeId,node,data){
+    for (var i = 0; i < node.length; i++) {
+        node[i].state.checked = true;
+        node[i].state.selected = true;
+        $(treeId).treeview('uncheckNode', [ node[i], { silent: true } ]);
+        $(treeId).treeview('unselectNode', [ node[i], { silent: true } ]);
+        if(node[i].nodes!=null){
+            unCheckChildNode(treeId,node[i].nodes,node[i]);
+		}
+    }
+}*/
+/*
+function unSelectChildNode(treeId,node,data){
+    for (var i = 0; i < node.length; i++) {
+        node[i].state.checked = true;
+        node[i].state.selected = true;
+        $(treeId).treeview('uncheckNode', [ node[i], { silent: true } ]);
+        $(treeId).treeview('unselectNode', [ node[i], { silent: true } ]);
+        if(node[i].nodes!=null){
+            unCheckChildNode(treeId,node[i].nodes,node[i]);
+        }
+    }
+}*/
+
+/*function selectParentNode(treeId,data){
+    var treeNodeList = $(treeId).treeview('getNodes', data);
+    if(data.parentId != null&&treeNodeList!=undefined) {
+        var allSelect = true;
+        var otherOption = $(treeId).treeview('getSiblings', data);
+        var allSelectCount = data.state.selected==true?1:0;
+        for(var i = 0;i<otherOption.length;i++){
+            if(data.state.selected != otherOption[i].state.selected){
+                allSelect = false;
+                break;
+            }
+        }
+        var parentNode = null;
+        for(var i = 0;i<treeNodeList.length;i++){
+            if(treeNodeList[i].nodeId == data.parentId){
+                parentNode = treeNodeList[i];
+                break;
+            }
+        }
+        for(var i = 0;i<otherOption.length;i++){
+            if(otherOption[i].state.selected==true)allSelectCount++;
+        }
+        if(allSelect==true&&parentNode!=undefined
+			&&(data.state.selected==true)&&allSelectCount==otherOption.length+1){
+            parentNode.state.checked = false;
+            //parentNode.state.selected = false;
+            $(treeId).treeview('checkNode', [parentNode, { silent: true }]);
+            $(treeId).treeview('selectNode', [parentNode, { silent: true }]);
+        }
+    }
+}*/
+
+/*function checkParentNode(treeId,data){
+    var treeNodeList = $(treeId).treeview('getNodes', data);
+    if(data.parentId != null&&treeNodeList!=undefined) {
+        var allSelect = true;
+        var otherOption = $(treeId).treeview('getSiblings', data);
+        var allSelectCount = data.state.checked==true?1:0;
+        for(var i = 0;i<otherOption.length;i++){
+            if(data.state.checked != otherOption[i].state.checked){
+                allSelect = false;
+                break;
+            }
+        }
+        var parentNode = null;
+        for(var i = 0;i<treeNodeList.length;i++){
+            if(treeNodeList[i].nodeId == data.parentId){
+                parentNode = treeNodeList[i];
+                break;
+            }
+        }
+        for(var i = 0;i<otherOption.length;i++){
+            if(otherOption[i].state.checked==true)allSelectCount++;
+        }
+        if(allSelect==true&&parentNode!=undefined
+            &&(data.state.checked==true)&&allSelectCount==otherOption.length+1){
+            parentNode.state.checked = false;
+            parentNode.state.selected = false;
+            $(treeId).treeview('checkNode', [parentNode, { silent: true }]);
+            $(treeId).treeview('selectNode', [parentNode, { silent: true }]);
+        }
+        if(parentNode.parentId!=null){
+            checkParentNode(treeId,parentNode);
+        }
+    }
+}*/
+
+/*function unCheckParentNode(treeId,data){
+    var treeNodeList = $(treeId).treeview('getNodes', data);
+    if(data.parentId != null&&treeNodeList!=undefined) {
+        var parentNode = null;
+        for (var i = 0; i < treeNodeList.length; i++) {
+            if (treeNodeList[i].nodeId == data.parentId) {
+                parentNode = treeNodeList[i];
+                break;
+            }
+        }
+        if(parentNode != null){
+            parentNode.state.checked = true;
+            $(treeId).treeview('uncheckNode', [parentNode, {silent: true}]);
+            parentNode.state.selected = true;
+            $(treeId).treeview('unselectNode', [parentNode, {silent: true}]);
+        }
+        if(parentNode.parentId!=null)
+        unCheckParentNode(treeId,parentNode);
+    }
+
+}*/
+
+// 递归获取所有的节点Id
+function getSubNodesByParent(node) {
+	var ts = [];
+	if (node.nodes) {
+		ts.push(node.nodeId);
+		for (i in node.nodes) {
+			ts.push(node.nodes[i].nodeId);
+			if (node.nodes[i].nodes) {
+				var parentNode = getSubNodesByParent(node.nodes[i]);
+				for (j in parentNode) {
+					ts.push(parentNode[j]);
+				}
+			}
+		}
+	} else {
+		ts.push(node.nodeId);
+	}
+	return ts;
+}
+
+function checkParentNode(treeId,data){
+    var siblingsNode = $(treeId).treeview('getSiblings',data);
+    if(data.parentId!=undefined||(siblingsNode!=undefined&&siblingsNode.length>0)){
+        var allSelect = true;
+        for(var i =0;i<siblingsNode.length;i++){
+            if(siblingsNode[i].state.selected == false){
+                allSelect = false;
+                break;
+            }
+        }
+        if(allSelect==true){
+            $(treeId).treeview('checkNode', [data.parentId, { silent: true }]);
+            $(treeId).treeview('selectNode', [data.parentId, { silent: true }]);
+            var parentNode = $(treeId).treeview('getParent', [data.nodeId, { silent: true }]);
+            if(parentNode!=undefined&&parentNode.parentId!=null){
+                checkParentNode(treeId,parentNode);
+            }
+        }
+	}
+}
+function unCheckParentNode(treeId,data){
+	if(data.parentId!=undefined){
+        $(treeId).treeview('uncheckNode', [data.parentId, { silent: true }]);
+        $(treeId).treeview('unselectNode', [data.parentId, { silent: true }]);
+        var parentNode = $(treeId).treeview('getParent', [data.nodeId, { silent: true }]);
+        if(parentNode!=undefined&&parentNode.parentId!=null){
+            unCheckParentNode(treeId,parentNode);
+		}
 	}
 }
 
