@@ -21,8 +21,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.ccloud.Consts;
+import org.ccloud.model.Customer;
+import org.ccloud.model.CustomerType;
 import org.ccloud.model.Department;
+import org.ccloud.model.Group;
 import org.ccloud.model.ModelSorter;
+import org.ccloud.model.Role;
+import org.ccloud.model.Seller;
+import org.ccloud.model.User;
+import org.ccloud.model.Warehouse;
 
 import com.google.common.collect.Lists;
 import com.jfinal.kit.StrKit;
@@ -63,7 +71,7 @@ public class DepartmentQuery extends JBaseQuery {
 		final List<Object> params = new LinkedList<Object>();
 		appendIfNotEmptyWithLike(sqlBuilder, "d.data_area", dataArea, params, false);
 		buildOrderBy(orderby, sqlBuilder);
-		String key = buildKey(null, null, null, null, orderby);
+		String key = buildKey(dataArea, null, null, null, orderby);
 		
 		List<Department> data = DAO.getFromListCache(key, new IDataLoader() {
 			@Override
@@ -162,8 +170,8 @@ public class DepartmentQuery extends JBaseQuery {
 		Map<String, Object> map = new HashMap<>();
 		map.put("text", "总部");// 父子表第一级名称,以后可以存储在字典表或字典类
 		ArrayList<String> newArrayList = Lists.newArrayList();
-		newArrayList.add("0");
-		newArrayList.add("0");		
+		newArrayList.add(Consts.DEPT_HQ_ID);
+		newArrayList.add(Consts.DEPT_HQ_DATAAREA);		
 		map.put("tags", newArrayList);
 		map.put("nodes", doBuild(list)); 
 		resTreeList.add(map);
@@ -193,14 +201,14 @@ public class DepartmentQuery extends JBaseQuery {
 		fromBuilder.append(" order by ");
 		
 		if (StrKit.isBlank(orderBy)) {
-			fromBuilder.append("d.order_list asc ");
+			fromBuilder.append("d.order_list,d.dept_level asc ");
 			return ;
 		}
 		
 		String orderbyInfo[] = orderBy.trim().split("\\s+");
 		orderBy = orderbyInfo[0];
 		
-		fromBuilder.append("d.order_list ");
+		fromBuilder.append("d.order_list,d.dept_level ");
 		
 		if (orderbyInfo.length == 1) {
 			fromBuilder.append("desc");
@@ -241,6 +249,186 @@ public class DepartmentQuery extends JBaseQuery {
 	public Department findBySellerId(String sellerId){
 		String sql = "select d.* from department d left join cc_seller cs on cs.dept_id = d.id where cs.id =?";
 		return DAO.findFirst(sql, sellerId);
+	}
+
+	public Department findByUserId(String userId){
+		String sql = "select d.* from department d LEFT JOIN user u on u.department_id=d.id where u.id=?";
+		return DAO.findFirst(sql, userId);
+	}
+	
+	public List<Map<String, Object>> findUserListByRole(String id) {
+		List<Role> list = RoleQuery.me().findByDeptId(id);
+		List<Map<String, Object>> resTreeList = new ArrayList<>();
+		Map<String, Object> map = new HashMap<>();
+		String title = "所有角色";
+		if (list.size() == 0) {
+			title = "暂无数据";
+		}		
+		map.put("text", title);
+		map.put("tags", Lists.newArrayList(0));
+		map.put("nodes", doBuildByUser(list));
+		resTreeList.add(map);
+		return resTreeList;
+	}
+
+	private List<Map<String, Object>> doBuildByUser(List<Role> list) {
+		List<Map<String, Object>> resTreeList = new ArrayList<>();
+		for (Role role : list) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("text", role.getRoleName());
+			map.put("tags", Lists.newArrayList(role.getId()));
+
+			List<Map<String, Object>> childList = new ArrayList<Map<String, Object>>();
+			
+			childList = addUser(role.getId(), childList);
+			map.put("nodes", childList);
+
+			resTreeList.add(map);
+			
+		}
+		return resTreeList;
+	}
+
+	private List<Map<String, Object>> addUser(String id, List<Map<String, Object>> childList) {
+		List<User> list = UserQuery.me().findByRole(id);
+		for (User user : list) {
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("text", user.getRealname());
+			map.put("tags", Lists.newArrayList(user.getId(), "user"));
+			childList.add(map);
+
+		}
+		return childList;
+	}
+
+	public List<Map<String, Object>> findWareHouse(String id) {
+		List<Warehouse> list = WarehouseQuery.me().findWareHouseByDept(id);
+		List<Map<String, Object>> resTreeList = new ArrayList<>();
+		Map<String, Object> map = new HashMap<>();
+		String title = "所有仓库";
+		if (list.size() == 0) {
+			title = "暂无数据";
+		}		
+		map.put("text", title);
+		map.put("tags", Lists.newArrayList(0));
+		map.put("nodes", doBuildByWareHouse(list));
+		resTreeList.add(map);
+		return resTreeList;		
+	}
+
+	private List<Map<String, Object>> doBuildByWareHouse(List<Warehouse> list) {
+		List<Map<String, Object>> resTreeList = new ArrayList<>();
+		for (Warehouse ware : list) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("text", ware.getName());
+			map.put("tags", Lists.newArrayList(ware.getId()));
+			resTreeList.add(map);
+		}
+		return resTreeList;
+	}
+
+	public List<Map<String, Object>> findSeller(String id) {
+		List<Seller> list = SellerQuery.me().querySellIdByDept(id);
+		List<Map<String, Object>> resTreeList = new ArrayList<>();
+		Map<String, Object> map = new HashMap<>();
+		String title = "所有账套";
+		if (list.size() == 0) {
+			title = "暂无数据";
+		}		
+		map.put("text", title);
+		map.put("tags", Lists.newArrayList(0));
+		map.put("nodes", doBuildBySeller(list));
+		resTreeList.add(map);
+		return resTreeList;	
+	}
+
+	private List<Map<String, Object>> doBuildBySeller(List<Seller> list) {
+		List<Map<String, Object>> resTreeList = new ArrayList<>();
+		for (Seller seller : list) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("text", seller.getSellerName());
+			map.put("tags", Lists.newArrayList(seller.getId()));
+			resTreeList.add(map);
+		}
+		return resTreeList;
+	}
+
+	public List<Map<String, Object>> findGroup(String id) {
+		List<Group> list = GroupQuery.me().findByDeptId(id);
+		List<Map<String, Object>> resTreeList = new ArrayList<>();
+		Map<String, Object> map = new HashMap<>();
+		String title = "所有分组";
+		if (list.size() == 0) {
+			title = "暂无数据";
+		}		
+		map.put("text", title);
+		map.put("tags", Lists.newArrayList(0));
+		map.put("nodes", doBuildGroup(list));
+		resTreeList.add(map);
+		return resTreeList;	
+	}
+
+	private List<Map<String, Object>> doBuildGroup(List<Group> list) {
+		List<Map<String, Object>> resTreeList = new ArrayList<>();
+		for (Group group : list) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("text", group.getGroupName());
+			map.put("tags", Lists.newArrayList(group.getId()));
+			resTreeList.add(map);
+		}
+		return resTreeList;
+	}
+
+	public List<Map<String, Object>> findCustomType(String id) {
+		List<CustomerType> list = CustomerTypeQuery.me().findByDept(id);
+		List<Map<String, Object>> resTreeList = new ArrayList<>();
+		Map<String, Object> map = new HashMap<>();
+		String title = "所有客户类型";
+		if (list.size() == 0) {
+			title = "暂无数据";
+		}		
+		map.put("text", title);
+		map.put("tags", Lists.newArrayList(0));
+		map.put("nodes", doBuildCustom(list));
+		resTreeList.add(map);
+		return resTreeList;	
+	}
+
+	private List<Map<String, Object>> doBuildCustom(List<CustomerType> list) {
+		List<Map<String, Object>> resTreeList = new ArrayList<>();
+		for (CustomerType type : list) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("text", type.getName());
+			map.put("tags", Lists.newArrayList(type.getId()));
+			resTreeList.add(map);
+		}
+		return resTreeList;
+	}
+
+	public List<Map<String, Object>> findCustomer(String id) {
+		List<Customer> list = CustomerQuery.me().findByUserId(id);
+		List<Map<String, Object>> resTreeList = new ArrayList<>();
+		Map<String, Object> map = new HashMap<>();
+		String title = "所有客户";
+		if (list.size() == 0) {
+			title = "暂无数据";
+		}		
+		map.put("text", title);
+		map.put("tags", Lists.newArrayList(0));
+		map.put("nodes", doBuildCustomer(list));
+		resTreeList.add(map);
+		return resTreeList;	
+	}
+
+	private List<Map<String, Object>> doBuildCustomer(List<Customer> list) {
+		List<Map<String, Object>> resTreeList = new ArrayList<>();
+		for (Customer customer : list) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("text", customer.getCustomerName());
+			map.put("tags", Lists.newArrayList(customer.getId()));
+			resTreeList.add(map);
+		}
+		return resTreeList;
 	}
 	
 }

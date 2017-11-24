@@ -22,6 +22,7 @@ import com.jfinal.kit.StrKit;
 
 import org.ccloud.model.ModelSorter;
 import org.ccloud.model.Station;
+import org.ccloud.model.User;
 
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.ehcache.IDataLoader;
@@ -246,4 +247,59 @@ public class StationQuery extends JBaseQuery {
 		Integer num = DAO.doFindCount("parent_id = ?", parentId).intValue();
 		return num;
 	}
+
+	public List<Map<String, Object>> findUserListByStation(String id) {
+		List<Station> list = findByDeptId(id);
+		ModelSorter.tree(list);
+		List<Map<String, Object>> resTreeList = new ArrayList<>();
+		Map<String, Object> map = new HashMap<>();
+		
+		String title = "所有岗位";
+		if (list.size() == 0) {
+			title = "暂无数据";
+		}
+		map.put("text", title);
+		map.put("tags", Lists.newArrayList(0));
+		map.put("nodes", doBuildByUser(list));
+		resTreeList.add(map);
+		return resTreeList;
+	}
+
+	public List<Station> findByDeptId(String id) {
+		return DAO.doFind("dept_id = ? and id <> 0", id);
+	}
+	
+	private List<Map<String, Object>> doBuildByUser(List<Station> list) {
+		List<Map<String, Object>> resTreeList = new ArrayList<>();
+		for (Station station : list) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("text", station.getStationName());
+			map.put("tags", Lists.newArrayList(station.getId()));
+
+			List<Map<String, Object>> childList = new ArrayList<Map<String, Object>>();
+			
+			if (station.getChildList() != null && station.getChildList().size() > 0) {
+				map.put("nodes", doBuild(station.getChildList()));
+			}
+			
+			childList = addUser(station.getId(), childList);
+			map.put("nodes", childList);
+
+			resTreeList.add(map);
+			
+		}
+		return resTreeList;
+	}	
+	
+	private List<Map<String, Object>> addUser(String stationId, List<Map<String, Object>> childList) {
+		List<User> list = UserQuery.me().findByStation(stationId);
+		for (User user : list) {
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("text", user.getRealname());
+			map.put("tags", Lists.newArrayList(user.getId(), "user"));
+			childList.add(map);
+
+		}
+		return childList;
+	}	
 }

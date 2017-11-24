@@ -153,5 +153,9 @@ public class RoleQuery extends JBaseQuery {
 		return list;
 	}
 
+	public List<Role> findByDeptId(String deptId) {
+		return DAO.doFind("dept_id = ?", deptId);
+	}
+
 }
 

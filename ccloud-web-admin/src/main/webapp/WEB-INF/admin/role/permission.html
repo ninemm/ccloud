@@ -66,8 +66,8 @@
 					<#list moduleList as bean>
 					    <#if bean.systemName??>  
 					    	<tr>
-						        <td rowspan="${bean.systemRowSpan}" class="zh">${bean.systemName}</td>
-						        <td rowspan="${bean.parentRowSpan}" class="zh">${bean.parentModuleName}</td>
+						        <td rowspan="${bean.systemRowSpan}" class="zh">${bean.systemName!}</td>
+						        <td rowspan="${bean.parentRowSpan}" class="zh">${bean.parentModuleName!}</td>
 						        <td>${bean.moduleName}</td>
 						        <td>
 									<#list bean.list as operation>

@@ -16,6 +16,7 @@
 package org.ccloud.model.query;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.ccloud.model.Customer;
@@ -102,6 +103,19 @@ public class CustomerQuery extends JBaseQuery {
 		return DAO.findById(id);
 	}
 
+	public Integer findByNameAndMobile(String name, String mobile) {
+		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
+
+		StringBuilder sqlBuilder = new StringBuilder(" select count(1) ");
+		sqlBuilder.append(" from `cc_customer` c ");
+		needWhere = appendIfNotEmpty(sqlBuilder, "c.customer_name", name, params, needWhere);
+		needWhere = appendIfNotEmpty(sqlBuilder, "c.mobile", mobile, params, needWhere);
+
+		return Db.queryInt(sqlBuilder.toString(), params.toArray());
+	}
+
+	
 	public int batchDelete(String... ids) {
 		if (ids != null && ids.length > 0) {
 			int deleteCount = 0;
@@ -113,6 +127,13 @@ public class CustomerQuery extends JBaseQuery {
 			return deleteCount;
 		}
 		return 0;
+	}
+
+	public List<Customer> findByUserId(String id) {
+		StringBuilder sql = new StringBuilder("SELECT cc.* FROM cc_customer cc ");
+		sql.append("RIGHT JOIN cc_user_join_customer a ON cc.id = a.customer_id ");
+		sql.append("WHERE a.user_id= ? ");		
+		return DAO.find(sql.toString(), id);
 	}
 
 }

@@ -85,4 +85,8 @@ public class WarehouseQuery extends JBaseQuery {
 		String sql = "SELECT cw.* from cc_warehouse cw LEFT JOIN cc_seller cs on cs.dept_id = cw.dept_id where cs.id= ?";
 		return DAO.find(sql, sellerId);
 	}
+
+	public List<Warehouse> findWareHouseByDept(String id) {
+		return DAO.doFind("dept_id = ?", id);
+	}
 }

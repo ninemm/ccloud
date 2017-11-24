@@ -26,13 +26,18 @@
 		jQuery.mm.initValidator('#form', validatorFields);
 		
 		$('#_module_tree').click(function() {
-			layer.open({
-				title:'模块资源',
-			    type: 2,
-			    area: ['580px', '530px'],
-			    fix: false, //不固定
-			    content: '${CPATH}/admin/module/module_tree'
-			});
+			var systemId = $("#systemChoose").find("option:selected").val();
+			if (systemId != null && systemId != "") {
+				layer.open({
+					title:'模块资源',
+				    type: 2,
+				    area: ['580px', '530px'],
+				    fix: false, //不固定
+				    content: '${CPATH}/admin/module/module_tree?id='+systemId
+				});		
+			} else {
+				toastr.error(data.message,'请选择系统!');
+			}		
 		});
 		
 	});
@@ -125,7 +130,7 @@
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">所属系统:</label>
 						<div class="input-group col-md-4 col-sm-10">
-							<select class="form-control input-sm" name="module.system_id">
+							<select class="form-control input-sm" name="module.system_id" id="systemChoose">
 								<option value="">--请选择--</option>
 								<#list list as system >
 									<option value="${system.id}" <#if module?? && system.id == module.system_id>selected="selected"</#if>>${system.name}</option>

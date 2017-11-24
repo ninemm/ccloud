@@ -88,4 +88,8 @@ public class GroupQuery extends JBaseQuery {
 		}
 		return DAO.find(sqlBuilder.toString(), params.toArray());
 	}
+
+	public List<Group> findByDeptId(String id) {
+		return DAO.doFind("dept_id = ?", id);
+	}
 }

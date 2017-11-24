@@ -82,8 +82,15 @@ public class SellerQuery extends JBaseQuery {
 		return 0;
 	}
 
-	public List<Seller> querySellIdByUser(String departmentId) {
+	public List<Seller> querySellIdByDept(String departmentId) {
 		return DAO.doFind("dept_id = ? and is_enabled = 1", departmentId);
+	}
+	
+	public List<Seller> findSellerListByUser(String userId) {
+		String sql = "select cs.* from cc_seller cs LEFT JOIN `user` u on u.department_id = cs.dept_id "
+				+ "WHERE u.id =? and cs.seller_type=1";
+
+		return DAO.find(sql, userId);
 	}
 	
 }

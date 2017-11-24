@@ -54,7 +54,7 @@ function batchAction() {
 							<th style="width: 20%">组合商品名称</th>
 							<th>商品价格</th>
 							<th>主商品规格</th>
-							<th>子商品品类数量</th>
+							<th>品类数量</th>
 							<@shiro.hasPermission name="/admin/productComposition/edit,/admin/all">
 							<th style="width: 20%">操作</th>
 							</@shiro.hasPermission>
@@ -73,7 +73,7 @@ function batchAction() {
 							</td>
 							<td>${bean.price!}</td>
 							<td>${bean.valueName!}</td>
-							<td>${bean.type_count!}</td>
+							<td>${bean.type_count+1!}</td>
 							<td>
 							<@shiro.hasPermission name="/admin/productComposition/edit,/admin/all">
 								<a href="${CPATH}/admin/productComposition/edit?id=${bean.parent_id}&c=${c!}&p=${p!}" class="btn btn-xs bg-olive btn-flat">编辑</a>

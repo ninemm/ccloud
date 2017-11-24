@@ -38,7 +38,7 @@ public class CustomerTypeQuery extends JBaseQuery {
 
 	public Record findById(final String id) {
 		StringBuilder fromBuilder = new StringBuilder(" select ");
-		fromBuilder.append(" c.id, c.name, c.price_system_id, p.name as price_system_name");
+		fromBuilder.append(" c.id, c.name, c.code, c.price_system_id, p.name as price_system_name");
 		fromBuilder.append(" from `cc_customer_type` c left join `cc_price_system` p on c.price_system_id = p.id ");
 		fromBuilder.append(" where c.id = ? ");
 
@@ -48,7 +48,7 @@ public class CustomerTypeQuery extends JBaseQuery {
 	public Record findMoreById(final String id) {
 		StringBuilder fromBuilder = new StringBuilder(" select ");
 		fromBuilder.append(
-				" c.id, c.name, c.price_system_id, p.name as price_system_name, c.dept_id, c.data_area, d.dept_name ");
+				" c.id, c.name, c.code, c.price_system_id, p.name as price_system_name, c.dept_id, c.data_area, d.dept_name ");
 		fromBuilder.append(" from `cc_customer_type` c left join `cc_price_system` p on c.price_system_id = p.id ");
 		fromBuilder.append(" left join department d on c.dept_id = d.id ");
 		fromBuilder.append(" where c.id = ? ");
@@ -58,7 +58,7 @@ public class CustomerTypeQuery extends JBaseQuery {
 
 	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String show, String deptId,
 			String dataArea) {
-		String select = "select c.id, c.name, c.is_show, p.name as price_system_name, d.dept_name ";
+		String select = "select c.id, c.name, c.code, c.is_show, p.name as price_system_name, d.dept_name ";
 		StringBuilder fromBuilder = new StringBuilder(
 				"from `cc_customer_type` c left join `cc_price_system` p on c.price_system_id = p.id ");
 		fromBuilder.append(" left join department d on c.dept_id = d.id ");
@@ -121,6 +121,10 @@ public class CustomerTypeQuery extends JBaseQuery {
 			return deleteCount;
 		}
 		return 0;
+	}
+
+	public List<CustomerType> findByDept(String id) {
+		return DAO.doFind("dept_id = ?", id);
 	}
 
 }
