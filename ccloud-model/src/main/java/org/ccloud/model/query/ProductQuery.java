@@ -184,13 +184,14 @@ public class ProductQuery extends JBaseQuery {
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 	
-	public List<Product> findAll(String userId){
-		String sql = "SELECT cp.id as id,cp.name as name,cp.price as price,GROUP_CONCAT(DISTINCT cgs.`name`) AS cps_name FROM cc_product cp "
-				+ "LEFT JOIN cc_product_goods_specification_value cpg ON cp.id = cpg.product_set_id "
+	public List<Product> findAllByUserId(String userId){
+		String sql = "SELECT cp.id AS id,cp.NAME AS name,csp.store_count,cp.big_unit as big_unit, cp.small_unit as small_unit,cp.convert_relate as convert_relate,cp.price AS price,GROUP_CONCAT(DISTINCT cgs.`name`) AS cps_name "
+				+ "FROM	cc_product cp LEFT JOIN cc_product_goods_specification_value cpg ON cp.id = cpg.product_set_id "
 				+ "LEFT JOIN cc_goods_specification_value cgs ON cpg.goods_specification_value_set_id = cgs.id "
-				+ "LEFT JOIN cc_product_safe_inventory cpsi ON cpsi.product_id = cp.id "
-				+ "LEFT JOIN `user` u on u.department_id = cpsi.dept_id "
-				+ "where u.id =? GROUP BY cp.id,cpsi.safe_inventory_count,cp.name,cp.price";
+				+ "LEFT JOIN cc_seller_product csp on csp.product_id=cp.id "
+				+ "LEFT JOIN cc_seller cs on cs.id=csp.seller_id "
+				+ "LEFT JOIN `user` u on u.department_id=cs.dept_id "
+				+ "WHERE u.id=? GROUP BY cp.id";
 		return DAO.find(sql, userId);
 	}
 	

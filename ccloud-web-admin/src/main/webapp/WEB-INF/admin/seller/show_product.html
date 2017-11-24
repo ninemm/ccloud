@@ -207,7 +207,7 @@
 	<div class="row content-row">
 		<div class="jp-left">
 			<a onclick="getA()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-plus"></i> 新增 </a>
-			<button type="button" class="btn btn-sm btn-primary" id="product_warehouse"  data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">批量设置仓库</button>
+			<!-- <button type="button" class="btn btn-sm btn-primary" id="product_warehouse"  data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">批量设置仓库</button> -->
 			<a  onclick="refresh()" class="btn btn-sm btn-primary"><i class="fa fa-refresh"></i> 刷新 </a>
 		</div>
 		<form class="form-horizontal" style="float: right" action="${CPATH}/admin/seller/show_product?c=${c!}&p=${p!}" method="post">
@@ -234,7 +234,7 @@
 			<input type="hidden" name="seller.id" value="${(seller.id)!}">
 					<div class="box-body">
 						<div class="form-group col-sm-12 validata-box">
-							<label class="control-label col-sm-2">品牌管理:</label>
+							<label class="control-label col-sm-2" style="width:90px;">仓库管理:</label>
 							<div class="input-group col-md-4 col-sm-10" style="width=300px;">
 								<select class="form-control input-sm" name="brand" id="brand_option" multiple="multiple" >
 								</select>
