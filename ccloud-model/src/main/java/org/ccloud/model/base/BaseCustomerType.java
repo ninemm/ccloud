@@ -106,6 +106,14 @@ public abstract class BaseCustomerType<M extends BaseCustomerType<M>> extends JM
 		return get("name");
 	}
 
+	public void setCode(java.lang.String code) {
+		set("code", code);
+	}
+
+	public java.lang.String getCode() {
+		return get("code");
+	}
+
 	public void setIsShow(java.lang.Integer isShow) {
 		set("is_show", isShow);
 	}
@@ -122,11 +130,11 @@ public abstract class BaseCustomerType<M extends BaseCustomerType<M>> extends JM
 		return get("type");
 	}
 
-	public void setPriceSystemId(java.lang.Integer priceSystemId) {
+	public void setPriceSystemId(java.lang.String priceSystemId) {
 		set("price_system_id", priceSystemId);
 	}
 
-	public java.lang.Integer getPriceSystemId() {
+	public java.lang.String getPriceSystemId() {
 		return get("price_system_id");
 	}
 

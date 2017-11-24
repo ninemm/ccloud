@@ -106,6 +106,14 @@ public abstract class BaseSalesRefundInstockDetail<M extends BaseSalesRefundInst
 		return getStr("product_id");
 	}
 
+	public void setWarehouseId(java.lang.String warehouseId) {
+		set("warehouse_id", warehouseId);
+	}
+
+	public java.lang.String getWarehouseId() {
+		return getStr("warehouse_id");
+	}
+
 	public void setRefundInstockId(java.lang.String refundInstockId) {
 		set("refund_instock_id", refundInstockId);
 	}

@@ -18,7 +18,10 @@ package org.ccloud.model.query;
 import java.util.LinkedList;
 import org.ccloud.model.SalesOutstock;
 
+import com.jfinal.kit.StrKit;
+import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
 /**
@@ -42,16 +45,36 @@ public class SalesOutstockQuery extends JBaseQuery {
 		});
 	}
 
-	public Page<SalesOutstock> paginate(int pageNumber, int pageSize, String orderby) {
-		String select = "select * ";
-		StringBuilder fromBuilder = new StringBuilder("from `cc_sales_outstock` ");
+	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate) {
+		String select = "select r.*, c.customer_name ";
+		StringBuilder fromBuilder = new StringBuilder("from `cc_sales_refund_instock` r ");
+		fromBuilder.append(" join cc_customer c on r.customer_id = c.id ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
+
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.instock_sn", keyword, params, needWhere);
+
+		if (needWhere) {
+			fromBuilder.append(" where 1 = 1");
+		}
+
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and r.create_date >= ?");
+			params.add(startDate);
+		}
+
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and r.create_date <= ?");
+			params.add(endDate);
+		}
+
+		fromBuilder.append(" order by r.create_date ");
 
 		if (params.isEmpty())
-			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
-		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
 	public int batchDelete(String... ids) {
