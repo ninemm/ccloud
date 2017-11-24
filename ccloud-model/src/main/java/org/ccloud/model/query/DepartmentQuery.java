@@ -193,14 +193,14 @@ public class DepartmentQuery extends JBaseQuery {
 		fromBuilder.append(" order by ");
 		
 		if (StrKit.isBlank(orderBy)) {
-			fromBuilder.append("d.order_list asc ");
+			fromBuilder.append("d.order_list,d.dept_level asc ");
 			return ;
 		}
 		
 		String orderbyInfo[] = orderBy.trim().split("\\s+");
 		orderBy = orderbyInfo[0];
 		
-		fromBuilder.append("d.order_list ");
+		fromBuilder.append("d.order_list,d.dept_level ");
 		
 		if (orderbyInfo.length == 1) {
 			fromBuilder.append("desc");
