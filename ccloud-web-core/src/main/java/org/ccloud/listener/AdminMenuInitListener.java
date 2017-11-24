@@ -106,9 +106,8 @@ public class AdminMenuInitListener implements MessageListener {
 		MenuGroup group = new MenuGroup("order", "fa fa-cart-arrow-down", "订单管理");
 		
 		{
-			group.addMenuItem(new MenuItem("salesOrder", "/admin/salesOrder", "订货单"));
-			group.addMenuItem(new MenuItem("saleRefund", "/admin/saleRefund", "退货单"));
-			group.addMenuItem(new MenuItem("confirmed", "/admin/order?s=101503", "订单指派"));
+			group.addMenuItem(new MenuItem("salesOrder", "/admin/salesOrder", "销售订货单"));
+			group.addMenuItem(new MenuItem("saleRefund", "/admin/saleRefund", "销售退货单"));
 			group.addMenuItem(new MenuItem("purchaseOrder", "/admin/purchaseOrder", "采购订单"));
 		}
 		
@@ -119,13 +118,12 @@ public class AdminMenuInitListener implements MessageListener {
 		MenuGroup group = new MenuGroup("store", "fa fa-barcode", "库存管理");
 		
 		{
-			group.addMenuItem(new MenuItem("init", "/admin/promoter", "初始化"));
+			group.addMenuItem(new MenuItem("warehouse", "/admin/warehouse", "仓库管理"));
 			group.addMenuItem(new MenuItem("stockTaking", "/admin/stockTaking", "库存盘点"));
 			group.addMenuItem(new MenuItem("transferBill", "/admin/transferBill", "库间调拨"));
-			group.addMenuItem(new MenuItem("setting", "/admin/promoter/setting", "出库管理"));
-			group.addMenuItem(new MenuItem("commission", "/admin/promoter/commission", "入库管理"));
-			group.addMenuItem(new MenuItem("warehouse", "/admin/warehouse", "仓库管理"));
 			group.addMenuItem(new MenuItem("inventory", "/admin/inventory", "库存总账管理"));
+			group.addMenuItem(new MenuItem("salesOutstock", "/admin/salesOutstock", "销售订货出库"));
+			group.addMenuItem(new MenuItem("salesInstock", "/admin/salesInstock", "销售退货入库"));
 		}
 		
 		return group;
