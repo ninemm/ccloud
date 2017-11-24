@@ -1,0 +1,105 @@
+<#macro script_import>
+</#macro> 
+<#macro script>
+</#macro> 
+<#macro css_import>
+</#macro> 
+<#macro css>
+</#macro> 
+<#macro layout>
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+  	<title>${WEB_TITLE!WEB_NAME!} - ${WEB_SUBTITLE!'协同云平台'}</title>
+  	<meta name="keywords" content="${META_KEYWORDS!}">
+  	<meta name="description" content="${META_DESCRIPTION!}">
+  	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  	<meta name="renderer" content="webkit">
+  	
+  	<!-- Facebook and Twitter integration -->
+	<meta property="og:title" content="${WEB_TITLE!WEB_NAME!}"/>
+	<meta property="og:image" content=""/>
+	<meta property="og:url" content=""/>
+	<meta property="og:site_name" content="${WEB_TITLE!WEB_NAME!}"/>
+	<meta property="og:description" content="${META_DESCRIPTION!}"/>
+	<meta name="twitter:title" content="${WEB_TITLE!WEB_NAME!}" />
+	<meta name="twitter:image" content="" />
+	<meta name="twitter:url" content="" />
+	<meta name="twitter:card" content="${META_DESCRIPTION!}" />
+	
+	<!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+  	<link rel="shortcut icon" href="${CTPATH}/images/favicon.ico" type="image/x-icon">
+
+    <!-- weui.css -->
+	<link type='text/css' rel="stylesheet" href="${CTPATH}/css/weui.min.css">
+	<!-- jquery-weui -->
+	<link type='text/css' rel="stylesheet" href="${CTPATH}/css/jquery-weui.min.css"> 
+	<!-- Icomoon Icon Fonts-->
+	<link type='text/css' rel="stylesheet" href="${CTPATH}/css/icomoon.css">
+	<link type='text/css' rel="stylesheet" href="${CPATH}/static/plugins/toastr/toastr.css">
+
+	<@css_import />
+
+	<!-- 
+		You can change the style.css (default color purple) to one of these styles
+	-->
+	<link type='text/css' rel="stylesheet" href="${CTPATH}/css/style.css">
+
+  	<#if css ??>
+  		<style type="text/css">
+  		<@css />
+  		</style>
+  	</#if>
+
+</head>
+
+<body ontouchstart>
+	
+	<#nested>
+	
+<!-- 	<div id="fh5co-toolbar">
+	   	<a href="javascript:;" class="toolbar-item toolbar-item-weixin"><span class="toolbar-layer"></span></a>
+	   	<a href="http://wpa.qq.com/msgrd?v=3&uin=${OPTION('web_administrator_qq')!}&site=qq&menu=yes" class="toolbar-item toolbar-item-feedback" target="_blank"></a>
+	   	<a href="http://t.9mm.tech" class="toolbar-item toolbar-item-app" target="_blank"><span class="toolbar-layer"></span></a>
+	   	<a href="javascript:scroll(0,0)" id="top" class="toolbar-item toolbar-item-top"></a>
+	</div> -->
+	<!-- <a href="#top" id="scroll-top"></a> -->
+	
+	<div style="display: none;">
+		${OPTION('jpblog_statistical_code')!}
+	</div>
+	
+    <!-- jQuery -->
+	<script type='text/javascript' src="${CTPATH}/js/jquery-3.2.1.min.js"></script>
+	<script type='text/javascript' src="${CPATH}/static/plugins/jquery/jquery.form.min.js"></script>
+	<!-- fastclick -->
+	<script type='text/javascript' src="${CTPATH}/js/fastclick.js"></script>
+	<!-- Bootstrap -->
+	<script type='text/javascript' src="${CTPATH}/js/jquery-weui.js"></script>
+	<script type='text/javascript' src="${CTPATH}/js/historyUtils.js"></script>
+	<script type='text/javascript' src="${CPATH}/static/plugins/toastr/toastr.js"></script>
+	<@script_import />
+	<script type='text/javascript' src="${CTPATH}/js/comm.js"></script>
+	<script type="text/javascript">
+	if (Utils.devMode) {
+        document.write("<script type=\"text/javascript\" src=\"" + '${CTPATH}' + "/js/vconsole.min.js\">" + "<\/script>");
+    }
+	
+	    $(function() {
+        	FastClick.attach(document.body);
+		});	
+	</script>
+	
+	<#if script ??>
+	<script type="text/javascript">
+		<@script />
+	</script>
+	</#if>
+</body>
+</html>
+</#macro>

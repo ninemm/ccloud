@@ -1,0 +1,203 @@
+.sector-menu * {
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  position: relative
+}
+
+.cn-wrapper {
+  font-size: 1em;
+  width: 26em;
+  height: 26em;
+  overflow: hidden;
+  position: fixed;
+  z-index: 801;
+  bottom: 2.5em;
+  right: -13em;
+  -webkit-transform: scale(0.1) rotate(270deg);
+  -ms-transform: scale(0.1) rotate(270deg);
+  -moz-transform: scale(0.1) rotate(270deg);
+  transform: scale(0.1) rotate(270deg);
+  pointer-events: none;
+  -webkit-transition: all .3s ease;
+  -moz-transition: all .3s ease;
+  transition: all .3s ease;
+}
+
+.opened-nav {
+  pointer-events: auto;
+  -webkit-transform: scale(0.5) rotate(270deg);
+  -moz-transform: scale(0.5) rotate(270deg);
+  -ms-transform: scale(0.5) rotate(270deg);
+  transform: scale(0.5) rotate(270deg);
+}
+
+.cn-overlay {
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  opacity: 0;
+  visibility: hidden;
+  z-index: 800;
+}
+
+.cn-overlay.on-overlay {
+  visibility: visible;
+  opacity: 1;
+}
+
+.cn-button {
+  display: block;
+  border: none;
+  background: none;
+  color: #fff;
+  text-align: center;
+  font-size: 1.8em;
+  padding-right: 1em;
+  height: 2.5rem;
+  width: 2.5rem;
+  background-color: #f1745e;
+  position: fixed;
+  right: -1.25rem;
+  bottom: 10em;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 802;
+  outline: none;
+}
+
+.cn-wrapper li {
+  position: absolute;
+  font-size: 1.5em;
+  width: 13em;
+  height: 13em;
+  -webkit-transform-origin: 100% 100%;
+  -moz-transform-origin: 100% 100%;
+  -ms-transform-origin: 100% 100%;
+  transform-origin: 100% 100%;
+  overflow: hidden;
+  -webkit-transition: border .3s ease;
+  -moz-transition: border .3s ease;
+  transition: border .3s ease;
+}
+
+.cn-wrapper li a {
+  display: block;
+  font-size: 36px;
+  height: 100%;
+  width: 100%;
+  border-radius: 100% 0 0 0;
+  position: fixed;
+  /* fix the "displacement" bug in webkit browsers when using tab key */
+  color: #fff;
+  text-align: center;
+  -webkit-backface-visibility: hidden;
+  -webkit-transition: opacity 0.3s, color 0.3s;
+  -moz-transition: opacity 0.3s, color 0.3s;
+  transition: opacity 0.3s, color 0.3s;
+}
+
+.cn-wrapper li a span {
+  font-size: 1.1em;
+  opacity: 0.7;
+  position: absolute;
+  right: 31%;
+  top: 47%;
+  transform: rotate(-45deg);
+}
+
+.three-menu li a span {
+  right: 40%;
+  top: 56%;
+}
+
+
+/* for a central angle x, the list items must be skewed by 90-x degrees
+in our case x=40deg so skew angle is 50deg
+items should be rotated by x, minus (sum of angles - 180)2s (for this demo) */
+
+.cn-wrapper li:first-child {
+  -ms-transform: rotate(0) skew(0);
+  -moz-transform: rotate(0) skew(0);
+  -webkit-transform: rotate(0) skew(0);
+  transform: rotate(0) skew(0);
+}
+
+.cn-wrapper li:nth-child(2) {
+  -webkit-transform: rotate(90deg) skew(0deg);
+  -ms-transform: rotate(90deg) skew(0deg);
+  -moz-transform: rotate(90deg) skew(0deg);
+  transform: rotate(90deg) skew(0deg);
+}
+
+.three-menu li:nth-child(2) {
+  transform: rotate(60deg) skew(0deg);
+}
+
+.cn-wrapper li:nth-child(3) {
+  -webkit-transform: rotate(120deg) skew(0);
+  -ms-transform: rotate(120deg) skew(0);
+  -moz-transform: rotate(120deg) skew(0);
+  transform: rotate(120deg) skew(0)
+}
+
+.cn-wrapper li:nth-child(4) {
+  -webkit-transform: rotate(110deg) skew(50deg);
+  -ms-transform: rotate(110deg) skew(50deg);
+  -moz-transform: rotate(110deg) skew(50deg);
+  transform: rotate(110deg) skew(50deg);
+}
+
+.cn-wrapper li:nth-child(5) {
+  -webkit-transform: rotate(150deg) skew(50deg);
+  -ms-transform: rotate(150deg) skew(50deg);
+  -moz-transform: rotate(150deg) skew(50deg);
+  transform: rotate(150deg) skew(50deg);
+}
+
+.cn-wrapper li:nth-child(odd) a {
+  background-color: #a11313;
+  background-color: hsla(0, 88%, 63%, 1);
+}
+
+.cn-wrapper li:nth-child(even) a {
+  background-color: #a61414;
+  background-color: hsla(0, 88%, 65%, 1);
+}
+
+
+/* active style */
+
+.cn-wrapper li.active a {
+  background-color: #b31515;
+  background-color: hsla(0, 88%, 70%, 1);
+}
+
+
+/* hover style */
+
+.cn-wrapper li:not(.active) a:hover,
+.cn-wrapper li:not(.active) a:active,
+.cn-wrapper li:not(.active) a:focus {
+  background-color: #b31515;
+  background-color: hsla(0, 88%, 70%, 1);
+}
+
+@media screen and (max-width:480px) {
+  .cn-wrapper {
+    font-size: 12px;
+  }
+  .cn-button {
+    font-size: 1em;
+  }
+  .cn-wrapper li {
+    font-size: 12px;
+  }
+}

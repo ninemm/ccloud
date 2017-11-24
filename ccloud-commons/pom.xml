@@ -51,6 +51,12 @@
             <groupId>net.sf.barcode4j</groupId>
             <artifactId>barcode4j-light</artifactId>
         </dependency>
+        
+        <dependency>
+		    <groupId>org.xerial.snappy</groupId>
+		    <artifactId>snappy-java</artifactId>
+		    <version>1.1.4</version>
+		</dependency>
 		
 		<dependency>
 			<groupId>javax.servlet</groupId>
