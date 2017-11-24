@@ -168,13 +168,15 @@ public class _PurchaseOrderDetailController extends JBaseCRUDController<Purchase
 		while (productNum > count) {
 			index++;
 			String productId = StringUtils.getArrayFirst(paraMap.get("productId" + index));
+			Product product = ProductQuery.me().findByUserId(user.getId(),productId);
+			int big =product.getConvertRelate();
 			if (StrKit.notBlank(productId)) {
 				String Id2 = StrKit.getRandomUUID();
-				int rowTotal=((Integer.parseInt(StringUtils.getArrayFirst(paraMap.get("smallNum"+ index)))+Integer.parseInt(StringUtils.getArrayFirst(paraMap.get("bigNum"+ index)))*24))*Integer.parseInt(StringUtils.getArrayFirst(paraMap.get("smallPrice"+ index)));
+				int rowTotal=((Integer.parseInt(StringUtils.getArrayFirst(paraMap.get("smallNum"+ index)))+Integer.parseInt(StringUtils.getArrayFirst(paraMap.get("bigNum"+ index)))*big))*Integer.parseInt(StringUtils.getArrayFirst(paraMap.get("smallPrice"+ index)));
 				purchaseOrderDetail.set("id", Id2);
 				purchaseOrderDetail.set("purchase_order_id", Id);
 				purchaseOrderDetail.set("product_id", productId);
-				purchaseOrderDetail.set("product_count", (Integer.parseInt(StringUtils.getArrayFirst(paraMap.get("smallNum"+ index)))+Integer.parseInt(StringUtils.getArrayFirst(paraMap.get("bigNum"+ index)))*24));
+				purchaseOrderDetail.set("product_count", (Integer.parseInt(StringUtils.getArrayFirst(paraMap.get("smallNum"+ index)))+Integer.parseInt(StringUtils.getArrayFirst(paraMap.get("bigNum"+ index)))*big));
 				purchaseOrderDetail.set("product_amount", rowTotal);
 				purchaseOrderDetail.set("product_price", StringUtils.getArrayFirst(paraMap.get("smallPrice"+ index)));
 				purchaseOrderDetail.set("order_list",index);
