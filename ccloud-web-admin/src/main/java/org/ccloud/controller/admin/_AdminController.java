@@ -125,7 +125,6 @@ public class _AdminController extends JBaseController {
 	}
 	
 	public void checkRole() {
-		System.out.println(123);
 		render("404.html");
 	}
 
