@@ -27,22 +27,20 @@ import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Brand;
+import org.ccloud.model.Customer;
 import org.ccloud.model.Department;
 import org.ccloud.model.Product;
-import org.ccloud.model.ProductSafeInventory;
 import org.ccloud.model.Seller;
 import org.ccloud.model.SellerBrand;
 import org.ccloud.model.SellerProduct;
 import org.ccloud.model.User;
-import org.ccloud.model.Warehouse;
+import org.ccloud.model.UserJoinCustomer;
 import org.ccloud.model.query.BrandQuery;
 import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.ProductQuery;
-import org.ccloud.model.query.ProductSafeInventoryQuery;
 import org.ccloud.model.query.SellerBrandQuery;
 import org.ccloud.model.query.SellerProductQuery;
 import org.ccloud.model.query.SellerQuery;
-import org.ccloud.model.query.WarehouseQuery;
 
 import com.alibaba.fastjson.JSONArray;
 import com.google.common.collect.ImmutableMap;
@@ -63,14 +61,14 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 	}
 	
 	public void list() {
-		
+		User user=getSessionAttr("user");
         String keyword = getPara("k");
         if (StrKit.notBlank(keyword)) {
             keyword = StringUtils.urlDecode(keyword);
             setAttr("k", keyword);
         }
 
-        Page<Seller> page = SellerQuery.me().paginate(getPageNumber(), getPageSize(),keyword,  "id");
+        Page<Seller> page = SellerQuery.me().paginate(getPageNumber(), getPageSize(),keyword,  "id",user.getUsername());
         Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);
 		
@@ -81,17 +79,20 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		String id = getPara("id");
 		if (id != null) {
 			Seller seller = SellerQuery.me().findById(id);
-	
 			setAttr("seller", seller);
 		}
 		
 	}
 	
 	//保存经销商信息
+	/* (non-Javadoc)
+	 * @see org.ccloud.core.JBaseCRUDController#save()
+	 */
 	public void save() {
-
 		final Seller seller = getModel(Seller.class);
 		final SellerBrand sellerBrand = getModel(SellerBrand.class);
+		final Customer customer = getModel(Customer.class);
+		final UserJoinCustomer userJoinCustomer = getModel(UserJoinCustomer.class);
 		String brandList =getPara("brandList");
 		String sellerId = seller.getId();
 		seller.setProvCode(getPara("userProvinceId"));
@@ -102,15 +103,51 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		seller.setCountryName(getPara("userDistrictText"));
 		
 		String [] brandIds= brandList.split(",");
-		
-		Department department=DepartmentQuery.me().findById(seller.getDeptId());
+		Department department=DepartmentQuery.me().findById(getPara("dept_id"));
 		User user=getSessionAttr("user");
 		if (StrKit.isBlank(sellerId)) {
 			sellerId = StrKit.getRandomUUID();
 			seller.set("id", sellerId);
+			seller.set("seller_name",getPara("seller_name"));
+			seller.set("seller_code",getPara("seller_code"));
+			seller.set("contact", getPara("contact"));
+			seller.set("phone", getPara("phone"));
+			seller.set("is_enabled", getPara("is_enabled"));
+			seller.set("market_name", getPara("market_name"));
+			seller.set("market_code", getPara("market_code"));
+			seller.set("jywx_open_id", getPara("jywx_open_id"));
+			seller.set("jpwx_open_id", getPara("jpwx_open_id"));
+			seller.set("product_type_store", getPara("product_type_store"));
+			seller.set("remark", getPara("remark"));
 			seller.set("create_date", new Date());
 			seller.set("modify_user_id", user.getId());
 			seller.set("is_inited", 1);
+			if(user.getUsername().equals("admin")){
+				seller.set("dept_id",getPara("dept_id"));
+				seller.set("seller_type", getPara("seller_type"));
+			}else{
+				seller.set("dept_id",user.getDepartmentId());
+				seller.set("seller_type", 1);
+				//保存客户
+				String customerId= StrKit.getRandomUUID();
+				customer.set("id", customerId);
+				customer.set("customer_code", "s");
+				customer.set("customer_name", getPara("seller_name"));
+				customer.set("contact", getPara("seller_name"));
+				customer.set("mobile",getPara("phone"));
+				customer.set("customer_kind", 2);
+				customer.set("is_enabled",getPara("is_enabled"));
+				customer.set("is_archive", 1);
+				customer.save();
+				
+				//用户、客户、组织中间表
+				userJoinCustomer.set("customer_id", customerId);
+				userJoinCustomer.set("user_id", user.getId());
+				userJoinCustomer.set("data_area", user.getDataArea());
+				userJoinCustomer.set("dept_id", user.getDepartmentId());
+				userJoinCustomer.save();
+				
+			}
 			seller.save();
 			
 			
@@ -121,12 +158,30 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 					sellerBrand.set("id",sellerBrandId);
 					sellerBrand.set("brand_id", brandIds[i]);
 					sellerBrand.set("seller_id",sellerId);
-					sellerBrand.set("data_area",department.getDataArea());
-					sellerBrand.set("dept_id", seller.getDeptId());
+					if(user.getUsername().equals("admin")){
+						sellerBrand.set("data_area",department.getDataArea());
+						sellerBrand.set("dept_id", department.getId());
+					}else{
+						sellerBrand.set("data_area",user.getDataArea());
+						sellerBrand.set("dept_id", user.getDepartmentId());
+					}
 					sellerBrand.save();
 				}
 			}
 		} else {
+			seller.set("seller_name",getPara("seller_name"));
+			seller.set("seller_code",getPara("seller_code"));
+			seller.set("contact", getPara("contact"));
+			seller.set("phone", getPara("phone"));
+			seller.set("market_name", getPara("market_name"));
+			seller.set("is_enabled", getPara("is_enabled"));
+			seller.set("market_code", getPara("market_code"));
+			seller.set("jywx_open_id", getPara("jywx_open_id"));
+			seller.set("jpwx_open_id", getPara("jpwx_open_id"));
+			seller.set("product_type_store", getPara("product_type_store"));
+			seller.set("remark", getPara("remark"));
+			seller.set("modify_user_id", user.getId());
+			seller.set("is_inited", 1);
 			seller.set("modify_date", new Date());
 			seller.set("modify_user_id", user.getId());
 			seller.update();
@@ -137,8 +192,13 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 					sellerBrand.set("id",sellerBrandId);
 					sellerBrand.set("brand_id", brandIds[i]);
 					sellerBrand.set("seller_id",sellerId);
-					sellerBrand.set("data_area",department.getDataArea());
-					sellerBrand.set("dept_id", seller.getDeptId());
+					if(user.getUsername().equals("admin")){
+						sellerBrand.set("data_area",department.getDataArea());
+						sellerBrand.set("dept_id", department.getId());
+					}else{
+						sellerBrand.set("data_area",user.getDataArea());
+						sellerBrand.set("dept_id", user.getDepartmentId());
+					}
 					sellerBrand.save();
 				}
 			}
@@ -304,78 +364,6 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			renderJson(result);
 		}		
 			
-	public void saveProductWarehouse(){
-		final ProductSafeInventory productSafeInventory = getModel(ProductSafeInventory.class);
-		String warehouselist =getPara("warehouselist");
-		String sellerId = getPara("sellerId");
-		Department department = DepartmentQuery.me().findBySellerId(sellerId);
-		String [] warehouselists= warehouselist.split(",");
-		String ds = getPara("orderItems");
-		boolean result = false;
-		JSONArray jsonArray = JSONArray.parseArray(ds);
-		List<ProductSafeInventory> imageList = jsonArray.toJavaList(ProductSafeInventory.class);
-		for (ProductSafeInventory sellerGood : imageList) {
-			List<String> s=new ArrayList<String>();
-			for(String w :warehouselists){
-				s.add(w);
-			}
-			List<ProductSafeInventory> inventory = ProductSafeInventoryQuery.me().findByWarehouseId(sellerGood.getProductId());
-			boolean flang = false;
-			if(inventory!=null){
-				for (ProductSafeInventory inventory2 :inventory){
-					for(int i=0;i<s.size();i++){
-			 				if(!s.get(i).equals(inventory2.getWarehouseId())){
-								flang = false;
-							}else{
-								flang = true;
-								inventory2.set("safe_inventory_count", sellerGood.getSafeInventoryCount());
-								inventory2.set("modify_date", new Date());
-								result=inventory2.update();
-								s.remove(s.get(i));
-								break;
-								}
-			 			}
-					if(flang == false){
-						ProductSafeInventoryQuery.me().deleteById(inventory2.getId());
-						}
-				}
-				for (int j=0;j<s.size();j++){
-					String Id = StrKit.getRandomUUID();
-					productSafeInventory.set("id", Id);
-					productSafeInventory.set("product_id",sellerGood.getProductId());
-					productSafeInventory.set("warehouse_id", s.get(j));
-					productSafeInventory.set("safe_inventory_count", sellerGood.getSafeInventoryCount());
-					productSafeInventory.set("data_area", department.getDataArea());
-					productSafeInventory.set("dept_id", department.getId());
-					productSafeInventory.set("create_date", new Date());
-					result=productSafeInventory.save();
-					if(result == false){
-						break;
-					}
-					
-				}
-			}
-
-		}
-		renderJson(result);
-		
-	}
-	
-	public void show_warehouse(){
-		String sellerId = getPara("sellerId");
-		List<Warehouse> Warehouses = WarehouseQuery.me().findBySellerId(sellerId);
-		List<Map<String, Object>> list = new ArrayList<>();
-		for (Warehouse Warehouse : Warehouses) {
-			if (Warehouse.getId().equals("")) {
-				continue;
-			}
-			Map<String, Object> map = new HashMap<>();
-			map.put("id", Warehouse.getId());
-			map.put("name",Warehouse.getName());
-			list.add(map);
-		}
-		renderJson(list);
-	}
 	
 	public void changeSeller() {
 		String id = getPara("sellerId");
@@ -383,6 +371,20 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		setSessionAttr("sellerId", id);
 		setSessionAttr("sellerName", name);
 		renderAjaxResultForSuccess("切换成功");
+	}
+	//对销售商进行启用和停用的操作
+	public void changeIsenabled(){
+		String id = getPara("id");
+		Seller seller = SellerQuery.me().findById(id);
+		boolean flang = false;
+		if(seller.getIsEnabled()==1){
+			seller.set("is_enabled", 0);
+		}else{
+			seller.set("is_enabled", 1);
+		}
+		seller.set("modify_date", new Date());
+		flang=seller.update();
+		renderJson(flang);
 	}
 }
 

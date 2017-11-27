@@ -38,24 +38,6 @@
 				$(".content").show();
 			}
 	})
-		$('#exampleModal').on('show.bs.modal', function (event) {
-		  var id = $("#sellerId").find("option:selected").val();
-			$.ajax({
-			url:"${CPATH}/admin/seller/show_warehouse",
-			type:"post",
-			dataType:"json",
-			data:{sellerId : id},
-			success:function(data)
-			{
-				$("#brand_option").html("");
-				for (var i = 0; i < data.length; i++) {
-						$("#brand_option").append("<option value=" + data[i].id + ">" + data[i].name + "</option>");
-				}
-			}
-		});
-				 
-		})
-	
 		
 	$(function() {
 		$(".jp-left").hide();
@@ -101,16 +83,6 @@
       			{field: "custom_name", title: "产品名称", align: "center", width: '10%',edit:false},
       			{field: "cps_name", title: "产品规格", align: "center", width: '15%',edit:false},
       			{field: "store_count", title: "库存数量", align: "center", width: '5%',edit:false},
-      			{field: "safeInventoryCount", title: "安全存量", align: "center", width: '5%',
-      			formatter: function(value, row, rowIndex) {
-      				if(row.safeInventoryCount==null){
-						var strHtml = '<input type="text" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="safeCount" id="safeCount" value="" size = "5"/>';
-      				}else{
-						var strHtml = '<input type="text" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="safeCount" id="safeCount" value="'+row.safeInventoryCount+'" size = "5"/>';
-					}
-					return strHtml;
-				},
-      			edit:false},
       			{field: "price", title: "销售价格", align: "center", width: '8%',edit:false},
       			{field: "warehouse_name", title: "已选仓库", align: "center", width: '25%',
       			
@@ -151,40 +123,6 @@
 		location.href=url;
 	}
 
-	function saveWarehouse(){
-		var id = $("#sellerId").find("option:selected").val();
-		var list = $("#brand_option").select2("val");
-		var ids = "";
-		if (list != null && list.length > 0) {
-			ids = list.toString();
-		}
-		var orderItems = new Array();
-		 var checklist = $('input[name="dataItem"]:checked').parent().parent();
-		 if(checklist.length == 0){
-			alert("未选中任何产品!");
-			return;		 
-		 }
-		 $('input[name="dataItem"]:checked').parent().parent().each(function(idx, item) {
-		  	var obj = {
-								"productId":  $(this).find('td').eq(0).find("input").val(),
-								"safeInventoryCount":  $(this).find('td').eq(4).find("input").val(),
-						};
-							orderItems.push(obj);
-		});
-		$.ajax({
-			url:"${CPATH}/admin/seller/saveProductWarehouse",
-			type:"post",
-			dataType:"json",
-			data : {orderItems : JSON.stringify(orderItems), warehouselist :ids,sellerId :id},
-			success:function(data){
-				if(data==true){
-					toastr.success(data.message, '操作成功');
-				}else{
-					toastr.error(data.message,'操作失败');
-				}
-			}
-		});
-	}
 </#macro>
 
 <@layout active_id=p child_active_id=c>
@@ -207,7 +145,6 @@
 	<div class="row content-row">
 		<div class="jp-left">
 			<a onclick="getA()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-plus"></i> 新增 </a>
-			<!-- <button type="button" class="btn btn-sm btn-primary" id="product_warehouse"  data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">批量设置仓库</button> -->
 			<a  onclick="refresh()" class="btn btn-sm btn-primary"><i class="fa fa-refresh"></i> 刷新 </a>
 		</div>
 		<form class="form-horizontal" style="float: right" action="${CPATH}/admin/seller/show_product?c=${c!}&p=${p!}" method="post">
@@ -222,32 +159,4 @@
 	</div>
 	<!-- /.box -->
 </section>
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="padding-top:200px;">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="exampleModalLabel">设置仓库操作</h4>
-      </div>
-      <div class="modal-body">
-       <form action="${CPATH}/admin/seller/save" method="post" id="form" class="form-horizontal" >
-			<input type="hidden" name="seller.id" value="${(seller.id)!}">
-					<div class="box-body">
-						<div class="form-group col-sm-12 validata-box">
-							<label class="control-label col-sm-2" style="width:90px;">仓库管理:</label>
-							<div class="input-group col-md-4 col-sm-10" style="width=300px;">
-								<select class="form-control input-sm" name="brand" id="brand_option" multiple="multiple" >
-								</select>
-							</div>
-						</div>
-					</div>
-		</form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary" onclick="saveWarehouse()">保存</button>
-        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-      </div>
-    </div>
-  </div>
-</div>
 </@layout>

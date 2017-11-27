@@ -265,7 +265,9 @@
 				if (data.errorCode == 0) {
 					//location.reload();
 					toastr.success(data.message, '操作成功');
+					setTimeout( function(){
 					location.href="${CPATH}/admin/purchaseOrder/index";
+								}, 2 * 1000 );
 				} else {
 					toastr.error(data.message,'操作失败');
 				}

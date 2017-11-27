@@ -53,7 +53,7 @@ public class SellerQuery extends JBaseQuery {
 		return DAO.doDelete("id = ?", sellerId);
 	}
 	
-	public Page<Seller> paginate(int pageNumber, int pageSize,String keyword, String orderby) {
+	public Page<Seller> paginate(int pageNumber, int pageSize,String keyword, String orderby,String username) {
 		String select = "select * ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_seller` ");
 
@@ -61,8 +61,17 @@ public class SellerQuery extends JBaseQuery {
 		
 		appendIfNotEmptyWithLike(fromBuilder, "seller_name", keyword, params, true);
 		
-		fromBuilder.append("order by " + orderby);	
 
+		if(keyword.equals("")){
+			if(!username.equals("admin")){
+				fromBuilder.append("where seller_type =1 ");
+			}
+		}else{
+			if(!username.equals("admin")){
+				fromBuilder.append("and seller_type =1 ");
+			}
+		}
+		fromBuilder.append("order by " + orderby);	
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
