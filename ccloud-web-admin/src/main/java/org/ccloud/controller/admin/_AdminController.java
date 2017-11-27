@@ -92,7 +92,7 @@ public class _AdminController extends JBaseController {
 			if (user != null) {
 				String dataArea = DataAreaUtil.getUserDeptDataArea(user.getDataArea());
 				String dealerDataArea = DataAreaUtil.getUserDealerDataArea(user.getDataArea());
-				List<Seller> sellerList = SellerQuery.me().querySellIdByUser(user.getDepartmentId());
+				List<Seller> sellerList = SellerQuery.me().querySellIdByDept(user.getDepartmentId());
 				setSessionAttr("DeptDataAreaLike", dataArea + "%");
 				setSessionAttr("DeptDataArea", dataArea);
 				setSessionAttr("sellerList", sellerList);

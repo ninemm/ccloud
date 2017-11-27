@@ -134,10 +134,12 @@ public class _ModuleController extends JBaseCRUDController<Module> {
 			}
 		}
 		return true;
-	}	
+	}
 
 	public void module_tree() {
-		List<Map<String, Object>> list = ModuleQuery.me().findModuleListAsTree(1);
+		String id = getPara("id");
+		List<Map<String, Object>> list = ModuleQuery.me().findModuleListAsTree(1, id);
+		list = ModuleQuery.me().findModuleListAsTree(1, id);
 		setAttr("treeData", JSON.toJSON(list));
 	}
 }

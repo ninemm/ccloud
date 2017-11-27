@@ -16,6 +16,7 @@
 package org.ccloud.controller.admin;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +27,7 @@ import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.Department;
 import org.ccloud.model.User;
 import org.ccloud.model.query.DepartmentQuery;
+import org.ccloud.model.query.StationQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
@@ -49,6 +51,9 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 	
 	@Override
 	public void index() {
+		String dataArea = getSessionAttr("DeptDataAreaLike");
+		List<Map<String, Object>> list = DepartmentQuery.me().findDeptListAsTree(1, dataArea);
+		setAttr("treeData", JSON.toJSON(list));		
 		render("index.html");
 	}
 	
@@ -145,5 +150,29 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 		List<Map<String, Object>> list = DepartmentQuery.me().findDeptListAsTree(1, dataArea);
 		setAttr("treeData", JSON.toJSON(list));
 	}
-
+	
+	public void getAboutInfo() {
+		String id = getPara("id");
+		List<Map<String, Object>> stationList = StationQuery.me().findUserListByStation(id);//岗位树
+		List<Map<String, Object>> roleList = DepartmentQuery.me().findUserListByRole(id);//角色树
+		List<Map<String, Object>> wareHouseList = DepartmentQuery.me().findWareHouse(id);//仓库树
+		List<Map<String, Object>> sellerList = DepartmentQuery.me().findSeller(id);//账套树
+		List<Map<String, Object>> groupList = DepartmentQuery.me().findGroup(id);//分组树
+		List<Map<String, Object>> customTypeList = DepartmentQuery.me().findCustomType(id);//客户类型树
+		Map<String,Object> map = new HashMap<>();
+		map.put("stationList", stationList);
+		map.put("roleList", roleList);
+		map.put("wareHouseList", wareHouseList);
+		map.put("sellerList", sellerList);
+		map.put("groupList", groupList);
+		map.put("customTypeList", customTypeList);		
+		renderJson(map);
+	}
+	
+	public void getCustomer() {
+		String id = getPara("id");
+		List<Map<String, Object>> customerList = DepartmentQuery.me().findCustomer(id);//客户树
+		renderJson(customerList);	
+	}
+	
 }

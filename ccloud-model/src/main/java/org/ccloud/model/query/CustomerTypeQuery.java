@@ -123,4 +123,8 @@ public class CustomerTypeQuery extends JBaseQuery {
 		return 0;
 	}
 
+	public List<CustomerType> findByDept(String id) {
+		return DAO.doFind("dept_id = ?", id);
+	}
+
 }

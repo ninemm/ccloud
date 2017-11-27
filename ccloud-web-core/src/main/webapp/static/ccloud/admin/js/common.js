@@ -388,6 +388,30 @@ jQuery.mm = {
 		});
 	},*/
 	
+	initIconTreeView: function(treeId, data, checkBox, url, nodeSelectedFunc, nodeUnselectedFunc) {
+		treeId = treeId || '#tree';
+		$(treeId).treeview({
+	          expandIcon: 'glyphicon glyphicon-chevron-right',
+	          collapseIcon: 'glyphicon glyphicon-chevron-down',					
+			  data: data,
+			  showIcon: false,
+			  showCheckbox: checkBox,
+			  onNodeSelected: function(event, node) {
+				$.ajax({
+					url:url,
+					type:"post",
+					data:{"id": node.tags[0]},
+					dataType:"json",
+					success:function(data) {
+						jQuery.mm.initIconTreeView('#treeview-checkable-custom', data, false);
+					}
+				});				  
+			  },
+			  onNodeUnchecked: function (event, node) {
+			  }
+		}); 
+	},    
+    
 	initValidator: function(formId, fields) {
 		formId = formId || '#form';
 		$(formId).bootstrapValidator({

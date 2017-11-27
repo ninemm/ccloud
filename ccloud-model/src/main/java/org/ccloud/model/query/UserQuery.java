@@ -162,5 +162,12 @@ public class UserQuery extends JBaseQuery {
 		return DAO.find(sqlBuilder.toString(), params.toArray());
 	}
 
+	public List<User> findByRole(String id) {
+		StringBuilder sql = new StringBuilder("group_id in ");
+		sql.append("(SELECT gr.group_id FROM group_role_rel gr ");
+		sql.append("LEFT JOIN `group` g ON gr.group_id = g.id WHERE gr.role_id=?)");
+		return DAO.doFind(sql.toString(), id);
+	}
+
 	
 }

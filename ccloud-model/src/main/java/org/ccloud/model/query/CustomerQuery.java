@@ -16,6 +16,7 @@
 package org.ccloud.model.query;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.ccloud.model.Customer;
@@ -125,6 +126,13 @@ public class CustomerQuery extends JBaseQuery {
 			return deleteCount;
 		}
 		return 0;
+	}
+
+	public List<Customer> findByUserId(String id) {
+		StringBuilder sql = new StringBuilder("SELECT cc.* FROM cc_customer cc ");
+		sql.append("RIGHT JOIN cc_user_join_customer a ON cc.id = a.customer_id ");
+		sql.append("WHERE a.user_id= ? ");		
+		return DAO.find(sql.toString(), id);
 	}
 
 }

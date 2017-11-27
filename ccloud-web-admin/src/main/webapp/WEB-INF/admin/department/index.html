@@ -4,7 +4,7 @@
 	
 	<!-- bootstrap-table -->
  	<script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table.js"></script>
- 	<!-- <script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table-edit.js"></script> -->
+ 	<script type="text/javascript" src="${CPATH}/static/plugins/bootstrap-treeview/js/bootstrap-treeview.js"></script>
  	<script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table-zh-CN.js"></script>
 	
 </#macro>
@@ -13,76 +13,53 @@
 	
 	<!-- bootstrap-table-->
     <link rel="stylesheet" href="${CPATH}/static/plugins/bootstrap-table/bootstrap-table.css">
-
+    <link rel="stylesheet" href="${CPATH}/static/plugins/goods/goods.css">
+	<link rel="stylesheet" href="${CPATH}/static/plugins/bootstrap-treeview/css/bootstrap-treeview.css">
 </#macro> 
 
 <#macro script>
 
-	var $table = $("#_dept_table");
-	
 	$(function() {
-			
-		var url = '${CPATH}/admin/department/list';
-		
-		jQuery.mm.initParentTable('#_dept_table', url, initParams, initFields(), null);
-		
-		$("#search-submit").click(function() {
-			$table.bootstrapTable('refresh');
-		});
-		
-	});
+        $('#treeview').treeview({
+          color: "#428bca",
+          expandIcon: 'glyphicon glyphicon-chevron-right',
+          collapseIcon: 'glyphicon glyphicon-chevron-down',
+          nodeIcon: 'glyphicon glyphicon-bookmark',
+          data: JSON.parse('${treeData!}'),
+          onNodeSelected: function(event, node) {
+			$.ajax({
+				url:"${CPATH}/admin/department/getAboutInfo",
+				type:"post",
+				data:{"id": node.tags[0]},
+				dataType:"json",
+				success:function(data) {
+					var url = '${CPATH}/admin/department/getCustomer';
+					jQuery.mm.initIconTreeView('#treeview-checkable-station', data.stationList, false, url);
+					jQuery.mm.initIconTreeView('#treeview-checkable-role', data.roleList, false, url);
+					jQuery.mm.initIconTreeView('#treeview-checkable-warehouse', data.wareHouseList, false, url);
+					jQuery.mm.initIconTreeView('#treeview-checkable-seller', data.sellerList, false, url);
+					jQuery.mm.initIconTreeView('#treeview-checkable-group', data.groupList, false, url);
+					jQuery.mm.initIconTreeView('#treeview-checkable-type', data.customTypeList, false, url);
+				}
+			});
+          }
+        });	
+	});	
 
-	var initParams = function(params) {
-	
-		var keyword = $('#post-search-input').val();
-		if (keyword) keyword = encodeURIComponent(keyword);
-		var param = {
-			size: params.limit,
-			page: params.offset/params.limit + 1,
-			k: keyword
-		};
-		return param;
-	};
-	
-	var initFields = function() {
-		var fields =  
-			[
-      			{field: "id", title: "ID", align: "center", visible:false, edit:false},
-      			{field: "dept_name", title: "部门名称", align: "center", width: '10%', edit:false},
-      			{field: "parent_name", title: "所属部门", align: "center", width: '10%', edit:false},
-   				{field: "dept_level", title: "部门等级", align: "center", width: '10%', edit:false},
-   				{field: "is_parent", title: "是否上级部门", align: "center", width: '10%', 
-   					formatter: function(value, row, rowIndex) {
-   						if (value == 1) return '是';
-   						else return '否';
-   					},
-   					edit: false
-   				},
-   				{field: "user_realname", title: "部门负责人", align: "center", width: '10%', edit:false},
-   				{field: "order_list", title: "序号", align: "center", width: '10%', edit:false},
-   				<@shiro.hasPermission name="/admin/department/edit,/admin/all">
-   				{field: "action", title: "操作", align: "center", width: '20%', 
-   					formatter: function(value, row, rowIndex) {
-   						var url = '${CPATH}/admin/department/edit?id=' + row.id + '&c=${c}&p=${p}';
-   						var strHtml = '<a href="' + url + '" class="btn btn-sm" title="编辑"><i class="fa fa-edit"></i></a> <a href="javascript:void(0);" class="btn btn-sm" onclick="del(\''+row.id+'\')" title="删除"><i class="fa fa-trash-o"></i></a>';
-    					return strHtml;
-   					},
-   					edit:false
-   				}  
-   				</@shiro.hasPermission> 				
-   			];
-   		return fields;	
-	}
-
-	function del(id) {
-		jQuery.mm.del('${CPATH}/admin/department/delete?ucode=${ucode}&id=' + id);
-	}
-
-	function batchAction() {
-		var $form = $("#form");
-		$form.attr("action", "${CPATH}/admin/department/batchDelete?ucode=${ucode}&c=${c!}&p=${p!}");
+	function batchAction(status) {
+		var status = status;
+		let nodes = $('#treeview').treeview("getSelected", 0);
+		if (nodes.length == 0) {// 未选中资源
+			toastr.error("请先选择部门!",'提示');
+			return ;
+		}
+		let deptId= nodes[0].tags[0];		
+		if (status == 'edit') {
+			location.href='${CPATH}/admin/department/edit?id=' + deptId + '&c=${c}&p=${p}';
+		} else {
+			jQuery.mm.del('${CPATH}/admin/department/delete?ucode=${ucode}&id=' + deptId);
+		}
 		
-		jQuery.mm.batchAction('#form', '请选择系统记录');
 	}
 
 </#macro>
@@ -103,19 +80,101 @@
 		<div class="jp-left">
 		<@shiro.hasPermission name="/admin/department/edit,/admin/all">
 			<a href="${CPATH}/admin/department/edit?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-plus"></i> 新增 </a>
-			<!--<a href="javascript:void(0);" onclick="batchAction()" class="btn btn-sm btn-danger btn-flat"><i class="fa fa-remove"></i> 删除 </a>  -->
-		</@shiro.hasPermission>	
+			<a href="javascript:void(0);" onclick="batchAction('edit')" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-remove"></i> 编辑 </a>
+			<a href="javascript:void(0);" onclick="batchAction('del')" class="btn btn-sm btn-danger btn-flat"><i class="fa fa-remove"></i> 删除 </a>
+		</@shiro.hasPermission>
 		</div>
 		<form class="form-horizontal" style="float: right" action="${CPATH}/admin/department?c=${c!}&p=${p!}" method="post">
-			<div class="input-group input-group-sm">
-				<input id="post-search-input" class="form-control" type="search" value="${k!}" name="k" placeholder="搜索名称">&nbsp; 
-				<input id="search-submit" class="btn btn-default btn-sm btn-flat" type="button" value="搜索">
-			</div>
 		</form>
 	</div>
 	<div class="box">
-		<table class="table table-striped table-hover table-condensed" id="_dept_table" ></table>
-	</div>
+	<table class="inputTable tabContent">
+		<tr>
+			<td colspan="2">
+				<table class="inputTable goodsSpecificationTable">
+					<tr>
+						<th style="width: 30%;padding-left:10px">
+							部门
+						</th>
+						<th style="width: 30%;padding-left:10px">
+							用户
+						</th>
+						<th style="width: 20%;padding-left:10px">
+							部门信息
+						</th>						
+					</tr>
+					<tr>
+						<td>
+							<div class="goodsSpecificationArea" style="height:400px;">
+								<div class="col-sm-20" style="padding:0">
+							    	<div id="treeview" class=""></div>
+							    </div>
+							</div>
+						</td>
+						<td>
+							<div id="goodsSpecificationPreview" class="goodsSpecificationPreview" style="height:400px;">
+							    <ul id="myTab" class="nav nav-tabs">  
+							        <li class="active"><a href="#A1" data-toggle="tab">岗位人员</a></li>  
+							        <li><a href="#B1" data-toggle="tab">角色人员</a></li>  
+							    </ul>
+							    <div id="myTabContent" class="tab-content">  
+							        <div class="tab-pane fade in active" id="A1">
+								        <div class="col-sm-20">
+								          <div id="treeview-checkable-station" class=""></div>
+								        </div>							        	
+							   		</div>
+							        <div class="tab-pane fade" id="B1">
+								        <div class="col-sm-20">
+								          <div id="treeview-checkable-role" class=""></div>
+								        </div>							        
+							   		</div>
+							   	</div>								    							
+							</div>
+						</td>
+						<td>
+							<div class="goodsSpecificationArea" style="height:400px;">
+							    <ul id="myTab" class="nav nav-tabs">  
+							        <li class="active"><a href="#A" data-toggle="tab">分组</a></li>  
+							        <li><a href="#B" data-toggle="tab">仓库</a></li>  
+							        <li><a href="#C" data-toggle="tab">账套</a></li>
+							        <li><a href="#D" data-toggle="tab">客户类型</a></li>
+							        <li><a href="#E" data-toggle="tab">客户</a></li>
+							    </ul>
+							    <div id="myTabContent" class="tab-content">  
+							        <div class="tab-pane fade in active" id="A">
+								        <div class="col-sm-20">
+								          <div id="treeview-checkable-group" class=""></div>
+								        </div>							        
+							   		</div>
+							        <div class="tab-pane fade" id="B">
+								        <div class="col-sm-20">
+								          <div id="treeview-checkable-warehouse" class=""></div>
+								        </div>
+							   		</div>
+							        <div class="tab-pane fade" id="C">
+								        <div class="col-sm-20">
+								          <div id="treeview-checkable-seller" class=""></div>
+								        </div>							        
+							   		</div>
+							        <div class="tab-pane fade" id="D">
+								        <div class="col-sm-20">
+								          <div id="treeview-checkable-type" class=""></div>
+								        </div>							        
+							   		</div>
+							        <div class="tab-pane fade" id="E">
+								        <div class="col-sm-20">
+								          <div id="treeview-checkable-custom" class=""></div>
+								        </div>							        	
+							   		</div>								   								   									   									   		
+							   	</div>						    						
+							</div>
+						</td>						
+					</tr>
+				</table>
+			</td>
+		</tr>
+		</table>	
+	</div>	    
 </section>
 
 </@layout>
