@@ -1,4 +1,3 @@
-package org.ccloud.front.controller;
 /**
  * Copyright (c) 2015-2016, Eric Huang 黄鑫 (ninemm@126.com).
  *
@@ -14,6 +13,7 @@ package org.ccloud.front.controller;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.ccloud.front.controller;
 
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;

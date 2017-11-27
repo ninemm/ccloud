@@ -25,5 +25,9 @@ import org.ccloud.model.base.BaseCustomer;
 public class Customer extends BaseCustomer<Customer> {
 
 	private static final long serialVersionUID = 1L;
+	
+	public static final String CUSTOMER_NORMAL = "100101";
+	public static final String CUSTOMER_AUDIT = "100102";
+	public static final String CUSTOMER_REJECT = "100103";
 
 }

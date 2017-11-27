@@ -138,6 +138,37 @@ function reply(id){
         </#list>
 	</div> -->
 	
+	<div class="row">
+	    <div class="col-md-6">
+            <!-- Line chart -->
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title"><i class="fa fa-file-text-o"></i> 待审核 - 客户</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                            <i class="fa fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div id="subsubsub" class="rss-widget">
+                        <ul class="list-unstyled ">
+                            <#list toDoCustomerList! as bean>
+                            <li>
+                                <span>${bean.createTime!}</span>
+                                <a href="${CPATH}/admin/customer/audit?id=${bean.id!}&taskId=${bean.taskId!}" target="_blank">${bean.customerName!}</a>
+                            </li>
+                            </#list>
+                        </ul>
+                    </div>
+                </div>
+                <!-- /.box-body-->
+            </div>
+            <!-- /.box -->
+        </div>
+        <!-- /.col -->
+	</div>
+	
 </section>
 <!-- /.content -->
 </@layout>

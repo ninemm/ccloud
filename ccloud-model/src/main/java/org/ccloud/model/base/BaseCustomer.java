@@ -282,12 +282,12 @@ public abstract class BaseCustomer<M extends BaseCustomer<M>> extends JModel<M> 
 		return get("location");
 	}
 
-	public void setProcKey(java.lang.String procKey) {
-		set("proc_key", procKey);
+	public void setProcDefKey(java.lang.String procDefKey) {
+		set("proc_def_key", procDefKey);
 	}
 
-	public java.lang.String getProcKey() {
-		return get("proc_key");
+	public java.lang.String getProcDefKey() {
+		return get("proc_def_key");
 	}
 
 	public void setProcInstId(java.lang.String procInstId) {
@@ -296,6 +296,14 @@ public abstract class BaseCustomer<M extends BaseCustomer<M>> extends JModel<M> 
 
 	public java.lang.String getProcInstId() {
 		return get("proc_inst_id");
+	}
+	
+	public void setStatus(java.lang.String status) {
+		set("status", status);
+	}
+
+	public java.lang.String getStatus() {
+		return get("status");
 	}
 
 	public void setCreateDate(java.util.Date createDate) {
