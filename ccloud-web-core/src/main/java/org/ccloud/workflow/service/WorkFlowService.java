@@ -239,7 +239,7 @@ public class WorkFlowService {
 		if (var == null) {
 			var = new HashMap<String, Object>();
 		}
-		// var.put(Consts.WORKFLOW_APPLY_USERNAME, ShiroKit.getUsername());
+		//var.put(Consts.WORKFLOW_APPLY_USERNAME, ShiroKit.getUsername());
 		ProcessInstance procIns = ActivitiPlugin.buildProcessEngine().getRuntimeService()
 				.startProcessInstanceByKey(defKey, id, var);
 		return procIns.getId();
@@ -301,5 +301,23 @@ public class WorkFlowService {
 		return Db
 				.find("select i.*,u.name from act_hi_identitylink i,sys_user u where u.username=i.USER_ID_ AND PROC_INST_ID_='"
 						+ insid + "'");
+	}
+	
+	/**
+	 * 获取流程中的变量值
+	 * @param taskId
+	 * @param variableName
+	 * @return
+	 */
+	public Object getTaskVariableByTaskId(String taskId, String variableName) {
+		
+		if (StrKit.isBlank(taskId))
+			return null;
+		
+		if (StrKit.isBlank(variableName))
+			return null;
+		
+		TaskService taskService = ActivitiPlugin.buildProcessEngine().getTaskService();
+		return taskService.getVariable(taskId, variableName);
 	}
 }

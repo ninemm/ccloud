@@ -29,6 +29,7 @@ import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.Seller;
 import org.ccloud.model.User;
+import org.ccloud.model.query.CustomerQuery;
 import org.ccloud.model.query.SellerQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
@@ -65,6 +66,13 @@ public class _AdminController extends JBaseController {
 		if (commentPage != null) {
 			setAttr("comments", commentPage.getList());
 		}*/
+		
+		User user = getSessionAttr("user");
+		if (user == null) {
+			redirect("/admin/login");
+			return ;
+		}
+		setAttr("toDoCustomerList", CustomerQuery.me().getToDo(user.getUsername()));
 
 		render("index.html");
 	}
