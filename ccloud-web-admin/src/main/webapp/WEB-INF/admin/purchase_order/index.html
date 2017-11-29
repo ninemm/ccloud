@@ -62,12 +62,12 @@
 		var fields =
 			[
 				{field: "id", title: "ID", align: "center", visible:false, edit:false},
-				{field: "checkbox", title: '<input class="jp-common-pad " id="dataItem" onclick="checkAll(this)" title="全选" type="checkbox">', align: "center", width: '2%', 
+				/*{field: "checkbox", title: '<input class="jp-common-pad " id="dataItem" onclick="checkAll(this)" title="全选" type="checkbox">', align: "center", width: '2%', 
 					formatter: function(value, row, rowIndex) {
 						return '<input class="jp-common-pad" name="dataItem" type="checkbox" value="' + row.id + '">';
 					},
 					edit:false
-				},
+				},*/
 				{field: "", title: "订单号/下单时间", align: "center", width: '10%',
 					formatter: function(value, row, rowIndex) {
 						return row.porder_sn + '/' + row.create_date;
@@ -85,8 +85,7 @@
 					},
 					edit: false
 				},
-				{field: "confirm_user", title: "审核人", align: "center", width: '5%', edit:false},
-				{field: "confirm_date", title: "审核日期", align: "center", width: '5%', edit:false},
+				{field: "total_amount", title: "采购金额", align: "center", width: '5%', edit:false},
 				{field: "status", title: "订单状态", align: "center", width: '5%',
 					formatter : function (value,row,rowIndex){
 						if(value == 0){return '待审核';}
@@ -101,7 +100,12 @@
 				edit: false},
 				{field: "action", title: "操作", align: "center", width: '15%',
 				formatter: function(value, row, rowIndex) {
-					var strHtml = '<a class="label label-table label-info" onclick="detail(\''+row.id+'\')" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">查看</a> ';
+					var strHtml = '<a class="btn btn-primary" onclick="detail(\''+row.id+'\')" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">详情</a> ';
+					if(row.status==0){
+						strHtml += '<a class="btn btn-success" onclick="review(\''+row.id+'\')" >入库</a> ';
+					}else{
+						strHtml += '<a class="btn btn-danger" onclick="refuse(\''+row.id+'\')" >退货</a> ';
+					}
 					return strHtml;
 				},
 				edit:false
@@ -112,6 +116,7 @@
 	
 	 function detail(id){
 		$('#exampleModal').on('show.bs.modal', function (event) {
+				var orderId= id;
 				$.ajax({
 				url:"${CPATH}/admin/purchaseOrder/show",
 				type:"post",
@@ -119,6 +124,7 @@
 				data:{ purchaseOrderId : id},
 				success:function(data)
 				{
+					$("#purchase_order_detail").html("");
 					var html ="<thead><tr><th>商品名/商品规格</th><th>小单位价格</th><th>小单位数量</th><th>小计</th></tr></thead><tbody>";
 					$("#purchase_order_detail").append(html);
 					var moneyTotel=0;
@@ -157,6 +163,33 @@
 			}
 		}
 	};
+	
+	function review(id){
+		if(confirm("是否确认审核通过该订单？")){
+		
+		$.ajax({
+				url:"${CPATH}/admin/purchaseOrder/review",
+				type:"post",
+				dataType:"json",
+				data:{ purchaseOrderId : id},
+				success:function(data)
+				{
+				
+					if(data==true){
+						toastr.success(data.message, '操作成功');
+					}else{
+						toastr.error(data.message, '操作失败');
+					}
+				}
+			});
+		}
+		
+		
+	}
+	
+	function refuse(id){
+		alert(id);
+	}
 </#macro>
 
 <@layout active_id=p child_active_id=c>
@@ -177,7 +210,7 @@
 		</div>
 		<div class="row content-row">
 			<div class="jp-left">
-				<!-- <button class="btn btn-sm btn-primary" type="button" onclick="batchAction()"><i class="fa fa-gavel"></i> 批量审核 </button> -->
+				<!-- <button class="btn btn-sm btn-primary" type="button" onclick="batchAction()"><i class="fa fa-gavel"></i> 批量审核 </button>  -->
 				<a href="${CPATH}/admin/purchaseOrderDetail/index?c=${c!}&p=${p!}" class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> 新建采购订单 </a>
 			</div>
 
@@ -224,7 +257,9 @@
 	</div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">返回</button>
+	      <!-- <button type="button" class="btn btn-success" onclick="review("+orderId+")">通过</button>
+	      <button type="button" class="btn btn-danger" onclick="refuse("+orderId+")">拒绝</button> -->
+          <button type="button" class="btn btn-default" data-dismiss="modal">返回</button>
       </div>
     </div>
   </div>

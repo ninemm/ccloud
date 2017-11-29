@@ -136,7 +136,6 @@ public class _PurchaseOrderDetailController extends JBaseCRUDController<Purchase
 		for(int m=0;m<(6-countt);m++){
 			j= "0"+j;
 		}
-		
 		Date date = new Date();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
 		String str = sdf.format(date);

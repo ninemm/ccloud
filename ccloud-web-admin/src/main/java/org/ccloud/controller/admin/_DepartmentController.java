@@ -51,7 +51,7 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 	
 	@Override
 	public void index() {
-		String dataArea = getSessionAttr("DeptDataAreaLike");
+		String dataArea = getSessionAttr("DeptDataArea");
 		List<Map<String, Object>> list = DepartmentQuery.me().findDeptListAsTree(1, dataArea);
 		setAttr("treeData", JSON.toJSON(list));		
 		render("index.html");
@@ -101,7 +101,9 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 			}
 			dept.setDataArea(dataArea);// 生成数据域	
 		}
-		dept.setIsParent(0);
+		if (StringUtils.isBlank(dept.getId())) {
+			dept.setIsParent(0);
+		}
 
 		if (dept.saveOrUpdate()) {
 			renderAjaxResultForSuccess("ok");
@@ -146,7 +148,7 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 	}	
 
 	public void department_tree() {
-		String dataArea = getSessionAttr("DeptDataAreaLike");
+		String dataArea = getSessionAttr("DeptDataArea");
 		List<Map<String, Object>> list = DepartmentQuery.me().findDeptListAsTree(1, dataArea);
 		setAttr("treeData", JSON.toJSON(list));
 	}

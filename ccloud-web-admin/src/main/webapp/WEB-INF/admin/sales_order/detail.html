@@ -1,0 +1,117 @@
+<#include "../_inc/_layer_layout.html"/>
+
+<#macro script_import>
+	<script type="text/javascript" src="${CPATH}/static/plugins/bootstrap-treeview/js/bootstrap-treeview.js"></script>
+	<!-- <script src="${CPATH}/static/plugins/toastr/toastr.js"></script> -->
+</#macro> 
+
+<#macro css_import>
+	<link rel="stylesheet" href="${CPATH}/static/plugins/bootstrap-treeview/css/bootstrap-treeview.css">
+	<!-- <link rel="stylesheet" href="${CPATH}/static/plugins/toastr/toastr.css"> -->
+</#macro>
+
+<#macro script>
+	$(document).ready(function() {
+	});
+
+</#macro>
+
+<@layout>
+<div style="padding: 10px;">
+	<div class="row">
+		<div class="col-xs-12" style="margin-top: 20px;">
+			<span class="pull-left">
+			单号：${(order.order_sn)!}
+			</br>
+			状态：${(order.proc_key)!} 
+			</span>
+			<span class="pull-right">
+			下单人员：${(order.realname)!}/ ${(order.mobile)!} 
+			<br/> 
+			创建时间：${(order.create_date)!}
+			</span>
+		</div>
+		<table class="table table-striped table-hover table-condensed text-center" >
+			<thead>
+				<tr>
+					<th>序号</th>
+					<th>商品</th>
+					<th>大单位数量</th>
+					<th>小单位数量</th>
+					<th>是否赠品</th>
+					<th>小计</th>
+				</tr>
+			</thead>
+			<tbody>
+				<#list orderDetail as detail>
+					<tr>
+						<td>${detail_index + 1}</td>
+						<td>${detail.custom_name!}</td>
+						<td>${(detail.product_count / detail.convert_relate)?floor} ${detail.big_unit + ' (x' + detail.convert_relate + detail.small_unit + ')' }</td>
+						<td>${detail.product_count % detail.convert_relate} ${detail.small_unit}</td>
+						<td><#if detail.is_gift?? && detail.is_gift == 1>是</#if></td>
+						<td>￥ ${detail.product_amount!}</td>
+					</tr>
+				</#list>
+			</tbody>
+			<tfoot>
+				<tr>
+					<th colspan="5" style="text-align:right">合计:</th>
+					<th>￥ ${(order.total_amount)!}</th>
+				</tr>
+			</tfoot>
+		</table>
+
+		<div id="customer">
+			<div class="form-group col-sm-12 validata-box">
+				<label class="control-label col-sm-2">客户名称:</label>
+				<div class="input-group col-md-4 col-sm-10">
+					<span class="control-span"> ${(order.customer_name)!} </span>
+				</div>
+			</div>
+			<div class="form-group col-sm-12 validata-box">
+				<label class="control-label col-sm-2">联系人:</label>
+				<div class="input-group col-md-4 col-sm-10">
+					<span class="control-span"> ${(order.ccontact)!} </span>
+				</div>
+			</div>
+			<div class="form-group col-sm-12 validata-box">
+				<label class="control-label col-sm-2">手机号:</label>
+				<div class="input-group col-md-4 col-sm-10">
+					<span class="control-span"> ${(order.cmobile)!} </span>
+				</div>
+			</div>
+			<div class="form-group col-sm-12 validata-box">
+				<label class="control-label col-sm-2">客户类型:</label>
+				<div class="input-group col-md-4 col-sm-10">
+					<span class="control-span"> ${(order.customerTypeName)!} </span>
+				</div>
+			</div>
+			<div class="form-group col-sm-12 validata-box">
+				<label class="control-label col-sm-2">配送地址:</label>
+				<div class="input-group col-md-4 col-sm-10">
+					<span class="control-span"> ${(order.delivery_address)!} </span>
+				</div>
+			</div>
+			<div class="form-group col-sm-12 validata-box">
+				<label class="control-label col-sm-2">配送时间:</label>
+				<div class="input-group col-md-4 col-sm-10">
+					<span class="control-span"> ${(order.delivery_date)!} </span>
+				</div>
+			</div>
+			<div class="form-group col-sm-12 validata-box">
+				<label class="control-label col-sm-2">收款方式:</label>
+				<div class="input-group col-md-4 col-sm-10">
+					<span class="control-span"> <#if order.receive_type == 1>现金<#else>应收账款</#if> </span>
+				</div>
+			</div>
+			<div class="form-group col-sm-12 validata-box">
+				<label class="control-label col-sm-2">备注:</label>
+				<div class="input-group col-md-4 col-sm-10">
+					<span class="control-span" > ${(order.remark)!} </span>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>	
+</@layout>
