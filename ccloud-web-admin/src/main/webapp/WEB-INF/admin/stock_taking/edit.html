@@ -31,7 +31,13 @@ var validatorFields = {
 		validators: {
             notEmpty: { message: '盘点仓库不能为空' },
         }
+	},
+	'stockTaking.biz_user_id': {
+		validators: {
+            notEmpty: { message: '盘点人不能为空' },
+        }
 	}
+	
 };
 function doSubmit(){
 	$form.ajaxSubmit({
@@ -196,8 +202,22 @@ function addTr(tid, productList, optionArr) {
 										</#list>
 									</select>
 				               	</div>
-							</div>																									
+				               	
+							</div>	
+							
+							<div class="form-group col-sm-12 validata-box">
+								<label class="control-label col-sm-2">盘点人:</label>
+								<div class="input-group col-md-4 col-sm-10">
+									<select class="form-control input-sm" name="stockTaking.biz_user_id" id="biz_user_id">
+										<option value="">--请选择--</option>
+										<#list (ulist)! as user >
+											<option value="${user.id}" <#if stockTaking?? && user.id == stockTaking.biz_user_id>selected="selected"</#if>>${(user.realname)!}</option>
+										</#list>
+									</select>
+				               	</div>	
+				               																								
 				      </div>
+				      
 			      </div>
 
 

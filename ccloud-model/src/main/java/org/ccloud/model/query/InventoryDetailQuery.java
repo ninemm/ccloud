@@ -42,10 +42,10 @@ public class InventoryDetailQuery extends JBaseQuery {
 		});
 	}
 
-	public Page<InventoryDetail> paginate(int pageNumber, int pageSize, String warehouse_id,String product_id,String start_date,String end_date) {
-		String select = "SELECT p.product_sn, p.name AS product_name, i.in_count, i.in_amount, i.in_price, i.out_count,i.out_amount,i.out_price,i.balance_count,i.balance_amount,i.balance_price,i.biz_type,u.real_name,i.biz_bill_sn,i.biz_date ";
-		StringBuilder fromBuilder = new StringBuilder("FROM `cc_inventory_detail` AS i INNER JOIN `cc_product` AS p ON i.product_id = p.id INNER JOIN `user` AS u ON i.biz_user_id = u.id ");
-		fromBuilder.append("WHERE i.warehouse_id = '"+ warehouse_id+"' AND i.product_id='product_id"+"' AND i.biz_date >='"+start_date+" 00:00:00' AND i.biz_date <='"+end_date+" 23:59:59'");
+	public Page<InventoryDetail> paginate(int pageNumber, int pageSize, String warehouse_id,String sell_product_id,String start_date,String end_date) {
+		String select = "SELECT p.product_sn, p.name AS product_name, i.in_count, i.in_amount, i.in_price, i.out_count,i.out_amount,i.out_price,i.balance_count,i.balance_amount,i.balance_price,i.biz_type,u.realname,i.biz_bill_sn,i.biz_date ";
+		StringBuilder fromBuilder = new StringBuilder("FROM `cc_inventory_detail` AS i INNER JOIN `cc_product` AS p ON (SELECT product_id from cc_seller_product sp WHERE i.sell_product_id=sp.id) = p.id INNER JOIN `user` AS u ON i.biz_user_id = u.id ");
+		fromBuilder.append("WHERE i.warehouse_id = '"+ warehouse_id+"' AND i.sell_product_id='"+sell_product_id+"' AND i.biz_date >='"+start_date+" 00:00:00' AND i.biz_date <='"+end_date+" 23:59:59'");
 		fromBuilder.append("ORDER BY i.biz_date DESC");
 		LinkedList<Object> params = new LinkedList<Object>();
 		

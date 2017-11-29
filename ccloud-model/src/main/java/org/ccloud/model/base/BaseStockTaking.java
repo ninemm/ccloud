@@ -105,7 +105,15 @@ public abstract class BaseStockTaking<M extends BaseStockTaking<M>> extends JMod
 	public java.lang.String getStockTakingSn() {
 		return getStr("stock_taking_sn");
 	}
+	
+	public void setSellerId(java.lang.String sellerId) {
+		set("seller_id", sellerId);
+	}
 
+	public java.lang.String getSellerId() {
+		return get("seller_id");
+	}
+	
 	public void setWarehouseId(java.lang.String warehouseId) {
 		set("warehouse_id", warehouseId);
 	}

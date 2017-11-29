@@ -16,9 +16,12 @@
 package org.ccloud.model.query;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
+import org.ccloud.model.InventoryDetail;
 import org.ccloud.model.StockTakingDetail;
 import org.ccloud.model.vo.ProductInfo;
 import org.ccloud.model.vo.StockTakingInfo;
@@ -104,6 +107,43 @@ public class StockTakingDetailQuery extends JBaseQuery {
 	
 	public List<StockTakingDetail> deleteByStockTakingId(String id) {
 		return DAO.doFind("stock_taking_id = ?", id);
+	}
+
+
+	public List<Map<String, Object>> findByStockTakingDetailId1(String id) {
+		StringBuilder fromBuilder = new StringBuilder("select * from cc_stock_taking_detail cs join cc_product cp on cs.product_id=cp.id where stock_taking_id =?");
+		List<Record> list = Db.find(fromBuilder.toString(), id);
+		List<Map<String, Object>> iList = new ArrayList<>();
+		for (Record record : list) {
+			Map<String, Object>map=new HashMap<>();
+			map.put("product_id", record.getStr("product_id"));
+			map.put("remark", record.getStr("remark"));
+			map.put("market_price", record.getStr("market_price"));
+			map.put("convert_relate", record.getStr("convert_relate"));
+			map.put("product_count", record.getStr("product_count"));
+			map.put("product_amount", record.getStr("product_amount"));
+			iList.add(map);
+		}
+		return iList;
+	}
+
+	public String selectSellProductId(String productId, String sellerId) {
+		StringBuilder fromBuilder1 = new StringBuilder("select id from cc_seller_product where product_id=? and seller_id=?");
+		List<Record> find = Db.find(fromBuilder1.toString(),productId,sellerId);
+		return find.get(0).getStr("id");
+	}
+
+	public List<Record> findByInventory(String productId, String warehouseId, String sellerId) {
+		StringBuilder fromBuilder1 = new StringBuilder("select * from cc_inventory where product_id=? and warehouse_id=? and seller_id=?");
+		List<Record> find = Db.find(fromBuilder1.toString(),productId,warehouseId,sellerId);
+		return find;
+	}
+
+	public List<Record> findByInventoryDetail(String sell_product_id, String warehouseId) {
+		StringBuilder fromBuilder1 = new StringBuilder("select * from cc_inventory_detail where sell_product_id=? and warehouse_id=?");
+		List<Record> find = Db.find(fromBuilder1.toString(),sell_product_id,warehouseId);
+		return find;
+		
 	}
 	
 }
