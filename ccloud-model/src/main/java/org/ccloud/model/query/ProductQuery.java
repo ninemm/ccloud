@@ -186,7 +186,7 @@ public class ProductQuery extends JBaseQuery {
 				+ "LEFT JOIN cc_seller_product csp on csp.product_id=cp.id "
 				+ "LEFT JOIN cc_seller cs on cs.id=csp.seller_id "
 				+ "LEFT JOIN `user` u on u.department_id=cs.dept_id "
-				+ "WHERE u.id=? GROUP BY cp.id";
+				+ "WHERE u.id=? and cs.seller_type=0 GROUP BY cp.id";
 		return DAO.find(sql, userId);
 	}
 	

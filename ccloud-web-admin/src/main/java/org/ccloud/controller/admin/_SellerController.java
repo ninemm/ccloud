@@ -265,19 +265,6 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 	
 	
 	//添加产品信息
-	public void show_product(){
-		User user=getSessionAttr("user");
-		Map<String, String> map = Maps.newHashMap();
-		Subject subject = SecurityUtils.getSubject();
-		List<Seller> list=new ArrayList<Seller>();
-		if (subject.isPermitted("/admin/dealer/all")) {
-			map.put("deptId", user.getDepartmentId());
-			map.put("dataArea", DataAreaUtil.getUserDeptDataArea(user.getDataArea()) + "%");
-			list=SellerQuery.me().findByDeptId(user.getId());
-		}
-		renderJson(list);
-	}
-	
 	public void showProduct(){
 		User user=getSessionAttr("user");
 		String keyword = getPara("k");

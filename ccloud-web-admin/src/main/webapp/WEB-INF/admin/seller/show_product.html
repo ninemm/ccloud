@@ -80,11 +80,7 @@
       			{field: "price", title: "销售价格", align: "center", width: '5%',
       				formatter: function(value, row, rowIndex) {
 					var strHtml = '<input type="text" size="6" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="price" value="'+row.price+'"/>';
-<<<<<<< HEAD
 					return strHtml;
-=======
-					return strHtml;   
->>>>>>> refs/heads/larry_lll
 				},
       			 edit:false},
       			{field: "is_enable", title: "是否上架", align: "center", width: '5%',
@@ -98,11 +94,7 @@
 				{field: "action", title: "操作", align: "center", width: '5%',
 				formatter: function(value, row, rowIndex) {
 					var url2 = '${CPATH}/admin/seller/change?id=' + row.id +'&is_enable='+row.is_enable+ '&c=${c}&p=${p}';
-<<<<<<< HEAD
-					  var strHtml = '<a onclick="saveOne(\''+row+'\')" class="btn btn-sm" title="保存"><i class="fa fa-check-square"></i></a>';
-=======
 					  var strHtml = '<a onclick="saveOne(this)" class="btn btn-sm" title="保存"><i class="fa fa-check-square"></i></a>';
->>>>>>> refs/heads/larry_lll
 					if(row.is_enable == 0){
 					  strHtml += '<a href="' + url2 + '" class="btn btn-sm" title="上架"><i class="fa fa-arrow-circle-o-up"></i></a>';
 					}else{

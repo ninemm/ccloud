@@ -78,10 +78,10 @@ public class SellerProductQuery extends JBaseQuery {
 				+ " LEFT JOIN user u on u.department_id =cs.dept_id");
 		LinkedList<Object> params = new LinkedList<Object>();
 		if(!keyword.equals("")){
-			appendIfNotEmptyWithLike(fromBuilder, "cs.custom_name", keyword, params, true);
-			fromBuilder.append(" and cs.seller_type=0 and u.id='"+userId+"' ");
+			appendIfNotEmptyWithLike(fromBuilder, "csp.custom_name", keyword, params, true);
+			fromBuilder.append(" and cs.seller_type=0 and cs.is_enabled=1 and u.id='"+userId+"' ");
 		}else{
-			fromBuilder.append(" where cs.seller_type=0 and u.id='"+userId+"' ");
+			fromBuilder.append(" where cs.seller_type=0 and cs.is_enabled=1 and u.id='"+userId+"' ");
 		}
 		fromBuilder.append(" GROUP BY csp.id,cpsi.safe_inventory_count ORDER BY csp.is_enable desc,csp.order_list ");
 		
