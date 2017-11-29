@@ -50,6 +50,7 @@ public class AdminMenuInitListener implements MessageListener {
 		menuManager.addMenuGroup(4, createWechatMenuGroup());
 		menuManager.addMenuGroup(5, createStatMenuGroup());
 		menuManager.addMenuGroup(6, createWorkFlowMenuGroup());
+		menuManager.addMenuGroup(7, createAccountMenuGroup());
 		
 		menuManager.addMenuGroup(MenuGroup.createBlockGroup());
 		
@@ -287,6 +288,15 @@ public class AdminMenuInitListener implements MessageListener {
 			group.addMenuItem(new MenuItem("combination", "/admin/productComposition", "组合商品管理"));
 			group.addMenuItem(new MenuItem("sellerJoinTemplate", "/admin/sellerJoinTemplate", "销售商模版管理"));
 
+		}
+		return group;
+	}
+	
+		private MenuGroup createAccountMenuGroup() {
+		MenuGroup group = new MenuGroup("account", "fa fa-rmb", "账款管理");
+		{
+			group.addMenuItem(new MenuItem("payables","/admin/payables","应付账款"));	
+			group.addMenuItem(new MenuItem("receivable","/admin/receivable","应收账款"));	
 		}
 		return group;
 	}
