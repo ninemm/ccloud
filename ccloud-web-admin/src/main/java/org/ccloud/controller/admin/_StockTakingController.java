@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.Inventory;
@@ -79,7 +80,7 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 
 	public void edit() {
 		String id = getPara("id");
-		User user = getSessionAttr("user");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String userId = user.getId();
 		String seller_id=getSessionAttr("sellerId").toString();
 		if (id != null) {
@@ -159,7 +160,7 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 	public void save() {
 		StockTaking stockTaking = getModel(StockTaking.class);
 		if (stockTaking.getStatus() == null || stockTaking.getStatus() == 0) {
-			User user = getSessionAttr("user");
+			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 			stockTaking.setDeptId(user.getDepartmentId());
 			stockTaking.setDataArea(user.getDataArea());
 			stockTaking.setInputUserId(user.getId());

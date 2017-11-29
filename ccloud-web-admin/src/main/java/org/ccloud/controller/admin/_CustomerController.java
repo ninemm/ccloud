@@ -30,6 +30,7 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.subject.Subject;
+import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.Customer;
@@ -104,7 +105,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 	private Map<String, String> getDeptIdAndDataArea() {
 
 		Map<String, String> map = Maps.newHashMap();
-		User user = getSessionAttr("user");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		Subject subject = SecurityUtils.getSubject();
 
 		if (subject.isPermitted("/admin/all")) {
@@ -275,7 +276,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 		String userIds = getPara("userIds");
 
 		if (StrKit.isBlank(userIds)) {
-			User user = getSessionAttr("user");
+			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 			userIds = user.getId();
 		}
 
@@ -296,7 +297,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 			// 找到对应的上级
 			var.set("manager", "hx");
 			var.set("apply", "qgadmin");
-			User user = getSessionAttr("user");
+			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 			var.set("applyUserId", user.getId());
 			var.set("applyer", user.getRealname());
 			@SuppressWarnings("unchecked")
@@ -347,7 +348,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 			"/admin/all" }, logical = Logical.OR)
 	public void uploading() {
 
-		User user = getSessionAttr("user");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
 		File file = getFile().getFile();
 		String userId = getPara("userIds");

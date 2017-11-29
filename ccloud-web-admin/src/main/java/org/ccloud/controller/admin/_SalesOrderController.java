@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.SalesOrder;
@@ -95,7 +96,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 	}
 
 	public void add() {
-		User user = getSessionAttr("user");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr("sellerId");
 		if (user == null || StrKit.isBlank(sellerId)) {
 			// TODO
@@ -152,7 +153,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 	public void customerTypeById() {
 		String customerId = getPara("customerId");
-		User user = getSessionAttr("user");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
 		List<Record> customerTypeList = SalesOrderQuery.me().findCustomerTypeListByCustomerId(customerId,
 				DataAreaUtil.getUserDealerDataArea(user.getDataArea()));
@@ -165,7 +166,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 	public void save() {
 
 		Map<String, String[]> paraMap = getParaMap();
-		User user = getSessionAttr("user");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr("sellerId");
 		String sellerCode = getSessionAttr("sellerCode");
 
@@ -204,7 +205,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 	public void pass() {
 
 		String orderId = getPara("orderId");
-		User user = getSessionAttr("user");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr("sellerId");
 		String sellerCode = getSessionAttr("sellerCode");
 
@@ -242,7 +243,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 	public void reject() {
 
 		String orderId = getPara("orderId");
-		User user = getSessionAttr("user");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
 		SalesOrderQuery.me().updateConfirm(orderId, 1001, user.getId(), new Date());// 已审核拒绝
 
