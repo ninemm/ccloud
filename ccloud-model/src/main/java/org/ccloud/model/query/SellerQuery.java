@@ -53,22 +53,22 @@ public class SellerQuery extends JBaseQuery {
 		return DAO.doDelete("id = ?", sellerId);
 	}
 	
-	public Page<Seller> paginate(int pageNumber, int pageSize,String keyword, String orderby,String username) {
-		String select = "select * ";
-		StringBuilder fromBuilder = new StringBuilder("from `cc_seller` ");
+	public Page<Seller> paginate(int pageNumber, int pageSize,String keyword, String orderby,String username,String userId) {
+		String select = "select DISTINCT cs.* ";
+		StringBuilder fromBuilder = new StringBuilder("from `cc_seller` cs LEFT JOIN user u on u.department_id =cs.dept_id ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
 		
-		appendIfNotEmptyWithLike(fromBuilder, "seller_name", keyword, params, true);
+		appendIfNotEmptyWithLike(fromBuilder, "cs.seller_name", keyword, params, true);
 		
 
 		if(keyword.equals("")){
 			if(!username.equals("admin")){
-				fromBuilder.append("where seller_type =1 ");
+				fromBuilder.append("where cs.seller_type =1 and u.id='"+userId+"' ");
 			}
 		}else{
 			if(!username.equals("admin")){
-				fromBuilder.append("and seller_type =1 ");
+				fromBuilder.append("and cs.seller_type =1 and u.id='"+userId+"' ");
 			}
 		}
 		fromBuilder.append("order by " + orderby);	
@@ -105,5 +105,10 @@ public class SellerQuery extends JBaseQuery {
 	public Seller findByUserId(String userId){
 		String sql = "select cs.* from cc_seller cs LEFT JOIN user u on u.department_id=cs.dept_id where u.id =? and cs.seller_type=0";
 		return DAO.findFirst(sql, userId);
+	}
+	
+	public Seller findByDeptAndSellerType(String deptId,String sellerType){
+		String sql = "select * from cc_seller where dept_id = '"+deptId+"' and seller_type = "+sellerType+"";
+		return DAO.findFirst(sql);
 	}
 }

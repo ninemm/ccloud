@@ -68,7 +68,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
             setAttr("k", keyword);
         }
 
-        Page<Seller> page = SellerQuery.me().paginate(getPageNumber(), getPageSize(),keyword,  "id",user.getUsername());
+        Page<Seller> page = SellerQuery.me().paginate(getPageNumber(), getPageSize(),keyword,  "cs.id",user.getUsername(),user.getId());
         Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);
 		
@@ -101,11 +101,15 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		seller.setCityName(getPara("userCityText"));
 		seller.setCountryCode(getPara("userDistrictId"));
 		seller.setCountryName(getPara("userDistrictText"));
-		
 		String [] brandIds= brandList.split(",");
 		Department department=DepartmentQuery.me().findById(getPara("dept_id"));
 		User user=getSessionAttr("user");
 		if (StrKit.isBlank(sellerId)) {
+			Seller seller2=SellerQuery.me().findByDeptAndSellerType(getPara("dept_id"),getPara("seller_type"));
+			if(seller2!=null){
+				renderAjaxResultForError("该公司部门已有一个经销商，请确认");
+				return;
+			}
 			sellerId = StrKit.getRandomUUID();
 			seller.set("id", sellerId);
 			seller.set("seller_name",getPara("seller_name"));
