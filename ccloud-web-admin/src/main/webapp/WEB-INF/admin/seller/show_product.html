@@ -75,18 +75,25 @@
 			[	
 				{field: "", title: "<input type='checkbox' onclick='checkAll(this)' name='dataItem1' value=''/>", align: "center", width: '5%',
 				formatter: function(value, row, rowIndex) {
-					var strHtml = '<input type="checkbox" name="dataItem" id="dataItem" value="'+row.product_id+'"/>';
+					var strHtml = '<input type="checkbox" name="dataItem" id="dataItem" value="'+row.id+'"/>';
 					return strHtml;
 				},
 				edit:false
 				},
-      			{field: "custom_name", title: "产品名称", align: "center", width: '10%',edit:false},
+      			{field: "custom_name", title: "产品名称", align: "center", width: '10%',
+      				formatter: function(value, row, rowIndex) {
+					var strHtml = '<input type="text" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="custom_name" value="'+row.custom_name+'"/>';
+					return strHtml;
+				},
+      				edit:false},
       			{field: "cps_name", title: "产品规格", align: "center", width: '15%',edit:false},
       			{field: "store_count", title: "库存数量", align: "center", width: '5%',edit:false},
-      			{field: "price", title: "销售价格", align: "center", width: '8%',edit:false},
-      			{field: "warehouse_name", title: "已选仓库", align: "center", width: '25%',
-      			
-      			edit:false},
+      			{field: "price", title: "销售价格", align: "center", width: '5%',
+      				formatter: function(value, row, rowIndex) {
+					var strHtml = '<input type="text" size="6" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="price" value="'+row.price+'"/>';
+					return strHtml;
+				},
+      			 edit:false},
       			{field: "is_enable", title: "是否上架", align: "center", width: '5%',
       				formatter: function(value, row, rowIndex) {
    						if (value == 1) return '是';
@@ -98,10 +105,11 @@
 				{field: "action", title: "操作", align: "center", width: '5%',
 				formatter: function(value, row, rowIndex) {
 					var url2 = '${CPATH}/admin/seller/change?id=' + row.id +'&is_enable='+row.is_enable+ '&c=${c}&p=${p}';
+					  var strHtml = '<a onclick="saveOne(\''+row+'\')" class="btn btn-sm" title="保存"><i class="fa fa-check-square"></i></a>';
 					if(row.is_enable == 0){
-					  var strHtml = '<a href="' + url2 + '" class="btn btn-sm" title="上架"><i class="fa fa-arrow-circle-o-up"></i></a>';
+					  strHtml += '<a href="' + url2 + '" class="btn btn-sm" title="上架"><i class="fa fa-arrow-circle-o-up"></i></a>';
 					}else{
-					  var strHtml = '<a href="' + url2 + '" class="btn btn-sm" title="下架"><i class="fa fa-arrow-circle-o-down"></i></a>';
+					  strHtml += '<a href="' + url2 + '" class="btn btn-sm" title="下架"><i class="fa fa-arrow-circle-o-down"></i></a>';
 					}
 					return strHtml;
 				},
@@ -121,6 +129,58 @@
 		var id = $("#sellerId").find("option:selected").val();
 		var url = '${CPATH}/admin/seller/addProduct?sellerId='+id+'&c=${c!}&p=${p!}';
 		location.href=url;
+	}
+	
+	function saveAll(){
+		var orderItems = new Array();
+		var flang=true;
+		 var checklist = $('input[name="dataItem"]:checked').parent().parent();
+		 if(checklist.length == 0){
+			alert("未选中任何数据!");
+			return;		 
+		 }
+		 $('input[name="dataItem"]:checked').parent().parent().each(function(idx, item) {
+		 	
+		 	if($(this).find('td').eq(1).find("input").val()==""){
+		 		alert("产品名不能为空!");
+			 	flang=false;
+				return;
+		 	}else if($(this).find('td').eq(3).find("input").val() =="" || isNaN($(this).find('td').eq(4).find("input").val())){
+		 		alert("销售价不能为空，且销售价为数字!");
+			 	flang=false;
+				return;
+		 	}
+		 	var sellerId=$("#sellerId option:selected").val();
+		  	var obj = {
+								"Id":  $(this).find('td').eq(0).find("input").val(),
+								"custom_name": $(this).find('td').eq(1).find("input").val(),
+								"seller_id":sellerId,
+								"price": $(this).find('td').eq(4).find("input").val(),
+							};
+							orderItems.push(obj);
+						})
+		if(flang==true){				
+			$.ajax({
+				url:"${CPATH}/admin/seller/savePro",
+				type:"post",
+				dataType:"json",
+				data : {orderItems : JSON.stringify(orderItems)},
+				success:function(data){
+					if(data==true){
+						toastr.success(data.message, '修改成功');
+					}else{
+						toastr.error(data.message, '修改失败');
+					}
+					setTimeout( function(){
+					refresh();
+								}, 2 * 1000 );
+				}
+			});
+		}
+	}
+	
+	function saveOne(obj){
+		console.log(event.path[3].val());
 	}
 
 </#macro>
@@ -145,6 +205,7 @@
 	<div class="row content-row">
 		<div class="jp-left">
 			<a onclick="getA()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-plus"></i> 新增 </a>
+			<a onclick="saveAll()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-check-square-o"></i> 批量保存操作 </a>
 			<a  onclick="refresh()" class="btn btn-sm btn-primary"><i class="fa fa-refresh"></i> 刷新 </a>
 		</div>
 		<form class="form-horizontal" style="float: right" action="${CPATH}/admin/seller/show_product?c=${c!}&p=${p!}" method="post">
