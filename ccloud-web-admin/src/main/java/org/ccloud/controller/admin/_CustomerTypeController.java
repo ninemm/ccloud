@@ -21,6 +21,7 @@ import java.util.Map;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.CustomerType;
@@ -65,7 +66,7 @@ public class _CustomerTypeController extends JBaseCRUDController<CustomerType> {
 		if (SecurityUtils.getSubject().isPermitted("/admin/all")) {
 			page = CustomerTypeQuery.me().paginate(getPageNumber(), getPageSize(), keyword, show, null, null);
 		} else {
-			User user = getSessionAttr("user");
+			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 			page = CustomerTypeQuery.me().paginate(getPageNumber(), getPageSize(), keyword, show,
 					user.getDepartmentId(), DataAreaUtil.getUserDeptDataArea(user.getDataArea()));
 		}
@@ -94,7 +95,7 @@ public class _CustomerTypeController extends JBaseCRUDController<CustomerType> {
 
 		boolean notBlank = StrKit.notBlank(id);
 		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/all");
-		User user = getSessionAttr("user");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
 		if (notBlank && isSuperAdmin) {// 超级管理员修改
 			Record customerType = CustomerTypeQuery.me().findMoreById(id);
@@ -121,7 +122,7 @@ public class _CustomerTypeController extends JBaseCRUDController<CustomerType> {
 	public void save() {
 
 		CustomerType customerType = getModel(CustomerType.class);
-		User user = getSessionAttr("user");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
 		if (SecurityUtils.getSubject().isPermitted("/admin/all")) {
 			customerType.set("dept_id", getPara("parent_id"));

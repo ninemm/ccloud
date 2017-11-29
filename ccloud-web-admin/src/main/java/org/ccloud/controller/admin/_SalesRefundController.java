@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.SalesRefundInstock;
@@ -136,7 +137,7 @@ public class _SalesRefundController extends JBaseCRUDController<SalesRefundInsto
 	public void save() {
 
 		Map<String, String[]> paraMap = getParaMap();
-		User user = getSessionAttr("user");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr("sellerId");
 		String sellerCode = getSessionAttr("sellerCode");
 		String deptId = StringUtils.getArrayFirst(paraMap.get("deptId"));

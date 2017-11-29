@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.route.RouterMapping;
@@ -61,7 +62,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 	}
 	
 	public void list() {
-		User user=getSessionAttr("user");
+		User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
         String keyword = getPara("k");
         if (StrKit.notBlank(keyword)) {
             keyword = StringUtils.urlDecode(keyword);
@@ -103,7 +104,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		seller.setCountryName(getPara("userDistrictText"));
 		String [] brandIds= brandList.split(",");
 		Department department=DepartmentQuery.me().findById(getPara("dept_id"));
-		User user=getSessionAttr("user");
+		User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
 		if (StrKit.isBlank(sellerId)) {
 			Seller seller2=SellerQuery.me().findByDeptAndSellerType(getPara("dept_id"),getPara("seller_type"));
 			if(seller2!=null){
@@ -266,7 +267,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 	
 	//添加产品信息
 	public void showProduct(){
-		User user=getSessionAttr("user");
+		User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String keyword = getPara("k");
 	        if (StrKit.notBlank(keyword)) {
 	            keyword = StringUtils.urlDecode(keyword);
@@ -319,7 +320,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 	//保存产品信息
 		public void savePro(){
 			final SellerProduct sellerProducts= getModel(SellerProduct.class);
-			User user=getSessionAttr("user");
+			User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
 			String ds = getPara("orderItems");
 			boolean result=false;
 			Seller seller=SellerQuery.me().findByUserId(user.getId());

@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.route.RouterMapping;
@@ -72,7 +73,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
 		}
-		User user=getSessionAttr("user");
+		User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
 		
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
@@ -93,7 +94,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 	@SuppressWarnings("unused")
 	public void review(){
 		String id = getPara("purchaseOrderId");
-		User user = getSessionAttr("user");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		boolean flang= false;
 		final PurchaseInstock purchaseInstock = getModel(PurchaseInstock.class);
 		final PurchaseInstockDetail purchaseInstockDetail = getModel(PurchaseInstockDetail.class);

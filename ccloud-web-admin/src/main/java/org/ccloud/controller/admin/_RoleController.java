@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
@@ -68,7 +69,7 @@ public class _RoleController extends JBaseCRUDController<Role> {
 	public void save() {
 		
 		Role role = getModel(Role.class);
-        User user = getSessionAttr("user");
+        User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
         role.setDeptId(user.getDepartmentId());
         role.setDataArea(getSessionAttr("DeptDataArea").toString());
 		if (role.saveOrUpdate())

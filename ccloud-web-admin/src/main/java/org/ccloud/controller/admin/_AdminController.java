@@ -67,7 +67,7 @@ public class _AdminController extends JBaseController {
 			setAttr("comments", commentPage.getList());
 		}*/
 		
-		User user = getSessionAttr("user");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		if (user == null) {
 			redirect("/admin/login");
 			return ;
@@ -113,7 +113,7 @@ public class _AdminController extends JBaseController {
 			}
 			MessageKit.sendMessage(Actions.USER_LOGINED, user);
 			CookieUtils.put(this, Consts.COOKIE_LOGINED_USER, user.getId().toString());
-			setSessionAttr("user", user);	        
+			setSessionAttr(Consts.SESSION_LOGINED_USER, user);	        
 	        renderAjaxResultForSuccess("登录成功");
 	    } catch (AuthenticationException e) {
 	    	e.printStackTrace();

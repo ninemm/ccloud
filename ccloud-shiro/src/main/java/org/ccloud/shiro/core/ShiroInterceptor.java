@@ -34,7 +34,7 @@ public class ShiroInterceptor implements Interceptor {
 		AuthzHandler ah = ShiroKit.getAuthzHandler(actionKey);
 
 		Controller controller = ai.getController();
-		User user = controller.getSessionAttr("user");
+		User user = controller.getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String operationId = OperationQuery.me().findIdByUrl(actionKey);
 
 		SystemLog systemlog = controller.getAttr(Consts.ATTR_GLOBAL_SYSTEM_LOG);

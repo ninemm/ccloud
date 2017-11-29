@@ -18,6 +18,7 @@ package org.ccloud.controller.admin;
 import java.util.Date;
 import java.util.Map;
 
+import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
@@ -80,7 +81,7 @@ public class _WarehouseController extends JBaseCRUDController<Warehouse> {
 	@Override
 	public void save() {
 	  Warehouse warehouse = getModel(Warehouse.class); 
-	  User user = getSessionAttr("user");
+	  User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 	  String seller_id=getSessionAttr("sellerId").toString();
 	  warehouse.setDeptId(user.getDepartmentId());
 	  warehouse.setDataArea(user.getDataArea());
