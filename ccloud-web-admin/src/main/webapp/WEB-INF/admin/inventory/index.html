@@ -74,6 +74,7 @@
 	var initFields = function(){
 		var fields = [
 			{field: "product_id", title: "ID", align: "center", visible:false, edit:false},
+			{field: "seller_id", title: "sellerId", align: "center", visible:false, edit:false},
 			{field: "product_sn", title: "商品编码", align: "center", edit:false},
 			{field: "product_name", title: "商品名称", align: "center", edit:false},
 			{field: "in_count", title: "商品入库数量", align: "center", edit:false},
@@ -85,14 +86,11 @@
 			{field: "balance_count", title: "商品剩余数量", align: "center", edit:false},
 			{field: "balance_amount", title: "商品剩余金额", align: "center", edit:false},
 			{field: "balance_price", title: "商品剩余单价", align: "center", edit:false},
-			{field: "afloat_count", title: "在途商品数量", align: "center", edit:false},
-			{field: "afloat_amount", title: "在途物品金额", align: "center", edit:false},
-			{field: "afloat_price", title: "在途商品单价", align: "center", edit:false},
 			{field: "create_date", title: "创建时间", align: "center", edit:false},
 			{field: "modify_date", title: "更新时间", align: "center", edit:false},
 			{field: "action", title: "明细账", align: "center",
 			 formatter: function(value, row, rowIndex){
-			 	var url = '${CPATH}/admin/inventory/renderlist?product_id='+row.product_id+'&warehouse_id='+warehouse_id;
+			 	var url = '${CPATH}/admin/inventory/renderlist?product_id='+row.product_id+'&warehouse_id='+warehouse_id+'&seller_id='+row.seller_id;
 			 	return '<a href="' + url + '" class="btn btn-sm" >仓库明细账</a>';
 			 },
 			 edit:false}

@@ -24,6 +24,7 @@ import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.model.Inventory;
 import org.ccloud.model.query.InventoryQuery;
+import org.ccloud.model.query.StockTakingDetailQuery;
 import org.ccloud.model.InventoryDetail;
 import org.ccloud.model.query.InventoryDetailQuery;
 
@@ -40,7 +41,8 @@ import com.jfinal.plugin.activerecord.Record;
 public class _InventoryController extends JBaseCRUDController<Inventory> { 
 
 	public void getWarehouse() {
-		List<Record> list = InventoryQuery.me().getWareHouseInfo();
+		String seller_id=getSessionAttr("sellerId").toString();
+		List<Record> list = InventoryQuery.me().getWareHouseInfo(seller_id);
 		renderJson(list);
 	}
 	
@@ -48,9 +50,10 @@ public class _InventoryController extends JBaseCRUDController<Inventory> {
 		String warehouse_id = getPara("warehouse_id");
 		String product_sn = getPara("product_sn");
 		String product_name = getPara("product_name");
+		String seller_id=getSessionAttr("sellerId").toString();
 //		String specification = getPara("specification");
 		
-		Page<Inventory> page = InventoryQuery.me().paginate(getPageNumber(), getPageSize(),product_sn,product_name,warehouse_id);
+		Page<Inventory> page = InventoryQuery.me().paginate(getPageNumber(), getPageSize(),product_sn,product_name,warehouse_id,seller_id);
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
 	}
@@ -58,16 +61,19 @@ public class _InventoryController extends JBaseCRUDController<Inventory> {
 	public void renderlist() {
 		setAttr("warehouse_id", getPara("warehouse_id"));
 		setAttr("product_id", getPara("product_id"));
+		setAttr("seller_id", getPara("seller_id"));
 		render("detaillist.html");
 	}
 	
 	public void detaillist() {
 		String warehouse_id = getPara("warehouse_id");
+		String seller_id = getPara("seller_id");
 		String product_id = getPara("product_id");
 		String start_date = getPara("start_date");
 		String end_date = getPara("end_date");
-		
-		Page<InventoryDetail> page = InventoryDetailQuery.me().paginate(getPageNumber(), getPageSize(),warehouse_id,product_id,start_date,end_date);
+		String sell_product_id= StockTakingDetailQuery.me().selectSellProductId(product_id,seller_id);
+
+		Page<InventoryDetail> page = InventoryDetailQuery.me().paginate(getPageNumber(), getPageSize(),warehouse_id,sell_product_id,start_date,end_date);
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
 	}

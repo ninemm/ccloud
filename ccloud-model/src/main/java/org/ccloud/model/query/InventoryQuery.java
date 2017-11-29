@@ -46,10 +46,10 @@ public class InventoryQuery extends JBaseQuery {
 		});
 	}
 
-	public Page<Inventory> paginate(int pageNumber, int pageSize,String product_sn,String product_name,String warehouse_id) {
-		String select = "SELECT i.product_id,p.name as product_name ,p.product_sn,i.in_count, i.in_amount, i.in_price, i.out_count, i.out_amount, i.out_price, i.balance_count, i.balance_amount, i.balance_price, i.afloat_count, i.afloat_amount, i.afloat_price, i.create_date, i.modify_date";
+	public Page<Inventory> paginate(int pageNumber, int pageSize,String product_sn,String product_name,String warehouse_id, String seller_id) {
+		String select = "SELECT i.seller_id,i.product_id,p.name as product_name ,p.product_sn,i.in_count, i.in_amount, i.in_price, i.out_count, i.out_amount, i.out_price, i.balance_count, i.balance_amount, i.balance_price, i.afloat_count, i.afloat_amount, i.afloat_price, i.create_date, i.modify_date";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_inventory` as i INNER JOIN  `cc_product` as p ON i.product_id = p.id ");
-		fromBuilder.append("WHERE i.warehouse_id = '"+ warehouse_id+"'");
+		fromBuilder.append("WHERE i.warehouse_id = '"+ warehouse_id+"'and i.seller_id='"+seller_id+"'");
 		LinkedList<Object> params = new LinkedList<Object>();
 		appendIfNotEmptyWithLike(fromBuilder, "p.name", product_name, params, true);
 		appendIfNotEmptyWithLike(fromBuilder, "p.product_sn", product_sn, params, true);
@@ -73,9 +73,9 @@ public class InventoryQuery extends JBaseQuery {
 		return 0;
 	}
 
-	public List<Record> getWareHouseInfo() {
-		StringBuilder fromBuilder = new StringBuilder("SELECT id,code,name FROM cc_warehouse");
-		List<Record> list = Db.find(fromBuilder.toString());
+	public List<Record> getWareHouseInfo(String seller_id) {
+		StringBuilder fromBuilder = new StringBuilder("SELECT id,code,name FROM cc_warehouse where seller_id=?");
+		List<Record> list = Db.find(fromBuilder.toString(),seller_id);
 		return list;
 	}
 }

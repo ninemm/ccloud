@@ -168,6 +168,12 @@ public class UserQuery extends JBaseQuery {
 		sql.append("LEFT JOIN `group` g ON gr.group_id = g.id WHERE gr.role_id=?)");
 		return DAO.doFind(sql.toString(), id);
 	}
+	
+	public List<User> findUserList(String userId) {
+		StringBuilder sql = new StringBuilder(" department_id=(select department_id FROM `user` WHERE id =?)");
+		return DAO.doFind(sql.toString(), userId);
+	}
+
 
 	
 }
