@@ -299,6 +299,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 			User user = getSessionAttr("user");
 			var.set("applyUserId", user.getId());
 			var.set("applyer", user.getRealname());
+			@SuppressWarnings("unchecked")
 			String procInstId = workflow.startProcess(customerId, defKey, var);
 			
 			customer.setStatus(Customer.CUSTOMER_AUDIT);

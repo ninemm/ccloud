@@ -36,7 +36,6 @@
 			size: params.limit,
 			page: params.offset/params.limit + 1,
 			k: keyword,
-			sellerId:'${(sellerId)!}'
 		};
 		return param;
 	};
@@ -109,7 +108,10 @@
 		 	}
 		  	var obj = {
 								"productId": $(this).find('td').eq(0).find("input").val(),
+<<<<<<< HEAD
 								"seller_id": '${(sellerId)!}',
+=======
+>>>>>>> refs/heads/larry_lll
 								"custom_name": $(this).find('td').eq(1).find("input").val(),
 								"store_count": $(this).find('td').eq(3).find("input").val(),
 								"price": $(this).find('td').eq(4).find("input").val(),
@@ -145,7 +147,7 @@
 	<h1>新增产品</h1>
 	<ol class="breadcrumb">
 		<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-       	<li><a href="#">经销商管理</a></li>
+       	<li><a href="#">销售商管理</a></li>
        	<li><a href="#">产品信息</a></li>
        	<li class="active">新增产品</li>
 	</ol>
@@ -154,8 +156,8 @@
 <section class="content">
 	<div class="row content-row">
 		<div class="jp-left">
-			<a onclick="savePro()" class="btn btn-sm btn-primary btn-flat" ><i class="fa fa-check-square-o fa-2x"></i><span style="font-size:20px;"> 保存</span> </a>
-			<input type="button" style="font-size:20px;" class="btn btn-primary" onclick="javascript:history.go(-1)" value="返  回" hidefocus="true" />
+			<a onclick="savePro()" class="btn btn-sm btn-primary btn-flat" ><i class="fa fa-check-square-o fa-1x"></i><span style="font-size:12px;"> 保存</span> </a>
+			<a onclick="javascript:history.go(-1)" class="btn btn-sm btn-primary btn-flat" ><i class="fa fa-reply fa-1x"></i><span style="font-size:12px;"> 返回</span> </a>
 		</div>
 		<form class="form-horizontal" style="float: right" action="${CPATH}/admin/addProduct?c=${c!}&p=${p!}" method="post">
 			<div class="input-group input-group-sm">

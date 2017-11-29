@@ -279,14 +279,14 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 	}
 	
 	public void showProduct(){
+		User user=getSessionAttr("user");
 		String keyword = getPara("k");
-		String id = getPara("seller_id");
 	        if (StrKit.notBlank(keyword)) {
 	            keyword = StringUtils.urlDecode(keyword);
 	            setAttr("k", keyword);
 	        }
 	        
-	        Page<SellerProduct> page = SellerProductQuery.me().paginate_sel(getPageNumber(), getPageSize(),keyword,id);
+	        Page<SellerProduct> page = SellerProductQuery.me().paginate_sel(getPageNumber(), getPageSize(),keyword,user.getId());
 
 	        Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 	        renderJson(map);
@@ -318,13 +318,12 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 	
 	public void productList(){
         String keyword = getPara("k");
-        String sellerId = getPara("sellerId");
         if (StrKit.notBlank(keyword)) {
             keyword = StringUtils.urlDecode(keyword);
             setAttr("k", keyword);
         }
         
-        Page<Product> page = ProductQuery.me().paginate_pro(getPageNumber(), getPageSize(),keyword,  "cp.id",sellerId);
+        Page<Product> page = ProductQuery.me().paginate_pro(getPageNumber(), getPageSize(),keyword,  "cp.id");
 
         Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);
@@ -332,21 +331,39 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 	
 	//保存产品信息
 		public void savePro(){
+			final SellerProduct sellerProducts= getModel(SellerProduct.class);
+			User user=getSessionAttr("user");
 			String ds = getPara("orderItems");
 			boolean result=false;
+			Seller seller=SellerQuery.me().findByUserId(user.getId());
 			JSONArray jsonArray = JSONArray.parseArray(ds);
 			List<SellerProduct> imageList = jsonArray.toJavaList(SellerProduct.class);
 			for (SellerProduct sellerProduct : imageList) {
 				  SellerProduct issellerProducts = SellerProductQuery.me().findById(sellerProduct.getId());
-				if(issellerProducts!=null){
-					issellerProducts.set("custom_name",sellerProduct.getCustomName());
-					issellerProducts.set("price", sellerProduct.getPrice());
-					issellerProducts.set("modify_date", new Date());
-					result=issellerProducts.update();
-					if(result == false){
-						break;
+					if(issellerProducts==null){
+						String Id = StrKit.getRandomUUID();
+						sellerProducts.set("id",Id);
+						sellerProducts.set("product_id",sellerProduct.getProductId());
+						sellerProducts.set("seller_id",seller.getId());
+						sellerProducts.set("custom_name",sellerProduct.getCustomName());
+						sellerProducts.set("store_count",sellerProduct.getStoreCount());
+						sellerProducts.set("price", sellerProduct.getPrice());
+						sellerProducts.set("is_enable", sellerProduct.getIsEnable());
+						sellerProducts.set("order_list", sellerProduct.getOrderList());
+						sellerProducts.set("create_date", new Date());
+						result=sellerProducts.save();
+						if(result == false){
+							break;
+						}
+					}else{
+						issellerProducts.set("custom_name",sellerProduct.getCustomName());
+						issellerProducts.set("price", sellerProduct.getPrice());
+						issellerProducts.set("modify_date", new Date());
+						result=issellerProducts.update();
+						if(result == false){
+							break;
+						}
 					}
-				}
 			}
 			renderJson(result);
 		}		
