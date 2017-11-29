@@ -174,10 +174,4 @@ public class UserQuery extends JBaseQuery {
 		return DAO.doFind(sql.toString(), userId);
 	}
 
-
-	public List<User> findUserList(String userId) {
-		StringBuilder sql = new StringBuilder(" department_id=(select department_id FROM `user` WHERE id =?)");
-		return DAO.doFind(sql.toString(), userId);
-	}
-
 }
