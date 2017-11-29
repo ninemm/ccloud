@@ -50,6 +50,7 @@ public class AdminMenuInitListener implements MessageListener {
 		menuManager.addMenuGroup(4, createWechatMenuGroup());
 		menuManager.addMenuGroup(5, createStatMenuGroup());
 		menuManager.addMenuGroup(6, createWorkFlowMenuGroup());
+		menuManager.addMenuGroup(7, createAccountMenuGroup());
 		
 		menuManager.addMenuGroup(MenuGroup.createBlockGroup());
 		
@@ -107,7 +108,7 @@ public class AdminMenuInitListener implements MessageListener {
 		
 		{
 			group.addMenuItem(new MenuItem("salesOrder", "/admin/salesOrder", "销售订货单"));
-			group.addMenuItem(new MenuItem("saleRefund", "/admin/saleRefund", "销售退货单"));
+			group.addMenuItem(new MenuItem("salesRefund", "/admin/salesRefund", "销售退货单"));
 			group.addMenuItem(new MenuItem("purchaseOrder", "/admin/purchaseOrder", "采购订单"));
 		}
 		
@@ -170,6 +171,7 @@ public class AdminMenuInitListener implements MessageListener {
 
 		{
 			group.addMenuItem(new MenuItem("list", "/admin/customer", "客户列表"));
+			group.addMenuItem(new MenuItem("audit", "/admin/customer/audit", "客户审核"));
 			group.addMenuItem(new MenuItem("type", "/admin/customerType", "客户类型"));
 			group.addMenuItem(new MenuItem("priceSystem", "/admin/priceSystem", "价格体系"));
 		}
@@ -286,6 +288,15 @@ public class AdminMenuInitListener implements MessageListener {
 			group.addMenuItem(new MenuItem("combination", "/admin/productComposition", "组合商品管理"));
 			group.addMenuItem(new MenuItem("sellerJoinTemplate", "/admin/sellerJoinTemplate", "销售商模版管理"));
 
+		}
+		return group;
+	}
+	
+		private MenuGroup createAccountMenuGroup() {
+		MenuGroup group = new MenuGroup("account", "fa fa-rmb", "账款管理");
+		{
+			group.addMenuItem(new MenuItem("payables","/admin/payables","应付账款"));	
+			group.addMenuItem(new MenuItem("receivable","/admin/receivable","应收账款"));	
 		}
 		return group;
 	}

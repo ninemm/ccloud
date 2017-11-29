@@ -1,4 +1,4 @@
-<#include "../_inc/_layout.html"/>
+<#include "../_inc/_layer_layout.html"/>
 
 <#macro script_import>
 
@@ -26,14 +26,14 @@
 
 <#macro script>
 
-	var $table = $("#_salesRefund_table");
-	var url = '${CPATH}/admin/salesRefund/list';
+	var $table = $("#_salesOutstock_table");
+	var url = '${CPATH}/admin/salesOutstock/list';
 
 	$(function() {
 		jQuery.mm.initDatetimepicker('form', '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initDatetimepicker('form', '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initValidator('#form', validatorFields)
-		jQuery.mm.initEditTable('#_salesRefund_table', url, initParams, initFields(), null);
+		jQuery.mm.initEditTable('#_salesOutstock_table', url, initParams, initFields(), null);
 	});
 
 	$("#search-submit").click(function() {
@@ -62,20 +62,14 @@
 		var fields =
 			[
 				{field: "id", title: "ID", align: "center", visible:false, edit:false},
-				{field: "checkbox", title: '<input class="jp-common-pad " id="dataItem" onclick="checkAll(this)" title="全选" type="checkbox">', align: "center", width: '2%', 
+				{field: "", title: "出库单号/创建时间", align: "center", width: '10%',
 					formatter: function(value, row, rowIndex) {
-						return '<input class="jp-common-pad" name="dataItem" type="checkbox" value="' + row.id + '">';
-					},
-					edit:false
-				},
-				{field: "", title: "退货单号/创建时间", align: "center", width: '10%',
-					formatter: function(value, row, rowIndex) {
-						return row.instock_sn + '<br>' + row.create_date;
+						return row.outstock_sn + '<br>' + row.create_date;
 					},
 					edit: false
 				},
 				{field: "customer_name", title: "客户名称", align: "center", width: '8%', edit:false},
-				{field: "total_reject_amount", title: "订单总额", align: "center", width: '5%', edit:false},
+				{field: "total_amount", title: "订单总额", align: "center", width: '5%', edit:false},
 				{field: "payment_type", title: "付款方式", align: "center", width: '5%',
 					formatter: function(value, row, rowIndex) {
 						return value == 0 ? '应付账款' : '现金';
@@ -85,11 +79,9 @@
 				{field: "status", title: "状态", align: "center", width: '5%',edit: false},
 				{field: "action", title: "操作", align: "center", width: '15%',
 				formatter: function(value, row, rowIndex) {
-					var strHtml ='<a class="label label-table label-info" onclick="detail(\''+row.id+'\')" >详细</a> ';
+					var strHtml ='<a class="label label-table label-info" onclick="parent.outstockDetail(\''+row.id+'\')" >详细</a> ';
 
-					strHtml = strHtml + '<a class="label label-table label-success" onclick="pass(\''+row.id+'\')" >通过</a> ';
-
-					strHtml = strHtml + '<a class="label label-table label-warning" onclick="reject(\''+row.id+'\')" >拒绝</a> ';
+					strHtml = strHtml + '<a class="label label-table label-danger" onclick="parent.refund(\''+row.id+'\')" >退货</a> ';
 
 					return strHtml;
 				},
@@ -112,38 +104,15 @@
 		}
 	};
 
-	function detail(id) {
-		layer.open({
-			title:"退货详细",
-			type: 2, 
-			area: ['70%', '80%'],
-			content: '${CPATH}/admin/salesRefund/detail/' + id
-		}); 
-	}
-
 </#macro>
 
-<@layout active_id=p child_active_id=c>
-
-<section class="content-header">
-	<h1>退货单</h1>
-	<ol class="breadcrumb">
-		<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-	<li><a href="#">订单管理</a></li>
-	<li class="active">退货单</li>
-	</ol>
-</section>
-<!-- Main content -->
+<@layout>
 <section class="content">
 	<form class="form-inline" id="form">
 		<div class="validata-box">
 			<input type="hidden" name="userIds" id="userIds" value="">
 		</div>
 		<div class="row content-row">
-			<div class="jp-left">
-				<button class="btn btn-sm btn-primary" type="button" onclick="batchAction()"><i class="fa fa-gavel"></i> 批量审核 </button>
-				<a href="${CPATH}/admin/salesRefund/add?c=${c!}&p=${p!}" class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> 新建销售退货单 </a>
-			</div>
 			<div class="form-group" style="float: right">
 				<div class="form-group validata-box">
 					<label class="control-label">开始时间:</label>
@@ -158,13 +127,13 @@
 					</div>
 				</div>
 				
-				<input id="post-search-input" class="form-control" type="search" value="${k!}" name="k" placeholder="搜索退货单号">&nbsp;
-				<input id="search-submit" class="btn btn-default" type="button" value="搜索">
+				<input id="post-search-input" class="form-control" type="search" value="${k!}" name="k" placeholder="搜索出库单号">&nbsp;
+				<input id="search-submit" class="btn btn-default btn-sm btn-flat" type="button" value="搜索">
 			</div>
 		</div>
 
 		<div class="box">
-			<table class="table table-striped table-hover table-condensed" id="_salesRefund_table" ></table>
+			<table class="table table-striped table-hover table-condensed" id="_salesOutstock_table" ></table>
 		</div>
 	</form>
 	<!-- /.box -->

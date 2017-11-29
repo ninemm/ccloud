@@ -15,9 +15,12 @@
  */
 package org.ccloud.model.query;
 
+import java.util.Date;
 import java.util.LinkedList;
+import java.util.Map;
 
 import org.ccloud.model.SalesRefundInstock;
+import org.ccloud.utils.StringUtils;
 
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
@@ -44,6 +47,18 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 				return DAO.findById(id);
 			}
 		});
+	}
+
+	public Record findMoreById(final String id) {
+		StringBuilder fromBuilder = new StringBuilder(
+				" select o.*,c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, u.realname, u.mobile ");
+		fromBuilder.append(" from `cc_sales_refund_instock` o ");
+		fromBuilder.append(" left join cc_customer c on o.customer_id = c.id ");
+		fromBuilder.append(" left join cc_customer_type ct on o.customer_type_id = ct.id ");
+		fromBuilder.append(" left join user u on o.biz_user_id = u.id ");
+		fromBuilder.append(" where o.id = ? ");
+
+		return Db.findFirst(fromBuilder.toString(), id);
 	}
 
 	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate) {
@@ -76,6 +91,30 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+
+	public boolean insert(Map<String, String[]> paraMap, String instockId, String instockSn, String sellerId,
+			String userId, Date date, Object deptId, Object dataArea) {
+		DAO.set("id", instockId);
+		DAO.set("instock_sn", instockSn);
+		DAO.set("warehouse_id", StringUtils.getArrayFirst(paraMap.get("warehouseId")));
+
+		DAO.set("seller_id", sellerId);
+		DAO.set("customer_id", StringUtils.getArrayFirst(paraMap.get("customerId")));
+		DAO.set("customer_type_id", StringUtils.getArrayFirst(paraMap.get("customerType")));
+
+		DAO.set("biz_user_id", StringUtils.getArrayFirst(paraMap.get("biz_user_id")));
+		DAO.set("input_user_id", userId);
+		DAO.set("status", 0);// 待退货
+
+		DAO.set("total_reject_amount", StringUtils.getArrayFirst(paraMap.get("total")));
+
+		DAO.set("payment_type", StringUtils.getArrayFirst(paraMap.get("paymentType")));
+		DAO.set("remark", StringUtils.getArrayFirst(paraMap.get("remark")));
+		DAO.set("create_date", date);
+		DAO.set("dept_id", deptId);
+		DAO.set("data_area", dataArea);
+		return DAO.save();
 	}
 
 	public int batchDelete(String... ids) {
