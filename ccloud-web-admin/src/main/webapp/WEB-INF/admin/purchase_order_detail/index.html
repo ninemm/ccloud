@@ -202,7 +202,7 @@
 		var $supplierSelect = $("#supplierId");
 	}
 	
-	function changeBigPrice(obj){
+	/*function changeBigPrice(obj){
 		var $curTr = $(obj).parent().parent().parent();
 		var bigPrice = $(obj).val();
 		var convert = $curTr.find("#convert").val();
@@ -211,7 +211,7 @@
 		$curTr.find("#smallPrice").val(smallPrice);
 
 		rowTotalF(obj);
-	}
+	}*/
 
 	function changeSmallPrice(obj){
 		var $curTr = $(obj).parent().parent().parent();
@@ -338,7 +338,7 @@
 							<td>
 								<input type="hidden" id="convert" value="" />
 								<div class = "validata-box">
-									￥<input type="text" id="bigPrice" name="bigPrice" style="width: 60%" onblur="changeBigPrice(this)" value="0" />
+									￥<input type="text" id="bigPrice" name="bigPrice" readonly="readonly" style="width: 60%" onblur="changeBigPrice(this)" value="0" />
 									</br>(<span id="bigPrice-span"></span>)
 								</div>
 							</td>

@@ -47,12 +47,14 @@ import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.StringUtils;
+import org.ccloud.workflow.service.WorkFlowService;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.jfinal.aop.Before;
+import com.jfinal.kit.Ret;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
@@ -286,6 +288,23 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 			customer.set("create_date", new Date());
 			customer.save();
 		} else {
+			
+			WorkFlowService workflow = new WorkFlowService();
+			String defKey = getPara("defKey");
+			defKey = "customer_edit";
+			Ret var = Ret.create();
+			// 找到对应的上级
+			var.set("manager", "hx");
+			var.set("apply", "qgadmin");
+			User user = getSessionAttr("user");
+			var.set("applyUserId", user.getId());
+			var.set("applyer", user.getRealname());
+			@SuppressWarnings("unchecked")
+			String procInstId = workflow.startProcess(customerId, defKey, var);
+			
+			customer.setStatus(Customer.CUSTOMER_AUDIT);
+			customer.setProcDefKey(defKey);
+			customer.setProcInstId(procInstId);
 			customer.set("modify_date", new Date());
 			customer.update();
 		}
@@ -452,5 +471,41 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 		}
 
 		renderAjaxResultForSuccess();
+	}
+	
+	public void audit() {
+		
+		keepPara("taskId");
+		String id = getPara("id");
+		
+		Customer customer = CustomerQuery.me().findById(id);
+		setAttr("customer", customer);
+		
+		WorkFlowService workflowService = new WorkFlowService();
+		Object _applyer = workflowService.getTaskVariableByTaskId(getPara("taskId"), "applyer");
+		
+		String applier = null;
+		if (_applyer != null) {
+			applier = _applyer.toString();
+			setAttr("applier", applier);
+		}
+	}
+	
+	public void auditSave() {
+		
+		Customer customer = getModel(Customer.class);
+		
+		String taskId = getPara("taskId");
+		String comment = getPara("comment");
+		
+		WorkFlowService workflowService = new WorkFlowService();
+		workflowService.completeTask(taskId, comment, null);
+		
+		if(customer.saveOrUpdate())
+			renderAjaxResultForSuccess("客户修改审核成功");
+		else
+			renderAjaxResultForError("客户修改审核失败");
+		
+		
 	}
 }

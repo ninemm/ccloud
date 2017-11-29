@@ -102,4 +102,8 @@ public class SellerQuery extends JBaseQuery {
 		return DAO.find(sql, userId);
 	}
 	
+	public Seller findByUserId(String userId){
+		String sql = "select cs.* from cc_seller cs LEFT JOIN user u on u.department_id=cs.dept_id where u.id =? and cs.seller_type=0";
+		return DAO.findFirst(sql, userId);
+	}
 }

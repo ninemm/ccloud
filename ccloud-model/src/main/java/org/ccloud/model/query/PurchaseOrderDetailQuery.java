@@ -69,9 +69,16 @@ public class PurchaseOrderDetailQuery extends JBaseQuery {
 		return 0;
 	}
 	
-	public List<PurchaseOrderDetail> findByPurchaseId(String purchaseOrderId){
-		String sql = "select cpod.* from cc_purchase_order_detail cpod LEFT JOIN cc_purchase_order cpo on cpod.purchase_order_id=cpo.id where cpo.id=?";
-		return DAO.find(sql, purchaseOrderId);
+	public List<PurchaseOrderDetail> findByPurchaseOrderId(String purchaseOrderId){
+			String sql = "SELECT cp.id AS product_id,cp. NAME AS NAME,cpod.product_amount,cpod.product_count,cpod.product_price,cpod.id,cpod.remark,cpod.dept_id,cpod.data_area,"
+					+ " csp.store_count,cp.big_unit AS big_unit,cs.id as sellerId,cp.small_unit AS small_unit,cp.convert_relate AS convert_relate,cp.price AS price "
+					+ "FROM cc_product cp "
+					+ "LEFT JOIN cc_purchase_order_detail cpod on cpod.product_id=cp.id "
+					+ "LEFT JOIN cc_inventory ci on ci.product_id = cp.id "
+					+ "LEFT JOIN cc_seller_product csp on csp.product_id = cp.id "
+					+ "LEFT JOIN cc_seller cs on cs.id = csp.seller_id "
+					+ "where cpod.purchase_order_id=? and cs.seller_type=0 GROUP BY cp.id";
+			return DAO.find(sql, purchaseOrderId);
 	}
 	
 	public List<PurchaseOrderDetail> findByAll(String id){
@@ -81,9 +88,11 @@ public class PurchaseOrderDetailQuery extends JBaseQuery {
 				+ "LEFT JOIN cc_product cp on cp.id= cpod.product_id "
 				+ "LEFT JOIN cc_product_goods_specification_value cpg ON cp.id = cpg.product_set_id "
 				+ "LEFT JOIN cc_goods_specification_value cgs ON cpg.goods_specification_value_set_id = cgs.id "
-				+ "WHERE cpo.id=? GROUP BY cpo.id";
+				+ "WHERE cpo.id=? GROUP BY cpod.id";
 		return DAO.find(sql, id);
 	}
-
 	
+	public PurchaseOrderDetail findByProductId(String productId){
+		return null;
+	}
 }
