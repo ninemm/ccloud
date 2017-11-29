@@ -187,5 +187,9 @@ public class _UserController extends JBaseCRUDController<User> {
 		user.update();
 		renderAjaxResultForSuccess("更新成功");
 	}
+	
+	public void synchroWechat() {
+		
+	}
 
 }

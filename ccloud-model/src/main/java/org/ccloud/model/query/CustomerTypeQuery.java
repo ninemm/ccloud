@@ -97,6 +97,22 @@ public class CustomerTypeQuery extends JBaseQuery {
 
 		return Db.find(sqlBuilder.toString(), params.toArray());
 	}
+	
+	public List<CustomerType> findByDataArea(String dataArea) {
+		
+		LinkedList<Object> params = new LinkedList<Object>();
+		
+		StringBuilder sql = new StringBuilder("select *");
+		sql.append(" from `cc_customer_type`");
+		sql.append(" where is_show = 1");
+		
+		appendIfNotEmptyWithLike(sql, "data_area", dataArea, params, false);
+		
+		sql.append(" order by create_date");
+		
+		return DAO.find(sql.toString(), params.toArray());
+		
+	}
 
 	public String findIdByName(String name, String dataArea) {
 		LinkedList<Object> params = new LinkedList<Object>();

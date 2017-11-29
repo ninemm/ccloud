@@ -69,7 +69,7 @@ public class DepartmentQuery extends JBaseQuery {
 		sqlBuilder.append("where d.id <> '0' ");
 		
 		final List<Object> params = new LinkedList<Object>();
-		appendIfNotEmptyWithLike(sqlBuilder, "d.data_area", dataArea, params, false);
+		sqlBuilder.append("AND LOCATE('" + dataArea + "' , d.data_area) = 1 ");
 		buildOrderBy(orderby, sqlBuilder);
 		String key = buildKey(dataArea, null, null, null, orderby);
 		
@@ -161,8 +161,23 @@ public class DepartmentQuery extends JBaseQuery {
 			return deleteCount;
 		}
 		return 0;
-	}	
-
+	}
+	
+	public List<Map<String, Object>> findDeptListAsTree(String dataArea, boolean hasUser) {
+		
+		Map<String, Object> map = new HashMap<String, Object>();
+		List<Department> list = findDeptList(dataArea, "order_list asc");
+		List<Map<String, Object>> deptTreeList = new ArrayList<Map<String, Object>>();
+		ModelSorter.tree(list);
+		
+		map.put("text", "总部");// 父子表第一级名称,以后可以存储在字典表或字典类
+		map.put("tags", Lists.newArrayList(0));
+		map.put("nodes", doBuild(list, hasUser));
+		deptTreeList.add(map);
+		
+		return deptTreeList;
+	}
+	
 	public List<Map<String, Object>> findDeptListAsTree(int i, String dataArea) {
 		List<Department> list = findDeptList(dataArea, "order_list asc");
 		List<Map<String, Object>> resTreeList = new ArrayList<>();
@@ -170,8 +185,10 @@ public class DepartmentQuery extends JBaseQuery {
 		Map<String, Object> map = new HashMap<>();
 		map.put("text", "总部");// 父子表第一级名称,以后可以存储在字典表或字典类
 		ArrayList<String> newArrayList = Lists.newArrayList();
-		newArrayList.add(Consts.DEPT_HQ_ID);
-		newArrayList.add(Consts.DEPT_HQ_DATAAREA);		
+		if (dataArea.equals(Consts.DEPT_HQ_DATAAREA)) {
+			newArrayList.add(Consts.DEPT_HQ_ID);
+			newArrayList.add(Consts.DEPT_HQ_DATAAREA);
+		}
 		map.put("tags", newArrayList);
 		map.put("nodes", doBuild(list)); 
 		resTreeList.add(map);
@@ -192,6 +209,30 @@ public class DepartmentQuery extends JBaseQuery {
 			if(dept.getChildList() != null && dept.getChildList().size() > 0) {
 				map.put("nodes", doBuild(dept.getChildList()));
 			}
+		}
+		return resTreeList;
+	}
+	
+	private List<Map<String, Object>> doBuild(List<Department> list, boolean addUserFlg) {
+		List<Map<String, Object>> resTreeList = new ArrayList<Map<String, Object>>();
+		for (Department dept : list) {
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("text", dept.getDeptName());
+			map.put("tags", Lists.newArrayList(dept.getId(), dept.getDataArea()));
+
+			List<Map<String, Object>> childList = new ArrayList<Map<String, Object>>();
+
+			if (dept.getChildList() != null && dept.getChildList().size() > 0) {
+				childList = doBuild(dept.getChildList(), addUserFlg);
+			}
+
+			if (addUserFlg) {
+				childList = addUser(dept.getId(), childList);
+			}
+
+			map.put("nodes", childList);
+
+			resTreeList.add(map);
 		}
 		return resTreeList;
 	}

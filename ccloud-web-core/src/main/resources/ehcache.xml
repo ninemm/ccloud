@@ -443,6 +443,73 @@
 		   timeToLiveSeconds="300"
 		   memoryStoreEvictionPolicy="LFU"
 		   transactionalMode="off"
+	/>
+
+	<cache name="cc_customer"
+           maxEntriesLocalHeap="10000"
+           eternal="false"
+           overflowToDisk="true"
+           timeToIdleSeconds="300"
+           timeToLiveSeconds="300"
+           memoryStoreEvictionPolicy="LFU"
+           transactionalMode="off"
+    />
+    
+    <cache name="cc_seller_customer"
+           maxEntriesLocalHeap="10000"
+           eternal="false"
+           overflowToDisk="true"
+           timeToIdleSeconds="300"
+           timeToLiveSeconds="300"
+           memoryStoreEvictionPolicy="LFU"
+           transactionalMode="off"
+    />
+	<cache name="cc_inventory"
+		   maxEntriesLocalHeap="10000"
+		   eternal="false"
+		   overflowToDisk="true"
+		   timeToIdleSeconds="300"
+		   timeToLiveSeconds="300"
+		   memoryStoreEvictionPolicy="LFU"
+		   transactionalMode="off"
+	/>	
+	<cache name="cc_inventory_detail"
+		   maxEntriesLocalHeap="10000"
+		   eternal="false"
+		   overflowToDisk="true"
+		   timeToIdleSeconds="300"
+		   timeToLiveSeconds="300"
+		   memoryStoreEvictionPolicy="LFU"
+		   transactionalMode="off"
+	/>	
+		
+	<cache name="cc_inventory"
+		   maxEntriesLocalHeap="10000"
+		   eternal="false"
+		   overflowToDisk="true"
+		   timeToIdleSeconds="300"
+		   timeToLiveSeconds="300"
+		   memoryStoreEvictionPolicy="LFU"
+		   transactionalMode="off"
+	/>	
+	<cache name="cc_inventory_detail"
+		   maxEntriesLocalHeap="10000"
+		   eternal="false"
+		   overflowToDisk="true"
+		   timeToIdleSeconds="300"
+		   timeToLiveSeconds="300"
+		   memoryStoreEvictionPolicy="LFU"
+		   transactionalMode="off"
+	/>	
+	
+	<cache name="permission_list"
+		   maxEntriesLocalHeap="10000"
+		   eternal="false"
+		   overflowToDisk="true"
+		   timeToIdleSeconds="300"
+		   timeToLiveSeconds="300"
+		   memoryStoreEvictionPolicy="LFU"
+		   transactionalMode="off"
 	/>	
 
 </ehcache>
