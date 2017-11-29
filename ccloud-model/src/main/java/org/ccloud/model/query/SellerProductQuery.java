@@ -70,17 +70,20 @@ public class SellerProductQuery extends JBaseQuery {
 		return 0;
 	}
 
-	public Page<SellerProduct> paginate_sel(int pageNumber, int pageSize,String keyword,String sellerId) {
-		String select = "SELECT cs.id,cs.product_id, cs.custom_name,cs.store_count,cs.price,cs.cost,cs.market_price,cs.is_enable, cs.order_list ,GROUP_CONCAT(distinct cgs.`name`) AS cps_name";
-		StringBuilder fromBuilder = new StringBuilder("from cc_seller_product cs LEFT JOIN cc_product cp ON  cs.product_id = cp.id LEFT JOIN cc_product_goods_specification_value cpg ON  cp.id = cpg.product_set_id LEFT JOIN cc_goods_specification_value cgs ON cpg.goods_specification_value_set_id = cgs.id LEFT JOIN cc_product_safe_inventory cpsi on cpsi.product_id=cs.product_id ");
+	public Page<SellerProduct> paginate_sel(int pageNumber, int pageSize,String keyword,String userId) {
+		String select = "SELECT csp.id,csp.product_id, csp.custom_name,csp.store_count,csp.price,csp.cost,csp.market_price,csp.is_enable, csp.order_list ,GROUP_CONCAT(distinct cgs.`name`) AS cps_name";
+		StringBuilder fromBuilder = new StringBuilder("from cc_seller_product csp LEFT JOIN cc_product cp ON  csp.product_id = cp.id LEFT JOIN cc_product_goods_specification_value cpg ON  cp.id = cpg.product_set_id "
+				+ " LEFT JOIN cc_goods_specification_value cgs ON cpg.goods_specification_value_set_id = cgs.id LEFT JOIN cc_product_safe_inventory cpsi on cpsi.product_id=csp.product_id "
+				+ " LEFT JOIN cc_seller cs on cs.id=csp.seller_id"
+				+ " LEFT JOIN user u on u.department_id =cs.dept_id");
 		LinkedList<Object> params = new LinkedList<Object>();
 		if(!keyword.equals("")){
 			appendIfNotEmptyWithLike(fromBuilder, "cs.custom_name", keyword, params, true);
-			fromBuilder.append(" and cs.seller_id='"+sellerId+"' ");
+			fromBuilder.append(" and cs.seller_type=0 and u.id='"+userId+"' ");
 		}else{
-			fromBuilder.append(" where cs.seller_id='"+sellerId+"' ");
+			fromBuilder.append(" where cs.seller_type=0 and u.id='"+userId+"' ");
 		}
-		fromBuilder.append(" GROUP BY cs.id,cpsi.safe_inventory_count ORDER BY cs.is_enable desc,cs.order_list ");
+		fromBuilder.append(" GROUP BY csp.id,cpsi.safe_inventory_count ORDER BY csp.is_enable desc,csp.order_list ");
 		
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());

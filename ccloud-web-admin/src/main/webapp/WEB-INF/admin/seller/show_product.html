@@ -21,26 +21,15 @@
 <#macro script>
 	$("#brand_option").select2();
 	var $table = $("#_seller_product_table");
-	$("#sellerId").change(function(){
-			$("#_seller_product_table").bootstrapTable('destroy');
-			var url = '${CPATH}/admin/seller/showProduct?seller_id=' + this.value + '&c=${c}&p=${p}';
-			jQuery.mm.initEditTable('#_seller_product_table', url, initParams, initFields(), null);
-			$("#search-submit").click(function() {
-				$table.bootstrapTable('refresh');
-			});
-			if(this.value==""){
-				$(".content").hide();
-				$(".jp-left").hide();
-				$(".box").hide();
-			}else{
-				$(".jp-left").show();
-				$(".box").show();
-				$(".content").show();
-			}
-	})
 		
 	$(function() {
-		$(".jp-left").hide();
+	
+		var url = '${CPATH}/admin/seller/showProduct';
+		jQuery.mm.initEditTable('#_seller_product_table', url, initParams, initFields(), null);
+		$("#search-submit").click(function() {
+			$table.bootstrapTable('refresh');
+		});
+		/*$(".jp-left").hide();
 		$(".content").hide();
 		$.ajax({
 				url:"${CPATH}/admin/seller/show_product",
@@ -54,7 +43,7 @@
 				}
 			});
 			
-		
+		*/
 	});
 	
 
@@ -222,11 +211,6 @@
 
 <section class="content-header">
 	<h1>产品信息</h1>
-	<div class="input-group col-md-2 col-sm-8" style="padding-top:10px;">
-		<select class="form-control input-sm" name="id" id="sellerId" >
-			<option value="">----请选择经销商----</option>
-		</select>
-    </div>
 	<ol class="breadcrumb">
 		<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
        	<li><a href="#">产品信息</a></li>
