@@ -169,12 +169,12 @@ public class ProductQuery extends JBaseQuery {
 		StringBuilder fromBuilder = new StringBuilder("FROM cc_product cp LEFT JOIN cc_product_goods_specification_value cpg ON cp.id = cpg.product_set_id LEFT JOIN cc_goods_specification_value cgs ON cpg.goods_specification_value_set_id=cgs.id ");
 		
 		LinkedList<Object> params = new LinkedList<Object>();
-		if(!keyword.equals("")){
+		//if(!keyword.equals("")){
 			appendIfNotEmptyWithLike(fromBuilder, "cp.name", keyword, params, true);
-			fromBuilder.append(" and cp.id  not in (select product_id from cc_seller_product where seller_id ='" + sellerId+"')");
+		/*	fromBuilder.append(" and cp.id  not in (select product_id from cc_seller_product where seller_id ='" + sellerId+"')");
 		}else{
 			fromBuilder.append(" where cp.id  not in (select product_id from cc_seller_product where seller_id ='" + sellerId+"')");
-		}
+		}*/
 		fromBuilder.append(" GROUP by " + orderby);
 		fromBuilder.append(" order by " + orderby);	
 		

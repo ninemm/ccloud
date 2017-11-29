@@ -22,7 +22,6 @@
 		var url = '${CPATH}/admin/seller/productList';
 		var count_check = $('input[name="row"]:checked').parent().parent().length;
 		 	jQuery.mm.initEditTable('#_seller_product_table', url, initParams, initFields(), null);
-		
 		$("#search-submit").click(function() {
 			$table.bootstrapTable('refresh');
 		});
@@ -45,23 +44,39 @@
 	var initFields = function() {
 		var fields =
 			[
-				{field: "", title: "<input type='checkbox' onclick='checkAll(this)' id='dataItem' value=''/>", align: "center", width: '5%',
+				{field: "", title: "<input type='checkbox' onclick='checkAll(this)' name='dataItem1' value=''/>", align: "center", width: '5%',
 				formatter: function(value, row, rowIndex) {
-					var strHtml = '<input type="checkbox" name="dataItem" id="id_name" value="'+row.id+'"/>';
+					var strHtml = '<input type="checkbox" name="dataItem" id="dataItem" value="'+row.id+'"/>';
 					return strHtml;
 				},
 				edit:false
 				},
-      			{field: "name", title: "产品名称", align: "center", width: '15%',edit:false},
+      			{field: "custom_name", title: "产品名称", align: "center", width: '15%',
+      				formatter: function(value, row, rowIndex) {
+					var strHtml = '<input type="text" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="custom_name" id="custom_name" value="'+row.name+'" size = "25"/>';
+					return strHtml;
+				},
+      				edit:false},
       			{field: "cps_name", title: "规格", align: "center", width: '18%',edit:false},
-      			{field: "store_count", title: "库存数量", align: "center", width: '8%',edit:false},
-      			{field: "price", title: "销售价格", align: "center", width: '8%',edit:false},
+      			{field: "store_count", title: "库存数量", align: "center", width: '8%',
+      				formatter: function(value, row, rowIndex) {
+					var strHtml = '<input type="text" readonly="readonly" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="store_count" id="store_count" value="" size = "10"/>';
+					return strHtml;
+				},
+      			 edit:false},
+      			{field: "price", title: "销售价格", align: "center", width: '8%',
+      				formatter: function(value, row, rowIndex) {
+					var strHtml = '<input type="text" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="price" id="price" value="'+row.price+'" size = "10"/>';
+					return strHtml;
+				},
+      			 edit:false},
       			{field: "is_enable", title: "是否上架", align: "center", width: '5%',
       				formatter: function(value, row, rowIndex) {
    						var strHtml = '<select class="form-control input-sm" name="is_enable" id="is_enable" style="width:60px;" ><option value="1">是</option><option value="0">否</option></select>';
    						return strHtml;
    					},
-      				edit:false},
+      				edit:false
+      			},
    				{field: "order_list", title: "排序", align: "center", width: '10%', 
    					formatter: function(value, row, rowIndex) {
    						var strHtml = '<div class="input-group col-md-4 col-sm-10"   style="padding-left:50px;width:120px;"><input class="form-control input-sm" type="number" id="order_list" name="order_list" value="0"></div>';
@@ -73,7 +88,6 @@
    		return fields;
 	}
 	
-	
 	function savePro(){
 		 var orderItems = new Array();
 		 var flang = true;
@@ -84,13 +98,21 @@
 			return;		 
 		 }
 		 $('input[name="dataItem"]:checked').parent().parent().each(function(idx, item) {
-		 	
+		 	if($(this).find('td').eq(1).find("input").val()==""){
+		 		alert("产品名不能为空!");
+			 	flang=false;
+				return;
+		 	}else if($(this).find('td').eq(4).find("input").val() =="" || isNaN($(this).find('td').eq(4).find("input").val())){
+		 		alert("销售价不能为空，且销售价为数字!");
+			 	flang=false;
+				return;
+		 	}
 		  	var obj = {
 								"productId": $(this).find('td').eq(0).find("input").val(),
 								"seller_id": '${(sellerId)!}',
-								"custom_name": $(this).find('td').eq(1).html(),
-								"store_count": $(this).find('td').eq(3).html(),
-								"price": $(this).find('td').eq(4).html(),
+								"custom_name": $(this).find('td').eq(1).find("input").val(),
+								"store_count": $(this).find('td').eq(3).find("input").val(),
+								"price": $(this).find('td').eq(4).find("input").val(),
 								"is_enable": $(this).find('td').eq(5).find("select").val(),
 								"order_list": $(this).find('td').eq(6).find("input").val(),
 							};
@@ -103,7 +125,11 @@
 					dataType:"json",
 					data : {orderItems : JSON.stringify(orderItems)},
 					success:function(data){
-						toastr.success(data.message,'操作成功');
+						if(data==true){
+							toastr.success(data.message, '添加成功');
+						}else{
+							toastr.error(data.message, '添加失败');
+						}
 						setTimeout( function(){
 						location.reload();
 								}, 2 * 1000 );
