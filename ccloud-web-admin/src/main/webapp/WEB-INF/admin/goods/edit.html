@@ -751,8 +751,8 @@ function doSubmit(){
 																	<li class="text {goodsSpecificationValueId: '${goodsSpecificationValueList.id}'}" title="${goodsSpecificationValueList.name}">${goodsSpecificationValueList.name}</li>
 																</#list>
 															<#else>
-																<#list goodsSpecificationList.goodsSpecificationValueSet as goodsSpecificationValueList>
-																	<li class="image {goodsSpecificationValueId: '${goodsSpecificationValueList.id}'}"><img src="${base}${goodsSpecificationValueList.image_path}" title="${goodsSpecificationValueList.name}" /></li>
+																<#list goodsSpecificationList.childList as goodsSpecificationValueList>
+																	<li class="image {goodsSpecificationValueId: '${goodsSpecificationValueList.id}'}"><img src="${CPATH}${goodsSpecificationValueList.image_path}" title="${goodsSpecificationValueList.name}" /></li>
 																</#list>
 															</#if>
 														</ul>
@@ -825,9 +825,9 @@ function doSubmit(){
 																		</#if>
 																	</#list>
 																<#else>
-																	<#list goodsSpecification.goodsSpecificationValueSet as goodsSpecificationValue>
+																	<#list goodsSpecification.childList as goodsSpecificationValue>
 																		<#if list.goodsSpecificationValueSet.contains(goodsSpecificationValue)>
-																			<img src="${base}${goodsSpecificationValue.image_path}" title="${goodsSpecificationValue.name}" /></li>
+																			<img src="${CPATH}${goodsSpecificationValue.image_path}" title="${goodsSpecificationValue.name}" /></li>
 																		</#if>
 																	</#list>
 																</#if>
@@ -839,7 +839,7 @@ function doSubmit(){
 																	</#list>
 																<#else>
 																	<#list goodsSpecification.childList as goodsSpecificationValue>
-																		<li class="image {goodsSpecificationValueId: '${goodsSpecificationValue.id}'}"><img src="${base}${goodsSpecificationValue.image_path}" title="${goodsSpecificationValue.name}" /></li>
+																		<li class="image {goodsSpecificationValueId: '${goodsSpecificationValue.id}'}"><img src="${CPATH}${goodsSpecificationValue.image_path}" title="${goodsSpecificationValue.name}" /></li>
 																	</#list>
 																</#if>
 															</ul>

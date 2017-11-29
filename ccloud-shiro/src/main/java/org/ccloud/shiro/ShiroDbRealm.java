@@ -33,12 +33,10 @@ public class ShiroDbRealm extends AuthorizingRealm {
 	    User userInPrincipal = (User) principals.getPrimaryPrincipal();
 	    //根据用户获取权限
 	    Map<String, List<String>> map = RoleQuery.me().getPermissions(userInPrincipal.getGroupId());
-	    List<String> rolePermissions = OperationQuery.me().getPermissionsByRole(map.get("roleIds")); //通过角色获取权限
-	    List<String> stationPermissions = OperationQuery.me().getPermissionsByStation(userInPrincipal.getStationId()); //通过岗位获取权限
-	    rolePermissions.addAll(stationPermissions);
+	    List<String> permission = OperationQuery.me().getPermissionsByUser(userInPrincipal);
 	    SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
 	    info.addRoles(map.get("roleCodes"));
-	    info.addStringPermissions(rolePermissions);
+	    info.addStringPermissions(permission);
 	    return info;
 	}
 

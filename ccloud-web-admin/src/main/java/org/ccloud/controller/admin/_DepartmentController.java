@@ -15,6 +15,7 @@
  */
 package org.ccloud.controller.admin;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -95,7 +96,7 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 			String dataArea = null;
 			List<Department> list = DepartmentQuery.me().findByParentId(dept.getParentId());
 			if (list.size() > 0) {
-				dataArea = "00" + String.valueOf(Integer.parseInt(list.get(0).getDataArea()) + 1);
+				dataArea = "00" + String.valueOf(new BigDecimal(list.get(0).getDataArea()).add(new BigDecimal(1)));
 			} else {
 				dataArea = parentDataArea + "001";
 			}

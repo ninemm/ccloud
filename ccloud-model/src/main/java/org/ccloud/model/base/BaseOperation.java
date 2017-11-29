@@ -15,6 +15,8 @@
  */
 package org.ccloud.model.base;
 
+import java.util.List;
+
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.core.JModel;
 
@@ -30,11 +32,32 @@ public abstract class BaseOperation<M extends BaseOperation<M>> extends JModel<M
 
 	public static final String CACHE_NAME = "operation";
 	public static final String METADATA_TYPE = "operation";
+	public static final String ALL_USER_PERMISSION = "permission_list";
 
 	public static final String ACTION_ADD = "operation:add";
 	public static final String ACTION_DELETE = "operation:delete";
 	public static final String ACTION_UPDATE = "operation:update";
+	
+	@SuppressWarnings("unchecked")
+    public static void clearAllList() {
+        List<String> list = CacheKit.getKeys(ALL_USER_PERMISSION);
+        if (list != null && list.size() > 0) {
+            for (String key : list) {
 
+                // 过滤
+
+                CacheKit.remove(ALL_USER_PERMISSION, key);
+            }
+        }
+    }
+	
+    public static void clearListByKey(String id) {
+        Object o = CacheKit.get(ALL_USER_PERMISSION, id);
+        if (o != null) {
+        	CacheKit.remove(ALL_USER_PERMISSION, id);
+        }
+    }	
+	
 	public void removeCache(Object key){
 		if(key == null) return;
 		CacheKit.remove(CACHE_NAME, key);

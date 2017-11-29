@@ -117,15 +117,15 @@ public class ModuleQuery extends JBaseQuery {
 	}	
 	
 	public List<Module> findModuleList(String parentId, String orderby, String systemId) {
-		final StringBuilder sqlBuilder = new StringBuilder("SELECT * FROM module m ");
+		final StringBuilder sqlBuilder = new StringBuilder("SELECT m.id,m.module_name,m.parent_id,m.is_parent FROM module m ");
 		sqlBuilder.append("where m.id <> '0' ");
 
 		final List<Object> params = new LinkedList<Object>();
-		appendIfNotEmpty(sqlBuilder, "parent_id", parentId, params, false);
-		appendIfNotEmpty(sqlBuilder, "system_id", systemId, params, false);
+		appendIfNotEmpty(sqlBuilder, "m.parent_id", parentId, params, false);
+		appendIfNotEmpty(sqlBuilder, "m.system_id", systemId, params, false);
 		buildOrderBy(orderby, sqlBuilder);
 
-		String key = buildKey(null, null, null, null, orderby);
+		String key = buildKey(systemId, null, null, null, orderby);
 
 		List<Module> data = DAO.getFromListCache(key, new IDataLoader() {
 			@Override
@@ -169,17 +169,17 @@ public class ModuleQuery extends JBaseQuery {
 	protected void buildOrderBy(String orderBy, StringBuilder fromBuilder) {
 
 		fromBuilder.append(" order by ");
-
+		
 		if (StrKit.isBlank(orderBy)) {
-			fromBuilder.append("m.order_list asc ");
+			fromBuilder.append("m.parent_id,m.order_list asc ");
 			return;
 		}
-
+		
 		String orderbyInfo[] = orderBy.trim().split("\\s+");
 		orderBy = orderbyInfo[0];
-
-		fromBuilder.append("m.order_list ");
-
+		
+		fromBuilder.append("m.parent_id,m.order_list ");
+		
 		if (orderbyInfo.length == 1) {
 			fromBuilder.append("desc");
 		} else {

@@ -24,7 +24,9 @@ import org.ccloud.model.ModelSorter;
 import org.ccloud.model.Station;
 import org.ccloud.model.User;
 
+import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
 /**
@@ -124,7 +126,7 @@ public class StationQuery extends JBaseQuery {
 
 		buildOrderBy(orderby, sqlBuilder);
 
-		String key = buildKey(null, null, null, null, orderby);
+		String key = buildKey(dataArea, null, null, null, orderby);
 
 		List<Station> data = DAO.getFromListCache(key, new IDataLoader() {
 
@@ -301,5 +303,13 @@ public class StationQuery extends JBaseQuery {
 
 		}
 		return childList;
+	}
+
+	public List<Record> findByUserCheck(String id) {
+		StringBuilder stringBuilder = new StringBuilder("SELECT s.station_name,s.id,u.realname FROM `station` s ");
+		stringBuilder.append("LEFT JOIN (SELECT * FROM `user` where id=?) u ");
+		stringBuilder.append("ON LOCATE(s.id,u.station_id) > 0 ");
+		stringBuilder.append("WHERE s.id <> 0 ");
+		return Db.find(stringBuilder.toString(), id);
 	}	
 }

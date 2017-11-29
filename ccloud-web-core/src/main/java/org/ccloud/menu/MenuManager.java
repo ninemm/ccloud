@@ -18,13 +18,12 @@ package org.ccloud.menu;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.ccloud.core.addon.HookInvoker;
 import org.ccloud.message.MessageKit;
+import org.ccloud.model.Operation;
 import org.ccloud.model.User;
 import org.ccloud.model.query.OperationQuery;
-import org.ccloud.model.query.RoleQuery;
 import org.ccloud.utils.StringUtils;
 
 import com.google.common.collect.Lists;
@@ -66,10 +65,7 @@ public class MenuManager {
 		
 		HookInvoker.menuInitBefore(this);
 		
-	    Map<String, List<String>> map = RoleQuery.me().getPermissions(user.getGroupId());
-	    List<String> rolePermissions = OperationQuery.me().getPermissionsByRole(map.get("roleIds"));
-	    List<String> stationPermissions = OperationQuery.me().getPermissionsByStation(user.getStationId());
-	    rolePermissions.addAll(stationPermissions);
+	    List<String> permission = OperationQuery.me().getPermissionsByUser(user);
 		
 		StringBuilder htmlBuilder = new StringBuilder();
 		for (MenuGroup group : menuGroups) {
@@ -79,13 +75,14 @@ public class MenuManager {
 				for (Iterator<MenuItem> it = list.iterator(); it.hasNext();) {
 					MenuItem menuItem = it.next();
 					String url = menuItem.getUrl();
-					
-					int pos = url.indexOf("?");
-					if (pos != -1) {
-						url = url.substring(0, pos);
+					if (url != null) {
+						int pos = url.indexOf("?");
+						if (pos != -1) {
+							url = url.substring(0, pos);
+						}
 					}
 					
-					if (rolePermissions.contains(url) || rolePermissions.contains("/admin/all")) {
+					if (permission.contains(url) || permission.contains("/admin/all")) {
 						menuList.add(menuItem);
 					}
 				}
@@ -153,6 +150,7 @@ public class MenuManager {
 	
 	@SuppressWarnings("unchecked")
     public static void clearAllList() {
+		Operation.clearAllList();
         List<String> list = CacheKit.getKeys(CACHE_NAME);
         if (list != null && list.size() > 0) {
             for (String key : list) {
@@ -168,6 +166,7 @@ public class MenuManager {
         String htmlBuilder = CacheKit.get(CACHE_NAME, userId);
         if (htmlBuilder != null) {
         	CacheKit.remove(CACHE_NAME, userId);
+        	Operation.clearListByKey(userId);
         }
         
     }
