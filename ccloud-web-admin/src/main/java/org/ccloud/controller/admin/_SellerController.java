@@ -340,7 +340,6 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				  SellerProduct issellerProducts = SellerProductQuery.me().findById(sellerProduct.getId());
 				if(issellerProducts!=null){
 					issellerProducts.set("custom_name",sellerProduct.getCustomName());
-					issellerProducts.set("seller_id",sellerProduct.getSellerId());
 					issellerProducts.set("price", sellerProduct.getPrice());
 					issellerProducts.set("modify_date", new Date());
 					result=issellerProducts.update();
