@@ -78,7 +78,7 @@ public class SellerProductQuery extends JBaseQuery {
 				+ " LEFT JOIN user u on u.department_id =cs.dept_id");
 		LinkedList<Object> params = new LinkedList<Object>();
 		if(!keyword.equals("")){
-			appendIfNotEmptyWithLike(fromBuilder, "cs.custom_name", keyword, params, true);
+			appendIfNotEmptyWithLike(fromBuilder, "csp.custom_name", keyword, params, true);
 			fromBuilder.append(" and cs.seller_type=0 and u.id='"+userId+"' ");
 		}else{
 			fromBuilder.append(" where cs.seller_type=0 and u.id='"+userId+"' ");
