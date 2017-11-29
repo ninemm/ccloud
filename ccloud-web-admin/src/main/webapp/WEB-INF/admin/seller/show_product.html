@@ -29,21 +29,6 @@
 		$("#search-submit").click(function() {
 			$table.bootstrapTable('refresh');
 		});
-		/*$(".jp-left").hide();
-		$(".content").hide();
-		$.ajax({
-				url:"${CPATH}/admin/seller/show_product",
-				type:"post",
-				dataType:"json",
-				success:function(data){
-					$.each(data,function(index, item) {
-						var html='<option value="'+item.id+'">'+item.seller_name+'</option>';
-						$("#sellerId").append(html);
-					});
-				}
-			});
-			
-		*/
 	});
 	
 

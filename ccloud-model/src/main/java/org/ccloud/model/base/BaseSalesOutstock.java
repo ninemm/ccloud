@@ -106,6 +106,14 @@ public abstract class BaseSalesOutstock<M extends BaseSalesOutstock<M>> extends 
 		return getStr("outstock_sn");
 	}
 
+	public void setSellerId(java.lang.String sellerId) {
+		set("seller_id", sellerId);
+	}
+
+	public java.lang.String getSellerId() {
+		return getStr("seller_id");
+	}
+
 	public void setCustomerId(java.lang.String customerId) {
 		set("customer_id", customerId);
 	}

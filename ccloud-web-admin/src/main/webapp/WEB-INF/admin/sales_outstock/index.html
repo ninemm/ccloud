@@ -70,7 +70,7 @@
 				},
 				{field: "", title: "出库单号/创建时间", align: "center", width: '10%',
 					formatter: function(value, row, rowIndex) {
-						return row.instock_sn + '<br>' + row.create_date;
+						return row.outstock_sn + '<br>' + row.create_date;
 					},
 					edit: false
 				},
@@ -85,11 +85,11 @@
 				{field: "status", title: "状态", align: "center", width: '5%',edit: false},
 				{field: "action", title: "操作", align: "center", width: '15%',
 				formatter: function(value, row, rowIndex) {
-					var strHtml = "<a class='label label-table label-info' onclick='detail(' + row.id + ')' >详细</a> ";
+					var strHtml ='<a class="label label-table label-info" onclick="detail(\''+row.id+'\')" >详细</a> ';
 
-					strHtml = strHtml + "<a class='label label-table label-success' onclick='success(' + row.id + ')' ></a>";
+					strHtml = strHtml + '<a class="label label-table label-success" onclick="detail(\''+row.id+'\')" >打印</a> ';
 					
-					strHtml = strHtml + "<a class='label label-table label-danger' onclick='success(' + row.id + ')' ></a>";
+					strHtml = strHtml + '<a class="label label-table label-warning" onclick="detail(\''+row.id+'\')" >出库</a> ';
 
 					return strHtml;
 				},
@@ -112,8 +112,13 @@
 		}
 	};
 
-	function del(id) {
-		jQuery.mm.del('${CPATH}/admin/systemLog/delete?ucode=${ucode}&id=' + id);
+	function detail(id) {
+		layer.open({
+			title:"出库单详细",
+			type: 2, 
+			area: ['70%', '80%'],
+			content: '${CPATH}/admin/salesOutstock/detail/' + id
+		}); 
 	}
 
 </#macro>

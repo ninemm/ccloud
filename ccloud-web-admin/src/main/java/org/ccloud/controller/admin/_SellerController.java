@@ -21,13 +21,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
-import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Brand;
 import org.ccloud.model.Customer;
@@ -47,7 +44,6 @@ import org.ccloud.model.query.SellerQuery;
 
 import com.alibaba.fastjson.JSONArray;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
