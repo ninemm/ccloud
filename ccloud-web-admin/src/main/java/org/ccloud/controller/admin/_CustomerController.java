@@ -29,7 +29,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.apache.shiro.subject.Subject;
+import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.message.Actions;
@@ -56,7 +56,6 @@ import org.joda.time.DateTime;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.Kv;
 import com.jfinal.kit.Ret;
@@ -257,7 +256,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 		String userIds = getPara("userIds");
 
 		if (StrKit.isBlank(userIds)) {
-			User user = getSessionAttr("user");
+			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 			userIds = user.getId();
 		}
 
@@ -278,9 +277,10 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 			// 找到对应的上级
 			var.set("manager", "hx");
 			var.set("apply", "qgadmin");
-			User user = getSessionAttr("user");
+			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 			var.set("applyUserId", user.getId());
 			var.set("applyer", user.getRealname());
+			@SuppressWarnings("unchecked")
 			String procInstId = workflow.startProcess(customerId, defKey, var);
 			
 			customer.setStatus(Customer.CUSTOMER_AUDIT);
@@ -342,7 +342,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 			"/admin/all" }, logical = Logical.OR)
 	public void uploading() {
 
-		User user = getSessionAttr("user");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
 		File file = getFile().getFile();
 		String userId = getPara("userIds");

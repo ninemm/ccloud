@@ -178,7 +178,7 @@ public class _OperationController extends JBaseCRUDController<Operation> {
 		int deleteRole = RoleOperationRelQuery.me().deleteByOperationId(id);
 		int deleteStation = StationOperationRelQuery.me().deleteByOperationId(id);
 		if (r != null) {
-			if (r.delete() && (deleteRole + deleteStation) > 0) {
+			if (r.delete() || (deleteRole + deleteStation) > 0) {
 				MenuManager.clearAllList();
 				renderAjaxResultForSuccess("删除成功");
 				return;
@@ -189,7 +189,7 @@ public class _OperationController extends JBaseCRUDController<Operation> {
 	
 	public void getRoleAndStation() {
         String id = getPara("id");
-        String dataArea = getSessionAttr("DeptDataAreaLike");
+        String dataArea = getSessionAttr("DeptDataArea");
         List<Record> roles = RoleQuery.me().findBydeptAndOperation(dataArea, id);
         List<Map<String, Object>> roleList = new ArrayList<>();
 
@@ -211,7 +211,7 @@ public class _OperationController extends JBaseCRUDController<Operation> {
 	}
 	
     public void station_tree() {
-    	String dataArea = getSessionAttr("DeptDataAreaLike");
+    	String dataArea = getSessionAttr("DeptDataArea");
         List<Map<String, Object>> list = StationQuery.me().findStationListAsTree(1, dataArea);
         setAttr("treeData", JSON.toJSON(list));
     }
@@ -223,6 +223,7 @@ public class _OperationController extends JBaseCRUDController<Operation> {
 		if (operation.getIsPrivilege() == 0) {
 			operation.setIsPrivilege(1);
 		} else {
+			MenuManager.clearAllList();
 			operation.setIsPrivilege(0);
 		}
 		operation.update();

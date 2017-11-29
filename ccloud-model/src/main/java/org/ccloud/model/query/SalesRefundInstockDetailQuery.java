@@ -15,10 +15,18 @@
  */
 package org.ccloud.model.query;
 
+import java.util.Date;
 import java.util.LinkedList;
-import org.ccloud.model.SalesRefundInstockDetail;
+import java.util.List;
+import java.util.Map;
 
+import org.ccloud.model.SalesRefundInstockDetail;
+import org.ccloud.utils.StringUtils;
+
+import com.jfinal.kit.StrKit;
+import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
 /**
@@ -40,6 +48,48 @@ public class SalesRefundInstockDetailQuery extends JBaseQuery {
 				return DAO.findById(id);
 			}
 		});
+	}
+	
+	public List<Record> findByRefundId(String refundId) {
+
+		StringBuilder sqlBuilder = new StringBuilder(
+				" SELECT sp.custom_name, sod.product_count, sod.product_amount, sod.is_gift, p.big_unit, p.small_unit, p.convert_relate ");
+		sqlBuilder.append(" from `cc_sales_refund_instock_detail` sod ");
+		sqlBuilder.append(" LEFT JOIN cc_seller_product sp ON sod.sell_product_id = sp.id ");
+		sqlBuilder.append(" LEFT JOIN cc_product p ON sp.product_id = p.id ");
+		sqlBuilder.append(" WHERE sod.refund_instock_id = ? ");
+
+		return Db.find(sqlBuilder.toString(), refundId);
+	}
+	
+	public boolean insert(Map<String, String[]> paraMap, String instockId, String sellerId, Date date,
+			String deptId, String dataArea, int index) {
+
+		DAO.set("id", StrKit.getRandomUUID());
+		DAO.set("refund_instock_id", instockId);
+		DAO.set("sell_product_id", StringUtils.getArrayFirst(paraMap.get("sellProductId" + index)));
+
+		String convert = StringUtils.getArrayFirst(paraMap.get("convert" + index));
+		String bigNum = StringUtils.getArrayFirst(paraMap.get("bigNum" + index));
+		String smallNum = StringUtils.getArrayFirst(paraMap.get("smallNum" + index));
+
+		Integer productCount = Integer.valueOf(bigNum) * Integer.valueOf(convert) + Integer.valueOf(smallNum);
+
+		DAO.set("product_count", productCount);
+		DAO.set("product_price", StringUtils.getArrayFirst(paraMap.get("smallPrice" + index)));
+		DAO.set("product_amount", StringUtils.getArrayFirst(paraMap.get("rowTotal" + index)));
+
+		DAO.set("outstock_detail_id", StringUtils.getArrayFirst(paraMap.get("outstockDetailId" + index)));
+
+		DAO.set("reject_product_count", productCount);
+		DAO.set("reject_product_price", StringUtils.getArrayFirst(paraMap.get("smallPrice" + index)));
+		DAO.set("reject_amount", StringUtils.getArrayFirst(paraMap.get("rowTotal" + index)));
+
+		DAO.set("is_gift", StringUtils.getArrayFirst(paraMap.get("isGift" + index)));
+		DAO.set("create_date", date);
+		DAO.set("dept_id", deptId);
+		DAO.set("data_area", dataArea);
+		return DAO.save();
 	}
 
 	public Page<SalesRefundInstockDetail> paginate(int pageNumber, int pageSize, String orderby) {

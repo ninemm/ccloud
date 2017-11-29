@@ -17,6 +17,7 @@ package org.ccloud.controller.admin;
 
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
+import org.ccloud.menu.MenuManager;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.model.RoleOperationRel;
@@ -43,8 +44,12 @@ public class _RoleOperationRelController extends JBaseCRUDController<RoleOperati
         roleOperationRel.setRoleId(roleId);
         roleOperationRel.setId(StrKit.getRandomUUID());
 
-        if (roleOperationRel.save()) renderAjaxResultForSuccess();
-        else renderAjaxResultForError();
+        if (roleOperationRel.save()) {
+        	MenuManager.clearAllList();
+        	renderAjaxResultForSuccess();
+        } else {
+        	renderAjaxResultForError();
+        }
 
     }
 
@@ -53,8 +58,12 @@ public class _RoleOperationRelController extends JBaseCRUDController<RoleOperati
         String roleId = getPara("role_id");
         String operationId = getPara("operation_id");
 
-        if (RoleOperationRelQuery.me().delete(roleId, operationId) != 0) renderAjaxResultForSuccess();
-        else renderAjaxResultForError();
+        if (RoleOperationRelQuery.me().delete(roleId, operationId) != 0) {
+        	MenuManager.clearAllList();
+        	renderAjaxResultForSuccess();
+        } else {
+        	renderAjaxResultForError();
+        }
     }
 	
 }

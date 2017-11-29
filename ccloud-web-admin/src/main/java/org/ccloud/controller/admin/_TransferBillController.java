@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.TransferBill;
@@ -88,7 +89,7 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 	public void save() {		
 	 TransferBill transferBill = getModel(TransferBill.class);
 	 if (transferBill.getStatus() == null || transferBill.getStatus() == 0) {
-	  User user = getSessionAttr("user");
+	  User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 	  transferBill.setDeptId(user.getDepartmentId());
 	  transferBill.setDataArea(user.getDataArea());
 	  transferBill.setInputUserId(user.getId());

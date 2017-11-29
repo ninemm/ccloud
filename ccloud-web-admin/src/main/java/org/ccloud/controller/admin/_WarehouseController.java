@@ -18,6 +18,7 @@ package org.ccloud.controller.admin;
 import java.util.Date;
 import java.util.Map;
 
+import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
@@ -47,16 +48,14 @@ public class _WarehouseController extends JBaseCRUDController<Warehouse> {
 			keyword = StringUtils.urlDecode(keyword);
 			setAttr("k", keyword);
 		}
-
-		Page<Warehouse> page = WarehouseQuery.me().paginate(getPageNumber(), getPageSize(), keyword, "c.create_date");
+		String seller_id=getSessionAttr("sellerId").toString();
+		Page<Warehouse> page = WarehouseQuery.me().paginate(getPageNumber(), getPageSize(), keyword, "c.create_date", seller_id);
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
-
 	}
 	
 	@Before(UCodeInterceptor.class)
 	public void batchDelete() {
-
 		String[] ids = getParaValues("dataItem");
 		int count = WarehouseQuery.me().batchDelete(ids);
 		if (count > 0) {
@@ -64,7 +63,6 @@ public class _WarehouseController extends JBaseCRUDController<Warehouse> {
 		} else {
 			renderAjaxResultForError("删除失败!");
 		}
-
 	}
 	
 	public void enable() {
@@ -83,9 +81,11 @@ public class _WarehouseController extends JBaseCRUDController<Warehouse> {
 	@Override
 	public void save() {
 	  Warehouse warehouse = getModel(Warehouse.class); 
-	  User user = getSessionAttr("user");
+	  User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+	  String seller_id=getSessionAttr("sellerId").toString();
 	  warehouse.setDeptId(user.getDepartmentId());
 	  warehouse.setDataArea(user.getDataArea());
+	  warehouse.setSellerId(seller_id);
 	  if (StringUtils.isBlank(warehouse.getId())) {
 		warehouse.setId(StrKit.getRandomUUID());
 		warehouse.setCreateDate(new Date());

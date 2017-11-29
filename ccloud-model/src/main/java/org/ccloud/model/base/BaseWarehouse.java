@@ -97,6 +97,14 @@ public abstract class BaseWarehouse<M extends BaseWarehouse<M>> extends JModel<M
 	public java.lang.String getId() {
 		return getStr("id");
 	}
+	
+	public void setSellerId(java.lang.String seller_id) {
+		set("seller_id", seller_id);
+	}
+
+	public java.lang.String getSellerId() {
+		return getStr("seller_id");
+	}
 
 	public void setCode(java.lang.String code) {
 		set("code", code);

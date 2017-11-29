@@ -37,6 +37,7 @@ import org.ccloud.utils.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Before;
+import com.jfinal.aop.Clear;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.tx.Tx;
@@ -74,7 +75,9 @@ public class _ModuleController extends JBaseCRUDController<Module> {
 	public void save() {
 
 		Module module = getModel(Module.class);
-		module.setIsParent(0);
+		if (StringUtils.isBlank(module.getId())) {
+			module.setIsParent(0);
+		}
 		if (module.saveOrUpdate()) {
 			ModuleQuery.me().updateParent(module);
 			renderAjaxResultForSuccess("新增成功");			
@@ -136,10 +139,10 @@ public class _ModuleController extends JBaseCRUDController<Module> {
 		return true;
 	}
 
+	@Clear
 	public void module_tree() {
 		String id = getPara("id");
 		List<Map<String, Object>> list = ModuleQuery.me().findModuleListAsTree(1, id);
-		list = ModuleQuery.me().findModuleListAsTree(1, id);
 		setAttr("treeData", JSON.toJSON(list));
 	}
 }

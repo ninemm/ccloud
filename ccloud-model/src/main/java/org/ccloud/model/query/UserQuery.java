@@ -49,8 +49,8 @@ public class UserQuery extends JBaseQuery {
 		StringBuilder fromBuilder = new StringBuilder(" from user u ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
-		appendIfNotEmptyWithLike(fromBuilder, "username", keyword, params, true);
-		appendIfNotEmptyWithLike(fromBuilder, "data_area", dataArea, params, true);
+		fromBuilder.append("WHERE LOCATE('" + dataArea + "' ,u.data_area) = 1 ");
+		appendIfNotEmptyWithLike(fromBuilder, "username", keyword, params, false);
 		
 		fromBuilder.append("order by " + orderby);
 		
@@ -80,7 +80,7 @@ public class UserQuery extends JBaseQuery {
 		return DAO.getCache(username, new IDataLoader() {
 			@Override
 			public Object load() {
-				return DAO.doFindFirst("username = ?", username);
+				return DAO.doFindFirst("username = ? AND status = 1", username);
 			}
 		});
 	}
@@ -168,6 +168,10 @@ public class UserQuery extends JBaseQuery {
 		sql.append("LEFT JOIN `group` g ON gr.group_id = g.id WHERE gr.role_id=?)");
 		return DAO.doFind(sql.toString(), id);
 	}
-
 	
+	public List<User> findUserList(String userId) {
+		StringBuilder sql = new StringBuilder(" department_id=(select department_id FROM `user` WHERE id =?)");
+		return DAO.doFind(sql.toString(), userId);
+	}
+
 }

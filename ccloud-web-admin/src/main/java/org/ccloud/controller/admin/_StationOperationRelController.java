@@ -17,6 +17,7 @@ package org.ccloud.controller.admin;
 
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
+import org.ccloud.menu.MenuManager;
 import org.ccloud.model.StationOperationRel;
 import org.ccloud.model.query.StationOperationRelQuery;
 import org.ccloud.route.RouterMapping;
@@ -42,8 +43,12 @@ public class _StationOperationRelController extends JBaseCRUDController<StationO
         stationOperationRel.setStationId(stationId);
         stationOperationRel.setId(StrKit.getRandomUUID());
 
-        if (stationOperationRel.save()) renderAjaxResultForSuccess();
-        else renderAjaxResultForError();
+        if (stationOperationRel.save()) {
+        	MenuManager.clearAllList();
+        	renderAjaxResultForSuccess();
+        } else {
+        	renderAjaxResultForError();
+        }
 
     }
 
@@ -52,8 +57,12 @@ public class _StationOperationRelController extends JBaseCRUDController<StationO
         String stationId = getPara("station_id");
         String operationId = getPara("operation_id");
 
-        if (StationOperationRelQuery.me().delete(stationId, operationId) != 0) renderAjaxResultForSuccess();
-        else renderAjaxResultForError();
+        if (StationOperationRelQuery.me().delete(stationId, operationId) != 0) {
+        	MenuManager.clearAllList();
+        	renderAjaxResultForSuccess();
+        } else {
+        	renderAjaxResultForError();
+        }
     }
 
 	

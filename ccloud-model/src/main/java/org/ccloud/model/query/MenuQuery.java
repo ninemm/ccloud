@@ -55,15 +55,16 @@ public class MenuQuery extends JBaseQuery {
 		});
 	}
 	
-	public List<Menu> findMenuList(String parentId, String orderby) {
+	public List<Menu> findMenuList(String parentId, String systemId, String orderby) {
 		final StringBuilder sqlBuilder = new StringBuilder("SELECT * FROM menu m ");
 		sqlBuilder.append("where m.id <> '0' ");
 		
 		final List<Object> params = new LinkedList<Object>();
-		appendIfNotEmpty(sqlBuilder, "parent_id", parentId, params, false);
+		appendIfNotEmpty(sqlBuilder, "m.parent_id", parentId, params, false);
+		appendIfNotEmpty(sqlBuilder, "m.system_id", systemId, params, false);
 		buildOrderBy(orderby, sqlBuilder);
 		
-		String key = buildKey(null, null, null, null, orderby);
+		String key = buildKey(systemId, null, null, null, orderby);
 		
 		List<Menu> data = DAO.getFromListCache(key, new IDataLoader() {
 			@Override
@@ -111,9 +112,9 @@ public class MenuQuery extends JBaseQuery {
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 	
-	public List<Map<String, Object>> findMenuListAsTree(Integer enable) {
+	public List<Map<String, Object>> findMenuListAsTree(Integer enable, String systemId) {
 		
-		List<Menu> list = findMenuList(null, "order_list asc");
+		List<Menu> list = findMenuList(null, systemId, "order_list asc");
 		ModelSorter.tree(list);
 		List<Map<String, Object>> resTreeList = new ArrayList<>();
 		Map<String, Object> map = new HashMap<>();
@@ -180,14 +181,14 @@ public class MenuQuery extends JBaseQuery {
 		fromBuilder.append(" order by ");
 		
 		if (StrKit.isBlank(orderBy)) {
-			fromBuilder.append("m.order_list asc ");
+			fromBuilder.append("m.parent_id,m.order_list asc ");
 			return ;
 		}
 		
 		String orderbyInfo[] = orderBy.trim().split("\\s+");
 		orderBy = orderbyInfo[0];
 		
-		fromBuilder.append("m.order_list ");
+		fromBuilder.append("m.parent_id,m.order_list ");
 		
 		if (orderbyInfo.length == 1) {
 			fromBuilder.append("desc");
@@ -242,5 +243,31 @@ public class MenuQuery extends JBaseQuery {
 	private Integer childNumById(String parentId) {
 		Integer num = DAO.doFindCount("parent_id = ?", parentId).intValue();
 		return num;
+	}
+
+	public List<Menu> findMenuList() {
+		StringBuilder sqlBuilder = new StringBuilder("select m.*,o.url ");
+		sqlBuilder.append("from `menu` m ");
+		sqlBuilder.append("LEFT JOIN operation o ON m.operator_id = o.id ");
+		sqlBuilder.append("WHERE m.id <> '0' ORDER BY m.`level`,m.order_list ");
+		return DAO.find(sqlBuilder.toString());
+	}
+
+	public void updateParents(Menu menu) {
+		if (menu != null && menu.getParentId() != "0") {
+			Menu parentMenu = findById(menu.getParentId());
+			Integer childNum = childNumById(menu.getParentId());
+			if (childNum > 0) {
+				if (parentMenu.getIsParent() == 0) {
+					parentMenu.setIsParent(1);
+					parentMenu.update();
+				}
+			} else {
+				if (parentMenu.getIsParent() > 0) {
+					parentMenu.setIsParent(0);
+					parentMenu.update();
+				}
+			}
+		}		
 	}
 }

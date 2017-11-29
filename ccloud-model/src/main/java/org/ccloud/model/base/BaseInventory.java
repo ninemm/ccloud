@@ -114,6 +114,14 @@ public abstract class BaseInventory<M extends BaseInventory<M>> extends JModel<M
 		return get("product_id");
 	}
 
+	public void setSellerId(java.lang.String sellerId) {
+		set("seller_id", sellerId);
+	}
+
+	public java.lang.String getSellerId() {
+		return get("seller_id");
+	}
+	
 	public void setInCount(java.math.BigDecimal inCount) {
 		set("in_count", inCount);
 	}

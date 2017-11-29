@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
@@ -90,10 +91,12 @@ public class _StationController extends JBaseCRUDController<Station> {
     public void save() {
 
         Station station = getModel(Station.class);
-        User user = getSessionAttr("user");
+        User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
         station.setDeptId(user.getDepartmentId());
         station.setDataArea(getSessionAttr("DeptDataArea").toString());
-        station.setIsParent(0);
+        if (StringUtils.isBlank(station.getId())) {
+        	station.setIsParent(0);
+        }
         if (station.saveOrUpdate()) {
         	StationQuery.me().updateParent(station);
         	renderAjaxResultForSuccess("新增成功");

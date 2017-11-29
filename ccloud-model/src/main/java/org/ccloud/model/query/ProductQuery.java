@@ -164,17 +164,12 @@ public class ProductQuery extends JBaseQuery {
 		return plist;
 	}
 	
-	public Page<Product> paginate_pro(int pageNumber, int pageSize,String keyword, String orderby,String sellerId) {
+	public Page<Product> paginate_pro(int pageNumber, int pageSize,String keyword, String orderby) {
 		String select = "SELECT cp.id,cp.cost,cp.market_price,cp.name,cp.price, GROUP_CONCAT(cgs.`name`) as cps_name ";
 		StringBuilder fromBuilder = new StringBuilder("FROM cc_product cp LEFT JOIN cc_product_goods_specification_value cpg ON cp.id = cpg.product_set_id LEFT JOIN cc_goods_specification_value cgs ON cpg.goods_specification_value_set_id=cgs.id ");
 		
 		LinkedList<Object> params = new LinkedList<Object>();
-		if(!keyword.equals("")){
-			appendIfNotEmptyWithLike(fromBuilder, "cp.name", keyword, params, true);
-			fromBuilder.append(" and cp.id  not in (select product_id from cc_seller_product where seller_id ='" + sellerId+"')");
-		}else{
-			fromBuilder.append(" where cp.id  not in (select product_id from cc_seller_product where seller_id ='" + sellerId+"')");
-		}
+		appendIfNotEmptyWithLike(fromBuilder, "cp.name", keyword, params, true);
 		fromBuilder.append(" GROUP by " + orderby);
 		fromBuilder.append(" order by " + orderby);	
 		
@@ -191,7 +186,7 @@ public class ProductQuery extends JBaseQuery {
 				+ "LEFT JOIN cc_seller_product csp on csp.product_id=cp.id "
 				+ "LEFT JOIN cc_seller cs on cs.id=csp.seller_id "
 				+ "LEFT JOIN `user` u on u.department_id=cs.dept_id "
-				+ "WHERE u.id=? GROUP BY cp.id";
+				+ "WHERE u.id=? and cs.seller_type=0 GROUP BY cp.id";
 		return DAO.find(sql, userId);
 	}
 	

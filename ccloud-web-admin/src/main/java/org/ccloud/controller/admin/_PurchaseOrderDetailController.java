@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.route.RouterMapping;
@@ -53,7 +54,7 @@ public class _PurchaseOrderDetailController extends JBaseCRUDController<Purchase
 	
 	@Override
 	public void index() {
-		User user = getSessionAttr("user");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		if (user == null ) {
 			// TODO
 		}
@@ -109,7 +110,7 @@ public class _PurchaseOrderDetailController extends JBaseCRUDController<Purchase
 	}
 		
 	public void list(){
-		User user = getSessionAttr("user");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		List<Product> list = ProductQuery.me().findAllByUserId(user.getId());
 		renderJson(list);
 	}
@@ -126,7 +127,7 @@ public class _PurchaseOrderDetailController extends JBaseCRUDController<Purchase
 		final PurchaseOrder purchaseOrder =getModel(PurchaseOrder.class);
 		final PurchaseOrderDetail purchaseOrderDetail = getModel(PurchaseOrderDetail.class);
 		Map<String, String[]> paraMap = getParaMap();
-		User user = getSessionAttr("user");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		int i = PurchaseOrderQuery.me().findByUserId(user.getId());
 		Department department = DepartmentQuery.me().findByUserId(user.getId());
 		/*采购订单：PO + 100000(机构编号或企业编号6位) + 20171108(时间) + 000001(流水号)*/

@@ -20,6 +20,7 @@ import java.util.Map;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.PriceSystem;
@@ -62,7 +63,7 @@ public class _PriceSystemController extends JBaseCRUDController<PriceSystem> {
 		if (SecurityUtils.getSubject().isPermitted("/admin/all")) {
 			page = PriceSystemQuery.me().paginate(getPageNumber(), getPageSize(), keyword, null, null);
 		} else {
-			User user = getSessionAttr("user");
+			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 			page = PriceSystemQuery.me().paginate(getPageNumber(), getPageSize(), keyword, user.getDepartmentId(),
 					DataAreaUtil.getUserDeptDataArea(user.getDataArea()));
 		}
@@ -94,7 +95,7 @@ public class _PriceSystemController extends JBaseCRUDController<PriceSystem> {
 	public void save() {
 
 		PriceSystem priceSystem = getModel(PriceSystem.class);
-		User user = getSessionAttr("user");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
 		if (SecurityUtils.getSubject().isPermitted("/admin/all")) {
 			priceSystem.set("dept_id", getPara("parent_id"));

@@ -36,6 +36,8 @@
 
     $("#search-submit").click(function() {
         $table.bootstrapTable('refresh');
+        paramId = 0;
+        $("#_payableInfo_table").bootstrapTable('refresh');
     });
 
     var initParams = function(params) {
@@ -71,9 +73,21 @@
         var fields =
         [
             {field: "customer_name", title: "直营商", align: "center", width: '8%', edit:false},
-            {field: "pay_amount", title: "应付总额", align: "center", width: '10%', edit: false},
-            {field: "act_amount", title: "已付总额", align: "center", width: '5%', edit: false},
-            {field: "balance_amount", title: "未付总额", align: "center", width: '15%', edit: false},
+            {field: "pay_amount", title: "应付总额(元)", align: "center", width: '10%',
+                formatter: function(value, row, index){
+                    return toMoney(value,2);
+                }, edit: false
+            },
+            {field: "act_amount", title: "已付总额(元)", align: "center", width: '5%',
+                formatter: function(value, row, index){
+                    return toMoney(value,2);
+                }, edit: false
+            },
+            {field: "balance_amount", title: "未付总额(元)", align: "center", width: '15%',
+                formatter: function(value, row, index){
+                    return toMoney(value,2);
+                },edit: false
+            },
             {field: "create_date", title: "首次付款", align: "center", width: '15%', edit: false},
             {field: "modify_date", title: "最后一次付款", align: "center", width: '15%', edit: false},
             {field: "action", title: "操作", align: "center", width: '10%',
@@ -93,9 +107,21 @@
     [
         {field: "ref_sn", title: "单号", align: "center", width: '13%', edit:false},
         {field: "ref_type", title: "单号类型", align: "center", width: '5%', edit: false},
-        {field: "pay_amount", title: "应付总额", align: "center", width: '5%', edit: false},
-        {field: "act_amount", title: "已付总额", align: "center", width: '5%', edit: false},
-        {field: "balance_amount", title: "未付总额", align: "center", width: '15%', edit: false},
+        {field: "pay_amount", title: "应付总额(元)", align: "center", width: '5%',
+            formatter: function(value, row, index){
+                return toMoney(value,2);
+            },edit: false
+        },
+        {field: "act_amount", title: "已付总额(元)", align: "center", width: '5%',
+            formatter: function(value, row, index){
+                return toMoney(value,2);
+            },edit: false
+        },
+        {field: "balance_amount", title: "未付总额(元)", align: "center", width: '15%',
+            formatter: function(value, row, index){
+                return toMoney(value,2);
+            },edit: false
+        },
         {field: "create_date", title: "首次付款", align: "center", width: '15%', edit: false},
         {field: "modify_date", title: "最后一次付款", align: "center", width: '15%', edit: false},
         {field: "action", title: "操作", align: "center", width: '10%',
@@ -114,7 +140,11 @@
     var fields =
         [
             {field: "ref_sn", title: "业务单号", align: "center", width: '8%', edit:false},
-            {field: "act_amount", title: "付款金额", align: "center", width: '5%', edit: false},
+            {field: "act_amount", title: "付款金额(元)", align: "center", width: '5%',
+                formatter: function(value, row, index){
+                    return toMoney(value,2);
+                },edit: false
+            },
             {field: "realname", title: "付款人", align: "center", width: '5%', edit: false},
             {field: "biz_date", title: "付款时间", align: "center", width: '15%', edit: false}
         ];
@@ -139,6 +169,18 @@
         paramId = id;
         $("#_payment_table").bootstrapTable('refresh');
         $("#exampleModal").modal('show');
+    }
+
+    function toMoney(val, num) {
+        num = num > 0 && num <= 9 ? num : 2;
+    val = parseFloat((val + "").replace(/[^\d\.-]/g, "")).toFixed(num) + "";
+        var l = val.split(".")[0].split("").reverse();
+        var r = val.split(".")[1];
+        var t = "";
+        for (i = 0; i < l.length; i++) {
+            t += l[i] + ((i + 1) % 3 == 0 && (i + 1) != l.length ? "," : "");
+        }
+        return t.split("").reverse().join("") + "." + r;
     }
 
 </#macro>

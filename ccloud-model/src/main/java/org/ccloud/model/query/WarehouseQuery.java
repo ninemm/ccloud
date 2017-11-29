@@ -44,10 +44,10 @@ public class WarehouseQuery extends JBaseQuery {
 		});
 	}
 
-	public Page<Warehouse> paginate(int pageNumber, int pageSize,String keyword, String orderby) {
+	public Page<Warehouse> paginate(int pageNumber, int pageSize,String keyword, String orderby, String seller_id) {
 		String select = "select c.id,c.name,c.code,c.contact,c.phone,c.is_inited,c.is_enabled,d.dept_name as deptName ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_warehouse` c ");
-        fromBuilder.append("inner join department d on c.dept_id = d.id ");
+        fromBuilder.append("inner join department d on c.dept_id = d.id where c.seller_id='"+seller_id+"'");
 		LinkedList<Object> params = new LinkedList<Object>();
 
 		appendIfNotEmptyWithLike(fromBuilder, "c.name", keyword, params, true);
@@ -82,7 +82,7 @@ public class WarehouseQuery extends JBaseQuery {
 	}
 	
 	public List<Warehouse> findBySellerId(String sellerId){
-		String sql = "SELECT cw.* from cc_warehouse cw LEFT JOIN cc_seller cs on cs.dept_id = cw.dept_id where cs.id= ?";
+		String sql = "SELECT * from cc_warehouse where seller_id= ?";
 		return DAO.find(sql, sellerId);
 	}
 

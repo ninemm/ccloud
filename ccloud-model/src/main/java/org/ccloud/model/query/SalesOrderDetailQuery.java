@@ -17,6 +17,7 @@ package org.ccloud.model.query;
 
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.ccloud.model.SalesOrderDetail;
@@ -40,15 +41,31 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		return QUERY;
 	}
 
-	public boolean insert(Map<String, String[]> paraMap, String orderSn, String sellerId, String userId, Date date,
+	public List<Record> findByOrderId(String orderId) {
+
+		StringBuilder sqlBuilder = new StringBuilder(
+				" SELECT sod.*, sp.custom_name, p.big_unit, p.small_unit, p.convert_relate, w.code as warehouseCode ");
+		sqlBuilder.append(" from `cc_sales_order_detail` sod ");
+		sqlBuilder.append(" LEFT JOIN cc_seller_product sp ON sod.sell_product_id = sp.id ");
+		sqlBuilder.append(" LEFT JOIN cc_product p ON sp.product_id = p.id ");
+		sqlBuilder.append(" LEFT JOIN cc_warehouse w ON sod.warehouse_id = w.id ");
+		sqlBuilder.append(" WHERE order_id = ? ");
+		sqlBuilder.append(" ORDER BY sod.warehouse_id ");
+
+		return Db.find(sqlBuilder.toString(), orderId);
+	}
+
+	public boolean insert(Map<String, String[]> paraMap, String orderId, String sellerId, String userId, Date date,
 			String deptId, String dataArea, int index) {
 
 		DAO.set("id", StrKit.getRandomUUID());
-		DAO.set("order_id", orderSn);
-		DAO.set("product_id", StringUtils.getArrayFirst(paraMap.get("productId" + index)));
+		DAO.set("order_id", orderId);
+		DAO.set("sell_product_id", StringUtils.getArrayFirst(paraMap.get("sellProductId" + index)));
 
-		String sellProductId = StringUtils.getArrayFirst(paraMap.get("sellProductId" + index));
-		String warehouseId = getWarehouseId(sellProductId);
+		String productId = StringUtils.getArrayFirst(paraMap.get("productId" + index));
+		// String warehouseId = this.getWarehouseId(productId, sellerId);TODO
+		// 库存盘点写入库存总账未完成
+		String warehouseId = "1";
 		DAO.set("warehouse_id", warehouseId);
 
 		String convert = StringUtils.getArrayFirst(paraMap.get("convert" + index));
@@ -67,7 +84,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		DAO.set("data_area", dataArea);
 		return DAO.save();
 	}
-
+	
 	private String getWarehouseId(String sellProductId) {
 
 		StringBuilder defaultSqlBuilder = new StringBuilder(" select i.warehouse_id, i.balance_count ");

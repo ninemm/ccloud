@@ -22,15 +22,20 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.SalesOrder;
 import org.ccloud.model.User;
 import org.ccloud.model.query.SalesOrderDetailQuery;
+import org.ccloud.model.query.SalesOrderJoinOutstockQuery;
 import org.ccloud.model.query.SalesOrderQuery;
+import org.ccloud.model.query.SalesOutstockDetailQuery;
+import org.ccloud.model.query.SalesOutstockQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.DataAreaUtil;
+import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
 
 import com.alibaba.fastjson.JSON;
@@ -76,8 +81,22 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 	}
 
+	public void detail() {
+
+		String orderId = getPara(0);
+
+		Record order = SalesOrderQuery.me().findMoreById(orderId);
+		List<Record> orderDetail = SalesOrderDetailQuery.me().findByOrderId(orderId);
+
+		setAttr("order", order);
+		setAttr("orderDetail", orderDetail);
+
+		render("detail.html");
+
+	}
+
 	public void add() {
-		User user = getSessionAttr("user");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr("sellerId");
 		if (user == null || StrKit.isBlank(sellerId)) {
 			// TODO
@@ -91,12 +110,12 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		for (Record record : productlist) {
 			Map<String, String> productOptionMap = new HashMap<String, String>();
 
-			String productId = record.getStr("product_id");
+			String sellProductId = record.getStr("id");
 			String customName = record.getStr("custom_name");
 
-			productInfoMap.put(productId, record);
+			productInfoMap.put(sellProductId, record);
 
-			productOptionMap.put("id", productId);
+			productOptionMap.put("id", sellProductId);
 			productOptionMap.put("text", customName);
 
 			productOptionList.add(productOptionMap);
@@ -134,7 +153,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 	public void customerTypeById() {
 		String customerId = getPara("customerId");
-		User user = getSessionAttr("user");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
 		List<Record> customerTypeList = SalesOrderQuery.me().findCustomerTypeListByCustomerId(customerId,
 				DataAreaUtil.getUserDealerDataArea(user.getDataArea()));
@@ -147,13 +166,18 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 	public void save() {
 
 		Map<String, String[]> paraMap = getParaMap();
-		User user = getSessionAttr("user");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr("sellerId");
+		String sellerCode = getSessionAttr("sellerCode");
 
-		String orderSn = StrKit.getRandomUUID();
+		String orderId = StrKit.getRandomUUID();
 		Date date = new Date();
 
-		SalesOrderQuery.me().insert(paraMap, orderSn, sellerId, user.getId(), date, user.getDepartmentId(),
+		// 销售订单：SO + 100000(机构编号或企业编号6位) + A(客户类型) + 171108(时间) + 100001(流水号)
+		String orderSn = "SO" + sellerCode + StringUtils.getArrayFirst(paraMap.get("customerTypeCode"))
+				+ DateUtils.format("yyMMdd", date) + "100001";
+
+		SalesOrderQuery.me().insert(paraMap, orderId, orderSn, sellerId, user.getId(), date, user.getDepartmentId(),
 				user.getDataArea());
 
 		String productNumStr = StringUtils.getArrayFirst(paraMap.get("productNum"));
@@ -165,13 +189,63 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 			index++;
 			String productId = StringUtils.getArrayFirst(paraMap.get("productId" + index));
 			if (StrKit.notBlank(productId)) {
-				SalesOrderDetailQuery.me().insert(paraMap, orderSn, sellerId, user.getId(), date,
+				SalesOrderDetailQuery.me().insert(paraMap, orderId, sellerId, user.getId(), date,
 						user.getDepartmentId(), user.getDataArea(), index);
 
 				count++;
 			}
 
 		}
+
+		renderAjaxResultForSuccess();
+
+	}
+
+	@Before(Tx.class)
+	public void pass() {
+
+		String orderId = getPara("orderId");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String sellerId = getSessionAttr("sellerId");
+		String sellerCode = getSessionAttr("sellerCode");
+
+		Record order = SalesOrderQuery.me().findMoreById(orderId);
+		List<Record> orderDetailList = SalesOrderDetailQuery.me().findByOrderId(orderId);
+
+		String outstockId = StrKit.getRandomUUID();
+		Date date = new Date();
+
+		String warehouseId = "";
+		String outstockSn = "";
+		for (Record orderDetail : orderDetailList) {
+			if (!warehouseId.equals(orderDetail.getStr("warehouse_id"))) {
+
+				warehouseId = orderDetail.getStr("warehouse_id");
+
+				// 销售出库单：SS + 100000(机构编号或企业编号6位) + A(客户类型) + W(仓库编号) + 171108(时间) + 100001(流水号)
+				outstockSn = "SS" + sellerCode + "A" + orderDetail.getStr("warehouseCode")
+						+ DateUtils.format("yyMMdd", date) + "100001";
+
+				SalesOutstockQuery.me().insert(outstockId, outstockSn, warehouseId, sellerId, order, date);
+				SalesOrderJoinOutstockQuery.me().insert(orderId, outstockId);
+			}
+
+			SalesOutstockDetailQuery.me().insert(outstockId, orderDetail, date);
+		}
+
+		SalesOrderQuery.me().updateConfirm(orderId, 1000, user.getId(), date);// 已审核通过
+
+		renderAjaxResultForSuccess();
+
+	}
+
+	@Before(Tx.class)
+	public void reject() {
+
+		String orderId = getPara("orderId");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+
+		SalesOrderQuery.me().updateConfirm(orderId, 1001, user.getId(), new Date());// 已审核拒绝
 
 		renderAjaxResultForSuccess();
 

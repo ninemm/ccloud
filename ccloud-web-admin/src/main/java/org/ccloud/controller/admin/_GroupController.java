@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
@@ -104,7 +105,7 @@ public class _GroupController extends JBaseCRUDController<Group> {
             @Override
             public boolean run() throws SQLException {
                 Group group = getModel(Group.class);
-                User user = getSessionAttr("user");
+                User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
             	group.setDeptId(user.getDepartmentId());
             	group.setDataArea(getSessionAttr("DeptDataArea").toString());
 

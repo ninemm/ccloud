@@ -83,7 +83,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		if (sellerCustomer != null) {
 			setAttr("sellerCustomer", sellerCustomer);
 			
-			String customerTypeIds = sellerCustomer.getCustomerTypeIds();
+			//String customerTypeIds = sellerCustomer.getCustomerTypeIds();
 		}
 		
 		Map<String, String> deptIdAndDataArea = getDeptIdAndDataArea();

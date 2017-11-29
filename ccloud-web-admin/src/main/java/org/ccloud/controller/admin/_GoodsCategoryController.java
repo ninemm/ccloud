@@ -77,7 +77,9 @@ public class _GoodsCategoryController extends JBaseCRUDController<GoodsCategory>
 	public void save() {
 		
 		final GoodsCategory category = getModel(GoodsCategory.class);
-		category.setIsParent(0);
+		if (StringUtils.isBlank(category.getId())) {
+			category.setIsParent(0);
+		}
 		if (category.saveOrUpdate()) {
 			GoodsCategoryQuery.me().updateParent(category);
 			renderAjaxResultForSuccess("ok");
