@@ -17,7 +17,6 @@ package org.ccloud.model.query;
 
 import java.util.LinkedList;
 
-import org.ccloud.model.PayablesDetail;
 import org.ccloud.model.Payment;
 
 import com.jfinal.plugin.activerecord.Page;
