@@ -1,0 +1,242 @@
+<#include "_inc/_layout.html"/>
+<#macro css> </#macro>
+<#macro script>
+    $(function() {
+    $("#tab3").addClass("weui-bar__item--on").siblings().removeClass("weui-bar__item--on");
+    $("#region").select({
+    title: "选择客户区域",
+    items: ["全部", "默认-客户区域"]
+    });
+    $("#customer-type").select({
+    title: "选择客户类型",
+    items: ["全部", "商超"]
+    });
+    $("#if-order").select({
+    title: "是否下单",
+    items: ["全部", "是", "否"]
+    });
+    });
+
+</#macro>
+
+<@layout>
+<div class="weui-tab">
+    <div class="weui-tab__bd">
+        <div class="weui-tab__bd-item weui-tab__bd-item--active">
+            <header>
+                <div class="weui-search-bar" id="customerSearchBar">
+                    <form class="weui-search-bar__form">
+                        <div class="weui-search-bar__box">
+                            <i class="weui-icon-search"></i>
+                            <input type="search" class="weui-search-bar__input" id="customerSearchInput" placeholder="搜索" required="">
+                            <a href="javascript:" class="weui-icon-clear" id="customerSearchClear"></a>
+                        </div>
+                        <label class="weui-search-bar__label" id="customerSearchText">
+                            <i class="weui-icon-search"></i>
+                            <span>请输入客户名或联系人</span>
+                        </label>
+                    </form>
+                    <a href="javascript:" class="weui-search-bar__cancel-btn" id="customerSearchCancel">取消</a>
+                </div>
+            </header>
+            <article class="customer">
+                <header class="has-th-list">
+                    <div class="head-search">
+                        <div>
+                            <input type="text" id="region" value="客户区域" class="weui-input" readonly>
+                            <i class="icon-sort-desc"></i>
+                        </div>
+                        <div>
+                            <input type="text" id="customer-type" value="客户类型" class="weui-input" readonly>
+                            <i class="icon-sort-desc"></i>
+                        </div>
+                        <div>
+                            <input type="text" id="if-order" value="是否下单" class="weui-input" readonly>
+                            <i class="icon-sort-desc"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <i class="icon-th-list"></i>
+                    </div>
+                </header>
+                <article>
+                    <div class="weui-panel weui-panel_access">
+                        <div class="weui-flex">
+                            <div class="weui-flex__item customer-info">
+                                <p class="ft14">小张烤鱼</p>
+                                <p class="gray">小张/18611111111</p>
+                            </div>
+                            <div class="weui-flex__item customer-href">
+                                <div class="weui-flex">
+                                    <a class="weui-flex__item">
+                                        <p>
+                                            <i class="icon-phone green"></i>
+                                        </p>
+                                        <p>电话</p>
+                                    </a>
+                                    <a class="weui-flex__item" href="historyOrder.html">
+                                        <p>
+                                            <i class="icon-file-text-o blue"></i>
+                                        </p>
+                                        <p>订单</p>
+                                    </a>
+                                    <a class="weui-flex__item" href="visitAdd.html">
+                                        <p>
+                                            <i class="icon-paw" style="color:#ff9800"></i>
+                                        </p>
+                                        <p>拜访</p>
+                                    </a>
+                                    <a class="weui-flex__item relative" href="./customerDetail.html">
+                                        <i class="icon-chevron-right gray"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <hr />
+                        <div class="weui-flex space-between">
+                            <div class="button blue-button">下订单</div>
+                            <div class="button blue-button">客户拜访</div>
+                            <div class="button white-button">再来一单</div>
+                        </div>
+                        <p class="gray">
+                            <span class="icon-map-marker ft16 green"></span>
+                            湖北省 武汉市 江汉区 德盛街
+                        </p>
+                    </div>
+                    <div class="weui-panel weui-panel_access">
+                        <div class="weui-flex">
+                            <div class="weui-flex__item customer-info">
+                                <p class="ft14">小张烤鱼</p>
+                                <p class="gray">小张/18611111111</p>
+                            </div>
+                            <div class="weui-flex__item customer-href">
+                                <div class="weui-flex">
+                                    <a class="weui-flex__item" href="customer.html">
+                                        <p>
+                                            <i class="icon-phone green"></i>
+                                        </p>
+                                        <p>电话</p>
+                                    </a>
+                                    <a class="weui-flex__item">
+                                        <p>
+                                            <i class="icon-file-text-o blue"></i>
+                                        </p>
+                                        <p>订单</p>
+                                    </a>
+                                    <a class="weui-flex__item">
+                                        <p>
+                                            <i class="icon-paw" style="color:#ff9800"></i>
+                                        </p>
+                                        <p>拜访</p>
+                                    </a>
+                                    <a class="weui-flex__item relative">
+                                        <i class="icon-chevron-right gray"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <hr />
+                        <div class="weui-flex space-between">
+                            <div class="button blue-button">下订单</div>
+                            <div class="button blue-button">客户拜访</div>
+                            <div class="button white-button">再来一单</div>
+                        </div>
+                        <p class="gray">
+                            <span class="icon-map-marker ft16 green"></span>
+                            湖北省 武汉市 江汉区 德盛街
+                        </p>
+                    </div>
+                    <div class="weui-panel weui-panel_access">
+                        <div class="weui-flex">
+                            <div class="weui-flex__item customer-info">
+                                <p class="ft14">小张烤鱼</p>
+                                <p class="gray">小张/18611111111</p>
+                            </div>
+                            <div class="weui-flex__item customer-href">
+                                <div class="weui-flex">
+                                    <a class="weui-flex__item" href="customer.html">
+                                        <p>
+                                            <i class="icon-phone green"></i>
+                                        </p>
+                                        <p>电话</p>
+                                    </a>
+                                    <a class="weui-flex__item">
+                                        <p>
+                                            <i class="icon-file-text-o blue"></i>
+                                        </p>
+                                        <p>订单</p>
+                                    </a>
+                                    <a class="weui-flex__item">
+                                        <p>
+                                            <i class="icon-paw" style="color:#ff9800"></i>
+                                        </p>
+                                        <p>拜访</p>
+                                    </a>
+                                    <a class="weui-flex__item relative">
+                                        <i class="icon-chevron-right gray"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <hr />
+                        <div class="weui-flex space-between">
+                            <div class="button blue-button">下订单</div>
+                            <div class="button blue-button">客户拜访</div>
+                            <div class="button white-button">再来一单</div>
+                        </div>
+                        <p class="gray">
+                            <span class="icon-map-marker ft16 green"></span>
+                            湖北省 武汉市 江汉区 德盛街
+                        </p>
+                    </div>
+                    <div class="weui-panel weui-panel_access">
+                        <div class="weui-flex">
+                            <div class="weui-flex__item customer-info">
+                                <p class="ft14">小张烤鱼</p>
+                                <p class="gray">小张/18611111111</p>
+                            </div>
+                            <div class="weui-flex__item customer-href">
+                                <div class="weui-flex">
+                                    <a class="weui-flex__item" href="customer.html">
+                                        <p>
+                                            <i class="icon-phone green"></i>
+                                        </p>
+                                        <p>电话</p>
+                                    </a>
+                                    <a class="weui-flex__item">
+                                        <p>
+                                            <i class="icon-file-text-o blue"></i>
+                                        </p>
+                                        <p>订单</p>
+                                    </a>
+                                    <a class="weui-flex__item">
+                                        <p>
+                                            <i class="icon-paw" style="color:#ff9800"></i>
+                                        </p>
+                                        <p>拜访</p>
+                                    </a>
+                                    <a class="weui-flex__item relative">
+                                        <i class="icon-chevron-right gray"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <hr />
+                        <div class="weui-flex space-between">
+                            <div class="button blue-button">下订单</div>
+                            <div class="button blue-button">客户拜访</div>
+                            <div class="button white-button">再来一单</div>
+                        </div>
+                        <p class="gray">
+                            <span class="icon-map-marker ft16 green"></span>
+                            湖北省 武汉市 江汉区 德盛街
+                        </p>
+                    </div>
+                </article>
+            </article>
+        </div>
+    </div>
+    <#include "tabbar.html"/>
+</div>
+</@layout>
+

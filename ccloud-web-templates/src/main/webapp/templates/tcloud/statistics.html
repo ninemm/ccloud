@@ -1,0 +1,17 @@
+<#include "_inc/_layout.html"/>
+<#macro css> </#macro>
+<#macro script>
+    $(function() {
+    $("#tab4").addClass("weui-bar__item--on").siblings().removeClass("weui-bar__item--on");
+    });
+</#macro>
+
+<@layout>
+<div class="weui-tab">
+    <div class="weui-tab__bd">
+        <div class="weui-tab__bd-item weui-tab__bd-item--active">
+        </div>
+    </div>
+    <#include "tabbar.html"/>
+</div>
+</@layout>

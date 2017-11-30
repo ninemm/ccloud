@@ -15,8 +15,13 @@
  */
 package org.ccloud.controller.admin;
 
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Map;
 
+import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.route.RouterMapping;
@@ -25,6 +30,7 @@ import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Payables;
 import org.ccloud.model.PayablesDetail;
 import org.ccloud.model.Payment;
+import org.ccloud.model.User;
 import org.ccloud.model.query.PayablesDetailQuery;
 import org.ccloud.model.query.PayablesQuery;
 import org.ccloud.model.query.PaymentQuery;
@@ -47,35 +53,146 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 	}
 	
 	public void list() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
         String keyword = getPara("k");
         if (StrKit.notBlank(keyword)) {
             keyword = StringUtils.urlDecode(keyword);
             setAttr("k", keyword);
         }
-        Page<Payables> page = PayablesQuery.me().paginate(getPageNumber(), getPageSize(),keyword,  "id");
+        String customerType = getPara("customerType");
+        if (StrKit.notBlank(customerType)) {
+        	customerType = StringUtils.urlDecode(customerType);
+            setAttr("customerType", customerType);
+        }
+        Page<Payables> page = PayablesQuery.me().paginate(getPageNumber(), getPageSize(),keyword,customerType,user.getDepartmentId(),  "id");
         Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);
 	}
 	
 	public void payableInfo() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String objId = getPara("objId");
         if (StrKit.notBlank(objId)) {
         	objId = StringUtils.urlDecode(objId);
             setAttr("objId", objId);
         }
-        Page<PayablesDetail> page = PayablesDetailQuery.me().findByObjId(getPageNumber(), getPageSize(),objId,  "id");
+        Page<PayablesDetail> page = PayablesDetailQuery.me().findByObjId(getPageNumber(), getPageSize(),objId,user.getDepartmentId(),  "id");
         Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);
 	}
 	
 	public void payment() {
-		String detail_id = getPara("detail_id");
-        if (StrKit.notBlank(detail_id)) {
-        	detail_id = StringUtils.urlDecode(detail_id);
-            setAttr("objId", detail_id);
+		String detailId = getPara("detail_id");
+        if (StrKit.notBlank(detailId)) {
+        	detailId = StringUtils.urlDecode(detailId);
+            setAttr("detailId", detailId);
         }
-        Page<Payment> page = PaymentQuery.me().findByDetailId(getPageNumber(), getPageSize(),detail_id, "id");
+        Page<Payment> page = PaymentQuery.me().findByDetailId(getPageNumber(), getPageSize(),detailId, "id");
         Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);
+	}
+	
+	public void savePayables() throws ParseException {
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String objId = getPara("objId");
+		String deptId = getPara("deptId");
+		Payables payables = PayablesQuery.me().findByObjId(objId, deptId);
+		if(payables==null) {
+			payables = getModel(Payables.class);
+			String payablesId = payables.getId();
+			payables.setObjId(objId);
+			payables.setObjType(getPara("objType"));
+			payables.setPayAmount(new BigDecimal("0.00"));
+			payables.setActAmount(new BigDecimal("0.00"));
+			payables.setBalanceAmount(new BigDecimal("0.00"));
+			payables.setDeptId(deptId);
+			payables.setDataArea(getPara("DataArea"));
+			payables.setCreateDate(sdf.parse(getPara("createDate")));
+			payables.setModifyDate(sdf.parse(getPara("modifyDate")));
+			if(StrKit.isBlank(payablesId)) {
+				payablesId = StrKit.getRandomUUID();
+			}
+			payables.setId(payablesId);
+			payables.save();
+			renderAjaxResultForSuccess();
+		}else {
+			renderAjaxResultForError("创建失败，汇总记录重复.");
+		}
+	}
+	
+	public void savePayablesDetail() throws ParseException {
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		final PayablesDetail payablesDetail = getModel(PayablesDetail.class);
+		String objId = getPara("objId");
+		String deptId = getPara("deptId");
+		Payables payables = PayablesQuery.me().findByObjId(objId, deptId);
+		if(payables!=null) {
+			String detailId = payablesDetail.getId();
+			payablesDetail.setObjectId(getPara("objId"));
+			payablesDetail.setObjectType(getPara("objType"));
+			payablesDetail.setPayAmount(new BigDecimal(getPara("payAmount")));
+			payablesDetail.setActAmount(new BigDecimal(getPara("actAmount")));
+			payablesDetail.setBalanceAmount(new BigDecimal(getPara("balanceAmount")));
+			payablesDetail.setRefSn(getPara("refSn"));
+			payablesDetail.setRefType(getPara("refType"));
+			payablesDetail.setDeptId(getPara("deptId"));
+			payablesDetail.setDataArea(getPara("DataArea"));
+			payablesDetail.setModifyDate(sdf.parse(getPara("modifyDate")));
+			payablesDetail.setCreateDate(sdf.parse(getPara("createDate")));
+			if(StrKit.isBlank(detailId)) {
+				detailId = StrKit.getRandomUUID();
+			}
+			payablesDetail.setId(detailId);
+			payablesDetail.save();
+			payables.setPayAmount(payables.getPayAmount().add(new BigDecimal(getPara("payAmount"))));
+			payables.setActAmount(payables.getActAmount().add(new BigDecimal(getPara("actAmount"))));
+			payables.setBalanceAmount(payables.getBalanceAmount().add(new BigDecimal(getPara("balanceAmount"))));
+			payables.setModifyDate(sdf.parse(getPara("modifyDate")));
+			payables.update();
+			renderAjaxResultForSuccess();
+		}else {
+			renderAjaxResultForError("未找到本次交易单位应付账款汇总数据.");
+		}
+
+	}
+	
+	public void savePayment() throws ParseException {
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String objId = getPara("objId");
+		String deptId = getPara("deptId");
+		String refSn = getPara("refSn");
+		PayablesDetail payablesDetail = PayablesDetailQuery.me().findByObjId(objId, deptId,refSn);
+		Payables payables = PayablesQuery.me().findByObjId(objId, deptId);
+		final Payment payment = getModel(Payment.class);
+		if(payablesDetail!=null) {
+			String paymentId = payment.getId();
+			payment.setPayablesDetailId(payablesDetail.getId());
+			payment.setActAmount(new BigDecimal(getPara("actAmount")));
+			payment.setBizDate(sdf.parse(getPara("bizDate")));
+			payment.setRefSn(refSn);
+			payment.setRefType(getPara("refType"));
+			payment.setInputUserId(getPara("inputUserId"));
+			payment.setPayUserId(getPara("payUserId"));
+			payment.setRemark(getPara("remark"));
+			payment.setDataArea(getPara("dataArea"));
+			payment.setDeptId(deptId);
+			payment.setCreateDate(sdf.parse(getPara("createDate")));
+			payment.setModifyDate(sdf.parse(getPara("modifyDate")));
+			if(StrKit.isBlank(paymentId)) {
+				paymentId = StrKit.getRandomUUID();
+			}
+			payment.save();
+			payablesDetail.setActAmount(payablesDetail.getActAmount().add(new BigDecimal(getPara("actAmount"))));
+			payablesDetail.setBalanceAmount(payablesDetail.getBalanceAmount().subtract(new BigDecimal(getPara("actAmount"))));
+			payablesDetail.setModifyDate(sdf.parse(getPara("modifyDate")));
+			payablesDetail.update();
+			payables.setActAmount(payables.getActAmount().add(new BigDecimal(getPara("actAmount"))));
+			payables.setBalanceAmount(payables.getBalanceAmount().subtract(new BigDecimal(getPara("actAmount"))));
+			payables.setModifyDate(sdf.parse(getPara("modifyDate")));
+			payables.update();
+			renderAjaxResultForSuccess();
+		}else {
+			renderAjaxResultForError("未找到本次单号的记录.");
+		}
 	}
 }

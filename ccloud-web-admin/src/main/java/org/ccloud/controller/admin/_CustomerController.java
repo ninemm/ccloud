@@ -92,12 +92,12 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 			keyword = StringUtils.urlDecode(keyword);
 		}
 
-		Map<String, String> deptIdAndDataArea = this.getDeptIdAndDataArea();
-		String deptId = deptIdAndDataArea.get("deptId");
-		String dataArea = deptIdAndDataArea.get("dataArea");
+
+		String deptId = "";//当加上部门筛选条件时
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
 		Page<Record> page = CustomerQuery.me().paginate(getPageNumber(), getPageSize(), keyword, paraMap, deptId,
-				dataArea);
+				selectDataArea);
 		List<Record> customerList = page.getList();
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", customerList);
@@ -127,9 +127,8 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/all");
 		boolean isDealerAdmin = SecurityUtils.getSubject().isPermitted("/admin/dealer/all");
 
-		Map<String, String> deptIdAndDataArea = this.getDeptIdAndDataArea();
-		String deptId = deptIdAndDataArea.get("deptId");
-		String dataArea = deptIdAndDataArea.get("dataArea");
+		String deptId = "";
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);;
 
 		StringBuilder cUserIds = new StringBuilder();
 		StringBuilder cUserNames = new StringBuilder();
@@ -137,10 +136,10 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 		if (StrKit.notBlank(id)) {// 超级管理员修改
 			setAttr("customer", CustomerQuery.me().findById(id));
 			setAttr("cTypeList", CustomerJoinCustomerTypeQuery.me().findCustomerTypeListByCustomerId(id,
-					DataAreaUtil.getUserDealerDataArea(dataArea)));
+					DataAreaUtil.getUserDealerDataArea(selectDataArea)));
 
 			if (isSuperAdmin || isDealerAdmin) {
-				List<Record> list = UserJoinCustomerQuery.me().findUserListByCustomerId(id, deptId, dataArea);
+				List<Record> list = UserJoinCustomerQuery.me().findUserListByCustomerId(id, deptId, selectDataArea);
 				for (Record record : list) {
 					if (cUserIds.length() != 0 || cUserIds.length() != 0) {
 						cUserIds.append(",");
@@ -158,7 +157,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 
 		if (!isSuperAdmin) {
 			setAttr("customerTypeList",
-					CustomerTypeQuery.me().findCustomerTypeList(DataAreaUtil.getUserDealerDataArea(dataArea)));
+					CustomerTypeQuery.me().findCustomerTypeList(DataAreaUtil.getUserDealerDataArea(selectDataArea)));
 		}
 
 		render("edit.html");
@@ -210,7 +209,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 			}
 
 			if (addUserFlg) {
-				childList = addUser(dept.getId(), childList);
+				childList = addDeptUser(dept.getId(), childList);
 			}
 
 			map.put("nodes", childList);
@@ -220,7 +219,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 		return resTreeList;
 	}
 
-	private List<Map<String, Object>> addUser(String deptId, List<Map<String, Object>> childList) {
+	private List<Map<String, Object>> addDeptUser(String deptId, List<Map<String, Object>> childList) {
 		List<User> list = UserQuery.me().findByDeptId(deptId);
 		for (User user : list) {
 			Map<String, Object> map = new HashMap<String, Object>();

@@ -87,14 +87,13 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			//String customerTypeIds = sellerCustomer.getCustomerTypeIds();
 		}
 		
-		Map<String, String> deptIdAndDataArea = getDeptIdAndDataArea();
-		String deptId = deptIdAndDataArea.get("deptId");
-		String dataArea = deptIdAndDataArea.get("dataArea");
+		String deptId = "";
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		
 		CustomerJoinCustomerTypeQuery.me().findCustomerTypeListByCustomerId(id, 
-				DataAreaUtil.getUserDealerDataArea(dataArea));
+				DataAreaUtil.getUserDealerDataArea(selectDataArea));
 	
-		List<Record> list = UserJoinCustomerQuery.me().findUserListByCustomerId(id, deptId, dataArea);
+		List<Record> list = UserJoinCustomerQuery.me().findUserListByCustomerId(id, deptId, selectDataArea);
 		
 		int length = list.size();
 		String[] userIds = new String[length];
@@ -108,7 +107,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		setAttr("userIds", StrKit.join(userIds, ","));
 		setAttr("realnames", StrKit.join(realnames, ","));
 		
-		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea("");
+		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(DataAreaUtil.getUserDealerDataArea(selectDataArea));
 		setAttr("customerTypeList", customerTypeList);
 		
 	}

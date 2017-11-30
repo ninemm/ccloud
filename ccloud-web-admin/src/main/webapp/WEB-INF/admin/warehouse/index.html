@@ -52,7 +52,13 @@
       			{field: "deptName", title: "所属部门", align: "center", width: '10%', edit:false},
       			{field: "contact", title: "联系人", align: "center", width: '10%', edit:false},
    				{field: "phone", title: "联系电话", align: "center", width: '10%', edit:false},
-				{field: "is_inited", title: "是否初始化", align: "center", width: '10%', edit:false},
+				{field: "is_inited", title: "是否初始化", align: "center", width: '10%', 
+				formatter: function(value, row, rowIndex) {
+   						if (value == 1) return '是';
+   						else return '否';
+   					},
+   					edit: false
+				},
    				{field: "is_enabled", title: "是否启用", align: "center", width: '10%',
    					formatter: function(value, row, rowIndex) {
    						if (value == 1) return '是';
@@ -64,7 +70,7 @@
 				formatter: function(value, row, rowIndex) {
 					var url = '${CPATH}/admin/warehouse/edit?id=' + row.id + '&c=${c}&p=${p}';
 					var strHtml = '<a href="' + url + '" class="btn btn-sm" title="编辑"><i class="fa fa-edit"></i></a> <a href="javascript:void(0);" class="btn btn-sm" onclick="del(\''+row.id+'\')" title="删除"><i class="fa fa-trash-o"></i></a>';
-					if(row.is_enable == 1){
+					if(row.is_enabled == 1){
 						strHtml = strHtml + '<a href="javascript:void(0);" class="btn btn-sm" onclick="enable(\''+row.id+'\'' + ',0' + ')" title="停用"><i class="fa fa-ban"></i></a>';
 					} else {
 						strHtml = strHtml + '<a href="javascript:void(0);" class="btn btn-sm" onclick="enable(\''+row.id+'\'' + ',1' + ')" title="启用"><i class="fa fa-check-circle-o"></i></a>';

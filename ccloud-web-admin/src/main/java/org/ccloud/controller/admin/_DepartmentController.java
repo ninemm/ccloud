@@ -54,10 +54,9 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 	
 	@Override
 	public void index() {
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String dataArea = DataAreaUtil.getUserDeptDataArea(user.getDataArea());
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		List<Map<String, Object>> list = DepartmentQuery.me().findDeptListAsTree(1, dataArea);
-		setAttr("treeData", JSON.toJSON(list));		
+		setAttr("treeData", JSON.toJSON(list));
 		render("index.html");
 	}
 	
