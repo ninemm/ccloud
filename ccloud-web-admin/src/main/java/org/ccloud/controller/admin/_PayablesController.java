@@ -18,9 +18,7 @@ package org.ccloud.controller.admin;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 import org.ccloud.Consts;
@@ -68,7 +66,7 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
         	customerType = StringUtils.urlDecode(customerType);
             setAttr("customerType", customerType);
         }
-        Page<Payables> page = PayablesQuery.me().paginate(getPageNumber(), getPageSize(),keyword,customerType,user.getDepartmentId(),  "create_date");
+        Page<Payables> page = PayablesQuery.me().paginate(getPageNumber(), getPageSize(),keyword,customerType,user.getDepartmentId(),user.getDataArea(),  "create_date");
         Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);
 	}
@@ -80,18 +78,19 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
         	objId = StringUtils.urlDecode(objId);
             setAttr("objId", objId);
         }
-        Page<PayablesDetail> page = PayablesDetailQuery.me().findByObjId(getPageNumber(), getPageSize(),objId,user.getDepartmentId(),  "create_date");
+        Page<PayablesDetail> page = PayablesDetailQuery.me().findByObjId(getPageNumber(), getPageSize(),objId,user.getDepartmentId(),user.getDataArea(),  "create_date");
         Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);
 	}
 	
 	public void payment() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String detailId = getPara("detail_id");
         if (StrKit.notBlank(detailId)) {
         	detailId = StringUtils.urlDecode(detailId);
             setAttr("detailId", detailId);
         }
-        Page<Payment> page = PaymentQuery.me().findByDetailId(getPageNumber(), getPageSize(),detailId, "id");
+        Page<Payment> page = PaymentQuery.me().findByDetailId(getPageNumber(), getPageSize(),detailId,user.getDataArea(), "id");
         Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);
 	}
@@ -138,22 +137,22 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		Payables payables = PayablesQuery.me().findByObjId(objId, deptId);
 		if(payables!=null) {
 			String detailId = StrKit.getRandomUUID();
-			payablesDetail.setId(detailId);
-			payablesDetail.setObjectId(getPara("objId"));
-			payablesDetail.setObjectType(getPara("objType"));
-			payablesDetail.setPayAmount(new BigDecimal(getPara("payAmount")));
-			payablesDetail.setActAmount(new BigDecimal(getPara("actAmount")));
-			payablesDetail.setBalanceAmount(new BigDecimal(getPara("balanceAmount")));
-			payablesDetail.setRefSn(getPara("refSn"));
-			payablesDetail.setRefType(getPara("refType"));
-			payablesDetail.setDeptId(deptId);
-			payablesDetail.setDataArea(user.getDataArea());
-			payablesDetail.setModifyDate(date);
-			payablesDetail.setCreateDate(date);
+			payablesDetail.set("id", detailId);
+			payablesDetail.set("object_id", getPara("objId"));
+			payablesDetail.set("object_type", getPara("objType"));
+			payablesDetail.set("pay_amount", new BigDecimal(getPara("payAmount")));
+			payablesDetail.set("act_amount", new BigDecimal(getPara("actAmount")));
+			payablesDetail.set("balance_amount", new BigDecimal(getPara("balanceAmount")));
+			payablesDetail.set("ref_sn", getPara("refSn"));
+			payablesDetail.set("ref_type", getPara("refType"));
+			payablesDetail.set("dept_id", deptId);
+			payablesDetail.set("data_area", user.getDataArea());
+			payablesDetail.set("create_date", date);
+			payablesDetail.set("modify_date", date);
 			payablesDetail.save();
-			payables.setPayAmount(payables.getPayAmount().add(new BigDecimal(getPara("payAmount"))));
-			payables.setActAmount(payables.getActAmount().add(new BigDecimal(getPara("actAmount"))));
-			payables.setBalanceAmount(payables.getBalanceAmount().add(new BigDecimal(getPara("balanceAmount"))));
+			payables.set("pay_amount", payables.getPayAmount().add(new BigDecimal(getPara("payAmount"))));
+			payables.set("act_amount", payables.getActAmount().add(new BigDecimal(getPara("actAmount"))));
+			payables.set("balance_amount", payables.getBalanceAmount().add(new BigDecimal(getPara("balanceAmount"))));
 			payables.setModifyDate(date);
 			payables.update();
 			renderAjaxResultForSuccess();
@@ -173,27 +172,27 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		final Payment payment = getModel(Payment.class);
 		if(payablesDetail!=null) {
 			String paymentId = StrKit.getRandomUUID();
-			payment.setId(paymentId);
-			payment.setPayablesDetailId(payablesDetail.getId());
-			payment.setActAmount(new BigDecimal(getPara("actAmount")));
-			payment.setBizDate(date);
-			payment.setRefSn(refSn);
-			payment.setRefType(getPara("refType"));
-			payment.setInputUserId(getPara("inputUserId"));
-			payment.setPayUserId(getPara("payUserId"));
-			payment.setRemark(getPara("remark"));
-			payment.setDataArea(user.getDataArea());
-			payment.setDeptId(user.getDepartmentId());
-			payment.setCreateDate(date);
-			payment.setModifyDate(date);
+			payment.set("id", paymentId);
+			payment.set("payables_detail_id", payablesDetail.getId());
+			payment.set("act_amount", new BigDecimal(getPara("actAmount")));
+			payment.set("biz_date", date);
+			payment.set("ref_sn", refSn);
+			payment.set("ref_type", getPara("refType"));
+			payment.set("input_user_id", user.getId());
+			payment.set("pay_user_id", getPara("payUserId"));
+			payment.set("remark", getPara("remark"));
+			payment.set("data_area", user.getDataArea());
+			payment.set("dept_id", user.getDepartmentId());
+			payment.set("create_date", date);
+			payment.set("modify_date", date);
 			payment.save();
-			payablesDetail.setActAmount(payablesDetail.getActAmount().add(new BigDecimal(getPara("actAmount"))));
-			payablesDetail.setBalanceAmount(payablesDetail.getBalanceAmount().subtract(new BigDecimal(getPara("actAmount"))));
-			payablesDetail.setModifyDate(date);
+			payablesDetail.set("act_amount", payablesDetail.getActAmount().add(new BigDecimal(getPara("actAmount"))));
+			payablesDetail.set("balance_amount", payablesDetail.getBalanceAmount().subtract(new BigDecimal(getPara("actAmount"))));
+			payablesDetail.set("modify_date", date);
 			payablesDetail.update();
-			payables.setActAmount(payables.getActAmount().add(new BigDecimal(getPara("actAmount"))));
-			payables.setBalanceAmount(payables.getBalanceAmount().subtract(new BigDecimal(getPara("actAmount"))));
-			payables.setModifyDate(date);
+			payables.set("act_amount", payables.getActAmount().add(new BigDecimal(getPara("actAmount"))));
+			payables.set("balance_amount", payables.getBalanceAmount().subtract(new BigDecimal(getPara("actAmount"))));
+			payables.set("modify_date", date);
 			payables.update();
 			renderAjaxResultForSuccess();
 		}else {

@@ -47,18 +47,21 @@ public class PayablesQuery extends JBaseQuery {
 		return DAO.findFirst(select);
 	}
 	
-	public Page<Payables> paginate(int pageNumber, int pageSize,String keyword,String cutomerType,String deptId, String orderby) {
+	public Page<Payables> paginate(int pageNumber, int pageSize,String keyword,String cutomerType,String deptId,String dataArea, String orderby) {
 		String select = "";
+		boolean needWhere = true;
 		StringBuilder fromBuilder = new StringBuilder("");
 		LinkedList<Object> params = new LinkedList<Object>();
 		if(cutomerType.equals("supplier")) {
 			select = "select cc_p.*,cc_s.`name` customer_name,'供应商' customer_type ";
 			fromBuilder.append(" from cc_payables cc_p inner join cc_supplier cc_s on cc_p.obj_id = cc_s.id where cc_p.obj_type = 'supplier' and cc_p.dept_id ='"+deptId+"' ");
-			appendIfNotEmptyWithLike(fromBuilder, "cc_s.`name`", keyword, params, true);
+			needWhere = appendIfNotEmptyWithLike(fromBuilder,"cc_p.data_area",dataArea,params,needWhere);
+			needWhere = appendIfNotEmptyWithLike(fromBuilder, "cc_s.`name`", keyword, params, needWhere);
 		}else {
 			select = "select cc_p.*,cc_c.customer_name customer_name,if(cc_c.customer_kind>1,'直营商','普通客户') customer_type ";
 			fromBuilder.append(" from cc_payables cc_p inner join cc_customer cc_c on cc_p.obj_id = cc_c.id where cc_p.obj_type = 'customer' and cc_p.dept_id ='"+deptId+"' ");
-			appendIfNotEmptyWithLike(fromBuilder, "cc_c.customer_name", keyword, params, true);
+			needWhere = appendIfNotEmptyWithLike(fromBuilder, "cc_p.data_area", dataArea, params, needWhere);
+			needWhere = appendIfNotEmptyWithLike(fromBuilder, "cc_c.customer_name", keyword, params, needWhere);
 		}
 		fromBuilder.append("order by " + orderby);
 		if (params.isEmpty())

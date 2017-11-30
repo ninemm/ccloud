@@ -42,12 +42,13 @@ public class PaymentQuery extends JBaseQuery {
 			}
 		});
 	}
-	public Page<Payment> findByDetailId(int pageNumber, int pageSize,String detailId, String orderby) {
+	public Page<Payment> findByDetailId(int pageNumber, int pageSize,String detailId,String dataArea, String orderby) {
 		String select = "select cc_p.*,u.realname ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_payment` cc_p left join user u on cc_p.pay_user_id = u.id ");
-		fromBuilder.append("where payables_detail_id = '"+detailId+"'");
+		fromBuilder.append("where payables_detail_id = '"+detailId+"' ");
 		LinkedList<Object> params = new LinkedList<Object>();
-		
+		appendIfNotEmptyWithLike(fromBuilder, "cc_p.data_area", dataArea, params, true);
+		fromBuilder.append("order by " + orderby);
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
