@@ -209,7 +209,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 			}
 
 			if (addUserFlg) {
-				childList = addUser(dept.getId(), childList);
+				childList = addDeptUser(dept.getId(), childList);
 			}
 
 			map.put("nodes", childList);
@@ -219,7 +219,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 		return resTreeList;
 	}
 
-	private List<Map<String, Object>> addUser(String deptId, List<Map<String, Object>> childList) {
+	private List<Map<String, Object>> addDeptUser(String deptId, List<Map<String, Object>> childList) {
 		List<User> list = UserQuery.me().findByDeptId(deptId);
 		for (User user : list) {
 			Map<String, Object> map = new HashMap<String, Object>();
