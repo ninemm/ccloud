@@ -135,20 +135,20 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 
 		if (StrKit.notBlank(id)) {// 超级管理员修改
 			setAttr("customer", CustomerQuery.me().findById(id));
-			setAttr("cTypeList", CustomerJoinCustomerTypeQuery.me().findCustomerTypeListByCustomerId(id,
-					DataAreaUtil.getUserDealerDataArea(selectDataArea)));
+//			setAttr("cTypeList", CustomerJoinCustomerTypeQuery.me().findCustomerTypeListByCustomerId(id,
+//					DataAreaUtil.getUserDealerDataArea(selectDataArea)));
 
 			if (isSuperAdmin || isDealerAdmin) {
-				List<Record> list = UserJoinCustomerQuery.me().findUserListByCustomerId(id, deptId, selectDataArea);
-				for (Record record : list) {
-					if (cUserIds.length() != 0 || cUserIds.length() != 0) {
-						cUserIds.append(",");
-						cUserNames.append(",");
-					}
-					cUserIds.append(record.get("user_id"));
-					cUserNames.append(record.get("realname"));
-
-				}
+//				List<Record> list = UserJoinCustomerQuery.me().findUserListByCustomerId(id, deptId, selectDataArea);
+//				for (Record record : list) {
+//					if (cUserIds.length() != 0 || cUserIds.length() != 0) {
+//						cUserIds.append(",");
+//						cUserNames.append(",");
+//					}
+//					cUserIds.append(record.get("user_id"));
+//					cUserNames.append(record.get("realname"));
+//
+//				}
 				setAttr("cUserIds", cUserIds);
 				setAttr("cUserNames", cUserNames);
 			}
@@ -259,8 +259,8 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 			userIds = user.getId();
 		}
 
-		CustomerJoinCustomerTypeQuery.me().deleteByCustomerId(customerId);
-		UserJoinCustomerQuery.me().deleteByCustomerId(customerId);
+//		CustomerJoinCustomerTypeQuery.me().deleteByCustomerId(customerId);
+//		UserJoinCustomerQuery.me().deleteByCustomerId(customerId);
 
 		if (StrKit.isBlank(customerId)) {
 			customerId = StrKit.getRandomUUID();
@@ -302,12 +302,6 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 			MessageKit.sendMessage(Actions.NotifyMessage.CUSTOMER_AUDIT_MESSAGE, kv);
 			
 		}
-
-		for (String customerType : customerTypes) {
-			CustomerJoinCustomerTypeQuery.me().insert(customerId, customerType);
-		}
-
-		this.insertUserJoinCustomer(customerId, userIds);
 
 		renderAjaxResultForSuccess();
 
@@ -384,7 +378,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 		for (String typeName : customerTypeNames) {
 			String id = CustomerTypeQuery.me().findIdByName(typeName,
 					DataAreaUtil.getUserDealerDataArea(user.getDataArea()));
-			CustomerJoinCustomerTypeQuery.me().insert(customerId, id);
+			//CustomerJoinCustomerTypeQuery.me().insert(customerId, id);
 		}
 	}
 
@@ -459,7 +453,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 		String[] customerIds = getParaValues("dataItem");
 		String[] userIds = getParaValues("userIds");
 		for (String customerId : customerIds) {
-			UserJoinCustomerQuery.me().deleteByCustomerId(customerId);
+			//UserJoinCustomerQuery.me().deleteByCustomerId(customerId);
 			for (String userId : userIds)
 				this.insertUserJoinCustomer(customerId, userId);
 		}

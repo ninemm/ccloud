@@ -90,12 +90,12 @@ public abstract class BaseCustomerJoinCustomerType<M extends BaseCustomerJoinCus
 		return update;
 	}
 
-	public void setCustomerId(java.lang.String customerId) {
-		set("customer_id", customerId);
+	public void setSellerCustomerId(java.lang.String sellerCustomerId) {
+		set("seller_customer_id", sellerCustomerId);
 	}
 
-	public java.lang.String getCustomerId() {
-		return get("customer_id");
+	public java.lang.String getSellerCustomerId() {
+		return get("seller_customer_id");
 	}
 
 	public void setCustomerTypeId(java.lang.String customerTypeId) {
