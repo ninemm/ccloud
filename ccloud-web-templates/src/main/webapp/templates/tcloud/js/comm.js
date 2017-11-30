@@ -79,9 +79,6 @@ function closePop() {
   setTimeout(function () {
     $(".pop-input").remove();
     $(".layer").removeClass("layer-pop-show");
-    $(".weui-footer").show();
-    $(".hidden-menu").show();
-    $(".weui-tabbar").show();
   }, 300);
 }
 
@@ -92,7 +89,6 @@ function confirmInput() {
 
 $(function () {
   FastClick.attach(document.body);
-  console.log(33)
   $(document).on("touchstart", "#button", function () {
     if (finished) {
       if (!open) {
@@ -112,13 +108,13 @@ $(function () {
     closePop();
   }).on("touchstart", "#confirm-input", function () {
     confirmInput();
-  }).on("focus", "input, textarea", function () {
-    $(".weui-footer").hide();
-    $(".hidden-menu").hide();
-    $(".weui-tabbar").hide();
-  }).on("blur", "input, textarea", function () {
-    $(".weui-footer").show();
-    $(".hidden-menu").show();
-    $(".weui-tabbar").show();
+  }).on("touchstart", ".operate:first-child", function() {
+    var $input = $(this).next();
+    $input.val(Number($input.val())-1);
+  }).on("touchstart", ".operate:last-child", function() {
+    var $input = $(this).prev();
+    $input.val(Number($input.val())+1);
+  }).on("change", "input[name=add-gift]", function () {
+    $(this).parent().next().slideToggle("fast");
   });
 })

@@ -2,101 +2,107 @@
 <#macro css> </#macro> 
 <#macro script>
 	$(function() {
-	    $("#region").select({
-	       title: "选择客户区域",
-	       items: ["全部", "总部-默认区域"]
-	    });
-	    $("#customer-type").select({
-	       title: "选择客户类型",
-	       items: ["全部", "商超"]
-	    });
-	    $("#if-order").select({
-	       title: "是否下单",
-	       items: ["全部", "是", "否"]
-	    });
-	    $(document).on("touchstart", "a[name=placeOrder]", function() {
-	       $(".weui-tabbar a:eq(1)").trigger("click");
-	    })
+	$("#tab1").addClass("weui-bar__item--on").siblings().removeClass("weui-bar__item--on");
 	});
-
 </#macro> 
 
 
 <@layout>
 <div class="weui-tab">
-	<div class="weui-tab__bd" style="padding-bottom: 50px;">
+	<div class="weui-tab__bd">
 		<div id="tab1" class="weui-tab__bd-item weui-tab__bd-item--active">
 			<article id="home">
 				<div>
 					<div class="weui-cells__title">
 						<div class="weui-flex">
-							<div class="weui-flex__item" style="color: #ff9800">
+							<div class="weui-flex__item" style="color:#ff9800">
 								<b>快捷入口</b>
 							</div>
 							<div class="weui-flex__item t-r">
 								<b>国庆</b>
 							</div>
-							<div class="weui-flex__item t-r" style="flex-grow: 2;">2017-10-18
-								星期五</div>
+							<div class="weui-flex__item t-r" style="flex-grow:2;">2017-10-18 星期五</div>
 						</div>
 					</div>
 					<div class="weui-grids">
-						<a class="weui-grid js_grid" name="placeOrder"> <span
-							class="weui-badge empty-badge">&nbsp;</span>
+						<a class="weui-grid js_grid" name="placeOrder">
+							<span class="weui-badge empty-badge">&nbsp;</span>
 							<div class="weui-grid__icon">
 								<i class="icon-file-text blue"></i>
 							</div>
-							<p class="weui-grid__label">下订单</p>
-						</a> <a href="visitAdd.html" class="weui-grid js_grid">
+							<p class="weui-grid__label">
+								下订单
+							</p>
+						</a>
+						<a href="visitAdd.html" class="weui-grid js_grid">
 							<div class="weui-grid__icon">
-								<i class="icon-plane" style="color: #ffa042"></i>
+								<i class="icon-plane" style="color:#ffa042"></i>
 							</div>
-							<p class="weui-grid__label">新增拜访</p>
-						</a> <a href="" class="weui-grid js_grid">
+							<p class="weui-grid__label">
+								新增拜访
+							</p>
+						</a>
+						<a href="" class="weui-grid js_grid">
 							<div class="weui-grid__icon">
-								<i class="icon-tasks" style="color: #19c594;"></i>
+								<i class="icon-tasks" style="color:#19c594;"></i>
 							</div>
-							<p class="weui-grid__label">活动申请</p>
-						</a> <a href="customerAdd.html" class="weui-grid js_grid"> <span
-							class="weui-badge left-top-tag">NEW</span>
+							<p class="weui-grid__label">
+								活动申请
+							</p>
+						</a>
+						<a href="customerAdd.html" class="weui-grid js_grid">
+							<span class="weui-badge left-top-tag">NEW</span>
 							<div class="weui-grid__icon">
-								<i class="icon-user-plus" style="color: #f1745e"></i>
+								<i class="icon-user-plus" style="color:#f1745e"></i>
 							</div>
-							<p class="weui-grid__label">新增客户</p>
+							<p class="weui-grid__label">
+								新增客户
+							</p>
 						</a>
 					</div>
 				</div>
 				<div>
-					<div class="weui-cells__title" style="color: #ff9800">
+					<div class="weui-cells__title" style="color:#ff9800">
 						<b>我的待办</b>
 					</div>
 					<div class="weui-grids">
-						<a href="customerAudit.html" class="weui-grid js_grid"> <span
-							class="weui-badge empty-badge">&nbsp;</span>
+						<a href="customerAudit.html" class="weui-grid js_grid">
+							<span class="weui-badge empty-badge">&nbsp;</span>
 							<div class="weui-grid__icon">
-								<i class="icon-user" style="color: #9c89b9"></i>
+								<i class="icon-user" style="color:#9c89b9"></i>
 							</div>
-							<p class="weui-grid__label">客户审核</p>
-						</a> <a href="feeAuditList.html" class="weui-grid js_grid"> <span
-							class="weui-badge empty-badge">&nbsp;</span>
+							<p class="weui-grid__label">
+								客户审核
+							</p>
+						</a>
+						<a href="feeAuditList.html" class="weui-grid js_grid">
+							<span class="weui-badge empty-badge">&nbsp;</span>
 							<div class="weui-grid__icon">
-								<i class="icon-check-square-o" style="color: #19c594"></i>
+								<i class="icon-check-square-o" style="color:#19c594"></i>
 							</div>
-							<p class="weui-grid__label">费用审核</p>
-						</a> <a href="visitAuditList.html" class="weui-grid js_grid">
+							<p class="weui-grid__label">
+								费用审核
+							</p>
+						</a>
+						<a href="visitAuditList.html" class="weui-grid js_grid">
 							<div class="weui-grid__icon">
-								<i class="icon-suitcase" style="color: #f7b55d;"></i>
+								<i class="icon-suitcase" style="color:#f7b55d;"></i>
 							</div>
-							<p class="weui-grid__label">拜访审核</p>
-						</a> <a href="" class="weui-grid js_grid">
+							<p class="weui-grid__label">
+								拜访审核
+							</p>
+						</a>
+						<a href="" class="weui-grid js_grid">
 							<div class="weui-grid__icon">
-								<i class="icon-suitcase" style="color: #f7b55d;"></i>
+								<i class="icon-suitcase" style="color:#f7b55d;"></i>
 							</div>
-							<p class="weui-grid__label">订单审核</p>
+							<p class="weui-grid__label">
+								订单审核
+							</p>
 						</a>
 					</div>
 				</div>
-				<div style="height: 26%">
+				<div style="height:26%">
 					<div class="weui-cells__title weui-cell_access weui-cell">
 						<div class="weui-cell__bd">
 							业务消息
@@ -111,56 +117,72 @@
 							<div class="weui-cell__bd">
 								<span>[小张烤鱼]</span>
 							</div>
-							<div class="check-pass">审核通过</div>
+							<div class="check-pass">
+								审核通过
+							</div>
 							<div class="weui-cell__ft">2017-10-15 12:00</div>
 						</div>
 						<div class="weui-cell">
 							<div class="weui-cell__bd">
 								<p>[张妈妈副食]</p>
 							</div>
-							<div class="check-pass">审核通过</div>
+							<div class="check-pass">
+								审核通过
+							</div>
 							<div class="weui-cell__ft">2017-10-15 12:13</div>
 						</div>
 						<div class="weui-cell">
 							<div class="weui-cell__bd">
 								<p>[咏梅副食]</p>
 							</div>
-							<div class="check-refuse">审核拒绝</div>
+							<div class="check-refuse">
+								审核拒绝
+							</div>
 							<div class="weui-cell__ft">2017-10-15 12:22</div>
 						</div>
 						<div class="weui-cell">
 							<div class="weui-cell__bd">
 								<p>[武大烟酒副食]</p>
 							</div>
-							<div class="check-refuse">审核拒绝</div>
+							<div class="check-refuse">
+								审核拒绝
+							</div>
 							<div class="weui-cell__ft">2017-10-15 12:22</div>
 						</div>
 						<div class="weui-cell">
 							<div class="weui-cell__bd">
 								<span>[小张烤鱼]</span>
 							</div>
-							<div class="check-pass">审核通过</div>
+							<div class="check-pass">
+								审核通过
+							</div>
 							<div class="weui-cell__ft">2017-10-15 12:00</div>
 						</div>
 						<div class="weui-cell">
 							<div class="weui-cell__bd">
 								<p>[张妈妈副食]</p>
 							</div>
-							<div class="check-pass">审核通过</div>
+							<div class="check-pass">
+								审核通过
+							</div>
 							<div class="weui-cell__ft">2017-10-15 12:13</div>
 						</div>
 						<div class="weui-cell">
 							<div class="weui-cell__bd">
 								<p>[咏梅副食]</p>
 							</div>
-							<div class="check-refuse">审核拒绝</div>
+							<div class="check-refuse">
+								审核拒绝
+							</div>
 							<div class="weui-cell__ft">2017-10-15 12:22</div>
 						</div>
 						<div class="weui-cell">
 							<div class="weui-cell__bd">
 								<p>[武大烟酒副食]</p>
 							</div>
-							<div class="check-refuse">审核拒绝</div>
+							<div class="check-refuse">
+								审核拒绝
+							</div>
 							<div class="weui-cell__ft">2017-10-15 12:22</div>
 						</div>
 					</div>
@@ -170,561 +192,13 @@
 						<i class="icon-map-pin"></i>&nbsp; 湖北省武汉市洪山区汉街2406
 					</div>
 					<div class="blue">
-						智能营销&nbsp; <i class="icon-angle-right"></i>
+						智能营销&nbsp;
+						<i class="icon-angle-right"></i>
 					</div>
 				</footer>
 			</article>
 		</div>
-		<div id="tab2" class="weui-tab__bd-item">
-			<div id="product">
-				<header>
-					<div class="weui-search-bar" id="searchBar">
-						<form class="weui-search-bar__form">
-							<div class="weui-search-bar__box">
-								<i class="weui-icon-search"></i> <input type="search"
-									class="weui-search-bar__input" id="searchInput"
-									placeholder="搜索" required=""> <a href="javascript:"
-									class="weui-icon-clear" id="searchClear"></a>
-							</div>
-							<label class="weui-search-bar__label" id="searchText"> <i
-								class="weui-icon-search"></i> <span>请输入商品名称</span>
-							</label>
-						</form>
-						<a href="javascript:" class="weui-search-bar__cancel-btn"
-							id="searchCancel">取消</a>
-					</div>
-				</header>
-				<aside>
-					<div id="sidebar" class="menu-left">
-						<ul>
-							<li class="active">热销</li>
-							<li>中国劲酒</li>
-							<li>毛铺</li>
-							<li>白云边</li>
-							<li>洋河</li>
-							<li>活动商品</li>
-						</ul>
-					</div>
-				</aside>
-				<article class="menu-right">
-					<section class="product_detail weui-panel weui-panel_access">
-						<div>
-							<div class="product_name">35度中国劲酒_125ml_1*24</div>
-							<div class="product_unit">
-								规格： <span>125ml</span> <span>250ml</span> <a> <i
-									class="icon-cart-plus enter-shopping-cart"></i>
-								</a>
-							</div>
-							<div class="product_bUnit">
-								<span class="price">￥725</span> <span class="unit">&nbsp;/&nbsp;件</span>
-								<div class="spinner">
-									<div class="operate fl">
-										<i class="icon-minus2"></i>
-									</div>
-									<input type="number" min="0" value="0" class="fl" readonly>
-									<div class="operate fl">
-										<i class="icon-plus2"></i>
-									</div>
-								</div>
-							</div>
-							<div class="product_mUnit">
-								<span class="price">￥30</span> <span class="unit">&nbsp;/&nbsp;瓶</span>
-								<div class="spinner">
-									<div class="operate fl">
-										<i class="icon-minus2"></i>
-									</div>
-									<input type="number" min="0" value="0" class="fl" readonly>
-									<div class="operate fl">
-										<i class="icon-plus2"></i>
-									</div>
-								</div>
-							</div>
-							<div>库存：1120.2件</div>
-						</div>
-						<hr>
-						<div>
-							<p>
-								赠品：参茸劲酒_250ml_1*6 <a class="fr">详情</a>
-							</p>
-						</div>
-					</section>
-					<section class="product_detail weui-panel weui-panel_access">
-						<div class="product_name">35度中国劲酒_125ml_1*24</div>
-						<div class="product_unit">
-							规格： <span>125ml</span> <span>250ml</span> <a> <i
-								class="icon-cart-plus enter-shopping-cart"></i>
-							</a>
-						</div>
-						<div class="product_bUnit">
-							<span class="price">￥725</span> <span class="unit">&nbsp;/&nbsp;件</span>
-							<div class="spinner">
-								<div class="operate fl">
-									<i class="icon-minus2"></i>
-								</div>
-								<input type="number" min="0" value="0" class="fl" readonly>
-								<div class="operate fl">
-									<i class="icon-plus2"></i>
-								</div>
-							</div>
-						</div>
-						<div class="product_mUnit">
-							<span class="price">￥30</span> <span class="unit">&nbsp;/&nbsp;瓶</span>
-							<div class="spinner">
-								<div class="operate fl">
-									<i class="icon-minus2"></i>
-								</div>
-								<input type="number" min="0" value="0" class="fl" readonly>
-								<div class="operate fl">
-									<i class="icon-plus2"></i>
-								</div>
-							</div>
-						</div>
-						<div>库存：1120.2件</div>
-					</section>
-					<section class="product_detail">
-						<div class="product_name">35度中国劲酒_125ml_1*24</div>
-						<div class="product_unit">
-							规格： <span>125ml</span> <span>250ml</span> <a> <i
-								class="icon-cart-plus enter-shopping-cart"></i>
-							</a>
-						</div>
-						<div class="product_bUnit">
-							<span class="price">￥725</span> <span class="unit">&nbsp;/&nbsp;件</span>
-							<div class="spinner">
-								<div class="operate fl">
-									<i class="icon-minus2"></i>
-								</div>
-								<input type="number" min="0" value="0" class="fl" readonly>
-								<div class="operate fl">
-									<i class="icon-plus2"></i>
-								</div>
-							</div>
-						</div>
-						<div class="product_mUnit">
-							<span class="price">￥30</span> <span class="unit">&nbsp;/&nbsp;瓶</span>
-							<div class="spinner">
-								<div class="operate fl">
-									<i class="icon-minus2"></i>
-								</div>
-								<input type="number" min="0" value="0" class="fl" readonly>
-								<div class="operate fl">
-									<i class="icon-plus2"></i>
-								</div>
-							</div>
-						</div>
-						<div>库存：1120.2件</div>
-					</section>
-					<section class="product_detail">
-						<div class="product_name">35度中国劲酒_125ml_1*24</div>
-						<div class="product_unit">
-							规格： <span>125ml</span> <span>250ml</span> <a> <i
-								class="icon-cart-plus enter-shopping-cart"></i>
-							</a>
-						</div>
-						<div class="product_bUnit">
-							<span class="price">￥725</span> <span class="unit">&nbsp;/&nbsp;件</span>
-							<div class="spinner">
-								<div class="operate fl">
-									<i class="icon-minus2"></i>
-								</div>
-								<input type="number" min="0" value="0" class="fl" readonly>
-								<div class="operate fl">
-									<i class="icon-plus2"></i>
-								</div>
-							</div>
-						</div>
-						<div class="product_mUnit">
-							<span class="price">￥30</span> <span class="unit">&nbsp;/&nbsp;瓶</span>
-							<div class="spinner">
-								<div class="operate fl">
-									<i class="icon-minus2"></i>
-								</div>
-								<input type="number" min="0" value="0" class="fl" readonly>
-								<div class="operate fl">
-									<i class="icon-plus2"></i>
-								</div>
-							</div>
-						</div>
-						<div>库存：1120.2件</div>
-					</section>
-				</article>
-				<div class="hidden-menu">
-					<ul>
-						<li><a href="shoppingCart.html"> 购物车 <i
-								class="icon-shopping-cart blue"></i>
-						</a></li>
-					</ul>
-					<i class="icon-menu-open orange fr" id="button"></i>
-				</div>
-				<div class="layer"></div>
-			</div>
-		</div>
-		<div id="tab3" class="weui-tab__bd-item">
-			<header>
-				<div class="weui-search-bar" id="customerSearchBar">
-					<form class="weui-search-bar__form">
-						<div class="weui-search-bar__box">
-							<i class="weui-icon-search"></i> <input type="search"
-								class="weui-search-bar__input" id="customerSearchInput"
-								placeholder="搜索" required=""> <a href="javascript:"
-								class="weui-icon-clear" id="customerSearchClear"></a>
-						</div>
-						<label class="weui-search-bar__label" id="customerSearchText">
-							<i class="weui-icon-search"></i> <span>请输入客户名或联系人</span>
-						</label>
-					</form>
-					<a href="javascript:" class="weui-search-bar__cancel-btn"
-						id="customerSearchCancel">取消</a>
-				</div>
-			</header>
-			<article class="customer">
-				<header class="has-th-list">
-					<div class="head-search">
-						<div>
-							<input type="text" id="region" value="客户区域" class="weui-input"
-								readonly> <i class="icon-sort-desc"></i>
-						</div>
-						<div>
-							<input type="text" id="customer-type" value="客户类型"
-								class="weui-input" readonly> <i class="icon-sort-desc"></i>
-						</div>
-						<div>
-							<input type="text" id="if-order" value="是否下单" class="weui-input"
-								readonly> <i class="icon-sort-desc"></i>
-						</div>
-					</div>
-					<div>
-						<i class="icon-th-list"></i>
-					</div>
-				</header>
-				<article>
-					<div class="weui-panel weui-panel_access">
-						<div class="weui-flex">
-							<div class="weui-flex__item customer-info">
-								<p class="ft14">小张烤鱼</p>
-								<p class="gray">小张/18611111111</p>
-							</div>
-							<div class="weui-flex__item customer-href">
-								<div class="weui-flex">
-									<a class="weui-flex__item">
-										<p>
-											<i class="icon-phone green"></i>
-										</p>
-										<p>电话</p>
-									</a> <a class="weui-flex__item" href="historyOrder.html">
-										<p>
-											<i class="icon-file-text-o blue"></i>
-										</p>
-										<p>订单</p>
-									</a> <a class="weui-flex__item" href="visitAdd.html">
-										<p>
-											<i class="icon-paw" style="color: #ff9800"></i>
-										</p>
-										<p>拜访</p>
-									</a> <a class="weui-flex__item relative"
-										href="./customerDetail.html"> <i
-										class="icon-chevron-right gray"></i>
-									</a>
-								</div>
-							</div>
-						</div>
-						<hr />
-						<div class="weui-flex space-between">
-							<div class="button blue-button">下订单</div>
-							<div class="button blue-button">客户拜访</div>
-							<div class="button white-button">再来一单</div>
-						</div>
-						<p class="gray">
-							<span class="icon-map-marker ft16 green"></span> 湖北省 武汉市 江汉区 德盛街
-						</p>
-					</div>
-					<div class="weui-panel weui-panel_access">
-						<div class="weui-flex">
-							<div class="weui-flex__item customer-info">
-								<p class="ft14">小张烤鱼</p>
-								<p class="gray">小张/18611111111</p>
-							</div>
-							<div class="weui-flex__item customer-href">
-								<div class="weui-flex">
-									<a class="weui-flex__item" href="customer.html">
-										<p>
-											<i class="icon-phone green"></i>
-										</p>
-										<p>电话</p>
-									</a> <a class="weui-flex__item">
-										<p>
-											<i class="icon-file-text-o blue"></i>
-										</p>
-										<p>订单</p>
-									</a> <a class="weui-flex__item">
-										<p>
-											<i class="icon-paw" style="color: #ff9800"></i>
-										</p>
-										<p>拜访</p>
-									</a> <a class="weui-flex__item relative"> <i
-										class="icon-chevron-right gray"></i>
-									</a>
-								</div>
-							</div>
-						</div>
-						<hr />
-						<div class="weui-flex space-between">
-							<div class="button blue-button">下订单</div>
-							<div class="button blue-button">客户拜访</div>
-							<div class="button white-button">再来一单</div>
-						</div>
-						<p class="gray">
-							<span class="icon-map-marker ft16 green"></span> 湖北省 武汉市 江汉区 德盛街
-						</p>
-					</div>
-					<div class="weui-panel weui-panel_access">
-						<div class="weui-flex">
-							<div class="weui-flex__item customer-info">
-								<p class="ft14">小张烤鱼</p>
-								<p class="gray">小张/18611111111</p>
-							</div>
-							<div class="weui-flex__item customer-href">
-								<div class="weui-flex">
-									<a class="weui-flex__item" href="customer.html">
-										<p>
-											<i class="icon-phone green"></i>
-										</p>
-										<p>电话</p>
-									</a> <a class="weui-flex__item">
-										<p>
-											<i class="icon-file-text-o blue"></i>
-										</p>
-										<p>订单</p>
-									</a> <a class="weui-flex__item">
-										<p>
-											<i class="icon-paw" style="color: #ff9800"></i>
-										</p>
-										<p>拜访</p>
-									</a> <a class="weui-flex__item relative"> <i
-										class="icon-chevron-right gray"></i>
-									</a>
-								</div>
-							</div>
-						</div>
-						<hr />
-						<div class="weui-flex space-between">
-							<div class="button blue-button">下订单</div>
-							<div class="button blue-button">客户拜访</div>
-							<div class="button white-button">再来一单</div>
-						</div>
-						<p class="gray">
-							<span class="icon-map-marker ft16 green"></span> 湖北省 武汉市 江汉区 德盛街
-						</p>
-					</div>
-					<div class="weui-panel weui-panel_access">
-						<div class="weui-flex">
-							<div class="weui-flex__item customer-info">
-								<p class="ft14">小张烤鱼</p>
-								<p class="gray">小张/18611111111</p>
-							</div>
-							<div class="weui-flex__item customer-href">
-								<div class="weui-flex">
-									<a class="weui-flex__item" href="customer.html">
-										<p>
-											<i class="icon-phone green"></i>
-										</p>
-										<p>电话</p>
-									</a> <a class="weui-flex__item">
-										<p>
-											<i class="icon-file-text-o blue"></i>
-										</p>
-										<p>订单</p>
-									</a> <a class="weui-flex__item">
-										<p>
-											<i class="icon-paw" style="color: #ff9800"></i>
-										</p>
-										<p>拜访</p>
-									</a> <a class="weui-flex__item relative"> <i
-										class="icon-chevron-right gray"></i>
-									</a>
-								</div>
-							</div>
-						</div>
-						<hr />
-						<div class="weui-flex space-between">
-							<div class="button blue-button">下订单</div>
-							<div class="button blue-button">客户拜访</div>
-							<div class="button white-button">再来一单</div>
-						</div>
-						<p class="gray">
-							<span class="icon-map-marker ft16 green"></span> 湖北省 武汉市 江汉区 德盛街
-						</p>
-					</div>
-				</article>
-			</article>
-		</div>
-		<div id="tab5" class="weui-tab__bd-item">
-			<article id="my">
-				<header>
-					<div>
-						<img src="static/images/avatar.png" width="100%">
-					</div>
-					<div>
-						<p>启光商贸-总部</p>
-						<p>张三</p>
-						<p>18611111111</p>
-					</div>
-				</header>
-				<div>
-					<div class="weui-cells__title">我的待办</div>
-					<div class="weui-grids">
-						<a href="./customerAudit.html" class="weui-grid js_grid">
-							<div class="weui-grid__icon">
-								<i class="icon-user" style="color: #9c89b9"></i>
-							</div>
-							<p class="weui-grid__label">客户审核</p>
-						</a> <a href="./feeAuditList.html" class="weui-grid js_grid">
-							<div class="weui-grid__icon">
-								<i class="icon-check-square-o" style="color: #19c594"></i>
-							</div>
-							<p class="weui-grid__label">费用审核</p>
-						</a> <a href="./visitAuditList.html" class="weui-grid js_grid">
-							<div class="weui-grid__icon">
-								<i class="icon-suitcase" style="color: #f7b55d;"></i>
-							</div>
-							<p class="weui-grid__label">拜访审核</p>
-						</a>
-					</div>
-					<div class="weui-cells__title">我的订单</div>
-					<div class="weui-grids">
-						<a href="./myOrder.html" class="weui-grid js_grid">
-							<div class="weui-grid__icon">
-								<i class="icon-file" style="color: #9c89b9"></i>
-							</div>
-							<p class="weui-grid__label">我的订单</p>
-						</a> <a class="weui-grid js_grid">
-							<div class="weui-grid__icon">
-								<i class="icon-check-square-o" style="color: #19c594"></i>
-							</div>
-							<p class="weui-grid__label">退货订单</p>
-						</a> <a class="weui-grid js_grid">
-							<div class="weui-grid__icon">
-								<i class="icon-paper" style="color: #f7b55d;"></i>
-							</div>
-							<p class="weui-grid__label">申请退货</p>
-						</a> <a href="./inventory.html" class="weui-grid js_grid">
-							<div class="weui-grid__icon">
-								<i class="icon-database" style="color: #f1745e;"></i>
-							</div>
-							<p class="weui-grid__label">库存详情</p>
-						</a>
-					</div>
-					<div class="weui-cells__title">营销活动</div>
-					<div class="weui-grids">
-						<a href="./activityList.html" class="weui-grid js_grid"> <span
-							class="weui-badge empty-badge">&nbsp;</span>
-							<div class="weui-grid__icon">
-								<i class="icon-file-text blue"></i>
-							</div>
-							<p class="weui-grid__label">活动列表</p>
-						</a> <a href="./applicationRecord.html" class="weui-grid js_grid">
-							<div class="weui-grid__icon">
-								<i class="icon-table" style="color: #ffa042"></i>
-							</div>
-							<p class="weui-grid__label">申请记录</p>
-						</a> <a href="./feeApplication.html" class="weui-grid js_grid">
-							<div class="weui-grid__icon">
-								<i class="icon-tasks" style="color: #19c594;"></i>
-							</div>
-							<p class="weui-grid__label">费用申请</p>
-						</a> <a href="./feeAuditList.html" class="weui-grid js_grid">
-							<div class="weui-grid__icon">
-								<i class="icon-exchange" style="color: #f1745e;"></i>
-							</div>
-							<p class="weui-grid__label">费用审批</p>
-						</a> <a class="weui-grid js_grid">
-							<div class="weui-grid__icon">
-								<i class="icon-envelope-o" style="color: #5F97F4;"></i>
-							</div>
-							<p class="weui-grid__label">结案</p>
-						</a> <a class="weui-grid js_grid"> <span
-							class="weui-badge left-top-tag">NEW</span>
-							<div class="weui-grid__icon">
-								<i class="icon-air-play" style="color: #9C89B9;"></i>
-							</div>
-							<p class="weui-grid__label">费用核销</p>
-						</a> <a class="weui-grid js_grid"> <span
-							class="weui-badge left-top-tag">NEW</span>
-							<div class="weui-grid__icon">
-								<i class="icon-list-alt" style="color: #f7b55d;"></i>
-							</div>
-							<p class="weui-grid__label">签到</p>
-						</a>
-					</div>
-					<div class="weui-cells__title">客户拜访</div>
-					<div class="weui-grids">
-						<a href="./visitRecord.html" class="weui-grid js_grid">
-							<div class="weui-grid__icon">
-								<i class="icon-building" style="color: #9c89b9"></i>
-							</div>
-							<p class="weui-grid__label">拜访记录</p>
-						</a> <a href="./visitAdd.html" class="weui-grid js_grid">
-							<div class="weui-grid__icon">
-								<i class="icon-plane" style="color: #19c594"></i>
-							</div>
-							<p class="weui-grid__label">新增拜访</p>
-						</a>
-					</div>
-					<div class="weui-cells__title">售后服务</div>
-					<div class="weui-grids">
-						<a href="" class="weui-grid js_grid">
-							<div class="weui-grid__icon">
-								<i class="icon-phone-square" style="color: #9c89b9"></i>
-							</div>
-							<p class="weui-grid__label">服务热线</p>
-						</a> <a href="./feedbackList.html" class="weui-grid js_grid">
-							<div class="weui-grid__icon">
-								<i class="icon-comment" style="color: #19c594"></i>
-							</div>
-							<p class="weui-grid__label">意见反馈</p>
-						</a>
-					</div>
-				</div>
-			</article>
-			<div class="hidden-menu">
-				<ul>
-					<li><a href="./information.html"> 咨询 <i
-							class="icon-bell blue"></i>
-					</a></li>
-				</ul>
-				<i class="icon-menu-open orange fr" id="button"></i>
-			</div>
-			<div class="layer"></div>
-		</div>
 	</div>
-	<div class="weui-tabbar">
-		<a href="#tab1" class="weui-tabbar__item weui-bar__item--on">
-			<div class="weui-tabbar__icon">
-				<i class="icon-home"></i>
-			</div>
-			<p class="weui-tabbar__label">首页</p>
-		</a> <a href="#tab2" class="weui-tabbar__item">
-			<div class="weui-tabbar__icon">
-				<i class="icon-shopping-cart"></i>
-			</div>
-			<p class="weui-tabbar__label">产品</p>
-		</a> <a href="#tab3" class="weui-tabbar__item">
-			<div class="weui-tabbar__icon">
-				<i class="icon-users"></i>
-			</div>
-			<p class="weui-tabbar__label">客户</p>
-		</a> <a href="#tab4" class="weui-tabbar__item">
-			<div class="weui-tabbar__icon">
-				<i class="icon-pie-chart"></i>
-			</div>
-			<p class="weui-tabbar__label">统计</p>
-		</a> <a href="#tab5" class="weui-tabbar__item">
-			<div class="weui-tabbar__icon">
-				<i class="icon-user"></i>
-			</div>
-			<p class="weui-tabbar__label">我的</p>
-		</a>
-	</div>
+	<#include "tabbar.html"/>
 </div>
-
 </@layout>
