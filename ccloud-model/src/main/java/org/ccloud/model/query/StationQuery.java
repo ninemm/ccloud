@@ -268,7 +268,7 @@ public class StationQuery extends JBaseQuery {
 	}
 
 	public List<Station> findByDeptId(String id) {
-		return DAO.doFind("dept_id = ? and id <> 0", id);
+		return DAO.doFind("dept_id = ? and id <> '0'", id);
 	}
 	
 	private List<Map<String, Object>> doBuildByUser(List<Station> list) {
@@ -305,11 +305,14 @@ public class StationQuery extends JBaseQuery {
 		return childList;
 	}
 
-	public List<Record> findByUserCheck(String id) {
+	public List<Record> findByUserCheck(String id, String dataArea) {
 		StringBuilder stringBuilder = new StringBuilder("SELECT s.station_name,s.id,u.realname FROM `station` s ");
 		stringBuilder.append("LEFT JOIN (SELECT * FROM `user` where id=?) u ");
 		stringBuilder.append("ON LOCATE(s.id,u.station_id) > 0 ");
-		stringBuilder.append("WHERE s.id <> 0 ");
-		return Db.find(stringBuilder.toString(), id);
+		stringBuilder.append("WHERE s.id <> '0' ");
+		LinkedList<Object> params = new LinkedList<Object>();
+		params.add(id);
+		appendIfNotEmptyWithLike(stringBuilder, "s.data_area", dataArea, params, false);
+		return Db.find(stringBuilder.toString(), params.toArray());
 	}	
 }

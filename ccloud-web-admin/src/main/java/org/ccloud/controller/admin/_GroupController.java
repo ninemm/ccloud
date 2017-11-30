@@ -61,7 +61,7 @@ public class _GroupController extends JBaseCRUDController<Group> {
         String keyword = getPara("k");
         if (StrKit.notBlank(keyword)) setAttr("k", keyword);
         
-        String dataArea = getSessionAttr("DeptDataAreaLike");
+        String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
         Page<Group> page = GroupQuery.me().paginate(getPageNumber(), getPageSize(), keyword, dataArea, "order_list");
         if (page != null) {
@@ -199,7 +199,8 @@ public class _GroupController extends JBaseCRUDController<Group> {
 	
 	public void getRoleCheck() {
 		String id = getPara("groupId");
-		List<Record> list = RoleQuery.me().findByRoleCheck(id);
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		List<Record> list = RoleQuery.me().findByRoleCheck(id, dataArea);
 		List<Map<String, Object>> checkList = new ArrayList<>();
 		List<Map<String, Object>> uncheckList = new ArrayList<>();
 		for (Record record : list) {

@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
@@ -29,9 +30,11 @@ import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
 import org.ccloud.model.Operation;
+import org.ccloud.model.Role;
 import org.ccloud.model.Station;
 import org.ccloud.model.User;
 import org.ccloud.model.query.OperationQuery;
+import org.ccloud.model.query.RoleQuery;
 import org.ccloud.model.query.StationOperationRelQuery;
 import org.ccloud.model.query.StationQuery;
 import org.ccloud.model.query.UserQuery;
@@ -39,6 +42,7 @@ import org.ccloud.model.vo.ModuleInfo;
 import org.ccloud.model.vo.OperationInfo;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
+import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.StringUtils;
 
 import com.alibaba.fastjson.JSON;
@@ -71,7 +75,7 @@ public class _StationController extends JBaseCRUDController<Station> {
             setAttr("k", keyword);
         }
         
-        String dataArea = getSessionAttr("DeptDataAreaLike");
+        String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
         Page<Station> page = StationQuery.me().paginate(getPageNumber(), getPageSize(),keyword, dataArea, "order_list");
         Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
@@ -93,7 +97,7 @@ public class _StationController extends JBaseCRUDController<Station> {
         Station station = getModel(Station.class);
         User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
         station.setDeptId(user.getDepartmentId());
-        station.setDataArea(user.getDataArea().toString());
+        station.setDataArea(DataAreaUtil.getUserDeptDataArea(user.getDataArea()));
         if (StringUtils.isBlank(station.getId())) {
         	station.setIsParent(0);
         }
@@ -226,7 +230,13 @@ public class _StationController extends JBaseCRUDController<Station> {
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
-        List<Record> list = OperationQuery.me().queryStationOperation(stationId);
+		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/all");
+		List<Role> ownRoleList = null;
+		if (!isSuperAdmin) {
+			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+			ownRoleList = RoleQuery.me().findByGroupId(user.getGroupId());
+		}
+        List<Record> list = OperationQuery.me().queryStationOperation(stationId,ownRoleList);
         List<ModuleInfo> moduleList = new ArrayList<>();
         List<String> system = new ArrayList<>();
         List<String> parentModule = new ArrayList<>();

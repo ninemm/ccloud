@@ -201,7 +201,8 @@ public class _UserController extends JBaseCRUDController<User> {
 	
 	public void getGroupCheck() {
 		String id = getPara("userId");
-		List<Record> list = StationQuery.me().findByUserCheck(id);
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		List<Record> list = StationQuery.me().findByUserCheck(id, dataArea);
 		List<Map<String, Object>> checkList = new ArrayList<>();
 		List<Map<String, Object>> uncheckList = new ArrayList<>();
 		for (Record record : list) {

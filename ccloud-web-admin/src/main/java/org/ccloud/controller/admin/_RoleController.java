@@ -20,6 +20,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
@@ -136,7 +137,13 @@ public class _RoleController extends JBaseCRUDController<Role> {
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
-        List<Record> list = OperationQuery.me().queryRoleOperation(roleId);
+		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/all");
+		List<Role> ownRoleList = null;
+		if (!isSuperAdmin) {
+			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+			ownRoleList = RoleQuery.me().findByGroupId(user.getGroupId());
+		}
+        List<Record> list = OperationQuery.me().queryRoleOperation(roleId, ownRoleList);
         List<ModuleInfo> moduleList = new ArrayList<>();
         List<String> system = new ArrayList<>();
         List<String> parentModule = new ArrayList<>();

@@ -227,7 +227,7 @@ public class DepartmentQuery extends JBaseQuery {
 			}
 
 			if (addUserFlg) {
-				childList = addUser(dept.getId(), childList);
+				childList = addDeptUser(dept.getId(), childList);
 			}
 
 			map.put("nodes", childList);
@@ -236,6 +236,18 @@ public class DepartmentQuery extends JBaseQuery {
 		}
 		return resTreeList;
 	}
+	
+	private List<Map<String, Object>> addDeptUser(String deptId, List<Map<String, Object>> childList) {
+		List<User> list = UserQuery.me().findByDeptId(deptId);
+		for (User user : list) {
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("text", user.getRealname());
+			map.put("tags", Lists.newArrayList(user.getId(), "user"));
+			childList.add(map);
+
+		}
+		return childList;
+	}	
 
 	protected void buildOrderBy(String orderBy, StringBuilder fromBuilder) {
 		
@@ -252,7 +264,7 @@ public class DepartmentQuery extends JBaseQuery {
 		fromBuilder.append("d.order_list,d.dept_level ");
 		
 		if (orderbyInfo.length == 1) {
-			fromBuilder.append("desc");
+			fromBuilder.append("asc");
 		} else {
 			fromBuilder.append(orderbyInfo[1]);
 		}
