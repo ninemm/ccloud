@@ -18,6 +18,7 @@ package org.ccloud.controller.admin;
 import java.util.List;
 import java.util.Map;
 
+import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.Customer;
@@ -173,7 +174,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 	
 	public void user_tree() {
 		
-		String dataArea = getSessionAttr("DeptDataAreaLike");
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		List<Map<String, Object>> treeData = DepartmentQuery.me().findDeptListAsTree(dataArea, true);
 		setAttr("treeData", JSON.toJSON(treeData));
 		

@@ -35,6 +35,7 @@ import org.ccloud.model.vo.ModuleInfo;
 import org.ccloud.model.vo.OperationInfo;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
+import org.ccloud.utils.DataAreaUtil;
 
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
@@ -55,7 +56,7 @@ public class _RoleController extends JBaseCRUDController<Role> {
 		
 		String keyword = getPara("k");
 		if (StrKit.notBlank(keyword)) setAttr("k", keyword);
-		String dataArea = getSessionAttr("DeptDataAreaLike");
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		
 		Page<Role> page = RoleQuery.me().paginate(getPageNumber(), getPageSize(), keyword, dataArea, "order_list");
 		if (page != null) {
@@ -71,7 +72,7 @@ public class _RoleController extends JBaseCRUDController<Role> {
 		Role role = getModel(Role.class);
         User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
         role.setDeptId(user.getDepartmentId());
-        role.setDataArea(getSessionAttr("DeptDataArea").toString());
+        role.setDataArea(DataAreaUtil.getUserDeptDataArea(user.getDataArea()));
 		if (role.saveOrUpdate())
 			renderAjaxResultForSuccess("新增成功");
 		else

@@ -167,7 +167,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 	@RequiresPermissions(value = { "/admin/customer/edit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void user_tree() {
 
-		String dataArea = getSessionAttr("DeptDataAreaLike");
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		List<Department> list = DepartmentQuery.me().findDeptList(dataArea, "order_list asc");
 		List<Map<String, Object>> resTreeList = new ArrayList<Map<String, Object>>();
 		ModelSorter.tree(list);
@@ -183,7 +183,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 	@RequiresPermissions(value = { "/admin/customer/edit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void department_tree() {
 
-		String dataArea = getSessionAttr("DeptDataAreaLike");
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		List<Department> list = DepartmentQuery.me().findDeptList(dataArea, "order_list asc");
 		List<Map<String, Object>> resTreeList = new ArrayList<Map<String, Object>>();
 		ModelSorter.tree(list);

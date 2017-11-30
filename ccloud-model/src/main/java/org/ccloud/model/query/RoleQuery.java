@@ -143,13 +143,12 @@ public class RoleQuery extends JBaseQuery {
 	}
 
 	public List<Record> findBydeptAndOperation(String dataArea, String id) {
-		String data = dataArea + "%";
  		StringBuilder fromBuilder = new StringBuilder("select * ");
 		fromBuilder.append("from role r ");
 		fromBuilder.append("left join (SELECT gr.role_id FROM role_operation_rel gr WHERE gr.operation_id = ?) b ");
 		fromBuilder.append("on r.id = b.role_id ");
 		fromBuilder.append("where r.data_area like ?");
-		List<Record> list = Db.find(fromBuilder.toString(), id, data);
+		List<Record> list = Db.find(fromBuilder.toString(), id, dataArea);
 		return list;
 	}
 

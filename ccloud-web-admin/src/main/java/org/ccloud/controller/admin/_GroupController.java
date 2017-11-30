@@ -37,6 +37,7 @@ import org.ccloud.model.query.RoleQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
+import org.ccloud.utils.DataAreaUtil;
 
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
@@ -80,7 +81,7 @@ public class _GroupController extends JBaseCRUDController<Group> {
 
     public void getRole() {
         String id = getPara("groupid");
-        String dataArea = getSessionAttr("DeptDataAreaLike");
+        String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
         List<Record> roles = RoleQuery.me().findBydeptAndGroup(dataArea, id);
         List<Map<String, Object>> list = new ArrayList<>();
 
@@ -107,7 +108,7 @@ public class _GroupController extends JBaseCRUDController<Group> {
                 Group group = getModel(Group.class);
                 User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
             	group.setDeptId(user.getDepartmentId());
-            	group.setDataArea(getSessionAttr("DeptDataArea").toString());
+            	group.setDataArea(DataAreaUtil.getUserDeptDataArea(user.getDataArea()));
 
                 String roleList = getPara("roleList");
                 String[] roleId = roleList.split(",");
