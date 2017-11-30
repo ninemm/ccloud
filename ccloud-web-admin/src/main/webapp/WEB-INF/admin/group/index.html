@@ -2,6 +2,47 @@
 
 <#macro script>
 
+	$('.modal').on('show.bs.modal', centerModals);
+	// 在窗口大小改变的时候调用垂直居中函数
+	$(window).on('resize', centerModals);
+
+    $('#add').click(function() {
+    //获取选中的选项，删除并追加给对方
+        $('#select1 option:selected').appendTo('#select2');
+    });
+    //移到左边
+    $('#remove').click(function() {
+        $('#select2 option:selected').appendTo('#select1');
+    });
+    //全部移到右边
+    $('#add_all').click(function() {
+        //获取全部的选项,删除并追加给对方
+        $('#select1 option').appendTo('#select2');
+    });
+    //全部移到左边
+    $('#remove_all').click(function() {
+        $('#select2 option').appendTo('#select1');
+    });
+    //双击选项
+    $('#select1').dblclick(function(){ //绑定双击事件
+        //获取全部的选项,删除并追加给对方
+        $("option:selected",this).appendTo('#select2'); //追加给对方
+    });
+    //双击选项
+    $('#select2').dblclick(function(){
+       $("option:selected",this).appendTo('#select1');
+    });
+
+	function centerModals(){
+	  $('.modal').each(function(i){
+	    var $clone = $(this).clone().css('display', 'block').appendTo('body');
+	    var top = Math.round(($clone.height() - $clone.find('.modal-content').height()) / 2);
+	    top = top > 50 ? top : 0;
+	    $clone.remove();
+	    $(this).find('.modal-content').css("margin-top", top-50);
+	  });
+	}  
+
 	function del(id) {
 		jQuery.mm.del('${CPATH}/admin/group/delete?ucode=${ucode}&id=' + id);
 	}
@@ -12,6 +53,60 @@
 	
 		jQuery.mm.batchAction('#form', '请选择分组记录');
 	}
+	
+	function group(id,name) {
+		var title = name + "角色管理";
+		$("#myModalLabel").html(title);
+		$("#groupId").val(id);
+		$("#select1").empty();
+		$("#select2").empty();
+		$.ajax({
+			url:"${CPATH}/admin/group/getRoleCheck",
+			type:"post",
+			data:{"groupId":id},
+			dataType:"json",
+			success:function(data) {
+				var select = data.checkList;
+				var unselect = data.uncheckList;
+				for (var i = 0; i < select.length; i++) {
+					$("#select2").append("<option value=" + select[i].id + ">" + select[i].name + "</option>");
+				}
+				for (var i = 0; i < unselect.length; i++) {
+					$("#select1").append("<option value=" + unselect[i].id + ">" + unselect[i].name + "</option>");
+				}			
+				$("#myModal").modal('show');
+			}
+		});	
+	}
+	
+	function saveRole() {
+		 var id = $("#groupId").val();
+	     var array = new Array();  //定义数组   
+	     $("#select2 option").each(function(){  //遍历所有option  
+	          var txt = $(this).val();   //获取option值   
+	          if(txt!=''){  
+	               array.push(txt);  //添加到数组中  
+	          }  
+	     })
+	     console.log(array);
+		$.ajax({
+			url:"${CPATH}/admin/group/saveRole",
+			type:"post",
+			data:{
+				"roleIds":array,
+				"groupId": id
+			},
+			dataType:"json",
+			success:function(data) {
+				$('#myModal').modal('hide');
+				if (data.errorCode == 0) {
+					toastr.success(data.message, '操作成功');
+				} else {
+					toastr.error(data.message,'操作失败');
+				}
+			}
+		});     
+	}	
 
 </#macro>
 
@@ -57,7 +152,7 @@
 						<th>分组编号</th>
 						<th>排序</th>
 						<@shiro.hasPermission name="/admin/group/edit,/admin/all">
-						<th>操作</th>
+						<th style="width: 20%">操作</th>
 						</@shiro.hasPermission>
 					</tr>
 					</thead>
@@ -77,8 +172,8 @@
 							<td>
 							<@shiro.hasPermission name="/admin/group/edit,/admin/all">
 								<a href="${CPATH}/admin/group/edit?id=${bean.id}&c=${c!}&p=${p!}" class="btn btn-xs bg-olive btn-flat">编辑</a>
+								<a onclick="group('${bean.id}','${bean.group_name!}')" class="btn btn-xs btn-warning btn-flat">角色</a>
 								<a href="javascript:void(0);" onclick="del('${bean.id}')" class="btn btn-xs btn-danger btn-flat">删除</a>
-								<!--<a href="${CPATH}/admin/group/assignRole?id=${bean.id}&c=${c!}&p=${p!}" class="btn btn-xs bg-primary btn-flat">分配角色</a>-->
 							</@shiro.hasPermission>	
 							</td>
 						</tr>
@@ -87,6 +182,49 @@
 				</table>
 			</form>
 		</div>
+		
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		    <div class="modal-dialog">
+		        <div class="modal-content">
+		            <div class="modal-header">
+		                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+		                <h4 class="modal-title" id="myModalLabel"></h4>
+		                <input type="hidden" id="groupId">
+		            </div>
+		            <div class="modal-body">
+			        <div style="padding-left:111px;">
+						<h4 style="margin-bottom:12px">
+							<i class="glyphicon glyphicon-user"></i> 未选分组
+							<span style="margin-left:97px"></span>
+							<i class="glyphicon glyphicon-user"></i> 已选分组
+						</h4>			        
+			          <select multiple="multiple" id="select1" style="width:150px;height:200px; float:left; padding:4px; ">
+			          </select>
+			        </div>
+			        <div style="float:left"> <span id="add">
+			          <input type="button" class="btn btn-default" value=">"/>
+			          </span><br />
+			          <span id="add_all">
+			          <input type="button" class="btn btn-default" value=">>"/>
+			          </span> <br />
+			          <span id="remove">
+			          <input type="button" class="btn btn-default" value="<"/>
+			          </span><br />
+			          <span id="remove_all">
+			          <input type="button" class="btn btn-default" value="<<"/>
+			          </span> </div>
+			        <div>
+			          <select multiple="multiple" id="select2" style="width: 150px;height:200px; float:lfet; padding:4px;">
+			          </select>
+			        </div>
+			      </div>		            
+		            <div class="modal-footer">
+		                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+		                <button type="button" class="btn btn-primary" onclick="saveRole()">提交更改</button>
+		            </div>
+		        </div><!-- /.modal-content -->
+		    </div><!-- /.modal-dialog -->
+		</div>			
 		<!-- /.box-body -->
 	</div>
 	<!-- /.box -->

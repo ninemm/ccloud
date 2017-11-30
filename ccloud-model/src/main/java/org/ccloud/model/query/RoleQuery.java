@@ -156,5 +156,12 @@ public class RoleQuery extends JBaseQuery {
 		return DAO.doFind("dept_id = ?", deptId);
 	}
 
+	public List<Record> findByRoleCheck(String id) {
+		StringBuilder stringBuilder = new StringBuilder("SELECT r.id,r.role_name,a.id as check_status FROM role r LEFT JOIN ");
+		stringBuilder.append("(SELECT * FROM group_role_rel gr WHERE gr.group_id = ?) a ");
+		stringBuilder.append("ON r.id = a.role_id ");
+		return Db.find(stringBuilder.toString(), id);
+	}
+
 }
 
