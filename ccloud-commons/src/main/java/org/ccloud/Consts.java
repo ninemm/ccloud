@@ -77,4 +77,5 @@ public class Consts {
 	
 	public static final String DEPT_HQ_ID = "0";//珈研部门ID
 	public static final String DEPT_HQ_DATAAREA = "001";//珈研部门数据域
+	public static final String DEPT_HQ_DATAAREA_LIKE = "001%";//珈研部门数据域子部门查询条件
 }

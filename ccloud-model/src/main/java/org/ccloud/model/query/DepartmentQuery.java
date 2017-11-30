@@ -185,7 +185,7 @@ public class DepartmentQuery extends JBaseQuery {
 		Map<String, Object> map = new HashMap<>();
 		map.put("text", "总部");// 父子表第一级名称,以后可以存储在字典表或字典类
 		ArrayList<String> newArrayList = Lists.newArrayList();
-		if (dataArea.equals(Consts.DEPT_HQ_DATAAREA)) {
+		if (dataArea.equals(Consts.DEPT_HQ_DATAAREA_LIKE)) {
 			newArrayList.add(Consts.DEPT_HQ_ID);
 			newArrayList.add(Consts.DEPT_HQ_DATAAREA);
 		}
