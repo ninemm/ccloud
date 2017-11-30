@@ -49,7 +49,7 @@ public class UserQuery extends JBaseQuery {
 		StringBuilder fromBuilder = new StringBuilder(" from user u ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
-		fromBuilder.append("WHERE LOCATE('" + dataArea + "' ,u.data_area) = 1 ");
+		appendIfNotEmptyWithLike(fromBuilder, "data_area", dataArea, params, true);
 		appendIfNotEmptyWithLike(fromBuilder, "username", keyword, params, false);
 		
 		fromBuilder.append("order by " + orderby);
