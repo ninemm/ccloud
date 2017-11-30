@@ -33,6 +33,7 @@ import org.ccloud.model.query.StationQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
+import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.StringUtils;
 
 import com.alibaba.fastjson.JSON;
@@ -53,7 +54,8 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 	
 	@Override
 	public void index() {
-		String dataArea = getSessionAttr("DeptDataArea");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String dataArea = DataAreaUtil.getUserDeptDataArea(user.getDataArea());
 		List<Map<String, Object>> list = DepartmentQuery.me().findDeptListAsTree(1, dataArea);
 		setAttr("treeData", JSON.toJSON(list));		
 		render("index.html");

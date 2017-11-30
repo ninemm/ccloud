@@ -182,4 +182,9 @@ public class SalesOrderQuery extends JBaseQuery {
 		return 0;
 	}
 
+	public static String getBillIdBySn(String order_sn) {
+		String sql = "SELECT id FROM cc_sales_order WHERE order_sn='"+order_sn+"'";
+		return Db.queryStr(sql);
+	}
+
 }

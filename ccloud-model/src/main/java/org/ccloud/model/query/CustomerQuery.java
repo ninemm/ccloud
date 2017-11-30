@@ -156,4 +156,10 @@ public class CustomerQuery extends JBaseQuery {
 		return DAO.find(sb.toString(), username);
 	}
 
+	public List<Record> getCustomerIdName(){
+		StringBuilder fromBuilder = new StringBuilder("SELECT id,customer_name AS text FROM cc_customer");
+		List<Record> list = Db.find(fromBuilder.toString());
+		return list;
+	}
+
 }

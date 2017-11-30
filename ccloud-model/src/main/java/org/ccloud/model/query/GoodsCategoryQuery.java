@@ -26,7 +26,9 @@ import org.ccloud.model.ModelSorter;
 
 import com.google.common.collect.Lists;
 import com.jfinal.kit.StrKit;
+import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
 /**
@@ -253,5 +255,11 @@ public class GoodsCategoryQuery extends JBaseQuery {
 		if (data == null)
 			return null;
 		return new ArrayList<GoodsCategory>(data);
+	}
+
+	public List<Record> getLeafTypes(){
+		StringBuilder fromBuilder = new StringBuilder("SELECT supplier_id AS id,name FROM cc_goods_category");
+		List<Record> list = Db.find(fromBuilder.toString());
+		return list;
 	}
 }

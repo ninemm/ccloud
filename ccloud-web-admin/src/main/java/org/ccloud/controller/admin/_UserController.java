@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
@@ -64,8 +65,14 @@ public class _UserController extends JBaseCRUDController<User> {
 			setAttr("k", keyword);
 		
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/all");
+		String userId = null;
+		if (!isSuperAdmin) {
+			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+			userId = user.getId();
+		}
 		
-		Page<User> page = UserQuery.me().paginate(getPageNumber(), getPageSize(), keyword, dataArea, "create_date");
+		Page<User> page = UserQuery.me().paginate(getPageNumber(), getPageSize(), keyword, dataArea, "create_date", userId);
 		if (page != null) {
 			setAttr("page", page);
 		}

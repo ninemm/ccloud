@@ -1,0 +1,297 @@
+<#include "../_inc/_layout.html"/>
+
+<#macro script>
+var type = $("#selecttype").val();
+var size = 15;
+var detail_object_id = "";
+$(function() {
+	updateOptions();
+	
+	$("#selecttype").change(function(){
+		updateOptions();
+		type = $(this).val();
+	});
+	
+	$("#search-receivables").click(function(){
+		var currentPage = $("#receivables-current-page").val();
+		getReceivables(currentPage);
+	});
+	
+	function getReceivables(page){
+		
+		var id = $("#category-or-customer").val();
+		
+		$.ajax({
+			url: "${CPATH}/admin/receivables/getReceivables?type="+type+"&id="+id+"&page="+page+"&size="+size,
+			async: false,
+			success: function(data){
+				var receivablesHtml = "";
+				console.log(data);
+				if(data.total >= 1){
+					var rows = data.rows;
+					for(var i in rows){
+						receivablesHtml += '<tr class="jp-onmouse" data="'+rows[i].id+'"><td>'+rows[i].code+'</td><td>'+rows[i].name+'</td><td>'+rows[i].receive_amount+'</td><td>'+rows[i].act_amount+'</td><td>'+rows[i].balance_amount+'</td></tr>';
+					}
+					var pageCount = Math.ceil(data.total/size);
+					$("#receivables-page-count").html(pageCount);
+					$("#receivables-current-page").val(data.page);
+				}
+				//console.log($("#receivables-tbody"));
+				$("#receivables-tbody").html(receivablesHtml);
+				
+			}
+		});
+	}
+	
+	$("#receivables-tbody").on("click",".jp-onmouse",function(){
+		detail_object_id = $(this).attr("data");
+		
+		$(this).siblings().css({"background-color":"#ffffff"});
+		$(this).css({"background-color":"#337ab7"});
+		
+		var detailPage = $("#detail-current-page").val();
+		getReceivablesDetail(detailPage);
+	});
+	
+	$("#receivables-first-page").click(function(){
+		getReceivables(1);
+	});
+	
+	$("#receivables-previous-page").click(function(){
+		var currentPage = parseInt($("#receivables-current-page").val());
+		var totalPage = $("#receivables-page-count").html();
+		if(currentPage === 1 || totalPage ===" " || totalPage === "1"){
+			return false;
+		}else{
+			getReceivables(currentPage - 1);
+		}
+	});
+	
+	$("#receivables-next-page").click(function(){
+		var currentPage = parseInt($("#receivables-current-page").val());
+		var totalPage = parseInt($("#receivables-page-count").html());
+		if(currentPage === totalPage || totalPage ===" "){
+			return false;
+		}else{
+			getReceivables(currentPage + 1);
+		}
+	});
+	
+	$("#receivables-next-page").click(function(){
+		var currentPage = parseInt($("#receivables-current-page").val());
+		var totalPage = parseInt($("#receivables-page-count").html());
+		if(currentPage === totalPage || totalPage ===" "){
+			return false;
+		}else{
+			getReceivables(currentPage + 1);
+		}
+	});
+	
+	$("#receivables-last-page").click(function(){
+		var totalPage = $("#receivables-page-count").html();
+		if(totalPage != ""){
+			getReceivables(totalPage);
+		}else{
+			return false;
+		}
+	});
+	
+	$("#receivables-last-page").click(function(){
+		var currentPage = $("#receivables-current-page").val();
+		if(currentPage != ""){
+			getReceivables(currentPage)
+		}else{
+			return false;
+		}
+	});
+	
+    $("#detail-first-page").click(function(){
+    	if(detail_object_id == ""){
+    		return false;
+    	}else{
+    		getReceivablesDetail(1);
+    	}
+    });
+    
+    $("#detail-first-page").click(function(){
+    	if(detail_object_id == ""){
+    		return false;
+    	}else{
+    		getReceivablesDetail(1);
+    	}
+    });
+    
+    $("#detail-previous-page").click(function(){
+    	var currentPage = parseInt($("#detail-current-page").val());
+		var totalPage = $("#detail-page-count").html();
+    	if(detail_object_id == "" || currentPage == 1 || totalPage ==""){
+    		return false;
+    	}else{
+    		getReceivablesDetail(1);
+    	}
+    });
+    
+    $("#detail-next-page").click(function(){
+    	var currentPage = parseInt($("#detail-current-page").val());
+		var totalPage = $("#detail-page-count").html();
+    	if(detail_object_id == "" || currentPage == 1 || totalPage ==""){
+    		return false;
+    	}else{
+    		totalPage = parseInt(totalPage);
+    		if(totalPage > currentPage){
+    			getReceivablesDetail(currentPage + 1);
+    		}
+    	}
+    });
+    
+    $("#detail-last-page").click(function(){
+    	var currentPage = parseInt($("#detail-current-page").val());
+		var totalPage = $("#detail-page-count").html();
+    	if(detail_object_id == "" || currentPage == 1 || totalPage ==""){
+    		return false;
+    	}else{
+    		totalPage = parseInt(totalPage);
+    		if(totalPage > currentPage){
+    			getReceivablesDetail(totalPage);
+    		}
+    	}
+    });
+    
+    $("#detail-refresh").click(function(){
+    	var currentPage = $("#detail-current-page").val();
+    	if(detail_object_id == "" || currentPage == ""){
+    		return false;
+    	}else{
+    		getReceivablesDetail(currentPage);
+    	}
+    })
+});
+
+function getReceivablesDetail(page){
+	$.ajax({
+		url: "${CPATH}/admin/receivables/getReceivablesDetail?type="+type+"&page="+page+"&id="+detail_object_id,
+		async: false,
+		success: function(data){
+			var detailHtml = "";
+			if(data.total >= 1){
+				var rows = data.rows;
+				for(var i in rows){
+					detailHtml += '<tr><td>'+rows[i].ref_type+'</td><td>'+rows[i].ref_sn+'</td><td>'+rows[i].biz_date+'</td><td>'+rows[i].receive_amount+'</td><td>'+rows[i].act_amount+'</td><td>'+rows[i].balance_amount+'</td><td>'+rows[i].create_date+'</td>';
+					detailHtml += '<td><a href="'+'${CPATH}/admin/receivables/renderlist?ref_sn='+ rows[i].ref_sn +'&ref_type='+rows[i].ref_type+'">收款详情</a></td></tr>';
+				}
+				var pageCount = Math.ceil(data.total/size);
+				$("#detail-page-count").html(pageCount);
+				$("#detail-current-page").val(data.page);
+			}
+			
+			$('#receivables-detail-tbody').html(detailHtml);
+		}
+	});
+}
+
+function updateOptions(){
+	var type = $("#selecttype").val();
+	$.ajax({
+		url: "${CPATH}/admin/receivables/getOptions?type="+type,
+		async: false,
+		success: function(data){
+			var optionsHtml = '<option value="0" >全部</option>';
+			if(data.length && data.length>=1){
+				for(var i in data){
+					optionsHtml += '<option value="'+data[i].id+'" >'+data[i].name+'</option>';
+				}
+			}
+			$("#category-or-customer").html(optionsHtml);
+		}
+	});
+}
+</#macro>
+<@layout active_id=p child_active_id=c>
+	
+<section class="content-header">
+	<h1>应收帐款管理</h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+       	<li><a href="#">库存管理</a></li>
+       	<li class="active">应收帐款管理</li>
+	</ol>
+</section>
+<!-- Main content -->
+<section class="content">
+	<div class="row content-row">
+		<div class="input-group input-group-sm" style="float:right;">
+			<span>往来单位：</span>
+			<select id="selecttype" style="width:200px">
+				<option value="1" >客户</option>
+				<option value="2" >供应商</option>
+			</select>&nbsp;&nbsp;&nbsp;
+			<span>分类：</span>
+			<select id="category-or-customer" style="width:200px">
+				<option value="0">全部</option>
+			</select>&nbsp;&nbsp;&nbsp;
+			<span id="search-receivables" class="btn btn-default btn-sm btn-flat" >搜索</span>
+		</div>
+	</div>
+	<div class="box" style="height:790px;">
+		<div class="box-body jp-common-pad" style="height:335px;overflow:auto;">
+			<table class="table table-striped">	
+				<thead>
+					<tr>
+						<th>编码</th>
+						<th>名称</th>
+						<th>应收金额</th>
+						<th>已收金额</th>
+						<th>未收金额</th>
+					</tr>
+				</thead>
+				<tbody id="receivables-tbody">
+				</tbody>
+			</table>
+		</div>
+		<div class="cf" style="position:relative;bottom: 0px">
+			<div class="pull-right">
+				<ul class="pagination" id="receivables" style="cursor:pointer">
+					<li id="receivables-first-page" class="paginate_button"><a>首页</a></li>
+					<li id="receivables-previous-page" class="paginate_button"><a>上一页</a></li>
+					<li class="paginate_button"><a>第<input id="receivables-current-page" style="width:25px;height:20px;" align="center" type="text" value="1">页，共<span id="receivables-page-count"></span>页</a></li>
+					<li id="receivables-next-page" class="paginate_button"><a>下一页</a></li>
+					<li id="receivables-last-page" class="paginate_button"><a>尾页</a></li>
+					<li id="receivables-refresh" class="paginate_button"><a >刷新</a></li>
+				</ul>
+			</div>
+		</div>
+		<div class="box-body jp-common-pad" style="height:455px;overflow:auto;">
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>业务类型</th>
+						<th>单号</th>
+						<th>业务日期</th>
+						<th>应收金额</th>
+						<th>已收金额</th>
+						<th>未收金额</th>
+						<th>创建时间</th>
+						<th>收款详情</th>
+					</tr>
+				</thead>
+				<tbody id="receivables-detail-tbody">
+					
+				</tbody>
+			</table>
+		</div>
+		<div class="cf" style="position:relative;bottom: 75px">
+			<div class="pull-right">
+				<ul class="pagination" id="detail" style="cursor:pointer">
+					<li id="detail-first-page" class="paginate_button"><a>首页</a></li>
+					<li id="detail-previous-page" class="paginate_button"><a>上一页</a></li>
+					<li class="paginate_button"><a>第<input id="detail-current-page" style="width:25px;height:20px;" align="center" type="text" value="1">页，共<span id="detail-page-count"></span>页</a></li>
+					<li id="detail-next-page" class="paginate_button"><a>下一页</a></li>
+					<li id="detail-last-page" class="paginate_button"><a>尾页</a></li>
+					<li id="detail-refresh" class="paginate_button"><a >刷新</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</section>
+
+</@layout>

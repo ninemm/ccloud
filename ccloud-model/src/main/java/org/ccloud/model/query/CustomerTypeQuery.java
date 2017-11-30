@@ -143,4 +143,10 @@ public class CustomerTypeQuery extends JBaseQuery {
 		return DAO.doFind("dept_id = ?", id);
 	}
 
+	public List<Record> getCustomerTypes(){
+		StringBuilder fromBuilder = new StringBuilder("SELECT id,name FROM cc_customer_type WHERE `is_show`=1");
+		List<Record> list = Db.find(fromBuilder.toString());
+		return list;
+	}
+
 }
