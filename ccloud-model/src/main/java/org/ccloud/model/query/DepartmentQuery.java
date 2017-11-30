@@ -185,9 +185,11 @@ public class DepartmentQuery extends JBaseQuery {
 		Map<String, Object> map = new HashMap<>();
 		map.put("text", "总部");// 父子表第一级名称,以后可以存储在字典表或字典类
 		ArrayList<String> newArrayList = Lists.newArrayList();
-		if (dataArea.equals(Consts.DEPT_HQ_DATAAREA)) {
+		newArrayList.add(Consts.DEPT_HQ_ID);
+		newArrayList.add(Consts.DEPT_HQ_DATAAREA);
+		newArrayList.add(Consts.DEPT_HQ_LEVEL);
+		if (dataArea.equals(Consts.DEPT_HQ_DATAAREA_LIKE)) {
 			newArrayList.add(Consts.DEPT_HQ_ID);
-			newArrayList.add(Consts.DEPT_HQ_DATAAREA);
 		}
 		map.put("tags", newArrayList);
 		map.put("nodes", doBuild(list)); 
@@ -203,6 +205,8 @@ public class DepartmentQuery extends JBaseQuery {
 			ArrayList<String> newArrayList = Lists.newArrayList();
 			newArrayList.add(dept.getId());
 			newArrayList.add(dept.getDataArea());
+			newArrayList.add(dept.getDeptLevel().toString());
+			newArrayList.add(dept.getId());			
 			map.put("tags", newArrayList);
 				resTreeList.add(map);
 			
@@ -248,23 +252,23 @@ public class DepartmentQuery extends JBaseQuery {
 		}
 		return childList;
 	}
-
+	
 	protected void buildOrderBy(String orderBy, StringBuilder fromBuilder) {
 		
 		fromBuilder.append(" order by ");
 		
 		if (StrKit.isBlank(orderBy)) {
-			fromBuilder.append("d.order_list,d.dept_level asc ");
+			fromBuilder.append("d.dept_level,d.order_list asc ");
 			return ;
 		}
 		
 		String orderbyInfo[] = orderBy.trim().split("\\s+");
 		orderBy = orderbyInfo[0];
 		
-		fromBuilder.append("d.order_list,d.dept_level ");
+		fromBuilder.append("d.dept_level,d.order_list ");
 		
 		if (orderbyInfo.length == 1) {
-			fromBuilder.append("desc");
+			fromBuilder.append("asc");
 		} else {
 			fromBuilder.append(orderbyInfo[1]);
 		}

@@ -16,6 +16,8 @@
 package org.ccloud.model.query;
 
 import java.util.LinkedList;
+import java.util.List;
+
 import org.ccloud.model.PayablesDetail;
 
 import com.jfinal.plugin.activerecord.Page;
@@ -41,10 +43,20 @@ public class PayablesDetailQuery extends JBaseQuery {
 			}
 		});
 	}
+	
+	public PayablesDetail findByObjId(String objId,String deptId,String refSn) {
+		String select = " select * from cc_payables_detail where object_id= '"+objId+"' and dept_id='"+deptId+"' and ref_sn='"+refSn+"'";
+		return DAO.findFirst(select);
+	}
+	
+	public List<PayablesDetail> findByObjId(String objId,String deptId) {
+		String select = " select * from cc_payables_detail where object_id= '"+objId+"' and dept_id='"+deptId+"'";
+		return DAO.find(select);
+	}
 
-	public Page<PayablesDetail> paginate(int pageNumber, int pageSize,String keyword, String orderby) {
+	public Page<PayablesDetail> paginate(int pageNumber, int pageSize,String keyword,String deptId, String orderby) {
 		String select = "select * ";
-		StringBuilder fromBuilder = new StringBuilder("from `cc_payables_detail` ");
+		StringBuilder fromBuilder = new StringBuilder("from `cc_payables_detail` where dept_id = '"+deptId+"'");
 
 		LinkedList<Object> params = new LinkedList<Object>();
 		
@@ -54,10 +66,10 @@ public class PayablesDetailQuery extends JBaseQuery {
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 	
-	public Page<PayablesDetail> findByObjId(int pageNumber, int pageSize,String keyword, String orderby) {
-		String select = "select * ";
-		StringBuilder fromBuilder = new StringBuilder("from `cc_payables_detail` ");
-		fromBuilder.append("where object_id = '"+keyword+"'");
+	public Page<PayablesDetail> findByObjId(int pageNumber, int pageSize,String objId,String deptId, String orderby) {
+		String select = "select cc_d.*,if(cc_s.`status`>0,'已退货','待退货') ref_status ";
+		StringBuilder fromBuilder = new StringBuilder("from cc_payables_detail cc_d inner join `cc_sales_refund_instock` cc_s on cc_d.ref_sn = cc_s.instock_sn and cc_s.payment_type = 0 ");
+		fromBuilder.append("where cc_d.object_id = '"+objId+"' and cc_d.dept_id ='"+deptId+"'");
 		LinkedList<Object> params = new LinkedList<Object>();
 		
 		if (params.isEmpty())

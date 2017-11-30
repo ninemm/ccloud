@@ -41,17 +41,26 @@ public class PayablesQuery extends JBaseQuery {
 			}
 		});
 	}
-
-	public Page<Payables> paginate(int pageNumber, int pageSize,String keyword, String orderby) {
-		String select = "select cc_p.*,cc_c.customer_name ";
-		StringBuilder fromBuilder = new StringBuilder("from cc_payables cc_p inner join cc_customer cc_c on cc_p.obj_id = cc_c.id and cc_c.customer_kind = 2 ");
-
+	
+	public Payables findByObjId(String objId,String deptId) {
+		String select = "select * from cc_payables where obj_id= '"+objId+"' and dept_id= '"+deptId+"'";
+		return DAO.findFirst(select);
+	}
+	
+	public Page<Payables> paginate(int pageNumber, int pageSize,String keyword,String cutomerType,String deptId, String orderby) {
+		String select = "";
+		StringBuilder fromBuilder = new StringBuilder("");
 		LinkedList<Object> params = new LinkedList<Object>();
-		
-		appendIfNotEmptyWithLike(fromBuilder, "cc_c.customer_name", keyword, params, true);
-		
+		if(cutomerType.equals("supplier")) {
+			select = "select cc_p.*,cc_s.`name` customer_name,'供应商' customer_type ";
+			fromBuilder.append(" from cc_payables cc_p inner join cc_supplier cc_s on cc_p.obj_id = cc_s.id where cc_p.obj_type = 'supplier' and cc_p.dept_id ='"+deptId+"' ");
+			appendIfNotEmptyWithLike(fromBuilder, "cc_s.`name`", keyword, params, true);
+		}else {
+			select = "select cc_p.*,cc_c.customer_name customer_name,if(cc_c.customer_kind>1,'直营商','普通客户') customer_type ";
+			fromBuilder.append(" from cc_payables cc_p inner join cc_customer cc_c on cc_p.obj_id = cc_c.id where cc_p.obj_type = 'customer' and cc_p.dept_id ='"+deptId+"' ");
+			appendIfNotEmptyWithLike(fromBuilder, "cc_c.customer_name", keyword, params, true);
+		}
 		fromBuilder.append("order by " + orderby);
-		
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
@@ -70,6 +79,5 @@ public class PayablesQuery extends JBaseQuery {
 		}
 		return 0;
 	}
-
 	
 }

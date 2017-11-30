@@ -102,6 +102,19 @@ function doSubmit(){
 			<div class="col-sm-12 ">
 				<div class="row">
 					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">上级部门:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<div class="input-group">
+								<input type="hidden" id="data_area" name="parentDataArea">
+								<input type="hidden" name="department.parent_id" id="parent_id" value="${(dept.parentId)!}">
+			                 	<input class="form-control input-sm" readOnly type="text" id="parent_name" name="parent_name" value="${(dept.parent_name)!}">
+		                 		<div class="input-group-addon" id="_menu_tree" style="cursor:pointer;">
+		                 			<i class="fa fa-search"></i> 选择
+								</div>
+		                 	</div>
+		               	</div>
+					</div>				
+					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">部门名称:</label>
 						<div class="input-group col-md-4 col-sm-10">
 		                 	<input class="form-control input-sm" type="text" name="department.dept_name" value="${(dept.deptName)!}" placeholder="1-15个任意字符">
@@ -110,7 +123,7 @@ function doSubmit(){
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">部门等级:</label>
 						<div class="input-group col-md-4 col-sm-10">
-		                 	<input class="form-control input-sm" type="text" name="department.dept_level" value="${(dept.deptLevel)!}" placeholder="2-2个任意字母数字">
+		                 	<input class="form-control input-sm" type="text" id="level" name="department.dept_level" value="${(dept.deptLevel)!}" placeholder="2-2个任意字母数字">
 		               	</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">
@@ -122,19 +135,6 @@ function doSubmit(){
 									<option value="${user.id}" <#if user.id == dept.principalUserId!>selected="selected"</#if>>${(user.realname)!}</option>
 								</#list>
 							</select>
-		               	</div>
-					</div>
-					<div class="form-group col-sm-12 validata-box">
-						<label class="control-label col-sm-2">上级部门:</label>
-						<div class="input-group col-md-4 col-sm-10">
-							<div class="input-group">
-								<input type="hidden" id="data_area" name="parentDataArea">
-								<input type="hidden" name="department.parent_id" id="parent_id" value="${(dept.parentId)!}">
-			                 	<input class="form-control input-sm" readOnly type="text" id="parent_name" name="parent_name" value="${(dept.parent_name)!}">
-		                 		<div class="input-group-addon" id="_menu_tree" style="cursor:pointer;">
-		                 			<i class="fa fa-search"></i> 选择
-								</div>
-		                 	</div>
 		               	</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">

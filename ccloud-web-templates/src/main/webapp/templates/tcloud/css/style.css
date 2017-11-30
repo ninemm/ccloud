@@ -101,6 +101,10 @@ a {
   background: #fff;
 }
 
+.weui-tab__bd {
+  padding-bottom: 50px;
+}
+
 .weui-cells {
   font-size: 0.7rem;
 }
@@ -538,8 +542,16 @@ a {
   margin-top: 0;
 }
 
-.product_detail>div>div:last-child {
+.product_detail .product_mUnit+div:last-child {
   color: #bbb;
+}
+
+.gift-open {
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  width: 2rem;
+  text-align: center;
+  box-sizing: border-box;
 }
 
 .spinner{
@@ -620,14 +632,10 @@ a {
 
 /* 购物车 */
 
-#shopping-cart {
+#shopping-cart main{
   font-size: 0.6rem;
-  position: absolute;
-  top: 0;
   bottom: 2.25rem;
-  width: 100%;
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
+  top: 0;
 }
 
 #shopping-cart .weui-panel {
@@ -737,13 +745,9 @@ a {
 
 /* 订单 */
 
-#order article {
-  position: absolute;
+#order main {
   top: 0;
   bottom: 2.25rem;
-  width: 100%;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
 }
 
 #order .weui-panel {
@@ -1392,5 +1396,17 @@ input[name=input-type] {
   .order-customer-info-title {
     width: 25%;
     font-size: 0.7rem;
+  }
+}
+
+@media screen and (max-height:500px) {
+  main{
+    bottom: 0!important;
+  }
+  .weui-footer, .hidden-menu, .weui-tabbar{
+    display: none;
+  }
+  .weui-tab__bd {
+    padding-bottom: 0!important;
   }
 }

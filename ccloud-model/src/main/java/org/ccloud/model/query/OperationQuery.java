@@ -20,6 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.ccloud.model.Operation;
+import org.ccloud.model.Role;
 import org.ccloud.model.User;
 
 import com.jfinal.kit.StrKit;
@@ -133,7 +134,8 @@ public class OperationQuery extends JBaseQuery {
 		return DAO.doFind("module_id = ?", id);
 	}
 
-	public List<Record> queryStationOperation(String id) {
+	public List<Record> queryStationOperation(String id, List<Role> list) {
+		LinkedList<Object> params = new LinkedList<Object>();
 		StringBuilder sqlBuilder = new StringBuilder("select m.id, m.module_name, s.name as sys_name, ");
 		sqlBuilder.append("me.module_name as parent_name, GROUP_CONCAT(o.id) as operation_code, GROUP_CONCAT(o.operation_name) ");
 		sqlBuilder.append("as operation_name,GROUP_CONCAT(IFNULL(b.station_id,'0')) as station_id ");
@@ -141,11 +143,27 @@ public class OperationQuery extends JBaseQuery {
 		sqlBuilder.append("left join `operation` o on o.module_id = m.id ");
 		sqlBuilder.append("left join (SELECT sr.station_id,sr.operation_id FROM station_operation_rel sr WHERE sr.station_id = ?) ");
 		sqlBuilder.append("b ON b.operation_id = o.id ");
-		sqlBuilder.append("WHERE operation_code is not null GROUP BY m.id ORDER BY sys_name, parent_name,module_name");
-		return Db.find(sqlBuilder.toString(), id);
+		params.add(id);
+		if (list != null && list.size() > 0) { 
+			sqlBuilder.append("LEFT JOIN role_operation_rel ro ON ro.operation_id = o.id ");
+		}
+		sqlBuilder.append("WHERE operation_code is not null ");
+		if (list != null && list.size() > 0) { 
+			sqlBuilder.append("AND ro.role_id in (?");
+			params.add(list.get(0).getId());
+			for (int i = 1; i < list.size(); i++) {
+				sqlBuilder.append(",?");
+				params.add(list.get(i).getId());
+			}
+
+			sqlBuilder.append(") ");
+		}			
+		sqlBuilder.append("GROUP BY m.id ORDER BY sys_name, parent_name,module_name");
+		return Db.find(sqlBuilder.toString(), params.toArray());
 	}
 	
-	public List<Record> queryRoleOperation(String id) {
+	public List<Record> queryRoleOperation(String id, List<Role> list) {
+		LinkedList<Object> params = new LinkedList<Object>();
 		StringBuilder sqlBuilder = new StringBuilder("select m.id, m.module_name, s.name as sys_name, ");
 		sqlBuilder.append("me.module_name as parent_name, GROUP_CONCAT(o.id) as operation_code, GROUP_CONCAT(o.operation_name) ");
 		sqlBuilder.append("as operation_name,GROUP_CONCAT(IFNULL(b.role_id,'0')) as station_id ");
@@ -153,8 +171,23 @@ public class OperationQuery extends JBaseQuery {
 		sqlBuilder.append("left join `operation` o on o.module_id = m.id ");
 		sqlBuilder.append("left join (SELECT sr.role_id,sr.operation_id FROM role_operation_rel sr WHERE sr.role_id = ?) ");
 		sqlBuilder.append("b ON b.operation_id = o.id ");
-		sqlBuilder.append("WHERE operation_code is not null GROUP BY m.id ORDER BY sys_name, parent_name,module_name");
-		return Db.find(sqlBuilder.toString(), id);
+		params.add(id);
+		if (list != null && list.size() > 0) { 
+			sqlBuilder.append("LEFT JOIN role_operation_rel ro ON ro.operation_id = o.id ");
+		}
+		sqlBuilder.append("WHERE operation_code is not null ");
+		if (list != null && list.size() > 0) { 
+			sqlBuilder.append("AND ro.role_id in (?");
+			params.add(list.get(0).getId());
+			for (int i = 1; i < list.size(); i++) {
+				sqlBuilder.append(",?");
+				params.add(list.get(i).getId());
+			}
+
+			sqlBuilder.append(") ");
+		}		
+		sqlBuilder.append("GROUP BY m.id ORDER BY sys_name, parent_name,module_name");
+		return Db.find(sqlBuilder.toString(), params.toArray());
 	}
 
 	public List<Record> queryMenuOperation(String id) {
