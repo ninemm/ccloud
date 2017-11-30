@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
@@ -62,7 +63,7 @@ public class _UserController extends JBaseCRUDController<User> {
 		if (StrKit.notBlank(keyword))
 			setAttr("k", keyword);
 		
-		String dataArea = getSessionAttr("DeptDataArea");
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		
 		Page<User> page = UserQuery.me().paginate(getPageNumber(), getPageSize(), keyword, dataArea, "create_date");
 		if (page != null) {
@@ -106,7 +107,7 @@ public class _UserController extends JBaseCRUDController<User> {
 			User user = UserQuery.me().findById(id);
 			setAttr("user", user);
 		}
-		String dataArea = getSessionAttr("DeptDataAreaLike");
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		List<Group> list = GroupQuery.me().findByDept(dataArea);
 		setAttr("list", list);
 	}
@@ -147,7 +148,7 @@ public class _UserController extends JBaseCRUDController<User> {
 
 	public void getStation() {
 		String id = getPara("userid");
-		String dataArea = getSessionAttr("DeptDataAreaLike");
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		List<Station> stations = StationQuery.me().findByDept(dataArea);
 		List<Map<String, Object>> list = new ArrayList<>();
 		for (Station station : stations) {

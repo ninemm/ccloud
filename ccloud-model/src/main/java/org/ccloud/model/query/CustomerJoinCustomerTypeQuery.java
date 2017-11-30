@@ -92,5 +92,5 @@ public class CustomerJoinCustomerTypeQuery extends JBaseQuery {
 		}
 		return 0;
 	}
-
+	
 }

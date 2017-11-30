@@ -93,7 +93,7 @@ public class _StationController extends JBaseCRUDController<Station> {
         Station station = getModel(Station.class);
         User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
         station.setDeptId(user.getDepartmentId());
-        station.setDataArea(getSessionAttr("DeptDataArea").toString());
+        station.setDataArea(user.getDataArea().toString());
         if (StringUtils.isBlank(station.getId())) {
         	station.setIsParent(0);
         }
@@ -167,7 +167,7 @@ public class _StationController extends JBaseCRUDController<Station> {
     }
 
     public void station_tree() {
-    	String dataArea = getSessionAttr("DeptDataAreaLike");
+    	String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
         List<Map<String, Object>> list = StationQuery.me().findStationListAsTree(1, dataArea);
         setAttr("treeData", JSON.toJSON(list));
     }

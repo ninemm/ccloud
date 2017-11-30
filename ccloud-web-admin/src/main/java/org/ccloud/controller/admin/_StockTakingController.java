@@ -32,8 +32,6 @@ import org.ccloud.model.StockTaking;
 import org.ccloud.model.StockTakingDetail;
 import org.ccloud.model.User;
 import org.ccloud.model.Warehouse;
-import org.ccloud.model.base.BaseInventory;
-import org.ccloud.model.query.InventoryDetailQuery;
 import org.ccloud.model.query.InventoryQuery;
 import org.ccloud.model.query.StockTakingDetailQuery;
 import org.ccloud.model.query.StockTakingQuery;

@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
@@ -189,7 +190,7 @@ public class _OperationController extends JBaseCRUDController<Operation> {
 	
 	public void getRoleAndStation() {
         String id = getPara("id");
-        String dataArea = getSessionAttr("DeptDataArea");
+        String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
         List<Record> roles = RoleQuery.me().findBydeptAndOperation(dataArea, id);
         List<Map<String, Object>> roleList = new ArrayList<>();
 
@@ -211,7 +212,7 @@ public class _OperationController extends JBaseCRUDController<Operation> {
 	}
 	
     public void station_tree() {
-    	String dataArea = getSessionAttr("DeptDataArea");
+    	String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
         List<Map<String, Object>> list = StationQuery.me().findStationListAsTree(1, dataArea);
         setAttr("treeData", JSON.toJSON(list));
     }

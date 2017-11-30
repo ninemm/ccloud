@@ -25,20 +25,18 @@
 	var $city = $('#city-picker');
 
 	$(function() {
-	    //$.fn.citypicker.noConflict();
-	
 		$('#customerTypes').select2({
 			placeholder: '请把默认类型设置为第一个'
 		});
+		
 		$city.citypicker({
             simple: true,
             responsive: true,
-            province: '${(customer.prov_name)!}',
+            province: '${(customer.provName)!}', 
             city: '${(customer.city_name)!}',
             district: '${(customer.country_name)!}'
         });
-		//console.log($city.data('citypicker').getCode());
-        //console.log($city.data('citypicker').getVal());
+		
 		jQuery.mm.initValidator('#form', validatorFields)
 		
 	});
@@ -135,7 +133,7 @@
 			type: 2,
 			area: ['580px', '530px'],
 			fix: false, //不固定
-			content: '${CPATH}/admin/customer/user_tree'
+			content: '${CPATH}/admin/sellerCustomer/user_tree'
 		});
 	});
 
@@ -143,6 +141,12 @@
 
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
+			
+			    $("#areaCodes").val($city.data('citypicker').getCode());
+			    $("#areaNames").val($city.data('citypicker').getVal());
+			    console.log($city.data('citypicker').getCode());
+                console.log($city.data('citypicker').getVal());
+			 
 				var validate = $form.data('bootstrapValidator');
 				validate.validate();
 				return validate.isValid()
@@ -187,19 +191,19 @@
 			</div>
 		</div>
 		<form action="${CPATH}/admin/customer/save" method="post" id="form" class="form-horizontal" >
-			<input type="hidden" name="customer.id" value="${(customer.id)!}">
+			<input type="hidden" name="sellerCustomer.id" value="${(sellerCustomer.id)!}">
 			<div class="box-body">
 			    <div class="form-group">
                     <div class="col-sm-5">
                         <label class="control-label col-sm-4">客户名称:</label>
                         <div class="input-group col-sm-8">
-                            <input class="form-control input-sm" type="text" name="customer.customer_name" value="${(customer.customer_name)!}" placeholder="1-25个任意字母数字">
+                            <input class="form-control input-sm" type="text" name="customer.customer_name" value="${(sellerCustomer.customer.customer_name)!}" placeholder="1-25个任意字母数字">
                         </div>
                     </div>
                     <div class="col-sm-5">
                         <label class="control-label col-sm-4">客户编码:</label>
                         <div class="input-group col-sm-8">
-                            <input class="form-control input-sm" type="text" name="customer.customer_code" value="${(customer.customer_code)!}" placeholder="1-15个任意字母数字">
+                            <input class="form-control input-sm" type="text" name="customer.customer_code" value="${(sellerCustomer.customer.customer_code)!}" placeholder="1-15个任意字母数字">
                         </div>
                     </div>
                 </div> 
@@ -207,40 +211,23 @@
                     <div class="col-sm-5">
                         <label class="control-label col-sm-4">联系人:</label>
                         <div class="input-group col-sm-8">
-                            <input class="form-control input-sm" type="text" name="customer.contact" value="${(customer.contact)!}" placeholder="1-15个任意字母数字">
+                            <input class="form-control input-sm" type="text" name="customer.contact" value="${(sellerCustomer.customer.contact)!}" placeholder="1-15个任意字母数字">
                         </div>
                     </div>
                     <div class="col-sm-5">
                         <label class="control-label col-sm-4">手机号:</label>
                         <div class="input-group col-sm-8">
-                            <input class="form-control input-sm" type="text" name="customer.mobile" value="${(customer.mobile)!}" placeholder="11位数字">
+                            <input class="form-control input-sm" type="text" name="customer.mobile" value="${(sellerCustomer.customer.mobile)!}" placeholder="11位数字">
                         </div>
                     </div>
                 </div>
 				
-				<div class="form-group col-sm-10">
-                    <label for="_title" class="col-sm-2 control-label">省市区:</label>
-                    <div class="input-group col-sm-10">
-                        <input readonly type="text" id="city-picker" style="width:70%;">
-                        <input type="hidden" name="userProvinceText" id="userProvinceText" value="" />
-                        <input type="hidden" name="userCityText" id="userCityText" value="" />
-                        <input type="hidden" name="userDistrictText" id="userDistrictText" value="" />
-                    </div>
-                </div>
-				
-				<div class="form-group col-sm-10 validata-box">
-                    <label for="_title" class="col-sm-2 control-label">详细地址:</label>
-                    <div class="input-group col-sm-10">
-                        <input class="form-control input-sm" type="text" name="customer.address" value="${(customer.address)!}" placeholder="1-50个任意字母数字">
-                    </div>
-                </div>
-                
                 <div class="form-group">
                     <div class="col-sm-5">
                         <label class="control-label col-sm-4">客户类型:</label>
                         <div class="input-group col-sm-8">
                             <select class="form-control input-sm" name="customerTypes" id ="customerTypes" multiple="multiple" >
-	                            <#list (customerTypeList)! as customerType >
+	                            <#list (customerTypeList)! as customerType>
 	                                <option value="${customerType.id}" <#if cTypeList??&&cTypeList?contains(customerType.id)>selected="selected"</#if>>${(customerType.name)!}</option>
 	                            </#list>
 	                        </select>
@@ -264,25 +251,41 @@
                     <div class="col-sm-5">
                         <label class="control-label col-sm-4">客户子类:</label>
                         <div class="input-group col-sm-8">
-                            <select class="form-control input-sm" name="customer.subType">
-                                ${DICT_BOX('customer_subtype', 'select', (customer.sub_type)!)}
+                            <select class="form-control input-sm" name="sellCustomer.sub_type">
+                                ${DICT_BOX('customer_subtype', 'select', (sellCustomer.subType)!)}
                             </select>
                         </div>
                     </div>
                     <div class="col-sm-5">
                         <label class="control-label col-sm-4">客户种类:</label>
                         <div class="input-group col-sm-8">
-                            <select class="form-control input-sm" name="customer.subType">
-                                ${DICT_BOX('customer_kind', 'select', (customer.sub_type)!)}
+                            <select class="form-control input-sm" name="sellCustomer.customer_kind">
+                                ${DICT_BOX('customer_kind', 'select', (sellCustomer.customerKind)!)}
                             </select>
                         </div>
+                    </div>
+                </div>
+                
+                <div class="form-group col-sm-10">
+                    <label for="_title" class="col-sm-2 control-label">省市区:</label>
+                    <div class="input-group col-sm-10">
+                        <input readonly type="text" id="city-picker" data-toggle="city-picker" style="width:70%;">
+                        <input type="hidden" id="areaNames" name="areaNames">
+                        <input type="hidden" id="areaCodes" name="areaCodes">
+                    </div>
+                </div>
+                
+                <div class="form-group col-sm-10 validata-box">
+                    <label for="_title" class="col-sm-2 control-label">详细地址:</label>
+                    <div class="input-group col-sm-10">
+                        <input class="form-control input-sm" type="text" name="customer.address" value="${(customer.address)!}" placeholder="1-50个任意字母数字">
                     </div>
                 </div>
 			</div>
 		</form>
 		<div class="box-footer"> 
-			<button type="button" onclick="doSubmit()" class="btn btn-primary">保存更改</button>
-			<input type="button" class="btn btn-primary" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
+			<button type="button" onclick="doSubmit()" class="btn btn-primary btn-flat">保存更改</button>
+			<input type="button" class="btn btn-primary btn-flat" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
 		</div>
 	</div>
 </section>

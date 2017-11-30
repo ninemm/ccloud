@@ -111,7 +111,7 @@ public class WorkFlowService {
 
 	}
 
-	/***
+	/**
 	 * 删除模型
 	 */
 	@Before(Tx.class)
@@ -119,7 +119,7 @@ public class WorkFlowService {
 		ActivitiPlugin.buildProcessEngine().getRepositoryService().deleteModel(id);
 	}
 
-	/***
+	/**
 	 * 挂起/激活
 	 */
 	@Before(Tx.class)
@@ -136,7 +136,7 @@ public class WorkFlowService {
 		return "无操作";
 	}
 
-	/***
+	/**
 	 * 转化为模型
 	 */
 	@Before(Tx.class)

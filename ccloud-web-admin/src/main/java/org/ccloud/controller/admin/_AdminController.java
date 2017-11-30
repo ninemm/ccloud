@@ -47,30 +47,29 @@ public class _AdminController extends JBaseController {
 
 	@Before(ActionCacheClearInterceptor.class)
 	public void index() {
-		
-/*		List<TplModule> moduleList = TemplateManager.me().currentTemplateModules();
-		setAttr("modules", moduleList);
 
-		if (moduleList != null && moduleList.size() > 0) {
-			String moduels[] = new String[moduleList.size()];
-			for (int i = 0; i < moduleList.size(); i++) {
-				moduels[i] = moduleList.get(i).getName();
-			}
+		/*
+		 * List<TplModule> moduleList = TemplateManager.me().currentTemplateModules();
+		 * setAttr("modules", moduleList);
+		 * 
+		 * if (moduleList != null && moduleList.size() > 0) { String moduels[] = new
+		 * String[moduleList.size()]; for (int i = 0; i < moduleList.size(); i++) {
+		 * moduels[i] = moduleList.get(i).getName(); }
+		 * 
+		 * List<Content> contents = ContentQuery.me().findListInNormal(1, 20, null,
+		 * null, null, null, moduels, null, null, null, null, null, null, null, null);
+		 * setAttr("contents", contents); }
+		 * 
+		 * Page<Comment> commentPage =
+		 * CommentQuery.me().paginateWithContentNotInDelete(1, 10, null, null, null,
+		 * null); if (commentPage != null) { setAttr("comments", commentPage.getList());
+		 * }
+		 */
 
-			List<Content> contents = ContentQuery.me().findListInNormal(1, 20, null, null, null, null, moduels, null,
-					null, null, null, null, null, null, null);
-			setAttr("contents", contents);
-		}
-
-		Page<Comment> commentPage = CommentQuery.me().paginateWithContentNotInDelete(1, 10, null, null, null, null);
-		if (commentPage != null) {
-			setAttr("comments", commentPage.getList());
-		}*/
-		
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		if (user == null) {
 			redirect("/admin/login");
-			return ;
+			return;
 		}
 		setAttr("toDoCustomerList", CustomerQuery.me().getToDo(user.getUsername()));
 
@@ -82,29 +81,32 @@ public class _AdminController extends JBaseController {
 		String username = getPara("username");
 		String password = getPara("password");
 		String rememberMeStr = getPara("remember_me");
-        boolean rememberMe = false;
-        if (rememberMeStr != null && rememberMeStr.equals("on")) {
-            rememberMe = true;
-        }		
+		boolean rememberMe = false;
+		if (rememberMeStr != null && rememberMeStr.equals("on")) {
+			rememberMe = true;
+		}
 
 		if (!StringUtils.areNotEmpty(username, password)) {
 			render("login.html");
 			return;
 		}
 
-	    Subject subject = SecurityUtils.getSubject();
-	    CaptchaUsernamePasswordToken token = new CaptchaUsernamePasswordToken(username, password, rememberMe, "", "");
-	    try {
-	        subject.login(token);
-	        User user = (User) subject.getPrincipal();
+		Subject subject = SecurityUtils.getSubject();
+		CaptchaUsernamePasswordToken token = new CaptchaUsernamePasswordToken(username, password, rememberMe, "", "");
+		try {
+			subject.login(token);
+			User user = (User) subject.getPrincipal();
 			if (user != null) {
-				String dataArea = DataAreaUtil.getUserDeptDataArea(user.getDataArea());
-				String dealerDataArea = DataAreaUtil.getUserDealerDataArea(user.getDataArea());
 				List<Seller> sellerList = SellerQuery.me().querySellIdByDept(user.getDepartmentId());
-				setSessionAttr("DeptDataAreaLike", dataArea + "%");
-				setSessionAttr("DeptDataArea", dataArea);
+
+				// 数据查看时的数据域
+				if (subject.isPermitted("/admin/all") || subject.isPermitted("/admin/manager")) {
+					setSessionAttr(Consts.SESSION_SELECT_DATAAREA,
+							DataAreaUtil.getUserDeptDataArea(user.getDataArea()) + "%");
+				} else {
+					setSessionAttr(Consts.SESSION_SELECT_DATAAREA, user.getDataArea());
+				}
 				setSessionAttr("sellerList", sellerList);
-				setSessionAttr("dealerDataArea", dealerDataArea);
 				if (sellerList.size() > 0) {
 					setSessionAttr("sellerId", sellerList.get(0).getId());
 					setSessionAttr("sellerCode", sellerList.get(0).getSellerCode());
@@ -113,25 +115,27 @@ public class _AdminController extends JBaseController {
 			}
 			MessageKit.sendMessage(Actions.USER_LOGINED, user);
 			CookieUtils.put(this, Consts.COOKIE_LOGINED_USER, user.getId().toString());
-			setSessionAttr(Consts.SESSION_LOGINED_USER, user);	        
-	        renderAjaxResultForSuccess("登录成功");
-	    } catch (AuthenticationException e) {
-	    	e.printStackTrace();
-	    	renderAjaxResultForError("用户名或密码错误");
-	    }
+			setSessionAttr(Consts.SESSION_LOGINED_USER, user);
+			renderAjaxResultForSuccess("登录成功");
+		} catch (AuthenticationException e) {
+			e.printStackTrace();
+			renderAjaxResultForError("用户名或密码错误");
+		}
 	}
 
 	@Before(UCodeInterceptor.class)
 	public void logout() {
+		removeSessionAttr(Consts.SESSION_LOGINED_USER);
+		removeSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		removeSessionAttr("sellerId");
 		removeSessionAttr("sellerCode");
 		removeSessionAttr("sellerName");
 		CookieUtils.remove(this, Consts.COOKIE_LOGINED_USER);
-	    Subject subject = SecurityUtils.getSubject();
-	    subject.logout();
+		Subject subject = SecurityUtils.getSubject();
+		subject.logout();
 		redirect("/admin");
 	}
-	
+
 	public void checkRole() {
 		render("404.html");
 	}

@@ -31,7 +31,6 @@ import org.ccloud.ui.freemarker.tag.DictTag;
 
 import com.jfinal.kit.PropKit;
 import com.jfinal.qyweixin.sdk.api.ApiConfig;
-import com.jfinal.qyweixin.sdk.api.ApiConfigKit;
 import com.jfinal.render.FreeMarkerRender;
 import com.jfinal.template.Engine;
 
@@ -58,7 +57,7 @@ public class Config extends CCloudConfig {
 		
 		MessageKit.sendMessage(Actions.CCLOUD_STARTED);
 		
-		ApiConfigKit.putApiConfig(getApiConfig());
+		//ApiConfigKit.putApiConfig(getApiConfig());
 	}
 
 	@Override

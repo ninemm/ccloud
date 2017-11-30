@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.Department;
@@ -67,7 +68,7 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 		}
 
 		String parentId = getPara("parentId", "0");
-		String dataArea = getSessionAttr("DeptDataAreaLike");
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
 		Page<Department> page = DepartmentQuery.me().paginate(getPageNumber(), getPageSize(), parentId, keyword, dataArea, null);
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
@@ -149,7 +150,7 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 	}	
 
 	public void department_tree() {
-		String dataArea = getSessionAttr("DeptDataArea");
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		List<Map<String, Object>> list = DepartmentQuery.me().findDeptListAsTree(1, dataArea);
 		setAttr("treeData", JSON.toJSON(list));
 	}

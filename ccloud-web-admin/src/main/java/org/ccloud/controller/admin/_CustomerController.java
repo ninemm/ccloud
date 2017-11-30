@@ -29,10 +29,11 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.apache.shiro.subject.Subject;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
+import org.ccloud.message.Actions;
+import org.ccloud.message.MessageKit;
 import org.ccloud.model.Customer;
 import org.ccloud.model.Department;
 import org.ccloud.model.ModelSorter;
@@ -48,13 +49,15 @@ import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.StringUtils;
+import org.ccloud.wechat.WechatApiConfigInterceptor;
 import org.ccloud.workflow.service.WorkFlowService;
+import org.joda.time.DateTime;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.jfinal.aop.Before;
+import com.jfinal.kit.Kv;
 import com.jfinal.kit.Ret;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
@@ -102,29 +105,6 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 
 	}
 
-	private Map<String, String> getDeptIdAndDataArea() {
-
-		Map<String, String> map = Maps.newHashMap();
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		Subject subject = SecurityUtils.getSubject();
-
-		if (subject.isPermitted("/admin/all")) {
-			map.put("deptId", "");
-			map.put("dataArea", "");
-
-		} else if (subject.isPermitted("/admin/dealer/all")) {
-			map.put("deptId", user.getDepartmentId());
-			map.put("dataArea", DataAreaUtil.getUserDeptDataArea(user.getDataArea()) + "%");
-
-		} else {
-			map.put("deptId", user.getDepartmentId());
-			map.put("dataArea", DataAreaUtil.getUserDeptDataArea(user.getDataArea()));
-
-		}
-
-		return map;
-	}
-
 	@RequiresPermissions(value = { "/admin/customer/edit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void enable() {
 
@@ -144,7 +124,6 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 	public void edit() {
 		String id = getPara("id");
 
-		boolean notBlank = StrKit.notBlank(id);
 		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/all");
 		boolean isDealerAdmin = SecurityUtils.getSubject().isPermitted("/admin/dealer/all");
 
@@ -155,7 +134,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 		StringBuilder cUserIds = new StringBuilder();
 		StringBuilder cUserNames = new StringBuilder();
 
-		if (notBlank) {// 超级管理员修改
+		if (StrKit.notBlank(id)) {// 超级管理员修改
 			setAttr("customer", CustomerQuery.me().findById(id));
 			setAttr("cTypeList", CustomerJoinCustomerTypeQuery.me().findCustomerTypeListByCustomerId(id,
 					DataAreaUtil.getUserDealerDataArea(dataArea)));
@@ -188,7 +167,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 	@RequiresPermissions(value = { "/admin/customer/edit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void user_tree() {
 
-		String dataArea = getSessionAttr("DeptDataAreaLike");
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		List<Department> list = DepartmentQuery.me().findDeptList(dataArea, "order_list asc");
 		List<Map<String, Object>> resTreeList = new ArrayList<Map<String, Object>>();
 		ModelSorter.tree(list);
@@ -204,7 +183,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 	@RequiresPermissions(value = { "/admin/customer/edit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void department_tree() {
 
-		String dataArea = getSessionAttr("DeptDataAreaLike");
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		List<Department> list = DepartmentQuery.me().findDeptList(dataArea, "order_list asc");
 		List<Map<String, Object>> resTreeList = new ArrayList<Map<String, Object>>();
 		ModelSorter.tree(list);
@@ -254,7 +233,8 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 	}
 
 	@Override
-	@Before(Tx.class)
+	
+	@Before({Tx.class, WechatApiConfigInterceptor.class})
 	@RequiresPermissions(value = { "/admin/customer/edit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void save() {
 
@@ -308,6 +288,20 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 			customer.setProcInstId(procInstId);
 			customer.set("modify_date", new Date());
 			customer.update();
+			
+			User tmp = UserQuery.me().findUserByUsername("yly");
+			Kv kv = Kv.create();
+			
+			kv.set("touser", tmp.getWechatOpenId());
+			kv.set("templateId", "Rak2cOiujFAdjxx-80z6y2JL4IFwSbKTxP1rkHUBZrI");
+			kv.set("customerName", customer.getCustomerName());
+			kv.set("submit", user.getRealname());
+			
+			kv.set("createTime", DateTime.now().toString("yyyy-MM-dd HH:mm"));
+			kv.set("status", "待审核");
+			
+			MessageKit.sendMessage(Actions.NotifyMessage.CUSTOMER_AUDIT_MESSAGE, kv);
+			
 		}
 
 		for (String customerType : customerTypes) {
