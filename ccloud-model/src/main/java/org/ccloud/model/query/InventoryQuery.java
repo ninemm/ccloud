@@ -72,10 +72,10 @@ public class InventoryQuery extends JBaseQuery {
 		}
 		return 0;
 	}
-
-	public List<Record> getWareHouseInfo(String seller_id) {
-		StringBuilder fromBuilder = new StringBuilder("SELECT id,code,name FROM cc_warehouse where seller_id=?");
-		List<Record> list = Db.find(fromBuilder.toString(),seller_id);
+	
+	public List<Record> getWareHouseInfo(String userId) {
+		StringBuilder fromBuilder = new StringBuilder("select w.id,w.code,w.name from  cc_warehouse w,cc_user_join_warehouse uw where w.id =uw.warehouse_id and uw.user_id=?");
+		List<Record> list = Db.find(fromBuilder.toString(),userId);
 		return list;
 	}
 	

@@ -80,11 +80,6 @@ public class WarehouseQuery extends JBaseQuery {
 	public List<Warehouse> findAll() {
 		return DAO.doFind();
 	}
-	
-	public List<Warehouse> findBySellerId(String sellerId){
-		String sql = "SELECT * from cc_warehouse where seller_id= ?";
-		return DAO.find(sql, sellerId);
-	}
 
 	public List<Warehouse> findWareHouseByDept(String id) {
 		return DAO.doFind("dept_id = ?", id);
@@ -92,6 +87,15 @@ public class WarehouseQuery extends JBaseQuery {
 	
 	public List<Warehouse> findByUserId(String userId){
 		String sql = "select cw.* from cc_warehouse cw LEFT JOIN user u on u.department_id=cw.dept_id where u.id=?";
+		return DAO.find(sql, userId);
+	}
+
+	public int deleteWarehouseId(String warehouse_id) {
+		return DAO.doDelete("id=?",warehouse_id);
+	}
+
+	public List<Warehouse> findWarehouseByUserId(String userId) {
+		String sql = "select w.* from  cc_warehouse w,cc_user_join_warehouse uw where w.id =uw.warehouse_id and uw.user_id=?";
 		return DAO.find(sql, userId);
 	}
  }

@@ -64,7 +64,6 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 	public static final String COMPANYCODE = "100000";
 
 	public void list() {
-		
 		String keyword = getPara("k");
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
@@ -80,12 +79,11 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 		String id = getPara("id");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String userId = user.getId();
-		String seller_id=getSessionAttr("sellerId").toString();
 		if (id != null) {
 			StockTaking stockTaking = StockTakingQuery.me().findById(id);
 			setAttr("stockTaking", stockTaking);
 		}
-		List<Warehouse> wlist = WarehouseQuery.me().findBySellerId(seller_id);
+		List<Warehouse> wlist = WarehouseQuery.me().findWarehouseByUserId(userId);
 		setAttr("wlist", wlist);
 		List<User> ulist = UserQuery.me().findUserList(userId);
 		setAttr("ulist", ulist);
@@ -97,6 +95,9 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 		String id = getPara("id");
 		int isEnabled = getParaToInt("isEnabled");
 		StockTaking stockTaking = StockTakingQuery.me().findById(id);
+		Warehouse warehouse=WarehouseQuery.me().findById(stockTaking.getWarehouseId());
+		warehouse.setIsInited(1);
+		warehouse.update();
 		stockTaking.setStatus(isEnabled);
 		if (stockTaking.saveOrUpdate()) {
 			List<Map<String, Object>>listMap=StockTakingDetailQuery.me().findByStockTakingDetailId1(id);
@@ -163,7 +164,6 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 			stockTaking.setDataArea(user.getDataArea());
 			stockTaking.setInputUserId(user.getId());
 			stockTaking.setSellerId( getSessionAttr("sellerId").toString());
-			
 			Map<String, String[]> map = getParaMap();
 			boolean update = false;
 			if (StringUtils.isBlank(stockTaking.getId())) {
@@ -210,7 +210,6 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 								.getArrayFirst(map.get("stockTakingList[" + factIndex[i] + "].product_count"));
 						String remark = StringUtils
 								.getArrayFirst(map.get("stockTakingList[" + factIndex[i] + "].remark"));
-
 						stockTakingDetail.setProductId(productId);
 						stockTakingDetail.setProductCount(Integer.parseInt(productCount));
 						stockTakingDetail.setRemark(remark);

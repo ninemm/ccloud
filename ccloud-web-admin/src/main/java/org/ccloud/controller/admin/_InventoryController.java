@@ -18,6 +18,7 @@ package org.ccloud.controller.admin;
 import java.util.List;
 import java.util.Map;
 
+import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.route.RouterMapping;
@@ -26,6 +27,7 @@ import org.ccloud.model.Inventory;
 import org.ccloud.model.query.InventoryQuery;
 import org.ccloud.model.query.StockTakingDetailQuery;
 import org.ccloud.model.InventoryDetail;
+import org.ccloud.model.User;
 import org.ccloud.model.query.InventoryDetailQuery;
 
 import com.google.common.collect.ImmutableMap;
@@ -41,8 +43,9 @@ import com.jfinal.plugin.activerecord.Record;
 public class _InventoryController extends JBaseCRUDController<Inventory> { 
 
 	public void getWarehouse() {
-		String seller_id=getSessionAttr("sellerId").toString();
-		List<Record> list = InventoryQuery.me().getWareHouseInfo(seller_id);
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String userId = user.getId();
+		List<Record> list = InventoryQuery.me().getWareHouseInfo(userId);
 		renderJson(list);
 	}
 	
