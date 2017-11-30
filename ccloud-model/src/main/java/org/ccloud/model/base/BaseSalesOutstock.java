@@ -114,6 +114,14 @@ public abstract class BaseSalesOutstock<M extends BaseSalesOutstock<M>> extends 
 		return getStr("seller_id");
 	}
 
+	public void setWarehouseId(java.lang.String warehouseId) {
+		set("warehouse_id", warehouseId);
+	}
+
+	public java.lang.String getWarehouseId() {
+		return getStr("warehouse_id");
+	}
+
 	public void setCustomerId(java.lang.String customerId) {
 		set("customer_id", customerId);
 	}
@@ -122,12 +130,12 @@ public abstract class BaseSalesOutstock<M extends BaseSalesOutstock<M>> extends 
 		return getStr("customer_id");
 	}
 
-	public void setWarehouseId(java.lang.String warehouseId) {
-		set("warehouse_id", warehouseId);
+	public void setCustomerTypeId(java.lang.String customerTypeId) {
+		set("customer_type_id", customerTypeId);
 	}
 
-	public java.lang.String getWarehouseId() {
-		return getStr("warehouse_id");
+	public java.lang.String getCustomerTypeId() {
+		return getStr("customer_type_id");
 	}
 
 	public void setContact(java.lang.String contact) {
@@ -208,6 +216,22 @@ public abstract class BaseSalesOutstock<M extends BaseSalesOutstock<M>> extends 
 
 	public java.lang.Integer getReceiveType() {
 		return getInt("receive_type");
+	}
+
+	public void setDeliveryAddress(java.lang.String deliveryAddress) {
+		set("delivery_address", deliveryAddress);
+	}
+
+	public java.lang.String getDeliveryAddress() {
+		return getStr("delivery_address");
+	}
+
+	public void setDeliveryDate(java.util.Date deliveryDate) {
+		set("delivery_date", deliveryDate);
+	}
+
+	public java.util.Date getDeliveryDate() {
+		return get("delivery_date");
 	}
 
 	public void setProcKey(java.lang.String procKey) {

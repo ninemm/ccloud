@@ -38,7 +38,6 @@ import org.ccloud.model.Customer;
 import org.ccloud.model.Department;
 import org.ccloud.model.ModelSorter;
 import org.ccloud.model.User;
-import org.ccloud.model.query.CustomerJoinCustomerTypeQuery;
 import org.ccloud.model.query.CustomerQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.DepartmentQuery;
@@ -245,7 +244,6 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 		customer.setCityName(getPara("userCityText"));
 		customer.setCountryCode(getPara("userDistrictId"));
 		customer.setCountryName(getPara("userDistrictText"));
-		customer.setIsArchive(1);
 		
 		if(!this.checkCustomerNameAndMobile(customer)) {
 			renderAjaxResultForError("该客户已存在");

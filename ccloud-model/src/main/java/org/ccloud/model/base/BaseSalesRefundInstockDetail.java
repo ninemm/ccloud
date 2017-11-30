@@ -98,22 +98,6 @@ public abstract class BaseSalesRefundInstockDetail<M extends BaseSalesRefundInst
 		return getStr("id");
 	}
 
-	public void setProductId(java.lang.String productId) {
-		set("product_id", productId);
-	}
-
-	public java.lang.String getProductId() {
-		return getStr("product_id");
-	}
-
-	public void setWarehouseId(java.lang.String warehouseId) {
-		set("warehouse_id", warehouseId);
-	}
-
-	public java.lang.String getWarehouseId() {
-		return getStr("warehouse_id");
-	}
-
 	public void setRefundInstockId(java.lang.String refundInstockId) {
 		set("refund_instock_id", refundInstockId);
 	}
@@ -122,44 +106,52 @@ public abstract class BaseSalesRefundInstockDetail<M extends BaseSalesRefundInst
 		return getStr("refund_instock_id");
 	}
 
-	public void setProductCount(java.lang.String productCount) {
+	public void setSellProductId(java.lang.String sellProductId) {
+		set("sell_product_id", sellProductId);
+	}
+
+	public java.lang.String getSellProductId() {
+		return getStr("sell_product_id");
+	}
+
+	public void setProductCount(java.lang.Integer productCount) {
 		set("product_count", productCount);
 	}
 
-	public java.lang.String getProductCount() {
-		return getStr("product_count");
+	public java.lang.Integer getProductCount() {
+		return getInt("product_count");
 	}
 
-	public void setProductAmount(java.lang.String productAmount) {
+	public void setProductAmount(java.math.BigDecimal productAmount) {
 		set("product_amount", productAmount);
 	}
 
-	public java.lang.String getProductAmount() {
-		return getStr("product_amount");
+	public java.math.BigDecimal getProductAmount() {
+		return get("product_amount");
 	}
 
-	public void setProductPrice(java.lang.String productPrice) {
+	public void setProductPrice(java.math.BigDecimal productPrice) {
 		set("product_price", productPrice);
 	}
 
-	public java.lang.String getProductPrice() {
-		return getStr("product_price");
+	public java.math.BigDecimal getProductPrice() {
+		return get("product_price");
 	}
 
-	public void setCost(java.lang.String cost) {
+	public void setCost(java.math.BigDecimal cost) {
 		set("cost", cost);
 	}
 
-	public java.lang.String getCost() {
-		return getStr("cost");
+	public java.math.BigDecimal getCost() {
+		return get("cost");
 	}
 
-	public void setTotalCost(java.lang.String totalCost) {
+	public void setTotalCost(java.math.BigDecimal totalCost) {
 		set("total_cost", totalCost);
 	}
 
-	public java.lang.String getTotalCost() {
-		return getStr("total_cost");
+	public java.math.BigDecimal getTotalCost() {
+		return get("total_cost");
 	}
 
 	public void setOutstockDetailId(java.lang.String outstockDetailId) {
@@ -192,6 +184,14 @@ public abstract class BaseSalesRefundInstockDetail<M extends BaseSalesRefundInst
 
 	public java.lang.Integer getRejectProductCount() {
 		return getInt("reject_product_count");
+	}
+
+	public void setIsGift(java.lang.Integer isGift) {
+		set("is_gift", isGift);
+	}
+
+	public java.lang.Integer getIsGift() {
+		return getInt("is_gift");
 	}
 
 	public void setRemark(java.lang.String remark) {

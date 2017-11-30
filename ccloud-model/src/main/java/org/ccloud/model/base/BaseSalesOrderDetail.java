@@ -106,12 +106,12 @@ public abstract class BaseSalesOrderDetail<M extends BaseSalesOrderDetail<M>> ex
 		return getStr("order_id");
 	}
 
-	public void setProductId(java.lang.String productId) {
-		set("product_id", productId);
+	public void setSellProductId(java.lang.String sellProductId) {
+		set("sell_product_id", sellProductId);
 	}
 
-	public java.lang.String getProductId() {
-		return getStr("product_id");
+	public java.lang.String getSellProductId() {
+		return getStr("sell_product_id");
 	}
 
 	public void setWarehouseId(java.lang.String warehouseId) {

@@ -95,7 +95,7 @@ public abstract class BaseCustomer<M extends BaseCustomer<M>> extends JModel<M> 
 	}
 
 	public java.lang.String getId() {
-		return get("id");
+		return getStr("id");
 	}
 
 	public void setCustomerCode(java.lang.String customerCode) {
@@ -103,7 +103,7 @@ public abstract class BaseCustomer<M extends BaseCustomer<M>> extends JModel<M> 
 	}
 
 	public java.lang.String getCustomerCode() {
-		return get("customer_code");
+		return getStr("customer_code");
 	}
 
 	public void setCustomerName(java.lang.String customerName) {
@@ -111,7 +111,7 @@ public abstract class BaseCustomer<M extends BaseCustomer<M>> extends JModel<M> 
 	}
 
 	public java.lang.String getCustomerName() {
-		return get("customer_name");
+		return getStr("customer_name");
 	}
 
 	public void setContact(java.lang.String contact) {
@@ -119,7 +119,7 @@ public abstract class BaseCustomer<M extends BaseCustomer<M>> extends JModel<M> 
 	}
 
 	public java.lang.String getContact() {
-		return get("contact");
+		return getStr("contact");
 	}
 
 	public void setMobile(java.lang.String mobile) {
@@ -127,7 +127,7 @@ public abstract class BaseCustomer<M extends BaseCustomer<M>> extends JModel<M> 
 	}
 
 	public java.lang.String getMobile() {
-		return get("mobile");
+		return getStr("mobile");
 	}
 
 	public void setEmail(java.lang.String email) {
@@ -135,23 +135,7 @@ public abstract class BaseCustomer<M extends BaseCustomer<M>> extends JModel<M> 
 	}
 
 	public java.lang.String getEmail() {
-		return get("email");
-	}
-
-	public void setCreditAmount(java.lang.Integer creditAmount) {
-		set("credit_amount", creditAmount);
-	}
-
-	public java.lang.Integer getCreditAmount() {
-		return get("credit_amount");
-	}
-
-	public void setBalanceAmount(java.lang.Integer balanceAmount) {
-		set("balance_amount", balanceAmount);
-	}
-
-	public java.lang.Integer getBalanceAmount() {
-		return get("balance_amount");
+		return getStr("email");
 	}
 
 	public void setImgPath(java.lang.String imgPath) {
@@ -159,31 +143,7 @@ public abstract class BaseCustomer<M extends BaseCustomer<M>> extends JModel<M> 
 	}
 
 	public java.lang.String getImgPath() {
-		return get("img_path");
-	}
-
-	public void setSubType(java.lang.String subType) {
-		set("sub_type", subType);
-	}
-
-	public java.lang.String getSubType() {
-		return get("sub_type");
-	}
-
-	public void setCustomerKind(java.lang.String customerKind) {
-		set("customer_kind", customerKind);
-	}
-
-	public java.lang.String getCustomerKind() {
-		return get("customer_kind");
-	}
-
-	public void setIsChecked(java.lang.Integer isChecked) {
-		set("is_checked", isChecked);
-	}
-
-	public java.lang.Integer getIsChecked() {
-		return get("is_checked");
+		return getStr("img_path");
 	}
 
 	public void setIsEnabled(java.lang.Integer isEnabled) {
@@ -191,15 +151,7 @@ public abstract class BaseCustomer<M extends BaseCustomer<M>> extends JModel<M> 
 	}
 
 	public java.lang.Integer getIsEnabled() {
-		return get("is_enabled");
-	}
-
-	public void setIsArchive(java.lang.Integer isArchive) {
-		set("is_archive", isArchive);
-	}
-
-	public java.lang.Integer getIsArchive() {
-		return get("is_archive");
+		return getInt("is_enabled");
 	}
 
 	public void setProvName(java.lang.String provName) {
@@ -207,7 +159,7 @@ public abstract class BaseCustomer<M extends BaseCustomer<M>> extends JModel<M> 
 	}
 
 	public java.lang.String getProvName() {
-		return get("prov_name");
+		return getStr("prov_name");
 	}
 
 	public void setCityName(java.lang.String cityName) {
@@ -215,7 +167,7 @@ public abstract class BaseCustomer<M extends BaseCustomer<M>> extends JModel<M> 
 	}
 
 	public java.lang.String getCityName() {
-		return get("city_name");
+		return getStr("city_name");
 	}
 
 	public void setCountryName(java.lang.String countryName) {
@@ -223,7 +175,7 @@ public abstract class BaseCustomer<M extends BaseCustomer<M>> extends JModel<M> 
 	}
 
 	public java.lang.String getCountryName() {
-		return get("country_name");
+		return getStr("country_name");
 	}
 
 	public void setProvCode(java.lang.String provCode) {
@@ -231,7 +183,7 @@ public abstract class BaseCustomer<M extends BaseCustomer<M>> extends JModel<M> 
 	}
 
 	public java.lang.String getProvCode() {
-		return get("prov_code");
+		return getStr("prov_code");
 	}
 
 	public void setCityCode(java.lang.String cityCode) {
@@ -239,7 +191,7 @@ public abstract class BaseCustomer<M extends BaseCustomer<M>> extends JModel<M> 
 	}
 
 	public java.lang.String getCityCode() {
-		return get("city_code");
+		return getStr("city_code");
 	}
 
 	public void setCountryCode(java.lang.String countryCode) {
@@ -247,7 +199,7 @@ public abstract class BaseCustomer<M extends BaseCustomer<M>> extends JModel<M> 
 	}
 
 	public java.lang.String getCountryCode() {
-		return get("country_code");
+		return getStr("country_code");
 	}
 
 	public void setAddress(java.lang.String address) {
@@ -255,7 +207,7 @@ public abstract class BaseCustomer<M extends BaseCustomer<M>> extends JModel<M> 
 	}
 
 	public java.lang.String getAddress() {
-		return get("address");
+		return getStr("address");
 	}
 
 	public void setLng(java.math.BigDecimal lng) {
@@ -279,31 +231,7 @@ public abstract class BaseCustomer<M extends BaseCustomer<M>> extends JModel<M> 
 	}
 
 	public java.lang.String getLocation() {
-		return get("location");
-	}
-
-	public void setProcDefKey(java.lang.String procDefKey) {
-		set("proc_def_key", procDefKey);
-	}
-
-	public java.lang.String getProcDefKey() {
-		return get("proc_def_key");
-	}
-
-	public void setProcInstId(java.lang.String procInstId) {
-		set("proc_inst_id", procInstId);
-	}
-
-	public java.lang.String getProcInstId() {
-		return get("proc_inst_id");
-	}
-	
-	public void setStatus(java.lang.String status) {
-		set("status", status);
-	}
-
-	public java.lang.String getStatus() {
-		return get("status");
+		return getStr("location");
 	}
 
 	public void setCreateDate(java.util.Date createDate) {
@@ -320,6 +248,30 @@ public abstract class BaseCustomer<M extends BaseCustomer<M>> extends JModel<M> 
 
 	public java.util.Date getModifyDate() {
 		return get("modify_date");
+	}
+
+	public void setStatus(java.lang.String status) {
+		set("status", status);
+	}
+
+	public java.lang.String getStatus() {
+		return getStr("status");
+	}
+
+	public void setProcDefKey(java.lang.String procDefKey) {
+		set("proc_def_key", procDefKey);
+	}
+
+	public java.lang.String getProcDefKey() {
+		return getStr("proc_def_key");
+	}
+
+	public void setProcInstId(java.lang.String procInstId) {
+		set("proc_inst_id", procInstId);
+	}
+
+	public java.lang.String getProcInstId() {
+		return getStr("proc_inst_id");
 	}
 
 }
