@@ -32,10 +32,12 @@
 			let parentId = nodes[0].tags[0];
 			let dataArea = nodes[0].tags[1];
 			let parentName = nodes[0].text;
+			let level = nodes[0].tags[2];
 			
 			parent.$("#parent_id").val(parentId);
 			parent.$("#parent_name").val(parentName);
 			parent.$("#data_area").val(dataArea);
+			parent.$("#level").val(parseInt(level)+1);
 			
 			parent.$('#form').data('bootstrapValidator')
 			.updateStatus('parent_name', 'NOT_VALIDATED', null)

@@ -185,9 +185,11 @@ public class DepartmentQuery extends JBaseQuery {
 		Map<String, Object> map = new HashMap<>();
 		map.put("text", "总部");// 父子表第一级名称,以后可以存储在字典表或字典类
 		ArrayList<String> newArrayList = Lists.newArrayList();
+		newArrayList.add(Consts.DEPT_HQ_ID);
+		newArrayList.add(Consts.DEPT_HQ_DATAAREA);
+		newArrayList.add(Consts.DEPT_HQ_LEVEL);
 		if (dataArea.equals(Consts.DEPT_HQ_DATAAREA_LIKE)) {
 			newArrayList.add(Consts.DEPT_HQ_ID);
-			newArrayList.add(Consts.DEPT_HQ_DATAAREA);
 		}
 		map.put("tags", newArrayList);
 		map.put("nodes", doBuild(list)); 
@@ -203,6 +205,8 @@ public class DepartmentQuery extends JBaseQuery {
 			ArrayList<String> newArrayList = Lists.newArrayList();
 			newArrayList.add(dept.getId());
 			newArrayList.add(dept.getDataArea());
+			newArrayList.add(dept.getDeptLevel().toString());
+			newArrayList.add(dept.getId());			
 			map.put("tags", newArrayList);
 				resTreeList.add(map);
 			
