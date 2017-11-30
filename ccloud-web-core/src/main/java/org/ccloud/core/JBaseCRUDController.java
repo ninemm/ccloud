@@ -129,25 +129,25 @@ public class JBaseCRUDController<M extends JModel<? extends JModel<?>>> extends 
 		return true;
 	}
 	
-	public Map<String, String> getDeptIdAndDataArea() {
-
-		User user = getSessionAttr("user");
-		Map<String, String> map = Maps.newHashMap();
-		Subject subject = SecurityUtils.getSubject();
-
-		if (subject.isPermitted("/admin/all")) {// 超级管理员
-			map.put("deptId", "");
-			map.put("dataArea", "");
-
-		} else if (subject.isPermitted("/admin/manager")) {// 经销商管理员
-			map.put("deptId", user.getDepartmentId());
-			map.put("dataArea", DataAreaUtil.getUserDeptDataArea(user.getDataArea()) + "%");
-		} else {// 业务员
-			map.put("deptId", user.getDepartmentId());
-			map.put("dataArea", DataAreaUtil.getUserDeptDataArea(user.getDataArea()));
-		}
-
-		return map;
-	}
+//	public Map<String, String> getDeptIdAndDataArea() {
+//
+//		User user = getSessionAttr("user");
+//		Map<String, String> map = Maps.newHashMap();
+//		Subject subject = SecurityUtils.getSubject();
+//
+//		if (subject.isPermitted("/admin/all")) {// 超级管理员
+//			map.put("deptId", "");
+//			map.put("dataArea", "");
+//
+//		} else if (subject.isPermitted("/admin/manager")) {// 经销商管理员
+//			map.put("deptId", user.getDepartmentId());
+//			map.put("dataArea", DataAreaUtil.getUserDeptDataArea(user.getDataArea()) + "%");
+//		} else {// 业务员
+//			map.put("deptId", user.getDepartmentId());
+//			map.put("dataArea", DataAreaUtil.getUserDeptDataArea(user.getDataArea()));
+//		}
+//
+//		return map;
+//	}
 
 }

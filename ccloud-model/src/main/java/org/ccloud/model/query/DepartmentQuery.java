@@ -69,7 +69,7 @@ public class DepartmentQuery extends JBaseQuery {
 		sqlBuilder.append("where d.id <> '0' ");
 		
 		final List<Object> params = new LinkedList<Object>();
-		sqlBuilder.append("AND LOCATE('" + dataArea + "' , d.data_area) = 1 ");
+		appendIfNotEmptyWithLike(sqlBuilder, "d.data_area", dataArea, params, false);
 		buildOrderBy(orderby, sqlBuilder);
 		String key = buildKey(dataArea, null, null, null, orderby);
 		

@@ -44,7 +44,7 @@ public class CustomerJoinCustomerTypeQuery extends JBaseQuery {
 		sqlBuilder.append(" from `cc_customer_join_customer_type` cj ");
 		sqlBuilder.append(" join `cc_customer_type` c on cj.customer_type_id = c.id ");
 		needWhere = appendIfNotEmpty(sqlBuilder, "cj.customer_id", customerId, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "c.data_area", dataArea, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(sqlBuilder, "c.data_area", dataArea, params, needWhere);
 
 		return Db.query(sqlBuilder.toString(), params.toArray());
 	}
