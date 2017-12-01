@@ -119,9 +119,9 @@ public class TaxonomyQuery extends JBaseQuery {
 		return list;
 	}
 
-	public Page<Taxonomy> doPaginate(int pageNumber, int pageSize, String module, String type) {
-		return DAO.doPaginate(pageNumber, pageSize, "content_module = ? and type = ? order by created desc", module,
-				type);
+	public Page<Taxonomy> doPaginate(int pageNumber, int pageSize, String module, String type, String sellerId) {
+		return DAO.doPaginate(pageNumber, pageSize, "content_module = ? and type = ? and seller_id = ? order by created desc", module,
+				type,sellerId);
 	}
 
 	public List<Taxonomy> findListByContentId(String contentId) {

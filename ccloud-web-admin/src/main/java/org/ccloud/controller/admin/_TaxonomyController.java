@@ -74,14 +74,14 @@ public class _TaxonomyController extends JBaseCRUDController<Taxonomy> {
 		if (id != null && taxonomys != null) {
 			ModelSorter.removeTreeBranch(taxonomys, id);
 		}
-
+		String sellerId = getSessionAttr("sellerId").toString();
 		if (TplTaxonomyType.TYPE_SELECT.equals(type.getFormType())) {
-			Page<Taxonomy> page = TaxonomyQuery.me().doPaginate(1, Integer.MAX_VALUE, getContentModule(), getType());
+			Page<Taxonomy> page = TaxonomyQuery.me().doPaginate(1, Integer.MAX_VALUE, getContentModule(), getType(),sellerId);
 			ModelSorter.sort(page.getList());
 			setAttr("page", page);
 		} else if (TplTaxonomyType.TYPE_INPUT.equals(type.getFormType())) {
 			Page<Taxonomy> page = TaxonomyQuery.me().doPaginate(getPageNumber(), getPageSize(), getContentModule(),
-					getType());
+					getType(),sellerId);
 			setAttr("page", page);
 		}
 
@@ -145,6 +145,10 @@ public class _TaxonomyController extends JBaseCRUDController<Taxonomy> {
 				content.setText(m.getUrl());
 				content.setTitle(m.getTitle());
 				content.setObjectId(m.getId());
+				Object _sellerId = getSessionAttr("sellerId");
+				if (_sellerId != null) {
+					content.setSellerId(_sellerId.toString());
+				}
 				content.saveOrUpdate();
 
 			} else {
