@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015-2016, Michael Yang 杨福海 (fuhai999@gmail.com).
+ * Copyright (c) 2015-2016, Eric Huang 黄鑫 (hx50859042@gmail.com).
  *
  * Licensed under the GNU Lesser General Public License (LGPL) ,Version 3.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.ccloud.model.Content;
+import org.ccloud.model.core.Jdb;
+import org.ccloud.model.vo.Archive;
 import org.ccloud.template.TemplateManager;
 import org.ccloud.utils.StringUtils;
 
+import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
 public class ContentQuery extends JBaseQuery {
@@ -57,7 +61,7 @@ public class ContentQuery extends JBaseQuery {
 	}
 
 	public Page<Content> paginateBySearch(int page, int pagesize, String module, String keyword, String status,
-			BigInteger[] tids, String month) {
+			String[] tids, String month) {
 		String[] modules = StringUtils.isNotBlank(module) ? new String[] { module } : null;
 		return paginate(page, pagesize, modules, keyword, status, tids, null, month, null);
 	}
@@ -67,7 +71,7 @@ public class ContentQuery extends JBaseQuery {
 	}
 
 	public Page<Content> paginateByModuleNotInDelete(int page, int pagesize, String module, String keyword,
-			BigInteger[] taxonomyIds, String month) {
+			String[] taxonomyIds, String month) {
 
 		StringBuilder sql = new StringBuilder(" from content c");
 		sql.append(" left join user u on c.user_id = u.id ");
@@ -94,15 +98,14 @@ public class ContentQuery extends JBaseQuery {
 			params.add(month);
 		}
 
-//		sql.append(" group by c.id");
 		sql.append(" ORDER BY c.created DESC");
 
 		String select = "select c.*, u.username, u.nickname";
 		if (params.isEmpty()) {
-			return DAO.paginate(page, pagesize, true, select, sql.toString());
+			return DAO.paginate(page, pagesize, select, sql.toString());
 		}
 
-		return DAO.paginate(page, pagesize, true, select, sql.toString(), params.toArray());
+		return DAO.paginate(page, pagesize, select, sql.toString(), params.toArray());
 	}
 
 	public Page<Content> paginateInNormal(int page, int pagesize, String module, BigInteger[] taxonomyIds,
@@ -136,8 +139,6 @@ public class ContentQuery extends JBaseQuery {
 			}
 		}
 
-//		sql.append(" group by c.id");
-
 		if (orderBy != null && orderBy.startsWith("meta:")) {
 			sql.append(" order by meta.`meta_value` + 0 desc ");
 		} else {
@@ -145,14 +146,14 @@ public class ContentQuery extends JBaseQuery {
 		}
 
 		if (params.isEmpty()) {
-			return DAO.paginate(page, pagesize, false, select, sql.toString());
+			return DAO.paginate(page, pagesize, select, sql.toString());
 		}
 
-		return DAO.paginate(page, pagesize, false, select, sql.toString(), params.toArray());
+		return DAO.paginate(page, pagesize, select, sql.toString(), params.toArray());
 	}
 
 	public Page<Content> paginate(int page, int pagesize, String module, String keyword, String status,
-			BigInteger[] taxonomyIds, BigInteger userId, String orderBy) {
+			String[] taxonomyIds, String userId, String orderBy) {
 
 		String[] modules = StringUtils.isNotBlank(module) ? new String[] { module } : null;
 
@@ -160,13 +161,13 @@ public class ContentQuery extends JBaseQuery {
 	}
 
 	public Page<Content> paginate(int page, int pagesize, String[] modules, String keyword, String status,
-			BigInteger[] taxonomyIds, BigInteger userId, String orderBy) {
+			String[] taxonomyIds, String userId, String orderBy) {
 
 		return paginate(page, pagesize, modules, keyword, status, taxonomyIds, userId, null, orderBy);
 	}
 
 	public Page<Content> paginate(int page, int pagesize, String[] modules, String keyword, String status,
-			BigInteger[] taxonomyIds, BigInteger userId, String month, String orderBy) {
+			String[] taxonomyIds, String userId, String month, String orderBy) {
 
 		String select = "select c.*";
 
@@ -198,15 +199,13 @@ public class ContentQuery extends JBaseQuery {
 			params.add(month);
 		}
 
-		//sql.append(" group by c.id");
-
 		buildOrderBy(orderBy, sql);
 
 		if (params.isEmpty()) {
-			return DAO.paginate(page, pagesize, false, select, sql.toString());
+			return DAO.paginate(page, pagesize, select, sql.toString());
 		}
 
-		return DAO.paginate(page, pagesize, false, select, sql.toString(), params.toArray());
+		return DAO.paginate(page, pagesize, select, sql.toString(), params.toArray());
 	}
 
 	protected String toString(Object[] a) {
@@ -307,14 +306,14 @@ public class ContentQuery extends JBaseQuery {
 				null, null);
 	}
 
-	public List<Content> findListInNormal(int page, int pagesize, BigInteger taxonomyId) {
-		return findListInNormal(page, pagesize, null, null, new BigInteger[] { taxonomyId }, null, null, null, null,
+	public List<Content> findListInNormalByTaxonomyId(int page, int pagesize, String taxonomyId) {
+		return findListInNormal(page, pagesize, null, null, new String[] { taxonomyId }, null, null, null, null,
 				null, null, null, null, null, null);
 	}
 
-	public List<Content> findListInNormal(int page, int pagesize, String orderBy, String keyword, BigInteger[] typeIds,
-			String[] typeSlugs, String[] modules, String[] styles, String[] flags, String[] slugs, BigInteger[] userIds,
-			BigInteger[] parentIds, String[] tags, Boolean hasThumbnail, String month) {
+	public List<Content> findListInNormal(int page, int pagesize, String orderBy, String keyword, String[] typeIds,
+			String[] typeSlugs, String[] modules, String[] styles, String[] flags, String[] slugs, String[] userIds,
+			String[] parentIds, String[] tags, Boolean hasThumbnail, String month) {
 
 		if (modules == null) {
 			modules = TemplateManager.me().currentTemplateModulesAsArray();
@@ -385,24 +384,24 @@ public class ContentQuery extends JBaseQuery {
 		return DAO.doFindFirst("module = ? and text = ? order by id desc", module, text);
 	}
 
-	public Content findFirstByModuleAndObjectId(String module, BigInteger objectId) {
+	public Content findFirstByModuleAndObjectId(String module, String objectId) {
 		return DAO.doFindFirst("module = ? and object_id = ? order by id desc", module, objectId);
 	}
 
-	public Content findFirstByModuleAndObjectId(String module, BigInteger objectId, BigInteger userId) {
+	public Content findFirstByModuleAndObjectId(String module, String objectId, String userId) {
 		return DAO.doFindFirst("module = ? and object_id = ? and user_id = ? order by id desc", module, objectId,
 				userId);
 	}
 
-	public Content findFirstByModuleAndUserId(String module, BigInteger userId) {
+	public Content findFirstByModuleAndUserId(String module, String userId) {
 		return DAO.doFindFirst("module = ? and user_id = ? order by id desc", module, userId);
 	}
 
-	public List<Content> findListByModuleAndObjectId(String module, BigInteger objectId) {
+	public List<Content> findListByModuleAndObjectId(String module, String objectId) {
 		return DAO.doFind("module = ? and object_id = ? order by id desc", module, objectId);
 	}
 
-	public List<Content> findListByModuleAndUserId(String module, BigInteger userId) {
+	public List<Content> findListByModuleAndUserId(String module, String userId) {
 		return DAO.doFind("module = ? and user_id = ? order by id desc", module, userId);
 	}
 
@@ -410,7 +409,7 @@ public class ContentQuery extends JBaseQuery {
 		return DAO.doFind("module = ? and title like ? order by id desc limit ?", module, "%" + title + "%", limit);
 	}
 
-	public List<Content> findByModule(final String module, final BigInteger parentId, String orderby) {
+	public List<Content> findByModule(final String module, final String parentId, String orderby) {
 		final StringBuilder sqlBuilder = new StringBuilder("select * from content c");
 		sqlBuilder.append(" where module = ? ");
 
@@ -526,11 +525,11 @@ public class ContentQuery extends JBaseQuery {
 		return DAO.doFindCount("module = ? AND status <> ?", module, Content.STATUS_DELETE);
 	}
 
-	public long findCountInNormalByModuleAndUserId(String module, BigInteger userId) {
+	public long findCountInNormalByModuleAndUserId(String module, String userId) {
 		return DAO.doFindCount("module = ? AND status <> ? and user_id = ? ", module, Content.STATUS_DELETE, userId);
 	}
 
-	public long findCountInNormalByParentId(BigInteger id, String module) {
+	public long findCountInNormalByParentId(String id, String module) {
 		if (id == null) {
 			return DAO.doFindCount("parent_id is null AND module = ? AND status <> ?", module, Content.STATUS_DELETE);
 		}
@@ -559,7 +558,7 @@ public class ContentQuery extends JBaseQuery {
 		if (ids != null && ids.length > 0) {
 			int deleteCount = 0;
 			for (int i = 0; i < ids.length; i++) {
-				if (ids[i] != null && deleteById(ids[i])) {
+				if (StrKit.notBlank(ids[i]) && deleteById(ids[i])) {
 					++deleteCount;
 				}
 			}
@@ -568,21 +567,21 @@ public class ContentQuery extends JBaseQuery {
 		return 0;
 	}
 
-//	public List<Archive> findArchives(String module) {
-//		String sql = "SELECT DATE_FORMAT( c.created, \"%Y-%m\" ) as d, COUNT( * ) count FROM content c"
-//				+ " WHERE c.module = ? GROUP BY d";
-//		List<Record> list = Jdb.find(sql, module);
-//		if (list == null || list.isEmpty())
-//			return null;
-//
-//		List<Archive> datas = new ArrayList<Archive>();
-//		for (Record r : list) {
-//			String date = r.getStr("d");
-//			if (StringUtils.isNotBlank(date)) {
-//				datas.add(new Archive(date, r.getLong("count")));
-//			}
-//		}
-//		return datas;
-//	}
+	public List<Archive> findArchives(String module) {
+		String sql = "SELECT DATE_FORMAT( c.created, \"%Y-%m\" ) as d, COUNT( * ) count FROM content c"
+				+ " WHERE c.module = ? GROUP BY d";
+		List<Record> list = Jdb.find(sql, module);
+		if (list == null || list.isEmpty())
+			return null;
+
+		List<Archive> datas = new ArrayList<Archive>();
+		for (Record r : list) {
+			String date = r.getStr("d");
+			if (StringUtils.isNotBlank(date)) {
+				datas.add(new Archive(date, r.getLong("count")));
+			}
+		}
+		return datas;
+	}
 
 }

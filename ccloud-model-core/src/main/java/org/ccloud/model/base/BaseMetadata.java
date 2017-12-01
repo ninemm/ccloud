@@ -127,11 +127,11 @@ public abstract class BaseMetadata<M extends BaseMetadata<M>> extends JModel<M> 
 		return update;
 	}
 
-	public void setId(java.lang.String id) {
+	public void setId(String id) {
 		set("id", id);
 	}
 
-	public java.lang.String getId() {
+	public String getId() {
 		return get("id");
 	}
 
@@ -159,11 +159,11 @@ public abstract class BaseMetadata<M extends BaseMetadata<M>> extends JModel<M> 
 		return get("object_type");
 	}
 
-	public void setObjectId(java.lang.String objectId) {
+	public void setObjectId(String objectId) {
 		set("object_id", objectId);
 	}
 
-	public java.lang.String getObjectId() {
+	public String getObjectId() {
 		return get("object_id");
 	}
 

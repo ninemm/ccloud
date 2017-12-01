@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015-2016, Michael Yang 杨福海 (fuhai999@gmail.com).
+ * Copyright (c) 2015-2016, Eric Huang 黄鑫 (hx50859042@gmail.com).
  *
  * Licensed under the GNU Lesser General Public License (LGPL) ,Version 3.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,11 @@ import java.util.Set;
 import org.ccloud.model.ModelSorter.ISortModel;
 import org.ccloud.model.base.BaseTaxonomy;
 import org.ccloud.model.core.Table;
+import org.ccloud.model.query.MappingQuery;
+import org.ccloud.model.router.TaxonomyRouter;
 import org.ccloud.utils.StringUtils;
 
+import com.jfinal.core.JFinal;
 import com.jfinal.plugin.ehcache.CacheKit;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
@@ -99,6 +102,7 @@ public class Taxonomy extends BaseTaxonomy<Taxonomy> implements ISortModel<Taxon
 		this.childList = childList;
 	}
 
+	@Override
 	public void addChild(Taxonomy child) {
 		if (null == childList) {
 			childList = new ArrayList<Taxonomy>();
@@ -121,45 +125,47 @@ public class Taxonomy extends BaseTaxonomy<Taxonomy> implements ISortModel<Taxon
 		this.activeClass = activeClass;
 	}
 
+	@Override
 	public Taxonomy getParent() {
 		return parent;
 	}
 
+	@Override
 	public void setParent(Taxonomy parent) {
 		this.parent = parent;
 	}
 
-//	public void updateContentCount() {
-//		long count = MappingQuery.me().findCountByTaxonomyId(getId(), Content.STATUS_NORMAL);
-//		if (count > 0) {
-//			setContentCount(count);
-//			this.update();
-//		}
-//	}
+	public void updateContentCount() {
+		long count = MappingQuery.me().findCountByTaxonomyId(getId(), Content.STATUS_NORMAL);
+		if (count > 0) {
+			setContentCount(count);
+			this.update();
+		}
+	}
 
-//	public long findContentCount() {
-//		Long count = MappingQuery.me().findCountByTaxonomyId(getId());
-//		return count == null ? 0 : count;
-//	}
-//
-//	public String getUrl() {
-//		return JFinal.me().getContextPath() + TaxonomyRouter.getRouter(this);
-//	}
+	public long findContentCount() {
+		Long count = MappingQuery.me().findCountByTaxonomyId(getId());
+		return count == null ? 0 : count;
+	}
 
-//	public String getFilterUrl() {
-//		if (filterList == null || filterList.isEmpty()) {
-//			return getUrl();
-//		}
-//
-//		List<Taxonomy> list = new ArrayList<Taxonomy>();
-//		for (Taxonomy taxonomy : filterList) {
-//			if (!taxonomy.getType().equals(getType())) {
-//				list.add(taxonomy);
-//			}
-//		}
-//		list.add(this);
-//		return JFinal.me().getContextPath() + TaxonomyRouter.getRouter(list);
-//	}
+	public String getUrl() {
+		return JFinal.me().getContextPath() + TaxonomyRouter.getRouter(this);
+	}
+
+	public String getFilterUrl() {
+		if (filterList == null || filterList.isEmpty()) {
+			return getUrl();
+		}
+
+		List<Taxonomy> list = new ArrayList<Taxonomy>();
+		for (Taxonomy taxonomy : filterList) {
+			if (!taxonomy.getType().equals(getType())) {
+				list.add(taxonomy);
+			}
+		}
+		list.add(this);
+		return JFinal.me().getContextPath() + TaxonomyRouter.getRouter(list);
+	}
 
 	public boolean isActive() {
 		return filterList != null && filterList.contains(this);
@@ -175,25 +181,25 @@ public class Taxonomy extends BaseTaxonomy<Taxonomy> implements ISortModel<Taxon
 		this.activeClass = activeClass;
 	}
 
-//	public String getSelectUrl() {
-//		if (filterList == null || filterList.isEmpty()) {
-//			return getUrl();
-//		}
-//
-//		List<Taxonomy> list = new ArrayList<Taxonomy>();
-//		list.addAll(filterList);
-//		if (!list.contains(this)) {
-//			list.add(this);
-//		} else {
-//			list.remove(this);
-//		}
-//
-//		if (list.isEmpty()) {
-//			return JFinal.me().getContextPath() + TaxonomyRouter.getRouter(getContentModule());
-//		}
-//
-//		return JFinal.me().getContextPath() + TaxonomyRouter.getRouter(list);
-//	}
+	public String getSelectUrl() {
+		if (filterList == null || filterList.isEmpty()) {
+			return getUrl();
+		}
+
+		List<Taxonomy> list = new ArrayList<Taxonomy>();
+		list.addAll(filterList);
+		if (!list.contains(this)) {
+			list.add(this);
+		} else {
+			list.remove(this);
+		}
+
+		if (list.isEmpty()) {
+			return JFinal.me().getContextPath() + TaxonomyRouter.getRouter(getContentModule());
+		}
+
+		return JFinal.me().getContextPath() + TaxonomyRouter.getRouter(list);
+	}
 
 	@Override
 	public boolean save() {

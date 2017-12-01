@@ -22,6 +22,9 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.ccloud.model.query.OptionQuery;
+import org.ccloud.utils.StringUtils;
+
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.StrKit;
 
@@ -63,16 +66,15 @@ public abstract class RouterConverter {
 	}
 
 	protected static boolean enalbleFakeStatic() {
-//		Boolean fakeStaticEnable = OptionQuery.me().findValueAsBool("router_fakestatic_enable");
-//		return fakeStaticEnable != null && fakeStaticEnable == true;
-		return true;
+		Boolean fakeStaticEnable = OptionQuery.me().findValueAsBool("router_fakestatic_enable");
+		return fakeStaticEnable != null && fakeStaticEnable == true;
 	}
 
 	protected static String getFakeStaticSuffix() {
-//		String fakeStaticSuffix = OptionQuery.me().findValue("router_fakestatic_suffix");
-//		if (StringUtils.isNotBlank(fakeStaticSuffix)) {
-//			return fakeStaticSuffix.trim();
-//		}
+		String fakeStaticSuffix = OptionQuery.me().findValue("router_fakestatic_suffix");
+		if (StringUtils.isNotBlank(fakeStaticSuffix)) {
+			return fakeStaticSuffix.trim();
+		}
 		return ".html";
 	}
 

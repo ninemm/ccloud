@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015-2016, Michael Yang 杨福海 (fuhai999@gmail.com).
+ * Copyright (c) 2015-2016, Eric Huang 黄鑫 (hx50859042@gmail.com).
  *
  * Licensed under the GNU Lesser General Public License (LGPL) ,Version 3.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,9 @@
 package org.ccloud.model.base;
 
 import org.ccloud.message.MessageKit;
+import org.ccloud.model.Metadata;
 import org.ccloud.model.core.JModel;
+import org.ccloud.model.query.MetaDataQuery;
 
 import com.jfinal.plugin.activerecord.IBean;
 import com.jfinal.plugin.ehcache.CacheKit;
@@ -52,7 +54,7 @@ public abstract class BaseTaxonomy<M extends BaseTaxonomy<M>> extends JModel<M> 
 		return CacheKit.get(CACHE_NAME, key, dataloader);
 	}
 
-	/*public Metadata createMetadata(){
+	public Metadata createMetadata(){
 		Metadata md = new Metadata();
 		md.setObjectId(getId());
 		md.setObjectType(METADATA_TYPE);
@@ -84,7 +86,7 @@ public abstract class BaseTaxonomy<M extends BaseTaxonomy<M>> extends JModel<M> 
 			return m.getMetaValue();
 		}
 		return null;
-	}*/
+	}
 
 	@Override
 	public boolean equals(Object o) {
@@ -125,11 +127,11 @@ public abstract class BaseTaxonomy<M extends BaseTaxonomy<M>> extends JModel<M> 
 		return update;
 	}
 
-	public void setId(java.math.BigInteger id) {
+	public void setId(String id) {
 		set("id", id);
 	}
 
-	public java.lang.String getId() {
+	public String getId() {
 		return get("id");
 	}
 
@@ -197,19 +199,19 @@ public abstract class BaseTaxonomy<M extends BaseTaxonomy<M>> extends JModel<M> 
 		return get("order_number");
 	}
 
-	public void setParentId(java.lang.String parentId) {
+	public void setParentId(String parentId) {
 		set("parent_id", parentId);
 	}
 
-	public java.lang.String getParentId() {
+	public String getParentId() {
 		return get("parent_id");
 	}
 
-	public void setObjectId(java.lang.String objectId) {
+	public void setObjectId(String objectId) {
 		set("object_id", objectId);
 	}
 
-	public java.lang.String getObjectId() {
+	public String getObjectId() {
 		return get("object_id");
 	}
 

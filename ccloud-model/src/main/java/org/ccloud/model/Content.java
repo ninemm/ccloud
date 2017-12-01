@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015-2016, Michael Yang 杨福海 (fuhai999@gmail.com).
+ * Copyright (c) 2015-2016, Eric Huang 黄鑫 (hx50859042@gmail.com).
  *
  * Licensed under the GNU Lesser General Public License (LGPL) ,Version 3.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.ccloud.Consts;
 import org.ccloud.model.ModelSorter.ISortModel;
 import org.ccloud.model.base.BaseContent;
 import org.ccloud.model.core.Table;
 import org.ccloud.model.query.ContentQuery;
+import org.ccloud.model.query.MappingQuery;
+import org.ccloud.model.query.MetaDataQuery;
+import org.ccloud.model.query.TaxonomyQuery;
+import org.ccloud.model.query.UserQuery;
+import org.ccloud.model.router.ContentRouter;
+import org.ccloud.model.router.PageRouter;
 import org.ccloud.template.TemplateManager;
 import org.ccloud.template.Thumbnail;
 import org.ccloud.utils.JsoupUtils;
@@ -32,6 +39,7 @@ import org.ccloud.utils.StringUtils;
 
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
+import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.ehcache.CacheKit;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
@@ -47,13 +55,13 @@ public class Content extends BaseContent<Content> implements ISortModel<Content>
 
 	private static final long serialVersionUID = 1L;
 
-//	private List<Taxonomy> taxonomys;
+	private List<Taxonomy> taxonomys;
 
 	private int layer = 0;
 	private List<Content> childList;
 	private Content parent;
-//	private List<Metadata> metadatas;
-//	private User user;
+	private List<Metadata> metadatas;
+	private User user;
 	private Object object;
 
 	public <T> T getFromListCache(Object key, IDataLoader dataloader) {
@@ -118,14 +126,14 @@ public class Content extends BaseContent<Content> implements ISortModel<Content>
 		return super.save();
 	}
 
-//	public boolean updateCommentCount() {
-//		long count = CommentQuery.me().findCountByContentIdInNormal(getId());
+	public boolean updateCommentCount() {
+		//long count = CommentQuery.me().findCountByContentIdInNormal(getId());
 //		if (count > 0) {
 //			setCommentCount(count);
 //			return this.update();
 //		}
-//		return false;
-//	}
+		return false;
+	}
 
 	public String getUsername() {
 		return get("username");
@@ -135,16 +143,16 @@ public class Content extends BaseContent<Content> implements ISortModel<Content>
 		return get("nickname");
 	}
 
-//	public User getUser() {
-//		if (user != null)
-//			return user;
-//
-//		if (getUserId() == null)
-//			return null;
-//
-//		user = UserQuery.me().findById(getUserId());
-//		return user;
-//	}
+	public User getUser() {
+		if (user != null)
+			return user;
+
+		if (getUserId() == null)
+			return null;
+
+		user = UserQuery.me().findById(getUserId());
+		return user;
+	}
 
 	public Object getObject() {
 		if (object != null) {
@@ -159,131 +167,131 @@ public class Content extends BaseContent<Content> implements ISortModel<Content>
 		return object;
 	}
 
-//	public Object getUserObject() {
-//		if (object != null) {
-//			return object;
-//		}
-//
-//		if (getObjectId() == null) {
-//			return null;
-//		}
-//
-//		object = UserQuery.me().findById(getObjectId());
-//		return object;
-//	}
+	public Object getUserObject() {
+		if (object != null) {
+			return object;
+		}
 
-//	public Object getTaxonomyObject() {
-//		if (object != null) {
-//			return object;
-//		}
-//
-//		if (getObjectId() == null) {
-//			return null;
-//		}
-//
-//		object = TaxonomyQuery.me().findById(getObjectId());
-//		return object;
-//	}
+		if (getObjectId() == null) {
+			return null;
+		}
+
+		object = UserQuery.me().findById(getObjectId());
+		return object;
+	}
+
+	public Object getTaxonomyObject() {
+		if (object != null) {
+			return object;
+		}
+
+		if (getObjectId() == null) {
+			return null;
+		}
+
+		object = TaxonomyQuery.me().findById(getObjectId());
+		return object;
+	}
 
 	public String getNicknameOrUsername() {
 		return StringUtils.isNotBlank(getNickame()) ? getNickame() : getUsername();
 	}
 
-//	public List<Metadata> getMetadatas() {
-//		if (metadatas == null) {
-//			metadatas = MetaDataQuery.me().findListByTypeAndId(METADATA_TYPE, getId());
-//		}
-//		return metadatas;
-//	}
-//
-//	public void setMetadatas(List<Metadata> metadatas) {
-//		this.metadatas = metadatas;
-//	}
+	public List<Metadata> getMetadatas() {
+		if (metadatas == null) {
+			metadatas = MetaDataQuery.me().findListByTypeAndId(METADATA_TYPE, getId());
+		}
+		return metadatas;
+	}
 
-//	public String getTagsAsString() {
-//		return getTaxonomyAsString(Taxonomy.TYPE_TAG);
-//	}
-//
-//	public String getTagsAsUrl() {
-//		return getTaxonomyAsUrl(Taxonomy.TYPE_TAG);
-//	}
-//
-//	public String getTagsAsUrl(String attrs) {
-//		return getTaxonomyAsUrl(Taxonomy.TYPE_TAG, attrs);
-//	}
-//
-//	public String getCategorysAsString() {
-//		return getTaxonomyAsString(Taxonomy.TYPE_CATEGORY);
-//	}
+	public void setMetadatas(List<Metadata> metadatas) {
+		this.metadatas = metadatas;
+	}
+
+	public String getTagsAsString() {
+		return getTaxonomyAsString(Taxonomy.TYPE_TAG);
+	}
+
+	public String getTagsAsUrl() {
+		return getTaxonomyAsUrl(Taxonomy.TYPE_TAG);
+	}
+
+	public String getTagsAsUrl(String attrs) {
+		return getTaxonomyAsUrl(Taxonomy.TYPE_TAG, attrs);
+	}
+
+	public String getCategorysAsString() {
+		return getTaxonomyAsString(Taxonomy.TYPE_CATEGORY);
+	}
 
 	public boolean isDelete() {
 		return STATUS_DELETE.equals(getStatus());
 	}
 
-//	public String getTaxonomyAsString(String type) {
-//		List<Taxonomy> taxonomies = getTaxonomys();
-//		if (taxonomies == null || taxonomies.isEmpty()) {
-//			return "";
-//		}
-//
-//		StringBuilder retBuilder = new StringBuilder();
-//		for (Taxonomy taxonomy : taxonomies) {
-//			if (type == null) {
-//				retBuilder.append(taxonomy.getTitle()).append(",");
-//			} else if (type.equals(taxonomy.getType())) {
-//				retBuilder.append(taxonomy.getTitle()).append(",");
-//			}
-//		}
-//
-//		if (retBuilder.length() > 0) {
-//			retBuilder.deleteCharAt(retBuilder.length() - 1);
-//		}
-//		return retBuilder.toString();
-//	}
+	public String getTaxonomyAsString(String type) {
+		List<Taxonomy> taxonomies = getTaxonomys();
+		if (taxonomies == null || taxonomies.isEmpty()) {
+			return "";
+		}
 
-//	public String getTaxonomyAsUrl(String type) {
-//		return getTaxonomyAsUrl(type, null);
-//	}
+		StringBuilder retBuilder = new StringBuilder();
+		for (Taxonomy taxonomy : taxonomies) {
+			if (type == null) {
+				retBuilder.append(taxonomy.getTitle()).append(",");
+			} else if (type.equals(taxonomy.getType())) {
+				retBuilder.append(taxonomy.getTitle()).append(",");
+			}
+		}
 
-//	public String getTaxonomyAsUrl(String type, String attrs) {
-//		List<Taxonomy> taxonomies = getTaxonomys();
-//		if (taxonomies == null || taxonomies.isEmpty()) {
-//			return "";
-//		}
-//
-//		StringBuilder retBuilder = new StringBuilder();
-//		for (Taxonomy taxonomy : taxonomies) {
-//			if (type.equals(taxonomy.getType())) {
-//				String string = String.format("<a href=\"%s\" %s >%s</a>", taxonomy.getUrl(), attrs,
-//						taxonomy.getTitle());
-//				retBuilder.append(string).append(",");
-//			}
-//		}
-//
-//		if (retBuilder.length() > 0) {
-//			retBuilder.deleteCharAt(retBuilder.length() - 1);
-//		}
-//		return retBuilder.toString();
-//	}
+		if (retBuilder.length() > 0) {
+			retBuilder.deleteCharAt(retBuilder.length() - 1);
+		}
+		return retBuilder.toString();
+	}
 
-//	public List<Taxonomy> getTaxonomys() {
-//		if (taxonomys != null) {
-//			return taxonomys;
-//		}
-//
-//		List<Mapping> mappingList = MappingQuery.me().findListByContentId(getId());
-//		if (mappingList == null || mappingList.isEmpty()) {
-//			return null;
-//		}
-//		taxonomys = new ArrayList<Taxonomy>();
-//		for (Mapping mapping : mappingList) {
-//			Taxonomy taxonomy = TaxonomyQuery.me().findById(mapping.getTaxonomyId());
-//			if (taxonomy != null) {
-//				taxonomys.add(taxonomy);
-//			}
-//		}
-//		return taxonomys;
-//	}
+	public String getTaxonomyAsUrl(String type) {
+		return getTaxonomyAsUrl(type, null);
+	}
+
+	public String getTaxonomyAsUrl(String type, String attrs) {
+		List<Taxonomy> taxonomies = getTaxonomys();
+		if (taxonomies == null || taxonomies.isEmpty()) {
+			return "";
+		}
+
+		StringBuilder retBuilder = new StringBuilder();
+		for (Taxonomy taxonomy : taxonomies) {
+			if (type.equals(taxonomy.getType())) {
+				String string = String.format("<a href=\"%s\" %s >%s</a>", taxonomy.getUrl(), attrs,
+						taxonomy.getTitle());
+				retBuilder.append(string).append(",");
+			}
+		}
+
+		if (retBuilder.length() > 0) {
+			retBuilder.deleteCharAt(retBuilder.length() - 1);
+		}
+		return retBuilder.toString();
+	}
+
+	public List<Taxonomy> getTaxonomys() {
+		if (taxonomys != null) {
+			return taxonomys;
+		}
+
+		List<Mapping> mappingList = MappingQuery.me().findListByContentId(getId());
+		if (mappingList == null || mappingList.isEmpty()) {
+			return null;
+		}
+		taxonomys = new ArrayList<Taxonomy>();
+		for (Mapping mapping : mappingList) {
+			Taxonomy taxonomy = TaxonomyQuery.me().findById(mapping.getTaxonomyId());
+			if (taxonomy != null) {
+				taxonomys.add(taxonomy);
+			}
+		}
+		return taxonomys;
+	}
 
 	@Override
 	public void setLayer(int layer) {
@@ -312,7 +320,7 @@ public class Content extends BaseContent<Content> implements ISortModel<Content>
 		if (parent != null)
 			return parent;
 
-		if (getParentId() == null) {
+		if (getParentId() == null || StrKit.equals(getParentId(), "0")) {
 			return null;
 		} else {
 			parent = ContentQuery.me().findById(getParentId());
@@ -340,19 +348,19 @@ public class Content extends BaseContent<Content> implements ISortModel<Content>
 		return childList != null && !childList.isEmpty();
 	}
 
-//	public String getUrl() {
-//		String baseUrl = null;
-//		if (Consts.MODULE_PAGE.equals(this.getModule())) {
-//			baseUrl = PageRouter.getRouter(this);
-//		} else {
-//			baseUrl = ContentRouter.getRouter(this);
-//		}
-//		return JFinal.me().getContextPath() + baseUrl;
-//	}
+	public String getUrl() {
+		String baseUrl = null;
+		if (Consts.MODULE_PAGE.equals(this.getModule())) {
+			baseUrl = PageRouter.getRouter(this);
+		} else {
+			baseUrl = ContentRouter.getRouter(this);
+		}
+		return JFinal.me().getContextPath() + baseUrl;
+	}
 
-//	public String getUrlWithPageNumber(int pagenumber) {
-//		return ContentRouter.getRouter(this, pagenumber);
-//	}
+	public String getUrlWithPageNumber(int pagenumber) {
+		return ContentRouter.getRouter(this, pagenumber);
+	}
 
 	public String getFirstImage() {
 		return JsoupUtils.getFirstImageSrc(getText());

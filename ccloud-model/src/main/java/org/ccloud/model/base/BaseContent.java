@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015-2016, Michael Yang 杨福海 (fuhai999@gmail.com).
+ * Copyright (c) 2015-2016, Eric Huang 黄鑫 (hx50859042@gmail.com).
  *
  * Licensed under the GNU Lesser General Public License (LGPL) ,Version 3.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,9 @@
 package org.ccloud.model.base;
 
 import org.ccloud.message.MessageKit;
+import org.ccloud.model.Metadata;
 import org.ccloud.model.core.JModel;
+import org.ccloud.model.query.MetaDataQuery;
 
 import com.jfinal.plugin.activerecord.IBean;
 import com.jfinal.plugin.ehcache.CacheKit;
@@ -52,39 +54,39 @@ public abstract class BaseContent<M extends BaseContent<M>> extends JModel<M> im
 		return CacheKit.get(CACHE_NAME, key, dataloader);
 	}
 
-//	public Metadata createMetadata(){
-//		Metadata md = new Metadata();
-//		md.setObjectId(getId());
-//		md.setObjectType(METADATA_TYPE);
-//		return md;
-//	}
-//
-//	public Metadata createMetadata(String key,String value){
-//		Metadata md = new Metadata();
-//		md.setObjectId(getId());
-//		md.setObjectType(METADATA_TYPE);
-//		md.setMetaKey(key);
-//		md.setMetaValue(value);
-//		return md;
-//	}
-//
-//	public boolean saveOrUpdateMetadta(String key,String value){
-//		Metadata metadata = MetaDataQuery.me().findByTypeAndIdAndKey(METADATA_TYPE, getId(), key);
-//		if (metadata == null) {
-//			metadata = createMetadata(key, value);
-//			return metadata.save();
-//		}
-//		metadata.setMetaValue(value);
-//		return metadata.update();
-//	}
-//
-//	public String metadata(String key) {
-//		Metadata m = MetaDataQuery.me().findByTypeAndIdAndKey(METADATA_TYPE, getId(), key);
-//		if (m != null) {
-//			return m.getMetaValue();
-//		}
-//		return null;
-//	}
+	public Metadata createMetadata(){
+		Metadata md = new Metadata();
+		md.setObjectId(getId());
+		md.setObjectType(METADATA_TYPE);
+		return md;
+	}
+
+	public Metadata createMetadata(String key,String value){
+		Metadata md = new Metadata();
+		md.setObjectId(getId());
+		md.setObjectType(METADATA_TYPE);
+		md.setMetaKey(key);
+		md.setMetaValue(value);
+		return md;
+	}
+
+	public boolean saveOrUpdateMetadta(String key,String value){
+		Metadata metadata = MetaDataQuery.me().findByTypeAndIdAndKey(METADATA_TYPE, getId(), key);
+		if (metadata == null) {
+			metadata = createMetadata(key, value);
+			return metadata.save();
+		}
+		metadata.setMetaValue(value);
+		return metadata.update();
+	}
+
+	public String metadata(String key) {
+		Metadata m = MetaDataQuery.me().findByTypeAndIdAndKey(METADATA_TYPE, getId(), key);
+		if (m != null) {
+			return m.getMetaValue();
+		}
+		return null;
+	}
 
 	@Override
 	public boolean equals(Object o) {
@@ -125,7 +127,7 @@ public abstract class BaseContent<M extends BaseContent<M>> extends JModel<M> im
 		return update;
 	}
 
-	public void setId(java.math.BigInteger id) {
+	public void setId(String id) {
 		set("id", id);
 	}
 
@@ -197,11 +199,11 @@ public abstract class BaseContent<M extends BaseContent<M>> extends JModel<M> im
 		return get("style");
 	}
 
-	public void setUserId(java.math.BigInteger userId) {
+	public void setUserId(String userId) {
 		set("user_id", userId);
 	}
 
-	public java.math.BigInteger getUserId() {
+	public String getUserId() {
 		return get("user_id");
 	}
 
@@ -241,15 +243,15 @@ public abstract class BaseContent<M extends BaseContent<M>> extends JModel<M> im
 		set("parent_id", parentId);
 	}
 
-	public java.lang.String getParentId() {
+	public String getParentId() {
 		return get("parent_id");
 	}
 
-	public void setObjectId(java.lang.String objectId) {
+	public void setObjectId(String objectId) {
 		set("object_id", objectId);
 	}
 
-	public java.lang.String getObjectId() {
+	public String getObjectId() {
 		return get("object_id");
 	}
 

@@ -16,7 +16,6 @@
 package org.ccloud.model.core;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import com.jfinal.core.JFinal;
@@ -166,10 +165,10 @@ public class JModel<M extends JModel<M>> extends Model<M> {
 	public boolean saveOrUpdate() {
 		if (null == get(getPrimaryKey())) {
 			set("id", StrKit.getRandomUUID());
-			set("create_date", new Date());
+			//set("create_date", new Date());
 			return this.save();
 		}
-		set("modify_date", new Date());
+		//set("modify_date", new Date());
 		return this.update();
 	}
 
