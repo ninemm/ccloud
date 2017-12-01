@@ -6,11 +6,11 @@ import org.ccloud.route.RouterMapping;
 /**
  * Created by WT on 2017/11/30.
  */
-@RouterMapping(url = "/my")
-public class MyController extends BaseFrontController{
+@RouterMapping(url = "/user")
+public class UserController extends BaseFrontController{
 
 	public void index() {
-		render("my.html");
+		render("user.html");
 	}
 
 }

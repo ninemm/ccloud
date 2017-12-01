@@ -27,6 +27,7 @@ import org.ccloud.model.SystemLog;
 import org.ccloud.model.query.OptionQuery;
 import org.ccloud.route.RouterManager;
 import org.ccloud.template.TemplateManager;
+import org.ccloud.ui.freemarker.tag.MenusTag;
 import org.ccloud.utils.FileUtils;
 import org.ccloud.utils.RequestUtils;
 import org.ccloud.utils.StringUtils;
@@ -133,7 +134,7 @@ public class JHandler extends Handler {
 
 	private void setGlobalAttrs(HttpServletRequest request) {
 
-		//request.setAttribute(MenusTag.TAG_NAME, new MenusTag(request));
+		request.setAttribute(MenusTag.TAG_NAME, new MenusTag(request));
 
 		if (null != TemplateManager.me().currentTemplate()) {
 			request.setAttribute("TPATH", TemplateManager.me().currentTemplate().getPath());

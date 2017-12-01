@@ -23,6 +23,7 @@ import org.ccloud.model.query.OptionQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.StringUtils;
 
+import com.jfinal.kit.StrKit;
 import com.jfinal.render.Render;
 
 @RouterMapping(url = "/")
@@ -44,7 +45,13 @@ public class IndexController extends BaseFrontController {
 
 	private void doRender() {
 		setGlobleAttrs();
-		//String para = getPara();
+		String para = getPara();
+		
+		if (StrKit.isBlank(para)) {
+			render("index.html");
+			return ;
+		}
+		
 		render("index.html");
 
 	}
