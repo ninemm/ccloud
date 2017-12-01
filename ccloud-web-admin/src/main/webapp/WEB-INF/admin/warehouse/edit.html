@@ -146,6 +146,17 @@ function doSubmit(){
 							</label>		                 		
 		               	</div>
 					</div>
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">默认仓库:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<label class="radio-inline">
+		                 		<input type="radio" name="warehouse.is_default" value="1" <#if !warehouse?? || warehouse.isDefault == 1>checked</#if>>是
+		                 	</label>
+		                 	<label class="radio-inline">
+		                 		<input type="radio" name="warehouse.is_default" value="0" <#if warehouse?? && warehouse.isDefault == 0>checked</#if>>否
+							</label>		                 		
+		               	</div>
+					</div>
 				</div>
 			</div>
 		</div>
