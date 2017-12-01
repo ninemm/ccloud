@@ -75,12 +75,12 @@ public class MenuManager {
 				for (Iterator<MenuItem> it = list.iterator(); it.hasNext();) {
 					MenuItem menuItem = it.next();
 					String url = menuItem.getUrl();
-					if (url != null) {
-						int pos = url.indexOf("?");
-						if (pos != -1) {
-							url = url.substring(0, pos);
-						}
-					}
+//					if (url != null) {
+//						int pos = url.indexOf("?");
+//						if (pos != -1) {
+//							url = url.substring(0, pos);
+//						}
+//					}
 					
 					if (permission.contains(url) || permission.contains("/admin/all")) {
 						menuList.add(menuItem);
