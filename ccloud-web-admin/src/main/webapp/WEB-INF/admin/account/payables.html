@@ -97,7 +97,7 @@
             {field: "action", title: "操作", align: "center", width: '5%',
             formatter: function(value, row, rowIndex) {
                 var url = '${CPATH}/admin/account/payableInfo?objId=' + row.obj_id ;
-                var strHtml = '<a href="javascript:void(0);" class="btn btn-sm" title="查看付账明细" onclick="getPayableInfo(\''+row.obj_id+'\'' + ',0' + ')"><i class="fa fa-eye"></i></a> ';
+                var strHtml = '<a href="javascript:void(0);" class="btn btn-xs btn-primary btn-flat" title="查看付账明细" onclick="getPayableInfo(\''+row.obj_id+'\'' + ',0' + ')">查看明细</a> ';
                 return strHtml;
             },
             edit:false
@@ -131,7 +131,7 @@
         {field: "action", title: "操作", align: "center", width: '10%',
         formatter: function(value, row, rowIndex) {
             var url = '${CPATH}/admin/account/paymentInfo?refSn=' + row.ref_sn ;
-            var strHtml = '<a href="javascript:void(0);" class="btn btn-sm" title="查看支付记录" onclick="getPaymentInfo(\''+row.id+'\')"><i class="fa fa-eye"></i></a> ';
+            var strHtml = '<a href="javascript:void(0);" class="btn btn-xs btn-primary btn-flat" title="查看支付记录" onclick="getPaymentInfo(\''+row.id+'\')">查看记录</a> ';
             return strHtml;
         },
         edit:false

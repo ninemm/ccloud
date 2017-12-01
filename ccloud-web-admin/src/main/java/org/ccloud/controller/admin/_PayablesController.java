@@ -30,12 +30,10 @@ import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Payables;
 import org.ccloud.model.PayablesDetail;
 import org.ccloud.model.Payment;
-import org.ccloud.model.Receivables;
 import org.ccloud.model.User;
 import org.ccloud.model.query.PayablesDetailQuery;
 import org.ccloud.model.query.PayablesQuery;
 import org.ccloud.model.query.PaymentQuery;
-import org.ccloud.model.query.ReceivablesQuery;
 
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Before;
