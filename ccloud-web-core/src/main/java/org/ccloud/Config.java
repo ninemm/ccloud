@@ -27,6 +27,7 @@ import org.ccloud.ui.freemarker.function.MetadataSelected;
 import org.ccloud.ui.freemarker.function.OptionChecked;
 import org.ccloud.ui.freemarker.function.OptionSelected;
 import org.ccloud.ui.freemarker.function.OptionValue;
+import org.ccloud.ui.freemarker.function.TaxonomyBox;
 import org.ccloud.ui.freemarker.tag.DictTag;
 
 import com.jfinal.kit.PropKit;
@@ -44,7 +45,7 @@ public class Config extends CCloudConfig {
 		CCloud.addTag(DictTag.TAG_NAME, new DictTag());
 //		CCloud.addTag(PermissionTag.TAG_NAME, new PermissionTag());
 		
-		//CCloud.addFunction("TAXONOMY_BOX", new TaxonomyBox());
+		CCloud.addFunction("TAXONOMY_BOX", new TaxonomyBox());
 		CCloud.addFunction("DICT_BOX", new DictBox());
 		CCloud.addFunction("DICT_NAME", new DictName());
 		CCloud.addFunction("OPTION", new OptionValue());
