@@ -63,8 +63,9 @@ public class _WarehouseController extends JBaseCRUDController<Warehouse> {
 			keyword = StringUtils.urlDecode(keyword);
 			setAttr("k", keyword);
 		}
-		String seller_id=getSessionAttr("sellerId").toString();
-		Page<Warehouse> page = WarehouseQuery.me().paginate(getPageNumber(), getPageSize(), keyword, "c.create_date", seller_id);
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String user_id = user.getId();
+		Page<Warehouse> page = WarehouseQuery.me().paginate(getPageNumber(), getPageSize(), keyword, "c.create_date", user_id);
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
 	}
@@ -156,27 +157,18 @@ public class _WarehouseController extends JBaseCRUDController<Warehouse> {
 	}
 	
 	public void adduserJoinWarehouse() {
-//		Db.tx(new IAtom() {
-//		    @Override
-//		    public boolean run() throws SQLException {
-				String warehouse_id=getPara("id");
-				String userIds = getPara("userIds");
-				UserJoinWarehouseQuery.me().deleteWarehouseId( warehouse_id);
-				String[] userIdArray = userIds.split(",");
-				for (String userId : userIdArray) {
-					UserJoinWarehouse userJoinWarehouse=new UserJoinWarehouse();
-					userJoinWarehouse.setUserId(userId);
-					userJoinWarehouse.setWarehouseId(warehouse_id);
-					userJoinWarehouse.save();
-				}
-//				if (!(deleteWarehouseId>0)) {
-//		    			renderAjaxResultForError("修改失败!");
-//		    			return false;
-//				}
-				renderAjaxResultForSuccess("添加成功！");
-//				return true;                	
-//		    }
-//		});
+		String warehouse_id=getPara("id");
+		String userIds = getPara("userIds");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		UserJoinWarehouseQuery.me().deleteWarehouseId( warehouse_id,user.getId());
+		String[] userIdArray = userIds.split(",");
+		for (String userId : userIdArray) {
+			UserJoinWarehouse userJoinWarehouse=new UserJoinWarehouse();
+			userJoinWarehouse.setUserId(userId);
+			userJoinWarehouse.setWarehouseId(warehouse_id);
+			userJoinWarehouse.save();
+		}
+		renderAjaxResultForSuccess("添加成功！");
 	}
 }
 

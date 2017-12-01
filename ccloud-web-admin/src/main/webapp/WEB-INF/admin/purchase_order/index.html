@@ -68,13 +68,13 @@
 					},
 					edit:false
 				},*/
-				{field: "", title: "订单号/下单时间", align: "center", width: '10%',
+				{field: "", title: "订单号", align: "center", width: '10%',
 					formatter: function(value, row, rowIndex) {
-						return row.porder_sn + '/' + row.create_date;
+						return row.porder_sn;
 					},
 					edit: false
 				},
-				{field: "supplier_name", title: "供应商名称", align: "center", width: '8%', edit:false},
+				{field: "supplierName", title: "供应商名称", align: "center", width: '8%', edit:false},
 				{field: "payment_type", title: "付款方式", align: "center", width: '5%',
 					formatter: function(value, row, rowIndex) {
 						if(value==0){return '应付账款';}
@@ -98,13 +98,17 @@
 						else {return '订单关闭';}
 					},
 				edit: false},
+				{field: "", title: "下单时间", align: "center", width: '10%',
+					formatter: function(value, row, rowIndex) {
+						return row.create_date;
+					},
+					edit: false
+				},
 				{field: "action", title: "操作", align: "center", width: '15%',
 				formatter: function(value, row, rowIndex) {
 					var strHtml = '<a class="btn btn-primary" onclick="detail(\''+row.id+'\')" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">详情</a> ';
 					if(row.status==0){
-						strHtml += '<a class="btn btn-success" onclick="review(\''+row.id+'\')" >入库</a> ';
-					}else{
-						strHtml += '<a class="btn btn-danger" onclick="refuse(\''+row.id+'\')" >退货</a> ';
+						strHtml += '<a class="btn btn-primary" onclick="pass(\''+row.id+'\')" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">通过</a> ';
 					}
 					return strHtml;
 				},
@@ -115,41 +119,34 @@
 	}
 	
 	 function detail(id){
-		$('#exampleModal').on('show.bs.modal', function (event) {
-				var orderId= id;
-				$.ajax({
-				url:"${CPATH}/admin/purchaseOrder/show",
-				type:"post",
-				dataType:"json",
-				data:{ purchaseOrderId : id},
-				success:function(data)
-				{
-					$("#purchase_order_detail").html("");
-					var html ="<thead><tr><th>商品名/商品规格</th><th>小单位价格</th><th>小单位数量</th><th>小计</th></tr></thead><tbody>";
-					$("#purchase_order_detail").append(html);
-					var moneyTotel=0;
-					 for(var i=0;i<data.length;i++){
-						var Html = "<tr class='jp-onmouse'>"
-									+"<td>"+data[i].name+"/"+data[i].cps_name+"</td>"
-									+"<td>"+data[i].price+"</td>"
-									+"<td>"+data[i].cc_product+"</td>"
-									+"<td>"+data[i].productAmount+"</td>"
-									+"</tr>";
-						$("#purchase_order_detail").append(Html);
-						moneyTotel += data[i].productAmount;
-					}
-					var HTML= '<tr class="jp-onmouse">'
-							+'<th></th>'
-							+'<th></th>'
-							+'<th></th>'
-							+'<th>合计：￥'+moneyTotel+'</th>'
-							+'<th></th>'
-							+'</tr></tbody>';
-					$("#purchase_order_detail").append(HTML);
-				}
-			});
-		});
+		layer.open({
+			title:"采购订单详细",
+			type: 2, 
+			area: ['70%', '80%'],
+			content: '${CPATH}/admin/purchaseOrder/detail/' + id
+		}); 
 	} 
+	
+	function pass(id){
+		$.ajax({
+			url:"${CPATH}/admin/purchaseOrder/pass",
+			type:"post",
+			dataType:"json",
+			data:{"id":id},
+			success : function(data) { 
+				if (data.errorCode == 0) {
+					toastr.success(data.message, '操作成功');
+					setTimeout( function(){location.reload();}, 2 * 1000 );
+				} else {
+					toastr.error(data.message,'操作失败');
+					setTimeout( function(){location.reload();}, 2 * 1000 );
+				}
+			},
+			error : function() {
+				alert("信息提交错误");
+			}
+		});
+	}
 	
 	var validatorFields = {
 		'startDate': {
@@ -163,33 +160,6 @@
 			}
 		}
 	};
-	
-	function review(id){
-		if(confirm("是否确认审核通过该订单？")){
-		
-		$.ajax({
-				url:"${CPATH}/admin/purchaseOrder/review",
-				type:"post",
-				dataType:"json",
-				data:{ purchaseOrderId : id},
-				success:function(data)
-				{
-				
-					if(data==true){
-						toastr.success(data.message, '操作成功');
-					}else{
-						toastr.error(data.message, '操作失败');
-					}
-				}
-			});
-		}
-		
-		
-	}
-	
-	function refuse(id){
-		alert(id);
-	}
 </#macro>
 
 <@layout active_id=p child_active_id=c>
@@ -238,30 +208,4 @@
 		</div>
 	</form>
 	<!-- /.box -->
-</section>
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="padding-top:200px;">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="exampleModalLabel">采购订单</h4>
-      </div>
-      <div class="modal-body">
-       	<div class="box ">
-		<!-- /.box-header -->
-		<div class="box-body jp-common-pad">
-				<table class="table table-striped" id ="purchase_order_detail">
-				</table>
-		</div>
-		<!-- /.box-body -->
-	</div>
-      </div>
-      <div class="modal-footer">
-	      <!-- <button type="button" class="btn btn-success" onclick="review("+orderId+")">通过</button>
-	      <button type="button" class="btn btn-danger" onclick="refuse("+orderId+")">拒绝</button> -->
-          <button type="button" class="btn btn-default" data-dismiss="modal">返回</button>
-      </div>
-    </div>
-  </div>
-</div>
 </@layout>

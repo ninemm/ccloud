@@ -35,12 +35,15 @@ import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.Customer;
+import org.ccloud.model.CustomerType;
 import org.ccloud.model.Department;
 import org.ccloud.model.ModelSorter;
 import org.ccloud.model.User;
+import org.ccloud.model.query.CustomerJoinCustomerTypeQuery;
 import org.ccloud.model.query.CustomerQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.DepartmentQuery;
+import org.ccloud.model.query.SellerCustomerQuery;
 import org.ccloud.model.query.UserJoinCustomerQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.vo.CustomerExcel;
@@ -91,12 +94,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 			keyword = StringUtils.urlDecode(keyword);
 		}
 
-
-		String deptId = "";//当加上部门筛选条件时
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-
-		Page<Record> page = CustomerQuery.me().paginate(getPageNumber(), getPageSize(), keyword, paraMap, deptId,
-				selectDataArea);
+		Page<Record> page = CustomerQuery.me().paginate(getPageNumber(), getPageSize(), keyword);
 		List<Record> customerList = page.getList();
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", customerList);
@@ -119,118 +117,6 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 	}
 
 	@Override
-	@RequiresPermissions(value = { "/admin/customer/edit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
-	public void edit() {
-		String id = getPara("id");
-
-		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/all");
-		boolean isDealerAdmin = SecurityUtils.getSubject().isPermitted("/admin/dealer/all");
-
-		String deptId = "";
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);;
-
-		StringBuilder cUserIds = new StringBuilder();
-		StringBuilder cUserNames = new StringBuilder();
-
-		if (StrKit.notBlank(id)) {// 超级管理员修改
-			setAttr("customer", CustomerQuery.me().findById(id));
-//			setAttr("cTypeList", CustomerJoinCustomerTypeQuery.me().findCustomerTypeListByCustomerId(id,
-//					DataAreaUtil.getUserDealerDataArea(selectDataArea)));
-
-			if (isSuperAdmin || isDealerAdmin) {
-//				List<Record> list = UserJoinCustomerQuery.me().findUserListByCustomerId(id, deptId, selectDataArea);
-//				for (Record record : list) {
-//					if (cUserIds.length() != 0 || cUserIds.length() != 0) {
-//						cUserIds.append(",");
-//						cUserNames.append(",");
-//					}
-//					cUserIds.append(record.get("user_id"));
-//					cUserNames.append(record.get("realname"));
-//
-//				}
-				setAttr("cUserIds", cUserIds);
-				setAttr("cUserNames", cUserNames);
-			}
-
-		}
-
-		if (!isSuperAdmin) {
-			setAttr("customerTypeList",
-					CustomerTypeQuery.me().findCustomerTypeList(DataAreaUtil.getUserDealerDataArea(selectDataArea)));
-		}
-
-		render("edit.html");
-	}
-
-	@RequiresPermissions(value = { "/admin/customer/edit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
-	public void user_tree() {
-
-		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		List<Department> list = DepartmentQuery.me().findDeptList(dataArea, "order_list asc");
-		List<Map<String, Object>> resTreeList = new ArrayList<Map<String, Object>>();
-		ModelSorter.tree(list);
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("text", "总部");// 父子表第一级名称,以后可以存储在字典表或字典类
-		map.put("tags", Lists.newArrayList(0));
-		map.put("nodes", doBuild(list, true));
-		resTreeList.add(map);
-
-		setAttr("treeData", JSON.toJSON(resTreeList));
-	}
-
-	@RequiresPermissions(value = { "/admin/customer/edit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
-	public void department_tree() {
-
-		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		List<Department> list = DepartmentQuery.me().findDeptList(dataArea, "order_list asc");
-		List<Map<String, Object>> resTreeList = new ArrayList<Map<String, Object>>();
-		ModelSorter.tree(list);
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("text", "总部");// 父子表第一级名称,以后可以存储在字典表或字典类
-		map.put("tags", Lists.newArrayList(0));
-		map.put("nodes", doBuild(list, false));
-		resTreeList.add(map);
-
-		setAttr("treeData", JSON.toJSON(resTreeList));
-	}
-
-	private List<Map<String, Object>> doBuild(List<Department> list, boolean addUserFlg) {
-		List<Map<String, Object>> resTreeList = new ArrayList<Map<String, Object>>();
-		for (Department dept : list) {
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("text", dept.getDeptName());
-			map.put("tags", Lists.newArrayList(dept.getId(), dept.getDataArea()));
-
-			List<Map<String, Object>> childList = new ArrayList<Map<String, Object>>();
-
-			if (dept.getChildList() != null && dept.getChildList().size() > 0) {
-				childList = doBuild(dept.getChildList(), addUserFlg);
-			}
-
-			if (addUserFlg) {
-				childList = addDeptUser(dept.getId(), childList);
-			}
-
-			map.put("nodes", childList);
-
-			resTreeList.add(map);
-		}
-		return resTreeList;
-	}
-
-	private List<Map<String, Object>> addDeptUser(String deptId, List<Map<String, Object>> childList) {
-		List<User> list = UserQuery.me().findByDeptId(deptId);
-		for (User user : list) {
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("text", user.getRealname());
-			map.put("tags", Lists.newArrayList(user.getId(), "user"));
-			childList.add(map);
-
-		}
-		return childList;
-	}
-
-	@Override
 	
 	@Before({Tx.class, WechatApiConfigInterceptor.class})
 	@RequiresPermissions(value = { "/admin/customer/edit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
@@ -238,27 +124,23 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 
 		Customer customer = getModel(Customer.class);
 		String customerId = customer.getId();
-		customer.setProvCode(getPara("userProvinceId"));
-		customer.setProvName(getPara("userProvinceText"));
-		customer.setCityCode(getPara("userCityId"));
-		customer.setCityName(getPara("userCityText"));
-		customer.setCountryCode(getPara("userDistrictId"));
-		customer.setCountryName(getPara("userDistrictText"));
+
+		String areaCodes = getPara("areaCodes");
+		String areaNames = getPara("areaNames");
+		String[] areaCodeArray = areaCodes.split("/");
+		String[] areaNameArray = areaNames.split("/");
+
+		customer.setProvName(areaNameArray[0]);
+		customer.setProvCode(areaCodeArray[0]);
+		customer.setCityName(areaNameArray[1]);
+		customer.setCityCode(areaCodeArray[1]);
+
+		customer.setCountryName(areaNameArray[2]);
+		customer.setCountryCode(areaCodeArray[2]);
 		
 		if(!this.checkCustomerNameAndMobile(customer)) {
 			renderAjaxResultForError("该客户已存在");
 		}
-		
-		String[] customerTypes = getParaValues("customerTypes");
-		String userIds = getPara("userIds");
-
-		if (StrKit.isBlank(userIds)) {
-			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-			userIds = user.getId();
-		}
-
-//		CustomerJoinCustomerTypeQuery.me().deleteByCustomerId(customerId);
-//		UserJoinCustomerQuery.me().deleteByCustomerId(customerId);
 
 		if (StrKit.isBlank(customerId)) {
 			customerId = StrKit.getRandomUUID();
@@ -356,7 +238,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 	private void insertCustomer(String customerId, CustomerExcel excel) {
 		Customer customer = new Customer();
 		customer.set("id", customerId);
-		customer.set("customer_code", excel.getCustomerCode());
+	//	customer.set("customer_code", excel.getCustomerCode());
 		customer.set("customer_name", excel.getCustomerName());
 		customer.set("contact", excel.getContact());
 		customer.set("mobile", excel.getMobile());
@@ -408,7 +290,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\customer\\"
 				+ depatName + "客户资料.xlsx";
 
-		Page<Record> page = CustomerQuery.me().paginate(1, Integer.MAX_VALUE, null, paraMap, depatId, "");
+		Page<Record> page = CustomerQuery.me().paginate(1, Integer.MAX_VALUE, "");
 		List<Record> customerList = page.getList();
 
 		List<CustomerExcel> excellist = Lists.newArrayList();
@@ -416,7 +298,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 
 			CustomerExcel excel = new CustomerExcel();
 			excel.setCustomerName((String) record.get("customer_name"));
-			excel.setCustomerCode((String) record.get("customer_code"));
+		//	excel.setCustomerCode((String) record.get("customer_code"));
 			excel.setContact((String) record.get("contact"));
 			excel.setMobile((String) record.get("mobile"));
 			excel.setEmail((String) record.get("email"));

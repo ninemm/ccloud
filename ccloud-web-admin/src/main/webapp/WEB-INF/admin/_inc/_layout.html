@@ -64,7 +64,7 @@
 							<div class="input-group col-md-6 col-sm-10">					
 								<select class="form-control input-sm" id="seller_id">
 									<#list (session['sellerList'])! as seller >
-										<option value="${seller.id}" <#if (Session.sellerId)! == seller.id!>selected="selected"</#if>>${(seller.sellerName)!}</option>
+										<option value="${seller.sellerId}" <#if (Session.sellerId)! == seller.id!>selected="selected"</#if>>${(seller.sellerName)!}</option>
 									</#list>
 								</select>
 							</div>	

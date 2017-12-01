@@ -134,6 +134,14 @@ public abstract class BaseContent<M extends BaseContent<M>> extends JModel<M> im
 	public String getId() {
 		return get("id");
 	}
+	
+	public void setSellerId(String sellerId) {
+		set("seller_id", sellerId);
+	}
+	
+	public String getSellerId() {
+		return get("seller_id");
+	}
 
 	public void setTitle(java.lang.String title) {
 		set("title", title);
@@ -414,5 +422,20 @@ public abstract class BaseContent<M extends BaseContent<M>> extends JModel<M> im
 	public java.lang.String getRemarks() {
 		return get("remarks");
 	}
-
+	
+	public void setDeptId(String deptId) {
+		set("dept_id", deptId);
+	}
+	
+	public String getDeptId() {
+		return get("dept_id");
+	}
+	
+	public void setDeptArea(String deptArea) {
+		set("dept_area", deptArea);
+	}
+	
+	public String getDeptArea() {
+		return get("dept_area");
+	}
 }

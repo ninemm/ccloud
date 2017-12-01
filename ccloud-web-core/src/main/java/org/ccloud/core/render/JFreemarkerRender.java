@@ -62,13 +62,13 @@ public class JFreemarkerRender extends FreeMarkerRender {
 		Map data = new HashMap();
 		for (Enumeration<String> attrs = request.getAttributeNames(); attrs.hasMoreElements();) {
 			String attrName = attrs.nextElement();
-			if (attrName.startsWith("jp.")) {
+			if (attrName.startsWith("cc.")) {
 				jpTags.put(attrName.substring(3), request.getAttribute(attrName));
 			} else {
 				data.put(attrName, request.getAttribute(attrName));
 			}
 		}
-		data.put("jp", jpTags);
+		data.put("cc", jpTags); 
 
 		String htmlContent = getHtmlContent(data);
 

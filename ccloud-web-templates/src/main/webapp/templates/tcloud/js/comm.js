@@ -4,30 +4,101 @@
 // 例子：
 // (new Date()).Format("yyyy-MM-dd hh:mm:ss.S") ==> 2006-07-02 08:09:04.423
 // (new Date()).Format("yyyy-M-d h:m:s.S") ==> 2006-7-2 8:9:4.18
-Date.prototype.Format = function (fmt) { // author: meizz
-  var o = {
-    "M+": this.getMonth() + 1, // 月份
-    "d+": this.getDate(), // 日
-    "h+": this.getHours(), // 小时
-    "m+": this.getMinutes(), // 分
-    "s+": this.getSeconds(), // 秒
-    "q+": Math.floor((this.getMonth() + 3) / 3), // 季度
-    "S": this.getMilliseconds()
-    // 毫秒
-  };
-  if (/(y+)/.test(fmt))
-    fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "")
-      .substr(4 - RegExp.$1.length));
-  for (var k in o)
-    if (new RegExp("(" + k + ")").test(fmt))
-      fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) :
-        (("00" + o[k]).substr(("" + o[k]).length)));
-  return fmt;
+Date.prototype.Format = function(fmt) { // author: meizz
+	var o = {
+		"M+" : this.getMonth() + 1, // 月份
+		"d+" : this.getDate(), // 日
+		"h+" : this.getHours(), // 小时
+		"m+" : this.getMinutes(), // 分
+		"s+" : this.getSeconds(), // 秒
+		"q+" : Math.floor((this.getMonth() + 3) / 3), // 季度
+		"S" : this.getMilliseconds()
+	// 毫秒
+	};
+	if (/(y+)/.test(fmt))
+		fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "")
+				.substr(4 - RegExp.$1.length));
+	for ( var k in o)
+		if (new RegExp("(" + k + ")").test(fmt))
+			fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k])
+					: (("00" + o[k]).substr(("" + o[k]).length)));
+	return fmt;
 }
 
-$.today = function () {
-  return new Date().Format("yyyy-MM-dd");
+$.today = function() {
+	return new Date().Format("yyyy-MM-dd");
 }
+
+Utils = {
+		context: '',	
+		devMode: true,
+		pageSize: 10,
+		ajax: function(url, param, callback) {
+			$.ajax({
+	            type: "post",
+	            url: url,
+	            data: param(),
+	            dataType: 'json',
+	            success: function(res) {
+	            	if (callback)
+	            		callback(res);
+	            },
+	            error: function(res) {
+	            	toastr.error(res.message);
+	            }
+	        });
+		},
+		get: function(url) {
+			$.get(url, function(res) {
+	            if (res.errorCode > 0) {
+	                toastr.warn(res.message);
+	            } else {
+	                toastr.success(res.message);
+	                location.reload();
+	            }
+	        });
+		},
+		confirm: function(title, text, url) {
+			$.confirm({
+	            title: title,
+	            text: text,
+	            onOK: function() {
+	                $.get(url, function(res) {
+			            if (res.errorCode > 0) {
+			                toastr.warn(res.message);
+			            } else {
+			                toastr.success(res.message);
+			                location.reload();
+			            }
+			        });
+	            },
+	            onCancel: function() {}
+	        });
+		},
+		infinite: function($root, $loadmore, data, loading, callback) {
+			$root = $root || $(window.body);
+			$root.infinite().on("infinite", function() {
+				console.log('infinite start');
+				if ($loadmore) $loadmore.show();
+				
+				if (loading) return;
+				loading = true;
+				$.ajax({
+		            type: "post",
+		            url: '${CPATH}/api',
+		            data: data,
+		            dataType: 'json',
+		            success: function(res) {
+		            	if (callback)
+		            		callback();
+		            },
+		            error: function(res) {
+		                toast.error(res.message);
+		            }
+		        });
+			});
+		}
+	}
 
 // 菜单
 var open = false;
@@ -35,86 +106,89 @@ var finished = true;
 var $currentInput = null;
 
 function openMenu() {
-  open = true;
-  finished = false;
-  $(".hidden-menu ul").show().addClass("animated fadeInUp");
-  $("#button").addClass("close-button");
-  $(".layer").addClass("layer-show");
-  setTimeout(function () {
-    $(".hidden-menu ul").removeClass("animated fadeInUp");
-    finished = true;
-  }, 300);
+	open = true;
+	finished = false;
+	$(".hidden-menu ul").show().addClass("animated fadeInUp");
+	$("#button").addClass("close-button");
+	$(".layer").addClass("layer-show");
+	setTimeout(function() {
+		$(".hidden-menu ul").removeClass("animated fadeInUp");
+		finished = true;
+	}, 300);
 }
 
 function closeMenu() {
-  finished = false;
-  $(".hidden-menu ul").addClass("animated fadeOutDown");
-  $("#button").removeClass("close-button");
-  setTimeout(function () {
-    $(".hidden-menu ul").hide().removeClass("animated fadeOutDown");
-    $(".layer").removeClass("layer-show");
-    open = false;
-    finished = true;
-  }, 300);
+	finished = false;
+	$(".hidden-menu ul").addClass("animated fadeOutDown");
+	$("#button").removeClass("close-button");
+	setTimeout(function() {
+		$(".hidden-menu ul").hide().removeClass("animated fadeOutDown");
+		$(".layer").removeClass("layer-show");
+		open = false;
+		finished = true;
+	}, 300);
 }
 
 function openPop() {
-  open = true;
-  $("body").append('<div class="pop-input">' +
-    '<input type="number" value="0">' +
-    '<div class="pop-button">' +
-    '<a class="gray-button width-50" id="cancel-input">取消</a>' +
-    '<a class="blue-button width-50" id="confirm-input">确定</a>' +
-    '</div>' +
-    '</div>');
-  $(".pop-input").addClass("animated fadeIn");
-  $(".layer").addClass("layer-pop-show");
-  $(".pop-input input").val($currentInput.val());
-  $(".pop-input input").focus();
+	open = true;
+	$("body")
+			.append(
+					'<div class="pop-input">'
+							+ '<input type="number" value="0">'
+							+ '<div class="pop-button">'
+							+ '<a class="gray-button width-50" id="cancel-input">取消</a>'
+							+ '<a class="blue-button width-50" id="confirm-input">确定</a>'
+							+ '</div>' + '</div>');
+	$(".pop-input").addClass("animated fadeIn");
+	$(".layer").addClass("layer-pop-show");
+	$(".pop-input input").val($currentInput.val());
+	$(".pop-input input").focus();
 }
 
 function closePop() {
-  open = false;
-  $(".pop-input").addClass("animated fadeOut");
-  setTimeout(function () {
-    $(".pop-input").remove();
-    $(".layer").removeClass("layer-pop-show");
-  }, 300);
+	open = false;
+	$(".pop-input").addClass("animated fadeOut");
+	setTimeout(function() {
+		$(".pop-input").remove();
+		$(".layer").removeClass("layer-pop-show");
+	}, 300);
 }
 
 function confirmInput() {
-  $currentInput.val($(".pop-input input").val());
-  closePop();
+	$currentInput.val($(".pop-input input").val());
+	closePop();
 }
 
-$(function () {
-  FastClick.attach(document.body);
-  $(document).on("touchstart", "#button", function () {
-    if (finished) {
-      if (!open) {
-        openMenu();
-      } else {
-        closeMenu();
-      };
-    };
-  }).on("touchmove", ".layer", function () {
-    event.preventDefault();
-  }).on("touchend", "input[type=number]", function () {
-    if (!open) {
-      $currentInput = $(this);
-      openPop();
-    }
-  }).on("touchstart", "#cancel-input", function () {
-    closePop();
-  }).on("touchstart", "#confirm-input", function () {
-    confirmInput();
-  }).on("touchstart", ".operate:first-child", function() {
-    var $input = $(this).next();
-    $input.val(Number($input.val())-1);
-  }).on("touchstart", ".operate:last-child", function() {
-    var $input = $(this).prev();
-    $input.val(Number($input.val())+1);
-  }).on("change", "input[name=add-gift]", function () {
-    $(this).parent().next().slideToggle("fast");
-  });
+$(function() {
+	FastClick.attach(document.body);
+	$(document).on("touchstart", "#button", function() {
+		if (finished) {
+			if (!open) {
+				openMenu();
+			} else {
+				closeMenu();
+			}
+			;
+		}
+		;
+	}).on("touchmove", ".layer", function() {
+		event.preventDefault();
+	}).on("touchend", "input[type=number]", function() {
+		if (!open) {
+			$currentInput = $(this);
+			openPop();
+		}
+	}).on("touchstart", "#cancel-input", function() {
+		closePop();
+	}).on("touchstart", "#confirm-input", function() {
+		confirmInput();
+	}).on("touchstart", ".operate:first-child", function() {
+		var $input = $(this).next();
+		$input.val(Number($input.val()) - 1);
+	}).on("touchstart", ".operate:last-child", function() {
+		var $input = $(this).prev();
+		$input.val(Number($input.val()) + 1);
+	}).on("change", "input[name=add-gift]", function() {
+		$(this).parent().next().slideToggle("fast");
+	});
 })

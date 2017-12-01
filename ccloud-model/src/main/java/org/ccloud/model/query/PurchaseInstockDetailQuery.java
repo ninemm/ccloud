@@ -16,9 +16,13 @@
 package org.ccloud.model.query;
 
 import java.util.LinkedList;
+import java.util.List;
+
 import org.ccloud.model.PurchaseInstockDetail;
 
+import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
 /**
@@ -67,5 +71,23 @@ public class PurchaseInstockDetailQuery extends JBaseQuery {
 		return 0;
 	}
 
-	
+	public List<Record> findByOutstockId(String outstockId,String dataArea) {
+
+		StringBuilder sqlBuilder = new StringBuilder(
+				" SELECT cpid.*,cp.`name` as productName, cp.big_unit, cp.small_unit, cp.convert_relate,GROUP_CONCAT(distinct cgs.`name`) AS cps_name ");
+		sqlBuilder.append(" FROM cc_purchase_instock_detail cpid  ");
+		sqlBuilder.append(" LEFT JOIN cc_seller_product csp on csp.product_id=cpid.seller_product_id ");
+		sqlBuilder.append(" LEFT JOIN cc_product_goods_specification_value cpg ON  cpid.seller_product_id = cpg.product_set_id ");
+		sqlBuilder.append(" LEFT JOIN cc_goods_specification_value cgs ON cpg.goods_specification_value_set_id = cgs.id ");
+		sqlBuilder.append(" LEFT JOIN cc_product cp on cp.id= cpid.seller_product_id ");
+		sqlBuilder.append(" where cpid.purchase_instock_id=? and cpid.data_area="+dataArea+" GROUP BY cpid.id ");
+
+		return Db.find(sqlBuilder.toString(), outstockId);
+	}
+
+	public List<PurchaseInstockDetail> findAllByPurchaseInstockId(String purchaseInstockId){
+		String sql = "select cpid.* ,cpi.warehouse_id,cpi.pwarehouse_sn from cc_purchase_instock_detail cpid "
+				+ " LEFT JOIN cc_purchase_instock cpi on cpid.purchase_instock_id=cpi.id where cpi.id=?";
+		return DAO.find(sql, purchaseInstockId);
+	}
 }

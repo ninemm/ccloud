@@ -28,11 +28,13 @@ import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.Inventory;
 import org.ccloud.model.InventoryDetail;
+import org.ccloud.model.SellerProduct;
 import org.ccloud.model.StockTaking;
 import org.ccloud.model.StockTakingDetail;
 import org.ccloud.model.User;
 import org.ccloud.model.Warehouse;
 import org.ccloud.model.query.InventoryQuery;
+import org.ccloud.model.query.SellerProductQuery;
 import org.ccloud.model.query.StockTakingDetailQuery;
 import org.ccloud.model.query.StockTakingQuery;
 import org.ccloud.model.query.UserQuery;
@@ -148,6 +150,14 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 				inventoryDetail.setDeptId(stockTaking.getDeptId());
 				inventoryDetail.setCreateDate(new Date());
 				inventoryDetail.save();
+				SellerProduct sellerProduct=SellerProductQuery.me().findByProductIdAndSellerId((String) listMap.get(i).get("product_id"),stockTaking.getSellerId());
+				BigDecimal storeCount = sellerProduct.getStoreCount();
+				if (storeCount==null) {
+					sellerProduct.setStoreCount(new BigDecimal(listMap.get(i).get("product_count").toString()));
+				}else {
+					sellerProduct.setStoreCount(new BigDecimal(listMap.get(i).get("product_count").toString()).add(storeCount));
+				}
+				sellerProduct.update();
 			}
 			renderAjaxResultForSuccess("更新成功");
 		} else {
@@ -211,7 +221,7 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 						String remark = StringUtils
 								.getArrayFirst(map.get("stockTakingList[" + factIndex[i] + "].remark"));
 						stockTakingDetail.setProductId(productId);
-						stockTakingDetail.setProductCount(Integer.parseInt(productCount));
+						stockTakingDetail.setProductCount(new BigDecimal(productCount));
 						stockTakingDetail.setRemark(remark);
 						stockTakingDetail.setStockTakingId(stockTaking.getId());
 						stockTakingDetail.setId(StrKit.getRandomUUID());
@@ -246,7 +256,7 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 						String remark = StringUtils.getArrayFirst(map.get("stockTakingList[" + i + "].remark"));
 
 						stockTakingDetail.setProductId(productId);
-						stockTakingDetail.setProductCount(Integer.parseInt(productCount));
+						stockTakingDetail.setProductCount(new BigDecimal(productCount));
 						stockTakingDetail.setRemark(remark);
 						stockTakingDetail.setStockTakingId(stockTaking.getId());
 						stockTakingDetail.setId(StrKit.getRandomUUID());

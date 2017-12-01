@@ -106,12 +106,12 @@ public abstract class BasePurchaseInstockDetail<M extends BasePurchaseInstockDet
 		return getStr("purchase_instock_id");
 	}
 
-	public void setProductId(java.lang.String productId) {
-		set("product_id", productId);
+	public void setSellerProductId(java.lang.String productId) {
+		set("seller_product_id", productId);
 	}
 
-	public java.lang.String getProductId() {
-		return getStr("product_id");
+	public java.lang.String getSellerProductId() {
+		return getStr("seller_product_id");
 	}
 
 	public void setProductCount(java.lang.Integer productCount) {

@@ -17,15 +17,9 @@ package org.ccloud.core;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Map;
 
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
-import org.ccloud.model.User;
 import org.ccloud.model.core.JModel;
-import org.ccloud.utils.DataAreaUtil;
 
-import com.google.common.collect.Maps;
 import com.jfinal.kit.StrKit;
 import com.jfinal.log.Log;
 import com.jfinal.plugin.activerecord.Page;
@@ -129,25 +123,4 @@ public class JBaseCRUDController<M extends JModel<? extends JModel<?>>> extends 
 		return true;
 	}
 	
-//	public Map<String, String> getDeptIdAndDataArea() {
-//
-//		User user = getSessionAttr("user");
-//		Map<String, String> map = Maps.newHashMap();
-//		Subject subject = SecurityUtils.getSubject();
-//
-//		if (subject.isPermitted("/admin/all")) {// 超级管理员
-//			map.put("deptId", "");
-//			map.put("dataArea", "");
-//
-//		} else if (subject.isPermitted("/admin/manager")) {// 经销商管理员
-//			map.put("deptId", user.getDepartmentId());
-//			map.put("dataArea", DataAreaUtil.getUserDeptDataArea(user.getDataArea()) + "%");
-//		} else {// 业务员
-//			map.put("deptId", user.getDepartmentId());
-//			map.put("dataArea", DataAreaUtil.getUserDeptDataArea(user.getDataArea()));
-//		}
-//
-//		return map;
-//	}
-
 }
