@@ -22,11 +22,9 @@
 <#macro script>
 
 	var $form = $("#form");
-	var $city = $('#city-picker');
+	var $city = $('#cityPicker');
 
 	$(function() {
-	    //$.fn.citypicker.noConflict();
-	
 		$('#customerTypes').select2({
 			placeholder: '请把默认类型设置为第一个'
 		});
@@ -37,8 +35,6 @@
             city: '${(customer.city_name)!}',
             district: '${(customer.country_name)!}'
         });
-		//console.log($city.data('citypicker').getCode());
-        //console.log($city.data('citypicker').getVal());
 		jQuery.mm.initValidator('#form', validatorFields)
 		
 	});
@@ -52,8 +48,7 @@
 		},
 		'customer.customer_code': {
 			validators: {
-				notEmpty: { message: '客户编码不能为空' },
-				stringLength: { max: 15, message: '客户编码最大长度是15字符，请重新输入' }
+				stringLength: { max: 22, message: '客户编码最大长度是22字符，请重新输入' }
 			}
 		},
 		'customer.contact': {
@@ -69,46 +64,9 @@
 				regexp:{regexp:/^1[3|5|8]{1}[0-9]{9}$/, message:'请输入正确的手机号码' }
 			}
 		},
-		'userProvinceId': {
+		'areaNames': {
 			validators: {
-				notEmpty: { message: '省不能为空' },
-				callback: {  
-					message: '省不能为空',  
-					callback: function(value, validator) {
-						if(value == '请选择省份'){
-							return false;
-						}
-						return true;
-					}
-				} 
-			}
-		},
-		'userCityId': {
-			validators: {
-				notEmpty: { message: '市不能为空' },
-				callback: {  
-					message: '市不能为空',  
-					callback: function(value, validator) {
-						if(value == '请选择城市'){
-							return false;
-						}
-						return true;
-					}
-				} 
-			}
-		},
-		'userDistrictId': {
-			validators: {
-				notEmpty: { message: '区不能为空' },
-				callback: {  
-					message: '区不能为空',  
-					callback: function(value, validator) {
-						if(value == '请选择区县'){
-							return false;
-						}
-						return true;
-					}
-				} 
+				notEmpty: { message: '省市区不能为空' }
 			}
 		},
 		'customer.address': {
@@ -116,31 +74,12 @@
 				notEmpty: { message: '地址不能为空' },
 				stringLength: { max: 50, message: '地址最大长度是50字符，请重新输入' }
 			}
-		},
-		'customerTypes': {
-			validators: {
-				notEmpty: { message: '客户类型不能为空' }
-			}
-		},
-		'userIds': {
-			validators: {
-				notEmpty: { message: '负责人不能为空' }
-			}
 		}
 	};
 
-	$('#_menu_tree').click(function() {
-		layer.open({
-			title:'负责人',
-			type: 2,
-			area: ['580px', '530px'],
-			fix: false, //不固定
-			content: '${CPATH}/admin/customer/user_tree'
-		});
-	});
-
 	function doSubmit(){
-
+		$("#areaCodes").val($city.data('citypicker').getCode());
+		$("#areaNames").val($city.data('citypicker').getVal());
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
 				var validate = $form.data('bootstrapValidator');
@@ -199,7 +138,7 @@
                     <div class="col-sm-5">
                         <label class="control-label col-sm-4">客户编码:</label>
                         <div class="input-group col-sm-8">
-                            <input class="form-control input-sm" type="text" name="customer.customer_code" value="${(customer.customer_code)!}" placeholder="1-15个任意字母数字">
+                            <input class="form-control input-sm" type="text" name="customer.customer_code" value="${(customer.customer_code)!}" placeholder="1-22个任意字母数字">
                         </div>
                     </div>
                 </div> 
@@ -217,67 +156,33 @@
                         </div>
                     </div>
                 </div>
+                
+                <div class="form-group">
+                     <div class="col-sm-5">
+                        <label class="control-label col-sm-4">邮箱:</label>
+                        <div class="input-group col-sm-8">
+                            <input class="form-control input-sm" type="text" name="customer.email" value="${(customer.email)!}" placeholder="1-25个任意字母数字">
+                        </div>
+                    </div>
+                </div>
 				
 				<div class="form-group col-sm-10">
                     <label for="_title" class="col-sm-2 control-label">省市区:</label>
                     <div class="input-group col-sm-10">
-                        <input readonly type="text" id="city-picker" style="width:70%;">
-                        <input type="hidden" name="userProvinceText" id="userProvinceText" value="" />
-                        <input type="hidden" name="userCityText" id="userCityText" value="" />
-                        <input type="hidden" name="userDistrictText" id="userDistrictText" value="" />
+                        <input readonly type="text" id="cityPicker" style="width:70%;">
+                        <input type="hidden" id="areaNames" name="areaNames">
+                        <input type="hidden" id="areaCodes" name="areaCodes">
                     </div>
                 </div>
-				
-				<div class="form-group col-sm-10 validata-box">
+
+				<div class="form-group col-sm-10">
                     <label for="_title" class="col-sm-2 control-label">详细地址:</label>
                     <div class="input-group col-sm-10">
                         <input class="form-control input-sm" type="text" name="customer.address" value="${(customer.address)!}" placeholder="1-50个任意字母数字">
                     </div>
                 </div>
-                
-                <div class="form-group">
-                    <div class="col-sm-5">
-                        <label class="control-label col-sm-4">客户类型:</label>
-                        <div class="input-group col-sm-8">
-                            <select class="form-control input-sm" name="customerTypes" id ="customerTypes" multiple="multiple" >
-	                            <#list (customerTypeList)! as customerType >
-	                                <option value="${customerType.id}" <#if cTypeList??&&cTypeList?contains(customerType.id)>selected="selected"</#if>>${(customerType.name)!}</option>
-	                            </#list>
-	                        </select>
-                        </div>
-                    </div>
-                    <@shiro.hasPermission name="/admin/dealer/all, /admin/all"> 
-                    <div class="col-sm-5">
-                        <label class="control-label col-sm-4">负责人:</label>
-                        <div class="input-group col-sm-8">
-                            <input type="hidden" name="userIds" id="userIds" value="${cUserIds!}">
-                            <input class="form-control input-sm" type="text" id="userNames" name="userNames" value="${cUserNames!}" disabled="disabled">
-                            <div class="input-group-addon" id="_menu_tree" style="cursor:pointer;">
-                                <i class="fa fa-search"></i> 选择
-                            </div>
-                        </div>
-                    </div>
-                    </@shiro.hasPermission>
-                </div>
-                
-                <div class="form-group">
-                    <div class="col-sm-5">
-                        <label class="control-label col-sm-4">客户子类:</label>
-                        <div class="input-group col-sm-8">
-                            <select class="form-control input-sm" name="customer.subType">
-                                ${DICT_BOX('customer_subtype', 'select', (customer.sub_type)!)}
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-sm-5">
-                        <label class="control-label col-sm-4">客户种类:</label>
-                        <div class="input-group col-sm-8">
-                            <select class="form-control input-sm" name="customer.subType">
-                                ${DICT_BOX('customer_kind', 'select', (customer.sub_type)!)}
-                            </select>
-                        </div>
-                    </div>
-                </div>
+
+
 			</div>
 		</form>
 		<div class="box-footer"> 

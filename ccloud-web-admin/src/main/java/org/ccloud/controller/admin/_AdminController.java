@@ -40,6 +40,8 @@ import org.ccloud.utils.StringUtils;
 
 import com.jfinal.aop.Before;
 import com.jfinal.aop.Clear;
+import com.jfinal.kit.StrKit;
+import com.jfinal.plugin.activerecord.Record;
 
 @RouterMapping(url = "/admin", viewPath = "/WEB-INF/admin")
 @RouterNotAllowConvert
@@ -97,8 +99,6 @@ public class _AdminController extends JBaseController {
 			subject.login(token);
 			User user = (User) subject.getPrincipal();
 			if (user != null) {
-				List<Seller> sellerList = SellerQuery.me().querySellIdByDept(user.getDepartmentId());
-
 				// 数据查看时的数据域
 				if (subject.isPermitted("/admin/all") || subject.isPermitted("/admin/manager")) {
 					setSessionAttr(Consts.SESSION_SELECT_DATAAREA,
@@ -106,11 +106,23 @@ public class _AdminController extends JBaseController {
 				} else {
 					setSessionAttr(Consts.SESSION_SELECT_DATAAREA, user.getDataArea());
 				}
-				setSessionAttr("sellerList", sellerList);
-				if (sellerList.size() > 0) {
-					setSessionAttr("sellerId", sellerList.get(0).getId());
-					setSessionAttr("sellerCode", sellerList.get(0).getSellerCode());
-					setSessionAttr("sellerName", sellerList.get(0).getSellerName());
+
+				// sellerId
+				if (!subject.isPermitted("/admin/all")) {
+					List<Record> sellerList = SellerQuery.me().querySellerIdByDept(user.getDepartmentId());
+
+					if(sellerList.size() == 0) {
+						sellerList = SellerQuery.me().queryParentSellerIdByDept(user.getDepartmentId());
+
+						while(StrKit.isBlank(sellerList.get(0).getStr("sellerId"))) {
+							sellerList = SellerQuery.me().queryParentSellerIdByDept(sellerList.get(0).getStr("parent_id"));
+						}
+					}
+
+					setSessionAttr("sellerList", sellerList);
+					setSessionAttr("sellerId", sellerList.get(0).get("sellerId"));
+					setSessionAttr("sellerCode", sellerList.get(0).get("sellerCode"));
+					setSessionAttr("sellerName", sellerList.get(0).get("sellerName"));
 				}
 			}
 			MessageKit.sendMessage(Actions.USER_LOGINED, user);

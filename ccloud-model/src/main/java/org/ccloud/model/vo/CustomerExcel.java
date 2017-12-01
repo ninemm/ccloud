@@ -6,8 +6,8 @@ public class CustomerExcel {
 
 	@Excel(name = "客户名称")
 	private String customerName;
-	@Excel(name = "客户编码")
-	private String customerCode;
+	@Excel(name = "客户昵称")
+	private String nickname;
 	@Excel(name = "联系人")
 	private String contact;
 	@Excel(name = "手机号")
@@ -35,20 +35,20 @@ public class CustomerExcel {
 		this.customerName = customerName;
 	}
 
-	public String getCustomerCode() {
-		return customerCode;
+	public String getNickname() {
+		return nickname;
 	}
 
-	public void setCustomerCode(String customerCode) {
-		this.customerCode = customerCode;
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
 	}
 
 	public String getContact() {
 		return contact;
 	}
 
-	public void setContact(String contacts) {
-		this.contact = contacts;
+	public void setContact(String contact) {
+		this.contact = contact;
 	}
 
 	public String getMobile() {

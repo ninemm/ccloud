@@ -68,23 +68,9 @@
 					},
 					edit: false
 				},
-				{field: "customerTypeNames", title: "客户类型", align: "center", width: '15%', edit: false},
-				{field: "realnames", title: "负责人", align: "center", width: '10%', edit: false},
-				{field: "customer_kind", title: "客户种类", align: "center", width: '5%',
-					formatter: function(value, row, rowIndex) {
-						return value == 1 ? '普通' : '直营商';
-					},
-					edit: false
-				},
 				{field: "is_enabled", title: "状态", align: "center", width: '5%',
 					formatter: function(value, row, rowIndex) {
 						return value == 1 ? '启用' : '停用';
-					},
-					edit: false
-				},
-				{field: "is_archive", title: "是否归档", align: "center", width: '5%',
-					formatter: function(value, row, rowIndex) {
-						return value == 1 ? '已归档' : '未归档';
 					},
 					edit: false
 				},
@@ -176,13 +162,11 @@
 			</div>
 			
 			<div class="jp-right">
-				<@shiro.hasPermission name="/admin/customer/uploading, /admin/dealer/all, /admin/all"> 
+				<@shiro.hasPermission name="/admin/all"> 
 					<a href="${CPATH}/admin/customer/upload?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-upload"></i> 导入</a>
-				</@shiro.hasPermission>
-				<@shiro.hasPermission name="/admin/customer/downloading, /admin/dealer/all, /admin/all"> 
 					<a href="${CPATH}/admin/customer/download?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-download"></i> 导出</a>
+					<a href="${CPATH}/admin/customer/edit?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-plus"></i> 新增 </a>
 				</@shiro.hasPermission>
-				<a href="${CPATH}/admin/customer/edit?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-plus"></i> 新增 </a>
 			</div>
 		</div>
 	

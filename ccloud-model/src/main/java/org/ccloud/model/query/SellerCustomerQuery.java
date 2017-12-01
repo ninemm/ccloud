@@ -16,6 +16,7 @@
 package org.ccloud.model.query;
 
 import java.util.LinkedList;
+
 import org.ccloud.model.SellerCustomer;
 
 import com.jfinal.plugin.activerecord.Db;
@@ -57,25 +58,49 @@ public class SellerCustomerQuery extends JBaseQuery {
 		return Db.findFirst(fromBuilder.toString(), id);
 	}
 
-	public Page<SellerCustomer> paginate(int pageNumber, int pageSize, String keyword) {
-		String select = "select sc.*, c.customer_code, c.customer_name"
-				+ ", c.contact, c.mobile, c.prov_name, c.city_name, c.country_name"
-				+ ", c.prov_code, c.city_code, c.country_code, c.address";
-
-		StringBuilder fromBuilder = new StringBuilder(" from `cc_seller_customer` sc ");
-		fromBuilder.append(" join `cc_customer` c on c.id = sc.customer_id ");
+	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String dataArea) {
 
 		boolean needWhere = true;
 		LinkedList<Object> params = new LinkedList<Object>();
 
+		String select = "select sc.*, c.customer_code, c.customer_name"
+				+ ", c.contact, c.mobile, c.prov_name, c.city_name, c.country_name"
+				+ ", c.prov_code, c.city_code, c.country_code, c.address"
+				+ ", t1.customerTypeNames, t2.realnames";
+
+		StringBuilder fromBuilder = new StringBuilder(" from `cc_seller_customer` sc ");
+		fromBuilder.append(" join `cc_customer` c on c.id = sc.customer_id ");
+
+		fromBuilder.append(" LEFT JOIN (SELECT c1.id,GROUP_CONCAT(ct. NAME) AS customerTypeNames ");
+		fromBuilder.append(" FROM cc_seller_customer c1 ");
+		fromBuilder.append(" LEFT JOIN cc_customer_join_customer_type cjct ON c1.id = cjct.seller_customer_id ");
+		fromBuilder.append(" LEFT JOIN cc_customer_type ct ON cjct.customer_type_id = ct.id ");
+		fromBuilder.append(" GROUP BY c1.id) t1 ON sc.id = t1.id ");
+
+		fromBuilder.append(" JOIN (SELECT c2.id, GROUP_CONCAT(u.realname) AS realnames ");
+		fromBuilder.append(" FROM cc_seller_customer c2 ");
+		fromBuilder.append(" JOIN cc_user_join_customer ujc ON c2.id = ujc.seller_customer_id ");
+		fromBuilder.append(" JOIN USER u ON ujc.user_id = u.id ");
+
+		appendIfNotEmptyWithLike(fromBuilder, "ujc.data_area", dataArea, params, true);
+		fromBuilder.append(" GROUP BY c2.id) t2 ON sc.id = t2.id ");
+
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "c.customer_name", keyword, params, needWhere);
 
+		fromBuilder.append(" GROUP BY sc.id ");
 		fromBuilder.append(" order by sc.create_date ");
 
 		if (params.isEmpty())
-			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
-		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+
+	public boolean enable(String id, int isEnabled) {
+		SellerCustomer sellerCustomer = DAO.findById(id);
+		sellerCustomer.set("is_enabled", isEnabled);
+
+		return sellerCustomer.saveOrUpdate();
 	}
 
 	public int batchDelete(String... ids) {
