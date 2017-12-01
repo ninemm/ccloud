@@ -53,6 +53,11 @@ public class PayablesDetailQuery extends JBaseQuery {
 		String select = " select * from cc_payables_detail where object_id= '"+objId+"' and dept_id='"+deptId+"'";
 		return DAO.find(select);
 	}
+	
+	public PayablesDetail findByRefSn(String objId,String deptId,String refSn) {
+		String select = " select * from cc_payables_detail where object_id= '"+objId+"' and dept_id='"+deptId+"' and ref_sn ='"+refSn+"' ";
+		return DAO.findFirst(select);
+	}
 
 	public Page<PayablesDetail> paginate(int pageNumber, int pageSize,String keyword,String deptId, String orderby) {
 		String select = "select * ";

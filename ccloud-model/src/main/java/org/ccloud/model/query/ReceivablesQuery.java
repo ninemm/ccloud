@@ -88,4 +88,9 @@ public class ReceivablesQuery extends JBaseQuery {
 		StringBuilder sqlBuilder = new StringBuilder("UPDATE `cc_receivables` SET act_amount = act_amount +"+act_amount+" , balance_amount = balance_amount-"+act_amount+" WHERE object_id=\'"+objejct_id+"\'");
 		Db.update(sqlBuilder.toString());
 	}
+	
+	public Receivables findByObjId(String objId,String deptId) {
+		String select = "select * from `cc_receivables` where obj_id= '"+objId+"' and dept_id= '"+deptId+"' ";
+		return DAO.findFirst(select);
+	}
 }
