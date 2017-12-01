@@ -114,6 +114,14 @@ public abstract class BaseSellerCustomer<M extends BaseSellerCustomer<M>> extend
 		return getStr("customer_id");
 	}
 
+	public void setNickname(java.lang.String nickname) {
+		set("nickname", nickname);
+	}
+
+	public java.lang.String getNickname() {
+		return getStr("nickname");
+	}
+
 	public void setCreditAmount(java.lang.Integer creditAmount) {
 		set("credit_amount", creditAmount);
 	}

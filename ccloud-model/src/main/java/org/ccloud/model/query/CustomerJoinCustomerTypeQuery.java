@@ -36,14 +36,14 @@ public class CustomerJoinCustomerTypeQuery extends JBaseQuery {
 		return QUERY;
 	}
 
-	public List<Integer> findCustomerTypeListByCustomerId(String customerId, String dataArea) {
+	public List<Integer> findCustomerTypeListBySellerCustomerId(String sellerCustomerId, String dataArea) {
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 
 		StringBuilder sqlBuilder = new StringBuilder("select cj.customer_type_id ");
 		sqlBuilder.append(" from `cc_customer_join_customer_type` cj ");
 		sqlBuilder.append(" join `cc_customer_type` c on cj.customer_type_id = c.id ");
-		needWhere = appendIfNotEmpty(sqlBuilder, "cj.customer_id", customerId, params, needWhere);
+		needWhere = appendIfNotEmpty(sqlBuilder, "cj.seller_customer_id", sellerCustomerId, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(sqlBuilder, "c.data_area", dataArea, params, needWhere);
 
 		return Db.query(sqlBuilder.toString(), params.toArray());
@@ -70,14 +70,8 @@ public class CustomerJoinCustomerTypeQuery extends JBaseQuery {
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
-	public int deleteByCustomerId(String customerId) {
-		return DAO.doDelete("customer_id = ?", customerId);
-	}
-
-	public boolean insert(String customerId, String customerType) {
-		DAO.set("customer_id", customerId);
-		DAO.set("customer_type_id", customerType);
-		return DAO.save();
+	public int deleteBySellerCustomerId(String sellerCustomerId) {
+		return DAO.doDelete("seller_customer_id = ?", sellerCustomerId);
 	}
 
 	public int batchDelete(String... ids) {

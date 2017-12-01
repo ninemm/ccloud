@@ -71,7 +71,7 @@ public class _AdminController extends JBaseController {
 			redirect("/admin/login");
 			return;
 		}
-//		setAttr("toDoCustomerList", CustomerQuery.me().getToDo(user.getUsername()));
+		setAttr("toDoCustomerList", CustomerQuery.me().getToDo(user.getUsername()));
 
 		render("index.html");
 	}

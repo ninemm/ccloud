@@ -38,7 +38,6 @@ import org.ccloud.model.Customer;
 import org.ccloud.model.Department;
 import org.ccloud.model.ModelSorter;
 import org.ccloud.model.User;
-import org.ccloud.model.query.CustomerJoinCustomerTypeQuery;
 import org.ccloud.model.query.CustomerQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.DepartmentQuery;
@@ -135,20 +134,20 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 
 		if (StrKit.notBlank(id)) {// 超级管理员修改
 			setAttr("customer", CustomerQuery.me().findById(id));
-			setAttr("cTypeList", CustomerJoinCustomerTypeQuery.me().findCustomerTypeListByCustomerId(id,
-					DataAreaUtil.getUserDealerDataArea(selectDataArea)));
+//			setAttr("cTypeList", CustomerJoinCustomerTypeQuery.me().findCustomerTypeListByCustomerId(id,
+//					DataAreaUtil.getUserDealerDataArea(selectDataArea)));
 
 			if (isSuperAdmin || isDealerAdmin) {
-				List<Record> list = UserJoinCustomerQuery.me().findUserListByCustomerId(id, deptId, selectDataArea);
-				for (Record record : list) {
-					if (cUserIds.length() != 0 || cUserIds.length() != 0) {
-						cUserIds.append(",");
-						cUserNames.append(",");
-					}
-					cUserIds.append(record.get("user_id"));
-					cUserNames.append(record.get("realname"));
-
-				}
+//				List<Record> list = UserJoinCustomerQuery.me().findUserListByCustomerId(id, deptId, selectDataArea);
+//				for (Record record : list) {
+//					if (cUserIds.length() != 0 || cUserIds.length() != 0) {
+//						cUserIds.append(",");
+//						cUserNames.append(",");
+//					}
+//					cUserIds.append(record.get("user_id"));
+//					cUserNames.append(record.get("realname"));
+//
+//				}
 				setAttr("cUserIds", cUserIds);
 				setAttr("cUserNames", cUserNames);
 			}
@@ -245,7 +244,6 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 		customer.setCityName(getPara("userCityText"));
 		customer.setCountryCode(getPara("userDistrictId"));
 		customer.setCountryName(getPara("userDistrictText"));
-		customer.setIsArchive(1);
 		
 		if(!this.checkCustomerNameAndMobile(customer)) {
 			renderAjaxResultForError("该客户已存在");
@@ -259,8 +257,8 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 			userIds = user.getId();
 		}
 
-		CustomerJoinCustomerTypeQuery.me().deleteByCustomerId(customerId);
-		UserJoinCustomerQuery.me().deleteByCustomerId(customerId);
+//		CustomerJoinCustomerTypeQuery.me().deleteByCustomerId(customerId);
+//		UserJoinCustomerQuery.me().deleteByCustomerId(customerId);
 
 		if (StrKit.isBlank(customerId)) {
 			customerId = StrKit.getRandomUUID();
@@ -302,12 +300,6 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 			MessageKit.sendMessage(Actions.NotifyMessage.CUSTOMER_AUDIT_MESSAGE, kv);
 			
 		}
-
-		for (String customerType : customerTypes) {
-			CustomerJoinCustomerTypeQuery.me().insert(customerId, customerType);
-		}
-
-		this.insertUserJoinCustomer(customerId, userIds);
 
 		renderAjaxResultForSuccess();
 
@@ -384,7 +376,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 		for (String typeName : customerTypeNames) {
 			String id = CustomerTypeQuery.me().findIdByName(typeName,
 					DataAreaUtil.getUserDealerDataArea(user.getDataArea()));
-			CustomerJoinCustomerTypeQuery.me().insert(customerId, id);
+			//CustomerJoinCustomerTypeQuery.me().insert(customerId, id);
 		}
 	}
 
@@ -459,7 +451,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 		String[] customerIds = getParaValues("dataItem");
 		String[] userIds = getParaValues("userIds");
 		for (String customerId : customerIds) {
-			UserJoinCustomerQuery.me().deleteByCustomerId(customerId);
+			//UserJoinCustomerQuery.me().deleteByCustomerId(customerId);
 			for (String userId : userIds)
 				this.insertUserJoinCustomer(customerId, userId);
 		}

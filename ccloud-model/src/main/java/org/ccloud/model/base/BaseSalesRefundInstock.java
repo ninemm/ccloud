@@ -114,12 +114,28 @@ public abstract class BaseSalesRefundInstock<M extends BaseSalesRefundInstock<M>
 		return getStr("seller_id");
 	}
 
+	public void setWarehouseId(java.lang.String warehouseId) {
+		set("warehouse_id", warehouseId);
+	}
+
+	public java.lang.String getWarehouseId() {
+		return getStr("warehouse_id");
+	}
+
 	public void setCustomerId(java.lang.String customerId) {
 		set("customer_id", customerId);
 	}
 
 	public java.lang.String getCustomerId() {
 		return getStr("customer_id");
+	}
+
+	public void setCustomerTypeId(java.lang.String customerTypeId) {
+		set("customer_type_id", customerTypeId);
+	}
+
+	public java.lang.String getCustomerTypeId() {
+		return getStr("customer_type_id");
 	}
 
 	public void setBizUserId(java.lang.String bizUserId) {
@@ -170,12 +186,12 @@ public abstract class BaseSalesRefundInstock<M extends BaseSalesRefundInstock<M>
 		return get("inventory_amount");
 	}
 
-	public void setWarehouseOutId(java.lang.String warehouseOutId) {
-		set("warehouse_out_id", warehouseOutId);
+	public void setOutstockId(java.lang.String outstockId) {
+		set("outstock_id", outstockId);
 	}
 
-	public java.lang.String getWarehouseOutId() {
-		return getStr("warehouse_out_id");
+	public java.lang.String getOutstockId() {
+		return getStr("outstock_id");
 	}
 
 	public void setPaymentType(java.lang.Integer paymentType) {

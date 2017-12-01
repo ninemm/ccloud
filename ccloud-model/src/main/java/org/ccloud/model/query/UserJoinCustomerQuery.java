@@ -37,16 +37,15 @@ public class UserJoinCustomerQuery extends JBaseQuery {
 		return QUERY;
 	}
 
-	public List<Record> findUserListByCustomerId(String customerId, String deptId, String dataArea) {
+	public List<Record> findUserListBySellerCustomerId(String sellerCustomerId, String dataArea) {
 		LinkedList<Object> params = new LinkedList<Object>();
 
 		StringBuilder sqlBuilder = new StringBuilder(" select c.user_id, i.realname ");
 		sqlBuilder.append(" from `cc_user_join_customer` c ");
 		sqlBuilder.append(" join `user` i on c.user_id = i.id ");
-		sqlBuilder.append(" where c.customer_id = ? ");
-		params.add(customerId);
+		sqlBuilder.append(" where c.seller_customer_id = ? ");
+		params.add(sellerCustomerId);
 
-		appendIfNotEmpty(sqlBuilder, "c.dept_id", deptId, params, false);
 		appendIfNotEmptyWithLike(sqlBuilder, "c.data_area", dataArea, params, false);
 
 		return Db.find(sqlBuilder.toString(), params.toArray());
@@ -73,8 +72,8 @@ public class UserJoinCustomerQuery extends JBaseQuery {
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
-	public int deleteByCustomerId(String customerId) {
-		return DAO.doDelete("customer_id = ?", customerId);
+	public int deleteBySelerCustomerId(String sellerCustomerId) {
+		return DAO.doDelete("seller_customer_id = ?", sellerCustomerId);
 	}
 
 	public boolean insert(String customerId, String userId, String deptId, String dataArea) {

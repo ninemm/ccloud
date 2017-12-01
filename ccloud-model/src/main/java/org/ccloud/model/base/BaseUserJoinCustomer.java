@@ -90,8 +90,8 @@ public abstract class BaseUserJoinCustomer<M extends BaseUserJoinCustomer<M>> ex
 		return update;
 	}
 
-	public void setCustomerId(java.lang.String customerId) {
-		set("customer_id", customerId);
+	public void setSellerCustomerId(java.lang.String sellerCustomerId) {
+		set("seller_customer_id", sellerCustomerId);
 	}
 
 	public java.lang.String getCustomerId() {

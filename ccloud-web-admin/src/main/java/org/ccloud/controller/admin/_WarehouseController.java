@@ -16,24 +16,33 @@
 package org.ccloud.controller.admin;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
+import org.ccloud.model.Department;
+import org.ccloud.model.ModelSorter;
 import org.ccloud.model.User;
 import org.ccloud.model.UserJoinWarehouse;
 import org.ccloud.model.Warehouse;
+import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.UserJoinWarehouseQuery;
+import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.query.WarehouseQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
 
+import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
@@ -107,24 +116,53 @@ public class _WarehouseController extends JBaseCRUDController<Warehouse> {
 
 	@Override
 	public void save() {
-	  Warehouse warehouse = getModel(Warehouse.class); 
-	  User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-	  String seller_id=getSessionAttr("sellerId").toString();
-	  warehouse.setDeptId(user.getDepartmentId());
-	  warehouse.setDataArea(user.getDataArea());
-	  warehouse.setSellerId(seller_id);
-	  if (StringUtils.isBlank(warehouse.getId())) {
-		warehouse.setId(StrKit.getRandomUUID());
-		warehouse.setCreateDate(new Date());
-		warehouse.save();
-		UserJoinWarehouse userJoinWarehouse=new UserJoinWarehouse();
-		userJoinWarehouse.setWarehouseId(warehouse.getId());
-		userJoinWarehouse.setUserId(user.getId());
-		userJoinWarehouse.save();
-		renderAjaxResultForSuccess("保存成功！");
-	  }else {
-		warehouse.saveOrUpdate();
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		Warehouse warehouse = getModel(Warehouse.class); 
+
+		if (warehouse.getIsDefault()==1) {
+			List<Warehouse> list = WarehouseQuery.me().findIsDefault(user.getId());
+			if (list.size()!=0&&!list.get(0).getId().equals(warehouse.getId())) {
+				renderAjaxResultForError("请求错误,已有默认仓库");
+				return;
+			}
+		}
+		
+		String seller_id=getSessionAttr("sellerId").toString();
+		warehouse.setDeptId(user.getDepartmentId());
+		warehouse.setDataArea(user.getDataArea());
+		warehouse.setSellerId(seller_id);
+		if (StringUtils.isBlank(warehouse.getId())) {
+			warehouse.setId(StrKit.getRandomUUID());
+			warehouse.setCreateDate(new Date());
+			warehouse.save();
+			UserJoinWarehouse userJoinWarehouse=new UserJoinWarehouse();
+			userJoinWarehouse.setWarehouseId(warehouse.getId());
+			userJoinWarehouse.setUserId(user.getId());
+			userJoinWarehouse.save();
+			renderAjaxResultForSuccess("保存成功！");
+		}else {
+			warehouse.saveOrUpdate();
+			renderAjaxResultForSuccess("修改成功！");
+		}
+	}
+	
+	public void user_tree() {
+		String id = getPara(0);
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		List<Map<String, Object>> treeData = DepartmentQuery.me().findDeptListAsTree(dataArea, true);
+		setAttr("treeData", JSON.toJSON(treeData));
+		setAttr("id", id);
+	}
+	
+	public void adduserJoinWarehouse() {
+		String id=getPara("id");
+		String userIds = getPara("userIds");
+		String[] userIdArray = userIds.split(",");
+		for (String userId : userIdArray) {
+			UserJoinWarehouse userJoinWarehouse=new UserJoinWarehouse();
+			userJoinWarehouse.setUserId(userId);
+			userJoinWarehouse.setWarehouseId(id);
+		}
 		renderAjaxResultForSuccess("修改成功！");
-	   }
 	}
 }
