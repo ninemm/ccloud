@@ -94,4 +94,9 @@ public class WarehouseQuery extends JBaseQuery {
 		String sql = "select cw.* from cc_warehouse cw LEFT JOIN user u on u.department_id=cw.dept_id where u.id=?";
 		return DAO.find(sql, userId);
 	}
+	
+	public Warehouse findOneByUserId(String userId){
+		String sql = "SELECT cw.* from cc_warehouse cw LEFT JOIN `user` u on u.department_id = cw.dept_id where cw.is_default=1 and u.id=? ";
+		return DAO.findFirst(sql, userId);
+	}
  }
