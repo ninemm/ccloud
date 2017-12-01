@@ -57,8 +57,6 @@ public class Config extends CCloudConfig {
 		FreeMarkerRender.getConfiguration().setSharedVariable(ShiroTags.TAG_NAME, new ShiroTags());
 		
 		MessageKit.sendMessage(Actions.CCLOUD_STARTED);
-		
-		//ApiConfigKit.putApiConfig(getApiConfig());
 	}
 
 	@Override
