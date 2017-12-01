@@ -221,7 +221,7 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 						String remark = StringUtils
 								.getArrayFirst(map.get("stockTakingList[" + factIndex[i] + "].remark"));
 						stockTakingDetail.setProductId(productId);
-						stockTakingDetail.setProductCount(Integer.parseInt(productCount));
+						stockTakingDetail.setProductCount(new BigDecimal(productCount));
 						stockTakingDetail.setRemark(remark);
 						stockTakingDetail.setStockTakingId(stockTaking.getId());
 						stockTakingDetail.setId(StrKit.getRandomUUID());
@@ -256,7 +256,7 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 						String remark = StringUtils.getArrayFirst(map.get("stockTakingList[" + i + "].remark"));
 
 						stockTakingDetail.setProductId(productId);
-						stockTakingDetail.setProductCount(Integer.parseInt(productCount));
+						stockTakingDetail.setProductCount(new BigDecimal(productCount));
 						stockTakingDetail.setRemark(remark);
 						stockTakingDetail.setStockTakingId(stockTaking.getId());
 						stockTakingDetail.setId(StrKit.getRandomUUID());
