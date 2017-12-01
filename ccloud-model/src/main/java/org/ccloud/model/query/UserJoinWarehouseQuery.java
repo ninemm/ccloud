@@ -79,5 +79,9 @@ public class UserJoinWarehouseQuery extends JBaseQuery {
 		return DAO.find(sql, warehouse_id);
 	}
 
+	public int deleteWarehouseId(String warehouse_id) {
+		 return DAO.doDelete(" warehouse_id=?",warehouse_id);
+	}
+
 	
 }

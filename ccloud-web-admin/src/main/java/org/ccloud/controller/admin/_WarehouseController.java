@@ -77,9 +77,7 @@ public class _WarehouseController extends JBaseCRUDController<Warehouse> {
 		    public boolean run() throws SQLException {
 		    		String warehouse_id = getPara("id");
 				int count = WarehouseQuery.me().deleteWarehouseId(warehouse_id);
-				User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		    		String user_id = user.getId();
-		    		int deleteWarehouseId = UserJoinWarehouseQuery.me().deleteWarehouseId(user_id,warehouse_id);
+		    		int deleteWarehouseId = UserJoinWarehouseQuery.me().deleteWarehouseId(warehouse_id);
 		    		if (!(count>0&&deleteWarehouseId>0)) {
 		    			renderAjaxResultForError("删除失败!");
 		    			return false;
