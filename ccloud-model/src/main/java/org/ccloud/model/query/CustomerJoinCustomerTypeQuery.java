@@ -74,6 +74,14 @@ public class CustomerJoinCustomerTypeQuery extends JBaseQuery {
 		return DAO.doDelete("seller_customer_id = ?", sellerCustomerId);
 	}
 
+	public boolean insert(String sellerCustomerId, String customerTypeId) {
+		CustomerJoinCustomerType customerJoinCustomerType = new CustomerJoinCustomerType();
+		customerJoinCustomerType.set("seller_customer_id", sellerCustomerId);
+		customerJoinCustomerType.set("customer_type_id", customerTypeId);
+
+		return customerJoinCustomerType.save();
+	}
+
 	public int batchDelete(String... ids) {
 		if (ids != null && ids.length > 0) {
 			int deleteCount = 0;
@@ -86,5 +94,5 @@ public class CustomerJoinCustomerTypeQuery extends JBaseQuery {
 		}
 		return 0;
 	}
-	
+
 }

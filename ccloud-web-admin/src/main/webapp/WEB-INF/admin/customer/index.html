@@ -116,7 +116,7 @@
 				type: 2,
 				area: ['580px', '530px'],
 				fix: false, //不固定
-				content: '${CPATH}/admin/customer/user_tree'
+				content: '${CPATH}/admin/sellerCustomer/user_tree'
 			});
 		}
 	}
@@ -155,7 +155,7 @@
 		
 		<div class="row content-row">
 			<div class="jp-left">
-				<@shiro.hasPermission name="/admin/customer/batchSetUser, /admin/dealer/all, /admin/all"> 
+				<@shiro.hasPermission name="/admin/sellercustomer/batchSetUser, /admin/dealer/all, /admin/all"> 
 					<label class="control-label">批量操作:</label>
 					<button class="btn btn-sm btn-default" type="button" onclick="batchAction('setUser')"> 设置负责人 </button>
 				</@shiro.hasPermission>

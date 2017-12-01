@@ -43,7 +43,7 @@
 		var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
 	
 		if(parent.batchFlg){
-		parent.$('#form').attr("action", "${CPATH}/admin/customer/batchSetUser");
+		parent.$('#form').attr("action", "${CPATH}/admin/sellerCustomer/batchSetUser");
 		parent.$('#form').ajaxSubmit({
 			type : "post",
 			dataType : "json",

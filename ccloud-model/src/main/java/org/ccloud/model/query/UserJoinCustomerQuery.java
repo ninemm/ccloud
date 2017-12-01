@@ -77,12 +77,13 @@ public class UserJoinCustomerQuery extends JBaseQuery {
 	}
 
 	public boolean insert(String customerId, String userId, String deptId, String dataArea) {
-		DAO.set("customer_id", customerId);
-		DAO.set("user_id", userId);
-		DAO.set("dept_id", deptId);
-		DAO.set("data_area", dataArea);
+		UserJoinCustomer userJoinCustomer = new UserJoinCustomer();
+		userJoinCustomer.set("seller_customer_id", customerId);
+		userJoinCustomer.set("user_id", userId);
+		userJoinCustomer.set("dept_id", deptId);
+		userJoinCustomer.set("data_area", dataArea);
 
-		return DAO.save();
+		return userJoinCustomer.save();
 	}
 
 	public int batchDelete(String... ids) {
