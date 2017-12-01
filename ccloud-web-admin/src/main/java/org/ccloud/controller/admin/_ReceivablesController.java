@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.route.RouterMapping;
@@ -72,17 +73,18 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 	public void getReceivables() {
 		String type = getPara("type");
 		String id = getPara("id");
-		
-		Page<Receivables> page = ReceivablesQuery.me().paginate(getPageNumber(),getPageSize(),id,type);
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		Page<Receivables> page = ReceivablesQuery.me().paginate(getPageNumber(),getPageSize(),id,type,user.getDataArea());
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(),"page",getPageNumber(), "rows", page.getList());
 		
 		renderJson(map);
 	}
 	
 	public void getReceivablesDetail() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String type = getPara("type");
 		String id = getPara("id");
-		Page<ReceivablesDetail> page = ReceivablesDetailQuery.me().paginate(getPageNumber(), getPageSize(), id,type);
+		Page<ReceivablesDetail> page = ReceivablesDetailQuery.me().paginate(getPageNumber(), getPageSize(), id,type,user.getDataArea());
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(),"page",getPageNumber(), "rows", page.getList());
 		
 		renderJson(map);
@@ -95,8 +97,9 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 	}
 	
 	public void list() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String ref_sn = getPara("ref_sn");
-		Page<Receiving> page = ReceivingQuery.me().paginate(getPageNumber(), getPageSize(), ref_sn);
+		Page<Receiving> page = ReceivingQuery.me().paginate(getPageNumber(), getPageSize(), ref_sn,user.getDataArea());
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(),"ref_sn",ref_sn,"rows", page.getList());
 		
 		renderJson(map);

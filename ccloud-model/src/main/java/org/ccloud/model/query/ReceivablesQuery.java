@@ -43,7 +43,7 @@ public class ReceivablesQuery extends JBaseQuery {
 		});
 	}
 
-	public Page<Receivables> paginate(int pageNumber, int pageSize, String id,String type) {
+	public Page<Receivables> paginate(int pageNumber, int pageSize, String id,String type,String dataArea) {
 		
 		String select;
 		StringBuilder fromBuilder;
@@ -61,10 +61,9 @@ public class ReceivablesQuery extends JBaseQuery {
 				fromBuilder.append("WHERE s.id = '"+ id+"'");
 			}
 		}
-		
-		fromBuilder.append("ORDER BY r.create_date DESC");
-
 		LinkedList<Object> params = new LinkedList<Object>();
+		appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, false);
+		fromBuilder.append("ORDER BY r.create_date DESC");
 
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
