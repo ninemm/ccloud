@@ -138,6 +138,14 @@ public abstract class BaseUser<M extends BaseUser<M>> extends JModel<M> implemen
 	public java.lang.String getPassword() {
 		return get("password");
 	}
+	
+	public void setAvatar(java.lang.String avatar) {
+		set("avatar", avatar);
+	}
+
+	public java.lang.String getAvatar() {
+		return get("avatar");
+	}
 
 	public void setSalt(java.lang.String salt) {
 		set("salt", salt);

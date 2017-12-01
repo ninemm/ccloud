@@ -18,14 +18,21 @@ package org.ccloud.controller.admin;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.ccloud.Consts;
 import org.ccloud.core.JBaseController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
 import org.ccloud.menu.MenuManager;
+import org.ccloud.model.Content;
+import org.ccloud.model.ModelSorter;
+import org.ccloud.model.query.ContentQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.template.Template;
@@ -35,6 +42,9 @@ import org.ccloud.utils.StringUtils;
 
 import com.jfinal.aop.Before;
 import com.jfinal.kit.PathKit;
+import com.jfinal.kit.StrKit;
+import com.jfinal.plugin.activerecord.Db;
+import com.jfinal.plugin.activerecord.IAtom;
 import com.jfinal.upload.UploadFile;
 
 @RouterMapping(url = "/admin/template", viewPath = "/WEB-INF/admin/template")
@@ -186,92 +196,92 @@ public class _TemplateController extends JBaseController {
 		renderAjaxResultForSuccess();
 	}
 
-//	public void menu() {
-//		List<Content> list = ContentQuery.me().findByModule(Consts.MODULE_MENU, null, "order_number ASC");
-//		ModelSorter.sort(list);
-//
-//		List<Content> menulist = new ArrayList<Content>();
-//		menulist.addAll(list);
-//
-//		BigInteger id = getParaToBigInteger("id");
-//		if (id != null) {
-//			Content c = ContentQuery.me().findById(id);
-//			setAttr("menu", c);
-//
-//			if (id != null && list != null) {
-//				ModelSorter.removeTreeBranch(list, id);
-//			}
-//		}
-//
-//		setAttr("menus", list);
-//		setAttr("menulist", menulist);
-//
-//	}
+	public void menu() {
+		List<Content> list = ContentQuery.me().findByModule(Consts.MODULE_MENU, null, "order_number ASC");
+		ModelSorter.sort(list);
 
-//	@Before(UCodeInterceptor.class)
-//	public void menusave() {
-//		Content c = getModel(Content.class);
-//		if (StringUtils.isBlank(c.getTitle())) {
-//			renderAjaxResultForError("菜单名称不能为空！");
-//			return;
-//		}
-//
-//		c.setModule(Consts.MODULE_MENU);
-//		c.setModified(new Date());
-//		if (c.getCreated() == null) {
-//			c.setCreated(new Date());
-//		}
-//		c.setStatus(Content.STATUS_NORMAL);
-//		c.saveOrUpdate();
-//		renderAjaxResultForSuccess();
-//	}
+		List<Content> menulist = new ArrayList<Content>();
+		menulist.addAll(list);
 
-//	@Before(UCodeInterceptor.class)
-//	public void menudel() {
-//		final BigInteger id = getParaToBigInteger("id");
-//		if (id == null) {
-//			renderAjaxResultForError();
-//		}
-//
-//		boolean deleted = Db.tx(new IAtom() {
-//			@Override
-//			public boolean run() throws SQLException {
-//				return doDeleteById(id);
-//			}
-//		});
-//
-//		if (deleted) {
-//			renderAjaxResultForSuccess();
-//		} else {
-//			renderAjaxResultForError();
-//		}
-//	}
-//	
-//	@Before(UCodeInterceptor.class)
-//	public void batchDelete() {
-//		
-//		final BigInteger[] ids = getParaValuesToBigInteger("dataItem");
-//		
-//		boolean batchDeleted = Db.tx(new IAtom() {
-//			@Override
-//			public boolean run() throws SQLException {
-//				
-//				if (ids != null && ids.length > 0) {
-//					for(int i = 0; i < ids.length; i++) {
-//						doDeleteById(ids[i]);
-//					}
-//					return true;
-//				}
-//				return false;
-//			}
-//		});
-//		
-//		if (batchDeleted) {
-//			renderAjaxResultForSuccess("success");
-//		} else {
-//			renderAjaxResultForError("批量删除菜单错误!");
-//		}
-//	}
+		String id = getPara("id");
+		if (StrKit.notBlank(id)) {
+			Content c = ContentQuery.me().findById(id);
+			setAttr("menu", c);
+
+			if (id != null && list != null) {
+				ModelSorter.removeTreeBranch(list, id);
+			}
+		}
+
+		setAttr("menus", list);
+		setAttr("menulist", menulist);
+
+	}
+
+	@Before(UCodeInterceptor.class)
+	public void menusave() {
+		Content c = getModel(Content.class);
+		if (StringUtils.isBlank(c.getTitle())) {
+			renderAjaxResultForError("菜单名称不能为空！");
+			return;
+		}
+
+		c.setModule(Consts.MODULE_MENU);
+		c.setModified(new Date());
+		if (c.getCreated() == null) {
+			c.setCreated(new Date());
+		}
+		c.setStatus(Content.STATUS_NORMAL);
+		c.saveOrUpdate();
+		renderAjaxResultForSuccess();
+	}
+
+	@Before(UCodeInterceptor.class)
+	public void menudel() {
+		final String id = getPara("id");
+		if (StrKit.isBlank(id)) {
+			renderAjaxResultForError();
+		}
+
+		boolean deleted = Db.tx(new IAtom() {
+			@Override
+			public boolean run() throws SQLException {
+				return doDeleteById(id);
+			}
+		});
+
+		if (deleted) {
+			renderAjaxResultForSuccess();
+		} else {
+			renderAjaxResultForError();
+		}
+	}
+	
+	@Before(UCodeInterceptor.class)
+	public void batchDelete() {
+		
+		final String[] ids = getParaValues("dataItem");
+		
+		boolean batchDeleted = Db.tx(new IAtom() {
+			@Override
+			public boolean run() throws SQLException {
+				
+				if (ids != null && ids.length > 0) {
+					for(int i = 0; i < ids.length; i++) {
+						doDeleteById(ids[i]);
+					}
+					return true;
+				}
+				return false;
+			}
+		});
+		
+		if (batchDeleted) {
+			renderAjaxResultForSuccess("success");
+		} else {
+			renderAjaxResultForError("批量删除菜单错误!");
+		}
+	}
 
 	public void setting() {
 		keepPara();
@@ -286,21 +296,21 @@ public class _TemplateController extends JBaseController {
 		renderAjaxResultForSuccess("成功！");
 	}
 	
-//	private boolean doDeleteById(BigInteger id) {
-//		Content menu = ContentQuery.me().findById(id);
-//		if (menu == null || !menu.delete()) {
-//			return false;
-//		}
-//
-//		List<Content> contents = ContentQuery.me().findByModule(Consts.MODULE_MENU, id, null);
-//		if (contents != null && !contents.isEmpty()) {
-//			for (Content c : contents) {
-//				c.setParentId(menu.getParentId());
-//				c.update();
-//			}
-//		}
-//
-//		return true;
-//	}
+	private boolean doDeleteById(String id) {
+		Content menu = ContentQuery.me().findById(id);
+		if (menu == null || !menu.delete()) {
+			return false;
+		}
+
+		List<Content> contents = ContentQuery.me().findByModule(Consts.MODULE_MENU, id, null);
+		if (contents != null && !contents.isEmpty()) {
+			for (Content c : contents) {
+				c.setParentId(menu.getParentId());
+				c.update();
+			}
+		}
+
+		return true;
+	}
 
 }
