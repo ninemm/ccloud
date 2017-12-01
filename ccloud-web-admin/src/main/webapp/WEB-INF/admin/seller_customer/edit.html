@@ -48,16 +48,15 @@
 				stringLength: { max: 25, message: '客户名称最大长度是25字符，请重新输入' }
 			}
 		},
-		'customer.customer_code': {
+		'sellerCustomer.nickname': {
 			validators: {
-				notEmpty: { message: '客户编码不能为空' },
-				stringLength: { max: 15, message: '客户编码最大长度是15字符，请重新输入' }
+				stringLength: { max: 15, message: '客户昵称最大长度是15字符，请重新输入' }
 			}
 		},
 		'customer.contact': {
 			validators: {
 				notEmpty: { message: '联系人不能为空' },
-				stringLength: { max: 15, message: '客户名称最大长度是15字符，请重新输入' }
+				stringLength: { max: 15, message: '客户联系人最大长度是15字符，请重新输入' }
 			}
 		},
 		'customer.mobile': {
@@ -143,7 +142,7 @@
 	<ol class="breadcrumb">
 		<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
 	<li>客户管理</li>
-		<li class="active"><#if (customer.id) ??>修改<#else>新增</#if>客户</li>
+		<li class="active"><#if (sellerCustomer.id) ??>修改<#else>新增</#if>客户</li>
 	</ol>
 </section>
 <!-- Main content -->
@@ -164,13 +163,13 @@
                     <div class="col-sm-5">
                         <label class="control-label col-sm-4">客户名称:</label>
                         <div class="input-group col-sm-8">
-                            <input class="form-control input-sm" type="text" name="customer.customer_name" value="${(sellerCustomer.customer.customer_name)!}" placeholder="1-25个任意字母数字">
+                            <input class="form-control input-sm" type="text" name="customer.customer_name" value="${(sellerCustomer.customer_name)!}" placeholder="1-25个任意字母数字">
                         </div>
                     </div>
                     <div class="col-sm-5">
-                        <label class="control-label col-sm-4">客户编码:</label>
+                        <label class="control-label col-sm-4">客户昵称:</label>
                         <div class="input-group col-sm-8">
-                            <input class="form-control input-sm" type="text" name="customer.customer_code" value="${(sellerCustomer.customer.customer_code)!}" placeholder="1-15个任意字母数字">
+                            <input class="form-control input-sm" type="text" name="sellerCustomer.nickname" value="${(sellerCustomer.nickname)!}" placeholder="1-15个任意字母数字">
                         </div>
                     </div>
                 </div> 
@@ -178,13 +177,13 @@
                     <div class="col-sm-5">
                         <label class="control-label col-sm-4">联系人:</label>
                         <div class="input-group col-sm-8">
-                            <input class="form-control input-sm" type="text" name="customer.contact" value="${(sellerCustomer.customer.contact)!}" placeholder="1-15个任意字母数字">
+                            <input class="form-control input-sm" type="text" name="customer.contact" value="${(sellerCustomer.contact)!}" placeholder="1-15个任意字母数字">
                         </div>
                     </div>
                     <div class="col-sm-5">
                         <label class="control-label col-sm-4">手机号:</label>
                         <div class="input-group col-sm-8">
-                            <input class="form-control input-sm" type="text" name="customer.mobile" value="${(sellerCustomer.customer.mobile)!}" placeholder="11位数字">
+                            <input class="form-control input-sm" type="text" name="customer.mobile" value="${(sellerCustomer.mobile)!}" placeholder="11位数字">
                         </div>
                     </div>
                 </div>
@@ -192,7 +191,7 @@
                 <div class="form-group">
                     <div class="col-sm-5">
                         <label class="control-label col-sm-4">客户类型:</label>
-                        <div class="input-group col-sm-8">
+                        <div class="input-group col-sm-7">
                             <select class="form-control input-sm" name="customerTypes" id ="customerTypes" multiple="multiple" >
 	                            <#list (customerTypeList)! as customerType>
 	                                <option value="${customerType.id}" <#if cTypeList??&&cTypeList?contains(customerType.id)>selected="selected"</#if>>${(customerType.name)!}</option>
@@ -219,7 +218,7 @@
                         <label class="control-label col-sm-4">客户子类:</label>
                         <div class="input-group col-sm-8">
                             <select class="form-control input-sm" name="sellerCustomer.sub_type">
-                                ${DICT_BOX('customer_subtype', 'select', (sellCustomer.subType)!)}
+                                ${DICT_BOX('customer_subtype', 'select', (sellerCustomer.sub_type)!)}
                             </select>
                         </div>
                     </div>
@@ -227,7 +226,7 @@
                         <label class="control-label col-sm-4">客户种类:</label>
                         <div class="input-group col-sm-8">
                             <select class="form-control input-sm" name="sellerCustomer.customer_kind">
-                                ${DICT_BOX('customer_kind', 'select', (sellCustomer.customerKind)!)}
+                                ${DICT_BOX('customer_kind', 'select', (sellerCustomer.customer_kind)!)}
                             </select>
                         </div>
                     </div>
@@ -245,7 +244,7 @@
                 <div class="form-group col-sm-10">
                     <label for="_title" class="col-sm-2 control-label">详细地址:</label>
                     <div class="input-group col-sm-10">
-                        <input class="form-control input-sm" type="text" name="customer.address" value="${(customer.address)!}" placeholder="1-50个任意字母数字">
+                        <input class="form-control input-sm" type="text" name="customer.address" value="${(sellerCustomer.address)!}" placeholder="1-50个任意字母数字">
                     </div>
                 </div>
 			</div>

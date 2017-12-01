@@ -70,12 +70,9 @@ public class UserJoinWarehouseQuery extends JBaseQuery {
 	}
 
 	public int deleteWarehouseId(String user_id, String warehouse_id) {
-		 return DAO.doDelete(" user_id = ? and warehouse_id=?", user_id,warehouse_id);
+		 return DAO.doDelete(" user_id != ? and warehouse_id=?", user_id,warehouse_id);
 	}
 
-	public int deleteWarehouseId(String warehouse_id) {
-		 return DAO.doDelete(" warehouse_id=?", warehouse_id);
-	}
 
 	public List<UserJoinWarehouse> findByWarehouseId(String warehouse_id) {
 		String sql = "select * from  cc_user_join_warehouse where warehouse_id=?";

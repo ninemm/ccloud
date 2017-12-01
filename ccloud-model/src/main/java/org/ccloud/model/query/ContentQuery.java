@@ -60,18 +60,57 @@ public class ContentQuery extends JBaseQuery {
 	}
 
 	public Page<Content> paginateBySearch(int page, int pagesize, String module, String keyword, String status,
-			String[] tids, String month) {
+			String[] tids, String month, String sellerId) {
 		String[] modules = StringUtils.isNotBlank(module) ? new String[] { module } : null;
-		return paginate(page, pagesize, modules, keyword, status, tids, null, month, null);
+		return paginate(page, pagesize, modules, keyword, status, tids, null, month, null,sellerId);
 	}
 
 	public Page<Content> paginateByModuleInNormal(int page, int pagesize, String module) {
 		return paginate(page, pagesize, module, null, Content.STATUS_NORMAL, null, null, null);
 	}
+	
+	public Page<Content> paginateByModuleNotInDelete(int page, int pagesize, String module, String keyword,
+			String[] taxonomyIds, String month, String sellerId) {
+		
+		StringBuilder sql = new StringBuilder(" from content c");
+		sql.append(" left join user u on c.user_id = u.id ");
+		sql.append(" left join mapping m on c.id = m.`content_id`");
+		sql.append(" left join taxonomy  t on  m.`taxonomy_id` = t.id");
+		sql.append(" where c.status <> ?");
 
+		LinkedList<Object> params = new LinkedList<Object>();
+		params.add(Content.STATUS_DELETE);
+
+		appendIfNotEmpty(sql, "c.module", module, params, false);
+		appendIfNotEmpty(sql, "c.seller_id", sellerId, params, false);
+		
+		if (StringUtils.isNotBlank(keyword)) {
+			sql.append(" AND c.title like ? ");
+			params.add("%" + keyword + "%");
+		}
+
+		if (taxonomyIds != null && taxonomyIds.length > 0) {
+			sql.append(" AND t.id in " + toString(taxonomyIds));
+		}
+
+		if (StringUtils.isNotBlank(month)) {
+			sql.append(" DATE_FORMAT( c.created, \"%Y-%m\" ) = ?");
+			params.add(month);
+		}
+
+		sql.append(" ORDER BY c.created DESC");
+
+		String select = "select c.*, u.username, u.nickname";
+		if (params.isEmpty()) {
+			return DAO.paginate(page, pagesize, select, sql.toString());
+		}
+
+		return DAO.paginate(page, pagesize, select, sql.toString(), params.toArray());
+	}
+	
 	public Page<Content> paginateByModuleNotInDelete(int page, int pagesize, String module, String keyword,
 			String[] taxonomyIds, String month) {
-
+		
 		StringBuilder sql = new StringBuilder(" from content c");
 		sql.append(" left join user u on c.user_id = u.id ");
 		sql.append(" left join mapping m on c.id = m.`content_id`");
@@ -163,6 +202,47 @@ public class ContentQuery extends JBaseQuery {
 			String[] taxonomyIds, String userId, String orderBy) {
 
 		return paginate(page, pagesize, modules, keyword, status, taxonomyIds, userId, null, orderBy);
+	}
+	
+	public Page<Content> paginate(int page, int pagesize, String[] modules, String keyword, String status,
+			String[] taxonomyIds, String userId, String month, String orderBy,String sellerId) {
+		String select = "select c.*";
+		StringBuilder sql = new StringBuilder(" from content c");
+		sql.append(" left join mapping m on c.id = m.`content_id`");
+		sql.append(" left join taxonomy  t on  m.`taxonomy_id` = t.id");
+
+		LinkedList<Object> params = new LinkedList<Object>();
+
+		boolean needWhere = true;
+		needWhere = appendIfNotEmpty(sql, "c.module", modules, params, needWhere);
+		needWhere = appendIfNotEmpty(sql, "c.status", status, params, needWhere);
+		needWhere = appendIfNotEmpty(sql, "c.user_id", userId, params, needWhere);
+		needWhere = appendIfNotEmpty(sql, "c.seller_id", sellerId, params, needWhere);
+		
+		if (StringUtils.isNotBlank(keyword)) {
+			needWhere = appendWhereOrAnd(sql, needWhere);
+			sql.append(" c.title like ? ");
+			params.add("%" + keyword + "%");
+		}
+
+		if (taxonomyIds != null && taxonomyIds.length > 0) {
+			needWhere = appendWhereOrAnd(sql, needWhere);
+			sql.append(" t.id in " + toString(taxonomyIds));
+		}
+
+		if (StringUtils.isNotBlank(month)) {
+			needWhere = appendWhereOrAnd(sql, needWhere);
+			sql.append(" DATE_FORMAT( c.created, \"%Y-%m\" ) = ?");
+			params.add(month);
+		}
+
+		buildOrderBy(orderBy, sql);
+
+		if (params.isEmpty()) {
+			return DAO.paginate(page, pagesize, select, sql.toString());
+		}
+
+		return DAO.paginate(page, pagesize, select, sql.toString(), params.toArray());
 	}
 
 	public Page<Content> paginate(int page, int pagesize, String[] modules, String keyword, String status,

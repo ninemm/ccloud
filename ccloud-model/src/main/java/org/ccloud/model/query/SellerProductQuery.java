@@ -98,5 +98,10 @@ public class SellerProductQuery extends JBaseQuery {
 		fromBuilder.append("WHERE cg.seller_id = ? ");
 		return DAO.find(fromBuilder.toString(), sellId);
 	}
+
+	public SellerProduct findByProductIdAndSellerId(String productId, String sellerId) {
+		StringBuilder fromBuilder = new StringBuilder("select * from cc_seller_product where product_id=? and seller_id=?");
+		return (SellerProduct) DAO.find(fromBuilder.toString(), productId,sellerId);
+	}
 	
 }
