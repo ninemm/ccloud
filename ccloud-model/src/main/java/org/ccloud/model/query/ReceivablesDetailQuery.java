@@ -53,7 +53,7 @@ public class ReceivablesDetailQuery extends JBaseQuery {
 			fromBuilder.append(" AND object_type = 'supplier'");
 		}
 		LinkedList<Object> params = new LinkedList<Object>();
-		appendIfNotEmptyWithLike(fromBuilder, "data_area", dataArea, params, true);
+		appendIfNotEmptyWithLike(fromBuilder, "data_area", dataArea, params, false);
 		fromBuilder.append(" ORDER BY create_date DESC");
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());

@@ -66,12 +66,12 @@ public class PayablesDetailQuery extends JBaseQuery {
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 	
-	public Page<PayablesDetail> findByObjId(int pageNumber, int pageSize,String objId,String deptId,String dataArea, String orderby) {
+	public Page<PayablesDetail> findByObjId(int pageNumber, int pageSize,String objId,String dataArea, String orderby) {
 		String select = "select cc_d.*,if(cc_s.`status`>0,'已退货','待退货') ref_status ";
 		StringBuilder fromBuilder = new StringBuilder("from cc_payables_detail cc_d inner join `cc_sales_refund_instock` cc_s on cc_d.ref_sn = cc_s.instock_sn and cc_s.payment_type = 0 ");
-		fromBuilder.append("where cc_d.object_id = '"+objId+"' and cc_d.dept_id ='"+deptId+"' ");
+		fromBuilder.append("where cc_d.object_id = '"+objId+"' ");
 		LinkedList<Object> params = new LinkedList<Object>();
-		appendIfNotEmptyWithLike(fromBuilder, "cc_d.data_area", dataArea, params, true);
+		appendIfNotEmptyWithLike(fromBuilder, "cc_d.data_area", dataArea, params, false);
 		fromBuilder.append("order by " + orderby);
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());

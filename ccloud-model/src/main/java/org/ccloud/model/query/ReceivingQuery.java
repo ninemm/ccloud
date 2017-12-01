@@ -47,7 +47,7 @@ public class ReceivingQuery extends JBaseQuery {
 		StringBuilder fromBuilder = new StringBuilder("FROM `cc_receiving` AS r LEFT JOIN `cc_customer` AS c ON r.receive_user_id = c.id LEFT JOIN `user` AS u ON r.input_user_id = u.id ");
 		fromBuilder.append(" WHERE r.ref_sn=\'"+ref_sn+"\' ");
 		LinkedList<Object> params = new LinkedList<Object>();
-		appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, true);
+		appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, false);
 		fromBuilder.append(" ORDER BY r.create_date DESC");
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());

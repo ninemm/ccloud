@@ -47,7 +47,7 @@ public class PaymentQuery extends JBaseQuery {
 		StringBuilder fromBuilder = new StringBuilder("from `cc_payment` cc_p left join user u on cc_p.pay_user_id = u.id ");
 		fromBuilder.append("where payables_detail_id = '"+detailId+"' ");
 		LinkedList<Object> params = new LinkedList<Object>();
-		appendIfNotEmptyWithLike(fromBuilder, "cc_p.data_area", dataArea, params, true);
+		appendIfNotEmptyWithLike(fromBuilder, "cc_p.data_area", dataArea, params, false);
 		fromBuilder.append("order by " + orderby);
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());

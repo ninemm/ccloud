@@ -62,7 +62,7 @@ public class ReceivablesQuery extends JBaseQuery {
 			}
 		}
 		LinkedList<Object> params = new LinkedList<Object>();
-		appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, true);
+		appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, false);
 		fromBuilder.append("ORDER BY r.create_date DESC");
 
 		if (params.isEmpty())
