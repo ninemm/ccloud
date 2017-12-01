@@ -42,13 +42,13 @@ public class ReceivingQuery extends JBaseQuery {
 		});
 	}
 
-	public Page<Receiving> paginate(int pageNumber, int pageSize, String ref_sn) {
+	public Page<Receiving> paginate(int pageNumber, int pageSize, String ref_sn,String dataArea) {
 		String select = "SELECT r.biz_date,r.act_amount,c.customer_name AS receive_user_name,r.create_date,u.realname AS input_user_name,r.remark ";
 		StringBuilder fromBuilder = new StringBuilder("FROM `cc_receiving` AS r LEFT JOIN `cc_customer` AS c ON r.receive_user_id = c.id LEFT JOIN `user` AS u ON r.input_user_id = u.id ");
-
-		fromBuilder.append(" WHERE r.ref_sn=\'"+ref_sn+"\' ORDER BY r.create_date DESC");
+		fromBuilder.append(" WHERE r.ref_sn=\'"+ref_sn+"\' ");
 		LinkedList<Object> params = new LinkedList<Object>();
-
+		appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, false);
+		fromBuilder.append(" ORDER BY r.create_date DESC");
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
