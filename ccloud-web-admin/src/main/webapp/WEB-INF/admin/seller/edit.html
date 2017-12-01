@@ -6,8 +6,8 @@
 	<!-- select2 -->
 	<script src="${CPATH}/static/plugins/select2/js/select2.js"></script>
 	<!-- cityPicker -->
-	<script src="${CPATH}/static/plugins/cityPicker/js/citydata.js"></script>
-	<script src="${CPATH}/static/plugins/cityPicker/js/cityPicker-1.1.4.js"></script>
+	<script src="${CPATH}/static/plugins/city-picker/js/city-picker.data.js"></script>
+    <script src="${CPATH}/static/plugins/city-picker/js/city-picker.js"></script>
 </#macro>
 
 <#macro css_import>
@@ -16,12 +16,13 @@
 	<!-- select2 -->
 	<link rel="stylesheet" href="${CPATH}/static/plugins/select2/css/select2.css">
 	<!-- cityPicker -->
-	<link rel="stylesheet" href="${CPATH}/static/plugins/cityPicker/css/city-picker.css">
+	<link rel="stylesheet" href="${CPATH}/static/plugins/city-picker/css/city-picker.css">
 </#macro>
 
 <#macro script>
-
+	
 	var $form = $("#form");
+	var $city = $('#cityPicker');
 	$("#brand_option").select2();
 	$(function() {
 		$.ajax({
@@ -40,25 +41,17 @@
 				}
 			}
 		});
-		var selector = $('#city-picker-selector').cityPicker({
-			dataJson: cityData,
-			renderMode: false
-		});
-		
-		<#if seller?exists>
-			selector.setCityVal([
-				{
-					'id': '${seller.prov_code!}',
-					'name': '${seller.prov_name!}'
-				}, {
-					'id': '${seller.city_code!}',
-					'name': '${seller.city_name!}'
-				}, {
-					'id': '${seller.country_code!}',
-					'name': '${seller.country_name!}'
-				}
-			]);
-		</#if>
+		$city.citypicker({
+            simple: true,
+            responsive: true,
+            province: '${(seller.prov_name)!}',
+            city: '${(seller.city_name)!}',
+            district: '${(seller.country_name)!}',
+        });
+		$city.on('choose-province.citypicker', function(event, tagert, storage) {
+			alert("asdasdsadas");
+		    console.log(storage);
+		});        
 		$('#_dept_tree').click(function() {
 		layer.open({
 			title:'所属部门',
@@ -107,6 +100,7 @@
 		'seller.phone': {
 			validators: {
 				notEmpty: { message: '手机号不能为空' },
+				stringLength: { min: 11, max: 11, message: '请输入11位手机号' },
 				regexp:{regexp:/^1[3|5|7|8]{1}[0-9]{9}$/, message:'请输入正确的手机号码' }
 			}
 		},
@@ -114,48 +108,6 @@
 		'seller.seller_type': {
 			validators: {
 				notEmpty: { message: '产品类型不能为空' }
-			}
-		},
-		'userProvinceId': {
-			validators: {
-				notEmpty: { message: '省不能为空' },
-				callback: {  
-					message: '省不能为空',  
-					callback: function(value, validator) {
-						if(value == '请选择省份'){
-							return false;
-						}
-						return true;
-					}
-				} 
-			}
-		},
-		'userCityId': {
-			validators: {
-				notEmpty: { message: '市不能为空' },
-				callback: {  
-					message: '市不能为空',  
-					callback: function(value, validator) {
-						if(value == '请选择城市'){
-							return false;
-						}
-						return true;
-					}
-				} 
-			}
-		},
-		'userDistrictId': {
-			validators: {
-				notEmpty: { message: '区不能为空' },
-				callback: {  
-					message: '区不能为空',  
-					callback: function(value, validator) {
-						if(value == '请选择区县'){
-							return false;
-						}
-						return true;
-					}
-				} 
 			}
 		},
 		'seller.market_name': {
@@ -176,12 +128,11 @@
 			}
 		},
 	};
-
+	
 	function doSubmit(){
-		$("#userProvinceText").val($("select[name='userProvinceId']").find("option:selected").text()); 
-		$("#userCityText").val($("select[name='userCityId']").find("option:selected").text()); 
-		$("#userDistrictText").val($("select[name='userDistrictId']").find("option:selected").text()); 
-		
+		$("#areaCodes").val($city.data('citypicker').getCode());
+		$("#areaNames").val($city.data('citypicker').getVal());
+	
 		var list = $("#brand_option").select2("val");
 		var ids = "";
 		if (list != null && list.length > 0) {
@@ -200,8 +151,8 @@
 			dataType : "json", 
 			success : function(data) { 
 				if(data.errorCode == 0) {
+					//location.reload();
 					toastr.success(data.message, '操作成功');
-					setTimeout( function(){window.history.back();}, 2 * 1000 );
 				} else {
 					toastr.error(data.message,'操作失败');
 				}
@@ -217,11 +168,11 @@
 
 <!-- Content Header (Page header) -->
 <section class="content-header">
-	<h1><#if (seller.id) ??>修改<#else>新增</#if>销售商</h1>
+	<h1><#if (customer.id) ??>修改<#else>新增</#if>销售商</h1>
 	<ol class="breadcrumb">
 		<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
 	<li>销售商管理</li>
-		<li class="active"><#if (seller.id) ??>修改<#else>新增</#if>销售商信息</li>
+		<li class="active"><#if (customer.id) ??>修改<#else>新增</#if>销售商信息</li>
 	</ol>
 </section>
 <!-- Main content -->
@@ -240,40 +191,40 @@
 					<div class="box-body">
 						<@shiro.hasPermission name="/admin/all">
 						<div class="form-group col-sm-12 validata-box">
-							<label class="control-label col-sm-2">所属部门组织:</label>
-							<div class="input-group col-md-4 col-sm-10">
-								<div class="input-group">
-									<input type="hidden" name="dept_id" id="parent_id" value="${(seller.dept_id)!}">
-				                 	<input class="form-control input-sm" type="text" id="parent_name" name="parent_name" value="${(seller.parent_name)!}">
-			                 		<div class="input-group-addon" id="_dept_tree" style="cursor:pointer;">
-			                 			<i class="fa fa-search"></i> 选择
-									</div>
-			                 	</div>
-			               	</div>
-						</div>
-						</@shiro.hasPermission>
+								<label class="control-label col-sm-2">所属部门组织:</label>
+								<div class="input-group col-md-4 col-sm-10">
+									<div class="input-group">
+										<input type="hidden" name="seller.dept_id" id="parent_id" value="${(seller.dept_id)!}">
+					                 	<input class="form-control input-sm" type="text" id="parent_name" name="parent_name" value="${(seller.parent_name)!}">
+				                 		<div class="input-group-addon" id="_dept_tree" style="cursor:pointer;">
+				                 			<i class="fa fa-search"></i> 选择
+										</div>
+				                 	</div>
+				               	</div>
+							</div>
+						</@shiro.hasPermission>	
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">*销售商名称:</label>
 							<div class="input-group col-md-4 col-sm-10">
-								<input class="form-control input-sm" type="text" name="seller.seller_name" value="${(seller.seller_name)!}" placeholder="1-25个任意字母数字">
+								<input class="form-control input-sm" type="text" name="seller_name" value="${(seller.seller_name)!}" placeholder="1-25个任意字母数字">
 							</div>
 						</div>
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">*销售商编码:</label>
 							<div class="input-group col-md-4 col-sm-10">
-								<input class="form-control input-sm" type="text" name="seller.seller_code" value="${(seller.seller_code)!}" placeholder="1-15个任意字母数字">
+								<input class="form-control input-sm" type="text" name="seller_code" value="${(seller.seller_code)!}" placeholder="1-15个任意字母数字">
 							</div>
 						</div>
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">*联系人:</label>
 							<div class="input-group col-md-4 col-sm-10">
-								<input class="form-control input-sm" type="text" name="seller.contact" value="${(seller.contact)!}" placeholder="1-15个任意字母数字">
+								<input class="form-control input-sm" type="text" name="contact" value="${(seller.contact)!}" placeholder="1-15个任意字母数字">
 							</div>
 						</div>
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">*手机号:</label>
 							<div class="input-group col-md-4 col-sm-10">
-								<input class="form-control input-sm" type="text" name="seller.phone" value="${(seller.phone)!}" placeholder="11位数字">
+								<input class="form-control input-sm" type="text" name="phone" value="${(seller.phone)!}" placeholder="11位数字">
 							</div>
 						</div>
 						<div class="form-group col-sm-12 validata-box">
@@ -291,57 +242,62 @@
 						<div class="form-group col-sm-12 validata-box">
 										<label class="control-label col-sm-2">*销售商类型:</label>
 										<div class="input-group col-md-4 col-sm-10">
-											<select class="form-control input-sm" name="seller.seller_type" id="seller.seller_type">
+											<select class="form-control input-sm" name="seller_type" id="seller_type">
 												<option value="">--请选择--</option>
-												<option value="0" <#if !seller?? || seller.seller_type! == 1>selected="selected"</#if> >经销商</option>
-												<option value="1" <#if !seller?? || seller.seller_type! == 0>selected="selected"</#if>>直营商</option>
+												<option value="1" <#if !seller?? || seller.seller_type! == 1>selected="selected"</#if> >经销商</option>
+												<option value="0" <#if !seller?? || seller.seller_type! == 0>selected="selected"</#if>>直营商</option>
 											</select>
 						               	</div>
 						</div>							
 						</@shiro.hasPermission>						
 						<div class="form-group col-sm-12 validata-box">
-							<label class="control-label col-sm-2">*省-市-区:</label>
-							<div class="input-group col-md-4 col-sm-10">
-								<div class="city-picker-selector" id="city-picker-selector"></div>
-								<input type="hidden" name="userProvinceText" id="userProvinceText" value="" />
-								<input type="hidden" name="userCityText" id="userCityText" value="" />
-								<input type="hidden" name="userDistrictText" id="userDistrictText" value="" />
-							</div>
+		                    <label for="_title" class="col-sm-2 control-label">省市区:</label>
+		                    <div class="input-group col-sm-10">
+		                        <input readonly type="text" id="cityPicker" data-toggle="cityPicker" style="width:40%;">
+		                        <input type="hidden" id="areaNames" name="areaNames">
+		                        <input type="hidden" id="areaCodes" name="areaCodes">
+		                    </div>
 						</div>
+						<div class="form-group col-sm-12 validata-box">
+		                    <label for="_title" class="col-sm-2 control-label">详细地址:</label>
+		                    <div class="input-group col-sm-10">
+		                        <input class="form-control input-sm" style="width:40%;" type="text" name="address" value="${(seller.address)!}" placeholder="1-50个任意字母数字">
+		                    </div>
+		                </div>
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">*市场名称:</label>
 							<div class="input-group col-md-4 col-sm-10">
-								<input class="form-control input-sm" type="text" name="seller.market_name" value="${(seller.market_name)!}" placeholder="1-25个任意字母数字">
+								<input class="form-control input-sm" type="text" name="market_name" value="${(seller.market_name)!}" placeholder="1-25个任意字母数字">
 							</div>
 						</div>
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">*市场代码:</label>
 							<div class="input-group col-md-4 col-sm-10">
-								<input class="form-control input-sm" type="text" name="seller.market_code" value="${(seller.market_code)!}" placeholder="1-25个任意字母数字">
+								<input class="form-control input-sm" type="text" name="market_code" value="${(seller.market_code)!}" placeholder="1-25个任意字母数字">
 							</div>
 						</div>
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">*企业微信号ID1:</label>
 							<div class="input-group col-md-4 col-sm-10">
-								<input class="form-control input-sm" type="text" name="seller.jywx_open_id" value="${(seller.jywx_open_id)!}" placeholder="1-25个任意字母数字">
+								<input class="form-control input-sm" type="text" name="jywx_open_id" value="${(seller.jywx_open_id)!}" placeholder="1-25个任意字母数字">
 							</div>
 						</div>
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">企业微信号ID2:</label>
 							<div class="input-group col-md-4 col-sm-10">
-								<input class="form-control input-sm" type="text" name="seller.jpwx_open_id" value="${(seller.jpwx_open_id)!}" placeholder="1-25个任意字母数字">
+								<input class="form-control input-sm" type="text" name="jpwx_open_id" value="${(seller.jpwx_open_id)!}" placeholder="1-25个任意字母数字">
 							</div>
 						</div>
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">*产品类型:</label>
 							<div class="input-group col-md-4 col-sm-10">
-								<input class="form-control input-sm" type="text" name="seller.product_type_store" value="${(seller.product_type_store)!}" placeholder="1-50个任意字母数字">
+								<input class="form-control input-sm" type="text" name="product_type_store" value="${(seller.product_type_store)!}" placeholder="1-50个任意字母数字">
 							</div>
 						</div>
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">品牌管理:</label>
 							<div class="input-group col-md-4 col-sm-10" style="width=300px;">
-								<select class="form-control input-sm" name="brand" id="seller.brand_option" multiple="multiple" >
+								<select class="form-control input-sm" name="brand" id="brand_option" multiple="multiple" >
 								</select>
 							</div>
 						</div>

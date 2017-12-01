@@ -33,6 +33,7 @@ import org.ccloud.model.Department;
 import org.ccloud.model.Product;
 import org.ccloud.model.Seller;
 import org.ccloud.model.SellerBrand;
+import org.ccloud.model.SellerCustomer;
 import org.ccloud.model.SellerProduct;
 import org.ccloud.model.User;
 import org.ccloud.model.UserJoinCustomer;
@@ -94,16 +95,31 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		final SellerBrand sellerBrand = getModel(SellerBrand.class);
 		final Customer customer = getModel(Customer.class);
 		final UserJoinCustomer userJoinCustomer = getModel(UserJoinCustomer.class);
+		final SellerCustomer sellerCustomer = getModel(SellerCustomer.class);
+		String address = getPara("address");
 		String brandList =getPara("brandList");
 		String sellerId = seller.getId();
-		seller.setProvCode(getPara("userProvinceId"));
-		seller.setProvName(getPara("userProvinceText"));
-		seller.setCityCode(getPara("userCityId"));
-		seller.setCityName(getPara("userCityText"));
-		seller.setCountryCode(getPara("userDistrictId"));
-		seller.setCountryName(getPara("userDistrictText"));
+		String areaCodes = getPara("areaCodes");
+		String areaNames = getPara("areaNames");
+		String[] areaCodeArray = areaCodes.split("/");
+		String[] areaNameArray = areaNames.split("/");
+
+		seller.setProvName(areaNameArray[0]);
+		seller.setProvCode(areaCodeArray[0]);
+		seller.setCityName(areaNameArray[1]);
+		seller.setCityCode(areaCodeArray[1]);
+		seller.setCountryName(areaNameArray[2]);
+		seller.setCountryCode(areaCodeArray[2]);
+		
+		customer.setProvName(areaNameArray[0]);
+		customer.setProvCode(areaCodeArray[0]);
+		customer.setCityName(areaNameArray[1]);
+		customer.setCityCode(areaCodeArray[1]);
+		customer.setCountryName(areaNameArray[2]);
+		customer.setCountryCode(areaCodeArray[2]);
+		
 		String [] brandIds= brandList.split(",");
-		Department department=DepartmentQuery.me().findById(getPara("dept_id"));
+		Department department=DepartmentQuery.me().findById(getPara("seller.dept_id"));
 		User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
 		if (StrKit.isBlank(sellerId)) {
 			Seller seller2=SellerQuery.me().findByDeptAndSellerType(getPara("dept_id"),getPara("seller_type"));
@@ -126,32 +142,13 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			seller.set("remark", getPara("remark"));
 			seller.set("create_date", new Date());
 			seller.set("modify_user_id", user.getId());
-			seller.set("is_inited", 1);
+			seller.set("is_inited", 0);
 			if(user.getUsername().equals("admin")){
 				seller.set("dept_id",getPara("dept_id"));
 				seller.set("seller_type", getPara("seller_type"));
 			}else{
 				seller.set("dept_id",user.getDepartmentId());
 				seller.set("seller_type", 1);
-				//保存客户
-				String customerId= StrKit.getRandomUUID();
-				customer.set("id", customerId);
-				customer.set("customer_code", "s");
-				customer.set("customer_name", getPara("seller_name"));
-				customer.set("contact", getPara("seller_name"));
-				customer.set("mobile",getPara("phone"));
-				customer.set("customer_kind", 2);
-				customer.set("is_enabled",getPara("is_enabled"));
-				customer.set("is_archive", 1);
-				customer.save();
-				
-				//用户、客户、组织中间表
-				userJoinCustomer.set("customer_id", customerId);
-				userJoinCustomer.set("user_id", user.getId());
-				userJoinCustomer.set("data_area", user.getDataArea());
-				userJoinCustomer.set("dept_id", user.getDepartmentId());
-				userJoinCustomer.save();
-				
 			}
 			seller.save();
 			
@@ -173,6 +170,44 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 					sellerBrand.save();
 				}
 			}
+			
+			String customerId = StrKit.getRandomUUID();
+			customer.set("id", customerId);
+			customer.set("customer_code", getPara("seller_code"));
+			customer.set("customer_name", getPara("seller_name"));
+			customer.set("contact", getPara("contact"));
+			customer.set("mobile", getPara("phone"));
+			customer.set("is_enabled", 1);
+			customer.set("address", address);
+			customer.set("create_date", new Date());
+			customer.set("status", 0);
+			customer.save();
+			
+			
+			if(!user.getUsername().equals("admin")){
+				Department department2= DepartmentQuery.me().findByUserId(user.getId());
+				userJoinCustomer.set("seller_customer_id", customerId);
+				userJoinCustomer.set("user_id", user.getId());
+				userJoinCustomer.set("data_area",department2.getDataArea());
+				userJoinCustomer.set("dept_id", user.getDepartmentId());
+				userJoinCustomer.save();
+				
+				sellerCustomer.set("id", StrKit.getRandomUUID());
+				sellerCustomer.set("seller_id", sellerId);
+				sellerCustomer.set("customer_id", customerId);
+				sellerCustomer.set("nickname", getPara("seller_name"));
+				sellerCustomer.set("is_checked", 1);
+				sellerCustomer.set("is_enabled", 1);
+				sellerCustomer.set("is_archive", 1);
+				sellerCustomer.set("customer_type_ids", 7);
+				sellerCustomer.set("customer_kind", 2);
+				sellerCustomer.set("status", 0);
+				sellerCustomer.set("data_area", department2.getDataArea());
+				sellerCustomer.set("dept_id", user.getDepartmentId());
+				sellerCustomer.set("create_date", new Date());
+				sellerCustomer.save();
+			}
+			
 		} else {
 			seller.set("seller_name",getPara("seller_name"));
 			seller.set("seller_code",getPara("seller_code"));
@@ -207,6 +242,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 					sellerBrand.save();
 				}
 			}
+			
 		}
 		renderAjaxResultForSuccess();
 	}
