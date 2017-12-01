@@ -30,10 +30,12 @@ import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Payables;
 import org.ccloud.model.PayablesDetail;
 import org.ccloud.model.Payment;
+import org.ccloud.model.Receivables;
 import org.ccloud.model.User;
 import org.ccloud.model.query.PayablesDetailQuery;
 import org.ccloud.model.query.PayablesQuery;
 import org.ccloud.model.query.PaymentQuery;
+import org.ccloud.model.query.ReceivablesQuery;
 
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Before;
@@ -129,10 +131,16 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 	}
 	
 	public void savePayablesDetail() throws ParseException {
-		Date date = new Date();
-		final PayablesDetail payablesDetail = getModel(PayablesDetail.class);
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String objId = getPara("objId");
+		String refSn = getPara("refSn");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		PayablesDetail qPayablesDetail = PayablesDetailQuery.me().findByRefSn(objId, user.getDepartmentId(),refSn);
+		if(qPayablesDetail!=null) {
+			renderAjaxResultForError("创建失败，单据明细记录重复.");
+			return;
+		}
+		Date date = new Date();
+		PayablesDetail payablesDetail = getModel(PayablesDetail.class);
 		String deptId = user.getDepartmentId();
 		Payables payables = PayablesQuery.me().findByObjId(objId, deptId);
 		if(payables!=null) {
@@ -170,6 +178,7 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		PayablesDetail payablesDetail = PayablesDetailQuery.me().findByObjId(objId, user.getDepartmentId(),refSn);
 		Payables payables = PayablesQuery.me().findByObjId(objId, user.getDepartmentId());
 		final Payment payment = getModel(Payment.class);
+		if(payables==null) renderAjaxResultForError("未找到来往单位应付汇总数据记录.");
 		if(payablesDetail!=null) {
 			String paymentId = StrKit.getRandomUUID();
 			payment.set("id", paymentId);

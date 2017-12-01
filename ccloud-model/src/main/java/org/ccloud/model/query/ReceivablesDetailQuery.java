@@ -78,4 +78,9 @@ public class ReceivablesDetailQuery extends JBaseQuery {
 		StringBuilder sqlBuilder = new StringBuilder("UPDATE `cc_receivables_detail` SET act_amount = act_amount + "+act_amount+",balance_amount = balance_amount -"+act_amount+" WHERE ref_sn=\'"+ref_sn+"\'");
 		Db.update(sqlBuilder.toString());
 	}
+	
+	public ReceivablesDetail findByRefSn(String objId,String deptId,String refSn) {
+		String select = "select * from `cc_receivables_detail` where object_id= '"+objId+"' and dept_id='"+deptId+"' and ref_sn ='"+refSn+"' ";
+		return DAO.findFirst(select);
+	}
 }
