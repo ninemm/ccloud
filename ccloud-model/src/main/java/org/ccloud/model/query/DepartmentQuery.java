@@ -30,6 +30,7 @@ import org.ccloud.model.ModelSorter;
 import org.ccloud.model.Role;
 import org.ccloud.model.Seller;
 import org.ccloud.model.User;
+import org.ccloud.model.UserJoinWarehouse;
 import org.ccloud.model.Warehouse;
 
 import com.google.common.collect.Lists;
@@ -487,5 +488,62 @@ public class DepartmentQuery extends JBaseQuery {
 		}
 		return resTreeList;
 	}
+
+	public List<Map<String, Object>> findDeptListAsTree(String dataArea, boolean hasUser,
+			List<UserJoinWarehouse> listUserJoinWarehouse) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		List<Department> list = findDeptList(dataArea, "order_list asc");
+		List<Map<String, Object>> deptTreeList = new ArrayList<Map<String, Object>>();
+		ModelSorter.tree(list);
+		map.put("text", "总部");// 父子表第一级名称,以后可以存储在字典表或字典类
+		map.put("tags", Lists.newArrayList(0));
+		map.put("nodes", doBuild(list, hasUser,listUserJoinWarehouse));
+		deptTreeList.add(map);
+		return deptTreeList;
+	}
+	
+	private List<Map<String, Object>> doBuild(List<Department> list, boolean addUserFlg,List<UserJoinWarehouse> listUserJoinWarehouse) {
+		List<Map<String, Object>> resTreeList = new ArrayList<Map<String, Object>>();
+		for (Department dept : list) {
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("text", dept.getDeptName());
+			map.put("tags", Lists.newArrayList(dept.getId(), dept.getDataArea()));
+			List<Map<String, Object>> childList = new ArrayList<Map<String, Object>>();
+			if (dept.getChildList() != null && dept.getChildList().size() > 0) {
+				childList = doBuild(dept.getChildList(), addUserFlg,listUserJoinWarehouse);
+			}
+			if (addUserFlg) {
+				childList = addDeptUser(dept.getId(), childList,listUserJoinWarehouse);
+			}
+			map.put("nodes", childList);
+			resTreeList.add(map);
+		}
+		return resTreeList;
+	}
+
+	private List<Map<String, Object>> addDeptUser(String deptId, List<Map<String, Object>> childList,
+			List<UserJoinWarehouse> listUserJoinWarehouse) {
+		List<User> list = UserQuery.me().findByDeptId(deptId);
+		for (User user : list) {
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("text", user.getRealname());
+			map.put("tags", Lists.newArrayList(user.getId(), "user"));
+			for (int i = 0; i < listUserJoinWarehouse.size(); i++) {
+				if (user.getId().equals(listUserJoinWarehouse.get(i).getUserId())) {
+					Map<String, Object> stateMap = new HashMap<>();
+					stateMap.put("checked", true);
+					stateMap.put("selected", true);
+					stateMap.put("disabled", false);
+					stateMap.put("expanded", true);
+					map.put("state", stateMap);
+				}
+			}
+			childList.add(map);
+
+		}
+		return childList;
+	}
+
+	
 	
 }

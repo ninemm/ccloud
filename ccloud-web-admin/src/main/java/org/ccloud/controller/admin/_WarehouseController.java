@@ -147,22 +147,40 @@ public class _WarehouseController extends JBaseCRUDController<Warehouse> {
 	}
 	
 	public void user_tree() {
-		String id = getPara(0);
+		String warehouse_id = getPara(0);
+		List<UserJoinWarehouse> listUserJoinWarehouse = UserJoinWarehouseQuery.me().findByWarehouseId(warehouse_id);
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		List<Map<String, Object>> treeData = DepartmentQuery.me().findDeptListAsTree(dataArea, true);
+		List<Map<String, Object>> treeData = DepartmentQuery.me().findDeptListAsTree(dataArea, true,listUserJoinWarehouse);
 		setAttr("treeData", JSON.toJSON(treeData));
-		setAttr("id", id);
+		setAttr("id", warehouse_id);
 	}
 	
 	public void adduserJoinWarehouse() {
-		String id=getPara("id");
-		String userIds = getPara("userIds");
-		String[] userIdArray = userIds.split(",");
-		for (String userId : userIdArray) {
-			UserJoinWarehouse userJoinWarehouse=new UserJoinWarehouse();
-			userJoinWarehouse.setUserId(userId);
-			userJoinWarehouse.setWarehouseId(id);
-		}
-		renderAjaxResultForSuccess("修改成功！");
+//		Db.tx(new IAtom() {
+//		    @Override
+//		    public boolean run() throws SQLException {
+				String warehouse_id=getPara("id");
+				String userIds = getPara("userIds");
+				UserJoinWarehouseQuery.me().deleteWarehouseId( warehouse_id);
+				String[] userIdArray = userIds.split(",");
+				for (String userId : userIdArray) {
+					UserJoinWarehouse userJoinWarehouse=new UserJoinWarehouse();
+					userJoinWarehouse.setUserId(userId);
+					userJoinWarehouse.setWarehouseId(warehouse_id);
+					userJoinWarehouse.save();
+				}
+//				if (!(deleteWarehouseId>0)) {
+//		    			renderAjaxResultForError("修改失败!");
+//		    			return false;
+//				}
+				renderAjaxResultForSuccess("添加成功！");
+//				return true;                	
+//		    }
+//		});
 	}
 }
+
+
+
+
+    		
