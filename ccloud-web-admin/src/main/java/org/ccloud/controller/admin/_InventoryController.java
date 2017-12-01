@@ -74,8 +74,8 @@ public class _InventoryController extends JBaseCRUDController<Inventory> {
 		String product_id = getPara("product_id");
 		String start_date = getPara("start_date");
 		String end_date = getPara("end_date");
-		String sell_product_id= StockTakingDetailQuery.me().selectSellProductId(product_id,seller_id);
-
+		List<Record> selectSellProductId = StockTakingDetailQuery.me().selectSellProductId(product_id,seller_id);
+		String sell_product_id=selectSellProductId.get(0).getStr("id");
 		Page<InventoryDetail> page = InventoryDetailQuery.me().paginate(getPageNumber(), getPageSize(),warehouse_id,sell_product_id,start_date,end_date);
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);

@@ -94,75 +94,107 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 	}
 
 	public void enable() {
-		String id = getPara("id");
-		int isEnabled = getParaToInt("isEnabled");
-		StockTaking stockTaking = StockTakingQuery.me().findById(id);
-		Warehouse warehouse=WarehouseQuery.me().findById(stockTaking.getWarehouseId());
-		warehouse.setIsInited(1);
-		warehouse.update();
-		stockTaking.setStatus(isEnabled);
-		if (stockTaking.saveOrUpdate()) {
-			List<Map<String, Object>>listMap=StockTakingDetailQuery.me().findByStockTakingDetailId1(id);
-			for (int i = 0; i < listMap.size(); i++) {
-				Inventory inventory=new Inventory();
-				InventoryDetail inventoryDetail=new InventoryDetail();
-				List<Record> findByInventory = StockTakingDetailQuery.me().findByInventory((String) listMap.get(i).get("product_id"),stockTaking.getWarehouseId(),stockTaking.getSellerId());
-				String sell_product_id= StockTakingDetailQuery.me().selectSellProductId((String) listMap.get(i).get("product_id"),stockTaking.getSellerId());
-				if (findByInventory.size()!=0) {
-					inventory=InventoryQuery.me().findById(findByInventory.get(0).getStr("id"));
-					inventory.setInCount( inventory.getInCount().add(new BigDecimal(listMap.get(i).get("product_count").toString())));
-					inventory.setInAmount(inventory.getInAmount().add(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString()))));
-					inventory.setModifyDate(new Date());
-					inventory.setBalanceCount(inventory.getBalanceCount().add(new BigDecimal(listMap.get(i).get("product_count").toString())));
-					inventory.setBalanceAmount(inventory.getBalanceAmount().add(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString()))));
-					inventory.update();
-				}else {
-					inventory.setId(StrKit.getRandomUUID());
-					inventory.setWarehouseId(stockTaking.getWarehouseId());
-					inventory.setProductId((String) listMap.get(i).get("product_id"));
-					inventory.setSellerId(stockTaking.getSellerId());
-					inventory.setInCount( new BigDecimal(listMap.get(i).get("product_count").toString()));
-					inventory.setInAmount(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString())));
-					inventory.setInPrice(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("convert_relate").toString())));
-					inventory.setBalanceCount( new BigDecimal(listMap.get(i).get("product_count").toString()));
-					inventory.setBalanceAmount(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString())));
-					inventory.setBalancePrice(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("convert_relate").toString())));
-					inventory.setDataArea(stockTaking.getDataArea());
-					inventory.setDeptId(stockTaking.getDeptId());
-					inventory.setCreateDate(new Date());
-					inventory.save();
+		Db.tx(new IAtom() {
+			@Override
+			public boolean run() throws SQLException {
+				String id = getPara("id");
+				int isEnabled = getParaToInt("isEnabled");
+				StockTaking stockTaking = StockTakingQuery.me().findById(id);
+				Warehouse warehouse=WarehouseQuery.me().findById(stockTaking.getWarehouseId());
+				warehouse.setIsInited(1);
+				boolean update = warehouse.update();
+				if (!update) {
+					return false;
 				}
-				inventoryDetail.setId(StrKit.getRandomUUID());
-				inventoryDetail.setWarehouseId(stockTaking.getWarehouseId());
-				inventoryDetail.setSellProductId(sell_product_id);
-				inventoryDetail.setInCount(new BigDecimal(listMap.get(i).get("product_count").toString()));
-				inventoryDetail.setInAmount(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString())));
-				inventoryDetail.setInPrice(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("convert_relate").toString())));
-				inventoryDetail.setBalanceCount(new BigDecimal(listMap.get(i).get("product_count").toString()));
-				inventoryDetail.setBalanceAmount(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString())));
-				inventoryDetail.setBalancePrice(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("convert_relate").toString())));
-				inventoryDetail.setBizType("100208");
-				inventoryDetail.setBizBillSn(stockTaking.getStockTakingSn());
-				inventoryDetail.setBizDate(stockTaking.getBizDate());
-				inventoryDetail.setBizUserId(stockTaking.getBizUserId());
-				inventoryDetail.setRemark((String) listMap.get(i).get("remark"));
-				inventoryDetail.setDataArea(stockTaking.getDataArea());
-				inventoryDetail.setDeptId(stockTaking.getDeptId());
-				inventoryDetail.setCreateDate(new Date());
-				inventoryDetail.save();
-				SellerProduct sellerProduct=SellerProductQuery.me().findByProductIdAndSellerId((String) listMap.get(i).get("product_id"),stockTaking.getSellerId());
-				BigDecimal storeCount = sellerProduct.getStoreCount();
-				if (storeCount==null) {
-					sellerProduct.setStoreCount(new BigDecimal(listMap.get(i).get("product_count").toString()));
-				}else {
-					sellerProduct.setStoreCount(new BigDecimal(listMap.get(i).get("product_count").toString()).add(storeCount));
+				stockTaking.setStatus(isEnabled);
+				if (stockTaking.saveOrUpdate()) {
+					List<Map<String, Object>>listMap=StockTakingDetailQuery.me().findByStockTakingDetailId1(id);
+					for (int i = 0; i < listMap.size(); i++) {
+						Inventory inventory=new Inventory();
+						InventoryDetail inventoryDetail=new InventoryDetail();
+						List<Record> findByInventory = StockTakingDetailQuery.me().findByInventory((String) listMap.get(i).get("product_id"),stockTaking.getWarehouseId(),stockTaking.getSellerId());
+						List<Record> selectSellProductId = StockTakingDetailQuery.me().selectSellProductId((String) listMap.get(i).get("product_id"),stockTaking.getSellerId());
+						if (selectSellProductId.size()==0) {
+							renderAjaxResultForError("更新失败 此用户没有SellProductId");
+							return false;
+						}
+						String sell_product_id = selectSellProductId.get(0).getStr("id");
+						if (findByInventory.size()!=0) {
+							inventory=InventoryQuery.me().findById(findByInventory.get(0).getStr("id"));
+							inventory.setInCount( inventory.getInCount().add(new BigDecimal(listMap.get(i).get("product_count").toString())));
+							inventory.setInAmount(inventory.getInAmount().add(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString()))));
+							inventory.setModifyDate(new Date());
+							inventory.setBalanceCount(inventory.getBalanceCount().add(new BigDecimal(listMap.get(i).get("product_count").toString())));
+							inventory.setBalanceAmount(inventory.getBalanceAmount().add(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString()))));
+							boolean update2 = inventory.update();
+							if (!update2) {
+								renderAjaxResultForError("更新失败");
+								return false;
+							}
+						}else {
+							inventory.setId(StrKit.getRandomUUID());
+							inventory.setWarehouseId(stockTaking.getWarehouseId());
+							inventory.setProductId((String) listMap.get(i).get("product_id"));
+							inventory.setSellerId(stockTaking.getSellerId());
+							inventory.setInCount( new BigDecimal(listMap.get(i).get("product_count").toString()));
+							inventory.setInAmount(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString())));
+							inventory.setInPrice(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("convert_relate").toString())));
+							inventory.setBalanceCount( new BigDecimal(listMap.get(i).get("product_count").toString()));
+							inventory.setBalanceAmount(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString())));
+							inventory.setBalancePrice(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("convert_relate").toString())));
+							inventory.setDataArea(stockTaking.getDataArea());
+							inventory.setDeptId(stockTaking.getDeptId());
+							inventory.setCreateDate(new Date());
+							boolean save = inventory.save();
+							if (!save) {
+								renderAjaxResultForError("更新失败");
+								return false;
+							}
+						}
+						inventoryDetail.setId(StrKit.getRandomUUID());
+						inventoryDetail.setWarehouseId(stockTaking.getWarehouseId());
+						inventoryDetail.setSellProductId(sell_product_id);
+						inventoryDetail.setInCount(new BigDecimal(listMap.get(i).get("product_count").toString()));
+						inventoryDetail.setInAmount(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString())));
+						inventoryDetail.setInPrice(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("convert_relate").toString())));
+						inventoryDetail.setBalanceCount(new BigDecimal(listMap.get(i).get("product_count").toString()));
+						inventoryDetail.setBalanceAmount(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString())));
+						inventoryDetail.setBalancePrice(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("convert_relate").toString())));
+						inventoryDetail.setBizType("100208");
+						inventoryDetail.setBizBillSn(stockTaking.getStockTakingSn());
+						inventoryDetail.setBizDate(stockTaking.getBizDate());
+						inventoryDetail.setBizUserId(stockTaking.getBizUserId());
+						inventoryDetail.setRemark((String) listMap.get(i).get("remark"));
+						inventoryDetail.setDataArea(stockTaking.getDataArea());
+						inventoryDetail.setDeptId(stockTaking.getDeptId());
+						inventoryDetail.setCreateDate(new Date());
+						boolean save = inventoryDetail.save();
+						if (!save) {
+							renderAjaxResultForError("更新失败");
+							return false;
+						}
+						List<SellerProduct> sellerProductList = SellerProductQuery.me().findByProductIdAndSellerId((String) listMap.get(i).get("product_id"),stockTaking.getSellerId());
+						SellerProduct sellerProduct = sellerProductList.get(0);
+						BigDecimal storeCount = sellerProduct.getStoreCount();
+						if (storeCount==null) {
+							sellerProduct.setStoreCount(new BigDecimal(listMap.get(i).get("product_count").toString()));
+						}else {
+							sellerProduct.setStoreCount(new BigDecimal(listMap.get(i).get("product_count").toString()).add(storeCount));
+						}
+						boolean update2 = sellerProduct.update();
+						if (!update2) {
+							return false;
+						}
+					}
+				} else {
+					renderAjaxResultForError("更新失败");
+					return false;
 				}
-				sellerProduct.update();
+				renderAjaxResultForSuccess("更新成功");
+				return true;
+		
 			}
-			renderAjaxResultForSuccess("更新成功");
-		} else {
-			renderAjaxResultForError("更新失败");
-		}
+		});
 	}
 
 	@Override

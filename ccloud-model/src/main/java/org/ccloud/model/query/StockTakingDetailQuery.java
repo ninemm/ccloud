@@ -127,10 +127,10 @@ public class StockTakingDetailQuery extends JBaseQuery {
 		return iList;
 	}
 
-	public String selectSellProductId(String productId, String sellerId) {
+	public List<Record> selectSellProductId(String productId, String sellerId) {
 		StringBuilder fromBuilder1 = new StringBuilder("select id from cc_seller_product where product_id=? and seller_id=?");
 		List<Record> find = Db.find(fromBuilder1.toString(),productId,sellerId);
-		return find.get(0).getStr("id");
+		return find ;
 	}
 
 	public List<Record> findByInventory(String productId, String warehouseId, String sellerId) {
