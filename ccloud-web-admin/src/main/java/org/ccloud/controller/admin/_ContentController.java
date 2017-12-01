@@ -447,8 +447,11 @@ public class _ContentController extends JBaseCRUDController<Content> {
 		content.setText(JsoupUtils.getBodyHtml(content.getText()));
 
 		if (content.getCreated() == null) {
-			//content.setId(StrKit.getRandomUUID());
 			content.setCreated(new Date());
+			Object _sellerId = getSessionAttr("sellerId");
+			if (_sellerId != null) {
+				content.setSellerId(_sellerId.toString());
+			}
 		}
 		content.setModified(new Date());
 

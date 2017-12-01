@@ -15,7 +15,6 @@
  */
 package org.ccloud.model.query;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -108,7 +107,7 @@ public class ContentQuery extends JBaseQuery {
 		return DAO.paginate(page, pagesize, select, sql.toString(), params.toArray());
 	}
 
-	public Page<Content> paginateInNormal(int page, int pagesize, String module, BigInteger[] taxonomyIds,
+	public Page<Content> paginateInNormal(int page, int pagesize, String module, String[] taxonomyIds,
 			String orderBy) {
 
 		LinkedList<Object> params = new LinkedList<Object>();

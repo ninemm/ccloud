@@ -134,6 +134,14 @@ public abstract class BaseTaxonomy<M extends BaseTaxonomy<M>> extends JModel<M> 
 	public String getId() {
 		return get("id");
 	}
+	
+	public void setSellerId(String sellerId) {
+		set("seller_id", sellerId);
+	}
+	
+	public String getSellerId() {
+		return get("seller_id");
+	}
 
 	public void setTitle(java.lang.String title) {
 		set("title", title);
@@ -253,6 +261,22 @@ public abstract class BaseTaxonomy<M extends BaseTaxonomy<M>> extends JModel<M> 
 
 	public java.lang.String getMetaDescription() {
 		return get("meta_description");
+	}
+	
+	public void setDeptId(String deptId) {
+		set("dept_id", deptId);
+	}
+	
+	public String getDeptId() {
+		return get("dept_id");
+	}
+	
+	public void setDeptArea(String deptArea) {
+		set("dept_area", deptArea);
+	}
+	
+	public String getDeptArea() {
+		return get("dept_area");
 	}
 
 	public void setCreated(java.util.Date created) {
