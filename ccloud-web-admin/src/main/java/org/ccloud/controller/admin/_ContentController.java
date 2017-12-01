@@ -98,12 +98,13 @@ public class _ContentController extends JBaseCRUDController<Content> {
 		String keyword = getPara("k", "").trim();
 
 		Page<Content> page = null;
+		String sellerId = getSessionAttr("sellerId").toString();
 		if (StringUtils.isNotBlank(getStatus())) {
 			page = ContentQuery.me().paginateBySearch(getPageNumber(), getPageSize(), getModuleName(), keyword,
-					getStatus(), tids, null);
+					getStatus(), tids, null,sellerId);
 		} else {
 			page = ContentQuery.me().paginateByModuleNotInDelete(getPageNumber(), getPageSize(), getModuleName(),
-					keyword, tids, null);
+					keyword, tids, null,sellerId);
 		}
 
 		filterUI(tids);

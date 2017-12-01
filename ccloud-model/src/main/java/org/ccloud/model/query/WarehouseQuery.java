@@ -44,9 +44,9 @@ public class WarehouseQuery extends JBaseQuery {
 		});
 	}
 	public Page<Warehouse> paginate(int pageNumber, int pageSize,String keyword, String orderby, String user_id) {
-		String select = "select w.id,w.name,w.code,w.contact,w.phone,w.is_inited,w.is_enabled,w.is_default,d.dept_name as deptName";
-		StringBuilder fromBuilder = new StringBuilder("from `cc_warehouse` w, cc_user_join_warehouse uw,department d where ");
-        fromBuilder.append("w.dept_id = d.id and w.id =uw.warehouse_id and uw.user_id='"+user_id+"'");
+		String select = "select c.id,c.name,c.code,c.contact,c.phone,c.is_inited,c.is_enabled,c.is_default,d.dept_name as deptName";
+		StringBuilder fromBuilder = new StringBuilder("from `cc_warehouse` c, cc_user_join_warehouse uw,department d where ");
+        fromBuilder.append("c.dept_id = d.id and c.id =uw.warehouse_id and uw.user_id='"+user_id+"'");
 		LinkedList<Object> params = new LinkedList<Object>();
 
 		appendIfNotEmptyWithLike(fromBuilder, "c.name", keyword, params, true);
