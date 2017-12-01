@@ -15,8 +15,6 @@
  */
 package org.ccloud.controller.admin;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -28,21 +26,10 @@ import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
-import org.ccloud.model.Inventory;
-import org.ccloud.model.InventoryDetail;
-import org.ccloud.model.PurchaseInstock;
-import org.ccloud.model.PurchaseInstockDetail;
 import org.ccloud.model.PurchaseOrder;
-import org.ccloud.model.PurchaseOrderDetail;
-import org.ccloud.model.PurchaseOrderJoinInstock;
 import org.ccloud.model.User;
-import org.ccloud.model.Warehouse;
-import org.ccloud.model.query.InventoryDetailQuery;
-import org.ccloud.model.query.InventoryQuery;
-import org.ccloud.model.query.PurchaseInstockQuery;
 import org.ccloud.model.query.PurchaseOrderDetailQuery;
 import org.ccloud.model.query.PurchaseOrderQuery;
-import org.ccloud.model.query.WarehouseQuery;
 
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Before;
@@ -78,371 +65,45 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 
-		Page<Record> page = PurchaseOrderQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate,user.getId());
+		Page<Record> page = PurchaseOrderQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate,user.getDataArea(),user.getId());
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
 
 	}
 	
-	public void show(){
-		String id = getPara("purchaseOrderId");
-		List<PurchaseOrderDetail> list = PurchaseOrderDetailQuery.me().findByAll(id);
-		renderJson(list);
-	}
-	
-	@SuppressWarnings("unused")
-	public void review(){
-		String id = getPara("purchaseOrderId");
+	public void detail(){
+		String orderId = getPara(0);
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		boolean flang= false;
-		final PurchaseInstock purchaseInstock = getModel(PurchaseInstock.class);
-		final PurchaseInstockDetail purchaseInstockDetail = getModel(PurchaseInstockDetail.class);
-		final PurchaseOrderJoinInstock purchaseOrderJoinInstock = getModel(PurchaseOrderJoinInstock.class);
-		final InventoryDetail inventoryDetail= getModel(InventoryDetail.class);
-		PurchaseOrder order= PurchaseOrderQuery.me().findById(id);
-		List<PurchaseOrderDetail> list =PurchaseOrderDetailQuery.me().findByPurchaseOrderId(id);
-		List<Warehouse> listw=WarehouseQuery.me().findByUserId(user.getId());
-		//储存不同的仓库ID
-		List<String> list0 = new ArrayList<String>();
-		for(int i=0;i<list.size();i++){
-			Inventory inventory = InventoryQuery.me().findBySellerIdAndProductId(list.get(i).get("sellerId").toString(), list.get(i).getProductId());
-			String sy ="";
-			if(inventory==null){
-				for(int j=0 ;j<listw.size();j++){
-					sy=listw.get(0).getId();
-					break;
-				}
-			}else{
-				if( inventory.getWarehouseId().equals("")){
-					for(int j=0 ;j<listw.size();j++){
-						sy=listw.get(0).getId();
-						break;
-					}
-				}else{
-					sy=inventory.getWarehouseId();
-				}
-			}
-			if(!list0.contains(sy)){
-				list0.add(sy);
-			}
-		}
-		for(int i=0;i<list0.size();i++){
-			/*入库订单：PO + 100000(机构编号或企业编号6位) + 20171108(时间) + 000001(流水号)*/
-			int m=PurchaseInstockQuery.me().findByUserId(user.getId());
-			m++;
-			String n=Integer.toString(m);
-			int countt =n.length();
-			for(int k=0;k<(6-countt);k++){
-				n= "0"+n;
-			}
-			Date date = new Date();
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-			String str = sdf.format(date);
-			String pwarehouseSn="PO"+user.getDepartmentId().substring(0, 6)+str.substring(0,8)+n;
-			String purchaseInstockId = StrKit.getRandomUUID();
-			purchaseInstock.set("id", purchaseInstockId);
-			purchaseInstock.set("pwarehouse_sn", pwarehouseSn);
-			purchaseInstock.set("supplier_id", order.getSupplierId());
-			purchaseInstock.set("warehouse_id", list0.get(i));
-			purchaseInstock.set("biz_user_id", user.getId());
-			purchaseInstock.set("biz_date", new Date());
-			purchaseInstock.set("input_user_id", user.getId());
-			purchaseInstock.set("status", 1000);
-			purchaseInstock.set("payment_type", order.getPaymentType());
-			purchaseInstock.set("dept_id",user.getDepartmentId());
-			purchaseInstock.set("data_area", user.getDataArea());
-			purchaseInstock.set("create_date", new Date());
-			int count =0;
-			for(int j=0;j<list.size();j++){
-				Inventory inventory0 = InventoryQuery.me().findBySellerIdAndProductId(list.get(j).get("sellerId").toString(), list.get(j).getProductId());
-				if(inventory0==null){
-					String www=list.get(j).getProductAmount().toString();
-					String mmm=www.substring(0, www.indexOf("."));
-					count +=Integer.parseInt(mmm);
-					String purchaseInstockDetailId = StrKit.getRandomUUID();
-					purchaseInstockDetail.set("id",purchaseInstockDetailId);
-					purchaseInstockDetail.set("purchase_instock_id", purchaseInstockId);
-					purchaseInstockDetail.set("seller_product_id", list.get(j).getProductId());
-					purchaseInstockDetail.set("product_count", list.get(j).getProductCount());
-					purchaseInstockDetail.set("product_amount", list.get(j).getProductAmount());
-					purchaseInstockDetail.set("product_price", list.get(j).getProductPrice());
-					purchaseInstockDetail.set("purchase_order_detail_id", list.get(j).getId());
-					purchaseInstockDetail.set("order_list", j);
-					purchaseInstockDetail.set("remark", list.get(j).getRemark());
-					purchaseInstockDetail.set("dept_id", list.get(j).getDeptId());
-					purchaseInstockDetail.set("data_area", list.get(j).getDataArea());
-					purchaseInstockDetail.set("create_date", new Date());
-					flang= purchaseInstockDetail.save();
-					if(flang==false){
-						break;
-					}
-					
-					String productId =list.get(j).get("product_id");
-					InventoryDetail inventoryDetail1 = InventoryDetailQuery.me().findByWarehouseIdAndProductId(list0.get(i),productId);
-					String inventoryDetailId = StrKit.getRandomUUID();
-					inventoryDetail.set("id", inventoryDetailId);
-					inventoryDetail.set("warehouse_id", list0.get(i));
-					inventoryDetail.set("sell_product_id", list.get(j).getProductId());
-					inventoryDetail.set("in_count", list.get(j).getProductCount());
-					inventoryDetail.set("in_amount", list.get(j).getProductAmount());
-					inventoryDetail.set("in_price",list.get(j).getProductPrice());
-					int balanceCount=0;
-					String bc1=list.get(j).get("product_count").toString();
-					if(inventoryDetail1==null){
-						balanceCount=Integer.parseInt(bc1);
-					}else{
-						if(inventoryDetail1.getBalanceCount().toString()==""){
-							balanceCount=Integer.parseInt(bc1);
-						}else{
-							String bc=inventoryDetail1.getBalanceCount().toString();
-							balanceCount=Integer.parseInt(bc.substring(0,bc.indexOf(".")))+Integer.parseInt(bc1);
-						}
-					}
-					String ba1=list.get(j).getProductAmount().toString();
-					int balanceAmount=0;
-					if(inventoryDetail1==null){
-						balanceAmount=Integer.parseInt(ba1.substring(0, ba1.indexOf(".")));
-					}else{
-						if(inventoryDetail1.getBalanceAmount().toString()==""){
-							balanceAmount=Integer.parseInt(ba1.substring(0, ba1.indexOf(".")));
-						}else{
-							String ba=inventoryDetail1.getBalanceAmount().toString();
-							balanceAmount=Integer.parseInt(ba.substring(0,ba.indexOf(".")))+Integer.parseInt(ba1.substring(0, ba1.indexOf(".")));
-						}
-					}
-					inventoryDetail.set("balance_count", balanceCount);
-					inventoryDetail.set("balance_amount", balanceAmount);
-					inventoryDetail.set("balance_price", list.get(j).getProductPrice());
-					inventoryDetail.set("biz_type", "采购入库");
-					inventoryDetail.set("biz_bill_sn", order.getPorderSn());
-					inventoryDetail.set("biz_date", new Date());
-					inventoryDetail.set("biz_user_id", user.getId());
-					inventoryDetail.set("remark", list.get(j).getRemark());
-					inventoryDetail.set("dept_id", list.get(j).getDeptId());
-					inventoryDetail.set("data_area", list.get(j).getDataArea());
-					inventoryDetail.set("create_date",new Date());
-					flang=inventoryDetail.save();
-					if(flang==false){
-						break;
-					}
-					
-					Inventory inventory = InventoryQuery.me().findByWarehouseIdAndProductId(list0.get(i),productId);
-					if(inventory==null){
-						inventory=new Inventory();
-						String inventoryId = StrKit.getRandomUUID();
-						inventory.set("id", inventoryId);
-						inventory.set("warehouse_id", list0.get(i));
-						inventory.set("product_id", productId);
-						inventory.set("seller_id", list.get(i).get("sellerId"));
-						inventory.set("dept_id", user.getDepartmentId());
-						inventory.set("data_area", user.getDataArea());
-						inventory.set("create_date", new Date());
-						inventory.set("in_count", list.get(j).getProductCount());
-						inventory.set("in_amount", list.get(j).getProductAmount());
-						inventory.set("in_price", list.get(j).getProductPrice());
-						String ibc1=list.get(j).getProductCount().toString();
-						int inventoryBalanceCount=0;
-						inventoryBalanceCount=Integer.parseInt(ibc1);
-						int inventoryBalanceAmount=0;
-						String iba1=list.get(j).getProductAmount().toString();
-						inventoryBalanceAmount=Integer.parseInt(iba1.substring(0, iba1.indexOf(".")));
-						inventory.set("balance_count", inventoryBalanceCount);
-						inventory.set("balance_amount", inventoryBalanceAmount);
-						inventory.set("balance_amount", list.get(j).getProductPrice());
-						flang=inventory.save();
-						if(flang==false){
-							break;
-						}
-					}else{
-						inventory.set("in_count", list.get(j).getProductCount());
-						inventory.set("in_amount", list.get(j).getProductAmount());
-						inventory.set("in_price", list.get(j).getProductPrice());
-						String ibc1=list.get(j).getProductCount().toString();
-						int inventoryBalanceCount=0;
-						if(inventory.getBalanceCount().toString()==""){
-							inventoryBalanceCount=Integer.parseInt(ibc1);
-						}else{
-							String ibc=inventory.getBalanceCount().toString();
-							inventoryBalanceCount=Integer.parseInt(ibc.substring(0,ibc.indexOf(".")))+Integer.parseInt(ibc1);
-						}
-						int inventoryBalanceAmount=0;
-						String iba1=list.get(j).getProductAmount().toString();
-						if(inventory.getBalanceAmount().toString()==""){
-							inventoryBalanceAmount=Integer.parseInt(iba1.substring(0, iba1.indexOf(".")));
-						}else{
-							String iba=inventory.getBalanceAmount().toString();
-							inventoryBalanceAmount=Integer.parseInt(iba.substring(0, iba.indexOf(".")))+Integer.parseInt(iba1.substring(0, iba1.indexOf(".")));
-						}
-						inventory.set("balance_count", inventoryBalanceCount);
-						inventory.set("balance_amount", inventoryBalanceAmount);
-							inventory.set("modify_date", new Date());
-							flang=inventory.update();
-						}
-						if(flang==false){
-							break;
-						}
-				}else{
-					if(list0.get(i).equals(inventory0.getWarehouseId())){
-						String www=list.get(j).getProductAmount().toString();
-						String mmm=www.substring(0, www.indexOf("."));
-						count +=Integer.parseInt(mmm);
-						String purchaseInstockDetailId = StrKit.getRandomUUID();
-						purchaseInstockDetail.set("id",purchaseInstockDetailId);
-						purchaseInstockDetail.set("purchase_instock_id", purchaseInstockId);
-						purchaseInstockDetail.set("seller_product_id", list.get(j).getProductId());
-						purchaseInstockDetail.set("product_count", list.get(j).getProductCount());
-						purchaseInstockDetail.set("product_amount", list.get(j).getProductAmount());
-						purchaseInstockDetail.set("product_price", list.get(j).getProductPrice());
-						purchaseInstockDetail.set("purchase_order_detail_id", list.get(j).getId());
-						purchaseInstockDetail.set("order_list", j);
-						purchaseInstockDetail.set("remark", list.get(j).getRemark());
-						purchaseInstockDetail.set("dept_id", list.get(j).getDeptId());
-						purchaseInstockDetail.set("data_area", list.get(j).getDataArea());
-						purchaseInstockDetail.set("create_date", new Date());
-						flang= purchaseInstockDetail.save();
-						if(flang==false){
-							break;
-						}
-						
-						String productId =list.get(j).get("product_id");
-						InventoryDetail inventoryDetail1 = InventoryDetailQuery.me().findByWarehouseIdAndProductId(list0.get(i),productId);
-						String inventoryDetailId = StrKit.getRandomUUID();
-						inventoryDetail.set("id", inventoryDetailId);
-						inventoryDetail.set("warehouse_id", list0.get(i));
-						inventoryDetail.set("sell_product_id", list.get(j).getProductId());
-						inventoryDetail.set("in_count", list.get(j).getProductCount());
-						inventoryDetail.set("in_amount", list.get(j).getProductAmount());
-						inventoryDetail.set("in_price",list.get(j).getProductPrice());
-						int balanceCount=0;
-						String bc1=list.get(j).get("product_count").toString();
-						if(inventoryDetail1==null){
-							balanceCount=Integer.parseInt(bc1);
-						}else{
-							if(inventoryDetail1.getBalanceCount().toString()==""){
-								balanceCount=Integer.parseInt(bc1);
-							}else{
-								String bc=inventoryDetail1.getBalanceCount().toString();
-								balanceCount=Integer.parseInt(bc.substring(0,bc.indexOf(".")))+Integer.parseInt(bc1);
-							}
-						}
-						String ba1=list.get(j).getProductAmount().toString();
-						int balanceAmount=0;
-						if(inventoryDetail1==null){
-							balanceAmount=Integer.parseInt(ba1.substring(0, ba1.indexOf(".")));
-						}else{
-							if(inventoryDetail1.getBalanceAmount().toString()==""){
-								balanceAmount=Integer.parseInt(ba1.substring(0, ba1.indexOf(".")));
-							}else{
-								String ba=inventoryDetail1.getBalanceAmount().toString();
-								balanceAmount=Integer.parseInt(ba.substring(0,ba.indexOf(".")))+Integer.parseInt(ba1.substring(0, ba1.indexOf(".")));
-							}
-						}
-						inventoryDetail.set("balance_count", balanceCount);
-						inventoryDetail.set("balance_amount", balanceAmount);
-						inventoryDetail.set("balance_price", list.get(j).getProductPrice());
-						inventoryDetail.set("biz_type", "采购入库");
-						inventoryDetail.set("biz_bill_sn", order.getPorderSn());
-						inventoryDetail.set("biz_date", new Date());
-						inventoryDetail.set("biz_user_id", user.getId());
-						inventoryDetail.set("remark", list.get(j).getRemark());
-						inventoryDetail.set("dept_id", list.get(j).getDeptId());
-						inventoryDetail.set("data_area", list.get(j).getDataArea());
-						inventoryDetail.set("create_date",new Date());
-						flang=inventoryDetail.save();
-						if(flang==false){
-							break;
-						}
-						
-						Inventory inventory = InventoryQuery.me().findByWarehouseIdAndProductId(list0.get(i),productId);
-						if(inventory==null){
-							inventory=new Inventory();
-							String inventoryId = StrKit.getRandomUUID();
-							inventory.set("id", inventoryId);
-							inventory.set("warehouse_id", list0.get(i));
-							inventory.set("product_id", productId);
-							inventory.set("seller_id", list.get(i).get("sellerId"));
-							inventory.set("dept_id", user.getDepartmentId());
-							inventory.set("data_area", user.getDataArea());
-							inventory.set("create_date", new Date());
-							inventory.set("in_count", list.get(j).getProductCount());
-							inventory.set("in_amount", list.get(j).getProductAmount());
-							inventory.set("in_price", list.get(j).getProductPrice());
-							String ibc1=list.get(j).getProductCount().toString();
-							int inventoryBalanceCount=0;
-							if(inventory.getBalanceCount().toString()==""){
-								inventoryBalanceCount=Integer.parseInt(ibc1);
-							}else{
-								String ibc=inventory.getBalanceCount().toString();
-								inventoryBalanceCount=Integer.parseInt(ibc.substring(0,ibc.indexOf(".")))+Integer.parseInt(ibc1);
-							}
-							int inventoryBalanceAmount=0;
-							String iba1=list.get(j).getProductAmount().toString();
-							if(inventory.getBalanceAmount().toString()==""){
-								inventoryBalanceAmount=Integer.parseInt(iba1.substring(0, iba1.indexOf(".")));
-							}else{
-								String iba=inventory.getBalanceAmount().toString();
-								inventoryBalanceAmount=Integer.parseInt(iba.substring(0, iba.indexOf(".")))+Integer.parseInt(iba1.substring(0, iba1.indexOf(".")));
-							}
-							inventory.set("balance_count", inventoryBalanceCount);
-							inventory.set("balance_amount", inventoryBalanceAmount);
-							flang=inventory.save();
-							if(flang==false){
-								break;
-							}
-						}else{
-							inventory.set("in_count", list.get(j).getProductCount());
-							inventory.set("in_amount", list.get(j).getProductAmount());
-							inventory.set("in_price", list.get(j).getProductPrice());
-							String ibc1=list.get(j).getProductCount().toString();
-							int inventoryBalanceCount=0;
-							if(inventory.getBalanceCount().toString()==""){
-								inventoryBalanceCount=Integer.parseInt(ibc1);
-							}else{
-								String ibc=inventory.getBalanceCount().toString();
-								inventoryBalanceCount=Integer.parseInt(ibc.substring(0,ibc.indexOf(".")))+Integer.parseInt(ibc1);
-							}
-							int inventoryBalanceAmount=0;
-							String iba1=list.get(j).getProductAmount().toString();
-							if(inventory.getBalanceAmount().toString()==""){
-								inventoryBalanceAmount=Integer.parseInt(iba1.substring(0, iba1.indexOf(".")));
-							}else{
-								String iba=inventory.getBalanceAmount().toString();
-								inventoryBalanceAmount=Integer.parseInt(iba.substring(0, iba.indexOf(".")))+Integer.parseInt(iba1.substring(0, iba1.indexOf(".")));
-							}
-							inventory.set("balance_count", inventoryBalanceCount);
-							inventory.set("balance_amount", inventoryBalanceAmount);
-								inventory.set("modify_date", new Date());
-								flang=inventory.update();
-							}
-							if(flang==false){
-								break;
-							}
-					}
-				}
-			}
-			if(flang==false){
-				break;
-			}
-			purchaseInstock.set("total_amount",count);
-			flang=purchaseInstock.save();
-			if(flang==false){
-				break;
-			}
-			
-			String purchaseOrderJoinInstockId = StrKit.getRandomUUID();
-			purchaseOrderJoinInstock.set("id", purchaseOrderJoinInstockId);
-			purchaseOrderJoinInstock.set("purchase_order_id",id);
-			purchaseOrderJoinInstock.set("purchase_instock_id", purchaseInstockId);
-			flang=purchaseOrderJoinInstock.save();
-			if(flang==false){
-				break;
-			}
-		}
-		PurchaseOrder purchaseOrder =PurchaseOrderQuery.me().findById(id);
-		purchaseOrder.set("status", 3000);
-		flang=purchaseOrder.update();
-		renderJson(flang);
+		Record order = PurchaseOrderQuery.me().findMoreById(orderId,user.getDataArea());
+		List<Record> orderDetail = PurchaseOrderDetailQuery.me().findByOutstockId(orderId,user.getDataArea());
+		setAttr("order", order);
+		setAttr("orderDetail", orderDetail);
+
+		render("detail.html");
 	}
 	
+	public void listOther(){
+		String keyword = getPara("k");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+		}
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+
+		Page<Record> page = PurchaseOrderQuery.me().paginateO(getPageNumber(), getPageSize(), keyword, startDate, endDate,user.getDataArea(),user.getId());
+
+		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
+		renderJson(map);
+	}
+	
+	public void pass(){
+		String id = getPara("id");
+		PurchaseOrder purchaseOrder=PurchaseOrderQuery.me().findById(id);
+		purchaseOrder.set("status", 1000);
+		purchaseOrder.update();
+		renderAjaxResultForSuccess("OK");
+	}
 }

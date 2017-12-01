@@ -65,10 +65,10 @@ public class PurchaseOrderQuery extends JBaseQuery {
 		return 0;
 	}
 
-	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate,String id) {
-		String select =  "SELECT cpo.id,cpo.total_amount, cpo.porder_sn,cs.`name` as supplier_name,user1.realname as biz_user,user2.realname as confirm_user,user3.realname as input_user,cpo.create_date,cpo.payment_type,cpo.confirm_date,cpo.`status` ";
+	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate,String dataArea,String id) {
+		String select =  "SELECT cpo.*,cs.name as supplierName,u.realname  ";
 		StringBuilder fromBuilder = new StringBuilder("FROM cc_purchase_order cpo ");
-		fromBuilder.append("LEFT JOIN (SELECT b.realname,b.id FROM `user` b) user1 ON user1.id = cpo.biz_user_id LEFT JOIN (SELECT b.realname,b.id FROM `user` b) user2 ON user2.id = cpo.confirm_user_id LEFT JOIN (SELECT b.realname,b.id FROM `user` b) user3 ON user3.id = cpo.input_user_id LEFT JOIN cc_supplier cs on cs.id=cpo.supplier_id ");
+		fromBuilder.append(" LEFT JOIN cc_supplier cs on cs.id=cpo.supplier_id LEFT JOIN user u on u.id=cpo.biz_user_id  ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
@@ -88,7 +88,7 @@ public class PurchaseOrderQuery extends JBaseQuery {
 			fromBuilder.append(" and cpo.create_date <= ?");
 			params.add(endDate);
 		}
-		fromBuilder.append(" and user1.id='"+id+"' ");
+		fromBuilder.append(" and u.id='"+id+"' and cpo.data_area= "+dataArea);
 		fromBuilder.append(" order by cpo.create_date ");
 
 		if (params.isEmpty())
@@ -97,10 +97,52 @@ public class PurchaseOrderQuery extends JBaseQuery {
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 	
-	public int findByUserId(String userId){
-		String sql = "select c.* from cc_purchase_order c LEFT JOIN user u on c.dept_id=u.department_id where u.id=?";
+	public int findByUserId(String userId,String dataArea){
+		String sql = "select c.* from cc_purchase_order c LEFT JOIN user u on c.dept_id=u.department_id where u.id=? and c.data_area="+dataArea;
 		return DAO.find(sql, userId).size();
 	}
 	
+	public Record findMoreById(final String id,String dataArea) {
+		StringBuilder fromBuilder = new StringBuilder(
+				" SELECT cpo.*,cs.`name` as supplier_name,cs.contact,u.mobile as userMobile,cs.mobile as supplierMobile,cs.`name` as supplier_name, cs.code,u.realname as biz_user  ");
+		fromBuilder.append(" FROM cc_purchase_order cpo ");
+		fromBuilder.append(" LEFT JOIN cc_supplier cs on cs.id=cpo.supplier_id ");
+		fromBuilder.append(" LEFT JOIN user u on u.id=cpo.biz_user_id ");
+		fromBuilder.append(" where cpo.id = ? and cpo.data_area= "+dataArea);
+
+		return Db.findFirst(fromBuilder.toString(), id);
+	}
+	
+	public Page<Record> paginateO(int pageNumber, int pageSize, String keyword, String startDate, String endDate,String dataArea,String id) {
+		String select =  "SELECT cpo.*,cs.name as supplierName,u.realname  ";
+		StringBuilder fromBuilder = new StringBuilder("FROM cc_purchase_order cpo ");
+		fromBuilder.append(" LEFT JOIN cc_supplier cs on cs.id=cpo.supplier_id LEFT JOIN user u on u.id=cpo.biz_user_id  ");
+
+		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
+
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cpo.porder_sn", keyword, params, needWhere);
+
+		if (needWhere) {
+			fromBuilder.append(" where 1 = 1");
+		}
+
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and cpo.create_date >= ?");
+			params.add(startDate);
+		}
+
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and cpo.create_date <= ?");
+			params.add(endDate);
+		}
+		fromBuilder.append(" and u.id='"+id+"' and cpo.data_area= "+dataArea+" and cpo.status=1000 ");
+		fromBuilder.append(" order by cpo.create_date ");
+
+		if (params.isEmpty())
+			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+
+		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
 
 }

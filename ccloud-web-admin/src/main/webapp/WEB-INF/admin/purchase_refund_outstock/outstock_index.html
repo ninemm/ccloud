@@ -1,0 +1,148 @@
+<#include "../_inc/_layer_layout.html"/>
+
+<#macro script_import>
+
+	<!-- bootstrap-table -->
+	<script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table.js"></script>
+	<script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table-zh-CN.js"></script>
+	<!-- bootstrap-datetimepicker -->
+	<script src="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.min.js"></script>
+	<script src="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.zh-CN.js"></script>
+	<!-- bootstrapvalidator -->
+	<script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
+
+</#macro>
+
+<#macro css_import>
+
+	<!-- bootstrap-table-->
+<link rel="stylesheet" href="${CPATH}/static/plugins/bootstrap-table/bootstrap-table.css">
+	<!-- bootstrap-datetimepicker -->
+<link rel="stylesheet" href="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.min.css">
+	<!-- bootstrapvalidator -->
+<link rel="stylesheet" href="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.css">
+
+</#macro>
+
+<#macro script>
+
+	var $table = $("#_purchaseOutstock_table");
+	var url = '${CPATH}/admin/purchaseInstock/listOther';
+
+	$(function() {
+		jQuery.mm.initDatetimepicker('form', '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
+		jQuery.mm.initDatetimepicker('form', '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
+		jQuery.mm.initValidator('#form', validatorFields)
+		jQuery.mm.initEditTable('#_purchaseOutstock_table', url, initParams, initFields(), null);
+	});
+
+	$("#search-submit").click(function() {
+		var validate = $('#form').data('bootstrapValidator');
+		validate.validate();
+		if (validate.isValid()){
+			$table.bootstrapTable('refresh');
+		}
+	});
+
+	var initParams = function(params) {
+
+		var keyword = $('#post-search-input').val();
+		if (keyword) keyword = encodeURIComponent(keyword);
+		var param = {
+			size: params.limit,
+			page: params.offset/params.limit + 1,
+			k: keyword,
+			startDate: $('#startDate').val() + " 00:00:00",
+			endDate: $('#endDate').val() + " 23:59:59"
+		};
+		return param;
+	};
+
+	var initFields = function() {
+		var fields =
+			[
+				{field: "id", title: "ID", align: "center", visible:false, edit:false},
+				{field: "", title: "出库单号/创建时间", align: "center", width: '10%',
+					formatter: function(value, row, rowIndex) {
+						return row.pwarehouse_sn + '<br>' + row.create_date;
+					},
+					edit: false
+				},
+				{field: "supplierName", title: "供应商名称名称", align: "center", width: '8%', edit:false},
+				{field: "total_amount", title: "订单总额", align: "center", width: '5%', edit:false},
+				{field: "payment_type", title: "付款方式", align: "center", width: '5%',
+					formatter: function(value, row, rowIndex) {
+						if(value==0){
+							return "应付账款";
+						}else if(value==1){
+							return "现金";
+						}else{
+							return "预付款";
+						}
+					},
+					edit: false
+				},
+				{field: "status", title: "状态", align: "center", width: '5%',edit: false},
+				{field: "action", title: "操作", align: "center", width: '15%',
+				formatter: function(value, row, rowIndex) {
+					var strHtml ='<a class="label label-table label-info" onclick="parent.outstockDetail(\''+row.id+'\')" >详细</a> ';
+
+					strHtml = strHtml + '<a class="label label-table label-danger" onclick="parent.refund(\''+row.id+'\')" >退货</a> ';
+
+					return strHtml;
+				},
+				edit:false
+				}
+			];
+		return fields;
+	}
+	
+	var validatorFields = {
+		'startDate': {
+			validators: {
+				date : { format : 'YYYY-MM-DD', message : '日期格式不正确' }
+			}
+		},
+		'endDate': {
+			validators: {
+				date : { format : 'YYYY-MM-DD', message : '日期格式不正确' }
+			}
+		}
+	};
+
+</#macro>
+
+<@layout>
+<section class="content">
+	<form class="form-inline" id="form">
+		<div class="validata-box">
+			<input type="hidden" name="userIds" id="userIds" value="">
+		</div>
+		<div class="row content-row">
+			<div class="form-group" style="float: right">
+				<div class="form-group validata-box">
+					<label class="control-label">开始时间:</label>
+					<div class="form-group">
+						<input id="startDate" class="form-control" value="${startDate!}" name="startDate" placeholder="开始日期" >&nbsp;
+					</div>
+				</div>
+				<div class="form-group validata-box">
+					<label class="control-label">结束时间:</label>
+					<div class="form-group">
+						<input id="endDate" class="form-control" value="${endDate!}" name="endDate" placeholder="结束日期" >&nbsp;
+					</div>
+				</div>
+				
+				<input id="post-search-input" class="form-control" type="search" value="${k!}" name="k" placeholder="搜索出库单号">&nbsp;
+				<input id="search-submit" class="btn btn-default btn-sm btn-flat" type="button" value="搜索">
+			</div>
+		</div>
+
+		<div class="box">
+			<table class="table table-striped table-hover table-condensed" id="_purchaseOutstock_table" ></table>
+		</div>
+	</form>
+	<!-- /.box -->
+</section>
+
+</@layout>
