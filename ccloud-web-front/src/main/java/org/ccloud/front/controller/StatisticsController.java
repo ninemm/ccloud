@@ -6,7 +6,7 @@ import org.ccloud.route.RouterMapping;
 /**
  * Created by WT on 2017/11/30.
  */
-@RouterMapping(url = "/statistics")
+@RouterMapping(url = "/stat")
 public class StatisticsController extends BaseFrontController {
 
 	public void index() {
