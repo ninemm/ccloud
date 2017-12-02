@@ -46,7 +46,7 @@
 			return;
 		}
 		
-		window.open('${CPATH}/admin/sellerCustomer/downloading?parent_id=' + $('#parent_id').val() + '&parent_name=' + $('#parent_name').val());
+		window.open('${CPATH}/admin/sellerCustomer/downloading?parent_id=' + $('#parent_id').val() + '&parent_name=' + $('#parent_name').val() + '&data_area=' + $('#data_area').val());
 	}
 </#macro>
 
@@ -78,6 +78,7 @@
 					<label class="control-label col-sm-2">*部门:</label>
 					<div class="input-group col-md-4 col-sm-10">
 						<input type="hidden" name="parent_id" id="parent_id" value="">
+						<input type="hidden" name="data_area" id="data_area" value="">
 						<input class="form-control input-sm" type="text" id="parent_name" name="parent_name" value="" readonly>
 						<div class="input-group-addon" id="_department_tree" style="cursor:pointer;">
 							<i class="fa fa-search"></i> 选择

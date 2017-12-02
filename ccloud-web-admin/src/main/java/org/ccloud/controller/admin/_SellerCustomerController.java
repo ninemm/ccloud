@@ -305,6 +305,8 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 				e.printStackTrace();
 			}
 		}
+		
+		ExcelExportUtil.closeExportBigExcel();
 
 		renderFile(new File(filePath));
 	}

@@ -215,7 +215,15 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 			out.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				out.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
+		
+		ExcelExportUtil.closeExportBigExcel();
 
 		renderFile(new File(filePath));
 	}	
