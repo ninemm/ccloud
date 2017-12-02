@@ -412,5 +412,11 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		flang=seller.update();
 		renderJson(flang);
 	}
+	
+	public void show_sellerName(){
+		User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
+		List<Seller> list = SellerQuery.me().findAllByUserId(user.getId());
+		renderJson(list);
+	}
 }
 
