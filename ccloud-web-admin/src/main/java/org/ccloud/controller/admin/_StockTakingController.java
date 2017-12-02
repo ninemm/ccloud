@@ -104,11 +104,13 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 				String seller_id=stockTaking.getSellerId();
 				//初始化仓库
 				Warehouse warehouse=WarehouseQuery.me().findById(warehouse_id);
-				warehouse.setIsInited(1);
-				boolean updateWarehouse = warehouse.update();
-				if (!updateWarehouse) {
-					renderAjaxResultForError("更新Warehouse失败 ");
-					return false;
+				if (warehouse.getIsDefault()!=1) {
+					warehouse.setIsInited(1);
+					boolean updateWarehouse = warehouse.update();
+					if (!updateWarehouse) {
+						renderAjaxResultForError("更新Warehouse失败 ");
+						return false;
+					}
 				}
 				stockTaking.setStatus(isEnabled);
 				if (stockTaking.saveOrUpdate()) {
@@ -171,6 +173,7 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 						inventoryDetail.setBalanceCount(new BigDecimal(listMap.get(i).get("product_count").toString()));
 						inventoryDetail.setBalanceAmount(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString())));
 						inventoryDetail.setBalancePrice(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("convert_relate").toString())));
+						//业务类型  盘盈入库--100208
 						inventoryDetail.setBizType("100208");
 						inventoryDetail.setBizBillSn(stockTaking.getStockTakingSn());
 						inventoryDetail.setBizDate(stockTaking.getBizDate());
