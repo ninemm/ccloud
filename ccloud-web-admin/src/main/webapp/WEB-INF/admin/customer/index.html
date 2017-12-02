@@ -159,9 +159,9 @@
 		
 		<div class="row content-row">
 			<div class="jp-left">
-				<@shiro.hasPermission name="/admin/sellercustomer/batchSetUser, /admin/dealer/all, /admin/all"> 
-					<label class="control-label">批量操作:</label>
-					<button class="btn btn-sm btn-default" type="button" onclick="batchAction('setUser')"> 设置负责人 </button>
+				<@shiro.hasPermission name="/admin/customer/batchSetUser /admin/all"> 
+<!-- 					<label class="control-label">批量操作:</label>
+					<button class="btn btn-sm btn-default" type="button" onclick="batchAction('setUser')"> 设置负责人 </button> -->
 				</@shiro.hasPermission>
 			</div>
 			
