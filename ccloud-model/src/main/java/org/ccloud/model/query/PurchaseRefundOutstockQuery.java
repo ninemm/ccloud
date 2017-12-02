@@ -50,7 +50,7 @@ public class PurchaseRefundOutstockQuery extends JBaseQuery {
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "r.outstock_sn", keyword, params, needWhere);
 
 		if (needWhere) {
-			fromBuilder.append(" where 1 = 1 and r.biz_user_id='"+userId+"' and r.data_area="+dataArea);
+			fromBuilder.append(" where 1 = 1 and r.biz_user_id='"+userId+"' and r.data_area='"+dataArea+"' ");
 		}
 
 		if (StrKit.notBlank(startDate)) {
@@ -90,7 +90,7 @@ public class PurchaseRefundOutstockQuery extends JBaseQuery {
 		fromBuilder.append(" from cc_purchase_refund_outstock cpro ");
 		fromBuilder.append(" LEFT JOIN cc_supplier cs on cs.id=cpro.supplier_id ");
 		fromBuilder.append(" LEFT JOIN `user` u on u.id=cpro.biz_user_id ");
-		fromBuilder.append(" where cpro.id=? and cpro.data_area="+dataArea);
+		fromBuilder.append(" where cpro.id=? and cpro.data_area='"+dataArea+"' ");
 
 		return Db.findFirst(fromBuilder.toString(), id);
 	}

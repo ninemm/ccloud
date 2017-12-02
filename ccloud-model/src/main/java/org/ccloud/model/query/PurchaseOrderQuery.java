@@ -88,7 +88,7 @@ public class PurchaseOrderQuery extends JBaseQuery {
 			fromBuilder.append(" and cpo.create_date <= ?");
 			params.add(endDate);
 		}
-		fromBuilder.append(" and u.id='"+id+"' and cpo.data_area= "+dataArea);
+		fromBuilder.append(" and u.id='"+id+"' and cpo.data_area= '"+dataArea+"' ");
 		fromBuilder.append(" order by cpo.create_date ");
 
 		if (params.isEmpty())
@@ -98,7 +98,7 @@ public class PurchaseOrderQuery extends JBaseQuery {
 	}
 	
 	public int findByUserId(String userId,String dataArea){
-		String sql = "select c.* from cc_purchase_order c LEFT JOIN user u on c.dept_id=u.department_id where u.id=? and c.data_area="+dataArea;
+		String sql = "select c.* from cc_purchase_order c LEFT JOIN user u on c.dept_id=u.department_id where u.id=? and c.data_area='"+dataArea+"' ";
 		return DAO.find(sql, userId).size();
 	}
 	
@@ -108,7 +108,7 @@ public class PurchaseOrderQuery extends JBaseQuery {
 		fromBuilder.append(" FROM cc_purchase_order cpo ");
 		fromBuilder.append(" LEFT JOIN cc_supplier cs on cs.id=cpo.supplier_id ");
 		fromBuilder.append(" LEFT JOIN user u on u.id=cpo.biz_user_id ");
-		fromBuilder.append(" where cpo.id = ? and cpo.data_area= "+dataArea);
+		fromBuilder.append(" where cpo.id = ? and cpo.data_area= '"+dataArea+"' ");
 
 		return Db.findFirst(fromBuilder.toString(), id);
 	}
@@ -136,7 +136,7 @@ public class PurchaseOrderQuery extends JBaseQuery {
 			fromBuilder.append(" and cpo.create_date <= ?");
 			params.add(endDate);
 		}
-		fromBuilder.append(" and u.id='"+id+"' and cpo.data_area= "+dataArea+" and cpo.status=1000 ");
+		fromBuilder.append(" and u.id='"+id+"' and cpo.data_area= '"+dataArea+"' and cpo.status=1000 ");
 		fromBuilder.append(" order by cpo.create_date ");
 
 		if (params.isEmpty())

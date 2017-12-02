@@ -127,8 +127,6 @@
 
 			var $tr = obj.parent().parent().parent();
 
-			$tr.find("#specification").text(product.store_count);
-
 			var convert = product.convertRelate;
 			$tr.find("#convert").val(convert);
 
@@ -309,7 +307,6 @@
 							<th width="2%"></th>
 							<th width="5%">序号</th>
 							<th width="20%">商品名称/商品规格</th>
-							<th width="8%">库存</th>
 							<th width="11%">大单位价格</th>
 							<th width="12%">大单位数量</th>
 							<th width="11%">小单位价格</th>
@@ -331,9 +328,6 @@
 									<select id="productId" name="productId" class="form-control">
 									</select>
 								</div>
-							</td>
-							<td>
-								<span id="specification"></span>
 							</td>
 							<td>
 								<input type="hidden" id="convert" value="" />
@@ -373,7 +367,7 @@
 							<td>
 								<button class="btn btn-xs btn-info" onclick="addProduct()" ><span class="glyphicon glyphicon-plus"></span></button>
 							</td>
-							<th colspan="9" style="text-align:right">合计:</th>
+							<th colspan="6" style="text-align:right">合计:</th>
 							<th>￥<span id="total">0</span> <input type="hidden" name="total" id="inputTotal" value="0" /></th>
 							<input type="hidden" name="productNum" id="productNum" value="0" />
 						</tr>
