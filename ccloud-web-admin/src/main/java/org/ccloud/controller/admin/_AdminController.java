@@ -27,7 +27,6 @@ import org.ccloud.interceptor.AdminInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
-import org.ccloud.model.Seller;
 import org.ccloud.model.User;
 import org.ccloud.model.query.CustomerQuery;
 import org.ccloud.model.query.SellerQuery;

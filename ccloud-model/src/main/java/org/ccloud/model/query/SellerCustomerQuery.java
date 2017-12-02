@@ -58,15 +58,14 @@ public class SellerCustomerQuery extends JBaseQuery {
 		return Db.findFirst(fromBuilder.toString(), id);
 	}
 
-	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String dataArea) {
+	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String dataArea, String deptId) {
 
 		boolean needWhere = true;
 		LinkedList<Object> params = new LinkedList<Object>();
 
 		String select = "select sc.*, c.customer_code, c.customer_name"
 				+ ", c.contact, c.mobile, c.prov_name, c.city_name, c.country_name"
-				+ ", c.prov_code, c.city_code, c.country_code, c.address"
-				+ ", t1.customerTypeNames, t2.realnames";
+				+ ", c.prov_code, c.city_code, c.country_code, c.address" + ", t1.customerTypeNames, t2.realnames";
 
 		StringBuilder fromBuilder = new StringBuilder(" from `cc_seller_customer` sc ");
 		fromBuilder.append(" join `cc_customer` c on c.id = sc.customer_id ");
@@ -83,6 +82,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 		fromBuilder.append(" JOIN USER u ON ujc.user_id = u.id ");
 
 		appendIfNotEmptyWithLike(fromBuilder, "ujc.data_area", dataArea, params, true);
+		appendIfNotEmpty(fromBuilder, "ujc.dept_id", deptId, params, false);
 		fromBuilder.append(" GROUP BY c2.id) t2 ON sc.id = t2.id ");
 
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "c.customer_name", keyword, params, needWhere);
@@ -101,6 +101,17 @@ public class SellerCustomerQuery extends JBaseQuery {
 		sellerCustomer.set("is_enabled", isEnabled);
 
 		return sellerCustomer.saveOrUpdate();
+	}
+
+	public String findsellerCustomerBycusId(String customerId, String dataArea) {
+
+		StringBuilder fromBuilder = new StringBuilder(" select sc.id ");
+		fromBuilder.append(" from cc_seller_customer sc ");
+		fromBuilder.append(" join cc_user_join_customer ujc on sc.id = ujc.seller_customer_id ");
+		fromBuilder.append(" where sc.customer_id = ? ");
+		fromBuilder.append(" AND ujc.data_area like ? ");
+
+		return Db.queryStr(fromBuilder.toString(), customerId, dataArea);
 	}
 
 	public int batchDelete(String... ids) {
