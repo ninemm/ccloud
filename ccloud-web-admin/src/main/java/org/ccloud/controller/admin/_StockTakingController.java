@@ -100,42 +100,51 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 				String id = getPara("id");
 				int isEnabled = getParaToInt("isEnabled");
 				StockTaking stockTaking = StockTakingQuery.me().findById(id);
-				Warehouse warehouse=WarehouseQuery.me().findById(stockTaking.getWarehouseId());
+				String warehouse_id=stockTaking.getWarehouseId();
+				String seller_id=stockTaking.getSellerId();
+				//初始化仓库
+				Warehouse warehouse=WarehouseQuery.me().findById(warehouse_id);
 				warehouse.setIsInited(1);
-				boolean update = warehouse.update();
-				if (!update) {
+				boolean updateWarehouse = warehouse.update();
+				if (!updateWarehouse) {
+					renderAjaxResultForError("更新Warehouse失败 ");
 					return false;
 				}
 				stockTaking.setStatus(isEnabled);
 				if (stockTaking.saveOrUpdate()) {
+					//遍历此次盘点的所有商品
 					List<Map<String, Object>>listMap=StockTakingDetailQuery.me().findByStockTakingDetailId1(id);
 					for (int i = 0; i < listMap.size(); i++) {
 						Inventory inventory=new Inventory();
-						InventoryDetail inventoryDetail=new InventoryDetail();
-						List<Record> findByInventory = StockTakingDetailQuery.me().findByInventory((String) listMap.get(i).get("product_id"),stockTaking.getWarehouseId(),stockTaking.getSellerId());
-						List<Record> selectSellProductId = StockTakingDetailQuery.me().selectSellProductId((String) listMap.get(i).get("product_id"),stockTaking.getSellerId());
+						String product_id=(String) listMap.get(i).get("product_id");
+						//获取sell_product_id
+						List<Record> selectSellProductId = StockTakingDetailQuery.me().selectSellProductId(product_id,seller_id);
 						if (selectSellProductId.size()==0) {
 							renderAjaxResultForError("更新失败 此用户没有SellProductId");
 							return false;
 						}
 						String sell_product_id = selectSellProductId.get(0).getStr("id");
+						//判断此商品是否已经在仓库中   
+						List<Record> findByInventory = StockTakingDetailQuery.me().findByInventory(product_id,warehouse_id,seller_id);
 						if (findByInventory.size()!=0) {
+							//存在--只更改数量 总价格
 							inventory=InventoryQuery.me().findById(findByInventory.get(0).getStr("id"));
 							inventory.setInCount( inventory.getInCount().add(new BigDecimal(listMap.get(i).get("product_count").toString())));
 							inventory.setInAmount(inventory.getInAmount().add(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString()))));
 							inventory.setModifyDate(new Date());
 							inventory.setBalanceCount(inventory.getBalanceCount().add(new BigDecimal(listMap.get(i).get("product_count").toString())));
 							inventory.setBalanceAmount(inventory.getBalanceAmount().add(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString()))));
-							boolean update2 = inventory.update();
-							if (!update2) {
-								renderAjaxResultForError("更新失败");
+							boolean updateInventory = inventory.update();
+							if (!updateInventory) {
+								renderAjaxResultForError("更新Inventory失败");
 								return false;
 							}
 						}else {
+							//不存在--添加新的记录
 							inventory.setId(StrKit.getRandomUUID());
-							inventory.setWarehouseId(stockTaking.getWarehouseId());
-							inventory.setProductId((String) listMap.get(i).get("product_id"));
-							inventory.setSellerId(stockTaking.getSellerId());
+							inventory.setWarehouseId(warehouse_id);
+							inventory.setProductId(product_id);
+							inventory.setSellerId(seller_id);
 							inventory.setInCount( new BigDecimal(listMap.get(i).get("product_count").toString()));
 							inventory.setInAmount(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString())));
 							inventory.setInPrice(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("convert_relate").toString())));
@@ -145,14 +154,16 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 							inventory.setDataArea(stockTaking.getDataArea());
 							inventory.setDeptId(stockTaking.getDeptId());
 							inventory.setCreateDate(new Date());
-							boolean save = inventory.save();
-							if (!save) {
-								renderAjaxResultForError("更新失败");
+							boolean saveInventory = inventory.save();
+							if (!saveInventory) {
+								renderAjaxResultForError("添加Inventory失败");
 								return false;
 							}
 						}
+						//添加库存明细
+						InventoryDetail inventoryDetail=new InventoryDetail();
 						inventoryDetail.setId(StrKit.getRandomUUID());
-						inventoryDetail.setWarehouseId(stockTaking.getWarehouseId());
+						inventoryDetail.setWarehouseId(warehouse_id);
 						inventoryDetail.setSellProductId(sell_product_id);
 						inventoryDetail.setInCount(new BigDecimal(listMap.get(i).get("product_count").toString()));
 						inventoryDetail.setInAmount(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString())));
@@ -168,12 +179,13 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 						inventoryDetail.setDataArea(stockTaking.getDataArea());
 						inventoryDetail.setDeptId(stockTaking.getDeptId());
 						inventoryDetail.setCreateDate(new Date());
-						boolean save = inventoryDetail.save();
-						if (!save) {
-							renderAjaxResultForError("更新失败");
+						boolean saveInventoryDetail = inventoryDetail.save();
+						if (!saveInventoryDetail) {
+							renderAjaxResultForError("更新InventoryDetail失败");
 							return false;
 						}
-						List<SellerProduct> sellerProductList = SellerProductQuery.me().findByProductIdAndSellerId((String) listMap.get(i).get("product_id"),stockTaking.getSellerId());
+						//获取经销商此商品的信息 更新库存
+						List<SellerProduct> sellerProductList = SellerProductQuery.me().findByProductIdAndSellerId(product_id,seller_id);
 						SellerProduct sellerProduct = sellerProductList.get(0);
 						BigDecimal storeCount = sellerProduct.getStoreCount();
 						if (storeCount==null) {
@@ -181,8 +193,9 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 						}else {
 							sellerProduct.setStoreCount(new BigDecimal(listMap.get(i).get("product_count").toString()).add(storeCount));
 						}
-						boolean update2 = sellerProduct.update();
-						if (!update2) {
+						boolean updateSellerProduct = sellerProduct.update();
+						if (!updateSellerProduct) {
+							renderAjaxResultForError("更新SellerProduct失败");
 							return false;
 						}
 					}
