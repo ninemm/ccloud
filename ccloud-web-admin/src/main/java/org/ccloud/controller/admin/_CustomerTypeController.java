@@ -75,7 +75,8 @@ public class _CustomerTypeController extends JBaseCRUDController<CustomerType> {
 
 	}
 
-	@RequiresPermissions(value = { "/admin/customerType/edit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
+	@RequiresPermissions(value = { "/admin/customerType/edit", "/admin/dealer/all",
+			"/admin/all" }, logical = Logical.OR)
 	public void enable() {
 
 		String id = getPara("id");
@@ -89,7 +90,8 @@ public class _CustomerTypeController extends JBaseCRUDController<CustomerType> {
 	}
 
 	@Override
-	@RequiresPermissions(value = { "/admin/customerType/edit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
+	@RequiresPermissions(value = { "/admin/customerType/edit", "/admin/dealer/all",
+			"/admin/all" }, logical = Logical.OR)
 	public void edit() {
 		String id = getPara("id");
 
@@ -118,7 +120,8 @@ public class _CustomerTypeController extends JBaseCRUDController<CustomerType> {
 	}
 
 	@Override
-	@RequiresPermissions(value = { "/admin/customerType/edit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
+	@RequiresPermissions(value = { "/admin/customerType/edit", "/admin/dealer/all",
+			"/admin/all" }, logical = Logical.OR)
 	public void save() {
 
 		CustomerType customerType = getModel(CustomerType.class);
@@ -137,8 +140,9 @@ public class _CustomerTypeController extends JBaseCRUDController<CustomerType> {
 		renderAjaxResultForSuccess();
 
 	}
-	
-	@RequiresPermissions(value = { "/admin/customerType/edit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
+
+	@RequiresPermissions(value = { "/admin/customerType/edit", "/admin/dealer/all",
+			"/admin/all" }, logical = Logical.OR)
 	public void findPriceSystemByDeptId() {
 		List<Record> priceSystemList = PriceSystemQuery.me().findPriceSystemByDeptId(getPara("parent_id"),
 				getPara("data_area"));

@@ -19,14 +19,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
@@ -35,27 +32,18 @@ import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.Customer;
-import org.ccloud.model.CustomerType;
-import org.ccloud.model.Department;
-import org.ccloud.model.ModelSorter;
 import org.ccloud.model.User;
-import org.ccloud.model.query.CustomerJoinCustomerTypeQuery;
 import org.ccloud.model.query.CustomerQuery;
-import org.ccloud.model.query.CustomerTypeQuery;
-import org.ccloud.model.query.DepartmentQuery;
-import org.ccloud.model.query.SellerCustomerQuery;
 import org.ccloud.model.query.UserJoinCustomerQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.vo.CustomerExcel;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
-import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.wechat.WechatApiConfigInterceptor;
 import org.ccloud.workflow.service.WorkFlowService;
 import org.joda.time.DateTime;
 
-import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.jfinal.aop.Before;
@@ -102,7 +90,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 
 	}
 
-	@RequiresPermissions(value = { "/admin/customer/edit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
+	@RequiresPermissions(value = { "/admin/customer/edit", "/admin/all" }, logical = Logical.OR)
 	public void enable() {
 
 		String id = getPara("id");
@@ -117,9 +105,9 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 	}
 
 	@Override
-	
-	@Before({Tx.class, WechatApiConfigInterceptor.class})
-	@RequiresPermissions(value = { "/admin/customer/edit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
+
+	@Before({ Tx.class, WechatApiConfigInterceptor.class })
+	@RequiresPermissions(value = { "/admin/customer/edit", "/admin/all" }, logical = Logical.OR)
 	public void save() {
 
 		Customer customer = getModel(Customer.class);
@@ -137,8 +125,8 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 
 		customer.setCountryName(areaNameArray[2]);
 		customer.setCountryCode(areaCodeArray[2]);
-		
-		if(!this.checkCustomerNameAndMobile(customer)) {
+
+		if (!this.checkCustomerNameAndMobile(customer)) {
 			renderAjaxResultForError("该客户已存在");
 		}
 
@@ -148,7 +136,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 			customer.set("create_date", new Date());
 			customer.save();
 		} else {
-			
+
 			WorkFlowService workflow = new WorkFlowService();
 			String defKey = getPara("defKey");
 			defKey = "customer_edit";
@@ -161,33 +149,32 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 			var.set("applyer", user.getRealname());
 			@SuppressWarnings("unchecked")
 			String procInstId = workflow.startProcess(customerId, defKey, var);
-			
+
 			customer.setStatus(Customer.CUSTOMER_AUDIT);
 			customer.setProcDefKey(defKey);
 			customer.setProcInstId(procInstId);
 			customer.set("modify_date", new Date());
 			customer.update();
-			
+
 			User tmp = UserQuery.me().findUserByUsername("yly");
 			Kv kv = Kv.create();
-			
+
 			kv.set("touser", tmp.getWechatOpenId());
 			kv.set("templateId", "Rak2cOiujFAdjxx-80z6y2JL4IFwSbKTxP1rkHUBZrI");
 			kv.set("customerName", customer.getCustomerName());
 			kv.set("submit", user.getRealname());
-			
+
 			kv.set("createTime", DateTime.now().toString("yyyy-MM-dd HH:mm"));
 			kv.set("status", "待审核");
-			
+
 			MessageKit.sendMessage(Actions.NotifyMessage.CUSTOMER_AUDIT_MESSAGE, kv);
-			
+
 		}
 
 		renderAjaxResultForSuccess();
 
 	}
-	
-	
+
 	private boolean checkCustomerNameAndMobile(Customer customer) {
 		Integer cnt = CustomerQuery.me().findByNameAndMobile(customer.getCustomerName(), customer.getMobile());
 		if (cnt > 1) {
@@ -196,26 +183,21 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 		return true;
 	}
 
-	@RequiresPermissions(value = { "/admin/customer/uploading", "/admin/dealer/all",
-			"/admin/all" }, logical = Logical.OR)
+	@RequiresPermissions(value = { "/admin/customer/uploading", "/admin/all" }, logical = Logical.OR)
 	public void upload() {
 
 		render("upload.html");
 	}
 
-	@RequiresPermissions(value = { "/admin/customer/uploading", "/admin/dealer/all",
-			"/admin/all" }, logical = Logical.OR)
+	@RequiresPermissions(value = { "/admin/customer/uploading", "/admin/all" }, logical = Logical.OR)
 	public void customerTemplate() {
 		String realPath = getSession().getServletContext().getRealPath("\\");
 		renderFile(new File(realPath + "\\WEB-INF\\admin\\customer\\customerTemplate.xlsx"));
 	}
 
 	@Before(Tx.class)
-	@RequiresPermissions(value = { "/admin/customer/uploading", "/admin/dealer/all",
-			"/admin/all" }, logical = Logical.OR)
+	@RequiresPermissions(value = { "/admin/customer/uploading", "/admin/all" }, logical = Logical.OR)
 	public void uploading() {
-
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
 		File file = getFile().getFile();
 		String userId = getPara("userIds");
@@ -227,7 +209,6 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 			String customerId = StrKit.getRandomUUID();
 
 			this.insertCustomer(customerId, excel);
-			this.insertCustomerJoinCustomerType(customerId, excel, user);
 			this.insertUserJoinCustomer(customerId, userId);
 
 		}
@@ -238,7 +219,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 	private void insertCustomer(String customerId, CustomerExcel excel) {
 		Customer customer = new Customer();
 		customer.set("id", customerId);
-	//	customer.set("customer_code", excel.getCustomerCode());
+		// customer.set("customer_code", excel.getCustomerCode());
 		customer.set("customer_name", excel.getCustomerName());
 		customer.set("contact", excel.getContact());
 		customer.set("mobile", excel.getMobile());
@@ -251,16 +232,6 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 		customer.save();
 	}
 
-	private void insertCustomerJoinCustomerType(String customerId, CustomerExcel excel, User user) {
-
-		String customerTypeName = excel.getCustomerTypeName();
-		String[] customerTypeNames = customerTypeName.split(",");
-		for (String typeName : customerTypeNames) {
-			String id = CustomerTypeQuery.me().findIdByName(typeName,
-					DataAreaUtil.getUserDealerDataArea(user.getDataArea()));
-			//CustomerJoinCustomerTypeQuery.me().insert(customerId, id);
-		}
-	}
 
 	private void insertUserJoinCustomer(String customerId, String userIds) {
 		String[] userIdArray = userIds.split(",");
@@ -270,22 +241,18 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 		}
 	}
 
-	@RequiresPermissions(value = { "/admin/customer/downloading", "/admin/dealer/all",
-			"/admin/all" }, logical = Logical.OR)
+	@RequiresPermissions(value = { "/admin/customer/downloading", "/admin/all" }, logical = Logical.OR)
 	public void download() {
 
 		render("download.html");
 	}
 
-	@RequiresPermissions(value = { "/admin/customer/downloading", "/admin/dealer/all",
-			"/admin/all" }, logical = Logical.OR)
+	@RequiresPermissions(value = { "/admin/customer/downloading", "/admin/all" }, logical = Logical.OR)
 	public void downloading() throws UnsupportedEncodingException {
-		Map<String, String[]> paraMap = getParaMap();
 		String depatName = getPara("parent_name");
 		if (StrKit.notBlank(depatName)) {
 			depatName = StringUtils.urlRedirectToUTF8(depatName);
 		}
-		String depatId = getPara("parent_id");
 
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\customer\\"
 				+ depatName + "客户资料.xlsx";
@@ -298,7 +265,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 
 			CustomerExcel excel = new CustomerExcel();
 			excel.setCustomerName((String) record.get("customer_name"));
-		//	excel.setCustomerCode((String) record.get("customer_code"));
+			// excel.setCustomerCode((String) record.get("customer_code"));
 			excel.setContact((String) record.get("contact"));
 			excel.setMobile((String) record.get("mobile"));
 			excel.setEmail((String) record.get("email"));
@@ -333,47 +300,46 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 		String[] customerIds = getParaValues("dataItem");
 		String[] userIds = getParaValues("userIds");
 		for (String customerId : customerIds) {
-			//UserJoinCustomerQuery.me().deleteByCustomerId(customerId);
+			// UserJoinCustomerQuery.me().deleteByCustomerId(customerId);
 			for (String userId : userIds)
 				this.insertUserJoinCustomer(customerId, userId);
 		}
 
 		renderAjaxResultForSuccess();
 	}
-	
+
 	public void audit() {
-		
+
 		keepPara("taskId");
 		String id = getPara("id");
-		
+
 		Customer customer = CustomerQuery.me().findById(id);
 		setAttr("customer", customer);
-		
+
 		WorkFlowService workflowService = new WorkFlowService();
 		Object _applyer = workflowService.getTaskVariableByTaskId(getPara("taskId"), "applyer");
-		
+
 		String applier = null;
 		if (_applyer != null) {
 			applier = _applyer.toString();
 			setAttr("applier", applier);
 		}
 	}
-	
+
 	public void auditSave() {
-		
+
 		Customer customer = getModel(Customer.class);
-		
+
 		String taskId = getPara("taskId");
 		String comment = getPara("comment");
-		
+
 		WorkFlowService workflowService = new WorkFlowService();
 		workflowService.completeTask(taskId, comment, null);
-		
-		if(customer.saveOrUpdate())
+
+		if (customer.saveOrUpdate())
 			renderAjaxResultForSuccess("客户修改审核成功");
 		else
 			renderAjaxResultForError("客户修改审核失败");
-		
-		
+
 	}
 }
