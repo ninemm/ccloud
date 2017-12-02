@@ -71,11 +71,13 @@ public class SellerProductQuery extends JBaseQuery {
 	}
 
 	public Page<SellerProduct> paginate_sel(int pageNumber, int pageSize,String keyword,String userId) {
-		String select = "SELECT csp.id,csp.product_id,cp.name as productName, csp.custom_name,csp.store_count,csp.price,csp.cost,csp.market_price,csp.is_enable, csp.order_list ,GROUP_CONCAT(distinct cgs.`name`) AS cps_name";
+		String select = "SELECT csp.id,csp.product_id,cgc.name as cgc_name,cp.name as productName, csp.custom_name,csp.store_count,csp.price,cp.big_unit,cp.small_unit,cp.convert_relate,csp.is_enable, csp.order_list ,GROUP_CONCAT(distinct cgs.`name`) AS cps_name";
 		StringBuilder fromBuilder = new StringBuilder("from cc_seller_product csp LEFT JOIN cc_product cp ON  csp.product_id = cp.id LEFT JOIN cc_product_goods_specification_value cpg ON  cp.id = cpg.product_set_id "
 				+ " LEFT JOIN cc_goods_specification_value cgs ON cpg.goods_specification_value_set_id = cgs.id LEFT JOIN cc_product_safe_inventory cpsi on cpsi.product_id=csp.product_id "
 				+ " LEFT JOIN cc_seller cs on cs.id=csp.seller_id"
-				+ " LEFT JOIN user u on u.department_id =cs.dept_id");
+				+ " LEFT JOIN user u on u.department_id =cs.dept_id "
+				+ " LEFT JOIN cc_goods cg on cg.id = cp.goods_id "
+				+ "LEFT JOIN cc_goods_category cgc on cgc.id = cg.goods_category_id");
 		LinkedList<Object> params = new LinkedList<Object>();
 		if(!keyword.equals("")){
 			appendIfNotEmptyWithLike(fromBuilder, "csp.custom_name", keyword, params, true);
