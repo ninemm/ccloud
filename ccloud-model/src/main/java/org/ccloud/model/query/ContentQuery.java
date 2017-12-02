@@ -98,7 +98,7 @@ public class ContentQuery extends JBaseQuery {
 			params.add(month);
 		}
 
-		sql.append(" ORDER BY c.created DESC");
+		sql.append("GROUP BY c.created ORDER BY c.created DESC");
 
 		String select = "select c.*, u.username, u.nickname";
 		if (params.isEmpty()) {
@@ -235,7 +235,7 @@ public class ContentQuery extends JBaseQuery {
 			sql.append(" DATE_FORMAT( c.created, \"%Y-%m\" ) = ?");
 			params.add(month);
 		}
-
+		sql.append("GROUP BY c.created");
 		buildOrderBy(orderBy, sql);
 
 		if (params.isEmpty()) {
@@ -292,7 +292,7 @@ public class ContentQuery extends JBaseQuery {
 		StringBuilder b = new StringBuilder();
 		b.append('(');
 		for (int i = 0;; i++) {
-			b.append(String.valueOf(a[i]));
+			b.append("'"+String.valueOf(a[i])+"'");
 			if (i == iMax)
 				return b.append(')').toString();
 			b.append(", ");
@@ -661,6 +661,14 @@ public class ContentQuery extends JBaseQuery {
 			}
 		}
 		return datas;
+	}
+
+	public long findCountByModuleAndStatus(String module, String status, String sellerId) {
+		return DAO.doFindCount("module = ? and status=? and seller_id=?", module, status,sellerId);
+	}
+
+	public long findCountInNormalByModule(String module, String sellerId) {
+		return DAO.doFindCount("module = ? AND status <> ? AND seller_id=?", module, Content.STATUS_DELETE,sellerId);
 	}
 
 }

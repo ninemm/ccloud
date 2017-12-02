@@ -75,13 +75,13 @@ public class _ContentController extends JBaseCRUDController<Content> {
 
 	@Override
 	public void index() {
-
+		String sellerId = getSessionAttr("sellerId").toString();
 		TplModule module = TemplateManager.me().currentTemplateModule(getModuleName());
 		setAttr("module", module);
-		setAttr("delete_count", ContentQuery.me().findCountByModuleAndStatus(getModuleName(), Content.STATUS_DELETE));
-		setAttr("draft_count", ContentQuery.me().findCountByModuleAndStatus(getModuleName(), Content.STATUS_DRAFT));
-		setAttr("normal_count", ContentQuery.me().findCountByModuleAndStatus(getModuleName(), Content.STATUS_NORMAL));
-		setAttr("count", ContentQuery.me().findCountInNormalByModule(getModuleName()));
+		setAttr("delete_count", ContentQuery.me().findCountByModuleAndStatus(getModuleName(), Content.STATUS_DELETE,sellerId));
+		setAttr("draft_count", ContentQuery.me().findCountByModuleAndStatus(getModuleName(), Content.STATUS_DRAFT,sellerId));
+		setAttr("normal_count", ContentQuery.me().findCountByModuleAndStatus(getModuleName(), Content.STATUS_NORMAL,sellerId));
+		setAttr("count", ContentQuery.me().findCountInNormalByModule(getModuleName(),sellerId));
 
 		setAttr("tids", getPara("tids"));
 		String[] tids = null;
@@ -98,7 +98,7 @@ public class _ContentController extends JBaseCRUDController<Content> {
 		String keyword = getPara("k", "").trim();
 
 		Page<Content> page = null;
-		String sellerId = getSessionAttr("sellerId").toString();
+		
 		if (StringUtils.isNotBlank(getStatus())) {
 			page = ContentQuery.me().paginateBySearch(getPageNumber(), getPageSize(), getModuleName(), keyword,
 					getStatus(), tids, null,sellerId);
