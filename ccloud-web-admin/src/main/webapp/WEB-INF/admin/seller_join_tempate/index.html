@@ -42,13 +42,35 @@
 		$(".jp-left").hide();
 		$(".content").hide();
 		$.ajax({
-				url:"${CPATH}/admin/seller/show_product",
+				url:"${CPATH}/admin/seller/show_sellerName",
 				type:"post",
 				dataType:"json",
 				success:function(data){
+					
 					$.each(data,function(index, item) {
-						var html='<option value="'+item.id+'">'+item.seller_name+'</option>';
-						$("#sellerId").append(html);
+						if(item.seller_type==0){
+							var html ='<option value="'+item.id+'" selected = "selected">'+item.seller_name+'</option>';
+							$("#sellerId").append(html);
+							$('#post-search-input').val("");
+							$("#_sellerJoinTemplate_table").bootstrapTable('destroy');
+							var url = '${CPATH}/admin/sellerJoinTemplate/list?seller_id=' + item.id;
+							jQuery.mm.initEditTable('#_sellerJoinTemplate_table', url, initParams, initFields(), null);
+							$("#search-submit").click(function() {
+								$table.bootstrapTable('refresh');
+							});
+							if(this.value==""){
+								$(".content").hide();
+								$(".jp-left").hide();
+								$(".box").hide();
+							}else{
+								$(".jp-left").show();
+								$(".box").show();
+								$(".content").show();
+							}
+						}else{
+							var Html ='<option value="'+item.id+'">'+item.seller_name+'</option>';
+							$("#sellerId").append(Html);
+						}
 					});
 				}
 			});
@@ -102,7 +124,7 @@
 	var initFieldss = function() {
 		var fields =
 			[
-				{field: "", title: "<input type='checkbox' onclick='checkA(this)' name='data' value=''/>", align: "center", width: '5%',
+				{field: "", title: "<input type='checkbox' onclick='checkA(this)' name='data1' value=''/>", align: "center", width: '5%',
 				formatter: function(value, row, rowIndex) {
 					var strHtml = '<input type="checkbox" name="data" id="data" value="'+row.id+'"/>';
 					return strHtml;
