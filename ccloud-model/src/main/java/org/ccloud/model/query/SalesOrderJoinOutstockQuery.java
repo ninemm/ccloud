@@ -36,10 +36,11 @@ public class SalesOrderJoinOutstockQuery extends JBaseQuery {
 	}
 
 	public boolean insert(String orderId, String outstockId) {
-		DAO.set("id", StrKit.getRandomUUID());
-		DAO.set("order_id", orderId);
-		DAO.set("outstock_id", outstockId);
-		return DAO.save();
+		SalesOrderJoinOutstock joinOutstock = new SalesOrderJoinOutstock();
+		joinOutstock.setId(StrKit.getRandomUUID());
+		joinOutstock.setOrderId(orderId);
+		joinOutstock.setOutstockId(outstockId);
+		return joinOutstock.save();
 	}
 
 	public SalesOrderJoinOutstock findById(final String id) {

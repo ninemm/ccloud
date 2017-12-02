@@ -12,8 +12,28 @@
 
 <#macro script>
 	$(document).ready(function() {
+		var detailList = ${(outstockDetail)!};
 	});
-
+	
+function doSubmit(){
+	console.log(detailList);
+	$form.ajaxSubmit({
+		data:{"detailList": detailList},
+		type : "post", 
+		dataType : "json", 
+		success : function(data) { 
+			if (data.errorCode == 0) {
+				toastr.success(data.message, '操作成功');
+				layer.closeAll();
+			} else {
+				toastr.error(data.message,'操作失败');
+			}
+		},
+		error : function() {
+			alert("信息提交错误");
+		}
+	});
+}
 </#macro>
 
 <@layout>
@@ -31,7 +51,9 @@
 			创建时间：${(outstock.create_date)!}
 			</span>
 		</div>
+		<form action="${CPATH}/admin/salesOutstock/out" method="post" id="form">
 		<table class="table table-striped table-hover table-condensed text-center" >
+		<input type='hidden' value="${(outstock.outstock_sn)!}" name="outstockSn">
 			<thead>
 				<tr>
 					<th>序号</th>
@@ -112,6 +134,11 @@
 				</div>
 			</div>
 		</div>
+		<div class="box-footer" style="padding-left:40%"> 
+			<button type="button" onclick="doSubmit()" class="btn btn-primary ladda-button" data-style="expand-right"><span class="ladda-label">确认出库</span></button>
+			<input type="button" class="btn btn-primary" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
+		</div>		
+		</form>
 	</div>
 </div>	
 </@layout>

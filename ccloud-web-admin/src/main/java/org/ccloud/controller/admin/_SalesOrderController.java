@@ -15,6 +15,7 @@
  */
 package org.ccloud.controller.admin;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -42,6 +43,8 @@ import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
+import com.jfinal.plugin.activerecord.Db;
+import com.jfinal.plugin.activerecord.IAtom;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.tx.Tx;
@@ -73,8 +76,10 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
+		String sellerId = getSessionAttr("sellerId");
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
-		Page<Record> page = SalesOrderQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate);
+		Page<Record> page = SalesOrderQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate, sellerId, dataArea);
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
@@ -112,11 +117,12 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 			String sellProductId = record.getStr("id");
 			String customName = record.getStr("custom_name");
+			String speName = record.getStr("valueName");
 
 			productInfoMap.put(sellProductId, record);
 
 			productOptionMap.put("id", sellProductId);
-			productOptionMap.put("text", customName);
+			productOptionMap.put("text", customName + "/" + speName);
 
 			productOptionList.add(productOptionMap);
 		}
@@ -163,44 +169,61 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 	@Override
 	@Before(Tx.class)
-	public void save() {
+	public synchronized void save() {
 
 		Map<String, String[]> paraMap = getParaMap();
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr("sellerId");
 		String sellerCode = getSessionAttr("sellerCode");
 
-		String orderId = StrKit.getRandomUUID();
-		Date date = new Date();
-
-		// 销售订单：SO + 100000(机构编号或企业编号6位) + A(客户类型) + 171108(时间) + 100001(流水号)
-		String orderSn = "SO" + sellerCode + StringUtils.getArrayFirst(paraMap.get("customerTypeCode"))
-				+ DateUtils.format("yyMMdd", date) + "100001";
-
-		SalesOrderQuery.me().insert(paraMap, orderId, orderSn, sellerId, user.getId(), date, user.getDepartmentId(),
-				user.getDataArea());
-
-		String productNumStr = StringUtils.getArrayFirst(paraMap.get("productNum"));
-		Integer productNum = Integer.valueOf(productNumStr);
-		Integer count = 0;
-		Integer index = 0;
-
-		while (productNum > count) {
-			index++;
-			String productId = StringUtils.getArrayFirst(paraMap.get("productId" + index));
-			if (StrKit.notBlank(productId)) {
-				SalesOrderDetailQuery.me().insert(paraMap, orderId, sellerId, user.getId(), date,
-						user.getDepartmentId(), user.getDataArea(), index);
-
-				count++;
-			}
-
+		if (this.saveOrder(paraMap, user, sellerId, sellerCode)) {
+			renderAjaxResultForSuccess("保存成功");
+		} else {
+			renderAjaxResultForSuccess("库存不足或提交失败");
 		}
-
-		renderAjaxResultForSuccess();
-
 	}
+	
+	private boolean saveOrder(final Map<String, String[]> paraMap, final User user, 
+			final String sellerId, final String sellerCode) {
+        boolean isSave = Db.tx(new IAtom() {
+            @Override
+            public boolean run() throws SQLException {
+        		String productNumStr = StringUtils.getArrayFirst(paraMap.get("productNum"));
+        		Integer productNum = Integer.valueOf(productNumStr);
+        		Integer count = 0;
+        		Integer index = 0;
+        		
+        		String orderId = StrKit.getRandomUUID();
+        		Date date = new Date();
+        		String OrderSO = SalesOrderQuery.me().getNewSn(sellerId);
 
+        		// 销售订单：SO + 100000(机构编号或企业编号6位) + A(客户类型) + 171108(时间) + 100001(流水号)
+        		String orderSn = "SO" + sellerCode + StringUtils.getArrayFirst(paraMap.get("customerTypeCode"))
+        				+ DateUtils.format("yyMMdd", date) + OrderSO;
+
+        		if(!SalesOrderQuery.me().insert(paraMap, orderId, orderSn, sellerId, user.getId(), date, user.getDepartmentId(),
+        				user.getDataArea())) {
+        			return false;
+        		}
+
+        		while (productNum > count) {
+        			index++;
+        			String productId = StringUtils.getArrayFirst(paraMap.get("productId" + index));
+        			if (StrKit.notBlank(productId)) {
+        				if(!SalesOrderDetailQuery.me().insert(paraMap, orderId, sellerId, user.getId(), date,
+        						user.getDepartmentId(), user.getDataArea(), index)) {
+        					return false;
+        				}
+        				count++;
+        			}
+
+        		}
+            	return true;
+            }
+        });
+        return isSave;
+	}
+	
 	@Before(Tx.class)
 	public void pass() {
 
@@ -212,19 +235,19 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		Record order = SalesOrderQuery.me().findMoreById(orderId);
 		List<Record> orderDetailList = SalesOrderDetailQuery.me().findByOrderId(orderId);
 
-		String outstockId = StrKit.getRandomUUID();
 		Date date = new Date();
 
 		String warehouseId = "";
 		String outstockSn = "";
 		for (Record orderDetail : orderDetailList) {
+			String outstockId = StrKit.getRandomUUID();
 			if (!warehouseId.equals(orderDetail.getStr("warehouse_id"))) {
 
 				warehouseId = orderDetail.getStr("warehouse_id");
-
+				String OrderSO = SalesOutstockQuery.me().getNewSn(sellerId);
 				// 销售出库单：SS + 100000(机构编号或企业编号6位) + A(客户类型) + W(仓库编号) + 171108(时间) + 100001(流水号)
 				outstockSn = "SS" + sellerCode + "A" + orderDetail.getStr("warehouseCode")
-						+ DateUtils.format("yyMMdd", date) + "100001";
+						+ DateUtils.format("yyMMdd", date) + OrderSO;
 
 				SalesOutstockQuery.me().insert(outstockId, outstockSn, warehouseId, sellerId, order, date);
 				SalesOrderJoinOutstockQuery.me().insert(orderId, outstockId);
@@ -233,7 +256,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 			SalesOutstockDetailQuery.me().insert(outstockId, orderDetail, date);
 		}
 
-		SalesOrderQuery.me().updateConfirm(orderId, 1000, user.getId(), date);// 已审核通过
+		SalesOrderQuery.me().updateConfirm(orderId, Consts.SALES_ORDER_AUDIT_STATUS_PASS, user.getId(), date);// 已审核通过
 
 		renderAjaxResultForSuccess();
 

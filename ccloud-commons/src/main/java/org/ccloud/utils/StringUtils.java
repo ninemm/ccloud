@@ -169,5 +169,12 @@ public class StringUtils {
 		}
 		return value[0];
 	}
+
+	//截取订单末尾流水号
+	public static String substringSN(String salesOrderSn, String orderSn) {
+		int length = salesOrderSn.length();
+		String SN = orderSn.substring(orderSn.length() - length, orderSn.length());
+		return SN;
+	}
 	
 }

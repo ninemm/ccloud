@@ -79,4 +79,21 @@ public class Consts {
 	public static final String DEPT_HQ_DATAAREA = "001";//珈研部门数据域
 	public static final String DEPT_HQ_DATAAREA_LIKE = "001%";//珈研部门数据域子部门查询条件
 	public static final String DEPT_HQ_LEVEL = "0";//珈研部门等级
+	
+	public static final String SALES_ORDER_SN = "100001";//订单流水每日起始数
+	public static final String SALES_OUT_STOCK_SN = "100001";//出库单单流水每日起始数
+	
+	public static final int SALES_ORDER_AUDIT_STATUS_PASS = 1000;//销售订单审核通过
+	
+	
+	public static final int SALES_ORDER_STATUS_PASS = 1000;//订单已审核
+	public static final int SALES_ORDER_STATUS_DEFAULT = 0;//订单待审核
+	public static final int SALES_ORDER_STATUS_CANCEL= 1001;//订单取消
+	public static final int SALES_ORDER_STATUS_PART_OUT= 2000;//订单部分出库
+	public static final int SALES_ORDER_STATUS_PART_OUT_CLOSE= 2001;//订单部分出库-订单关闭
+	public static final int SALES_ORDER_STATUS_ALL_OUT= 3000;//订单全部出库
+	public static final int SALES_ORDER_STATUS_ALL_OUT_CLOSE= 30001;//订单全部出库-订单关闭
+	
+	public static final int SALES_OUT_STOCK_STATUS_OUT = 1000;//出库单出库
+	public static final int SALES_OUT_STOCK_STATUS_DEFUALT = 0;//出库单待出库
 }

@@ -15,12 +15,15 @@
  */
 package org.ccloud.model.query;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.ccloud.Consts;
 import org.ccloud.model.SalesOrder;
+import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
 
 import com.jfinal.kit.StrKit;
@@ -57,20 +60,22 @@ public class SalesOrderQuery extends JBaseQuery {
 		return Db.findFirst(fromBuilder.toString(), id);
 	}
 
-	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate) {
+	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate, String sellerId, String dataArea) {
 		String select = "select o.*, c.customer_name ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_sales_order` o ");
-		fromBuilder.append(" join cc_customer c on o.customer_id = c.id ");
+		fromBuilder.append("left join cc_customer c on o.customer_id = c.id ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.order_sn", keyword, params, needWhere);
-
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
+		
 		if (needWhere) {
 			fromBuilder.append(" where 1 = 1");
 		}
-
+		
 		if (StrKit.notBlank(startDate)) {
 			fromBuilder.append(" and o.create_date >= ?");
 			params.add(startDate);
@@ -91,14 +96,12 @@ public class SalesOrderQuery extends JBaseQuery {
 
 	public List<Record> findProductListBySeller(String sellerId) {
 		StringBuilder fromBuilder = new StringBuilder(
-				" SELECT sg.id, sg.product_id, sg.custom_name, sg.store_count, sg.price, sg.warehouse_id, GROUP_CONCAT(gsv.name) AS spe_name, p.big_unit, p.small_unit, p.convert_relate ");
-		fromBuilder.append(" FROM cc_seller_product sg ");
-		fromBuilder.append(" LEFT JOIN cc_product p ON sg.product_id = p.id ");
-		fromBuilder
-				.append(" LEFT JOIN cc_product_goods_specification_value pgsv ON sg.product_id = pgsv.product_set_id ");
-		fromBuilder.append(
-				" LEFT JOIN cc_goods_specification_value gsv ON pgsv.goods_specification_value_set_id = gsv.goods_specification_id ");
-		fromBuilder.append(" WHERE sg.is_enable = 1 ");
+				" SELECT sg.id, sg.product_id, sg.custom_name, sg.store_count, sg.price, sg.warehouse_id, t1.valueName, p.big_unit, p.small_unit, p.convert_relate ");
+		fromBuilder.append("FROM cc_seller_product sg ");
+		fromBuilder.append("LEFT JOIN cc_product p ON sg.product_id = p.id ");
+		fromBuilder.append("LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
+		fromBuilder.append("RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = sg.product_id ");
+		fromBuilder.append("WHERE sg.is_enable = 1 ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
 		appendIfNotEmpty(fromBuilder, "sg.seller_id", sellerId, params, false);
@@ -111,16 +114,17 @@ public class SalesOrderQuery extends JBaseQuery {
 
 	public List<Record> findCustomerListByUser(String userId) {
 		StringBuilder fromBuilder = new StringBuilder(
-				" select c.id, c.customer_name, c.contact, c.mobile, c.prov_name, c.city_name, c.country_name, c.address ");
-		fromBuilder.append(" from `cc_customer` c ");
-		fromBuilder.append(" JOIN cc_user_join_customer ujc ON c.id = ujc.customer_id ");
-		fromBuilder.append(" WHERE c.customer_kind = '1' ");
-		fromBuilder.append(" AND c.is_enabled = 1 ");
+				" select cs.id, cc.customer_name, cc.contact, cc.mobile, cc.prov_name, cc.city_name, cc.country_name, cc.address ");
+		fromBuilder.append(" from `cc_seller_customer` cs ");
+		fromBuilder.append(" LEFT JOIN cc_customer cc ON cs.customer_id = cc.id ");
+		fromBuilder.append(" JOIN cc_user_join_customer ujc ON cs.id = ujc.seller_customer_id ");
+//		fromBuilder.append(" WHERE cs.customer_kind = '1' ");
+		fromBuilder.append(" WHERE cs.is_enabled = 1 ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
 		appendIfNotEmpty(fromBuilder, "ujc.user_id", userId, params, false);
 
-		fromBuilder.append(" order by c.create_date ");
+		fromBuilder.append(" order by cc.create_date ");
 
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}
@@ -132,7 +136,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		sqlBuilder.append(" from `cc_customer_join_customer_type` cj ");
 		sqlBuilder.append(" join `cc_customer_type` c on cj.customer_type_id = c.id ");
 		sqlBuilder.append(" where c.is_show = 1 ");
-		appendIfNotEmpty(sqlBuilder, "cj.customer_id", customerId, params, false);
+		appendIfNotEmpty(sqlBuilder, "cj.seller_customer_id", customerId, params, false);
 		appendIfNotEmpty(sqlBuilder, "c.data_area", dataArea, params, false);
 
 		return Db.find(sqlBuilder.toString(), params.toArray());
@@ -140,25 +144,29 @@ public class SalesOrderQuery extends JBaseQuery {
 
 	public boolean insert(Map<String, String[]> paraMap, String orderId, String orderSn, String sellerId, String userId,
 			Date date, String deptId, String dataArea) {
-		DAO.set("id", orderId);
-		DAO.set("order_sn", orderSn);
-		DAO.set("seller_id", sellerId);
-		DAO.set("biz_user_id", userId);
-		DAO.set("customer_id", StringUtils.getArrayFirst(paraMap.get("customerId")));
-		DAO.set("customer_type_id", StringUtils.getArrayFirst(paraMap.get("customerType")));
-		DAO.set("contact", StringUtils.getArrayFirst(paraMap.get("contact")));
-		DAO.set("mobile", StringUtils.getArrayFirst(paraMap.get("mobile")));
-		DAO.set("address", StringUtils.getArrayFirst(paraMap.get("address")));
-		DAO.set("status", 0);// 待审核
-		DAO.set("total_amount", StringUtils.getArrayFirst(paraMap.get("total")));
-		DAO.set("receive_type", StringUtils.getArrayFirst(paraMap.get("receiveType")));
-		DAO.set("delivery_address", StringUtils.getArrayFirst(paraMap.get("deliveryAddress")));
-		DAO.set("delivery_date", StringUtils.getArrayFirst(paraMap.get("deliveryDate")));
-		DAO.set("remark", StringUtils.getArrayFirst(paraMap.get("remark")));
-		DAO.set("create_date", date);
-		DAO.set("dept_id", deptId);
-		DAO.set("data_area", dataArea);
-		return DAO.save();
+		SalesOrder salesOrder = new SalesOrder();
+		salesOrder.setId(orderId);
+		salesOrder.setOrderSn(orderSn);
+		salesOrder.setSellerId(sellerId);		
+		salesOrder.setBizUserId(userId);
+		salesOrder.setCustomerId(StringUtils.getArrayFirst(paraMap.get("customerId")));
+		salesOrder.setCustomerTypeId(StringUtils.getArrayFirst(paraMap.get("customerType")));
+		salesOrder.setContact(StringUtils.getArrayFirst(paraMap.get("contact")));
+		salesOrder.setMobile(StringUtils.getArrayFirst(paraMap.get("mobile")));
+		salesOrder.setAddress(StringUtils.getArrayFirst(paraMap.get("address")));
+		salesOrder.setStatus(0);// 待审核
+		String total = StringUtils.getArrayFirst(paraMap.get("total"));
+		String type = StringUtils.getArrayFirst(paraMap.get("receiveType"));
+		salesOrder.setTotalAmount(StringUtils.isNumeric(total)? new BigDecimal(total) : new BigDecimal(0));
+		salesOrder.setReceiveType(StringUtils.isNumeric(type)? Integer.parseInt(type) : 0);
+		salesOrder.setDeliveryAddress(StringUtils.getArrayFirst(paraMap.get("receiveType")));
+		Date deliveryDate = DateUtils.strToDate(StringUtils.getArrayFirst(paraMap.get("deliveryDate")), DateUtils.DEFAULT_NORMAL_FORMATTER);
+		salesOrder.setDeliveryDate(deliveryDate);
+		salesOrder.setRemark(StringUtils.getArrayFirst(paraMap.get("remark")));
+		salesOrder.setCreateDate(date);
+		salesOrder.setDeptId(deptId);
+		salesOrder.setDataArea(dataArea);
+		return salesOrder.save();
 	}
 
 	public int updateConfirm(String orderId, int status, String userId, Date date) {
@@ -185,6 +193,19 @@ public class SalesOrderQuery extends JBaseQuery {
 	public static String getBillIdBySn(String order_sn) {
 		String sql = "SELECT id FROM cc_sales_order WHERE order_sn='"+order_sn+"'";
 		return Db.queryStr(sql);
+	}
+
+	public String getNewSn(String sellerId) {
+		String sql = "SELECT s.order_sn FROM cc_sales_order s WHERE date(s.create_date) = curdate() AND s.seller_id = ? ORDER BY s.create_date desc";
+		SalesOrder sales = DAO.findFirst(sql, sellerId);
+		String SN = "";
+		if (sales == null || StringUtils.isBlank(sales.getOrderSn())) {
+			SN = Consts.SALES_ORDER_SN;
+		} else {
+			String endSN = StringUtils.substringSN(Consts.SALES_ORDER_SN, sales.getOrderSn());
+			SN = new BigDecimal(endSN).add(new BigDecimal(1)).toString();
+		}
+		return SN;
 	}
 
 }

@@ -15,7 +15,10 @@
  */
 package org.ccloud.model.query;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -55,56 +58,112 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		return Db.find(sqlBuilder.toString(), orderId);
 	}
 
+	@SuppressWarnings("unchecked")
 	public boolean insert(Map<String, String[]> paraMap, String orderId, String sellerId, String userId, Date date,
 			String deptId, String dataArea, int index) {
-
-		DAO.set("id", StrKit.getRandomUUID());
-		DAO.set("order_id", orderId);
-		DAO.set("sell_product_id", StringUtils.getArrayFirst(paraMap.get("sellProductId" + index)));
-
-		String productId = StringUtils.getArrayFirst(paraMap.get("productId" + index));
-		// String warehouseId = this.getWarehouseId(productId, sellerId);TODO
-		// 库存盘点写入库存总账未完成
-		String warehouseId = "1";
-		DAO.set("warehouse_id", warehouseId);
-
+		List<SalesOrderDetail> detailList = new ArrayList<>();
 		String convert = StringUtils.getArrayFirst(paraMap.get("convert" + index));
 		String bigNum = StringUtils.getArrayFirst(paraMap.get("bigNum" + index));
 		String smallNum = StringUtils.getArrayFirst(paraMap.get("smallNum" + index));
-
 		Integer productCount = Integer.valueOf(bigNum) * Integer.valueOf(convert) + Integer.valueOf(smallNum);
+		String productId = StringUtils.getArrayFirst(paraMap.get("productId" + index));
+		Map<String, Object> result = this.getWarehouseId(productId, sellerId, productCount, Integer.parseInt(convert));
+		String status = result.get("status").toString();
+		List<Map<String, String>> list = (List<Map<String, String>>) result.get("countList");
+		
+		if (!status.equals("enough")) {
+			return false;
+		}
+		for (Map<String, String> map : list) {
+			SalesOrderDetail detail = new SalesOrderDetail();
+			detail.setProductCount(Integer.parseInt(map.get("productCount").toString()));
+			// 库存盘点写入库存总账未完成
+			detail.setWarehouseId(map.get("warehouse_id").toString());
+			
+			detail.setId(StrKit.getRandomUUID());
+			detail.setOrderId(orderId);
+			detail.setSellProductId(StringUtils.getArrayFirst(paraMap.get("sellProductId" + index)));
 
-		DAO.set("product_count", productCount);
-		DAO.set("product_price", StringUtils.getArrayFirst(paraMap.get("smallPrice" + index)));
-
-		DAO.set("product_amount", StringUtils.getArrayFirst(paraMap.get("rowTotal" + index)));
-		DAO.set("is_gift", StringUtils.getArrayFirst(paraMap.get("isGift" + index)));
-		DAO.set("create_date", date);
-		DAO.set("dept_id", deptId);
-		DAO.set("data_area", dataArea);
-		return DAO.save();
+			String productPrice = StringUtils.getArrayFirst(paraMap.get("smallPrice" + index));
+			String productAmount = StringUtils.getArrayFirst(paraMap.get("rowTotal" + index));
+			String isGift = StringUtils.getArrayFirst(paraMap.get("isGift" + index));
+			detail.setProductPrice(StringUtils.isNumeric(productPrice)? new BigDecimal(productPrice) : new BigDecimal(0));
+			detail.setProductAmount(StringUtils.isNumeric(productAmount)? new BigDecimal(productAmount) : new BigDecimal(0));
+			detail.setIsGift(StringUtils.isNumeric(isGift)? Integer.parseInt(isGift) : 0);
+			detail.setCreateDate(date);
+			detail.setDeptId(deptId);
+			detail.setDataArea(dataArea);	
+			detailList.add(detail);
+		}
+		Db.batchSave(detailList, detailList.size());
+		
+		return true;
 	}
 	
-	private String getWarehouseId(String sellProductId) {
+	private Map<String, Object> getWarehouseId(String productId, String sellerId, Integer productCount, Integer convert) {
+		Map<String, Object> result = new HashMap<>();
+		List<Map<String, String>> countList = new ArrayList<>();
+		boolean isCheckStore = true;
 
 		StringBuilder defaultSqlBuilder = new StringBuilder(" select i.warehouse_id, i.balance_count ");
 		defaultSqlBuilder.append(" from cc_inventory i ");
-		defaultSqlBuilder.append(" JOIN cc_warehouse w ON i.warehouse_id = w.id ");
+		defaultSqlBuilder.append(" LEFT JOIN cc_warehouse w ON i.warehouse_id = w.id ");
 		defaultSqlBuilder.append(" WHERE w.is_default = 1 ");
-		defaultSqlBuilder.append(" AND i.sell_product_id = ? ");
+		defaultSqlBuilder.append(" AND i.seller_id = ? AND i.product_id = ? ");
 
-		Record defaultRecord = Db.findFirst(defaultSqlBuilder.toString(), sellProductId);
-		Integer defaultCount = defaultRecord.getInt("balance_count");
-		if (defaultCount > 0) {
-			return defaultRecord.getStr("warehouse_id");
+		Record defaultRecord = Db.findFirst(defaultSqlBuilder.toString(), sellerId, productId);
+		Integer defaultCount = defaultRecord.getInt("balance_count") * convert;
+		if (!isCheckStore || (defaultCount >= productCount)) {
+			Map<String, String> map = new HashMap<>();
+			map.put("warehouse_id", defaultRecord.getStr("warehouse_id"));
+			map.put("productCount", productCount.toString());
+			countList.add(map);
+			result.put("status", "enough");
+			result.put("countList", countList);
+			return result;
 		}
-
 		StringBuilder sqlBuilder = new StringBuilder(" select i.warehouse_id, i.balance_count ");
 		sqlBuilder.append(" from cc_inventory i ");
-		sqlBuilder.append(" WHERE i.sell_product_id = ? ");
-		Record record = Db.findFirst(sqlBuilder.toString(), sellProductId);
-
-		return record.getStr("warehouse_id");
+		sqlBuilder.append(" WHERE i.seller_id = ? AND i.product_id = ? AND w.is_default != 1");
+		List<Record> records = Db.find(sqlBuilder.toString(), sellerId, productId);
+		if (defaultCount > 0) {
+			Map<String, String> map = new HashMap<>();
+			map.put("warehouse_id", defaultRecord.getStr("warehouse_id"));
+			map.put("productCount", productCount.toString());
+			countList.add(map);
+		}
+		Integer count = this.findMoreWareHouse(records, countList, productCount - defaultCount, convert);
+		if (count > 0) {
+			result.put("status", "notEnough");
+		} else {
+			result.put("status", "enough");
+		}
+		result.put("countList", countList);
+		return result;
+	}
+	
+	private Integer findMoreWareHouse(List<Record> records, List<Map<String, String>> countList, Integer productCount, Integer convert) {
+		Integer count = productCount;
+		for (Record record : records) {
+			Integer store = record.getInt("balance_count") * convert;
+			if (store >= count) {
+				Map<String, String> map = new HashMap<>();
+				map.put("warehouse_id", record.getStr("warehouse_id"));
+				map.put("productCount", productCount.toString());
+				countList.add(map);
+				count = 0;
+				break;
+			} else {
+				count = count - store;
+				if (store > 0) {
+					Map<String, String> map = new HashMap<>();
+					map.put("warehouse_id", record.getStr("warehouse_id"));
+					map.put("produtCount", store.toString());
+					countList.add(map);
+				}
+			}
+		}
+		return count;
 	}
 
 	public SalesOrderDetail findById(final String id) {

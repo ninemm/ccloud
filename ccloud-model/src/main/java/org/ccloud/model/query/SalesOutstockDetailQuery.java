@@ -42,7 +42,7 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 	public List<Record> findByOutstockId(String outstockId) {
 
 		StringBuilder sqlBuilder = new StringBuilder(
-				" SELECT sod.*, sp.custom_name, p.big_unit, p.small_unit, p.convert_relate");
+				" SELECT sod.*, sp.custom_name, p.big_unit, p.small_unit, p.convert_relate, sp.seller_id, sp.product_id");
 		sqlBuilder.append(" from `cc_sales_outstock_detail` sod ");
 		sqlBuilder.append(" LEFT JOIN cc_seller_product sp ON sod.sell_product_id = sp.id ");
 		sqlBuilder.append(" LEFT JOIN cc_product p ON sp.product_id = p.id ");
@@ -52,21 +52,20 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 	}
 
 	public boolean insert(String outstockId, Record orderDetail, Date date) {
-
-		DAO.set("id", StrKit.getRandomUUID());
-		DAO.set("outstock_id", outstockId);
-		DAO.set("sell_product_id", orderDetail.get("sell_product_id"));
-
-		DAO.set("product_count", orderDetail.get("product_count"));
-		DAO.set("product_price", orderDetail.get("product_price" ));
-		DAO.set("product_amount", orderDetail.get("product_amount" ));
-		DAO.set("is_gift", orderDetail.get("is_gift"));
-
-		DAO.set("order_detail_id", orderDetail.get("id"));
-		DAO.set("create_date", date);
-		DAO.set("dept_id", orderDetail.get("dept_id"));
-		DAO.set("data_area", orderDetail.get("data_area"));
-		return DAO.save();
+		SalesOutstockDetail detail = new SalesOutstockDetail();
+		detail.setId(StrKit.getRandomUUID());
+		detail.setOutstockId(outstockId);
+		detail.setSellProductId(orderDetail.getStr("sell_product_id"));
+		detail.setProductCount(orderDetail.getInt("product_count"));
+		detail.setProductPrice(orderDetail.getBigDecimal("product_price"));
+		detail.setProductAmount(orderDetail.getBigDecimal("product_amount"));
+		detail.setIsGift(orderDetail.getInt("is_gift"));
+		detail.setOrderDetailId(orderDetail.getStr("id"));
+		detail.setCreateDate(date);
+		detail.setDeptId(orderDetail.getStr("dept_id"));
+		detail.setDataArea(orderDetail.getStr("data_area"));
+		
+		return detail.save();
 	}
 
 	public SalesOutstockDetail findById(final String id) {

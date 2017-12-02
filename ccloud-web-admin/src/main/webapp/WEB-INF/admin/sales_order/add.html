@@ -45,8 +45,14 @@
 		},
 		'deliveryDate': {
 			validators: {
+				notEmpty: { message: '配送日期不能为空' },
 				date : { format : 'YYYY-MM-DD', message : '日期格式不正确' }
 			}
+		},
+		'customerId': {
+			validators: {
+				notEmpty: { message: '客户不能为空' },
+			}		
 		}
 	};
 
@@ -131,22 +137,25 @@
 			var $tr = obj.parent().parent().parent();
 
 			$tr.find("#productId").val(product.product_id);
-			$tr.find("#specification").text(product.spe_name);
-			$tr.find("#stock").text(product.store_count);
+			if (product.store_count == null) {
+				$tr.find("#stock").text(0);
+			} else {
+				$tr.find("#stock").text(product.store_count);
+			}
 
 			var convert = product.convert_relate;
 			$tr.find("#convert").val(convert);
 
-			var smallPrice = product.price;
+			var smallPrice = (product.price/convert).toFixed(2);;
 			var smallUnit = product.small_unit;
 
-			var bigPrice = smallPrice*convert;
+			var bigPrice = product.price;
 	
 			$tr.find("#bigPrice").val(bigPrice);
 			$tr.find("#bigPrice-span").text(bigPrice);
 			$tr.find("#bigUnit-span").text(product.big_unit + "(x" + convert + smallUnit + ")");
 			
-			$tr.find("#smallPrice").val(product.price);
+			$tr.find("#smallPrice").val(smallPrice);
 			$tr.find("#smallPrice-span").text(product.price);
 			$tr.find("#smallUnit-span").text(smallUnit);
 			
@@ -281,9 +290,32 @@
 		$("#total").text(total);
 		$("#inputTotal").val(total);
 	}
+	
+	function checkStore() {
+		var store = $(".storeCount");
+		var check = false;
+		if (store.length <= 1) {
+			check = false;
+			return check;
+		}
+		store.each(function(index,element){
+		  	var x = parseInt($(this).html());
+		  	if (x <= 0) {
+				return false;
+		 	}
+	    	if (index == store.length-1) {
+	    		check = true;
+	    	}
+		});
+		return check;	
+	}
 
 	function doSubmit(){
 		$("#productNum").val($(".rowNum").length - 1);
+		if (!checkStore()) {
+			toastr.error('未选择商品或库存不足!','操作失败');
+			return;
+		}
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
 				var validate = $form.data('bootstrapValidator');
@@ -337,7 +369,6 @@
 							<th width="2%"></th>
 							<th width="5%">序号</th>
 							<th width="20%">商品名称</th>
-							<th width="9%">规格</th>
 							<th width="8%">库存</th>
 							<th width="11%">大单位价格</th>
 							<th width="12%">大单位数量</th>
@@ -364,10 +395,7 @@
 							</td>
 							
 							<td>
-								<span id="stock"></span>
-							</td>
-							<td>
-								<span id="specification"></span>
+								<span class="storeCount" id="stock"></span>
 							</td>
 							<td>
 								<input type="hidden" name="convert" id="convert" value="" />
@@ -407,7 +435,7 @@
 							<td>
 								<button class="btn btn-xs btn-info" onclick="addProduct()" ><span class="glyphicon glyphicon-plus"></span></button>
 							</td>
-							<th colspan="9" style="text-align:right">合计:</th>
+							<th colspan="8" style="text-align:right">合计:</th>
 							<th>￥<span id="total">0</span> <input type="hidden" name="total" id="inputTotal" value="0" /></th>
 							<input type="hidden" name="productNum" id="productNum" value="0" />
 						</tr>
