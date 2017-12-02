@@ -242,20 +242,10 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 	}
 
 	@RequiresPermissions(value = { "/admin/customer/downloading", "/admin/all" }, logical = Logical.OR)
-	public void download() {
-
-		render("download.html");
-	}
-
-	@RequiresPermissions(value = { "/admin/customer/downloading", "/admin/all" }, logical = Logical.OR)
 	public void downloading() throws UnsupportedEncodingException {
-		String depatName = getPara("parent_name");
-		if (StrKit.notBlank(depatName)) {
-			depatName = StringUtils.urlRedirectToUTF8(depatName);
-		}
 
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\customer\\"
-				+ depatName + "客户资料.xlsx";
+				+ "customerInfo.xlsx";
 
 		Page<Record> page = CustomerQuery.me().paginate(1, Integer.MAX_VALUE, "");
 		List<Record> customerList = page.getList();
@@ -265,7 +255,6 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 
 			CustomerExcel excel = new CustomerExcel();
 			excel.setCustomerName((String) record.get("customer_name"));
-			// excel.setCustomerCode((String) record.get("customer_code"));
 			excel.setContact((String) record.get("contact"));
 			excel.setMobile((String) record.get("mobile"));
 			excel.setEmail((String) record.get("email"));
@@ -273,7 +262,6 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 			excel.setCityName((String) record.get("city_name"));
 			excel.setCountyName((String) record.get("country_name"));
 			excel.setAddress((String) record.get("address"));
-			excel.setCustomerTypeName((String) record.get("customerTypeNames"));
 
 			excellist.add(excel);
 		}
