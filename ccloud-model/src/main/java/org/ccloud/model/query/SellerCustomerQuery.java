@@ -58,7 +58,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 		return Db.findFirst(fromBuilder.toString(), id);
 	}
 
-	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String dataArea, String deptId) {
+	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String dataArea) {
 
 		boolean needWhere = true;
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -82,7 +82,6 @@ public class SellerCustomerQuery extends JBaseQuery {
 		fromBuilder.append(" JOIN USER u ON ujc.user_id = u.id ");
 
 		appendIfNotEmptyWithLike(fromBuilder, "ujc.data_area", dataArea, params, true);
-		appendIfNotEmpty(fromBuilder, "ujc.dept_id", deptId, params, false);
 		fromBuilder.append(" GROUP BY c2.id) t2 ON sc.id = t2.id ");
 
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "c.customer_name", keyword, params, needWhere);

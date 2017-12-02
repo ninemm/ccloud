@@ -85,15 +85,15 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			keyword = StringUtils.urlDecode(keyword);
 		}
 
-		Page<Record> page = SellerCustomerQuery.me().paginate(getPageNumber(), getPageSize(), keyword, selectDataArea,
-				"");
+		Page<Record> page = SellerCustomerQuery.me().paginate(getPageNumber(), getPageSize(), keyword, selectDataArea);
 		List<Record> customerList = page.getList();
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", customerList);
 		renderJson(map);
 	}
 
-	@RequiresPermissions(value = { "/admin/sellerCustomer/edit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
+	@RequiresPermissions(value = { "/admin/sellerCustomer/edit", "/admin/dealer/all",
+			"/admin/all" }, logical = Logical.OR)
 	public void edit() {
 		String id = getPara("id");
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
@@ -126,7 +126,8 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 
 	}
 
-	@RequiresPermissions(value = { "/admin/sellerCustomer/edit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
+	@RequiresPermissions(value = { "/admin/sellerCustomer/edit", "/admin/dealer/all",
+			"/admin/all" }, logical = Logical.OR)
 	public void enable() {
 
 		String id = getPara("id");
@@ -141,7 +142,8 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 	}
 
 	@Before(Tx.class)
-	@RequiresPermissions(value = { "/admin/sellerCustomer/edit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
+	@RequiresPermissions(value = { "/admin/sellerCustomer/edit", "/admin/dealer/all",
+			"/admin/all" }, logical = Logical.OR)
 	public void save() {
 
 		String sellerId = getSessionAttr("sellerId");
@@ -260,13 +262,12 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			"/admin/all" }, logical = Logical.OR)
 	public void downloading() throws UnsupportedEncodingException {
 
-		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		String depatId = getPara("parent_id");
+		String dataArea = getPara("data_area");
 
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\seller_customer\\"
 				+ "customerInfo.xlsx";
 
-		Page<Record> page = SellerCustomerQuery.me().paginate(1, Integer.MAX_VALUE, "", dataArea, depatId);
+		Page<Record> page = SellerCustomerQuery.me().paginate(1, Integer.MAX_VALUE, "", dataArea + "%");
 		List<Record> customerList = page.getList();
 
 		List<CustomerExcel> excellist = Lists.newArrayList();
@@ -297,6 +298,12 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			out.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				out.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 
 		renderFile(new File(filePath));
@@ -320,6 +327,8 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 	@RequiresPermissions(value = { "/admin/sellerCustomer/uploading", "/admin/dealer/all",
 			"/admin/all" }, logical = Logical.OR)
 	public void uploading() {
+		int inCnt = 0;
+		int existCnt = 0;
 
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr("sellerId");
@@ -348,6 +357,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 				customer.set("create_date", new Date());
 				customer.save();
 			} else {
+				customerId = customer.getId();
 				// 检查客户是否存在我销售商的客户中
 				sellerCustomerId = SellerCustomerQuery.me().findsellerCustomerBycusId(customerId, dataArea);
 			}
@@ -364,14 +374,19 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 				sellerCustomer.set("customer_kind", 100401);
 				sellerCustomer.set("nickname", excel.getNickname());
 				sellerCustomer.save();
+				inCnt++;
+			} else {
+				existCnt++;
 			}
 
+			UserJoinCustomerQuery.me().deleteBySelerCustomerId(sellerCustomerId);
 			this.insertUserJoinCustomer(sellerCustomerId, userId);
+			CustomerJoinCustomerTypeQuery.me().deleteBySellerCustomerId(sellerCustomerId);
 			this.insertCustomerJoinCustomerType(sellerCustomerId, excel, user);
 
 		}
 
-		renderAjaxResultForSuccess();
+		renderAjaxResultForSuccess("成功导入客户" + inCnt + "个,已存在客户" + existCnt + "个");
 	}
 
 	private void setCustomer(Customer customer, CustomerExcel excel) {
@@ -392,6 +407,9 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		for (String typeName : customerTypeNames) {
 			String id = CustomerTypeQuery.me().findIdByName(typeName,
 					DataAreaUtil.getUserDealerDataArea(user.getDataArea()));
+			if (StrKit.isBlank(id)) {
+				renderAjaxResultForError("你还没有创建这个客户类型：" + typeName + ", 请确认");
+			}
 			CustomerJoinCustomerTypeQuery.me().insert(sellerCustomerId, id);
 		}
 	}
