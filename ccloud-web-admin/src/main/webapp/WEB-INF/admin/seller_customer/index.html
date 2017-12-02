@@ -59,7 +59,7 @@
 					edit:false
 				},
 				{field: "customer_name", title: "客户名称", align: "center", width: '8%', edit:false},
-				{field: "customer_code", title: "客户编码", align: "center", width: '5%', edit: false},
+				{field: "nickname", title: "客户昵称", align: "center", width: '5%', edit: false},
 				{field: "contact", title: "联系人", align: "center", width: '5%', edit: false},
 				{field: "mobile", title: "手机号", align: "center", width: '5%', edit: false},
 				{field: "adr", title: "地址", align: "center", width: '15%',
@@ -163,7 +163,7 @@
 		
 		<div class="row content-row">
 			<div class="jp-left">
-				<@shiro.hasPermission name="/admin/customer/batchSetUser, /admin/dealer/all, /admin/all"> 
+				<@shiro.hasPermission name="/admin/sellerCustomer/batchSetUser, /admin/dealer/all, /admin/all"> 
 					<label class="control-label">批量操作:</label>
 					<button class="btn btn-sm btn-default" type="button" onclick="batchAction('setUser')"> 设置负责人 </button>
 				</@shiro.hasPermission>

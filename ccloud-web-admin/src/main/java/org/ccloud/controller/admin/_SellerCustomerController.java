@@ -70,9 +70,11 @@ import cn.afterturn.easypoi.excel.entity.ImportParams;
 @RouterNotAllowConvert
 public class _SellerCustomerController extends JBaseCRUDController<SellerCustomer> {
 
+	@RequiresPermissions(value = { "/admin/sellerCustomer", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void index() {
 	}
 
+	@RequiresPermissions(value = { "/admin/sellerCustomer", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void list() {
 
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
@@ -91,6 +93,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		renderJson(map);
 	}
 
+	@RequiresPermissions(value = { "/admin/sellerCustomer/edit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void edit() {
 		String id = getPara("id");
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
@@ -123,6 +126,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 
 	}
 
+	@RequiresPermissions(value = { "/admin/sellerCustomer/edit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void enable() {
 
 		String id = getPara("id");
@@ -137,6 +141,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 	}
 
 	@Before(Tx.class)
+	@RequiresPermissions(value = { "/admin/sellerCustomer/edit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void save() {
 
 		String sellerId = getSessionAttr("sellerId");
@@ -244,7 +249,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		setAttr("treeData", JSON.toJSON(treeData));
 	}
 
-	@RequiresPermissions(value = { "/admin/customer/downloading", "/admin/dealer/all",
+	@RequiresPermissions(value = { "/admin/sellerCustomer/downloading", "/admin/dealer/all",
 			"/admin/all" }, logical = Logical.OR)
 	public void download() {
 

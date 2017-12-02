@@ -200,7 +200,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				sellerCustomer.set("is_enabled", 1);
 				sellerCustomer.set("is_archive", 1);
 				sellerCustomer.set("customer_type_ids", 7);
-				sellerCustomer.set("customer_kind", 2);
+				sellerCustomer.set("customer_kind", 100402);
 				sellerCustomer.set("status", 0);
 				sellerCustomer.set("data_area", department2.getDataArea());
 				sellerCustomer.set("dept_id", user.getDepartmentId());
@@ -317,26 +317,24 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 	}
 	
 	public void change(){
-		String id = getPara("id");
-		int isEnable =Integer.parseInt(getPara("is_enable"));
-		if(isEnable == 1){
-			isEnable = 0;
-		}else{
-			isEnable = 1;
-		}
+		String id = getPara("sellerProductId");
+		boolean flang=false;
 		SellerProduct sellerProducts = SellerProductQuery.me().findById(id);
-		sellerProducts.set("is_enable", isEnable);
+		if(sellerProducts.getIsEnable() == 1){
+			sellerProducts.set("is_enable",0);
+		}else{
+			sellerProducts.set("is_enable",1);
+		}
+		
+		
 		if(sellerProducts!=null){
 			sellerProducts.set("modify_date", new Date());
-			sellerProducts.update();
+			flang=sellerProducts.update();
 		}
-		setAttr("sellerId", sellerProducts.getSellerId());
-		render("show_product.html");
+		renderJson(flang);
 	}
 	
 	public void addProduct(){
-			String sellerId = getPara("sellerId");
-			setAttr("sellerId", sellerId);
 			render("add_product.html");
 	}
 	
@@ -413,6 +411,12 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		seller.set("modify_date", new Date());
 		flang=seller.update();
 		renderJson(flang);
+	}
+	
+	public void show_sellerName(){
+		User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
+		List<Seller> list = SellerQuery.me().findAllByUserId(user.getId());
+		renderJson(list);
 	}
 }
 

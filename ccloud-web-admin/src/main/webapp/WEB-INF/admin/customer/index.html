@@ -77,12 +77,16 @@
 				{field: "action", title: "操作", align: "center", width: '20%',
 					formatter: function(value, row, rowIndex) {
 						var url = '${CPATH}/admin/customer/edit?id=' + row.id + '&c=${c}&p=${p}';
-						var strHtml = '<a href="' + url + '" class="btn btn-sm" title="编辑"><i class="fa fa-edit"></i></a> ';
+						var strHtml = '<@shiro.hasPermission name="/admin/all"> ';
+						strHtml = strHtml + '<a href="' + url + '" class="btn btn-sm" title="编辑"><i class="fa fa-edit"></i></a> ';
 						if(row.is_enabled == 1){
 							strHtml = strHtml + '<a href="javascript:void(0);" class="btn btn-sm" onclick="enable(\''+row.id+'\'' + ',0' + ')" title="停用"><i class="fa fa-ban"></i></a>';
 						} else {
 							strHtml = strHtml + '<a href="javascript:void(0);" class="btn btn-sm" onclick="enable(\''+row.id+'\'' + ',1' + ')" title="启用"><i class="fa fa-check-circle-o"></i></a>';
 						}
+
+						strHtml = strHtml + '</@shiro.hasPermission> ';
+
 						return strHtml;
 						
 					},
@@ -154,17 +158,9 @@
 		</div>
 		
 		<div class="row content-row">
-			<div class="jp-left">
-				<@shiro.hasPermission name="/admin/sellercustomer/batchSetUser, /admin/dealer/all, /admin/all"> 
-					<label class="control-label">批量操作:</label>
-					<button class="btn btn-sm btn-default" type="button" onclick="batchAction('setUser')"> 设置负责人 </button>
-				</@shiro.hasPermission>
-			</div>
-			
 			<div class="jp-right">
 				<@shiro.hasPermission name="/admin/all"> 
-					<a href="${CPATH}/admin/customer/upload?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-upload"></i> 导入</a>
-					<a href="${CPATH}/admin/customer/download?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-download"></i> 导出</a>
+					<a href="${CPATH}/admin/customer/downloading?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-download"></i> 导出</a>
 					<a href="${CPATH}/admin/customer/edit?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-plus"></i> 新增 </a>
 				</@shiro.hasPermission>
 			</div>
