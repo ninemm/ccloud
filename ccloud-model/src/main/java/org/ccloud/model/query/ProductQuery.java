@@ -165,7 +165,7 @@ public class ProductQuery extends JBaseQuery {
 	}
 	
 	public Page<Product> paginate_pro(int pageNumber, int pageSize,String keyword, String orderby) {
-		String select = "SELECT cp.id,cp.cost,cp.market_price,cp.name,cp.price, GROUP_CONCAT(cgs.`name`) as cps_name ";
+		String select = "SELECT cp.id,cp.big_unit,cp.small_unit,cp.convert_relate,cp.cost,cp.market_price,cp.name,cp.price, GROUP_CONCAT(cgs.`name`) as cps_name ";
 		StringBuilder fromBuilder = new StringBuilder("FROM cc_product cp LEFT JOIN cc_product_goods_specification_value cpg ON cp.id = cpg.product_set_id LEFT JOIN cc_goods_specification_value cgs ON cpg.goods_specification_value_set_id=cgs.id ");
 		
 		LinkedList<Object> params = new LinkedList<Object>();
