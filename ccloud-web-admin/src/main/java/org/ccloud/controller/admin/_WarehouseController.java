@@ -16,9 +16,7 @@
 package org.ccloud.controller.admin;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,23 +24,18 @@ import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
-import org.ccloud.model.Department;
-import org.ccloud.model.ModelSorter;
 import org.ccloud.model.User;
 import org.ccloud.model.UserJoinWarehouse;
 import org.ccloud.model.Warehouse;
 import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.UserJoinWarehouseQuery;
-import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.query.WarehouseQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
 
 import com.alibaba.fastjson.JSON;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
@@ -57,7 +50,6 @@ import com.jfinal.plugin.activerecord.Page;
 public class _WarehouseController extends JBaseCRUDController<Warehouse> { 
 
 	public void list() {
-
 		String keyword = getPara("k");
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
@@ -70,15 +62,19 @@ public class _WarehouseController extends JBaseCRUDController<Warehouse> {
 		renderJson(map);
 	}
 	
-	
+	//删除仓库  删除UserJoinWarehouse
 	public void delete() {
 		Db.tx(new IAtom() {
 		    @Override
 		    public boolean run() throws SQLException {
 		    		String warehouse_id = getPara("id");
-				int count = WarehouseQuery.me().deleteWarehouseId(warehouse_id);
-		    		int deleteWarehouseId = UserJoinWarehouseQuery.me().deleteWarehouseId(warehouse_id);
-		    		if (!(count>0&&deleteWarehouseId>0)) {
+				int deleteWarehouse = WarehouseQuery.me().deleteWarehouseId(warehouse_id);
+				if (!(deleteWarehouse>0)) {
+		    			renderAjaxResultForError("删除失败!");
+		    			return false;
+				}
+		    		int deleteUserJoinWarehouse = UserJoinWarehouseQuery.me().deleteWarehouseId(warehouse_id);
+		    		if (!(deleteUserJoinWarehouse>0)) {
 		    			renderAjaxResultForError("删除失败!");
 		    			return false;
 				}
@@ -86,7 +82,6 @@ public class _WarehouseController extends JBaseCRUDController<Warehouse> {
 		        return true;                	
 		    }
 		});
-
 	}
 	
 	@Before(UCodeInterceptor.class)

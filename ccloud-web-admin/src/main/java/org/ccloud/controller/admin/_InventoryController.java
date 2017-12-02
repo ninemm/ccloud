@@ -54,7 +54,6 @@ public class _InventoryController extends JBaseCRUDController<Inventory> {
 		String product_sn = getPara("product_sn");
 		String product_name = getPara("product_name");
 		String seller_id=getSessionAttr("sellerId").toString();
-//		String specification = getPara("specification");
 		
 		Page<Inventory> page = InventoryQuery.me().paginate(getPageNumber(), getPageSize(),product_sn,product_name,warehouse_id,seller_id);
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());

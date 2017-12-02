@@ -31,7 +31,6 @@ import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.model.ProductComposition;
-import org.ccloud.model.Seller;
 import org.ccloud.model.SellerProduct;
 import org.ccloud.model.query.ProductCompositionQuery;
 import org.ccloud.model.query.SellerProductQuery;
@@ -218,15 +217,11 @@ public class _ProductCompositionController extends JBaseCRUDController<ProductCo
 	}	
 	
 	public void getProductInfo() {
-		List<Seller> sellerList = getSessionAttr("sellerList");
-		if (sellerList.size() > 0) {
-			String sellerId = sellerList.get(0).getId();
+		String sellerId = getSessionAttr("sellerId");
+		if (StringUtils.isNotBlank(sellerId)) {
 			List<SellerProduct> list = SellerProductQuery.me().findBySellerId(sellerId);
 			renderJson(list);
 		}
-//		String sellerId = "4e9de81102104e5db5149dfefd904d6c";
-//		List<SellerProduct> list = SellerProductQuery.me().findBySellerId(sellerId);
-//		renderJson(list);		
 	}
 	
 }

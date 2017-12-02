@@ -79,14 +79,14 @@ public class PurchaseRefundOutstockDetailQuery extends JBaseQuery {
 		sqlBuilder.append(" LEFT JOIN cc_product_goods_specification_value cpg ON  cprod.seller_product_id = cpg.product_set_id ");
 		sqlBuilder.append(" LEFT JOIN cc_goods_specification_value cgs ON cpg.goods_specification_value_set_id = cgs.id ");
 		sqlBuilder.append(" LEFT JOIN cc_product cp on cp.id= cprod.seller_product_id  ");
-		sqlBuilder.append(" where cprod.purchase_refund_outstock_id=? and cprod.data_area="+dataArea+" GROUP BY cprod.id ");
+		sqlBuilder.append(" where cprod.purchase_refund_outstock_id=? and cprod.data_area='"+dataArea+"' GROUP BY cprod.id ");
 
 		return Db.find(sqlBuilder.toString(), refundId);
 	}
 	
 	public List<PurchaseRefundOutstockDetail> findAllByPurchaseRefundId(String purchaseRefundOutstockId,String dataArea){
 		String sql = "select prod.* ,pro.outstock_sn,pro.warehouse_id from cc_purchase_refund_outstock_detail prod "
-				+ " LEFT JOIN cc_purchase_refund_outstock pro on pro.id = prod.purchase_refund_outstock_id where pro.id = ? and pro.data_area="+dataArea;
+				+ " LEFT JOIN cc_purchase_refund_outstock pro on pro.id = prod.purchase_refund_outstock_id where pro.id = ? and pro.data_area='"+dataArea+"' ";
 		return DAO.find(sql, purchaseRefundOutstockId);
 	}
 	

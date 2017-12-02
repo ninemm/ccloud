@@ -85,7 +85,7 @@ public class PurchaseInstockQuery extends JBaseQuery {
 	}
 	
 	public int findByUserId(String userId,String dataArea){
-		String sql = "select * from cc_purchase_instock where input_user_id ='"+userId+"' and data_area ="+dataArea;
+		String sql = "select * from cc_purchase_instock where input_user_id ='"+userId+"' and data_area ='"+dataArea+"' ";
 		return DAO.find(sql).size();
 	}
 	
@@ -95,7 +95,7 @@ public class PurchaseInstockQuery extends JBaseQuery {
 		fromBuilder.append(" from cc_purchase_instock cpi ");
 		fromBuilder.append(" LEFT JOIN cc_supplier cs on cs.id= cpi.supplier_id ");
 		fromBuilder.append(" left join user u on cpi.biz_user_id = u.id ");
-		fromBuilder.append(" where cpi.id = ? and cpi.data_area="+dataArea+" GROUP BY cpi.id");
+		fromBuilder.append(" where cpi.id = ? and cpi.data_area='"+dataArea+"' GROUP BY cpi.id");
 
 		return Db.findFirst(fromBuilder.toString(), id);
 	}
