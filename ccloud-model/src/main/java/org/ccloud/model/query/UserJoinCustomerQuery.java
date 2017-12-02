@@ -75,6 +75,10 @@ public class UserJoinCustomerQuery extends JBaseQuery {
 	public int deleteBySelerCustomerId(String sellerCustomerId) {
 		return DAO.doDelete("seller_customer_id = ?", sellerCustomerId);
 	}
+	
+	public int deleteBySelerCustomerIdAndUserId(String sellerCustomerId, String userId) {
+		return DAO.doDelete("seller_customer_id = ? AND user_id = ?", sellerCustomerId,userId);
+	}
 
 	public boolean insert(String customerId, String userId, String deptId, String dataArea) {
 		UserJoinCustomer userJoinCustomer = new UserJoinCustomer();

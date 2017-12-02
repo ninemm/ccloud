@@ -201,8 +201,16 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			ccType.save();
 		}
 
-		UserJoinCustomerQuery.me().deleteBySelerCustomerId(sellerCustomerId);
 		String _userIds = getPara("userIds");
+
+		if (StrKit.isBlank(_userIds)) {// 业务员修改时
+			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+			UserJoinCustomerQuery.me().deleteBySelerCustomerIdAndUserId(sellerCustomerId, user.getId());
+			_userIds = user.getId();
+		} else {
+			UserJoinCustomerQuery.me().deleteBySelerCustomerId(sellerCustomerId);
+		}
+
 		String[] userIdArray = _userIds.split(",");
 
 		for (String userId : userIdArray) {
@@ -390,7 +398,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			UserJoinCustomerQuery.me().insert(sellerCustomerId, id, user.getDepartmentId(), user.getDataArea());
 		}
 	}
-	
+
 	@Before(Tx.class)
 	@RequiresPermissions(value = { "/admin/sellerCustomer/batchSetUser", "/admin/dealer/all",
 			"/admin/all" }, logical = Logical.OR)
