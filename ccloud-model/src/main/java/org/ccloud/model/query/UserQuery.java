@@ -88,6 +88,24 @@ public class UserQuery extends JBaseQuery {
 			}
 		});
 	}
+	
+	public User findByWechatOpenid(final String openid) {
+		return DAO.getCache(openid, new IDataLoader() {
+			@Override
+			public Object load() {
+				return DAO.doFindFirst("wechat_open_id = ? AND status = 1", openid);
+			}
+		});
+	}
+	
+	public User findByMobile(final String mobile) {
+		return DAO.getCache(mobile, new IDataLoader() {
+			@Override
+			public Object load() {
+				return DAO.doFindFirst("mobile = ? AND status = 1", mobile);
+			}
+		});
+	}
 
 	public List<User> findByDeptId(String deptId) {
 		return DAO.doFind("department_id = ?", deptId);
