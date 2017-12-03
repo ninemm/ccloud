@@ -40,9 +40,9 @@ public class WechatUserInterceptor implements Interceptor {
 	public void intercept(Invocation inv) {
 
 		Controller controller = inv.getController();
-
+		
 		String userJson = inv.getController().getSessionAttr(Consts.SESSION_WECHAT_USER);
-
+//		System.err.println("userJson = " + userJson);
 		if (StringUtils.isNotBlank(userJson)) {
 			inv.invoke();
 			return;
