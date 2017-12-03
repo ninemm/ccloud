@@ -139,6 +139,11 @@ a {
   position: relative;
 }
 
+.weui-navbar__item.weui-bar__item--on {
+  color: #35b8f0;
+  background: #fff;
+}
+
 .blue {
   color: #35b8f0!important;
 }
@@ -385,7 +390,7 @@ a {
   margin-left: -40%;
   height: 2rem;
   top: 20%;
-  border: 1px solid #000;
+  border: 1px solid #bbb;
 }
 
 .pop-button {
@@ -409,10 +414,12 @@ a {
 
 /* 首页 */
 
-#home {
+#home, #product, #customer, #statistics, #my {
   font-size: 0.7rem;
-  height: 100%;
-  position: relative;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  bottom: 50px;
 }
 
 #home .weui-grid,
@@ -481,18 +488,7 @@ a {
   margin-left: 1.25rem;
 }
 
-.message {
-  height: 100%;
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-
 /* 产品页 */
-
-#product {
-  font-size: 0.7rem;
-}
 #product .product_bUnit,
 #product .product_mUnit{
   width: 80%;
@@ -1065,7 +1061,6 @@ input[name=sex] {
 #my {
   overflow: auto;
   -webkit-overflow-scrolling: touch;
-  height: 100%;
 }
 
 #my header {
@@ -1389,6 +1384,14 @@ input[name=input-type] {
 }
 #visit-record-audit img{
   width: 2.5rem;
+}
+
+/* 消息列表 */
+#informationList main{
+  padding-bottom: 0;
+}
+#informationList .weui-cells {
+  margin-top: 0;
 }
 /* 媒体查询 */
 

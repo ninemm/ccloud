@@ -1,0 +1,92 @@
+<#include "_inc/_layout.html"/> <#macro css> </#macro> 
+<#macro css_import>
+<link type='text/css' rel="stylesheet" href="${CTPATH}/css/slider.css">
+</#macro>
+
+<#macro script_import>
+<script type='text/javascript' src="${CTPATH}/js/slider.js"></script>
+</#macro>
+
+<#macro script>
+    $(function() {
+        var gotCode = 0;
+        $(document).on("input", "#phone", function () {
+            if ($("#phone").val().length === 11) {
+                $("#get-code").addClass("can-get");
+            } else {
+		        if ($("#get-code").text() === "获取验证码") {
+		            $("#get-code").removeClass("can-get");
+		        }
+		        $(".stage").hide();
+            }
+            
+            $(this).next().show();
+	        if (($("#phone").val().length === 0)) {
+	            $(this).next().hide();
+	        };
+	        
+        }).on("touchstart", ".can-get", function () {
+            
+            if (/^1[34578]\d{9}$/.test($("#phone").val())) {
+                $("#get-code").removeClass("can-get");
+                $(".stage").show();
+                gotCode = 1;
+            } else {
+                $.toast("请输入正确的手机号", "text");
+            }
+            
+        }).on("input", "#code", function () {
+            
+            if ($("#code").val().length === 6 && gotCode) {
+                $("#bind").addClass("can-bind");
+            } else {
+                $("#bind").removeClass("can-bind");
+            }
+            
+            $(this).next().show();
+            if (($("#code").val().length === 0)) {
+                $(this).next().hide();
+            }
+            
+        }).on("touchstart", ".icon-times-circle", function() {
+            $(this).prev().val("");
+            $(this).hide();
+        });
+    }); 
+</#macro>
+
+<@layout>
+<header>
+	<img src="${CTPATH}/images/avatar.png" alt="">
+</header>
+<main>
+	<div id="nickname">小苗</div>
+	<div class="input-area">
+		<div>
+			<i class="icon-mobile"></i> 
+			<input type="tel" name="phone" id="phone" maxlength="11" placeholder="手机号">
+			<i class="icon-times-circle"></i>
+			<div id="get-code">获取验证码</div>
+		</div>
+		<div>
+			<i class="icon-lock"></i>
+			<input type="tel" name="" id="code" placeholder="验证码" maxlength="6">
+			<i class="icon-times-circle"></i>
+		</div>
+	</div>
+	<div class="stage">
+		<div class="slider" id="slider">
+			<div class="label">向右滑动验证</div>
+			<div class="track" id="track">
+				<div class="bg-green"></div>
+			</div>
+			<div class="button" id="btn">
+				<div class="icon" id="icon">>></div>
+				<div class="spinner" id="spinner"></div>
+			</div>
+		</div>
+	</div>
+	<div id="bind">绑定微信号</div>
+</main>
+
+</@layout>

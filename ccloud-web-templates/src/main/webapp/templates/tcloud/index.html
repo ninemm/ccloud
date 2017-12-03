@@ -1,204 +1,126 @@
-<#include "_inc/_layout.html"/> 
-<#macro css> </#macro> 
-<#macro script>
-	$(function() {
-	$("#tab1").addClass("weui-bar__item--on").siblings().removeClass("weui-bar__item--on");
-	});
-</#macro> 
-
-
-<@layout>
-<div class="weui-tab">
-	<div class="weui-tab__bd">
-		<div id="tab1" class="weui-tab__bd-item weui-tab__bd-item--active">
-			<article id="home">
-				<div>
-					<div class="weui-cells__title">
-						<div class="weui-flex">
-							<div class="weui-flex__item" style="color:#ff9800">
-								<b>快捷入口</b>
-							</div>
-							<div class="weui-flex__item t-r">
-								<b>国庆</b>
-							</div>
-							<div class="weui-flex__item t-r" style="flex-grow:2;">2017-10-18 星期五</div>
-						</div>
+<#include "_inc/_layout.html"/> <#macro css> </#macro> <#macro script>
+$(function() { }); </#macro> <@layout>
+<div class="weui-content">
+	<article id="home">
+		<div>
+			<div class="weui-cells__title">
+				<div class="weui-flex">
+					<div class="weui-flex__item" style="color: #ff9800">
+						<b>快捷入口</b>
 					</div>
-					<div class="weui-grids">
-						<a class="weui-grid js_grid" name="placeOrder">
-							<span class="weui-badge empty-badge">&nbsp;</span>
-							<div class="weui-grid__icon">
-								<i class="icon-file-text blue"></i>
-							</div>
-							<p class="weui-grid__label">
-								下订单
-							</p>
-						</a>
-						<a href="visitAdd.html" class="weui-grid js_grid">
-							<div class="weui-grid__icon">
-								<i class="icon-plane" style="color:#ffa042"></i>
-							</div>
-							<p class="weui-grid__label">
-								新增拜访
-							</p>
-						</a>
-						<a href="" class="weui-grid js_grid">
-							<div class="weui-grid__icon">
-								<i class="icon-tasks" style="color:#19c594;"></i>
-							</div>
-							<p class="weui-grid__label">
-								活动申请
-							</p>
-						</a>
-						<a href="customerAdd.html" class="weui-grid js_grid">
-							<span class="weui-badge left-top-tag">NEW</span>
-							<div class="weui-grid__icon">
-								<i class="icon-user-plus" style="color:#f1745e"></i>
-							</div>
-							<p class="weui-grid__label">
-								新增客户
-							</p>
-						</a>
+					<div class="weui-flex__item t-r">
+						<b>国庆</b>
 					</div>
+					<div class="weui-flex__item t-r" style="flex-grow: 2;">2017-10-18
+						星期五</div>
 				</div>
-				<div>
-					<div class="weui-cells__title" style="color:#ff9800">
-						<b>我的待办</b>
+			</div>
+			<div class="weui-grids">
+				<a href="./product.html" class="weui-grid js_grid"> <span
+					class="weui-badge empty-badge">&nbsp;</span>
+					<div class="weui-grid__icon">
+						<i class="icon-file-text blue"></i>
 					</div>
-					<div class="weui-grids">
-						<a href="customerAudit.html" class="weui-grid js_grid">
-							<span class="weui-badge empty-badge">&nbsp;</span>
-							<div class="weui-grid__icon">
-								<i class="icon-user" style="color:#9c89b9"></i>
-							</div>
-							<p class="weui-grid__label">
-								客户审核
-							</p>
-						</a>
-						<a href="feeAuditList.html" class="weui-grid js_grid">
-							<span class="weui-badge empty-badge">&nbsp;</span>
-							<div class="weui-grid__icon">
-								<i class="icon-check-square-o" style="color:#19c594"></i>
-							</div>
-							<p class="weui-grid__label">
-								费用审核
-							</p>
-						</a>
-						<a href="visitAuditList.html" class="weui-grid js_grid">
-							<div class="weui-grid__icon">
-								<i class="icon-suitcase" style="color:#f7b55d;"></i>
-							</div>
-							<p class="weui-grid__label">
-								拜访审核
-							</p>
-						</a>
-						<a href="" class="weui-grid js_grid">
-							<div class="weui-grid__icon">
-								<i class="icon-suitcase" style="color:#f7b55d;"></i>
-							</div>
-							<p class="weui-grid__label">
-								订单审核
-							</p>
-						</a>
+					<p class="weui-grid__label">下订单</p>
+				</a> <a href="visitAdd.html" class="weui-grid js_grid">
+					<div class="weui-grid__icon">
+						<i class="icon-plane" style="color: #ffa042"></i>
 					</div>
-				</div>
-				<div style="height:26%">
-					<div class="weui-cells__title weui-cell_access weui-cell">
-						<div class="weui-cell__bd">
-							业务消息
-							<p class="menu">订单</p>
-							<p class="menu">客户</p>
-							<p class="menu">费用</p>
-						</div>
-						<span class="weui-cell__ft"></span>
+					<p class="weui-grid__label">新增拜访</p>
+				</a> <a href="" class="weui-grid js_grid">
+					<div class="weui-grid__icon">
+						<i class="icon-tasks" style="color: #19c594;"></i>
 					</div>
-					<div class="weui-cells message">
-						<div class="weui-cell">
-							<div class="weui-cell__bd">
-								<span>[小张烤鱼]</span>
-							</div>
-							<div class="check-pass">
-								审核通过
-							</div>
-							<div class="weui-cell__ft">2017-10-15 12:00</div>
-						</div>
-						<div class="weui-cell">
-							<div class="weui-cell__bd">
-								<p>[张妈妈副食]</p>
-							</div>
-							<div class="check-pass">
-								审核通过
-							</div>
-							<div class="weui-cell__ft">2017-10-15 12:13</div>
-						</div>
-						<div class="weui-cell">
-							<div class="weui-cell__bd">
-								<p>[咏梅副食]</p>
-							</div>
-							<div class="check-refuse">
-								审核拒绝
-							</div>
-							<div class="weui-cell__ft">2017-10-15 12:22</div>
-						</div>
-						<div class="weui-cell">
-							<div class="weui-cell__bd">
-								<p>[武大烟酒副食]</p>
-							</div>
-							<div class="check-refuse">
-								审核拒绝
-							</div>
-							<div class="weui-cell__ft">2017-10-15 12:22</div>
-						</div>
-						<div class="weui-cell">
-							<div class="weui-cell__bd">
-								<span>[小张烤鱼]</span>
-							</div>
-							<div class="check-pass">
-								审核通过
-							</div>
-							<div class="weui-cell__ft">2017-10-15 12:00</div>
-						</div>
-						<div class="weui-cell">
-							<div class="weui-cell__bd">
-								<p>[张妈妈副食]</p>
-							</div>
-							<div class="check-pass">
-								审核通过
-							</div>
-							<div class="weui-cell__ft">2017-10-15 12:13</div>
-						</div>
-						<div class="weui-cell">
-							<div class="weui-cell__bd">
-								<p>[咏梅副食]</p>
-							</div>
-							<div class="check-refuse">
-								审核拒绝
-							</div>
-							<div class="weui-cell__ft">2017-10-15 12:22</div>
-						</div>
-						<div class="weui-cell">
-							<div class="weui-cell__bd">
-								<p>[武大烟酒副食]</p>
-							</div>
-							<div class="check-refuse">
-								审核拒绝
-							</div>
-							<div class="weui-cell__ft">2017-10-15 12:22</div>
-						</div>
+					<p class="weui-grid__label">活动申请</p>
+				</a> <a href="customerAdd.html" class="weui-grid js_grid"> <span
+					class="weui-badge left-top-tag">NEW</span>
+					<div class="weui-grid__icon">
+						<i class="icon-user-plus" style="color: #f1745e"></i>
 					</div>
-				</div>
-				<footer class="weui-footer weui-footer_fixed-bottom ft12">
-					<div>
-						<i class="icon-map-pin"></i>&nbsp; 湖北省武汉市洪山区汉街2406
-					</div>
-					<div class="blue">
-						智能营销&nbsp;
-						<i class="icon-angle-right"></i>
-					</div>
-				</footer>
-			</article>
+					<p class="weui-grid__label">新增客户</p>
+				</a>
+			</div>
 		</div>
-	</div>
+		<div>
+			<div class="weui-cells__title" style="color: #ff9800">
+				<b>我的待办</b>
+			</div>
+			<div class="weui-grids">
+				<a href="customerAudit.html" class="weui-grid js_grid"> <span
+					class="weui-badge empty-badge">&nbsp;</span>
+					<div class="weui-grid__icon">
+						<i class="icon-user" style="color: #9c89b9"></i>
+					</div>
+					<p class="weui-grid__label">客户审核</p>
+				</a> <a href="feeAuditList.html" class="weui-grid js_grid"> <span
+					class="weui-badge empty-badge">&nbsp;</span>
+					<div class="weui-grid__icon">
+						<i class="icon-check-square-o" style="color: #19c594"></i>
+					</div>
+					<p class="weui-grid__label">费用审核</p>
+				</a> <a href="visitAuditList.html" class="weui-grid js_grid">
+					<div class="weui-grid__icon">
+						<i class="icon-suitcase" style="color: #f7b55d;"></i>
+					</div>
+					<p class="weui-grid__label">拜访审核</p>
+				</a> <a href="" class="weui-grid js_grid">
+					<div class="weui-grid__icon">
+						<i class="icon-suitcase" style="color: #f7b55d;"></i>
+					</div>
+					<p class="weui-grid__label">订单审核</p>
+				</a>
+			</div>
+		</div>
+		<div>
+			<a class="weui-cells__title weui-cell_access weui-cell"
+				href="./informationList.html">
+				<div class="weui-cell__bd">
+					业务消息
+					<p class="menu">订单</p>
+					<p class="menu">客户</p>
+					<p class="menu">费用</p>
+				</div> <span class="weui-cell__ft"></span>
+			</a>
+			<div class="weui-cells">
+				<div class="weui-cell">
+					<div class="weui-cell__bd">
+						<span>[小张烤鱼]</span>
+					</div>
+					<div class="check-pass">审核通过</div>
+					<div class="weui-cell__ft">2017-10-15 12:00</div>
+				</div>
+				<div class="weui-cell">
+					<div class="weui-cell__bd">
+						<p>[张妈妈副食]</p>
+					</div>
+					<div class="check-pass">审核通过</div>
+					<div class="weui-cell__ft">2017-10-15 12:13</div>
+				</div>
+				<div class="weui-cell">
+					<div class="weui-cell__bd">
+						<p>[咏梅副食]</p>
+					</div>
+					<div class="check-refuse">审核拒绝</div>
+					<div class="weui-cell__ft">2017-10-15 12:22</div>
+				</div>
+				<div class="weui-cell">
+					<div class="weui-cell__bd">
+						<p>[武大烟酒副食]</p>
+					</div>
+					<div class="check-refuse">审核拒绝</div>
+					<div class="weui-cell__ft">2017-10-15 12:22</div>
+				</div>
+			</div>
+		</div>
+		<footer class="weui-footer weui-footer_fixed-bottom ft12">
+			<div>
+				<i class="icon-map-pin"></i>&nbsp; 湖北省武汉市洪山区汉街2406
+			</div>
+			<div class="blue">
+				智能营销&nbsp; <i class="icon-angle-right"></i>
+			</div>
+		</footer>
+	</article> 
 	<#include "_inc/_footer_nav.html" />
 </div>
 </@layout>
