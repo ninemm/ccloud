@@ -15,6 +15,7 @@
  */
 package org.ccloud.controller.admin;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -55,11 +56,8 @@ public class _PurchaseOrderDetailController extends JBaseCRUDController<Purchase
 	@Override
 	public void index() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		if (user == null ) {
-			// TODO
-		}
-		
-		List<Product> productlist = ProductQuery.me().findAllByUserId(user.getId(),user.getDataArea());
+		String supplierId = getPara("supplierId");
+		List<Product> productlist = ProductQuery.me().findAllByUser(user.getId(),user.getDataArea(),supplierId);
 		
 		Map<String, Object> productInfoMap = new HashMap<String, Object>();
 		List<Map<String, String>> productOptionList = new ArrayList<Map<String, String>>();
@@ -79,30 +77,13 @@ public class _PurchaseOrderDetailController extends JBaseCRUDController<Purchase
 			productOptionList.add(productOptionMap);
 		}
 		
-		List<Supplier> suppliers = SupplierQuery.me().findAll();
+		Supplier supplier = SupplierQuery.me().findById(supplierId);
 		
-		Map<String, Object> supplierInfoMap = new HashMap<String, Object>();
-		List<Map<String, String>> supplierOptionList = new ArrayList<Map<String, String>>();
-		
-		for (Supplier record : suppliers) {
-			Map<String, String> supplierOptionMap = new HashMap<String, String>();
-			
-			String id = record.getStr("id");
-			String name = record.getStr("name");
-			
-			supplierInfoMap.put(id, record);
-			
-			supplierOptionMap.put("id", id);
-			supplierOptionMap.put("text", name);
-			
-			supplierOptionList.add(supplierOptionMap);
-		}
 		
 		setAttr("productInfoMap", JSON.toJSON(productInfoMap));
 		setAttr("productOptionList", JSON.toJSON(productOptionList));
 		
-		setAttr("supplierInfoMap", JSON.toJSON(supplierInfoMap));
-		setAttr("supplierOptionList", JSON.toJSON(supplierOptionList));
+		setAttr("supplierInfoMap", JSON.toJSON(supplier));
 		
 		setAttr("deliveryDate", DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
 		
@@ -172,7 +153,7 @@ public class _PurchaseOrderDetailController extends JBaseCRUDController<Purchase
 			int big =product.getConvertRelate();
 			if (StrKit.notBlank(productId)) {
 				String Id2 = StrKit.getRandomUUID();
-				int rowTotal=((Integer.parseInt(StringUtils.getArrayFirst(paraMap.get("smallNum"+ index)))+Integer.parseInt(StringUtils.getArrayFirst(paraMap.get("bigNum"+ index)))*big))*Integer.parseInt(StringUtils.getArrayFirst(paraMap.get("smallPrice"+ index)));
+				String rowTotal=StringUtils.getArrayFirst(paraMap.get("inputRowTotal"+ index));
 				purchaseOrderDetail.set("id", Id2);
 				purchaseOrderDetail.set("purchase_order_id", Id);
 				purchaseOrderDetail.set("product_id", productId);
@@ -191,5 +172,9 @@ public class _PurchaseOrderDetailController extends JBaseCRUDController<Purchase
 		}
 		renderAjaxResultForSuccess();
 
+	}
+	public void show_supplier(){
+		List<Supplier> suppliers = SupplierQuery.me().findAll();
+		renderJson(suppliers);
 	}
 }
