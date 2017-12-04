@@ -43,7 +43,7 @@ public class PaymentQuery extends JBaseQuery {
 		});
 	}
 	public Page<Payment> findByDetailId(int pageNumber, int pageSize,String detailId,String dataArea, String orderby) {
-		String select = "select cc_p.*,u.realname ";
+		String select = "select cc_p.*,u.realname,(select realname from user where id = cc_p.input_user_id) input_user ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_payment` cc_p left join user u on cc_p.pay_user_id = u.id ");
 		fromBuilder.append("where payables_detail_id = '"+detailId+"' ");
 		LinkedList<Object> params = new LinkedList<Object>();
