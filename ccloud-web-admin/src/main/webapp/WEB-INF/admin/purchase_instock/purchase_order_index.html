@@ -62,9 +62,9 @@
 		var fields =
 			[
 				{field: "id", title: "ID", align: "center", visible:false, edit:false},
-				{field: "", title: "采购单号/创建时间", align: "center", width: '10%',
+				{field: "", title: "采购单号", align: "center", width: '10%',
 					formatter: function(value, row, rowIndex) {
-						return row.porder_sn + '<br>' + row.create_date;
+						return row.porder_sn;
 					},
 					edit: false
 				},
@@ -83,6 +83,12 @@
 					edit: false
 				},
 				{field: "status", title: "状态", align: "center", width: '5%',edit: false},
+				{field: "", title: "创建时间", align: "center", width: '10%',
+					formatter: function(value, row, rowIndex) {
+						return row.create_date;
+					},
+					edit: false
+				},
 				{field: "action", title: "操作", align: "center", width: '15%',
 				formatter: function(value, row, rowIndex) {
 					var strHtml ='<a class="label label-table label-info" onclick="parent.orderDetail(\''+row.id+'\')" >详细</a> ';
