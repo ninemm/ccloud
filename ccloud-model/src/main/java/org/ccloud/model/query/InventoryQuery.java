@@ -74,7 +74,7 @@ public class InventoryQuery extends JBaseQuery {
 	}
 	
 	public List<Record> getWareHouseInfo(String userId) {
-		StringBuilder fromBuilder = new StringBuilder("select w.id,w.code,w.name from  cc_warehouse w,cc_user_join_warehouse uw where w.id =uw.warehouse_id and uw.user_id=?");
+		StringBuilder fromBuilder = new StringBuilder("select w.id,w.code,w.name from  cc_warehouse w,cc_user_join_warehouse uw where w.id =uw.warehouse_id and uw.user_id=? and w.is_enabled=1");
 		List<Record> list = Db.find(fromBuilder.toString(),userId);
 		return list;
 	}

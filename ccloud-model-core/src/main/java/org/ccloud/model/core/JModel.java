@@ -177,9 +177,11 @@ public class JModel<M extends JModel<M>> extends Model<M> {
 		if (null == get(getPrimaryKey())) {
 			set("id", StrKit.getRandomUUID());
 //			set("create_date", new Date());
+			set("created", new Date());
 			return this.save();
 		}
 //		set("modify_date", new Date());
+		set("modified", new Date());
 		return this.update();
 	}
 

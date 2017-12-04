@@ -94,7 +94,7 @@ public class WarehouseQuery extends JBaseQuery {
 	}
 
 	public List<Warehouse> findWarehouseByUserId(String userId) {
-		String sql = "select w.* from  cc_warehouse w,cc_user_join_warehouse uw where w.id =uw.warehouse_id and uw.user_id=?";
+		String sql = "select w.* from  cc_warehouse w,cc_user_join_warehouse uw where w.id =uw.warehouse_id and uw.user_id=? and w.is_enabled=1";
 		return DAO.find(sql, userId);
 	}
 
