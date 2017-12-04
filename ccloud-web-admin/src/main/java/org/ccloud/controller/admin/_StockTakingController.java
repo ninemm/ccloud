@@ -78,6 +78,7 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 	}
 
 	public void edit() {
+		//判断当前是新增  还是  修改
 		String id = getPara("id");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String userId = user.getId();

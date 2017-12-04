@@ -77,7 +77,7 @@ function initProduct(){
 			$.each(productList, function(idx, item) {
 				var option = {
 					id: item.productList.productId,
-					text: item.productList.name
+					text: item.productList.name + item.productList.specificationValue
 				}
 				productOptionArr.push(option);
 				productMap[item.productList.productId] = item;
