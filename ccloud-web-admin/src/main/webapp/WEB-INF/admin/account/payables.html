@@ -75,6 +75,7 @@
     var initFields = function() {
         var fields =
         [
+            {field: "customer_no", title: "客户编号", align: "center", width: '10%', edit:false},
             {field: "customer_name", title: "客户", align: "center", width: '8%', edit:false},
             {field: "customer_type", title: "客户类型", align: "center", width: '8%', edit:false},
             {field: "pay_amount", title: "应付总额(元)", align: "center", width: '10%',
@@ -130,7 +131,6 @@
         {field: "modify_date", title: "最后一次付款", align: "center", width: '15%', edit: false},
         {field: "action", title: "操作", align: "center", width: '10%',
         formatter: function(value, row, rowIndex) {
-            var url = '${CPATH}/admin/account/paymentInfo?refSn=' + row.ref_sn ;
             var strHtml = '<a href="javascript:void(0);" class="btn btn-xs btn-primary btn-flat" title="查看支付记录" onclick="getPaymentInfo(\''+row.id+'\')">查看记录</a> ';
             return strHtml;
         },
@@ -150,7 +150,9 @@
                 },edit: false
             },
             {field: "realname", title: "付款人", align: "center", width: '5%', edit: false},
-            {field: "biz_date", title: "付款时间", align: "center", width: '15%', edit: false}
+            {field: "biz_date", title: "付款时间", align: "center", width: '15%', edit: false},
+            {field: "input_user", title: "录入人", align: "center", width: '5%', edit: false},
+            {field: "remark", title: "备注", align: "center", width: '10%', edit: false}
         ];
         return fields;
     }
