@@ -23,7 +23,13 @@
 			<span class="pull-left">
 			单号：${(order.porder_sn)!}
 			</br>
-			状态：${(order.status)!} 
+			状态：<#if order.status ==0>待审核</#if> <#if order.status ==1000>已审核</#if> 
+			<#if order.status ==2000>部分入库</#if> 
+			<#if order.status ==2001>部分入库-订单关闭</#if> 
+			<#if order.status ==3000>全部入库 </#if> 
+			<#if order.status ==3001>全部入库-订单关闭</#if> 
+			<#if order.status ==1001>订单取消</#if> 
+			<#if order.status ==4000>订单关闭</#if> 
 			</span>
 			<span class="pull-right">
 			下单人员：${(order.biz_user)!}/ ${(order.userMobile)!} 
