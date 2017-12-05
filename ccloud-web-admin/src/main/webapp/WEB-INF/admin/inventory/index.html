@@ -31,7 +31,6 @@
 	function initWareHouse(){
 		$.ajax({
 			url: "${CPATH}/admin/inventory/getWarehouse",
-			//url: "${CPATH}/admin/goods/getSpValue",
 			async: false,
 			success: function(data) {
 				
@@ -102,20 +101,19 @@
 	var initParams = function(params){
 		var product_sn = encodeURIComponent($("input[name='product_sn']").val());
 		var product_name = encodeURIComponent($("input[name='product_name']").val());
-		var specification = encodeURIComponent($("input[name='specification']").val());
+		//var specification = encodeURIComponent($("input[name='specification']").val());
 		
 		var param = {
 			'size': params.limit,
 			'page': params.offset/params.limit + 1,
 			'product_sn': product_sn,
 			'product_name': product_name,
-			'warehouse_id': warehouse_id,
-			'specification': specification
+			'warehouse_id': warehouse_id
 		}
 		return param;
 	};
 	
-	/*
+
 	$(function() {
 
 		var url = '${CPATH}/admin/warehouse/list';
@@ -198,7 +196,7 @@
 		jQuery.mm.batchAction('#form', '请选择供应商记录');
 	}
     
-    */
+
 </#macro>
 
 <@layout active_id=p child_active_id=c>

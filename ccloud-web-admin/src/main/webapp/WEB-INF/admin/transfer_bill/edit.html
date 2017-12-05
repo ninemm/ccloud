@@ -156,7 +156,7 @@ function addTr(tid, productList, optionArr) {
      var cspecification = result.specificationValue;
      var cbig_unit = firstProduct.weightUnit;
      var $tr = $(this).parent().parent();
-     $tr.find("td>#goodsCode").val(cgoodsCode);
+     $tr.find("td>#goodsCode").val(cproductId);
      $tr.find("td>#goodsName").html(cgoodsName); 
      $tr.find("td>#specification").text(cspecification);
      $tr.find("td>#big_unit").text(cbig_unit);
