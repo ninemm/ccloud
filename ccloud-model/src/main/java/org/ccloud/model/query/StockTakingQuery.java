@@ -53,6 +53,7 @@ public class StockTakingQuery extends JBaseQuery {
 		StringBuilder fromBuilder = new StringBuilder("from `cc_stock_taking`  c ");
 		fromBuilder.append("INNER JOIN cc_warehouse w on c.warehouse_id = w.id ");
 		fromBuilder.append("INNER JOIN `user`  u on c.input_user_id = u.id ");
+		fromBuilder.append("INNER JOIN `cc_user_join_warehouse`  uw on uw.user_id = u.id ");
 		fromBuilder.append("where c.seller_id='"+seller_id+"'");
 		LinkedList<Object> params = new LinkedList<Object>();
 		appendIfNotEmptyWithLike(fromBuilder, "w.name", keyword, params, true);
