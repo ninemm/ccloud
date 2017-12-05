@@ -15,6 +15,7 @@
  */
 package org.ccloud.controller.admin;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -53,10 +54,17 @@ public class _InventoryController extends JBaseCRUDController<Inventory> {
 		String warehouse_id = getPara("warehouse_id");
 		String product_sn = getPara("product_sn");
 		String product_name = getPara("product_name");
-		String seller_id=getSessionAttr("sellerId").toString();
+		String seller_id= getSessionAttr("sellerId").toString();
 		
-		Page<Inventory> page = InventoryQuery.me().paginate(getPageNumber(), getPageSize(),product_sn,product_name,warehouse_id,seller_id);
-		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
+		// Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, Object> map;
+		if(seller_id == null) {
+			map = new HashMap<String, Object>();
+		}else {
+			Page<Inventory> page = InventoryQuery.me().paginate(getPageNumber(), getPageSize(),product_sn,product_name,warehouse_id,seller_id);
+			map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
+		}
+		
 		renderJson(map);
 	}
 	
