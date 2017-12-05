@@ -47,14 +47,19 @@
 	var initFields = function() {
 		var fields =
 			[	
-				{field: "", title: "", align: "center", width: '1%',
+				{field: "", title: "<input type='checkbox' onclick='checkAll(this)' name='dataItem1' value=''/>", align: "center", width: '1%',
 				formatter: function(value, row, rowIndex) {
-					var strHtml = '<input type="hidden" name="dataItem" id="dataItem" value="'+row.id+'"/>';
+					var strHtml = '<input type="checkbox" name="dataItem" id="dataItem" value="'+row.id+'"/>';
 					return strHtml;
 				},
 				edit:false
 				},
-				{field: "order_list", title: "排序", align: "center", width: '5%', edit: false}, 
+				{field: "order_list", title: "排序", align: "center", width: '5%',
+					formatter : function(value,row,rowIndex){
+						var strHtml = '<input class="form-control input-sm" style="margin-left:30%;" type="number" id="order_list" name="order_list" value="'+row.order_list+'"  min="0" >';
+						return strHtml;
+					},
+				 edit: false}, 
       			{field: "id", title: "ID", align: "center", visible:false, edit:false},
       			{field: "productName", title: "产品名称", align: "center", width: '10%',edit:false},
       			{field: "cgc_name", title: "产品类别", align: "center", width: '5%',edit:false},
@@ -90,7 +95,13 @@
 					return strHtml;
 				},
       			 edit:false},
-   				  
+   				{field: "", title: "", align: "center", width: '1%',
+				formatter: function(value, row, rowIndex) {
+					var strHtml = '<input type="hidden" name="is_enable" id="is_enable" value="'+row.id+'"/>';
+					return strHtml;
+				},
+				edit:false
+				},
 				{field: "action", title: "操作", align: "center", width: '5%',
 				formatter: function(value, row, rowIndex) {
 					if(row.is_enable == 0){
@@ -98,17 +109,13 @@
 					}else{
 					  var strHtml = '<a onclick="change(\''+row.id+'\')" class="btn btn-xs btn-danger btn-flat">下架</a>';
 					}
+					//strHtml += '&nbsp;<a onclick="del(\''+row.id+'\')" class="btn btn-xs btn-danger btn-flat">删除</a>'
 					return strHtml;
 				},
 				edit:false
 				}
    			];
    		return fields;
-	}
-	
-	function refresh(){
-		$('#post-search-input').val("");
-		$table.bootstrapTable('refresh');
 	}
 	
 	function getA(){
@@ -135,6 +142,7 @@
 		 	}
 		  	var obj = {
 								"Id":  $(this).find('td').eq(0).find("input").val(),
+								"order_list": $(this).find('td').eq(1).find("input").val(),
 								"custom_name": $(this).find('td').eq(4).find("input").val(),
 								"price": $(this).find('td').eq(7).find("input[name='bigPrice']").val(),
 							};
@@ -160,6 +168,15 @@
 		}
 	}
 	
+	function del(id){
+		jQuery.mm.del('${CPATH}/admin/seller/deleteProduct?ucode=${ucode}&id=' + id);
+	}
+	
+	function refresh(){
+		$('#post-search-input').val("");
+		$table.bootstrapTable('refresh');
+	}
+	
 	function change(id){
 			$.ajax({
 				url:"${CPATH}/admin/seller/change",
@@ -183,7 +200,81 @@
 		var smallprice=($(obj).val()/$(obj).parent().parent().find("td").eq(8).html()).toFixed(2);
 		$(obj).parent().parent().find("td").eq(9).find("input[name='smallPrice']").val(smallprice);
 	}
-
+	
+	function upIsenable(){
+		var orderItems = new Array();
+		 var flang = true;
+		 var checklist = $('input[name="dataItem"]:checked').parent().parent();
+		 if(checklist.length == 0){
+			alert("未选中任何数据!");
+			flang=false;
+			return;		 
+		 }
+		 $('input[name="dataItem"]:checked').parent().parent().each(function(idx, item) {
+		  	var obj = {
+								"id": $(this).find('td').eq(0).find("input").val(),
+								"is_enable": $(this).find('td').eq(11).find("input").val(),
+							};
+							orderItems.push(obj);
+						})
+			if(flang==true){			
+				$.ajax({
+					url:"${CPATH}/admin/seller/changeIsenable",
+					type:"post",
+					dataType:"json",
+					data : {orderItems : JSON.stringify(orderItems)},
+					success:function(data){
+						if(data==true){
+							toastr.success(data.message, '添加成功');
+						}else{
+							toastr.error(data.message, '添加失败');
+						}
+						setTimeout( function(){
+						location.reload();
+								}, 2 * 1000 );
+					}
+				});
+			}
+		
+	}
+	
+	function downIsenable(){
+		var orderItems = new Array();
+		 var flang = true;
+		 var checklist = $('input[name="dataItem"]:checked').parent().parent();
+		 if(checklist.length == 0){
+			alert("未选中任何数据!");
+			flang=false;
+			return;		 
+		 }
+		 $('input[name="dataItem"]:checked').parent().parent().each(function(idx, item) {
+		  	var obj = {
+								"id": $(this).find('td').eq(0).find("input").val(),
+								"is_enable": $(this).find('td').eq(11).find("input").val(),
+							};
+							orderItems.push(obj);
+						})
+			if(flang==true){			
+				$.ajax({
+					url:"${CPATH}/admin/seller/changeIsenable",
+					type:"post",
+					dataType:"json",
+					data : {orderItems : JSON.stringify(orderItems)},
+					success:function(data){
+						if(data==true){
+							toastr.success(data.message, '添加成功');
+						}else{
+							toastr.error(data.message, '添加失败');
+						}
+						setTimeout( function(){
+						location.reload();
+								}, 2 * 1000 );
+					}
+				});
+			}
+		
+	}
+	
 </#macro>
 
 <@layout active_id=p child_active_id=c>
@@ -201,9 +292,10 @@
 	<div class="row content-row">
 		<div class="jp-left">
 			<a onclick="getA()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-plus"></i> 新增 </a>
+			<a onclick="upIsenable()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-check-square-o"></i>批量修改上架 </a>
+			<a onclick="downIsenable()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-check-square-o"></i>批量修改下架 </a>
 			<a onclick="saveAll()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-check-square-o"></i>保存 </a>
-			<a  onclick="refresh()" class="btn btn-sm btn-primary"><i class="fa fa-refresh"></i> 刷新 </a>
-		</div>
+ 		</div>
 		<form class="form-horizontal" style="float: right" action="${CPATH}/admin/seller/showProduct?c=${c!}&p=${p!}" method="post">
 			<div class="input-group input-group-sm">
 				<input id="post-search-input" class="form-control" type="search" value="${k!}" name="k" placeholder="搜索名称">&nbsp; 

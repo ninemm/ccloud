@@ -123,7 +123,20 @@ var initFields = function(){
 		{field: "balance_count", title: "剩余商品数量", align: "center", edit:false},
 		{field: "balance_amount", title: "剩余商品金额", align: "center", edit:false},
 		{field: "balance_price", title: "剩余商品单价", align: "center", edit:false},
-		{field: "biz_type", title: "业务类型", align: "center", edit:false},
+		{field: "biz_type", title: "业务类型", align: "center",
+			formatter: function(value, row, rowIndex) {
+  					if (value == 100209) return '盘亏出库';
+  					if (value == 100208) return '盘盈入库';
+  					if (value == 100207) return '调拨出库';
+  					if (value == 100206) return '调拨单';
+  					if (value == 100205) return '销售退货入库';
+  					if (value == 100204) return '销售出库';
+  					if (value == 100203) return '采购退货出库';
+  					if (value == 100202) return '采购入库';
+  					if (value == 100201) return '库存建账';
+  				},
+  				edit: false
+  			},
 		{field: "realname", title: "业务员", align: "center", edit:false},
 		{field: "biz_bill_sn", title: "业务单号", align: "center", edit:false},
 		{field: "biz_date", title: "业务日期", align: "center", edit:false},

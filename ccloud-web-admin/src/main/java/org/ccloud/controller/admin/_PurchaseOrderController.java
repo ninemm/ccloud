@@ -106,4 +106,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		purchaseOrder.update();
 		renderAjaxResultForSuccess("OK");
 	}
+	
+	
+	
 }

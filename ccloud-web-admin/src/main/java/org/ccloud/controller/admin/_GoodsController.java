@@ -536,7 +536,8 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
 	}
 	
 	public void getProductInfo() {
-		List<ProductInfo> productList = ProductQuery.me().getAllProductInfo();
+		String sellerId = getSessionAttr("sellerId").toString();
+		List<ProductInfo> productList = ProductQuery.me().getAllProductInfoBySellerId(sellerId);
         List<Map<String, Object>> list = new ArrayList<>();
         for (ProductInfo productInfo : productList) {
            Map<String, Object> map = new HashMap<>();

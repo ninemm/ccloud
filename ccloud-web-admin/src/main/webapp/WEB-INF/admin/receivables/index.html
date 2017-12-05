@@ -177,7 +177,7 @@ function getReceivablesDetail(page){
 				var rows = data.rows;
 				for(var i in rows){
 					detailHtml += '<tr><td>'+rows[i].ref_type+'</td><td>'+rows[i].ref_sn+'</td><td>'+rows[i].biz_date+'</td><td>'+rows[i].receive_amount+'</td><td>'+rows[i].act_amount+'</td><td>'+rows[i].balance_amount+'</td><td>'+rows[i].create_date+'</td>';
-					detailHtml += '<td><a href="'+'${CPATH}/admin/receivables/renderlist?ref_sn='+ rows[i].ref_sn +'&ref_type='+rows[i].ref_type+'">收款详情</a></td></tr>';
+					detailHtml += '<td><a class="btn btn-xs btn-primary btn-flat" href="'+'${CPATH}/admin/receivables/renderlist?ref_sn='+ rows[i].ref_sn +'&ref_type='+rows[i].ref_type+'">收款详情</a></td></tr>';
 				}
 				var pageCount = Math.ceil(data.total/size);
 				$("#detail-page-count").html(pageCount);
