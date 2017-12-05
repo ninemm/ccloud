@@ -169,7 +169,7 @@ public class _ContentController extends JBaseCRUDController<Content> {
 		Content c = ContentQuery.me().findById(getPara("id"));
 		if (c != null) {
 			c.setStatus(Content.STATUS_DELETE);
-			c.saveOrUpdateWithoutDate();
+			c.saveOrUpdate();
 			renderAjaxResultForSuccess("success");
 		} else {
 			renderAjaxResultForError("trash error!");
@@ -181,7 +181,7 @@ public class _ContentController extends JBaseCRUDController<Content> {
 		Content c = ContentQuery.me().findById(getPara("id"));
 		if (c != null) {
 			c.setStatus(Content.STATUS_DRAFT);
-			c.saveOrUpdateWithoutDate();
+			c.saveOrUpdate();
 			renderAjaxResultForSuccess("success");
 		} else {
 			renderAjaxResultForError("trash error!");
@@ -217,7 +217,7 @@ public class _ContentController extends JBaseCRUDController<Content> {
 		if (c != null && c.isDelete()) {
 			c.setStatus(Content.STATUS_DRAFT);
 			c.setModified(new Date());
-			c.saveOrUpdateWithoutDate();
+			c.saveOrUpdate();
 			renderAjaxResultForSuccess("success");
 		} else {
 			renderAjaxResultForError("restore error!");
@@ -395,7 +395,7 @@ public class _ContentController extends JBaseCRUDController<Content> {
 					oldContent = ContentQuery.me().findById(content.getId());
 				}
 
-				if (!content.saveOrUpdateWithoutDate()) {
+				if (!content.saveOrUpdate()) {
 					return false;
 				}
 

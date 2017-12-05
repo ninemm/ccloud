@@ -20,6 +20,15 @@ public class ProductInfo {
 	private String categoryName;
 	private String specificationValue;
 	private String productId;
+	private String bigUnit;
+
+	public String getBigUnit() {
+		return bigUnit;
+	}
+
+	public void setBigUnit(String bigUnit) {
+		this.bigUnit = bigUnit;
+	}
 
 	public Date getCreateDate() {
 		return createDate;

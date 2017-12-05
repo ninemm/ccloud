@@ -131,7 +131,7 @@ public class ProductQuery extends JBaseQuery {
 	
 	public List<ProductInfo> getAllProductInfoById(String id) {
  		StringBuilder fromBuilder = new StringBuilder("SELECT p.create_date as createDate,p.id as productId, p.cost, p.is_marketable as isMarketable, p.market_price as marketPrice, p.`name`, p.price, ");
-		fromBuilder.append("p.product_sn as productSn, p.store, p.store_place, p.weight, p.weight_unit as weightUnit, g.`code`, b.`name` as brandName, c.`name` as categoryName, t1.valueName ");
+		fromBuilder.append("p.product_sn as productSn, p.store, p.store_place, p.big_unit as bigUnit, p.weight, p.weight_unit as weightUnit, g.`code`, b.`name` as brandName, c.`name` as categoryName, t1.valueName ");
 		fromBuilder.append("FROM cc_product p ");
 		fromBuilder.append("LEFT JOIN cc_goods g ON p.goods_id = g.id ");
 		fromBuilder.append("LEFT JOIN cc_brand b ON g.brand_id = b.id ");
@@ -143,6 +143,7 @@ public class ProductQuery extends JBaseQuery {
 		List<ProductInfo> plist = new ArrayList<>();
 		for (Record record : list) {
 			ProductInfo pro = new ProductInfo();
+			pro.setBigUnit(record.getStr("bigUnit"));
 			pro.setBrandName(record.getStr("brandName"));
 			pro.setCategoryName(record.getStr("categoryName"));
 			pro.setCode(record.getStr("code"));
@@ -190,6 +191,19 @@ public class ProductQuery extends JBaseQuery {
 		return DAO.find(sql, userId);
 	}
 	
+	public List<Product> findAllByUser(String userId,String dataArea,String supplierId){
+		String sql = "SELECT cp.id AS id,cp.NAME AS name,csp.store_count,cp.big_unit as big_unit, cp.small_unit as small_unit,cp.convert_relate as convert_relate,cp.price AS price,GROUP_CONCAT(DISTINCT cgs.`name`) AS cps_name "
+				+ "FROM	cc_product cp LEFT JOIN cc_product_goods_specification_value cpg ON cp.id = cpg.product_set_id "
+				+ "LEFT JOIN cc_goods_specification_value cgs ON cpg.goods_specification_value_set_id = cgs.id "
+				+ "LEFT JOIN cc_seller_product csp on csp.product_id=cp.id "
+				+ "LEFT JOIN cc_seller cs on cs.id=csp.seller_id "
+				+ "LEFT JOIN `user` u on u.department_id=cs.dept_id "
+				+ "LEFT JOIN cc_goods cg on cg.id=cp.goods_id "
+				+ "LEFT JOIN cc_brand cb on cb.id=cg.brand_id "
+				+ "WHERE u.id=? and cs.seller_type=0 and u.data_area='"+dataArea+"' and cb.supplier_id='"+supplierId+"' GROUP BY cp.id";
+		return DAO.find(sql, userId);
+	}
+	
 	public Product findByPId(String id){
 		return DAO.findById(id);
 	}
@@ -202,5 +216,41 @@ public class ProductQuery extends JBaseQuery {
 				+ "LEFT JOIN `user` u on u.department_id=cs.dept_id "
 				+ "WHERE u.id='"+userId+"' and cp.id='"+productId+"' GROUP BY cp.id";
 		return DAO.findFirst(sql);
+	}
+
+	public List<ProductInfo> getAllProductInfoBySellerId(String sellerId) {
+		StringBuilder fromBuilder = new StringBuilder("SELECT p.create_date as createDate,p.id as productId, p.cost, p.is_marketable as isMarketable, p.market_price as marketPrice, p.`name`, p.price, ");
+		fromBuilder.append("p.product_sn as productSn, p.store, p.store_place,p.big_unit as bigUnit, p.weight, p.weight_unit as weightUnit, g.`code`, b.`name` as brandName, c.`name` as categoryName, t1.valueName ");
+		fromBuilder.append("FROM cc_product p ");
+		fromBuilder.append("LEFT JOIN cc_seller_product sp ON sp.product_id = p.id ");
+		fromBuilder.append("LEFT JOIN cc_goods g ON p.goods_id = g.id ");
+		fromBuilder.append("LEFT JOIN cc_brand b ON g.brand_id = b.id ");
+		fromBuilder.append("LEFT JOIN cc_goods_category c ON g.goods_category_id = c.id ");
+		fromBuilder.append("LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
+		fromBuilder.append("RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = p.id where sp.is_enable=1 and sp.seller_id=?");
+		List<Record> list = Db.find(fromBuilder.toString(),sellerId);	
+		List<ProductInfo> plist = new ArrayList<>();
+		for (Record record : list) {
+			ProductInfo pro = new ProductInfo();
+			pro.setBigUnit(record.getStr("bigUnit"));
+			pro.setBrandName(record.getStr("brandName"));
+			pro.setCategoryName(record.getStr("categoryName"));
+			pro.setCode(record.getStr("code"));
+			pro.setCost(record.getBigDecimal("cost"));
+			pro.setCreateDate(record.getDate("createDate"));
+			pro.setIsMarketable(record.getBoolean("isMarketable"));
+			pro.setMarketPrice(record.getBigDecimal("marketPrice"));
+			pro.setName(record.getStr("name"));
+			pro.setPrice(record.getBigDecimal("price"));
+			pro.setProductSn(record.getStr("productSn"));
+			pro.setStore(record.getStr("store"));
+			pro.setStorePlace(record.getStr("storePlace"));
+			pro.setWeight(record.getStr("weight"));
+			pro.setWeightUnit(record.getStr("weightUnit"));
+			pro.setProductId(record.getStr("productId"));
+			pro.setSpecificationValue(record.getStr("valueName"));
+			plist.add(pro);
+		}
+		return plist;
 	}
 }

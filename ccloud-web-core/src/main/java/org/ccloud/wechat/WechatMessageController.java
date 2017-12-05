@@ -89,10 +89,10 @@ public class WechatMessageController extends MsgController {
 		if (StringUtils.areNotBlank(appId, appSecret)) {
 			ApiResult result = WechatApi.getOpenId(appId, appSecret, code);
 			if (result != null) {
-//				System.err.println(result.getJson());
+				System.err.println(result.getJson());
 				getRequest().getSession().setAttribute(Consts.SESSION_WECHAT_USER, result.getJson());
 				//setSessionAttr(Consts.SESSION_WECHAT_USER, result.getJson());
-				//this.setSessionAttr(Consts.SESSION_WECHAT_USER, result.getJson());
+				this.setSessionAttr(Consts.SESSION_WECHAT_USER, result.getJson());
 			}
 		}
 

@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.ccloud.Consts;
 import org.ccloud.model.SalesOrder;
+import org.ccloud.model.SalesOrderDetail;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
 
@@ -52,7 +53,8 @@ public class SalesOrderQuery extends JBaseQuery {
 	public Record findMoreById(final String id) {
 		StringBuilder fromBuilder = new StringBuilder(" select o.*,c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, u.realname, u.mobile ");
 		fromBuilder.append(" from `cc_sales_order` o ");
-		fromBuilder.append(" left join cc_customer c on o.customer_id = c.id ");
+		fromBuilder.append(" left join cc_seller_customer cc ON o.customer_id = cc.id ");
+		fromBuilder.append(" left join cc_customer c on cc.customer_id = c.id ");
 		fromBuilder.append(" left join cc_customer_type ct on o.customer_type_id = ct.id ");
 		fromBuilder.append(" left join user u on o.biz_user_id = u.id ");
 		fromBuilder.append(" where o.id = ? ");
@@ -63,8 +65,8 @@ public class SalesOrderQuery extends JBaseQuery {
 	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate, String sellerId, String dataArea) {
 		String select = "select o.*, c.customer_name ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_sales_order` o ");
-		fromBuilder.append("left join cc_customer c on o.customer_id = c.id ");
-
+		fromBuilder.append("left join cc_seller_customer cc ON o.customer_id = cc.id ");
+		fromBuilder.append("left join cc_customer c on cc.customer_id = c.id ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 
@@ -206,6 +208,34 @@ public class SalesOrderQuery extends JBaseQuery {
 			SN = new BigDecimal(endSN).add(new BigDecimal(1)).toString();
 		}
 		return SN;
+	}
+
+	public boolean checkStatus(String outStockId) {
+		SalesOrder salesOrder = this.findByOutStockId(outStockId);
+		List<SalesOrderDetail> list = SalesOrderDetailQuery.me().findBySalesOrderId(salesOrder.getId());
+		boolean status = true;
+		for (SalesOrderDetail salesOrderDetail : list) {
+			if (salesOrderDetail.getLeftCount() > 0) {
+				status = false;
+				break;
+			}
+		}
+		
+		if (status) {
+			salesOrder.setStatus(Consts.SALES_ORDER_STATUS_ALL_OUT);
+		} else {
+			salesOrder.setStatus(Consts.SALES_ORDER_STATUS_PART_OUT);
+		}
+		
+		if (!salesOrder.update()) {
+			return false;
+		}
+		return true;
+	}
+
+	private SalesOrder findByOutStockId(String outStockId) {
+		String sql = "SELECT cs.* FROM cc_sales_order cs LEFT JOIN cc_sales_order_join_outstock cj ON cs.id = cj.order_id where cj.outstock_id=? ";
+		return DAO.findFirst(sql, outStockId);
 	}
 
 }

@@ -151,19 +151,6 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		SellerCustomer sellerCustomer = getModel(SellerCustomer.class);
 		Customer customer = getModel(Customer.class);
 
-		String areaCodes = getPara("areaCodes");
-		String areaNames = getPara("areaNames");
-		String[] areaCodeArray = areaCodes.split("/");
-		String[] areaNameArray = areaNames.split("/");
-
-		customer.setProvName(areaNameArray[0]);
-		customer.setProvCode(areaCodeArray[0]);
-		customer.setCityName(areaNameArray[1]);
-		customer.setCityCode(areaCodeArray[1]);
-
-		customer.setCountryName(areaNameArray[2]);
-		customer.setCountryCode(areaCodeArray[2]);
-
 		String customerId = "";
 		String sellerCustomerId = "";
 		// 检查客户是否存在

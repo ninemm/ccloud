@@ -52,8 +52,8 @@
 			size: params.limit,
 			page: params.offset/params.limit + 1,
 			k: keyword,
-			startDate: $('#startDate').val(),
-			endDate: $('#endDate').val()
+			startDate: $('#startDate').val() + " 00:00:00",
+			endDate: $('#endDate').val() + " 23:59:59"
 		};
 		return param;
 	};
@@ -149,17 +149,32 @@
 	}
 	
 	var validatorFields = {
-		'startDate': {
-			validators: {
-				date : { format : 'YYYY-MM-DD', message : '日期格式不正确' }
-			}
-		},
-		'endDate': {
-			validators: {
-				date : { format : 'YYYY-MM-DD', message : '日期格式不正确' }
-			}
-		}
 	};
+	
+	$('#exampleModal1').on('show.bs.modal', function (event) {
+		$(".modal-body").html("");
+		$.ajax({
+				url:"${CPATH}/admin/purchaseOrderDetail/show_supplier",
+				type:"post",
+				dataType:"json",
+				success:function(data){
+					var Html = '<div class="input-group col-md-2 col-sm-8" style="padding-top:10px;">'
+							  +'<select class="form-control input-sm" style="width:180px;" name="id" id="supplierId" >'
+							  +'<option value="">----请选择供应商----</option>'
+							  +'</select></div>';
+					$(".modal-body").append(Html);
+					$.each(data,function(index, item) {
+							var html ='<option value="'+item.id+'">'+item.name+'</option>';
+							$("#supplierId").append(html);
+					});
+				}
+			});
+	})
+	
+	function addProduct(){
+		 var supplierId=$("#supplierId").find("option:selected").val();
+		 location.href="${CPATH}/admin/purchaseOrderDetail/index?supplierId="+supplierId;
+	}
 </#macro>
 
 <@layout active_id=p child_active_id=c>
@@ -181,7 +196,7 @@
 		<div class="row content-row">
 			<div class="jp-left">
 				<!-- <button class="btn btn-sm btn-primary" type="button" onclick="batchAction()"><i class="fa fa-gavel"></i> 批量审核 </button>  -->
-				<a href="${CPATH}/admin/purchaseOrderDetail/index?c=${c!}&p=${p!}" class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> 新建采购订单 </a>
+				<button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#exampleModal1" data-whatever="@mdo" style="font_size:10px;"><i class="fa fa-plus"></i>新建采购订单</button>
 			</div>
 
 			<div class="form-group" style="float: right">
@@ -208,4 +223,20 @@
 		</div>
 	</form>
 	<!-- /.box -->
+	<div class="modal fade" id="exampleModal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	        <h4 class="modal-title" id="exampleModalLabel">选择供应商</h4>
+	      </div>
+	      <div class="modal-body">
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" onclick="addProduct()" class="btn btn-primary">确认</button>
+	        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
 </@layout>

@@ -35,6 +35,13 @@
             city: '${(customer.city_name)!}',
             district: '${(customer.country_name)!}'
         });
+
+        var $selectItem = $(".select-item");
+		$.each($areaName, function(index, el) {
+			$(el).val($selectItem.eq(index).text());
+			$areaCode.eq(index).val($selectItem.eq(index).data('code'));
+		});
+
 		jQuery.mm.initValidator('#form', validatorFields)
 		
 	});
@@ -71,9 +78,19 @@
                 }
             }
         },
-		'areaNames': {
+		'customer.prov_name': {
 			validators: {
-				notEmpty: { message: '省市区不能为空' }
+				notEmpty: { message: '省不能为空' },
+			}
+		},
+		'customer.city_name': {
+			validators: {
+				notEmpty: { message: '市不能为空' },
+			}
+		},
+		'customer.country_name': {
+			validators: {
+				notEmpty: { message: '区不能为空' },
 			}
 		},
 		'customer.address': {
@@ -83,6 +100,25 @@
 			}
 		}
 	};
+
+	var $areaName = $(".areaName");
+	var $areaCode = $(".areaCode");
+	
+	$city.on('cp:updated', function() {
+		areaCheck();
+	});
+	
+	function areaCheck() {
+		var $selectItem = $(".select-item");
+		$.each($areaName, function(index, el) {
+			$(el).val($selectItem.eq(index).text());
+			$areaCode.eq(index).val($selectItem.eq(index).data('code'));
+
+			$form.data('bootstrapValidator')
+			.updateStatus($(el).attr('name'), 'NOT_VALIDATED', null)
+			.validateField($(el).attr('name'));
+		});
+	}
 
 	function doSubmit(){
 		$("#areaCodes").val($city.data('citypicker').getCode());
@@ -178,8 +214,12 @@
 	                    <label for="_title" class="col-sm-4 control-label">省市区:</label>
 	                    <div class="input-group col-sm-7">
 	                        <input readonly type="text" id="cityPicker" data-toggle="cityPicker" style="width:100%;">
-	                        <input type="hidden" id="areaNames" name="areaNames">
-	                        <input type="hidden" id="areaCodes" name="areaCodes">
+	                        <input type="hidden" class="areaName" name="customer.prov_name">
+	                        <input type="hidden" class="areaName" name="customer.city_name">
+	                        <input type="hidden" class="areaName" name="customer.country_name">
+	                        <input type="hidden" class="areaCode" name="customer.prov_code">
+	                        <input type="hidden" class="areaCode" name="customer.city_code">
+	                        <input type="hidden" class="areaCode" name="customer.country_code">
 	                    </div>
 	                </div>
 	                

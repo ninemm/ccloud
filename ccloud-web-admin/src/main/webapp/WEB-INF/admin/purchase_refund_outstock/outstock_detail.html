@@ -23,7 +23,8 @@
 			<span class="pull-left">
 			单号：${(outstock.pwarehouse_sn)!}
 			</br>
-			状态：${(outstock.status)!} 
+			状态：<#if outstock.status ==0>待入库</#if>
+			<#if outstock.status ==1000>已入库</#if>
 			</span>
 			<span class="pull-right">
 			下单人员：${(outstock.biz_userName)!}/ ${(outstock.userMobile)!} 

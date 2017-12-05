@@ -15,6 +15,7 @@
  */
 package org.ccloud.model.query;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -64,32 +65,33 @@ public class SalesRefundInstockDetailQuery extends JBaseQuery {
 	
 	public boolean insert(Map<String, String[]> paraMap, String instockId, String sellerId, Date date,
 			String deptId, String dataArea, int index) {
-
-		DAO.set("id", StrKit.getRandomUUID());
-		DAO.set("refund_instock_id", instockId);
-		DAO.set("sell_product_id", StringUtils.getArrayFirst(paraMap.get("sellProductId" + index)));
-
+		SalesRefundInstockDetail detail = new SalesRefundInstockDetail();
+		detail.setId(StrKit.getRandomUUID());
+		detail.setRefundInstockId(instockId);
+		detail.setSellProductId(StringUtils.getArrayFirst(paraMap.get("sellProductId" + index)));
 		String convert = StringUtils.getArrayFirst(paraMap.get("convert" + index));
 		String bigNum = StringUtils.getArrayFirst(paraMap.get("bigNum" + index));
 		String smallNum = StringUtils.getArrayFirst(paraMap.get("smallNum" + index));
-
+		
 		Integer productCount = Integer.valueOf(bigNum) * Integer.valueOf(convert) + Integer.valueOf(smallNum);
+		String productPrice = StringUtils.getArrayFirst(paraMap.get("smallPrice" + index));
+		String productAmount = StringUtils.getArrayFirst(paraMap.get("rowTotal" + index));
+		String isGift = StringUtils.getArrayFirst(paraMap.get("isGift" + index));
+		
+		detail.setProductCount(productCount);
+		detail.setProductPrice(StringUtils.isNumeric(productPrice)? new BigDecimal(productPrice) : new BigDecimal(0));
+		detail.setProductAmount(StringUtils.isNumeric(productAmount)? new BigDecimal(productAmount) : new BigDecimal(0));
+		detail.setOutstockDetailId(StringUtils.getArrayFirst(paraMap.get("outstockDetailId" + index)));
+		detail.setRejectProductCount(productCount);
+		detail.setRejectProductPrice(StringUtils.isNumeric(productPrice)? new BigDecimal(productPrice) : new BigDecimal(0));
+		detail.setRejectAmount(StringUtils.isNumeric(productAmount)? new BigDecimal(productAmount) : new BigDecimal(0));
+		
+		detail.setIsGift(StringUtils.isNumeric(isGift)? Integer.parseInt(isGift) : 0);
+		detail.setCreateDate(date);
+		detail.setDeptId(deptId);
+		detail.setDataArea(dataArea);
 
-		DAO.set("product_count", productCount);
-		DAO.set("product_price", StringUtils.getArrayFirst(paraMap.get("smallPrice" + index)));
-		DAO.set("product_amount", StringUtils.getArrayFirst(paraMap.get("rowTotal" + index)));
-
-		DAO.set("outstock_detail_id", StringUtils.getArrayFirst(paraMap.get("outstockDetailId" + index)));
-
-		DAO.set("reject_product_count", productCount);
-		DAO.set("reject_product_price", StringUtils.getArrayFirst(paraMap.get("smallPrice" + index)));
-		DAO.set("reject_amount", StringUtils.getArrayFirst(paraMap.get("rowTotal" + index)));
-
-		DAO.set("is_gift", StringUtils.getArrayFirst(paraMap.get("isGift" + index)));
-		DAO.set("create_date", date);
-		DAO.set("dept_id", deptId);
-		DAO.set("data_area", dataArea);
-		return DAO.save();
+		return detail.save();
 	}
 
 	public Page<SalesRefundInstockDetail> paginate(int pageNumber, int pageSize, String orderby) {
