@@ -110,19 +110,6 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 		Customer customer = getModel(Customer.class);
 		String customerId = customer.getId();
 
-		String areaCodes = getPara("areaCodes");
-		String areaNames = getPara("areaNames");
-		String[] areaCodeArray = areaCodes.split("/");
-		String[] areaNameArray = areaNames.split("/");
-
-		customer.setProvName(areaNameArray[0]);
-		customer.setProvCode(areaCodeArray[0]);
-		customer.setCityName(areaNameArray[1]);
-		customer.setCityCode(areaCodeArray[1]);
-
-		customer.setCountryName(areaNameArray[2]);
-		customer.setCountryCode(areaCodeArray[2]);
-
 		if (!this.checkCustomerNameAndMobile(customer)) {
 			renderAjaxResultForError("该客户已存在");
 		}
