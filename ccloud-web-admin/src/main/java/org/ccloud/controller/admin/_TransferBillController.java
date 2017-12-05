@@ -73,11 +73,13 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 	
 	public void edit() {	
 		String id = getPara("id");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String userId = user.getId();
 		if (id != null) {
 			TransferBill transferBill = TransferBillQuery.me().findById(id);
 			setAttr("transferBill", transferBill);
 		}
-		List<Warehouse> wlist = WarehouseQuery.me().findAll();
+		List<Warehouse> wlist = WarehouseQuery.me().findWarehouseByUserId(userId);
 		setAttr("wlist", wlist);
 		
 		List<transferBillInfo> ilist = TransferBillDetailQuery.me().findByTransferBillDetailId(id);
