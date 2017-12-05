@@ -27,12 +27,12 @@ import com.jfinal.plugin.ehcache.IDataLoader;
 @SuppressWarnings("serial")
 public abstract class BaseSellerProduct<M extends BaseSellerProduct<M>> extends JModel<M> implements IBean {
 
-	public static final String CACHE_NAME = "cc_seller_goods";
-	public static final String METADATA_TYPE = "cc_seller_goods";
+	public static final String CACHE_NAME = "cc_seller_product";
+	public static final String METADATA_TYPE = "cc_seller_product";
 
-	public static final String ACTION_ADD = "cc_seller_goods:add";
-	public static final String ACTION_DELETE = "cc_seller_goods:delete";
-	public static final String ACTION_UPDATE = "cc_seller_goods:update";
+	public static final String ACTION_ADD = "cc_seller_product:add";
+	public static final String ACTION_DELETE = "cc_seller_product:delete";
+	public static final String ACTION_UPDATE = "cc_seller_product:update";
 
 	public void removeCache(Object key){
 		if(key == null) return;
@@ -95,7 +95,7 @@ public abstract class BaseSellerProduct<M extends BaseSellerProduct<M>> extends 
 	}
 
 	public java.lang.String getId() {
-		return get("id");
+		return getStr("id");
 	}
 
 	public void setProductId(java.lang.String productId) {
@@ -103,7 +103,7 @@ public abstract class BaseSellerProduct<M extends BaseSellerProduct<M>> extends 
 	}
 
 	public java.lang.String getProductId() {
-		return get("product_id");
+		return getStr("product_id");
 	}
 
 	public void setSellerId(java.lang.String sellerId) {
@@ -111,7 +111,7 @@ public abstract class BaseSellerProduct<M extends BaseSellerProduct<M>> extends 
 	}
 
 	public java.lang.String getSellerId() {
-		return get("seller_id");
+		return getStr("seller_id");
 	}
 
 	public void setCustomName(java.lang.String customName) {
@@ -119,7 +119,7 @@ public abstract class BaseSellerProduct<M extends BaseSellerProduct<M>> extends 
 	}
 
 	public java.lang.String getCustomName() {
-		return get("custom_name");
+		return getStr("custom_name");
 	}
 
 	public void setStoreCount(java.math.BigDecimal storeCount) {
@@ -167,7 +167,15 @@ public abstract class BaseSellerProduct<M extends BaseSellerProduct<M>> extends 
 	}
 
 	public java.lang.String getWeightUnit() {
-		return get("weight_unit");
+		return getStr("weight_unit");
+	}
+
+	public void setWarehouseId(java.lang.String warehouseId) {
+		set("warehouse_id", warehouseId);
+	}
+
+	public java.lang.String getWarehouseId() {
+		return getStr("warehouse_id");
 	}
 
 	public void setIsEnable(java.lang.Integer isEnable) {
@@ -175,7 +183,7 @@ public abstract class BaseSellerProduct<M extends BaseSellerProduct<M>> extends 
 	}
 
 	public java.lang.Integer getIsEnable() {
-		return get("is_enable");
+		return getInt("is_enable");
 	}
 
 	public void setFreezeStore(java.math.BigDecimal freezeStore) {
@@ -186,12 +194,28 @@ public abstract class BaseSellerProduct<M extends BaseSellerProduct<M>> extends 
 		return get("freeze_store");
 	}
 
+	public void setBarCode(java.lang.String barCode) {
+		set("bar_code", barCode);
+	}
+
+	public java.lang.String getBarCode() {
+		return getStr("bar_code");
+	}
+
+	public void setQrcodeUrl(java.lang.String qrcodeUrl) {
+		set("qrcode_url", qrcodeUrl);
+	}
+
+	public java.lang.String getQrcodeUrl() {
+		return getStr("qrcode_url");
+	}
+
 	public void setOrderList(java.lang.Integer orderList) {
 		set("order_list", orderList);
 	}
 
 	public java.lang.Integer getOrderList() {
-		return get("order_list");
+		return getInt("order_list");
 	}
 
 	public void setCreateDate(java.util.Date createDate) {

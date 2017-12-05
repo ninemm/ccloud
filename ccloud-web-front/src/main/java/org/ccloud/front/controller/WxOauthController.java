@@ -3,6 +3,7 @@ package org.ccloud.front.controller;
 import javax.servlet.http.HttpServletRequest;
 
 import org.ccloud.Consts;
+import org.ccloud.core.BaseFrontController;
 import org.ccloud.core.cache.ActionCache;
 import org.ccloud.model.User;
 import org.ccloud.model.query.UserQuery;
@@ -14,7 +15,6 @@ import org.ccloud.wechat.WechatUserInterceptor;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.jfinal.aop.Before;
-import com.jfinal.core.Controller;
 import com.jfinal.kit.StrKit;
 import com.jfinal.weixin.sdk.api.ApiConfigKit;
 import com.jfinal.weixin.sdk.api.ApiResult;
@@ -22,7 +22,7 @@ import com.jfinal.weixin.sdk.api.SnsAccessTokenApi;
 import com.jfinal.weixin.sdk.api.UserApi;
 
 @RouterMapping(url = "/wxoauth")
-public class WxOauthController extends Controller {
+public class WxOauthController extends BaseFrontController {
 
 	@ActionCache
 	@Before(WechatUserInterceptor.class)
@@ -49,7 +49,7 @@ public class WxOauthController extends Controller {
 			}
 			
 			User user = UserQuery.me().findByWechatOpenid(openId);
-			System.err.println("user is not exsit>>>" + (user == null));
+//			System.err.println("user is not exsit>>>" + (user == null));
 			
 			if (user == null) {
 				gotoUrl = "/user/bind";

@@ -55,7 +55,7 @@ public class OptionQuery extends JBaseQuery {
 		option.setOptionKey(key);
 		option.setOptionValue(value);
 
-		return option.saveOrUpdate();
+		return option.saveOrUpdateWithoutDate();
 	}
 
 	public Option findByKey(String key) {
