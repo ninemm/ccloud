@@ -82,14 +82,34 @@
 					},
 					edit: false
 				},
-				{field: "status", title: "状态", align: "center", width: '5%',edit: false},
+				{field: "status", title: "状态", align: "center", width: '5%',
+					formatter: function(value, row, rowIndex) {
+					if (value == 0) {
+						return '待审核';
+					} else if (value == 1000) {
+						return '已审核'
+					} else if (value == 1001) {
+						return '订单取消'
+					} else if (value == 2000) {
+						return '部分出库'
+					} else if (value == 2001) {
+						return '部分出库-订单关闭'
+					} else if (value == 3000) {
+						return '全部出库'
+					} else {
+						return '全部出库-订单关闭'
+					}
+					},edit: false
+				},
 				{field: "action", title: "操作", align: "center", width: '15%',
 				formatter: function(value, row, rowIndex) {
 					var strHtml ='<a class="label label-table label-info" onclick="detail(\''+row.id+'\')" >详细</a> ';
-
-					strHtml = strHtml + '<a class="label label-table label-success" onclick="pass(\''+row.id+'\')" >通过</a> ';
-
-					strHtml = strHtml + '<a class="label label-table label-warning" onclick="reject(\''+row.id+'\')" >拒绝</a> ';
+					
+					if (row.status == 0) {
+						strHtml = strHtml + '<a class="label label-table label-success" onclick="pass(\''+row.id+'\')" >通过</a> ';
+	
+						strHtml = strHtml + '<a class="label label-table label-warning" onclick="reject(\''+row.id+'\')" >拒绝</a> ';					
+					}
 
 					return strHtml;
 				},

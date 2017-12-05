@@ -49,7 +49,8 @@ public class SalesOutstockQuery extends JBaseQuery {
 				" select o.*,c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as customerTypeCode, u.realname, u.mobile ");
 		fromBuilder.append(" ,w.code as warehouseCode ");
 		fromBuilder.append(" from `cc_sales_outstock` o ");
-		fromBuilder.append(" left join cc_customer c on o.customer_id = c.id ");
+		fromBuilder.append(" left join cc_seller_customer cs on o.customer_id = cs.id ");
+		fromBuilder.append(" left join cc_customer c on cs.customer_id = c.id ");
 		fromBuilder.append(" left join cc_customer_type ct on o.customer_type_id = ct.id ");
 		fromBuilder.append(" left join user u on o.biz_user_id = u.id ");
 		fromBuilder.append(" left join cc_warehouse w on o.warehouse_id = w.id ");
@@ -86,7 +87,8 @@ public class SalesOutstockQuery extends JBaseQuery {
 	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate) {
 		String select = "select o.*, c.customer_name ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_sales_outstock` o ");
-		fromBuilder.append(" join cc_customer c on o.customer_id = c.id ");
+		fromBuilder.append("left join cc_seller_customer cs on o.customer_id = cs.id ");
+		fromBuilder.append("left join cc_customer c on c.id = cs.customer_id ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
@@ -139,6 +141,16 @@ public class SalesOutstockQuery extends JBaseQuery {
 			SN = new BigDecimal(endSN).add(new BigDecimal(1)).toString();
 		}
 		return SN;
+	}
+
+	public boolean updateStatus(String id, int salesOutStockStatusOut) {
+		String sql = "update cc_sales_outstock cc set cc.status = ? where cc.id = ?";
+		int i = Db.update(sql, salesOutStockStatusOut, id);
+		if (i > 0) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 }
