@@ -1,9 +1,30 @@
 <#include "../_inc/_layout.html"/>
 
+<#macro script_import>
+
+    <!-- bootstrap-table -->
+    <script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table.js"></script>
+    <script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table-zh-CN.js"></script>
+    <!-- bootstrapValidator -->
+    <script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
+</#macro>
+
+<#macro css_import>
+
+    <!-- bootstrap-table-->
+    <link rel="stylesheet" href="${CPATH}/static/plugins/bootstrap-table/bootstrap-table.css">
+    <!-- bootstrapValidator -->
+    <link rel="stylesheet" href="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.css">
+
+</#macro>
+
 <#macro script>
 var type = $("#selecttype").val();
-var size = 15;
+
 var detail_object_id = "";
+
+var receivablesUrl = '${CPATH}/admin/receivables/getReceivables';
+var receivableDetailUrl = '${CPATH}/admin/receivables/getReceivablesDetail';
 $(function() {
 	updateOptions();
 	
@@ -11,161 +32,94 @@ $(function() {
 		updateOptions();
 		type = $(this).val();
 	});
-	
+
+	jQuery.mm.initEditTable('#_receivables_table', receivablesUrl, getReceivablesParams, initReceivablesTable(), null);
 	$("#search-receivables").click(function(){
-		var currentPage = $("#receivables-current-page").val();
-		getReceivables(currentPage);
+		$('#_receivables_table').bootstrapTable('refresh');
 	});
 	
-	function getReceivables(page){
-		
-		var id = $("#category-or-customer").val();
-		
-		$.ajax({
-			url: "${CPATH}/admin/receivables/getReceivables?type="+type+"&id="+id+"&page="+page+"&size="+size,
-			async: false,
-			success: function(data){
-				var receivablesHtml = "";
-				console.log(data);
-				if(data.total >= 1){
-					var rows = data.rows;
-					for(var i in rows){
-						receivablesHtml += '<tr class="jp-onmouse" data="'+rows[i].id+'"><td>'+rows[i].code+'</td><td>'+rows[i].name+'</td><td>'+rows[i].receive_amount+'</td><td>'+rows[i].act_amount+'</td><td>'+rows[i].balance_amount+'</td></tr>';
-					}
-					var pageCount = Math.ceil(data.total/size);
-					$("#receivables-page-count").html(pageCount);
-					$("#receivables-current-page").val(data.page);
-				}
-				//console.log($("#receivables-tbody"));
-				$("#receivables-tbody").html(receivablesHtml);
-				
-			}
-		});
-	}
-	
-	$("#receivables-tbody").on("click",".jp-onmouse",function(){
-		detail_object_id = $(this).attr("data");
-		
-		$(this).siblings().css({"background-color":"#ffffff"});
-		$(this).css({"background-color":"#337ab7"});
-		
-		var detailPage = $("#detail-current-page").val();
-		getReceivablesDetail(detailPage);
+	// 委托点击事件
+	$("#_receivables_table").on('click','tr[data-uniqueid]',function(){
+		var $this = $(this);
+		detail_object_id = $this.attr("data-uniqueid");
+		$this.siblings().css("background-color","#ffffff");
+		$this.css("background-color","#428bca");
+		$('#_receivables_detail_table').bootstrapTable('refresh');
 	});
 	
-	$("#receivables-first-page").click(function(){
-		getReceivables(1);
-	});
-	
-	$("#receivables-previous-page").click(function(){
-		var currentPage = parseInt($("#receivables-current-page").val());
-		var totalPage = $("#receivables-page-count").html();
-		if(currentPage === 1 || totalPage ===" " || totalPage === "1"){
-			return false;
-		}else{
-			getReceivables(currentPage - 1);
-		}
-	});
-	
-	$("#receivables-next-page").click(function(){
-		var currentPage = parseInt($("#receivables-current-page").val());
-		var totalPage = parseInt($("#receivables-page-count").html());
-		if(currentPage === totalPage || totalPage ===" "){
-			return false;
-		}else{
-			getReceivables(currentPage + 1);
-		}
-	});
-	
-	$("#receivables-next-page").click(function(){
-		var currentPage = parseInt($("#receivables-current-page").val());
-		var totalPage = parseInt($("#receivables-page-count").html());
-		if(currentPage === totalPage || totalPage ===" "){
-			return false;
-		}else{
-			getReceivables(currentPage + 1);
-		}
-	});
-	
-	$("#receivables-last-page").click(function(){
-		var totalPage = $("#receivables-page-count").html();
-		if(totalPage != ""){
-			getReceivables(totalPage);
-		}else{
-			return false;
-		}
-	});
-	
-	$("#receivables-last-page").click(function(){
-		var currentPage = $("#receivables-current-page").val();
-		if(currentPage != ""){
-			getReceivables(currentPage)
-		}else{
-			return false;
-		}
-	});
-	
-    $("#detail-first-page").click(function(){
-    	if(detail_object_id == ""){
-    		return false;
-    	}else{
-    		getReceivablesDetail(1);
-    	}
-    });
-    
-    $("#detail-first-page").click(function(){
-    	if(detail_object_id == ""){
-    		return false;
-    	}else{
-    		getReceivablesDetail(1);
-    	}
-    });
-    
-    $("#detail-previous-page").click(function(){
-    	var currentPage = parseInt($("#detail-current-page").val());
-		var totalPage = $("#detail-page-count").html();
-    	if(detail_object_id == "" || currentPage == 1 || totalPage ==""){
-    		return false;
-    	}else{
-    		getReceivablesDetail(1);
-    	}
-    });
-    
-    $("#detail-next-page").click(function(){
-    	var currentPage = parseInt($("#detail-current-page").val());
-		var totalPage = $("#detail-page-count").html();
-    	if(detail_object_id == "" || currentPage == 1 || totalPage ==""){
-    		return false;
-    	}else{
-    		totalPage = parseInt(totalPage);
-    		if(totalPage > currentPage){
-    			getReceivablesDetail(currentPage + 1);
-    		}
-    	}
-    });
-    
-    $("#detail-last-page").click(function(){
-    	var currentPage = parseInt($("#detail-current-page").val());
-		var totalPage = $("#detail-page-count").html();
-    	if(detail_object_id == "" || currentPage == 1 || totalPage ==""){
-    		return false;
-    	}else{
-    		totalPage = parseInt(totalPage);
-    		if(totalPage > currentPage){
-    			getReceivablesDetail(totalPage);
-    		}
-    	}
-    });
-    
-    $("#detail-refresh").click(function(){
-    	var currentPage = $("#detail-current-page").val();
-    	if(detail_object_id == "" || currentPage == ""){
-    		return false;
-    	}else{
-    		getReceivablesDetail(currentPage);
-    	}
-    })
+	jQuery.mm.initEditTable('#_receivables_detail_table', receivableDetailUrl, getReceivablesDetailParams, initReceivableDetailTable() , null);
 });
+
+function updateOptions(){
+	var type = $("#selecttype").val();
+	$.ajax({
+		url: "${CPATH}/admin/receivables/getOptions?type="+type,
+		async: false,
+		success: function(data){
+			var optionsHtml = '<option value="0" >全部</option>';
+			if(data.length && data.length>=1){
+				for(var i in data){
+					optionsHtml += '<option value="'+data[i].id+'" >'+data[i].name+'</option>';
+				}
+			}
+			$("#category-or-customer").html(optionsHtml);
+		}
+	});
+}
+
+var initReceivablesTable = function(){
+	var fields = [
+		{field: "object_id",title: "ID", align: "center", visible:false, edit:false},
+		{field: "code",title:"编码",align: "center", width: '8%', edit:false},
+		{field: "name",title:"名称",align: "center", width: '12%', edit:false},
+		{field: "receive_amount",title:"应收金额",align: "center",edit:false},
+		{field: "act_amount",title:"实收金额",align: "center",edit:false},
+		{field: "balance_amount",title:"未收金额",align: "center",edit:false}
+	];
+	
+	return fields;
+};
+
+var getReceivablesParams = function(params){
+	var param = {
+        size: params.limit,
+        page: params.offset/params.limit + 1,
+        type : type
+    };
+    return param;
+}
+
+var initReceivableDetailTable = function(){
+	var fields = [
+		{field: "ref_type",title:"业务类型",align: "center", edit: false},
+		{field: "ref_sn",title:"单号",align: "center",edit: false},
+		{field: "biz_date",title:"业务日期",align: "center",edit: false},
+		{field: "receive_amount",title:"应收金额",align: "center",edit: false},
+		{field: "act_amount",title:"已收金额",align: "center",edit: false},
+		{field: "balance_amount",title:"未收金额",align: "center",edit: false},
+		{field: "create_date",title:"创建时间",align:"center",edit:false},
+		{field: "action", title: "收款详情", align: "center",
+			 formatter: function(value, row, rowIndex){
+			 	var url = '${CPATH}/admin/receivables/renderlist?ref_sn='+row.ref_sn+'&&ref_type='+type;
+			 	return '<a href="' + url + '" class="btn btn-sm" >收款详情</a>';
+			 },
+			 edit:false}
+	];
+	
+	return fields;
+}
+
+var getReceivablesDetailParams = function(params){
+
+	var param = {
+        size: params.limit,
+        page: params.offset/params.limit + 1,
+        type : type,
+        id: detail_object_id
+    };
+    
+	return param;
+}
 
 function getReceivablesDetail(page){
 	$.ajax({
@@ -189,22 +143,7 @@ function getReceivablesDetail(page){
 	});
 }
 
-function updateOptions(){
-	var type = $("#selecttype").val();
-	$.ajax({
-		url: "${CPATH}/admin/receivables/getOptions?type="+type,
-		async: false,
-		success: function(data){
-			var optionsHtml = '<option value="0" >全部</option>';
-			if(data.length && data.length>=1){
-				for(var i in data){
-					optionsHtml += '<option value="'+data[i].id+'" >'+data[i].name+'</option>';
-				}
-			}
-			$("#category-or-customer").html(optionsHtml);
-		}
-	});
-}
+
 </#macro>
 <@layout active_id=p child_active_id=c>
 	
@@ -232,65 +171,12 @@ function updateOptions(){
 			<span id="search-receivables" class="btn btn-default btn-sm btn-flat" >搜索</span>
 		</div>
 	</div>
-	<div class="box" style="height:790px;">
-		<div class="box-body jp-common-pad" style="height:335px;overflow:auto;">
-			<table class="table table-striped">	
-				<thead>
-					<tr>
-						<th>编码</th>
-						<th>名称</th>
-						<th>应收金额</th>
-						<th>已收金额</th>
-						<th>未收金额</th>
-					</tr>
-				</thead>
-				<tbody id="receivables-tbody">
-				</tbody>
-			</table>
-		</div>
-		<div class="cf" style="position:relative;bottom: 0px">
-			<div class="pull-right">
-				<ul class="pagination" id="receivables" style="cursor:pointer">
-					<li id="receivables-first-page" class="paginate_button"><a>首页</a></li>
-					<li id="receivables-previous-page" class="paginate_button"><a>上一页</a></li>
-					<li class="paginate_button"><a>第<input id="receivables-current-page" style="width:25px;height:20px;" align="center" type="text" value="1">页，共<span id="receivables-page-count"></span>页</a></li>
-					<li id="receivables-next-page" class="paginate_button"><a>下一页</a></li>
-					<li id="receivables-last-page" class="paginate_button"><a>尾页</a></li>
-					<li id="receivables-refresh" class="paginate_button"><a >刷新</a></li>
-				</ul>
-			</div>
-		</div>
-		<div class="box-body jp-common-pad" style="height:455px;overflow:auto;">
-			<table class="table table-striped">
-				<thead>
-					<tr>
-						<th>业务类型</th>
-						<th>单号</th>
-						<th>业务日期</th>
-						<th>应收金额</th>
-						<th>已收金额</th>
-						<th>未收金额</th>
-						<th>创建时间</th>
-						<th>收款详情</th>
-					</tr>
-				</thead>
-				<tbody id="receivables-detail-tbody">
-					
-				</tbody>
-			</table>
-		</div>
-		<div class="cf" style="position:relative;bottom: 75px">
-			<div class="pull-right">
-				<ul class="pagination" id="detail" style="cursor:pointer">
-					<li id="detail-first-page" class="paginate_button"><a>首页</a></li>
-					<li id="detail-previous-page" class="paginate_button"><a>上一页</a></li>
-					<li class="paginate_button"><a>第<input id="detail-current-page" style="width:25px;height:20px;" align="center" type="text" value="1">页，共<span id="detail-page-count"></span>页</a></li>
-					<li id="detail-next-page" class="paginate_button"><a>下一页</a></li>
-					<li id="detail-last-page" class="paginate_button"><a>尾页</a></li>
-					<li id="detail-refresh" class="paginate_button"><a >刷新</a></li>
-				</ul>
-			</div>
-		</div>
+	<div class="box">
+        <table class="table table-striped table-hover table-condensed" id="_receivables_table" ></table>
+    </div>
+    <div class="box">
+        <table class="table table-striped table-hover table-condensed" id="_receivables_detail_table" ></table>
+    </div>
 	</div>
 </section>
 

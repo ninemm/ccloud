@@ -20,6 +20,7 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -80,7 +81,7 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 		String id = getPara("id");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		Page<Receivables> page = ReceivablesQuery.me().paginate(getPageNumber(),getPageSize(),id,type,user.getDataArea());
-		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(),"page",getPageNumber(), "rows", page.getList());
+		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(),"rows", page.getList());
 		
 		renderJson(map);
 	}
@@ -89,8 +90,14 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String type = getPara("type");
 		String id = getPara("id");
-		Page<ReceivablesDetail> page = ReceivablesDetailQuery.me().paginate(getPageNumber(), getPageSize(), id,type,user.getDataArea());
-		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(),"page",getPageNumber(), "rows", page.getList());
+		
+		Map<String, Object> map;
+		if(type != null && id!=null) {
+			Page<ReceivablesDetail> page = ReceivablesDetailQuery.me().paginate(getPageNumber(), getPageSize(), id,type,user.getDataArea());
+			map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
+		}else {
+			map = new HashMap<String, Object>();
+		}
 		
 		renderJson(map);
 	}
@@ -112,7 +119,14 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 	
 	public void addreceiving() {
 		String ref_sn = getPara("ref_sn");
+		String ref_type = getPara("ref_type");
 		String order_id = SalesOrderQuery.getBillIdBySn(ref_sn);
+		if(order_id == null) {
+			setAttr("ref_sn",ref_sn);
+			setAttr("ref_type",ref_type);
+			render("list.html");
+		}
+		
 		List<Record> list = CustomerQuery.me().getCustomerIdName();
 		
 		setAttr("ref_sn",ref_sn);
