@@ -220,7 +220,19 @@ public class _ProductCompositionController extends JBaseCRUDController<ProductCo
 		String sellerId = getSessionAttr("sellerId");
 		if (StringUtils.isNotBlank(sellerId)) {
 			List<SellerProduct> list = SellerProductQuery.me().findBySellerId(sellerId);
-			renderJson(list);
+			List<Map<String, String>> productOptionList = new ArrayList<Map<String, String>>();
+			for (SellerProduct sellerProduct : list) {
+				Map<String, String> productOptionMap = new HashMap<String, String>();
+				
+				String sellProductId = sellerProduct.getId();
+				String customName = sellerProduct.getCustomName();
+				String speName = sellerProduct.getStr("valueName");				
+				productOptionMap.put("id", sellProductId);
+				productOptionMap.put("custom_name", customName + "/" + speName);
+
+				productOptionList.add(productOptionMap);				
+			}
+			renderJson(productOptionList);
 		}
 	}
 	

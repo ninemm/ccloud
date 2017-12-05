@@ -15,9 +15,11 @@
  */
 package org.ccloud.model.query;
 
+import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.ccloud.Consts;
 import org.ccloud.model.Inventory;
 
 import com.jfinal.plugin.activerecord.Db;
@@ -74,7 +76,7 @@ public class InventoryQuery extends JBaseQuery {
 	}
 	
 	public List<Record> getWareHouseInfo(String userId) {
-		StringBuilder fromBuilder = new StringBuilder("select w.id,w.code,w.name from  cc_warehouse w,cc_user_join_warehouse uw where w.id =uw.warehouse_id and uw.user_id=?");
+		StringBuilder fromBuilder = new StringBuilder("select w.id,w.code,w.name from  cc_warehouse w,cc_user_join_warehouse uw where w.id =uw.warehouse_id and uw.user_id=? and w.is_enabled=1");
 		List<Record> list = Db.find(fromBuilder.toString(),userId);
 		return list;
 	}
@@ -87,5 +89,29 @@ public class InventoryQuery extends JBaseQuery {
 	public Inventory findBySellerIdAndProductId(String sellerId,String productId){
 		String sql ="select * from cc_inventory where seller_id='"+sellerId+"' and product_id ='"+productId+"'";
 		return DAO.findFirst(sql);
+	}
+
+	public int updateInventory(String sellerId, String productId, BigDecimal count, BigDecimal productAmount,
+			BigDecimal price, int inventoryType) {
+		StringBuilder fromBuilder = new StringBuilder("update cc_inventory cc set ");
+		if (inventoryType == Consts.INVENTORY_TYPE_IN) {
+			fromBuilder.append("cc.in_amount = cc.in_amount+? and cc.in_count = cc.in_count+? AND cc.in_price = ? ");
+			fromBuilder.append("AND cc.balance_amount = cc.balance_amount+? AND cc.balance_count = cc.balance_count+? AND cc.balance_price = ? ");
+		} else {
+			fromBuilder.append("cc.out_amount = cc.out_amount+? and cc.out_count = cc.out_count+? AND cc.out_price = ? ");
+			fromBuilder.append("AND cc.balance_amount = cc.balance_amount-? AND cc.balance_count = cc.balance_count-? AND cc.balance_price = ? ");
+		}
+		fromBuilder.append("WHERE cc.seller_id=? and cc.product_id = ? ");
+		LinkedList<Object> params = new LinkedList<Object>();
+		params.add(productAmount);
+		params.add(count);
+		params.add(price);
+		params.add(productAmount);
+		params.add(count);
+		params.add(price);
+		params.add(sellerId);
+		params.add(productId);
+		int i =Db.update(fromBuilder.toString(), params.toArray());
+		return i;
 	}
 }

@@ -237,12 +237,13 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 		Date date = new Date();
 
+		String outstockId = "";
 		String warehouseId = "";
 		String outstockSn = "";
 		for (Record orderDetail : orderDetailList) {
-			String outstockId = StrKit.getRandomUUID();
 			if (!warehouseId.equals(orderDetail.getStr("warehouse_id"))) {
-
+				
+				outstockId = StrKit.getRandomUUID();
 				warehouseId = orderDetail.getStr("warehouse_id");
 				String OrderSO = SalesOutstockQuery.me().getNewSn(sellerId);
 				// 销售出库单：SS + 100000(机构编号或企业编号6位) + A(客户类型) + W(仓库编号) + 171108(时间) + 100001(流水号)

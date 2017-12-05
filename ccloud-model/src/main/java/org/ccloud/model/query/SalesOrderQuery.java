@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.ccloud.Consts;
 import org.ccloud.model.SalesOrder;
+import org.ccloud.model.SalesOrderDetail;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
 
@@ -206,6 +207,34 @@ public class SalesOrderQuery extends JBaseQuery {
 			SN = new BigDecimal(endSN).add(new BigDecimal(1)).toString();
 		}
 		return SN;
+	}
+
+	public boolean checkStatus(String outStockId) {
+		SalesOrder salesOrder = this.findByOutStockId(outStockId);
+		List<SalesOrderDetail> list = SalesOrderDetailQuery.me().findBySalesOrderId(salesOrder.getId());
+		boolean status = true;
+		for (SalesOrderDetail salesOrderDetail : list) {
+			if (salesOrderDetail.getLeftCount() > 0) {
+				status = false;
+				break;
+			}
+		}
+		
+		if (status) {
+			salesOrder.setStatus(Consts.SALES_ORDER_STATUS_ALL_OUT);
+		} else {
+			salesOrder.setStatus(Consts.SALES_ORDER_STATUS_PART_OUT);
+		}
+		
+		if (!salesOrder.update()) {
+			return false;
+		}
+		return true;
+	}
+
+	private SalesOrder findByOutStockId(String outStockId) {
+		String sql = "SELECT cs.* FROM cc_sales_order cs LEFT JOIN cc_sales_order_join_outstock cj ON cs.id = cj.order_id where cj.outstock_id=? ";
+		return DAO.findFirst(sql, outStockId);
 	}
 
 }

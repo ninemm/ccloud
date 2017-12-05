@@ -17,6 +17,7 @@ package org.ccloud.controller.admin;
 
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,10 +25,8 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
-import org.ccloud.model.Inventory;
 import org.ccloud.model.SalesOrder;
-import org.ccloud.model.SalesOutstock;
-import org.ccloud.model.query.InventoryQuery;
+import org.ccloud.model.User;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SalesOutstockDetailQuery;
 import org.ccloud.model.query.SalesOutstockQuery;
@@ -36,6 +35,7 @@ import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
@@ -78,7 +78,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 
 	}
 	
-	public void detail() {
+	public void stockdetail() {
 
 		String outstockId = getPara(0);
 
@@ -89,37 +89,74 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 
 		render("detail.html");
 
+	}	
+	
+	public void getDetail() {
+		String id = getPara("id");
+		setAttr("id", id);
+		render("out_stock_detail.html");
 	}
 	
-	public void out() {
-        boolean isSave = Db.tx(new IAtom() {
-            @Override
-            public boolean run() throws SQLException {
-            	Map<String, String[]> map = getParaMap();
-        		String outstockId = getPara("outstockSn");
-//        		SalesOutstock outstock = SalesOutstockQuery.me().findById(outstockId);
-//        		SalesOrder salesOrder = SalesOrderQuery.me().findById(outstockId);
-//        		salesOrder.setStatus(Consts.SALES_ORDER_STATUS_ALL_OUT);
-//        		outstock.setStatus(Consts.SALES_OUT_STOCK_STATUS_OUT);
-//        		if (!outstock.update()) {
-//        			return false;
-//        		}
-//        		List<Record> outstockDetail = SalesOutstockDetailQuery.me().findByOutstockId(outstockId);
-//        		for (Record record : outstockDetail) {
-//        			Inventory inventory = InventoryQuery.me().
-//        					findBySellerIdAndProductId(record.getStr("seller_id"), record.getStr("product_id"));
-//        			inventory.set
-//				}
-        		
-        		return true;
-            }
-        });
+	public void detail() {
+
+		String outstockId = getPara("outstockId");
+
+		Record outstock = SalesOutstockQuery.me().findMoreById(outstockId);
+		List<Record> outstockDetail = SalesOutstockDetailQuery.me().findByOutstockId(outstockId);
+		HashMap<String, Object> result = Maps.newHashMap();
+		result.put("outstock", outstock);
+		result.put("outstockDetail", outstockDetail);
+
+		renderJson(result);
+	}
+	
+	public void outStock() {
+
+		Map<String, String[]> paraMap = getParaMap();
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String sellerId = getSessionAttr("sellerId");
+		String sellerCode = getSessionAttr("sellerCode");
+		boolean isSave = this.out(paraMap, user, sellerId, sellerCode);
         if (isSave) {
         	renderAjaxResultForSuccess("出库成功");
         } else {
         	renderAjaxResultForError("出库失败!");
         }
-        
+
+	}	
+	
+	public boolean out(final Map<String, String[]> paraMap, final User user, final String sellerId, final String sellerCode) {
+        boolean isSave = Db.tx(new IAtom() {
+            @Override
+            public boolean run() throws SQLException {
+        		String deptId = StringUtils.getArrayFirst(paraMap.get("deptId"));
+        		String dataArea = StringUtils.getArrayFirst(paraMap.get("dataArea"));
+        		String outStockId =  StringUtils.getArrayFirst(paraMap.get("salesStockId"));
+        		String outStockSN =  StringUtils.getArrayFirst(paraMap.get("salesStockSN"));
+        		Date date = new Date();
+        		String productNumStr = StringUtils.getArrayFirst(paraMap.get("productNum"));
+        		Integer productNum = Integer.valueOf(productNumStr);
+        		Integer count = 0;
+        		Integer index = 0;
+        		
+        		while (productNum > count) {
+        			index++;
+        			String sellProductId = StringUtils.getArrayFirst(paraMap.get("sellProductId" + index));
+        			if (StrKit.notBlank(sellProductId)) {
+        				SalesOutstockDetailQuery.me().outStock(paraMap, sellerId, 
+        						date, deptId, dataArea, index, user.getId(), outStockSN);
+        				count++;
+        			}
+
+        		}
+        		if (!SalesOutstockQuery.me().updateStatus(outStockId, Consts.SALES_OUT_STOCK_STATUS_OUT) || 
+        				!SalesOrderQuery.me().checkStatus(outStockId)) {
+        			return false;
+        		}
+        		return true;
+            }
+        });
+        return isSave;
 	}
 
 }
