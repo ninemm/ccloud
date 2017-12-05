@@ -30,75 +30,75 @@ $.today = function() {
 }
 
 Utils = {
-		context: '',	
-		devMode: true,
-		pageSize: 10,
-		ajax: function(url, param, callback) {
+	context: '',	
+	devMode: true,
+	pageSize: 10,
+	ajax: function(url, param, callback) {
+		$.ajax({
+            type: "post",
+            url: url,
+            data: param(),
+            dataType: 'json',
+            success: function(res) {
+            	if (callback)
+            		callback(res);
+            },
+            error: function(res) {
+            	toastr.error(res.message);
+            }
+        });
+	},
+	get: function(url) {
+		$.get(url, function(res) {
+            if (res.errorCode > 0) {
+                toastr.warn(res.message);
+            } else {
+                toastr.success(res.message);
+                location.reload();
+            }
+        });
+	},
+	confirm: function(title, text, url) {
+		$.confirm({
+            title: title,
+            text: text,
+            onOK: function() {
+                $.get(url, function(res) {
+		            if (res.errorCode > 0) {
+		                toastr.warn(res.message);
+		            } else {
+		                toastr.success(res.message);
+		                location.reload();
+		            }
+		        });
+            },
+            onCancel: function() {}
+        });
+	},
+	infinite: function($root, $loadmore, data, loading, callback) {
+		$root = $root || $(window.body);
+		$root.infinite().on("infinite", function() {
+			console.log('infinite start');
+			if ($loadmore) $loadmore.show();
+			
+			if (loading) return;
+			loading = true;
 			$.ajax({
 	            type: "post",
-	            url: url,
-	            data: param(),
+	            url: '${CPATH}/api',
+	            data: data,
 	            dataType: 'json',
 	            success: function(res) {
 	            	if (callback)
-	            		callback(res);
+	            		callback();
 	            },
 	            error: function(res) {
-	            	toastr.error(res.message);
+	                toast.error(res.message);
 	            }
 	        });
-		},
-		get: function(url) {
-			$.get(url, function(res) {
-	            if (res.errorCode > 0) {
-	                toastr.warn(res.message);
-	            } else {
-	                toastr.success(res.message);
-	                location.reload();
-	            }
-	        });
-		},
-		confirm: function(title, text, url) {
-			$.confirm({
-	            title: title,
-	            text: text,
-	            onOK: function() {
-	                $.get(url, function(res) {
-			            if (res.errorCode > 0) {
-			                toastr.warn(res.message);
-			            } else {
-			                toastr.success(res.message);
-			                location.reload();
-			            }
-			        });
-	            },
-	            onCancel: function() {}
-	        });
-		},
-		infinite: function($root, $loadmore, data, loading, callback) {
-			$root = $root || $(window.body);
-			$root.infinite().on("infinite", function() {
-				console.log('infinite start');
-				if ($loadmore) $loadmore.show();
-				
-				if (loading) return;
-				loading = true;
-				$.ajax({
-		            type: "post",
-		            url: '${CPATH}/api',
-		            data: data,
-		            dataType: 'json',
-		            success: function(res) {
-		            	if (callback)
-		            		callback();
-		            },
-		            error: function(res) {
-		                toast.error(res.message);
-		            }
-		        });
-			});
-		}
+		});
 	}
+}
 
 // 菜单
 var open = false;

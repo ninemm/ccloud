@@ -19,6 +19,9 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.Date;
+import java.util.Random;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -175,6 +178,59 @@ public class StringUtils {
 		int length = salesOrderSn.length();
 		String SN = orderSn.substring(orderSn.length() - length, orderSn.length());
 		return SN;
+	}
+	
+	public static String getRandomCode(int length, int type) {
+		StringBuffer buffer = null;
+		StringBuffer sb = new StringBuffer();
+		Random r = new Random();
+		r.setSeed(new Date().getTime());
+		
+		switch (type) {
+			case 0:
+				buffer = new StringBuffer("0123456789");
+				break;
+			case 1:
+				buffer = new StringBuffer("abcdefghijklmnopqrstuvwxyz");
+				break;
+			case 2:
+				buffer = new StringBuffer("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+				break;
+			case 3:
+				buffer = new StringBuffer("0123456789abcdefghijklmnopqrstuvwxyz");
+				break;
+			case 4:
+				buffer = new StringBuffer("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+				break;
+			case 5:
+				buffer = new StringBuffer("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+				break;
+			case 6:
+				buffer = new StringBuffer("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
+				sb.append(buffer.charAt(r.nextInt(buffer.length() - 10)));
+				length -= 1;
+				break;
+			case 7:
+				String uuid = getUUID();
+				sb.append(uuid);
+				break;
+			default:
+				break;
+		}
+		
+		if (type != 7) {
+			int range = buffer.length();
+			for (int i = 0; i < length; i++) {
+				sb.append(buffer.charAt(r.nextInt(range)));
+			}
+		}
+		
+		return sb.toString();
+	}
+	
+	public static String getUUID() {
+		String uuid = UUID.randomUUID().toString();
+		return uuid.substring(0, 8) + uuid.substring(9, 13) + uuid.substring(14, 18) + uuid.substring(19, 23) + uuid.substring(24);
 	}
 	
 }
