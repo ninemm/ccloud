@@ -15,6 +15,8 @@
  */
 package org.ccloud.controller.admin;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -26,6 +28,7 @@ import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
+import org.ccloud.utils.QRCodeUtils;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Brand;
 import org.ccloud.model.Customer;
@@ -70,7 +73,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
             setAttr("k", keyword);
         }
 
-        Page<Seller> page = SellerQuery.me().paginate(getPageNumber(), getPageSize(),keyword,  "cs.id",user.getUsername(),user.getId(),user.getDataArea());
+        Page<Seller> page = SellerQuery.me().paginate(getPageNumber(), getPageSize(),keyword,  "cs.id",user.getUsername(),user.getId());
         Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);
 		
@@ -373,18 +376,48 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 						sellerProducts.set("is_enable", sellerProduct.getIsEnable());
 						sellerProducts.set("order_list", sellerProduct.getOrderList());
 						sellerProducts.set("create_date", new Date());
+						//生成二维码
+						
+						Date date = new Date();
+						SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+						String  fileName = sdf.format(date)+".png";
+						String contents =getRequest().getScheme() + "://" + getRequest().getServerName()+"/admin/seller/fu"+"?id="+Id; 
+						//部署之前上传
+						//String contents = getRequest().getScheme() + "://" + getRequest().getServerName()+":"+getRequest().getLocalPort()+getRequest().getContextPath()+"/admin/seller/fn"+"?id="+Id;
+						String imagePath = getRequest().getSession().getServletContext().getRealPath("\\qrcode\\");
+						QRCodeUtils.genQRCode(contents, imagePath, fileName);
+						sellerProducts.set("qrcode_url", imagePath+"\\"+fileName);
 						result=sellerProducts.save();
 						if(result == false){
 							break;
 						}
 					}else{
+						if(issellerProducts.getQrcodeUrl()!=null){
+							File file = new File(issellerProducts.getQrcodeUrl());
+							file.delete();
+						}
 						issellerProducts.set("custom_name",sellerProduct.getCustomName());
+						issellerProducts.set("order_list", sellerProduct.getOrderList());
 						issellerProducts.set("price", sellerProduct.getPrice());
+						issellerProducts.set("bar_code", sellerProduct.getBarCode());
 						issellerProducts.set("modify_date", new Date());
+						
+						//生成二维码
+						
+						Date date = new Date();
+						SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+						String  fileName = sdf.format(date)+".png";
+						String contents =getRequest().getScheme() + "://" + getRequest().getServerName()+"/admin/seller/fu"+"?id="+issellerProducts.getId(); 
+						//部署之前上传
+						//String contents = getRequest().getScheme() + "://" + getRequest().getServerName()+":"+getRequest().getLocalPort()+getRequest().getContextPath()+"/admin/seller/fn"+"?id="+Id;
+						String imagePath = getRequest().getSession().getServletContext().getRealPath("\\qrcode\\");
+						QRCodeUtils.genQRCode(contents, imagePath, fileName);
+						issellerProducts.set("qrcode_url", imagePath+"\\"+fileName);
 						result=issellerProducts.update();
 						if(result == false){
 							break;
 						}
+						
 					}
 			}
 			renderJson(result);
@@ -392,7 +425,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			
 	
 	public void changeSeller() {
-		String id = getPara("0");
+		String id = getPara("sellerId");
 		String name = getPara("sellerName");
 		setSessionAttr("sellerId", id);
 		setSessionAttr("sellerName", name);
@@ -429,6 +462,44 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				}
 			renderAjaxResultForError("删除失败");
 		}
+	}
+	
+	public void upIsenable(){
+		String ds = getPara("orderItems");
+		boolean flang = false;
+		JSONArray jsonArray = JSONArray.parseArray(ds);
+		List<SellerProduct> imageList = jsonArray.toJavaList(SellerProduct.class);
+		for (SellerProduct sellerProduct : imageList) {
+			  SellerProduct issellerProducts = SellerProductQuery.me().findById(sellerProduct.getId());
+				issellerProducts.set("is_enable", 1);
+				flang=issellerProducts.update();
+		}
+		renderJson(flang);
+	}
+	
+	public void downIsenable(){
+		String ds = getPara("orderItems");
+		boolean flang = false;
+		JSONArray jsonArray = JSONArray.parseArray(ds);
+		List<SellerProduct> imageList = jsonArray.toJavaList(SellerProduct.class);
+		for (SellerProduct sellerProduct : imageList) {
+			  SellerProduct issellerProducts = SellerProductQuery.me().findById(sellerProduct.getId());
+				issellerProducts.set("is_enable", 0);
+				flang=issellerProducts.update();
+		}
+		renderJson(flang);
+	}
+	
+	public void getQrcode(){
+		String id = getPara("id");
+		SellerProduct sellerProduct = SellerProductQuery.me().findById(id);
+		renderJson(sellerProduct);
+	}
+	
+	public void fu(){
+		String id = getPara("id");
+		SellerProduct sellerProduct = SellerProductQuery.me().findById(id);
+		renderJson(sellerProduct);
 	}
 }
 

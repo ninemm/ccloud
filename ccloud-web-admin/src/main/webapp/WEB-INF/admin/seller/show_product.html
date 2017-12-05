@@ -54,15 +54,15 @@
 				},
 				edit:false
 				},
-				{field: "order_list", title: "排序", align: "center", width: '5%',
+				{field: "order_list", title: "排序", align: "center", width: '3%',
 					formatter : function(value,row,rowIndex){
-						var strHtml = '<input class="form-control input-sm" style="margin-left:30%;" type="number" id="order_list" name="order_list" value="'+row.order_list+'"  min="0" >';
+						var strHtml = '<input class="form-control input-sm" style="margin-left:20%;" type="number" id="order_list" name="order_list" value="'+row.order_list+'"  min="0" >';
 						return strHtml;
 					},
 				 edit: false}, 
       			{field: "id", title: "ID", align: "center", visible:false, edit:false},
-      			{field: "productName", title: "产品名称", align: "center", width: '10%',edit:false},
-      			{field: "cgc_name", title: "产品类别", align: "center", width: '5%',edit:false},
+      			{field: "productName", title: "产品名称", align: "center", width: '5%',edit:false},
+      			{field: "cgc_name", title: "产品类别", align: "center", width: '3%',edit:false},
       			{field: "custom_name", title: "产品自定义名称", align: "center", width: '8%',
       				formatter: function(value, row, rowIndex) {
 					var strHtml = '<input type="text" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="custom_name" value="'+row.custom_name+'"/>';
@@ -80,7 +80,7 @@
       					return strHtml;
       				},
       			edit:false},
-      			{field: "bigPrice", title: "销售价格(大件)", align: "center", width: '9%',
+      			{field: "bigPrice", title: "销售价格(大单位)", align: "center", width: '7%',
       				formatter: function(value, row, rowIndex) {
 					var strHtml = '￥<input type="text" size="6" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="bigPrice" value="'+row.price.toFixed(2)+'" onblur="changeMoney(this)"/>';
 					strHtml += '/<input type="text" size="6" readonly style="text-align:center;background-color:transparent;border:0px;" name="big_unit" value="'+row.big_unit+'"/>';
@@ -88,7 +88,7 @@
 				},
       			 edit:false},
       			 {field: "convert_relate", title: "换算", align: "center", width: '2%',edit:false},
-      			 {field: "samllPrice", title: "销售价格(个)", align: "center", width: '9%',
+      			 {field: "samllPrice", title: "销售价格(小单位)", align: "center", width: '7%',
       				formatter: function(value, row, rowIndex) {
 					var strHtml = '￥<input type="text" size="6" readonly style="text-align:center;background-color:transparent;border:0px;" name="smallPrice" value="'+(row.price/row.convert_relate).toFixed(2)+'"/>';
 					strHtml += '/<input type="text" size="6" readonly style="text-align:center;background-color:transparent;border:0px;" name="samll_unit" value="'+row.small_unit+'"/>';
@@ -102,14 +102,25 @@
 				},
 				edit:false
 				},
-				{field: "action", title: "操作", align: "center", width: '5%',
+				{field: "bar_code", title: "条码", align: "center", width: '8%',
+      				formatter: function(value, row, rowIndex) {
+      				if(value==null){
+      					var strHtml = '<input type="text" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="bar_code" value=""/>';
+      				}else{
+      					var strHtml = '<input type="text" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="bar_code" value="'+row.bar_code+'"/>';		
+      				}
+					return strHtml;
+				},
+      				edit:false},
+				{field: "action", title: "操作", align: "center", width: '7%',
 				formatter: function(value, row, rowIndex) {
 					if(row.is_enable == 0){
 					  var  strHtml = '<a onclick="change(\''+row.id+'\')" class="btn btn-xs bg-olive btn-flat" >上架</a>';
 					}else{
 					  var strHtml = '<a onclick="change(\''+row.id+'\')" class="btn btn-xs btn-danger btn-flat">下架</a>';
 					}
-					//strHtml += '&nbsp;<a onclick="del(\''+row.id+'\')" class="btn btn-xs btn-danger btn-flat">删除</a>'
+					strHtml += '&nbsp;<a type="button" onclick="getQrocde(\''+row.id+'\')" data-toggle="modal" data-target="#exampleModal1" name="qrcode" class="btn btn-xs btn-info  btn-flat">二维码</a>';
+					//strHtml += '&nbsp;<a onclick="del(\''+row.id+'\')" class="btn btn-xs btn-danger btn-flat">删除</a>';
 					return strHtml;
 				},
 				edit:false
@@ -145,6 +156,7 @@
 								"order_list": $(this).find('td').eq(1).find("input").val(),
 								"custom_name": $(this).find('td').eq(4).find("input").val(),
 								"price": $(this).find('td').eq(7).find("input[name='bigPrice']").val(),
+								"bar_code": $(this).find('td').eq(11).find("input").val(),
 							};
 							orderItems.push(obj);
 		})
@@ -219,7 +231,7 @@
 						})
 			if(flang==true){			
 				$.ajax({
-					url:"${CPATH}/admin/seller/changeIsenable",
+					url:"${CPATH}/admin/seller/upIsenable",
 					type:"post",
 					dataType:"json",
 					data : {orderItems : JSON.stringify(orderItems)},
@@ -256,7 +268,7 @@
 						})
 			if(flang==true){			
 				$.ajax({
-					url:"${CPATH}/admin/seller/changeIsenable",
+					url:"${CPATH}/admin/seller/downIsenable",
 					type:"post",
 					dataType:"json",
 					data : {orderItems : JSON.stringify(orderItems)},
@@ -274,6 +286,24 @@
 			}
 		
 	}
+	function getQrocde(id){
+		$('#exampleModal1').on('show.bs.modal', function (event) {
+			
+		$.ajax({
+					url:"${CPATH}/admin/seller/getQrcode",
+					type:"post",
+					dataType:"json",
+					data : {id : id},
+					success:function(data){
+						var url = data.qrcode_url;
+						$(".modal-body").html("");
+						var html = '<img src="'+url.substring(url.indexOf('\ccloud-web-admin')-1,url.length)+'" alt="二维码" class="jp-grids-photos img-responsive">'
+						$(".modal-body").append(html);
+					}
+				});
+		});
+	}
+	
 	
 </#macro>
 
@@ -292,8 +322,8 @@
 	<div class="row content-row">
 		<div class="jp-left">
 			<a onclick="getA()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-plus"></i> 新增 </a>
-			<a onclick="upIsenable()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-check-square-o"></i>批量修改上架 </a>
-			<a onclick="downIsenable()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-check-square-o"></i>批量修改下架 </a>
+			<a onclick="upIsenable()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-check-square-o"></i>批量上架 </a>
+			<a onclick="downIsenable()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-check-square-o"></i>批量下架 </a>
 			<a onclick="saveAll()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-check-square-o"></i>保存 </a>
  		</div>
 		<form class="form-horizontal" style="float: right" action="${CPATH}/admin/seller/showProduct?c=${c!}&p=${p!}" method="post">
@@ -308,4 +338,17 @@
 	</div>
 	<!-- /.box -->
 </section>
+<!-- Small modal -->
+	<div class="modal fade" id="exampleModal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="padding-top:10%;">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content" style="width:200px;margin-left:30%;">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	        <h4 class="modal-title" id="exampleModalLabel">商品二维码</h4>
+	      </div>
+	      <div class="modal-body">
+	      </div>
+	    </div>
+	  </div>
+	</div>
 </@layout>

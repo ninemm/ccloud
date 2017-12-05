@@ -146,7 +146,7 @@ function addTr(tid, productList, optionArr) {
      var cgoodsCode = result.productId;
      var cgoodsName = result.name;
      var cspecification = result.specificationValue;
-     var cbig_unit = firstProduct.weightUnit;
+     var cbig_unit = result.bigUnit;
      var $tr = $(this).parent().parent();
      
      $tr.find("td>#goodsCode").val(cgoodsCode);
@@ -274,7 +274,7 @@ function addTr(tid, productList, optionArr) {
 													<input name="specification" id="specification" value="${plist.specificationValue!}" disabled="disabled"></input>
 												</td>
 												<td class="text-center">
-													<input name="big_unit" id="big_unit" value="${plist.weightUnit!}" disabled="disabled"></input>
+													<input name="big_unit" id="big_unit" value="${plist.bigUnit!}" disabled="disabled"></input>
 												</td>
 												</#list>
 												<td class="text-center">
