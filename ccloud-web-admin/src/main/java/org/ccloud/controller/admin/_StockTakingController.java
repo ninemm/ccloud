@@ -74,7 +74,7 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 		String seller_id=getSessionAttr("sellerId").toString();
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String userId = user.getId();
-		Page<StockTaking> page = StockTakingQuery.me().paginate(getPageNumber(), getPageSize(), keyword,seller_id,"c.create_date",userId);
+		Page<StockTaking> page = StockTakingQuery.me().paginate(getPageNumber(), getPageSize(), keyword,seller_id,userId);
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
 	}
@@ -171,13 +171,19 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 						inventoryDetail.setWarehouseId(warehouse_id);
 						inventoryDetail.setSellProductId(sell_product_id);
 						inventoryDetail.setInCount(new BigDecimal(listMap.get(i).get("product_count").toString()));
-						inventoryDetail.setInAmount(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString())));
-						inventoryDetail.setInPrice(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("convert_relate").toString())));
-						inventoryDetail.setBalanceCount(new BigDecimal(listMap.get(i).get("product_count").toString()));
-						inventoryDetail.setBalanceAmount(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString())));
-						inventoryDetail.setBalancePrice(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("convert_relate").toString())));
-						//业务类型  盘盈入库--100208
-						inventoryDetail.setBizType("100208");
+						inventoryDetail.setInAmount(inventory.getInAmount().add(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString()))));
+						inventoryDetail.setInPrice(inventory.getInPrice());
+						
+						inventoryDetail.setBalanceCount(inventory.getBalanceCount());
+						inventoryDetail.setBalanceAmount(inventory.getBalanceAmount());
+						inventoryDetail.setBalancePrice(inventory.getBalancePrice());
+						//业务类型  盘盈入库--100208  盘亏入库--100209
+						int compareTo = new BigDecimal(listMap.get(i).get("product_count").toString()).compareTo(new BigDecimal(0));
+						if (compareTo<0) {
+							inventoryDetail.setBizType("100209");
+						}else {
+							inventoryDetail.setBizType("100208");
+						}
 						inventoryDetail.setBizBillSn(stockTaking.getStockTakingSn());
 						inventoryDetail.setBizDate(stockTaking.getBizDate());
 						inventoryDetail.setBizUserId(stockTaking.getBizUserId());
