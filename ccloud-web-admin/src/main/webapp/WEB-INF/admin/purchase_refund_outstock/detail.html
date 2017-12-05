@@ -23,7 +23,8 @@
 			<span class="pull-left">
 			单号：${(refund.outstock_sn)!}
 			</br>
-			状态：${(refund.status)!} 
+			状态：<#if refund.status ==0>待出库</#if>
+			<#if refund.status ==1000>已出库</#if> 
 			</span>
 			<span class="pull-right">
 			下单人员：${(refund.realname)!}/ ${(refund.userMobile)!} 

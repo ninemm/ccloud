@@ -77,7 +77,7 @@ function initProduct(){
 			$.each(productList, function(idx, item) {
 				var option = {
 					id: item.productList.productId,
-					text: item.productList.name
+					text: item.productList.name + item.productList.specificationValue
 				}
 				productOptionArr.push(option);
 				productMap[item.productList.productId] = item;
@@ -108,7 +108,7 @@ function addTr(tid, productList, optionArr) {
 	var goodsCode = firstProduct.productId;
 	var goodsName = firstProduct.name;
 	var specification = firstProduct.specificationValue;
-	var big_unit = firstProduct.weightUnit;
+	var big_unit = firstProduct.bigUnit;
 
 	var $tbody = $(tid + " tbody"),
 	$tr = $tbody.find("tr:eq(0)"),
@@ -229,7 +229,7 @@ function addTr(tid, productList, optionArr) {
 												<th class="col-sm-2 center">商品名称</th>
 												<th class="col-sm-1 center">规格</th>
 												<th class="col-sm-1 center">单位</th>
-												<th class="col-sm-1 center">盘点后库存数量</th>
+												<th class="col-sm-1 center">数量</th>
 												<th class="col-sm-2 center">备注</th>
 											</tr>
 										</thead>

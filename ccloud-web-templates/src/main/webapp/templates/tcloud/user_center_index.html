@@ -2,7 +2,6 @@
 <#macro css> </#macro>
 <#macro script>
     $(function() {
-    $("#tab5").addClass("weui-bar__item--on").siblings().removeClass("weui-bar__item--on");
     });
 </#macro>
 
@@ -13,7 +12,7 @@
             <article id="my">
                 <header>
                     <div>
-                        <img src="static/images/avatar.png" width="100%">
+                        <img src="${CTPATH}/images/avatar.png" width="100%">
                     </div>
                     <div>
                         <p>启光商贸-总部</p>
@@ -210,6 +209,6 @@
             <div class="layer"></div>
         </div>
     </div>
-    <#include "tabbar.html"/>
+    <#include "_inc/_footer_nav.html" />
 </div>
 </@layout>

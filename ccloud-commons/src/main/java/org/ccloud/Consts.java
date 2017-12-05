@@ -23,6 +23,8 @@ public class Consts {
 	public static final String SESSION_SELECT_DATAAREA = "SESSION_SELECT_DATAAREA";//数据查看时的数据域
 
 	public static final String CHARTSET_UTF8 = "UTF-8";
+	
+	public static final String INDEX_URL = "/";
 
 	public static final String INDEX_URL = "/";
 	

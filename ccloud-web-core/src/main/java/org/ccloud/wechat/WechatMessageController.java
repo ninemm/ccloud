@@ -19,6 +19,8 @@ import java.util.List;
 
 import org.ccloud.Consts;
 import org.ccloud.core.JSession;
+import org.ccloud.model.Content;
+import org.ccloud.model.query.ContentQuery;
 import org.ccloud.model.query.OptionQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.template.TemplateManager;
@@ -63,6 +65,7 @@ import com.jfinal.weixin.sdk.msg.in.event.InVerifyFailEvent;
 import com.jfinal.weixin.sdk.msg.in.event.InVerifySuccessEvent;
 import com.jfinal.weixin.sdk.msg.in.event.InWifiEvent;
 import com.jfinal.weixin.sdk.msg.in.speech_recognition.InSpeechRecognitionResults;
+import com.jfinal.weixin.sdk.msg.out.News;
 import com.jfinal.weixin.sdk.msg.out.OutCustomMsg;
 import com.jfinal.weixin.sdk.msg.out.OutMsg;
 import com.jfinal.weixin.sdk.msg.out.OutNewsMsg;
@@ -86,6 +89,9 @@ public class WechatMessageController extends MsgController {
 		if (StringUtils.areNotBlank(appId, appSecret)) {
 			ApiResult result = WechatApi.getOpenId(appId, appSecret, code);
 			if (result != null) {
+				System.err.println(result.getJson());
+				getRequest().getSession().setAttribute(Consts.SESSION_WECHAT_USER, result.getJson());
+				//setSessionAttr(Consts.SESSION_WECHAT_USER, result.getJson());
 				this.setSessionAttr(Consts.SESSION_WECHAT_USER, result.getJson());
 			}
 		}
@@ -225,11 +231,11 @@ public class WechatMessageController extends MsgController {
 		}
 
 		// 自动回复
-		/*Content content = ContentQuery.me().findFirstByModuleAndTitle(Consts.MODULE_WECHAT_REPLY, userInput);
+		Content content = ContentQuery.me().findFirstByModuleAndTitle(Consts.MODULE_WECHAT_REPLY, userInput);
 		if (content != null && StringUtils.isNotBlank(content.getText())) {
 			textOrSeniorRender(message, content.getText());
 			return;
-		}*/
+		}
 
 		// 搜索相关
 		if (searchProcess(message, userInput)) {
@@ -291,8 +297,7 @@ public class WechatMessageController extends MsgController {
 			count = 10;
 		}
 		
-		List<String> contents = null;
-		//List<Content> contents = ContentQuery.me().searchByModuleAndTitle(searchModule.getName(), userInput, count);
+		List<Content> contents = ContentQuery.me().searchByModuleAndTitle(searchModule.getName(), userInput, count);
 		if (contents == null || contents.isEmpty()) {
 			// 搜索不到内容时
 			processDefaultReplay("wechat_search_none_content", message);
@@ -308,14 +313,14 @@ public class WechatMessageController extends MsgController {
 		}
 
 		OutNewsMsg out = new OutNewsMsg(message);
-		/*for (Content content : contents) {
+		for (Content content : contents) {
 			News news = new News();
 			news.setTitle(content.getTitle());
 			news.setDescription(content.getSummary());
 			news.setPicUrl(domain + content.getImage());
 			news.setUrl(domain + content.getUrl());
 			out.addNews(news);
-		}*/
+		}
 		render(out);
 		return true;
 

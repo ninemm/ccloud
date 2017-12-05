@@ -72,12 +72,15 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 			setAttr("k", keyword);
 		}
 		String seller_id=getSessionAttr("sellerId").toString();
-		Page<StockTaking> page = StockTakingQuery.me().paginate(getPageNumber(), getPageSize(), keyword,seller_id,"c.create_date");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String userId = user.getId();
+		Page<StockTaking> page = StockTakingQuery.me().paginate(getPageNumber(), getPageSize(), keyword,seller_id,"c.create_date",userId);
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
 	}
 
 	public void edit() {
+		//判断当前是新增  还是  修改
 		String id = getPara("id");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String userId = user.getId();

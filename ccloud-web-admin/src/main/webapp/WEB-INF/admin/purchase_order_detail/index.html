@@ -24,14 +24,13 @@
 		jQuery.mm.initValidator('#form', validatorFields);
 		jQuery.mm.initDatetimepicker('form', '#deliveryDate', 'deliveryDate', 'yyyy-MM-dd', 2, 4, 2);
 		addProduct();
-		initCustomer();
+		initsupplier();
 	});
 	
 	var $form = $("#form");
-	var productInfoMap = ${productInfoMap!}
-	var productOptionList = ${productOptionList!}
-	var supplierInfoMap = ${supplierInfoMap!}
-	var supplierOptionList = ${supplierOptionList!}
+	var productInfoMap = ${productInfoMap!};
+	var productOptionList = ${productOptionList!};
+	var supplierInfoMap = ${supplierInfoMap!};
 	//标志
 	var newTrIdx = 0;
 	
@@ -116,7 +115,6 @@
 		});
 		
 		$newTr.find("#productId").attr("name", "productId" + newTrIdx);
-		$newTr.find("#isGift").attr("name", "isGift" + newTrIdx);
 		$newTr.find("#inputRowTotal").attr("name", "inputRowTotal" + newTrIdx);
 
 		orderNum();
@@ -130,17 +128,16 @@
 			var convert = product.convertRelate;
 			$tr.find("#convert").val(convert);
 
-			var smallPrice = product.price;
+			var bigPrice = product.price;
 			var smallUnit = product.smallUnit;
-
-			var bigPrice = smallPrice*convert;
-	
-			$tr.find("#bigPrice").val(bigPrice);
-			$tr.find("#bigPrice-span").text(bigPrice);
+			var smallPrice = bigPrice/convert;
+			
+			$tr.find("#bigPrice").val(bigPrice.toFixed(2));
+			$tr.find("#bigPrice-span").text(bigPrice.toFixed(2));
 			$tr.find("#bigUnit-span").text(product.bigUnit + "(x" + convert + smallUnit + ")");
 			
-			$tr.find("#smallPrice").val(product.price);
-			$tr.find("#smallPrice-span").text(product.price);
+			$tr.find("#smallPrice").val(smallPrice.toFixed(2));
+			$tr.find("#smallPrice-span").text(smallPrice.toFixed(2));
 			$tr.find("#smallUnit-span").text(smallUnit);
 			
 			rowTotalF(obj);
@@ -168,39 +165,18 @@
 		});
 	}
 	
-	function initCustomer(){
-		var $supplierSelect = $("#supplierId");
-
-		$supplierSelect.select2({
-			data: supplierOptionList,
-			width: "100%",
-			language: "zh-CN"
-		});
-		
-		<!--切换客户的方法  -->
-		$supplierSelect.change(function(){
-			supplierChange($(this));
-		});
-
-		<!--触发一次 -->
-		supplierChange($supplierSelect);
-	
-	}
-
-	function supplierChange(obj){
-		var supplier = supplierInfoMap[obj.val()];
-
+	function initsupplier(){
+		var supplier = supplierInfoMap;
+		$("#supplierId").val(supplier.id);
+		$("#supplierName").val(supplier.name);
 		$("#contact").val(supplier.contact);
 		$("#mobile").val(supplier.mobile);
 
 		var address = supplier.provName +"-"+ supplier.cityName +"-"+ supplier.countryName 
 		$("#address").val(address);
 		$("#deliveryAddress").val(address);
-		
-		var $supplierSelect = $("#supplierId");
 	}
-	
-	/*function changeBigPrice(obj){
+	function changeBigPrice(obj){
 		var $curTr = $(obj).parent().parent().parent();
 		var bigPrice = $(obj).val();
 		var convert = $curTr.find("#convert").val();
@@ -209,7 +185,7 @@
 		$curTr.find("#smallPrice").val(smallPrice);
 
 		rowTotalF(obj);
-	}*/
+	}
 
 	function changeSmallPrice(obj){
 		var $curTr = $(obj).parent().parent().parent();
@@ -232,8 +208,8 @@
 		var smallNum = $curTr.find("#smallNum").val();
 		rowTotal = Number(bigPrice) * Number(bigNum) + Number(smallPrice) * Number(smallNum);
 		rowTotal.toFixed(2);
-		$curTr.find(".rowTotal").text(rowTotal);
-		$curTr.find("#inputRowTotal").val(rowTotal);
+		$curTr.find(".rowTotal").text(rowTotal.toFixed(2));
+		$curTr.find("#inputRowTotal").val(rowTotal.toFixed(2));
 
 		totalF();
 	}
@@ -245,8 +221,8 @@
 			total += Number($(item).text());
 		});
 		total.toFixed(2);
-		$("#total").text(total);
-		$("#inputTotal").val(total);
+		$("#total").text(total.toFixed(2));
+		$("#inputTotal").val(total.toFixed(2));
 	}
 
 	function doSubmit(){
@@ -306,7 +282,7 @@
 						<tr>
 							<th width="2%"></th>
 							<th width="5%">序号</th>
-							<th width="20%">商品名称/商品规格</th>
+							<th width="10%">商品名称</th>
 							<th width="11%">大单位价格</th>
 							<th width="12%">大单位数量</th>
 							<th width="11%">小单位价格</th>
@@ -332,33 +308,28 @@
 							<td>
 								<input type="hidden" id="convert" value="" />
 								<div class = "validata-box">
-									￥<input type="text" id="bigPrice" name="bigPrice" readonly="readonly" style="width: 60%" onblur="changeBigPrice(this)" value="0" />
-									</br>(<span id="bigPrice-span"></span>)
+									￥<input type="text" id="bigPrice" name="bigPrice" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;width: 60%;" onblur="changeBigPrice(this)" value="0" />
+									(<span id="bigPrice-span"></span>)
 								</div>
 							</td>
 							<td>
 								<div class = "validata-box">
-									<input type="text" id="bigNum" name="bigNum" style="width: 60%" onblur="rowTotalF(this)" value="1" />
-									</br><span id="bigUnit-span"></span>
+									<input type="text" id="bigNum" name="bigNum" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;width: 60%;" onblur="rowTotalF(this)" value="1" />
+									<span id="bigUnit-span"></span>
 								</div>
 							</td>
 							<td>
 								<div class = "validata-box">
-									￥<input type="text" id="smallPrice" name="smallPrice" style="width: 60%" onblur="changeSmallPrice(this)" value="0"/>
-									</br>(<span id="smallPrice-span"></span>)
+									￥<input type="text" id="smallPrice" name="smallPrice" readonly style="text-align:center;background-color:transparent;border:0px;width: 30%;" onblur="changeSmallPrice(this)" value="0"/>
+									(<span id="smallPrice-span"></span>)
 								</div>
 							</td>
 							<td>
 								<div class = "validata-box">
-									<input type="text" id="smallNum" name="smallNum" style="width: 60%" onblur="rowTotalF(this)" value="0" />
-									</br><span id="smallUnit-span"></span>
+									<input type="text" id="smallNum" name="smallNum" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;width: 60%;" onblur="rowTotalF(this)" value="0" />
+									<span id="smallUnit-span"></span>
 								</div>
 							</td>
-							<!-- <td>
-								<div class = "validata-box">
-									<input type="checkbox" id="isGift" name="isGift" onclick="rowTotalF(this)"/>
-								</div>
-							</td> -->
 							<td>￥<span class="rowTotal" >0</span> <input type="hidden" name="rowTotal" id="inputRowTotal" value="0" /></td>
 						</tr>
 					</tbody>
@@ -380,15 +351,14 @@
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">*供应商名称:</label>
 						<div class="input-group col-md-4 col-sm-10">
-							<select id="supplierId" name="supplierId" class="form-control">
-							</select>
-							<button id="addCustomer" class="form-control btn btn-sm ">添加</button>
+							<input class="form-control input-sm" type="text" id="supplierName" name="supplierName" value="" readonly>
 						</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">*联系人:</label>
 						<div class="input-group col-md-4 col-sm-10">
 							<input class="form-control input-sm" type="text" id="contact" name="contact" value="" readonly>
+							<input class="form-control input-sm" type="hidden" id="supplierId" name="supplierId" value="" >
 						</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">
@@ -398,7 +368,7 @@
 						</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">
-						<label class="control-label col-sm-2">*配送时间:</label>
+						<label class="control-label col-sm-2">配送时间:</label>
 						<div class="input-group col-md-4 col-sm-10">
 							<input class="form-control input-sm" type="text" id="deliveryDate" name="dealDate" value="${dealDate!}"  >
 						</div>

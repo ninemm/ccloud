@@ -17,6 +17,7 @@ package org.ccloud.model;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -468,6 +469,16 @@ public class Content extends BaseContent<Content> implements ISortModel<Content>
 			}
 		}
 		super.setSlug(slug);
+	}
+
+	public boolean saveOrUpdate() {
+		if (null == get(getPrimaryKey())) {
+			set("id", StrKit.getRandomUUID());
+			set("created", new Date());
+			return this.save();
+		}
+		set("modified", new Date());
+		return this.update();
 	}
 
 }

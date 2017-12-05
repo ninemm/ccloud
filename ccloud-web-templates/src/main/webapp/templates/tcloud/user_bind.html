@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" name="viewport">
+	<meta content="yes" name="apple-mobile-web-app-capable">
+	<meta content="black" name="apple-mobile-web-app-status-bar-style">
+	<meta content="telephone=no" name="format-detection">
+	<meta content="email=no" name="format-detection">
+	<link rel="stylesheet" href="${CTPATH}/css/normalize.css">
+	<link rel="stylesheet" href="${CTPATH}/css/weui.min.css">
+	<link rel="stylesheet" href="${CTPATH}/css/jquery-weui.min.css">
+	<link rel="stylesheet" href="${CTPATH}/css/icomoon.css">
+	<link rel="stylesheet" href="${CTPATH}/css/slider.css">
+    <title>绑定用户信息</title>
+</head>
+
+<body>
+	<header>
+		<img src="${avatar!}" alt="微信图像">
+	</header>
+	<main>
+		<div id="nickname">${nickname!}</div>
+		<div class="input-area">
+			<div>
+				<i class="icon-mobile"></i>
+				<input type="tel" name="mobile" id="phone" maxlength="11" placeholder="手机号">
+				<i class="icon-times-circle"></i>
+				<div id="get-code">获取验证码</div>
+			</div>
+			<div>
+				<i class="icon-lock"></i>
+				<input type="tel" name="code" id="code" placeholder="验证码" maxlength="6">
+				<i class="icon-times-circle"></i>
+			</div>
+		</div>
+		<div class="stage">
+			<div class="slider" id="slider">
+				<div class="label">向右滑动验证</div>
+				<div class="track" id="track">
+					<div class="bg-green"></div>
+				</div>
+				<div class="button" id="btn">
+					<div class="icon" id="icon">>></div>
+					<div class="spinner" id="spinner"></div>
+				</div>
+			</div>
+		</div>
+		<div id="bind">绑定手机号</div>
+	</main>
+</body>
+<script src="${CTPATH}/js/jquery-3.2.1.min.js"></script>
+<script src="${CTPATH}/js/fastclick.js"></script>
+<script src="${CTPATH}/js/slider.js"></script>
+<script src="${CTPATH}/js/jquery-weui.min.js"></script>
+<script src="${CTPATH}/js/comm.js"></script>
+<script src="${CTPATH}/js/vconsole.min.js"></script>
+<script>
+	$(function() { 
+		
+		var gotCode = 0;
+		var $mobile = $('#phone');
+		
+		FastClick.attach(document.body);
+		
+		$(document).on("input", "#phone", function() {
+			if ($mobile.val().length === 11) {
+				$("#get-code").addClass("can-get");
+				
+				checkMobile($mobile.val());
+				
+			} else {
+				if ($("#get-code").text() === "获取验证码") {
+					$("#get-code").removeClass("can-get");
+				}
+				$(".stage").hide();
+			}
+			
+			$(this).next().show();
+			if (($mobile.val().length === 0)) {
+				$(this).next().hide();
+			}
+		}).on("touchstart", ".can-get", function() {
+			if (/^1[34578]\d{9}$/.test($mobile.val())) {
+				$("#get-code").removeClass("can-get");
+				$(".stage").show();
+				gotCode = 1;
+				sendSms();
+			} else {
+				$.toast("请输入正确的手机号", "text");
+			}
+		}).on("input", "#code", function() {
+			if ($("#code").val().length === 6 && gotCode) {
+				$("#bind").addClass("can-bind");
+			} else {
+				$("#bind").removeClass("can-bind");
+			}
+			$(this).next().show();
+			if (($("#code").val().length === 0)) {
+				$(this).next().hide();
+			}
+		}).on("touchstart", ".icon-times-circle", function() {
+			$(this).prev().val("");
+			$(this).hide();
+		});
+		
+		var param = function() {
+	        return {
+	            mobile: $mobile.val(),
+	            code: $('#code').val()
+	        }
+	    }
+	    
+	    function sendSms() {
+	        var url = "${CPATH}/smsCode/send";
+	        Utils.ajax(url, param, null);
+	    }
+	    
+	    function checkMobile(mobile) {
+	    	var url = "${CPATH}/user/checkMobile";
+	    	Utils.ajax(url, param, mobileCallback);
+	    }
+	    
+	    $('#bind').on('click', function() {
+            var url = '${CPATH}/user/update';
+            Utils.ajax(url, param, callback);
+        });
+        
+	    var callback = function(res) {
+	        if (res.errorCode == 0) {
+	        	location.href = "/";
+	        }
+	    }
+	    
+	    var mobileCallback = function(res) {
+	    	if (res.errorCode != 0) {
+	    		$.toptip(res.message, 'error');
+	    	}
+	    }
+		
+	})
+</script>
+
+</html>

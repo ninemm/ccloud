@@ -34,15 +34,14 @@ public class WechatUserInterceptor implements Interceptor {
 			+ "&state={state}#wechat_redirect";*/
 	public static final String AUTHORIZE_URL = "https://open.weixin.qq.com/connect/oauth2/authorize" + "?appid={appid}"
 			+ "&redirect_uri={redirecturi}" + "&response_type=code" + "&scope=snsapi_userinfo"
-			+ "&state=235#wechat_redirect";
+			+ "&state=wx#wechat_redirect";
 
 	@Override
 	public void intercept(Invocation inv) {
 
 		Controller controller = inv.getController();
-
 		String userJson = inv.getController().getSessionAttr(Consts.SESSION_WECHAT_USER);
-
+//		System.err.println("userJson = " + userJson);
 		if (StringUtils.isNotBlank(userJson)) {
 			inv.invoke();
 			return;

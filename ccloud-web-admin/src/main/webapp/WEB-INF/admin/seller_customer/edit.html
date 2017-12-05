@@ -36,9 +36,14 @@
             city: '${(sellerCustomer.city_name)!}',
             district: '${(sellerCustomer.country_name)!}'
         });
+
+        var $selectItem = $(".select-item");
+		$.each($areaName, function(index, el) {
+			$(el).val($selectItem.eq(index).text());
+			$areaCode.eq(index).val($selectItem.eq(index).data('code'));
+		});
 		
 		jQuery.mm.initValidator('#form', validatorFields)
-		
 	});
 
 	var validatorFields = {
@@ -66,18 +71,19 @@
 				regexp:{regexp:/^1[3|5|8]{1}[0-9]{9}$/, message:'请输入正确的手机号码' }
 			}
 		},
-		'areaNames': {
+		'customer.prov_name': {
 			validators: {
 				notEmpty: { message: '省不能为空' },
-				callback: {  
-					message: '省不能为空',  
-					callback: function(value, validator) {
-						if(value == '请选择省份'){
-							return false;
-						}
-						return true;
-					}
-				} 
+			}
+		},
+		'customer.city_name': {
+			validators: {
+				notEmpty: { message: '市不能为空' },
+			}
+		},
+		'customer.country_name': {
+			validators: {
+				notEmpty: { message: '区不能为空' },
 			}
 		},
 		'customer.address': {
@@ -107,10 +113,27 @@
 			content: '${CPATH}/admin/sellerCustomer/user_tree'
 		});
 	});
+	
+	var $areaName = $(".areaName");
+	var $areaCode = $(".areaCode");
+	
+	$city.on('cp:updated', function() {
+		areaCheck();
+	});
+	
+	function areaCheck() {
+		var $selectItem = $(".select-item");
+		$.each($areaName, function(index, el) {
+			$(el).val($selectItem.eq(index).text());
+			$areaCode.eq(index).val($selectItem.eq(index).data('code'));
+
+			$form.data('bootstrapValidator')
+			.updateStatus($(el).attr('name'), 'NOT_VALIDATED', null)
+			.validateField($(el).attr('name'));
+		});
+	}
 
 	function doSubmit(){
-		$("#areaCodes").val($city.data('citypicker').getCode());
-		$("#areaNames").val($city.data('citypicker').getVal());
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
 				var validate = $form.data('bootstrapValidator');
@@ -237,8 +260,12 @@
 	                    <label for="_title" class="col-sm-4 control-label">省市区:</label>
 	                    <div class="input-group col-sm-7">
 	                        <input readonly type="text" id="cityPicker" data-toggle="cityPicker" style="width:100%;">
-	                        <input type="hidden" id="areaNames" name="areaNames">
-	                        <input type="hidden" id="areaCodes" name="areaCodes">
+	                        <input type="hidden" class="areaName" name="customer.prov_name">
+	                        <input type="hidden" class="areaName" name="customer.city_name">
+	                        <input type="hidden" class="areaName" name="customer.country_name">
+	                        <input type="hidden" class="areaCode" name="customer.prov_code">
+	                        <input type="hidden" class="areaCode" name="customer.city_code">
+	                        <input type="hidden" class="areaCode" name="customer.country_code">
 	                    </div>
 	                </div>
 	                

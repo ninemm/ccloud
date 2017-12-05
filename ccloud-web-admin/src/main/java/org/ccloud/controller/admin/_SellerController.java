@@ -392,7 +392,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			
 	
 	public void changeSeller() {
-		String id = getPara("sellerId");
+		String id = getPara("0");
 		String name = getPara("sellerName");
 		setSessionAttr("sellerId", id);
 		setSessionAttr("sellerName", name);
@@ -417,6 +417,18 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
 		List<Seller> list = SellerQuery.me().findAllByUserId(user.getId());
 		renderJson(list);
+	}
+	
+	public void deleteProduct(){
+		String id = getPara("id");
+		final SellerProduct s = SellerProductQuery.me().findById(id);
+			if (s != null) {
+				if (s.delete()) {
+					renderAjaxResultForSuccess("删除成功");
+					return;
+				}
+			renderAjaxResultForError("删除失败");
+		}
 	}
 }
 
