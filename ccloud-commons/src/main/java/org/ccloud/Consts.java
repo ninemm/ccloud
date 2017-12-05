@@ -26,8 +26,6 @@ public class Consts {
 	
 	public static final String INDEX_URL = "/";
 
-	public static final String INDEX_URL = "/";
-	
 	public static final String ROUTER_CONTENT = "/c";
 	public static final String ROUTER_TAXONOMY = "/t";
 	public static final String ROUTER_USER = "/user";
@@ -113,4 +111,6 @@ public class Consts {
 	
 	public static final int INVENTORY_TYPE_IN = 0;//库存总账入库
 	public static final int INVENTORY_TYPE_OUT = 1;//库存总账出库
+	
+	public static final String SELLER_OPTION_STORE_SWITCH = "store_switch"; //经销商设置尾缀
 }
