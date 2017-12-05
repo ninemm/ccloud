@@ -55,7 +55,7 @@ public class SellerQuery extends JBaseQuery {
 		return DAO.doDelete("id = ?", sellerId);
 	}
 	
-	public Page<Seller> paginate(int pageNumber, int pageSize,String keyword, String orderby,String username,String userId,String dataArea) {
+	public Page<Seller> paginate(int pageNumber, int pageSize,String keyword, String orderby,String username,String userId) {
 		String select = "select DISTINCT cs.* ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_seller` cs LEFT JOIN user u on u.department_id =cs.dept_id ");
 
@@ -66,11 +66,11 @@ public class SellerQuery extends JBaseQuery {
 
 		if(keyword.equals("")){
 			if(!username.equals("admin")){
-				fromBuilder.append("where cs.seller_type =1 and u.id='"+userId+"' and ");
+				fromBuilder.append("where cs.seller_type =1 and u.id='"+userId+"' ");
 			}
 		}else{
 			if(!username.equals("admin")){
-				fromBuilder.append("and cs.seller_type =1 and u.id='"+userId+"' u.data_area='"+dataArea+"' ");
+				fromBuilder.append("and cs.seller_type =1 and u.id='"+userId+"' ");
 			}
 		}
 		fromBuilder.append(" GROUP BY cs.id order by " + orderby);	
