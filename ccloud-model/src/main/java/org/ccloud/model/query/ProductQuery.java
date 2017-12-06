@@ -131,18 +131,20 @@ public class ProductQuery extends JBaseQuery {
 	
 	public List<ProductInfo> getAllProductInfoById(String id) {
  		StringBuilder fromBuilder = new StringBuilder("SELECT p.create_date as createDate,p.id as productId, p.cost, p.is_marketable as isMarketable, p.market_price as marketPrice, p.`name`, p.price, ");
-		fromBuilder.append("p.product_sn as productSn, p.store, p.store_place, p.big_unit as bigUnit, p.weight, p.weight_unit as weightUnit, g.`code`, b.`name` as brandName, c.`name` as categoryName, t1.valueName ");
+		fromBuilder.append("p.product_sn as productSn, p.store,sp.custom_name as customName,p.store_place, p.big_unit as bigUnit, p.weight, p.weight_unit as weightUnit, g.`code`, b.`name` as brandName, c.`name` as categoryName, t1.valueName ");
 		fromBuilder.append("FROM cc_product p ");
+		fromBuilder.append("LEFT JOIN cc_seller_product sp ON sp.product_id = p.id ");
 		fromBuilder.append("LEFT JOIN cc_goods g ON p.goods_id = g.id ");
 		fromBuilder.append("LEFT JOIN cc_brand b ON g.brand_id = b.id ");
 		fromBuilder.append("LEFT JOIN cc_goods_category c ON g.goods_category_id = c.id ");
 		fromBuilder.append("LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
 		fromBuilder.append("RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = p.id ");		
-	 	fromBuilder.append("WHERE p.id = ?");
+	 	fromBuilder.append("WHERE sp.id = ?");
 		List<Record> list = Db.find(fromBuilder.toString(), id);	
 		List<ProductInfo> plist = new ArrayList<>();
 		for (Record record : list) {
 			ProductInfo pro = new ProductInfo();
+			pro.setCustomName(record.getStr("customName"));
 			pro.setBigUnit(record.getStr("bigUnit"));
 			pro.setBrandName(record.getStr("brandName"));
 			pro.setCategoryName(record.getStr("categoryName"));
@@ -219,8 +221,8 @@ public class ProductQuery extends JBaseQuery {
 	}
 
 	public List<ProductInfo> getAllProductInfoBySellerId(String sellerId) {
-		StringBuilder fromBuilder = new StringBuilder("SELECT p.create_date as createDate,p.id as productId, p.cost, p.is_marketable as isMarketable, p.market_price as marketPrice, p.`name`, p.price, ");
-		fromBuilder.append("p.product_sn as productSn, p.store, p.store_place,p.big_unit as bigUnit, p.weight, p.weight_unit as weightUnit, g.`code`, b.`name` as brandName, c.`name` as categoryName, t1.valueName ");
+		StringBuilder fromBuilder = new StringBuilder("SELECT p.create_date as createDate,sp.id as sellerProductId, p.cost, p.is_marketable as isMarketable, p.market_price as marketPrice, p.`name`, p.price, ");
+		fromBuilder.append("p.product_sn as productSn,sp.custom_name as customName, p.store, p.store_place,p.big_unit as bigUnit, p.weight, p.weight_unit as weightUnit, g.`code`, b.`name` as brandName, c.`name` as categoryName, t1.valueName ");
 		fromBuilder.append("FROM cc_product p ");
 		fromBuilder.append("LEFT JOIN cc_seller_product sp ON sp.product_id = p.id ");
 		fromBuilder.append("LEFT JOIN cc_goods g ON p.goods_id = g.id ");
@@ -232,6 +234,7 @@ public class ProductQuery extends JBaseQuery {
 		List<ProductInfo> plist = new ArrayList<>();
 		for (Record record : list) {
 			ProductInfo pro = new ProductInfo();
+			pro.setCustomName(record.getStr("customName"));
 			pro.setBigUnit(record.getStr("bigUnit"));
 			pro.setBrandName(record.getStr("brandName"));
 			pro.setCategoryName(record.getStr("categoryName"));
@@ -248,6 +251,7 @@ public class ProductQuery extends JBaseQuery {
 			pro.setWeight(record.getStr("weight"));
 			pro.setWeightUnit(record.getStr("weightUnit"));
 			pro.setProductId(record.getStr("productId"));
+			pro.setSellerProductId(record.getStr("sellerProductId"));
 			pro.setSpecificationValue(record.getStr("valueName"));
 			plist.add(pro);
 		}

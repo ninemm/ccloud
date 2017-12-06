@@ -76,11 +76,11 @@ function initProduct(){
 	if(productList) {
 			$.each(productList, function(idx, item) {
 				var option = {
-					id: item.productList.productId,
-					text: item.productList.name + item.productList.specificationValue
+					id: item.productList.sellerProductId,
+					text: item.productList.customName
 				}
 				productOptionArr.push(option);
-				productMap[item.productList.productId] = item;
+				productMap[item.productList.sellerProductId] = item;
 			});
 		}
 
@@ -105,7 +105,7 @@ function addNew() {
 var index = 1;
 function addTr(tid, productList, optionArr) {
 	var firstProduct = productList[0].productList;
-	var goodsCode = firstProduct.productId;
+	var goodsCode = firstProduct.sellerProductId;
 	var goodsName = firstProduct.name;
 	var specification = firstProduct.specificationValue;
 	var big_unit = firstProduct.bigUnit;
@@ -117,7 +117,7 @@ function addTr(tid, productList, optionArr) {
 	trHtml = $tr.html();
 
 	$tbody.append("<tr id='tr" + newTrIdx + "'>" +trHtml+ "</tr>");
-    $tbody.find("tr:last>td>#goodsCode").attr("name","stockTakingList["+ lastTrIdx +"].product_id");
+    $tbody.find("tr:last>td>#goodsCode").attr("name","stockTakingList["+ lastTrIdx +"].seller_product_id");
     $tbody.find("tr:last>td>#stock").attr("name","stockTakingList["+ lastTrIdx +"].product_count"); 
     $tbody.find("tr:last>td>#remarks").attr("name","stockTakingList["+ lastTrIdx +"].remark");           
     $tbody.find("tr:last>td>#goodsCode").val(goodsCode);
@@ -143,7 +143,7 @@ function addTr(tid, productList, optionArr) {
     <!--切换商品的方法  -->
     $tbody.find("tr:last>td>select.pro-slc2").change(function(){
      var result = productMap[$(this).val()].productList;   
-     var cgoodsCode = result.productId;
+     var cgoodsCode = result.sellerProductId;
      var cgoodsName = result.name;
      var cspecification = result.specificationValue;
      var cbig_unit = result.bigUnit;
@@ -239,7 +239,7 @@ function addTr(tid, productList, optionArr) {
 													<a class="btn btn-danger btn-xs removeTr" data-toggle="modal" data-target="#deleteBackProModal" ><span class="glyphicon glyphicon-remove"></span></a>
 												</td>
 												<td class="text-left">
-													<input type="hidden" id="goodsCode" name="stockTakingList[-1].product_id" disabled="true" />
+													<input type="hidden" id="goodsCode" name="stockTakingList[-1].seller_product_id" disabled="true" />
 												   <input type="hidden"  id="factIndex" name="factIndex" value="-1"/>
 													<select class="pro-slc2">
 													</select>
@@ -266,8 +266,8 @@ function addTr(tid, productList, optionArr) {
 												</td>
 												<#list (list.productInfos)! as plist>
 												<td class="text-left">
-													<input type="hidden" id="goodsCode" name="stockTakingList[${list_index}].product_id"  value="${list.productId}" />
-													<input type="text" id="goodsName" name="goodsName"  value="${plist.name}${plist.specificationValue!}" disabled="disabled"/>
+													<input type="hidden" id="goodsCode" name="stockTakingList[${list_index}].seller_product_id"  value="${list.sellerProductId}" />
+													<input type="text" id="goodsName" name="goodsName"  value="${plist.customName}" disabled="disabled"/>
 												   <input type="hidden"  id="factIndex" name="factIndex" value="${list_index}"/>
 												</td>
 												<td class="text-center">

@@ -81,7 +81,7 @@ public class StockTakingDetailQuery extends JBaseQuery {
 	public List<StockTakingInfo> findByStockTakingDetailId(String id) {
 		
 	 	StringBuilder fromBuilder = new StringBuilder("select c1.stock_taking_sn,c1.warehouse_id,c1.biz_user_id,c1.biz_date,c1.`status`,c1.create_date, ");
-	 	fromBuilder.append("c2.product_id,c2.product_amount,c2.product_count,c2.remark");
+	 	fromBuilder.append("c2.seller_product_id as seller_product_id,c2.product_amount,c2.product_count,c2.remark");
 	 	fromBuilder.append(" FROM cc_stock_taking c1 ");
 	 	fromBuilder.append(" inner JOIN cc_stock_taking_detail c2 ON c1.id = c2.stock_taking_id ");
 	 	fromBuilder.append(" WHERE c2.stock_taking_id = ?");
@@ -94,11 +94,11 @@ public class StockTakingDetailQuery extends JBaseQuery {
 			stockTakingInfo.setBizUserId(record.getStr("biz_user_id"));
 			stockTakingInfo.setBizDate(record.getDate("biz_date"));
 			stockTakingInfo.setStatus(record.getInt("status"));
-			stockTakingInfo.setProductId(record.getStr("product_id"));
+			stockTakingInfo.setSellerProductId(record.getStr("seller_product_id"));
 			stockTakingInfo.setProductAmount(record.getBigDecimal("product_amount"));
 			stockTakingInfo.setProductCount(record.getBigDecimal("product_count"));
 			stockTakingInfo.setRemark(record.getStr("remark"));
-			List<ProductInfo> ProductInfo = ProductQuery.me().getAllProductInfoById(stockTakingInfo.getProductId());
+			List<ProductInfo> ProductInfo = ProductQuery.me().getAllProductInfoById(stockTakingInfo.getSellerProductId());
 			stockTakingInfo.setProductInfos(ProductInfo);
 			iList.add(stockTakingInfo);
 		}
@@ -111,14 +111,16 @@ public class StockTakingDetailQuery extends JBaseQuery {
 
 
 	public List<Map<String, Object>> findByStockTakingDetailId1(String id) {
-		StringBuilder fromBuilder = new StringBuilder("select * from cc_stock_taking_detail cs join cc_product cp on cs.product_id=cp.id where stock_taking_id =?");
+		StringBuilder fromBuilder = new StringBuilder("select * from cc_stock_taking_detail c1 join cc_seller_product c2 on c1.seller_product_id=c2.id join cc_product p on p.id=c2.product_id where c1.stock_taking_id =?");
 		List<Record> list = Db.find(fromBuilder.toString(), id);
 		List<Map<String, Object>> iList = new ArrayList<>();
 		for (Record record : list) {
 			Map<String, Object>map=new HashMap<>();
+			map.put("convert_relate", record.getStr("convert_relate"));
 			map.put("product_id", record.getStr("product_id"));
+			map.put("seller_product_id", record.getStr("seller_product_id"));
 			map.put("remark", record.getStr("remark"));
-			map.put("market_price", record.getStr("market_price"));
+			map.put("price", record.getStr("price"));
 			map.put("convert_relate", record.getStr("convert_relate"));
 			map.put("product_count", record.getStr("product_count"));
 			map.put("product_amount", record.getStr("product_amount"));
@@ -127,14 +129,8 @@ public class StockTakingDetailQuery extends JBaseQuery {
 		return iList;
 	}
 
-	public List<Record> selectSellProductId(String productId, String sellerId) {
-		StringBuilder fromBuilder1 = new StringBuilder("select id from cc_seller_product where product_id=? and seller_id=?");
-		List<Record> find = Db.find(fromBuilder1.toString(),productId,sellerId);
-		return find ;
-	}
-
 	public List<Record> findByInventory(String productId, String warehouseId, String sellerId) {
-		StringBuilder fromBuilder1 = new StringBuilder("select * from cc_inventory where product_id=? and warehouse_id=? and seller_id=?");
+		StringBuilder fromBuilder1 = new StringBuilder("select i.* from cc_inventory i,cc_inventory_detail d,cc_product p WHERE i.product_id=p.id and p.id=? and i.warehouse_id=? and i.seller_id=?");
 		List<Record> find = Db.find(fromBuilder1.toString(),productId,warehouseId,sellerId);
 		return find;
 	}
@@ -144,6 +140,10 @@ public class StockTakingDetailQuery extends JBaseQuery {
 		List<Record> find = Db.find(fromBuilder1.toString(),sell_product_id,warehouseId);
 		return find;
 		
+	}
+
+	public List<Record> selectSellProductId(String product_id, String seller_id) {
+		return null;
 	}
 	
 }

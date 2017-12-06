@@ -104,9 +104,9 @@ public class SellerProductQuery extends JBaseQuery {
 		return DAO.find(fromBuilder.toString(), sellId);
 	}
 
-	public List<SellerProduct> findByProductIdAndSellerId(String productId, String sellerId) {
-		StringBuilder fromBuilder = new StringBuilder("select * from cc_seller_product where product_id=? and seller_id=?");
-		return DAO.find(fromBuilder.toString(), productId,sellerId);
+	public List<SellerProduct> findByProductIdAndSellerId(String seller_product_id, String sellerId) {
+		StringBuilder fromBuilder = new StringBuilder("select * from cc_seller_product where id=? and seller_id=?");
+		return DAO.find(fromBuilder.toString(), seller_product_id,sellerId);
 	}
 	
 	public List<Record> findProductTypeBySellerForApp(String sellerId) {
