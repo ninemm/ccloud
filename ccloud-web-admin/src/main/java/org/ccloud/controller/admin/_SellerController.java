@@ -122,11 +122,11 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		customer.setCountryCode(areaCodeArray[2]);
 		
 		String [] brandIds= brandList.split(",");
-		Department department=DepartmentQuery.me().findById(getPara("seller.dept_id"));
+		Department department=DepartmentQuery.me().findById(getPara("dept_id"));
 		User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
 		if (StrKit.isBlank(sellerId)) {
 			Seller seller2=SellerQuery.me().findByDeptAndSellerType(getPara("dept_id"),getPara("seller_type"));
-			if(seller2!=null){
+			if(seller2!=null && getPara("seller_type")=="0"){
 				renderAjaxResultForError("该公司部门已有一个经销商，请确认");
 				return;
 			}
