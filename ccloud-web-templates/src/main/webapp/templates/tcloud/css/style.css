@@ -557,6 +557,7 @@ a {
   top: .2rem;
 }
 
+
 .product_detail {
   background: #fff;
   margin-top: 10px;
@@ -629,7 +630,7 @@ a {
   color: #e6292f;
   font-weight: 600;
   display: inline-block;
-  width: 2rem;
+  width: 3rem;
 }
 
 .operate {
@@ -891,6 +892,16 @@ a {
   width: 5rem!important;
   margin-left: 0!important;
 }
+
+.goods-detail select:disabled {
+  width: 3rem!important;
+}
+
+.goods-detail input[type=number]:disabled{
+  border: 1px solid #bbb;
+}
+
+
 
 
 /* 客户 */
