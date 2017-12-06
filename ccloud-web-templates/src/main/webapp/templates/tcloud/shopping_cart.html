@@ -1,0 +1,153 @@
+<#include "_inc/_layout.html"/>
+<#macro css> </#macro>
+
+<#macro script>
+$(function() {
+  $(document).on("touchstart", ".icon-trash-o", function() {
+    var _this = $(this);
+    $.confirm("确认删除商品？", function() {
+      _this.parents(".weui-panel").remove();
+    }, function() {
+
+    })
+  });
+  
+  initProduct();
+  
+});
+
+var newHtml = $(".weui-panel").eq(0).html();
+var $main = $("main");
+
+function initProduct(){
+	var productList = getItemBykey("productList");
+	$main.empty();
+	$.each(productList, function(index, el) {
+		$main.append("<div class='weui-panel weui-panel_access'>" + newHtml + "</div>");
+		var $newProductDetail = $main.find(".weui-panel:last");
+		$newProductDetail.find("#productName").text(el.productName);
+		$newProductDetail.find("#valueName").text(el.valueName);
+
+		$newProductDetail.find("#bigPriceSpan").text(el.bigPriceSpan);
+		$newProductDetail.find("#smallPriceSpan").text(el.smallPriceSpan);
+		$newProductDetail.find("#bigUnitSpan").text(el.bigUnitSpan);
+		$newProductDetail.find("#smallUnitSpan").text(el.smallUnitSpan);
+
+		$newProductDetail.find("#bigPrice").val(el.bigPrice);
+		$newProductDetail.find("#smallPrice").val(el.smallPrice);
+		$newProductDetail.find("#bigUnit").val(el.bigUnit);
+		$newProductDetail.find("#smallUnit").val(el.smallUnit);
+		$newProductDetail.find("#sellProductId").val(el.sellProductId);
+		$newProductDetail.find("#productId").val(el.productId);
+		$newProductDetail.find("#convert").val(el.convert);
+		
+		$newProductDetail.find("#bigNum").val(el.bigNum);
+		$newProductDetail.find("#smallNum").val(el.smallNum);
+
+	});
+}
+</#macro>
+
+<@layout>
+<body id="shopping-cart">
+	<main>
+		<div class="weui-panel weui-panel_access">
+			<input type="hidden" id="sellProductId" value="">
+			<input type="hidden" id="productId" value="">
+			<input type="hidden" id="convert" value="">
+			<div class="product_name" id="productName">
+				35度中国劲酒_125ml_1*24
+<!--         <span class="gift-tag">赠品</span> -->
+			</div>
+			<div class="product_unit">
+				规格：<span id="valueName">125ml</span>
+			</div>
+			<div class="product_bUnit">
+				<span class="price" id="bigPriceSpan">￥725</span>
+				<span class="unit" id="bigUnitSpan">&nbsp;/&nbsp;件</span>
+				<div class="spinner">
+					<div class="operate fl">
+						<i class="icon-minus2"></i>
+					</div>
+					<input type="number" min="0" value="0" class="fl" id="bigNum" >
+					<div class="operate fl">
+						<i class="icon-plus2"></i>
+					</div>
+				</div>
+				<input type="number" class="street-value" id="bigPrice" value="720" >
+			</div>
+			<div class="product_mUnit">
+				<span class="price" id="smallPriceSpan" >￥30</span>
+				<span class="unit" id="smallUnitSpan" >&nbsp;/&nbsp;瓶</span>
+				<div class="spinner">
+					<div class="operate fl">
+						<i class="icon-minus2"></i>
+					</div>
+					<input type="number" min="0" value="0" class="fl" id="smallNum" >
+					<div class="operate fl">
+						<i class="icon-plus2"></i>
+					</div>
+				</div>
+				<input type="number" class="street-value" id="smallPrice" value="30" >
+				<i class="icon-trash-o fr ft30 gray"></i>
+			</div>
+			<hr />
+			<div class="gift">
+				<div>
+					<input type="checkbox" name="add-gift">
+					<span>添加赠品</span>
+				</div>
+				<div style="display:none">
+					<div class="goods">
+						<span>商品</span>
+						<select>
+							<option>选择商品</option>
+							<option>瓶</option>
+						</select>
+						<input type="checkbox" name="default-goods">
+						<span>默认商品</span>
+					</div>
+					<div class="number">
+						<span>数量</span>
+						<div class="spinner">
+							<div class="operate fl">
+								<i class="icon-minus2"></i>
+							</div>
+							<input type="number" min="0" value="0" class="fl" >
+							<div class="operate fl">
+								<i class="icon-plus2"></i>
+							</div>
+						</div>
+						<select>
+							<option>件</option>
+							<option>瓶</option>
+						</select>
+					</div>
+				</div>
+			</div>
+		</div>
+	</main>
+	<div class="hidden-menu">
+		<ul>
+			<li>
+				<a href="index.html">
+				首页
+				<i class="icon-home blue"></i>
+				</a>
+			</li>
+			<li>
+				<a href="javascript:history.go(-1)">
+				上一页
+				<i class="icon-undo green"></i>
+				</a>
+			</li>
+		</ul>
+		<i class="icon-menu-open orange fr" id="button"></i>
+	</div>
+	<div class="layer"></div>
+	<footer class="weui-footer weui-footer_fixed-bottom">
+		<p class="total bg-white">共2款，总数10件</p>
+		<a href="order.html" class="place-order bg-blue white">下单</a>
+	</footer>
+</body>
+</@layout>

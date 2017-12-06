@@ -11,8 +11,99 @@ $(function() {
 	        $(this).text("展开");
 	        $(this).parent().next().hide();
         }
+    }).on("touchstart", "#sidebar li", function () {
+ 
+        $(this).addClass("active").siblings().removeClass("active");
+        var typeId = $(this).attr('id');
+		initProduct();
+    }).on("input", "#searchInput", function () {
+    	keyword = $(this).val();
+		initProduct();
+    }).on("touchstart", "#searchCancel", function () {
+    	keyword = $(this).val();
+		initProduct();
     });
+    
+    initProduct();
 });
+
+var typeId = '';
+var keyword = '';
+var newHtml = $(".product_detail").eq(0).html();
+var $menuRight = $(".menu-right");
+function initProduct(){
+	Utils.ajax('${CPATH}/product/productList', {'typeId' : typeId, 'keyword': keyword}, 
+		function(data){
+			$menuRight.empty();
+			$.each(data, function(index, el) {
+				$menuRight.append("<section class='product_detail weui-panel weui-panel_access'>" + newHtml + "</section>");
+				var $newProductDetail = $menuRight.find(".product_detail:last");
+				$newProductDetail.find("#productName").text(el.custom_name);
+				$newProductDetail.find("#valueName").text(el.valueName);
+				
+				var bigPrice = el.price;
+				var convert = el.convert_relate;
+				var smallPrice = (bigPrice / convert).toFixed(2);
+
+				$newProductDetail.find("#bigPriceSpan").text('￥' + bigPrice);
+				$newProductDetail.find("#smallPriceSpan").text('￥' + smallPrice);
+				$newProductDetail.find("#bigUnitSpan").text(' / '+ el.big_unit);
+				$newProductDetail.find("#smallUnitSpan").text(' / ' + el.small_unit);
+				$newProductDetail.find("#stock").text('库存：' + el.store_count + el.big_unit);
+
+				$newProductDetail.find("#bigPrice").val(bigPrice);
+				$newProductDetail.find("#smallPrice").val(smallPrice);
+				$newProductDetail.find("#bigUnit").val(el.big_unit);
+				$newProductDetail.find("#smallUnit").val(el.small_unit);
+				$newProductDetail.find("#sellProductId").val(el.sell_product_id);
+				$newProductDetail.find("#productId").val(el.product_id);
+				$newProductDetail.find("#convert").val(el.convert_relate);
+			
+
+			});
+		}
+	);
+}
+
+function save(){
+	var productList = [];
+	var $product = $(".product_detail");
+	$.each($product, function(index, el) {
+		$el = $(el);
+		var sellProductId = $el.find("#sellProductId").val();
+		var bigNum = $el.find("#bigNum").val();
+		var smallNum = $el.find("#smallNum").val();
+		
+		if(bigNum != 0 || smallNum != 0){
+			productList.push({
+				productName : $el.find("#productName").text(),
+				valueName : $el.find("#valueName").text(),
+				
+				bigPriceSpan : $el.find("#bigPriceSpan").text(),
+				smallPriceSpan : $el.find("#smallPriceSpan").text(),
+				bigUnitSpan : $el.find("#bigUnitSpan").text(),
+				smallUnitSpan : $el.find("#smallUnitSpan").text(),
+				stock : $el.find("#stock").text(),
+				
+				bigPrice : $el.find("#bigPrice").val(),
+				smallPrice : $el.find("#smallPrice").val(),
+				bigUnit : $el.find("#bigUnit").val(),
+				smallUnit : $el.find("#smallUnit").val(),
+				sellProductId : sellProductId,
+				productId : $el.find("#productId").val(),
+				convert : $el.find("#convert").val(),
+
+				bigNum : $el.find("#bigNum").val(),
+				smallNum : $el.find("#smallNum").val()
+			});
+		}
+	});
+	
+	setItemBykey("productList",productList);
+	window.location.href = '${CPATH}/product/shoppingCart';
+}
+
+
 </#macro>
 
 <@layout>
@@ -38,161 +129,72 @@ $(function() {
 		<aside>
 			<div id="sidebar" class="menu-left">
 				<ul>
-					<li class="active">热销</li>
-					<li>中国劲酒</li>
-					<li>毛铺</li>
-					<li>白云边</li>
-					<li>洋河</li>
-					<li>活动商品</li>
+					<li  id='' class="active">热销
+						<span class="goods-num">8</span>
+					</li>
+					<#list productTypeList as productType >
+						<li id='${(productType.id)!}'>
+							${(productType.name)!}
+							<span class="goods-num">8</span>
+						</li>
+					</#list>
 				</ul>
 			</div>
 		</aside>
+		
 		<article class="menu-right">
 			<section class="product_detail weui-panel weui-panel_access">
 				<div>
-					<div class="product_name">35度中国劲酒_125ml_1*24</div>
-					<div class="product_unit">
-						规格： <span>125ml</span> <span>250ml</span> <a> <i
-							class="icon-cart-plus enter-shopping-cart"></i>
-						</a>
-					</div>
+					<input type="hidden" id="sellProductId" value="">
+					<input type="hidden" id="productId" value="">
+					<input type="hidden" id="convert" value="">
+					<input type="hidden" id="bigPrice" value="">
+					<input type="hidden" id="smallPrice" value="">
+					<input type="hidden" id="bigUnit" value="">
+					<input type="hidden" id="smallUnit" value="">
+					<div>
+						<div class="product-top">
+							<img src="./static/images/pro3.jpg" alt="" style="width:2rem;">
+							<div class="product_name" id="productName">
+								<div>35度中国劲酒</div>
+							</div>
+							<div class="product_unit">
+								规格： <span id="valueName">125ml</span> 
+							</div>
+							<span class="weui-cell__ft"></span>
+						</div>
 					<div class="product_bUnit">
-						<span class="price">￥725</span> <span class="unit">&nbsp;/&nbsp;件</span>
+						<span class="price" id="bigPriceSpan">￥210</span> <span class="unit" id="bigUnitSpan">&nbsp;/&nbsp;件</span>
 						<div class="spinner">
 							<div class="operate fl">
 								<i class="icon-minus2"></i>
 							</div>
-							<input type="number" min="0" value="0" class="fl">
+							<input type="number" min="0" value="0" class="fl" id="bigNum">
 							<div class="operate fl">
 								<i class="icon-plus2"></i>
 							</div>
 						</div>
 					</div>
 					<div class="product_mUnit">
-						<span class="price">￥30</span> <span class="unit">&nbsp;/&nbsp;瓶</span>
+						<span class="price" id="smallPriceSpan">￥12</span> <span class="unit" id="smallUnitSpan">&nbsp;/&nbsp;瓶</span>
 						<div class="spinner">
 							<div class="operate fl">
 								<i class="icon-minus2"></i>
 							</div>
-							<input type="number" min="0" value="0" class="fl">
+							<input type="number" min="0" value="0" class="fl" id="smallNum">
 							<div class="operate fl">
 								<i class="icon-plus2"></i>
 							</div>
 						</div>
 					</div>
-					<div>库存：1120.2件</div>
-				</div>
-				<hr>
-				<div>
-					<p>
-						赠品：参茸劲酒_250ml_1*6 <a class="fr gift-open">展开</a>
-					</p>
-					<p class="t-r width-50 none">X 1 件</p>
+					<div id="stock">库存：1000件</div>
 				</div>
 			</section>
-			<section class="product_detail weui-panel weui-panel_access">
-				<div class="product_name">35度中国劲酒_125ml_1*24</div>
-				<div class="product_unit">
-					规格： <span>125ml</span> <span>250ml</span> <a> <i
-						class="icon-cart-plus enter-shopping-cart"></i>
-					</a>
-				</div>
-				<div class="product_bUnit">
-					<span class="price">￥725</span> <span class="unit">&nbsp;/&nbsp;件</span>
-					<div class="spinner">
-						<div class="operate fl">
-							<i class="icon-minus2"></i>
-						</div>
-						<input type="number" min="0" value="0" class="fl">
-						<div class="operate fl">
-							<i class="icon-plus2"></i>
-						</div>
-					</div>
-				</div>
-				<div class="product_mUnit">
-					<span class="price">￥30</span> <span class="unit">&nbsp;/&nbsp;瓶</span>
-					<div class="spinner">
-						<div class="operate fl">
-							<i class="icon-minus2"></i>
-						</div>
-						<input type="number" min="0" value="0" class="fl">
-						<div class="operate fl">
-							<i class="icon-plus2"></i>
-						</div>
-					</div>
-				</div>
-				<div>库存：1120.2件</div>
-			</section>
-			<section class="product_detail">
-				<div class="product_name">35度中国劲酒_125ml_1*24</div>
-				<div class="product_unit">
-					规格： <span>125ml</span> <span>250ml</span> <a> <i
-						class="icon-cart-plus enter-shopping-cart"></i>
-					</a>
-				</div>
-				<div class="product_bUnit">
-					<span class="price">￥725</span> <span class="unit">&nbsp;/&nbsp;件</span>
-					<div class="spinner">
-						<div class="operate fl">
-							<i class="icon-minus2"></i>
-						</div>
-						<input type="number" min="0" value="0" class="fl">
-						<div class="operate fl">
-							<i class="icon-plus2"></i>
-						</div>
-					</div>
-				</div>
-				<div class="product_mUnit">
-					<span class="price">￥30</span> <span class="unit">&nbsp;/&nbsp;瓶</span>
-					<div class="spinner">
-						<div class="operate fl">
-							<i class="icon-minus2"></i>
-						</div>
-						<input type="number" min="0" value="0" class="fl">
-						<div class="operate fl">
-							<i class="icon-plus2"></i>
-						</div>
-					</div>
-				</div>
-				<div>库存：1120.2件</div>
-			</section>
-			<section class="product_detail">
-				<div class="product_name">35度中国劲酒_125ml_1*24</div>
-				<div class="product_unit">
-					规格： <span>125ml</span> <span>250ml</span> <a> <i
-						class="icon-cart-plus enter-shopping-cart"></i>
-					</a>
-				</div>
-				<div class="product_bUnit">
-					<span class="price">￥725</span> <span class="unit">&nbsp;/&nbsp;件</span>
-					<div class="spinner">
-						<div class="operate fl">
-							<i class="icon-minus2"></i>
-						</div>
-						<input type="number" min="0" value="0" class="fl">
-						<div class="operate fl">
-							<i class="icon-plus2"></i>
-						</div>
-					</div>
-				</div>
-				<div class="product_mUnit">
-					<span class="price">￥30</span> <span class="unit">&nbsp;/&nbsp;瓶</span>
-					<div class="spinner">
-						<div class="operate fl">
-							<i class="icon-minus2"></i>
-						</div>
-						<input type="number" min="0" value="0" class="fl">
-						<div class="operate fl">
-							<i class="icon-plus2"></i>
-						</div>
-					</div>
-				</div>
-				<div>库存：1120.2件</div>
-			</section>
+
 		</article>
 		<div class="hidden-menu">
 			<ul>
-				<li><a href="shoppingCart.html"> 购物车 <i
+				<li><a onclick="save()"> 购物车 <i
 						class="icon-shopping-cart blue"></i>
 				</a></li>
 			</ul>

@@ -1,0 +1,245 @@
+<#include "_inc/_layout.html"/>
+<#macro css> </#macro>
+
+<#macro script>
+$(function() {
+  $(document).on("touchstart", ".icon-trash-o", function() {
+    var _this = $(this);
+    $.confirm("确认删除商品？", function() {
+      _this.parents(".weui-panel").remove();
+    }, function() {
+
+    })
+  })
+})
+</#macro>
+
+<@layout>
+<body id="order">
+  <main>
+    <section class="weui-panel weui-panel_access order-customer-info">
+      <div class="weui-cell weui-cell_access">
+        <div class="weui-cell__bd">
+          <div class="order-customer-info-title">
+            客户名称
+            <span class="require">*</span>
+          </div>
+          <input type="text" placeholder="请选择客户" class="weui-input">
+        </div>
+        <span class="weui-cell__ft"></span>
+      </div>
+      <div class="weui-cell weui-cell_access">
+        <div class="weui-cell__bd">
+          <div class="order-customer-info-title">
+            联系人
+            <span class="require">*</span>
+          </div>
+          <input type="text" placeholder="请输入客户信息" class="weui-input">
+        </div>
+      </div>
+      <div class="weui-cell weui-cell_access">
+        <div class="weui-cell__bd">
+          <div class="order-customer-info-title">
+            电话号码
+            <span class="require">*</span>
+          </div>
+          <input type="text" placeholder="请输入电话号码" class="weui-input">
+        </div>
+      </div>
+      <div class="weui-cell weui-cell_access">
+        <div class="weui-cell__bd">
+          <div class="order-customer-info-title">
+            详细地址
+            <span class="require">*</span>
+          </div>
+          <input type="text" placeholder="请输入详细地址" class="weui-input">
+        </div>
+      </div>
+    </section>
+    <section class="weui-panel weui-panel_access delivery-info">
+      <div class="weui-cell weui-cell_access">
+        <div class="weui-cell__bd">
+          配送时间
+          <input type="text" placeholder="请选择配送时间" readonly id="delivery-time" class="weui-input">
+          <span class="weui-cell__ft"></span>
+        </div>
+      </div>
+    </section>
+    <section class="weui-panel weui-panel_access ft14">
+      <div class="weui-cell weui-cell_access">
+        <div class="weui-cell__bd">
+          <div>
+            <input type="checkbox" name="if-account" id=""> 是否账期
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="weui-panel weui-panel_access ft14 remark">
+      <div class="weui-cell weui-cell_access">
+        <div class="weui-cell__bd">
+          <textarea placeholder="备注说明（70字以内）"></textarea>
+        </div>
+      </div>
+    </section>
+    <div class="weui-cells__title black">商品明细</div>
+    <div class="weui-panel weui-panel_access goods-detail">
+      <div class="product_name">
+        35度中国劲酒_125ml_1*24
+        <span class="gift-tag">赠品</span>
+      </div>
+      <div class="product_unit">
+        规格：
+        <span class="blue-button">125ml</span>
+        <span>250ml</span>
+      </div>
+      <div class="product_bUnit">
+        <span class="price">￥725</span>
+        <span class="unit">&nbsp;/&nbsp;件</span>
+        <div class="spinner">
+          <div class="operate fl">
+            <i class="icon-minus2"></i>
+          </div>
+          <input type="number" min="0" value="0" class="fl" >
+          <div class="operate fl">
+            <i class="icon-plus2"></i>
+          </div>
+        </div>
+        <input type="number" class="street-value" value="720" >
+      </div>
+      <div class="product_mUnit">
+        <span class="price">￥30</span>
+        <span class="unit">&nbsp;/&nbsp;瓶</span>
+        <div class="spinner">
+          <div class="operate fl">
+            <i class="icon-minus2"></i>
+          </div>
+          <input type="number" min="0" value="0" class="fl" >
+          <div class="operate fl">
+            <i class="icon-plus2"></i>
+          </div>
+        </div>
+        <input type="number" class="street-value" value="30" >
+        <i class="icon-trash-o fr ft30 gray"></i>
+      </div>
+      <hr />
+      <div class="gift">
+        <div>
+          <input type="checkbox" name="add-gift">
+          <span>添加赠品</span>
+        </div>
+        <div style="display:none">
+          <div class="number">
+            <span>数量</span>
+            <div class="spinner">
+              <div class="operate fl">
+                <i class="icon-minus2"></i>
+              </div>
+              <input type="number" min="0" value="0" class="fl" >
+              <div class="operate fl">
+                <i class="icon-plus2"></i>
+              </div>
+            </div>
+          </div>
+          <div class="number">
+            <span>单位</span>
+            <select>
+              <option>件</option>
+              <option>瓶</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="weui-panel weui-panel_access goods-detail">
+      <div class="product_name">
+        35度中国劲酒_125ml_1*24
+        <span class="gift-tag">赠品</span>
+      </div>
+      <div class="product_unit">
+        规格：
+        <span class="blue-button">125ml</span>
+        <span>250ml</span>
+      </div>
+      <div class="product_bUnit">
+        <span class="price">￥725</span>
+        <span class="unit">&nbsp;/&nbsp;件</span>
+        <div class="spinner">
+          <div class="operate fl">
+            <i class="icon-minus2"></i>
+          </div>
+          <input type="number" min="0" value="0" class="fl" >
+          <div class="operate fl">
+            <i class="icon-plus2"></i>
+          </div>
+        </div>
+        <input type="number" class="street-value" value="720" >
+      </div>
+      <div class="product_mUnit">
+        <span class="price">￥30</span>
+        <span class="unit">&nbsp;/&nbsp;瓶</span>
+        <div class="spinner">
+          <div class="operate fl">
+            <i class="icon-minus2"></i>
+          </div>
+          <input type="number" min="0" value="0" class="fl" >
+          <div class="operate fl">
+            <i class="icon-plus2"></i>
+          </div>
+        </div>
+        <input type="number" class="street-value" value="30" >
+        <i class="icon-trash-o fr ft30 gray"></i>
+      </div>
+      <hr />
+      <div class="gift">
+        <div>
+          <input type="checkbox" name="add-gift">
+          <span>添加赠品</span>
+        </div>
+        <div style="display:none">
+          <div class="number">
+            <span>数量</span>
+            <div class="spinner">
+              <div class="operate fl">
+                <i class="icon-minus2"></i>
+              </div>
+              <input type="number" min="0" value="0" class="fl" >
+              <div class="operate fl">
+                <i class="icon-plus2"></i>
+              </div>
+            </div>
+          </div>
+          <div class="number">
+            <span>单位</span>
+            <select>
+              <option>件</option>
+              <option>瓶</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <div class="hidden-menu">
+    <ul>
+      <li>
+        <a href="index.html">
+          首页
+          <i class="icon-home blue"></i>
+        </a>
+      </li>
+      <li>
+        <a href="javascript:history.go(-1)">
+          上一页
+          <i class="icon-undo green"></i>
+        </a>
+      </li>
+    </ul>
+    <i class="icon-menu-open orange fr" id="button"></i>
+  </div>
+  <div class="layer"></div>
+  <footer class="weui-footer weui-footer_fixed-bottom">
+    <p class="total bg-gray">共2款，总数10件&nbsp;总额：2600元</p>
+    <a href="order.html" class="place-order bg-blue white">提交订单</a>
+  </footer>
+</body>
+</@layout>

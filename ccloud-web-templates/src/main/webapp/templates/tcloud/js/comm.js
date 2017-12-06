@@ -37,7 +37,7 @@ Utils = {
 		$.ajax({
             type: "post",
             url: url,
-            data: param(),
+            data: param,
             dataType: 'json',
             success: function(res) {
             	if (callback)
@@ -157,6 +157,44 @@ function closePop() {
 function confirmInput() {
 	$currentInput.val($(".pop-input input").val());
 	closePop();
+}
+
+//设定storage
+function setItemBykey(key, value){
+	if(window.localStorage){
+		var storage = window.localStorage;
+		storage.setItem(key, JSON.stringify(value));
+	} else {
+		alert("浏览器不支持localstorage");
+	}
+}
+//获取storage中的数据
+function getItemBykey(key){
+	if(window.localStorage){
+		var storage = window.localStorage;
+		var json = storage.getItem(key);
+        return JSON.parse(json);
+	} else {
+		alert("浏览器不支持localstorage");
+	}
+}
+//移除storage中的item
+function removeItemBykey(key){
+	if(window.localStorage){
+		var storage = window.localStorage;
+		storage.removeItem(key);
+	} else {
+		alert("浏览器不支持localstorage");
+	}
+}
+//清空storage
+function clearStorage(){
+	if(window.localStorage){
+		var storage = window.localStorage;
+		storage.clear();
+	} else {
+		alert("浏览器不支持localstorage");
+	}
 }
 
 $(function() {
