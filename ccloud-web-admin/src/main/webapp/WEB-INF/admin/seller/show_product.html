@@ -223,9 +223,10 @@
 			return;		 
 		 }
 		 $('input[name="dataItem"]:checked').parent().parent().each(function(idx, item) {
+		 	console.log($(this));
 		  	var obj = {
 								"id": $(this).find('td').eq(0).find("input").val(),
-								"is_enable": $(this).find('td').eq(11).find("input").val(),
+								"is_enable": $(this).find('td').eq(10).find("input").val(),
 							};
 							orderItems.push(obj);
 						})
@@ -262,7 +263,7 @@
 		 $('input[name="dataItem"]:checked').parent().parent().each(function(idx, item) {
 		  	var obj = {
 								"id": $(this).find('td').eq(0).find("input").val(),
-								"is_enable": $(this).find('td').eq(11).find("input").val(),
+								"is_enable": $(this).find('td').eq(10).find("input").val(),
 							};
 							orderItems.push(obj);
 						})
