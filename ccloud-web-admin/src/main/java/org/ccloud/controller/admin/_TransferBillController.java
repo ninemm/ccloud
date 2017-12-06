@@ -29,6 +29,7 @@ import org.ccloud.model.TransferBill;
 import org.ccloud.model.TransferBillDetail;
 import org.ccloud.model.User;
 import org.ccloud.model.Warehouse;
+import org.ccloud.model.query.ProductQuery;
 import org.ccloud.model.query.TransferBillDetailQuery;
 import org.ccloud.model.query.TransferBillQuery;
 import org.ccloud.model.query.WarehouseQuery;
@@ -88,7 +89,7 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 	
 	
 	@Override
-	public void save() {		
+	public void save() {			
 	 TransferBill transferBill = getModel(TransferBill.class);
 	 if (transferBill.getStatus() == null || transferBill.getStatus() == 0) {
 	  User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
@@ -115,7 +116,6 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 		  renderAjaxResultForError("保存失败,该单子已调拨完成！");
 	 }
 	}
-	
 	
 	public boolean saveTransferBillInfo(final Map<String, String[]>map,final TransferBill transferBill,final boolean update) {
 		boolean isSave = Db.tx(new IAtom() {
@@ -175,7 +175,7 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 						 transferBillDetail.setDeptId(transferBill.getDeptId());
 						 transferBillDetail.setDataArea(transferBill.getDataArea());
 						 transferBillDetail.setCreateDate(new Date());
-					     iSaveList.add(transferBillDetail);
+					     iSaveList.add(transferBillDetail);					     
 	 					loopEnd++;
 	 					if (loopEnd == factIndex.length) {
 	    					break;
@@ -197,10 +197,16 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 	
 	public void enable() {
 		String id = getPara("id");
+		//查询商品调拨库存数量
+		List<transferBillInfo> transferBillInfos = TransferBillDetailQuery.me().findByTransferBillDetailId(id);
+		//查找商品的库存数量并和调拨数量做比较
+		this.checkStoreCount(transferBillInfos);
 		int isEnabled = getParaToInt("isEnabled");
 		TransferBill transferBill = TransferBillQuery.me().findById(id);
 			transferBill.setStatus(isEnabled);
 			if (transferBill.saveOrUpdate()) {
+				//往库存总账主表写记录
+				this.saveInventoryInfo(transferBill);
 				renderAjaxResultForSuccess("更新成功");
 			} else {
 				renderAjaxResultForError("更新失败");
@@ -208,7 +214,17 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 	}
 	
 	
-	//删除调拨单主表及其子表的信息
+	private void checkStoreCount(List<transferBillInfo> transferBillInfos) {
+		
+	}
+
+
+	private void saveInventoryInfo(TransferBill transferBill) {
+		
+	}
+
+
+		//删除调拨单主表及其子表的信息
 		@Override
 		public void delete() {
 			String id = getPara("id");

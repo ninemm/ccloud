@@ -41,6 +41,7 @@ var validatorFields = {
 
 function doSubmit(){
 
+	checkIsTheSameWarehouse();
 	$form.ajaxSubmit({
 		beforeSubmit: function() {
 			var validate = $form.data('bootstrapValidator');
@@ -63,10 +64,13 @@ function doSubmit(){
 	});
 }
 
-<!-- 调拨数量不能为空 -->
-function checkStock(){
-
-
+//调出仓库和调入仓库不能是同一个仓库
+function checkIsTheSameWarehouse(){
+var from_warehouse_id =  $("#from_warehouse_id").val();
+var to_warehouse_id = $("#to_warehouse_id").val();
+ if(from_warehouse_id == to_warehouse_id){
+ 	alert("调出仓库和调入仓库不能是同一个仓库");
+ }
 }
 
 
@@ -85,7 +89,7 @@ function initProduct(){
 			$.each(productList, function(idx, item) {
 				var option = {
 					id: item.productList.productId,
-					text: item.productList.name + item.productList.specificationValue
+					text: item.productList.name
 				}
 				productOptionArr.push(option);
 				productMap[item.productList.productId] = item;

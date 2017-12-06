@@ -12,7 +12,7 @@ public class transferBillInfo {
     private Date bizDate;
     private Integer status;
     private Date createDate;
-    private String productId;
+    private String sellerProductId;
     private Integer productCount;
 	private List<ProductInfo> productInfos;
 	
@@ -47,13 +47,13 @@ public class transferBillInfo {
 	public void setCreateDate(Date createDate) {
 		this.createDate = createDate;
 	}
-	public String getProductId() {
-		return productId;
+	
+	public String getSellerProductId() {
+		return sellerProductId;
 	}
-	public void setProductId(String productId) {
-		this.productId = productId;
+	public void setSellerProductId(String sellerProductId) {
+		this.sellerProductId = sellerProductId;
 	}
-
 	public Integer getProductCount() {
 		return productCount;
 	}
