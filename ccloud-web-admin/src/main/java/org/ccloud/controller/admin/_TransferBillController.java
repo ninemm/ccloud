@@ -33,6 +33,7 @@ import org.ccloud.model.query.ProductQuery;
 import org.ccloud.model.query.TransferBillDetailQuery;
 import org.ccloud.model.query.TransferBillQuery;
 import org.ccloud.model.query.WarehouseQuery;
+import org.ccloud.model.vo.ProductInfo;
 import org.ccloud.model.vo.transferBillInfo;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
@@ -197,10 +198,11 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 	
 	public void enable() {
 		String id = getPara("id");
-		//查询商品调拨库存数量
+		//获取调拨单明细
 		List<transferBillInfo> transferBillInfos = TransferBillDetailQuery.me().findByTransferBillDetailId(id);
 		//查找商品的库存数量并和调拨数量做比较
 		this.checkStoreCount(transferBillInfos);
+	    Boolean status = this.insertIntoInventory(transferBillInfos);
 		int isEnabled = getParaToInt("isEnabled");
 		TransferBill transferBill = TransferBillQuery.me().findById(id);
 			transferBill.setStatus(isEnabled);
@@ -213,9 +215,36 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 			}		
 	}
 	
-	
-	private void checkStoreCount(List<transferBillInfo> transferBillInfos) {
+	/**
+	 * 
+	* @Title: 调拨单数据插入到总账 
+	* @Description: TODO
+	* @param @param transferBillInfos   
+	* @return void    
+	* @throws
+	 */
+	private boolean insertIntoInventory(List<transferBillInfo> transferBillInfos) {
+		return false;
 		
+	}
+
+    /**
+     * 
+    * @Title: 检查待调拨数量和现在库存数量大小 
+    * @Description: TODO
+    * @param @param transferBillInfos   
+    * @return void    
+    * @throws
+     */
+	private void checkStoreCount(List<transferBillInfo> transferBillInfos) {
+		for (transferBillInfo transferBillInfo : transferBillInfos) {
+			List<ProductInfo> productInfos = ProductQuery.me().getAllProductInfoBySellerId(transferBillInfo.getSellerProductId());
+			for (ProductInfo productInfo : productInfos) {
+				if (productInfo.getStoreCount() < transferBillInfo.getProductCount()) {
+					renderAjaxResultForError("商品" + productInfo.getName() + "库存不足，无法调拨");
+				}
+			}
+		}
 	}
 
 
