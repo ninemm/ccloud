@@ -1,24 +1,31 @@
 package org.ccloud.front.controller;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.subject.Subject;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.core.cache.ActionCache;
+import org.ccloud.message.Actions;
+import org.ccloud.message.MessageKit;
 import org.ccloud.model.User;
+import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
+import org.ccloud.shiro.CaptchaUsernamePasswordToken;
 import org.ccloud.utils.CookieUtils;
-import org.ccloud.utils.StringUtils;
+import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.wechat.WechatUserInterceptor;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.jfinal.aop.Before;
+import com.jfinal.kit.LogKit;
 import com.jfinal.kit.StrKit;
-import com.jfinal.weixin.sdk.api.ApiConfigKit;
+import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.weixin.sdk.api.ApiResult;
-import com.jfinal.weixin.sdk.api.SnsAccessTokenApi;
 import com.jfinal.weixin.sdk.api.UserApi;
 
 @RouterMapping(url = "/wxoauth")
@@ -49,82 +56,74 @@ public class WxOauthController extends BaseFrontController {
 			}
 			
 			User user = UserQuery.me().findByWechatOpenid(openId);
-//			System.err.println("user is not exsit>>>" + (user == null));
-			
 			if (user == null) {
 				gotoUrl = "/user/bind";
 			} else {
 				
-				// 获取用户的相应权限
+				// 获取用户的相应权限放入缓存
+				init(user.getUsername(), user.getPassword(), true);
 				
 				// 更新用户的信息
+				ApiResult wxUserResult = UserApi.getUserInfo(openId);
+				if (wxUserResult.isSucceed()) {
+					user.setAvatar(wxUserResult.getStr("headimgurl"));
+					user.setNickname(wxUserResult.getStr("nickname"));
+					user.setWechatOpenId(openId);
+					
+					if (!user.saveOrUpdate()) {
+						renderError(500);
+						return ;
+					}
+				} else {
+					LogKit.warn("user info get failure");
+				}
+					
 			}
 		}
 		
 		redirect(gotoUrl);
 	}
 	
-	public void toOauth() {
-		HttpServletRequest request = this.getRequest();
-		// 获取用户将要去的路径
-		String queryString = request.getQueryString();
+	private void init(String username, String password, Boolean rememberMe) {
 		
-		// 被拦截前的请求URL
-//		String toUrl = request.getRequestURI();
-//		if (StringUtils.isNotBlank(queryString)) {
-//			toUrl = toUrl.concat("?").concat(queryString);
-//		}
-		String redirectUrl = request.getScheme() + "://" + request.getServerName() 
-//			+ ":" + request.getServerPort() 
-			+ "/wxoauth";
-		
-		if (StrKit.notBlank(queryString))
-			redirectUrl = redirectUrl.concat("?").concat(queryString);
-		
-		System.out.println("redirect = " + redirectUrl);
-		redirectUrl = StringUtils.urlEncode(redirectUrl);
-		//String appid = OptionQuery.me().findValue("wechat_appid");
-		String appid = ApiConfigKit.getAppId();
-		
-		if (StrKit.isBlank(appid))
-			renderText("config is error");
-		else {
-			String url = SnsAccessTokenApi.getAuthorizeURL(appid.trim(), redirectUrl, false);
-			redirect(url);
+		Subject subject = SecurityUtils.getSubject();
+		CaptchaUsernamePasswordToken token = new CaptchaUsernamePasswordToken(username, password, rememberMe, "", "");
+		try {
+			subject.login(token);
+			User user = (User) subject.getPrincipal();
+			if (user != null) {
+				// 数据查看时的数据域
+				if (subject.isPermitted("/admin/all") || subject.isPermitted("/admin/manager")) {
+					setSessionAttr(Consts.SESSION_SELECT_DATAAREA,
+							DataAreaUtil.getUserDeptDataArea(user.getDataArea()) + "%");
+				} else {
+					setSessionAttr(Consts.SESSION_SELECT_DATAAREA, user.getDataArea());
+				}
+
+				// sellerId
+				if (!subject.isPermitted("/admin/all")) {
+					List<Record> sellerList = SellerQuery.me().querySellerIdByDept(user.getDepartmentId());
+
+					if(sellerList.size() == 0) {
+						sellerList = SellerQuery.me().queryParentSellerIdByDept(user.getDepartmentId());
+
+						while(StrKit.isBlank(sellerList.get(0).getStr("sellerId"))) {
+							sellerList = SellerQuery.me().queryParentSellerIdByDept(sellerList.get(0).getStr("parent_id"));
+						}
+					}
+
+					setSessionAttr("sellerList", sellerList);
+					setSessionAttr("sellerId", sellerList.get(0).get("sellerId"));
+					setSessionAttr("sellerCode", sellerList.get(0).get("sellerCode"));
+					setSessionAttr("sellerName", sellerList.get(0).get("sellerName"));
+				}
+			}
+			MessageKit.sendMessage(Actions.USER_LOGINED, user);
+			CookieUtils.put(this, Consts.COOKIE_LOGINED_USER, user.getId().toString());
+			setSessionAttr(Consts.SESSION_LOGINED_USER, user);
+		} catch (AuthenticationException e) {
+			e.printStackTrace();
 		}
-	}
-	
-	public boolean saveOrUpdate(ApiResult apiResult, User user, String openId, int subscribe) {
-		JSONObject jsonObject = JSON.parseObject(apiResult.getJson());
-		String nickname = jsonObject.getString("nickname");
-		//nickname = StringUtils.urlEncode(nickname);
-		// 用户的性别，值为1时是男性，值为2时是女性，值为0时是未知
-		//int sex = jsonObject.getIntValue("sex");
-//			String city = jsonObject.getString("city");
-//			String province = jsonObject.getString("province");//省份
-//	        String country = jsonObject.getString("country");//国家
-		String headimgurl = jsonObject.getString("headimgurl");
-		//String unionid = jsonObject.getString("unionid");
-		
-		ApiResult userInfo = UserApi.getUserInfo(openId);
-		if (userInfo.isSucceed()) {
-			String userText = userInfo.toString();
-			subscribe = JSON.parseObject(userText).getIntValue("subscribe");
-		}
-		
-//		if (sex == 1)
-//			user.setGender("male");
-//		else if (sex == 2)
-//			user.setGender("female");
-//		
-		user.setAvatar(headimgurl);
-		user.setNickname(nickname);
-		//user.setUnionid(unionid);
-		//user.setOpenid(openId);
-		//user.setCreateSource("wechat");
-		//user.setSubscribe(subscribe);
-		
-		return user.saveOrUpdate();
 	}
 	
 }

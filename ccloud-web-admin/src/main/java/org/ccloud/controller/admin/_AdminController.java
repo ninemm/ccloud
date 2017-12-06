@@ -30,11 +30,13 @@ import org.ccloud.message.MessageKit;
 import org.ccloud.model.User;
 import org.ccloud.model.query.CustomerQuery;
 import org.ccloud.model.query.SellerQuery;
+import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.shiro.CaptchaUsernamePasswordToken;
 import org.ccloud.utils.CookieUtils;
 import org.ccloud.utils.DataAreaUtil;
+import org.ccloud.utils.EncryptUtils;
 import org.ccloud.utils.StringUtils;
 
 import com.jfinal.aop.Before;
@@ -91,9 +93,12 @@ public class _AdminController extends JBaseController {
 			render("login.html");
 			return;
 		}
-
+		
+		User _user = UserQuery.me().findUserByUsername(username);
+		password = EncryptUtils.encryptPassword(password, _user.getSalt());
 		Subject subject = SecurityUtils.getSubject();
 		CaptchaUsernamePasswordToken token = new CaptchaUsernamePasswordToken(username, password, rememberMe, "", "");
+		
 		try {
 			subject.login(token);
 			User user = (User) subject.getPrincipal();
