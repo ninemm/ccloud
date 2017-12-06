@@ -17,7 +17,6 @@ import org.ccloud.model.User;
 import org.ccloud.model.query.OperationQuery;
 import org.ccloud.model.query.RoleQuery;
 import org.ccloud.model.query.UserQuery;
-import org.ccloud.utils.EncryptUtils;
 
 public class ShiroDbRealm extends AuthorizingRealm {
 	
@@ -48,7 +47,8 @@ public class ShiroDbRealm extends AuthorizingRealm {
 		CaptchaUsernamePasswordToken authcToken = (CaptchaUsernamePasswordToken) token;
 	    User user = UserQuery.me().findUserByUsername(authcToken.getUsername());
 	    if (user != null) {
-	    	String password = EncryptUtils.encryptPassword(new String(authcToken.getPassword()), user.getSalt());
+	    	//String password = EncryptUtils.encryptPassword(new String(authcToken.getPassword()), user.getSalt());
+	    	String password = user.getPassword();
 	        if(!user.getPassword().equals(password)){
 	            throw new AuthenticationException("密码错误");
 	        }

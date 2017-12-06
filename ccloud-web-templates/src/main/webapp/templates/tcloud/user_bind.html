@@ -11,7 +11,7 @@
 	<link rel="stylesheet" href="${CTPATH}/css/weui.min.css">
 	<link rel="stylesheet" href="${CTPATH}/css/jquery-weui.min.css">
 	<link rel="stylesheet" href="${CTPATH}/css/icomoon.css">
-	<link rel="stylesheet" href="${CTPATH}/css/slider.css">
+	<link rel="stylesheet" href="${CTPATH}/css/unlock.css">
     <title>绑定用户信息</title>
 </head>
 
@@ -34,80 +34,118 @@
 				<i class="icon-times-circle"></i>
 			</div>
 		</div>
-		<div class="stage">
-			<div class="slider" id="slider">
-				<div class="label">向右滑动验证</div>
-				<div class="track" id="track">
-					<div class="bg-green"></div>
-				</div>
-				<div class="button" id="btn">
-					<div class="icon" id="icon">>></div>
-					<div class="spinner" id="spinner"></div>
-				</div>
-			</div>
+		<div class="wrapper">
+            <div class="bar"></div>
 		</div>
-		<div id="bind">绑定手机号</div>
+		<button id="bind">绑定手机号</button>
 	</main>
 </body>
 <script src="${CTPATH}/js/jquery-3.2.1.min.js"></script>
-<script src="${CTPATH}/js/fastclick.js"></script>
-<script src="${CTPATH}/js/slider.js"></script>
 <script src="${CTPATH}/js/jquery-weui.min.js"></script>
+<script src="${CTPATH}/js/fastclick.js"></script>
+<script src="${CTPATH}/js/unlock.js"></script>
 <script src="${CTPATH}/js/comm.js"></script>
 <script src="${CTPATH}/js/vconsole.min.js"></script>
 <script>
 	$(function() { 
 		
-		var gotCode = 0;
+		var isSend = false;
+		var $bar = $('.bar');
+		var $bind = $('#bind');
+		var $code = $('#code');
+		
 		var $mobile = $('#phone');
+		var $wrapper = $('.wrapper');
+		var $getCode = $('#get-code');
 		
 		FastClick.attach(document.body);
 		
 		$(document).on("input", "#phone", function() {
+			
 			if ($mobile.val().length === 11) {
-				$("#get-code").addClass("can-get");
-				
+				$getCode.addClass("can-get");
 				checkMobile($mobile.val());
-				
 			} else {
-				if ($("#get-code").text() === "获取验证码") {
-					$("#get-code").removeClass("can-get");
+				if ($getCode.text() === "获取验证码") {
+					$getCode.removeClass("can-get");
 				}
-				$(".stage").hide();
 			}
 			
 			$(this).next().show();
 			if (($mobile.val().length === 0)) {
 				$(this).next().hide();
 			}
-		}).on("touchstart", ".can-get", function() {
+			
+		}).on("touchend", ".can-get", function() {
 			if (/^1[34578]\d{9}$/.test($mobile.val())) {
-				$("#get-code").removeClass("can-get");
-				$(".stage").show();
-				gotCode = 1;
-				sendSms();
+				$getCode.removeClass("can-get");
+				$wrapper.show();
 			} else {
 				$.toast("请输入正确的手机号", "text");
 			}
 		}).on("input", "#code", function() {
-			if ($("#code").val().length === 6 && gotCode) {
-				$("#bind").addClass("can-bind");
+			if ($code.val().length === 6 && isSend) {
+				$bind.addClass("can-bind");
 			} else {
-				$("#bind").removeClass("can-bind");
+				$bind.removeClass("can-bind");
 			}
+			
 			$(this).next().show();
-			if (($("#code").val().length === 0)) {
+			if (($code.val().length === 0)) {
 				$(this).next().hide();
 			}
-		}).on("touchstart", ".icon-times-circle", function() {
+			
+		}).on("touchend", ".icon-times-circle", function() {
 			$(this).prev().val("");
 			$(this).hide();
+			
+			if ($(this).prev().is($mobile)) {
+				$wrapper.hide();
+				$getCode.removeClass("can-get");
+		    } else {
+		    	$bind.removeClass("can-bind");
+		    }
 		});
+		
+		$('.bar').slideToUnlock({
+		    text: '滑动获取验证码',
+		    succText: '解锁成功',
+		    successFunc: function() {
+		    	countdown();
+		    }
+	    });
+		
+		function countdown() {
+		    
+			sendSms();
+			
+			setTimeout(function () {
+				isSend = true;
+			    $(".wrapper").hide();
+			    $code.focus();
+		    }, 1000);
+		    
+		    var time = 60;
+		    var interval = setInterval(function () {
+		        time --;
+		        $getCode.text(time + "s");
+		        
+		        if (time == 0) {
+		            $getCode.text("获取验证码");
+		            if (/^1[34578]\d{9}$/.test($("#phone").val())) {
+		                $getCode.addClass("can-get");
+		            };
+		            
+		            $('.bar').resetUnlock();
+		            clearInterval(interval);
+		        }
+		    }, 1000);
+		}
 		
 		var param = function() {
 	        return {
 	            mobile: $mobile.val(),
-	            code: $('#code').val()
+	            code: $code.val()
 	        }
 	    }
 	    
