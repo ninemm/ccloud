@@ -3,6 +3,8 @@
 <#macro script_import>
 	<!-- bootstrapValidator -->
 	<script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
+	<!-- bootstrapTypeAhead -->
+	<script src="${CPATH}/static/plugins/bootstrap-autocomplete/bootstrap3-typeahead.js"></script>
 	<!-- select2 -->
 	<script src="${CPATH}/static/plugins/select2/js/select2.js"></script>
 	<!-- cityPicker -->
@@ -23,16 +25,17 @@
 
 	var $form = $("#form");
 	var $city = $('#cityPicker');
+	var queryList = new Array();
 
 	$(function() {
 		$('#customerTypes').select2({
 			placeholder: '请把默认类型设置为第一个'
 		});
-		
+
 		$city.citypicker({
 		    simple: true,
             responsive: true,
-            province: '${(sellerCustomer.prov_name)!}', 
+            province: '${(sellerCustomer.prov_name)!}',
             city: '${(sellerCustomer.city_name)!}',
             district: '${(sellerCustomer.country_name)!}'
         });
@@ -43,7 +46,81 @@
 			$areaCode.eq(index).val($selectItem.eq(index).data('code'));
 		});
 		
-		jQuery.mm.initValidator('#form', validatorFields)
+		jQuery.mm.initValidator('#form', validatorFields);
+		var query = $("#customer_name").val();
+		$("#customer_name").typeahead({
+			source: function (query, process) {
+				return $.ajax({
+					url: '${CPATH}/admin/sellerCustomer/searchByCustomerName',
+					type: 'post',
+					data: {name: query},
+					success: function (result) {
+						if(queryList!=null)queryList.length = 0;
+						queryList = result.data;
+						var resultList = [];
+						for(row in queryList){
+							var aItem = {id: row,name:queryList[row].columns.customer_name,mobile:queryList[row].columns.mobile};
+							resultList.push(JSON.stringify(aItem));
+						}
+						return process(resultList);
+					}
+				});
+			},
+			highlighter: function (obj) {
+				var item = JSON.parse(obj);
+				var query = this.query.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&');
+				return item.name.replace(new RegExp('(' + query + ')', 'ig'), function ($1, match) {
+					return '<strong>' + match + '</strong>'
+				});
+			},
+			updater: function (obj) {
+				var item = JSON.parse(obj);
+				var checkOption = queryList[item.id].columns;
+				$('input[name="customer.mobile"]').val(checkOption.mobile);
+				$('input[name="customer.contact"]').val(checkOption.contact);
+				$('input[name="customer.address"]').val(checkOption.address);
+				$('input[name="customer.prov_name"]').val(checkOption.prov_name);
+				$('input[name="customer.city_name"]').val(checkOption.city_name);
+				$('input[name="customer.country_name"]').val(checkOption.country_name);
+				$('input[name="customer.prov_code"]').val(checkOption.prov_code);
+				$('input[name="customer.city_code"]').val(checkOption.city_code);
+				$('input[name="customer.country_code"]').val(checkOption.country_code);
+				$('input[name="sellerCustomer.nickname"]').val(checkOption.nickName);
+				$('select[name="sellerCustomer.customer_kind"]').val(checkOption.kind);
+				$('select[name="sellerCustomer.customer_kind"]').find("option[value='"+checkOption.kind+"']").attr("selected",true);
+				$('select[name="sellerCustomer.sub_type"]').val(checkOption.subType);
+				$('select[name="sellerCustomer.sub_type"]').find("option[value='"+checkOption.subType+"']").attr("selected",true);
+				$city.citypicker('destroy');
+				$city.citypicker({
+					simple: true,
+					responsive: true,
+					province: checkOption.prov_name,
+					city: checkOption.city_name,
+					district: checkOption.country_name
+				});
+				$.ajax({
+					url: '${CPATH}/admin/sellerCustomer/searchTypeById',
+					type: 'post',
+					data: {sellerC_Id: checkOption.sellercId},
+					success: function (result) {
+						var query = result.data;
+						var strHtml = '';
+						for(index in query){
+							var row = query[index].columns;
+							$("#customerTypes option").each(function(){
+								if(row.id == $(this)[0].value){
+									$("#customerTypes").val($(this)[0].value).select2();
+								}
+							});
+						}
+					},
+					error: function(result){
+						toastr.error(result.errorCode,result.message);
+					}
+				});
+				return item.name;
+			}
+		});
 	});
 
 	var validatorFields = {
@@ -186,7 +263,8 @@
                     <div class="col-sm-5 validata-box">
                         <label class="control-label col-sm-4">客户名称:</label>
                         <div class="input-group col-sm-7">
-                            <input class="form-control input-sm" type="text" name="customer.customer_name" value="${(sellerCustomer.customer_name)!}" placeholder="1-25个任意字母数字">
+							<input type="text" class="form-control input-sm typeahead" data-provide="typeahead" autocomplete="off" id="customer_name" name="customer.customer_name" value="${(sellerCustomer.customer_name)!}" placeholder="1-25个任意字母数字">
+                            <!---<input class="form-control input-sm" type="text" name="customer.customer_name" value="${(sellerCustomer.customer_name)!}" placeholder="1-25个任意字母数字">--->
                         </div>
                     </div>
                     <div class="col-sm-5 validata-box">

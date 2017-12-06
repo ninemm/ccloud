@@ -50,6 +50,15 @@ public class UserJoinCustomerQuery extends JBaseQuery {
 
 		return Db.find(sqlBuilder.toString(), params.toArray());
 	}
+	
+	public List<Record> findCustomerTypeBySellerCustomerId(String sellerCustomerId, String dataArea){
+		LinkedList<Object> params = new LinkedList<Object>();
+		StringBuilder sqlBuilder = new StringBuilder("select cct.id,cct.`code`,cct.`name` ");
+		sqlBuilder.append("from cc_customer_join_customer_type cc inner join cc_customer_type cct on cc.customer_type_id = cct.id ");
+		appendIfNotEmpty(sqlBuilder,"cc.seller_customer_id",sellerCustomerId,params,true);
+		appendIfNotEmptyWithLike(sqlBuilder, "cct.data_area", dataArea, params, false);
+		return Db.find(sqlBuilder.toString(), params.toArray());
+	}
 
 	public UserJoinCustomer findById(final String id) {
 		return DAO.getCache(id, new IDataLoader() {
