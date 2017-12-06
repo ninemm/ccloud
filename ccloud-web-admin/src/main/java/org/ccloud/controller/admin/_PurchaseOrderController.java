@@ -15,6 +15,7 @@
  */
 package org.ccloud.controller.admin;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -26,10 +27,17 @@ import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
+import org.ccloud.model.PurchaseInstock;
+import org.ccloud.model.PurchaseInstockDetail;
 import org.ccloud.model.PurchaseOrder;
+import org.ccloud.model.PurchaseOrderDetail;
+import org.ccloud.model.PurchaseOrderJoinInstock;
 import org.ccloud.model.User;
+import org.ccloud.model.Warehouse;
+import org.ccloud.model.query.PurchaseInstockQuery;
 import org.ccloud.model.query.PurchaseOrderDetailQuery;
 import org.ccloud.model.query.PurchaseOrderQuery;
+import org.ccloud.model.query.WarehouseQuery;
 
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Before;
@@ -74,12 +82,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 	
 	public void detail(){
 		String orderId = getPara(0);
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		Record order = PurchaseOrderQuery.me().findMoreById(orderId,user.getDataArea());
-		List<Record> orderDetail = PurchaseOrderDetailQuery.me().findByOutstockId(orderId,user.getDataArea());
-		setAttr("order", order);
-		setAttr("orderDetail", orderDetail);
-
+		setAttr("orderId", orderId);
 		render("detail.html");
 	}
 	
@@ -101,12 +104,151 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 	
 	public void pass(){
 		String id = getPara("id");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		PurchaseOrder purchaseOrder=PurchaseOrderQuery.me().findById(id);
 		purchaseOrder.set("status", 1000);
 		purchaseOrder.update();
+		Warehouse warehouse = WarehouseQuery.me().findOneByUserId(user.getId());
+		final PurchaseInstock purchaseInstock = getModel(PurchaseInstock.class);
+		final PurchaseInstockDetail purchaseInstockDetail = getModel(PurchaseInstockDetail.class);
+		String purchaseInstockId = StrKit.getRandomUUID();
+		//采购入库单： PO + 100000(机构编号或企业编号6位) + 20171108(时间) + 100001(流水号)
+		int m=PurchaseInstockQuery.me().findByUserId(user.getId(),user.getDataArea());
+		m++;
+		String n=Integer.toString(m);
+		int countt =n.length();
+		for(int k=0;k<(6-countt);k++){
+			n= "0"+n;
+		}
+		Date date = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+		String str = sdf.format(date);
+		String pwarehouseSn="PO"+user.getDepartmentId().substring(0, 6)+str.substring(0,8)+n;
+		purchaseInstock.set("id", purchaseInstockId);
+		purchaseInstock.set("pwarehouse_sn", pwarehouseSn);
+		purchaseInstock.set("supplier_id", purchaseOrder.getSupplierId());
+		purchaseInstock.set("warehouse_id", warehouse.getId());
+		purchaseInstock.set("biz_user_id", user.getId());
+		purchaseInstock.set("biz_date", new Date());
+		purchaseInstock.set("input_user_id", user.getId());
+		purchaseInstock.set("status", 0);//待审核
+		purchaseInstock.set("total_amount",purchaseOrder.getTotalAmount());
+		purchaseInstock.set("payment_type", purchaseOrder.getPaymentType());
+		purchaseInstock.set("remark",  purchaseOrder.getRemark());
+		purchaseInstock.set("dept_id", user.getDepartmentId());
+		purchaseInstock.set("data_area", user.getDataArea());
+		purchaseInstock.set("create_date", date);
+		purchaseInstock.save();
+		
+		List<PurchaseOrderDetail> purchaseOrderDetails =  PurchaseOrderDetailQuery.me().findByPurchaseOrderId(id);
+		
+		for(PurchaseOrderDetail purchaseOrderDetail : purchaseOrderDetails){
+			purchaseInstockDetail.set("id", StrKit.getRandomUUID());
+			purchaseInstockDetail.set("purchase_instock_id", purchaseInstockId);
+			purchaseInstockDetail.set("seller_product_id", purchaseOrderDetail.getProductId());
+			purchaseInstockDetail.set("product_count", purchaseOrderDetail.getProductCount());
+			purchaseInstockDetail.set("product_price", purchaseOrderDetail.getProductPrice());
+			purchaseInstockDetail.set("product_amount", purchaseOrderDetail.getProductAmount());
+			purchaseInstockDetail.set("purchase_order_detail_id", purchaseOrderDetail.getId());
+			purchaseInstockDetail.set("order_list", purchaseOrderDetail.getOrderList());
+			purchaseInstockDetail.set("create_date", date);
+			purchaseInstockDetail.set("dept_id", user.getDepartmentId());
+			purchaseInstockDetail.set("data_area", user.getDataArea());
+			purchaseInstockDetail.save();
+		}
+		
 		renderAjaxResultForSuccess("OK");
 	}
 	
+	@Override
+	public void save(){
+		final PurchaseInstock purchaseInstock = getModel(PurchaseInstock.class);
+		final PurchaseInstockDetail purchaseInstockDetail = getModel(PurchaseInstockDetail.class);
+		final PurchaseOrderJoinInstock purchaseOrderJoinInstock = getModel(PurchaseOrderJoinInstock.class);
+		Map<String, String[]> paraMap = getParaMap();
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		Warehouse warehouse = WarehouseQuery.me().findOneByUserId(user.getId());
+		String purchaseInstockId = StrKit.getRandomUUID();
+
+		//采购入库单： PO + 100000(机构编号或企业编号6位) + 20171108(时间) + 100001(流水号)
+		int m=PurchaseInstockQuery.me().findByUserId(user.getId(),user.getDataArea());
+		m++;
+		String n=Integer.toString(m);
+		int countt =n.length();
+		for(int k=0;k<(6-countt);k++){
+			n= "0"+n;
+		}
+		Date date = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+		String str = sdf.format(date);
+		String purchaseOrderId=StringUtils.getArrayFirst(paraMap.get("purchaseOrderId"));
+		PurchaseOrder purchaseOrder = PurchaseOrderQuery.me().findById(purchaseOrderId);
+		String pwarehouseSn="PO"+user.getDepartmentId().substring(0, 6)+str.substring(0,8)+n;
+		purchaseInstock.set("id", purchaseInstockId);
+		purchaseInstock.set("pwarehouse_sn", pwarehouseSn);
+		purchaseInstock.set("supplier_id", StringUtils.getArrayFirst(paraMap.get("supplierId")));
+		purchaseInstock.set("warehouse_id", warehouse.getId());
+		purchaseInstock.set("biz_user_id", user.getId());
+		purchaseInstock.set("biz_date", new Date());
+		purchaseInstock.set("input_user_id", user.getId());
+		purchaseInstock.set("status", 0);//待审核
+		purchaseInstock.set("total_amount", StringUtils.getArrayFirst(paraMap.get("total")));
+		purchaseInstock.set("payment_type", StringUtils.getArrayFirst(paraMap.get("paymentType")));
+		purchaseInstock.set("remark",  StringUtils.getArrayFirst(paraMap.get("remark")));
+		purchaseInstock.set("dept_id", user.getDepartmentId());
+		purchaseInstock.set("data_area", user.getDataArea());
+		purchaseInstock.set("create_date", date);
+		purchaseInstock.save();
+		
+		PurchaseOrder order = PurchaseOrderQuery.me().findById(purchaseOrderId);
+		order.set("total_amount", StringUtils.getArrayFirst(paraMap.get("total")));
+		order.set("payment_type", StringUtils.getArrayFirst(paraMap.get("paymentType")));
+		order.set("status", 1000);
+		order.set("modify_date", new Date());
+		order.update();
+		String productNumStr = StringUtils.getArrayFirst(paraMap.get("productNum"));
+		Integer productNum = Integer.valueOf(productNumStr);
+		Integer count = 0;
+		Integer index = 0;
+
+		while (productNum > count) {
+			index++;
+			String productId = StringUtils.getArrayFirst(paraMap.get("sellerProductId" + index));
+			String purchaseOrserDetailId = StringUtils.getArrayFirst(paraMap.get("purchaseOrderDetailId" + index));
+			PurchaseOrderDetail purchaseOrderDetail = PurchaseOrderDetailQuery.me().findById(purchaseOrserDetailId);
+			if (StrKit.notBlank(productId)) {
+				String convert = StringUtils.getArrayFirst(paraMap.get("convert" + index));
+				String bigNum = StringUtils.getArrayFirst(paraMap.get("bigNum" + index));
+				String smallNum = StringUtils.getArrayFirst(paraMap.get("smallNum" + index));
+				Integer productCount = Integer.valueOf(bigNum) * Integer.valueOf(convert) + Integer.valueOf(smallNum);
+				purchaseOrderDetail.set("product_count", productCount);
+				purchaseOrderDetail.set("product_amount", StringUtils.getArrayFirst(paraMap.get("rowTotal" + index)));
+				purchaseOrderDetail.update();
+				
+				purchaseInstockDetail.set("id", StrKit.getRandomUUID());
+				purchaseInstockDetail.set("purchase_instock_id", purchaseInstockId);
+				purchaseInstockDetail.set("seller_product_id", StringUtils.getArrayFirst(paraMap.get("sellerProductId" + index)));
+				purchaseInstockDetail.set("product_count", productCount);
+				purchaseInstockDetail.set("product_price", StringUtils.getArrayFirst(paraMap.get("bigPrice" + index)));
+				purchaseInstockDetail.set("product_amount", StringUtils.getArrayFirst(paraMap.get("rowTotal" + index)));
+				purchaseInstockDetail.set("purchase_order_detail_id", purchaseOrserDetailId);
+				purchaseInstockDetail.set("order_list", index);
+				purchaseInstockDetail.set("create_date", date);
+				purchaseInstockDetail.set("dept_id", user.getDepartmentId());
+				purchaseInstockDetail.set("data_area", user.getDataArea());
+				purchaseInstockDetail.save();
+				purchaseOrder.set("status", 4000);
+				purchaseOrder.update();
+				count++;
+			}
+
+		}
+		purchaseOrderJoinInstock.set("id", StrKit.getRandomUUID());
+		purchaseOrderJoinInstock.set("purchase_order_id", StringUtils.getArrayFirst(paraMap.get("purchaseOrderId")));
+		purchaseOrderJoinInstock.set("purchase_instock_id", purchaseInstockId);
+		purchaseOrderJoinInstock.save();
+		renderAjaxResultForSuccess("OK");
+	} 
 	
 	
 }

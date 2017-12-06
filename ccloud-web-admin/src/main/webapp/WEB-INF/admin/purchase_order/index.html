@@ -106,9 +106,9 @@
 				},
 				{field: "action", title: "操作", align: "center", width: '15%',
 				formatter: function(value, row, rowIndex) {
-					var strHtml = '<a class="btn btn-primary" onclick="detail(\''+row.id+'\')" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">详情</a> ';
+					var strHtml = '<a class="label label-table label-info" onclick="detail(\''+row.id+'\')" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">详情</a> ';
 					if(row.status==0){
-						strHtml += '<a class="btn btn-primary" onclick="pass(\''+row.id+'\')" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">通过</a> ';
+						strHtml += '<a class="label label-table label-info" onclick="pass(\''+row.id+'\')" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">通过</a> ';
 					}
 					return strHtml;
 				},
