@@ -284,6 +284,10 @@ public class DepartmentQuery extends JBaseQuery {
 	public List<Department> findByParentId(String id) {
 		return DAO.doFind("parent_id = ? ORDER BY data_area desc", id);
 	}
+	
+	public Department findByDataArea(String dataArea) {
+		return DAO.doFindFirst(" data_area = ? order by dept_level asc",dataArea);
+	}
 
 	public void updateParents(Department dept) {
 		if (dept != null && dept.getParentId() != "0") {

@@ -1,4 +1,3 @@
-
 /**
  * Copyright (c) 2015-2016, 九毫米(Eric Huang) (hx50859042@gmail.com).
  *
@@ -47,8 +46,8 @@ public class AdminMenuInitListener implements MessageListener {
 	private void createMenuList(List<Menu> list, MenuManager menuManager) {
 		for (Menu menu : list) {
 			if (menu.getIsParent() > 0) {
-				MenuGroup group = new MenuGroup(menu.getParam(), menu.getIcon(), menu.getName());
-				menuManager.addMenuGroup(group);
+				MenuGroup group = new MenuGroup(menu.getCode(), menu.getIcon(), menu.getName());
+				menuManager.addMenuGroup(group); 
 				this.findChild(menu, list, group);
 			}
 		}
@@ -58,7 +57,7 @@ public class AdminMenuInitListener implements MessageListener {
 		for (Menu menu : list) {
 			if (menu.getParentId().equals(parent.getId())) {
 				String url = menu.get("url") == null ? "" : menu.get("url").toString();
-				MenuItem menuItem = new MenuItem(menu.getParam(), url, menu.getName());
+				MenuItem menuItem = new MenuItem(menu.getCode(), url, menu.getName());
 				group.addMenuItem(menuItem);
 			}
 		}

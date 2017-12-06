@@ -101,15 +101,15 @@
                 },
                 edit: false
             },
-            {field: "question_desc", title: "问题描述", align: "center", width: '22%', edit: false},
+            {field: "question_desc", title: "问题描述", align: "center", width: '28%', edit: false},
             {field: "visit_user", title: "拜访人", align: "center", width: '5%',edit: false},
             {field: "status", title: "状态", align: "center", width: '8%',
             formatter: function (value, row, rowIndex){
                 return value=="0"?"待审核":"已审核";
             }, edit: false},
             {field: "review_user", title: "审核人", align: "center", width: '5%', edit: false},
-            {field: "create_date", title: "创建时间", align: "center", width: '15%', edit: false},
-            {field: "modify_date", title: "审核时间", align: "center", width: '15%', edit: false},
+            {field: "create_date", title: "创建时间", align: "center", width: '12%', edit: false},
+            {field: "modify_date", title: "审核时间", align: "center", width: '12%', edit: false},
             {field: "action", title: "操作", align: "center", width: '10%',
             formatter: function(value, row, rowIndex) {
                 var audit = [row.location,row.lng,row.lat,row.advice,row.solution,row.status,row.photo,row.vedio];

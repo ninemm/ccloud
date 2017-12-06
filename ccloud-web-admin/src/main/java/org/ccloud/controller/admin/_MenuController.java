@@ -96,9 +96,9 @@ public class _MenuController extends JBaseCRUDController<Menu> {
 		if (menu.saveOrUpdate()) {
 			MenuQuery.me().updateParent(menu);
 			MenuManager.clearAllList();
-			renderAjaxResultForSuccess("新增成功");			
+			renderAjaxResultForSuccess("操作成功");			
 		} else {
-			renderAjaxResultForError("修改失败!");
+			renderAjaxResultForError("操作失败!");
 		}
 	}
 	
