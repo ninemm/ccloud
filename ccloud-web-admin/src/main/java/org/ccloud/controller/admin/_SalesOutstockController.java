@@ -21,14 +21,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.time.DateFormatUtils;
-import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
-import org.ccloud.model.Inventory;
 import org.ccloud.model.SalesOrder;
-import org.ccloud.model.SalesOutstock;
-import org.ccloud.model.query.InventoryQuery;
-import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SalesOutstockDetailQuery;
 import org.ccloud.model.query.SalesOutstockQuery;
 import org.ccloud.route.RouterMapping;
@@ -95,8 +90,8 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
         boolean isSave = Db.tx(new IAtom() {
             @Override
             public boolean run() throws SQLException {
-            	Map<String, String[]> map = getParaMap();
-        		String outstockId = getPara("outstockSn");
+  //          	Map<String, String[]> map = getParaMap();
+ //       		String outstockId = getPara("outstockSn");
 //        		SalesOutstock outstock = SalesOutstockQuery.me().findById(outstockId);
 //        		SalesOrder salesOrder = SalesOrderQuery.me().findById(outstockId);
 //        		salesOrder.setStatus(Consts.SALES_ORDER_STATUS_ALL_OUT);
