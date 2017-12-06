@@ -121,24 +121,18 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 					List<Map<String, Object>>listMap=StockTakingDetailQuery.me().findByStockTakingDetailId1(id);
 					for (int i = 0; i < listMap.size(); i++) {
 						Inventory inventory=new Inventory();
+						String seller_product_id=(String) listMap.get(i).get("seller_product_id");
 						String product_id=(String) listMap.get(i).get("product_id");
-						//获取sell_product_id
-						List<Record> selectSellProductId = StockTakingDetailQuery.me().selectSellProductId(product_id,seller_id);
-						if (selectSellProductId.size()==0) {
-							renderAjaxResultForError("更新失败 此用户没有SellProductId");
-							return false;
-						}
-						String sell_product_id = selectSellProductId.get(0).getStr("id");
 						//判断此商品是否已经在仓库中   
 						List<Record> findByInventory = StockTakingDetailQuery.me().findByInventory(product_id,warehouse_id,seller_id);
 						if (findByInventory.size()!=0) {
 							//存在--只更改数量 总价格
 							inventory=InventoryQuery.me().findById(findByInventory.get(0).getStr("id"));
 							inventory.setInCount( inventory.getInCount().add(new BigDecimal(listMap.get(i).get("product_count").toString())));
-							inventory.setInAmount(inventory.getInAmount().add(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString()))));
+							inventory.setInAmount(inventory.getInAmount().add(new BigDecimal(listMap.get(i).get("price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString()))));
 							inventory.setModifyDate(new Date());
 							inventory.setBalanceCount(inventory.getBalanceCount().add(new BigDecimal(listMap.get(i).get("product_count").toString())));
-							inventory.setBalanceAmount(inventory.getBalanceAmount().add(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString()))));
+							inventory.setBalanceAmount(inventory.getBalanceAmount().add(new BigDecimal(listMap.get(i).get("price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString()))));
 							boolean updateInventory = inventory.update();
 							if (!updateInventory) {
 								renderAjaxResultForError("更新Inventory失败");
@@ -151,11 +145,14 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 							inventory.setProductId(product_id);
 							inventory.setSellerId(seller_id);
 							inventory.setInCount( new BigDecimal(listMap.get(i).get("product_count").toString()));
-							inventory.setInAmount(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString())));
-							inventory.setInPrice(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("convert_relate").toString())));
+							inventory.setInAmount(new BigDecimal(listMap.get(i).get("price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString())));
+							inventory.setInPrice(new BigDecimal(listMap.get(i).get("price").toString()).multiply(new BigDecimal(listMap.get(i).get("convert_relate").toString())));
+							inventory.setOutAmount(new BigDecimal(0));
+							inventory.setOutCount(new BigDecimal(0));
+							inventory.setOutPrice(new BigDecimal(listMap.get(i).get("price").toString()).multiply(new BigDecimal(listMap.get(i).get("convert_relate").toString())));
 							inventory.setBalanceCount( new BigDecimal(listMap.get(i).get("product_count").toString()));
-							inventory.setBalanceAmount(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString())));
-							inventory.setBalancePrice(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("convert_relate").toString())));
+							inventory.setBalanceAmount(new BigDecimal(listMap.get(i).get("price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString())));
+							inventory.setBalancePrice(new BigDecimal(listMap.get(i).get("price").toString()).multiply(new BigDecimal(listMap.get(i).get("convert_relate").toString())));
 							inventory.setDataArea(stockTaking.getDataArea());
 							inventory.setDeptId(stockTaking.getDeptId());
 							inventory.setCreateDate(new Date());
@@ -169,9 +166,9 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 						InventoryDetail inventoryDetail=new InventoryDetail();
 						inventoryDetail.setId(StrKit.getRandomUUID());
 						inventoryDetail.setWarehouseId(warehouse_id);
-						inventoryDetail.setSellProductId(sell_product_id);
+						inventoryDetail.setSellProductId(seller_product_id);
 						inventoryDetail.setInCount(new BigDecimal(listMap.get(i).get("product_count").toString()));
-						inventoryDetail.setInAmount(inventory.getInAmount().add(new BigDecimal(listMap.get(i).get("market_price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString()))));
+						inventoryDetail.setInAmount(inventory.getInAmount().add(new BigDecimal(listMap.get(i).get("price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString()))));
 						inventoryDetail.setInPrice(inventory.getInPrice());
 						
 						inventoryDetail.setBalanceCount(inventory.getBalanceCount());
@@ -197,7 +194,7 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 							return false;
 						}
 						//获取经销商此商品的信息 更新库存
-						List<SellerProduct> sellerProductList = SellerProductQuery.me().findByProductIdAndSellerId(product_id,seller_id);
+						List<SellerProduct> sellerProductList = SellerProductQuery.me().findByProductIdAndSellerId(seller_product_id,seller_id);
 						SellerProduct sellerProduct = sellerProductList.get(0);
 						BigDecimal storeCount = sellerProduct.getStoreCount();
 						if (storeCount==null) {
@@ -271,13 +268,13 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 					String[] factIndex = map.get("factIndex");
 					for (int i = 1; i < factIndex.length; i++) {
 						StockTakingDetail stockTakingDetail = getModel(StockTakingDetail.class);
-						String productId = StringUtils
-								.getArrayFirst(map.get("stockTakingList[" + factIndex[i] + "].product_id"));
+						String sellerProductId = StringUtils
+								.getArrayFirst(map.get("stockTakingList[" + factIndex[i] + "].seller_product_id"));
 						String productCount = StringUtils
 								.getArrayFirst(map.get("stockTakingList[" + factIndex[i] + "].product_count"));
 						String remark = StringUtils
 								.getArrayFirst(map.get("stockTakingList[" + factIndex[i] + "].remark"));
-						stockTakingDetail.setProductId(productId);
+						stockTakingDetail.setSellerProductId(sellerProductId);
 						stockTakingDetail.setProductCount(new BigDecimal(productCount));
 						stockTakingDetail.setRemark(remark);
 						stockTakingDetail.setStockTakingId(stockTaking.getId());
@@ -307,12 +304,12 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 					int loopEnd = 1;
 					for (int i = 0; i < factIndex.length; i++) {
 						StockTakingDetail stockTakingDetail = getModel(StockTakingDetail.class);
-						String productId = StringUtils.getArrayFirst(map.get("stockTakingList[" + i + "].product_id"));
+						String sellerProductId = StringUtils.getArrayFirst(map.get("stockTakingList[" + i + "].seller_product_id"));
 						String productCount = StringUtils
 								.getArrayFirst(map.get("stockTakingList[" + i + "].product_count"));
 						String remark = StringUtils.getArrayFirst(map.get("stockTakingList[" + i + "].remark"));
 
-						stockTakingDetail.setProductId(productId);
+						stockTakingDetail.setSellerProductId(sellerProductId);
 						stockTakingDetail.setProductCount(new BigDecimal(productCount));
 						stockTakingDetail.setRemark(remark);
 						stockTakingDetail.setStockTakingId(stockTaking.getId());

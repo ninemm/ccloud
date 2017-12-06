@@ -12,7 +12,7 @@ public class StockTakingInfo {
     private Date bizDate;
     private Integer status;
     private Date createDate;
-    private String productId;
+    private String sellerProductId;
     private BigDecimal productAmount;
     private BigDecimal productCount;
     private String remark;
@@ -60,11 +60,11 @@ public class StockTakingInfo {
 	public void setProductInfos(List<ProductInfo> productInfos) {
 		this.productInfos = productInfos;
 	}
-	public String getProductId() {
-		return productId;
+	public String getSellerProductId() {
+		return sellerProductId;
 	}
-	public void setProductId(String productId) {
-		this.productId = productId;
+	public void setSellerProductId(String sellerProductId) {
+		this.sellerProductId = sellerProductId;
 	}
 	public BigDecimal getProductAmount() {
 		return productAmount;

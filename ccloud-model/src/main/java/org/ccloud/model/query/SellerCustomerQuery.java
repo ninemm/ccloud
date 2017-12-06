@@ -17,6 +17,7 @@ package org.ccloud.model.query;
 
 import java.util.LinkedList;
 
+import com.jfinal.kit.StrKit;
 import org.ccloud.model.SellerCustomer;
 
 import com.jfinal.plugin.activerecord.Db;
@@ -127,6 +128,47 @@ public class SellerCustomerQuery extends JBaseQuery {
 	}
 
 	public void findUserListAsTree() {
+
+	}
+
+	public Page<Record> findByUserTypeForApp(int pageNumber, int pageSize, Object[] userId, String customerType, String isOrdered, String searchKey) {
+		boolean needwhere = false;
+		LinkedList<Object> params = new LinkedList<Object>();
+
+		String select = "SELECT c.id,c.customer_name,c.contact,c.mobile,c.prov_name,c.city_name,c.country_name,c.address ";
+		StringBuilder sql = new StringBuilder("FROM (SELECT c.id,c.customer_name,c.contact,c.mobile,c.prov_name,c.city_name,c.country_name,c.address FROM cc_user_join_customer cujc ");
+		sql.append("LEFT JOIN cc_customer_join_customer_type ccjct ON cujc.seller_customer_id = ccjct.seller_customer_id ");
+		sql.append("LEFT JOIN cc_seller_customer csc ON cujc.seller_customer_id = csc.id ");
+		sql.append("LEFT JOIN cc_customer c ON csc.customer_id = c.id ");
+		sql.append("LEFT JOIN cc_sales_order cso ON cujc.seller_customer_id = cso.customer_id ");
+
+		if (StrKit.notBlank(searchKey)) {
+			sql.append("WHERE ( c.customer_name LIKE ? OR c.contact LIKE ? ) ");
+			if (searchKey.contains("%")) {
+				params.add(searchKey);
+				params.add(searchKey);
+			} else {
+				params.add("%" + searchKey + "%");
+				params.add("%" + searchKey + "%");
+			}
+		} else {
+			sql.append("WHERE c.customer_name is not null ");
+			needwhere = false;
+		}
+
+		needwhere = appendIfNotEmpty(sql, "cujc.user_id", userId, params, needwhere);
+		needwhere = appendIfNotEmpty(sql, "ccjct.customer_type_id", customerType, params, needwhere);
+
+		sql.append("GROUP BY c.id ");
+
+		if (StrKit.notBlank(isOrdered)) {
+
+			if (isOrdered.equals("1")) sql.append("HAVING count(DISTINCT(cso.order_sn)) > 0 ");
+			if (isOrdered.equals("0")) sql.append("HAVING count(DISTINCT(cso.order_sn)) = 0 ");
+		}
+
+		sql.append(") AS c");
+		return Db.paginate(pageNumber, pageSize, select, sql.toString(), params.toArray());
 
 	}
 

@@ -76,7 +76,15 @@
 					},
 					edit: false
 				},
-				{field: "status", title: "状态", align: "center", width: '5%',edit: false},
+				{field: "status", title: "状态", align: "center", width: '5%',edit: false,
+					formatter: function(value, row, rowIndex) {
+						if (value == 0) {
+							return '待出库';
+						} else {
+							return '已出库'
+						}
+					}				
+				},
 				{field: "action", title: "操作", align: "center", width: '15%',
 				formatter: function(value, row, rowIndex) {
 					var strHtml ='<a class="label label-table label-info" onclick="parent.outstockDetail(\''+row.id+'\')" >详细</a> ';

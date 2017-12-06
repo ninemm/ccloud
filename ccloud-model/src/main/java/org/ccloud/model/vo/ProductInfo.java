@@ -21,6 +21,8 @@ public class ProductInfo {
 	private String specificationValue;
 	private String productId;
 	private String bigUnit;
+	private String customName;
+	private String sellerProductId;
 	private Long storeCount;
 
 	public Long getStoreCount() {
@@ -29,6 +31,22 @@ public class ProductInfo {
 
 	public void setStoreCount(Long storeCount) {
 		this.storeCount = storeCount;
+	}
+
+	public String getSellerProductId() {
+		return sellerProductId;
+	}
+
+	public void setSellerProductId(String sellerProductId) {
+		this.sellerProductId = sellerProductId;
+	}
+
+	public String getCustomName() {
+		return customName;
+	}
+
+	public void setCustomName(String customName) {
+		this.customName = customName;
 	}
 
 	public String getBigUnit() {

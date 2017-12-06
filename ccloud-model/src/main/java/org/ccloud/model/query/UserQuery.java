@@ -18,6 +18,8 @@ package org.ccloud.model.query;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.jfinal.plugin.activerecord.Db;
+import com.jfinal.plugin.activerecord.Record;
 import org.ccloud.model.User;
 
 import com.jfinal.plugin.activerecord.Page;
@@ -196,4 +198,13 @@ public class UserQuery extends JBaseQuery {
 		return DAO.doFind(sql.toString(), userId);
 	}
 
+	public List<Record> findNextLevelsUserList(String dataArea) {
+
+		StringBuilder sql = new StringBuilder("SELECT id, realname ");
+		sql.append("FROM user ");
+		final List<Object> params = new LinkedList<Object>();
+		appendIfNotEmptyWithLike(sql, "data_area", dataArea, params, true);
+
+		return Db.find(sql.toString(), dataArea );
+	}
 }
