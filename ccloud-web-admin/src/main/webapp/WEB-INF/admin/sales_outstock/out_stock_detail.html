@@ -220,6 +220,7 @@
 				$("#dataArea").val(outstock.data_area);
 				$("#salesStockId").val(outstock.id);
 				$("#salesStockSN").val(outstock.outstock_sn);
+				$("#wareHouseId").val(outstock.warehouse_id);
 
 				$.each(outstockDetail, function(index,element){
 					addProduct(element);
@@ -257,6 +258,7 @@
 				<table id="table" class="table table-bordered table-hover text-center" width="100%">
 				<input id="salesStockId" name="salesStockId" type="hidden">
 				<input id="salesStockSN" name="salesStockSN" type="hidden">
+				<input id="wareHouseId" name="wareHouseId" type="hidden">
 					<thead>
 						<tr>
 							<th width="2%"></th>

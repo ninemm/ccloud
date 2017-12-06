@@ -227,9 +227,9 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
         				}
         				product.setId(productId);
         				product.setProductSn(productSn);
-        				product.setPrice(StringUtils.isNumeric(productPrice)? new BigDecimal(productPrice) : new BigDecimal(0));
-        				product.setCost(StringUtils.isNumeric(productPrice)? new BigDecimal(productPrice) : new BigDecimal(0));
-        				product.setMarketPrice(StringUtils.isNumeric(productPrice)? new BigDecimal(productPrice) : new BigDecimal(0));
+        				product.setPrice(new BigDecimal(productPrice));
+        				product.setCost(new BigDecimal(productPrice));
+        				product.setMarketPrice(new BigDecimal(productPrice));
         				product.setBigUnit(bigUnit);
         				product.setConvertRelate(relate == null ? null : Integer.parseInt(relate));
         				product.setSmallUnit(smallUnit);

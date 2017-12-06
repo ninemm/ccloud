@@ -72,7 +72,7 @@
 			width: "100%",
 			language: "zh-CN"
 		});
-
+		
 		<!--切换商品的方法  -->
 		$productSelect.change(function(){
 			productChange($(this));
@@ -146,7 +146,7 @@
 			var convert = product.convert_relate;
 			$tr.find("#convert").val(convert);
 
-			var smallPrice = (product.price/convert).toFixed(2);;
+			var smallPrice = (product.price/convert).toFixed(2);
 			var smallUnit = product.small_unit;
 
 			var bigPrice = product.price;
@@ -156,7 +156,7 @@
 			$tr.find("#bigUnit-span").text(product.big_unit + "(x" + convert + smallUnit + ")");
 			
 			$tr.find("#smallPrice").val(smallPrice);
-			$tr.find("#smallPrice-span").text(product.price);
+			$tr.find("#smallPrice-span").text(smallPrice);
 			$tr.find("#smallUnit-span").text(smallUnit);
 			
 			rowTotalF(obj);

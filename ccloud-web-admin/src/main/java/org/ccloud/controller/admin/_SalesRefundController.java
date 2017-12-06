@@ -72,7 +72,7 @@ public class _SalesRefundController extends JBaseCRUDController<SalesRefundInsto
 		String endDate = getPara("endDate");
 
 		Page<Record> page = SalesRefundInstockQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate,
-				endDate);
+				endDate, null);
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
@@ -172,4 +172,17 @@ public class _SalesRefundController extends JBaseCRUDController<SalesRefundInsto
 		renderAjaxResultForSuccess();
 
 	}
+	
+	@Before(Tx.class)
+	public void pass() {
+
+		String inStockId = getPara("inStockId");
+		int status = getParaToInt("status");
+
+		SalesRefundInstockQuery.me().updateConfirm(inStockId, status, new Date());
+
+		renderAjaxResultForSuccess();
+
+	}
+	
 }

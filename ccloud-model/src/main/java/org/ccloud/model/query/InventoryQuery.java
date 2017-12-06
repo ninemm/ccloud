@@ -114,4 +114,14 @@ public class InventoryQuery extends JBaseQuery {
 		int i =Db.update(fromBuilder.toString(), params.toArray());
 		return i;
 	}
+
+	public List<Inventory> _findBySellerIdAndProductId(String sellerId,String productId){
+		String sql ="select * from cc_inventory where seller_id='"+sellerId+"' and product_id ='"+productId+"'";
+		return DAO.find(sql);
+	}	
+	
+	public Inventory findBySellerIdAndProductIdAndWareHouseId(String sellerId, String productId, String wareHouseId) {
+		String sql ="select * from cc_inventory where seller_id=? and product_id =? and warehouse_id = ?";
+		return DAO.findFirst(sql, sellerId, productId, wareHouseId);
+	}
 }

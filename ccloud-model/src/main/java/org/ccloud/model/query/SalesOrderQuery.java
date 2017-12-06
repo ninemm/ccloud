@@ -211,7 +211,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		return SN;
 	}
 
-	public boolean checkStatus(String outStockId) {
+	public boolean checkStatus(String outStockId, Date date) {
 		SalesOrder salesOrder = this.findByOutStockId(outStockId);
 		List<SalesOrderDetail> list = SalesOrderDetailQuery.me().findBySalesOrderId(salesOrder.getId());
 		boolean status = true;
@@ -227,6 +227,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		} else {
 			salesOrder.setStatus(Consts.SALES_ORDER_STATUS_PART_OUT);
 		}
+		salesOrder.setModifyDate(date);
 		
 		if (!salesOrder.update()) {
 			return false;
@@ -238,5 +239,23 @@ public class SalesOrderQuery extends JBaseQuery {
 		String sql = "SELECT cs.* FROM cc_sales_order cs LEFT JOIN cc_sales_order_join_outstock cj ON cs.id = cj.order_id where cj.outstock_id=? ";
 		return DAO.findFirst(sql, outStockId);
 	}
+	
+	public Page<Record> findBySellerCustomerId(int pageNumber, int pageSize, String customerId, String dataArea) {
+		boolean needwhere = true;
+		LinkedList<Object> params = new LinkedList<Object>();
+		String select = "SELECT o.order_sn, o.total_count, o.create_date, o.total_amount, o.realname, o.`status`,o.data_area,o.receive_type ";
+
+		StringBuilder sql = new StringBuilder("FROM (SELECT cso.order_sn, cso.total_count, cso.create_date, cso.total_amount, u.realname, cso.`status`,cso.data_area,cso.receive_type ");
+		sql.append("FROM cc_sales_order cso LEFT JOIN cc_sales_order_detail csod ON cso.id = csod.order_id ");
+		sql.append("LEFT JOIN `user` u ON u.id = cso.biz_user_id ");
+		sql.append("LEFT JOIN cc_seller_customer csc ON csc.id = cso.customer_id ");
+
+		needwhere = appendIfNotEmpty(sql, "csc.customer_id", customerId, params, needwhere);
+		needwhere = appendIfNotEmptyWithLike(sql, "cso.data_area", dataArea, params, needwhere);
+
+		sql.append("GROUP BY cso.id ");
+		sql.append("ORDER BY cso.`status`, cso.create_date DESC) AS o");
+		return Db.paginate(pageNumber, pageSize, select, sql.toString(), params.toArray());
+	}	
 
 }
