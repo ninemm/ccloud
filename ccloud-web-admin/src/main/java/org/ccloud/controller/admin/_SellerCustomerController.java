@@ -32,6 +32,7 @@ import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.Customer;
 import org.ccloud.model.CustomerJoinCustomerType;
 import org.ccloud.model.CustomerType;
+import org.ccloud.model.Department;
 import org.ccloud.model.SellerCustomer;
 import org.ccloud.model.User;
 import org.ccloud.model.UserJoinCustomer;
@@ -173,7 +174,11 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		sellerCustomer.set("customer_id", customerId);
 		sellerCustomer.set("is_enabled", 1);
 		sellerCustomer.set("is_archive", 1);
-
+		User loginUser=getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String dept_dataArea = DataAreaUtil.getUserDealerDataArea(loginUser.getDataArea());
+		Department dept =  DepartmentQuery.me().findByDataArea(dept_dataArea);
+		sellerCustomer.set("data_area", dept_dataArea);
+		sellerCustomer.set("dept_id", dept.getId());
 		if (StrKit.isBlank(sellerCustomer.getId())) {
 			sellerCustomerId = StrKit.getRandomUUID();
 			sellerCustomer.set("id", sellerCustomerId);
@@ -424,6 +429,31 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		}
 
 		renderAjaxResultForSuccess();
+	}
+	
+	public void searchByCustomerName() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String dept_dataArea = DataAreaUtil.getUserDealerDataArea(user.getDataArea());
+		if(StrKit.isBlank(dept_dataArea)) {
+			renderAjaxResultForError("丢失组织数据");
+			return ;
+		}
+		Department dept =  DepartmentQuery.me().findByDataArea(dept_dataArea);
+		if(dept==null||StrKit.isBlank(dept.getId())) {
+			renderAjaxResultForError("丢失组织结构数据");
+			return ;
+		}
+		String tCustomerName = getPara("name");
+		renderAjaxResultForSuccess("success",JSON.toJSON(CustomerQuery.me().findByCustomerName(dept_dataArea, dept.getId(), tCustomerName)));
+	}
+	
+	public void searchTypeById() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String dept_dataArea = DataAreaUtil.getUserDealerDataArea(user.getDataArea());
+		String sellerCustomerId = getPara("sellerC_Id");
+		List<Record> list = UserJoinCustomerQuery.me().findCustomerTypeBySellerCustomerId(sellerCustomerId, dept_dataArea+"%");
+		renderAjaxResultForSuccess("success",JSON.toJSON(list));
+
 	}
 
 }

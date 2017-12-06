@@ -57,7 +57,7 @@ public class PayablesQuery extends JBaseQuery {
 			 appendIfNotEmptyWithLike(fromBuilder,"cc_p.data_area",dataArea,params,false);
 			 appendIfNotEmptyWithLike(fromBuilder, "cc_s.`name`", keyword, params, false);
 		}else {
-			select = "select cc_p.*,cc_c.customer_code customer_no,cc_c.customer_name customer_name,if(cc_s.customer_kind<>2,'普通客户','直营商') customer_type ";
+			select = "select cc_p.*,cc_c.customer_code customer_no,cc_c.customer_name customer_name,if(cc_s.customer_kind<>'100402','普通客户','直营商') customer_type ";
 			fromBuilder.append(" from cc_payables cc_p left join cc_seller_customer cc_s on cc_p.obj_id = cc_s.id left join cc_customer cc_c on cc_s.customer_id = cc_c.id where cc_p.obj_type = 'customer' ");
 			 appendIfNotEmptyWithLike(fromBuilder, "cc_p.data_area", dataArea, params, false);
 			 appendIfNotEmptyWithLike(fromBuilder, "cc_c.customer_name", keyword, params, false);
