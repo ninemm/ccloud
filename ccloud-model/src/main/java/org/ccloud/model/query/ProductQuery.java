@@ -172,7 +172,12 @@ public class ProductQuery extends JBaseQuery {
 		StringBuilder fromBuilder = new StringBuilder("FROM cc_product cp LEFT JOIN cc_product_goods_specification_value cpg ON cp.id = cpg.product_set_id LEFT JOIN cc_goods_specification_value cgs ON cpg.goods_specification_value_set_id=cgs.id ");
 		
 		LinkedList<Object> params = new LinkedList<Object>();
-		appendIfNotEmptyWithLike(fromBuilder, "cp.name", keyword, params, true);
+		if(!keyword.equals("")){
+			appendIfNotEmptyWithLike(fromBuilder, "cp.name", keyword, params, true);
+			fromBuilder.append(" and cp.is_marketable=1 ");
+		}else{
+			fromBuilder.append(" where cp.is_marketable=1 ");
+		}
 		fromBuilder.append(" GROUP by " + orderby);
 		fromBuilder.append(" order by " + orderby);	
 		

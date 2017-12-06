@@ -143,9 +143,9 @@ public class SalesOutstockQuery extends JBaseQuery {
 		return SN;
 	}
 
-	public boolean updateStatus(String id, int salesOutStockStatusOut) {
-		String sql = "update cc_sales_outstock cc set cc.status = ? where cc.id = ?";
-		int i = Db.update(sql, salesOutStockStatusOut, id);
+	public boolean updateStatus(String id, int salesOutStockStatusOut, Date date) {
+		String sql = "update cc_sales_outstock cc set cc.status = ? AND cc.modify_date = ? where cc.id = ?";
+		int i = Db.update(sql, salesOutStockStatusOut, date, id);
 		if (i > 0) {
 			return true;
 		} else {

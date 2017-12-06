@@ -107,12 +107,13 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 	}
 
 	public boolean outStock(Map<String, String[]> paraMap, String sellerId, Date date, String deptId,
-			String dataArea, Integer index, String userId, String outStockSN) {
+			String dataArea, Integer index, String userId, String outStockSN, String wareHouseId) {
 		SalesOutstockDetail detail = SalesOutstockDetailQuery.me().
 				findById(StringUtils.getArrayFirst(paraMap.get("outstockDetailId" + index)));
 		String convert = StringUtils.getArrayFirst(paraMap.get("convert" + index));
 		String bigNum = StringUtils.getArrayFirst(paraMap.get("bigNum" + index));
 		String smallNum = StringUtils.getArrayFirst(paraMap.get("smallNum" + index));
+		String price = StringUtils.getArrayFirst(paraMap.get("bigPrice" + index));
 		
 		Integer bigCount = Integer.valueOf(bigNum);
 		Integer productConvert = Integer.valueOf(convert);
@@ -120,21 +121,30 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		
 		Integer productCount = bigCount * productConvert + smallCount;
 		String productAmount = StringUtils.getArrayFirst(paraMap.get("rowTotal" + index));
+		BigDecimal productPrice = new BigDecimal(price);
 		
 		detail.setProductCount(productCount);
-		detail.setProductAmount(StringUtils.isNumeric(productAmount)? new BigDecimal(productAmount) : new BigDecimal(0));
+		detail.setProductAmount(new BigDecimal(productAmount));
+		detail.setModifyDate(date);
 		
 		if (!detail.update()) {
 			return false;
 		}
 		
+		BigDecimal smallStoreCount = new BigDecimal(smallCount).divide(new BigDecimal(productConvert), 2, BigDecimal.ROUND_HALF_UP);
+		
 		String productId = StringUtils.getArrayFirst(paraMap.get("productId" + index));
-		Inventory inventory = InventoryQuery.me().findBySellerIdAndProductId(sellerId, productId);
-		inventory.setOutCount(inventory.getOutCount().add(new BigDecimal(bigCount)).add(new BigDecimal(smallCount/productConvert)));
+		Inventory inventory = InventoryQuery.me().findBySellerIdAndProductIdAndWareHouseId(sellerId, productId, wareHouseId);
+		if (inventory == null) {
+			return false;
+		}
+		inventory.setOutCount(inventory.getOutCount().add(new BigDecimal(bigCount)).add(smallStoreCount));
 		inventory.setOutAmount(inventory.getOutAmount().add(detail.getProductAmount()));
+		inventory.setOutPrice(productPrice);
 		inventory.setBalanceCount(inventory.getBalanceCount().subtract(new BigDecimal(bigCount))
-				.subtract(new BigDecimal(smallCount/productConvert)));
+				.subtract(smallStoreCount));
 		inventory.setBalanceAmount(inventory.getBalanceAmount().subtract(detail.getProductAmount()));
+		inventory.setModifyDate(date);
 		
 		if (!inventory.update()) {
 			return false;
@@ -145,8 +155,8 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		inventoryDetail.setWarehouseId(inventory.getWarehouseId());
 		inventoryDetail.setSellProductId(detail.getSellProductId());
 		inventoryDetail.setOutAmount(detail.getProductAmount());
-		inventoryDetail.setOutCount(new BigDecimal(bigCount).add(new BigDecimal(smallCount/productConvert)));
-		inventoryDetail.setOutPrice(inventory.getBalancePrice());
+		inventoryDetail.setOutCount(new BigDecimal(bigCount).add(smallStoreCount));
+		inventoryDetail.setOutPrice(inventory.getOutPrice());
 		inventoryDetail.setBalanceAmount(inventory.getBalanceAmount());
 		inventoryDetail.setBalanceCount(inventory.getBalanceCount());
 		inventoryDetail.setBalancePrice(inventory.getBalancePrice());
@@ -165,6 +175,7 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		List<SellerProduct> sellerProductList = SellerProductQuery.me().findByProductIdAndSellerId(productId, sellerId);
 		for (SellerProduct sellerProduct : sellerProductList) {
 			sellerProduct.setStoreCount(inventory.getBalanceCount());
+			sellerProduct.setModifyDate(date);
 		}
 		int[] i = Db.batchUpdate(sellerProductList, sellerProductList.size());
 		int count = 0;
@@ -178,6 +189,7 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		SalesOrderDetail salesOrderDetail = SalesOrderDetailQuery.me().findById(detail.getOrderDetailId());
 		salesOrderDetail.setOutCount(salesOrderDetail.getOutCount() + productCount);
 		salesOrderDetail.setLeftCount(salesOrderDetail.getLeftCount() - productCount);
+		salesOrderDetail.setModifyDate(date);
 		if (!salesOrderDetail.update()) {
 			return false;
 		}

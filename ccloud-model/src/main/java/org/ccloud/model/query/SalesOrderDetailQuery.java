@@ -91,7 +91,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 			String productAmount = StringUtils.getArrayFirst(paraMap.get("rowTotal" + index));
 			String isGift = StringUtils.getArrayFirst(paraMap.get("isGift" + index));
 			detail.setProductPrice(new BigDecimal(productPrice));
-			detail.setProductAmount(StringUtils.isNumeric(productAmount)? new BigDecimal(productAmount) : new BigDecimal(0));
+			detail.setProductAmount(new BigDecimal(productAmount));
 			detail.setIsGift(StringUtils.isNumeric(isGift)? Integer.parseInt(isGift) : 0);
 			detail.setCreateDate(date);
 			detail.setDeptId(deptId);

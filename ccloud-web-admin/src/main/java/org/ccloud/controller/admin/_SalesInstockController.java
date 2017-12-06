@@ -15,14 +15,18 @@
  */
 package org.ccloud.controller.admin;
 
+import java.sql.SQLException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.SalesOrder;
+import org.ccloud.model.User;
 import org.ccloud.model.query.SalesRefundInstockDetailQuery;
 import org.ccloud.model.query.SalesRefundInstockQuery;
 import org.ccloud.route.RouterMapping;
@@ -30,8 +34,11 @@ import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
+import com.jfinal.plugin.activerecord.Db;
+import com.jfinal.plugin.activerecord.IAtom;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 
@@ -63,12 +70,18 @@ public class _SalesInstockController extends JBaseCRUDController<SalesOrder> {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 
-		Page<Record> page = SalesRefundInstockQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate);
+		Page<Record> page = SalesRefundInstockQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate, "1");
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
 
 	}
+	
+	public void getDetail() {
+		String id = getPara("id");
+		setAttr("id", id);
+		render("in_stock_detail.html");
+	}	
 	
 	public void detail() {
 
@@ -83,5 +96,71 @@ public class _SalesInstockController extends JBaseCRUDController<SalesOrder> {
 		render("detail.html");
 
 	}
+	
+	public void inDetail() {
+
+		String refundId = getPara("instockId");
+
+		Record refund = SalesRefundInstockQuery.me().findMoreById(refundId);
+		List<Record> refundDetail = SalesRefundInstockDetailQuery.me().findByRefundId(refundId);
+
+		HashMap<String, Object> result = Maps.newHashMap();
+		result.put("refund", refund);
+		result.put("refundDetail", refundDetail);
+
+		renderJson(result);		
+
+	}
+	
+	public void inStock() {
+
+		Map<String, String[]> paraMap = getParaMap();
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String sellerId = getSessionAttr("sellerId");
+		String sellerCode = getSessionAttr("sellerCode");
+		boolean isSave = this.in(paraMap, user, sellerId, sellerCode);
+        if (isSave) {
+        	renderAjaxResultForSuccess("入库成功");
+        } else {
+        	renderAjaxResultForError("入库失败!");
+        }
+
+	}
+	
+	public boolean in(final Map<String, String[]> paraMap, final User user, final String sellerId, final String sellerCode) {
+        boolean isSave = Db.tx(new IAtom() {
+            @Override
+            public boolean run() throws SQLException {
+        		String deptId = StringUtils.getArrayFirst(paraMap.get("deptId"));
+        		String dataArea = StringUtils.getArrayFirst(paraMap.get("dataArea"));
+        		String inStockId =  StringUtils.getArrayFirst(paraMap.get("salesStockId"));
+        		String inStockSN =  StringUtils.getArrayFirst(paraMap.get("salesStockSN"));
+        		String wareHouseId =  StringUtils.getArrayFirst(paraMap.get("wareHouseId"));
+        		Date date = new Date();
+        		String productNumStr = StringUtils.getArrayFirst(paraMap.get("productNum"));
+        		Integer productNum = Integer.valueOf(productNumStr);
+        		Integer count = 0;
+        		Integer index = 0;
+        		
+        		while (productNum > count) {
+        			index++;
+        			String sellProductId = StringUtils.getArrayFirst(paraMap.get("sellProductId" + index));
+        			if (StrKit.notBlank(sellProductId)) {
+        				if (!SalesRefundInstockQuery.me().inStock(paraMap, sellerId, 
+        						date, deptId, dataArea, index, user.getId(), inStockSN, wareHouseId)) {
+        					return false;
+        				}
+        				count++;
+        			}
+
+        		}
+        		if (!SalesRefundInstockQuery.me().updateStatus(inStockId, date)) {
+        			return false;
+        		}
+        		return true;
+            }
+        });
+        return isSave;
+	}	
 
 }

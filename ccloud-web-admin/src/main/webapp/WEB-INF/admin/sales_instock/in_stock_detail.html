@@ -22,6 +22,8 @@
 <#macro script>
 	$(function() {
 		jQuery.mm.initValidator('#form', validatorFields);
+		var id = "${id}";
+		refund(id);
 	});
 	
 	var $form = $("#form");
@@ -41,7 +43,7 @@
 		$tbody.append("<tr id='" + newTrId + "'>" + newTrHtml + "</tr>");
 
 		var $newTr = $("#" + newTrId);
-		var $productSelect = $newTr.find("#sellerProductId")
+		var $productSelect = $newTr.find("#sellProductId")
 
 
 		productValue($productSelect, product);
@@ -74,12 +76,12 @@
 				}
 		});
 		
-		$newTr.find("#sellerProductId").attr("name", "sellerProductId" + newTrIdx);
+		$newTr.find("#sellProductId").attr("name", "sellProductId" + newTrIdx);
 		$newTr.find("#productId").attr("name", "productId" + newTrIdx);
 		$newTr.find("#convert").attr("name", "convert" + newTrIdx);
 		$newTr.find("#isGift").attr("name", "isGift" + newTrIdx);
 		$newTr.find("#inputRowTotal").attr("name", "rowTotal" + newTrIdx);
-		$newTr.find("#orderDetailId").attr("name", "orderDetailId" + newTrIdx);
+		$newTr.find("#outstockDetailId").attr("name", "outstockDetailId" + newTrIdx);
 
 		orderNum();
 	}
@@ -87,19 +89,20 @@
 	function productValue(obj,product){
 
 			var $tr = obj.parent().parent().parent();
-			
-			$tr.find("#sellerProductId").val(product.product_id);
-			$tr.find("#sellerProductName").text(product.productName);
-			$tr.find("#specification").text(product.cps_name);
+
+			$tr.find("#sellProductId").val(product.sell_product_id);
+			$tr.find("#productId").val(product.product_id);
+			$tr.find("#sellProductName").text(product.custom_name);
+			$tr.find("#specification").text(product.valueName);
 
 			var convert = product.convert_relate;
 			$tr.find("#convert").val(convert);
 			var productCount = product.product_count;
 
-			var smallPrice = product.product_price;
+			var smallPrice = (product.product_price/convert).toFixed(2);
 			var smallUnit = product.small_unit;
 
-			var bigPrice = smallPrice*convert;
+			var bigPrice = product.product_price;
 	
 			$tr.find("#bigPrice").val(bigPrice);
 			$tr.find("#bigPrice-span").text(bigPrice);
@@ -107,8 +110,8 @@
 			
 			$tr.find("#bigNum").val(Math.floor(productCount/convert));
 			
-			$tr.find("#smallPrice").val(product.product_price);
-			$tr.find("#smallPrice-span").text(product.product_price);
+			$tr.find("#smallPrice").val(smallPrice);
+			$tr.find("#smallPrice-span").text(smallPrice);
 			$tr.find("#smallUnit-span").text(smallUnit);
 			
 			$tr.find("#smallNum").val(productCount%convert);
@@ -116,7 +119,7 @@
 				$tr.find("#isGift").attr("checked", true);
 			}
 
-			$tr.find("#orderDetailId").val(product.id);
+			$tr.find("#outstockDetailId").val(product.id);
 			
 			rowTotalF(obj);
 	}
@@ -183,10 +186,8 @@
 			dataType : "json", 
 			success : function(data) { 
 				if (data.errorCode == 0) {
+					//location.reload();
 					toastr.success(data.message, '操作成功');
-					setTimeout( function(){
-						location.href="${CPATH}/admin/purchaseInstock/index";
-					}, 2 * 1000 );
 				} else {
 					toastr.error(data.message,'操作失败');
 				}
@@ -197,45 +198,31 @@
 		});
 	}
 	
-	function orderIndex() {
-		layer.open({
-			title:"选择采购订单",
-			type: 2, 
-			area: ['70%', '80%'],
-			content: '${CPATH}/admin/purchaseInstock/orderIndex'
-		}); 
-	}
-	
-	function orderDetail(id) {
-		layer.open({
-			title:"采购订单详细",
-			type: 2, 
-			area: ['70%', '80%'],
-			content: '${CPATH}/admin/purchaseInstock/orderDetail/' + id
-		}); 
-	}
-	
 	function refund(id) {
 		$("#table tbody tr").not(".hide").remove();
-		layer.closeAll();
 
-		$.get('${CPATH}/admin/purchaseInstock/refund?ucode=${ucode}&orderId=' + id,
+		$.get('${CPATH}/admin/salesInstock/inDetail?instockId=' + id,
 			function(result){
-				var order = result.order;
-				var orderDetail = result.orderDetail;
+				var outstock = result.refund;
+				var outstockDetail = result.refundDetail;
 
-				$("#supplierId").val(order.supplier_id);
-				$("#purchaseOrderId").val(order.id);
-				$("#supplierCode").val(order.code);
-				$("#supplierName").val(order.supplier_name);
-				$("#contact").val(order.contact);
-				$("#mobile").val(order.mobile);
-				$("#warehouseCode").val(order.warehouseCode);
-				$("#biz_user_id").val(order.biz_user_id);
-				$("#deptId").val(order.dept_id);
-				$("#dataArea").val(order.data_area);
+				$("#customerId").val(outstock.customer_id);
+				$("#customerName").val(outstock.customer_name);
+				$("#contact").val(outstock.ccontact);
+				$("#mobile").val(outstock.cmobile);
+				$("#customerType").val(outstock.customer_type_id);
+				$("#customerTypeName").val(outstock.customerTypeName);
+				$("#customerTypeCode").val(outstock.customerTypeCode);
+				$("#warehouseId").val(outstock.warehouse_id);
+				$("#warehouseCode").val(outstock.warehouseCode);
+				$("#biz_user_id").val(outstock.biz_user_id);
+				$("#deptId").val(outstock.dept_id);
+				$("#dataArea").val(outstock.data_area);
+				$("#salesStockId").val(outstock.id);
+				$("#salesStockSN").val(outstock.instock_sn);
+				$("#wareHouseId").val(outstock.warehouse_id);
 
-				$.each(orderDetail, function(index,element){
+				$.each(outstockDetail, function(index,element){
 					addProduct(element);
 				});
 			}
@@ -247,18 +234,18 @@
 
 <!-- Content Header (Page header) -->
 <section class="content-header">
-	<h1>新增采购入库</h1>
+	<h1>入库管理</h1>
 	<ol class="breadcrumb">
 		<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
 		<li><a href="#">订单管理</a></li>
-		<li class="active">新增采购退货</li>
+		<li class="active">入库管理</li>
 	</ol>
 </section>
 <!-- Main content -->
 <section class="content">
 	<div class="box box-default">
 		<div class="box-header with-border">
-			<h3 class="box-title">新增采购入库</h3>
+			<h3 class="box-title">入库管理</h3>
 			<div class="box-tools">
 				<button type="button" class="btn btn-box-tool" data-widget="collapse">
 					<i class="fa fa-minus"></i>
@@ -266,10 +253,12 @@
 			</div>
 		</div>
 
-		<form action="${CPATH}/admin/purchaseInstock/save" method="post" id="form" class="form-horizontal" >
+		<form action="${CPATH}/admin/salesInstock/inStock" method="post" id="form" class="form-horizontal" >
 			<div class="box-body">
-				<a onclick="orderIndex()" class="btn btn-sm btn-primary"> 选择采购单 </a>
 				<table id="table" class="table table-bordered table-hover text-center" width="100%">
+				<input id="salesStockId" name="salesStockId" type="hidden">
+				<input id="salesStockSN" name="salesStockSN" type="hidden">
+				<input id="wareHouseId" name="wareHouseId" type="hidden">
 					<thead>
 						<tr>
 							<th width="2%"></th>
@@ -280,21 +269,22 @@
 							<th width="12%">大单位数量</th>
 							<th width="11%">小单位价格</th>
 							<th width="11%">小单位数量</th>
+							<th width="5%">赠品</th>
 							<th width="7%">小计</th>
 						</tr>
 					</thead>
 					<tbody>
 						<tr class="hide">
 							<td>
-								<a class="btn btn-danger btn-xs" onclick="deleteTr(this)"><span class="glyphicon glyphicon-remove"></span></a>
 							</td>
 							<td>
 								<span class="rowNum">0</span>
 							</td>
 							<td>
 								<div class = "validata-box">
-									<span id="sellerProductName" ></span>
-									<input type="hidden" id="sellerProductId" name="sellerProductId" />
+									<span id="sellProductName" ></span>
+									<input type="hidden" id="sellProductId" name="sellProductId" />
+									<input type="hidden" id="productId" name="productId" />
 								</div>
 							</td>
 							<td>
@@ -325,8 +315,13 @@
 									<span id="smallUnit-span"></span>
 								</div>
 							</td>
+							<td>
+								<div class = "validata-box">
+									<input type="checkbox" id="isGift" name="isGift" value ="1" onclick="rowTotalF(this)" disabled="disabled"/>
+								</div>
+							</td>
 							<td>￥<span class="rowTotal">0</span> <input type="hidden" name="rowTotal" id="inputRowTotal" value="0" /></td>
-							<input  type="hidden" id="orderDetailId" name="orderDetailId" value="" >
+							<input  type="hidden" id="outstockDetailId" name="outstockDetailId" value="" >
 						</tr>
 					</tbody>
 					<tfoot>
@@ -342,13 +337,10 @@
 
 				<div id="customer">
 					<div class="form-group col-sm-12 validata-box">
-						<label class="control-label col-sm-2">*供应商名称:</label>
+						<label class="control-label col-sm-2">*客户名称:</label>
 						<div class="input-group col-md-4 col-sm-10">
-							<input type="hidden" id="id" name="id" />
-							<input class="form-control input-sm" type="text" id="supplierName" name="supplierName" value="" readonly>
-							<input type="hidden" id="supplierId" name="supplierId" />
-							<input type="hidden" id="supplierCode" name="supplierCode" />
-							<input type="hidden" id="purchaseOrderId" name="purchaseOrderId" />
+							<input class="form-control input-sm" type="text" id="customerName" name="customerName" value="" readonly>
+							<input type="hidden" id="customerId" name="customerId" />
 						</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">
@@ -364,16 +356,21 @@
 						</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">*客户类型:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<input  type="hidden" id="customerType" name="customerType" value="" >
+							<input  type="hidden" id="customerTypeCode" name="customerTypeCode" value="" >
+							<input class="form-control input-sm" type="text" id="customerTypeName" name="customerTypeName" value="" readonly>
+						</div>
+					</div>
+					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">收款方式:</label>
 						<div class="input-group col-md-4 col-sm-10">
 							<label class="radio-inline">
-								<input type="radio" name="paymentType" value="1" checked>现结
+								<input type="radio" name="paymentType" value="1" checked disabled>现结
 							</label>
 							<label class="radio-inline">
-								<input class="minimal" type="radio" name="paymentType" value="0" >应付账款
-							</label>
-							<label class="radio-inline">
-								<input type="radio" name="paymentType" value="2" checked>预付款
+								<input class="minimal" type="radio" name="paymentType" value="0" disabled>应付账款
 							</label>
 						</div>
 					</div>
@@ -392,7 +389,7 @@
 			</div>
 
 			<div class="box-footer"> 
-				<button type="button" onclick="doSubmit()" class="btn btn-primary">提交订单</button>
+				<button type="button" onclick="doSubmit()" class="btn btn-primary">确认入库</button>
 				<input type="button" class="btn btn-primary" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
 			</div>
 		</form>

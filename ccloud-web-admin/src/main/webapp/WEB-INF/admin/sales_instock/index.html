@@ -75,7 +75,7 @@
 					edit: false
 				},
 				{field: "customer_name", title: "客户名称", align: "center", width: '8%', edit:false},
-				{field: "total_amount", title: "订单总额", align: "center", width: '5%', edit:false},
+				{field: "total_reject_amount", title: "订单总额", align: "center", width: '5%', edit:false},
 				{field: "payment_type", title: "付款方式", align: "center", width: '5%',
 					formatter: function(value, row, rowIndex) {
 						return value == 0 ? '应付账款' : '现金';
@@ -85,9 +85,12 @@
 				{field: "status", title: "状态", align: "center", width: '5%',edit: false},
 				{field: "action", title: "操作", align: "center", width: '15%',
 				formatter: function(value, row, rowIndex) {
+					var url = '${CPATH}/admin/salesInstock/getDetail?id=' + row.id + '&c=${c}&p=${p}';
 					var strHtml ='<a class="label label-table label-info" onclick="detail(\''+row.id+'\')" >详细</a> ';
-
-					strHtml = strHtml + '<a class="label label-table label-warning" onclick="pass(\''+row.id+'\')" >入库</a> ';
+					
+					if (row.status == 1000) {
+						strHtml = strHtml + '<a class="label label-table label-warning" href="' + url + '" >入库</a> ';			
+					}					
 
 					return strHtml;
 				},

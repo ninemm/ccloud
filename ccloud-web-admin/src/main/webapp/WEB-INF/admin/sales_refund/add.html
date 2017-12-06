@@ -90,16 +90,16 @@
 
 			$tr.find("#sellProductId").val(product.sell_product_id);
 			$tr.find("#sellProductName").text(product.custom_name);
-			$tr.find("#specification").text(product.spe_name);
+			$tr.find("#specification").text(product.valueName);
 
 			var convert = product.convert_relate;
 			$tr.find("#convert").val(convert);
 			var productCount = product.product_count;
 
-			var smallPrice = product.product_price;
+			var smallPrice = (product.product_price/convert).toFixed(2);
 			var smallUnit = product.small_unit;
 
-			var bigPrice = smallPrice*convert;
+			var bigPrice = product.product_price;
 	
 			$tr.find("#bigPrice").val(bigPrice);
 			$tr.find("#bigPrice-span").text(bigPrice);
@@ -107,8 +107,8 @@
 			
 			$tr.find("#bigNum").val(Math.floor(productCount/convert));
 			
-			$tr.find("#smallPrice").val(product.product_price);
-			$tr.find("#smallPrice-span").text(product.product_price);
+			$tr.find("#smallPrice").val(smallPrice);
+			$tr.find("#smallPrice-span").text(smallPrice);
 			$tr.find("#smallUnit-span").text(smallUnit);
 			
 			$tr.find("#smallNum").val(productCount%convert);

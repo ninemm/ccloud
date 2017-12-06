@@ -85,8 +85,10 @@ public class PurchaseRefundOutstockDetailQuery extends JBaseQuery {
 	}
 	
 	public List<PurchaseRefundOutstockDetail> findAllByPurchaseRefundId(String purchaseRefundOutstockId,String dataArea){
-		String sql = "select prod.* ,pro.outstock_sn,pro.warehouse_id from cc_purchase_refund_outstock_detail prod "
-				+ " LEFT JOIN cc_purchase_refund_outstock pro on pro.id = prod.purchase_refund_outstock_id where pro.id = ? and pro.data_area='"+dataArea+"' ";
+		String sql = "select prod.*,cp.convert_relate ,pro.outstock_sn,pro.warehouse_id from cc_purchase_refund_outstock_detail prod "
+				+ " LEFT JOIN cc_purchase_refund_outstock pro on pro.id = prod.purchase_refund_outstock_id "
+				+ " LEFT JOIN cc_product cp on cp.id = prod.seller_product_id "
+				+ " where pro.id = ? and pro.data_area='"+dataArea+"' ";
 		return DAO.find(sql, purchaseRefundOutstockId);
 	}
 	

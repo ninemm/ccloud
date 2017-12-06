@@ -133,6 +133,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
         		String dataArea = StringUtils.getArrayFirst(paraMap.get("dataArea"));
         		String outStockId =  StringUtils.getArrayFirst(paraMap.get("salesStockId"));
         		String outStockSN =  StringUtils.getArrayFirst(paraMap.get("salesStockSN"));
+        		String wareHouseId =  StringUtils.getArrayFirst(paraMap.get("wareHouseId"));
         		Date date = new Date();
         		String productNumStr = StringUtils.getArrayFirst(paraMap.get("productNum"));
         		Integer productNum = Integer.valueOf(productNumStr);
@@ -143,14 +144,16 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
         			index++;
         			String sellProductId = StringUtils.getArrayFirst(paraMap.get("sellProductId" + index));
         			if (StrKit.notBlank(sellProductId)) {
-        				SalesOutstockDetailQuery.me().outStock(paraMap, sellerId, 
-        						date, deptId, dataArea, index, user.getId(), outStockSN);
+        				if (!SalesOutstockDetailQuery.me().outStock(paraMap, sellerId, 
+        						date, deptId, dataArea, index, user.getId(), outStockSN, wareHouseId)) {
+        					return false;
+        				}
         				count++;
         			}
 
         		}
-        		if (!SalesOutstockQuery.me().updateStatus(outStockId, Consts.SALES_OUT_STOCK_STATUS_OUT) || 
-        				!SalesOrderQuery.me().checkStatus(outStockId)) {
+        		if (!SalesOutstockQuery.me().updateStatus(outStockId, Consts.SALES_OUT_STOCK_STATUS_OUT, date) || 
+        				!SalesOrderQuery.me().checkStatus(outStockId, date)) {
         			return false;
         		}
         		return true;
