@@ -36,6 +36,7 @@
 				<tr>
 					<th>序号</th>
 					<th>商品</th>
+					<th>规格</th>
 					<th>大单位数量</th>
 					<th>小单位数量</th>
 					<th>是否赠品</th>
@@ -47,6 +48,7 @@
 					<tr>
 						<td>${detail_index + 1}</td>
 						<td>${detail.custom_name!}</td>
+						<th>${detail.valueName!}</th>
 						<td>${(detail.product_count / detail.convert_relate)?floor} ${detail.big_unit + ' (x' + detail.convert_relate + detail.small_unit + ')' }</td>
 						<td>${detail.product_count % detail.convert_relate} ${detail.small_unit}</td>
 						<td><#if detail.is_gift?? && detail.is_gift == 1>是</#if></td>

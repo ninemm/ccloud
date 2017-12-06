@@ -49,8 +49,8 @@ public class ReceivablesQuery extends JBaseQuery {
 		StringBuilder fromBuilder;
 		if("1".equals(type)) {
 			select = "SELECT c.id,c.customer_code AS code,c.customer_name AS name,r.receive_amount,r.act_amount,r.balance_amount";
-			fromBuilder = new StringBuilder(" FROM `cc_receivables` AS r INNER JOIN `cc_customer` AS c ON r.object_id=c.id LEFT JOIN `cc_customer_join_customer_type` AS ct ON c.id=ct.customer_id ");
-			if(!"0".equals(id)){
+			fromBuilder = new StringBuilder(" FROM `cc_receivables` AS r INNER JOIN `cc_customer_join_customer_type` AS ct ON r.object_id=ct.seller_customer_id LEFT JOIN `cc_seller_customer` AS sc ON sc.id=ct.seller_customer_id LEFT JOIN `cc_customer` AS c ON c.id=sc.customer_id ");
+			if(!("0".equals(id)) && id != null){
 				fromBuilder.append("WHERE ct.customer_type_id = '"+ id+"'");
 			}
 			
@@ -64,7 +64,8 @@ public class ReceivablesQuery extends JBaseQuery {
 		LinkedList<Object> params = new LinkedList<Object>();
 		appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, false);
 		fromBuilder.append("ORDER BY r.create_date DESC");
-
+		
+		
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 

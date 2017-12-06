@@ -178,7 +178,6 @@ function addTr(tid, productList, optionArr) {
 	var firstProduct = productList[0];
 	var goodsCode = firstProduct.id;
 	var goodsName = firstProduct.customName;
-	var specification = firstProduct.valueName;
 
 	var $tbody = $(tid + " tbody"),
 	$tr = $tbody.find("tr:eq(0)"),
@@ -195,7 +194,6 @@ function addTr(tid, productList, optionArr) {
     $tbody.find("tr:last>td>div>div>#stock").attr("name","productComposition["+ lastTrIdx +"].product_count");
     $tbody.find("tr:last>td>#compositionId").attr("name","composition["+ lastTrIdx +"].id");
     $tbody.find("tr:last>td>#goodsCode").val(goodsCode);
-    $tbody.find("tr:last>td>#specification").text(specification);
     $tbody.find("tr:last>td>#factIndex").attr("value",lastTrIdx);
     $tbody.find("tr:last").find(":input").attr("disabled",false);
     
@@ -240,11 +238,9 @@ function addTr(tid, productList, optionArr) {
      var result = productMap[$(this).val()];   
      var cgoodsCode = result.id;
      var cgoodsName = result.customName;
-     var cspecification = result.valueName;
      var $tr = $(this).parent().parent();
      $tr.find("td>#goodsCode").val(cgoodsCode);
      $tr.find("td>#goodsName").html(cgoodsName); 
-	 $tr.find("td>#specification").text(cspecification);
      });  
 }
 
@@ -297,7 +293,6 @@ function addTr(tid, productList, optionArr) {
 							<tr>
 								<th class="col-sm-1 center zr">操作</th>
 								<th class="col-sm-2 center zh">商品名称</th>
-								<th class="col-sm-1 center zh">规格</th>
 								<th class="col-sm-1 center">子商品数量</th>
 							</tr>
 						</thead>
@@ -314,8 +309,6 @@ function addTr(tid, productList, optionArr) {
 									type="hidden" id="factIndex" name="factIndex" value="-1" /> <select
 									class="pro-slc2">
 								</select></td>
-								<td class="text-center"><span class="specification"
-									id="specification"></span></td>
 								<td class="text-center">
 								<div class="form-group validata-box" style="margin: 0;">
 								<div class="input-group col-md-4 col-sm-10">
@@ -337,8 +330,6 @@ function addTr(tid, productList, optionArr) {
 									value="${list_index}" /> <select
 									class="pro-slc2" id="select_${list_index}">
 								</select></td>
-								<td class="text-center"><span class="specification"
-									id="specification">${list.product_sp!}</span></td>								
 								<td class="text-center">
 								<div class="form-group validata-box" style="margin: 0;">
 								<div class="input-group col-md-4 col-sm-10">								
@@ -367,8 +358,6 @@ function addTr(tid, productList, optionArr) {
 									value="${list_index+1}" /> <select
 									class="pro-slc2" id="select_${list_index+1}">
 								</select></td>
-								<td class="text-center"><span class="specification"
-									id="specification">${list.sub_product_sp!}</span></td>
 								<td class="text-center zh">
 								<div class="form-group validata-box" style="margin: 0;">
 								<div class="input-group col-md-4 col-sm-10">								

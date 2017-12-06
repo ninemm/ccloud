@@ -85,7 +85,7 @@ function initProduct(){
 			$.each(productList, function(idx, item) {
 				var option = {
 					id: item.productList.productId,
-					text: item.productList.name
+					text: item.productList.name + item.productList.specificationValue
 				}
 				productOptionArr.push(option);
 				productMap[item.productList.productId] = item;
@@ -116,7 +116,7 @@ function addTr(tid, productList, optionArr) {
 	var productId = firstProduct.productId;
 	var goodsName = firstProduct.name;
 	var specification = firstProduct.specificationValue;
-	var big_unit = firstProduct.weightUnit;
+	var big_unit = firstProduct.bigUnit;
 
 	var $tbody = $(tid + " tbody"),
 	$tr = $tbody.find("tr:eq(0)"),
@@ -154,9 +154,9 @@ function addTr(tid, productList, optionArr) {
      var cproductId = result.productId;
      var cgoodsName = result.name;
      var cspecification = result.specificationValue;
-     var cbig_unit = firstProduct.weightUnit;
+     var cbig_unit = firstProduct.bigUnit;
      var $tr = $(this).parent().parent();
-     $tr.find("td>#goodsCode").val(cgoodsCode);
+     $tr.find("td>#goodsCode").val(cproductId);
      $tr.find("td>#goodsName").html(cgoodsName); 
      $tr.find("td>#specification").text(cspecification);
      $tr.find("td>#big_unit").text(cbig_unit);

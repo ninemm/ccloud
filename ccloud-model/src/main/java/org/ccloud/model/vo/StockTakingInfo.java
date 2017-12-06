@@ -14,7 +14,7 @@ public class StockTakingInfo {
     private Date createDate;
     private String productId;
     private BigDecimal productAmount;
-    private Integer productCount;
+    private BigDecimal productCount;
     private String remark;
 	private List<ProductInfo> productInfos;
 	
@@ -79,10 +79,10 @@ public class StockTakingInfo {
 	public void setRemark(String remark) {
 		this.remark = remark;
 	}
-	public Integer getProductCount() {
+	public BigDecimal getProductCount() {
 		return productCount;
 	}
-	public void setProductCount(Integer productCount) {
+	public void setProductCount(BigDecimal productCount) {
 		this.productCount = productCount;
 	}
 
