@@ -38,12 +38,7 @@ public class PurchaseOrderDetailQuery extends JBaseQuery {
 	}
 
 	public PurchaseOrderDetail findById(final String id) {
-		return DAO.getCache(id, new IDataLoader() {
-			@Override
-			public Object load() {
 				return DAO.findById(id);
-			}
-		});
 	}
 
 	public Page<PurchaseOrderDetail> paginate(int pageNumber, int pageSize, String orderby) {

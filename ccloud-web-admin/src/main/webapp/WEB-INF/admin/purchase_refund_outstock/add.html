@@ -98,10 +98,10 @@
 			$tr.find("#convert").val(convert);
 			var productCount = product.product_count;
 
-			var smallPrice = product.product_price;
+			var bigPrice = product.product_price;
+			var smallPrice = bigPrice/convert;
 			var smallUnit = product.small_unit;
 
-			var bigPrice = smallPrice*convert;
 	
 			$tr.find("#bigPrice").val(bigPrice);
 			$tr.find("#bigPrice-span").text(bigPrice);
@@ -109,8 +109,8 @@
 			
 			$tr.find("#bigNum").val(Math.floor(productCount/convert));
 			
-			$tr.find("#smallPrice").val(product.product_price);
-			$tr.find("#smallPrice-span").text(product.product_price);
+			$tr.find("#smallPrice").val(smallPrice);
+			$tr.find("#smallPrice-span").text(smallPrice);
 			$tr.find("#smallUnit-span").text(smallUnit);
 			
 			$tr.find("#smallNum").val(productCount%convert);

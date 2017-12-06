@@ -38,12 +38,7 @@ public class PurchaseInstockDetailQuery extends JBaseQuery {
 	}
 
 	public PurchaseInstockDetail findById(final String id) {
-		return DAO.getCache(id, new IDataLoader() {
-			@Override
-			public Object load() {
 				return DAO.findById(id);
-			}
-		});
 	}
 
 	public Page<PurchaseInstockDetail> paginate(int pageNumber, int pageSize, String orderby) {
@@ -86,8 +81,10 @@ public class PurchaseInstockDetailQuery extends JBaseQuery {
 	}
 
 	public List<PurchaseInstockDetail> findAllByPurchaseInstockId(String purchaseInstockId){
-		String sql = "select cpid.* ,cpi.warehouse_id,cpi.pwarehouse_sn from cc_purchase_instock_detail cpid "
-				+ " LEFT JOIN cc_purchase_instock cpi on cpid.purchase_instock_id=cpi.id where cpi.id=?";
+		String sql = "select cpid.* ,cp.convert_relate,cpi.warehouse_id,cpi.pwarehouse_sn from cc_purchase_instock_detail cpid "
+				+ " LEFT JOIN cc_purchase_instock cpi on cpid.purchase_instock_id=cpi.id "
+				+ " LEFT JOIN cc_product cp ON  cp.id = cpid.seller_product_id "
+				+ "where cpi.id=?";
 		return DAO.find(sql, purchaseInstockId);
 	}
 }

@@ -104,7 +104,7 @@ Utils = {
 var open = false;
 var finished = true;
 var $currentInput = null;
-
+//打开菜单
 function openMenu() {
 	open = true;
 	finished = false;
@@ -116,7 +116,7 @@ function openMenu() {
 		finished = true;
 	}, 300);
 }
-
+//关闭菜单
 function closeMenu() {
 	finished = false;
 	$(".hidden-menu ul").addClass("animated fadeOutDown");
@@ -128,7 +128,7 @@ function closeMenu() {
 		finished = true;
 	}, 300);
 }
-
+//关闭输入框
 function openPop() {
 	open = true;
 	$("body")
@@ -153,7 +153,7 @@ function closePop() {
 		$(".layer").removeClass("layer-pop-show");
 	}, 300);
 }
-
+//确认输入
 function confirmInput() {
 	$currentInput.val($(".pop-input input").val());
 	closePop();
@@ -211,7 +211,7 @@ $(function() {
 		;
 	}).on("touchmove", ".layer", function() {
 		event.preventDefault();
-	}).on("touchend", "input[type=number]", function() {
+	}).on("touchend", "input[type=number]:not([disabled])", function() {
 		if (!open) {
 			$currentInput = $(this);
 			openPop();
@@ -220,13 +220,13 @@ $(function() {
 		closePop();
 	}).on("touchstart", "#confirm-input", function() {
 		confirmInput();
-	}).on("touchstart", ".operate:first-child", function() {
+	}).on("touchstart", ".operate:first-child", function() {//减少商品数量
 		var $input = $(this).next();
 		Number($input.val())-1 >= 0 ? $input.val(Number($input.val()) - 1) : "";
-	}).on("touchstart", ".operate:last-child", function() {
+	}).on("touchstart", ".operate:last-child", function() {//增加商品数量
 		var $input = $(this).prev();
 		$input.val(Number($input.val()) + 1);
-	}).on("change", "input[name=add-gift]", function() {
+	}).on("change", "input[name=add-gift]", function() {//点击遮罩关闭菜单
 		$(this).parent().next().slideToggle("fast");
 	});
 })
