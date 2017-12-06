@@ -98,6 +98,9 @@ public class MenuManager {
 
 		HookInvoker.menuInitAfter(this);
 		CacheKit.put(CACHE_NAME, user.getId(), htmlBuilder.toString());
+		
+		System.err.println(htmlBuilder.toString());
+		
 		return htmlBuilder.toString();
 		
 		

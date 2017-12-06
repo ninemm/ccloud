@@ -136,6 +136,14 @@ public abstract class BaseMenu<M extends BaseMenu<M>> extends JModel<M> implemen
 	public java.lang.String getName() {
 		return get("name");
 	}
+	
+	public void setCode(java.lang.String code) {
+		set("code", code);
+	}
+
+	public java.lang.String getCode() {
+		return get("code");
+	}
 
 	public void setIcon(java.lang.String icon) {
 		set("icon", icon);

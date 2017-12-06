@@ -128,6 +128,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 			// 找到对应的上级
 			var.set("manager", "hx");
 			var.set("apply", "qgadmin");
+			var.set("assign", "");
 			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 			var.set("applyUserId", user.getId());
 			var.set("applyer", user.getRealname());

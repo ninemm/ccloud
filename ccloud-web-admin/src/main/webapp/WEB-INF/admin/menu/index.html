@@ -58,9 +58,9 @@
    					edit: false
    				},
    				{field: "level", title: "层级", align: "center", width: '10%', edit:false},
-   				{field: "order_list", title: "序号", align: "center", width: '10%', edit:false},
+   				{field: "order_list", title: "序号", align: "center", width: '5%', edit:false},
    				<@shiro.hasPermission name="/admin/menu/edit,/admin/all">
-   				{field: "action", title: "操作", align: "center", width: '10%', 
+   				{field: "action", title: "操作", align: "center", width: '15%', 
    					formatter: function(value, row, rowIndex) {
    						var url = '${CPATH}/admin/menu/edit?id=' + row.id + '&c=${c}&p=${p}';
    						var url2 = '${CPATH}/admin/menu/permission?id=' + row.id + '&menuName=' + row.name + '&c=${c}&p=${p}';
