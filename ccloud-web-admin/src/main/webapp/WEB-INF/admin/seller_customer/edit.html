@@ -123,6 +123,28 @@
 		});
 	});
 
+	$("#customer_name").on("blur",function(){
+		var customer_name = $("#customer_name").val();
+		if($.trim(customer_name)==""){
+			$('input[name="customer.mobile"]').val("");
+			$('input[name="customer.contact"]').val("");
+			$('input[name="customer.address"]').val("");
+			$('input[name="customer.prov_name"]').val("");
+			$('input[name="customer.city_name"]').val("");
+			$('input[name="customer.country_name"]').val("");
+			$('input[name="customer.prov_code"]').val("");
+			$('input[name="customer.city_code"]').val("");
+			$('input[name="customer.country_code"]').val("");
+			$('input[name="sellerCustomer.nickname"]').val("");
+			$('select[name="sellerCustomer.customer_kind"]').val("100401");
+			$('select[name="sellerCustomer.customer_kind"]').find("option[value='100401']").attr("selected",true);
+			$('select[name="sellerCustomer.sub_type"]').val("100301");
+			$('select[name="sellerCustomer.sub_type"]').find("option[value='100301']").attr("selected",true);
+			$city.citypicker('reset');
+			$("#customerTypes").val("").select2();
+	}
+	});
+
 	var validatorFields = {
 		'customer.customer_name': {
 			validators: {
