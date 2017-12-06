@@ -134,9 +134,10 @@ public class SalesOrderQuery extends JBaseQuery {
 	public List<Record> findCustomerTypeListByCustomerId(String customerId, String dataArea) {
 		LinkedList<Object> params = new LinkedList<Object>();
 
-		StringBuilder sqlBuilder = new StringBuilder("select c.id, c.name, c.code ");
+		StringBuilder sqlBuilder = new StringBuilder("select c.id, c.name, c.code, cp.factor ");
 		sqlBuilder.append(" from `cc_customer_join_customer_type` cj ");
-		sqlBuilder.append(" join `cc_customer_type` c on cj.customer_type_id = c.id ");
+		sqlBuilder.append(" left join `cc_customer_type` c on cj.customer_type_id = c.id ");
+		sqlBuilder.append(" left join `cc_price_system` cp on cp.id = c.price_system_id ");
 		sqlBuilder.append(" where c.is_show = 1 ");
 		appendIfNotEmpty(sqlBuilder, "cj.seller_customer_id", customerId, params, false);
 		appendIfNotEmpty(sqlBuilder, "c.data_area", dataArea, params, false);
@@ -159,7 +160,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		salesOrder.setStatus(0);// 待审核
 		String total = StringUtils.getArrayFirst(paraMap.get("total"));
 		String type = StringUtils.getArrayFirst(paraMap.get("receiveType"));
-		salesOrder.setTotalAmount(StringUtils.isNumeric(total)? new BigDecimal(total) : new BigDecimal(0));
+		salesOrder.setTotalAmount(new BigDecimal(total));
 		salesOrder.setReceiveType(StringUtils.isNumeric(type)? Integer.parseInt(type) : 0);
 		salesOrder.setDeliveryAddress(StringUtils.getArrayFirst(paraMap.get("receiveType")));
 		Date deliveryDate = DateUtils.strToDate(StringUtils.getArrayFirst(paraMap.get("deliveryDate")), DateUtils.DEFAULT_NORMAL_FORMATTER);
