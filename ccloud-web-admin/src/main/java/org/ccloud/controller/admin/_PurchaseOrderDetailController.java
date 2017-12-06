@@ -15,7 +15,6 @@
  */
 package org.ccloud.controller.admin;
 
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -127,7 +126,7 @@ public class _PurchaseOrderDetailController extends JBaseCRUDController<Purchase
 		purchaseOrder.set("id", Id);
 		purchaseOrder.set("porder_sn", porderSn);
 		purchaseOrder.set("supplier_id", StringUtils.getArrayFirst(paraMap.get("supplierId")));
-		purchaseOrder.set("contact", StringUtils.getArrayFirst(paraMap.get("mobile")));
+		purchaseOrder.set("contact", StringUtils.getArrayFirst(paraMap.get("contact")));
 		purchaseOrder.set("mobile", StringUtils.getArrayFirst(paraMap.get("mobile")));
 		purchaseOrder.set("biz_user_id", user.getId());
 		purchaseOrder.set("biz_date", date1);
@@ -159,7 +158,7 @@ public class _PurchaseOrderDetailController extends JBaseCRUDController<Purchase
 				purchaseOrderDetail.set("product_id", productId);
 				purchaseOrderDetail.set("product_count", (Integer.parseInt(StringUtils.getArrayFirst(paraMap.get("smallNum"+ index)))+Integer.parseInt(StringUtils.getArrayFirst(paraMap.get("bigNum"+ index)))*big));
 				purchaseOrderDetail.set("product_amount", rowTotal);
-				purchaseOrderDetail.set("product_price", StringUtils.getArrayFirst(paraMap.get("smallPrice"+ index)));
+				purchaseOrderDetail.set("product_price", StringUtils.getArrayFirst(paraMap.get("bigPrice"+ index)));
 				purchaseOrderDetail.set("order_list",index);
 				purchaseOrderDetail.set("create_date", date1);
 				purchaseOrderDetail.set("dept_id", user.getDepartmentId());
