@@ -267,7 +267,7 @@ function addTr(tid, productList, optionArr) {
 												<#list (list.productInfos)! as plist>
 												<td class="text-left">
 													<input type="hidden" id="goodsCode" name="stockTakingList[${list_index}].product_id"  value="${list.productId}" />
-													<input type="text" id="goodsName" name="goodsName"  value="${plist.name}" disabled="disabled"/>
+													<input type="text" id="goodsName" name="goodsName"  value="${plist.name}${plist.specificationValue!}" disabled="disabled"/>
 												   <input type="hidden"  id="factIndex" name="factIndex" value="${list_index}"/>
 												</td>
 												<td class="text-center">

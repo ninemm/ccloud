@@ -96,7 +96,7 @@ public class StockTakingDetailQuery extends JBaseQuery {
 			stockTakingInfo.setStatus(record.getInt("status"));
 			stockTakingInfo.setProductId(record.getStr("product_id"));
 			stockTakingInfo.setProductAmount(record.getBigDecimal("product_amount"));
-			stockTakingInfo.setProductCount(record.getInt("product_count"));
+			stockTakingInfo.setProductCount(record.getBigDecimal("product_count"));
 			stockTakingInfo.setRemark(record.getStr("remark"));
 			List<ProductInfo> ProductInfo = ProductQuery.me().getAllProductInfoById(stockTakingInfo.getProductId());
 			stockTakingInfo.setProductInfos(ProductInfo);
