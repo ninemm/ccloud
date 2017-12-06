@@ -183,6 +183,7 @@
 	}
 
 	function doSubmit(){
+		$(do_Submit).attr("disabled","disabled"); 
 		$("#productNum").val($(".rowNum").length - 1);
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
@@ -372,7 +373,7 @@
 
 			<div class="box-footer"> 
 				<button type="button" id="do_Submit" onclick="doSubmit()" class="btn btn-primary">审核通过</button>
-				<input type="button" class="btn btn-primary" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
+				<input type="button" class="btn btn-primary" onclick="history.go(-1)" value="返  回" hidefocus="true" />
 			</div>
 		</form>
 	</div>

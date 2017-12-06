@@ -39,10 +39,11 @@ public class PurchaseInstockQuery extends JBaseQuery {
 				return DAO.findById(id);
 	}
 
-	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate) {
+	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate,String userId,String dataArea) {
 		String select = "select i.*, cs.name as supplierName";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_purchase_instock` i ");
 		fromBuilder.append(" join cc_supplier cs on i.supplier_id = cs.id ");
+		fromBuilder.append(" join user u on i.input_user_id = u.id ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
@@ -63,7 +64,7 @@ public class PurchaseInstockQuery extends JBaseQuery {
 			params.add(endDate);
 		}
 
-		fromBuilder.append(" order by i.create_date ");
+		fromBuilder.append(" and u.id='"+userId+"' and u.data_area ='"+dataArea+"' order by i.create_date ");
 
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
