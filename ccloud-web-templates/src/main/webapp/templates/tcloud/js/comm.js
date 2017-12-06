@@ -222,7 +222,7 @@ $(function() {
 		confirmInput();
 	}).on("touchstart", ".operate:first-child", function() {
 		var $input = $(this).next();
-		$input.val(Number($input.val()) - 1);
+		Number($input.val())-1 >= 0 ? $input.val(Number($input.val()) - 1) : "";
 	}).on("touchstart", ".operate:last-child", function() {
 		var $input = $(this).prev();
 		$input.val(Number($input.val()) + 1);
