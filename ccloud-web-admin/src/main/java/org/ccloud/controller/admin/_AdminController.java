@@ -15,6 +15,7 @@
  */
 package org.ccloud.controller.admin;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.shiro.SecurityUtils;
@@ -84,6 +85,7 @@ public class _AdminController extends JBaseController {
 		String username = getPara("username");
 		String password = getPara("password");
 		String rememberMeStr = getPara("remember_me");
+		List<Record> list = new ArrayList<>(); 
 		boolean rememberMe = false;
 		if (rememberMeStr != null && rememberMeStr.equals("on")) {
 			rememberMe = true;
@@ -127,12 +129,13 @@ public class _AdminController extends JBaseController {
 					setSessionAttr("sellerId", sellerList.get(0).get("sellerId"));
 					setSessionAttr("sellerCode", sellerList.get(0).get("sellerCode"));
 					setSessionAttr("sellerName", sellerList.get(0).get("sellerName"));
+					list = sellerList;
 				}
 			}
 			MessageKit.sendMessage(Actions.USER_LOGINED, user);
 			CookieUtils.put(this, Consts.COOKIE_LOGINED_USER, user.getId().toString());
 			setSessionAttr(Consts.SESSION_LOGINED_USER, user);
-			renderAjaxResultForSuccess("登录成功");
+			renderAjaxResultForSuccess("登录成功", list);
 		} catch (AuthenticationException e) {
 			e.printStackTrace();
 			renderAjaxResultForError("用户名或密码错误");
@@ -146,6 +149,7 @@ public class _AdminController extends JBaseController {
 		removeSessionAttr("sellerId");
 		removeSessionAttr("sellerCode");
 		removeSessionAttr("sellerName");
+		removeSessionAttr("sellerList");
 		CookieUtils.remove(this, Consts.COOKIE_LOGINED_USER);
 		Subject subject = SecurityUtils.getSubject();
 		subject.logout();
@@ -154,6 +158,10 @@ public class _AdminController extends JBaseController {
 
 	public void checkRole() {
 		render("404.html");
+	}
+	
+	public void sellerSelect() {
+		render("seller_select.html");
 	}
 
 }
