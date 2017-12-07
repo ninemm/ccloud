@@ -50,7 +50,7 @@
       			{field: "SUSPENSION_STATE_", title: "是否挂起", align: "center", visible:false, width: '15%', edit:false},
       			{field: "DEPLOYMENT_ID_", title: "部署ID", align: "center", visible:false, width: '18%', edit:false},
       			{field: "KEY_", title: "流程标识", align: "center", width: '8%', edit:false},
-      			{field: "NAME_", title: "流程名称", align: "center", width: '15%', edit:false},
+      			{field: "NAME_", title: "流程名称", align: "center", width: '25%', edit:false},
       			{field: "VERSION_", title: "流程版本", align: "center", width: '8%', edit:false},
    				{field: "RESOURCE_NAME_", title: "流程XML", align: "center", visible:false, width: '15%', 
    					formatter: function(value, row, rowIndex) {
@@ -58,13 +58,13 @@
    					},
    					edit: false
    				},
-   				{field: "DGRM_RESOURCE_NAME_", title: "流程图片", align: "center", width: '18%', 
+   				{field: "DGRM_RESOURCE_NAME_", title: "流程图片", align: "center", width: '20%', 
                     formatter: function(value, row, rowIndex) {
                         return "<a target='_blank' href='${CPATH}/admin/workflow/resourceRead?procDefId="+row.ID_+"&resType=image' style='color:#2EB6FF;'>"+value+"</a>";
                     },
                     edit: false
                 },
-   				{field: "DEPLOY_TIME_", title: "部署时间", align: "center", width: '18%', edit:false},
+   				{field: "DEPLOY_TIME_", title: "部署时间", align: "center", width: '16%', edit:false},
    				{field: "action", title: "操作", align: "center", 
    					formatter: function(value, row, rowIndex) {
    					    var  strHtml = '<a class="label label-table label-info" href="${SPATH}/processEditor/diagram-viewer/index.html?processDefinitionId='+row.ID_+'" target="_blank">预览</a>&nbsp;';
