@@ -8,6 +8,8 @@
 	<!-- bootstrap-datetimepicker -->
 	<script src="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.min.js"></script>
 	<script src="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="${CPATH}/static/ladda/spin.min.js"></script>
+	<script src="${CPATH}/static/ladda/ladda.min.js"></script>		
 </#macro>
 
 <#macro css_import>
@@ -17,6 +19,7 @@
 	<link rel="stylesheet" href="${CPATH}/static/plugins/select2/css/select2.css">
 	<!-- bootstrap-datetimepicker -->
 	<link rel="stylesheet" href="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="${CPATH}/static/ladda/ladda-themeless.min.css">
 </#macro>
 
 <#macro script>
@@ -176,15 +179,20 @@
 
 	function doSubmit(){
 		$("#productNum").val($(".rowNum").length - 1);
+		var l = Ladda.create( document.querySelector( '.ladda-button' ) );
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
 				var validate = $form.data('bootstrapValidator');
 				validate.validate();
+				if (validate.isValid()) {
+					l.start();
+				}				
 				return validate.isValid();
 			},
 			type : "post", 
 			dataType : "json", 
 			success : function(data) { 
+				l.stop();
 				if (data.errorCode == 0) {
 					//location.reload();
 					toastr.success(data.message, '操作成功');
@@ -193,6 +201,7 @@
 				}
 			},
 			error : function() {
+				l.stop();
 				alert("信息提交错误");
 			}
 		});
@@ -389,7 +398,7 @@
 			</div>
 
 			<div class="box-footer"> 
-				<button type="button" onclick="doSubmit()" class="btn btn-primary">确认出库</button>
+				<button type="button" onclick="doSubmit()" class="btn btn-primary ladda-button" data-style="expand-right"><span class="ladda-label">确认出库</span></button>
 				<input type="button" class="btn btn-primary" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
 			</div>
 		</form>

@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
@@ -49,6 +50,7 @@ import com.jfinal.plugin.activerecord.tx.Tx;
 @RouterMapping(url = "/admin/salesRefund", viewPath = "/WEB-INF/admin/sales_refund")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
+@RequiresPermissions("/admin/salesRefund")
 public class _SalesRefundController extends JBaseCRUDController<SalesRefundInstock> {
 
 	@Override
@@ -173,6 +175,7 @@ public class _SalesRefundController extends JBaseCRUDController<SalesRefundInsto
 
 	}
 	
+	@RequiresPermissions("/admin/salesRefund/check")
 	@Before(Tx.class)
 	public void pass() {
 

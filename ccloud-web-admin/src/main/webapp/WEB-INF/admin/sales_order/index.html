@@ -76,7 +76,7 @@
 				},
 				{field: "customer_name", title: "客户名称", align: "center", width: '8%', edit:false},
 				{field: "total_amount", title: "订单总额", align: "center", width: '5%', edit:false},
-				{field: "payment_type", title: "付款方式", align: "center", width: '5%',
+				{field: "receive_type", title: "付款方式", align: "center", width: '5%',
 					formatter: function(value, row, rowIndex) {
 						return value == 0 ? '应付账款' : '现金';
 					},
@@ -105,11 +105,13 @@
 				formatter: function(value, row, rowIndex) {
 					var strHtml ='<a class="label label-table label-info" onclick="detail(\''+row.id+'\')" >详细</a> ';
 					
+					<@shiro.hasPermission name="/admin/salesOrder/check">
 					if (row.status == 0) {
 						strHtml = strHtml + '<a class="label label-table label-success" onclick="pass(\''+row.id+'\')" >通过</a> ';
 	
 						strHtml = strHtml + '<a class="label label-table label-warning" onclick="reject(\''+row.id+'\')" >拒绝</a> ';					
 					}
+					</@shiro.hasPermission>			
 
 					return strHtml;
 				},
@@ -187,7 +189,9 @@
 		</div>
 		<div class="row content-row">
 			<div class="jp-left">
-				<button class="btn btn-sm btn-primary" type="button" onclick="batchAction()"><i class="fa fa-gavel"></i> 批量审核 </button>
+				<@shiro.hasPermission name="/admin/salesOrder/check">
+					<button class="btn btn-sm btn-primary" type="button" onclick="batchAction()"><i class="fa fa-gavel"></i> 批量审核 </button>
+				</@shiro.hasPermission>
 				<a href="${CPATH}/admin/salesOrder/add?c=${c!}&p=${p!}" class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> 新建销售订货单 </a>
 			</div>
 
