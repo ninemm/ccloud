@@ -96,6 +96,66 @@ public class SellerCustomerQuery extends JBaseQuery {
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
+	public Page<Record> paginateForApp(int pageNumber, int pageSize, String keyword, String dataArea, String userId,
+			String customerTypeId, String isOrdered) {
+
+		boolean needWhere = true;
+		LinkedList<Object> params = new LinkedList<Object>();
+
+		String select = "select sc.*, c.customer_code, c.customer_name"
+				+ ", c.contact, c.mobile, c.prov_name, c.city_name, c.country_name"
+				+ ", c.prov_code, c.city_code, c.country_code, c.address" + ", t1.customerTypeNames, t2.realnames";
+
+		StringBuilder fromBuilder = new StringBuilder(" from `cc_seller_customer` sc ");
+		fromBuilder.append(" join `cc_customer` c on c.id = sc.customer_id ");
+		fromBuilder.append(" left join `cc_sales_order` so on sc.id = so.customer_id ");
+
+		fromBuilder.append(" JOIN (SELECT c1.id,GROUP_CONCAT(ct. NAME) AS customerTypeNames ");
+		fromBuilder.append(" FROM cc_seller_customer c1 ");
+		fromBuilder.append(" JOIN cc_customer_join_customer_type cjct ON c1.id = cjct.seller_customer_id ");
+		fromBuilder.append(" JOIN cc_customer_type ct ON cjct.customer_type_id = ct.id ");
+		appendIfNotEmptyWithLike(fromBuilder, "ct.id", customerTypeId, params, true);
+		fromBuilder.append(" GROUP BY c1.id) t1 ON sc.id = t1.id ");
+
+		fromBuilder.append(" JOIN (SELECT c2.id, GROUP_CONCAT(u.realname) AS realnames ");
+		fromBuilder.append(" FROM cc_seller_customer c2 ");
+		fromBuilder.append(" JOIN cc_user_join_customer ujc ON c2.id = ujc.seller_customer_id ");
+		fromBuilder.append(" JOIN USER u ON ujc.user_id = u.id ");
+
+		appendIfNotEmptyWithLike(fromBuilder, "ujc.data_area", dataArea, params, true);
+		appendIfNotEmpty(fromBuilder, "ujc.user_id", userId, params, false);
+		fromBuilder.append(" GROUP BY c2.id) t2 ON sc.id = t2.id ");
+
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "c.customer_name", keyword, params, needWhere);
+
+		if (needWhere) {
+			fromBuilder.append(" WHERE 1 = 1 ");
+			needWhere = false;
+		}
+		if (StrKit.notBlank(isOrdered)) {
+			if ("1".equals(isOrdered)) {
+
+				fromBuilder.append(" AND EXISTS ");
+			}
+
+			if ("0".equals(isOrdered)) {
+
+				fromBuilder.append(" AND NOT EXISTS ");
+			}
+			
+			fromBuilder.append(" (SELECT 1 FROM cc_seller_customer csc  join `cc_sales_order` cso on csc.id = cso.customer_id where sc.id = csc.id group by csc.id)" );
+
+		}
+
+		fromBuilder.append(" GROUP BY sc.id ");
+		fromBuilder.append(" order by sc.create_date ");
+
+		if (params.isEmpty())
+			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+
+		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+
 	public boolean enable(String id, int isEnabled) {
 		SellerCustomer sellerCustomer = DAO.findById(id);
 		sellerCustomer.set("is_enabled", isEnabled);
@@ -131,13 +191,16 @@ public class SellerCustomerQuery extends JBaseQuery {
 
 	}
 
-	public Page<Record> findByUserTypeForApp(int pageNumber, int pageSize, Object[] userId, String customerType, String isOrdered, String searchKey) {
+	public Page<Record> findByUserTypeForApp(int pageNumber, int pageSize, Object[] userId, String customerType,
+			String isOrdered, String searchKey) {
 		boolean needwhere = false;
 		LinkedList<Object> params = new LinkedList<Object>();
 
 		String select = "SELECT c.id,c.customer_name,c.contact,c.mobile,c.prov_name,c.city_name,c.country_name,c.address ";
-		StringBuilder sql = new StringBuilder("FROM (SELECT c.id,c.customer_name,c.contact,c.mobile,c.prov_name,c.city_name,c.country_name,c.address FROM cc_user_join_customer cujc ");
-		sql.append("LEFT JOIN cc_customer_join_customer_type ccjct ON cujc.seller_customer_id = ccjct.seller_customer_id ");
+		StringBuilder sql = new StringBuilder(
+				"FROM (SELECT c.id,c.customer_name,c.contact,c.mobile,c.prov_name,c.city_name,c.country_name,c.address FROM cc_user_join_customer cujc ");
+		sql.append(
+				"LEFT JOIN cc_customer_join_customer_type ccjct ON cujc.seller_customer_id = ccjct.seller_customer_id ");
 		sql.append("LEFT JOIN cc_seller_customer csc ON cujc.seller_customer_id = csc.id ");
 		sql.append("LEFT JOIN cc_customer c ON csc.customer_id = c.id ");
 		sql.append("LEFT JOIN cc_sales_order cso ON cujc.seller_customer_id = cso.customer_id ");
@@ -163,8 +226,10 @@ public class SellerCustomerQuery extends JBaseQuery {
 
 		if (StrKit.notBlank(isOrdered)) {
 
-			if (isOrdered.equals("1")) sql.append("HAVING count(DISTINCT(cso.order_sn)) > 0 ");
-			if (isOrdered.equals("0")) sql.append("HAVING count(DISTINCT(cso.order_sn)) = 0 ");
+			if (isOrdered.equals("1"))
+				sql.append("HAVING count(DISTINCT(cso.order_sn)) > 0 ");
+			if (isOrdered.equals("0"))
+				sql.append("HAVING count(DISTINCT(cso.order_sn)) = 0 ");
 		}
 
 		sql.append(") AS c");

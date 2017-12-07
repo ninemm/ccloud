@@ -1,0 +1,257 @@
+<#include "_inc/_layout.html"/>
+<#macro css> </#macro>
+<#macro script>
+
+
+    $(function() {
+        //搜索框监听
+        $(document).on("input", "#searchInput", function() {
+            initCustomer();
+        }).on("touchstart", "#customerInfo", function() {
+			var el = $(this);
+	        var customerInfo = {
+	        	customerName : el.find("#customerName").text(),
+	        	sellerCustomerId : el.find("#sellerCustomerId").val(),
+	        	contact : el.find("#contact").val(),
+	        	mobile : el.find("#mobile").val(),
+	        	address : el.find("#address").val()
+	        }
+	        setItemBykey("customerInfo", customerInfo)
+	        window.location.href = '${CPATH}/product/order';
+        });
+
+        //筛选项获取
+         $("#userId").select({
+	         title: "选择业务员",
+	         items: ${userIds!}
+         });
+
+         $("#customerTypeId").select({
+	         title: "选择客户类型",
+	         items: ${customerTypes!}
+         });
+
+         $("#isOrdered").select({
+	         title: "是否下单",
+	         items: [{
+	             title: "全部", value: ""
+	             },{
+	             title: "是", value: "1"
+	             },{
+	             title: "否",value: "0"
+	         }]
+         });
+         
+         initCustomer();
+
+    });
+    
+    var pageNumber = 1;
+    var pageSize = 10;
+    var loading = false;
+
+    var $endNode = null;
+    var $loadmore = $(".weui-loadmore");
+    
+	var newHtml = $(".weui-panel").eq(0).html();
+	var $customerList = $("#customerList");
+	$customerList.empty();
+	
+	var params = {
+            "keyword": $("#searchInput").val(),
+            "page": pageNumber,
+            "size": pageSize,
+            "userId": $("#userId").val(),
+            "customerTypeId": $("#customerTypeId").val(),
+            "isOrdered": $("#isOrdered").val()
+    }
+    
+    function initCustomer() {
+    	Utils.ajax('${CPATH}/product/customerList', params, 
+			function(data){
+				$.each(data.customerList, function(index, el) {
+					$customerList.append("<div class='weui-panel weui-panel_access'>" + newHtml + "</div>");
+					var $newCustomer = $customerList.find(".weui-panel:last");
+					$newCustomer.find("#customerName").text(el.customer_name);
+					$newCustomer.find("#contactP").text(el.contact + "/" + el.mobile);
+					$newCustomer.find("#addressSpan").text(el.prov_name + " " + el.city_name + " " + el.country_name + " " + el.address);
+
+					$newCustomer.find("#sellerCustomerId").val(el.id);
+					$newCustomer.find("#contact").val(el.contact);
+					$newCustomer.find("#mobile").val(el.mobile);
+					$newCustomer.find("#address").val(el.prov_name + " " + el.city_name + " " + el.country_name + " " + el.address);
+				});
+			}
+		);
+        pageNumber++;
+    }
+
+
+
+    //监听滚动
+    $(".infinite").infinite().on("infinite", function() {
+        var self = this;
+        $endNode = $(".weui-panel_access:last");
+        $loadmore = $(self).find(".weui-loadmore");
+        if ($loadmore) $loadmore.show();
+        if (loading) return ;
+        loading = true;
+
+        $.ajax({
+            type: "post",
+            url: "${CPATH}/customer/refresh",
+            data: paramData(),
+            dataType: "json",
+            success:function(data) {
+                if ($loadmore) $loadmore.show();
+                if (data.totalPage >= pageNumber) {
+                    $endNode.after(data.html);
+                }
+                if (data.totalPage = pageNumber) {
+                    $(".infinite").destroyInfinite();
+                    $loadmore.hide();
+                }
+                pageNumber++;
+                loading = false;
+            }
+        });
+    });
+
+
+    //搜索框叉掉和取消时，先清input值，再调用接口
+    function searchCancel() {
+        $("#searchInput")[0].value = "";
+        refresh();
+    }
+
+    function refresh() {
+        pageNumber = 1;
+        $.ajax({
+            url:"${CPATH}/customer/refresh",
+            type:"post",
+            data:paramData(),
+            dataType:"json",
+            success:function(data) {
+                $loadmore = $(this).find(".weui-loadmore");
+                $(".infinite").destroyInfinite();
+                $loadmore.hide();
+
+                if (data.totalPage > pageNumber) {
+                    loading = false;
+                    $(".infinite").infinite();
+                    $(".weui-loadmore").removeAttr("style");
+                }
+
+                $(".infinite")[0].scrollTop = 0;
+                $("#customerList").empty();
+                $("#customerList").html(data.html);
+                pageNumber = 2;
+            }
+        });
+    }
+
+</#macro>
+
+<@layout>
+<div id="customer">
+    <header>
+        <div class="weui-search-bar" id="SearchBar">
+            <form class="weui-search-bar__form">
+                <div class="weui-search-bar__box">
+                    <i class="weui-icon-search"></i>
+                    <input type="search" class="weui-search-bar__input" id="searchInput" placeholder="搜索" required="">
+                    <a href="javascript:" class="weui-icon-clear" id="searchClear" onclick="initCustomer()"></a>
+                </div>
+                <label class="weui-search-bar__label" id="searchText">
+                    <i class="weui-icon-search"></i>
+                    <span>请输入客户名或联系人</span>
+                </label>
+            </form>
+            <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel" onclick="initCustomer()">取消</a>
+        </div>
+    </header>
+    <article class="customer">
+	    <header class="has-th-list">
+	        <div class="head-search">
+	            <div>
+	                <input type="text" id="userId" class="weui-input" placeholder="业务员" onChange="initCustomer()" readonly>
+	                <i class="icon-sort-desc"></i>
+	            </div>
+	            <div>
+	                <input type="text" id="customerTypeId" class="weui-input" placeholder="客户类型" onChange="initCustomer()" readonly>
+	                <i class="icon-sort-desc"></i>
+	            </div>
+	            <div>
+	                <input type="text" id="isOrdered" class="weui-input" placeholder="是否下单" onChange="initCustomer()" readonly>
+	                <i class="icon-sort-desc"></i>
+	            </div>
+	        </div>
+	        <div>
+	            <i class="icon-th-list"></i>
+	        </div>
+	    </header>
+	        <div id="customerList">
+	            <div class="weui-panel weui-panel_access">
+	               <div class="weui-flex">
+	                   <div class="weui-flex__item customer-info" id="customerInfo">
+	                       <p class="ft14" id="customerName">小张烤鱼</p>
+	                       <p class="gray" id="contactP">小张/18611111111</p>
+	                       <input type="hidden" id="sellerCustomerId" value="">
+	                       <input type="hidden" id="contact" value="">
+	                       <input type="hidden" id="mobile" value="">
+	                       <input type="hidden" id="address" value="">
+	                   </div>
+	                   <div class="weui-flex__item customer-href">
+	                       <div class="weui-flex">
+	                           <a href="tel:${(customer.mobile)!}"class="weui-flex__item">
+	                               <p>
+	                                   <i class="icon-phone green"></i>
+	                               </p>
+	                               <p>电话</p>
+	                           </a>
+	                           <a class="weui-flex__item" href="./historyOrder.html?customer_id=${(customer.id)!}&customer_name=${(customer.customer_name)!}">
+	                               <p>
+	                                   <i class="icon-file-text-o blue"></i>
+	                               </p>
+	                               <p>订单</p>
+	                           </a>
+	                           <a class="weui-flex__item relative" href="./customerDetail.html">
+	                               <i class="icon-chevron-right gray"></i>
+	                           </a>
+	                       </div>
+	                   </div>
+	               </div>
+	               <p class="gray">
+	                   <span class="icon-map-marker ft16 green"></span>
+	                   <span id="addressSpan">湖北省 武汉市 江汉区 德盛街</span>
+	               </p>
+	           </div>
+	       </div>
+	            <div class="weui-loadmore weui-loadmore_line">
+	                <span class="weui-loadmore__tips">暂无数据</span>
+	            </div>
+                <div class="weui-loadmore">
+                    <i class="weui-loading"></i>
+                    <span class="weui-loadmore__tips">正在加载</span>
+                </div>
+	          <div class="hidden-menu">
+			    <ul>
+			      <li>
+			        <a href="index.html">
+			          首页
+			          <i class="icon-home blue"></i>
+			        </a>
+			      </li>
+			      <li>
+			        <a href="javascript:history.go(-1)">
+			          上一页
+			          <i class="icon-undo green"></i>
+			        </a>
+			      </li>
+			    </ul>
+			    <i class="icon-menu-open orange fr" id="button"></i>
+			  </div>
+    </article>
+</div>
+</@layout>
+
