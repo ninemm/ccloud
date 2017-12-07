@@ -33,6 +33,7 @@ import org.ccloud.model.StockTaking;
 import org.ccloud.model.StockTakingDetail;
 import org.ccloud.model.User;
 import org.ccloud.model.Warehouse;
+import org.ccloud.model.query.InventoryDetailQuery;
 import org.ccloud.model.query.InventoryQuery;
 import org.ccloud.model.query.SellerProductQuery;
 import org.ccloud.model.query.StockTakingDetailQuery;
@@ -123,7 +124,7 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 						Inventory inventory=new Inventory();
 						String seller_product_id=(String) listMap.get(i).get("seller_product_id");
 						String product_id=(String) listMap.get(i).get("product_id");
-						//判断此商品是否已经在仓库中   
+						//判断此商品是否已经在仓库中   同一商品不同别名 总账相加  明细分开
 						List<Record> findByInventory = StockTakingDetailQuery.me().findByInventory(product_id,warehouse_id,seller_id);
 						if (findByInventory.size()!=0) {
 							//存在--只更改数量 总价格
@@ -170,10 +171,17 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 						inventoryDetail.setInCount(new BigDecimal(listMap.get(i).get("product_count").toString()));
 						inventoryDetail.setInAmount(inventory.getInAmount().add(new BigDecimal(listMap.get(i).get("price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString()))));
 						inventoryDetail.setInPrice(inventory.getInPrice());
-						
-						inventoryDetail.setBalanceCount(inventory.getBalanceCount());
-						inventoryDetail.setBalanceAmount(inventory.getBalanceAmount());
+						//根据seller_product_id添加各自的库存明细
+						InventoryDetail findByInventoryDetail = InventoryDetailQuery.me().findBySellerProductId(seller_product_id,warehouse_id);
+						if (findByInventoryDetail==null) {
+							inventoryDetail.setBalanceCount(new BigDecimal(listMap.get(i).get("product_count").toString()));
+							inventoryDetail.setBalanceAmount(inventory.getInAmount().add(new BigDecimal(listMap.get(i).get("price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString()))));
+						}else {
+							inventoryDetail.setBalanceCount(findByInventoryDetail.getBalanceCount().add(new BigDecimal(listMap.get(i).get("product_count").toString())));
+							inventoryDetail.setBalanceAmount(findByInventoryDetail.getBalanceAmount().add(inventory.getInAmount().add(new BigDecimal(listMap.get(i).get("price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString())))));
+						}
 						inventoryDetail.setBalancePrice(inventory.getBalancePrice());
+						
 						//业务类型  盘盈入库--100208  盘亏入库--100209
 						int compareTo = new BigDecimal(listMap.get(i).get("product_count").toString()).compareTo(new BigDecimal(0));
 						if (compareTo<0) {
@@ -193,9 +201,10 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 							renderAjaxResultForError("更新InventoryDetail失败");
 							return false;
 						}
+						
+						
 						//获取经销商此商品的信息 更新库存
-						List<SellerProduct> sellerProductList = SellerProductQuery.me().findByProductIdAndSellerId(seller_product_id,seller_id);
-						SellerProduct sellerProduct = sellerProductList.get(0);
+						SellerProduct sellerProduct = SellerProductQuery.me().findById(seller_product_id);
 						BigDecimal storeCount = sellerProduct.getStoreCount();
 						if (storeCount==null) {
 							sellerProduct.setStoreCount(new BigDecimal(listMap.get(i).get("product_count").toString()));
