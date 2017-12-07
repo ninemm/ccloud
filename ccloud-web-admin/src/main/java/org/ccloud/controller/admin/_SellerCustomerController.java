@@ -371,7 +371,6 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 				sellerCustomer.set("nickname", excel.getNickname());
 				sellerCustomer.set("data_area", dataArea);
 				sellerCustomer.set("dept_id", dept.getId());
-				sellerCustomer.set("data_area", dataArea);
 				sellerCustomer.set("create_date", new Date());
 				sellerCustomer.save();
 				inCnt++;
