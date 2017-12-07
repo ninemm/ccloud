@@ -76,10 +76,9 @@ public class TransferBillDetailQuery extends JBaseQuery {
 	
 	
 	
-public List<transferBillInfo> findByTransferBillDetailId(String id) {
-		
-	 	StringBuilder fromBuilder = new StringBuilder("select c1.transfer_bill_sn,c1.from_warehouse_id,c1.to_warehouse_id,c1.biz_user_id,c1.biz_date,c1.`status`,c1.create_date, ");
-	 	fromBuilder.append("c2.product_id,c2.product_count");
+public List<transferBillInfo> findByTransferBillDetailId(String id,String sellerId) {
+	 	StringBuilder fromBuilder = new StringBuilder("select c1.transfer_bill_sn,c1.from_warehouse_id,c1.to_warehouse_id,c1.biz_user_id,c1.biz_date,c1.`status`,c1.create_date,c1.data_area,  ");
+	 	fromBuilder.append("c2.seller_product_id,c2.product_count");
 	 	fromBuilder.append(" FROM cc_transfer_bill c1 ");
 	 	fromBuilder.append(" inner JOIN cc_transfer_bill_detail c2 ON c1.id = c2.transfer_bill_id ");
 	 	fromBuilder.append(" WHERE c2.transfer_bill_id = ?");
@@ -93,9 +92,10 @@ public List<transferBillInfo> findByTransferBillDetailId(String id) {
 			transferBillInfo.setBizUserId(record.getStr("biz_user_id"));
 			transferBillInfo.setBizDate(record.getDate("biz_date"));
 			transferBillInfo.setStatus(record.getInt("status"));
-			transferBillInfo.setProductId(record.getStr("product_id"));
-			transferBillInfo.setProductCount(record.getInt("product_count"));
-			List<ProductInfo> ProductInfo = ProductQuery.me().getAllProductInfoById(transferBillInfo.getProductId());
+			transferBillInfo.setSellerProductId(record.getStr("seller_product_id"));
+			transferBillInfo.setProductCount(record.getBigDecimal("product_count"));
+			transferBillInfo.setDataArea(record.getStr("data_area"));
+			List<ProductInfo> ProductInfo = ProductQuery.me().getProductBySellerProId(record.getStr("seller_product_id"));
 			transferBillInfo.setProductInfos(ProductInfo);
 			iList.add(transferBillInfo);
 		}

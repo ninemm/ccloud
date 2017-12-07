@@ -23,8 +23,17 @@ public class ProductInfo {
 	private String bigUnit;
 	private String customName;
 	private String sellerProductId;
+	private BigDecimal storeCount;
+
 	
-	
+
+	public BigDecimal getStoreCount() {
+		return storeCount;
+	}
+
+	public void setStoreCount(BigDecimal storeCount) {
+		this.storeCount = storeCount;
+	}
 
 	public String getSellerProductId() {
 		return sellerProductId;
@@ -161,6 +170,7 @@ public class ProductInfo {
 	public void setCategoryName(String categoryName) {
 		this.categoryName = categoryName;
 	}
+
 
 	public String getProductId() {
 		return productId;

@@ -107,6 +107,7 @@
 
 			var bigPrice = product.product_price;
 	
+			$tr.find("#product_totalCount").val(productCount);
 			$tr.find("#bigPrice").val(bigPrice);
 			$tr.find("#bigPrice-span").text(bigPrice);
 			$tr.find("#bigUnit-span").text(product.big_unit + "(x" + convert + smallUnit + ")");
@@ -176,9 +177,41 @@
 		$("#total").text(total);
 		$("#inputTotal").val(total);
 	}
+	
+	function checkProductNumber() {
+		var store = $(".product tr");
+		var check = false;
+		var alltotal = 0;
+		if (store.length <= 1) {
+			check = false;
+			return check;
+		}
+		store.each(function(index,obj){
+			var productCount = parseInt($(obj).find("#product_totalCount").val());
+			var bigNum = $(obj).find("#bigNum").val();
+			var convert = $(obj).find("#convert").val();
+			var smallNum = $(obj).find("#smallNum").val();
+			var total = parseInt(bigNum)*parseInt(convert) + parseInt(smallNum);
+			if (total > productCount) {
+				return false;
+			}
+			if (isNaN(total)) {
+				total = 0;
+			}
+			alltotal = alltotal + total;
+		});
+		if (alltotal > 0) {
+			check = true;
+		}
+		return check;	
+	}	
 
 	function doSubmit(){
 		$("#productNum").val($(".rowNum").length - 1);
+		if (!checkProductNumber()) {
+			toastr.error('入库数量为零或超过默认入库数量!','操作失败');
+			return;			
+		}	
 		var l = Ladda.create( document.querySelector( '.ladda-button' ) );
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
@@ -282,7 +315,7 @@
 							<th width="7%">小计</th>
 						</tr>
 					</thead>
-					<tbody>
+					<tbody class="product">
 						<tr class="hide">
 							<td>
 							</td>
@@ -294,6 +327,7 @@
 									<span id="sellProductName" ></span>
 									<input type="hidden" id="sellProductId" name="sellProductId" />
 									<input type="hidden" id="productId" name="productId" />
+									<input type="hidden" id="product_totalCount" value="" />
 								</div>
 							</td>
 							<td>
