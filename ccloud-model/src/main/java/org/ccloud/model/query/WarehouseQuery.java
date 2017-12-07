@@ -49,7 +49,7 @@ public class WarehouseQuery extends JBaseQuery {
         fromBuilder.append("c.dept_id = d.id and c.id =uw.warehouse_id and uw.user_id='"+user_id+"'");
 		LinkedList<Object> params = new LinkedList<Object>();
 
-		appendIfNotEmptyWithLike(fromBuilder, "c.name", keyword, params, true);
+		appendIfNotEmptyWithLike(fromBuilder, "c.name", keyword, params, false);
 		
 		fromBuilder.append("order by " + orderby);
 		

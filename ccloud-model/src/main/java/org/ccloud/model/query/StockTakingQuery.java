@@ -55,7 +55,7 @@ public class StockTakingQuery extends JBaseQuery {
 		fromBuilder.append("(SELECT warehouse_id from cc_user_join_warehouse  where user_id='"+userId+"')");
 		fromBuilder.append("and c.seller_id='"+seller_id+"' ");
 		LinkedList<Object> params = new LinkedList<Object>();
-		appendIfNotEmptyWithLike(fromBuilder, "w.name", keyword, params, true);
+		appendIfNotEmptyWithLike(fromBuilder, "w.name", keyword, params, false);
 		fromBuilder.append("GROUP BY c.id ");		
 		fromBuilder.append("ORDER BY c.create_date DESC");		
 		if (params.isEmpty())
