@@ -16,6 +16,7 @@
 package org.ccloud.model.query;
 
 import java.util.LinkedList;
+
 import org.ccloud.model.InventoryDetail;
 
 import com.jfinal.plugin.activerecord.Page;
@@ -73,5 +74,27 @@ public class InventoryDetailQuery extends JBaseQuery {
 	public InventoryDetail findByWarehouseIdAndProductId(String warehouseId, String productId){
 		String sql = "select * from cc_inventory_detail where warehouse_id = '"+warehouseId+"' and sell_product_id = '"+productId+"'";
 		return DAO.findFirst(sql);
+	}
+	
+	public Page<InventoryDetail> _in_paginate(int pageNumber, int pageSize,String keyword, String orderby,String userId,String dataArea) {
+		String select = "SELECT cid.*,cw.`name` as warehouse,csp.custom_name as sellerName,u.realname as bizName ";
+		StringBuilder fromBuilder = new StringBuilder(" from cc_inventory_detail cid ");
+		fromBuilder.append(" LEFT JOIN cc_warehouse cw on cw.id = cid.warehouse_id ");
+		fromBuilder.append(" LEFT JOIN cc_seller_product csp on csp.id = cid.sell_product_id ");
+		fromBuilder.append(" LEFT JOIN `user` u on u.id = cid.biz_user_id ");
+		LinkedList<Object> params = new LinkedList<Object>();
+		
+		
+		if(keyword.equals("")){
+				fromBuilder.append("where cid.biz_type in ('100202','100205','100208') and u.id='"+userId+"' and cid.data_area = '"+dataArea+"' ");
+		}else{
+			fromBuilder.append(" where cid.biz_bill_sn like '%"+keyword+"%' ");
+				fromBuilder.append("and cid.biz_type in ('100202','100205','100208') and u.id='"+userId+"' and cid.data_area = '"+dataArea+"' ");
+		}
+		fromBuilder.append(" order by " + orderby);	
+		if (params.isEmpty())
+			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+
+		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 }

@@ -40,12 +40,7 @@ public class ProductQuery extends JBaseQuery {
 	}
 
 	public Product findById(final String id) {
-		return DAO.getCache(id, new IDataLoader() {
-			@Override
-			public Object load() {
 				return DAO.findById(id);
-			}
-		});
 	}
 	
 	public Page<Product> paginate(int pageNumber, int pageSize, String orderby) {
@@ -167,16 +162,16 @@ public class ProductQuery extends JBaseQuery {
 		return plist;
 	}
 	
-	public Page<Product> paginate_pro(int pageNumber, int pageSize,String keyword, String orderby) {
+	public Page<Product> paginate_pro(int pageNumber, int pageSize,String keyword, String orderby,String sellerId) {
 		String select = "SELECT cp.id,cp.big_unit,cp.small_unit,cp.convert_relate,cp.cost,cp.market_price,cp.name,cp.price, GROUP_CONCAT(cgs.`name`) as cps_name ";
 		StringBuilder fromBuilder = new StringBuilder("FROM cc_product cp LEFT JOIN cc_product_goods_specification_value cpg ON cp.id = cpg.product_set_id LEFT JOIN cc_goods_specification_value cgs ON cpg.goods_specification_value_set_id=cgs.id ");
 		
 		LinkedList<Object> params = new LinkedList<Object>();
 		if(!keyword.equals("")){
 			appendIfNotEmptyWithLike(fromBuilder, "cp.name", keyword, params, true);
-			fromBuilder.append(" and cp.is_marketable=1 ");
+			fromBuilder.append(" and cp.is_marketable=1 and cp.id  not in (select product_id from cc_seller_product where seller_id ='" + sellerId+"')");
 		}else{
-			fromBuilder.append(" where cp.is_marketable=1 ");
+			fromBuilder.append(" where cp.is_marketable=1 and cp.id  not in (select product_id from cc_seller_product where seller_id ='" + sellerId+"')");
 		}
 		fromBuilder.append(" GROUP by " + orderby);
 		fromBuilder.append(" order by " + orderby);	
