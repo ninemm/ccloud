@@ -173,13 +173,13 @@ public class _WarehouseController extends JBaseCRUDController<Warehouse> {
 					}
 					userJoinWarehouse.setUserId(userId);
 					boolean save = userJoinWarehouse.save();
-					if (save) {
-						renderAjaxResultForError("添加失败");
+					if (!save) {
+						renderAjaxResultForError("授权失败");
 						return false;  
 					}
 				}
-				renderAjaxResultForSuccess("添加成功！");
-				 return true;                	
+				renderAjaxResultForSuccess("授权成功！");
+				return true;                	
 		    }
 		});
 	}
