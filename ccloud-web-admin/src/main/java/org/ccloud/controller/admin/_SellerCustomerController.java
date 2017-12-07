@@ -327,7 +327,9 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr("sellerId");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-
+		String dept_dataArea = DataAreaUtil.getUserDealerDataArea(user.getDataArea());
+		Department dept =  DepartmentQuery.me().findByDataArea(dept_dataArea);
+		
 		File file = getFile().getFile();
 		String userId = getPara("userIds");
 		ImportParams params = new ImportParams();
@@ -367,6 +369,10 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 				sellerCustomer.set("sub_type", 100301);
 				sellerCustomer.set("customer_kind", 100401);
 				sellerCustomer.set("nickname", excel.getNickname());
+				sellerCustomer.set("data_area", dataArea);
+				sellerCustomer.set("dept_id", dept.getId());
+				sellerCustomer.set("data_area", dataArea);
+				sellerCustomer.set("create_date", new Date());
 				sellerCustomer.save();
 				inCnt++;
 			} else {
