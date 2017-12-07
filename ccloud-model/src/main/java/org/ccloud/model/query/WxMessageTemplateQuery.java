@@ -41,6 +41,15 @@ public class WxMessageTemplateQuery extends JBaseQuery {
 			}
 		});
 	}
+	
+	public WxMessageTemplate findByCode(final String code) {
+		return DAO.getCache(code, new IDataLoader() {
+			@Override
+			public Object load() {
+				return DAO.doFindFirst("code = ?", code);
+			}
+		});
+	}
 
 	public Page<WxMessageTemplate> paginate(int pageNumber, int pageSize, String orderby) {
 		String select = "select * ";

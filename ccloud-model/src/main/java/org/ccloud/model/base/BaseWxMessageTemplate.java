@@ -27,8 +27,8 @@ import com.jfinal.plugin.ehcache.IDataLoader;
 @SuppressWarnings("serial")
 public abstract class BaseWxMessageTemplate<M extends BaseWxMessageTemplate<M>> extends JModel<M> implements IBean {
 
-	public static final String CACHE_NAME = "cc_wx_message_template";
-	public static final String METADATA_TYPE = "cc_wx_message_template";
+	public static final String CACHE_NAME = "wx_message_template";
+	public static final String METADATA_TYPE = "wx_message_template";
 
 	public static final String ACTION_ADD = "cc_wx_message_template:add";
 	public static final String ACTION_DELETE = "cc_wx_message_template:delete";
