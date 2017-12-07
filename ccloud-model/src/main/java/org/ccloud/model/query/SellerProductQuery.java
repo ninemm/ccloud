@@ -145,7 +145,7 @@ public class SellerProductQuery extends JBaseQuery {
 	}
 	
 	public SellerProduct _findByProductIdAndSellerId(String product_id, String sellerId) {
-		StringBuilder fromBuilder = new StringBuilder("select * from cc_seller_product where id=? and seller_id=?");
+		StringBuilder fromBuilder = new StringBuilder("select * from cc_seller_product where product_id=? and seller_id=?");
 		return DAO.findFirst(fromBuilder.toString(), product_id,sellerId);
 	}
 }
