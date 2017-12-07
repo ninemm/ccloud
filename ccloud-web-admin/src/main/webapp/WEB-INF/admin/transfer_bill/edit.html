@@ -41,6 +41,7 @@ var validatorFields = {
 
 function doSubmit(){
 
+	checkIsTheSameWarehouse();
 	$form.ajaxSubmit({
 		beforeSubmit: function() {
 			var validate = $form.data('bootstrapValidator');
@@ -63,16 +64,19 @@ function doSubmit(){
 	});
 }
 
-<!-- 调拨数量不能为空 -->
-function checkStock(){
-
-
+//调出仓库和调入仓库不能是同一个仓库
+function checkIsTheSameWarehouse(){
+var from_warehouse_id =  $("#from_warehouse_id").val();
+var to_warehouse_id = $("#to_warehouse_id").val();
+ if(from_warehouse_id == to_warehouse_id){
+ 	alert("调出仓库和调入仓库不能是同一个仓库");
+ }
 }
 
 
 function initProduct(){
          $.ajax({
-				url: "${CPATH}/admin/goods/getProductInfo",
+				url: "${CPATH}/admin/goods/getProductInfoAndIsStockTaking",
 				dataType: "json",
 				async: false,
 				success: function(data) {
@@ -84,11 +88,11 @@ function initProduct(){
 	if(productList) {
 			$.each(productList, function(idx, item) {
 				var option = {
-					id: item.productList.productId,
-					text: item.productList.name + item.productList.specificationValue
+					id: item.productList.sellerProductId,
+					text: item.productList.customName
 				}
 				productOptionArr.push(option);
-				productMap[item.productList.productId] = item;
+				productMap[item.productList.sellerProductId] = item;
 			});
 		}
 
@@ -113,7 +117,7 @@ function addNew() {
 var index = 1;
 function addTr(tid, productList, optionArr) {
 	var firstProduct = productList[0].productList;
-	var productId = firstProduct.productId;
+	var productId = firstProduct.sellerProductId;
 	var goodsName = firstProduct.name;
 	var specification = firstProduct.specificationValue;
 	var big_unit = firstProduct.bigUnit;
@@ -151,12 +155,12 @@ function addTr(tid, productList, optionArr) {
     <!--切换商品的方法  -->
     $tbody.find("tr:last>td>select.pro-slc2").change(function(){
      var result = productMap[$(this).val()].productList;   
-     var cproductId = result.productId;
+     var cproductId = result.sellerProductId;
      var cgoodsName = result.name;
      var cspecification = result.specificationValue;
      var cbig_unit = firstProduct.bigUnit;
      var $tr = $(this).parent().parent();
-     $tr.find("td>#goodsCode").val(cproductId);
+     $tr.find("td>#productId").val(cproductId);
      $tr.find("td>#goodsName").html(cgoodsName); 
      $tr.find("td>#specification").text(cspecification);
      $tr.find("td>#big_unit").text(cbig_unit);
@@ -225,6 +229,17 @@ function addTr(tid, productList, optionArr) {
 							</div>	
 				        </div>
 			         </div>
+			         
+			         <div class="form-group col-sm-12 validata-box">
+								<label class="control-label col-sm-2">调拨人:</label>
+								<div class="input-group col-md-4 col-sm-10">
+									<select class="form-control input-sm" name="transferBill.biz_user_id" id="biz_user_id">
+										<option value="">--请选择--</option>
+										<#list (ulist)! as user >
+											<option value="${user.id}" <#if transferBill?? && user.id == transferBill.biz_user_id>selected="selected"</#if>>${(user.realname)!}</option>
+										</#list>
+									</select>
+				               	</div>	
 
 	                            <div style="padding: 5px;clear: both;">
 									<table id="dataTable" class="table table-striped table-bordered" width="100%" >
@@ -265,7 +280,7 @@ function addTr(tid, productList, optionArr) {
 												</td>
 												<#list (list.productInfos)! as plist>
 												<td class="text-left">
-													<input type="hidden" id="productId" name="transferBillDetailList[${list_index}].product_id"  value="${list.productId}" />
+													<input type="hidden" id="productId" name="transferBillDetailList[${list_index}].product_id"  value="${list.sellerProductId}" />
 													<input type="text" id="goodsName" name="goodsName"  value="${plist.name}" disabled="disabled"/>
 												   <input type="hidden"  id="factIndex" name="factIndex" value="${list_index}"/>
 												</td>

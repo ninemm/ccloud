@@ -106,12 +106,12 @@ public abstract class BaseTransferBillDetail<M extends BaseTransferBillDetail<M>
 		return getStr("transfer_bill_id");
 	}
 
-	public void setProductId(java.lang.String productId) {
-		set("product_id", productId);
+	public void setSellerProductId(java.lang.String sellerProductId) {
+		set("seller_product_id", sellerProductId);
 	}
 
-	public java.lang.String getProductId() {
-		return getStr("product_id");
+	public java.lang.String getSellerProductId() {
+		return getStr("seller_product_id");
 	}
 
 	public void setProductCount(java.lang.Integer productCount) {
