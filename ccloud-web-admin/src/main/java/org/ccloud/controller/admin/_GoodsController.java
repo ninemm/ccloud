@@ -547,5 +547,18 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
         renderJson(list);
 	}
 	
+	//盘点单获取已盘点的商品信息
+	public void getProductInfoAndIsStockTaking() {
+		String sellerId = getSessionAttr("sellerId").toString();
+		List<ProductInfo> productList = ProductQuery.me().getProductInfoBySellerId(sellerId);
+        List<Map<String, Object>> list = new ArrayList<>();
+        for (ProductInfo productInfo : productList) {
+           Map<String, Object> map = new HashMap<>();
+            map.put("productList", productInfo);
+            list.add(map);
+		}
+        renderJson(list);
+	}
+	
 }
 

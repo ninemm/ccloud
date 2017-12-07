@@ -1,5 +1,6 @@
 package org.ccloud.model.vo;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -13,10 +14,18 @@ public class transferBillInfo {
     private Integer status;
     private Date createDate;
     private String sellerProductId;
-    private Integer productCount;
+    private BigDecimal productCount;
+    private String dataArea;
 	private List<ProductInfo> productInfos;
 	
 	
+	
+	public String getDataArea() {
+		return dataArea;
+	}
+	public void setDataArea(String dataArea) {
+		this.dataArea = dataArea;
+	}
 	public String getTransferBillSn() {
 		return transferBillSn;
 	}
@@ -54,13 +63,13 @@ public class transferBillInfo {
 	public void setSellerProductId(String sellerProductId) {
 		this.sellerProductId = sellerProductId;
 	}
-	public Integer getProductCount() {
+	
+	public BigDecimal getProductCount() {
 		return productCount;
 	}
-	public void setProductCount(Integer productCount) {
+	public void setProductCount(BigDecimal productCount) {
 		this.productCount = productCount;
 	}
-	
 	public List<ProductInfo> getProductInfos() {
 		return productInfos;
 	}

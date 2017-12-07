@@ -23,13 +23,15 @@ public class ProductInfo {
 	private String bigUnit;
 	private String customName;
 	private String sellerProductId;
-	private Long storeCount;
+	private BigDecimal storeCount;
 
-	public Long getStoreCount() {
+	
+
+	public BigDecimal getStoreCount() {
 		return storeCount;
 	}
 
-	public void setStoreCount(Long storeCount) {
+	public void setStoreCount(BigDecimal storeCount) {
 		this.storeCount = storeCount;
 	}
 
