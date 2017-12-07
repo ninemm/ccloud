@@ -55,6 +55,7 @@ public class InventoryQuery extends JBaseQuery {
 		LinkedList<Object> params = new LinkedList<Object>();
 		appendIfNotEmptyWithLike(fromBuilder, "p.name", product_name, params, false);
 		appendIfNotEmptyWithLike(fromBuilder, "p.product_sn", product_sn, params, false);
+
 		fromBuilder.append("ORDER BY i.create_date DESC");
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
@@ -123,5 +124,13 @@ public class InventoryQuery extends JBaseQuery {
 	public Inventory findBySellerIdAndProductIdAndWareHouseId(String sellerId, String productId, String wareHouseId) {
 		String sql ="select * from cc_inventory where seller_id=? and product_id =? and warehouse_id = ?";
 		return DAO.findFirst(sql, sellerId, productId, wareHouseId);
+	}
+
+	public List<Record> findProductStore(String sellerId, String productId) {
+		StringBuilder defaultSqlBuilder = new StringBuilder(" select i.warehouse_id, i.balance_count ");
+		defaultSqlBuilder.append(" from cc_inventory i ");
+		defaultSqlBuilder.append(" LEFT JOIN cc_warehouse w ON i.warehouse_id = w.id ");
+		defaultSqlBuilder.append(" WHERE i.seller_id = ? AND i.product_id = ? order by w.is_default desc");
+		return Db.find(defaultSqlBuilder.toString(), sellerId, productId);
 	}
 }

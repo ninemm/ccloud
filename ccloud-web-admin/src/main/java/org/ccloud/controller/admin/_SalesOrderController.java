@@ -170,7 +170,6 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 	}
 
 	@Override
-	@Before(Tx.class)
 	public synchronized void save() {
 
 		Map<String, String[]> paraMap = getParaMap();
@@ -181,7 +180,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		if (this.saveOrder(paraMap, user, sellerId, sellerCode)) {
 			renderAjaxResultForSuccess("保存成功");
 		} else {
-			renderAjaxResultForSuccess("库存不足或提交失败");
+			renderAjaxResultForError("库存不足或仓库中未找到对应商品");
 		}
 	}
 	
@@ -237,6 +236,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 		Record order = SalesOrderQuery.me().findMoreById(orderId);
 		List<Record> orderDetailList = SalesOrderDetailQuery.me().findByOrderId(orderId);
+		this.createReceivables(order);
 
 		Date date = new Date();
 
@@ -264,6 +264,10 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 		renderAjaxResultForSuccess();
 
+	}
+
+	private void createReceivables(Record order) {
+		
 	}
 
 	@RequiresPermissions("/admin/salesOrder/check")
