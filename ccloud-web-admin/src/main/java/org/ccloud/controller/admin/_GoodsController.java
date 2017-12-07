@@ -522,6 +522,9 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
 			if (state == 0 && product.getIsMarketable()) {
 				product.setIsMarketable(false);
 				product.update();
+			} else if (state == 1) {
+				product.setIsMarketable(true);
+				product.update();
 			}
 		}
 		goods.setState(state);

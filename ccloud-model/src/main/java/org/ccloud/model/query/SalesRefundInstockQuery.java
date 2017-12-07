@@ -139,7 +139,7 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 	}
 
 	public boolean inStock(Map<String, String[]> paraMap, String sellerId, Date date, String deptId, String dataArea,
-			Integer index, String userId, String inStockSN, String wareHouseId) {
+			Integer index, String userId, String inStockSN, String wareHouseId, String sellerProductId) {
 		SalesRefundInstockDetail detail = SalesRefundInstockDetailQuery.me().
 				findById(StringUtils.getArrayFirst(paraMap.get("outstockDetailId" + index)));
 		String convert = StringUtils.getArrayFirst(paraMap.get("convert" + index));
@@ -205,17 +205,11 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 			return false;
 		}
 		
-		List<SellerProduct> sellerProductList = SellerProductQuery.me().findByProductIdAndSellerId(productId, sellerId);
-		for (SellerProduct sellerProduct : sellerProductList) {
-			sellerProduct.setStoreCount(inventory.getBalanceCount());
-			sellerProduct.setModifyDate(date);
-		}
-		int[] i = Db.batchUpdate(sellerProductList, sellerProductList.size());
-		int count = 0;
-		for (int j : i) {
-			count = count + j;
-		}
-		if (count != sellerProductList.size()) {
+		SellerProduct sellerProduct = SellerProductQuery.me().findById(sellerProductId);
+		sellerProduct.setStoreCount(sellerProduct.getStoreCount().add(new BigDecimal(bigCount))
+				.add(smallStoreCount));
+		sellerProduct.setModifyDate(date);
+		if (!sellerProduct.update()) {
 			return false;
 		}
 		

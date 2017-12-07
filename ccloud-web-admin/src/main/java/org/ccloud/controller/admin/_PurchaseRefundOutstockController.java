@@ -128,13 +128,12 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 		final PurchaseRefundOutstockDetail purchaseRefundOutstockDetail = getModel(PurchaseRefundOutstockDetail.class);
 		Map<String, String[]> paraMap = getParaMap();
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String supplierCode = StringUtils.getArrayFirst(paraMap.get("supplierCode"));
 		String purchaseInstockId = StringUtils.getArrayFirst(paraMap.get("purchaseInstockId"));
 		String orderId = StrKit.getRandomUUID();
 		Date date = new Date();
 		PurchaseInstock purchaseInstock=PurchaseInstockQuery.me().findById(purchaseInstockId);
 		//采购退货单： PR + 100000(机构编号或企业编号6位) + 20171108(时间) + 100001(流水号)
-		String orderSn = "PR" + supplierCode + DateUtils.format("yyMMdd", date) + "100001";
+		String orderSn = "PR" + user.getDepartmentId().substring(0, 6) + DateUtils.format("yyMMdd", date) + "100001";
 
 		purchaseRefundOutstock.set("id", orderId);
 		purchaseRefundOutstock.set("outstock_sn", orderSn);
