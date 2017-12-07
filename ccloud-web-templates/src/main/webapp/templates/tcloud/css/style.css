@@ -93,7 +93,7 @@ a {
   bottom: 0;
   display: flex;
   justify-content: space-between;
-  z-index: 1000;
+  z-index: 500;
   position: absolute;
 }
 
@@ -115,6 +115,10 @@ a {
 
 .weui-cell__ft {
   font-size: 0.6rem;
+}
+
+.weui-picker-container {
+  z-index: 802;
 }
 
 .weui-badge {
@@ -313,7 +317,7 @@ a {
 /* 菜单 */
 
 .hidden-menu {
-  z-index: 20001;
+  z-index: 801;
   position: fixed;
   right: 5%;
   bottom: 10%;
@@ -366,7 +370,7 @@ a {
   right: 0;
   opacity: 0;
   visibility: hidden;
-  z-index: 20000;
+  z-index: 800;
   position: fixed;
 }
 
@@ -387,7 +391,7 @@ a {
   height: 6rem;
   margin-top: -3rem;
   background: #fff;
-  z-index: 30001;
+  z-index: 901;
 }
 
 .pop-input input {
@@ -417,7 +421,7 @@ a {
 .layer-pop-show {
   opacity: 1;
   visibility: visible;
-  z-index: 30000;
+  z-index: 900;
 }
 
 
@@ -544,9 +548,10 @@ a {
 }
 
 .goods-num {
+  display: none;
   position: absolute;
   height: .8rem;
-  width: .8rem;
+  min-width: .8rem;
   background: red;
   border-radius: 100%;
   text-align: center;
@@ -556,7 +561,6 @@ a {
   right: 0;
   top: .2rem;
 }
-
 
 .product_detail {
   background: #fff;
@@ -640,7 +644,6 @@ a {
   line-height: inherit;
   background: #f7f7f7;
   border: 1px solid #bbb;
-  color: #555;
   font-size: 0.9rem;
   vertical-align: middle;
   font-size: 0;
@@ -648,6 +651,14 @@ a {
 
 .operate i {
   font-size: 0.9rem!important;
+}
+
+.operate .icon-plus2 {
+  color: #999;
+}
+
+.operate .icon-minus2 {
+  color: #b8b8b8;
 }
 
 .unit {
@@ -689,7 +700,7 @@ a {
   width: 90%;
 }
 
-.product-detail img{
+.product-detail img {
   width: 30%;
 }
 
@@ -897,17 +908,15 @@ a {
   width: 3rem!important;
 }
 
-.goods-detail input[type=number]:disabled{
+.goods-detail input[type=number]:disabled {
   border: 1px solid #bbb;
 }
-
-
 
 
 /* 客户 */
 
 .head-search {
-  height: 40px;
+  height: 2rem;
   display: flex;
   background: #fff;
   font-size: 0.7rem;
@@ -942,19 +951,23 @@ a {
   display: flex;
 }
 
+.has-th-list .head-search div:last-child i {
+  border-right: 1px solid #bbb;
+}
+/* 
 .has-th-list>div:first-child {
   width: 88.888889%;
-}
+} */
 
-.has-th-list>div:last-child {
-  width: 11.111111%;
+#combin-filter-btn {
+  width: 10%;
   color: #9b9b9b;
   border-bottom: 1px solid #bbb;
   position: relative;
   background: #fff;
 }
 
-.has-th-list>div:last-child i {
+#combin-filter-btn i {
   position: absolute;
   width: 100%;
   top: 50%;
@@ -1200,9 +1213,44 @@ input[name=sex] {
 /* 我的订单 */
 
 #my-order main {
-  top: 40px;
+  top: 2rem;
   bottom: 0;
 }
+
+#combin-filter {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 80%;
+  right: 0;
+  z-index: 802;
+  background: #fff;
+  display: none;
+}
+
+.filter-item {
+  padding: 0 0.5rem;
+}
+
+.filter-item h4 {
+  padding: 1rem 0 .5rem;
+}
+
+.filter-item .weui-flex{
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.filter-item span {
+  display: block;
+  text-align: center;
+  width: 30%;
+  background: #f2f2f2;
+  margin-bottom: .5rem;
+  height: 1.2rem;
+  line-height: 1.2rem;
+
+}
+
 
 
 /* 商品库存 */
@@ -1214,7 +1262,7 @@ input[name=sex] {
 
 #inventory .menu-left,
 #inventory .menu-right {
-  top: 40px;
+  top: 2rem;
 }
 
 #inventory .menu-right span {
@@ -1253,7 +1301,7 @@ input[name=sex] {
 /* 申请记录 */
 
 #application-record main {
-  top: 40px;
+  top: 2rem;
   bottom: 2.25rem;
 }
 
@@ -1443,7 +1491,7 @@ input[name=input-type] {
 /* 拜访记录 */
 
 #visit-record main {
-  top: 40px;
+  top: 2rem;
   bottom: 2.25rem;
   background: #fff;
 }
@@ -1467,7 +1515,7 @@ input[name=input-type] {
 /* 费用审核清单 */
 
 #fee-audit-list main {
-  top: 40px;
+  top: 2rem;
   ;
   bottom: 0;
 }
@@ -1484,7 +1532,7 @@ input[name=input-type] {
 /* 拜访审核清单 */
 
 #visit-audit-list main {
-  top: 40px;
+  top: 2rem;
   bottom: 0;
   background: #fff;
 }
@@ -1519,6 +1567,9 @@ input[name=input-type] {
   .order-customer-info-title {
     width: 25%;
     font-size: 0.7rem;
+  }
+  #my-order .has-th-list div:last-child i{
+    padding: 0;
   }
 }
 

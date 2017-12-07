@@ -171,6 +171,56 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		}
 		return count;
 	}
+	
+	@SuppressWarnings("unchecked")
+	public boolean insertForApp(Map<String, String[]> paraMap, String orderId, String sellerId, String userId, Date date,
+			String deptId, String dataArea, int index) {
+		List<SalesOrderDetail> detailList = new ArrayList<>();
+		String convert = paraMap.get("convert")[index];
+		String bigNum = paraMap.get("bigNum")[index];
+		String smallNum = paraMap.get("smallNum")[index];
+		Integer productCount = Integer.valueOf(bigNum) * Integer.valueOf(convert) + Integer.valueOf(smallNum);
+		String productId = paraMap.get("productId")[index];
+		Map<String, Object> result = this.getWarehouseId(productId, sellerId, productCount, Integer.parseInt(convert));
+		String status = result.get("status").toString();
+		List<Map<String, String>> list = (List<Map<String, String>>) result.get("countList");
+		
+		if (!status.equals("enough")) {
+			return false;
+		}
+		for (Map<String, String> map : list) {
+			SalesOrderDetail detail = new SalesOrderDetail();
+			detail.setProductCount(Integer.parseInt(map.get("productCount").toString()));
+			detail.setLeftCount(detail.getProductCount());
+			detail.setOutCount(0);
+			// 库存盘点写入库存总账未完成
+			detail.setWarehouseId(map.get("warehouse_id").toString());
+			
+			detail.setId(StrKit.getRandomUUID());
+			detail.setOrderId(orderId);
+			detail.setSellProductId(paraMap.get("sellProductId")[index]);
+
+			String productPrice = paraMap.get("bigPrice")[index];
+			String productAmount = paraMap.get("rowTotal")[index];
+			String isGift = "0";//paraMap.get("isGift")[index];
+			detail.setProductPrice(new BigDecimal(productPrice));
+			detail.setProductAmount(new BigDecimal(productAmount));
+			detail.setIsGift(StringUtils.isNumeric(isGift)? Integer.parseInt(isGift) : 0);
+			detail.setCreateDate(date);
+			detail.setDeptId(deptId);
+			detail.setDataArea(dataArea);	
+			detailList.add(detail);
+		}
+		int[] i = Db.batchSave(detailList, detailList.size());
+		int count = 0;
+		for (int j : i) {
+			count = count + j;
+		}
+		if (count != detailList.size()) {
+			return false;
+		}
+		return true;
+	}
 
 	public SalesOrderDetail findById(final String id) {
 		return DAO.findById(id);

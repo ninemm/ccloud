@@ -1,0 +1,111 @@
+<#include "_inc/_layout.html"/>
+<#macro css> </#macro>
+<#macro script>
+
+</#macro>
+
+<@layout>
+<body id="order-detail">
+  <main class="ft12">
+    <div class="weui-panel weui-panel_access">
+      <div class="ft14">
+        订单状态
+        <span class="fr blue">订单待审核</span>
+      </div>
+      <div class="gray">
+        <p>客户名称&nbsp;小张烤鱼
+        </p>
+        <p>订货单号&nbsp;DH-O-20171017-002276</p>
+        <p>下单时间&nbsp;2017-10-17 06:03:04</p>
+      </div>
+      <hr>
+      <div class="ft14">
+        <input type="checkbox" name="if-account"> 是否账期
+      </div>
+    </div>
+    <div class="weui-panel weui-panel_access">
+      <div class="ft14">
+        订单详情
+      </div>
+      <div class="p-l-15">
+        <p>35度中国劲酒_1*24_125ml</p>
+        <div class="weui-flex">
+          <div class="weui-flex__item flex-grow2">
+            <div class="fr width-40">
+              ￥720
+              <span class="gray">（710）</span>
+            </div>
+          </div>
+          <div class="weui-flex__item t-r">1件</div>
+        </div>
+        <div class="weui-flex">
+          <div class="weui-flex__item flex-grow2">
+            <div class="fr width-40">
+              ￥30
+              <span class="gray">（30）</span>
+            </div>
+          </div>
+          <div class="weui-flex__item t-r">1瓶</div>
+        </div>
+      </div>
+      <div class="p-l-15">
+        <p>
+          <span class="tag">赠品</span>35度中国劲酒_1*24_125ml</p>
+        <div class="t-r">1瓶</div>
+      </div>
+      <hr>
+      <div class="t-r ft14">
+        总计：
+        <span class="red">740元</span>
+      </div>
+    </div>
+    <div class="weui-panel weui-panel_access">
+      <div class="ft14">
+        收货信息
+      </div>
+      <div class="gray">
+        <p>
+          收货人：小张
+          <span class="fr">18611111111</span>
+        </p>
+        <p>地址详情：湖北省武汉市武昌区八一路299号</p>
+      </div>
+      <hr>
+      <div class="ft14">
+        备注信息：
+        <span class="ft12">尽快送达</span>
+      </div>
+    </div>
+    <a class="weui-panel weui-panel_access block" href="./operateHistory.html">
+      <div class="weui-cell weui-cell_access">
+        <div class="weui-cell__bd ft14">
+            操作记录
+        </div>
+        <span class="weui-cell__ft"></span>
+      </div>
+    </a>
+  </main>
+  <div class="hidden-menu">
+    <ul>
+      <li>
+        <a href="index.html">
+          首页
+          <i class="icon-home blue"></i>
+        </a>
+      </li>
+      <li>
+        <a href="javascript:history.go(-1)">
+          上一页
+          <i class="icon-undo green"></i>
+        </a>
+      </li>
+    </ul>
+    <i class="icon-menu-open orange fr" id="button"></i>
+  </div>
+  <div class="layer"></div>
+  <footer class="weui-footer weui-footer_fixed-bottom ft16">
+    <a class="gray-button width-50">撤销</a>
+    <a class="blue-button width-50">再次购买</a>
+  </footer>
+</body>
+</@layout>

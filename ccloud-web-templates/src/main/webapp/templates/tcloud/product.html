@@ -24,6 +24,10 @@ $(function() {
 		initProduct();
     }).on("touchstart", "#shoppingCart", function () {
     	save()
+    }).on("touchend", ".operate:first-child", function () { //减少商品数量
+      calTotal($(this));
+    }).on("touchend", ".operate:last-child", function () { //增加商品数量
+      calTotal($(this));
     });
     
     initProduct();
@@ -64,6 +68,21 @@ function initProduct(){
 			});
 		}
 	);
+}
+
+function calTotal($this) {
+  var $parents = $this.parents('.product_detail');
+  var $sellProductId = $parents.find('.sellProductId').data('id');
+  var $total = $('#sidebar').find('li[data-id=' + $sellProductId + ']').find('span');
+  var bigNumber = Number($parents.find('.product_bUnit input').val());
+  var smallNumber = Number($parents.find('.product_mUnit input').val());
+  var total = bigNumber + smallNumber;
+  if (total > 0) {
+    $total.show().text(total);
+  } else {
+    $total.hide().text(total);
+  }
+  
 }
 
 function save(){

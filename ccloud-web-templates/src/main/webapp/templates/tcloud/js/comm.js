@@ -211,7 +211,7 @@ $(function() {
 		;
 	}).on("touchmove", ".layer", function() {
 		event.preventDefault();
-	}).on("touchend", "input[type=number]:not([disabled])", function() {
+	}).on("touchend", "input[type=number]:not([readonly])", function() {
 		if (!open) {
 			$currentInput = $(this);
 			openPop();
