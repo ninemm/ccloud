@@ -16,6 +16,8 @@
 package org.ccloud.model.query;
 
 import java.util.LinkedList;
+import java.util.List;
+
 import org.ccloud.model.PurchaseRefundOutstock;
 
 import com.jfinal.kit.StrKit;
@@ -93,6 +95,11 @@ public class PurchaseRefundOutstockQuery extends JBaseQuery {
 		fromBuilder.append(" where cpro.id=? and cpro.data_area='"+dataArea+"' ");
 
 		return Db.findFirst(fromBuilder.toString(), id);
+	}
+	
+	public List<PurchaseRefundOutstock> findByUser(String userId, String dataArea){
+		String sql = "select c.* from cc_purchase_refund_outstock c LEFT JOIN user u on u.department_id =c.dept_id where u.id='"+userId+"' and c.data_area = '"+dataArea+"' ";
+		return DAO.find(sql);
 	}
 	
 }
