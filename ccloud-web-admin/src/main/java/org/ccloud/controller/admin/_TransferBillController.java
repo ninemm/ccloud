@@ -15,6 +15,7 @@
  */
 package org.ccloud.controller.admin;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -252,7 +253,6 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 			public boolean run() throws SQLException {
 				List<Inventory> updateList = new ArrayList<>();
 				List<Inventory> saveList = new ArrayList<>();
-				List<InventoryDetail> inventoryDetails = new ArrayList<>();
 				List<SellerProduct> sellerProducts = new ArrayList<>();
                 for (transferBillInfo transferBillInfo : transferBill) {
         			List<ProductInfo> productInfos = ProductQuery.me().getProductBySellerProId(transferBillInfo.getSellerProductId());
@@ -275,6 +275,9 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
                     	  outInventoryDetail.setId(StrKit.getRandomUUID());
                     	  outInventoryDetail.setWarehouseId(transferBillInfo.getFromWarehouseId());
                     	  outInventoryDetail.setSellProductId(transferBillInfo.getSellerProductId());
+                    	  outInventoryDetail.setInCount(new BigDecimal(0));
+                    	  outInventoryDetail.setInPrice(new BigDecimal(0));
+                    	  outInventoryDetail.setInAmount(new BigDecimal(0));
                     	  outInventoryDetail.setOutCount(transferBillInfo.getProductCount());
                     	  outInventoryDetail.setOutPrice(outInventory.getInPrice());
                     	  outInventoryDetail.setOutAmount(outInventoryDetail.getOutCount().multiply(outInventoryDetail.getOutPrice()));
@@ -289,7 +292,9 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
                     	  outInventoryDetail.setDeptId(user.getDepartmentId());
                     	  outInventoryDetail.setBizUserId(transferBillInfo.getBizUserId());
                     	  outInventoryDetail.setCreateDate(new Date());
-                    	  inventoryDetails.add(outInventoryDetail);
+                    	  if (!outInventoryDetail.save()) {
+							return false;
+						}
 //                    	 //处理调入仓库的库存总账  
                  	      Inventory inInventory = InventoryQuery.me().findBySellerIdAndProductIdAndWareHouseId(sellerId,productInfo.getProductId(),transferBillInfo.getToWarehouseId());
                  	      if (inInventory == null) {
@@ -298,6 +303,9 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
                  	    	 inInventory.setWarehouseId(transferBillInfo.getToWarehouseId());
                  	    	 inInventory.setProductId(productInfo.getProductId());
                  	    	 inInventory.setSellerId(sellerId);
+                 	    	 inInventory.setOutCount(new BigDecimal(0));
+                 	    	 inInventory.setOutPrice(new BigDecimal(0));
+                 	    	 inInventory.setOutAmount(new BigDecimal(0));
                  	    	 inInventory.setInCount(transferBillInfo.getProductCount());
                  	    	 inInventory.setInPrice(outInventory.getInPrice());
                  	    	 inInventory.setInAmount(transferBillInfo.getProductCount().multiply(outInventory.getInPrice()));
@@ -323,8 +331,11 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
                      	 //处理调入仓库的总账子表信息
                     	  InventoryDetail inInventoryDetail = new InventoryDetail();
                     	  inInventoryDetail.setId(StrKit.getRandomUUID());
-                    	  inInventoryDetail.setSellProductId(transferBillInfo.getToWarehouseId());
-                    	  inInventoryDetail.setWarehouseId(transferBillInfo.getTransferBillSn());
+                    	  inInventoryDetail.setSellProductId(transferBillInfo.getSellerProductId());
+                    	  inInventoryDetail.setWarehouseId(transferBillInfo.getToWarehouseId());
+                    	  inInventoryDetail.setOutCount(new BigDecimal(0));
+                    	  inInventoryDetail.setOutPrice(new BigDecimal(0));
+                    	  inInventoryDetail.setOutAmount(new BigDecimal(0));
                     	  inInventoryDetail.setInCount(transferBillInfo.getProductCount());
                     	  inInventoryDetail.setInPrice(outInventory.getInPrice());
                     	  inInventoryDetail.setInAmount(transferBillInfo.getProductCount().multiply(outInventory.getInPrice()));
@@ -338,13 +349,15 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
                     	  inInventoryDetail.setDataArea(transferBillInfo.getDataArea());
                     	  inInventoryDetail.setDeptId(user.getDepartmentId());
                     	  inInventoryDetail.setCreateDate(new Date());
-                    	  inventoryDetails.add(inInventoryDetail);
+                    	  if (!inInventoryDetail.save()) {
+							return false;
+						}
+                    	  
 					}
 				}
                 try {
 					Db.batchUpdate(updateList, updateList.size());
 					Db.batchSave(saveList, saveList.size());
-					Db.batchSave(inventoryDetails, inventoryDetails.size());
 					//更新seller_product的商品库存信息
 					Db.batchUpdate(sellerProducts, sellerProducts.size());
 				
