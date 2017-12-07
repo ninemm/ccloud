@@ -21,7 +21,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.ccloud.model.InventoryDetail;
 import org.ccloud.model.StockTakingDetail;
 import org.ccloud.model.vo.ProductInfo;
 import org.ccloud.model.vo.StockTakingInfo;

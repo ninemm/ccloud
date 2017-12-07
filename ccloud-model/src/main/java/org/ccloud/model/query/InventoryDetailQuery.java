@@ -49,7 +49,7 @@ public class InventoryDetailQuery extends JBaseQuery {
 		fromBuilder.append(product_id+"'and sp.seller_id='"+seller_id+"' )INNER JOIN `user` AS u ON i.biz_user_id = u.id ");
 		fromBuilder.append("INNER JOIN cc_seller_product AS sp ON sp.id=i.sell_product_id ");
 		fromBuilder.append("WHERE i.warehouse_id = '"+ warehouse_id+"'and p.id='"+product_id+"' AND i.biz_date >='"+start_date+" 00:00:00' AND i.biz_date <='"+end_date+" 23:59:59'");
-		fromBuilder.append("ORDER BY i.create_date DESC");
+		fromBuilder.append("ORDER BY sp.custom_name, i.create_date DESC");
 		LinkedList<Object> params = new LinkedList<Object>();
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
@@ -74,4 +74,11 @@ public class InventoryDetailQuery extends JBaseQuery {
 		String sql = "select * from cc_inventory_detail where warehouse_id = '"+warehouseId+"' and sell_product_id = '"+productId+"'";
 		return DAO.findFirst(sql);
 	}
+
+	public InventoryDetail findBySellerProductId(String seller_product_id,String warehouse_id) {
+		String sql = "select * from cc_inventory_detail c where c.sell_product_id = '"+seller_product_id+"' and c.warehouse_id ='"+warehouse_id+"' ORDER BY  c.create_date DESC ";
+		return DAO.findFirst(sql);
+	}
+	
+	
 }

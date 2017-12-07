@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
@@ -49,6 +50,7 @@ import com.jfinal.plugin.activerecord.Record;
 @RouterMapping(url = "/admin/salesOutstock", viewPath = "/WEB-INF/admin/sales_outstock")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
+@RequiresPermissions("/admin/salesOutstock")
 public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 
 	@Override
@@ -110,6 +112,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		renderJson(result);
 	}
 	
+	@RequiresPermissions("/admin/salesOutstock/check")
 	public void outStock() {
 
 		Map<String, String[]> paraMap = getParaMap();
@@ -145,7 +148,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
         			String sellProductId = StringUtils.getArrayFirst(paraMap.get("sellProductId" + index));
         			if (StrKit.notBlank(sellProductId)) {
         				if (!SalesOutstockDetailQuery.me().outStock(paraMap, sellerId, 
-        						date, deptId, dataArea, index, user.getId(), outStockSN, wareHouseId)) {
+        						date, deptId, dataArea, index, user.getId(), outStockSN, wareHouseId, sellProductId)) {
         					return false;
         				}
         				count++;
