@@ -74,6 +74,7 @@ public class WxOauthController extends BaseFrontController {
 						renderError(500);
 						return ;
 					}
+					setSessionAttr(Consts.SESSION_LOGINED_USER, user);
 				} else {
 					LogKit.warn("user info get failure");
 				}

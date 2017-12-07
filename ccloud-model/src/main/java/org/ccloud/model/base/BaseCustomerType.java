@@ -137,6 +137,14 @@ public abstract class BaseCustomerType<M extends BaseCustomerType<M>> extends JM
 	public java.lang.String getPriceSystemId() {
 		return get("price_system_id");
 	}
+	
+	public void setProcDefKey(java.lang.String procDefKey) {
+		set("proc_def_key", procDefKey);
+	}
+
+	public java.lang.String getProcDefKey() {
+		return get("proc_def_key");
+	}
 
 	public void setCreateDate(java.util.Date createDate) {
 		set("create_date", createDate);

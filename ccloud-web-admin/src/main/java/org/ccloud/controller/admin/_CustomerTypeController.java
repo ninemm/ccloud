@@ -32,6 +32,8 @@ import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.StringUtils;
+import org.ccloud.workflow.model.ActReProcdef;
+import org.ccloud.workflow.query.ActReProcdefQuery;
 
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Before;
@@ -115,6 +117,9 @@ public class _CustomerTypeController extends JBaseCRUDController<CustomerType> {
 			setAttr("priceSystemList", PriceSystemQuery.me().findPriceSystemByDeptId(user.getDepartmentId(),
 					DataAreaUtil.getUserDeptDataArea(user.getDataArea())));
 		}
+		
+		List<ActReProcdef> procDefList = ActReProcdefQuery.me().findListInNormal();
+		setAttr("procDefList", procDefList);
 
 		render("edit.html");
 	}

@@ -16,6 +16,7 @@
 package org.ccloud.model;
 
 import org.ccloud.model.core.Table;
+import org.ccloud.model.query.DepartmentQuery;
 
 import com.jfinal.plugin.ehcache.CacheKit;
 
@@ -77,4 +78,9 @@ public class User extends BaseUser<User> {
 		
 		return super.deleteById(idValue);
 	}
+	
+	public Department findDepartmentById() {
+		return DepartmentQuery.me().findById(getDepartmentId());
+	}
+	
 }

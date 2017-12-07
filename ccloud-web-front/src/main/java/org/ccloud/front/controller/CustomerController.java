@@ -1,22 +1,36 @@
 package org.ccloud.front.controller;
 
-import com.google.common.collect.ImmutableMap;
-import com.jfinal.kit.StrKit;
-import com.jfinal.plugin.activerecord.Page;
-import com.jfinal.plugin.activerecord.Record;
-import org.ccloud.core.BaseFrontController;
-import org.ccloud.model.CustomerType;
-import org.ccloud.model.User;
-import org.ccloud.model.query.CustomerTypeQuery;
-import org.ccloud.model.query.SellerCustomerQuery;
-import org.ccloud.model.query.UserQuery;
-import org.ccloud.route.RouterMapping;
-import org.ccloud.utils.DataAreaUtil;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.ccloud.Consts;
+import org.ccloud.core.BaseFrontController;
+import org.ccloud.message.Actions;
+import org.ccloud.message.MessageKit;
+import org.ccloud.model.CustomerType;
+import org.ccloud.model.SellerCustomer;
+import org.ccloud.model.User;
+import org.ccloud.model.WxMessageTemplate;
+import org.ccloud.model.query.CustomerTypeQuery;
+import org.ccloud.model.query.OptionQuery;
+import org.ccloud.model.query.SellerCustomerQuery;
+import org.ccloud.model.query.UserQuery;
+import org.ccloud.model.query.WxMessageTemplateQuery;
+import org.ccloud.route.RouterMapping;
+import org.ccloud.utils.DataAreaUtil;
+import org.ccloud.workflow.service.WorkFlowService;
+import org.joda.time.DateTime;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
+import com.jfinal.aop.Before;
+import com.jfinal.kit.Kv;
+import com.jfinal.kit.StrKit;
+import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.Record;
+import com.jfinal.plugin.activerecord.tx.Tx;
 
 /**
  * Created by WT on 2017/11/29.
@@ -80,48 +94,42 @@ public class CustomerController extends BaseFrontController {
 		StringBuilder html = new StringBuilder();
 		for (Record customer : customerList.getList())
 		{
-			html.append("                    <div class=\"weui-panel weui-panel_access\">\n" +
-					"                        <div class=\"weui-flex\">\n" +
-					"                            <div class=\"weui-flex__item customer-info\">\n" +
-					"                                <p class=\"ft14\">" + customer.getStr("customer_name") + "</p>\n" +
-					"                                <p class=\"gray\">" + customer.getStr("contact") + "/" + customer.getStr("mobile")+ "</p>\n" +
-					"                            </div>\n" +
-					"                            <div class=\"weui-flex__item customer-href\">\n" +
-					"                                <div class=\"weui-flex\">\n" +
-					"                                    <a href=\"tel:\"" + customer.getStr("mobile") + " class=\"weui-flex__item\">\n" +
-					"                                        <p>\n" +
-					"                                            <i class=\"icon-phone green\"></i>\n" +
-					"                                        </p>\n" +
-					"                                        <p>电话</p>\n" +
-					"                                    </a>\n" +
-					"                                    <a class=\"weui-flex__item\" href=\"./historyOrder.html?customer_id=" + customer.getStr("id") + "&customer_name=" + customer.getStr("customer_name") + "\">\n" +
-					"                                        <p>\n" +
-					"                                            <i class=\"icon-file-text-o blue\"></i>\n" +
-					"                                        </p>\n" +
-					"                                        <p>订单</p>\n" +
-					"                                    </a>\n" +
-					"                                    <a class=\"weui-flex__item\" href=\"visitAdd.html\">\n" +
-					"                                        <p>\n" +
-					"                                            <i class=\"icon-paw\" style=\"color:#ff9800\"></i>\n" +
-					"                                        </p>\n" +
-					"                                        <p>拜访</p>\n" +
-					"                                    </a>\n" +
-					"                                    <a class=\"weui-flex__item relative\" href=\"./customerDetail.html\">\n" +
-					"                                        <i class=\"icon-chevron-right gray\"></i>\n" +
-					"                                    </a>\n" +
-					"                                </div>\n" +
-					"                            </div>\n" +
-					"                        </div>\n" +
-					"                        <hr />\n" +
-					"                        <div class=\"weui-flex space-between\">\n" +
-					"                            <div class=\"button blue-button\">下订单</div>\n" +
-					"                            <div class=\"button blue-button\">客户拜访</div>\n" +
-					"                        </div>\n" +
-					"                        <p class=\"gray\">\n" +
-					"                            <span class=\"icon-map-marker ft16 green\"></span>\n" +
-					                            customer.getStr("prov_name") + " " + customer.getStr("city_name") + " " + customer.getStr("country_name") + " " + customer.getStr("address") + "\n" +
-					"                        </p>\n" +
-					"                    </div>\n" );
+			html.append("<div class=\"weui-panel weui-panel_access\">\n");
+			html.append("	<div class=\"weui-flex\">\n");
+			html.append("		<div class=\"weui-flex__item customer-info\">\n");
+			html.append("			<p class=\"ft14\">" + customer.getStr("customer_name") + "</p>\n");
+			html.append("			<p class=\"gray\">" + customer.getStr("contact") + "/" + customer.getStr("mobile")+ "</p>\n");
+			html.append("		</div>\n");
+			html.append("		<div class=\"weui-flex__item customer-href\">\n");
+			html.append("			<div class=\"weui-flex\">\n");
+			html.append("				<a href=\"tel:\"" + customer.getStr("mobile") + " class=\"weui-flex__item\">\n");
+			html.append("					<p><i class=\"icon-phone green\"></i></p>\n");
+			html.append("					<p>电话</p>\n");
+			html.append("				</a>\n");
+			html.append("				<a class=\"weui-flex__item\" href=\"./historyOrder.html?customer_id=" + customer.getStr("id") + "&customer_name=" + customer.getStr("customer_name") + "\">\n");
+			html.append("					<p><i class=\"icon-file-text-o blue\"></i></p>\n");
+			html.append("					<p>订单</p>\n");
+			html.append("				</a>\n");
+			html.append("				<a class=\"weui-flex__item\" href=\"visitAdd.html\">\n");
+			html.append("					<p><i class=\"icon-paw\" style=\"color:#ff9800\"></i></p>\n");
+			html.append("					<p>拜访</p>\n");
+			html.append("				</a>\n");
+			html.append("				<a class=\"weui-flex__item relative\" href=\"./customerDetail.html\">\n");
+			html.append("					<i class=\"icon-chevron-right gray\"></i>\n");
+			html.append("				</a>\n");
+			html.append("			</div>\n");
+			html.append("		</div>\n");
+			html.append("	</div>\n");
+			html.append("	<hr />\n");
+			html.append("	<div class=\"weui-flex space-between\">\n");
+			html.append("		<div class=\"button blue-button\">下订单</div>\n");
+			html.append("		<div class=\"button blue-button\">客户拜访</div>\n");
+			html.append("	</div>\n");
+			html.append("	<p class=\"gray\">\n");
+			html.append("		<span class=\"icon-map-marker ft16 green\"></span>\n");
+			html.append(		customer.getStr("prov_name") + " " + customer.getStr("city_name") + " " + customer.getStr("country_name") + " " + customer.getStr("address") + "\n");
+			html.append("	</p>\n");
+			html.append("</div>\n" );
 		}
 
 		Map<String, Object> map = new HashMap<>();
@@ -151,5 +159,67 @@ public class CustomerController extends BaseFrontController {
 			userIdList[i] = userList.get(i).getStr("id");
 		}
 		return userIdList;
+	}
+	
+	@Before(Tx.class)
+	public void update() {
+		
+		boolean updated = false;
+		String id = getPara("id");
+		SellerCustomer customer = SellerCustomerQuery.me().findById(id);
+		
+		if (customer != null) {
+			
+			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+			Boolean isCustomerAudit = OptionQuery.me().findValueAsBool("isCustomerAudit");
+			
+			if (isCustomerAudit != null && isCustomerAudit.booleanValue()) {
+			
+				User manager = UserQuery.me().findManagerByDeptId(user.getDepartmentId());
+				
+				if (manager == null) {
+					renderError(500);
+					return ;
+				}
+				
+				String defKey = "";
+				Map<String, Object> param = Maps.newHashMap();
+//				param.put("apply", user.getUsername());
+				param.put("manager", manager.getUsername());
+				
+				WorkFlowService workflow = new WorkFlowService();
+				String procInstId = workflow.startProcess(customer.getId(), defKey, param);
+				
+				customer.setProcDefKey(defKey);
+				customer.setProcInstId(procInstId);
+				customer.setStatus(SellerCustomer.CUSTOMER_AUDIT);
+				updated = customer.update();
+				
+				if (updated) {
+				
+					Kv kv = Kv.create();
+		
+					WxMessageTemplate messageTemplate = WxMessageTemplateQuery.me().findByCode("_customer_audit");
+					
+					kv.set("touser", manager.getWechatOpenId());
+					kv.set("templateId", messageTemplate.getTemplateId());
+					kv.set("customerName", customer.getCustomer().getCustomerName());
+					kv.set("submit", user.getRealname());
+		
+					kv.set("createTime", DateTime.now().toString("yyyy-MM-dd HH:mm"));
+					kv.set("status", "待审核");
+		
+					MessageKit.sendMessage(Actions.NotifyMessage.CUSTOMER_AUDIT_MESSAGE, kv);
+				}
+			
+			} else {
+				updated = customer.update();
+			}
+		}
+		
+		if (updated)
+			renderAjaxResultForSuccess("操作成功");
+		else
+			renderAjaxResultForError("操作失败");
 	}
 }
