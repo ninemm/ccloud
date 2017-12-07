@@ -77,7 +77,11 @@
         [
             {field: "customer_no", title: "客户编号", align: "center", width: '10%', edit:false},
             {field: "customer_name", title: "客户", align: "center", width: '8%', edit:false},
-            {field: "customer_type", title: "客户类型", align: "center", width: '8%', edit:false},
+            {field: "customer_type", title: "客户种型", align: "center", width: '8%',
+            formatter: function(value, row, index){
+                return value=="100402"?"直营商":"普通客户";
+            },
+            edit:false},
             {field: "pay_amount", title: "应付总额(元)", align: "center", width: '10%',
                 formatter: function(value, row, index){
                     return toMoney(value,2);
@@ -111,7 +115,11 @@
     var fields =
     [
         {field: "ref_sn", title: "单号", align: "center", width: '13%', edit:false},
-        {field: "ref_status", title: "单号状态", align: "center", width: '5%', edit: false},
+        {field: "ref_status", title: "单号状态", align: "center", width: '5%',
+        formatter: function (value, row, index){
+            return value>0?"已退货":"待退货";
+        },
+        edit: false},
         {field: "pay_amount", title: "应付总额(元)", align: "center", width: '5%',
             formatter: function(value, row, index){
                 return toMoney(value,2);
@@ -150,7 +158,7 @@
                 },edit: false
             },
             {field: "realname", title: "付款人", align: "center", width: '5%', edit: false},
-            {field: "biz_date", title: "付款时间", align: "center", width: '15%', edit: false},
+            {field: "biz_date", title: "付款时间", align: "center", width: '20%', edit: false},
             {field: "input_user", title: "录入人", align: "center", width: '5%', edit: false},
             {field: "remark", title: "备注", align: "center", width: '10%', edit: false}
         ];

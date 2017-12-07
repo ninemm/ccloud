@@ -36,21 +36,23 @@ public class CustomerVisitQuery extends JBaseQuery {
 				return DAO.findById(id);
 	}
 
-	public Page<CustomerVisit> paginate(int pageNumber, int pageSize, String keyword, String dataArea,String customerType,String questionType, String orderby) {
+	public Page<CustomerVisit> paginate(int pageNumber, int pageSize, String keyword, String dataArea,String customerType,String questionType,String groupBy, String orderby) {
 		
-		String select = "select cc_v.*,cc.customer_name,(select realname from `user` where id = cc_v.user_id) visit_user,u.realname review_user,cc_s.customer_type_ids customer_type ";
+		String select = "select cc_v.*,cc.customer_name,(select realname from `user` where id = cc_v.user_id) visit_user,u.realname review_user,GROUP_CONCAT(cc_t.`name`) customer_type ";
 		boolean needWhere = true;
-		StringBuilder fromBuilder = new StringBuilder("from cc_customer_visit cc_v left join cc_seller_customer cc_s on cc_v.seller_customer_id = cc_s.id left join cc_customer cc on cc_s.customer_id = cc.id left join `user` u on u.id = cc_v.review_id ");
+		StringBuilder fromBuilder = new StringBuilder("from cc_customer_visit cc_v left join cc_seller_customer cc_s on cc_v.seller_customer_id = cc_s.id left join cc_customer cc on cc_s.customer_id = cc.id ");
+		fromBuilder.append("left join `user` u on u.id = cc_v.review_id left join cc_customer_join_customer_type cc_ct on cc_ct.seller_customer_id = cc_s.id left join cc_customer_type cc_t on cc_t.id = cc_ct.customer_type_id ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cc_v.data_area", dataArea, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cc.customer_name", keyword, params, needWhere);
 		if(!customerType.equals("0")) {
-			needWhere = appendIfNotEmpty(fromBuilder, "cc_s.customer_type_ids", customerType, params, needWhere);
+			needWhere = appendIfNotEmpty(fromBuilder, "cc_t.`id`", customerType, params, needWhere);
 		}
 		if(!questionType.equals("0")) {
 			needWhere = appendIfNotEmpty(fromBuilder, "cc_v.question_type", questionType, params, needWhere);
 		}
-		fromBuilder.append("order by " + orderby);
+		fromBuilder.append(" GROUP BY cc_v.id ");
+		fromBuilder.append(" ORDER BY " + orderby);
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 

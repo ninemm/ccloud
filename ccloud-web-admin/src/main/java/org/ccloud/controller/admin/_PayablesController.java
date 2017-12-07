@@ -66,7 +66,7 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
         	customerType = StringUtils.urlDecode(customerType);
             setAttr("customerType", customerType);
         }
-        Page<Payables> page = PayablesQuery.me().paginate(getPageNumber(), getPageSize(),keyword,customerType,user.getDataArea(),  "create_date");
+        Page<Payables> page = PayablesQuery.me().paginate(getPageNumber(), getPageSize(),keyword,customerType,user.getDataArea()+"%",  "create_date");
         Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);
 	}
@@ -78,7 +78,7 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
         	objId = StringUtils.urlDecode(objId);
             setAttr("objId", objId);
         }
-        Page<PayablesDetail> page = PayablesDetailQuery.me().findByObjId(getPageNumber(), getPageSize(),objId,user.getDataArea(),  "create_date");
+        Page<PayablesDetail> page = PayablesDetailQuery.me().findByObjId(getPageNumber(), getPageSize(),objId,user.getDataArea()+"%",  "create_date");
         Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);
 	}
@@ -90,7 +90,7 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
         	detailId = StringUtils.urlDecode(detailId);
             setAttr("detailId", detailId);
         }
-        Page<Payment> page = PaymentQuery.me().findByDetailId(getPageNumber(), getPageSize(),detailId,user.getDataArea(), "id");
+        Page<Payment> page = PaymentQuery.me().findByDetailId(getPageNumber(), getPageSize(),detailId,user.getDataArea()+"%", "id");
         Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);
 	}
