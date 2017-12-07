@@ -72,7 +72,7 @@ public class PayablesDetailQuery extends JBaseQuery {
 	}
 	
 	public Page<PayablesDetail> findByObjId(int pageNumber, int pageSize,String objId,String dataArea, String orderby) {
-		String select = "select cc_d.*,if(cc_s.`status`>0,'已退货','待退货') ref_status ";
+		String select = "select cc_d.*,cc_s.`status` ref_status ";
 		StringBuilder fromBuilder = new StringBuilder("from cc_payables_detail cc_d inner join `cc_sales_refund_instock` cc_s on cc_d.ref_sn = cc_s.instock_sn and cc_s.payment_type = 0 ");
 		fromBuilder.append("where cc_d.object_id = '"+objId+"' ");
 		LinkedList<Object> params = new LinkedList<Object>();
