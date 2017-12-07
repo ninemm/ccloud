@@ -12,6 +12,12 @@ function batchAction() {
 	
 	jQuery.mm.batchAction('#form', '请选择角色记录');
 }
+	$("input").on("keydown",function(){
+		if (event.keyCode == 13) {
+			event.keyCode = 0;
+			event.returnValue = false;
+		}
+	});
 </#macro>
 
 <@layout active_id=p child_active_id=c>

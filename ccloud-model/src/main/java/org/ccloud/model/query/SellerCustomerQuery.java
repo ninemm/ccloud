@@ -169,7 +169,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 		fromBuilder.append(" from cc_seller_customer sc ");
 		fromBuilder.append(" join cc_user_join_customer ujc on sc.id = ujc.seller_customer_id ");
 		fromBuilder.append(" where sc.customer_id = ? ");
-		fromBuilder.append(" AND ujc.data_area like ? ");
+		fromBuilder.append(" AND ujc.data_area like ? LIMIT 1");
 
 		return Db.queryStr(fromBuilder.toString(), customerId, dataArea);
 	}

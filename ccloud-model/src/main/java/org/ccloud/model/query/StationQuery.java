@@ -77,9 +77,9 @@ public class StationQuery extends JBaseQuery {
 		fromBuilder.append("join `station` st on st.id = s.parent_id ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
-
-		appendIfNotEmptyWithLike(fromBuilder, "s.station_name", keyword, params, true);
-		appendIfNotEmptyWithLike(fromBuilder, "s.data_area", dataArea, params, true);
+		boolean needWhere = true;
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "s.station_name", keyword, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "s.data_area", dataArea, params, needWhere);
 
 		fromBuilder.append("order by " + orderby);
 
