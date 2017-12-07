@@ -147,7 +147,7 @@ public class _SalesInstockController extends JBaseCRUDController<SalesOrder> {
         			String sellProductId = StringUtils.getArrayFirst(paraMap.get("sellProductId" + index));
         			if (StrKit.notBlank(sellProductId)) {
         				if (!SalesRefundInstockQuery.me().inStock(paraMap, sellerId, 
-        						date, deptId, dataArea, index, user.getId(), inStockSN, wareHouseId)) {
+        						date, deptId, dataArea, index, user.getId(), inStockSN, wareHouseId, sellProductId)) {
         					return false;
         				}
         				count++;
