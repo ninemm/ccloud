@@ -114,34 +114,31 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		List<Map<String, String>> countList = new ArrayList<>();
 		boolean isCheckStore = true;
 
-		StringBuilder defaultSqlBuilder = new StringBuilder(" select i.warehouse_id, i.balance_count ");
-		defaultSqlBuilder.append(" from cc_inventory i ");
-		defaultSqlBuilder.append(" LEFT JOIN cc_warehouse w ON i.warehouse_id = w.id ");
-		defaultSqlBuilder.append(" WHERE w.is_default = 1 ");
-		defaultSqlBuilder.append(" AND i.seller_id = ? AND i.product_id = ? ");
-
-		Record defaultRecord = Db.findFirst(defaultSqlBuilder.toString(), sellerId, productId);
-		Integer defaultCount = defaultRecord.getInt("balance_count") * convert;
+		List<Record> list = InventoryQuery.me().findProductStore(sellerId, productId);
+		if (list.size() == 0) {
+			result.put("status", "notEnough");
+			result.put("countList", countList);	
+			return result;
+		}
+		Record record = list.get(0);
+		Integer defaultCount = record.getInt("balance_count") * convert;
 		if (!isCheckStore || (defaultCount >= productCount)) {
 			Map<String, String> map = new HashMap<>();
-			map.put("warehouse_id", defaultRecord.getStr("warehouse_id"));
+			map.put("warehouse_id", record.getStr("warehouse_id"));
 			map.put("productCount", productCount.toString());
 			countList.add(map);
 			result.put("status", "enough");
 			result.put("countList", countList);
 			return result;
 		}
-		StringBuilder sqlBuilder = new StringBuilder(" select i.warehouse_id, i.balance_count ");
-		sqlBuilder.append(" from cc_inventory i ");
-		sqlBuilder.append(" WHERE i.seller_id = ? AND i.product_id = ? AND w.is_default != 1");
-		List<Record> records = Db.find(sqlBuilder.toString(), sellerId, productId);
 		if (defaultCount > 0) {
 			Map<String, String> map = new HashMap<>();
-			map.put("warehouse_id", defaultRecord.getStr("warehouse_id"));
+			map.put("warehouse_id", record.getStr("warehouse_id"));
 			map.put("productCount", productCount.toString());
 			countList.add(map);
 		}
-		Integer count = this.findMoreWareHouse(records, countList, productCount - defaultCount, convert);
+		list.remove(0);
+		Integer count = this.findMoreWareHouse(list, countList, productCount - defaultCount, convert);
 		if (count > 0) {
 			result.put("status", "notEnough");
 		} else {
