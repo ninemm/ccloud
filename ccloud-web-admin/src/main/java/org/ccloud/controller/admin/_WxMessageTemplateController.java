@@ -15,6 +15,7 @@
  */
 package org.ccloud.controller.admin;
 
+import java.util.List;
 import java.util.Map;
 
 import org.ccloud.core.JBaseCRUDController;
@@ -25,12 +26,11 @@ import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.wechat.WechatApiConfigInterceptor;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
+import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.weixin.sdk.api.ApiResult;
 import com.jfinal.weixin.sdk.api.TemplateMsgApi;
@@ -52,23 +52,64 @@ public class _WxMessageTemplateController extends JBaseCRUDController<WxMessageT
 		renderJson(map);
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Before(WechatApiConfigInterceptor.class)
 	public void templateSync() {
 		
 		ApiResult apiResult = TemplateMsgApi.getAllTemplate();
-		String templateJson = apiResult.getJson();
-		if (StrKit.isBlank(templateJson)) {
-			renderAjaxResultForError("同步失败");
+		
+		if (apiResult == null) {
+			renderAjaxResultForError("获取微信模板失败");
 			return ;
 		}
 		
-		JSONArray array = JSON.parseArray(templateJson);
-		array.size();
-		for (int i = 0; i < array.size(); i++) {
-			JSONObject object = array.getJSONObject(i);
-//			object.getString("template_id")
+		List<Map<String, String>> templateList = apiResult.getList("template_list");
+		
+		List<WxMessageTemplate> list = Lists.newArrayList();
+		for (Map<String, String> obj : templateList) {
+			
+			WxMessageTemplate messageTemplate = new WxMessageTemplate();
+			messageTemplate.setId(StrKit.getRandomUUID());
+			messageTemplate.setTemplateId(obj.get("template_id"));
+			messageTemplate.setTitle(obj.get("title"));
+			
+			messageTemplate.setContent(obj.get("content"));
+			messageTemplate.setDeputyIndustry(obj.get("deputy_industry"));
+			messageTemplate.setPrimaryIndustry(obj.get("primary_industry"));
+			messageTemplate.setExample(obj.get("example"));
+			
+			list.add(messageTemplate);
+		}
+		int[] result = Db.batchSave(list, list.size());
+		
+		if (result.length == list.size()) {
+			renderAjaxResultForSuccess("微信模板同步成功");
+		} else {
+			renderAjaxResultForError("微信模板同步失败");
 		}
 		
+	}
+	
+	public void edit() {
+		
+		String id = getPara("id");
+		if (StrKit.notBlank(id)) {
+			WxMessageTemplate messageTemplate = WxMessageTemplateQuery.me().findById(id);
+			setAttr("wxMessageTemplate", messageTemplate);
+		}
+		
+	}
+	
+	public void save() {
+		
+		WxMessageTemplate messageTemplate = getModel(WxMessageTemplate.class);
+		
+		if (messageTemplate.saveOrUpdateWithoutDate()) {
+			renderAjaxResultForSuccess("操作成功");
+			return;
+		}
+		
+		renderAjaxResultForError("操作失败");
 		
 	}
 }
