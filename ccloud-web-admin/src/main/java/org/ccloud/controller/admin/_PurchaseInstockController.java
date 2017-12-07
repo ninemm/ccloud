@@ -201,25 +201,6 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 		for(PurchaseInstockDetail pi : list){
 			BigDecimal count1 = new BigDecimal(pi.getProductCount());
 			BigDecimal convent = new BigDecimal(pi.get("convert_relate").toString());
-			String inventoryDetailId = StrKit.getRandomUUID();
-			inventoryDetail.set("id", inventoryDetailId);
-			inventoryDetail.set("warehouse_id", pi.get("warehouse_id"));
-			inventoryDetail.set("sell_product_id",pi.getSellerProductId());
-			inventoryDetail.set("in_count", count1.divide(convent, 2, BigDecimal.ROUND_HALF_UP));
-			inventoryDetail.set("in_amount", pi.getProductAmount());
-			inventoryDetail.set("in_price", pi.getProductPrice());
-			inventoryDetail.set("biz_type", "采购入库");
-			inventoryDetail.set("biz_bill_sn", pi.get("pwarehouse_sn"));
-			inventoryDetail.set("biz_date", new Date());
-			inventoryDetail.set("biz_user_id", user.getId());
-			inventoryDetail.set("remark", pi.getRemark());
-			inventoryDetail.set("dept_id",pi.getDeptId());
-			inventoryDetail.set("data_area", pi.getDataArea());
-			inventoryDetail.set("create_date", new Date());
-			flang=inventoryDetail.save();
-			if(flang==false){
-				break;
-			}
 			Inventory inventory= InventoryQuery.me().findByWarehouseIdAndProductId(pi.get("warehouse_id").toString(), pi.getSellerProductId());
 			if(inventory!=null){
 				inventory.set("in_count", count1.divide(convent, 2, BigDecimal.ROUND_HALF_UP));
@@ -238,10 +219,10 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 				inventory.set("warehouse_id", pi.get("warehouse_id").toString());
 				inventory.set("product_id", pi.getSellerProductId());
 				inventory.set("seller_id", seller.getId());
-//				inventory.set("in_count", count1.divide(convent));
+				inventory.set("in_count", count1.divide(convent, 2, BigDecimal.ROUND_HALF_UP));
 				inventory.set("in_amount",pi.getProductAmount());
 				inventory.set("in_price", pi.getProductPrice());
-				inventory.set("balance_count", new BigDecimal(pi.getProductCount()));
+				inventory.set("balance_count", count1.divide(convent, 2, BigDecimal.ROUND_HALF_UP));
 				inventory.set("balance_amount", pi.getProductAmount());
 				inventory.set("balance_price", pi.getProductPrice());
 				inventory.set("data_area",pi.getDataArea());
@@ -252,17 +233,37 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 					break;
 				}
 			}
-			List<SellerProduct> sellerProducts = SellerProductQuery.me().findByProductIdAndSellerId(pi.getSellerProductId(),seller.getId());
+			String inventoryDetailId = StrKit.getRandomUUID();
+			inventoryDetail.set("id", inventoryDetailId);
+			inventoryDetail.set("warehouse_id", pi.get("warehouse_id"));
+			inventoryDetail.set("sell_product_id",pi.getSellerProductId());
+			inventoryDetail.set("in_count", count1.divide(convent, 2, BigDecimal.ROUND_HALF_UP));
+			inventoryDetail.set("in_amount", pi.getProductAmount());
+			inventoryDetail.set("in_price", pi.getProductPrice());
+			inventoryDetail.set("balance_count", inventory.getBalanceCount());
+			inventoryDetail.set("balance_amount", inventory.getBalanceAmount());
+			inventoryDetail.set("balance_price", inventory.getBalancePrice());
+			inventoryDetail.set("biz_type", "100202");
+			inventoryDetail.set("biz_bill_sn", pi.get("pwarehouse_sn"));
+			inventoryDetail.set("biz_date", new Date());
+			inventoryDetail.set("biz_user_id", user.getId());
+			inventoryDetail.set("remark", pi.getRemark());
+			inventoryDetail.set("dept_id",pi.getDeptId());
+			inventoryDetail.set("data_area", pi.getDataArea());
+			inventoryDetail.set("create_date", new Date());
+			flang=inventoryDetail.save();
+			if(flang==false){
+				break;
+			}
+			SellerProduct sellerProduct = SellerProductQuery.me().findById(pi.getSellerProductId());
 			List<Inventory> inventorys = InventoryQuery.me()._findBySellerIdAndProductId(seller.getId(),pi.getSellerProductId());
 			BigDecimal count0 = new BigDecimal(0);
 			for(Inventory inventory0:inventorys){
 				count0 = count0.add(inventory0.getBalanceCount());
 			}
-			for(SellerProduct sellerProduct : sellerProducts){
-				sellerProduct.set("store_count", count0);
-				sellerProduct.set("modify_date", new Date());
-				sellerProduct.update();
-			}
+			sellerProduct.setStoreCount(count0);
+			sellerProduct.set("modify_date", new Date());
+			sellerProduct.update();
 		}
 		if(flang==true){
 			purchaseInstock.set("status", 1000);
@@ -291,7 +292,7 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 			inventoryDetail.set("in_count", pi.getProductCount());
 			inventoryDetail.set("in_amount", pi.getProductAmount());
 			inventoryDetail.set("in_price", pi.getProductPrice());
-			inventoryDetail.set("biz_type", "采购入库");
+			inventoryDetail.set("biz_type", "100202");
 			inventoryDetail.set("biz_bill_sn", pi.get("pwarehouse_sn"));
 			inventoryDetail.set("biz_date", new Date());
 			inventoryDetail.set("biz_user_id", user.getId());
@@ -336,11 +337,9 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 					break;
 				}
 			}
-			List<SellerProduct> sellerProducts = SellerProductQuery.me().findByProductIdAndSellerId(pi.getSellerProductId(),seller.getId());
-			for(SellerProduct sellerProduct : sellerProducts){
-				sellerProduct.set("store_count", inventory.getBalanceCount());
-				sellerProduct.update();
-			}
+			SellerProduct sellerProduct = SellerProductQuery.me().findById(pi.getSellerProductId());
+			sellerProduct.set("store_count", inventory.getBalanceCount());
+			sellerProduct.update();
 		}
 		if(flang==true){
 			purchaseInstock.set("status", 1000);

@@ -26,17 +26,24 @@ import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
+import org.ccloud.utils.QRCodeUtils;
 import org.ccloud.utils.StringUtils;
+import org.ccloud.model.Product;
 import org.ccloud.model.PurchaseInstock;
 import org.ccloud.model.PurchaseInstockDetail;
 import org.ccloud.model.PurchaseOrder;
 import org.ccloud.model.PurchaseOrderDetail;
 import org.ccloud.model.PurchaseOrderJoinInstock;
+import org.ccloud.model.Seller;
+import org.ccloud.model.SellerProduct;
 import org.ccloud.model.User;
 import org.ccloud.model.Warehouse;
+import org.ccloud.model.query.ProductQuery;
 import org.ccloud.model.query.PurchaseInstockQuery;
 import org.ccloud.model.query.PurchaseOrderDetailQuery;
 import org.ccloud.model.query.PurchaseOrderQuery;
+import org.ccloud.model.query.SellerProductQuery;
+import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.WarehouseQuery;
 
 import com.google.common.collect.ImmutableMap;
@@ -105,6 +112,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 	public void pass(){
 		String id = getPara("id");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		Seller seller = SellerQuery.me().findByUserId(user.getId());
 		PurchaseOrder purchaseOrder=PurchaseOrderQuery.me().findById(id);
 		purchaseOrder.set("status", 1000);
 		purchaseOrder.update();
@@ -143,9 +151,35 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		List<PurchaseOrderDetail> purchaseOrderDetails =  PurchaseOrderDetailQuery.me().findByPurchaseOrderId(id);
 		
 		for(PurchaseOrderDetail purchaseOrderDetail : purchaseOrderDetails){
+			Product product = ProductQuery.me().findById(purchaseOrderDetail.getProductId());
+			SellerProduct sellerProduct = SellerProductQuery.me()._findByProductIdAndSellerId(purchaseOrderDetail.getProductId(),seller.getId());
+			if(sellerProduct==null){
+				sellerProduct = new SellerProduct();
+				String sellerProductId = StrKit.getRandomUUID();
+				sellerProduct.set("id", sellerProductId);
+				sellerProduct.set("product_id", purchaseOrderDetail.getProductId());
+				sellerProduct.set("seller_id", seller.getId());
+				sellerProduct.set("custom_name", product.getName());
+				sellerProduct.set("price", product.getPrice());
+				sellerProduct.set("cost", product.getCost());
+				sellerProduct.set("market_price", product.getMarketPrice());
+				sellerProduct.set("weight", product.getWeight());
+				sellerProduct.set("weight_unit", product.getWeightUnit());
+				sellerProduct.set("is_enable", 1);
+				sellerProduct.set("is_gift", 0);
+				//生成二维码
+				String  fileName = str+".png";
+				String contents =getRequest().getScheme() + "://" + getRequest().getServerName()+"/admin/seller/fu"+"?id="+sellerProductId; 
+				//部署之前上传
+				//String contents = getRequest().getScheme() + "://" + getRequest().getServerName()+":"+getRequest().getLocalPort()+getRequest().getContextPath()+"/admin/seller/fn"+"?id="+Id;
+				String imagePath = getRequest().getSession().getServletContext().getRealPath("\\qrcode\\");
+				QRCodeUtils.genQRCode(contents, imagePath, fileName);
+				sellerProduct.set("qrcode_url", imagePath+"\\"+fileName);
+				sellerProduct.set("create_date", date);
+				sellerProduct.save();
+			}
 			purchaseInstockDetail.set("id", StrKit.getRandomUUID());
 			purchaseInstockDetail.set("purchase_instock_id", purchaseInstockId);
-			purchaseInstockDetail.set("seller_product_id", purchaseOrderDetail.getProductId());
 			purchaseInstockDetail.set("product_count", purchaseOrderDetail.getProductCount());
 			purchaseInstockDetail.set("product_price", purchaseOrderDetail.getProductPrice());
 			purchaseInstockDetail.set("product_amount", purchaseOrderDetail.getProductAmount());
@@ -154,6 +188,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 			purchaseInstockDetail.set("create_date", date);
 			purchaseInstockDetail.set("dept_id", user.getDepartmentId());
 			purchaseInstockDetail.set("data_area", user.getDataArea());
+			purchaseInstockDetail.set("seller_product_id", sellerProduct.getId());
 			purchaseInstockDetail.save();
 		}
 		
@@ -167,6 +202,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		final PurchaseOrderJoinInstock purchaseOrderJoinInstock = getModel(PurchaseOrderJoinInstock.class);
 		Map<String, String[]> paraMap = getParaMap();
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		Seller seller = SellerQuery.me().findByUserId(user.getId());
 		Warehouse warehouse = WarehouseQuery.me().findOneByUserId(user.getId());
 		String purchaseInstockId = StrKit.getRandomUUID();
 
@@ -213,7 +249,34 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 
 		while (productNum > count) {
 			index++;
-			String productId = StringUtils.getArrayFirst(paraMap.get("sellerProductId" + index));
+			String productId = StringUtils.getArrayFirst(paraMap.get("productId" + index));
+			Product product = ProductQuery.me().findById(productId);
+			SellerProduct sellerProduct = SellerProductQuery.me()._findByProductIdAndSellerId(productId,seller.getId());
+			if(sellerProduct==null){
+				sellerProduct = new SellerProduct();
+				String sellerProductId = StrKit.getRandomUUID();
+				sellerProduct.set("id", sellerProductId);
+				sellerProduct.set("product_id", productId);
+				sellerProduct.set("seller_id", seller.getId());
+				sellerProduct.set("custom_name", product.getName());
+				sellerProduct.set("price", product.getPrice());
+				sellerProduct.set("cost", product.getCost());
+				sellerProduct.set("market_price", product.getMarketPrice());
+				sellerProduct.set("weight", product.getWeight());
+				sellerProduct.set("weight_unit", product.getWeightUnit());
+				sellerProduct.set("is_enable", 1);
+				sellerProduct.set("is_gift", 0);
+				//生成二维码
+				String  fileName = str+".png";
+				String contents =getRequest().getScheme() + "://" + getRequest().getServerName()+"/admin/seller/fu"+"?id="+sellerProductId; 
+				//部署之前上传
+				//String contents = getRequest().getScheme() + "://" + getRequest().getServerName()+":"+getRequest().getLocalPort()+getRequest().getContextPath()+"/admin/seller/fn"+"?id="+Id;
+				String imagePath = getRequest().getSession().getServletContext().getRealPath("\\qrcode\\");
+				QRCodeUtils.genQRCode(contents, imagePath, fileName);
+				sellerProduct.set("qrcode_url", imagePath+"\\"+fileName);
+				sellerProduct.set("create_date", date);
+				sellerProduct.save();
+			}
 			String purchaseOrserDetailId = StringUtils.getArrayFirst(paraMap.get("purchaseOrderDetailId" + index));
 			PurchaseOrderDetail purchaseOrderDetail = PurchaseOrderDetailQuery.me().findById(purchaseOrserDetailId);
 			if (StrKit.notBlank(productId)) {
@@ -227,7 +290,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 				
 				purchaseInstockDetail.set("id", StrKit.getRandomUUID());
 				purchaseInstockDetail.set("purchase_instock_id", purchaseInstockId);
-				purchaseInstockDetail.set("seller_product_id", StringUtils.getArrayFirst(paraMap.get("sellerProductId" + index)));
+				purchaseInstockDetail.set("seller_product_id", sellerProduct.getId());
 				purchaseInstockDetail.set("product_count", productCount);
 				purchaseInstockDetail.set("product_price", StringUtils.getArrayFirst(paraMap.get("bigPrice" + index)));
 				purchaseInstockDetail.set("product_amount", StringUtils.getArrayFirst(paraMap.get("rowTotal" + index)));

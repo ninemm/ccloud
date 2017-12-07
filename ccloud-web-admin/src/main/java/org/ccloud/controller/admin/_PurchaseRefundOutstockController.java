@@ -220,6 +220,18 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 		for(PurchaseRefundOutstockDetail pr : list){
 			BigDecimal count1 = pr.getProductCount();
 			BigDecimal convent = new BigDecimal(pr.get("convert_relate").toString());
+			SellerProduct sellerProduct = SellerProductQuery.me().findById(pr.getSellerProductId());
+			Inventory inventory= InventoryQuery.me().findByWarehouseIdAndProductId(pr.get("warehouse_id").toString(),sellerProduct.getProductId() );
+			inventory.set("out_count", count1.divide(convent, 2, BigDecimal.ROUND_HALF_UP));
+			inventory.set("out_amount", pr.getProductAmount());
+			inventory.set("out_price", pr.getProductPrice());
+			inventory.set("balance_count", inventory.getBalanceCount().subtract(count1.divide(convent, 2, BigDecimal.ROUND_HALF_UP)));
+			inventory.set("balance_amount", inventory.getBalanceAmount().subtract(pr.getProductAmount()));
+			inventory.set("modify_date", new Date());
+			flang=inventory.update();
+			if(flang==false){
+				break;
+			}
 			String inventoryDetailId = StrKit.getRandomUUID();
 			inventoryDetail.set("id", inventoryDetailId);
 			inventoryDetail.set("warehouse_id", pr.get("warehouse_id"));
@@ -227,7 +239,10 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 			inventoryDetail.set("out_count", count1.divide(convent, 2, BigDecimal.ROUND_HALF_UP));
 			inventoryDetail.set("out_amount", pr.getProductAmount());
 			inventoryDetail.set("out_price", pr.getProductPrice());
-			inventoryDetail.set("biz_type", "采购退货出库");
+			inventoryDetail.set("balance_count", inventory.getBalanceCount());
+			inventoryDetail.set("balance_amount", inventory.getBalanceAmount());
+			inventoryDetail.set("balance_price", inventory.getBalancePrice());
+			inventoryDetail.set("biz_type", "100203");
 			inventoryDetail.set("biz_bill_sn", pr.get("outstock_sn"));
 			inventoryDetail.set("biz_date", new Date());
 			inventoryDetail.set("biz_user_id", user.getId());
@@ -240,28 +255,14 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 				break;
 			}
 			
-			Inventory inventory= InventoryQuery.me().findByWarehouseIdAndProductId(pr.get("warehouse_id").toString(), pr.getSellerProductId());
-			inventory.set("out_count", count1.divide(convent, 2, BigDecimal.ROUND_HALF_UP));
-			inventory.set("out_amount", pr.getProductAmount());
-			inventory.set("out_price", pr.getProductPrice());
-			inventory.set("balance_count", inventory.getBalanceCount().subtract(count1.divide(convent, 2, BigDecimal.ROUND_HALF_UP)));
-			inventory.set("balance_amount", inventory.getBalanceAmount().subtract(pr.getProductAmount()));
-			inventory.set("modify_date", new Date());
-			flang=inventory.update();
-			if(flang==false){
-				break;
-			}
-			List<SellerProduct> sellerProducts = SellerProductQuery.me().findByProductIdAndSellerId(inventory.getProductId(),inventory.getSellerId());
 			List<Inventory> inventorys = InventoryQuery.me()._findBySellerIdAndProductId(inventory.getSellerId(),inventory.getProductId());
 			BigDecimal count0 = new BigDecimal(0);
 			for(Inventory inventory0:inventorys){
 				count0 = count0.add(inventory0.getBalanceCount());
 			}
-			for(SellerProduct sellerProduct : sellerProducts){
-				sellerProduct.set("store_count", count0);
-				sellerProduct.set("modify_date", new Date());
-				sellerProduct.update();
-			}
+			sellerProduct.set("store_count", count0);
+			sellerProduct.set("modify_date", new Date());
+			sellerProduct.update();
 		}
 		if(flang==true){
 			purchaseRefundOutstock.set("status", 1000);

@@ -50,7 +50,7 @@
 		$tbody.append("<tr id='" + newTrId + "'>" + newTrHtml + "</tr>");
 
 		var $newTr = $("#" + newTrId);
-		var $productSelect = $newTr.find("#sellerProductId")
+		var $productSelect = $newTr.find("#productId")
 
 
 		productValue($productSelect, product);
@@ -83,9 +83,8 @@
 				}
 		});
 		
-		$newTr.find("#sellerProductId").attr("name", "sellerProductId" + newTrIdx);
-		$newTr.find("#purchaseOrderDetailId").attr("name","purchaseOrderDetailId"+newTrIdx);
 		$newTr.find("#productId").attr("name", "productId" + newTrIdx);
+		$newTr.find("#purchaseOrderDetailId").attr("name","purchaseOrderDetailId"+newTrIdx);
 		$newTr.find("#convert").attr("name", "convert" + newTrIdx);
 		$newTr.find("#isGift").attr("name", "isGift" + newTrIdx);
 		$newTr.find("#inputRowTotal").attr("name", "rowTotal" + newTrIdx);
@@ -98,7 +97,7 @@
 
 			var $tr = obj.parent().parent().parent();
 			
-			$tr.find("#sellerProductId").val(product.product_id);
+			$tr.find("#productId").val(product.product_id);
 			$tr.find("#purchaseOrderDetailId").val(product.id);
 			$tr.find("#sellerProductName").text(product.productName);
 			$tr.find("#specification").text(product.cps_name);
@@ -274,7 +273,7 @@
 							<td>
 								<div class = "validata-box">
 									<span id="sellerProductName" ></span>
-									<input type="hidden" id="sellerProductId" name="sellerProductId" />
+									<input type="hidden" id="productId" name="productId" />
 									<input type="hidden" id="purchaseOrderDetailId" name="purchaseOrderDetailId" />
 								</div>
 							</td>
@@ -373,7 +372,7 @@
 
 			<div class="box-footer"> 
 				<button type="button" id="do_Submit" onclick="doSubmit()" class="btn btn-primary">审核通过</button>
-				<input type="button" class="btn btn-primary" onclick="history.go(-1)" value="返  回" hidefocus="true" />
+				<!-- <input type="button" class="btn btn-primary" onclick="history.go(-1)" value="返  回" hidefocus="true" /> -->
 			</div>
 		</form>
 	</div>
