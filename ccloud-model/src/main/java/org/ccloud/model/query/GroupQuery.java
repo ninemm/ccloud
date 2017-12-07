@@ -43,9 +43,9 @@ public class GroupQuery extends JBaseQuery {
 		StringBuilder fromBuilder = new StringBuilder("from `group` ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
-
-		appendIfNotEmptyWithLike(fromBuilder, "`group_name`", keyword, params, true);
-		appendIfNotEmptyWithLike(fromBuilder, "data_area", dataArea, params, true);
+		boolean needWhere = true;
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "`group_name`", keyword, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "data_area", dataArea, params, needWhere);
 
 		fromBuilder.append("order by " + orderby);
 

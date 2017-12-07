@@ -51,8 +51,9 @@ public class UserQuery extends JBaseQuery {
 		StringBuilder fromBuilder = new StringBuilder(" from user u ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
-		appendIfNotEmptyWithLike(fromBuilder, "username", keyword, params, true);
-		appendIfNotEmptyWithLike(fromBuilder, "data_area", dataArea, params, true);
+		boolean needWhere = true;
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "username", keyword, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "data_area", dataArea, params, needWhere);
 		if (userId != null) {
 			fromBuilder.append("AND u.id != ? ");
 			params.add(userId);

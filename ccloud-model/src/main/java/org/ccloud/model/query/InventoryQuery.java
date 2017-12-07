@@ -53,8 +53,9 @@ public class InventoryQuery extends JBaseQuery {
 		StringBuilder fromBuilder = new StringBuilder("from `cc_inventory` as i INNER JOIN  `cc_product` as p ON i.product_id = p.id ");
 		fromBuilder.append("WHERE i.warehouse_id = '"+ warehouse_id+"'and i.seller_id='"+seller_id+"'");
 		LinkedList<Object> params = new LinkedList<Object>();
-		appendIfNotEmptyWithLike(fromBuilder, "p.name", product_name, params, true);
-		appendIfNotEmptyWithLike(fromBuilder, "p.product_sn", product_sn, params, true);
+		boolean needWhere = true;
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "p.name", product_name, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "p.product_sn", product_sn, params, needWhere);
 		fromBuilder.append("ORDER BY i.create_date DESC");
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
