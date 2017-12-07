@@ -108,7 +108,6 @@ public class SalesOrderQuery extends JBaseQuery {
 		LinkedList<Object> params = new LinkedList<Object>();
 		appendIfNotEmpty(fromBuilder, "sg.seller_id", sellerId, params, false);
 
-		fromBuilder.append(" GROUP BY sg.product_id ");
 		fromBuilder.append(" ORDER BY sg.order_list ");
 
 		return Db.find(fromBuilder.toString(), params.toArray());
@@ -162,7 +161,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		String type = StringUtils.getArrayFirst(paraMap.get("receiveType"));
 		salesOrder.setTotalAmount(new BigDecimal(total));
 		salesOrder.setReceiveType(StringUtils.isNumeric(type)? Integer.parseInt(type) : 0);
-		salesOrder.setDeliveryAddress(StringUtils.getArrayFirst(paraMap.get("receiveType")));
+		salesOrder.setDeliveryAddress(StringUtils.getArrayFirst(paraMap.get("deliveryAddress")));
 		Date deliveryDate = DateUtils.strToDate(StringUtils.getArrayFirst(paraMap.get("deliveryDate")), DateUtils.DEFAULT_NORMAL_FORMATTER);
 		salesOrder.setDeliveryDate(deliveryDate);
 		salesOrder.setRemark(StringUtils.getArrayFirst(paraMap.get("remark")));
