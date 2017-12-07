@@ -1,5 +1,7 @@
 package org.ccloud.workflow.query;
 
+import java.util.List;
+
 import org.ccloud.workflow.model.ActReProcdef;
 
 import com.jfinal.plugin.activerecord.Page;
@@ -30,5 +32,9 @@ public class ActReProcdefQuery {
 		fromBuilder.append("ORDER BY VERSION_ DESC");
 		
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+	}
+	
+	public List<ActReProcdef> findListInNormal() {
+		return DAO.doFind();
 	}
 }

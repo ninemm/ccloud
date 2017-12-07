@@ -76,7 +76,7 @@
 				},
 				{field: "customer_name", title: "客户名称", align: "center", width: '8%', edit:false},
 				{field: "total_amount", title: "订单总额", align: "center", width: '5%', edit:false},
-				{field: "payment_type", title: "付款方式", align: "center", width: '5%',
+				{field: "receive_type", title: "付款方式", align: "center", width: '5%',
 					formatter: function(value, row, rowIndex) {
 						return value == 0 ? '应付账款' : '现金';
 					},
@@ -97,10 +97,11 @@
 					var strHtml ='<a class="label label-table label-info" onclick="detail(\''+row.id+'\')" >详细</a> ';
 
 					strHtml = strHtml + '<a class="label label-table label-success" onclick="detail(\''+row.id+'\')" >打印</a> ';
-					
-					if (row.status == 0) {
-						strHtml = strHtml + '<a class="label label-table label-warning" href="' + url + '">出库</a> ';				
-					}					
+					<@shiro.hasPermission name="/admin/salesOutstock/check">
+						if (row.status == 0) {
+							strHtml = strHtml + '<a class="label label-table label-warning" href="' + url + '">出库</a> ';				
+						}
+					</@shiro.hasPermission>						
 					
 					return strHtml;
 				},

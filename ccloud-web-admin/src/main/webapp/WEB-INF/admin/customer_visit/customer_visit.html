@@ -29,7 +29,7 @@
     $(function() {
         jQuery.mm.initEditTable('#_customer_visit_table', url, initParams, initFields(), null);
         jQuery.mm.initValidator('#audit_form', validatorFields);
-
+        initCustomerType();
     });
 
 
@@ -62,28 +62,12 @@
             [
             {field: "customer_name", title: "客户", align: "center", width: '7%', edit:false},
             {field: "customer_type", title: "客户类型", align: "center", width: '8%',
-                formatter: function(value, row, rowIndex){
+                /*formatter: function(value, row, rowIndex){
                     switch (value){
-                        case '1':
-                        return "团购直销";
-                        case '2':
-                        return "商超";
-                        case '3':
-                        return "餐饮";
-                        case '4':
-                        return "批发";
-                        case '5':
-                        return "零售终端";
-                        case '6':
-                        return "其他";
-                        case '7':
-                        return "直营商";
-                        case '8':
-                        return "餐饮(直供)";
-                        default:
-                        return "未定";
-                    }
-                },
+                        case '1':return "团购直销";case '2':return "商超";case '3':return "餐饮";
+                        case '4':return "批发";case '5':return "零售终端";
+                        case '6':return "其他";case '7':return "直营商";
+                        case '8':return "餐饮(直供)";default:return "未定";}},*/
                 edit:false
             },
             {field: "question_type", title: "问题类型", align: "center", width: '5%',
@@ -122,6 +106,25 @@
             }
         ];
         return fields;
+    };
+
+    var initCustomerType = function () {
+        var strHtml = "";
+        var url = '${CPATH}/admin/customerVisit/queryCustomerType';
+        $.ajax({
+        url: url,
+        type: 'post',
+        success: function (result) {
+            var customerType = result.data;
+            strHtml = '<option selected="selected" value="0">客户类型</option>';
+            for(index in customerType){
+                var row = customerType[index].columns;
+                strHtml +='<option value="'+row.id+'">'+row.name+'</option>';
+            }
+            $("#customer_type").html(strHtml);
+        }
+        });
+
     }
 
 
@@ -246,15 +249,6 @@
         <div class="row content-row">
             <div class="input-group input-group-sm " style="float: right">
                 <select class="input-sm" name="customer_type" id="customer_type" style="float: left;padding-right:5px;margin-right:5px;">
-                    <option selected="selected" value="0">客户类型</option>
-                    <option value="1">团购直销</option>
-                    <option value="2">商超</option>
-                    <option value="3">餐饮</option>
-                    <option value="4">批发</option>
-                    <option value="5">零售终端</option>
-                    <option value="6">其他</option>
-                    <option value="7">直营商</option>
-                    <option value="8">餐饮(直供)</option>
                 </select>
                 <select class="input-sm" name="question_type" id="question_type" style="float: left;padding-right:5px;margin-right:5px;">
                     <option selected="selected" value="type">问题类型</option>

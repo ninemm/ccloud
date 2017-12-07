@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
@@ -48,6 +49,7 @@ import com.jfinal.plugin.activerecord.Record;
 @RouterMapping(url = "/admin/salesInstock", viewPath = "/WEB-INF/admin/sales_instock")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
+@RequiresPermissions("/admin/salesInstock")
 public class _SalesInstockController extends JBaseCRUDController<SalesOrder> {
 
 	@Override
@@ -112,6 +114,7 @@ public class _SalesInstockController extends JBaseCRUDController<SalesOrder> {
 
 	}
 	
+	@RequiresPermissions("/admin/salesInstock/check")
 	public void inStock() {
 
 		Map<String, String[]> paraMap = getParaMap();

@@ -100,12 +100,13 @@
 				{field: "action", title: "操作", align: "center", width: '15%',
 				formatter: function(value, row, rowIndex) {
 					var strHtml ='<a class="label label-table label-info" onclick="detail(\''+row.id+'\')" >详细</a> ';
-					
+					<@shiro.hasPermission name="/admin/salesRefund/check">
 					if (row.status == 0) {
 						strHtml = strHtml + '<a class="label label-table label-success" onclick="pass(\''+row.id+'\',1000)" >通过</a> ';
 	
 						strHtml = strHtml + '<a class="label label-table label-warning" onclick="pass(\''+row.id+'\',1001)" >拒绝</a> ';			
 					}					
+					</@shiro.hasPermission>						
 
 					return strHtml;
 				},
@@ -170,7 +171,9 @@
 		</div>
 		<div class="row content-row">
 			<div class="jp-left">
-				<button class="btn btn-sm btn-primary" type="button" onclick="batchAction()"><i class="fa fa-gavel"></i> 批量审核 </button>
+				<@shiro.hasPermission name="/admin/salesRefund/check">
+					<button class="btn btn-sm btn-primary" type="button" onclick="batchAction()"><i class="fa fa-gavel"></i> 批量审核 </button>
+				</@shiro.hasPermission>				
 				<a href="${CPATH}/admin/salesRefund/add?c=${c!}&p=${p!}" class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> 新建销售退货单 </a>
 			</div>
 			<div class="form-group" style="float: right">

@@ -4,14 +4,9 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
-import org.ccloud.shiro.SimpleUser;
+import org.ccloud.model.User;
 
 
-/**
- * ShiroKit. (Singleton, ThreadSafe)
- *
- * @author dafei
- */
 public class ShiroKit {
 
 	/**
@@ -26,9 +21,9 @@ public class ShiroKit {
 
 
 	/**
-	 * 登录成功时所用的页面。
+	 * 登录不成功时所用的页面。
 	 */
-	private static String unauthorizedUrl ="/401.jsp";
+	private static String unauthorizedUrl ="/error404";
 
 
 	/**
@@ -93,11 +88,11 @@ public class ShiroKit {
 	 * 获取登陆用户信息
 	 * @return
 	 */
-	public static SimpleUser getLoginUser(){
+	public static User getLoginUser(){
 		Subject subject = SecurityUtils.getSubject();
-		if(subject!=null){
-			return (SimpleUser)subject.getPrincipal();
-		}else{
+		if (subject != null) {
+			return (User) subject.getPrincipal();
+		} else {
 			SecurityUtils.getSubject().logout();
 			return null;
 		}
@@ -107,7 +102,7 @@ public class ShiroKit {
 	 * @return
 	 */
 	public static String getUserId(){
-		SimpleUser user = ShiroKit.getLoginUser();
+		User user = ShiroKit.getLoginUser();
 		return user.getId();
 	}
 	/***
@@ -115,7 +110,7 @@ public class ShiroKit {
 	 * @return
 	 */
 	public static String getUsername(){
-		SimpleUser user = ShiroKit.getLoginUser();
+		User user = ShiroKit.getLoginUser();
 		return user.getUsername();
 	}
 	
@@ -124,8 +119,8 @@ public class ShiroKit {
 	 * @return
 	 */
 	public static String getUserName(){
-		SimpleUser user = ShiroKit.getLoginUser();
-		return user.getName();
+		User user = ShiroKit.getLoginUser();
+		return user.getRealname();
 	}
 	
 	/***

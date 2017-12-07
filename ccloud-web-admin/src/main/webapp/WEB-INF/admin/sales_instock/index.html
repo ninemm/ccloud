@@ -101,10 +101,11 @@
 				formatter: function(value, row, rowIndex) {
 					var url = '${CPATH}/admin/salesInstock/getDetail?id=' + row.id + '&c=${c}&p=${p}';
 					var strHtml ='<a class="label label-table label-info" onclick="detail(\''+row.id+'\')" >详细</a> ';
-					
+					<@shiro.hasPermission name="/admin/salesInstock/check">
 					if (row.status == 1000) {
 						strHtml = strHtml + '<a class="label label-table label-warning" href="' + url + '" >入库</a> ';			
-					}					
+					}						
+					</@shiro.hasPermission>						
 
 					return strHtml;
 				},
