@@ -182,7 +182,7 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 			PurchaseInstockDetail purchaseInstockDetail = PurchaseInstockDetailQuery.me().findById(purchaseInstockDetailId);
 			String purchaseOrderDetailId = StringUtils.getArrayFirst(paraMap.get("purchaseOrderDetailId"+index));
 			PurchaseOrderDetail purchaseOrderDetail = PurchaseOrderDetailQuery.me().findById(purchaseOrderDetailId);
-			PurchaseOrder purchaseOrder = PurchaseOrderQuery.me().findById(purchaseOrderDetail.getId());
+			PurchaseOrder purchaseOrder = PurchaseOrderQuery.me().findById(purchaseOrderDetail.getPurchaseOrderId());
 			String productId = StringUtils.getArrayFirst(paraMap.get("purchaseInstockDetailId" + index));
 			if (StrKit.notBlank(productId)) {
 				String convert = StringUtils.getArrayFirst(paraMap.get("convert" + index));
@@ -290,7 +290,7 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 	}
 	
 	
-	public void pass(){
+/*	public void pass(){
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String purchaseInstockId=getPara("id");
 		boolean flang = false;
@@ -372,7 +372,7 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 		}
 		renderAjaxResultForSuccess("OK");
 
-	}
+	}*/
 	
 	public void refund_instock(){
 		String instockId = getPara("instockId");
