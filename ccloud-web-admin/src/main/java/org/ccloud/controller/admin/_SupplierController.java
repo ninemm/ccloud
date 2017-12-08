@@ -120,5 +120,11 @@ public class _SupplierController extends JBaseCRUDController<Supplier> {
 		}
 
 	}
+	
+	public void searchByCode() {
+		String code = getPara("code");
+		List<Supplier> list = SupplierQuery.me().findByCode(code);
+		renderAjaxResultForSuccess("success",list.size()>0?false:true);
+	}
 
 }
