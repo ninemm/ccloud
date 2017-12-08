@@ -18,11 +18,9 @@
 	$("#assignUser").select2();
 
 	var $form = $("#form");
-
-	$(function() {
-
-		jQuery.mm.initValidator('#form', validatorFields);
-		$.ajax({
+	
+    function getRole(){
+    $.ajax({
 			url:"${CPATH}/admin/group/getRole",
 			type:"post",
 			data:{"groupid":'${(group.id)!}'},
@@ -37,8 +35,10 @@
 				}
 			}
 		});
-		
-		$.ajax({
+    }
+    
+    function getUser(){
+    $.ajax({
 			url:"${CPATH}/admin/group/getUser",
 			type:"post",
 			data:{"groupid":'${(group.id)!}'},
@@ -53,6 +53,12 @@
 				}
 			}
 		});
+    }
+    
+	$(function() {
+		jQuery.mm.initValidator('#form', validatorFields);
+        getRole();
+        getUser();
 	});
 
 	var validatorFields = {

@@ -16,9 +16,13 @@
 package org.ccloud.model.query;
 
 import java.util.LinkedList;
+import java.util.List;
+
 import org.ccloud.model.UserGroupRel;
 
+import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
 /**
@@ -72,5 +76,19 @@ public class UserGroupRelQuery extends JBaseQuery {
         return DAO.doDelete(" group_id = ?", groupId);
     }
 
+	public List<UserGroupRel> findByUserId(String id) {
+		return DAO.doFind("user_id = ?", id);
+	}
+	
+	
+	public List<Record> findByUserIdAndGroupId(String id,String groupId) {
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("select id from user_group_rel where user_id = ? and group_id =?");
+		LinkedList<Object> params = new LinkedList<Object>();
+		params.add(id);
+		params.add(groupId);
+		return Db.find(stringBuilder.toString(), params.toArray());
+
+	}
 	
 }

@@ -55,7 +55,7 @@
 	}
 	var saveGruopType = "";
 	function save(){
-	if(saveGruopType == role){
+	if(saveGruopType == "role"){
 	  saveRole();
      }else{
      saveUser();
@@ -245,7 +245,7 @@
 							<@shiro.hasPermission name="/admin/group/edit,/admin/all">
 								<a href="${CPATH}/admin/group/edit?id=${bean.id}&c=${c!}&p=${p!}" class="btn btn-xs bg-olive btn-flat">编辑</a>
 								<a onclick="group('${bean.id}','${bean.group_name!}')" class="btn btn-xs btn-warning btn-flat">角色</a>
-						        <a onclick="userGroup('${bean.id}','${bean.group_name!}')" class="btn btn-xs btn-warning btn-flat">用户</a>
+						        <a onclick="userGroup('${bean.id}','${bean.group_name!}')" class="btn btn-xs btn-primary btn-flat">用户</a>
 								<a href="javascript:void(0);" onclick="del('${bean.id}')" class="btn btn-xs btn-danger btn-flat">删除</a>
 							</@shiro.hasPermission>	
 							</td>
