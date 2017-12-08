@@ -72,8 +72,9 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
-		Page<Record> page = SalesOutstockQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate);
+		Page<Record> page = SalesOutstockQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate, dataArea);
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);

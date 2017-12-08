@@ -84,7 +84,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 		return outstock.save();
 	}
 
-	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate) {
+	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate, String dataArea) {
 		String select = "select o.*, c.customer_name ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_sales_outstock` o ");
 		fromBuilder.append("left join cc_seller_customer cs on o.customer_id = cs.id ");
@@ -94,6 +94,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 		boolean needWhere = true;
 
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.instock_sn", keyword, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
 
 		if (needWhere) {
 			fromBuilder.append(" where 1 = 1");
