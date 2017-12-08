@@ -55,8 +55,7 @@ public class InventoryQuery extends JBaseQuery {
 		LinkedList<Object> params = new LinkedList<Object>();
 		appendIfNotEmptyWithLike(fromBuilder, "p.name", product_name, params, false);
 		appendIfNotEmptyWithLike(fromBuilder, "p.product_sn", product_sn, params, false);
-
-		fromBuilder.append("ORDER BY i.create_date DESC");
+		fromBuilder.append("GROUP BY p.id ORDER BY i.create_date DESC");
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
