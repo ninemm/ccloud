@@ -26,6 +26,7 @@ import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
+import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Payables;
 import org.ccloud.model.PayablesDetail;
@@ -66,7 +67,8 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
         	customerType = StringUtils.urlDecode(customerType);
             setAttr("customerType", customerType);
         }
-        Page<Payables> page = PayablesQuery.me().paginate(getPageNumber(), getPageSize(),keyword,customerType,user.getDataArea()+"%",  "create_date");
+        String deptDataArea = DataAreaUtil.getUserDeptDataArea(user.getDataArea());
+        Page<Payables> page = PayablesQuery.me().paginate(getPageNumber(), getPageSize(),keyword,customerType,deptDataArea+"%",  "create_date");
         Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);
 	}
@@ -78,7 +80,8 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
         	objId = StringUtils.urlDecode(objId);
             setAttr("objId", objId);
         }
-        Page<PayablesDetail> page = PayablesDetailQuery.me().findByObjId(getPageNumber(), getPageSize(),objId,user.getDataArea()+"%",  "create_date");
+        String deptDataArea = DataAreaUtil.getUserDeptDataArea(user.getDataArea());
+        Page<PayablesDetail> page = PayablesDetailQuery.me().findByObjId(getPageNumber(), getPageSize(),objId,deptDataArea+"%",  "create_date");
         Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);
 	}
@@ -90,7 +93,8 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
         	detailId = StringUtils.urlDecode(detailId);
             setAttr("detailId", detailId);
         }
-        Page<Payment> page = PaymentQuery.me().findByDetailId(getPageNumber(), getPageSize(),detailId,user.getDataArea()+"%", "id");
+        String deptDataArea = DataAreaUtil.getUserDeptDataArea(user.getDataArea());
+        Page<Payment> page = PaymentQuery.me().findByDetailId(getPageNumber(), getPageSize(),detailId,deptDataArea+"%", "id");
         Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);
 	}
