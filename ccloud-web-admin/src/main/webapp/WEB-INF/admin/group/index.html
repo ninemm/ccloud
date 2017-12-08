@@ -53,8 +53,17 @@
 	
 		jQuery.mm.batchAction('#form', '请选择分组记录');
 	}
+	var saveGruopType = "";
+	function save(){
+	if(saveGruopType == "role"){
+	  saveRole();
+     }else{
+     saveUser();
+     }
+	}
 	
 	function group(id,name) {
+	    saveGruopType = "role";
 		var title = name + "角色管理";
 		$("#myModalLabel").html(title);
 		$("#groupId").val(id);
@@ -107,6 +116,64 @@
 			}
 		});     
 	}
+	
+		
+	function userGroup(id,name) {
+	    saveGruopType = "user";
+		var title = name + "用户管理";
+		$("#myModalLabel").html(title);
+		$("#groupId").val(id);
+		$("#select1").empty();
+		$("#select2").empty();
+		$.ajax({
+			url:"${CPATH}/admin/group/getUserCheck",
+			type:"post",
+			data:{"groupId":id},
+			dataType:"json",
+			success:function(data) {
+				var select = data.checkList;
+				var unselect = data.uncheckList;
+				for (var i = 0; i < select.length; i++) {
+					$("#select2").append("<option value=" + select[i].id + ">" + select[i].name + "</option>");
+				}
+				for (var i = 0; i < unselect.length; i++) {
+					$("#select1").append("<option value=" + unselect[i].id + ">" + unselect[i].name + "</option>");
+				}			
+				$("#myModal").modal('show');
+			}
+		});	
+	}
+	
+	function saveUser() {
+		 var id = $("#groupId").val();
+	     var array = new Array();  //定义数组   
+	     $("#select2 option").each(function(){  //遍历所有option  
+	          var txt = $(this).val();   //获取option值   
+	          if(txt!=''){  
+	               array.push(txt);  //添加到数组中  
+	          }  
+	     })
+	     console.log(array);
+		$.ajax({
+			url:"${CPATH}/admin/group/saveUser",
+			type:"post",
+			data:{
+				"userIds":array,
+				"groupId": id
+			},
+			dataType:"json",
+			success:function(data) {
+				$('#myModal').modal('hide');
+				if (data.errorCode == 0) {
+					toastr.success(data.message, '操作成功');
+				} else {
+					toastr.error(data.message,'操作失败');
+				}
+			}
+		});     
+	}
+	
+	
 	$("input").on("keydown",function(){
 		if (event.keyCode == 13) {
 			event.keyCode = 0;
@@ -178,6 +245,7 @@
 							<@shiro.hasPermission name="/admin/group/edit,/admin/all">
 								<a href="${CPATH}/admin/group/edit?id=${bean.id}&c=${c!}&p=${p!}" class="btn btn-xs bg-olive btn-flat">编辑</a>
 								<a onclick="group('${bean.id}','${bean.group_name!}')" class="btn btn-xs btn-warning btn-flat">角色</a>
+						        <a onclick="userGroup('${bean.id}','${bean.group_name!}')" class="btn btn-xs btn-primary btn-flat">用户</a>
 								<a href="javascript:void(0);" onclick="del('${bean.id}')" class="btn btn-xs btn-danger btn-flat">删除</a>
 							</@shiro.hasPermission>	
 							</td>
@@ -225,7 +293,7 @@
 			      </div>		            
 		            <div class="modal-footer">
 		                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-		                <button type="button" class="btn btn-primary" onclick="saveRole()">提交更改</button>
+		                <button type="button" class="btn btn-primary" onclick="save()">提交更改</button>
 		            </div>
 		        </div><!-- /.modal-content -->
 		    </div><!-- /.modal-dialog -->
