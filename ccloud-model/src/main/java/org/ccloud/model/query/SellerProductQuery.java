@@ -143,8 +143,8 @@ public class SellerProductQuery extends JBaseQuery {
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}
 	
-	public SellerProduct _findByProductIdAndSellerId(String product_id, String sellerId) {
+	public List<SellerProduct> _findByProductIdAndSellerId(String product_id, String sellerId) {
 		StringBuilder fromBuilder = new StringBuilder("select * from cc_seller_product where product_id=? and seller_id=?");
-		return DAO.findFirst(fromBuilder.toString(), product_id,sellerId);
+		return DAO.find(fromBuilder.toString(), product_id,sellerId);
 	}
 }

@@ -70,9 +70,10 @@ public class PurchaseInstockDetailQuery extends JBaseQuery {
 		StringBuilder sqlBuilder = new StringBuilder(
 				" SELECT cpid.*,cp.`name` as productName,cpi.warehouse_id, cp.big_unit, cp.small_unit, cp.convert_relate,GROUP_CONCAT(distinct cgs.`name`) AS cps_name ");
 		sqlBuilder.append(" FROM cc_purchase_instock_detail cpid  ");
-		sqlBuilder.append(" LEFT JOIN cc_product_goods_specification_value cpg ON  cpid.seller_product_id = cpg.product_set_id ");
-		sqlBuilder.append(" LEFT JOIN cc_goods_specification_value cgs ON cpg.goods_specification_value_set_id = cgs.id ");
 		sqlBuilder.append(" LEFT JOIN cc_seller_product csp on csp.id=cpid.seller_product_id ");
+		sqlBuilder.append(" LEFT JOIN cc_product_goods_specification_value cpg ON  csp.product_id = cpg.product_set_id ");
+		sqlBuilder.append(" LEFT JOIN cc_goods_specification_value cgs ON cpg.goods_specification_value_set_id = cgs.id ");
+		
 		sqlBuilder.append(" LEFT JOIN cc_product cp on cp.id= csp.product_id ");
 		sqlBuilder.append(" LEFT JOIN cc_purchase_instock cpi on cpi.id=cpid.purchase_instock_id");
 		sqlBuilder.append(" where cpid.purchase_instock_id=? and cpid.data_area='"+dataArea+"' GROUP BY cpid.id ");
