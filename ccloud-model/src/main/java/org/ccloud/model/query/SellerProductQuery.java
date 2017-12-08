@@ -147,4 +147,17 @@ public class SellerProductQuery extends JBaseQuery {
 		StringBuilder fromBuilder = new StringBuilder("select * from cc_seller_product where product_id=? and seller_id=?");
 		return DAO.find(fromBuilder.toString(), product_id,sellerId);
 	}
+
+	public List<SellerProduct> findByCompositionId(String productId) {
+		StringBuilder stringBuilder = new StringBuilder("SELECT cc.*,cp.sub_product_count as productCount, cd.convert_relate FROM cc_seller_product cc ");
+		stringBuilder.append("RIGHT JOIN cc_product_composition cp ON cp.sub_seller_product_id = cc.id ");
+		stringBuilder.append("LEFT JOIN cc_product cd ON cd.id = cc.product_id ");
+		stringBuilder.append("WHERE parent_id = ? ");
+		stringBuilder.append("UNION ALL ");
+		stringBuilder.append("SELECT cc.*,1 as productCount, cd.convert_relate FROM cc_seller_product cc ");
+		stringBuilder.append("RIGHT JOIN cc_product_composition cp ON cp.seller_product_id = cc.id ");
+		stringBuilder.append("LEFT JOIN cc_product cd ON cd.id = cc.product_id ");
+		stringBuilder.append("WHERE parent_id = ? GROUP BY cp.parent_id");
+		return DAO.find(stringBuilder.toString(), productId, productId);
+	}
 }

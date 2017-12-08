@@ -303,10 +303,10 @@
 
 	function doSubmit(){
 		$("#productNum").val($(".rowNum").length - 1);
-		if (!checkStore()) {
-			toastr.error('未选择商品或库存不足!','操作失败');
-			return;
-		}
+<!-- 		if (!checkStore()) { -->
+<!-- 			toastr.error('未选择商品或库存不足!','操作失败'); -->
+<!-- 			return; -->
+<!-- 		} -->
 		if (!checkProductNumber()) {
 			toastr.error('商品购买数量不能为零!','操作失败');
 			return;			
@@ -362,7 +362,7 @@
 				</button>
 			</div>
 		</div>
-		<form action="${CPATH}/admin/productComposition/save" method="post" id="form" class="form-horizontal" >
+		<form action="${CPATH}/admin/productComposition/saveOrder" method="post" id="form" class="form-horizontal" >
 			<div class="box-body">
 				<table id="table" class="table table-bordered table-hover text-center" width="100%">
 					<thead>

@@ -41,14 +41,14 @@
 					<tbody>
 						<#if list??> 
 							<#list list as bean>
-							<if list_index == 0 >
+							<#if bean_index == 0>
 								<tr class="jp-onmouse">
 									<td>${bean.product_name!}</td>
 									<td>${bean.product_sp!}</td>
 									<td>${bean.price!}</td>
 									<td>1</td>
 								</tr>					
-							</if>
+							</#if>
 							<tr class="jp-onmouse">
 								<td>${bean.sub_product_name!}</td>
 								<td>${bean.sub_product_sp!}</td>

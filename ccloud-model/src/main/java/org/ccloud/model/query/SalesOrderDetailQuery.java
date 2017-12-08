@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.ccloud.model.SalesOrderDetail;
+import org.ccloud.model.SellerProduct;
 import org.ccloud.utils.StringUtils;
 
 import com.jfinal.kit.StrKit;
@@ -88,10 +89,12 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 			detail.setSellProductId(StringUtils.getArrayFirst(paraMap.get("sellProductId" + index)));
 
 			String productPrice = StringUtils.getArrayFirst(paraMap.get("bigPrice" + index));
-			String productAmount = StringUtils.getArrayFirst(paraMap.get("rowTotal" + index));
+//			String productAmount = StringUtils.getArrayFirst(paraMap.get("rowTotal" + index));
+			BigDecimal productAmount = new BigDecimal(detail.getProductCount()).divide(new BigDecimal(convert), 2, BigDecimal.ROUND_HALF_UP)
+					.multiply(new BigDecimal(productPrice));
 			String isGift = StringUtils.getArrayFirst(paraMap.get("isGift" + index));
 			detail.setProductPrice(new BigDecimal(productPrice));
-			detail.setProductAmount(new BigDecimal(productAmount));
+			detail.setProductAmount(productAmount);
 			detail.setIsGift(StringUtils.isNumeric(isGift)? Integer.parseInt(isGift) : 0);
 			detail.setCreateDate(date);
 			detail.setDeptId(deptId);
@@ -253,6 +256,55 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 
 	public List<SalesOrderDetail> findBySalesOrderId(String id) {
 		return DAO.doFind("order_id = ?", id);
+	}
+
+	@SuppressWarnings("unchecked")
+	public boolean insertDetailByComposition(SellerProduct product, String orderId, String sellerId, String id,
+			Date date, String deptId, String dataArea, Integer index, Integer isGift, Integer number) {
+		List<SalesOrderDetail> detailList = new ArrayList<>();
+		Integer convert = product.getInt("convert_relate");
+		Integer compositionCount = Integer.parseInt(product.getStr("productCount"));
+		Integer productCount = compositionCount * convert * number;
+		String productId = product.getProductId();
+		Map<String, Object> result = this.getWarehouseId(productId, sellerId, productCount, convert);
+		String status = result.get("status").toString();
+		List<Map<String, String>> list = (List<Map<String, String>>) result.get("countList");
+		
+		if (!status.equals("enough")) {
+			return false;
+		}
+		for (Map<String, String> map : list) {
+			SalesOrderDetail detail = new SalesOrderDetail();
+			detail.setProductCount(Integer.parseInt(map.get("productCount").toString()));
+			detail.setLeftCount(detail.getProductCount());
+			detail.setOutCount(0);
+			// 库存盘点写入库存总账未完成
+			detail.setWarehouseId(map.get("warehouse_id").toString());
+			
+			detail.setId(StrKit.getRandomUUID());
+			detail.setOrderId(orderId);
+			detail.setSellProductId(product.getId());
+
+			detail.setProductPrice(product.getPrice());
+			BigDecimal productAmount = new BigDecimal(detail.getProductCount()).divide(new BigDecimal(convert), 2, BigDecimal.ROUND_HALF_UP)
+					.multiply(product.getPrice());
+//			BigDecimal amount = new BigDecimal(product.getInt("productCount")).multiply(product.getPrice());
+			detail.setProductAmount(productAmount);
+			detail.setIsGift(isGift);
+			detail.setCreateDate(date);
+			detail.setDeptId(deptId);
+			detail.setDataArea(dataArea);	
+			detailList.add(detail);
+		}
+		int[] i = Db.batchSave(detailList, detailList.size());
+		int count = 0;
+		for (int j : i) {
+			count = count + j;
+		}
+		if (count != detailList.size()) {
+			return false;
+		}
+		return true;
 	}
 
 }

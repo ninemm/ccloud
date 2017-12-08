@@ -32,11 +32,13 @@ import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
+import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.model.ProductComposition;
 import org.ccloud.model.SellerProduct;
 import org.ccloud.model.User;
 import org.ccloud.model.query.ProductCompositionQuery;
+import org.ccloud.model.query.SalesOrderDetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SellerProductQuery;
 
@@ -62,7 +64,9 @@ public class _ProductCompositionController extends JBaseCRUDController<ProductCo
 		String keyword = getPara("k");
 		if (StrKit.notBlank(keyword)) setAttr("k", keyword);
 		
-		Page<ProductComposition> page = ProductCompositionQuery.me().paginate(getPageNumber(), getPageSize(), keyword, null);
+		String sellerId = getSessionAttr("sellerId");
+		
+		Page<ProductComposition> page = ProductCompositionQuery.me().paginate(getPageNumber(), getPageSize(), keyword, sellerId, null);
 		if (page != null) {
 			setAttr("page", page);
 		}
@@ -307,5 +311,65 @@ public class _ProductCompositionController extends JBaseCRUDController<ProductCo
 		setAttr("list", list);
 		render("product_detail.html");
 	}
+	
+	public synchronized void saveOrder() {
+
+		Map<String, String[]> paraMap = getParaMap();
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String sellerId = getSessionAttr("sellerId");
+		String sellerCode = getSessionAttr("sellerCode");
+
+		if (this.saveDetail(paraMap, user, sellerId, sellerCode)) {
+			renderAjaxResultForSuccess("保存成功");
+		} else {
+			renderAjaxResultForError("库存不足或仓库中未找到对应商品");
+		}
+	}
+	
+	private boolean saveDetail(final Map<String, String[]> paraMap, final User user, 
+			final String sellerId, final String sellerCode) {
+        boolean isSave = Db.tx(new IAtom() {
+            @Override
+            public boolean run() throws SQLException {
+        		String productNumStr = StringUtils.getArrayFirst(paraMap.get("productNum"));
+        		Integer productNum = Integer.valueOf(productNumStr);
+        		Integer count = 0;
+        		Integer index = 0;
+        		
+        		String orderId = StrKit.getRandomUUID();
+        		Date date = new Date();
+        		String OrderSO = SalesOrderQuery.me().getNewSn(sellerId);
+
+        		// 销售订单：SO + 100000(机构编号或企业编号6位) + A(客户类型) + 171108(时间) + 100001(流水号)
+        		String orderSn = "SO" + sellerCode + StringUtils.getArrayFirst(paraMap.get("customerTypeCode"))
+        				+ DateUtils.format("yyMMdd", date) + OrderSO;
+
+        		if(!SalesOrderQuery.me().insertOrderByComposition(paraMap, orderId, orderSn, sellerId, user.getId(), date, user.getDepartmentId(),
+        				user.getDataArea())) {
+        			return false;
+        		}
+
+        		while (productNum > count) {
+        			index++;
+        			String productId = StringUtils.getArrayFirst(paraMap.get("productId" + index));
+        			String isGift = StringUtils.getArrayFirst(paraMap.get("isGift" + index));
+        			String number = StringUtils.getArrayFirst(paraMap.get("bigNum" + index));
+        			Integer gift = StringUtils.isNumeric(isGift)? Integer.parseInt(isGift) : 0;
+        			if (StrKit.notBlank(productId)) {
+	        			List<SellerProduct> list = SellerProductQuery.me().findByCompositionId(productId);
+	        			for (SellerProduct sellerProduct : list) {
+	        				if(!SalesOrderDetailQuery.me().insertDetailByComposition(sellerProduct, orderId, sellerId, user.getId(), date,
+	        						user.getDepartmentId(), user.getDataArea(), index, gift, Integer.parseInt(number))) {
+	        					return false;
+	        				}
+						}
+	        			count++;
+        			}
+        		}
+            	return true;
+            }
+        });
+        return isSave;
+	}	
 	
 }
