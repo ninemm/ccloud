@@ -132,6 +132,8 @@ $(function() {
 			success : function(data) { 
 				if (data.errorCode == 0) {
 					toastr.success(data.message);
+					removeItemBykey("productList");
+					removeItemBykey("customerInfo");
 					window.location.href = "${CPATH}/product/myOrder"
 				} else {
 					toastr.error(data.message);

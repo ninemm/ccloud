@@ -49,9 +49,8 @@ public class ProductController extends BaseFrontController {
 
 	public void productList() {
 
-		String typeId = getPara("typeId");
 		String keyword = getPara("keyword");
-		List<Record> productList = SellerProductQuery.me().findProductListForApp(sellerId, typeId, keyword);
+		List<Record> productList = SellerProductQuery.me().findProductListForApp(sellerId, keyword);
 		renderJson(productList);
 	}
 
