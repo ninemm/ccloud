@@ -104,7 +104,7 @@ public class _GroupController extends JBaseCRUDController<Group> {
 
     }
 
-    public void saveGroupAndGroupRoleRel() {
+    public Boolean saveGroupAndGroupRoleRel() {
         boolean isSave = Db.tx(new IAtom() {
             @Override
             public boolean run() throws SQLException {
@@ -134,18 +134,16 @@ public class _GroupController extends JBaseCRUDController<Group> {
                     groupRoleRel.setId(StrKit.getRandomUUID());
 
                 }
-
-                Db.batchSave(groupRoleRelList, groupRoleRelList.size());
+                try {
+                    Db.batchSave(groupRoleRelList, groupRoleRelList.size());
+				} catch (Exception e) {
+					e.printStackTrace();
+					return false;
+				}
                 return true;
             }
         });
-
-        if (isSave) {
-        	MenuManager.clearAllList();
-        	renderAjaxResultForSuccess();
-        } else { 
-        	renderAjaxResultForError();
-        }
+		return isSave;
     }
 
     @Override
@@ -240,7 +238,7 @@ public class _GroupController extends JBaseCRUDController<Group> {
 	}
 	
 	
-    public void saveGroupAndUserGroupRel() {
+    public Boolean saveGroupAndUserGroupRel() {
         boolean isSave = Db.tx(new IAtom() {
             @Override
             public boolean run() throws SQLException {
@@ -269,18 +267,22 @@ public class _GroupController extends JBaseCRUDController<Group> {
                 	userGroupRel.setId(StrKit.getRandomUUID());
                 	userGroupRelList.add(userGroupRel);
                 }
-
-                Db.batchSave(userGroupRelList, userGroupRelList.size());
+                try {
+                    Db.batchSave(userGroupRelList, userGroupRelList.size());
+				} catch (Exception e) {
+					e.printStackTrace();
+					return false;
+				}
                 return true;
             }
         });
-
-        if (isSave) {
-        	MenuManager.clearAllList();
-        	renderAjaxResultForSuccess();
-        } else { 
-        	renderAjaxResultForError();
-        }
+//        if (isSave) {
+//        	MenuManager.clearAllList();
+//        	renderAjaxResultForSuccess();
+//        } else { 
+//        	renderAjaxResultForError();
+//        }
+		return isSave;
     }
 	
 	
@@ -346,6 +348,29 @@ public class _GroupController extends JBaseCRUDController<Group> {
 		MenuManager.clearListByKey(id);
 		renderAjaxResultForSuccess("保存成功");
 	}
+	
+	
+    public void saveUserGroupRelAndGroupRoleRel() {
+    	Boolean roleBoolean = false;
+    	Boolean userBoolean = false;
+        String roleList = getPara("roleList");
+        String userList = getPara("uList");
+        if (!(roleList == null)) {
+			 roleBoolean = this.saveGroupAndGroupRoleRel();
+        }else {
+			roleBoolean = true;
+		} if (!(userList == null)) {
+			 userBoolean = this.saveGroupAndUserGroupRel();
+		}else {
+			userBoolean = true;
+		}
+        if (!roleBoolean == false && !userBoolean == false) {
+        	MenuManager.clearAllList();
+        	renderAjaxResultForSuccess();
+		}else {
+            renderAjaxResultForError();
+		}      
+    }
 	
 }
 

@@ -69,41 +69,16 @@
 			}
 		}
 	};
-	
-	function saveGroupAndGroupRoleRel(){
-	    var list = $("#assignRole").select2("val");
-	    var ids = "";
+
+	function doSubmit(){
+		var list = $("#assignRole").select2("val");
+		var ids = "";
 		if (list != null && list.length > 0) {
 			ids = list.toString();
 		}
 		var roleList = $("#assignRole").select2("val");
-		$form.ajaxSubmit({
-			beforeSubmit: function() {
-				var validate = $form.data('bootstrapValidator');
-				validate.validate();
-				return validate.isValid();
-			},
-			url:"${CPATH}/admin/group/saveGroupAndGroupRoleRel",
-			type : "post",
-			data : { "roleList":ids },
-			dataType : "json",
-			success : function(data) {
-				if(data.errorCode == 0) {
-					toastr.success(data.message, '操作成功');
-				} else {
-					toastr.error(data.message,'操作失败');
-				}
-			},
-			error : function() {
-				alert("信息提交错误");
-			}
-	    });
-	}
-	
-	
-	
-	function saveGroupAndUserGroupRel(){
-	   var userList = $("#assignUser").select2("val");
+		
+		var userList = $("#assignUser").select2("val");
 		var userIds = "";
 		if (userList != null && userList.length > 0) {
 			userIds = userList.toString();
@@ -115,9 +90,9 @@
 				validate.validate();
 				return validate.isValid();
 			},
-			url:"${CPATH}/admin/group/saveGroupAndUserGroupRel",
+			url:"${CPATH}/admin/group/saveUserGroupRelAndGroupRoleRel",
 			type : "post",
-			data : { "uList":userIds },
+			data : { "roleList":ids,"uList":userIds},
 			dataType : "json",
 			success : function(data) {
 				if(data.errorCode == 0) {
@@ -130,17 +105,6 @@
 				alert("信息提交错误");
 			}
 	    });
-	}
-	
-
-	function doSubmit(){
-		var list = $("#assignRole").select2("val");
-	    var userList = $("#assignUser").select2("val");
-		if(userList != null && userList.length > 0){
-		saveGroupAndUserGroupRel();
-		}else if (list != null && list.length > 0) {
-		saveGroupAndGroupRoleRel();
-		}
 	}
 </#macro>
 
