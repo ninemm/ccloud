@@ -18,11 +18,8 @@ package org.ccloud.controller.admin;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -92,7 +89,7 @@ public class _UserController extends JBaseCRUDController<User> {
 		String stationList = getPara("stationList");
 		String stationName = getPara("stationName");
 		String groupList = getPara("groupList");
-		String groupName = getPara("groupName");
+//		String groupName = getPara("groupName");
 		String deptName = getPara("parent_name");
 		user.setDepartmentName(deptName);
 		user.setStationId(stationList);
