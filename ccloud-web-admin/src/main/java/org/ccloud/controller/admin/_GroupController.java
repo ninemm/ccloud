@@ -31,9 +31,11 @@ import org.ccloud.menu.MenuManager;
 import org.ccloud.model.Group;
 import org.ccloud.model.GroupRoleRel;
 import org.ccloud.model.User;
+import org.ccloud.model.UserGroupRel;
 import org.ccloud.model.query.GroupQuery;
 import org.ccloud.model.query.GroupRoleRelQuery;
 import org.ccloud.model.query.RoleQuery;
+import org.ccloud.model.query.UserGroupRelQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
@@ -232,6 +234,114 @@ public class _GroupController extends JBaseCRUDController<Group> {
 			saveList.add(groupRoleRel);
 		}
 		GroupRoleRelQuery.me().deleteByGroupId(id);
+		Db.batchSave(saveList, saveList.size());
+		MenuManager.clearListByKey(id);
+		renderAjaxResultForSuccess("保存成功");
+	}
+	
+	
+    public void saveGroupAndUserGroupRel() {
+        boolean isSave = Db.tx(new IAtom() {
+            @Override
+            public boolean run() throws SQLException {
+                Group group = getModel(Group.class);
+                User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+            	group.setDeptId(user.getDepartmentId());
+            	group.setDataArea(DataAreaUtil.getUserDeptDataArea(user.getDataArea()));
+
+                String userList = getPara("uList");
+                String[] userId = userList.split(",");
+
+                if (!group.saveOrUpdate())
+                    return false;
+
+                String groupId = group.getId();
+
+                UserGroupRelQuery.me().deleteByGroupId(groupId);
+
+                List<UserGroupRel> userGroupRelList = new ArrayList<>();
+
+                for (int i = 0; i < userId.length; i++) {
+                	UserGroupRel userGroupRel = getModel(UserGroupRel.class);
+
+                	userGroupRel.setGroupId(groupId);
+                	userGroupRel.setUserId(userId[i]);
+                	userGroupRel.setId(StrKit.getRandomUUID());
+                	userGroupRelList.add(userGroupRel);
+                }
+
+                Db.batchSave(userGroupRelList, userGroupRelList.size());
+                return true;
+            }
+        });
+
+        if (isSave) {
+        	MenuManager.clearAllList();
+        	renderAjaxResultForSuccess();
+        } else { 
+        	renderAjaxResultForError();
+        }
+    }
+	
+	
+	public void getUser() {
+        String id = getPara("groupid");
+        String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+        List<Record> user = UserQuery.me().findBydeptAndGroup(dataArea, id);
+        List<Map<String, Object>> list = new ArrayList<>();
+
+        for (Record record : user) {
+            Map<String, Object> map = new HashMap<>();
+
+            map.put("id", record.getStr("id"));
+            map.put("name", record.getStr("realname"));
+
+            if (record.getStr("user_id") == null) map.put("isvalid", 0);
+            else map.put("isvalid", 1);
+
+            list.add(map);
+        }
+
+        renderJson(list);
+
+    }
+	
+	public void getUserCheck() {
+		String id = getPara("groupId");
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		List<Record> list = UserQuery.me().findByUserCheck(id, dataArea);
+		List<Map<String, Object>> checkList = new ArrayList<>();
+		List<Map<String, Object>> uncheckList = new ArrayList<>();
+		for (Record record : list) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("id", record.getStr("id"));
+			map.put("name", record.getStr("realname"));
+			if (record.getStr("check_status") == null) {
+				uncheckList.add(map);
+			} else {
+				checkList.add(map);
+			}
+		}
+		Map<String, List<Map<String, Object>>> data = new HashMap<>();
+		data.put("checkList", checkList);
+		data.put("uncheckList", uncheckList);
+		renderJson(data);
+	}
+	
+	
+	@Before(Tx.class)
+	public void saveUser() {
+		String id = getPara("groupId");
+		String[] ids = getParaValues("userIds[]");
+		List<UserGroupRel> saveList = new ArrayList<>();
+		for (int i = 0; i < ids.length; i++) {
+			UserGroupRel userGroupRel = new UserGroupRel();
+			userGroupRel.setId(StrKit.getRandomUUID());
+			userGroupRel.setGroupId(id);
+			userGroupRel.setUserId(ids[i]);
+			saveList.add(userGroupRel);
+		}
+		UserGroupRelQuery.me().deleteByGroupId(id);
 		Db.batchSave(saveList, saveList.size());
 		MenuManager.clearListByKey(id);
 		renderAjaxResultForSuccess("保存成功");
