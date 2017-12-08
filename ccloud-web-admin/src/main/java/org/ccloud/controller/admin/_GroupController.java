@@ -104,7 +104,7 @@ public class _GroupController extends JBaseCRUDController<Group> {
 
     }
 
-    public Boolean saveGroupAndGroupRoleRel() {
+    public void saveGroupAndGroupRoleRel() {
         boolean isSave = Db.tx(new IAtom() {
             @Override
             public boolean run() throws SQLException {
@@ -134,16 +134,33 @@ public class _GroupController extends JBaseCRUDController<Group> {
                     groupRoleRel.setId(StrKit.getRandomUUID());
 
                 }
-                try {
+                String userList = getPara("uList");
+                String[] userId = userList.split(",");
+
+                if (!group.saveOrUpdate())
+                    return false;
+                UserGroupRelQuery.me().deleteByGroupId(groupId);
+                List<UserGroupRel> userGroupRelList = new ArrayList<>();
+
+                for (int i = 0; i < userId.length; i++) {
+                	UserGroupRel userGroupRel = getModel(UserGroupRel.class);
+
+                	userGroupRel.setGroupId(groupId);
+                	userGroupRel.setUserId(userId[i]);
+                	userGroupRel.setId(StrKit.getRandomUUID());
+                	userGroupRelList.add(userGroupRel);
+                }
+                    Db.batchSave(userGroupRelList, userGroupRelList.size());
                     Db.batchSave(groupRoleRelList, groupRoleRelList.size());
-				} catch (Exception e) {
-					e.printStackTrace();
-					return false;
-				}
                 return true;
             }
         });
-		return isSave;
+        if (isSave) {
+        	MenuManager.clearAllList();
+        	renderAjaxResultForSuccess();
+        } else { 
+        	renderAjaxResultForError();
+        }
     }
 
     @Override
@@ -348,29 +365,5 @@ public class _GroupController extends JBaseCRUDController<Group> {
 		MenuManager.clearListByKey(id);
 		renderAjaxResultForSuccess("保存成功");
 	}
-	
-	
-    public void saveUserGroupRelAndGroupRoleRel() {
-    	Boolean roleBoolean = false;
-    	Boolean userBoolean = false;
-        String roleList = getPara("roleList");
-        String userList = getPara("uList");
-        if (!(roleList == null)) {
-			 roleBoolean = this.saveGroupAndGroupRoleRel();
-        }else {
-			roleBoolean = true;
-		} if (!(userList == null)) {
-			 userBoolean = this.saveGroupAndUserGroupRel();
-		}else {
-			userBoolean = true;
-		}
-        if (!roleBoolean == false && !userBoolean == false) {
-        	MenuManager.clearAllList();
-        	renderAjaxResultForSuccess();
-		}else {
-            renderAjaxResultForError();
-		}      
-    }
-	
 }
 
