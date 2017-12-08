@@ -16,6 +16,7 @@
 package org.ccloud.controller.admin;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -132,6 +133,8 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 		String purchaseInstockId = StringUtils.getArrayFirst(paraMap.get("purchaseInstockId"));
 		String orderId = StrKit.getRandomUUID();
 		Date date = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+		String str = sdf.format(date);
 		PurchaseInstock purchaseInstock=PurchaseInstockQuery.me().findById(purchaseInstockId);
 		//采购退货单： PR + 100000(机构编号或企业编号6位) + 20171108(时间) + 100001(流水号)
 		List<PurchaseRefundOutstock> list =PurchaseRefundOutstockQuery.me().findByUser(user.getId(),user.getDataArea());
@@ -142,7 +145,7 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 		for(int m=0;m<(6-countt);m++){
 			j= "0"+j;
 		}
-		String orderSn = "PR" + user.getDepartmentId().substring(0, 6) + DateUtils.format("yyMMdd", date) + j;
+		String orderSn = "PR" + user.getDepartmentId().substring(0, 6) +str.substring(0, 8) + j;
 
 		purchaseRefundOutstock.set("id", orderId);
 		purchaseRefundOutstock.set("outstock_sn", orderSn);
