@@ -51,7 +51,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 
 	public Record findMoreById(final String id) {
-		StringBuilder fromBuilder = new StringBuilder(" select o.*,c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, u.realname, u.mobile ");
+		StringBuilder fromBuilder = new StringBuilder(" select o.*,c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as typeCode, u.realname, u.mobile ");
 		fromBuilder.append(" from `cc_sales_order` o ");
 		fromBuilder.append(" left join cc_seller_customer cc ON o.customer_id = cc.id ");
 		fromBuilder.append(" left join cc_customer c on cc.customer_id = c.id ");
@@ -170,7 +170,34 @@ public class SalesOrderQuery extends JBaseQuery {
 		salesOrder.setDataArea(dataArea);
 		return salesOrder.save();
 	}
-
+	
+	public boolean insertForApp(Map<String, String[]> paraMap, String orderId, String orderSn, String sellerId, String userId,
+			Date date, String deptId, String dataArea) {
+		SalesOrder salesOrder = new SalesOrder();
+		salesOrder.setId(orderId);
+		salesOrder.setOrderSn(orderSn);
+		salesOrder.setSellerId(sellerId);		
+		salesOrder.setBizUserId(userId);
+		salesOrder.setCustomerId(StringUtils.getArrayFirst(paraMap.get("customerId")));
+		salesOrder.setCustomerTypeId(StringUtils.getArrayFirst(paraMap.get("customerType")));
+		salesOrder.setContact(StringUtils.getArrayFirst(paraMap.get("contact")));
+		salesOrder.setMobile(StringUtils.getArrayFirst(paraMap.get("mobile")));
+		salesOrder.setAddress(StringUtils.getArrayFirst(paraMap.get("address")));
+		salesOrder.setStatus(0);// 待审核
+		String total = StringUtils.getArrayFirst(paraMap.get("total"));
+		String type = StringUtils.getArrayFirst(paraMap.get("receiveType"));
+		salesOrder.setTotalAmount(new BigDecimal(total));
+		salesOrder.setReceiveType(StringUtils.isNumeric(type)? Integer.parseInt(type) : 0);
+		salesOrder.setDeliveryAddress(StringUtils.getArrayFirst(paraMap.get("deliveryAddress")));
+		Date deliveryDate = DateUtils.strToDate(StringUtils.getArrayFirst(paraMap.get("deliveryDate")), DateUtils.DEFAULT_NORMAL_FORMATTER);
+		salesOrder.setDeliveryDate(deliveryDate);
+		salesOrder.setRemark(StringUtils.getArrayFirst(paraMap.get("remark")));
+		salesOrder.setCreateDate(date);
+		salesOrder.setDeptId(deptId);
+		salesOrder.setDataArea(dataArea);
+		return salesOrder.save();
+	}
+	
 	public int updateConfirm(String orderId, int status, String userId, Date date) {
 
 		return Db.update(

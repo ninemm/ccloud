@@ -116,9 +116,13 @@ public class Consts {
 	public static final String BIZ_TYPE_TRANSFER_OUTSTOCK = "100207";//调拨出库
 	public static final String BIZ_TYPE_TRANSFER_PLUS_INSTOCK = "100208";//盘盈入库
 	public static final String BIZ_TYPE_TRANSFER_REDUCE_OUTSTOCK = "100209";//盘亏出库
+	public static final String BIZ_TYPE_SALES_ORDER = "100210";//商品销售
 	
 	public static final int INVENTORY_TYPE_IN = 0;//库存总账入库
 	public static final int INVENTORY_TYPE_OUT = 1;//库存总账出库
 	
 	public static final String SELLER_OPTION_STORE_SWITCH = "store_switch"; //经销商设置尾缀
+	
+	public static final String RECEIVABLES_OBJECT_TYPE_CUSTOMER = "customer"; //应收账款客户类型
+	public static final String RECEIVABLES_OBJECT_TYPE_SUPPLIER = "supplier"; //应收账款供应商类型
 }
