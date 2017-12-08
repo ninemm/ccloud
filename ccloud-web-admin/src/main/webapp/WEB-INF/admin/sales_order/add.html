@@ -30,6 +30,7 @@
 		initCustomer();
 	});
 	
+	var discount = 10;
 	var $form = $("#form");
 	var productInfoMap = ${productInfoMap!}
 	var productOptionList = ${productOptionList!}
@@ -274,7 +275,7 @@
 			var bigNum = $curTr.find("#bigNum").val();
 			var smallPrice = $curTr.find("#smallPrice").val();
 			var smallNum = $curTr.find("#smallNum").val();
-			rowTotal = Number(bigPrice) * Number(bigNum) + Number(smallPrice) * Number(smallNum);
+			rowTotal = Number(bigPrice) * Number(bigNum) + Number(smallPrice) * Number(smallNum) * Number(discount);
 			rowTotal.toFixed(2);
 		}
 		$curTr.find(".rowTotal").text(rowTotal);
@@ -506,6 +507,12 @@
 							</select>
 						</div>
 					</div>
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">折扣:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<input type="text" id="discount" value="无" readonly="readonly" class="form-control">
+						</div>
+					</div>					
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">*配送地址:</label>
 						<div class="input-group col-md-4 col-sm-10">

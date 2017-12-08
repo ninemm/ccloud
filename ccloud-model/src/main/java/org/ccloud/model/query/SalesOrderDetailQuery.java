@@ -124,8 +124,9 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 			return result;
 		}
 		Record record = list.get(0);
-		Integer defaultCount = record.getInt("balance_count") * convert;
-		if (!isCheckStore || (defaultCount >= productCount)) {
+		BigDecimal defaultCount = record.getBigDecimal("balance_count").multiply(new BigDecimal(convert));
+		if (!isCheckStore || defaultCount.compareTo(new BigDecimal(productCount)) == 1 
+				|| defaultCount.compareTo(new BigDecimal(productCount)) == 0) {
 			Map<String, String> map = new HashMap<>();
 			map.put("warehouse_id", record.getStr("warehouse_id"));
 			map.put("productCount", productCount.toString());
@@ -134,15 +135,15 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 			result.put("countList", countList);
 			return result;
 		}
-		if (defaultCount > 0) {
+		if (defaultCount.compareTo(new BigDecimal(0)) == 1) {
 			Map<String, String> map = new HashMap<>();
 			map.put("warehouse_id", record.getStr("warehouse_id"));
 			map.put("productCount", productCount.toString());
 			countList.add(map);
 		}
 		list.remove(0);
-		Integer count = this.findMoreWareHouse(list, countList, productCount - defaultCount, convert);
-		if (count > 0) {
+		BigDecimal count = this.findMoreWareHouse(list, countList, new BigDecimal(productCount).subtract(defaultCount), convert);
+		if (count.compareTo(new BigDecimal(0)) == 1) {
 			result.put("status", "notEnough");
 		} else {
 			result.put("status", "enough");
@@ -151,20 +152,21 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		return result;
 	}
 	
-	private Integer findMoreWareHouse(List<Record> records, List<Map<String, String>> countList, Integer productCount, Integer convert) {
-		Integer count = productCount;
+	private BigDecimal findMoreWareHouse(List<Record> records, List<Map<String, String>> countList, BigDecimal productCount, Integer convert) {
+		BigDecimal count = productCount;
 		for (Record record : records) {
-			Integer store = record.getInt("balance_count") * convert;
-			if (store >= count) {
+			BigDecimal store = record.getBigDecimal("balance_count").multiply(new BigDecimal(convert));
+			if (store.compareTo(count) == 1 
+					|| store.compareTo(count) == 0) {
 				Map<String, String> map = new HashMap<>();
 				map.put("warehouse_id", record.getStr("warehouse_id"));
 				map.put("productCount", productCount.toString());
 				countList.add(map);
-				count = 0;
+				count = new BigDecimal(0);
 				break;
 			} else {
-				count = count - store;
-				if (store > 0) {
+				count = count.subtract(store);
+				if (store.compareTo(new BigDecimal(0)) == 1) {
 					Map<String, String> map = new HashMap<>();
 					map.put("warehouse_id", record.getStr("warehouse_id"));
 					map.put("produtCount", store.toString());
