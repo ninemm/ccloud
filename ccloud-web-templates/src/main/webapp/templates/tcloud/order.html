@@ -48,7 +48,7 @@ $(function() {
 							value : el.id
 						})
 					});
-	
+
 					var $customerTypeName = $("#customerTypeName");
 					$customerTypeName.select({
 				         title: "客户类型",
@@ -134,7 +134,7 @@ $(function() {
 					toastr.success(data.message);
 					removeItemBykey("productList");
 					removeItemBykey("customerInfo");
-					window.location.href = "${CPATH}/product/myOrder"
+					window.location.href = "${CPATH}/order/myOrder"
 				} else {
 					toastr.error(data.message);
 				}
