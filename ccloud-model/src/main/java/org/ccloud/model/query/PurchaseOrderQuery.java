@@ -145,11 +145,11 @@ public class PurchaseOrderQuery extends JBaseQuery {
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 	
-	public PurchaseOrder findByPurchaseOrderDetailId(String purchaseOrderDetailId){
+	/*public PurchaseOrder findByPurchaseOrderDetailId(String purchaseOrderDetailId){
 		String sql = "select cpo.* from cc_purchase_order cpo "
 				+ " LEFT JOIN cc_purchase_order_detail cpod on cpo.id=cpod.purchase_order_id "
 				+ " where cpod.id = ?";
 		return DAO.findFirst(sql, purchaseOrderDetailId);
-	}
+	}*/
 
 }

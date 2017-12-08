@@ -234,14 +234,12 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		purchaseInstock.set("dept_id", user.getDepartmentId());
 		purchaseInstock.set("data_area", user.getDataArea());
 		purchaseInstock.set("create_date", date);
-		purchaseInstock.save();
 		
 		PurchaseOrder order = PurchaseOrderQuery.me().findById(purchaseOrderId);
 		order.set("total_amount", StringUtils.getArrayFirst(paraMap.get("total")));
 		order.set("payment_type", StringUtils.getArrayFirst(paraMap.get("paymentType")));
 		order.set("status", 1000);
 		order.set("modify_date", new Date());
-		order.update();
 		String productNumStr = StringUtils.getArrayFirst(paraMap.get("productNum"));
 		Integer productNum = Integer.valueOf(productNumStr);
 		Integer count = 0;
@@ -249,7 +247,13 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 
 		while (productNum > count) {
 			index++;
+			String convert = StringUtils.getArrayFirst(paraMap.get("convert" + index));
+			String bigNum = StringUtils.getArrayFirst(paraMap.get("bigNum" + index));
+			String smallNum = StringUtils.getArrayFirst(paraMap.get("smallNum" + index));
+			Integer productCount = Integer.valueOf(bigNum) * Integer.valueOf(convert) + Integer.valueOf(smallNum);
 			String productId = StringUtils.getArrayFirst(paraMap.get("productId" + index));
+			String purchaseOrserDetailId = StringUtils.getArrayFirst(paraMap.get("purchaseOrderDetailId" + index));
+			PurchaseOrderDetail purchaseOrderDetail = PurchaseOrderDetailQuery.me().findById(purchaseOrserDetailId);
 			Product product = ProductQuery.me().findById(productId);
 			SellerProduct sellerProduct = SellerProductQuery.me()._findByProductIdAndSellerId(productId,seller.getId());
 			if(sellerProduct==null){
@@ -277,13 +281,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 				sellerProduct.set("create_date", date);
 				sellerProduct.save();
 			}
-			String purchaseOrserDetailId = StringUtils.getArrayFirst(paraMap.get("purchaseOrderDetailId" + index));
-			PurchaseOrderDetail purchaseOrderDetail = PurchaseOrderDetailQuery.me().findById(purchaseOrserDetailId);
 			if (StrKit.notBlank(productId)) {
-				String convert = StringUtils.getArrayFirst(paraMap.get("convert" + index));
-				String bigNum = StringUtils.getArrayFirst(paraMap.get("bigNum" + index));
-				String smallNum = StringUtils.getArrayFirst(paraMap.get("smallNum" + index));
-				Integer productCount = Integer.valueOf(bigNum) * Integer.valueOf(convert) + Integer.valueOf(smallNum);
 				purchaseOrderDetail.set("product_count", productCount);
 				purchaseOrderDetail.set("product_amount", StringUtils.getArrayFirst(paraMap.get("rowTotal" + index)));
 				purchaseOrderDetail.update();
@@ -306,6 +304,8 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 			}
 
 		}
+		order.update();
+		purchaseInstock.save();
 		purchaseOrderJoinInstock.set("id", StrKit.getRandomUUID());
 		purchaseOrderJoinInstock.set("purchase_order_id", StringUtils.getArrayFirst(paraMap.get("purchaseOrderId")));
 		purchaseOrderJoinInstock.set("purchase_instock_id", purchaseInstockId);

@@ -33,6 +33,7 @@ import org.ccloud.model.InventoryDetail;
 import org.ccloud.model.PurchaseInstock;
 import org.ccloud.model.PurchaseInstockDetail;
 import org.ccloud.model.PurchaseOrder;
+import org.ccloud.model.PurchaseOrderDetail;
 import org.ccloud.model.PurchaseRefundOutstock;
 import org.ccloud.model.Seller;
 import org.ccloud.model.SellerProduct;
@@ -166,7 +167,6 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 		purchaseInstock.set("dept_id", user.getDepartmentId());
 		purchaseInstock.set("data_area", user.getDataArea());
 		purchaseInstock.set("modify_date", new Date());
-		purchaseInstock.update();
 		String productNumStr = StringUtils.getArrayFirst(paraMap.get("productNum"));
 		Integer productNum = Integer.valueOf(productNumStr);
 		Integer count = 0;
@@ -181,13 +181,18 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 			}
 			PurchaseInstockDetail purchaseInstockDetail = PurchaseInstockDetailQuery.me().findById(purchaseInstockDetailId);
 			String purchaseOrderDetailId = StringUtils.getArrayFirst(paraMap.get("purchaseOrderDetailId"+index));
-			PurchaseOrder purchaseOrder = PurchaseOrderQuery.me().findByPurchaseOrderDetailId(purchaseOrderDetailId);
+			PurchaseOrderDetail purchaseOrderDetail = PurchaseOrderDetailQuery.me().findById(purchaseOrderDetailId);
+			PurchaseOrder purchaseOrder = PurchaseOrderQuery.me().findById(purchaseOrderDetail.getId());
 			String productId = StringUtils.getArrayFirst(paraMap.get("purchaseInstockDetailId" + index));
 			if (StrKit.notBlank(productId)) {
 				String convert = StringUtils.getArrayFirst(paraMap.get("convert" + index));
 				String bigNum = StringUtils.getArrayFirst(paraMap.get("bigNum" + index));
 				String smallNum = StringUtils.getArrayFirst(paraMap.get("smallNum" + index));
 				Integer productCount = Integer.valueOf(bigNum) * Integer.valueOf(convert) + Integer.valueOf(smallNum);
+				if(purchaseOrderDetail.getProductCount()<productCount){
+					renderAjaxResultForError("入库的货物数量不可大于原订单的货物数量，请重新输入！");
+					return;
+				}
 				purchaseInstockDetail.set("product_count", productCount);
 				purchaseInstockDetail.set("product_amount", StringUtils.getArrayFirst(paraMap.get("rowTotal" + index)));
 				purchaseInstockDetail.set("modify_date", new Date());
@@ -200,6 +205,7 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 		for(PurchaseInstockDetail d: details){
 			d.delete();
 		}
+		purchaseInstock.update();
 		
 		//对库存总账进行修改
 		boolean flang = false;
