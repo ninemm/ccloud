@@ -32,6 +32,7 @@ import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Inventory;
 import org.ccloud.model.InventoryDetail;
 import org.ccloud.model.PurchaseInstock;
+import org.ccloud.model.PurchaseInstockDetail;
 import org.ccloud.model.PurchaseRefundOutstock;
 import org.ccloud.model.PurchaseRefundOutstockDetail;
 import org.ccloud.model.SellerProduct;
@@ -159,7 +160,6 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 		purchaseRefundOutstock.set("create_date", date);
 		purchaseRefundOutstock.set("dept_id", user.getDepartmentId());
 		purchaseRefundOutstock.set("data_area", user.getDataArea());
-		purchaseRefundOutstock.save();
 		String productNumStr = StringUtils.getArrayFirst(paraMap.get("productNum"));
 		Integer productNum = Integer.valueOf(productNumStr);
 		Integer count = 0;
@@ -167,8 +167,9 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 
 		while (productNum > count) {
 			index++;
-			String productId = StringUtils.getArrayFirst(paraMap.get("sellerProductId" + index));
-			if (StrKit.notBlank(productId)) {
+			String purchaseInstockDetailId = StringUtils.getArrayFirst(paraMap.get("purchaseInstockDetailId" + index));
+			PurchaseInstockDetail purchaseInstockDetail = PurchaseInstockDetailQuery.me().findById(purchaseInstockDetailId);
+			if (StrKit.notBlank(purchaseInstockDetailId)) {
 				purchaseRefundOutstockDetail.set("id", StrKit.getRandomUUID());
 				purchaseRefundOutstockDetail.set("purchase_refund_outstock_id", orderId);
 				purchaseRefundOutstockDetail.set("seller_product_id", StringUtils.getArrayFirst(paraMap.get("sellerProductId" + index)));
@@ -178,7 +179,12 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 				String smallNum = StringUtils.getArrayFirst(paraMap.get("smallNum" + index));
 
 				Integer productCount = Integer.valueOf(bigNum) * Integer.valueOf(convert) + Integer.valueOf(smallNum);
-
+				
+				if(purchaseInstockDetail.getProductCount()<productCount){
+					renderAjaxResultForError("出库的货物数量不可大于原订单的入库货物数量，请重新输入！");
+					return;
+				}
+				
 				purchaseRefundOutstockDetail.set("product_count", productCount);
 				purchaseRefundOutstockDetail.set("product_price", StringUtils.getArrayFirst(paraMap.get("bigPrice" + index)));
 
@@ -197,6 +203,7 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 			}
 
 		}
+		purchaseRefundOutstock.save();
 		purchaseInstock.set("status", 1000);
 		purchaseInstock.update();
 		renderAjaxResultForSuccess("OK");
