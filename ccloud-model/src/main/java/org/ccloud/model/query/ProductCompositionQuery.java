@@ -20,7 +20,9 @@ import java.util.List;
 
 import org.ccloud.model.ProductComposition;
 
+import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
 /**
@@ -44,7 +46,7 @@ public class ProductCompositionQuery extends JBaseQuery {
 		});
 	}
 
-	public Page<ProductComposition> paginate(int pageNumber, int pageSize, String keyword, String orderby) {
+	public Page<ProductComposition> paginate(int pageNumber, int pageSize, String keyword, String sellerId, String orderby) {
 		String select = "SELECT cp.name,cp.price,cp.id,cp.seller_product_id,cs.custom_name,t1.valueName,cs.product_id,count(cp.sub_seller_product_id) as type_count,cp.parent_id ";
 		StringBuilder fromBuilder = new StringBuilder("FROM cc_product_composition cp ");
 
@@ -52,7 +54,8 @@ public class ProductCompositionQuery extends JBaseQuery {
 		fromBuilder.append("LEFT JOIN cc_seller_product cs ON cs.id = cp.seller_product_id ");
 		fromBuilder.append("LEFT JOIN (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
 		fromBuilder.append("RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = cs.product_id ");
-		appendIfNotEmptyWithLike(fromBuilder, "cs.custom_name", keyword, params, true);
+		appendIfNotEmpty(fromBuilder, "cs.seller_id", sellerId, params, true);
+		appendIfNotEmptyWithLike(fromBuilder, "cs.custom_name", keyword, params, false);
 		fromBuilder.append(" GROUP BY parent_id");
 
 		if (params.isEmpty())
@@ -95,7 +98,7 @@ public class ProductCompositionQuery extends JBaseQuery {
 
 	public List<ProductComposition> findDetailByProductId(String id) {
  		StringBuilder fromBuilder = new StringBuilder("SELECT cp.id,cp.name,cp.price,cp.seller_product_id,cp.sub_seller_product_id,cs.product_id as product_id,cg.product_id as sub_product_id, ");
-		fromBuilder.append("t1.valueName as product_sp, t2.valueName as sub_product_sp, ");
+		fromBuilder.append("t1.valueName as product_sp, t2.valueName as sub_product_sp, cs.price as price, cg.price as sub_price, ");
 		fromBuilder.append("cs.custom_name as product_name,cg.custom_name as sub_product_name,cp.sub_product_count,cp.parent_id ");
 		fromBuilder.append("from `cc_product_composition` cp ");
 		fromBuilder.append("LEFT JOIN cc_seller_product cs ON cs.id = cp.seller_product_id ");
@@ -114,6 +117,19 @@ public class ProductCompositionQuery extends JBaseQuery {
 
 	public int deleteByParentId(String id) {
 		return DAO.doDelete("parent_id = ? ", id);
+	}
+
+	public List<Record> findProductBySeller(String sellerId) {
+		StringBuilder fromBuilder = new StringBuilder("SELECT sp.parent_id as id, sp.name, sp.price ");
+		fromBuilder.append("FROM cc_product_composition sp ");
+		fromBuilder.append("LEFT JOIN cc_seller_product cs ON cs.id = sp.seller_product_id ");
+
+		LinkedList<Object> params = new LinkedList<Object>();
+		appendIfNotEmpty(fromBuilder, "cs.seller_id", sellerId, params, true);
+
+		fromBuilder.append(" GROUP BY sp.parent_id");
+
+		return Db.find(fromBuilder.toString(), params.toArray());
 	}
 
 	

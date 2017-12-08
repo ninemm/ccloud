@@ -12,6 +12,16 @@ function batchAction() {
 	
 	jQuery.mm.batchAction('#form', '请选择组合商品记录');
 }
+
+function group(id) {
+	var productId = id;
+	layer.open({
+		title:"组合详情",
+		type: 2, 
+		area: ['40%', '40%'],
+		content: '${CPATH}/admin/productComposition/getDetail?id='+productId
+	});		
+}
 </#macro>
 
 <@layout active_id=p child_active_id=c>
@@ -31,6 +41,7 @@ function batchAction() {
 		<@shiro.hasPermission name="/admin/productComposition/edit,/admin/all">
 			<a href="${CPATH}/admin/productComposition/edit?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-plus"></i> 新增 </a>
 			<a href="javascript:void(0);" onclick="batchAction()" class="btn btn-sm btn-danger btn-flat"><i class="fa fa-remove"></i> 删除 </a>
+			<a href="${CPATH}/admin/productComposition/add?c=${c!}&p=${p!}" class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> 新建组合订单 </a>
 		</@shiro.hasPermission>
 		</div>
 		<form class="form-horizontal" style="float: right" action="${CPATH}/admin/productComposition?c=${c!}&p=${p!}" method="post">
@@ -77,6 +88,7 @@ function batchAction() {
 							<td>
 							<@shiro.hasPermission name="/admin/productComposition/edit,/admin/all">
 								<a href="${CPATH}/admin/productComposition/edit?id=${bean.parent_id}&c=${c!}&p=${p!}" class="btn btn-xs bg-olive btn-flat">编辑</a>
+								<a onclick="group('${bean.parent_id!}')" class="btn btn-xs btn-warning btn-flat">组合详情</a>
 								<a href="javascript:void(0);" onclick="del('${bean.parent_id}')" class="btn btn-xs btn-danger btn-flat">删除</a>
 							</@shiro.hasPermission>
 							</td>

@@ -57,8 +57,8 @@
 
 		
 		<!--添加validate -->
-		var bigPriceName = "bigPrice" + newTrIdx;
-		$newTr.find("#bigPrice").attr("name", bigPriceName)
+		var bigPriceName = "store_count" + newTrIdx;
+		$newTr.find("#store_count").attr("name", bigPriceName)
 		
 		var bigNumName = "bigNum" + newTrIdx;
 		$newTr.find("#bigNum").attr("name", bigNumName)
@@ -84,6 +84,7 @@
 		});
 		
 		$newTr.find("#purchaseInstockDetailId").attr("name", "purchaseInstockDetailId" + newTrIdx);
+		$newTr.find("#custom_name").attr("name", "custom_name" + newTrIdx);
 		$newTr.find("#purchaseOrderDetailId").attr("name", "purchaseOrderDetailId" + newTrIdx);
 		$newTr.find("#convert").attr("name", "convert" + newTrIdx);
 		$newTr.find("#inputRowTotal").attr("name", "rowTotal" + newTrIdx);
@@ -93,10 +94,11 @@
 	}
 	
 	function productValue(obj,product){
-
+			console.log(product.custom_name);
 			var $tr = obj.parent().parent().parent();
 			
 			$tr.find("#purchaseInstockDetailId").val(product.id);
+			$tr.find("#custom_name").text(product.custom_name);
 			$tr.find("#purchaseOrderDetailId").val(product.purchase_order_detail_id);
 			$tr.find("#sellerProductName").text(product.productName);
 			$tr.find("#specification").text(product.cps_name);
@@ -105,13 +107,13 @@
 			$tr.find("#convert").val(convert);
 			var productCount = product.product_count;
 
-			var bigPrice = product.product_price;
+			var store_count = product.store_count;
 			var smallPrice = bigPrice/convert;
 			var smallUnit = product.small_unit;
 
 	
-			$tr.find("#bigPrice").val(bigPrice);
-			$tr.find("#bigPrice-span").text(bigPrice);
+			$tr.find("#store_count").val(store_count);
+			$tr.find("#bigPrice-span").text(store_count);
 			$tr.find("#bigUnit-span").text(product.big_unit + "(x" + convert + smallUnit + ")");
 			
 			$tr.find("#bigNum").val(Math.floor(productCount/convert));
@@ -197,6 +199,9 @@
 					toastr.success(data.message, '操作成功');
 				} else {
 					toastr.error(data.message,'操作失败');
+					setTimeout( function(){
+						location.reload();
+								}, 3* 1000 );
 				}
 			},
 			error : function() {
@@ -257,11 +262,12 @@
 						<tr>
 							<th width="2%"></th>
 							<th width="5%">序号</th>
-							<th width="20%">商品名称</th>
+							<th width="10%">商品名称</th>
 							<th width="9%">规格</th>
-							<th width="11%">大单位价格</th>
+							<th width="10">自定义产品名</th>
+							<th width="11%">已有库存</th>
 							<th width="12%">大单位数量</th>
-							<th width="11%">小单位价格</th>
+							<th width="11%">采购数量</th>
 							<th width="11%">小单位数量</th>
 							<th width="7%">小计</th>
 						</tr>
@@ -285,10 +291,15 @@
 								<span id="specification"></span>
 							</td>
 							<td>
+								<div class = "validata-box">
+									<span id="custom_name" ></span>
+								</div>
+							</td>
+							<td>
 								<input type="hidden" name="convert" id="convert" value="" />
 								<div class = "validata-box">
 									<span id="bigPrice-span"></span>
-									<input type="hidden" id="bigPrice" name="bigPrice" value="" />
+									<input type="hidden" id="bigPrice" name="store_count" value="" />
 								</div>
 							</td>
 							<td>

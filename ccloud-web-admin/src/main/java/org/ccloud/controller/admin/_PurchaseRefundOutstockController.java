@@ -16,6 +16,7 @@
 package org.ccloud.controller.admin;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -27,11 +28,11 @@ import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
-import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Inventory;
 import org.ccloud.model.InventoryDetail;
 import org.ccloud.model.PurchaseInstock;
+import org.ccloud.model.PurchaseInstockDetail;
 import org.ccloud.model.PurchaseRefundOutstock;
 import org.ccloud.model.PurchaseRefundOutstockDetail;
 import org.ccloud.model.SellerProduct;
@@ -131,6 +132,8 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 		String purchaseInstockId = StringUtils.getArrayFirst(paraMap.get("purchaseInstockId"));
 		String orderId = StrKit.getRandomUUID();
 		Date date = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+		String str = sdf.format(date);
 		PurchaseInstock purchaseInstock=PurchaseInstockQuery.me().findById(purchaseInstockId);
 		//采购退货单： PR + 100000(机构编号或企业编号6位) + 20171108(时间) + 100001(流水号)
 		List<PurchaseRefundOutstock> list =PurchaseRefundOutstockQuery.me().findByUser(user.getId(),user.getDataArea());
@@ -141,7 +144,7 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 		for(int m=0;m<(6-countt);m++){
 			j= "0"+j;
 		}
-		String orderSn = "PR" + user.getDepartmentId().substring(0, 6) + DateUtils.format("yyMMdd", date) + j;
+		String orderSn = "PR" + user.getDepartmentId().substring(0, 6) +str.substring(0, 8) + j;
 
 		purchaseRefundOutstock.set("id", orderId);
 		purchaseRefundOutstock.set("outstock_sn", orderSn);
@@ -159,7 +162,6 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 		purchaseRefundOutstock.set("create_date", date);
 		purchaseRefundOutstock.set("dept_id", user.getDepartmentId());
 		purchaseRefundOutstock.set("data_area", user.getDataArea());
-		purchaseRefundOutstock.save();
 		String productNumStr = StringUtils.getArrayFirst(paraMap.get("productNum"));
 		Integer productNum = Integer.valueOf(productNumStr);
 		Integer count = 0;
@@ -167,8 +169,9 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 
 		while (productNum > count) {
 			index++;
-			String productId = StringUtils.getArrayFirst(paraMap.get("sellerProductId" + index));
-			if (StrKit.notBlank(productId)) {
+			String purchaseInstockDetailId = StringUtils.getArrayFirst(paraMap.get("purchaseInstockDetailId" + index));
+			PurchaseInstockDetail purchaseInstockDetail = PurchaseInstockDetailQuery.me().findById(purchaseInstockDetailId);
+			if (StrKit.notBlank(purchaseInstockDetailId)) {
 				purchaseRefundOutstockDetail.set("id", StrKit.getRandomUUID());
 				purchaseRefundOutstockDetail.set("purchase_refund_outstock_id", orderId);
 				purchaseRefundOutstockDetail.set("seller_product_id", StringUtils.getArrayFirst(paraMap.get("sellerProductId" + index)));
@@ -178,7 +181,12 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 				String smallNum = StringUtils.getArrayFirst(paraMap.get("smallNum" + index));
 
 				Integer productCount = Integer.valueOf(bigNum) * Integer.valueOf(convert) + Integer.valueOf(smallNum);
-
+				
+				if(purchaseInstockDetail.getProductCount()<productCount){
+					renderAjaxResultForError("出库的货物数量不可大于原订单的入库货物数量，请重新输入！");
+					return;
+				}
+				
 				purchaseRefundOutstockDetail.set("product_count", productCount);
 				purchaseRefundOutstockDetail.set("product_price", StringUtils.getArrayFirst(paraMap.get("bigPrice" + index)));
 
@@ -197,6 +205,7 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 			}
 
 		}
+		purchaseRefundOutstock.save();
 		purchaseInstock.set("status", 1000);
 		purchaseInstock.update();
 		renderAjaxResultForSuccess("OK");

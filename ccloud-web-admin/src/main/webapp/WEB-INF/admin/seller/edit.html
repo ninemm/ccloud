@@ -150,14 +150,13 @@
 			dataType : "json", 
 			success : function(data) { 
 				if(data.errorCode == 0) {
-					//location.reload();
 					toastr.success(data.message, '操作成功');
-				} else {
-					toastr.error(data.message,'操作失败');
-				}
 					setTimeout( function(){
 						location.href = '${CPATH}/admin/seller/index';
 								}, 2 * 1000 );
+				} else {
+					toastr.error(data.message,'操作失败');
+				}
 			},
 			error : function() {
 				alert("信息提交错误");

@@ -19,8 +19,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.ccloud.Consts;
@@ -142,6 +144,21 @@ public class _PurchaseOrderDetailController extends JBaseCRUDController<Purchase
 		
 		String productNumStr = StringUtils.getArrayFirst(paraMap.get("productNum"));
 		Integer productNum = Integer.valueOf(productNumStr);
+		
+		int a = 0;
+		int b = 0;
+		Set<String> set = new HashSet<String>();
+		while (productNum > a) {
+				b++;
+				String productId = StringUtils.getArrayFirst(paraMap.get("productId" + b));
+				set.add(productId);
+				a++;
+			}
+		if(set.size()<productNum){
+			renderAjaxResultForError("订单中有两件及以上相同的产品，请重新选择！");
+			return;
+		}
+		
 		Integer count = 0;
 		Integer index = 0;
 		
