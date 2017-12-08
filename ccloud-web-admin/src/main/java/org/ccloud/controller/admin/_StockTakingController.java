@@ -177,22 +177,22 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 						inventoryDetail.setInAmount(amount);
 						inventoryDetail.setInPrice(price);
 						//根据seller_product_id添加各自的库存明细
-						//InventoryDetail findByInventoryDetail = InventoryDetailQuery.me().findBySellerProductId(seller_product_id,warehouse_id);
-						//if (findByInventoryDetail==null) {
-						inventoryDetail.setBalanceCount(inventory.getBalanceCount());
-						inventoryDetail.setBalanceAmount(inventory.getBalanceAmount());
-						//}else {
-						//	inventoryDetail.setBalanceCount(findByInventoryDetail.getBalanceCount().add());
-						//	inventoryDetail.setBalanceAmount(findByInventoryDetail.getBalanceAmount().add());
-						//}
+						InventoryDetail findByInventoryDetail = InventoryDetailQuery.me().findBySellerProductId(seller_product_id,warehouse_id);
+						if (findByInventoryDetail==null) {
+							inventoryDetail.setBalanceCount(productCount);
+							inventoryDetail.setBalanceAmount(amount);
+						}else {
+							inventoryDetail.setBalanceCount(findByInventoryDetail.getBalanceCount().add(productCount));
+							inventoryDetail.setBalanceAmount(findByInventoryDetail.getBalanceAmount().add(amount));
+						}
 						inventoryDetail.setBalancePrice(price);
 						
 						//业务类型  盘盈入库--100208  盘亏入库--100209
 						int compareTo = productCount.compareTo(new BigDecimal(0));
 						if (compareTo<0) {
-							inventoryDetail.setBizType("100209");
+							inventoryDetail.setBizType(Consts.BIZ_TYPE_TRANSFER_REDUCE_OUTSTOCK);
 						}else {
-							inventoryDetail.setBizType("100208");
+							inventoryDetail.setBizType(Consts.BIZ_TYPE_TRANSFER_PLUS_INSTOCK);
 						}
 						inventoryDetail.setBizBillSn(stockTaking.getStockTakingSn());
 						inventoryDetail.setBizDate(stockTaking.getBizDate());
@@ -206,6 +206,7 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 							renderAjaxResultForError("更新InventoryDetail失败");
 							return false;
 						}
+						
 						//获取经销商此商品的信息 更新库存
 						SellerProduct sellerProduct = SellerProductQuery.me().findById(seller_product_id);
 						BigDecimal storeCount = sellerProduct.getStoreCount();
