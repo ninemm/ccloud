@@ -78,10 +78,7 @@
 				{field: "payment_type", title: "付款方式", align: "center", width: '5%',
 					formatter: function(value, row, rowIndex) {
 						if(value==0){return '应付账款';}
-						else if(value == 1){return '现金付款';}
-						else{
-							return '预付款';
-						}
+						else {return '现金付款';}
 					},
 					edit: false
 				},

@@ -244,6 +244,9 @@
 								}, 2 * 1000 );
 				} else {
 					toastr.error(data.message,'操作失败');
+					setTimeout( function(){
+					location.reload();
+								}, 2 * 1000 );
 				}
 			},
 			error : function() {
@@ -381,9 +384,6 @@
 							</label>
 							<label class="radio-inline">
 								<input type="radio" name="paymentType" value="1" checked>现结
-							</label>
-							<label class="radio-inline">
-								<input class="minimal" type="radio" name="paymentType" value="2" >预付款
 							</label>
 						</div>
 					</div>

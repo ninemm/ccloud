@@ -197,6 +197,9 @@
 					toastr.success(data.message, '操作成功');
 				} else {
 					toastr.error(data.message,'操作失败');
+					setTimeout( function(){
+						location.reload();
+								}, 3* 1000 );
 				}
 			},
 			error : function() {
