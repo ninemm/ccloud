@@ -85,5 +85,10 @@ public class SupplierQuery extends JBaseQuery {
 	public List<Supplier> findEnable() {
 		return DAO.doFind("is_enable = 1");
 	}
+	
+	public List<Supplier> findByCode(String code){
+		String select =" select * from `cc_supplier` where code ='"+code+"'"; 
+		return DAO.find(select);
+	}
 
 }

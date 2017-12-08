@@ -13,6 +13,7 @@
 <#macro script>
 
 var $form = $("#form");
+var dataCheck = false;
 
 $(function() {
 	
@@ -30,7 +31,8 @@ var validatorFields = {
 	'supplier.code': {
 		validators: {
 			notEmpty: { message: '供应商编码不能为空' },
-	        stringLength: { min: 2, max: 20, message: '供应商编码最少2个字符，最多20字符，请重新输入' }
+			regexp:{regexp:/^[\d|a-zA-Z]{6}$/, message:'请确认录入6位字母或数字的供应商编码' }
+
         }
 	},
 	'supplier.is_enable': {
@@ -76,6 +78,40 @@ function doSubmit(){
 		}
 	});
 }
+	$('input[name="supplier.code"]').on("blur",function(){
+		var supplierCode = $('input[name="supplier.code"]').val();
+		var reg = /^[\d|a-zA-Z]{6}$/;
+		if(reg.test(supplierCode)){
+			$.ajax({
+				url: '${CPATH}/admin/supplier/searchByCode',
+				type: 'post',
+				data: {code: supplierCode},
+				success: function (result) {
+					dataCheck = result.data;
+					if(!dataCheck){
+						$("button.btn-primary").attr("disabled", true);
+						$('input[name="supplier.code"]').parent().append('<small class="help-block" data-bv-validator="regexp" name="small-codeCheck" data-bv-for="supplier.code" data-bv-result="INVALID" style="">当前供应商编码重复</small>');
+						$('input[name="supplier.code"]').parent().removeClass("has-success");
+						$('input[name="supplier.code"]').parent().addClass("has-error");
+						$('input[name="supplier.code"]').parent().siblings("i").removeClass("glyphicon-ok");
+						$('input[name="supplier.code"]').parent().siblings("i").addClass("glyphicon-remove");
+						$('input[name="supplier.code"]').parent().parent().removeClass("has-success");
+						$('input[name="supplier.code"]').parent().parent().addClass("has-error");
+					}else{
+						$("button.btn-primary").attr("disabled", false);
+						$('small[name="small-codeCheck"]').remove();
+					}
+				}
+			});
+		}else{
+			$("button.btn-primary").attr("disabled", false);
+			$('small[name="small-codeCheck"]').remove();
+		}
+	});
+	$('input[name="supplier.code"]').on("focus",function(){
+		$("button.btn-primary").attr("disabled", false);
+		$('small[name="small-codeCheck"]').remove();
+	});
 </#macro>
 
 <@layout active_id=p child_active_id=c>
@@ -114,7 +150,7 @@ function doSubmit(){
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">编号:</label>
 						<div class="input-group col-md-4 col-sm-10">
-		                 	<input class="form-control input-sm" type="text" name="supplier.code" value="${(supplier.code)!}" placeholder="2-20个任意字母数字">
+		                 	<input class="form-control input-sm" type="text" name="supplier.code" value="${(supplier.code)!}" placeholder="6个任意字母数字">
 		               	</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">
