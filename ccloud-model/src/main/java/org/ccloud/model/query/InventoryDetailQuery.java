@@ -84,11 +84,12 @@ public class InventoryDetailQuery extends JBaseQuery {
 	
 	
 	public Page<InventoryDetail> _in_paginate(int pageNumber, int pageSize,String keyword, String orderby,String userId,String dataArea) {
-		String select = "SELECT cid.*,cw.`name` as warehouse,csp.custom_name as sellerName,u.realname as bizName ";
+		String select = "SELECT cid.*,cw.`name` as warehouse,csp.custom_name as sellerName ";
 		StringBuilder fromBuilder = new StringBuilder(" from cc_inventory_detail cid ");
 		fromBuilder.append(" LEFT JOIN cc_warehouse cw on cw.id = cid.warehouse_id ");
 		fromBuilder.append(" LEFT JOIN cc_seller_product csp on csp.id = cid.sell_product_id ");
-		fromBuilder.append(" LEFT JOIN `user` u on u.id = cid.biz_user_id ");
+		fromBuilder.append(" LEFT JOIN cc_user_join_warehouse cujw on cujw.warehouse_id=cid.warehouse_id "
+				+ " LEFT JOIN `user` u on u.id = cujw.user_id ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		
 		
@@ -106,11 +107,12 @@ public class InventoryDetailQuery extends JBaseQuery {
 	}
 	
 	public Page<InventoryDetail> _out_paginate(int pageNumber, int pageSize,String keyword, String orderby,String userId,String dataArea) {
-		String select = "SELECT cid.*,cw.`name` as warehouse,csp.custom_name as sellerName,u.realname as bizName ";
+		String select = "SELECT cid.*,cw.`name` as warehouse,csp.custom_name as sellerName ";
 		StringBuilder fromBuilder = new StringBuilder(" from cc_inventory_detail cid ");
 		fromBuilder.append(" LEFT JOIN cc_warehouse cw on cw.id = cid.warehouse_id ");
 		fromBuilder.append(" LEFT JOIN cc_seller_product csp on csp.id = cid.sell_product_id ");
-		fromBuilder.append(" LEFT JOIN `user` u on u.id = cid.biz_user_id ");
+		fromBuilder.append(" LEFT JOIN cc_user_join_warehouse cujw on cujw.warehouse_id=cid.warehouse_id "
+				+ " LEFT JOIN `user` u on u.id = cujw.user_id ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		
 		
