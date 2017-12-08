@@ -168,12 +168,5 @@ public class ProductController extends BaseFrontController {
 		return isSave;
 	}
 	
-	public void myOrder() {
-		render("myOrder.html");
-	}
-
-	public void orderDetial() {
-		render("myOrder.html");
-	}
 
 }

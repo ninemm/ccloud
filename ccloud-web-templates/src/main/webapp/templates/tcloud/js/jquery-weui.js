@@ -4842,6 +4842,12 @@ var selectList = [];
 
       if(typeof params === typeof "a") select[params].call(select, args);
 
+      $(document).on('touchend', function(e) {
+        var _this = $(e.target);
+        if (_this.parents('.weui-picker-container').length == 0 && _this.parents('.select-area').length ==0) {
+            select.close();
+        }
+      });
       return select;
     });
   }
@@ -5253,8 +5259,6 @@ var selectList = [];
                       addClass += ' picker-calendar-day-weekend';
                   }
                   // Disabled
-                  console.log(dayDate);
-                  console.log(minDate);
                   if ((minDate && dayDate <= minDate) || (maxDate && dayDate > maxDate)) {
                       addClass += ' picker-calendar-day-disabled';   
                   }
