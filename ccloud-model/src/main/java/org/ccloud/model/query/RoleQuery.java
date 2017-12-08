@@ -48,12 +48,12 @@ public class RoleQuery extends JBaseQuery {
 
 	public Page<Role> paginate(int pageNumber, int pageSize, String keyword, String dataArea, String orderby) {
 		String select = "select * ";
-		StringBuilder fromBuilder = new StringBuilder("from `role` ");
+		StringBuilder fromBuilder = new StringBuilder("from `role` r INNER JOIN `department` d ON d.id = r.dept_id ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "role_name", keyword, params, needWhere);
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "data_area", dataArea, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "r.role_name", keyword, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, needWhere);
 		fromBuilder.append("order by " + orderby);
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());

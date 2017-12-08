@@ -59,7 +59,7 @@ public class _RoleController extends JBaseCRUDController<Role> {
 		if (StrKit.notBlank(keyword)) setAttr("k", keyword);
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		
-		Page<Role> page = RoleQuery.me().paginate(getPageNumber(), getPageSize(), keyword, dataArea, "order_list");
+		Page<Role> page = RoleQuery.me().paginate(getPageNumber(), getPageSize(), keyword, dataArea, "r.order_list");
 		if (page != null) {
 			setAttr("page", page);
 		}
