@@ -270,12 +270,8 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 				break;
 			}
 			SellerProduct sellerProduct = SellerProductQuery.me().findById(pi.getSellerProductId());
-			List<Inventory> inventorys = InventoryQuery.me()._findBySellerIdAndProductId(seller.getId(),pi.get("productId").toString());
-			BigDecimal count0 = new BigDecimal(0);
-			for(Inventory inventory0:inventorys){
-				count0 = count0.add(inventory0.getBalanceCount());
-			}
-			sellerProduct.setStoreCount(count0);
+			BigDecimal count0 = count1.divide(convent, 2, BigDecimal.ROUND_HALF_UP);
+			sellerProduct.setStoreCount(count0.add(sellerProduct.getStoreCount()));
 			sellerProduct.set("modify_date", new Date());
 			sellerProduct.update();
 		}
