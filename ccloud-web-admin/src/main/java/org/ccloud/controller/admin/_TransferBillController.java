@@ -65,14 +65,15 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 	public final static String startNo = "000001";
 	 //目前系统还没有企业编号，先创建一个100000占位	
 	public void list() {
-
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String departmentId = user.getDepartmentId();
 		String keyword = getPara("k");
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
 			setAttr("k", keyword);
 		}
 
-		Page<TransferBill> page = TransferBillQuery.me().paginate(getPageNumber(), getPageSize(), keyword, "c.create_date desc");
+		Page<TransferBill> page = TransferBillQuery.me().paginate(getPageNumber(), getPageSize(), keyword, "c.create_date desc",departmentId);
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
 
