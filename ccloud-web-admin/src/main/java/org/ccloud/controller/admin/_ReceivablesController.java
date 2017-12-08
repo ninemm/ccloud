@@ -29,6 +29,7 @@ import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
+import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.model.Receivables;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.GoodsCategoryQuery;
@@ -77,7 +78,8 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 		String type = getPara("type");
 		String id = getPara("id");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		Page<Receivables> page = ReceivablesQuery.me().paginate(getPageNumber(),getPageSize(),id,type,user.getDataArea());
+		String deptDataArea = DataAreaUtil.getUserDeptDataArea(user.getDataArea());
+		Page<Receivables> page = ReceivablesQuery.me().paginate(getPageNumber(),getPageSize(),id,type,deptDataArea);
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(),"rows", page.getList());
 		
 		renderJson(map);
@@ -87,10 +89,10 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String type = getPara("type");
 		String id = getPara("id");
-		
+		String deptDataArea = DataAreaUtil.getUserDeptDataArea(user.getDataArea());
 		Map<String, Object> map;
 		if(type != null && id!=null) {
-			Page<ReceivablesDetail> page = ReceivablesDetailQuery.me().paginate(getPageNumber(), getPageSize(), id,type,user.getDataArea());
+			Page<ReceivablesDetail> page = ReceivablesDetailQuery.me().paginate(getPageNumber(), getPageSize(), id,type,deptDataArea);
 			map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		}else {
 			map = new HashMap<String, Object>();
@@ -108,7 +110,8 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 	public void list() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String ref_sn = getPara("ref_sn");
-		Page<Receiving> page = ReceivingQuery.me().paginate(getPageNumber(), getPageSize(), ref_sn,user.getDataArea());
+		String deptDataArea = DataAreaUtil.getUserDeptDataArea(user.getDataArea());
+		Page<Receiving> page = ReceivingQuery.me().paginate(getPageNumber(), getPageSize(), ref_sn,deptDataArea);
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(),"ref_sn",ref_sn,"rows", page.getList());
 		
 		renderJson(map);
