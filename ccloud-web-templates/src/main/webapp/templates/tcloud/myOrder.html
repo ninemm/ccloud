@@ -1,0 +1,220 @@
+<#include "_inc/_layout.html"/>
+<#macro css> </#macro>
+<#macro script>
+  $(function () {
+    $("#order-status").select({
+      title: "选择客户区域",
+      items: ["全部", "待审核", "已完成"]
+    });
+    $("#customer-type").select({
+      title: "选择客户类型",
+      items: ["全部", "商超"]
+    });
+    $("#date").calendar();
+    $("#date").val($.today());
+  });
+</#macro>
+
+<@layout>
+<body id="my-order" class="ft12">
+  <header class="has-th-list">
+    <div class="head-search">
+      <div>
+        <input type="text" id="order-status" class="weui-input" readonly placeholder="订单状态">
+        <i class="icon-sort-desc"></i>
+      </div>
+      <div>
+        <input type="text" id="customer-type" placeholder="客户类型" class="weui-input" readonly>
+        <i class="icon-sort-desc"></i>
+      </div>
+      <div>
+        <input type="text" id="date" class="weui-input" readonly>
+        <i class="icon-sort-desc"></i>
+      </div>
+    </div>
+    <div id="combin-filter-btn">
+      <i class="icon-th-list"></i>
+    </div>
+  </header>
+  <main>
+    <div class="weui-panel weui-panel_access">
+      <div class="ft14 gray">
+        DH-O-20171017-002276
+        <span class="fr blue">订单待审核</span>
+      </div>
+      <div>
+        小张烤鱼
+      </div>
+      <div class="gray">
+        <p>联系人：小张/18611111111
+          <span class="fr">终端客户</span>
+        </p>
+      </div>
+      <div class="gray">
+        <p>数量：2件
+          <span class="fr">时间：2017-10-17 06:03:04</span>
+        </p>
+      </div>
+      <hr>
+      <div>
+        <div class="button blue-button fl">撤销</div>
+        <div class="button white-button fr">再次购买</div>
+      </div>
+    </div>
+    <div class="weui-panel weui-panel_access">
+      <div class="ft14 gray">
+        <span class="tag">账期</span>
+        DH-O-20171017-002276
+        <span class="fr blue">订单待审核</span>
+      </div>
+      <div>
+        小张烤鱼
+      </div>
+      <div class="gray">
+        <p>联系人：小张/18611111111
+          <span class="fr">终端客户</span>
+        </p>
+      </div>
+      <div class="gray">
+        <p>数量：2件
+          <span class="fr">时间：2017-10-17 06:03:04</span>
+        </p>
+      </div>
+      <hr>
+      <div>
+        <div class="button blue-button fl">撤销</div>
+        <div class="button white-button fr">再次购买</div>
+      </div>
+    </div>
+    <div class="weui-panel weui-panel_access">
+      <div class="ft14 gray">
+        DH-O-20171017-002276
+        <span class="fr blue">已完成</span>
+      </div>
+      <div>
+        小张烤鱼
+      </div>
+      <div class="gray">
+        <p>联系人：小张/18611111111
+          <span class="fr">终端客户</span>
+        </p>
+      </div>
+      <div class="gray">
+        <p>数量：2件
+          <span class="fr">时间：2017-10-17 06:03:04</span>
+        </p>
+      </div>
+      <hr>
+      <div>
+        <div class="button blue-button fl none">撤销</div>
+        <div class="button white-button fr">再次购买</div>
+      </div>
+    </div>
+    <div class="weui-panel weui-panel_access">
+      <div class="ft14 gray">
+        DH-O-20171017-002276
+        <span class="fr blue">待发货</span>
+      </div>
+      <div>
+        小张烤鱼
+      </div>
+      <div class="gray">
+        <p>联系人：小张/18611111111
+          <span class="fr">终端客户</span>
+        </p>
+      </div>
+      <div class="gray">
+        <p>数量：2件
+          <span class="fr">时间：2017-10-17 06:03:04</span>
+        </p>
+      </div>
+      <hr>
+      <div>
+        <div class="button blue-button fl none">撤销</div>
+        <div class="button white-button fr">再次购买</div>
+      </div>
+    </div>
+    <div class="weui-panel weui-panel_access">
+      <div class="ft14 gray">
+        DH-O-20171017-002276
+        <span class="fr blue">待发货</span>
+      </div>
+      <div>
+        小张烤鱼
+      </div>
+      <div class="gray">
+        <p>联系人：小张/18611111111
+          <span class="fr">终端客户</span>
+        </p>
+      </div>
+      <div class="gray">
+        <p>数量：2件
+          <span class="fr">时间：2017-10-17 06:03:04</span>
+        </p>
+      </div>
+      <hr>
+      <div>
+        <div class="button blue-button fl none">撤销</div>
+        <div class="button white-button fr">再次购买</div>
+      </div>
+    </div>
+    <div class="weui-panel weui-panel_access">
+      <div class="ft14 gray">
+        DH-O-20171017-002276
+        <span class="fr blue">待发货</span>
+      </div>
+      <div>
+        小张烤鱼
+      </div>
+      <div class="gray">
+        <p>联系人：小张/18611111111
+          <span class="fr">终端客户</span>
+        </p>
+      </div>
+      <div class="gray">
+        <p>数量：2件
+          <span class="fr">时间：2017-10-17 06:03:04</span>
+        </p>
+      </div>
+      <hr>
+      <div>
+        <div class="button blue-button fl none">撤销</div>
+        <div class="button white-button fr">再次购买</div>
+      </div>
+    </div>
+  </main>
+  <article id="combin-filter">
+    <div class="filter-item">
+      <h4>下单日期</h4>
+      <div class="weui-flex">
+        <span class="blue-button">当天</span>
+        <span>最近3天</span>
+        <span>最近7天</span>
+        <span>最近30天</span>
+      </div>
+    </div>
+    <footer class="weui-footer weui-footer_fixed-bottom ft16">
+      <a class="gray-button width-50 cancel-search-btn">取消</a>
+      <a class="blue-button width-50 confirm-search-btn">确定</a>
+    </footer>
+  </article>
+  <div class="hidden-menu">
+    <ul>
+      <li>
+        <a href="index.html">
+          首页
+          <i class="icon-home blue"></i>
+        </a>
+      </li>
+      <li>
+        <a href="javascript:history.go(-1)">
+          上一页
+          <i class="icon-undo green"></i>
+        </a>
+      </li>
+    </ul>
+    <i class="icon-menu-open orange fr" id="button"></i>
+  </div>
+  <div class="layer"></div>
+</body>
+</@layout>

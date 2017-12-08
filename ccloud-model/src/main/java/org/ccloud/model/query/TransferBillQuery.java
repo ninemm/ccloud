@@ -48,7 +48,7 @@ public class TransferBillQuery extends JBaseQuery {
 		});
 	}
 
-	public Page<TransferBill> paginate(int pageNumber, int pageSize,String keyword, String orderby) {
+	public Page<TransferBill> paginate(int pageNumber, int pageSize,String keyword, String orderby,String departmentId) {
 		String select = "select c.id, c.transfer_bill_sn,w1.name as from_warehouse_id,w2.name as to_warehouse_id,c.biz_date,u.realname,c.status,c.create_date";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_transfer_bill` c ");
 		fromBuilder.append("INNER JOIN cc_warehouse w1 on c.from_warehouse_id = w1.id ");
@@ -56,6 +56,10 @@ public class TransferBillQuery extends JBaseQuery {
 		fromBuilder.append("INNER JOIN `user`  u on c.input_user_id = u.id ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		appendIfNotEmptyWithLike(fromBuilder, "transfer_bill_sn", keyword, params, true);
+		if (departmentId != null) {
+			fromBuilder.append("AND c.dept_id = ? ");
+			params.add(departmentId);
+		}
 		fromBuilder.append("order by " + orderby);		
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());

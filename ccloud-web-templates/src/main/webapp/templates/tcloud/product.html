@@ -14,8 +14,9 @@ $(function() {
     }).on("touchstart", "#sidebar li", function () {
  
         $(this).addClass("active").siblings().removeClass("active");
-        var typeId = $(this).attr('id');
-		initProduct();
+        var index = $(this).index();
+     	$('.type').eq(index).show().siblings('.type').hide();
+
     }).on("input", "#searchInput", function () {
     	keyword = $(this).val();
 		initProduct();
@@ -24,22 +25,36 @@ $(function() {
 		initProduct();
     }).on("touchstart", "#shoppingCart", function () {
     	save()
+    }).on("touchend", ".operate:first-child", function () { //减少商品数量
+      calTotal($(this));
+    }).on("touchend", ".operate:last-child", function () { //增加商品数量
+      calTotal($(this));
     });
     
     initProduct();
 });
 
-var typeId = '';
 var keyword = '';
 var newHtml = $(".product_detail").eq(0).html();
 var $menuRight = $(".menu-right");
 function initProduct(){
-	Utils.ajax('${CPATH}/product/productList', {'typeId' : typeId, 'keyword': keyword}, 
+	var typeId = '';
+	Utils.ajax('${CPATH}/product/productList', {'keyword': keyword}, 
 		function(data){
 			$menuRight.empty();
 			$.each(data, function(index, el) {
-				$menuRight.append("<section class='product_detail weui-panel weui-panel_access'>" + newHtml + "</section>");
-				var $newProductDetail = $menuRight.find(".product_detail:last");
+				if(typeId != el.typeId) {
+					if(typeId == '') {
+						$menuRight.append("<div class='type'> </div>")
+					} else {
+						$menuRight.append("<div class='type' style='display:none'> </div>")
+					}
+					typeId = el.typeId;
+				}
+
+				var $type = $menuRight.find(".type:last");
+				$type.append("<section class='product_detail weui-panel weui-panel_access'>" + newHtml + "</section>");
+				var $newProductDetail = $type.find(".product_detail:last");
 				$newProductDetail.find("#productName").text(el.custom_name);
 				$newProductDetail.find("#valueName").text(el.valueName);
 				
@@ -64,6 +79,21 @@ function initProduct(){
 			});
 		}
 	);
+}
+
+function calTotal($this) {
+  var $parents = $this.parents('.type');
+  var $sellProductId = $parents.find('.sellProductId').data('id');
+  var $total = $('#sidebar').find('li[data-id=' + $sellProductId + ']').find('span');
+  var bigNumber = Number($parents.find('.product_bUnit input').val());
+  var smallNumber = Number($parents.find('.product_mUnit input').val());
+  var total = bigNumber + smallNumber;
+  if (total > 0) {
+    $total.show().text(total);
+  } else {
+    $total.hide().text(total);
+  }
+  
 }
 
 function save(){
@@ -134,9 +164,6 @@ function save(){
 		<aside>
 			<div id="sidebar" class="menu-left">
 				<ul>
-					<li  id='' class="active">热销
-						<span class="goods-num">8</span>
-					</li>
 					<#list productTypeList as productType >
 						<li id='${(productType.id)!}'>
 							${(productType.name)!}
@@ -198,14 +225,9 @@ function save(){
 				</section>
 			</div>
 		</article>
-		<div class="hidden-menu">
-			<ul>
-				<li><a id="shoppingCart" > 购物车 <i
-						class="icon-shopping-cart blue"></i>
-				</a></li>
-			</ul>
-			<i class="icon-menu-open orange fr" id="button"></i>
-		</div>
+		<a class="hidden-menu" id="shoppingCart" >
+			<i class="icon-menu-shopping-cart orange fr"></i>
+		</a>
 		<div class="layer"></div>
 	</div>
 </div>

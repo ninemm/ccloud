@@ -124,16 +124,21 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 						Inventory inventory=new Inventory();
 						String seller_product_id=(String) listMap.get(i).get("seller_product_id");
 						String product_id=(String) listMap.get(i).get("product_id");
-						//判断此商品是否已经在仓库中   同一商品不同别名 总账相加  明细分开
+						//判断此商品是否已经在仓库中
 						List<Record> findByInventory = StockTakingDetailQuery.me().findByInventory(product_id,warehouse_id,seller_id);
+						//当前商品的存入数量  大单位换算关系  商品大单位的价格  商品总价格
+						BigDecimal productCount = new BigDecimal(listMap.get(i).get("product_count").toString());
+						BigDecimal convertRelate=new BigDecimal(listMap.get(i).get("convert_relate").toString());
+						BigDecimal price=new BigDecimal(listMap.get(i).get("price").toString()).multiply(convertRelate);
+						BigDecimal amount=productCount.multiply(price);
 						if (findByInventory.size()!=0) {
 							//存在--只更改数量 总价格
 							inventory=InventoryQuery.me().findById(findByInventory.get(0).getStr("id"));
-							inventory.setInCount( inventory.getInCount().add(new BigDecimal(listMap.get(i).get("product_count").toString())));
-							inventory.setInAmount(inventory.getInAmount().add(new BigDecimal(listMap.get(i).get("price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString()))));
+							inventory.setInCount( inventory.getInCount().add(productCount));
+							inventory.setInAmount(inventory.getInAmount().add(amount));
 							inventory.setModifyDate(new Date());
-							inventory.setBalanceCount(inventory.getBalanceCount().add(new BigDecimal(listMap.get(i).get("product_count").toString())));
-							inventory.setBalanceAmount(inventory.getBalanceAmount().add(new BigDecimal(listMap.get(i).get("price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString()))));
+							inventory.setBalanceCount(inventory.getBalanceCount().add(productCount));
+							inventory.setBalanceAmount(inventory.getBalanceAmount().add(amount));
 							boolean updateInventory = inventory.update();
 							if (!updateInventory) {
 								renderAjaxResultForError("更新Inventory失败");
@@ -145,15 +150,15 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 							inventory.setWarehouseId(warehouse_id);
 							inventory.setProductId(product_id);
 							inventory.setSellerId(seller_id);
-							inventory.setInCount( new BigDecimal(listMap.get(i).get("product_count").toString()));
-							inventory.setInAmount(new BigDecimal(listMap.get(i).get("price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString())));
-							inventory.setInPrice(new BigDecimal(listMap.get(i).get("price").toString()).multiply(new BigDecimal(listMap.get(i).get("convert_relate").toString())));
+							inventory.setInCount(productCount);
+							inventory.setInAmount(amount);
+							inventory.setInPrice(price);
 							inventory.setOutAmount(new BigDecimal(0));
 							inventory.setOutCount(new BigDecimal(0));
-							inventory.setOutPrice(new BigDecimal(listMap.get(i).get("price").toString()).multiply(new BigDecimal(listMap.get(i).get("convert_relate").toString())));
-							inventory.setBalanceCount( new BigDecimal(listMap.get(i).get("product_count").toString()));
-							inventory.setBalanceAmount(new BigDecimal(listMap.get(i).get("price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString())));
-							inventory.setBalancePrice(new BigDecimal(listMap.get(i).get("price").toString()).multiply(new BigDecimal(listMap.get(i).get("convert_relate").toString())));
+							inventory.setOutPrice(price);
+							inventory.setBalanceCount(productCount);
+							inventory.setBalanceAmount(amount);
+							inventory.setBalancePrice(price);
 							inventory.setDataArea(stockTaking.getDataArea());
 							inventory.setDeptId(stockTaking.getDeptId());
 							inventory.setCreateDate(new Date());
@@ -168,22 +173,22 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 						inventoryDetail.setId(StrKit.getRandomUUID());
 						inventoryDetail.setWarehouseId(warehouse_id);
 						inventoryDetail.setSellProductId(seller_product_id);
-						inventoryDetail.setInCount(new BigDecimal(listMap.get(i).get("product_count").toString()));
-						inventoryDetail.setInAmount(inventory.getInAmount().add(new BigDecimal(listMap.get(i).get("price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString()))));
-						inventoryDetail.setInPrice(inventory.getInPrice());
+						inventoryDetail.setInCount(productCount);
+						inventoryDetail.setInAmount(amount);
+						inventoryDetail.setInPrice(price);
 						//根据seller_product_id添加各自的库存明细
-						InventoryDetail findByInventoryDetail = InventoryDetailQuery.me().findBySellerProductId(seller_product_id,warehouse_id);
-						if (findByInventoryDetail==null) {
-							inventoryDetail.setBalanceCount(new BigDecimal(listMap.get(i).get("product_count").toString()));
-							inventoryDetail.setBalanceAmount(inventory.getInAmount().add(new BigDecimal(listMap.get(i).get("price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString()))));
-						}else {
-							inventoryDetail.setBalanceCount(findByInventoryDetail.getBalanceCount().add(new BigDecimal(listMap.get(i).get("product_count").toString())));
-							inventoryDetail.setBalanceAmount(findByInventoryDetail.getBalanceAmount().add(inventory.getInAmount().add(new BigDecimal(listMap.get(i).get("price").toString()).multiply(new BigDecimal(listMap.get(i).get("product_count").toString())))));
-						}
-						inventoryDetail.setBalancePrice(inventory.getBalancePrice());
+						//InventoryDetail findByInventoryDetail = InventoryDetailQuery.me().findBySellerProductId(seller_product_id,warehouse_id);
+						//if (findByInventoryDetail==null) {
+						inventoryDetail.setBalanceCount(inventory.getBalanceCount());
+						inventoryDetail.setBalanceAmount(inventory.getBalanceAmount());
+						//}else {
+						//	inventoryDetail.setBalanceCount(findByInventoryDetail.getBalanceCount().add());
+						//	inventoryDetail.setBalanceAmount(findByInventoryDetail.getBalanceAmount().add());
+						//}
+						inventoryDetail.setBalancePrice(price);
 						
 						//业务类型  盘盈入库--100208  盘亏入库--100209
-						int compareTo = new BigDecimal(listMap.get(i).get("product_count").toString()).compareTo(new BigDecimal(0));
+						int compareTo = productCount.compareTo(new BigDecimal(0));
 						if (compareTo<0) {
 							inventoryDetail.setBizType("100209");
 						}else {
@@ -201,15 +206,13 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 							renderAjaxResultForError("更新InventoryDetail失败");
 							return false;
 						}
-						
-						
 						//获取经销商此商品的信息 更新库存
 						SellerProduct sellerProduct = SellerProductQuery.me().findById(seller_product_id);
 						BigDecimal storeCount = sellerProduct.getStoreCount();
 						if (storeCount==null) {
-							sellerProduct.setStoreCount(new BigDecimal(listMap.get(i).get("product_count").toString()));
+							sellerProduct.setStoreCount(productCount);
 						}else {
-							sellerProduct.setStoreCount(new BigDecimal(listMap.get(i).get("product_count").toString()).add(storeCount));
+							sellerProduct.setStoreCount(productCount.add(storeCount));
 						}
 						boolean updateSellerProduct = sellerProduct.update();
 						if (!updateSellerProduct) {

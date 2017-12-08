@@ -22,7 +22,7 @@
 
 	$(function() {
 
-		var url = '${CPATH}/admin/inventoryDetail/list';
+		var url = '${CPATH}/admin/inventoryDetail/outList';
 
 		jQuery.mm.initEditTable('#_inventoryDetail_table', url, initParams, initFields(), null);
 		$("#search-submit").click(function() {
@@ -50,17 +50,17 @@
       			{field: "biz_bill_sn", title: "业务单号", align: "center", width: '7%', edit:false},
       			{field: "cc_warehouse", title: "仓库", align: "center", width: '8%', edit:false},
       			{field: "sellerName", title: "产品名", align: "center", width: '10%', edit:false},
-      			{field: "in_count", title: "入库数量", align: "center", width: '5%', edit:false},
-      			{field: "in_amount", title: "入库金额", align: "center", width: '5%', edit:false},
-      			{field: "in_price", title: "入库单价", align: "center", width: '5%', edit:false},
+      			{field: "out_count", title: "出库数量", align: "center", width: '5%', edit:false},
+      			{field: "out_amount", title: "出库金额", align: "center", width: '5%', edit:false},
+      			{field: "out_price", title: "出库单价", align: "center", width: '5%', edit:false},
       			{field: "balance_count", title: "库存", align: "center", width: '5%',	edit:false},
       					
-      			{field: "biz_type", title: "入库类型", align: "center", width: '3%', 
+      			{field: "biz_type", title: "出库类型", align: "center", width: '3%', 
       			formatter: function(value, row, rowIndex) {
-						if(value==100202){return "采购入库"}
-						else if(value == 100205){return "销售退货入库"}
-						else if(value == 100206){return "调拨单"}
-						else if (value == 100208){return "盘盈入库"}
+						if(value==100203){return "采购退货出库"}
+						else if(value == 100204){return "销售出库"}
+						else if (value == 100207){return "调拨出库"}
+						else if (value == 100209){return "盘亏出库"}
 					},
       			edit:false},
       			
@@ -85,7 +85,7 @@
 <!-- Main content -->
 <section class="content">
 	<div class="row content-row">
-		<form class="form-horizontal" style="float: right" action="${CPATH}/admin/inventoryDetail?c=${c!}&p=${p!}" method="post">
+		<form class="form-horizontal" style="float: right" action="${CPATH}/admin/inventoryDetail/out?c=${c!}&p=${p!}" method="post">
 			<div class="input-group input-group-sm">
 				<input id="post-search-input" class="form-control" type="search" value="${k!}" name="k" placeholder="搜索名称">&nbsp; 
 				<input id="search-submit" class="btn btn-default btn-sm btn-flat" type="submit" value="搜索">

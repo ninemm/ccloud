@@ -126,9 +126,9 @@ public class SellerProductQuery extends JBaseQuery {
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}
 	
-	public List<Record> findProductListForApp(String sellerId, String typeId, String keyword) {
+	public List<Record> findProductListForApp(String sellerId, String keyword) {
 		StringBuilder fromBuilder = new StringBuilder(
-				" SELECT sp.id AS sell_product_id, sp.product_id, sp.custom_name, sp.store_count, sp.price, p.convert_relate, p.big_unit, p.small_unit, t1.valueName, g.`name` AS goodsName, gc.`name` AS categoryName, gt.`name` as typeName ");
+				" SELECT sp.id AS sell_product_id, sp.product_id, sp.custom_name, sp.store_count, sp.price, p.convert_relate, p.big_unit, p.small_unit, t1.valueName, g.`name` AS goodsName, gc.`name` AS categoryName, gt.`id` as typeId, gt.`name` as typeName ");
 		fromBuilder.append(" FROM cc_seller_product sp JOIN cc_product p ON sp.product_id = p.id ");
 		fromBuilder.append(" LEFT JOIN (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv.`name`) AS valueName FROM cc_goods_specification_value sv RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id ) t1 ON t1.product_set_id = p.id ");
 		fromBuilder.append(" JOIN cc_goods g ON p.goods_id = g.id JOIN cc_goods_category gc ON g.goods_category_id = gc.id JOIN cc_goods_type gt on g.goods_type_id = gt.id ");
@@ -136,7 +136,6 @@ public class SellerProductQuery extends JBaseQuery {
 
 		LinkedList<Object> params = new LinkedList<Object>();
 		appendIfNotEmpty(fromBuilder, "sp.seller_id", sellerId, params, false);
-		appendIfNotEmpty(fromBuilder, "gt.id", typeId, params, false);
 		appendIfNotEmptyWithLike(fromBuilder, "sp.custom_name", keyword, params, false);
 
 		fromBuilder.append(" ORDER BY gc.order_list, gt.`name`, sp.order_list ");
@@ -145,7 +144,7 @@ public class SellerProductQuery extends JBaseQuery {
 	}
 	
 	public SellerProduct _findByProductIdAndSellerId(String product_id, String sellerId) {
-		StringBuilder fromBuilder = new StringBuilder("select * from cc_seller_product where id=? and seller_id=?");
+		StringBuilder fromBuilder = new StringBuilder("select * from cc_seller_product where product_id=? and seller_id=?");
 		return DAO.findFirst(fromBuilder.toString(), product_id,sellerId);
 	}
 }

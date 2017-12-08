@@ -133,14 +133,22 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 		Date date = new Date();
 		PurchaseInstock purchaseInstock=PurchaseInstockQuery.me().findById(purchaseInstockId);
 		//采购退货单： PR + 100000(机构编号或企业编号6位) + 20171108(时间) + 100001(流水号)
-		String orderSn = "PR" + user.getDepartmentId().substring(0, 6) + DateUtils.format("yyMMdd", date) + "100001";
+		List<PurchaseRefundOutstock> list =PurchaseRefundOutstockQuery.me().findByUser(user.getId(),user.getDataArea());
+		int i = list.size();
+		i++;
+		String j=Integer.toString(i);
+		int countt =j.length();
+		for(int m=0;m<(6-countt);m++){
+			j= "0"+j;
+		}
+		String orderSn = "PR" + user.getDepartmentId().substring(0, 6) + DateUtils.format("yyMMdd", date) + j;
 
 		purchaseRefundOutstock.set("id", orderId);
 		purchaseRefundOutstock.set("outstock_sn", orderSn);
 		purchaseRefundOutstock.set("supplier_id", StringUtils.getArrayFirst(paraMap.get("supplierId")));
 		purchaseRefundOutstock.set("warehouse_id", StringUtils.getArrayFirst(paraMap.get("warehouseId")));
 		purchaseRefundOutstock.set("biz_user_id", user.getId());
-		purchaseRefundOutstock.set("warehouse_in_id", StringUtils.getArrayFirst(paraMap.get("warehouseInId")));
+		purchaseRefundOutstock.set("warehouse_in_id", purchaseInstockId);
 		purchaseRefundOutstock.set("biz_date", date);
 		purchaseRefundOutstock.set("input_user_id", user.getId());
 		purchaseRefundOutstock.set("status", 0);

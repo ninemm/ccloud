@@ -10,102 +10,106 @@ $(function() {
   });
 
   initCustomer();
-  $("#deliveryTime").calendar();
+  $("#deliveryDate").calendar();
   initProduct();
   total();
 
 })
-var $form = $('#form');
-var newHtml = $(".goods-detail").eq(0).html();
-var $product = $("#productList");
-var customerTypeInfoMap = [];
+	var $form = $('#form');
+	var newHtml = $(".goods-detail").eq(0).html();
+	var $product = $("#productList");
+	var customerTypeInfoMap = [];
 
-function initCustomer(){
-	var customerInfo = getItemBykey("customerInfo");
-
-	if(customerInfo){
-		$("#sellerCustomerId").val(customerInfo.sellerCustomerId);
-		$("#customerName").val(customerInfo.customerName);
-		$("#contact").val(customerInfo.contact);
-		$("#mobile").val(customerInfo.mobile);
-		$("#address").val(customerInfo.address);
+	function initCustomer(){
+		var customerInfo = getItemBykey("customerInfo");
 	
-		$("#deliveryAddress").val(customerInfo.address);
+		if(customerInfo){
+			$("#sellerCustomerId").val(customerInfo.sellerCustomerId);
+			$("#customerName").val(customerInfo.customerName);
+			$("#contact").val(customerInfo.contact);
+			$("#mobile").val(customerInfo.mobile);
+			$("#address").val(customerInfo.address);
 		
-		Utils.ajax('${CPATH}/product/customerTypeById', {"customerId" : customerInfo.sellerCustomerId}, 
-			function(data){
-				var items = [];
-				$.each(data, function(index, el) {
-					customerTypeInfoMap[el.id] = {
-						id : el.id,
-						name : el.name,
-						code : el.code,
-						factor : el.factor
-					}
-					
-					items.push({
-						title : el.name,
-						value : el.id
-					})
-				});
-
-				var $customerType = $("#customerType");
-				$customerType.select({
-			         title: "客户类型",
-			         items: items,
-			         onChange: function(data) {
-			         	$("#customerTypeId").val(customerTypeInfoMap[data.values].id);
-				        $("#customerTypeCode").val(customerTypeInfoMap[data.values].code);
-				        $("#factor").val(customerTypeInfoMap[data.values].factor);
-			         }
-		        });
-		        $customerType.val(items[0].title);
-		        $customerType.attr('data-values', items[0].value);
-
-		        $("#customerTypeId").val(customerTypeInfoMap[items[0].value].id);
-		        $("#customerTypeCode").val(customerTypeInfoMap[items[0].value].code);
-		        $("#factor").val(customerTypeInfoMap[items[0].value].factor);
-			}
-		);
+			$("#deliveryAddress").val(customerInfo.address);
+			
+			Utils.ajax('${CPATH}/product/customerTypeById', {"customerId" : customerInfo.sellerCustomerId}, 
+				function(data){
+					var items = [];
+					$.each(data, function(index, el) {
+						customerTypeInfoMap[el.id] = {
+							id : el.id,
+							name : el.name,
+							code : el.code,
+							factor : el.factor
+						}
+						
+						items.push({
+							title : el.name,
+							value : el.id
+						})
+					});
+	
+					var $customerTypeName = $("#customerTypeName");
+					$customerTypeName.select({
+				         title: "客户类型",
+				         items: items,
+				         onChange: function(data) {
+				         	$("#customerType").val(customerTypeInfoMap[data.values].id);
+					        $("#customerTypeCode").val(customerTypeInfoMap[data.values].code);
+					        $("#factor").val(customerTypeInfoMap[data.values].factor);
+				         }
+			        });
+			        $customerTypeName.val(items[0].title);
+			        $customerTypeName.attr('data-values', items[0].value);
+	
+			        $("#customerType").val(customerTypeInfoMap[items[0].value].id);
+			        $("#customerTypeCode").val(customerTypeInfoMap[items[0].value].code);
+			        $("#factor").val(customerTypeInfoMap[items[0].value].factor);
+				}
+			);
+		}
+	
 	}
 
-}
-
-function initProduct(){
-	var productList = getItemBykey("productList");
-	$product.empty();
-	$.each(productList, function(index, el) {
-		$product.append("<div class='weui-panel weui-panel_access goods-detail'>" + newHtml + "</div>");
-		var $newProductDetail = $product.find(".weui-panel:last");
-		$newProductDetail.find("#productName").text(el.productName);
-		$newProductDetail.find("#valueName").text(el.valueName);
-
-		$newProductDetail.find("#bigPriceSpan").text(el.bigPriceSpan);
-		$newProductDetail.find("#smallPriceSpan").text(el.smallPriceSpan);
-		$newProductDetail.find("#bigUnitSpan").text(el.bigUnitSpan);
-		$newProductDetail.find("#smallUnitSpan").text(el.smallUnitSpan);
-
-		$newProductDetail.find("#bigPrice").val(el.bigPrice);
-		$newProductDetail.find("#smallPrice").val(el.smallPrice);
-		$newProductDetail.find("#bigUnit").val(el.bigUnit);
-		$newProductDetail.find("#smallUnit").val(el.smallUnit);
-		$newProductDetail.find("#sellProductId").val(el.sellProductId);
-		$newProductDetail.find("#productId").val(el.productId);
-		$newProductDetail.find("#convert").val(el.convert);
-		
-		$newProductDetail.find("#bigNum").val(el.bigNum);
-		$newProductDetail.find("#smallNum").val(el.smallNum);
-
-	});
-}
+	function initProduct(){
+		var productList = getItemBykey("productList");
+		$product.empty();
+		$.each(productList, function(index, el) {
+			$product.append("<div class='weui-panel weui-panel_access goods-detail'>" + newHtml + "</div>");
+			var $newProductDetail = $product.find(".weui-panel:last");
+			$newProductDetail.find("#productName").text(el.productName);
+			$newProductDetail.find("#valueName").text(el.valueName);
+	
+			$newProductDetail.find("#bigPriceSpan").text(el.bigPriceSpan);
+			$newProductDetail.find("#smallPriceSpan").text(el.smallPriceSpan);
+			$newProductDetail.find("#bigUnitSpan").text(el.bigUnitSpan);
+			$newProductDetail.find("#smallUnitSpan").text(el.smallUnitSpan);
+	
+			$newProductDetail.find("#bigPrice").val(el.bigPrice);
+			$newProductDetail.find("#smallPrice").val(el.smallPrice);
+			$newProductDetail.find("#bigUnit").val(el.bigUnit);
+			$newProductDetail.find("#smallUnit").val(el.smallUnit);
+			$newProductDetail.find("#sellProductId").val(el.sellProductId);
+			$newProductDetail.find("#productId").val(el.productId);
+			$newProductDetail.find("#convert").val(el.convert);
+			
+			$newProductDetail.find("#bigNum").val(el.bigNum);
+			$newProductDetail.find("#smallNum").val(el.smallNum);
+	
+		});
+	}
 
 	function total() {
 		var products = $(".goods-detail");
+		var rowTotal = 0;
 		var total = 0;
 		$.each(products, function(index, el) {
-			total += $(el).find("#bigNum").val() * $(el).find("#bigPrice").val();
-			total += $(el).find("#smallNum").val() * $(el).find("#smallPrice").val();
+			var $el = $(el);
+			rowTotal = $el.find("#bigNum").val() * $el.find("#bigPrice").val() + $el.find("#smallNum").val() * $el.find("#smallPrice").val();
+			$el.find("#rowTotal").val(rowTotal);
+			total += rowTotal;
 		});
+		$("#total").val(total);
 		$("#totalNum").text("共" + products.length + "款,合计:" + total + "元")
 	
 	} 
@@ -127,10 +131,12 @@ function initProduct(){
 			dataType : "json", 
 			success : function(data) { 
 				if (data.errorCode == 0) {
-					//location.reload();
-					toastr.success(data.message, '操作成功');
+					toastr.success(data.message);
+					removeItemBykey("productList");
+					removeItemBykey("customerInfo");
+					window.location.href = "${CPATH}/product/myOrder"
 				} else {
-					toastr.error(data.message,'操作失败');
+					toastr.error(data.message);
 				}
 			},
 			error : function() {
@@ -151,7 +157,7 @@ function initProduct(){
 							客户名称
 							<span class="require">*</span>
 						</div>
-						<input type="hidden" id="sellerCustomerId" value="" >
+						<input type="hidden" id="sellerCustomerId" name="customerId" value="" >
 						<input type="text" placeholder="请选择客户" class="weui-input" id="customerName" name="customerName" value="" readonly>
 						<span class="weui-cell__ft"></span>
 					</div>
@@ -190,10 +196,10 @@ function initProduct(){
 							客户类型
 							<span class="require">*</span>
 						</div>
-						<input type="hidden" id="customerTypeId" name="customerTypeId" value="">
+						<input type="hidden" id="customerType" name="customerType" value="">
 						<input type="hidden" id="customerTypeCode" name="customerTypeCode" value="">
 						<input type="hidden" id="factor" name="factor" value="">
-						<input type="text" placeholder="请选择客户类型" class="weui-input" id="customerType" name="customerType" value="" readonly>
+						<input type="text" placeholder="请选择客户类型" class="weui-input" id="customerTypeName" name="customerTypeName" value="" readonly>
 						<span class="weui-cell__ft"></span>
 					</div>
 				</div>
@@ -202,7 +208,7 @@ function initProduct(){
 				<div class="weui-cell weui-cell_access">
 					<div class="weui-cell__bd">
 						配送时间
-						<input type="text" placeholder="请选择配送时间" class="weui-input" data-toggle='date' id="deliveryTime" name="deliveryAddress" readonly>
+						<input type="text" placeholder="请选择配送时间" class="weui-input" data-toggle='date' id="deliveryDate" name="deliveryDate" value="${deliveryDate!}" readonly>
 						<span class="weui-cell__ft"></span>
 					</div>
 				</div>
@@ -240,18 +246,19 @@ function initProduct(){
 						<span class="price" id="bigPriceSpan">￥725</span>
 						<span class="unit" id="bigUnitSpan">&nbsp;/&nbsp;件</span>
 						<div class="spinner">
-							<input type="number" min="0" value="0" class="fl" id="bigNum" name="bigNum" disabled>
+							<input type="number" min="0" value="0" class="fl" id="bigNum" name="bigNum" readonly>
 						</div>
-						<input type="number" class="street-value"  id="bigPrice" value="720" name="bigPrice" disabled>
+						<input type="number" class="street-value"  id="bigPrice" value="720" name="bigPrice" readonly>
 					</div>
 					<div class="product_mUnit">
 						<span class="price" id="smallPriceSpan">￥30</span>
 						<span class="unit" id="smallUnitSpan">&nbsp;/&nbsp;瓶</span>
 						<div class="spinner">
-							<input type="number" min="0" value="0" class="fl" id="smallNum" name="smallNum" disabled>
+							<input type="number" min="0" value="0" class="fl" id="smallNum" name="smallNum" readonly>
 						</div>
-						<input type="number" class="street-value" value="30" id="smallPrice" name="smallPrice" disabled>
+						<input type="number" class="street-value" value="30" id="smallPrice" name="smallPrice" readonly>
 					</div>
+					<input type="hidden" id="rowTotal" name="rowTotal" value="">
 					<hr />
 					<div class="gift">
 						<div>
@@ -282,11 +289,12 @@ function initProduct(){
 					</div>
 				</div>
 			</div>
+			<input type="hidden" id="total" name="total" value="">
 		</main>
 		<div class="hidden-menu">
 			<ul>
 				<li>
-					<a href="index.html">
+					<a href="${CPATH}/product/index">
 							首页
 						<i class="icon-home blue"></i>
 					</a>

@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.ccloud.Consts;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.CustomerType;
 import org.ccloud.model.User;
@@ -35,9 +35,13 @@ import com.jfinal.plugin.activerecord.Record;
 @RouterMapping(url = "/product")
 public class ProductController extends BaseFrontController {
 
+	String sellerId = "05a9ad0a516c4c459cb482f83bfbbf33";
+	String sellerCode = "QG";
+	User user = UserQuery.me().findById("1f797c5b2137426093100f082e234c14");
+	String dataArea = DataAreaUtil.getUserDealerDataArea(user.getDataArea());
+
 	public void index() {
 
-		String sellerId = "739cbc22c4484a9bb84622ed4ccc0541";
 		List<Record> productTypeList = SellerProductQuery.me().findProductTypeBySellerForApp(sellerId);
 		setAttr("productTypeList", productTypeList);
 		render("product.html");
@@ -45,10 +49,8 @@ public class ProductController extends BaseFrontController {
 
 	public void productList() {
 
-		String sellerId = "739cbc22c4484a9bb84622ed4ccc0541";
-		String typeId = getPara("typeId");
 		String keyword = getPara("keyword");
-		List<Record> productList = SellerProductQuery.me().findProductListForApp(sellerId, typeId, keyword);
+		List<Record> productList = SellerProductQuery.me().findProductListForApp(sellerId, keyword);
 		renderJson(productList);
 	}
 
@@ -58,13 +60,11 @@ public class ProductController extends BaseFrontController {
 	}
 
 	public void order() {
-
+		setAttr("deliveryDate", DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
 		render("order.html");
 	}
 
 	public void customerChoose() {
-
-		User user = UserQuery.me().findById("1f797c5b2137426093100f082e234c14");
 
 		Map<String, Object> all = new HashMap<>();
 		all.put("title", "全部");
@@ -99,7 +99,6 @@ public class ProductController extends BaseFrontController {
 	}
 
 	public void customerList() {
-		User user = UserQuery.me().findById("1f797c5b2137426093100f082e234c14");
 
 		String keyword = getPara("keyword");
 		String userId = getPara("userId");
@@ -107,7 +106,7 @@ public class ProductController extends BaseFrontController {
 		String isOrdered = getPara("isOrdered");
 
 		Page<Record> customerList = SellerCustomerQuery.me().paginateForApp(getPageNumber(), getPageSize(), keyword,
-				DataAreaUtil.getUserDealerDataArea(user.getDataArea()), userId, customerTypeId, isOrdered);
+				dataArea, userId, customerTypeId, isOrdered);
 
 		Map<String, Object> map = new HashMap<>();
 		map.put("customerList", customerList.getList());
@@ -115,11 +114,9 @@ public class ProductController extends BaseFrontController {
 		map.put("totalPage", customerList.getTotalPage());
 		renderJson(map);
 	}
-	
+
 	public void customerTypeById() {
 		String customerId = getPara("customerId");
-//		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		User user = UserQuery.me().findById("1f797c5b2137426093100f082e234c14");
 
 		List<Record> customerTypeList = SalesOrderQuery.me().findCustomerTypeListByCustomerId(customerId,
 				DataAreaUtil.getUserDealerDataArea(user.getDataArea()));
@@ -130,14 +127,11 @@ public class ProductController extends BaseFrontController {
 	public synchronized void salesOrder() {
 
 		Map<String, String[]> paraMap = getParaMap();
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String sellerId = getSessionAttr("sellerId");
-		String sellerCode = getSessionAttr("sellerCode");
 
 		if (this.saveOrder(paraMap, user, sellerId, sellerCode)) {
 			renderAjaxResultForSuccess("保存成功");
 		} else {
-			renderAjaxResultForSuccess("库存不足或提交失败");
+			renderAjaxResultForError("库存不足或提交失败");
 		}
 	}
 
@@ -146,10 +140,7 @@ public class ProductController extends BaseFrontController {
 		boolean isSave = Db.tx(new IAtom() {
 			@Override
 			public boolean run() throws SQLException {
-				String productNumStr = StringUtils.getArrayFirst(paraMap.get("productNum"));
-				Integer productNum = Integer.valueOf(productNumStr);
-				Integer count = 0;
-				Integer index = 0;
+				String[] sellProductIds = paraMap.get("sellProductId");
 
 				String orderId = StrKit.getRandomUUID();
 				Date date = new Date();
@@ -159,20 +150,15 @@ public class ProductController extends BaseFrontController {
 				String orderSn = "SO" + sellerCode + StringUtils.getArrayFirst(paraMap.get("customerTypeCode"))
 						+ DateUtils.format("yyMMdd", date) + OrderSO;
 
-				if (!SalesOrderQuery.me().insert(paraMap, orderId, orderSn, sellerId, user.getId(), date,
+				if (!SalesOrderQuery.me().insertForApp(paraMap, orderId, orderSn, sellerId, user.getId(), date,
 						user.getDepartmentId(), user.getDataArea())) {
 					return false;
 				}
 
-				while (productNum > count) {
-					index++;
-					String productId = StringUtils.getArrayFirst(paraMap.get("productId" + index));
-					if (StrKit.notBlank(productId)) {
-						if (!SalesOrderDetailQuery.me().insert(paraMap, orderId, sellerId, user.getId(), date,
-								user.getDepartmentId(), user.getDataArea(), index)) {
-							return false;
-						}
-						count++;
+				for (int index = 0; index < sellProductIds.length; index++) {
+					if (!SalesOrderDetailQuery.me().insertForApp(paraMap, orderId, sellerId, user.getId(), date,
+							user.getDepartmentId(), user.getDataArea(), index)) {
+						return false;
 					}
 
 				}
@@ -180,6 +166,14 @@ public class ProductController extends BaseFrontController {
 			}
 		});
 		return isSave;
+	}
+	
+	public void myOrder() {
+		render("myOrder.html");
+	}
+
+	public void orderDetial() {
+		render("myOrder.html");
 	}
 
 }

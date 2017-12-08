@@ -16,6 +16,19 @@
     <link rel="stylesheet" href="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.min.css">
     <link rel="stylesheet" href="${CPATH}/static/plugins/bootstrap-table/bootstrap-table.css">
 </#macro>
+
+<#macro css>
+	.customName .th-inner {
+		width:200px;
+	}
+	.realName1 .th-inner {
+		width:100px;
+	}
+	.dateTime .th-inner {
+		width:150px;
+	}
+	
+</#macro> 
  
 <#macro script>
 var warehouse_id = '${warehouse_id}';
@@ -113,7 +126,7 @@ var initFields = function(){
 	var fields = [
 		{field: "id", title: "ID", align: "center", visible:false, edit:false},
 		{field: "product_sn", title: "商品编码", align: "center", edit:false},
-		{field: "custom_name", title: "商品名称", align: "center", edit:false},
+		{field: "custom_name", title: "商品名称", align: "center", edit:false,class:'customName'},
 		{field: "in_count", title: "入库数量", align: "center", edit:false},
 		{field: "in_amount", title: "入库金额", align: "center", edit:false},
 		{field: "in_price", title: "入库单价", align: "center", edit:false},
@@ -136,9 +149,9 @@ var initFields = function(){
   				},
   				edit: false
   			},
-		{field: "realname", title: "业务员", align: "center", edit:false},
+		{field: "realname", title: "业务员", align: "center", edit:false,class:'realName1'},
 		{field: "biz_bill_sn", title: "业务单号", align: "center", edit:false},
-		{field: "biz_date", title: "业务日期", align: "center", edit:false},
+		{field: "biz_date", title: "业务日期", align: "center", edit:false,class:'dateTime'},
 	];
 	
 	return fields;

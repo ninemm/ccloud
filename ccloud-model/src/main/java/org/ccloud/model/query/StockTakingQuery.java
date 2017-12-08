@@ -55,7 +55,7 @@ public class StockTakingQuery extends JBaseQuery {
 		fromBuilder.append(userId+"')");
 		LinkedList<Object> params = new LinkedList<Object>();
 		appendIfNotEmptyWithLike(fromBuilder, "w.name", keyword, params, false);
-		fromBuilder.append("ORDER BY c.create_date DESC");
+		fromBuilder.append("ORDER BY s.create_date DESC");
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
