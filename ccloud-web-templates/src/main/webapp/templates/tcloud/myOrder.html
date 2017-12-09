@@ -88,6 +88,8 @@
 						$newOrder.find("#receiveType").remove();
 					}
 					
+					$newOrder.find("#salesOrderId").attr('href', '${CPATH}/order/orderDetail?orderId=' + el.id);
+
 					$newOrder.find("#orderSn").text(el.order_sn);
 					
 					$newOrder.find("#status").text(getStatus(el.status));
@@ -183,6 +185,7 @@
 	<main>
 		<div id="main">
 			<div class="weui-panel weui-panel_access">
+				<a href="" id="salesOrderId">
 				<div class="ft14 gray">
 					<span class="tag" id="receiveType">账期</span>
 					<span id="orderSn">DH-O-20171017-002276</span>
@@ -204,10 +207,8 @@
 					</p>
 				</div>
 				<hr>
-				<div>
-					<div class="button blue-button fl">撤销</div>
-					<div class="button white-button fr">再次购买</div>
-				</div>
+				<div class="button blue-button fl">撤销</div>
+				<div class="button white-button fr">再次购买</div>
 			</div>
 		</div>
 		<div class="weui-loadmore" id="loading" style="display: none;">

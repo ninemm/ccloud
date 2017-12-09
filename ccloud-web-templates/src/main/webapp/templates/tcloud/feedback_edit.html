@@ -1,0 +1,212 @@
+<#include "_inc/_layout.html"/>
+<#macro css>
+    
+</#macro>
+
+<#macro script_import>
+    <!-- <script type='text/javascript' src="${CTPATH}/js/weui.js"></script> -->
+    <script src="${CPATH}/static/layer_mobile/layer.js"></script>
+</#macro>
+
+<#macro script>
+	var imageArr = [];
+	var count = 3;
+	var $picNum = $('.weui-uploader__info');
+	var $gallery = $("#gallery"), $galleryImg = $("#galleryImg");
+	
+	$(function() {
+		$("#uploaderInput").on("change",function () {
+	    
+	        var files = this.files;;
+	        var arrNum = imageArr.length;
+	        var num = arrNum + files.length;
+
+	        if (num > count) {
+	            $.alert("最多上传三张图片");
+	            return false;
+	        }
+	        
+	        $picNum.text(num + '/' + count);
+	        
+	        for (var i = 0; i < files.length; i ++) {
+	            var file = files[i];
+	            if (!/image\/\w+/.test(file.type)) {
+		            $.alert("请确保文件为图像类型");
+	                return false;
+	            }
+	            
+	            var reader = new FileReader();
+	            
+	            (function(x) {
+	                reader.onload = function(e) {
+	                    var str = '<li class="weui-uploader__file " style="background-image:url('+this.result+')"><span class="remove" style="color:red">X</span></li>';
+	                    $("#uploaderFiles").append(str);
+	                    render(this.result, x);
+	                }
+	            })(file.name)
+	            
+	            reader.readAsDataURL(file);
+	        }
+	    
+	    });
+	    
+	    var MAX_HEIGHT = 1000;
+	    
+	    function render(src, picname) {
+	        
+	        var image = new Image();
+	        image.onload = function() {
+	           
+	           var canvas = document.createElement("canvas");
+	           if (image.height > MAX_HEIGHT && image.height >= image.width) {
+	               image.width *= MAX_HEIGHT / image.height;
+	               image.height = MAX_HEIGHT;
+	           }
+	           
+	           if (image.width > MAX_HEIGHT && image.width > image.height) {
+		            // 宽度等比例缩放 *=
+		            image.height *= MAX_HEIGHT / image.width;
+		            image.width = MAX_HEIGHT;
+		       }
+		       
+		       var ctx = canvas.getContext("2d");
+		       ctx.clearRect(0, 0, canvas.width, canvas.height);
+		       
+		       canvas.width = image.width;
+		       canvas.height = image.height;
+		       
+		       ctx.drawImage(image, 0, 0, image.width, image.height);
+		       var blob = canvas.toDataURL('image/jpeg', 0.8);
+		       imageArr.push({"pic":blob, "pic_name":picname});
+	        };
+	        image.src = src;
+	    }
+	
+	    var index; //第几张图片
+        $("#uploaderFiles").on("click", "li", function() {
+            index = $(this).index();
+            $galleryImg.attr("style", this.getAttribute("style"));
+            $gallery.fadeIn(100);
+        });
+        $gallery.on("click", function() {
+            $gallery.fadeOut(100);
+        });
+        //删除图片  删除图片的代码也贴出来。
+        $(".weui-gallery__del").click(function() { //这部分刚才放错地方了，放到$(function(){})外面去了
+            console.log('删除');
+            $uploaderFiles.find("li").eq(index).remove();
+        });
+        
+        
+	})
+	
+	function doSubmit() {
+        var content = $('#content').val();
+        $('#_submit_btn').attr('disabled', true);
+        $.ajax({
+            url: "${CPATH}/feedback/save",
+            type: "post",
+            dataType: "json",
+            data: {'pic': JSON.stringify(imageArr), 'content': content},
+            beforeSend: function() {
+                if (content == null || content == '') {
+                    $.toptip('反馈内容不能为空', 2000, 'error');
+                    return ;
+                }
+                
+                layer.open({
+                    type: 2,
+                    content: '保存中...'
+                });
+            },
+            success: function(res) {
+                if (res.errorCode == 0) {
+                    $.confirm({
+					    title: res.message,
+					    text: '返回列表页？',
+					    onOK: function () {
+					        location.href = '${CPATH}/feedback'
+					    },
+					    onCancel: function () {
+					        $.closeModal();
+					    }
+                    });
+                } else {
+                    $.alert(res.message);
+                }
+                layer.closeAll();
+            },
+            error: function(res) {
+                layer.closeAll();
+            }
+        });
+    }
+	
+</#macro>
+
+<@layout>
+<div class="weui-content">
+
+	<article>
+		<section class="weui-cells">
+			<div class="weui-cell">
+				<div class="weui-cell__bd">
+					<textarea name="content" id="content" cols="30" rows="10" placeholder="请输入反馈意见">${(feedback.content)!}</textarea>
+					<div class="weui-textarea-counter"><span>0</span>/200</div>
+				</div>
+			</div>
+		</section>
+		<div class="weui-gallery" id="gallery">
+            <span class="weui-gallery__img" id="galleryImg"></span>
+            <div class="weui-gallery__opr">
+                <a href="javascript:" rel="nofollow" target="_blank"  class="weui-gallery__del">
+                    <i class="weui-icon-delete weui-icon_gallery-delete"></i>
+                </a>
+            </div>
+        </div>
+		<section class="weui-cells weui-cells_form" id="uploader">
+			<div class="weui-cell">
+				<div class="weui-cell__bd">
+					<div class="weui-uploader">
+						<div class="weui-uploader__hd">
+							<p class="weui-uploader__title">附件图片</p>
+							<div class="weui-uploader__info">${(feedback.imageList?size)!0}/3</div>
+						</div>
+						<div class="weui-uploader__bd">
+							<ul class="weui-uploader__files" id="uploaderFiles">
+							    <#if (feedback.imageList) ??> 
+							    <#list feedback.imageList as bean>
+							        <li class="weui-uploader__file" style="background-image: url(${bean.savePath})"></li>
+                                </#list>
+							    </#if>
+							</ul>
+							<div class="weui-uploader__input-box">
+								<input id="uploaderInput" class="weui-uploader__input"
+									type="file" accept="image/*" multiple="">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</article>
+	<div class="hidden-menu">
+		<ul>
+			<li><a href="index.html"> 首页 <i class="icon-home blue"></i>
+			</a></li>
+			<li><a href="javascript:history.go(-1)"> 上一页 <i
+					class="icon-undo green"></i>
+			</a></li>
+		</ul>
+		<i class="icon-menu-open orange fr" id="button"></i>
+	</div>
+	<div class="layer"></div>
+	<footer class="weui-footer weui-footer_fixed-bottom">
+	    <#if feedback??>
+	    <a href="javascript:history.go(-1);" class="place-order bg-blue white width-100">返回</a>
+	    <#else> 
+		<button id="_submit_btn" onclick="doSubmit()" class="place-order bg-blue white width-100" style="border: 0 ;">确定</button>
+		</#if>
+	</footer>
+</div>
+</@layout>

@@ -1,0 +1,93 @@
+<#include "_inc/_layout.html"/>
+
+<#macro script>
+    //$loadmore.hide();
+    var loading = false;
+    var pageNumber = 2;
+    var pageSize = Utils.pageSize;
+    var $loadmore = $(".weui-loadmore");
+    var $endNode = null;
+    
+    var paramData = function() {
+        return {
+            method: 'queryScore', 
+            pageSize: pageSize, 
+            pageNumber: pageNumber
+        }
+    }
+    
+    var callback = function(res) {
+        if (res.errorCode == 0 && res.data) {
+             $endNode.after(res.data.feedbackData);
+             loading = false;
+             pageNumber ++ ;
+             
+             if (res.data.isEnd) {
+                $(document.body).destroyInfinite();
+                $loadmore.hide();
+             }
+             
+         } else {
+             toastr.error(res.message);
+         }
+    }
+    
+    $(document.body).infinite().on("infinite", function() {
+    
+        $endNode = $('.weui-cells .weui-cell_access:last');
+        if ($loadmore) 
+            $loadmore.show();
+            
+        if (loading) 
+            return;
+            
+        loading = true;
+        
+        Utils.ajax('${CPATH}/feedback/more', paramData(), callback);
+    });
+</#macro>
+
+<@layout>
+<div class="weui-content">
+	<main>
+	<#if page??>
+		<div class="weui-cells">
+		    <#list page.list as bean>
+			<a href="${CPATH}/feedback/edit?id=${bean.id}" class="weui-cell weui-cell_access">
+				<div class="weui-cell__bd">
+					<p>${(bean.content)!}</p>
+				</div>
+				<div class="weui-cell__ft">${(bean.createDate?string('yyyy-MM-dd HH:mm'))!}</div>
+			</a> 
+			</#list>
+		</div>
+	</#if>
+	<#if (page.list?size = 0)>
+    <div class="weui-loadmore weui-loadmore_line">
+        <span class="weui-loadmore__tips">暂无数据</span>
+    </div>
+    <#elseif (page.list?size == page.pageSize)>
+    <div class="weui-loadmore">
+        <i class="weui-loading"></i>
+        <span class="weui-loadmore__tips">正在加载</span>
+    </div>
+    </#if> 
+	</main>
+	
+	<div class="hidden-menu">
+		<ul>
+			<li><a href="index.html"> 首页 <i class="icon-home blue"></i>
+			</a></li>
+			<li><a href="javascript:history.go(-1)"> 上一页 <i
+					class="icon-undo green"></i>
+			</a></li>
+		</ul>
+		<i class="icon-menu-open orange fr" id="button"></i>
+	</div>
+	<div class="layer"></div>
+	<footer class="weui-footer weui-footer_fixed-bottom">
+		<a href="${CPATH}/feedback/edit" class="place-order bg-blue white width-100">新增反馈</a>
+	</footer>
+	
+</div>
+</@layout>

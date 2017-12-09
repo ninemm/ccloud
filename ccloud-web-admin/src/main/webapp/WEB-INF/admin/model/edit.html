@@ -31,18 +31,16 @@
 		'name': {
 			validators: {
 	            notEmpty: { message: '模块名称不能为空' },
-	            stringLength: { min: 2, max: 15, message: '模块名称最大长度是15字符，请重新输入' }
+	            stringLength: { min: 2, max: 100, message: '模块名称最大长度是100字符，请重新输入' }
 	        }
 		},	
 		'key': {
 			validators: {
 	            notEmpty: { message: '模块编码不能为空' },
-	            stringLength: { min: 2, max: 15, message: '模块编码最大长度是15字符，请重新输入' }
+	            stringLength: { min: 2, max: 100, message: '模块编码最大长度是100字符，请重新输入' }
 	        }
 		}	
 	};
-	
-	
 	
 	function doSubmit(){
 		$form.ajaxSubmit({

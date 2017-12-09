@@ -30,6 +30,7 @@ import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.User;
 import org.ccloud.model.query.CustomerQuery;
+import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
@@ -76,7 +77,7 @@ public class _AdminController extends JBaseController {
 			return;
 		}
 		setAttr("toDoCustomerList", CustomerQuery.me().getToDo(user.getUsername()));
-
+		setAttr("toDoOrdersList", SalesOrderQuery.me().getToDo(user.getUsername()));
 		render("index.html");
 	}
 

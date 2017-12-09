@@ -62,6 +62,10 @@ main {
   -webkit-overflow-scrolling: touch;
 }
 
+button {
+  border: 0;
+}
+
 a {
   color: #000;
 }
@@ -269,6 +273,7 @@ a {
 }
 
 .button {
+	border: 0;
   border-radius: 0.2rem;
   height: 1.5rem;
   line-height: 1.5rem;
@@ -786,6 +791,22 @@ a {
   font-size: 0.6rem;
 }
 
+.choose-good {
+  width: 5rem;
+  border: 1px solid #bbb;
+  text-align: center;
+}
+
+.choose-unit {
+  margin-left: 7.246377%;
+  width: 3rem;
+  position: absolute;
+  top: 0;
+  left: 8.2rem;
+  border: 1px solid #bbb;
+  text-align: center;
+}
+
 .gift input[name=add-gift] {
   position: absolute;
   left: 0;
@@ -1084,7 +1105,8 @@ input[name=sex] {
 /* 订单详情 */
 
 #order-detail main {
-  margin-bottom: 2.25rem;
+  top: 0;
+  bottom: 2.25rem;
 }
 
 #order-detail .weui-panel {
@@ -1516,7 +1538,6 @@ input[name=input-type] {
 
 #fee-audit-list main {
   top: 2rem;
-  ;
   bottom: 0;
 }
 
@@ -1558,6 +1579,13 @@ input[name=input-type] {
 
 #informationList .weui-cells {
   margin-top: 0;
+}
+
+/* 反馈列表 */
+
+#feedback-list main, #feedback-add main {
+  top: 0;
+  bottom: 2.25rem;
 }
 
 

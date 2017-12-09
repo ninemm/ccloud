@@ -5,10 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.CustomerType;
 import org.ccloud.model.User;
 import org.ccloud.model.query.CustomerTypeQuery;
+import org.ccloud.model.query.SalesOrderDetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
@@ -68,8 +70,27 @@ public class OrderController extends BaseFrontController {
 		renderJson(map);
 	}
 
-	public void orderDetial() {
-		render("myOrder.html");
+	public void orderDetail() {
+		String orderId = getPara("orderId");
+		Record order = SalesOrderQuery.me().findMoreById(orderId);
+		List<Record> orderDetailList = SalesOrderDetailQuery.me().findByOrderId(orderId);
+
+		order.set("statusName", getStatusName(order.getInt("status")));
+
+		setAttr("order", order);
+		setAttr("orderDetailList", orderDetailList);
+		render("orderDetail.html");
 	}
 
+
+	private String getStatusName (int statusCode) {
+		if (statusCode == Consts.SALES_ORDER_STATUS_PASS) return "已审核";
+		if (statusCode == Consts.SALES_ORDER_STATUS_DEFAULT) return "待审核";
+		if (statusCode == Consts.SALES_ORDER_STATUS_CANCEL) return "取消";
+		if (statusCode == Consts.SALES_ORDER_STATUS_PART_OUT) return "部分出库";
+		if (statusCode == Consts.SALES_ORDER_STATUS_PART_OUT_CLOSE) return "部分出库-订单关闭";
+		if (statusCode == Consts.SALES_ORDER_STATUS_ALL_OUT) return "全部出库";
+		if (statusCode == Consts.SALES_ORDER_STATUS_ALL_OUT_CLOSE) return "全部出库-订单关闭";
+		return "无";
+	}
 }

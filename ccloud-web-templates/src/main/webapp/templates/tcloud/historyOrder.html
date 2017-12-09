@@ -1,0 +1,148 @@
+<#include "_inc/_layout.html"/>
+<#macro css> </#macro>
+<#macro script>
+    var pageNumber = 2;
+    var pageSize = 10;
+    var loading = false;
+
+    var $endNode = null;
+    var $loadmore = $(".weui-loadmore");
+
+    var paramData = function() {
+        return  {
+            "customerId": "${(customerId)!}",
+            "pageNumber": pageNumber,
+            "pageSize": pageSize
+        };
+    }
+
+    //滚动监听
+    $(".infinite").infinite().on("infinite", function() {
+        var self = this;
+        $endNode = $(".weui-panel_access:last");
+        $loadmore = $(self).find(".weui-loadmore");
+        if ($loadmore) $loadmore.show();
+        if (loading) return ;
+        loading = true;
+
+        $.ajax({
+            type: "post",
+            url: "${CPATH}/historyOrder/refresh",
+            data: paramData(),
+            dataType: "json",
+            success:function(data) {
+                if ($loadmore) $loadmore.show();
+                if (data.totalPage >= pageNumber) {
+                    $endNode.after(data.html);
+                }
+                if (data.totalPage = pageNumber) {
+                    $(".infinite").destroyInfinite();
+                    $loadmore.hide();
+                }
+                pageNumber++;
+                loading = false;
+            }
+        });
+    });
+
+    function refresh() {
+        pageNumber = 1;
+        $.ajax({
+            url:"${CPATH}/historyOrder/refresh",
+            type:"post",
+            data:paramData(),
+            dataType:"json",
+            success:function(data) {
+                $loadmore = $(this).find(".weui-loadmore");
+                $(".infinite").destroyInfinite();
+                $loadmore.hide();
+
+                if (data.totalPage > pageNumber) {
+                    loading = false;
+                    $(".infinite").infinite();
+                    $(".weui-loadmore").removeAttr("style");
+                }
+
+                $(".infinite")[0].scrollTop = 0;
+                $("#orderList").empty();
+                $("#orderList").html(data.html);
+                pageNumber = 2;
+            }
+        });
+    }
+</#macro>
+<@layout>
+<body id="history" class="ft12">
+<div class="infinite">
+    <header class="t-c">
+        ${(customerName)!}
+    </header>
+    <main class="infinite" id="orderList">
+        <#if orderList??>
+        <#assign total = orderList.totalRow>
+            <#list orderList.list as order>
+                    <div class="weui-panel weui-panel_access">
+                        <a href="order/orderDetail?orderId=${(order.id)!}">
+                        <div class="ft14">
+                            <#if order.receive_type = 0>
+                                <span class="tag">${(order.receive_Name)!}</span>
+                            </#if>
+                            ${(order.order_sn)}
+                            <span class="fr blue">${(order.statusName)!}</span>
+                        </div>
+                        <div class="gray">
+                            <p>数量：${(order.total_count)!}件
+                                <span class="fr">时间：${(order.create_date)!}</span>
+                            </p>
+                            <p>金额：${(order.total_amount)!}
+                                <span class="fr">业务员：${(order.realname)!}</span>
+                            </p>
+
+                        </div>
+                        </a>
+                        <hr>
+                        <div>
+                            <#if order.status = 0><div class="button blue-button fl">撤销</div></#if>
+                            <div class="button white-button fr">再次购买</div>
+                        </div>
+                    </div>
+            </#list>
+        </#if>
+        <#if total = 0>
+                <div class="weui-loadmore weui-loadmore_line">
+                    <span class="weui-loadmore__tips">暂无数据</span>
+                </div>
+                <#elseif total &gt; 10>
+                    <div class="weui-loadmore">
+                        <i class="weui-loading"></i>
+                        <span class="weui-loadmore__tips">正在加载</span>
+                    </div>
+            </#if>
+    </main>
+</div>
+<div class="hidden-menu">
+    <ul>
+        <li>
+            <a href="index.html">
+                首页
+                <i class="icon-home blue"></i>
+            </a>
+        </li>
+        <li>
+            <a href="/orderStatistics.html">
+                订单统计
+                <i class="icon-pie-chart red"></i>
+            </a>
+        </li>
+        <li>
+            <a href="javascript:history.go(-1)">
+                上一页
+                <i class="icon-undo green"></i>
+            </a>
+        </li>
+    </ul>
+    <i class="icon-menu-open orange fr" id="button"></i>
+</div>
+<div class="layer"></div>
+</body>
+</@layout>
