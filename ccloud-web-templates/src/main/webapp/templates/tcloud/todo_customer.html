@@ -1,0 +1,83 @@
+<#include "_inc/_layout.html"/>
+
+<#macro css> </#macro>
+
+<#macro script>
+	$(function() {
+	    $("#region").select({
+	        title: "选择客户区域",
+	        items: ["全部", "总部-默认区域"]
+	    });
+	    $("#customer-type").select({
+	        title: "选择客户类型",
+	        items: ["全部", "团购直销", "商超"]
+	    });
+	    $("#if-order").select({
+	        title: "是否下单",
+	        items: ["全部", "是", "否"]
+	    });
+	});
+</#macro> 
+
+<@layout>
+
+<div id="customer-audit">
+    <header>
+        <#include "_inc/_search_box.html" />
+        <!-- <div class="has-th-list">
+	        <div class="head-search select-area">
+		        <div>
+		            <input type="text" id="region" placeholder="客户区域" class="weui-input" readonly>
+		            <i class="icon-sort-desc"></i>
+		        </div>
+		        <div>
+		            <input type="text" id="customer-type" placeholder="客户类型" class="weui-input" readonly>
+		            <i class="icon-sort-desc"></i>
+		        </div>
+		        <div>
+		            <input type="text" id="if-order" placeholder="是否下单" class="weui-input" readonly>
+		            <i class="icon-sort-desc"></i>
+		        </div>
+	        </div>
+	        <div id="combin-filter-btn">
+	            <i class="icon-th-list"></i>
+	        </div>
+        </div> -->
+    </header>
+    <main>
+        <#if todoList ??>
+        <#list todoList as customer>
+		<div class="weui-panel weui-panel_access">
+			<div class="weui-cell weui-cell_access">
+				<div class="weui-cell__bd ft14">
+					<p>${(customer.customer_name)!}</p>
+					<div class="ft12 gray">
+						<p>联系人：${(customer.contact)!}/${(customer.mobile)!}</p>
+						<p>客户类型：终端</p>
+						<p>配送地址：${(customer.prov_name)!} ${(customer.city_name)!} ${(customer.country_name)!} ${(customer.address)!}</p>
+						<p>
+							<i class="icon-map-pin ft16 green"></i>&nbsp;&nbsp; ${(customer.location)!}
+						</p>
+					</div>
+				</div>
+			</div>
+			<div class="weui-cell weui-cell_access">
+				<div class="weui-cell__bd ft14">
+					<p>变更类型：资料变更</p>
+					<p>客户类型：终端、团购</p>
+					<p>原因说明：该客户现在可以做团购</p>
+				</div>
+			</div>
+			<div class="weui-cell weui-cell_access">
+				<div class="weui-flex space-between width-100 ft14">
+					<div class="button blue-button">同意</div>
+					<div class="button white-button">拒绝</div>
+				</div>
+			</div>
+		</div>
+		</#list>
+		</#if>
+	</main>
+    <#include "_inc/_goback.html" />
+</div>
+</@layout>

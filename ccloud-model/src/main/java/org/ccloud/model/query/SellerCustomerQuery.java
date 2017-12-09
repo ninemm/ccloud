@@ -16,10 +16,11 @@
 package org.ccloud.model.query;
 
 import java.util.LinkedList;
+import java.util.List;
 
-import com.jfinal.kit.StrKit;
 import org.ccloud.model.SellerCustomer;
 
+import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
@@ -235,6 +236,18 @@ public class SellerCustomerQuery extends JBaseQuery {
 		sql.append(") AS c");
 		return Db.paginate(pageNumber, pageSize, select, sql.toString(), params.toArray());
 
+	}
+	
+	public List<SellerCustomer> getToDo(String username) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("SELECT sc.*, c.customer_name, c.customer_code, c.contact, c.mobile, c.address, c.prov_name, c.city_name, c.country_name,");
+		sb.append(" a.ID_ taskId, a.NAME_ taskName, a.ASSIGNEE_ assignee, a.CREATE_TIME_ createTime");
+		sb.append(" FROM cc_seller_customer sc");
+		sb.append(" JOIN cc_customer c on sc.customer_id = c.id");
+		sb.append(" JOIN act_ru_task a on sc.proc_inst_id = a.PROC_INST_ID_");
+		sb.append(" JOIN act_ru_identitylink u on sc.proc_inst_id = u.PROC_INST_ID_");
+		sb.append(" where c.is_enabled = 1 and locate(?, u.USER_ID_) > 0");
+		return DAO.find(sb.toString(), username);
 	}
 
 }
