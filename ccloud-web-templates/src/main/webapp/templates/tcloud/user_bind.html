@@ -151,17 +151,17 @@
 	    
 	    function sendSms() {
 	        var url = "${CPATH}/smsCode/send";
-	        Utils.ajax(url, param, null);
+	        Utils.ajax(url, param(), null);
 	    }
 	    
 	    function checkMobile(mobile) {
 	    	var url = "${CPATH}/user/checkMobile";
-	    	Utils.ajax(url, param, mobileCallback);
+	    	Utils.ajax(url, {'mobile': mobile}, mobileCallback);
 	    }
 	    
 	    $('#bind').on('click', function() {
             var url = '${CPATH}/user/update';
-            Utils.ajax(url, param, callback);
+            Utils.ajax(url, param(), callback);
         });
         
 	    var callback = function(res) {

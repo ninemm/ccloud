@@ -172,7 +172,7 @@ public class CustomerController extends BaseFrontController {
 			
 			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 			Boolean isCustomerAudit = OptionQuery.me().findValueAsBool("isCustomerAudit");
-			
+			isCustomerAudit = true;
 			if (isCustomerAudit != null && isCustomerAudit.booleanValue()) {
 			
 				User manager = UserQuery.me().findManagerByDeptId(user.getDepartmentId());
@@ -182,7 +182,7 @@ public class CustomerController extends BaseFrontController {
 					return ;
 				}
 				
-				String defKey = "";
+				String defKey = "_customer_audit";
 				Map<String, Object> param = Maps.newHashMap();
 //				param.put("apply", user.getUsername());
 				param.put("manager", manager.getUsername());
