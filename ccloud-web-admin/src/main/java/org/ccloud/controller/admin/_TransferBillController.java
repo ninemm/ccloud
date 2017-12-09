@@ -33,14 +33,13 @@ import org.ccloud.model.TransferBill;
 import org.ccloud.model.TransferBillDetail;
 import org.ccloud.model.User;
 import org.ccloud.model.Warehouse;
+import org.ccloud.model.query.InventoryDetailQuery;
 import org.ccloud.model.query.InventoryQuery;
-import org.ccloud.model.query.ProductQuery;
 import org.ccloud.model.query.SellerProductQuery;
 import org.ccloud.model.query.TransferBillDetailQuery;
 import org.ccloud.model.query.TransferBillQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.query.WarehouseQuery;
-import org.ccloud.model.vo.ProductInfo;
 import org.ccloud.model.vo.transferBillInfo;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
@@ -228,7 +227,7 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 	}
     /**
      * 
-    * @Title: 检查待调拨数量和现在库存数量大小 
+    * @Title: 检查待调拨数量和现在库存总账库存数量大小关系 
     * @Description: TODO
     * @param @param transferBillInfos   
     * @return void    
@@ -236,11 +235,9 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
      */
 	private void checkStoreCount(List<transferBillInfo> transferBillInfos) {
 		for (transferBillInfo transferBillInfo : transferBillInfos) {
-			List<ProductInfo> productInfos = ProductQuery.me().getProductBySellerProId(transferBillInfo.getSellerProductId());
-			for (ProductInfo productInfo : productInfos) {
-				if (productInfo.getStoreCount().subtract(transferBillInfo.getProductCount()).doubleValue() < 0) {
-					renderAjaxResultForError("商品" + productInfo.getName() + "库存不足，无法调拨");
-				}
+			InventoryDetail inventoryDetail = InventoryDetailQuery.me().findByWarehouseIdAndProductId(transferBillInfo.getFromWarehouseId(),transferBillInfo.getSellerProductId());
+				if (inventoryDetail.getBalanceCount().subtract(transferBillInfo.getProductCount()).doubleValue() < 0) {
+					renderAjaxResultForError("商品库存不足，无法调拨");
 			}
 		}
 	}
@@ -252,26 +249,27 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 		boolean isSave = Db.tx(new IAtom() {
 			@Override
 			public boolean run() throws SQLException {
-				List<Inventory> updateList = new ArrayList<>();
-				List<Inventory> saveList = new ArrayList<>();
-				List<SellerProduct> sellerProducts = new ArrayList<>();
+//				List<Inventory> updateList = new ArrayList<>();
+//				List<Inventory> saveList = new ArrayList<>();
                 for (transferBillInfo transferBillInfo : transferBill) {
-        			List<ProductInfo> productInfos = ProductQuery.me().getProductBySellerProId(transferBillInfo.getSellerProductId());
-        			   SellerProduct sellerProduct = SellerProductQuery.me().findById(transferBillInfo.getSellerProductId());   
-                       for (ProductInfo productInfo : productInfos) {
+        			SellerProduct sellerProduct = SellerProductQuery.me().findById(transferBillInfo.getSellerProductId());
+        			
                     	 //先处理调出仓库的总账
-                    	   Inventory outInventory = InventoryQuery.me().findBySellerIdAndProductIdAndWareHouseId(sellerId,productInfo.getProductId(),transferBillInfo.getFromWarehouseId());        
+                    	   Inventory outInventory = InventoryQuery.me().findBySellerIdAndProductIdAndWareHouseId(sellerId,sellerProduct.getProductId(),transferBillInfo.getFromWarehouseId());        
                     	   outInventory.setOutCount(outInventory.getOutCount().add(transferBillInfo.getProductCount()));
                     	   outInventory.setOutPrice(outInventory.getInPrice());
-                    	   outInventory.setOutAmount(outInventory.getOutCount().multiply(outInventory.getOutPrice()));
+                    	   outInventory.setOutAmount(outInventory.getOutCount().multiply(outInventory.getInPrice()));
                     	   outInventory.setBalanceCount(outInventory.getBalanceCount().subtract(transferBillInfo.getProductCount()));
                     	   outInventory.setBalancePrice(outInventory.getInPrice());
                     	   outInventory.setBalanceAmount(outInventory.getBalanceCount().multiply(outInventory.getInPrice()));
-                    	   sellerProduct.setStoreCount(outInventory.getBalanceCount());
                     	   outInventory.setModifyDate(new Date());
-                    	   updateList.add(outInventory);
-                    	   sellerProducts.add(sellerProduct);
+                    	  if (!outInventory.saveOrUpdate()) {
+							return false;
+					     	}
+                    	   
                     	 //处理调出仓库的总账子表信息
+                    	 //查询目前子表该品项的最新库存
+               			  InventoryDetail outDetail = InventoryDetailQuery.me().findByWarehouseIdAndProductId(transferBillInfo.getFromWarehouseId(),transferBillInfo.getSellerProductId());
                           InventoryDetail outInventoryDetail = new InventoryDetail();
                     	  outInventoryDetail.setId(StrKit.getRandomUUID());
                     	  outInventoryDetail.setWarehouseId(transferBillInfo.getFromWarehouseId());
@@ -282,9 +280,9 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
                     	  outInventoryDetail.setOutCount(transferBillInfo.getProductCount());
                     	  outInventoryDetail.setOutPrice(outInventory.getInPrice());
                     	  outInventoryDetail.setOutAmount(outInventoryDetail.getOutCount().multiply(outInventoryDetail.getOutPrice()));
-                    	  outInventoryDetail.setBalanceCount(outInventory.getBalanceCount());
-                    	  outInventoryDetail.setBalancePrice(outInventory.getBalancePrice());
-                    	  outInventoryDetail.setBalanceAmount(outInventory.getBalanceAmount());
+                    	  outInventoryDetail.setBalanceCount(outDetail.getBalanceCount().subtract(transferBillInfo.getProductCount()));
+                    	  outInventoryDetail.setBalancePrice(outInventory.getInPrice());
+                    	  outInventoryDetail.setBalanceAmount(outInventoryDetail.getBalanceCount().multiply(outInventory.getInPrice()));
                     	  outInventoryDetail.setBizType(Consts.BIZ_TYPE_TRANSFER_OUTSTOCK);
                     	  outInventoryDetail.setBizBillSn(transferBillInfo.getTransferBillSn());
                     	  outInventoryDetail.setBizDate(new Date());
@@ -297,12 +295,12 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 							return false;
 						}
 //                    	 //处理调入仓库的库存总账  
-                 	      Inventory inInventory = InventoryQuery.me().findBySellerIdAndProductIdAndWareHouseId(sellerId,productInfo.getProductId(),transferBillInfo.getToWarehouseId());
+                 	      Inventory inInventory = InventoryQuery.me().findBySellerIdAndProductIdAndWareHouseId(sellerId,sellerProduct.getProductId(),transferBillInfo.getToWarehouseId());
                  	      if (inInventory == null) {
                  	    	 inInventory = new Inventory();
                  	    	 inInventory.setId(StrKit.getRandomUUID());
                  	    	 inInventory.setWarehouseId(transferBillInfo.getToWarehouseId());
-                 	    	 inInventory.setProductId(productInfo.getProductId());
+                 	    	 inInventory.setProductId(sellerProduct.getProductId());
                  	    	 inInventory.setSellerId(sellerId);
                  	    	 inInventory.setOutCount(new BigDecimal(0));
                  	    	 inInventory.setOutPrice(new BigDecimal(0));
@@ -310,62 +308,90 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
                  	    	 inInventory.setInCount(transferBillInfo.getProductCount());
                  	    	 inInventory.setInPrice(outInventory.getInPrice());
                  	    	 inInventory.setInAmount(transferBillInfo.getProductCount().multiply(outInventory.getInPrice()));
-                 	    	 inInventory.setBalanceCount(outInventory.getBalanceCount());
-                 	    	 inInventory.setBalancePrice(outInventory.getBalancePrice());
-                 	    	 inInventory.setBalanceAmount(outInventory.getBalanceAmount());
+                 	    	 inInventory.setBalanceCount(transferBillInfo.getProductCount());
+                 	    	 inInventory.setBalancePrice(outInventory.getInPrice());
+                 	    	 inInventory.setBalanceAmount(transferBillInfo.getProductCount().multiply(outInventory.getInPrice()));
                  	    	 inInventory.setDataArea(user.getDataArea());
                  	    	 inInventory.setDeptId(user.getDepartmentId());
                  	    	 inInventory.setCreateDate(new Date());
-                 	         saveList.add(inInventory);
-                 	    	 
+                 	    	 inInventory.setModifyDate(new Date());
+                 	    	 if (!inInventory.save()) {
+								return false;
+							}
 						  }else {
 	                 	      inInventory.setWarehouseId(transferBillInfo.getToWarehouseId());
 	                    	  inInventory.setInCount(inInventory.getInCount().add(transferBillInfo.getProductCount()));
 	                    	  inInventory.setInPrice(outInventory.getInPrice());
 	                    	  inInventory.setInAmount(inInventory.getInCount().multiply(inInventory.getInPrice()));
-	                    	  inInventory.setBalanceCount(outInventory.getBalanceCount());
+	                    	  inInventory.setBalanceCount(inInventory.getBalanceCount().add(transferBillInfo.getProductCount()));
 	                    	  inInventory.setBalancePrice(outInventory.getBalancePrice());
-	                    	  inInventory.setBalanceAmount(outInventory.getBalanceAmount());
+	                    	  inInventory.setBalanceAmount(inInventory.getBalanceCount().multiply(outInventory.getInPrice()));
 	                    	  inInventory.setModifyDate(new Date());
-	                    	  updateList.add(inInventory);
-						}
-                     	 //处理调入仓库的总账子表信息
-                    	  InventoryDetail inInventoryDetail = new InventoryDetail();
-                    	  inInventoryDetail.setId(StrKit.getRandomUUID());
-                    	  inInventoryDetail.setSellProductId(transferBillInfo.getSellerProductId());
-                    	  inInventoryDetail.setWarehouseId(transferBillInfo.getToWarehouseId());
-                    	  inInventoryDetail.setOutCount(new BigDecimal(0));
-                    	  inInventoryDetail.setOutPrice(new BigDecimal(0));
-                    	  inInventoryDetail.setOutAmount(new BigDecimal(0));
-                    	  inInventoryDetail.setInCount(transferBillInfo.getProductCount());
-                    	  inInventoryDetail.setInPrice(outInventory.getInPrice());
-                    	  inInventoryDetail.setInAmount(transferBillInfo.getProductCount().multiply(outInventory.getInPrice()));
-                    	  inInventoryDetail.setBalanceCount(outInventory.getBalanceCount());
-                    	  inInventoryDetail.setBalancePrice(outInventory.getInPrice());
-                    	  inInventoryDetail.setBalanceAmount(outInventory.getBalanceAmount());
-                    	  inInventoryDetail.setBizType(Consts.BIZ_TYPE_TRANSFER_INSTOCK);
-                    	  inInventoryDetail.setBizBillSn(transferBillInfo.getTransferBillSn());
-                    	  inInventoryDetail.setBizDate(new Date());
-                    	  inInventoryDetail.setBizUserId(transferBillInfo.getBizUserId());
-                    	  inInventoryDetail.setDataArea(transferBillInfo.getDataArea());
-                    	  inInventoryDetail.setDeptId(user.getDepartmentId());
-                    	  inInventoryDetail.setCreateDate(new Date());
-                    	  if (!inInventoryDetail.save()) {
-							return false;
-						}
-                    	  
-					}
+	                    	  if (!inInventory.saveOrUpdate()) {
+								return false;
+							}
+						  }
+	                    	  InventoryDetail inDetail = InventoryDetailQuery.me().findByWarehouseIdAndProductId(transferBillInfo.getToWarehouseId(),transferBillInfo.getSellerProductId());
+                              if ("null".equals(String.valueOf(inDetail.getBalanceCount()))) {
+								inDetail.setBalanceCount(new BigDecimal(0));
+								InventoryDetail inInventoryDetail = new InventoryDetail();
+		                    	  inInventoryDetail.setId(StrKit.getRandomUUID());
+		                    	  inInventoryDetail.setSellProductId(transferBillInfo.getSellerProductId());
+		                    	  inInventoryDetail.setWarehouseId(transferBillInfo.getToWarehouseId());
+		                    	  inInventoryDetail.setOutCount(new BigDecimal(0));
+		                    	  inInventoryDetail.setOutPrice(new BigDecimal(0));
+		                    	  inInventoryDetail.setOutAmount(new BigDecimal(0));
+		                    	  inInventoryDetail.setInCount(transferBillInfo.getProductCount());
+		                    	  inInventoryDetail.setInPrice(outInventory.getInPrice());
+		                    	  inInventoryDetail.setInAmount(transferBillInfo.getProductCount().multiply(outInventory.getInPrice()));
+		                    	  inInventoryDetail.setBalanceCount(inDetail.getBalanceCount().add(transferBillInfo.getProductCount()));
+		                    	  inInventoryDetail.setBalancePrice(outInventory.getInPrice());
+		                    	  inInventoryDetail.setBalanceAmount(inInventoryDetail.getBalanceCount().multiply(outInventory.getInPrice()));
+		                    	  inInventoryDetail.setBizType(Consts.BIZ_TYPE_TRANSFER_INSTOCK);
+		                    	  inInventoryDetail.setBizBillSn(transferBillInfo.getTransferBillSn());
+		                    	  inInventoryDetail.setBizDate(new Date());
+		                    	  inInventoryDetail.setBizUserId(transferBillInfo.getBizUserId());
+		                    	  inInventoryDetail.setDataArea(transferBillInfo.getDataArea());
+		                    	  inInventoryDetail.setDeptId(user.getDepartmentId());
+		                    	  inInventoryDetail.setCreateDate(new Date());
+		                    	  if (!inInventoryDetail.save()) {
+									return false;
+								}
+							  }else {
+								  InventoryDetail inInventoryDetail = new InventoryDetail();
+		                    	  inInventoryDetail.setId(StrKit.getRandomUUID());
+		                    	  inInventoryDetail.setSellProductId(transferBillInfo.getSellerProductId());
+		                    	  inInventoryDetail.setWarehouseId(transferBillInfo.getToWarehouseId());
+		                    	  inInventoryDetail.setOutCount(new BigDecimal(0));
+		                    	  inInventoryDetail.setOutPrice(new BigDecimal(0));
+		                    	  inInventoryDetail.setOutAmount(new BigDecimal(0));
+		                    	  inInventoryDetail.setInCount(transferBillInfo.getProductCount());
+		                    	  inInventoryDetail.setInPrice(outInventory.getInPrice());
+		                    	  inInventoryDetail.setInAmount(transferBillInfo.getProductCount().multiply(outInventory.getInPrice()));
+		                    	  inInventoryDetail.setBalanceCount(inDetail.getBalanceCount().add(transferBillInfo.getProductCount()));
+		                    	  inInventoryDetail.setBalancePrice(outInventory.getInPrice());
+		                    	  inInventoryDetail.setBalanceAmount(inInventoryDetail.getBalanceCount().multiply(outInventory.getInPrice()));
+		                    	  inInventoryDetail.setBizType(Consts.BIZ_TYPE_TRANSFER_INSTOCK);
+		                    	  inInventoryDetail.setBizBillSn(transferBillInfo.getTransferBillSn());
+		                    	  inInventoryDetail.setBizDate(new Date());
+		                    	  inInventoryDetail.setBizUserId(transferBillInfo.getBizUserId());
+		                    	  inInventoryDetail.setDataArea(transferBillInfo.getDataArea());
+		                    	  inInventoryDetail.setDeptId(user.getDepartmentId());
+		                    	  inInventoryDetail.setCreateDate(new Date());
+		                    	  if (!inInventoryDetail.save()) {
+									return false;
+								}
+							}                    	  
+	                    	  
+						
 				}
-                try {
-					Db.batchUpdate(updateList, updateList.size());
-					Db.batchSave(saveList, saveList.size());
-					//更新seller_product的商品库存信息
-					Db.batchUpdate(sellerProducts, sellerProducts.size());
-				
-				} catch (Exception e) {
-					e.printStackTrace();
-					return false;
-				}
+//                try {
+//					Db.batchUpdate(updateList, updateList.size());
+//					Db.batchSave(saveList, saveList.size());
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//					return false;
+//				}
 				return true;
 			}
 		});

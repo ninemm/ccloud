@@ -47,12 +47,12 @@
 			success: function(data) {
 				var wareHouseInfo = "<div class='list-group col-sm-13'>";
 				if(checkResultFromAjax(data)){
-					wareHouseInfo += "<a class='list-group-item disabled' ><span style='font-size:16px;width:50%;'>仓库编码</span><span style='margin-left:14px;font-size:16px;width:50%;'>仓库名称</span></a>";
+					wareHouseInfo += "<a class='list-group-item disabled' ><span style='font-size:14px;width:50%;'>仓库编码</span><span style='margin-left:14px;font-size:14px;width:50%;'>仓库名称</span></a>";
 					for(var i in data){
-						wareHouseInfo += "<a class='list-group-item click-flag' style='cursor:pointer' data="+data[i].id+"><span style='font-size:16px;width:50%;'>"+data[i].code+"</span>&nbsp;&nbsp;&nbsp;<span style='margin-left:14px;font-size:16px;width:50%;'>"+data[i].name+"</span></a>";
+						wareHouseInfo += "<a class='list-group-item click-flag' style='cursor:pointer' data="+data[i].id+"><span style='font-size:14px;width:50%;'>"+data[i].code+"</span>&nbsp;&nbsp;&nbsp;<span style='margin-left:14px;font-size:14px;width:50%;'>"+data[i].name+"</span></a>";
 					}
 				}else{
-					wareHouseInfo += "<a class='list-group-item'><span style='font-size:16px;'>没有仓库信息</a>";
+					wareHouseInfo += "<a class='list-group-item'><span style='font-size:14px;'>没有仓库信息</a>";
 				}
 				wareHouseInfo += "</div>"
 				$("#_warehouse_table").html(wareHouseInfo);
@@ -149,10 +149,10 @@
 		</form>
 	</div>
 	<div class="box">
-		<div class="list-group col-sm-2" style="overflow:auto;" id="_warehouse_table">
+		<div class="list-group col-sm-3" style="overflow:auto;" id="_warehouse_table">
 			<a href="#" class="list-group-item">努力读取仓库信息中....</a>
 		</div>
-		<div class="col-sm-10">
+		<div class="col-sm-9 no-padding">
 			<table class="table table-striped table-hover table-condensed" id="_inventory_table"></table>
 		</div>
 	</div>
