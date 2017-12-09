@@ -47,7 +47,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 	public List<Record> findByOrderId(String orderId) {
 
 		StringBuilder sqlBuilder = new StringBuilder(
-				" SELECT sod.*, sp.custom_name, p.big_unit, p.small_unit, p.convert_relate, w.code as warehouseCode, t1.valueName ");
+				" SELECT sod.*, sp.custom_name, sp.price, p.big_unit, p.small_unit, p.convert_relate, w.code as warehouseCode, t1.valueName ");
 		sqlBuilder.append(" from `cc_sales_order_detail` sod ");
 		sqlBuilder.append(" LEFT JOIN cc_seller_product sp ON sod.sell_product_id = sp.id ");
 		sqlBuilder.append(" LEFT JOIN cc_product p ON sp.product_id = p.id ");
@@ -293,6 +293,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 //			BigDecimal amount = new BigDecimal(product.getInt("productCount")).multiply(product.getPrice());
 			detail.setProductAmount(productAmount);
 			detail.setIsGift(isGift);
+			detail.setIsComposite(1);
 			detail.setCreateDate(date);
 			detail.setDeptId(deptId);
 			detail.setDataArea(dataArea);	

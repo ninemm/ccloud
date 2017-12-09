@@ -225,5 +225,13 @@ public abstract class BaseSalesOrderDetail<M extends BaseSalesOrderDetail<M>> ex
 	public java.util.Date getModifyDate() {
 		return get("modify_date");
 	}
+	
+	public void setIsComposite(java.lang.Integer isComposite) {
+		set("is_composite", isComposite);
+	}
+
+	public java.lang.Integer getIsComposite() {
+		return getInt("is_composite");
+	}	
 
 }

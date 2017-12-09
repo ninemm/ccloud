@@ -68,13 +68,13 @@
 					},
 					edit:false
 				},
-				{field: "", title: "订货单号/创建时间", align: "center", width: '10%',
+				{field: "", title: "订货单号", align: "center", width: '8%',
 					formatter: function(value, row, rowIndex) {
-						return row.order_sn + '<br>' + row.create_date;
+						return row.order_sn;
 					},
 					edit: false
 				},
-				{field: "customer_name", title: "客户名称", align: "center", width: '8%', edit:false},
+				{field: "customer_name", title: "客户名称", align: "center", width: '12%', edit:false},
 				{field: "total_amount", title: "订单总额", align: "center", width: '5%', edit:false},
 				{field: "receive_type", title: "付款方式", align: "center", width: '5%',
 					formatter: function(value, row, rowIndex) {
@@ -82,11 +82,14 @@
 					},
 					edit: false
 				},
-				{field: "status", title: "状态", align: "center", width: '5%',
+				{field: "create_date", title: "下单时间", align: "center", width: '12%', edit:false},
+				{field: "status", title: "状态", align: "center", width: '6%',
 					formatter: function(value, row, rowIndex) {
 					if (value == 0) {
 						return '待审核';
-					} else if (value == 1000) {
+					} else if (value == 1) {
+                        return '审核中'
+                    }  else if (value == 1000) {
 						return '已审核'
 					} else if (value == 1001) {
 						return '订单取消'
@@ -108,11 +111,11 @@
 					<@shiro.hasPermission name="/admin/salesOrder/check">
 					if (row.status == 0) {
 						strHtml = strHtml + '<a class="label label-table label-success" onclick="pass(\''+row.id+'\')" >通过</a> ';
-	
-						strHtml = strHtml + '<a class="label label-table label-warning" onclick="reject(\''+row.id+'\')" >拒绝</a> ';					
+						strHtml = strHtml + '<a class="label label-table label-warning" onclick="reject(\''+row.id+'\')" >拒绝</a> ';
 					}
 					</@shiro.hasPermission>			
-
+                    strHtml = strHtml + '<a class="label label-table label-warning" onclick="proc(\''+row.id+'\')" >proc</a> ';
+                    strHtml = strHtml + '<a class="label label-table label-warning" onclick="cancel(\''+row.id+'\')" >取消</a> ';
 					return strHtml;
 				},
 				edit:false
@@ -167,6 +170,32 @@
 				}
 			}
 		);
+	}
+	
+	function proc(id) {
+	    $.get('${CPATH}/admin/salesOrder/start?ucode=${ucode}&orderId=' + id,
+            function(result){
+                if (result.errorCode > 0) {
+                    toastr.error(result.message, '操作失败');
+                } else {
+                    toastr.success(result.message, '操作成功');
+                    $table.bootstrapTable('refresh');
+                }
+            }
+        );
+	}
+	
+	function cancel(id) {
+	    $.get('${CPATH}/admin/salesOrder/cancel?ucode=${ucode}&orderId=' + id,
+            function(result){
+                if (result.errorCode > 0) {
+                    toastr.error(result.message, '操作失败');
+                } else {
+                    toastr.success(result.message, '操作成功');
+                    $table.bootstrapTable('refresh');
+                }
+            }
+        );
 	}
 
 </#macro>

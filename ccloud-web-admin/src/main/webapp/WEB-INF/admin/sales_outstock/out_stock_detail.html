@@ -11,6 +11,12 @@
 	<script src="${CPATH}/static/ladda/spin.min.js"></script>
 	<script src="${CPATH}/static/ladda/ladda.min.js"></script>		
 </#macro>
+<#macro css>
+.warning {
+    color: red;
+    padding-left: 10px;
+}
+</#macro>
 
 <#macro css_import>
 	<!-- bootstrapvalidator -->
@@ -41,6 +47,7 @@
 	function addProduct(product){
 		var $tbody = $("#table tbody");
 
+		var isComposition = product.is_composite;
 		var newTrHtml = $tbody.find("tr:first").html();
 		newTrIdx = newTrIdx + 1;
 		var newTrId = 'tr' + newTrIdx;
@@ -80,6 +87,14 @@
 				}
 		});
 		
+		if (isComposition == 1) {
+			$newTr.find(".remove").remove();
+			$newTr.find("#bigNum").attr("readonly", "readonly");
+			$newTr.find("#bigNum").removeAttr("onblur");
+			$newTr.find("#smallNum").attr("readonly", "readonly");
+			$newTr.find("#smallNum").removeAttr("onblur");
+			$(".warning").html("注:*此商品为组合商品,退货时无法修改数量");
+		}		
 		$newTr.find("#sellProductId").attr("name", "sellProductId" + newTrIdx);
 		$newTr.find("#productId").attr("name", "productId" + newTrIdx);
 		$newTr.find("#convert").attr("name", "convert" + newTrIdx);
@@ -179,6 +194,13 @@
 		$("#total").text(total);
 		$("#inputTotal").val(total);
 	}
+	
+	function totalC(money) {
+		total = money;
+		total.toFixed(2);
+		$("#total").text(total);
+		$("#inputTotal").val(total);
+	}	
 	
 	function checkProductNumber() {
 		var store = $(".product tr");
@@ -280,6 +302,8 @@
 				$.each(outstockDetail, function(index,element){
 					addProduct(element);
 				});
+				var totalAmount = outstock.total_amount;
+				totalC(totalAmount);				
 			}
 		);
 	}
@@ -389,6 +413,7 @@
 					</tfoot>
 				</table>
 
+				<span class="warning"></span>
 				<div class="form-group col-sm-12"></div>
 
 				<div id="customer">

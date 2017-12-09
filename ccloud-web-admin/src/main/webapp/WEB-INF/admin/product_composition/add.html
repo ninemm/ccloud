@@ -30,6 +30,7 @@
 		initCustomer();
 	});
 	
+	var discount = 1;
 	var $form = $("#form");
 	var productInfoMap = ${productInfoMap!}
 	var productOptionList = ${productOptionList!}
@@ -197,6 +198,11 @@
 				$customerTypeSelect.empty();
 
 				$.each(data, function(index, obj){
+					if (index == 0 && obj.factor != null) {
+						discount = obj.factor;
+					} else {
+						discount = 1;
+					}				
 					$customerTypeSelect.append("<option value='" + obj.id + "'>" + obj.name + "</option>");
 					customerTypeCodeMap[obj.id] = obj.code;
 				});
@@ -206,6 +212,12 @@
 				});
 
 				customerTypeChange($customerTypeSelect);
+				if (discount == 1) {
+					$("#discount").val('无');
+				} else {
+					$("#discount").val(discount);
+				}
+				totalF();				
 			}
 		);
 
@@ -256,6 +268,7 @@
 		$.each(rows, function(index, item) {
 			total += Number($(item).text());
 		});
+		total = total * discount
 		total.toFixed(2);
 		$("#total").text(total);
 		$("#inputTotal").val(total);
@@ -463,6 +476,12 @@
 							</select>
 						</div>
 					</div>
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">折扣:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<input type="text" id="discount" value="无" readonly="readonly" class="form-control">
+						</div>
+					</div>						
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">*配送地址:</label>
 						<div class="input-group col-md-4 col-sm-10">

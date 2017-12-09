@@ -48,8 +48,10 @@ public class SalesRefundInstockDetailQuery extends JBaseQuery {
 	public List<Record> findByRefundId(String refundId) {
 
 		StringBuilder sqlBuilder = new StringBuilder(
-				" SELECT sod.*, sp.custom_name, sod.is_gift, p.big_unit, p.small_unit, p.convert_relate,sp.product_id, t1.valueName ");
+				" SELECT sod.*, sp.custom_name, sod.is_gift, p.big_unit, p.small_unit, p.convert_relate,sp.product_id, t1.valueName, cs.is_composite ");
 		sqlBuilder.append(" from `cc_sales_refund_instock_detail` sod ");
+		sqlBuilder.append(" LEFT JOIN cc_sales_outstock_detail co ON sod.outstock_detail_id = co.id ");
+		sqlBuilder.append(" LEFT JOIN cc_sales_order_detail cs ON co.order_detail_id = cs.id ");
 		sqlBuilder.append(" LEFT JOIN cc_seller_product sp ON sod.sell_product_id = sp.id ");
 		sqlBuilder.append(" LEFT JOIN cc_product p ON sp.product_id = p.id ");
 		sqlBuilder.append("LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
