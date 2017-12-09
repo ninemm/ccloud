@@ -30,6 +30,7 @@
 		initCustomer();
 	});
 	
+	var discount = 2;
 	var $form = $("#form");
 	var productInfoMap = ${productInfoMap!}
 	var productOptionList = ${productOptionList!}
@@ -316,6 +317,7 @@
 	function checkProductNumber() {
 		var store = $(".product tr");
 		var check = false;
+		var alltotal = 0;
 		if (store.length <= 1) {
 			check = false;
 			return check;
@@ -324,13 +326,23 @@
 			var bigNum = $(obj).find("#bigNum").val();
 			var smallNum = $(obj).find("#smallNum").val();
 			var total = parseInt(bigNum) + parseInt(smallNum);
+			var bigNum = $(obj).find("#bigNum").val();
+			var convert = $(obj).find("#convert").val();
+			var smallNum = $(obj).find("#smallNum").val();
+			var producttotal = parseInt(bigNum)*parseInt(convert) + parseInt(smallNum);
+			if (isNaN(producttotal)) {
+				producttotal = 0;
+			}					
 		  	if (total <= 0) {
 				return false;
 		 	}
 	    	if (index == store.length-1) {
 	    		check = true;
 	    	}
+	    	alltotal = alltotal + producttotal;
+	    	$("#productTotal").val(alltotal);
 		});
+		
 		return check;	
 	}
 
@@ -425,6 +437,7 @@
 									<select id="sellProductId" name="sellProductId" class="form-control">
 									</select>
 									<input type="hidden" name="productId" id="productId" value="" />
+									<input type="hidden" name="productTotal" id="productTotal" value="" />
 								</div>
 							</td>
 							
