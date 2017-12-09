@@ -11,6 +11,9 @@
 		startDate = $("#datePicker").val();
 		endDate = startDate + ' 23:59:59';
 		combo();
+	}).on("touchstart", "#salesOrder", function() {
+		var salesOrderId = $(this).parent().find("#salesOrderId").val();
+		window.location.href = "${CPATH}/order/orderDetail/" + salesOrderId;
 	});
 
     $("#datePicker").calendar();
@@ -88,6 +91,8 @@
 						$newOrder.find("#receiveType").remove();
 					}
 					
+					$newOrder.find("#salesOrderId").val(el.id);
+
 					$newOrder.find("#orderSn").text(el.order_sn);
 					
 					$newOrder.find("#status").text(getStatus(el.status));
@@ -183,31 +188,32 @@
 	<main>
 		<div id="main">
 			<div class="weui-panel weui-panel_access">
-				<div class="ft14 gray">
-					<span class="tag" id="receiveType">账期</span>
-					<span id="orderSn">DH-O-20171017-002276</span>
-					<span class="fr blue" id="status">订单待审核</span>
-				</div>
-				<div id="customerName">
-					 小张烤鱼
-				</div>
-				<div class="gray">
-					<p>
-						联系人：<span id="contact">小张/18611111111</span>
-						<span class="fr" id="customerType">终端客户</span>
-					</p>
-				</div>
-				<div class="gray">
-					<p>
-						金额：￥<span id="amount">200</span>
-						<span class="fr" id="date">时间： 2017-10-17 06:03:04</span>
-					</p>
+				<input type="hidden" id="salesOrderId" value="">
+				<div id ="salesOrder">
+					<div class="ft14 gray">
+						<span class="tag" id="receiveType">账期</span>
+						<span id="orderSn">DH-O-20171017-002276</span>
+						<span class="fr blue" id="status">订单待审核</span>
+					</div>
+					<div id="customerName">
+						 小张烤鱼
+					</div>
+					<div class="gray">
+						<p>
+							联系人：<span id="contact">小张/18611111111</span>
+							<span class="fr" id="customerType">终端客户</span>
+						</p>
+					</div>
+					<div class="gray">
+						<p>
+							金额：￥<span id="amount">200</span>
+							<span class="fr" id="date">时间： 2017-10-17 06:03:04</span>
+						</p>
+					</div>
 				</div>
 				<hr>
-				<div>
-					<div class="button blue-button fl">撤销</div>
-					<div class="button white-button fr">再次购买</div>
-				</div>
+				<div class="button blue-button fl">撤销</div>
+				<div class="button white-button fr">再次购买</div>
 			</div>
 		</div>
 		<div class="weui-loadmore" id="loading" style="display: none;">

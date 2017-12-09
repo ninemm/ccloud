@@ -11,10 +11,14 @@ $(function() {
     }, function() {
     })
   }).on("touchstart", "#placeOrder", function () {
-    	save();
+      save();
   }).on("touchend", ".operate:first-child", function () { //减少商品数量
       total();
   }).on("touchend", ".operate:last-child", function () { //增加商品数量
+      total();
+  }).on("change", "#bigPrice", function () { //改小价格
+      total();
+  }).on("change", "#smallPrice", function () { //改大价格
       total();
   });
   
@@ -100,6 +104,10 @@ function save(){
 	});
 	
 	setItemBykey("productList",productList);
+	if(productList.length == 0) {
+		toastr.warning("你的购物车内没有商品!"); 
+		return;
+	}
 	window.location.href = '${CPATH}/product/order';
 }
 </#macro>

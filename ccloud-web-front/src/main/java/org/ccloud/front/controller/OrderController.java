@@ -9,6 +9,7 @@ import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.CustomerType;
 import org.ccloud.model.User;
 import org.ccloud.model.query.CustomerTypeQuery;
+import org.ccloud.model.query.SalesOrderDetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
@@ -68,8 +69,15 @@ public class OrderController extends BaseFrontController {
 		renderJson(map);
 	}
 
-	public void orderDetial() {
-		render("myOrder.html");
+	public void orderDetail() {
+		String salesOrderId = getPara(0);
+		
+		Record order = SalesOrderQuery.me().findMoreById(salesOrderId);
+		List<Record> orderDetail = SalesOrderDetailQuery.me().findByOrderId(salesOrderId);
+
+		setAttr("order", order);
+		setAttr("orderDetail", orderDetail);
+		render("orderDetail.html");
 	}
 
 }

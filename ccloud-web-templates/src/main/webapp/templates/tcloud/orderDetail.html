@@ -9,54 +9,74 @@
   <main class="ft12">
     <div class="weui-panel weui-panel_access">
       <div class="ft14">
-        订单状态
-        <span class="fr blue">订单待审核</span>
+		订单状态
+        <span class="fr blue">
+        	<#if order.status = 0>
+				待审核
+			<#elseif order.status = 2001>
+				部分出库-订单关闭
+			<#elseif order.status = 1000>
+				已审核
+			<#elseif order.status = 1001>
+				订单取消
+			<#elseif order.status = 2000>
+				部分出库
+			<#elseif  order.status = 3000>
+				全部出库
+			<#else>
+				全部出库-订单关闭'
+			</#if>
+		</span>
       </div>
       <div class="gray">
-        <p>客户名称&nbsp;小张烤鱼
+        <p>客户名称&nbsp;${(order.customer_name)!}
         </p>
-        <p>订货单号&nbsp;DH-O-20171017-002276</p>
-        <p>下单时间&nbsp;2017-10-17 06:03:04</p>
+        <p>订货单号&nbsp;${(order.order_sn)!}</p>
+        <p>下单时间&nbsp;${(order.create_date)!}</p>
       </div>
       <hr>
       <div class="ft14">
-        <input type="checkbox" name="if-account"> 是否账期
+      	<#if order.receive_type = 0>
+        	<span class="tag" >账期</span>
+        </#if>
       </div>
     </div>
     <div class="weui-panel weui-panel_access">
       <div class="ft14">
         订单详情
       </div>
-      <div class="p-l-15">
-        <p>35度中国劲酒_1*24_125ml</p>
-        <div class="weui-flex">
-          <div class="weui-flex__item flex-grow2">
-            <div class="fr width-40">
-              ￥720
-              <span class="gray">（710）</span>
-            </div>
-          </div>
-          <div class="weui-flex__item t-r">1件</div>
-        </div>
-        <div class="weui-flex">
-          <div class="weui-flex__item flex-grow2">
-            <div class="fr width-40">
-              ￥30
-              <span class="gray">（30）</span>
-            </div>
-          </div>
-          <div class="weui-flex__item t-r">1瓶</div>
-        </div>
-      </div>
-      <div class="p-l-15">
+      <#list orderDetail as detail>
+	      <div class="p-l-15">
+	        <p>${detail.custom_name!}</p>
+	        <div class="weui-flex">
+	          <div class="weui-flex__item flex-grow2">
+	            <div class="fr width-50">
+					￥${detail.price!}
+	              <span class="gray">（${detail.product_price!}）</span>
+	            </div>
+	          </div>
+	          <div class="weui-flex__item t-r">${(detail.product_count / detail.convert_relate)?floor} ${detail.big_unit}</div>
+	        </div>
+	        <div class="weui-flex">
+	          <div class="weui-flex__item flex-grow2">
+	            <div class="fr width-50">
+					￥${(detail.price / detail.convert_relate)?string("0.##")}
+	              <span class="gray">（${(detail.product_price / detail.convert_relate)?string("0.##")}）</span>
+	            </div>
+	          </div>
+	          <div class="weui-flex__item t-r">${detail.product_count % detail.convert_relate} ${detail.small_unit}</div>
+	        </div>
+	      </div>
+	  </#list>
+<!--       <div class="p-l-15">
         <p>
           <span class="tag">赠品</span>35度中国劲酒_1*24_125ml</p>
         <div class="t-r">1瓶</div>
-      </div>
+      </div> -->
       <hr>
       <div class="t-r ft14">
         总计：
-        <span class="red">740元</span>
+        <span class="red">${(order.total_amount)!}元</span>
       </div>
     </div>
     <div class="weui-panel weui-panel_access">
@@ -65,15 +85,15 @@
       </div>
       <div class="gray">
         <p>
-          收货人：小张
-          <span class="fr">18611111111</span>
+          收货人：${(order.ccontact)!}
+          <span class="fr">${(order.cmobile)!}</span>
         </p>
-        <p>地址详情：湖北省武汉市武昌区八一路299号</p>
+        <p>地址详情：${(order.delivery_address)!}</p>
       </div>
       <hr>
       <div class="ft14">
         备注信息：
-        <span class="ft12">尽快送达</span>
+        <span class="ft12">${(order.remark)!}</span>
       </div>
     </div>
     <a class="weui-panel weui-panel_access block" href="./operateHistory.html">
@@ -88,7 +108,7 @@
   <div class="hidden-menu">
     <ul>
       <li>
-        <a href="index.html">
+        <a href="${CPATH}/index"">
           首页
           <i class="icon-home blue"></i>
         </a>
