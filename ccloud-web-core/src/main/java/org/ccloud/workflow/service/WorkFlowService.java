@@ -22,10 +22,13 @@ import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.history.HistoricActivityInstance;
+import org.activiti.engine.history.HistoricActivityInstanceQuery;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.Model;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.Task;
 import org.apache.commons.lang3.StringUtils;
 import org.ccloud.Consts;
@@ -35,6 +38,7 @@ import org.ccloud.workflow.plugin.ActivitiPlugin;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.collect.Lists;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
@@ -280,11 +284,11 @@ public class WorkFlowService {
 	}
 
 	@Before(Tx.class)
-	public void deleteProcessInstance(String insid) {
+	public void deleteProcessInstance(String instId) {
 		RuntimeService runtimeService = ActivitiPlugin.buildProcessEngine().getRuntimeService();
 		HistoryService historyService = ActivitiPlugin.buildProcessEngine().getHistoryService();
-		runtimeService.deleteProcessInstance(insid, "清除流程实例");
-		historyService.deleteHistoricProcessInstance(insid);
+		runtimeService.deleteProcessInstance(instId, "清除流程实例");
+		historyService.deleteHistoricProcessInstance(instId);
 	}
 
 	/***
@@ -321,5 +325,33 @@ public class WorkFlowService {
 		
 		TaskService taskService = ActivitiPlugin.buildProcessEngine().getTaskService();
 		return taskService.getVariable(taskId, variableName);
+	}
+	
+	public List<Comment> getProcessComments(String taskId) {
+		
+		List<Comment> historyCommnets = Lists.newArrayList();
+		
+		TaskService taskService = ActivitiPlugin.buildProcessEngine().getTaskService();
+		RuntimeService runtimeService = ActivitiPlugin.buildProcessEngine().getRuntimeService();
+		HistoryService historyService = ActivitiPlugin.buildProcessEngine().getHistoryService();
+		
+		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+        ProcessInstance pi = runtimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
+        
+        HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
+        //query.orderByHistoricActivityInstanceId().asc();
+        query.orderByHistoricActivityInstanceEndTime().desc();
+        List<HistoricActivityInstance> hais = query.processInstanceId(pi.getId()).activityType("userTask").list();
+        
+        for (HistoricActivityInstance hai : hais) {
+            String historytaskId = hai.getTaskId();
+            List<Comment> comments = taskService.getTaskComments(historytaskId);
+            // 4）如果当前任务有批注信息，添加到集合中
+            if(comments!=null && comments.size()>0){
+                historyCommnets.addAll(comments);
+            }
+        }
+        
+        return historyCommnets;
 	}
 }

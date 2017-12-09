@@ -84,7 +84,7 @@
 				},
 				{field: "action", title: "操作", align: "center", width: '20%',
 					formatter: function(value, row, rowIndex) {
-						var url = '${CPATH}/admin/sellerCustomer/edit?id=' + row.id + '&c=${c}&p=${p}';
+						var url = '${CPATH}/admin/sellerCustomer/edit?id=' + row.id + '&c=${c!}&p=${p!}';
 						var strHtml = '<a href="' + url + '" class="btn btn-sm" title="编辑"><i class="fa fa-edit"></i></a> ';
 						if(row.is_enabled == 1){
 							strHtml = strHtml + '<a href="javascript:void(0);" class="btn btn-sm" onclick="enable(\''+row.id+'\'' + ',0' + ')" title="停用"><i class="fa fa-ban"></i></a>';

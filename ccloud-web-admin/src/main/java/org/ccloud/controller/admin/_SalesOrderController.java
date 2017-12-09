@@ -15,6 +15,7 @@
  */
 package org.ccloud.controller.admin;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,11 +23,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.engine.history.HistoricTaskInstance;
+import org.activiti.engine.history.HistoricTaskInstanceQuery;
+import org.activiti.engine.task.Comment;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
+import org.ccloud.model.Customer;
+import org.ccloud.model.Receivables;
 import org.ccloud.model.SalesOrder;
 import org.ccloud.model.User;
 import org.ccloud.model.query.SalesOrderDetailQuery;
@@ -39,9 +45,12 @@ import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
+import org.ccloud.workflow.plugin.ActivitiPlugin;
+import org.ccloud.workflow.service.WorkFlowService;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
@@ -165,12 +174,11 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 		List<Record> customerTypeList = SalesOrderQuery.me().findCustomerTypeListByCustomerId(customerId,
 				DataAreaUtil.getUserDealerDataArea(user.getDataArea()));
-
+		setAttr("customerTypeList", customerTypeList);
 		renderJson(customerTypeList);
 	}
 
 	@Override
-	@Before(Tx.class)
 	public synchronized void save() {
 
 		Map<String, String[]> paraMap = getParaMap();
@@ -181,7 +189,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		if (this.saveOrder(paraMap, user, sellerId, sellerCode)) {
 			renderAjaxResultForSuccess("保存成功");
 		} else {
-			renderAjaxResultForSuccess("库存不足或提交失败");
+			renderAjaxResultForError("库存不足或仓库中未找到对应商品");
 		}
 	}
 	
@@ -237,6 +245,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 		Record order = SalesOrderQuery.me().findMoreById(orderId);
 		List<Record> orderDetailList = SalesOrderDetailQuery.me().findByOrderId(orderId);
+		this.createReceivables(order);
 
 		Date date = new Date();
 
@@ -250,14 +259,14 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 				warehouseId = orderDetail.getStr("warehouse_id");
 				String OrderSO = SalesOutstockQuery.me().getNewSn(sellerId);
 				// 销售出库单：SS + 100000(机构编号或企业编号6位) + A(客户类型) + W(仓库编号) + 171108(时间) + 100001(流水号)
-				outstockSn = "SS" + sellerCode + "A" + orderDetail.getStr("warehouseCode")
+				outstockSn = "SS" + sellerCode + order.getStr("typeCode") + orderDetail.getStr("warehouseCode")
 						+ DateUtils.format("yyMMdd", date) + OrderSO;
 
 				SalesOutstockQuery.me().insert(outstockId, outstockSn, warehouseId, sellerId, order, date);
 				SalesOrderJoinOutstockQuery.me().insert(orderId, outstockId);
 			}
 
-			SalesOutstockDetailQuery.me().insert(outstockId, orderDetail, date);
+			SalesOutstockDetailQuery.me().insert(outstockId, orderDetail, date, order);
 		}
 
 		SalesOrderQuery.me().updateConfirm(orderId, Consts.SALES_ORDER_AUDIT_STATUS_PASS, user.getId(), date);// 已审核通过
@@ -266,16 +275,122 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 	}
 
+	private void createReceivables(Record order) {
+		Receivables receivables = new Receivables();
+		receivables.setId(StrKit.getRandomUUID());
+		receivables.setObjectId(order.getStr("customer_id"));
+		receivables.setObjectType(Consts.RECEIVABLES_OBJECT_TYPE_CUSTOMER);
+		receivables.setReceiveAmount(order.getBigDecimal("total_amount"));
+		receivables.setActAmount(new BigDecimal(0));
+		receivables.setBalanceAmount(order.getBigDecimal("total_amount"));
+		receivables.setDeptId(order.getStr("dept_id"));
+		receivables.setDataArea(order.getStr("data_area"));
+		receivables.setCreateDate(new Date());
+		receivables.save();
+	}
+
 	@RequiresPermissions("/admin/salesOrder/check")
 	@Before(Tx.class)
 	public void reject() {
 
 		String orderId = getPara("orderId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-
 		SalesOrderQuery.me().updateConfirm(orderId, 1001, user.getId(), new Date());// 已审核拒绝
-
 		renderAjaxResultForSuccess();
 
 	}
+	
+	public void start() {
+		
+		String orderId = getPara("orderId");
+		WorkFlowService workflow = new WorkFlowService();
+		String defKey = "_order_review";
+		
+		SalesOrder salesOrder = SalesOrderQuery.me().findById(orderId);
+		
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		Map<String, Object> param = Maps.newHashMap();
+		param.put("applyUsername", user.getUsername());
+		param.put("account", "zhangwu");
+		
+		String procInstId = workflow.startProcess(orderId, defKey, param);
+		
+		salesOrder.setProcKey(defKey);
+		salesOrder.setStatus(1);
+		salesOrder.setProcInstId(procInstId);
+		salesOrder.set("modify_date", new Date());
+		salesOrder.update();
+		
+		renderAjaxResultForSuccess();
+	}
+	
+	public void audit() {
+
+		keepPara();
+		
+		boolean isCheck = false;
+		String id = getPara("id");
+
+		SalesOrder salesOrder = SalesOrderQuery.me().findById(id);
+		setAttr("salesOrder", salesOrder);
+		
+//		HistoricTaskInstanceQuery query = ActivitiPlugin.buildProcessEngine().getHistoryService()  
+//                .createHistoricTaskInstanceQuery();  
+//        query.orderByProcessInstanceId().asc();  
+//        query.orderByHistoricTaskInstanceEndTime().desc();  
+//        List<HistoricTaskInstance> list = query.list();  
+//        for (HistoricTaskInstance hi : list) {  
+//            System.out.println(hi.getAssignee() + " " + hi.getName() + " "  
+//                    + hi.getStartTime());  
+//        }
+        
+        String taskId = getPara("taskId");
+        List<Comment> comments = WorkFlowService.me().getProcessComments(taskId);
+		setAttr("comments", comments);
+		
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		if (user != null && StrKit.equals(getPara("assignee"), user.getUsername())) {
+			isCheck = true;
+		}
+		setAttr("isCheck", isCheck);
+	}
+	
+	public void complete() {
+		SalesOrder salesOrder = getModel(SalesOrder.class);
+
+		String taskId = getPara("taskId");
+		String comment = getPara("comment");
+		Integer pass = getParaToInt("pass", 1);
+		
+		Map<String, Object> var = Maps.newHashMap();
+		var.put("pass", pass);
+		var.put("orderId", salesOrder.getId());
+		
+		WorkFlowService workflowService = new WorkFlowService();
+		workflowService.completeTask(taskId, comment, var);
+
+		renderAjaxResultForSuccess("客户修改审核成功");
+	}
+	
+	public void cancel() {
+		
+		String orderId = getPara("orderId");
+		SalesOrder salesOrder = SalesOrderQuery.me().findById(orderId);
+		WorkFlowService workflow = new WorkFlowService();
+		
+		String procInstId = salesOrder.getProcInstId();
+		if (StrKit.notBlank(procInstId))
+			workflow.deleteProcessInstance(salesOrder.getProcInstId());
+		
+		salesOrder.setStatus(Consts.SALES_ORDER_STATUS_CANCEL);
+		
+		if (!salesOrder.saveOrUpdate()) {
+			renderAjaxResultForError("取消订单失败");
+			return ;
+		}
+		
+		renderAjaxResultForSuccess();
+	}
+	
+	
 }
