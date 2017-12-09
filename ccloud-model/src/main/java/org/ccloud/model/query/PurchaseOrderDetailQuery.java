@@ -100,4 +100,11 @@ public class PurchaseOrderDetailQuery extends JBaseQuery {
 
 		return Db.find(sqlBuilder.toString(), orderId);
 	}
+	
+	public PurchaseOrderDetail findbySellerProductId(String sellerProductId){
+		String sql = "select cpod.* from cc_purchase_order_detail cpod "
+				+ " LEFT JOIN cc_purchase_instock_detail cpid on cpid.purchase_order_detail_id = cpod.id where "
+				+ " cpid.seller_product_id = ?";
+		return DAO.findFirst(sql, sellerProductId);
+	}
 }

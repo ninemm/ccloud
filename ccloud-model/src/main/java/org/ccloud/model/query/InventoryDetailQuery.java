@@ -17,6 +17,7 @@ package org.ccloud.model.query;
 
 import java.util.LinkedList;
 
+import org.ccloud.Consts;
 import org.ccloud.model.InventoryDetail;
 
 import com.jfinal.plugin.activerecord.Page;
@@ -84,7 +85,7 @@ public class InventoryDetailQuery extends JBaseQuery {
 	
 	
 	public Page<InventoryDetail> _in_paginate(int pageNumber, int pageSize,String keyword, String orderby,String userId,String dataArea) {
-		String select = "SELECT cid.*,cw.`name` as warehouse,csp.custom_name as sellerName ";
+		String select = "SELECT cid.*,csp.store_count,cw.`name` as warehouse,csp.custom_name as sellerName ";
 		StringBuilder fromBuilder = new StringBuilder(" from cc_inventory_detail cid ");
 		fromBuilder.append(" LEFT JOIN cc_warehouse cw on cw.id = cid.warehouse_id ");
 		fromBuilder.append(" LEFT JOIN cc_seller_product csp on csp.id = cid.sell_product_id ");
@@ -94,12 +95,12 @@ public class InventoryDetailQuery extends JBaseQuery {
 		
 		
 		if(keyword.equals("")){
-				fromBuilder.append("where cid.biz_type in ('100202','100205','100206','100208') and u.id='"+userId+"' and cid.data_area = '"+dataArea+"' ");
+				fromBuilder.append("where cid.biz_type in ('"+Consts.BIZ_TYPE_INSTOCK+"','"+Consts.BIZ_TYPE_SALES_REFUND_INSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_INSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_PLUS_INSTOCK+"') and u.id='"+userId+"' and cid.data_area = '"+dataArea+"' ");
 		}else{
 			fromBuilder.append(" where cid.biz_bill_sn like '%"+keyword+"%' ");
-				fromBuilder.append("and cid.biz_type in ('100202','100205','100206','100208') and u.id='"+userId+"' and cid.data_area = '"+dataArea+"' ");
+				fromBuilder.append("and cid.biz_type in ('"+Consts.BIZ_TYPE_INSTOCK+"','"+Consts.BIZ_TYPE_SALES_REFUND_INSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_INSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_PLUS_INSTOCK+"') and u.id='"+userId+"' and cid.data_area = '"+dataArea+"' ");
 		}
-		fromBuilder.append(" order by " + orderby);	
+		fromBuilder.append(" order by " + orderby+" desc");	
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
@@ -107,7 +108,7 @@ public class InventoryDetailQuery extends JBaseQuery {
 	}
 	
 	public Page<InventoryDetail> _out_paginate(int pageNumber, int pageSize,String keyword, String orderby,String userId,String dataArea) {
-		String select = "SELECT cid.*,cw.`name` as warehouse,csp.custom_name as sellerName ";
+		String select = "SELECT cid.*,csp.store_count,cw.`name` as warehouse,csp.custom_name as sellerName ";
 		StringBuilder fromBuilder = new StringBuilder(" from cc_inventory_detail cid ");
 		fromBuilder.append(" LEFT JOIN cc_warehouse cw on cw.id = cid.warehouse_id ");
 		fromBuilder.append(" LEFT JOIN cc_seller_product csp on csp.id = cid.sell_product_id ");
@@ -117,12 +118,12 @@ public class InventoryDetailQuery extends JBaseQuery {
 		
 		
 		if(keyword.equals("")){
-				fromBuilder.append("where cid.biz_type in ('100203','100204','100207','100209') and u.id='"+userId+"' and cid.data_area = '"+dataArea+"' ");
+				fromBuilder.append("where cid.biz_type in ('"+Consts.BIZ_TYPE_P_OUTSTOCK+"','"+Consts.BIZ_TYPE_SALES_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_REDUCE_OUTSTOCK+"') and u.id='"+userId+"' and cid.data_area = '"+dataArea+"' ");
 		}else{
 			fromBuilder.append(" where cid.biz_bill_sn like '%"+keyword+"%' ");
-				fromBuilder.append("and cid.biz_type in ('100203','100204','100207','100209') and u.id='"+userId+"' and cid.data_area = '"+dataArea+"' ");
+				fromBuilder.append("and cid.biz_type in ('"+Consts.BIZ_TYPE_P_OUTSTOCK+"','"+Consts.BIZ_TYPE_SALES_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_REDUCE_OUTSTOCK+"') and u.id='"+userId+"' and cid.data_area = '"+dataArea+"' ");
 		}
-		fromBuilder.append(" order by " + orderby);	
+		fromBuilder.append(" order by " + orderby+" desc");	
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 

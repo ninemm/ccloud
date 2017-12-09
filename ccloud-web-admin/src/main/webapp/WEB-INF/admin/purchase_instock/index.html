@@ -74,9 +74,9 @@
 		var fields =
 			[
 				{field: "id", title: "ID", align: "center", visible:false, edit:false},
-				{field: "checkbox", title: '<input class="jp-common-pad " id="dataItem" onclick="checkAll(this)" title="全选" type="checkbox">', align: "center", width: '2%', 
+				{field: "", title: '', align: "center", width: '2%', 
 					formatter: function(value, row, rowIndex) {
-						return '<input class="jp-common-pad" name="dataItem" type="checkbox" value="' + row.id + '">';
+						return '<input class="jp-common-pad" name="dataItem" type="hidden" value="' + row.id + '">';
 					},
 					edit:false
 				},
@@ -92,7 +92,7 @@
                     return toMoney(value,2);
                 },
 				edit:false},
-				{field: "receive_type", title: "付款方式", align: "center", width: '5%',
+				{field: "payment_type", title: "付款方式", align: "center", width: '5%',
 					formatter: function(value, row, rowIndex) {
 						if(value==0){
 							return "应付账款";
@@ -115,10 +115,7 @@
 				},
 				{field: "action", title: "操作", align: "center", width: '15%',
 				formatter: function(value, row, rowIndex) {
-					var strHtml ='<a class="label label-table label-info" onclick="detail(\''+row.id+'\')" >详细</a> ';
-					if(row.status==0){
-						strHtml = strHtml + '<a class="label label-table label-success" onclick="pass(\''+row.id+'\')" >通过</a> ';
-					}
+					var strHtml ='<a class="label label-table label-info" onclick="detail(\''+row.id+'\')" >入库</a> ';
 					return strHtml;
 				},
 				edit:false
@@ -189,9 +186,6 @@
 			<input type="hidden" name="userIds" id="userIds" value="">
 		</div>
 		<div class="row content-row">
-			<div class="jp-left">
-				<button class="btn btn-sm btn-primary" type="button" onclick="batchAction()"><i class="fa fa-gavel"></i> 批量审核 </button>
-			</div>
 			<div class="form-group" style="float: right">
 				<div class="form-group validata-box">
 					<label class="control-label">开始时间:</label>
