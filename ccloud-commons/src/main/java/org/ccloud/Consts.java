@@ -93,6 +93,7 @@ public class Consts {
 	public static final int SALES_ORDER_STATUS_PASS = 1000;//订单已审核
 	public static final int SALES_ORDER_STATUS_DEFAULT = 0;//订单待审核
 	public static final int SALES_ORDER_STATUS_CANCEL= 1001;//订单取消
+	public static final int SALES_ORDER_STATUS_REJECT = 1002;// 订单拒绝
 	public static final int SALES_ORDER_STATUS_PART_OUT= 2000;//订单部分出库
 	public static final int SALES_ORDER_STATUS_PART_OUT_CLOSE= 2001;//订单部分出库-订单关闭
 	public static final int SALES_ORDER_STATUS_ALL_OUT= 3000;//订单全部出库
@@ -116,9 +117,13 @@ public class Consts {
 	public static final String BIZ_TYPE_TRANSFER_OUTSTOCK = "100207";//调拨出库
 	public static final String BIZ_TYPE_TRANSFER_PLUS_INSTOCK = "100208";//盘盈入库
 	public static final String BIZ_TYPE_TRANSFER_REDUCE_OUTSTOCK = "100209";//盘亏出库
+	public static final String BIZ_TYPE_SALES_ORDER = "100210";//商品销售
 	
 	public static final int INVENTORY_TYPE_IN = 0;//库存总账入库
 	public static final int INVENTORY_TYPE_OUT = 1;//库存总账出库
 	
 	public static final String SELLER_OPTION_STORE_SWITCH = "store_switch"; //经销商设置尾缀
+	
+	public static final String RECEIVABLES_OBJECT_TYPE_CUSTOMER = "customer"; //应收账款客户类型
+	public static final String RECEIVABLES_OBJECT_TYPE_SUPPLIER = "supplier"; //应收账款供应商类型
 }
