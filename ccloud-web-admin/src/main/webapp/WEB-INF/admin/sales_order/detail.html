@@ -23,7 +23,22 @@
 			<span class="pull-left">
 			单号：${(order.order_sn)!}
 			</br>
-			状态：${(order.proc_key)!} 
+			状态：
+			<#if order.status = 0>
+				待审核
+			<#elseif order.status = 2001>
+				部分出库-订单关闭
+			<#elseif order.status = 1000>
+				已审核
+			<#elseif order.status = 1001>
+				订单取消
+			<#elseif order.status = 2000>
+				部分出库
+			<#elseif  order.status = 3000>
+				全部出库
+			<#else>
+				全部出库-订单关闭'
+			</#if>
 			</span>
 			<span class="pull-right">
 			下单人员：${(order.realname)!}/ ${(order.mobile)!} 
@@ -51,7 +66,7 @@
 						<th>${detail.valueName!}</th>
 						<td>${(detail.product_count / detail.convert_relate)?floor} ${detail.big_unit + ' (x' + detail.convert_relate + detail.small_unit + ')' }</td>
 						<td>${detail.product_count % detail.convert_relate} ${detail.small_unit}</td>
-						<td><#if detail.is_gift?? && detail.is_gift == 1>是</#if></td>
+						<td><#if detail.is_gift?? && detail.is_gift == 1>是<#else>否</#if></td>
 						<td>￥ ${detail.product_amount!}</td>
 					</tr>
 				</#list>
