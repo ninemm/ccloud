@@ -27,6 +27,7 @@
 		jQuery.mm.initValidator('#form', validatorFields);
 	});
 	
+	var discount = 1;
 	var $form = $("#form");
 	//标志
 	var newTrIdx = 0;
@@ -169,6 +170,7 @@
 		$.each(rows, function(index, item) {
 			total += Number($(item).text());
 		});
+		total = total * discount;
 		total.toFixed(2);
 		$("#total").text(total);
 		$("#inputTotal").val(total);
@@ -268,7 +270,17 @@
 				$("#biz_user_id").val(outstock.biz_user_id);
 				$("#deptId").val(outstock.dept_id);
 				$("#dataArea").val(outstock.data_area);
-
+				var dprice = outstock.factor;
+				if (dprice != null) {
+					discount = dprice;
+				} else {
+					discount = 1;
+				}
+				if (discount == 1) {
+					$("#discount").val('无');
+				} else {
+					$("#discount").val(discount);
+				}
 				$.each(outstockDetail, function(index,element){
 					addProduct(element);
 				});
@@ -408,6 +420,12 @@
 							<input class="form-control input-sm" type="text" id="customerTypeName" name="customerTypeName" value="" readonly>
 						</div>
 					</div>
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">折扣:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<input type="text" id="discount" value="无" readonly="readonly" class="form-control">
+						</div>
+					</div>							
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">收款方式:</label>
 						<div class="input-group col-md-4 col-sm-10">

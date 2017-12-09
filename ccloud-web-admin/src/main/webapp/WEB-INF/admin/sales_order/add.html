@@ -29,8 +29,7 @@
 		addProduct();
 		initCustomer();
 	});
-	
-	var discount = 2;
+	var discount = 1;
 	var $form = $("#form");
 	var productInfoMap = ${productInfoMap!}
 	var productOptionList = ${productOptionList!}
@@ -225,6 +224,11 @@
 				$customerTypeSelect.empty();
 
 				$.each(data, function(index, obj){
+					if (index == 0 && obj.factor != null) {
+						discount = obj.factor;
+					} else {
+						discount = 1;
+					}
 					$customerTypeSelect.append("<option value='" + obj.id + "'>" + obj.name + "</option>");
 					customerTypeCodeMap[obj.id] = obj.code;
 				});
@@ -234,6 +238,12 @@
 				});
 
 				customerTypeChange($customerTypeSelect);
+				if (discount == 1) {
+					$("#discount").val('无');
+				} else {
+					$("#discount").val(discount);
+				}
+				totalF();
 			}
 		);
 
@@ -275,7 +285,7 @@
 			var bigNum = $curTr.find("#bigNum").val();
 			var smallPrice = $curTr.find("#smallPrice").val();
 			var smallNum = $curTr.find("#smallNum").val();
-			rowTotal = Number(bigPrice) * Number(bigNum) + Number(smallPrice) * Number(smallNum);
+			rowTotal = (Number(bigPrice) * Number(bigNum) + Number(smallPrice) * Number(smallNum))* discount;
 			rowTotal.toFixed(2);
 		}
 		$curTr.find(".rowTotal").text(rowTotal);
@@ -290,6 +300,7 @@
 		$.each(rows, function(index, item) {
 			total += Number($(item).text());
 		});
+		total = total * discount
 		total.toFixed(2);
 		$("#total").text(total);
 		$("#inputTotal").val(total);
