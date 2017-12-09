@@ -89,13 +89,14 @@ public class _UserController extends JBaseCRUDController<User> {
 		String stationList = getPara("stationList");
 		String stationName = getPara("stationName");
 		String groupList = getPara("groupList");
-//		String groupName = getPara("groupName");
+		String groupName = getPara("groupName");
+		String NewGroupName = groupName.substring(0, groupName.length() -1);
 		String deptName = getPara("parent_name");
 		user.setDepartmentName(deptName);
 		user.setStationId(stationList);
 		user.setStationName(stationName);
 		// user.setGroupId(groupList);
-		// user.setGroupName(groupName);
+		 user.setGroupName(NewGroupName);
 		Department dept = DepartmentQuery.me().findById(user.getDepartmentId());
 		String dataArea = DataAreaUtil.dataAreaSetByUser(dept.getDataArea());
 		user.setDataArea(dataArea);
@@ -107,14 +108,6 @@ public class _UserController extends JBaseCRUDController<User> {
 		if (user.getId() == null) {
 			user.setSalt(EncryptUtils.salt());
 			user.setPassword(EncryptUtils.encryptPassword(user.getPassword(), user.getSalt()));
-			for (String groupId : groupLists) {
-	    		UserGroupRel userGroupRel = new UserGroupRel();
-	    		userGroupRel.setId(StrKit.getRandomUUID());
-				userGroupRel.setUserId(user.getId());
-				userGroupRel.setGroupId(groupId);
-				userGroupRelList.add(userGroupRel);
-			}
-	    	Db.batchSave(userGroupRelList, userGroupRelList.size());
 		}else {
 			//更新用户组信息
 			List<UserGroupRel> userGroupRels = UserGroupRelQuery.me().findByUserId(user.getId());
@@ -134,6 +127,14 @@ public class _UserController extends JBaseCRUDController<User> {
 			}
 		}		
 		if (user.saveOrUpdate()) {
+			for (String groupId : groupLists) {
+	    		UserGroupRel userGroupRel = new UserGroupRel();
+	    		userGroupRel.setId(StrKit.getRandomUUID());
+				userGroupRel.setUserId(user.getId());
+				userGroupRel.setGroupId(groupId);
+				userGroupRelList.add(userGroupRel);
+			}
+	    	Db.batchSave(userGroupRelList, userGroupRelList.size());
 			MenuManager.clearListByKey(user.getId());
 			renderAjaxResultForSuccess("ok");
 		} else {
