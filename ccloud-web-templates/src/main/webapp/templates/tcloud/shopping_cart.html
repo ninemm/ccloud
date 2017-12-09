@@ -7,12 +7,23 @@ $(function() {
     var _this = $(this);
     $.confirm("确认删除商品？", function() {
       _this.parents(".weui-panel").remove();
+      total();
     }, function() {
-
     })
+  }).on("touchstart", "#placeOrder", function () {
+      save();
+  }).on("touchend", ".operate:first-child", function () { //减少商品数量
+      total();
+  }).on("touchend", ".operate:last-child", function () { //增加商品数量
+      total();
+  }).on("change", "#bigPrice", function () { //改小价格
+      total();
+  }).on("change", "#smallPrice", function () { //改大价格
+      total();
   });
   
   initProduct();
+  total();
   
 });
 
@@ -45,6 +56,59 @@ function initProduct(){
 		$newProductDetail.find("#smallNum").val(el.smallNum);
 
 	});
+}
+
+function total(){
+	var products = $(".weui-panel");
+	var total = 0;
+	$.each(products, function(index, el) {
+		total += $(el).find("#bigNum").val() * $(el).find("#bigPrice").val();
+		total += $(el).find("#smallNum").val() * $(el).find("#smallPrice").val();
+	});
+	$("#totalNum").text("共" + products.length + "款,合计:" + total + "元")
+
+} 
+
+function save(){
+	var productList = [];
+	var $product = $(".weui-panel");
+	$.each($product, function(index, el) {
+		$el = $(el);
+		var sellProductId = $el.find("#sellProductId").val();
+		var bigNum = $el.find("#bigNum").val();
+		var smallNum = $el.find("#smallNum").val();
+		
+		if(bigNum != 0 || smallNum != 0){
+			productList.push({
+				productName : $el.find("#productName").text(),
+				valueName : $el.find("#valueName").text(),
+				
+				bigPriceSpan : $el.find("#bigPriceSpan").text(),
+				smallPriceSpan : $el.find("#smallPriceSpan").text(),
+				bigUnitSpan : $el.find("#bigUnitSpan").text(),
+				smallUnitSpan : $el.find("#smallUnitSpan").text(),
+				stock : $el.find("#stock").text(),
+				
+				bigPrice : $el.find("#bigPrice").val(),
+				smallPrice : $el.find("#smallPrice").val(),
+				bigUnit : $el.find("#bigUnit").val(),
+				smallUnit : $el.find("#smallUnit").val(),
+				sellProductId : sellProductId,
+				productId : $el.find("#productId").val(),
+				convert : $el.find("#convert").val(),
+
+				bigNum : bigNum,
+				smallNum : smallNum
+			});
+		}
+	});
+	
+	setItemBykey("productList",productList);
+	if(productList.length == 0) {
+		toastr.warning("你的购物车内没有商品!"); 
+		return;
+	}
+	window.location.href = '${CPATH}/product/order';
 }
 </#macro>
 
@@ -130,7 +194,7 @@ function initProduct(){
 	<div class="hidden-menu">
 		<ul>
 			<li>
-				<a href="index.html">
+				<a href="${CPATH}/product/index">
 				首页
 				<i class="icon-home blue"></i>
 				</a>
@@ -146,8 +210,8 @@ function initProduct(){
 	</div>
 	<div class="layer"></div>
 	<footer class="weui-footer weui-footer_fixed-bottom">
-		<p class="total bg-white">共2款，总数10件</p>
-		<a href="order.html" class="place-order bg-blue white">下单</a>
+		<p class="total bg-white" id="totalNum">共2款，总数10件</p>
+		<a id="placeOrder" class="place-order bg-blue white">下单</a>
 	</footer>
 </body>
 </@layout>

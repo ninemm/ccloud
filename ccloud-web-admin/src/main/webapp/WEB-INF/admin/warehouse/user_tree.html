@@ -39,16 +39,25 @@
 		console.log(parent.$("#userIds").val(userIds));
 		var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
 	  	var id='${id}';
-       $.ajax({     
-            type: "Post",     
-            //方法所在页面和方法名      
-            url: "${CPATH}/admin/warehouse/adduserJoinWarehouse?ucode=${ucode}&userIds="+userIds+"&id="+id,    
-            contentType: "application/json; charset=utf-8",     
-            dataType: "json",     
-     });
-
-		parent.layer.close(index);
-
+		$.ajax({     
+			type: "Post",     
+			//方法所在页面和方法名      
+			url: "${CPATH}/admin/warehouse/adduserJoinWarehouse?ucode=${ucode}&userIds="+userIds+"&id="+id,    
+			contentType: "application/json; charset=utf-8",     
+			dataType: "json",  
+			success : function(result) {
+				if (result.errorCode > 0) {
+					parent.toastr.error(result.message, '操作失败');
+				} else {
+					parent.toastr.success(result.message, '操作成功');
+					parent.$table.bootstrapTable('refresh');
+					parent.layer.close(index);
+				}
+			},
+			error : function() {
+				parent.toastr.error("信息提交错误", '操作失败');
+			} 
+		});
 	});
 </#macro>
 

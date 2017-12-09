@@ -100,10 +100,14 @@ Utils = {
 	}
 }
 
-// 菜单
+//菜单
 var open = false;
 var finished = true;
 var $currentInput = null;
+var $menu = $(".hidden-menu ul");
+var $menuBtn = $("#button");
+var $layer = $(".layer");
+var $combinSearch = $('#combin-filter');
 //打开菜单
 function openMenu() {
 	open = true;
@@ -128,7 +132,7 @@ function closeMenu() {
 		finished = true;
 	}, 300);
 }
-//关闭输入框
+//弹出输入框
 function openPop() {
 	open = true;
 	$("body")
@@ -144,7 +148,7 @@ function openPop() {
 	$(".pop-input input").val($currentInput.val());
 	$(".pop-input input").focus();
 }
-
+//关闭输入框	
 function closePop() {
 	open = false;
 	$(".pop-input").addClass("animated fadeOut");
@@ -157,6 +161,40 @@ function closePop() {
 function confirmInput() {
 	$currentInput.val($(".pop-input input").val());
 	closePop();
+}
+
+//阻止滚动后触发touchend事件
+function stopTouchendPropagationAfterScroll() {
+  var locked = false;
+
+  window.addEventListener('touchmove', function (ev) {
+    locked || (locked = true, window.addEventListener('touchend', stopTouchendPropagation, true));
+  }, true);
+
+  function stopTouchendPropagation(ev) {
+    ev.stopPropagation();
+    window.removeEventListener('touchend', stopTouchendPropagation, true);
+    locked = false;
+  }
+}
+
+
+//打开组合搜索
+function openCombinSearch() {
+  $combinSearch.show().addClass("animated bounceInRight");
+  $layer.addClass("layer-show");
+  setTimeout(function () {
+    $combinSearch.removeClass("animated bounceInRight");
+  }, 300);
+}
+
+//关闭组合搜索
+function closeCombinSearch() {
+  $combinSearch.addClass("animated bounceOutRight");
+  setTimeout(function () {
+    $layer.removeClass("layer-show");
+    $combinSearch.hide().removeClass("animated bounceOutRight");
+  }, 300);
 }
 
 //设定storage
@@ -211,7 +249,7 @@ $(function() {
 		;
 	}).on("touchmove", ".layer", function() {
 		event.preventDefault();
-	}).on("touchend", "input[type=number]:not([disabled])", function() {
+	}).on("touchend", "input[type=number]:not([readonly])", function() {
 		if (!open) {
 			$currentInput = $(this);
 			openPop();
@@ -228,5 +266,16 @@ $(function() {
 		$input.val(Number($input.val()) + 1);
 	}).on("change", "input[name=add-gift]", function() {//点击遮罩关闭菜单
 		$(this).parent().next().slideToggle("fast");
+	}).on("touchend", ".layer", function () { //点击遮罩关闭菜单、组合筛选
+	    closeMenu();
+	    closeCombinSearch();
+	}).on('touchend', '#combin-filter-btn', function () { //打开组合筛选
+	    if ($combinSearch.length > 0) {
+	      openCombinSearch();
+	    }
+	}).on('touchend', '#combin-filter .cancel-search-btn, #combin-filter .confirm-search-btn', function () { //关闭组合筛选
+	    closeCombinSearch();
+	}).on('touchend', '#combin-filter span', function () {
+		$(this).addClass('blue-button').siblings().removeClass('blue-button');
 	});
 })

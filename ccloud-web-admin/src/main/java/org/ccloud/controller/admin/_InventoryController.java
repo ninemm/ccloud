@@ -26,7 +26,6 @@ import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.model.Inventory;
 import org.ccloud.model.query.InventoryQuery;
-import org.ccloud.model.query.StockTakingDetailQuery;
 import org.ccloud.model.InventoryDetail;
 import org.ccloud.model.User;
 import org.ccloud.model.query.InventoryDetailQuery;

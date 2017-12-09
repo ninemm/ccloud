@@ -15,6 +15,7 @@
  */
 package org.ccloud.controller.admin;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -25,13 +26,21 @@ import java.util.Map;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
+import org.ccloud.model.Inventory;
+import org.ccloud.model.InventoryDetail;
+import org.ccloud.model.SellerProduct;
 import org.ccloud.model.TransferBill;
 import org.ccloud.model.TransferBillDetail;
 import org.ccloud.model.User;
 import org.ccloud.model.Warehouse;
+import org.ccloud.model.query.InventoryQuery;
+import org.ccloud.model.query.ProductQuery;
+import org.ccloud.model.query.SellerProductQuery;
 import org.ccloud.model.query.TransferBillDetailQuery;
 import org.ccloud.model.query.TransferBillQuery;
+import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.query.WarehouseQuery;
+import org.ccloud.model.vo.ProductInfo;
 import org.ccloud.model.vo.transferBillInfo;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
@@ -53,18 +62,18 @@ import com.jfinal.plugin.activerecord.Page;
 public class _TransferBillController extends JBaseCRUDController<TransferBill> { 
 
 	public static final String BILLTYPE = "TB";
-	 //目前系统还没有企业编号，先创建一个100000占位
-	public static final String COMPANYCODE = "100000";
-	
+	public final static String startNo = "000001";
+	 //目前系统还没有企业编号，先创建一个100000占位	
 	public void list() {
-
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String departmentId = user.getDepartmentId();
 		String keyword = getPara("k");
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
 			setAttr("k", keyword);
 		}
 
-		Page<TransferBill> page = TransferBillQuery.me().paginate(getPageNumber(), getPageSize(), keyword, "c.create_date");
+		Page<TransferBill> page = TransferBillQuery.me().paginate(getPageNumber(), getPageSize(), keyword, "c.create_date desc",departmentId);
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
 
@@ -73,6 +82,7 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 	
 	public void edit() {	
 		String id = getPara("id");
+		final String sellerId = getSessionAttr("sellerId").toString();
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String userId = user.getId();
 		if (id != null) {
@@ -81,14 +91,15 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 		}
 		List<Warehouse> wlist = WarehouseQuery.me().findWarehouseByUserId(userId);
 		setAttr("wlist", wlist);
-		
-		List<transferBillInfo> ilist = TransferBillDetailQuery.me().findByTransferBillDetailId(id);
+		List<User> ulist = UserQuery.me().findUserList(userId);
+		setAttr("ulist", ulist);
+		List<transferBillInfo> ilist = TransferBillDetailQuery.me().findByTransferBillDetailId(id,sellerId);
 		setAttr("ilist", ilist);		
 	}
 	
 	
 	@Override
-	public void save() {		
+	public void save() {			
 	 TransferBill transferBill = getModel(TransferBill.class);
 	 if (transferBill.getStatus() == null || transferBill.getStatus() == 0) {
 	  User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
@@ -116,7 +127,6 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 	 }
 	}
 	
-	
 	public boolean saveTransferBillInfo(final Map<String, String[]>map,final TransferBill transferBill,final boolean update) {
 		boolean isSave = Db.tx(new IAtom() {
 			@Override
@@ -137,7 +147,7 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 						 String productId = StringUtils.getArrayFirst(map.get("transferBillDetailList[" + factIndex[i] +"].product_id"));
 						 String productCount = StringUtils.getArrayFirst(map.get("transferBillDetailList[" + factIndex[i] + "].product_count"));
 						 
-						 transferBillDetail.setProductId(productId);
+						 transferBillDetail.setSellerProductId(productId);
 						 transferBillDetail.setProductCount(Integer.parseInt(productCount));
 						 transferBillDetail.setTransferBillId(transferBill.getId());
 						 transferBillDetail.setId(StrKit.getRandomUUID());
@@ -168,14 +178,14 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 						 String productId = StringUtils.getArrayFirst(map.get("transferBillDetailList[" + i +"].product_id"));
 						 String productCount = StringUtils.getArrayFirst(map.get("transferBillDetailList[" + i + "].product_count"));
 						 
-						 transferBillDetail.setProductId(productId);
+						 transferBillDetail.setSellerProductId(productId);
 						 transferBillDetail.setProductCount(Integer.parseInt(productCount));
 						 transferBillDetail.setTransferBillId(transferBill.getId());
 						 transferBillDetail.setId(StrKit.getRandomUUID());
 						 transferBillDetail.setDeptId(transferBill.getDeptId());
 						 transferBillDetail.setDataArea(transferBill.getDataArea());
 						 transferBillDetail.setCreateDate(new Date());
-					     iSaveList.add(transferBillDetail);
+					     iSaveList.add(transferBillDetail);					     
 	 					loopEnd++;
 	 					if (loopEnd == factIndex.length) {
 	    					break;
@@ -198,17 +208,172 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 	public void enable() {
 		String id = getPara("id");
 		int isEnabled = getParaToInt("isEnabled");
-		TransferBill transferBill = TransferBillQuery.me().findById(id);
+		final String sellerId = getSessionAttr("sellerId").toString();
+		//获取调拨单明细
+		List<transferBillInfo> transferBillInfos = TransferBillDetailQuery.me().findByTransferBillDetailId(id,sellerId);
+		//查找商品的库存数量并和调拨数量做比较
+		this.checkStoreCount(transferBillInfos);
+	    Boolean status = this.inserIntoInventoryInfo(transferBillInfos);
+	    if (status) {
+	    	TransferBill transferBill = TransferBillQuery.me().findById(id);
 			transferBill.setStatus(isEnabled);
 			if (transferBill.saveOrUpdate()) {
 				renderAjaxResultForSuccess("更新成功");
 			} else {
 				renderAjaxResultForError("更新失败");
-			}		
+			}
+		}else {
+			renderAjaxResultForError("更新失败");
+		}
 	}
-	
-	
-	//删除调拨单主表及其子表的信息
+    /**
+     * 
+    * @Title: 检查待调拨数量和现在库存数量大小 
+    * @Description: TODO
+    * @param @param transferBillInfos   
+    * @return void    
+    * @throws
+     */
+	private void checkStoreCount(List<transferBillInfo> transferBillInfos) {
+		for (transferBillInfo transferBillInfo : transferBillInfos) {
+			List<ProductInfo> productInfos = ProductQuery.me().getProductBySellerProId(transferBillInfo.getSellerProductId());
+			for (ProductInfo productInfo : productInfos) {
+				if (productInfo.getStoreCount().subtract(transferBillInfo.getProductCount()).doubleValue() < 0) {
+					renderAjaxResultForError("商品" + productInfo.getName() + "库存不足，无法调拨");
+				}
+			}
+		}
+	}
+
+
+	private Boolean inserIntoInventoryInfo(final List<transferBillInfo> transferBill) {
+		final String sellerId = getSessionAttr("sellerId").toString();
+		  final User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		boolean isSave = Db.tx(new IAtom() {
+			@Override
+			public boolean run() throws SQLException {
+				List<Inventory> updateList = new ArrayList<>();
+				List<Inventory> saveList = new ArrayList<>();
+				List<SellerProduct> sellerProducts = new ArrayList<>();
+                for (transferBillInfo transferBillInfo : transferBill) {
+        			List<ProductInfo> productInfos = ProductQuery.me().getProductBySellerProId(transferBillInfo.getSellerProductId());
+        			   SellerProduct sellerProduct = SellerProductQuery.me().findById(transferBillInfo.getSellerProductId());   
+                       for (ProductInfo productInfo : productInfos) {
+                    	 //先处理调出仓库的总账
+                    	   Inventory outInventory = InventoryQuery.me().findBySellerIdAndProductIdAndWareHouseId(sellerId,productInfo.getProductId(),transferBillInfo.getFromWarehouseId());        
+                    	   outInventory.setOutCount(outInventory.getOutCount().add(transferBillInfo.getProductCount()));
+                    	   outInventory.setOutPrice(outInventory.getInPrice());
+                    	   outInventory.setOutAmount(outInventory.getOutCount().multiply(outInventory.getOutPrice()));
+                    	   outInventory.setBalanceCount(outInventory.getBalanceCount().subtract(transferBillInfo.getProductCount()));
+                    	   outInventory.setBalancePrice(outInventory.getInPrice());
+                    	   outInventory.setBalanceAmount(outInventory.getBalanceCount().multiply(outInventory.getInPrice()));
+                    	   sellerProduct.setStoreCount(outInventory.getBalanceCount());
+                    	   outInventory.setModifyDate(new Date());
+                    	   updateList.add(outInventory);
+                    	   sellerProducts.add(sellerProduct);
+                    	 //处理调出仓库的总账子表信息
+                          InventoryDetail outInventoryDetail = new InventoryDetail();
+                    	  outInventoryDetail.setId(StrKit.getRandomUUID());
+                    	  outInventoryDetail.setWarehouseId(transferBillInfo.getFromWarehouseId());
+                    	  outInventoryDetail.setSellProductId(transferBillInfo.getSellerProductId());
+                    	  outInventoryDetail.setInCount(new BigDecimal(0));
+                    	  outInventoryDetail.setInPrice(new BigDecimal(0));
+                    	  outInventoryDetail.setInAmount(new BigDecimal(0));
+                    	  outInventoryDetail.setOutCount(transferBillInfo.getProductCount());
+                    	  outInventoryDetail.setOutPrice(outInventory.getInPrice());
+                    	  outInventoryDetail.setOutAmount(outInventoryDetail.getOutCount().multiply(outInventoryDetail.getOutPrice()));
+                    	  outInventoryDetail.setBalanceCount(outInventory.getBalanceCount());
+                    	  outInventoryDetail.setBalancePrice(outInventory.getBalancePrice());
+                    	  outInventoryDetail.setBalanceAmount(outInventory.getBalanceAmount());
+                    	  outInventoryDetail.setBizType(Consts.BIZ_TYPE_TRANSFER_OUTSTOCK);
+                    	  outInventoryDetail.setBizBillSn(transferBillInfo.getTransferBillSn());
+                    	  outInventoryDetail.setBizDate(new Date());
+                    	  outInventoryDetail.setBizUserId(transferBillInfo.getBizUserId());
+                    	  outInventoryDetail.setDataArea(transferBillInfo.getDataArea());
+                    	  outInventoryDetail.setDeptId(user.getDepartmentId());
+                    	  outInventoryDetail.setBizUserId(transferBillInfo.getBizUserId());
+                    	  outInventoryDetail.setCreateDate(new Date());
+                    	  if (!outInventoryDetail.save()) {
+							return false;
+						}
+//                    	 //处理调入仓库的库存总账  
+                 	      Inventory inInventory = InventoryQuery.me().findBySellerIdAndProductIdAndWareHouseId(sellerId,productInfo.getProductId(),transferBillInfo.getToWarehouseId());
+                 	      if (inInventory == null) {
+                 	    	 inInventory = new Inventory();
+                 	    	 inInventory.setId(StrKit.getRandomUUID());
+                 	    	 inInventory.setWarehouseId(transferBillInfo.getToWarehouseId());
+                 	    	 inInventory.setProductId(productInfo.getProductId());
+                 	    	 inInventory.setSellerId(sellerId);
+                 	    	 inInventory.setOutCount(new BigDecimal(0));
+                 	    	 inInventory.setOutPrice(new BigDecimal(0));
+                 	    	 inInventory.setOutAmount(new BigDecimal(0));
+                 	    	 inInventory.setInCount(transferBillInfo.getProductCount());
+                 	    	 inInventory.setInPrice(outInventory.getInPrice());
+                 	    	 inInventory.setInAmount(transferBillInfo.getProductCount().multiply(outInventory.getInPrice()));
+                 	    	 inInventory.setBalanceCount(outInventory.getBalanceCount());
+                 	    	 inInventory.setBalancePrice(outInventory.getBalancePrice());
+                 	    	 inInventory.setBalanceAmount(outInventory.getBalanceAmount());
+                 	    	 inInventory.setDataArea(user.getDataArea());
+                 	    	 inInventory.setDeptId(user.getDepartmentId());
+                 	    	 inInventory.setCreateDate(new Date());
+                 	         saveList.add(inInventory);
+                 	    	 
+						  }else {
+	                 	      inInventory.setWarehouseId(transferBillInfo.getToWarehouseId());
+	                    	  inInventory.setInCount(inInventory.getInCount().add(transferBillInfo.getProductCount()));
+	                    	  inInventory.setInPrice(outInventory.getInPrice());
+	                    	  inInventory.setInAmount(inInventory.getInCount().multiply(inInventory.getInPrice()));
+	                    	  inInventory.setBalanceCount(outInventory.getBalanceCount());
+	                    	  inInventory.setBalancePrice(outInventory.getBalancePrice());
+	                    	  inInventory.setBalanceAmount(outInventory.getBalanceAmount());
+	                    	  inInventory.setModifyDate(new Date());
+	                    	  updateList.add(inInventory);
+						}
+                     	 //处理调入仓库的总账子表信息
+                    	  InventoryDetail inInventoryDetail = new InventoryDetail();
+                    	  inInventoryDetail.setId(StrKit.getRandomUUID());
+                    	  inInventoryDetail.setSellProductId(transferBillInfo.getSellerProductId());
+                    	  inInventoryDetail.setWarehouseId(transferBillInfo.getToWarehouseId());
+                    	  inInventoryDetail.setOutCount(new BigDecimal(0));
+                    	  inInventoryDetail.setOutPrice(new BigDecimal(0));
+                    	  inInventoryDetail.setOutAmount(new BigDecimal(0));
+                    	  inInventoryDetail.setInCount(transferBillInfo.getProductCount());
+                    	  inInventoryDetail.setInPrice(outInventory.getInPrice());
+                    	  inInventoryDetail.setInAmount(transferBillInfo.getProductCount().multiply(outInventory.getInPrice()));
+                    	  inInventoryDetail.setBalanceCount(outInventory.getBalanceCount());
+                    	  inInventoryDetail.setBalancePrice(outInventory.getInPrice());
+                    	  inInventoryDetail.setBalanceAmount(outInventory.getBalanceAmount());
+                    	  inInventoryDetail.setBizType(Consts.BIZ_TYPE_TRANSFER_INSTOCK);
+                    	  inInventoryDetail.setBizBillSn(transferBillInfo.getTransferBillSn());
+                    	  inInventoryDetail.setBizDate(new Date());
+                    	  inInventoryDetail.setBizUserId(transferBillInfo.getBizUserId());
+                    	  inInventoryDetail.setDataArea(transferBillInfo.getDataArea());
+                    	  inInventoryDetail.setDeptId(user.getDepartmentId());
+                    	  inInventoryDetail.setCreateDate(new Date());
+                    	  if (!inInventoryDetail.save()) {
+							return false;
+						}
+                    	  
+					}
+				}
+                try {
+					Db.batchUpdate(updateList, updateList.size());
+					Db.batchSave(saveList, saveList.size());
+					//更新seller_product的商品库存信息
+					Db.batchUpdate(sellerProducts, sellerProducts.size());
+				
+				} catch (Exception e) {
+					e.printStackTrace();
+					return false;
+				}
+				return true;
+			}
+		});
+		return isSave;
+	}
+
+
+		//删除调拨单主表及其子表的信息
 		@Override
 		public void delete() {
 			String id = getPara("id");
@@ -222,11 +387,11 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 	
 	//通过数据库查最大的单据号加1返回去
 	  public String getBillSn() {
+	    String sellerCode = getSessionAttr("sellerCode");
 		int newNo = 0; 
 		List<Integer> list = new ArrayList<>();
-	    String startNo = "000001";
 		StringBuilder sBuilder = new StringBuilder(BILLTYPE);
-		sBuilder.append(COMPANYCODE);
+		sBuilder.append(sellerCode);
         String Number = DateUtils.dateString();
 		//查询数据库当天最大的单据号，并在此基础上加1
 		SimpleDateFormat sdf = new SimpleDateFormat(DateUtils.DEFAULT_NORMAL_FORMATTER); 

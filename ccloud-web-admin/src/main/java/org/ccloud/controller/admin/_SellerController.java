@@ -67,13 +67,20 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 	
 	public void list() {
 		User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		List<Department> departments = DepartmentQuery.me().findDeptList(dataArea, "id");
+		String childId = "";
+		for (int i = 0;i<departments.size();i++){
+			childId += "'"+departments.get(i).getId()+"',";
+		}
+		String childs = childId.substring(0, childId.length()-1);
         String keyword = getPara("k");
         if (StrKit.notBlank(keyword)) {
             keyword = StringUtils.urlDecode(keyword);
             setAttr("k", keyword);
         }
 
-        Page<Seller> page = SellerQuery.me().paginate(getPageNumber(), getPageSize(),keyword,  "cs.id",user.getUsername(),user.getId());
+        Page<Seller> page = SellerQuery.me().paginate(getPageNumber(), getPageSize(),keyword,  "cs.id",user.getUsername(),childs);
         Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);
 		
@@ -94,6 +101,10 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 	 * @see org.ccloud.core.JBaseCRUDController#save()
 	 */
 	public void save() {
+		if(getPara("dept_id").equals("0")){
+			renderAjaxResultForError("不可为总部创建销售商，请重新选择！");
+			return;
+		}
 		final Seller seller = getModel(Seller.class);
 		final SellerBrand sellerBrand = getModel(SellerBrand.class);
 		final Customer customer = getModel(Customer.class);
@@ -146,13 +157,13 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			seller.set("create_date", new Date());
 			seller.set("modify_user_id", user.getId());
 			seller.set("is_inited", 0);
+			seller.set("dept_id",getPara("dept_id"));
 			if(user.getUsername().equals("admin")){
-				seller.set("dept_id",getPara("dept_id"));
 				seller.set("seller_type", getPara("seller_type"));
 			}else{
-				seller.set("dept_id",user.getDepartmentId());
 				seller.set("seller_type", 1);
 			}
+			
 			seller.save();
 			
 			
@@ -163,13 +174,8 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 					sellerBrand.set("id",sellerBrandId);
 					sellerBrand.set("brand_id", brandIds[i]);
 					sellerBrand.set("seller_id",sellerId);
-					if(user.getUsername().equals("admin")){
-						sellerBrand.set("data_area",department.getDataArea());
-						sellerBrand.set("dept_id", department.getId());
-					}else{
-						sellerBrand.set("data_area",user.getDataArea());
-						sellerBrand.set("dept_id", user.getDepartmentId());
-					}
+					sellerBrand.set("data_area",department.getDataArea());
+					sellerBrand.set("dept_id", department.getId());
 					sellerBrand.save();
 				}
 			}
@@ -188,11 +194,10 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			
 			
 			if(!user.getUsername().equals("admin")){
-				Department department2= DepartmentQuery.me().findByUserId(user.getId());
 				userJoinCustomer.set("seller_customer_id", customerId);
 				userJoinCustomer.set("user_id", user.getId());
-				userJoinCustomer.set("data_area",department2.getDataArea());
-				userJoinCustomer.set("dept_id", user.getDepartmentId());
+				userJoinCustomer.set("data_area",department.getDataArea());
+				userJoinCustomer.set("dept_id", department.getId());
 				userJoinCustomer.save();
 				
 				sellerCustomer.set("id", StrKit.getRandomUUID());
@@ -205,8 +210,8 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				sellerCustomer.set("customer_type_ids", 7);
 				sellerCustomer.set("customer_kind", 100402);
 				sellerCustomer.set("status", 0);
-				sellerCustomer.set("data_area", department2.getDataArea());
-				sellerCustomer.set("dept_id", user.getDepartmentId());
+				sellerCustomer.set("data_area", department.getDataArea());
+				sellerCustomer.set("dept_id", department.getId());
 				sellerCustomer.set("create_date", new Date());
 				sellerCustomer.save();
 			}
@@ -227,6 +232,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			seller.set("is_inited", 1);
 			seller.set("modify_date", new Date());
 			seller.set("modify_user_id", user.getId());
+			seller.set("dept_id",getPara("dept_id"));
 			seller.update();
 			SellerBrandQuery.me().deleteBySellertId(sellerId);
 			for(int i=0;i<brandIds.length;i++){
@@ -347,8 +353,9 @@ public class _SellerController extends JBaseCRUDController<Seller> {
             keyword = StringUtils.urlDecode(keyword);
             setAttr("k", keyword);
         }
-        
-        Page<Product> page = ProductQuery.me().paginate_pro(getPageNumber(), getPageSize(),keyword,  "cp.id");
+        User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
+        Seller seller = SellerQuery.me().findByUserId(user.getId());
+        Page<Product> page = ProductQuery.me().paginate_pro(getPageNumber(), getPageSize(),keyword,  "cp.id",seller.getId());
 
         Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);

@@ -35,6 +35,8 @@
 	<!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
   	<link rel="shortcut icon" href="${CTPATH}/images/favicon.ico" type="image/x-icon">
 
+    <!-- animate.min.css -->
+	<link type='text/css' rel="stylesheet" href="${CTPATH}/css/animate.min.css">
     <!-- weui.css -->
 	<link type='text/css' rel="stylesheet" href="${CTPATH}/css/weui.min.css">
 	<!-- jquery-weui -->
@@ -92,7 +94,28 @@
 	
 	    $(function() {
         	FastClick.attach(document.body);
+        	initToast();
 		});	
+	    
+	    function initToast(){
+	    	toastr.options = {
+	    	  "closeButton": true,
+	    	  "debug": false,
+	    	  "newestOnTop": false,
+	    	  "progressBar": true,
+	    	  "positionClass": "toast-top-center",
+	    	  "preventDuplicates": false,
+	    	  "onclick": null,
+	    	  "showDuration": "300",
+	    	  "hideDuration": "1000",
+	    	  "timeOut": "2000",
+	    	  "extendedTimeOut": "1000",
+	    	  "showEasing": "swing",
+	    	  "hideEasing": "linear",
+	    	  "showMethod": "fadeIn",
+	    	  "hideMethod": "fadeOut"
+	    	}
+	    }
 	</script>
 	
 	<#if script ??>

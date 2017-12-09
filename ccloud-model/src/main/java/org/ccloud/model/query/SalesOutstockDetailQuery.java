@@ -24,6 +24,7 @@ import java.util.Map;
 import org.ccloud.Consts;
 import org.ccloud.model.Inventory;
 import org.ccloud.model.InventoryDetail;
+import org.ccloud.model.ReceivablesDetail;
 import org.ccloud.model.SalesOrderDetail;
 import org.ccloud.model.SalesOutstockDetail;
 import org.ccloud.model.SellerProduct;
@@ -60,7 +61,7 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		return Db.find(sqlBuilder.toString(), outstockId);
 	}
 
-	public boolean insert(String outstockId, Record orderDetail, Date date) {
+	public boolean insert(String outstockId, Record orderDetail, Date date, Record order) {
 		SalesOutstockDetail detail = new SalesOutstockDetail();
 		detail.setId(StrKit.getRandomUUID());
 		detail.setOutstockId(outstockId);
@@ -74,7 +75,21 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		detail.setDeptId(orderDetail.getStr("dept_id"));
 		detail.setDataArea(orderDetail.getStr("data_area"));
 		
-		return detail.save();
+		ReceivablesDetail receivablesDetail = new ReceivablesDetail();
+		receivablesDetail.setId(StrKit.getRandomUUID());
+		receivablesDetail.setObjectId(order.getStr("customer_id"));
+		receivablesDetail.setObjectType(Consts.RECEIVABLES_OBJECT_TYPE_CUSTOMER);
+		receivablesDetail.setReceiveAmount(detail.getProductAmount());
+		receivablesDetail.setActAmount(new BigDecimal(0));
+		receivablesDetail.setBalanceAmount(detail.getProductAmount());
+		receivablesDetail.setBizDate(date);
+		receivablesDetail.setRefSn(order.getStr("order_sn"));
+		receivablesDetail.setRefType(Consts.BIZ_TYPE_SALES_ORDER);
+		receivablesDetail.setDeptId(orderDetail.getStr("dept_id"));
+		receivablesDetail.setDataArea(orderDetail.getStr("data_area"));
+		receivablesDetail.setCreateDate(date);
+		
+		return detail.save() && receivablesDetail.save();
 	}
 
 	public SalesOutstockDetail findById(final String id) {

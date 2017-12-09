@@ -49,13 +49,13 @@ public class InventoryQuery extends JBaseQuery {
 	}
 
 	public Page<Inventory> paginate(int pageNumber, int pageSize,String product_sn,String product_name,String warehouse_id, String seller_id) {
-		String select = "SELECT i.seller_id,i.product_id,p.name as product_name ,p.product_sn,i.in_count, i.in_amount, i.in_price, i.out_count, i.out_amount, i.out_price, i.balance_count, i.balance_amount, i.balance_price, i.afloat_count, i.afloat_amount, i.afloat_price, i.create_date, i.modify_date";
-		StringBuilder fromBuilder = new StringBuilder("from `cc_inventory` as i INNER JOIN  `cc_product` as p ON i.product_id = p.id ");
+		String select = "SELECT sp.custom_name,i.seller_id,i.product_id,p.name as product_name ,p.product_sn,i.in_count, i.in_amount, i.in_price, i.out_count, i.out_amount, i.out_price, i.balance_count, i.balance_amount, i.balance_price, i.afloat_count, i.afloat_amount, i.afloat_price, i.create_date, i.modify_date";
+		StringBuilder fromBuilder = new StringBuilder("from `cc_inventory` as i INNER JOIN  `cc_product` as p ON i.product_id = p.id INNER JOIN cc_seller_product as sp on sp.seller_id=i.seller_id and sp.product_id=p.id ");
 		fromBuilder.append("WHERE i.warehouse_id = '"+ warehouse_id+"'and i.seller_id='"+seller_id+"'");
 		LinkedList<Object> params = new LinkedList<Object>();
-		appendIfNotEmptyWithLike(fromBuilder, "p.name", product_name, params, true);
-		appendIfNotEmptyWithLike(fromBuilder, "p.product_sn", product_sn, params, true);
-		fromBuilder.append("ORDER BY i.create_date DESC");
+		appendIfNotEmptyWithLike(fromBuilder, "p.name", product_name, params, false);
+		appendIfNotEmptyWithLike(fromBuilder, "p.product_sn", product_sn, params, false);
+		fromBuilder.append("GROUP BY p.id ORDER BY i.create_date DESC");
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
@@ -82,7 +82,8 @@ public class InventoryQuery extends JBaseQuery {
 	}
 	
 	public Inventory findByWarehouseIdAndProductId(String warehouseId,String productId){
-		String sql = "select * from cc_inventory where warehouse_id='"+warehouseId+"' and product_id ='"+productId+"'";
+		String sql = "select * from cc_inventory "
+				+ "where warehouse_id='"+warehouseId+"' and product_id ='"+productId+"'";
 		return DAO.findFirst(sql);
 	}
 	
@@ -123,5 +124,13 @@ public class InventoryQuery extends JBaseQuery {
 	public Inventory findBySellerIdAndProductIdAndWareHouseId(String sellerId, String productId, String wareHouseId) {
 		String sql ="select * from cc_inventory where seller_id=? and product_id =? and warehouse_id = ?";
 		return DAO.findFirst(sql, sellerId, productId, wareHouseId);
+	}
+
+	public List<Record> findProductStore(String sellerId, String productId) {
+		StringBuilder defaultSqlBuilder = new StringBuilder(" select i.warehouse_id, i.balance_count ");
+		defaultSqlBuilder.append(" from cc_inventory i ");
+		defaultSqlBuilder.append(" LEFT JOIN cc_warehouse w ON i.warehouse_id = w.id ");
+		defaultSqlBuilder.append(" WHERE i.seller_id = ? AND i.product_id = ? order by w.is_default desc");
+		return Db.find(defaultSqlBuilder.toString(), sellerId, productId);
 	}
 }

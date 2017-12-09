@@ -321,5 +321,13 @@ public abstract class BaseSalesOrder<M extends BaseSalesOrder<M>> extends JModel
 	public java.util.Date getModifyDate() {
 		return get("modify_date");
 	}
+	
+	public void setTotalCount(java.math.BigDecimal totalCount) {
+		set("total_count", totalCount);
+	}
+
+	public java.math.BigDecimal getTotalCount() {
+		return get("total_count");
+	}
 
 }

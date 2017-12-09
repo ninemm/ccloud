@@ -20,7 +20,7 @@ public class DataAreaUtil {
 	}
 
 	public static String getUserDealerDataArea(String userDataArea) {
-		if (userDataArea != null && userDataArea.length() >= 12) {
+		if (userDataArea != null && userDataArea.length() >= 10) {
 			return userDataArea.substring(0, 9);
 		}
 		return userDataArea;

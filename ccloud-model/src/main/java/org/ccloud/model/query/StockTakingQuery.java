@@ -54,8 +54,8 @@ public class StockTakingQuery extends JBaseQuery {
 		fromBuilder.append(" WHERE s.seller_id='"+seller_id+"' and w.id in(SELECT u.warehouse_id FROM cc_user_join_warehouse u where u.user_id='");
 		fromBuilder.append(userId+"')");
 		LinkedList<Object> params = new LinkedList<Object>();
-		appendIfNotEmptyWithLike(fromBuilder, "w.name", keyword, params, true);
-		fromBuilder.append("ORDER BY s.create_date DESC");		
+		appendIfNotEmptyWithLike(fromBuilder, "w.name", keyword, params, false);
+		fromBuilder.append("ORDER BY s.create_date DESC");
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 

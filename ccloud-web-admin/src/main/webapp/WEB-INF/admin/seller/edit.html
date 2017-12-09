@@ -150,14 +150,13 @@
 			dataType : "json", 
 			success : function(data) { 
 				if(data.errorCode == 0) {
-					//location.reload();
 					toastr.success(data.message, '操作成功');
-				} else {
-					toastr.error(data.message,'操作失败');
-				}
 					setTimeout( function(){
 						location.href = '${CPATH}/admin/seller/index';
 								}, 2 * 1000 );
+				} else {
+					toastr.error(data.message,'操作失败');
+				}
 			},
 			error : function() {
 				alert("信息提交错误");
@@ -191,7 +190,6 @@
 		<form action="${CPATH}/admin/seller/save" method="post" id="form" class="form-horizontal" >
 			<input type="hidden" name="seller.id" value="${(seller.id)!}">
 					<div class="box-body">
-						<@shiro.hasPermission name="/admin/all">
 						<div class="form-group col-sm-12 validata-box">
 								<label class="control-label col-sm-2">所属部门组织:</label>
 								<div class="input-group col-md-4 col-sm-10">
@@ -204,7 +202,6 @@
 				                 	</div>
 				               	</div>
 							</div>
-						</@shiro.hasPermission>	
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">*销售商名称:</label>
 							<div class="input-group col-md-4 col-sm-10">

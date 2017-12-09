@@ -120,7 +120,7 @@
 					  var strHtml = '<a onclick="change(\''+row.id+'\')" class="btn btn-xs btn-danger btn-flat">下架</a>';
 					}
 					strHtml += '&nbsp;<a type="button" onclick="getQrocde(\''+row.id+'\')" data-toggle="modal" data-target="#exampleModal1" name="qrcode" class="btn btn-xs btn-info  btn-flat">二维码</a>';
-					//strHtml += '&nbsp;<a onclick="del(\''+row.id+'\')" class="btn btn-xs btn-danger btn-flat">删除</a>';
+					strHtml += '&nbsp;<a onclick="del(\''+row.id+'\')" class="btn btn-xs btn-danger btn-flat">删除</a>';
 					return strHtml;
 				},
 				edit:false
@@ -302,7 +302,12 @@
 				});
 		});
 	}
-	
+	$("input").on("keydown",function(){
+		if (event.keyCode == 13) {
+			event.keyCode = 0;
+			event.returnValue = false;
+		}
+	});
 	
 </#macro>
 

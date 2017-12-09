@@ -16,6 +16,7 @@
 package org.ccloud.controller.admin;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -27,11 +28,11 @@ import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
-import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Inventory;
 import org.ccloud.model.InventoryDetail;
 import org.ccloud.model.PurchaseInstock;
+import org.ccloud.model.PurchaseInstockDetail;
 import org.ccloud.model.PurchaseRefundOutstock;
 import org.ccloud.model.PurchaseRefundOutstockDetail;
 import org.ccloud.model.SellerProduct;
@@ -131,16 +132,26 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 		String purchaseInstockId = StringUtils.getArrayFirst(paraMap.get("purchaseInstockId"));
 		String orderId = StrKit.getRandomUUID();
 		Date date = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+		String str = sdf.format(date);
 		PurchaseInstock purchaseInstock=PurchaseInstockQuery.me().findById(purchaseInstockId);
 		//采购退货单： PR + 100000(机构编号或企业编号6位) + 20171108(时间) + 100001(流水号)
-		String orderSn = "PR" + user.getDepartmentId().substring(0, 6) + DateUtils.format("yyMMdd", date) + "100001";
+		List<PurchaseRefundOutstock> list =PurchaseRefundOutstockQuery.me().findByUser(user.getId(),user.getDataArea());
+		int i = list.size();
+		i++;
+		String j=Integer.toString(i);
+		int countt =j.length();
+		for(int m=0;m<(6-countt);m++){
+			j= "0"+j;
+		}
+		String orderSn = "PR" + user.getDepartmentId().substring(0, 6) +str.substring(0, 8) + j;
 
 		purchaseRefundOutstock.set("id", orderId);
 		purchaseRefundOutstock.set("outstock_sn", orderSn);
 		purchaseRefundOutstock.set("supplier_id", StringUtils.getArrayFirst(paraMap.get("supplierId")));
 		purchaseRefundOutstock.set("warehouse_id", StringUtils.getArrayFirst(paraMap.get("warehouseId")));
 		purchaseRefundOutstock.set("biz_user_id", user.getId());
-		purchaseRefundOutstock.set("warehouse_in_id", StringUtils.getArrayFirst(paraMap.get("warehouseInId")));
+		purchaseRefundOutstock.set("warehouse_in_id", purchaseInstockId);
 		purchaseRefundOutstock.set("biz_date", date);
 		purchaseRefundOutstock.set("input_user_id", user.getId());
 		purchaseRefundOutstock.set("status", 0);
@@ -151,7 +162,6 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 		purchaseRefundOutstock.set("create_date", date);
 		purchaseRefundOutstock.set("dept_id", user.getDepartmentId());
 		purchaseRefundOutstock.set("data_area", user.getDataArea());
-		purchaseRefundOutstock.save();
 		String productNumStr = StringUtils.getArrayFirst(paraMap.get("productNum"));
 		Integer productNum = Integer.valueOf(productNumStr);
 		Integer count = 0;
@@ -159,8 +169,9 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 
 		while (productNum > count) {
 			index++;
-			String productId = StringUtils.getArrayFirst(paraMap.get("sellerProductId" + index));
-			if (StrKit.notBlank(productId)) {
+			String purchaseInstockDetailId = StringUtils.getArrayFirst(paraMap.get("purchaseInstockDetailId" + index));
+			PurchaseInstockDetail purchaseInstockDetail = PurchaseInstockDetailQuery.me().findById(purchaseInstockDetailId);
+			if (StrKit.notBlank(purchaseInstockDetailId)) {
 				purchaseRefundOutstockDetail.set("id", StrKit.getRandomUUID());
 				purchaseRefundOutstockDetail.set("purchase_refund_outstock_id", orderId);
 				purchaseRefundOutstockDetail.set("seller_product_id", StringUtils.getArrayFirst(paraMap.get("sellerProductId" + index)));
@@ -170,7 +181,12 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 				String smallNum = StringUtils.getArrayFirst(paraMap.get("smallNum" + index));
 
 				Integer productCount = Integer.valueOf(bigNum) * Integer.valueOf(convert) + Integer.valueOf(smallNum);
-
+				
+				if(purchaseInstockDetail.getProductCount()<productCount){
+					renderAjaxResultForError("出库的货物数量不可大于原订单的入库货物数量，请重新输入！");
+					return;
+				}
+				
 				purchaseRefundOutstockDetail.set("product_count", productCount);
 				purchaseRefundOutstockDetail.set("product_price", StringUtils.getArrayFirst(paraMap.get("bigPrice" + index)));
 
@@ -189,6 +205,7 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 			}
 
 		}
+		purchaseRefundOutstock.save();
 		purchaseInstock.set("status", 1000);
 		purchaseInstock.update();
 		renderAjaxResultForSuccess("OK");
@@ -220,6 +237,18 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 		for(PurchaseRefundOutstockDetail pr : list){
 			BigDecimal count1 = pr.getProductCount();
 			BigDecimal convent = new BigDecimal(pr.get("convert_relate").toString());
+			SellerProduct sellerProduct = SellerProductQuery.me().findById(pr.getSellerProductId());
+			Inventory inventory= InventoryQuery.me().findByWarehouseIdAndProductId(pr.get("warehouse_id").toString(),sellerProduct.getProductId() );
+			inventory.set("out_count", count1.divide(convent, 2, BigDecimal.ROUND_HALF_UP));
+			inventory.set("out_amount", pr.getProductAmount());
+			inventory.set("out_price", pr.getProductPrice());
+			inventory.set("balance_count", inventory.getBalanceCount().subtract(count1.divide(convent, 2, BigDecimal.ROUND_HALF_UP)));
+			inventory.set("balance_amount", inventory.getBalanceAmount().subtract(pr.getProductAmount()));
+			inventory.set("modify_date", new Date());
+			flang=inventory.update();
+			if(flang==false){
+				break;
+			}
 			String inventoryDetailId = StrKit.getRandomUUID();
 			inventoryDetail.set("id", inventoryDetailId);
 			inventoryDetail.set("warehouse_id", pr.get("warehouse_id"));
@@ -227,7 +256,10 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 			inventoryDetail.set("out_count", count1.divide(convent, 2, BigDecimal.ROUND_HALF_UP));
 			inventoryDetail.set("out_amount", pr.getProductAmount());
 			inventoryDetail.set("out_price", pr.getProductPrice());
-			inventoryDetail.set("biz_type", "采购退货出库");
+			inventoryDetail.set("balance_count", inventory.getBalanceCount());
+			inventoryDetail.set("balance_amount", inventory.getBalanceAmount());
+			inventoryDetail.set("balance_price", inventory.getBalancePrice());
+			inventoryDetail.set("biz_type", "100203");
 			inventoryDetail.set("biz_bill_sn", pr.get("outstock_sn"));
 			inventoryDetail.set("biz_date", new Date());
 			inventoryDetail.set("biz_user_id", user.getId());
@@ -240,28 +272,14 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 				break;
 			}
 			
-			Inventory inventory= InventoryQuery.me().findByWarehouseIdAndProductId(pr.get("warehouse_id").toString(), pr.getSellerProductId());
-			inventory.set("out_count", count1.divide(convent, 2, BigDecimal.ROUND_HALF_UP));
-			inventory.set("out_amount", pr.getProductAmount());
-			inventory.set("out_price", pr.getProductPrice());
-			inventory.set("balance_count", inventory.getBalanceCount().subtract(count1.divide(convent, 2, BigDecimal.ROUND_HALF_UP)));
-			inventory.set("balance_amount", inventory.getBalanceAmount().subtract(pr.getProductAmount()));
-			inventory.set("modify_date", new Date());
-			flang=inventory.update();
-			if(flang==false){
-				break;
-			}
-			List<SellerProduct> sellerProducts = SellerProductQuery.me().findByProductIdAndSellerId(inventory.getProductId(),inventory.getSellerId());
 			List<Inventory> inventorys = InventoryQuery.me()._findBySellerIdAndProductId(inventory.getSellerId(),inventory.getProductId());
 			BigDecimal count0 = new BigDecimal(0);
 			for(Inventory inventory0:inventorys){
 				count0 = count0.add(inventory0.getBalanceCount());
 			}
-			for(SellerProduct sellerProduct : sellerProducts){
-				sellerProduct.set("store_count", count0);
-				sellerProduct.set("modify_date", new Date());
-				sellerProduct.update();
-			}
+			sellerProduct.set("store_count", count0);
+			sellerProduct.set("modify_date", new Date());
+			sellerProduct.update();
 		}
 		if(flang==true){
 			purchaseRefundOutstock.set("status", 1000);

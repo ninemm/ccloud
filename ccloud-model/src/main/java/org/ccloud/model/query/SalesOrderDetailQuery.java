@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.ccloud.model.SalesOrderDetail;
+import org.ccloud.model.SellerProduct;
 import org.ccloud.utils.StringUtils;
 
 import com.jfinal.kit.StrKit;
@@ -46,7 +47,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 	public List<Record> findByOrderId(String orderId) {
 
 		StringBuilder sqlBuilder = new StringBuilder(
-				" SELECT sod.*, sp.custom_name, p.big_unit, p.small_unit, p.convert_relate, w.code as warehouseCode, t1.valueName ");
+				" SELECT sod.*, sp.custom_name, sp.price, p.big_unit, p.small_unit, p.convert_relate, w.code as warehouseCode, t1.valueName ");
 		sqlBuilder.append(" from `cc_sales_order_detail` sod ");
 		sqlBuilder.append(" LEFT JOIN cc_seller_product sp ON sod.sell_product_id = sp.id ");
 		sqlBuilder.append(" LEFT JOIN cc_product p ON sp.product_id = p.id ");
@@ -88,10 +89,12 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 			detail.setSellProductId(StringUtils.getArrayFirst(paraMap.get("sellProductId" + index)));
 
 			String productPrice = StringUtils.getArrayFirst(paraMap.get("bigPrice" + index));
-			String productAmount = StringUtils.getArrayFirst(paraMap.get("rowTotal" + index));
+//			String productAmount = StringUtils.getArrayFirst(paraMap.get("rowTotal" + index));
+			BigDecimal productAmount = new BigDecimal(detail.getProductCount()).divide(new BigDecimal(convert), 2, BigDecimal.ROUND_HALF_UP)
+					.multiply(new BigDecimal(productPrice));
 			String isGift = StringUtils.getArrayFirst(paraMap.get("isGift" + index));
 			detail.setProductPrice(new BigDecimal(productPrice));
-			detail.setProductAmount(new BigDecimal(productAmount));
+			detail.setProductAmount(productAmount);
 			detail.setIsGift(StringUtils.isNumeric(isGift)? Integer.parseInt(isGift) : 0);
 			detail.setCreateDate(date);
 			detail.setDeptId(deptId);
@@ -114,35 +117,33 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		List<Map<String, String>> countList = new ArrayList<>();
 		boolean isCheckStore = true;
 
-		StringBuilder defaultSqlBuilder = new StringBuilder(" select i.warehouse_id, i.balance_count ");
-		defaultSqlBuilder.append(" from cc_inventory i ");
-		defaultSqlBuilder.append(" LEFT JOIN cc_warehouse w ON i.warehouse_id = w.id ");
-		defaultSqlBuilder.append(" WHERE w.is_default = 1 ");
-		defaultSqlBuilder.append(" AND i.seller_id = ? AND i.product_id = ? ");
-
-		Record defaultRecord = Db.findFirst(defaultSqlBuilder.toString(), sellerId, productId);
-		Integer defaultCount = defaultRecord.getInt("balance_count") * convert;
-		if (!isCheckStore || (defaultCount >= productCount)) {
+		List<Record> list = InventoryQuery.me().findProductStore(sellerId, productId);
+		if (list.size() == 0) {
+			result.put("status", "notEnough");
+			result.put("countList", countList);	
+			return result;
+		}
+		Record record = list.get(0);
+		BigDecimal defaultCount = record.getBigDecimal("balance_count").multiply(new BigDecimal(convert));
+		if (!isCheckStore || defaultCount.compareTo(new BigDecimal(productCount)) == 1 
+				|| defaultCount.compareTo(new BigDecimal(productCount)) == 0) {
 			Map<String, String> map = new HashMap<>();
-			map.put("warehouse_id", defaultRecord.getStr("warehouse_id"));
+			map.put("warehouse_id", record.getStr("warehouse_id"));
 			map.put("productCount", productCount.toString());
 			countList.add(map);
 			result.put("status", "enough");
 			result.put("countList", countList);
 			return result;
 		}
-		StringBuilder sqlBuilder = new StringBuilder(" select i.warehouse_id, i.balance_count ");
-		sqlBuilder.append(" from cc_inventory i ");
-		sqlBuilder.append(" WHERE i.seller_id = ? AND i.product_id = ? AND w.is_default != 1");
-		List<Record> records = Db.find(sqlBuilder.toString(), sellerId, productId);
-		if (defaultCount > 0) {
+		if (defaultCount.compareTo(new BigDecimal(0)) == 1) {
 			Map<String, String> map = new HashMap<>();
-			map.put("warehouse_id", defaultRecord.getStr("warehouse_id"));
+			map.put("warehouse_id", record.getStr("warehouse_id"));
 			map.put("productCount", productCount.toString());
 			countList.add(map);
 		}
-		Integer count = this.findMoreWareHouse(records, countList, productCount - defaultCount, convert);
-		if (count > 0) {
+		list.remove(0);
+		BigDecimal count = this.findMoreWareHouse(list, countList, new BigDecimal(productCount).subtract(defaultCount), convert);
+		if (count.compareTo(new BigDecimal(0)) == 1) {
 			result.put("status", "notEnough");
 		} else {
 			result.put("status", "enough");
@@ -151,20 +152,21 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		return result;
 	}
 	
-	private Integer findMoreWareHouse(List<Record> records, List<Map<String, String>> countList, Integer productCount, Integer convert) {
-		Integer count = productCount;
+	private BigDecimal findMoreWareHouse(List<Record> records, List<Map<String, String>> countList, BigDecimal productCount, Integer convert) {
+		BigDecimal count = productCount;
 		for (Record record : records) {
-			Integer store = record.getInt("balance_count") * convert;
-			if (store >= count) {
+			BigDecimal store = record.getBigDecimal("balance_count").multiply(new BigDecimal(convert));
+			if (store.compareTo(count) == 1 
+					|| store.compareTo(count) == 0) {
 				Map<String, String> map = new HashMap<>();
 				map.put("warehouse_id", record.getStr("warehouse_id"));
 				map.put("productCount", productCount.toString());
 				countList.add(map);
-				count = 0;
+				count = new BigDecimal(0);
 				break;
 			} else {
-				count = count - store;
-				if (store > 0) {
+				count = count.subtract(store);
+				if (store.compareTo(new BigDecimal(0)) == 1) {
 					Map<String, String> map = new HashMap<>();
 					map.put("warehouse_id", record.getStr("warehouse_id"));
 					map.put("produtCount", store.toString());
@@ -173,6 +175,56 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 			}
 		}
 		return count;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public boolean insertForApp(Map<String, String[]> paraMap, String orderId, String sellerId, String userId, Date date,
+			String deptId, String dataArea, int index) {
+		List<SalesOrderDetail> detailList = new ArrayList<>();
+		String convert = paraMap.get("convert")[index];
+		String bigNum = paraMap.get("bigNum")[index];
+		String smallNum = paraMap.get("smallNum")[index];
+		Integer productCount = Integer.valueOf(bigNum) * Integer.valueOf(convert) + Integer.valueOf(smallNum);
+		String productId = paraMap.get("productId")[index];
+		Map<String, Object> result = this.getWarehouseId(productId, sellerId, productCount, Integer.parseInt(convert));
+		String status = result.get("status").toString();
+		List<Map<String, String>> list = (List<Map<String, String>>) result.get("countList");
+		
+		if (!status.equals("enough")) {
+			return false;
+		}
+		for (Map<String, String> map : list) {
+			SalesOrderDetail detail = new SalesOrderDetail();
+			detail.setProductCount(Integer.parseInt(map.get("productCount").toString()));
+			detail.setLeftCount(detail.getProductCount());
+			detail.setOutCount(0);
+			// 库存盘点写入库存总账未完成
+			detail.setWarehouseId(map.get("warehouse_id").toString());
+			
+			detail.setId(StrKit.getRandomUUID());
+			detail.setOrderId(orderId);
+			detail.setSellProductId(paraMap.get("sellProductId")[index]);
+
+			String productPrice = paraMap.get("bigPrice")[index];
+			String productAmount = paraMap.get("rowTotal")[index];
+			String isGift = "0";//paraMap.get("isGift")[index];
+			detail.setProductPrice(new BigDecimal(productPrice));
+			detail.setProductAmount(new BigDecimal(productAmount));
+			detail.setIsGift(StringUtils.isNumeric(isGift)? Integer.parseInt(isGift) : 0);
+			detail.setCreateDate(date);
+			detail.setDeptId(deptId);
+			detail.setDataArea(dataArea);	
+			detailList.add(detail);
+		}
+		int[] i = Db.batchSave(detailList, detailList.size());
+		int count = 0;
+		for (int j : i) {
+			count = count + j;
+		}
+		if (count != detailList.size()) {
+			return false;
+		}
+		return true;
 	}
 
 	public SalesOrderDetail findById(final String id) {
@@ -206,6 +258,55 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 
 	public List<SalesOrderDetail> findBySalesOrderId(String id) {
 		return DAO.doFind("order_id = ?", id);
+	}
+
+	@SuppressWarnings("unchecked")
+	public boolean insertDetailByComposition(SellerProduct product, String orderId, String sellerId, String id,
+			Date date, String deptId, String dataArea, Integer index, Integer isGift, Integer number) {
+		List<SalesOrderDetail> detailList = new ArrayList<>();
+		Integer convert = product.getInt("convert_relate");
+		Integer compositionCount = Integer.parseInt(product.getStr("productCount"));
+		Integer productCount = compositionCount * convert * number;
+		String productId = product.getProductId();
+		Map<String, Object> result = this.getWarehouseId(productId, sellerId, productCount, convert);
+		String status = result.get("status").toString();
+		List<Map<String, String>> list = (List<Map<String, String>>) result.get("countList");
+		
+		if (!status.equals("enough")) {
+			return false;
+		}
+		for (Map<String, String> map : list) {
+			SalesOrderDetail detail = new SalesOrderDetail();
+			detail.setProductCount(Integer.parseInt(map.get("productCount").toString()));
+			detail.setLeftCount(detail.getProductCount());
+			detail.setOutCount(0);
+			// 库存盘点写入库存总账未完成
+			detail.setWarehouseId(map.get("warehouse_id").toString());
+			
+			detail.setId(StrKit.getRandomUUID());
+			detail.setOrderId(orderId);
+			detail.setSellProductId(product.getId());
+
+			detail.setProductPrice(product.getPrice());
+			BigDecimal productAmount = new BigDecimal(detail.getProductCount()).divide(new BigDecimal(convert), 2, BigDecimal.ROUND_HALF_UP)
+					.multiply(product.getPrice());
+//			BigDecimal amount = new BigDecimal(product.getInt("productCount")).multiply(product.getPrice());
+			detail.setProductAmount(productAmount);
+			detail.setIsGift(isGift);
+			detail.setCreateDate(date);
+			detail.setDeptId(deptId);
+			detail.setDataArea(dataArea);	
+			detailList.add(detail);
+		}
+		int[] i = Db.batchSave(detailList, detailList.size());
+		int count = 0;
+		for (int j : i) {
+			count = count + j;
+		}
+		if (count != detailList.size()) {
+			return false;
+		}
+		return true;
 	}
 
 }

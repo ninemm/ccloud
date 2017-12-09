@@ -90,7 +90,6 @@
 			
 			$tr.find("#sellerProductId").val(product.seller_product_id);
 			$tr.find("#purchaseInstockDetailId").val(product.id);
-			$tr.find("#warehouseId").val(product.warehouse_id);
 			$tr.find("#sellerProductName").text(product.productName);
 			$tr.find("#specification").text(product.cps_name);
 
@@ -189,6 +188,9 @@
 					toastr.success(data.message, '操作成功');
 				} else {
 					toastr.error(data.message,'操作失败');
+					setTimeout( function(){
+						location.reload();
+								}, 3* 1000 );
 				}
 			},
 			error : function() {
@@ -227,10 +229,9 @@
 				$("#supplierId").val(outstock.supplierId);
 				$("#supplierCode").val(outstock.code);
 				$("#purchaseInstockId").val(outstock.id);
-				$("#warehouseInId").val(outstock.id);
 				$("#supplierName").val(outstock.supplierName);
 				$("#contact").val(outstock.contact);
-				$("#mobile").val(outstock.mobile);
+				$("#mobile").val(outstock.supplierMobile);
 				$("#warehouseId").val(outstock.warehouse_id);
 				$("#warehouseCode").val(outstock.warehouseCode);
 				$("#biz_user_id").val(outstock.biz_user_id);
@@ -298,7 +299,6 @@
 									<span id="sellerProductName" ></span>
 									<input type="hidden" id="sellerProductId" name="sellerProductId" />
 									<input type="hidden" id="purchaseInstockDetailId" name="purchaseInstockDetailId" />
-									<input type="hidden" id="warehouseId" name="warehouseId" />
 								</div>
 							</td>
 							<td>
@@ -348,7 +348,6 @@
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">*供应商名称:</label>
 						<div class="input-group col-md-4 col-sm-10">
-							<input type="hidden" id="warehouseInId" name="warehouseInId" />
 							<input class="form-control input-sm" type="text" id="supplierName" name="supplierName" value="" readonly>
 							<input type="hidden" id="supplierId" name="supplierId" />
 							<input type="hidden" id="supplierCode" name="supplierCode" />

@@ -16,11 +16,9 @@
 
 var $form = $("#form");
 $("#station_option").select2();
+$("#group_id").select2();
 
-$(function() {
-	
-	jQuery.mm.initValidator('#form', validatorFields)
-	
+function getStation(){
 	$.ajax({
 	url:"${CPATH}/admin/user/getStation",
 	type:"post",
@@ -36,12 +34,33 @@ $(function() {
 			}
 		}
 	}
-	});		
-	
-	$("#group_id").change(function() {
-		var groupname = $("#group_id").find("option:selected").text(); 
-		$("#group_name").val(groupname);
 	});	
+}
+
+ function getGroup(){
+ 	$.ajax({
+	url:"${CPATH}/admin/user/getGroup",
+	type:"post",
+	data:{"userid":'${(user.id)!}'},
+	dataType:"json",
+	success:function(data)
+	{
+		for (var i = 0; i < data.length; i++) {
+			if (data[i].isvalid == 0 ) {
+				$("#group_id").append("<option value=" + data[i].id + ">" + data[i].name + "</option>");
+			} else {
+				$("#group_id").append("<option value=" + data[i].id + " selected >" + data[i].name + "</option>");
+			}
+		}
+	}
+	});	
+ }
+
+$(function() {
+	
+	jQuery.mm.initValidator('#form', validatorFields)
+	getStation();
+	getGroup();
 	
 	$('#_dept_tree').click(function() {
 		layer.open({
@@ -101,6 +120,7 @@ function doSubmit(){
 		ids = list.toString();
 	}
 	var name = "";
+	
 	for(var i=0;i<count;i++){
 		if($("station_option").selected = true)  
 		{
@@ -109,6 +129,26 @@ function doSubmit(){
 				break;
 			}
 			name = name + $("#station_option").select2("data")[i].text + ",";
+		}  
+	}	
+	
+	var groupCount = $("#group_id").select2("data").length;
+	var userGroupList = $("#group_id").select2("val");
+	var groupIds = "";
+	if (userGroupList != null && userGroupList.length > 0) {
+		groupIds = userGroupList.toString();
+	}
+	var groupName = "";
+	
+	
+	for(var i=0;i<groupCount;i++){
+		if($("group_id").selected = true)  
+		{
+			if (i == count-1) {
+				groupName = groupName + $("#group_id").select2("data")[i].text;
+				break;
+			}
+			groupName = groupName + $("#group_id").select2("data")[i].text + ",";
 		}  
 	}	
 
@@ -121,7 +161,9 @@ function doSubmit(){
 		type : "post", 
 		data : {
 		"stationList":ids,
-		"stationName":name
+		"stationName":name,
+		"groupList":groupIds,
+		"groupName":groupName
 		},
 		dataType : "json", 
 		success : function(data) { 
@@ -212,17 +254,12 @@ function doSubmit(){
 		               	</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">
-						<label class="control-label col-sm-2">分组:</label>
+						<label class="control-label col-sm-2">用户分组:</label>
 						<div class="input-group col-md-4 col-sm-10">
-							<input type="hidden" name="user.group_name" id="group_name" value="${(user.group_name)!}">
-							<select class="form-control input-sm" name="user.group_id" id="group_id">
-								<option value="">--请选择--</option>
-								<#list (list)! as group >
-									<option value="${group.id!}" <#if (user.group_id)! == (group.id)!>selected="selected"</#if>>${(group.group_name)!}</option>
-								</#list>
+							<select class="form-control input-sm" name="group" id="group_id" multiple="multiple" >
 							</select>
-		               	</div>
-					</div>
+						</div>
+					</div>	
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">所属部门:</label>
 						<div class="input-group col-md-4 col-sm-10">

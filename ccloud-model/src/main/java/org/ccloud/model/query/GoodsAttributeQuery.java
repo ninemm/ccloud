@@ -50,10 +50,10 @@ public class GoodsAttributeQuery extends JBaseQuery {
 		fromBuilder.append("join `cc_goods_type` ct on cc.goods_type_id = ct.id ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "name", keyword, params, needWhere);
 		
-		appendIfNotEmptyWithLike(fromBuilder, "name", keyword, params, true);
-		
-		appendIfNotEmpty(fromBuilder, "goods_type_id", type, params, true);
+		needWhere = appendIfNotEmpty(fromBuilder, "goods_type_id", type, params, needWhere);
 		
 		fromBuilder.append("order by " + orderby);		
 

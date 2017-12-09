@@ -63,7 +63,34 @@
 		<!-- /.login-box-body -->
 	</div>
 	<!-- /.login-box -->
-
+	<div class="modal fade" tabindex="-1" role="dialog"
+		aria-labelledby="gridSystemModalLabel" id="sellerModal">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" id="gridSystemModalLabel">选择账套</h4>
+				</div>
+				<div class="modal-body">
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">账套:</label>
+						<div class="input-group col-md-6 col-sm-10">					
+							<select class="form-control input-sm" id="seller_id">
+							</select>
+						</div>	
+					</div>						
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" onclick="changeSeller();">确认选择</button>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal-dialog -->
+	</div>
 	<!-- jQuery 2.1.4 -->
 	<script src="${CPATH}/static/plugins/jquery/jquery-2.1.4.min.js"></script>
 	<script src="${CPATH}/static/plugins/jquery/jquery.form.min.js"></script>
@@ -82,7 +109,16 @@
 					dataType : "json", 
 					success : function(data) { 
 						if (data.errorCode == 0) {
-							window.location.href = "${CPATH}/admin/index";
+							var sellerSize = data.data;
+							console.log(sellerSize);
+							if (sellerSize.length > 1) {
+								for (var i = 0; i < sellerSize.length; i++) {
+									$("#seller_id").append("<option value=" + sellerSize[i].sellerId + ">" + sellerSize[i].sellerName + "</option>");
+								}								
+								$("#sellerModal").modal('show');
+							} else {
+								window.location.href = "${CPATH}/admin/index";
+							}
 						} else {
 							alert(data.message);
 						}
@@ -94,6 +130,22 @@
 				return false; //不刷新页面  
 			});
 		});
+		function changeSeller() {
+			var sellerId = $("#seller_id").find("option:selected").val();
+			var sellerName = $("#seller_id").find("option:selected").text();
+			$.ajax({
+				url:"${CPATH}/admin/seller/changeSeller",
+				type:"post",
+				data:{
+					"sellerId":sellerId,
+					"sellerName":sellerName	
+				},
+				dataType:"json",
+				success:function(data) {
+					window.location.href = "${CPATH}/admin/index";
+				}
+			});
+		}		
 	</script>
 </body>
 </html>

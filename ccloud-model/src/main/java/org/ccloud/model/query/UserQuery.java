@@ -51,8 +51,9 @@ public class UserQuery extends JBaseQuery {
 		StringBuilder fromBuilder = new StringBuilder(" from user u ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
-		appendIfNotEmptyWithLike(fromBuilder, "username", keyword, params, true);
-		appendIfNotEmptyWithLike(fromBuilder, "data_area", dataArea, params, true);
+		boolean needWhere = true;
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "username", keyword, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "data_area", dataArea, params, needWhere);
 		if (userId != null) {
 			fromBuilder.append("AND u.id != ? ");
 			params.add(userId);
@@ -212,4 +213,27 @@ public class UserQuery extends JBaseQuery {
 		String sql = "select * from user u left join department d on u.id = d.principal_user_id where d.id = ?";
 		return DAO.findFirst(sql, deptId);
 	}	
+	
+	public List<Record> findByUserCheck(String id, String dataArea) {
+		StringBuilder stringBuilder = new StringBuilder("SELECT u.id,u.realname,a.id as check_status FROM user u LEFT JOIN ");
+		stringBuilder.append("(SELECT * FROM user_group_rel gr WHERE gr.group_id = ?) a ");
+		stringBuilder.append("ON u.id = a.user_id ");
+		LinkedList<Object> params = new LinkedList<Object>();
+		params.add(id);
+		appendIfNotEmptyWithLike(stringBuilder, "u.data_area", dataArea, params, false);
+		return Db.find(stringBuilder.toString(), params.toArray());
+	}
+	
+	
+	
+	public List<Record> findBydeptAndGroup(String dataArea, String id) {
+		String data = dataArea + "%";
+ 		StringBuilder fromBuilder = new StringBuilder("select * ");
+		fromBuilder.append("from user u ");
+		fromBuilder.append("left join (SELECT gr.user_id FROM user_group_rel gr WHERE gr.group_id = ?) b ");
+		fromBuilder.append("on u.id = b.user_id ");
+		fromBuilder.append("where u.data_area like ?");
+		List<Record> list = Db.find(fromBuilder.toString(), id, data);
+		return list;
+	}
 }

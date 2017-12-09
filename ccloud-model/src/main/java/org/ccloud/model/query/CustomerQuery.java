@@ -69,11 +69,13 @@ public class CustomerQuery extends JBaseQuery {
 	}
 	
 	public List<Record> findByCustomerName(String dataArea,String deptId,String customerName) {
-		StringBuilder sqlBuilder = new StringBuilder("select cc_c.*,cc_s.nickname nickName,cc_s.customer_kind kind,cc_s.customer_type_ids type,cc_s.sub_type subType,cc_s.id sellercId ");
+		StringBuilder sqlBuilder = new StringBuilder("select cc_c.*,cc_s.nickname nickName,cc_s.customer_kind kind,cc_s.sub_type subType,cc_s.id sellercId,GROUP_CONCAT(u.id) principalIds,GROUP_CONCAT(u.realname) principal ");
 		sqlBuilder.append("from cc_customer cc_c inner join cc_seller_customer cc_s on cc_c.id = cc_s.customer_id ");
+		sqlBuilder.append("left join cc_user_join_customer cju on cju.seller_customer_id = cc_s.id left join `user` u on cju.user_id = u.id ");
 		sqlBuilder.append("where cc_s.dept_id ='"+deptId+"' ");
 		sqlBuilder.append("and cc_s.data_area like '"+dataArea+"%' ");
 		sqlBuilder.append("and cc_c.customer_name like '%"+customerName+"%' ");
+		sqlBuilder.append("GROUP BY cc_s.id");
 		List<Record> list = Db.find(sqlBuilder.toString());
 		return list;
 	}

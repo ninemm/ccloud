@@ -69,6 +69,7 @@ function enable(obj,id) {
 }
 
 function group(id,name) {
+    saveType = "station";
 	var title = name + "岗位管理";
 	$("#myModalLabel").html(title);
 	$("#userId").val(id);
@@ -92,6 +93,42 @@ function group(id,name) {
 		}
 	});	
 }
+
+function userGroup(id,name) {
+    saveType = "group";
+	var title = name + "分组管理";
+	$("#myModalLabel").html(title);
+	$("#userId").val(id);
+	$("#select1").empty();
+	$("#select2").empty();
+	$.ajax({
+		url:"${CPATH}/admin/user/getUserGroupCheck",
+		type:"post",
+		data:{"userId":id},
+		dataType:"json",
+		success:function(data) {
+			var select = data.checkList;
+			var unselect = data.uncheckList;
+			for (var i = 0; i < select.length; i++) {
+				$("#select2").append("<option value=" + select[i].id + ">" + select[i].name + "</option>");
+			}
+			for (var i = 0; i < unselect.length; i++) {
+				$("#select1").append("<option value=" + unselect[i].id + ">" + unselect[i].name + "</option>");
+			}			
+			$("#myModal").modal('show');
+		}
+	});	
+}
+
+var saveType = "";
+function saveInfo(){
+ if(saveType == "station"){
+ saveStation();
+ }else{
+ saveGroup();
+ }
+}
+
 
 function saveStation() {
 	 var id = $("#userId").val();
@@ -122,12 +159,48 @@ function saveStation() {
 	});     
 }
 
+
+function saveGroup() {
+	 var id = $("#userId").val();
+     var array = new Array();  //定义数组   
+     $("#select2 option").each(function(){  //遍历所有option  
+          var txt = $(this).val();   //获取option值   
+          if(txt!=''){  
+               array.push(txt);  //添加到数组中  
+          }  
+     })
+     console.log(array);
+	$.ajax({
+		url:"${CPATH}/admin/user/saveGroup",
+		type:"post",
+		data:{
+			"groupIds":array,
+			"userId": id
+		},
+		dataType:"json",
+		success:function(data) {
+			$('#myModal').modal('hide');
+			if (data.errorCode == 0) {
+				toastr.success(data.message, '操作成功');
+			} else {
+				toastr.error(data.message,'操作失败');
+			}
+		}
+	});     
+}
+
 function batchAction() {
 	var $form = $("#form");
 	$form.attr("action", "${CPATH}/admin/user/batchDelete?ucode=${ucode}&c=${c!}&p=${p!}");
 	
 	jQuery.mm.batchAction('#form', '请选择系统记录');
 }
+	$("input").on("keydown",function(){
+		if (event.keyCode == 13) {
+			event.keyCode = 0;
+			event.returnValue = false;
+		}
+	});
 </#macro>
 
 <@layout active_id=p child_active_id=c>
@@ -205,6 +278,7 @@ function batchAction() {
 							<@shiro.hasPermission name="/admin/user/edit,/admin/all">
 								<a href="${CPATH}/admin/user/edit?id=${bean.id}&c=${c!}&p=${p!}" class="btn btn-xs bg-olive btn-flat">编辑</a>
 								<a onclick="group('${bean.id}','${bean.realname!}')" class="btn btn-xs btn-warning btn-flat">岗位</a>
+								<a onclick="userGroup('${bean.id}','${bean.realname!}')" class="btn btn-xs btn-primary btn-flat">分组</a>
 								<a href="javascript:void(0);" onclick="del('${bean.id}')" class="btn btn-xs btn-danger btn-flat">删除</a>
 								<a href="javascript:void(0);" onclick="enable(this,'${bean.id}')" class="btn btn-xs btn-info btn-flat"><#if bean.status == 1>停用<#else>启用</#if></a>
 							</@shiro.hasPermission>
@@ -227,9 +301,9 @@ function batchAction() {
 		            <div class="modal-body">
 			        <div style="padding-left:111px;">
 						<h4 style="margin-bottom:12px">
-							<i class="glyphicon glyphicon-user"></i> 未选岗位
+							<i class="glyphicon glyphicon-user"></i> 未选分组
 							<span style="margin-left:127px"></span>
-							<i class="glyphicon glyphicon-user"></i> 已选岗位
+							<i class="glyphicon glyphicon-user"></i> 已选分组
 						</h4>			        
 			          <select multiple="multiple" id="select1" style="width:150px;height:200px; float:left; padding:4px; ">
 			          </select>
@@ -253,7 +327,7 @@ function batchAction() {
 			      </div>		            
 		            <div class="modal-footer">
 		                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-		                <button type="button" class="btn btn-primary" onclick="saveStation()">提交更改</button>
+		                <button type="button" class="btn btn-primary" onclick="saveInfo()">提交更改</button>
 		            </div>
 		        </div><!-- /.modal-content -->
 		    </div><!-- /.modal-dialog -->
