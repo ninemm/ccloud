@@ -46,6 +46,7 @@
 
 		var newTrHtml = $tbody.find("tr:first").html();
 		newTrIdx = newTrIdx + 1;
+		var showNum = newTrIdx;
 		var newTrId = 'tr' + newTrIdx;
 		$tbody.append("<tr id='" + newTrId + "'>" + newTrHtml + "</tr>");
 
@@ -57,8 +58,8 @@
 
 		
 		<!--添加validate -->
-		var bigPriceName = "store_count" + newTrIdx;
-		$newTr.find("#store_count").attr("name", bigPriceName)
+		var bigPriceName = "bigPrice" + newTrIdx;
+		$newTr.find("#bigPrice").attr("name", bigPriceName)
 		
 		var bigNumName = "bigNum" + newTrIdx;
 		$newTr.find("#bigNum").attr("name", bigNumName)
@@ -83,38 +84,82 @@
 				}
 		});
 		
-		$newTr.find("#purchaseInstockDetailId").attr("name", "purchaseInstockDetailId" + newTrIdx);
-		$newTr.find("#custom_name").attr("name", "custom_name" + newTrIdx);
-		$newTr.find("#purchaseOrderDetailId").attr("name", "purchaseOrderDetailId" + newTrIdx);
-		$newTr.find("#convert").attr("name", "convert" + newTrIdx);
-		$newTr.find("#inputRowTotal").attr("name", "rowTotal" + newTrIdx);
-		$newTr.find("#instockDetailId").attr("name", "instockDetailId" + newTrIdx);
+		$newTr.find("#purchaseInstockDetailId").attr("name", "purchaseInstockDetailId" + showNum);
+		$newTr.find("#custom_name").attr("name", "custom_name" + showNum);
+		$newTr.find("#storeCount").attr("name", "storeCount" + showNum);
+		$newTr.find("#purchaseOrderDetailId").attr("name", "purchaseOrderDetailId" + showNum);
+		$newTr.find("#sellerProductId").attr("name", "sellerProductId" + showNum);
+		$newTr.find("#convert").attr("name", "convert" + showNum);
+		$newTr.find("#bN").attr("name", "bN" + showNum);
+		$newTr.find("#sN").attr("name", "sN" + showNum);
+		$newTr.find("#inputRowTotal").attr("name", "rowTotal" + showNum);
 
 		orderNum();
 	}
 	
 	function productValue(obj,product){
-			console.log(product.custom_name);
 			var $tr = obj.parent().parent().parent();
-			
-			$tr.find("#purchaseInstockDetailId").val(product.id);
-			$tr.find("#custom_name").text(product.custom_name);
-			$tr.find("#purchaseOrderDetailId").val(product.purchase_order_detail_id);
+			var num = $("#productNum").val();
+			num++;
+			$tr.find('td').eq(0).attr("rowspan",product.list.length);
+			$tr.find('td').eq(3).find('span').attr("margin-top","50%");
+			$tr.find('td').eq(1).attr("rowspan",product.list.length);
+			$tr.find('td').eq(2).attr("rowspan",product.list.length);
+			$tr.find('td').eq(3).attr("rowspan",product.list.length);
+			$tr.find('td').eq(4).attr("rowspan",product.list.length);
+			$tr.find('td').eq(5).attr("rowspan",product.list.length);
+			$tr.find("#purchaseInstockDetailId").val(product.list.purchaseInstockDetailId);
+			for(var i=1;i<product.list.length;i++){
+				var $tbody = $("#table tbody");
+				var newTrHtml = $tbody.find("tr:first").html();
+				newTrIdx = newTrIdx + 1;
+				var newTrId = 'tr' + newTrIdx;
+				$tbody.append("<tr id='" + newTrId + "'>" + newTrHtml + "</tr>");
+				var $newTr = $("#" + newTrId);
+				$newTr.find("#purchaseInstockDetailId").attr("name", "purchaseInstockDetailId" + newTrIdx);
+				$newTr.find("#custom_name").attr("name", "custom_name" + newTrIdx);
+				$newTr.find("#storeCount").attr("name", "storeCount" + newTrIdx);
+				$newTr.find("#purchaseOrderDetailId").attr("name", "purchaseOrderDetailId" + newTrIdx);
+				$newTr.find("#sellerProductId").attr("name", "sellerProductId" + newTrIdx);
+				$newTr.find("#convert").attr("name", "convert" + newTrIdx);
+				$newTr.find("#bN").attr("name", "bN" + newTrIdx);
+				$newTr.find("#sN").attr("name", "sN" + newTrIdx);
+				$newTr.find("#inputRowTotal").attr("name", "rowTotal" + newTrIdx);
+				
+				var $productSelect = $newTr.find("#purchaseInstockDetailId")
+				$newTr.find("#custom_name").text(product.list[i].custom_name);
+				$newTr.find("#storeCount").text(product.list[i].store_count);
+				$newTr.find("#purchaseInstockDetailId").val(product.purchaseInstockDetailId);
+				$newTr.find("#sellerProductId").val(product.list[i].id);
+				$newTr.find("#purchaseOrderDetailId").text(product.purchaseOrderDetailId);
+				$newTr.find("#convert").val(product.convertRelate);
+				$newTr.find('td').eq(0).remove();
+				$newTr.find('td').eq(0).remove();
+				$newTr.find('td').eq(0).remove();
+				$newTr.find('td').eq(0).remove();
+				$newTr.find('td').eq(0).remove();
+				$newTr.find('td').eq(0).remove();
+				num++;
+			}
+			$tr.find("#custom_name").text(product.list[0].custom_name);
+			$tr.find("#storeCount").text(product.list[0].store_count);
+			$tr.find("#sellerProductId").val(product.list[0].id);
+			$tr.find("#purchaseOrderDetailId").val(product.purchaseOrderDetailId);
 			$tr.find("#sellerProductName").text(product.productName);
-			$tr.find("#specification").text(product.cps_name);
+			$tr.find("#specification").text(product.cpsName);
 
-			var convert = product.convert_relate;
+			var convert = product.convertRelate;
 			$tr.find("#convert").val(convert);
-			var productCount = product.product_count;
+			var productCount = product.productCount;
 
-			var store_count = product.store_count;
+			var bigPrice = product.productRrice;
 			var smallPrice = bigPrice/convert;
-			var smallUnit = product.small_unit;
+			var smallUnit = product.smallUnit;
 
 	
-			$tr.find("#store_count").val(store_count);
-			$tr.find("#bigPrice-span").text(store_count);
-			$tr.find("#bigUnit-span").text(product.big_unit + "(x" + convert + smallUnit + ")");
+			$tr.find("#bigPrice").val(bigPrice);
+			$tr.find("#bigPrice-span").text(bigPrice);
+			$tr.find("#bigUnit-span").text(product.bigUnit + "(x" + convert + smallUnit + ")");
 			
 			$tr.find("#bigNum").val(Math.floor(productCount/convert));
 			
@@ -127,8 +172,7 @@
 				$tr.find("#isGift").attr("checked", true);
 			}
 
-			$tr.find("#instockDetailId").val(product.id);
-			
+			$("#productNum").val(num);
 			rowTotalF(obj);
 	}
 	
@@ -184,7 +228,7 @@
 
 	function doSubmit(){
 		$(do_Submit).attr("disabled","disabled"); 
-		$("#productNum").val($(".rowNum").length - 1);
+		//$("#productNum").val($(".rowNum").length - 1);
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
 				var validate = $form.data('bootstrapValidator');
@@ -262,28 +306,28 @@
 						<tr>
 							<th width="2%"></th>
 							<th width="5%">序号</th>
-							<th width="10%">商品名称</th>
-							<th width="9%">规格</th>
-							<th width="10">自定义产品名</th>
-							<th width="11%">已有库存</th>
-							<th width="12%">大单位数量</th>
-							<th width="11%">采购数量</th>
-							<th width="11%">小单位数量</th>
-							<th width="7%">小计</th>
+							<th width="8%">商品名称</th>
+							<th width="8%">规格</th>
+							<th class="dR" width="12%">待入库</th>
+							<th class="dR" width="11%">待入库</th>
+							<th width="5">产品名</th>
+							<th width="5">产品库存</th>
+							<th width="8%">大单位数量</th>
+							<th width="8%">小单位数量</th>
+							<!-- <th width="7%">小计</th> -->
 						</tr>
 					</thead>
 					<tbody>
 						<tr class="hide">
 							<td>
-								<a class="btn btn-danger btn-xs" onclick="deleteTr(this)"><span class="glyphicon glyphicon-remove"></span></a>
+								<!-- <a class="btn btn-danger btn-xs" onclick="deleteTr(this)"><span class="glyphicon glyphicon-remove"></span></a> -->
 							</td>
 							<td>
 								<span class="rowNum">0</span>
 							</td>
-							<td>
+							<td>								
 								<div class = "validata-box">
 									<span id="sellerProductName" ></span>
-									<input type="hidden" id="purchaseInstockDetailId" name="purchaseInstockDetailId" />
 									<input type="hidden" id="purchaseOrderDetailId" name="purchaseOrderDetailId" />
 								</div>
 							</td>
@@ -291,46 +335,44 @@
 								<span id="specification"></span>
 							</td>
 							<td>
-								<div class = "validata-box">
-									<span id="custom_name" ></span>
-								</div>
-							</td>
-							<td>
 								<input type="hidden" name="convert" id="convert" value="" />
 								<div class = "validata-box">
-									<span id="bigPrice-span"></span>
-									<input type="hidden" id="bigPrice" name="store_count" value="" />
-								</div>
-							</td>
-							<td>
-								<div class = "validata-box">
-									<input type="text" id="bigNum" name="bigNum" style="width: 30%" onblur="rowTotalF(this)" value="1" />
+									<input type="text" readonly="readonly" id="bigNum" name="bigNum" style="width: 30%;background-color:transparent;border:0px;" onblur="rowTotalF(this)" />
 									<span id="bigUnit-span"></span>
 								</div>
 							</td>
 							<td>
 								<div class = "validata-box">
-									<span id="smallPrice-span"></span>
-									<input type="hidden" id="smallPrice" name="smallPrice" value="" />
+									<input type="text" id="smallNum" readonly="readonly" name="smallNum" style="width: 30%;background-color:transparent;border:0px;" onblur="rowTotalF(this)"  />
+									<span id="smallUnit-span"></span>
+								</div>
+							</td>
+							<td>
+									<span id="custom_name" ></span>
+									<input type="hidden" name="sellerProductId" id="sellerProductId" />
+							</td>
+							<td>
+									<span id="storeCount" ></span>
+							</td>
+							<td>
+								<input type="hidden" name="convert" id="convert" value="" />
+								<div class = "validata-box">
+									<input type="text" id="bN" name="bN" style="width: 70%;text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" onblur="rowTotalF(this)" value="0" />
+								<input type="hidden" id="purchaseInstockDetailId" name="purchaseInstockDetailId" />
 								</div>
 							</td>
 							<td>
 								<div class = "validata-box">
-									<input type="text" id="smallNum" name="smallNum" style="width: 30%" onblur="rowTotalF(this)" value="0" />
-									<span id="smallUnit-span"></span>
+									<input type="text" id="sN" name="sN" style="width: 70%;text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" onblur="rowTotalF(this)" value="0" />
 								</div>
+							<input type="hidden" name="productNum" id="productNum" value="0" />
 							</td>
-							<td>￥<span class="rowTotal">0</span> <input type="hidden" name="rowTotal" id="inputRowTotal" value="0" /></td>
-							<input  type="hidden" id="instockDetailId" name="instockDetailId" value="" >
 						</tr>
 					</tbody>
 					<tfoot>
 						<tr>
-							<th colspan="9" style="text-align:right">合计:</th>
-							<th>￥<span id="total">0</span> <input type="hidden" name="total" id="inputTotal" value="0" /></th>
-							<input type="hidden" name="productNum" id="productNum" value="0" />
 						</tr>
-					</tfoot>
+					</tfoot> 
 				</table>
 
 				<div class="form-group col-sm-12"></div>
@@ -359,7 +401,7 @@
 						</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">
-						<label class="control-label col-sm-2">收款方式:</label>
+						<label class="control-label col-sm-2">付款方式:</label>
 						<div class="input-group col-md-4 col-sm-10">
 							<label class="radio-inline">
 								<input type="radio" name="paymentType" value="1" checked>现结
@@ -382,7 +424,7 @@
 			</div>
 
 			<div class="box-footer"> 
-				<button type="button" id="do_Submit" onclick="doSubmit()" class="btn btn-primary">审核通过</button>
+				<button type="button" id="do_Submit" onclick="doSubmit()" class="btn btn-primary">确认入库</button>
 				<!-- <input type="button" class="btn btn-primary" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" /> -->
 			</div>
 		</form>

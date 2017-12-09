@@ -15,6 +15,7 @@
  */
 package org.ccloud.controller.admin;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -118,7 +119,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		purchaseOrder.update();
 		Warehouse warehouse = WarehouseQuery.me().findOneByUserId(user.getId());
 		final PurchaseInstock purchaseInstock = getModel(PurchaseInstock.class);
-		final PurchaseInstockDetail purchaseInstockDetail = getModel(PurchaseInstockDetail.class);
+		PurchaseInstockDetail purchaseInstockDetail = getModel(PurchaseInstockDetail.class);
 		String purchaseInstockId = StrKit.getRandomUUID();
 		//采购入库单： PO + 100000(机构编号或企业编号6位) + 20171108(时间) + 100001(流水号)
 		int m=PurchaseInstockQuery.me().findByUserId(user.getId(),user.getDataArea());
@@ -153,13 +154,14 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		for(PurchaseOrderDetail purchaseOrderDetail : purchaseOrderDetails){
 			Product product = ProductQuery.me().findById(purchaseOrderDetail.getProductId());
 			List<SellerProduct> sellerProducts = SellerProductQuery.me()._findByProductIdAndSellerId(purchaseOrderDetail.getProductId(),seller.getId());
-			if(sellerProducts==null){
+			if(sellerProducts.size()==0){
 				SellerProduct sellerProduct = new SellerProduct();
 				String sellerProductId = StrKit.getRandomUUID();
 				sellerProduct.set("id", sellerProductId);
 				sellerProduct.set("product_id", purchaseOrderDetail.getProductId());
 				sellerProduct.set("seller_id", seller.getId());
 				sellerProduct.set("custom_name", product.getName());
+				sellerProduct.setStoreCount(new BigDecimal(0));
 				sellerProduct.set("price", product.getPrice());
 				sellerProduct.set("cost", product.getCost());
 				sellerProduct.set("market_price", product.getMarketPrice());
@@ -177,9 +179,10 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 				sellerProduct.set("qrcode_url", imagePath+"\\"+fileName);
 				sellerProduct.set("create_date", date);
 				sellerProduct.save();
+				sellerProducts.add(sellerProduct);
 			}
 			for(int i=0;i<sellerProducts.size();i++){
-				
+				purchaseInstockDetail = new PurchaseInstockDetail();
 				purchaseInstockDetail.set("id", StrKit.getRandomUUID());
 				purchaseInstockDetail.set("purchase_instock_id", purchaseInstockId);
 				purchaseInstockDetail.set("product_count", purchaseOrderDetail.getProductCount());
@@ -259,7 +262,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 			PurchaseOrderDetail purchaseOrderDetail = PurchaseOrderDetailQuery.me().findById(purchaseOrserDetailId);
 			Product product = ProductQuery.me().findById(productId);
 			List<SellerProduct> sellerProducts = SellerProductQuery.me()._findByProductIdAndSellerId(productId,seller.getId());
-			if(sellerProducts==null){
+			if(sellerProducts.size()==0){
 				SellerProduct sellerProduct = new SellerProduct();
 				String sellerProductId = StrKit.getRandomUUID();
 				sellerProduct.set("id", sellerProductId);
@@ -283,6 +286,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 				sellerProduct.set("qrcode_url", imagePath+"\\"+fileName);
 				sellerProduct.set("create_date", date);
 				sellerProduct.save();
+				sellerProducts.add(sellerProduct);
 			}
 			purchaseOrderDetail.set("product_count", productCount);
 			purchaseOrderDetail.set("product_amount", StringUtils.getArrayFirst(paraMap.get("rowTotal" + index)));

@@ -199,25 +199,20 @@ public class ProductQuery extends JBaseQuery {
 				+ "FROM	cc_product cp LEFT JOIN cc_product_goods_specification_value cpg ON cp.id = cpg.product_set_id "
 				+ "LEFT JOIN cc_goods_specification_value cgs ON cpg.goods_specification_value_set_id = cgs.id "
 				+ "LEFT JOIN cc_seller_product csp on csp.product_id=cp.id "
-				+ "LEFT JOIN cc_seller cs on cs.id=csp.seller_id "
-				+ "LEFT JOIN `user` u on u.department_id=cs.dept_id "
 				+ "LEFT JOIN cc_goods cg on cg.id=cp.goods_id "
 				+ "LEFT JOIN cc_brand cb on cb.id=cg.brand_id "
-				+ "WHERE u.id=? and cs.seller_type=0 and u.data_area='"+dataArea+"' and cb.supplier_id='"+supplierId+"' GROUP BY cp.id";
-		return DAO.find(sql, userId);
+				+ "WHERE cb.supplier_id=? and cp.is_marketable=1 GROUP BY cp.id";
+		return DAO.find(sql, supplierId);
 	}
 	
 	public Product findByPId(String id){
 		return DAO.findById(id);
 	}
 	public Product findByUserId(String userId,String productId){
-		String sql = "SELECT cp.id AS id,cp.NAME AS name,csp.store_count,cp.big_unit as big_unit, cp.small_unit as small_unit,cp.convert_relate as convert_relate,cp.price AS price,GROUP_CONCAT(DISTINCT cgs.`name`) AS cps_name "
+		String sql = "SELECT cp.id AS id,cp.NAME AS name,cp.big_unit as big_unit, cp.small_unit as small_unit,cp.convert_relate as convert_relate,cp.price AS price,GROUP_CONCAT(DISTINCT cgs.`name`) AS cps_name "
 				+ "FROM	cc_product cp LEFT JOIN cc_product_goods_specification_value cpg ON cp.id = cpg.product_set_id "
 				+ "LEFT JOIN cc_goods_specification_value cgs ON cpg.goods_specification_value_set_id = cgs.id "
-				+ "LEFT JOIN cc_seller_product csp on csp.product_id=cp.id "
-				+ "LEFT JOIN cc_seller cs on cs.id=csp.seller_id "
-				+ "LEFT JOIN `user` u on u.department_id=cs.dept_id "
-				+ "WHERE u.id='"+userId+"' and cp.id='"+productId+"' GROUP BY cp.id";
+				+ "WHERE  cp.id='"+productId+"' GROUP BY cp.id";
 		return DAO.findFirst(sql);
 	}
 
