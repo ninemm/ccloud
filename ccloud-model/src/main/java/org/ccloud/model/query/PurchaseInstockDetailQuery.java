@@ -68,7 +68,7 @@ public class PurchaseInstockDetailQuery extends JBaseQuery {
 	public List<Record> findByOutstockId(String outstockId,String dataArea) {
 
 		StringBuilder sqlBuilder = new StringBuilder(
-				" SELECT cpid.*,cp.`name` as productName,cpi.warehouse_id,csp.custom_name,csp.store_count, cp.big_unit, cp.small_unit, cp.convert_relate,GROUP_CONCAT(distinct cgs.`name`) AS cps_name ");
+				" SELECT cpid.*,cp.`name` as productName,cpi.warehouse_id,csp.custom_name,csp.store_count as storeCount, cp.big_unit, cp.small_unit, cp.convert_relate,GROUP_CONCAT(distinct cgs.`name`) AS cps_name ");
 		sqlBuilder.append(" FROM cc_purchase_instock_detail cpid  ");
 		sqlBuilder.append(" LEFT JOIN cc_seller_product csp on csp.id=cpid.seller_product_id ");
 		sqlBuilder.append(" LEFT JOIN cc_product_goods_specification_value cpg ON  csp.product_id = cpg.product_set_id ");
@@ -89,4 +89,10 @@ public class PurchaseInstockDetailQuery extends JBaseQuery {
 				+ "where cpi.id=?";
 		return DAO.find(sql, purchaseInstockId);
 	}
+	
+	public PurchaseInstockDetail findByPSId(String purchaseInstockId,String sellerProductId){
+		String sql = "select * from cc_purchase_instock_detail where purchase_instock_id = ? and seller_product_id = ?  ";
+		return DAO.findFirst(sql,purchaseInstockId,sellerProductId);
+	}
+	
 }
