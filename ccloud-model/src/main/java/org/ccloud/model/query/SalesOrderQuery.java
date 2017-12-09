@@ -354,5 +354,15 @@ public class SalesOrderQuery extends JBaseQuery {
 		salesOrder.setDataArea(dataArea);
 		return salesOrder.save();
 	}
+	
+	public List<SalesOrder> getToDo(String username) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("SELECT o.*, a.ID_ taskId, a.NAME_ taskName, a.ASSIGNEE_ assignee, a.CREATE_TIME_ createTime");
+		sb.append(" FROM cc_sales_order o");
+		sb.append(" JOIN act_ru_task a on o.proc_inst_id = a.PROC_INST_ID_");
+		sb.append(" JOIN act_ru_identitylink u on o.proc_inst_id = u.PROC_INST_ID_");
+		sb.append(" where locate(?, u.USER_ID_) > 0");
+		return DAO.find(sb.toString(), username);
+	}	
 
 }
