@@ -313,22 +313,21 @@ public class SalesOrderQuery extends JBaseQuery {
 	public Page<Record> findBySellerCustomerId(int pageNumber, int pageSize, String customerId, String dataArea) {
 		boolean needwhere = true;
 		LinkedList<Object> params = new LinkedList<Object>();
-		String select = "SELECT o.order_sn, o.total_count, o.create_date, o.total_amount, o.realname, o.`status`,o.data_area,o.receive_type ";
+		String select = "SELECT o.order_sn, o.total_count, o.create_date, o.total_amount, o.realname, o.`status`,o.data_area,o.receive_type,o.id ";
 
-		StringBuilder sql = new StringBuilder(
-				"FROM (SELECT cso.order_sn, cso.total_count, cso.create_date, cso.total_amount, u.realname, cso.`status`,cso.data_area,cso.receive_type ");
+		StringBuilder sql = new StringBuilder("FROM (SELECT cso.order_sn, cso.total_count, cso.create_date, cso.total_amount, u.realname, cso.`status`,cso.data_area,cso.receive_type,cso.id ");
 		sql.append("FROM cc_sales_order cso LEFT JOIN cc_sales_order_detail csod ON cso.id = csod.order_id ");
 		sql.append("LEFT JOIN `user` u ON u.id = cso.biz_user_id ");
 		sql.append("LEFT JOIN cc_seller_customer csc ON csc.id = cso.customer_id ");
 
-		needwhere = appendIfNotEmpty(sql, "csc.customer_id", customerId, params, needwhere);
+		needwhere = appendIfNotEmpty(sql, "csc.id", customerId, params, needwhere);
 		needwhere = appendIfNotEmptyWithLike(sql, "cso.data_area", dataArea, params, needwhere);
 
 		sql.append("GROUP BY cso.id ");
 		sql.append("ORDER BY cso.`status`, cso.create_date DESC) AS o");
 		return Db.paginate(pageNumber, pageSize, select, sql.toString(), params.toArray());
 	}
-	
+
 	public boolean insertOrderByComposition(Map<String, String[]> paraMap, String orderId, String orderSn,
 			String sellerId, String userId, Date date, String deptId, String dataArea) {
 		SalesOrder salesOrder = new SalesOrder();
@@ -354,16 +353,6 @@ public class SalesOrderQuery extends JBaseQuery {
 		salesOrder.setDeptId(deptId);
 		salesOrder.setDataArea(dataArea);
 		return salesOrder.save();
-	}
-	
-	public List<SalesOrder> getToDo(String username) {
-		StringBuilder sb = new StringBuilder();
-		sb.append("SELECT o.*, a.ID_ taskId, a.NAME_ taskName, a.ASSIGNEE_ assignee, a.CREATE_TIME_ createTime");
-		sb.append(" FROM cc_sales_order o");
-		sb.append(" JOIN act_ru_task a on o.proc_inst_id = a.PROC_INST_ID_");
-		sb.append(" JOIN act_ru_identitylink u on o.proc_inst_id = u.PROC_INST_ID_");
-		sb.append(" where locate(?, u.USER_ID_) > 0");
-		return DAO.find(sb.toString(), username);
 	}
 
 }

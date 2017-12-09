@@ -36,7 +36,7 @@ public class CustomerJoinCustomerTypeQuery extends JBaseQuery {
 		return QUERY;
 	}
 
-	public List<Integer> findCustomerTypeListBySellerCustomerId(String sellerCustomerId, String dataArea) {
+	public List<String> findCustomerTypeListBySellerCustomerId(String sellerCustomerId, String dataArea) {
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 

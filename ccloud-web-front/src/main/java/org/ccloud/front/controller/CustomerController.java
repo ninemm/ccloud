@@ -106,16 +106,16 @@ public class CustomerController extends BaseFrontController {
 			html.append("					<p><i class=\"icon-phone green\"></i></p>\n");
 			html.append("					<p>电话</p>\n");
 			html.append("				</a>\n");
-			html.append("				<a class=\"weui-flex__item\" href=\"./historyOrder.html?customer_id=" + customer.getStr("id") + "&customer_name=" + customer.getStr("customer_name") + "\">\n");
+			html.append("				<a class=\"weui-flex__item\" href=\"/historyOrder?sellerCustomerId=" + customer.getStr("sellerCustomerId") + "&customerName=" + customer.getStr("customer_name") + "\">\n");
 			html.append("					<p><i class=\"icon-file-text-o blue\"></i></p>\n");
 			html.append("					<p>订单</p>\n");
 			html.append("				</a>\n");
-			html.append("				<a class=\"weui-flex__item\" href=\"visitAdd.html\">\n");
+			html.append("				<a class=\"weui-flex__item\" href=\"/visitAdd\">\n");
 			html.append("					<p><i class=\"icon-paw\" style=\"color:#ff9800\"></i></p>\n");
 			html.append("					<p>拜访</p>\n");
 			html.append("				</a>\n");
-			html.append("				<a class=\"weui-flex__item relative\" href=\"./customerDetail.html\">\n");
-			html.append("					<i class=\"icon-chevron-right gray\"></i>\n");
+			html.append("				<a class=\"weui-flex__item relative\" href=\"/customerDetail\">\n");
+			html.append("					<i class=\"icon-chevron-right gray href=\"/customerDetail?sellerCustomerId=" + customer.getStr("sellerCustomerId") + "\"></i>\n");
 			html.append("				</a>\n");
 			html.append("			</div>\n");
 			html.append("		</div>\n");
@@ -140,7 +140,7 @@ public class CustomerController extends BaseFrontController {
 	}
 
 	private User getUser(){
-		User user = UserQuery.me().findById("1f797c5b2137426093100f082e234c14");
+		User user = UserQuery.me().findById("ce05e9008ece42bc986e7bc41edcf4a0");
 		return user;
 	}
 

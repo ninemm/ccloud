@@ -6,126 +6,125 @@
 
 <@layout>
 <body id="order-detail">
-  <main class="ft12">
-    <div class="weui-panel weui-panel_access">
-      <div class="ft14">
-		订单状态
-        <span class="fr blue">
-        	<#if order.status = 0>
-				待审核
-			<#elseif order.status = 2001>
-				部分出库-订单关闭
-			<#elseif order.status = 1000>
-				已审核
-			<#elseif order.status = 1001>
-				订单取消
-			<#elseif order.status = 2000>
-				部分出库
-			<#elseif  order.status = 3000>
-				全部出库
-			<#else>
-				全部出库-订单关闭'
-			</#if>
-		</span>
-      </div>
-      <div class="gray">
-        <p>客户名称&nbsp;${(order.customer_name)!}
-        </p>
-        <p>订货单号&nbsp;${(order.order_sn)!}</p>
-        <p>下单时间&nbsp;${(order.create_date)!}</p>
-      </div>
-      <hr>
-      <div class="ft14">
-      	<#if order.receive_type = 0>
-        	<span class="tag" >账期</span>
-        </#if>
-      </div>
+<main class="ft12">
+  <div class="weui-panel weui-panel_access">
+    <div class="ft14">
+      订单状态
+      <span class="fr blue">${(order.statusName)!}</span>
     </div>
-    <div class="weui-panel weui-panel_access">
-      <div class="ft14">
-        订单详情
-      </div>
-      <#list orderDetail as detail>
-	      <div class="p-l-15">
-	        <p>${detail.custom_name!}</p>
-	        <div class="weui-flex">
-	          <div class="weui-flex__item flex-grow2">
-	            <div class="fr width-50">
-					￥${detail.price!}
-	              <span class="gray">（${detail.product_price!}）</span>
-	            </div>
-	          </div>
-	          <div class="weui-flex__item t-r">${(detail.product_count / detail.convert_relate)?floor} ${detail.big_unit}</div>
-	        </div>
-	        <div class="weui-flex">
-	          <div class="weui-flex__item flex-grow2">
-	            <div class="fr width-50">
-					￥${(detail.price / detail.convert_relate)?string("0.##")}
-	              <span class="gray">（${(detail.product_price / detail.convert_relate)?string("0.##")}）</span>
-	            </div>
-	          </div>
-	          <div class="weui-flex__item t-r">${detail.product_count % detail.convert_relate} ${detail.small_unit}</div>
-	        </div>
-	      </div>
-	  </#list>
-<!--       <div class="p-l-15">
-        <p>
-          <span class="tag">赠品</span>35度中国劲酒_1*24_125ml</p>
-        <div class="t-r">1瓶</div>
-      </div> -->
-      <hr>
-      <div class="t-r ft14">
-        总计：
-        <span class="red">${(order.total_amount)!}元</span>
-      </div>
+    <div class="gray">
+      <p>客户名称&nbsp;${(order.customer_name)!}</p>
+      <p>订货单号&nbsp;${(order.order_sn)!}</p>
+      <p>下单时间&nbsp;${(order.create_date)!}</p>
+      <p>业务员&nbsp;${(order.realname)!}</p>
     </div>
-    <div class="weui-panel weui-panel_access">
-      <div class="ft14">
-        收货信息
-      </div>
-      <div class="gray">
-        <p>
-          收货人：${(order.ccontact)!}
-          <span class="fr">${(order.cmobile)!}</span>
-        </p>
-        <p>地址详情：${(order.delivery_address)!}</p>
-      </div>
-      <hr>
-      <div class="ft14">
-        备注信息：
-        <span class="ft12">${(order.remark)!}</span>
-      </div>
+    <hr>
+    <div class="ft14">
+      <#if order.receive_type = 0>
+        <input type="checkbox" name="if-account" checked disabled="disabled" >
+        <#else>
+          <input type="checkbox" name="if-account" disabled="disabled">
+      </#if>是否账期
     </div>
-    <a class="weui-panel weui-panel_access block" href="./operateHistory.html">
-      <div class="weui-cell weui-cell_access">
-        <div class="weui-cell__bd ft14">
-            操作记录
-        </div>
-        <span class="weui-cell__ft"></span>
-      </div>
-    </a>
-  </main>
-  <div class="hidden-menu">
-    <ul>
-      <li>
-        <a href="${CPATH}/index"">
-          首页
-          <i class="icon-home blue"></i>
-        </a>
-      </li>
-      <li>
-        <a href="javascript:history.go(-1)">
-          上一页
-          <i class="icon-undo green"></i>
-        </a>
-      </li>
-    </ul>
-    <i class="icon-menu-open orange fr" id="button"></i>
   </div>
-  <div class="layer"></div>
-  <footer class="weui-footer weui-footer_fixed-bottom ft16">
-    <a class="gray-button width-50">撤销</a>
-    <a class="blue-button width-50">再次购买</a>
-  </footer>
+  <div class="weui-panel weui-panel_access">
+    <div class="ft14">
+      订单详情
+    </div>
+    <#list orderDetailList as orderDetail>
+      <#if orderDetail.is_gift??>
+        <#if orderDetail.is_gift = 0>
+          <div class="p-l-15">
+            <p>${orderDetail.custom_name!}</p>
+            <span class="gray">规格：${(orderDetail.valueName)!}</span>
+            <div class="weui-flex">
+              <div class="weui-flex__item flex-grow2">
+                <div class="fr width-40">
+                  ￥${(orderDetail.product_price)!}
+                  <span class="gray">（${(orderDetail.price)!}）</span>
+                </div>
+              </div>
+              <div class="weui-flex__item t-r">${(orderDetail.product_count / orderDetail.convert_relate)?floor}${(orderDetail.big_unit)!}</div>
+            </div>
+            <div class="weui-flex">
+              <div class="weui-flex__item flex-grow2">
+                <div class="fr width-40">
+                  ￥${(orderDetail.product_price / orderDetail.convert_relate)?string("0.##")}
+                  <span class="gray">（${(orderDetail.price % orderDetail.convert_relate)}）</span>
+                </div>
+              </div>
+              <div class="weui-flex__item t-r">${(orderDetail.product_count % orderDetail.convert_relate)}${(orderDetail.small_unit)!}</div>
+            </div>
+          </div>
+        </#if>
+        <#if orderDetail.is_gift = 1>
+          <div class="p-l-15">
+            <p>
+              <span class="tag">赠品</span>${orderDetail.custom_name!}</p>
+            <div class="weui-flex__item t-r">${(orderDetail.product_count / orderDetail.convert_relate)?floor}${(orderDetail.big_unit)!}</div>
+            <div class="weui-flex__item t-r">${(orderDetail.product_count % orderDetail.convert_relate)}${(orderDetail.small_unit)!}</div>
+          </div>
+        </#if>
+      </#if>
+    </#list>
+    <hr>
+    <div class="t-r ft14">
+      总计：
+      <span class="red">${(order.total_amount)!}元</span>
+    </div>
+  </div>
+  <div class="weui-panel weui-panel_access">
+    <div class="ft14">
+      收货信息
+    </div>
+    <div class="gray">
+      <p>
+        收货人：${(order.customer_name)!}
+        <span class="fr"> ${(order.cmobile)!}</span>
+      </p>
+      <p>地址详情：${(order.delivery_address)!}</p>
+    </div>
+    <hr>
+    <div class="ft14">
+      备注信息：
+      <span class="ft12">
+                    <#if order.remark??>
+                        ${(order.remark)!}
+                        <#else>无
+                    </#if>
+                </span>
+    </div>
+  </div>
+  <a class="weui-panel weui-panel_access block" href="./operateHistory.html">
+    <div class="weui-cell weui-cell_access">
+      <div class="weui-cell__bd ft14">
+        操作记录
+      </div>
+      <span class="weui-cell__ft"></span>
+    </div>
+  </a>
+</main>
+<div class="hidden-menu">
+  <ul>
+    <li>
+      <a href="index.html">
+        首页
+        <i class="icon-home blue"></i>
+      </a>
+    </li>
+    <li>
+      <a href="javascript:history.go(-1)">
+        上一页
+        <i class="icon-undo green"></i>
+      </a>
+    </li>
+  </ul>
+  <i class="icon-menu-open orange fr" id="button"></i>
+</div>
+<div class="layer"></div>
+<footer class="weui-footer weui-footer_fixed-bottom ft16">
+  <a class="gray-button width-50">撤销</a>
+  <a class="blue-button width-50">再次购买</a>
+</footer>
 </body>
 </@layout>

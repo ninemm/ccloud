@@ -142,7 +142,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 
 				fromBuilder.append(" AND NOT EXISTS ");
 			}
-			
+
 			fromBuilder.append(" (SELECT 1 FROM cc_seller_customer csc  join `cc_sales_order` cso on csc.id = cso.customer_id where sc.id = csc.id group by csc.id)" );
 
 		}
@@ -169,7 +169,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 		fromBuilder.append(" from cc_seller_customer sc ");
 		fromBuilder.append(" join cc_user_join_customer ujc on sc.id = ujc.seller_customer_id ");
 		fromBuilder.append(" where sc.customer_id = ? ");
-		fromBuilder.append(" AND ujc.data_area like ? LIMIT 1");
+		fromBuilder.append(" AND ujc.data_area like ? ");
 
 		return Db.queryStr(fromBuilder.toString(), customerId, dataArea);
 	}
@@ -196,9 +196,9 @@ public class SellerCustomerQuery extends JBaseQuery {
 		boolean needwhere = false;
 		LinkedList<Object> params = new LinkedList<Object>();
 
-		String select = "SELECT c.id,c.customer_name,c.contact,c.mobile,c.prov_name,c.city_name,c.country_name,c.address ";
+		String select = "SELECT c.id,c.customer_name,c.contact,c.mobile,c.prov_name,c.city_name,c.country_name,c.address,c.sellerCustomerId ";
 		StringBuilder sql = new StringBuilder(
-				"FROM (SELECT c.id,c.customer_name,c.contact,c.mobile,c.prov_name,c.city_name,c.country_name,c.address FROM cc_user_join_customer cujc ");
+				"FROM (SELECT c.id,c.customer_name,c.contact,c.mobile,c.prov_name,c.city_name,c.country_name,c.address,csc.id as sellerCustomerId  FROM cc_user_join_customer cujc ");
 		sql.append(
 				"LEFT JOIN cc_customer_join_customer_type ccjct ON cujc.seller_customer_id = ccjct.seller_customer_id ");
 		sql.append("LEFT JOIN cc_seller_customer csc ON cujc.seller_customer_id = csc.id ");

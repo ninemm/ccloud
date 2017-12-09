@@ -9,6 +9,7 @@
     var $loadmore = $(".weui-loadmore");
 
     $(function() {
+    console.log("${(CPATH)!}");
         //搜索框监听
         $(document).on("input", "#searchInput", function() {
             refresh();
@@ -140,21 +141,21 @@
     </header>
     <article class="customer">
     <header class="has-th-list">
-        <div class="head-search">
+        <div class="head-search select-area">
             <div>
-                <input type="text" id="region" value="业务员" data-values="" class="weui-input" onChange="refresh()" readonly>
+                <input type="text" id="region" placeholder="业务员" data-values="" class="weui-input" onChange="refresh()" readonly>
                 <i class="icon-sort-desc"></i>
             </div>
             <div>
-                <input type="text" id="customer-type" value="客户类型" data-values="" class="weui-input" onChange="refresh()" readonly>
+                <input type="text" id="customer-type" placeholder="客户类型" data-values="" class="weui-input" onChange="refresh()" readonly>
                 <i class="icon-sort-desc"></i>
             </div>
             <div>
-                <input type="text" id="if-order" value="是否下单" data-values="" class="weui-input" onChange="refresh()" readonly>
+                <input type="text" id="if-order" placeholder="是否下单" data-values="" class="weui-input" onChange="refresh()" readonly>
                 <i class="icon-sort-desc"></i>
             </div>
         </div>
-        <div>
+        <div id="combin-filter-btn">
             <i class="icon-th-list"></i>
         </div>
     </header>
@@ -177,19 +178,19 @@
                                             </p>
                                             <p>电话</p>
                                         </a>
-                                        <a class="weui-flex__item" href="./historyOrder.html?customer_id=${(customer.id)!}&customer_name=${(customer.customer_name)!}">
+                                        <a class="weui-flex__item" href="/historyOrder?sellerCustomerId=${(customer.sellerCustomerId)!}&customerName=${(customer.customer_name)!}">
                                             <p>
                                                 <i class="icon-file-text-o blue"></i>
                                             </p>
                                             <p>订单</p>
                                         </a>
-                                        <a class="weui-flex__item" href="visitAdd.html">
+                                        <a class="weui-flex__item" href="/visitAdd">
                                             <p>
                                                 <i class="icon-paw" style="color:#ff9800"></i>
                                             </p>
                                             <p>拜访</p>
                                         </a>
-                                        <a class="weui-flex__item relative" href="./customerDetail.html">
+                                        <a class="weui-flex__item relative" href="/customerDetail?sellerCustomerId=${(customer.sellerCustomerId)!}">
                                             <i class="icon-chevron-right gray"></i>
                                         </a>
                                     </div>
@@ -197,8 +198,8 @@
                             </div>
                             <hr />
                             <div class="weui-flex space-between">
-                                <div class="button blue-button" href="./product.html">下订单</div>
-                                <div class="button blue-button" hred="./visitAdd/html">客户拜访</div>
+                                <div class="button blue-button" href="/product">下订单</div>
+                                <div class="button blue-button" hred="/visitAdd">客户拜访</div>
                             </div>
                             <p class="gray">
                                 <span class="icon-map-marker ft16 green"></span>
@@ -221,6 +222,10 @@
     </article>
     </article>
 </div>
+<a class="hidden-menu" href="/customerDetail">
+    <i class="icon-menu-shopping-cart orange fr"></i>
+</a>
+<div class="layer"></div>
 <#include "_inc/_footer_nav.html" />
 </@layout>
 

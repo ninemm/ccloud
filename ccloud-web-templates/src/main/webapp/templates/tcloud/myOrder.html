@@ -11,9 +11,6 @@
 		startDate = $("#datePicker").val();
 		endDate = startDate + ' 23:59:59';
 		combo();
-	}).on("touchstart", "#salesOrder", function() {
-		var salesOrderId = $(this).parent().find("#salesOrderId").val();
-		window.location.href = "${CPATH}/order/orderDetail/" + salesOrderId;
 	});
 
     $("#datePicker").calendar();
@@ -91,7 +88,7 @@
 						$newOrder.find("#receiveType").remove();
 					}
 					
-					$newOrder.find("#salesOrderId").val(el.id);
+					$newOrder.find("#salesOrderId").attr('href', '${CPATH}/order/orderDetail?orderId=' + el.id);
 
 					$newOrder.find("#orderSn").text(el.order_sn);
 					
@@ -188,28 +185,26 @@
 	<main>
 		<div id="main">
 			<div class="weui-panel weui-panel_access">
-				<input type="hidden" id="salesOrderId" value="">
-				<div id ="salesOrder">
-					<div class="ft14 gray">
-						<span class="tag" id="receiveType">账期</span>
-						<span id="orderSn">DH-O-20171017-002276</span>
-						<span class="fr blue" id="status">订单待审核</span>
-					</div>
-					<div id="customerName">
-						 小张烤鱼
-					</div>
-					<div class="gray">
-						<p>
-							联系人：<span id="contact">小张/18611111111</span>
-							<span class="fr" id="customerType">终端客户</span>
-						</p>
-					</div>
-					<div class="gray">
-						<p>
-							金额：￥<span id="amount">200</span>
-							<span class="fr" id="date">时间： 2017-10-17 06:03:04</span>
-						</p>
-					</div>
+				<a href="" id="salesOrderId">
+				<div class="ft14 gray">
+					<span class="tag" id="receiveType">账期</span>
+					<span id="orderSn">DH-O-20171017-002276</span>
+					<span class="fr blue" id="status">订单待审核</span>
+				</div>
+				<div id="customerName">
+					 小张烤鱼
+				</div>
+				<div class="gray">
+					<p>
+						联系人：<span id="contact">小张/18611111111</span>
+						<span class="fr" id="customerType">终端客户</span>
+					</p>
+				</div>
+				<div class="gray">
+					<p>
+						金额：￥<span id="amount">200</span>
+						<span class="fr" id="date">时间： 2017-10-17 06:03:04</span>
+					</p>
 				</div>
 				<hr>
 				<div class="button blue-button fl">撤销</div>
