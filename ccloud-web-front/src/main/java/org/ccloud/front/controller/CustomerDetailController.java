@@ -43,7 +43,7 @@ public class CustomerDetailController extends BaseFrontController {
 			setAttr("cTypeName", org.apache.shiro.util.StringUtils.join(typeName.iterator(),","));
 		}
 
-		render("customerDetail.html");
+		render("customer_detail.html");
 
 	}
 

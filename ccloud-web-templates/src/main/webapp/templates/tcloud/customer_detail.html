@@ -1,0 +1,217 @@
+<#include "_inc/_layout.html"/>
+<#macro css> </#macro>
+<#macro script>
+    var $form = $("#form");
+    $(function () {
+        $("#delivery-address").cityPicker({
+            title: "请选择配送地址"
+        });
+
+        $.ajax({
+            url:"${CPATH}/customerDetail/getCustomerType",
+            type:"post",
+            dataType:"json",
+            success:function(data) {
+                $("#customer_type").select({
+                    title: "选择客户类型",
+                    multi: true,
+                    items: data.customerTypeList
+                });
+            }
+        });
+    });
+
+    function doSubmit(){
+        $form.ajaxSubmit({
+            beforeSubmit: function() {
+                if($("#customer_name").val().length==0) {toastr.error("客户名称不能为空"); return false;}
+                if($("#contact").val().length==0) {toastr.error("联系人不能为空"); return false;}
+                if($("#mobile").val().length==0) {toastr.error("联系电话不能为空"); return false;}
+                if(/^1[34578]\d{9}$/.test($("#mobile").val())==false){toastr.error("联系电话不正确"); return false;}
+                if($("#customer_type").val().length==0) {toastr.error("客户类型不能为空"); return false;}
+                if($("#delivery-address").val().length==0) {toastr.error("配送地址不能为空"); return false;}
+                if($("#address").val().length==0) {toastr.error("地址详情不能为空"); return false;}
+                return true;
+            },
+            type : "post",
+            dataType : "json",
+            success : function(data) {
+                if(data.errorCode == 0) {
+                    toastr.success(data.message, '操作成功');
+                } else {
+                    toastr.error(data.message,'操作失败');
+                }
+            },
+            error : function() {
+                alert("信息提交错误");
+            }
+        });
+    }
+
+    function doEnabled() {
+        $.get("${CPATH}/customerDetail/enable?id=${(sellerCustomer.id)!""}&isEnabled=0" ,
+        function(result){
+            if (result.errorCode > 0) {
+                toastr.error(result.message, '操作失败');
+            } else {
+                toastr.success(result.message, '操作成功');
+                $table.bootstrapTable('refresh');
+            }
+        }
+    )};
+
+</#macro>
+<@layout>
+<body id="customer-add">
+<main>
+    <form action="${CPATH}/customerDetail/update" method="post" id="form">
+    <section class="weui-panel weui-panel_access order-customer-info">
+        <input type="hidden" name="sellerCustomer.id" value="${(sellerCustomer.id)!}">
+        <div class="weui-cell weui-cell_access">
+            <div class="weui-cell__bd">
+                <div class="order-customer-info-title">
+                    客户名称
+                    <span class="require">*</span>
+                </div>
+                <input type="text" class="weui-input" id="customer_name" name="customer.customer_name" value="${(sellerCustomer.customer_name)!}"  placeholder="1-25个任意字母数字" required>
+            </div>
+        </div>
+        <div class="weui-cell weui-cell_access">
+            <div class="weui-cell__bd">
+                <div class="order-customer-info-title">
+                    客户昵称&nbsp;&nbsp;
+                    <span class="require"> </span>
+                </div>
+                <input type="text" class="weui-input" id="nickname" name="sellerustomer.nickname" value="${(sellerCustomer.nickname)!}" placeholder="1-25个任意字母数字">
+            </div>
+        </div>
+        <div class="weui-cell weui-cell_access">
+            <div class="weui-cell__bd">
+                <div class="order-customer-info-title">
+                    联系人
+                    <span class="require">*</span>
+                </div>
+                <input type="text" class="weui-input" id="contact" name="customer.contact" value="${(sellerCustomer.contact)!}" placeholder="1-15个任意字母数字">
+            </div>
+        </div>
+        <!--<div class="weui-cell weui-cell_access">-->
+            <!--<div class="weui-cell__bd">-->
+                <!--<div class="order-customer-info-title">-->
+                    <!--性别-->
+                <!--</div>-->
+                <!--<label class="fr">-->
+                    <!--<input type="radio" name="sex" id="" value="女" checked> 女</label>-->
+                <!--<label class="fr">-->
+                    <!--<input type="radio" name="sex" id="" value="男"> 男</label>-->
+            <!--</div>-->
+        <!--</div>-->
+        <div class="weui-cell weui-cell_access">
+            <div class="weui-cell__bd">
+                <div class="order-customer-info-title">
+                    联系电话
+                    <span class="require">*</span>
+                </div>
+                <input type="text" class="weui-input" id="mobile" name="customer.mobile" value="${(sellerCustomer.mobile)!}" placeholder="11位数字">
+            </div>
+        </div>
+        <div class="weui-cell weui-cell_access select-area">
+            <div class="weui-cell__bd">
+                <div class="order-customer-info-title">
+                    客户类型
+                    <span class="require">*</span>
+                </div>
+                <input type="text" id="customer_type" name="customer_type" data-values="${(cTypeList)!}" value="${(cTypeName)!}" placeholder="请选择" class="weui-input">
+            </div>
+            <span class="weui-cell__ft"></span>
+        </div>
+        <!--<div class="weui-cell weui-cell_access">-->
+            <!--<div class="weui-cell__bd">-->
+                <!--<div class="order-customer-info-title">-->
+                    <!--客户区域-->
+                    <!--<span class="require">*</span>-->
+                <!--</div>-->
+                <!--<input type="text" placeholder="请选择" class="weui-input">-->
+            <!--</div>-->
+            <!--<span class="weui-cell__ft"></span>-->
+        <!--</div>-->
+        <div class="weui-cell weui-cell_access">
+            <div class="weui-cell__bd">
+                <div class="order-customer-info-title">
+                    配送地址
+                    <span class="require">*</span>
+                </div>
+                <input type="text" placeholder="省市区" class="weui-input" id="delivery-address" name="customer.prov_name" value="${(sellerCustomer.prov_name)!"湖北省"} ${(sellerCustomer.city_name)!"武汉市"} ${(sellerCustomer.country_name)!"洪山区"}">
+            </div>
+            <span class="weui-cell__ft"></span>
+        </div>
+        <div class="weui-cell weui-cell_access">
+            <div class="weui-cell__bd">
+                <div class="order-customer-info-title">
+                    地址详情
+                    <span class="require">*</span>
+                </div>
+                <input type="text" class="weui-input" id="address" name="customer.address" value="${(sellerCustomer.address)!}" placeholder="1-50个任意字母数字">
+            </div>
+        </div>
+        <!--<div class="weui-cell weui-cell_access">-->
+            <!--<div class="weui-cell__bd">-->
+                <!--<textarea placeholder="备注说明（70字以内）"></textarea>-->
+            <!--</div>-->
+        <!--</div>-->
+    </section>
+    <section class="weui-cells weui-cells_form">
+        <div class="weui-cell">
+            <div class="weui-cell__bd">
+                <div class="weui-uploader">
+                    <div class="weui-uploader__hd">
+                        <p class="weui-uploader__title">附件图片</p>
+                        <div class="weui-uploader__info">0/2</div>
+                    </div>
+                    <div class="weui-uploader__bd">
+                        <div class="weui-uploader__input-box">
+                            <input id="uploaderInput" name="customer.img_path" class="weui-uploader__input" type="file" accept="image/*" multiple="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="weui-panel weui-panel_access ft14 remark">
+        <div class="weui-cell weui-cell_access">
+            <div class="weui-cell__bd">
+                <span class="icon-map-pin ft16 green"></span>
+                &nbsp;&nbsp;${(sellerCustomer.location)!}
+            </div>
+        </div>
+    </section>
+    </form>
+</main>
+<div class="hidden-menu">
+    <ul>
+        <li>
+            <a href="index.html">
+                首页
+                <i class="icon-home blue"></i>
+            </a>
+        </li>
+        <li>
+            <a href="javascript:history.go(-1)">
+                上一页
+                <i class="icon-undo green"></i>
+            </a>
+        </li>
+    </ul>
+    <i class="icon-menu-open orange fr" id="button"></i>
+</div>
+<div class="layer"></div>
+<footer class="weui-footer weui-footer_fixed-bottom ft16">
+    <#if sellerCustomer??>
+        <button class="gray-button width-50" onclick="doEnabled()">停用</button>
+        <button class="blue-button width-50" onclick="doSubmit()">更新</button>
+    <#else>
+        <button class="blue-button width-100" onclick="doSubmit()">添加</button>
+    </#if>
+
+</footer>
+</body>
+</@layout>
