@@ -6,7 +6,17 @@
     $(function() {
         //搜索框监听
         $(document).on("input", "#searchInput", function() {
-            initCustomer();
+            combo();
+        }).on("input", "#searchInput", function() {
+            combo();
+        }).on("input", "#searchCancel", function() {
+            combo();
+        }).on("change", "#userId", function() {
+            combo();
+        }).on("change", "#customerTypeId", function() {
+            combo();
+        }).on("change", "#isOrdered", function() {
+            combo();
         }).on("touchstart", "#customerInfo", function() {
 			var el = $(this);
 	        var customerInfo = {
@@ -19,56 +29,67 @@
 	        setItemBykey("customerInfo", customerInfo)
 	        window.location.href = '${CPATH}/product/order';
         });
-
-        //筛选项获取
-         $("#userId").select({
-	         title: "选择业务员",
-	         items: ${userIds!}
-         });
-
-         $("#customerTypeId").select({
-	         title: "选择客户类型",
-	         items: ${customerTypes!}
-         });
-
-         $("#isOrdered").select({
-	         title: "是否下单",
-	         items: [{
-	             title: "全部", value: ""
-	             },{
-	             title: "是", value: "1"
-	             },{
-	             title: "否",value: "0"
-	         }]
-         });
          
-         initCustomer();
+       combo();
 
     });
-    
-    var pageNumber = 1;
-    var pageSize = 10;
-    var loading = false;
 
-    var $endNode = null;
-    var $loadmore = $(".weui-loadmore");
+    //筛选项获取
+    $("#userId").select({
+     title: "选择业务员",
+     items: ${userIds!}
+    });
+
+    $("#customerTypeId").select({
+     title: "选择客户类型",
+     items: ${customerTypes!}
+    });
+
+    $("#isOrdered").select({
+     title: "是否下单",
+     items: [{
+         title: "全部", value: ""
+         },{
+         title: "是", value: "1"
+         },{
+         title: "否",value: "0"
+     }]
+    });
     
 	var newHtml = $(".weui-panel").eq(0).html();
+	var $loading = $("#loading");
+	var $noMore = $("#noMore");
+	var loading = false;
+    
+    var keyword = '';
+    var page = 1;
+	var size = 10;
+
 	var $customerList = $("#customerList");
 	$customerList.empty();
 	
-	var params = {
-            "keyword": $("#searchInput").val(),
-            "page": pageNumber,
-            "size": pageSize,
-            "userId": $("#userId").val(),
-            "customerTypeId": $("#customerTypeId").val(),
-            "isOrdered": $("#isOrdered").val()
-    }
     
     function initCustomer() {
+    	$loading.show();
+		$noMore.hide();
+
+	    var params = {
+		    "page": page,
+	        "size": size,
+	        "keyword": $("#searchInput").val(),
+	        "userId": $("#userId").data('values'),
+	        "customerTypeId": $("#customerTypeId").data('values'),
+	        "isOrdered": $("#isOrdered").data('values')
+	    }
+
     	Utils.ajax('${CPATH}/product/customerList', params, 
 			function(data){
+				$loading.hide();
+				if(data.customerList.length == 0){
+					$noMore.show();
+					loading = true;
+					return;
+				}
 				$.each(data.customerList, function(index, el) {
 					$customerList.append("<div class='weui-panel weui-panel_access'>" + newHtml + "</div>");
 					var $newCustomer = $customerList.find(".weui-panel:last");
@@ -81,74 +102,27 @@
 					$newCustomer.find("#mobile").val(el.mobile);
 					$newCustomer.find("#address").val(el.prov_name + " " + el.city_name + " " + el.country_name + " " + el.address);
 				});
+				page++;
+				loading = false;
 			}
 		);
-        pageNumber++;
     }
 
-
-
-    //监听滚动
-    $(".infinite").infinite().on("infinite", function() {
-        var self = this;
-        $endNode = $(".weui-panel_access:last");
-        $loadmore = $(self).find(".weui-loadmore");
-        if ($loadmore) $loadmore.show();
-        if (loading) return ;
-        loading = true;
-
-        $.ajax({
-            type: "post",
-            url: "${CPATH}/customer/refresh",
-            data: paramData(),
-            dataType: "json",
-            success:function(data) {
-                if ($loadmore) $loadmore.show();
-                if (data.totalPage >= pageNumber) {
-                    $endNode.after(data.html);
-                }
-                if (data.totalPage = pageNumber) {
-                    $(".infinite").destroyInfinite();
-                    $loadmore.hide();
-                }
-                pageNumber++;
-                loading = false;
-            }
-        });
-    });
-
-
-    //搜索框叉掉和取消时，先清input值，再调用接口
-    function searchCancel() {
-        $("#searchInput")[0].value = "";
-        refresh();
-    }
-
-    function refresh() {
-        pageNumber = 1;
-        $.ajax({
-            url:"${CPATH}/customer/refresh",
-            type:"post",
-            data:paramData(),
-            dataType:"json",
-            success:function(data) {
-                $loadmore = $(this).find(".weui-loadmore");
-                $(".infinite").destroyInfinite();
-                $loadmore.hide();
-
-                if (data.totalPage > pageNumber) {
-                    loading = false;
-                    $(".infinite").infinite();
-                    $(".weui-loadmore").removeAttr("style");
-                }
-
-                $(".infinite")[0].scrollTop = 0;
-                $("#customerList").empty();
-                $("#customerList").html(data.html);
-                pageNumber = 2;
-            }
-        });
-    }
+	//滑动方法
+	$("main").infinite().on("infinite", function() {
+		if(loading) {
+			return;
+		}
+		loading = true;
+		initCustomer();
+	});
+	
+	function combo() {
+		$customerList.empty();
+		loading = false;
+		page = 1;
+		initCustomer();
+	}
 
 </#macro>
 
@@ -160,29 +134,29 @@
                 <div class="weui-search-bar__box">
                     <i class="weui-icon-search"></i>
                     <input type="search" class="weui-search-bar__input" id="searchInput" placeholder="搜索" required="">
-                    <a href="javascript:" class="weui-icon-clear" id="searchClear" onclick="initCustomer()"></a>
+                    <a href="javascript:" class="weui-icon-clear" id="searchClear" ></a>
                 </div>
                 <label class="weui-search-bar__label" id="searchText">
                     <i class="weui-icon-search"></i>
                     <span>请输入客户名或联系人</span>
                 </label>
             </form>
-            <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel" onclick="initCustomer()">取消</a>
+            <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel" >取消</a>
         </div>
     </header>
     <article class="customer">
 	    <header class="has-th-list">
 	        <div class="head-search select-area">
 	            <div>
-	                <input type="text" id="userId" class="weui-input" placeholder="业务员" onChange="initCustomer()" readonly>
+	                <input type="text" id="userId" class="weui-input" placeholder="业务员" readonly>
 	                <i class="icon-sort-desc"></i>
 	            </div>
 	            <div>
-	                <input type="text" id="customerTypeId" class="weui-input" placeholder="客户类型" onChange="initCustomer()" readonly>
+	                <input type="text" id="customerTypeId" class="weui-input" placeholder="客户类型"  readonly>
 	                <i class="icon-sort-desc"></i>
 	            </div>
 	            <div>
-	                <input type="text" id="isOrdered" class="weui-input" placeholder="是否下单" onChange="initCustomer()" readonly>
+	                <input type="text" id="isOrdered" class="weui-input" placeholder="是否下单" readonly>
 	                <i class="icon-sort-desc"></i>
 	            </div>
 	        </div>
@@ -227,13 +201,13 @@
 	               </p>
 	           </div>
 	       </div>
-	            <div class="weui-loadmore weui-loadmore_line">
-	                <span class="weui-loadmore__tips">暂无数据</span>
-	            </div>
-                <div class="weui-loadmore">
-                    <i class="weui-loading"></i>
-                    <span class="weui-loadmore__tips">正在加载</span>
-                </div>
+			<div class="weui-loadmore" id="loading" style="display: none;">
+			  <i class="weui-loading"></i>
+			  <span class="weui-loadmore__tips">正在加载</span>
+			</div>
+			<div class="weui-loadmore weui-loadmore_line" id="noMore" style="display: none;">
+			  <span class="weui-loadmore__tips">暂无数据</span>
+			</div>
 	          <div class="hidden-menu">
 			    <ul>
 			      <li>

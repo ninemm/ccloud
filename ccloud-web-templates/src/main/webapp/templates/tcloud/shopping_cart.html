@@ -7,10 +7,15 @@ $(function() {
     var _this = $(this);
     $.confirm("确认删除商品？", function() {
       _this.parents(".weui-panel").remove();
+      total();
     }, function() {
     })
   }).on("touchstart", "#placeOrder", function () {
-    	save()
+    	save();
+  }).on("touchend", ".operate:first-child", function () { //减少商品数量
+      total();
+  }).on("touchend", ".operate:last-child", function () { //增加商品数量
+      total();
   });
   
   initProduct();

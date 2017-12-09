@@ -201,7 +201,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		String total = StringUtils.getArrayFirst(paraMap.get("total"));
 		String type = StringUtils.getArrayFirst(paraMap.get("receiveType"));
 		salesOrder.setTotalAmount(new BigDecimal(total));
-		salesOrder.setReceiveType(StringUtils.isNumeric(type) ? Integer.parseInt(type) : 0);
+		salesOrder.setReceiveType(StringUtils.isNumeric(type) ? Integer.parseInt(type) : 1);
 		salesOrder.setDeliveryAddress(StringUtils.getArrayFirst(paraMap.get("deliveryAddress")));
 		Date deliveryDate = DateUtils.strToDate(StringUtils.getArrayFirst(paraMap.get("deliveryDate")),
 				DateUtils.DEFAULT_NORMAL_FORMATTER);
@@ -229,7 +229,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		String total = StringUtils.getArrayFirst(paraMap.get("total"));
 		String type = StringUtils.getArrayFirst(paraMap.get("receiveType"));
 		salesOrder.setTotalAmount(new BigDecimal(total));
-		salesOrder.setReceiveType(StringUtils.isNumeric(type) ? Integer.parseInt(type) : 0);
+		salesOrder.setReceiveType(StringUtils.isNumeric(type) ? Integer.parseInt(type) : 1);
 		salesOrder.setDeliveryAddress(StringUtils.getArrayFirst(paraMap.get("deliveryAddress")));
 		Date deliveryDate = DateUtils.strToDate(StringUtils.getArrayFirst(paraMap.get("deliveryDate")),
 				DateUtils.DEFAULT_NORMAL_FORMATTER);

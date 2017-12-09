@@ -57,9 +57,11 @@ public class OrderController extends BaseFrontController {
 
 		String status = getPara("status");
 		String customerTypeId = getPara("customerTypeId");
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
 
 		Page<Record> orderList = SalesOrderQuery.me().paginateForApp(getPageNumber(), getPageSize(), keyword, status,
-				customerTypeId, "", "", sellerId, dataArea);
+				customerTypeId, startDate, endDate, sellerId, dataArea);
 
 		Map<String, Object> map = new HashMap<>();
 		map.put("orderList", orderList.getList());

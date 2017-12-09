@@ -8,6 +8,8 @@
 	}).on("change", "#customerTypeId", function() {
 		combo();
 	}).on("change", "#datePicker", function() {
+		startDate = $("#datePicker").val();
+		endDate = startDate + ' 23:59:59';
 		combo();
 	});
 
@@ -22,9 +24,17 @@
 	  items: [{
 	       title: "全部", value: ""
 	       },{
-	       title: "待审核", value: "1"
+	       title: "已审核", value: "1000"
 	       },{
-	       title: "已完成", value: "0"
+	       title: "订单取消", value: "1001"
+	       },{
+	       title: "部分出库", value: "2000"
+	       },{
+	       title: "部分出库-订单关闭", value: "2001"
+	       },{
+	       title: "全部出库", value: "3000"
+	       },{
+	       title: "全部出库-订单关闭", value: "3001"
 	    }]
 	});
 	$("#customerTypeId").select({
@@ -39,7 +49,8 @@
 	var loading = false;
 	
 	var keyword = '';
-	var customerTypeId = '';
+	var startDate = $.today();
+	var endDate = $.today() + ' 23:59:59';
 	var page = 1;
 	var size = 10;
 
@@ -53,7 +64,8 @@
 			"keyword": keyword,
 			"status": $("#status").data('values'),
 			"customerTypeId": $("#customerTypeId").data('values'),
-			"datePicker": $("#datePicker").val()
+			"startDate": startDate,
+			"endDate" : endDate
 		}
 
 
@@ -77,7 +89,8 @@
 					}
 					
 					$newOrder.find("#orderSn").text(el.order_sn);
-					$newOrder.find("#status").text(el.status);
+					
+					$newOrder.find("#status").text(getStatus(el.status));
 					$newOrder.find("#customerName").text(el.customer_name);
 					$newOrder.find("#contact").text(el.contact + '/' + el.mobile);
 					$newOrder.find("#customerType").text(el.customerTypeName);
@@ -90,6 +103,44 @@
 			}
 		);
 	}
+	
+	function getDateOrder(){
+		var dateType = $("#getDate").find(".blue-button").data("id");
+		var date = new Date();
+		if(dateType == 0){
+			startDate = $.today();
+		}else if(dateType == 1){
+			date.setDate(date.getDate() - 3);
+			startDate = date.Format("yyyy-MM-dd");
+		}else if(dateType == 2){
+			date.setDate(date.getDate() - 7);
+			startDate = date.Format("yyyy-MM-dd");
+		}else if(dateType == 3){
+			date.setDate(date.getDate() - 30);
+			startDate = date.Format("yyyy-MM-dd");
+		}
+
+		endDate = $.today() + ' 23:59:59';
+		combo();
+	}
+
+	function getStatus(value) {
+		if (value == 0) {
+			return '待审核';
+		} else if (value == 1000) {
+			return '已审核'
+		} else if (value == 1001) {
+			return '订单取消'
+		} else if (value == 2000) {
+			return '部分出库'
+		} else if (value == 2001) {
+			return '部分出库-订单关闭'
+		} else if (value == 3000) {
+			return '全部出库'
+		} 
+		return '全部出库-订单关闭'
+	}
+	
 	
 	//滑动方法
 	$("main").infinite().on("infinite", function() {
@@ -170,22 +221,22 @@
 	<article id="combin-filter">
 		<div class="filter-item">
 			<h4>下单日期</h4>
-			<div class="weui-flex">
-				<span class="blue-button">当天</span>
-				<span>最近3天</span>
-				<span>最近7天</span>
-				<span>最近30天</span>
+			<div class="weui-flex" id="getDate">
+				<span class="blue-button" data-id="0">今天</span>
+				<span data-id="1">最近3天</span>
+				<span data-id="2">最近7天</span>
+				<span data-id="3">最近30天</span>
 			</div>
 		</div>
 		<footer class="weui-footer weui-footer_fixed-bottom ft16">
 			<a class="gray-button width-50 cancel-search-btn">取消</a>
-			<a class="blue-button width-50 confirm-search-btn">确定</a>
+			<a class="blue-button width-50 confirm-search-btn" onclick="getDateOrder()">确定</a>
 		</footer>
 	</article>
 	<div class="hidden-menu">
 		<ul>
 			<li>
-				<a href="index.html">
+				<a href="${CPATH}/index">
 					首页
 					<i class="icon-home blue"></i>
 				</a>

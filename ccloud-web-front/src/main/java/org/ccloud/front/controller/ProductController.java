@@ -110,8 +110,6 @@ public class ProductController extends BaseFrontController {
 
 		Map<String, Object> map = new HashMap<>();
 		map.put("customerList", customerList.getList());
-		map.put("totalRow", customerList.getTotalRow());
-		map.put("totalPage", customerList.getTotalPage());
 		renderJson(map);
 	}
 
