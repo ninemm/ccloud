@@ -245,7 +245,7 @@ public class WorkFlowService {
 		if (var == null) {
 			var = new HashMap<String, Object>();
 		}
-		var.put(Consts.WORKFLOW_APPLY_USERNAME, ShiroKit.getUsername());
+//		var.put(Consts.WORKFLOW_APPLY_USERNAME, ShiroKit.getUsername());
 		ProcessInstance procIns = ActivitiPlugin.buildProcessEngine().getRuntimeService()
 				.startProcessInstanceByKey(defKey, id, var);
 		return procIns.getId();

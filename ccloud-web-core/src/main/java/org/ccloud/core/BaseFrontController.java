@@ -15,10 +15,20 @@
  */
 package org.ccloud.core;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+
 import org.ccloud.template.TemplateManager;
+import org.ccloud.utils.FileUtils;
 import org.ccloud.utils.StringUtils;
+import org.joda.time.DateTime;
 
 import com.jfinal.core.Controller;
+import com.jfinal.kit.Base64Kit;
+import com.jfinal.kit.LogKit;
+import com.jfinal.kit.PathKit;
+import com.jfinal.kit.StrKit;
 
 public class BaseFrontController extends JBaseController {
 
@@ -152,6 +162,41 @@ public class BaseFrontController extends JBaseController {
 			setAttr("goto", StringUtils.urlEncode(gotoUrl));
 		}
 		return this;
+	}
+	
+	public String upload(String blobImage) {
+		if (StrKit.notBlank(blobImage)) {
+			
+			String webRoot = PathKit.getWebRootPath();
+			String uuid = StrKit.getRandomUUID();
+			StringBuilder newFileName = new StringBuilder(webRoot).append(File.separator).append("attachment")
+					.append(File.separator).append(DateTime.now().toString("yyyyMMdd")).append(File.separator).append(uuid)
+					.append(".jpeg");
+
+			File newfile = new File(newFileName.toString());
+
+			if (!newfile.getParentFile().exists()) {
+				newfile.getParentFile().mkdirs();
+			}
+			
+			try (OutputStream os = new FileOutputStream(newfile)) {
+				blobImage = blobImage.substring(blobImage.indexOf(",") + 1);
+				byte[] b = Base64Kit.decode(blobImage);
+				for (int i = 0; i < b.length; ++i) {
+		            if (b[i] < 0) {//调整异常数据
+		                b[i] += 256;
+		            }
+		        }
+				
+				os.write(b);
+				os.close();
+			} catch (Exception e) {
+				LogKit.error("上传反馈图片失败!");
+				return null;
+			}
+			return FileUtils.removePrefix(newfile.getAbsolutePath(), webRoot);
+		}
+		return null;
 	}
 
 }

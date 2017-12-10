@@ -837,6 +837,27 @@ li.jp-borwer-active-li {
 	border-radius: 0;
 }
 
+/* Select2 Custom ----------------------------------------------------------------------------------------------------*/
+
+.select2-container--default .select2-selection--multiple {
+	border: 1px solid #d2d6de;
+	border-radius: 0;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+	background-color: #3c8dbc;
+    border: 1px solid #3c8dbc;
+    border-radius: 0;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+	color: #ffffff;
+}
+
+.select2-container--default.select2-container--focus .select2-selection--multiple {
+	border: 1px solid #3c8dbc;
+}
+
 /* 404 Error ---------------------------------------------------------------------------------------------------------*/
 .error404 {
     display: block;

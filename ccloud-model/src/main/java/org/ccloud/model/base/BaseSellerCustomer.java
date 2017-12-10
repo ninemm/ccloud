@@ -185,7 +185,15 @@ public abstract class BaseSellerCustomer<M extends BaseSellerCustomer<M>> extend
 	public java.lang.String getCustomerKind() {
 		return getStr("customer_kind");
 	}
+	
+	public void setImageListStore(java.lang.String imageListStore) {
+		set("image_list_store", imageListStore);
+	}
 
+	public java.lang.String getImageListStore() {
+		return getStr("image_list_store");
+	}
+	
 	public void setLng(java.math.BigDecimal lng) {
 		set("lng", lng);
 	}

@@ -1,0 +1,185 @@
+<#include "../_inc/_layout.html"/>
+
+<#macro script_import>
+	<!-- bootstrapValidator -->
+	<script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
+	<!-- select2 -->
+	<script src="${CPATH}/static/plugins/select2/js/select2.js"></script>
+	<!-- cityPicker -->
+	<script src="${CPATH}/static/plugins/city-picker/js/city-picker.data.js"></script>
+	<script src="${CPATH}/static/plugins/city-picker/js/city-picker.js"></script>
+</#macro>
+
+<#macro css_import>
+	<!-- bootstrapValidator -->
+	<link rel="stylesheet" href="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.css">
+	<!-- select2 -->
+	<link rel="stylesheet" href="${CPATH}/static/plugins/select2/css/select2.css">
+	<!-- cityPicker -->
+	<link rel="stylesheet" href="${CPATH}/static/plugins/city-picker/css/city-picker.css">
+</#macro>
+
+<#macro script>
+
+	var $form = $("#form");
+	var $city = $('#city-picker');
+
+	$(function() {
+		$('#customerTypes').select2({
+			placeholder: '请把默认类型设置为第一个'
+		});
+	});
+
+	function doSubmit(value){
+	
+		$form.ajaxSubmit({
+			beforeSubmit: function() {
+				var comment = $('#_comment').val();
+				if (value == 0 && (comment == null || comment == '')) {
+			        toastr.error('请输入拒绝原因','操作失败');
+			        return ;
+				}
+				
+				$('#status').val(value);
+			},
+			type : "post", 
+			dataType : "json", 
+			success : function(data) { 
+				if(data.errorCode == 0) {
+					//location.reload();
+					toastr.success(data.message, '操作成功');
+					$('.btn_review').hide();
+				} else {
+					toastr.error(data.message,'操作失败');
+				}
+			},
+			error : function() {
+				alert("信息提交错误");
+			}
+		});
+	}
+</#macro>
+
+<@layout active_id=p child_active_id=c>
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+	<h1>客户审核</h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+	    <li>客户管理</li>
+		<li class="active">审核客户</li>
+	</ol>
+</section>
+<!-- Main content -->
+<section class="content">
+	<div class="box box-default">
+		<div class="box-header with-border">
+			<h3 class="box-title">客户信息审核</h3>
+			<div class="box-tools">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse">
+					<i class="fa fa-minus"></i>
+				</button>
+			</div>
+		</div>
+		<form action="${CPATH}/admin/sellerCustomer/complete" method="post" id="form" class="form-horizontal" >
+			<input type="hidden" name="id" value="${(sellerCustomer.id)!}">
+			<input type="hidden" name="taskId" value="${(taskId)!}">
+			<input type="hidden" name="status" id="status">
+			<div class="row form-horizontal">
+				<div class="form-group">
+				    <div class="col-sm-5">
+						<label class="control-label col-sm-4">客户名称:</label>
+						<div class="input-group col-sm-8">
+						    <p class="form-control-static">${(sellerCustomer.customer_name)!}</p>
+						</div>
+					</div>
+					<div class="col-sm-5">
+						<label class="control-label col-sm-4">客户昵称:</label>
+	                    <div class="input-group col-sm-8">
+	                        <p class="form-control-static">${(sellerCustomer.nickname)!}</p>
+	                    </div>
+                    </div>
+				</div>
+				
+				<div class="form-group">
+                    <div class="col-sm-5">
+                        <label class="control-label col-sm-4">联系人:</label>
+                        <div class="input-group col-sm-8">
+                            <p class="form-control-static">${(sellerCustomer.contact)!}</p>
+                        </div>
+                    </div>
+                    <div class="col-sm-5">
+                        <label class="control-label col-sm-4">客户编码:</label>
+                        <div class="input-group col-sm-8">
+                            <p class="form-control-static">${(sellerCustomer.customer_code)!}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div class="col-sm-5">
+                        <label class="control-label col-sm-4">手机号:</label>
+                        <div class="input-group col-sm-8">
+                            <p class="form-control-static">${(sellerCustomer.mobile)!}</p>
+                        </div>
+                    </div>
+                    <div class="col-sm-5">
+                        <label class="control-label col-sm-4">客户类型:</label>
+                        <div class="input-group col-sm-8">
+                            <p class="form-control-static">
+                                dddd
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group col-sm-10">
+                    <label for="_title" class="col-sm-2 control-label">详细地址:</label>
+                    <div class="input-group col-sm-10">
+                        <p class="form-control-static">${(sellerCustomer.prov_name)!} ${(sellerCustomer.city_name)!} ${(sellerCustomer.country_name)!} ${(sellerCustomer.address)!}</p>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div class="col-sm-5">
+                        <label class="control-label col-sm-4">提交人:</label>
+                        <div class="input-group col-sm-8">
+                            <p class="form-control-static text-yellow">${(applyer.realname)!}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div class="col-sm-5">
+                        <label class="control-label col-sm-4">变更内容:</label>
+                        <div class="input-group col-sm-8">
+                            <#if diffAttrList??>
+                            <#list diffAttrList as txt>
+                            <p class="form-control-static text-yellow">
+                                ${txt!}
+                            </p>
+                            </#list>
+                            </#if>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group col-sm-10">
+		            <label for="_remark" class="col-sm-2 control-label">审核评论:</label>
+		            <div class="input-group col-sm-10">
+		                <textarea class="form-control" rows="3" name="comment" id="_comment" placeholder="在此输入评论内容"></textarea>
+		            </div>
+		        </div>
+			</div>
+		</form>
+		<div class="box-footer"> 
+			<button type="button" onclick="doSubmit(1)" class="btn btn-primary btn-flat btn_review">确认</button>
+			<button type="button" onclick="doSubmit(0)" class="btn btn-primary btn-flat btn_review">拒绝</button>
+			<a href="${CPATH}/admin" class="btn btn-primary btn-flat">返回</a>
+			<input type="button" class="btn btn-primary btn-flat" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
+		</div>
+	</div>
+</section>
+
+</@layout>

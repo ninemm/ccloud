@@ -42,22 +42,17 @@ public class SellerCustomerQuery extends JBaseQuery {
 		return DAO.getCache(id, new IDataLoader() {
 			@Override
 			public Object load() {
-				return DAO.findById(id);
+				StringBuilder sql = new StringBuilder(
+						" select sc.*, c.customer_code, c.customer_name, c.contact, c.mobile");
+				sql.append(" , c.prov_name, c.city_name, c.country_name");
+				sql.append(" , c.prov_code, c.city_code, c.country_code, c.address");
+				sql.append(" from `cc_seller_customer` sc");
+				sql.append(" join `cc_customer` c on c.id = sc.customer_id");
+				sql.append(" WHERE sc.id = ? ");
+				return DAO.findFirst(sql.toString(), id);
+				//return DAO.findById(id);
 			}
 		});
-	}
-
-	public Record findMoreById(final String id) {
-
-		StringBuilder fromBuilder = new StringBuilder(
-				" select sc.*, c.customer_code, c.customer_name, c.contact, c.mobile ");
-		fromBuilder.append(" , c.prov_name, c.city_name, c.country_name ");
-		fromBuilder.append(" , c.prov_code, c.city_code, c.country_code, c.address ");
-		fromBuilder.append(" from `cc_seller_customer` sc ");
-		fromBuilder.append(" join `cc_customer` c on c.id = sc.customer_id ");
-		fromBuilder.append(" WHERE sc.id = ? ");
-
-		return Db.findFirst(fromBuilder.toString(), id);
 	}
 
 	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String dataArea) {

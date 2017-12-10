@@ -15,10 +15,14 @@
  */
 package org.ccloud.controller.admin;
 
+import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -44,12 +48,16 @@ import org.ccloud.model.query.SellerCustomerQuery;
 import org.ccloud.model.query.UserJoinCustomerQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.vo.CustomerExcel;
+import org.ccloud.model.vo.CustomerVO;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.StringUtils;
+import org.ccloud.workflow.service.WorkFlowService;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.annotation.JSONField;
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.jfinal.aop.Before;
@@ -100,7 +108,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
 		if (StrKit.notBlank(id)) {
-			Record sellerCustomer = SellerCustomerQuery.me().findMoreById(id);
+			SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(id);
 			setAttr("sellerCustomer", sellerCustomer);
 
 			List<Record> list = UserJoinCustomerQuery.me().findUserListBySellerCustomerId(id, selectDataArea);
@@ -108,7 +116,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			int length = list.size();
 			String[] userIds = new String[length];
 			String[] realnames = new String[length];
-
+			
 			for (int i = 0; i < length; i++) {
 				userIds[i] = list.get(i).getStr("user_id");
 				realnames[i] = list.get(i).getStr("realname");
@@ -143,52 +151,47 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 	}
 
 	@Before(Tx.class)
-	@RequiresPermissions(value = { "/admin/sellerCustomer/edit", "/admin/dealer/all",
-			"/admin/all" }, logical = Logical.OR)
+	@RequiresPermissions(value = { "/admin/sellerCustomer/edit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void save() {
 
 		String sellerId = getSessionAttr("sellerId");
-
-		SellerCustomer sellerCustomer = getModel(SellerCustomer.class);
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		Customer customer = getModel(Customer.class);
+		SellerCustomer sellerCustomer = getModel(SellerCustomer.class);
 
-		String customerId = "";
-		String sellerCustomerId = "";
+		//String customerId = "";
 		// 检查客户是否存在
-		Customer persiste = CustomerQuery.me().findByCustomerNameAndMobile(customer.getCustomerName(),
-				customer.getMobile());
-
+		Customer persiste = CustomerQuery.me().findByCustomerNameAndMobile(customer.getCustomerName(), customer.getMobile());
+		
+		if (persiste != null) {
+			customer.setId(persiste.getId());
+		}
+		customer.saveOrUpdate();
+		/*
 		if (persiste == null) {
 			customerId = StrKit.getRandomUUID();
-			customer.set("id", customerId);
-			customer.set("create_date", new Date());
+			customer.setId(customerId);
+			customer.setCreateDate(new Date());
 			customer.save();
 		} else {
 			customerId = persiste.getId();
-			customer.set("id", customerId);
-			customer.set("modify_date", new Date());
+			customer.setId(customerId);
+			customer.setModifyDate(new Date());
 			customer.update();
-		}
+		}*/
 
-		sellerCustomer.set("seller_id", sellerId);
-		sellerCustomer.set("customer_id", customerId);
-		sellerCustomer.set("is_enabled", 1);
-		sellerCustomer.set("is_archive", 1);
-		User loginUser=getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String dept_dataArea = DataAreaUtil.getUserDealerDataArea(loginUser.getDataArea());
-		Department dept =  DepartmentQuery.me().findByDataArea(dept_dataArea);
-		sellerCustomer.set("data_area", dept_dataArea);
-		sellerCustomer.set("dept_id", dept.getId());
-		if (StrKit.isBlank(sellerCustomer.getId())) {
-			sellerCustomerId = StrKit.getRandomUUID();
-			sellerCustomer.set("id", sellerCustomerId);
-			sellerCustomer.set("create_date", new Date());
-			sellerCustomer.save();
-		} else {
-			sellerCustomerId = sellerCustomer.getId();
-			sellerCustomer.set("modify_date", new Date());
-			sellerCustomer.update();
-		}
+		sellerCustomer.setSellerId(sellerId);
+		sellerCustomer.setCustomerId(customer.getId());
+		sellerCustomer.setIsEnabled(1);
+		sellerCustomer.setIsArchive(1);
+		
+		String deptDataArea = DataAreaUtil.getUserDealerDataArea(user.getDataArea());
+		Department department =  DepartmentQuery.me().findByDataArea(deptDataArea);
+		sellerCustomer.setDataArea(deptDataArea);
+		sellerCustomer.setDeptId(department.getId());
+		
+		sellerCustomer.saveOrUpdate();
+		String sellerCustomerId = sellerCustomer.getId();
 
 		CustomerJoinCustomerTypeQuery.me().deleteBySellerCustomerId(sellerCustomerId);
 
@@ -203,7 +206,6 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		String _userIds = getPara("userIds");
 
 		if (StrKit.isBlank(_userIds)) {// 业务员修改时
-			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 			UserJoinCustomerQuery.me().deleteBySelerCustomerIdAndUserId(sellerCustomerId, user.getId());
 			_userIds = user.getId();
 		} else {
@@ -214,13 +216,13 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 
 		for (String userId : userIdArray) {
 
-			User user = UserQuery.me().findById(userId);
+			User persist = UserQuery.me().findById(userId);
 			UserJoinCustomer uCustomer = new UserJoinCustomer();
 
 			uCustomer.setSellerCustomerId(sellerCustomerId);
 			uCustomer.setUserId(userId);
-			uCustomer.setDeptId(user.getDepartmentId());
-			uCustomer.setDataArea(user.getDataArea());
+			uCustomer.setDeptId(persist.getDepartmentId());
+			uCustomer.setDataArea(persist.getDataArea());
 
 			uCustomer.save();
 		}
@@ -459,6 +461,166 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		List<Record> list = UserJoinCustomerQuery.me().findCustomerTypeBySellerCustomerId(sellerCustomerId, dept_dataArea+"%");
 		renderAjaxResultForSuccess("success",JSON.toJSON(list));
 
+	}
+	
+	public void audit() {
+		
+		keepPara();
+		
+		String id = getPara("id");
+		String taskId = getPara("taskId");
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+
+		if (StrKit.isBlank(id)) {
+			renderError(500);
+			return;
+		}
+		
+		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(id);
+		setAttr("sellerCustomer", sellerCustomer);
+
+		List<Record> list = UserJoinCustomerQuery.me().findUserListBySellerCustomerId(id, selectDataArea);
+
+		int length = list.size();
+		String[] userIds = new String[length];
+		String[] realnames = new String[length];
+		
+		for (int i = 0; i < length; i++) {
+			userIds[i] = list.get(i).getStr("user_id");
+			realnames[i] = list.get(i).getStr("realname");
+		}
+
+		setAttr("cUserIds", StrKit.join(userIds, ","));
+		setAttr("cUserNames", StrKit.join(realnames, ","));
+		setAttr("cTypeList", CustomerJoinCustomerTypeQuery.me().findCustomerTypeListBySellerCustomerId(id,
+				DataAreaUtil.getUserDealerDataArea(selectDataArea)));
+
+		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
+				.findByDataArea(DataAreaUtil.getUserDealerDataArea(selectDataArea));
+		setAttr("customerTypeList", customerTypeList);
+		
+		WorkFlowService workflowService = new WorkFlowService();
+		Object customerVO = workflowService.getTaskVariableByTaskId(taskId, "customerVO");
+		Object applyer = workflowService.getTaskVariableByTaskId(taskId, "applyUsername");
+		if (applyer != null) {
+			User user = UserQuery.me().findUserByUsername(applyer.toString());
+			setAttr("applyer", user);
+		}
+		
+		if (customerVO != null) {
+			CustomerVO src = new CustomerVO();
+			CustomerVO dest = (CustomerVO) customerVO;
+			
+			src.setNickname(sellerCustomer.getNickname());
+			src.setSellerCustomerId(sellerCustomer.getId());
+			src.setCustomerId(sellerCustomer.getCustomerId());
+			
+			src.setContact(sellerCustomer.getStr("contact"));
+			src.setMobile(sellerCustomer.getStr("mobile"));
+			src.setAddress(sellerCustomer.getStr("address"));
+			src.setCustomerName(sellerCustomer.getStr("customer_name"));
+			
+			String areaName = Joiner.on(",").skipNulls()
+				.join(sellerCustomer.getStr("prov_name")
+					, sellerCustomer.getStr("city_name")
+					, sellerCustomer.getStr("country_name"));
+			src.setAreaName(areaName);
+			
+			String areaCode = Joiner.on(",").skipNulls()
+				.join(sellerCustomer.getStr("prov_code")
+					, sellerCustomer.getStr("city_code")
+					, sellerCustomer.getStr("country_code"));
+			src.setAreaCode(areaCode);
+//			src.setProvCode(sellerCustomer.getStr("prov_code"));
+//			src.setProvName(sellerCustomer.getStr("prov_name"));
+//			src.setCityCode(sellerCustomer.getStr("city_code"));
+//			src.setCityName(sellerCustomer.getStr("city_name"));
+//			src.setCountryCode(sellerCustomer.getStr("country_code"));
+//			src.setCountryName(sellerCustomer.getStr("country_name"));
+			//src.setCustTypeList(custTypeList);
+			List<String> diffAttrList = contrastObj(src, dest);
+			setAttr("diffAttrList", diffAttrList);
+		}
+	}
+	
+	public void complete() {
+		
+		String taskId = getPara("taskId");
+		Integer status = getParaToInt("status");
+		String customerId = getPara("customerId");
+		String comment = getPara("comment", "批准");
+		
+		SellerCustomer sellerCustomer = new SellerCustomer();
+		
+		boolean updated = true;
+		
+		sellerCustomer = SellerCustomerQuery.me().findById(customerId);
+		sellerCustomer.setStatus(status == 1 ? SellerCustomer.CUSTOMER_NORMAL : SellerCustomer.CUSTOMER_REJECT);
+		
+		if (status == 1) {
+			// 做业务处理
+		}
+		
+		WorkFlowService workflowService = new WorkFlowService();
+		workflowService.completeTask(taskId, comment, null);
+		
+		if (updated)
+			renderAjaxResultForSuccess("操作成功");
+		else
+			renderAjaxResultForError("操作失败");
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public List<String> contrastObj(Object src, Object dest) {
+		
+		if (src instanceof CustomerVO && dest instanceof CustomerVO) {
+			CustomerVO scustomer = (CustomerVO) src;
+			CustomerVO dcustomer = (CustomerVO) dest;
+			List<String> diffAttrList = new ArrayList<String>();
+			
+			try {
+				Class clazz = scustomer.getClass();
+				Field[] fields = scustomer.getClass().getDeclaredFields();
+				
+				for (Field field : fields) {
+					
+					if (StrKit.equals(field.getName(), "serialVersionUID")) {
+						continue;
+					}
+					
+					JSONField jsonField = field.getAnnotation(JSONField.class);
+					if (jsonField == null)
+						continue;
+					
+					PropertyDescriptor pd = new PropertyDescriptor(field.getName(), clazz);
+					Method getMethod = pd.getReadMethod();
+					Object srcObj = getMethod.invoke(scustomer);
+					Object destObj = getMethod.invoke(dcustomer);
+					
+					if (srcObj == null && destObj == null) {
+						continue;
+					} else {
+						if (destObj != null) {
+							if (srcObj != null) {
+								System.out.println(srcObj.toString() + "-->>>" + destObj.toString());
+								if(!srcObj.toString().equals(destObj.toString())) {
+									diffAttrList.add(jsonField.name() + ": " + destObj.toString());
+								}
+								
+							} else {
+								diffAttrList.add(jsonField.name() + ": " + destObj.toString());
+							}
+						}
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				return null;
+			}
+			
+			return diffAttrList;
+		}
+		return null;
 	}
 
 }

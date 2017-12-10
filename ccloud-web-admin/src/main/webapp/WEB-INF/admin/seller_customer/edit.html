@@ -306,15 +306,21 @@
                             <input class="form-control input-sm" type="text" name="customer.contact" value="${(sellerCustomer.contact)!}" placeholder="1-15个任意字母数字">
                         </div>
                     </div>
+                    <div class="col-sm-5">
+                        <label class="control-label col-sm-4">客户编号:</label>
+                        <div class="input-group col-sm-7">
+                            <input class="form-control input-sm" type="text" name="customer.customer_code" value="${(sellerCustomer.customer_code)!}" placeholder="1-15个任意字母数字">
+                        </div>
+                    </div>
+                </div>
+				
+                <div class="form-group">
                     <div class="col-sm-5 validata-box">
                         <label class="control-label col-sm-4">手机号:</label>
                         <div class="input-group col-sm-7">
                             <input class="form-control input-sm" type="text" name="customer.mobile" value="${(sellerCustomer.mobile)!}" placeholder="11位数字">
                         </div>
                     </div>
-                </div>
-				
-                <div class="form-group">
                     <div class="col-sm-5 validata-box">
                         <label class="control-label col-sm-4">客户类型:</label>
                         <div class="input-group col-sm-7">
@@ -325,18 +331,6 @@
 	                        </select>
                         </div>
                     </div>
-                    <@shiro.hasPermission name="/admin/dealer/all, /admin/all"> 
-                    <div class="col-sm-5 validata-box">
-                        <label class="control-label col-sm-4">负责人:</label>
-                        <div class="input-group col-sm-7">
-                            <input type="hidden" name="userIds" id="userIds" value="${cUserIds!}">
-                            <input class="form-control input-sm" type="text" id="userNames" name="userNames" value="${cUserNames!}" disabled="disabled">
-                            <div class="input-group-addon" id="_menu_tree" style="cursor:pointer;">
-                                <i class="fa fa-search"></i> 选择
-                            </div>
-                        </div>
-                    </div>
-                    </@shiro.hasPermission>
                 </div>
                 
                 <div class="form-group">
@@ -357,6 +351,21 @@
                         </div>
                     </div>
                 </div>
+                
+                <@shiro.hasPermission name="/admin/dealer/all, /admin/all"> 
+                <div class="form-group">
+                    <div class="col-sm-5 validata-box">
+                        <label class="control-label col-sm-4">负责人:</label>
+                        <div class="input-group col-sm-7">
+                            <input type="hidden" name="userIds" id="userIds" value="${cUserIds!}">
+                            <input class="form-control input-sm" type="text" id="userNames" name="userNames" value="${cUserNames!}" disabled="disabled">
+                            <div class="input-group-addon" id="_menu_tree" style="cursor:pointer;">
+                                <i class="fa fa-search"></i> 选择
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </@shiro.hasPermission>
                 
                 <div class="form-group">
 	                <div class="col-sm-5 validata-box">

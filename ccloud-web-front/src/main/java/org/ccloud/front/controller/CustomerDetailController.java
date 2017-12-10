@@ -1,21 +1,46 @@
 package org.ccloud.front.controller;
 
-import com.jfinal.aop.Before;
-import com.jfinal.kit.Kv;
-import com.jfinal.kit.StrKit;
-import com.jfinal.plugin.activerecord.Record;
-import com.jfinal.plugin.activerecord.tx.Tx;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
-import org.ccloud.model.*;
-import org.ccloud.model.query.*;
+import org.ccloud.model.Customer;
+import org.ccloud.model.CustomerJoinCustomerType;
+import org.ccloud.model.CustomerType;
+import org.ccloud.model.Department;
+import org.ccloud.model.SellerCustomer;
+import org.ccloud.model.User;
+import org.ccloud.model.WxMessageTemplate;
+import org.ccloud.model.query.CustomerJoinCustomerTypeQuery;
+import org.ccloud.model.query.CustomerQuery;
+import org.ccloud.model.query.CustomerTypeQuery;
+import org.ccloud.model.query.DepartmentQuery;
+import org.ccloud.model.query.SellerBrandQuery;
+import org.ccloud.model.query.SellerCustomerQuery;
+import org.ccloud.model.query.UserQuery;
+import org.ccloud.model.query.WxMessageTemplateQuery;
+import org.ccloud.model.vo.CustomerVO;
+import org.ccloud.model.vo.ImageJson;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.workflow.service.WorkFlowService;
 import org.joda.time.DateTime;
 
-import java.util.*;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.beust.jcommander.internal.Lists;
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+import com.jfinal.aop.Before;
+import com.jfinal.kit.Kv;
+import com.jfinal.kit.StrKit;
+import com.jfinal.plugin.activerecord.tx.Tx;
 
 /**
  * Created by WT on 2017/12/7.
@@ -26,12 +51,13 @@ public class CustomerDetailController extends BaseFrontController {
 	public void index() {
 
 		User user = getUser();
-		String id = getPara("sellerCustomerId");
+		String taskId = getPara("taskId");
+		String sellerCustomerId = getPara("sellerCustomerId");
 		String selectDataArea = getUserDeptDataArea(user.getDataArea());
 
-		if (StrKit.notBlank(id)) {
-			Record sellerCustomer = SellerCustomerQuery.me().findMoreById(id);
-			List<String> typeList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeListBySellerCustomerId(id,
+		if (StrKit.notBlank(sellerCustomerId)) {
+			SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(sellerCustomerId);
+			List<String> typeList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeListBySellerCustomerId(sellerCustomerId,
 					DataAreaUtil.getUserDealerDataArea(selectDataArea));
 
 			List<String> typeName = new ArrayList<>();
@@ -40,7 +66,12 @@ public class CustomerDetailController extends BaseFrontController {
 
 			setAttr("sellerCustomer", sellerCustomer);
 			setAttr("cTypeList",typeList);
-			setAttr("cTypeName", org.apache.shiro.util.StringUtils.join(typeName.iterator(),","));
+//			setAttr("cTypeName", org.apache.shiro.util.StringUtils.join(typeName.iterator(),","));
+			setAttr("cTypeName", Joiner.on(",").join(typeName.iterator()));
+		}
+		
+		if (StrKit.notBlank(taskId)) {
+			
 		}
 
 		render("customer_detail.html");
@@ -68,19 +99,60 @@ public class CustomerDetailController extends BaseFrontController {
 		renderJson(data);
 	}
 
-	@Before(Tx.class)
+	//@Before(Tx.class)
 	public void update() {
-		//获取的前台数据
-		SellerCustomer sellerCustomer = getModel(SellerCustomer.class);
-		Customer customer = getModel(Customer.class);
-
+		
 		boolean updated = false;
-
 		Map<String, Object> map = new HashMap<>();
-
-		map.put("sellerCustomer", sellerCustomer);
-		map.put("customer", customer);
-		if (sellerCustomer != null) updated = auditWorkflow(sellerCustomer.getId(), map);
+		List<ImageJson> list = Lists.newArrayList();
+		
+		Customer customer = getModel(Customer.class);
+		SellerCustomer sellerCustomer = getModel(SellerCustomer.class);
+		
+		String picJson = getPara("pic");
+		String areaCode = getPara("areaCode");
+		String areaName = getPara("areaName");
+		String customerTypeIds = getPara("customerTypeIds", "");
+		
+		System.err.println(customerTypeIds);
+		
+		List<String> custTypeList = Splitter.on(",")
+				.trimResults()
+				.omitEmptyStrings()
+				.splitToList(customerTypeIds);
+		
+		if (StrKit.notBlank(picJson)) {
+			
+			JSONArray array = JSON.parseArray(picJson);
+			for (int i = 0; i < array.size(); i++) {
+				JSONObject obj = array.getJSONObject(i);
+				String pic = obj.getString("pic");
+				String picname = obj.getString("picname");
+				
+				ImageJson image = new ImageJson();
+				image.setImgName(picname);
+				String newPath = upload(pic);
+				image.setSavePath(newPath.replace("\\", "/"));
+				list.add(image);
+			}
+		}
+		
+		CustomerVO temp = new CustomerVO();
+		temp.setAreaCode(areaCode);
+		temp.setAreaName(areaName);
+		temp.setCustTypeList(custTypeList);
+		temp.setContact(customer.getContact());
+		
+		temp.setMobile(customer.getMobile());
+		temp.setAddress(customer.getAddress());
+		temp.setNickname(sellerCustomer.getNickname());
+		temp.setCustomerName(customer.getCustomerName());
+		
+		temp.setImageListStore(JSON.toJSONString(list));
+		map.put("customerVO", temp);
+		
+		if (sellerCustomer != null) 
+			updated = startProcessInstance(sellerCustomer.getId(), map);
 
 		if (updated)
 			renderAjaxResultForSuccess("操作成功");
@@ -100,7 +172,7 @@ public class CustomerDetailController extends BaseFrontController {
 		map.put("isEnabled", isEnabled);
 
 		boolean updated = false;
-		if (id != null) updated = auditWorkflow(id, map);
+		if (id != null) updated = startProcessInstance(id, map);
 
 		//用来处理审核
 		if (updated)
@@ -110,7 +182,7 @@ public class CustomerDetailController extends BaseFrontController {
 	}
 
 	private User getUser(){
-		User user = UserQuery.me().findById("ce05e9008ece42bc986e7bc41edcf4a0");
+		User user = UserQuery.me().findById("53c87914b1ea416681701ed01c05cd21");
 		return user;
 	}
 
@@ -207,17 +279,17 @@ public class CustomerDetailController extends BaseFrontController {
 		}
 	}
 
-	private boolean auditWorkflow(String id,Map<String, Object> param ) {
+	private boolean startProcessInstance(String customerId, Map<String, Object> param) {
 
 		//用来处理审核
-		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(id);
+		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(customerId);
 		boolean updated = true;
 
 		if (sellerCustomer != null) {
 
 			User user = getUser();
+			
 //			Boolean isCustomerAudit = OptionQuery.me().findValueAsBool("isCustomerAudit");
-
 			Boolean isCustomerAudit = true;
 
 			if (isCustomerAudit != null && isCustomerAudit.booleanValue()) {
@@ -235,7 +307,7 @@ public class CustomerDetailController extends BaseFrontController {
 				param.put("manager", manager.getUsername());
 
 				WorkFlowService workflow = new WorkFlowService();
-				String procInstId = workflow.startProcess(sellerCustomer.getId(), defKey, param);
+				String procInstId = workflow.startProcess(customerId, defKey, param);
 
 				sellerCustomer.setProcDefKey(defKey);
 				sellerCustomer.setProcInstId(procInstId);
@@ -246,7 +318,7 @@ public class CustomerDetailController extends BaseFrontController {
 
 					Kv kv = Kv.create();
 
-					WxMessageTemplate messageTemplate = WxMessageTemplateQuery.me().findByCode("_customer_audit");
+					WxMessageTemplate messageTemplate = WxMessageTemplateQuery.me().findByCode(defKey);
 
 					kv.set("touser", manager.getWechatOpenId());
 					kv.set("templateId", messageTemplate.getTemplateId());
@@ -265,5 +337,23 @@ public class CustomerDetailController extends BaseFrontController {
 		}
 
 		return updated;
+	}
+	
+	public void complete() {
+		
+//		Customer customer = getModel(Customer.class);
+//		SellerCustomer sellerCustomer = getModel(SellerCustomer.class);
+		
+		String taskId = getPara("taskId");
+		String comment = getPara("comment");
+		
+		WorkFlowService workflowService = new WorkFlowService();
+		workflowService.completeTask(taskId, comment, null);
+		
+		// 处理对应的业务逻辑
+		Customer temp = (Customer) workflowService.getTaskVariableByTaskId(taskId, "tempCustomer");
+		System.out.println(JSON.toJSON(temp));
+		
+		renderAjaxResultForSuccess();
 	}
 }

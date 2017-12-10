@@ -168,6 +168,7 @@ public class CustomerController extends BaseFrontController {
 		String id = getPara("id");
 		SellerCustomer customer = SellerCustomerQuery.me().findById(id);
 		
+		
 		if (customer != null) {
 			
 			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);

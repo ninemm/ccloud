@@ -64,7 +64,8 @@
 				{field: "mobile", title: "手机号", align: "center", width: '5%', edit: false},
 				{field: "adr", title: "地址", align: "center", width: '15%',
 					formatter: function(value, row, rowIndex) {
-						return row.prov_name + row.city_name + row.country_name + row.address;
+						//return row.prov_name + row.city_name + row.country_name + row.address;
+						return row.address;
 					},
 					edit: false
 				},
