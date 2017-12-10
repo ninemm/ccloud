@@ -193,7 +193,7 @@
 	<#include "_inc/_goback.html" />
 	<footer class="weui-footer weui-footer_fixed-bottom">
 	    <#if feedback??>
-	    <a href="javascript:history.go(-1);" class="place-order bg-blue white width-100">返回</a>
+	    <a class="place-order bg-blue white width-100 goback">返回</a>
 	    <#else> 
 		<button id="_submit_btn" onclick="doSubmit()" class="place-order bg-blue white width-100" style="border: 0 ;">确定</button>
 		</#if>

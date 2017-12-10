@@ -277,5 +277,7 @@ $(function() {
 	    closeCombinSearch();
 	}).on('touchend', '#combin-filter span', function () {
 		$(this).addClass('blue-button').siblings().removeClass('blue-button');
+	}).on('touchend', '.goback', function() {
+		historyUtils.back();
 	});
 })
