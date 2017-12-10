@@ -792,19 +792,35 @@ a {
 }
 
 .choose-good {
-  width: 5rem;
+  width: 4.9rem;
   border: 1px solid #bbb;
   text-align: center;
+  height: 1rem;
+  line-height: 1rem;
+}
+
+.choose-good + .icon-sort-desc {
+  height: 1rem;
+  position: relative;
+  right: .6rem;
+  line-height: 1rem;
+  bottom: .1rem;
 }
 
 .choose-unit {
-  margin-left: 7.246377%;
+  margin-left: 1rem;
   width: 3rem;
   position: absolute;
   top: 0;
   left: 8.2rem;
   border: 1px solid #bbb;
   text-align: center;
+}
+
+.choose-unit + .icon-sort-desc {
+  position: absolute;
+  top: .1rem;
+  left: 11.7rem;
 }
 
 .gift input[name=add-gift] {
