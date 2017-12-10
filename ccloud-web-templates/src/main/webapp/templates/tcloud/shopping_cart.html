@@ -161,13 +161,11 @@ function save(){
 					<input type="checkbox" name="add-gift">
 					<span>添加赠品</span>
 				</div>
-				<div style="display:none">
+				<div style="display:none" class="select-area">
 					<div class="goods">
 						<span>商品</span>
-						<select>
-							<option>选择商品</option>
-							<option>瓶</option>
-						</select>
+						<input type="text" class="choose-good weui-input" readonly placeholder="选择商品">
+						<i class="icon-sort-desc"></i>
 						<input type="checkbox" name="default-goods">
 						<span>默认商品</span>
 					</div>
@@ -182,10 +180,8 @@ function save(){
 								<i class="icon-plus2"></i>
 							</div>
 						</div>
-						<select>
-							<option>件</option>
-							<option>瓶</option>
-						</select>
+						<input type="text" class="choose-unit weui-input" readonly placeholder="单位">
+						<i class="icon-sort-desc"></i>
 					</div>
 				</div>
 			</div>
