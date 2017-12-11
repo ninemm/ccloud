@@ -286,36 +286,43 @@ a {
   background: #fff;
   color: #666;
   border: 1px solid #bbb;
+  height: 100%;
 }
 
 .gray-button {
   background: #bbb;
   color: #fff!important;
+  height: 100%;
 }
 
 .blue-button {
   background: #35b8f0!important;
   color: #fff!important;
+  height: 100%;
 }
 
 .green-button {
   background: #8bc34a!important;
   color: #fff!important;
+  height: 100%;
 }
 
 .yellow-button {
   background: #ff9800!important;
   color: #fff!important;
+  height: 100%;
 }
 
 .navy-button {
   background: #3f51b5!important;
   color: #fff!important;
+  height: 100%;
 }
 
 .red-button {
   background: #e51c23!important;
   color: #fff!important;
+  height: 100%;
 }
 
 
@@ -962,7 +969,7 @@ a {
 
 .head-search div {
   position: relative;
-  border-bottom: 1px solid #bbb;
+  height: 100%;
 }
 
 .head-search input {
@@ -984,10 +991,6 @@ a {
   border: none;
 }
 
-.has-th-list {
-  display: flex;
-}
-
 .has-th-list .head-search div:last-child i {
   border-right: 1px solid #bbb;
 }
@@ -999,7 +1002,6 @@ a {
 #combin-filter-btn {
   width: 10%;
   color: #9b9b9b;
-  border-bottom: 1px solid #bbb;
   position: relative;
   background: #fff;
 }
@@ -1048,6 +1050,10 @@ a {
 
 .customer-href .weui-flex__item {
   text-align: right;
+}
+
+.operate-btn {
+  height: 1.5rem;
 }
 
 
@@ -1612,7 +1618,7 @@ input[name=input-type] {
     width: 25%;
     font-size: 0.7rem;
   }
-  #my-order .has-th-list div:last-child i{
+  #my-order .has-th-list .weui-flex div:last-child i{
     padding: 0;
   }
 }
