@@ -71,7 +71,7 @@ public class GoodsTypeQuery extends JBaseQuery {
 		return DAO.doFind();
 	}
 	
-	public List<GoodsType> findProductType(String dataArea){
+	public List<GoodsType> findGoodsType(String dataArea){
 		StringBuilder sqlBuilder = new StringBuilder("select distinct cc_gt.id,cc_gt.`name` ");
 		sqlBuilder.append("from cc_inventory cc_i left join cc_product cc_p on cc_i.product_id = cc_p.id left join cc_goods cc_g on cc_p.goods_id = cc_g.id left join cc_goods_type cc_gt on cc_g.goods_type_id = cc_gt.id ");
 		sqlBuilder.append("where cc_i.data_area like '"+dataArea+"'");

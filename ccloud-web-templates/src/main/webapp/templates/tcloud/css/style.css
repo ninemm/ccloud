@@ -495,10 +495,6 @@ a {
   text-align: center;
 }
 
-.select-area {
-  padding-top:50px;
-}
-
 .menu {
   display: inline-block;
   background: #35b8f0;
@@ -533,7 +529,8 @@ a {
 
 .showInventoryMenu{
   position: absolute;
-  margin-top: 60px;
+  margin-top: 50px;
+  margin-bottom: 50px;
 }
 
 .menu-left {

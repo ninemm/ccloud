@@ -14,7 +14,6 @@ import org.ccloud.core.BaseFrontController;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.GoodsType;
-import org.ccloud.model.Inventory;
 import org.ccloud.model.Product;
 import org.ccloud.model.Seller;
 import org.ccloud.model.SmsCode;
@@ -30,7 +29,6 @@ import org.ccloud.shiro.CaptchaUsernamePasswordToken;
 import org.ccloud.utils.CookieUtils;
 import org.ccloud.utils.DataAreaUtil;
 
-import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.kit.Ret;
 import com.jfinal.kit.StrKit;
@@ -186,45 +184,51 @@ public class UserController extends BaseFrontController{
 	
 	public void inventory() {
 		User loginUser = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String wareHouseId = getPara("mobile");
-		String productName = getPara("product");
+		//String wareHouseId = getPara("mobile");
+		//String productName = getPara("product");
 		String sellerId = getPara("sellerId");
 		String deptDataArea = loginUser!=null?DataAreaUtil.getUserDeptDataArea(loginUser.getDataArea()):"";
 		String deptId = "";
-		List<Record> inventoryList = InventoryQuery.me().findDetailByApp(wareHouseId,productName,sellerId,deptDataArea,deptId);
-		
-		List<Product> productList = ProductQuery.me().findAllProduct();
-		//renderJson(inventoryList);
+		//Page<Record> inventoryList = InventoryQuery.me().findDetailByApp(getPageNumber(), getPageSize(),"","",sellerId,deptDataArea,deptId);
+		Page<Record> inventoryList = InventoryQuery.me().findDetailByParams("","", sellerId, "", deptId, deptDataArea,"",getPageNumber(), getPageSize());
+
+		List<GoodsType> goodsTypeList = GoodsTypeQuery.me().findGoodsType(deptDataArea+"%");
 		setAttr("inventoryList", inventoryList);
-		setAttr("productList", productList);
+		setAttr("goodsTypeList", goodsTypeList);
 		render("inventory.html");
 	}
 	
 	public void appLoadRegionAndProductType() {
 		User loginUser = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String deptDataArea = loginUser!=null?DataAreaUtil.getUserDeptDataArea(loginUser.getDataArea()):"001";
-		List<Seller> sellerList = SellerQuery.me().findSellerRegion(deptDataArea+"%");
+		String goodsType = getPara("goodsType");
+		String queryType = getPara("queryType");
 		List<Map<String, Object>> regionList = new ArrayList<>();
-		Map<String, Object> region = new HashMap<>();
-		region.put("title", "全部");
-		region.put("value", "");
-		regionList.add(region);
-		for(Seller seller : sellerList) {
-			Map<String, Object> item = new HashMap<>();
-			item.put("title", seller.getSellerName());
-			item.put("value", seller.getId());
-			regionList.add(item);
+		if(!queryType.equals("productType")) {
+			String deptDataArea = loginUser!=null?DataAreaUtil.getUserDeptDataArea(loginUser.getDataArea()):"";
+			List<Seller> sellerList = SellerQuery.me().findSellerRegion(deptDataArea+"%");
+			Map<String, Object> region = new HashMap<>();
+			region.put("title", "全部");
+			region.put("value", "");
+			regionList.add(region);
+			for(Seller seller : sellerList) {
+				Map<String, Object> item = new HashMap<>();
+				item.put("title", seller.getSellerName());
+				item.put("value", seller.getId());
+				regionList.add(item);
+			}
 		}
-		List<GoodsType> productTypeList = GoodsTypeQuery.me().findProductType(deptDataArea+"%");
+		//List<GoodsType> productTypeList = GoodsTypeQuery.me().findProductType(deptDataArea+"%");
+		goodsType = (!StrKit.notBlank(goodsType))?"":goodsType;
+		List<Product> productList = ProductQuery.me().findAllProduct(goodsType);
 		List<Map<String, Object>> typeList = new ArrayList<>();
 		Map<String, Object> type = new HashMap<>();
 		type.put("title", "全部");
 		type.put("value", "");
 		typeList.add(type);
-		for(GoodsType productType : productTypeList) {
+		for(Product product : productList) {
 			Map<String, Object> item = new HashMap<>();
-			item.put("title", productType.getName());
-			item.put("value", productType.getId());
+			item.put("title", product.getName());
+			item.put("value", product.getId());
 			typeList.add(item);
 		}
 		Map<String, List<Map<String, Object>>> data = ImmutableMap.of("region", regionList, "productType", typeList);
@@ -238,20 +242,22 @@ public class UserController extends BaseFrontController{
 		int pageSize = Integer.parseInt(getPara("pageSize"));
 		String sellerId = getPara("region");
 		String productType = getPara("productType");
+		productType = productType.equals("全部")?"":productType;
 		String isOrdered = getPara("isOrdered");
 		if(isOrdered==null)isOrdered="00";
-		String productName = getPara("goodsType");
-		productName = productName.equals("全部商品")?"":productName;
-		String wareHouseId = "";
+		String goodsType = getPara("goodsType");
+		goodsType = goodsType.equals("00")||goodsType==null?"":goodsType;
 		String deptDataArea = loginUser!=null?DataAreaUtil.getUserDeptDataArea(loginUser.getDataArea()):"";
 		String deptId = "";
-		Page<Record> inventoryList = InventoryQuery.me().findDetailByParams(productName, sellerId, productType, deptId, deptDataArea,isOrdered,pageNumber,pageSize);
+		Page<Record> inventoryList = InventoryQuery.me().findDetailByParams(search,goodsType, sellerId, productType, deptId, deptDataArea,isOrdered,pageNumber,pageSize);
 		StringBuilder inventoryHtml = new StringBuilder();
 		for (Record inventory : inventoryList.getList()) {
-			inventoryHtml.append("<div class=\"inventory_detail\">");
+			inventoryHtml.append("<div class=\"product_detail\">");
 			inventoryHtml.append("<div class=\"inventory_name\">"+inventory.getStr("name")+"</div>");
-			inventoryHtml.append("<div class=\"weui-flex\"><div class=\"weui-flex__item\">期初结存：<span>"+inventory.getStr("in_count")+"</span></div><div class=\"weui-flex__item\">期末结存：<span>"+inventory.getStr("out_count")+"</span></div></div>");
+			//期初期末结存 未定,暂时不做统计。
+			//inventoryHtml.append("<div class=\"weui-flex\"><div class=\"weui-flex__item\">期初结存：<span>"+inventory.getStr("in_count")+"</span></div><div class=\"weui-flex__item\">期末结存：<span>"+inventory.getStr("out_count")+"</span></div></div>");
 			inventoryHtml.append("<div class=\"weui-flex\"><div class=\"weui-flex__item\">出库：<span class=\"green-button\">"+inventory.getStr("in_count")+"</span></div><div class=\"weui-flex__item\">入库：<span class=\"yellow-button\">"+inventory.getStr("out_count")+"</span></div></div>");
+			inventoryHtml.append("<div class=\"weui-flex\"><div class=\"weui-flex__item\">库存：<span class=\"blue-button\">"+inventory.getStr("balance_count")+"</span></div><div class=\"weui-flex__item\">在途：<span class=\"yellow-button\">"+inventory.getStr("afloat_count")+"</span></div></div>");
 			inventoryHtml.append("<div><i class=\"icon-map-pin blue ft16\"></i>&nbsp;&nbsp;"+inventory.getStr("seller_name")+"</div>");
 			inventoryHtml.append("</div>\n");
 		}
