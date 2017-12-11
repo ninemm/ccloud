@@ -20,6 +20,7 @@ import java.util.List;
 
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Record;
+
 import org.ccloud.model.User;
 
 import com.jfinal.plugin.activerecord.Page;
@@ -212,5 +213,5 @@ public class UserQuery extends JBaseQuery {
 	public User findManagerByDeptId(String deptId) {
 		String sql = "select * from user u left join department d on u.id = d.principal_user_id where d.id = ?";
 		return DAO.findFirst(sql, deptId);
-	}	
+	}
 }

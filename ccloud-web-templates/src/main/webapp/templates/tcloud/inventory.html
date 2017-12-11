@@ -1,0 +1,236 @@
+<#include "_inc/_layout.html"/>
+<#macro css> </#macro>
+<#macro script>
+    var pageNumber = 1;
+    var pageSize = 10;
+    var goodsType = "";
+    var loading = false;
+
+    var $endNode = null;
+    var $loadmore = $(".weui-loadmore");
+    $(function () {
+        FastClick.attach(document.body);
+        $.ajax({
+            url:"${CPATH}/user/appLoadRegionAndProductType",
+            type:"post",
+            dataType:"json",
+            success:function(data) {
+
+                $("#region").select({
+                title: "客户区域",
+                items: data.region
+                });
+
+                $("#product-type").select({
+                title: "产品类型",
+                items: data.productType
+                });
+
+                $("#if-order").select({
+                title: "是否下单",
+                items: [{
+                    title: "全部", value: "00"
+                },{
+                    title: "是", value: "1"
+                },{
+                    title: "否",value: "0"
+                }]
+                });
+            }
+        });
+    /**
+        $("#region").select({
+        title: "选择客户区域",
+        items: ["全部", "总部-默认区域"]
+        });
+        $("#product-type").select({
+        title: "选择客户类型",
+        items: ["全部", "毛铺", "劲酒"]
+        });
+        $("#if-order").select({
+        title: "是否下单",
+        items: ["全部", "是", "否"]
+        });**/
+    });
+
+    var paramData = function() {
+        return  {
+            "search": $("#searchInput")[0].value,
+            "pageNumber": pageNumber,
+            "pageSize": pageSize,
+            "region": $("#region")[0].dataset.values,
+            "productType": $("#product-type")[0].dataset.values,
+            "isOrdered": $("#if-order")[0].dataset.values,
+            "goodsType": goodsType
+        };
+    }
+
+    //监听滚动
+    $(".infinite").infinite().on("infinite", function() {
+        var self = this;
+        $endNode = $(".inventory_detail:last");
+        $loadmore = $(self).find(".weui-loadmore");
+        if ($loadmore) $loadmore.show();
+        if (loading) return ;
+        loading = true;
+
+        $.ajax({
+            type: "post",
+            url: "${CPATH}/user/appLoadFollowUpData",
+            data: paramData(),
+            dataType: "json",
+            success:function(data) {
+                    if ($loadmore) $loadmore.show();
+                        if (data.totalPage >= pageNumber) {
+                        $endNode.after(result.inventoryHtml);
+                    }
+                    if (data.totalPage = pageNumber) {
+                        $(".infinite").destroyInfinite();
+                        $loadmore.hide();
+                    }
+                pageNumber++;
+                loading = false;
+            }
+        });
+    });
+
+    $("#products ul li").on("click",function(){
+        var $product = this;
+        goodsType = $($product).text();
+        loadInventoryDetail();
+        $('#products ul li').removeClass("active");
+        $($product).addClass("active");
+
+    });
+    $(".weui-input").on("change",function(){
+        loadInventoryDetail();
+    });
+
+    function loadInventoryDetail(){
+        $.ajax({
+        url: '/ccloud-web-front/user/appLoadFollowUpData',
+        type: 'post',
+        data:paramData(),
+        success: function (result) {
+            //var productList = result.data.list;
+            $("#inventory_detailList").html("");
+            //var strHtml = "";
+            /*for( row in productList ){
+            var rowData = productList[row];
+            strHtml += '<div class="inventory_detail">';
+            strHtml += '<div class="inventory_name">'+rowData.name+'</div>';
+            strHtml += '<div class="weui-flex"><div class="weui-flex__item">期初结存：<span>'+rowData.in_count+'</span></div><div class="weui-flex__item">期末结存：<span>'+rowData.out_count+'</span></div></div>';
+            strHtml += '<div class="weui-flex"><div class="weui-flex__item">出库：<span class="green-button">'+rowData.in_count+'</span></div><div class="weui-flex__item">入库：<span class="yellow-button">'+rowData.out_count+'</span></div></div>';
+            strHtml += '<div><i class="icon-map-pin blue ft16"></i>&nbsp;&nbsp;'+rowData.seller_name+'</div>';
+            strHtml += '</div>';
+            }*/
+            $("#inventory_detailList").html(result.inventoryHtml);
+            }
+        });
+    }
+</#macro>
+<@layout>
+<header>
+    <div class="weui-search-bar" id="searchBar">
+        <form class="weui-search-bar__form">
+            <div class="weui-search-bar__box">
+                <i class="weui-icon-search"></i>
+                <input type="search" class="weui-search-bar__input" id="searchInput" placeholder="搜索" required="">
+                <a href="javascript:" class="weui-icon-clear" id="searchClear"></a>
+            </div>
+            <label class="weui-search-bar__label" id="searchText">
+                <i class="weui-icon-search"></i>
+                <span>请输入商品</span>
+            </label>
+        </form>
+        <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
+    </div>
+</header>
+<article  class="inventory">
+    <div class="ft14" id="inventoryView">
+        <header class="has-th-list">
+            <div class="head-search select-area">
+                <div>
+                    <input type="text" id="region" placeholder="客户区域" class="weui-input" readonly>
+                    <i class="icon-sort-desc"></i>
+                </div>
+                <div>
+                    <input type="text" id="product-type" placeholder="产品类型" class="weui-input" readonly>
+                    <i class="icon-sort-desc"></i>
+                </div>
+                <div>
+                    <input type="text" id="if-order" placeholder="是否下单" class="weui-input" readonly>
+                    <i class="icon-sort-desc"></i>
+                </div>
+            </div>
+            <div id="combin-filter-btn" style="height:50px;margin-top:50px;">
+                <i class="icon-th-list"></i>
+            </div>
+        </header>
+        <div>
+            <div id="products" class="menu-left showInventoryMenu">
+                <ul>
+                    <li id="allProduct" class="active">全部商品</li>
+                    <#list productList as product >
+                        <li>${(product.name)!}</li>
+                    </#list>
+                </ul>
+            </div>
+        </div>
+    <article  class="infinite">
+        <div class="menu-right showInventoryMenu" id="inventory_detailList">
+            <#list inventoryList as inventory >
+                <div class="inventory_detail">
+                    <div class="inventory_name">
+                        ${(inventory.name)!}
+                    </div>
+                    <div class="weui-flex">
+                        <div class="weui-flex__item">
+                            期初结存：
+                            <span>${(inventory.in_count)!}</span>
+                        </div>
+                        <div class="weui-flex__item">
+                            期末结存：
+                            <span>${(inventory.out_count)!}</span>
+                        </div>
+                    </div>
+                    <div class="weui-flex">
+                        <div class="weui-flex__item">
+                            出库：
+                            <span class="green-button">${(inventory.in_count)!}</span>
+                        </div>
+                        <div class="weui-flex__item">
+                            入库：
+                            <span class="yellow-button">${(inventory.out_count)!}</span>
+                        </div>
+                    </div>
+                    <div>
+                        <i class="icon-map-pin blue ft16"></i>
+                        &nbsp;&nbsp;${(inventory.seller_name)!}
+                    </div>
+                </div>
+            </#list>
+        </div>
+    </div>
+</article>
+</article>
+<div class="hidden-menu">
+    <ul>
+        <li>
+            <a href="index.html">
+                首页
+                <i class="icon-home blue"></i>
+            </a>
+        </li>
+        <li>
+            <a href="javascript:history.go(-1)">
+                上一页
+                <i class="icon-undo green"></i>
+            </a>
+        </li>
+    </ul>
+    <i class="icon-menu-open orange fr" id="button"></i>
+</div>
+<div class="layer"></div>
+<#include "_inc/_footer_nav.html" />
+</@layout>

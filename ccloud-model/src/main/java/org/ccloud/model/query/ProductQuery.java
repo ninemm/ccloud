@@ -338,4 +338,10 @@ public class ProductQuery extends JBaseQuery {
 		}
 		return plist;
 	}
+	
+	public List<Product> findAllProduct(){
+		String select ="select distinct name from cc_product ";
+		return DAO.find(select);
+	}
+	
 }

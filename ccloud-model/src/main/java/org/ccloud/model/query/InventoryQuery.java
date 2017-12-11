@@ -134,4 +134,44 @@ public class InventoryQuery extends JBaseQuery {
 		defaultSqlBuilder.append(" WHERE i.seller_id = ? AND i.product_id = ? order by w.is_default desc");
 		return Db.find(defaultSqlBuilder.toString(), sellerId, productId);
 	}
+	
+	public List<Record> findDetailByApp(String wareHouseId,String productName, String sellerId, String dataArea, String deptId){
+		StringBuilder fromBuilder = new StringBuilder("select cc_s.id,cc_s.seller_name,cc_s.seller_code,cc_s.seller_type,cc_i.product_id,cc_p.`name`,count(cc_i.in_count) in_count,count(cc_i.out_count) out_count ");
+		fromBuilder.append("from cc_inventory cc_i left join cc_seller cc_s on cc_i.seller_id = cc_s.id left join cc_product cc_p on cc_i.product_id = cc_p.id ");
+		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
+		needWhere = appendIfNotEmpty(fromBuilder, "cc_i.warehouseId", wareHouseId, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "cc_p.`name`", productName, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "cc_i.seller_id", sellerId, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "cc_i.dept_id", deptId, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cc_i.data_area", dataArea, params, needWhere);
+		fromBuilder.append("GROUP BY cc_s.id,cc_i.product_id ");
+		fromBuilder.append("limit 0,10 ");
+		List<Record> list = Db.find(fromBuilder.toString(), params.toArray());	
+		return list;
+	}
+	/**APP端 库存详情 数据**/
+	public Page<Record> findDetailByParams(String productName, String sellerId, String productType, String deptId, String dataArea,String isOrdered, int page, int pageSize){
+		String select ="select cc_s.id,cc_s.seller_name,cc_s.seller_code,cc_s.seller_type,cc_i.product_id,cc_p.`name`,count(cc_i.in_count) in_count,count(cc_i.out_count) out_count ,querys.counts ";
+		//StringBuilder fromBuilder = new StringBuilder("select cc_s.id,cc_s.seller_name,cc_s.seller_code,cc_s.seller_type,cc_i.product_id,cc_p.`name`,count(cc_i.in_count) in_count,count(cc_i.out_count) out_count ");
+		StringBuilder fromBuilder = new StringBuilder("from cc_inventory cc_i left join cc_seller cc_s on cc_i.seller_id = cc_s.id left join cc_product cc_p on cc_i.product_id = cc_p.id left join cc_goods cc_g on cc_p.goods_id = cc_g.id left join cc_goods_type cc_gt on cc_g.goods_type_id = cc_gt.id ");
+		//fromBuilder.append("from cc_inventory cc_i left join cc_seller cc_s on cc_i.seller_id = cc_s.id left join cc_product cc_p on cc_i.product_id = cc_p.id ");
+		//fromBuilder.append("left join cc_goods cc_g on cc_p.goods_id = cc_g.id left join cc_goods_type cc_gt on cc_g.goods_type_id = cc_gt.id ");
+		fromBuilder.append("left join (select csp.seller_id seller_id,csp.product_id product_id,count(csod.id) counts from cc_seller_product csp left join  cc_sales_order_detail csod on csp.id = csod.sell_product_id group by csp.seller_id,csp.product_id) querys on querys.seller_id = cc_s.id and querys.product_id = cc_i.product_id ");
+		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
+		needWhere = appendIfNotEmpty(fromBuilder, "cc_p.`name`", productName, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "cc_i.seller_id", sellerId, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "cc_gt.id", productType, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "cc_i.dept_id", deptId, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cc_i.data_area", dataArea, params, needWhere);
+		fromBuilder.append("GROUP BY cc_s.id,cc_i.product_id ");
+		if(isOrdered.equals("0")) {
+			fromBuilder.append("having querys.counts<=0 or ISNULL(querys.counts)=1 ");
+		}else if(isOrdered.equals("1")){
+			fromBuilder.append("having querys.counts>0 ");
+		}
+		return Db.paginate(page, pageSize,select, fromBuilder.toString(),params.toArray());
+	}
+	
 }

@@ -438,6 +438,12 @@ a {
   width: 100%;
   bottom: 50px;
 }
+#inventoryView {
+  font-size: 0.7rem;
+  position: absolute;
+  top: 0;
+  bottom: 50px;
+}
 
 #home .weui-grid,
 #my .weui-grid {
@@ -489,6 +495,10 @@ a {
   text-align: center;
 }
 
+.select-area {
+  padding-top:50px;
+}
+
 .menu {
   display: inline-block;
   background: #35b8f0;
@@ -505,7 +515,6 @@ a {
   margin-left: 1.25rem;
 }
 
-
 /* 产品页 */
 
 #product .product_bUnit,
@@ -520,6 +529,11 @@ a {
   bottom: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+}
+
+.showInventoryMenu{
+  position: absolute;
+  margin-top: 60px;
 }
 
 .menu-left {
@@ -1274,6 +1288,17 @@ input[name=sex] {
   text-align: center;
   margin-top: 0.15rem;
   float: right;
+}
+
+#inventory_detailList .inventory_detail span {
+  display: inline-block;
+  width: 2.5rem;
+  height: 1.2rem;
+  line-height: 1.2rem;
+  background: #f2f2f2;
+  text-align: center;
+  margin-top: 0.15rem;
+  /*float: right;*/
 }
 
 #inventory .menu-right .weui-flex__item {
