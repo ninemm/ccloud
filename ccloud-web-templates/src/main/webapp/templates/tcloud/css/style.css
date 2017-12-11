@@ -756,11 +756,13 @@ a {
   color: #bbb;
   display: inline-block;
   width: 72.222222%;
+  height: 100%;
 }
 
 .place-order {
   display: inline-block;
   width: 27.777778%;
+  height: 100%;
 }
 
 .gift-tag {
@@ -987,7 +989,7 @@ a {
   right: 0;
 }
 
-.head-search div:last-child i {
+.head-search .wuei-flex__item:last-child i {
   border: none;
 }
 

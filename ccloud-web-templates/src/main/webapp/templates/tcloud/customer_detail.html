@@ -333,10 +333,10 @@
     </form>
 </main>
 <#include "_inc/_goback.html" />
-<footer class="weui-footer weui-footer_fixed-bottom ft16">
+<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
     <#if sellerCustomer??>
-        <button class="gray-button width-50 _submit_btn" onclick="doEnabled()">停用</button>
-        <button class="blue-button width-50 _submit_btn" onclick="doSubmit()">更新</button>
+        <button class="gray-button weui-flex__item _submit_btn" onclick="doEnabled()">停用</button>
+        <button class="blue-button weui-flex__item _submit_btn" onclick="doSubmit()">更新</button>
     <#else>
         <button class="blue-button width-100 _submit_btn" onclick="doSubmit()">添加</button>
     </#if>
