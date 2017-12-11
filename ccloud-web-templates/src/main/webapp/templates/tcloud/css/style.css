@@ -1618,7 +1618,7 @@ input[name=input-type] {
     width: 25%;
     font-size: 0.7rem;
   }
-  #my-order .has-th-list div:last-child i{
+  #my-order .has-th-list .weui-flex div:last-child i{
     padding: 0;
   }
 }

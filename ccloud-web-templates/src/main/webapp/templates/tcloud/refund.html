@@ -19,20 +19,22 @@
 
 <@layout>
  <body id="my-order" class="ft12">
-  <header class="has-th-list">
-    <div class="head-search select-area">
-      <div>
-        <input type="text" id="order-status" class="weui-input" readonly placeholder="订单状态" onChange="refresh()">
-        <i class="icon-sort-desc"></i>
-      </div>
-      <div>
-        <input type="text" id="customer-type" placeholder="客户类型" class="weui-input" readonly onChange="refresh()">
-        <i class="icon-sort-desc"></i>
-      </div>
-      <div>
-        <input type="text" id="date" class="weui-input" readonly onChange="refresh()">
-        <i class="icon-sort-desc"></i>
-      </div>
+  <header class="has-th-list weui-flex">
+    <div class="head-search select-area weui-flex__item">
+			<div class="weui-flex">
+				<div class="weui-flex__item">
+					<input type="text" id="order-status" class="weui-input" readonly placeholder="订单状态" onChange="refresh()">
+					<i class="icon-sort-desc"></i>
+				</div>
+				<div class="weui-flex__item">
+					<input type="text" id="customer-type" placeholder="客户类型" class="weui-input" readonly onChange="refresh()">
+					<i class="icon-sort-desc"></i>
+				</div>
+				<div class="weui-flex__item">
+					<input type="text" id="date" class="weui-input" readonly onChange="refresh()">
+					<i class="icon-sort-desc"></i>
+				</div>
+			</div>
     </div>
     <div id="combin-filter-btn">
       <i class="icon-th-list"></i>
