@@ -78,18 +78,17 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 		String type = getPara("type");
 		String id = getPara("id");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String deptDataArea = DataAreaUtil.getUserDeptDataArea(user.getDataArea());
-		Page<Receivables> page = ReceivablesQuery.me().paginate(getPageNumber(),getPageSize(),id,type,deptDataArea);
+		String deptDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		Page<Receivables> page = ReceivablesQuery.me().paginate(getPageNumber(),getPageSize(),id,type,user.getId(),deptDataArea);
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(),"rows", page.getList());
 		
 		renderJson(map);
 	}
 	
 	public void getReceivablesDetail() {
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String type = getPara("type");
 		String id = getPara("id");
-		String deptDataArea = DataAreaUtil.getUserDeptDataArea(user.getDataArea());
+		String deptDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		Map<String, Object> map;
 		if(type != null && id!=null) {
 			Page<ReceivablesDetail> page = ReceivablesDetailQuery.me().paginate(getPageNumber(), getPageSize(), id,type,deptDataArea);

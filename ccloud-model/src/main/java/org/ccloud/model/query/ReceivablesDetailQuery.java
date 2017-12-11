@@ -44,13 +44,14 @@ public class ReceivablesDetailQuery extends JBaseQuery {
 	}
 
 	public Page<ReceivablesDetail> paginate(int pageNumber, int pageSize, String id,String type,String dataArea) {
+		
 		String select = "SELECT ref_type,ref_sn,receive_amount,act_amount,biz_date,balance_amount,create_date";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_receivables_detail` ");
 		fromBuilder.append(" WHERE object_id ='"+id+"'");
 		if("1".equals(type)) {
-			fromBuilder.append(" AND object_type = 'customer'");
+			fromBuilder.append(" AND object_type = 'customer' ");
 		}else {
-			fromBuilder.append(" AND object_type = 'supplier'");
+			fromBuilder.append(" AND object_type = 'supplier' ");
 		}
 		LinkedList<Object> params = new LinkedList<Object>();
 		appendIfNotEmptyWithLike(fromBuilder, "data_area", dataArea, params, false);
