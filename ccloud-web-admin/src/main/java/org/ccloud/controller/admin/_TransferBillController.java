@@ -331,7 +331,7 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 								return false;
 							}
 						  }
-	                    	  InventoryDetail inDetail = InventoryDetailQuery.me().findByWarehouseIdAndProductId(transferBillInfo.getToWarehouseId(),transferBillInfo.getSellerProductId());
+	                    	  InventoryDetail inDetail = InventoryDetailQuery.me().findBalanceCountByWarehouseIdId(transferBillInfo.getToWarehouseId(),transferBillInfo.getSellerProductId());
                               if ("null".equals(String.valueOf(inDetail.getBalanceCount()))) {
 								inDetail.setBalanceCount(new BigDecimal(0));
 								InventoryDetail inInventoryDetail = new InventoryDetail();
