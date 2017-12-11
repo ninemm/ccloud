@@ -76,6 +76,11 @@ public class InventoryDetailQuery extends JBaseQuery {
 		String sql = "select * from cc_inventory_detail where warehouse_id = '"+warehouseId+"' and sell_product_id = '"+productId+"'";
 		return DAO.findFirst(sql);
 	}
+	
+	public InventoryDetail findBalanceCountByWarehouseIdId(String warehouseId, String productId){
+		String sql = "select MAX(create_date),balance_count from cc_inventory_detail where warehouse_id = '"+warehouseId+"' and sell_product_id = '"+productId+"'";
+		return DAO.findFirst(sql);
+	}
 
 	public InventoryDetail findBySellerProductId(String seller_product_id,String warehouse_id) {
 		String sql = "select * from cc_inventory_detail c where c.sell_product_id = '"+seller_product_id+"' and c.warehouse_id ='"+warehouse_id+"' ORDER BY  c.create_date DESC ";

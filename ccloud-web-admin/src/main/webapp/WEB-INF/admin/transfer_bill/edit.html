@@ -63,9 +63,9 @@ function doSubmit(){
 	});
 }
 
+
 //调出仓库和调入仓库不能是同一个仓库
 function checkIsTheSameWarehouse(){
-var from_warehouse_id =  $("#from_warehouse_id").val();
 var to_warehouse_id = $("#to_warehouse_id").val();
  if(from_warehouse_id == to_warehouse_id){
  	alert("调出仓库和调入仓库不能是同一个仓库");
@@ -132,6 +132,7 @@ function addNew() {
     alert("请先选择一个调出仓库");
     return;
     }
+    initProduct(fromWarehouseId);
 	addTr("#dataTable", pList, pOptionArr);
 }
 var index = 1;
