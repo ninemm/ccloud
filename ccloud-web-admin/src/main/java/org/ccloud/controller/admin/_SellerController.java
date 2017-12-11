@@ -32,8 +32,11 @@ import org.ccloud.utils.QRCodeUtils;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Brand;
 import org.ccloud.model.Customer;
+import org.ccloud.model.CustomerType;
 import org.ccloud.model.Department;
+import org.ccloud.model.Group;
 import org.ccloud.model.Product;
+import org.ccloud.model.Role;
 import org.ccloud.model.Seller;
 import org.ccloud.model.SellerBrand;
 import org.ccloud.model.SellerCustomer;
@@ -41,8 +44,12 @@ import org.ccloud.model.SellerProduct;
 import org.ccloud.model.User;
 import org.ccloud.model.UserJoinCustomer;
 import org.ccloud.model.query.BrandQuery;
+import org.ccloud.model.query.CustomerQuery;
+import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.DepartmentQuery;
+import org.ccloud.model.query.GroupQuery;
 import org.ccloud.model.query.ProductQuery;
+import org.ccloud.model.query.RoleQuery;
 import org.ccloud.model.query.SellerBrandQuery;
 import org.ccloud.model.query.SellerProductQuery;
 import org.ccloud.model.query.SellerQuery;
@@ -215,7 +222,51 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				sellerCustomer.set("create_date", new Date());
 				sellerCustomer.save();
 			}
-			
+			//新建销售商时默认导入  分组  角色  客户类型
+			List<Group> groupList = GroupQuery.me().findByDeptId("0");
+			for (Group group : groupList) {
+				Group newGroup=new Group();
+				String groupId = StrKit.getRandomUUID();
+				newGroup.setId(groupId);
+				newGroup.setGroupName(group.getGroupName());
+				newGroup.setGroupCode(group.getGroupCode()+seller.getSellerCode());
+				newGroup.setOrderList(group.getOrderList());
+				newGroup.setDescription(group.getDescription());
+				newGroup.set("dept_id", seller.getDeptId());
+				newGroup.set("data_area", getPara("data_area"));
+				newGroup.setCreateDate(new Date());
+				newGroup.save();
+			}
+			List<Role> roleList = RoleQuery.me().findByDeptId("0");
+			for (Role role : roleList) {
+				Role newRole = new Role();
+				String roleId = StrKit.getRandomUUID();
+				newRole.setId(roleId);
+				newRole.setRoleName(role.getRoleName());
+				newRole.setRoleCode(role.getRoleCode()+seller.getSellerCode());
+				newRole.setOrderList(role.getOrderList());
+				newRole.setDescription(role.getDescription());
+				newRole.set("dept_id", seller.getDeptId());
+				newRole.set("data_area", getPara("data_area"));
+				newRole.setCreateDate(new Date());
+				newRole.save();
+			}
+			List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDept("0");
+			for (CustomerType customerType : customerTypeList) {
+				CustomerType newCustomerType = new CustomerType();
+				String customerTypeId = StrKit.getRandomUUID();
+				newCustomerType.setId(customerTypeId);
+				newCustomerType.setName(customerType.getName());
+				newCustomerType.setCode(customerType.getCode()+seller.getSellerCode());
+				newCustomerType.setIsShow(customerType.getIsShow());
+				newCustomerType.setType(customerType.getType());
+				newCustomerType.setPriceSystemId(customerType.getPriceSystemId());
+				newCustomerType.setProcDefKey(customerType.getProcDefKey());
+				newCustomerType.set("dept_id", seller.getDeptId());
+				newCustomerType.set("data_area", getPara("data_area"));
+				newCustomerType.setCreateDate(new Date());
+				newCustomerType.save();
+			}
 		} else {
 			seller.set("seller_name",getPara("seller_name"));
 			seller.set("seller_code",getPara("seller_code"));
