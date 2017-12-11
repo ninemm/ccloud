@@ -102,16 +102,18 @@
 			var num = $("#productNum").val();
 			num++;
 			$tr.find('td').eq(0).attr("rowspan",product.list.length);
-			$tr.find('td').eq(1).find('div').attr("style",'height:'+product.list.length*57+'px;'+'vertical-align:middle;display:table-cell;');
 			$tr.find('td').eq(1).attr("rowspan",product.list.length);
 			$tr.find('td').eq(2).attr("rowspan",product.list.length);
-			$tr.find('td').eq(2).find('div').attr("style",'height:'+product.list.length*57+'px;'+'vertical-align:middle;display:table-cell;');
 			$tr.find('td').eq(3).attr("rowspan",product.list.length);
-			$tr.find('td').eq(3).find('div').attr("style",'height:'+product.list.length*57+'px;'+'vertical-align:middle;display:table-cell;');
 			$tr.find('td').eq(4).attr("rowspan",product.list.length);
-			$tr.find('td').eq(4).find('div').attr("style",'height:'+product.list.length*57+'px;'+'vertical-align:middle;display:table-cell;');
 			$tr.find('td').eq(5).attr("rowspan",product.list.length);
-			$tr.find('td').eq(5).find('div').attr("style",'height:'+product.list.length*57+'px;'+'vertical-align:middle;display:table-cell;');
+			if(product.list.length>1){
+				$tr.find('td').eq(1).find('div').attr("style",'height:'+product.list.length*57+'px;'+'vertical-align:middle;display:table-cell;');
+				$tr.find('td').eq(2).find('div').attr("style",'height:'+product.list.length*57+'px;'+'vertical-align:middle;display:table-cell;');
+				$tr.find('td').eq(3).find('div').attr("style",'height:'+product.list.length*57+'px;'+'vertical-align:middle;display:table-cell;');
+				$tr.find('td').eq(4).find('div').attr("style",'height:'+product.list.length*57+'px;'+'vertical-align:middle;display:table-cell;');
+				$tr.find('td').eq(5).find('div').attr("style",'height:'+product.list.length*57+'px;'+'vertical-align:middle;display:table-cell;');
+			}
 			$tr.find("#purchaseInstockDetailId").val(product.list.purchaseInstockDetailId);
 			for(var i=1;i<product.list.length;i++){
 				var $tbody = $("#table tbody");

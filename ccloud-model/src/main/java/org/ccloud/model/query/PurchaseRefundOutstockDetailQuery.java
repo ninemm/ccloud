@@ -76,10 +76,10 @@ public class PurchaseRefundOutstockDetailQuery extends JBaseQuery {
 		StringBuilder sqlBuilder = new StringBuilder(
 				" SELECT cprod.*,cp.`name` as productName, cp.big_unit, cp.small_unit, cp.convert_relate,GROUP_CONCAT(distinct cgs.`name`) AS cps_name  ");
 		sqlBuilder.append(" from cc_purchase_refund_outstock_detail cprod ");
-		sqlBuilder.append(" LEFT JOIN cc_product_goods_specification_value cpg ON  cprod.seller_product_id = cpg.product_set_id ");
-		sqlBuilder.append(" LEFT JOIN cc_goods_specification_value cgs ON cpg.goods_specification_value_set_id = cgs.id ");
-		sqlBuilder.append( " LEFT JOIN cc_seller_product csp on csp.id=cprod.seller_product_id ");
+		sqlBuilder.append(" LEFT JOIN cc_seller_product csp on csp.id=cprod.seller_product_id ");
 		sqlBuilder.append(" LEFT JOIN cc_product cp ON  cp.id = csp.product_id ");
+		sqlBuilder.append(" LEFT JOIN cc_product_goods_specification_value cpg ON  cp.id = cpg.product_set_id ");
+		sqlBuilder.append(" LEFT JOIN cc_goods_specification_value cgs ON cpg.goods_specification_value_set_id = cgs.id ");
 		sqlBuilder.append(" where cprod.purchase_refund_outstock_id=? and cprod.data_area='"+dataArea+"' GROUP BY cprod.id ");
 
 		return Db.find(sqlBuilder.toString(), refundId);
