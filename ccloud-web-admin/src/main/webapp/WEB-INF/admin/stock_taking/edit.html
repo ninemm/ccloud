@@ -22,7 +22,6 @@ var $form = $("#form");
 $(function() {
 	
 	jQuery.mm.initValidator('#form', validatorFields)
-	initProduct();
 	
 });
 
@@ -62,13 +61,18 @@ function doSubmit(){
 	});
 }
 
-function initProduct(){
+function initProduct(warehouse_id){
+         var productList = new Array();
+         var productOptionArr = new Array();
+         var productMap = new Map();
          $.ajax({
 				url: "${CPATH}/admin/goods/getProductInfo",
+				data:{"warehouse_id":warehouse_id},
 				dataType: "json",
 				async: false,
 				success: function(data) {
 					productList = data;
+					pList = productList;
 					
 				}
 			});
@@ -80,17 +84,19 @@ function initProduct(){
 					text: item.productList.customName
 				}
 				productOptionArr.push(option);
+		        pOptionArr = productOptionArr;
 				productMap[item.productList.sellerProductId] = item;
+				pMap = productMap;
 			});
 		}
 
 }
 
-<!--商品列表 -->
-var productList = new Array();
-var productOptionArr = new Array();
-var productMap = new Map();
 
+<!--商品列表 -->
+var pList = new Array();
+var pOptionArr = new Array();
+var pMap = new Map();
 function removeTr(obj) {
 	$(obj).parent().parent().remove();
 }
@@ -99,8 +105,22 @@ function deleteTr(obj){
   $(obj).parent().parent().remove();
 }
 
+
+//切换调入仓库后事件
+$("#warehouse_id").change(function(){
+    var fromWarehouseId = $("#warehouse_id").val();
+    initProduct(fromWarehouseId);
+})
+
 function addNew() {
-	addTr("#dataTable", productList, productOptionArr);
+   //添加商品验证，是否选择一个调出仓库
+    var fromWarehouseId = $("#warehouse_id").val();
+    if(fromWarehouseId == "" || fromWarehouseId == null || fromWarehouseId == undefined){
+    alert("请先选择一盘点仓库");
+    return;
+    }
+    initProduct(fromWarehouseId);
+	addTr("#dataTable", pList, pOptionArr);
 }
 var index = 1;
 function addTr(tid, productList, optionArr) {
@@ -109,6 +129,8 @@ function addTr(tid, productList, optionArr) {
 	var goodsName = firstProduct.name;
 	var specification = firstProduct.specificationValue;
 	var big_unit = firstProduct.bigUnit;
+    var balanceCount = firstProduct.balanceCount;
+	
 
 	var $tbody = $(tid + " tbody"),
 	$tr = $tbody.find("tr:eq(0)"),
@@ -123,6 +145,7 @@ function addTr(tid, productList, optionArr) {
     $tbody.find("tr:last>td>#goodsCode").val(goodsCode);
     $tbody.find("tr:last>td>#specification").text(specification);
     $tbody.find("tr:last>td>#big_unit").text(big_unit);
+    $tbody.find("tr:last>td>#balanceCount").text(balanceCount);
     $tbody.find("tr:last>td>#factIndex").attr("value",lastTrIdx);
     $tbody.find("tr:last").find(":input").attr("disabled",false);
     var productCount = 'stockTakingList['+ lastTrIdx +'].product_coun';
@@ -142,17 +165,19 @@ function addTr(tid, productList, optionArr) {
 
     <!--切换商品的方法  -->
     $tbody.find("tr:last>td>select.pro-slc2").change(function(){
-     var result = productMap[$(this).val()].productList;   
+     var result = pMap[$(this).val()].productList;   
      var cgoodsCode = result.sellerProductId;
      var cgoodsName = result.name;
      var cspecification = result.specificationValue;
      var cbig_unit = result.bigUnit;
+     var balanceCount = result.balanceCount;
      var $tr = $(this).parent().parent();
      
      $tr.find("td>#goodsCode").val(cgoodsCode);
      $tr.find("td>#goodsName").html(cgoodsName); 
      $tr.find("td>#specification").text(cspecification);
      $tr.find("td>#big_unit").text(cbig_unit);
+     $tr.find("td>#balanceCount").text(balanceCount);     
      });  
 }
 
@@ -229,7 +254,8 @@ function addTr(tid, productList, optionArr) {
 												<th class="col-sm-2 center">商品名称</th>
 												<th class="col-sm-1 center">规格</th>
 												<th class="col-sm-1 center">单位</th>
-												<th class="col-sm-1 center">数量</th>
+												<th class="col-sm-1 center">库存数量</th>
+												<th class="col-sm-1 center">盘点后数量</th>
 												<th class="col-sm-2 center">备注</th>
 											</tr>
 										</thead>
@@ -249,6 +275,10 @@ function addTr(tid, productList, optionArr) {
 												</td>
 												<td class="text-center">
 													<span class="big_unit" id="big_unit"></span>
+												</td>
+												</td>
+													<td class="text-center">
+													<span class="balanceCount" id="balanceCount"></span>
 												</td>
 												<div class="form-group">
 												<td class="text-center">
@@ -274,7 +304,7 @@ function addTr(tid, productList, optionArr) {
 													<input name="specification" id="specification" value="${plist.specificationValue!}" disabled="disabled"></input>
 												</td>
 												<td class="text-center">
-													<input name="big_unit" id="big_unit" value="${plist.bigUnit!}" disabled="disabled"></input>
+													<input name="balanceCount" id="balanceCount" value="${plist.balanceCount!0}" disabled="disabled"></input>
 												</td>
 												</#list>
 												<td class="text-center">
