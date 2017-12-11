@@ -551,9 +551,10 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
 	}
 	
 	//盘点单获取已盘点的商品信息
-	public void getProductInfoAndIsStockTaking() {
+	public void getProductInfoBySellerIdAndWhouse() {
 		String sellerId = getSessionAttr("sellerId").toString();
-		List<ProductInfo> productList = ProductQuery.me().getProductInfoBySellerId(sellerId);
+		String  warehouseId = getPara("warehouse_id");
+		List<ProductInfo> productList = ProductQuery.me().getProductInfoByInventory(sellerId,warehouseId);
         List<Map<String, Object>> list = new ArrayList<>();
         for (ProductInfo productInfo : productList) {
            Map<String, Object> map = new HashMap<>();

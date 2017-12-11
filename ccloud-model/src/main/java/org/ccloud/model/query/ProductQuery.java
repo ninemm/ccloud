@@ -256,18 +256,28 @@ public class ProductQuery extends JBaseQuery {
 	}
 	
 	
-	//调拨单获取已盘点的商品
-	public List<ProductInfo> getProductInfoBySellerId(String sellerId) {
+	/**
+	 * 
+	* @Title: 通过SellerId和仓库Id去库存总账里面查询商品的信息 
+	* @Description: TODO
+	* @param @param sellerId
+	* @param @param warehouseId
+	* @param @return   
+	* @return List<ProductInfo>    
+	* @throws
+	 */
+	public List<ProductInfo> getProductInfoByInventory(String sellerId,String warehouseId) {
 		StringBuilder fromBuilder = new StringBuilder("SELECT p.create_date as createDate,sp.id as sellerProductId, p.cost, p.is_marketable as isMarketable, p.market_price as marketPrice, p.`name`, p.price, sp.store_count,p.id as productId, ");
-		fromBuilder.append("p.product_sn as productSn,sp.custom_name as customName, p.store, p.store_place,p.big_unit as bigUnit, p.weight, p.weight_unit as weightUnit, g.`code`, b.`name` as brandName, c.`name` as categoryName, t1.valueName ");
+		fromBuilder.append("p.product_sn as productSn,sp.custom_name as customName, p.store, p.store_place,p.big_unit as bigUnit, p.weight, p.weight_unit as weightUnit, g.`code`, b.`name` as brandName, c.`name` as categoryName, t1.valueName,d.balance_count ");
 		fromBuilder.append("FROM cc_product p ");
 		fromBuilder.append("LEFT JOIN cc_seller_product sp ON sp.product_id = p.id ");
 		fromBuilder.append("LEFT JOIN cc_goods g ON p.goods_id = g.id ");
 		fromBuilder.append("LEFT JOIN cc_brand b ON g.brand_id = b.id ");
 		fromBuilder.append("LEFT JOIN cc_goods_category c ON g.goods_category_id = c.id ");
 		fromBuilder.append("LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
-		fromBuilder.append("RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = p.id where sp.is_enable=1 and sp.store_count is not null and sp.seller_id=?");
-		List<Record> list = Db.find(fromBuilder.toString(),sellerId);	
+		fromBuilder.append("RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = p.id  INNER JOIN cc_inventory c2 ON p.id = c2.product_id  INNER JOIN cc_inventory_detail d on d.sell_product_id = sp.id ");
+		fromBuilder.append("and c2.warehouse_id = d.warehouse_id  WHERE c2.seller_id =? AND c2.warehouse_id =?");
+		List<Record> list = Db.find(fromBuilder.toString(),sellerId,warehouseId);	
 		List<ProductInfo> plist = new ArrayList<>();
 		for (Record record : list) {
 			ProductInfo pro = new ProductInfo();
@@ -291,6 +301,7 @@ public class ProductQuery extends JBaseQuery {
 			pro.setSellerProductId(record.getStr("sellerProductId"));
 			pro.setSpecificationValue(record.getStr("valueName"));
 			pro.setStoreCount(record.getBigDecimal("store_count"));
+			pro.setBalanceCount(record.getBigDecimal("balance_count"));
 			plist.add(pro);
 		}
 		return plist;
@@ -334,5 +345,5 @@ public class ProductQuery extends JBaseQuery {
 			plist.add(pro);
 		}
 		return plist;
-	}
+	}	
 }

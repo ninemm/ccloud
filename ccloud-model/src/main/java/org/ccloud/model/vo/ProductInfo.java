@@ -24,8 +24,16 @@ public class ProductInfo {
 	private String customName;
 	private String sellerProductId;
 	private BigDecimal storeCount;
+	private BigDecimal balanceCount;//库存总账中明细的库存
 
-	
+
+	public BigDecimal getBalanceCount() {
+		return balanceCount;
+	}
+
+	public void setBalanceCount(BigDecimal balanceCount) {
+		this.balanceCount = balanceCount;
+	}
 
 	public BigDecimal getStoreCount() {
 		return storeCount;
