@@ -101,7 +101,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		}
 	}
 	
-	//保存经销商信息
+	//保存销售商信息及对应的表
 	/* (non-Javadoc)
 	 * @see org.ccloud.core.JBaseCRUDController#save()
 	 */
@@ -206,13 +206,8 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			
 			
 			if(!user.getUsername().equals("admin")){
-				userJoinCustomer.set("seller_customer_id", customerId);
-				userJoinCustomer.set("user_id", user.getId());
-				userJoinCustomer.set("data_area",department.getDataArea());
-				userJoinCustomer.set("dept_id", department.getId());
-				userJoinCustomer.save();
-				
-				sellerCustomer.set("id", StrKit.getRandomUUID());
+				String sellerCustomerId = StrKit.getRandomUUID();
+				sellerCustomer.set("id", sellerCustomerId);
 				sellerCustomer.set("seller_id", sellerId);
 				sellerCustomer.set("customer_id", customerId);
 				sellerCustomer.set("nickname", getPara("seller_name"));
@@ -226,6 +221,12 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				sellerCustomer.set("dept_id", department.getId());
 				sellerCustomer.set("create_date", new Date());
 				sellerCustomer.save();
+				
+				userJoinCustomer.set("seller_customer_id", sellerCustomerId);
+				userJoinCustomer.set("user_id", user.getId());
+				userJoinCustomer.set("data_area",department.getDataArea());
+				userJoinCustomer.set("dept_id", department.getId());
+				userJoinCustomer.save();
 			}
 			//新建销售商时默认导入  分组  角色  客户类型
 			List<Group> groupList = GroupQuery.me().findByDeptId("0");

@@ -104,7 +104,7 @@ public class RoleQuery extends JBaseQuery {
 
 		sqlBuilder.append("from `role` r ");
 		sqlBuilder.append("left join `group_role_rel` gr on gr.role_id = r.id ");
-		sqlBuilder.append("where LOCATE(gr.group_id, (SELECT ug.group_id FROM user_group_rel ug where ug.user_id = ?)) > 0");
+		sqlBuilder.append("where gr.group_id in (SELECT ug.group_id FROM user_group_rel ug where ug.user_id = ?)");
 
 		return DAO.find(sqlBuilder.toString(), userId);
 	}

@@ -30,7 +30,7 @@ var validatorFields = {
 	'warehouse.code': {
 		validators: {
 			notEmpty: { message: '仓库编码不能为空' },
-	        stringLength: { min: 2, max: 20, message: '供应商编码最少2个字符，最多20字符，请重新输入' }
+	        stringLength: { min: 1, max: 20, message: '供应商编码最少1个字符，最多20字符，请重新输入' }
         }
 	},
 	'warehouse.is_enable': {
@@ -41,11 +41,6 @@ var validatorFields = {
 	'warehouse.phone': {
 		validators: {
 			notEmpty: { message: '联系电话不能为空' },
-	        stringLength: {
-	            min: 11,
-	            max: 11,
-	            message: '请输入11位手机号码'
-	        },
 	        regexp: {
 	            regexp: /^1[3|5|8]{1}[0-9]{9}$/,
 	            message: '请输入正确的手机号码'
