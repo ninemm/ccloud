@@ -177,7 +177,7 @@
 	                                            </p>
 	                                            <p>电话</p>
 	                                        </a>
-	                                        <a class="weui-flex__item" href="/historyOrder?sellerCustomerId=${(customer.sellerCustomerId)!}&customerName=${(customer.customer_name)!}">
+	                                        <a class="weui-flex__item" href="${(CPATH)!}/customer/historyOrder?sellerCustomerId=${(customer.sellerCustomerId)!}&customerName=${(customer.customer_name)!}">
 	                                            <p>
 	                                                <i class="icon-file-text-o blue"></i>
 	                                            </p>
@@ -189,7 +189,7 @@
 	                                            </p>
 	                                            <p>拜访</p>
 	                                        </a>
-	                                        <a class="weui-flex__item relative" href="${CPATH}/customerDetail?sellerCustomerId=${(customer.sellerCustomerId)!}">
+	                                        <a class="weui-flex__item relative" href="/customer/edit?sellerCustomerId=${(customer.sellerCustomerId)!}">
 	                                            <i class="icon-chevron-right gray"></i>
 	                                        </a>
 	                                    </div>
