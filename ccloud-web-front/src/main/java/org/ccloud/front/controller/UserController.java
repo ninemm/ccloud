@@ -1,5 +1,6 @@
 package org.ccloud.front.controller;
 
+import java.math.BigInteger;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -8,6 +9,7 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.subject.Subject;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
+import org.ccloud.interceptor.UserInterceptor;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.SmsCode;
@@ -19,7 +21,11 @@ import org.ccloud.route.RouterMapping;
 import org.ccloud.shiro.CaptchaUsernamePasswordToken;
 import org.ccloud.utils.CookieUtils;
 import org.ccloud.utils.DataAreaUtil;
+import org.ccloud.utils.EncryptUtils;
+import org.ccloud.utils.StringUtils;
 
+import com.jfinal.aop.Clear;
+import com.jfinal.core.ActionKey;
 import com.jfinal.kit.Ret;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
@@ -35,10 +41,88 @@ import com.jfinal.weixin.sdk.api.UserApi;
 public class UserController extends BaseFrontController{
 
 	public void index() {
-		render("user.html");
+		String action = getPara();
+		if (StringUtils.isBlank(action)) {
+			renderError(404);
+		}
+
+		keepPara();
+
+		BigInteger userId = StringUtils.toBigInteger(action, null);
+		if (userId != null) {
+			
+			
+		} else {
+			if ("detail".equalsIgnoreCase(action)) {
+				renderError(404);
+			}
+			render(String.format("user_%s.html", action));
+		}
 	}
 	
-	public void login() {}
+	@Clear(UserInterceptor.class)
+	@ActionKey(Consts.ROUTER_USER_LOGIN) // 固定登录的url
+	public void login() {
+		String username = getPara("username");
+		String password = getPara("password");
+
+		if (username == null || password == null) {
+			render("user_login.html");
+			return;
+		}
+		
+		long errorTimes = CookieUtils.getLong(this, "_login_errors", 0);
+		
+		if (errorTimes >= 3) {
+			if (!validateCaptcha("_login_captcha")) { // 验证码没验证成功！
+				if (isAjaxRequest()) {
+					renderAjaxResultForError("没有该用户");
+				} else {
+					redirect(Consts.ROUTER_USER_LOGIN);
+				}
+				return;
+			}
+		}
+		
+		User user = UserQuery.me().findUserByUsername(username);
+		if (null == user) {
+			if (isAjaxRequest()) {
+				renderAjaxResultForError("没有该用户");
+			} else {
+				setAttr("errorMsg", "没有该用户");
+				render("user_login.html");
+			}
+			CookieUtils.put(this, "_login_errors", errorTimes + 1);
+			return;
+		}
+		
+		if (EncryptUtils.verlifyUser(user.getPassword(), user.getSalt(), password)) {
+			MessageKit.sendMessage(Actions.USER_LOGINED, user);
+			//CookieUtils.put(this, Consts.COOKIE_LOGINED_USER, user.getId());
+			// 获取用户权限
+			init(user.getUsername(), user.getPassword(), true);
+			if (this.isAjaxRequest()) {
+				renderAjaxResultForSuccess("登录成功");
+			} else {
+				String gotoUrl = getPara("goto");
+				if (StringUtils.isNotEmpty(gotoUrl)) {
+					gotoUrl = StringUtils.urlDecode(gotoUrl);
+					gotoUrl = StringUtils.urlRedirect(gotoUrl);
+					redirect(gotoUrl);
+				} else {
+					redirect(Consts.ROUTER_USER_CENTER);
+				}
+			}
+		} else {
+			if (isAjaxRequest()) {
+				renderAjaxResultForError("密码错误");
+			} else {
+				setAttr("errorMsg", "密码错误");
+				render("user_login.html");
+			}
+			CookieUtils.put(this, "_login_errors", errorTimes + 1);
+		}
+	}
 	
 	public void center() {
 		keepPara();
