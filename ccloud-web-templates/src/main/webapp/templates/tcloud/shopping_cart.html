@@ -27,6 +27,8 @@ $(function() {
   
 });
 
+var sellerProductInfoMap = ${sellerProductInfoMap!};
+var sellerProductItems = ${sellerProductItems!};
 var newHtml = $(".weui-panel").eq(0).html();
 var $main = $("main");
 
@@ -55,7 +57,54 @@ function initProduct(){
 		$newProductDetail.find("#bigNum").val(el.bigNum);
 		$newProductDetail.find("#smallNum").val(el.smallNum);
 
+		//赠品
+		$newProductDetail.find("#giftProduct").select({
+			title: "选择商品",
+			items: sellerProductItems,
+			onChange: function(obj){
+				var $gift = $(this)[0].$input.parent().parent().parent();
+				var product = sellerProductInfoMap[obj.values].columns;
+
+				selectGift($gift, product)
+			}
+		});
+		
+		//默认商品
+		$newProductDetail.find("#isDefault").change(function() {
+			var $this = $(this);
+			var $gift = $this.parent().parent().parent();
+			var $giftProduct = $gift.find("#giftProduct");
+
+			if($this.is(':checked')) {
+				var sellProductId = $gift.parent().find("#sellProductId").val();
+				var product = sellerProductInfoMap[sellProductId].columns;
+				
+				$giftProduct.val(product.custom_name);
+				$giftProduct.attr('data-values', product.sell_product_id);
+				$giftProduct.attr('disabled', 'true');
+
+				selectGift($gift, product);
+			}else{
+				$giftProduct.removeAttr('disabled');
+			}
+		
+		});
 	});
+}
+
+function selectGift($gift, product){
+
+	$gift.find("#giftSellProductId").val(product.sell_product_id);
+	$gift.find("#giftProductId").val(product.product_id);
+	$gift.find("#giftConvert").val(product.convert_relate);
+	$gift.find("#giftBigPrice").val(product.price);
+	
+	var $giftUnit = $gift.find("#giftUnit");
+	$giftUnit.select({title: "单位", items: [{title: product.big_unit, value: "bigUnit"}, {title: product.small_unit, value: "smallUnit"}] });
+	//赋初始值
+	$giftUnit.val(product.big_unit);
+	$giftUnit.attr('data-values', "bigUnit");
+
 }
 
 function total(){
@@ -98,9 +147,54 @@ function save(){
 				convert : $el.find("#convert").val(),
 
 				bigNum : bigNum,
-				smallNum : smallNum
+				smallNum : smallNum,
+				isGift : 0
 			});
 		}
+		
+		//赠品
+		var flag = $el.find("#addGift").is(':checked');
+		if(flag){
+			var giftBigNum = 0;
+			var giftSmallNum = 0;
+			var giftBigUnit = '';
+			var giftSmallUnit = '';
+			var giftNum = $el.find("#giftNum").val();
+			var giftUnitName = $el.find("#giftUnit").val();
+			var giftUnit = $el.find("#giftUnit").data("values");
+			if(giftUnit == "bigUnit"){
+				giftBigUnit = giftUnitName;
+				giftBigNum = giftNum;
+			} else {
+				giftSmallUnit = giftUnitName;
+				giftSmallNum = giftNum;
+			}
+		
+			productList.push({
+				productName : $el.find("#giftProduct").val(),
+				valueName : '',
+				
+				bigPriceSpan : '',
+				smallPriceSpan : '',
+				bigUnitSpan : '',
+				smallUnitSpan : '',
+				stock : '',
+				
+				bigPrice : $el.find("#giftBigPrice").val(),
+				smallPrice : '',
+				bigUnit : giftBigUnit,
+				smallUnit : giftSmallUnit,
+				sellProductId : $el.find("#giftSellProductId").val(),
+				productId : $el.find("#giftProductId").val(),
+				convert : $el.find("#giftConvert").val(),
+
+				bigNum : giftBigNum,
+				smallNum : giftSmallNum,
+				isGift : 1
+			});
+		
+		}
+		
 	});
 	
 	setItemBykey("productList",productList);
@@ -156,17 +250,21 @@ function save(){
 				<i class="icon-trash-o fr ft30 gray"></i>
 			</div>
 			<hr />
-			<div class="gift">
+			<div class="gift" id="gift">
+				<input type="hidden" id="giftSellProductId" value="">
+				<input type="hidden" id="giftProductId" value="">
+				<input type="hidden" id="giftConvert" value="">
+				<input type="hidden" id="giftBigPrice" value="" >
 				<div>
-					<input type="checkbox" name="add-gift">
+					<input type="checkbox" name="add-gift" id="addGift">
 					<span>添加赠品</span>
 				</div>
 				<div style="display:none" class="select-area">
 					<div class="goods">
 						<span>商品</span>
-						<input type="text" class="choose-good weui-input" readonly placeholder="选择商品">
+						<input type="text" class="choose-good weui-input" placeholder="选择商品" id="giftProduct" readonly>
 						<i class="icon-sort-desc"></i>
-						<input type="checkbox" name="default-goods">
+						<input type="checkbox" name="default-goods"  id="isDefault">
 						<span>默认商品</span>
 					</div>
 					<div class="number">
@@ -175,12 +273,12 @@ function save(){
 							<div class="operate fl">
 								<i class="icon-minus2"></i>
 							</div>
-							<input type="number" min="0" value="0" class="fl" >
+							<input type="number" min="0" value="0" class="fl" id="giftNum" readyOnly>
 							<div class="operate fl">
 								<i class="icon-plus2"></i>
 							</div>
 						</div>
-						<input type="text" class="choose-unit weui-input" readonly placeholder="单位">
+						<input type="text" class="choose-unit weui-input" placeholder="单位" id="giftUnit" readonly>
 						<i class="icon-sort-desc"></i>
 					</div>
 				</div>
