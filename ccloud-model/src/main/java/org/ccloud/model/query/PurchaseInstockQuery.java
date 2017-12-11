@@ -64,7 +64,7 @@ public class PurchaseInstockQuery extends JBaseQuery {
 			params.add(endDate);
 		}
 
-		fromBuilder.append(" and u.id='"+userId+"' and u.data_area ='"+dataArea+"' order by i.create_date ");
+		fromBuilder.append(" and u.id='"+userId+"' and u.data_area ='"+dataArea+"' order by i.create_date desc ");
 
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());

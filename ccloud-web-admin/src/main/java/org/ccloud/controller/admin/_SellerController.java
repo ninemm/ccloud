@@ -100,7 +100,6 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			Seller seller = SellerQuery.me().findById(id);
 			setAttr("seller", seller);
 		}
-		
 	}
 	
 	//保存经销商信息
@@ -148,10 +147,17 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				renderAjaxResultForError("该公司部门已有一个经销商，请确认");
 				return;
 			}
+			List<Seller> list = SellerQuery.me().findAll();
+			int s = list.size();
+			String j=Integer.toString(s);
+			int countt =j.length();
+			for(int m=0;m<(6-countt);m++){
+				j= "0"+j;
+			}
 			sellerId = StrKit.getRandomUUID();
 			seller.set("id", sellerId);
 			seller.set("seller_name",getPara("seller_name"));
-			seller.set("seller_code",getPara("seller_code"));
+			seller.set("seller_code",j);
 			seller.set("contact", getPara("contact"));
 			seller.set("phone", getPara("phone"));
 			seller.set("is_enabled", getPara("is_enabled"));
@@ -406,7 +412,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
         }
         User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
         Seller seller = SellerQuery.me().findByUserId(user.getId());
-        Page<Product> page = ProductQuery.me().paginate_pro(getPageNumber(), getPageSize(),keyword,  "cp.id",seller.getId());
+        Page<Product> page = ProductQuery.me().paginate_pro(getPageNumber(), getPageSize(),keyword,  "cp.id",seller.getId(),user.getId());
 
         Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);

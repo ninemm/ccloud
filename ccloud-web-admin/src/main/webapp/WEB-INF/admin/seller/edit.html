@@ -73,12 +73,6 @@
 				stringLength: { max: 25, message: '销售商名称最大长度是25字符，请重新输入' }
 			}
 		},
-		'seller_code': {
-			validators: {
-				notEmpty: { message: '销售商编码不能为空' },
-				regexp:{regexp:/^[0-9a-zA-Z_]{6,18}$/, message:'销售商编码必须由6-18位字母或数字组合' }
-			}
-		},
 		'contact': {
 			validators: {
 				notEmpty: { message: '联系人不能为空' },
@@ -208,12 +202,14 @@
 								<input class="form-control input-sm" type="text" name="seller_name" value="${(seller.seller_name)!}" placeholder="1-25个任意字母数字">
 							</div>
 						</div>
+						<#if (seller.id) ??>
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">*销售商编码:</label>
 							<div class="input-group col-md-4 col-sm-10">
-								<input class="form-control input-sm" type="text" name="seller_code" value="${(seller.seller_code)!}" placeholder="1-15个任意字母数字">
+								<input class="form-control input-sm" type="text" readonly name="seller_code" value="${(seller.seller_code)!}">
 							</div>
 						</div>
+						</#if>
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">*联系人:</label>
 							<div class="input-group col-md-4 col-sm-10">

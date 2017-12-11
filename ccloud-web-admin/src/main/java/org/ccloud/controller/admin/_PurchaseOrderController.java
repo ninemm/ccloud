@@ -109,7 +109,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
 	}
-	
+	//入库订单及明细
 	public void pass(){
 		String id = getPara("id");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
@@ -132,7 +132,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		Date date = new Date();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
 		String str = sdf.format(date);
-		String pwarehouseSn="PO"+user.getDepartmentId().substring(0, 6)+str.substring(0,8)+n;
+		String pwarehouseSn="PO"+seller.getSellerCode().substring(0, 6)+str.substring(0,8)+n;
 		purchaseInstock.set("id", purchaseInstockId);
 		purchaseInstock.set("pwarehouse_sn", pwarehouseSn);
 		purchaseInstock.set("supplier_id", purchaseOrder.getSupplierId());

@@ -31,15 +31,15 @@ import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
-import org.ccloud.model.Department;
 import org.ccloud.model.Product;
 import org.ccloud.model.PurchaseOrder;
 import org.ccloud.model.PurchaseOrderDetail;
+import org.ccloud.model.Seller;
 import org.ccloud.model.Supplier;
 import org.ccloud.model.User;
-import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.ProductQuery;
 import org.ccloud.model.query.PurchaseOrderQuery;
+import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.SupplierQuery;
 
 import com.alibaba.fastjson.JSON;
@@ -103,6 +103,7 @@ public class _PurchaseOrderDetailController extends JBaseCRUDController<Purchase
 		renderJson(product);
 	}
 	
+	//采购订单生成
 	@Override
 	@Before(Tx.class)
 	public void save() {
@@ -110,9 +111,9 @@ public class _PurchaseOrderDetailController extends JBaseCRUDController<Purchase
 		final PurchaseOrderDetail purchaseOrderDetail = getModel(PurchaseOrderDetail.class);
 		Map<String, String[]> paraMap = getParaMap();
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		Seller seller = SellerQuery.me().findByUserId(user.getId());
 		int i = PurchaseOrderQuery.me().findByUserId(user.getId(),user.getDataArea());
-		Department department = DepartmentQuery.me().findByUserId(user.getId());
-		/*采购订单：PO + 100000(机构编号或企业编号6位) + 20171108(时间) + 000001(流水号)*/
+		/*采购订单：PO + 100000(机构编号或企业编号6位,这里取销售商编码) + 20171108(时间) + 000001(流水号)*/
 		i++;
 		String j=Integer.toString(i);
 		int countt =j.length();
@@ -122,7 +123,7 @@ public class _PurchaseOrderDetailController extends JBaseCRUDController<Purchase
 		Date date = new Date();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
 		String str = sdf.format(date);
-		String porderSn = "PO"+department.getId().substring(0, 6)+str.substring(0,8)+j;
+		String porderSn = "PO"+seller.getSellerCode().substring(0, 6)+str.substring(0,8)+j;
 		Date date1 = new Date();
 		String Id = StrKit.getRandomUUID();
 		purchaseOrder.set("id", Id);
