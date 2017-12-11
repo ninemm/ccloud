@@ -98,7 +98,7 @@ public class UserController extends BaseFrontController{
 		
 		if (EncryptUtils.verlifyUser(user.getPassword(), user.getSalt(), password)) {
 			MessageKit.sendMessage(Actions.USER_LOGINED, user);
-			//CookieUtils.put(this, Consts.COOKIE_LOGINED_USER, user.getId());
+			CookieUtils.put(this, Consts.COOKIE_LOGINED_USER, user.getId());
 			// 获取用户权限
 			init(user.getUsername(), user.getPassword(), true);
 			if (this.isAjaxRequest()) {
