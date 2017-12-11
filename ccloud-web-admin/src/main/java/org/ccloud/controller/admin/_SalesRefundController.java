@@ -147,10 +147,11 @@ public class _SalesRefundController extends JBaseCRUDController<SalesRefundInsto
 
 		String instockId = StrKit.getRandomUUID();
 		Date date = new Date();
+		String OrderSO = SalesRefundInstockQuery.me().getNewSn(sellerId);
 
 		// SR + 100000(机构编号或企业编号6位) + A(客户类型) + W(仓库编号) + 171108(时间) + 100001(流水号)
 		String instockSn = "SR" + sellerCode + StringUtils.getArrayFirst(paraMap.get("customerTypeCode"))
-				+ StringUtils.getArrayFirst(paraMap.get("warehouseCode")) + DateUtils.format("yyMMdd", date) + "100001";
+				+ StringUtils.getArrayFirst(paraMap.get("warehouseCode")) + DateUtils.format("yyMMdd", date) + OrderSO;
 
 		SalesRefundInstockQuery.me().insert(paraMap, instockId, instockSn, sellerId, user.getId(), date, deptId,
 				dataArea);
