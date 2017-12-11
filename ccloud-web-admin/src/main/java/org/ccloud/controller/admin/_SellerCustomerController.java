@@ -167,18 +167,6 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			customer.setId(persiste.getId());
 		}
 		customer.saveOrUpdate();
-		/*
-		if (persiste == null) {
-			customerId = StrKit.getRandomUUID();
-			customer.setId(customerId);
-			customer.setCreateDate(new Date());
-			customer.save();
-		} else {
-			customerId = persiste.getId();
-			customer.setId(customerId);
-			customer.setModifyDate(new Date());
-			customer.update();
-		}*/
 
 		sellerCustomer.setSellerId(sellerId);
 		sellerCustomer.setCustomerId(customer.getId());
@@ -531,13 +519,6 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 					, sellerCustomer.getStr("city_code")
 					, sellerCustomer.getStr("country_code"));
 			src.setAreaCode(areaCode);
-//			src.setProvCode(sellerCustomer.getStr("prov_code"));
-//			src.setProvName(sellerCustomer.getStr("prov_name"));
-//			src.setCityCode(sellerCustomer.getStr("city_code"));
-//			src.setCityName(sellerCustomer.getStr("city_name"));
-//			src.setCountryCode(sellerCustomer.getStr("country_code"));
-//			src.setCountryName(sellerCustomer.getStr("country_name"));
-			//src.setCustTypeList(custTypeList);
 			List<String> diffAttrList = contrastObj(src, dest);
 			setAttr("diffAttrList", diffAttrList);
 		}

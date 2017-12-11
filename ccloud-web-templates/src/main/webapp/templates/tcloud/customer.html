@@ -9,7 +9,6 @@
     var $loadmore = $(".weui-loadmore");
 
     $(function() {
-    console.log("${(CPATH)!}");
         //搜索框监听
         $(document).on("input", "#searchInput", function() {
             refresh();
@@ -140,91 +139,91 @@
         </div>
     </header>
     <article class="customer">
-    <header class="has-th-list">
-        <div class="head-search select-area">
-            <div>
-                <input type="text" id="region" placeholder="业务员" data-values="" class="weui-input" onChange="refresh()" readonly>
-                <i class="icon-sort-desc"></i>
-            </div>
-            <div>
-                <input type="text" id="customer-type" placeholder="客户类型" data-values="" class="weui-input" onChange="refresh()" readonly>
-                <i class="icon-sort-desc"></i>
-            </div>
-            <div>
-                <input type="text" id="if-order" placeholder="是否下单" data-values="" class="weui-input" onChange="refresh()" readonly>
-                <i class="icon-sort-desc"></i>
-            </div>
-        </div>
-        <div id="combin-filter-btn">
-            <i class="icon-th-list"></i>
-        </div>
-    </header>
-    <article  class="infinite">
-        <div id = "customerList">
-            <#if customerList??>
-                <#assign total = customerList.totalRow>
-                    <#list customerList.list as customer>
-                         <div class="weui-panel weui-panel_access">
-                            <div class="weui-flex">
-                                <div class="weui-flex__item customer-info">
-                                    <p class="ft14">${(customer.customer_name)!}</p>
-                                    <p class="gray">${(customer.contact)!}/${(customer.mobile)!}</p>
-                                </div>
-                                <div class="weui-flex__item customer-href">
-                                    <div class="weui-flex">
-                                        <a href="tel:${(customer.mobile)!}"class="weui-flex__item">
-                                            <p>
-                                                <i class="icon-phone green"></i>
-                                            </p>
-                                            <p>电话</p>
-                                        </a>
-                                        <a class="weui-flex__item" href="/historyOrder?sellerCustomerId=${(customer.sellerCustomerId)!}&customerName=${(customer.customer_name)!}">
-                                            <p>
-                                                <i class="icon-file-text-o blue"></i>
-                                            </p>
-                                            <p>订单</p>
-                                        </a>
-                                        <a class="weui-flex__item" href="/visitAdd">
-                                            <p>
-                                                <i class="icon-paw" style="color:#ff9800"></i>
-                                            </p>
-                                            <p>拜访</p>
-                                        </a>
-                                        <a class="weui-flex__item relative" href="${CPATH}/customerDetail?sellerCustomerId=${(customer.sellerCustomerId)!}">
-                                            <i class="icon-chevron-right gray"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                            <hr />
-                            <div class="weui-flex space-between">
-                                <div class="button blue-button" href="/product">下订单</div>
-                                <div class="button blue-button" hred="/visitAdd">客户拜访</div>
-                            </div>
-                            <p class="gray">
-                                <span class="icon-map-marker ft16 green"></span>
-                                ${(customer.prov_name)!} ${(customer.city_name)!} ${(customer.country_name)!} ${(customer.address)!}
-                            </p>
-                        </div>
-                    </#list>
-            </#if>
-        </div>
-        <#if total = 0>
-            <div class="weui-loadmore weui-loadmore_line">
-                <span class="weui-loadmore__tips">暂无数据</span>
-            </div>
-            <#elseif total &gt; 10>
-                <div class="weui-loadmore">
-                    <i class="weui-loading"></i>
-                    <span class="weui-loadmore__tips">正在加载</span>
-                </div>
-        </#if>
+	    <header class="has-th-list">
+	        <div class="head-search select-area">
+	            <div>
+	                <input type="text" id="region" placeholder="业务员" data-values="" class="weui-input" onChange="refresh()" readonly>
+	                <i class="icon-sort-desc"></i>
+	            </div>
+	            <div>
+	                <input type="text" id="customer-type" placeholder="客户类型" data-values="" class="weui-input" onChange="refresh()" readonly>
+	                <i class="icon-sort-desc"></i>
+	            </div>
+	            <div>
+	                <input type="text" id="if-order" placeholder="是否下单" data-values="" class="weui-input" onChange="refresh()" readonly>
+	                <i class="icon-sort-desc"></i>
+	            </div>
+	        </div>
+	        <div id="combin-filter-btn">
+	            <i class="icon-th-list"></i>
+	        </div>
+	    </header>
+	    <article  class="infinite">
+	        <div id = "customerList">
+	            <#if customerList??>
+	                <#assign total = customerList.totalRow>
+	                    <#list customerList.list as customer>
+	                         <div class="weui-panel weui-panel_access">
+	                            <div class="weui-flex">
+	                                <div class="weui-flex__item customer-info">
+	                                    <p class="ft14">${(customer.customer_name)!}</p>
+	                                    <p class="gray">${(customer.contact)!}/${(customer.mobile)!}</p>
+	                                </div>
+	                                <div class="weui-flex__item customer-href">
+	                                    <div class="weui-flex">
+	                                        <a href="tel:${(customer.mobile)!}"class="weui-flex__item">
+	                                            <p>
+	                                                <i class="icon-phone green"></i>
+	                                            </p>
+	                                            <p>电话</p>
+	                                        </a>
+	                                        <a class="weui-flex__item" href="/historyOrder?sellerCustomerId=${(customer.sellerCustomerId)!}&customerName=${(customer.customer_name)!}">
+	                                            <p>
+	                                                <i class="icon-file-text-o blue"></i>
+	                                            </p>
+	                                            <p>订单</p>
+	                                        </a>
+	                                        <a class="weui-flex__item" href="/visitAdd">
+	                                            <p>
+	                                                <i class="icon-paw" style="color:#ff9800"></i>
+	                                            </p>
+	                                            <p>拜访</p>
+	                                        </a>
+	                                        <a class="weui-flex__item relative" href="${CPATH}/customerDetail?sellerCustomerId=${(customer.sellerCustomerId)!}">
+	                                            <i class="icon-chevron-right gray"></i>
+	                                        </a>
+	                                    </div>
+	                                </div>
+	                            </div>
+	                            <hr />
+	                            <div class="weui-flex space-between">
+	                                <div class="button blue-button" href="/product">下订单</div>
+	                                <div class="button blue-button" hred="/visitAdd">客户拜访</div>
+	                            </div>
+	                            <p class="gray">
+	                                <span class="icon-map-marker ft16 green"></span>
+	                                ${(customer.prov_name)!} ${(customer.city_name)!} ${(customer.country_name)!} ${(customer.address)!}
+	                            </p>
+	                        </div>
+	                    </#list>
+	            </#if>
+	        </div>
+	        <#if total = 0>
+	            <div class="weui-loadmore weui-loadmore_line">
+	                <span class="weui-loadmore__tips">暂无数据</span>
+	            </div>
+	            <#elseif total &gt; 10>
+	                <div class="weui-loadmore">
+	                    <i class="weui-loading"></i>
+	                    <span class="weui-loadmore__tips">正在加载</span>
+	                </div>
+	        </#if>
+	    </article>
     </article>
 </div>
-<a class="hidden-menu" href="/customerDetail">
+<a class="hidden-menu" href="/customer/edit">
     <i class="icon-menu-shopping-cart orange fr"></i>
 </a>
 <div class="layer"></div>
 <#include "_inc/_footer_nav.html" />
 </@layout>
-

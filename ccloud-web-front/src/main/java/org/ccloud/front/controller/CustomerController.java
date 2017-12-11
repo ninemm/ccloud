@@ -9,20 +9,35 @@ import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
+import org.ccloud.model.Customer;
+import org.ccloud.model.CustomerJoinCustomerType;
 import org.ccloud.model.CustomerType;
+import org.ccloud.model.Department;
 import org.ccloud.model.SellerCustomer;
 import org.ccloud.model.User;
+import org.ccloud.model.UserJoinCustomer;
 import org.ccloud.model.WxMessageTemplate;
+import org.ccloud.model.query.CustomerJoinCustomerTypeQuery;
+import org.ccloud.model.query.CustomerQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
+import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.OptionQuery;
 import org.ccloud.model.query.SellerCustomerQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.query.WxMessageTemplateQuery;
+import org.ccloud.model.vo.CustomerVO;
+import org.ccloud.model.vo.ImageJson;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.workflow.service.WorkFlowService;
 import org.joda.time.DateTime;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.beust.jcommander.internal.Lists;
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.jfinal.aop.Before;
@@ -40,7 +55,8 @@ public class CustomerController extends BaseFrontController {
 
 	public void index() {
 
-		User user = getUser();
+		//User user = getUser();
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
 		Page<Record> customerList = SellerCustomerQuery.me().findByUserTypeForApp(getPageNumber(), getPageSize(), getUserIdList(user), getPara("customerType"), getPara("isOrdered"), getPara("searchKey"));
 
@@ -138,6 +154,223 @@ public class CustomerController extends BaseFrontController {
 		map.put("totalPage", customerList.getTotalPage());
 		renderJson(map);
 	}
+	
+	public void edit() {
+		
+		String id = getPara("id");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		
+		if (StrKit.notBlank(id)) {
+			String selectDataArea = getUserDeptDataArea(user.getDataArea());
+			SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(id);
+			String dealerDataArea = DataAreaUtil.getUserDealerDataArea(selectDataArea);
+			List<String> typeList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeListBySellerCustomerId(id, dealerDataArea + "%");
+
+			List<String> typeName = new ArrayList<>();
+			for(String type : typeList)
+				typeName.add(CustomerTypeQuery.me().findById(type).getStr("name"));
+
+			setAttr("sellerCustomer", sellerCustomer);
+			setAttr("cTypeList",typeList);
+			setAttr("cTypeName", Joiner.on(",").join(typeName.iterator()));
+		}
+		
+		render("customer_edit.html");
+	}
+	
+	public void save() {
+		
+		boolean updated = false;
+		Map<String, Object> map = Maps.newHashMap();
+		List<ImageJson> list = Lists.newArrayList();
+		
+		Customer customer = getModel(Customer.class);
+		SellerCustomer sellerCustomer = getModel(SellerCustomer.class);
+		
+		String picJson = getPara("pic");
+		String areaCode = getPara("areaCode");
+		String areaName = getPara("areaName");
+		String customerTypeIds = getPara("customerTypeIds", "");
+		
+		System.err.println(customerTypeIds);
+		
+		List<String> custTypeList = Splitter.on(",")
+				.trimResults()
+				.omitEmptyStrings()
+				.splitToList(customerTypeIds);
+		
+		if (StrKit.notBlank(picJson)) {
+			
+			JSONArray array = JSON.parseArray(picJson);
+			for (int i = 0; i < array.size(); i++) {
+				JSONObject obj = array.getJSONObject(i);
+				String pic = obj.getString("pic");
+				String picname = obj.getString("picname");
+				
+				ImageJson image = new ImageJson();
+				image.setImgName(picname);
+				String newPath = upload(pic);
+				image.setSavePath(newPath.replace("\\", "/"));
+				list.add(image);
+			}
+		}
+		
+		if (sellerCustomer != null && StrKit.notBlank(sellerCustomer.getId())) {
+			
+			CustomerVO temp = new CustomerVO();
+			temp.setAreaCode(areaCode);
+			temp.setAreaName(areaName);
+			temp.setCustTypeList(custTypeList);
+			temp.setContact(customer.getContact());
+			
+			temp.setMobile(customer.getMobile());
+			temp.setAddress(customer.getAddress());
+			temp.setNickname(sellerCustomer.getNickname());
+			temp.setCustomerName(customer.getCustomerName());
+			
+			temp.setImageListStore(JSON.toJSONString(list));
+			map.put("customerVO", temp);
+			
+		} else {
+			// 查看客户库是否存在这个客户
+			Customer persist = CustomerQuery.me().findByCustomerNameAndMobile(customer.getCustomerName(), customer.getMobile());
+			
+			List<String> areaCodeList = Splitter.on(",")
+					.omitEmptyStrings()
+					.trimResults()
+					.splitToList(areaCode);
+			
+			List<String> areaNameList = Splitter.on(",")
+					.omitEmptyStrings()
+					.trimResults()
+					.splitToList(areaName);
+			
+			if (areaCodeList.size() == 3 && areaNameList.size() == 3) {
+				
+				customer.setProvCode(areaCodeList.get(0));
+				customer.setProvName(areaNameList.get(0));
+				customer.setCityCode(areaCodeList.get(1));
+				customer.setCityName(areaNameList.get(1));
+				
+				customer.setCountryCode(areaCodeList.get(2));
+				customer.setCountryName(areaNameList.get(2));
+			}
+			
+			if (persist != null) {
+				customer.setId(persist.getId());
+			}
+			
+			updated = customer.saveOrUpdate();
+			
+			if (!updated) {
+				renderError(500);
+				return ;
+			}
+			
+			String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+			
+			sellerCustomer.setSellerId(sellerId);
+			sellerCustomer.setCustomerId(customer.getId());
+			sellerCustomer.setIsEnabled(1);
+			sellerCustomer.setIsArchive(1);
+			
+			sellerCustomer.setCustomerTypeIds(customerTypeIds);
+			sellerCustomer.setSubType("100301");
+			sellerCustomer.setCustomerKind("100401");
+			
+			String deptDataArea = DataAreaUtil.getUserDealerDataArea(user.getDataArea());
+			Department department =  DepartmentQuery.me().findByDataArea(deptDataArea);
+			sellerCustomer.setDataArea(deptDataArea);
+			sellerCustomer.setDeptId(department.getId());
+			
+			updated = sellerCustomer.saveOrUpdate();
+			
+			if (!updated) {
+				renderError(500);
+				return ;
+			}
+			
+			CustomerJoinCustomerTypeQuery.me().deleteBySellerCustomerId(sellerCustomer.getId());
+	
+			for (String custTypeId : custTypeList) {
+				CustomerJoinCustomerType ccType = new CustomerJoinCustomerType();
+				ccType.setSellerCustomerId(sellerCustomer.getId());
+				ccType.setCustomerTypeId(custTypeId);
+				ccType.save();
+			}
+			
+			UserJoinCustomer userJoinCustomer = new UserJoinCustomer();
+	
+			userJoinCustomer.setSellerCustomerId(sellerCustomer.getId());
+			userJoinCustomer.setUserId(user.getId());
+			userJoinCustomer.setDeptId(user.getDepartmentId());
+			userJoinCustomer.setDataArea(user.getDataArea());
+	
+			updated = userJoinCustomer.save();
+		}
+		
+		if (sellerCustomer != null) 
+			updated = startProcess(sellerCustomer.getId(), map);
+//		MessageKit.sendMessage(action, map);
+
+		if (updated)
+			renderAjaxResultForSuccess("操作成功");
+		else
+			renderAjaxResultForError("操作失败");
+	}
+	
+	private boolean startProcess(String customerId, Map<String, Object> param) {
+		
+		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(customerId);
+		boolean isUpdated = true;
+//		Boolean isCustomerAudit = OptionQuery.me().findValueAsBool("isCustomerAudit");
+		Boolean isCustomerAudit = true;
+		
+		if (sellerCustomer != null) {
+			if (isCustomerAudit != null && isCustomerAudit.booleanValue()) {
+				User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+				User manager = UserQuery.me().findManagerByDeptId(user.getDepartmentId());
+				if (manager == null) {
+					renderError(500);
+					return false;
+				}
+				
+				String defKey = "_customer_audit";
+	
+				param.put("applyUsername", user.getUsername());
+				param.put("manager", manager.getUsername());
+				
+				WorkFlowService workflow = new WorkFlowService();
+				String procInstId = workflow.startProcess(customerId, defKey, param);
+	
+				sellerCustomer.setProcDefKey(defKey);
+				sellerCustomer.setProcInstId(procInstId);
+				sellerCustomer.setStatus(SellerCustomer.CUSTOMER_AUDIT);
+				isUpdated = sellerCustomer.update();
+				
+				if (isUpdated) {
+	
+					Kv kv = Kv.create();
+	
+					WxMessageTemplate messageTemplate = WxMessageTemplateQuery.me().findByCode(defKey);
+	
+					kv.set("touser", manager.getWechatOpenId());
+					kv.set("templateId", messageTemplate.getTemplateId());
+					kv.set("customerName", sellerCustomer.getCustomer().getCustomerName());
+					kv.set("submit", user.getRealname());
+	
+					kv.set("createTime", DateTime.now().toString("yyyy-MM-dd HH:mm"));
+					kv.set("status", "待审核");
+	
+					MessageKit.sendMessage(Actions.NotifyMessage.CUSTOMER_AUDIT_MESSAGE, kv);
+				}
+			} else {
+				isUpdated = sellerCustomer.update();
+			}
+		}
+		return isUpdated;
+	}
 
 	private User getUser(){
 		User user = UserQuery.me().findById("ce05e9008ece42bc986e7bc41edcf4a0");
@@ -147,7 +380,9 @@ public class CustomerController extends BaseFrontController {
 	private String getUserDeptDataArea(String dataArea) {
 		if (dataArea.length() % 3 != 0) {
 			return DataAreaUtil.getUserDeptDataArea(dataArea);
-		} else return dataArea;
+		} else {
+			return dataArea;
+		}
 	}
 
 	private Object[] getUserIdList(User user) {
