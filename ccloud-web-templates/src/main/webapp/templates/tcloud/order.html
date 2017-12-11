@@ -3,6 +3,10 @@
 	#bigNum,#smallNum {
 		border: 1px solid #bbb;
 	}
+
+	#order .gift input::-webkit-input-placeholder {
+		text-align: center;
+	}
 </#macro>
 
 <#macro script>
@@ -79,26 +83,54 @@ $(function() {
 		var productList = getItemBykey("productList");
 		$product.empty();
 		$.each(productList, function(index, el) {
-			$product.append("<div class='weui-panel weui-panel_access goods-detail'>" + newHtml + "</div>");
-			var $newProductDetail = $product.find(".weui-panel:last");
-			$newProductDetail.find("#productName").text(el.productName);
-			$newProductDetail.find("#valueName").text(el.valueName);
-	
-			$newProductDetail.find("#bigPriceSpan").text(el.bigPriceSpan);
-			$newProductDetail.find("#smallPriceSpan").text(el.smallPriceSpan);
-			$newProductDetail.find("#bigUnitSpan").text(el.bigUnitSpan);
-			$newProductDetail.find("#smallUnitSpan").text(el.smallUnitSpan);
-	
-			$newProductDetail.find("#bigPrice").val(el.bigPrice);
-			$newProductDetail.find("#smallPrice").val(el.smallPrice);
-			$newProductDetail.find("#bigUnit").val(el.bigUnit);
-			$newProductDetail.find("#smallUnit").val(el.smallUnit);
-			$newProductDetail.find("#sellProductId").val(el.sellProductId);
-			$newProductDetail.find("#productId").val(el.productId);
-			$newProductDetail.find("#convert").val(el.convert);
+			if(el.isGift == 0) {
+				$product.append("<div class='weui-panel weui-panel_access goods-detail'>" + newHtml + "</div>");
+				var $newProductDetail = $product.find(".weui-panel:last");
+				$newProductDetail.find("#productName").text(el.productName);
+				$newProductDetail.find("#valueName").text(el.valueName);
+		
+				$newProductDetail.find("#bigPriceSpan").text(el.bigPriceSpan);
+				$newProductDetail.find("#smallPriceSpan").text(el.smallPriceSpan);
+				$newProductDetail.find("#bigUnitSpan").text(el.bigUnitSpan);
+				$newProductDetail.find("#smallUnitSpan").text(el.smallUnitSpan);
+		
+				$newProductDetail.find("#bigPrice").val(el.bigPrice);
+				$newProductDetail.find("#smallPrice").val(el.smallPrice);
+				$newProductDetail.find("#bigUnit").val(el.bigUnit);
+				$newProductDetail.find("#smallUnit").val(el.smallUnit);
+				$newProductDetail.find("#sellProductId").val(el.sellProductId);
+				$newProductDetail.find("#productId").val(el.productId);
+				$newProductDetail.find("#convert").val(el.convert);
+				
+				$newProductDetail.find("#bigNum").val(el.bigNum);
+				$newProductDetail.find("#smallNum").val(el.smallNum);
+			} else {
+				var $newProductDetail = $product.find(".weui-panel:last");
+				$newProductDetail.find("#addGift").attr("checked",'true').trigger("change");
+
+				$newProductDetail.find("#giftProduct").val(el.productName);
+				$newProductDetail.find("#giftSellProductId").val(el.sellProductId);
+				$newProductDetail.find("#giftProductId").val(el.productId);
+				$newProductDetail.find("#giftConvert").val(el.convert);
+				$newProductDetail.find("#giftBigPrice").val(el.bigPrice);
+
+				//数量
+				if(el.bigNum > 0 && el.bigUnit){
+					$newProductDetail.find("#giftNum").val(el.bigNum);
+					$newProductDetail.find("#giftUnit").val(el.bigUnit);
+					$newProductDetail.find("#giftUnit").attr('data-values', "bigUnit");
+				}else{
+					$newProductDetail.find("#giftNum").val(el.smallNum);
+					$newProductDetail.find("#giftUnit").val(el.smallUnit);
+					$newProductDetail.find("#giftUnit").attr('data-values', "smallUnit");
+				}
+				//默认
+				if($newProductDetail.find("#sellProductId").val() == el.sellProductId){
+					$newProductDetail.find("#isDefault").attr("checked","true");
+				}
 			
-			$newProductDetail.find("#bigNum").val(el.bigNum);
-			$newProductDetail.find("#smallNum").val(el.smallNum);
+			
+			}
 	
 		});
 	}
@@ -264,30 +296,36 @@ $(function() {
 					</div>
 					<input type="hidden" id="rowTotal" name="rowTotal" value="">
 					<hr />
-					<div class="gift">
+					<div class="gift" id="gift">
+						<input type="hidden" name="giftSellProductId" id="giftSellProductId" value="">
+						<input type="hidden" name="giftProductId" id="giftProductId" value="">
+						<input type="hidden" name="giftConvert" id="giftConvert" value="">
+						<input type="hidden" name="giftBigPrice" id="giftBigPrice" value="" >
 						<div>
-							<input type="checkbox" name="add-gift" disabled>
-							<span>添加赠品</span>
+							<input type="checkbox" name="add-gift" id="addGift" disabled>
+							<span>赠品</span>
 						</div>
-						<div style="display:none">
-							<div class="number">
-			 					<span>数量</span>
-									<div class="spinner">
-										<div class="operate fl">
-											<i class="icon-minus2"></i>
-										</div>
-										<input type="number" min="0" value="0" class="fl" disabled>
-										<div class="operate fl">
-											<i class="icon-plus2"></i>
-										</div>
-									</div>
+						<div style="display:none" class="select-area">
+							<div class="goods">
+								<span>商品</span>
+								<input type="text" class="choose-good weui-input" placeholder="选择商品" id="giftProduct" readonly>
+								<i class="icon-sort-desc"></i>
+								<input type="checkbox" name="default-goods" id="isDefault" disabled>
+								<span>默认商品</span>
 							</div>
 							<div class="number">
-								<span>单位</span>
-								<select disabled>
-									<option>件</option>
-									<option>瓶</option>
-								</select>
+								<span>数量</span>
+								<div class="spinner">
+									<div class="operate fl">
+										<i class="icon-minus2"></i>
+									</div>
+									<input type="number" min="0" value="0" class="fl" name="giftNum" id="giftNum" readonly>
+									<div class="operate fl">
+										<i class="icon-plus2"></i>
+									</div>
+								</div>
+								<input type="text" class="choose-unit weui-input" placeholder="单位" name="giftUnit" id="giftUnit" readonly>
+								<i class="icon-sort-desc"></i>
 							</div>
 						</div>
 					</div>
