@@ -139,25 +139,27 @@
         </div>
     </header>
     <article class="customer">
-	    <header class="has-th-list">
-	        <div class="head-search select-area">
-	            <div>
-	                <input type="text" id="region" placeholder="业务员" data-values="" class="weui-input" onChange="refresh()" readonly>
-	                <i class="icon-sort-desc"></i>
-	            </div>
-	            <div>
-	                <input type="text" id="customer-type" placeholder="客户类型" data-values="" class="weui-input" onChange="refresh()" readonly>
-	                <i class="icon-sort-desc"></i>
-	            </div>
-	            <div>
-	                <input type="text" id="if-order" placeholder="是否下单" data-values="" class="weui-input" onChange="refresh()" readonly>
-	                <i class="icon-sort-desc"></i>
-	            </div>
-	        </div>
-	        <div id="combin-filter-btn">
-	            <i class="icon-th-list"></i>
-	        </div>
-	    </header>
+        <header class="has-th-list weui-flex">
+            <div class="head-search select-area wewui weui-flex__item">
+                <div class="weui-flex">
+                <div class="weui-flex__item">
+                    <input type="text" id="region" placeholder="客户区域" class="weui-input" readonly onchange="refresh()">
+                    <i class="icon-sort-desc"></i>
+                </div>
+                <div class="weui-flex__item">
+                    <input type="text" id="customer-type" placeholder="客户类型" class="weui-input" readonly onchange="refresh()">
+                    <i class="icon-sort-desc"></i>
+                </div>
+                <div class="weui-flex__item">
+                    <input type="text" id="if-order" placeholder="是否下单" class="weui-input" readonly onchange="refresh()">
+                    <i class="icon-sort-desc"></i>
+                </div>
+                </div>
+            </div>
+            <div id="combin-filter-btn">
+                <i class="icon-th-list"></i>
+            </div>
+        </header>
 	    <article  class="infinite">
 	        <div id = "customerList">
 	            <#if customerList??>
@@ -196,9 +198,9 @@
 	                                </div>
 	                            </div>
 	                            <hr />
-	                            <div class="weui-flex space-between">
-	                                <div class="button blue-button" href="/product">下订单</div>
-	                                <div class="button blue-button" hred="/visitAdd">客户拜访</div>
+	                            <div class="operate-btn">
+	                                <div class="button blue-button fl" href="/product">下订单</div>
+	                                <div class="button blue-button fr" hred="/visitAdd">客户拜访</div>
 	                            </div>
 	                            <p class="gray">
 	                                <span class="icon-map-marker ft16 green"></span>
