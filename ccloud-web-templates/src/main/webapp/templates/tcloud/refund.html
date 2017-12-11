@@ -1,0 +1,110 @@
+<#include "_inc/_layout.html"/>
+
+
+<#macro script>
+  $(function () {
+		$("#order-status").select({
+	      title: "选择客户区域",
+	      items: ["全部", "待出库", "已出库"]
+	    });
+	    $("#customer-type").select({
+	      title: "选择客户类型",
+	      items: ["全部", "商超"]
+	    });
+	    $("#date").calendar();
+	    $("#date").val($.today());
+  });
+  
+</#macro> 
+
+<@layout>
+ <body id="my-order" class="ft12">
+  <header class="has-th-list">
+    <div class="head-search select-area">
+      <div>
+        <input type="text" id="order-status" class="weui-input" readonly placeholder="订单状态" onChange="refresh()">
+        <i class="icon-sort-desc"></i>
+      </div>
+      <div>
+        <input type="text" id="customer-type" placeholder="客户类型" class="weui-input" readonly onChange="refresh()">
+        <i class="icon-sort-desc"></i>
+      </div>
+      <div>
+        <input type="text" id="date" class="weui-input" readonly onChange="refresh()">
+        <i class="icon-sort-desc"></i>
+      </div>
+    </div>
+    <div id="combin-filter-btn">
+      <i class="icon-th-list"></i>
+    </div>
+  </header>
+  <main>
+	 <#if salesOutstockList??>
+		 <#assign total = salesOutstockList.totalRow>
+			 <#list salesOutstockList.list as salesOutstock>
+			    <div class="weui-panel weui-panel_access">
+			      <div class="ft14 gray">
+			        ${(salesOutstock.salesOutstock)!}
+			        <span class="fr blue"> 
+						<#if salesOutstock.status = 0>
+							待出库
+						<#else>
+							已出库
+						</#if>			        	
+			        </span>
+			      </div>
+			      <div>
+			       	${(salesOutstock.customerName)!}
+			      </div>
+			      <div class="gray">
+			        <p>联系人：${(salesOutstock.contact)!}/${(salesOutstock.mobile)!}
+			          <span class="fr">终端客户</span>
+			        </p>
+			      </div>
+			      <div class="gray">
+			        <p>订单总额：${(salesOutstock.total_amount)!}
+			          <span class="fr">创建时间：${(salesOutstock.create_date)!}</span>
+			        </p>
+			      </div>
+			      <hr>
+			      <div>
+			        <!-- <div class="button blue-button fl " >订单详情</div> -->
+			       
+			        <div class="button white-button fr" >
+			         <a  href="detail?id=${(salesOutstock.id)!}" >退货</div>
+			      </div>
+			    </div>
+		    </#list>
+          </#if>
+         <#if total = 0>
+            <div class="weui-loadmore weui-loadmore_line">
+                <span class="weui-loadmore__tips">暂无数据</span>
+            </div>
+            <#elseif total &gt; 10>
+                <div class="weui-loadmore">
+                    <i class="weui-loading"></i>
+                    <span class="weui-loadmore__tips">正在加载</span>
+                </div>
+        	</#if>
+    
+  </main>
+ 	<div class="hidden-menu">
+	    <ul>
+	      <li>
+	        <a href="../">
+	          首页
+	          <i class="icon-home blue"></i>
+	        </a>
+	      </li>
+	      <li>
+	        <a href="javascript:history.go(-1)">
+	          上一页
+	          <i class="icon-undo green"></i>
+	        </a>
+	      </li>
+	    </ul>
+	    <i class="icon-menu-open orange fr" id="button"></i>
+  </div>
+  <div class="layer"></div>
+</body>
+</@layout>

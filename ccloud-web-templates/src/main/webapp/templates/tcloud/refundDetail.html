@@ -1,0 +1,140 @@
+<#include "_inc/_layout.html"/>
+
+
+<#macro script>
+  $(function () {
+
+  });
+  
+</#macro> 
+
+<@layout>
+ <main>
+ <#list salesOutstockDetail as list>
+	<#if list_index == 0 >
+	    <section class="weui-panel weui-panel_access order-customer-info">
+	      <div class="weui-cell weui-cell_access">
+	        <div class="weui-cell__bd">
+	          <div class="order-customer-info-title">
+	            客户名称
+	            <span class="require">*</span>
+	          </div>
+	          <input type="text" value=${(list.customer_name)!} class="weui-input" readonly>
+	          </div>
+	        </div>
+	      </div>
+	      <div class="weui-cell weui-cell_access">
+	        <div class="weui-cell__bd">
+	          <div class="order-customer-info-title">
+	            联系人
+	            <span class="require">*</span>
+	          </div>
+	            <input type="text" value=${(list.contact)!} class="weui-input" readonly>
+	          </div>
+	        </div>
+	      </div>
+	      <div class="weui-cell weui-cell_access">
+	        <div class="weui-cell__bd">
+	          <div class="order-customer-info-title">
+	            电话号码
+	            <span class="require">*</span>
+	          </div>
+	            <input type="text" value=${(list.mobile)!} class="weui-input" readonly>
+	          </div>
+	        </div>
+	      </div>
+	      <div class="weui-cell weui-cell_access">
+	        <div class="weui-cell__bd">
+	          <div class="order-customer-info-title">
+	            详细地址
+	            <span class="require">*</span>
+	          </div>
+	            <input type="text" value=${(list.address)!} class="weui-input" readonly>
+	          </div>
+	        </div>
+	      </div>
+	    </section>
+	    <section class="weui-panel weui-panel_access delivery-info">
+	      <div class="weui-cell weui-cell_access">
+	        <div class="weui-cell__bd">
+	          <div class="order-customer-info-title">
+	            发货时间
+	            <span class="require">*</span>
+	             </div>
+	            <input type="text" value=${(list.delivery_date)!} class="weui-input" readonly>
+	          </div>
+	        </div>
+	      </div>
+	    </section>
+	    <section class="weui-panel weui-panel_access ft14">
+	      <div class="weui-cell weui-cell_access">
+	        <div class="weui-cell__bd">
+	          <div class="order-customer-info-title">
+	             账期:
+	              </div>
+	             是<input type="checkbox" disabled="disabled"  <#if list.receive_type = 0>checked="checked"</#if> >
+	             否<input type="checkbox" disabled="disabled" <#if list.receive_type = 1>checked="checked"</#if> >
+	          </div>
+	        </div>
+	      </div>
+	    </section>
+    	<#break>
+	</#if>
+	</#list>
+   
+    <section class="weui-panel weui-panel_access ft14 remark">
+      <div class="weui-cell weui-cell_access">
+        <div class="weui-cell__bd">
+        </div>
+      </div>
+    </section>
+    <div class="weui-cells__title black">商品明细</div>
+   <#list salesOutstockDetail as list>
+    <div class="weui-panel weui-panel_access goods-detail">
+      <div class="product_name">
+       ${(list.custom_name)!} 
+      </div>
+      <div class="product_unit">
+        规格：
+        <span class="blue-button"> ${(list.cps_name)!} </span>
+        数量:
+        <span class="price">${(list.product_count)!}</span>
+      </div>
+      <div class="product_bUnit">
+        <span class="price">￥${(list.product_price)!}</span>
+        <span style="margin-left:6rem">退货数量:</span>
+        <div class="spinner">
+          <div class="operate fl">
+            <i class="icon-minus2"></i>
+          </div>
+        		<input type="number" class="fl" value='0' >
+          <div class="operate fl">
+            <i class="icon-plus2"></i>
+          </div>
+        </div>
+      </div>
+      <hr />
+    </div>
+    </#list>
+    <div class="button white-button fr" ><a  href="returnGoods" >确认退货</div>
+  </main>
+ 	<div class="hidden-menu">
+	    <ul>
+	      <li>
+	        <a href="../">
+	          首页
+	          <i class="icon-home blue"></i>
+	        </a>
+	      </li>
+	      <li>
+	        <a href="javascript:history.go(-1)">
+	          上一页
+	          <i class="icon-undo green"></i>
+	        </a>
+	      </li>
+	    </ul>
+	    <i class="icon-menu-open orange fr" id="button"></i>
+  </div>
+  <div class="layer"></div>
+</body>
+</@layout>

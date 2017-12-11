@@ -207,4 +207,18 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		return true;
 	}
 
+	public List<Record> findById1(String id) {
+		StringBuilder sqlBuilder = new StringBuilder(
+				" SELECT c.customer_name , s.contact , s.mobile , s.address , s.receive_type ,s.delivery_date, sp.custom_name , sd.product_count , sd.product_price ,");
+		sqlBuilder.append(" sd.product_amount , s.total_amount , GROUP_CONCAT(DISTINCT cgs.`name`) AS cps_name ");
+		sqlBuilder.append(" FROM cc_sales_outstock_detail sd INNER JOIN cc_sales_outstock s ON s.id = sd.outstock_id ");
+		sqlBuilder.append(" INNER JOIN cc_customer c ON c.id = s.customer_id ");
+		sqlBuilder.append(" INNER JOIN cc_seller_product sp ON sp.id = sd.sell_product_id ");
+		sqlBuilder.append(" LEFT JOIN cc_product_goods_specification_value cpg ON sp.product_id = cpg.product_set_id ");		
+		sqlBuilder.append(" LEFT JOIN cc_goods_specification_value cgs ON cpg.goods_specification_value_set_id = cgs.id");
+		sqlBuilder.append("  WHERE sd.outstock_id = ? GROUP BY sp.id");
+		return Db.find(sqlBuilder.toString(), id);
+	}
+
+
 }

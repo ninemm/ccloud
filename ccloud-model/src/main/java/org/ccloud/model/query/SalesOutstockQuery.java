@@ -155,4 +155,14 @@ public class SalesOutstockQuery extends JBaseQuery {
 		}
 	}
 
+	public Page<Record> findByBizUserId(int pageNumber, int pageSize, String biz_user_id) {
+		String select = "SELECT c.customer_name as customerName,s.*  ";
+		StringBuilder fromBuilder = new StringBuilder("from cc_sales_outstock s INNER JOIN cc_customer c ON s.customer_id=c.id WHERE s.biz_user_id='"+biz_user_id+"'");
+		LinkedList<Object> params = new LinkedList<Object>();
+		if (params.isEmpty())
+			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+
+
 }
