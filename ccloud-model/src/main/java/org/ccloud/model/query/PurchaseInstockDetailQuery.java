@@ -94,5 +94,11 @@ public class PurchaseInstockDetailQuery extends JBaseQuery {
 		String sql = "select * from cc_purchase_instock_detail where purchase_instock_id = ? and seller_product_id = ?  ";
 		return DAO.findFirst(sql,purchaseInstockId,sellerProductId);
 	}
-	
+	//通过采购订单查看入库详情
+	/*public PurchaseInstockDetail findOrderId(String orderId){
+		String sql = "Select cpid.* from cc_purchase_instock_detail cpid "
+				+ " LEFT JOIN cc_purchase_order_detail cpod on cpod.id = cpid.purchase_order_detail_id "
+				+ " where cpod.purchase_order_id = ?";
+		return DAO.findFirst(sql,orderId);
+	}*/
 }

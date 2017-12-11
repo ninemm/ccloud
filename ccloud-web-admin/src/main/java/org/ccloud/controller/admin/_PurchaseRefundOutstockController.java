@@ -263,7 +263,7 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 			inventoryDetail.set("balance_count", inventory.getBalanceCount());
 			inventoryDetail.set("balance_amount", inventory.getBalanceAmount());
 			inventoryDetail.set("balance_price", inventory.getBalancePrice());
-			inventoryDetail.set("biz_type", "100203");
+			inventoryDetail.set("biz_type", Consts.BIZ_TYPE_P_OUTSTOCK);
 			inventoryDetail.set("biz_bill_sn", pr.get("outstock_sn"));
 			inventoryDetail.set("biz_date", new Date());
 			inventoryDetail.set("biz_user_id", user.getId());

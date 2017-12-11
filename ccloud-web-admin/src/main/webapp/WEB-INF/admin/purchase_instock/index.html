@@ -115,7 +115,12 @@
 				},
 				{field: "action", title: "操作", align: "center", width: '15%',
 				formatter: function(value, row, rowIndex) {
-					var strHtml ='<a class="label label-table label-info" onclick="detail(\''+row.id+'\')" >入库</a> ';
+					var strHtml = "";
+					if(row.status ==0){
+					 	strHtml +='<a class="label label-table label-info" onclick="detail(\''+row.id+'\')" >入库</a> ';
+					}else{
+						strHtml +='<a class="label label-table label-success" onclick="instockDetail(\''+row.id+'\')" >详情</a> '
+					}
 					return strHtml;
 				},
 				edit:false
@@ -146,6 +151,14 @@
 		}); 
 	}
 	
+	function instockDetail(id){
+		layer.open({
+			title:"入库详细",
+			type: 2, 
+			area: ['70%', '90%'],
+			content: '${CPATH}/admin/purchaseInstock/instockDetail/' + id
+		}); 
+	}
 	function pass(id){
 		$.ajax({
 			url:"${CPATH}/admin/purchaseInstock/pass",
