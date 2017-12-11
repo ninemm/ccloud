@@ -163,5 +163,4 @@ public class CustomerVO implements Serializable {
 		this.custTypeNameList = custTypeNameList;
 	}
 	
-	
 }

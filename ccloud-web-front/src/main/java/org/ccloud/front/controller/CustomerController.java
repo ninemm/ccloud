@@ -17,6 +17,7 @@ import org.ccloud.model.SellerCustomer;
 import org.ccloud.model.User;
 import org.ccloud.model.UserJoinCustomer;
 import org.ccloud.model.WxMessageTemplate;
+import org.ccloud.model.compare.BeanCompareUtils;
 import org.ccloud.model.query.*;
 import org.ccloud.model.vo.CustomerVO;
 import org.ccloud.model.vo.ImageJson;
@@ -215,7 +216,7 @@ public class CustomerController extends BaseFrontController {
 			String selectDataArea = getUserDeptDataArea(user.getDataArea());
 			SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(id);
 			String dealerDataArea = DataAreaUtil.getUserDealerDataArea(selectDataArea);
-			List<String> typeList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeListBySellerCustomerId(id, dealerDataArea + "%");
+			List<String> typeList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeIdListBySellerCustomerId(id, dealerDataArea + "%");
 
 			List<String> typeName = new ArrayList<>();
 			for(String type : typeList)
@@ -393,6 +394,63 @@ public class CustomerController extends BaseFrontController {
 			renderAjaxResultForError("操作失败");
 	}
 	
+	public void review() {
+		String id = getPara("id");
+		String taskId = getPara("taskId");
+		
+		if (StrKit.isBlank(id)) {
+			renderError(404);
+			return ;
+		}
+			
+		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(id);
+		setAttr("sellerCustomer", sellerCustomer);
+		
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String dealerDataArea = DataAreaUtil.getUserDealerDataArea(selectDataArea);
+		List<String> custTypeNameList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeNameListBySellerCustomerId(id, dealerDataArea);
+		String custTypeNames = Joiner.on(",").skipNulls().join(custTypeNameList);
+		setAttr("custTypeNames", custTypeNames);
+		
+		WorkFlowService workflowService = new WorkFlowService();
+		Object customerVO = workflowService.getTaskVariableByTaskId(taskId, "customerVO");
+		Object applyer = workflowService.getTaskVariableByTaskId(taskId, "applyUsername");
+		if (applyer != null) {
+			User user = UserQuery.me().findUserByUsername(applyer.toString());
+			setAttr("applyer", user);
+		}
+		
+		if (customerVO != null) {
+			CustomerVO src = new CustomerVO();
+			CustomerVO dest = (CustomerVO) customerVO;
+			
+			src.setNickname(sellerCustomer.getNickname());
+			src.setSellerCustomerId(sellerCustomer.getId());
+			src.setCustomerId(sellerCustomer.getCustomerId());
+			
+			src.setContact(sellerCustomer.getStr("contact"));
+			src.setMobile(sellerCustomer.getStr("mobile"));
+			src.setAddress(sellerCustomer.getStr("address"));
+			src.setCustomerName(sellerCustomer.getStr("customer_name"));
+			
+			String areaName = Joiner.on(",").skipNulls()
+				.join(sellerCustomer.getStr("prov_name")
+					, sellerCustomer.getStr("city_name")
+					, sellerCustomer.getStr("country_name"));
+			src.setAreaName(areaName);
+			
+			String areaCode = Joiner.on(",").skipNulls()
+				.join(sellerCustomer.getStr("prov_code")
+					, sellerCustomer.getStr("city_code")
+					, sellerCustomer.getStr("country_code"));
+			src.setAreaCode(areaCode);
+			List<String> diffAttrList = BeanCompareUtils.contrastObj(src, dest);
+			setAttr("diffAttrList", diffAttrList);
+		}
+		
+		render("customer_review.html");
+	}
+	
 	private boolean startProcess(String customerId, Map<String, Object> param) {
 		
 		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(customerId);
@@ -444,6 +502,8 @@ public class CustomerController extends BaseFrontController {
 		}
 		return isUpdated;
 	}
+	
+	
 
 	private String getUserDeptDataArea(String dataArea) {
 		if (dataArea.length() % 3 != 0) {

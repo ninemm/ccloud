@@ -36,7 +36,7 @@ public class CustomerJoinCustomerTypeQuery extends JBaseQuery {
 		return QUERY;
 	}
 
-	public List<String> findCustomerTypeListBySellerCustomerId(String sellerCustomerId, String dataArea) {
+	public List<String> findCustomerTypeIdListBySellerCustomerId(String sellerCustomerId, String dataArea) {
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 
@@ -46,6 +46,19 @@ public class CustomerJoinCustomerTypeQuery extends JBaseQuery {
 		needWhere = appendIfNotEmpty(sqlBuilder, "cj.seller_customer_id", sellerCustomerId, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(sqlBuilder, "c.data_area", dataArea, params, needWhere);
 
+		return Db.query(sqlBuilder.toString(), params.toArray());
+	}
+	
+	public List<String> findCustomerTypeNameListBySellerCustomerId(String sellerCustomerId, String dataArea) {
+		
+		StringBuilder sqlBuilder = new StringBuilder("select c.name ");
+		sqlBuilder.append(" from `cc_customer_join_customer_type` cj ");
+		sqlBuilder.append(" join `cc_customer_type` c on cj.customer_type_id = c.id ");
+		
+		boolean needWhere = true;
+		LinkedList<Object> params = new LinkedList<Object>();
+		needWhere = appendIfNotEmpty(sqlBuilder, "cj.seller_customer_id", sellerCustomerId, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(sqlBuilder, "c.data_area", dataArea, params, needWhere);
 		return Db.query(sqlBuilder.toString(), params.toArray());
 	}
 

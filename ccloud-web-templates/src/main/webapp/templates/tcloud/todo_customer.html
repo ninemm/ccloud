@@ -49,10 +49,11 @@
         <#list todoList as customer>
 		<div class="weui-panel weui-panel_access">
 			<div class="weui-cell weui-cell_access">
+			    <a href="${CPATH}/customer/review?id=${customer.id}&taskId=${customer.taskId!}&assignee=${customer.assignee}"> 
 				<div class="weui-cell__bd ft14">
 					<p>${(customer.customer_name)!}</p>
 					<div class="ft12 gray">
-						<p>联系人：${(customer.contact)!}/${(customer.mobile)!}</p>
+						<p>联系人：${(customer.contact)!} / ${(customer.mobile)!}</p>
 						<p>客户类型：终端</p>
 						<p>配送地址：${(customer.prov_name)!} ${(customer.city_name)!} ${(customer.country_name)!} ${(customer.address)!}</p>
 						<p>
@@ -60,14 +61,15 @@
 						</p>
 					</div>
 				</div>
+				</a>
 			</div>
-			<div class="weui-cell weui-cell_access">
+<!-- 			<div class="weui-cell weui-cell_access">
 				<div class="weui-cell__bd ft14">
 					<p>变更类型：资料变更</p>
 					<p>客户类型：终端、团购</p>
 					<p>原因说明：该客户现在可以做团购</p>
 				</div>
-			</div>
+			</div> -->
 			<div class="weui-cell weui-cell_access">
 				<div class="weui-flex space-between width-100 ft14">
 					<div class="button blue-button">同意</div>
