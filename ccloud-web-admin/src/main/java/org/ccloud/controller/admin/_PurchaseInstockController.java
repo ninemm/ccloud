@@ -274,16 +274,18 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 					break;
 				}
 			}
+			SellerProduct sellerProduct = SellerProductQuery.me().findById(pi.getSellerProductId());
 			String inventoryDetailId = StrKit.getRandomUUID();
+			BigDecimal  storeCount = sellerProduct.getStoreCount().add(count2.divide(convent, 2, BigDecimal.ROUND_HALF_UP));
 			inventoryDetail.set("id", inventoryDetailId);
 			inventoryDetail.set("warehouse_id", pi.get("warehouse_id"));
 			inventoryDetail.set("sell_product_id",pi.getSellerProductId());
 			inventoryDetail.set("in_count", count2.divide(convent, 2, BigDecimal.ROUND_HALF_UP));
 			inventoryDetail.set("in_amount", pi.getProductAmount());
 			inventoryDetail.set("in_price", pi.getProductPrice());
-			inventoryDetail.set("balance_count", inventory.getBalanceCount());
-			inventoryDetail.set("balance_amount", inventory.getBalanceAmount());
-			inventoryDetail.set("balance_price", inventory.getBalancePrice());
+			inventoryDetail.set("balance_count",storeCount );
+			inventoryDetail.set("balance_amount", storeCount.multiply(pi.getProductPrice()));
+			inventoryDetail.set("balance_price", pi.getProductPrice());
 			inventoryDetail.set("biz_type", Consts.BIZ_TYPE_INSTOCK);
 			inventoryDetail.set("biz_bill_sn", pi.get("pwarehouse_sn"));
 			inventoryDetail.set("biz_date", new Date());
@@ -296,7 +298,6 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 			if(flang==false){
 				break;
 			}
-			SellerProduct sellerProduct = SellerProductQuery.me().findById(pi.getSellerProductId());
 			if(sellerProduct.getStoreCount()==null)
 			{
 				sellerProduct.setStoreCount(new BigDecimal(0));

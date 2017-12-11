@@ -253,6 +253,7 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 			if(flang==false){
 				break;
 			}
+			BigDecimal storeCount = sellerProduct.getStoreCount().subtract(count1.divide(convent, 2, BigDecimal.ROUND_HALF_UP));
 			String inventoryDetailId = StrKit.getRandomUUID();
 			inventoryDetail.set("id", inventoryDetailId);
 			inventoryDetail.set("warehouse_id", pr.get("warehouse_id"));
@@ -260,9 +261,9 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 			inventoryDetail.set("out_count", count1.divide(convent, 2, BigDecimal.ROUND_HALF_UP));
 			inventoryDetail.set("out_amount", pr.getProductAmount());
 			inventoryDetail.set("out_price", pr.getProductPrice());
-			inventoryDetail.set("balance_count", inventory.getBalanceCount());
-			inventoryDetail.set("balance_amount", inventory.getBalanceAmount());
-			inventoryDetail.set("balance_price", inventory.getBalancePrice());
+			inventoryDetail.set("balance_count", storeCount);
+			inventoryDetail.set("balance_amount", storeCount.multiply(pr.getProductPrice()));
+			inventoryDetail.set("balance_price", pr.getProductPrice());
 			inventoryDetail.set("biz_type", Consts.BIZ_TYPE_P_OUTSTOCK);
 			inventoryDetail.set("biz_bill_sn", pr.get("outstock_sn"));
 			inventoryDetail.set("biz_date", new Date());
