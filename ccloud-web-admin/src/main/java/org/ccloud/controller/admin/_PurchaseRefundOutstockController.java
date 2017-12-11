@@ -35,6 +35,7 @@ import org.ccloud.model.PurchaseInstock;
 import org.ccloud.model.PurchaseInstockDetail;
 import org.ccloud.model.PurchaseRefundOutstock;
 import org.ccloud.model.PurchaseRefundOutstockDetail;
+import org.ccloud.model.Seller;
 import org.ccloud.model.SellerProduct;
 import org.ccloud.model.User;
 import org.ccloud.model.query.InventoryQuery;
@@ -43,6 +44,7 @@ import org.ccloud.model.query.PurchaseInstockQuery;
 import org.ccloud.model.query.PurchaseRefundOutstockDetailQuery;
 import org.ccloud.model.query.PurchaseRefundOutstockQuery;
 import org.ccloud.model.query.SellerProductQuery;
+import org.ccloud.model.query.SellerQuery;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -121,7 +123,7 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 
 		renderJson(result);
 	}
-	
+	//退货订单生成
 	@Override
 	@Before(Tx.class)
 	public void save() {
@@ -129,6 +131,7 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 		final PurchaseRefundOutstockDetail purchaseRefundOutstockDetail = getModel(PurchaseRefundOutstockDetail.class);
 		Map<String, String[]> paraMap = getParaMap();
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		Seller seller = SellerQuery.me().findByUserId(user.getId());
 		String purchaseInstockId = StringUtils.getArrayFirst(paraMap.get("purchaseInstockId"));
 		String orderId = StrKit.getRandomUUID();
 		Date date = new Date();
@@ -144,7 +147,7 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 		for(int m=0;m<(6-countt);m++){
 			j= "0"+j;
 		}
-		String orderSn = "PR" + user.getDepartmentId().substring(0, 6) +str.substring(0, 8) + j;
+		String orderSn = "PR" + seller.getSellerCode().substring(0, 6) +str.substring(0, 8) + j;
 
 		purchaseRefundOutstock.set("id", orderId);
 		purchaseRefundOutstock.set("outstock_sn", orderSn);
@@ -226,7 +229,7 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 		render("detail.html");
 
 	}
-	
+	//审核通过，对库存总账进行修改
 	public void pass(){
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String purchaseRefundId=getPara("id");
