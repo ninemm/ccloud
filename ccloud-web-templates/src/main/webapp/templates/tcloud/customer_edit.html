@@ -16,7 +16,8 @@
     var $gallery = $("#gallery"), $galleryImg = $("#galleryImg");
     
     $(function() {
-        
+        if($("#delivery-address").val().length == 2) $("#delivery-address").val('');
+
         $("#delivery-address").cityPicker({
             title: "请选择配送地址",
             onClose: function(obj) {
@@ -29,7 +30,7 @@
         });
 
         $.ajax({
-            url: "${CPATH}/customerDetail/getCustomerType",
+            url: "${CPATH}/customer/getCustomerType",
             type: "post",
             dataType: "json",
             success: function(data) {
@@ -183,16 +184,15 @@
     }
     
     function doEnabled() {
-        $.get("${CPATH}/customerDetail/enable?id=${(sellerCustomer.id)!""}&isEnabled=0" ,
+        $.get("${CPATH}/customer/enable?id=${(sellerCustomer.id)!""}&isEnabled=0" ,
         function(result){
             if (result.errorCode > 0) {
                 toastr.error(result.message, '操作失败');
             } else {
                 toastr.success(result.message, '操作成功');
-                $table.bootstrapTable('refresh');
             }
         }
-    )}
+    )};
 
 </#macro>
 
@@ -255,9 +255,9 @@
 	                    配送地址
 	                    <span class="require">*</span>
 	                </div>
-	                <input type="hidden" name="areaCode" id="areaCode">
-	                <input type="hidden" name="areaName" id="areaName">
-	                <input type="text" placeholder="省市区" class="weui-input" id="delivery-address" name="customer.prov_name" value="${(sellerCustomer.prov_name)!'湖北省'} ${(sellerCustomer.city_name)!'武汉市'} ${(sellerCustomer.country_name)!'洪山区'}">
+	                <input type="hidden" name="areaCode" id="areaCode" value="${(sellerCustomer.prov_code)!''},${(sellerCustomer.city_code)!''},${(sellerCustomer.country_code)!''}">
+	                <input type="hidden" name="areaName" id="areaName" value="${(sellerCustomer.prov_name)!''},${(sellerCustomer.city_name)!''},${(sellerCustomer.country_name)!''}">
+	                <input type="text" placeholder="省市区" class="weui-input" id="delivery-address" name="customer.prov_name" value="${(sellerCustomer.prov_name)!''} ${(sellerCustomer.city_name)!''} ${(sellerCustomer.country_name)!''}" >
 	            </div>
 	            <span class="weui-cell__ft"></span>
 	        </div>

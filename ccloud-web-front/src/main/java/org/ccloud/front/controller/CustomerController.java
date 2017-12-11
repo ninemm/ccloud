@@ -265,14 +265,21 @@ public class CustomerController extends BaseFrontController {
 		String areaCode = getPara("areaCode");
 		String areaName = getPara("areaName");
 		String customerTypeIds = getPara("customerTypeIds", "");
-		
+
 		System.err.println(customerTypeIds);
-		
+
+		String custTypeNames = getPara("customer_type");
+
 		List<String> custTypeList = Splitter.on(",")
 				.trimResults()
 				.omitEmptyStrings()
 				.splitToList(customerTypeIds);
-		
+
+		List<String> custTypeNameList = Splitter.on(",")
+				.trimResults()
+				.omitEmptyStrings()
+				.splitToList(custTypeNames);
+
 		if (StrKit.notBlank(picJson)) {
 			
 			JSONArray array = JSON.parseArray(picJson);
@@ -295,6 +302,7 @@ public class CustomerController extends BaseFrontController {
 			temp.setAreaCode(areaCode);
 			temp.setAreaName(areaName);
 			temp.setCustTypeList(custTypeList);
+			temp.setCustTypeNameList(custTypeNameList);
 			temp.setContact(customer.getContact());
 			
 			temp.setMobile(customer.getMobile());
@@ -304,7 +312,9 @@ public class CustomerController extends BaseFrontController {
 			
 			temp.setImageListStore(JSON.toJSONString(list));
 			map.put("customerVO", temp);
-			
+//			开始审核流程
+			updated = startProcess(sellerCustomer.getId(), map);
+
 		} else {
 			// 查看客户库是否存在这个客户
 			Customer persist = CustomerQuery.me().findByCustomerNameAndMobile(customer.getCustomerName(), customer.getMobile());
@@ -384,8 +394,8 @@ public class CustomerController extends BaseFrontController {
 			updated = userJoinCustomer.save();
 		}
 		
-		if (sellerCustomer != null) 
-			updated = startProcess(sellerCustomer.getId(), map);
+
+
 //		MessageKit.sendMessage(action, map);
 
 		if (updated)
@@ -393,25 +403,25 @@ public class CustomerController extends BaseFrontController {
 		else
 			renderAjaxResultForError("操作失败");
 	}
-	
+
 	public void review() {
 		String id = getPara("id");
 		String taskId = getPara("taskId");
-		
+
 		if (StrKit.isBlank(id)) {
 			renderError(404);
 			return ;
 		}
-			
+
 		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(id);
 		setAttr("sellerCustomer", sellerCustomer);
-		
+
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String dealerDataArea = DataAreaUtil.getUserDealerDataArea(selectDataArea);
 		List<String> custTypeNameList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeNameListBySellerCustomerId(id, dealerDataArea);
 		String custTypeNames = Joiner.on(",").skipNulls().join(custTypeNameList);
 		setAttr("custTypeNames", custTypeNames);
-		
+
 		WorkFlowService workflowService = new WorkFlowService();
 		Object customerVO = workflowService.getTaskVariableByTaskId(taskId, "customerVO");
 		Object applyer = workflowService.getTaskVariableByTaskId(taskId, "applyUsername");
@@ -419,26 +429,26 @@ public class CustomerController extends BaseFrontController {
 			User user = UserQuery.me().findUserByUsername(applyer.toString());
 			setAttr("applyer", user);
 		}
-		
+
 		if (customerVO != null) {
 			CustomerVO src = new CustomerVO();
 			CustomerVO dest = (CustomerVO) customerVO;
-			
+
 			src.setNickname(sellerCustomer.getNickname());
 			src.setSellerCustomerId(sellerCustomer.getId());
 			src.setCustomerId(sellerCustomer.getCustomerId());
-			
+
 			src.setContact(sellerCustomer.getStr("contact"));
 			src.setMobile(sellerCustomer.getStr("mobile"));
 			src.setAddress(sellerCustomer.getStr("address"));
 			src.setCustomerName(sellerCustomer.getStr("customer_name"));
-			
+
 			String areaName = Joiner.on(",").skipNulls()
 				.join(sellerCustomer.getStr("prov_name")
 					, sellerCustomer.getStr("city_name")
 					, sellerCustomer.getStr("country_name"));
 			src.setAreaName(areaName);
-			
+
 			String areaCode = Joiner.on(",").skipNulls()
 				.join(sellerCustomer.getStr("prov_code")
 					, sellerCustomer.getStr("city_code")
@@ -447,10 +457,29 @@ public class CustomerController extends BaseFrontController {
 			List<String> diffAttrList = BeanCompareUtils.contrastObj(src, dest);
 			setAttr("diffAttrList", diffAttrList);
 		}
-		
+
 		render("customer_review.html");
 	}
-	
+
+
+	public void enable() {
+
+		String id = getPara("id");
+		int isEnabled = getParaToInt("isEnabled");
+		if(StrKit.notBlank(id)) {
+
+			boolean updated = startProcess(id, new HashMap<String, Object>());
+
+			if (updated) {
+				renderAjaxResultForSuccess("操作成功");
+			} else {
+				renderAjaxResultForError("操作失败");
+			}
+		}else {
+			renderError(500);
+		}
+	}
+
 	private boolean startProcess(String customerId, Map<String, Object> param) {
 		
 		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(customerId);
@@ -502,8 +531,6 @@ public class CustomerController extends BaseFrontController {
 		}
 		return isUpdated;
 	}
-	
-	
 
 	private String getUserDeptDataArea(String dataArea) {
 		if (dataArea.length() % 3 != 0) {

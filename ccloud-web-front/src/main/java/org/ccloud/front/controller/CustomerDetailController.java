@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
@@ -50,7 +51,7 @@ public class CustomerDetailController extends BaseFrontController {
 
 	public void index() {
 
-		User user = getUser();
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String taskId = getPara("taskId");
 		String sellerCustomerId = getPara("sellerCustomerId");
 		String selectDataArea = getUserDeptDataArea(user.getDataArea());
@@ -79,7 +80,7 @@ public class CustomerDetailController extends BaseFrontController {
 	}
 
 	public void getCustomerType(){
-		User user = getUser();
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String selectDataArea = getUserDeptDataArea(user.getDataArea());
 
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
@@ -181,10 +182,6 @@ public class CustomerDetailController extends BaseFrontController {
 			renderAjaxResultForError("操作失败");
 	}
 
-	private User getUser(){
-		User user = UserQuery.me().findById("53c87914b1ea416681701ed01c05cd21");
-		return user;
-	}
 
 	private String getUserDeptDataArea(String dataArea) {
 		if (dataArea.length() % 3 != 0) {
@@ -205,7 +202,8 @@ public class CustomerDetailController extends BaseFrontController {
 
 		boolean updated = true;
 		String sellerId = "7c1818ed7e3743d4829db05e653178bb";
-		User user = getUser();
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+
 
 		Customer persiste = CustomerQuery.me().findByCustomerNameAndMobile(customer.getCustomerName(),
 				customer.getMobile());
@@ -260,24 +258,6 @@ public class CustomerDetailController extends BaseFrontController {
 			renderAjaxResultForError("客户修改审核失败");
 	}
 
-	public void auditSellerCustomerEnableComplete() {
-
-		String taskId = getPara("taskId");
-		String comment = getPara("comment");
-
-		WorkFlowService workflowService = new WorkFlowService();
-		workflowService.completeTask(taskId, comment, null);
-
-
-		String id = (String) workflowService.getTaskVariableByTaskId(taskId, "sellerCustomerId");
-		int isEnabled = (Integer) workflowService.getTaskVariableByTaskId(taskId, "isEnabled");
-
-		if (SellerCustomerQuery.me().enable(id, isEnabled)) {
-			renderAjaxResultForSuccess();
-		} else {
-			renderAjaxResultForError();
-		}
-	}
 
 	private boolean startProcessInstance(String customerId, Map<String, Object> param) {
 
@@ -287,8 +267,9 @@ public class CustomerDetailController extends BaseFrontController {
 
 		if (sellerCustomer != null) {
 
-			User user = getUser();
-			
+			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+
+
 //			Boolean isCustomerAudit = OptionQuery.me().findValueAsBool("isCustomerAudit");
 			Boolean isCustomerAudit = true;
 
