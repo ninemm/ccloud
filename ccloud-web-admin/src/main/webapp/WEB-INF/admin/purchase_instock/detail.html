@@ -107,13 +107,6 @@
 			$tr.find('td').eq(3).attr("rowspan",product.list.length);
 			$tr.find('td').eq(4).attr("rowspan",product.list.length);
 			$tr.find('td').eq(5).attr("rowspan",product.list.length);
-			if(product.list.length>1){
-				$tr.find('td').eq(1).find('div').attr("style",'height:'+product.list.length*57+'px;'+'vertical-align:middle;display:table-cell;');
-				$tr.find('td').eq(2).find('div').attr("style",'height:'+product.list.length*57+'px;'+'vertical-align:middle;display:table-cell;');
-				$tr.find('td').eq(3).find('div').attr("style",'height:'+product.list.length*57+'px;'+'vertical-align:middle;display:table-cell;');
-				$tr.find('td').eq(4).find('div').attr("style",'height:'+product.list.length*57+'px;'+'vertical-align:middle;display:table-cell;');
-				$tr.find('td').eq(5).find('div').attr("style",'height:'+product.list.length*57+'px;'+'vertical-align:middle;display:table-cell;');
-			}
 			$tr.find("#purchaseInstockDetailId").val(product.list.purchaseInstockDetailId);
 			for(var i=1;i<product.list.length;i++){
 				var $tbody = $("#table tbody");
@@ -328,50 +321,46 @@
 							<td>
 								<!-- <a class="btn btn-danger btn-xs" onclick="deleteTr(this)"><span class="glyphicon glyphicon-remove"></span></a> -->
 							</td>
-							<td>
-								<div style="vertical-align:middle;display:table-cell">
+							<td style = "vertical-align:middle;">
 									<span class="rowNum">0</span>
-								</div>
 							</td>
-							<td>								
-								<div class = "validata-box" style="vertical-align:middle;display:table-cell">
+							<td style = "vertical-align:middle;">								
+								<div class = "validata-box" >
 									<span id="sellerProductName" ></span>
 									<input type="hidden" id="purchaseOrderDetailId" name="purchaseOrderDetailId" />
 								</div>
 							</td>
-							<td>
-								<div style="vertical-align:middle;display:table-cell">
+							<td style = "vertical-align:middle;">
 									<span id="specification"></span>
-								</div>
 							</td>
-							<td>
+							<td style = "vertical-align:middle;">
 								<input type="hidden" name="convert" id="convert" value="" />
-								<div class = "validata-box" style="vertical-align:middle;display:table-cell">
+								<div class = "validata-box">
 									<input type="text" readonly="readonly" id="bigNum" name="bigNum" style="width: 30%;background-color:transparent;border:0px;" onblur="rowTotalF(this)" />
 									<span id="bigUnit-span"></span>
 								</div>
 							</td>
-							<td>
-								<div class = "validata-box" style="vertical-align:middle;display:table-cell">
+							<td style = "vertical-align:middle;">
+								<div class = "validata-box">
 									<input type="text" id="smallNum" readonly="readonly" name="smallNum" style="width: 30%;background-color:transparent;border:0px;" onblur="rowTotalF(this)"  />
 									<span id="smallUnit-span"></span>
 								</div>
 							</td>
-							<td>
+							<td style = "vertical-align:middle;">
 									<span id="custom_name" ></span>
 									<input type="hidden" name="sellerProductId" id="sellerProductId" />
 							</td>
-							<td>
+							<td style = "vertical-align:middle;">
 									<span id="storeCount" ></span>
 							</td>
-							<td>
+							<td style = "vertical-align:middle;">
 								<input type="hidden" name="convert" id="convert" value="" />
 								<div class = "validata-box">
 									<input type="text" id="bN" name="bN" style="width: 70%;text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" onblur="rowTotalF(this)" value="0" />
 								<input type="hidden" id="purchaseInstockDetailId" name="purchaseInstockDetailId" />
 								</div>
 							</td>
-							<td>
+							<td style = "vertical-align:middle;">
 								<div class = "validata-box">
 									<input type="text" id="sN" name="sN" style="width: 70%;text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" onblur="rowTotalF(this)" value="0" />
 								</div>

@@ -173,10 +173,10 @@ public class ProductQuery extends JBaseQuery {
 		LinkedList<Object> params = new LinkedList<Object>();
 		if(!keyword.equals("")){
 			appendIfNotEmptyWithLike(fromBuilder, "cp.name", keyword, params, true);
-			fromBuilder.append(" and cp.is_marketable=1 and u.id='"+userId+"' ");
+			fromBuilder.append(" and cp.is_marketable=1 and u.id='"+userId+"' and cs.seller_type = 0 ");
 	//				+ " and cp.id  not in (select product_id from cc_seller_product where seller_id ='" + sellerId+"')");
 		}else{
-			fromBuilder.append(" where cp.is_marketable=1 and u.id='"+userId+"' ");
+			fromBuilder.append(" where cp.is_marketable=1 and u.id='"+userId+"' and cs.seller_type = 0 ");
 	//				+ "and cp.id  not in (select product_id from cc_seller_product where seller_id ='" + sellerId+"')");
 		}
 		fromBuilder.append(" GROUP by " + orderby);
