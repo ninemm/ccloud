@@ -76,7 +76,7 @@
 		'seller_code': {
 			validators: {
 				notEmpty: { message: '销售商编码不能为空' },
-				stringLength: { max: 15, message: '销售商编码最大长度是15字符，请重新输入' }
+				regexp:{regexp:/^[0-9a-zA-Z_]{6,18}$/, message:'销售商编码必须由6-18位字母或数字组合' }
 			}
 		},
 		'contact': {
