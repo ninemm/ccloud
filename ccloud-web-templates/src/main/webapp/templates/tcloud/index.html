@@ -11,28 +11,30 @@ $(function() { }); </#macro> <@layout>
 					<div class="weui-flex__item t-r">
 						<b>国庆</b>
 					</div>
-					<div class="weui-flex__item t-r" style="flex-grow: 2;">2017-10-18
-						星期五</div>
+					<div class="weui-flex__item t-r" style="flex-grow: 2;">2017-10-18 星期五</div>
 				</div>
 			</div>
 			<div class="weui-grids">
-				<a href="./product.html" class="weui-grid js_grid"> <span
-					class="weui-badge empty-badge">&nbsp;</span>
+				<a href="./product.html" class="weui-grid js_grid">
+                    <!-- <span class="weui-badge empty-badge">&nbsp;</span> -->
 					<div class="weui-grid__icon">
 						<i class="icon-file-text blue"></i>
 					</div>
 					<p class="weui-grid__label">下订单</p>
-				</a> <a href="visitAdd.html" class="weui-grid js_grid">
+				</a>
+                <a href="visitAdd.html" class="weui-grid js_grid">
 					<div class="weui-grid__icon">
 						<i class="icon-plane" style="color: #ffa042"></i>
 					</div>
 					<p class="weui-grid__label">新增拜访</p>
-				</a> <a href="" class="weui-grid js_grid">
+				</a>
+				<!-- <a href="" class="weui-grid js_grid">
 					<div class="weui-grid__icon">
 						<i class="icon-tasks" style="color: #19c594;"></i>
 					</div>
 					<p class="weui-grid__label">活动申请</p>
-				</a> <a href="customerAdd.html" class="weui-grid js_grid"> <span
+				</a> -->
+                <a href="customerAdd.html" class="weui-grid js_grid"> <span
 					class="weui-badge left-top-tag">NEW</span>
 					<div class="weui-grid__icon">
 						<i class="icon-user-plus" style="color: #f1745e"></i>
@@ -46,31 +48,32 @@ $(function() { }); </#macro> <@layout>
 				<b>我的待办</b>
 			</div>
 			<div class="weui-grids">
-				<a href="${CPATH}/todo/customer" class="weui-grid js_grid"> <span
-					class="weui-badge empty-badge">&nbsp;</span>
+			    <a href="" class="weui-grid js_grid">
+			        <span class="weui-badge empty-badge">&nbsp;</span>
+                    <div class="weui-grid__icon">
+                        <i class="icon-file-text" style="color: #19c594;"></i>
+                    </div>
+                    <p class="weui-grid__label">订单审核</p>
+                </a>
+				<a href="${CPATH}/todo/customer" class="weui-grid js_grid">
+                    <span class="weui-badge empty-badge">&nbsp;</span>
 					<div class="weui-grid__icon">
 						<i class="icon-user" style="color: #9c89b9"></i>
 					</div>
 					<p class="weui-grid__label">客户审核</p>
 				</a>
-                <a href="feeAuditList.html" class="weui-grid js_grid"> <span
+                <!-- <a href="feeAuditList.html" class="weui-grid js_grid"> <span
 					class="weui-badge empty-badge">&nbsp;</span>
 					<div class="weui-grid__icon">
 						<i class="icon-check-square-o" style="color: #19c594"></i>
 					</div>
 					<p class="weui-grid__label">费用审核</p>
-				</a>
+				</a> -->
                 <a href="visitAuditList.html" class="weui-grid js_grid">
 					<div class="weui-grid__icon">
 						<i class="icon-suitcase" style="color: #f7b55d;"></i>
 					</div>
 					<p class="weui-grid__label">拜访审核</p>
-				</a>
-                <a href="" class="weui-grid js_grid">
-					<div class="weui-grid__icon">
-						<i class="icon-suitcase" style="color: #f7b55d;"></i>
-					</div>
-					<p class="weui-grid__label">订单审核</p>
 				</a>
 			</div>
 		</div>
