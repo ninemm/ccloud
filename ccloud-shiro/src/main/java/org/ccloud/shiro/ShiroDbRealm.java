@@ -31,7 +31,7 @@ public class ShiroDbRealm extends AuthorizingRealm {
 	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
 	    User userInPrincipal = (User) principals.getPrimaryPrincipal();
 	    //根据用户获取权限
-	    Map<String, List<String>> map = RoleQuery.me().getPermissions(userInPrincipal.getGroupId());
+	    Map<String, List<String>> map = RoleQuery.me().getPermissions(userInPrincipal.getId());
 	    List<String> permission = OperationQuery.me().getPermissionsByUser(userInPrincipal);
 	    SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
 	    info.addRoles(map.get("roleCodes"));

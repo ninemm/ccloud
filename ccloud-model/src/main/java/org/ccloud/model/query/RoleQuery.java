@@ -47,7 +47,7 @@ public class RoleQuery extends JBaseQuery {
 	}
 
 	public Page<Role> paginate(int pageNumber, int pageSize, String keyword, String dataArea, String orderby) {
-		String select = "select * ";
+		String select = "select r.* ";
 		StringBuilder fromBuilder = new StringBuilder("from `role` r INNER JOIN `department` d ON d.id = r.dept_id ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -85,11 +85,11 @@ public class RoleQuery extends JBaseQuery {
 		return DAO.find(sqlBuilder.toString(), roleId, groupId);
 	}
 
-	public Map<String, List<String>> getPermissions(String groupId) {
+	public Map<String, List<String>> getPermissions(String userId) {
 		Map<String, List<String>> map = new HashMap<>();
 		List<String> roleIds = new ArrayList<>();
 		List<String> roleCodes = new ArrayList<>();
-		List<Role> list = RoleQuery.me().findByGroupId(groupId);
+		List<Role> list = RoleQuery.me().findByUserId(userId);
 		for (Role role : list) {
 			roleCodes.add(role.getRoleCode());
 			roleIds.add(role.getId());
@@ -99,15 +99,14 @@ public class RoleQuery extends JBaseQuery {
 		return map;
 	}
 
-	public List<Role> findByGroupId(String groupId) {
+	public List<Role> findByUserId(String userId) {
 		StringBuilder sqlBuilder = new StringBuilder("select r.* ");
 
 		sqlBuilder.append("from `role` r ");
 		sqlBuilder.append("left join `group_role_rel` gr on gr.role_id = r.id ");
-		sqlBuilder.append("left join `group` g on g.id = gr.group_id ");
-		sqlBuilder.append("where g.id = ? ");
+		sqlBuilder.append("where LOCATE(gr.group_id, (SELECT ug.group_id FROM user_group_rel ug where ug.user_id = ?)) > 0");
 
-		return DAO.find(sqlBuilder.toString(), groupId);
+		return DAO.find(sqlBuilder.toString(), userId);
 	}
 
 	public List<Role> queryRoleOperation(String roleId, String operationId) {
