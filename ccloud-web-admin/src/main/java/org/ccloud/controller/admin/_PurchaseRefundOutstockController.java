@@ -232,6 +232,7 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 	//审核通过，对库存总账进行修改
 	public void pass(){
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		Seller seller = SellerQuery.me().findByUserId(user.getId());
 		String purchaseRefundId=getPara("id");
 		boolean flang = false;
 		final InventoryDetail inventoryDetail= getModel(InventoryDetail.class);
@@ -241,7 +242,7 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 			BigDecimal count1 = pr.getProductCount();
 			BigDecimal convent = new BigDecimal(pr.get("convert_relate").toString());
 			SellerProduct sellerProduct = SellerProductQuery.me().findById(pr.getSellerProductId());
-			Inventory inventory= InventoryQuery.me().findByWarehouseIdAndProductId(pr.get("warehouse_id").toString(),sellerProduct.getProductId() );
+			Inventory inventory= InventoryQuery.me().findBySellerIdAndProductIdAndWareHouseId(seller.getId(), sellerProduct.getProductId(), pr.get("warehouse_id").toString());
 			inventory.set("out_count", count1.divide(convent, 2, BigDecimal.ROUND_HALF_UP));
 			inventory.set("out_amount", pr.getProductAmount());
 			inventory.set("out_price", pr.getProductPrice());
@@ -274,13 +275,8 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 			if(flang==false){
 				break;
 			}
-			
-			List<Inventory> inventorys = InventoryQuery.me()._findBySellerIdAndProductId(inventory.getSellerId(),inventory.getProductId());
-			BigDecimal count0 = new BigDecimal(0);
-			for(Inventory inventory0:inventorys){
-				count0 = count0.add(inventory0.getBalanceCount());
-			}
-			sellerProduct.set("store_count", count0);
+			BigDecimal count0 = count1.divide(convent, 2, BigDecimal.ROUND_HALF_UP);
+			sellerProduct.set("store_count", sellerProduct.getStoreCount().subtract(count0));
 			sellerProduct.set("modify_date", new Date());
 			sellerProduct.update();
 		}

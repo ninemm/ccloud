@@ -102,12 +102,17 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String p = "";
 		List<PurchaseRefundOutstock> list = PurchaseRefundOutstockQuery.me().findByUser(user.getId(), user.getDataArea());
-		String pro = "";
-		for(int i=0;i<list.size();i++){
-			pro += "'"+list.get(i).getWarehouseInId()+"',"; 
+		if(list.size()>0){	
+			String pro = "";
+			for(int i=0;i<list.size();i++){
+				pro += "'"+list.get(i).getWarehouseInId()+"',"; 
+			}
+			p = pro.substring(0, pro.length()-1);
+		}else{
+			p = "''";
 		}
-		String p = pro.substring(0, pro.length()-1);
 		Page<Record> page = PurchaseInstockQuery.me().paginateO(getPageNumber(), getPageSize(), keyword, startDate, endDate,user.getId(),user.getDataArea(),p);
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
@@ -220,8 +225,8 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 		List<PurchaseInstockDetail> list= PurchaseInstockDetailQuery.me().findAllByPurchaseInstockId(purchaseInstockId);
 		for(PurchaseInstockDetail pi : list){
 			BigDecimal count2 = new BigDecimal(pi.getProductCount());
-			BigDecimal convent = new BigDecimal(pi.get("convert_relate").toString());
-			Inventory inventory= InventoryQuery.me().findByWarehouseIdAndProductId(pi.get("warehouse_id").toString(), pi.get("productId").toString());
+			BigDecimal convent = new BigDecimal(pi.get("convert_relate").toString()); 
+			Inventory inventory= InventoryQuery.me().findBySellerIdAndProductIdAndWareHouseId(seller.getId(), pi.get("productId").toString(), pi.get("warehouse_id").toString());
 			if(inventory!=null){
 				inventory.set("in_count", count2.divide(convent, 2, BigDecimal.ROUND_HALF_UP));
 				inventory.set("in_amount", pi.getProductAmount());
