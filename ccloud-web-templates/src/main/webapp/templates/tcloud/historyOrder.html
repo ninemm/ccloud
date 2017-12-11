@@ -27,7 +27,7 @@
 
         $.ajax({
             type: "post",
-            url: "${CPATH}/historyOrder/refresh",
+            url: "${CPATH}/customer/refreshHistoryOrder",
             data: paramData(),
             dataType: "json",
             success:function(data) {
@@ -48,7 +48,7 @@
     function refresh() {
         pageNumber = 1;
         $.ajax({
-            url:"${CPATH}/historyOrder/refresh",
+            url: "${CPATH}/customer/refreshHistoryOrder",
             type:"post",
             data:paramData(),
             dataType:"json",
@@ -82,7 +82,7 @@
         <#assign total = orderList.totalRow>
             <#list orderList.list as order>
                     <div class="weui-panel weui-panel_access">
-                        <a href="order/orderDetail?orderId=${(order.id)!}">
+                        <a href="/order/orderDetail?orderId=${(order.id)!}">
                         <div class="ft14">
                             <#if order.receive_type = 0>
                                 <span class="tag">${(order.receive_Name)!}</span>

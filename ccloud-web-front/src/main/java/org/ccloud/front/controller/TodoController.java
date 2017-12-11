@@ -16,6 +16,7 @@ public class TodoController extends BaseFrontController {
 		
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String username = user.getUsername();
+		username = "zhuguan";
 		List<SellerCustomer> list = SellerCustomerQuery.me().getToDo(username);
 		setAttr("todoList", list);
 		render("todo_customer.html");

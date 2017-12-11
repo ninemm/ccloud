@@ -57,7 +57,7 @@ public class CustomerDetailController extends BaseFrontController {
 
 		if (StrKit.notBlank(sellerCustomerId)) {
 			SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(sellerCustomerId);
-			List<String> typeList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeListBySellerCustomerId(sellerCustomerId,
+			List<String> typeList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeIdListBySellerCustomerId(sellerCustomerId,
 					DataAreaUtil.getUserDealerDataArea(selectDataArea));
 
 			List<String> typeName = new ArrayList<>();

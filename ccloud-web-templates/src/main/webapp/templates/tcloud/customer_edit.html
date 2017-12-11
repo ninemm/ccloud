@@ -109,6 +109,7 @@
                ctx.drawImage(image, 0, 0, image.width, image.height);
                var blob = canvas.toDataURL('image/jpeg', 0.8);
                imageArr.push({"pic":blob, "pic_name":picname});
+               $("#pic").val(JSON.stringify(imageArr));
             };
             image.src = src;
         }
@@ -136,11 +137,13 @@
     
     function doSubmit() {
     
-        $form.ajaxSubmit({
-            type: "post",
-            dataType: "json",
-            data: {'pic': JSON.stringify(imageArr)},
-            beforeSubmit: function() {
+        $.ajax({
+            url: '${CPATH}/customer/save',
+            method: 'post',
+            dataType: 'json',
+            data: $form.serialize(),
+            beforeSend: function() {
+            
                 if($("#customer_name").val().length==0) {$.toptip('客户名称不能为空', 1000, 'error'); return false;}
                 if($("#contact").val().length==0) {$.toptip('联系人不能为空', 1000, 'error'); return false;}
                 if($("#mobile").val().length==0) {$.toptip('联系电话不能为空', 1000, 'error'); return false;}
@@ -150,10 +153,7 @@
                 if($("#delivery-address").val().length==0) {$.toptip('配送地址不能为空', 1000, 'error'); return false;}
                 if($("#address").val().length==0) {$.toptip('地址详情不能为空', 1000, 'error'); return false;}
                 
-                //return true;
-                //$('._submit_btn').attr('disabled', true);
-                //$("#pic").val(JSON.stringify(imageArr));
-                
+                $('._submit_btn').attr('disabled', true);
                 layer.open({
                     type: 2,
                     content: '保存中...'
@@ -302,7 +302,7 @@
 	                        </ul>
 	                        <div class="weui-uploader__input-box">
 	                            <input id="uploaderInput" name="customer.img_path" class="weui-uploader__input" type="file" accept="image/*" multiple="">
-	                            <!-- <input type="hidden" name="pic" id="pic"> -->
+	                            <input type="hidden" name="pic" id="pic">
 	                        </div>
 	                    </div>
 	                </div>
@@ -320,10 +320,10 @@
     </form>
 </main>
 <#include "_inc/_goback.html" />
-<footer class="weui-footer weui-footer_fixed-bottom ft16">
+<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
     <#if sellerCustomer??>
-        <button class="gray-button width-50 _submit_btn" onclick="doEnabled()">停用</button>
-        <button class="blue-button width-50 _submit_btn" onclick="doSubmit()">更新</button>
+        <button class="gray-button weui-flex__item _submit_btn" onclick="doEnabled()">停用</button>
+        <button class="blue-button weui-flex__item _submit_btn" onclick="doSubmit()">更新</button>
     <#else>
         <button class="blue-button width-100 _submit_btn" onclick="doSubmit()">新增客户</button>
     </#if>

@@ -17,14 +17,8 @@ import org.ccloud.model.SellerCustomer;
 import org.ccloud.model.User;
 import org.ccloud.model.UserJoinCustomer;
 import org.ccloud.model.WxMessageTemplate;
-import org.ccloud.model.query.CustomerJoinCustomerTypeQuery;
-import org.ccloud.model.query.CustomerQuery;
-import org.ccloud.model.query.CustomerTypeQuery;
-import org.ccloud.model.query.DepartmentQuery;
-import org.ccloud.model.query.OptionQuery;
-import org.ccloud.model.query.SellerCustomerQuery;
-import org.ccloud.model.query.UserQuery;
-import org.ccloud.model.query.WxMessageTemplateQuery;
+import org.ccloud.model.compare.BeanCompareUtils;
+import org.ccloud.model.query.*;
 import org.ccloud.model.vo.CustomerVO;
 import org.ccloud.model.vo.ImageJson;
 import org.ccloud.route.RouterMapping;
@@ -67,7 +61,7 @@ public class CustomerController extends BaseFrontController {
 
 	public void getCustomerRegionAndType() {
 
-		User user = getUser();
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
 		List<Record> userList = UserQuery.me().findNextLevelsUserList(user.getDataArea());
 		List<Map<String, Object>> region = new ArrayList<>();
@@ -99,7 +93,7 @@ public class CustomerController extends BaseFrontController {
 	}
 
 	public void refresh() {
-		User user = getUser();
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
 		Page<Record> customerList = new Page<>();
 		if (StrKit.notBlank(getPara("region"))) {
@@ -130,8 +124,8 @@ public class CustomerController extends BaseFrontController {
 			html.append("					<p><i class=\"icon-paw\" style=\"color:#ff9800\"></i></p>\n");
 			html.append("					<p>拜访</p>\n");
 			html.append("				</a>\n");
-			html.append("				<a class=\"weui-flex__item relative\" href=\"/customerDetail\">\n");
-			html.append("					<i class=\"icon-chevron-right gray href=\"/customerDetail?sellerCustomerId=" + customer.getStr("sellerCustomerId") + "\"></i>\n");
+			html.append("				<a class=\"weui-flex__item relative\" href=\"/customer/edit?sellerCustomerId=" + customer.getStr("sellerCustomerId") + "\">\n");
+			html.append("					<i class=\"icon-chevron-right gray\"></i>\n");
 			html.append("				</a>\n");
 			html.append("			</div>\n");
 			html.append("		</div>\n");
@@ -154,17 +148,75 @@ public class CustomerController extends BaseFrontController {
 		map.put("totalPage", customerList.getTotalPage());
 		renderJson(map);
 	}
+
+	public void refreshHistoryOrder() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+
+		Page<Record> orderList = new Page<>();
+		orderList = SalesOrderQuery.me().findBySellerCustomerId(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("sellerCustomerId"), getUserDeptDataArea(user.getDataArea()));
+
+		StringBuilder html = new StringBuilder();
+		for(Record order : orderList.getList()){
+			order.set("statusName", getStatusName(order.getInt("status")));
+			order.set("receive_Name", getReceiveName(order.getInt("receive_type")));
+			html.append("<div class=\"weui-panel weui-panel_access\">\n" +
+					"                        <a href=\"/order/orderDetail?orderId=" + order.getStr("id") + "\">\n" +
+					"                        <div class=\"ft14\">\n");
+			if (order.get("receive_type").toString().equals("0")) html.append("                                <span class=\"tag\">" + order.getStr("receive_Name") + "</span>\n");
+			html.append(order.getStr("order_sn") + "\n" +
+					"                            <span class=\"fr blue\">" + order.getStr("statusName") + "</span>\n" +
+					"                        </div>\n" +
+					"                        <div class=\"gray\">\n" +
+					"                            <p>数量：" + order.getStr("total_count") + "件\n" +
+					"                                <span class=\"fr\">时间：" + order.get("create_date").toString() + "</span>\n" +
+					"                            </p>\n" +
+					"                            <p>金额：" + order.get("total_amount").toString() + "" +
+					"							 <span class=\"fr\">业务员：" + order.getStr("realname") + "</span>" +
+					"							 </p>\n" +
+					"                        </div>\n" +
+					"                        </a>\n" +
+					"                        <hr>\n" +
+					"                        <div>\n");
+			if(order.get("status").toString().equals("0")) html.append("<div class=\"button blue-button fl\">撤销</div>\n" +
+					"                            <div class=\"button white-button fr\">再次购买</div>\n" +
+					"                        </div>\n" +
+					"                    </div>");
+		}
+
+		Map<String, Object> map = new HashMap<>();
+		map.put("html", html.toString());
+		map.put("totalRow", orderList.getTotalRow());
+		map.put("totalPage", orderList.getTotalPage());
+		renderJson(map);
+	}
+
+	public void historyOrder() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+
+		Page<Record> orderList = SalesOrderQuery.me().findBySellerCustomerId(getPageNumber(), getPageSize(), getPara("sellerCustomerId"), getUserDeptDataArea(user.getDataArea()));
+
+		for(Record record : orderList.getList()){
+			record.set("statusName", getStatusName(record.getInt("status")));
+			record.set("receive_Name", getReceiveName(record.getInt("receive_type")));
+		}
+
+		setAttr("orderList", orderList);
+		setAttr("sellerCustomerId", getPara("sellerCustomerId"));
+		setAttr("customerName", getPara("customerName"));
+
+		render("historyOrder.html");
+	}
 	
 	public void edit() {
 		
-		String id = getPara("id");
+		String id = getPara("sellerCustomerId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		
 		if (StrKit.notBlank(id)) {
 			String selectDataArea = getUserDeptDataArea(user.getDataArea());
 			SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(id);
 			String dealerDataArea = DataAreaUtil.getUserDealerDataArea(selectDataArea);
-			List<String> typeList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeListBySellerCustomerId(id, dealerDataArea + "%");
+			List<String> typeList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeIdListBySellerCustomerId(id, dealerDataArea + "%");
 
 			List<String> typeName = new ArrayList<>();
 			for(String type : typeList)
@@ -177,7 +229,29 @@ public class CustomerController extends BaseFrontController {
 		
 		render("customer_edit.html");
 	}
-	
+
+	public void getCustomerType(){
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+
+		String selectDataArea = getUserDeptDataArea(user.getDataArea());
+
+		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
+				.findByDataArea(DataAreaUtil.getUserDealerDataArea(selectDataArea));
+		List<Map<String, Object>> customerTypeList2 = new ArrayList<>();
+
+		for(CustomerType customerType : customerTypeList)
+		{
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", customerType.getName());
+			item.put("value", customerType.getId());
+			customerTypeList2.add(item);
+		}
+
+		Map<String, List<Map<String, Object>>> data = new HashMap<>();
+		data.put("customerTypeList", customerTypeList2);
+		renderJson(data);
+	}
+
 	public void save() {
 		
 		boolean updated = false;
@@ -320,6 +394,63 @@ public class CustomerController extends BaseFrontController {
 			renderAjaxResultForError("操作失败");
 	}
 	
+	public void review() {
+		String id = getPara("id");
+		String taskId = getPara("taskId");
+		
+		if (StrKit.isBlank(id)) {
+			renderError(404);
+			return ;
+		}
+			
+		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(id);
+		setAttr("sellerCustomer", sellerCustomer);
+		
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String dealerDataArea = DataAreaUtil.getUserDealerDataArea(selectDataArea);
+		List<String> custTypeNameList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeNameListBySellerCustomerId(id, dealerDataArea);
+		String custTypeNames = Joiner.on(",").skipNulls().join(custTypeNameList);
+		setAttr("custTypeNames", custTypeNames);
+		
+		WorkFlowService workflowService = new WorkFlowService();
+		Object customerVO = workflowService.getTaskVariableByTaskId(taskId, "customerVO");
+		Object applyer = workflowService.getTaskVariableByTaskId(taskId, "applyUsername");
+		if (applyer != null) {
+			User user = UserQuery.me().findUserByUsername(applyer.toString());
+			setAttr("applyer", user);
+		}
+		
+		if (customerVO != null) {
+			CustomerVO src = new CustomerVO();
+			CustomerVO dest = (CustomerVO) customerVO;
+			
+			src.setNickname(sellerCustomer.getNickname());
+			src.setSellerCustomerId(sellerCustomer.getId());
+			src.setCustomerId(sellerCustomer.getCustomerId());
+			
+			src.setContact(sellerCustomer.getStr("contact"));
+			src.setMobile(sellerCustomer.getStr("mobile"));
+			src.setAddress(sellerCustomer.getStr("address"));
+			src.setCustomerName(sellerCustomer.getStr("customer_name"));
+			
+			String areaName = Joiner.on(",").skipNulls()
+				.join(sellerCustomer.getStr("prov_name")
+					, sellerCustomer.getStr("city_name")
+					, sellerCustomer.getStr("country_name"));
+			src.setAreaName(areaName);
+			
+			String areaCode = Joiner.on(",").skipNulls()
+				.join(sellerCustomer.getStr("prov_code")
+					, sellerCustomer.getStr("city_code")
+					, sellerCustomer.getStr("country_code"));
+			src.setAreaCode(areaCode);
+			List<String> diffAttrList = BeanCompareUtils.contrastObj(src, dest);
+			setAttr("diffAttrList", diffAttrList);
+		}
+		
+		render("customer_review.html");
+	}
+	
 	private boolean startProcess(String customerId, Map<String, Object> param) {
 		
 		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(customerId);
@@ -371,11 +502,8 @@ public class CustomerController extends BaseFrontController {
 		}
 		return isUpdated;
 	}
-
-	private User getUser(){
-		User user = UserQuery.me().findById("ce05e9008ece42bc986e7bc41edcf4a0");
-		return user;
-	}
+	
+	
 
 	private String getUserDeptDataArea(String dataArea) {
 		if (dataArea.length() % 3 != 0) {
@@ -394,6 +522,23 @@ public class CustomerController extends BaseFrontController {
 			userIdList[i] = userList.get(i).getStr("id");
 		}
 		return userIdList;
+	}
+
+	private String getStatusName (int statusCode) {
+		if (statusCode == Consts.SALES_ORDER_STATUS_PASS) return "已审核";
+		if (statusCode == Consts.SALES_ORDER_STATUS_DEFAULT) return "待审核";
+		if (statusCode == Consts.SALES_ORDER_STATUS_CANCEL) return "取消";
+		if (statusCode == Consts.SALES_ORDER_STATUS_PART_OUT) return "部分出库";
+		if (statusCode == Consts.SALES_ORDER_STATUS_PART_OUT_CLOSE) return "部分出库-订单关闭";
+		if (statusCode == Consts.SALES_ORDER_STATUS_ALL_OUT) return "全部出库";
+		if (statusCode == Consts.SALES_ORDER_STATUS_ALL_OUT_CLOSE) return "全部出库-订单关闭";
+		return "无";
+	}
+
+	private String getReceiveName(int receiveCode) {
+		if (receiveCode == Consts.SALES_ORDER_RECEIVE_TYPE_ACCOUNT) return "账期";
+		if (receiveCode == Consts.SALES_ORDER_RECEIVE_TYPE_CASH) return "现金";
+		return "";
 	}
 	
 	@Before(Tx.class)

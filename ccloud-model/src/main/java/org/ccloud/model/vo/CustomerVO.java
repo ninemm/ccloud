@@ -35,8 +35,11 @@ public class CustomerVO implements Serializable {
 	@JSONField(name = "店招图")
 	private String imageListStore;
 	
-	@JSONField(name = "客户类型")
+	@JSONField(name = "客户类型ID")
 	private List<String> custTypeList;
+	@JSONField(name = "客户类型")
+	private List<String> custTypeNameList;
+	
 	@JSONField(name = "定位地址")
 	private String location;
 	
@@ -87,54 +90,6 @@ public class CustomerVO implements Serializable {
 	public void setNickname(String nickname) {
 		this.nickname = nickname;
 	}
-
-//	public String getProvName() {
-//		return provName;
-//	}
-//
-//	public void setProvName(String provName) {
-//		this.provName = provName;
-//	}
-//
-//	public String getProvCode() {
-//		return provCode;
-//	}
-//
-//	public void setProvCode(String provCode) {
-//		this.provCode = provCode;
-//	}
-//
-//	public String getCityName() {
-//		return cityName;
-//	}
-//
-//	public void setCityName(String cityName) {
-//		this.cityName = cityName;
-//	}
-//
-//	public String getCityCode() {
-//		return cityCode;
-//	}
-//
-//	public void setCityCode(String cityCode) {
-//		this.cityCode = cityCode;
-//	}
-//
-//	public String getCountryName() {
-//		return countryName;
-//	}
-//
-//	public void setCountryName(String countryName) {
-//		this.countryName = countryName;
-//	}
-//
-//	public String getCountryCode() {
-//		return countryCode;
-//	}
-//
-//	public void setCountryCode(String countryCode) {
-//		this.countryCode = countryCode;
-//	}
 
 	public String getAreaCode() {
 		return areaCode;
@@ -199,6 +154,13 @@ public class CustomerVO implements Serializable {
 	public void setCustTypeList(List<String> custTypeList) {
 		this.custTypeList = custTypeList;
 	}
-	
+
+	public List<String> getCustTypeNameList() {
+		return custTypeNameList;
+	}
+
+	public void setCustTypeNameList(List<String> custTypeNameList) {
+		this.custTypeNameList = custTypeNameList;
+	}
 	
 }

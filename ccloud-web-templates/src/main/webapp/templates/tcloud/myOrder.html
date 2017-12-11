@@ -163,19 +163,21 @@
 
 <@layout>
 <body id="my-order" class="ft12">
-	<header class="has-th-list">
-		<div class="head-search select-area">
-			<div>
-				<input type="text" id="status" class="weui-input" readonly placeholder="订单状态">
-				<i class="icon-sort-desc"></i>
-			</div>
-			<div>
-				<input type="text" id="customerTypeId" placeholder="客户类型" class="weui-input" readonly>
-				<i class="icon-sort-desc"></i>
-			</div>
-			<div>
-				<input type="text" id="datePicker" class="weui-input" readonly>
-				<i class="icon-sort-desc"></i>
+	<header class="has-th-list weui-flex">
+		<div class="head-search select-area weui-flex__item">
+			<div class="weui-flex">
+				<div class="weui-flex__item">
+					<input type="text" id="status" class="weui-input" readonly placeholder="订单状态">
+					<i class="icon-sort-desc"></i>
+				</div>
+				<div class="weui-flex__item">
+					<input type="text" id="customerTypeId" placeholder="客户类型" class="weui-input" readonly>
+					<i class="icon-sort-desc"></i>
+				</div>
+				<div class="weui-flex__item">
+					<input type="text" id="datePicker" class="weui-input" readonly>
+					<i class="icon-sort-desc"></i>
+				</div>
 			</div>
 		</div>
 		<div id="combin-filter-btn">

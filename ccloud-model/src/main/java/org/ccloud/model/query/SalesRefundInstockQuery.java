@@ -247,4 +247,17 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 				status, date, inStockId);
 	}
 
+	public String getNewSn(String sellerId) {
+		String sql = "SELECT s.instock_sn FROM cc_sales_refund_instock s WHERE date(s.create_date) = curdate() AND s.seller_id = ? ORDER BY s.create_date desc";
+		SalesRefundInstock sales = DAO.findFirst(sql, sellerId);
+		String SN = "";
+		if (sales == null || StringUtils.isBlank(sales.getInstockSn())) {
+			SN = Consts.SALES_ORDER_SN;
+		} else {
+			String endSN = StringUtils.substringSN(Consts.SALES_ORDER_SN, sales.getInstockSn());
+			SN = new BigDecimal(endSN).add(new BigDecimal(1)).toString();
+		}
+		return SN;
+	}
+
 }

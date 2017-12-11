@@ -49,8 +49,10 @@ public class InventoryQuery extends JBaseQuery {
 	}
 
 	public Page<Inventory> paginate(int pageNumber, int pageSize,String product_sn,String product_name,String warehouse_id, String seller_id) {
-		String select = "SELECT sp.custom_name,i.seller_id,i.product_id,p.name as product_name ,p.product_sn,i.in_count, i.in_amount, i.in_price, i.out_count, i.out_amount, i.out_price, i.balance_count, i.balance_amount, i.balance_price, i.afloat_count, i.afloat_amount, i.afloat_price, i.create_date, i.modify_date";
+		String select = "SELECT sp.custom_name,i.seller_id,i.product_id,p.name as product_name ,p.product_sn,i.in_count, i.in_amount, i.in_price, i.out_count, i.out_amount, i.out_price, i.balance_count, i.balance_amount, i.balance_price, i.afloat_count, i.afloat_amount, i.afloat_price, i.create_date, i.modify_date,t1.valueName";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_inventory` as i INNER JOIN  `cc_product` as p ON i.product_id = p.id INNER JOIN cc_seller_product as sp on sp.seller_id=i.seller_id and sp.product_id=p.id ");
+		fromBuilder.append("LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
+		fromBuilder.append("RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = sp.product_id ");		
 		fromBuilder.append("WHERE i.warehouse_id = '"+ warehouse_id+"'and i.seller_id='"+seller_id+"'");
 		LinkedList<Object> params = new LinkedList<Object>();
 		appendIfNotEmptyWithLike(fromBuilder, "p.name", product_name, params, false);
@@ -79,12 +81,6 @@ public class InventoryQuery extends JBaseQuery {
 		StringBuilder fromBuilder = new StringBuilder("select w.id,w.code,w.name from  cc_warehouse w,cc_user_join_warehouse uw where w.id =uw.warehouse_id and uw.user_id=? and w.is_enabled=1");
 		List<Record> list = Db.find(fromBuilder.toString(),userId);
 		return list;
-	}
-	
-	public Inventory findByWarehouseIdAndProductId(String warehouseId,String productId){
-		String sql = "select * from cc_inventory "
-				+ "where warehouse_id='"+warehouseId+"' and product_id ='"+productId+"'";
-		return DAO.findFirst(sql);
 	}
 	
 	public Inventory findBySellerIdAndProductId(String sellerId,String productId){

@@ -29,7 +29,7 @@
         });
 
         $.ajax({
-            url: "${CPATH}/customerDetail/getCustomerType",
+            url: "${(CPATH)!}/customer/getCustomerType",
             type: "post",
             dataType: "json",
             success: function(data) {
@@ -176,7 +176,7 @@
     }
     
     function doEnabled() {
-        $.get("${CPATH}/customerDetail/enable?id=${(sellerCustomer.id)!""}&isEnabled=0" ,
+        $.get("${CPATH}/customer/enable?id=${(sellerCustomer.id)!""}&isEnabled=0" ,
         function(result){
             if (result.errorCode > 0) {
                 toastr.error(result.message, '操作失败');
@@ -191,7 +191,7 @@
 <@layout>
 <div id="customer-add">
 <main>
-    <form action="${CPATH}/customerDetail/update" method="post" id="form">
+    <form action="${CPATH}/customer/update" method="post" id="form">
     <section class="weui-panel weui-panel_access order-customer-info">
         <input type="hidden" name="sellerCustomer.id" value="${(sellerCustomer.id)!}">
         <div class="weui-cell weui-cell_access">
@@ -333,10 +333,10 @@
     </form>
 </main>
 <#include "_inc/_goback.html" />
-<footer class="weui-footer weui-footer_fixed-bottom ft16">
+<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
     <#if sellerCustomer??>
-        <button class="gray-button width-50 _submit_btn" onclick="doEnabled()">停用</button>
-        <button class="blue-button width-50 _submit_btn" onclick="doSubmit()">更新</button>
+        <button class="gray-button weui-flex__item _submit_btn" onclick="doEnabled()">停用</button>
+        <button class="blue-button weui-flex__item _submit_btn" onclick="doSubmit()">更新</button>
     <#else>
         <button class="blue-button width-100 _submit_btn" onclick="doSubmit()">添加</button>
     </#if>

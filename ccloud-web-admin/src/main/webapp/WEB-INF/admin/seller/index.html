@@ -61,7 +61,10 @@
       			},
       			{field: "prov_name", title: "区域", align: "center", width: '10%',
       				formatter: function(value, row, rowIndex) {
-						var str = value +"-"+ row.city_name +"-"+row.country_name;
+						var str = value +"-"+ row.city_name;
+						if(row.country_name!=""){
+							str += "-"+row.country_name;
+						}
 						return str;
    					},
       				edit:false
