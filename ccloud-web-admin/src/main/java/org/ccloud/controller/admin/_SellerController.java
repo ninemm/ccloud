@@ -127,15 +127,21 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		seller.setProvCode(areaCodeArray[0]);
 		seller.setCityName(areaNameArray[1]);
 		seller.setCityCode(areaCodeArray[1]);
-		seller.setCountryName(areaNameArray[2]);
-		seller.setCountryCode(areaCodeArray[2]);
-		
+		if(areaNameArray.length>2){
+			seller.setCountryName(areaNameArray[2]);
+			seller.setCountryCode(areaCodeArray[2]);
+			customer.setCountryName(areaNameArray[2]);
+			customer.setCountryCode(areaCodeArray[2]);
+		}else{
+			seller.setCountryName("");
+			seller.setCountryCode("");
+			customer.setCountryName("");
+			customer.setCountryCode("");
+		}
 		customer.setProvName(areaNameArray[0]);
 		customer.setProvCode(areaCodeArray[0]);
 		customer.setCityName(areaNameArray[1]);
 		customer.setCityCode(areaCodeArray[1]);
-		customer.setCountryName(areaNameArray[2]);
-		customer.setCountryCode(areaCodeArray[2]);
 		
 		String [] brandIds= brandList.split(",");
 		Department department=DepartmentQuery.me().findById(getPara("dept_id"));
