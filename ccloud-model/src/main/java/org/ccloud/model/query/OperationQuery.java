@@ -215,9 +215,9 @@ public class OperationQuery extends JBaseQuery {
 				fromBuilder.append("UNION ALL ");
 				fromBuilder.append("select o.url from `station_operation_rel` r left join `operation` o ");
 				fromBuilder.append("on r.operation_id = o.id ");
-				fromBuilder.append("WHERE LOCATE((SELECT u.station_id FROM `user` u where u.id = ?),r.station_id) > 0");
+				fromBuilder.append("WHERE LOCATE(?,r.station_id) > 0");
 				params.add(user.getId());
-				params.add(user.getId());
+				params.add(user.getStationId());
 				List<Record> records = Db.find(fromBuilder.toString(), params.toArray());
 				for (Record record : records) {
 					list.add(record.getStr("url"));

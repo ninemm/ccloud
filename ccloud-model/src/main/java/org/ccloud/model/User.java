@@ -17,8 +17,11 @@ package org.ccloud.model;
 
 import org.ccloud.model.core.Table;
 import org.ccloud.model.query.DepartmentQuery;
+import org.ccloud.model.query.OperationQuery;
 
 import com.jfinal.plugin.ehcache.CacheKit;
+
+import java.util.List;
 
 import org.ccloud.model.base.BaseUser;
 
@@ -81,6 +84,10 @@ public class User extends BaseUser<User> {
 	
 	public Department findDepartmentById() {
 		return DepartmentQuery.me().findById(getDepartmentId());
+	}
+	
+	public List<String> getUserPermission(User user) {
+		return OperationQuery.me().getPermissionsByUser(user);
 	}
 	
 }

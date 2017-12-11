@@ -55,10 +55,10 @@ import com.jfinal.plugin.activerecord.Record;
 @RouterMapping(url = "/admin/productComposition", viewPath = "/WEB-INF/admin/product_composition")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
-@RequiresPermissions(value={"/admin/productComposition","/admin/all"},logical=Logical.OR)
 public class _ProductCompositionController extends JBaseCRUDController<ProductComposition> { 
 
 	@Override
+	@RequiresPermissions(value={"/admin/productComposition","/admin/all"},logical=Logical.OR)
 	public void index() {
 		
 		String keyword = getPara("k");
@@ -75,6 +75,7 @@ public class _ProductCompositionController extends JBaseCRUDController<ProductCo
 	
 	@Override
 	@Before(UCodeInterceptor.class)
+	@RequiresPermissions(value={"/admin/productComposition","/admin/all"},logical=Logical.OR)
 	public void save() {
 		Map<String, String[]> map = getParaMap();
 		boolean status = this.saveProduct(map);
@@ -302,6 +303,7 @@ public class _ProductCompositionController extends JBaseCRUDController<ProductCo
 		render("add.html");
 	}	
 	
+	@RequiresPermissions(value={"/admin/productComposition","/admin/salesOrder"},logical=Logical.OR)
 	public void getDetail () {
 		String id = getPara("id");
 		List<ProductComposition> list = new ArrayList<>();
@@ -312,6 +314,7 @@ public class _ProductCompositionController extends JBaseCRUDController<ProductCo
 		render("product_detail.html");
 	}
 	
+	@RequiresPermissions(value={"/admin/salesOrder"})
 	public synchronized void saveOrder() {
 
 		Map<String, String[]> paraMap = getParaMap();
