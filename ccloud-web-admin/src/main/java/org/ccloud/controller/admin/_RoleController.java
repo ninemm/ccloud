@@ -141,7 +141,7 @@ public class _RoleController extends JBaseCRUDController<Role> {
 		List<Role> ownRoleList = null;
 		if (!isSuperAdmin) {
 			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-			ownRoleList = RoleQuery.me().findByGroupId(user.getGroupId());
+			ownRoleList = RoleQuery.me().findByUserId(user.getId());
 		}
         List<Record> list = OperationQuery.me().queryRoleOperation(roleId, ownRoleList);
         List<ModuleInfo> moduleList = new ArrayList<>();

@@ -210,12 +210,13 @@ public class OperationQuery extends JBaseQuery {
 				LinkedList<Object> params = new LinkedList<Object>();
 				StringBuilder fromBuilder = new StringBuilder("select o.url from `role_operation_rel` r left join `operation` o ");
 				fromBuilder.append("on r.operation_id = o.id where r.role_id in ");
-				fromBuilder.append("(SELECT gr.role_id FROM group_role_rel gr where gr.group_id = ?) ");
+				fromBuilder.append("(SELECT gr.role_id FROM group_role_rel gr ");
+				fromBuilder.append("where LOCATE(gr.group_id ,(SELECT ug.group_id FROM user_group_rel ug where ug.user_id = ?)) > 0) ");
 				fromBuilder.append("UNION ALL ");
 				fromBuilder.append("select o.url from `station_operation_rel` r left join `operation` o ");
 				fromBuilder.append("on r.operation_id = o.id ");
 				fromBuilder.append("WHERE LOCATE((SELECT u.station_id FROM `user` u where u.id = ?),r.station_id) > 0");
-				params.add(user.getGroupId());
+				params.add(user.getId());
 				params.add(user.getId());
 				List<Record> records = Db.find(fromBuilder.toString(), params.toArray());
 				for (Record record : records) {

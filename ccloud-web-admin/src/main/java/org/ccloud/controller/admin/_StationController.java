@@ -234,7 +234,7 @@ public class _StationController extends JBaseCRUDController<Station> {
 		List<Role> ownRoleList = null;
 		if (!isSuperAdmin) {
 			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-			ownRoleList = RoleQuery.me().findByGroupId(user.getGroupId());
+			ownRoleList = RoleQuery.me().findByUserId(user.getId());
 		}
         List<Record> list = OperationQuery.me().queryStationOperation(stationId,ownRoleList);
         List<ModuleInfo> moduleList = new ArrayList<>();
