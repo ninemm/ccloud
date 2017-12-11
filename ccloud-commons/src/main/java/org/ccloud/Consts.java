@@ -116,7 +116,7 @@ public class Consts {
 	public static final String BIZ_TYPE_P_OUTSTOCK = "100203";//采购退货出库
 	public static final String BIZ_TYPE_SALES_OUTSTOCK = "100204";//销售出库
 	public static final String BIZ_TYPE_SALES_REFUND_INSTOCK = "100205";//销售退货入库
-	public static final String BIZ_TYPE_TRANSFER_INSTOCK = "100206";//调拨单
+	public static final String BIZ_TYPE_TRANSFER_INSTOCK = "100206";//调拨入库
 	public static final String BIZ_TYPE_TRANSFER_OUTSTOCK = "100207";//调拨出库
 	public static final String BIZ_TYPE_TRANSFER_PLUS_INSTOCK = "100208";//盘盈入库
 	public static final String BIZ_TYPE_TRANSFER_REDUCE_OUTSTOCK = "100209";//盘亏出库
