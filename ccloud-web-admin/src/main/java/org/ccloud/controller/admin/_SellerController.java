@@ -44,7 +44,6 @@ import org.ccloud.model.SellerProduct;
 import org.ccloud.model.User;
 import org.ccloud.model.UserJoinCustomer;
 import org.ccloud.model.query.BrandQuery;
-import org.ccloud.model.query.CustomerQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.GroupQuery;
