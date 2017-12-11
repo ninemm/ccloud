@@ -56,6 +56,25 @@ public class ProductController extends BaseFrontController {
 
 	public void shoppingCart() {
 
+		List<Record> productList = SellerProductQuery.me().findProductListForApp(sellerId, "");
+
+		Map<String, Object> sellerProductInfoMap = new HashMap<String, Object>();
+		List<Map<String, Object>> sellerProductItems = new ArrayList<>();
+
+		for (Record record : productList) {
+			Map<String, Object> item = new HashMap<>();
+
+			String sellProductId = record.get("sell_product_id");
+			item.put("title", record.getStr("custom_name") + record.getStr("valueName"));
+			item.put("value", sellProductId);
+
+			sellerProductItems.add(item);
+			sellerProductInfoMap.put(sellProductId, record);
+		}
+
+		setAttr("sellerProductInfoMap", JSON.toJSON(sellerProductInfoMap));
+		setAttr("sellerProductItems", JSON.toJSON(sellerProductItems));
+
 		render("shopping_cart.html");
 	}
 
@@ -138,7 +157,6 @@ public class ProductController extends BaseFrontController {
 		boolean isSave = Db.tx(new IAtom() {
 			@Override
 			public boolean run() throws SQLException {
-				String[] sellProductIds = paraMap.get("sellProductId");
 
 				String orderId = StrKit.getRandomUUID();
 				Date date = new Date();
@@ -153,8 +171,20 @@ public class ProductController extends BaseFrontController {
 					return false;
 				}
 
+				String[] sellProductIds = paraMap.get("sellProductId");
+				//常规商品
 				for (int index = 0; index < sellProductIds.length; index++) {
 					if (!SalesOrderDetailQuery.me().insertForApp(paraMap, orderId, sellerId, user.getId(), date,
+							user.getDepartmentId(), user.getDataArea(), index)) {
+						return false;
+					}
+
+				}
+				
+				String[] giftSellProductIds = paraMap.get("giftSellProductId");
+				//赠品
+				for (int index = 0; index < giftSellProductIds.length; index++) {
+					if (!SalesOrderDetailQuery.me().insertForAppGift(paraMap, orderId, sellerId, user.getId(), date,
 							user.getDepartmentId(), user.getDataArea(), index)) {
 						return false;
 					}
@@ -165,6 +195,5 @@ public class ProductController extends BaseFrontController {
 		});
 		return isSave;
 	}
-	
 
 }

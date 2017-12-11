@@ -36,10 +36,9 @@
         <#if orderDetail.is_gift = 0>
           <div class="p-l-15">
             <p>${orderDetail.custom_name!}</p>
-            <span class="gray">规格：${(orderDetail.valueName)!}</span>
             <div class="weui-flex">
               <div class="weui-flex__item flex-grow2">
-                <div class="fr width-40">
+                <div class="fr width-50">
                   ￥${(orderDetail.product_price)!}
                   <span class="gray">（${(orderDetail.price)!}）</span>
                 </div>
@@ -48,9 +47,9 @@
             </div>
             <div class="weui-flex">
               <div class="weui-flex__item flex-grow2">
-                <div class="fr width-40">
+                <div class="fr width-50">
                   ￥${(orderDetail.product_price / orderDetail.convert_relate)?string("0.##")}
-                  <span class="gray">（${(orderDetail.price % orderDetail.convert_relate)}）</span>
+                  <span class="gray">（${(orderDetail.price / orderDetail.convert_relate)?string("0.##")}）</span>
                 </div>
               </div>
               <div class="weui-flex__item t-r">${(orderDetail.product_count % orderDetail.convert_relate)}${(orderDetail.small_unit)!}</div>
@@ -60,7 +59,7 @@
         <#if orderDetail.is_gift = 1>
           <div class="p-l-15">
             <p>
-              <span class="tag">赠品</span>${orderDetail.custom_name!}</p>
+              <span class="tag">赠品</span>${orderDetail.custom_name!} / ${(orderDetail.valueName)!}</p>
             <div class="weui-flex__item t-r">${(orderDetail.product_count / orderDetail.convert_relate)?floor}${(orderDetail.big_unit)!}</div>
             <div class="weui-flex__item t-r">${(orderDetail.product_count % orderDetail.convert_relate)}${(orderDetail.small_unit)!}</div>
           </div>
@@ -107,7 +106,7 @@
 <div class="hidden-menu">
   <ul>
     <li>
-      <a href="index.html">
+      <a href="${CPATH}/user/center">
         首页
         <i class="icon-home blue"></i>
       </a>

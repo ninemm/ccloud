@@ -155,14 +155,16 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			List<Seller> list = SellerQuery.me().findAll();
 			int s = list.size();
 			String j=Integer.toString(s);
+			String w = "1";
 			int countt =j.length();
-			for(int m=0;m<(6-countt);m++){
+			for(int m=0;m<(5-countt);m++){
 				j= "0"+j;
 			}
+			w += j;
 			sellerId = StrKit.getRandomUUID();
 			seller.set("id", sellerId);
 			seller.set("seller_name",getPara("seller_name"));
-			seller.set("seller_code",j);
+			seller.set("seller_code",w);
 			seller.set("contact", getPara("contact"));
 			seller.set("phone", getPara("phone"));
 			seller.set("is_enabled", getPara("is_enabled"));
@@ -454,7 +456,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 						String contents =getRequest().getScheme() + "://" + getRequest().getServerName()+"/admin/seller/fu"+"?id="+Id; 
 						//部署之前上传
 						//String contents = getRequest().getScheme() + "://" + getRequest().getServerName()+":"+getRequest().getLocalPort()+getRequest().getContextPath()+"/admin/seller/fn"+"?id="+Id;
-						String imagePath = getRequest().getSession().getServletContext().getRealPath("\\qrcode\\");
+						String imagePath = getRequest().getSession().getServletContext().getRealPath(Consts.QRCODE_PATH);
 						QRCodeUtils.genQRCode(contents, imagePath, fileName);
 						sellerProducts.set("qrcode_url", imagePath+"\\"+fileName);
 						result=sellerProducts.save();

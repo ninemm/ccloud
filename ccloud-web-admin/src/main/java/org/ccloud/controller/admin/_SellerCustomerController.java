@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -503,6 +504,10 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			src.setMobile(sellerCustomer.getStr("mobile"));
 			src.setAddress(sellerCustomer.getStr("address"));
 			src.setCustomerName(sellerCustomer.getStr("customer_name"));
+
+			List<String> custTypeNameList =  CustomerJoinCustomerTypeQuery.me().findCustomerTypeNameListBySellerCustomerId(id, DataAreaUtil.getUserDealerDataArea(selectDataArea));
+
+			src.setCustTypeNameList(custTypeNameList);
 			
 			String areaName = Joiner.on(",").skipNulls()
 				.join(sellerCustomer.getStr("prov_name")
@@ -516,6 +521,10 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 					, sellerCustomer.getStr("country_code"));
 			src.setAreaCode(areaCode);
 			List<String> diffAttrList = BeanCompareUtils.contrastObj(src, dest);
+			setAttr("diffAttrList", diffAttrList);
+		} else {
+			List<String> diffAttrList = new ArrayList<>();
+			diffAttrList.add("申请停用");
 			setAttr("diffAttrList", diffAttrList);
 		}
 	}
