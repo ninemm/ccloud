@@ -150,9 +150,6 @@ public class _UserController extends JBaseCRUDController<User> {
 			User user = UserQuery.me().findById(id);
 			setAttr("user", user);
 		}
-		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		List<Group> list = GroupQuery.me().findByDept(dataArea);
-		setAttr("list", list);
 	}
 
 	@Override
