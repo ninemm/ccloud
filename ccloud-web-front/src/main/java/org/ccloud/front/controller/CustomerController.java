@@ -18,11 +18,20 @@ import org.ccloud.model.User;
 import org.ccloud.model.UserJoinCustomer;
 import org.ccloud.model.WxMessageTemplate;
 import org.ccloud.model.compare.BeanCompareUtils;
-import org.ccloud.model.query.*;
+import org.ccloud.model.query.CustomerJoinCustomerTypeQuery;
+import org.ccloud.model.query.CustomerQuery;
+import org.ccloud.model.query.CustomerTypeQuery;
+import org.ccloud.model.query.DepartmentQuery;
+import org.ccloud.model.query.OptionQuery;
+import org.ccloud.model.query.SalesOrderQuery;
+import org.ccloud.model.query.SellerCustomerQuery;
+import org.ccloud.model.query.UserQuery;
+import org.ccloud.model.query.WxMessageTemplateQuery;
 import org.ccloud.model.vo.CustomerVO;
 import org.ccloud.model.vo.ImageJson;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DataAreaUtil;
+import org.ccloud.wechat.WechatJSSDKInterceptor;
 import org.ccloud.workflow.service.WorkFlowService;
 import org.joda.time.DateTime;
 
@@ -49,7 +58,6 @@ public class CustomerController extends BaseFrontController {
 
 	public void index() {
 
-		//User user = getUser();
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
 		Page<Record> customerList = SellerCustomerQuery.me().findByUserTypeForApp(getPageNumber(), getPageSize(), getUserIdList(user), getPara("customerType"), getPara("isOrdered"), getPara("searchKey"));
@@ -207,6 +215,7 @@ public class CustomerController extends BaseFrontController {
 		render("customer_historyOrder.html");
 	}
 
+	@Before(WechatJSSDKInterceptor.class)
 	public void edit() {
 		
 		String id = getPara("sellerCustomerId");
