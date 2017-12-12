@@ -101,13 +101,15 @@
 			var $tr = obj.parent().parent().parent();
 			var num = $("#productNum").val();
 			num++;
+			console.log(product.list);
+			console.log(product);
 			$tr.find('td').eq(0).attr("rowspan",product.list.length);
 			$tr.find('td').eq(1).attr("rowspan",product.list.length);
 			$tr.find('td').eq(2).attr("rowspan",product.list.length);
 			$tr.find('td').eq(3).attr("rowspan",product.list.length);
 			$tr.find('td').eq(4).attr("rowspan",product.list.length);
 			$tr.find('td').eq(5).attr("rowspan",product.list.length);
-			$tr.find("#purchaseInstockDetailId").val(product.list.purchaseInstockDetailId);
+			$tr.find("#purchaseInstockDetailId").val(product.purchaseInstockDetailId);
 			for(var i=1;i<product.list.length;i++){
 				var $tbody = $("#table tbody");
 				var newTrHtml = $tbody.find("tr:first").html();
@@ -130,7 +132,7 @@
 				$newTr.find("#storeCount").text(product.list[i].store_count);
 				$newTr.find("#purchaseInstockDetailId").val(product.purchaseInstockDetailId);
 				$newTr.find("#sellerProductId").val(product.list[i].id);
-				$newTr.find("#purchaseOrderDetailId").text(product.purchaseOrderDetailId);
+				$newTr.find("#purchaseOrderDetailId").val(product.purchaseOrderDetailId);
 				$newTr.find("#convert").val(product.convertRelate);
 				$newTr.find('td').eq(0).remove();
 				$newTr.find('td').eq(0).remove();
@@ -327,7 +329,7 @@
 							<td style = "vertical-align:middle;">								
 								<div class = "validata-box" >
 									<span id="sellerProductName" ></span>
-									<input type="hidden" id="purchaseOrderDetailId" name="purchaseOrderDetailId" />
+									
 								</div>
 							</td>
 							<td style = "vertical-align:middle;">
@@ -358,6 +360,7 @@
 								<div class = "validata-box">
 									<input type="text" id="bN" name="bN" style="width: 70%;text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" onblur="rowTotalF(this)" value="0" />
 								<input type="hidden" id="purchaseInstockDetailId" name="purchaseInstockDetailId" />
+								<input type="hidden" id="purchaseOrderDetailId" name="purchaseOrderDetailId" />
 								</div>
 							</td>
 							<td style = "vertical-align:middle;">
