@@ -318,7 +318,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 
 	@SuppressWarnings("unchecked")
 	public boolean insertDetailByComposition(SellerProduct product, String orderId, String sellerId, String id,
-			Date date, String deptId, String dataArea, Integer index, Integer isGift, Integer number) {
+			Date date, String deptId, String dataArea, Integer index, Integer number) {
 		List<SalesOrderDetail> detailList = new ArrayList<>();
 		Integer convert = product.getInt("convert_relate");
 		Integer compositionCount = Integer.parseInt(product.getStr("productCount"));
@@ -348,7 +348,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 					.multiply(product.getPrice());
 //			BigDecimal amount = new BigDecimal(product.getInt("productCount")).multiply(product.getPrice());
 			detail.setProductAmount(productAmount);
-			detail.setIsGift(isGift);
+			detail.setIsGift(product.getIsGift());
 			detail.setIsComposite(1);
 			detail.setCreateDate(date);
 			detail.setDeptId(deptId);
