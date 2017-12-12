@@ -16,6 +16,7 @@
 package org.ccloud.controller.admin;
 
 import java.io.File;
+import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,6 +36,7 @@ import org.ccloud.model.Customer;
 import org.ccloud.model.CustomerType;
 import org.ccloud.model.Department;
 import org.ccloud.model.Group;
+import org.ccloud.model.Option;
 import org.ccloud.model.Product;
 import org.ccloud.model.Role;
 import org.ccloud.model.Seller;
@@ -47,6 +49,7 @@ import org.ccloud.model.query.BrandQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.GroupQuery;
+import org.ccloud.model.query.OptionQuery;
 import org.ccloud.model.query.ProductQuery;
 import org.ccloud.model.query.RoleQuery;
 import org.ccloud.model.query.SellerBrandQuery;
@@ -185,6 +188,16 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			}
 			
 			seller.save();
+			Option option = new Option();
+			List<Option> options =  OptionQuery.me().findAll();
+			int opID = options.size();
+			int opIDs = ++opID;
+			option.setId( BigInteger.valueOf(opIDs));
+			option.setOptionKey(sellerId+"_store_check");
+			option.setOptionValue("1");
+			option.set("seller_id",sellerId );
+			option.save();
+			
 			
 			
 			
@@ -214,9 +227,10 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			
 			
 			if(!user.getUsername().equals("admin")){
+				Seller Seller = SellerQuery.me().findByUserId(user.getId());
 				String sellerCustomerId = StrKit.getRandomUUID();
 				sellerCustomer.set("id", sellerCustomerId);
-				sellerCustomer.set("seller_id", sellerId);
+				sellerCustomer.set("seller_id", Seller.getId());
 				sellerCustomer.set("customer_id", customerId);
 				sellerCustomer.set("nickname", getPara("seller_name"));
 				sellerCustomer.set("is_checked", 1);

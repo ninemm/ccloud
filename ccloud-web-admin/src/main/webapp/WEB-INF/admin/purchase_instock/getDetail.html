@@ -1,0 +1,416 @@
+<#include "../_inc/_layer_layout.html"/>
+
+<#macro script_import>
+
+	<!-- bootstrap-table -->
+	<script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table.js"></script>
+	<script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table-zh-CN.js"></script>
+	<!-- bootstrap-datetimepicker -->
+	<script src="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.min.js"></script>
+	<script src="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.zh-CN.js"></script>
+	<!-- bootstrapvalidator -->
+	<script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
+	<script src="${CPATH}/static/plugins/toastr/toastr.js"></script>
+
+</#macro>
+
+<#macro css_import>
+
+	<!-- bootstrap-table-->
+<link rel="stylesheet" href="${CPATH}/static/plugins/bootstrap-table/bootstrap-table.css">
+	<!-- bootstrap-datetimepicker -->
+<link rel="stylesheet" href="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.min.css">
+	<!-- bootstrapvalidator -->
+<link rel="stylesheet" href="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.css">
+<link rel="stylesheet" href="${CPATH}/static/plugins/toastr/toastr.css">
+
+</#macro>
+
+<#macro script>
+	$(function() {
+		jQuery.mm.initValidator('#form', validatorFields);
+		var id = '${(instockId)}';
+		refund(id);
+	});
+	
+	var $form = $("#form");
+	//标志
+	var newTrIdx = 0;
+	
+	var validatorFields = {
+
+	};
+
+	function addProduct(product){
+		var $tbody = $("#table tbody");
+
+		var newTrHtml = $tbody.find("tr:first").html();
+		newTrIdx = newTrIdx + 1;
+		var showNum = newTrIdx;
+		var newTrId = 'tr' + newTrIdx;
+		$tbody.append("<tr id='" + newTrId + "'>" + newTrHtml + "</tr>");
+
+		var $newTr = $("#" + newTrId);
+		var $productSelect = $newTr.find("#purchaseInstockDetailId")
+
+
+		productValue($productSelect, product);
+
+		
+		<!--添加validate -->
+		var bigPriceName = "bigPrice" + newTrIdx;
+		$newTr.find("#bigPrice").attr("name", bigPriceName)
+		
+		var bigNumName = "bigNum" + newTrIdx;
+		$newTr.find("#bigNum").attr("name", bigNumName)
+		$form.data('bootstrapValidator').addField(bigNumName,
+			{
+				validators: {
+					notEmpty: { message: '数量不能为空' },
+					regexp:{regexp:/^[0-9]\d*$/, message:'请输入正确的数量' }
+				}
+		});
+		
+		var smallPriceName = "smallPrice" + newTrIdx;
+		$newTr.find("#smallPrice").attr("name", smallPriceName)
+		
+		var smallNumName = "smallNum" + newTrIdx;
+		$newTr.find("#smallNum").attr("name", smallNumName)
+		$form.data('bootstrapValidator').addField(smallNumName,
+			{
+				validators: {
+					notEmpty: { message: '数量不能为空' },
+					regexp:{regexp:/^[0-9]\d*$/, message:'请输入正确的数量' }
+				}
+		});
+		
+		$newTr.find("#purchaseInstockDetailId").attr("name", "purchaseInstockDetailId" + showNum);
+		$newTr.find("#custom_name").attr("name", "custom_name" + showNum);
+		$newTr.find("#storeCount").attr("name", "storeCount" + showNum);
+		$newTr.find("#purchaseOrderDetailId").attr("name", "purchaseOrderDetailId" + showNum);
+		$newTr.find("#sellerProductId").attr("name", "sellerProductId" + showNum);
+		$newTr.find("#convert").attr("name", "convert" + showNum);
+		$newTr.find("#bN").attr("name", "bN" + showNum);
+		$newTr.find("#sN").attr("name", "sN" + showNum);
+		$newTr.find("#inputRowTotal").attr("name", "rowTotal" + showNum);
+
+		orderNum();
+	}
+	
+	function productValue(obj,product){
+			var $tr = obj.parent().parent().parent();
+			var num =0;
+			
+			$tr.find('td').eq(0).attr("rowspan",product.list.length);
+			$tr.find('td').eq(1).attr("rowspan",product.list.length);
+			$tr.find('td').eq(2).attr("rowspan",product.list.length);
+			$tr.find('td').eq(3).attr("rowspan",product.list.length);
+			$tr.find('td').eq(4).attr("rowspan",product.list.length);
+			$tr.find('td').eq(5).attr("rowspan",product.list.length);
+			$tr.find("#purchaseInstockDetailId").val(product.list.purchaseInstockDetailId);
+			var convert = product.convertRelate;
+			for(var i=1;i<product.list.length;i++){
+				var $tbody = $("#table tbody");
+				var newTrHtml = $tbody.find("tr:first").html();
+				newTrIdx = newTrIdx + 1;
+				var newTrId = 'tr' + newTrIdx;
+				$tbody.append("<tr id='" + newTrId + "'>" + newTrHtml + "</tr>");
+				var $newTr = $("#" + newTrId);
+				$newTr.find("#purchaseInstockDetailId").attr("name", "purchaseInstockDetailId" + newTrIdx);
+				$newTr.find("#custom_name").attr("name", "custom_name" + newTrIdx);
+				$newTr.find("#storeCount").attr("name", "storeCount" + newTrIdx);
+				$newTr.find("#purchaseOrderDetailId").attr("name", "purchaseOrderDetailId" + newTrIdx);
+				$newTr.find("#sellerProductId").attr("name", "sellerProductId" + newTrIdx);
+				$newTr.find("#convert").attr("name", "convert" + newTrIdx);
+				$newTr.find("#bN").attr("name", "bN" + newTrIdx);
+				$newTr.find("#sN").attr("name", "sN" + newTrIdx);
+				$newTr.find("#inputRowTotal").attr("name", "rowTotal" + newTrIdx);
+				
+				var $productSelect = $newTr.find("#purchaseInstockDetailId")
+				$newTr.find("#custom_name").text(product.list[i].customName);
+				$newTr.find("#purchaseInstockDetailId").val(product.purchaseInstockDetailId);
+				$newTr.find("#sellerProductId").val(product.list[i].id);
+				$newTr.find("#purchaseOrderDetailId").text(product.purchaseOrderDetailId);
+				$newTr.find("#convert").val(product.convertRelate);
+				$newTr.find("#bN").val(product.list[i].privateCount/convert);
+				$newTr.find("#sN").val(product.list[i].privateCount%convert);
+				$newTr.find('td').eq(0).remove();
+				$newTr.find('td').eq(0).remove();
+				$newTr.find('td').eq(0).remove();
+				$newTr.find('td').eq(0).remove();
+				$newTr.find('td').eq(0).remove();
+				$newTr.find('td').eq(0).remove();
+				num += product.list[i].privateCount;
+			}
+			console.log(num);
+			num += product.list[0].privateCount;
+			$tr.find("#custom_name").text(product.list[0].customName);
+			$tr.find("#sellerProductId").val(product.list[0].id);
+			$tr.find("#purchaseOrderDetailId").val(product.purchaseOrderDetailId);
+			$tr.find("#sellerProductName").text(product.productName);
+			$tr.find("#specification").text(product.cpsName);
+
+			$tr.find("#convert").val(convert);
+
+			var smallUnit = product.smallUnit;
+
+			$tr.find("#bN").val(product.list[0].privateCount/convert);
+			$tr.find("#sN").val(product.list[0].privateCount%convert);
+			$tr.find("#bigUnit-span").text(product.bigUnit + "(x" + convert + smallUnit + ")");
+			
+			$tr.find("#bigNum").val(Math.floor(num/convert));
+			
+			$tr.find("#smallUnit-span").text(smallUnit);
+			
+			$tr.find("#smallNum").val(num%convert);
+
+			rowTotalF(obj);
+	}
+	
+	function deleteTr(obj){
+		var $tr = $(obj).parent().parent();
+		var trIndex = $tr.attr("id").replace("tr", "");
+		$form.bootstrapValidator('removeField', 'bigNum' + trIndex);
+		$form.bootstrapValidator('removeField', 'smallNum' + trIndex);
+		
+		$tr.remove();
+		
+		totalF();
+		orderNum();
+	}
+	
+	function orderNum(){
+		var $rowNum = $(".rowNum");
+		
+		$rowNum.each(function(index, el){
+			$(el).text(index);
+		});
+	}
+
+	function rowTotalF(obj){
+		var $curTr = $(obj).parent().parent().parent();
+		var rowTotal = 0;
+
+		var isCheck = $curTr.find("input[type='checkbox']").is(':checked');
+		if (!isCheck) {
+			var bigPrice = $curTr.find("#bigPrice").val();
+			var bigNum = $curTr.find("#bigNum").val();
+			var smallPrice = $curTr.find("#smallPrice").val();
+			var smallNum = $curTr.find("#smallNum").val();
+			rowTotal = Number(bigPrice) * Number(bigNum) + Number(smallPrice) * Number(smallNum);
+			rowTotal.toFixed(2);
+		}
+		$curTr.find(".rowTotal").text(rowTotal);
+		$curTr.find("#inputRowTotal").val(rowTotal);
+
+		totalF();
+	}
+
+	function totalF() {
+		var rows = $(".rowTotal");
+		var total = 0;
+		$.each(rows, function(index, item) {
+			total += Number($(item).text());
+		});
+		total.toFixed(2);
+		$("#total").text(total);
+		$("#inputTotal").val(total);
+	}
+
+	function doSubmit(){
+		$(do_Submit).attr("disabled","disabled"); 
+		//$("#productNum").val($(".rowNum").length - 1);
+		$form.ajaxSubmit({
+			beforeSubmit: function() {
+				var validate = $form.data('bootstrapValidator');
+				validate.validate();
+				return validate.isValid();
+			},
+			type : "post", 
+			dataType : "json", 
+			success : function(data) { 
+				if (data.errorCode == 0) {
+					//location.reload();
+					toastr.success(data.message, '操作成功');
+				} else {
+					toastr.error(data.message,'操作失败');
+					setTimeout( function(){
+						location.reload();
+								}, 3* 1000 );
+				}
+			},
+			error : function() {
+				alert("信息提交错误");
+			}
+		});
+	}
+	
+	function refund(id) {
+		$("#table tbody tr").not(".hide").remove();
+		layer.closeAll();
+
+		$.get('${CPATH}/admin/purchaseInstock/refund_instock_etail?ucode=${ucode}&instockId=' + id,
+			function(result){
+				var instock = result.instock;
+				var instockDetail = result.instockDetail;
+
+				$("#supplierId").val(instock.supplierId);
+				$("#supplierCode").val(instock.code);
+				$("#purchaseInstockId").val(instock.id);
+				$("#warehouseInId").val(instock.id);
+				$("#supplierName").val(instock.supplierName);
+				$("#contact").val(instock.contact);
+				$("#mobile").val(instock.supplierMobile);
+				if(instock.payment_type==0){
+					$("#paymentType").text("应付账款");
+				}else{
+					$("#paymentType").text("现金")
+				}
+				$("#remark").val(instock.remark);
+				$("#biz_user_id").val(instock.biz_user_id);
+				$("#deptId").val(instock.dept_id);
+				$("#dataArea").val(instock.data_area);
+				
+				$.each(instockDetail, function(index,element){
+					addProduct(element);
+				});
+				if(instock.status==1000){
+					$("#do_Submit").hide();
+				}
+			}
+		);
+	}
+</#macro>
+
+<@layout>
+<!-- Main content -->
+<section class="content">
+	<div class="box box-default">
+		<div class="box-header with-border">
+			<h3 class="box-title">采购订单入库详情</h3>
+			<div class="box-tools">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse">
+					<i class="fa fa-minus"></i>
+				</button>
+			</div>
+		</div>
+
+		<form action="${CPATH}/admin/purchaseInstock/save" method="post" id="form" class="form-horizontal" >
+			<div class="box-body">
+				<table id="table" class="table table-bordered table-hover text-center" width="100%">
+					<thead>
+						<tr>
+							<th width="2%"></th>
+							<th width="5%">序号</th>
+							<th width="8%">商品名称</th>
+							<th width="8%">规格</th>
+							<th width="12%">已入库</th>
+							<th width="11%">已入库</th>
+							<th width="5">产品名</th>
+							<th width="8%">大单位数量</th>
+							<th width="8%">小单位数量</th>
+							<!-- <th width="7%">小计</th> -->
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="hide">
+							<td>
+								<!-- <a class="btn btn-danger btn-xs" onclick="deleteTr(this)"><span class="glyphicon glyphicon-remove"></span></a> -->
+							</td>
+							<td style = "vertical-align:middle;">
+									<span class="rowNum">0</span>
+							</td>
+							<td style = "vertical-align:middle;">								
+								<div class = "validata-box" >
+									<span id="sellerProductName" ></span>
+									<input type="hidden" id="purchaseOrderDetailId" name="purchaseOrderDetailId" />
+								</div>
+							</td>
+							<td style = "vertical-align:middle;">
+									<span id="specification"></span>
+							</td>
+							<td style = "vertical-align:middle;">
+								<input type="hidden" name="convert" id="convert" value="" />
+								<div class = "validata-box">
+									<input type="text" readonly="readonly" id="bigNum" name="bigNum" style="width: 30%;background-color:transparent;border:0px;" onblur="rowTotalF(this)" />
+									<span id="bigUnit-span"></span>
+								</div>
+							</td>
+							<td style = "vertical-align:middle;">
+								<div class = "validata-box">
+									<input type="text" id="smallNum" readonly="readonly" name="smallNum" style="width: 30%;background-color:transparent;border:0px;" onblur="rowTotalF(this)"  />
+									<span id="smallUnit-span"></span>
+								</div>
+							</td>
+							<td style = "vertical-align:middle;">
+									<span id="custom_name" ></span>
+									<input type="hidden" name="sellerProductId" id="sellerProductId" />
+							</td>
+							<td style = "vertical-align:middle;">
+								<input type="hidden" name="convert" id="convert" value="" />
+								<div class = "validata-box">
+									<input type="text" id="bN" name="bN" readonly="readonly" style="width: 70%;text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" onblur="rowTotalF(this)" />
+								<input type="hidden" id="purchaseInstockDetailId" name="purchaseInstockDetailId" />
+								</div>
+							</td>
+							<td style = "vertical-align:middle;">
+								<div class = "validata-box">
+									<input type="text" id="sN" name="sN" readonly="readonly" style="width: 70%;text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" onblur="rowTotalF(this)"/>
+								</div>
+							<input type="hidden" name="productNum" id="productNum" value="0" />
+							</td>
+						</tr>
+					</tbody>
+					<tfoot>
+						<tr>
+						</tr>
+					</tfoot> 
+				</table>
+
+				<div class="form-group col-sm-12"></div>
+
+				<div id="customer">
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">*供应商名称:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<input type="hidden" id="warehouseInId" name="warehouseInId" />
+							<input class="form-control input-sm" type="text" id="supplierName" name="supplierName" value="" readonly>
+							<input type="hidden" id="supplierId" name="supplierId" />
+							<input type="hidden" id="supplierCode" name="supplierCode" />
+							<input type="hidden" id="purchaseInstockId" name="purchaseInstockId" />
+						</div>
+					</div>
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">*联系人:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<input class="form-control input-sm" type="text" id="contact" name="contact" value="" readonly>
+						</div>
+					</div>
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">*手机号:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<input class="form-control input-sm" type="text" id="mobile" name="mobile" value="" readonly>
+						</div>
+					</div>
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">付款方式:</label>
+						<div class="input-group col-md-4 col-sm-10">
+						&nbsp;<span id="paymentType"></span>
+						</div>
+					</div>
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">备注:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<textarea class="form-control input-sm" id="remark" name="remark" readonly="readonly" type="text" ></textarea>
+						</div>
+					</div>
+				</div>
+				<input  type="hidden" id="biz_user_id" name="biz_user_id" value="" >
+				<input  type="hidden" id="deptId" name="deptId" value="" >
+				<input  type="hidden" id="dataArea" name="dataArea" value="" >
+			</div>
+		</form>
+	</div>
+</section>
+
+</@layout>
