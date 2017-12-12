@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
@@ -54,7 +55,8 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 	@Override
 	public void index() {
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		List<Map<String, Object>> list = DepartmentQuery.me().findDeptListAsTree(1, dataArea);
+		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/all");
+		List<Map<String, Object>> list = DepartmentQuery.me().findDeptListAsTree(1, dataArea, isSuperAdmin);
 		setAttr("treeData", JSON.toJSON(list));
 		render("index.html");
 	}
@@ -151,7 +153,8 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 
 	public void department_tree() {
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		List<Map<String, Object>> list = DepartmentQuery.me().findDeptListAsTree(1, dataArea);
+		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/all");
+		List<Map<String, Object>> list = DepartmentQuery.me().findDeptListAsTree(1, dataArea, isSuperAdmin);
 		setAttr("treeData", JSON.toJSON(list));
 	}
 	

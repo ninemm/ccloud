@@ -89,7 +89,7 @@ public class SalesOrderQuery extends JBaseQuery {
 			params.add(endDate);
 		}
 
-		fromBuilder.append(" order by o.create_date ");
+		fromBuilder.append(" order by o.create_date desc");
 
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
