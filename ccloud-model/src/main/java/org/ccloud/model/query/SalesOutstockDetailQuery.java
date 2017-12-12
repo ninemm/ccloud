@@ -209,7 +209,7 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 
 	public List<Record> findById1(String id) {
 		StringBuilder sqlBuilder = new StringBuilder(
-				" SELECT c.customer_name , s.contact , s.mobile , s.address , s.receive_type ,s.delivery_date, sp.custom_name , sd.product_count , sd.product_price ,");
+				" SELECT sd.sell_product_id , c.customer_name , s.contact , s.mobile , s.address , s.receive_type ,s.delivery_date, sp.custom_name , sd.product_count , sd.product_price ,");
 		sqlBuilder.append(" sd.product_amount , s.total_amount , GROUP_CONCAT(DISTINCT cgs.`name`) AS cps_name ");
 		sqlBuilder.append(" FROM cc_sales_outstock_detail sd INNER JOIN cc_sales_outstock s ON s.id = sd.outstock_id ");
 		sqlBuilder.append(" INNER JOIN cc_customer c ON c.id = s.customer_id ");
@@ -218,6 +218,22 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		sqlBuilder.append(" LEFT JOIN cc_goods_specification_value cgs ON cpg.goods_specification_value_set_id = cgs.id");
 		sqlBuilder.append("  WHERE sd.outstock_id = ? GROUP BY sp.id");
 		return Db.find(sqlBuilder.toString(), id);
+	}
+	
+	public Record findByIdAndSellProductId(String id,String sell_product_id) {
+		StringBuilder sqlBuilder = new StringBuilder(
+				" SELECT sp.seller_id , ct.`code` customerTypeCode , w.`code` warehouseCode , cs.seller_code sellerCode , s.warehouse_id , s.customer_id , s.customer_type_id , s.biz_user_id , ");
+		sqlBuilder.append("s.biz_date , s.receive_type , s.proc_key , s.proc_ins_id , sd.id , sd.product_count , sd.product_amount , sd.product_price , sd.is_gift , s.remark , s.dept_id , s.data_area  ");
+		sqlBuilder.append(" FROM cc_sales_outstock_detail sd INNER JOIN cc_sales_outstock s ON s.id = sd.outstock_id ");
+		sqlBuilder.append(" INNER JOIN cc_customer c ON c.id = s.customer_id ");
+		sqlBuilder.append(" INNER JOIN cc_seller_product sp ON sp.id = sd.sell_product_id ");
+		sqlBuilder.append(" LEFT JOIN cc_product_goods_specification_value cpg ON sp.product_id = cpg.product_set_id ");		
+		sqlBuilder.append(" LEFT JOIN cc_goods_specification_value cgs ON cpg.goods_specification_value_set_id = cgs.id ");
+		sqlBuilder.append(" LEFT JOIN cc_warehouse w ON w.id = s.warehouse_id ");		
+		sqlBuilder.append(" LEFT JOIN cc_customer_type ct ON ct.id = s.customer_type_id ");
+		sqlBuilder.append(" LEFT JOIN cc_seller cs ON cs.id = s.seller_id");
+		sqlBuilder.append(" WHERE sd.outstock_id = ? and sd.sell_product_id=? GROUP BY sp.id");
+		return Db.findFirst(sqlBuilder.toString(), id,sell_product_id);
 	}
 
 
