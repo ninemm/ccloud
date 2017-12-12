@@ -127,19 +127,18 @@
                         <div class="check-pass">${DICT_NAME('${bean.type}')}</div>
                         <div class="weui-cell__ft">${(bean.createDate?string('yyyy-MM-dd HH:mm'))!}</div>
                     </div>
-	                </#list>
-	                </div>
-	                <#if (customerPage.totalRow = 0)>
-	                <div class="weui-loadmore weui-loadmore_line">
-	                    <span class="weui-loadmore__tips">暂无数据</span>
-	                </div>
-	                <#elseif (customerPage.totalRow > customerPage.pageSize)>
-	                <div class="weui-loadmore">
-	                    <i class="weui-loading"></i>
-	                    <span class="weui-loadmore__tips">正在加载</span>
-	                </div>
-	                </#if> 
+                </#list>
                 </div>
+                <#if (customerPage.totalRow = 0)>
+                <div class="weui-loadmore weui-loadmore_line">
+                    <span class="weui-loadmore__tips">暂无数据</span>
+                </div>
+                <#elseif (customerPage.totalRow > customerPage.pageSize)>
+                <div class="weui-loadmore">
+                    <i class="weui-loading"></i>
+                    <span class="weui-loadmore__tips">正在加载</span>
+                </div>
+                </#if> 
             </div>
             <div id="tab3" class="infinite weui-tab__bd-item">
                 <div class="weui-cells message">
