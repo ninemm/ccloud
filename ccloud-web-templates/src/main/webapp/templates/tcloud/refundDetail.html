@@ -2,10 +2,43 @@
 
 
 <#macro script>
-  $(function () {
-
-  });
-  
+ 	var $form = $("#form");
+ 	
+ 	function checkProductNumber() {
+		var store = $(".goods-detail");
+		var check = false;
+		store.each(function(index,obj){
+			var productCount = parseInt($(obj).find("#count").html());
+			var number = parseInt($(obj).find("#number").val());
+			if (number > productCount) {
+				return false;
+			}
+			if (index == store.length-1) {
+				check = true;
+			} 
+		});
+		return check;	
+	}	
+ 	
+    function doSubmit() {
+    		if (!checkProductNumber()) {
+			toastr.error('商品退货数量大于购买数量!','操作失败');
+			return;			
+		}	
+        $form.ajaxSubmit({
+			type: "post",
+			dataType: "json",
+			data:{"outstock_id":'${outstock_id}'},
+			success: function(result){
+	            if (result.errorCode > 0) {
+	                toastr.error(result.message, '操作失败');
+	            } else {
+	                toastr.success(result.message, '操作成功');
+	                $table.bootstrapTable('refresh');
+	            }
+			}
+        });
+    }
 </#macro> 
 
 <@layout>
@@ -89,34 +122,39 @@
       </div>
     </section>
     <div class="weui-cells__title black">商品明细</div>
-   <#list salesOutstockDetail as list>
-    <div class="weui-panel weui-panel_access goods-detail">
-      <div class="product_name">
-       ${(list.custom_name)!} 
-      </div>
-      <div class="product_unit">
-        规格：
-        <span class="blue-button"> ${(list.cps_name)!} </span>
-        数量:
-        <span class="price">${(list.product_count)!}</span>
-      </div>
-      <div class="product_bUnit">
-        <span class="price">￥${(list.product_price)!}</span>
-        <span style="margin-left:6rem">退货数量:</span>
-        <div class="spinner">
-          <div class="operate fl">
-            <i class="icon-minus2"></i>
-          </div>
-        		<input type="number" class="fl" value='0' >
-          <div class="operate fl">
-            <i class="icon-plus2"></i>
-          </div>
-        </div>
-      </div>
-      <hr />
-    </div>
-    </#list>
-    <div class="button white-button fr" ><a  href="returnGoods" >确认退货</div>
+   
+   <form  action="${CPATH}/refund/refundGood" method="post" id="form">
+	   <#list salesOutstockDetail as list>
+	    <div class="weui-panel weui-panel_access goods-detail">
+	    <input type="hidden" name="sell_product_id" value=${(list.sell_product_id)!}>
+	      <div class="product_name">
+	       ${(list.custom_name)!} 
+	      </div>
+	      <div class="product_unit">
+	        规格：
+	        <span class="blue-button"> ${(list.cps_name)!} </span>
+	        数量:
+	        <span class="price" id="count">${(list.product_count)!}</span>
+	      </div>
+	      <div class="product_bUnit">
+	        <span class="price">￥${(list.product_price)!}</span>
+	        <span style="margin-left:6rem">退货数量:</span>
+	        <div class="spinner">
+	          <div class="operate fl">
+	            <i class="icon-minus2"></i>
+	          </div>
+	        		<input name="number" type="number" class="fl" value="0" id="number">
+	          <div class="operate fl">
+	            <i class="icon-plus2"></i>
+	          </div>
+	        </div>
+	      </div>
+	      <hr />
+	    </div>
+	    </#list>
+    </form>
+    <div class="button white-button fr" onclick="doSubmit()" >确认退货</div>
+    
   </main>
  	<div class="hidden-menu">
 	    <ul>
