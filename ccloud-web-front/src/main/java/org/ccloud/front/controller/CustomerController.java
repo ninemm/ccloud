@@ -204,7 +204,7 @@ public class CustomerController extends BaseFrontController {
 		setAttr("sellerCustomerId", getPara("sellerCustomerId"));
 		setAttr("customerName", getPara("customerName"));
 
-		render("historyOrder.html");
+		render("customer_historyOrder.html");
 	}
 
 	public void edit() {

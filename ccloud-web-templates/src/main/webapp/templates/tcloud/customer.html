@@ -118,6 +118,11 @@
         });
     }
 
+    function newOrder(customer){
+        setItemBykey("customerInfo", customer);
+        window.location.href = '${CPATH}/product';
+    }
+
 </#macro>
 
 <@layout>
@@ -199,8 +204,12 @@
 	                            </div>
 	                            <hr />
 	                            <div class="operate-btn">
-	                                <div class="button blue-button fl" href="/product">下订单</div>
-	                                <div class="button blue-button fr" hred="/visitAdd">客户拜访</div>
+	                                <div class="button white-button fl" hred="/visitAdd">客户拜访</div>
+                                    <div class="button blue-button fr" onclick="newOrder({customerName:'${(customer.customer_name)}',
+                                                                                            sellerCustomerId:'${(customer.sellerCustomerId)}',
+                                                                                            contact:'${(customer.contact)}',
+                                                                                            mobile:'${(customer.mobile)}',
+                                                                                            address:'${(customer.address)}'})">下订单</div>
 	                            </div>
 	                            <p class="gray">
 	                                <span class="icon-map-marker ft16 green"></span>
@@ -224,11 +233,7 @@
     </article>
 </div>
 <a class="hidden-menu" href="/customer/edit">
-<<<<<<< HEAD
     <img src="${CTPATH}/images/customer_add.png" alt="">
-=======
-    <i class="icon-add icon-menu-shopping-cart orange fr"></i>
->>>>>>> 3ed5d6fcc75939fc6a1116c4c2f6fde07c5dd53e
 </a>
 <div class="layer"></div>
 <#include "_inc/_footer_nav.html" />
