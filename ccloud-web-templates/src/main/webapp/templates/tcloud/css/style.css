@@ -109,10 +109,6 @@ a {
   background: #fff;
 }
 
-.weui-tab__bd {
-  padding-bottom: 50px;
-}
-
 .weui-cells {
   font-size: 0.7rem;
 }
@@ -978,6 +974,8 @@ a {
   background: #fff;
   font-size: 0.7rem;
   color: #9b9b9b;
+  border-bottom: 1px solid #bbb;
+  box-sizing: border-box;
 }
 
 .head-search div {
@@ -1017,6 +1015,8 @@ a {
   color: #9b9b9b;
   position: relative;
   background: #fff;
+  border-bottom: 1px solid #bbb;
+  box-sizing: border-box;
 }
 
 #combin-filter-btn i {
