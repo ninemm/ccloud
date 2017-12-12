@@ -199,50 +199,54 @@
         <div>
             <div id="products" class="menu-left showInventoryMenu">
                 <ul>
-                    <li id="allProduct" class="active" value="00">全部商品类型</li>
+                    <#if goodsTypeList??&&(goodsTypeList?size>0)>
+                        <li id="allProduct" class="active" value="00">全部商品类型</li>
+                    </#if>
                     <#list goodsTypeList as goodsType >
                         <li value="${(goodsType.id)!}">${(goodsType.name)!}</li>
                     </#list>
                 </ul>
             </div>
         </div>
-        <article  >
+        <article>
             <div class="menu-right showInventoryMenu infinite" id="inventory_detailList">
                 <#if inventoryList??>
                     <#assign total = inventoryList.totalRow>
-                        <#list inventoryList.list as inventory >
-                            <div class="product_detail">
-                                <div class="inventory_name">
-                                    ${(inventory.name)!}
+                        <#if total &gt; 0>
+                            <#list inventoryList.list as inventory >
+                                <div class="product_detail">
+                                    <div class="inventory_name">
+                                        ${(inventory.name)!}
+                                    </div>
+                                    <!--<div class="weui-flex">
+                                        <div class="weui-flex__item">期初结存：<span>${(inventory.in_count)!}</span>
+                                        </div>
+                                        <div class="weui-flex__item">期末结存：<span>${(inventory.out_count)!}</span>
+                                        </div>
+                                    </div>-->
+                                    <div class="weui-flex">
+                                        <div class="weui-flex__item">出库：<span class="green-button">${(inventory.in_count)!}</span>
+                                        </div>
+                                        <div class="weui-flex__item">入库：<span class="yellow-button">${(inventory.out_count)!}</span>
+                                        </div>
+                                    </div>
+                                    <div class="weui-flex">
+                                        <div class="weui-flex__item">库存：<span class="blue-button">${(inventory.balance_count)!}</span>
+                                        </div>
+                                        <div class="weui-flex__item">在途：<span>${(inventory.afloat_count)!}</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <i class="icon-map-pin blue ft16"></i>
+                                        &nbsp;&nbsp;${(inventory.seller_name)!}
+                                    </div>
                                 </div>
-                                <!--<div class="weui-flex">
-                                    <div class="weui-flex__item">期初结存：<span>${(inventory.in_count)!}</span>
-                                    </div>
-                                    <div class="weui-flex__item">期末结存：<span>${(inventory.out_count)!}</span>
-                                    </div>
-                                </div>-->
-                                <div class="weui-flex">
-                                    <div class="weui-flex__item">出库：<span class="green-button">${(inventory.in_count)!}</span>
-                                    </div>
-                                    <div class="weui-flex__item">入库：<span class="yellow-button">${(inventory.out_count)!}</span>
-                                    </div>
-                                </div>
-                                <div class="weui-flex">
-                                    <div class="weui-flex__item">库存：<span class="blue-button">${(inventory.balance_count)!}</span>
-                                    </div>
-                                    <div class="weui-flex__item">在途：<span>${(inventory.afloat_count)!}</span>
-                                    </div>
-                                </div>
-                                <div>
-                                    <i class="icon-map-pin blue ft16"></i>
-                                    &nbsp;&nbsp;${(inventory.seller_name)!}
-                                </div>
-                            </div>
-                        </#list>
+                            </#list>
+                        </#if>
                 </#if>
                 <#if total = 0>
                     <div class="weui-loadmore weui-loadmore_line">
-                        <span class="weui-loadmore__tips">暂无数据</span>
+                        <span class="weui-loadmore__tips"  style="float: inherit;">暂无数据</span>
                     </div>
                     <#elseif total &gt; 10>
                         <div class="weui-loadmore">
