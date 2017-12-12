@@ -199,14 +199,16 @@
         <div>
             <div id="products" class="menu-left showInventoryMenu">
                 <ul>
-                    <li id="allProduct" class="active" value="00">全部商品类型</li>
+                    <#if goodsTypeList??&&(goodsTypeList?size>0)>
+                        <li id="allProduct" class="active" value="00">全部商品类型</li>
+                    </#if>
                     <#list goodsTypeList as goodsType >
                         <li value="${(goodsType.id)!}">${(goodsType.name)!}</li>
                     </#list>
                 </ul>
             </div>
         </div>
-        <article  >
+        <article>
             <div class="menu-right showInventoryMenu infinite" id="inventory_detailList">
                 <#if inventoryList??>
                     <#assign total = inventoryList.totalRow>
