@@ -75,7 +75,7 @@
                 if (data.totalPage >= pageNumber) {
                     $endNode.after(data.html);
                 }
-                if (data.totalPage = pageNumber) {
+                if (data.totalPage == pageNumber) {
                     $(".infinite").destroyInfinite();
                     $loadmore.hide();
                 }
@@ -224,7 +224,7 @@
     </article>
 </div>
 <a class="hidden-menu" href="/customer/edit">
-    <i class="icon-menu-shopping-cart orange fr"></i>
+    <i class="icon-add icon-menu-shopping-cart orange fr"></i>
 </a>
 <div class="layer"></div>
 <#include "_inc/_footer_nav.html" />

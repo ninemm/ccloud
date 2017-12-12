@@ -29,93 +29,125 @@
     
     $(function() {
         
-        
-        
+        console.log("${(sellerCustomer.id)!}");
+		console.log("${(taskId)!}");
+
     })
+
+	function doReject(){
+		layer.open({
+			type: 2,
+			content: '保存中...'
+		});
+		$.get("${CPATH}/customer/complete?id=${(sellerCustomer.id)!}&taskId=${(taskId)}&status=0" ,
+
+			function(res){
+				if (res.errorCode == 0) {
+					$.confirm({
+						title: res.message,
+						text: '返回列表页？',
+						onOK: function () {
+							location.href = '${CPATH}/todo/customer'
+						},
+						onCancel: function () {
+							$.closeModal();
+						}
+					});
+				} else {
+					$.alert(res.message);
+				}
+			layer.closeAll();
+		})
+	};
     
     function doSubmit() {
-    
-        $.ajax({
-            url: '${CPATH}/customer/save',
-            method: 'post',
-            dataType: 'json',
-            data: $form.serialize(),
-            beforeSend: function() {
-                layer.open({
-                    type: 2,
-                    content: '处理中...'
-                });
-            },
-            success: function(res) {
-                if (res.errorCode == 0) {
-                    $.confirm({
-                        title: res.message,
-                        text: '返回列表页？',
-                        onOK: function () {
-                            location.href = '${CPATH}/customer'
-                        },
-                        onCancel: function () {
-                            $.closeModal();
-                        }
-                    });
-                } else {
-                    $.alert(res.message);
-                }
-                layer.closeAll();
-            },
-            error: function(res) {
-                layer.closeAll();
-            }
-        });
-    }
+
+		layer.open({
+			type: 2,
+			content: '保存中...'
+		});
+		$.get("${CPATH}/customer/complete?id=${(sellerCustomer.id)!}&taskId=${(taskId)}&status=1" ,
+			function(res){
+				if (res.errorCode == 0) {
+					$.confirm({
+						title: res.message,
+						text: '返回列表页？',
+						onOK: function () {
+							location.href = '${CPATH}/todo/customer'
+						},
+						onCancel: function () {
+							$.closeModal();
+						}
+					});
+				} else {
+					$.alert(res.message);
+				}
+			layer.closeAll();
+		})
+    };
     
 </#macro>
 
 <@layout>
 <div id="customer-add">
 <main>
+	<section class="weui-panel weui-panel_access">
+		<div class="weui-panel__hd">变更内容</div>
+		<div class="weui-panel__bd">
+			<div class="weui-media-box weui-media-box_text">
+				<!-- <h4 class="weui-media-box__title">标题一</h4> -->
+				<#if diffAttrList??>
+					<#list diffAttrList as txt>
+						<p class="weui-media-box__desc orange">
+							${txt!}
+						</p>
+					</#list>
+				</#if>
+			</div>
+		</div>
+	</section>
 	    <section class="weui-panel weui-panel_access order-customer-info">
 	        <input type="hidden" name="sellerCustomer.id" value="${(sellerCustomer.id)!}">
 	        <div class="weui-cell weui-cell_access">
 	            <div class="weui-cell__bd">
 	                <div class="order-customer-info-title">客户名称: </div>
-	                <span class="txt-gray">${(sellerCustomer.customer_name)!}</span>
+	                <input class="txt-gray" value="${(sellerCustomer.customer_name)!}">
 	            </div>
 	        </div>
 	        <div class="weui-cell weui-cell_access">
 	            <div class="weui-cell__bd">
 	                <div class="order-customer-info-title">客户昵称: </div>
-	                <span class="txt-gray">${(sellerCustomer.nickname)!'无'}</span>
+	                <input class="txt-gray" value="${(sellerCustomer.nickname)!'无'}">
 	            </div>
 	        </div>
 	        <div class="weui-cell weui-cell_access">
 	            <div class="weui-cell__bd">
 	                <div class="order-customer-info-title">联系人: </div>
-	                <span class="txt-gray">${(sellerCustomer.contact)!}</span>
+	                <input class="txt-gray" value="${(sellerCustomer.contact)!}">
 	            </div>
 	        </div>
 	        <div class="weui-cell weui-cell_access">
 	            <div class="weui-cell__bd">
 	                <div class="order-customer-info-title">联系电话: </div>
-	                <span class="txt-gray">${(sellerCustomer.mobile)!}</span>
+	                <input class="txt-gray" value="${(sellerCustomer.mobile)!}">
 	            </div>
 	        </div>
 	        <div class="weui-cell weui-cell_access select-area">
 	            <div class="weui-cell__bd">
 	                <div class="order-customer-info-title">客户类型: </div>
-	                <span class="txt-gray">${(custTypeNames)!}</span>
+	                <input class="txt-gray" value="${(custTypeNames)!}">
 	            </div>
 	        </div>
 	        <div class="weui-cell weui-cell_access">
 	            <div class="weui-cell__bd">
 	                <div class="order-customer-info-title">省市区: </div>
-	                <span class="txt-gray">${(sellerCustomer.prov_name)!} ${(sellerCustomer.city_name)!} ${(sellerCustomer.country_name)!}</span>
+	                <input class="txt-gray" value="${(sellerCustomer.prov_name)!} ${(sellerCustomer.city_name)!} ${(sellerCustomer.country_name)!}">
 	            </div>
 	        </div>
 	        <div class="weui-cell weui-cell_access">
 	            <div class="weui-cell__bd">
 	                <div class="order-customer-info-title">地址详情: </div>
-	                <span class="txt-gray">${(sellerCustomer.address)!}
+	                <input class="txt-gray" value="${(sellerCustomer.address)!}">
 	            </div>
 	        </div>
 	    </section>
@@ -136,7 +168,7 @@
 	                        </#if>
 	                        </ul>
 	                        <div class="weui-uploader__input-box">
-	                            <input id="uploaderInput" name="customer.img_path" class="weui-uploader__input" type="file" accept="image/*" multiple="">
+	                            <!--<input id="uploaderInput" name="customer.img_path" class="weui-uploader__input" type="file" accept="image/*" multiple="">-->
 	                            <input type="hidden" name="pic" id="pic">
 	                        </div>
 	                    </div>
@@ -172,7 +204,7 @@
 </main>
 <#include "_inc/_goback.html" />
 <footer class="weui-footer weui-footer_fixed-bottom ft16">
-    <button class="gray-button width-50 _submit_btn" onclick="doEnabled()">拒绝</button>
+    <button class="gray-button width-50 _submit_btn" onclick="doReject()">拒绝</button>
     <button class="blue-button width-50 _submit_btn" onclick="doSubmit()">通过</button>
 </footer>
 </div>
