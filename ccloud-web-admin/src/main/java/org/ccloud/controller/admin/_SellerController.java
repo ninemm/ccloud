@@ -439,7 +439,8 @@ public class _SellerController extends JBaseCRUDController<Seller> {
             setAttr("k", keyword);
         }
         User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
-        Seller seller = SellerQuery.me().findByUserId(user.getId());
+        String se = getSessionAttr("sellerId").toString();
+        Seller seller = SellerQuery.me().findById(getSessionAttr("sellerId").toString());
         Page<Product> page = ProductQuery.me().paginate_pro(getPageNumber(), getPageSize(),keyword,  "cp.id",seller.getId(),user.getId());
 
         Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
