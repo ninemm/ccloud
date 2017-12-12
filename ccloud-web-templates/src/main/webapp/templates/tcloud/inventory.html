@@ -125,7 +125,7 @@
 
     function loadInventoryDetail(){
         $.ajax({
-        url: '/ccloud-web-front/user/appLoadFollowUpData',
+        url: '${CPATH}/user/appLoadFollowUpData',
         type: 'post',
         data:paramData(),
         success: function (result) {
@@ -178,7 +178,7 @@
 
     <article  class="inventory">
         <header class="has-th-list">
-            <div class="head-search">
+            <div class="head-search" style="width:94%;float:left;">
                 <div>
                     <input type="text" id="region" placeholder="客户区域" class="weui-input" readonly>
                     <i class="icon-sort-desc"></i>
@@ -192,7 +192,7 @@
                     <i class="icon-sort-desc"></i>
                 </div>
             </div>
-            <div>
+            <div style="float:right;margin:13px 10px;">
                 <i class="icon-th-list"></i>
             </div>
         </header>

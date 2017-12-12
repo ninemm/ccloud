@@ -268,29 +268,30 @@ public class UserController extends BaseFrontController{
 	}
 	
 	public void inventory() {
-		User loginUser = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		//User loginUser = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		//String wareHouseId = getPara("mobile");
 		//String productName = getPara("product");
 		String sellerId = getPara("sellerId");
-		String deptDataArea = loginUser!=null?DataAreaUtil.getUserDeptDataArea(loginUser.getDataArea()):"";
+		String selDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String deptId = "";
 		//Page<Record> inventoryList = InventoryQuery.me().findDetailByApp(getPageNumber(), getPageSize(),"","",sellerId,deptDataArea,deptId);
-		Page<Record> inventoryList = InventoryQuery.me().findDetailByParams("","", sellerId, "", deptId, deptDataArea,"",getPageNumber(), getPageSize());
+		Page<Record> inventoryList = InventoryQuery.me().findDetailByParams("","", sellerId, "", deptId, selDataArea,"",getPageNumber(), getPageSize());
 
-		List<GoodsType> goodsTypeList = GoodsTypeQuery.me().findGoodsType(deptDataArea+"%");
+		List<GoodsType> goodsTypeList = GoodsTypeQuery.me().findGoodsType(selDataArea);
 		setAttr("inventoryList", inventoryList);
 		setAttr("goodsTypeList", goodsTypeList);
 		render("inventory.html");
 	}
 	
 	public void appLoadRegionAndProductType() {
-		User loginUser = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		//User loginUser = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String selDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String goodsType = getPara("goodsType");
 		String queryType = getPara("queryType");
 		List<Map<String, Object>> regionList = new ArrayList<>();
 		if(!queryType.equals("productType")) {
-			String deptDataArea = loginUser!=null?DataAreaUtil.getUserDeptDataArea(loginUser.getDataArea()):"";
-			List<Seller> sellerList = SellerQuery.me().findSellerRegion(deptDataArea+"%");
+			//String deptDataArea = loginUser!=null?DataAreaUtil.getUserDeptDataArea(loginUser.getDataArea()):"";
+			List<Seller> sellerList = SellerQuery.me().findSellerRegion(selDataArea);
 			Map<String, Object> region = new HashMap<>();
 			region.put("title", "全部");
 			region.put("value", "");
@@ -321,7 +322,8 @@ public class UserController extends BaseFrontController{
 	}
 	
 	public void appLoadFollowUpData() {
-		User loginUser = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		//User loginUser = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String selDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String search = getPara("search");
 		int pageNumber = Integer.parseInt(getPara("pageNumber"));
 		int pageSize = Integer.parseInt(getPara("pageSize"));
@@ -332,9 +334,9 @@ public class UserController extends BaseFrontController{
 		if(isOrdered==null)isOrdered="00";
 		String goodsType = getPara("goodsType");
 		goodsType = goodsType.equals("00")||goodsType==null?"":goodsType;
-		String deptDataArea = loginUser!=null?DataAreaUtil.getUserDeptDataArea(loginUser.getDataArea()):"";
+		//String deptDataArea = loginUser!=null?DataAreaUtil.getUserDeptDataArea(loginUser.getDataArea()):"";
 		String deptId = "";
-		Page<Record> inventoryList = InventoryQuery.me().findDetailByParams(search,goodsType, sellerId, productType, deptId, deptDataArea,isOrdered,pageNumber,pageSize);
+		Page<Record> inventoryList = InventoryQuery.me().findDetailByParams(search,goodsType, sellerId, productType, deptId, selDataArea,isOrdered,pageNumber,pageSize);
 		StringBuilder inventoryHtml = new StringBuilder();
 		for (Record inventory : inventoryList.getList()) {
 			inventoryHtml.append("<div class=\"product_detail\">");
