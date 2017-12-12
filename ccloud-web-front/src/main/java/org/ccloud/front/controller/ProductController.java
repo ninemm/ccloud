@@ -11,8 +11,10 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.CustomerType;
+import org.ccloud.model.SellerProduct;
 import org.ccloud.model.User;
 import org.ccloud.model.query.CustomerTypeQuery;
+import org.ccloud.model.query.ProductCompositionQuery;
 import org.ccloud.model.query.SalesOrderDetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SellerCustomerQuery;
@@ -50,6 +52,14 @@ public class ProductController extends BaseFrontController {
 		String keyword = getPara("keyword");
 		List<Record> productList = SellerProductQuery.me().findProductListForApp(sellerId, keyword);
 		renderJson(productList);
+	}
+
+	public void productCompositionList() {
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+
+		String keyword = getPara("keyword");
+		List<Record> productCompositionList = ProductCompositionQuery.me().findProductBySeller(sellerId, keyword);
+		renderJson(productCompositionList);
 	}
 
 	public void shoppingCart() {
@@ -198,6 +208,22 @@ public class ProductController extends BaseFrontController {
 					}
 
 				}
+
+				String[] compositionIds = paraMap.get("compositionId");
+				String[] compositionNums = paraMap.get("compositionNum");
+				// 组合商品
+				for (int index = 0; index < compositionIds.length; index++) {
+					String productId = compositionIds[index];
+					String number = compositionNums[index];
+					List<SellerProduct> list = SellerProductQuery.me().findByCompositionId(productId);
+					for (SellerProduct sellerProduct : list) {
+						if (!SalesOrderDetailQuery.me().insertForAppComposition(sellerProduct, orderId, sellerId,
+								user.getId(), date, user.getDepartmentId(), user.getDataArea(),Integer.parseInt(number))) {
+							return false;
+						}
+					}
+				}
+
 				return true;
 			}
 		});

@@ -17,14 +17,18 @@ $(function() {
 		doSubmit();
   });
 
+
   initCustomer();
   $("#deliveryDate").calendar();
+
+  $product.empty();
   initProduct();
+  initProductComposition();
   total();
 
 })
 	var $form = $('#form');
-	var newHtml = $(".goods-detail").eq(0).html();
+	var newHtml = $(".common").eq(0).html();
 	var $product = $("#productList");
 	var customerTypeInfoMap = [];
 
@@ -81,10 +85,9 @@ $(function() {
 
 	function initProduct(){
 		var productList = getItemBykey("productList");
-		$product.empty();
 		$.each(productList, function(index, el) {
 			if(el.isGift == 0) {
-				$product.append("<div class='weui-panel weui-panel_access goods-detail'>" + newHtml + "</div>");
+				$product.append("<div class='weui-panel weui-panel_access goods-detail common'>" + newHtml + "</div>");
 				var $newProductDetail = $product.find(".weui-panel:last");
 				$newProductDetail.find("#productName").text(el.productName);
 				$newProductDetail.find("#valueName").text(el.valueName);
@@ -134,9 +137,27 @@ $(function() {
 	
 		});
 	}
+	
+	var compositionHtml = $(".composition").eq(0).html();
+	function initProductComposition(){
+		var productCompositionList = getItemBykey("productCompositionList");
+	
+		$.each(productCompositionList, function(index, el) {
+			$product.append("<div class='weui-panel weui-panel_access goods-detail composition'>" + compositionHtml + "</div>");
+			var $newProductDetail = $product.find(".composition:last");
+			$newProductDetail.find("#compositionName").text(el.compositionName);
+	
+			$newProductDetail.find("#compositionPriceSpan").text(el.compositionPriceSpan);
+	
+			$newProductDetail.find("#compositionPrice").val(el.compositionPrice);
+			$newProductDetail.find("#compositionId").val(el.compositionId);
+			
+			$newProductDetail.find("#compositionNum").val(el.compositionNum);
+		});
+	}
 
 	function total() {
-		var products = $(".goods-detail");
+		var products = $(".common");
 		var rowTotal = 0;
 		var total = 0;
 		$.each(products, function(index, el) {
@@ -145,8 +166,16 @@ $(function() {
 			$el.find("#rowTotal").val(rowTotal);
 			total += rowTotal;
 		});
+
+		var compositions = $(".composition");
+		$.each(compositions, function(index, el) {
+			var $el = $(el);
+			rowTotal = $el.find("#compositionNum").val() * $el.find("#compositionPrice").val();
+			$el.find("#rowTotal").val(rowTotal);
+			total += rowTotal;
+		});
 		$("#total").val(total);
-		$("#totalNum").text("共" + products.length + "款,合计:" + total + "元")
+		$("#totalNum").text("共" + (products.length + compositions.length) + "款,合计:" + total + "元")
 	
 	} 
 
@@ -267,7 +296,7 @@ $(function() {
 			</section>
 			<div class="weui-cells__title black">商品明细</div>
 			<div id="productList">
-				<div class="weui-panel weui-panel_access goods-detail">
+				<div class="weui-panel weui-panel_access goods-detail common">
 					<input type="hidden" name="sellProductId" id="sellProductId" value="">
 					<input type="hidden" name="productId" id="productId" value="">
 					<input type="hidden" name="convert" id="convert" value="">
@@ -329,6 +358,21 @@ $(function() {
 							</div>
 						</div>
 					</div>
+				</div>
+				<div class="weui-panel weui-panel_access goods-detail composition">
+					<input type="hidden" id="compositionId" name="compositionId" value="">
+					<div class="product_name" id="compositionName">
+						35度中国劲酒_125ml_1*24
+					</div>
+					<div class="product_bUnit">
+						<span class="price" id="compositionPriceSpan">￥725</span>
+						<div class="spinner">
+							<input type="number" min="0" value="0" class="fl" id="compositionNum" name="compositionNum" readonly>
+						</div>
+						<input type="number" class="street-value"  id="compositionPrice" value="720" name="compositionPrice" readonly>
+					</div>
+
+					<input type="hidden" id="rowTotal" name="rowTotal" value="">
 				</div>
 			</div>
 			<input type="hidden" id="total" name="total" value="">

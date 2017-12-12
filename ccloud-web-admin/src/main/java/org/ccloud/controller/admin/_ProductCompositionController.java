@@ -255,7 +255,7 @@ public class _ProductCompositionController extends JBaseCRUDController<ProductCo
 			// TODO
 		}
 
-		List<Record> productlist = ProductCompositionQuery.me().findProductBySeller(sellerId);
+		List<Record> productlist = ProductCompositionQuery.me().findProductBySeller(sellerId, "");
 		Map<String, Object> productInfoMap = new HashMap<String, Object>();
 		List<Map<String, String>> productOptionList = new ArrayList<Map<String, String>>();
 

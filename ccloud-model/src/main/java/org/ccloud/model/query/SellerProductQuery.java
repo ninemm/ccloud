@@ -114,8 +114,9 @@ public class SellerProductQuery extends JBaseQuery {
 		fromBuilder.append(" FROM cc_seller_product sp ");
 		fromBuilder.append(" JOIN cc_product p ON sp.product_id = p.id ");
 		fromBuilder.append(" JOIN cc_goods g ON p.goods_id = g.id ");
+		fromBuilder.append(" JOIN cc_goods_category gc ON g.goods_category_id = gc.id ");
 		fromBuilder.append(" JOIN cc_goods_type gt on g.goods_type_id = gt.id ");
-		fromBuilder.append(" WHERE sp.is_enable = 1 ");
+		fromBuilder.append(" WHERE sp.is_enable = 1  AND sp.is_gift = 0 ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
 		appendIfNotEmpty(fromBuilder, "sp.seller_id", sellerId, params, false);
@@ -138,7 +139,7 @@ public class SellerProductQuery extends JBaseQuery {
 		appendIfNotEmpty(fromBuilder, "sp.seller_id", sellerId, params, false);
 		appendIfNotEmptyWithLike(fromBuilder, "sp.custom_name", keyword, params, false);
 
-		fromBuilder.append(" ORDER BY gc.order_list, gt.`name`, sp.order_list ");
+		fromBuilder.append(" ORDER BY gt.`name`, sp.order_list ");
 
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}

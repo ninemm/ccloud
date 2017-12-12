@@ -279,6 +279,56 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		}
 		return true;
 	}
+	
+	@SuppressWarnings("unchecked")
+	public boolean insertForAppComposition(SellerProduct product, String orderId, String sellerId, String id,
+			Date date, String deptId, String dataArea, Integer number) {
+		List<SalesOrderDetail> detailList = new ArrayList<>();
+		Integer convert = product.getInt("convert_relate");
+		Integer compositionCount = Integer.parseInt(product.getStr("productCount"));
+		Integer productCount = compositionCount * convert * number;
+		String productId = product.getProductId();
+		Map<String, Object> result = this.getWarehouseId(productId, sellerId, productCount, convert);
+		String status = result.get("status").toString();
+		List<Map<String, String>> list = (List<Map<String, String>>) result.get("countList");
+		
+		if (!status.equals("enough")) {
+			return false;
+		}
+		for (Map<String, String> map : list) {
+			SalesOrderDetail detail = new SalesOrderDetail();
+			detail.setProductCount(Integer.parseInt(map.get("productCount").toString()));
+			detail.setLeftCount(detail.getProductCount());
+			detail.setOutCount(0);
+	
+			detail.setWarehouseId(map.get("warehouse_id").toString());
+			
+			detail.setId(StrKit.getRandomUUID());
+			detail.setOrderId(orderId);
+			detail.setSellProductId(product.getId());
+
+			detail.setProductPrice(product.getPrice());
+			BigDecimal productAmount = new BigDecimal(detail.getProductCount()).divide(new BigDecimal(convert), 2, BigDecimal.ROUND_HALF_UP)
+					.multiply(product.getPrice());
+//			BigDecimal amount = new BigDecimal(product.getInt("productCount")).multiply(product.getPrice());
+			detail.setProductAmount(productAmount);
+			detail.setIsGift(0);
+			detail.setIsComposite(1);
+			detail.setCreateDate(date);
+			detail.setDeptId(deptId);
+			detail.setDataArea(dataArea);	
+			detailList.add(detail);
+		}
+		int[] i = Db.batchSave(detailList, detailList.size());
+		int count = 0;
+		for (int j : i) {
+			count = count + j;
+		}
+		if (count != detailList.size()) {
+			return false;
+		}
+		return true;
+	}
 
 
 	public SalesOrderDetail findById(final String id) {
