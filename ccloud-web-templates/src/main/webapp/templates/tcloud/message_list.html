@@ -1,0 +1,172 @@
+<#include "_inc/_layout.html"/>
+
+<#macro css>
+    #informationList {
+        height: 100%;
+    }
+</#macro>
+
+<#macro script>
+    
+    var loading = false;
+    var pageNumber = 2;
+    var status = "all";
+    var pageSize = Utils.pageSize;
+
+    var $endNode = null;
+    var $loadmore = $(".weui-loadmore");
+    var $activeTab = $('.weui-bar__item--on');
+    var $navbarItem = $(".weui-navbar__item");
+    
+    var $curTab = $("#tab1");
+    
+    $navbarItem.on('click', function() {
+        $(".infinite").infinite();
+        var type = $(this).attr('type');
+        if (type != 'all') {
+            status = type;
+        }
+        
+        $curTab = $($(this).attr("href"));
+        var page = $curTab.attr('page');
+        if (page) {
+            pageNumber = parseInt(page);
+        } else {
+            pageNumber = 2;
+        }
+    });
+    
+    var paramData = function() {
+        return {
+            //method: 'queryOrder', 
+            pageSize: pageSize, 
+            pageNumber: pageNumber,
+            status: status
+        }
+    }
+    
+    $('.infinite').infinite().on("infinite", function() {
+        var self = this;
+        $endNode = $('.weui-tab__bd-item--active .weui-cell:last');
+        $loadmore = $(self).find('.weui-loadmore');
+        if ($loadmore) 
+            $loadmore.show();
+        
+        if (self.loading)
+            return ;
+        
+        self.loading = true;
+        
+        $.ajax({
+            type: 'post',
+            url: '${CPATH}/message/more',
+            data: paramData(),
+            dataType: 'json',
+            success: function(res) {
+                self.loading = false;
+                if (res.errorCode == 0 && res.data) {
+                    $endNode.after(res.data.messageData);
+                    pageNumber ++ ;
+                    $curTab.attr('page', pageNumber);
+                    //console.log('success, page = ', $tab.attr('page'))
+                 
+                    if (res.data.isEnd) {
+                        $('.infinite').destroyInfinite();
+                        $loadmore.hide();
+                    }
+                } else {
+                    toastr.error(res.message);
+                }
+            },
+            error: function(res) {
+                toastr.error(res.message);
+            }
+        });
+    });
+</#macro>
+
+<@layout>
+<div id="informationList">
+    <div class="weui-tab">
+        <div class="weui-navbar">
+            <a class="weui-navbar__item weui-bar__item--on" href="#tab1" type="order"> 订单 </a>
+            <a class="weui-navbar__item" href="#tab2" type="customer">客户 </a>
+            <a class="weui-navbar__item" href="#tab3" type="customer_visit">客户拜访 </a>
+        </div>
+        <div class="weui-tab__bd">
+            <div id="tab1" class="infinite weui-tab__bd-item weui-tab__bd-item--active">
+                <div class="weui-cells message">
+                <#list orderPage.list as bean>
+                    <div class="weui-cell">
+                        <div class="weui-cell__bd">
+                            <span>${(bean.title)!}</span>
+                        </div>
+                        <div class="check-pass">${DICT_NAME('${bean.type}')}</div>
+                        <div class="weui-cell__ft">${(bean.createDate?string('yyyy-MM-dd HH:mm'))!}</div>
+                    </div>
+                </#list>
+                </div>
+                <#if (orderPage.totalRow = 0)>
+                <div class="weui-loadmore weui-loadmore_line">
+                    <span class="weui-loadmore__tips">暂无数据</span>
+                </div>
+                <#elseif (orderPage.totalRow > orderPage.pageSize)>
+                <div class="weui-loadmore">
+                    <i class="weui-loading"></i>
+                    <span class="weui-loadmore__tips">正在加载</span>
+                </div>
+                </#if> 
+            </div>
+            <div id="tab2" class="infinite weui-tab__bd-item">
+                <div class="weui-cells message">
+                    <#list customerPage.list as bean>
+                    <div class="weui-cell">
+                        <div class="weui-cell__bd">
+                            <span>${(bean.title)!}</span>
+                        </div>
+                        <div class="check-pass">${DICT_NAME('${bean.type}')}</div>
+                        <div class="weui-cell__ft">${(bean.createDate?string('yyyy-MM-dd HH:mm'))!}</div>
+                    </div>
+                </#list>
+                </div>
+                <#if (customerPage.totalRow = 0)>
+                <div class="weui-loadmore weui-loadmore_line">
+                    <span class="weui-loadmore__tips">暂无数据</span>
+                </div>
+                <#elseif (customerPage.totalRow > customerPage.pageSize)>
+                <div class="weui-loadmore">
+                    <i class="weui-loading"></i>
+                    <span class="weui-loadmore__tips">正在加载</span>
+                </div>
+                </#if> 
+            </div>
+            <div id="tab3" class="infinite weui-tab__bd-item">
+                <div class="weui-cells message">
+                    <#list customerVisitPage.list as bean>
+                    <div class="weui-cell">
+                        <div class="weui-cell__bd">
+                            <span>${(bean.title)!}</span>
+                        </div>
+                        <div class="check-pass">${DICT_NAME('${bean.type}')}</div>
+                        <div class="weui-cell__ft">${(bean.createDate?string('yyyy-MM-dd HH:mm'))!}</div>
+                    </div>
+	                </#list>
+	                </div>
+	                <#if (customerVisitPage.totalRow = 0)>
+	                <div class="weui-loadmore weui-loadmore_line">
+	                    <span class="weui-loadmore__tips">暂无数据</span>
+	                </div>
+	                <#elseif (customerVisitPage.totalRow > customerVisitPage.pageSize)>
+	                <div class="weui-loadmore">
+	                    <i class="weui-loading"></i>
+	                    <span class="weui-loadmore__tips">正在加载</span>
+	                </div>
+	                </#if> 
+                </div>
+            </div>
+        </div>
+    </div>  
+    <#include "_inc/_goback.html" /> 
+</div>
+
+</@layout>

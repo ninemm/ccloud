@@ -1,0 +1,47 @@
+<#include "../_inc/_layout.html"/> 
+<#include "_option_script.html"/> 
+<@layout active_id=p child_active_id=c>
+<section class="content-header">
+	<h1>经销商定制化服务</h1>
+</section>
+
+<!-- Main content -->
+<section class="content">
+	<p class="content-msg">
+	</p>
+	<form action="${CPATH}/admin/option/saveBySeller" method="POST" id="form">
+		<input type="hidden" name="ucode" value="${ucode}"> 
+		<div class="row">
+			<div class="col-xs-12">
+				<h4 class="jp-set-title">常规选项</h4>
+				<ul class="list-unstyled">
+					<li class="jp-set-pad">
+						<div class="col-sm-3 ">
+							<div class="  jp-set-title-line jp-set-info ">库存检查开关</div>
+						</div>
+						<div class="col-sm-9  jp-set-title-line">
+							<div class="col-sm-6 jp-table-distance-top ">
+								<label class="radio-inline">
+			                 		<input type="radio" name="seller_store_check" value="1" <#if value == '1'>checked</#if>>开
+			                 	</label>
+			                 	<label class="radio-inline">
+			                 		<input type="radio" name="seller_store_check" value="0" <#if value == '0'>checked</#if>>关
+								</label>	
+							</div>
+						</div>
+						<div class="clr"></div>
+					</li>
+				</ul>
+			</div>
+			<!-- /.box -->
+		</div>
+		<div class="row">
+			<div class="col-xs-12">
+				<button type="button" onclick="doSubmit()" class="btn btn-primary">保存更改</button>
+			</div>
+		</div>
+		<!-- /.row -->
+	</form>
+</section>
+<!-- /.content -->
+</@layout>
