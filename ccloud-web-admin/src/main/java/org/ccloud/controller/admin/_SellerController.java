@@ -16,7 +16,6 @@
 package org.ccloud.controller.admin;
 
 import java.io.File;
-import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -49,7 +48,6 @@ import org.ccloud.model.query.BrandQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.GroupQuery;
-import org.ccloud.model.query.OptionQuery;
 import org.ccloud.model.query.ProductQuery;
 import org.ccloud.model.query.RoleQuery;
 import org.ccloud.model.query.SellerBrandQuery;
@@ -189,10 +187,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			
 			seller.save();
 			Option option = new Option();
-			List<Option> options =  OptionQuery.me().findAll();
-			int opID = options.size();
-			int opIDs = ++opID;
-			option.setId( BigInteger.valueOf(opIDs));
+			//List<Option> options =  OptionQuery.me().findAll();
 			option.setOptionKey(sellerId+"_store_check");
 			option.setOptionValue("1");
 			option.set("seller_id",sellerId );
