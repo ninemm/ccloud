@@ -40,15 +40,15 @@ public class MessageController extends BaseFrontController {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		
 		Dict dict = DictQuery.me().findByKey("message_type", "order");
-		Page<Message> orderPage = MessageQuery.me().paginate(getPageNumber(), getPageSize(), sellerId, dict.getValue(), null, user.getId(), null);
+		Page<Message> orderPage = MessageQuery.me().paginate(getPageNumber(), 15, sellerId, dict.getValue(), null, user.getId(), null);
 		setAttr("orderPage", orderPage);
 		
 		Dict customer = DictQuery.me().findByKey("message_type", "customer");
-		Page<Message> customerPage = MessageQuery.me().paginate(getPageNumber(), getPageSize(), sellerId, customer.getValue(), null, user.getId(), null);
+		Page<Message> customerPage = MessageQuery.me().paginate(getPageNumber(), 15, sellerId, customer.getValue(), null, user.getId(), null);
 		setAttr("customerPage", customerPage);
 		
 		Dict customerVisit = DictQuery.me().findByKey("message_type", "customer_visit");
-		Page<Message> customerVisitPage = MessageQuery.me().paginate(getPageNumber(), getPageSize(), sellerId, customerVisit.getValue(), null, user.getId(), null);
+		Page<Message> customerVisitPage = MessageQuery.me().paginate(getPageNumber(), 15, sellerId, customerVisit.getValue(), null, user.getId(), null);
 		setAttr("customerVisitPage", customerVisitPage);
 		
 		render("message_list.html");

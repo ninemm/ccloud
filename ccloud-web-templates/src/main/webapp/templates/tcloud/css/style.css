@@ -1,7 +1,7 @@
 html,
 body {
   height: 100%;
-  background: #f7f7f7;
+  background: #fcfcfc;
   width: 100%;
 }
 
@@ -331,6 +331,10 @@ a {
   bottom: 10%;
 }
 
+.hidden-menu>img {
+  width: 2rem;
+}
+
 .hidden-menu ul {
   display: none;
 }
@@ -340,12 +344,22 @@ a {
   color: #fff;
   height: 1.5rem;
   line-height: 1.5rem;
-  font-size: 0.6rem;
+  font-size: 0.7rem;
   width: 4rem;
+}
+
+.hidden-menu li img {
+  width: 1.5rem;
+  height: 1.5rem;
+  position: absolute;
+  top: 50%;
+  margin-top: -0.75rem;
+  right: 0;
 }
 
 .hidden-menu li {
   position: relative;
+  margin: 0.5rem 0;
 }
 
 .hidden-menu li i {
@@ -538,7 +552,6 @@ a {
 .showInventoryMenu{
   position: absolute;
   margin-top: 50px;
-  margin-bottom: 50px;
 }
 
 .menu-left {
