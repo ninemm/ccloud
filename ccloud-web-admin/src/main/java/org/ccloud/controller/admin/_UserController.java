@@ -97,7 +97,11 @@ public class _UserController extends JBaseCRUDController<User> {
 		user.setStationName(stationName);
 		// user.setGroupId(groupList);
 		 user.setGroupName(NewGroupName);
-		if (StringUtils.isNotBlank(user.getId())) {
+		if (StringUtils.isBlank(user.getId())) {
+			Department dept = DepartmentQuery.me().findById(user.getDepartmentId());
+			String dataArea = DataAreaUtil.dataAreaSetByUser(dept.getDataArea());
+			user.setDataArea(dataArea);
+		} else {
 			User userOld = UserQuery.me().findById(user.getId());
 			if (!userOld.getDepartmentId().equals(user.getDepartmentId())) {
 				Department dept = DepartmentQuery.me().findById(user.getDepartmentId());
