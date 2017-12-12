@@ -22,22 +22,24 @@ $(function() {
       total();
   });
   
+  $main.empty();
   initProduct();
+  initProductComposition();
   total();
   
 });
 
 var sellerProductInfoMap = ${sellerProductInfoMap!};
 var sellerProductItems = ${sellerProductItems!};
-var newHtml = $(".weui-panel").eq(0).html();
+var newHtml = $(".common").eq(0).html();
 var $main = $("main");
 
 function initProduct(){
 	var productList = getItemBykey("productList");
-	$main.empty();
+
 	$.each(productList, function(index, el) {
-		$main.append("<div class='weui-panel weui-panel_access'>" + newHtml + "</div>");
-		var $newProductDetail = $main.find(".weui-panel:last");
+		$main.append("<div class='weui-panel weui-panel_access common'>" + newHtml + "</div>");
+		var $newProductDetail = $main.find(".common:last");
 		$newProductDetail.find("#productName").text(el.productName);
 		$newProductDetail.find("#valueName").text(el.valueName);
 
@@ -107,27 +109,51 @@ function selectGift($gift, product){
 
 }
 
+var compositionHtml = $(".composition").eq(0).html();
+function initProductComposition(){
+	var productCompositionList = getItemBykey("productCompositionList");
+
+	$.each(productCompositionList, function(index, el) {
+		$main.append("<div class='weui-panel weui-panel_access composition'>" + compositionHtml + "</div>");
+		var $newProductDetail = $main.find(".composition:last");
+		$newProductDetail.find("#compositionName").text(el.compositionName);
+
+		$newProductDetail.find("#compositionPriceSpan").text(el.compositionPriceSpan);
+
+		$newProductDetail.find("#compositionPrice").val(el.compositionPrice);
+		$newProductDetail.find("#compositionId").val(el.compositionId);
+		
+		$newProductDetail.find("#compositionNum").val(el.compositionNum);
+	});
+}
+
+
 function total(){
-	var products = $(".weui-panel");
+	var products = $(".common");
 	var total = 0;
 	$.each(products, function(index, el) {
 		total += $(el).find("#bigNum").val() * $(el).find("#bigPrice").val();
 		total += $(el).find("#smallNum").val() * $(el).find("#smallPrice").val();
 	});
-	$("#totalNum").text("共" + products.length + "款,合计:" + total + "元")
+	
+	var compositions = $(".composition");
+	$.each(compositions, function(index, el) {
+		total += $(el).find("#compositionNum").val() * $(el).find("#compositionPrice").val();
+	});
+	$("#totalNum").text("共" + (products.length + compositions.length) + "款,合计:" + total + "元")
 
 } 
 
 function save(){
 	var productList = [];
-	var $product = $(".weui-panel");
+	var $product = $(".common");
 	$.each($product, function(index, el) {
 		$el = $(el);
 		var sellProductId = $el.find("#sellProductId").val();
 		var bigNum = $el.find("#bigNum").val();
 		var smallNum = $el.find("#smallNum").val();
 		
-		if(bigNum != 0 || smallNum != 0){
+		if(bigNum > 0 || smallNum > 0){
 			productList.push({
 				productName : $el.find("#productName").text(),
 				valueName : $el.find("#valueName").text(),
@@ -157,16 +183,22 @@ function save(){
 		if(flag){
 			var giftBigNum = 0;
 			var giftSmallNum = 0;
+			var giftBigUnitSpan = '';
+			var giftSmallUnitSpan = '';
 			var giftBigUnit = '';
 			var giftSmallUnit = '';
+
 			var giftNum = $el.find("#giftNum").val();
 			var giftUnitName = $el.find("#giftUnit").val();
 			var giftUnit = $el.find("#giftUnit").data("values");
+
 			if(giftUnit == "bigUnit"){
-				giftBigUnit = giftUnitName;
+				giftBigUnitSpan = giftUnitName;
+				giftBigUnit = giftUnit;
 				giftBigNum = giftNum;
 			} else {
-				giftSmallUnit = giftUnitName;
+				giftSmallUnitSpan = giftUnitName;
+				giftSmallUnit = giftUnit;
 				giftSmallNum = giftNum;
 			}
 		
@@ -176,8 +208,8 @@ function save(){
 				
 				bigPriceSpan : '',
 				smallPriceSpan : '',
-				bigUnitSpan : '',
-				smallUnitSpan : '',
+				bigUnitSpan : giftBigUnitSpan,
+				smallUnitSpan : giftSmallUnitSpan,
 				stock : '',
 				
 				bigPrice : $el.find("#giftBigPrice").val(),
@@ -198,7 +230,34 @@ function save(){
 	});
 	
 	setItemBykey("productList",productList);
-	if(productList.length == 0) {
+	
+	//组合商品
+	var productCompositionList = [];
+	var $composition = $(".composition");
+	
+	$.each($composition, function(index, el) {
+		$el = $(el);
+		var compositionId = $el.find("#compositionId").val();
+		var compositionNum = $el.find("#compositionNum").val();
+		
+		if(compositionNum > 0){
+			productCompositionList.push({
+				compositionName : $el.find("#compositionName").text(),
+				
+				compositionPriceSpan : $el.find("#compositionPriceSpan").text(),
+				stock : $el.find("#stock").text(),
+				
+				compositionPrice : $el.find("#compositionPrice").val(),
+				compositionId : compositionId,
+
+				compositionNum : compositionNum,
+			});
+		}
+	});
+	
+	setItemBykey("productCompositionList", productCompositionList);
+
+	if(productList.length == 0 && productCompositionList.length == 0) {
 		toastr.warning("你的购物车内没有商品!"); 
 		return;
 	}
@@ -209,7 +268,7 @@ function save(){
 <@layout>
 <body id="shopping-cart">
 	<main>
-		<div class="weui-panel weui-panel_access">
+		<div class="weui-panel weui-panel_access common">
 			<input type="hidden" id="sellProductId" value="">
 			<input type="hidden" id="productId" value="">
 			<input type="hidden" id="convert" value="">
@@ -273,7 +332,7 @@ function save(){
 							<div class="operate fl">
 								<i class="icon-minus2"></i>
 							</div>
-							<input type="number" min="0" value="0" class="fl" id="giftNum" readyOnly>
+							<input type="number" min="0" value="1" class="fl" id="giftNum" readyOnly>
 							<div class="operate fl">
 								<i class="icon-plus2"></i>
 							</div>
@@ -282,6 +341,25 @@ function save(){
 						<i class="icon-sort-desc"></i>
 					</div>
 				</div>
+			</div>
+		</div>
+		<div class="weui-panel weui-panel_access composition">
+			<input type="hidden" id="compositionId" value="">
+			<div class="product_name" id="compositionName">
+				35度中国劲酒_125ml_1*24
+			</div>
+			<div class="product_bUnit">
+				<span class="price" id="compositionPriceSpan">￥720</span>
+				<div class="spinner">
+					<div class="operate fl">
+						<i class="icon-minus2"></i>
+					</div>
+					<input type="number" min="0" value="0" class="fl" id="compositionNum" >
+					<div class="operate fl">
+						<i class="icon-plus2"></i>
+					</div>
+				</div>
+				<input type="number" class="street-value" id="compositionPrice" value="720" >
 			</div>
 		</div>
 	</main>

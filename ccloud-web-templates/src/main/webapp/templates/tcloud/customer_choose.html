@@ -82,7 +82,7 @@
 	        "isOrdered": $("#isOrdered").data('values')
 	    }
 
-    	Utils.ajax('${CPATH}/product/customerList', params, 
+		Utils.ajax('${CPATH}/product/customerList', params, 
 			function(data){
 				$loading.hide();
 				if(data.customerList.length == 0){
@@ -213,7 +213,7 @@
 	          <div class="hidden-menu">
 			    <ul>
 			      <li>
-			        <a href="index.html">
+			        <a href="${CPATH}/product/index">
 			          首页
 			          <i class="icon-home blue"></i>
 			        </a>
