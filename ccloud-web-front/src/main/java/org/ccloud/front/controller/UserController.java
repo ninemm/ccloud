@@ -257,7 +257,7 @@ public class UserController extends BaseFrontController{
 			//期初期末结存 未定,暂时不做统计。
 			//inventoryHtml.append("<div class=\"weui-flex\"><div class=\"weui-flex__item\">期初结存：<span>"+inventory.getStr("in_count")+"</span></div><div class=\"weui-flex__item\">期末结存：<span>"+inventory.getStr("out_count")+"</span></div></div>");
 			inventoryHtml.append("<div class=\"weui-flex\"><div class=\"weui-flex__item\">出库：<span class=\"green-button\">"+inventory.getStr("in_count")+"</span></div><div class=\"weui-flex__item\">入库：<span class=\"yellow-button\">"+inventory.getStr("out_count")+"</span></div></div>");
-			inventoryHtml.append("<div class=\"weui-flex\"><div class=\"weui-flex__item\">库存：<span class=\"blue-button\">"+inventory.getStr("balance_count")+"</span></div><div class=\"weui-flex__item\">在途：<span class=\"yellow-button\">"+inventory.getStr("afloat_count")+"</span></div></div>");
+			inventoryHtml.append("<div class=\"weui-flex\"><div class=\"weui-flex__item\">库存：<span class=\"blue-button\">"+inventory.getStr("balance_count")+"</span></div><div class=\"weui-flex__item\">在途：<span>"+inventory.getStr("afloat_count")+"</span></div></div>");
 			inventoryHtml.append("<div><i class=\"icon-map-pin blue ft16\"></i>&nbsp;&nbsp;"+inventory.getStr("seller_name")+"</div>");
 			inventoryHtml.append("</div>\n");
 		}
