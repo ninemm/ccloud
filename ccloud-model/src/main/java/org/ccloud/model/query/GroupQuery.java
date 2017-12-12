@@ -91,8 +91,9 @@ public class GroupQuery extends JBaseQuery {
 		return DAO.find(sqlBuilder.toString(), params.toArray());
 	}
 
-	public List<Group> findByDeptId(String id) {
-		return DAO.doFind("dept_id = ?", id);
+	public List<Group> findByDeptId() {
+		String sql = "SELECT * from `group` where dept_id = '0' and group_code >'001' and group_code<'020'";
+		return DAO.find(sql);
 	}
 	
 	public List<Record> findByUserCheck(String id, String dataArea) {
@@ -106,4 +107,12 @@ public class GroupQuery extends JBaseQuery {
 		return Db.find(stringBuilder.toString(), params.toArray());
 	}
 	
+	public Group findDeptIdAndDataAreaAndGroupCode(String deptId,String dataArea,String groupCode){
+		String sql = "select * from `group` where dept_id = ? and data_area = ? and group_code = ?";
+		return DAO.findFirst(sql, deptId,dataArea,groupCode);
+	}
+	
+	public List<Group> findByDeptId(String id) {
+		return DAO.doFind("dept_id = ?", id);
+	}
 }
