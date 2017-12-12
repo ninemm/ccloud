@@ -198,9 +198,31 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 		BigDecimal totalAmount = new BigDecimal(0);
 		Set<String> set = new HashSet<String>();
 		for(int i = 1;i<=productNum;i++){
-			String purchaseInstockDetailId = StringUtils.getArrayFirst(paraMap.get("purchaseInstockDetailId"+i));
-			set.add(purchaseInstockDetailId);
+			String purchaseOederDetailId = StringUtils.getArrayFirst(paraMap.get("purchaseOrderDetailId"+i));
+			set.add(purchaseOederDetailId);
 		}
+		
+		for(String pid : set){
+			int productCount = 0;
+			for(int j = 1; j<=productNum;j++){
+				String purchaseOederDetailId = StringUtils.getArrayFirst(paraMap.get("purchaseOrderDetailId"+j));
+				String convert = StringUtils.getArrayFirst(paraMap.get("convert" + j));
+				String bN = StringUtils.getArrayFirst(paraMap.get("bN" + j));
+				String sN = StringUtils.getArrayFirst(paraMap.get("sN" + j));
+				Integer productCount0 = Integer.valueOf(bN) * Integer.valueOf(convert) + Integer.valueOf(sN);
+				if(purchaseOederDetailId.equals(pid)){
+					productCount += productCount0;
+				}else{
+					break;
+				}
+			}
+			PurchaseOrderDetail purchaseOrderDetail = PurchaseOrderDetailQuery.me().findById(pid);
+			if(productCount!=purchaseOrderDetail.getProductCount()){
+				renderAjaxResultForError("商品数量输入有误，请核对后重新输入！");
+				return;
+			}
+		}
+		
 		while (productNum > count) {
 			index++;
 			String sellerProductId = StringUtils.getArrayFirst(paraMap.get("sellerProductId"+index));
