@@ -16,7 +16,6 @@
 package org.ccloud.controller.admin;
 
 import java.io.File;
-import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -33,9 +32,9 @@ import org.ccloud.utils.QRCodeUtils;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Brand;
 import org.ccloud.model.Customer;
-import org.ccloud.model.CustomerType;
 import org.ccloud.model.Department;
 import org.ccloud.model.Group;
+import org.ccloud.model.GroupRoleRel;
 import org.ccloud.model.Option;
 import org.ccloud.model.Product;
 import org.ccloud.model.Role;
@@ -46,10 +45,8 @@ import org.ccloud.model.SellerProduct;
 import org.ccloud.model.User;
 import org.ccloud.model.UserJoinCustomer;
 import org.ccloud.model.query.BrandQuery;
-import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.GroupQuery;
-import org.ccloud.model.query.OptionQuery;
 import org.ccloud.model.query.ProductQuery;
 import org.ccloud.model.query.RoleQuery;
 import org.ccloud.model.query.SellerBrandQuery;
@@ -189,10 +186,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			
 			seller.save();
 			Option option = new Option();
-			List<Option> options =  OptionQuery.me().findAll();
-			int opID = options.size();
-			int opIDs = ++opID;
-			option.setId( BigInteger.valueOf(opIDs));
+			//List<Option> options =  OptionQuery.me().findAll();
 			option.setOptionKey(sellerId+"_store_check");
 			option.setOptionValue("1");
 			option.set("seller_id",sellerId );
@@ -250,36 +244,48 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				userJoinCustomer.set("dept_id", department.getId());
 				userJoinCustomer.save();
 			}
-			//新建销售商时默认导入  分组  角色  客户类型
-			List<Group> groupList = GroupQuery.me().findByDeptId("0");
-			for (Group group : groupList) {
-				Group newGroup=new Group();
-				String groupId = StrKit.getRandomUUID();
-				newGroup.setId(groupId);
-				newGroup.setGroupName(group.getGroupName());
-				newGroup.setGroupCode(group.getGroupCode()+seller.getSellerCode());
-				newGroup.setOrderList(group.getOrderList());
-				newGroup.setDescription(group.getDescription());
-				newGroup.set("dept_id", seller.getDeptId());
-				newGroup.set("data_area", getPara("data_area"));
-				newGroup.setCreateDate(new Date());
-				newGroup.save();
+			//新建销售商时默认创建分组  角色  及中间表
+ 			List<Seller> sellers = SellerQuery.me().findByDeptId(department.getId());
+			if(sellers.size()==1){
+				List<Group> groupList = GroupQuery.me().findByDeptId();
+				for (Group group : groupList) {
+					Group newGroup=new Group();
+					String groupId = StrKit.getRandomUUID();
+					newGroup.setId(groupId);
+					newGroup.setGroupName(group.getGroupName());
+					newGroup.setGroupCode(group.getGroupCode());
+					newGroup.setOrderList(group.getOrderList());
+					newGroup.setDescription(group.getDescription());
+					newGroup.set("dept_id", department.getId());
+					newGroup.set("data_area", department.getDataArea());
+					newGroup.setCreateDate(new Date());
+					newGroup.save();
+				}
+				List<Role> roleList = RoleQuery.me().findByDeptId();
+				for (Role role : roleList) {
+					Role newRole = new Role();
+					String roleId = StrKit.getRandomUUID();
+					newRole.setId(roleId);
+					newRole.setRoleName(role.getRoleName());
+					newRole.setRoleCode(role.getRoleCode());
+					newRole.setOrderList(role.getOrderList());
+					newRole.setDescription(role.getDescription());
+					newRole.set("dept_id", department.getId());
+					newRole.set("data_area",department.getDataArea());
+					newRole.setCreateDate(new Date());
+					newRole.save();
+					
+					GroupRoleRel groupRoleRel = new GroupRoleRel();
+					Group group = GroupQuery.me().findDeptIdAndDataAreaAndGroupCode(newRole.getDeptId(),newRole.getDataArea(),newRole.getRoleCode());
+					groupRoleRel.setId(StrKit.getRandomUUID());
+					groupRoleRel.setGroupId(group.getId());
+					groupRoleRel.setRoleId(roleId);
+					groupRoleRel.save();
+				}
 			}
-			List<Role> roleList = RoleQuery.me().findByDeptId("0");
-			for (Role role : roleList) {
-				Role newRole = new Role();
-				String roleId = StrKit.getRandomUUID();
-				newRole.setId(roleId);
-				newRole.setRoleName(role.getRoleName());
-				newRole.setRoleCode(role.getRoleCode()+seller.getSellerCode());
-				newRole.setOrderList(role.getOrderList());
-				newRole.setDescription(role.getDescription());
-				newRole.set("dept_id", seller.getDeptId());
-				newRole.set("data_area", getPara("data_area"));
-				newRole.setCreateDate(new Date());
-				newRole.save();
-			}
-			List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDept("0");
+			
+			
+			/*List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDept("0");
 			for (CustomerType customerType : customerTypeList) {
 				CustomerType newCustomerType = new CustomerType();
 				String customerTypeId = StrKit.getRandomUUID();
@@ -294,7 +300,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				newCustomerType.set("data_area", getPara("data_area"));
 				newCustomerType.setCreateDate(new Date());
 				newCustomerType.save();
-			}
+			}*/
 		} else {
 			seller.set("seller_name",getPara("seller_name"));
 			seller.set("seller_code",getPara("seller_code"));

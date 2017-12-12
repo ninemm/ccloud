@@ -68,7 +68,6 @@
                     $endNode.after(res.data.messageData);
                     pageNumber ++ ;
                     $curTab.attr('page', pageNumber);
-                    //console.log('success, page = ', $tab.attr('page'))
                  
                     if (res.data.isEnd) {
                         $('.infinite').destroyInfinite();
@@ -106,16 +105,16 @@
                     </div>
                 </#list>
                 </div>
-                <#if (orderPage.totalRow = 0)>
+                <#if orderPage ??> <#if (orderPage.totalRow = 0)>
                 <div class="weui-loadmore weui-loadmore_line">
                     <span class="weui-loadmore__tips">暂无数据</span>
                 </div>
-                <#elseif (orderPage.totalRow > orderPage.pageSize)>
+                <#elseif (orderPage.totalRow >= orderPage.pageSize)>
                 <div class="weui-loadmore">
                     <i class="weui-loading"></i>
                     <span class="weui-loadmore__tips">正在加载</span>
                 </div>
-                </#if> 
+                </#if> </#if>
             </div>
             <div id="tab2" class="infinite weui-tab__bd-item">
                 <div class="weui-cells message">
@@ -127,9 +126,9 @@
                         <div class="check-pass">${DICT_NAME('${bean.type}')}</div>
                         <div class="weui-cell__ft">${(bean.createDate?string('yyyy-MM-dd HH:mm'))!}</div>
                     </div>
-                </#list>
+	                </#list>
                 </div>
-                <#if (customerPage.totalRow = 0)>
+                <#if customerPage ??> <#if (customerPage.totalRow = 0)>
                 <div class="weui-loadmore weui-loadmore_line">
                     <span class="weui-loadmore__tips">暂无数据</span>
                 </div>
@@ -138,7 +137,7 @@
                     <i class="weui-loading"></i>
                     <span class="weui-loadmore__tips">正在加载</span>
                 </div>
-                </#if> 
+                </#if> </#if>
             </div>
             <div id="tab3" class="infinite weui-tab__bd-item">
                 <div class="weui-cells message">
@@ -152,7 +151,7 @@
                     </div>
 	                </#list>
 	                </div>
-	                <#if (customerVisitPage.totalRow = 0)>
+	                <#if customerVisitPage ??> <#if (customerVisitPage.totalRow = 0)>
 	                <div class="weui-loadmore weui-loadmore_line">
 	                    <span class="weui-loadmore__tips">暂无数据</span>
 	                </div>
@@ -161,7 +160,7 @@
 	                    <i class="weui-loading"></i>
 	                    <span class="weui-loadmore__tips">正在加载</span>
 	                </div>
-	                </#if> 
+	                </#if> </#if>
                 </div>
             </div>
         </div>

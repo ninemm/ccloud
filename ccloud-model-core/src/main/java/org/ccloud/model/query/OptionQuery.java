@@ -15,8 +15,6 @@
  */
 package org.ccloud.model.query;
 
-import java.util.List;
-
 import org.ccloud.model.Option;
 import org.ccloud.utils.StringUtils;
 
@@ -110,11 +108,6 @@ public class OptionQuery extends JBaseQuery {
 		}
 		return null;
 	}
-	
-	public List<Option> findAll(){
-		String sql = "select * from `option`";
-		return DAO.find(sql);
-	}	
 	
 	public String findByKeyAndSellerId(final String key, final String sellerId) {
 		String sessionKey = sellerId + key;

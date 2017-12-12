@@ -18,6 +18,7 @@ package org.ccloud.model.query;
 import java.util.LinkedList;
 import org.ccloud.model.Message;
 
+import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
@@ -66,6 +67,9 @@ public class MessageQuery extends JBaseQuery {
 		needWhere = appendIfNotEmpty(fromBuilder, "type", type, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "from_user_id", fromUserId, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "to_user_id", toUserId, params, needWhere);
+		
+		orderby = StrKit.isBlank(orderby) == true ? "create_date" : orderby;
+		fromBuilder.append("order by " + orderby +" desc");
 		
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
