@@ -20,8 +20,10 @@ import java.util.List;
 
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
+import org.ccloud.model.Dict;
 import org.ccloud.model.Message;
 import org.ccloud.model.User;
+import org.ccloud.model.query.DictQuery;
 import org.ccloud.model.query.MessageQuery;
 import org.ccloud.route.RouterMapping;
 
@@ -33,9 +35,23 @@ import com.jfinal.plugin.activerecord.Page;
 public class MessageController extends BaseFrontController {
 
 	public void index() {
-		Page<Message> page = MessageQuery.me().paginate(getPageNumber(), getPageSize(), null);
-		setAttr("page", page);
-		render("message.html");
+		
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		
+		Dict dict = DictQuery.me().findByKey("message_type", "order");
+		Page<Message> orderPage = MessageQuery.me().paginate(getPageNumber(), getPageSize(), sellerId, dict.getValue(), null, user.getId(), null);
+		setAttr("orderPage", orderPage);
+		
+		Dict customer = DictQuery.me().findByKey("message_type", "customer");
+		Page<Message> customerPage = MessageQuery.me().paginate(getPageNumber(), getPageSize(), sellerId, customer.getValue(), null, user.getId(), null);
+		setAttr("customerPage", customerPage);
+		
+		Dict customerVisit = DictQuery.me().findByKey("message_type", "customer_visit");
+		Page<Message> customerVisitPage = MessageQuery.me().paginate(getPageNumber(), getPageSize(), sellerId, customerVisit.getValue(), null, user.getId(), null);
+		setAttr("customerVisitPage", customerVisitPage);
+		
+		render("message_list.html");
 	}
 	
 	public void edit() {
@@ -60,16 +76,25 @@ public class MessageController extends BaseFrontController {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		
-		Page<Message> page = MessageQuery.me().paginate(pageNumber, pageSize, sellerId, type, user.getId(), null);
+		Page<Message> page = MessageQuery.me().paginate(pageNumber, pageSize, sellerId, type, null, user.getId(), null);
 		List<Message> list = page.getList();
 		Ret ret = Ret.create();
 		StringBuilder strBuilder = new StringBuilder();
 		for (Message message : list) {
-			
+			StringBuilder str = new StringBuilder();
+			str.append("<div class=\"weui-cell\">");
+			str.append("	<div class=\"weui-cell__bd\">");
+			str.append("  		<p>" + message.getTitle() + "</p>");
+			str.append("	</div>");
+			str.append("	<div class=\"check-pass\">");
+			str.append(			DictQuery.me().findByKey("message_type", type));
+			str.append("	</div>");
+			str.append("	<div class=\"weui-cell__ft\">" + message.getCreateDate() + "</div>");
+			str.append("</div>");
 		}
 		
 		ret.set("isEnd", list.size() >= pageSize ? false : true);
-		ret.set("scoreData", strBuilder.toString());
+		ret.set("messageData", strBuilder.toString());
 		
 		renderAjaxResultForSuccess("success", ret);
 	}

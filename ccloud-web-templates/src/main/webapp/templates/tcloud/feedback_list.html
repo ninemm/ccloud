@@ -32,7 +32,7 @@
          }
     }
     
-    $(document.body).infinite().on("infinite", function() {
+    $('infinite').infinite().on("infinite", function() {
     
         $endNode = $('.weui-cells .weui-cell_access:last');
         if ($loadmore) 
@@ -49,7 +49,7 @@
 
 <@layout>
 <div class="weui-content">
-	<main>
+	<main class="infinite">
 		<#if page??>
 			<div class="weui-cells">
 			    <#list page.list as bean>
