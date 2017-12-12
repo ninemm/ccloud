@@ -110,7 +110,7 @@
 					success : function(data) { 
 						if (data.errorCode == 0) {
 							var sellerSize = data.data;
-							console.log(sellerSize);
+							$("#seller_id").empty();
 							if (sellerSize.length > 1) {
 								for (var i = 0; i < sellerSize.length; i++) {
 									$("#seller_id").append("<option value=" + sellerSize[i].sellerId + ">" + sellerSize[i].sellerName + "</option>");

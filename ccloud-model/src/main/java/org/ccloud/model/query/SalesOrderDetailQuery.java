@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.ccloud.Consts;
 import org.ccloud.model.SalesOrderDetail;
 import org.ccloud.model.SellerProduct;
 import org.ccloud.utils.StringUtils;
@@ -78,7 +79,8 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		}
 		for (Map<String, String> map : list) {
 			SalesOrderDetail detail = new SalesOrderDetail();
-			detail.setProductCount(Integer.parseInt(map.get("productCount").toString()));
+			BigDecimal count = new BigDecimal(map.get("productCount"));
+			detail.setProductCount(count.intValue());
 			detail.setLeftCount(detail.getProductCount());
 			detail.setOutCount(0);
 			// 库存盘点写入库存总账未完成
@@ -115,7 +117,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 	private Map<String, Object> getWarehouseId(String productId, String sellerId, Integer productCount, Integer convert) {
 		Map<String, Object> result = new HashMap<>();
 		List<Map<String, String>> countList = new ArrayList<>();
-		boolean isCheckStore = true;
+		boolean isCheckStore = OptionQuery.me().findStoreCheck(Consts.OPTION_SELLER_STORE_CHECK, sellerId);
 
 		List<Record> list = InventoryQuery.me().findProductStore(sellerId, productId);
 		if (list.size() == 0) {

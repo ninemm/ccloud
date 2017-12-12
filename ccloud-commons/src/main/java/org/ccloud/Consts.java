@@ -132,4 +132,6 @@ public class Consts {
 	
 	public static final String RECEIVABLES_OBJECT_TYPE_CUSTOMER = "customer"; //应收账款客户类型
 	public static final String RECEIVABLES_OBJECT_TYPE_SUPPLIER = "supplier"; //应收账款供应商类型
+	
+	public static final String OPTION_SELLER_STORE_CHECK = "seller_store_check";//经销商检查库存开关设置
 }

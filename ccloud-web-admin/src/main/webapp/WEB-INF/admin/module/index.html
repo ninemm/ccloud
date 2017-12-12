@@ -29,6 +29,13 @@
 			$table.bootstrapTable('refresh');
 		});
 		
+	$("input").on("keydown",function(){
+		if (event.keyCode == 13) {
+			event.keyCode = 0;
+			event.returnValue = false;
+		}
+	});		
+		
 	});
 	
 	var initParams = function(params) {
