@@ -7,7 +7,7 @@
 	</a>
 	<@cc.menus>
 	<#list menus as menu>
-    <a href="${(menu.url)!}" class="weui-tabbar__item <#if menu.isActive()>weui-bar__item--on</#if>">
+    <a href="${CPATH}${(menu.url)!}" class="weui-tabbar__item <#if menu.isActive()>weui-bar__item--on</#if>">
         <div class="weui-tabbar__icon">
             <i class="${(menu.icon)!}"></i>
         </div>
