@@ -175,7 +175,10 @@ public class DepartmentQuery extends JBaseQuery {
 		map.put("tags", Lists.newArrayList(0));
 		list.remove(0);
 		ModelSorter.tree(list);
-		map.put("nodes", doBuild(list, hasUser));
+		List<Map<String, Object>> childList = doBuild(list, hasUser);
+		childList = addDeptUser(department.getId(), childList);
+		map.put("nodes", childList);		
+		
 		deptTreeList.add(map);
 		
 		return deptTreeList;
