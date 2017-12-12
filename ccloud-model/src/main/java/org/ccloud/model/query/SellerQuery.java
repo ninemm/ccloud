@@ -129,8 +129,16 @@ public class SellerQuery extends JBaseQuery {
 		return DAO.find(sql, userId);
 	}
 	
+
 	public List<Seller> findAll(){
 		String sql = "select * from cc_seller";
 		return DAO.find(sql);
+	}
+	
+	public List<Seller> findSellerRegion(String dataArea){
+		StringBuilder sqlBuilder = new StringBuilder("select c_s.id,c_s.seller_name from department d inner join cc_seller c_s on d.id = c_s.dept_id where d.data_area like '"+dataArea+"'");
+		sqlBuilder.append("order by order_list,dept_level ");
+		return DAO.find(sqlBuilder.toString());
+
 	}
 }

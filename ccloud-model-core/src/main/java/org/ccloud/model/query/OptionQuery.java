@@ -116,7 +116,6 @@ public class OptionQuery extends JBaseQuery {
 		return DAO.find(sql);
 	}	
 	
-
 	public String findByKeyAndSellerId(final String key, final String sellerId) {
 		String sessionKey = sellerId + key;
 		String value = CacheKit.get(Option.CACHE_NAME, sessionKey, new IDataLoader() {

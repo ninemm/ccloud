@@ -402,5 +402,11 @@ public class ProductQuery extends JBaseQuery {
 			plist.add(pro);
 		}
 		return plist;
-	}	
+	}
+	
+	public List<Product> findAllProduct(String goodsType){
+		//String select ="select distinct name from cc_product ";
+		String select ="select distinct cp.`name` from cc_product cp left join cc_goods cg on cp.goods_id = cg.id left join cc_goods_type cgt on cg.goods_type_id = cgt.id where cgt.id = '"+goodsType+"'";
+		return DAO.find(select);
+	}
 }
