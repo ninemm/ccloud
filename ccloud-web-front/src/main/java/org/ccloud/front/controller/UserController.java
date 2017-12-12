@@ -346,7 +346,7 @@ public class UserController extends BaseFrontController{
 		StringBuilder inventoryHtml = new StringBuilder("<div class=\"weui-loadmore weui-loadmore_line\"><span class=\"weui-loadmore__tips\"  style=\"float: inherit;\">暂无数据</span></div>");
 		if(StrKit.notBlank(selDataArea)) {
 			inventoryList = InventoryQuery.me().findDetailByParams(search,goodsType, sellerId, productType, deptId, selDataArea,isOrdered,pageNumber,pageSize);
-			if(inventoryList.getList().size()<1) {
+			if(inventoryList.getList().size()>0||pageNumber>1) {
 				inventoryHtml.delete(0, inventoryHtml.length());	
 			}
 			for (Record inventory : inventoryList.getList()) {

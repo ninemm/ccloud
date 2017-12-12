@@ -178,7 +178,7 @@
 
     <article  class="inventory">
         <header class="has-th-list">
-            <div class="head-search" style="width:94%;float:left;">
+            <div class="head-search" style="width:90%;float:left;">
                 <div>
                     <input type="text" id="region" placeholder="客户区域" class="weui-input" readonly>
                     <i class="icon-sort-desc"></i>
@@ -192,7 +192,7 @@
                     <i class="icon-sort-desc"></i>
                 </div>
             </div>
-            <div style="float:right;margin:13px 10px;">
+            <div style="float:right;margin-top:0.45rem;margin-right:0.2rem;width:5%;">
                 <i class="icon-th-list"></i>
             </div>
         </header>
@@ -200,7 +200,7 @@
             <div id="products" class="menu-left showInventoryMenu">
                 <ul>
                     <#if goodsTypeList??&&(goodsTypeList?size>0)>
-                        <li id="allProduct" class="active" value="00">全部商品类型</li>
+                        <li id="allProduct" class="active" value="00">商品类型</li>
                     </#if>
                     <#list goodsTypeList as goodsType >
                         <li value="${(goodsType.id)!}">${(goodsType.name)!}</li>
@@ -258,5 +258,4 @@
         </article>
     </article>
 </div>
-<#include "_inc/_footer_nav.html" />
 </@layout>
