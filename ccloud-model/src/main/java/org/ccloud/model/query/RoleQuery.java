@@ -152,8 +152,9 @@ public class RoleQuery extends JBaseQuery {
 		return list;
 	}
 
-	public List<Role> findByDeptId(String deptId) {
-		return DAO.doFind("dept_id = ?", deptId);
+	public List<Role> findByDeptId() {
+		String sql = "SELECT * from `role` where dept_id = '0' and role_code >'001' and role_code<'020'";
+		return DAO.find(sql);
 	}
 
 	public List<Record> findByRoleCheck(String id, String dataArea) {
@@ -166,5 +167,8 @@ public class RoleQuery extends JBaseQuery {
 		return Db.find(stringBuilder.toString(), params.toArray());
 	}
 
+	public List<Role> findByDeptId(String deptId) {
+		return DAO.doFind("dept_id = ?", deptId);
+	}
 }
 
