@@ -539,11 +539,6 @@ a {
   -webkit-overflow-scrolling: touch;
 }
 
-.showInventoryMenu{
-  position: absolute;
-  margin-top: 50px;
-}
-
 .menu-left {
   width: 22.222222%;
   background: #f7f7f7;
