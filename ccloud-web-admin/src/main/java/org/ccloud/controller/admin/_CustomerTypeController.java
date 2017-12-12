@@ -65,13 +65,13 @@ public class _CustomerTypeController extends JBaseCRUDController<CustomerType> {
 		String show = getPara("show");
 
 		Page<Record> page = null;
-		if (SecurityUtils.getSubject().isPermitted("/admin/all")) {
-			page = CustomerTypeQuery.me().paginate(getPageNumber(), getPageSize(), keyword, show, null, null);
+		page = CustomerTypeQuery.me().paginate(getPageNumber(), getPageSize(), keyword, show, null, null);
+		/*if (SecurityUtils.getSubject().isPermitted("/admin/all")) {
 		} else {
 			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 			page = CustomerTypeQuery.me().paginate(getPageNumber(), getPageSize(), keyword, show,
 					user.getDepartmentId(), DataAreaUtil.getUserDeptDataArea(user.getDataArea()));
-		}
+		}*/
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
 
