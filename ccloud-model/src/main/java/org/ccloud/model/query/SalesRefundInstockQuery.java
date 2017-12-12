@@ -74,9 +74,10 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		boolean needWhere = true;
 
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "r.refund_sn", keyword, params, needWhere);
-
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, needWhere);
+		
 		if (needWhere) {
-			fromBuilder.append(" where 1 = 1 and r.data_area like '"+dataArea+"%' ");
+			fromBuilder.append(" where 1 = 1 ");
 		}
 
 		if (StrKit.notBlank(startDate)) {
