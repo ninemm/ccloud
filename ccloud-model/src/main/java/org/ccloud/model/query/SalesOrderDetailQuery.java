@@ -312,9 +312,8 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 			detail.setProductPrice(product.getPrice());
 			BigDecimal productAmount = new BigDecimal(detail.getProductCount()).divide(new BigDecimal(convert), 2, BigDecimal.ROUND_HALF_UP)
 					.multiply(product.getPrice());
-//			BigDecimal amount = new BigDecimal(product.getInt("productCount")).multiply(product.getPrice());
 			detail.setProductAmount(productAmount);
-			detail.setIsGift(0);
+			detail.setIsGift(product.getInt("is_gift"));
 			detail.setIsComposite(1);
 			detail.setCreateDate(date);
 			detail.setDeptId(deptId);

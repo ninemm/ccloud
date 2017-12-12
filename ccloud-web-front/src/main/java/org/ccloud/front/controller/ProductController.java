@@ -191,35 +191,46 @@ public class ProductController extends BaseFrontController {
 
 				String[] sellProductIds = paraMap.get("sellProductId");
 				// 常规商品
-				for (int index = 0; index < sellProductIds.length; index++) {
-					if (!SalesOrderDetailQuery.me().insertForApp(paraMap, orderId, sellerId, user.getId(), date,
-							user.getDepartmentId(), user.getDataArea(), index)) {
-						return false;
-					}
+				if (StrKit.notBlank(sellProductIds)) {
+					for (int index = 0; index < sellProductIds.length; index++) {
+						if (StrKit.notBlank(sellProductIds[index])) {
+							if (!SalesOrderDetailQuery.me().insertForApp(paraMap, orderId, sellerId, user.getId(), date,
+									user.getDepartmentId(), user.getDataArea(), index)) {
+								return false;
+							}
+						}
 
+					}
 				}
 
 				String[] giftSellProductIds = paraMap.get("giftSellProductId");
 				// 赠品
-				for (int index = 0; index < giftSellProductIds.length; index++) {
-					if (!SalesOrderDetailQuery.me().insertForAppGift(paraMap, orderId, sellerId, user.getId(), date,
-							user.getDepartmentId(), user.getDataArea(), index)) {
-						return false;
-					}
+				if (StrKit.notBlank(giftSellProductIds)) {
+					for (int index = 0; index < giftSellProductIds.length; index++) {
+						if (StrKit.notBlank(giftSellProductIds[index])) {
+							if (!SalesOrderDetailQuery.me().insertForAppGift(paraMap, orderId, sellerId, user.getId(),
+									date, user.getDepartmentId(), user.getDataArea(), index)) {
+								return false;
+							}
+						}
 
+					}
 				}
 
 				String[] compositionIds = paraMap.get("compositionId");
 				String[] compositionNums = paraMap.get("compositionNum");
 				// 组合商品
-				for (int index = 0; index < compositionIds.length; index++) {
-					String productId = compositionIds[index];
-					String number = compositionNums[index];
-					List<SellerProduct> list = SellerProductQuery.me().findByCompositionId(productId);
-					for (SellerProduct sellerProduct : list) {
-						if (!SalesOrderDetailQuery.me().insertForAppComposition(sellerProduct, orderId, sellerId,
-								user.getId(), date, user.getDepartmentId(), user.getDataArea(),Integer.parseInt(number))) {
-							return false;
+				if (StrKit.notBlank(compositionIds)) {
+					for (int index = 0; index < compositionIds.length; index++) {
+						String productId = compositionIds[index];
+						String number = compositionNums[index];
+						List<SellerProduct> list = SellerProductQuery.me().findByCompositionId(productId);
+						for (SellerProduct sellerProduct : list) {
+							if (!SalesOrderDetailQuery.me().insertForAppComposition(sellerProduct, orderId, sellerId,
+									user.getId(), date, user.getDepartmentId(), user.getDataArea(),
+									Integer.parseInt(number))) {
+								return false;
+							}
 						}
 					}
 				}

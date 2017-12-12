@@ -41,7 +41,7 @@ $(function() {
 			$("#contact").val(customerInfo.contact);
 			$("#mobile").val(customerInfo.mobile);
 			$("#address").val(customerInfo.address);
-		
+
 			$("#deliveryAddress").val(customerInfo.address);
 			
 			Utils.ajax('${CPATH}/product/customerTypeById', {"customerId" : customerInfo.sellerCustomerId}, 
@@ -120,12 +120,14 @@ $(function() {
 				//数量
 				if(el.bigNum > 0 && el.bigUnit){
 					$newProductDetail.find("#giftNum").val(el.bigNum);
-					$newProductDetail.find("#giftUnit").val(el.bigUnit);
-					$newProductDetail.find("#giftUnit").attr('data-values', "bigUnit");
+					$newProductDetail.find("#giftUnitName").val(el.bigUnitSpan);
+					$newProductDetail.find("#giftUnitName").attr('data-values', "bigUnit");
+					$newProductDetail.find("#giftUnit").val("bigUnit");
 				}else{
 					$newProductDetail.find("#giftNum").val(el.smallNum);
-					$newProductDetail.find("#giftUnit").val(el.smallUnit);
-					$newProductDetail.find("#giftUnit").attr('data-values', "smallUnit");
+					$newProductDetail.find("#giftUnitName").val(el.smallUnitSpan);
+					$newProductDetail.find("#giftUnitName").attr('data-values', "smallUnit");
+					$newProductDetail.find("#giftUnit").val("smallUnit");
 				}
 				//默认
 				if($newProductDetail.find("#sellProductId").val() == el.sellProductId){
@@ -190,6 +192,7 @@ $(function() {
 	//	}
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
+				$("#placeOrder").attr('diabled', 'disabled');
 				return true
 			},
 			type : "post", 
@@ -199,12 +202,19 @@ $(function() {
 					toastr.success(data.message);
 					removeItemBykey("productList");
 					removeItemBykey("customerInfo");
-					window.location.href = "${CPATH}/order/myOrder"
+					removeItemBykey("productCompositionList");
+
+					setTimeout(function(){
+						window.location.href = "${CPATH}/order/myOrder";
+					},1000);
+					
 				} else {
+					$("#placeOrder").removeAttr('diabled');
 					toastr.error(data.message);
 				}
 			},
 			error : function() {
+				$("#placeOrder").removeAttr('diabled');
 				alert("信息提交错误");
 			}
 		});
@@ -353,7 +363,8 @@ $(function() {
 										<i class="icon-plus2"></i>
 									</div>
 								</div>
-								<input type="text" class="choose-unit weui-input" placeholder="单位" name="giftUnit" id="giftUnit" readonly>
+								<input type="hidden" name="giftUnit" id="giftUnit">
+								<input type="text" class="choose-unit weui-input" placeholder="单位" name="giftUnitName" id="giftUnitName" readonly>
 								<i class="icon-sort-desc"></i>
 							</div>
 						</div>
@@ -397,7 +408,7 @@ $(function() {
 		<div class="layer"></div>
 		<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
 			<p class="total bg-gray weui-flex__item" id="totalNum">共2款，总数10件&nbsp;总额：2600元</p>
-			<button id="placeOrder" class="place-order bg-blue white">提交订单</button>
+			<button type="button" id="placeOrder" class="place-order bg-blue white">提交订单</button>
 		</footer>
 	</form>
 </body>

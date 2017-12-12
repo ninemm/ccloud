@@ -183,16 +183,22 @@ function save(){
 		if(flag){
 			var giftBigNum = 0;
 			var giftSmallNum = 0;
+			var giftBigUnitSpan = '';
+			var giftSmallUnitSpan = '';
 			var giftBigUnit = '';
 			var giftSmallUnit = '';
+
 			var giftNum = $el.find("#giftNum").val();
 			var giftUnitName = $el.find("#giftUnit").val();
 			var giftUnit = $el.find("#giftUnit").data("values");
+
 			if(giftUnit == "bigUnit"){
-				giftBigUnit = giftUnitName;
+				giftBigUnitSpan = giftUnitName;
+				giftBigUnit = giftUnit;
 				giftBigNum = giftNum;
 			} else {
-				giftSmallUnit = giftUnitName;
+				giftSmallUnitSpan = giftUnitName;
+				giftSmallUnit = giftUnit;
 				giftSmallNum = giftNum;
 			}
 		
@@ -202,8 +208,8 @@ function save(){
 				
 				bigPriceSpan : '',
 				smallPriceSpan : '',
-				bigUnitSpan : '',
-				smallUnitSpan : '',
+				bigUnitSpan : giftBigUnitSpan,
+				smallUnitSpan : giftSmallUnitSpan,
 				stock : '',
 				
 				bigPrice : $el.find("#giftBigPrice").val(),
@@ -326,7 +332,7 @@ function save(){
 							<div class="operate fl">
 								<i class="icon-minus2"></i>
 							</div>
-							<input type="number" min="0" value="0" class="fl" id="giftNum" readyOnly>
+							<input type="number" min="0" value="1" class="fl" id="giftNum" readyOnly>
 							<div class="operate fl">
 								<i class="icon-plus2"></i>
 							</div>
