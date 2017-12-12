@@ -298,7 +298,12 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 			}
 			SellerProduct sellerProduct = SellerProductQuery.me().findById(pi.getSellerProductId());
 			String inventoryDetailId = StrKit.getRandomUUID();
-			BigDecimal  storeCount = sellerProduct.getStoreCount().add(count2.divide(convent, 2, BigDecimal.ROUND_HALF_UP));
+			BigDecimal  storeCount = new BigDecimal(0);
+			if(sellerProduct.getStoreCount()==null){
+				storeCount = count2.divide(convent, 2, BigDecimal.ROUND_HALF_UP);
+			}else{
+				storeCount = sellerProduct.getStoreCount().add(count2.divide(convent, 2, BigDecimal.ROUND_HALF_UP));
+			}
 			inventoryDetail.set("id", inventoryDetailId);
 			inventoryDetail.set("warehouse_id", pi.get("warehouse_id"));
 			inventoryDetail.set("sell_product_id",pi.getSellerProductId());
