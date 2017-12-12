@@ -1294,7 +1294,8 @@ input[name=sex] {
   margin-bottom: .5rem;
   height: 1.2rem;
   line-height: 1.2rem;
-
+  margin-right: 3%;
+  float: left;
 }
 
 
