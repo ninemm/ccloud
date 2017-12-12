@@ -12,7 +12,6 @@ import org.ccloud.model.User;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.SalesOrderDetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
-import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DataAreaUtil;
 
@@ -26,12 +25,9 @@ import com.jfinal.plugin.activerecord.Record;
 @RouterMapping(url = "/order")
 public class OrderController extends BaseFrontController {
 
-	String sellerId = "05a9ad0a516c4c459cb482f83bfbbf33";
-	String sellerCode = "QG";
-	User user = UserQuery.me().findById("1f797c5b2137426093100f082e234c14");
-	String dataArea = DataAreaUtil.getUserDealerDataArea(user.getDataArea());
-
 	public void myOrder() {
+		
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
 		Map<String, Object> all = new HashMap<>();
 		all.put("title", "全部");
@@ -54,6 +50,9 @@ public class OrderController extends BaseFrontController {
 	}
 
 	public void orderList() {
+		
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 
 		String keyword = getPara("keyword");
 
@@ -63,7 +62,7 @@ public class OrderController extends BaseFrontController {
 		String endDate = getPara("endDate");
 
 		Page<Record> orderList = SalesOrderQuery.me().paginateForApp(getPageNumber(), getPageSize(), keyword, status,
-				customerTypeId, startDate, endDate, sellerId, dataArea);
+				customerTypeId, startDate, endDate, sellerId, selectDataArea);
 
 		Map<String, Object> map = new HashMap<>();
 		map.put("orderList", orderList.getList());

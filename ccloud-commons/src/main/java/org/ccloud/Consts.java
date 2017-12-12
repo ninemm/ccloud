@@ -22,6 +22,8 @@ public class Consts {
 	public static final String SESSION_LOGINED_USER = "SESSION_LOGINED_USER";
 	public static final String SESSION_SELECT_DATAAREA = "SESSION_SELECT_DATAAREA";//数据查看时的数据域
 	public static final String SESSION_SELLER_ID = "sellerId";
+	public static final String SESSION_SELLER_CODE = "sellerCode";
+	public static final String SESSION_SELLER_NAME = "sellerName";
 	
 	public static final String WORKFLOW_APPLY_USERNAME = "applyUsername";
 

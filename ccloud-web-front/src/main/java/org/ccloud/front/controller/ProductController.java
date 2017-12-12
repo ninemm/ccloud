@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.CustomerType;
 import org.ccloud.model.User;
@@ -35,12 +36,8 @@ import com.jfinal.plugin.activerecord.Record;
 @RouterMapping(url = "/product")
 public class ProductController extends BaseFrontController {
 
-	String sellerId = "05a9ad0a516c4c459cb482f83bfbbf33";
-	String sellerCode = "QG";
-	User user = UserQuery.me().findById("1f797c5b2137426093100f082e234c14");
-	String dataArea = DataAreaUtil.getUserDealerDataArea(user.getDataArea());
-
 	public void index() {
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 
 		List<Record> productTypeList = SellerProductQuery.me().findProductTypeBySellerForApp(sellerId);
 		setAttr("productTypeList", productTypeList);
@@ -48,6 +45,7 @@ public class ProductController extends BaseFrontController {
 	}
 
 	public void productList() {
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 
 		String keyword = getPara("keyword");
 		List<Record> productList = SellerProductQuery.me().findProductListForApp(sellerId, keyword);
@@ -55,6 +53,7 @@ public class ProductController extends BaseFrontController {
 	}
 
 	public void shoppingCart() {
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 
 		List<Record> productList = SellerProductQuery.me().findProductListForApp(sellerId, "");
 
@@ -85,6 +84,9 @@ public class ProductController extends BaseFrontController {
 
 	public void customerChoose() {
 
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+
 		Map<String, Object> all = new HashMap<>();
 		all.put("title", "全部");
 		all.put("value", "");
@@ -92,7 +94,7 @@ public class ProductController extends BaseFrontController {
 		List<Map<String, Object>> userIds = new ArrayList<>();
 		userIds.add(all);
 
-		List<Record> userList = UserQuery.me().findNextLevelsUserList(user.getDataArea());
+		List<Record> userList = UserQuery.me().findNextLevelsUserList(selectDataArea);
 		for (Record record : userList) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", record.get("realname"));
@@ -119,13 +121,15 @@ public class ProductController extends BaseFrontController {
 
 	public void customerList() {
 
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+
 		String keyword = getPara("keyword");
 		String userId = getPara("userId");
 		String customerTypeId = getPara("customerTypeId");
 		String isOrdered = getPara("isOrdered");
 
 		Page<Record> customerList = SellerCustomerQuery.me().paginateForApp(getPageNumber(), getPageSize(), keyword,
-				dataArea, userId, customerTypeId, isOrdered);
+				selectDataArea, userId, customerTypeId, isOrdered);
 
 		Map<String, Object> map = new HashMap<>();
 		map.put("customerList", customerList.getList());
@@ -133,6 +137,7 @@ public class ProductController extends BaseFrontController {
 	}
 
 	public void customerTypeById() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String customerId = getPara("customerId");
 
 		List<Record> customerTypeList = SalesOrderQuery.me().findCustomerTypeListByCustomerId(customerId,
@@ -142,6 +147,9 @@ public class ProductController extends BaseFrontController {
 	}
 
 	public synchronized void salesOrder() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
 
 		Map<String, String[]> paraMap = getParaMap();
 
@@ -172,7 +180,7 @@ public class ProductController extends BaseFrontController {
 				}
 
 				String[] sellProductIds = paraMap.get("sellProductId");
-				//常规商品
+				// 常规商品
 				for (int index = 0; index < sellProductIds.length; index++) {
 					if (!SalesOrderDetailQuery.me().insertForApp(paraMap, orderId, sellerId, user.getId(), date,
 							user.getDepartmentId(), user.getDataArea(), index)) {
@@ -180,9 +188,9 @@ public class ProductController extends BaseFrontController {
 					}
 
 				}
-				
+
 				String[] giftSellProductIds = paraMap.get("giftSellProductId");
-				//赠品
+				// 赠品
 				for (int index = 0; index < giftSellProductIds.length; index++) {
 					if (!SalesOrderDetailQuery.me().insertForAppGift(paraMap, orderId, sellerId, user.getId(), date,
 							user.getDepartmentId(), user.getDataArea(), index)) {
