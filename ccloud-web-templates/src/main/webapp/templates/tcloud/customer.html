@@ -168,7 +168,6 @@
 	    <article  class="infinite">
 	        <div id = "customerList">
 	            <#if customerList??>
-	                <#assign total = customerList.totalRow>
 	                    <#list customerList.list as customer>
 	                         <div class="weui-panel weui-panel_access">
 	                            <div class="weui-flex">
@@ -219,16 +218,18 @@
 	                    </#list>
 	            </#if>
 	        </div>
-	        <#if total = 0>
+            <#if customerList??>
+	        <#if customerList.totalRow = 0>
 	            <div class="weui-loadmore weui-loadmore_line">
 	                <span class="weui-loadmore__tips">暂无数据</span>
 	            </div>
-	            <#elseif total &gt; 10>
+	            <#elseif customerList.totalRow &gt; 10>
 	                <div class="weui-loadmore">
 	                    <i class="weui-loading"></i>
 	                    <span class="weui-loadmore__tips">正在加载</span>
 	                </div>
 	        </#if>
+            </#if>
 	    </article>
     </article>
 </div>
