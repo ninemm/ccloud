@@ -62,6 +62,15 @@ public class DictQuery extends JBaseQuery {
 		});
 	}
 	
+	public Dict findByKey(final String type, final String key) {
+		return DAO.getCache(type + key, new IDataLoader() {
+			@Override
+			public Object load() {
+				return DAO.doFindFirst("`type` = ? and `key` = ?", type, key);
+			}
+		});
+	}
+	
 	public List<Dict> findDictByType(String type) {
 		List<Dict> list = DAO.doFindByCache(Dict.CACHE_NAME, type, "`type` = ? order by ?", type, "`value`");
 		Collections.sort(list, new Comparator<Dict>() {

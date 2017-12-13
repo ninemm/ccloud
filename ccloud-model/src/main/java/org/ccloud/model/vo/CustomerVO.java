@@ -34,8 +34,7 @@ public class CustomerVO implements Serializable {
 	private String address;
 	@JSONField(name = "店招图")
 	private String imageListStore;
-	
-	@JSONField(name = "客户类型ID")
+
 	private List<String> custTypeList;
 	@JSONField(name = "客户类型")
 	private List<String> custTypeNameList;
@@ -162,6 +161,5 @@ public class CustomerVO implements Serializable {
 	public void setCustTypeNameList(List<String> custTypeNameList) {
 		this.custTypeNameList = custTypeNameList;
 	}
-	
 	
 }

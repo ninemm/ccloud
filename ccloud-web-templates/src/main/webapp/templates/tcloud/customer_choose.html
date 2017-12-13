@@ -82,7 +82,7 @@
 	        "isOrdered": $("#isOrdered").data('values')
 	    }
 
-    	Utils.ajax('${CPATH}/product/customerList', params, 
+		Utils.ajax('${CPATH}/product/customerList', params, 
 			function(data){
 				$loading.hide();
 				if(data.customerList.length == 0){
@@ -145,19 +145,21 @@
         </div>
     </header>
     <article class="customer">
-	    <header class="has-th-list">
-	        <div class="head-search select-area">
-	            <div>
-	                <input type="text" id="userId" class="weui-input" placeholder="业务员" readonly>
-	                <i class="icon-sort-desc"></i>
-	            </div>
-	            <div>
-	                <input type="text" id="customerTypeId" class="weui-input" placeholder="客户类型"  readonly>
-	                <i class="icon-sort-desc"></i>
-	            </div>
-	            <div>
-	                <input type="text" id="isOrdered" class="weui-input" placeholder="是否下单" readonly>
-	                <i class="icon-sort-desc"></i>
+	    <header class="has-th-list weui-flex">
+	        <div class="head-search select-area weui-flex__item">
+	        	<div class="weui-flex">
+					<div class="weui-flex__item">
+						<input type="text" id="userId" class="weui-input" placeholder="业务员" readonly>
+						<i class="icon-sort-desc"></i>
+					</div>
+					<div class="weui-flex__item">
+						<input type="text" id="customerTypeId" class="weui-input" placeholder="客户类型"  readonly>
+						<i class="icon-sort-desc"></i>
+					</div>
+					<div class="weui-flex__item">
+						<input type="text" id="isOrdered" class="weui-input" placeholder="是否下单" readonly>
+						<i class="icon-sort-desc"></i>
+					</div>
 	            </div>
 	        </div>
 	        <div id="combin-filter-btn">
@@ -165,7 +167,7 @@
 	        </div>
 	    </header>
 	        <div id="customerList">
-	            <div class="weui-panel weui-panel_access">
+	            <div class="weui-panel weui-panel_access" style="display: none">
 	               <div class="weui-flex">
 	                   <div class="weui-flex__item customer-info" id="customerInfo">
 	                       <p class="ft14" id="customerName">小张烤鱼</p>
@@ -183,7 +185,7 @@
 	                               </p>
 	                               <p>电话</p>
 	                           </a>
-	                           <a class="weui-flex__item" href="./historyOrder.html?customer_id=${(customer.id)!}&customer_name=${(customer.customer_name)!}">
+	                           <a class="weui-flex__item" href="./customer_historyOrder.html?customer_id=${(customer.id)!}&customer_name=${(customer.customer_name)!}">
 	                               <p>
 	                                   <i class="icon-file-text-o blue"></i>
 	                               </p>
@@ -211,7 +213,7 @@
 	          <div class="hidden-menu">
 			    <ul>
 			      <li>
-			        <a href="index.html">
+			        <a href="${CPATH}/product/index">
 			          首页
 			          <i class="icon-home blue"></i>
 			        </a>
@@ -225,6 +227,7 @@
 			    </ul>
 			    <i class="icon-menu-open orange fr" id="button"></i>
 			  </div>
+			  <div class="layer"></div>
     </article>
 </div>
 </@layout>

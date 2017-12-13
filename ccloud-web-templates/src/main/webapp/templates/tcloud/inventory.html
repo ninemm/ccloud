@@ -1,0 +1,281 @@
+<#include "_inc/_layout.html"/>
+<#macro css> </#macro>
+<#macro script>
+    var pageNumber = 1;
+    var pageSize = 10;
+    var goodsType = "";
+    var loading = false;
+
+    var $endNode = null;
+    var $loadmore = $(".weui-loadmore");
+    $(function () {
+        //FastClick.attach(document.body);
+        initMenuData();
+        var data = $(".weui-flex__item");
+        for(var i = 0 ;i<data.length;i++){
+            console.log($($(data[i])[0]).find("span").text());
+            $($(data[i])[0]).find("span").text(toMoney($($(data[i])[0]).find("span").text()),2);
+            //$(data[index])[0].find("span").text().toFixed(2);
+        }
+
+
+    });
+
+    function searchCancel() {
+        $("#searchInput")[0].value = "";
+    }
+
+    function initMenuData(){
+        $.ajax({
+        url:"${CPATH}/user/appLoadRegionAndProductType",
+        type:"post",
+        dataType:"json",
+        data:{"goodsType":goodsType,"queryType":"All"},
+        success:function(data) {
+            $("#region").select({
+                title: "客户区域",
+                items: data.region
+            });
+
+            $("#product-type").select({
+                title: "产品类型",
+                items: data.productType
+            });
+
+            $("#if-order").select({
+                title: "是否下单",
+                items: [{
+                    title: "全部", value: "00"
+                },{
+                    title: "是", value: "1"
+                },{
+                    title: "否",value: "0"
+                }]
+            });
+            }
+        });
+    }
+
+    var paramData = function() {
+        return  {
+            "search": $("#searchInput")[0].value,
+            "pageNumber": pageNumber,
+            "pageSize": pageSize,
+            "region": $("#region")[0].dataset.values,
+            "productType": $("#product-type")[0].value,
+            "isOrdered": $("#if-order")[0].dataset.values,
+            "goodsType": goodsType
+        };
+    }
+    //搜索框监听
+    $(document).on("input", "#searchInput", function() {
+        pageNumber = 1;
+        loadInventoryDetail();
+    });
+    //监听滚动
+    $(".infinite").infinite().on("infinite", function() {
+        var self = this;
+        $endNode = $(".product_detail:last");
+        $loadmore = $(self).find(".weui-loadmore");
+        if ($loadmore) $loadmore.show();
+        if (loading) return ;
+        loading = true;
+        pageNumber++;
+        $.ajax({
+            type: "post",
+            url: "${CPATH}/user/appLoadFollowUpData",
+            data: paramData(),
+            dataType: "json",
+            success:function(result) {
+                    if ($loadmore) $loadmore.show();
+                    if (result.totalPage >= pageNumber) {
+                        $endNode.after(result.inventoryHtml);
+                    }
+                    if (result.totalPage == pageNumber) {
+                        $(".infinite").destroyInfinite();
+                        $loadmore.hide();
+                    }
+                loading = false;
+            }
+        });
+    });
+
+    $("#products ul li").on("click",function(){
+        pageNumber = 1;
+        $product = this;
+        goodsType = $($product).attr("value");
+        loadInventoryDetail();
+        $('#products ul li').removeClass("active");
+        $($product).addClass("active");
+        $.ajax({
+            url:"${CPATH}/user/appLoadRegionAndProductType",
+            type:"post",
+            dataType:"json",
+            data:{"goodsType":goodsType,"queryType":"productType"},
+            success:function(data) {
+                $("#product-type").select("update", { items: data.productType });
+            }
+        });
+
+    });
+    $(".weui-input").on("change",function(){
+        pageNumber = 1;
+        loadInventoryDetail();
+    });
+
+    function loadInventoryDetail(){
+        $.ajax({
+        url: '${CPATH}/user/appLoadFollowUpData',
+        type: 'post',
+        data:paramData(),
+        success: function (result) {
+            $loadmore = $("#inventory").find(".weui-loadmore");
+            $(".infinite").destroyInfinite();
+            $loadmore.hide();
+            if (result.totalPage > pageNumber) {
+                loading = false;
+                $(".infinite").infinite();
+                $(".weui-loadmore").removeAttr("style");
+            }
+
+            $(".infinite")[0].scrollTop = 0;
+            $("#inventory_detailList").empty();
+            $("#inventory_detailList").html(result.inventoryHtml);
+            }
+        });
+    }
+
+    function toMoney(val, num) {
+        num = num > 0 && num <= 9 ? num : 2;
+        val = parseFloat((val + "").replace(/[^\d\.-]/g, "")).toFixed(num) + "";
+        var l = val.split(".")[0].split("").reverse();
+        var r = val.split(".")[1];
+        var t = "";
+        for (i = 0; i < l.length; i++) {
+            t += l[i] + ((i + 1) % 3 == 0 && (i + 1) != l.length ? "," : "");
+        }
+        return t.split("").reverse().join("") + "." + r;
+    }
+</#macro>
+<@layout>
+<body>
+    <div id="inventory">
+        <header>
+            <div class="weui-search-bar" id="searchBar">
+                <form class="weui-search-bar__form">
+                    <div class="weui-search-bar__box">
+                        <i class="weui-icon-search"></i>
+                        <input type="search" class="weui-search-bar__input" id="searchInput" placeholder="搜索" required="">
+                        <a href="javascript:" class="weui-icon-clear" id="searchClear"></a>
+                    </div>
+                    <label class="weui-search-bar__label" id="searchText">
+                        <i class="weui-icon-search"></i>
+                        <span>请输入产品</span>
+                    </label>
+                </form>
+                <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
+            </div>
+        </header>
+
+        <main  class="inventory">
+            <header class="has-th-list weui-flex">
+                <div class="head-search select-area wewui weui-flex__item">
+                    <div class="weui-flex">
+                        <div class="weui-flex__item">
+                            <input type="text" id="region" placeholder="客户区域" class="weui-input" readonly>
+                            <i class="icon-sort-desc"></i>
+                        </div>
+                        <div class="weui-flex__item">
+                            <input type="text" id="product-type" placeholder="产品类型" class="weui-input" readonly>
+                            <i class="icon-sort-desc"></i>
+                        </div>
+                        <div class="weui-flex__item">
+                            <input type="text" id="if-order" placeholder="是否下单" class="weui-input" readonly>
+                            <i class="icon-sort-desc"></i>
+                        </div>
+                    </div>
+                </div>
+                <div id="combin-filter-btn">
+                    <i class="icon-th-list"></i>
+                </div>
+            </header>
+            <div>
+                <div id="products" class="menu-left ft14">
+                    <ul>
+                        <#if goodsTypeList??&&(goodsTypeList?size>0)>
+                            <li id="allProduct" class="active" value="00">商品类型</li>
+                        </#if>
+                        <#list goodsTypeList as goodsType >
+                            <li value="${(goodsType.id)!}">${(goodsType.name)!}</li>
+                        </#list>
+                    </ul>
+                </div>
+            </div>
+            <article class="menu-right infinite" id="inventory_detailList">
+                <#if inventoryList??>
+                    <#assign total = inventoryList.totalRow>
+                        <#if total &gt; 0>
+                            <#list inventoryList.list as inventory >
+                                <div class="product_detail">
+                                    <div class="inventory_name">
+                                        ${(inventory.name)!}
+                                    </div>
+                                    <!--<div class="weui-flex">
+                                        <div class="weui-flex__item">期初结存：<span>${(inventory.in_count)!}</span>
+                                        </div>
+                                        <div class="weui-flex__item">期末结存：<span>${(inventory.out_count)!}</span>
+                                        </div>
+                                    </div>-->
+                                    <div class="weui-flex">
+                                        <div class="weui-flex__item">出库：<span class="green-button">${(inventory.in_count)!}</span>
+                                        </div>
+                                        <div class="weui-flex__item">入库：<span class="yellow-button">${(inventory.out_count)!}</span>
+                                        </div>
+                                    </div>
+                                    <div class="weui-flex">
+                                        <div class="weui-flex__item">库存：<span class="blue-button">${(inventory.balance_count)!}</span>
+                                        </div>
+                                        <div class="weui-flex__item">在途：<span>${(inventory.afloat_count)!}</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <i class="icon-map-pin blue ft16"></i>
+                                        &nbsp;&nbsp;${(inventory.seller_name)!}
+                                    </div>
+                                </div>
+                            </#list>
+                        </#if>
+                </#if>
+                <#if total = 0>
+                    <div class="weui-loadmore weui-loadmore_line">
+                        <span class="weui-loadmore__tips"  style="float: inherit;">暂无数据</span>
+                    </div>
+                    <#elseif total &gt; 10>
+                        <div class="weui-loadmore">
+                            <i class="weui-loading"></i>
+                            <span class="weui-loadmore__tips">正在加载</span>
+                        </div>
+                </#if>
+            </article>
+        </main>
+    </div>
+    <div class="hidden-menu">
+        <ul>
+            <li>
+                <a href="index.html">
+                    首页
+                    <i class="icon-home blue"></i>
+                </a>
+            </li>
+            <li>
+                <a href="javascript:history.go(-1)">
+                    上一页
+                    <i class="icon-undo green"></i>
+                </a>
+            </li>
+        </ul>
+        <i class="icon-menu-open orange fr" id="button"></i>
+    </div>
+    <div class="layer"></div>
+</body>
+</@layout>

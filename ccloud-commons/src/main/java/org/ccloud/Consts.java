@@ -19,9 +19,11 @@ public class Consts {
 
 	public static final String COOKIE_LOGINED_USER = "user";
 
-	public static final String SESSION_LOGINED_USER = "SESSION_LOGINED_USER";
-	public static final String SESSION_SELECT_DATAAREA = "SESSION_SELECT_DATAAREA";//数据查看时的数据域
+	public static final String SESSION_LOGINED_USER = "_logined_user";
+	public static final String SESSION_SELECT_DATAAREA = "_data_area";//数据查看时的数据域
 	public static final String SESSION_SELLER_ID = "sellerId";
+	public static final String SESSION_SELLER_CODE = "sellerCode";
+	public static final String SESSION_SELLER_NAME = "sellerName";
 	
 	public static final String WORKFLOW_APPLY_USERNAME = "applyUsername";
 
@@ -130,4 +132,6 @@ public class Consts {
 	
 	public static final String RECEIVABLES_OBJECT_TYPE_CUSTOMER = "customer"; //应收账款客户类型
 	public static final String RECEIVABLES_OBJECT_TYPE_SUPPLIER = "supplier"; //应收账款供应商类型
+	
+	public static final String OPTION_SELLER_STORE_CHECK = "seller_store_check";//经销商检查库存开关设置
 }

@@ -125,7 +125,7 @@ public class CustomerTypeQuery extends JBaseQuery {
 
 		return Db.queryStr(sqlBuilder.toString(), params.toArray());
 	}
-
+	
 	public int batchDelete(String... ids) {
 		if (ids != null && ids.length > 0) {
 			int deleteCount = 0;
@@ -143,8 +143,8 @@ public class CustomerTypeQuery extends JBaseQuery {
 		return DAO.doFind("dept_id = ?", id);
 	}
 
-	public List<Record> getCustomerTypes(){
-		StringBuilder fromBuilder = new StringBuilder("SELECT id,name FROM cc_customer_type WHERE `is_show`=1");
+	public List<Record> getCustomerTypes(String DataArea){
+		StringBuilder fromBuilder = new StringBuilder("SELECT id,name FROM cc_customer_type WHERE `is_show`=1 and data_area like '"+DataArea+"'");
 		List<Record> list = Db.find(fromBuilder.toString());
 		return list;
 	}

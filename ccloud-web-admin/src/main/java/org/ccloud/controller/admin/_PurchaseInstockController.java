@@ -49,6 +49,8 @@ import org.ccloud.model.query.PurchaseOrderQuery;
 import org.ccloud.model.query.PurchaseRefundOutstockQuery;
 import org.ccloud.model.query.SellerProductQuery;
 import org.ccloud.model.query.SellerQuery;
+import org.ccloud.model.vo.PurchaseInstockDetailInfo;
+import org.ccloud.model.vo.PurchaseSeller;
 import org.ccloud.model.vo.SellerProductInfo;
 
 import com.google.common.collect.ImmutableMap;
@@ -126,6 +128,20 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 		render("detail.html");
 
 	}
+	public void instockDetail() {
+		String instockId = getPara(0);
+
+		setAttr("instockId", instockId);
+		render("getDetail.html");
+
+	}
+	//通过采购订单查看入库详情
+	/*public void instock_detail(){
+		String orderId = getPara(0);
+		String instockId = PurchaseInstockDetailQuery.me().findOrderId(orderId).getPurchaseInstockId();
+		setAttr("instockId", instockId);
+		render("getDetail.html");
+	}*/
 	
 	public void add() {
 		render("add.html");
@@ -182,9 +198,31 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 		BigDecimal totalAmount = new BigDecimal(0);
 		Set<String> set = new HashSet<String>();
 		for(int i = 1;i<=productNum;i++){
-			String purchaseInstockDetailId = StringUtils.getArrayFirst(paraMap.get("purchaseInstockDetailId"+i));
-			set.add(purchaseInstockDetailId);
+			String purchaseOederDetailId = StringUtils.getArrayFirst(paraMap.get("purchaseOrderDetailId"+i));
+			set.add(purchaseOederDetailId);
 		}
+		
+		for(String pid : set){
+			int productCount = 0;
+			for(int j = 1; j<=productNum;j++){
+				String purchaseOederDetailId = StringUtils.getArrayFirst(paraMap.get("purchaseOrderDetailId"+j));
+				String convert = StringUtils.getArrayFirst(paraMap.get("convert" + j));
+				String bN = StringUtils.getArrayFirst(paraMap.get("bN" + j));
+				String sN = StringUtils.getArrayFirst(paraMap.get("sN" + j));
+				Integer productCount0 = Integer.valueOf(bN) * Integer.valueOf(convert) + Integer.valueOf(sN);
+				if(purchaseOederDetailId.equals(pid)){
+					productCount += productCount0;
+				}else{
+					break;
+				}
+			}
+			PurchaseOrderDetail purchaseOrderDetail = PurchaseOrderDetailQuery.me().findById(pid);
+			if(productCount!=purchaseOrderDetail.getProductCount()){
+				renderAjaxResultForError("商品数量输入有误，请核对后重新输入！");
+				return;
+			}
+		}
+		
 		while (productNum > count) {
 			index++;
 			String sellerProductId = StringUtils.getArrayFirst(paraMap.get("sellerProductId"+index));
@@ -221,7 +259,7 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 		//对库存总账进行修改
 		boolean flang = false;
 		final InventoryDetail inventoryDetail= getModel(InventoryDetail.class);
-		Seller seller = SellerQuery.me().findByUserId(user.getId());
+		Seller seller = SellerQuery.me().findById(getSessionAttr("sellerId").toString());
 		List<PurchaseInstockDetail> list= PurchaseInstockDetailQuery.me().findAllByPurchaseInstockId(purchaseInstockId);
 		for(PurchaseInstockDetail pi : list){
 			BigDecimal count2 = new BigDecimal(pi.getProductCount());
@@ -258,16 +296,23 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 					break;
 				}
 			}
+			SellerProduct sellerProduct = SellerProductQuery.me().findById(pi.getSellerProductId());
 			String inventoryDetailId = StrKit.getRandomUUID();
+			BigDecimal  storeCount = new BigDecimal(0);
+			if(sellerProduct.getStoreCount()==null){
+				storeCount = count2.divide(convent, 2, BigDecimal.ROUND_HALF_UP);
+			}else{
+				storeCount = sellerProduct.getStoreCount().add(count2.divide(convent, 2, BigDecimal.ROUND_HALF_UP));
+			}
 			inventoryDetail.set("id", inventoryDetailId);
 			inventoryDetail.set("warehouse_id", pi.get("warehouse_id"));
 			inventoryDetail.set("sell_product_id",pi.getSellerProductId());
 			inventoryDetail.set("in_count", count2.divide(convent, 2, BigDecimal.ROUND_HALF_UP));
 			inventoryDetail.set("in_amount", pi.getProductAmount());
 			inventoryDetail.set("in_price", pi.getProductPrice());
-			inventoryDetail.set("balance_count", inventory.getBalanceCount());
-			inventoryDetail.set("balance_amount", inventory.getBalanceAmount());
-			inventoryDetail.set("balance_price", inventory.getBalancePrice());
+			inventoryDetail.set("balance_count",storeCount );
+			inventoryDetail.set("balance_amount", storeCount.multiply(pi.getProductPrice()));
+			inventoryDetail.set("balance_price", pi.getProductPrice());
 			inventoryDetail.set("biz_type", Consts.BIZ_TYPE_INSTOCK);
 			inventoryDetail.set("biz_bill_sn", pi.get("pwarehouse_sn"));
 			inventoryDetail.set("biz_date", new Date());
@@ -280,7 +325,6 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 			if(flang==false){
 				break;
 			}
-			SellerProduct sellerProduct = SellerProductQuery.me().findById(pi.getSellerProductId());
 			if(sellerProduct.getStoreCount()==null)
 			{
 				sellerProduct.setStoreCount(new BigDecimal(0));
@@ -300,91 +344,6 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 		renderAjaxResultForSuccess("OK");
 
 	}
-	
-	
-/*	public void pass(){
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String purchaseInstockId=getPara("id");
-		boolean flang = false;
-		final InventoryDetail inventoryDetail= getModel(InventoryDetail.class);
-		Seller seller = SellerQuery.me().findByUserId(user.getId());
-		PurchaseInstock purchaseInstock = PurchaseInstockQuery.me().findById(purchaseInstockId);
-		List<PurchaseInstockDetail> list= PurchaseInstockDetailQuery.me().findAllByPurchaseInstockId(purchaseInstockId);
-		for(PurchaseInstockDetail pi : list){
-			BigDecimal count1 = new BigDecimal(pi.getProductCount());
-			BigDecimal convent = new BigDecimal(pi.get("convert_relate").toString());
-			Inventory inventory= InventoryQuery.me().findByWarehouseIdAndProductId(pi.get("warehouse_id").toString(), pi.get("productId").toString());
-			if(inventory!=null){
-				inventory.set("in_count", count1.divide(convent, 2, BigDecimal.ROUND_HALF_UP));
-				inventory.set("in_amount", pi.getProductAmount());
-				inventory.set("in_price", pi.getProductPrice());
-				inventory.set("balance_count", inventory.getBalanceCount().add(count1.divide(convent, 2, BigDecimal.ROUND_HALF_UP)));
-				inventory.set("balance_amount", inventory.getBalanceAmount().add(pi.getProductAmount()));
-				inventory.set("modify_date", new Date());
-				flang=inventory.update();
-				if(flang==false){
-					break;
-				}
-			}else{
-				inventory=new Inventory();
-				inventory.set("id", StrKit.getRandomUUID());
-				inventory.set("warehouse_id", pi.get("warehouse_id").toString());
-				inventory.set("product_id", pi.getSellerProductId());
-				inventory.set("seller_id", seller.getId());
-				inventory.set("in_count", new BigDecimal(pi.getProductCount()));
-				inventory.set("in_amount",pi.getProductAmount());
-				inventory.set("in_price", pi.getProductPrice());
-				inventory.set("balance_count", new BigDecimal(pi.getProductCount()));
-				inventory.set("balance_amount", pi.getProductAmount());
-				inventory.set("balance_price", pi.getProductPrice());
-				inventory.set("data_area",pi.getDataArea());
-				inventory.set("dept_id", pi.getDeptId());
-				inventory.set("create_date", new Date());
-				flang=inventory.save();
-				if(flang==false){
-					break;
-				}
-			}
-			String inventoryDetailId = StrKit.getRandomUUID();
-			inventoryDetail.set("id", inventoryDetailId);
-			inventoryDetail.set("warehouse_id", pi.get("warehouse_id"));
-			inventoryDetail.set("sell_product_id",pi.getSellerProductId());
-			inventoryDetail.set("in_count", count1.divide(convent, 2, BigDecimal.ROUND_HALF_UP));
-			inventoryDetail.set("in_amount", pi.getProductAmount());
-			inventoryDetail.set("in_price", pi.getProductPrice());
-			inventoryDetail.set("balance_count", inventory.getBalanceCount());
-			inventoryDetail.set("balance_amount", inventory.getBalanceAmount().add(pi.getProductAmount()));
-			inventoryDetail.set("biz_type", "100202");
-			inventoryDetail.set("biz_bill_sn", pi.get("pwarehouse_sn"));
-			inventoryDetail.set("biz_date", new Date());
-			inventoryDetail.set("biz_user_id", user.getId());
-			inventoryDetail.set("remark", pi.getRemark());
-			inventoryDetail.set("dept_id",pi.getDeptId());
-			inventoryDetail.set("data_area", pi.getDataArea());
-			inventoryDetail.set("create_date", new Date());
-			flang=inventoryDetail.save();
-			if(flang==false){
-				break;
-			}
-			
-			
-			SellerProduct sellerProduct = SellerProductQuery.me().findById(pi.getSellerProductId());
-			List<Inventory> inventorys = InventoryQuery.me()._findBySellerIdAndProductId(seller.getId(),pi.get("productId").toString());
-			BigDecimal count0 = new BigDecimal(0);
-			for(Inventory inventory0:inventorys){
-				count0 = count0.add(inventory0.getBalanceCount());
-			}
-			sellerProduct.setStoreCount(count0);
-			sellerProduct.set("modify_date", new Date());
-			sellerProduct.update();
-		}
-		if(flang==true){
-			purchaseInstock.set("status", 1000);
-			purchaseInstock.update();
-		}
-		renderAjaxResultForSuccess("OK");
-
-	}*/
 	
 	public void refund_instock(){
 		String instockId = getPara("instockId");
@@ -440,4 +399,57 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 		}
 	}
 	
+	public void refund_instock_etail(){
+		String instockId = getPara("instockId");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		Record instock = PurchaseInstockQuery.me().findMoreById(instockId,user.getDataArea());
+		List<Record> instockDetail = PurchaseInstockDetailQuery.me().findByOutstockId(instockId,user.getDataArea());
+		List<PurchaseInstockDetailInfo> sProduct = new ArrayList<>(); 
+		List<String> ls = new ArrayList<>();
+		PurchaseInstockDetailInfo purchaseInstockDetailInfo = new PurchaseInstockDetailInfo();
+		for (Record record : instockDetail) {
+			String id = record.get("purchase_order_detail_id").toString();
+			if (ls.contains(id)){
+				this._addChild(sProduct, id,record);
+				continue;
+			}
+			purchaseInstockDetailInfo = new PurchaseInstockDetailInfo();
+			purchaseInstockDetailInfo.setPurchaseInstockDetailId(record.get("id").toString());
+			purchaseInstockDetailInfo.setPurchaseOrderDetailId(record.get("purchase_order_detail_id").toString());
+			ls.add(purchaseInstockDetailInfo.getPurchaseOrderDetailId());
+			purchaseInstockDetailInfo.setWarehouseId(record.get("warehouse_id").toString());
+			purchaseInstockDetailInfo.setProductName(record.get("productName").toString());
+			purchaseInstockDetailInfo.setBigUnit(record.get("big_unit").toString());
+			purchaseInstockDetailInfo.setSmallUnit(record.get("small_unit").toString());
+			purchaseInstockDetailInfo.setProductCount(record.get("product_count").toString());
+			purchaseInstockDetailInfo.setConvertRelate(record.get("convert_relate").toString());
+			purchaseInstockDetailInfo.setCpsName(record.get("cps_name").toString());
+			List<PurchaseSeller> product = new ArrayList<>();
+			PurchaseSeller purchaseSeller = new PurchaseSeller();
+			purchaseSeller.setSellerProductId(record.get("seller_product_id").toString());
+			purchaseSeller.setCustomName(record.get("custom_name").toString());
+			purchaseSeller.setPrivateCount(Integer.parseInt(record.get("product_count").toString()));
+			product.add(purchaseSeller);
+			purchaseInstockDetailInfo.setList(product);
+			sProduct.add(purchaseInstockDetailInfo);
+		}
+		HashMap<String, Object> result = Maps.newHashMap();
+		result.put("instock", instock);
+		result.put("instockDetail", sProduct);
+		renderJson(result);
+	}
+	
+	private void _addChild(List<PurchaseInstockDetailInfo> sproduct, String id, Record record) {
+		for (PurchaseInstockDetailInfo purchaseInstockDetailInfo : sproduct) {
+			if (purchaseInstockDetailInfo.getPurchaseOrderDetailId().equals(id)) {
+				List<PurchaseSeller> product = purchaseInstockDetailInfo.getList();
+				PurchaseSeller purchaseSeller = new PurchaseSeller();
+				purchaseSeller.setSellerProductId(record.get("seller_product_id").toString());
+				purchaseSeller.setCustomName(record.get("custom_name").toString());
+				purchaseSeller.setPrivateCount(Integer.parseInt(record.get("product_count").toString()));
+				product.add(purchaseSeller);
+				purchaseInstockDetailInfo.setList(product);
+			}
+		}
+	}
 }

@@ -75,7 +75,7 @@
                 if (data.totalPage >= pageNumber) {
                     $endNode.after(data.html);
                 }
-                if (data.totalPage = pageNumber) {
+                if (data.totalPage == pageNumber) {
                     $(".infinite").destroyInfinite();
                     $loadmore.hide();
                 }
@@ -118,6 +118,11 @@
         });
     }
 
+    function newOrder(customer){
+        setItemBykey("customerInfo", customer);
+        window.location.href = '${CPATH}/product';
+    }
+
 </#macro>
 
 <@layout>
@@ -140,7 +145,7 @@
     </header>
     <article class="customer">
         <header class="has-th-list weui-flex">
-            <div class="head-search select-area wewui weui-flex__item">
+            <div class="head-search select-area weui-flex__item">
                 <div class="weui-flex">
                 <div class="weui-flex__item">
                     <input type="text" id="region" placeholder="客户区域" class="weui-input" readonly onchange="refresh()">
@@ -199,8 +204,12 @@
 	                            </div>
 	                            <hr />
 	                            <div class="operate-btn">
-	                                <div class="button blue-button fl" href="/product">下订单</div>
-	                                <div class="button blue-button fr" hred="/visitAdd">客户拜访</div>
+	                                <div class="button white-button fl" hred="/visitAdd">客户拜访</div>
+                                    <div class="button blue-button fr" onclick="newOrder({customerName:'${(customer.customer_name)}',
+                                                                                            sellerCustomerId:'${(customer.sellerCustomerId)}',
+                                                                                            contact:'${(customer.contact)}',
+                                                                                            mobile:'${(customer.mobile)}',
+                                                                                            address:'${(customer.address)}'})">下订单</div>
 	                            </div>
 	                            <p class="gray">
 	                                <span class="icon-map-marker ft16 green"></span>
@@ -224,7 +233,7 @@
     </article>
 </div>
 <a class="hidden-menu" href="/customer/edit">
-    <i class="icon-menu-shopping-cart orange fr"></i>
+    <img src="${CTPATH}/images/customer_add.png" alt="">
 </a>
 <div class="layer"></div>
 <#include "_inc/_footer_nav.html" />

@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.ccloud.Consts;
 import org.ccloud.core.JBaseController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
@@ -35,13 +36,14 @@ import com.jfinal.aop.Before;
 @RouterMapping(url = "/admin/option", viewPath = "/WEB-INF/admin/option")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
-@RequiresPermissions(value={"/admin/option","/admin/all"},logical=Logical.OR)
 public class _OptionController extends JBaseController {
-
+	
+	@RequiresPermissions(value={"/admin/option","/admin/all"},logical=Logical.OR)
 	public void index() {
 		render((getPara() == null ? "web" : getPara()) + ".html");
 	}
 
+	@RequiresPermissions(value={"/admin/option","/admin/all"},logical=Logical.OR)
 	@Before(UCodeInterceptor.class)
 	public void save() {
 
@@ -86,6 +88,43 @@ public class _OptionController extends JBaseController {
 		MessageKit.sendMessage(Actions.SETTING_CHANGED, datasMap);
 		renderAjaxResultForSuccess();
 	}
+	
+	@RequiresPermissions(value={"/admin/option/seller"})
+	@Before(UCodeInterceptor.class)
+	public void saveBySeller() {
 
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		HashMap<String, String> datasMap = new HashMap<String, String>();
 
+		Map<String, String[]> paraMap = getParaMap();
+		if (paraMap != null && !paraMap.isEmpty()) {
+			for (Map.Entry<String, String[]> entry : paraMap.entrySet()) {
+				if (entry.getValue() != null && entry.getValue().length > 0) {
+					String value = null;
+					for (String v : entry.getValue()) {
+						if (StringUtils.isNotEmpty(v)) {
+							value = v;
+							break;
+						}
+					}
+					datasMap.put(entry.getKey(), value);
+				}
+			}
+		}
+
+		for (Map.Entry<String, String> entry : datasMap.entrySet()) {
+			OptionQuery.me().saveOrUpdateBySellerId(entry.getKey(), entry.getValue(), sellerId);
+		}
+
+		MessageKit.sendMessage(Actions.SETTING_CHANGED, datasMap);
+		renderAjaxResultForSuccess();
+	}	
+	
+	@RequiresPermissions(value={"/admin/option/seller"})
+	public void seller() {
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		String value = OptionQuery.me().findByKeyAndSellerId(Consts.OPTION_SELLER_STORE_CHECK, sellerId);
+		setAttr("value", value);
+	}
+	
 }

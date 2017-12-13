@@ -41,13 +41,13 @@ public class GroupQuery extends JBaseQuery {
 	}
 
 	public Page<Group> paginate(int pageNumber, int pageSize,String keyword, String dataArea, String orderby) {
-		String select = "select * ";
-		StringBuilder fromBuilder = new StringBuilder("from `group` ");
+		String select = "select *,d.dept_name ";
+		StringBuilder fromBuilder = new StringBuilder("from `group` g INNER JOIN `department` d ON d.id = g.dept_id ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "`group_name`", keyword, params, needWhere);
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "data_area", dataArea, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "`g.group_name`", keyword, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "g.data_area", dataArea, params, needWhere);
 
 		fromBuilder.append("order by " + orderby);
 
@@ -91,8 +91,9 @@ public class GroupQuery extends JBaseQuery {
 		return DAO.find(sqlBuilder.toString(), params.toArray());
 	}
 
-	public List<Group> findByDeptId(String id) {
-		return DAO.doFind("dept_id = ?", id);
+	public List<Group> findByDeptId() {
+		String sql = "SELECT * from `group` where dept_id = '0' and group_code >'001' and group_code<'020'";
+		return DAO.find(sql);
 	}
 	
 	public List<Record> findByUserCheck(String id, String dataArea) {
@@ -106,4 +107,12 @@ public class GroupQuery extends JBaseQuery {
 		return Db.find(stringBuilder.toString(), params.toArray());
 	}
 	
+	public Group findDeptIdAndDataAreaAndGroupCode(String deptId,String dataArea,String groupCode){
+		String sql = "select * from `group` where dept_id = ? and data_area = ? and group_code = ?";
+		return DAO.findFirst(sql, deptId,dataArea,groupCode);
+	}
+	
+	public List<Group> findByDeptId(String id) {
+		return DAO.doFind("dept_id = ?", id);
+	}
 }

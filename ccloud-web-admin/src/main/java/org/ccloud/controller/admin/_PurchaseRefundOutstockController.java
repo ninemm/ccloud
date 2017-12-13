@@ -131,7 +131,7 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 		final PurchaseRefundOutstockDetail purchaseRefundOutstockDetail = getModel(PurchaseRefundOutstockDetail.class);
 		Map<String, String[]> paraMap = getParaMap();
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		Seller seller = SellerQuery.me().findByUserId(user.getId());
+		Seller seller = SellerQuery.me().findById(getSessionAttr("sellerId").toString());
 		String purchaseInstockId = StringUtils.getArrayFirst(paraMap.get("purchaseInstockId"));
 		String orderId = StrKit.getRandomUUID();
 		Date date = new Date();
@@ -232,7 +232,7 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 	//审核通过，对库存总账进行修改
 	public void pass(){
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		Seller seller = SellerQuery.me().findByUserId(user.getId());
+		Seller seller = SellerQuery.me().findById(getSessionAttr("sellerId").toString());
 		String purchaseRefundId=getPara("id");
 		boolean flang = false;
 		final InventoryDetail inventoryDetail= getModel(InventoryDetail.class);
@@ -253,6 +253,7 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 			if(flang==false){
 				break;
 			}
+			BigDecimal storeCount = sellerProduct.getStoreCount().subtract(count1.divide(convent, 2, BigDecimal.ROUND_HALF_UP));
 			String inventoryDetailId = StrKit.getRandomUUID();
 			inventoryDetail.set("id", inventoryDetailId);
 			inventoryDetail.set("warehouse_id", pr.get("warehouse_id"));
@@ -260,10 +261,10 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 			inventoryDetail.set("out_count", count1.divide(convent, 2, BigDecimal.ROUND_HALF_UP));
 			inventoryDetail.set("out_amount", pr.getProductAmount());
 			inventoryDetail.set("out_price", pr.getProductPrice());
-			inventoryDetail.set("balance_count", inventory.getBalanceCount());
-			inventoryDetail.set("balance_amount", inventory.getBalanceAmount());
-			inventoryDetail.set("balance_price", inventory.getBalancePrice());
-			inventoryDetail.set("biz_type", "100203");
+			inventoryDetail.set("balance_count", storeCount);
+			inventoryDetail.set("balance_amount", storeCount.multiply(pr.getProductPrice()));
+			inventoryDetail.set("balance_price", pr.getProductPrice());
+			inventoryDetail.set("biz_type", Consts.BIZ_TYPE_P_OUTSTOCK);
 			inventoryDetail.set("biz_bill_sn", pr.get("outstock_sn"));
 			inventoryDetail.set("biz_date", new Date());
 			inventoryDetail.set("biz_user_id", user.getId());

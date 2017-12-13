@@ -32,6 +32,7 @@ import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.Receivables;
 import org.ccloud.model.SalesOrder;
 import org.ccloud.model.User;
+import org.ccloud.model.query.ReceivablesQuery;
 import org.ccloud.model.query.SalesOrderDetailQuery;
 import org.ccloud.model.query.SalesOrderJoinOutstockQuery;
 import org.ccloud.model.query.SalesOrderQuery;
@@ -272,17 +273,25 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 	}
 
 	private void createReceivables(Record order) {
-		Receivables receivables = new Receivables();
-		receivables.setId(StrKit.getRandomUUID());
-		receivables.setObjectId(order.getStr("customer_id"));
-		receivables.setObjectType(Consts.RECEIVABLES_OBJECT_TYPE_CUSTOMER);
-		receivables.setReceiveAmount(order.getBigDecimal("total_amount"));
-		receivables.setActAmount(new BigDecimal(0));
-		receivables.setBalanceAmount(order.getBigDecimal("total_amount"));
-		receivables.setDeptId(order.getStr("dept_id"));
-		receivables.setDataArea(order.getStr("data_area"));
-		receivables.setCreateDate(new Date());
-		receivables.save();
+		String customeId = order.getStr("customer_id");
+		Receivables receivables = ReceivablesQuery.me().findByCustomerId(customeId);
+		if (receivables == null) {
+			receivables = new Receivables();
+			receivables.setObjectId(order.getStr("customer_id"));
+			receivables.setObjectType(Consts.RECEIVABLES_OBJECT_TYPE_CUSTOMER);
+			receivables.setReceiveAmount(order.getBigDecimal("total_amount"));
+			receivables.setActAmount(new BigDecimal(0));
+			receivables.setBalanceAmount(order.getBigDecimal("total_amount"));
+			receivables.setDeptId(order.getStr("dept_id"));
+			receivables.setDataArea(order.getStr("data_area"));
+			receivables.setCreateDate(new Date());
+		} else {
+			receivables.setReceiveAmount(receivables.getReceiveAmount()
+					.add(order.getBigDecimal("total_amount")));
+			receivables.setBalanceAmount(receivables.getBalanceAmount()
+					.add(order.getBigDecimal("total_amount")));
+		}
+		receivables.saveOrUpdate();
 	}
 
 	@RequiresPermissions("/admin/salesOrder/check")

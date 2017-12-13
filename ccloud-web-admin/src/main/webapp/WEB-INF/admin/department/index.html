@@ -30,7 +30,7 @@
 			$.ajax({
 				url:"${CPATH}/admin/department/getAboutInfo",
 				type:"post",
-				data:{"id": node.tags[3]},
+				data:{"id": node.tags[0]},
 				dataType:"json",
 				success:function(data) {
 					var url = '${CPATH}/admin/department/getCustomer';

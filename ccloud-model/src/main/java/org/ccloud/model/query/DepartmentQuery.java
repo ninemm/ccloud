@@ -166,34 +166,49 @@ public class DepartmentQuery extends JBaseQuery {
 	
 	public List<Map<String, Object>> findDeptListAsTree(String dataArea, boolean hasUser) {
 		
+
 		Map<String, Object> map = new HashMap<String, Object>();
 		List<Department> list = findDeptList(dataArea, "order_list asc");
 		List<Map<String, Object>> deptTreeList = new ArrayList<Map<String, Object>>();
-		ModelSorter.tree(list);
-		
-		map.put("text", "总部");// 父子表第一级名称,以后可以存储在字典表或字典类
+		Department department = list.get(0);
+		map.put("text", department.getDeptName());// 父子表第一级名称,以后可以存储在字典表或字典类
 		map.put("tags", Lists.newArrayList(0));
-		map.put("nodes", doBuild(list, hasUser));
+		list.remove(0);
+		ModelSorter.tree(list);
+		List<Map<String, Object>> childList = doBuild(list, hasUser);
+		childList = addDeptUser(department.getId(), childList);
+		map.put("nodes", childList);		
+		
 		deptTreeList.add(map);
 		
 		return deptTreeList;
 	}
 	
-	public List<Map<String, Object>> findDeptListAsTree(int i, String dataArea) {
+	public List<Map<String, Object>> findDeptListAsTree(int i, String dataArea, boolean isAdmin) {
 		List<Department> list = findDeptList(dataArea, "order_list asc");
 		List<Map<String, Object>> resTreeList = new ArrayList<>();
-		ModelSorter.tree(list);
 		Map<String, Object> map = new HashMap<>();
-		map.put("text", "总部");// 父子表第一级名称,以后可以存储在字典表或字典类
-		ArrayList<String> newArrayList = Lists.newArrayList();
-		newArrayList.add(Consts.DEPT_HQ_ID);
-		newArrayList.add(Consts.DEPT_HQ_DATAAREA);
-		newArrayList.add(Consts.DEPT_HQ_LEVEL);
-		if (dataArea.equals(Consts.DEPT_HQ_DATAAREA_LIKE)) {
+		if (isAdmin) {
+			map.put("text", "总部");// 父子表第一级名称,以后可以存储在字典表或字典类
+			ArrayList<String> newArrayList = Lists.newArrayList();
 			newArrayList.add(Consts.DEPT_HQ_ID);
+			newArrayList.add(Consts.DEPT_HQ_DATAAREA);
+			newArrayList.add(Consts.DEPT_HQ_LEVEL);
+			map.put("tags", newArrayList);
+			ModelSorter.tree(list);
+			map.put("nodes", doBuild(list)); 
+		} else {
+			Department department = list.get(0);
+			map.put("text", department.getDeptName());// 父子表第一级名称,以后可以存储在字典表或字典类
+			ArrayList<String> newArrayList = Lists.newArrayList();
+			newArrayList.add(department.getId());
+			newArrayList.add(department.getDataArea());
+			newArrayList.add(department.getDeptLevel().toString());
+			map.put("tags", newArrayList);
+			list.remove(0);
+			ModelSorter.tree(list);
+			map.put("nodes", doBuild(list)); 			
 		}
-		map.put("tags", newArrayList);
-		map.put("nodes", doBuild(list)); 
 		resTreeList.add(map);
 		return resTreeList;
 	}
@@ -207,7 +222,6 @@ public class DepartmentQuery extends JBaseQuery {
 			newArrayList.add(dept.getId());
 			newArrayList.add(dept.getDataArea());
 			newArrayList.add(dept.getDeptLevel().toString());
-			newArrayList.add(dept.getId());			
 			map.put("tags", newArrayList);
 				resTreeList.add(map);
 			
@@ -344,8 +358,9 @@ public class DepartmentQuery extends JBaseQuery {
 			
 			childList = addUser(role.getId(), childList);
 			map.put("nodes", childList);
-
-			resTreeList.add(map);
+			if (childList.size() > 0) {
+				resTreeList.add(map);
+			}
 			
 		}
 		return resTreeList;

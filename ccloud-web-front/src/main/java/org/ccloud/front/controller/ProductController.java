@@ -8,10 +8,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.CustomerType;
+import org.ccloud.model.SellerProduct;
 import org.ccloud.model.User;
 import org.ccloud.model.query.CustomerTypeQuery;
+import org.ccloud.model.query.ProductCompositionQuery;
 import org.ccloud.model.query.SalesOrderDetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SellerCustomerQuery;
@@ -35,12 +38,8 @@ import com.jfinal.plugin.activerecord.Record;
 @RouterMapping(url = "/product")
 public class ProductController extends BaseFrontController {
 
-	String sellerId = "05a9ad0a516c4c459cb482f83bfbbf33";
-	String sellerCode = "QG";
-	User user = UserQuery.me().findById("1f797c5b2137426093100f082e234c14");
-	String dataArea = DataAreaUtil.getUserDealerDataArea(user.getDataArea());
-
 	public void index() {
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 
 		List<Record> productTypeList = SellerProductQuery.me().findProductTypeBySellerForApp(sellerId);
 		setAttr("productTypeList", productTypeList);
@@ -48,13 +47,42 @@ public class ProductController extends BaseFrontController {
 	}
 
 	public void productList() {
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 
 		String keyword = getPara("keyword");
 		List<Record> productList = SellerProductQuery.me().findProductListForApp(sellerId, keyword);
 		renderJson(productList);
 	}
 
+	public void productCompositionList() {
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+
+		String keyword = getPara("keyword");
+		List<Record> productCompositionList = ProductCompositionQuery.me().findProductBySeller(sellerId, keyword);
+		renderJson(productCompositionList);
+	}
+
 	public void shoppingCart() {
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+
+		List<Record> productList = SellerProductQuery.me().findProductListForApp(sellerId, "");
+
+		Map<String, Object> sellerProductInfoMap = new HashMap<String, Object>();
+		List<Map<String, Object>> sellerProductItems = new ArrayList<>();
+
+		for (Record record : productList) {
+			Map<String, Object> item = new HashMap<>();
+
+			String sellProductId = record.get("sell_product_id");
+			item.put("title", record.getStr("custom_name") + record.getStr("valueName"));
+			item.put("value", sellProductId);
+
+			sellerProductItems.add(item);
+			sellerProductInfoMap.put(sellProductId, record);
+		}
+
+		setAttr("sellerProductInfoMap", JSON.toJSON(sellerProductInfoMap));
+		setAttr("sellerProductItems", JSON.toJSON(sellerProductItems));
 
 		render("shopping_cart.html");
 	}
@@ -66,6 +94,9 @@ public class ProductController extends BaseFrontController {
 
 	public void customerChoose() {
 
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+
 		Map<String, Object> all = new HashMap<>();
 		all.put("title", "全部");
 		all.put("value", "");
@@ -73,7 +104,7 @@ public class ProductController extends BaseFrontController {
 		List<Map<String, Object>> userIds = new ArrayList<>();
 		userIds.add(all);
 
-		List<Record> userList = UserQuery.me().findNextLevelsUserList(user.getDataArea());
+		List<Record> userList = UserQuery.me().findNextLevelsUserList(selectDataArea);
 		for (Record record : userList) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", record.get("realname"));
@@ -100,13 +131,15 @@ public class ProductController extends BaseFrontController {
 
 	public void customerList() {
 
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+
 		String keyword = getPara("keyword");
 		String userId = getPara("userId");
 		String customerTypeId = getPara("customerTypeId");
 		String isOrdered = getPara("isOrdered");
 
 		Page<Record> customerList = SellerCustomerQuery.me().paginateForApp(getPageNumber(), getPageSize(), keyword,
-				dataArea, userId, customerTypeId, isOrdered);
+				selectDataArea, userId, customerTypeId, isOrdered);
 
 		Map<String, Object> map = new HashMap<>();
 		map.put("customerList", customerList.getList());
@@ -114,6 +147,7 @@ public class ProductController extends BaseFrontController {
 	}
 
 	public void customerTypeById() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String customerId = getPara("customerId");
 
 		List<Record> customerTypeList = SalesOrderQuery.me().findCustomerTypeListByCustomerId(customerId,
@@ -123,6 +157,9 @@ public class ProductController extends BaseFrontController {
 	}
 
 	public synchronized void salesOrder() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
 
 		Map<String, String[]> paraMap = getParaMap();
 
@@ -138,7 +175,6 @@ public class ProductController extends BaseFrontController {
 		boolean isSave = Db.tx(new IAtom() {
 			@Override
 			public boolean run() throws SQLException {
-				String[] sellProductIds = paraMap.get("sellProductId");
 
 				String orderId = StrKit.getRandomUUID();
 				Date date = new Date();
@@ -153,18 +189,56 @@ public class ProductController extends BaseFrontController {
 					return false;
 				}
 
-				for (int index = 0; index < sellProductIds.length; index++) {
-					if (!SalesOrderDetailQuery.me().insertForApp(paraMap, orderId, sellerId, user.getId(), date,
-							user.getDepartmentId(), user.getDataArea(), index)) {
-						return false;
-					}
+				String[] sellProductIds = paraMap.get("sellProductId");
+				// 常规商品
+				if (StrKit.notBlank(sellProductIds)) {
+					for (int index = 0; index < sellProductIds.length; index++) {
+						if (StrKit.notBlank(sellProductIds[index])) {
+							if (!SalesOrderDetailQuery.me().insertForApp(paraMap, orderId, sellerId, user.getId(), date,
+									user.getDepartmentId(), user.getDataArea(), index)) {
+								return false;
+							}
+						}
 
+					}
 				}
+
+				String[] giftSellProductIds = paraMap.get("giftSellProductId");
+				// 赠品
+				if (StrKit.notBlank(giftSellProductIds)) {
+					for (int index = 0; index < giftSellProductIds.length; index++) {
+						if (StrKit.notBlank(giftSellProductIds[index])) {
+							if (!SalesOrderDetailQuery.me().insertForAppGift(paraMap, orderId, sellerId, user.getId(),
+									date, user.getDepartmentId(), user.getDataArea(), index)) {
+								return false;
+							}
+						}
+
+					}
+				}
+
+				String[] compositionIds = paraMap.get("compositionId");
+				String[] compositionNums = paraMap.get("compositionNum");
+				// 组合商品
+				if (StrKit.notBlank(compositionIds)) {
+					for (int index = 0; index < compositionIds.length; index++) {
+						String productId = compositionIds[index];
+						String number = compositionNums[index];
+						List<SellerProduct> list = SellerProductQuery.me().findByCompositionId(productId);
+						for (SellerProduct sellerProduct : list) {
+							if (!SalesOrderDetailQuery.me().insertForAppComposition(sellerProduct, orderId, sellerId,
+									user.getId(), date, user.getDepartmentId(), user.getDataArea(),
+									Integer.parseInt(number))) {
+								return false;
+							}
+						}
+					}
+				}
+
 				return true;
 			}
 		});
 		return isSave;
 	}
-	
 
 }

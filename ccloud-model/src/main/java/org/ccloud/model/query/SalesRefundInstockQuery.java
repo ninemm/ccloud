@@ -64,7 +64,7 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		return Db.findFirst(fromBuilder.toString(), id);
 	}
 
-	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate, String status) {
+	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate, String status,String dataArea) {
 		String select = "select r.*, c.customer_name ";
 		StringBuilder fromBuilder = new StringBuilder(" from `cc_sales_refund_instock` r");
 		fromBuilder.append(" left join cc_seller_customer cc ON r.customer_id = cc.id ");
@@ -74,9 +74,10 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		boolean needWhere = true;
 
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "r.refund_sn", keyword, params, needWhere);
-
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, needWhere);
+		
 		if (needWhere) {
-			fromBuilder.append(" where 1 = 1");
+			fromBuilder.append(" where 1 = 1 ");
 		}
 
 		if (StrKit.notBlank(startDate)) {

@@ -46,11 +46,6 @@ public class SellerQuery extends JBaseQuery {
 		//return DAO.findById(id);
 	}
 	
-	public List<Seller> findByDeptId(String id){
-		String sql="SELECT cs.* from cc_seller cs LEFT JOIN  user u on u.department_id=cs.dept_id where u.id= ?";
-		return DAO.find(sql,id);
-	}
-
 	public int deleteByCcSellerId(String sellerId) {
 		return DAO.doDelete("id = ?", sellerId);
 	}
@@ -129,8 +124,21 @@ public class SellerQuery extends JBaseQuery {
 		return DAO.find(sql, userId);
 	}
 	
+
 	public List<Seller> findAll(){
 		String sql = "select * from cc_seller";
 		return DAO.find(sql);
+	}
+	
+	public List<Seller> findSellerRegion(String dataArea){
+		StringBuilder sqlBuilder = new StringBuilder("select c_s.id,c_s.seller_name from department d inner join cc_seller c_s on d.id = c_s.dept_id where d.data_area like '"+dataArea+"'");
+		sqlBuilder.append("order by order_list,dept_level ");
+		return DAO.find(sqlBuilder.toString());
+
+	}
+	
+	public List<Seller> findByDeptId(String deptId){
+		String sql="SELECT cs.* from cc_seller cs where cs.dept_id= ?";
+		return DAO.find(sql,deptId);
 	}
 }

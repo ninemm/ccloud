@@ -81,62 +81,67 @@ function reply(id){
 <!-- Main content -->
 <section class="content">
 	
-	<!-- <div class="row">
-		<#list modules! as module>
-		<div class="col-md-3 col-sm-6 col-xs-12">
-          	<div class="info-box <#if module_index==1>bg-aqua</#if>">
-            	<span class="info-box-icon <#if module_index==0>bg-aqua</#if>"><i class="fa fa-gear"></i></span>
-            	<div class="info-box-content">
-              		<span class="info-box-text">${module.title!} - 总计</span>
-              		<span class="info-box-number">${module.findNotDeleteContentCount()!}</span>
-            	</div>
-            	/.info-box-content
-	        </div>
-	        /.info-box
-        </div>
-        /.col
-        <div class="col-md-3 col-sm-6 col-xs-12">
-          	<div class="info-box <#if module_index==1>bg-red</#if>">
-            	<span class="info-box-icon <#if module_index==0>bg-red</#if>"><i class="fa fa-file-text-o"></i></span>
-            	<div class="info-box-content">
-              		<span class="info-box-text">${module.title!} - 草稿</span>
-              		<span class="info-box-number">${module.findDraftContentCount()!}</span>
-            	</div>
-            	/.info-box-content
-	        </div>
-	        /.info-box
-        </div>
-        /.col
-        
-        fix for small devices only
-        <div class="clearfix visible-sm-block"></div>
-        
-        <div class="col-md-3 col-sm-6 col-xs-12">
-          	<div class="info-box <#if module_index==1>bg-green</#if>">
-            	<span class="info-box-icon <#if module_index==0>bg-green</#if>"><i class="fa fa-trash"></i></span>
-            	<div class="info-box-content">
-              		<span class="info-box-text">${module.title!} - 垃圾箱</span>
-              		<span class="info-box-number">${module.findDeleteContentCount()!}</span>
-            	</div>
-            	/.info-box-content
-	        </div>
-	        /.info-box
-        </div>
-        /.col
-        <div class="col-md-3 col-sm-6 col-xs-12">
-          	<div class="info-box <#if module_index==1>bg-yellow</#if>">
-            	<span class="info-box-icon <#if module_index==0>bg-yellow</#if>"><i class="fa fa-files-o"></i></span>
-            	<div class="info-box-content">
-              		<span class="info-box-text">${module.title!} - 正常</span>
-              		<span class="info-box-number">${module.findNormalContentCount()!}</span>
-            	</div>
-            	/.info-box-content
-	        </div>
-	        /.info-box
-        </div>
-        /.col
-        </#list>
-	</div> -->
+	<!-- Small boxes (Stat box) -->
+	<div class="row">
+		<div class="col-lg-3 col-xs-6">
+			<!-- small box -->
+			<div class="small-box bg-aqua">
+				<div class="inner">
+					<h3>150</h3>
+					<p>今日订单</p>
+				</div>
+				<div class="icon">
+					<i class="fa fa-shopping-bag"></i>
+				</div>
+				<a href="#" class="small-box-footer">详情 <i class="fa fa-arrow-circle-right"></i></a>
+			</div>
+		</div>
+		<!-- ./col -->
+		<div class="col-lg-3 col-xs-6">
+			<!-- small box -->
+			<div class="small-box bg-green">
+				<div class="inner">
+					<h3>53<sup style="font-size: 20px">%</sup></h3>
+					<p>Bounce Rate</p>
+				</div>
+				<div class="icon">
+					<i class="fa fa-bar-chart"></i>
+				</div>
+				<a href="#" class="small-box-footer">详情 <i class="fa fa-arrow-circle-right"></i></a>
+			</div>
+		</div>
+		<!-- ./col -->
+		<div class="col-lg-3 col-xs-6">
+			<!-- small box -->
+			<div class="small-box bg-yellow">
+				<div class="inner">
+					<h3>44</h3>
+					<p>客户总数</p>
+				</div>
+				<div class="icon">
+					<i class="fa fa-user-plus"></i>
+				</div>
+				<a href="#" class="small-box-footer">详情 <i class="fa fa-arrow-circle-right"></i></a>
+			</div>
+		</div>
+		<!-- ./col -->
+		<div class="col-lg-3 col-xs-6">
+			<!-- small box -->
+			<div class="small-box bg-red">
+				<div class="inner">
+					<h3>65</h3>
+					<p>Unique Visitors</p>
+				</div>
+				<div class="icon">
+					<i class="fa fa-pie-chart"></i>
+				</div>
+				<a href="#" class="small-box-footer">详情 <i class="fa fa-arrow-circle-right"></i></a>
+			</div>
+		</div>
+		<!-- ./col -->
+	</div>
+	<!-- /.row -->
+    <!-- Main row -->
 	
 	<div class="row">
 	    <div class="col-md-6">

@@ -2,7 +2,7 @@
 
 
 <#macro script>
-  $(function () {
+	 $(function () {
 		$("#order-status").select({
 	      title: "选择客户区域",
 	      items: ["全部", "待出库", "已出库"]
@@ -14,32 +14,32 @@
 	    $("#date").calendar();
 	    $("#date").val($.today());
   });
-  
+ 
 </#macro> 
 
 <@layout>
  <body id="my-order" class="ft12">
-  <header class="has-th-list weui-flex">
-    <div class="head-search select-area weui-flex__item">
-			<div class="weui-flex">
-				<div class="weui-flex__item">
-					<input type="text" id="order-status" class="weui-input" readonly placeholder="订单状态" onChange="refresh()">
-					<i class="icon-sort-desc"></i>
-				</div>
-				<div class="weui-flex__item">
-					<input type="text" id="customer-type" placeholder="客户类型" class="weui-input" readonly onChange="refresh()">
-					<i class="icon-sort-desc"></i>
-				</div>
-				<div class="weui-flex__item">
-					<input type="text" id="date" class="weui-input" readonly onChange="refresh()">
-					<i class="icon-sort-desc"></i>
-				</div>
-			</div>
-    </div>
-    <div id="combin-filter-btn">
-      <i class="icon-th-list"></i>
-    </div>
-  </header>
+ <header class="has-th-list weui-flex">
+            <div class="head-search select-area wewui weui-flex__item">
+                <div class="weui-flex">
+                <div class="weui-flex__item">
+                    <input type="text" id="order-status" placeholder="客户区域" class="weui-input" readonly onchange="refresh()">
+                    <i class="icon-sort-desc"></i>
+                </div>
+                <div class="weui-flex__item">
+                    <input type="text" id="customer-type" placeholder="客户类型" class="weui-input" readonly onchange="refresh()">
+                    <i class="icon-sort-desc"></i>
+                </div>
+                <div class="weui-flex__item">
+                    <input type="text" id="date" class="weui-input" readonly onchange="refresh()">
+                    <i class="icon-sort-desc"></i>
+                </div>
+                </div>
+            </div>
+            <div id="combin-filter-btn">
+                <i class="icon-th-list"></i>
+            </div>
+        </header>
   <main>
 	 <#if salesOutstockList??>
 		 <#assign total = salesOutstockList.totalRow>
@@ -89,24 +89,22 @@
                 </div>
         	</#if>
     
-  </main>
- 	<div class="hidden-menu">
-	    <ul>
-	      <li>
-	        <a href="../">
-	          首页
-	          <i class="icon-home blue"></i>
-	        </a>
-	      </li>
-	      <li>
-	        <a href="javascript:history.go(-1)">
-	          上一页
-	          <i class="icon-undo green"></i>
-	        </a>
-	      </li>
-	    </ul>
-	    <i class="icon-menu-open orange fr" id="button"></i>
-  </div>
-  <div class="layer"></div>
+	</main>
+	<article id="combin-filter">
+		<div class="filter-item">
+			<h4>下单日期</h4>
+			<div class="weui-flex" id="getDate">
+				<span class="blue-button" data-id="0">今天</span>
+				<span data-id="1">最近3天</span>
+				<span data-id="2">最近7天</span>
+				<span data-id="3">最近30天</span>
+			</div>
+		</div>
+		<footer class="weui-footer weui-footer_fixed-bottom ft16">
+			<button class="white-button width-50 cancel-search-btn">取消</button>
+			<button class="blue-button width-50 confirm-search-btn" onclick="getDateOrder()">确定</button>
+		</footer>
+	</article>
+	<#include "_inc/_goback.html" />
 </body>
 </@layout>

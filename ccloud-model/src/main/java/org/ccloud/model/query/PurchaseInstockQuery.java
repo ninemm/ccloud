@@ -133,4 +133,5 @@ public class PurchaseInstockQuery extends JBaseQuery {
 
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
+	
 }

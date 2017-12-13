@@ -1,5 +1,25 @@
 <#include "_inc/_layout.html"/>
-<#macro css> </#macro>
+<#macro css>
+    #history {
+        font-size: .7rem;
+        background: #fff;
+        height: inherit;
+    }
+    
+    .t-c {
+        background: #35b8f0;
+        font-size: .8rem;
+        color: #fff;
+    }
+    
+    #history header, #activity-list header {
+	    height: 2rem;
+	    line-height: 2rem;
+	    margin: 0;
+	    color: #fff;
+    }
+
+</#macro>
 <#macro script>
     var pageNumber = 2;
     var pageSize = 10;
@@ -35,7 +55,7 @@
                 if (data.totalPage >= pageNumber) {
                     $endNode.after(data.html);
                 }
-                if (data.totalPage = pageNumber) {
+                if (data.totalPage == pageNumber) {
                     $(".infinite").destroyInfinite();
                     $loadmore.hide();
                 }
@@ -72,7 +92,7 @@
     }
 </#macro>
 <@layout>
-<body id="history" class="ft12">
+<div id="history" class="ft12">
 <div class="infinite">
     <header class="t-c">
         ${(customerName)!}
@@ -120,29 +140,6 @@
             </#if>
     </main>
 </div>
-<div class="hidden-menu">
-    <ul>
-        <li>
-            <a href="index.html">
-                首页
-                <i class="icon-home blue"></i>
-            </a>
-        </li>
-        <li>
-            <a href="/orderStatistics.html">
-                订单统计
-                <i class="icon-pie-chart red"></i>
-            </a>
-        </li>
-        <li>
-            <a class="goback">
-                上一页
-                <i class="icon-undo green"></i>
-            </a>
-        </li>
-    </ul>
-    <i class="icon-menu-open orange fr" id="button"></i>
+<#include "_inc/_goback.html" />
 </div>
-<div class="layer"></div>
-</body>
 </@layout>

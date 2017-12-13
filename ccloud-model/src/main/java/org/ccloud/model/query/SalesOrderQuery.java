@@ -89,7 +89,7 @@ public class SalesOrderQuery extends JBaseQuery {
 			params.add(endDate);
 		}
 
-		fromBuilder.append(" order by o.create_date ");
+		fromBuilder.append(" order by o.create_date desc");
 
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
@@ -227,7 +227,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		salesOrder.setContact(StringUtils.getArrayFirst(paraMap.get("contact")));
 		salesOrder.setMobile(StringUtils.getArrayFirst(paraMap.get("mobile")));
 		salesOrder.setAddress(StringUtils.getArrayFirst(paraMap.get("address")));
-		salesOrder.setStatus(0);// 待审核
+		salesOrder.setStatus(Consts.SALES_ORDER_STATUS_DEFAULT);// 待审核
 		String total = StringUtils.getArrayFirst(paraMap.get("total"));
 		String type = StringUtils.getArrayFirst(paraMap.get("receiveType"));
 		salesOrder.setTotalAmount(new BigDecimal(total));
@@ -344,7 +344,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		String total = StringUtils.getArrayFirst(paraMap.get("total"));
 		String type = StringUtils.getArrayFirst(paraMap.get("receiveType"));
 		salesOrder.setTotalAmount(new BigDecimal(total));
-		salesOrder.setReceiveType(StringUtils.isNumeric(type)? Integer.parseInt(type) : 0);
+		salesOrder.setReceiveType(StringUtils.isNumeric(type)? Integer.parseInt(type) : 1);
 		salesOrder.setDeliveryAddress(StringUtils.getArrayFirst(paraMap.get("deliveryAddress")));
 		Date deliveryDate = DateUtils.strToDate(StringUtils.getArrayFirst(paraMap.get("deliveryDate")), DateUtils.DEFAULT_NORMAL_FORMATTER);
 		salesOrder.setDeliveryDate(deliveryDate);

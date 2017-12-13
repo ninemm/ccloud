@@ -15,13 +15,10 @@
  */
 package org.ccloud.controller.admin;
 
-import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -40,6 +37,7 @@ import org.ccloud.model.Department;
 import org.ccloud.model.SellerCustomer;
 import org.ccloud.model.User;
 import org.ccloud.model.UserJoinCustomer;
+import org.ccloud.model.compare.BeanCompareUtils;
 import org.ccloud.model.query.CustomerJoinCustomerTypeQuery;
 import org.ccloud.model.query.CustomerQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
@@ -56,7 +54,6 @@ import org.ccloud.utils.StringUtils;
 import org.ccloud.workflow.service.WorkFlowService;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.annotation.JSONField;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -125,7 +122,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			setAttr("cUserIds", StrKit.join(userIds, ","));
 			setAttr("cUserNames", StrKit.join(realnames, ","));
 
-			setAttr("cTypeList", CustomerJoinCustomerTypeQuery.me().findCustomerTypeListBySellerCustomerId(id,
+			setAttr("cTypeList", CustomerJoinCustomerTypeQuery.me().findCustomerTypeIdListBySellerCustomerId(id,
 					DataAreaUtil.getUserDealerDataArea(selectDataArea)));
 		}
 
@@ -480,7 +477,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 
 		setAttr("cUserIds", StrKit.join(userIds, ","));
 		setAttr("cUserNames", StrKit.join(realnames, ","));
-		setAttr("cTypeList", CustomerJoinCustomerTypeQuery.me().findCustomerTypeListBySellerCustomerId(id,
+		setAttr("cTypeList", CustomerJoinCustomerTypeQuery.me().findCustomerTypeIdListBySellerCustomerId(id,
 				DataAreaUtil.getUserDealerDataArea(selectDataArea)));
 
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
@@ -507,6 +504,10 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			src.setMobile(sellerCustomer.getStr("mobile"));
 			src.setAddress(sellerCustomer.getStr("address"));
 			src.setCustomerName(sellerCustomer.getStr("customer_name"));
+
+			List<String> custTypeNameList =  CustomerJoinCustomerTypeQuery.me().findCustomerTypeNameListBySellerCustomerId(id, DataAreaUtil.getUserDealerDataArea(selectDataArea));
+
+			src.setCustTypeNameList(custTypeNameList);
 			
 			String areaName = Joiner.on(",").skipNulls()
 				.join(sellerCustomer.getStr("prov_name")
@@ -519,7 +520,11 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 					, sellerCustomer.getStr("city_code")
 					, sellerCustomer.getStr("country_code"));
 			src.setAreaCode(areaCode);
-			List<String> diffAttrList = contrastObj(src, dest);
+			List<String> diffAttrList = BeanCompareUtils.contrastObj(src, dest);
+			setAttr("diffAttrList", diffAttrList);
+		} else {
+			List<String> diffAttrList = new ArrayList<>();
+			diffAttrList.add("申请停用");
 			setAttr("diffAttrList", diffAttrList);
 		}
 	}
@@ -549,59 +554,6 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			renderAjaxResultForSuccess("操作成功");
 		else
 			renderAjaxResultForError("操作失败");
-	}
-	
-	@SuppressWarnings("rawtypes")
-	public List<String> contrastObj(Object src, Object dest) {
-		
-		if (src instanceof CustomerVO && dest instanceof CustomerVO) {
-			CustomerVO scustomer = (CustomerVO) src;
-			CustomerVO dcustomer = (CustomerVO) dest;
-			List<String> diffAttrList = new ArrayList<String>();
-			
-			try {
-				Class clazz = scustomer.getClass();
-				Field[] fields = scustomer.getClass().getDeclaredFields();
-				
-				for (Field field : fields) {
-					
-					if (StrKit.equals(field.getName(), "serialVersionUID")) {
-						continue;
-					}
-					
-					JSONField jsonField = field.getAnnotation(JSONField.class);
-					if (jsonField == null)
-						continue;
-					
-					PropertyDescriptor pd = new PropertyDescriptor(field.getName(), clazz);
-					Method getMethod = pd.getReadMethod();
-					Object srcObj = getMethod.invoke(scustomer);
-					Object destObj = getMethod.invoke(dcustomer);
-					
-					if (srcObj == null && destObj == null) {
-						continue;
-					} else {
-						if (destObj != null) {
-							if (srcObj != null) {
-								System.out.println(srcObj.toString() + "-->>>" + destObj.toString());
-								if(!srcObj.toString().equals(destObj.toString())) {
-									diffAttrList.add(jsonField.name() + ": " + destObj.toString());
-								}
-								
-							} else {
-								diffAttrList.add(jsonField.name() + ": " + destObj.toString());
-							}
-						}
-					}
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-				return null;
-			}
-			
-			return diffAttrList;
-		}
-		return null;
-	}
+	}	
 
 }

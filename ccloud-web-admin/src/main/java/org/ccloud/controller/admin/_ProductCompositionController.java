@@ -255,7 +255,7 @@ public class _ProductCompositionController extends JBaseCRUDController<ProductCo
 			// TODO
 		}
 
-		List<Record> productlist = ProductCompositionQuery.me().findProductBySeller(sellerId);
+		List<Record> productlist = ProductCompositionQuery.me().findProductBySeller(sellerId, "");
 		Map<String, Object> productInfoMap = new HashMap<String, Object>();
 		List<Map<String, String>> productOptionList = new ArrayList<Map<String, String>>();
 
@@ -355,14 +355,14 @@ public class _ProductCompositionController extends JBaseCRUDController<ProductCo
         		while (productNum > count) {
         			index++;
         			String productId = StringUtils.getArrayFirst(paraMap.get("productId" + index));
-        			String isGift = StringUtils.getArrayFirst(paraMap.get("isGift" + index));
+//        			String isGift = StringUtils.getArrayFirst(paraMap.get("isGift" + index));
         			String number = StringUtils.getArrayFirst(paraMap.get("bigNum" + index));
-        			Integer gift = StringUtils.isNumeric(isGift)? Integer.parseInt(isGift) : 0;
+//        			Integer gift = StringUtils.isNumeric(isGift)? Integer.parseInt(isGift) : 0;
         			if (StrKit.notBlank(productId)) {
 	        			List<SellerProduct> list = SellerProductQuery.me().findByCompositionId(productId);
 	        			for (SellerProduct sellerProduct : list) {
 	        				if(!SalesOrderDetailQuery.me().insertDetailByComposition(sellerProduct, orderId, sellerId, user.getId(), date,
-	        						user.getDepartmentId(), user.getDataArea(), index, gift, Integer.parseInt(number))) {
+	        						user.getDepartmentId(), user.getDataArea(), index, Integer.parseInt(number))) {
 	        					return false;
 	        				}
 						}

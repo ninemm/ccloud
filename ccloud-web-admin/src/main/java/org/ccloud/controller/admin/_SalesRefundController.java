@@ -70,11 +70,12 @@ public class _SalesRefundController extends JBaseCRUDController<SalesRefundInsto
 			keyword = StringUtils.urlDecode(keyword);
 		}
 
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 
 		Page<Record> page = SalesRefundInstockQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate,
-				endDate, null);
+				endDate, null,user.getDataArea());
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);

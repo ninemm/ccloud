@@ -19,9 +19,15 @@ import org.ccloud.message.MessageKit;
 import org.ccloud.model.Customer;
 import org.ccloud.model.CustomerVisit;
 import org.ccloud.model.Dict;
+import org.ccloud.model.GoodsType;
+import org.ccloud.model.Product;
+import org.ccloud.model.Seller;
 import org.ccloud.model.SmsCode;
 import org.ccloud.model.User;
 import org.ccloud.model.query.DictQuery;
+import org.ccloud.model.query.GoodsTypeQuery;
+import org.ccloud.model.query.InventoryQuery;
+import org.ccloud.model.query.ProductQuery;
 import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.SmsCodeQuery;
 import org.ccloud.model.query.UserQuery;
@@ -36,12 +42,15 @@ import org.ccloud.utils.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.Maps;
+
 import com.jfinal.aop.Clear;
 import com.jfinal.core.ActionKey;
+import com.google.common.collect.ImmutableMap;
 import com.jfinal.kit.Ret;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.IAtom;
+import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.weixin.sdk.api.ApiResult;
 import com.jfinal.weixin.sdk.api.UserApi;
@@ -401,6 +410,5 @@ public class UserController extends BaseFrontController{
 		 customerVisit.set("id", visit_id);
 		 customerVisit.set("user_id", user_id);
 		 customerVisit.set("seller_customer_id", seller_customer_id);
-		 
 	}
 }
