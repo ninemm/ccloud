@@ -3,20 +3,26 @@ package org.ccloud.front.controller;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
+import org.ccloud.model.CustomerType;
 import org.ccloud.model.SalesRefundInstock;
 import org.ccloud.model.User;
+import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.SalesOutstockDetailQuery;
 import org.ccloud.model.query.SalesOutstockQuery;
 import org.ccloud.model.query.SalesRefundInstockDetailQuery;
 import org.ccloud.model.query.SalesRefundInstockQuery;
 import org.ccloud.route.RouterMapping;
+import org.ccloud.utils.DataAreaUtil;
 
+import com.alibaba.fastjson.JSON;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.IAtom;
@@ -27,11 +33,47 @@ import com.jfinal.plugin.activerecord.Record;
 public class RefundController extends BaseFrontController{
 	
 	public void index() {
+		
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		Page<Record> salesOutstockList= SalesOutstockQuery.me().findByBizUserId(getPageNumber(), getPageSize(),user.getId());
-		setAttr("salesOutstockList", salesOutstockList);
-		render("refund.html");
+
+		Map<String, Object> all = new HashMap<>();
+		all.put("title", "全部");
+		all.put("value", "");
+
+		List<Map<String, Object>> customerTypes = new ArrayList<>();
+		customerTypes.add(all);
+
+		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
+				.findByDataArea(DataAreaUtil.getUserDealerDataArea(user.getDataArea()));
+		for (CustomerType customerType : customerTypeList) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", customerType.getName());
+			item.put("value", customerType.getId());
+			customerTypes.add(item);
+		}
+
+		setAttr("customerTypes", JSON.toJSON(customerTypes));
+		render("refund.html");		
 	}
+	
+	public void stockOrder() {
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+
+		String keyword = getPara("keyword");
+
+		String status = getPara("status");
+		String customerTypeId = getPara("customerTypeId");
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+
+		Page<Record> outStockList = SalesOutstockQuery.me().paginateForApp(getPageNumber(), getPageSize(), keyword, status,
+				customerTypeId, startDate, endDate, sellerId, selectDataArea);
+
+		Map<String, Object> map = new HashMap<>();
+		map.put("outStockList", outStockList.getList());
+		renderJson(map);
+	}	
 	
 	
 	public void detail() {
