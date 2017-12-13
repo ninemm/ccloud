@@ -1,0 +1,376 @@
+<#include "_inc/_layout.html"/>
+
+<#macro css> </#macro>
+
+<#macro script_import>
+    <script type="text/javascript" src="${CPATH}/static/layer_mobile/layer.js"></script>
+    <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=Ec4VbDTTjjuEGtVGzSvPwwQtvnvWFeGY"></script>
+    <script type="text/javascript" src="${CTPATH}/js/convertor.js"></script>
+</#macro>
+
+<#macro script>
+    var customerList = [];
+
+    var problemList = JSON.parse('${problem}');
+
+    var orgCustomerList = {};
+
+    var customerSelect = [];
+    var problemSelect = [];
+
+
+    var imageArr = [];
+    var count = 3;
+    var $form = $("#form");
+    var $picNum = $('.weui-uploader__info');
+    var $uploaderFiles = $("#uploaderFiles");
+    var $gallery = $("#gallery"), $galleryImg = $("#galleryImg");
+
+    initData();
+    initCustomer();
+
+    function initData(){
+
+        for(var k in problemList){
+                var problemDataTemp = {};
+                problemDataTemp.title = problemList[k].name;
+                problemDataTemp.value = problemList[k].id;
+                problemSelect.push(problemDataTemp);
+        }
+    }
+    function initCustomer(){
+        var customerInfo = getItemBykey("customerInfo");
+        if(customerInfo){
+            $("#customer_id").val(customerInfo.sellerCustomerId);
+            $("#customer_name").val(customerInfo.customerName);
+            $("#contact").val(customerInfo.contact);
+            $("#mobile").val(customerInfo.mobile);
+        }
+    }
+
+    $(document).on("touchstart", "#customer_name", function () {
+        window.location.href = '${CPATH}/customerVisit/visitCustomerChoose';
+    });
+
+    $("#problem_type").select({
+        title: "请选择问题类型",
+        multi: false,
+        items: problemSelect,
+        onClose: function(obj) {
+        	var problemId = obj.data.values;
+            if(problemId){
+                $("#problem_id").val(problemId);
+            }
+        }
+    });
+
+    function updateVisitData(customerId){
+        var customerInfo = orgCustomerList[customerId];
+
+        $("#customer_id").val(customerId);
+        $("#mobile").val(customerInfo.mobile);
+        $("#contact").val(customerInfo.contact);
+    }
+
+    $(function(){
+        $("#uploaderInput").on("change",function () {
+
+            var files = this.files;;
+            var arrNum = imageArr.length;
+            var num = arrNum + files.length;
+
+            if (num > count) {
+                $.alert("最多上传三张图片");
+                return false;
+            }
+
+            $picNum.text(num + '/' + count);
+
+            for (var i = 0; i < files.length; i ++) {
+                var file = files[i];
+                if (!/image\/\w+/.test(file.type)) {
+                    $.alert("请确保文件为图像类型");
+                    return false;
+                }
+
+                var reader = new FileReader();
+
+                (function(x) {
+                    reader.onload = function(e) {
+                        var str = '<li class="weui-uploader__file " style="background-image:url('+this.result+')"><span class="remove" style="color:red">X</span></li>';
+                        $uploaderFiles.append(str);
+                        render(this.result, x);
+                    }
+                })(file.name)
+
+                    reader.readAsDataURL(file);
+            }
+
+        });
+
+        var MAX_HEIGHT = 1000;
+
+        function render(src, picname) {
+
+            var image = new Image();
+            image.onload = function() {
+
+                var canvas = document.createElement("canvas");
+                if (image.height > MAX_HEIGHT && image.height >= image.width) {
+                    image.width *= MAX_HEIGHT / image.height;
+                    image.height = MAX_HEIGHT;
+                }
+
+                if (image.width > MAX_HEIGHT && image.width > image.height) {
+                    // 宽度等比例缩放 *=
+                    image.height *= MAX_HEIGHT / image.width;
+                    image.width = MAX_HEIGHT;
+                }
+
+                var ctx = canvas.getContext("2d");
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                canvas.width = image.width;
+                canvas.height = image.height;
+
+                ctx.drawImage(image, 0, 0, image.width, image.height);
+                var blob = canvas.toDataURL('image/jpeg', 0.8);
+                imageArr.push({"pic":blob, "pic_name":picname});
+                $("#pic").val(JSON.stringify(imageArr));
+            };
+            image.src = src;
+        }
+
+        var index; //第几张图片
+            $uploaderFiles.on("click", "li", function() {
+            index = $(this).index();
+            $galleryImg.attr("style", this.getAttribute("style"));
+            $gallery.fadeIn(100);
+        });
+
+        $gallery.on("click", function() {
+            $gallery.fadeOut(100);
+        });
+
+        //删除图片  删除图片的代码也贴出来。
+        $(".weui-gallery__del").click(function() { //这部分刚才放错地方了，放到$(function(){})外面去了
+            console.log('删除', index);
+            $uploaderFiles.find("li").eq(index).remove();
+            imageArr = imageArr.splice(index, 1);
+            console.log('image lenght = ', imageArr.length)
+        });
+
+    });
+
+    function doSubmit(){
+        $("#location").val($("location-span").html());
+
+        $.ajax({
+            url: '${CPATH}/customerVisit/save',
+            method: 'post',
+            dataType: 'json',
+            data: $form.serialize(),
+            beforeSend: function(){
+                if($("#problem_id").val().length==0) {$.toptip('问题类型不能为空', 1000, 'error');return false;}
+                if($("#question_desc").val().length==0) {$.toptip('备注描述不能为空', 1000, 'error');return false;}
+                $('._submit_btn').attr('disabled', true);
+                layer.open({
+                    type: 2,
+                    content: '保存中...'
+                });
+            },
+            success: function(res) {
+                if (res.errorCode == 0) {
+                    $.confirm({
+                        title: res.message,
+                        text: '返回列表页？',
+                        onOK: function () {
+                            location.href = '${CPATH}/user/center'
+                        },
+                        onCancel: function () {
+                            $.closeModal();
+                        }
+                    });
+                } else {
+                    $.alert(res.message);
+                }
+                layer.closeAll();
+            }
+        });
+    }
+
+    wx.config({
+        debug: false,
+        appId: '${appId!}',
+        timestamp: '${timestamp!}',
+        nonceStr: '${nonceStr!}',
+        signature: '${signature!}',
+        jsApiList: [
+        'checkJsApi',
+        'getLocation'
+        ]
+    });
+
+    wx.ready(function() {
+        // 获取定位信息
+        wx.getLocation({
+        type: 'wgs84',
+            success: function (res) {
+            var latitude = res.latitude;                      // 纬度，浮点数，范围为90 ~ -90
+            var longitude = res.longitude;                    // 经度，浮点数，范围为180 ~ -180。
+
+            $("#lng").val(longitude.toFixed(2));
+            $("#lat").val(latitude.toFixed(2));
+
+            var speed = res.speed;                            // 速度，以米/每秒计
+            var accuracy = res.accuracy;                      // 位置精度
+
+            var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
+            var geoc = new BMap.Geocoder();                   // 获取百度地址解析器
+
+            translateCallback = function (point) {            // 回调函数
+                geoc.getLocation(point, function(rs) {
+                    var addComp = rs.addressComponents;
+                    var address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
+                    //console.log(address)
+                    //alert(address);
+                    //df.resolve();
+                    $('#location-span').text(address);
+                    $('#location').val(address);
+                });
+            };
+                setTimeout(function() {
+                BMap.Convertor.translate(point, 0, translateCallback);//真实经纬度转成百度坐标
+                }, 100);
+            },
+            cancel: function (res) {
+                console.log('用户拒绝授权获取地理位置');
+            },
+            fail: function (res) {
+                console.log(JSON.stringify(res));
+            }
+        });
+    });
+</#macro>
+<@layout>
+<div id="visit-add">
+    <main>
+        <form action="${CPATH}/customerVisit/save" method="post" id="form">
+            <section class="weui-panel weui-panel_access order-customer-info">
+                <div class="weui-cell weui-cell_access">
+                    <div class="weui-cell__bd">
+                        <div class="order-customer-info-title">客户名称
+                            <span class="require">*</span>
+                        </div>
+                        <input type="hidden" id="customer_id" name="customerVisit.seller_customer_id" />
+                        <input type="text" class="weui-input" id="customer_name" name="customer_name" value=""  placeholder="选择客户" required>
+                    </div>
+                    <span class="weui-cell__ft"></span>
+                </div>
+
+                <div class="weui-cell weui-cell_access">
+                    <div class="weui-cell__bd">
+                        <div class="order-customer-info-title">联系人
+                            <span class="require">*</span>
+                        </div>
+                        <input type="text" class="weui-input" id="contact" name="contact" value="" readonly="readonly" placeholder="联系人" required>
+                    </div>
+                    <span class="weui-cell__ft"></span>
+                </div>
+
+
+                <div class="weui-cell weui-cell_access">
+                    <div class="weui-cell__bd">
+                        <div class="order-customer-info-title">性别</div>
+                        <label class="fr">
+                            <input type="radio" name="sex" id="" value="female">女</label>
+                        <label class="fr">
+                            <input type="radio" name="sex" id="" value="male">男</label>
+                    </div>
+                </div>
+
+                <div class="weui-cell weui-cell_access">
+                    <div class="weui-cell__bd">
+                        <div class="order-customer-info-title">联系电话<span class="require">*</span></div>
+                        <input id="mobile" type="text" name="mobile" placeholder="联系电话" class="weui-input" readonly="readonly" />
+                    </div>
+                </div>
+
+                <div class="weui-cell weui-cell_access">
+                    <div class="weui-cell__bd">
+                        <div class="order-customer-info-title">问题类型
+                            <span class="require">*</span>
+                        </div>
+                        <input id="problem_id" name="customerVisit.question_type" type="hidden" />
+                        <input id="problem_type" name="problem_type" type="text" placeholder="请选择" class="weui-input">
+                    </div>
+                    <span class="weui-cell__ft"></span>
+                </div>
+
+                <div class="weui-cell weui-cell_access">
+                    <div class="weui-cell__bd">
+                        <textarea name="customerVisit.question_desc" id="question_desc" placeholder="备注说明（70字以内）"></textarea>
+                    </div>
+                </div>
+            </section>
+            <div class="weui-gallery" id="gallery">
+                <span class="weui-gallery__img" id="galleryImg"></span>
+                <div class="weui-gallery__opr">
+                    <a href="javascript:" rel="nofollow" target="_blank"  class="weui-gallery__del">
+                        <i class="weui-icon-delete weui-icon_gallery-delete"></i>
+                    </a>
+                </div>
+            </div>
+            <section class="weui-cells weui-cells_form">
+                <div class="weui-cell">
+                    <div class="weui-cell__bd">
+                        <div class="weui-uploader">
+                            <div class="weui-uploader__hd">
+                                <p class="weui-uploader__title">附件图片</p>
+                                <div class="weui-uploader__info">0/3</div>
+                            </div>
+                            <div class="weui-uploader__bd">
+                                <ul class="weui-uploader__files" id="uploaderFiles">
+                                    <!--
+                                    <li class="weui-uploader__file weui-uploader__file_status" style="background-image:url(./images/pic_160.png)">
+                                        <div class="weui-uploader__file-content">
+                                            <i class="weui-icon-warn"></i>
+                                        </div>
+                                    </li>
+                                    <li class="weui-uploader__file weui-uploader__file_status" style="background-image:url(./images/pic_160.png)">
+                                        <div class="weui-uploader__file-content">50%</div>
+                                    </li>
+                                     -->
+                                </ul>
+                                <div class="weui-uploader__input-box">
+                                    <input id="uploaderInput" class="weui-uploader__input" type="file" accept="image/*" multiple="">
+                                    <input type="hidden" name="pic" id="pic">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="weui-panel weui-panel_access ft14 remark">
+                <div class="weui-cell weui-cell_access">
+                    <div class="weui-cell__bd">
+                        <span class="icon-map-pin ft16 green"></span>
+                        <input id="location" name="customerVisit.location" type="hidden" />
+                        <input id="lng" name="customerVisit.lng" type="hidden" />
+                        <input id="lat" name="customerVisit.lat" type="hidden" />
+                        <span id="location-span"></span>
+                    </div>
+                </div>
+            </section>
+        </form>
+    </main>
+
+    <include "_inc/_goback.html" />
+    <footer class="weui-footer weui-footer_fixed-bottom ft16">
+        <a class="blue-button width-100 _submit_btn" onclick="doSubmit()" href="">提交</a>
+    </footer>
+
+</div>
+</@layout>
