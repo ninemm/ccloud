@@ -509,6 +509,11 @@ a {
   font-size: 0.6rem;
 }
 
+.index-info {
+  background: #fff;
+  min-height: 5rem;
+}
+
 .index-info .weui-cells {
   margin-top: 0;
 }
@@ -1667,6 +1672,16 @@ input[name=input-type] {
 
 #informationList .weui-cells {
   margin-top: 0;
+}
+
+.not-read {
+  height: .5rem;
+  width: .5rem;
+  padding: 0;
+  position: absolute;
+  left: 3px;
+  top: 50%;
+  margin-top: -0.25rem;
 }
 
 /* 反馈列表 */
