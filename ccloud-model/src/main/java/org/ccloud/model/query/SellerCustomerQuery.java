@@ -93,7 +93,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 	}
 
 	public Page<Record> paginateForApp(int pageNumber, int pageSize, String keyword, String dataArea, String userId,
-			String customerTypeId, String isOrdered) {
+			String customerTypeId, String isOrdered, String customerKind) {
 
 		boolean needWhere = true;
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -105,6 +105,10 @@ public class SellerCustomerQuery extends JBaseQuery {
 		StringBuilder fromBuilder = new StringBuilder(" from `cc_seller_customer` sc ");
 		fromBuilder.append(" join `cc_customer` c on c.id = sc.customer_id ");
 		fromBuilder.append(" left join `cc_sales_order` so on sc.id = so.customer_id ");
+
+		if(StrKit.isBlank(customerTypeId)) {
+			fromBuilder.append(" LEFT ");
+		}
 
 		fromBuilder.append(" JOIN (SELECT c1.id,GROUP_CONCAT(ct. NAME) AS customerTypeNames ");
 		fromBuilder.append(" FROM cc_seller_customer c1 ");
@@ -123,6 +127,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 		fromBuilder.append(" GROUP BY c2.id) t2 ON sc.id = t2.id ");
 
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "c.customer_name", keyword, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "sc.customer_kind", customerKind, params, needWhere);
 
 		if (needWhere) {
 			fromBuilder.append(" WHERE 1 = 1 ");

@@ -27,8 +27,8 @@ import com.jfinal.plugin.ehcache.IDataLoader;
 @SuppressWarnings("serial")
 public abstract class BaseCustomerVisit<M extends BaseCustomerVisit<M>> extends JModel<M> implements IBean {
 
-	public static final String CACHE_NAME = "cc_customer_visit";
-	public static final String METADATA_TYPE = "cc_customer_visit";
+	public static final String CACHE_NAME = "customer_visit";
+	public static final String METADATA_TYPE = "customer_visit";
 
 	public static final String ACTION_ADD = "cc_customer_visit:add";
 	public static final String ACTION_DELETE = "cc_customer_visit:delete";

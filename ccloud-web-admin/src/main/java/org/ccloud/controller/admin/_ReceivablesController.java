@@ -38,8 +38,7 @@ import org.ccloud.model.ReceivablesDetail;
 import org.ccloud.model.query.ReceivablesDetailQuery;
 import org.ccloud.model.Receiving;
 import org.ccloud.model.query.ReceivingQuery;
-import org.ccloud.model.query.SalesOrderQuery;
-import org.ccloud.model.query.CustomerQuery;
+import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.User;
 
 import com.google.common.collect.ImmutableMap;
@@ -61,12 +60,12 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 	
 	public void getOptions(){
 		String type = getPara("type");
-		
+		String DataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		List<Record> list = new ArrayList();
 		if(type != null) {
 			if("1".equals(type)) {
-				list = CustomerTypeQuery.me().getCustomerTypes();
+				list = CustomerTypeQuery.me().getCustomerTypes(DataArea);
 			}else if("2".equals(type)) {
 				list = GoodsCategoryQuery.me().getLeafTypes();
 			}
@@ -103,6 +102,7 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 	public void renderlist() {
 		setAttr("ref_sn",getPara("ref_sn"));
 		setAttr("ref_type",getPara("ref_type"));
+		setAttr("object_id", getPara("object_id"));
 		render("list.html");
 	}
 	
@@ -119,19 +119,25 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 	public void addreceiving() {
 		String ref_sn = getPara("ref_sn");
 		String ref_type = getPara("ref_type");
-		String order_id = SalesOrderQuery.getBillIdBySn(ref_sn);
-		if(order_id == null) {
+		String object_id = getPara("object_id");
+		//通过客户Id找到应收账款主表ID
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		Receivables receivables = ReceivablesQuery.me().findByObjId(object_id, user.getDepartmentId());
+		
+		if(receivables == null) {
 			setAttr("ref_sn",ref_sn);
 			setAttr("ref_type",ref_type);
 			render("list.html");
 		}
 		
-		List<Record> list = CustomerQuery.me().getCustomerIdName();
-		
+		String userDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		List<User> list = UserQuery.me().findIdAndNameByDataArea(userDataArea);
+	
 		setAttr("ref_sn",ref_sn);
-		setAttr("bill_id",order_id);
+		setAttr("bill_id",receivables.getId());
 		setAttr("ref_type",getPara("ref_type"));
-		setAttr("customer_info",JsonKit.toJson(list));
+		setAttr("object_id", object_id);
+		setAttr("userInfo",JsonKit.toJson(list));
 	}
 	
 	@Override
@@ -142,7 +148,7 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 				
 				Receiving receiving = new Receiving();
 				String receiving_id = StrKit.getRandomUUID();
-				User user = getSessionAttr("user");
+				User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 				String act_amount = getPara("act_amount");
 				String ref_sn = getPara("ref_sn");
 				String receive_user_id = getPara("receive_user");
@@ -152,7 +158,7 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 				receiving.set("bill_id", getPara("bill_id"));
 				receiving.set("act_amount", act_amount);
 				receiving.set("biz_date", getPara("biz_date"));
-				receiving.set("ref_sn", getPara("ref_sn"));
+				receiving.set("ref_sn", ref_sn);
 				receiving.set("ref_type", getPara("ref_type"));
 				receiving.set("input_user_id", user.getId());
 				receiving.set("receive_user_id",receive_user_id);
@@ -162,8 +168,8 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 				receiving.set("create_date", date);
 				receiving.set("modify_date", date);
 
-				ReceivablesDetailQuery.me().updateAmountByRefSn(ref_sn,act_amount);
-				ReceivablesQuery.me().updateAmountByObjectId(receive_user_id,act_amount);
+//				ReceivablesDetailQuery.me().updateAmountByRefSn(ref_sn,act_amount);
+				ReceivablesQuery.me().updateAmountById(getPara("bill_id"),act_amount);
 				return receiving.save();
 			}
 		});

@@ -8,11 +8,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.CustomerType;
+import org.ccloud.model.SellerProduct;
 import org.ccloud.model.User;
 import org.ccloud.model.query.CustomerTypeQuery;
+import org.ccloud.model.query.ProductCompositionQuery;
 import org.ccloud.model.query.SalesOrderDetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SellerCustomerQuery;
@@ -50,6 +54,14 @@ public class ProductController extends BaseFrontController {
 		String keyword = getPara("keyword");
 		List<Record> productList = SellerProductQuery.me().findProductListForApp(sellerId, keyword);
 		renderJson(productList);
+	}
+
+	public void productCompositionList() {
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+
+		String keyword = getPara("keyword");
+		List<Record> productCompositionList = ProductCompositionQuery.me().findProductBySeller(sellerId, keyword);
+		renderJson(productCompositionList);
 	}
 
 	public void shoppingCart() {
@@ -127,9 +139,15 @@ public class ProductController extends BaseFrontController {
 		String userId = getPara("userId");
 		String customerTypeId = getPara("customerTypeId");
 		String isOrdered = getPara("isOrdered");
+		
+		String customerKind = Consts.CUSTOMER_KIND_COMMON;
+		Subject subject = SecurityUtils.getSubject();
+		if(subject.isPermitted("/admin/salesOrder/seller")) {
+			customerKind = Consts.CUSTOMER_KIND_SELLER;
+		}
 
 		Page<Record> customerList = SellerCustomerQuery.me().paginateForApp(getPageNumber(), getPageSize(), keyword,
-				selectDataArea, userId, customerTypeId, isOrdered);
+				selectDataArea, userId, customerTypeId, isOrdered, customerKind);
 
 		Map<String, Object> map = new HashMap<>();
 		map.put("customerList", customerList.getList());
@@ -181,23 +199,50 @@ public class ProductController extends BaseFrontController {
 
 				String[] sellProductIds = paraMap.get("sellProductId");
 				// 常规商品
-				for (int index = 0; index < sellProductIds.length; index++) {
-					if (!SalesOrderDetailQuery.me().insertForApp(paraMap, orderId, sellerId, user.getId(), date,
-							user.getDepartmentId(), user.getDataArea(), index)) {
-						return false;
-					}
+				if (StrKit.notBlank(sellProductIds)) {
+					for (int index = 0; index < sellProductIds.length; index++) {
+						if (StrKit.notBlank(sellProductIds[index])) {
+							if (!SalesOrderDetailQuery.me().insertForApp(paraMap, orderId, sellerId, user.getId(), date,
+									user.getDepartmentId(), user.getDataArea(), index)) {
+								return false;
+							}
+						}
 
+					}
 				}
 
 				String[] giftSellProductIds = paraMap.get("giftSellProductId");
 				// 赠品
-				for (int index = 0; index < giftSellProductIds.length; index++) {
-					if (!SalesOrderDetailQuery.me().insertForAppGift(paraMap, orderId, sellerId, user.getId(), date,
-							user.getDepartmentId(), user.getDataArea(), index)) {
-						return false;
-					}
+				if (StrKit.notBlank(giftSellProductIds)) {
+					for (int index = 0; index < giftSellProductIds.length; index++) {
+						if (StrKit.notBlank(giftSellProductIds[index])) {
+							if (!SalesOrderDetailQuery.me().insertForAppGift(paraMap, orderId, sellerId, user.getId(),
+									date, user.getDepartmentId(), user.getDataArea(), index)) {
+								return false;
+							}
+						}
 
+					}
 				}
+
+				String[] compositionIds = paraMap.get("compositionId");
+				String[] compositionNums = paraMap.get("compositionNum");
+				// 组合商品
+				if (StrKit.notBlank(compositionIds)) {
+					for (int index = 0; index < compositionIds.length; index++) {
+						String productId = compositionIds[index];
+						String number = compositionNums[index];
+						List<SellerProduct> list = SellerProductQuery.me().findByCompositionId(productId);
+						for (SellerProduct sellerProduct : list) {
+							if (!SalesOrderDetailQuery.me().insertForAppComposition(sellerProduct, orderId, sellerId,
+									user.getId(), date, user.getDepartmentId(), user.getDataArea(),
+									Integer.parseInt(number))) {
+								return false;
+							}
+						}
+					}
+				}
+
 				return true;
 			}
 		});

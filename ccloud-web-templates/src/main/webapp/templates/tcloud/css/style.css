@@ -109,6 +109,13 @@ a {
   background: #fff;
 }
 
+.weui-grids::before,
+.weui-grids::after,
+.weui-grid::before,
+.weui-grid::after {
+  content: none;
+}
+
 .weui-cells {
   font-size: 0.7rem;
 }
@@ -477,18 +484,49 @@ a {
   font-size: 1.5rem;
 }
 
-#home .weui-footer {
+#home {
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 1.5rem;
+}
+
+.company {
+  height: 2rem;
+  line-height: 2rem;
+  text-align: center;
+  font-size: .8rem;
+  background: #35b8f0;
+  color: #fff;
+}
+
+.index-footer {
   background: #fff;
   height: 1.5rem;
   line-height: 1.5rem;
   padding: 0 0.75rem;
-  bottom: 0;
   z-index: 500;
+  bottom: 50px;
   position: absolute;
+  width: 100%;
+  box-sizing: border-box;
+  color: #999
 }
 
-#home .weui-footer i {
+.index-footer i {
   font-size: 0.6rem;
+}
+
+.index-info {
+  background: #fff;
+}
+
+.index-info .weui-cells {
+  margin-top: 0;
+}
+
+.index-info-tab .weui-cell__ft {
+  height: 100%;
+  width: 1rem;
 }
 
 .empty-badge {
@@ -503,6 +541,7 @@ a {
   padding: 0 0.75rem;
   line-height: 2rem;
   position: relative;
+  color: #eee;
 }
 
 .check-pass {
@@ -519,8 +558,8 @@ a {
 
 .menu {
   display: inline-block;
-  background: #35b8f0;
-  color: #fff;
+  background: #ddd;
+  color: #000;
   height: 1.25rem;
   line-height: 1.25rem;
   vertical-align: middle;
@@ -529,7 +568,7 @@ a {
   margin: 0 0.25rem;
 }
 
-.menu:first-child {
+.menu:nth-child(2) {
   margin-left: 1.25rem;
 }
 
@@ -549,14 +588,9 @@ a {
   -webkit-overflow-scrolling: touch;
 }
 
-.showInventoryMenu{
-  position: absolute;
-  margin-top: 50px;
-}
-
 .menu-left {
   width: 22.222222%;
-  background: #f7f7f7;
+  background: #fcfcfc;
 }
 
 .menu-left li {
@@ -597,8 +631,8 @@ a {
 .product_detail {
   background: #fff;
   margin-top: 10px;
-  padding: 0 0.7rem 0.5rem;
-  font-size: 0.6rem;
+  padding: .5rem .7rem;
+  font-size: .7rem;
   position: relative;
 }
 
@@ -1040,9 +1074,15 @@ a {
   text-align: center;
 }
 
+.customer {
+  position: absolute;
+  top: 44px;
+  bottom: 0;
+}
+
 .customer article {
   position: absolute;
-  top: 84px;
+  top: 2rem;
   bottom: 0;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
@@ -1253,32 +1293,60 @@ input[name=sex] {
   -webkit-overflow-scrolling: touch;
 }
 
-#my header {
-  height: 3.75rem;
-  background: #8cc152;
-  box-shadow: 0 0.15rem 0.3rem rgba(34, 34, 34, 0.21), 0 0.3rem 0.3rem rgba(34, 34, 34, 0.26);
-  padding: 0.75rem 1.5rem;
-  box-sizing: border-box;
-  display: flex;
-}
-
-#my header div:first-child {
-  width: 2.25rem;
-  height: 2.25rem;
-}
-
-#my header div:nth-child(2) {
-  font-size: 0.6rem;
-  color: #fff;
+#my .weui-cells__title {
+  font-size: .8rem;
+  height: 2rem;
+  margin: 0;
+  padding: 0 0.75rem;
+  line-height: 2rem;
   position: relative;
-  left: 5%;
-  top: -0.25rem;
+  background: #eee;
 }
 
-#my header img {
-  border-radius: 100%;
+.user-box {
+  position: relative;
+  background: #fff;
+  width: 100%;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
 }
 
+.user-info {
+  height: 4rem;
+  background: #00a7d0;
+  color: #fff;
+  font-size: .7rem;
+  padding-top: 1rem;
+  box-sizing: border-box;
+  padding: 1rem 10% 0;
+}
+
+.user-avatar {
+  position: absolute;
+  left: 50%;
+  margin-left: -1.5rem;
+  top: 2rem;
+}
+
+.user-avatar img {
+  width: 3rem;
+  height: auto;
+  border-radius: 50%;
+  border: 3px solid #fff;
+}
+
+.user-statistics {
+  background: #fff;
+  height: 4rem;
+  padding-top: 1rem;
+  box-sizing: border-box;
+  text-align: center;
+  font-size: .8rem;
+  color: #999;
+}
+
+.user-statistics .weui-flex__item p {
+  font-size: .6rem;
+}
 
 /* 我的订单 */
 
@@ -1639,6 +1707,16 @@ input[name=input-type] {
 
 #informationList .weui-cells {
   margin-top: 0;
+}
+
+.not-read {
+  height: .5rem;
+  width: .5rem;
+  padding: 0;
+  position: absolute;
+  left: 3px;
+  top: 50%;
+  margin-top: -0.25rem;
 }
 
 /* 反馈列表 */

@@ -118,6 +118,11 @@
         });
     }
 
+    function newOrder(customer){
+        setItemBykey("customerInfo", customer);
+        window.location.href = '${CPATH}/product';
+    }
+
 </#macro>
 
 <@layout>
@@ -140,7 +145,7 @@
     </header>
     <article class="customer">
         <header class="has-th-list weui-flex">
-            <div class="head-search select-area wewui weui-flex__item">
+            <div class="head-search select-area weui-flex__item">
                 <div class="weui-flex">
                 <div class="weui-flex__item">
                     <input type="text" id="region" placeholder="客户区域" class="weui-input" readonly onchange="refresh()">
@@ -163,7 +168,6 @@
 	    <article  class="infinite">
 	        <div id = "customerList">
 	            <#if customerList??>
-	                <#assign total = customerList.totalRow>
 	                    <#list customerList.list as customer>
 	                         <div class="weui-panel weui-panel_access">
 	                            <div class="weui-flex">
@@ -199,8 +203,12 @@
 	                            </div>
 	                            <hr />
 	                            <div class="operate-btn">
-	                                <div class="button blue-button fl" href="/product">下订单</div>
-	                                <div class="button blue-button fr" hred="/visitAdd">客户拜访</div>
+	                                <div class="button white-button fl" hred="/visitAdd">客户拜访</div>
+                                    <div class="button blue-button fr" onclick="newOrder({customerName:'${(customer.customer_name)}',
+                                                                                            sellerCustomerId:'${(customer.sellerCustomerId)}',
+                                                                                            contact:'${(customer.contact)}',
+                                                                                            mobile:'${(customer.mobile)}',
+                                                                                            address:'${(customer.address)}'})">下订单</div>
 	                            </div>
 	                            <p class="gray">
 	                                <span class="icon-map-marker ft16 green"></span>
@@ -210,25 +218,23 @@
 	                    </#list>
 	            </#if>
 	        </div>
-	        <#if total = 0>
+            <#if customerList??>
+	        <#if customerList.totalRow = 0>
 	            <div class="weui-loadmore weui-loadmore_line">
 	                <span class="weui-loadmore__tips">暂无数据</span>
 	            </div>
-	            <#elseif total &gt; 10>
+	            <#elseif customerList.totalRow &gt; 10>
 	                <div class="weui-loadmore">
 	                    <i class="weui-loading"></i>
 	                    <span class="weui-loadmore__tips">正在加载</span>
 	                </div>
 	        </#if>
+            </#if>
 	    </article>
     </article>
 </div>
 <a class="hidden-menu" href="/customer/edit">
-<<<<<<< HEAD
     <img src="${CTPATH}/images/customer_add.png" alt="">
-=======
-    <i class="icon-add icon-menu-shopping-cart orange fr"></i>
->>>>>>> 3ed5d6fcc75939fc6a1116c4c2f6fde07c5dd53e
 </a>
 <div class="layer"></div>
 <#include "_inc/_footer_nav.html" />
