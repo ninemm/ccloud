@@ -236,4 +236,16 @@ public class UserQuery extends JBaseQuery {
 		List<Record> list = Db.find(fromBuilder.toString(), id, data);
 		return list;
 	}
+	
+	public List<User> findIdAndNameByDataArea(String dataArea) {
+		StringBuilder sqlBuilder = new StringBuilder("select u.id,u.realname as text ");
+
+		sqlBuilder.append("from `user` u ");
+		final List<Object> params = new LinkedList<Object>();
+		appendIfNotEmptyWithLike(sqlBuilder, "u.data_area", dataArea, params, true);
+		if (params.isEmpty()) {
+			return DAO.find(sqlBuilder.toString());
+		}
+		return DAO.find(sqlBuilder.toString(), params.toArray());
+	}
 }

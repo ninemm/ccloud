@@ -45,7 +45,7 @@ public class ReceivablesDetailQuery extends JBaseQuery {
 
 	public Page<ReceivablesDetail> paginate(int pageNumber, int pageSize, String id,String type,String dataArea) {
 		
-		String select = "SELECT ref_type,ref_sn,receive_amount,act_amount,biz_date,balance_amount,create_date";
+		String select = "SELECT object_id, ref_type,ref_sn,SUM(receive_amount) as receive_amount,SUM(act_amount) as act_amount,biz_date,SUM(balance_amount) as balance_amount,create_date";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_receivables_detail` ");
 		fromBuilder.append(" WHERE object_id ='"+id+"'");
 		if("1".equals(type)) {
@@ -55,7 +55,7 @@ public class ReceivablesDetailQuery extends JBaseQuery {
 		}
 		LinkedList<Object> params = new LinkedList<Object>();
 		appendIfNotEmptyWithLike(fromBuilder, "data_area", dataArea, params, false);
-		fromBuilder.append(" ORDER BY create_date DESC");
+		fromBuilder.append(" GROUP BY ref_sn  ORDER BY create_date DESC");
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
@@ -76,7 +76,7 @@ public class ReceivablesDetailQuery extends JBaseQuery {
 	}
 	
 	public void updateAmountByRefSn(String ref_sn,String act_amount) {
-		StringBuilder sqlBuilder = new StringBuilder("UPDATE `cc_receivables_detail` SET act_amount = act_amount + "+act_amount+",balance_amount = balance_amount -"+act_amount+" WHERE ref_sn=\'"+ref_sn+"\'");
+		StringBuilder sqlBuilder = new StringBuilder("UPDATE `cc_receivables_detail` SET act_amount = act_amount + "+act_amount+",balance_amount = balance_amount -"+act_amount+" WHERE ref_sn='"+ref_sn+"'");
 		Db.update(sqlBuilder.toString());
 	}
 	

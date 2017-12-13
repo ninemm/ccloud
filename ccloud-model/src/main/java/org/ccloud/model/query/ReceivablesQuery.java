@@ -88,13 +88,13 @@ public class ReceivablesQuery extends JBaseQuery {
 		return 0;
 	}
 
-	public void updateAmountByObjectId(String objejct_id,String act_amount) {
-		StringBuilder sqlBuilder = new StringBuilder("UPDATE `cc_receivables` SET act_amount = act_amount +"+act_amount+" , balance_amount = balance_amount-"+act_amount+" WHERE object_id=\'"+objejct_id+"\'");
+	public void updateAmountById(String id,String act_amount) {
+		StringBuilder sqlBuilder = new StringBuilder("UPDATE `cc_receivables` SET act_amount = act_amount +"+act_amount+" , balance_amount = balance_amount-"+act_amount+" WHERE id='"+id+"'");
 		Db.update(sqlBuilder.toString());
 	}
 	
 	public Receivables findByObjId(String objId,String deptId) {
-		String select = "select * from `cc_receivables` where obj_id= '"+objId+"' and dept_id= '"+deptId+"' ";
+		String select = "select * from `cc_receivables` where object_id= '"+objId+"' and dept_id= '"+deptId+"' ";
 		return DAO.findFirst(select);
 	}
 
