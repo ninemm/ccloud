@@ -93,7 +93,7 @@ public class CustomerVisitController extends BaseFrontController {
 	    //String data_area = "0010010016410";
 	    //User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 	    String selDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		Page<Record> customer_list = SellerCustomerQuery.me().paginateForApp(getPageNumber(), getPageSize(), "",selDataArea, user_id, "", "");
+		Page<Record> customer_list = SellerCustomerQuery.me().paginateForApp(getPageNumber(), getPageSize(), "",selDataArea, user_id, "", "","");
 		List<Record> customerList = new ArrayList<Record>();
 		if(customer_list!=null) {
 			customerList = customer_list.getList();
