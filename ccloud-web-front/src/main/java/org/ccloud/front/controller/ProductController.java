@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.CustomerType;
@@ -137,9 +139,15 @@ public class ProductController extends BaseFrontController {
 		String userId = getPara("userId");
 		String customerTypeId = getPara("customerTypeId");
 		String isOrdered = getPara("isOrdered");
+		
+		String customerKind = Consts.CUSTOMER_KIND_COMMON;
+		Subject subject = SecurityUtils.getSubject();
+		if(subject.isPermitted("/admin/salesOrder/seller")) {
+			customerKind = Consts.CUSTOMER_KIND_SELLER;
+		}
 
 		Page<Record> customerList = SellerCustomerQuery.me().paginateForApp(getPageNumber(), getPageSize(), keyword,
-				selectDataArea, userId, customerTypeId, isOrdered);
+				selectDataArea, userId, customerTypeId, isOrdered, customerKind);
 
 		Map<String, Object> map = new HashMap<>();
 		map.put("customerList", customerList.getList());
