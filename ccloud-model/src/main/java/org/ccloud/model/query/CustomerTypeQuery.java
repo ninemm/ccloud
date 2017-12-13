@@ -148,5 +148,10 @@ public class CustomerTypeQuery extends JBaseQuery {
 		List<Record> list = Db.find(fromBuilder.toString());
 		return list;
 	}
-
+	
+	public CustomerType findDataAreaAndName(String dataArea,String name){
+		String sql = "select * from cc_customer_type where data_area = ? and name = ?";
+		return DAO.findFirst(sql, dataArea,name);
+	}
+	
 }
