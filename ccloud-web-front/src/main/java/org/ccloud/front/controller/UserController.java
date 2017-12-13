@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -15,17 +16,22 @@ import org.ccloud.core.BaseFrontController;
 import org.ccloud.interceptor.UserInterceptor;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
+import org.ccloud.model.Customer;
+import org.ccloud.model.CustomerVisit;
+import org.ccloud.model.Dict;
 import org.ccloud.model.GoodsType;
 import org.ccloud.model.Product;
 import org.ccloud.model.Seller;
 import org.ccloud.model.SmsCode;
 import org.ccloud.model.User;
+import org.ccloud.model.query.DictQuery;
 import org.ccloud.model.query.GoodsTypeQuery;
 import org.ccloud.model.query.InventoryQuery;
 import org.ccloud.model.query.ProductQuery;
 import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.SmsCodeQuery;
 import org.ccloud.model.query.UserQuery;
+import org.ccloud.model.vo.ImageJson;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.shiro.CaptchaUsernamePasswordToken;
 import org.ccloud.utils.CookieUtils;
@@ -33,6 +39,9 @@ import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.EncryptUtils;
 import org.ccloud.utils.StringUtils;
 
+import com.alibaba.fastjson.JSON;
+import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.Maps;
 
 import com.jfinal.aop.Clear;
 import com.jfinal.core.ActionKey;
@@ -367,5 +376,55 @@ public class UserController extends BaseFrontController{
 		map.put("totalPage", inventoryList.getTotalPage());
 		renderJson(map);
 		//renderAjaxResultForSuccess("success",JSON.toJSON(inventoryList));
+	}	
+	
+	// 用户新增拜访页面显示
+	public void visitAdd() {
+	    String user_id = "1f797c5b2137426093100f082e234c14";
+	    String data_area = "0010010016410";
+	    
+	    List<Record> customer_list = UserQuery.me().getCustomerInfoByUserId(user_id,data_area);
+	    List<Dict> problem_list = DictQuery.me().findByCode("visit");
+	    
+	    setAttr("customer",JSON.toJSONString(customer_list));
+	    setAttr("problem",JSON.toJSONString(problem_list));
+		
+		render("user_visitAdd.html");
+	}
+	
+	// 用户新增拜访保存
+	public void save() {
+		
+		 CustomerVisit customerVisit = getModel(CustomerVisit.class);
+		 String user_id= "1f797c5b2137426093100f082e234c14";
+		 String data_area = "0010010016410";
+		 String department_id = "9ec18b144c1d46ea91b3d30f0e91f41b";
+		 String picJson = getPara("pic");
+		 String seller_customer_id = getPara("customer_id");
+		 String question_type = getPara("problem_id");
+		 String location = getPara("location");
+		 //String mobile = getPara("mobile");
+		 //String sex = getPara("sex");
+		 String question_desc = getPara("question_desc");
+		 
+		 String visit_id = StrKit.getRandomUUID();
+		 Date date = new Date();
+		 customerVisit.set("id", visit_id);
+		 customerVisit.set("user_id", user_id);
+		 customerVisit.set("seller_customer_id", seller_customer_id);
+		 customerVisit.set("photo", picJson);
+		 customerVisit.set("question_type", question_type);
+		 customerVisit.set("question_desc", question_desc);
+		 customerVisit.set("lng", "lng");
+		 customerVisit.set("lat", "lat");
+		 customerVisit.set("location", location);
+		 customerVisit.set("status", 0);
+		 customerVisit.set("dept_id", department_id);
+		 customerVisit.set("data_area", data_area);
+		 customerVisit.set("create_date", date);
+		 customerVisit.set("modify_date", date);
+		 boolean saveResult = customerVisit.save();
+		 if (saveResult) renderAjaxResultForSuccess("添加成功");
+	        else renderAjaxResultForError("添加失败");
 	}
 }

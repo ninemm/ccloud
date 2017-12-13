@@ -41,7 +41,7 @@ public class GroupQuery extends JBaseQuery {
 	}
 
 	public Page<Group> paginate(int pageNumber, int pageSize,String keyword, String dataArea, String orderby) {
-		String select = "select *,d.dept_name ";
+		String select = "select g.*,d.dept_name ";
 		StringBuilder fromBuilder = new StringBuilder("from `group` g INNER JOIN `department` d ON d.id = g.dept_id ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -92,7 +92,7 @@ public class GroupQuery extends JBaseQuery {
 	}
 
 	public List<Group> findByDeptId() {
-		String sql = "SELECT * from `group` where dept_id = '0' and group_code >'001' and group_code<'020'";
+		String sql = "SELECT * from `group` where dept_id = '0' and group_code >'002' and group_code<'020'";
 		return DAO.find(sql);
 	}
 	

@@ -16,6 +16,13 @@
 package org.ccloud.model;
 
 import org.ccloud.model.core.Table;
+import org.ccloud.model.vo.ImageJson;
+
+import com.alibaba.fastjson.JSON;
+import com.jfinal.kit.StrKit;
+
+import java.util.List;
+
 import org.ccloud.model.base.BaseCustomerVisit;
 
 /**
@@ -26,4 +33,13 @@ public class CustomerVisit extends BaseCustomerVisit<CustomerVisit> {
 
 	private static final long serialVersionUID = 1L;
 
+	public List<ImageJson> getImageList() {
+		
+		String imageListStore = getPhoto();
+		if (StrKit.notBlank(imageListStore)) {
+			List<ImageJson> list = JSON.parseArray(imageListStore, ImageJson.class);
+			return list;
+		}
+		return null;
+	}
 }
