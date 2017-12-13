@@ -14,14 +14,11 @@
 	<link rel="stylesheet" href="${CTPATH}/css/unlock.css">
     <title>用户登录</title>
     <style>
-    .input-area>div, input {
-        background: inherit;
-    }
 
     input {
         position: relative;
         left: 0;
-        padding-left: 1.5rem;
+        margin-left: 1.5rem;
     }
 
     #bind {
@@ -52,11 +49,21 @@
         height: 25%;
         font-family: '宋体';
         color: #35b8f0;
-    }
+	}
+	
+	#login {
+		max-width: 600px;
+		margin: 0 auto;
+	}
+
+	input:-webkit-autofill { 
+		box-shadow: 0 0 0px 1000px white inset !important;
+	}
     </style>
 </head>
 
 <body>
+	<div id="login">
 	<header>
 		<h1>协同云平台</h1>
         <h3>用户登录</h3>
@@ -79,6 +86,7 @@
 			<button id="bind">登录</button>
 		</main>
 	</form>
+	</div>
 </body>
 <script src="${CTPATH}/js/jquery-3.2.1.min.js"></script>
 <script src="${CTPATH}/js/jquery-weui.min.js"></script>
