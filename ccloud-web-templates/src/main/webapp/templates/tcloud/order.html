@@ -88,7 +88,7 @@ $(function() {
 		$.each(productList, function(index, el) {
 			if(el.isGift == 0) {
 				$product.append("<div class='weui-panel weui-panel_access goods-detail common'>" + newHtml + "</div>");
-				var $newProductDetail = $product.find(".weui-panel:last");
+				var $newProductDetail = $product.find(".common:last");
 				$newProductDetail.find("#productName").text(el.productName);
 				$newProductDetail.find("#valueName").text(el.valueName);
 		
@@ -108,8 +108,13 @@ $(function() {
 				$newProductDetail.find("#bigNum").val(el.bigNum);
 				$newProductDetail.find("#smallNum").val(el.smallNum);
 			} else {
-				var $newProductDetail = $product.find(".weui-panel:last");
+				var $newProductDetail = $product.find(".common:last");
 				$newProductDetail.find("#addGift").attr("checked",'true').trigger("change");
+
+				//默认
+				if($newProductDetail.find("#sellProductId").val() == el.sellProductId){
+					$newProductDetail.find("#isDefault").attr("checked","true");
+				}
 
 				$newProductDetail.find("#giftProduct").val(el.productName);
 				$newProductDetail.find("#giftSellProductId").val(el.sellProductId);
@@ -129,11 +134,6 @@ $(function() {
 					$newProductDetail.find("#giftUnitName").attr('data-values', "smallUnit");
 					$newProductDetail.find("#giftUnit").val("smallUnit");
 				}
-				//默认
-				if($newProductDetail.find("#sellProductId").val() == el.sellProductId){
-					$newProductDetail.find("#isDefault").attr("checked","true");
-				}
-			
 			
 			}
 	
