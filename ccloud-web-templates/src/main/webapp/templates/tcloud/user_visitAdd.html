@@ -20,6 +20,7 @@
     var count = 3;
     var $form = $("#form");
 	var $uploaderFiles = $("#uploaderFiles");
+	var $gallery = $("#gallery"), $galleryImg = $("#galleryImg");
 	
 	initData();
 	
@@ -195,10 +196,72 @@
             	
             	if($("#problem_type").val().length==0) {$.toptip('问题类型不能为空', 1000, 'error'); return false;}
             	
-            	
-            }
+            	$('._submit_btn').attr('disabled', true);
+                layer.open({
+                    type: 2,
+                    content: '保存中...'
+                });
+            },
+            success: function(res) {
+                if (res.errorCode == 0) {
+                    $.confirm({
+                        title: res.message,
+                        text: '返回列表页？',
+                        onOK: function () {
+                            location.href = '${CPATH}/user/'
+                        },
+                        onCancel: function () {
+                            $.closeModal();
+                        }
+                    });
+                } else {
+                    $.alert(res.message);
+                }
+                layer.closeAll();
+            },
 		});
-	}
+	};
+	
+	wx.ready(function() {
+        // 获取定位信息
+        wx.getLocation({
+            type: 'wgs84',
+	        success: function (res) {
+	            var latitude = res.latitude;                      // 纬度，浮点数，范围为90 ~ -90
+                var longitude = res.longitude;                    // 经度，浮点数，范围为180 ~ -180。
+                
+                $("#lng").val(longitude.toFixed(2));
+                $("#lat").val(latitude.toFixed(2));
+                
+                var speed = res.speed;                            // 速度，以米/每秒计
+                var accuracy = res.accuracy;                      // 位置精度
+                
+                var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
+                var geoc = new BMap.Geocoder();                   // 获取百度地址解析器  
+
+                translateCallback = function (point) {            // 回调函数
+                    geoc.getLocation(point, function(rs) {
+                        var addComp = rs.addressComponents;
+                        var address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
+                        //console.log(address)
+                        //alert(address);
+                        //df.resolve();
+                        $('#location-span').text(address);
+                        $('#location').val(address);
+                    });
+                 };
+                 setTimeout(function() {
+                     BMap.Convertor.translate(point, 0, translateCallback);//真实经纬度转成百度坐标
+                 }, 100);
+	        },
+	        cancel: function (res) {
+	            console.log('用户拒绝授权获取地理位置');
+	        },
+	        fail: function (res) {
+	           console.log(JSON.stringify(res));
+	        }
+	    });
+    });
 </#macro>
 <@layout>
 <div id="visit-add">
@@ -261,7 +324,14 @@
 		        </div>
 	        </div>
 		</section>
-		
+		<div class="weui-gallery" id="gallery">
+	        <span class="weui-gallery__img" id="galleryImg"></span>
+	        <div class="weui-gallery__opr">
+	            <a href="javascript:" rel="nofollow" target="_blank"  class="weui-gallery__del">
+	                <i class="weui-icon-delete weui-icon_gallery-delete"></i>
+	            </a>
+	        </div>
+	    </div>
 		<section class="weui-cells weui-cells_form">
 	        <div class="weui-cell">
 		        <div class="weui-cell__bd">
@@ -272,6 +342,7 @@
 			            </div>
 			            <div class="weui-uploader__bd">
 			                <ul class="weui-uploader__files" id="uploaderFiles">
+			                    <!-- 
 				                <li class="weui-uploader__file weui-uploader__file_status" style="background-image:url(./images/pic_160.png)">
 				                    <div class="weui-uploader__file-content">
 				                    	<i class="weui-icon-warn"></i>
@@ -280,6 +351,7 @@
 				                <li class="weui-uploader__file weui-uploader__file_status" style="background-image:url(./images/pic_160.png)">
 				                    <div class="weui-uploader__file-content">50%</div>
 				                </li>
+				                 -->
 			                </ul>
 			                    <div class="weui-uploader__input-box">
 			                    <input id="uploaderInput" class="weui-uploader__input" type="file" accept="image/*" multiple="">
@@ -295,8 +367,10 @@
 	        <div class="weui-cell weui-cell_access">
 		        <div class="weui-cell__bd">
 		            <span class="icon-map-pin ft16 green"></span>
-		            <input id="location" type="hidden" />
-		            <span id="location-span" >湖北省武汉市洪山区汉街2406</span>
+		            <input id="location" name="location" type="hidden" />
+		            <input id="lng" name="lng" type="hidden" />
+		            <input id="lat" name="lat" type="hidden" />
+		            <span id="location-span" ></span>
 		        </div>
 	        </div>
 	    </section>

@@ -397,12 +397,13 @@ public class UserController extends BaseFrontController{
 		 CustomerVisit customerVisit = getModel(CustomerVisit.class);
 		 String user_id= "1f797c5b2137426093100f082e234c14";
 		 String data_area = "0010010016410";
+		 String department_id = "9ec18b144c1d46ea91b3d30f0e91f41b";
 		 String picJson = getPara("pic");
 		 String seller_customer_id = getPara("customer_id");
 		 String question_type = getPara("problem_id");
 		 String location = getPara("location");
-		 String mobile = getPara("mobile");
-		 String sex = getPara("sex");
+		 //String mobile = getPara("mobile");
+		 //String sex = getPara("sex");
 		 String question_desc = getPara("question_desc");
 		 
 		 String visit_id = StrKit.getRandomUUID();
@@ -410,5 +411,19 @@ public class UserController extends BaseFrontController{
 		 customerVisit.set("id", visit_id);
 		 customerVisit.set("user_id", user_id);
 		 customerVisit.set("seller_customer_id", seller_customer_id);
+		 customerVisit.set("photo", picJson);
+		 customerVisit.set("question_type", question_type);
+		 customerVisit.set("question_desc", question_desc);
+		 customerVisit.set("lng", "lng");
+		 customerVisit.set("lat", "lat");
+		 customerVisit.set("location", location);
+		 customerVisit.set("status", 0);
+		 customerVisit.set("dept_id", department_id);
+		 customerVisit.set("data_area", data_area);
+		 customerVisit.set("create_date", date);
+		 customerVisit.set("modify_date", date);
+		 boolean saveResult = customerVisit.save();
+		 if (saveResult) renderAjaxResultForSuccess("添加成功");
+	        else renderAjaxResultForError("添加失败");
 	}
 }
