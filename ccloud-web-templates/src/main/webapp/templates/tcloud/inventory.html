@@ -177,7 +177,7 @@
             </div>
         </header>
 
-        <article  class="inventory">
+        <main  class="inventory">
             <header class="has-th-list weui-flex">
                 <div class="head-search select-area wewui weui-flex__item">
                     <div class="weui-flex">
@@ -200,7 +200,7 @@
                 </div>
             </header>
             <div>
-                <div id="products" class="menu-left" style="top: 4.1rem;">
+                <div id="products" class="menu-left">
                     <ul>
                         <#if goodsTypeList??&&(goodsTypeList?size>0)>
                             <li id="allProduct" class="active" value="00">商品类型</li>
@@ -211,7 +211,7 @@
                     </ul>
                 </div>
             </div>
-            <article class="menu-right infinite" id="inventory_detailList"  style="top: 4.1rem;">
+            <article class="menu-right infinite" id="inventory_detailList">
                 <#if inventoryList??>
                     <#assign total = inventoryList.totalRow>
                         <#if total &gt; 0>
@@ -257,7 +257,7 @@
                         </div>
                 </#if>
             </article>
-        </article>
+        </main>
     </div>
     <div class="hidden-menu">
         <ul>
