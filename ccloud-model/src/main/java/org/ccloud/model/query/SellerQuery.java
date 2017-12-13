@@ -138,7 +138,7 @@ public class SellerQuery extends JBaseQuery {
 	}
 	
 	public List<Seller> findByDeptId(String deptId){
-		String sql="SELECT cs.* from cc_seller cs where cs.dept_id= ?";
+		String sql="SELECT * from cc_seller where dept_id= ? and seller_type = 0";
 		return DAO.find(sql,deptId);
 	}
 }
