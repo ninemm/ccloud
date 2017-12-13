@@ -155,7 +155,7 @@ public class CustomerVisitController extends BaseFrontController {
 		 customerVisit.setUserId(userId);
 		 customerVisit.setStatus(0);
 		 customerVisit.setDataArea(user.getDataArea());
-		 customerVisit.setDataArea(user.getDepartmentId());
+		 customerVisit.setDeptId(user.getDepartmentId());
 		 if (StrKit.notBlank(picJson)) {
 				
 			JSONArray array = JSON.parseArray(picJson);
