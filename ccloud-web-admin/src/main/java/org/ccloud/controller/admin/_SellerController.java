@@ -16,6 +16,7 @@
 package org.ccloud.controller.admin;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -474,8 +475,10 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 						sellerProducts.set("product_id",sellerProduct.getProductId());
 						sellerProducts.set("seller_id",seller.getId());
 						sellerProducts.set("custom_name",sellerProduct.getCustomName());
-						sellerProducts.set("store_count",sellerProduct.getStoreCount());
+						sellerProducts.set("store_count",new BigDecimal(0));
 						sellerProducts.set("price", sellerProduct.getPrice());
+						sellerProducts.setCost(sellerProduct.getCost());
+						sellerProducts.setMarketPrice(sellerProduct.getMarketPrice());
 						sellerProducts.set("is_enable", sellerProduct.getIsEnable());
 						sellerProducts.set("order_list", sellerProduct.getOrderList());
 						sellerProducts.set("create_date", new Date());
