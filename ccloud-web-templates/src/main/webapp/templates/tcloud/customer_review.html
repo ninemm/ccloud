@@ -26,13 +26,6 @@
 <#macro script>
     
     var $form = $("#form");
-    
-    $(function() {
-        
-        console.log("${(sellerCustomer.id)!}");
-		console.log("${(taskId)!}");
-
-    })
 
 	function doReject(){
 		layer.open({
@@ -161,7 +154,7 @@
 	                    </div>
 	                    <div class="weui-uploader__bd">
 	                        <ul class="weui-uploader__files" id="uploaderFiles">
-	                        <#if (sellerCustomer.imageList) ??> 
+	                        <#if (sellerCustomer.imageList) ??>
 	                        <#list sellerCustomer.imageList as bean>
 	                            <li class="weui-uploader__file" style="background-image: url(${bean.savePath})"></li>
 	                        </#list>
@@ -184,22 +177,6 @@
 	            </div>
 	        </div>
 	    </section>
-
-		<section class="weui-panel weui-panel_access">
-			<div class="weui-panel__hd">变更内容</div>
-			<div class="weui-panel__bd">
-				<div class="weui-media-box weui-media-box_text">
-					<!-- <h4 class="weui-media-box__title">标题一</h4> -->
-					<#if diffAttrList??>
-                    <#list diffAttrList as txt>
-                    <p class="weui-media-box__desc orange">
-                        ${txt!}
-                    </p>
-                    </#list>
-                    </#if>
-				</div>
-			</div>
-		</section>
 	</form>
 </main>
 <#include "_inc/_goback.html" />

@@ -251,4 +251,11 @@ public class SellerCustomerQuery extends JBaseQuery {
 		return DAO.find(sb.toString(), username);
 	}
 
+	public List<Record> findSubTypeByUserID(String dataArea) {
+		List<Object> param = new LinkedList<Object>();
+		StringBuilder sql = new StringBuilder("select DISTINCT(sub_type) ");
+		sql.append(" FROM cc_seller_customer ");
+		appendIfNotEmptyWithLike(sql, "data_area", dataArea, param, true );
+		return Db.find(sql.toString(), param);
+	}
 }

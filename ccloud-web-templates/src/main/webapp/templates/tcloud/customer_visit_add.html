@@ -155,10 +155,8 @@
 
         //删除图片  删除图片的代码也贴出来。
         $(".weui-gallery__del").click(function() { //这部分刚才放错地方了，放到$(function(){})外面去了
-            console.log('删除', index);
             $uploaderFiles.find("li").eq(index).remove();
             imageArr = imageArr.splice(index, 1);
-            console.log('image lenght = ', imageArr.length)
         });
 
     });
@@ -233,9 +231,6 @@
                 geoc.getLocation(point, function(rs) {
                     var addComp = rs.addressComponents;
                     var address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
-                    //console.log(address)
-                    //alert(address);
-                    //df.resolve();
                     $('#location-span').text(address);
                     $('#location').val(address);
                 });
@@ -257,7 +252,7 @@
 <div id="visit-add">
     <main>
         <form action="${CPATH}/customerVisit/save" method="post" id="form">
-            <section class="weui-panel weui-panel_access order-customer-info">
+            <section class="weui-panel weui-panel_access order-customer-info select-area">
                 <div class="weui-cell weui-cell_access">
                     <div class="weui-cell__bd">
                         <div class="order-customer-info-title">客户名称
