@@ -248,7 +248,8 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			}
 			//新建销售商时默认创建分组  角色  及中间表
  			List<Seller> sellers = SellerQuery.me().findByDeptId(department.getId());
-			if(sellers.size()==1){
+			
+			if(sellers.size()==1 ){
 				List<Group> groupList = GroupQuery.me().findByDeptId();
 				for (Group group : groupList) {
 					Group newGroup=new Group();
