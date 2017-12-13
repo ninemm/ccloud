@@ -351,11 +351,12 @@ public class UserController extends BaseFrontController{
 			}
 			for (Record inventory : inventoryList.getList()) {
 				inventoryHtml.append("<div class=\"product_detail\">");
-				inventoryHtml.append("<div class=\"inventory_name\">"+inventory.getStr("name")+"</div>");
+				inventoryHtml.append("<div class=\"inventory_name\" style=\"font-size: 0.7rem;\">"+inventory.getStr("name")+"</div>");
 				//期初期末结存 未定,暂时不做统计。
 				//inventoryHtml.append("<div class=\"weui-flex\"><div class=\"weui-flex__item\">期初结存：<span>"+inventory.getStr("in_count")+"</span></div><div class=\"weui-flex__item\">期末结存：<span>"+inventory.getStr("out_count")+"</span></div></div>");
-				inventoryHtml.append("<div class=\"weui-flex\"><div class=\"weui-flex__item\">出库：<span class=\"green-button\">"+inventory.getStr("in_count")+"</span></div><div class=\"weui-flex__item\">入库：<span class=\"yellow-button\">"+inventory.getStr("out_count")+"</span></div></div>");
-				inventoryHtml.append("<div class=\"weui-flex\"><div class=\"weui-flex__item\">库存：<span class=\"blue-button\">"+inventory.getStr("balance_count")+"</span></div><div class=\"weui-flex__item\">在途：<span>"+inventory.getStr("afloat_count")+"</span></div></div>");
+				inventoryHtml.append("<div class=\"weui-flex\" style=\"margin:0.1rem;\"><div class=\"weui-flex__item\">出库：<span class=\"green-button\">"+inventory.getStr("in_count")+"</span></div><div class=\"weui-flex__item\">入库：<span class=\"yellow-button\">"+inventory.getStr("out_count")+"</span></div></div>");
+				//暂时隐藏在途量 <div class=\"weui-flex__item\">在途：<span>"+inventory.getStr("afloat_count")+"</span></div>
+				inventoryHtml.append("<div class=\"weui-flex\" style=\"margin:0.1rem;\"><div class=\"weui-flex__item\">库存：<span class=\"blue-button\">"+inventory.getStr("balance_count")+"</span></div><div class=\"weui-flex__item\"></div></div>");
 				inventoryHtml.append("<div><i class=\"icon-map-pin blue ft16\"></i>&nbsp;&nbsp;"+inventory.getStr("seller_name")+"</div>");
 				inventoryHtml.append("</div>\n");
 			}
