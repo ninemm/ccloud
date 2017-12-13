@@ -20,6 +20,7 @@
 <#macro script>
 var ref_sn = '${ref_sn}';
 var bill_id = '${bill_id}';
+var ref_type = '${ref_type}';
 var userInfo = JSON.parse('${userInfo}');
 
 var $form = $("#form");
@@ -139,7 +140,7 @@ function getObjectClass(obj){
 	<div class="box box-default">
 		<form action="${CPATH}/admin/receivables/save" method="post" id="form" class="form-horizontal" >
 			<input type="hidden" name="bill_id" value="${bill_id}"/>
-			<input type="hidden" name="ref_tye" value="${ref_type}"/>
+			<input type="hidden" name="ref_type" value="${ref_type}"/>
 			<div class="box-body">
 				<div class="form-group col-sm-12 validata-box">
 					<label class="control-label col-sm-2">单号:</label>

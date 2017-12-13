@@ -47,6 +47,7 @@ public class ReceivablesQuery extends JBaseQuery {
 
 	public Page<Receivables> paginate(int pageNumber, int pageSize, String id,String type,String seller_id,String dataArea) {
 		
+		Boolean b = true;
 		String select;
 		StringBuilder fromBuilder;
 		
@@ -55,6 +56,7 @@ public class ReceivablesQuery extends JBaseQuery {
 			fromBuilder = new StringBuilder(" FROM `cc_receivables` AS r INNER JOIN `cc_customer_join_customer_type` AS ct ON r.object_id=ct.seller_customer_id LEFT JOIN `cc_seller_customer` AS sc ON sc.id=ct.seller_customer_id LEFT JOIN `cc_customer` AS c ON c.id=sc.customer_id ");
 			if(!("0".equals(id)) && id != null){
 				fromBuilder.append(" WHERE ct.customer_type_id = '"+ id+"'");
+				b = false;
 			}
 			
 		}else {
@@ -62,10 +64,11 @@ public class ReceivablesQuery extends JBaseQuery {
 			fromBuilder = new StringBuilder(" FROM `cc_receivables` AS r INNER JOIN `cc_supplier` AS s on r.object_id=s.id ");
 			if(!"0".equals(id)){
 				fromBuilder.append("WHERE s.id = '"+ id+"'");
+				b = false;
 			}
 		}
 		LinkedList<Object> params = new LinkedList<Object>();
-		appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, true);
+		appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, b);
 		fromBuilder.append(" ORDER BY r.create_date DESC");
 		
 		
