@@ -5211,8 +5211,8 @@ var selectList = [];
               firstDayOfMonthIndex = new Date(date.getFullYear(), date.getMonth()).getDay();
           if (firstDayOfMonthIndex === 0) firstDayOfMonthIndex = 7;
           
-          var max = new Date(typeof params.maxDate === "function" ? params.maxDate() : params.maxDate);
-          var min = new Date(typeof params.minDate === "function" ? params.minDate() : params.minDate);
+          var max = params.maxDate?new Date(typeof params.maxDate === "function" ? params.maxDate() : params.maxDate):null;
+          var min = params.minDate?new Date(typeof params.minDate === "function" ? params.minDate() : params.minDate):null;
           var dayDate, currentValues = [], i, j,
               rows = 6, cols = 7,
               monthHTML = '',
@@ -5352,7 +5352,7 @@ var selectList = [];
           var nextDate = new Date(nextYear, nextMonth);
           var nextDateTime = nextDate.getTime();
           var transitionEndCallback = p.animating ? false : true;
-          var maxDate = new Date(typeof p.params.maxDate === "function" ? p.params.maxDate() : p.params.maxDate);
+          var maxDate = params.maxDate?new Date(typeof p.params.maxDate === "function" ? p.params.maxDate() : p.params.maxDate):null;
           if (maxDate) {
               if (nextDateTime > new Date(maxDate).getTime()) {
                   return p.resetMonth();
@@ -5392,7 +5392,7 @@ var selectList = [];
           var prevDate = new Date(prevYear, prevMonth + 1, -1);
           var prevDateTime = prevDate.getTime();
           var transitionEndCallback = p.animating ? false : true;
-          var minDate = new Date(typeof p.params.minDate === "function" ? p.params.minDate() : p.params.minDate);
+          var minDate = params.minDate?new Date(typeof p.params.minDate === "function" ? p.params.minDate() : p.params.minDate):null;
           if (minDate) {
               if (prevDateTime < new Date(minDate).getTime()) {
                   return p.resetMonth();
@@ -5440,11 +5440,11 @@ var selectList = [];
           else {
               targetDate = new Date(year, month).getTime();
           }
-          var maxDate = new Date(typeof p.params.maxDate === "function" ? p.params.maxDate() : p.params.maxDate);
+          var maxDate = params.maxDate?new Date(typeof p.params.maxDate === "function" ? p.params.maxDate() : p.params.maxDate):null;
           if (maxDate && targetDate > new Date(maxDate).getTime()) {
               return false;
           }
-          var minDate = new Date(typeof p.params.minDate === "function" ? p.params.minDate() : p.params.minDate);
+          var minDate = params.minDate?new Date(typeof p.params.minDate === "function" ? p.params.minDate() : p.params.minDate):null;
           if (minDate && targetDate < new Date(minDate).getTime()) {
               return false;
           }

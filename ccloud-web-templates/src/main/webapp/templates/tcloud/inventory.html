@@ -177,22 +177,24 @@
     </header>
 
     <article  class="inventory">
-        <header class="has-th-list">
-            <div class="head-search" style="width:90%;float:left;">
-                <div>
+        <header class="has-th-list weui-flex">
+            <div class="head-search select-area weui-flex__item">
+                <div class="weui-flex">
+                    <div class="weui-flex__item">
                     <input type="text" id="region" placeholder="客户区域" class="weui-input" readonly>
                     <i class="icon-sort-desc"></i>
                 </div>
-                <div>
+                <div class="weui-flex__item">
                     <input type="text" id="product-type" placeholder="产品类型" class="weui-input" readonly>
                     <i class="icon-sort-desc"></i>
                 </div>
-                <div>
+                <div class="weui-flex__item">
                     <input type="text" id="if-order" placeholder="是否下单" class="weui-input" readonly>
                     <i class="icon-sort-desc"></i>
                 </div>
+                </div>
             </div>
-            <div style="float:right;margin-top:0.45rem;margin-right:0.2rem;width:5%;">
+            <div id="combin-filter-btn">
                 <i class="icon-th-list"></i>
             </div>
         </header>
