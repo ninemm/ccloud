@@ -19,8 +19,10 @@ import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.core.addon.HookInvoker;
 import org.ccloud.core.cache.ActionCache;
+import org.ccloud.model.Dict;
 import org.ccloud.model.Message;
 import org.ccloud.model.User;
+import org.ccloud.model.query.DictQuery;
 import org.ccloud.model.query.MessageQuery;
 import org.ccloud.model.query.OptionQuery;
 import org.ccloud.route.RouterMapping;
@@ -54,17 +56,19 @@ public class IndexController extends BaseFrontController {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		if (user != null) {
-			//Dict dict = DictQuery.me().findByKey("message_type", "order");
-			Page<Message> orderPage = MessageQuery.me().paginate(getPageNumber(), 5, sellerId, null, null, user.getId(), null);
+			Dict order = DictQuery.me().findByKey("message_type", "order");
+			Page<Message> orderPage = MessageQuery.me().paginate(getPageNumber(), 5, sellerId, order.getValue(), null, user.getId(), null);
 			setAttr("orderPage", orderPage);
+			
+			Dict customer = DictQuery.me().findByKey("message_type", "customer");
+			Page<Message> customerPage = MessageQuery.me().paginate(getPageNumber(), 5, sellerId, customer.getValue(), null, user.getId(), null);
+			setAttr("customerPage", customerPage);
+			
+			Dict customerVisit = DictQuery.me().findByKey("message_type", "customer_visit");
+			Page<Message> customerVisitPage = MessageQuery.me().paginate(getPageNumber(), 5, sellerId, customerVisit.getValue(), null, user.getId(), null);
+			setAttr("customerVisitPage", customerVisitPage);
 		}
-//		Dict customer = DictQuery.me().findByKey("message_type", "customer");
-//		Page<Message> customerPage = MessageQuery.me().paginate(getPageNumber(), 5, sellerId, customer.getValue(), null, user.getId(), null);
-//		setAttr("customerPage", customerPage);
-//		
-//		Dict customerVisit = DictQuery.me().findByKey("message_type", "customer_visit");
-//		Page<Message> customerVisitPage = MessageQuery.me().paginate(getPageNumber(), 5, sellerId, customerVisit.getValue(), null, user.getId(), null);
-//		setAttr("customerVisitPage", customerVisitPage);
+
 		
 		if (StrKit.isBlank(para)) {
 			render("index.html");

@@ -511,7 +511,6 @@ a {
 
 .index-info {
   background: #fff;
-  min-height: 5rem;
 }
 
 .index-info .weui-cells {
@@ -583,7 +582,7 @@ a {
 
 .menu-left {
   width: 22.222222%;
-  background: #f7f7f7;
+  background: #fcfcfc;
 }
 
 .menu-left li {
@@ -624,8 +623,8 @@ a {
 .product_detail {
   background: #fff;
   margin-top: 10px;
-  padding: 0 0.7rem 0.5rem;
-  font-size: 0.6rem;
+  padding: .5rem .7rem;
+  font-size: .7rem;
   position: relative;
 }
 
