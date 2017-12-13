@@ -538,6 +538,18 @@
            memoryStoreEvictionPolicy="LFU"
            transactionalMode="off"
     />
+    
+    <cache name="_wechat_jssdk"
+           maxEntriesLocalHeap="10000"
+           eternal="false"
+           overflowToDisk="true"
+           timeToIdleSeconds="300"
+           timeToLiveSeconds="300"
+           memoryStoreEvictionPolicy="LFU"
+           transactionalMode="off"
+    />
+    
+    
 	
 
 </ehcache>

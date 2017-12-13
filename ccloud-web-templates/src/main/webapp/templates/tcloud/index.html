@@ -1,7 +1,18 @@
-<#include "_inc/_layout.html"/> <#macro css> </#macro> <#macro script>
-$(function() { }); </#macro> <@layout>
+<#include "_inc/_layout.html"/> <#macro css> </#macro> 
+<#macro script>
+$(function () {
+    $(document).on('touchend', '.menu', function () {
+      var $this = $(this);
+      var index = $this.index()-1;
+      $this.addClass('blue-button').siblings().removeClass('blue-button');
+      $('.index-info').find('.weui-cells:eq(' + index + ')').show().siblings().hide();
+      return false;
+    })
+})
+</#macro> <@layout>
 <div class="weui-content">
 	<article id="home">
+		<div class="company">启光商贸</div>
 		<div>
 			<div class="weui-cells__title">
 				<div class="weui-flex">
@@ -15,14 +26,14 @@ $(function() { }); </#macro> <@layout>
 				</div>
 			</div>
 			<div class="weui-grids">
-				<a href="./product.html" class="weui-grid js_grid">
+				<a href="${CPATH}/product/index" class="weui-grid js_grid">
                     <!-- <span class="weui-badge empty-badge">&nbsp;</span> -->
 					<div class="weui-grid__icon">
 						<i class="icon-file-text blue"></i>
 					</div>
 					<p class="weui-grid__label">下订单</p>
 				</a>
-                <a href="visitAdd.html" class="weui-grid js_grid">
+                <a href="${CPATH}/customerVisit/edit" class="weui-grid js_grid">
 					<div class="weui-grid__icon">
 						<i class="icon-plane" style="color: #ffa042"></i>
 					</div>
@@ -34,8 +45,8 @@ $(function() { }); </#macro> <@layout>
 					</div>
 					<p class="weui-grid__label">活动申请</p>
 				</a> -->
-                <a href="customerAdd.html" class="weui-grid js_grid"> <span
-					class="weui-badge left-top-tag">NEW</span>
+                <a href="${CPATH}/customer/edit" class="weui-grid js_grid">
+                    <span class="weui-badge left-top-tag">NEW</span>
 					<div class="weui-grid__icon">
 						<i class="icon-user-plus" style="color: #f1745e"></i>
 					</div>
@@ -48,7 +59,7 @@ $(function() { }); </#macro> <@layout>
 				<b>我的待办</b>
 			</div>
 			<div class="weui-grids">
-			    <a href="" class="weui-grid js_grid">
+			    <a href="${CPATH}/order/myOrder" class="weui-grid js_grid">
 			        <span class="weui-badge empty-badge">&nbsp;</span>
                     <div class="weui-grid__icon">
                         <i class="icon-file-text" style="color: #19c594;"></i>
@@ -78,55 +89,41 @@ $(function() { }); </#macro> <@layout>
 			</div>
 		</div>
 		<div>
-			<a class="weui-cells__title weui-cell_access weui-cell"
-				href="./informationList.html">
+			<div class="weui-cells__title weui-cell_access weui-cell index-info-tab" >
 				<div class="weui-cell__bd">
-					业务消息
-					<p class="menu">订单</p>
+					<b style="color:#ff9800">业务消息</b>
+					<p class="menu blue-button">订单</p>
 					<p class="menu">客户</p>
 					<p class="menu">费用</p>
-				</div> <span class="weui-cell__ft"></span>
-			</a>
-			<div class="weui-cells">
-				<div class="weui-cell">
-					<div class="weui-cell__bd">
-						<span>[小张烤鱼]</span>
-					</div>
-					<div class="check-pass">审核通过</div>
-					<div class="weui-cell__ft">2017-10-15 12:00</div>
 				</div>
-				<div class="weui-cell">
-					<div class="weui-cell__bd">
-						<p>[张妈妈副食]</p>
-					</div>
-					<div class="check-pass">审核通过</div>
-					<div class="weui-cell__ft">2017-10-15 12:13</div>
+				<a class="weui-cell__ft" href="${CPATH}/message"></a>
+			</div>
+			<div class="index-info">
+				<div class="weui-cells">
+					<#if orderPage ??><#list orderPage.list as bean>
+						<div class="weui-cell">
+							<div class="weui-cell__bd">
+								<span>${(bean.title)!}</span>
+							</div>
+							<div class="check-pass">${DICT_NAME('${bean.type}')}</div>
+							<div class="weui-cell__ft">${(bean.createDate?string('yyyy-MM-dd HH:mm'))!}</div>
+						</div>
+					</#list> </#if>
 				</div>
-				<div class="weui-cell">
-					<div class="weui-cell__bd">
-						<p>[咏梅副食]</p>
-					</div>
-					<div class="check-refuse">审核拒绝</div>
-					<div class="weui-cell__ft">2017-10-15 12:22</div>
-				</div>
-				<div class="weui-cell">
-					<div class="weui-cell__bd">
-						<p>[武大烟酒副食]</p>
-					</div>
-					<div class="check-refuse">审核拒绝</div>
-					<div class="weui-cell__ft">2017-10-15 12:22</div>
-				</div>
+				<div class="weui-cells none"></div>
+				<div class="weui-cells none"></div>				
 			</div>
 		</div>
-		<footer class="weui-footer weui-footer_fixed-bottom ft12">
-			<div>
-				<i class="icon-map-pin"></i>&nbsp; 湖北省武汉市洪山区汉街2406
-			</div>
-			<div class="blue">
-				智能营销&nbsp; <i class="icon-angle-right"></i>
-			</div>
-		</footer>
 	</article> 
+	<footer class="ft12 index-footer">
+		<div class="fl">
+		  <i class="icon-map-pin"></i>&nbsp; 湖北省武汉市洪山区汉街2406
+		</div>
+		<div class="blue fr">
+		  智能营销&nbsp;
+		  <i class="icon-angle-right"></i>
+		</div>
+	</footer>
 	<#include "_inc/_footer_nav.html" />
 </div>
 </@layout>

@@ -119,13 +119,15 @@ public class ProductCompositionQuery extends JBaseQuery {
 		return DAO.doDelete("parent_id = ? ", id);
 	}
 
-	public List<Record> findProductBySeller(String sellerId) {
+	public List<Record> findProductBySeller(String sellerId, String keyword) {
 		StringBuilder fromBuilder = new StringBuilder("SELECT sp.parent_id as id, sp.name, sp.price ");
 		fromBuilder.append("FROM cc_product_composition sp ");
-		fromBuilder.append("LEFT JOIN cc_seller_product cs ON cs.id = sp.seller_product_id ");
+		fromBuilder.append("JOIN cc_seller_product cs ON cs.id = sp.seller_product_id ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
-		appendIfNotEmpty(fromBuilder, "cs.seller_id", sellerId, params, true);
+		boolean needWhere = true;
+		needWhere = appendIfNotEmpty(fromBuilder, "cs.seller_id", sellerId, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "sp.name", keyword, params, needWhere);
 
 		fromBuilder.append(" GROUP BY sp.parent_id");
 

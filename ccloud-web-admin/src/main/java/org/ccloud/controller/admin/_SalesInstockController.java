@@ -71,8 +71,8 @@ public class _SalesInstockController extends JBaseCRUDController<SalesOrder> {
 
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
-
-		Page<Record> page = SalesRefundInstockQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate, "1");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		Page<Record> page = SalesRefundInstockQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate, "1",user.getId());
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);

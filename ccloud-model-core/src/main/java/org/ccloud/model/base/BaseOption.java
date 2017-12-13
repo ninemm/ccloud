@@ -120,5 +120,13 @@ public abstract class BaseOption<M extends BaseOption<M>> extends JModel<M> impl
 	public java.lang.String getOptionValue() {
 		return get("option_value");
 	}
+	
+	public void setSellerId(java.lang.String sellerId) {
+		set("seller_id", sellerId);
+	}
+
+	public java.lang.String getSellerId() {
+		return get("seller_id");
+	}	
 
 }

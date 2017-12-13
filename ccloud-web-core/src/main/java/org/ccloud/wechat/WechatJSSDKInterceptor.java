@@ -10,15 +10,15 @@ import com.jfinal.core.Controller;
 import com.jfinal.kit.HashKit;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.ehcache.CacheKit;
-import com.jfinal.qyweixin.sdk.api.ApiConfigKit;
-import com.jfinal.qyweixin.sdk.api.JsTicket;
-import com.jfinal.qyweixin.sdk.api.JsTicketApi;
-import com.jfinal.qyweixin.sdk.api.JsTicketApi.JsApiType;
+import com.jfinal.weixin.sdk.api.ApiConfigKit;
+import com.jfinal.weixin.sdk.api.JsTicket;
+import com.jfinal.weixin.sdk.api.JsTicketApi;
+import com.jfinal.weixin.sdk.api.JsTicketApi.JsApiType;
 
 public class WechatJSSDKInterceptor implements Interceptor {
 
-	private static final String CACHE_NAME = "_CC_JSSDK";
-	private static final String CACHE_KEY = "_CC_JSAPI_TICKET";
+	private static final String CACHE_NAME = "_wechat_jssdk";
+	private static final String CACHE_KEY = "_wechat_jsapi_ticket";
 	
 	@Override
 	public void intercept(Invocation inv) {
@@ -60,12 +60,14 @@ public class WechatJSSDKInterceptor implements Interceptor {
 		// System.out.println("nonceStr " + nonce_str + " timestamp " + timestamp);
 		// System.out.println(" jsapi_ticket " + jsapi_ticket);
 		// System.out.println("nonce_str " + nonce_str);
-		controller.setAttr("appId", ApiConfigKit.getApiConfig().getCorpId());
+		controller.setAttr("appId", ApiConfigKit.getApiConfig().getAppId());
 		controller.setAttr("nonceStr", nonce_str);
 		controller.setAttr("timestamp", timestamp);
 		controller.setAttr("url", url);
 		controller.setAttr("signature", signature);
 		controller.setAttr("jsapi_ticket", jsapi_ticket);
+		
+		inv.invoke();
 	}
 	
 	private static String create_timestamp() {

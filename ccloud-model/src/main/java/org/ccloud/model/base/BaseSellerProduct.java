@@ -233,5 +233,13 @@ public abstract class BaseSellerProduct<M extends BaseSellerProduct<M>> extends 
 	public java.util.Date getModifyDate() {
 		return get("modify_date");
 	}
+	
+	public void setIsGift(java.lang.Integer isGift) {
+		set("is_gift", isGift);
+	}
+
+	public java.lang.Integer getIsGift() {
+		return getInt("is_gift");
+	}		
 
 }

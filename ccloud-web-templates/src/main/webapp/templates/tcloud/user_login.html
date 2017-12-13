@@ -13,12 +13,53 @@
 	<link rel="stylesheet" href="${CTPATH}/css/icomoon.css">
 	<link rel="stylesheet" href="${CTPATH}/css/unlock.css">
     <title>用户登录</title>
+    <style>
+    .input-area>div, input {
+        background: inherit;
+    }
+
+    input {
+        position: relative;
+        left: 0;
+        padding-left: 1.5rem;
+    }
+
+    #bind {
+        color: #fff;
+        border-radius: 4px;
+    }
+
+    .input-area i {
+        height: 2rem;
+        line-height: 2rem;
+        font-size: 1rem;
+        position: absolute;
+        left: 0;
+        bottom: 0;
+    }
+
+    #phone, #code {
+        width: 100%;
+    }
+
+    .input-area {
+        color: #afb8c1;
+    }
+
+    header {
+        text-align: center;
+        padding-top: 25%;
+        height: 25%;
+        font-family: '宋体';
+        color: #35b8f0;
+    }
+    </style>
 </head>
 
 <body>
 	<header>
-		<h3><center>协同云平台</center></h3>
-		<h4><center>用户登录</center></h4>
+		<h1>协同云平台</h1>
+        <h3>用户登录</h3>
 	</header>
 	<form action="${CPATH}/user/login" method="post" id="form">
 		<main>

@@ -63,8 +63,8 @@ import com.jfinal.plugin.activerecord.Model;
 import com.jfinal.plugin.cron4j.Cron4jPlugin;
 import com.jfinal.plugin.druid.DruidPlugin;
 import com.jfinal.plugin.ehcache.EhCachePlugin;
-import com.jfinal.weixin.sdk.api.ApiConfigKit;
 import com.jfinal.render.ViewType;
+import com.jfinal.weixin.sdk.api.ApiConfigKit;
 import com.mysql.jdbc.AbandonedConnectionCleanupThread;
 
 import net.sf.ehcache.CacheManager;

@@ -16,6 +16,8 @@
 package org.ccloud.model.query;
 
 import java.util.LinkedList;
+
+import org.ccloud.Consts;
 import org.ccloud.model.Receivables;
 
 import com.jfinal.plugin.activerecord.Db;
@@ -94,5 +96,10 @@ public class ReceivablesQuery extends JBaseQuery {
 	public Receivables findByObjId(String objId,String deptId) {
 		String select = "select * from `cc_receivables` where obj_id= '"+objId+"' and dept_id= '"+deptId+"' ";
 		return DAO.findFirst(select);
+	}
+
+	public Receivables findByCustomerId(String customeId) {
+		String receivableType = Consts.RECEIVABLES_OBJECT_TYPE_CUSTOMER; 
+		return DAO.doFindFirst("object_id = ? and object_type = ?", customeId, receivableType);
 	}
 }

@@ -101,27 +101,10 @@
 			</div>
 		</div>
 		<footer class="weui-footer weui-footer_fixed-bottom ft16">
-			<button class="gray-button width-50 cancel-search-btn">取消</button>
+			<button class="white-button width-50 cancel-search-btn">取消</button>
 			<button class="blue-button width-50 confirm-search-btn" onclick="getDateOrder()">确定</button>
 		</footer>
 	</article>
-	<div class="hidden-menu">
-		<ul>
-			<li>
-				<a href="${CPATH}/index">
-					首页
-					<i class="icon-home blue"></i>
-				</a>
-			</li>
-			<li>
-				<a class="goback">
-					上一页
-					<i class="icon-undo green"></i>
-				</a>
-			</li>
-		</ul>
-		<i class="icon-menu-open orange fr" id="button"></i>
-	</div>
-	<div class="layer"></div>
+	<#include "_inc/_goback.html" />
 </body>
 </@layout>

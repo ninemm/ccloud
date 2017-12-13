@@ -186,28 +186,29 @@
 	</header>
 	<main>
 		<div id="main">
-			<div class="weui-panel weui-panel_access">
+			<div class="weui-panel weui-panel_access" style="display: none">
 				<a href="" id="salesOrderId">
-				<div class="ft14 gray">
-					<span class="tag" id="receiveType">账期</span>
-					<span id="orderSn">DH-O-20171017-002276</span>
-					<span class="fr blue" id="status">订单待审核</span>
-				</div>
-				<div id="customerName">
-					 小张烤鱼
-				</div>
-				<div class="gray">
-					<p>
-						联系人：<span id="contact">小张/18611111111</span>
-						<span class="fr" id="customerType">终端客户</span>
-					</p>
-				</div>
-				<div class="gray">
-					<p>
-						金额：￥<span id="amount">200</span>
-						<span class="fr" id="date">时间： 2017-10-17 06:03:04</span>
-					</p>
-				</div>
+					<div class="ft14 gray">
+						<span class="tag" id="receiveType">账期</span>
+						<span id="orderSn">DH-O-20171017-002276</span>
+						<span class="fr blue" id="status">订单待审核</span>
+					</div>
+					<div id="customerName">
+						 小张烤鱼
+					</div>
+					<div class="gray">
+						<p>
+							联系人：<span id="contact">小张/18611111111</span>
+							<span class="fr" id="customerType">终端客户</span>
+						</p>
+					</div>
+					<div class="gray">
+						<p>
+							金额：￥<span id="amount">200</span>
+							<span class="fr" id="date">时间： 2017-10-17 06:03:04</span>
+						</p>
+					</div>
+				</a>
 				<hr>
 				<div class="button blue-button fl">撤销</div>
 				<div class="button white-button fr">再次购买</div>
@@ -232,27 +233,10 @@
 			</div>
 		</div>
 		<footer class="weui-footer weui-footer_fixed-bottom ft16">
-			<button class="gray-button width-50 cancel-search-btn">取消</button>
+			<button class="white-button width-50 cancel-search-btn">取消</button>
 			<button class="blue-button width-50 confirm-search-btn" onclick="getDateOrder()">确定</button>
 		</footer>
 	</article>
-	<div class="hidden-menu">
-		<ul>
-			<li>
-				<a href="${CPATH}/index">
-					首页
-					<i class="icon-home blue"></i>
-				</a>
-			</li>
-			<li>
-				<a class="goback">
-					上一页
-					<i class="icon-undo green"></i>
-				</a>
-			</li>
-		</ul>
-		<i class="icon-menu-open orange fr" id="button"></i>
-	</div>
-	<div class="layer"></div>
+	<#include "_inc/_goback.html" />
 </body>
 </@layout>

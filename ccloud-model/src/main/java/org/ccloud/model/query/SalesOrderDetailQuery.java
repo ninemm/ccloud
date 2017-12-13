@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.ccloud.Consts;
 import org.ccloud.model.SalesOrderDetail;
 import org.ccloud.model.SellerProduct;
 import org.ccloud.utils.StringUtils;
@@ -78,7 +79,8 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		}
 		for (Map<String, String> map : list) {
 			SalesOrderDetail detail = new SalesOrderDetail();
-			detail.setProductCount(Integer.parseInt(map.get("productCount").toString()));
+			BigDecimal count = new BigDecimal(map.get("productCount"));
+			detail.setProductCount(count.intValue());
 			detail.setLeftCount(detail.getProductCount());
 			detail.setOutCount(0);
 			// 库存盘点写入库存总账未完成
@@ -115,7 +117,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 	private Map<String, Object> getWarehouseId(String productId, String sellerId, Integer productCount, Integer convert) {
 		Map<String, Object> result = new HashMap<>();
 		List<Map<String, String>> countList = new ArrayList<>();
-		boolean isCheckStore = true;
+		boolean isCheckStore = OptionQuery.me().findStoreCheck(Consts.OPTION_SELLER_STORE_CHECK, sellerId);
 
 		List<Record> list = InventoryQuery.me().findProductStore(sellerId, productId);
 		if (list.size() == 0) {
@@ -279,6 +281,55 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		}
 		return true;
 	}
+	
+	@SuppressWarnings("unchecked")
+	public boolean insertForAppComposition(SellerProduct product, String orderId, String sellerId, String id,
+			Date date, String deptId, String dataArea, Integer number) {
+		List<SalesOrderDetail> detailList = new ArrayList<>();
+		Integer convert = product.getInt("convert_relate");
+		Integer compositionCount = Integer.parseInt(product.getStr("productCount"));
+		Integer productCount = compositionCount * convert * number;
+		String productId = product.getProductId();
+		Map<String, Object> result = this.getWarehouseId(productId, sellerId, productCount, convert);
+		String status = result.get("status").toString();
+		List<Map<String, String>> list = (List<Map<String, String>>) result.get("countList");
+		
+		if (!status.equals("enough")) {
+			return false;
+		}
+		for (Map<String, String> map : list) {
+			SalesOrderDetail detail = new SalesOrderDetail();
+			detail.setProductCount(Integer.parseInt(map.get("productCount").toString()));
+			detail.setLeftCount(detail.getProductCount());
+			detail.setOutCount(0);
+	
+			detail.setWarehouseId(map.get("warehouse_id").toString());
+			
+			detail.setId(StrKit.getRandomUUID());
+			detail.setOrderId(orderId);
+			detail.setSellProductId(product.getId());
+
+			detail.setProductPrice(product.getPrice());
+			BigDecimal productAmount = new BigDecimal(detail.getProductCount()).divide(new BigDecimal(convert), 2, BigDecimal.ROUND_HALF_UP)
+					.multiply(product.getPrice());
+			detail.setProductAmount(productAmount);
+			detail.setIsGift(product.getInt("is_gift"));
+			detail.setIsComposite(1);
+			detail.setCreateDate(date);
+			detail.setDeptId(deptId);
+			detail.setDataArea(dataArea);	
+			detailList.add(detail);
+		}
+		int[] i = Db.batchSave(detailList, detailList.size());
+		int count = 0;
+		for (int j : i) {
+			count = count + j;
+		}
+		if (count != detailList.size()) {
+			return false;
+		}
+		return true;
+	}
 
 
 	public SalesOrderDetail findById(final String id) {
@@ -316,7 +367,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 
 	@SuppressWarnings("unchecked")
 	public boolean insertDetailByComposition(SellerProduct product, String orderId, String sellerId, String id,
-			Date date, String deptId, String dataArea, Integer index, Integer isGift, Integer number) {
+			Date date, String deptId, String dataArea, Integer index, Integer number) {
 		List<SalesOrderDetail> detailList = new ArrayList<>();
 		Integer convert = product.getInt("convert_relate");
 		Integer compositionCount = Integer.parseInt(product.getStr("productCount"));
@@ -346,7 +397,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 					.multiply(product.getPrice());
 //			BigDecimal amount = new BigDecimal(product.getInt("productCount")).multiply(product.getPrice());
 			detail.setProductAmount(productAmount);
-			detail.setIsGift(isGift);
+			detail.setIsGift(product.getIsGift());
 			detail.setIsComposite(1);
 			detail.setCreateDate(date);
 			detail.setDeptId(deptId);
