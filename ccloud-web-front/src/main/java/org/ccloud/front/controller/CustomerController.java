@@ -139,9 +139,13 @@ public class CustomerController extends BaseFrontController {
 			html.append("		</div>\n");
 			html.append("	</div>\n");
 			html.append("	<hr />\n");
-			html.append("	<div class=\"operate-bt\">\n");
-			html.append("		<div class=\"button blue-button fl\" href=\"/product\">下订单</div>\n");
-			html.append("		<div class=\"button blue-button fr\" hred=\"/visitAdd\">客户拜访</div>\n");
+			html.append("	<div class=\"operate-btn\">\n");
+			html.append("		<div class=\"button white-button fl\" href=\"/visitAdd\">客户拜访</div>\n");
+			html.append("		<div class=\"button blue-button fr\" href=\"/product\" onclick=\"newOrder({customerName:'" + customer.getStr("customer_name") + "',\n" +
+					"                                                                                            sellerCustomerId:'" + customer.getStr("sellerCustomerId") + "',\n" +
+					"                                                                                            contact:'" + customer.getStr("contact") + "',\n" +
+					"                                                                                            mobile:'" + customer.getStr("mobile") + "',\n" +
+					"                                                                                            address:'" + customer.getStr("address") + "'})\" >下订单</div>\n");
 			html.append("	</div>\n");
 			html.append("	<p class=\"gray\">\n");
 			html.append("		<span class=\"icon-map-marker ft16 green\"></span>\n");
