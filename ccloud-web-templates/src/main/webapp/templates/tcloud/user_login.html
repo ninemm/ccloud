@@ -14,14 +14,11 @@
 	<link rel="stylesheet" href="${CTPATH}/css/unlock.css">
     <title>用户登录</title>
     <style>
-    .input-area>div, input {
-        background: inherit;
-    }
 
     input {
         position: relative;
         left: 0;
-        padding-left: 1.5rem;
+        margin-left: 1.5rem;
     }
 
     #bind {
@@ -56,34 +53,39 @@
 	
 	#login {
 		max-width: 600px;
+		margin: 0 auto;
+	}
+
+	input:-webkit-autofill { 
+		box-shadow: 0 0 0px 1000px white inset !important;
 	}
     </style>
 </head>
 
 <body>
 	<div id="login">
-		<header>
-			<h1>协同云平台</h1>
-			<h3>用户登录</h3>
-		</header>
-		<form action="${CPATH}/user/login" method="post" id="form">
-			<main>
-				<div class="input-area">
-					<div>
-						<i class="icon-mobile"></i>
-						<input type="text" name="username" id="phone" maxlength="11" placeholder="用户名">
-						<i class="icon-times-circle"></i>
-						<!-- <div id="get-code">获取验证码</div> -->
-					</div>
-					<div>
-						<i class="icon-lock"></i>
-						<input type="password" name="password" id="code" placeholder="密码" maxlength="8">
-						<i class="icon-times-circle"></i>
-					</div>
+	<header>
+		<h1>协同云平台</h1>
+        <h3>用户登录</h3>
+	</header>
+	<form action="${CPATH}/user/login" method="post" id="form">
+		<main>
+			<div class="input-area">
+				<div>
+					<i class="icon-mobile"></i>
+					<input type="text" name="username" id="phone" maxlength="11" placeholder="用户名">
+					<i class="icon-times-circle"></i>
+					<!-- <div id="get-code">获取验证码</div> -->
 				</div>
-				<button id="bind">登录</button>
-			</main>
-		</form>
+				<div>
+					<i class="icon-lock"></i>
+					<input type="password" name="password" id="code" placeholder="密码" maxlength="8">
+					<i class="icon-times-circle"></i>
+				</div>
+			</div>
+			<button id="bind">登录</button>
+		</main>
+	</form>
 	</div>
 </body>
 <script src="${CTPATH}/js/jquery-3.2.1.min.js"></script>
