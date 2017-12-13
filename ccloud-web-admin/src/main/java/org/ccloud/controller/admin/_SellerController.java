@@ -161,6 +161,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			}*/
 			List<Seller> list = SellerQuery.me().findAll();
 			int s = list.size();
+			s++;
 			String j=Integer.toString(s);
 			String w = "1";
 			int countt =j.length();
@@ -217,6 +218,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			
 			if(!user.getUsername().equals("admin")){
 				String customerId = StrKit.getRandomUUID();
+				//添加客户
 				customer.set("id", customerId);
 				customer.set("customer_code", getPara("seller_code"));
 				customer.set("customer_name", getPara("seller_name"));
@@ -228,6 +230,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				customer.set("status", 0);
 				customer.save();
 				
+				//添加直营商客户
 				String sellerCustomerId = StrKit.getRandomUUID();
 				sellerCustomer.set("id", sellerCustomerId);
 				sellerCustomer.set("seller_id",getSessionAttr("sellerId").toString());
@@ -244,84 +247,96 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				sellerCustomer.set("create_date", new Date());
 				sellerCustomer.save();
 				
+				//添加用户客户中间表
 				userJoinCustomer.set("seller_customer_id", sellerCustomerId);
 				userJoinCustomer.set("user_id", user.getId());
 				userJoinCustomer.set("data_area",department.getDataArea());
 				userJoinCustomer.set("dept_id", department.getId());
 				userJoinCustomer.save();
 				
-				String name = "直营商";
-				CustomerType customerType = CustomerTypeQuery.me().findDataAreaAndName(DataAreaUtil.getUserDeptDataArea(user.getDataArea()),name);
-				CustomerJoinCustomerType customerJoinCustomerType = new CustomerJoinCustomerType();
-				customerJoinCustomerType.setSellerCustomerId(sellerCustomerId);
-				customerJoinCustomerType.setCustomerTypeId(customerType.getId());
-				customerJoinCustomerType.save();
+				String code = "G";
+				CustomerType customerType = CustomerTypeQuery.me().findDataAreaAndName(DataAreaUtil.getUserDeptDataArea(user.getDataArea()),code);
+				if(customerType!=null){
+					CustomerJoinCustomerType customerJoinCustomerType = new CustomerJoinCustomerType();
+					customerJoinCustomerType.setSellerCustomerId(sellerCustomerId);
+					customerJoinCustomerType.setCustomerTypeId(customerType.getId());
+					customerJoinCustomerType.save();
+				}
 			}
 			//新建销售商时默认创建分组  角色  及中间表 客户类型
  			List<Seller> sellers = SellerQuery.me().findByDeptId(department.getId());
 			
 			if(sellers.size()==1 ){
 				List<Group> groupList = GroupQuery.me().findByDeptId();
-				for (Group group : groupList) {
-					Group newGroup=new Group();
-					String groupId = StrKit.getRandomUUID();
-					newGroup.setId(groupId);
-					newGroup.setGroupName(group.getGroupName());
-					newGroup.setGroupCode(group.getGroupCode());
-					newGroup.setOrderList(group.getOrderList());
-					newGroup.setDescription(group.getDescription());
-					newGroup.set("dept_id", department.getId());
-					newGroup.set("data_area", department.getDataArea());
-					newGroup.setCreateDate(new Date());
-					newGroup.save();
+				if(groupList.size()>0){
+					for (Group group : groupList) {
+						Group newGroup=new Group();
+						String groupId = StrKit.getRandomUUID();
+						newGroup.setId(groupId);
+						newGroup.setGroupName(group.getGroupName());
+						newGroup.setGroupCode(group.getGroupCode());
+						newGroup.setOrderList(group.getOrderList());
+						newGroup.setDescription(group.getDescription());
+						newGroup.set("dept_id", department.getId());
+						newGroup.set("data_area", department.getDataArea());
+						newGroup.setCreateDate(new Date());
+						newGroup.save();
+					}
 				}
 				List<Role> roleList = RoleQuery.me().findByDeptId();
-				for (Role role : roleList) {
-					Role newRole = new Role();
-					String roleId = StrKit.getRandomUUID();
-					newRole.setId(roleId);
-					newRole.setRoleName(role.getRoleName());
-					newRole.setRoleCode(role.getRoleCode());
-					newRole.setOrderList(role.getOrderList());
-					newRole.setDescription(role.getDescription());
-					newRole.set("dept_id", department.getId());
-					newRole.set("data_area",department.getDataArea());
-					newRole.setCreateDate(new Date());
-					newRole.save();
-					
-					GroupRoleRel groupRoleRel = new GroupRoleRel();
-					Group group = GroupQuery.me().findDeptIdAndDataAreaAndGroupCode(newRole.getDeptId(),newRole.getDataArea(),newRole.getRoleCode());
-					groupRoleRel.setId(StrKit.getRandomUUID());
-					groupRoleRel.setGroupId(group.getId());
-					groupRoleRel.setRoleId(roleId);
-					groupRoleRel.save();
-					
-					
-					List<RoleOperationRel> pRels = RoleOperationRelQuery.me().findByRoleId(role.getId());
-					for(RoleOperationRel pRel : pRels){
-						RoleOperationRel operationRel = new RoleOperationRel();
-						operationRel.setId(StrKit.getRandomUUID());
-						operationRel.setOperationId(pRel.getOperationId());
-						operationRel.setRoleId(roleId);
-						operationRel.save();
+				if(roleList.size()>0){
+					for (Role role : roleList) {
+						Role newRole = new Role();
+						String roleId = StrKit.getRandomUUID();
+						newRole.setId(roleId);
+						newRole.setRoleName(role.getRoleName());
+						newRole.setRoleCode(role.getRoleCode());
+						newRole.setOrderList(role.getOrderList());
+						newRole.setDescription(role.getDescription());
+						newRole.set("dept_id", department.getId());
+						newRole.set("data_area",department.getDataArea());
+						newRole.setCreateDate(new Date());
+						newRole.save();
 						
+						GroupRoleRel groupRoleRel = new GroupRoleRel();
+						Group group = GroupQuery.me().findDeptIdAndDataAreaAndGroupCode(newRole.getDeptId(),newRole.getDataArea(),newRole.getRoleCode());
+						groupRoleRel.setId(StrKit.getRandomUUID());
+						groupRoleRel.setGroupId(group.getId());
+						groupRoleRel.setRoleId(roleId);
+						groupRoleRel.save();
+						
+						
+						List<RoleOperationRel> pRels = RoleOperationRelQuery.me().findByRoleId(role.getId());
+						if(pRels.size()>0){
+							for(RoleOperationRel pRel : pRels){
+								RoleOperationRel operationRel = new RoleOperationRel();
+								operationRel.setId(StrKit.getRandomUUID());
+								operationRel.setOperationId(pRel.getOperationId());
+								operationRel.setRoleId(roleId);
+								operationRel.save();
+								
+							}
+						}
 					}
+					
 				}
 				
 				List<CustomerType> customerTypes = CustomerTypeQuery.me().findByDept("0");
-				for(CustomerType cT : customerTypes){
-					CustomerType customerType = new CustomerType();
-					customerType.setId(StrKit.getRandomUUID());
-					customerType.setName(cT.getName());
-					customerType.setCode(cT.getCode());
-					customerType.setIsShow(cT.getIsShow());
-					customerType.setType(cT.getType());
-					customerType.setPriceSystemId(cT.getPriceSystemId());
-					customerType.setProcDefKey(cT.getProcDefKey());
-					customerType.set("dept_id",department.getId());
-					customerType.set("data_area", department.getDataArea());
-					customerType.setCreateDate(new Date());
-					customerType.save();
+				if(customerTypes.size()>0){
+					for(CustomerType cT : customerTypes){
+						CustomerType customerType = new CustomerType();
+						customerType.setId(StrKit.getRandomUUID());
+						customerType.setName(cT.getName());
+						customerType.setCode(cT.getCode());
+						customerType.setIsShow(cT.getIsShow());
+						customerType.setType(cT.getType());
+						customerType.setPriceSystemId(cT.getPriceSystemId());
+						customerType.setProcDefKey(cT.getProcDefKey());
+						customerType.set("dept_id",department.getId());
+						customerType.set("data_area", department.getDataArea());
+						customerType.setCreateDate(new Date());
+						customerType.save();
+					}
 				}
 			}
 			
