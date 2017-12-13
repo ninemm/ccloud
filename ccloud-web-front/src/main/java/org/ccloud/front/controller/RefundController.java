@@ -80,6 +80,8 @@ public class RefundController extends BaseFrontController{
 		String outstock_id = getPara("id");
 		Record outstock = SalesOutstockQuery.me().findMoreById(outstock_id);
 		List<Record> outstockDetail = SalesOutstockDetailQuery.me().findByOutstockId(outstock_id);
+		List<Record> refundDetail = SalesRefundInstockQuery.me().findByOutstockId(outstock_id);
+		setAttr("salesRefundDetail", refundDetail);
 		setAttr("salesOutstockDetail", outstockDetail);
 		setAttr("outstock", outstock);
 		setAttr("outstock_id", outstock_id);
