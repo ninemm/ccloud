@@ -131,7 +131,7 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 		final PurchaseRefundOutstockDetail purchaseRefundOutstockDetail = getModel(PurchaseRefundOutstockDetail.class);
 		Map<String, String[]> paraMap = getParaMap();
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		Seller seller = SellerQuery.me().findByUserId(user.getId());
+		Seller seller = SellerQuery.me().findById(getSessionAttr("sellerId").toString());
 		String purchaseInstockId = StringUtils.getArrayFirst(paraMap.get("purchaseInstockId"));
 		String orderId = StrKit.getRandomUUID();
 		Date date = new Date();
@@ -232,7 +232,7 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 	//审核通过，对库存总账进行修改
 	public void pass(){
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		Seller seller = SellerQuery.me().findByUserId(user.getId());
+		Seller seller = SellerQuery.me().findById(getSessionAttr("sellerId").toString());
 		String purchaseRefundId=getPara("id");
 		boolean flang = false;
 		final InventoryDetail inventoryDetail= getModel(InventoryDetail.class);

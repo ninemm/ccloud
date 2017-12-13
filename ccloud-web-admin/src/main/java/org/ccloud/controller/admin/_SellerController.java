@@ -38,6 +38,7 @@ import org.ccloud.model.GroupRoleRel;
 import org.ccloud.model.Option;
 import org.ccloud.model.Product;
 import org.ccloud.model.Role;
+import org.ccloud.model.RoleOperationRel;
 import org.ccloud.model.Seller;
 import org.ccloud.model.SellerBrand;
 import org.ccloud.model.SellerCustomer;
@@ -48,6 +49,7 @@ import org.ccloud.model.query.BrandQuery;
 import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.GroupQuery;
 import org.ccloud.model.query.ProductQuery;
+import org.ccloud.model.query.RoleOperationRelQuery;
 import org.ccloud.model.query.RoleQuery;
 import org.ccloud.model.query.SellerBrandQuery;
 import org.ccloud.model.query.SellerProductQuery;
@@ -147,11 +149,11 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		Department department=DepartmentQuery.me().findById(getPara("dept_id"));
 		User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
 		if (StrKit.isBlank(sellerId)) {
-			Seller seller2=SellerQuery.me().findByDeptAndSellerType(getPara("dept_id"),getPara("seller_type"));
+			/*Seller seller2=SellerQuery.me().findByDeptAndSellerType(getPara("dept_id"),getPara("seller_type"));
 			if(seller2!=null && getPara("seller_type")=="0"){
 				renderAjaxResultForError("该公司部门已有一个经销商，请确认");
 				return;
-			}
+			}*/
 			List<Seller> list = SellerQuery.me().findAll();
 			int s = list.size();
 			String j=Integer.toString(s);
@@ -186,7 +188,6 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			
 			seller.save();
 			Option option = new Option();
-			//List<Option> options =  OptionQuery.me().findAll();
 			option.setOptionKey(sellerId+"_store_check");
 			option.setOptionValue("1");
 			option.set("seller_id",sellerId );
@@ -221,7 +222,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			
 			
 			if(!user.getUsername().equals("admin")){
-				Seller Seller = SellerQuery.me().findByUserId(user.getId());
+				Seller Seller = SellerQuery.me().findById(getSessionAttr("sellerId").toString());
 				String sellerCustomerId = StrKit.getRandomUUID();
 				sellerCustomer.set("id", sellerCustomerId);
 				sellerCustomer.set("seller_id", Seller.getId());
@@ -281,6 +282,17 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 					groupRoleRel.setGroupId(group.getId());
 					groupRoleRel.setRoleId(roleId);
 					groupRoleRel.save();
+					
+					
+					List<RoleOperationRel> pRels = RoleOperationRelQuery.me().findByRoleId(role.getId());
+					for(RoleOperationRel pRel : pRels){
+						RoleOperationRel operationRel = new RoleOperationRel();
+						operationRel.setId(StrKit.getRandomUUID());
+						operationRel.setOperationId(pRel.getOperationId());
+						operationRel.setRoleId(roleId);
+						operationRel.save();
+						
+					}
 				}
 			}
 			
@@ -439,7 +451,6 @@ public class _SellerController extends JBaseCRUDController<Seller> {
             setAttr("k", keyword);
         }
         User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
-        String se = getSessionAttr("sellerId").toString();
         Seller seller = SellerQuery.me().findById(getSessionAttr("sellerId").toString());
         Page<Product> page = ProductQuery.me().paginate_pro(getPageNumber(), getPageSize(),keyword,  "cp.id",seller.getId(),user.getId());
 
@@ -450,10 +461,9 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 	//保存产品信息
 		public void savePro(){
 			final SellerProduct sellerProducts= getModel(SellerProduct.class);
-			User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
 			String ds = getPara("orderItems");
 			boolean result=false;
-			Seller seller=SellerQuery.me().findByUserId(user.getId());
+			Seller seller=SellerQuery.me().findById(getSessionAttr("sellerId").toString());
 			JSONArray jsonArray = JSONArray.parseArray(ds);
 			List<SellerProduct> imageList = jsonArray.toJavaList(SellerProduct.class);
 			for (SellerProduct sellerProduct : imageList) {

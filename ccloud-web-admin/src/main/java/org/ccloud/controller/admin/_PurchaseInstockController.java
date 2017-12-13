@@ -259,7 +259,7 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 		//对库存总账进行修改
 		boolean flang = false;
 		final InventoryDetail inventoryDetail= getModel(InventoryDetail.class);
-		Seller seller = SellerQuery.me().findByUserId(user.getId());
+		Seller seller = SellerQuery.me().findById(getSessionAttr("sellerId").toString());
 		List<PurchaseInstockDetail> list= PurchaseInstockDetailQuery.me().findAllByPurchaseInstockId(purchaseInstockId);
 		for(PurchaseInstockDetail pi : list){
 			BigDecimal count2 = new BigDecimal(pi.getProductCount());

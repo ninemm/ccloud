@@ -111,10 +111,10 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 	}
 	//入库订单及明细
 	public void pass(){
-		String id = getPara("id");
+		String orderId = getPara("id");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		Seller seller = SellerQuery.me().findByUserId(user.getId());
-		PurchaseOrder purchaseOrder=PurchaseOrderQuery.me().findById(id);
+		Seller seller = SellerQuery.me().findById(getSessionAttr("sellerId").toString());
+		PurchaseOrder purchaseOrder=PurchaseOrderQuery.me().findById(orderId);
 		purchaseOrder.set("status", 1000);
 		purchaseOrder.update();
 		Warehouse warehouse = WarehouseQuery.me().findOneByUserId(user.getId());
@@ -149,7 +149,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		purchaseInstock.set("create_date", date);
 		purchaseInstock.save();
 		
-		List<PurchaseOrderDetail> purchaseOrderDetails =  PurchaseOrderDetailQuery.me().findByPurchaseOrderId(id);
+		List<PurchaseOrderDetail> purchaseOrderDetails =  PurchaseOrderDetailQuery.me().findByPurchaseOrderId(orderId);
 		
 		for(PurchaseOrderDetail purchaseOrderDetail : purchaseOrderDetails){
 			Product product = ProductQuery.me().findById(purchaseOrderDetail.getProductId());
@@ -167,6 +167,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 				sellerProduct.set("market_price", product.getMarketPrice());
 				sellerProduct.set("weight", product.getWeight());
 				sellerProduct.set("weight_unit", product.getWeightUnit());
+				sellerProduct.setOrderList(0);;
 				sellerProduct.set("is_enable", 1);
 				sellerProduct.set("is_gift", 0);
 				//生成二维码
@@ -208,7 +209,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		final PurchaseOrderJoinInstock purchaseOrderJoinInstock = getModel(PurchaseOrderJoinInstock.class);
 		Map<String, String[]> paraMap = getParaMap();
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		Seller seller = SellerQuery.me().findByUserId(user.getId());
+		Seller seller = SellerQuery.me().findById(getSessionAttr("sellerId").toString());
 		Warehouse warehouse = WarehouseQuery.me().findOneByUserId(user.getId());
 		String purchaseInstockId = StrKit.getRandomUUID();
 
@@ -274,6 +275,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 				sellerProduct.set("market_price", product.getMarketPrice());
 				sellerProduct.set("weight", product.getWeight());
 				sellerProduct.set("weight_unit", product.getWeightUnit());
+				sellerProduct.setOrderList(0);;
 				sellerProduct.set("is_enable", 1);
 				sellerProduct.set("is_gift", 0);
 				//生成二维码
