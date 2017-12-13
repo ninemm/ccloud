@@ -27,6 +27,7 @@ import org.ccloud.model.InventoryDetail;
 import org.ccloud.model.SalesRefundInstock;
 import org.ccloud.model.SalesRefundInstockDetail;
 import org.ccloud.model.SellerProduct;
+import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
 
 import com.jfinal.kit.StrKit;
@@ -259,6 +260,35 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 			SN = new BigDecimal(endSN).add(new BigDecimal(1)).toString();
 		}
 		return SN;
+	}
+
+	public SalesRefundInstock insertByApp(String instockId, Record record, String userId,
+			String sellerId, String sellerCode, String paymentType, Date date, String remark) {
+		String newSn = SalesRefundInstockQuery.me().getNewSn(record.getStr("seller_id"));
+		// SR + (机构编号或企业编号6位) + A(客户类型) + W(仓库编号) + 171108(时间) + 100001(流水号)
+		String instockSn = "SR" + sellerCode +  record.get("customerTypeCode")
+		+ record.get("warehouseCode")+ DateUtils.format("yyMMdd", new Date()) + newSn;
+		
+		SalesRefundInstock salesRefundInstock = new SalesRefundInstock();
+		
+		salesRefundInstock.setId(instockId);
+		salesRefundInstock.setInstockSn(instockSn);
+		salesRefundInstock.setWarehouseId(record.getStr("warehouse_id"));
+		salesRefundInstock.setSellerId(sellerId);
+		salesRefundInstock.setCustomerId(record.getStr("customer_id"));
+		salesRefundInstock.setCustomerTypeId(record.getStr("customer_type_id"));
+		salesRefundInstock.setBizUserId(record.getStr("biz_user_id"));
+		salesRefundInstock.setInputUserId(userId);
+		salesRefundInstock.setStatus(Consts.SALES_REFUND_INSTOCK_DEFUALT);
+		
+		salesRefundInstock.setPaymentType(StringUtils.isNumeric(paymentType)? Integer.parseInt(paymentType) : 1);
+		salesRefundInstock.setCreateDate(date);
+		salesRefundInstock.setDeptId(record.getStr("dept_id"));
+		salesRefundInstock.setDataArea(record.getStr("data_area"));
+		salesRefundInstock.setRemark(remark);
+		
+		return salesRefundInstock;
+		
 	}
 
 }
