@@ -47,7 +47,7 @@ public class RoleQuery extends JBaseQuery {
 	}
 
 	public Page<Role> paginate(int pageNumber, int pageSize, String keyword, String dataArea, String orderby) {
-		String select = "select r.* ";
+		String select = "select r.*,d.dept_name ";
 		StringBuilder fromBuilder = new StringBuilder("from `role` r INNER JOIN `department` d ON d.id = r.dept_id ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
