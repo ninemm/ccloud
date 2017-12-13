@@ -158,60 +158,60 @@
     }
 </#macro>
 <@layout>
-<div id="inventory">
-    <header>
-        <div class="weui-search-bar" id="searchBar">
-            <form class="weui-search-bar__form">
-                <div class="weui-search-bar__box">
-                    <i class="weui-icon-search"></i>
-                    <input type="search" class="weui-search-bar__input" id="searchInput" placeholder="搜索" required="">
-                    <a href="javascript:" class="weui-icon-clear" id="searchClear"></a>
-                </div>
-                <label class="weui-search-bar__label" id="searchText">
-                    <i class="weui-icon-search"></i>
-                    <span>请输入产品</span>
-                </label>
-            </form>
-            <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
-        </div>
-    </header>
-
-    <article  class="inventory">
-        <header class="has-th-list weui-flex">
-            <div class="head-search select-area weui-flex__item">
-                <div class="weui-flex">
-                    <div class="weui-flex__item">
-                    <input type="text" id="region" placeholder="客户区域" class="weui-input" readonly>
-                    <i class="icon-sort-desc"></i>
-                </div>
-                <div class="weui-flex__item">
-                    <input type="text" id="product-type" placeholder="产品类型" class="weui-input" readonly>
-                    <i class="icon-sort-desc"></i>
-                </div>
-                <div class="weui-flex__item">
-                    <input type="text" id="if-order" placeholder="是否下单" class="weui-input" readonly>
-                    <i class="icon-sort-desc"></i>
-                </div>
-                </div>
-            </div>
-            <div id="combin-filter-btn">
-                <i class="icon-th-list"></i>
+<body>
+    <div id="inventory">
+        <header>
+            <div class="weui-search-bar" id="searchBar">
+                <form class="weui-search-bar__form">
+                    <div class="weui-search-bar__box">
+                        <i class="weui-icon-search"></i>
+                        <input type="search" class="weui-search-bar__input" id="searchInput" placeholder="搜索" required="">
+                        <a href="javascript:" class="weui-icon-clear" id="searchClear"></a>
+                    </div>
+                    <label class="weui-search-bar__label" id="searchText">
+                        <i class="weui-icon-search"></i>
+                        <span>请输入产品</span>
+                    </label>
+                </form>
+                <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
             </div>
         </header>
-        <div>
-            <div id="products" class="menu-left showInventoryMenu">
-                <ul>
-                    <#if goodsTypeList??&&(goodsTypeList?size>0)>
-                        <li id="allProduct" class="active" value="00">商品类型</li>
-                    </#if>
-                    <#list goodsTypeList as goodsType >
-                        <li value="${(goodsType.id)!}">${(goodsType.name)!}</li>
-                    </#list>
-                </ul>
+
+        <main  class="inventory">
+            <header class="has-th-list weui-flex">
+                <div class="head-search select-area wewui weui-flex__item">
+                    <div class="weui-flex">
+                        <div class="weui-flex__item">
+                            <input type="text" id="region" placeholder="客户区域" class="weui-input" readonly>
+                            <i class="icon-sort-desc"></i>
+                        </div>
+                        <div class="weui-flex__item">
+                            <input type="text" id="product-type" placeholder="产品类型" class="weui-input" readonly>
+                            <i class="icon-sort-desc"></i>
+                        </div>
+                        <div class="weui-flex__item">
+                            <input type="text" id="if-order" placeholder="是否下单" class="weui-input" readonly>
+                            <i class="icon-sort-desc"></i>
+                        </div>
+                    </div>
+                </div>
+                <div id="combin-filter-btn">
+                    <i class="icon-th-list"></i>
+                </div>
+            </header>
+            <div>
+                <div id="products" class="menu-left">
+                    <ul>
+                        <#if goodsTypeList??&&(goodsTypeList?size>0)>
+                            <li id="allProduct" class="active" value="00">商品类型</li>
+                        </#if>
+                        <#list goodsTypeList as goodsType >
+                            <li value="${(goodsType.id)!}">${(goodsType.name)!}</li>
+                        </#list>
+                    </ul>
+                </div>
             </div>
-        </div>
-        <article>
-            <div class="menu-right showInventoryMenu infinite" id="inventory_detailList">
+            <article class="menu-right infinite" id="inventory_detailList">
                 <#if inventoryList??>
                     <#assign total = inventoryList.totalRow>
                         <#if total &gt; 0>
@@ -256,8 +256,26 @@
                             <span class="weui-loadmore__tips">正在加载</span>
                         </div>
                 </#if>
-            </div>
-        </article>
-    </article>
-</div>
+            </article>
+        </main>
+    </div>
+    <div class="hidden-menu">
+        <ul>
+            <li>
+                <a href="index.html">
+                    首页
+                    <i class="icon-home blue"></i>
+                </a>
+            </li>
+            <li>
+                <a href="javascript:history.go(-1)">
+                    上一页
+                    <i class="icon-undo green"></i>
+                </a>
+            </li>
+        </ul>
+        <i class="icon-menu-open orange fr" id="button"></i>
+    </div>
+    <div class="layer"></div>
+</body>
 </@layout>
