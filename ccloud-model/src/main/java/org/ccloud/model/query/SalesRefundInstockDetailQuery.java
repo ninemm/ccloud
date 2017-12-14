@@ -17,6 +17,7 @@ package org.ccloud.model.query;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -119,6 +120,38 @@ public class SalesRefundInstockDetailQuery extends JBaseQuery {
 			return deleteCount;
 		}
 		return 0;
+	}
+
+	public Map<String, Object> insertByApp(Record record, String instockId, String sellerId, 
+			Date date, String bigCount, String smallCount) {
+		SalesRefundInstockDetail detail = new SalesRefundInstockDetail();
+		detail.setId(StrKit.getRandomUUID());
+		detail.setRefundInstockId(instockId);
+		detail.setSellProductId(record.getStr("sell_product_id"));
+		Integer convert = record.getInt("convert_relate");
+		Integer productCount = Integer.valueOf(bigCount) * Integer.valueOf(convert) + Integer.valueOf(smallCount);
+		BigDecimal productPrice = record.getBigDecimal("product_price");
+		BigDecimal productAmount = new BigDecimal(productCount).divide(new BigDecimal(convert), 2, BigDecimal.ROUND_HALF_UP)
+				.multiply(productPrice);
+		Integer isGift = record.getInt("is_gift");
+		
+		detail.setProductCount(productCount);
+		detail.setProductPrice(productPrice);
+		detail.setProductAmount(productAmount);
+		detail.setOutstockDetailId(record.getStr("id"));
+		detail.setRejectProductCount(productCount);
+		detail.setRejectProductPrice(productPrice);
+		detail.setRejectAmount(productAmount);
+		
+		detail.setIsGift(isGift);
+		detail.setCreateDate(date);
+		detail.setDeptId(record.getStr("dept_id"));
+		detail.setDataArea(record.getStr("data_area"));
+		
+		Map<String, Object> map = new HashMap<>();
+		map.put("status", detail.save());
+		map.put("productAmount", productAmount);
+		return map;
 	}
 
 	

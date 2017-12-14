@@ -27,6 +27,7 @@ import org.ccloud.model.InventoryDetail;
 import org.ccloud.model.SalesRefundInstock;
 import org.ccloud.model.SalesRefundInstockDetail;
 import org.ccloud.model.SellerProduct;
+import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
 
 import com.jfinal.kit.StrKit;
@@ -102,7 +103,7 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 	}
 
 	public boolean insert(Map<String, String[]> paraMap, String instockId, String instockSn, String sellerId,
-			String userId, Date date, String deptId, String dataArea) {
+			String userId, Date date, String deptId, String dataArea, String outStockId) {
 		SalesRefundInstock salesRefundInstock = new SalesRefundInstock();
 		
 		salesRefundInstock.setId(instockId);
@@ -114,6 +115,7 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		salesRefundInstock.setBizUserId(StringUtils.getArrayFirst(paraMap.get("biz_user_id")));
 		salesRefundInstock.setInputUserId(userId);
 		salesRefundInstock.setStatus(Consts.SALES_REFUND_INSTOCK_DEFUALT);
+		salesRefundInstock.setOutstockId(outStockId);
 		String total = StringUtils.getArrayFirst(paraMap.get("total"));
 		String type = StringUtils.getArrayFirst(paraMap.get("paymentType"));
 		
@@ -259,6 +261,51 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 			SN = new BigDecimal(endSN).add(new BigDecimal(1)).toString();
 		}
 		return SN;
+	}
+
+	public SalesRefundInstock insertByApp(String instockId, Record record, String userId,
+			String sellerId, String sellerCode, String paymentType, Date date, String remark) {
+		String newSn = SalesRefundInstockQuery.me().getNewSn(record.getStr("seller_id"));
+		// SR + (机构编号或企业编号6位) + A(客户类型) + W(仓库编号) + 171108(时间) + 100001(流水号)
+		String instockSn = "SR" + sellerCode +  record.get("customerTypeCode")
+		+ record.get("warehouseCode")+ DateUtils.format("yyMMdd", new Date()) + newSn;
+		
+		SalesRefundInstock salesRefundInstock = new SalesRefundInstock();
+		
+		salesRefundInstock.setId(instockId);
+		salesRefundInstock.setInstockSn(instockSn);
+		salesRefundInstock.setWarehouseId(record.getStr("warehouse_id"));
+		salesRefundInstock.setSellerId(sellerId);
+		salesRefundInstock.setCustomerId(record.getStr("customer_id"));
+		salesRefundInstock.setCustomerTypeId(record.getStr("customer_type_id"));
+		salesRefundInstock.setBizUserId(record.getStr("biz_user_id"));
+		salesRefundInstock.setInputUserId(userId);
+		salesRefundInstock.setStatus(Consts.SALES_REFUND_INSTOCK_DEFUALT);
+		salesRefundInstock.setOutstockId(record.getStr("id"));
+		
+		salesRefundInstock.setPaymentType(StringUtils.isNumeric(paymentType)? Integer.parseInt(paymentType) : 1);
+		salesRefundInstock.setCreateDate(date);
+		salesRefundInstock.setDeptId(record.getStr("dept_id"));
+		salesRefundInstock.setDataArea(record.getStr("data_area"));
+		salesRefundInstock.setRemark(remark);
+		
+		return salesRefundInstock;
+		
+	}
+
+	public List<Record> findByOutstockId(String outstockId) {
+		StringBuilder sqlBuilder = new StringBuilder(
+				" SELECT sod.*, sp.custom_name, p.big_unit, p.small_unit, p.convert_relate, sp.seller_id, sp.product_id, t1.valueName ");
+		sqlBuilder.append(" from `cc_sales_refund_instock_detail` sod ");
+		sqlBuilder.append(" LEFT JOIN cc_sales_outstock_detail cd ON cd.id = sod.outstock_detail_id ");
+		sqlBuilder.append(" LEFT JOIN cc_sales_outstock co ON co.id = cd.outstock_id ");
+		sqlBuilder.append(" LEFT JOIN cc_seller_product sp ON sod.sell_product_id = sp.id ");
+		sqlBuilder.append(" LEFT JOIN cc_product p ON sp.product_id = p.id ");
+		sqlBuilder.append("LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
+		sqlBuilder.append("RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = p.id ");
+		sqlBuilder.append(" WHERE co.id = ? ");
+
+		return Db.find(sqlBuilder.toString(), outstockId);
 	}
 
 }

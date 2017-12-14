@@ -129,7 +129,7 @@ function addTr(tid, productList, optionArr) {
 	var goodsName = firstProduct.name;
 	var specification = firstProduct.specificationValue;
 	var big_unit = firstProduct.bigUnit;
-    var balanceCount = firstProduct.balanceCount;
+    var balanceCount = firstProduct.balanceCount == null ? "暂未盘点": firstProduct.balanceCount;
 	
 
 	var $tbody = $(tid + " tbody"),
@@ -170,7 +170,7 @@ function addTr(tid, productList, optionArr) {
      var cgoodsName = result.name;
      var cspecification = result.specificationValue;
      var cbig_unit = result.bigUnit;
-     var balanceCount = result.balanceCount;
+     var balanceCount = result.balanceCount == null ? "暂未盘点":result.balanceCount;
      var $tr = $(this).parent().parent();
      
      $tr.find("td>#goodsCode").val(cgoodsCode);
@@ -251,17 +251,17 @@ function addTr(tid, productList, optionArr) {
 										<thead>
 											<tr>
 												<th class="col-sm-1 center">序号</th>
-												<th class="col-sm-2 center">商品名称</th>
-												<th class="col-sm-1 center">规格</th>
+												<th class="col-sm-3 center">商品名称</th>
+												<th class="col-sm-2 center">规格</th>
 												<th class="col-sm-1 center">单位</th>
 												<th class="col-sm-1 center">库存数量</th>
-												<th class="col-sm-1 center">盘点后数量</th>
-												<th class="col-sm-2 center">备注</th>
+												<th class="col-sm-1 center">盘盈(+)/盘亏(-)</th>
+												<th class="col-sm-3 center">备注</th>
 											</tr>
 										</thead>
 										<tbody id="sProdBody">
 											<tr class="hide-always hide">
-												<td class="center text-center">
+												<td class="center">
 													<a class="btn btn-danger btn-xs removeTr" data-toggle="modal" data-target="#deleteBackProModal" ><span class="glyphicon glyphicon-remove"></span></a>
 												</td>
 												<td class="text-left">
@@ -270,18 +270,18 @@ function addTr(tid, productList, optionArr) {
 													<select class="pro-slc2">
 													</select>
 												</td>
-												<td class="text-center">
+												<td>
 													<span class="specification" id="specification"></span>
 												</td>
-												<td class="text-center">
+												<td>
 													<span class="big_unit" id="big_unit"></span>
 												</td>
 												</td>
-													<td class="text-center">
+													<td>
 													<span class="balanceCount" id="balanceCount"></span>
 												</td>
 												<div class="form-group">
-												<td class="text-center">
+												<td>
 												<input type="text" id="stock" class="stock" name="stockTakingList[-1].product_count" disabled="true" />
 												</td>
 												</div>
@@ -291,7 +291,7 @@ function addTr(tid, productList, optionArr) {
 											</tr>
 											<#list (ilist)! as list>
                                        <tr id="tr${list_index+1}">
-                        	                    <td class="center text-center">
+                        	                    <td class="center">
 													<a class="btn btn-danger btn-xs removeTr" data-toggle="modal" data-target="#deleteBackProModal" onclick="deleteTr(this)"><span class="glyphicon glyphicon-remove"></span></a>
 												</td>
 												<#list (list.productInfos)! as plist>
@@ -300,14 +300,14 @@ function addTr(tid, productList, optionArr) {
 													<input type="text" id="goodsName" name="goodsName"  value="${plist.customName}" disabled="disabled"/>
 												   <input type="hidden"  id="factIndex" name="factIndex" value="${list_index}"/>
 												</td>
-												<td class="text-center">
+												<td>
 													<input name="specification" id="specification" value="${plist.specificationValue!}" disabled="disabled"></input>
 												</td>
-												<td class="text-center">
-													<input name="balanceCount" id="balanceCount" value="${plist.balanceCount!0}" disabled="disabled"></input>
+												<td>
+													<input name="balanceCount" id="balanceCount" value="${plist.balanceCount!}" disabled="disabled"></input>
 												</td>
 												</#list>
-												<td class="text-center">
+												<td>
 												<input type="text" id="stock" class="stock" name="stockTakingList[${list_index}].product_count"  value="${list.productCount}" />
 												</td>
 												<td class="text-left">

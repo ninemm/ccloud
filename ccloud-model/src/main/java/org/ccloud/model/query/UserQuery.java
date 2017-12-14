@@ -236,4 +236,26 @@ public class UserQuery extends JBaseQuery {
 		List<Record> list = Db.find(fromBuilder.toString(), id, data);
 		return list;
 	}
+	
+	public List<User> findIdAndNameByDataArea(String dataArea) {
+		StringBuilder sqlBuilder = new StringBuilder("select u.id,u.realname as text ");
+
+		sqlBuilder.append("from `user` u ");
+		final List<Object> params = new LinkedList<Object>();
+		appendIfNotEmptyWithLike(sqlBuilder, "u.data_area", dataArea, params, true);
+		if (params.isEmpty()) {
+			return DAO.find(sqlBuilder.toString());
+		}
+		return DAO.find(sqlBuilder.toString(), params.toArray());
+	}	
+	
+	public List<Record> getCustomerInfoByUserId(String userId,String dataArea){
+		String data = dataArea + "%";
+		StringBuilder fromBuilder = new StringBuilder("SELECT c.id, c.customer_code AS code, c.customer_name AS name, c.contact, c.mobile ");
+		fromBuilder.append("FROM `cc_user_join_customer` AS uc LEFT JOIN `cc_customer` AS c ON uc.seller_customer_id = c.id ");
+		fromBuilder.append("WHERE c.id != '' AND c.is_enabled = 1 AND uc.user_id = ? AND uc.data_area like ?");
+		
+		List<Record> list = Db.find(fromBuilder.toString(), userId, data);
+		return list;
+	}
 }

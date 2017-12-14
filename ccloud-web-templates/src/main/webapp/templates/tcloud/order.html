@@ -88,7 +88,7 @@ $(function() {
 		$.each(productList, function(index, el) {
 			if(el.isGift == 0) {
 				$product.append("<div class='weui-panel weui-panel_access goods-detail common'>" + newHtml + "</div>");
-				var $newProductDetail = $product.find(".weui-panel:last");
+				var $newProductDetail = $product.find(".common:last");
 				$newProductDetail.find("#productName").text(el.productName);
 				$newProductDetail.find("#valueName").text(el.valueName);
 		
@@ -108,8 +108,13 @@ $(function() {
 				$newProductDetail.find("#bigNum").val(el.bigNum);
 				$newProductDetail.find("#smallNum").val(el.smallNum);
 			} else {
-				var $newProductDetail = $product.find(".weui-panel:last");
+				var $newProductDetail = $product.find(".common:last");
 				$newProductDetail.find("#addGift").attr("checked",'true').trigger("change");
+
+				//默认
+				if($newProductDetail.find("#sellProductId").val() == el.sellProductId){
+					$newProductDetail.find("#isDefault").attr("checked","true");
+				}
 
 				$newProductDetail.find("#giftProduct").val(el.productName);
 				$newProductDetail.find("#giftSellProductId").val(el.sellProductId);
@@ -129,11 +134,6 @@ $(function() {
 					$newProductDetail.find("#giftUnitName").attr('data-values', "smallUnit");
 					$newProductDetail.find("#giftUnit").val("smallUnit");
 				}
-				//默认
-				if($newProductDetail.find("#sellProductId").val() == el.sellProductId){
-					$newProductDetail.find("#isDefault").attr("checked","true");
-				}
-			
 			
 			}
 	
@@ -266,7 +266,7 @@ $(function() {
 					</div>
 				</div>
 				<div class="weui-cell weui-cell_access">
-					<div class="weui-cell__bd">
+					<div class="weui-cell__bd select-area">
 						<div class="order-customer-info-title">
 							客户类型
 							<span class="require">*</span>
@@ -306,7 +306,7 @@ $(function() {
 			</section>
 			<div class="weui-cells__title black">商品明细</div>
 			<div id="productList">
-				<div class="weui-panel weui-panel_access goods-detail common">
+				<div class="weui-panel weui-panel_access goods-detail common" style="display: none">
 					<input type="hidden" name="sellProductId" id="sellProductId" value="">
 					<input type="hidden" name="productId" id="productId" value="">
 					<input type="hidden" name="convert" id="convert" value="">
@@ -370,7 +370,7 @@ $(function() {
 						</div>
 					</div>
 				</div>
-				<div class="weui-panel weui-panel_access goods-detail composition">
+				<div class="weui-panel weui-panel_access goods-detail composition" style="display: none">
 					<input type="hidden" id="compositionId" name="compositionId" value="">
 					<div class="product_name" id="compositionName">
 						35度中国劲酒_125ml_1*24

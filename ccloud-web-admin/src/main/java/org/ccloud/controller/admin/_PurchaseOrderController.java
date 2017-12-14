@@ -15,20 +15,17 @@
  */
 package org.ccloud.controller.admin;
 
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
-import org.ccloud.route.RouterMapping;
-import org.ccloud.route.RouterNotAllowConvert;
-import org.ccloud.utils.QRCodeUtils;
-import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Product;
 import org.ccloud.model.PurchaseInstock;
 import org.ccloud.model.PurchaseInstockDetail;
@@ -46,6 +43,9 @@ import org.ccloud.model.query.PurchaseOrderQuery;
 import org.ccloud.model.query.SellerProductQuery;
 import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.WarehouseQuery;
+import org.ccloud.route.RouterMapping;
+import org.ccloud.route.RouterNotAllowConvert;
+import org.ccloud.utils.StringUtils;
 
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Before;
@@ -111,12 +111,11 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 	}
 	//入库订单及明细
 	public void pass(){
-		String id = getPara("id");
+		String orderId = getPara("id");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		Seller seller = SellerQuery.me().findByUserId(user.getId());
-		PurchaseOrder purchaseOrder=PurchaseOrderQuery.me().findById(id);
+		Seller seller = SellerQuery.me().findById(getSessionAttr("sellerId").toString());
+		PurchaseOrder purchaseOrder=PurchaseOrderQuery.me().findById(orderId);
 		purchaseOrder.set("status", 1000);
-		purchaseOrder.update();
 		Warehouse warehouse = WarehouseQuery.me().findOneByUserId(user.getId());
 		final PurchaseInstock purchaseInstock = getModel(PurchaseInstock.class);
 		PurchaseInstockDetail purchaseInstockDetail = getModel(PurchaseInstockDetail.class);
@@ -131,8 +130,8 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		}
 		Date date = new Date();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-		String str = sdf.format(date);
-		String pwarehouseSn="PO"+seller.getSellerCode().substring(0, 6)+str.substring(0,8)+n;
+		String fomatDate = sdf.format(date);
+		String pwarehouseSn="PO"+seller.getSellerCode().substring(0, 6)+fomatDate.substring(0,8)+n;
 		purchaseInstock.set("id", purchaseInstockId);
 		purchaseInstock.set("pwarehouse_sn", pwarehouseSn);
 		purchaseInstock.set("supplier_id", purchaseOrder.getSupplierId());
@@ -148,37 +147,15 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		purchaseInstock.set("data_area", user.getDataArea());
 		purchaseInstock.set("create_date", date);
 		purchaseInstock.save();
+		purchaseOrder.update();
 		
-		List<PurchaseOrderDetail> purchaseOrderDetails =  PurchaseOrderDetailQuery.me().findByPurchaseOrderId(id);
-		
+		List<PurchaseOrderDetail> purchaseOrderDetails =  PurchaseOrderDetailQuery.me().findByPurchaseOrderId(orderId);
+		HttpServletRequest request = getRequest();
 		for(PurchaseOrderDetail purchaseOrderDetail : purchaseOrderDetails){
 			Product product = ProductQuery.me().findById(purchaseOrderDetail.getProductId());
 			List<SellerProduct> sellerProducts = SellerProductQuery.me()._findByProductIdAndSellerId(purchaseOrderDetail.getProductId(),seller.getId());
 			if(sellerProducts.size()==0){
-				SellerProduct sellerProduct = new SellerProduct();
-				String sellerProductId = StrKit.getRandomUUID();
-				sellerProduct.set("id", sellerProductId);
-				sellerProduct.set("product_id", purchaseOrderDetail.getProductId());
-				sellerProduct.set("seller_id", seller.getId());
-				sellerProduct.set("custom_name", product.getName());
-				sellerProduct.setStoreCount(new BigDecimal(0));
-				sellerProduct.set("price", product.getPrice());
-				sellerProduct.set("cost", product.getCost());
-				sellerProduct.set("market_price", product.getMarketPrice());
-				sellerProduct.set("weight", product.getWeight());
-				sellerProduct.set("weight_unit", product.getWeightUnit());
-				sellerProduct.set("is_enable", 1);
-				sellerProduct.set("is_gift", 0);
-				//生成二维码
-				String  fileName = str+".png";
-				String contents =getRequest().getScheme() + "://" + getRequest().getServerName()+"/admin/seller/fu"+"?id="+sellerProductId; 
-				//部署之前上传
-				//String contents = getRequest().getScheme() + "://" + getRequest().getServerName()+":"+getRequest().getLocalPort()+getRequest().getContextPath()+"/admin/seller/fn"+"?id="+Id;
-				String imagePath = getRequest().getSession().getServletContext().getRealPath("\\qrcode\\");
-				QRCodeUtils.genQRCode(contents, imagePath, fileName);
-				sellerProduct.set("qrcode_url", imagePath+"\\"+fileName);
-				sellerProduct.set("create_date", date);
-				sellerProduct.save();
+				SellerProduct sellerProduct = SellerProductQuery.me().newProduct(seller.getId(), date, fomatDate, product, request);
 				sellerProducts.add(sellerProduct);
 			}
 			for(int i=0;i<sellerProducts.size();i++){
@@ -200,6 +177,8 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		
 		renderAjaxResultForSuccess("OK");
 	}
+
+
 	
 	@Override
 	public void save(){
@@ -208,7 +187,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		final PurchaseOrderJoinInstock purchaseOrderJoinInstock = getModel(PurchaseOrderJoinInstock.class);
 		Map<String, String[]> paraMap = getParaMap();
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		Seller seller = SellerQuery.me().findByUserId(user.getId());
+		Seller seller = SellerQuery.me().findById(getSessionAttr("sellerId").toString());
 		Warehouse warehouse = WarehouseQuery.me().findOneByUserId(user.getId());
 		String purchaseInstockId = StrKit.getRandomUUID();
 
@@ -222,10 +201,10 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		}
 		Date date = new Date();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-		String str = sdf.format(date);
+		String fomatDate = sdf.format(date);
 		String purchaseOrderId=StringUtils.getArrayFirst(paraMap.get("purchaseOrderId"));
 		PurchaseOrder purchaseOrder = PurchaseOrderQuery.me().findById(purchaseOrderId);
-		String pwarehouseSn="PO"+user.getDepartmentId().substring(0, 6)+str.substring(0,8)+n;
+		String pwarehouseSn="PO"+user.getDepartmentId().substring(0, 6)+fomatDate.substring(0,8)+n;
 		purchaseInstock.set("id", purchaseInstockId);
 		purchaseInstock.set("pwarehouse_sn", pwarehouseSn);
 		purchaseInstock.set("supplier_id", StringUtils.getArrayFirst(paraMap.get("supplierId")));
@@ -253,6 +232,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 
 		while (productNum > count) {
 			index++;
+			HttpServletRequest request = getRequest();
 			String convert = StringUtils.getArrayFirst(paraMap.get("convert" + index));
 			String bigNum = StringUtils.getArrayFirst(paraMap.get("bigNum" + index));
 			String smallNum = StringUtils.getArrayFirst(paraMap.get("smallNum" + index));
@@ -263,29 +243,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 			Product product = ProductQuery.me().findById(productId);
 			List<SellerProduct> sellerProducts = SellerProductQuery.me()._findByProductIdAndSellerId(productId,seller.getId());
 			if(sellerProducts.size()==0){
-				SellerProduct sellerProduct = new SellerProduct();
-				String sellerProductId = StrKit.getRandomUUID();
-				sellerProduct.set("id", sellerProductId);
-				sellerProduct.set("product_id", productId);
-				sellerProduct.set("seller_id", seller.getId());
-				sellerProduct.set("custom_name", product.getName());
-				sellerProduct.set("price", product.getPrice());
-				sellerProduct.set("cost", product.getCost());
-				sellerProduct.set("market_price", product.getMarketPrice());
-				sellerProduct.set("weight", product.getWeight());
-				sellerProduct.set("weight_unit", product.getWeightUnit());
-				sellerProduct.set("is_enable", 1);
-				sellerProduct.set("is_gift", 0);
-				//生成二维码
-				String  fileName = str+".png";
-				String contents =getRequest().getScheme() + "://" + getRequest().getServerName()+"/admin/seller/fu"+"?id="+sellerProductId; 
-				//部署之前上传
-				//String contents = getRequest().getScheme() + "://" + getRequest().getServerName()+":"+getRequest().getLocalPort()+getRequest().getContextPath()+"/admin/seller/fn"+"?id="+Id;
-				String imagePath = getRequest().getSession().getServletContext().getRealPath("\\qrcode\\");
-				QRCodeUtils.genQRCode(contents, imagePath, fileName);
-				sellerProduct.set("qrcode_url", imagePath+"\\"+fileName);
-				sellerProduct.set("create_date", date);
-				sellerProduct.save();
+				SellerProduct sellerProduct = SellerProductQuery.me().newProduct(seller.getId(), date, fomatDate, product, request);
 				sellerProducts.add(sellerProduct);
 			}
 			purchaseOrderDetail.set("product_count", productCount);

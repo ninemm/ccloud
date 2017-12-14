@@ -141,10 +141,11 @@ public class _SalesRefundController extends JBaseCRUDController<SalesRefundInsto
 
 		Map<String, String[]> paraMap = getParaMap();
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String sellerId = getSessionAttr("sellerId");
-		String sellerCode = getSessionAttr("sellerCode");
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);		
 		String deptId = StringUtils.getArrayFirst(paraMap.get("deptId"));
 		String dataArea = StringUtils.getArrayFirst(paraMap.get("dataArea"));
+		String outStockId = StringUtils.getArrayFirst(paraMap.get("outStockId"));
 
 		String instockId = StrKit.getRandomUUID();
 		Date date = new Date();
@@ -155,7 +156,7 @@ public class _SalesRefundController extends JBaseCRUDController<SalesRefundInsto
 				+ StringUtils.getArrayFirst(paraMap.get("warehouseCode")) + DateUtils.format("yyMMdd", date) + OrderSO;
 
 		SalesRefundInstockQuery.me().insert(paraMap, instockId, instockSn, sellerId, user.getId(), date, deptId,
-				dataArea);
+				dataArea, outStockId);
 
 		String productNumStr = StringUtils.getArrayFirst(paraMap.get("productNum"));
 		Integer productNum = Integer.valueOf(productNumStr);

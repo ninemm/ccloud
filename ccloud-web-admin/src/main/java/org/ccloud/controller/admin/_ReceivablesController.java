@@ -15,9 +15,7 @@
  */
 package org.ccloud.controller.admin;
 
-import java.math.BigDecimal;
 import java.sql.SQLException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -38,8 +36,7 @@ import org.ccloud.model.ReceivablesDetail;
 import org.ccloud.model.query.ReceivablesDetailQuery;
 import org.ccloud.model.Receiving;
 import org.ccloud.model.query.ReceivingQuery;
-import org.ccloud.model.query.SalesOrderQuery;
-import org.ccloud.model.query.CustomerQuery;
+import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.User;
 
 import com.google.common.collect.ImmutableMap;
@@ -61,12 +58,12 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 	
 	public void getOptions(){
 		String type = getPara("type");
-		
+		String DataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		List<Record> list = new ArrayList();
 		if(type != null) {
 			if("1".equals(type)) {
-				list = CustomerTypeQuery.me().getCustomerTypes();
+				list = CustomerTypeQuery.me().getCustomerTypes(DataArea);
 			}else if("2".equals(type)) {
 				list = GoodsCategoryQuery.me().getLeafTypes();
 			}
@@ -76,10 +73,10 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 	
 	public void getReceivables() {
 		String type = getPara("type");
-		String id = getPara("id");
+		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String deptDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		Page<Receivables> page = ReceivablesQuery.me().paginate(getPageNumber(),getPageSize(),id,type,user.getId(),deptDataArea);
+		Page<Receivables> page = ReceivablesQuery.me().paginate(getPageNumber(),getPageSize(),customerTypeId,type,user.getId(),deptDataArea);
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(),"rows", page.getList());
 		
 		renderJson(map);
@@ -103,6 +100,7 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 	public void renderlist() {
 		setAttr("ref_sn",getPara("ref_sn"));
 		setAttr("ref_type",getPara("ref_type"));
+		setAttr("object_id", getPara("object_id"));
 		render("list.html");
 	}
 	
@@ -119,19 +117,25 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 	public void addreceiving() {
 		String ref_sn = getPara("ref_sn");
 		String ref_type = getPara("ref_type");
-		String order_id = SalesOrderQuery.getBillIdBySn(ref_sn);
-		if(order_id == null) {
+		String object_id = getPara("object_id");
+		//通过客户Id找到应收账款主表ID
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		Receivables receivables = ReceivablesQuery.me().findByObjId(object_id, user.getDepartmentId());
+		
+		if(receivables == null) {
 			setAttr("ref_sn",ref_sn);
 			setAttr("ref_type",ref_type);
 			render("list.html");
 		}
 		
-		List<Record> list = CustomerQuery.me().getCustomerIdName();
-		
+		String userDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		List<User> list = UserQuery.me().findIdAndNameByDataArea(userDataArea);
+	
 		setAttr("ref_sn",ref_sn);
-		setAttr("bill_id",order_id);
-		setAttr("ref_type",getPara("ref_type"));
-		setAttr("customer_info",JsonKit.toJson(list));
+		setAttr("bill_id",receivables.getId());
+		setAttr("ref_type",ref_type);
+		setAttr("object_id", object_id);
+		setAttr("userInfo",JsonKit.toJson(list));
 	}
 	
 	@Override
@@ -142,9 +146,10 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 				
 				Receiving receiving = new Receiving();
 				String receiving_id = StrKit.getRandomUUID();
-				User user = getSessionAttr("user");
+				User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 				String act_amount = getPara("act_amount");
 				String ref_sn = getPara("ref_sn");
+				String ref_type = getPara("ref_type");
 				String receive_user_id = getPara("receive_user");
 				Date date = new Date();
 				
@@ -152,8 +157,8 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 				receiving.set("bill_id", getPara("bill_id"));
 				receiving.set("act_amount", act_amount);
 				receiving.set("biz_date", getPara("biz_date"));
-				receiving.set("ref_sn", getPara("ref_sn"));
-				receiving.set("ref_type", getPara("ref_type"));
+				receiving.set("ref_sn", ref_sn);
+				receiving.set("ref_type", ref_type);
 				receiving.set("input_user_id", user.getId());
 				receiving.set("receive_user_id",receive_user_id);
 				receiving.set("remark",getPara("remark"));
@@ -162,86 +167,13 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 				receiving.set("create_date", date);
 				receiving.set("modify_date", date);
 
-				ReceivablesDetailQuery.me().updateAmountByRefSn(ref_sn,act_amount);
-				ReceivablesQuery.me().updateAmountByObjectId(receive_user_id,act_amount);
-				return receiving.save();
+//				ReceivablesDetailQuery.me().updateAmountByRefSn(ref_sn,act_amount);
+				ReceivablesQuery.me().updateAmountById(getPara("bill_id"),act_amount);
+			    return receiving.save();
 			}
 		});
 		
 		if (isAdd) renderAjaxResultForSuccess("添加收款记录成功");
         else renderAjaxResultForError("添加收款记录失败");
-	}
-	
-	public void saveReceivables() {
-		String objId = getPara("objId");
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		Receivables receivables = ReceivablesQuery.me().findByObjId(objId, user.getDepartmentId());
-		if(receivables!=null) {
-			renderAjaxResultForError("创建失败，汇总记录重复.");
-			return;
-		}
-		boolean saveStatus = Db.tx(new IAtom() {
-			@Override
-			public boolean run() throws SQLException{
-				User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-				Date date = new Date();
-				Receivables receivables = getModel(Receivables.class);
-				String receivablesId = StrKit.getRandomUUID();
-				receivables.set("id", receivablesId);
-				receivables.set("obj_id", getPara("objId"));
-				receivables.set("obj_type", getPara("objType"));
-				receivables.set("receive_amount", new BigDecimal("0.00"));
-				receivables.set("act_amount", new BigDecimal("0.00"));
-				receivables.set("balance_amount", new BigDecimal("0.00"));
-				receivables.set("dept_id", user.getDepartmentId());
-				receivables.set("data_area", user.getDataArea());
-				receivables.set("create_date", date);
-				receivables.set("modify_date", date);
-				return receivables.save();
-			}
-		});
-		if (saveStatus) renderAjaxResultForSuccess("添加应收汇总记录成功");
-        else renderAjaxResultForError("添加应收汇总记录失败");
-	}
-	
-	public void saveReceivablesDetail() throws ParseException {
-		String objId = getPara("objId");
-		String refSn = getPara("refSn");
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		ReceivablesDetail qReceivablesDetail = ReceivablesDetailQuery.me().findByRefSn(objId, user.getDepartmentId(), refSn);
-		if(qReceivablesDetail!=null) {
-			renderAjaxResultForError("创建失败,该单据应收明细重复.");
-			return;
-		}
-		Date date = new Date();
-		final ReceivablesDetail receivablesDetail = getModel(ReceivablesDetail.class);
-		String deptId = user.getDepartmentId();
-		Receivables receivables = ReceivablesQuery.me().findByObjId(objId, user.getDepartmentId());
-		if(receivables!=null) {
-			String detailId = StrKit.getRandomUUID();
-			receivablesDetail.set("id", detailId);
-			receivablesDetail.set("object_id", getPara("objId"));
-			receivablesDetail.set("object_type", getPara("objType"));
-			receivablesDetail.set("receive_amount", new BigDecimal(getPara("receiveAmount")));
-			receivablesDetail.set("act_amount", new BigDecimal(getPara("actAmount")));
-			receivablesDetail.set("balance_amount", new BigDecimal(getPara("balanceAmount")));
-			receivablesDetail.set("ref_sn", getPara("refSn"));
-			receivablesDetail.set("ref_type", getPara("refType"));
-			receivablesDetail.set("biz_date", date);
-			receivablesDetail.set("dept_id", deptId);
-			receivablesDetail.set("data_area", user.getDataArea());
-			receivablesDetail.set("create_date", date);
-			receivablesDetail.set("modify_date", date);
-			receivablesDetail.save();
-			receivables.set("receive_amount", receivables.getReceiveAmount().add(new BigDecimal(getPara("receiveAmount"))));
-			receivables.set("act_amount", receivables.getActAmount().add(new BigDecimal(getPara("actAmount"))));
-			receivables.set("balance_amount", receivables.getBalanceAmount().add(new BigDecimal(getPara("balanceAmount"))));
-			receivables.setModifyDate(date);
-			receivables.update();
-			renderAjaxResultForSuccess();
-		}else {
-			renderAjaxResultForError("未找到本次交易单位应收账款汇总数据.");
-		}
-
 	}
 }

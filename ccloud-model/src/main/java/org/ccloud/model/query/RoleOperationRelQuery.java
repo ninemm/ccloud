@@ -109,5 +109,9 @@ public class RoleOperationRelQuery extends JBaseQuery {
 		StringBuilder sql = new StringBuilder(" role_id = ? and operation_id = ? ");
 		return DAO.doDelete(sql.toString(), roleId, operationId);
 	}
+	
+	public List<RoleOperationRel> findByRoleId(String roleId){
+		return DAO.doFind(" role_id = ?", roleId);
+	}
 
 }

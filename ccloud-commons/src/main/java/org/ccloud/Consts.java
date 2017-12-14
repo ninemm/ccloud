@@ -89,6 +89,8 @@ public class Consts {
 	
 	public static final String SALES_ORDER_SN = "100001";//订单流水每日起始数
 	public static final String SALES_OUT_STOCK_SN = "100001";//出库单单流水每日起始数
+	public static final String PURCHASE_IN_STOCK_SN = "100001";//采购入库单单流水每日起始数
+	
 	
 	public static final int SALES_ORDER_AUDIT_STATUS_PASS = 1000;//销售订单审核通过
 	
@@ -134,4 +136,7 @@ public class Consts {
 	public static final String RECEIVABLES_OBJECT_TYPE_SUPPLIER = "supplier"; //应收账款供应商类型
 	
 	public static final String OPTION_SELLER_STORE_CHECK = "seller_store_check";//经销商检查库存开关设置
+	
+	public static final String CUSTOMER_KIND_COMMON = "100401";//经销商检查库存开关设置
+	public static final String CUSTOMER_KIND_SELLER = "100402";//经销商检查库存开关设置
 }

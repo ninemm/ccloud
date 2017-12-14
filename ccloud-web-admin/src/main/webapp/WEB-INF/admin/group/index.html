@@ -222,6 +222,7 @@
 						</th>
 						<th style="width: 20%">分组名称</th>
 						<th>分组编号</th>
+						<th>部门</th>
 						<th>排序</th>
 						<@shiro.hasPermission name="/admin/group/edit,/admin/all">
 						<th style="width: 20%">操作</th>
@@ -240,6 +241,7 @@
 								<a href="${CPATH}/admin/group/edit?id=${bean.id}&c=${c!}&p=${p!}">${bean.group_name!}</a>
 							</td>
 							<td>${bean.group_code!}</td>
+							<td>${bean.dept_name!}</td>
 							<td>${bean.order_list!}</td>
 							<td>
 							<@shiro.hasPermission name="/admin/group/edit,/admin/all">

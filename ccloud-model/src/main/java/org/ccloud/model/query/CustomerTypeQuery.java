@@ -56,7 +56,7 @@ public class CustomerTypeQuery extends JBaseQuery {
 		return Db.findFirst(fromBuilder.toString(), id);
 	}
 
-	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String show, String deptId,
+	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String show, 
 			String dataArea) {
 		String select = "select c.id, c.name, c.code, c.is_show, p.name as price_system_name, d.dept_name ";
 		StringBuilder fromBuilder = new StringBuilder(
@@ -68,7 +68,6 @@ public class CustomerTypeQuery extends JBaseQuery {
 
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "c.name", keyword, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "c.is_show", show, params, needWhere);
-		needWhere = appendIfNotEmpty(fromBuilder, "c.dept_id", deptId, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "c.data_area", dataArea, params, needWhere);
 
 		fromBuilder.append(" order by c.create_date ");
@@ -143,10 +142,15 @@ public class CustomerTypeQuery extends JBaseQuery {
 		return DAO.doFind("dept_id = ?", id);
 	}
 
-	public List<Record> getCustomerTypes(){
-		StringBuilder fromBuilder = new StringBuilder("SELECT id,name FROM cc_customer_type WHERE `is_show`=1");
+	public List<Record> getCustomerTypes(String DataArea){
+		StringBuilder fromBuilder = new StringBuilder("SELECT id,name FROM cc_customer_type WHERE `is_show`=1 and data_area like '"+DataArea+"'");
 		List<Record> list = Db.find(fromBuilder.toString());
 		return list;
 	}
-
+	
+	public CustomerType findDataAreaAndName(String dataArea,String code){
+		String sql = "select * from cc_customer_type where data_area = ? and code = ?";
+		return DAO.findFirst(sql, dataArea,code);
+	}
+	
 }
