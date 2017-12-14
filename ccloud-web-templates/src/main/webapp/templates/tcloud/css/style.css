@@ -1339,19 +1339,20 @@ input[name=sex] {
 }
 
 .user-info {
-  height: 3rem;
+  height: 4rem;
   background: #00a7d0;
   color: #fff;
   font-size: .7rem;
+  padding-top: 1rem;
   box-sizing: border-box;
-  padding: .5rem 10% 0;
+  padding: 1rem 10% 0;
 }
 
 .user-avatar {
   position: absolute;
   left: 50%;
   margin-left: -1.5rem;
-  top: 1.5rem;
+  top: 2rem;
 }
 
 .user-avatar img {
@@ -1363,8 +1364,8 @@ input[name=sex] {
 
 .user-statistics {
   background: #fff;
-  height: 3rem;
-  padding-top: .5rem;
+  height: 4rem;
+  padding-top: 1rem;
   box-sizing: border-box;
   text-align: center;
   font-size: .8rem;
