@@ -15,11 +15,22 @@
  */
 package org.ccloud.model.query;
 
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.ccloud.model.Product;
 import org.ccloud.model.PurchaseInstockDetail;
+import org.ccloud.model.SellerProduct;
+import org.ccloud.utils.DateUtils;
+import org.ccloud.utils.QRCodeUtils;
+import org.ccloud.utils.StringUtils;
 
+import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
@@ -101,4 +112,53 @@ public class PurchaseInstockDetailQuery extends JBaseQuery {
 				+ " where cpod.purchase_order_id = ?";
 		return DAO.findFirst(sql,orderId);
 	}*/
+	
+	
+	public boolean insertBySalesOrder(Map<String, String[]> paraMap, String purchaseInstockId, Record seller, int index,
+			Date date, HttpServletRequest request) {
+		String convert = StringUtils.getArrayFirst(paraMap.get("convert" + index));
+		String bigNum = StringUtils.getArrayFirst(paraMap.get("bigNum" + index));
+		String smallNum = StringUtils.getArrayFirst(paraMap.get("smallNum" + index));
+		String price = StringUtils.getArrayFirst(paraMap.get("bigPrice" + index));
+
+		Integer bigCount = Integer.valueOf(bigNum);
+		Integer productConvert = Integer.valueOf(convert);
+		Integer smallCount = Integer.valueOf(smallNum);
+
+		Integer productCount = bigCount * productConvert + smallCount;
+		String productAmount = StringUtils.getArrayFirst(paraMap.get("rowTotal" + index));
+		BigDecimal productPrice = new BigDecimal(price);
+
+		String sellerId = seller.getStr("id");
+		String productId = StringUtils.getArrayFirst(paraMap.get("product" + index));
+		Product product = ProductQuery.me().findById(productId);
+		List<SellerProduct> sellerProducts = SellerProductQuery.me()._findByProductIdAndSellerId(productId, sellerId);
+		if (sellerProducts.size() == 0) {
+			SellerProduct sellerProduct = SellerProductQuery.me().newProduct(sellerId, date,
+					DateUtils.format("yyMMdd", date), product, request);
+			sellerProducts.add(sellerProduct);
+		}
+		for (int i = 0; i < sellerProducts.size(); i++) {
+			PurchaseInstockDetail purchaseInstockDetail = new PurchaseInstockDetail();
+			purchaseInstockDetail.setId(StrKit.getRandomUUID());
+			purchaseInstockDetail.setPurchaseInstockId(purchaseInstockId);
+
+			purchaseInstockDetail.set("seller_product_id", sellerProducts.get(i).getId());
+			purchaseInstockDetail.setProductCount(productCount);
+			purchaseInstockDetail.setProductAmount(new BigDecimal(productAmount));
+			purchaseInstockDetail.setProductPrice(productPrice);
+			purchaseInstockDetail
+					.setPurchaseOrderDetailId(StringUtils.getArrayFirst(paraMap.get("outstockDetailId" + index)));
+
+			purchaseInstockDetail.setDeptId(seller.getStr("dept_id"));
+			purchaseInstockDetail.setDataArea(seller.getStr("data_area"));
+			purchaseInstockDetail.setCreateDate(date);
+
+			if (!purchaseInstockDetail.save()) {
+				return false;
+			}
+		}
+
+		return true;
+	}
 }
