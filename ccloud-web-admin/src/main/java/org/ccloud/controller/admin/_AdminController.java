@@ -116,6 +116,7 @@ public class _AdminController extends JBaseController {
 
 				// sellerId
 				if (!subject.isPermitted("/admin/all")) {
+					
 					List<Record> sellerList = SellerQuery.me().querySellerIdByDept(user.getDepartmentId());
 
 					if(sellerList.size() == 0) {

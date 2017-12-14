@@ -12,7 +12,7 @@ $(function () {
 </#macro> <@layout>
 <div class="weui-content">
 	<article id="home">
-		<div class="company">启光商贸</div>
+		<div class="company">${(session.sellerName)!}</div>
 		<div>
 			<div class="weui-cells__title">
 				<div class="weui-flex">
@@ -109,7 +109,7 @@ $(function () {
 							<div class="weui-cell__ft">${(bean.createDate?string('yyyy-MM-dd HH:mm'))!}</div>
 						</div>
 					</#list> </#if>
-					<#if (orderPage.totalRow = 0)>
+					<#if !(orderPage ??) || (orderPage.totalRow = 0)>
 					    <div class="weui-loadmore weui-loadmore_line">
 	                        <span class="weui-loadmore__tips"  style="float: inherit;">暂无数据</span>
 	                    </div>
@@ -125,7 +125,7 @@ $(function () {
                             <div class="weui-cell__ft">${(bean.createDate?string('yyyy-MM-dd HH:mm'))!}</div>
                         </div>
                     </#list> </#if>
-                    <#if (customerPage.totalRow = 0)>
+                    <#if !(customerPage ??) || (customerPage.totalRow = 0)>
                         <div class="weui-loadmore weui-loadmore_line">
                             <span class="weui-loadmore__tips"  style="float: inherit;">暂无数据</span>
                         </div>
@@ -141,7 +141,7 @@ $(function () {
                             <div class="weui-cell__ft">${(bean.createDate?string('yyyy-MM-dd HH:mm'))!}</div>
                         </div>
                     </#list> </#if>
-                    <#if (customerVisitPage.totalRow = 0)>
+                    <#if !(customerVisitPage ??) || (customerVisitPage.totalRow = 0)>
                         <div class="weui-loadmore weui-loadmore_line">
                             <span class="weui-loadmore__tips"  style="float: inherit;">暂无数据</span>
                         </div>
