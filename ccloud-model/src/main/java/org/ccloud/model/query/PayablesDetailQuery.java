@@ -19,7 +19,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.ccloud.model.PayablesDetail;
-
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
@@ -59,12 +58,20 @@ public class PayablesDetailQuery extends JBaseQuery {
 		return DAO.findFirst(select);
 	}
 
-	public Page<PayablesDetail> paginate(int pageNumber, int pageSize,String keyword,String deptId, String orderby) {
-		String select = "select * ";
-		StringBuilder fromBuilder = new StringBuilder("from `cc_payables_detail` where dept_id = '"+deptId+"'");
-
-		LinkedList<Object> params = new LinkedList<Object>();
+public Page<PayablesDetail> paginate(int pageNumber, int pageSize, String id,String type,String dataArea) {
 		
+		String select = "SELECT COALESCE(SUM(t3.act_amount),0) as act_amount, t3.ref_sn, t3.pay_amount,(t3.pay_amount) - COALESCE(SUM(t3.act_amount),0) as balance_amount, t3.object_id, d.name as ref_Name,t3.ref_type, t3.create_date, t3.biz_date ";
+		StringBuilder fromBuilder = new StringBuilder(" FROM (SELECT r.act_amount AS act_amount, t2.ref_sn, t2.pay_amount AS pay_amount, t2.pay_amount - r.act_amount AS ");
+		fromBuilder.append("balance_amount, t2.object_id, t2.ref_type, t2.create_date, t2.biz_date FROM cc_payment r RIGHT JOIN (SELECT SUM(pay_amount) AS pay_amount, object_id, ref_type, create_date, biz_date, ref_sn FROM `cc_payables_detail` c ");
+		fromBuilder.append(" WHERE c.object_id ='"+id+"'");
+		if("1".equals(type)) {
+			fromBuilder.append(" AND c.object_type = 'customer' ");
+		}else {
+			fromBuilder.append(" AND c.object_type = 'supplier' ");
+		}
+		LinkedList<Object> params = new LinkedList<Object>();
+		appendIfNotEmptyWithLike(fromBuilder, "data_area", dataArea, params, false);
+		fromBuilder.append(" GROUP BY c.ref_sn  ORDER BY c.create_date DESC ) t2 ON r.ref_sn = t2.ref_sn ) t3  INNER JOIN dict d on t3.ref_type = d.`value`  GROUP BY t3.ref_sn");
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 

@@ -15,9 +15,7 @@
  */
 package org.ccloud.controller.admin;
 
-import java.math.BigDecimal;
 import java.sql.SQLException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -171,84 +169,11 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 
 //				ReceivablesDetailQuery.me().updateAmountByRefSn(ref_sn,act_amount);
 				ReceivablesQuery.me().updateAmountById(getPara("bill_id"),act_amount);
-				return receiving.save();
+			    return receiving.save();
 			}
 		});
 		
 		if (isAdd) renderAjaxResultForSuccess("添加收款记录成功");
         else renderAjaxResultForError("添加收款记录失败");
-	}
-	
-	public void saveReceivables() {
-		String objId = getPara("objId");
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		Receivables receivables = ReceivablesQuery.me().findByObjId(objId, user.getDepartmentId());
-		if(receivables!=null) {
-			renderAjaxResultForError("创建失败，汇总记录重复.");
-			return;
-		}
-		boolean saveStatus = Db.tx(new IAtom() {
-			@Override
-			public boolean run() throws SQLException{
-				User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-				Date date = new Date();
-				Receivables receivables = getModel(Receivables.class);
-				String receivablesId = StrKit.getRandomUUID();
-				receivables.set("id", receivablesId);
-				receivables.set("obj_id", getPara("objId"));
-				receivables.set("obj_type", getPara("objType"));
-				receivables.set("receive_amount", new BigDecimal("0.00"));
-				receivables.set("act_amount", new BigDecimal("0.00"));
-				receivables.set("balance_amount", new BigDecimal("0.00"));
-				receivables.set("dept_id", user.getDepartmentId());
-				receivables.set("data_area", user.getDataArea());
-				receivables.set("create_date", date);
-				receivables.set("modify_date", date);
-				return receivables.save();
-			}
-		});
-		if (saveStatus) renderAjaxResultForSuccess("添加应收汇总记录成功");
-        else renderAjaxResultForError("添加应收汇总记录失败");
-	}
-	
-	public void saveReceivablesDetail() throws ParseException {
-		String objId = getPara("objId");
-		String refSn = getPara("refSn");
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		ReceivablesDetail qReceivablesDetail = ReceivablesDetailQuery.me().findByRefSn(objId, user.getDepartmentId(), refSn);
-		if(qReceivablesDetail!=null) {
-			renderAjaxResultForError("创建失败,该单据应收明细重复.");
-			return;
-		}
-		Date date = new Date();
-		final ReceivablesDetail receivablesDetail = getModel(ReceivablesDetail.class);
-		String deptId = user.getDepartmentId();
-		Receivables receivables = ReceivablesQuery.me().findByObjId(objId, user.getDepartmentId());
-		if(receivables!=null) {
-			String detailId = StrKit.getRandomUUID();
-			receivablesDetail.set("id", detailId);
-			receivablesDetail.set("object_id", getPara("objId"));
-			receivablesDetail.set("object_type", getPara("objType"));
-			receivablesDetail.set("receive_amount", new BigDecimal(getPara("receiveAmount")));
-			receivablesDetail.set("act_amount", new BigDecimal(getPara("actAmount")));
-			receivablesDetail.set("balance_amount", new BigDecimal(getPara("balanceAmount")));
-			receivablesDetail.set("ref_sn", getPara("refSn"));
-			receivablesDetail.set("ref_type", getPara("refType"));
-			receivablesDetail.set("biz_date", date);
-			receivablesDetail.set("dept_id", deptId);
-			receivablesDetail.set("data_area", user.getDataArea());
-			receivablesDetail.set("create_date", date);
-			receivablesDetail.set("modify_date", date);
-			receivablesDetail.save();
-			receivables.set("receive_amount", receivables.getReceiveAmount().add(new BigDecimal(getPara("receiveAmount"))));
-			receivables.set("act_amount", receivables.getActAmount().add(new BigDecimal(getPara("actAmount"))));
-			receivables.set("balance_amount", receivables.getBalanceAmount().add(new BigDecimal(getPara("balanceAmount"))));
-			receivables.setModifyDate(date);
-			receivables.update();
-			renderAjaxResultForSuccess();
-		}else {
-			renderAjaxResultForError("未找到本次交易单位应收账款汇总数据.");
-		}
-
 	}
 }
