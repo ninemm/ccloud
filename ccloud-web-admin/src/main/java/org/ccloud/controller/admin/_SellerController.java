@@ -265,7 +265,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			//新建销售商时默认创建分组  角色  及中间表 客户类型
  			List<Seller> sellers = SellerQuery.me().findByDeptId(department.getId());
 			
-			if(sellers.size()==1 ){
+			if(sellers.size()==0 ){
 				List<Group> groupList = GroupQuery.me().findByDeptId();
 				if(groupList.size()>0){
 					for (Group group : groupList) {
@@ -298,7 +298,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 						newRole.save();
 						
 						GroupRoleRel groupRoleRel = new GroupRoleRel();
-						Group group = GroupQuery.me().findDeptIdAndDataAreaAndGroupCode(newRole.getDeptId(),newRole.getDataArea(),newRole.getRoleCode());
+						Group group = GroupQuery.me().findDeptIdAndDataAreaAndGroupCode(newRole.getDeptId(),newRole.getDataArea(),newRole.getRoleCode().substring(1));
 						groupRoleRel.setId(StrKit.getRandomUUID());
 						groupRoleRel.setGroupId(group.getId());
 						groupRoleRel.setRoleId(roleId);
