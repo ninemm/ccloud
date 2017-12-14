@@ -88,6 +88,61 @@ public class RefundController extends BaseFrontController{
 		render("refundDetail.html");
 	}
 	
+	public void myRefund() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+
+		Map<String, Object> all = new HashMap<>();
+		all.put("title", "全部");
+		all.put("value", "");
+
+		List<Map<String, Object>> customerTypes = new ArrayList<>();
+		customerTypes.add(all);
+
+		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
+				.findByDataArea(DataAreaUtil.getUserDealerDataArea(user.getDataArea()));
+		for (CustomerType customerType : customerTypeList) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", customerType.getName());
+			item.put("value", customerType.getId());
+			customerTypes.add(item);
+		}
+
+		setAttr("customerTypes", JSON.toJSON(customerTypes));
+		render("refundList.html");
+	}
+	
+	public void list() {
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+
+		String keyword = getPara("keyword");
+
+		String status = getPara("status");
+		String customerTypeId = getPara("customerTypeId");
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+
+		Page<Record> refundList = SalesRefundInstockQuery.me().paginateForApp(getPageNumber(), getPageSize(), keyword, status,
+				customerTypeId, startDate, endDate, sellerId, selectDataArea);
+
+		Map<String, Object> map = new HashMap<>();
+		map.put("refundList", refundList.getList());
+		renderJson(map);
+	}
+	
+	public void refundDetail() {
+		String refundId = getPara("id");
+
+		Record refund = SalesRefundInstockQuery.me().findMoreById(refundId);
+		List<Record> refundDetail = SalesRefundInstockDetailQuery.me().findByRefundId(refundId);
+
+		setAttr("refund", refund);
+		setAttr("refundDetail", refundDetail);
+
+		render("sales_refund_detail.html");
+	}
+		
+	
 	//退货
 	public void refundGood() {
         boolean isSave = Db.tx(new IAtom() {

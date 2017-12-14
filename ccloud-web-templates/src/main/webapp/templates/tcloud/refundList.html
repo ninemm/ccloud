@@ -24,21 +24,19 @@
 	  items: [{
 	       title: "全部", value: ""
 	       },{
+	       title: "取消", value: "1001"
+	       },{
+	       title: "待审核", value: "0"
+	       },{
 	       title: "已审核", value: "1000"
 	       },{
-	       title: "订单取消", value: "1001"
+	       title: "部分入库", value: "2000"
 	       },{
-	       title: "部分出库", value: "2000"
-	       },{
-	       title: "部分出库-订单关闭", value: "2001"
-	       },{
-	       title: "全部出库", value: "3000"
-	       },{
-	       title: "全部出库-订单关闭", value: "3001"
-	    }]
+	       title: "全部入库", value: "3000"
+	       }]
 	});
 	$("#customerTypeId").select({
-	  title: "择客户类型",
+	  title: "选择客户类型",
 	  items: ${customerTypes!}
 	});
   
@@ -69,17 +67,17 @@
 		}
 
 
-		Utils.ajax('${CPATH}/order/orderList', params, 
+		Utils.ajax('${CPATH}/refund/list', params, 
 			function(data){
 				$loading.hide();
 
-				if(data.orderList.length == 0){
+				if(data.refundList.length == 0){
 					$noMore.show();
 					loading = true;
 					return;
 				}
 
-				$.each(data.orderList, function(index, el) {
+				$.each(data.refundList, function(index, el) {
 	
 					$main.append("<div class='weui-panel weui-panel_access'>" + newHtml + "</section>");
 					var $newOrder = $main.find(".weui-panel:last");
@@ -88,19 +86,18 @@
 						$newOrder.find("#receiveType").remove();
 					}
 					
-					$newOrder.find("#salesOrderId").attr('href', '${CPATH}/order/orderDetail?orderId=' + el.id);
 
-					$newOrder.find("#orderSn").text(el.order_sn);
+					$newOrder.find("#orderSn").text(el.instock_sn);
 					
 					$newOrder.find("#status").text(getStatus(el.status));
 					$newOrder.find("#customerName").text(el.customer_name);
-					$newOrder.find("#contact").text(el.contact + '/' + el.mobile);
+					$newOrder.find("#contact").text(el.ccontact + '/' + el.cmobile);
 					$newOrder.find("#customerType").text(el.customerTypeName);
-					$newOrder.find("#orderAgain").on('click', function(){ 
- 						 window.location.href = "${CPATH}/order/getOldOrder?orderId="+el.id
-					}); 					
+					$newOrder.find("#refund").on('click', function(){ 
+ 						 window.location.href = "${CPATH}/refund/refundDetail?id="+el.id
+					}); 
 
-					$newOrder.find("#amount").text(el.total_amount);
+					$newOrder.find("#amount").text(el.reject_amount);
 					$newOrder.find("#date").text('时间：' + el.create_date);
 				});
 				page++;
@@ -135,15 +132,12 @@
 		} else if (value == 1000) {
 			return '已审核'
 		} else if (value == 1001) {
-			return '订单取消'
+			return '退货单取消'
 		} else if (value == 2000) {
-			return '部分出库'
-		} else if (value == 2001) {
-			return '部分出库-订单关闭'
-		} else if (value == 3000) {
-			return '全部出库'
-		} 
-		return '全部出库-订单关闭'
+			return '部分入库'
+		} else {
+			return '全部入库'
+		}
 	}
 	
 	
@@ -190,7 +184,7 @@
 	<main>
 		<div id="main">
 			<div class="weui-panel weui-panel_access" style="display: none">
-				<a href="" id="salesOrderId">
+				<a id="salesOrderId">
 					<div class="ft14 gray">
 						<span class="tag" id="receiveType">账期</span>
 						<span id="orderSn">DH-O-20171017-002276</span>
@@ -213,8 +207,7 @@
 					</div>
 				</a>
 				<hr>
-				<div class="button blue-button fl">撤销</div>
-				<div id="orderAgain" class="button white-button fr">再次购买</div>
+				<div id="refund" class="button white-button fr">详情</div>
 			</div>
 		</div>
 		<div class="weui-loadmore" id="loading" style="display: none;">

@@ -491,7 +491,7 @@ public class CustomerController extends BaseFrontController {
 	public void enable() {
 
 		String id = getPara("id");
-		int isEnabled = getParaToInt("isEnabled");
+		//int isEnabled = getParaToInt("isEnabled");
 		if(StrKit.notBlank(id)) {
 
 			boolean updated = startProcess(id, new HashMap<String, Object>());

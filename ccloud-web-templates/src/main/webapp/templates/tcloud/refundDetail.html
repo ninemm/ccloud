@@ -7,6 +7,10 @@
 	#order .gift input::-webkit-input-placeholder {
 		text-align: center;
 	}
+	
+	.bo {
+		border: 1px solid #bbb !important;
+	}
 </#macro>
 
 <#macro script>
@@ -98,7 +102,6 @@ $(function() {
 							<span class="require">*</span>
 						</div>
 						<input type="text" class="weui-input" value="${(outstock.customer_name)!}" readonly>
-						<span class="weui-cell__ft"></span>
 					</div>
 				</div>
 				<div class="weui-cell weui-cell_access">
@@ -136,7 +139,6 @@ $(function() {
 							<span class="require">*</span>
 						</div>
 						<input type="text" class="weui-input" id="customerTypeName" name="customerTypeName" value="${(outstock.customerTypeName)!}" readonly>
-						<span class="weui-cell__ft"></span>
 					</div>
 				</div>
 			</section>
@@ -145,7 +147,6 @@ $(function() {
 					<div class="weui-cell__bd">
 						发货时间
 						<input type="text" class="weui-input" data-toggle='date' id="deliveryDate" name="deliveryDate" value="${(outstock.delivery_date)!}" readonly>
-						<span class="weui-cell__ft"></span>
 					</div>
 				</div>
 			</section>
@@ -183,6 +184,7 @@ $(function() {
 					<div class="product_bUnit">
 						<span class="price" id="bigPriceSpan">￥${(list.product_price)!}</span>
 						<span class="unit" id="bigUnitSpan">&nbsp;/&nbsp;${(list.big_unit)!}</span>
+						<#if list.is_composite == 0>
 						<div class="spinner">
 				          <div class="operate fl">
 				            <i class="icon-minus2"></i>
@@ -190,12 +192,18 @@ $(function() {
 				        		<input name="bNum" type="number" class="fl" value="${((list.product_count-list.refundCount)/list.convert_relate)?int}" id="bNum">
 				          <div class="operate fl">
 				            <i class="icon-plus2"></i>
-				          </div>						
+				          </div>				        		
 						</div>
+						<#else>
+						<div class="spinner">
+				        	<input name="bNum" type="number" class="fl bo" value="${((list.product_count-list.refundCount)/list.convert_relate)?int}" id="bNum" readonly>
+				        </div>	
+						</#if> 
 					</div>
 					<div class="product_mUnit">
 						<span class="price" id="smallPriceSpan">￥${((list.product_price/list.convert_relate)!)?string("0.##")}</span>
 						<span class="unit" id="smallUnitSpan">&nbsp;/&nbsp;${(list.small_unit)!}</span>
+						<#if list.is_composite == 0>
 						<div class="spinner">
 				          <div class="operate fl">
 				            <i class="icon-minus2"></i>
@@ -205,6 +213,11 @@ $(function() {
 				            <i class="icon-plus2"></i>
 				          </div>
 						</div>
+						<#else>
+						<div class="spinner">
+				        		<input name="sNum" type="number" class="fl bo" value="${((list.product_count-list.refundCount) % list.convert_relate)!0}" id="sNum" readonly>
+						</div>							
+						</#if>
 					</div>
 					<hr />
 					<div class="gift" id="gift">

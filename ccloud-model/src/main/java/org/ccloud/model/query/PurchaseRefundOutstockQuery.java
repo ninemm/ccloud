@@ -50,9 +50,9 @@ public class PurchaseRefundOutstockQuery extends JBaseQuery {
 		boolean needWhere = true;
 
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "r.outstock_sn", keyword, params, needWhere);
-
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, needWhere);
 		if (needWhere) {
-			fromBuilder.append(" where 1 = 1 and r.biz_user_id='"+userId+"' and r.data_area='"+dataArea+"' ");
+			fromBuilder.append(" where 1 = 1 and r.biz_user_id='"+userId+"' ");
 		}
 
 		if (StrKit.notBlank(startDate)) {

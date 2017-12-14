@@ -187,6 +187,7 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 			return false;
 		}
 		
+		InventoryDetail oldDetail = InventoryDetailQuery.me().findBySellerProductId(sellerId, wareHouseId);
 		InventoryDetail inventoryDetail = new InventoryDetail();
 		inventoryDetail.setId(StrKit.getRandomUUID());
 		inventoryDetail.setWarehouseId(inventory.getWarehouseId());
@@ -194,9 +195,10 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		inventoryDetail.setInAmount(detail.getProductAmount());
 		inventoryDetail.setInCount(new BigDecimal(bigCount).add(smallStoreCount));
 		inventoryDetail.setInPrice(inventory.getBalancePrice());
-		inventoryDetail.setBalanceAmount(inventory.getBalanceAmount());
-		inventoryDetail.setBalanceCount(inventory.getBalanceCount());
-		inventoryDetail.setBalancePrice(inventory.getBalancePrice());
+		inventoryDetail.setBalanceAmount(oldDetail.getBalanceAmount().add(detail.getProductAmount()));
+		inventoryDetail.setBalanceCount(oldDetail.getBalanceCount().add(new BigDecimal(bigCount))
+				.add(smallStoreCount));
+		inventoryDetail.setBalancePrice(oldDetail.getBalancePrice());
 		inventoryDetail.setBizBillSn(inStockSN);
 		inventoryDetail.setBizDate(detail.getCreateDate());
 		inventoryDetail.setBizType(Consts.BIZ_TYPE_SALES_REFUND_INSTOCK);
@@ -306,6 +308,44 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		sqlBuilder.append(" WHERE co.id = ? ");
 
 		return Db.find(sqlBuilder.toString(), outstockId);
+	}
+
+	public Page<Record> paginateForApp(int pageNumber, int pageSize, String keyword, String status,
+			String customerTypeId, String startDate, String endDate, String sellerId, String dataArea) {
+		String select = "select o.*, c.customer_name, ct.name as customerTypeName, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName ";
+		StringBuilder fromBuilder = new StringBuilder("from cc_sales_refund_instock o ");
+		fromBuilder.append("left join cc_seller_customer cc ON o.customer_id = cc.id ");
+		fromBuilder.append("left join cc_customer c on cc.customer_id = c.id ");
+		fromBuilder.append("left join cc_customer_type ct on o.customer_type_id = ct.id ");
+		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
+
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.instock_sn", keyword, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "o.status", status, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "o.customer_type_id", customerTypeId, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
+
+		if (needWhere) {
+			fromBuilder.append(" where 1 = 1");
+		}
+
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and o.create_date >= ?");
+			params.add(startDate);
+		}
+
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and o.create_date <= ?");
+			params.add(endDate);
+		}
+
+		fromBuilder.append(" order by o.create_date desc ");
+
+		if (params.isEmpty())
+			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+
+		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
 }

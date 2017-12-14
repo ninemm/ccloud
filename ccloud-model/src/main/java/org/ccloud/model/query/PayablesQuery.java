@@ -15,11 +15,16 @@
  */
 package org.ccloud.model.query;
 
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.LinkedList;
+
+import org.ccloud.Consts;
 import org.ccloud.model.Payables;
 
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
 /**
@@ -43,8 +48,8 @@ public class PayablesQuery extends JBaseQuery {
 		});
 	}
 	
-	public Payables findByObjId(String objId,String deptId) {
-		String select = "select * from cc_payables where obj_id= '"+objId+"' and dept_id= '"+deptId+"'";
+	public Payables findByObjId(String objId, String objType) {
+		String select = "select * from cc_payables where obj_id= '"+objId+"' and obj_type= '"+objType+"'";
 		return DAO.findFirst(select);
 	}
 	
@@ -93,6 +98,27 @@ public class PayablesQuery extends JBaseQuery {
 			return deleteCount;
 		}
 		return 0;
+	}
+
+	public boolean insert(Record record, Date date) {
+		Payables payables = this.findByObjId(record.getStr("customer_id"), Consts.RECEIVABLES_OBJECT_TYPE_CUSTOMER);
+		if (payables == null) {
+			payables = new Payables();
+			payables.setObjId(record.getStr("customer_id"));
+			payables.setObjType(Consts.RECEIVABLES_OBJECT_TYPE_CUSTOMER);
+			payables.setPayAmount(record.getBigDecimal("total_reject_amount"));
+			payables.setActAmount(new BigDecimal(0));
+			payables.setBalanceAmount(record.getBigDecimal("total_reject_amount"));
+			payables.setDeptId(record.getStr("dept_id"));
+			payables.setDataArea(record.getStr("data_area"));
+			payables.setCreateDate(new Date());
+		} else {
+			payables.setPayAmount(payables.getPayAmount()
+					.add(record.getBigDecimal("total_reject_amount")));
+			payables.setBalanceAmount(payables.getBalanceAmount()
+					.add(record.getBigDecimal("total_reject_amount")));
+		}
+		return payables.saveOrUpdate();
 	}
 	
 }

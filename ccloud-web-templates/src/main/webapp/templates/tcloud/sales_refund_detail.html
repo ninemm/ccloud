@@ -1,0 +1,151 @@
+<#include "_inc/_layout.html"/>
+<#macro css> 
+	#bigNum,#smallNum {
+		border: 1px solid #bbb;
+	}
+
+	#order .gift input::-webkit-input-placeholder {
+		text-align: center;
+	}
+	
+	.bo {
+		border: 1px solid #bbb !important;
+	}
+</#macro>
+
+<#macro script>
+</#macro>
+
+<@layout>
+<body id="order">
+		<main>
+			<section class="weui-panel weui-panel_access order-customer-info">
+				<div class="weui-cell weui-cell_access">
+					<div class="weui-cell__bd">
+						<div class="order-customer-info-title">
+							客户名称
+							<span class="require">*</span>
+						</div>
+						<input type="text" class="weui-input" value="${(refund.customer_name)!}" readonly>
+					</div>
+				</div>
+				<div class="weui-cell weui-cell_access">
+					<div class="weui-cell__bd">
+						<div class="order-customer-info-title">
+							联系人
+							<span class="require">*</span>
+						</div>
+						<input type="text" class="weui-input" id="contact" name="contact" value="${(refund.ccontact)!}" readonly>
+					</div>
+				</div>
+				<div class="weui-cell weui-cell_access">
+					<div class="weui-cell__bd">
+						<div class="order-customer-info-title">
+							 电话号码
+							<span class="require">*</span>
+						</div>
+						<input type="text" class="weui-input" id="mobile" name="mobile" value="${(refund.cmobile)!}" readonly>
+					</div>
+				</div>
+				<div class="weui-cell weui-cell_access">
+					<div class="weui-cell__bd">
+						<div class="order-customer-info-title">
+							详细地址
+							<span class="require">*</span>
+						</div>
+						<input type="text" class="weui-input" id="deliveryAddress" name="deliveryAddress" value="${(refund.caddress)!}" readonly>
+					</div>
+				</div>
+				<div class="weui-cell weui-cell_access">
+					<div class="weui-cell__bd">
+						<div class="order-customer-info-title">
+							客户类型
+							<span class="require">*</span>
+						</div>
+						<input type="text" class="weui-input" id="customerTypeName" name="customerTypeName" value="${(refund.customerTypeName)!}" readonly>
+					</div>
+				</div>
+			</section>
+			<section class="weui-panel weui-panel_access delivery-info">
+				<div class="weui-cell weui-cell_access">
+					<div class="weui-cell__bd">
+						发货时间
+						<input type="text" class="weui-input" data-toggle='date' id="deliveryDate" name="deliveryDate" value="${(refund.biz_date)!}" readonly>
+					</div>
+				</div>
+			</section>
+			<section class="weui-panel weui-panel_access ft14">
+				<div class="weui-cell weui-cell_access">
+					<div class="weui-cell__bd">
+						<div>
+							<input type="checkbox" id="receiveType" name="receiveType" <#if refund.payment_type == 0>checked</#if> disabled> 是否账期
+						</div>
+					</div>
+				</div>
+			</section>
+			<section class="weui-panel weui-panel_access ft14 remark">
+				<div class="weui-cell weui-cell_access">
+					<div class="weui-cell__bd">
+						<textarea id="remark" name="remark" readonly>${refund.remark!}</textarea>
+					</div>
+				</div>
+			</section>
+			<div class="weui-cells__title black">商品明细</div>
+			<div id="productList">
+				<#list refundDetail as list>
+				<div class="weui-panel weui-panel_access goods-detail">
+					<div class="product_name" id="productName">
+						${(list.custom_name)!} 
+					</div>
+					<div class="product_unit">
+						规格：<span id="valueName">${(list.valueName)!}</span>
+					</div>
+					<div class="product_bUnit">
+						<span class="price" id="bigPriceSpan">￥${(list.product_price)!}</span>
+						<span class="unit" id="bigUnitSpan">&nbsp;/&nbsp;${(list.big_unit)!}</span>
+						<div class="spinner">
+				        	<input name="bNum" type="number" class="fl bo" value="${((list.product_count)/list.convert_relate)?int}" id="bNum" readonly>
+				        </div>	
+					</div>
+					<div class="product_mUnit">
+						<span class="price" id="smallPriceSpan">￥${((list.product_price/list.convert_relate)!)?string("0.##")}</span>
+						<span class="unit" id="smallUnitSpan">&nbsp;/&nbsp;${(list.small_unit)!}</span>
+						<div class="spinner">
+			        		<input name="sNum" type="number" class="fl bo" value="${((list.product_count) % list.convert_relate)!0}" id="sNum" readonly>
+						</div>							
+					</div>
+					<hr />
+					<div class="gift" id="gift">
+						<div>
+							<input type="checkbox" name="add-gift" id="addGift" <#if list.is_gift == 1>checked</#if> disabled>
+							<span>赠品</span>
+						</div>
+					</div>
+				</div>
+				</#list>
+			</div>
+		</main>
+		<div class="hidden-menu">
+			<ul>
+				<li>
+					<a href="${CPATH}/product/index">
+							首页
+						<i class="icon-home blue"></i>
+					</a>
+				</li>
+				<li>
+					<a class="goback">
+							上一页
+						<i class="icon-undo green"></i>
+					</a>
+				</li>
+			</ul>
+			<i class="icon-menu-open orange fr" id="button"></i>
+		</div>
+		<div class="layer"></div>
+	<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
+		<p class="total bg-gray weui-flex__item" id="totalNum">共${refundDetail?size}款,合计:￥${refund.total_reject_amount!}元</p>
+		<button onclick="window.location.href = '${CPATH}/refund/myRefund'" class="place-order bg-blue white">返回</button>
+	</footer>	
+</body>
+</@layout>

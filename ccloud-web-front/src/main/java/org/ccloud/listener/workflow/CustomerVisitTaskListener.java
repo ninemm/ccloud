@@ -12,7 +12,7 @@ public class CustomerVisitTaskListener implements TaskListener {
 		
 		Object _applyUsername = task.getVariable("applyUsername");
 		if (_applyUsername != null) {
-			String applyUsername = (String) _applyUsername;
+		//	String applyUsername = (String) _applyUsername;
 			// 找到主管
 			
 			task.setAssignee("");

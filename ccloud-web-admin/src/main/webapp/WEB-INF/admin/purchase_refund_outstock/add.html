@@ -177,7 +177,7 @@
 	}
 
 	function doSubmit(){
-		var l = Ladda.create( document.querySelector( '#do_Submit' ) );
+		var l = Ladda.create( document.querySelector( '#do_submit' ) );
 		$("#productNum").val($(".rowNum").length - 1);
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
@@ -195,11 +195,14 @@
 				if (data.errorCode == 0) {
 					//location.reload();
 					toastr.success(data.message, '操作成功');
+					setTimeout( function(){
+						location.href = '${CPATH}/admin/purchaseRefundOutstock/index';
+								}, 2* 1000 );
 				} else {
 					toastr.error(data.message,'操作失败');
 					setTimeout( function(){
 						location.reload();
-								}, 3* 1000 );
+								}, 2* 1000 );
 				}
 			},
 			error : function() {
@@ -402,7 +405,7 @@
 			</div>
 
 			<div class="box-footer"> 
-				<button type="button" id="do_submit" onclick="doSubmit()" class="btn btn-primary">提交订单</button>
+				<button type="button" id="do_submit" onclick="doSubmit()" class="btn btn-primary ladda-button" data-style="expand-right">提交订单</button>
 				<input type="button" class="btn btn-primary" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
 			</div>
 		</form>

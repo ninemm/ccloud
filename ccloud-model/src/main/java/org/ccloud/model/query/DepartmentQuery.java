@@ -563,6 +563,22 @@ public class DepartmentQuery extends JBaseQuery {
 		return childList;
 	}
 
-	
+	public List<Department> findAllParentDepartmentsBySubDeptId(String subDeptId) {
+		StringBuilder sql = new StringBuilder("SELECT d2.id, d2.dept_name, d2.dept_level, d2.parent_id, s.id as seller_id, s.seller_name, s.seller_code");
+		sql.append(" FROM (");
+		sql.append(" SELECT @r as _id,");
+		sql.append(" 	(SELECT @r := parent_id FROM department WHERE id = _id) AS p_id,");
+		sql.append(" 	@l := @l + 1 AS lvl ");
+		sql.append(" FROM");
+		sql.append(" 	(SELECT @r := ?, @l := 0) vars, department h");
+		sql.append(" WHERE @r > '0' ");
+		sql.append(" ) d1");
+		sql.append(" JOIN department d2 ON d1._id = d2.id");
+		sql.append(" JOIN cc_seller s on d2.id = s.dept_id");
+		sql.append(" WHERE d2.parent_id > '0' and d2.dept_level = 2");
+		sql.append(" ORDER BY d2.dept_level");
+		
+		return DAO.find(sql.toString(), subDeptId);
+	}
 	
 }

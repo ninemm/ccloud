@@ -191,7 +191,6 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			option.setOptionKey(sellerId+"_store_check");
 			option.setOptionValue("1");
 			option.set("seller_id",sellerId );
-			option.save();
 			
 			
 			
@@ -244,7 +243,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				//添加用户客户中间表
 				userJoinCustomer.set("seller_customer_id", sellerCustomerId);
 				userJoinCustomer.set("user_id", user.getId());
-				userJoinCustomer.set("data_area",department.getDataArea());
+				userJoinCustomer.set("data_area",DataAreaUtil.getUserDealerDataArea(department.getDataArea()));
 				userJoinCustomer.set("dept_id", department.getId());
 				userJoinCustomer.save();
 				
@@ -263,11 +262,10 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				seller.set("seller_type", 1);
 				seller.setCustomerId(customer.getId());
 			}
-			seller.save();
 			//新建销售商时默认创建分组  角色  及中间表 客户类型
  			List<Seller> sellers = SellerQuery.me().findByDeptId(department.getId());
 			
-			if(sellers.size()==1 ){
+			if(sellers.size()==0 ){
 				List<Group> groupList = GroupQuery.me().findByDeptId();
 				if(groupList.size()>0){
 					for (Group group : groupList) {
@@ -300,7 +298,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 						newRole.save();
 						
 						GroupRoleRel groupRoleRel = new GroupRoleRel();
-						Group group = GroupQuery.me().findDeptIdAndDataAreaAndGroupCode(newRole.getDeptId(),newRole.getDataArea(),newRole.getRoleCode());
+						Group group = GroupQuery.me().findDeptIdAndDataAreaAndGroupCode(newRole.getDeptId(),newRole.getDataArea(),newRole.getRoleCode().substring(1));
 						groupRoleRel.setId(StrKit.getRandomUUID());
 						groupRoleRel.setGroupId(group.getId());
 						groupRoleRel.setRoleId(roleId);
@@ -340,6 +338,8 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 					}
 				}
 			}
+			option.save();
+			seller.save();
 			
 			
 			/*List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDept("0");
