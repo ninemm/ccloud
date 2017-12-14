@@ -22,13 +22,12 @@
                 $("#question_desc").val(detailInfo.questionDesc);
                 $("#customer_name").val(detailInfo.customer_name);
                 var pic = JSON.parse(detailInfo.picurl);
-                console.log(pic);
                 var addHtml = "";
                 //../templates/tcloud/images/avatar.png
                 for(var i in pic){
                     addHtml += '<li class="weui-uploader__file" style="background-image:url('+pic[i].savePath+')"></li>';
-                    $uploaderFiles.html(addHtml);
                 }
+                $("#uploaderFiles").html(addHtml);
             }
         });
     });
