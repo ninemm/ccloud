@@ -178,6 +178,11 @@
 		 var supplierId=$("#supplierId").find("option:selected").val();
 		 location.href="${CPATH}/admin/purchaseOrderDetail/index?supplierId="+supplierId;
 	}
+	
+	function refresh(){
+		layer.closeAll();
+		location.reload();
+	}
 </#macro>
 
 <@layout active_id=p child_active_id=c>

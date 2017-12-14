@@ -108,7 +108,7 @@ public class GroupQuery extends JBaseQuery {
 	}
 	
 	public Group findDeptIdAndDataAreaAndGroupCode(String deptId,String dataArea,String groupCode){
-		String sql = "select * from `group` where dept_id = ? and data_area = ? and group_code = ?";
+		String sql = "select * from `group` where dept_id = ? and data_area = ? and SUBSTRING(group_code,5 ) = ?";
 		return DAO.findFirst(sql, deptId,dataArea,groupCode);
 	}
 	

@@ -11,6 +11,8 @@
 	<!-- bootstrapvalidator -->
 	<script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
 	<script src="${CPATH}/static/plugins/toastr/toastr.js"></script>
+	<script src="${CPATH}/static/ladda/spin.min.js"></script>
+	<script src="${CPATH}/static/ladda/ladda.min.js"></script>
 
 </#macro>
 
@@ -23,7 +25,7 @@
 	<!-- bootstrapvalidator -->
 <link rel="stylesheet" href="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.css">
 <link rel="stylesheet" href="${CPATH}/static/plugins/toastr/toastr.css">
-
+<link rel="stylesheet" href="${CPATH}/static/ladda/ladda-themeless.min.css">
 </#macro>
 
 <#macro script>
@@ -182,24 +184,32 @@
 	}
 
 	function doSubmit(){
-		$(do_Submit).attr("disabled","disabled"); 
+		var l = Ladda.create( document.querySelector( '#do_submit' ) );
 		$("#productNum").val($(".rowNum").length - 1);
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
 				var validate = $form.data('bootstrapValidator');
 				validate.validate();
+				if (validate.isValid()) {
+					l.start();
+				}
 				return validate.isValid();
 			},
 			type : "post", 
 			dataType : "json", 
 			success : function(data) { 
+				l.stop();
 				if (data.errorCode == 0) {
 					toastr.success(data.message, '操作成功');
+					setTimeout( function(){
+						parent.refresh();
+								}, 3* 1000 );
 				} else {
 					toastr.error(data.message,'操作失败');
 				}
 			},
 			error : function() {
+				l.stop();
 				alert("信息提交错误");
 			}
 		});
@@ -368,7 +378,7 @@
 			</div>
 
 			<div class="box-footer"> 
-				<button class="btn btn-primary  ladda-button" id="do_Submit" onclick="doSubmit()" data-color="green" data-style="contract-overlay">审核通过</button>  
+				<button class="btn btn-primary  ladda-button" id="do_Submit" onclick="doSubmit()" data-color="green" data-style="expand-right">审核通过</button>  
 				<!-- <button type="button" id="do_Submit" onclick="doSubmit()" class="btn btn-primary">审核通过</button> -->
 				<!-- <input type="button" class="btn btn-primary" onclick="history.go(-1)" value="返  回" hidefocus="true" /> -->
 			</div>
