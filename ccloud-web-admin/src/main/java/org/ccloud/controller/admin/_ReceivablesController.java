@@ -119,8 +119,7 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 		String ref_type = getPara("ref_type");
 		String object_id = getPara("object_id");
 		//通过客户Id找到应收账款主表ID
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		Receivables receivables = ReceivablesQuery.me().findByObjId(object_id, user.getDepartmentId());
+		Receivables receivables = ReceivablesQuery.me().findByObjId(object_id, Consts.RECEIVABLES_OBJECT_TYPE_CUSTOMER);
 		
 		if(receivables == null) {
 			setAttr("ref_sn",ref_sn);
