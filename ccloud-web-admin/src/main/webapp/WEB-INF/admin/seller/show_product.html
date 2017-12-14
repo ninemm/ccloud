@@ -183,11 +183,6 @@
 		jQuery.mm.del('${CPATH}/admin/seller/deleteProduct?ucode=${ucode}&id=' + id);
 	}
 	
-	function refresh(){
-		$('#post-search-input').val("");
-		$table.bootstrapTable('refresh');
-	}
-	
 	function change(id){
 			$.ajax({
 				url:"${CPATH}/admin/seller/change",

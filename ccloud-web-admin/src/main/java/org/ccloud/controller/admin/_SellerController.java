@@ -191,7 +191,6 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			option.setOptionKey(sellerId+"_store_check");
 			option.setOptionValue("1");
 			option.set("seller_id",sellerId );
-			option.save();
 			
 			
 			
@@ -263,7 +262,6 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				seller.set("seller_type", 1);
 				seller.setCustomerId(customer.getId());
 			}
-			seller.save();
 			//新建销售商时默认创建分组  角色  及中间表 客户类型
  			List<Seller> sellers = SellerQuery.me().findByDeptId(department.getId());
 			
@@ -340,6 +338,8 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 					}
 				}
 			}
+			option.save();
+			seller.save();
 			
 			
 			/*List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDept("0");
