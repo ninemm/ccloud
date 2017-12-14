@@ -40,9 +40,9 @@ public class CustomerVisitController extends BaseFrontController {
 	public void index() {
 		
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-		String userId = ShiroKit.getUserId();
-		render("customer_visit_list.html");
+		Page<Record> visitList = CustomerVisitQuery.me().queryVisitRecord(getPageNumber(), getPageSize(), user.getId());
+		setAttr("visitList",visitList);
+		render("customer_visit_record.html");
 	}
 
 	@Before(WechatJSSDKInterceptor.class)

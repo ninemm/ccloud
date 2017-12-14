@@ -19,7 +19,9 @@ import java.util.LinkedList;
 
 import org.ccloud.model.CustomerVisit;
 
+import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
 /**
@@ -98,5 +100,14 @@ public class CustomerVisitQuery extends JBaseQuery {
 		fromBuilder.append(" where c.is_enabled = 1 and locate(?, u.USER_ID_) > 0");
 		
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), username);
+	}
+	
+	public Page<Record> queryVisitRecord(int pageNumber, int pageSize,String userId){
+		String select = "select ccv.*,cc.customer_name,cc.contact,cc.mobile,d.`name` questionType,if(ccv.`status`>0,'已审核','未审核') visitStatus ";
+		StringBuilder fromBuilder = new StringBuilder("from cc_customer_visit ccv left join cc_seller_customer csc on ccv.seller_customer_id = csc.id left join cc_customer cc on csc.customer_id = cc.id left join dict d on ccv.question_type = d.id ");
+		LinkedList<Object> params = new LinkedList<Object>();
+		appendIfNotEmpty(fromBuilder, "ccv.user_id", userId, params, true);
+		fromBuilder.append("ORDER BY ccv.create_date desc ");
+		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 }

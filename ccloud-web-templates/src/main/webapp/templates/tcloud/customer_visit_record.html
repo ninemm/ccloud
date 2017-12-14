@@ -1,0 +1,182 @@
+<#include "_inc/_layout.html"/>
+<#macro css> </#macro>
+<#macro script>
+    var pageNumber = 2;
+    var pageSize = 10;
+    var loading = false;
+
+    var $endNode = null;
+    var $loadmore = $(".weui-loadmore");
+
+    $(function() {
+            //搜索框监听
+        $(document).on("input", "#searchInput", function() {
+            refresh();
+        });
+
+        //筛选项获取
+        $.ajax({
+            url:"${CPATH}/customer/getCustomerRegionAndType",
+            type:"post",
+            dataType:"json",
+            success:function(data) {
+
+                $("#region").select({
+                    title: "选择业务员",
+                    items: data.region
+                });
+
+                $("#customer-type").select({
+                    title: "选择客户类型",
+                    items: data.customerType
+                });
+
+                $("#if-order").select({
+                    title: "是否下单",
+                    items: [{
+                    title: "全部", value: ""
+                    },{
+                    title: "是", value: "1"
+                    },{
+                    title: "否",value: "0"
+                    }]
+                });
+            }
+        });
+    });
+
+    var paramData = function() {
+        return  {
+            "pageNumber": pageNumber,
+            "pageSize": pageSize,
+            "region": $("#region")[0].dataset.values,
+            "customerType": $("#customer-type")[0].dataset.values,
+            "isOrdered": $("#if-order")[0].dataset.values
+        };
+    }
+
+    //监听滚动
+    $(".infinite").infinite().on("infinite", function() {
+        var self = this;
+        $endNode = $(".weui-panel_access:last");
+        $loadmore = $(self).find(".weui-loadmore");
+        if ($loadmore) $loadmore.show();
+        if (loading) return ;
+        loading = true;
+
+        $.ajax({
+            type: "post",
+            url: "${CPATH}/customer/refresh",
+            data: paramData(),
+            dataType: "json",
+            success:function(data) {
+                if ($loadmore) $loadmore.show();
+                if (data.totalPage >= pageNumber) {
+                    $endNode.after(data.html);
+                }
+                if (data.totalPage == pageNumber) {
+                    $(".infinite").destroyInfinite();
+                    $loadmore.hide();
+                }
+                pageNumber++;
+                loading = false;
+            }
+        });
+    });
+
+
+
+    function refresh() {
+        pageNumber = 1;
+        $.ajax({
+            url:"${CPATH}/customer/refresh",
+            type:"post",
+            data:paramData(),
+            dataType:"json",
+            success:function(data) {
+                $loadmore = $(this).find(".weui-loadmore");
+                $(".infinite").destroyInfinite();
+                $loadmore.hide();
+
+                if (data.totalPage > pageNumber) {
+                    loading = false;
+                    $(".infinite").infinite();
+                    $(".weui-loadmore").removeAttr("style");
+                }
+
+                $(".infinite")[0].scrollTop = 0;
+                $("#customerList").empty();
+                $("#customerList").html(data.html);
+                pageNumber = 2;
+            }
+        });
+    }
+
+
+</#macro>
+
+<@layout>
+<div id="visit-record">
+    <article class="customer">
+        <header class="has-th-list weui-flex">
+            <div class="head-search select-area weui-flex__item">
+                <div class="weui-flex">
+                    <div class="weui-flex__item">
+                        <input type="text" id="customer-type" placeholder="客户类型" class="weui-input" readonly onchange="refresh()">
+                        <i class="icon-sort-desc"></i>
+                    </div>
+                    <div class="weui-flex__item">
+                        <input type="text" id="customer-nature" placeholder="客户性质" class="weui-input" readonly onchange="refresh()">
+                        <i class="icon-sort-desc"></i>
+                    </div>
+                    <div class="weui-flex__item">
+                        <input type="text" id="customer-level" placeholder="客户级别" class="weui-input" readonly onchange="refresh()">
+                        <i class="icon-sort-desc"></i>
+                    </div>
+                </div>
+            </div>
+            <div id="combin-filter-btn">
+                <i class="icon-th-list"></i>
+            </div>
+        </header>
+        <article  class="infinite">
+            <div id = "visitList">
+                <#if visitList??>
+                    <#list visitList.list as visit>
+                        <a class="weui-cell weui-cell_access" id="visit_">
+                            <div class="weui-cell__bd ft14">
+                                <p>${(visit.customer_name)!}</p>
+                                <p class="gray ft12">${(visit.contact)!}/${(visit.mobile)!}
+                                    <span class="fr">${(visit.create_date)!}</span>
+                                </p>
+                                <p>活动类型：
+                                    <span class="orange">${(visit.questionType)!}</span>
+                                    <span class="green fr">${(visit.visitStatus)!}</span>
+                                </p>
+                            </div>
+                            <span class="weui-cell__ft"></span>
+                        </a>
+                    </#list>
+                </#if>
+            </div>
+            <#if visitList??>
+                <#if visitList.totalRow = 0>
+                    <div class="weui-loadmore weui-loadmore_line">
+                        <span class="weui-loadmore__tips">暂无数据</span>
+                    </div>
+                    <#elseif visitList.totalRow &gt; 10>
+                        <div class="weui-loadmore">
+                            <i class="weui-loading"></i>
+                            <span class="weui-loadmore__tips">正在加载</span>
+                        </div>
+                </#if>
+            </#if>
+        </article>
+    </article>
+</div>
+<a class="hidden-menu" href="/customer/edit">
+    <img src="${CTPATH}/images/customer_add.png" alt="">
+</a>
+<div class="layer"></div>
+<#include "_inc/_footer_nav.html" />
+</@layout>
