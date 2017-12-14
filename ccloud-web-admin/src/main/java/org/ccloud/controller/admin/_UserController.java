@@ -287,7 +287,7 @@ public class _UserController extends JBaseCRUDController<User> {
 	public void getGroup() {
 		String id = getPara("userid");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		List<Group> groups = GroupQuery.me().findByDept(dataArea);
+		List<Group> groups = GroupQuery.me().findByDept(DataAreaUtil.getUserDealerDataArea(dataArea));
 		List<Map<String, Object>> list = new ArrayList<>();
 		for (Group group : groups) {
 			if (group.getId().equals("0")) {
