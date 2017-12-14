@@ -49,6 +49,7 @@ public class Actions {
 	}
 	public class NotifyMessage {
 		public static final String CUSTOMER_AUDIT_MESSAGE = "customer:audit";
+		public static final String CUSTOMER_VISIT_AUDIT_MESSAGE = "visit:audit";
 	}
 	
 

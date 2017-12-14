@@ -81,7 +81,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 		boolean needwhere = true;
 		List<Object> params = new LinkedList<Object>();
 
-		String select  ="SELECT ccv.id, cc.customer_name, cc.contact, cc.mobile, ccv.create_date, ccv.`status`, ccv.question_type ";
+		String select  ="SELECT DISTINCT(ccv.id), cc.customer_name, cc.contact, cc.mobile, ccv.create_date, ccv.`status`, ccv.question_type ";
 		StringBuilder sql = new StringBuilder("FROM cc_customer_visit ccv ");
 		sql.append("LEFT JOIN cc_seller_customer csc ON ccv.seller_customer_id = csc.id ");
 		sql.append("LEFT JOIN cc_customer cc ON csc.customer_id = cc.id ");
@@ -96,12 +96,12 @@ public class CustomerVisitQuery extends JBaseQuery {
 	}
 
 	public List<Record> findMoreById(String id) {
-		StringBuilder sql = new StringBuilder("SELECT ccv.id, cc.customer_name, cc.contact, cc.mobile, ccv.create_date, ccv.`status`, ccv.question_type, ccv.comment, ccv.location, ccv.photo ");
+		StringBuilder sql = new StringBuilder("SELECT DISTINCT(ccv.id), ccv.seller_customer_id, cc.customer_name, cc.contact, cc.mobile, ccv.create_date, ccv.`status`, ccv.question_type, ccv.comment, ccv.location, ccv.photo, ccv.question_desc ");
 		sql.append("FROM cc_customer_visit ccv ");
 		sql.append("LEFT JOIN cc_seller_customer csc ON ccv.seller_customer_id = csc.id ");
 		sql.append("LEFT JOIN cc_customer cc ON csc.customer_id = cc.id ");
 		sql.append("LEFT JOIN cc_customer_join_customer_type ccjct ON csc.id = ccjct.seller_customer_id ");
-		sql.append("WHERE ccv.id = ?");
+		sql.append("WHERE ccv.id = ? limit 1");
 
 		return Db.find(sql.toString(), id);
 	}
@@ -121,13 +121,13 @@ public class CustomerVisitQuery extends JBaseQuery {
 
 	public Page<CustomerVisit> getToDo(int pageNumber, int pageSize, String username) {
 		
-		String select = "select cv.*, sc.nickname, c.customer_name, c.customer_code, c.contact, c.mobile, a.ID_ taskId, a.NAME_ taskName, a.ASSIGNEE_ assignee, a.CREATE_TIME_ createTime";
+		String select = "select cv.*, sc.nickname, c.customer_name, c.customer_code, c.contact, c.mobile, c.prov_name, c.city_name, c.country_name, c.address, a.ID_ taskId, a.NAME_ taskName, a.ASSIGNEE_ assignee, a.CREATE_TIME_ createTime";
 		
 		StringBuilder fromBuilder = new StringBuilder(" FROM cc_customer_visit cv");
 		fromBuilder.append(" JOIN cc_seller_customer sc on cv.seller_customer_id = sc.id");
 		fromBuilder.append(" JOIN cc_customer c on sc.customer_id = c.id");
-		fromBuilder.append(" JOIN act_ru_task a on sc.proc_inst_id = a.PROC_INST_ID_");
-		fromBuilder.append(" JOIN act_ru_identitylink u on sc.proc_inst_id = u.PROC_INST_ID_");
+		fromBuilder.append(" JOIN act_ru_task a on cv.proc_inst_id = a.PROC_INST_ID_");
+		fromBuilder.append(" JOIN act_ru_identitylink u on cv.proc_inst_id = u.PROC_INST_ID_");
 		fromBuilder.append(" where c.is_enabled = 1 and locate(?, u.USER_ID_) > 0");
 		
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), username);
