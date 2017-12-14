@@ -244,8 +244,16 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 			BigDecimal convent = new BigDecimal(pr.get("convert_relate").toString());
 			SellerProduct sellerProduct = SellerProductQuery.me().findById(pr.getSellerProductId());
 			Inventory inventory= InventoryQuery.me().findBySellerIdAndProductIdAndWareHouseId(seller.getId(), sellerProduct.getProductId(), pr.get("warehouse_id").toString());
-			inventory.set("out_count",inventory.getOutCount().add( count1.divide(convent, 2, BigDecimal.ROUND_HALF_UP)));
-			inventory.set("out_amount", inventory.getOutAmount().add(pr.getProductAmount()));
+			if(inventory.getOutCount() == null ){
+				inventory.set("out_count", count1.divide(convent, 2, BigDecimal.ROUND_HALF_UP));
+			}else{
+				inventory.set("out_count",inventory.getOutCount().add( count1.divide(convent, 2, BigDecimal.ROUND_HALF_UP)));
+			}
+			if(inventory.getOutAmount()==null){
+				inventory.set("out_amount", pr.getProductAmount());
+			}else{
+				inventory.set("out_amount", inventory.getOutAmount().add(pr.getProductAmount()));
+			}
 			inventory.set("out_price", pr.getProductPrice());
 			inventory.set("balance_count", inventory.getBalanceCount().subtract(count1.divide(convent, 2, BigDecimal.ROUND_HALF_UP)));
 			inventory.set("balance_amount", inventory.getBalanceAmount().subtract(pr.getProductAmount()));
