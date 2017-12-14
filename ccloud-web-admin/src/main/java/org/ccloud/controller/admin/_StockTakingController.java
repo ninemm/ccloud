@@ -128,8 +128,7 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 						List<Record> findByInventory = StockTakingDetailQuery.me().findByInventory(product_id,warehouse_id,seller_id);
 						//当前商品的存入数量  大单位换算关系  商品大单位的价格  商品总价格
 						BigDecimal productCount = new BigDecimal(listMap.get(i).get("product_count").toString());
-						BigDecimal convertRelate=new BigDecimal(listMap.get(i).get("convert_relate").toString());
-						BigDecimal price=new BigDecimal(listMap.get(i).get("price").toString()).multiply(convertRelate);
+						BigDecimal price=new BigDecimal(listMap.get(i).get("price").toString());
 						BigDecimal amount=productCount.multiply(price);
 						if (findByInventory.size()!=0) {
 							//存在--只更改数量 总价格
