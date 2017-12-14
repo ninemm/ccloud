@@ -1,0 +1,140 @@
+<#include "_inc/_layout.html"/>
+
+<#macro css> </#macro>
+
+<#macro script_import>
+    <script type="text/javascript" src="${CPATH}/static/layer_mobile/layer.js"></script>
+</#macro>
+
+<#macro script>
+    $(function(){
+        var visitId = getItemBykey("visitId");
+        $.ajax({
+            url:"${CPATH}/customerVisit/loadVisitDetail",
+            type:"post",
+            data:{"visitId":visitId},
+            dataType:"json",
+            success:function(data) {
+                var detailInfo = data;
+                $("#contact").val(detailInfo.contact);
+                $("#mobile").val(detailInfo.mobile);
+                $("#problem_type").val(detailInfo.questionType);
+                $("#question_desc").val(detailInfo.questionDesc);
+                $("#customer_name").val(detailInfo.customer_name);
+                var pic = JSON.parse(detailInfo.picurl);
+                console.log(pic);
+                var addHtml = "";
+                //../templates/tcloud/images/avatar.png
+                for(var i in pic){
+                    addHtml += '<li class="weui-uploader__file" style="background-image:url('+pic[i].savePath+')"></li>';
+                    $uploaderFiles.html(addHtml);
+                }
+            }
+        });
+    });
+
+
+</#macro>
+<@layout>
+<div id="visit-detail">
+    <main>
+        <form>
+            <section class="weui-panel weui-panel_access order-customer-info">
+                <div class="weui-cell weui-cell_access">
+                    <div class="weui-cell__bd">
+                        <div class="order-customer-info-title">客户名称
+                            <span class="require">*</span>
+                        </div>
+                        <input type="text" class="weui-input" id="customer_name" name="customer_name" value="" readonly>
+                    </div>
+                    <span class="weui-cell__ft"></span>
+                </div>
+
+                <div class="weui-cell weui-cell_access">
+                    <div class="weui-cell__bd">
+                        <div class="order-customer-info-title">联系人
+                            <span class="require">*</span>
+                        </div>
+                        <input type="text" class="weui-input" id="contact" name="contact" value="" readonly="readonly" readonly>
+                    </div>
+                    <span class="weui-cell__ft"></span>
+                </div>
+
+
+                <div class="weui-cell weui-cell_access">
+                    <div class="weui-cell__bd">
+                        <div class="order-customer-info-title">性别</div>
+                        <label class="fr">
+                            <input type="radio" name="sex" value="female">女</label>
+                        <label class="fr">
+                            <input type="radio" name="sex" value="male">男</label>
+                    </div>
+                </div>
+
+                <div class="weui-cell weui-cell_access">
+                    <div class="weui-cell__bd">
+                        <div class="order-customer-info-title">联系电话<span class="require">*</span></div>
+                        <input id="mobile" type="text" name="mobile" class="weui-input" readonly="readonly" />
+                    </div>
+                </div>
+
+                <div class="weui-cell weui-cell_access">
+                    <div class="weui-cell__bd">
+                        <div class="order-customer-info-title">问题类型
+                            <span class="require">*</span>
+                        </div>
+                        <input id="problem_type" name="problem_type" type="text" class="weui-input" readonly>
+                    </div>
+                    <span class="weui-cell__ft"></span>
+                </div>
+
+                <div class="weui-cell weui-cell_access">
+                    <div class="weui-cell__bd">
+                        <textarea name="customerVisit.question_desc" id="question_desc"></textarea>
+                    </div>
+                </div>
+            </section>
+            <div class="weui-gallery" id="gallery">
+                <span class="weui-gallery__img" id="galleryImg"></span>
+                <div class="weui-gallery__opr">
+                    <a href="javascript:" rel="nofollow" target="_blank"  class="weui-gallery__del">
+                        <i class="weui-icon-delete weui-icon_gallery-delete"></i>
+                    </a>
+                </div>
+            </div>
+            <section class="weui-cells weui-cells_form">
+                <div class="weui-cell">
+                    <div class="weui-cell__bd">
+                        <div class="weui-uploader">
+                            <div class="weui-uploader__hd">
+                                <p class="weui-uploader__title">附件图片</p>
+                                <div class="weui-uploader__info">0/3</div>
+                            </div>
+                            <div class="weui-uploader__bd">
+                                <ul class="weui-uploader__files" id="uploaderFiles">
+                                    <!--
+                                    <li class="weui-uploader__file weui-uploader__file_status" style="background-image:url(./images/pic_160.png)">
+                                        <div class="weui-uploader__file-content">
+                                            <i class="weui-icon-warn"></i>
+                                        </div>
+                                    </li>
+                                    <li class="weui-uploader__file weui-uploader__file_status" style="background-image:url(./images/pic_160.png)">
+                                        <div class="weui-uploader__file-content">50%</div>
+                                    </li>
+                                     -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </form>
+    </main>
+
+    <#include "_inc/_goback.html" />
+    <footer class="weui-footer weui-footer_fixed-bottom ft16">
+        <a class="blue-button width-100 _submit_btn" href="javascript:history.go(-1)">返回</a>
+    </footer>
+
+</div>
+</@layout>

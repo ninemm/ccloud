@@ -1,6 +1,5 @@
 package org.ccloud.front.controller;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -40,8 +39,32 @@ public class CustomerVisitController extends BaseFrontController {
 	public void index() {
 		
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		Page<Record> visitList = CustomerVisitQuery.me().queryVisitRecord(getPageNumber(), getPageSize(), user.getId());
+		Page<Record> visitList = CustomerVisitQuery.me().queryVisitRecord(getPageNumber(), getPageSize(),"","","", user.getId());
+	    String selDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		List<Record> typeList = CustomerTypeQuery.me().findCustomerTypeList(selDataArea);
+		List<Dict> levelList = DictQuery.me().findDictByType("customer_subtype");
+		Map<String, Object> all = new HashMap<>();
+		all.put("title", "全部");
+		all.put("value", "");
+		List<Map<String, Object>> customerTypeList = new ArrayList<>();
+		customerTypeList.add(all);
+		for (Record customerType : typeList) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", customerType.get("name"));
+			item.put("value", customerType.get("id"));
+			customerTypeList.add(item);
+		}
+		List<Map<String, Object>> customerLevel = new ArrayList<>();
+		customerLevel.add(all);
+		for (Dict level : levelList) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", level.getName());
+			item.put("value", level.getValue());
+			customerLevel.add(item);
+		}
+	    setAttr("typeList",JSON.toJSONString(customerTypeList));
 		setAttr("visitList",visitList);
+		setAttr("customerLevel",JSON.toJSONString(customerLevel));
 		render("customer_visit_record.html");
 	}
 
@@ -91,9 +114,9 @@ public class CustomerVisitController extends BaseFrontController {
 	public void visitAdd() {
 	    String user_id = "1f797c5b2137426093100f082e234c14";
 	    //String data_area = "0010010016410";
-	    //User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+	    User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 	    String selDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		Page<Record> customer_list = SellerCustomerQuery.me().paginateForApp(getPageNumber(), getPageSize(), "",selDataArea, user_id, "", "","");
+		Page<Record> customer_list = SellerCustomerQuery.me().paginateForApp(getPageNumber(), getPageSize(), "",selDataArea, user.getId(), "", "","");
 		List<Record> customerList = new ArrayList<Record>();
 		if(customer_list!=null) {
 			customerList = customer_list.getList();
@@ -184,6 +207,48 @@ public class CustomerVisitController extends BaseFrontController {
 		setAttr("problem",JSON.toJSONString(problem_list));
 		setAttr("deliveryDate", DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
 		render("customer_visit_add.html");
+	}
+	
+	public void loadVisitRecord() {
+        int pageNumber = Integer.parseInt(getPara("pageNumber"));
+        int pageSize = Integer.parseInt(getPara("pageSize"));
+        String customerLevel = getPara("customerLevel");
+        String customerType = getPara("customerType");
+        String customerNature = getPara("customerNature");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		Page<Record> visitList = new Page<Record>();
+		StringBuilder recordHtml = new StringBuilder("<div class=\"weui-loadmore weui-loadmore_line\"><span class=\"weui-loadmore__tips\"  style=\"float: inherit;\">暂无数据</span></div>");
+		if(StrKit.notBlank(user.getId())) {
+			visitList = CustomerVisitQuery.me().queryVisitRecord(pageNumber, pageSize,customerLevel,customerType,customerNature, user.getId());
+			if(visitList.getList().size()>0||pageNumber>1) {
+				recordHtml.delete(0, recordHtml.length());
+			}
+			for (Record visit : visitList.getList()) {
+				recordHtml.append("<a class=\"weui-cell weui-cell_access\"><div class=\"weui-cell__bd ft14\">");
+				recordHtml.append("<p>"+visit.getStr("customer_name")+"</p><p class=\"gray ft12\">"+visit.getStr("contact")+"/"+visit.getStr("mobile")+"<span class=\"fr\">"+visit.getStr("create_date")+"</span></p>");
+				recordHtml.append("<p>活动类型：<span class=\"orange\">"+visit.getStr("questionType")+"</span><span class=\"green fr\">"+visit.get("visitStatus")+"</span></p>");
+				recordHtml.append("</div><span class=\"weui-cell__ft\"></span></a>");
+			}
+		}
+		Map<String, Object> map = new HashMap<>();
+		map.put("recordHtml", recordHtml.toString());
+		map.put("totalRow", visitList.getTotalRow());
+		map.put("totalPage", visitList.getTotalPage());
+		renderJson(map);
+	}
+	
+	public void loadVisitDetail() {
+		String visitId = getPara("visitId");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		Record detail = new Record();
+		if(StrKit.notBlank(visitId)) {
+			detail = CustomerVisitQuery.me().queryVisitDetail(user.getId(),visitId);
+			Map<String, Object> map = new HashMap<>();
+			map.put("detail", detail);
+			renderJson(detail);
+		}else {
+			render("customer_visit_detail.html");
+		}
 	}
 	
 }
