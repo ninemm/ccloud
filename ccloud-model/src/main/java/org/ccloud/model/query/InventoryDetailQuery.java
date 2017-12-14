@@ -106,7 +106,7 @@ public class InventoryDetailQuery extends JBaseQuery {
 		}else{
 				fromBuilder.append("and cid.biz_type in ('"+Consts.BIZ_TYPE_INSTOCK+"','"+Consts.BIZ_TYPE_SALES_REFUND_INSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_INSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_PLUS_INSTOCK+"') ");
 		}
-		fromBuilder.append(" order by " + orderby+" desc");	
+		fromBuilder.append(" GROUP BY cid.id order by " + orderby+" desc");	
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
@@ -129,7 +129,7 @@ public class InventoryDetailQuery extends JBaseQuery {
 		}else{
 				fromBuilder.append("and cid.biz_type in ('"+Consts.BIZ_TYPE_P_OUTSTOCK+"','"+Consts.BIZ_TYPE_SALES_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_REDUCE_OUTSTOCK+"') ");
 		}
-		fromBuilder.append(" order by " + orderby+" desc");	
+		fromBuilder.append(" GROUP BY cid.id order by " + orderby+" desc");	
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
