@@ -14,8 +14,8 @@ public class CustomerVisitTaskListener implements TaskListener {
 		if (_applyUsername != null) {
 		//	String applyUsername = (String) _applyUsername;
 			// 找到主管
-			
-			task.setAssignee("");
+			Object _manager = task.getVariable("manager");
+			task.setAssignee(_manager.toString());
 		}
 	}
 

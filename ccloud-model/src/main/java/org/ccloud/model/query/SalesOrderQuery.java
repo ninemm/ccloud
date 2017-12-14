@@ -366,6 +366,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		return DAO.find(sb.toString(), username);
 	}
 
+	//我管理的业务员
 	public Page<SalesOrder> findByDataArea(int pageNumber, int pageSize, String startDate, String endDate, String keyword, String dataArea) {
 		String select = "SELECT u.realname , sum(so.total_amount) total_amount";
 		StringBuilder fromBuilder = new StringBuilder(" FROM cc_sales_order so ");
@@ -403,7 +404,33 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller_customer c ON c.id=so.customer_id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_detail sd ON sd.order_id=so.id ");
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
-		fromBuilder.append(" WHERE so.biz_user_id='"+userId+"' and so.is_gift=0");
+		fromBuilder.append(" WHERE so.biz_user_id='"+userId+"' and sd.is_gift=0");
+		LinkedList<Object> params = new LinkedList<Object>();
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and "+keyword+" >= ?");
+			params.add(startDate);
+		}
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and "+keyword+" <= ?");
+			params.add(endDate);
+		}
+		fromBuilder.append("GROUP BY c.id,sp.id ");
+		
+		if (params.isEmpty())
+			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+	//我的客户赠品
+	public Page<SalesOrder> findByCustomerGift(int pageNumber, int pageSize, String startDate, String endDate,
+			String keyword, String userId) {
+		String select = "SELECT c.nickname,sp.custom_name,sum(sd.product_count) productCountTotal";
+		StringBuilder fromBuilder = new StringBuilder(" FROM cc_sales_order so ");
+		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id=sojo.order_id");
+		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id=sojo.outstock_id");
+		fromBuilder.append(" LEFT JOIN cc_seller_customer c ON c.id=so.customer_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_order_detail sd ON sd.order_id=so.id ");
+		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
+		fromBuilder.append(" WHERE so.biz_user_id='"+userId+"' and sd.is_gift=1");
 		LinkedList<Object> params = new LinkedList<Object>();
 		if (StrKit.notBlank(startDate)) {
 			fromBuilder.append(" and "+keyword+" >= ?");
@@ -432,7 +459,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_customer_type ct ON ct.id=cct.customer_type_id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_detail sd ON sd.order_id=so.id ");
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
-		fromBuilder.append(" WHERE so.biz_user_id='"+userId+"'and so.is_gift=0");
+		fromBuilder.append(" WHERE so.biz_user_id='"+userId+"'and sd.is_gift=0");
 		LinkedList<Object> params = new LinkedList<Object>();
 		if (StrKit.notBlank(startDate)) {
 			fromBuilder.append(" and "+keyword+" >= ?");
@@ -449,6 +476,36 @@ public class SalesOrderQuery extends JBaseQuery {
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
+	//我的客户类型赠品
+	public Page<SalesOrder> findByCustomerTypeGift(int pageNumber, int pageSize, String startDate, String endDate,
+			String keyword, String userId) {
+		String select = "SELECT ct.`name`,sp.custom_name,sum(sd.product_count) productCountTotal";
+		StringBuilder fromBuilder = new StringBuilder(" FROM cc_sales_order so ");
+		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id=sojo.order_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id=sojo.outstock_id ");
+		fromBuilder.append(" LEFT JOIN cc_seller_customer c ON c.id=so.customer_id ");
+		fromBuilder.append(" LEFT JOIN cc_customer_join_customer_type cct ON cct.seller_customer_id=c.id ");
+		fromBuilder.append(" LEFT JOIN cc_customer_type ct ON ct.id=cct.customer_type_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_order_detail sd ON sd.order_id=so.id ");
+		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
+		fromBuilder.append(" WHERE so.biz_user_id='"+userId+"'and sd.is_gift=1");
+		LinkedList<Object> params = new LinkedList<Object>();
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and "+keyword+" >= ?");
+			params.add(startDate);
+		}
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and "+keyword+" <= ?");
+			params.add(endDate);
+		}
+		fromBuilder.append("GROUP BY cct.customer_type_id,sp.id");
+		
+		if (params.isEmpty())
+			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+	
+	//我的产品
 	public Page<SalesOrder> findByProduct(int pageNumber, int pageSize, String startDate, String endDate,
 			String keyword, String userId) {
 		String select = "SELECT sp.custom_name,sum(sd.product_count) productCountTotal";
@@ -457,7 +514,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id=sojo.outstock_id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_detail sd ON sd.order_id=so.id ");
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
-		fromBuilder.append(" WHERE so.biz_user_id='"+userId+"' and so.is_gift=0");
+		fromBuilder.append(" WHERE so.biz_user_id='"+userId+"' and sd.is_gift=0");
 		LinkedList<Object> params = new LinkedList<Object>();
 		if (StrKit.notBlank(startDate)) {
 			fromBuilder.append(" and "+keyword+" >= ?");
@@ -473,4 +530,267 @@ public class SalesOrderQuery extends JBaseQuery {
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
+
+	//我的产品赠品
+	public Page<SalesOrder> findByProductGift(int pageNumber, int pageSize, String startDate, String endDate,
+			String keyword, String userId) {
+		String select = "SELECT sp.custom_name,sum(sd.product_count) productCountTotal";
+		StringBuilder fromBuilder = new StringBuilder(" FROM cc_sales_order so ");
+		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id=sojo.order_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id=sojo.outstock_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_order_detail sd ON sd.order_id=so.id ");
+		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
+		fromBuilder.append(" WHERE so.biz_user_id='"+userId+"' and sd.is_gift=1");
+		LinkedList<Object> params = new LinkedList<Object>();
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and "+keyword+" >= ?");
+			params.add(startDate);
+		}
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and "+keyword+" <= ?");
+			params.add(endDate);
+		}
+		fromBuilder.append("GROUP BY sp.id");
+		
+		if (params.isEmpty())
+			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+
+	//我部门的产品
+	public Page<SalesOrder> findByDepartmentProduct(int pageNumber, int pageSize, String startDate, String endDate,
+			String keyword, String dataArea) {
+		String select = "SELECT sp.custom_name,sum(sd.product_count) productCountTotal";
+		StringBuilder fromBuilder = new StringBuilder(" FROM cc_sales_order so ");
+		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id=sojo.order_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id=sojo.outstock_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_order_detail sd ON sd.order_id=so.id ");
+		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
+		fromBuilder.append(" WHERE sd.is_gift=0 ");
+		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = false;
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "so.data_area", dataArea, params, needWhere);
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and "+keyword+" >= ?");
+			params.add(startDate);
+		}
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and "+keyword+" <= ?");
+			params.add(endDate);
+		}
+		fromBuilder.append("GROUP BY sp.id");
+		
+		if (params.isEmpty())
+			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+
+	//我部门的产品赠品
+	public Page<SalesOrder> findByDepartmentProductGift(int pageNumber, int pageSize, String startDate, String endDate,
+			String keyword, String dataArea) {
+		String select = "SELECT sp.custom_name,sum(sd.product_count) productCountTotal";
+		StringBuilder fromBuilder = new StringBuilder(" FROM cc_sales_order so ");
+		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id=sojo.order_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id=sojo.outstock_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_order_detail sd ON sd.order_id=so.id ");
+		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
+		fromBuilder.append(" WHERE sd.is_gift=1");
+		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = false;
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "so.data_area", dataArea, params, needWhere);
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and "+keyword+" >= ?");
+			params.add(startDate);
+		}
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and "+keyword+" <= ?");
+			params.add(endDate);
+		}
+		fromBuilder.append("GROUP BY sp.id");
+		
+		if (params.isEmpty())
+			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+
+	//我部门的业务员
+	public Page<SalesOrder> findByDepartSalesman(int pageNumber, int pageSize, String startDate, String endDate,
+			String keyword, String dataArea) {
+		String select = "SELECT u.realname , sum(sd.product_count) productCountTotal , sp.custom_name ";
+		StringBuilder fromBuilder = new StringBuilder(" FROM cc_sales_order so ");
+		fromBuilder.append(" LEFT JOIN `user` u ON u.id = so.biz_user_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id=sojo.order_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id=sojo.outstock_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_order_detail sd ON sd.order_id=so.id ");
+		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
+		fromBuilder.append(" WHERE sd.is_gift=0");
+		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = false;
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "so.data_area", dataArea, params, needWhere);
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and "+keyword+" >= ?");
+			params.add(startDate);
+		}
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and "+keyword+" <= ?");
+			params.add(endDate);
+		}
+		fromBuilder.append("GROUP BY so.biz_user_id ,sp.id");
+		
+		if (params.isEmpty())
+			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+
+	//我部门的业务员赠品
+	public Page<SalesOrder> findByDepartSalesmanGift(int pageNumber, int pageSize, String startDate, String endDate,
+			String keyword, String dataArea) {
+		String select = "SELECT u.realname , sum(sd.product_count) productCountTotal , sp.custom_name ";
+		StringBuilder fromBuilder = new StringBuilder(" FROM cc_sales_order so ");
+		fromBuilder.append(" LEFT JOIN `user` u ON u.id = so.biz_user_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id=sojo.order_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id=sojo.outstock_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_order_detail sd ON sd.order_id=so.id ");
+		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
+		fromBuilder.append(" WHERE sd.is_gift=1");
+		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = false;
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "so.data_area", dataArea, params, needWhere);
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and "+keyword+" >= ?");
+			params.add(startDate);
+		}
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and "+keyword+" <= ?");
+			params.add(endDate);
+		}
+		fromBuilder.append("GROUP BY so.biz_user_id ,sp.id");
+		
+		if (params.isEmpty())
+			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+
+	//我管理的直营商
+	public Page<SalesOrder> findByManageSeller(int pageNumber, int pageSize, String startDate, String endDate,
+			String keyword, String dataArea) {
+		String select = "SELECT sp.custom_name,s.seller_name,sum(sd.product_count) productCountTotal ";
+		StringBuilder fromBuilder = new StringBuilder(" FROM cc_sales_order so ");
+		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id=sojo.order_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id=sojo.outstock_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_order_detail sd ON sd.order_id=so.id ");
+		fromBuilder.append(" LEFT JOIN cc_seller s ON s.id=so.seller_id ");
+		fromBuilder.append(" LEFT JOIN department d ON d.id=s.dept_id ");
+		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
+		fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id=so.customer_id");
+		fromBuilder.append(" WHERE sd.is_gift=0 and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
+		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = false;
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, " so.data_area", dataArea, params, needWhere);
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and "+keyword+" >= ?");
+			params.add(startDate);
+		}
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and "+keyword+" <= ?");
+			params.add(endDate);
+		}
+		fromBuilder.append("GROUP BY d.id,sp.id");
+		
+		if (params.isEmpty())
+			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+
+	//我管理的直营商赠品
+	public Page<SalesOrder> findByManageSellerGift(int pageNumber, int pageSize, String startDate, String endDate,
+			String keyword, String dataArea) {
+		String select = "SELECT sp.custom_name,s.seller_name,sum(sd.product_count) productCountTotal ";
+		StringBuilder fromBuilder = new StringBuilder(" FROM cc_sales_order so ");
+		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id=sojo.order_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id=sojo.outstock_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_order_detail sd ON sd.order_id=so.id ");
+		fromBuilder.append(" LEFT JOIN cc_seller s ON s.id=so.seller_id ");
+		fromBuilder.append(" LEFT JOIN department d ON d.id=s.dept_id ");
+		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
+		fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id=so.customer_id");
+		fromBuilder.append(" WHERE sd.is_gift=1 and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
+		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = false;
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, " so.data_area", dataArea, params, needWhere);
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and "+keyword+" >= ?");
+			params.add(startDate);
+		}
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and "+keyword+" <= ?");
+			params.add(endDate);
+		}
+		fromBuilder.append("GROUP BY d.id,sp.id");
+		
+		if (params.isEmpty())
+			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+
+	public Page<SalesOrder> findBypurSeller(int pageNumber, int pageSize, String startDate, String endDate,
+			String keyword, String dataArea) {
+		String select = "SELECT sp.custom_name,s.seller_name,sum(sd.product_count) productCountTotal ";
+		StringBuilder fromBuilder = new StringBuilder(" FROM cc_sales_order so ");
+		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id=sojo.order_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id=sojo.outstock_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_order_detail sd ON sd.order_id=so.id ");
+		fromBuilder.append(" LEFT JOIN cc_seller s ON s.id=so.seller_id ");
+		fromBuilder.append(" LEFT JOIN department d ON d.id=s.dept_id ");
+		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
+		fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id=so.customer_id");
+		fromBuilder.append(" WHERE sd.is_gift=1 and sc.customer_kind ="+Consts.CUSTOMER_KIND_SELLER);
+		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = false;
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, " so.data_area", dataArea, params, needWhere);
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and "+keyword+" >= ?");
+			params.add(startDate);
+		}
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and "+keyword+" <= ?");
+			params.add(endDate);
+		}
+		fromBuilder.append("GROUP BY d.id,sp.id");
+		
+		if (params.isEmpty())
+			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+
+	public Page<SalesOrder> findBypurSellerGift(int pageNumber, int pageSize, String startDate, String endDate,
+			String keyword, String dataArea) {
+		String select = "SELECT sp.custom_name,s.seller_name,sum(sd.product_count) productCountTotal ";
+		StringBuilder fromBuilder = new StringBuilder(" FROM cc_sales_order so ");
+		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id=sojo.order_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id=sojo.outstock_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_order_detail sd ON sd.order_id=so.id ");
+		fromBuilder.append(" LEFT JOIN cc_seller s ON s.id=so.seller_id ");
+		fromBuilder.append(" LEFT JOIN department d ON d.id=s.dept_id ");
+		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
+		fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id=so.customer_id");
+		fromBuilder.append(" WHERE sd.is_gift=1 and sc.customer_kind ="+Consts.CUSTOMER_KIND_SELLER);
+		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = false;
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, " so.data_area", dataArea, params, needWhere);
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and "+keyword+" >= ?");
+			params.add(startDate);
+		}
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and "+keyword+" <= ?");
+			params.add(endDate);
+		}
+		fromBuilder.append("GROUP BY d.id,sp.id");
+		
+		if (params.isEmpty())
+			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+
 }

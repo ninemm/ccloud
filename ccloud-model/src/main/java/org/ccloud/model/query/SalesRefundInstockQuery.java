@@ -187,7 +187,7 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 			return false;
 		}
 		
-		InventoryDetail oldDetail = InventoryDetailQuery.me().findBySellerProductId(sellerId, wareHouseId);
+		InventoryDetail oldDetail = InventoryDetailQuery.me().findBySellerProductId(sellerProductId, wareHouseId);
 		InventoryDetail inventoryDetail = new InventoryDetail();
 		inventoryDetail.setId(StrKit.getRandomUUID());
 		inventoryDetail.setWarehouseId(inventory.getWarehouseId());

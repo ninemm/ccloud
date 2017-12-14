@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.base.Joiner;
 import org.apache.commons.lang.time.DateFormatUtils;
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.kit.Kv;
@@ -48,7 +49,7 @@ public class CustomerVisitController extends BaseFrontController {
 		
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-		String userId = ShiroKit.getUserId();
+//		String userId = ShiroKit.getUserId();
 
 		Page<Record> visitList = CustomerVisitQuery.me().paginateForApp(getPageNumber(), getPageSize(), getPara("type"), getPara("nature"), getPara("subType"), DataAreaUtil.getUserDeptDataArea(user.getDataArea()));
 
@@ -171,23 +172,39 @@ public class CustomerVisitController extends BaseFrontController {
 		keepPara();
 		
 		String id = getPara("id");
-		
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+
 		if (StrKit.isBlank(id)) {
 			renderError(404);
 			return ;
 		}
 		
-		CustomerVisit customerVisit = CustomerVisitQuery.me().findById(id);
+		List<Record> customerVisit = CustomerVisitQuery.me().findMoreById(id);
+
+		List<String> typeList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeIdListBySellerCustomerId(customerVisit.get(0).getStr("seller_customer_id"), DataAreaUtil.getUserDealerDataArea(user.getDataArea()) + "%");
+
+		List<String> typeName = new ArrayList<>();
+		for(String type : typeList)
+			typeName.add(CustomerTypeQuery.me().findById(type).getStr("name"));
+
 		if (customerVisit == null) {
 			renderError(404);
 			return ;
 		}
-		setAttr("customerVisit", customerVisit);
-		
+		transform(customerVisit);
+
+		String imageListStore = customerVisit.get(0).get("photo");
+		List<ImageJson> list = new ArrayList<>();
+		if (StrKit.notBlank(imageListStore)) {
+			list = JSON.parseArray(imageListStore, ImageJson.class);
+		}
+		customerVisit.get(0).set("imageList",list);
+
+		setAttr("customerVisit", customerVisit.get(0));
+		setAttr("cTypeName", Joiner.on(",").join(typeName.iterator()));
 		
 		render("customer_visit_review.html");
 	}
-
 
 	// 用户新增拜访页面显示
 	public void visitAdd() {
@@ -206,6 +223,7 @@ public class CustomerVisitController extends BaseFrontController {
 	    setAttr("problem",JSON.toJSONString(problem_list));
 		render("customer_visit_add.html");
 	}
+
 	//拜访客户选择
 	public void visitCustomerChoose() {
 
@@ -243,6 +261,7 @@ public class CustomerVisitController extends BaseFrontController {
 		setAttr("customerTypes", JSON.toJSON(customerTypes));
 		render("customer_visit_choose.html");
 	}
+
 	// 用户新增拜访保存
 	public void save() {
 
@@ -251,9 +270,11 @@ public class CustomerVisitController extends BaseFrontController {
 
 		 List<ImageJson> list = Lists.newArrayList();
 		 String picJson = getPara("pic");
-		 String userId = ShiroKit.getUserId();
+//		 String userId = ShiroKit.getUserId();
 
-		 customerVisit.setUserId(userId);
+//		 customerVisit.setUserId(userId);
+
+		 customerVisit.setUserId(user.getId());
 		 customerVisit.setStatus(0);
 		 customerVisit.setDataArea(user.getDataArea());
 		 customerVisit.setDeptId(user.getDepartmentId());
@@ -273,11 +294,14 @@ public class CustomerVisitController extends BaseFrontController {
 			}
 		}
 		 customerVisit.setPhoto(JSON.toJSONString(list));
-		 if (!customerVisit.saveOrUpdate()) {
-			 renderAjaxResultForError("添加失败");
-			 return ;
+
+		 boolean updated = true;
+		 updated = updated && customerVisit.saveOrUpdate();
+		 updated = updated && startProcess(customerVisit.getId());
+		 if (updated) {
+			 renderAjaxResultForSuccess("添加成功");
 		 }
-		 renderAjaxResultForSuccess("添加成功");
+		 else renderAjaxResultForError("添加失败");
 	}
 
 	public void visitCustomerInfo() {
@@ -287,27 +311,79 @@ public class CustomerVisitController extends BaseFrontController {
 		render("customer_visit_add.html");
 	}
 
+	public void complete() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+
+		String taskId = getPara("taskId");
+		String id = getPara("id");
+
+		String picJson = getPara("pic");
+		List<ImageJson> list = Lists.newArrayList();
+		if (StrKit.notBlank(picJson)) {
+
+			JSONArray array = JSON.parseArray(picJson);
+			for (int i = 0; i < array.size(); i++) {
+				JSONObject obj = array.getJSONObject(i);
+				String pic = obj.getString("pic");
+				String picname = obj.getString("picname");
+
+				ImageJson image = new ImageJson();
+				image.setImgName(picname);
+				String newPath = upload(pic);
+				image.setSavePath(newPath.replace("\\", "/"));
+				list.add(image);
+			}
+		}
+		String commentDesc = getPara("comment");
+		String location = getPara("location");
+
+		CustomerVisit customerVisit = CustomerVisitQuery.me().findById(id);
+
+		if(StrKit.notBlank(location)) customerVisit.setLocation(location);
+		if(StrKit.notBlank(commentDesc)) customerVisit.setComment(commentDesc);
+		if(list.size() != 0) customerVisit.setImageListStore(JSON.toJSONString(list));
+
+		String status = getPara("status");
+		String comment;
+
+		if(status.equals("1")) comment = "批准";
+		else comment = "拒绝";
+
+		WorkFlowService workFlowService = new WorkFlowService();
+
+		Map<String,Object> var = new HashMap<>();
+		var.put("visit", customerVisit);
+		var.put("status", status);
+		var.put("userName", workFlowService.getTaskVariableByTaskId(taskId,"applyUsername"));
+		var.put("openId", workFlowService.getTaskVariableByTaskId(taskId,"applyWxId"));
+
+		workFlowService.completeTask(taskId, comment, var);
+
+		renderAjaxResultForSuccess("操作成功");
+	}
 
 	private void transform(List<Record> list) {
 
 		List<Dict> problem_list = DictQuery.me().findByCode("visit");
 
 		for(Record visit : list) {
-			if(visit.getInt("status") == 1) visit.set("statusName", "已审核");
-			else if (visit.getInt("status") == 0) visit.set("statusName", "待审核");
-			else visit.set("statusName", "无");
+			if (visit.getInt("status") == 2) visit.set("statusName", "正常");
+			if (visit.getInt("status") == 1) visit.set("statusName", "已拒绝");
+			if (visit.getInt("status") == 0) visit.set("statusName", "待审核");
 
 			for(Dict dict : problem_list)
 				if(visit.getStr("question_type").equals(dict.getId().toString())) visit.set("typeName", dict.getName());
 		}
 	}
 
-	private boolean startProcess(String id, Map<String, Object> param) {
+	private boolean startProcess(String id) {
 
 		CustomerVisit customerVisit = CustomerVisitQuery.me().findById(id);
 		boolean isUpdated = true;
-//		Boolean isCustomerAudit = OptionQuery.me().findValueAsBool("isCustomerAudit");
+//		Boolean isCustomerAudit = OptionQuery.me().findValueAsBool("isCustomerVisit");
 		Boolean isCustomerVisit = true;
+
+		Map<String, Object> param = new HashMap<>();
 
 		if (customerVisit != null) {
 			if (isCustomerVisit != null && isCustomerVisit.booleanValue()) {
@@ -322,12 +398,13 @@ public class CustomerVisitController extends BaseFrontController {
 
 				param.put("applyUsername", user.getUsername());
 				param.put("manager", manager.getUsername());
+				param.put("applyWxId", user.getWechatOpenId());
 
 				WorkFlowService workflow = new WorkFlowService();
 				String procInstId = workflow.startProcess(id, defKey, param);
 
-//				customerVisit.setProcDefKey(defKey);
-//				customerVisit.setProcInstId(procInstId);
+				customerVisit.setProcDefKey(defKey);
+				customerVisit.setProcInstId(procInstId);
 				customerVisit.setStatus(0);
 				isUpdated = customerVisit.update();
 
@@ -340,6 +417,7 @@ public class CustomerVisitController extends BaseFrontController {
 					kv.set("touser", manager.getWechatOpenId());
 					kv.set("templateId", messageTemplate.getTemplateId());
 					kv.set("customerName", SellerCustomerQuery.me().findById(customerVisit.getSellerCustomerId()).getCustomer().getCustomerName());
+					kv.set("questionType", customerVisit.getQuestionType());
 					kv.set("submit", user.getRealname());
 
 					kv.set("createTime", DateTime.now().toString("yyyy-MM-dd HH:mm"));
