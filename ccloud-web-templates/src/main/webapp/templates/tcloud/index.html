@@ -9,6 +9,10 @@ $(function () {
       return false;
 	})
 	
+	$('.week').text($.week());
+    $('.day').text($.today());
+
+
 	var mySwiper = new Swiper('.swiper-container', {
 		loop: true,
 		paginationHide: true,
@@ -16,7 +20,7 @@ $(function () {
 		  disableOnInteraction: false,
 		},
 		allowTouchMove: false,
-		direction: 'vertical',
+		direction: 'vertical'
 	})
 })
 </#macro> <@layout>
@@ -26,13 +30,12 @@ $(function () {
 		<div>
 			<div class="weui-cells__title">
 				<div class="weui-flex">
-					<div class="weui-flex__item" style="color: #ff9800">
-						<b>快捷入口</b>
+					<div class="weui-flex__item">
+					  <b>快捷入口</b>
 					</div>
-					<div class="weui-flex__item t-r">
-						<b>国庆</b>
+					<div class="weui-flex__item t-c week">
 					</div>
-					<div class="weui-flex__item t-r" style="flex-grow: 2;">2017-10-18 星期五</div>
+					<div class="weui-flex__item t-r day"></div>
 				</div>
 			</div>
 			<div class="weui-grids">
@@ -64,8 +67,17 @@ $(function () {
 				</a>
 			</div>
 		</div>
+		<div class="notice">
+			<i class="notice-icon-laba"></i>
+			<div class="swiper-container">
+			  <div class="swiper-wrapper">
+				<div class="swiper-slide"><a href="">热烈祝贺伟义商城成功热烈祝贺伟义商城成功上线热烈祝贺伟义商城成功上线上线</a></div>
+				<div class="swiper-slide"><a href="">蓝之蓝股份成公司上市</a></div>
+			  </div>
+			</div>
+		</div>
 		<div>
-			<div class="weui-cells__title" style="color: #ff9800">
+			<div class="weui-cells__title">
 				<b>我的待办</b>
 			</div>
 			<div class="weui-grids">
@@ -99,30 +111,9 @@ $(function () {
 			</div>
 		</div>
 		<div>
-			<div class="weui-cells__title" style="color:#ff9800">
-			  <b>消息通知</b>
-			</div>
-			<div class="note">
-				<div class="swiper-container">
-					<div class="swiper-wrapper">
-						<div class="swiper-slide">消息1</div>
-						<div class="swiper-slide">消息2</div>
-						<div class="swiper-slide">消息3</div>
-						<div class="swiper-slide">消息4</div>
-						<div class="swiper-slide">消息5</div>
-						<div class="swiper-slide">消息6</div>
-						<div class="swiper-slide">消息7</div>
-						<div class="swiper-slide">消息8</div>
-						<div class="swiper-slide">消息9</div>
-						<div class="swiper-slide">消息10</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div>
 			<div class="weui-cells__title weui-cell_access weui-cell index-info-tab" >
 				<div class="weui-cell__bd">
-					<b style="color:#ff9800">业务消息</b>
+					<b style="color:#999">业务消息</b>
 					<p class="menu blue-button">订单</p>
 					<p class="menu">客户</p>
 					<p class="menu">费用</p>

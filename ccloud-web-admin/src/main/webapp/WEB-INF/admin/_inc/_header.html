@@ -11,7 +11,7 @@
 			<span class="sr-only">开关</span> 
 			<span class="icon-bar"></span>
 		</a>
-        <a href="#" class="navbar-brand">${(session.sellerName)!'协同云平台'} <i class="fa fa-chevron-down" style="font-size:12px;"></i></a>
+        <a href="#" class="navbar-brand">${(session.sellerName)!'协同云平台'}</a>
 		<div class="navbar-custom-menu" style="padding-right: 2rem">
 			<ul class="nav navbar-nav">
                 <!-- Messages: style can be found in dropdown.less-->
@@ -45,8 +45,8 @@
 				</li>
 				<#if session['sellerList']?? && session['sellerList']?size gt 1>
 				<li class="dropdown notifications-menu">
-				    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-				        <span class="hidden-xs">${(session.sellerName)!}</span>
+				    <a href="#" class="dropdown-toggle" data-toggle="dropdown" title="账套">
+				        <!-- <span class="hidden-xs">${(session.sellerName)!}</span> -->
 				        <i class="fa fa-users"></i><span class="label label-success">${(session.sellerList?size)!}</span>
 				    </a>
 				    <ul class="dropdown-menu">
@@ -55,8 +55,8 @@
                             <ul class="menu">
                                 <#list session['sellerList'] as seller>
                                 <li>
-                                    <a href="javascript:void(0)" onclick="changeSeller('${(seller.sellerId)!}')">
-                                        <i class="fa fa-users text-aqua"></i> ${(seller.sellerName)!}
+                                    <a href="<#if (session.sellerId = seller.seller_id)>#<#else>${CPATH}/admin/change?mobile=${(session._logined_user.mobile)!}&sellerId=${(seller.seller_id)!}</#if>">
+                                        <i class="fa fa-users text-aqua"></i> ${(seller.seller_name)!}
                                     </a>
                                 </li>
                                 </#list>

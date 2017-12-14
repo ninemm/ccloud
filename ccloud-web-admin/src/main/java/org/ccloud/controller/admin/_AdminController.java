@@ -15,8 +15,8 @@
  */
 package org.ccloud.controller.admin;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -28,10 +28,11 @@ import org.ccloud.interceptor.AdminInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
+import org.ccloud.model.Department;
 import org.ccloud.model.User;
+import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SellerCustomerQuery;
-import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
@@ -41,10 +42,11 @@ import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.EncryptUtils;
 import org.ccloud.utils.StringUtils;
 
+import com.beust.jcommander.internal.Lists;
+import com.beust.jcommander.internal.Maps;
 import com.jfinal.aop.Before;
 import com.jfinal.aop.Clear;
 import com.jfinal.kit.StrKit;
-import com.jfinal.plugin.activerecord.Record;
 
 @RouterMapping(url = "/admin", viewPath = "/WEB-INF/admin")
 @RouterNotAllowConvert
@@ -80,13 +82,13 @@ public class _AdminController extends JBaseController {
 		setAttr("toDoOrdersList", SalesOrderQuery.me().getToDo(user.getUsername()));
 		render("index.html");
 	}
-
+	
 	@Clear(AdminInterceptor.class)
 	public void login() {
+		
 		String username = getPara("username");
 		String password = getPara("password");
 		String rememberMeStr = getPara("remember_me");
-		List<Record> list = new ArrayList<>(); 
 		boolean rememberMe = false;
 		if (rememberMeStr != null && rememberMeStr.equals("on")) {
 			rememberMe = true;
@@ -108,49 +110,74 @@ public class _AdminController extends JBaseController {
 			if (user != null) {
 				// 数据查看时的数据域
 				if (subject.isPermitted("/admin/all") || subject.isPermitted("/admin/manager")) {
-					setSessionAttr(Consts.SESSION_SELECT_DATAAREA,
-							DataAreaUtil.getUserDeptDataArea(user.getDataArea()) + "%");
+					String dataArea = DataAreaUtil.getUserDeptDataArea(user.getDataArea()) + "%";
+					setSessionAttr(Consts.SESSION_SELECT_DATAAREA, dataArea);
 				} else {
 					setSessionAttr(Consts.SESSION_SELECT_DATAAREA, user.getDataArea());
 				}
-
-				// sellerId
-				if (!subject.isPermitted("/admin/all")) {
+				
+				String mobile = user.getMobile();
+				List<User> userList = UserQuery.me().findByMobile(mobile);
+				
+				List<Map<String, String>> sellerList = Lists.newArrayList();
+				if (userList.size() > 1) {
 					
-					List<Record> sellerList = SellerQuery.me().querySellerIdByDept(user.getDepartmentId());
-
-					if(sellerList.size() == 0) {
-						sellerList = SellerQuery.me().queryParentSellerIdByDept(user.getDepartmentId());
-
-						while(StrKit.isBlank(sellerList.get(0).getStr("sellerId"))) {
-							sellerList = SellerQuery.me().queryParentSellerIdByDept(sellerList.get(0).getStr("parent_id"));
+					for (User temp : userList) {
+						List<Department> tmpList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(temp.getDepartmentId());
+						if (tmpList.size() > 0) {
+							Department dept = tmpList.get(0);
+							Map<String, String> seller = Maps.newHashMap();
+							seller.put("seller_id", dept.getStr("seller_id"));
+							seller.put("seller_name", dept.getStr("seller_name"));
+							seller.put("seller_code", dept.getStr("seller_code"));
+							sellerList.add(seller);
 						}
 					}
-
+				}
+				
+				if (sellerList.size() == 0 && !user.isAdministrator()) {
+					renderError(404);
+					return ;
+				} else if (sellerList.size() > 1) {
+					setAttr("mobile", mobile);
+					setAttr("sellerList", sellerList);
 					setSessionAttr("sellerList", sellerList);
-					setSessionAttr("sellerId", sellerList.get(0).get("sellerId"));
-					setSessionAttr("sellerCode", sellerList.get(0).get("sellerCode"));
-					setSessionAttr("sellerName", sellerList.get(0).get("sellerName"));
-					list = sellerList;
+					forwardAction("/admin/choice");
+					return ;
+				}
+				
+				if (!user.isAdministrator()) {
+					Map<String, String> map = sellerList.get(0);
+					setSessionAttr(Consts.SESSION_SELLER_ID, map.get("seller_id"));
+					setSessionAttr(Consts.SESSION_SELLER_NAME, map.get("seller_name"));
+					setSessionAttr(Consts.SESSION_SELLER_CODE, map.get("seller_code"));
 				}
 			}
 			MessageKit.sendMessage(Actions.USER_LOGINED, user);
 			CookieUtils.put(this, Consts.COOKIE_LOGINED_USER, user.getId().toString());
 			setSessionAttr(Consts.SESSION_LOGINED_USER, user);
-			renderAjaxResultForSuccess("登录成功", list);
+			redirect("/admin/index");
 		} catch (AuthenticationException e) {
 			e.printStackTrace();
-			renderAjaxResultForError("用户名或密码错误");
+			render("login.html");
 		}
+	}
+	
+	@Clear(AdminInterceptor.class)
+	public void choice() { 
+		
+		keepPara();
+		render("choice.html");
+		
 	}
 
 	@Before(UCodeInterceptor.class)
 	public void logout() {
 		removeSessionAttr(Consts.SESSION_LOGINED_USER);
 		removeSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		removeSessionAttr("sellerId");
-		removeSessionAttr("sellerCode");
-		removeSessionAttr("sellerName");
+		removeSessionAttr(Consts.SESSION_SELLER_ID);
+		removeSessionAttr(Consts.SESSION_SELLER_CODE);
+		removeSessionAttr(Consts.SESSION_SELLER_NAME);
 		removeSessionAttr("sellerList");
 		CookieUtils.remove(this, Consts.COOKIE_LOGINED_USER);
 		Subject subject = SecurityUtils.getSubject();
@@ -162,8 +189,63 @@ public class _AdminController extends JBaseController {
 		render("404.html");
 	}
 	
-	public void sellerSelect() {
-		render("seller_select.html");
+	@Clear(AdminInterceptor.class)
+	public void change() {
+		
+		String mobile = getPara("mobile");
+		String sellerId = getPara("sellerId");
+		User curUser = null;
+		
+		List<User> userList = UserQuery.me().findByMobile(mobile);
+		
+		for (User user : userList) {
+			if (curUser != null)
+				break;
+			
+			List<Department> deptList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
+			for (Department dept : deptList) {
+				if (StrKit.equals(sellerId, dept.getStr("seller_id"))) {
+					curUser = user;
+					setSessionAttr(Consts.SESSION_SELLER_ID, dept.get("seller_id"));
+					setSessionAttr(Consts.SESSION_SELLER_NAME, dept.get("seller_name"));
+					setSessionAttr(Consts.SESSION_SELLER_CODE, dept.get("seller_code"));
+					break;
+				}
+			}
+		}
+		
+		if (curUser == null) {
+			renderError(404);
+			return ;
+		}
+		
+		init(curUser.getUsername(), curUser.getPassword(), true);
+		
+		redirect("/admin/index");
+	}
+	
+	private void init(String username, String password, Boolean rememberMe) {
+		
+		Subject subject = SecurityUtils.getSubject();
+		CaptchaUsernamePasswordToken token = new CaptchaUsernamePasswordToken(username, password, rememberMe, "", "");
+		try {
+			subject.login(token);
+			User user = (User) subject.getPrincipal();
+			if (user != null) {
+				// 数据查看时的数据域
+				if (subject.isPermitted("/admin/all") || subject.isPermitted("/admin/manager")) {
+					setSessionAttr(Consts.SESSION_SELECT_DATAAREA,
+							DataAreaUtil.getUserDeptDataArea(user.getDataArea()) + "%");
+				} else {
+					setSessionAttr(Consts.SESSION_SELECT_DATAAREA, user.getDataArea());
+				}
+			}
+			MessageKit.sendMessage(Actions.USER_LOGINED, user);
+			CookieUtils.put(this, Consts.COOKIE_LOGINED_USER, user.getId().toString());
+			setSessionAttr(Consts.SESSION_LOGINED_USER, user);
+		} catch (AuthenticationException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
