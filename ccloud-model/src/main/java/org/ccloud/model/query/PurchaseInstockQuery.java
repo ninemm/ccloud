@@ -15,8 +15,14 @@
  */
 package org.ccloud.model.query;
 
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.LinkedList;
+import java.util.Map;
+
+import org.ccloud.Consts;
 import org.ccloud.model.PurchaseInstock;
+import org.ccloud.utils.StringUtils;
 
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
@@ -132,6 +138,37 @@ public class PurchaseInstockQuery extends JBaseQuery {
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+	
+	public String getNewSn(String sellerId) {
+		String sql = "SELECT s.order_sn FROM cc_sales_order s WHERE date(s.create_date) = curdate() AND s.seller_id = ? ORDER BY s.create_date desc";
+		PurchaseInstock purchaseInstock = DAO.findFirst(sql, sellerId);
+		String SN = "";
+		if (purchaseInstock == null || StringUtils.isBlank(purchaseInstock.getPwarehouseSn())) {
+			SN = Consts.PURCHASE_IN_STOCK_SN;
+		} else {
+			String endSN = StringUtils.substringSN(Consts.PURCHASE_IN_STOCK_SN, purchaseInstock.getPwarehouseSn());
+			SN = new BigDecimal(endSN).add(new BigDecimal(1)).toString();
+		}
+		return SN;
+	}
+	
+	public boolean insertBySalesOutStock(Map<String, String[]> paraMap, Record seller, String purchaseInstockId,
+			String pwarehouseSn, String warehouseId, String userId, Date date) {
+		PurchaseInstock purchaseInstock = new PurchaseInstock();
+		purchaseInstock.set("id", purchaseInstockId);
+		purchaseInstock.set("pwarehouse_sn", pwarehouseSn);
+		purchaseInstock.set("warehouse_id", warehouseId);
+		purchaseInstock.set("biz_user_id", userId);
+		purchaseInstock.set("input_user_id", StringUtils.getArrayFirst(paraMap.get("input_user_id")));
+		purchaseInstock.set("status", 0);// 待入库
+		purchaseInstock.set("total_amount", StringUtils.getArrayFirst(paraMap.get("total")));
+		purchaseInstock.set("payment_type", StringUtils.getArrayFirst(paraMap.get("paymentType")));
+		purchaseInstock.set("remark", StringUtils.getArrayFirst(paraMap.get("remark")));
+		purchaseInstock.set("dept_id", seller.get("dept_id"));
+		purchaseInstock.set("data_area", seller.get("data_area"));
+		purchaseInstock.set("create_date", date);
+		return purchaseInstock.save();
 	}
 	
 }

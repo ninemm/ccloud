@@ -15,11 +15,18 @@
  */
 package org.ccloud.model.query;
 
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.ccloud.model.SellerProduct;
+import javax.servlet.http.HttpServletRequest;
 
+import org.ccloud.model.Product;
+import org.ccloud.model.SellerProduct;
+import org.ccloud.utils.QRCodeUtils;
+
+import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
@@ -84,9 +91,9 @@ public class SellerProductQuery extends JBaseQuery {
 		LinkedList<Object> params = new LinkedList<Object>();
 		if(!keyword.equals("")){
 			appendIfNotEmptyWithLike(fromBuilder, "csp.custom_name", keyword, params, true);
-			fromBuilder.append(" and cs.seller_type=0 and cs.is_enabled=1 and u.id='"+userId+"' ");
+			fromBuilder.append(" and  cs.is_enabled=1 and u.id='"+userId+"' ");
 		}else{
-			fromBuilder.append(" where cs.seller_type=0 and cs.is_enabled=1 and u.id='"+userId+"' ");
+			fromBuilder.append(" where  cs.is_enabled=1 and u.id='"+userId+"' ");
 		}
 		fromBuilder.append(" GROUP BY csp.id ORDER BY csp.is_enable desc,csp.order_list ");
 		
@@ -160,5 +167,38 @@ public class SellerProductQuery extends JBaseQuery {
 		stringBuilder.append("LEFT JOIN cc_product cd ON cd.id = cc.product_id ");
 		stringBuilder.append("WHERE parent_id = ? GROUP BY cp.parent_id");
 		return DAO.find(stringBuilder.toString(), productId, productId);
+	}
+	
+	public SellerProduct newProduct(String sellerId, Date date, String fomatDate, Product product, HttpServletRequest request) {
+		SellerProduct sellerProduct = new SellerProduct();
+		String sellerProductId = StrKit.getRandomUUID();
+		sellerProduct.set("id", sellerProductId);
+		sellerProduct.set("product_id", product.getId());
+		sellerProduct.set("seller_id", sellerId);
+		sellerProduct.set("custom_name", product.getName());
+		sellerProduct.setStoreCount(new BigDecimal(0));
+		sellerProduct.set("price", product.getPrice());
+		sellerProduct.set("cost", product.getCost());
+		sellerProduct.set("market_price", product.getMarketPrice());
+		sellerProduct.set("weight", product.getWeight());
+		sellerProduct.set("weight_unit", product.getWeightUnit());
+		sellerProduct.setOrderList(0);
+		;
+		sellerProduct.set("is_enable", 1);
+		sellerProduct.set("is_gift", 0);
+		// 生成二维码
+		String fileName = fomatDate + ".png";
+
+		String contents = request.getScheme() + "://" + request.getServerName() + "/admin/seller/fu" + "?id="
+				+ sellerProductId;
+		// 部署之前上传
+		// String contents = getRequest().getScheme() + "://" +
+		// getRequest().getServerName()+":"+getRequest().getLocalPort()+getRequest().getContextPath()+"/admin/seller/fn"+"?id="+Id;
+		String imagePath = request.getSession().getServletContext().getRealPath("\\qrcode\\");
+		QRCodeUtils.genQRCode(contents, imagePath, fileName);
+		sellerProduct.set("qrcode_url", imagePath + "\\" + fileName);
+		sellerProduct.set("create_date", date);
+		sellerProduct.save();
+		return sellerProduct;
 	}
 }

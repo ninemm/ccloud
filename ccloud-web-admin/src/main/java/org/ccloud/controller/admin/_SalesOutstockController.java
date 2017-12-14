@@ -28,11 +28,17 @@ import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.SalesOrder;
 import org.ccloud.model.User;
+import org.ccloud.model.Warehouse;
+import org.ccloud.model.query.PurchaseInstockDetailQuery;
+import org.ccloud.model.query.PurchaseInstockQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SalesOutstockDetailQuery;
 import org.ccloud.model.query.SalesOutstockQuery;
+import org.ccloud.model.query.SellerQuery;
+import org.ccloud.model.query.WarehouseQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
+import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
 
 import com.google.common.collect.ImmutableMap;
@@ -160,6 +166,42 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
         				!SalesOrderQuery.me().checkStatus(outStockId, date)) {
         			return false;
         		}
+        		
+        		//如果客户种类是直营商，则生成直营商的采购入库单
+        		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+        		
+        		
+        		String customerId =  StringUtils.getArrayFirst(paraMap.get("customerId"));
+        		String customerKind =  StringUtils.getArrayFirst(paraMap.get("customerKind"));
+        		if(Consts.CUSTOMER_KIND_SELLER.equals(customerKind)) {
+        			Record seller = SellerQuery.me().findByCustomerId(customerId);
+        			String purchaseInstockId =StrKit.getRandomUUID();
+        			
+        			//PS + 100000(机构编号或企业编号6位) + 20171108(时间) + 000001(流水号)
+        			String pwarehouseSn = "PS" + seller.getStr("seller_code") + DateUtils.format("yyMMdd", date) + PurchaseInstockQuery.me().getNewSn(seller.getStr("id"));
+        
+        			Warehouse warehouse = WarehouseQuery.me().findBySellerId(seller.getStr("id"));
+
+        			if(!PurchaseInstockQuery.me().insertBySalesOutStock(paraMap, seller, purchaseInstockId, pwarehouseSn, warehouse.getId(), user.getId(), date)) {
+        				return false;
+        			}
+        			
+            		count = 0;
+            		index = 0;
+            		while (productNum > count) {
+            			index++;
+            			String sellProductId = StringUtils.getArrayFirst(paraMap.get("sellProductId" + index));
+            			if (StrKit.notBlank(sellProductId)) {
+            				if (!PurchaseInstockDetailQuery.me().insertBySalesOrder(paraMap, purchaseInstockId, seller, index, date, getRequest())) {
+            					return false;
+            				}
+            				count++;
+            			}
+
+            		}
+        			
+        		}
+        		
         		return true;
             }
         });

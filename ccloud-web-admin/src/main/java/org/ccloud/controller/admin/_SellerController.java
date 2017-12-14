@@ -16,6 +16,7 @@
 package org.ccloud.controller.admin;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -28,16 +29,20 @@ import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
+import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.QRCodeUtils;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Brand;
 import org.ccloud.model.Customer;
+import org.ccloud.model.CustomerJoinCustomerType;
+import org.ccloud.model.CustomerType;
 import org.ccloud.model.Department;
 import org.ccloud.model.Group;
 import org.ccloud.model.GroupRoleRel;
 import org.ccloud.model.Option;
 import org.ccloud.model.Product;
 import org.ccloud.model.Role;
+import org.ccloud.model.RoleOperationRel;
 import org.ccloud.model.Seller;
 import org.ccloud.model.SellerBrand;
 import org.ccloud.model.SellerCustomer;
@@ -45,9 +50,11 @@ import org.ccloud.model.SellerProduct;
 import org.ccloud.model.User;
 import org.ccloud.model.UserJoinCustomer;
 import org.ccloud.model.query.BrandQuery;
+import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.GroupQuery;
 import org.ccloud.model.query.ProductQuery;
+import org.ccloud.model.query.RoleOperationRelQuery;
 import org.ccloud.model.query.RoleQuery;
 import org.ccloud.model.query.SellerBrandQuery;
 import org.ccloud.model.query.SellerProductQuery;
@@ -106,8 +113,9 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 	 * @see org.ccloud.core.JBaseCRUDController#save()
 	 */
 	public void save() {
-		if(getPara("dept_id").equals("0")){
-			renderAjaxResultForError("不可为总部创建销售商，请重新选择！");
+		Department department=DepartmentQuery.me().findById(getPara("dept_id"));
+		if(department.getDeptLevel()<2){
+			renderAjaxResultForError("部门选择错误，请重新选择！");
 			return;
 		}
 		final Seller seller = getModel(Seller.class);
@@ -144,16 +152,16 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		customer.setCityCode(areaCodeArray[1]);
 		
 		String [] brandIds= brandList.split(",");
-		Department department=DepartmentQuery.me().findById(getPara("dept_id"));
 		User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
 		if (StrKit.isBlank(sellerId)) {
-			Seller seller2=SellerQuery.me().findByDeptAndSellerType(getPara("dept_id"),getPara("seller_type"));
+			/*Seller seller2=SellerQuery.me().findByDeptAndSellerType(getPara("dept_id"),getPara("seller_type"));
 			if(seller2!=null && getPara("seller_type")=="0"){
 				renderAjaxResultForError("该公司部门已有一个经销商，请确认");
 				return;
-			}
+			}*/
 			List<Seller> list = SellerQuery.me().findAll();
 			int s = list.size();
+			s++;
 			String j=Integer.toString(s);
 			String w = "1";
 			int countt =j.length();
@@ -163,30 +171,23 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			w += j;
 			sellerId = StrKit.getRandomUUID();
 			seller.set("id", sellerId);
-			seller.set("seller_name",getPara("seller_name"));
+			seller.set("seller_name",getPara("seller.seller_name"));
 			seller.set("seller_code",w);
-			seller.set("contact", getPara("contact"));
-			seller.set("phone", getPara("phone"));
-			seller.set("is_enabled", getPara("is_enabled"));
-			seller.set("market_name", getPara("market_name"));
-			seller.set("market_code", getPara("market_code"));
-			seller.set("jywx_open_id", getPara("jywx_open_id"));
-			seller.set("jpwx_open_id", getPara("jpwx_open_id"));
-			seller.set("product_type_store", getPara("product_type_store"));
-			seller.set("remark", getPara("remark"));
+			seller.set("contact", getPara("seller.contact"));
+			seller.set("phone", getPara("seller.phone"));
+			seller.set("is_enabled", getPara("seller.is_enabled"));
+			seller.set("market_name", getPara("seller.market_name"));
+			seller.set("market_code", getPara("seller.market_code"));
+			seller.set("jywx_open_id", getPara("seller.jywx_open_id"));
+			seller.set("jpwx_open_id", getPara("seller.jpwx_open_id"));
+			seller.set("product_type_store", getPara("seller.product_type_store"));
+			seller.set("remark", getPara("seller.remark"));
 			seller.set("create_date", new Date());
 			seller.set("modify_user_id", user.getId());
 			seller.set("is_inited", 0);
 			seller.set("dept_id",getPara("dept_id"));
-			if(user.getUsername().equals("admin")){
-				seller.set("seller_type", getPara("seller_type"));
-			}else{
-				seller.set("seller_type", 1);
-			}
 			
-			seller.save();
 			Option option = new Option();
-			//List<Option> options =  OptionQuery.me().findAll();
 			option.setOptionKey(sellerId+"_store_check");
 			option.setOptionValue("1");
 			option.set("seller_id",sellerId );
@@ -207,26 +208,28 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				}
 			}
 			
-			String customerId = StrKit.getRandomUUID();
-			customer.set("id", customerId);
-			customer.set("customer_code", getPara("seller_code"));
-			customer.set("customer_name", getPara("seller_name"));
-			customer.set("contact", getPara("contact"));
-			customer.set("mobile", getPara("phone"));
-			customer.set("is_enabled", 1);
-			customer.set("address", address);
-			customer.set("create_date", new Date());
-			customer.set("status", 0);
-			customer.save();
 			
 			
 			if(!user.getUsername().equals("admin")){
-				Seller Seller = SellerQuery.me().findByUserId(user.getId());
+				String customerId = StrKit.getRandomUUID();
+				//添加客户
+				customer.set("id", customerId);
+				customer.set("customer_code", getPara("seller.seller_code"));
+				customer.set("customer_name", getPara("seller.seller_name"));
+				customer.set("contact", getPara("seller.contact"));
+				customer.set("mobile", getPara("seller.phone"));
+				customer.set("is_enabled", 1);
+				customer.set("address", address);
+				customer.set("create_date", new Date());
+				customer.set("status", 0);
+				customer.save();
+				
+				//添加直营商客户
 				String sellerCustomerId = StrKit.getRandomUUID();
 				sellerCustomer.set("id", sellerCustomerId);
-				sellerCustomer.set("seller_id", Seller.getId());
+				sellerCustomer.set("seller_id",getSessionAttr("sellerId").toString());
 				sellerCustomer.set("customer_id", customerId);
-				sellerCustomer.set("nickname", getPara("seller_name"));
+				sellerCustomer.set("nickname", getPara("seller.seller_name"));
 				sellerCustomer.set("is_checked", 1);
 				sellerCustomer.set("is_enabled", 1);
 				sellerCustomer.set("is_archive", 1);
@@ -238,49 +241,103 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				sellerCustomer.set("create_date", new Date());
 				sellerCustomer.save();
 				
+				//添加用户客户中间表
 				userJoinCustomer.set("seller_customer_id", sellerCustomerId);
 				userJoinCustomer.set("user_id", user.getId());
 				userJoinCustomer.set("data_area",department.getDataArea());
 				userJoinCustomer.set("dept_id", department.getId());
 				userJoinCustomer.save();
+				
+				String code = "G";
+				CustomerType customerType = CustomerTypeQuery.me().findDataAreaAndName(DataAreaUtil.getUserDeptDataArea(user.getDataArea()),code);
+				if(customerType!=null){
+					CustomerJoinCustomerType customerJoinCustomerType = new CustomerJoinCustomerType();
+					customerJoinCustomerType.setSellerCustomerId(sellerCustomerId);
+					customerJoinCustomerType.setCustomerTypeId(customerType.getId());
+					customerJoinCustomerType.save();
+				}
 			}
-			//新建销售商时默认创建分组  角色  及中间表
+			if(user.getUsername().equals("admin")){
+				seller.set("seller_type", 0);
+			}else{
+				seller.set("seller_type", 1);
+				seller.setCustomerId(customer.getId());
+			}
+			seller.save();
+			//新建销售商时默认创建分组  角色  及中间表 客户类型
  			List<Seller> sellers = SellerQuery.me().findByDeptId(department.getId());
-			if(sellers.size()==1){
+			
+			if(sellers.size()==1 ){
 				List<Group> groupList = GroupQuery.me().findByDeptId();
-				for (Group group : groupList) {
-					Group newGroup=new Group();
-					String groupId = StrKit.getRandomUUID();
-					newGroup.setId(groupId);
-					newGroup.setGroupName(group.getGroupName());
-					newGroup.setGroupCode(group.getGroupCode());
-					newGroup.setOrderList(group.getOrderList());
-					newGroup.setDescription(group.getDescription());
-					newGroup.set("dept_id", department.getId());
-					newGroup.set("data_area", department.getDataArea());
-					newGroup.setCreateDate(new Date());
-					newGroup.save();
+				if(groupList.size()>0){
+					for (Group group : groupList) {
+						Group newGroup=new Group();
+						String groupId = StrKit.getRandomUUID();
+						newGroup.setId(groupId);
+						newGroup.setGroupName(group.getGroupName());
+						newGroup.setGroupCode(group.getGroupCode());
+						newGroup.setOrderList(group.getOrderList());
+						newGroup.setDescription(group.getDescription());
+						newGroup.set("dept_id", department.getId());
+						newGroup.set("data_area", department.getDataArea());
+						newGroup.setCreateDate(new Date());
+						newGroup.save();
+					}
 				}
 				List<Role> roleList = RoleQuery.me().findByDeptId();
-				for (Role role : roleList) {
-					Role newRole = new Role();
-					String roleId = StrKit.getRandomUUID();
-					newRole.setId(roleId);
-					newRole.setRoleName(role.getRoleName());
-					newRole.setRoleCode(role.getRoleCode());
-					newRole.setOrderList(role.getOrderList());
-					newRole.setDescription(role.getDescription());
-					newRole.set("dept_id", department.getId());
-					newRole.set("data_area",department.getDataArea());
-					newRole.setCreateDate(new Date());
-					newRole.save();
+				if(roleList.size()>0){
+					for (Role role : roleList) {
+						Role newRole = new Role();
+						String roleId = StrKit.getRandomUUID();
+						newRole.setId(roleId);
+						newRole.setRoleName(role.getRoleName());
+						newRole.setRoleCode(role.getRoleCode());
+						newRole.setOrderList(role.getOrderList());
+						newRole.setDescription(role.getDescription());
+						newRole.set("dept_id", department.getId());
+						newRole.set("data_area",department.getDataArea());
+						newRole.setCreateDate(new Date());
+						newRole.save();
+						
+						GroupRoleRel groupRoleRel = new GroupRoleRel();
+						Group group = GroupQuery.me().findDeptIdAndDataAreaAndGroupCode(newRole.getDeptId(),newRole.getDataArea(),newRole.getRoleCode());
+						groupRoleRel.setId(StrKit.getRandomUUID());
+						groupRoleRel.setGroupId(group.getId());
+						groupRoleRel.setRoleId(roleId);
+						groupRoleRel.save();
+						
+						
+						List<RoleOperationRel> pRels = RoleOperationRelQuery.me().findByRoleId(role.getId());
+						if(pRels.size()>0){
+							for(RoleOperationRel pRel : pRels){
+								RoleOperationRel operationRel = new RoleOperationRel();
+								operationRel.setId(StrKit.getRandomUUID());
+								operationRel.setOperationId(pRel.getOperationId());
+								operationRel.setRoleId(roleId);
+								operationRel.save();
+								
+							}
+						}
+					}
 					
-					GroupRoleRel groupRoleRel = new GroupRoleRel();
-					Group group = GroupQuery.me().findDeptIdAndDataAreaAndGroupCode(newRole.getDeptId(),newRole.getDataArea(),newRole.getRoleCode());
-					groupRoleRel.setId(StrKit.getRandomUUID());
-					groupRoleRel.setGroupId(group.getId());
-					groupRoleRel.setRoleId(roleId);
-					groupRoleRel.save();
+				}
+				
+				List<CustomerType> customerTypes = CustomerTypeQuery.me().findByDept("0");
+				if(customerTypes.size()>0){
+					for(CustomerType cT : customerTypes){
+						CustomerType customerType = new CustomerType();
+						customerType.setId(StrKit.getRandomUUID());
+						customerType.setName(cT.getName());
+						customerType.setCode(cT.getCode());
+						customerType.setIsShow(cT.getIsShow());
+						customerType.setType(cT.getType());
+						customerType.setPriceSystemId(cT.getPriceSystemId());
+						customerType.setProcDefKey(cT.getProcDefKey());
+						customerType.set("dept_id",department.getId());
+						customerType.set("data_area", department.getDataArea());
+						customerType.setCreateDate(new Date());
+						customerType.save();
+					}
 				}
 			}
 			
@@ -302,22 +359,21 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				newCustomerType.save();
 			}*/
 		} else {
-			seller.set("seller_name",getPara("seller_name"));
-			seller.set("seller_code",getPara("seller_code"));
-			seller.set("contact", getPara("contact"));
-			seller.set("phone", getPara("phone"));
-			seller.set("market_name", getPara("market_name"));
-			seller.set("is_enabled", getPara("is_enabled"));
-			seller.set("market_code", getPara("market_code"));
-			seller.set("jywx_open_id", getPara("jywx_open_id"));
-			seller.set("jpwx_open_id", getPara("jpwx_open_id"));
-			seller.set("product_type_store", getPara("product_type_store"));
-			seller.set("remark", getPara("remark"));
+			seller.set("dept_id",getPara("dept_id"));
+			seller.set("seller_name",getPara("seller.seller_name"));
+			seller.set("contact", getPara("seller.contact"));
+			seller.set("phone", getPara("seller.phone"));
+			seller.set("market_name", getPara("seller.market_name"));
+			seller.set("is_enabled", getPara("seller.is_enabled"));
+			seller.set("market_code", getPara("seller.market_code"));
+			seller.set("jywx_open_id", getPara("seller.jywx_open_id"));
+			seller.set("jpwx_open_id", getPara("seller.jpwx_open_id"));
+			seller.set("product_type_store", getPara("seller.product_type_store"));
+			seller.set("remark", getPara("seller.remark"));
 			seller.set("modify_user_id", user.getId());
 			seller.set("is_inited", 1);
 			seller.set("modify_date", new Date());
 			seller.set("modify_user_id", user.getId());
-			seller.set("dept_id",getPara("dept_id"));
 			seller.update();
 			SellerBrandQuery.me().deleteBySellertId(sellerId);
 			for(int i=0;i<brandIds.length;i++){
@@ -439,7 +495,6 @@ public class _SellerController extends JBaseCRUDController<Seller> {
             setAttr("k", keyword);
         }
         User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
-        String se = getSessionAttr("sellerId").toString();
         Seller seller = SellerQuery.me().findById(getSessionAttr("sellerId").toString());
         Page<Product> page = ProductQuery.me().paginate_pro(getPageNumber(), getPageSize(),keyword,  "cp.id",seller.getId(),user.getId());
 
@@ -450,10 +505,9 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 	//保存产品信息
 		public void savePro(){
 			final SellerProduct sellerProducts= getModel(SellerProduct.class);
-			User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
 			String ds = getPara("orderItems");
 			boolean result=false;
-			Seller seller=SellerQuery.me().findByUserId(user.getId());
+			Seller seller=SellerQuery.me().findById(getSessionAttr("sellerId").toString());
 			JSONArray jsonArray = JSONArray.parseArray(ds);
 			List<SellerProduct> imageList = jsonArray.toJavaList(SellerProduct.class);
 			for (SellerProduct sellerProduct : imageList) {
@@ -464,8 +518,10 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 						sellerProducts.set("product_id",sellerProduct.getProductId());
 						sellerProducts.set("seller_id",seller.getId());
 						sellerProducts.set("custom_name",sellerProduct.getCustomName());
-						sellerProducts.set("store_count",sellerProduct.getStoreCount());
+						sellerProducts.set("store_count",new BigDecimal(0));
 						sellerProducts.set("price", sellerProduct.getPrice());
+						sellerProducts.setCost(sellerProduct.getCost());
+						sellerProducts.setMarketPrice(sellerProduct.getMarketPrice());
 						sellerProducts.set("is_enable", sellerProduct.getIsEnable());
 						sellerProducts.set("order_list", sellerProduct.getOrderList());
 						sellerProducts.set("create_date", new Date());

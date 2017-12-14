@@ -38,59 +38,93 @@ function initProduct(){
 	var productList = getItemBykey("productList");
 
 	$.each(productList, function(index, el) {
-		$main.append("<div class='weui-panel weui-panel_access common'>" + newHtml + "</div>");
-		var $newProductDetail = $main.find(".common:last");
-		$newProductDetail.find("#productName").text(el.productName);
-		$newProductDetail.find("#valueName").text(el.valueName);
+		if(el.isGift == 0) {
+			$main.append("<div class='weui-panel weui-panel_access common'>" + newHtml + "</div>");
+			var $newProductDetail = $main.find(".common:last");
+			$newProductDetail.find("#productName").text(el.productName);
+			$newProductDetail.find("#valueName").text(el.valueName);
+	
+			$newProductDetail.find("#bigPriceSpan").text(el.bigPriceSpan);
+			$newProductDetail.find("#smallPriceSpan").text(el.smallPriceSpan);
+			$newProductDetail.find("#bigUnitSpan").text(el.bigUnitSpan);
+			$newProductDetail.find("#smallUnitSpan").text(el.smallUnitSpan);
+	
+			$newProductDetail.find("#bigPrice").val(el.bigPrice);
+			$newProductDetail.find("#smallPrice").val(el.smallPrice);
+			$newProductDetail.find("#bigUnit").val(el.bigUnit);
+			$newProductDetail.find("#smallUnit").val(el.smallUnit);
+			$newProductDetail.find("#sellProductId").val(el.sellProductId);
+			$newProductDetail.find("#productId").val(el.productId);
+			$newProductDetail.find("#convert").val(el.convert);
+			
+			$newProductDetail.find("#bigNum").val(el.bigNum);
+			$newProductDetail.find("#smallNum").val(el.smallNum);
+	
+			//赠品
+			$newProductDetail.find("#giftProduct").select({
+				title: "选择商品",
+				items: sellerProductItems,
+				onChange: function(obj){
+					var $gift = $(this)[0].$input.parent().parent().parent();
+					var product = sellerProductInfoMap[obj.values].columns;
+	
+					selectGift($gift, product)
+				}
+			});
+			
+			//默认商品
+			$newProductDetail.find("#isDefault").change(function() {
+				var $this = $(this);
+				var $gift = $this.parent().parent().parent();
+				var $giftProduct = $gift.find("#giftProduct");
+	
+				if($this.is(':checked')) {
+					var sellProductId = $gift.parent().find("#sellProductId").val();
+					var product = sellerProductInfoMap[sellProductId].columns;
+					
+					$giftProduct.val(product.custom_name);
+					$giftProduct.attr('data-values', product.sell_product_id);
+					$giftProduct.attr('disabled', 'true');
+	
+					selectGift($gift, product);
+				}else{
+					$giftProduct.removeAttr('disabled');
+				}
+			
+			});
+		} else {
+			var $newProductDetail = $main.find(".common:last");
+			$newProductDetail.find("#addGift").attr("checked",'true').trigger("change");
 
-		$newProductDetail.find("#bigPriceSpan").text(el.bigPriceSpan);
-		$newProductDetail.find("#smallPriceSpan").text(el.smallPriceSpan);
-		$newProductDetail.find("#bigUnitSpan").text(el.bigUnitSpan);
-		$newProductDetail.find("#smallUnitSpan").text(el.smallUnitSpan);
-
-		$newProductDetail.find("#bigPrice").val(el.bigPrice);
-		$newProductDetail.find("#smallPrice").val(el.smallPrice);
-		$newProductDetail.find("#bigUnit").val(el.bigUnit);
-		$newProductDetail.find("#smallUnit").val(el.smallUnit);
-		$newProductDetail.find("#sellProductId").val(el.sellProductId);
-		$newProductDetail.find("#productId").val(el.productId);
-		$newProductDetail.find("#convert").val(el.convert);
-		
-		$newProductDetail.find("#bigNum").val(el.bigNum);
-		$newProductDetail.find("#smallNum").val(el.smallNum);
-
-		//赠品
-		$newProductDetail.find("#giftProduct").select({
-			title: "选择商品",
-			items: sellerProductItems,
-			onChange: function(obj){
-				var $gift = $(this)[0].$input.parent().parent().parent();
-				var product = sellerProductInfoMap[obj.values].columns;
-
-				selectGift($gift, product)
+			//默认
+			if($newProductDetail.find("#sellProductId").val() == el.sellProductId){
+				$newProductDetail.find("#isDefault").attr("checked","true");
+				$newProductDetail.find("#giftProduct").attr('disabled', 'true');
 			}
-		});
-		
-		//默认商品
-		$newProductDetail.find("#isDefault").change(function() {
-			var $this = $(this);
-			var $gift = $this.parent().parent().parent();
-			var $giftProduct = $gift.find("#giftProduct");
 
-			if($this.is(':checked')) {
-				var sellProductId = $gift.parent().find("#sellProductId").val();
-				var product = sellerProductInfoMap[sellProductId].columns;
-				
-				$giftProduct.val(product.custom_name);
-				$giftProduct.attr('data-values', product.sell_product_id);
-				$giftProduct.attr('disabled', 'true');
+			$newProductDetail.find("#giftProduct").val(el.productName);
+			$newProductDetail.find("#giftSellProductId").val(el.sellProductId);
+			$newProductDetail.find("#giftProductId").val(el.productId);
+			$newProductDetail.find("#giftConvert").val(el.convert);
+			$newProductDetail.find("#giftBigPrice").val(el.bigPrice);
+			
+			var $giftUnitName = $newProductDetail.find("#giftUnitName");
 
-				selectGift($gift, product);
+			initGiftUnitName($giftUnitName, sellerProductInfoMap[el.sellProductId].columns);
+
+			//数量
+			if(el.bigNum > 0 && el.bigUnit){
+				$newProductDetail.find("#giftNum").val(el.bigNum);
+				$giftUnitName.val(el.bigUnitSpan);
+				$giftUnitName.attr('data-values', "bigUnit");
+				$newProductDetail.find("#giftUnit").val("bigUnit");
 			}else{
-				$giftProduct.removeAttr('disabled');
+				$newProductDetail.find("#giftNum").val(el.smallNum);
+				$giftUnitName.val(el.smallUnitSpan);
+				$giftUnitName.attr('data-values', "smallUnit");
+				$newProductDetail.find("#giftUnit").val("smallUnit");
 			}
-		
-		});
+		}
 	});
 }
 
@@ -101,12 +135,25 @@ function selectGift($gift, product){
 	$gift.find("#giftConvert").val(product.convert_relate);
 	$gift.find("#giftBigPrice").val(product.price);
 	
-	var $giftUnit = $gift.find("#giftUnit");
-	$giftUnit.select({title: "单位", items: [{title: product.big_unit, value: "bigUnit"}, {title: product.small_unit, value: "smallUnit"}] });
-	//赋初始值
-	$giftUnit.val(product.big_unit);
-	$giftUnit.attr('data-values', "bigUnit");
+	var $giftUnitName = $gift.find("#giftUnitName");
+	initGiftUnitName($giftUnitName, product);
 
+	//赋初始值
+	$giftUnitName.val(product.big_unit);
+	$giftUnitName.attr('data-values', "bigUnit");
+
+}
+
+function initGiftUnitName(obj, product) {
+	obj.select({
+				title: "单位", 
+				items: [{title: product.big_unit, value: "bigUnit"}, 
+						{title: product.small_unit, value: "smallUnit"}],
+				onChange : function(data) {
+						var $gift = $(this)[0].$input.parent().parent().parent();
+						$gift.find("#giftUnit").val(data.values);
+				}
+			});
 }
 
 var compositionHtml = $(".composition").eq(0).html();
@@ -189,8 +236,8 @@ function save(){
 			var giftSmallUnit = '';
 
 			var giftNum = $el.find("#giftNum").val();
-			var giftUnitName = $el.find("#giftUnit").val();
-			var giftUnit = $el.find("#giftUnit").data("values");
+			var giftUnitName = $el.find("#giftUnitName").val();
+			var giftUnit = $el.find("#giftUnit").val();
 
 			if(giftUnit == "bigUnit"){
 				giftBigUnitSpan = giftUnitName;
@@ -268,7 +315,7 @@ function save(){
 <@layout>
 <body id="shopping-cart">
 	<main>
-		<div class="weui-panel weui-panel_access common">
+		<div class="weui-panel weui-panel_access common" style="display: none">
 			<input type="hidden" id="sellProductId" value="">
 			<input type="hidden" id="productId" value="">
 			<input type="hidden" id="convert" value="">
@@ -337,13 +384,14 @@ function save(){
 								<i class="icon-plus2"></i>
 							</div>
 						</div>
-						<input type="text" class="choose-unit weui-input" placeholder="单位" id="giftUnit" readonly>
+						<input type="hidden" name="giftUnit" id="giftUnit">
+						<input type="text" class="choose-unit weui-input" placeholder="单位" id="giftUnitName" readonly>
 						<i class="icon-sort-desc"></i>
 					</div>
 				</div>
 			</div>
 		</div>
-		<div class="weui-panel weui-panel_access composition">
+		<div class="weui-panel weui-panel_access composition" style="display: none">
 			<input type="hidden" id="compositionId" value="">
 			<div class="product_name" id="compositionName">
 				35度中国劲酒_125ml_1*24

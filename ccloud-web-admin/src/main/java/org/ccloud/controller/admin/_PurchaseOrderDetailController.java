@@ -111,7 +111,7 @@ public class _PurchaseOrderDetailController extends JBaseCRUDController<Purchase
 		final PurchaseOrderDetail purchaseOrderDetail = getModel(PurchaseOrderDetail.class);
 		Map<String, String[]> paraMap = getParaMap();
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		Seller seller = SellerQuery.me().findByUserId(user.getId());
+		Seller seller = SellerQuery.me().findById(getSessionAttr("sellerId").toString());
 		int i = PurchaseOrderQuery.me().findByUserId(user.getId(),user.getDataArea());
 		/*采购订单：PO + 100000(机构编号或企业编号6位,这里取销售商编码) + 20171108(时间) + 000001(流水号)*/
 		i++;

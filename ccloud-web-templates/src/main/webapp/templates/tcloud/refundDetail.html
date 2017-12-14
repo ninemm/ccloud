@@ -1,178 +1,278 @@
 <#include "_inc/_layout.html"/>
+<#macro css> 
+	#bigNum,#smallNum {
+		border: 1px solid #bbb;
+	}
 
+	#order .gift input::-webkit-input-placeholder {
+		text-align: center;
+	}
+</#macro>
 
 <#macro script>
- 	var $form = $("#form");
- 	
- 	function checkProductNumber() {
+$(function() {
+})
+	var $form = $('#form');
+
+	function total() {
+		var products = $(".goods-detail");
+		var rowTotal = 0;
+		var total = 0;
+		$.each(products, function(index, el) {
+			var $el = $(el);
+			rowTotal = $el.find("#bigNum").val() * $el.find("#bigPrice").val() + $el.find("#smallNum").val() * $el.find("#smallPrice").val();
+			$el.find("#rowTotal").val(rowTotal);
+			total += rowTotal;
+		});
+		$("#total").val(total);
+		$("#totalNum").text("共" + products.length + "款,合计:" + total + "元")
+	
+	}
+	
+	function checkProductNumber() {
 		var store = $(".goods-detail");
 		var check = false;
+		var alltotal = 0;
+		var status = true;
+		if (store.length <= 1) {
+			check = false;
+			return check;
+		}
 		store.each(function(index,obj){
-			var productCount = parseInt($(obj).find("#count").html());
-			var number = parseInt($(obj).find("#number").val());
-			if (number > productCount) {
+			var productCount = parseInt($(obj).find("#productCount").val());
+			var bigNum = $(obj).find("#bNum").val();
+			var convert = $(obj).find("#convert").val();
+			var smallNum = $(obj).find("#sNum").val();
+			var total = parseInt(bigNum)*parseInt(convert) + parseInt(smallNum);
+			if (total > productCount) {
+				status = false;
 				return false;
 			}
-			if (index == store.length-1) {
-				check = true;
-			} 
+			if (isNaN(total)) {
+				total = 0;
+			}
+			alltotal = alltotal + total;
 		});
+		if (alltotal > 0 && status) {
+			check = true;
+		}
 		return check;	
-	}	
- 	
-    function doSubmit() {
-    		if (!checkProductNumber()) {
-			toastr.error('商品退货数量大于购买数量!','操作失败');
+	}		
+	
+	function doSubmit(){
+		var receiveType = "1";
+		var remark = $("#remark").val();
+		if ($("#receiveType").is(":checked")) {
+			receiveType = "0";
+		}
+    	if (!checkProductNumber()) {
+			toastr.error('退货大于购买数量或数量为0!','操作失败');
 			return;			
-		}	
+		}
         $form.ajaxSubmit({
 			type: "post",
 			dataType: "json",
-			data:{"outstock_id":'${outstock_id}'},
+			data:{
+				"receiveType":receiveType,
+				"remark": remark
+			},
 			success: function(result){
 	            if (result.errorCode > 0) {
 	                toastr.error(result.message, '操作失败');
 	            } else {
-	                toastr.success(result.message, '操作成功');
-	                $table.bootstrapTable('refresh');
+	                window.location.href = "${CPATH}/refund/index"
 	            }
 			}
         });
-    }
-</#macro> 
+	}
+</#macro>
 
 <@layout>
- <main>
- <#list salesOutstockDetail as list>
-	<#if list_index == 0 >
-	    <section class="weui-panel weui-panel_access order-customer-info">
-	      <div class="weui-cell weui-cell_access">
-	        <div class="weui-cell__bd">
-	          <div class="order-customer-info-title">
-	            客户名称
-	            <span class="require">*</span>
-	          </div>
-	          <input type="text" value=${(list.customer_name)!} class="weui-input" readonly>
-	          </div>
-	        </div>
-	      </div>
-	      <div class="weui-cell weui-cell_access">
-	        <div class="weui-cell__bd">
-	          <div class="order-customer-info-title">
-	            联系人
-	            <span class="require">*</span>
-	          </div>
-	            <input type="text" value=${(list.contact)!} class="weui-input" readonly>
-	          </div>
-	        </div>
-	      </div>
-	      <div class="weui-cell weui-cell_access">
-	        <div class="weui-cell__bd">
-	          <div class="order-customer-info-title">
-	            电话号码
-	            <span class="require">*</span>
-	          </div>
-	            <input type="text" value=${(list.mobile)!} class="weui-input" readonly>
-	          </div>
-	        </div>
-	      </div>
-	      <div class="weui-cell weui-cell_access">
-	        <div class="weui-cell__bd">
-	          <div class="order-customer-info-title">
-	            详细地址
-	            <span class="require">*</span>
-	          </div>
-	            <input type="text" value=${(list.address)!} class="weui-input" readonly>
-	          </div>
-	        </div>
-	      </div>
-	    </section>
-	    <section class="weui-panel weui-panel_access delivery-info">
-	      <div class="weui-cell weui-cell_access">
-	        <div class="weui-cell__bd">
-	          <div class="order-customer-info-title">
-	            发货时间
-	            <span class="require">*</span>
-	             </div>
-	            <input type="text" value=${(list.delivery_date)!} class="weui-input" readonly>
-	          </div>
-	        </div>
-	      </div>
-	    </section>
-	    <section class="weui-panel weui-panel_access ft14">
-	      <div class="weui-cell weui-cell_access">
-	        <div class="weui-cell__bd">
-	          <div class="order-customer-info-title">
-	             账期:
-	              </div>
-	             是<input type="checkbox" disabled="disabled"  <#if list.receive_type = 0>checked="checked"</#if> >
-	             否<input type="checkbox" disabled="disabled" <#if list.receive_type = 1>checked="checked"</#if> >
-	          </div>
-	        </div>
-	      </div>
-	    </section>
-    	<#break>
-	</#if>
-	</#list>
-   
-    <section class="weui-panel weui-panel_access ft14 remark">
-      <div class="weui-cell weui-cell_access">
-        <div class="weui-cell__bd">
-        </div>
-      </div>
-    </section>
-    <div class="weui-cells__title black">商品明细</div>
-   
-   <form  action="${CPATH}/refund/refundGood" method="post" id="form">
-	   <#list salesOutstockDetail as list>
-	    <div class="weui-panel weui-panel_access goods-detail">
-	    <input type="hidden" name="sell_product_id" value=${(list.sell_product_id)!}>
-	      <div class="product_name">
-	       ${(list.custom_name)!} 
-	      </div>
-	      <div class="product_unit">
-	        规格：
-	        <span class="blue-button"> ${(list.cps_name)!} </span>
-	        数量:
-	        <span class="price" id="count">${(list.product_count)!}</span>
-	      </div>
-	      <div class="product_bUnit">
-	        <span class="price">￥${(list.product_price)!}</span>
-	        <span style="margin-left:6rem">退货数量:</span>
-	        <div class="spinner">
-	          <div class="operate fl">
-	            <i class="icon-minus2"></i>
-	          </div>
-	        		<input name="number" type="number" class="fl" value="0" id="number">
-	          <div class="operate fl">
-	            <i class="icon-plus2"></i>
-	          </div>
-	        </div>
-	      </div>
-	      <hr />
-	    </div>
-	    </#list>
-    </form>
-    <div class="button white-button fr" onclick="doSubmit()" >确认退货</div>
-    
-  </main>
- 	<div class="hidden-menu">
-	    <ul>
-	      <li>
-	        <a href="../">
-	          首页
-	          <i class="icon-home blue"></i>
-	        </a>
-	      </li>
-	      <li>
-	        <a href="javascript:history.go(-1)">
-	          上一页
-	          <i class="icon-undo green"></i>
-	        </a>
-	      </li>
-	    </ul>
-	    <i class="icon-menu-open orange fr" id="button"></i>
-  </div>
-  <div class="layer"></div>
+<body id="order">
+		<main>
+			<section class="weui-panel weui-panel_access order-customer-info">
+				<div class="weui-cell weui-cell_access">
+					<div class="weui-cell__bd">
+						<div class="order-customer-info-title">
+							客户名称
+							<span class="require">*</span>
+						</div>
+						<input type="text" class="weui-input" value="${(outstock.customer_name)!}" readonly>
+						<span class="weui-cell__ft"></span>
+					</div>
+				</div>
+				<div class="weui-cell weui-cell_access">
+					<div class="weui-cell__bd">
+						<div class="order-customer-info-title">
+							联系人
+							<span class="require">*</span>
+						</div>
+						<input type="text" class="weui-input" id="contact" name="contact" value="${(outstock.contact)!}" readonly>
+					</div>
+				</div>
+				<div class="weui-cell weui-cell_access">
+					<div class="weui-cell__bd">
+						<div class="order-customer-info-title">
+							 电话号码
+							<span class="require">*</span>
+						</div>
+						<input type="text" class="weui-input" id="mobile" name="mobile" value="${(outstock.mobile)!}" readonly>
+					</div>
+				</div>
+				<div class="weui-cell weui-cell_access">
+					<div class="weui-cell__bd">
+						<div class="order-customer-info-title">
+							详细地址
+							<span class="require">*</span>
+						</div>
+						<input type="hidden" id="address" name="address" value="">
+						<input type="text" class="weui-input" id="deliveryAddress" name="deliveryAddress" value="${(outstock.address)!}" readonly>
+					</div>
+				</div>
+				<div class="weui-cell weui-cell_access">
+					<div class="weui-cell__bd">
+						<div class="order-customer-info-title">
+							客户类型
+							<span class="require">*</span>
+						</div>
+						<input type="text" class="weui-input" id="customerTypeName" name="customerTypeName" value="${(outstock.customerTypeName)!}" readonly>
+						<span class="weui-cell__ft"></span>
+					</div>
+				</div>
+			</section>
+			<section class="weui-panel weui-panel_access delivery-info">
+				<div class="weui-cell weui-cell_access">
+					<div class="weui-cell__bd">
+						发货时间
+						<input type="text" class="weui-input" data-toggle='date' id="deliveryDate" name="deliveryDate" value="${(outstock.delivery_date)!}" readonly>
+						<span class="weui-cell__ft"></span>
+					</div>
+				</div>
+			</section>
+			<section class="weui-panel weui-panel_access ft14">
+				<div class="weui-cell weui-cell_access">
+					<div class="weui-cell__bd">
+						<div>
+							<input type="checkbox" id="receiveType" name="receiveType" value="0"> 是否账期
+						</div>
+					</div>
+				</div>
+			</section>
+			<section class="weui-panel weui-panel_access ft14 remark">
+				<div class="weui-cell weui-cell_access">
+					<div class="weui-cell__bd">
+						<textarea id="remark" name="remark" placeholder="备注说明（70字以内）"></textarea>
+					</div>
+				</div>
+			</section>
+			<form action="${CPATH}/refund/refundGood" method="post" id="form">
+			<input type="hidden" name="outStockId" id="outStockId" value="${(outstock.id)!}">
+			<div class="weui-cells__title black">商品明细</div>
+			<div id="productList">
+				<#list salesOutstockDetail as list>
+				<div class="weui-panel weui-panel_access goods-detail">
+					<input type="hidden" name="sellProductId" id="sellProductId" value="${(list.sell_product_id)!}">
+					<input type="hidden" id="productCount" value="${(list.product_count-list.refundCount)!}">
+					<input type="hidden" id="convert" value="${(list.convert_relate)!}">
+					<div class="product_name" id="productName">
+						${(list.custom_name)!} 
+					</div>
+					<div class="product_unit">
+						规格：<span id="valueName">${(list.valueName)!}</span>
+					</div>
+					<div class="product_bUnit">
+						<span class="price" id="bigPriceSpan">￥${(list.product_price)!}</span>
+						<span class="unit" id="bigUnitSpan">&nbsp;/&nbsp;${(list.big_unit)!}</span>
+						<div class="spinner">
+				          <div class="operate fl">
+				            <i class="icon-minus2"></i>
+				          </div>
+				        		<input name="bNum" type="number" class="fl" value="${((list.product_count-list.refundCount)/list.convert_relate)?int}" id="bNum">
+				          <div class="operate fl">
+				            <i class="icon-plus2"></i>
+				          </div>						
+						</div>
+					</div>
+					<div class="product_mUnit">
+						<span class="price" id="smallPriceSpan">￥${((list.product_price/list.convert_relate)!)?string("0.##")}</span>
+						<span class="unit" id="smallUnitSpan">&nbsp;/&nbsp;${(list.small_unit)!}</span>
+						<div class="spinner">
+				          <div class="operate fl">
+				            <i class="icon-minus2"></i>
+				          </div>
+				        		<input name="sNum" type="number" class="fl" value="${((list.product_count-list.refundCount) % list.convert_relate)!0}" id="sNum">
+				          <div class="operate fl">
+				            <i class="icon-plus2"></i>
+				          </div>
+						</div>
+					</div>
+					<hr />
+					<div class="gift" id="gift">
+						<div>
+							<input type="checkbox" name="add-gift" id="addGift" <#if list.is_gift == 1>checked</#if> disabled>
+							<span>赠品</span>
+						</div>
+					</div>
+				</div>
+				</#list>
+			</div>
+			<div class="weui-cells__title black">已退货明细</div>
+			<div id="productList">
+				<#list salesRefundDetail as list>
+				<div class="weui-panel weui-panel_access goods-detail">
+					<div class="product_name" id="productName">
+						${(list.custom_name)!} 
+					</div>
+					<div class="product_unit">
+						规格：<span id="valueName">${(list.valueName)!}</span>
+					</div>
+					<div class="product_bUnit">
+						<span class="price" id="bigPriceSpan">￥${(list.product_price)!}</span>
+						<span class="unit" id="bigUnitSpan">&nbsp;/&nbsp;${(list.big_unit)!}</span>
+						<div class="spinner">
+			        		<input type="number" min="0" class="fl" id="bigNum" value="${(list.reject_product_count/list.convert_relate)?int}" disable>
+						</div>
+					</div>
+					<div class="product_mUnit">
+						<span class="price" id="smallPriceSpan">￥${((list.product_price/list.convert_relate)!)?string("0.##")}</span>
+						<span class="unit" id="smallUnitSpan">&nbsp;/&nbsp;${(list.small_unit)!}</span>
+						<div class="spinner">
+				        	<input type="number" min="0" class="fl" id="smallNum" value="${(list.reject_product_count % list.convert_relate)!0}" disable>
+						</div>
+					</div>
+					<hr />
+					<div class="gift" id="gift">
+						<div>
+							<input type="checkbox" name="add-gift" id="addGift" <#if list.is_gift == 1>checked</#if> disabled>
+							<span>赠品</span>
+						</div>
+					</div>
+				</div>
+				</#list>
+			</div>			
+		</main>
+		<div class="hidden-menu">
+			<ul>
+				<li>
+					<a href="${CPATH}/product/index">
+							首页
+						<i class="icon-home blue"></i>
+					</a>
+				</li>
+				<li>
+					<a class="goback">
+							上一页
+						<i class="icon-undo green"></i>
+					</a>
+				</li>
+			</ul>
+			<i class="icon-menu-open orange fr" id="button"></i>
+		</div>
+		<div class="layer"></div>
+	</form>
+	<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
+		<p class="total bg-gray weui-flex__item" id="totalNum"></p>
+		<button onclick="doSubmit()" class="place-order bg-blue white">提交订单</button>
+	</footer>	
 </body>
 </@layout>

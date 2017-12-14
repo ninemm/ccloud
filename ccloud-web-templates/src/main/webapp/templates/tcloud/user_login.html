@@ -14,14 +14,12 @@
 	<link rel="stylesheet" href="${CTPATH}/css/unlock.css">
     <title>用户登录</title>
     <style>
-    .input-area>div, input {
-        background: inherit;
-    }
 
     input {
         position: relative;
         left: 0;
-        padding-left: 1.5rem;
+		margin-left: 1.5rem;
+		margin-right: 1rem;
     }
 
     #bind {
@@ -29,7 +27,7 @@
         border-radius: 4px;
     }
 
-    .input-area i {
+    .input-area i:first-child {
         height: 2rem;
         line-height: 2rem;
         font-size: 1rem;
@@ -52,11 +50,28 @@
         height: 25%;
         font-family: '宋体';
         color: #35b8f0;
+	}
+	
+	#login {
+		max-width: 600px;
+		margin: 0 auto;
+	}
+
+	.icon-times-circle {
+      position: absolute!important;
+      right: 0!important;
+      font-size: 1rem!important;
+	  top: 0.5rem;
     }
+
+	input:-webkit-autofill { 
+		box-shadow: 0 0 0px 1000px white inset !important;
+	}
     </style>
 </head>
 
 <body>
+	<div id="login">
 	<header>
 		<h1>协同云平台</h1>
         <h3>用户登录</h3>
@@ -79,6 +94,7 @@
 			<button id="bind">登录</button>
 		</main>
 	</form>
+	</div>
 </body>
 <script src="${CTPATH}/js/jquery-3.2.1.min.js"></script>
 <script src="${CTPATH}/js/jquery-weui.min.js"></script>
@@ -91,9 +107,39 @@
 		var isSend = false;
 		
 		var $bind = $('#bind');
-	    var $form = $('#form')
+	    var $form = $('#form');
+	    var $mobile = $('#phone');
+	    var $code = $('#code');
 		
 		FastClick.attach(document.body);
+		
+		$(document).on("input", "#phone", function () {
+		    var $this = $(this);
+		    $this.next().show();
+		    if (($mobile.val().length === 0)) {
+		      $this.next().hide();
+		    }
+		}).on('focus', '#phone', function() {
+			var $this = $(this);
+			$this.val()?$this.next().show():'';
+		}).on("input", "#code", function () {
+		    var $this = $(this);
+		    if($this.is(':focus')){
+		    	$this.next().show();
+			    if (($code.val().length === 0)) {
+			      $this.next().hide();
+			    }
+		    }
+		}).on("touchend", ".icon-times-circle", function () {
+		    var $this = $(this);
+		    if ($(this).prev().is($mobile)) {
+				$('.icon-times-circle').hide();
+				$('input').val("");
+		    } else {
+			    $this.prev().val("");
+			    $this.hide();
+		    }
+		});
 		
 		var param = function() {
 	        return {

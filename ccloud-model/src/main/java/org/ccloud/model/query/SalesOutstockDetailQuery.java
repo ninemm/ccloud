@@ -50,13 +50,15 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 	public List<Record> findByOutstockId(String outstockId) {
 
 		StringBuilder sqlBuilder = new StringBuilder(
-				" SELECT sod.*, sp.custom_name, p.big_unit, p.small_unit, p.convert_relate, sp.seller_id, sp.product_id, t1.valueName, cs.is_composite");
+				" SELECT sod.*, sp.custom_name, p.big_unit, p.small_unit, p.convert_relate, sp.seller_id, sp.product_id, t1.valueName, cs.is_composite, IFNULL(t2.refundCount,0) as refundCount ");
 		sqlBuilder.append(" from `cc_sales_outstock_detail` sod ");
 		sqlBuilder.append(" LEFT JOIN cc_sales_order_detail cs ON sod.order_detail_id = cs.id ");
 		sqlBuilder.append(" LEFT JOIN cc_seller_product sp ON sod.sell_product_id = sp.id ");
 		sqlBuilder.append(" LEFT JOIN cc_product p ON sp.product_id = p.id ");
 		sqlBuilder.append("LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
-		sqlBuilder.append("RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = p.id ");		
+		sqlBuilder.append("RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = p.id ");
+		sqlBuilder.append("LEFT JOIN (SELECT SUM(cr.reject_product_count) as refundCount,cr.outstock_detail_id FROM cc_sales_refund_instock_detail cr GROUP BY cr.outstock_detail_id) t2 ");
+		sqlBuilder.append("on t2.outstock_detail_id = sod.id ");
 		sqlBuilder.append(" WHERE sod.outstock_id = ? ");
 
 		return Db.find(sqlBuilder.toString(), outstockId);
@@ -206,35 +208,5 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		
 		return true;
 	}
-
-	public List<Record> findById1(String id) {
-		StringBuilder sqlBuilder = new StringBuilder(
-				" SELECT sd.sell_product_id , c.customer_name , s.contact , s.mobile , s.address , s.receive_type ,s.delivery_date, sp.custom_name , sd.product_count , sd.product_price ,");
-		sqlBuilder.append(" sd.product_amount , s.total_amount , GROUP_CONCAT(DISTINCT cgs.`name`) AS cps_name ");
-		sqlBuilder.append(" FROM cc_sales_outstock_detail sd INNER JOIN cc_sales_outstock s ON s.id = sd.outstock_id ");
-		sqlBuilder.append(" INNER JOIN cc_customer c ON c.id = s.customer_id ");
-		sqlBuilder.append(" INNER JOIN cc_seller_product sp ON sp.id = sd.sell_product_id ");
-		sqlBuilder.append(" LEFT JOIN cc_product_goods_specification_value cpg ON sp.product_id = cpg.product_set_id ");		
-		sqlBuilder.append(" LEFT JOIN cc_goods_specification_value cgs ON cpg.goods_specification_value_set_id = cgs.id");
-		sqlBuilder.append("  WHERE sd.outstock_id = ? GROUP BY sp.id");
-		return Db.find(sqlBuilder.toString(), id);
-	}
-	
-	public Record findByIdAndSellProductId(String id,String sell_product_id) {
-		StringBuilder sqlBuilder = new StringBuilder(
-				" SELECT sp.seller_id , ct.`code` customerTypeCode , w.`code` warehouseCode , cs.seller_code sellerCode , s.warehouse_id , s.customer_id , s.customer_type_id , s.biz_user_id , ");
-		sqlBuilder.append("s.biz_date , s.receive_type , s.proc_key , s.proc_ins_id , sd.id , sd.product_count , sd.product_amount , sd.product_price , sd.is_gift , s.remark , s.dept_id , s.data_area  ");
-		sqlBuilder.append(" FROM cc_sales_outstock_detail sd INNER JOIN cc_sales_outstock s ON s.id = sd.outstock_id ");
-		sqlBuilder.append(" INNER JOIN cc_customer c ON c.id = s.customer_id ");
-		sqlBuilder.append(" INNER JOIN cc_seller_product sp ON sp.id = sd.sell_product_id ");
-		sqlBuilder.append(" LEFT JOIN cc_product_goods_specification_value cpg ON sp.product_id = cpg.product_set_id ");		
-		sqlBuilder.append(" LEFT JOIN cc_goods_specification_value cgs ON cpg.goods_specification_value_set_id = cgs.id ");
-		sqlBuilder.append(" LEFT JOIN cc_warehouse w ON w.id = s.warehouse_id ");		
-		sqlBuilder.append(" LEFT JOIN cc_customer_type ct ON ct.id = s.customer_type_id ");
-		sqlBuilder.append(" LEFT JOIN cc_seller cs ON cs.id = s.seller_id");
-		sqlBuilder.append(" WHERE sd.outstock_id = ? and sd.sell_product_id=? GROUP BY sp.id");
-		return Db.findFirst(sqlBuilder.toString(), id,sell_product_id);
-	}
-
 
 }

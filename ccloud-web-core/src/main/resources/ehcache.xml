@@ -491,6 +491,16 @@
            transactionalMode="off"
     />
     
+    <cache name="customer_visit"
+           maxEntriesLocalHeap="10000"
+           eternal="false"
+           overflowToDisk="true"
+           timeToIdleSeconds="300"
+           timeToLiveSeconds="300"
+           memoryStoreEvictionPolicy="LFU"
+           transactionalMode="off"
+    />
+    
     <cache name="cc_seller_customer"
            maxEntriesLocalHeap="10000"
            eternal="false"

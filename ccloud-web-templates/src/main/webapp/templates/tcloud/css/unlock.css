@@ -142,6 +142,11 @@ input {
   right: 4rem;
 }
 
+#code+.icon-times-circle {
+  position: absolute;
+  right: 0;
+}
+
 #get-code {
   padding: 0 0.3rem;
   width: 3.5rem;

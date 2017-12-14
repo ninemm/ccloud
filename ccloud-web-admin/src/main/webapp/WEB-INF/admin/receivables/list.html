@@ -18,6 +18,7 @@
 
 <#macro script>
 	var ref_sn = '${ref_sn}';
+	 
 
 	$(function(){
 		var url = '${CPATH}/admin/receivables/list?ref_sn='+ref_sn;
@@ -28,7 +29,7 @@
 		var fields = [
 			{field: "biz_date", title: "收款日期", align: "center", edit:false},
 			{field: "act_amount", title: "收款金额", align: "center", edit:false},
-			{field: "receive_user_name", title: "付款人", align: "center", edit:false},
+			{field: "receive_user_name", title: "收款人", align: "center", edit:false},
 			{field: "create_date", title: "录入时间", align: "center", edit:false},
 			{field: "input_user_name",title: "录入人", align:"center",edit:false},
 			{field: "remark",title:"备注",align:"center",edit:false}
@@ -65,7 +66,7 @@
 <section class="content">
 	<div class="row content-row">
 		<div class="jp-left">
-			<a class="btn btn-sm btn-primary btn-flat" href="${CPATH}/admin/receivables/addreceiving?ref_sn=${ref_sn}&ref_type=${ref_type}"><i class="fa fa-plus"></i>录入收款记录</a>
+			<a class="btn btn-sm btn-primary btn-flat" href="${CPATH}/admin/receivables/addreceiving?ref_sn=${ref_sn}&ref_type=${ref_type}&object_id=${object_id}"><i class="fa fa-plus"></i>录入收款记录</a>
 		</div>
 	</div>
 	<div class="box">
