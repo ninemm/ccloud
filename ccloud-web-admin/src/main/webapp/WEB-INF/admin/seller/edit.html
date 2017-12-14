@@ -100,12 +100,6 @@
 				regexp:{regexp:/^1[3|5|7|8]{1}[0-9]{9}$/, message:'请输入正确的手机号码' }
 			}
 		},
-		
-		'seller_type': {
-			validators: {
-				notEmpty: { message: '产品类型不能为空' }
-			}
-		},
 		'market_name': {
 			validators: {
 				notEmpty: { message: '市场名称不能为空' },
@@ -197,7 +191,7 @@
 			</div>
 		</div>
 		<form action="${CPATH}/admin/seller/save" method="post" id="form" class="form-horizontal" >
-			<input type="hidden" name="seller.id" value="${(seller.id)!}">
+			<input type="hidden" name="id" value="${(seller.id)!}">
 					<div class="box-body">
 						<div class="form-group col-sm-12 validata-box">
 								<label class="control-label col-sm-2">所属部门组织:</label>
@@ -248,18 +242,6 @@
 											</label>		                 		
 						               	</div>
 						</div>
-						<@shiro.hasPermission name="/admin/all">
-						<div class="form-group col-sm-12 validata-box">
-										<label class="control-label col-sm-2">*销售商类型:</label>
-										<div class="input-group col-md-4 col-sm-10">
-											<select class="form-control input-sm" name="seller_type" id="seller_type">
-												<option value="">--请选择--</option>
-												<option value="0" <#if !seller?? || seller.seller_type! == 1>selected="selected"</#if> >经销商</option>
-												<option value="1" <#if !seller?? || seller.seller_type! == 0>selected="selected"</#if>>直营商</option>
-											</select>
-						               	</div>
-						</div>							
-						</@shiro.hasPermission>						
 						<div class="form-group col-sm-12 validata-box">
 		                    <label for="_title" class="col-sm-2 control-label">省市区:</label>
 		                    <div class="input-group col-sm-10">

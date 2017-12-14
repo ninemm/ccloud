@@ -205,7 +205,7 @@
                 </div>
             </header>
             <div>
-                <div id="products" class="menu-left ft14">
+                <div id="products" class="menu-left ft14" style="background: #fcfcfc;">
                     <ul>
                         <#if goodsTypeList??&&(goodsTypeList?size>0)>
                             <li id="allProduct" class="active" value="00">商品类型</li>
@@ -222,7 +222,7 @@
                         <#if total &gt; 0>
                             <#list inventoryList.list as inventory >
                                 <div class="product_detail">
-                                    <div class="inventory_name">
+                                    <div class="inventory_name" style="font-size: 0.7rem;">
                                         ${(inventory.name)!}
                                     </div>
                                     <!--<div class="weui-flex">
@@ -231,7 +231,7 @@
                                         <div class="weui-flex__item">期末结存：<span>${(inventory.out_count)!}</span>
                                         </div>
                                     </div>-->
-                                    <div class="weui-flex">
+                                    <div class="weui-flex" style="margin:0.1rem;">
                                         <div class="weui-flex__item">出库：<span class="green-button">${(inventory.in_count)!}</span>
                                         </div>
                                         <div class="weui-flex__item">入库：<span class="yellow-button">${(inventory.out_count)!}</span>

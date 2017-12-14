@@ -103,7 +103,7 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 	}
 
 	public boolean insert(Map<String, String[]> paraMap, String instockId, String instockSn, String sellerId,
-			String userId, Date date, String deptId, String dataArea) {
+			String userId, Date date, String deptId, String dataArea, String outStockId) {
 		SalesRefundInstock salesRefundInstock = new SalesRefundInstock();
 		
 		salesRefundInstock.setId(instockId);
@@ -115,6 +115,7 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		salesRefundInstock.setBizUserId(StringUtils.getArrayFirst(paraMap.get("biz_user_id")));
 		salesRefundInstock.setInputUserId(userId);
 		salesRefundInstock.setStatus(Consts.SALES_REFUND_INSTOCK_DEFUALT);
+		salesRefundInstock.setOutstockId(outStockId);
 		String total = StringUtils.getArrayFirst(paraMap.get("total"));
 		String type = StringUtils.getArrayFirst(paraMap.get("paymentType"));
 		
@@ -280,6 +281,7 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		salesRefundInstock.setBizUserId(record.getStr("biz_user_id"));
 		salesRefundInstock.setInputUserId(userId);
 		salesRefundInstock.setStatus(Consts.SALES_REFUND_INSTOCK_DEFUALT);
+		salesRefundInstock.setOutstockId(record.getStr("id"));
 		
 		salesRefundInstock.setPaymentType(StringUtils.isNumeric(paymentType)? Integer.parseInt(paymentType) : 1);
 		salesRefundInstock.setCreateDate(date);
@@ -289,6 +291,21 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		
 		return salesRefundInstock;
 		
+	}
+
+	public List<Record> findByOutstockId(String outstockId) {
+		StringBuilder sqlBuilder = new StringBuilder(
+				" SELECT sod.*, sp.custom_name, p.big_unit, p.small_unit, p.convert_relate, sp.seller_id, sp.product_id, t1.valueName ");
+		sqlBuilder.append(" from `cc_sales_refund_instock_detail` sod ");
+		sqlBuilder.append(" LEFT JOIN cc_sales_outstock_detail cd ON cd.id = sod.outstock_detail_id ");
+		sqlBuilder.append(" LEFT JOIN cc_sales_outstock co ON co.id = cd.outstock_id ");
+		sqlBuilder.append(" LEFT JOIN cc_seller_product sp ON sod.sell_product_id = sp.id ");
+		sqlBuilder.append(" LEFT JOIN cc_product p ON sp.product_id = p.id ");
+		sqlBuilder.append("LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
+		sqlBuilder.append("RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = p.id ");
+		sqlBuilder.append(" WHERE co.id = ? ");
+
+		return Db.find(sqlBuilder.toString(), outstockId);
 	}
 
 }

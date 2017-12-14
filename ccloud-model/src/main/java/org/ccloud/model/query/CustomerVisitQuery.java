@@ -16,7 +16,10 @@
 package org.ccloud.model.query;
 
 import java.util.LinkedList;
+import java.util.List;
 
+import com.jfinal.plugin.activerecord.Db;
+import com.jfinal.plugin.activerecord.Record;
 import org.ccloud.model.CustomerVisit;
 
 import com.jfinal.plugin.activerecord.Page;
@@ -71,6 +74,36 @@ public class CustomerVisitQuery extends JBaseQuery {
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+
+	public Page<Record> paginateForApp(int pageNumber, int pageSize, String type, String nature, String subType, String dataArea) {
+
+		boolean needwhere = true;
+		List<Object> params = new LinkedList<Object>();
+
+		String select  ="SELECT ccv.id, cc.customer_name, cc.contact, cc.mobile, ccv.create_date, ccv.`status`, ccv.question_type ";
+		StringBuilder sql = new StringBuilder("FROM cc_customer_visit ccv ");
+		sql.append("LEFT JOIN cc_seller_customer csc ON ccv.seller_customer_id = csc.id ");
+		sql.append("LEFT JOIN cc_customer cc ON csc.customer_id = cc.id ");
+		sql.append("LEFT JOIN cc_customer_join_customer_type ccjct ON csc.id = ccjct.seller_customer_id ");
+
+		appendIfNotEmptyWithLike(sql, "ccv.data_area", dataArea, params, needwhere);
+		appendIfNotEmpty(sql, "ccjct.customer_type_id", type, params, needwhere);
+		appendIfNotEmpty(sql, "csc.sub_type", subType, params, needwhere);
+
+		sql.append("ORDER BY ccv.`status`, ccv.create_date desc");
+		return Db.paginate(pageNumber, pageSize,select ,sql.toString(), params.toArray());
+	}
+
+	public List<Record> findMoreById(String id) {
+		StringBuilder sql = new StringBuilder("SELECT ccv.id, cc.customer_name, cc.contact, cc.mobile, ccv.create_date, ccv.`status`, ccv.question_type, ccv.comment, ccv.location, ccv.photo ");
+		sql.append("FROM cc_customer_visit ccv ");
+		sql.append("LEFT JOIN cc_seller_customer csc ON ccv.seller_customer_id = csc.id ");
+		sql.append("LEFT JOIN cc_customer cc ON csc.customer_id = cc.id ");
+		sql.append("LEFT JOIN cc_customer_join_customer_type ccjct ON csc.id = ccjct.seller_customer_id ");
+		sql.append("WHERE ccv.id = ?");
+
+		return Db.find(sql.toString(), id);
 	}
 
 	public int batchDelete(String... ids) {

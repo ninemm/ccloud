@@ -117,7 +117,6 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		Seller seller = SellerQuery.me().findById(getSessionAttr("sellerId").toString());
 		PurchaseOrder purchaseOrder=PurchaseOrderQuery.me().findById(orderId);
 		purchaseOrder.set("status", 1000);
-		purchaseOrder.update();
 		Warehouse warehouse = WarehouseQuery.me().findOneByUserId(user.getId());
 		final PurchaseInstock purchaseInstock = getModel(PurchaseInstock.class);
 		PurchaseInstockDetail purchaseInstockDetail = getModel(PurchaseInstockDetail.class);
@@ -149,6 +148,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		purchaseInstock.set("data_area", user.getDataArea());
 		purchaseInstock.set("create_date", date);
 		purchaseInstock.save();
+		purchaseOrder.update();
 		
 		List<PurchaseOrderDetail> purchaseOrderDetails =  PurchaseOrderDetailQuery.me().findByPurchaseOrderId(orderId);
 		HttpServletRequest request = getRequest();

@@ -155,16 +155,44 @@ public class SalesOutstockQuery extends JBaseQuery {
 		}
 	}
 
-	public Page<Record> findByBizUserId(int pageNumber, int pageSize, String biz_user_id) {
-		String select = "SELECT cm.customer_name as customerName,s.*  ";
-		StringBuilder fromBuilder = new StringBuilder("from cc_sales_outstock s LEFT JOIN cc_seller_customer c ON s.customer_id=c.id ");
-		fromBuilder.append("left join cc_customer cm on cm.id = c.customer_id ");
-		fromBuilder.append("WHERE s.biz_user_id='"+biz_user_id+"'");
+	public Page<Record> paginateForApp(int pageNumber, int pageSize, String keyword, String status,
+			String customerTypeId, String startDate, String endDate, String sellerId, String dataArea) {
+		String select = "select o.*, c.customer_name, ct.name as customerTypeName ";
+		StringBuilder fromBuilder = new StringBuilder("from `cc_sales_outstock` o ");
+		fromBuilder.append("left join cc_seller_customer cc ON o.customer_id = cc.id ");
+		fromBuilder.append("left join cc_customer c on cc.customer_id = c.id ");
+		fromBuilder.append("left join cc_customer_type ct on o.customer_type_id = ct.id ");
 		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
+
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.outstock_sn", keyword, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "o.status", status, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "o.customer_type_id", customerTypeId, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
+
+		if (needWhere) {
+			fromBuilder.append(" where 1 = 1");
+		}
+
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and o.create_date >= ?");
+			params.add(startDate);
+		}
+
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and o.create_date <= ?");
+			params.add(endDate);
+		}
+
+		fromBuilder.append(" order by o.create_date desc ");
+
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
+	
 
 }

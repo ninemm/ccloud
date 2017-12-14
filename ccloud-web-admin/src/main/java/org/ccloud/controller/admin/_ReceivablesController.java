@@ -75,10 +75,10 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 	
 	public void getReceivables() {
 		String type = getPara("type");
-		String id = getPara("id");
+		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String deptDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		Page<Receivables> page = ReceivablesQuery.me().paginate(getPageNumber(),getPageSize(),id,type,user.getId(),deptDataArea);
+		Page<Receivables> page = ReceivablesQuery.me().paginate(getPageNumber(),getPageSize(),customerTypeId,type,user.getId(),deptDataArea);
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(),"rows", page.getList());
 		
 		renderJson(map);
@@ -135,7 +135,7 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 	
 		setAttr("ref_sn",ref_sn);
 		setAttr("bill_id",receivables.getId());
-		setAttr("ref_type",getPara("ref_type"));
+		setAttr("ref_type",ref_type);
 		setAttr("object_id", object_id);
 		setAttr("userInfo",JsonKit.toJson(list));
 	}
@@ -151,6 +151,7 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 				User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 				String act_amount = getPara("act_amount");
 				String ref_sn = getPara("ref_sn");
+				String ref_type = getPara("ref_type");
 				String receive_user_id = getPara("receive_user");
 				Date date = new Date();
 				
@@ -159,7 +160,7 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 				receiving.set("act_amount", act_amount);
 				receiving.set("biz_date", getPara("biz_date"));
 				receiving.set("ref_sn", ref_sn);
-				receiving.set("ref_type", getPara("ref_type"));
+				receiving.set("ref_type", ref_type);
 				receiving.set("input_user_id", user.getId());
 				receiving.set("receive_user_id",receive_user_id);
 				receiving.set("remark",getPara("remark"));

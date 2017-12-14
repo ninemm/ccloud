@@ -360,11 +360,12 @@ public class UserController extends BaseFrontController{
 			}
 			for (Record inventory : inventoryList.getList()) {
 				inventoryHtml.append("<div class=\"product_detail\">");
-				inventoryHtml.append("<div class=\"inventory_name\">"+inventory.getStr("name")+"</div>");
+				inventoryHtml.append("<div class=\"inventory_name\" style=\"font-size: 0.7rem;\">"+inventory.getStr("name")+"</div>");
 				//期初期末结存 未定,暂时不做统计。
 				//inventoryHtml.append("<div class=\"weui-flex\"><div class=\"weui-flex__item\">期初结存：<span>"+inventory.getStr("in_count")+"</span></div><div class=\"weui-flex__item\">期末结存：<span>"+inventory.getStr("out_count")+"</span></div></div>");
-				inventoryHtml.append("<div class=\"weui-flex\"><div class=\"weui-flex__item\">出库：<span class=\"green-button\">"+inventory.getStr("in_count")+"</span></div><div class=\"weui-flex__item\">入库：<span class=\"yellow-button\">"+inventory.getStr("out_count")+"</span></div></div>");
-				inventoryHtml.append("<div class=\"weui-flex\"><div class=\"weui-flex__item\">库存：<span class=\"blue-button\">"+inventory.getStr("balance_count")+"</span></div><div class=\"weui-flex__item\">在途：<span>"+inventory.getStr("afloat_count")+"</span></div></div>");
+				inventoryHtml.append("<div class=\"weui-flex\" style=\"margin:0.1rem;\"><div class=\"weui-flex__item\">出库：<span class=\"green-button\">"+inventory.getStr("in_count")+"</span></div><div class=\"weui-flex__item\">入库：<span class=\"yellow-button\">"+inventory.getStr("out_count")+"</span></div></div>");
+				//暂时隐藏在途量 <div class=\"weui-flex__item\">在途：<span>"+inventory.getStr("afloat_count")+"</span></div>
+				inventoryHtml.append("<div class=\"weui-flex\" style=\"margin:0.1rem;\"><div class=\"weui-flex__item\">库存：<span class=\"blue-button\">"+inventory.getStr("balance_count")+"</span></div><div class=\"weui-flex__item\"></div></div>");
 				inventoryHtml.append("<div><i class=\"icon-map-pin blue ft16\"></i>&nbsp;&nbsp;"+inventory.getStr("seller_name")+"</div>");
 				inventoryHtml.append("</div>\n");
 			}
@@ -376,54 +377,4 @@ public class UserController extends BaseFrontController{
 		renderJson(map);
 		//renderAjaxResultForSuccess("success",JSON.toJSON(inventoryList));
 	}	
-	
-	// 用户新增拜访页面显示
-	public void visitAdd() {
-	    String user_id = "1f797c5b2137426093100f082e234c14";
-	    String data_area = "0010010016410";
-	    
-	    List<Record> customer_list = UserQuery.me().getCustomerInfoByUserId(user_id,data_area);
-	    List<Dict> problem_list = DictQuery.me().findByCode("visit");
-	    
-	    setAttr("customer",JSON.toJSONString(customer_list));
-	    setAttr("problem",JSON.toJSONString(problem_list));
-		
-		render("user_visitAdd.html");
-	}
-	
-	// 用户新增拜访保存
-	public void save() {
-		
-		 CustomerVisit customerVisit = getModel(CustomerVisit.class);
-		 String user_id= "1f797c5b2137426093100f082e234c14";
-		 String data_area = "0010010016410";
-		 String department_id = "9ec18b144c1d46ea91b3d30f0e91f41b";
-		 String picJson = getPara("pic");
-		 String seller_customer_id = getPara("customer_id");
-		 String question_type = getPara("problem_id");
-		 String location = getPara("location");
-		 //String mobile = getPara("mobile");
-		 //String sex = getPara("sex");
-		 String question_desc = getPara("question_desc");
-		 
-		 String visit_id = StrKit.getRandomUUID();
-		 Date date = new Date();
-		 customerVisit.set("id", visit_id);
-		 customerVisit.set("user_id", user_id);
-		 customerVisit.set("seller_customer_id", seller_customer_id);
-		 customerVisit.set("photo", picJson);
-		 customerVisit.set("question_type", question_type);
-		 customerVisit.set("question_desc", question_desc);
-		 customerVisit.set("lng", "lng");
-		 customerVisit.set("lat", "lat");
-		 customerVisit.set("location", location);
-		 customerVisit.set("status", 0);
-		 customerVisit.set("dept_id", department_id);
-		 customerVisit.set("data_area", data_area);
-		 customerVisit.set("create_date", date);
-		 customerVisit.set("modify_date", date);
-		 boolean saveResult = customerVisit.save();
-		 if (saveResult) renderAjaxResultForSuccess("添加成功");
-	        else renderAjaxResultForError("添加失败");
-	}
 }
