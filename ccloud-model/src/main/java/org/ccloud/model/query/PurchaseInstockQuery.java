@@ -55,6 +55,7 @@ public class PurchaseInstockQuery extends JBaseQuery {
 		boolean needWhere = true;
 
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "i.pwarehouse_sn", keyword, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "i.data_area", dataArea, params, needWhere);
 
 		if (needWhere) {
 			fromBuilder.append(" where 1 = 1");
@@ -70,7 +71,7 @@ public class PurchaseInstockQuery extends JBaseQuery {
 			params.add(endDate);
 		}
 
-		fromBuilder.append(" and u.id='"+userId+"' and u.data_area ='"+dataArea+"' order by i.create_date desc ");
+		fromBuilder.append(" and u.id='"+userId+"' order by i.create_date desc ");
 
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
