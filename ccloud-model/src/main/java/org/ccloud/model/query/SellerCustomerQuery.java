@@ -83,7 +83,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "c.customer_name", keyword, params, needWhere);
 
-		fromBuilder.append(" GROUP BY sc.id ");
+		fromBuilder.append("  GROUP BY sc.id ");
 		fromBuilder.append(" order by sc.create_date ");
 
 		if (params.isEmpty())

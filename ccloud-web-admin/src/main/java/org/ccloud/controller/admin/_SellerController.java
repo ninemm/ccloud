@@ -244,7 +244,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				//添加用户客户中间表
 				userJoinCustomer.set("seller_customer_id", sellerCustomerId);
 				userJoinCustomer.set("user_id", user.getId());
-				userJoinCustomer.set("data_area",department.getDataArea());
+				userJoinCustomer.set("data_area",DataAreaUtil.getUserDealerDataArea(department.getDataArea()));
 				userJoinCustomer.set("dept_id", department.getId());
 				userJoinCustomer.save();
 				
