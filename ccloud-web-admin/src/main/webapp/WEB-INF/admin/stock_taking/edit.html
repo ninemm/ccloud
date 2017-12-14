@@ -129,7 +129,7 @@ function addTr(tid, productList, optionArr) {
 	var goodsName = firstProduct.name;
 	var specification = firstProduct.specificationValue;
 	var big_unit = firstProduct.bigUnit;
-    var balanceCount = firstProduct.balanceCount;
+    var balanceCount = firstProduct.balanceCount == null ? "暂未盘点": firstProduct.balanceCount;
 	
 
 	var $tbody = $(tid + " tbody"),
@@ -170,7 +170,7 @@ function addTr(tid, productList, optionArr) {
      var cgoodsName = result.name;
      var cspecification = result.specificationValue;
      var cbig_unit = result.bigUnit;
-     var balanceCount = result.balanceCount;
+     var balanceCount = result.balanceCount == null ? "暂未盘点":result.balanceCount;
      var $tr = $(this).parent().parent();
      
      $tr.find("td>#goodsCode").val(cgoodsCode);
@@ -304,7 +304,7 @@ function addTr(tid, productList, optionArr) {
 													<input name="specification" id="specification" value="${plist.specificationValue!}" disabled="disabled"></input>
 												</td>
 												<td>
-													<input name="balanceCount" id="balanceCount" value="${plist.balanceCount!0}" disabled="disabled"></input>
+													<input name="balanceCount" id="balanceCount" value="${plist.balanceCount!}" disabled="disabled"></input>
 												</td>
 												</#list>
 												<td>
