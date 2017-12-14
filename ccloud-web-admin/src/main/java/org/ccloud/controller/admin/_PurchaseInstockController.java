@@ -266,8 +266,8 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 			BigDecimal convent = new BigDecimal(pi.get("convert_relate").toString()); 
 			Inventory inventory= InventoryQuery.me().findBySellerIdAndProductIdAndWareHouseId(seller.getId(), pi.get("productId").toString(), pi.get("warehouse_id").toString());
 			if(inventory!=null){
-				inventory.set("in_count", count2.divide(convent, 2, BigDecimal.ROUND_HALF_UP));
-				inventory.set("in_amount", pi.getProductAmount());
+				inventory.set("in_count", inventory.getInCount().add(count2.divide(convent, 2, BigDecimal.ROUND_HALF_UP)));
+				inventory.set("in_amount",inventory.getInAmount().add(pi.getProductAmount()));
 				inventory.set("in_price", pi.getProductPrice());
 				inventory.set("balance_count", inventory.getBalanceCount().add(count2.divide(convent, 2, BigDecimal.ROUND_HALF_UP)));
 				inventory.set("balance_amount", inventory.getBalanceAmount().add(pi.getProductAmount()));
