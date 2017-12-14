@@ -1,6 +1,7 @@
 package org.ccloud.front.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -10,8 +11,9 @@ import org.ccloud.core.BaseFrontController;
 import org.ccloud.core.cache.ActionCache;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
+import org.ccloud.model.Department;
 import org.ccloud.model.User;
-import org.ccloud.model.query.SellerQuery;
+import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.shiro.CaptchaUsernamePasswordToken;
@@ -21,10 +23,11 @@ import org.ccloud.wechat.WechatUserInterceptor;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.beust.jcommander.internal.Lists;
+import com.beust.jcommander.internal.Maps;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.LogKit;
 import com.jfinal.kit.StrKit;
-import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.weixin.sdk.api.ApiResult;
 import com.jfinal.weixin.sdk.api.UserApi;
 
@@ -55,34 +58,53 @@ public class WxOauthController extends BaseFrontController {
 				return ;
 			}
 			
-			User user = UserQuery.me().findByWechatOpenid(openId);
-			if (user == null) {
+			List<User> userList = UserQuery.me().findByWechatOpenid(openId);
+			if (userList == null || userList.size() == 0) {
 				gotoUrl = "/user/bind";
 			} else {
-				
-				// 获取用户的相应权限放入缓存
-				init(user.getUsername(), user.getPassword(), true);
-				
-				// 更新用户的信息
-				ApiResult wxUserResult = UserApi.getUserInfo(openId);
-				if (wxUserResult.isSucceed()) {
-					user.setAvatar(wxUserResult.getStr("headimgurl"));
-					user.setNickname(wxUserResult.getStr("nickname"));
-					user.setWechatOpenId(openId);
+				int count = userList.size();
+				if (count == 1) {
+					User user = userList.get(0);
+					// 获取用户的相应权限放入缓存
+					init(user.getUsername(), user.getPassword(), true);
 					
-					if (!user.saveOrUpdate()) {
-						renderError(500);
-						return ;
+					// 更新用户的信息
+					ApiResult wxUserResult = UserApi.getUserInfo(openId);
+					if (wxUserResult.isSucceed()) {
+						user.setAvatar(wxUserResult.getStr("headimgurl"));
+						user.setNickname(wxUserResult.getStr("nickname"));
+						user.setWechatOpenId(openId);
+						
+						if (!user.saveOrUpdate()) {
+							renderError(500);
+							return ;
+						}
+						setSessionAttr(Consts.SESSION_LOGINED_USER, user);
+					} else {
+						LogKit.warn("user info get failure");
 					}
-					setSessionAttr(Consts.SESSION_LOGINED_USER, user);
 				} else {
-					LogKit.warn("user info get failure");
+					List<Map<String, String>> sellerList = Lists.newArrayList();
+					for (User user : userList) {
+						List<Department> deptList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
+						if (deptList.size() > 0) {
+							Department dept = deptList.get(0);
+							Map<String, String> seller = Maps.newHashMap();
+							seller.put("seller_id", dept.getStr("seller_id"));
+							seller.put("seller_name", dept.getStr("seller_name"));
+							seller.put("seller_code", dept.getStr("seller_code"));
+							sellerList.add(seller);
+						}
+					}
+					setAttr("openid", openId);
+					setAttr("sellerList", sellerList);
+					gotoUrl = "/user/choice";
 				}
-					
 			}
 		}
 		
-		redirect(gotoUrl);
+		//redirect(gotoUrl);
+		forwardAction(gotoUrl);
 	}
 	
 	private void init(String username, String password, Boolean rememberMe) {
@@ -99,24 +121,6 @@ public class WxOauthController extends BaseFrontController {
 							DataAreaUtil.getUserDeptDataArea(user.getDataArea()) + "%");
 				} else {
 					setSessionAttr(Consts.SESSION_SELECT_DATAAREA, user.getDataArea());
-				}
-
-				// sellerId
-				if (!subject.isPermitted("/admin/all")) {
-					List<Record> sellerList = SellerQuery.me().querySellerIdByDept(user.getDepartmentId());
-
-					if(sellerList.size() == 0) {
-						sellerList = SellerQuery.me().queryParentSellerIdByDept(user.getDepartmentId());
-
-						while(StrKit.isBlank(sellerList.get(0).getStr("sellerId"))) {
-							sellerList = SellerQuery.me().queryParentSellerIdByDept(sellerList.get(0).getStr("parent_id"));
-						}
-					}
-
-					setSessionAttr("sellerList", sellerList);
-					setSessionAttr("sellerId", sellerList.get(0).get("sellerId"));
-					setSessionAttr("sellerCode", sellerList.get(0).get("sellerCode"));
-					setSessionAttr("sellerName", sellerList.get(0).get("sellerName"));
 				}
 			}
 			MessageKit.sendMessage(Actions.USER_LOGINED, user);

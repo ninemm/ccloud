@@ -80,6 +80,7 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 
 	public void list() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String keyword = getPara("k");
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
@@ -88,7 +89,7 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 
-		Page<Record> page = PurchaseInstockQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate,user.getId(),user.getDataArea());
+		Page<Record> page = PurchaseInstockQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate,user.getId(),dataArea);
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);

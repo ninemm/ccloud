@@ -15,11 +15,17 @@
  */
 package org.ccloud.model.query;
 
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.ccloud.Consts;
 import org.ccloud.model.PayablesDetail;
+
+import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
 /**
@@ -102,6 +108,22 @@ public Page<PayablesDetail> paginate(int pageNumber, int pageSize, String id,Str
 			return deleteCount;
 		}
 		return 0;
+	}
+
+	public boolean insert(Record record, String customerId, String refundSn, Date date) {
+		PayablesDetail payablesDetail = new PayablesDetail();
+		payablesDetail.setId(StrKit.getRandomUUID());
+		payablesDetail.setObjectId(customerId);
+		payablesDetail.setObjectType(Consts.RECEIVABLES_OBJECT_TYPE_CUSTOMER);
+		payablesDetail.setPayAmount(record.getBigDecimal("reject_amount"));
+		payablesDetail.setActAmount(new BigDecimal(0));
+		payablesDetail.setBalanceAmount(record.getBigDecimal("reject_amount"));
+		payablesDetail.setRefSn(refundSn);
+		payablesDetail.setRefType(Consts.BIZ_TYPE_SALES_REFUND_INSTOCK);
+		payablesDetail.setDeptId(record.getStr("dept_id"));
+		payablesDetail.setDataArea(record.getStr("data_area"));
+		payablesDetail.setCreateDate(date);
+		return payablesDetail.save();
 	}
 
 	

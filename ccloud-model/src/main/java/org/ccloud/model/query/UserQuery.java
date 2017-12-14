@@ -92,22 +92,12 @@ public class UserQuery extends JBaseQuery {
 		});
 	}
 	
-	public User findByWechatOpenid(final String openid) {
-		return DAO.getCache(openid, new IDataLoader() {
-			@Override
-			public Object load() {
-				return DAO.doFindFirst("wechat_open_id = ? AND status = 1", openid);
-			}
-		});
+	public List<User> findByWechatOpenid(final String openid) {
+		return DAO.doFindByCache(User.CACHE_NAME, openid, "wechat_open_id = ? AND status = 1", openid);
 	}
 	
-	public User findByMobile(final String mobile) {
-		return DAO.getCache(mobile, new IDataLoader() {
-			@Override
-			public Object load() {
-				return DAO.doFindFirst("mobile = ? AND status = 1", mobile);
-			}
-		});
+	public List<User> findByMobile(final String mobile) {
+		return DAO.doFindByCache(User.CACHE_NAME, mobile, "mobile = ? AND status = 1", mobile);
 	}
 
 	public List<User> findByDeptId(String deptId) {
@@ -224,8 +214,6 @@ public class UserQuery extends JBaseQuery {
 		return Db.find(stringBuilder.toString(), params.toArray());
 	}
 	
-	
-	
 	public List<Record> findBydeptAndGroup(String dataArea, String id) {
 		String data = dataArea + "%";
  		StringBuilder fromBuilder = new StringBuilder("select * ");
@@ -249,7 +237,7 @@ public class UserQuery extends JBaseQuery {
 		return DAO.find(sqlBuilder.toString(), params.toArray());
 	}	
 	
-	public List<Record> getCustomerInfoByUserId(String userId,String dataArea){
+	public List<Record> getCustomerInfoByUserId(String userId, String dataArea){
 		String data = dataArea + "%";
 		StringBuilder fromBuilder = new StringBuilder("SELECT c.id, c.customer_code AS code, c.customer_name AS name, c.contact, c.mobile ");
 		fromBuilder.append("FROM `cc_user_join_customer` AS uc LEFT JOIN `cc_customer` AS c ON uc.seller_customer_id = c.id ");
@@ -258,4 +246,5 @@ public class UserQuery extends JBaseQuery {
 		List<Record> list = Db.find(fromBuilder.toString(), userId, data);
 		return list;
 	}
+	
 }

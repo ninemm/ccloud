@@ -3,16 +3,17 @@
 <#macro css> </#macro>
 
 <#macro script>
-$(function() {  });
+$(function() {
+});
 </#macro> 
 
 <@layout>
 <article id="my">
 	<header class="user-box">
 		<div class="user-info">
-			<p class="seller">启光商贸劲牌有限公司</p>
-			<p class="name">小张</p>
-			<p class="mobile">13611111111</p>
+			<p class="seller ft16">${(session.sellerName)!}</p>
+			<p class="name">${(session._logined_user.realname)!}</p>
+			<p class="mobile">${(session._logined_user.mobile)!}</p>
 			<a href="./sellerSelect.html" class="change-seller">
 				<span>
 				  <i class="icon-cog ft20 white"></i>
@@ -20,8 +21,8 @@ $(function() {  });
 			</a>
 		</div>
 		<div class="user-avatar">
-			<img src="${CTPATH}/images/avatar.png" alt="">
-		</div>
+			<img src="${(session._logined_user.avatar)!'${CTPATH}/images/avatar.png'}" alt="">
+		</div> 
 		<div class="user-statistics">
 			<div class="weui-flex">
 			<div class="weui-flex__item">

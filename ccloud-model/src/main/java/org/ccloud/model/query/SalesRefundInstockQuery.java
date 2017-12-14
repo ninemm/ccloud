@@ -187,6 +187,7 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 			return false;
 		}
 		
+		InventoryDetail oldDetail = InventoryDetailQuery.me().findBySellerProductId(sellerId, wareHouseId);
 		InventoryDetail inventoryDetail = new InventoryDetail();
 		inventoryDetail.setId(StrKit.getRandomUUID());
 		inventoryDetail.setWarehouseId(inventory.getWarehouseId());
@@ -194,9 +195,10 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		inventoryDetail.setInAmount(detail.getProductAmount());
 		inventoryDetail.setInCount(new BigDecimal(bigCount).add(smallStoreCount));
 		inventoryDetail.setInPrice(inventory.getBalancePrice());
-		inventoryDetail.setBalanceAmount(inventory.getBalanceAmount());
-		inventoryDetail.setBalanceCount(inventory.getBalanceCount());
-		inventoryDetail.setBalancePrice(inventory.getBalancePrice());
+		inventoryDetail.setBalanceAmount(oldDetail.getBalanceAmount().add(detail.getProductAmount()));
+		inventoryDetail.setBalanceCount(oldDetail.getBalanceCount().add(new BigDecimal(bigCount))
+				.add(smallStoreCount));
+		inventoryDetail.setBalancePrice(oldDetail.getBalancePrice());
 		inventoryDetail.setBizBillSn(inStockSN);
 		inventoryDetail.setBizDate(detail.getCreateDate());
 		inventoryDetail.setBizType(Consts.BIZ_TYPE_SALES_REFUND_INSTOCK);
