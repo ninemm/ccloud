@@ -1339,20 +1339,37 @@ input[name=sex] {
 }
 
 .user-info {
-  height: 4rem;
+  height: 5rem;
   background: #00a7d0;
   color: #fff;
   font-size: .7rem;
-  padding-top: 1rem;
   box-sizing: border-box;
-  padding: 1rem 10% 0;
+  padding: 1.5rem 10% 0;
+}
+
+.user-info .seller {
+  height: 1.5rem;
+  line-height: 1.5rem;
+  text-align: center;
+  width: 100%;
+  margin-bottom: .5rem;
+}
+
+.user-info .name {
+  float: left;
+  padding-left: .3rem;
+}
+
+.user-info .mobile {
+  float: right;
+  padding-right: .2rem;
 }
 
 .user-avatar {
   position: absolute;
   left: 50%;
   margin-left: -1.5rem;
-  top: 2rem;
+  top: 3rem;
 }
 
 .user-avatar img {
@@ -1374,6 +1391,12 @@ input[name=sex] {
 
 .user-statistics .weui-flex__item p {
   font-size: .6rem;
+}
+
+.change-seller{
+  position: absolute;
+  top: .5rem;
+  right: .5rem;
 }
 
 /* 我的订单 */
