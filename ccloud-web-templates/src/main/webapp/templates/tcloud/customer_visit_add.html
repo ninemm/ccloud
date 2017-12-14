@@ -164,16 +164,14 @@
     });
 
     function doSubmit(){
-        $("#location").val($("location-span").html());
-
         $.ajax({
             url: '${CPATH}/customerVisit/save',
             method: 'post',
             dataType: 'json',
             data: $form.serialize(),
             beforeSend: function(){
-                if($("#problem_id").val().length==0) {$.toptip('问题类型不能为空', 1000, 'error');return false;}
-                if($("#question_desc").val().length==0) {$.toptip('备注描述不能为空', 1000, 'error');return false;}
+                if($("#problem_id").val().length==0) {$.toptip('问题类型不能为空', 3000, 'error');return false;}
+                if($("#question_desc").val().length==0) {$.toptip('备注描述不能为空', 3000, 'error');return false;}
                 $('._submit_btn').attr('disabled', true);
                 layer.open({
                     type: 2,
@@ -181,6 +179,9 @@
                 });
             },
             success: function(res) {
+                console.log(res.errorCode);
+                layer.closeAll();
+                removeItemBykey("customerInfo");
                 if (res.errorCode == 0) {
                     $.confirm({
                         title: res.message,
@@ -195,6 +196,8 @@
                 } else {
                     $.alert(res.message);
                 }
+            },
+            error: function(res) {
                 layer.closeAll();
             }
         });
