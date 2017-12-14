@@ -24,9 +24,15 @@
 	  items: [{
 	       title: "全部", value: ""
 	       },{
-	       title: "已出库", value: "1000"
+	       title: "取消", value: "1001"
 	       },{
-	       title: "待出库", value: "0"
+	       title: "待审核", value: "0"
+	       },{
+	       title: "已审核", value: "1000"
+	       },{
+	       title: "部分入库", value: "2000"
+	       },{
+	       title: "全部入库", value: "3000"
 	       }]
 	});
 	$("#customerTypeId").select({
@@ -61,17 +67,17 @@
 		}
 
 
-		Utils.ajax('${CPATH}/refund/stockOrder', params, 
+		Utils.ajax('${CPATH}/refund/list', params, 
 			function(data){
 				$loading.hide();
 
-				if(data.outStockList.length == 0){
+				if(data.refundList.length == 0){
 					$noMore.show();
 					loading = true;
 					return;
 				}
 
-				$.each(data.outStockList, function(index, el) {
+				$.each(data.refundList, function(index, el) {
 	
 					$main.append("<div class='weui-panel weui-panel_access'>" + newHtml + "</section>");
 					var $newOrder = $main.find(".weui-panel:last");
@@ -81,17 +87,17 @@
 					}
 					
 
-					$newOrder.find("#orderSn").text(el.outstock_sn);
+					$newOrder.find("#orderSn").text(el.instock_sn);
 					
 					$newOrder.find("#status").text(getStatus(el.status));
-					$newOrder.find("#customerName").text(el.customerName);
-					$newOrder.find("#contact").text(el.contact + '/' + el.mobile);
+					$newOrder.find("#customerName").text(el.customer_name);
+					$newOrder.find("#contact").text(el.ccontact + '/' + el.cmobile);
 					$newOrder.find("#customerType").text(el.customerTypeName);
 					$newOrder.find("#refund").on('click', function(){ 
- 						 window.location.href = "${CPATH}/refund/detail?id="+el.id
+ 						 window.location.href = "${CPATH}/refund/refundDetail?id="+el.id
 					}); 
 
-					$newOrder.find("#amount").text(el.total_amount);
+					$newOrder.find("#amount").text(el.reject_amount);
 					$newOrder.find("#date").text('时间：' + el.create_date);
 				});
 				page++;
@@ -122,9 +128,15 @@
 
 	function getStatus(value) {
 		if (value == 0) {
-			return '待出库';
+			return '待审核';
+		} else if (value == 1000) {
+			return '已审核'
+		} else if (value == 1001) {
+			return '退货单取消'
+		} else if (value == 2000) {
+			return '部分入库'
 		} else {
-			return '已出库'
+			return '全部入库'
 		}
 	}
 	
@@ -195,7 +207,7 @@
 					</div>
 				</a>
 				<hr>
-				<div id="refund" class="button white-button fr">退货</div>
+				<div id="refund" class="button white-button fr">详情</div>
 			</div>
 		</div>
 		<div class="weui-loadmore" id="loading" style="display: none;">

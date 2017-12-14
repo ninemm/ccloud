@@ -168,6 +168,7 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 			return false;
 		}
 		
+		InventoryDetail oldDetail = InventoryDetailQuery.me().findBySellerProductId(sellerProductId, wareHouseId);
 		InventoryDetail inventoryDetail = new InventoryDetail();
 		inventoryDetail.setId(StrKit.getRandomUUID());
 		inventoryDetail.setWarehouseId(inventory.getWarehouseId());
@@ -175,9 +176,10 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		inventoryDetail.setOutAmount(detail.getProductAmount());
 		inventoryDetail.setOutCount(new BigDecimal(bigCount).add(smallStoreCount));
 		inventoryDetail.setOutPrice(inventory.getOutPrice());
-		inventoryDetail.setBalanceAmount(inventory.getBalanceAmount());
-		inventoryDetail.setBalanceCount(inventory.getBalanceCount());
-		inventoryDetail.setBalancePrice(inventory.getBalancePrice());
+		inventoryDetail.setBalanceAmount(oldDetail.getBalanceAmount().subtract(detail.getProductAmount()));
+		inventoryDetail.setBalanceCount(oldDetail.getBalanceCount().subtract(new BigDecimal(bigCount))
+				.subtract(smallStoreCount));
+		inventoryDetail.setBalancePrice(oldDetail.getBalancePrice());
 		inventoryDetail.setBizBillSn(outStockSN);
 		inventoryDetail.setBizDate(detail.getCreateDate());
 		inventoryDetail.setBizType(Consts.BIZ_TYPE_SALES_OUTSTOCK);

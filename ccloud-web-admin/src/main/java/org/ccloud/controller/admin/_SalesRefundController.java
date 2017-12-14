@@ -15,6 +15,7 @@
  */
 package org.ccloud.controller.admin;
 
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +28,8 @@ import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.SalesRefundInstock;
 import org.ccloud.model.User;
+import org.ccloud.model.query.PayablesDetailQuery;
+import org.ccloud.model.query.PayablesQuery;
 import org.ccloud.model.query.SalesOutstockDetailQuery;
 import org.ccloud.model.query.SalesOutstockQuery;
 import org.ccloud.model.query.SalesRefundInstockDetailQuery;
@@ -40,6 +43,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
+import com.jfinal.plugin.activerecord.Db;
+import com.jfinal.plugin.activerecord.IAtom;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.tx.Tx;
@@ -70,12 +75,12 @@ public class _SalesRefundController extends JBaseCRUDController<SalesRefundInsto
 			keyword = StringUtils.urlDecode(keyword);
 		}
 
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
 		Page<Record> page = SalesRefundInstockQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate,
-				endDate, null,user.getDataArea());
+				endDate, null, dataArea);
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
@@ -179,16 +184,45 @@ public class _SalesRefundController extends JBaseCRUDController<SalesRefundInsto
 	}
 	
 	@RequiresPermissions("/admin/salesRefund/check")
-	@Before(Tx.class)
 	public void pass() {
 
 		String inStockId = getPara("inStockId");
 		int status = getParaToInt("status");
-
-		SalesRefundInstockQuery.me().updateConfirm(inStockId, status, new Date());
-
-		renderAjaxResultForSuccess();
-
+		boolean isSave = this.passSalesRefund(inStockId, status);
+		if (isSave) {
+			renderAjaxResultForSuccess("审核成功");
+		} else {
+			renderAjaxResultForError("审核失败");
+		}
+	}
+	
+	public boolean passSalesRefund(final String inStockId,final int status) {
+        boolean isSave = Db.tx(new IAtom() {
+            @Override
+            public boolean run() throws SQLException {
+            	Date date = new Date();
+            	int i = SalesRefundInstockQuery.me().updateConfirm(inStockId, status, date);
+            	if (i <= 0) {
+            		return false;
+            	}
+            	if (status == 1000) {
+            		Record refund = SalesRefundInstockQuery.me().findMoreById(inStockId);
+            		String customerId = refund.getStr("customer_id");
+            		String refundSn = refund.getStr("instock_sn");
+            		List<Record> refundDetail = SalesRefundInstockDetailQuery.me().findByRefundId(inStockId);
+            		if (!PayablesQuery.me().insert(refund, date)) {
+            			return false;
+            		}
+            		for (Record record : refundDetail) {
+    					if (!PayablesDetailQuery.me().insert(record, customerId, refundSn, date)) {
+    						return false;
+    					}
+    				}
+            	}
+            	return true;
+            }
+        });
+        return isSave;
 	}
 	
 }

@@ -19,17 +19,17 @@
 </#macro>
 
 <#macro script>	
-	var $table = $("#_clientTypeReport_table");
-	var $tableGift = $("#_clientTypeReportGift_table");
-	var url = '${CPATH}/admin/report/clientTypeReportList';
-	var urlGift = '${CPATH}/admin/report/clientTypeReportGiftList';
+	var $table = $("#_departmentProductReport_table");
+	var $tableGift = $("#_departmentProductReportGift_table");
+	var url = '${CPATH}/admin/report/departmentProductReportList';
+	var urlGift = '${CPATH}/admin/report/departmentProductGiftReportList';
 
 	$(function() {
 		jQuery.mm.initDatetimepicker('form', '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initDatetimepicker('form', '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initValidator('#form', validatorFields);
-		jQuery.mm.initEditTable('#_clientTypeReport_table',url, initParams, initFields(), null);
-		jQuery.mm.initEditTable('#_clientTypeReportGift_table',urlGift, initParams, initFieldsGift(), null);
+		jQuery.mm.initEditTable('#_departmentProductReport_table',url, initParams, initFields(), null);
+		jQuery.mm.initEditTable('#_departmentProductReportGift_table',urlGift, initParams, initFieldsGift(), null);
 	});
 
 	var initParams = function(params) {
@@ -87,7 +87,6 @@
 	var initFields = function() {
 		var fields =
 			[ 	{title: "序号", align: "center", edit:false, formatter: function (value, row, index) { return index+1; } },
-      			{field: "name", title: "客户类型", align: "center",  edit:false},
       			{field: "custom_name", title: "商品名称", align: "center",  edit:false},
       			{field: "productCountTotal", title: "数量(件)", align: "center",  edit:false}
    			];
@@ -97,7 +96,6 @@
 	var initFieldsGift = function() {
 		var fields =
 			[ 	{title: "序号", align: "center", edit:false, formatter: function (value, row, index) { return index+1; } },
-      			{field: "name", title: "客户类型", align: "center",  edit:false},
       			{field: "custom_name", title: "商品名称", align: "center",  edit:false},
       			{field: "productCountTotal", title: "数量(件)", align: "center",  edit:false}
    			];
@@ -133,11 +131,11 @@
 <@layout active_id=p child_active_id=c>
 
 <section class="content-header">
-	<h1>我的客户类型详情</h1>
+	<h1>我部门的产品明细</h1>
 	<ol class="breadcrumb">
 		<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
        	<li><a href="#">报表查询</a></li>
-       	<li class="active">我的客户类型详情</li>
+       	<li class="active">我部门的产品明细</li>
 	</ol>
 </section>
 <!-- Main content -->
@@ -161,17 +159,18 @@
 						<input id="endDate" class="form-control" value="${endDate!}" name="endDate" placeholder="结束日期" >&nbsp;
 					</div>
 				</div>
+				
 				<input id="search-submit" class="btn btn-sm btn-primary" type="button" value="搜索">
+				</div>
 			</div>
-		</div>
-	</form>
+		</form>
 		
 	<div class="box">
-		<table class="table table-striped table-hover table-condensed" id="_clientTypeReport_table" ></table>
+		<table class="table table-striped table-hover table-condensed" id="_departmentProductReport_table" ></table>
 	</div>
 	<h2>赠品统计</h2>
 	<div class="box">
-		<table class="table table-striped table-hover table-condensed" id="_clientTypeReportGift_table" ></table>
+		<table class="table table-striped table-hover table-condensed" id="_departmentProductReportGift_table" ></table>
 	</div>
 	<!-- /.box -->
 </section>

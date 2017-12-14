@@ -20,7 +20,7 @@
 
 <#macro script>	
 	var $table = $("#_report_table");
-	var url = '${CPATH}/admin/report/reportlist';
+	var url = '${CPATH}/admin/report/salesman';
 
 	$(function() {
 		jQuery.mm.initDatetimepicker('form', '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
@@ -52,41 +52,29 @@
 	
 	function orderTime(){
 		$('#post-search-input').val("so.create_date");
-		 var opt = {
-	        url: "${CPATH}/admin/report/reportlist",
-	        silent: true,
-	        query:{
-	            type:1,
-	            level:2
-	        }
-	    };
-		$table.bootstrapTable('refresh',opt);
+		var validate = $('#form').data('bootstrapValidator');
+		validate.validate();
+		if (validate.isValid()){
+			$table.bootstrapTable('refresh');
+		}
 	};
 	
 	function prints(){
 		$('#post-search-input').val("so.print_time");
-		 var opt = {
-	        url: "${CPATH}/admin/report/reportlist",
-	        silent: true,
-	        query:{
-	            type:1,
-	            level:2
-	        }
-	    };
-		$table.bootstrapTable('refresh',opt);
+		var validate = $('#form').data('bootstrapValidator');
+		validate.validate();
+		if (validate.isValid()){
+			$table.bootstrapTable('refresh');
+		}
 	};
 	
 	function complete(){
 		$('#post-search-input').val("sok.create_date");
-		 var opt = {
-	        url: "${CPATH}/admin/report/reportlist",
-	        silent: true,
-	        query:{
-	            type:1,
-	            level:2
-	        }
-	    };
-		$table.bootstrapTable('refresh',opt);
+		var validate = $('#form').data('bootstrapValidator');
+		validate.validate();
+		if (validate.isValid()){
+			$table.bootstrapTable('refresh');
+		}
 	};
 	
 	var initFields = function() {
@@ -141,9 +129,9 @@
 		<div class="row content-row">
 			<div class="form-group col-sm-12" style="float: right">
 				<input id="post-search-input" class="form-control" type="hidden" value="so.create_date" name="k" >&nbsp;
-				<input onclick="orderTime()" class="btn btn-default" type="button" value="按下单时间查询">
-				<input onclick="prints()" class="btn btn-default" type="button" value="按打印时间查询">
-				<input onclick="complete()" class="btn btn-default" type="button" value="按配送时间查询">
+				<input onclick="orderTime()" class="btn btn-sm btn-primary" type="button" value="已下单查询">
+				<input onclick="prints()" class="btn btn-sm btn-primary" type="button" value="已打印查询">
+				<input onclick="complete()" class="btn btn-sm btn-primary" type="button" value="已出库查询">
 				<div class="form-group validata-box">
 					<label class="control-label">开始时间:</label>
 					<div class="form-group">
@@ -157,7 +145,7 @@
 					</div>
 				</div>
 				
-				<input id="search-submit" class="btn btn-default" type="button" value="搜索">
+				<input id="search-submit" class="btn btn-sm btn-primary" type="button" value="搜索">
 				</div>
 			</div>
 		</form>

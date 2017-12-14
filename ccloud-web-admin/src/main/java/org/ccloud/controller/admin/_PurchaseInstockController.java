@@ -80,6 +80,7 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 
 	public void list() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String keyword = getPara("k");
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
@@ -88,7 +89,7 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 
-		Page<Record> page = PurchaseInstockQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate,user.getId(),user.getDataArea());
+		Page<Record> page = PurchaseInstockQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate,user.getId(),dataArea);
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
@@ -239,7 +240,7 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 				String bN = StringUtils.getArrayFirst(paraMap.get("bN" + index));
 				String sN = StringUtils.getArrayFirst(paraMap.get("sN" + index));
 				Integer productCount0 = Integer.valueOf(bN) * Integer.valueOf(convert) + Integer.valueOf(sN);
-				BigDecimal productAmount =  purchaseOrderDetail.getProductPrice().multiply(new BigDecimal(bN)).add((purchaseOrderDetail.getProductPrice().divide(new BigDecimal(convert))).multiply(new BigDecimal(sN)));
+				BigDecimal productAmount =  purchaseOrderDetail.getProductPrice().multiply(new BigDecimal(bN)).add((purchaseOrderDetail.getProductPrice().divide((new BigDecimal(convert)), 2, BigDecimal.ROUND_HALF_UP))).multiply(new BigDecimal(sN));
 				purchaseInstockDetail.set("product_count", productCount0);
 				purchaseInstockDetail.set("product_amount", productAmount);
 				purchaseInstockDetail.set("modify_date", new Date());

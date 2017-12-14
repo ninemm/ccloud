@@ -106,13 +106,12 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 	}
 	
 	
-	public void addreceiving() {
+	public void addPayment() {
 		String ref_sn = getPara("ref_sn");
 		String ref_type = getPara("ref_type");
 		String object_id = getPara("object_id");
 		//通过客户Id找到应付账款主表ID
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		Payables payables = PayablesQuery.me().findByObjId(object_id, user.getDepartmentId());
+		Payables payables = PayablesQuery.me().findByObjId(object_id, Consts.RECEIVABLES_OBJECT_TYPE_CUSTOMER);
 		
 		if(payables == null) {
 			setAttr("ref_sn",ref_sn);
@@ -177,8 +176,8 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 			}
 		});
 		
-		if (isAdd) renderAjaxResultForSuccess("添加收款记录成功");
-        else renderAjaxResultForError("添加收款记录失败");
+		if (isAdd) renderAjaxResultForSuccess("添加付款记录成功");
+        else renderAjaxResultForError("添加付款记录失败");
 	}
 	
 }
