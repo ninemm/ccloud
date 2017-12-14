@@ -205,18 +205,20 @@ public class _SalesRefundController extends JBaseCRUDController<SalesRefundInsto
             	if (i <= 0) {
             		return false;
             	}
-        		Record refund = SalesRefundInstockQuery.me().findMoreById(inStockId);
-        		String customerId = refund.getStr("customer_id");
-        		String refundSn = refund.getStr("instock_sn");
-        		List<Record> refundDetail = SalesRefundInstockDetailQuery.me().findByRefundId(inStockId);
-        		if (!PayablesQuery.me().insert(refund, date)) {
-        			return false;
-        		}
-        		for (Record record : refundDetail) {
-					if (!PayablesDetailQuery.me().insert(record, customerId, refundSn, date)) {
-						return false;
-					}
-				}
+            	if (status == 1000) {
+            		Record refund = SalesRefundInstockQuery.me().findMoreById(inStockId);
+            		String customerId = refund.getStr("customer_id");
+            		String refundSn = refund.getStr("instock_sn");
+            		List<Record> refundDetail = SalesRefundInstockDetailQuery.me().findByRefundId(inStockId);
+            		if (!PayablesQuery.me().insert(refund, date)) {
+            			return false;
+            		}
+            		for (Record record : refundDetail) {
+    					if (!PayablesDetailQuery.me().insert(record, customerId, refundSn, date)) {
+    						return false;
+    					}
+    				}
+            	}
             	return true;
             }
         });

@@ -102,7 +102,6 @@ $(function() {
 							<span class="require">*</span>
 						</div>
 						<input type="text" class="weui-input" value="${(outstock.customer_name)!}" readonly>
-						<span class="weui-cell__ft"></span>
 					</div>
 				</div>
 				<div class="weui-cell weui-cell_access">
@@ -140,7 +139,6 @@ $(function() {
 							<span class="require">*</span>
 						</div>
 						<input type="text" class="weui-input" id="customerTypeName" name="customerTypeName" value="${(outstock.customerTypeName)!}" readonly>
-						<span class="weui-cell__ft"></span>
 					</div>
 				</div>
 			</section>
@@ -149,7 +147,6 @@ $(function() {
 					<div class="weui-cell__bd">
 						发货时间
 						<input type="text" class="weui-input" data-toggle='date' id="deliveryDate" name="deliveryDate" value="${(outstock.delivery_date)!}" readonly>
-						<span class="weui-cell__ft"></span>
 					</div>
 				</div>
 			</section>
@@ -211,8 +208,7 @@ $(function() {
 				          <div class="operate fl">
 				            <i class="icon-minus2"></i>
 				          </div>
-				        		<input name="sNum" type="number" class="fl <#if list.is_composite == 1>bo</#if>" value="${((list.product_count-list.refundCount) % list.convert_relate)!0}" id="sNum"
-				        		<#if list.is_composite == 1>readonly</#if>>
+				        		<input name="sNum" type="number" class="fl" value="${((list.product_count-list.refundCount) % list.convert_relate)!0}" id="sNum">
 				          <div class="operate fl">
 				            <i class="icon-plus2"></i>
 				          </div>
