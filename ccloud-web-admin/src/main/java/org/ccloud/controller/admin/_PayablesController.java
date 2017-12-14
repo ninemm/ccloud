@@ -111,8 +111,7 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		String ref_type = getPara("ref_type");
 		String object_id = getPara("object_id");
 		//通过客户Id找到应付账款主表ID
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		Payables payables = PayablesQuery.me().findByObjId(object_id, user.getDepartmentId());
+		Payables payables = PayablesQuery.me().findByObjId(object_id, Consts.RECEIVABLES_OBJECT_TYPE_CUSTOMER);
 		
 		if(payables == null) {
 			setAttr("ref_sn",ref_sn);
