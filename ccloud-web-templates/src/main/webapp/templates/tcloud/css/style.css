@@ -541,7 +541,7 @@ a {
   padding: 0 0.75rem;
   line-height: 2rem;
   position: relative;
-  color: #eee;
+  background: #eee;
 }
 
 .check-pass {
