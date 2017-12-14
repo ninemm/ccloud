@@ -1,0 +1,151 @@
+<#include "_inc/_layout.html"/>
+<#macro css> </#macro>
+<#macro script>
+    $(function () {
+        var pageNumber = 2;
+        var pageSize = 10;
+        var loading = false;
+
+        var $endNode = null;
+        var $loadmore = $(".weui-loadmore");
+        $.ajax({
+            url:"${CPATH}/customerVisit/getSelect",
+            type:"post",
+            dataType:"json",
+            success:function(data) {
+                $("#customer-type").select({
+                    title: "选择客户类型",
+                    items: data.type
+                });
+                $("#customer-nature").select({
+                    title: "选择客户性质",
+                    items: data.nature
+                });
+                $("#customer-level").select({
+                    title: "选择客户级别",
+                    items: data.level
+                });
+            }
+        })
+    });
+
+    var paramData = function() {
+        return  {
+            "pageNumber": pageNumber,
+            "pageSize": pageSize,
+            "type": $("#customer-type")[0].dataset.values,
+            "nature": $("#customer-nature")[0].dataset.values,
+            "level": $("#customer-level")[0].dataset.values
+        };
+    }
+
+    $(".infinite").infinite().on("infinite", function() {
+        var self = this;
+        $endNode = $(".weui-panel_access:last");
+        $loadmore = $(self).find(".weui-loadmore");
+        if ($loadmore) $loadmore.show();
+        if (loading) return ;
+        loading = true;
+
+        $.ajax({
+            type: "post",
+            url: "${CPATH}/customerVisit/refresh",
+            data: paramData(),
+            dataType: "json",
+            success:function(data) {
+                if ($loadmore) $loadmore.show();
+                if (data.totalPage >= pageNumber) {
+                    $endNode.after(data.html);
+                }
+                if (data.totalPage == pageNumber) {
+                    $(".infinite").destroyInfinite();
+                    $loadmore.hide();
+                }
+                pageNumber++;
+                loading = false;
+            }
+        });
+    });
+
+    function refresh() {
+        pageNumber = 1;
+        $.ajax({
+            url:"${CPATH}/customerVisit/refresh",
+            type:"post",
+            data:paramData(),
+            dataType:"json",
+            success:function(data) {
+                $loadmore = $(this).find(".weui-loadmore");
+                $(".infinite").destroyInfinite();
+                $loadmore.hide();
+
+                if (data.totalPage > pageNumber) {
+                    loading = false;
+                    $(".infinite").infinite();
+                    $(".weui-loadmore").removeAttr("style");
+                }
+
+                $(".infinite")[0].scrollTop = 0;
+                $("#visitList").empty();
+                $("#visitList").html(data.html);
+                pageNumber = 2;
+            }
+        });
+    }
+
+</#macro>
+<@layout>
+<body id="visit-record">
+<header>
+    <div class="head-search select-area">
+        <div>
+            <input type="text" id="customer-type" placeholder="客户类型" class="weui-input" readonly>
+            <i class="icon-sort-desc"></i>
+        </div>
+        <div>
+            <input type="text" id="customer-nature" placeholder="客户性质" class="weui-input" readonly>
+            <i class="icon-sort-desc"></i>
+        </div>
+        <div>
+            <input type="text" id="customer-level" placeholder="客户级别" class="weui-input" readonly>
+            <i class="icon-sort-desc"></i>
+        </div>
+    </div>
+</header>
+<main if="visitList" class="infinite">
+    <#if visitList??>
+        <#list visitList.list as visit>
+            <a class="weui-cell weui-cell_access" href="${(CPATH)}/customerVisit/detail?id=${(visit.id)!}">
+                <div class="weui-cell__bd ft14">
+                    <p>${(visit.customer_name)!}</p>
+                    <p class="gray ft12">${(visit.contact)!}/${(visit.mobile)!}
+                        <span class="fr">${(visit.create_date)!}</span>
+                    </p>
+                    <p>活动类型：
+                        <span class="orange">${(visit.typeName)!}</span>
+                        <span class="green fr">${(visit.statusName)!}</span>
+                    </p>
+                </div>
+                <span class="weui-cell__ft"></span>
+            </a>
+        </#list>
+    </#if>
+    <#if visitList??>
+        <#if visitList.totalRow = 0>
+            <div class="weui-loadmore weui-loadmore_line">
+                <span class="weui-loadmore__tips">暂无数据</span>
+            </div>
+            <#elseif visitList.totalRow &gt; 10>
+                <div class="weui-loadmore">
+                    <i class="weui-loading"></i>
+                    <span class="weui-loadmore__tips">正在加载</span>
+                </div>
+        </#if>
+    </#if>
+</main>
+<#include "_inc/_goback.html" />
+<footer class="weui-footer weui-footer_fixed-bottom">
+    <a href="${(CPATH)!}/customerVisit/visitAdd" class="place-order bg-blue white width-100">添加拜访</a>
+</footer>
+</body>
+</@layout>

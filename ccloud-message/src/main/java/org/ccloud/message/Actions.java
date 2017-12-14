@@ -47,7 +47,6 @@ public class Actions {
 	public class System {
 		public static final String ACTION_LOG = "action:log";
 	}
-	
 	public class NotifyMessage {
 		public static final String CUSTOMER_AUDIT_MESSAGE = "customer:audit";
 	}

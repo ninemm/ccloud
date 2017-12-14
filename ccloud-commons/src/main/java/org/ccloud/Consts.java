@@ -89,6 +89,8 @@ public class Consts {
 	
 	public static final String SALES_ORDER_SN = "100001";//订单流水每日起始数
 	public static final String SALES_OUT_STOCK_SN = "100001";//出库单单流水每日起始数
+	public static final String PURCHASE_IN_STOCK_SN = "100001";//采购入库单单流水每日起始数
+	
 	
 	public static final int SALES_ORDER_AUDIT_STATUS_PASS = 1000;//销售订单审核通过
 	

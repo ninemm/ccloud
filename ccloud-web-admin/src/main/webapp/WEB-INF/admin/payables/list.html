@@ -21,15 +21,15 @@
 	 
 
 	$(function(){
-		var url = '${CPATH}/admin/receivables/list?ref_sn='+ref_sn;
-		jQuery.mm.initEditTable('#_receiving_table', url, initParams, initFields(), null);
+		var url = '${CPATH}/admin/payables/list?ref_sn='+ref_sn;
+		jQuery.mm.initEditTable('#_payment_table', url, initParams, initFields(), null);
 	});
 	
 	var initFields = function(){
 		var fields = [
-			{field: "biz_date", title: "收款日期", align: "center", edit:false},
-			{field: "act_amount", title: "收款金额", align: "center", edit:false},
-			{field: "receive_user_name", title: "收款人", align: "center", edit:false},
+			{field: "biz_date", title: "付款日期", align: "center", edit:false},
+			{field: "act_amount", title: "付款金额", align: "center", edit:false},
+			{field: "pay_user_name", title: "付款人", align: "center", edit:false},
 			{field: "create_date", title: "录入时间", align: "center", edit:false},
 			{field: "input_user_name",title: "录入人", align:"center",edit:false},
 			{field: "remark",title:"备注",align:"center",edit:false}
@@ -53,11 +53,11 @@
 <@layout active_id=p child_active_id=c>
 
 <section class="content-header">
-	<h1>收款记录</h1>
+	<h1>付款记录</h1>
 	<ol class="breadcrumb">
 		<li><a href="#"><i class="fa fa-dashboard"></i>Home</a></li>
        	<li><a href="#">帐款管理</a></li>
-       	<li class="active">收款记录</li>
+       	<li class="active">付款记录</li>
 	</ol>
 </section>
 
@@ -66,11 +66,11 @@
 <section class="content">
 	<div class="row content-row">
 		<div class="jp-left">
-			<a class="btn btn-sm btn-primary btn-flat" href="${CPATH}/admin/receivables/addreceiving?ref_sn=${ref_sn}&ref_type=${ref_type}&object_id=${object_id}"><i class="fa fa-plus"></i>录入收款记录</a>
+			<a class="btn btn-sm btn-primary btn-flat" href="${CPATH}/admin/payables/addreceiving?ref_sn=${ref_sn}&ref_type=${ref_type}&object_id=${object_id}"><i class="fa fa-plus"></i>录入付款记录</a>
 		</div>
 	</div>
 	<div class="box">
-		<table class="table table-striped table-hover table-condensed" id="_receiving_table"></table>
+		<table class="table table-striped table-hover table-condensed" id="_payment_table"></table>
 	</div>
 </section>
 </@layout>
