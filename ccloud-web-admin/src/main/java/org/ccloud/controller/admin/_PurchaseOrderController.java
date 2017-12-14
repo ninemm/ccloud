@@ -81,7 +81,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 
-		Page<Record> page = PurchaseOrderQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate,user.getDataArea(),user.getId());
+		Page<Record> page = PurchaseOrderQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate,getSessionAttr(Consts.SESSION_SELECT_DATAAREA).toString(),user.getId());
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
@@ -104,7 +104,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 
-		Page<Record> page = PurchaseOrderQuery.me().paginateO(getPageNumber(), getPageSize(), keyword, startDate, endDate,user.getDataArea(),user.getId());
+		Page<Record> page = PurchaseOrderQuery.me().paginateO(getPageNumber(), getPageSize(), keyword, startDate, endDate,getSessionAttr(Consts.SESSION_SELECT_DATAAREA).toString(),user.getId());
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);

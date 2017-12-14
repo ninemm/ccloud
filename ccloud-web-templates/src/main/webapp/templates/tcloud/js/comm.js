@@ -25,8 +25,14 @@ Date.prototype.Format = function(fmt) { // author: meizz
 	return fmt;
 }
 
-$.today = function() {
+// 今天的日期
+$.today = function () {
 	return new Date().Format("yyyy-MM-dd");
+}
+  
+// 今天的日期和星期
+$.week = function () {
+	return "星期" + "日一二三四五六".charAt(new Date().getDay());
 }
 
 Utils = {

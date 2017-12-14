@@ -38,7 +38,9 @@
 					<th>序号</th>
 					<th>商品</th>
 					<th>大单位数量</th>
+					<th>大单位价格</th>
 					<th>小单位数量</th>
+					<th>小单位价格</th>
 					<th>小计</th>
 				</tr>
 			</thead>
@@ -48,7 +50,9 @@
 						<td>${detail_index + 1}</td>
 						<td>${detail.productName!}/${detail.cps_name!}</td>
 						<td>${(detail.product_count / detail.convert_relate)?floor} ${detail.big_unit + ' (x' + detail.convert_relate + detail.small_unit + ')' }</td>
+						<td>￥${(detail.product_price )?floor}/ ${detail.big_unit + ' (x' + detail.convert_relate + detail.small_unit + ')' }</td>
 						<td>${detail.product_count % detail.convert_relate} ${detail.small_unit}</td>
+						<td>￥${(detail.product_price / detail.convert_relate)?floor} /${detail.small_unit}</td>
 						<td>￥ ${detail.product_amount!}</td>
 					</tr>
 				</#list>

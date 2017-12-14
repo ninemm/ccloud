@@ -207,7 +207,7 @@ public class _SalesRefundController extends JBaseCRUDController<SalesRefundInsto
             	}
         		Record refund = SalesRefundInstockQuery.me().findMoreById(inStockId);
         		String customerId = refund.getStr("customer_id");
-        		String refundSn = "abc123456";
+        		String refundSn = refund.getStr("instock_sn");
         		List<Record> refundDetail = SalesRefundInstockDetailQuery.me().findByRefundId(inStockId);
         		if (!PayablesQuery.me().insert(refund, date)) {
         			return false;
