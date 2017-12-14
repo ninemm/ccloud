@@ -65,7 +65,7 @@ public class _GroupController extends JBaseCRUDController<Group> {
         
         String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
-        Page<Group> page = GroupQuery.me().paginate(getPageNumber(), getPageSize(), keyword, dataArea, "g.order_list");
+        Page<Group> page = GroupQuery.me().paginate(getPageNumber(), getPageSize(), keyword, DataAreaUtil.getUserDealerDataArea(dataArea), "g.order_list");
         if (page != null) {
             setAttr("page", page);
         }
