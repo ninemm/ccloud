@@ -250,5 +250,9 @@ public class SellerCustomerQuery extends JBaseQuery {
 		sb.append(" where c.is_enabled = 1 and locate(?, u.USER_ID_) > 0");
 		return DAO.find(sb.toString(), username);
 	}
+	
+	public SellerCustomer findBySellerId(String sellerId){
+		return DAO.doFindFirst("seller_id = ?", sellerId);
+	}
 
 }
