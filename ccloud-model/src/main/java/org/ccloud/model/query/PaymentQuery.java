@@ -18,7 +18,6 @@ package org.ccloud.model.query;
 import java.util.LinkedList;
 
 import org.ccloud.model.Payment;
-
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
@@ -55,12 +54,13 @@ public class PaymentQuery extends JBaseQuery {
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 	
-	public Page<Payment> paginate(int pageNumber, int pageSize, String orderby) {
-		String select = "select * ";
-		StringBuilder fromBuilder = new StringBuilder("from `cc_payment` ");
-
+	public Page<Payment> paginate(int pageNumber, int pageSize, String ref_sn,String dataArea) {
+		String select = "SELECT r.biz_date,r.act_amount,u2.realname AS pay_user_name,r.create_date,u.realname AS input_user_name,r.remark ";
+		StringBuilder fromBuilder = new StringBuilder("FROM `cc_payment` AS r  LEFT JOIN `user` AS u ON r.input_user_id = u.id  LEFT JOIN `user` as u2 on r.pay_user_id = u2.id");
+		fromBuilder.append(" WHERE r.ref_sn=\'"+ref_sn+"\' ");
 		LinkedList<Object> params = new LinkedList<Object>();
-
+		appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, false);
+		fromBuilder.append(" ORDER BY r.create_date DESC");
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 

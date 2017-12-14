@@ -83,7 +83,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "c.customer_name", keyword, params, needWhere);
 
-		fromBuilder.append(" GROUP BY sc.id ");
+		fromBuilder.append("  GROUP BY sc.id ");
 		fromBuilder.append(" order by sc.create_date ");
 
 		if (params.isEmpty())
@@ -250,5 +250,16 @@ public class SellerCustomerQuery extends JBaseQuery {
 		sb.append(" where c.is_enabled = 1 and locate(?, u.USER_ID_) > 0");
 		return DAO.find(sb.toString(), username);
 	}
+	
+	public SellerCustomer findBySellerId(String sellerId){
+		return DAO.doFindFirst("seller_id = ?", sellerId);
+	}
 
+	public List<Record> findSubTypeByUserID(String dataArea) {
+		List<Object> param = new LinkedList<Object>();
+		StringBuilder sql = new StringBuilder("select DISTINCT(sub_type) ");
+		sql.append(" FROM cc_seller_customer ");
+		appendIfNotEmptyWithLike(sql, "data_area", dataArea, param, true );
+		return Db.find(sql.toString(), param);
+	}
 }

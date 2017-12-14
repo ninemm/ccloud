@@ -1,0 +1,165 @@
+<#include "../_inc/_layout.html"/>
+
+<#macro script_import>
+
+    <!-- bootstrap-table -->
+    <script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table.js"></script>
+    <script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table-zh-CN.js"></script>
+    <!-- bootstrapValidator -->
+    <script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
+</#macro>
+
+<#macro css_import>
+
+    <!-- bootstrap-table-->
+    <link rel="stylesheet" href="${CPATH}/static/plugins/bootstrap-table/bootstrap-table.css">
+    <!-- bootstrapValidator -->
+    <link rel="stylesheet" href="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.css">
+
+</#macro>
+
+<#macro script>
+var type = $("#selecttype").val();
+
+var detail_object_id = "";
+
+var payablesUrl = '${CPATH}/admin/payables/getPayables';
+var payableDetailUrl = '${CPATH}/admin/payables/getpayablesDetail';
+$(function() {
+	updateOptions();
+	
+	$("#selecttype").change(function(){
+		updateOptions();
+		type = $(this).val();
+	});
+
+	jQuery.mm.initEditTable('#_payables_table', payablesUrl, getpayablesParams, initpayablesTable(), null);
+	$("#search-payables").click(function(){
+		$('#_payables_table').bootstrapTable('refresh');
+	});
+	
+	// 委托点击事件
+	$("#_payables_table").on('click','tr[data-uniqueid]',function(){
+		var $this = $(this);
+		detail_object_id = $this.attr("data-uniqueid");
+		$this.siblings().css("background-color","#ffffff");
+		$this.css("background-color","#428bca");
+		$('#_payables_detail_table').bootstrapTable('refresh');
+	});
+	
+	jQuery.mm.initEditTable('#_payables_detail_table', payableDetailUrl, getpayablesDetailParams, initpayableDetailTable() , null);
+});
+
+function updateOptions(){
+	var type = $("#selecttype").val();
+	$.ajax({
+		url: "${CPATH}/admin/payables/getOptions?type="+type,
+		async: false,
+		success: function(data){
+			var optionsHtml = '<option value="0" >全部</option>';
+			if(data.length && data.length>=1){
+				for(var i in data){
+					optionsHtml += '<option value="'+data[i].id+'" >'+data[i].name+'</option>';
+				}
+			}
+			$("#category-or-customer").html(optionsHtml);
+		}
+	});
+}
+
+var initpayablesTable = function(){
+	var fields = [
+		{field: "object_id",title: "ID", align: "center", visible:false, edit:false},
+		{field: "code",title:"编码",align: "center", width: '8%', edit:false},
+		{field: "name",title:"名称",align: "center", width: '12%', edit:false},
+		{field: "pay_amount",title:"应付金额",align: "center",edit:false},
+		{field: "act_amount",title:"已付金额",align: "center",edit:false},
+		{field: "balance_amount",title:"未付金额",align: "center",edit:false}
+	];
+	
+	return fields;
+};
+
+var getpayablesParams = function(params){
+var customerTypeId = $('#category-or-customer').val();
+	var param = {
+        size: params.limit,
+        page: params.offset/params.limit + 1,
+        type : type,
+        customerTypeId:customerTypeId
+    };
+    return param;
+}
+
+var initpayableDetailTable = function(){
+	var fields = [
+		{field: "ref_type",title:"业务类型编码",align: "center",visible:false, edit: false},	
+	    {field: "ref_Name",title:"业务类型",align: "center", edit: false},		
+		{field: "ref_sn",title:"单号",align: "center",edit: false},
+		{field: "biz_date",title:"业务日期",align: "center",edit: false},
+		{field: "pay_amount",title:"应付金额",align: "center",edit: false},
+		{field: "act_amount",title:"已付金额",align: "center",edit: false},
+		{field: "balance_amount",title:"未付金额",align: "center",edit: false},
+		{field: "create_date",title:"创建时间",align:"center",edit:false},
+		{field: "action", title: "付款详情", align: "center",
+			 formatter: function(value, row, rowIndex){
+			 	var url = '${CPATH}/admin/payables/renderlist?ref_sn='+row.ref_sn+'&&ref_type='+row.ref_type+'&&object_id='+row.object_id;
+			 	return '<a href="' + url + '" class="btn btn-sm" >付款详情</a>';
+			 },
+			 edit:false}
+	];
+	
+	return fields;
+}
+
+var getpayablesDetailParams = function(params){
+
+	var param = {
+        size: params.limit,
+        page: params.offset/params.limit + 1,
+        type : type,
+        id: detail_object_id
+    };
+    
+	return param;
+}
+
+
+
+</#macro>
+<@layout active_id=p child_active_id=c>
+	
+<section class="content-header">
+	<h1>应付帐款管理</h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+       	<li><a href="#">账款管理</a></li>
+       	<li class="active">应付帐款管理</li>
+	</ol>
+</section>
+<!-- Main content -->
+<section class="content">
+	<div class="row content-row">
+		<div class="input-group input-group-sm" style="float:right;">
+			<span>往来单位：</span>
+			<select id="selecttype" style="width:200px">
+				<option value="1" >客户</option>
+				<option value="2" >供应商</option>
+			</select>&nbsp;&nbsp;&nbsp;
+			<span>分类：</span>
+			<select id="category-or-customer" style="width:200px">
+				<option value="0">全部</option>
+			</select>&nbsp;&nbsp;&nbsp;
+			<span id="search-payables" class="btn btn-default btn-sm btn-flat" >搜索</span>
+		</div>
+	</div>
+	<div class="box">
+        <table class="table table-striped table-hover table-condensed" id="_payables_table" ></table>
+    </div>
+    <div class="box">
+        <table class="table table-striped table-hover table-condensed" id="_payables_detail_table" ></table>
+    </div>
+	</div>
+</section>
+
+</@layout>

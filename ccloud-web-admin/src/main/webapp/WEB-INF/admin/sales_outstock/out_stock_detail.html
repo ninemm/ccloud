@@ -272,10 +272,11 @@
 				var outstock = result.outstock;
 				var outstockDetail = result.outstockDetail;
 
-				$("#customerId").val(outstock.customer_id);
+				$("#customerId").val(outstock.customerId);
 				$("#customerName").val(outstock.customer_name);
 				$("#contact").val(outstock.ccontact);
 				$("#mobile").val(outstock.cmobile);
+				$("#customerKind").val(outstock.customer_kind);
 				$("#customerType").val(outstock.customer_type_id);
 				$("#customerTypeName").val(outstock.customerTypeName);
 				$("#customerTypeCode").val(outstock.customerTypeCode);
@@ -439,6 +440,7 @@
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">*客户类型:</label>
 						<div class="input-group col-md-4 col-sm-10">
+							<input  type="hidden" id="customerKind" name="customerKind" value="" >
 							<input  type="hidden" id="customerType" name="customerType" value="" >
 							<input  type="hidden" id="customerTypeCode" name="customerTypeCode" value="" >
 							<input class="form-control input-sm" type="text" id="customerTypeName" name="customerTypeName" value="" readonly>

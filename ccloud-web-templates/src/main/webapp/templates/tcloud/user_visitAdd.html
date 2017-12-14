@@ -23,7 +23,7 @@
 	var $gallery = $("#gallery"), $galleryImg = $("#galleryImg");
 	
 	initData();
-	
+	initCustomer();
 	
 	function initData(){
 		var customerData = JSON.parse('${customer}');
@@ -221,6 +221,16 @@
             },
 		});
 	};
+
+	function initCustomer(){
+	var customerInfo = getItemBykey("customerInfo");
+		if(customerInfo){
+			$("#customer_id").val(customerInfo.sellerCustomerId);
+			$("#customer_name").val(customerInfo.customerName);
+			$("#contact").val(customerInfo.contact);
+			$("#mobile").val(customerInfo.mobile);
+		}
+	}
 	
 	wx.ready(function() {
         // 获取定位信息

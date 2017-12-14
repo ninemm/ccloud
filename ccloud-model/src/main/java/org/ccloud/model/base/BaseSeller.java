@@ -95,7 +95,7 @@ public abstract class BaseSeller<M extends BaseSeller<M>> extends JModel<M> impl
 	}
 
 	public java.lang.String getId() {
-		return get("id");
+		return getStr("id");
 	}
 
 	public void setDeptId(java.lang.String deptId) {
@@ -103,7 +103,7 @@ public abstract class BaseSeller<M extends BaseSeller<M>> extends JModel<M> impl
 	}
 
 	public java.lang.String getDeptId() {
-		return get("dept_id");
+		return getStr("dept_id");
 	}
 
 	public void setSellerName(java.lang.String sellerName) {
@@ -111,7 +111,7 @@ public abstract class BaseSeller<M extends BaseSeller<M>> extends JModel<M> impl
 	}
 
 	public java.lang.String getSellerName() {
-		return get("seller_name");
+		return getStr("seller_name");
 	}
 
 	public void setSellerCode(java.lang.String sellerCode) {
@@ -119,7 +119,15 @@ public abstract class BaseSeller<M extends BaseSeller<M>> extends JModel<M> impl
 	}
 
 	public java.lang.String getSellerCode() {
-		return get("seller_code");
+		return getStr("seller_code");
+	}
+
+	public void setCustomerId(java.lang.String customerId) {
+		set("customer_id", customerId);
+	}
+
+	public java.lang.String getCustomerId() {
+		return getStr("customer_id");
 	}
 
 	public void setContact(java.lang.String contact) {
@@ -127,7 +135,7 @@ public abstract class BaseSeller<M extends BaseSeller<M>> extends JModel<M> impl
 	}
 
 	public java.lang.String getContact() {
-		return get("contact");
+		return getStr("contact");
 	}
 
 	public void setPhone(java.lang.String phone) {
@@ -135,7 +143,7 @@ public abstract class BaseSeller<M extends BaseSeller<M>> extends JModel<M> impl
 	}
 
 	public java.lang.String getPhone() {
-		return get("phone");
+		return getStr("phone");
 	}
 
 	public void setIsInited(java.lang.Integer isInited) {
@@ -143,7 +151,7 @@ public abstract class BaseSeller<M extends BaseSeller<M>> extends JModel<M> impl
 	}
 
 	public java.lang.Integer getIsInited() {
-		return get("is_inited");
+		return getInt("is_inited");
 	}
 
 	public void setIsEnabled(java.lang.Integer isEnabled) {
@@ -151,7 +159,7 @@ public abstract class BaseSeller<M extends BaseSeller<M>> extends JModel<M> impl
 	}
 
 	public java.lang.Integer getIsEnabled() {
-		return get("is_enabled");
+		return getInt("is_enabled");
 	}
 
 	public void setIsHeadquarter(java.lang.Integer isHeadquarter) {
@@ -159,7 +167,7 @@ public abstract class BaseSeller<M extends BaseSeller<M>> extends JModel<M> impl
 	}
 
 	public java.lang.Integer getIsHeadquarter() {
-		return get("is_headquarter");
+		return getInt("is_headquarter");
 	}
 
 	public void setSellerType(java.lang.Integer sellerType) {
@@ -167,7 +175,7 @@ public abstract class BaseSeller<M extends BaseSeller<M>> extends JModel<M> impl
 	}
 
 	public java.lang.Integer getSellerType() {
-		return get("seller_type");
+		return getInt("seller_type");
 	}
 
 	public void setProvCode(java.lang.String provCode) {
@@ -175,7 +183,7 @@ public abstract class BaseSeller<M extends BaseSeller<M>> extends JModel<M> impl
 	}
 
 	public java.lang.String getProvCode() {
-		return get("prov_code");
+		return getStr("prov_code");
 	}
 
 	public void setProvName(java.lang.String provName) {
@@ -183,7 +191,7 @@ public abstract class BaseSeller<M extends BaseSeller<M>> extends JModel<M> impl
 	}
 
 	public java.lang.String getProvName() {
-		return get("prov_name");
+		return getStr("prov_name");
 	}
 
 	public void setCityCode(java.lang.String cityCode) {
@@ -191,7 +199,7 @@ public abstract class BaseSeller<M extends BaseSeller<M>> extends JModel<M> impl
 	}
 
 	public java.lang.String getCityCode() {
-		return get("city_code");
+		return getStr("city_code");
 	}
 
 	public void setCityName(java.lang.String cityName) {
@@ -199,7 +207,7 @@ public abstract class BaseSeller<M extends BaseSeller<M>> extends JModel<M> impl
 	}
 
 	public java.lang.String getCityName() {
-		return get("city_name");
+		return getStr("city_name");
 	}
 
 	public void setCountryCode(java.lang.String countryCode) {
@@ -207,7 +215,7 @@ public abstract class BaseSeller<M extends BaseSeller<M>> extends JModel<M> impl
 	}
 
 	public java.lang.String getCountryCode() {
-		return get("country_code");
+		return getStr("country_code");
 	}
 
 	public void setCountryName(java.lang.String countryName) {
@@ -215,7 +223,7 @@ public abstract class BaseSeller<M extends BaseSeller<M>> extends JModel<M> impl
 	}
 
 	public java.lang.String getCountryName() {
-		return get("country_name");
+		return getStr("country_name");
 	}
 
 	public void setMarketName(java.lang.String marketName) {
@@ -223,7 +231,7 @@ public abstract class BaseSeller<M extends BaseSeller<M>> extends JModel<M> impl
 	}
 
 	public java.lang.String getMarketName() {
-		return get("market_name");
+		return getStr("market_name");
 	}
 
 	public void setMarketCode(java.lang.String marketCode) {
@@ -231,7 +239,7 @@ public abstract class BaseSeller<M extends BaseSeller<M>> extends JModel<M> impl
 	}
 
 	public java.lang.String getMarketCode() {
-		return get("market_code");
+		return getStr("market_code");
 	}
 
 	public void setJywxOpenId(java.lang.String jywxOpenId) {
@@ -239,7 +247,7 @@ public abstract class BaseSeller<M extends BaseSeller<M>> extends JModel<M> impl
 	}
 
 	public java.lang.String getJywxOpenId() {
-		return get("jywx_open_id");
+		return getStr("jywx_open_id");
 	}
 
 	public void setJpwxOpenId(java.lang.String jpwxOpenId) {
@@ -247,7 +255,7 @@ public abstract class BaseSeller<M extends BaseSeller<M>> extends JModel<M> impl
 	}
 
 	public java.lang.String getJpwxOpenId() {
-		return get("jpwx_open_id");
+		return getStr("jpwx_open_id");
 	}
 
 	public void setModifyUserId(java.lang.String modifyUserId) {
@@ -255,7 +263,7 @@ public abstract class BaseSeller<M extends BaseSeller<M>> extends JModel<M> impl
 	}
 
 	public java.lang.String getModifyUserId() {
-		return get("modify_user_id");
+		return getStr("modify_user_id");
 	}
 
 	public void setProductTypeStore(java.lang.String productTypeStore) {
@@ -263,7 +271,7 @@ public abstract class BaseSeller<M extends BaseSeller<M>> extends JModel<M> impl
 	}
 
 	public java.lang.String getProductTypeStore() {
-		return get("product_type_store");
+		return getStr("product_type_store");
 	}
 
 	public void setRemark(java.lang.String remark) {
@@ -271,7 +279,7 @@ public abstract class BaseSeller<M extends BaseSeller<M>> extends JModel<M> impl
 	}
 
 	public java.lang.String getRemark() {
-		return get("remark");
+		return getStr("remark");
 	}
 
 	public void setCreateDate(java.util.Date createDate) {

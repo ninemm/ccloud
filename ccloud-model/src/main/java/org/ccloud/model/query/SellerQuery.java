@@ -141,4 +141,9 @@ public class SellerQuery extends JBaseQuery {
 		String sql="SELECT * from cc_seller where dept_id= ? and seller_type = 0";
 		return DAO.find(sql,deptId);
 	}
+	
+	public Record findByCustomerId(final String customerId) {
+		
+		return Db.findFirst("select s.* , d.data_area from cc_seller s join department d on s.dept_id = d.id where customer_id = ?" , customerId);
+	}
 }
