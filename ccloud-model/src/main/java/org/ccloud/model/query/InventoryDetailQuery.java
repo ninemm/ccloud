@@ -97,13 +97,14 @@ public class InventoryDetailQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller_product csp on csp.id = cid.sell_product_id ");
 		fromBuilder.append(" LEFT JOIN cc_user_join_warehouse cujw on cujw.warehouse_id=cid.warehouse_id ");
 		LinkedList<Object> params = new LinkedList<Object>();
-		
-		
-		if(keyword.equals("")){
-				fromBuilder.append("where cid.biz_type in ('"+Consts.BIZ_TYPE_INSTOCK+"','"+Consts.BIZ_TYPE_SALES_REFUND_INSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_INSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_PLUS_INSTOCK+"')  and cid.data_area = '"+dataArea+"' ");
+		boolean needWhere = true;
+
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cid.biz_bill_sn", keyword, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cid.data_area", dataArea, params, needWhere);
+		if (needWhere) {
+				fromBuilder.append("where 1=1 and cid.biz_type in ('"+Consts.BIZ_TYPE_INSTOCK+"','"+Consts.BIZ_TYPE_SALES_REFUND_INSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_INSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_PLUS_INSTOCK+"') ");
 		}else{
-			fromBuilder.append(" where cid.biz_bill_sn like '%"+keyword+"%' ");
-				fromBuilder.append("and cid.biz_type in ('"+Consts.BIZ_TYPE_INSTOCK+"','"+Consts.BIZ_TYPE_SALES_REFUND_INSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_INSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_PLUS_INSTOCK+"')  and cid.data_area = '"+dataArea+"' ");
+				fromBuilder.append("and cid.biz_type in ('"+Consts.BIZ_TYPE_INSTOCK+"','"+Consts.BIZ_TYPE_SALES_REFUND_INSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_INSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_PLUS_INSTOCK+"') ");
 		}
 		fromBuilder.append(" order by " + orderby+" desc");	
 		if (params.isEmpty())
@@ -119,13 +120,14 @@ public class InventoryDetailQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller_product csp on csp.id = cid.sell_product_id ");
 		fromBuilder.append(" LEFT JOIN cc_user_join_warehouse cujw on cujw.warehouse_id=cid.warehouse_id ");
 		LinkedList<Object> params = new LinkedList<Object>();
-		
-		
-		if(keyword.equals("")){
-				fromBuilder.append("where cid.biz_type in ('"+Consts.BIZ_TYPE_P_OUTSTOCK+"','"+Consts.BIZ_TYPE_SALES_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_REDUCE_OUTSTOCK+"') and cid.data_area = '"+dataArea+"' ");
+		boolean needWhere = true;
+
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cid.biz_bill_sn", keyword, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cid.data_area", dataArea, params, needWhere);
+		if (needWhere) {
+				fromBuilder.append("where 1 = 1 and  cid.biz_type in ('"+Consts.BIZ_TYPE_P_OUTSTOCK+"','"+Consts.BIZ_TYPE_SALES_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_REDUCE_OUTSTOCK+"') ");
 		}else{
-			fromBuilder.append(" where cid.biz_bill_sn like '%"+keyword+"%' ");
-				fromBuilder.append("and cid.biz_type in ('"+Consts.BIZ_TYPE_P_OUTSTOCK+"','"+Consts.BIZ_TYPE_SALES_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_REDUCE_OUTSTOCK+"') and cid.data_area = '"+dataArea+"' ");
+				fromBuilder.append("and cid.biz_type in ('"+Consts.BIZ_TYPE_P_OUTSTOCK+"','"+Consts.BIZ_TYPE_SALES_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_REDUCE_OUTSTOCK+"') ");
 		}
 		fromBuilder.append(" order by " + orderby+" desc");	
 		if (params.isEmpty())
