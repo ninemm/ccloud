@@ -96,6 +96,9 @@
 					$newOrder.find("#customerName").text(el.customer_name);
 					$newOrder.find("#contact").text(el.contact + '/' + el.mobile);
 					$newOrder.find("#customerType").text(el.customerTypeName);
+					$newOrder.find("#orderAgain").on('click', function(){ 
+ 						 window.location.href = "${CPATH}/order/getOldOrder?orderId="+el.id
+					}); 					
 
 					$newOrder.find("#amount").text(el.total_amount);
 					$newOrder.find("#date").text('时间：' + el.create_date);
@@ -211,7 +214,7 @@
 				</a>
 				<hr>
 				<div class="button blue-button fl">撤销</div>
-				<div class="button white-button fr">再次购买</div>
+				<div id="orderAgain" class="button white-button fr">再次购买</div>
 			</div>
 		</div>
 		<div class="weui-loadmore" id="loading" style="display: none;">

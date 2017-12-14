@@ -1,10 +1,12 @@
 package org.ccloud.front.controller;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.CustomerType;
@@ -91,5 +93,24 @@ public class OrderController extends BaseFrontController {
 		if (statusCode == Consts.SALES_ORDER_STATUS_ALL_OUT) return "全部出库";
 		if (statusCode == Consts.SALES_ORDER_STATUS_ALL_OUT_CLOSE) return "全部出库-订单关闭";
 		return "无";
+	}
+	
+	public void getOldOrder() {
+		String orderId = getPara("orderId");
+		
+		Record order = SalesOrderQuery.me().findMoreById(orderId);
+		setAttr("deliveryDate", DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
+		setAttr("id", orderId);
+		setAttr("order", order);
+		render("order_again.html");
+	}	
+	
+	public void orderAgain() {
+		String orderId = getPara("orderId");
+		
+		List<Record> orderDetail = SalesOrderDetailQuery.me().findByOrderId(orderId);
+		Map<String, Object> map = new HashMap<>();
+		map.put("orderDetail", orderDetail);
+		renderJson(map);
 	}
 }
