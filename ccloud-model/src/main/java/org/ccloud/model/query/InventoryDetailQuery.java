@@ -20,6 +20,7 @@ import java.util.LinkedList;
 import org.ccloud.Consts;
 import org.ccloud.model.InventoryDetail;
 
+import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
@@ -132,6 +133,57 @@ public class InventoryDetailQuery extends JBaseQuery {
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
+		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+
+	public Page<InventoryDetail> findByDataArea(int pageNumber, int pageSize, String keyword, String create_date,
+			 String startDate, String endDate,String dataArea, String warehouseId) {
+		String select = "SELECT cid.warehouse_id ,cid.sell_product_id , cs.seller_name , w.`name` , sp.custom_name , SUM(cid.in_count) in_count, SUM(cid.out_count) out_count";
+		StringBuilder fromBuilder = new StringBuilder(" FROM cc_inventory i");
+		fromBuilder.append(" LEFT JOIN cc_seller cs ON cs.id = i.seller_id ");
+		fromBuilder.append(" LEFT JOIN cc_warehouse w ON w.id = i.warehouse_id ");
+		fromBuilder.append(" LEFT JOIN cc_inventory_detail cid ON i.warehouse_id = cid.warehouse_id ");
+		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id = cid.sell_product_id ");
+		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "i.data_area", dataArea, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "w.id", warehouseId, params, needWhere);
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and cid.create_date >= ?");
+			params.add(startDate);
+		}
+
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and cid.create_date <= ?");
+			params.add(endDate);
+		}
+		fromBuilder.append("GROUP BY cid.warehouse_id , cid.sell_product_id ");
+		if (keyword=="") {
+			fromBuilder.append("order by "+create_date);
+		}else {
+			fromBuilder.append("order by "+keyword);
+		}
+		if (params.isEmpty())
+			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+
+		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+
+	public Page<InventoryDetail> findByInventoryDetailListTotal(int pageNumber, int pageSize, String string,
+			String dataArea, String seller_id) {
+		String select = "SELECT cs.seller_name ,'总计' as `name` , sp.custom_name , SUM(cid.in_count) in_count, SUM(cid.out_count) out_count,SUM(cid.in_count)-SUM(cid.out_count) as balance_count";
+		StringBuilder fromBuilder = new StringBuilder(" FROM cc_inventory i");
+		fromBuilder.append(" LEFT JOIN cc_seller cs ON cs.id = i.seller_id ");
+		fromBuilder.append(" LEFT JOIN cc_warehouse w ON w.id = i.warehouse_id ");
+		fromBuilder.append(" LEFT JOIN cc_inventory_detail cid ON i.warehouse_id = cid.warehouse_id ");
+		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id = cid.sell_product_id ");
+		fromBuilder.append(" where cs.id='"+seller_id+"'");
+		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = false;
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "i.data_area", dataArea, params, needWhere);
+		fromBuilder.append("GROUP BY cid.sell_product_id ");
+		if (params.isEmpty())
+			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 }
