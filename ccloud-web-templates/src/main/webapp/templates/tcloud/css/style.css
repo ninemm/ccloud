@@ -32,7 +32,7 @@ input[type=checkbox] {
 
 hr {
   margin: 0.5rem 0;
-  border-top: #efeff4 1px solid;
+  border-top: #fcfcfc 1px solid;
 }
 
 select {
@@ -306,7 +306,14 @@ a {
 .white-button {
   background: #fff;
   color: #666;
-  /* border: 1px solid #bbb; */
+  border: 1px solid #eee;
+  height: 100%;
+}
+
+.white-button-no-border {
+  background: #fff;
+  color: #666;
+  border: 0;
   height: 100%;
 }
 
@@ -476,6 +483,14 @@ a {
   opacity: 1;
   visibility: visible;
   z-index: 900;
+}
+
+.weui-panel:before {
+    border-top: 0;
+}
+
+.weui-panel:after {
+    border-bottom: 0;
 }
 
 

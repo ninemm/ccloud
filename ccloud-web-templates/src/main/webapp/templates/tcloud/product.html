@@ -4,13 +4,6 @@
         background: #fcfcfc;
     }
     
-    .weui-panel:before {
-        border-top: 0;
-    }
-    
-    .weui-panel:after {
-        border-bottom: 0;
-    }
 </#macro>
 
 <#macro script>
@@ -322,9 +315,10 @@ function save(){
 			</div>
 		</article>
 		<a class="hidden-menu" id="shoppingCart" >
-				<img src="${CTPATH}/images/shopping_cart.png" alt="">
+			<img src="${CTPATH}/images/shopping_cart.png" alt="">
 		</a>
 		<div class="layer"></div>
 	</div>
 </div>
-<#include "_inc/_footer_nav.html" /> </@layout>
+<#include "_inc/_footer_nav.html" />
+</@layout>

@@ -1,16 +1,16 @@
 <#include "_inc/_layout.html"/>
 <#macro css>
     .t-c {
-    background: #35b8f0;
-    font-size: .8rem;
-    color: #fff;
+	    background: #ea6f5a;
+	    font-size: .8rem;
+	    color: #fff;
     }
 
     #visit-record header, #activity-list header {
-    height: 2rem;
-    line-height: 2rem;
-    margin: 0;
-    color: #fff;
+	    height: 2rem;
+	    line-height: 2rem;
+	    margin: 0;
+	    color: #fff;
     }
 </#macro>
 <#macro script>
@@ -108,64 +108,64 @@
 
 </#macro>
 <@layout>
-<body id="visit-record">
-<#if id??>
-    <header class="t-c">
-    ${(name)!}
-    </header>
+<div id="visit-record">
+	<#if id??>
+	    <header class="t-c">
+	    ${(name)!}
+	    </header>
+	</#if>
+	<header>
+	    <div class="head-search select-area">
+	        <div>
+	            <input type="text" id="customer-type" placeholder="客户类型" class="weui-input" readonly onchange="refresh()">
+	            <i class="icon-sort-desc"></i>
+	        </div>
+	        <div>
+	            <input type="text" id="customer-nature" placeholder="客户性质" class="weui-input" readonly onchange="refresh()">
+	            <i class="icon-sort-desc"></i>
+	        </div>
+	        <div>
+	            <input type="text" id="customer-level" placeholder="客户级别" class="weui-input" readonly onchange="refresh()">
+	            <i class="icon-sort-desc"></i>
+	        </div>
+	    </div>
+	</header>
+	<main if="visitList" class="infinite">
+	    <#if visitList??>
+	        <#list visitList.list as visit>
+	            <a class="weui-cell weui-cell_access" href="${(CPATH)}/customerVisit/detail?id=${(visit.id)!}">
+	                <div class="weui-cell__bd ft14">
+	                    <p>${(visit.customer_name)!}</p>
+	                    <p class="gray ft12">${(visit.contact)!}/${(visit.mobile)!}
+	                        <span class="fr">${(visit.create_date)!}</span>
+	                    </p>
+	                    <p>活动类型：
+	                        <span class="orange">${(visit.typeName)!}</span>
+	                        <span class="green fr">${(visit.statusName)!}</span>
+	                    </p>
+	                </div>
+	                <span class="weui-cell__ft"></span>
+	            </a>
+	        </#list>
+	    </#if>
+	    <#if visitList??>
+	        <#if visitList.totalRow = 0>
+	            <div class="weui-loadmore weui-loadmore_line">
+	                <span class="weui-loadmore__tips">暂无数据</span>
+	            </div>
+	            <#elseif visitList.totalRow &gt; 10>
+	                <div class="weui-loadmore">
+	                    <i class="weui-loading"></i>
+	                    <span class="weui-loadmore__tips">正在加载</span>
+	                </div>
+	        </#if>
+	    </#if>
+	</main>
+    <#include "_inc/_goback.html" />
+	<#if !id??>
+	<footer class="weui-footer weui-footer_fixed-bottom">
+	    <a href="${(CPATH)!}/customerVisit/visitAdd" class="place-order bg-blue white width-100">添加拜访</a>
+	</footer>
 </#if>
-<header>
-    <div class="head-search select-area">
-        <div>
-            <input type="text" id="customer-type" placeholder="客户类型" class="weui-input" readonly onchange="refresh()">
-            <i class="icon-sort-desc"></i>
-        </div>
-        <div>
-            <input type="text" id="customer-nature" placeholder="客户性质" class="weui-input" readonly onchange="refresh()">
-            <i class="icon-sort-desc"></i>
-        </div>
-        <div>
-            <input type="text" id="customer-level" placeholder="客户级别" class="weui-input" readonly onchange="refresh()">
-            <i class="icon-sort-desc"></i>
-        </div>
-    </div>
-</header>
-<main if="visitList" class="infinite">
-    <#if visitList??>
-        <#list visitList.list as visit>
-            <a class="weui-cell weui-cell_access" href="${(CPATH)}/customerVisit/detail?id=${(visit.id)!}">
-                <div class="weui-cell__bd ft14">
-                    <p>${(visit.customer_name)!}</p>
-                    <p class="gray ft12">${(visit.contact)!}/${(visit.mobile)!}
-                        <span class="fr">${(visit.create_date)!}</span>
-                    </p>
-                    <p>活动类型：
-                        <span class="orange">${(visit.typeName)!}</span>
-                        <span class="green fr">${(visit.statusName)!}</span>
-                    </p>
-                </div>
-                <span class="weui-cell__ft"></span>
-            </a>
-        </#list>
-    </#if>
-    <#if visitList??>
-        <#if visitList.totalRow = 0>
-            <div class="weui-loadmore weui-loadmore_line">
-                <span class="weui-loadmore__tips">暂无数据</span>
-            </div>
-            <#elseif visitList.totalRow &gt; 10>
-                <div class="weui-loadmore">
-                    <i class="weui-loading"></i>
-                    <span class="weui-loadmore__tips">正在加载</span>
-                </div>
-        </#if>
-    </#if>
-</main>
-<#include "_inc/_goback.html" />
-<#if !id??>
-<footer class="weui-footer weui-footer_fixed-bottom">
-    <a href="${(CPATH)!}/customerVisit/visitAdd" class="place-order bg-blue white width-100">添加拜访</a>
-</footer>
-</#if>
-</body>
+</div>
 </@layout>

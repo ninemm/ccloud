@@ -145,7 +145,7 @@ public class CustomerController extends BaseFrontController {
 					"                                                                     contact:'" + customer.getStr("contact") + "',\n" +
 					"                                                                     mobile:'" + customer.getStr("mobile") + "',\n" +
 					"                                                                     address:'" + customer.getStr("address") + "'})\">客户拜访</div>\n");
-			html.append("		<div class=\"button blue-button fr\" onclick=\"newOrder({customerName:'" + customer.getStr("customer_name") + "',\n" +
+			html.append("		<div class=\"button red-button fr\" onclick=\"newOrder({customerName:'" + customer.getStr("customer_name") + "',\n" +
 					"                                                                    sellerCustomerId:'" + customer.getStr("sellerCustomerId") + "',\n" +
 					"                                                                    contact:'" + customer.getStr("contact") + "',\n" +
 					"                                                                    mobile:'" + customer.getStr("mobile") + "',\n" +
