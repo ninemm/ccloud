@@ -77,16 +77,16 @@ public class UserController extends BaseFrontController {
 		
 		long errorTimes = CookieUtils.getLong(this, "_login_errors", 0);
 		
-//		if (errorTimes >= 3) {
-//			if (!validateCaptcha("_login_captcha")) { // 验证码没验证成功！
-//				if (isAjaxRequest()) {
-//					renderAjaxResultForError("没有该用户");
-//				} else {
-//					redirect(Consts.ROUTER_USER_LOGIN);
-//				}
-//				return;
-//			}
-//		}
+		if (errorTimes >= 3) {
+			if (!validateCaptcha("_login_captcha")) { // 验证码没验证成功！
+				if (isAjaxRequest()) {
+					renderAjaxResultForError("没有该用户");
+				} else {
+					redirect(Consts.ROUTER_USER_LOGIN);
+				}
+				return;
+			}
+		}
 		
 		List<User> userList = UserQuery.me().findByMobile(username);
 		if (null == userList || userList.size() == 0) {
