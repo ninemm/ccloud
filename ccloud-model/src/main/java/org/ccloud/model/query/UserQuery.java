@@ -247,7 +247,6 @@ public class UserQuery extends JBaseQuery {
 		return list;
 	}
 	
-<<<<<<< HEAD
 	public List<String> findUserIdsByDeptDataArea(String dataArea) {
 
 		StringBuilder fromBuilder = new StringBuilder(" SELECT u.username ");
@@ -259,6 +258,4 @@ public class UserQuery extends JBaseQuery {
 	}
 	
 	
-=======
->>>>>>> 2f49b85bbecd22cac378320ebfdd6bc990ebfd71
 }
