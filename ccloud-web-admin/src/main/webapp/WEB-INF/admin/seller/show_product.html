@@ -72,9 +72,9 @@
       			{field: "store_count", title: "库存数量", align: "center", width: '3%',
       				formatter: function(value, row, rowIndex){
       					if(value==null){
-      						var strHtml = '<input type="text" size="3" readonly style="text-align:center;background-color:transparent;border:0px;" name="store_count" value="暂未盘点"/>';
+      						var strHtml = '<input type="text" size="10" readonly style="text-align:center;background-color:transparent;border:0px;" name="store_count" value="暂未盘点"/>';
       					}else{
-      						var strHtml = '<input type="text" size="3" readonly style="text-align:center;background-color:transparent;border:0px;" name="store_count" value="'+row.store_count+'"/>';
+      						var strHtml = '<input type="text" size="10" readonly style="text-align:center;background-color:transparent;border:0px;" name="store_count" value="'+row.store_count+'"/>';
       					}
       					return strHtml;
       				},
