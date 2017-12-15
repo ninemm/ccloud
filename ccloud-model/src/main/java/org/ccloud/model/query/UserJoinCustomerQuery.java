@@ -112,5 +112,10 @@ public class UserJoinCustomerQuery extends JBaseQuery {
 		}
 		return 0;
 	}
-
+	
+	public int customerCount(String dataArea) {
+		StringBuilder fromBuilder = new StringBuilder("select count(seller_customer_id) from cc_user_join_customer ");
+		fromBuilder.append("where data_area like '"+dataArea+"'");
+		return Db.queryInt(fromBuilder.toString());
+	}
 }

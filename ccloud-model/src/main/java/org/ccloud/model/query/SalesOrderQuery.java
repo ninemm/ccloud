@@ -795,5 +795,13 @@ public class SalesOrderQuery extends JBaseQuery {
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
+	
+	public int queryCountToDayOrders(String userId,String dataArea) {
+		StringBuilder fromBuilder = new StringBuilder(" select count(cso.order_sn) from cc_sales_order cso inner join `user` u on u.id = cso.biz_user_id ");
+		fromBuilder.append("where DATE_FORMAT(cso.create_date, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d') ");
+		//fromBuilder.append("and cso.biz_user_id <> '"+userId+"' ");
+		fromBuilder.append("and u.data_area like '"+dataArea+"' ");
+		return Db.queryInt(fromBuilder.toString());
+	}
 
 }

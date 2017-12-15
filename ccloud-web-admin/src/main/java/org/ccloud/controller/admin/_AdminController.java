@@ -33,6 +33,7 @@ import org.ccloud.model.User;
 import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SellerCustomerQuery;
+import org.ccloud.model.query.UserJoinCustomerQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
@@ -78,8 +79,11 @@ public class _AdminController extends JBaseController {
 			redirect("/admin/login");
 			return;
 		}
+		String selDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		setAttr("toDoCustomerList", SellerCustomerQuery.me().getToDo(user.getUsername()));
 		setAttr("toDoOrdersList", SalesOrderQuery.me().getToDo(user.getUsername()));
+		setAttr("orderCount", StrKit.notBlank(selDataArea)?SalesOrderQuery.me().queryCountToDayOrders(user.getId(), selDataArea):0);
+		setAttr("customerCount",StrKit.notBlank(selDataArea)?UserJoinCustomerQuery.me().customerCount(selDataArea):0);
 		render("index.html");
 	}
 	
