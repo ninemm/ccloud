@@ -374,7 +374,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		WorkFlowService workflowService = new WorkFlowService();
 		workflowService.completeTask(taskId, comment, var);
 
-		renderAjaxResultForSuccess("订单审核成功");
+		renderAjaxResultForSuccess("客户修改审核成功");
 	}
 	
 	public void cancel() {

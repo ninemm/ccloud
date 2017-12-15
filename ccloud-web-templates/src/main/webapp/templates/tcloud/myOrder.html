@@ -24,13 +24,9 @@
 	  items: [{
 	       title: "全部", value: ""
 	       },{
-	       title: "待审核", value: "0"
-	       },{
 	       title: "已审核", value: "1000"
 	       },{
 	       title: "订单取消", value: "1001"
-	       },{
-	       title: "订单拒绝", value: "1002"
 	       },{
 	       title: "部分出库", value: "2000"
 	       },{
@@ -140,18 +136,14 @@
 			return '已审核'
 		} else if (value == 1001) {
 			return '订单取消'
-		} else if (value == 1002) {
-			return '订单拒绝'
 		} else if (value == 2000) {
 			return '部分出库'
 		} else if (value == 2001) {
 			return '部分出库-订单关闭'
 		} else if (value == 3000) {
 			return '全部出库'
-		} else if (value == 3001) {
-			return '全部出库-订单关闭'
 		} 
-		return value
+		return '全部出库-订单关闭'
 	}
 	
 	

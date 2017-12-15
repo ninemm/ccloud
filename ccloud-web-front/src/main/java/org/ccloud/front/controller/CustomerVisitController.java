@@ -38,7 +38,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.beust.jcommander.internal.Lists;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
+
 import com.jfinal.plugin.activerecord.Record;
+import com.jfinal.plugin.activerecord.tx.Tx;
 import org.ccloud.workflow.service.WorkFlowService;
 import org.joda.time.DateTime;
 
@@ -263,17 +265,13 @@ public class CustomerVisitController extends BaseFrontController {
 	}
 
 	// 用户新增拜访保存
+	@Before(Tx.class)
 	public void save() {
-
 		 CustomerVisit customerVisit = getModel(CustomerVisit.class);
 		 User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
 		 List<ImageJson> list = Lists.newArrayList();
 		 String picJson = getPara("pic");
-//		 String userId = ShiroKit.getUserId();
-
-//		 customerVisit.setUserId(userId);
-
 		 customerVisit.setUserId(user.getId());
 		 customerVisit.setStatus(0);
 		 customerVisit.setDataArea(user.getDataArea());
@@ -310,6 +308,7 @@ public class CustomerVisitController extends BaseFrontController {
 		setAttr("deliveryDate", DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
 		render("customer_visit_add.html");
 	}
+	
 
 	public void complete() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
@@ -431,4 +430,5 @@ public class CustomerVisitController extends BaseFrontController {
 		}
 		return isUpdated;
 	}
+
 }

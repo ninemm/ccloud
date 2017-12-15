@@ -91,31 +91,4 @@ public class UserGroupRelQuery extends JBaseQuery {
 
 	}
 	
-	public List<String> findUserIdsByGroup(String groupCode, String userId) {
-
-		StringBuilder fromBuilder = new StringBuilder(" SELECT ugr.id ");
-		fromBuilder.append(" FROM `user` u ");
-		fromBuilder.append(" JOIN `user_group_rel` ugr ON u.id = ugr.user_id ");
-		fromBuilder.append(" JOIN `group` g ON ugr.group_id = g.id ");
-		fromBuilder.append(" AND LOCATE( ? , g.group_code) > 0 ");
-		fromBuilder.append(" WHERE u.id = ? ");
-
-		return Db.query(fromBuilder.toString(), groupCode, userId);
-	}
-	
-	public List<String> findUserNamesByRoleCode(String groupCode, String roleCode, String userIds) {
-
-		StringBuilder fromBuilder = new StringBuilder(" SELECT u.username ");
-		fromBuilder.append(" FROM `user` u ");
-		fromBuilder.append(" JOIN `user_group_rel` ugr ON u.id = ugr.user_id ");
-		fromBuilder.append(" JOIN `group` g ON ugr.group_id = g.id ");
-		fromBuilder.append(" AND LOCATE( ? , g.group_code) > 0 ");
-		fromBuilder.append(" JOIN `group_role_rel` grr ON g.id = grr.group_id ");
-		fromBuilder.append(" JOIN role r ON grr.role_id = r.id ");
-		fromBuilder.append(" WHERE r.role_code = ? ");
-		fromBuilder.append(" AND FIND_IN_SET(u.id, ?) ");
-
-		return Db.query(fromBuilder.toString(), groupCode, roleCode, userIds);
-	}
-	
 }

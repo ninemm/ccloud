@@ -46,6 +46,7 @@
             $("#customer_name").val(customerInfo.customerName);
             $("#contact").val(customerInfo.contact);
             $("#mobile").val(customerInfo.mobile);
+            removeItemBykey("customerInfo");
         }
     }
 
@@ -162,16 +163,14 @@
     });
 
     function doSubmit(){
-        $("#location").val($("location-span").html());
-
         $.ajax({
             url: '${CPATH}/customerVisit/save',
             method: 'post',
             dataType: 'json',
             data: $form.serialize(),
             beforeSend: function(){
-                if($("#problem_id").val().length==0) {$.toptip('问题类型不能为空', 1000, 'error');return false;}
-                if($("#question_desc").val().length==0) {$.toptip('备注描述不能为空', 1000, 'error');return false;}
+                if($("#problem_id").val().length==0) {$.toptip('问题类型不能为空', 3000, 'error');return false;}
+                if($("#question_desc").val().length==0) {$.toptip('备注描述不能为空', 3000, 'error');return false;}
                 $('._submit_btn').attr('disabled', true);
                 layer.open({
                     type: 2,
@@ -179,12 +178,15 @@
                 });
             },
             success: function(res) {
+                console.log(res.errorCode);
+                layer.closeAll();
+
                 if (res.errorCode == 0) {
                     $.confirm({
                         title: res.message,
                         text: '返回列表页？',
                         onOK: function () {
-                            location.href = '${CPATH}/user/center'
+                            location.href = '${CPATH}/customerVisit/index'
                         },
                         onCancel: function () {
                             $.closeModal();
@@ -193,6 +195,8 @@
                 } else {
                     $.alert(res.message);
                 }
+            },
+            error: function(res) {
                 layer.closeAll();
             }
         });
@@ -364,7 +368,15 @@
 
     <include "_inc/_goback.html" />
     <footer class="weui-footer weui-footer_fixed-bottom ft16">
+<<<<<<< HEAD
+<<<<<<< HEAD
+        <a href="javascript:void(0)" class="blue-button width-100 _submit_btn" onclick="doSubmit()" href="">提交</a>
+=======
         <a href = "javascript:void(0)" class="blue-button width-100 _submit_btn" onclick="doSubmit()" href="">提交</a>
+>>>>>>> refs/heads/dev
+=======
+        <a href="javascript:void(0)" class="blue-button width-100 _submit_btn" onclick="doSubmit()" href="">提交</a>
+>>>>>>> branch 'jiashiyu' of https://gitee.com/antrace_047/ccloud.git
     </footer>
 
 </div>

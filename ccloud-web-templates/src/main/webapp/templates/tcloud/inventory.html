@@ -33,7 +33,7 @@
 
     function initMenuData(){
         $.ajax({
-        url:"${CPATH}/user/appLoadRegionAndProductType",
+        url:"${CPATH}/inventory/appLoadRegionAndProductType",
         type:"post",
         dataType:"json",
         data:{"goodsType":goodsType,"queryType":"All"},
@@ -89,7 +89,7 @@
         pageNumber++;
         $.ajax({
             type: "post",
-            url: "${CPATH}/user/appLoadFollowUpData",
+            url: "${CPATH}/inventory/appLoadFollowUpData",
             data: paramData(),
             dataType: "json",
             success:function(result) {
@@ -114,7 +114,7 @@
         $('#products ul li').removeClass("active");
         $($product).addClass("active");
         $.ajax({
-            url:"${CPATH}/user/appLoadRegionAndProductType",
+            url:"${CPATH}/inventory/appLoadRegionAndProductType",
             type:"post",
             dataType:"json",
             data:{"goodsType":goodsType,"queryType":"productType"},
@@ -131,7 +131,7 @@
 
     function loadInventoryDetail(){
         $.ajax({
-        url: '${CPATH}/user/appLoadFollowUpData',
+        url: '${CPATH}/inventory/appLoadFollowUpData',
         type: 'post',
         data:paramData(),
         success: function (result) {
