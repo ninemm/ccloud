@@ -84,6 +84,7 @@ public class SellerProductQuery extends JBaseQuery {
 		String select = "SELECT csp.id,csp.product_id,csp.bar_code,csp.qrcode_url,cgc.name as cgc_name,cp.name as productName, csp.custom_name,csp.store_count,csp.price,cp.big_unit,cp.small_unit,cp.convert_relate,csp.is_enable, csp.order_list ,GROUP_CONCAT(distinct cgs.`name`) AS cps_name";
 		StringBuilder fromBuilder = new StringBuilder("from cc_seller_product csp LEFT JOIN cc_product cp ON  csp.product_id = cp.id LEFT JOIN cc_product_goods_specification_value cpg ON  cp.id = cpg.product_set_id "
 				+ " LEFT JOIN cc_goods_specification_value cgs ON cpg.goods_specification_value_set_id = cgs.id "
+				+ " LEFT JOIN cc_goods_specification css on css.id = cgs.goods_specification_id "
 				+ " LEFT JOIN cc_seller cs on cs.id=csp.seller_id"
 				+ " LEFT JOIN user u on u.department_id =cs.dept_id "
 				+ " LEFT JOIN cc_goods cg on cg.id = cp.goods_id "
@@ -95,7 +96,7 @@ public class SellerProductQuery extends JBaseQuery {
 		}else{
 			fromBuilder.append(" where  cs.is_enabled=1 and u.id='"+userId+"' ");
 		}
-		fromBuilder.append(" GROUP BY csp.id ORDER BY csp.is_enable desc,csp.order_list ");
+		fromBuilder.append(" GROUP BY csp.id ORDER BY csp.is_enable desc,csp.order_list,cgs.name,css.name ");
 		
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
