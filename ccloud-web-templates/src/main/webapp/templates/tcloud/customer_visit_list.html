@@ -1,13 +1,26 @@
 <#include "_inc/_layout.html"/>
-<#macro css> </#macro>
-<#macro script>
-    $(function () {
-        var pageNumber = 2;
-        var pageSize = 10;
-        var loading = false;
+<#macro css>
+    .t-c {
+    background: #35b8f0;
+    font-size: .8rem;
+    color: #fff;
+    }
 
-        var $endNode = null;
-        var $loadmore = $(".weui-loadmore");
+    #visit-record header, #activity-list header {
+    height: 2rem;
+    line-height: 2rem;
+    margin: 0;
+    color: #fff;
+    }
+</#macro>
+<#macro script>
+    var pageNumber = 2;
+    var pageSize = 10;
+    var loading = false;
+
+    var $endNode = null;
+    var $loadmore = $(".weui-loadmore");
+    $(function () {
         $.ajax({
             url:"${CPATH}/customerVisit/getSelect",
             type:"post",
@@ -41,7 +54,7 @@
 
     $(".infinite").infinite().on("infinite", function() {
         var self = this;
-        $endNode = $(".weui-panel_access:last");
+        $endNode = $(".weui-cell_access:last");
         $loadmore = $(self).find(".weui-loadmore");
         if ($loadmore) $loadmore.show();
         if (loading) return ;
@@ -96,18 +109,23 @@
 </#macro>
 <@layout>
 <body id="visit-record">
+<#if id??>
+    <header class="t-c">
+    ${(name)!}
+    </header>
+</#if>
 <header>
     <div class="head-search select-area">
         <div>
-            <input type="text" id="customer-type" placeholder="客户类型" class="weui-input" readonly>
+            <input type="text" id="customer-type" placeholder="客户类型" class="weui-input" readonly onchange="refresh()">
             <i class="icon-sort-desc"></i>
         </div>
         <div>
-            <input type="text" id="customer-nature" placeholder="客户性质" class="weui-input" readonly>
+            <input type="text" id="customer-nature" placeholder="客户性质" class="weui-input" readonly onchange="refresh()">
             <i class="icon-sort-desc"></i>
         </div>
         <div>
-            <input type="text" id="customer-level" placeholder="客户级别" class="weui-input" readonly>
+            <input type="text" id="customer-level" placeholder="客户级别" class="weui-input" readonly onchange="refresh()">
             <i class="icon-sort-desc"></i>
         </div>
     </div>
@@ -144,8 +162,10 @@
     </#if>
 </main>
 <#include "_inc/_goback.html" />
+<#if !id??>
 <footer class="weui-footer weui-footer_fixed-bottom">
     <a href="${(CPATH)!}/customerVisit/visitAdd" class="place-order bg-blue white width-100">添加拜访</a>
 </footer>
+</#if>
 </body>
 </@layout>

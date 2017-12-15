@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
@@ -59,6 +60,7 @@ import com.jfinal.plugin.activerecord.tx.Tx;
 @RouterMapping(url = "/admin/purchaseRefundOutstock", viewPath = "/WEB-INF/admin/purchase_refund_outstock")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
+@RequiresPermissions("/admin/purchaseRefundOutstock")
 public class _PurchaseRefundOutstockController extends JBaseCRUDController<PurchaseRefundOutstock> { 
 
 	@Override
@@ -168,10 +170,10 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 		purchaseRefundOutstock.set("data_area", user.getDataArea());
 		String productNumStr = StringUtils.getArrayFirst(paraMap.get("productNum"));
 		Integer productNum = Integer.valueOf(productNumStr);
-		Integer count = 0;
+		
 		Integer index = 0;
 
-		while (productNum > count) {
+		for (Integer count = 0;count<productNum;count++) {
 			index++;
 			String purchaseInstockDetailId = StringUtils.getArrayFirst(paraMap.get("purchaseInstockDetailId" + index));
 			PurchaseInstockDetail purchaseInstockDetail = PurchaseInstockDetailQuery.me().findById(purchaseInstockDetailId);
@@ -205,7 +207,7 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 				purchaseRefundOutstockDetail.set("dept_id", user.getDepartmentId());
 				purchaseRefundOutstockDetail.set("data_area", user.getDataArea());
 				purchaseRefundOutstockDetail.save();
-				count++;
+				
 			}
 
 		}
@@ -231,6 +233,7 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 
 	}
 	//审核通过，对库存总账进行修改
+	@Before(Tx.class)
 	public void pass(){
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		Seller seller = SellerQuery.me().findById(getSessionAttr("sellerId").toString());

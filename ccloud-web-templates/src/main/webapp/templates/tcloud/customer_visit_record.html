@@ -1,0 +1,219 @@
+<#include "_inc/_layout.html"/>
+<#macro css> </#macro>
+<#macro script_import>
+</#macro>
+<#macro script>
+    var pageNumber = 1;
+    var pageSize = 10;
+    var loading = false;
+
+    var $endNode = null;
+    var $loadmore = $(".weui-loadmore");
+
+    var customerTypeSelect = [];
+    var customerLevelSelect = [];
+    $(function(){
+        initData();
+        $("#customer-type").select({
+            title: "请选择客户类型",
+            multi: false,
+            items: customerTypeSelect,
+            onClose: function(obj) {
+                var typeId = obj.data.values;
+                if(typeId){
+                    $("#customerType_id").val(typeId);
+                }
+            }
+        });
+
+        $("#customer-nature").select({
+            title: "请选择客户性质",
+            multi: false,
+            items: [],
+            onClose: function(obj) {
+                var level = obj.data.values;
+                if(level){
+                    $("#customerLevel_id").val(level);
+                }
+            }
+        });
+
+        $("#customer-level").select({
+            title: "请选择客户级别",
+            multi: false,
+            items: customerLevelSelect,
+            onClose: function(obj) {
+                var level = obj.data.values;
+                if(level){
+                    $("#customerNature_id").val(level);
+                }
+            }
+        });
+    });
+
+
+    function initData(){
+        var customerTypeData = JSON.parse('${typeList}');
+        var customerLevel = JSON.parse('${customerLevel}');
+        var typeList = [];
+        for(var i in customerTypeData){
+            typeList.push(customerTypeData[i].columns);
+        }
+
+        for(var j in typeList){
+            var customerTypeTemp = {};
+            customerTypeTemp.title = customerTypeData[j].title;
+            customerTypeTemp.value = customerTypeData[j].value;
+            customerTypeSelect.push(customerTypeTemp);
+        }
+
+        for(var k in customerLevel){
+            var levelTemp = {};
+            levelTemp.title = customerLevel[k].title;
+            levelTemp.value = customerLevel[k].value;
+            customerLevelSelect.push(levelTemp);
+        }
+    }
+
+
+    var paramData = function() {
+        return  {
+            "pageNumber": pageNumber,
+            "pageSize": pageSize,
+            "customerLevel": $("#customer-level")[0].dataset.values,
+            "customerType": $("#customer-type")[0].dataset.values,
+            "customerNature": ""
+        };
+    }
+
+    //监听滚动
+    $(".infinite").infinite().on("infinite", function() {
+        var self = this;
+        $endNode = $(".weui-cell_access:last");
+        $loadmore = $(self).find(".weui-loadmore");
+        if ($loadmore) $loadmore.show();
+        if (loading) return ;
+        loading = true;
+        pageNumber++;
+        $.ajax({
+            type: "post",
+            url: "${CPATH}/customerVisit/loadVisitRecord",
+            data: paramData(),
+            dataType: "json",
+            success:function(data) {
+                if ($loadmore) $loadmore.show();
+                if (data.totalPage >= pageNumber) {
+                    $endNode.after(data.recordHtml);
+                }
+                if (data.totalPage == pageNumber) {
+                    $(".infinite").destroyInfinite();
+                    $loadmore.hide();
+                }
+                loading = false;
+            }
+        });
+    });
+
+
+    function refresh() {
+        $.ajax({
+            url:"${CPATH}/customerVisit/loadVisitRecord",
+            type:"post",
+            data:paramData(),
+            dataType:"json",
+            success:function(data) {
+                $loadmore = $(this).find(".weui-loadmore");
+                $(".infinite").destroyInfinite();
+                $loadmore.hide();
+
+                if (data.totalPage > pageNumber) {
+                    loading = false;
+                    $(".infinite").infinite();
+                    $(".weui-loadmore").removeAttr("style");
+                }
+
+                $(".infinite")[0].scrollTop = 0;
+                $("#visitList").empty();
+                $("#visitList").html(data.recordHtml);
+
+            }
+        });
+    }
+
+    $(".weui-cell_access").on("click",function(){
+        var $visit = this;
+        var visitId = $(this).find("#visitId").text();
+        setItemBykey("visitId", visitId);
+        window.location.href="${CPATH}/customerVisit/loadVisitDetail";
+    });
+
+</#macro>
+
+<@layout>
+<div id="visit-record">
+    <article class="visit-record">
+        <header class="has-th-list weui-flex">
+            <div class="head-search select-area weui-flex__item">
+                <div class="weui-flex">
+                    <div class="weui-flex__item">
+                        <input type="hidden" id="customerType_id" name="customerType_id" />
+                        <input type="text" id="customer-type" placeholder="客户类型" class="weui-input" readonly onchange="refresh()">
+                        <i class="icon-sort-desc"></i>
+                    </div>
+                    <div class="weui-flex__item">
+                        <input type="hidden" id="customerNature_id" name="customerNature_id" />
+                        <input type="text" id="customer-nature" placeholder="客户性质" class="weui-input" readonly onchange="refresh()">
+                        <i class="icon-sort-desc"></i>
+                    </div>
+                    <div class="weui-flex__item">
+                        <input type="hidden" id="customerLevel_id" name="customerLevel_id" />
+                        <input type="text" id="customer-level" placeholder="客户级别" class="weui-input" readonly onchange="refresh()">
+                        <i class="icon-sort-desc"></i>
+                    </div>
+                </div>
+            </div>
+            <div id="combin-filter-btn">
+                <i class="icon-th-list"></i>
+            </div>
+        </header>
+        <article  class="infinite">
+            <div id = "visitList">
+                <#if visitList??>
+                    <#list visitList.list as visit>
+                        <a class="weui-cell weui-cell_access">
+                            <p id="visitId" hidden="hidden">${(visit.id)!}</p>
+                            <div class="weui-cell__bd ft14">
+                                <p>${(visit.customer_name)!}</p>
+                                <p class="gray ft12">${(visit.contact)!}/${(visit.mobile)!}
+                                    <span class="fr">${(visit.create_date)!}</span>
+                                </p>
+                                <p>活动类型：
+                                    <span class="orange">${(visit.questionType)!}</span>
+                                    <span class="green fr">${(visit.visitStatus)!}</span>
+                                </p>
+                            </div>
+                            <span class="weui-cell__ft"></span>
+                        </a>
+                    </#list>
+                </#if>
+            </div>
+            <#if visitList??>
+                <#if visitList.totalRow = 0>
+                    <div class="weui-loadmore weui-loadmore_line">
+                        <span class="weui-loadmore__tips">暂无数据</span>
+                    </div>
+                <#elseif visitList.totalRow &gt; 10>
+                    <div class="weui-loadmore">
+                        <i class="weui-loading"></i>
+                        <span class="weui-loadmore__tips">正在加载</span>
+                    </div>
+                </#if>
+            </#if>
+        </article>
+    </article>
+</div>
+<a class="hidden-menu" href="${CPATH}/customerVisit/visitAdd">
+    <img src="${CTPATH}/images/customer_add.png" alt="">
+</a>
+<div class="layer"></div>
+</@layout>

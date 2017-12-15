@@ -76,7 +76,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
-	public Page<Record> paginateForApp(int pageNumber, int pageSize, String type, String nature, String subType, String dataArea) {
+	public Page<Record> paginateForApp(int pageNumber, int pageSize, String id, String type, String nature, String subType, String dataArea) {
 
 		boolean needwhere = true;
 		List<Object> params = new LinkedList<Object>();
@@ -87,9 +87,10 @@ public class CustomerVisitQuery extends JBaseQuery {
 		sql.append("LEFT JOIN cc_customer cc ON csc.customer_id = cc.id ");
 		sql.append("LEFT JOIN cc_customer_join_customer_type ccjct ON csc.id = ccjct.seller_customer_id ");
 
-		appendIfNotEmptyWithLike(sql, "ccv.data_area", dataArea, params, needwhere);
-		appendIfNotEmpty(sql, "ccjct.customer_type_id", type, params, needwhere);
-		appendIfNotEmpty(sql, "csc.sub_type", subType, params, needwhere);
+		needwhere = appendIfNotEmptyWithLike(sql, "ccv.data_area", dataArea, params, needwhere);
+		needwhere = appendIfNotEmpty(sql, "ccjct.customer_type_id", type, params, needwhere);
+		needwhere = appendIfNotEmpty(sql, "csc.sub_type", subType, params, needwhere);
+		needwhere = appendIfNotEmpty(sql,"csc.id", id, params, needwhere);
 
 		sql.append("ORDER BY ccv.`status`, ccv.create_date desc");
 		return Db.paginate(pageNumber, pageSize,select ,sql.toString(), params.toArray());
@@ -132,4 +133,26 @@ public class CustomerVisitQuery extends JBaseQuery {
 		
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), username);
 	}
+	
+	public Page<Record> queryVisitRecord(int pageNumber, int pageSize,String customerLevel,String customerType,String customerNature,String userId){
+		String select = "select ccv.id,ccv.create_date,cc.customer_name,cc.contact,cc.mobile,d.`name` questionType,if(ccv.`status`>0,'已审核','未审核') visitStatus ";
+		StringBuilder fromBuilder = new StringBuilder("from cc_customer_visit ccv left join cc_seller_customer csc on ccv.seller_customer_id = csc.id left join cc_customer cc on csc.customer_id = cc.id left join dict d on ccv.question_type = d.id ");
+		fromBuilder.append("left join cc_customer_join_customer_type cjct on cjct.seller_customer_id = ccv.seller_customer_id inner join cc_customer_type cct on cjct.customer_type_id = cct.id ");
+		LinkedList<Object> params = new LinkedList<Object>();
+		appendIfNotEmpty(fromBuilder, "ccv.user_id", userId, params, true);
+		appendIfNotEmpty(fromBuilder, "csc.sub_type", customerLevel, params, false);
+		appendIfNotEmpty(fromBuilder, "cct.id", customerType, params, false);
+		fromBuilder.append("ORDER BY ccv.create_date desc ");
+		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+	
+	public Record queryVisitDetail(String userId,String visitId) {
+		StringBuilder fromBuilder = new StringBuilder("select ccv.id,ccv.create_date,cc.customer_name,cc.contact,cc.mobile,ccv.photo picurl,d.`name` questionType,ccv.question_desc questionDesc,ccv.location ");
+		fromBuilder.append("from cc_customer_visit ccv left join cc_seller_customer csc on ccv.seller_customer_id = csc.id left join cc_customer cc on csc.customer_id = cc.id left join dict d on ccv.question_type = d.id ");
+		fromBuilder.append("left join cc_customer_join_customer_type cjct on cjct.seller_customer_id = ccv.seller_customer_id inner join cc_customer_type cct on cjct.customer_type_id = cct.id ");
+		fromBuilder.append("where ccv.user_id ='"+userId+"' ");
+		fromBuilder.append("and ccv.id =? ");
+		return Db.findFirst(fromBuilder.toString(), visitId);
+	}
+	
 }

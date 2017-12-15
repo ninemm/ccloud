@@ -48,7 +48,7 @@ public class CustomerTypeQuery extends JBaseQuery {
 	public Record findMoreById(final String id) {
 		StringBuilder fromBuilder = new StringBuilder(" select ");
 		fromBuilder.append(
-				" c.id, c.name, c.code, c.price_system_id, p.name as price_system_name, c.dept_id, c.data_area, d.dept_name ");
+				" c.id, c.name, c.code, c.price_system_id, p.name as price_system_name,c.proc_def_key, c.dept_id, c.data_area, d.dept_name ");
 		fromBuilder.append(" from `cc_customer_type` c left join `cc_price_system` p on c.price_system_id = p.id ");
 		fromBuilder.append(" left join department d on c.dept_id = d.id ");
 		fromBuilder.append(" where c.id = ? ");

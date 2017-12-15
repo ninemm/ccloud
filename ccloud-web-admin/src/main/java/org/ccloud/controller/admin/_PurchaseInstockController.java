@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
@@ -66,6 +67,7 @@ import com.jfinal.plugin.activerecord.tx.Tx;
 @RouterMapping(url = "/admin/purchaseInstock", viewPath = "/WEB-INF/admin/purchase_instock")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
+@RequiresPermissions("/admin/purchaseInstock")
 public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInstock> { 
 	
 	@Override
@@ -194,8 +196,7 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 		purchaseInstock.set("modify_date", new Date());
 		String productNumStr = StringUtils.getArrayFirst(paraMap.get("productNum"));
 		Integer productNum = Integer.valueOf(productNumStr);
-		Integer count = 0;
-		Integer index = 0;
+		
 		BigDecimal totalAmount = new BigDecimal(0);
 		Set<String> set = new HashSet<String>();
 		for(int i = 1;i<=productNum;i++){
@@ -213,8 +214,6 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 				Integer productCount0 = Integer.valueOf(bN) * Integer.valueOf(convert) + Integer.valueOf(sN);
 				if(purchaseOederDetailId.equals(pid)){
 					productCount += productCount0;
-				}else{
-					break;
 				}
 			}
 			PurchaseOrderDetail purchaseOrderDetail = PurchaseOrderDetailQuery.me().findById(pid);
@@ -224,7 +223,8 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 			}
 		}
 		
-		while (productNum > count) {
+		Integer index = 0;
+		for (Integer count = 0;count<productNum;count++) {
 			index++;
 			String sellerProductId = StringUtils.getArrayFirst(paraMap.get("sellerProductId"+index));
 			for(int i = 0;i<instockDetails.size();i++){
@@ -240,14 +240,13 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 				String bN = StringUtils.getArrayFirst(paraMap.get("bN" + index));
 				String sN = StringUtils.getArrayFirst(paraMap.get("sN" + index));
 				Integer productCount0 = Integer.valueOf(bN) * Integer.valueOf(convert) + Integer.valueOf(sN);
-				BigDecimal productAmount =  purchaseOrderDetail.getProductPrice().multiply(new BigDecimal(bN)).add((purchaseOrderDetail.getProductPrice().divide((new BigDecimal(convert)), 2, BigDecimal.ROUND_HALF_UP))).multiply(new BigDecimal(sN));
+				BigDecimal productAmount =  (purchaseOrderDetail.getProductPrice().multiply(new BigDecimal(bN))).add(((purchaseOrderDetail.getProductPrice().divide((new BigDecimal(convert)), 2, BigDecimal.ROUND_HALF_UP))).multiply(new BigDecimal(sN)));
 				purchaseInstockDetail.set("product_count", productCount0);
 				purchaseInstockDetail.set("product_amount", productAmount);
 				purchaseInstockDetail.set("modify_date", new Date());
 				purchaseInstockDetail.update();
-				purchaseOrder.set("status", 4000);
+				purchaseOrder.set("status", 3000);
 				purchaseOrder.update();
-				count++;
 				totalAmount = totalAmount.add(productAmount);
 			}
 		}

@@ -38,7 +38,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.beust.jcommander.internal.Lists;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
+
 import com.jfinal.plugin.activerecord.Record;
+import com.jfinal.plugin.activerecord.tx.Tx;
 import org.ccloud.workflow.service.WorkFlowService;
 import org.joda.time.DateTime;
 
@@ -51,10 +53,13 @@ public class CustomerVisitController extends BaseFrontController {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 //		String userId = ShiroKit.getUserId();
 
-		Page<Record> visitList = CustomerVisitQuery.me().paginateForApp(getPageNumber(), getPageSize(), getPara("type"), getPara("nature"), getPara("subType"), DataAreaUtil.getUserDeptDataArea(user.getDataArea()));
+		Page<Record> visitList = CustomerVisitQuery.me().paginateForApp(getPageNumber(), getPageSize(), getPara("id"), getPara("type"), getPara("nature"), getPara("subType"), DataAreaUtil.getUserDeptDataArea(user.getDataArea()));
 
 		transform(visitList.getList());
-
+		if(StrKit.notBlank(getPara("id"))) {
+			setAttr("id", getPara("id"));
+			setAttr("name", getPara("name"));
+		}
 		setAttr("visitList", visitList);
 		render("customer_visit_list.html");
 	}
@@ -100,7 +105,7 @@ public class CustomerVisitController extends BaseFrontController {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
 		Page<Record> visitList = new Page<>();
-		visitList = CustomerVisitQuery.me().paginateForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("type"), getPara("nature"), getPara("subType"), DataAreaUtil.getUserDeptDataArea(user.getDataArea()));
+		visitList = CustomerVisitQuery.me().paginateForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("id"), getPara("type"), getPara("nature"), getPara("subType"), DataAreaUtil.getUserDeptDataArea(user.getDataArea()));
 		transform(visitList.getList());
 
 		StringBuilder html = new StringBuilder();
@@ -108,8 +113,7 @@ public class CustomerVisitController extends BaseFrontController {
 		{
 			html.append("<a class=\"weui-cell weui-cell_access\" href=\"/customerVisit/detail?id=" + visit.getStr("id") + "\">\n" +
 					"                <div class=\"weui-cell__bd ft14\">\n" +
-					"                    <p>${(visit.customer_name)!}</p>\n" +
-					"                    <p>${(visit.customer_name)!}</p>\n" +
+					"                    <p>" + visit.getStr("customer_name") + "</p>\n" +
 					"                    <p class=\"gray ft12\">" + visit.getStr("contact") + "/" + visit.getStr("mobile") + "\n" +
 					"                        <span class=\"fr\">" + visit.get("create_date").toString() + "</span>\n" +
 					"                    </p>\n" +
@@ -263,17 +267,13 @@ public class CustomerVisitController extends BaseFrontController {
 	}
 
 	// 用户新增拜访保存
+	@Before(Tx.class)
 	public void save() {
-
 		 CustomerVisit customerVisit = getModel(CustomerVisit.class);
 		 User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
 		 List<ImageJson> list = Lists.newArrayList();
 		 String picJson = getPara("pic");
-//		 String userId = ShiroKit.getUserId();
-
-//		 customerVisit.setUserId(userId);
-
 		 customerVisit.setUserId(user.getId());
 		 customerVisit.setStatus(0);
 		 customerVisit.setDataArea(user.getDataArea());
@@ -310,6 +310,7 @@ public class CustomerVisitController extends BaseFrontController {
 		setAttr("deliveryDate", DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
 		render("customer_visit_add.html");
 	}
+	
 
 	public void complete() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
@@ -431,4 +432,5 @@ public class CustomerVisitController extends BaseFrontController {
 		}
 		return isUpdated;
 	}
+
 }
