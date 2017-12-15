@@ -357,11 +357,14 @@ public class SalesOrderQuery extends JBaseQuery {
 	
 	public List<SalesOrder> getToDo(String username) {
 		StringBuilder sb = new StringBuilder();
-		sb.append("SELECT o.*, a.ID_ taskId, a.NAME_ taskName, a.ASSIGNEE_ assignee, a.CREATE_TIME_ createTime");
-		sb.append(" FROM cc_sales_order o");
-		sb.append(" JOIN act_ru_task a on o.proc_inst_id = a.PROC_INST_ID_");
-		sb.append(" JOIN act_ru_identitylink u on o.proc_inst_id = u.PROC_INST_ID_");
-		sb.append(" where locate(?, u.USER_ID_) > 0");
+		sb.append(" SELECT o.*, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, a.ID_ taskId, a.NAME_ taskName, a.ASSIGNEE_ assignee, a.CREATE_TIME_ createTime ");
+		sb.append(" FROM cc_sales_order o ");
+		sb.append(" left join cc_seller_customer cc ON o.customer_id = cc.id ");
+		sb.append(" left join cc_customer c on cc.customer_id = c.id ");
+		sb.append(" left join cc_customer_type ct on o.customer_type_id = ct.id ");
+		sb.append(" JOIN act_ru_task a on o.proc_inst_id = a.PROC_INST_ID_ ");
+		sb.append(" JOIN act_ru_identitylink u on o.proc_inst_id = u.PROC_INST_ID_ ");
+		sb.append(" where locate(?, u.USER_ID_) > 0 ");
 		return DAO.find(sb.toString(), username);
 	}	
 

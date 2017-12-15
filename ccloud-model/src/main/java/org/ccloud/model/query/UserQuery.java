@@ -258,4 +258,16 @@ public class UserQuery extends JBaseQuery {
 		List<Record> list = Db.find(fromBuilder.toString(), userId, data);
 		return list;
 	}
+	
+	public List<String> findUserIdsByDeptDataArea(String dataArea) {
+
+		StringBuilder fromBuilder = new StringBuilder(" SELECT u.username ");
+		fromBuilder.append(" FROM department d ");
+		fromBuilder.append(" JOIN `user u ON d.id = u.department_id ");
+		fromBuilder.append(" WHERE d.data_area = ? ");
+
+		return Db.query(fromBuilder.toString(), dataArea);
+	}
+	
+	
 }
