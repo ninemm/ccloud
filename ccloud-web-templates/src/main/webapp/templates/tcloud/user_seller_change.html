@@ -1,0 +1,82 @@
+<#include "_inc/_layout.html"/>
+
+<#macro script_import>
+    <script src="${CPATH}/static/layer_mobile/layer.js"></script>
+</#macro>
+
+<#macro script>
+$(function() {
+    $('.weui-check').click(function() {
+        console.log($(this).val());
+        var sellerId = $(this).val();
+        var openid = '${(session._logined_user.wechatOpenId)!}';
+        console.log(openid)
+        $.confirm({
+            title: '账号切换',
+            text: '确定切换账号吗',
+            onOK: function () {
+                layer.open({
+                    type: 2,
+                    content: '保存中...'
+                });
+                $.ajax({
+                    url: '${CPATH}/user/change',
+                    data: {openid: openid, sellerId: sellerId},
+                    dataType: 'json',
+                    type: 'post',
+                    success: function(res) {
+                        if (res.errorCode == 0) {
+                            location.href = '${CPATH}/'
+                        } else {
+                            $.alert(res.message);
+                        }
+                        layer.closeAll();
+                    },
+                    error: function(res) {
+                        layer.closeAll();
+                    }
+                });
+                //layer.closeAll();
+                //location.href = '${CPATH}/customer'
+            },
+            onCancel: function () {
+                $.closeModal();
+            }
+        });
+        
+    });
+    
+});
+</#macro>
+
+<@layout>
+<div class="weui-content">
+	<div class="weui-cells__title">我的账套</div>
+	<div class="weui-cells weui-cells_radio">
+	    <#if (session.sellerList)??>
+	    <#list session.sellerList as bean>
+		<label class="weui-cell weui-check__label">
+			<div class="weui-cell__bd">
+				<p>${(bean.seller_name)!}</p>
+			</div>
+			<div class="weui-cell__ft">
+				<input type="radio" class="weui-check" name="sellerId" value="${bean.seller_id}" <#if (bean.seller_id = session.sellerId)>checked="checked"</#if> >
+				<span class="weui-icon-checked"></span>
+			</div>
+		</label>
+		</#list>
+		</#if>
+		<!-- <label class="weui-cell weui-check__label" for="x12">
+			<div class="weui-cell__bd">
+				<p>咏梅</p>
+			</div>
+			<div class="weui-cell__ft">
+				<input type="radio" name="radio1" class="weui-check" id="x12"
+					checked="checked"> <span class="weui-icon-checked"></span>
+			</div>
+		</label> -->
+	</div>
+	<#include "_inc/_goback.html" />
+</div>
+
+</@layout>

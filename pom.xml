@@ -64,6 +64,7 @@
 		<activiti.version>5.21.0</activiti.version>
 
 		<easypoi.version>3.0.3</easypoi.version>
+		<hutool.version>3.2.3</hutool.version>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -258,6 +259,12 @@
 				<groupId>cn.afterturn</groupId>
 				<artifactId>easypoi-annotation</artifactId>
 				<version>${easypoi.version}</version>
+			</dependency>
+			
+			<dependency>
+			    <groupId>com.xiaoleilu</groupId>
+			    <artifactId>hutool-all</artifactId>
+			    <version>${hutool.version}</version>
 			</dependency>
 
 		</dependencies>
