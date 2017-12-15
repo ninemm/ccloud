@@ -87,7 +87,11 @@ function reply(id){
 			<!-- small box -->
 			<div class="small-box bg-aqua">
 				<div class="inner">
-					<h3>150</h3>
+					<#if (orderCount??)>
+						<h3>${orderCount!}</h3>
+					<#else>
+						<h3>0</h3>
+					</#if>
 					<p>今日订单</p>
 				</div>
 				<div class="icon">
@@ -115,7 +119,11 @@ function reply(id){
 			<!-- small box -->
 			<div class="small-box bg-yellow">
 				<div class="inner">
-					<h3>44</h3>
+					<#if (customerCount??)>
+						<h3>${customerCount!}</h3>
+						<#else>
+							<h3>0</h3>
+					</#if>
 					<p>客户总数</p>
 				</div>
 				<div class="icon">

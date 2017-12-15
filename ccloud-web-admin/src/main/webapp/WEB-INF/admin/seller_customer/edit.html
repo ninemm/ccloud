@@ -323,7 +323,7 @@
                     </div>
                     <div class="col-sm-5 validata-box">
                         <label class="control-label col-sm-4">客户类型:</label>
-                        <div class="input-group col-sm-8" style="float:right; width:64%;">
+                        <div class="input-group col-sm-7" >
                             <select class="form-control input-sm" name="customerTypes" id ="customerTypes" multiple="multiple" >
 	                            <#list (customerTypeList)! as customerType>
 	                                <option value="${customerType.id}" <#if cTypeList??&&cTypeList?contains(customerType.id)>selected="selected"</#if>>${(customerType.name)!}</option>

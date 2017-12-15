@@ -5,6 +5,7 @@ import org.activiti.engine.delegate.ExecutionListener;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.CustomerVisit;
+import org.ccloud.model.Message;
 import org.ccloud.model.WxMessageTemplate;
 import org.ccloud.model.query.SellerCustomerQuery;
 import org.ccloud.model.query.WxMessageTemplateQuery;
@@ -51,6 +52,8 @@ public class CustomerVisitExecutionListener implements ExecutionListener {
 
 					MessageKit.sendMessage(Actions.NotifyMessage.CUSTOMER_VISIT_AUDIT_MESSAGE, kv);
 				} else {
+					Message message = (Message) execution.getVariable("message");
+					message.saveOrUpdate();
 					// 记录正常的消息
 				}
 			}
