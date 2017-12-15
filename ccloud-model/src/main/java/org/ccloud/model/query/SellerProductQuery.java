@@ -103,12 +103,12 @@ public class SellerProductQuery extends JBaseQuery {
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 	
-	public List<SellerProduct> findBySellerId(String sellId) {
+	public List<SellerProduct> findBySellerId(String sellerId) {
  		StringBuilder fromBuilder = new StringBuilder("select cg.*,t1.valueName from cc_seller_product cg ");
 		fromBuilder.append("LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
 		fromBuilder.append("RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = cg.product_id ");
 		fromBuilder.append("WHERE cg.seller_id = ? ");
-		return DAO.find(fromBuilder.toString(), sellId);
+		return DAO.find(fromBuilder.toString(), sellerId);
 	}
 
 	public List<SellerProduct> findByProductIdAndSellerId(String seller_product_id, String sellerId) {
@@ -200,5 +200,13 @@ public class SellerProductQuery extends JBaseQuery {
 		sellerProduct.set("create_date", date);
 		sellerProduct.save();
 		return sellerProduct;
+	}
+	
+	public List<SellerProduct> findBySellerIdAndIsEnable(String sellerId){
+		StringBuilder fromBuilder = new StringBuilder("select cg.*,t1.valueName from cc_seller_product cg ");
+		fromBuilder.append("LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
+		fromBuilder.append("RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = cg.product_id ");
+		fromBuilder.append("WHERE cg.seller_id = ? and cg.is_enable = 1");
+		return DAO.find(fromBuilder.toString(), sellerId);
 	}
 }

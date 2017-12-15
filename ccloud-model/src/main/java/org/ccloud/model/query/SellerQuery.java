@@ -114,8 +114,8 @@ public class SellerQuery extends JBaseQuery {
 		return DAO.findFirst(sql, userId);
 	}
 	
-	public Seller findByDeptAndSellerType(String deptId,String sellerType){
-		String sql = "select * from cc_seller where dept_id = '"+deptId+"' and seller_type = "+sellerType+"";
+	public Seller findByDeptAndSellerType(String deptId){
+		String sql = "select * from cc_seller where dept_id = '"+deptId+"' and seller_type =0";
 		return DAO.findFirst(sql);
 	}
 	
@@ -137,9 +137,9 @@ public class SellerQuery extends JBaseQuery {
 
 	}
 	
-	public List<Seller> findByDeptId(String deptId){
+	public Seller findByDeptId(String deptId){
 		String sql="SELECT * from cc_seller where dept_id= ? and seller_type = 0";
-		return DAO.find(sql,deptId);
+		return DAO.findFirst(sql,deptId);
 	}
 	
 	public Record findByCustomerId(final String customerId) {
