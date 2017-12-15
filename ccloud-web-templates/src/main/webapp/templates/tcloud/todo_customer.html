@@ -110,6 +110,11 @@
 		</div>
 		</#list>
 		</#if>
+		<#if size??>
+			<div class="weui-loadmore weui-loadmore_line">
+				<span class="weui-loadmore__tips">暂无数据</span>
+			</div>
+		</#if>
 	</main>
     <#include "_inc/_goback.html" />
 </div>
