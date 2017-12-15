@@ -78,7 +78,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
-	public Page<Record> paginateForApp(int pageNumber, int pageSize, String type, String nature, String subType, String dataArea) {
+	public Page<Record> paginateForApp(int pageNumber, int pageSize, String id, String type, String nature, String subType, String dataArea) {
 
 		boolean needwhere = true;
 		List<Object> params = new LinkedList<Object>();
@@ -89,9 +89,10 @@ public class CustomerVisitQuery extends JBaseQuery {
 		sql.append("LEFT JOIN cc_customer cc ON csc.customer_id = cc.id ");
 		sql.append("LEFT JOIN cc_customer_join_customer_type ccjct ON csc.id = ccjct.seller_customer_id ");
 
-		appendIfNotEmptyWithLike(sql, "ccv.data_area", dataArea, params, needwhere);
-		appendIfNotEmpty(sql, "ccjct.customer_type_id", type, params, needwhere);
-		appendIfNotEmpty(sql, "csc.sub_type", subType, params, needwhere);
+		needwhere = appendIfNotEmptyWithLike(sql, "ccv.data_area", dataArea, params, needwhere);
+		needwhere = appendIfNotEmpty(sql, "ccjct.customer_type_id", type, params, needwhere);
+		needwhere = appendIfNotEmpty(sql, "csc.sub_type", subType, params, needwhere);
+		needwhere = appendIfNotEmpty(sql,"csc.id", id, params, needwhere);
 
 		sql.append("ORDER BY ccv.`status`, ccv.create_date desc");
 		return Db.paginate(pageNumber, pageSize,select ,sql.toString(), params.toArray());
