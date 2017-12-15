@@ -322,6 +322,7 @@ public class CustomerVisitController extends BaseFrontController {
 
 	public void complete() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 
 		String taskId = getPara("taskId");
 		String id = getPara("id");
@@ -366,6 +367,17 @@ public class CustomerVisitController extends BaseFrontController {
 		var.put("userName", workFlowService.getTaskVariableByTaskId(taskId,"applyUsername"));
 		var.put("openId", workFlowService.getTaskVariableByTaskId(taskId,"applyWxId"));
 
+		Message message = new Message();
+		message.setSellerId(sellerId);
+		message.setType("100501");
+		message.setTitle("客户拜访审核消息");
+		message.setContent(comment);
+		message.setFromUserId(workFlowService.getTaskVariableByTaskId(taskId, "fromId").toString());
+		message.setToUserId(user.getId());
+		message.setDeptId(user.getDepartmentId());
+		message.setDataArea(user.getDataArea());
+		message.setIsRead(0);
+		var.put("message", message);
 		workFlowService.completeTask(taskId, comment, var);
 
 		renderAjaxResultForSuccess("操作成功");
@@ -408,6 +420,7 @@ public class CustomerVisitController extends BaseFrontController {
 				param.put("applyUsername", user.getUsername());
 				param.put("manager", manager.getUsername());
 				param.put("applyWxId", user.getWechatOpenId());
+				param.put("fromId", user.getId());
 
 				WorkFlowService workflow = new WorkFlowService();
 				String procInstId = workflow.startProcess(id, defKey, param);

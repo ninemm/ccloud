@@ -616,7 +616,7 @@ public class CustomerController extends BaseFrontController {
 		message.setType("100603");
 		message.setTitle("客户审核消息");
 		message.setContent(comment);
-//		message.setFromUserId(workFlowService.getTaskVariableByTaskId(taskId,"applyId").toString());
+		message.setFromUserId(workFlowService.getTaskVariableByTaskId(taskId,"fromId").toString());
 		message.setToUserId(user.getId());
 		message.setDeptId(user.getDepartmentId());
 		message.setDataArea(user.getDataArea());
@@ -651,6 +651,7 @@ public class CustomerController extends BaseFrontController {
 	
 				param.put("applyUsername", user.getUsername());
 				param.put("manager", manager.getUsername());
+				param.put("fromId", user.getId());
 				
 				WorkFlowService workflow = new WorkFlowService();
 				String procInstId = workflow.startProcess(customerId, defKey, param);
