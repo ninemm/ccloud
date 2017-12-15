@@ -20,7 +20,6 @@ import org.ccloud.model.query.SalesOrderDetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SellerProductQuery;
 import org.ccloud.model.query.UserGroupRelQuery;
-import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.DateUtils;
