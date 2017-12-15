@@ -32,6 +32,7 @@ import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.Receivables;
 import org.ccloud.model.SalesOrder;
 import org.ccloud.model.User;
+import org.ccloud.model.query.OptionQuery;
 import org.ccloud.model.query.ReceivablesQuery;
 import org.ccloud.model.query.SalesOrderDetailQuery;
 import org.ccloud.model.query.SalesOrderJoinOutstockQuery;
@@ -153,7 +154,8 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 			customerOptionList.add(customerOptionMap);
 		}
-
+		boolean isCheckStore = OptionQuery.me().findStoreCheck(Consts.OPTION_SELLER_STORE_CHECK, sellerId);
+		setAttr("isCheckStore", isCheckStore);
 		setAttr("productInfoMap", JSON.toJSON(productInfoMap));
 		setAttr("productOptionList", JSON.toJSON(productOptionList));
 
@@ -374,7 +376,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		WorkFlowService workflowService = new WorkFlowService();
 		workflowService.completeTask(taskId, comment, var);
 
-		renderAjaxResultForSuccess("客户修改审核成功");
+		renderAjaxResultForSuccess("订单审核成功");
 	}
 	
 	public void cancel() {

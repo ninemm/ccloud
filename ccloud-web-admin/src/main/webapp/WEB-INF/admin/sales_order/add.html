@@ -308,6 +308,10 @@
 	
 	function checkStore() {
 		var store = $(".storeCount");
+		var shouldCheck = ${(isCheckStore!)?string("true","flase")};
+		if (!shouldCheck) {
+			return true;
+		}
 		var check = false;
 		if (store.length <= 1) {
 			check = false;
@@ -315,7 +319,11 @@
 		}
 		store.each(function(index,element){
 		  	var x = parseInt($(this).html());
-		  	if (x <= 0) {
+			var bigNum =$(this).parent().parent().find("#bigNum").val();
+			var smallNum = $(this).parent().parent().find("#smallNum").val();
+			var convert = $(this).parent().parent().find("#convert").val();
+			var producttotal = parseInt(bigNum) + parseInt(smallNum)/parseInt(convert);	
+		  	if (x <= 0 || producttotal > x) {
 				return false;
 		 	}
 	    	if (index == store.length-1) {
@@ -337,9 +345,7 @@
 			var bigNum = $(obj).find("#bigNum").val();
 			var smallNum = $(obj).find("#smallNum").val();
 			var total = parseInt(bigNum) + parseInt(smallNum);
-			var bigNum = $(obj).find("#bigNum").val();
 			var convert = $(obj).find("#convert").val();
-			var smallNum = $(obj).find("#smallNum").val();
 			var producttotal = parseInt(bigNum)*parseInt(convert) + parseInt(smallNum);
 			if (isNaN(producttotal)) {
 				producttotal = 0;
