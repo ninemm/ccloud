@@ -308,8 +308,7 @@
 
                 <div class="weui-cell weui-cell_access">
                     <div class="weui-cell__bd">
-                        <textarea name="customerVisit.question_desc" id="question_desc" placeholder="备注说明"></textarea>
-                        <div class="weui-textarea-counter"><span>0</span>/70</div>
+                        <textarea name="customerVisit.question_desc" id="question_desc" placeholder="备注说明（70字以内）"></textarea>
                     </div>
                 </div>
             </section>
@@ -366,9 +365,9 @@
         </form>
     </main>
 
-    <#include "_inc/_goback.html" />
+    <include "_inc/_goback.html" />
     <footer class="weui-footer weui-footer_fixed-bottom ft16">
-        <a href="javascript:void(0)" class="red-button width-100 _submit_btn" onclick="doSubmit()" href="">提交</a>
+        <a href="javascript:void(0)" class="blue-button width-100 _submit_btn" onclick="doSubmit()" href="">提交</a>
     </footer>
 
 </div>
