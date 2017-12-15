@@ -118,20 +118,17 @@ public class _AdminController extends JBaseController {
 				
 				String mobile = user.getMobile();
 				List<User> userList = UserQuery.me().findByMobile(mobile);
-				
 				List<Map<String, String>> sellerList = Lists.newArrayList();
-				if (userList.size() > 1) {
-					
-					for (User temp : userList) {
-						List<Department> tmpList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(temp.getDepartmentId());
-						if (tmpList.size() > 0) {
-							Department dept = tmpList.get(0);
-							Map<String, String> seller = Maps.newHashMap();
-							seller.put("seller_id", dept.getStr("seller_id"));
-							seller.put("seller_name", dept.getStr("seller_name"));
-							seller.put("seller_code", dept.getStr("seller_code"));
-							sellerList.add(seller);
-						}
+				
+				for (User temp : userList) {
+					List<Department> tmpList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(temp.getDepartmentId());
+					if (tmpList.size() > 0) {
+						Department dept = tmpList.get(0);
+						Map<String, String> seller = Maps.newHashMap();
+						seller.put("seller_id", dept.getStr("seller_id"));
+						seller.put("seller_name", dept.getStr("seller_name"));
+						seller.put("seller_code", dept.getStr("seller_code"));
+						sellerList.add(seller);
 					}
 				}
 				
