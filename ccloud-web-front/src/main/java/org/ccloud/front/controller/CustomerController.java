@@ -611,6 +611,19 @@ public class CustomerController extends BaseFrontController {
 			}
 		}
 
+		Kv kv = Kv.create();
+
+		WxMessageTemplate messageTemplate = WxMessageTemplateQuery.me().findByCode("_customer_audit");
+
+		kv.set("touser", workFlowService.getTaskVariableByTaskId(taskId,"applyWxId"));
+		kv.set("templateId", messageTemplate.getTemplateId());
+		kv.set("customerName", sellerCustomer.getCustomer().getCustomerName());
+		kv.set("submit", user.getRealname());
+
+		kv.set("createTime", DateTime.now().toString("yyyy-MM-dd HH:mm"));
+		kv.set("status", "已审核");
+		MessageKit.sendMessage(Actions.NotifyMessage.CUSTOMER_AUDIT_MESSAGE, kv);
+
 		Message message = new Message();
 		message.setSellerId(sellerId);
 		message.setType("100603");
@@ -651,6 +664,7 @@ public class CustomerController extends BaseFrontController {
 	
 				param.put("applyUsername", user.getUsername());
 				param.put("manager", manager.getUsername());
+				param.put("applyWxId", user.getWechatOpenId());
 				param.put("fromId", user.getId());
 				
 				WorkFlowService workflow = new WorkFlowService();

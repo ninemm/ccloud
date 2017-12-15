@@ -48,7 +48,7 @@ public class CustomerVisitExecutionListener implements ExecutionListener {
 					kv.set("submit", execution.getVariable("userName"));
 
 					kv.set("createTime", DateTime.now().toString("yyyy-MM-dd HH:mm"));
-					kv.set("status", "待审核");
+					kv.set("status", "已审核");
 
 					MessageKit.sendMessage(Actions.NotifyMessage.CUSTOMER_VISIT_AUDIT_MESSAGE, kv);
 				} else {
