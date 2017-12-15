@@ -53,10 +53,13 @@ public class CustomerVisitController extends BaseFrontController {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 //		String userId = ShiroKit.getUserId();
 
-		Page<Record> visitList = CustomerVisitQuery.me().paginateForApp(getPageNumber(), getPageSize(), getPara("type"), getPara("nature"), getPara("subType"), DataAreaUtil.getUserDeptDataArea(user.getDataArea()));
+		Page<Record> visitList = CustomerVisitQuery.me().paginateForApp(getPageNumber(), getPageSize(), getPara("id"), getPara("type"), getPara("nature"), getPara("subType"), DataAreaUtil.getUserDeptDataArea(user.getDataArea()));
 
 		transform(visitList.getList());
-
+		if(StrKit.notBlank(getPara("id"))) {
+			setAttr("id", getPara("id"));
+			setAttr("name", getPara("name"));
+		}
 		setAttr("visitList", visitList);
 		render("customer_visit_list.html");
 	}
@@ -102,7 +105,7 @@ public class CustomerVisitController extends BaseFrontController {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
 		Page<Record> visitList = new Page<>();
-		visitList = CustomerVisitQuery.me().paginateForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("type"), getPara("nature"), getPara("subType"), DataAreaUtil.getUserDeptDataArea(user.getDataArea()));
+		visitList = CustomerVisitQuery.me().paginateForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("id"), getPara("type"), getPara("nature"), getPara("subType"), DataAreaUtil.getUserDeptDataArea(user.getDataArea()));
 		transform(visitList.getList());
 
 		StringBuilder html = new StringBuilder();
@@ -110,8 +113,7 @@ public class CustomerVisitController extends BaseFrontController {
 		{
 			html.append("<a class=\"weui-cell weui-cell_access\" href=\"/customerVisit/detail?id=" + visit.getStr("id") + "\">\n" +
 					"                <div class=\"weui-cell__bd ft14\">\n" +
-					"                    <p>${(visit.customer_name)!}</p>\n" +
-					"                    <p>${(visit.customer_name)!}</p>\n" +
+					"                    <p>" + visit.getStr("customer_name") + "</p>\n" +
 					"                    <p class=\"gray ft12\">" + visit.getStr("contact") + "/" + visit.getStr("mobile") + "\n" +
 					"                        <span class=\"fr\">" + visit.get("create_date").toString() + "</span>\n" +
 					"                    </p>\n" +

@@ -146,24 +146,21 @@ public class _PurchaseOrderDetailController extends JBaseCRUDController<Purchase
 		String productNumStr = StringUtils.getArrayFirst(paraMap.get("productNum"));
 		Integer productNum = Integer.valueOf(productNumStr);
 		
-		int a = 0;
 		int b = 0;
 		Set<String> set = new HashSet<String>();
-		while (productNum > a) {
+		for(int a = 0 ;a<productNum;a++) {
 				b++;
 				String productId = StringUtils.getArrayFirst(paraMap.get("productId" + b));
 				set.add(productId);
-				a++;
 			}
 		if(set.size()<productNum){
 			renderAjaxResultForError("订单中有两件及以上相同的产品，请重新选择！");
 			return;
 		}
 		
-		Integer count = 0;
 		Integer index = 0;
 		
-		while (productNum > count) {
+		for ( int count = 0 ;count<productNum;count++) {
 			index++;
 			String productId = StringUtils.getArrayFirst(paraMap.get("productId" + index));
 			Product product = ProductQuery.me().findByUserId(user.getId(),productId);
@@ -183,7 +180,6 @@ public class _PurchaseOrderDetailController extends JBaseCRUDController<Purchase
 				purchaseOrderDetail.set("data_area", user.getDataArea());
 				purchaseOrderDetail.save();
 				
-				count++;
 			}
 
 		}
@@ -191,7 +187,9 @@ public class _PurchaseOrderDetailController extends JBaseCRUDController<Purchase
 
 	}
 	public void show_supplier(){
-		List<Supplier> suppliers = SupplierQuery.me().findAll();
+		String sellerId = getSessionAttr("sellerId");
+		//List<Supplier> suppliers = SupplierQuery.me().findAll();
+		List<Supplier> suppliers = SupplierQuery.me().findBySellerId(sellerId);
 		renderJson(suppliers);
 	}
 }
