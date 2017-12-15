@@ -17,6 +17,7 @@ package org.ccloud.controller.admin;
 
 import java.util.Map;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
@@ -43,7 +44,7 @@ public class _InventoryDetailController extends JBaseCRUDController<InventoryDet
 	public void index() {
 		render("index.html");
 	}
-	
+	@RequiresPermissions("/admin/salesOrder/check")
 	public void list() {
 		User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);

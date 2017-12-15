@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
@@ -66,6 +67,7 @@ import com.jfinal.plugin.activerecord.tx.Tx;
 @RouterMapping(url = "/admin/purchaseInstock", viewPath = "/WEB-INF/admin/purchase_instock")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
+@RequiresPermissions("/admin/purchaseInstock")
 public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInstock> { 
 	
 	@Override
@@ -213,8 +215,6 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 				Integer productCount0 = Integer.valueOf(bN) * Integer.valueOf(convert) + Integer.valueOf(sN);
 				if(purchaseOederDetailId.equals(pid)){
 					productCount += productCount0;
-				}else{
-					break;
 				}
 			}
 			PurchaseOrderDetail purchaseOrderDetail = PurchaseOrderDetailQuery.me().findById(pid);
