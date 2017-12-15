@@ -122,7 +122,7 @@ public Page<PayablesDetail> paginate(int pageNumber, int pageSize, String id,Str
 		payablesDetail.setRefType(Consts.BIZ_TYPE_SALES_REFUND_INSTOCK);
 		payablesDetail.setDeptId(record.getStr("dept_id"));
 		payablesDetail.setDataArea(record.getStr("data_area"));
-	//	payablesDetail.setBizDate(date);
+		payablesDetail.setBizDate(date);
 		payablesDetail.setCreateDate(date);
 		return payablesDetail.save();
 	}
