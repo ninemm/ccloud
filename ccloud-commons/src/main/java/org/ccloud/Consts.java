@@ -146,3 +146,4 @@ public class Consts {
 	
 	public static final String ROLE_CODE_007 = "007";//财务
 	public static final String ROLE_CODE_020 = "020";//账务
+}
