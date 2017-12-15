@@ -59,7 +59,7 @@ public class GoodsSpecificationQuery extends JBaseQuery {
 	public Page<Record> paginateRecords(int pageNumber, int pageSize, String keyword, String orderby) {
 		String select = "SELECT c.*, t1.valueName ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_goods_specification` c ");
-		fromBuilder.append("LEFT JOIN (SELECT sv.goods_specification_id, GROUP_CONCAT(sv. NAME) AS valueName ");
+		fromBuilder.append("LEFT JOIN (SELECT sv.goods_specification_id, GROUP_CONCAT(sv. NAME ORDER BY sv.order_list ) AS valueName ");
 		fromBuilder.append("FROM cc_goods_specification_value sv GROUP BY sv.goods_specification_id ) t1 ");
 		fromBuilder.append("ON c.id = t1.goods_specification_id ");
 		

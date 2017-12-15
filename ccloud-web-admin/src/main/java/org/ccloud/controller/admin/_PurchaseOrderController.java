@@ -232,10 +232,10 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		order.set("modify_date", new Date());
 		String productNumStr = StringUtils.getArrayFirst(paraMap.get("productNum"));
 		Integer productNum = Integer.valueOf(productNumStr);
-		Integer count = 0;
+		
 		Integer index = 0;
 
-		while (productNum > count) {
+		for ( Integer count = 0;count<productNum;count++) {
 			index++;
 			HttpServletRequest request = getRequest();
 			String convert = StringUtils.getArrayFirst(paraMap.get("convert" + index));
@@ -271,7 +271,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 				purchaseInstockDetail.save();
 				purchaseOrder.set("status", 4000);
 				purchaseOrder.update();
-				count++;
+				
 			}
 
 		}

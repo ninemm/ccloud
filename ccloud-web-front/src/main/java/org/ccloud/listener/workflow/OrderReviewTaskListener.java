@@ -12,6 +12,7 @@ import org.ccloud.Consts;
 import org.ccloud.model.User;
 import org.ccloud.model.query.UserGroupRelQuery;
 import org.ccloud.model.query.UserQuery;
+import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.workflow.plugin.ActivitiPlugin;
 
 import com.google.common.base.Joiner;
@@ -22,7 +23,8 @@ public class OrderReviewTaskListener implements TaskListener {
 
 	@Override
 	public void notify(DelegateTask task) {
-		User user = (User) task.getVariable(Consts.WORKFLOW_APPLY_USER);
+		Object object = task.getVariable(Consts.WORKFLOW_APPLY_USER);
+		User user = (User) object;
 		String executeInstanceId = task.getProcessInstanceId();
 		ProcessEngine processEngine = ActivitiPlugin.buildProcessEngine();
 		List<Task> taskList = processEngine.getTaskService().createTaskQuery().executionId(executeInstanceId).list();  
@@ -45,7 +47,7 @@ public class OrderReviewTaskListener implements TaskListener {
             	task.setAssignee(manager.getUsername());
 //            	task.setVariable("manager", "zhuguan");
             } else if (size == 2) {// 财务
-            	String userNames = getTreasurer(user.getDataArea());
+            	String userNames = getTreasurer(DataAreaUtil.getUserDealerDataArea(user.getDataArea()));
             	task.setAssignee(userNames);
             	//task.setVariable("financer", "caiwu");
             } 

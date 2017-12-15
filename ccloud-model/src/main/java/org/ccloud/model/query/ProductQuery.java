@@ -162,9 +162,10 @@ public class ProductQuery extends JBaseQuery {
 	}
 	
 	public Page<Product> paginate_pro(int pageNumber, int pageSize,String keyword, String orderby,String sellerId,String userId) {
-		String select = "SELECT cp.id,cp.big_unit,cp.small_unit,cp.convert_relate,cp.cost,cp.market_price,cp.name,cp.price, GROUP_CONCAT(cgs.`name`) as cps_name ";
+		String select = "SELECT cp.id,cp.big_unit,cp.small_unit,cp.convert_relate,cp.cost,cp.market_price,cp.name,cp.price, GROUP_CONCAT(cgs.`name` order by css.id) as cps_name ";
 		StringBuilder fromBuilder = new StringBuilder("FROM cc_product cp LEFT JOIN cc_product_goods_specification_value cpg ON cp.id = cpg.product_set_id LEFT JOIN cc_goods_specification_value cgs ON cpg.goods_specification_value_set_id=cgs.id "
-			 	     									+ "	LEFT JOIN cc_goods cg on cg.id=cp.goods_id "
+			 	     									+ " LEFT JOIN cc_goods_specification css on css.id = cgs.goods_specification_id "
+			 	     									+ " LEFT JOIN cc_goods cg on cg.id=cp.goods_id "
 			 	     									+ "LEFT JOIN cc_brand cb on cb.id=cg.brand_id "
 			 	     									+ "LEFT JOIN cc_seller_brand csb on csb.brand_id = cb.id "
 			 	     									+ "LEFT JOIN cc_seller cs on cs.id = csb.seller_id  "
@@ -179,7 +180,7 @@ public class ProductQuery extends JBaseQuery {
 			fromBuilder.append(" where cp.is_marketable=1 and u.id='"+userId+"' ");
 	//				+ " and cs.seller_type = 0 and cp.id  not in (select product_id from cc_seller_product where seller_id ='" + sellerId+"')");
 		}
-		fromBuilder.append(" GROUP by " + orderby);
+		fromBuilder.append(" GROUP by cp.id ");
 		fromBuilder.append(" order by " + orderby);	
 		
 		if (params.isEmpty())

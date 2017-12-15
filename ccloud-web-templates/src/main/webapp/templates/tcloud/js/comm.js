@@ -146,8 +146,8 @@ function openPop() {
 					'<div class="pop-input">'
 							+ '<input type="number" value="0">'
 							+ '<div class="pop-button">'
-							+ '<a class="gray-button width-50" id="cancel-input">取消</a>'
-							+ '<a class="blue-button width-50" id="confirm-input">确定</a>'
+							+ '<a class="white-button-no-border width-50" id="cancel-input">取消</a>'
+							+ '<a class="red-button width-50" id="confirm-input">确定</a>'
 							+ '</div>' + '</div>');
 	$(".pop-input").addClass("animated fadeIn");
 	$(".layer").addClass("layer-pop-show");
@@ -346,7 +346,7 @@ $(function() {
 	}).on('touchend', '#combin-filter .cancel-search-btn, #combin-filter .confirm-search-btn', function () { //关闭组合筛选
 	    closeCombinSearch();
 	}).on('touchend', '#combin-filter span', function () {
-		$(this).addClass('blue-button').siblings().removeClass('blue-button');
+		$(this).addClass('red-button').siblings().removeClass('red-button');
 	}).on('touchend', '.goback', function() {
 		historyUtils.back();
 	});

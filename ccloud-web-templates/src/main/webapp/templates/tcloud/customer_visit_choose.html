@@ -208,25 +208,7 @@
         <div class="weui-loadmore weui-loadmore_line" id="noMore" style="display: none;">
             <span class="weui-loadmore__tips">暂无数据</span>
         </div>
-        <div class="hidden-menu">
-            <ul>
-                <li>
-                    <a href="${CPATH}/user/index">
-                        首页
-                        <i class="icon-home blue"></i>
-                    </a>
-                </li>
-                <li>
-                    <a class="goback">
-                        上一页
-                        <i class="icon-undo green"></i>
-                    </a>
-                </li>
-            </ul>
-            <i class="icon-menu-open orange fr" id="button"></i>
-        </div>
-        <div class="layer"></div>
+        <#include "_inc/_goback.html" />
     </article>
 </div>
 </@layout>
-

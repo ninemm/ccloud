@@ -51,12 +51,16 @@ public class CustomerVisitController extends BaseFrontController {
 		
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 //		String userId = ShiroKit.getUserId();
 
-		Page<Record> visitList = CustomerVisitQuery.me().paginateForApp(getPageNumber(), getPageSize(), getPara("type"), getPara("nature"), getPara("subType"), DataAreaUtil.getUserDeptDataArea(user.getDataArea()));
+		Page<Record> visitList = CustomerVisitQuery.me().paginateForApp(getPageNumber(), getPageSize(), getPara("id"), getPara("type"), getPara("nature"), getPara("subType"), selectDataArea + "%");
 
 		transform(visitList.getList());
-
+		if(StrKit.notBlank(getPara("id"))) {
+			setAttr("id", getPara("id"));
+			setAttr("name", getPara("name"));
+		}
 		setAttr("visitList", visitList);
 		render("customer_visit_list.html");
 	}
@@ -65,11 +69,13 @@ public class CustomerVisitController extends BaseFrontController {
 
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+
 		Map<String, Object> all = new HashMap<>();
 		all.put("title", "全部");
 		all.put("value", "");
 
-		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(DataAreaUtil.getUserDeptDataArea(user.getDataArea()));
+		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(DataAreaUtil.getUserDealerDataArea(selectDataArea));
 		List<Map<String, Object>> customerTypeList2 = new ArrayList<>();
 		customerTypeList2.add(all);
 
@@ -80,14 +86,14 @@ public class CustomerVisitController extends BaseFrontController {
 			customerTypeList2.add(item);
 		}
 
-		List<Record> subTypeList = SellerCustomerQuery.me().findSubTypeByUserID(DataAreaUtil.getUserDeptDataArea(user.getDataArea()));
+		List<Dict> subTypeList = DictQuery.me().findDictByType("customer_subtype");
 		List<Map<String, Object>> customerLevel = new ArrayList<>();
 		customerLevel.add(all);
 
-		for(Record subType : subTypeList) {
+		for(Dict subType : subTypeList) {
 			Map<String, Object> item = new HashMap<>();
-			item.put("title", subType.getStr("sub_type"));
-			item.put("value", subType.getStr("sub_type"));
+			item.put("title", subType.getName());
+			item.put("value", subType.getValue());
 			customerLevel.add(item);
 		}
 
@@ -100,18 +106,23 @@ public class CustomerVisitController extends BaseFrontController {
 
 	public void refresh() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
 		Page<Record> visitList = new Page<>();
-		visitList = CustomerVisitQuery.me().paginateForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("type"), getPara("nature"), getPara("subType"), DataAreaUtil.getUserDeptDataArea(user.getDataArea()));
+		visitList = CustomerVisitQuery.me().paginateForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("id"), getPara("type"), getPara("nature"), getPara("level"), selectDataArea);
 		transform(visitList.getList());
+
+		if(StrKit.notBlank(getPara("id"))) {
+			setAttr("id", getPara("id"));
+			setAttr("name", getPara("name"));
+		}
 
 		StringBuilder html = new StringBuilder();
 		for (Record visit : visitList.getList())
 		{
 			html.append("<a class=\"weui-cell weui-cell_access\" href=\"/customerVisit/detail?id=" + visit.getStr("id") + "\">\n" +
 					"                <div class=\"weui-cell__bd ft14\">\n" +
-					"                    <p>${(visit.customer_name)!}</p>\n" +
-					"                    <p>${(visit.customer_name)!}</p>\n" +
+					"                    <p>" + visit.getStr("customer_name") + "</p>\n" +
 					"                    <p class=\"gray ft12\">" + visit.getStr("contact") + "/" + visit.getStr("mobile") + "\n" +
 					"                        <span class=\"fr\">" + visit.get("create_date").toString() + "</span>\n" +
 					"                    </p>\n" +
@@ -135,8 +146,7 @@ public class CustomerVisitController extends BaseFrontController {
 	public void edit() {
 		
 		String userId = ShiroKit.getUserId();
-		
-		//List<Record> customer_list = UserQuery.me().getCustomerInfoByUserId(user_id,data_area);
+
 	    List<Dict> problem_list = DictQuery.me().findByCode("visit");
 	    
 	    //setAttr("customer",JSON.toJSONString(customer_list));
@@ -175,6 +185,7 @@ public class CustomerVisitController extends BaseFrontController {
 		
 		String id = getPara("id");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
 		if (StrKit.isBlank(id)) {
 			renderError(404);
@@ -183,7 +194,7 @@ public class CustomerVisitController extends BaseFrontController {
 		
 		List<Record> customerVisit = CustomerVisitQuery.me().findMoreById(id);
 
-		List<String> typeList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeIdListBySellerCustomerId(customerVisit.get(0).getStr("seller_customer_id"), DataAreaUtil.getUserDealerDataArea(user.getDataArea()) + "%");
+		List<String> typeList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeIdListBySellerCustomerId(customerVisit.get(0).getStr("seller_customer_id"), DataAreaUtil.getUserDealerDataArea(selectDataArea) + "%");
 
 		List<String> typeName = new ArrayList<>();
 		for(String type : typeList)
@@ -210,7 +221,6 @@ public class CustomerVisitController extends BaseFrontController {
 
 	// 用户新增拜访页面显示
 	public void visitAdd() {
-	    //String data_area = "0010010016410";
 	    User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 	    String selDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		Page<Record> customer_list = SellerCustomerQuery.me().paginateForApp(getPageNumber(), getPageSize(), "",selDataArea, user.getId(), "", "","");
@@ -312,6 +322,7 @@ public class CustomerVisitController extends BaseFrontController {
 
 	public void complete() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 
 		String taskId = getPara("taskId");
 		String id = getPara("id");
@@ -356,6 +367,17 @@ public class CustomerVisitController extends BaseFrontController {
 		var.put("userName", workFlowService.getTaskVariableByTaskId(taskId,"applyUsername"));
 		var.put("openId", workFlowService.getTaskVariableByTaskId(taskId,"applyWxId"));
 
+		Message message = new Message();
+		message.setSellerId(sellerId);
+		message.setType("100501");
+		message.setTitle("客户拜访审核消息");
+		message.setContent(comment);
+		message.setFromUserId(workFlowService.getTaskVariableByTaskId(taskId, "fromId").toString());
+		message.setToUserId(user.getId());
+		message.setDeptId(user.getDepartmentId());
+		message.setDataArea(user.getDataArea());
+		message.setIsRead(0);
+		var.put("message", message);
 		workFlowService.completeTask(taskId, comment, var);
 
 		renderAjaxResultForSuccess("操作成功");
@@ -398,6 +420,7 @@ public class CustomerVisitController extends BaseFrontController {
 				param.put("applyUsername", user.getUsername());
 				param.put("manager", manager.getUsername());
 				param.put("applyWxId", user.getWechatOpenId());
+				param.put("fromId", user.getId());
 
 				WorkFlowService workflow = new WorkFlowService();
 				String procInstId = workflow.startProcess(id, defKey, param);

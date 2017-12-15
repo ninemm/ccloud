@@ -2,8 +2,6 @@ package org.ccloud.front.controller;
 
 import java.math.BigInteger;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,16 +14,9 @@ import org.ccloud.interceptor.UserInterceptor;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.Department;
-import org.ccloud.model.GoodsType;
-import org.ccloud.model.Product;
-import org.ccloud.model.Seller;
 import org.ccloud.model.SmsCode;
 import org.ccloud.model.User;
 import org.ccloud.model.query.DepartmentQuery;
-import org.ccloud.model.query.GoodsTypeQuery;
-import org.ccloud.model.query.InventoryQuery;
-import org.ccloud.model.query.ProductQuery;
-import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.SmsCodeQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
@@ -37,15 +28,12 @@ import org.ccloud.utils.StringUtils;
 
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Maps;
-import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Clear;
 import com.jfinal.core.ActionKey;
 import com.jfinal.kit.Ret;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.IAtom;
-import com.jfinal.plugin.activerecord.Page;
-import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.weixin.sdk.api.ApiResult;
 import com.jfinal.weixin.sdk.api.UserApi;
 
@@ -89,16 +77,16 @@ public class UserController extends BaseFrontController {
 		
 		long errorTimes = CookieUtils.getLong(this, "_login_errors", 0);
 		
-//		if (errorTimes >= 3) {
-//			if (!validateCaptcha("_login_captcha")) { // 验证码没验证成功！
-//				if (isAjaxRequest()) {
-//					renderAjaxResultForError("没有该用户");
-//				} else {
-//					redirect(Consts.ROUTER_USER_LOGIN);
-//				}
-//				return;
-//			}
-//		}
+		if (errorTimes >= 3) {
+			if (!validateCaptcha("_login_captcha")) { // 验证码没验证成功！
+				if (isAjaxRequest()) {
+					renderAjaxResultForError("没有该用户");
+				} else {
+					redirect(Consts.ROUTER_USER_LOGIN);
+				}
+				return;
+			}
+		}
 		
 		List<User> userList = UserQuery.me().findByMobile(username);
 		if (null == userList || userList.size() == 0) {
@@ -150,7 +138,7 @@ public class UserController extends BaseFrontController {
 				setSessionAttr(Consts.SESSION_SELLER_CODE, map.get("seller_code"));
 			}
 			// 获取用户权限
-			init(user.getUsername(), user.getPassword(), true);
+			initUserRole(user.getUsername(), user.getPassword(), true);
 			
 			if (this.isAjaxRequest()) {
 				renderAjaxResultForSuccess("登录成功");
@@ -195,6 +183,26 @@ public class UserController extends BaseFrontController {
 	
 	public void change() {
 		
+		User curUser = initSellerAccount();
+		
+		if (curUser == null) {
+			if (isAjaxRequest())
+				renderAjaxResultForError("切换账号失败");
+			else
+				renderError(404);
+			return ;
+		}
+		
+		initUserRole(curUser.getUsername(), curUser.getPassword(), true);
+		
+		if (isAjaxRequest()) {
+			renderAjaxResultForSuccess("切换账号成功");
+			return ;
+		}
+		redirect("/"); 
+	}
+	
+	private User initSellerAccount() {
 		String mobile = getPara("mobile");
 		String openid = getPara("openid");
 		String sellerId = getPara("sellerId");
@@ -220,15 +228,8 @@ public class UserController extends BaseFrontController {
 			}
 		}
 		
-		if (curUser == null) {
-			renderError(404);
-			return ;
-		}
-		
-		init(curUser.getUsername(), curUser.getPassword(), true);
-		
-		redirect("/"); 
-	}
+		return curUser;
+	} 
 	
 	public void checkMobile() {
 		
@@ -279,7 +280,7 @@ public class UserController extends BaseFrontController {
 					}
 					
 					// 获取用户权限
-					init(user.getUsername(), user.getPassword(), true);
+					initUserRole(user.getUsername(), user.getPassword(), true);
 
 					List<Department> tmpList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
 					if (tmpList.size() > 0) {
@@ -300,7 +301,7 @@ public class UserController extends BaseFrontController {
 		renderAjaxResultForError(ret.getStr("message"));
 	}
 
-	private void init(String username, String password, Boolean rememberMe) {
+	private void initUserRole(String username, String password, Boolean rememberMe) {
 		
 		Subject subject = SecurityUtils.getSubject();
 		CaptchaUsernamePasswordToken token = new CaptchaUsernamePasswordToken(username, password, rememberMe, "", "");

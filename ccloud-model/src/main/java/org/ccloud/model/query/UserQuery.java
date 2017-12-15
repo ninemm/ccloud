@@ -99,6 +99,10 @@ public class UserQuery extends JBaseQuery {
 	public List<User> findByMobile(final String mobile) {
 		return DAO.doFindByCache(User.CACHE_NAME, mobile, "mobile = ? AND status = 1", mobile);
 	}
+	
+	public List<User> findByMobileOrWechatOpenid(String value) {
+		return DAO.doFindByCache(User.CACHE_NAME, value, "(mobile = ? OR wechat_open_id = ?) AND status = 1", value, value);
+	}
 
 	public List<User> findByDeptId(String deptId) {
 		return DAO.doFind("department_id = ?", deptId);
@@ -251,7 +255,7 @@ public class UserQuery extends JBaseQuery {
 
 		StringBuilder fromBuilder = new StringBuilder(" SELECT u.username ");
 		fromBuilder.append(" FROM department d ");
-		fromBuilder.append(" JOIN `user u ON d.id = u.department_id ");
+		fromBuilder.append(" JOIN `user` u ON d.id = u.department_id ");
 		fromBuilder.append(" WHERE d.data_area = ? ");
 
 		return Db.query(fromBuilder.toString(), dataArea);

@@ -93,7 +93,7 @@ public class UserGroupRelQuery extends JBaseQuery {
 	
 	public List<String> findUserIdsByGroup(String groupCode, String userId) {
 
-		StringBuilder fromBuilder = new StringBuilder(" SELECT ugr.id ");
+		StringBuilder fromBuilder = new StringBuilder(" SELECT ugr.user_id ");
 		fromBuilder.append(" FROM `user` u ");
 		fromBuilder.append(" JOIN `user_group_rel` ugr ON u.id = ugr.user_id ");
 		fromBuilder.append(" JOIN `group` g ON ugr.group_id = g.id ");

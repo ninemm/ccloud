@@ -1,0 +1,132 @@
+<#include "_inc/_layout.html"/>
+
+<#macro css>
+    body {
+        background: #fcfcfc;
+    }
+    
+    .weui-cells {
+	    font-size: 0.8rem;
+	}
+    
+    .weui-cell__ft {
+	    font-size: 0.7rem;
+	}
+</#macro>
+
+<#macro script>
+    $(function() {
+    
+        var $iosActionsheet = $('#weui-actionsheet');
+        var $iosMask = $('#iosMask');
+
+        function hideActionSheet() {
+            $iosActionsheet.removeClass('weui-actionsheet_toggle');
+            $iosMask.fadeOut(200);
+        }
+
+        $iosMask.on('click', hideActionSheet);
+        $('#iosActionsheetCancel').on('click', hideActionSheet);
+        $("#showIOSActionSheet").on("click", function(){
+            $iosActionsheet.addClass('weui-actionsheet_toggle');
+            $iosMask.fadeIn(200);
+        });
+    
+    
+        //var $androidActionSheet = $('#weui-android-actionsheet');
+        //var $androidMask = $androidActionSheet.find('.weui-mask');
+
+        $("#showAndroidActionSheet").on('click', function() {
+            $androidActionSheet.fadeIn(200);
+            $androidMask.on('click',function () {
+                $androidActionSheet.fadeOut(200);
+            });
+        });
+    });
+    
+    var callback = function(x) {
+        console.log(x);
+    }
+
+    function doChange() {
+    
+        $.actions({
+		    actions: [{
+			    text: "编辑",
+			    onClick: function() {
+			      //do something
+			    }
+		    },{
+			    text: "删除",
+			    onClick: function() {
+			      //do something
+			    }
+		    }]
+	    });
+    }
+</#macro>
+
+<@layout>
+<div class="weui-content">
+	<div class="weui-cells">
+		<a class="weui-cell weui-cell_access" href="javascript:;">
+			<div class="weui-cell__bd">
+				<p>账号</p>
+			</div>
+			<div class="weui-cell__ft"></div>
+		</a>
+	</div>
+	<div class="weui-cells">
+		<a class="weui-cell weui-cell_access" href="javascript:;">
+			<div class="weui-cell__bd">
+				<p>新消息通知</p>
+			</div>
+			<div class="weui-cell__ft"></div>
+		</a>
+	</div>
+	<div class="weui-cells">
+		<a class="weui-cell weui-cell_access" href="${CPATH}/user/seller_change">
+			<div class="weui-cell__bd">
+				<p>切换账套</p>
+			</div>
+			<div class="weui-cell__ft">${(session.sellerName)!}</div>
+		</a>
+	</div>
+	<!-- <div class="weui-cells">
+		<button class="weui-cell weui-cell_access width-100 bg-white">
+			<div class="weui-cell__bd">
+				<p class="t-c red">退出登录</p>
+			</div>
+		</button>
+	</div> -->
+	
+	<!-- <div id="actionSheet_wrap"> -->
+	    <!-- <div class="weui-mask_transparent actionsheet__mask" id="iosMask"></div>
+	    <div class="weui-actionsheet" id="weui-actionsheet">
+	        <div class="weui-actionsheet__menu">
+	            <#if (session.sellerList)??>
+                <#list session.sellerList as bean>
+                <div class="weui-actionsheet__cell"><i class="icon-user <#if (bean.seller_id = session.sellerId)>red<#else>gray</#if>"></i> ${(bean.seller_name)!}</div>
+                </#list>
+                </#if>
+	        </div>
+	        <div class="weui-actionsheet__action">
+	            <div class="weui-actionsheet__cell" id="iosActionsheetCancel">取消</div>
+	        </div>
+	    </div> -->
+	    <!-- <div class="weui-skin_android" id="weui-android-actionsheet" style="display: none">
+	        <div class="weui-mask"></div>
+	        <div class="weui-actionsheet">
+	            <div class="weui-actionsheet__menu">
+	                <#if (session.sellerList)??>
+			        <#list session.sellerList as bean>
+			        <div class="weui-actionsheet__cell"><i class="icon-user <#if (bean.seller_id = session.sellerId)>red<#else>gray</#if>"></i> ${(bean.seller_name)!}</div>
+			        </#list>
+			        </#if>
+	            </div>
+	        </div>
+	    </div> -->
+	<#include "_inc/_goback.html" />    
+</div>
+
+</@layout>

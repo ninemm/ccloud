@@ -1,5 +1,10 @@
 <#include "_inc/_layout.html"/>
-<#macro css> </#macro>
+<#macro css>
+    #customer {
+        background: #fcfcfc; 
+    }
+</#macro>
+
 <#macro script>
     var pageNumber = 2;
     var pageSize = 10;
@@ -123,6 +128,11 @@
         window.location.href = '${CPATH}/product';
     }
 
+    function newVisit(customer){
+    setItemBykey("customerInfo", customer);
+    window.location.href = '${CPATH}/customerVisit/visitAdd';
+    }
+
 </#macro>
 
 <@layout>
@@ -189,7 +199,7 @@
 	                                            </p>
 	                                            <p>订单</p>
 	                                        </a>
-	                                        <a class="weui-flex__item" href="/visitAdd">
+	                                        <a class="weui-flex__item" href="${CPATH}/customerVisit?id=${(customer.sellerCustomerId)!}&name=${(customer.customer_name)!}">
 	                                            <p>
 	                                                <i class="icon-paw" style="color:#ff9800"></i>
 	                                            </p>
@@ -203,8 +213,12 @@
 	                            </div>
 	                            <hr />
 	                            <div class="operate-btn">
-	                                <div class="button white-button fl" hred="/visitAdd">客户拜访</div>
-                                    <div class="button blue-button fr" onclick="newOrder({customerName:'${(customer.customer_name)}',
+	                                <div class="button white-button fl" onclick="newVisit({customerName:'${(customer.customer_name)}',
+                                                                                            sellerCustomerId:'${(customer.sellerCustomerId)}',
+                                                                                            contact:'${(customer.contact)}',
+                                                                                            mobile:'${(customer.mobile)}',
+                                                                                            address:'${(customer.address)}'})">客户拜访</div>
+                                    <div class="button red-button fr" onclick="newOrder({customerName:'${(customer.customer_name)}',
                                                                                             sellerCustomerId:'${(customer.sellerCustomerId)}',
                                                                                             contact:'${(customer.contact)}',
                                                                                             mobile:'${(customer.mobile)}',

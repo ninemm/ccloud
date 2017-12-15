@@ -9,14 +9,7 @@ import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
-import org.ccloud.model.Customer;
-import org.ccloud.model.CustomerJoinCustomerType;
-import org.ccloud.model.CustomerType;
-import org.ccloud.model.Department;
-import org.ccloud.model.SellerCustomer;
-import org.ccloud.model.User;
-import org.ccloud.model.UserJoinCustomer;
-import org.ccloud.model.WxMessageTemplate;
+import org.ccloud.model.*;
 import org.ccloud.model.compare.BeanCompareUtils;
 import org.ccloud.model.query.CustomerJoinCustomerTypeQuery;
 import org.ccloud.model.query.CustomerQuery;
@@ -70,8 +63,9 @@ public class CustomerController extends BaseFrontController {
 	public void getCustomerRegionAndType() {
 
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
-		List<Record> userList = UserQuery.me().findNextLevelsUserList(user.getDataArea());
+		List<Record> userList = UserQuery.me().findNextLevelsUserList(selectDataArea);
 		List<Map<String, Object>> region = new ArrayList<>();
 		Map<String, Object> all = new HashMap<>();
 		all.put("title", "全部");
@@ -85,7 +79,7 @@ public class CustomerController extends BaseFrontController {
 			region.add(item);
 		}
 
-		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(DataAreaUtil.getUserDeptDataArea(user.getDataArea()) + "%");
+		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(DataAreaUtil.getUserDealerDataArea(user.getDataArea()) + "%");
 		List<Map<String, Object>> customerTypeList2 = new ArrayList<>();
 		customerTypeList2.add(all);
 
@@ -124,11 +118,11 @@ public class CustomerController extends BaseFrontController {
 			html.append("					<p><i class=\"icon-phone green\"></i></p>\n");
 			html.append("					<p>电话</p>\n");
 			html.append("				</a>\n");
-			html.append("				<a class=\"weui-flex__item\" href=\"/historyOrder?sellerCustomerId=" + customer.getStr("sellerCustomerId") + "&customerName=" + customer.getStr("customer_name") + "\">\n");
+			html.append("				<a class=\"weui-flex__item\" href=\"/customer/historyOrder?sellerCustomerId=" + customer.getStr("sellerCustomerId") + "&customerName=" + customer.getStr("customer_name") + "\">\n");
 			html.append("					<p><i class=\"icon-file-text-o blue\"></i></p>\n");
 			html.append("					<p>订单</p>\n");
 			html.append("				</a>\n");
-			html.append("				<a class=\"weui-flex__item\" href=\"/visitAdd\">\n");
+			html.append("				<a class=\"weui-flex__item\" href=\"/customerVisit?id=" + customer.getStr("sellerCustomerId") +"&name=" + customer.getStr("customer_name") + "\">\n");
 			html.append("					<p><i class=\"icon-paw\" style=\"color:#ff9800\"></i></p>\n");
 			html.append("					<p>拜访</p>\n");
 			html.append("				</a>\n");
@@ -140,12 +134,16 @@ public class CustomerController extends BaseFrontController {
 			html.append("	</div>\n");
 			html.append("	<hr />\n");
 			html.append("	<div class=\"operate-btn\">\n");
-			html.append("		<div class=\"button white-button fl\" href=\"/visitAdd\">客户拜访</div>\n");
-			html.append("		<div class=\"button blue-button fr\" href=\"/product\" onclick=\"newOrder({customerName:'" + customer.getStr("customer_name") + "',\n" +
-					"                                                                                            sellerCustomerId:'" + customer.getStr("sellerCustomerId") + "',\n" +
-					"                                                                                            contact:'" + customer.getStr("contact") + "',\n" +
-					"                                                                                            mobile:'" + customer.getStr("mobile") + "',\n" +
-					"                                                                                            address:'" + customer.getStr("address") + "'})\" >下订单</div>\n");
+			html.append("		<div class=\"button white-button fl border-1px\" onclick=\"newVisit({customerName:'" + customer.getStr("customer_name") + "',\n" +
+					"                                                                     sellerCustomerId:'" + customer.getStr("sellerCustomerId") + "',\n" +
+					"                                                                     contact:'" + customer.getStr("contact") + "',\n" +
+					"                                                                     mobile:'" + customer.getStr("mobile") + "',\n" +
+					"                                                                     address:'" + customer.getStr("address") + "'})\">客户拜访</div>\n");
+			html.append("		<div class=\"button red-button fr\" onclick=\"newOrder({customerName:'" + customer.getStr("customer_name") + "',\n" +
+					"                                                                    sellerCustomerId:'" + customer.getStr("sellerCustomerId") + "',\n" +
+					"                                                                    contact:'" + customer.getStr("contact") + "',\n" +
+					"                                                                    mobile:'" + customer.getStr("mobile") + "',\n" +
+					"                                                                    address:'" + customer.getStr("address") + "'})\" >下订单</div>\n");
 			html.append("	</div>\n");
 			html.append("	<p class=\"gray\">\n");
 			html.append("		<span class=\"icon-map-marker ft16 green\"></span>\n");
@@ -163,9 +161,10 @@ public class CustomerController extends BaseFrontController {
 
 	public void refreshHistoryOrder() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
 		Page<Record> orderList = new Page<>();
-		orderList = SalesOrderQuery.me().findBySellerCustomerId(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("sellerCustomerId"), DataAreaUtil.getUserDeptDataArea(user.getDataArea()) + "%");
+		orderList = SalesOrderQuery.me().findBySellerCustomerId(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("sellerCustomerId"), selectDataArea + "%");
 
 		StringBuilder html = new StringBuilder();
 		for(Record order : orderList.getList()){
@@ -204,8 +203,9 @@ public class CustomerController extends BaseFrontController {
 
 	public void historyOrder() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
-		Page<Record> orderList = SalesOrderQuery.me().findBySellerCustomerId(getPageNumber(), getPageSize(), getPara("sellerCustomerId"), DataAreaUtil.getUserDeptDataArea(user.getDataArea()) + "%");
+		Page<Record> orderList = SalesOrderQuery.me().findBySellerCustomerId(getPageNumber(), getPageSize(), getPara("sellerCustomerId"), selectDataArea + "%");
 
 		for(Record record : orderList.getList()){
 			record.set("statusName", getStatusName(record.getInt("status")));
@@ -226,7 +226,7 @@ public class CustomerController extends BaseFrontController {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		
 		if (StrKit.notBlank(id)) {
-			String selectDataArea = DataAreaUtil.getUserDeptDataArea(user.getDataArea());
+			String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 			SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(id);
 			String dealerDataArea = DataAreaUtil.getUserDealerDataArea(selectDataArea);
 			List<String> typeList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeIdListBySellerCustomerId(id, dealerDataArea + "%");
@@ -247,7 +247,7 @@ public class CustomerController extends BaseFrontController {
 	public void getCustomerType(){
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
-		String selectDataArea = DataAreaUtil.getUserDeptDataArea(user.getDataArea());
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
 				.findByDataArea(DataAreaUtil.getUserDealerDataArea(selectDataArea));
@@ -485,7 +485,6 @@ public class CustomerController extends BaseFrontController {
 		render("customer_review.html");
 	}
 
-
 	public void enable() {
 
 		String id = getPara("id");
@@ -508,6 +507,7 @@ public class CustomerController extends BaseFrontController {
 	public void complete() {
 
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 
 		String taskId = getPara("taskId");
 		Integer status = getParaToInt("status");
@@ -528,7 +528,6 @@ public class CustomerController extends BaseFrontController {
 
 		if (status == 1) {
 
-			String sellerId = getSessionAttr("sellerId");
 			CustomerVO customerVO = (CustomerVO) workFlowService.getTaskVariableByTaskId(taskId,"customerVO");
 
 			if(customerVO != null) {
@@ -612,10 +611,22 @@ public class CustomerController extends BaseFrontController {
 			}
 		}
 
+		Message message = new Message();
+		message.setSellerId(sellerId);
+		message.setType("100603");
+		message.setTitle("客户审核消息");
+		message.setContent(comment);
+		message.setFromUserId(workFlowService.getTaskVariableByTaskId(taskId,"fromId").toString());
+		message.setToUserId(user.getId());
+		message.setDeptId(user.getDepartmentId());
+		message.setDataArea(user.getDataArea());
+		message.setIsRead(0);
+		updated = updated && message.saveOrUpdate();
 		workFlowService.completeTask(taskId, comment, null);
 
-		if (updated)
+		if (updated){
 			renderAjaxResultForSuccess("操作成功");
+		}
 		else
 			renderAjaxResultForError("操作失败");
 	}
@@ -640,6 +651,7 @@ public class CustomerController extends BaseFrontController {
 	
 				param.put("applyUsername", user.getUsername());
 				param.put("manager", manager.getUsername());
+				param.put("fromId", user.getId());
 				
 				WorkFlowService workflow = new WorkFlowService();
 				String procInstId = workflow.startProcess(customerId, defKey, param);
@@ -673,7 +685,7 @@ public class CustomerController extends BaseFrontController {
 	}
 
 	private Object[] getUserIdList(User user) {
-		List<Record> userList = UserQuery.me().findNextLevelsUserList(user.getDataArea());
+		List<Record> userList = UserQuery.me().findNextLevelsUserList(getSessionAttr(Consts.SESSION_SELECT_DATAAREA).toString() + "%");
 		if (userList.size() == 0) return null;
 
 		Object[] userIdList = new Object[userList.size()];

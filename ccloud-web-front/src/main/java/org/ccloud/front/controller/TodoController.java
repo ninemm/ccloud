@@ -24,6 +24,7 @@ public class TodoController extends BaseFrontController {
 		String username = user.getUsername();
 		List<SellerCustomer> list = SellerCustomerQuery.me().getToDo(username);
 		setAttr("todoList", list);
+		if (list.size()==0) setAttr("size", list.size());
 		render("todo_customer.html");
 	}
 	
@@ -32,7 +33,7 @@ public class TodoController extends BaseFrontController {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String username = user.getUsername();
 		List<SalesOrder> list = SalesOrderQuery.me().getToDo(username);
-		setAttr("todoList", list);
+		if(list.size() !=0 )setAttr("todoList", list);
 		render("todo_order.html");
 	}
 	
