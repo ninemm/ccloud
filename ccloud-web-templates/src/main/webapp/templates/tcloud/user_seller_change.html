@@ -7,10 +7,14 @@
 <#macro script>
 $(function() {
     $('.weui-check').click(function() {
-        console.log($(this).val());
         var sellerId = $(this).val();
+        var curSellerId = '${(session.sellerId)!}';
         var openid = '${(session._logined_user.wechatOpenId)!}';
-        console.log(openid)
+        
+        if (sellerId == curSellerId) {
+            return ;
+        }
+        
         $.confirm({
             title: '账号切换',
             text: '确定切换账号吗',
@@ -36,8 +40,6 @@ $(function() {
                         layer.closeAll();
                     }
                 });
-                //layer.closeAll();
-                //location.href = '${CPATH}/customer'
             },
             onCancel: function () {
                 $.closeModal();
@@ -66,15 +68,6 @@ $(function() {
 		</label>
 		</#list>
 		</#if>
-		<!-- <label class="weui-cell weui-check__label" for="x12">
-			<div class="weui-cell__bd">
-				<p>咏梅</p>
-			</div>
-			<div class="weui-cell__ft">
-				<input type="radio" name="radio1" class="weui-check" id="x12"
-					checked="checked"> <span class="weui-icon-checked"></span>
-			</div>
-		</label> -->
 	</div>
 	<#include "_inc/_goback.html" />
 </div>
