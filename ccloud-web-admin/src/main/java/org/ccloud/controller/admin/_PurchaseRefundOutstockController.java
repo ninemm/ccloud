@@ -170,10 +170,10 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 		purchaseRefundOutstock.set("data_area", user.getDataArea());
 		String productNumStr = StringUtils.getArrayFirst(paraMap.get("productNum"));
 		Integer productNum = Integer.valueOf(productNumStr);
-		Integer count = 0;
+		
 		Integer index = 0;
 
-		while (productNum > count) {
+		for (Integer count = 0;count<productNum;count++) {
 			index++;
 			String purchaseInstockDetailId = StringUtils.getArrayFirst(paraMap.get("purchaseInstockDetailId" + index));
 			PurchaseInstockDetail purchaseInstockDetail = PurchaseInstockDetailQuery.me().findById(purchaseInstockDetailId);
@@ -207,7 +207,7 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 				purchaseRefundOutstockDetail.set("dept_id", user.getDepartmentId());
 				purchaseRefundOutstockDetail.set("data_area", user.getDataArea());
 				purchaseRefundOutstockDetail.save();
-				count++;
+				
 			}
 
 		}

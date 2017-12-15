@@ -196,8 +196,7 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 		purchaseInstock.set("modify_date", new Date());
 		String productNumStr = StringUtils.getArrayFirst(paraMap.get("productNum"));
 		Integer productNum = Integer.valueOf(productNumStr);
-		Integer count = 0;
-		Integer index = 0;
+		
 		BigDecimal totalAmount = new BigDecimal(0);
 		Set<String> set = new HashSet<String>();
 		for(int i = 1;i<=productNum;i++){
@@ -224,7 +223,8 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 			}
 		}
 		
-		while (productNum > count) {
+		Integer index = 0;
+		for (Integer count = 0;count<productNum;count++) {
 			index++;
 			String sellerProductId = StringUtils.getArrayFirst(paraMap.get("sellerProductId"+index));
 			for(int i = 0;i<instockDetails.size();i++){
@@ -247,7 +247,6 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 				purchaseInstockDetail.update();
 				purchaseOrder.set("status", 3000);
 				purchaseOrder.update();
-				count++;
 				totalAmount = totalAmount.add(productAmount);
 			}
 		}
