@@ -70,43 +70,43 @@
 	});
 
 	var validatorFields = {
-		'seller_name': {
+		'seller.seller_name': {
 			validators: {
 				notEmpty: { message: '销售商名称不能为空' },
 				stringLength: { max: 25, message: '销售商名称最大长度是25字符，请重新输入' }
 			}
 		},
-		'contact': {
+		'seller.contact': {
 			validators: {
 				notEmpty: { message: '联系人不能为空' },
 				stringLength: { max: 15, message: '联系人名称最大长度是15字符，请重新输入' }
 			}
 		},
-		'jywx_open_id': {
+		'seller.jywx_open_id': {
 			validators: {
 				notEmpty: { message: '带*的企业微信号不能为空' },
 				stringLength: { max: 15, message: '企业微信号最大长度是15字符，请重新输入' }
 			}
 		},
-		'product_type_store': {
+		'seller.product_type_store': {
 			validators: {
 				notEmpty: { message: '产品类型不能为空' },
 				stringLength: { max: 15, message: '产品类型最大长度是15字符，请重新输入' }
 			}
 		},
-		'phone': {
+		'seller.phone': {
 			validators: {
 				notEmpty: { message: '手机号不能为空' },
-				regexp:{regexp:/^1[3|5|7|8]{1}[0-9]{9}$/, message:'请输入正确的手机号码' }
+				regexp:{regexp:/^1[3|4|5|7|8|9]{1}[0-9]{9}$/, message:'请输入正确的手机号码' }
 			}
 		},
-		'market_name': {
+		'seller.market_name': {
 			validators: {
 				notEmpty: { message: '市场名称不能为空' },
 				stringLength: { max: 50, message: '市场名称最大长度是15字符，请重新输入' }
 			}
 		},
-		'market_code': {
+		'seller.market_code': {
 			validators: {
 				notEmpty: { message: '市场代码不能为空' },
 				stringLength: { max: 50, message: '市场代码最大长度是15字符，请重新输入' }
@@ -191,7 +191,7 @@
 			</div>
 		</div>
 		<form action="${CPATH}/admin/seller/save" method="post" id="form" class="form-horizontal" >
-			<input type="hidden" name="id" value="${(seller.id)!}">
+			<input type="hidden" name="seller.id" value="${(seller.id)!}">
 					<div class="box-body">
 						<div class="form-group col-sm-12 validata-box">
 								<label class="control-label col-sm-2">所属部门组织:</label>
@@ -208,37 +208,37 @@
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">*销售商名称:</label>
 							<div class="input-group col-md-4 col-sm-10">
-								<input class="form-control input-sm" type="text" name="seller_name" value="${(seller.seller_name)!}" placeholder="1-25个任意字母数字">
+								<input class="form-control input-sm" type="text" name="seller.seller_name" value="${(seller.seller_name)!}" placeholder="1-25个任意字母数字">
 							</div>
 						</div>
 						<#if (seller.id) ??>
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">*销售商编码:</label>
 							<div class="input-group col-md-4 col-sm-10">
-								<input class="form-control input-sm" type="text" readonly name="seller_code" value="${(seller.seller_code)!}">
+								<input class="form-control input-sm" type="text" readonly name="seller.seller_code" value="${(seller.seller_code)!}">
 							</div>
 						</div>
 						</#if>
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">*联系人:</label>
 							<div class="input-group col-md-4 col-sm-10">
-								<input class="form-control input-sm" type="text" name="contact" value="${(seller.contact)!}" placeholder="1-15个任意字母数字">
+								<input class="form-control input-sm" type="text" name="seller.contact" value="${(seller.contact)!}" placeholder="1-15个任意字母数字">
 							</div>
 						</div>
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">*手机号:</label>
 							<div class="input-group col-md-4 col-sm-10">
-								<input class="form-control input-sm" type="text" name="phone" value="${(seller.phone)!}" placeholder="11位数字">
+								<input class="form-control input-sm" type="text" name="seller.phone" value="${(seller.phone)!}" placeholder="11位数字">
 							</div>
 						</div>
 						<div class="form-group col-sm-12 validata-box">
 										<label class="control-label col-sm-2">是否启用:</label>
 										<div class="input-group col-md-4 col-sm-10">
 											<label class="radio-inline">
-						                 		<input type="radio" name="is_enabled" value="1" <#if !seller?? || seller.is_enabled == 1>checked</#if>>是
+						                 		<input type="radio" name="seller.is_enabled" value="1" <#if !seller?? || seller.is_enabled == 1>checked</#if>>是
 						                 	</label>
 						                 	<label class="radio-inline">
-						                 		<input type="radio" name="is_enabled" value="0" <#if seller?? && seller.is_enabled == 0>checked</#if>>否
+						                 		<input type="radio" name="seller.is_enabled" value="0" <#if seller?? && seller.is_enabled == 0>checked</#if>>否
 											</label>		                 		
 						               	</div>
 						</div>
@@ -259,31 +259,31 @@
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">*市场名称:</label>
 							<div class="input-group col-md-4 col-sm-10">
-								<input class="form-control input-sm" type="text" name="market_name" value="${(seller.market_name)!}" placeholder="1-25个任意字母数字">
+								<input class="form-control input-sm" type="text" name="seller.market_name" value="${(seller.market_name)!}" placeholder="1-25个任意字母数字">
 							</div>
 						</div>
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">*市场代码:</label>
 							<div class="input-group col-md-4 col-sm-10">
-								<input class="form-control input-sm" type="text" name="market_code" value="${(seller.market_code)!}" placeholder="1-25个任意字母数字">
+								<input class="form-control input-sm" type="text" name="seller.market_code" value="${(seller.market_code)!}" placeholder="1-25个任意字母数字">
 							</div>
 						</div>
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">*企业微信号ID1:</label>
 							<div class="input-group col-md-4 col-sm-10">
-								<input class="form-control input-sm" type="text" name="jywx_open_id" value="${(seller.jywx_open_id)!}" placeholder="1-25个任意字母数字">
+								<input class="form-control input-sm" type="text" name="seller.jywx_open_id" value="${(seller.jywx_open_id)!}" placeholder="1-25个任意字母数字">
 							</div>
 						</div>
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">企业微信号ID2:</label>
 							<div class="input-group col-md-4 col-sm-10">
-								<input class="form-control input-sm" type="text" name="jpwx_open_id" value="${(seller.jpwx_open_id)!}" placeholder="1-25个任意字母数字">
+								<input class="form-control input-sm" type="text" name="seller.jpwx_open_id" value="${(seller.jpwx_open_id)!}" placeholder="1-25个任意字母数字">
 							</div>
 						</div>
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">*产品类型:</label>
 							<div class="input-group col-md-4 col-sm-10">
-								<input class="form-control input-sm" type="text" name="product_type_store" value="${(seller.product_type_store)!}" placeholder="1-50个任意字母数字">
+								<input class="form-control input-sm" type="text" name="seller.product_type_store" value="${(seller.product_type_store)!}" placeholder="1-50个任意字母数字">
 							</div>
 						</div>
 						<div class="form-group col-sm-12 validata-box">
@@ -296,12 +296,12 @@
 						<div class="form-group col-sm-12 validata-box">
 										<label class="control-label col-sm-2">备注:</label>
 										<div class="input-group col-md-4 col-sm-10">
-						                 	<textarea class="form-control" rows="3" name="remark" value="${(seller.remark)!}" placeholder="2-20个任意字母数字">${(seller.remark)!}</textarea>
+						                 	<textarea class="form-control" rows="3" name="seller.remark" value="${(seller.remark)!}" placeholder="2-20个任意字母数字">${(seller.remark)!}</textarea>
 						               	</div>
 						</div>
 					</div>
 		<div class="box-footer"> 
-			<button type="button" id="do_Submit" onclick="doSubmit()" class="btn btn-primary">保存更改</button>
+			<button type="button" id="do_Submit" onclick="doSubmit()" class="btn btn-primary ladda-button" data-style="expand-right">保存更改</button>
 			<input type="button" class="btn btn-primary" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
 		</div>
 		</form>

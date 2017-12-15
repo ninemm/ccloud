@@ -15,10 +15,16 @@
  */
 package org.ccloud.model.query;
 
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.LinkedList;
+
+import org.ccloud.Consts;
 import org.ccloud.model.Payables;
 
+import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
 /**
@@ -42,27 +48,39 @@ public class PayablesQuery extends JBaseQuery {
 		});
 	}
 	
-	public Payables findByObjId(String objId,String deptId) {
-		String select = "select * from cc_payables where obj_id= '"+objId+"' and dept_id= '"+deptId+"'";
+	public Payables findByObjId(String objId, String objType) {
+		String select = "select * from cc_payables where obj_id= '"+objId+"' and obj_type= '"+objType+"'";
 		return DAO.findFirst(select);
 	}
 	
-	public Page<Payables> paginate(int pageNumber, int pageSize,String keyword,String cutomerType,String dataArea, String orderby) {
-		String select = "";
-		StringBuilder fromBuilder = new StringBuilder("");
-		LinkedList<Object> params = new LinkedList<Object>();
-		if(cutomerType.equals("supplier")) {
-			select = "select cc_p.*,cc_s.`code` customer_no,cc_s.`name` customer_name,'供应商' customer_type ";
-			fromBuilder.append(" from cc_payables cc_p inner join cc_supplier cc_s on cc_p.obj_id = cc_s.id where cc_p.obj_type = 'supplier' ");
-			 appendIfNotEmptyWithLike(fromBuilder,"cc_p.data_area",dataArea,params,false);
-			 appendIfNotEmptyWithLike(fromBuilder, "cc_s.`name`", keyword, params, false);
+	public void updateAmountById(String id,String act_amount) {
+		StringBuilder sqlBuilder = new StringBuilder("UPDATE `cc_payables` SET act_amount = act_amount +"+act_amount+" , balance_amount = balance_amount-"+act_amount+" WHERE id='"+id+"'");
+		Db.update(sqlBuilder.toString());
+	}
+	
+    public Page<Payables> paginate(int pageNumber, int pageSize, String id,String type,String seller_id,String dataArea) {
+		Boolean b = true;
+		String select;
+		StringBuilder fromBuilder;
+		
+		if("1".equals(type)) {
+			select = "SELECT r.obj_id AS id,c.customer_code AS code,c.customer_name AS name,r.pay_amount,r.act_amount,r.balance_amount";
+			fromBuilder = new StringBuilder(" FROM `cc_payables` AS r INNER JOIN `cc_customer_join_customer_type` AS ct ON r.obj_id=ct.seller_customer_id LEFT JOIN `cc_seller_customer` AS sc ON sc.id=ct.seller_customer_id LEFT JOIN `cc_customer` AS c ON c.id=sc.customer_id ");
+			if(!("0".equals(id)) && id != null){
+				fromBuilder.append(" WHERE ct.customer_type_id = '"+ id+"'");
+				b = false;
+			}
 		}else {
-			select = "select cc_p.*,cc_c.customer_code customer_no,cc_c.customer_name customer_name,cc_s.customer_kind customer_type ";
-			fromBuilder.append(" from cc_payables cc_p left join cc_seller_customer cc_s on cc_p.obj_id = cc_s.id left join cc_customer cc_c on cc_s.customer_id = cc_c.id where cc_p.obj_type = 'customer' ");
-			 appendIfNotEmptyWithLike(fromBuilder, "cc_p.data_area", dataArea, params, false);
-			 appendIfNotEmptyWithLike(fromBuilder, "cc_c.customer_name", keyword, params, false);
+			select = "SELECT s.id,s.code,s.name,r.pay_amount,r.act_amount,r.balance_amount";
+			fromBuilder = new StringBuilder(" FROM `cc_payables` AS r INNER JOIN `cc_supplier` AS s on r.object_id=s.id ");
+			if(!"0".equals(id)){
+				fromBuilder.append("WHERE s.id = '"+ id+"'");
+				b = false;
+			}
 		}
-		fromBuilder.append("order by " + orderby);
+		LinkedList<Object> params = new LinkedList<Object>();
+		appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, b);
+		fromBuilder.append(" ORDER BY r.create_date DESC");
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
@@ -80,6 +98,27 @@ public class PayablesQuery extends JBaseQuery {
 			return deleteCount;
 		}
 		return 0;
+	}
+
+	public boolean insert(Record record, Date date) {
+		Payables payables = this.findByObjId(record.getStr("customer_id"), Consts.RECEIVABLES_OBJECT_TYPE_CUSTOMER);
+		if (payables == null) {
+			payables = new Payables();
+			payables.setObjId(record.getStr("customer_id"));
+			payables.setObjType(Consts.RECEIVABLES_OBJECT_TYPE_CUSTOMER);
+			payables.setPayAmount(record.getBigDecimal("total_reject_amount"));
+			payables.setActAmount(new BigDecimal(0));
+			payables.setBalanceAmount(record.getBigDecimal("total_reject_amount"));
+			payables.setDeptId(record.getStr("dept_id"));
+			payables.setDataArea(record.getStr("data_area"));
+			payables.setCreateDate(new Date());
+		} else {
+			payables.setPayAmount(payables.getPayAmount()
+					.add(record.getBigDecimal("total_reject_amount")));
+			payables.setBalanceAmount(payables.getBalanceAmount()
+					.add(record.getBigDecimal("total_reject_amount")));
+		}
+		return payables.saveOrUpdate();
 	}
 	
 }

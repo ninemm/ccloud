@@ -1,7 +1,9 @@
 <#include "_inc/_layout.html"/>
 <#macro css> </#macro>
 <#macro script>
-
+	function orderAgain() {
+		window.location.href = "${CPATH}/order/getOldOrder?orderId=${order.id}";
+	}
 </#macro>
 
 <@layout>
@@ -123,7 +125,7 @@
 <div class="layer"></div>
 <footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
   <button class="gray-button weui-flex__item">撤销</button>
-  <button class="blue-button weui-flex__item">再次购买</button>
+  <button onclick="orderAgain()" class="blue-button weui-flex__item">再次购买</button>
 </footer>
 </body>
 </@layout>

@@ -74,6 +74,7 @@ public class PurchaseOrderQuery extends JBaseQuery {
 		boolean needWhere = true;
 
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cpo.porder_sn", keyword, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cpo.data_area", dataArea, params, needWhere);
 
 		if (needWhere) {
 			fromBuilder.append(" where 1 = 1");
@@ -88,7 +89,7 @@ public class PurchaseOrderQuery extends JBaseQuery {
 			fromBuilder.append(" and cpo.create_date <= ?");
 			params.add(endDate);
 		}
-		fromBuilder.append(" and u.id='"+id+"' and cpo.data_area= '"+dataArea+"' ");
+		fromBuilder.append(" and u.id='"+id+"' ");
 		fromBuilder.append(" order by cpo.create_date desc ");
 
 		if (params.isEmpty())

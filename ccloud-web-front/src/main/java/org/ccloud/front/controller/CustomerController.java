@@ -85,7 +85,7 @@ public class CustomerController extends BaseFrontController {
 			region.add(item);
 		}
 
-		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(getUserDeptDataArea(user.getDataArea()));
+		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(DataAreaUtil.getUserDeptDataArea(user.getDataArea()) + "%");
 		List<Map<String, Object>> customerTypeList2 = new ArrayList<>();
 		customerTypeList2.add(all);
 
@@ -165,7 +165,7 @@ public class CustomerController extends BaseFrontController {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
 		Page<Record> orderList = new Page<>();
-		orderList = SalesOrderQuery.me().findBySellerCustomerId(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("sellerCustomerId"), getUserDeptDataArea(user.getDataArea()));
+		orderList = SalesOrderQuery.me().findBySellerCustomerId(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("sellerCustomerId"), DataAreaUtil.getUserDeptDataArea(user.getDataArea()) + "%");
 
 		StringBuilder html = new StringBuilder();
 		for(Record order : orderList.getList()){
@@ -205,7 +205,7 @@ public class CustomerController extends BaseFrontController {
 	public void historyOrder() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
-		Page<Record> orderList = SalesOrderQuery.me().findBySellerCustomerId(getPageNumber(), getPageSize(), getPara("sellerCustomerId"), getUserDeptDataArea(user.getDataArea()));
+		Page<Record> orderList = SalesOrderQuery.me().findBySellerCustomerId(getPageNumber(), getPageSize(), getPara("sellerCustomerId"), DataAreaUtil.getUserDeptDataArea(user.getDataArea()) + "%");
 
 		for(Record record : orderList.getList()){
 			record.set("statusName", getStatusName(record.getInt("status")));
@@ -226,7 +226,7 @@ public class CustomerController extends BaseFrontController {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		
 		if (StrKit.notBlank(id)) {
-			String selectDataArea = getUserDeptDataArea(user.getDataArea());
+			String selectDataArea = DataAreaUtil.getUserDeptDataArea(user.getDataArea());
 			SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(id);
 			String dealerDataArea = DataAreaUtil.getUserDealerDataArea(selectDataArea);
 			List<String> typeList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeIdListBySellerCustomerId(id, dealerDataArea + "%");
@@ -247,7 +247,7 @@ public class CustomerController extends BaseFrontController {
 	public void getCustomerType(){
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
-		String selectDataArea = getUserDeptDataArea(user.getDataArea());
+		String selectDataArea = DataAreaUtil.getUserDeptDataArea(user.getDataArea());
 
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
 				.findByDataArea(DataAreaUtil.getUserDealerDataArea(selectDataArea));
@@ -280,8 +280,6 @@ public class CustomerController extends BaseFrontController {
 		String areaCode = getPara("areaCode");
 		String areaName = getPara("areaName");
 		String customerTypeIds = getPara("customerTypeIds", "");
-
-		System.err.println(customerTypeIds);
 
 		String custTypeNames = getPara("customer_type");
 
@@ -491,7 +489,7 @@ public class CustomerController extends BaseFrontController {
 	public void enable() {
 
 		String id = getPara("id");
-		int isEnabled = getParaToInt("isEnabled");
+		//int isEnabled = getParaToInt("isEnabled");
 		if(StrKit.notBlank(id)) {
 
 			boolean updated = startProcess(id, new HashMap<String, Object>());
@@ -672,14 +670,6 @@ public class CustomerController extends BaseFrontController {
 			}
 		}
 		return isUpdated;
-	}
-
-	private String getUserDeptDataArea(String dataArea) {
-		if (dataArea.length() % 3 != 0) {
-			return DataAreaUtil.getUserDeptDataArea(dataArea);
-		} else {
-			return dataArea;
-		}
 	}
 
 	private Object[] getUserIdList(User user) {

@@ -274,4 +274,27 @@ public abstract class BaseCustomerVisit<M extends BaseCustomerVisit<M>> extends 
 		return get("modify_date");
 	}
 
+	public void setProcDefKey(java.lang.String procDefKey) {
+		set("proc_def_key", procDefKey);
+	}
+
+	public java.lang.String getProcDefKey() {
+		return getStr("proc_def_key");
+	}
+
+	public void setProcInstId(java.lang.String procInstId) {
+		set("proc_inst_id", procInstId);
+	}
+
+	public java.lang.String getProcInstId() {
+		return getStr("proc_inst_id");
+	}
+
+	public void setImageListStore(java.lang.String imageListStore) {
+		set("image_list_store", imageListStore);
+	}
+
+	public java.lang.String getImageListStore() {
+		return getStr("image_list_store");
+	}
 }

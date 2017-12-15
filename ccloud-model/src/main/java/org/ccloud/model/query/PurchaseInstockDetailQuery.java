@@ -27,7 +27,6 @@ import org.ccloud.model.Product;
 import org.ccloud.model.PurchaseInstockDetail;
 import org.ccloud.model.SellerProduct;
 import org.ccloud.utils.DateUtils;
-import org.ccloud.utils.QRCodeUtils;
 import org.ccloud.utils.StringUtils;
 
 import com.jfinal.kit.StrKit;

@@ -5,20 +5,6 @@
 	<script src="${CPATH}/static/layer_mobile/layer.js"></script>
 </#macro>
 <#macro script>
-	$(function() {
-	    $("#region").select({
-	        title: "选择客户区域",
-	        items: ["全部", "总部-默认区域"]
-	    });
-	    $("#customer-type").select({
-	        title: "选择客户类型",
-	        items: ["全部", "团购直销", "商超"]
-	    });
-	    $("#if-order").select({
-	        title: "是否下单",
-	        items: ["全部", "是", "否"]
-	    });
-	});
 
 	function doReject(url){
 
@@ -33,7 +19,7 @@
 						title: res.message,
 						text: '返回列表页？',
 						onOK: function () {
-							location.href = '${CPATH}/todo/customer'
+							location.href = '${CPATH}/todo/visit'
 						},
 						onCancel: function () {
 							$.closeModal();
@@ -59,7 +45,7 @@
 						title: res.message,
 						text: '返回列表页？',
 						onOK: function () {
-							location.href = '${CPATH}/todo/customer'
+							location.href = '${CPATH}/todo/visit'
 						},
 						onCancel: function () {
 							$.closeModal();
@@ -97,7 +83,7 @@
 				</a>
 			</div>
 			<div class="weui-cell weui-cell_access">
-				<a class="weui-cell__bd" style="color: gray" href="${CPATH}/customerVisit/review?id=${bean.id}&taskId=${bean.taskId!}&assignee=${bean.assignee}">变更详情</a>
+				<a class="weui-cell__bd" style="color: gray" href="${CPATH}/customerVisit/review?id=${bean.id}&taskId=${bean.taskId!}&assignee=${bean.assignee}">拜访详情</a>
 				<span class="weui-cell__ft"></span>
 			</div>
 			<div class="weui-cell weui-cell_access">

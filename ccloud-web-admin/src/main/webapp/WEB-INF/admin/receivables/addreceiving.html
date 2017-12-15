@@ -28,18 +28,6 @@ var $form = $("#form");
 $(function(){
 	
     jQuery.mm.initDatetimepicker('form', '#biz_date', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
-<!-- 	var nowDate = new Date(); -->
-<!-- 	var nowDateStr = getDateTime(nowDate); -->
-	
-<!-- 	$('#biz_date').datetimepicker({ -->
-<!-- 		language: 'zh-CN', -->
-<!--     	format: 'yyyy-mm-dd hh:ii:ss', -->
-<!--     	endDate: nowDate, -->
-<!--     	todayBtn: true, -->
-<!--     	initialDate: nowDateStr -->
-<!-- 	}); -->
-	
-<!-- 	$("#biz_date").val(nowDateStr); -->
 	
 	$('#receive_user').select2({
 		'data':userInfo,
@@ -88,41 +76,7 @@ function returnToList(){
 	window.location.href = "${CPATH}/admin/receivables/renderlist?ref_sn=${ref_sn}&ref_type=${ref_type}&object_id=${object_id}";
 }
 
-// 获取日期字符串
-<!-- function getDateTime(date){ -->
-<!-- 	var dateStr = ''; -->
-<!-- 	if(getObjectClass(date) === 'Date'){ -->
-<!-- 		var nowY = date.getFullYear(); -->
-<!-- 		var nowM = date.getMonth()+1; -->
-<!-- 		var nowD = date.getDate(); -->
-<!-- 		var nowH = date.getHours() < 10 ? "0" + date.getHours() : date.getHours(); -->
-<!-- 		var nowMin =  date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes(); -->
-<!-- 		var nowS = date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds(); -->
-<!-- 		dateStr = nowY+"-"+(nowM<10 ? "0" + nowM : nowM)+"-"+(nowD<10 ? "0"+ nowD : nowD)+" "+nowH+":"+nowMin+":"+nowS; -->
-<!-- 	} -->
-<!-- 	return dateStr; -->
-<!-- } -->
 
-// 获取类名
-function getObjectClass(obj){
- if (obj && obj.constructor && obj.constructor.toString()) {
-   	if(obj.constructor.name) {
-    	return obj.constructor.name;
-   	}
-   	var str = obj.constructor.toString();
-
-    if(str.charAt(0) == '[')
-   	{
-     	var arr = str.match(/\[\w+\s*(\w+)\]/);
-   	} else {
-       var arr = str.match(/function\s*(\w+)/);
-    }
-    if (arr && arr.length == 2) {
-        return arr[1];
-     }
-  }
-  return undefined; 
-};
 </#macro>
 
 <@layout active_id=p child_active_id=c>

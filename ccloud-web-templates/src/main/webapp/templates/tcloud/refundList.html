@@ -1,0 +1,238 @@
+<#include "_inc/_layout.html"/>
+<#macro css> </#macro>
+<#macro script>
+  $(function () {
+  
+	$(document).on("change", "#status", function() {
+		combo();
+	}).on("change", "#customerTypeId", function() {
+		combo();
+	}).on("change", "#datePicker", function() {
+		startDate = $("#datePicker").val();
+		endDate = startDate + ' 23:59:59';
+		combo();
+	});
+
+    $("#datePicker").calendar();
+    $("#datePicker").val($.today());
+
+	combo();
+  });
+
+	$("#status").select({
+	  title: "订单状态",
+	  items: [{
+	       title: "全部", value: ""
+	       },{
+	       title: "取消", value: "1001"
+	       },{
+	       title: "待审核", value: "0"
+	       },{
+	       title: "已审核", value: "1000"
+	       },{
+	       title: "部分入库", value: "2000"
+	       },{
+	       title: "全部入库", value: "3000"
+	       }]
+	});
+	$("#customerTypeId").select({
+	  title: "选择客户类型",
+	  items: ${customerTypes!}
+	});
+  
+	var newHtml = $(".weui-panel").eq(0).html();
+	var $main = $("#main");
+	var $loading = $("#loading");
+	var $noMore = $("#noMore");
+	var loading = false;
+	
+	var keyword = '';
+	var startDate = $.today();
+	var endDate = $.today() + ' 23:59:59';
+	var page = 1;
+	var size = 10;
+
+	function initMyOrder(){
+		$loading.show();
+		$noMore.hide();
+
+		var params = {
+			"page": page,
+			"size": size,
+			"keyword": keyword,
+			"status": $("#status").data('values'),
+			"customerTypeId": $("#customerTypeId").data('values'),
+			"startDate": startDate,
+			"endDate" : endDate
+		}
+
+
+		Utils.ajax('${CPATH}/refund/list', params, 
+			function(data){
+				$loading.hide();
+
+				if(data.refundList.length == 0){
+					$noMore.show();
+					loading = true;
+					return;
+				}
+
+				$.each(data.refundList, function(index, el) {
+	
+					$main.append("<div class='weui-panel weui-panel_access'>" + newHtml + "</section>");
+					var $newOrder = $main.find(".weui-panel:last");
+					
+					if(el.receive_type == 1) {
+						$newOrder.find("#receiveType").remove();
+					}
+					
+
+					$newOrder.find("#orderSn").text(el.instock_sn);
+					
+					$newOrder.find("#status").text(getStatus(el.status));
+					$newOrder.find("#customerName").text(el.customer_name);
+					$newOrder.find("#contact").text(el.ccontact + '/' + el.cmobile);
+					$newOrder.find("#customerType").text(el.customerTypeName);
+					$newOrder.find("#refund").on('click', function(){ 
+ 						 window.location.href = "${CPATH}/refund/refundDetail?id="+el.id
+					}); 
+
+					$newOrder.find("#amount").text(el.reject_amount);
+					$newOrder.find("#date").text('时间：' + el.create_date);
+				});
+				page++;
+				loading = false;
+			}
+		);
+	}
+	
+	function getDateOrder(){
+		var dateType = $("#getDate").find(".blue-button").data("id");
+		var date = new Date();
+		if(dateType == 0){
+			startDate = $.today();
+		}else if(dateType == 1){
+			date.setDate(date.getDate() - 3);
+			startDate = date.Format("yyyy-MM-dd");
+		}else if(dateType == 2){
+			date.setDate(date.getDate() - 7);
+			startDate = date.Format("yyyy-MM-dd");
+		}else if(dateType == 3){
+			date.setDate(date.getDate() - 30);
+			startDate = date.Format("yyyy-MM-dd");
+		}
+
+		endDate = $.today() + ' 23:59:59';
+		combo();
+	}
+
+	function getStatus(value) {
+		if (value == 0) {
+			return '待审核';
+		} else if (value == 1000) {
+			return '已审核'
+		} else if (value == 1001) {
+			return '退货单取消'
+		} else if (value == 2000) {
+			return '部分入库'
+		} else {
+			return '全部入库'
+		}
+	}
+	
+	
+	//滑动方法
+	$("main").infinite().on("infinite", function() {
+		if(loading) {
+			return;
+		}
+		loading = true;
+		initMyOrder();
+	});
+	
+	function combo() {
+		$main.empty();
+		loading = false;
+		page = 1;
+		initMyOrder();
+	}
+</#macro>
+
+<@layout>
+<body id="my-order" class="ft12">
+	<header class="has-th-list weui-flex">
+		<div class="head-search select-area weui-flex__item">
+			<div class="weui-flex">
+				<div class="weui-flex__item">
+					<input type="text" id="status" class="weui-input" readonly placeholder="订单状态">
+					<i class="icon-sort-desc"></i>
+				</div>
+				<div class="weui-flex__item">
+					<input type="text" id="customerTypeId" placeholder="客户类型" class="weui-input" readonly>
+					<i class="icon-sort-desc"></i>
+				</div>
+				<div class="weui-flex__item">
+					<input type="text" id="datePicker" class="weui-input" readonly>
+					<i class="icon-sort-desc"></i>
+				</div>
+			</div>
+		</div>
+		<div id="combin-filter-btn">
+			<i class="icon-th-list"></i>
+		</div>
+	</header>
+	<main>
+		<div id="main">
+			<div class="weui-panel weui-panel_access" style="display: none">
+				<a id="salesOrderId">
+					<div class="ft14 gray">
+						<span class="tag" id="receiveType">账期</span>
+						<span id="orderSn">DH-O-20171017-002276</span>
+						<span class="fr blue" id="status">订单待审核</span>
+					</div>
+					<div id="customerName">
+						 小张烤鱼
+					</div>
+					<div class="gray">
+						<p>
+							联系人：<span id="contact">小张/18611111111</span>
+							<span class="fr" id="customerType">终端客户</span>
+						</p>
+					</div>
+					<div class="gray">
+						<p>
+							金额：￥<span id="amount">200</span>
+							<span class="fr" id="date">时间： 2017-10-17 06:03:04</span>
+						</p>
+					</div>
+				</a>
+				<hr>
+				<div id="refund" class="button white-button fr">详情</div>
+			</div>
+		</div>
+		<div class="weui-loadmore" id="loading" style="display: none;">
+		  <i class="weui-loading"></i>
+		  <span class="weui-loadmore__tips">正在加载</span>
+		</div>
+		<div class="weui-loadmore weui-loadmore_line" id="noMore" style="display: none;">
+		  <span class="weui-loadmore__tips">暂无数据</span>
+		</div>
+	</main>
+	<article id="combin-filter">
+		<div class="filter-item">
+			<h4>下单日期</h4>
+			<div class="relative" id="getDate">
+				<span class="blue-button" data-id="0">今天</span>
+				<span data-id="1">最近3天</span>
+				<span data-id="2">最近7天</span>
+				<span data-id="3">最近30天</span>
+			</div>
+		</div>
+		<footer class="weui-footer weui-footer_fixed-bottom ft16">
+			<button class="white-button width-50 cancel-search-btn">取消</button>
+			<button class="blue-button width-50 confirm-search-btn" onclick="getDateOrder()">确定</button>
+		</footer>
+	</article>
+	<#include "_inc/_goback.html" />
+</body>
+</@layout>

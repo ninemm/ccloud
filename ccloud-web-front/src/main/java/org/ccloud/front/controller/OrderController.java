@@ -116,6 +116,7 @@ public class OrderController extends BaseFrontController {
 		return "无";
 	}
 
+
 	public synchronized void salesOrder() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);

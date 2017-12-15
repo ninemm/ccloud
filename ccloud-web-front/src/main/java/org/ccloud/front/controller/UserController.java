@@ -4,7 +4,6 @@ import java.math.BigInteger;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -16,22 +15,19 @@ import org.ccloud.core.BaseFrontController;
 import org.ccloud.interceptor.UserInterceptor;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
-import org.ccloud.model.Customer;
-import org.ccloud.model.CustomerVisit;
-import org.ccloud.model.Dict;
+import org.ccloud.model.Department;
 import org.ccloud.model.GoodsType;
 import org.ccloud.model.Product;
 import org.ccloud.model.Seller;
 import org.ccloud.model.SmsCode;
 import org.ccloud.model.User;
-import org.ccloud.model.query.DictQuery;
+import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.GoodsTypeQuery;
 import org.ccloud.model.query.InventoryQuery;
 import org.ccloud.model.query.ProductQuery;
 import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.SmsCodeQuery;
 import org.ccloud.model.query.UserQuery;
-import org.ccloud.model.vo.ImageJson;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.shiro.CaptchaUsernamePasswordToken;
 import org.ccloud.utils.CookieUtils;
@@ -39,13 +35,11 @@ import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.EncryptUtils;
 import org.ccloud.utils.StringUtils;
 
-import com.alibaba.fastjson.JSON;
 import com.beust.jcommander.internal.Lists;
-import com.google.common.collect.Maps;
-
+import com.beust.jcommander.internal.Maps;
+import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Clear;
 import com.jfinal.core.ActionKey;
-import com.google.common.collect.ImmutableMap;
 import com.jfinal.kit.Ret;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
@@ -59,7 +53,7 @@ import com.jfinal.weixin.sdk.api.UserApi;
  * Created by WT on 2017/11/30.
  */
 @RouterMapping(url = Consts.ROUTER_USER)
-public class UserController extends BaseFrontController{
+public class UserController extends BaseFrontController {
 
 	public void index() {
 		String action = getPara();
@@ -77,6 +71,7 @@ public class UserController extends BaseFrontController{
 			if ("detail".equalsIgnoreCase(action)) {
 				renderError(404);
 			}
+			
 			render(String.format("user_%s.html", action));
 		}
 	}
@@ -105,8 +100,8 @@ public class UserController extends BaseFrontController{
 			}
 		}
 		
-		User user = UserQuery.me().findUserByUsername(username);
-		if (null == user) {
+		List<User> userList = UserQuery.me().findByMobile(username);
+		if (null == userList || userList.size() == 0) {
 			if (isAjaxRequest()) {
 				renderAjaxResultForError("没有该用户");
 			} else {
@@ -117,11 +112,46 @@ public class UserController extends BaseFrontController{
 			return;
 		}
 		
+
+		List<Map<String, String>> sellerList = Lists.newArrayList();
+		for (User temp : userList) {
+			List<Department> tmpList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(temp.getDepartmentId());
+			if (tmpList.size() > 0) {
+				Department dept = tmpList.get(0);
+				Map<String, String> seller = Maps.newHashMap();
+				seller.put("seller_id", dept.getStr("seller_id"));
+				seller.put("seller_name", dept.getStr("seller_name"));
+				seller.put("seller_code", dept.getStr("seller_code"));
+				sellerList.add(seller);
+			}
+		}
+		
+		if (sellerList.size() == 0) {
+			renderError(404);
+			return ;
+		} else if (sellerList.size() > 1) {
+			setAttr("mobile", username);
+			setAttr("sellerList", sellerList);
+			setSessionAttr("sellerList", sellerList);
+			forwardAction("/user/choice");
+			return ;
+		}
+		
+		User user = userList.get(0);
+		
 		if (EncryptUtils.verlifyUser(user.getPassword(), user.getSalt(), password)) {
 			MessageKit.sendMessage(Actions.USER_LOGINED, user);
-			CookieUtils.put(this, Consts.COOKIE_LOGINED_USER, user.getId());
+			//CookieUtils.put(this, Consts.COOKIE_LOGINED_USER, user.getId());
+			
+			if (!user.isAdministrator()) {
+				Map<String, String> map = sellerList.get(0);
+				setSessionAttr(Consts.SESSION_SELLER_ID, map.get("seller_id"));
+				setSessionAttr(Consts.SESSION_SELLER_NAME, map.get("seller_name"));
+				setSessionAttr(Consts.SESSION_SELLER_CODE, map.get("seller_code"));
+			}
 			// 获取用户权限
 			init(user.getUsername(), user.getPassword(), true);
+			
 			if (this.isAjaxRequest()) {
 				renderAjaxResultForSuccess("登录成功");
 			} else {
@@ -163,11 +193,48 @@ public class UserController extends BaseFrontController{
 		render("user_bind.html");
 	}
 	
+	public void change() {
+		
+		String mobile = getPara("mobile");
+		String openid = getPara("openid");
+		String sellerId = getPara("sellerId");
+		User curUser = null;
+		
+		List<User> userList = UserQuery.me().findByWechatOpenid(openid);
+		if (userList == null || userList.size() == 0)
+			userList = UserQuery.me().findByMobile(mobile);
+		
+		for (User user : userList) {
+			if (curUser != null)
+				break;
+			
+			List<Department> deptList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
+			for (Department dept : deptList) {
+				if (StrKit.equals(sellerId, dept.getStr("seller_id"))) {
+					curUser = user;
+					setSessionAttr(Consts.SESSION_SELLER_ID, dept.get("seller_id"));
+					setSessionAttr(Consts.SESSION_SELLER_NAME, dept.get("seller_name"));
+					setSessionAttr(Consts.SESSION_SELLER_CODE, dept.get("seller_code"));
+					break;
+				}
+			}
+		}
+		
+		if (curUser == null) {
+			renderError(404);
+			return ;
+		}
+		
+		init(curUser.getUsername(), curUser.getPassword(), true);
+		
+		redirect("/"); 
+	}
+	
 	public void checkMobile() {
 		
 		String mobile = getPara("mobile");
-		User user = UserQuery.me().findByMobile(mobile);
-		if (user != null)
+		List<User> list = UserQuery.me().findByMobile(mobile);
+		if (list != null && list.size() > 0)
 			renderAjaxResultForSuccess();
 		else
 			renderAjaxResultForError("手机号不存在");
@@ -181,48 +248,47 @@ public class UserController extends BaseFrontController{
 		final Ret ret = Ret.create();
 		
 		boolean updated = Db.tx(new IAtom() {
-			
 			@Override
 			public boolean run() throws SQLException {
-				
-				boolean isSend = false;
 				// 验证短信验证码是否正确
 				SmsCode smsCode = SmsCodeQuery.me().findByMobileAndCode(mobile, code);
-				if (smsCode != null) {
-					smsCode.setStatus(1);
-					if (!smsCode.update()) {
+				if (smsCode == null)
+					return false;
+				
+				smsCode.setStatus(1);
+				if (!smsCode.update())
+					return false;
+				
+				String openId = getSessionAttr(Consts.SESSION_WECHAT_OPEN_ID);
+				ApiResult wxUserResult = UserApi.getUserInfo(openId);
+				if (wxUserResult != null) {
+					
+					List<User> userList = UserQuery.me().findByMobile(mobile);
+					if (userList == null || userList.size() == 0) {
+						ret.set("message", "手机号不存在，请联系管理员");
 						return false;
 					}
-					isSend = true;
-				} else {
-					return false;
-				}
-				
-				if (isSend) {
-					String openId = getSessionAttr(Consts.SESSION_WECHAT_OPEN_ID);
 					
-					ApiResult wxUserResult = UserApi.getUserInfo(openId);
-					if (wxUserResult != null) {
-						User user = UserQuery.me().findByMobile(mobile);
-						
-						if (user == null) {
-							ret.set("message", "手机号不存在，请联系管理员");
-							return false;
-						}
-						
-						user.setAvatar(wxUserResult.getStr("headimgurl"));
-						user.setNickname(wxUserResult.getStr("nickname"));
-						user.setWechatOpenId(openId);
-						if (!user.saveOrUpdate()) {
-							ret.set("message", "手机号绑定失败，请联系管理员");
-							return false;
-						}
-						
-						// 获取用户权限
-						init(user.getUsername(), user.getPassword(), true);
+					User user = userList.get(0);
+					user.setAvatar(wxUserResult.getStr("headimgurl"));
+					user.setNickname(wxUserResult.getStr("nickname"));
+					user.setWechatOpenId(openId);
+					if (!user.saveOrUpdate()) {
+						ret.set("message", "手机号绑定失败，请联系管理员");
+						return false;
+					}
+					
+					// 获取用户权限
+					init(user.getUsername(), user.getPassword(), true);
+
+					List<Department> tmpList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
+					if (tmpList.size() > 0) {
+						Department dept = tmpList.get(0);
+						setSessionAttr(Consts.SESSION_SELLER_ID, dept.get("seller_id"));
+						setSessionAttr(Consts.SESSION_SELLER_NAME, dept.get("seller_name"));
+						setSessionAttr(Consts.SESSION_SELLER_CODE, dept.get("seller_code"));
 					}
 				}
-				
 				return true;
 			}
 		});
@@ -248,24 +314,6 @@ public class UserController extends BaseFrontController{
 							DataAreaUtil.getUserDeptDataArea(user.getDataArea()) + "%");
 				} else {
 					setSessionAttr(Consts.SESSION_SELECT_DATAAREA, user.getDataArea());
-				}
-
-				// sellerId
-				if (!subject.isPermitted("/admin/all")) {
-					List<Record> sellerList = SellerQuery.me().querySellerIdByDept(user.getDepartmentId());
-
-					if(sellerList.size() == 0) {
-						sellerList = SellerQuery.me().queryParentSellerIdByDept(user.getDepartmentId());
-
-						while(StrKit.isBlank(sellerList.get(0).getStr("sellerId"))) {
-							sellerList = SellerQuery.me().queryParentSellerIdByDept(sellerList.get(0).getStr("parent_id"));
-						}
-					}
-
-					setSessionAttr("sellerList", sellerList);
-					setSessionAttr("sellerId", sellerList.get(0).get("sellerId"));
-					setSessionAttr("sellerCode", sellerList.get(0).get("sellerCode"));
-					setSessionAttr("sellerName", sellerList.get(0).get("sellerName"));
 				}
 			}
 			MessageKit.sendMessage(Actions.USER_LOGINED, user);

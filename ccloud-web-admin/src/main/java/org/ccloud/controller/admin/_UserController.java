@@ -30,11 +30,13 @@ import org.ccloud.interceptor.UCodeInterceptor;
 import org.ccloud.menu.MenuManager;
 import org.ccloud.model.Department;
 import org.ccloud.model.Group;
+import org.ccloud.model.Seller;
 import org.ccloud.model.Station;
 import org.ccloud.model.User;
 import org.ccloud.model.UserGroupRel;
 import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.GroupQuery;
+import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.StationQuery;
 import org.ccloud.model.query.UserGroupRelQuery;
 import org.ccloud.model.query.UserQuery;
@@ -287,7 +289,7 @@ public class _UserController extends JBaseCRUDController<User> {
 	public void getGroup() {
 		String id = getPara("userid");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		List<Group> groups = GroupQuery.me().findByDept(dataArea);
+		List<Group> groups = GroupQuery.me().findByDept(DataAreaUtil.getUserDealerDataArea(dataArea));
 		List<Map<String, Object>> list = new ArrayList<>();
 		for (Group group : groups) {
 			if (group.getId().equals("0")) {
@@ -369,5 +371,18 @@ public class _UserController extends JBaseCRUDController<User> {
 			}
 			renderAjaxResultForSuccess("保存成功");
 			}
+	}
+	
+	public void changeSeller() {
+		
+		String sellerId = getPara("sellerId");
+		if (StrKit.isBlank(sellerId)) {
+			renderAjaxResultForError("销售商编码错误，请联系管理员!");
+			return ;
+		}
+		
+		Seller seller = SellerQuery.me().findById(sellerId);
+		
+		
 	}
 }

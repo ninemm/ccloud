@@ -185,5 +185,13 @@ public abstract class BasePayablesDetail<M extends BasePayablesDetail<M>> extend
 	public java.util.Date getModifyDate() {
 		return get("modify_date");
 	}
+	
+	public void setBizDate(java.util.Date bizDate) {
+		set("biz_date", bizDate);
+	}
+
+	public java.util.Date getBizDate() {
+		return get("biz_date");
+	}
 
 }

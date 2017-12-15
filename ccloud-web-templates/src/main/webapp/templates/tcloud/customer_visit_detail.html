@@ -1,0 +1,100 @@
+<#include "_inc/_layout.html"/>
+<#macro css> </#macro>
+<#macro script>
+</#macro>
+<@layout>
+<body id="customer-add">
+<main>
+    <section class="weui-panel weui-panel_access order-customer-info">
+        <div class="weui-cell weui-cell_access">
+            <div class="weui-cell__bd">
+                <div class="order-customer-info-title">
+                    客户名称
+                    <span class="require">*</span>
+                </div>
+                <input type="text" placeholder="客户名称" class="weui-input" value="${(visit.customer_name)!}">
+            </div>
+        </div>
+        <div class="weui-cell weui-cell_access">
+            <div class="weui-cell__bd">
+                <div class="order-customer-info-title">
+                    联系人
+                    <span class="require">*</span>
+                </div>
+                <input type="text" placeholder="联系人" class="weui-input" value="${(visit.contact)!}">
+            </div>
+        </div>
+        <div class="weui-cell weui-cell_access">
+            <div class="weui-cell__bd">
+                <div class="order-customer-info-title">
+                    联系电话
+                    <span class="require">*</span>
+                </div>
+                <input type="text" placeholder="联系电话" class="weui-input" value="${(visit.mobile)!}">
+            </div>
+        </div>
+        <!--<div class="weui-cell weui-cell_access">-->
+            <!--<div class="weui-cell__bd">-->
+                <!--<div class="order-customer-info-title">-->
+                    <!--活动名称-->
+                    <!--<span class="require">*</span>-->
+                <!--</div>-->
+                <!--<input type="text" placeholder="请选择" class="weui-input" value="">-->
+            <!--</div>-->
+            <!--<span class="weui-cell__ft"></span>-->
+        <!--</div>-->
+        <div class="weui-cell weui-cell_access">
+            <div class="weui-cell__bd">
+                <div class="order-customer-info-title">
+                    问题类型
+                    <span class="require">*</span>
+                </div>
+                <input type="text" placeholder="请选择" class="weui-input" value="${(visit.typeName)!}">
+            </div>
+        </div>
+        <div class="weui-cell weui-cell_access">
+            <div class="weui-cell__bd">
+                <textarea placeholder="备注说明（70字以内）">${(visit.question_desc)!}</textarea>
+            </div>
+        </div>
+    </section>
+    <section class="weui-cells weui-cells_form">
+        <div class="weui-cell">
+            <div class="weui-cell__bd">
+                <div class="weui-uploader">
+                    <div class="weui-uploader__hd">
+                        <p class="weui-uploader__title">附件图片</p>
+                        <div class="weui-uploader__info">${(visit.imageList?size)!0}/2</div>
+                    </div>
+                    <div class="weui-uploader__bd">
+                        <ul class="weui-uploader__files" id="uploaderFiles">
+                            <#if (visit.imageList) ??>
+                                <#list visit.imageList as bean>
+                                    <li class="weui-uploader__file" style="background-image: url(${bean.savePath})"></li>
+                                </#list>
+                            </#if>
+                        </ul>
+                        <!--<div class="weui-uploader__input-box">-->
+                            <!--&lt;!&ndash;<input id="uploaderInput" name="customer.img_path" class="weui-uploader__input" type="file" accept="image/*" multiple="">&ndash;&gt;-->
+                            <!--<input type="hidden" name="pic" id="pic">-->
+                        <!--</div>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="weui-panel weui-panel_access ft14 remark">
+        <div class="weui-cell weui-cell_access">
+            <div class="weui-cell__bd">
+                <span class="icon-map-pin ft16 green"></span>
+                &nbsp;&nbsp;${(visit.location)!}
+            </div>
+        </div>
+    </section>
+</main>
+<#include "_inc/_goback.html" />
+<footer class="weui-footer weui-footer_fixed-bottom ft16">
+    <a class="blue-button width-100" href="javascript:history.go(-1)">返回</a>
+</footer>
+</body>
+</@layout>

@@ -96,8 +96,8 @@ public class ReceivablesQuery extends JBaseQuery {
 		Db.update(sqlBuilder.toString());
 	}
 	
-	public Receivables findByObjId(String objId,String deptId) {
-		String select = "select * from `cc_receivables` where object_id= '"+objId+"' and dept_id= '"+deptId+"' ";
+	public Receivables findByObjId(String objId,String object_type) {
+		String select = "select * from `cc_receivables` where object_id= '"+objId+"' and object_type= '"+object_type+"' ";
 		return DAO.findFirst(select);
 	}
 

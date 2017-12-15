@@ -129,7 +129,7 @@ public class StockTakingDetailQuery extends JBaseQuery {
 	}
 
 	public List<Record> findByInventory(String productId, String warehouseId, String sellerId) {
-		StringBuilder fromBuilder1 = new StringBuilder("select i.* from cc_inventory i,cc_inventory_detail d,cc_product p WHERE i.product_id=p.id and p.id=? and i.warehouse_id=? and i.seller_id=?");
+		StringBuilder fromBuilder1 = new StringBuilder("select i.* from cc_inventory i,cc_product p WHERE i.product_id=p.id and p.id=? and i.warehouse_id=? and i.seller_id=?");
 		List<Record> find = Db.find(fromBuilder1.toString(),productId,warehouseId,sellerId);
 		return find;
 	}

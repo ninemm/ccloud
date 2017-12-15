@@ -31,18 +31,21 @@
 		<!-- /.login-logo -->
 		<div class="login-box-body">
 			<p class="login-box-msg">管理员登录</p>
-
 			<form action="${CPATH}/admin/login" method="post" id="loginform">
 				<div class="form-group has-feedback">
 					<label>用户名：</label> 
-					<input class="form-control" name="username" value="admin">
-					<span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+					<input class="form-control" name="username" value="" id="_username">
+					<span class="glyphicon glyphicon-user form-control-feedback"></span>
 				</div>
 				<div class="form-group has-feedback">
 					<label>密码：</label> 
 					<input type="password" name="password" class="form-control" value="123456"> 
 					<span class="glyphicon glyphicon-lock form-control-feedback"></span>
 				</div>
+				<!-- <div class="form-group has-feedback" id="_account" style="display:none;">
+                    <label>账套：</label>
+                    <select class="form-control input-sm" id="_seller_id" name="sellerId"></select>
+                </div> -->
 				<div class="row">
 					<div class="col-xs-8">
 						<div class="form-group checkbox">
@@ -62,37 +65,9 @@
 		</div>
 		<!-- /.login-box-body -->
 	</div>
-	<!-- /.login-box -->
-	<div class="modal fade" tabindex="-1" role="dialog"
-		aria-labelledby="gridSystemModalLabel" id="sellerModal">
-		<div class="modal-dialog" role="document">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal"
-						aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					</button>
-					<h4 class="modal-title" id="gridSystemModalLabel">选择账套</h4>
-				</div>
-				<div class="modal-body">
-					<div class="form-group col-sm-12 validata-box">
-						<label class="control-label col-sm-2">账套:</label>
-						<div class="input-group col-md-6 col-sm-10">					
-							<select class="form-control input-sm" id="seller_id">
-							</select>
-						</div>	
-					</div>						
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-primary" onclick="changeSeller();">确认选择</button>
-				</div>
-			</div>
-			<!-- /.modal-content -->
-		</div>
-		<!-- /.modal-dialog -->
-	</div>
+	
 	<!-- jQuery 2.1.4 -->
-	<script src="${CPATH}/static/plugins/jquery/jquery-2.1.4.min.js"></script>
+	<script src="${CPATH}/static/plugins/jquery/jquery.min.js"></script>
 	<script src="${CPATH}/static/plugins/jquery/jquery.form.min.js"></script>
 	<!-- Bootstrap 3.3.5 -->
 	<script src="${CPATH}/static/bootstrap/js/bootstrap.min.js"></script>
@@ -102,8 +77,7 @@
 			$(document).ajaxStart(function() {
 				Pace.restart();
 			});
-
-			$("#loginform").submit(function() {
+			/* $("#loginform").submit(function() {
 				$(this).ajaxSubmit({
 					type : "post", 
 					dataType : "json", 
@@ -128,24 +102,8 @@
 					}
 				});
 				return false; //不刷新页面  
-			});
+			}); */
 		});
-		function changeSeller() {
-			var sellerId = $("#seller_id").find("option:selected").val();
-			var sellerName = $("#seller_id").find("option:selected").text();
-			$.ajax({
-				url:"${CPATH}/admin/seller/changeSeller",
-				type:"post",
-				data:{
-					"sellerId":sellerId,
-					"sellerName":sellerName	
-				},
-				dataType:"json",
-				success:function(data) {
-					window.location.href = "${CPATH}/admin/index";
-				}
-			});
-		}		
 	</script>
 </body>
 </html>

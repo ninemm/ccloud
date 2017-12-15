@@ -45,7 +45,6 @@ import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.WarehouseQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
-import org.ccloud.utils.QRCodeUtils;
 import org.ccloud.utils.StringUtils;
 
 import com.google.common.collect.ImmutableMap;
@@ -82,7 +81,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 
-		Page<Record> page = PurchaseOrderQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate,user.getDataArea(),user.getId());
+		Page<Record> page = PurchaseOrderQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate,getSessionAttr(Consts.SESSION_SELECT_DATAAREA).toString(),user.getId());
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
@@ -105,7 +104,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 
-		Page<Record> page = PurchaseOrderQuery.me().paginateO(getPageNumber(), getPageSize(), keyword, startDate, endDate,user.getDataArea(),user.getId());
+		Page<Record> page = PurchaseOrderQuery.me().paginateO(getPageNumber(), getPageSize(), keyword, startDate, endDate,getSessionAttr(Consts.SESSION_SELECT_DATAAREA).toString(),user.getId());
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
@@ -202,10 +201,10 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		}
 		Date date = new Date();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-		String str = sdf.format(date);
+		String fomatDate = sdf.format(date);
 		String purchaseOrderId=StringUtils.getArrayFirst(paraMap.get("purchaseOrderId"));
 		PurchaseOrder purchaseOrder = PurchaseOrderQuery.me().findById(purchaseOrderId);
-		String pwarehouseSn="PO"+user.getDepartmentId().substring(0, 6)+str.substring(0,8)+n;
+		String pwarehouseSn="PO"+user.getDepartmentId().substring(0, 6)+fomatDate.substring(0,8)+n;
 		purchaseInstock.set("id", purchaseInstockId);
 		purchaseInstock.set("pwarehouse_sn", pwarehouseSn);
 		purchaseInstock.set("supplier_id", StringUtils.getArrayFirst(paraMap.get("supplierId")));
@@ -233,6 +232,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 
 		while (productNum > count) {
 			index++;
+			HttpServletRequest request = getRequest();
 			String convert = StringUtils.getArrayFirst(paraMap.get("convert" + index));
 			String bigNum = StringUtils.getArrayFirst(paraMap.get("bigNum" + index));
 			String smallNum = StringUtils.getArrayFirst(paraMap.get("smallNum" + index));
@@ -243,30 +243,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 			Product product = ProductQuery.me().findById(productId);
 			List<SellerProduct> sellerProducts = SellerProductQuery.me()._findByProductIdAndSellerId(productId,seller.getId());
 			if(sellerProducts.size()==0){
-				SellerProduct sellerProduct = new SellerProduct();
-				String sellerProductId = StrKit.getRandomUUID();
-				sellerProduct.set("id", sellerProductId);
-				sellerProduct.set("product_id", productId);
-				sellerProduct.set("seller_id", seller.getId());
-				sellerProduct.set("custom_name", product.getName());
-				sellerProduct.set("price", product.getPrice());
-				sellerProduct.set("cost", product.getCost());
-				sellerProduct.set("market_price", product.getMarketPrice());
-				sellerProduct.set("weight", product.getWeight());
-				sellerProduct.set("weight_unit", product.getWeightUnit());
-				sellerProduct.setOrderList(0);;
-				sellerProduct.set("is_enable", 1);
-				sellerProduct.set("is_gift", 0);
-				//生成二维码
-				String  fileName = str+".png";
-				String contents =getRequest().getScheme() + "://" + getRequest().getServerName()+"/admin/seller/fu"+"?id="+sellerProductId; 
-				//部署之前上传
-				//String contents = getRequest().getScheme() + "://" + getRequest().getServerName()+":"+getRequest().getLocalPort()+getRequest().getContextPath()+"/admin/seller/fn"+"?id="+Id;
-				String imagePath = getRequest().getSession().getServletContext().getRealPath("\\qrcode\\");
-				QRCodeUtils.genQRCode(contents, imagePath, fileName);
-				sellerProduct.set("qrcode_url", imagePath+"\\"+fileName);
-				sellerProduct.set("create_date", date);
-				sellerProduct.save();
+				SellerProduct sellerProduct = SellerProductQuery.me().newProduct(seller.getId(), date, fomatDate, product, request);
 				sellerProducts.add(sellerProduct);
 			}
 			purchaseOrderDetail.set("product_count", productCount);

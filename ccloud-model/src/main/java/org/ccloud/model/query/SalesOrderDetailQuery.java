@@ -16,6 +16,7 @@
 package org.ccloud.model.query;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -48,7 +49,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 	public List<Record> findByOrderId(String orderId) {
 
 		StringBuilder sqlBuilder = new StringBuilder(
-				" SELECT sod.*, sp.custom_name, sp.price, p.big_unit, p.small_unit, p.convert_relate, w.code as warehouseCode, t1.valueName ");
+				" SELECT sod.*, sp.custom_name, sp.price, p.big_unit, p.small_unit, p.convert_relate, p.id as productId, w.code as warehouseCode, t1.valueName ");
 		sqlBuilder.append(" from `cc_sales_order_detail` sod ");
 		sqlBuilder.append(" LEFT JOIN cc_seller_product sp ON sod.sell_product_id = sp.id ");
 		sqlBuilder.append(" LEFT JOIN cc_product p ON sp.product_id = p.id ");
@@ -92,8 +93,11 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 
 			String productPrice = StringUtils.getArrayFirst(paraMap.get("bigPrice" + index));
 //			String productAmount = StringUtils.getArrayFirst(paraMap.get("rowTotal" + index));
-			BigDecimal productAmount = new BigDecimal(detail.getProductCount()).divide(new BigDecimal(convert), 2, BigDecimal.ROUND_HALF_UP)
+			BigDecimal bigAmount = new BigDecimal(detail.getProductCount()).divide(new BigDecimal(convert), 0 , RoundingMode.DOWN)
 					.multiply(new BigDecimal(productPrice));
+			BigDecimal smallPrice = new BigDecimal(productPrice).divide(new BigDecimal(convert), 2, BigDecimal.ROUND_HALF_UP);
+			BigDecimal smallAmount = new BigDecimal(detail.getProductCount()).divideAndRemainder(new BigDecimal(convert))[1].multiply(smallPrice);
+			BigDecimal productAmount = bigAmount.add(smallAmount);
 			String isGift = StringUtils.getArrayFirst(paraMap.get("isGift" + index));
 			detail.setProductPrice(new BigDecimal(productPrice));
 			detail.setProductAmount(productAmount);
@@ -207,8 +211,13 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 			detail.setSellProductId(paraMap.get("sellProductId")[index]);
 
 			String productPrice = paraMap.get("bigPrice")[index];
-			BigDecimal productAmount = new BigDecimal(detail.getProductCount()).divide(new BigDecimal(convert), 2, BigDecimal.ROUND_HALF_UP)
+			
+			BigDecimal bigAmount = new BigDecimal(detail.getProductCount()).divide(new BigDecimal(convert), 0 , RoundingMode.DOWN)
 					.multiply(new BigDecimal(productPrice));
+			BigDecimal smallPrice = new BigDecimal(productPrice).divide(new BigDecimal(convert), 2, BigDecimal.ROUND_HALF_UP);
+			BigDecimal smallAmount = new BigDecimal(detail.getProductCount()).divideAndRemainder(new BigDecimal(convert))[1].multiply(smallPrice);
+			BigDecimal productAmount = bigAmount.add(smallAmount);
+			
 			detail.setProductPrice(new BigDecimal(productPrice));
 			detail.setProductAmount(productAmount);
 			detail.setIsGift(0);//非赠品

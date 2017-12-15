@@ -21,33 +21,136 @@
 
 <#macro script_import>
     <script src="${CPATH}/static/layer_mobile/layer.js"></script>
+    <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=Ec4VbDTTjjuEGtVGzSvPwwQtvnvWFeGY"></script>
+    <script type="text/javascript" src="${CTPATH}/js/convertor.js"></script>
 </#macro>
 
 <#macro script>
+
+    var imageArr = [];
+    var count = 3;
+    var $picNum = $('.weui-uploader__info');
+    var $uploaderFiles = $('#uploaderFiles');
+    var $gallery = $("#gallery"), $galleryImg = $("#galleryImg");
     
     var $form = $("#form");
-    
-    $(function() {
-        
-        console.log("${(customerVisit.id)!}");
-		console.log("${(taskId)!}");
 
-    })
+    $(function() {
+
+        $("#uploaderInput").on("change",function () {
+
+            var files = this.files;;
+            var arrNum = imageArr.length;
+            var num = arrNum + files.length;
+
+            if (num > count) {
+                $.alert("最多上传三张图片");
+                return false;
+            }
+
+            $picNum.text(num + '/' + count);
+
+            for (var i = 0; i < files.length; i ++) {
+                var file = files[i];
+                if (!/image\/\w+/.test(file.type)) {
+                    $.alert("请确保文件为图像类型");
+                    return false;
+                }
+
+                var reader = new FileReader();
+
+                (function(x) {
+                    reader.onload = function(e) {
+                        var str = '<li class="weui-uploader__file " style="background-image:url('+this.result+')"><span class="remove" style="color:red">X</span></li>';
+                        $uploaderFiles.append(str);
+                        render(this.result, x);
+                    }
+                })(file.name)
+
+                reader.readAsDataURL(file);
+            }
+        });
+
+        var MAX_HEIGHT = 1000;
+
+        function render(src, picname) {
+
+            var image = new Image();
+            image.onload = function() {
+
+                var canvas = document.createElement("canvas");
+                if (image.height > MAX_HEIGHT && image.height >= image.width) {
+                    image.width *= MAX_HEIGHT / image.height;
+                    image.height = MAX_HEIGHT;
+                }
+
+                if (image.width > MAX_HEIGHT && image.width > image.height) {
+                    // 宽度等比例缩放 *=
+                    image.height *= MAX_HEIGHT / image.width;
+                    image.width = MAX_HEIGHT;
+                }
+
+                var ctx = canvas.getContext("2d");
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                canvas.width = image.width;
+                canvas.height = image.height;
+
+                ctx.drawImage(image, 0, 0, image.width, image.height);
+                var blob = canvas.toDataURL('image/jpeg', 0.8);
+                imageArr.push({"pic":blob, "pic_name":picname});
+                $("#pic").val(JSON.stringify(imageArr));
+            };
+            image.src = src;
+        }
+
+        var index; //第几张图片
+        $uploaderFiles.on("click", "li", function() {
+            index = $(this).index();
+            $galleryImg.attr("style", this.getAttribute("style"));
+            $gallery.fadeIn(100);
+        });
+
+        $gallery.on("click", function() {
+            $gallery.fadeOut(100);
+        });
+
+        //删除图片  删除图片的代码也贴出来。
+        $(".weui-gallery__del").click(function() { //这部分刚才放错地方了，放到$(function(){})外面去了
+            $uploaderFiles.find("li").eq(index).remove();
+            imageArr = imageArr.splice(index, 1);
+        });
+    });
+
+    var paramData = function() {
+        return  {
+            "id": $("#id").val(),
+            "taskId": $("#taskId").val(),
+            "status": '1',
+            "comment": $("#comment").val(),
+            "pic": JSON.stringify(imageArr),
+            "location": $("#location").val()
+        };
+    }
 
 	function doReject(){
 		layer.open({
 			type: 2,
 			content: '保存中...'
 		});
-		$.get("${CPATH}/customer/complete?id=${(customerVisit.id)!}&taskId=${(taskId)}&status=0" ,
-
-			function(res){
+        $.ajax({
+            url: '${CPATH}/customerVisit/complete',
+            method: 'post',
+            dataType: 'json',
+            data: paramData(),
+			success: function(res){
 				if (res.errorCode == 0) {
 					$.confirm({
 						title: res.message,
 						text: '返回列表页？',
 						onOK: function () {
-							location.href = '${CPATH}/todo/customer'
+							location.href = '${CPATH}/todo/visit'
 						},
 						onCancel: function () {
 							$.closeModal();
@@ -56,24 +159,31 @@
 				} else {
 					$.alert(res.message);
 				}
-			layer.closeAll();
+			    layer.closeAll();
+            },
+            error: function(res) {
+                layer.closeAll();
+            }
 		})
 	};
     
     function doSubmit() {
-
 		layer.open({
 			type: 2,
 			content: '保存中...'
 		});
-		$.get("${CPATH}/customer/complete?id=${(customerVisit.id)!}&taskId=${(taskId)}&status=1" ,
-			function(res){
+        $.ajax({
+            url: '${CPATH}/customerVisit/complete',
+            method: 'post',
+            dataType: 'json',
+            data: paramData(),
+			success:function(res){
 				if (res.errorCode == 0) {
 					$.confirm({
 						title: res.message,
 						text: '返回列表页？',
 						onOK: function () {
-							location.href = '${CPATH}/todo/customer'
+							location.href = '${CPATH}/todo/visit'
 						},
 						onCancel: function () {
 							$.closeModal();
@@ -82,9 +192,58 @@
 				} else {
 					$.alert(res.message);
 				}
-			layer.closeAll();
+			    layer.closeAll();
+            },
+            error: function(res) {
+                layer.closeAll();
+            }
 		})
     };
+
+    wx.config({
+        debug: false,
+        appId: '${appId!}',
+        timestamp: ${timestamp},
+        nonceStr: '${nonceStr!}',
+        signature: '${signature!}',
+        jsApiList: [
+            'checkJsApi',
+            'getLocation'
+        ]
+    });
+
+    wx.ready(function() {
+        // 获取定位信息
+        wx.getLocation({
+            type: 'wgs84',
+            success: function (res) {
+                var latitude = res.latitude;                      // 纬度，浮点数，范围为90 ~ -90
+                var longitude = res.longitude;                    // 经度，浮点数，范围为180 ~ -180。
+                var speed = res.speed;                            // 速度，以米/每秒计
+                var accuracy = res.accuracy;                      // 位置精度
+
+                var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
+                var geoc = new BMap.Geocoder();                   // 获取百度地址解析器
+
+                translateCallback = function (point) {            // 回调函数
+                    geoc.getLocation(point, function(rs) {
+                    var addComp = rs.addressComponents;
+                    var address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
+                    $('#location').text(address);
+                    });
+                };
+                setTimeout(function() {
+                    BMap.Convertor.translate(point, 0, translateCallback);//真实经纬度转成百度坐标
+                    }, 100);
+            },
+            cancel: function (res) {
+                console.log('用户拒绝授权获取地理位置');
+            },
+            fail: function (res) {
+                console.log(JSON.stringify(res));
+            }
+        });
+    });
     
 </#macro>
 
@@ -92,7 +251,8 @@
 <div id="customer-add">
 <main>
     <section class="weui-panel weui-panel_access order-customer-info">
-      <input type="hidden" name="customerVisit.id" value="${(customerVisit.id)!}">
+      <input type="hidden" name="customerVisit.id" id ="id" value="${(customerVisit.id)!}">
+        <input type="hidden" id ="taskId" value="${(taskId)!}">
       <div class="weui-cell weui-cell_access">
           <div class="weui-cell__bd">
               <div class="order-customer-info-title">客户名称: </div>
@@ -120,19 +280,19 @@
       <div class="weui-cell weui-cell_access select-area">
           <div class="weui-cell__bd">
               <div class="order-customer-info-title">客户类型: </div>
-              <input class="txt-gray" value="${(custTypeNames)!}">
+              <input class="txt-gray" value="${(cTypeName)!}">
           </div>
       </div>
-      <div class="weui-cell weui-cell_access">
-          <div class="weui-cell__bd">
-              <div class="order-customer-info-title">活动名称: </div>
-              <input class="txt-gray" value="${DICT_NAME('customerVisit.question_type')}">
-          </div>
-      </div>
+      <!--<div class="weui-cell weui-cell_access">-->
+          <!--<div class="weui-cell__bd">-->
+              <!--<div class="order-customer-info-title">活动名称: </div>-->
+              <!--<input class="txt-gray" value="${DICT_NAME('customerVisit.question_type')}">-->
+          <!--</div>-->
+      <!--</div>-->
       <div class="weui-cell weui-cell_access">
           <div class="weui-cell__bd">
               <div class="order-customer-info-title">问题类型: </div>
-              <input class="txt-gray" value="${DICT_NAME('customerVisit.question_type')}">
+              <input class="txt-gray" value="${(customerVisit.typeName)!}">
           </div>
       </div>
       <div class="weui-cell weui-cell_access">
@@ -170,7 +330,7 @@
        <div class="weui-cell weui-cell_access">
            <div class="weui-cell__bd">
                <span class="icon-map-pin ft16 green"></span>
-               <span id="location">${(customerVisit.location)!}</span>
+               <span id="locationVisit">${(customerVisit.location)!}</span>
            </div>
        </div>
    </section>
@@ -195,10 +355,19 @@
         <div class="weui-cell weui-cell_access">
 	        <div class="weui-cell__bd">
 	            <p>建议</p>
-	            <textarea class="weui-textarea" name="" id="" rows="10" placeholder="审核建议"></textarea>
+	            <textarea class="weui-textarea" name="" id="comment" rows="10" placeholder="审核建议"></textarea>
 	            <div class="weui-textarea-counter"><span>0</span>/200</div>
 	        </div>
         </div>
+        <div class="weui-gallery" id="gallery">
+            <span class="weui-gallery__img" id="galleryImg"></span>
+            <div class="weui-gallery__opr">
+                <a href="javascript:" rel="nofollow" target="_blank"  class="weui-gallery__del">
+                    <i class="weui-icon-delete weui-icon_gallery-delete"></i>
+                </a>
+            </div>
+        </div>
+        <section>
         <div class="weui-cells weui-cells_form">
             <div class="weui-cell">
 	            <div class="weui-cell__bd">
@@ -212,18 +381,20 @@
 			                </ul>
 			                <div class="weui-uploader__input-box">
 			                  <input id="uploaderInput" class="weui-uploader__input" type="file" accept="image/*" multiple="">
+                                <input type="hidden" name="pic" id="pic">
 			                </div>
 		                </div>
 		            </div>
 	            </div>
             </div>
         </div>
+        </section>
     </section>
     <section class="weui-panel weui-panel_access ft14 remark">
         <div class="weui-cell weui-cell_access">
 	        <div class="weui-cell__bd">
 	            <span class="icon-map-pin ft16 green"></span>
-	            <span id="location">${(customerVisit.location)!'正在定位中...'}</span>
+	            <span id="location">正在定位中...</span>
 	        </div>
         </div>
     </section>
