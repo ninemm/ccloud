@@ -1,5 +1,6 @@
 package org.ccloud.front.controller;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -10,14 +11,21 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.CustomerType;
+import org.ccloud.model.SellerProduct;
 import org.ccloud.model.User;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.SalesOrderDetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
+import org.ccloud.model.query.SellerProductQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DataAreaUtil;
+import org.ccloud.utils.DateUtils;
+import org.ccloud.utils.StringUtils;
 
 import com.alibaba.fastjson.JSON;
+import com.jfinal.kit.StrKit;
+import com.jfinal.plugin.activerecord.Db;
+import com.jfinal.plugin.activerecord.IAtom;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 
@@ -93,6 +101,92 @@ public class OrderController extends BaseFrontController {
 		if (statusCode == Consts.SALES_ORDER_STATUS_ALL_OUT) return "全部出库";
 		if (statusCode == Consts.SALES_ORDER_STATUS_ALL_OUT_CLOSE) return "全部出库-订单关闭";
 		return "无";
+	}
+	
+
+	public synchronized void salesOrder() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
+
+		Map<String, String[]> paraMap = getParaMap();
+
+		if (this.saveOrder(paraMap, user, sellerId, sellerCode)) {
+			renderAjaxResultForSuccess("保存成功");
+		} else {
+			renderAjaxResultForError("库存不足或提交失败");
+		}
+	}
+
+	private boolean saveOrder(final Map<String, String[]> paraMap, final User user, final String sellerId,
+			final String sellerCode) {
+		boolean isSave = Db.tx(new IAtom() {
+			@Override
+			public boolean run() throws SQLException {
+
+				String orderId = StrKit.getRandomUUID();
+				Date date = new Date();
+				String OrderSO = SalesOrderQuery.me().getNewSn(sellerId);
+
+				// 销售订单：SO + 100000(机构编号或企业编号6位) + A(客户类型) + 171108(时间) + 100001(流水号)
+				String orderSn = "SO" + sellerCode + StringUtils.getArrayFirst(paraMap.get("customerTypeCode"))
+						+ DateUtils.format("yyMMdd", date) + OrderSO;
+
+				if (!SalesOrderQuery.me().insertForApp(paraMap, orderId, orderSn, sellerId, user.getId(), date,
+						user.getDepartmentId(), user.getDataArea())) {
+					return false;
+				}
+
+				String[] sellProductIds = paraMap.get("sellProductId");
+				// 常规商品
+				if (StrKit.notBlank(sellProductIds)) {
+					for (int index = 0; index < sellProductIds.length; index++) {
+						if (StrKit.notBlank(sellProductIds[index])) {
+							if (!SalesOrderDetailQuery.me().insertForApp(paraMap, orderId, sellerId, user.getId(), date,
+									user.getDepartmentId(), user.getDataArea(), index)) {
+								return false;
+							}
+						}
+
+					}
+				}
+
+				String[] giftSellProductIds = paraMap.get("giftSellProductId");
+				// 赠品
+				if (StrKit.notBlank(giftSellProductIds)) {
+					for (int index = 0; index < giftSellProductIds.length; index++) {
+						if (StrKit.notBlank(giftSellProductIds[index])) {
+							if (!SalesOrderDetailQuery.me().insertForAppGift(paraMap, orderId, sellerId, user.getId(),
+									date, user.getDepartmentId(), user.getDataArea(), index)) {
+								return false;
+							}
+						}
+
+					}
+				}
+
+				String[] compositionIds = paraMap.get("compositionId");
+				String[] compositionNums = paraMap.get("compositionNum");
+				// 组合商品
+				if (StrKit.notBlank(compositionIds)) {
+					for (int index = 0; index < compositionIds.length; index++) {
+						String productId = compositionIds[index];
+						String number = compositionNums[index];
+						List<SellerProduct> list = SellerProductQuery.me().findByCompositionId(productId);
+						for (SellerProduct sellerProduct : list) {
+							if (!SalesOrderDetailQuery.me().insertForAppComposition(sellerProduct, orderId, sellerId,
+									user.getId(), date, user.getDepartmentId(), user.getDataArea(),
+									Integer.parseInt(number))) {
+								return false;
+							}
+						}
+					}
+				}
+
+				return true;
+			}
+		});
+		return isSave;
 	}
 	
 	public void getOldOrder() {
