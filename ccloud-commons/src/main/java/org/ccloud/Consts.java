@@ -25,8 +25,10 @@ public class Consts {
 	public static final String SESSION_SELLER_CODE = "sellerCode";
 	public static final String SESSION_SELLER_NAME = "sellerName";
 	
+	public static final String WORKFLOW_APPLY_USER = "applyUse";
 	public static final String WORKFLOW_APPLY_USERNAME = "applyUsername";
-	public static final String WORKFLOW_APPLY_USER = "applyUser";
+	public static final String WORKFLOW_APPLY_SELLER_ID = "sellerId";
+	public static final String WORKFLOW_APPLY_SELLER_CODE = "sellerCode";
 
 	public static final String CHARTSET_UTF8 = "UTF-8";
 	

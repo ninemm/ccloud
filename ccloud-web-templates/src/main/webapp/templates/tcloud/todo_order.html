@@ -1,4 +1,4 @@
-+<#include "_inc/_layout.html"/>
+<#include "_inc/_layout.html"/>
 
 <#macro css> </#macro>
 <#macro script_import>
@@ -68,11 +68,11 @@
 
 <div id="customer-audit">
     <main style="top:12px">
-        <#if todoList ??>
+        <#if (todoList?size>0) >
 	        <#list todoList as order>
 				<div class="weui-panel weui-panel_access">
 					<div class="weui-cell weui-cell_access">
-					    <a href="${CPATH}/customer/review?id=${order.id}&taskId=${order.taskId!}&assignee=${order.assignee}"> 
+					    <a href="${CPATH}/order/review?id=${order.id!}&taskId=${order.taskId!}&assignee=${order.assignee!}"> 
 						<div class="weui-cell__bd ft14">
 							<#if order.receive_type == 0>
 								<span class="tag">账期</span>
@@ -93,17 +93,21 @@
 						</a>
 					</div>
 					<div class="weui-cell weui-cell_access">
-						<a class="weui-cell__bd" style="color: gray" href="${CPATH}/customer/review?id=${order.id}&taskId=${order.taskId!}&assignee=${order.assignee}">订单详情</a>
+						<a class="weui-cell__bd" style="color: gray" href="${CPATH}/customer/review?id=${order.id!}&taskId=${order.taskId!}&assignee=${order.assignee!}">订单详情</a>
 						<span class="weui-cell__ft"></span>
 					</div>
 					<div class="weui-cell weui-cell_access">
 						<div class="weui-flex space-between width-100 ft14">
-							<div class="button white-button" onclick="doReject('${CPATH}/order/complete?id=${(order.id)!}&taskId=${(order.taskId)&pass=0')">拒绝</div>
+							<div class="button white-button" onclick="doReject('${CPATH}/order/complete?id=${(order.id)!}&taskId=${(order.taskId)}&pass=0')">拒绝</div>
 							<div class="button blue-button" onclick="doSubmit('${CPATH}/order/complete?id=${(order.id)!}&taskId=${(order.taskId)}&pass=1')">同意</div>
 						</div>
 					</div>
 				</div>
 			</#list>
+		<#else>
+			<div class="weui-loadmore weui-loadmore_line">
+				<span class="weui-loadmore__tips">暂无数据</span>
+			</div>
 		</#if>
 	</main>
     <#include "_inc/_goback.html" />

@@ -52,7 +52,8 @@ $(function() {
 							id : el.id,
 							name : el.name,
 							code : el.code,
-							factor : el.factor
+							factor : el.factor,
+							proc_def_key : el.proc_def_key
 						}
 						
 						items.push({
@@ -69,6 +70,7 @@ $(function() {
 				         	$("#customerType").val(customerTypeInfoMap[data.values].id);
 					        $("#customerTypeCode").val(customerTypeInfoMap[data.values].code);
 					        $("#factor").val(customerTypeInfoMap[data.values].factor);
+					        $("#proc_def_key").val(customerTypeInfoMap[data.values].proc_def_key);
 				         }
 			        });
 			        $customerTypeName.val(items[0].title);
@@ -77,6 +79,7 @@ $(function() {
 			        $("#customerType").val(customerTypeInfoMap[items[0].value].id);
 			        $("#customerTypeCode").val(customerTypeInfoMap[items[0].value].code);
 			        $("#factor").val(customerTypeInfoMap[items[0].value].factor);
+			        $("#proc_def_key").val(customerTypeInfoMap[items[0].value].proc_def_key);
 				}
 			);
 		}
@@ -176,6 +179,11 @@ $(function() {
 			$el.find("#rowTotal").val(rowTotal);
 			total += rowTotal;
 		});
+
+		var factor = $("#factor").val();
+		if (factor != '') {
+			total = total * factor;
+		}
 		$("#total").val(total);
 		$("#totalNum").text("共" + (products.length + compositions.length) + "款,合计:" + total + "元")
 	
@@ -274,6 +282,7 @@ $(function() {
 						<input type="hidden" id="customerType" name="customerType" value="">
 						<input type="hidden" id="customerTypeCode" name="customerTypeCode" value="">
 						<input type="hidden" id="factor" name="factor" value="">
+						<input type="hidden" id="proc_def_key" name="proc_def_key" value="">
 						<input type="text" placeholder="请选择客户类型" class="weui-input" id="customerTypeName" name="customerTypeName" value="" readonly>
 						<span class="weui-cell__ft"></span>
 					</div>

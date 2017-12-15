@@ -175,7 +175,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	public List<Record> findCustomerTypeListByCustomerId(String customerId, String dataArea) {
 		LinkedList<Object> params = new LinkedList<Object>();
 
-		StringBuilder sqlBuilder = new StringBuilder("select c.id, c.name, c.code, cp.factor ");
+		StringBuilder sqlBuilder = new StringBuilder("select c.id, c.name, c.code, cp.factor, c.proc_def_key ");
 		sqlBuilder.append(" from `cc_customer_join_customer_type` cj ");
 		sqlBuilder.append(" left join `cc_customer_type` c on cj.customer_type_id = c.id ");
 		sqlBuilder.append(" left join `cc_price_system` cp on cp.id = c.price_system_id ");
