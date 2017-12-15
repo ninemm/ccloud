@@ -179,7 +179,7 @@ public class ProductQuery extends JBaseQuery {
 			fromBuilder.append(" where cp.is_marketable=1 and u.id='"+userId+"' ");
 	//				+ " and cs.seller_type = 0 and cp.id  not in (select product_id from cc_seller_product where seller_id ='" + sellerId+"')");
 		}
-		fromBuilder.append(" GROUP by " + orderby);
+		fromBuilder.append(" GROUP by cp.id ");
 		fromBuilder.append(" order by " + orderby);	
 		
 		if (params.isEmpty())

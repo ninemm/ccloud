@@ -16,15 +16,20 @@
 package org.ccloud.model.query;
 
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.ccloud.Consts;
+import org.ccloud.model.Receivables;
 import org.ccloud.model.SalesOutstock;
+import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
 
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
+import com.jfinal.plugin.activerecord.IAtom;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 
@@ -58,6 +63,67 @@ public class SalesOutstockQuery extends JBaseQuery {
 		fromBuilder.append(" where o.id = ? ");
 
 		return Db.findFirst(fromBuilder.toString(), id);
+	}
+	
+	public boolean pass(final String orderId, final String userId, final String sellerId, final String sellerCode) {
+		boolean isSave = Db.tx(new IAtom() {
+
+			@Override
+			public boolean run() throws SQLException {
+
+				Record order = SalesOrderQuery.me().findMoreById(orderId);
+				List<Record> orderDetailList = SalesOrderDetailQuery.me().findByOrderId(orderId);
+				createReceivables(order);
+
+				Date date = new Date();
+
+				String outstockId = "";
+				String warehouseId = "";
+				String outstockSn = "";
+				for (Record orderDetail : orderDetailList) {
+					if (!warehouseId.equals(orderDetail.getStr("warehouse_id"))) {
+
+						outstockId = StrKit.getRandomUUID();
+						warehouseId = orderDetail.getStr("warehouse_id");
+						String OrderSO = SalesOutstockQuery.me().getNewSn(sellerId);
+						// 销售出库单：SS + 100000(机构编号或企业编号6位) + A(客户类型) + W(仓库编号) + 171108(时间) + 100001(流水号)
+						outstockSn = "SS" + sellerCode + order.getStr("typeCode") + orderDetail.getStr("warehouseCode")
+								+ DateUtils.format("yyMMdd", date) + OrderSO;
+
+						SalesOutstockQuery.me().insert(outstockId, outstockSn, warehouseId, sellerId, order, date);
+						SalesOrderJoinOutstockQuery.me().insert(orderId, outstockId);
+					}
+
+					SalesOutstockDetailQuery.me().insert(outstockId, orderDetail, date, order);
+				}
+
+				SalesOrderQuery.me().updateConfirm(orderId, Consts.SALES_ORDER_AUDIT_STATUS_PASS, userId, date);// 已审核通过
+
+				return true;
+			}
+		});
+
+		return isSave;
+	}
+	
+	private void createReceivables(Record order) {
+		String customeId = order.getStr("customer_id");
+		Receivables receivables = ReceivablesQuery.me().findByCustomerId(customeId);
+		if (receivables == null) {
+			receivables = new Receivables();
+			receivables.setObjectId(order.getStr("customer_id"));
+			receivables.setObjectType(Consts.RECEIVABLES_OBJECT_TYPE_CUSTOMER);
+			receivables.setReceiveAmount(order.getBigDecimal("total_amount"));
+			receivables.setActAmount(new BigDecimal(0));
+			receivables.setBalanceAmount(order.getBigDecimal("total_amount"));
+			receivables.setDeptId(order.getStr("dept_id"));
+			receivables.setDataArea(order.getStr("data_area"));
+			receivables.setCreateDate(new Date());
+		} else {
+			receivables.setReceiveAmount(receivables.getReceiveAmount().add(order.getBigDecimal("total_amount")));
+			receivables.setBalanceAmount(receivables.getBalanceAmount().add(order.getBigDecimal("total_amount")));
+		}
+		receivables.saveOrUpdate();
 	}
 
 	public boolean insert(String outstockId, String outstockSn, String warehouseId, String sellerId, Record order,

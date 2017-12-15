@@ -178,12 +178,28 @@ public abstract class BaseSellerProduct<M extends BaseSellerProduct<M>> extends 
 		return getStr("warehouse_id");
 	}
 
+	public void setIsSource(java.lang.Integer isSource) {
+		set("is_source", isSource);
+	}
+
+	public java.lang.Integer getIsSource() {
+		return getInt("is_source");
+	}
+
 	public void setIsEnable(java.lang.Integer isEnable) {
 		set("is_enable", isEnable);
 	}
 
 	public java.lang.Integer getIsEnable() {
 		return getInt("is_enable");
+	}
+
+	public void setIsGift(java.lang.Integer isGift) {
+		set("is_gift", isGift);
+	}
+
+	public java.lang.Integer getIsGift() {
+		return getInt("is_gift");
 	}
 
 	public void setFreezeStore(java.math.BigDecimal freezeStore) {
@@ -233,13 +249,5 @@ public abstract class BaseSellerProduct<M extends BaseSellerProduct<M>> extends 
 	public java.util.Date getModifyDate() {
 		return get("modify_date");
 	}
-	
-	public void setIsGift(java.lang.Integer isGift) {
-		set("is_gift", isGift);
-	}
-
-	public java.lang.Integer getIsGift() {
-		return getInt("is_gift");
-	}		
 
 }

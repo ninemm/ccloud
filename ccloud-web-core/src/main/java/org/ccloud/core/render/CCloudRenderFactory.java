@@ -59,7 +59,7 @@ public class CCloudRenderFactory extends RenderFactory {
 	public Render getErrorRender(int errorCode, String view) {
 
 		if (!CCloud.isInstalled()) {
-			return new TextRender(errorCode + " error in jpress.");
+			return new TextRender(errorCode + " error in ccloud.");
 		}
 
 		Template template = TemplateManager.me().currentTemplate();
@@ -68,7 +68,6 @@ public class CCloudRenderFactory extends RenderFactory {
 		}
 
 		String errorHtml = TemplateManager.me().currentTemplatePath() + "/" + errorCode + ".html";
-
 		String renderType = TemplateManager.me().currentTemplate().getRenderType();
 
 		// the default render type is freemarker
@@ -78,11 +77,9 @@ public class CCloudRenderFactory extends RenderFactory {
 
 		if ("freemarker".equalsIgnoreCase(renderType)) {
 			return new JFreemarkerRender(errorHtml, true);
-		} /*else if ("thymeleaf".equalsIgnoreCase(renderType)) {
-			return new ThymeleafRender(errorHtml);
-		}*/
+		}
 
-		return new TextRender(errorCode + " error in jpress.");
+		return new TextRender(errorCode + " error in ccloud.");
 		
 	}
 

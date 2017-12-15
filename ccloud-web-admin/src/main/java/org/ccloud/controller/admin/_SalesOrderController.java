@@ -15,7 +15,6 @@
  */
 package org.ccloud.controller.admin;
 
-import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,15 +28,11 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
-import org.ccloud.model.Receivables;
 import org.ccloud.model.SalesOrder;
 import org.ccloud.model.User;
 import org.ccloud.model.query.OptionQuery;
-import org.ccloud.model.query.ReceivablesQuery;
 import org.ccloud.model.query.SalesOrderDetailQuery;
-import org.ccloud.model.query.SalesOrderJoinOutstockQuery;
 import org.ccloud.model.query.SalesOrderQuery;
-import org.ccloud.model.query.SalesOutstockDetailQuery;
 import org.ccloud.model.query.SalesOutstockQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
@@ -242,58 +237,10 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		String sellerId = getSessionAttr("sellerId");
 		String sellerCode = getSessionAttr("sellerCode");
 
-		Record order = SalesOrderQuery.me().findMoreById(orderId);
-		List<Record> orderDetailList = SalesOrderDetailQuery.me().findByOrderId(orderId);
-		this.createReceivables(order);
-
-		Date date = new Date();
-
-		String outstockId = "";
-		String warehouseId = "";
-		String outstockSn = "";
-		for (Record orderDetail : orderDetailList) {
-			if (!warehouseId.equals(orderDetail.getStr("warehouse_id"))) {
-				
-				outstockId = StrKit.getRandomUUID();
-				warehouseId = orderDetail.getStr("warehouse_id");
-				String OrderSO = SalesOutstockQuery.me().getNewSn(sellerId);
-				// 销售出库单：SS + 100000(机构编号或企业编号6位) + A(客户类型) + W(仓库编号) + 171108(时间) + 100001(流水号)
-				outstockSn = "SS" + sellerCode + order.getStr("typeCode") + orderDetail.getStr("warehouseCode")
-						+ DateUtils.format("yyMMdd", date) + OrderSO;
-
-				SalesOutstockQuery.me().insert(outstockId, outstockSn, warehouseId, sellerId, order, date);
-				SalesOrderJoinOutstockQuery.me().insert(orderId, outstockId);
-			}
-
-			SalesOutstockDetailQuery.me().insert(outstockId, orderDetail, date, order);
-		}
-
-		SalesOrderQuery.me().updateConfirm(orderId, Consts.SALES_ORDER_AUDIT_STATUS_PASS, user.getId(), date);// 已审核通过
+		SalesOutstockQuery.me().pass(orderId, user.getId(), sellerId, sellerCode);
 
 		renderAjaxResultForSuccess();
 
-	}
-
-	private void createReceivables(Record order) {
-		String customeId = order.getStr("customer_id");
-		Receivables receivables = ReceivablesQuery.me().findByCustomerId(customeId);
-		if (receivables == null) {
-			receivables = new Receivables();
-			receivables.setObjectId(order.getStr("customer_id"));
-			receivables.setObjectType(Consts.RECEIVABLES_OBJECT_TYPE_CUSTOMER);
-			receivables.setReceiveAmount(order.getBigDecimal("total_amount"));
-			receivables.setActAmount(new BigDecimal(0));
-			receivables.setBalanceAmount(order.getBigDecimal("total_amount"));
-			receivables.setDeptId(order.getStr("dept_id"));
-			receivables.setDataArea(order.getStr("data_area"));
-			receivables.setCreateDate(new Date());
-		} else {
-			receivables.setReceiveAmount(receivables.getReceiveAmount()
-					.add(order.getBigDecimal("total_amount")));
-			receivables.setBalanceAmount(receivables.getBalanceAmount()
-					.add(order.getBigDecimal("total_amount")));
-		}
-		receivables.saveOrUpdate();
 	}
 
 	@RequiresPermissions("/admin/salesOrder/check")
@@ -302,7 +249,8 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 		String orderId = getPara("orderId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		SalesOrderQuery.me().updateConfirm(orderId, 1001, user.getId(), new Date());// 已审核拒绝
+		SalesOrderQuery.me().updateConfirm(orderId, 1002, user.getId(), new Date());// 已审核拒绝
+
 		renderAjaxResultForSuccess();
 
 	}

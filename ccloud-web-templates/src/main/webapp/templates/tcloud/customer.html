@@ -1,5 +1,10 @@
 <#include "_inc/_layout.html"/>
-<#macro css> </#macro>
+<#macro css>
+    #customer {
+        background: #fcfcfc; 
+    }
+</#macro>
+
 <#macro script>
     var pageNumber = 2;
     var pageSize = 10;
@@ -213,7 +218,7 @@
                                                                                             contact:'${(customer.contact)}',
                                                                                             mobile:'${(customer.mobile)}',
                                                                                             address:'${(customer.address)}'})">客户拜访</div>
-                                    <div class="button blue-button fr" onclick="newOrder({customerName:'${(customer.customer_name)}',
+                                    <div class="button red-button fr" onclick="newOrder({customerName:'${(customer.customer_name)}',
                                                                                             sellerCustomerId:'${(customer.sellerCustomerId)}',
                                                                                             contact:'${(customer.contact)}',
                                                                                             mobile:'${(customer.mobile)}',
