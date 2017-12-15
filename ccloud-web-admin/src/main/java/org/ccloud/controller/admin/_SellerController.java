@@ -116,9 +116,17 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 	@Before(Tx.class)
 	public void save() {
 		Department department=DepartmentQuery.me().findById(getPara("dept_id"));
-		if(department.getDeptLevel()<2){
-			renderAjaxResultForError("部门选择错误，请重新选择！");
-			return;
+		User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
+		if(user.getUsername().equals("admin")){
+			if(department.getDeptLevel()<2){
+				renderAjaxResultForError("部门选择错误，请重新选择！");
+				return;
+			}
+		}else{
+			if(department.getDeptLevel()<3){
+				renderAjaxResultForError("部门选择错误，请重新选择！");
+				return;
+			}
 		}
 		final Seller seller = getModel(Seller.class);
 		final SellerBrand sellerBrand = getModel(SellerBrand.class);
@@ -154,13 +162,12 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		customer.setCityCode(areaCodeArray[1]);
 		
 		String [] brandIds= brandList.split(",");
-		User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
 		if (StrKit.isBlank(sellerId)) {
-			/*Seller seller2=SellerQuery.me().findByDeptAndSellerType(getPara("dept_id"),getPara("seller_type"));
-			if(seller2!=null && getPara("seller_type")=="0"){
+			Seller seller2=SellerQuery.me().findByDeptAndSellerType(getPara("dept_id"));
+			if(seller2!=null){
 				renderAjaxResultForError("该公司部门已有一个经销商，请确认");
 				return;
-			}*/
+			}
 			List<Seller> list = SellerQuery.me().findAll();
 			int s = list.size();
 			s++;
@@ -210,8 +217,8 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			}
 			
 			
-			
-			if(!user.getUsername().equals("admin")){
+			//添加直营商客户时 初始化数据
+			if(department.getDeptLevel()>2){
 				String customerId = StrKit.getRandomUUID();
 				//添加客户
 				customer.set("id", customerId);
@@ -228,7 +235,17 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				//添加直营商客户
 				String sellerCustomerId = StrKit.getRandomUUID();
 				sellerCustomer.set("id", sellerCustomerId);
-				sellerCustomer.set("seller_id",getSessionAttr("sellerId").toString());
+				if(user.getUsername().equals("admin")){
+					Department department2 = DepartmentQuery.me().findByDataArea(DataAreaUtil.getUserDealerDataArea(department.getDataArea()));
+					Seller sl = SellerQuery.me().findByDeptId(department2.getId());
+					if(sl==null){
+						renderAjaxResultForError("该公司部门"+department2.getDeptName()+"没有一个经销商，请先创建！");
+						return;
+					}
+					sellerCustomer.set("seller_id",sl.getId());
+				}else{
+					sellerCustomer.set("seller_id",getSessionAttr("sellerId").toString());
+				}
 				sellerCustomer.set("customer_id", customerId);
 				sellerCustomer.set("nickname", getPara("seller.seller_name"));
 				sellerCustomer.set("is_checked", 1);
@@ -257,17 +274,60 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 					customerJoinCustomerType.setCustomerTypeId(customerType.getId());
 					customerJoinCustomerType.save();
 				}
+				
+				//初始化直营商产品
+				List<SellerProduct> sellerProducts = new ArrayList<SellerProduct>();
+				if(user.getUsername().equals("admin")){
+					Department department2 = DepartmentQuery.me().findByDataArea(DataAreaUtil.getUserDealerDataArea(department.getDataArea()));
+					Seller sl = SellerQuery.me().findByDeptId(department2.getId());
+					sellerProducts = SellerProductQuery.me().findBySellerIdAndIsEnable(sl.getId());
+				}else{
+					sellerProducts = SellerProductQuery.me().findBySellerId(getSessionAttr("sellerId").toString());
+				}
+				for(SellerProduct sellerProduct : sellerProducts){
+					SellerProduct sPro = new SellerProduct();
+					String sellerProductId = StrKit.getRandomUUID();
+					sPro.setId(sellerProductId);
+					sPro.setProductId(sellerProduct.getProductId());
+					sPro.setSellerId(sellerId);
+					sPro.setCustomName(sellerProduct.getCustomName());
+					sPro.setStoreCount(new BigDecimal(0));
+					sPro.setPrice(sellerProduct.getPrice());
+					sPro.setCost(sellerProduct.getCost());
+					sPro.setMarketPrice(sellerProduct.getMarketPrice());
+					sPro.setWeight(sellerProduct.getWeight());
+					sPro.setWeightUnit(sellerProduct.getWeightUnit());
+					sPro.setWarehouseId(sellerProduct.getWarehouseId());
+					sPro.setIsSource(0);
+					sPro.setIsEnable(sellerProduct.getIsEnable());
+					sPro.setIsGift(sellerProduct.getIsGift());
+					sPro.setFreezeStore(sellerProduct.getFreezeStore());
+					sPro.setBarCode(sellerProduct.getBarCode());
+					//生成二维码
+					Date date = new Date();
+					SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+					String  fileName = sdf.format(date)+".png";
+					String contents =getRequest().getScheme() + "://" + getRequest().getServerName()+"/admin/seller/fu"+"?id="+sellerProductId; 
+					//部署之前上传
+					//String contents = getRequest().getScheme() + "://" + getRequest().getServerName()+":"+getRequest().getLocalPort()+getRequest().getContextPath()+"/admin/seller/fn"+"?id="+Id;
+					String imagePath = getRequest().getSession().getServletContext().getRealPath(Consts.QRCODE_PATH);
+					QRCodeUtils.genQRCode(contents, imagePath, fileName);
+					sPro.setQrcodeUrl(imagePath+"\\"+fileName);
+					sPro.setOrderList(sellerProduct.getOrderList());
+					sPro.setCreateDate(date);
+					sPro.save();
+				}
 			}
-			if(user.getUsername().equals("admin")){
+			if(department.getDeptLevel()==2){
 				seller.set("seller_type", 0);
 			}else{
 				seller.set("seller_type", 1);
 				seller.setCustomerId(customer.getId());
 			}
 			//新建销售商时默认创建分组  角色  及中间表 客户类型
- 			List<Seller> sellers = SellerQuery.me().findByDeptId(department.getId());
+ 			Seller sr = SellerQuery.me().findByDeptId(department.getId());
 			
-			if(sellers.size()==0 ){
+			if(sr==null && department.getDeptLevel()==2){
 				List<Group> groupList = GroupQuery.me().findByDeptId();
 				if(groupList.size()>0){
 					for (Group group : groupList) {
@@ -498,7 +558,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
         }
         User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
         Seller seller = SellerQuery.me().findById(getSessionAttr("sellerId").toString());
-        Page<Product> page = ProductQuery.me().paginate_pro(getPageNumber(), getPageSize(),keyword,  "cp.id",seller.getId(),user.getId());
+        Page<Product> page = ProductQuery.me().paginate_pro(getPageNumber(), getPageSize(),keyword,  "cp.name",seller.getId(),user.getId());
 
         Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);
@@ -524,6 +584,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 						sellerProducts.set("store_count",new BigDecimal(0));
 						sellerProducts.set("price", sellerProduct.getPrice());
 						sellerProducts.setCost(sellerProduct.getCost());
+						sellerProducts.setIsSource(1);
 						sellerProducts.setMarketPrice(sellerProduct.getMarketPrice());
 						sellerProducts.set("is_enable", sellerProduct.getIsEnable());
 						sellerProducts.set("order_list", sellerProduct.getOrderList());
