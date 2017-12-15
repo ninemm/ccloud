@@ -72,7 +72,7 @@ public class PayablesQuery extends JBaseQuery {
 			}
 		}else {
 			select = "SELECT s.id,s.code,s.name,r.pay_amount,r.act_amount,r.balance_amount";
-			fromBuilder = new StringBuilder(" FROM `cc_payables` AS r INNER JOIN `cc_supplier` AS s on r.object_id=s.id ");
+			fromBuilder = new StringBuilder(" FROM `cc_payables` AS r INNER JOIN `cc_supplier` AS s on r.obj_id=s.id ");
 			if(!"0".equals(id)){
 				fromBuilder.append("WHERE s.id = '"+ id+"'");
 				b = false;

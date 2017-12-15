@@ -99,25 +99,11 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 	
 	
 	public void renderlist() {
-		setAttr("ref_sn",getPara("ref_sn"));
-		setAttr("ref_type",getPara("ref_type"));
-		setAttr("object_id", getPara("object_id"));
-		render("list.html");
-	}
-	
-	
-	public void addPayment() {
 		String ref_sn = getPara("ref_sn");
 		String ref_type = getPara("ref_type");
 		String object_id = getPara("object_id");
-		//通过客户Id找到应付账款主表ID
+		//通过客户Id找到应收账款主表ID
 		Payables payables = PayablesQuery.me().findByObjId(object_id, Consts.RECEIVABLES_OBJECT_TYPE_CUSTOMER);
-		
-		if(payables == null) {
-			setAttr("ref_sn",ref_sn);
-			setAttr("ref_type",ref_type);
-			render("list.html");
-		}
 		
 		String userDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		List<User> list = UserQuery.me().findIdAndNameByDataArea(userDataArea);
@@ -125,11 +111,12 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		setAttr("ref_sn",ref_sn);
 		setAttr("bill_id",payables.getId());
 		setAttr("ref_type",ref_type);
+		setAttr("type", payables.getObjType());
 		setAttr("object_id", object_id);
 		setAttr("userInfo",JsonKit.toJson(list));
+		render("list.html");
 	}
-	
-	
+		
 	public void list() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String ref_sn = getPara("ref_sn");
