@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.engine.task.Comment;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.CustomerType;
@@ -307,5 +308,24 @@ public class OrderController extends BaseFrontController {
 		}
 
 		renderAjaxResultForSuccess();
+	}
+	
+	public void getOldOrder() {
+		String orderId = getPara("orderId");
+		
+		Record order = SalesOrderQuery.me().findMoreById(orderId);
+		setAttr("deliveryDate", DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
+		setAttr("id", orderId);
+		setAttr("order", order);
+		render("order_again.html");
+	}	
+	
+	public void orderAgain() {
+		String orderId = getPara("orderId");
+		
+		List<Record> orderDetail = SalesOrderDetailQuery.me().findByOrderId(orderId);
+		Map<String, Object> map = new HashMap<>();
+		map.put("orderDetail", orderDetail);
+		renderJson(map);
 	}
 }
