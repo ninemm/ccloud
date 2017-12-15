@@ -104,5 +104,4 @@ public class IndexController extends BaseFrontController {
 	private void onRenderAfter() {
 		HookInvoker.indexRenderAfter(this);
 	}
-
 }

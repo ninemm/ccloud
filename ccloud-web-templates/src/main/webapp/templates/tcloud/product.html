@@ -1,5 +1,17 @@
 <#include "_inc/_layout.html"/>
-<#macro css> </#macro>
+<#macro css>
+    .type {
+        background: #fcfcfc;
+    }
+    
+    .weui-panel:before {
+        border-top: 0;
+    }
+    
+    .weui-panel:after {
+        border-bottom: 0;
+    }
+</#macro>
 
 <#macro script>
 $(function() {
@@ -222,7 +234,7 @@ function save(){
 			<div id="sidebar" class="menu-left">
 				<ul>
 					<#list productTypeList as productType >
-						<li id='${(productType.id)!}'>
+						<li id='${(productType.id)!}' <#if (productType_index=0)>class="active"</#if>>
 							${(productType.name)!}
 							<span class="goods-num">8</span>
 						</li>

@@ -2,8 +2,6 @@ package org.ccloud.front.controller;
 
 import java.math.BigInteger;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,16 +14,9 @@ import org.ccloud.interceptor.UserInterceptor;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.Department;
-import org.ccloud.model.GoodsType;
-import org.ccloud.model.Product;
-import org.ccloud.model.Seller;
 import org.ccloud.model.SmsCode;
 import org.ccloud.model.User;
 import org.ccloud.model.query.DepartmentQuery;
-import org.ccloud.model.query.GoodsTypeQuery;
-import org.ccloud.model.query.InventoryQuery;
-import org.ccloud.model.query.ProductQuery;
-import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.SmsCodeQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
@@ -37,15 +28,12 @@ import org.ccloud.utils.StringUtils;
 
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Maps;
-import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Clear;
 import com.jfinal.core.ActionKey;
 import com.jfinal.kit.Ret;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.IAtom;
-import com.jfinal.plugin.activerecord.Page;
-import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.weixin.sdk.api.ApiResult;
 import com.jfinal.weixin.sdk.api.UserApi;
 

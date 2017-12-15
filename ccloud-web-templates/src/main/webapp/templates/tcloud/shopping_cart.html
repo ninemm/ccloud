@@ -313,7 +313,7 @@ function save(){
 </#macro>
 
 <@layout>
-<body id="shopping-cart">
+<div id="shopping-cart">
 	<main>
 		<div class="weui-panel weui-panel_access common" style="display: none">
 			<input type="hidden" id="sellProductId" value="">
@@ -411,27 +411,10 @@ function save(){
 			</div>
 		</div>
 	</main>
-	<div class="hidden-menu">
-		<ul>
-			<li>
-				<a href="${CPATH}/product/index">
-				首页
-				<i class="icon-home blue"></i>
-				</a>
-			</li>
-			<li>
-				<a class="goback">
-				上一页
-				<i class="icon-undo green"></i>
-				</a>
-			</li>
-		</ul>
-		<i class="icon-menu-open orange fr" id="button"></i>
-	</div>
-	<div class="layer"></div>
+	<#include "_inc/_goback.html" />
 	<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
 		<p class="total bg-white weui-flex__item" id="totalNum">共2款，总数10件</p>
-		<button id="placeOrder" class="place-order bg-blue white">下单</button>
+		<button id="placeOrder" class="place-order red-button white">下单</button>
 	</footer>
-</body>
+</div>
 </@layout>

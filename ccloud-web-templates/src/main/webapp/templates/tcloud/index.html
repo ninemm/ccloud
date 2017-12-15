@@ -2,12 +2,12 @@
 <#macro script>
 $(function () {
     $(document).on('touchend', '.menu', function () {
-      var $this = $(this);
-      var index = $this.index()-1;
-      $this.addClass('blue-button').siblings().removeClass('blue-button');
-      $('.index-info').find('.weui-cells:eq(' + index + ')').show().siblings().hide();
-      return false;
-	})
+        var $this = $(this);
+        var index = $this.index()-1;
+        $this.addClass('red-button').siblings().removeClass('red-button');
+        $('.index-info').find('.weui-cells:eq(' + index + ')').show().siblings().hide();
+        return false;
+	});
 	
 	$('.week').text($.week());
     $('.day').text($.today());
@@ -17,7 +17,7 @@ $(function () {
 		loop: true,
 		paginationHide: true,
 		autoplay: {
-		  disableOnInteraction: false,
+            disableOnInteraction: false,
 		},
 		allowTouchMove: false,
 		direction: 'vertical'
@@ -68,7 +68,9 @@ $(function () {
 			</div>
 		</div>
 		<div class="notice">
-			<i class="notice-icon-laba"></i>
+			<span class="notice-icon">
+				<i class="icon-volume ft16"></i>
+			  </span>
 			<div class="swiper-container">
 			  <div class="swiper-wrapper">
 				<div class="swiper-slide"><a href="">热烈祝贺伟义商城成功热烈祝贺伟义商城成功上线热烈祝贺伟义商城成功上线上线</a></div>
@@ -114,7 +116,7 @@ $(function () {
 			<div class="weui-cells__title weui-cell_access weui-cell index-info-tab" >
 				<div class="weui-cell__bd">
 					<b style="color:#999">业务消息</b>
-					<p class="menu blue-button">订单</p>
+					<p class="menu red-button">订单</p>
 					<p class="menu">客户</p>
 					<p class="menu">费用</p>
 				</div>
