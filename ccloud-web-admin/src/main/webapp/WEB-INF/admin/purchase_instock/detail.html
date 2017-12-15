@@ -249,12 +249,12 @@
 					toastr.success(data.message, '操作成功');
 					setTimeout( function(){
 						parent.refresh();
-								}, 3* 1000 );
+								}, 1* 1000 );
 				} else {
 					toastr.error(data.message,'操作失败');
 					setTimeout( function(){
 						location.reload();
-								}, 3* 1000 );
+								}, 2* 1000 );
 				}
 			},
 			error : function() {
