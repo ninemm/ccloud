@@ -25,5 +25,10 @@ import org.ccloud.model.base.BaseMessage;
 public class Message extends BaseMessage<Message> {
 
 	private static final long serialVersionUID = 1L;
+	
+	public static final String ORDER_REVIEW_TYPE_CODE = "100601";
+	public static final String CUSTOMER_REVIEW_TYPE_CODE = "100602";
+	public static final String CUSTOMER_VISIT_REVIEW_TYPE_CODE = "100603";
+	
 
 }

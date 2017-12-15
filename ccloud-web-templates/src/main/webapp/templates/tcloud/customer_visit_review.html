@@ -253,11 +253,11 @@
     <section class="weui-panel weui-panel_access order-customer-info">
       <input type="hidden" name="customerVisit.id" id ="id" value="${(customerVisit.id)!}">
         <input type="hidden" id ="taskId" value="${(taskId)!}">
-      <div class="weui-cell weui-cell_access">
+      <div class="weui-cell">
           <div class="weui-cell__bd">
               <div class="order-customer-info-title">客户名称: </div>
-              <input class="txt-gray" value="${(customerVisit.customer_name)!}">
           </div>
+          <div class="weui-cell__ft">${(customerVisit.customer_name)!}</div>
       </div>
       <!-- <div class="weui-cell weui-cell_access">
           <div class="weui-cell__bd">
@@ -265,23 +265,23 @@
               <input class="txt-gray" value="${(customerVisit.nickname)!'无'}">
           </div>
       </div> -->
-      <div class="weui-cell weui-cell_access">
+      <div class="weui-cell">
           <div class="weui-cell__bd">
               <div class="order-customer-info-title">联系人: </div>
-              <input class="txt-gray" value="${(customerVisit.contact)!}">
           </div>
+          <div class="weui-cell__ft">${(customerVisit.contact)!}</div>
       </div>
-      <div class="weui-cell weui-cell_access">
+      <div class="weui-cell">
           <div class="weui-cell__bd">
               <div class="order-customer-info-title">联系电话: </div>
-              <input class="txt-gray" value="${(customerVisit.mobile)!}">
           </div>
+          <div class="weui-cell__ft">${(customerVisit.mobile)!}</div>
       </div>
-      <div class="weui-cell weui-cell_access select-area">
+      <div class="weui-cell">
           <div class="weui-cell__bd">
               <div class="order-customer-info-title">客户类型: </div>
-              <input class="txt-gray" value="${(cTypeName)!}">
           </div>
+          <div class="weui-cell__ft">${(cTypeName)!}</div>
       </div>
       <!--<div class="weui-cell weui-cell_access">-->
           <!--<div class="weui-cell__bd">-->
@@ -289,17 +289,18 @@
               <!--<input class="txt-gray" value="${DICT_NAME('customerVisit.question_type')}">-->
           <!--</div>-->
       <!--</div>-->
-      <div class="weui-cell weui-cell_access">
+      <div class="weui-cell">
           <div class="weui-cell__bd">
               <div class="order-customer-info-title">问题类型: </div>
               <input class="txt-gray" value="${(customerVisit.typeName)!}">
           </div>
+          <div class="weui-cell__ft">${(customerVisit.typeName)!}</div>
       </div>
-      <div class="weui-cell weui-cell_access">
+      <div class="weui-cell">
           <div class="weui-cell__bd">
               <div class="order-customer-info-title">描述: </div>
-              <input class="txt-gray" value="${(customerVisit.question_desc)!}">
           </div>
+          <div class="weui-cell__ft">${(customerVisit.question_desc)!}</div>
       </div>
   </section>
   <section class="weui-cells weui-cells_form">

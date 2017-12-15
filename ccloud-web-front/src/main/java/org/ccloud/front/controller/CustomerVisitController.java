@@ -6,55 +6,58 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.base.Joiner;
 import org.apache.commons.lang.time.DateFormatUtils;
-import com.google.common.collect.ImmutableMap;
-import com.jfinal.kit.Kv;
-import com.jfinal.plugin.activerecord.Page;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
+import org.ccloud.message.Actions;
+import org.ccloud.message.MessageKit;
 import org.ccloud.model.CustomerType;
 import org.ccloud.model.CustomerVisit;
 import org.ccloud.model.Dict;
+import org.ccloud.model.Message;
 import org.ccloud.model.User;
+import org.ccloud.model.WxMessageTemplate;
+import org.ccloud.model.query.CustomerJoinCustomerTypeQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.CustomerVisitQuery;
 import org.ccloud.model.query.DictQuery;
 import org.ccloud.model.query.SellerCustomerQuery;
 import org.ccloud.model.query.UserQuery;
+import org.ccloud.model.query.WxMessageTemplateQuery;
 import org.ccloud.model.vo.ImageJson;
-import org.ccloud.message.Actions;
-import org.ccloud.message.MessageKit;
-import org.ccloud.model.*;
-import org.ccloud.model.query.*;
 import org.ccloud.route.RouterMapping;
-import org.ccloud.shiro.core.ShiroKit;
 import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.wechat.WechatJSSDKInterceptor;
+import org.ccloud.workflow.service.WorkFlowService;
+import org.joda.time.DateTime;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.beust.jcommander.internal.Lists;
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Before;
+import com.jfinal.kit.Kv;
 import com.jfinal.kit.StrKit;
-
+import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.tx.Tx;
-import org.ccloud.workflow.service.WorkFlowService;
-import org.joda.time.DateTime;
 
 @RouterMapping(url = "/customerVisit")
 public class CustomerVisitController extends BaseFrontController {
 	
 	public void index() {
 		
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-//		String userId = ShiroKit.getUserId();
+		
+		String id = getPara("id");
+		String type = getPara("type");
+		String nature = getPara("nature");
+		String subType = getPara("subType");
+		String dataArea = selectDataArea + "%";
 
-		Page<Record> visitList = CustomerVisitQuery.me().paginateForApp(getPageNumber(), getPageSize(), getPara("id"), getPara("type"), getPara("nature"), getPara("subType"), selectDataArea + "%");
+		Page<Record> visitList = CustomerVisitQuery.me().paginateForApp(getPageNumber(), getPageSize(), id, type, nature, subType, dataArea);
 
 		transform(visitList.getList());
 		if(StrKit.notBlank(getPara("id"))) {
@@ -66,8 +69,6 @@ public class CustomerVisitController extends BaseFrontController {
 	}
 
 	public void getSelect() {
-
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
@@ -105,7 +106,7 @@ public class CustomerVisitController extends BaseFrontController {
 	}
 
 	public void refresh() {
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
 		Page<Record> visitList = new Page<>();
@@ -144,14 +145,8 @@ public class CustomerVisitController extends BaseFrontController {
 
 	@Before(WechatJSSDKInterceptor.class)
 	public void edit() {
-		
-		String userId = ShiroKit.getUserId();
-
 	    List<Dict> problem_list = DictQuery.me().findByCode("visit");
-	    
-	    //setAttr("customer",JSON.toJSONString(customer_list));
 	    setAttr("problem",JSON.toJSONString(problem_list));
-		
 		render("customer_visit_detail.html");
 	}
 
@@ -173,7 +168,6 @@ public class CustomerVisitController extends BaseFrontController {
 
 	}
 
-	
 	public void success() {
 		render("success.html");
 	}
@@ -184,7 +178,6 @@ public class CustomerVisitController extends BaseFrontController {
 		keepPara();
 		
 		String id = getPara("id");
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
 		if (StrKit.isBlank(id)) {
@@ -193,17 +186,16 @@ public class CustomerVisitController extends BaseFrontController {
 		}
 		
 		List<Record> customerVisit = CustomerVisitQuery.me().findMoreById(id);
-
-		List<String> typeList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeIdListBySellerCustomerId(customerVisit.get(0).getStr("seller_customer_id"), DataAreaUtil.getUserDealerDataArea(selectDataArea) + "%");
-
-		List<String> typeName = new ArrayList<>();
-		for(String type : typeList)
-			typeName.add(CustomerTypeQuery.me().findById(type).getStr("name"));
-
 		if (customerVisit == null) {
 			renderError(404);
 			return ;
 		}
+		
+		List<String> typeList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeIdListBySellerCustomerId(customerVisit.get(0).getStr("seller_customer_id"), DataAreaUtil.getUserDealerDataArea(selectDataArea) + "%");
+		List<String> typeName = new ArrayList<>();
+		for(String type : typeList)
+			typeName.add(CustomerTypeQuery.me().findById(type).getStr("name"));
+
 		transform(customerVisit);
 
 		String imageListStore = customerVisit.get(0).get("photo");
@@ -401,7 +393,6 @@ public class CustomerVisitController extends BaseFrontController {
 
 		CustomerVisit customerVisit = CustomerVisitQuery.me().findById(id);
 		boolean isUpdated = true;
-//		Boolean isCustomerAudit = OptionQuery.me().findValueAsBool("isCustomerVisit");
 		Boolean isCustomerVisit = true;
 
 		Map<String, Object> param = new HashMap<>();
@@ -445,7 +436,7 @@ public class CustomerVisitController extends BaseFrontController {
 					kv.set("createTime", DateTime.now().toString("yyyy-MM-dd HH:mm"));
 					kv.set("status", "待审核");
 
-					MessageKit.sendMessage(Actions.NotifyMessage.CUSTOMER_VISIT_AUDIT_MESSAGE, kv);
+					MessageKit.sendMessage(Actions.NotifyWechatMessage.CUSTOMER_VISIT_AUDIT_MESSAGE, kv);
 				}
 			} else {
 				isUpdated = customerVisit.update();

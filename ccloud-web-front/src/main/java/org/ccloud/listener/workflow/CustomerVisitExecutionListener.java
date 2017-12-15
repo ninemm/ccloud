@@ -50,7 +50,7 @@ public class CustomerVisitExecutionListener implements ExecutionListener {
 					kv.set("createTime", DateTime.now().toString("yyyy-MM-dd HH:mm"));
 					kv.set("status", "已审核");
 
-					MessageKit.sendMessage(Actions.NotifyMessage.CUSTOMER_VISIT_AUDIT_MESSAGE, kv);
+					MessageKit.sendMessage(Actions.NotifyWechatMessage.CUSTOMER_VISIT_AUDIT_MESSAGE, kv);
 				} else {
 					Message message = (Message) execution.getVariable("message");
 					message.saveOrUpdate();

@@ -31,6 +31,8 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.Task;
 import org.apache.commons.lang3.StringUtils;
+import org.ccloud.Consts;
+import org.ccloud.shiro.core.ShiroKit;
 import org.ccloud.workflow.plugin.ActivitiPlugin;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -244,7 +246,7 @@ public class WorkFlowService {
 			var = new HashMap<String, Object>();
 		}
 
-//		var.put(Consts.WORKFLOW_APPLY_USERNAME, ShiroKit.getUserName());
+		var.put(Consts.WORKFLOW_APPLY_USERNAME, ShiroKit.getUsername());
 		ProcessInstance procIns = ActivitiPlugin.buildProcessEngine().getRuntimeService()
 				.startProcessInstanceByKey(defKey, id, var);
 		return procIns.getId();

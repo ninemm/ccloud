@@ -10,7 +10,7 @@ import com.jfinal.kit.Kv;
 import com.jfinal.kit.Ret;
 import com.jfinal.weixin.sdk.api.TemplateMsgApi;
 
-@Listener(action = Actions.NotifyMessage.CUSTOMER_AUDIT_MESSAGE)
+@Listener(action = Actions.NotifyWechatMessage.CUSTOMER_AUDIT_MESSAGE)
 public class CustomerAuditListener implements MessageListener {
 
 	@Override

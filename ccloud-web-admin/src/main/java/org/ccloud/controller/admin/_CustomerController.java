@@ -152,7 +152,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 			kv.set("createTime", DateTime.now().toString("yyyy-MM-dd HH:mm"));
 			kv.set("status", "待审核");
 
-			MessageKit.sendMessage(Actions.NotifyMessage.CUSTOMER_AUDIT_MESSAGE, kv);
+			MessageKit.sendMessage(Actions.NotifyWechatMessage.CUSTOMER_AUDIT_MESSAGE, kv);
 
 		}
 
