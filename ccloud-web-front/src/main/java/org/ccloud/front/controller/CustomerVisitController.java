@@ -32,6 +32,7 @@ import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
+import com.jfinal.plugin.activerecord.tx.Tx;
 
 @RouterMapping(url = "/customerVisit")
 public class CustomerVisitController extends BaseFrontController {
@@ -166,8 +167,8 @@ public class CustomerVisitController extends BaseFrontController {
 		render("customer_visit_choose.html");
 	}
 	// 用户新增拜访保存
+	@Before(Tx.class)
 	public void save() {
-		
 		 CustomerVisit customerVisit = getModel(CustomerVisit.class);
 		 User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		 
