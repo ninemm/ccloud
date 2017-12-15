@@ -26,6 +26,7 @@ public class Consts {
 	public static final String SESSION_SELLER_NAME = "sellerName";
 	
 	public static final String WORKFLOW_APPLY_USERNAME = "applyUsername";
+	public static final String WORKFLOW_APPLY_USER = "applyUser";
 
 	public static final String CHARTSET_UTF8 = "UTF-8";
 	
@@ -137,6 +138,11 @@ public class Consts {
 	
 	public static final String OPTION_SELLER_STORE_CHECK = "seller_store_check";//经销商检查库存开关设置
 	
-	public static final String CUSTOMER_KIND_COMMON = "100401";//经销商检查库存开关设置
-	public static final String CUSTOMER_KIND_SELLER = "100402";//经销商检查库存开关设置
-}
+	public static final String CUSTOMER_KIND_COMMON = "100401";//普通客户
+	public static final String CUSTOMER_KIND_SELLER = "100402";//直营商客户
+	
+	public static final String GROUP_CODE_PREFIX_DATA = "data";//用户组
+	public static final String GROUP_CODE_PREFIX_ROLE = "role";//权限组
+	
+	public static final String ROLE_CODE_007 = "007";//财务
+	public static final String ROLE_CODE_020 = "020";//账务

@@ -7,22 +7,29 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.engine.task.Comment;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.CustomerType;
+import org.ccloud.model.SalesOrder;
 import org.ccloud.model.SellerProduct;
 import org.ccloud.model.User;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.SalesOrderDetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SellerProductQuery;
+import org.ccloud.model.query.UserGroupRelQuery;
+import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
+import org.ccloud.workflow.service.WorkFlowService;
 
 import com.alibaba.fastjson.JSON;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Maps;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.IAtom;
@@ -91,18 +98,23 @@ public class OrderController extends BaseFrontController {
 		render("orderDetail.html");
 	}
 
-
-	private String getStatusName (int statusCode) {
-		if (statusCode == Consts.SALES_ORDER_STATUS_PASS) return "已审核";
-		if (statusCode == Consts.SALES_ORDER_STATUS_DEFAULT) return "待审核";
-		if (statusCode == Consts.SALES_ORDER_STATUS_CANCEL) return "取消";
-		if (statusCode == Consts.SALES_ORDER_STATUS_PART_OUT) return "部分出库";
-		if (statusCode == Consts.SALES_ORDER_STATUS_PART_OUT_CLOSE) return "部分出库-订单关闭";
-		if (statusCode == Consts.SALES_ORDER_STATUS_ALL_OUT) return "全部出库";
-		if (statusCode == Consts.SALES_ORDER_STATUS_ALL_OUT_CLOSE) return "全部出库-订单关闭";
+	private String getStatusName(int statusCode) {
+		if (statusCode == Consts.SALES_ORDER_STATUS_PASS)
+			return "已审核";
+		if (statusCode == Consts.SALES_ORDER_STATUS_DEFAULT)
+			return "待审核";
+		if (statusCode == Consts.SALES_ORDER_STATUS_CANCEL)
+			return "取消";
+		if (statusCode == Consts.SALES_ORDER_STATUS_PART_OUT)
+			return "部分出库";
+		if (statusCode == Consts.SALES_ORDER_STATUS_PART_OUT_CLOSE)
+			return "部分出库-订单关闭";
+		if (statusCode == Consts.SALES_ORDER_STATUS_ALL_OUT)
+			return "全部出库";
+		if (statusCode == Consts.SALES_ORDER_STATUS_ALL_OUT_CLOSE)
+			return "全部出库-订单关闭";
 		return "无";
 	}
-	
 
 	public synchronized void salesOrder() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
@@ -182,11 +194,119 @@ public class OrderController extends BaseFrontController {
 						}
 					}
 				}
+				
+				if(!start(orderId)) {
+					return false;
+				}
 
 				return true;
 			}
 		});
 		return isSave;
+	}
+
+	private boolean start(String orderId) {
+
+		WorkFlowService workflow = new WorkFlowService();
+		String defKey = "_order_review_1";
+
+		SalesOrder salesOrder = SalesOrderQuery.me().findById(orderId);
+
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		
+		Map<String, Object> param = Maps.newHashMap();
+
+		String acount = getAcount(user.getId());
+
+		if(StrKit.isBlank(acount)) {
+			return false;
+		}
+		param.put("account", acount);
+
+		String procInstId = workflow.startProcess(orderId, defKey, param);
+
+		salesOrder.setProcKey(defKey);
+		salesOrder.setStatus(Consts.SALES_ORDER_STATUS_DEFAULT);
+		salesOrder.setProcInstId(procInstId);
+		
+		return salesOrder.update();
+	}
+	
+	private String getAcount(String userId) {
+		List<String> userIdList = UserGroupRelQuery.me().findUserIdsByGroup(Consts.GROUP_CODE_PREFIX_DATA, userId);
+		String userIds = Joiner.on(",").join(userIdList);
+		List<String> userNameList = UserGroupRelQuery.me().findUserNamesByRoleCode(Consts.GROUP_CODE_PREFIX_ROLE, Consts.ROLE_CODE_020, userIds);
+
+		return Joiner.on(",").join(userNameList);
+	}
+
+	public void audit() {
+
+		keepPara();
+
+		boolean isCheck = false;
+		String id = getPara("id");
+
+		SalesOrder salesOrder = SalesOrderQuery.me().findById(id);
+		setAttr("salesOrder", salesOrder);
+
+		// HistoricTaskInstanceQuery query =
+		// ActivitiPlugin.buildProcessEngine().getHistoryService()
+		// .createHistoricTaskInstanceQuery();
+		// query.orderByProcessInstanceId().asc();
+		// query.orderByHistoricTaskInstanceEndTime().desc();
+		// List<HistoricTaskInstance> list = query.list();
+		// for (HistoricTaskInstance hi : list) {
+		// System.out.println(hi.getAssignee() + " " + hi.getName() + " "
+		// + hi.getStartTime());
+		// }
+
+		String taskId = getPara("taskId");
+		List<Comment> comments = WorkFlowService.me().getProcessComments(taskId);
+		setAttr("comments", comments);
+
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		if (user != null && StrKit.equals(getPara("assignee"), user.getUsername())) {
+			isCheck = true;
+		}
+		setAttr("isCheck", isCheck);
+	}
+
+	public void complete() {
+		String orderId = getPara("id");
+
+		String taskId = getPara("taskId");
+		String comment = getPara("comment");
+		Integer pass = getParaToInt("pass", 1);
+
+		Map<String, Object> var = Maps.newHashMap();
+		var.put("pass", pass);
+		var.put("orderId", orderId);
+
+		WorkFlowService workflowService = new WorkFlowService();
+		workflowService.completeTask(taskId, comment, var);
+
+		renderAjaxResultForSuccess("订单审核成功");
+	}
+
+	public void cancel() {
+
+		String orderId = getPara("orderId");
+		SalesOrder salesOrder = SalesOrderQuery.me().findById(orderId);
+		WorkFlowService workflow = new WorkFlowService();
+
+		String procInstId = salesOrder.getProcInstId();
+		if (StrKit.notBlank(procInstId))
+			workflow.deleteProcessInstance(salesOrder.getProcInstId());
+
+		salesOrder.setStatus(Consts.SALES_ORDER_STATUS_CANCEL);
+
+		if (!salesOrder.saveOrUpdate()) {
+			renderAjaxResultForError("取消订单失败");
+			return;
+		}
+
+		renderAjaxResultForSuccess();
 	}
 	
 	public void getOldOrder() {
