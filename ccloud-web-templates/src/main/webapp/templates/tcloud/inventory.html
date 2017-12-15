@@ -5,6 +5,10 @@
         text-align: left!important;
         background-color: white!important;
     }
+    
+    .menu-left {
+        background: #f3f5f7!important;
+    } 
 </#macro>
 <#macro script>
     var pageNumber = 1;
@@ -204,17 +208,15 @@
                     <i class="icon-th-list"></i>
                 </div>
             </header>
-            <div>
-                <div id="products" class="menu-left ft14" style="background: #fcfcfc;">
-                    <ul>
-                        <#if goodsTypeList??&&(goodsTypeList?size>0)>
-                            <li id="allProduct" class="active" value="00">商品类型</li>
-                        </#if>
-                        <#list goodsTypeList as goodsType >
-                            <li value="${(goodsType.id)!}">${(goodsType.name)!}</li>
-                        </#list>
-                    </ul>
-                </div>
+            <div id="products" class="menu-left ft14">
+                <ul>
+                    <#if goodsTypeList??&&(goodsTypeList?size>0)>
+                        <li id="allProduct" class="active" value="00">商品类型</li>
+                    </#if>
+                    <#list goodsTypeList as goodsType >
+                        <li value="${(goodsType.id)!}">${(goodsType.name)!}</li>
+                    </#list>
+                </ul>
             </div>
             <article class="menu-right infinite" id="inventory_detailList">
                 <#if inventoryList??>

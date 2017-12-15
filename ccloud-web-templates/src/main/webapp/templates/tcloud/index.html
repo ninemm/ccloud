@@ -27,6 +27,17 @@ $(function () {
 <div class="weui-content">
 	<article id="home">
 		<div class="company">${(session.sellerName)!}</div>
+		<div class="notice">
+            <span class="notice-icon">
+                <i class="icon-volume ft16"></i>
+              </span>
+            <div class="swiper-container">
+              <div class="swiper-wrapper">
+                <div class="swiper-slide"><a href="">热烈祝贺伟义商城成功热烈祝贺伟义商城成功上线热烈祝贺伟义商城成功上线上线</a></div>
+                <div class="swiper-slide"><a href="">蓝之蓝股份成公司上市</a></div>
+              </div>
+            </div>
+        </div>
 		<div>
 			<div class="weui-cells__title">
 				<div class="weui-flex">
@@ -42,13 +53,13 @@ $(function () {
 				<a href="${CPATH}/product" class="weui-grid js_grid">
                     <!-- <span class="weui-badge empty-badge">&nbsp;</span> -->
 					<div class="weui-grid__icon">
-						<i class="icon-file-text blue"></i>
+						<i class="icon-file-text" style="color: #9c89b9"></i>
 					</div>
 					<p class="weui-grid__label">下订单</p>
 				</a>
                 <a href="${CPATH}/customerVisit/edit" class="weui-grid js_grid">
 					<div class="weui-grid__icon">
-						<i class="icon-plane" style="color: #ffa042"></i>
+						<i class="icon-plane" style="color: #19c594"></i>
 					</div>
 					<p class="weui-grid__label">新增拜访</p>
 				</a>
@@ -61,21 +72,10 @@ $(function () {
                 <a href="${CPATH}/customer/edit" class="weui-grid js_grid">
                     <span class="weui-badge left-top-tag">NEW</span>
 					<div class="weui-grid__icon">
-						<i class="icon-user-plus" style="color: #f1745e"></i>
+						<i class="icon-user-plus" style="color: #f7b55d;"></i>
 					</div>
 					<p class="weui-grid__label">新增客户</p>
 				</a>
-			</div>
-		</div>
-		<div class="notice">
-			<span class="notice-icon">
-				<i class="icon-volume ft16"></i>
-			  </span>
-			<div class="swiper-container">
-			  <div class="swiper-wrapper">
-				<div class="swiper-slide"><a href="">热烈祝贺伟义商城成功热烈祝贺伟义商城成功上线热烈祝贺伟义商城成功上线上线</a></div>
-				<div class="swiper-slide"><a href="">蓝之蓝股份成公司上市</a></div>
-			  </div>
 			</div>
 		</div>
 		<div>
@@ -86,14 +86,14 @@ $(function () {
 			    <a href="${CPATH}/todo/order" class="weui-grid js_grid">
 			        <span class="weui-badge empty-badge">&nbsp;</span>
                     <div class="weui-grid__icon">
-                        <i class="icon-file-text" style="color: #19c594;"></i>
+                        <i class="icon-file-text" style="color: #9c89b9"></i>
                     </div>
                     <p class="weui-grid__label">订单审核</p>
                 </a>
 				<a href="${CPATH}/todo/customer" class="weui-grid js_grid">
                     <span class="weui-badge empty-badge">&nbsp;</span>
 					<div class="weui-grid__icon">
-						<i class="icon-user" style="color: #9c89b9"></i>
+						<i class="icon-user" style="color: #19c594"></i>
 					</div>
 					<p class="weui-grid__label">客户审核</p>
 				</a>
