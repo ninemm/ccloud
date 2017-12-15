@@ -240,12 +240,12 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 				String bN = StringUtils.getArrayFirst(paraMap.get("bN" + index));
 				String sN = StringUtils.getArrayFirst(paraMap.get("sN" + index));
 				Integer productCount0 = Integer.valueOf(bN) * Integer.valueOf(convert) + Integer.valueOf(sN);
-				BigDecimal productAmount =  purchaseOrderDetail.getProductPrice().multiply(new BigDecimal(bN)).add((purchaseOrderDetail.getProductPrice().divide((new BigDecimal(convert)), 2, BigDecimal.ROUND_HALF_UP))).multiply(new BigDecimal(sN));
+				BigDecimal productAmount =  (purchaseOrderDetail.getProductPrice().multiply(new BigDecimal(bN))).add(((purchaseOrderDetail.getProductPrice().divide((new BigDecimal(convert)), 2, BigDecimal.ROUND_HALF_UP))).multiply(new BigDecimal(sN)));
 				purchaseInstockDetail.set("product_count", productCount0);
 				purchaseInstockDetail.set("product_amount", productAmount);
 				purchaseInstockDetail.set("modify_date", new Date());
 				purchaseInstockDetail.update();
-				purchaseOrder.set("status", 4000);
+				purchaseOrder.set("status", 3000);
 				purchaseOrder.update();
 				count++;
 				totalAmount = totalAmount.add(productAmount);
