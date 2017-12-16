@@ -27,9 +27,6 @@
         border-top: .05rem solid #f3f5f7;
     }
     
-    .space-between {
-        font-size: .7rem;
-    }
 </#macro>
 
 <#macro script_import>
@@ -143,7 +140,9 @@
             "status": status,
             "comment": $("#comment").val(),
             "pic": JSON.stringify(imageArr),
-            "location": $("#location").val()
+            "location": $("#location").val(),
+            lng: $("#lng").val(),
+            lat: $("#lat").val()
         };
     }
 
@@ -201,6 +200,9 @@
                 var longitude = res.longitude;                    // 经度，浮点数，范围为180 ~ -180。
                 var speed = res.speed;                            // 速度，以米/每秒计
                 var accuracy = res.accuracy;                      // 位置精度
+
+                $("#lng").val(longitude.toFixed(2));
+                $("#lat").val(latitude.toFixed(2));
 
                 var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
                 var geoc = new BMap.Geocoder();                   // 获取百度地址解析器
@@ -263,17 +265,18 @@
           </div>
           <div class="weui-cell__ft">${(cTypeName)!}</div>
       </div>
-      <!--<div class="weui-cell weui-cell_access">-->
-          <!--<div class="weui-cell__bd">-->
-              <!--<div class="order-customer-info-title">活动名称: </div>-->
-              <!--<input class="txt-gray" value="${DICT_NAME('customerVisit.question_type')}">-->
-          <!--</div>-->
-      <!--</div>-->
+      
       <div class="weui-cell">
           <div class="weui-cell__bd">
               <div class="order-customer-info-title">问题类型: </div>
           </div>
           <div class="weui-cell__ft">${(customerVisit.typeName)!}</div>
+      </div>
+      <div class="weui-cell">
+          <div class="weui-cell__bd">
+              <div class="order-customer-info-title">拜访时间: </div>
+          </div>
+          <div class="weui-cell__ft">${(customerVisit.create_date?string('yyyy-MM-dd HH:mm'))!}</div>
       </div>
       <div class="weui-cell">
           <div class="weui-cell__bd">
@@ -287,8 +290,8 @@
           <div class="weui-cell__bd">
               <div class="weui-uploader">
                   <div class="weui-uploader__hd">
-                      <p class="weui-uploader__title">附件图片</p>
-                      <div class="weui-uploader__info">${(customerVisit.imageList?size)!0}/3</div>
+                      <p class="weui-uploader__title">拜访实景图</p>
+                      <!-- <div class="weui-uploader__info">${(customerVisit.imageList?size)!0}/3</div> -->
                   </div>
                   <div class="weui-uploader__bd">
                       <ul class="weui-uploader__files">
@@ -312,29 +315,21 @@
        </div>
    </section>
 	
-	<section class="weui-panel weui-panel_access ft12 remark">
+	<section class="weui-panel weui-panel_access ft14 remark"> 
         <div class="weui-cell weui-cell_access space-between">
-	        <p>业务员：${(customerVisit.realname)!}/${(customerVisit.userMobile)!}</p>
-	        <p>${(customerVisit.createDate)!}</p>
+	        <p>业务员：${(customerVisit.realname)!} / ${(customerVisit.userMobile)!}</p>
         </div>
     </section>
     
     <section class="weui-panel weui-panel_access ft14 remark">
-        <!-- <div class="weui-cells__title">文本域</div>
+        <div class="weui-cells__title">建议</div>
         <div class="weui-cells weui-cells_form">
             <div class="weui-cell">
 	            <div class="weui-cell__bd">
-	                <textarea class="weui-textarea" placeholder="请输入文本" rows="3"></textarea>
+	                <textarea class="weui-textarea" name="customerVisit.comment" placeholder="审核建议" rows="3"></textarea>
 	                <div class="weui-textarea-counter"><span>0</span>/200</div>
 	            </div>
             </div>
-        </div> -->
-        <div class="weui-cell weui-cell_access">
-	        <div class="weui-cell__bd">
-	            <p>建议</p>
-	            <textarea class="weui-textarea" name="customerVisit.comment" id="comment" rows="10" placeholder="审核建议"></textarea>
-	            <div class="weui-textarea-counter"><span>0</span>/200</div>
-	        </div>
         </div>
         <div class="weui-gallery" id="gallery">
             <span class="weui-gallery__img" id="galleryImg"></span>
@@ -371,6 +366,8 @@
 	        <div class="weui-cell__bd">
 	            <span class="icon-map-pin ft16 green"></span>
 	            <span id="location">正在定位中...</span>
+	            <input id="lng" name="customerVisit.lng" type="hidden" />
+                <input id="lat" name="customerVisit.lat" type="hidden" />
 	        </div>
         </div>
     </section>
