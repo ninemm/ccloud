@@ -181,8 +181,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
         			String pwarehouseSn = "PS" + seller.getStr("seller_code") + DateUtils.format("yyMMdd", date) + PurchaseInstockQuery.me().getNewSn(seller.getStr("id"));
         
         			Warehouse warehouse = WarehouseQuery.me().findBySellerId(seller.getStr("id"));
-
-        			if(!PurchaseInstockQuery.me().insertBySalesOutStock(paraMap, seller, purchaseInstockId, pwarehouseSn, warehouse.getId(), user.getId(), date)) {
+        			if(!PurchaseInstockQuery.me().insertBySalesOutStock(paraMap, seller, purchaseInstockId, pwarehouseSn, warehouse.getId(), user.getId(), date,sellerId)) {
         				return false;
         			}
         			

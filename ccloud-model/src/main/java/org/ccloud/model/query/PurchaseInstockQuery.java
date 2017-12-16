@@ -48,8 +48,8 @@ public class PurchaseInstockQuery extends JBaseQuery {
 	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate,String userId,String dataArea) {
 		String select = "select i.*, cs.name as supplierName";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_purchase_instock` i ");
-		fromBuilder.append(" join cc_supplier cs on i.supplier_id = cs.id ");
-		fromBuilder.append(" join user u on i.input_user_id = u.id ");
+		fromBuilder.append(" left join cc_supplier cs on i.supplier_id = cs.id ");
+		fromBuilder.append(" left join user u on i.input_user_id = u.id ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
@@ -71,7 +71,7 @@ public class PurchaseInstockQuery extends JBaseQuery {
 			params.add(endDate);
 		}
 
-		fromBuilder.append(" and u.id='"+userId+"' order by i.create_date desc ");
+		fromBuilder.append(" order by i.create_date desc ");
 
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
@@ -103,7 +103,7 @@ public class PurchaseInstockQuery extends JBaseQuery {
 		fromBuilder.append(" from cc_purchase_instock cpi ");
 		fromBuilder.append(" LEFT JOIN cc_supplier cs on cs.id= cpi.supplier_id ");
 		fromBuilder.append(" left join user u on cpi.biz_user_id = u.id ");
-		fromBuilder.append(" where cpi.id = ? and cpi.data_area='"+dataArea+"' GROUP BY cpi.id");
+		fromBuilder.append(" where cpi.id = ? and cpi.data_area like'"+dataArea+"' GROUP BY cpi.id");
 
 		return Db.findFirst(fromBuilder.toString(), id);
 	}
@@ -155,12 +155,13 @@ public class PurchaseInstockQuery extends JBaseQuery {
 	}
 	
 	public boolean insertBySalesOutStock(Map<String, String[]> paraMap, Record seller, String purchaseInstockId,
-			String pwarehouseSn, String warehouseId, String userId, Date date) {
+			String pwarehouseSn, String warehouseId, String userId, Date date,String sellerId) {
 		PurchaseInstock purchaseInstock = new PurchaseInstock();
 		purchaseInstock.set("id", purchaseInstockId);
 		purchaseInstock.set("pwarehouse_sn", pwarehouseSn);
 		purchaseInstock.set("warehouse_id", warehouseId);
 		purchaseInstock.set("biz_user_id", userId);
+		purchaseInstock.setSupplierId(sellerId);
 		purchaseInstock.set("input_user_id", StringUtils.getArrayFirst(paraMap.get("input_user_id")));
 		purchaseInstock.set("status", 0);// 待入库
 		purchaseInstock.set("total_amount", StringUtils.getArrayFirst(paraMap.get("total")));
