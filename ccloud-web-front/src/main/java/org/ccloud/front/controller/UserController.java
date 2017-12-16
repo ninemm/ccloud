@@ -102,10 +102,11 @@ public class UserController extends BaseFrontController {
 		
 
 		List<Map<String, String>> sellerList = Lists.newArrayList();
+		List<Department> tmpList = Lists.newArrayList();
 		for (User temp : userList) {
-			List<Department> tmpList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(temp.getDepartmentId());
+			tmpList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(temp.getDepartmentId());
 			if (tmpList.size() > 0) {
-				Department dept = tmpList.get(0);
+				Department dept = tmpList.get(tmpList.size() - 1);
 				Map<String, String> seller = Maps.newHashMap();
 				seller.put("seller_id", dept.getStr("seller_id"));
 				seller.put("seller_name", dept.getStr("seller_name"));
@@ -132,10 +133,14 @@ public class UserController extends BaseFrontController {
 			//CookieUtils.put(this, Consts.COOKIE_LOGINED_USER, user.getId());
 			
 			if (!user.isAdministrator()) {
-				Map<String, String> map = sellerList.get(0);
-				setSessionAttr(Consts.SESSION_SELLER_ID, map.get("seller_id"));
-				setSessionAttr(Consts.SESSION_SELLER_NAME, map.get("seller_name"));
-				setSessionAttr(Consts.SESSION_SELLER_CODE, map.get("seller_code"));
+				Department dept = tmpList.get(0);
+				if (dept == null) {
+					renderError(404);
+					return ;
+				}
+				setSessionAttr(Consts.SESSION_SELLER_ID, dept.get("seller_id"));
+				setSessionAttr(Consts.SESSION_SELLER_NAME, dept.get("seller_name"));
+				setSessionAttr(Consts.SESSION_SELLER_CODE, dept.get("seller_code"));
 			}
 			// 获取用户权限
 			initUserRole(user.getUsername(), user.getPassword(), true);

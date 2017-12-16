@@ -204,7 +204,7 @@ public class UserQuery extends JBaseQuery {
 	}
 	
 	public User findManagerByDeptId(String deptId) {
-		String sql = "select * from user u left join department d on u.id = d.principal_user_id where d.id = ?";
+		String sql = "select u.* from user u left join department d on u.id = d.principal_user_id where d.id = ?";
 		return DAO.findFirst(sql, deptId);
 	}	
 	

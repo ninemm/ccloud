@@ -65,7 +65,7 @@ public abstract class BaseMessage<M extends BaseMessage<M>> extends JModel<M> im
 	@Override
 	public boolean save() {
 		boolean saved = super.save();
-		if (saved) { MessageKit.sendMessage(ACTION_ADD, this); }
+		//if (saved) { MessageKit.sendMessage(ACTION_ADD, this); }
 		return saved;
 	}
 

@@ -16,7 +16,8 @@ import com.jfinal.kit.PropKit;
 public class SmsCodeController extends BaseFrontController{
 
 	public void index() {
-		render("user.html");
+		//render("user.html");
+		renderNull();
 	}
 	
 	public void send() {

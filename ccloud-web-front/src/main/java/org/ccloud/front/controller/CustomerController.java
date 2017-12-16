@@ -9,13 +9,20 @@ import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
-import org.ccloud.model.*;
+import org.ccloud.model.Customer;
+import org.ccloud.model.CustomerJoinCustomerType;
+import org.ccloud.model.CustomerType;
+import org.ccloud.model.Department;
+import org.ccloud.model.Message;
+import org.ccloud.model.SellerCustomer;
+import org.ccloud.model.User;
+import org.ccloud.model.UserJoinCustomer;
+import org.ccloud.model.WxMessageTemplate;
 import org.ccloud.model.compare.BeanCompareUtils;
 import org.ccloud.model.query.CustomerJoinCustomerTypeQuery;
 import org.ccloud.model.query.CustomerQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.DepartmentQuery;
-import org.ccloud.model.query.OptionQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SellerCustomerQuery;
 import org.ccloud.model.query.UserQuery;
@@ -37,6 +44,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.jfinal.aop.Before;
+import com.jfinal.kit.JsonKit;
 import com.jfinal.kit.Kv;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
@@ -160,7 +168,6 @@ public class CustomerController extends BaseFrontController {
 	}
 
 	public void refreshHistoryOrder() {
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
 		Page<Record> orderList = new Page<>();
@@ -173,7 +180,8 @@ public class CustomerController extends BaseFrontController {
 			html.append("<div class=\"weui-panel weui-panel_access\">\n" +
 					"                        <a href=\"/order/orderDetail?orderId=" + order.getStr("id") + "\">\n" +
 					"                        <div class=\"ft14\">\n");
-			if (order.get("receive_type").toString().equals("0")) html.append("                                <span class=\"tag\">" + order.getStr("receive_Name") + "</span>\n");
+			if (order.get("receive_type").toString().equals("0")) 
+				html.append("                                <span class=\"tag\">" + order.getStr("receive_Name") + "</span>\n");
 			html.append(order.getStr("order_sn") + "\n" +
 					"                            <span class=\"fr blue\">" + order.getStr("statusName") + "</span>\n" +
 					"                        </div>\n" +
@@ -202,7 +210,6 @@ public class CustomerController extends BaseFrontController {
 	}
 
 	public void historyOrder() {
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
 		Page<Record> orderList = SalesOrderQuery.me().findBySellerCustomerId(getPageNumber(), getPageSize(), getPara("sellerCustomerId"), selectDataArea + "%");
@@ -216,14 +223,13 @@ public class CustomerController extends BaseFrontController {
 		setAttr("sellerCustomerId", getPara("sellerCustomerId"));
 		setAttr("customerName", getPara("customerName"));
 
-		render("customer_historyOrder.html");
+		render("customer_history_order.html");
 	}
 
 	@Before(WechatJSSDKInterceptor.class)
 	public void edit() {
 		
 		String id = getPara("sellerCustomerId");
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		
 		if (StrKit.notBlank(id)) {
 			String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
@@ -245,7 +251,6 @@ public class CustomerController extends BaseFrontController {
 	}
 
 	public void getCustomerType(){
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
@@ -269,7 +274,7 @@ public class CustomerController extends BaseFrontController {
 	@Before(Tx.class)
 	public void save() {
 		
-		boolean updated = false;
+		boolean updated = true;
 		Map<String, Object> map = Maps.newHashMap();
 		List<ImageJson> list = Lists.newArrayList();
 		
@@ -325,8 +330,6 @@ public class CustomerController extends BaseFrontController {
 			
 			temp.setImageListStore(JSON.toJSONString(list));
 			map.put("customerVO", temp);
-//			开始审核流程
-			updated = startProcess(sellerCustomer.getId(), map);
 
 		} else {
 			// 查看客户库是否存在这个客户
@@ -383,14 +386,11 @@ public class CustomerController extends BaseFrontController {
 			sellerCustomer.setImageListStore(JSON.toJSONString(list));
 			
 			updated = sellerCustomer.saveOrUpdate();
-			
 			if (!updated) {
 				renderError(500);
 				return ;
 			}
 			
-			CustomerJoinCustomerTypeQuery.me().deleteBySellerCustomerId(sellerCustomer.getId());
-	
 			for (String custTypeId : custTypeList) {
 				CustomerJoinCustomerType ccType = new CustomerJoinCustomerType();
 				ccType.setSellerCustomerId(sellerCustomer.getId());
@@ -408,9 +408,12 @@ public class CustomerController extends BaseFrontController {
 			updated = userJoinCustomer.save();
 		}
 		
-
-
-//		MessageKit.sendMessage(action, map);
+		if (!updated) {
+			renderError(404);
+			return ;
+		}
+		
+		updated = startProcess(sellerCustomer.getId(), map);
 
 		if (updated)
 			renderAjaxResultForSuccess("操作成功");
@@ -479,8 +482,7 @@ public class CustomerController extends BaseFrontController {
 			List<String> diffAttrList = new ArrayList<>();
 			diffAttrList.add("申请停用");
 			setAttr("diffAttrList", diffAttrList);
-
-	}
+		}
 
 		render("customer_review.html");
 	}
@@ -512,19 +514,16 @@ public class CustomerController extends BaseFrontController {
 		String taskId = getPara("taskId");
 		Integer status = getParaToInt("status");
 		String sellerCustomerId = getPara("id");
-		String comment;
-
-		if(status == 1) comment = "批准";
-		else comment = "拒绝";
-
-		SellerCustomer sellerCustomer = new SellerCustomer();
+		String comment = (status == 1) ? "批准" : "拒绝";
 
 		boolean updated = true;
 
-		sellerCustomer = SellerCustomerQuery.me().findById(sellerCustomerId);
+		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(sellerCustomerId);
 		sellerCustomer.setStatus(status == 1 ? SellerCustomer.CUSTOMER_NORMAL : SellerCustomer.CUSTOMER_REJECT);
 
 		WorkFlowService workFlowService = new WorkFlowService();
+		String applyUsername = workFlowService.getTaskVariableByTaskId(taskId, Consts.WORKFLOW_APPLY_USERNAME).toString();
+		User toUser = UserQuery.me().findUserByUsername(applyUsername);
 
 		if (status == 1) {
 
@@ -594,9 +593,8 @@ public class CustomerController extends BaseFrontController {
 				if(customerVO.getCustTypeList() != null || customerVO.getCustTypeList().size() != 0) {
 
 					CustomerJoinCustomerTypeQuery.me().deleteBySellerCustomerId(sellerCustomerId);
-
 					String[] customerTypes = sellerCustomer.getCustomerTypeIds().split(",");
-
+					
 					for (String custType : customerTypes) {
 						CustomerJoinCustomerType ccType = new CustomerJoinCustomerType();
 						ccType.setSellerCustomerId(sellerCustomerId);
@@ -605,24 +603,38 @@ public class CustomerController extends BaseFrontController {
 					}
 				}
 
-			}else{
-				sellerCustomer.setIsEnabled(0);
-				updated = updated && sellerCustomer.saveOrUpdate();
 			}
-		}
+		} else {
+			Kv kv = Kv.create();
 
+			WxMessageTemplate messageTemplate = WxMessageTemplateQuery.me().findByCode("_customer_audit");
+
+			kv.set("touser", toUser.getWechatOpenId());
+			kv.set("templateId", messageTemplate.getTemplateId());
+			kv.set("customerName", sellerCustomer.getCustomer().getCustomerName());
+			kv.set("submit", user.getRealname());
+
+			kv.set("createTime", DateTime.now().toString("yyyy-MM-dd HH:mm"));
+			kv.set("status", comment);
+			MessageKit.sendMessage(Actions.NotifyWechatMessage.CUSTOMER_AUDIT_MESSAGE, kv);
+		}
+		
+		Map<String, Object> var = Maps.newHashMap();
+		var.put("pass", status);
+		workFlowService.completeTask(taskId, comment, var);
+		
 		Message message = new Message();
 		message.setSellerId(sellerId);
-		message.setType("100603");
-		message.setTitle("客户审核消息");
 		message.setContent(comment);
-		message.setFromUserId(workFlowService.getTaskVariableByTaskId(taskId,"fromId").toString());
-		message.setToUserId(user.getId());
+		message.setFromUserId(user.getId());
+		
+		message.setToUserId(toUser.getId());
 		message.setDeptId(user.getDepartmentId());
 		message.setDataArea(user.getDataArea());
-		message.setIsRead(0);
-		updated = updated && message.saveOrUpdate();
-		workFlowService.completeTask(taskId, comment, null);
+		message.setType(Message.CUSTOMER_REVIEW_TYPE_CODE);
+		
+		message.setTitle(sellerCustomer.getCustomer().getCustomerName());
+		MessageKit.sendMessage(Actions.ProcessMessage.PROCESS_MESSAGE_SAVE, message);
 
 		if (updated){
 			renderAjaxResultForSuccess("操作成功");
@@ -638,49 +650,57 @@ public class CustomerController extends BaseFrontController {
 //		Boolean isCustomerAudit = OptionQuery.me().findValueAsBool("isCustomerAudit");
 		Boolean isCustomerAudit = true;
 		
-		if (sellerCustomer != null) {
-			if (isCustomerAudit != null && isCustomerAudit.booleanValue()) {
-				User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-				User manager = UserQuery.me().findManagerByDeptId(user.getDepartmentId());
-				if (manager == null) {
-					renderError(500);
-					return false;
-				}
-				
-				String defKey = "_customer_audit";
-	
-				param.put("applyUsername", user.getUsername());
-				param.put("manager", manager.getUsername());
-				param.put("fromId", user.getId());
-				
-				WorkFlowService workflow = new WorkFlowService();
-				String procInstId = workflow.startProcess(customerId, defKey, param);
-	
-				sellerCustomer.setProcDefKey(defKey);
-				sellerCustomer.setProcInstId(procInstId);
-				sellerCustomer.setStatus(SellerCustomer.CUSTOMER_AUDIT);
-				isUpdated = sellerCustomer.update();
-				
-				if (isUpdated) {
-	
-					Kv kv = Kv.create();
-	
-					WxMessageTemplate messageTemplate = WxMessageTemplateQuery.me().findByCode(defKey);
-	
-					kv.set("touser", manager.getWechatOpenId());
-					kv.set("templateId", messageTemplate.getTemplateId());
-					kv.set("customerName", sellerCustomer.getCustomer().getCustomerName());
-					kv.set("submit", user.getRealname());
-	
-					kv.set("createTime", DateTime.now().toString("yyyy-MM-dd HH:mm"));
-					kv.set("status", "待审核");
-	
-					MessageKit.sendMessage(Actions.NotifyMessage.CUSTOMER_AUDIT_MESSAGE, kv);
-				}
-			} else {
-				isUpdated = sellerCustomer.update();
-			}
+		if (sellerCustomer == null) {
+			renderError(404);
+			return false;
 		}
+		
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		User manager = UserQuery.me().findManagerByDeptId(user.getDepartmentId());
+		
+		if (isCustomerAudit != null && isCustomerAudit.booleanValue()) {
+			
+			if (manager == null) {
+				renderError(500);
+				return false;
+			}
+			
+			String defKey = "_customer_audit";
+			param.put("manager", manager.getUsername());
+			
+			WorkFlowService workflow = new WorkFlowService();
+			String procInstId = workflow.startProcess(customerId, defKey, param);
+
+			sellerCustomer.setProcDefKey(defKey);
+			sellerCustomer.setProcInstId(procInstId);
+			sellerCustomer.setStatus(SellerCustomer.CUSTOMER_AUDIT);
+		}
+		
+		isUpdated = sellerCustomer.update();
+		
+		if (!isUpdated)
+			return false;
+		
+		Message message = new Message();
+		message.setFromUserId(user.getId());
+		message.setToUserId(manager.getId());
+		message.setDeptId(user.getDepartmentId());
+		message.setDataArea(user.getDataArea());
+		message.setSellerId(sellerId);
+		message.setType(Message.CUSTOMER_REVIEW_TYPE_CODE);
+		message.setTitle(sellerCustomer.getCustomer().getCustomerName());
+		
+		Object customerVO = param.get("customerVO");
+		if (customerVO == null) {
+			message.setContent("新增待审核");
+		} else {
+			List<String> list = BeanCompareUtils.contrastObj(sellerCustomer, customerVO);
+			if (list != null)
+				message.setContent(JsonKit.toJson(list));
+		}
+		MessageKit.sendMessage(Actions.ProcessMessage.PROCESS_MESSAGE_SAVE, message);
+		
 		return isUpdated;
 	}
 
@@ -712,66 +732,4 @@ public class CustomerController extends BaseFrontController {
 		return "";
 	}
 	
-	@Before(Tx.class)
-	public void update() {
-		
-		boolean updated = false;
-		String id = getPara("id");
-		SellerCustomer customer = SellerCustomerQuery.me().findById(id);
-		
-		
-		if (customer != null) {
-			
-			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-			Boolean isCustomerAudit = OptionQuery.me().findValueAsBool("isCustomerAudit");
-			isCustomerAudit = true;
-			if (isCustomerAudit != null && isCustomerAudit.booleanValue()) {
-			
-				User manager = UserQuery.me().findManagerByDeptId(user.getDepartmentId());
-				
-				if (manager == null) {
-					renderError(500);
-					return ;
-				}
-				
-				String defKey = "_customer_audit";
-				Map<String, Object> param = Maps.newHashMap();
-//				param.put("apply", user.getUsername());
-				param.put("manager", manager.getUsername());
-				
-				WorkFlowService workflow = new WorkFlowService();
-				String procInstId = workflow.startProcess(customer.getId(), defKey, param);
-				
-				customer.setProcDefKey(defKey);
-				customer.setProcInstId(procInstId);
-				customer.setStatus(SellerCustomer.CUSTOMER_AUDIT);
-				updated = customer.update();
-				
-				if (updated) {
-				
-					Kv kv = Kv.create();
-		
-					WxMessageTemplate messageTemplate = WxMessageTemplateQuery.me().findByCode("_customer_audit");
-					
-					kv.set("touser", manager.getWechatOpenId());
-					kv.set("templateId", messageTemplate.getTemplateId());
-					kv.set("customerName", customer.getCustomer().getCustomerName());
-					kv.set("submit", user.getRealname());
-		
-					kv.set("createTime", DateTime.now().toString("yyyy-MM-dd HH:mm"));
-					kv.set("status", "待审核");
-		
-					MessageKit.sendMessage(Actions.NotifyMessage.CUSTOMER_AUDIT_MESSAGE, kv);
-				}
-			
-			} else {
-				updated = customer.update();
-			}
-		}
-		
-		if (updated)
-			renderAjaxResultForSuccess("操作成功");
-		else
-			renderAjaxResultForError("操作失败");
-	}
 }
