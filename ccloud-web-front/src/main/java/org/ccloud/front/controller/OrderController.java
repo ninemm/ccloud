@@ -232,6 +232,7 @@ public class OrderController extends BaseFrontController {
 		
 
 		String acount = "";
+		String managerName = "";
 
 		if(Consts.WORKFLOW_PROC_DEF_KEY_ORDER_REVIEW.equals(proc_def_key)) {
 			//一审是账务比较特殊
@@ -240,11 +241,11 @@ public class OrderController extends BaseFrontController {
 			
 		}else {
 			User manager = UserQuery.me().findManagerByDeptId(user.getDepartmentId());
-			String managerName = manager.getUsername();
+			managerName = manager.getUsername();
 			param.put("manager", managerName);
 		}
 
-		if(StrKit.isBlank(acount)) {
+		if (StrKit.isBlank(acount) && StrKit.isBlank(managerName)) {
 			return false;
 		}
 
