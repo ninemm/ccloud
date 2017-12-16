@@ -108,6 +108,20 @@ public class OrderController extends BaseFrontController {
 		setAttr("orderDetailList", orderDetailList);
 		render("orderDetail.html");
 	}
+	
+	public void orderReview() {
+		String orderId = getPara("orderId");
+		String taskId = getPara("taskId");
+		Record order = SalesOrderQuery.me().findMoreById(orderId);
+		List<Record> orderDetailList = SalesOrderDetailQuery.me().findByOrderId(orderId);
+
+		order.set("statusName", getStatusName(order.getInt("status")));
+
+		setAttr("taskId", taskId);
+		setAttr("order", order);
+		setAttr("orderDetailList", orderDetailList);
+		render("order_review.html");
+	}
 
 	private String getStatusName(int statusCode) {
 		if (statusCode == Consts.SALES_ORDER_STATUS_PASS)
