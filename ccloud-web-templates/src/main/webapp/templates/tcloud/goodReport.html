@@ -79,7 +79,7 @@
                 
 	            for(var i = 0; i < length; i++){
 	            	j = i + 1;
-	            	rank.append("<div class='rank-detail'><span class='sequence'>"+j+"</span><img src='${CTPATH}/images/order.png'><div class='good-name'>"+data[i].custom_name+"</div><div class='good-total'>");
+	            	rank.append("<div class='rank-detail'><span class='sequence'>"+j+"</span><img src='${CTPATH}/images/jp.jpg'><div class='good-name'>"+data[i].custom_name+"</div><div class='good-total'>");
 	            	rank.append("<span class='orange'>￥"+data[i].totalAmount+"</span><span class='gray ft14'>/"+data[i].orderCount+"笔("+(data[i].productCount).toFixed(2)+")件</span></div></div>");
 	                crSeriesData.push({
 	                    name: data[i].custom_name + '(' + data[i].totalAmount + ')',
@@ -122,7 +122,7 @@
 </#macro>
 
 <@layout>
-<body>
+<div class="weui-content">
     <div class="head-search select-area weui-flex__item">
         <div class="weui-flex width-100">
             <div class="weui-flex__item">
@@ -166,7 +166,7 @@
             <div class="weui-media-box ft14" id="productRank">
                 <div class="rank-detail">
                     <span class="sequence">1</span>
-                    <img src="${CTPATH}/images/order.png" alt="">
+                    <img src="${CTPATH}/images/jp.jpg" alt="">
                     <div class="good-name">劲酒</div>
                     <div class="good-total">
                         <span class="orange">￥88888</span>
@@ -176,6 +176,6 @@
             </div>
         </div>
     </div>
-</body>
+</div>
 <#include "_inc/_goback.html" />
 </@layout>

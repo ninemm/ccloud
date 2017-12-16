@@ -1,4 +1,17 @@
 <#include "_inc/_layout.html"/>
+
+<#macro css>
+    .report {
+        font-size: 0.7rem;
+	    position: absolute;
+	    top: 0;
+	    width: 100%;
+	    bottom: 50px;
+	    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    }
+</#macro>
+
 <#macro css_import>
 <link rel="stylesheet" href="${CTPATH}/css/normalize.css">
 </#macro>
@@ -285,7 +298,7 @@
  	}  
 </#macro>
 <@layout>
-<body>
+	<div class="weui-content">
 	<div class="report">
 		<div class="weui-panel weui-panel_access report-header">
 			<div class="weui-panel__hd">
@@ -388,7 +401,7 @@
 				</div>
 			</div>
 		</div>
+		</div>
+		<#include "_inc/_footer_nav.html" />
 	</div>
-</body>
-<#include "_inc/_goback.html" />
 </@layout>

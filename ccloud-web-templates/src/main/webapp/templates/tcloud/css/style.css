@@ -1854,16 +1854,18 @@ input[name=input-type] {
 
 /* 报表 */
 .report-header {
-  background: #3c8dbc;
+  background: #ea6f5a;
 }
 
 .report-header .weui-panel__hd {
   color: #fff;
+  border-bottom: 1px solid #f3f5f7;
 }
 
 .overview-hd-title {
-  width: 4rem;
-  display: inline-block;
+	font-size: .7rem;
+    width: 4.2rem;
+    display: inline-block;
 }
 
 .briefly {
@@ -1888,7 +1890,7 @@ input[name=input-type] {
   margin: .5rem .5rem;
   padding: .8rem 0 .5rem;
   background: #fff;
-  border: 1px solid #efeff4;
+/*   border: 1px solid #efeff4; */
 }
 
 .report-block {
