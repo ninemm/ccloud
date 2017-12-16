@@ -33,6 +33,7 @@ import org.ccloud.model.User;
 import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SellerCustomerQuery;
+import org.ccloud.model.query.UserJoinCustomerQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
@@ -78,8 +79,11 @@ public class _AdminController extends JBaseController {
 			redirect("/admin/login");
 			return;
 		}
+		String selDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		setAttr("toDoCustomerList", SellerCustomerQuery.me().getToDo(user.getUsername()));
 		setAttr("toDoOrdersList", SalesOrderQuery.me().getToDo(user.getUsername()));
+		setAttr("orderCount", StrKit.notBlank(selDataArea)?SalesOrderQuery.me().queryCountToDayOrders(user.getId(), selDataArea):0);
+		setAttr("customerCount",StrKit.notBlank(selDataArea)?UserJoinCustomerQuery.me().customerCount(selDataArea):0);
 		render("index.html");
 	}
 	
@@ -119,11 +123,12 @@ public class _AdminController extends JBaseController {
 				String mobile = user.getMobile();
 				List<User> userList = UserQuery.me().findByMobile(mobile);
 				List<Map<String, String>> sellerList = Lists.newArrayList();
+				List<Department> tmpList = Lists.newArrayList();
 				
 				for (User temp : userList) {
-					List<Department> tmpList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(temp.getDepartmentId());
+					tmpList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(temp.getDepartmentId());
 					if (tmpList.size() > 0) {
-						Department dept = tmpList.get(0);
+						Department dept = tmpList.get(tmpList.size() - 1);
 						Map<String, String> seller = Maps.newHashMap();
 						seller.put("seller_id", dept.getStr("seller_id"));
 						seller.put("seller_name", dept.getStr("seller_name"));
@@ -143,11 +148,16 @@ public class _AdminController extends JBaseController {
 					return ;
 				}
 				
-				if (!user.isAdministrator()) {
-					Map<String, String> map = sellerList.get(0);
-					setSessionAttr(Consts.SESSION_SELLER_ID, map.get("seller_id"));
-					setSessionAttr(Consts.SESSION_SELLER_NAME, map.get("seller_name"));
-					setSessionAttr(Consts.SESSION_SELLER_CODE, map.get("seller_code"));
+				if (!user.isAdministrator() && tmpList != null) {
+					Department dept = tmpList.get(0);
+					if (dept == null) {
+						renderError(404);
+						return ;
+					}
+					
+					setSessionAttr(Consts.SESSION_SELLER_ID, dept.get("seller_id"));
+					setSessionAttr(Consts.SESSION_SELLER_NAME, dept.get("seller_name"));
+					setSessionAttr(Consts.SESSION_SELLER_CODE, dept.get("seller_code"));
 				}
 			}
 			MessageKit.sendMessage(Actions.USER_LOGINED, user);

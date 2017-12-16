@@ -85,10 +85,11 @@ public class WxOauthController extends BaseFrontController {
 					}
 				} else {
 					List<Map<String, String>> sellerList = Lists.newArrayList();
+					List<Department> deptList = Lists.newArrayList();
 					for (User user : userList) {
-						List<Department> deptList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
+						deptList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
 						if (deptList.size() > 0) {
-							Department dept = deptList.get(0);
+							Department dept = deptList.get(deptList.size() - 1);
 							Map<String, String> seller = Maps.newHashMap();
 							seller.put("seller_id", dept.getStr("seller_id"));
 							seller.put("seller_name", dept.getStr("seller_name"));

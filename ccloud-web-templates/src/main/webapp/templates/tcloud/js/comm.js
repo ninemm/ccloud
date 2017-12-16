@@ -37,7 +37,7 @@ $.week = function () {
 
 Utils = {
 	context: '',	
-	devMode: true,
+	devMode: false,
 	pageSize: 10,
 	ajax: function(url, param, callback) {
 		$.ajax({

@@ -15,13 +15,11 @@ $(function() {
 			<p class="name">${(session._logined_user.realname)!}</p>
 			<p class="mobile">${(session._logined_user.mobile)!}</p>
 			<a href="${CPATH}/user/config" class="change-seller">
-				<span>
-				    <i class="icon-cog ft20 white"></i>
-				</span>
+				<span><i class="icon-cog ft20 white"></i></span>
 			</a>
 		</div>
 		<div class="user-avatar">
-			<img src="${(session._logined_user.avatar)!'${CTPATH}/images/avatar.png'}" alt="">
+			<img src="${(session._logined_user.avatar)!'${CTPATH}/images/avatar.png'}">
 		</div> 
 		<div class="user-statistics">
 			<div class="weui-flex">

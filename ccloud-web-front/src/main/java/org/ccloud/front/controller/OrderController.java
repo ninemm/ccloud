@@ -26,6 +26,7 @@ import org.ccloud.model.query.SalesOutstockDetailQuery;
 import org.ccloud.model.query.SalesOutstockQuery;
 import org.ccloud.model.query.SellerProductQuery;
 import org.ccloud.model.query.UserGroupRelQuery;
+import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.DateUtils;
@@ -228,13 +229,25 @@ public class OrderController extends BaseFrontController {
 		param.put(Consts.WORKFLOW_APPLY_USER, user);
 		param.put(Consts.WORKFLOW_APPLY_SELLER_ID, sellerId);
 		param.put(Consts.WORKFLOW_APPLY_SELLER_CODE, sellerCode);
+		
 
-		String acount = getAcount(user.getId());
+		String acount = "";
+		String managerName = "";
 
-		if(StrKit.isBlank(acount)) {
+		if(Consts.WORKFLOW_PROC_DEF_KEY_ORDER_REVIEW.equals(proc_def_key)) {
+			//一审是账务比较特殊
+			acount = getAcount(user.getId());
+			param.put("account", acount);
+			
+		}else {
+			User manager = UserQuery.me().findManagerByDeptId(user.getDepartmentId());
+			managerName = manager.getUsername();
+			param.put("manager", managerName);
+		}
+
+		if (StrKit.isBlank(acount) && StrKit.isBlank(managerName)) {
 			return false;
 		}
-		param.put("account", acount);
 
 		String procInstId = workflow.startProcess(orderId, proc_def_key, param);
 

@@ -6,54 +6,57 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.base.Joiner;
 import org.apache.commons.lang.time.DateFormatUtils;
-import com.google.common.collect.ImmutableMap;
-import com.jfinal.kit.Kv;
-import com.jfinal.plugin.activerecord.Page;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
+import org.ccloud.message.Actions;
+import org.ccloud.message.MessageKit;
 import org.ccloud.model.CustomerType;
 import org.ccloud.model.CustomerVisit;
 import org.ccloud.model.Dict;
+import org.ccloud.model.Message;
 import org.ccloud.model.User;
+import org.ccloud.model.WxMessageTemplate;
+import org.ccloud.model.query.CustomerJoinCustomerTypeQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.CustomerVisitQuery;
 import org.ccloud.model.query.DictQuery;
-import org.ccloud.model.query.SellerCustomerQuery;
 import org.ccloud.model.query.UserQuery;
+import org.ccloud.model.query.WxMessageTemplateQuery;
 import org.ccloud.model.vo.ImageJson;
-import org.ccloud.message.Actions;
-import org.ccloud.message.MessageKit;
-import org.ccloud.model.*;
-import org.ccloud.model.query.*;
 import org.ccloud.route.RouterMapping;
-import org.ccloud.shiro.core.ShiroKit;
 import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.wechat.WechatJSSDKInterceptor;
+import org.ccloud.workflow.service.WorkFlowService;
+import org.joda.time.DateTime;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.beust.jcommander.internal.Lists;
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Before;
+import com.jfinal.kit.Kv;
 import com.jfinal.kit.StrKit;
-
+import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.tx.Tx;
-import org.ccloud.workflow.service.WorkFlowService;
-import org.joda.time.DateTime;
 
 @RouterMapping(url = "/customerVisit")
 public class CustomerVisitController extends BaseFrontController {
 	
 	public void index() {
 		
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-//		String userId = ShiroKit.getUserId();
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		
+		String id = getPara("id");
+		String type = getPara("type");
+		String nature = getPara("nature");
+		String subType = getPara("subType");
+		String dataArea = selectDataArea + "%";
 
-		Page<Record> visitList = CustomerVisitQuery.me().paginateForApp(getPageNumber(), getPageSize(), getPara("id"), getPara("type"), getPara("nature"), getPara("subType"), DataAreaUtil.getUserDeptDataArea(user.getDataArea()));
+		Page<Record> visitList = CustomerVisitQuery.me().paginateForApp(getPageNumber(), getPageSize(), id, type, nature, subType, dataArea);
 
 		transform(visitList.getList());
 		if(StrKit.notBlank(getPara("id"))) {
@@ -66,13 +69,13 @@ public class CustomerVisitController extends BaseFrontController {
 
 	public void getSelect() {
 
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
 		Map<String, Object> all = new HashMap<>();
 		all.put("title", "全部");
 		all.put("value", "");
 
-		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(DataAreaUtil.getUserDeptDataArea(user.getDataArea()));
+		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(DataAreaUtil.getUserDealerDataArea(selectDataArea));
 		List<Map<String, Object>> customerTypeList2 = new ArrayList<>();
 		customerTypeList2.add(all);
 
@@ -83,14 +86,14 @@ public class CustomerVisitController extends BaseFrontController {
 			customerTypeList2.add(item);
 		}
 
-		List<Record> subTypeList = SellerCustomerQuery.me().findSubTypeByUserID(DataAreaUtil.getUserDeptDataArea(user.getDataArea()));
+		List<Dict> subTypeList = DictQuery.me().findDictByType("customer_subtype");
 		List<Map<String, Object>> customerLevel = new ArrayList<>();
 		customerLevel.add(all);
 
-		for(Record subType : subTypeList) {
+		for(Dict subType : subTypeList) {
 			Map<String, Object> item = new HashMap<>();
-			item.put("title", subType.getStr("sub_type"));
-			item.put("value", subType.getStr("sub_type"));
+			item.put("title", subType.getName());
+			item.put("value", subType.getValue());
 			customerLevel.add(item);
 		}
 
@@ -102,11 +105,17 @@ public class CustomerVisitController extends BaseFrontController {
 	}
 
 	public void refresh() {
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
 		Page<Record> visitList = new Page<>();
-		visitList = CustomerVisitQuery.me().paginateForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("id"), getPara("type"), getPara("nature"), getPara("subType"), DataAreaUtil.getUserDeptDataArea(user.getDataArea()));
+		visitList = CustomerVisitQuery.me().paginateForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("id"), getPara("type"), getPara("nature"), getPara("level"), selectDataArea);
 		transform(visitList.getList());
+
+		if(StrKit.notBlank(getPara("id"))) {
+			setAttr("id", getPara("id"));
+			setAttr("name", getPara("name"));
+		}
 
 		StringBuilder html = new StringBuilder();
 		for (Record visit : visitList.getList())
@@ -135,15 +144,8 @@ public class CustomerVisitController extends BaseFrontController {
 
 	@Before(WechatJSSDKInterceptor.class)
 	public void edit() {
-		
-		String userId = ShiroKit.getUserId();
-		
-		//List<Record> customer_list = UserQuery.me().getCustomerInfoByUserId(user_id,data_area);
 	    List<Dict> problem_list = DictQuery.me().findByCode("visit");
-	    
-	    //setAttr("customer",JSON.toJSONString(customer_list));
-	    setAttr("problem",JSON.toJSONString(problem_list));
-		
+	    setAttr("problem", JSON.toJSONString(problem_list));
 		render("customer_visit_detail.html");
 	}
 
@@ -165,7 +167,6 @@ public class CustomerVisitController extends BaseFrontController {
 
 	}
 
-	
 	public void success() {
 		render("success.html");
 	}
@@ -176,7 +177,7 @@ public class CustomerVisitController extends BaseFrontController {
 		keepPara();
 		
 		String id = getPara("id");
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
 		if (StrKit.isBlank(id)) {
 			renderError(404);
@@ -184,17 +185,16 @@ public class CustomerVisitController extends BaseFrontController {
 		}
 		
 		List<Record> customerVisit = CustomerVisitQuery.me().findMoreById(id);
-
-		List<String> typeList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeIdListBySellerCustomerId(customerVisit.get(0).getStr("seller_customer_id"), DataAreaUtil.getUserDealerDataArea(user.getDataArea()) + "%");
-
-		List<String> typeName = new ArrayList<>();
-		for(String type : typeList)
-			typeName.add(CustomerTypeQuery.me().findById(type).getStr("name"));
-
 		if (customerVisit == null) {
 			renderError(404);
 			return ;
 		}
+		
+		List<String> typeList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeIdListBySellerCustomerId(customerVisit.get(0).getStr("seller_customer_id"), DataAreaUtil.getUserDealerDataArea(selectDataArea) + "%");
+		List<String> typeName = new ArrayList<>();
+		for(String type : typeList)
+			typeName.add(CustomerTypeQuery.me().findById(type).getStr("name"));
+
 		transform(customerVisit);
 
 		String imageListStore = customerVisit.get(0).get("photo");
@@ -210,20 +210,9 @@ public class CustomerVisitController extends BaseFrontController {
 		render("customer_visit_review.html");
 	}
 
-	// 用户新增拜访页面显示
+	@Before(WechatJSSDKInterceptor.class)
 	public void visitAdd() {
-	    //String data_area = "0010010016410";
-	    User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-	    String selDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		Page<Record> customer_list = SellerCustomerQuery.me().paginateForApp(getPageNumber(), getPageSize(), "",selDataArea, user.getId(), "", "","");
-		List<Record> customerList = new ArrayList<Record>();
-		if(customer_list!=null) {
-			customerList = customer_list.getList();
-		}
-
 	    List<Dict> problem_list = DictQuery.me().findByCode("visit");
-
-	    setAttr("customer",JSON.toJSONString(customerList));
 	    setAttr("problem",JSON.toJSONString(problem_list));
 		render("customer_visit_add.html");
 	}
@@ -266,18 +255,20 @@ public class CustomerVisitController extends BaseFrontController {
 		render("customer_visit_choose.html");
 	}
 
-	// 用户新增拜访保存
 	@Before(Tx.class)
 	public void save() {
+		
 		 CustomerVisit customerVisit = getModel(CustomerVisit.class);
 		 User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
 		 List<ImageJson> list = Lists.newArrayList();
 		 String picJson = getPara("pic");
+		 
 		 customerVisit.setUserId(user.getId());
 		 customerVisit.setStatus(0);
 		 customerVisit.setDataArea(user.getDataArea());
 		 customerVisit.setDeptId(user.getDepartmentId());
+		 
 		 if (StrKit.notBlank(picJson)) {
 
 			JSONArray array = JSON.parseArray(picJson);
@@ -292,12 +283,19 @@ public class CustomerVisitController extends BaseFrontController {
 				image.setSavePath(newPath.replace("\\", "/"));
 				list.add(image);
 			}
-		}
+		 }
 		 customerVisit.setPhoto(JSON.toJSONString(list));
 
 		 boolean updated = true;
-		 updated = updated && customerVisit.saveOrUpdate();
-		 updated = updated && startProcess(customerVisit.getId());
+		 updated = customerVisit.saveOrUpdate();
+		 
+		 if (!updated) {
+			 renderAjaxResultForError("包括客户拜访信息出错");
+			 return ;
+		 }
+		 
+		 updated = startProcess(customerVisit.getId());
+		 
 		 if (updated) {
 			 renderAjaxResultForSuccess("添加成功");
 		 }
@@ -314,6 +312,7 @@ public class CustomerVisitController extends BaseFrontController {
 
 	public void complete() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 
 		String taskId = getPara("taskId");
 		String id = getPara("id");
@@ -339,28 +338,56 @@ public class CustomerVisitController extends BaseFrontController {
 		String location = getPara("location");
 
 		CustomerVisit customerVisit = CustomerVisitQuery.me().findById(id);
-
+		Integer status = getParaToInt("status");
+		String comment = (status == 1) ? "批准" : "拒绝";
 		if(StrKit.notBlank(location)) customerVisit.setLocation(location);
+		
 		if(StrKit.notBlank(commentDesc)) customerVisit.setComment(commentDesc);
-		if(list.size() != 0) customerVisit.setImageListStore(JSON.toJSONString(list));
-
-		String status = getPara("status");
-		String comment;
-
-		if(status.equals("1")) comment = "批准";
-		else comment = "拒绝";
-
+		if(list.size() > 0) customerVisit.setImageListStore(JSON.toJSONString(list));
+		
 		WorkFlowService workFlowService = new WorkFlowService();
+		String applyUsername = workFlowService.getTaskVariableByTaskId(taskId, Consts.WORKFLOW_APPLY_USERNAME).toString();
+		User toUser = UserQuery.me().findUserByUsername(applyUsername);
+		
+		if (status == 1) {
+			customerVisit.setStatus(1);
+		} else {
+			customerVisit.setStatus(2);
+			Kv kv = Kv.create();
 
+			WxMessageTemplate messageTemplate = WxMessageTemplateQuery.me().findByCode("_customer_visit_review");
+
+			kv.set("touser", toUser.getWechatOpenId());
+			kv.set("templateId", messageTemplate.getTemplateId());
+			kv.set("customerName", customerVisit.getSellerCustomer().getCustomer().getCustomerName());
+			kv.set("submit", user.getRealname());
+
+			kv.set("createTime", DateTime.now().toString("yyyy-MM-dd HH:mm"));
+			kv.set("status", comment);
+			MessageKit.sendMessage(Actions.NotifyWechatMessage.CUSTOMER_AUDIT_MESSAGE, kv);
+		}
+		
 		Map<String,Object> var = new HashMap<>();
-		var.put("visit", customerVisit);
-		var.put("status", status);
-		var.put("userName", workFlowService.getTaskVariableByTaskId(taskId,"applyUsername"));
-		var.put("openId", workFlowService.getTaskVariableByTaskId(taskId,"applyWxId"));
-
+		var.put("pass", status);
 		workFlowService.completeTask(taskId, comment, var);
-
-		renderAjaxResultForSuccess("操作成功");
+		
+		Message message = new Message();
+		message.setSellerId(sellerId);
+		message.setContent(comment);
+		message.setFromUserId(user.getId());
+		
+		message.setToUserId(toUser.getId());
+		message.setDeptId(user.getDepartmentId());
+		message.setDataArea(user.getDataArea());
+		message.setType(Message.CUSTOMER_VISIT_REVIEW_TYPE_CODE);
+		
+		message.setTitle(customerVisit.getSellerCustomer().getCustomer().getCustomerName());
+		MessageKit.sendMessage(Actions.ProcessMessage.PROCESS_MESSAGE_SAVE, message);
+		
+		if (customerVisit.saveOrUpdate())
+			renderAjaxResultForSuccess("操作成功");
+		else
+			renderAjaxResultForError("操作失败");
 	}
 
 	private void transform(List<Record> list) {
@@ -381,55 +408,51 @@ public class CustomerVisitController extends BaseFrontController {
 
 		CustomerVisit customerVisit = CustomerVisitQuery.me().findById(id);
 		boolean isUpdated = true;
-//		Boolean isCustomerAudit = OptionQuery.me().findValueAsBool("isCustomerVisit");
 		Boolean isCustomerVisit = true;
 
-		Map<String, Object> param = new HashMap<>();
-
-		if (customerVisit != null) {
-			if (isCustomerVisit != null && isCustomerVisit.booleanValue()) {
-				User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-				User manager = UserQuery.me().findManagerByDeptId(user.getDepartmentId());
-				if (manager == null) {
-					renderError(500);
-					return false;
-				}
-
-				String defKey = "_customer_visit_review";
-
-				param.put("applyUsername", user.getUsername());
-				param.put("manager", manager.getUsername());
-				param.put("applyWxId", user.getWechatOpenId());
-
-				WorkFlowService workflow = new WorkFlowService();
-				String procInstId = workflow.startProcess(id, defKey, param);
-
-				customerVisit.setProcDefKey(defKey);
-				customerVisit.setProcInstId(procInstId);
-				customerVisit.setStatus(0);
-				isUpdated = customerVisit.update();
-
-				if (isUpdated) {
-
-					Kv kv = Kv.create();
-
-					WxMessageTemplate messageTemplate = WxMessageTemplateQuery.me().findByCode(defKey);
-
-					kv.set("touser", manager.getWechatOpenId());
-					kv.set("templateId", messageTemplate.getTemplateId());
-					kv.set("customerName", SellerCustomerQuery.me().findById(customerVisit.getSellerCustomerId()).getCustomer().getCustomerName());
-					kv.set("questionType", customerVisit.getQuestionType());
-					kv.set("submit", user.getRealname());
-
-					kv.set("createTime", DateTime.now().toString("yyyy-MM-dd HH:mm"));
-					kv.set("status", "待审核");
-
-					MessageKit.sendMessage(Actions.NotifyMessage.CUSTOMER_VISIT_AUDIT_MESSAGE, kv);
-				}
-			} else {
-				isUpdated = customerVisit.update();
-			}
+		if (customerVisit == null) {
+			return false;
 		}
+		
+		Map<String, Object> param = new HashMap<>();
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		User manager = UserQuery.me().findManagerByDeptId(user.getDepartmentId());
+		
+		if (isCustomerVisit != null && isCustomerVisit.booleanValue()) {
+			
+			if (manager == null) {
+				return false;
+			}
+
+			String defKey = "_customer_visit_review";
+			param.put("manager", manager.getUsername());
+			WorkFlowService workflow = new WorkFlowService();
+			String procInstId = workflow.startProcess(id, defKey, param);
+
+			customerVisit.setProcDefKey(defKey);
+			customerVisit.setProcInstId(procInstId);
+			customerVisit.setStatus(0);
+		}
+		
+		isUpdated = customerVisit.update();
+		
+		if (!isUpdated)
+			return false;
+		
+		Message message = new Message();
+		message.setFromUserId(user.getId());
+		message.setToUserId(manager.getId());
+		message.setDeptId(user.getDepartmentId());
+		
+		message.setSellerId(sellerId);
+		message.setDataArea(user.getDataArea());
+		message.setContent(customerVisit.getQuestionDesc());
+		message.setType(Message.CUSTOMER_VISIT_REVIEW_TYPE_CODE);
+		message.setTitle(customerVisit.getSellerCustomer().getCustomer().getCustomerName());
+			
+		MessageKit.sendMessage(Actions.ProcessMessage.PROCESS_MESSAGE_SAVE, message);
+		
 		return isUpdated;
 	}
 

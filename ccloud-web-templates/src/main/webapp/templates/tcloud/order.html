@@ -194,6 +194,12 @@ $(function() {
 			toastr.warning('请选择客户');
 			return;
 		}
+
+		layer.open({
+			type: 2,
+			content: '保存中...'
+		});
+
 	//	if (!checkStore()) {
 	//		toastr.error('未选择商品或库存不足!','操作失败');
 	//		return;
@@ -206,6 +212,7 @@ $(function() {
 			type : "post", 
 			dataType : "json", 
 			success : function(data) { 
+				layer.closeAll();
 				if (data.errorCode == 0) {
 					toastr.success(data.message);
 					removeItemBykey("productList");
@@ -222,6 +229,7 @@ $(function() {
 				}
 			},
 			error : function() {
+				layer.closeAll();
 				$("#placeOrder").removeAttr('diabled');
 				alert("信息提交错误");
 			}

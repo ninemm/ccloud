@@ -28,7 +28,6 @@
                 var areaName = obj.displayValue.join(",");
                 $('#areaCode').val(areaCode);
                 $('#areaName').val(areaName);
-                console.log(obj.displayValue.join(","), obj.value.join(","));
             }
         });
 
@@ -43,7 +42,6 @@
                     items: data.customerTypeList,
                     onClose: function(obj) {
                         var custTypeIds = obj.data.values;
-                        console.log(custTypeIds);
 			            $('#customerTypeIds').val(custTypeIds);
                     }
                 });
@@ -131,10 +129,8 @@
         
         //删除图片  删除图片的代码也贴出来。
         $(".weui-gallery__del").click(function() { //这部分刚才放错地方了，放到$(function(){})外面去了
-            console.log('删除', index);
             $uploaderFiles.find("li").eq(index).remove();
             imageArr = imageArr.splice(index, 1);
-            console.log('image lenght = ', imageArr.length)
         });
         
     })
@@ -226,9 +222,6 @@
                     geoc.getLocation(point, function(rs) {
                         var addComp = rs.addressComponents;
                         var address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
-                        //console.log(address)
-                        //alert(address);
-                        //df.resolve();
                         $('#location').text(address);
                     });
                  };
@@ -250,7 +243,7 @@
 <div id="customer-add">
 <main>
     <form action="${CPATH}/customer/save" method="post" id="form">
-	    <section class="weui-panel weui-panel_access order-customer-info">
+	    <section class="weui-panel weui-panel_access order-customer-info select-area">
 	        <input type="hidden" name="sellerCustomer.id" value="${(sellerCustomer.id)!}">
 	        <div class="weui-cell weui-cell_access">
 	            <div class="weui-cell__bd">
@@ -288,7 +281,7 @@
 	                <input type="text" class="weui-input" id="mobile" name="customer.mobile" value="${(sellerCustomer.mobile)!}" placeholder="11位数字">
 	            </div>
 	        </div>
-	        <div class="weui-cell weui-cell_access select-area">
+	        <div class="weui-cell weui-cell_access">
 	            <div class="weui-cell__bd">
 	                <div class="order-customer-info-title">
 	                    客户类型
@@ -313,11 +306,8 @@
 	        </div>
 	        <div class="weui-cell weui-cell_access">
 	            <div class="weui-cell__bd">
-	                <div class="order-customer-info-title">
-	                    地址详情
-	                    <span class="require">*</span>
-	                </div>
-	                <input type="text" class="weui-input" id="address" name="customer.address" value="${(sellerCustomer.address)!}" placeholder="1-50个任意字母数字">
+                    <textarea name="customer.address" id="address" placeholder="地址详情必填（50字以内）">${(sellerCustomer.address)!}</textarea>
+	                <!--<input type="textarea" class="weui-input" id="address" name="customer.address" value="${(sellerCustomer.address)!}" placeholder="1-50个任意字母数字">-->
 	            </div>
 	        </div>
 	        <!--<div class="weui-cell weui-cell_access">-->
@@ -371,8 +361,8 @@
 </main>
 <#include "_inc/_goback.html" />
 <footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex border-1px">
-    <#if sellerCustomer??>
-        <button class="white-button weui-flex__item _submit_btn" onclick="doEnabled()">停用</button>
+    <#if sellerCustomer??> 
+        <button class="white-button-no-border weui-flex__item _submit_btn" onclick="doEnabled()">停用</button>
         <button class="red-button weui-flex__item _submit_btn" onclick="doSubmit()">更新</button>
     <#else>
         <button class="red-button width-100 _submit_btn" onclick="doSubmit()">新增客户</button>

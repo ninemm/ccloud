@@ -1,6 +1,11 @@
 <#include "_inc/_layout.html"/>
 
-<#macro css> </#macro>
+<#macro css>
+    #customer-audit {
+        background: #f3f5f7;
+        height: inherit;
+    } 
+</#macro>
 <#macro script_import>
 	<script src="${CPATH}/static/layer_mobile/layer.js"></script>
 </#macro>
@@ -89,7 +94,7 @@
 			<div class="weui-cell weui-cell_access">
 				<div class="weui-flex space-between width-100 ft14">
 					<div class="button white-button" onclick="doReject('${CPATH}/customerVisit/complete?id=${(bean.id)!}&taskId=${(bean.taskId)}&status=0')">拒绝</div>
-					<div class="button blue-button" onclick="doSubmit('${CPATH}/customerVisit/complete?id=${(bean.id)!}&taskId=${(bean.taskId)}&status=1')">同意</div>
+					<div class="button red-button" onclick="doSubmit('${CPATH}/customerVisit/complete?id=${(bean.id)!}&taskId=${(bean.taskId)}&status=1')">同意</div>
 				</div>
 			</div>
 		</div>

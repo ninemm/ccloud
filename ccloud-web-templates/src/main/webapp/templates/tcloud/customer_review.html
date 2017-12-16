@@ -5,6 +5,10 @@
         color: #999;
     }
     
+    .weui-cell__ft {
+        font-size: .8rem;
+    }
+    
     .weui-media-box__desc {
         line-height: 1.4rem;
         height: 1.4rem;
@@ -16,6 +20,11 @@
 	    color: #000;
 	    font-size: .8rem;
 	}
+	
+	#customer-add {
+        background: #f3f5f7;
+        height: inherit;
+    }
 
 </#macro>
 
@@ -25,41 +34,13 @@
 
 <#macro script>
     
-    var $form = $("#form");
-
-	function doReject(){
-		layer.open({
-			type: 2,
-			content: '保存中...'
-		});
-		$.get("${CPATH}/customer/complete?id=${(sellerCustomer.id)!}&taskId=${(taskId)}&status=0" ,
-
-			function(res){
-				if (res.errorCode == 0) {
-					$.confirm({
-						title: res.message,
-						text: '返回列表页？',
-						onOK: function () {
-							location.href = '${CPATH}/todo/customer'
-						},
-						onCancel: function () {
-							$.closeModal();
-						}
-					});
-				} else {
-					$.alert(res.message);
-				}
-			layer.closeAll();
-		})
-	};
-    
-    function doSubmit() {
+    function doSubmit(status) {
 
 		layer.open({
 			type: 2,
 			content: '保存中...'
 		});
-		$.get("${CPATH}/customer/complete?id=${(sellerCustomer.id)!}&taskId=${(taskId)}&status=1" ,
+		$.get("${CPATH}/customer/complete?id=${(sellerCustomer.id)!}&taskId=${(taskId)}&status="+status ,
 			function(res){
 				if (res.errorCode == 0) {
 					$.confirm({
@@ -101,47 +82,47 @@
 	</section>
 	    <section class="weui-panel weui-panel_access order-customer-info">
 	        <input type="hidden" name="sellerCustomer.id" value="${(sellerCustomer.id)!}">
-	        <div class="weui-cell weui-cell_access">
+	        <div class="weui-cell">
 	            <div class="weui-cell__bd">
 	                <div class="order-customer-info-title">客户名称: </div>
-	                <input class="txt-gray" value="${(sellerCustomer.customer_name)!}">
 	            </div>
+	            <div class="weui-cell__ft">${(sellerCustomer.customer_name)!}</div>
 	        </div>
-	        <div class="weui-cell weui-cell_access">
+	        <div class="weui-cell">
 	            <div class="weui-cell__bd">
 	                <div class="order-customer-info-title">客户昵称: </div>
-	                <input class="txt-gray" value="${(sellerCustomer.nickname)!'无'}">
 	            </div>
+	            <div class="weui-cell__ft">${(sellerCustomer.nickname)!'无'}</div>
 	        </div>
-	        <div class="weui-cell weui-cell_access">
+	        <div class="weui-cell">
 	            <div class="weui-cell__bd">
 	                <div class="order-customer-info-title">联系人: </div>
-	                <input class="txt-gray" value="${(sellerCustomer.contact)!}">
 	            </div>
+	            <div class="weui-cell__ft">${(sellerCustomer.contact)!}</div>
 	        </div>
-	        <div class="weui-cell weui-cell_access">
+	        <div class="weui-cell">
 	            <div class="weui-cell__bd">
 	                <div class="order-customer-info-title">联系电话: </div>
-	                <input class="txt-gray" value="${(sellerCustomer.mobile)!}">
 	            </div>
+	            <div class="weui-cell__ft">${(sellerCustomer.mobile)!}</div>
 	        </div>
-	        <div class="weui-cell weui-cell_access select-area">
+	        <div class="weui-cell">
 	            <div class="weui-cell__bd">
 	                <div class="order-customer-info-title">客户类型: </div>
-	                <input class="txt-gray" value="${(custTypeNames)!}">
 	            </div>
+	            <div class="weui-cell__ft">${(custTypeNames)!}</div>
 	        </div>
-	        <div class="weui-cell weui-cell_access">
+	        <div class="weui-cell">
 	            <div class="weui-cell__bd">
 	                <div class="order-customer-info-title">省市区: </div>
-	                <input class="txt-gray" value="${(sellerCustomer.prov_name)!} ${(sellerCustomer.city_name)!} ${(sellerCustomer.country_name)!}">
 	            </div>
+	            <div class="weui-cell__ft">${(sellerCustomer.prov_name)!} ${(sellerCustomer.city_name)!} ${(sellerCustomer.country_name)!}</div>
 	        </div>
-	        <div class="weui-cell weui-cell_access">
+	        <div class="weui-cell">
 	            <div class="weui-cell__bd">
 	                <div class="order-customer-info-title">地址详情: </div>
-	                <input class="txt-gray" value="${(sellerCustomer.address)!}">
 	            </div>
+	            <div class="weui-cell__ft">${(sellerCustomer.address)!}</div>
 	        </div>
 	    </section>
 	    <section class="weui-cells weui-cells_form">
@@ -177,12 +158,17 @@
 	            </div>
 	        </div>
 	    </section>
+	    <section class="weui-panel weui-panel_access ft12 remark">
+	        <div class="weui-cell weui-cell_access space-between">
+	            <p>业务员：${(applyer.realname)!} / ${(applyer.mobile)!}</p>
+	        </div>
+        </section>
 	</form>
 </main>
 <#include "_inc/_goback.html" />
 <footer class="weui-footer weui-footer_fixed-bottom ft16 border-top-1px">
-    <button class="white-button width-50 _submit_btn" onclick="doReject()">拒绝</button>
-    <button class="red-button width-50 _submit_btn" onclick="doSubmit()">通过</button>
+    <button class="white-button-no-border width-50 _submit_btn" onclick="doSubmit(0)">拒绝</button>
+    <button class="red-button width-50 _submit_btn" onclick="doSubmit(1)">通过</button>
 </footer>
 </div>
 </@layout>

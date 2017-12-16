@@ -62,7 +62,7 @@
 
         $.ajax({
             type: "post",
-            url: "${CPATH}/customerVisit/refresh",
+            url: "${CPATH}/customerVisit/refresh?id=${(id)!}&name=${(name)!}",
             data: paramData(),
             dataType: "json",
             success:function(data) {
@@ -100,6 +100,7 @@
 
                 $(".infinite")[0].scrollTop = 0;
                 $("#visitList").empty();
+                if(data.html.length ==0) data.html = data.html +'<div class="weui-loadmore weui-loadmore_line"><span class="weui-loadmore__tips">暂无数据</span></div>';
                 $("#visitList").html(data.html);
                 pageNumber = 2;
             }
@@ -129,7 +130,7 @@
 	            <i class="icon-sort-desc"></i>
 	        </div>
 	    </div>
-	</header>
+	</header> 
 	<main if="visitList" class="infinite">
 	    <#if visitList??>
 	        <#list visitList.list as visit>
@@ -164,8 +165,8 @@
     <#include "_inc/_goback.html" />
 	<#if !id??>
 	<footer class="weui-footer weui-footer_fixed-bottom">
-	    <a href="${(CPATH)!}/customerVisit/visitAdd" class="place-order bg-blue white width-100">添加拜访</a>
+	    <a href="${(CPATH)!}/customerVisit/visitAdd" class="place-order red-button white width-100">添加拜访</a>
 	</footer>
 </#if>
-</div>
+</body>
 </@layout>
