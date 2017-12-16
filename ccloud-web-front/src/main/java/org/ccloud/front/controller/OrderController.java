@@ -236,16 +236,17 @@ public class OrderController extends BaseFrontController {
 		if(Consts.WORKFLOW_PROC_DEF_KEY_ORDER_REVIEW.equals(proc_def_key)) {
 			//一审是账务比较特殊
 			acount = getAcount(user.getId());
+			param.put("account", acount);
 			
 		}else {
 			User manager = UserQuery.me().findManagerByDeptId(user.getDepartmentId());
-			acount = manager.getUsername();
+			String managerName = manager.getUsername();
+			param.put("manager", managerName);
 		}
 
 		if(StrKit.isBlank(acount)) {
 			return false;
 		}
-		param.put("account", acount);
 
 		String procInstId = workflow.startProcess(orderId, proc_def_key, param);
 
