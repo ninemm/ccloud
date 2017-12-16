@@ -1,0 +1,181 @@
+<#include "_inc/_layout.html"/>
+<#macro css_import>
+<link rel="stylesheet" href="${CTPATH}/css/normalize.css">
+</#macro>
+<#macro script_import>
+<script type='text/javascript' src="${CTPATH}/js/echarts.min.js"></script>
+</#macro>
+<#macro script>
+	$(function () {
+		var params = {
+			"dayTag":  'today'
+		}
+		
+		productAmount(params);
+		productAndRank(params);
+		
+		$(document).on("change", "#productType", function() {
+			var params = {
+				"productType":  $("#productType").data('values'),
+				"dayTag": $("#time").data('values')
+			}
+			productAmount(params);	
+			productAndRank(params);
+		}).on("change", "#time", function() {
+			var params = {
+				"productType":  $("#productType").data('values'),
+				"dayTag": $("#time").data('values')
+			}
+			productAmount(params);	
+			productAndRank(params);
+		});	
+  	})
+  	
+	$("#time").select({
+	  title: "今日",
+	  items: [{
+	       title: "今日", value: "today"
+	       },{
+	       title: "昨日", value: "yesterday"
+	       },{
+	       title: "本周", value: "week"
+	       },{
+	       title: "上周", value: "lastweek"
+	       },{
+	       title: "本月", value: "month"
+	       },{
+	       title: "上月", value: "lastmonth"
+	       }]
+	});
+	  	
+	$("#productType").select({
+	  title: "选择客户类型",
+	  items: ${productTypeList!}
+	});
+	
+    function productAmount(params) {
+		Utils.ajax('${CPATH}/report/productAmount', params, 
+			function(data){
+				$("#productCount").html((data.productCount).toFixed(2)+"件");
+				$("#totalCount").html(data.orderCount+"笔");
+				$("#totalAmount").html(data.totalAmount+"元");
+			}
+		);    	
+    }	
+	
+    function productAndRank(params) {
+		Utils.ajax('${CPATH}/report/productCount', params, 
+			function(data){
+				$("#productRank").empty();
+				var rank = $("#productRank");			
+	            var crSeriesData = [];
+	            var length = data.length;
+	            if (length == 0) {
+	                crSeriesData.push({
+	                    name: '暂无数据',
+	                    value: 0
+	                });	            	
+	            }
+                
+	            for(var i = 0; i < length; i++){
+	            	j = i + 1;
+	            	rank.append("<div class='rank-detail'><span class='sequence'>"+j+"</span><img src='${CTPATH}/images/order.png'><div class='good-name'>"+data[i].custom_name+"</div><div class='good-total'>");
+	            	rank.append("<span class='orange'>￥"+data[i].totalAmount+"</span><span class='gray ft14'>/"+data[i].orderCount+"笔("+(data[i].productCount).toFixed(2)+")件</span></div></div>");
+	                crSeriesData.push({
+	                    name: data[i].custom_name + '(' + data[i].totalAmount + ')',
+	                    value: data[i].totalAmount
+	                });
+	            }
+	            var productCount = document.getElementById('productCanve');
+	            var productCountChart = echarts.init(productCanve);
+	            var crOption = {
+	                title: [{
+	                    textStyle: {
+	                        fontWeight: 'normal',
+	                        fontSize: 16
+	                    }
+	                }],
+	                color: ['#4ac7f5', '#f36f8a', '#fd9173', '#AF89D6', '#5f71d2'],
+	                series: [
+	                    {
+	                        type:'pie',
+	                        radius: ['25%', '45%'],
+	                        center: ['32%', '50%'],
+	                        avoidLabelOverlap: false,
+	                        label: {
+	                            normal: {
+	                                textStyle: {
+	                                    fontSize: 10
+	                                }
+	                            }
+	                        },
+	                        data:crSeriesData
+	                    }
+	                ]
+	            };
+	            productCountChart.resize();
+	            productCountChart.setOption(crOption,true);
+			}
+		);    	
+    }
+        	
+</#macro>
+
+<@layout>
+<body>
+    <div class="head-search select-area weui-flex__item">
+        <div class="weui-flex width-100">
+            <div class="weui-flex__item">
+                <input type="text" id="productType" placeholder="品牌" class="weui-input" readonly>
+                <i class="icon-sort-desc"></i>
+            </div>
+            <div class="weui-flex__item">
+                <input type="text" id="time" placeholder="今日" class="weui-input" readonly>
+                <i class="icon-sort-desc"></i>
+            </div>
+        </div>
+    </div>
+    <div class="weui-panel weui-panel_access margin-0">
+        <div class="weui-panel__bd report-area">
+            <div class="weui-media-box ft14">
+                <div class="weui-flex t-c">
+                    <div class="weui-flex__item border-right-1px">
+                        <p class="ft16">订单金额</p>
+                        <p class="ft16 orange" id="totalAmount">7,000.00</p>
+                    </div>
+                    <div class="weui-flex__item">
+                        <p class="ft16">订单量
+                            <span class="ft16 orange" id="orderCount">3</span>
+                        </p>
+                        <p class="ft16">商品量
+                            <span class="ft16 orange" id="productCount">520</span>
+                        </p>
+                    </div>
+                </div>
+                <div id="productCanve" style="width:600px; height: 300px;">
+                
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="weui-panel weui-panel_access">
+        <div class="weui-panel__hd">
+            <span class="overview-hd-title">商品销售排行</span>
+        </div>
+        <div class="weui-panel__bd">
+            <div class="weui-media-box ft14" id="productRank">
+                <div class="rank-detail">
+                    <span class="sequence">1</span>
+                    <img src="${CTPATH}/images/order.png" alt="">
+                    <div class="good-name">劲酒</div>
+                    <div class="good-total">
+                        <span class="orange">￥88888</span>
+                        <span class="gray ft14">/1笔</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<#include "_inc/_goback.html" />
+</@layout>

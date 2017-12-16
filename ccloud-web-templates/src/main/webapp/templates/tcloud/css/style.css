@@ -1852,6 +1852,139 @@ input[name=input-type] {
   bottom: 2.25rem;
 }
 
+/* 报表 */
+.report-header {
+  background: #3c8dbc;
+}
+
+.report-header .weui-panel__hd {
+  color: #fff;
+}
+
+.overview-hd-title {
+  width: 4rem;
+  display: inline-block;
+}
+
+.briefly {
+  border: 1px solid #efeff4;
+  width: 3rem;
+  display: inline-block;
+  border-radius: .5rem;
+  padding: 0 .5rem;
+  box-sizing: border-box;
+  font-size: .6rem;
+  position: relative;
+  margin-right: .5rem;
+}
+
+.briefly .icon-chevron-down {
+  position: absolute;
+  right: .3rem;
+  top: .1rem;
+}
+
+.overview-block {
+  margin: .5rem .5rem;
+  padding: .8rem 0 .5rem;
+  background: #fff;
+  border: 1px solid #efeff4;
+}
+
+.report-block {
+  margin: .5rem .5rem;
+  padding: .8rem 0 .5rem;
+}
+
+.overview-title {
+  margin-bottom: .5rem;
+}
+
+.overview-title span{
+  font-size: .6rem;
+  bottom: .8rem;
+  margin-left: .2rem;
+  position: relative;
+  color: #999faa;
+}
+
+.report-header img {
+  width: 2rem;
+  margin-left: 1rem;
+}
+
+.overview-block strong {
+  font-weight: 200;
+  font-size: 1rem;
+}
+
+.overview-block small {
+  color: #999faa;
+}
+
+.overview-ft {
+  text-align: center;
+  font-size: .6rem;
+}
+
+.overview-ft span {
+  color: #999faa;
+}
+
+.overview-hd-segmenting {
+  display: inline-block;
+  width: 1rem;
+  text-align: center;
+}
+
+.report-detail {
+  margin-bottom: 15px;
+  float: right;
+  color: #999faa;
+}
+
+.weui-panel__hd .weui-input {
+  width: 20%;
+  font-size: .6rem;
+}
+
+.rank-detail span{
+  display: inline-block;
+  vertical-align: top;
+}
+
+.sequence {
+  height: 3rem;
+  line-height: 3rem;
+}
+
+.rank-detail {
+  width: 100%;
+  position: relative;
+}
+
+.rank-detail img{
+  width: 3rem;
+  margin:0 .5rem;
+}
+
+.good-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  position: absolute;
+  left: 4.5rem;
+  right:0;
+  top: 0;
+}
+
+.good-total {
+  position: absolute;
+  left: 4.5rem;
+  bottom: 0;
+}
 
 /* 媒体查询 */
 
