@@ -16,6 +16,7 @@
 package org.ccloud.model;
 
 import org.ccloud.model.core.Table;
+import org.ccloud.model.query.SellerCustomerQuery;
 import org.ccloud.model.vo.ImageJson;
 
 import com.alibaba.fastjson.JSON;
@@ -41,5 +42,9 @@ public class CustomerVisit extends BaseCustomerVisit<CustomerVisit> {
 			return list;
 		}
 		return null;
+	}
+	
+	public SellerCustomer getSellerCustomer() {
+		return SellerCustomerQuery.me().findById(getSellerCustomerId());
 	}
 }

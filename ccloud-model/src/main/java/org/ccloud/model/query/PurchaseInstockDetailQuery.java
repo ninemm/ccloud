@@ -86,7 +86,7 @@ public class PurchaseInstockDetailQuery extends JBaseQuery {
 		
 		sqlBuilder.append(" LEFT JOIN cc_product cp on cp.id= csp.product_id ");
 		sqlBuilder.append(" LEFT JOIN cc_purchase_instock cpi on cpi.id=cpid.purchase_instock_id");
-		sqlBuilder.append(" where cpid.purchase_instock_id=? and cpid.data_area='"+dataArea+"'  GROUP BY cpid.id ORDER BY csp.product_id ");
+		sqlBuilder.append(" where cpid.purchase_instock_id=? and cpid.data_area like '"+dataArea+"'  GROUP BY cpid.id ORDER BY csp.product_id ");
 
 		return Db.find(sqlBuilder.toString(), outstockId);
 	}
@@ -129,7 +129,7 @@ public class PurchaseInstockDetailQuery extends JBaseQuery {
 		BigDecimal productPrice = new BigDecimal(price);
 
 		String sellerId = seller.getStr("id");
-		String productId = StringUtils.getArrayFirst(paraMap.get("product" + index));
+		String productId = StringUtils.getArrayFirst(paraMap.get("productId" + index));
 		Product product = ProductQuery.me().findById(productId);
 		List<SellerProduct> sellerProducts = SellerProductQuery.me()._findByProductIdAndSellerId(productId, sellerId);
 		if (sellerProducts.size() == 0) {

@@ -179,7 +179,7 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		inventoryDetail.setWarehouseId(inventory.getWarehouseId());
 		inventoryDetail.setSellProductId(detail.getSellProductId());
 		inventoryDetail.setOutAmount(detail.getProductAmount());
-		inventoryDetail.setOutCount(new BigDecimal(bigCount).add(smallStoreCount));
+		inventoryDetail.setOutCount((new BigDecimal(bigCount)).add(smallStoreCount));
 		inventoryDetail.setOutPrice(inventory.getOutPrice());
 		inventoryDetail.setBalanceAmount(oldDetail.getBalanceAmount().subtract(detail.getProductAmount()));
 		inventoryDetail.setBalanceCount(oldDetail.getBalanceCount().subtract(new BigDecimal(bigCount))
