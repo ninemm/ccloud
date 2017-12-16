@@ -16,6 +16,7 @@
 package org.ccloud.model.query;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,6 +29,7 @@ import org.ccloud.model.ReceivablesDetail;
 import org.ccloud.model.SalesOrderDetail;
 import org.ccloud.model.SalesOutstockDetail;
 import org.ccloud.model.SellerProduct;
+import org.ccloud.model.vo.orderProductInfo;
 import org.ccloud.utils.StringUtils;
 
 import com.jfinal.kit.StrKit;
@@ -48,6 +50,23 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 	}
 	
 	public List<Record> findByOutstockId(String outstockId) {
+
+		StringBuilder sqlBuilder = new StringBuilder(
+				" SELECT sod.*, sp.custom_name, p.big_unit, p.small_unit, p.convert_relate, sp.seller_id, sp.product_id, t1.valueName, cs.is_composite, IFNULL(t2.refundCount,0) as refundCount ");
+		sqlBuilder.append(" from `cc_sales_outstock_detail` sod ");
+		sqlBuilder.append(" LEFT JOIN cc_sales_order_detail cs ON sod.order_detail_id = cs.id ");
+		sqlBuilder.append(" LEFT JOIN cc_seller_product sp ON sod.sell_product_id = sp.id ");
+		sqlBuilder.append(" LEFT JOIN cc_product p ON sp.product_id = p.id ");
+		sqlBuilder.append("LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
+		sqlBuilder.append("RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = p.id ");
+		sqlBuilder.append("LEFT JOIN (SELECT SUM(cr.reject_product_count) as refundCount,cr.outstock_detail_id FROM cc_sales_refund_instock_detail cr GROUP BY cr.outstock_detail_id) t2 ");
+		sqlBuilder.append("on t2.outstock_detail_id = sod.id ");
+		sqlBuilder.append(" WHERE sod.outstock_id = ? ");
+
+		return Db.find(sqlBuilder.toString(), outstockId);
+	}
+	
+	public List<Record> getPrintDetailById(String outstockId) {
 
 		StringBuilder sqlBuilder = new StringBuilder(
 				" SELECT sod.*, sp.custom_name, p.big_unit, p.small_unit, p.convert_relate, sp.seller_id, sp.product_id, t1.valueName, cs.is_composite, IFNULL(t2.refundCount,0) as refundCount ");
@@ -93,6 +112,41 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		receivablesDetail.setCreateDate(date);
 		
 		return detail.save() && receivablesDetail.save();
+	}
+	
+	
+	public List<orderProductInfo> findPrintProductInfo(String outstockId) {
+		StringBuilder sqlBuilder = new StringBuilder(
+				" SELECT sod.outstock_id,sod.is_gift, sp.custom_name, p.big_unit, p.small_unit, p.convert_relate, sp.seller_id, sp.product_id, t1.valueName, cs.is_composite, IFNULL(t2.refundCount,0) as refundCount,sp.bar_code,sod.product_price,CONVERT( sod.product_price/p.convert_relate,decimal(18,2)) as small_price, ");
+		sqlBuilder.append(" floor(sod.product_count/p.convert_relate) as bigCount,MOD(sod.product_count,p.convert_relate) as smallCount ");
+		sqlBuilder.append(" from `cc_sales_outstock_detail` sod ");
+		sqlBuilder.append(" LEFT JOIN cc_sales_order_detail cs ON sod.order_detail_id = cs.id ");
+		sqlBuilder.append(" LEFT JOIN cc_seller_product sp ON sod.sell_product_id = sp.id ");
+		sqlBuilder.append(" LEFT JOIN cc_product p ON sp.product_id = p.id ");
+		sqlBuilder.append("LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
+		sqlBuilder.append("RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = p.id ");
+		sqlBuilder.append("LEFT JOIN (SELECT SUM(cr.reject_product_count) as refundCount,cr.outstock_detail_id FROM cc_sales_refund_instock_detail cr GROUP BY cr.outstock_detail_id) t2 ");
+		sqlBuilder.append("on t2.outstock_detail_id = sod.id ");
+		sqlBuilder.append(" WHERE sod.outstock_id = ? ");
+
+		List<Record> records = Db.find(sqlBuilder.toString(), outstockId);
+		List<orderProductInfo> orderProductInfos = new ArrayList<>();
+		for (Record record : records) {
+			orderProductInfo orderProductInfo = new orderProductInfo();
+			orderProductInfo.setProductName(record.getStr("custom_name"));//产品名称		
+			orderProductInfo.setBarCode(record.getStr("bar_code"));//条码
+			orderProductInfo.setBigUnit(record.getStr("big_unit"));//产品大单位
+			orderProductInfo.setSmallUnit(record.getStr("small_unit"));//产品小单位
+			orderProductInfo.setConvertRelate(record.getInt("convert_relate"));//换算关系
+			orderProductInfo.setBigPrice(record.getBigDecimal("product_price"));//大单位价格
+			orderProductInfo.setSmallPrice(record.getBigDecimal("small_price"));//小单位价格
+			orderProductInfo.setBigCount(record.getInt("bigCount"));
+			orderProductInfo.setSmallCount(record.getInt("smallCount"));
+			orderProductInfo.setIsgift(record.getInt("is_gift"));
+			
+			orderProductInfos.add(orderProductInfo);
+		}
+		 return orderProductInfos;
 	}
 
 	public SalesOutstockDetail findById(final String id) {
