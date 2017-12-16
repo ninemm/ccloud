@@ -411,9 +411,9 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 	
 	public void refund_instock_etail(){
 		String instockId = getPara("instockId");
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		Record instock = PurchaseInstockQuery.me().findMoreById(instockId,user.getDataArea());
-		List<Record> instockDetail = PurchaseInstockDetailQuery.me().findByOutstockId(instockId,user.getDataArea());
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		Record instock = PurchaseInstockQuery.me().findMoreById(instockId,dataArea);
+		List<Record> instockDetail = PurchaseInstockDetailQuery.me().findByOutstockId(instockId,dataArea);
 		List<PurchaseInstockDetailInfo> sProduct = new ArrayList<>(); 
 		List<String> ls = new ArrayList<>();
 		PurchaseInstockDetailInfo purchaseInstockDetailInfo = new PurchaseInstockDetailInfo();
