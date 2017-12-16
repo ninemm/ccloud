@@ -218,7 +218,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 
 	public boolean insertForApp(Map<String, String[]> paraMap, String orderId, String orderSn, String sellerId,
-			String userId, Date date, String deptId, String dataArea) {
+			String userId, Date date, String deptId, String dataArea, String allTotalAmount) {
 		SalesOrder salesOrder = new SalesOrder();
 		salesOrder.setId(orderId);
 		salesOrder.setOrderSn(orderSn);
@@ -237,6 +237,11 @@ public class SalesOrderQuery extends JBaseQuery {
 		salesOrder.setDeliveryAddress(StringUtils.getArrayFirst(paraMap.get("deliveryAddress")));
 		Date deliveryDate = DateUtils.strToDate(StringUtils.getArrayFirst(paraMap.get("deliveryDate")),
 				DateUtils.DEFAULT_NORMAL_FORMATTER);
+		BigDecimal totalNum = new BigDecimal(0);
+		if (StringUtils.isNotBlank(allTotalAmount)) {
+			totalNum = new BigDecimal(allTotalAmount);
+		}
+		salesOrder.setTotalCount(totalNum);
 		salesOrder.setDeliveryDate(deliveryDate);
 		salesOrder.setRemark(StringUtils.getArrayFirst(paraMap.get("remark")));
 		salesOrder.setCreateDate(date);

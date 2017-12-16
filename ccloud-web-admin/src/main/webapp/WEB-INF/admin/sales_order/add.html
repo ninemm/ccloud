@@ -346,7 +346,7 @@
 			var smallNum = $(obj).find("#smallNum").val();
 			var total = parseInt(bigNum) + parseInt(smallNum);
 			var convert = $(obj).find("#convert").val();
-			var producttotal = parseInt(bigNum)*parseInt(convert) + parseInt(smallNum);
+			var producttotal = parseInt(bigNum) + (parseInt(smallNum)/parseInt(convert)).toFixed(2)*1;
 			if (isNaN(producttotal)) {
 				producttotal = 0;
 			}					
