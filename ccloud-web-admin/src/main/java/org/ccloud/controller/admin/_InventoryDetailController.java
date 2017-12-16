@@ -64,12 +64,13 @@ public class _InventoryDetailController extends JBaseCRUDController<InventoryDet
 	
 	public void outList(){
 		User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
         String keyword = getPara("k");
         if (StrKit.notBlank(keyword)) {
             keyword = StringUtils.urlDecode(keyword);
             setAttr("k", keyword);
         }
-		Page<InventoryDetail> page = InventoryDetailQuery.me()._out_paginate(getPageNumber(), getPageSize(),keyword,"cid.create_date",user.getId(),user.getDataArea());
+		Page<InventoryDetail> page = InventoryDetailQuery.me()._out_paginate(getPageNumber(), getPageSize(),keyword,"cid.create_date",user.getId(),dataArea);
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);
 	}
