@@ -41,7 +41,7 @@ public class PurchaseRefundOutstockQuery extends JBaseQuery {
 				return DAO.findById(id);
 	}
 
-	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate,String userId,String dataArea) {
+	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate,String dataArea) {
 		String select = "select r.*, cs.name as supplierName ";
 		StringBuilder fromBuilder = new StringBuilder(" from `cc_purchase_refund_outstock` r");
 		fromBuilder.append(" join cc_supplier cs on r.supplier_id = cs.id ");
@@ -52,7 +52,7 @@ public class PurchaseRefundOutstockQuery extends JBaseQuery {
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "r.outstock_sn", keyword, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, needWhere);
 		if (needWhere) {
-			fromBuilder.append(" where 1 = 1 and r.biz_user_id='"+userId+"' ");
+			fromBuilder.append(" where 1 = 1  ");
 		}
 
 		if (StrKit.notBlank(startDate)) {

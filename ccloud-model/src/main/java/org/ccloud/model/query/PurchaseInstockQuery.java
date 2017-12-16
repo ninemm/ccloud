@@ -45,10 +45,11 @@ public class PurchaseInstockQuery extends JBaseQuery {
 				return DAO.findById(id);
 	}
 
-	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate,String userId,String dataArea) {
-		String select = "select i.*, cs.name as supplierName";
+	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate,String deptId,String dataArea) {
+		String select = "select i.*, CASE WHEN cs.`name` IS NOT NULL THEN cs.`name` ELSE s.seller_name END AS supplierName ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_purchase_instock` i ");
 		fromBuilder.append(" left join cc_supplier cs on i.supplier_id = cs.id ");
+		fromBuilder.append(" LEFT JOIN cc_seller s ON i.supplier_id = s.id ");
 		fromBuilder.append(" left join user u on i.input_user_id = u.id ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -71,7 +72,7 @@ public class PurchaseInstockQuery extends JBaseQuery {
 			params.add(endDate);
 		}
 
-		fromBuilder.append(" order by i.create_date desc ");
+		fromBuilder.append(" and i.dept_id ='"+deptId+"'  order by i.create_date desc ");
 
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
@@ -99,9 +100,15 @@ public class PurchaseInstockQuery extends JBaseQuery {
 	
 	public Record findMoreById(final String id,String dataArea) {
 		StringBuilder fromBuilder = new StringBuilder(
-				" select cpi.*,u.mobile as userMobile,cs.id as supplierId,cs.code,cs.`name` as supplierName,cs.contact,cs.mobile as supplierMobile,u.realname as biz_userName  ");
+				" select cpi.*,u.mobile as userMobile,"
+				+ "CASE WHEN cs.id IS NOT NULL THEN cs.id ELSE s.id END as supplierId,cs.code,"
+				+ "CASE WHEN cs.`name` IS NOT NULL THEN cs.`name` ELSE s.seller_name END AS supplierName,"
+				+ "CASE WHEN cs.contact IS NOT NULL THEN cs.contact ELSE s.contact END as contact,"
+				+ "CASE WHEN cs.mobile IS NOT NULL THEN cs.mobile ELSE s.phone END as supplierMobile,"
+				+ "u.realname as biz_userName  ");
 		fromBuilder.append(" from cc_purchase_instock cpi ");
 		fromBuilder.append(" LEFT JOIN cc_supplier cs on cs.id= cpi.supplier_id ");
+		fromBuilder.append(" LEFT JOIN cc_seller s ON cpi.supplier_id = s.id ");
 		fromBuilder.append(" left join user u on cpi.biz_user_id = u.id ");
 		fromBuilder.append(" where cpi.id = ? and cpi.data_area like'"+dataArea+"' GROUP BY cpi.id");
 
