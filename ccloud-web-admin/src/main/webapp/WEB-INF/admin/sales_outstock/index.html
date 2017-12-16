@@ -96,7 +96,7 @@
 					var url = '${CPATH}/admin/salesOutstock/getDetail?id=' + row.id + '&c=${c}&p=${p}';
 					var strHtml ='<a class="label label-table label-info" onclick="detail(\''+row.id+'\')" >详细</a> ';
 
-					strHtml = strHtml + '<a class="label label-table label-success" onclick="detail(\''+row.id+'\')" >打印</a> ';
+					strHtml = strHtml + '<a class="label label-table label-success" onclick="print(\''+row.id+'\')" >打印</a> ';
 					<@shiro.hasPermission name="/admin/salesOutstock/check">
 						if (row.status == 0) {
 							strHtml = strHtml + '<a class="label label-table label-warning" href="' + url + '">出库</a> ';				
@@ -124,6 +124,15 @@
 		}
 	};
 
+	function print(id) {
+		layer.open({
+			title:"出库单打印",
+			type: 2, 
+			area: ['80%', '80%'],
+			content: '${CPATH}/admin/salesOutstock/renderPrintPage/' + id
+		}); 
+	}
+	
 	function detail(id) {
 		layer.open({
 			title:"出库单详细",
