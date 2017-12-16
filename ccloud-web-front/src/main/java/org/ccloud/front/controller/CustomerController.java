@@ -62,9 +62,7 @@ public class CustomerController extends BaseFrontController {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
 		Page<Record> customerList = SellerCustomerQuery.me().findByUserTypeForApp(getPageNumber(), getPageSize(), getUserIdList(user), getPara("customerType"), getPara("isOrdered"), getPara("searchKey"));
-
 		setAttr("customerList", customerList);
-
 		render("customer.html");
 	}
 
@@ -108,7 +106,7 @@ public class CustomerController extends BaseFrontController {
 		Page<Record> customerList = new Page<>();
 		if (StrKit.notBlank(getPara("region"))) {
 			Object[] region = {getPara("region")};
-			 customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), region, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"));
+			customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), region, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"));
 		} else customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), getUserIdList(user), getPara("customerType"), getPara("isOrdered"), getPara("searchKey"));
 
 		StringBuilder html = new StringBuilder();
@@ -247,28 +245,28 @@ public class CustomerController extends BaseFrontController {
 			setAttr("cTypeName", Joiner.on(",").join(typeName.iterator()));
 		}
 		
+		setAttr("customerType", JSON.toJSONString(getCustomerType()));
+		
 		render("customer_edit.html");
 	}
 
-	public void getCustomerType(){
+	public List<Map<String, Object>> getCustomerType(){
 
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-
-		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
-				.findByDataArea(DataAreaUtil.getUserDealerDataArea(selectDataArea));
-		List<Map<String, Object>> customerTypeList2 = new ArrayList<>();
+		String dataArea = DataAreaUtil.getUserDealerDataArea(selectDataArea);
+		
+		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(dataArea);
+		List<Map<String, Object>> list = new ArrayList<>();
 
 		for(CustomerType customerType : customerTypeList)
 		{
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", customerType.getName());
 			item.put("value", customerType.getId());
-			customerTypeList2.add(item);
+			list.add(item);
 		}
 
-		Map<String, List<Map<String, Object>>> data = new HashMap<>();
-		data.put("customerTypeList", customerTypeList2);
-		renderJson(data);
+		return list;
 	}
 
 	@Before(Tx.class)

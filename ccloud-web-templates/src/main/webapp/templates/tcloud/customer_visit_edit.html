@@ -34,22 +34,6 @@
         }
     }
 
-    $(document).on("touchstart", "#customer_name", function () {
-        window.location.href = '${CPATH}/customerVisit/visitCustomerChoose';
-    });
-
-    $("#question_type").select({
-        title: "请选择问题类型",
-        multi: false,
-        items: JSON.parse('${problem}'),
-        onClose: function(obj) {
-            var problemId = obj.data.values;
-            if(problemId){
-                $("#problem_id").val(problemId);
-            }
-        }
-    });
-    
     function updateVisitData(customerId){
         var customerInfo = orgCustomerList[customerId];
 
@@ -58,7 +42,23 @@
         $("#contact").val(customerInfo.contact);
     }
 
-    $(function(){
+    $(function() {
+        $(document).on("touchstart", "#customer_name", function () {
+	        window.location.href = '${CPATH}/customerVisit/visitCustomerChoose';
+	    });
+	
+	    $("#question_type").select({
+	        title: "请选择问题类型",
+	        multi: false,
+	        items: JSON.parse('${problem}'),
+	        onClose: function(obj) {
+	            var problemId = obj.data.values;
+	            if(problemId){
+	                $("#problem_id").val(problemId);
+	            }
+	        }
+	    });
+	    
         $("#uploaderInput").on("change",function () {
 
             var files = this.files;;
