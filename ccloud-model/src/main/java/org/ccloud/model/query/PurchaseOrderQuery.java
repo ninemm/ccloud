@@ -65,15 +65,15 @@ public class PurchaseOrderQuery extends JBaseQuery {
 		return 0;
 	}
 
-	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate,String dataArea,String id) {
+	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate,String dataArea,String sellerId) {
 		String select =  "SELECT cpo.*,cs.name as supplierName,u.realname  ";
 		StringBuilder fromBuilder = new StringBuilder("FROM cc_purchase_order cpo ");
-		fromBuilder.append(" LEFT JOIN cc_supplier cs on cs.id=cpo.supplier_id LEFT JOIN user u on u.id=cpo.biz_user_id  ");
+		fromBuilder.append(" LEFT JOIN cc_supplier cs on cs.id=cpo.supplier_id LEFT JOIN user u on u.id=cpo.biz_user_id "
+				+ " LEFT JOIN cc_seller s on s.dept_id = cpo.dept_id ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cpo.porder_sn", keyword, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cpo.data_area", dataArea, params, needWhere);
 
 		if (needWhere) {
@@ -89,7 +89,7 @@ public class PurchaseOrderQuery extends JBaseQuery {
 			fromBuilder.append(" and cpo.create_date <= ?");
 			params.add(endDate);
 		}
-		fromBuilder.append(" and u.id='"+id+"' ");
+		fromBuilder.append(" and s.id='"+sellerId+"' ");
 		fromBuilder.append(" order by cpo.create_date desc ");
 
 		if (params.isEmpty())
