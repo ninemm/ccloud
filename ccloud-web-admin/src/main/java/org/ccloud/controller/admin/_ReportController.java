@@ -1,6 +1,7 @@
 package org.ccloud.controller.admin;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -11,10 +12,12 @@ import org.ccloud.core.JBaseController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.InventoryDetail;
 import org.ccloud.model.SalesOrder;
+import org.ccloud.model.SellerProduct;
 import org.ccloud.model.User;
 import org.ccloud.model.Warehouse;
 import org.ccloud.model.query.InventoryDetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
+import org.ccloud.model.query.SellerProductQuery;
 import org.ccloud.model.query.WarehouseQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
@@ -24,6 +27,7 @@ import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.Record;
 
 @RouterMapping(url = "/admin/report", viewPath = "/WEB-INF/admin/report")
 @Before(ActionCacheClearInterceptor.class)
@@ -313,82 +317,103 @@ public class _ReportController extends JBaseController {
 	
 	//我部门的直营商详情
 	public void mSellerDetail() {
-		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
-		setAttr("startDate", date);
-		setAttr("endDate", date);
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		if (startDate==null) {
+			String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
+			startDate=date;
+			endDate=date;
+		}
+		String keyword = getPara("k");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+			setAttr("k", keyword);
+		}
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
+		Page<Record> page = SalesOrderQuery.me().findByMSellerDetail(getPageNumber(), getPageSize(),startDate,endDate,keyword, dataArea,sellerId);
+		List<Record> list = page.getList();
+		List<String>watchHead=new ArrayList<>();
+		if (list.size()!=0) {
+			String[] watchHead1 = list.get(0).getColumnNames();
+			watchHead = Arrays.asList(watchHead1);
+		}else {
+			watchHead.add("直营商名称");
+			List<SellerProduct> findBySellerId = SellerProductQuery.me().findBySellerId(sellerId);
+			for (SellerProduct sellerProduct : findBySellerId) {
+				String customName=sellerProduct.getCustomName();
+				watchHead.add(customName);
+			}
+		}
+		List<Object[]>mSellerDetailReportList=new ArrayList<>();
+		for (Record record : list) {
+			Object[] columnValues = record.getColumnValues();
+			mSellerDetailReportList.add(columnValues);
+		}
+		setAttr("watchHead", watchHead);
+		setAttr("mSellerDetailReportList", mSellerDetailReportList);
+		Page<Record> page1 = SalesOrderQuery.me().findByMSellerDetailGift(getPageNumber(), getPageSize(),startDate,endDate,keyword, dataArea,sellerId);
+		List<Record> list1 = page1.getList();
+		List<Object[]>mSellerDetailGiftReportList=new ArrayList<>();
+		for (Record record : list1) {
+			Object[] columnValues = record.getColumnValues();
+			mSellerDetailGiftReportList.add(columnValues);
+		}
+		setAttr("startDate", startDate);
+		setAttr("endDate", endDate);
+		setAttr("mSellerDetailGiftReportList", mSellerDetailGiftReportList);
 		render("mSellerDetail.html");
 	}
 	
-	//我部门的直营商详情list
-	public void mSellerDetailReportList() {
-		String keyword = getPara("k");
-		if (StrKit.notBlank(keyword)) {
-			keyword = StringUtils.urlDecode(keyword);
-			setAttr("k", keyword);
-		}
-		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		String startDate = getPara("startDate");
-		String endDate = getPara("endDate");
-		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
-		Page<SalesOrder> page = SalesOrderQuery.me().findByMSellerDetail(getPageNumber(), getPageSize(),startDate,endDate,keyword, dataArea,sellerId);
-		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
-		renderJson(map);
-	}
-	
-	//我部门的直营商详情赠品list
-	public void mSellerDetailGiftReportList() {
-		String keyword = getPara("k");
-		if (StrKit.notBlank(keyword)) {
-			keyword = StringUtils.urlDecode(keyword);
-			setAttr("k", keyword);
-		}
-		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		String startDate = getPara("startDate");
-		String endDate = getPara("endDate");
-		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
-		Page<SalesOrder> page = SalesOrderQuery.me().findByMSellerDetailGift(getPageNumber(), getPageSize(),startDate,endDate,keyword, dataArea,sellerId);
-		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
-		renderJson(map);
-	}
-	
-	//我部门的业务员详情list
+	//我部门的业务员详情
 	public void mSalesmanDetail() {
-		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
-		setAttr("startDate", date);
-		setAttr("endDate", date);
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		if (startDate==null) {
+			String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
+			startDate=date;
+			endDate=date;
+		}
+		String keyword = getPara("k");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+			setAttr("k", keyword);
+		}
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
+		Page<Record> page = SalesOrderQuery.me().findByMSalesmanDetail(getPageNumber(), getPageSize(),startDate,endDate,keyword, dataArea,sellerId);
+		List<Record> list = page.getList();
+		List<String>watchHead=new ArrayList<>();
+		if (list.size()!=0) {
+			String[] watchHead1 = list.get(0).getColumnNames();
+			watchHead = Arrays.asList(watchHead1);
+		}else {
+			watchHead.add("业务员名称");
+			List<SellerProduct> findBySellerId = SellerProductQuery.me().findBySellerId(sellerId);
+			for (SellerProduct sellerProduct : findBySellerId) {
+				String customName=sellerProduct.getCustomName();
+				watchHead.add(customName);
+			}
+		}
+		List<Object[]>mSalesmanDetailReportList=new ArrayList<>();
+		for (Record record : list) {
+			Object[] columnValues = record.getColumnValues();
+			mSalesmanDetailReportList.add(columnValues);
+		}
+		setAttr("watchHead", watchHead);
+		setAttr("mSalesmanDetailReportList", mSalesmanDetailReportList);
+		Page<Record> page1 = SalesOrderQuery.me().findByMSalesmanDetailGift(getPageNumber(), getPageSize(),startDate,endDate,keyword, dataArea,sellerId);
+		List<Record> list1 = page1.getList();
+		List<Object[]>mSalesmanDetailGiftReportList=new ArrayList<>();
+		for (Record record : list1) {
+			Object[] columnValues = record.getColumnValues();
+			mSalesmanDetailGiftReportList.add(columnValues);
+		}
+		setAttr("startDate", startDate);
+		setAttr("endDate", endDate);
+		setAttr("mSalesmanDetailGiftReportList", mSalesmanDetailGiftReportList);
 		render("mSalesmanDetail.html");
-	}
-	
-	//我部门的业务员详情list
-	public void mSalesmanDetailReportList() {
-		String keyword = getPara("k");
-		if (StrKit.notBlank(keyword)) {
-			keyword = StringUtils.urlDecode(keyword);
-			setAttr("k", keyword);
-		}
-		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		String startDate = getPara("startDate");
-		String endDate = getPara("endDate");
-		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
-		Page<SalesOrder> page = SalesOrderQuery.me().findByMSalesmanDetail(getPageNumber(), getPageSize(),startDate,endDate,keyword, dataArea,sellerId);
-		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
-		renderJson(map);
-	}
-	
-	//我部门的业务员详情赠品list
-	public void mSalesmanDetailGiftReportList() {
-		String keyword = getPara("k");
-		if (StrKit.notBlank(keyword)) {
-			keyword = StringUtils.urlDecode(keyword);
-			setAttr("k", keyword);
-		}
-		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		String startDate = getPara("startDate");
-		String endDate = getPara("endDate");
-		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
-		Page<SalesOrder> page = SalesOrderQuery.me().findByMSalesmanDetailGift(getPageNumber(), getPageSize(),startDate,endDate,keyword, dataArea,sellerId);
-		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
-		renderJson(map);
 	}
 	
 	//经销商的直营商的采购
