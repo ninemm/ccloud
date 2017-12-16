@@ -203,9 +203,10 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 			String purchaseOederDetailId = StringUtils.getArrayFirst(paraMap.get("purchaseOrderDetailId"+i));
 			set.add(purchaseOederDetailId);
 		}
-		
+		int ind = 0 ;
 		for(String pid : set){
 			int productCount = 0;
+			String convertt = "";
 			for(int j = 1; j<=productNum;j++){
 				String purchaseOederDetailId = StringUtils.getArrayFirst(paraMap.get("purchaseOrderDetailId"+j));
 				String convert = StringUtils.getArrayFirst(paraMap.get("convert" + j));
@@ -213,11 +214,15 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 				String sN = StringUtils.getArrayFirst(paraMap.get("sN" + j));
 				Integer productCount0 = Integer.valueOf(bN) * Integer.valueOf(convert) + Integer.valueOf(sN);
 				if(purchaseOederDetailId.equals(pid)){
+					convertt = StringUtils.getArrayFirst(paraMap.get("convert" + j));
 					productCount += productCount0;
+					ind++;
 				}
 			}
-			PurchaseOrderDetail purchaseOrderDetail = PurchaseOrderDetailQuery.me().findById(pid);
-			if(productCount!=purchaseOrderDetail.getProductCount()){
+			String bigNum = StringUtils.getArrayFirst(paraMap.get("bigNum" + ind));
+			String smallNum = StringUtils.getArrayFirst(paraMap.get("smallNum" + ind));
+			Integer productCountt = Integer.valueOf(bigNum) * Integer.valueOf(convertt) + Integer.valueOf(smallNum);
+			if(productCount!=productCountt){
 				renderAjaxResultForError("商品数量输入有误，请核对后重新输入！");
 				return;
 			}
@@ -232,21 +237,26 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 						details.remove(instockDetails.get(i));
 				}
 			}
+			String purchaseOederDetailId = StringUtils.getArrayFirst(paraMap.get("purchaseOrderDetailId"+index));
+			PurchaseOrder order = PurchaseOrderQuery.me().findByPurchaseInstockDetailId(purchaseOederDetailId);
 			PurchaseInstockDetail purchaseInstockDetail = PurchaseInstockDetailQuery.me().findByPSId(purchaseInstockId,sellerProductId);
-			PurchaseOrderDetail purchaseOrderDetail = PurchaseOrderDetailQuery.me().findById(purchaseInstockDetail.getPurchaseOrderDetailId());
-			PurchaseOrder purchaseOrder = PurchaseOrderQuery.me().findById(purchaseOrderDetail.getPurchaseOrderId());
+			if(order !=null){
+				PurchaseOrderDetail purchaseOrderDetail = PurchaseOrderDetailQuery.me().findById(purchaseInstockDetail.getPurchaseOrderDetailId());
+				PurchaseOrder purchaseOrder = PurchaseOrderQuery.me().findById(purchaseOrderDetail.getPurchaseOrderId());
+				purchaseOrder.set("status", 3000);
+				purchaseOrder.update();
+			}
 			if (StrKit.notBlank(sellerProductId)) {
 				String convert = StringUtils.getArrayFirst(paraMap.get("convert" + index));
 				String bN = StringUtils.getArrayFirst(paraMap.get("bN" + index));
 				String sN = StringUtils.getArrayFirst(paraMap.get("sN" + index));
 				Integer productCount0 = Integer.valueOf(bN) * Integer.valueOf(convert) + Integer.valueOf(sN);
-				BigDecimal productAmount =  (purchaseOrderDetail.getProductPrice().multiply(new BigDecimal(bN))).add(((purchaseOrderDetail.getProductPrice().divide((new BigDecimal(convert)), 2, BigDecimal.ROUND_HALF_UP))).multiply(new BigDecimal(sN)));
+				BigDecimal productAmount =  (purchaseInstockDetail.getProductPrice().multiply(new BigDecimal(bN))).add(((purchaseInstockDetail.getProductPrice().divide((new BigDecimal(convert)), 2, BigDecimal.ROUND_HALF_UP))).multiply(new BigDecimal(sN)));
 				purchaseInstockDetail.set("product_count", productCount0);
 				purchaseInstockDetail.set("product_amount", productAmount);
 				purchaseInstockDetail.set("modify_date", new Date());
 				purchaseInstockDetail.update();
-				purchaseOrder.set("status", 3000);
-				purchaseOrder.update();
+				
 				totalAmount = totalAmount.add(productAmount);
 			}
 		}
@@ -347,9 +357,9 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 	
 	public void refund_instock(){
 		String instockId = getPara("instockId");
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		Record instock = PurchaseInstockQuery.me().findMoreById(instockId,user.getDataArea());
-		List<Record> instockDetail = PurchaseInstockDetailQuery.me().findByOutstockId(instockId,user.getDataArea());
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		Record instock = PurchaseInstockQuery.me().findMoreById(instockId,dataArea);
+		List<Record> instockDetail = PurchaseInstockDetailQuery.me().findByOutstockId(instockId,dataArea);
 		List<SellerProductInfo> sProduct = new ArrayList<>(); 
 		List<String> ls = new ArrayList<>();
 		SellerProductInfo sellerProductInfo = new SellerProductInfo();

@@ -152,5 +152,9 @@ public class PurchaseOrderQuery extends JBaseQuery {
 				+ " where cpod.id = ?";
 		return DAO.findFirst(sql, purchaseOrderDetailId);
 	}*/
-
+	public PurchaseOrder findByPurchaseInstockDetailId(String orderId){
+		String sql = " select cpo.* from cc_purchase_order cpo LEFT join cc_purchase_order_detail cpod on cpo.id = cpod.purchase_order_id "
+				+ " where cpod.id=? ";
+		return DAO.findFirst(sql, orderId);
+	}
 }
