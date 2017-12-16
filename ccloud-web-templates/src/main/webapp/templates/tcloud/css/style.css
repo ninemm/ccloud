@@ -86,6 +86,11 @@ a {
   float: right;
 }
 
+.weui-content {
+	background: #f3f5f7;
+    height: inherit;
+}
+
 .weui-tabbar__item.weui-bar__item--on .weui-tabbar__label,
 .weui-tabbar__item.weui-bar__item--on .weui-tabbar__icon i {
   color: #ea6f5a;

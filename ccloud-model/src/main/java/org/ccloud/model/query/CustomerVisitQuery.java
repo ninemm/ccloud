@@ -96,16 +96,16 @@ public class CustomerVisitQuery extends JBaseQuery {
 		return Db.paginate(pageNumber, pageSize,select ,sql.toString(), params.toArray());
 	}
 
-	public List<Record> findMoreById(String id) {
-		StringBuilder sql = new StringBuilder("SELECT DISTINCT(ccv.id), ccv.seller_customer_id, cc.customer_name, cc.contact, cc.mobile, ccv.create_date, ccv.`status`, ccv.question_type, ccv.comment, ccv.location, ccv.photo, ccv.question_desc, u.realname, u.mobile as userMobile ");
+	public CustomerVisit findMoreById(String id) {
+		StringBuilder sql = new StringBuilder("SELECT ccv.id, ccv.seller_customer_id, cc.customer_name, cc.contact, cc.mobile, ccv.create_date, ccv.`status`, ccv.question_type, ccv.comment, ccv.location, ccv.photo, ccv.question_desc, u.realname, u.mobile as userMobile ");
 		sql.append("FROM cc_customer_visit ccv ");
 		sql.append("LEFT JOIN user u ON ccv.user_id = u.id ");
 		sql.append("LEFT JOIN cc_seller_customer csc ON ccv.seller_customer_id = csc.id ");
 		sql.append("LEFT JOIN cc_customer cc ON csc.customer_id = cc.id ");
-		sql.append("LEFT JOIN cc_customer_join_customer_type ccjct ON csc.id = ccjct.seller_customer_id ");
+//		sql.append("LEFT JOIN cc_customer_join_customer_type ccjct ON csc.id = ccjct.seller_customer_id ");
 		sql.append("WHERE ccv.id = ? limit 1");
 
-		return Db.find(sql.toString(), id);
+		return DAO.findFirst(sql.toString(), id);
 	}
 
 	public int batchDelete(String... ids) {

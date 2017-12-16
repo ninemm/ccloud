@@ -111,9 +111,7 @@
 <@layout>
 <div id="visit-record">
 	<#if id??>
-	    <header class="t-c">
-	    ${(name)!}
-	    </header>
+	<header class="t-c">${(name)!}</header>
 	</#if>
 	<header>
 	    <div class="head-search select-area">
@@ -141,8 +139,8 @@
 	                        <span class="fr">${(visit.create_date)!}</span>
 	                    </p>
 	                    <p>活动类型：
-	                        <span class="orange">${(visit.typeName)!}</span>
-	                        <span class="green fr">${(visit.statusName)!}</span>
+	                        <span class="orange">${DICT_NAME(visit.question_type)}</span>
+	                        <span class="green fr">${DICT_NAME(visit.status)}</span>
 	                    </p>
 	                </div>
 	                <span class="weui-cell__ft"></span>
@@ -165,7 +163,7 @@
     <#include "_inc/_goback.html" />
 	<#if !id??>
 	<footer class="weui-footer weui-footer_fixed-bottom">
-	    <a href="${(CPATH)!}/customerVisit/visitAdd" class="place-order red-button white width-100">添加拜访</a>
+	    <a href="${CPATH}/customerVisit/edit" class="place-order red-button white width-100">添加拜访</a>
 	</footer>
 </#if>
 </body>
