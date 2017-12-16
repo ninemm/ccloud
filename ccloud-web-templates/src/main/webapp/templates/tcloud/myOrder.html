@@ -102,7 +102,16 @@
 					$newOrder.find("#customerType").text(el.customerTypeName);
 					if(el.status == 0) {
 						$newOrder.find("#cancel").on('click', function(){ 
-	 						 window.location.href = "${CPATH}/order/cancel?orderId="+el.id
+								$.get('${CPATH}/order/cancel?orderId=' + el.id,
+									function(result){
+										if (result.errorCode > 0) {
+											toastr.error(result.message);
+										} else {
+											toastr.success(result.message);
+											combo();
+										}
+									}
+								);
 						});
 					} else {
 						$newOrder.find("#cancel").remove();
