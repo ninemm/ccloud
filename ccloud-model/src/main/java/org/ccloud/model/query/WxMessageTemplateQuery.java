@@ -16,6 +16,8 @@
 package org.ccloud.model.query;
 
 import java.util.LinkedList;
+import java.util.List;
+
 import org.ccloud.model.WxMessageTemplate;
 
 import com.jfinal.plugin.activerecord.Page;
@@ -49,6 +51,10 @@ public class WxMessageTemplateQuery extends JBaseQuery {
 				return DAO.doFindFirst("code = ?", code);
 			}
 		});
+	}
+	
+	public List<WxMessageTemplate> findAll() {
+		return DAO.doFind();
 	}
 
 	public Page<WxMessageTemplate> paginate(int pageNumber, int pageSize, String orderby) {

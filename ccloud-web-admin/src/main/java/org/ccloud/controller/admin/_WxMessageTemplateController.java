@@ -64,21 +64,33 @@ public class _WxMessageTemplateController extends JBaseCRUDController<WxMessageT
 		}
 		
 		List<Map<String, String>> templateList = apiResult.getList("template_list");
+		List<WxMessageTemplate> existList = WxMessageTemplateQuery.me().findAll();
 		
 		List<WxMessageTemplate> list = Lists.newArrayList();
+		boolean isExist = false;
+		
 		for (Map<String, String> obj : templateList) {
+			isExist = false;
+			for (WxMessageTemplate template : existList) {
+				if (StrKit.equals(template.getTemplateId(), obj.get("template_id"))) {
+					isExist = true;
+					break;
+				}
+			}
 			
-			WxMessageTemplate messageTemplate = new WxMessageTemplate();
-			messageTemplate.setId(StrKit.getRandomUUID());
-			messageTemplate.setTemplateId(obj.get("template_id"));
-			messageTemplate.setTitle(obj.get("title"));
-			
-			messageTemplate.setContent(obj.get("content"));
-			messageTemplate.setDeputyIndustry(obj.get("deputy_industry"));
-			messageTemplate.setPrimaryIndustry(obj.get("primary_industry"));
-			messageTemplate.setExample(obj.get("example"));
-			
-			list.add(messageTemplate);
+			if (!isExist) {
+				WxMessageTemplate messageTemplate = new WxMessageTemplate();
+				messageTemplate.setId(StrKit.getRandomUUID());
+				messageTemplate.setTemplateId(obj.get("template_id"));
+				messageTemplate.setTitle(obj.get("title"));
+				
+				messageTemplate.setContent(obj.get("content"));
+				messageTemplate.setDeputyIndustry(obj.get("deputy_industry"));
+				messageTemplate.setPrimaryIndustry(obj.get("primary_industry"));
+				messageTemplate.setExample(obj.get("example"));
+				
+				list.add(messageTemplate);
+			}
 		}
 		int[] result = Db.batchSave(list, list.size());
 		
