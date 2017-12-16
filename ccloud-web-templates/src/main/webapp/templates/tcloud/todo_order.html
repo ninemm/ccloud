@@ -72,7 +72,7 @@
 	        <#list todoList as order>
 				<div class="weui-panel weui-panel_access">
 					<div class="weui-cell weui-cell_access">
-					    <a href="${CPATH}/order/orderDetail?id=${order.id!}&taskId=${order.taskId!}&assignee=${order.assignee!}"> 
+					    <a href="${CPATH}/order/orderDetail?orderId=${order.id!}"> 
 						<div class="weui-cell__bd ft14">
 							<#if order.receive_type == 0>
 								<span class="tag">账期</span>
@@ -93,7 +93,7 @@
 						</a>
 					</div>
 					<div class="weui-cell weui-cell_access">
-						<a class="weui-cell__bd" style="color: gray" href="${CPATH}/order/orderDetail?id=${order.id!}&taskId=${order.taskId!}&assignee=${order.assignee!}">订单详情</a>
+						<a class="weui-cell__bd" style="color: gray" href="${CPATH}/order/orderDetail?orderId=${order.id!}&taskId=${order.taskId!}&assignee=${order.assignee!}">订单详情</a>
 						<span class="weui-cell__ft"></span>
 					</div>
 					<div class="weui-cell weui-cell_access">
