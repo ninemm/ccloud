@@ -250,12 +250,14 @@
 		                        <input type="hidden" id="areaCodes" name="areaCodes">
 		                    </div>
 						</div>
+						<#if (seller.id) ??><#else>
 						<div class="form-group col-sm-12 validata-box">
 		                    <label for="_title" class="col-sm-2 control-label">详细地址:</label>
 		                    <div class="input-group col-sm-10">
 		                        <input class="form-control input-sm" style="width:40%;" type="text" name="address" value="${(seller.address)!}" placeholder="1-50个任意字母数字">
 		                    </div>
 		                </div>
+		                </#if>
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">*市场名称:</label>
 							<div class="input-group col-md-4 col-sm-10">
