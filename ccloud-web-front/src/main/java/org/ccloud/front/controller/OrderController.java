@@ -344,7 +344,9 @@ public class OrderController extends BaseFrontController {
 
 	public void complete() {
 		String orderId = getPara("id");
-
+		
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		
 		String taskId = getPara("taskId");
 		String comment = getPara("comment");
 		Integer pass = getParaToInt("pass", 1);
@@ -352,6 +354,7 @@ public class OrderController extends BaseFrontController {
 		Map<String, Object> var = Maps.newHashMap();
 		var.put("pass", pass);
 		var.put("orderId", orderId);
+		var.put(Consts.WORKFLOW_APPLY_COMFIRM, user);
 
 		WorkFlowService workflowService = new WorkFlowService();
 		workflowService.completeTask(taskId, comment, var);
