@@ -1,9 +1,6 @@
 <#include "_inc/_layout.html"/>
 
 <#macro css>
-    .txt-gray {
-        color: #999;
-    }
     
     .weui-media-box__desc {
         line-height: 1.4rem;
@@ -16,7 +13,23 @@
 	    color: #000;
 	    font-size: .8rem;
 	}
-
+	
+	.weui-cell__ft {
+        font-size: .8rem;
+    }
+    
+    #customer-add {
+        background: #f3f5f7;
+        height: inherit;
+    }
+    
+    .weui-footer {
+        border-top: .05rem solid #f3f5f7;
+    }
+    
+    .space-between {
+        font-size: .7rem;
+    }
 </#macro>
 
 <#macro script_import>
@@ -123,18 +136,18 @@
         });
     });
 
-    var paramData = function() {
+    var paramData = function(status) {
         return  {
             "id": $("#id").val(),
             "taskId": $("#taskId").val(),
-            "status": '1',
+            "status": status,
             "comment": $("#comment").val(),
             "pic": JSON.stringify(imageArr),
             "location": $("#location").val()
         };
     }
 
-	function doReject(){
+    function doSubmit(status) {
 		layer.open({
 			type: 2,
 			content: '保存中...'
@@ -143,40 +156,7 @@
             url: '${CPATH}/customerVisit/complete',
             method: 'post',
             dataType: 'json',
-            data: paramData(),
-			success: function(res){
-				if (res.errorCode == 0) {
-					$.confirm({
-						title: res.message,
-						text: '返回列表页？',
-						onOK: function () {
-							location.href = '${CPATH}/todo/visit'
-						},
-						onCancel: function () {
-							$.closeModal();
-						}
-					});
-				} else {
-					$.alert(res.message);
-				}
-			    layer.closeAll();
-            },
-            error: function(res) {
-                layer.closeAll();
-            }
-		})
-	};
-    
-    function doSubmit() {
-		layer.open({
-			type: 2,
-			content: '保存中...'
-		});
-        $.ajax({
-            url: '${CPATH}/customerVisit/complete',
-            method: 'post',
-            dataType: 'json',
-            data: paramData(),
+            data: paramData(status),
 			success:function(res){
 				if (res.errorCode == 0) {
 					$.confirm({
@@ -292,7 +272,6 @@
       <div class="weui-cell">
           <div class="weui-cell__bd">
               <div class="order-customer-info-title">问题类型: </div>
-              <input class="txt-gray" value="${(customerVisit.typeName)!}">
           </div>
           <div class="weui-cell__ft">${(customerVisit.typeName)!}</div>
       </div>
@@ -319,9 +298,6 @@
                       </#list>
                       </#if>
                       </ul>
-                      <!-- <div class="weui-uploader__input-box">
-                           <input type="hidden" name="pic" id="pic">
-                       </div> -->
                    </div>
                </div>
            </div>
@@ -338,8 +314,8 @@
 	
 	<section class="weui-panel weui-panel_access ft12 remark">
         <div class="weui-cell weui-cell_access space-between">
-	        <p>业务员：${(customerVisit.realname)}/${(customerVisit.userMobile)}</p>
-	        <p>${(customerVisit.create_date)}</p>
+	        <p>业务员：${(customerVisit.realname)!}/${(customerVisit.userMobile)!}</p>
+	        <p>${(customerVisit.createDate)!}</p>
         </div>
     </section>
     
@@ -356,7 +332,7 @@
         <div class="weui-cell weui-cell_access">
 	        <div class="weui-cell__bd">
 	            <p>建议</p>
-	            <textarea class="weui-textarea" name="" id="comment" rows="10" placeholder="审核建议"></textarea>
+	            <textarea class="weui-textarea" name="customerVisit.comment" id="comment" rows="10" placeholder="审核建议"></textarea>
 	            <div class="weui-textarea-counter"><span>0</span>/200</div>
 	        </div>
         </div>
@@ -378,8 +354,7 @@
 		                    <div class="weui-uploader__info">0/2</div>
 		                </div>
 		                <div class="weui-uploader__bd">
-			                <ul class="weui-uploader__files" id="uploaderFiles">
-			                </ul>
+			                <ul class="weui-uploader__files" id="uploaderFiles"></ul>
 			                <div class="weui-uploader__input-box">
 			                  <input id="uploaderInput" class="weui-uploader__input" type="file" accept="image/*" multiple="">
                                 <input type="hidden" name="pic" id="pic">
@@ -402,8 +377,8 @@
 </main>
 <#include "_inc/_goback.html" />
 <footer class="weui-footer weui-footer_fixed-bottom ft16">
-    <button class="white-button-no-border width-50 _submit_btn" onclick="doReject()">拒绝</button>
-    <button class="red-button width-50 _submit_btn" onclick="doSubmit()">通过</button>
+    <button class="white-button-no-border width-50 _submit_btn" onclick="doSubmit(0)">拒绝</button>
+    <button class="red-button width-50 _submit_btn" onclick="doSubmit(1)">通过</button>
 </footer>
 </div>
 </@layout>

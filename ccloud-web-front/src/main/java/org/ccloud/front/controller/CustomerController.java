@@ -528,7 +528,6 @@ public class CustomerController extends BaseFrontController {
 		if (status == 1) {
 
 			CustomerVO customerVO = (CustomerVO) workFlowService.getTaskVariableByTaskId(taskId,"customerVO");
-
 			if(customerVO != null) {
 
 				Customer customer = CustomerQuery.me().findById(sellerCustomer.getCustomerId());
@@ -587,7 +586,6 @@ public class CustomerController extends BaseFrontController {
 				sellerCustomer.setDeptId(department.getId());
 
 				updated = updated && sellerCustomer.saveOrUpdate();
-
 				sellerCustomerId = sellerCustomer.getId();
 
 				if(customerVO.getCustTypeList() != null || customerVO.getCustTypeList().size() != 0) {
@@ -662,7 +660,6 @@ public class CustomerController extends BaseFrontController {
 		if (isCustomerAudit != null && isCustomerAudit.booleanValue()) {
 			
 			if (manager == null) {
-				renderError(500);
 				return false;
 			}
 			
