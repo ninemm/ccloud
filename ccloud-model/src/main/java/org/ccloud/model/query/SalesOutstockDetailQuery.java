@@ -149,7 +149,7 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 			return false;
 		}
 		
-		BigDecimal smallStoreCount = new BigDecimal(smallCount).divide(new BigDecimal(productConvert), 2, BigDecimal.ROUND_HALF_UP);
+		BigDecimal smallStoreCount = (new BigDecimal(smallCount)).divide(new BigDecimal(productConvert), 2, BigDecimal.ROUND_HALF_UP);
 		
 		String productId = StringUtils.getArrayFirst(paraMap.get("productId" + index));
 		Inventory inventory = InventoryQuery.me().findBySellerIdAndProductIdAndWareHouseId(sellerId, productId, wareHouseId);
@@ -158,13 +158,14 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		}
 		BigDecimal oldOutCount = inventory.getOutCount() == null? new BigDecimal(0) : inventory.getOutCount();
 		BigDecimal oldOutAmount = inventory.getOutAmount() == null? new BigDecimal(0) : inventory.getOutAmount();
-		BigDecimal oldOutPrice = inventory.getOutPrice() == null? new BigDecimal(0) : inventory.getOutPrice();
-		BigDecimal oldBalanceAmount = inventory.getBalanceCount() == null? new BigDecimal(0) : inventory.getBalanceCount();
+		//BigDecimal oldOutPrice = inventory.getOutPrice() == null? new BigDecimal(0) : inventory.getOutPrice();
+		BigDecimal oldBalanceAmount = inventory.getBalanceAmount() == null? new BigDecimal(0) : inventory.getBalanceAmount();
+		BigDecimal oldBalanceCount = inventory.getBalanceCount() == null? new BigDecimal(0) : inventory.getBalanceCount();
 				
 		inventory.setOutCount(oldOutCount.add(new BigDecimal(bigCount)).add(smallStoreCount));
 		inventory.setOutAmount(oldOutAmount.add(detail.getProductAmount()));
 		inventory.setOutPrice(productPrice);
-		inventory.setBalanceCount(oldOutPrice.subtract(new BigDecimal(bigCount))
+		inventory.setBalanceCount(oldBalanceCount.subtract(new BigDecimal(bigCount))
 				.subtract(smallStoreCount));
 		inventory.setBalanceAmount(oldBalanceAmount.subtract(detail.getProductAmount()));
 		inventory.setModifyDate(date);
