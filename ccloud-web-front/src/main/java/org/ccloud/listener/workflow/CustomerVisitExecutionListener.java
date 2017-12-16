@@ -2,16 +2,6 @@ package org.ccloud.listener.workflow;
 
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
-import org.ccloud.message.Actions;
-import org.ccloud.message.MessageKit;
-import org.ccloud.model.CustomerVisit;
-import org.ccloud.model.Message;
-import org.ccloud.model.WxMessageTemplate;
-import org.ccloud.model.query.SellerCustomerQuery;
-import org.ccloud.model.query.WxMessageTemplateQuery;
-import org.joda.time.DateTime;
-
-import com.jfinal.kit.Kv;
 
 public class CustomerVisitExecutionListener implements ExecutionListener {
 
@@ -19,10 +9,9 @@ public class CustomerVisitExecutionListener implements ExecutionListener {
 
 	@Override
 	public void notify(DelegateExecution execution) throws Exception {
-		CustomerVisit customerVisit = (CustomerVisit) execution.getVariable("visit");
-		Object isPass = execution.getVariable("status");
-		if (customerVisit != null) {
-			
+		//CustomerVisit customerVisit = (CustomerVisit) execution.getVariable("visit");
+		//Object isPass = execution.getVariable("status");
+		/*if (customerVisit != null) {
 			if (isPass != null) {
 				int pass = Integer.valueOf(isPass.toString());
 				if (pass == 1) {
@@ -57,7 +46,7 @@ public class CustomerVisitExecutionListener implements ExecutionListener {
 					// 记录正常的消息
 				}
 			}
-		}
+		}*/
 		
 	}
 
