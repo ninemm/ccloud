@@ -188,7 +188,7 @@
                                     <span class="fr">${(visit.create_date)!}</span>
                                 </p>
                                 <p>活动类型：
-                                    <span class="orange">${(visit.questionType)!}</span>
+                                    <span class="orange">${DICT_NAME('${visit.question_type}')!'无'}</span>
                                     <span class="green fr">${(visit.visitStatus)!}</span>
                                 </p>
                             </div>
@@ -212,7 +212,7 @@
         </article>
     </article>
 </div>
-<a class="hidden-menu" href="${CPATH}/customerVisit/visitAdd">
+<a class="hidden-menu" href="${CPATH}/customerVisit/edit">
     <img src="${CTPATH}/images/customer_add.png" alt="">
 </a>
 <div class="layer"></div>

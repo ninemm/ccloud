@@ -9,8 +9,9 @@ public class CustomerVisitExecutionListener implements ExecutionListener {
 
 	@Override
 	public void notify(DelegateExecution execution) throws Exception {
+		
 		//CustomerVisit customerVisit = (CustomerVisit) execution.getVariable("visit");
-		//Object isPass = execution.getVariable("status");
+//		Object status = execution.getVariable("status");
 		/*if (customerVisit != null) {
 			if (isPass != null) {
 				int pass = Integer.valueOf(isPass.toString());
