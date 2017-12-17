@@ -98,18 +98,19 @@ public class OrderController extends BaseFrontController {
 	}
 
 	public void orderDetail() {
+		
 		String orderId = getPara("orderId");
 		Record order = SalesOrderQuery.me().findMoreById(orderId);
 		List<Record> orderDetailList = SalesOrderDetailQuery.me().findByOrderId(orderId);
-
 		order.set("statusName", getStatusName(order.getInt("status")));
-
+		
 		setAttr("order", order);
 		setAttr("orderDetailList", orderDetailList);
-		render("orderDetail.html");
+		render("order_detail.html");
 	}
 	
 	public void orderReview() {
+		
 		String orderId = getPara("orderId");
 		String taskId = getPara("taskId");
 		Record order = SalesOrderQuery.me().findMoreById(orderId);
@@ -291,7 +292,6 @@ public class OrderController extends BaseFrontController {
 		return Joiner.on(",").join(userNameList);
 	}
 	
-	
 	private void sendOrderMessage(String sellerId, String title, String content, String fromUserId, String toUserId, String deptId, String dataArea) {
 		
 		Message message = new Message();
@@ -319,17 +319,6 @@ public class OrderController extends BaseFrontController {
 
 		SalesOrder salesOrder = SalesOrderQuery.me().findById(id);
 		setAttr("salesOrder", salesOrder);
-
-		// HistoricTaskInstanceQuery query =
-		// ActivitiPlugin.buildProcessEngine().getHistoryService()
-		// .createHistoricTaskInstanceQuery();
-		// query.orderByProcessInstanceId().asc();
-		// query.orderByHistoricTaskInstanceEndTime().desc();
-		// List<HistoricTaskInstance> list = query.list();
-		// for (HistoricTaskInstance hi : list) {
-		// System.out.println(hi.getAssignee() + " " + hi.getName() + " "
-		// + hi.getStartTime());
-		// }
 
 		String taskId = getPara("taskId");
 		List<Comment> comments = WorkFlowService.me().getProcessComments(taskId);

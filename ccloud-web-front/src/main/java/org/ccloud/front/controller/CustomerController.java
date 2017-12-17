@@ -60,8 +60,13 @@ public class CustomerController extends BaseFrontController {
 	public void index() {
 
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		
+		String key = getPara("searchKey");
+		String hasOrder = getPara("isOrdered");
+		String customerType =  getPara("customerType");
+		Object[] userIds = getUserIdList(user);
 
-		Page<Record> customerList = SellerCustomerQuery.me().findByUserTypeForApp(getPageNumber(), getPageSize(), getUserIdList(user), getPara("customerType"), getPara("isOrdered"), getPara("searchKey"));
+		Page<Record> customerList = SellerCustomerQuery.me().findByUserTypeForApp(getPageNumber(), getPageSize(), userIds, customerType, hasOrder, key);
 		setAttr("customerList", customerList);
 		render("customer.html");
 	}
@@ -208,10 +213,12 @@ public class CustomerController extends BaseFrontController {
 	}
 
 	public void historyOrder() {
+		
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String sellerCustomerId = getPara("sellerCustomerId");
+		Page<Record> orderList = SalesOrderQuery.me().findBySellerCustomerId(getPageNumber(), getPageSize(), sellerCustomerId, selectDataArea + "%");
 
-		Page<Record> orderList = SalesOrderQuery.me().findBySellerCustomerId(getPageNumber(), getPageSize(), getPara("sellerCustomerId"), selectDataArea + "%");
-
+		// 需要修改，使用字典来显示，不用在这个地方做查询
 		for(Record record : orderList.getList()){
 			record.set("statusName", getStatusName(record.getInt("status")));
 			record.set("receive_Name", getReceiveName(record.getInt("receive_type")));

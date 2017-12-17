@@ -1,67 +1,58 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" name="viewport">
-	<meta content="yes" name="apple-mobile-web-app-capable">
-	<meta content="black" name="apple-mobile-web-app-status-bar-style">
-	<meta content="telephone=no" name="format-detection">
-	<meta content="email=no" name="format-detection">
-	<link rel="stylesheet" href="${CPATH}/static/bootstrap/css/bootstrap.css">
-	<!-- Font Awesome -->
-    <link rel="stylesheet" href="${CPATH}/static/font-awesome/css/font-awesome.css">
-	<!-- Theme style -->
-    <link rel="stylesheet" href="${CPATH}/static/lte/css/AdminLTE.min.css">
-    <!--[if lt IE 9]>
-     <script src="${CPATH}/static/plugins/html5/html5shiv.min.js"></script>
-     <script src="${CPATH}/static/plugins/html5/respond.min.js"></script>
-    <![endif]-->
-    <title>账套选择</title>
-    <style type="text/css">
-        @media (max-width: 768px) {
-            .login-box, .register-box {
-	            margin-top: 120px;
-	        }
-        }
-        
-    </style>
-</head>
+<#include "_inc/_layout.html"/>
 
-<body class="hold-transition">
-    <div class="login-box">
-        <div class="login-logo">
-            <a href="#"><b>协同云平台</b></a>
-        </div>
-        <!-- /.login-logo -->
-        <div class="login-box-body">
-            <p class="login-box-msg">账套选择</p>
-            <form action="${CPATH}/user/change" method="post" id="loginform">
-                <input type="hidden" value="${mobile!}" name="mobile">
-                <input type="hidden" value="${openid!}" name="openid">
-                <div class="form-group">
-                    <!-- <label>用户名：</label>  -->
-                    <!-- <span class="glyphicon glyphicon-envelope form-control-feedback"></span> -->
-                    <select class="form-control" name="sellerId">
-                        <!-- <option value="">---请选择---</option> -->
-                        <#if sellerList ??> <#list sellerList as bean>
-                        <option value="${(bean.seller_id)!}">${(bean.seller_name)!}</option>
-                        </#list> </#if>
-                    </select>
-                </div>
-                <div class="row">
-                    <!-- /.col -->
-                    <div class="col-xs-12">
-                        <button type="submit" class="btn btn-primary btn-block">确认</button>
+<#macro css>
+    .weui-content {
+        background: #fff;
+    }
+
+    .weui-panel__hd {
+        font-size: 1rem;
+        color: #ea6f5a;
+    }
+    
+    .weui-cell {
+        padding: .75rem;
+        font-size: .8rem;
+    }
+</#macro>
+
+<#macro script>
+    var mobile = '${(mobile)!}';
+    var openid = '${(openid)!}';
+    
+    var callback = function(res) {
+        if (res.errorCode == 0) {
+            location.href = '${CPATH}/';
+        }
+    }
+    
+    function doChange(sellerId) {
+        var url = "${CPATH}/user/change";
+        Utils.ajax(url, {'mobile': mobile, 'openid': openid, 'sellerId': sellerId}, callback);
+    }
+    
+</#macro>
+
+<@layout>
+    <div class="weui-content">
+        <div class="weui-panel">
+            <div class="weui-panel__hd"><i class="icon-user"></i> 选择工作身份</div>
+            <div class="weui-panel__bd">
+                <div class="weui-media-box weui-media-box_small-appmsg">
+                    <div class="weui-cells">
+                        <#if sellerList ??>
+                        <#list sellerList as bean>
+                        <a class="weui-cell weui-cell_access" href="javascript:void(0);" onclick="doChange('${(bean.seller_id)!}');">
+                            <div class="weui-cell__bd weui-cell_primary">
+                                <p>${(bean.seller_name)!}</p>
+                            </div>
+                            <span class="weui-cell__ft"></span>
+                        </a>
+                        </#list>
+                        </#if>
                     </div>
-                    <!-- /.col -->
                 </div>
-            </form>
-            <!-- /.social-auth-links -->
+            </div>
         </div>
-        <!-- /.login-box-body -->
     </div>
-    <!-- /.login-box -->
-</body>
-<script src="${CTPATH}/js/jquery-3.2.1.min.js"></script>
-<script src="${CPATH}/static/bootstrap/js/bootstrap.min.js"></script>
-</html>
+</@layout>

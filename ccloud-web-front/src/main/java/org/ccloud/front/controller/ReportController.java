@@ -125,7 +125,7 @@ public class ReportController extends BaseFrontController {
 		}
 		setAttr("customerTypes", JSON.toJSON(customerTypes));			
 		
-		render("customerReport.html");
+		render("report_customer.html");
 	}
 	
 	public void productDetail() {
@@ -147,7 +147,7 @@ public class ReportController extends BaseFrontController {
 		}
 		setAttr("productTypeList", JSON.toJSON(productTypes));
 		
-		render("goodReport.html");
+		render("report_product.html");
 	}
 	
 }
