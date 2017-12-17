@@ -28,6 +28,8 @@ import org.ccloud.ui.freemarker.function.OptionChecked;
 import org.ccloud.ui.freemarker.function.OptionSelected;
 import org.ccloud.ui.freemarker.function.OptionValue;
 import org.ccloud.ui.freemarker.function.TaxonomyBox;
+import org.ccloud.ui.freemarker.tag.ContentTag;
+import org.ccloud.ui.freemarker.tag.ContentsTag;
 import org.ccloud.ui.freemarker.tag.DictTag;
 
 import com.jfinal.kit.PropKit;
@@ -40,8 +42,8 @@ public class Config extends CCloudConfig {
 	@Override
 	public void onCCloudStarted() {
 
-//		CCloud.addTag(ModulesTag.TAG_NAME, new ModulesTag());
-//		CCloud.addTag(UsersTag.TAG_NAME, new UsersTag());
+		CCloud.addTag(ContentsTag.TAG_NAME, new ContentsTag());
+		CCloud.addTag(ContentTag.TAG_NAME, new ContentTag());
 		CCloud.addTag(DictTag.TAG_NAME, new DictTag());
 //		CCloud.addTag(PermissionTag.TAG_NAME, new PermissionTag());
 		

@@ -85,7 +85,7 @@ public class RefundController extends BaseFrontController{
 		setAttr("salesOutstockDetail", outstockDetail);
 		setAttr("outstock", outstock);
 		setAttr("outstock_id", outstock_id);
-		render("refundDetail.html");
+		render("refund_detail.html");
 	}
 	
 	public void myRefund() {
@@ -108,7 +108,7 @@ public class RefundController extends BaseFrontController{
 		}
 
 		setAttr("customerTypes", JSON.toJSON(customerTypes));
-		render("refundList.html");
+		render("refund_list.html");
 	}
 	
 	public void list() {

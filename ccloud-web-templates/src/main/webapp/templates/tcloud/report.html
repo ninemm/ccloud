@@ -8,7 +8,12 @@
 	    width: 100%;
 	    bottom: 50px;
 	    overflow: auto;
-    -webkit-overflow-scrolling: touch;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .report .weui-panel__hd:after {
+        left: 0;
+        height: 0;
     }
 </#macro>
 
@@ -304,7 +309,7 @@
 			<div class="weui-panel__hd">
 				<span class="overview-hd-title">销售简报</span> <span class="briefly" onclick="dayTagSelect(this,'order')">
 					<p class="dayTagText">今日</p>
-					<i class="icon-chevron-down"></i>
+					<i class="icon-angle-down"></i>
 				</span> 
 				<input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'order')" readonly="">
 				<span class="overview-hd-segmenting fr"> - </span> 
@@ -314,15 +319,15 @@
 				<div class="weui-flex overview-block">
 					<div class="weui-flex__item">
 						<div class="overview-title">
-							<img src="${CTPATH}/images/order.png" alt=""> <span>订单总数</span>
+							<img src="${CTPATH}/images/order.png"> <span>订单总数</span>
 						</div>
 						<div class="t-c">
-							<strong id="productCount">0</strong> <small id="totalCount">/0笔</small>
+							<strong id="productCount">0</strong> <small id="totalCount">/ 0笔</small>
 						</div>
 					</div>
 					<div class="weui-flex__item">
 						<div class="overview-title">
-							<img src="${CTPATH}/images/money.png" alt=""> <span>订单金额</span>
+							<img src="${CTPATH}/images/money.png"> <span>订单金额</span>
 						</div>
 						<div class="t-c">
 							<strong id="totalAmount">0</strong>
@@ -335,7 +340,7 @@
 			<div class="weui-panel__hd">
 				<span class="overview-hd-title">客户订单统计</span> <span class="briefly" onclick="dayTagSelect(this,'customer')">
 				<p class="dayTagText">今日</p>
-					<i class="icon-chevron-down"></i>
+					<i class="icon-angle-down"></i>
 				</span> <input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'customer')" readonly="">
 				<span class="overview-hd-segmenting fr"> - </span> <input
 					class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'customer')" readonly="">
@@ -353,7 +358,7 @@
 			<div class="weui-panel__hd">
 				<span class="overview-hd-title">商品销售统计</span> <span class="briefly" onclick="dayTagSelect(this,'product')">
 				<p class="dayTagText">今日</p>
-					<i class="icon-chevron-down"></i>
+					<i class="icon-angle-down"></i>
 				</span> <input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'product')" readonly="">
 				<span class="overview-hd-segmenting fr"> - </span> <input
 					class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'product')" readonly="">
@@ -368,12 +373,10 @@
 			</div>
 		</div>
 		<div class="weui-panel weui-panel_access margin-0">
-			<div class="weui-panel__hd">订单完成统计</div>
+			<div class="weui-panel__hd"><span class="overview-hd-title">订单完成统计</span></div>
 			<div class="weui-panel__bd report-area">
 				<div class="weui-media-box ft14">
-					<div id="orderStatus" style="width:600px; height: 300px;">
-						
-					</div>
+					<div id="orderStatus" style="width:600px; height: 300px;"></div>
 				</div>
 			</div>
 		</div>		
@@ -381,7 +384,7 @@
 			<div class="weui-panel__hd">
 				<span class="overview-hd-title">退货统计</span> <span class="briefly" onclick="dayTagSelect(this,'refund')">
 				<p class="dayTagText">今日</p>
-					<i class="icon-chevron-down"></i>
+					<i class="icon-angle-down"></i>
 				</span> <input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'refund')" readonly="">
 				<span class="overview-hd-segmenting fr"> - </span> <input
 					class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'refund')" readonly="">
