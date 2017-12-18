@@ -372,6 +372,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		sb.append(" JOIN act_ru_task a on o.proc_inst_id = a.PROC_INST_ID_ ");
 		sb.append(" JOIN act_ru_identitylink u on o.proc_inst_id = u.PROC_INST_ID_ ");
 		sb.append(" where locate(?, u.USER_ID_) > 0 ");
+		sb.append(" order by o.create_date ");
 		return DAO.find(sb.toString(), username);
 	}
 

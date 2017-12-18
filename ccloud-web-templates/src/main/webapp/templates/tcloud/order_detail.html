@@ -96,7 +96,7 @@
                 </span>
     </div>
   </div>
-  <a class="weui-panel weui-panel_access block" href="./operateHistory.html">
+  <a class="weui-panel weui-panel_access block" href="${CPATH}/order/operateHistory?id=${(order.id)!}&proc_inst_id=${(order.proc_inst_id)!}">
     <div class="weui-cell weui-cell_access">
       <div class="weui-cell__bd ft14">
         操作记录
@@ -124,8 +124,10 @@
 </div>
 <div class="layer"></div>
 <footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
-  <button class="gray-button weui-flex__item">撤销</button>
-  <button onclick="orderAgain()" class="blue-button weui-flex__item">再次购买</button>
+  <#if order.status == 0>
+    <button class="gray-button weui-flex__item">撤销</button>
+  </#if>
+  <button onclick="orderAgain()" class="red-button weui-flex__item">再次购买</button>
 </footer>
 </body>
 </@layout>

@@ -63,6 +63,8 @@ public class Consts {
 	public static final String ATTR_GLOBAL_META_KEYWORDS = "META_KEYWORDS";
 	public static final String ATTR_GLOBAL_META_DESCRIPTION = "META_DESCRIPTION";
 	public static final String ATTR_GLOBAL_SYSTEM_LOG = "SYSTEM_LOG";
+	public static final String ATTR_GLOBAL_SELLER_ID = "SELLER_ID";
+	public static final String ATTR_GLOBAL_SELLER_NAME = "SELLER_NAME";
 
 	public static final String SESSION_WECHAT_USER = "_wechat_user";
 	public static final String SESSION_WECHAT_ACCESS_TOKEN = "_wechat_access_token";
@@ -153,4 +155,7 @@ public class Consts {
 	
 	public static final String ROLE_CODE_007 = "007";//财务
 	public static final String ROLE_CODE_020 = "020";//账务
+	
+	public static final String OPERATE_HISTORY_TITLE_ORDER_REVIEW= "订单审核";
+	public static final String OPERATE_HISTORY_TITLE_ORDER_PRINT= "订单打印";
 }
