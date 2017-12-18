@@ -122,7 +122,7 @@
                 </span>
     </div>
   </div>
-  <a class="weui-panel weui-panel_access block" href="./operateHistory.html">
+  <a class="weui-panel weui-panel_access block" href="${CPATH}/order/operateHistory?id=${(order.id)!}&proc_inst_id=${(order.proc_inst_id)!}">
     <div class="weui-cell weui-cell_access">
       <div class="weui-cell__bd ft14">
         操作记录
@@ -151,7 +151,7 @@
 <div class="layer"></div>
 <footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
   <button class="gray-button weui-flex__item" onclick="doSubmit(0)">拒绝</button>
-  <button class="blue-button weui-flex__item" onclick="doSubmit(1)">通过</button>
+  <button class="red-button weui-flex__item" onclick="doSubmit(1)">通过</button>
 </footer>
 </body>
 </@layout>

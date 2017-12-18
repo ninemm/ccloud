@@ -372,6 +372,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		sb.append(" JOIN act_ru_task a on o.proc_inst_id = a.PROC_INST_ID_ ");
 		sb.append(" JOIN act_ru_identitylink u on o.proc_inst_id = u.PROC_INST_ID_ ");
 		sb.append(" where locate(?, u.USER_ID_) > 0 ");
+		sb.append(" order by o.create_date ");
 		return DAO.find(sb.toString(), username);
 	}
 
@@ -777,16 +778,16 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 	
 	//我部门的直营商详情
-	public Page<Record> findByMSellerDetail(int pageNumber, int pageSize, String startDate, String endDate,
+	public List<Record> findByMSellerDetail( String startDate, String endDate,
 			String keyword, String dataArea, String sellerId) {
 		List<SellerProduct> findBySellerId = SellerProductQuery.me().findBySellerId(sellerId);
-		String select="SELECT ";
+		StringBuilder fromBuilder=new StringBuilder("SELECT ");
 		for (SellerProduct sellerProduct : findBySellerId) {
 			String customName=sellerProduct.getCustomName();
-			select=select+"sum( CASE sp.custom_name WHEN '"+customName+"' THEN sd.product_count ELSE 0 END) '"+customName+"' ,";
+			fromBuilder.append("sum( CASE sp.custom_name WHEN '"+customName+"' THEN sd.product_count ELSE 0 END) '"+customName+"' ,");
 		}
-		select=select+"s.seller_name '直营商名称'";
-		StringBuilder fromBuilder = new StringBuilder(" FROM cc_sales_order so ");
+		fromBuilder.append("s.seller_name '直营商名称'");
+		fromBuilder.append(" FROM cc_sales_order so ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id=sojo.order_id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id=sojo.outstock_id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_detail sd ON sd.order_id=so.id ");
@@ -794,37 +795,26 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id = so.customer_id ");
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
 		fromBuilder.append(" WHERE sd.is_gift=0 and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
-		LinkedList<Object> params = new LinkedList<Object>();
-		boolean needWhere = false;
 		startDate=startDate+" 00:00:00";
 		endDate=endDate+" 23:59:59";
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, " so.data_area", dataArea, params, needWhere);
-		if (StrKit.notBlank(startDate)) {
-			fromBuilder.append(" and "+keyword+" >= ?");
-			params.add(startDate);
-		}
-		if (StrKit.notBlank(endDate)) {
-			fromBuilder.append(" and "+keyword+" <= ?");
-			params.add(endDate);
-		}
-		fromBuilder.append("GROUP BY s.id");
-		
-		if (params.isEmpty())
-			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
-		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+		fromBuilder.append(" AND so.data_area like '"+ dataArea+"' ");
+		fromBuilder.append(" AND "+ keyword+" >= '"+startDate+"'");
+		fromBuilder.append(" AND "+ keyword+" <= '"+endDate+"'");
+		fromBuilder.append(" GROUP BY s.id");
+		return Db.find(fromBuilder.toString());
 	}
 
 	//我部门的直营商详情赠品
-	public Page<Record> findByMSellerDetailGift(int pageNumber, int pageSize, String startDate, String endDate,
+	public List<Record> findByMSellerDetailGift(String startDate, String endDate,
 			String keyword, String dataArea, String sellerId) {
 		List<SellerProduct> findBySellerId = SellerProductQuery.me().findBySellerId(sellerId);
-		String select="SELECT ";
+		StringBuilder fromBuilder=new StringBuilder("SELECT ");
 		for (SellerProduct sellerProduct : findBySellerId) {
 			String customName=sellerProduct.getCustomName();
-			select=select+"sum( CASE sp.custom_name WHEN '"+customName+"' THEN sd.product_count ELSE 0 END) '"+customName+"' ,";
+			fromBuilder.append("sum( CASE sp.custom_name WHEN '"+customName+"' THEN sd.product_count ELSE 0 END) '"+customName+"' ,");
 		}
-		select=select+"s.seller_name '直营商名称'";
-		StringBuilder fromBuilder = new StringBuilder(" FROM cc_sales_order so ");
+		fromBuilder.append("s.seller_name '直营商名称'");
+		fromBuilder.append(" FROM cc_sales_order so ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id=sojo.order_id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id=sojo.outstock_id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_detail sd ON sd.order_id=so.id ");
@@ -832,37 +822,26 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id = so.customer_id ");
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
 		fromBuilder.append(" WHERE sd.is_gift=1 and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
-		LinkedList<Object> params = new LinkedList<Object>();
-		boolean needWhere = false;
 		startDate=startDate+" 00:00:00";
 		endDate=endDate+" 23:59:59";
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, " so.data_area", dataArea, params, needWhere);
-		if (StrKit.notBlank(startDate)) {
-			fromBuilder.append(" and "+keyword+" >= ?");
-			params.add(startDate);
-		}
-		if (StrKit.notBlank(endDate)) {
-			fromBuilder.append(" and "+keyword+" <= ?");
-			params.add(endDate);
-		}
-		fromBuilder.append("GROUP BY s.id");
-		
-		if (params.isEmpty())
-			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
-		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+		fromBuilder.append(" AND so.data_area like '"+ dataArea+"' ");
+		fromBuilder.append(" AND "+ keyword+" >= '"+startDate+"'");
+		fromBuilder.append(" AND "+ keyword+" <= '"+endDate+"'");
+		fromBuilder.append(" GROUP BY s.id");
+		return Db.find(fromBuilder.toString());
 	}
 	
 	//我部门的业务员详情
-	public Page<Record> findByMSalesmanDetail(int pageNumber, int pageSize, String startDate, String endDate,
+	public List<Record> findByMSalesmanDetail(String startDate, String endDate,
 			String keyword, String dataArea, String sellerId) {
 		List<SellerProduct> findBySellerId = SellerProductQuery.me().findBySellerId(sellerId);
-		String select="SELECT ";
+		StringBuilder fromBuilder=new StringBuilder("SELECT ");
 		for (SellerProduct sellerProduct : findBySellerId) {
 			String customName=sellerProduct.getCustomName();
-			select=select+"sum( CASE sp.custom_name WHEN '"+customName+"' THEN sd.product_count ELSE 0 END) '"+customName+"' ,";
+			fromBuilder.append("sum( CASE sp.custom_name WHEN '"+customName+"' THEN sd.product_count ELSE 0 END) '"+customName+"' ,");
 		}
-		select=select+"u.realname '业务员名称'";
-		StringBuilder fromBuilder = new StringBuilder(" FROM cc_sales_order so ");
+		fromBuilder.append("u.realname '业务员名称'");
+		fromBuilder.append(" FROM cc_sales_order so ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id=sojo.order_id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id=sojo.outstock_id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_detail sd ON sd.order_id=so.id ");
@@ -870,37 +849,28 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id = so.customer_id ");
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
 		fromBuilder.append(" WHERE sd.is_gift=0 and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
-		LinkedList<Object> params = new LinkedList<Object>();
-		boolean needWhere = false;
 		startDate=startDate+" 00:00:00";
 		endDate=endDate+" 23:59:59";
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, " so.data_area", dataArea, params, needWhere);
-		if (StrKit.notBlank(startDate)) {
-			fromBuilder.append(" and "+keyword+" >= ?");
-			params.add(startDate);
-		}
-		if (StrKit.notBlank(endDate)) {
-			fromBuilder.append(" and "+keyword+" <= ?");
-			params.add(endDate);
-		}
-		fromBuilder.append("GROUP BY u.id");
-		
-		if (params.isEmpty())
-			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
-		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+		startDate=startDate+" 00:00:00";
+		endDate=endDate+" 23:59:59";
+		fromBuilder.append(" AND so.data_area like '"+ dataArea+"' ");
+		fromBuilder.append(" AND "+ keyword+" >= '"+startDate+"'");
+		fromBuilder.append(" AND "+ keyword+" <= '"+endDate+"'");
+		fromBuilder.append(" GROUP BY u.id");
+		return Db.find(fromBuilder.toString());
 	}
 	
 	//我部门的业务员详情赠品
-	public Page<Record> findByMSalesmanDetailGift(int pageNumber, int pageSize, String startDate, String endDate,
+	public List<Record> findByMSalesmanDetailGift(String startDate, String endDate,
 			String keyword, String dataArea, String sellerId) {
 		List<SellerProduct> findBySellerId = SellerProductQuery.me().findBySellerId(sellerId);
-		String select="SELECT ";
+		StringBuilder fromBuilder=new StringBuilder("SELECT ");
 		for (SellerProduct sellerProduct : findBySellerId) {
 			String customName=sellerProduct.getCustomName();
-			select=select+"sum( CASE sp.custom_name WHEN '"+customName+"' THEN sd.product_count ELSE 0 END) '"+customName+"' ,";
+			fromBuilder.append("sum( CASE sp.custom_name WHEN '"+customName+"' THEN sd.product_count ELSE 0 END) '"+customName+"' ,");
 		}
-		select=select+"u.realname '业务员名称'";
-		StringBuilder fromBuilder = new StringBuilder(" FROM cc_sales_order so ");
+		fromBuilder.append("u.realname '业务员名称'");
+		fromBuilder.append(" FROM cc_sales_order so ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id=sojo.order_id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id=sojo.outstock_id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_detail sd ON sd.order_id=so.id ");
@@ -908,24 +878,17 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id = so.customer_id ");
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
 		fromBuilder.append(" WHERE sd.is_gift=1 and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
-		LinkedList<Object> params = new LinkedList<Object>();
-		boolean needWhere = false;
 		startDate=startDate+" 00:00:00";
 		endDate=endDate+" 23:59:59";
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, " so.data_area", dataArea, params, needWhere);
-		if (StrKit.notBlank(startDate)) {
-			fromBuilder.append(" and "+keyword+" >= ?");
-			params.add(startDate);
-		}
-		if (StrKit.notBlank(endDate)) {
-			fromBuilder.append(" and "+keyword+" <= ?");
-			params.add(endDate);
-		}
-		fromBuilder.append("GROUP BY u.id");
-		
-		if (params.isEmpty())
-			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
-		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+		startDate=startDate+" 00:00:00";
+		endDate=endDate+" 23:59:59";
+		startDate=startDate+" 00:00:00";
+		endDate=endDate+" 23:59:59";
+		fromBuilder.append(" AND so.data_area like '"+ dataArea+"' ");
+		fromBuilder.append(" AND "+ keyword+" >= '"+startDate+"'");
+		fromBuilder.append(" AND "+ keyword+" <= '"+endDate+"'");
+		fromBuilder.append(" GROUP BY u.id");
+		return Db.find(fromBuilder.toString());
 	}
 	
 	//统计今日订单

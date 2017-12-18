@@ -155,4 +155,7 @@ public class Consts {
 	
 	public static final String ROLE_CODE_007 = "007";//财务
 	public static final String ROLE_CODE_020 = "020";//账务
+	
+	public static final String OPERATE_HISTORY_TITLE_ORDER_REVIEW= "订单审核";
+	public static final String OPERATE_HISTORY_TITLE_ORDER_PRINT= "订单打印";
 }

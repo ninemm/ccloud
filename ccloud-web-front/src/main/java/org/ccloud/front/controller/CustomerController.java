@@ -60,13 +60,14 @@ public class CustomerController extends BaseFrontController {
 	public void index() {
 
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		
 		String key = getPara("searchKey");
 		String hasOrder = getPara("isOrdered");
 		String customerType =  getPara("customerType");
-		Object[] userIds = getUserIdList(user);
 
-		Page<Record> customerList = SellerCustomerQuery.me().findByUserTypeForApp(getPageNumber(), getPageSize(), userIds, customerType, hasOrder, key);
+
+		Page<Record> customerList = SellerCustomerQuery.me().findByUserTypeForApp(getPageNumber(), getPageSize(), selectDataArea, customerType, hasOrder, key);
 		setAttr("customerList", customerList);
 		render("customer.html");
 	}
@@ -107,12 +108,13 @@ public class CustomerController extends BaseFrontController {
 
 	public void refresh() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
 		Page<Record> customerList = new Page<>();
 		if (StrKit.notBlank(getPara("region"))) {
-			Object[] region = {getPara("region")};
-			customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), region, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"));
-		} else customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), getUserIdList(user), getPara("customerType"), getPara("isOrdered"), getPara("searchKey"));
+			String dataArea = UserQuery.me().findById(getPara("region")).getDataArea();
+			customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), dataArea, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"));
+		} else customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), selectDataArea, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"));
 
 		StringBuilder html = new StringBuilder();
 		for (Record customer : customerList.getList())
@@ -704,17 +706,6 @@ public class CustomerController extends BaseFrontController {
 		MessageKit.sendMessage(Actions.ProcessMessage.PROCESS_MESSAGE_SAVE, message);
 		
 		return isUpdated;
-	}
-
-	private Object[] getUserIdList(User user) {
-		List<Record> userList = UserQuery.me().findNextLevelsUserList(getSessionAttr(Consts.SESSION_SELECT_DATAAREA).toString() + "%");
-		if (userList.size() == 0) return null;
-
-		Object[] userIdList = new Object[userList.size()];
-		for (int i = 0; i < userList.size(); i++) {
-			userIdList[i] = userList.get(i).getStr("id");
-		}
-		return userIdList;
 	}
 
 	private String getStatusName (int statusCode) {
