@@ -31,6 +31,7 @@ import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SellerProductQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DataAreaUtil;
+import org.ccloud.utils.StringUtils;
 
 import com.alibaba.fastjson.JSON;
 import com.jfinal.plugin.activerecord.Record;
@@ -149,5 +150,25 @@ public class ReportController extends BaseFrontController {
 		
 		render("report_product.html");
 	}
+	
+	public void userRank() {
+		render("user_rank.html");
+	}
+	
+	public void getUserRank() {
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String dayTag = getPara("dayTag");
+		String sellerId = getSessionAttr("sellerId");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String dataArea = DataAreaUtil.getUserDealerDataArea(user.getDataArea());
+		String status = getPara("status");
+		String deptId = null;
+		if (StringUtils.isNotBlank(status)) {
+			deptId = user.getDepartmentId();
+		}
+		List<Record> record = SalesOrderQuery.me().getUserRank(startDate, endDate, dayTag, deptId, sellerId, dataArea);
+		renderJson(record);
+	}	
 	
 }
