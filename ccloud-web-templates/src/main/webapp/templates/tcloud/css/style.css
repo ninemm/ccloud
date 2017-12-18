@@ -543,7 +543,6 @@ a {
 #home {
   overflow: auto;
   -webkit-overflow-scrolling: touch;
-  padding-bottom: 1.5rem;
 }
 
 .company {
@@ -782,6 +781,11 @@ a {
   justify-content: space-between;
 }
 
+.composition .product_name {
+  height: 3.25rem;
+  line-height: 3.25rem;
+}
+
 .product_unit {
   height: 1.25rem;
   line-height: 1.25rem;
@@ -883,32 +887,34 @@ a {
   top: 0;
 }
 
-.product-detail,
-.audit {
+.layui-m-layerchild {
   width: 90%;
+}
+
+.service {
+  width: 70%;
 }
 
 .product-detail img {
   width: 30%;
 }
 
-.product-detail .layui-m-layercont,
-.audit .layui-m-layercont {
+.service img {
+  width: 60%;
+  margin: 5% 20% 0;
+}
+
+.layui-m-layercont {
   padding: 5px 15px!important;
-  margin-bottom: 2rem;
 }
 
-.product-detail .layui-m-layerbtn,
-.audit .layui-m-layerbtn {
-  height: 2rem;
-  line-height: 2rem;
-  position: absolute;
-  bottom: 0;
+.layui-m-layerbtn {
+  height: 2rem!important;
+  line-height: 2rem!important;
 }
 
-.product-detail .layui-m-layerbtn span[yes],
-.audit .layui-m-layerbtn span[yes] {
-  color: #fff;
+.layui-m-layerbtn span[yes] {
+  color: #fff!important;
   border-radius: 0;
   background: #ea6f5a;
 }
@@ -1249,6 +1255,11 @@ input.street-value {
   line-height: 1rem;
   margin-top: 0.5rem;
   color: #000;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
 }
 
 .customer-href i {

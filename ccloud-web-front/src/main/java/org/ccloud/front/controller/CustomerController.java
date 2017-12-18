@@ -420,7 +420,7 @@ public class CustomerController extends BaseFrontController {
 			return ;
 		}
 		
-		updated = startProcess(sellerCustomer.getId(), map);
+		updated = startProcess(sellerCustomer.getId(), map, 0);
 
 		if (updated)
 			renderAjaxResultForSuccess("操作成功");
@@ -500,7 +500,7 @@ public class CustomerController extends BaseFrontController {
 		//int isEnabled = getParaToInt("isEnabled");
 		if(StrKit.notBlank(id)) {
 
-			boolean updated = startProcess(id, new HashMap<String, Object>());
+			boolean updated = startProcess(id, new HashMap<String, Object>(), 1);
 
 			if (updated) {
 				renderAjaxResultForSuccess("操作成功");
@@ -521,7 +521,7 @@ public class CustomerController extends BaseFrontController {
 		String taskId = getPara("taskId");
 		Integer status = getParaToInt("status");
 		String sellerCustomerId = getPara("id");
-		String comment = (status == 1) ? "批准" : "拒绝";
+		String comment = (status == 1) ? "客户审核批准" : "客户审核拒绝";
 
 		boolean updated = true;
 
@@ -573,7 +573,8 @@ public class CustomerController extends BaseFrontController {
 				} else customer.setId(null);
 				updated = updated && customer.saveOrUpdate();
 
-				sellerCustomer.setNickname(customerVO.getNickname());
+				if (StrKit.notBlank(customerVO.getNickname()))
+					sellerCustomer.setNickname(customerVO.getNickname());
 
 				if (customerVO.getCustTypeList() != null || customerVO.getCustTypeList().size() != 0)
 					sellerCustomer.setCustomerTypeIds(Joiner.on(",").join(customerVO.getCustTypeList().iterator()));
@@ -608,6 +609,9 @@ public class CustomerController extends BaseFrontController {
 					}
 				}
 
+			}else {
+				sellerCustomer.setIsEnabled(0);
+				updated = sellerCustomer.saveOrUpdate();
 			}
 		} else {
 			Kv kv = Kv.create();
@@ -648,7 +652,7 @@ public class CustomerController extends BaseFrontController {
 			renderAjaxResultForError("操作失败");
 	}
 
-	private boolean startProcess(String customerId, Map<String, Object> param) {
+	private boolean startProcess(String customerId, Map<String, Object> param, int isEnable) {
 		
 		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(customerId);
 		boolean isUpdated = true;
@@ -696,9 +700,11 @@ public class CustomerController extends BaseFrontController {
 		message.setTitle(sellerCustomer.getCustomer().getCustomerName());
 		
 		Object customerVO = param.get("customerVO");
-		if (customerVO == null) {
+		if (customerVO == null && isEnable == 0) {
 			message.setContent("新增待审核");
-		} else {
+		} else if(customerVO == null && isEnable == 1) {
+			message.setContent("停用待审核");
+		}else {
 			List<String> list = BeanCompareUtils.contrastObj(sellerCustomer, customerVO);
 			if (list != null)
 				message.setContent(JsonKit.toJson(list));

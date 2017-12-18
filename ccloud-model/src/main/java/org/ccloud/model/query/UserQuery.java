@@ -200,7 +200,7 @@ public class UserQuery extends JBaseQuery {
 		final List<Object> params = new LinkedList<Object>();
 		appendIfNotEmptyWithLike(sql, "data_area", dataArea, params, true);
 
-		return Db.find(sql.toString(), dataArea );
+		return Db.find(sql.toString(), params.toArray() );
 	}
 	
 	public User findManagerByDeptId(String deptId) {

@@ -892,12 +892,12 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 	
 	//统计今日订单
-	public int queryCountToDayOrders(String userId,String dataArea) {
+	public long queryCountToDayOrders(String userId,String dataArea) {
 		StringBuilder fromBuilder = new StringBuilder(" select count(cso.order_sn) from cc_sales_order cso inner join `user` u on u.id = cso.biz_user_id ");
 		fromBuilder.append("where DATE_FORMAT(cso.create_date, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d') ");
 		//fromBuilder.append("and cso.biz_user_id <> '"+userId+"' ");
 		fromBuilder.append("and u.data_area like '"+dataArea+"' ");
-		return Db.queryInt(fromBuilder.toString());
+		return Db.queryLong(fromBuilder.toString());
 	}
 	
 	public Record getMyOrderAmount(String startDate, String endDate, String dayTag, String customerType, String sellerId, String dataArea) {
@@ -1147,5 +1147,47 @@ public class SalesOrderQuery extends JBaseQuery {
 
 		return Db.findFirst(fromBuilder.toString(), params.toArray());
 	}
+	
+	public List<Record> getUserRank(String startDate, String endDate, String dayTag, String deptId, String sellerId,
+			String dataArea) {
+		if (dayTag != null) {
+			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
+			startDate = date[0];
+			endDate = date[1];
+		}
+		LinkedList<Object> params = new LinkedList<Object>();
+		StringBuilder fromBuilder = new StringBuilder("SELECT IFNULL(SUM(cc.total_amount),0) as totalAmount, IFNULL(SUM(cc.total_count),0) as productCount, ");
+		fromBuilder.append("COUNT(cc.id) as orderCount, u.realname, u.avatar ");
+		fromBuilder.append("FROM `user` u LEFT JOIN cc_sales_order cc ON cc.biz_user_id = u.id ");
+		boolean needWhere = true;
+		if (StringUtils.isNotBlank(deptId)) {
+			needWhere = appendIfNotEmpty(fromBuilder, " u.dept_id", deptId, params, needWhere);
+		} else {
+			needWhere = appendIfNotEmptyWithLike(fromBuilder, " u.data_area", dataArea, params, needWhere);
+		}
+		needWhere = appendIfNotEmpty(fromBuilder, " cc.seller_id", sellerId, params, needWhere);
+		if (needWhere) {
+			fromBuilder.append(" where cc.status != 1001");
+		} else {
+			fromBuilder.append(" and cc.status != 1001");
+		}
+
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and cc.create_date >= ? ");
+			params.add(startDate);
+		}
+
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and cc.create_date <= ? ");
+			params.add(endDate);
+		}
+		fromBuilder.append("GROUP BY u.id ");
+		fromBuilder.append("ORDER BY totalAmount desc ");
+		
+		if (params.isEmpty())
+			return Db.find(fromBuilder.toString());
+
+		return Db.find(fromBuilder.toString(), params.toArray());
+	}	
 
 }
