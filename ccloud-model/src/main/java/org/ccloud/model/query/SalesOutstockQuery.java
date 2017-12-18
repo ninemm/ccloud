@@ -17,7 +17,6 @@ package org.ccloud.model.query;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -260,7 +259,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 	}
 
 	
-	public List<printAllNeedInfo> findStockOutForPrint(final String id) {
+	public printAllNeedInfo findStockOutForPrint(final String id) {
 		StringBuilder fromBuilder = new StringBuilder("select o.outstock_sn,o.delivery_address,o.total_amount, cs.customer_kind, c.id as customerId, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as customerTypeCode, u.realname, u.mobile, ");
 		fromBuilder.append(" w.code as warehouseCode, cp.factor,w.`name` as warehouseName,w.phone as warehousePhone,o.create_date as placeOrderTime,o.remark,sn.seller_name,so.total_amount ");
 		fromBuilder.append(" from `cc_sales_outstock` o ");
@@ -274,11 +273,9 @@ public class SalesOutstockQuery extends JBaseQuery {
 		fromBuilder.append(" left join user u on so.biz_user_id = u.id ");
 		fromBuilder.append(" left join cc_warehouse w on o.warehouse_id = w.id ");
 		fromBuilder.append(" where o.id = ? ");
-
+		printAllNeedInfo printAllNeedInfo = new printAllNeedInfo();
 		 List<Record> records = Db.find(fromBuilder.toString(), id);
-		 List<printAllNeedInfo> printAllNeedInfos = new ArrayList<>();
 		 for (Record record : records) {
-			printAllNeedInfo printAllNeedInfo = new printAllNeedInfo();
 			printAllNeedInfo.setOutstockSn(record.getStr("outstock_sn"));
 			printAllNeedInfo.setDeliveryAddress(record.getStr("delivery_address"));
 			printAllNeedInfo.setCustomerName(record.getStr("customer_name"));
@@ -292,9 +289,8 @@ public class SalesOutstockQuery extends JBaseQuery {
 			printAllNeedInfo.setSellerName(record.getStr("seller_name"));
 			printAllNeedInfo.setRemark(record.getStr("remark"));
 			printAllNeedInfo.setPlaceOrderTime(record.getDate("placeOrderTime"));
-			printAllNeedInfos.add(printAllNeedInfo);
 		}
-		    return printAllNeedInfos;
+		    return printAllNeedInfo;
 	}
 	
 	

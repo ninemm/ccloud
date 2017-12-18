@@ -229,7 +229,17 @@ function rowNumber(pageSize){
 $("#print").click(function() {
 
     if (window.confirm('确认打印吗(订单状态会变为已打印)?')) {
-        window.print();
+    $.ajax({
+      url: "${CPATH}/admin/salesOutstock/recordPrintInfo",
+        data: {
+            "outstockId": '${outstockId!}'
+        },
+        dataType: "json",
+        async: false,
+        success: function(data) {
+                window.print();
+        }
+    })
     }
 });
 

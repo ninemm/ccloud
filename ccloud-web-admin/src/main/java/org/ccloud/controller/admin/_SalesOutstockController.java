@@ -16,6 +16,7 @@
 package org.ccloud.controller.admin;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -126,13 +127,16 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		render("print.html");
 	}
 	
-	
+	//获取出库单打印的信息
 	public void getPrintInfo() {
 		String outstockId = getPara("outstockId");
-		List<printAllNeedInfo> printAllNeedInfos = SalesOutstockQuery.me().findStockOutForPrint(outstockId);
-		List<orderProductInfo> orderProductInfos = SalesOutstockDetailQuery.me().findPrintProductInfo(outstockId);
-		for (printAllNeedInfo printAllNeedInfo : printAllNeedInfos) {
+		String[] outId = outstockId.split(",");
+		List<printAllNeedInfo> printAllNeedInfos = new ArrayList<>();
+		for (String s : outId) {
+			printAllNeedInfo printAllNeedInfo = SalesOutstockQuery.me().findStockOutForPrint(s);
+			List<orderProductInfo> orderProductInfos = SalesOutstockDetailQuery.me().findPrintProductInfo(s);
 			printAllNeedInfo.setOrderProductInfos(orderProductInfos);
+			printAllNeedInfos.add(printAllNeedInfo);
 		}
 		HashMap<String, Object> result = Maps.newHashMap();
         result.put("rows", printAllNeedInfos);
@@ -155,6 +159,14 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
         }
 
 	}	
+	
+//	public void recordPrintInfo() {
+//		String outstockId = getPara("outstockId");
+//		String[] outId = outstockId.split(",");
+//		//把打印记录写到出库打印记录表里
+//
+//	}
+	
 	
 	public boolean out(final Map<String, String[]> paraMap, final User user, final String sellerId, final String sellerCode) {
         boolean isSave = Db.tx(new IAtom() {

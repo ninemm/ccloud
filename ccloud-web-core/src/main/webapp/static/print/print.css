@@ -6,7 +6,7 @@
 body {
 	font-family: Verdana, Geneva, sans-serif;
 	font-size: 12px;
-	width: 660px;
+	width: 700px;
 	text-align: center;
 	margin: 0 auto;
 }
@@ -30,12 +30,12 @@ img {
 #content-body {
 	font-family: Verdana, Geneva, sans-serif;
 	font-size: 12px;
-	width: 660px;
+	width: 700px;
 	margin: 0 auto;
 }
 
 #print-content {
-	width: 660px;
+	width: 700px;
 	margin: 10px auto;
 }
 
@@ -71,7 +71,7 @@ img {
 table {
 	font-size: 12px;
 	border-collapse: collapse;
-	width: 660px;
+	width: 700px;
 	border: 1px solid #999;
 }
 
@@ -169,7 +169,7 @@ td, th {
 	line-height: 50px;
 	height: 50px;
 	margin: 5px auto;
-	width: 660px;
+	width: 700px;
 }
 
 @media print {
@@ -181,6 +181,6 @@ td, th {
 	}
 	
 	.print-content {
-		width: 660px;
+		width: 700px;
 	}
 }
