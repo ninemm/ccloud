@@ -27,6 +27,7 @@ import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.StringUtils;
+import org.ccloud.model.Customer;
 import org.ccloud.model.CustomerVisit;
 import org.ccloud.model.User;
 import org.ccloud.model.query.CustomerTypeQuery;
@@ -96,7 +97,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 		 String visitId = getPara("visitId");
 		 String review_solution = getPara("review_solution");
 		 CustomerVisit customerVisit = CustomerVisitQuery.me().findById(visitId);
-		 customerVisit.setStatus(1);
+		 customerVisit.setStatus(Customer.CUSTOMER_NORMAL);
 		 customerVisit.setSolution(review_solution);
 		 customerVisit.setReviewId(user.getId());
 		 customerVisit.setReviewDate(date);

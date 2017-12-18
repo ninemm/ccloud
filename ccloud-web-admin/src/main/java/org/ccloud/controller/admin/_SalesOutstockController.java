@@ -36,6 +36,8 @@ import org.ccloud.model.query.SalesOutstockDetailQuery;
 import org.ccloud.model.query.SalesOutstockQuery;
 import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.WarehouseQuery;
+import org.ccloud.model.vo.orderProductInfo;
+import org.ccloud.model.vo.printAllNeedInfo;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.DateUtils;
@@ -118,6 +120,25 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 
 		renderJson(result);
 	}
+	
+	public void renderPrintPage() {
+        setAttr("outstockId", getPara(0));
+		render("print.html");
+	}
+	
+	
+	public void getPrintInfo() {
+		String outstockId = getPara("outstockId");
+		List<printAllNeedInfo> printAllNeedInfos = SalesOutstockQuery.me().findStockOutForPrint(outstockId);
+		List<orderProductInfo> orderProductInfos = SalesOutstockDetailQuery.me().findPrintProductInfo(outstockId);
+		for (printAllNeedInfo printAllNeedInfo : printAllNeedInfos) {
+			printAllNeedInfo.setOrderProductInfos(orderProductInfos);
+		}
+		HashMap<String, Object> result = Maps.newHashMap();
+        result.put("rows", printAllNeedInfos);
+        renderJson(result);
+	}
+	
 	
 	@RequiresPermissions("/admin/salesOutstock/check")
 	public void outStock() {

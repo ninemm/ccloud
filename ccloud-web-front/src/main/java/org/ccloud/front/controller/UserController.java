@@ -75,19 +75,6 @@ public class UserController extends BaseFrontController {
 			return;
 		}
 		
-		long errorTimes = CookieUtils.getLong(this, "_login_errors", 0);
-		
-		if (errorTimes >= 3) {
-			if (!validateCaptcha("_login_captcha")) { // 验证码没验证成功！
-				if (isAjaxRequest()) {
-					renderAjaxResultForError("没有该用户");
-				} else {
-					redirect(Consts.ROUTER_USER_LOGIN);
-				}
-				return;
-			}
-		}
-		
 		List<User> userList = UserQuery.me().findByMobile(username);
 		if (null == userList || userList.size() == 0) {
 			if (isAjaxRequest()) {
@@ -96,10 +83,8 @@ public class UserController extends BaseFrontController {
 				setAttr("errorMsg", "没有该用户");
 				render("user_login.html");
 			}
-			CookieUtils.put(this, "_login_errors", errorTimes + 1);
 			return;
 		}
-		
 
 		List<Map<String, String>> sellerList = Lists.newArrayList();
 		List<Department> tmpList = Lists.newArrayList();
@@ -116,12 +101,17 @@ public class UserController extends BaseFrontController {
 		}
 		
 		if (sellerList.size() == 0) {
-			renderError(404);
+			if (isAjaxRequest()) {
+				renderAjaxResultForError("没有分配销售商");
+			} else {
+				renderError(404);
+			}
 			return ;
 		} else if (sellerList.size() > 1) {
 			setAttr("mobile", username);
 			setAttr("sellerList", sellerList);
 			setSessionAttr("sellerList", sellerList);
+//			redirect("/user/choice", true);
 			forwardAction("/user/choice");
 			return ;
 		}
@@ -130,7 +120,7 @@ public class UserController extends BaseFrontController {
 		
 		if (EncryptUtils.verlifyUser(user.getPassword(), user.getSalt(), password)) {
 			MessageKit.sendMessage(Actions.USER_LOGINED, user);
-			//CookieUtils.put(this, Consts.COOKIE_LOGINED_USER, user.getId());
+			CookieUtils.put(this, Consts.COOKIE_LOGINED_USER, user.getId());
 			
 			if (!user.isAdministrator()) {
 				Department dept = tmpList.get(0);
@@ -164,7 +154,6 @@ public class UserController extends BaseFrontController {
 				setAttr("errorMsg", "密码错误");
 				render("user_login.html");
 			}
-			CookieUtils.put(this, "_login_errors", errorTimes + 1);
 		}
 	}
 	

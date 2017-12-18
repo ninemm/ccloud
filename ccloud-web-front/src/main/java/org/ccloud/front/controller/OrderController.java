@@ -12,7 +12,10 @@ import org.activiti.engine.task.Comment;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
+import org.ccloud.message.Actions;
+import org.ccloud.message.MessageKit;
 import org.ccloud.model.CustomerType;
+import org.ccloud.model.Message;
 import org.ccloud.model.Receivables;
 import org.ccloud.model.SalesOrder;
 import org.ccloud.model.SellerProduct;
@@ -95,15 +98,30 @@ public class OrderController extends BaseFrontController {
 	}
 
 	public void orderDetail() {
+		
 		String orderId = getPara("orderId");
+		Record order = SalesOrderQuery.me().findMoreById(orderId);
+		List<Record> orderDetailList = SalesOrderDetailQuery.me().findByOrderId(orderId);
+		order.set("statusName", getStatusName(order.getInt("status")));
+		
+		setAttr("order", order);
+		setAttr("orderDetailList", orderDetailList);
+		render("order_detail.html");
+	}
+	
+	public void orderReview() {
+		
+		String orderId = getPara("orderId");
+		String taskId = getPara("taskId");
 		Record order = SalesOrderQuery.me().findMoreById(orderId);
 		List<Record> orderDetailList = SalesOrderDetailQuery.me().findByOrderId(orderId);
 
 		order.set("statusName", getStatusName(order.getInt("status")));
 
+		setAttr("taskId", taskId);
 		setAttr("order", order);
 		setAttr("orderDetailList", orderDetailList);
-		render("orderDetail.html");
+		render("order_review.html");
 	}
 
 	private String getStatusName(int statusCode) {
@@ -147,13 +165,13 @@ public class OrderController extends BaseFrontController {
 				String orderId = StrKit.getRandomUUID();
 				Date date = new Date();
 				String OrderSO = SalesOrderQuery.me().getNewSn(sellerId);
-
+				String allTotalAmount = StringUtils.getArrayFirst(paraMap.get("allTotalAmount"));
 				// 销售订单：SO + 100000(机构编号或企业编号6位) + A(客户类型) + 171108(时间) + 100001(流水号)
 				String orderSn = "SO" + sellerCode + StringUtils.getArrayFirst(paraMap.get("customerTypeCode"))
 						+ DateUtils.format("yyMMdd", date) + OrderSO;
 
 				if (!SalesOrderQuery.me().insertForApp(paraMap, orderId, orderSn, sellerId, user.getId(), date,
-						user.getDepartmentId(), user.getDataArea())) {
+						user.getDepartmentId(), user.getDataArea(), allTotalAmount)) {
 					return false;
 				}
 
@@ -204,7 +222,7 @@ public class OrderController extends BaseFrontController {
 				}
 				String proc_def_key = StringUtils.getArrayFirst(paraMap.get("proc_def_key"));
 				if (StrKit.notBlank(proc_def_key)) {
-					if (!start(orderId, proc_def_key)) {
+					if (!start(orderId, StringUtils.getArrayFirst(paraMap.get("customerName")), proc_def_key)) {
 						return false;
 					}
 				}
@@ -215,7 +233,7 @@ public class OrderController extends BaseFrontController {
 		return isSave;
 	}
 
-	private boolean start(String orderId, String proc_def_key) {
+	private boolean start(String orderId, String customerName, String proc_def_key) {
 
 		WorkFlowService workflow = new WorkFlowService();
 
@@ -233,6 +251,7 @@ public class OrderController extends BaseFrontController {
 
 		String acount = "";
 		String managerName = "";
+		String toUserId = "";
 
 		if(Consts.WORKFLOW_PROC_DEF_KEY_ORDER_REVIEW.equals(proc_def_key)) {
 			//一审是账务比较特殊
@@ -243,6 +262,7 @@ public class OrderController extends BaseFrontController {
 			User manager = UserQuery.me().findManagerByDeptId(user.getDepartmentId());
 			managerName = manager.getUsername();
 			param.put("manager", managerName);
+			toUserId = manager.getId();
 		}
 
 		if (StrKit.isBlank(acount) && StrKit.isBlank(managerName)) {
@@ -255,7 +275,13 @@ public class OrderController extends BaseFrontController {
 		salesOrder.setStatus(Consts.SALES_ORDER_STATUS_DEFAULT);
 		salesOrder.setProcInstId(procInstId);
 		
-		return salesOrder.update();
+		if(!salesOrder.update()) {
+			return false;
+		}
+		
+		sendOrderMessage(sellerId, customerName, "新增订单审核", user.getId(), toUserId, user.getDepartmentId(), user.getDataArea());
+		
+		return true;
 	}
 	
 	private String getAcount(String userId) {
@@ -264,6 +290,24 @@ public class OrderController extends BaseFrontController {
 		List<String> userNameList = UserGroupRelQuery.me().findUserNamesByRoleCode(Consts.GROUP_CODE_PREFIX_ROLE, Consts.ROLE_CODE_020, userIds);
 
 		return Joiner.on(",").join(userNameList);
+	}
+	
+	private void sendOrderMessage(String sellerId, String title, String content, String fromUserId, String toUserId, String deptId, String dataArea) {
+		
+		Message message = new Message();
+		message.setType(Message.ORDER_REVIEW_TYPE_CODE);
+		
+		message.setSellerId(sellerId);
+		message.setTitle(title);
+		message.setContent(content);
+		
+		message.setFromUserId(fromUserId);
+		message.setToUserId(toUserId);
+		message.setDeptId(deptId);
+		message.setDataArea(dataArea);
+		
+		MessageKit.sendMessage(Actions.ProcessMessage.PROCESS_MESSAGE_SAVE, message);
+		
 	}
 
 	public void audit() {
@@ -275,17 +319,6 @@ public class OrderController extends BaseFrontController {
 
 		SalesOrder salesOrder = SalesOrderQuery.me().findById(id);
 		setAttr("salesOrder", salesOrder);
-
-		// HistoricTaskInstanceQuery query =
-		// ActivitiPlugin.buildProcessEngine().getHistoryService()
-		// .createHistoricTaskInstanceQuery();
-		// query.orderByProcessInstanceId().asc();
-		// query.orderByHistoricTaskInstanceEndTime().desc();
-		// List<HistoricTaskInstance> list = query.list();
-		// for (HistoricTaskInstance hi : list) {
-		// System.out.println(hi.getAssignee() + " " + hi.getName() + " "
-		// + hi.getStartTime());
-		// }
 
 		String taskId = getPara("taskId");
 		List<Comment> comments = WorkFlowService.me().getProcessComments(taskId);
@@ -300,7 +333,9 @@ public class OrderController extends BaseFrontController {
 
 	public void complete() {
 		String orderId = getPara("id");
-
+		
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		
 		String taskId = getPara("taskId");
 		String comment = getPara("comment");
 		Integer pass = getParaToInt("pass", 1);
@@ -308,6 +343,7 @@ public class OrderController extends BaseFrontController {
 		Map<String, Object> var = Maps.newHashMap();
 		var.put("pass", pass);
 		var.put("orderId", orderId);
+		var.put(Consts.WORKFLOW_APPLY_COMFIRM, user);
 
 		WorkFlowService workflowService = new WorkFlowService();
 		workflowService.completeTask(taskId, comment, var);
@@ -332,7 +368,7 @@ public class OrderController extends BaseFrontController {
 			return;
 		}
 
-		renderAjaxResultForSuccess();
+		renderAjaxResultForSuccess("订单撤销成功");
 	}
 	
 	

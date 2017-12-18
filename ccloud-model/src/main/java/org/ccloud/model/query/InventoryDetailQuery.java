@@ -90,7 +90,7 @@ public class InventoryDetailQuery extends JBaseQuery {
 	
 	
 	
-	public Page<InventoryDetail> _in_paginate(int pageNumber, int pageSize,String keyword, String orderby,String userId,String dataArea) {
+	public Page<InventoryDetail> _in_paginate(int pageNumber, int pageSize,String keyword, String orderby,String sellerId,String dataArea) {
 		String select = "SELECT cid.*,cw.`name` as warehouse,csp.custom_name as sellerName ";
 		StringBuilder fromBuilder = new StringBuilder(" from cc_inventory_detail cid ");
 		fromBuilder.append(" LEFT JOIN cc_warehouse cw on cw.id = cid.warehouse_id ");
@@ -100,20 +100,20 @@ public class InventoryDetailQuery extends JBaseQuery {
 		boolean needWhere = true;
 
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cid.biz_bill_sn", keyword, params, needWhere);
-		//needWhere = appendIfNotEmptyWithLike(fromBuilder, "cid.data_area", dataArea, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cid.data_area", dataArea, params, needWhere);
 		if (needWhere) {
 				fromBuilder.append("where 1=1 and cid.biz_type in ('"+Consts.BIZ_TYPE_INSTOCK+"','"+Consts.BIZ_TYPE_SALES_REFUND_INSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_INSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_PLUS_INSTOCK+"') ");
 		}else{
 				fromBuilder.append("and cid.biz_type in ('"+Consts.BIZ_TYPE_INSTOCK+"','"+Consts.BIZ_TYPE_SALES_REFUND_INSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_INSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_PLUS_INSTOCK+"') ");
 		}
-		fromBuilder.append(" and cujw.user_id = '"+userId+"' GROUP BY cid.id order by " + orderby+" desc");	
+		fromBuilder.append(" and csp.seller_id = '"+sellerId+"' GROUP BY cid.id order by " + orderby+" desc");	
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 	
-	public Page<InventoryDetail> _out_paginate(int pageNumber, int pageSize,String keyword, String orderby,String userId,String dataArea) {
+	public Page<InventoryDetail> _out_paginate(int pageNumber, int pageSize,String keyword, String orderby,String sellerId,String dataArea) {
 		String select = "SELECT cid.*,cw.`name` as warehouse,csp.custom_name as sellerName ";
 		StringBuilder fromBuilder = new StringBuilder(" from cc_inventory_detail cid ");
 		fromBuilder.append(" LEFT JOIN cc_warehouse cw on cw.id = cid.warehouse_id ");
@@ -123,13 +123,13 @@ public class InventoryDetailQuery extends JBaseQuery {
 		boolean needWhere = true;
 
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cid.biz_bill_sn", keyword, params, needWhere);
-		//needWhere = appendIfNotEmptyWithLike(fromBuilder, "cid.data_area", dataArea, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cid.data_area", dataArea, params, needWhere);
 		if (needWhere) {
 				fromBuilder.append("where 1 = 1 and  cid.biz_type in ('"+Consts.BIZ_TYPE_P_OUTSTOCK+"','"+Consts.BIZ_TYPE_SALES_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_REDUCE_OUTSTOCK+"') ");
 		}else{
 				fromBuilder.append("and cid.biz_type in ('"+Consts.BIZ_TYPE_P_OUTSTOCK+"','"+Consts.BIZ_TYPE_SALES_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_REDUCE_OUTSTOCK+"') ");
 		}
-		fromBuilder.append(" and cujw.user_id = '"+userId+"' GROUP BY cid.id order by " + orderby+" desc");	
+		fromBuilder.append(" and csp.seller_id = '"+sellerId+"' GROUP BY cid.id order by " + orderby+" desc");	
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
@@ -168,7 +168,8 @@ public class InventoryDetailQuery extends JBaseQuery {
 
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
-
+	
+	//库存详细报表 产品总计
 	public Page<InventoryDetail> findByInventoryDetailListTotal(int pageNumber, int pageSize, String string,
 			String dataArea, String seller_id) {
 		String select = "SELECT cs.seller_name ,'总计' as `name` , sp.custom_name , SUM(cid.in_count) in_count, SUM(cid.out_count) out_count,SUM(cid.in_count)-SUM(cid.out_count) as balance_count";
@@ -185,5 +186,12 @@ public class InventoryDetailQuery extends JBaseQuery {
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+
+	public InventoryDetail findByInventoryDetail(String sellProductId, String warehouseId1, String startDate,
+			String endDate) {
+		String sql = "select * from cc_inventory_detail c where c.sell_product_id = '"+sellProductId+"' and c.warehouse_id ='";
+		sql=sql+warehouseId1+"'and c.create_date >= '"+startDate+"' and c.create_date <= '"+endDate+"' ORDER BY c.create_date DESC ";
+		return DAO.findFirst(sql);
 	}
 }

@@ -17,7 +17,6 @@ $(function() {
 		doSubmit();
   });
 
-
   initCustomer();
   $("#deliveryDate").calendar();
 
@@ -165,9 +164,15 @@ $(function() {
 		var products = $(".common");
 		var rowTotal = 0;
 		var total = 0;
+		var allTotalAmount = 0;
 		$.each(products, function(index, el) {
 			var $el = $(el);
+			var bigNum = parseInt($el.find("#bigNum").val());
+			var convert = parseInt($el.find("#convert").val());
+			var smallNum = parseInt($el.find("#smallNum").val());
 			rowTotal = $el.find("#bigNum").val() * $el.find("#bigPrice").val() + $el.find("#smallNum").val() * $el.find("#smallPrice").val();
+			var number = (smallNum/convert).toFixed(2);
+			allTotalAmount = allTotalAmount + bigNum + number*1;
 			$el.find("#rowTotal").val(rowTotal);
 			total += rowTotal;
 		});
@@ -175,9 +180,14 @@ $(function() {
 		var compositions = $(".composition");
 		$.each(compositions, function(index, el) {
 			var $el = $(el);
+			var comNum = $el.find("#compositionNum").val();
 			rowTotal = $el.find("#compositionNum").val() * $el.find("#compositionPrice").val();
 			$el.find("#rowTotal").val(rowTotal);
 			total += rowTotal;
+			if (!comNum) {
+				comNum = 0;
+			}
+			allTotalAmount = allTotalAmount + comNum*1;
 		});
 
 		var factor = $("#factor").val();
@@ -186,7 +196,7 @@ $(function() {
 		}
 		$("#total").val(total);
 		$("#totalNum").text("共" + (products.length + compositions.length) + "款,合计:" + total + "元")
-	
+		$("#allTotalAmount").val(allTotalAmount);
 	} 
 
 	function doSubmit(){
@@ -287,6 +297,7 @@ $(function() {
 							客户类型
 							<span class="require">*</span>
 						</div>
+						<input type="hidden" id="allTotalAmount" name="allTotalAmount" value="">
 						<input type="hidden" id="customerType" name="customerType" value="">
 						<input type="hidden" id="customerTypeCode" name="customerTypeCode" value="">
 						<input type="hidden" id="factor" name="factor" value="">

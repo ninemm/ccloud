@@ -18,6 +18,7 @@ package org.ccloud.utils;
 import java.security.InvalidParameterException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import org.joda.time.DateTime;
@@ -204,6 +205,63 @@ public class DateUtils {
 		} else {// 近一年
 			return dateTime.plusYears(-1).toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
 		}
+	}
+	
+	/**
+	 * 功能描述：通过类型返回开始时期与结束时期
+	 * @param dateType	类型(today、yesterday、week、lastweek、month、lastmonth)
+	 * @return
+	 * 返回类型：String
+	 * 创建人：zengcheng
+	 * 日期：2017年12月15日
+	 */
+	public static String[] getStartDateAndEndDateByType(String dayTag) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		String[] date = new String[2];
+		String startDate = "";
+		String endDate = "";
+		Calendar start = Calendar.getInstance();
+		Calendar end = Calendar.getInstance();
+		if (dayTag == null) dayTag = "";
+		if (dayTag.equals("today")) {
+			startDate = sdf.format(new Date());
+			endDate = startDate + " 23:59:59";
+		} else if(dayTag.equals("yesterday")) {
+			start.add(Calendar.DATE,-1);
+			startDate = sdf.format(start.getTime());
+			endDate = sdf.format(start.getTime()) + " 23:59:59";
+		} else if (dayTag.equals("week")) {
+			start.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY); //获取本周一的日期  
+	        startDate = sdf.format(start.getTime());
+	        end.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY); //获取本周日的日期  
+	        end.add(Calendar.WEEK_OF_YEAR, 1);  
+	        endDate = sdf.format(end.getTime()) + " 23:59:59";
+		} else if (dayTag.equals("lastweek")) {
+		    int dayOfWeek = start.get(Calendar.DAY_OF_WEEK) - 1;  
+		    int offset1 = 1 - dayOfWeek;  
+		    int offset2 = 7 - dayOfWeek;  
+		    start.add(Calendar.DATE, offset1 - 7);  
+		    end.add(Calendar.DATE, offset2 - 7);  
+		    startDate = sdf.format(start.getTime());  
+		    endDate = sdf.format(end.getTime()) + " 23:59:59"; 
+		} else if (dayTag.equals("month")) {
+			start.add(Calendar.MONTH, 0);
+			start.set(Calendar.DAY_OF_MONTH,1);//设置为1号,当前日期既为本月第一天 
+			startDate = sdf.format(start.getTime());
+			//获取当前月最后一天
+			end.set(Calendar.DAY_OF_MONTH, end.getActualMaximum(Calendar.DAY_OF_MONTH));  
+			endDate = sdf.format(end.getTime()) + " 23:59:59";
+		} else if (dayTag.equals("lastmonth")) {
+			start.add(Calendar.MONTH, -1);
+			start.set(Calendar.DAY_OF_MONTH,1);//设置为1号,当前日期既为本月第一天 
+			startDate = sdf.format(start.getTime());
+			//获取前月的最后一天
+			end.set(Calendar.DAY_OF_MONTH,0);//设置为1号,当前日期既为本月第一天 
+			endDate = sdf.format(end.getTime()) + " 23:59:59";
+		}
+		date[0] = startDate;
+		date[1] = endDate;
+		return date;
 	}
 	
 	public static void main(String[] args) throws ParseException {

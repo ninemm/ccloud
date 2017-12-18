@@ -169,6 +169,22 @@ public abstract class BaseCustomerVisit<M extends BaseCustomerVisit<M>> extends 
 	public java.math.BigDecimal getLat() {
 		return get("lat");
 	}
+	
+	public void setReviewLng(java.math.BigDecimal lng) {
+		set("review_lng", lng);
+	}
+
+	public java.math.BigDecimal getReviewLng() {
+		return get("review_lng");
+	}
+
+	public void setReviewLat(java.math.BigDecimal lat) {
+		set("review_lat", lat);
+	}
+
+	public java.math.BigDecimal getReviewLat() {
+		return get("review_lat");
+	}
 
 	public void setLocation(java.lang.String location) {
 		set("location", location);
@@ -226,12 +242,12 @@ public abstract class BaseCustomerVisit<M extends BaseCustomerVisit<M>> extends 
 		return getStr("review_address");
 	}
 
-	public void setStatus(java.lang.Integer status) {
+	public void setStatus(java.lang.String status) {
 		set("status", status);
 	}
 
-	public java.lang.Integer getStatus() {
-		return getInt("status");
+	public java.lang.String getStatus() {
+		return getStr("status");
 	}
 
 	public void setReviewDate(java.util.Date reviewDate) {

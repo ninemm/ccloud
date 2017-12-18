@@ -63,7 +63,8 @@ public class _ReportController extends JBaseController {
 		for (InventoryDetail inventoryDetail : list) {
 			String warehouseId1 = inventoryDetail.getWarehouseId();
 			String sellProductId = inventoryDetail.getSellProductId();
-			InventoryDetail inventoryDetail1 = InventoryDetailQuery.me().findBySellerProductId(sellProductId, warehouseId1);
+			//得到查询时间段中最新的剩余商品件数
+			InventoryDetail inventoryDetail1 = InventoryDetailQuery.me().findByInventoryDetail(sellProductId, warehouseId1,startDate,endDate);
 			inventoryDetail.setBalanceCount(inventoryDetail1.getBalanceCount());
 			list1.add(inventoryDetail);
 		}

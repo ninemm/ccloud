@@ -1,0 +1,410 @@
+<#include "_inc/_layout.html"/>
+
+<#macro css>
+    .report {
+        font-size: 0.7rem;
+	    position: absolute;
+	    top: 0;
+	    width: 100%;
+	    bottom: 50px;
+	    overflow: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .report .weui-panel__hd:after {
+        left: 0;
+        height: 0;
+    }
+</#macro>
+
+<#macro css_import>
+<link rel="stylesheet" href="${CTPATH}/css/normalize.css">
+</#macro>
+<#macro script_import>
+<script type='text/javascript' src="${CTPATH}/js/echarts.min.js"></script>
+</#macro>  
+<#macro script>
+  $(function () {
+  
+    $(".end-date").calendar();
+    $(".end-date").val($.today());
+    $(".begin-date").calendar();
+    $(".begin-date").val($.today());
+    var startDate = $.today();
+	var endDate = $.today() + ' 23:59:59';  
+	var params = {
+		"dayTag":  'today',
+		"startDate": startDate,
+		"endDate" : endDate
+	}  
+ 	orderAmount(params);
+ 	refundCount(params);
+ 	orderStatus(params);
+ 	customerCount(params);
+ 	productCount(params);
+  })
+  
+    function orderAmount(params) {
+		Utils.ajax('${CPATH}/report/orderAmount', params, 
+			function(data){
+				$("#productCount").html(data.productCount+"件/");
+				$("#totalCount").html(data.orderCount+"笔");
+				$("#totalAmount").html(data.totalAmount+"元");
+			}
+		);    	
+    }
+    
+    function refundCount(params) {
+		Utils.ajax('${CPATH}/report/refundCount', params, 
+			function(data){
+				$("#refundAmount").html(data.totalAmount);
+				$("#refundCount").html(data.totalCount);
+			}
+		);    	
+    }    
+    
+    function orderStatus(params) {
+		Utils.ajax('${CPATH}/report/orderTypeCount', params, 
+			function(data){
+	            var crSeriesData = [];
+	            var length = data.length;
+	            if (length == 0) {
+	                crSeriesData.push({
+	                    name: '暂无数据',
+	                    value: 0
+	                });	            	
+	            }	
+	            for(var i = 0; i < length; i++){
+	                crSeriesData.push({
+	                    name: data[i].status + '(' + data[i].count + ')',
+	                    value: data[i].count
+	                });
+	            }
+	            var orderStatus = document.getElementById('orderStatus');
+	            var orderStatusChart = echarts.init(orderStatus);
+	            var crOption = {
+	                title: [{
+	                    textStyle: {
+	                        fontWeight: 'normal',
+	                        fontSize: 16
+	                    }
+	                }],
+	                color: ['#4ac7f5', '#f36f8a', '#fd9173', '#AF89D6', '#5f71d2'],
+	                series: [
+	                    {
+	                        type:'pie',
+	                        radius: ['25%', '45%'],
+	                        center: ['32%', '50%'],
+	                        avoidLabelOverlap: false,
+	                        label: {
+	                            normal: {
+	                                textStyle: {
+	                                    fontSize: 10
+	                                }
+	                            }
+	                        },
+	                        data:crSeriesData
+	                    }
+	                ]
+	            };
+	            orderStatusChart.resize();
+	            orderStatusChart.setOption(crOption,true);
+			}
+		);    	
+    }
+    
+    function customerCount(params) {
+		Utils.ajax('${CPATH}/report/customerCount', params, 
+			function(data){
+	            var crSeriesData = [];
+	            var length = data.length;
+	            if (length == 0) {
+	                crSeriesData.push({
+	                    name: '暂无数据',
+	                    value: 0
+	                });	            	
+	            }	
+	            for(var i = 0; i < length; i++){
+	                crSeriesData.push({
+	                    name: data[i].customer_name + '(' + data[i].totalAmount + ')',
+	                    value: data[i].totalAmount
+	                });
+	            }
+	            var customerCount = document.getElementById('customerCount');
+	            var customerCountChart = echarts.init(customerCount);
+	            var crOption = {
+	                title: [{
+	                    textStyle: {
+	                        fontWeight: 'normal',
+	                        fontSize: 16
+	                    }
+	                }],
+	                color: ['#4ac7f5', '#f36f8a', '#fd9173', '#AF89D6', '#5f71d2'],
+	                series: [
+	                    {
+	                        type:'pie',
+	                        radius: ['25%', '45%'],
+	                        center: ['32%', '50%'],
+	                        avoidLabelOverlap: false,
+	                        label: {
+	                            normal: {
+	                                textStyle: {
+	                                    fontSize: 10
+	                                }
+	                            }
+	                        },
+	                        data:crSeriesData
+	                    }
+	                ]
+	            };
+	            customerCountChart.resize();
+	            customerCountChart.setOption(crOption,true);
+			}
+		);     
+    }
+    
+    function productCount(params) {
+		Utils.ajax('${CPATH}/report/productCount', params, 
+			function(data){
+	            var crSeriesData = [];
+	            var length = data.length;
+	            if (length == 0) {
+	                crSeriesData.push({
+	                    name: '暂无数据',
+	                    value: 0
+	                });	            	
+	            }
+	
+	            for(var i = 0; i < length; i++){
+	                crSeriesData.push({
+	                    name: data[i].custom_name + '(' + data[i].totalAmount + ')',
+	                    value: data[i].totalAmount
+	                });
+	            }
+	            var productCount = document.getElementById('productCanve');
+	            var productCountChart = echarts.init(productCanve);
+	            var crOption = {
+	                title: [{
+	                    textStyle: {
+	                        fontWeight: 'normal',
+	                        fontSize: 16
+	                    }
+	                }],
+	                color: ['#4ac7f5', '#f36f8a', '#fd9173', '#AF89D6', '#5f71d2'],
+	                series: [
+	                    {
+	                        type:'pie',
+	                        radius: ['25%', '45%'],
+	                        center: ['32%', '50%'],
+	                        avoidLabelOverlap: false,
+	                        label: {
+	                            normal: {
+	                                textStyle: {
+	                                    fontSize: 10
+	                                }
+	                            }
+	                        },
+	                        data:crSeriesData
+	                    }
+	                ]
+	            };
+	            productCountChart.resize();
+	            productCountChart.setOption(crOption,true);
+			}
+		);    	
+    }
+    
+    function urlSelect(params, type){
+    	if (type == 'order') {
+			orderAmount(params);
+		} else if (type == 'customer') {
+			customerCount(params);
+		} else if (type == 'product') {
+			productCount(params);
+		} else {
+			refundCount(params);
+		}
+    }
+    
+    function startDaySelect(obj,type) {
+		var params = {
+    		"startDate": $(obj).val(),
+			"endDate": $(obj).parent().find('#endDay').val()
+		}
+		urlSelect(params,type); 
+    }
+    
+    function endDaySelect(obj,type) {
+		var params = {
+    		"startDate": $(obj).parent().find('#startDay').val(),
+			"endDate": $(obj).val()
+		}
+		urlSelect(params,type); 
+    }    
+    
+ 	function dayTagSelect(obj,type) {
+      $.actions({
+        actions: [{
+          text: "今日",
+          onClick: function () {
+			var params = {
+				"dayTag": 'today'
+			}
+			urlSelect(params,type); 
+            $(obj).find(".dayTagText").text('今日')
+          }
+        }, {
+          text: "昨日",
+          onClick: function () {
+			var params = {
+				"dayTag": 'yesterday'
+			}
+          	urlSelect(params,type);
+            $(obj).find(".dayTagText").text('昨日')
+          }
+        }, {
+          text: "本周",
+          onClick: function () {
+			var params = {
+				"dayTag": 'week'
+			}
+			urlSelect(params,type);   
+          	$(obj).find(".dayTagText").text('本周')
+          }
+        }, {
+          text: "上周",
+          onClick: function () {
+			var params = {
+				"dayTag": 'lastweek'
+			}
+          urlSelect(params,type);
+          $(obj).find(".dayTagText").text('上周')
+          }
+        }, {
+          text: "本月",
+          onClick: function () {
+			var params = {
+				"dayTag": 'month'
+			}     
+			urlSelect(params,type);    
+         	$(obj).find(".dayTagText").text('本月')
+          }
+        }, {
+          text: "上月",
+          onClick: function () {
+			var params = {
+				"dayTag": 'lastmonth'
+			}         
+			urlSelect(params,type);
+          	$(obj).find(".dayTagText").text('上月')
+          }
+        }]
+      }); 	
+ 	}  
+</#macro>
+<@layout>
+	<div class="weui-content">
+	<div class="report">
+		<div class="weui-panel weui-panel_access report-header">
+			<div class="weui-panel__hd">
+				<span class="overview-hd-title">销售简报</span> <span class="briefly" onclick="dayTagSelect(this,'order')">
+					<p class="dayTagText">今日</p>
+					<i class="icon-angle-down"></i>
+				</span> 
+				<input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'order')" readonly="">
+				<span class="overview-hd-segmenting fr"> - </span> 
+				<input class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'order')" readonly="">
+			</div>
+			<div class="weui-panel__bd">
+				<div class="weui-flex overview-block">
+					<div class="weui-flex__item">
+						<div class="overview-title">
+							<img src="${CTPATH}/images/order.png"> <span>订单总数</span>
+						</div>
+						<div class="t-c">
+							<strong id="productCount">0</strong> <small id="totalCount">/ 0笔</small>
+						</div>
+					</div>
+					<div class="weui-flex__item">
+						<div class="overview-title">
+							<img src="${CTPATH}/images/money.png"> <span>订单金额</span>
+						</div>
+						<div class="t-c">
+							<strong id="totalAmount">0</strong>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="weui-panel weui-panel_access">
+			<div class="weui-panel__hd">
+				<span class="overview-hd-title">客户订单统计</span> <span class="briefly" onclick="dayTagSelect(this,'customer')">
+				<p class="dayTagText">今日</p>
+					<i class="icon-angle-down"></i>
+				</span> <input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'customer')" readonly="">
+				<span class="overview-hd-segmenting fr"> - </span> <input
+					class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'customer')" readonly="">
+			</div>
+			<div class="weui-panel__bd report-area">
+				<div class="weui-media-box ft14">
+					<div id="customerCount" style="width:600px; height: 300px;">
+						
+					</div>
+					<a class="report-detail" href="${CPATH}/report/customerDetail">详情></a>
+				</div>
+			</div>
+		</div>
+		<div class="weui-panel weui-panel_access">
+			<div class="weui-panel__hd">
+				<span class="overview-hd-title">商品销售统计</span> <span class="briefly" onclick="dayTagSelect(this,'product')">
+				<p class="dayTagText">今日</p>
+					<i class="icon-angle-down"></i>
+				</span> <input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'product')" readonly="">
+				<span class="overview-hd-segmenting fr"> - </span> <input
+					class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'product')" readonly="">
+			</div>
+			<div class="weui-panel__bd report-area">
+				<div class="weui-media-box ft14">
+					<div id="productCanve" style="width:600px; height: 300px;">
+						
+					</div>
+					<a class="report-detail" href="${CPATH}/report/productDetail">详情></a>
+				</div>
+			</div>
+		</div>
+		<div class="weui-panel weui-panel_access margin-0">
+			<div class="weui-panel__hd"><span class="overview-hd-title">订单完成统计</span></div>
+			<div class="weui-panel__bd report-area">
+				<div class="weui-media-box ft14">
+					<div id="orderStatus" style="width:600px; height: 300px;"></div>
+				</div>
+			</div>
+		</div>		
+		<div class="weui-panel weui-panel_access">
+			<div class="weui-panel__hd">
+				<span class="overview-hd-title">退货统计</span> <span class="briefly" onclick="dayTagSelect(this,'refund')">
+				<p class="dayTagText">今日</p>
+					<i class="icon-angle-down"></i>
+				</span> <input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'refund')" readonly="">
+				<span class="overview-hd-segmenting fr"> - </span> <input
+					class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'refund')" readonly="">
+			</div>
+			<div class="weui-panel__bd report-area">
+				<div class="weui-media-box ft14">
+					<div class="weui-flex t-c">
+						<div class="weui-flex__item border-right-1px">
+							<p class="ft16">退货金额（元）</p>
+							<p class="ft24 orange" id="refundAmount">7,000.00</p>
+						</div>
+						<div class="weui-flex__item">
+							<p class="ft16">退货数量（笔）</p>
+							<p class="ft24 orange" id="refundCount">1</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		</div>
+		<#include "_inc/_footer_nav.html" />
+	</div>
+</@layout>

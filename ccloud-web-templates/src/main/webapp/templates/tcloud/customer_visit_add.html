@@ -178,6 +178,7 @@
             },
             success: function(res) {
                 layer.closeAll();
+
                 if (res.errorCode == 0) {
                     $.confirm({
                         title: res.message,
@@ -328,7 +329,8 @@
                                 <div class="weui-uploader__info">0/3</div>
                             </div>
                             <div class="weui-uploader__bd">
-                                <ul class="weui-uploader__files" id="uploaderFiles"></ul>
+                                <ul class="weui-uploader__files" id="uploaderFiles">
+                                </ul>
                                 <div class="weui-uploader__input-box">
                                     <input id="uploaderInput" class="weui-uploader__input" type="file" accept="image/*" multiple="">
                                     <input type="hidden" name="pic" id="pic">

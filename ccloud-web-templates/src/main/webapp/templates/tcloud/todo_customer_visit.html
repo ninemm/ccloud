@@ -1,10 +1,6 @@
 <#include "_inc/_layout.html"/>
 
 <#macro css>
-    #customer-audit {
-        background: #f3f5f7;
-        height: inherit;
-    } 
 </#macro>
 <#macro script_import>
 	<script src="${CPATH}/static/layer_mobile/layer.js"></script>
@@ -68,30 +64,29 @@
 
 <@layout>
 
+<div class="weui-content">
 <div id="customer-audit">
     <main style="top:12px">
         <#if page ??> <#list page.list as bean>
 		<div class="weui-panel weui-panel_access">
 			<div class="weui-cell weui-cell_access">
 			    <a href="${CPATH}/customerVisit/review?id=${bean.id}&taskId=${bean.taskId!}&assignee=${bean.assignee}"> 
-				<div class="weui-cell__bd ft14">
-					<p>${(bean.customer_name)!}</p>
-					<div class="ft12 gray">
+				<div class="weui-cell__bd">
+					<p class="ft16">${(bean.customer_name)!}</p>
+					<div class="ft14 gray">
 						<p>联系人：${(bean.contact)!} / ${(bean.mobile)!}</p>
 						<p>客户类型：终端</p>
 						<p>配送地址：${(bean.prov_name)!} ${(bean.city_name)!} ${(bean.country_name)!} ${(bean.address)!}</p>
-						<p>
-							<i class="icon-map-pin ft16 green"></i>&nbsp;&nbsp; ${(bean.location)!}
-						</p>
+						<p><i class="icon-map-pin ft16 green"></i> ${(bean.location)!}</p>
 					</div>
 				</div>
 				</a>
 			</div>
 			<div class="weui-cell weui-cell_access">
-				<a class="weui-cell__bd" style="color: gray" href="${CPATH}/customerVisit/review?id=${bean.id}&taskId=${bean.taskId!}&assignee=${bean.assignee}">拜访详情</a>
-				<span class="weui-cell__ft"></span>
+				<a class="weui-cell__bd weui-cell_link" href="${CPATH}/customerVisit/review?id=${bean.id}&taskId=${bean.taskId!}&assignee=${bean.assignee}">客户拜访详情</a>
+				<span class="weui-cell__ft">${(bean.createTime?string('yyyy-MM-dd HH:mm'))!}</span>
 			</div>
-			<div class="weui-cell weui-cell_access">
+			<div class="weui-cell">
 				<div class="weui-flex space-between width-100 ft14">
 					<div class="button white-button" onclick="doReject('${CPATH}/customerVisit/complete?id=${(bean.id)!}&taskId=${(bean.taskId)}&status=0')">拒绝</div>
 					<div class="button red-button" onclick="doSubmit('${CPATH}/customerVisit/complete?id=${(bean.id)!}&taskId=${(bean.taskId)}&status=1')">同意</div>
@@ -111,5 +106,6 @@
         </#if> 
 	</main>
     <#include "_inc/_goback.html" />
+</div>
 </div>
 </@layout>
