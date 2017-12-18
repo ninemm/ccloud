@@ -16,9 +16,13 @@
 package org.ccloud.model.query;
 
 import java.util.LinkedList;
+import java.util.List;
+
 import org.ccloud.model.OutstockPrint;
 
+import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
 /**
@@ -65,6 +69,10 @@ public class OutstockPrintQuery extends JBaseQuery {
 			return deleteCount;
 		}
 		return 0;
+	}
+	
+	public List<Record> findByOrderId(String orderId) {
+		return Db.find(" select op.status, op.create_date, u.realname from cc_outstock_print op left join user u on op.biz_user_id = u.id where op.order_id = ? order by op.create_date", orderId);
 	}
 
 	

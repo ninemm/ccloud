@@ -22,8 +22,7 @@ import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
-import org.activiti.engine.history.HistoricActivityInstance;
-import org.activiti.engine.history.HistoricActivityInstanceQuery;
+import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.Model;
 import org.activiti.engine.repository.ProcessDefinition;
@@ -328,24 +327,18 @@ public class WorkFlowService {
 		return taskService.getVariable(taskId, variableName);
 	}
 	
-	public List<Comment> getProcessComments(String taskId) {
+	public List<Comment> getProcessComments(String procInstId) {
 		
 		List<Comment> historyCommnets = Lists.newArrayList();
-		
+
 		TaskService taskService = ActivitiPlugin.buildProcessEngine().getTaskService();
-		RuntimeService runtimeService = ActivitiPlugin.buildProcessEngine().getRuntimeService();
 		HistoryService historyService = ActivitiPlugin.buildProcessEngine().getHistoryService();
-		
-		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
-        ProcessInstance pi = runtimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
         
-        HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
-        //query.orderByHistoricActivityInstanceId().asc();
-        query.orderByHistoricActivityInstanceEndTime().desc();
-        List<HistoricActivityInstance> hais = query.processInstanceId(pi.getId()).activityType("userTask").list();
-        
-        for (HistoricActivityInstance hai : hais) {
-            String historytaskId = hai.getTaskId();
+		List<HistoricTaskInstance> htiList = historyService.createHistoricTaskInstanceQuery()//历史任务表查询
+				.processInstanceId(procInstId)//使用流程实例ID查询
+				.list();
+        for (HistoricTaskInstance  hai : htiList) {
+            String historytaskId = hai.getId();
             List<Comment> comments = taskService.getTaskComments(historytaskId);
             // 4）如果当前任务有批注信息，添加到集合中
             if(comments!=null && comments.size()>0){
