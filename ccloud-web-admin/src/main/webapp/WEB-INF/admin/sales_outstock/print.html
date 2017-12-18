@@ -83,7 +83,7 @@ var headerStr =
 					'<div><span>联系电话：{2}</span><span class="sign" >收货单位签字盖章</span></div>' +
 				'</div>' +
 				'<div style="text-align: left; width: inherit; font-size: 10px; line-height: 12px;">' +
-					'<span class="width200">备注：{3}</span><span style="float: right;">白联：客户 红联：提单 蓝联：结算</span>' +
+					'<span class="width200">备注：{3}</span><span style="float: right;">{4}</span>' +
 				'</div>' +
 			'</div>';
 
@@ -142,8 +142,10 @@ function queryPrintDetail() {
                     headerContent = $.format(headerStr, item.outstockSn, placeOrderTime, curDate, item.customerName, item.customerContacts, item.customerPhone, item.deliveryAddress, placeOrderMan, placeOrderPhone, item.warehouseName);
 
                     var salesAmount = DX(item.salesAmount);
-
-                    footerContent = $.format(footerStr, salesAmount, item.salesAmount, warehousePhone, remark);
+                    
+                    let printFootContext = item.printFootContext;
+                    if (!printFootContext) printFootContext = '';
+                    footerContent = $.format(footerStr, salesAmount, item.salesAmount, warehousePhone, remark,printFootContext);
 
                     batchPrintContent += headerInfoContent + headerContent + content + footerContent;
 

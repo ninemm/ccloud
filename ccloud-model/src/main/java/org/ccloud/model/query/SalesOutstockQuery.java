@@ -261,7 +261,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 	
 	public printAllNeedInfo findStockOutForPrint(final String id) {
 		StringBuilder fromBuilder = new StringBuilder("select o.outstock_sn,o.delivery_address,o.total_amount, cs.customer_kind, c.id as customerId, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as customerTypeCode, u.realname, u.mobile, ");
-		fromBuilder.append(" w.code as warehouseCode, cp.factor,w.`name` as warehouseName,w.phone as warehousePhone,o.create_date as placeOrderTime,o.remark,sn.seller_name,so.total_amount,so.id as orderId,so.biz_user_id,o.id as salesOutStockId ");
+		fromBuilder.append(" w.code as warehouseCode, cp.factor,w.`name` as warehouseName,w.phone as warehousePhone,o.create_date as placeOrderTime,o.remark,sn.seller_name,so.total_amount,so.id as orderId,so.biz_user_id,o.id as salesOutStockId,sn.id as sellerId,pt.context as printFootContext ");
 		fromBuilder.append(" from `cc_sales_outstock` o ");
 		fromBuilder.append(" left join cc_seller_customer cs on o.customer_id = cs.id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sj on sj.outstock_id = o.id ");
@@ -272,6 +272,8 @@ public class SalesOutstockQuery extends JBaseQuery {
 		fromBuilder.append(" left join cc_price_system cp on cp.id = ct.price_system_id ");
 		fromBuilder.append(" left join user u on so.biz_user_id = u.id ");
 		fromBuilder.append(" left join cc_warehouse w on o.warehouse_id = w.id ");
+		fromBuilder.append(" LEFT JOIN cc_seller_join_template cjt on cjt.seller_id = sn.id ");
+		fromBuilder.append(" LEFT JOIN cc_print_template pt on pt.id = cjt.print_template_id ");
 		fromBuilder.append(" where o.id = ? ");
 		printAllNeedInfo printAllNeedInfo = new printAllNeedInfo();
 		 List<Record> records = Db.find(fromBuilder.toString(), id);
@@ -292,6 +294,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 			printAllNeedInfo.setOrderId(record.getStr("orderId"));
 			printAllNeedInfo.setBizUserId(record.getStr("biz_user_id"));
 			printAllNeedInfo.setSalesOutStockId(record.getStr("salesOutStockId"));
+			printAllNeedInfo.setPrintFootContext(record.getStr("printFootContext"));
 		}
 		    return printAllNeedInfo;
 	}

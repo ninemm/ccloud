@@ -22,8 +22,9 @@ public class printAllNeedInfo {
 	private String deliveryAddress;//配送地址
 	private String sellerName;//销售商名字
 	private String orderId;//订单ID
-	private String bizUserId;//
-	private String salesOutStockId;
+	private String bizUserId;//业务员ID
+	private String salesOutStockId;//出库单ID
+	private String printFootContext;//打印的页脚内容
 	private List<orderProductInfo> orderProductInfos;//订单明细信息
 	public String getOutstockSn() {
 		return outstockSn;
@@ -139,6 +140,12 @@ public class printAllNeedInfo {
 	}
 	public void setSalesOutStockId(String salesOutStockId) {
 		this.salesOutStockId = salesOutStockId;
+	}
+	public String getPrintFootContext() {
+		return printFootContext;
+	}
+	public void setPrintFootContext(String printFootContext) {
+		this.printFootContext = printFootContext;
 	}
 	
 }

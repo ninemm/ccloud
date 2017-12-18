@@ -82,7 +82,16 @@
 					},
 					edit: false
 				},
-				{field: "status", title: "状态", align: "center", width: '5%',edit: false,
+				{field: "is_print", title: "打印状态", align: "center", width: '5%',edit: false,
+					formatter: function(value, row, rowIndex) {
+						if (value == 0) {
+							return '未打印';
+						} else {
+							return '已打印'
+						}
+					}
+				},
+				{field: "status", title: "出库状态", align: "center", width: '5%',edit: false,
 					formatter: function(value, row, rowIndex) {
 						if (value == 0) {
 							return '待出库';
