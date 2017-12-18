@@ -15,7 +15,6 @@
  */
 package org.ccloud.controller.admin;
 
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -168,8 +167,8 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 				purchaseInstockDetail.set("id", StrKit.getRandomUUID());
 				purchaseInstockDetail.set("purchase_instock_id", purchaseInstockId);
 				purchaseInstockDetail.set("product_count", purchaseOrderDetail.getProductCount());
-				purchaseInstockDetail.set("product_price", sellerProducts.get(i).getPrice());
-				purchaseInstockDetail.set("product_amount", sellerProducts.get(i).getPrice().multiply(new BigDecimal(purchaseOrderDetail.getProductCount())));
+				purchaseInstockDetail.set("product_price", purchaseOrderDetail.getProductPrice());
+				purchaseInstockDetail.set("product_amount", purchaseOrderDetail.getProductAmount());
 				purchaseInstockDetail.set("purchase_order_detail_id", purchaseOrderDetail.getId());
 				purchaseInstockDetail.set("order_list", purchaseOrderDetail.getOrderList());
 				purchaseInstockDetail.set("create_date", date);

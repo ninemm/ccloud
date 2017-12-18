@@ -281,7 +281,7 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 			if(inventory!=null){
 				inventory.set("in_count", inventory.getInCount().add(count2.divide(convent, 2, BigDecimal.ROUND_HALF_UP)));
 				inventory.set("in_amount",inventory.getInAmount().add(pi.getProductAmount()));
-				inventory.set("in_price", pi.getProductAmount().divide((count2.divide(convent)),2, BigDecimal.ROUND_HALF_UP));
+				inventory.set("in_price", pi.getProductPrice());
 				inventory.set("balance_count", inventory.getBalanceCount().add(count2.divide(convent, 2, BigDecimal.ROUND_HALF_UP)));
 				inventory.set("balance_amount", inventory.getBalanceAmount().add(pi.getProductAmount()));
 				inventory.set("modify_date", new Date());
@@ -297,7 +297,7 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 				inventory.set("seller_id", seller.getId());
 				inventory.set("in_count", count2.divide(convent, 2, BigDecimal.ROUND_HALF_UP));
 				inventory.set("in_amount",pi.getProductAmount());
-				inventory.set("in_price", pi.getProductAmount().divide((count2.divide(convent)),2, BigDecimal.ROUND_HALF_UP));
+				inventory.set("in_price", pi.getProductPrice());
 				inventory.set("balance_count", count2.divide(convent, 2, BigDecimal.ROUND_HALF_UP));
 				inventory.set("balance_amount", pi.getProductAmount());
 				inventory.set("balance_price", pi.getProductPrice());
@@ -322,10 +322,10 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 			inventoryDetail.set("sell_product_id",pi.getSellerProductId());
 			inventoryDetail.set("in_count", count2.divide(convent, 2, BigDecimal.ROUND_HALF_UP));
 			inventoryDetail.set("in_amount", pi.getProductAmount());
-			inventoryDetail.set("in_price", sellerProduct.getPrice());
+			inventoryDetail.set("in_price", pi.getProductPrice());
 			inventoryDetail.set("balance_count",storeCount );
-			inventoryDetail.set("balance_amount", storeCount.multiply(sellerProduct.getPrice()));
-			inventoryDetail.set("balance_price", sellerProduct.getPrice());
+			inventoryDetail.set("balance_amount", storeCount.multiply(pi.getProductPrice()));
+			inventoryDetail.set("balance_price", pi.getProductPrice());
 			inventoryDetail.set("biz_type", Consts.BIZ_TYPE_INSTOCK);
 			inventoryDetail.set("biz_bill_sn", pi.get("pwarehouse_sn"));
 			inventoryDetail.set("biz_date", new Date());
