@@ -36,6 +36,9 @@ import org.joda.time.DateTime;
 import com.jfinal.handler.Handler;
 import com.jfinal.kit.HandlerKit;
 import com.jfinal.kit.StrKit;
+import com.jfinal.render.FreeMarkerRender;
+
+import freemarker.ext.servlet.HttpSessionHashModel;
 
 public class JHandler extends Handler {
 
@@ -53,8 +56,11 @@ public class JHandler extends Handler {
 			return ;
 		}
 		
+		//HttpSessionHashModel session = new HttpSessionHashModel(request.getSession(), FreeMarkerRender.getConfiguration().getObjectWrapper());
+		
 		String CPATH = request.getContextPath();
 		request.setAttribute("REQUEST", request);
+		//request.setAttribute("SESSION", session);
 		request.setAttribute("CPATH", CPATH);
 		request.setAttribute("SPATH", CPATH + "/static");
 		request.setAttribute("JPRESS_VERSION", CCloud.VERSION);

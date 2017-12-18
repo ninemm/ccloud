@@ -15,8 +15,6 @@
  */
 package org.ccloud.model.router;
 
-import java.text.SimpleDateFormat;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -79,7 +77,7 @@ public class ContentRouter extends RouterConverter {
 			return SLASH + content.getModule() + SLASH + content.getSlug();
 		}
 		// 模型ID
-		else if (TYPE_STATIC_MODULE_ID.equals(settingType)) {
+		/*else if (TYPE_STATIC_MODULE_ID.equals(settingType)) {
 			return SLASH + content.getModule() + SLASH + content.getId();
 		}
 		// 日期SLUG
@@ -111,7 +109,7 @@ public class ContentRouter extends RouterConverter {
 		else if (TYPE_DYNAMIC_SLUG.equals(settingType)) {
 			String prefix = getRouterPrefix();
 			return SLASH + prefix + "?slug=" + content.getSlug();
-		}
+		}*/
 		else {
 			return Consts.ROUTER_CONTENT + "?id=" + content.getId();
 		}

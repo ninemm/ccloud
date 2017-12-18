@@ -4,6 +4,19 @@
 
 <#macro script>
 $(function() {
+    var $dialog = $('#dialog');
+    
+    $dialog.on('click', '.weui-dialog-btn', function() {
+        $(this).fadeOut(200);
+    });
+    
+    $('#service_btn').on('click', function() {
+        //$dialog.fadeIn(200);
+        layer.open({
+            type: 1,
+            content: $('#dialog')
+        });
+    });
 });
 </#macro> 
 
@@ -135,7 +148,7 @@ $(function() {
 				</div>
 				<p class="weui-grid__label">拜访记录</p>
 			</a> 
-			<a href="${CPATH}/customerVisit/visitAdd" class="weui-grid js_grid">
+			<a href="${CPATH}/customerVisit/edit" class="weui-grid js_grid">
 				<div class="weui-grid__icon">
 					<i class="icon-plane" style="color: #19c594"></i>
 				</div>
@@ -144,7 +157,7 @@ $(function() {
 		</div>
 		<div class="weui-cells__title">售后服务</div>
 		<div class="weui-grids">
-			<a href="" class="weui-grid js_grid">
+			<a href="javascript:void(0);" id="service_btn" class="weui-grid js_grid">
 				<div class="weui-grid__icon">
 					<i class="icon-phone-square" style="color: #9c89b9"></i>
 				</div>
@@ -159,15 +172,15 @@ $(function() {
 		</div>
 	</div>
 </article>
-<!-- <div class="hidden-menu">
-	<ul>
-		<li><a href="./information.html"> 咨询 <i
-				class="icon-bell blue"></i>
-		</a></li>
-	</ul>
-	<i class="icon-menu-open orange fr" id="button"></i>
-</div> -->
-
 <#include "_inc/_footer_nav.html" />
-
+<div id="dialog">
+        <div class="weui-mask"></div>
+        <div class="weui-dialog">
+            <div class="weui-dialog__hd"><strong class="weui-dialog__title">弹窗标题</strong></div>
+            <div class="weui-dialog__bd">弹窗内容，告知当前页面信息等</div>
+            <div class="weui-dialog__ft">
+                <a href="javascript:;" class="weui-dialog__btn weui-dialog__btn_primary">确定</a>
+            </div>
+        </div>
+    </div>
 </@layout>
