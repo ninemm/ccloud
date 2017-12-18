@@ -261,7 +261,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 	
 	public printAllNeedInfo findStockOutForPrint(final String id) {
 		StringBuilder fromBuilder = new StringBuilder("select o.outstock_sn,o.delivery_address,o.total_amount, cs.customer_kind, c.id as customerId, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as customerTypeCode, u.realname, u.mobile, ");
-		fromBuilder.append(" w.code as warehouseCode, cp.factor,w.`name` as warehouseName,w.phone as warehousePhone,o.create_date as placeOrderTime,o.remark,sn.seller_name,so.total_amount ");
+		fromBuilder.append(" w.code as warehouseCode, cp.factor,w.`name` as warehouseName,w.phone as warehousePhone,o.create_date as placeOrderTime,o.remark,sn.seller_name,so.total_amount,so.id as orderId,so.biz_user_id,o.id as salesOutStockId ");
 		fromBuilder.append(" from `cc_sales_outstock` o ");
 		fromBuilder.append(" left join cc_seller_customer cs on o.customer_id = cs.id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sj on sj.outstock_id = o.id ");
@@ -289,10 +289,16 @@ public class SalesOutstockQuery extends JBaseQuery {
 			printAllNeedInfo.setSellerName(record.getStr("seller_name"));
 			printAllNeedInfo.setRemark(record.getStr("remark"));
 			printAllNeedInfo.setPlaceOrderTime(record.getDate("placeOrderTime"));
+			printAllNeedInfo.setOrderId(record.getStr("orderId"));
+			printAllNeedInfo.setBizUserId(record.getStr("biz_user_id"));
+			printAllNeedInfo.setSalesOutStockId(record.getStr("salesOutStockId"));
 		}
 		    return printAllNeedInfo;
 	}
 	
-	
+	public void updatePrintStatus(String id) {
+		String sql = "update cc_sales_outstock cc set is_print = 1,print_count=print_count+ "+ 1 +" where cc.id = '"+id+"'";
+		Db.update(sql);
+	}
 
 }

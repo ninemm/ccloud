@@ -20,7 +20,10 @@ public class printAllNeedInfo {
 	private String remark;//备注
 	private String warehousePhone;//仓库电话
 	private String deliveryAddress;//配送地址
-	private String sellerName;
+	private String sellerName;//销售商名字
+	private String orderId;//订单ID
+	private String bizUserId;//
+	private String salesOutStockId;
 	private List<orderProductInfo> orderProductInfos;//订单明细信息
 	public String getOutstockSn() {
 		return outstockSn;
@@ -119,6 +122,23 @@ public class printAllNeedInfo {
 	public void setSellerName(String sellerName) {
 		this.sellerName = sellerName;
 	}
-
+	public String getOrderId() {
+		return orderId;
+	}
+	public void setOrderId(String orderId) {
+		this.orderId = orderId;
+	}
+	public String getBizUserId() {
+		return bizUserId;
+	}
+	public void setBizUserId(String bizUserId) {
+		this.bizUserId = bizUserId;
+	}
+	public String getSalesOutStockId() {
+		return salesOutStockId;
+	}
+	public void setSalesOutStockId(String salesOutStockId) {
+		this.salesOutStockId = salesOutStockId;
+	}
 	
 }

@@ -237,7 +237,11 @@ $("#print").click(function() {
         dataType: "json",
         async: false,
         success: function(data) {
-                window.print();
+          if (data.result == 200) {
+			window.print();
+		  } else {
+		alert("记录打印日志出错，请联系管理员!");
+			}
         }
     })
     }
