@@ -118,7 +118,7 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 	public List<orderProductInfo> findPrintProductInfo(String outstockId) {
 		StringBuilder sqlBuilder = new StringBuilder(
 				" SELECT sod.outstock_id,sod.is_gift, sp.custom_name, p.big_unit, p.small_unit, p.convert_relate, sp.seller_id, sp.product_id, t1.valueName, cs.is_composite, IFNULL(t2.refundCount,0) as refundCount,sp.bar_code,sod.product_price,CONVERT( sod.product_price/p.convert_relate,decimal(18,2)) as small_price, ");
-		sqlBuilder.append(" floor(sod.product_count/p.convert_relate) as bigCount,MOD(sod.product_count,p.convert_relate) as smallCount ");
+		sqlBuilder.append(" floor(sod.product_count/p.convert_relate) as bigCount,MOD(sod.product_count,p.convert_relate) as smallCount,sod.product_amount ");
 		sqlBuilder.append(" from `cc_sales_outstock_detail` sod ");
 		sqlBuilder.append(" LEFT JOIN cc_sales_order_detail cs ON sod.order_detail_id = cs.id ");
 		sqlBuilder.append(" LEFT JOIN cc_seller_product sp ON sod.sell_product_id = sp.id ");
@@ -143,7 +143,7 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 			orderProductInfo.setBigCount(record.getInt("bigCount"));
 			orderProductInfo.setSmallCount(record.getInt("smallCount"));
 			orderProductInfo.setIsgift(record.getInt("is_gift"));
-			
+			orderProductInfo.setProductAmout(record.getBigDecimal("product_amount"));
 			orderProductInfos.add(orderProductInfo);
 		}
 		 return orderProductInfos;
