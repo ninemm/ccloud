@@ -151,19 +151,23 @@
 		}); 
 	}
 
-   function batchAction(){
-   	ids = new Array();
+    function batchAction(){
+   
+   	   ids = new Array();
 		$("[name='dataItem']:checkbox").each(function() {
 			if ($(this).is(":checked")) {
 				ids.push($(this).val());
 			}
 		});
-		print(ids);
+		if(ids.length == 0){
+		 alert("请选择要打印的出库单");
+		}else{
+	     print(ids);
+		}
    }
    
-  function batchCheckAll() {
-      
-var items = document.getElementsByName("dataItem");
+   function batchCheckAll() {   
+    var items = document.getElementsByName("dataItem");
 	for (var i = 0; i < items.length; i++) {
 	    if(items[i].checked){
 	    items[i].checked = false;

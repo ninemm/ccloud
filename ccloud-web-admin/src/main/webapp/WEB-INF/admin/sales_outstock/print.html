@@ -35,32 +35,33 @@ var headerStr =
 		'<thead>' +
 		'<tr>' +
 			'<td class="text-center width8">发货单号</td>' +
-			'<td class="width16">{0}</td>' +
+			'<td class="width8">{0}</td>' +
 			'<td class="text-center width8">下单时间</td>' +
-			'<td colspan="2">{1}</td>' +
+			'<td colspan="2" class="width8">{1}</td>' +
 			'<td class="text-center width8">制单时间</td>' +
-			'<td colspan="2" class="width16">{2}</td>' +
+			'<td colspan="2">{2}</td>' +
 		'</tr>' +
 		'<tr>' +
 			'<td class="text-center width8">客户信息</td>' +
 			'<td colspan="3" class="text-left">{3},{6}</td>' +
 			'<td colspan="2" class="text-center width8">客户/电话</td>' +
-			'<td colspan="2" class="text-left">{4},{5}</span></td>' +
+			'<td colspan="3" class="text-left">{4},{5}</span></td>' +
 		'</tr>' +
 		'<tr>' +
 			'<td class="text-center">配送信息</td>' +
-			'<td colspan="3" class="text-left">{9}</td>' +
+			'<td colspan="2" class="text-left">{9}</td>' +
 			'<td colspan="2" class="text-center">业务员/电话</td>' +
-			'<td colspan="2" class="text-left"><span>{7}({8})</span></td>' +
+			'<td colspan="3" class="text-left"><span>{7}({8})</span></td>' +
 		'</tr>' +
 		'<tr>' +
 			'<td class="center2">序号</td>' +
 			'<td class="center2">产品名称</td>' +
-			'<td class="width8">件数</td>' +
-			'<td class="width8">瓶数</td>' +
+			'<td style="width:10%">件数</td>' +
+			'<td style="width:10%">瓶数</td>' +
 			'<td style="width:10%">件单价</td>' +
 			'<td style="width:10%">瓶单价</td>' +
-			'<td colspan="2" class="center2">条码</td>' +
+			'<td style="width:10%">购货价格</td>' +
+			'<td colspan="3" class="center2">条码</td>' +
 		'</tr>' +
 	'</thead>';
 
@@ -71,6 +72,7 @@ var headerStr =
 			'<td class="center2"><span style="font-weight:700;">{4}</span></td>' +
 			'<td class="center2">{3}</td>' +
 			'<td class="center2">{5}</td>' +
+			'<td class="center2">{8}</td>' +
 			'<td colspan="2" class="center2">{6}</td>' +
 			'</tr>';
 
@@ -119,7 +121,8 @@ function queryPrintDetail() {
                             } else {
                                 isGift = "";
                             }
-                            content += $.format(contentStr, (idx + 1), subitem.productName, subitem.bigCount, subitem.bigPrice + '元', subitem.smallCount, subitem.smallPrice + '元', barCode, isGift)
+                            var productAmout = subitem.productAmout
+                            content += $.format(contentStr, (idx + 1), subitem.productName, subitem.bigCount, subitem.bigPrice + '元', subitem.smallCount, subitem.smallPrice + '元', barCode, isGift,productAmout+ '元')
                         });
 
                         let len = item.orderProductInfos.length;
