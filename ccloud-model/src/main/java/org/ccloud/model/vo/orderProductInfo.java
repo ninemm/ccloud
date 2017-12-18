@@ -15,6 +15,7 @@ public class orderProductInfo {
 	private BigDecimal smallPrice;//小单位价格
 	private Integer isgift;//是否赠品
 	private Integer convertRelate;//大单位小单位换算关系
+	private BigDecimal productAmout;//出库单子表，每个品项的金额合计
 	public String getProductName() {
 		return productName;
 	}
@@ -82,4 +83,11 @@ public class orderProductInfo {
 	public void setConvertRelate(Integer convertRelate) {
 		this.convertRelate = convertRelate;
 	}
+	public BigDecimal getProductAmout() {
+		return productAmout;
+	}
+	public void setProductAmout(BigDecimal productAmout) {
+		this.productAmout = productAmout;
+	}
+	
 }

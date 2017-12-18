@@ -1,0 +1,155 @@
+<#include "_inc/_layout.html"/>
+
+<#macro css> </#macro>
+
+<#macro script>
+	$(function() {
+		var params = {
+			"dayTag":  'today',
+		}
+		productAndRank(params);
+	});
+    function productAndRank(params) {
+		Utils.ajax('${CPATH}/report/getUserRank', params, 
+			function(data){
+				$("#userRankAsc").empty();
+				$("#userRankDesc").empty();
+				var rank = $("#userRankAsc");
+				var descRank = $("#userRankDesc");
+	            var length = data.length;
+	            var descLength = 0;
+	            if (length >= 10) {
+	            	length = 10;
+	            }
+	            if (length >= 5) {
+	            	descLength = length - 5;
+	            }
+	            for(var i = 0; i < length; i++){
+	            	j = i + 1;
+	            	if (i == 0) {
+	            		$("#firstName").html(data[i].realname);
+						$("#orderCount").html(data[i].orderCount);
+						$("#totalAmount").html(data[i].totalAmount);	            		
+	            	}
+	            	rank.append("<div class='rank-detail'><span class='sequence'>"+j+"</span><img src='${CTPATH}/images/jp.jpg'><div class='good-name'>"+data[i].realname+"</div><div class='good-total'>");
+	            	rank.append("<span class='orange'>￥"+data[i].totalAmount+"</span><span class='gray ft14'>/"+data[i].orderCount+"笔("+(data[i].productCount).toFixed(2)+")件</span></div></div>");
+	            }
+	            for(var i = length-1; i >= descLength; i--){
+	            	j = 1;
+	            	descRank.append("<div class='rank-detail'><span class='sequence'>"+j+"</span><img src='${CTPATH}/images/jp.jpg'><div class='good-name'>"+data[i].realname+"</div><div class='good-total'>");
+	            	descRank.append("<span class='orange'>￥"+data[i].totalAmount+"</span><span class='gray ft14'>/"+data[i].orderCount+"笔("+(data[i].productCount).toFixed(2)+")件</span></div></div>");
+	            	j++;
+	            }
+	            
+			}
+		);    	
+    }
+    
+ 	function dayTagSelect(obj,type) {
+      $.actions({
+        actions: [{
+          text: "今日",
+          onClick: function () {
+			var params = {
+				"dayTag": 'today'
+			}
+			productAndRank(params); 
+            $(obj).find(".dayTagText").text('今日')
+          }
+        }, {
+          text: "昨日",
+          onClick: function () {
+			var params = {
+				"dayTag": 'yesterday'
+			}
+          	productAndRank(params);
+            $(obj).find(".dayTagText").text('昨日')
+          }
+        }, {
+          text: "本周",
+          onClick: function () {
+			var params = {
+				"dayTag": 'week'
+			}
+			productAndRank(params);   
+          	$(obj).find(".dayTagText").text('本周')
+          }
+        }, {
+          text: "上周",
+          onClick: function () {
+			var params = {
+				"dayTag": 'lastweek'
+			}
+          productAndRank(params);
+          $(obj).find(".dayTagText").text('上周')
+          }
+        }, {
+          text: "本月",
+          onClick: function () {
+			var params = {
+				"dayTag": 'month'
+			}     
+			productAndRank(params);   
+         	$(obj).find(".dayTagText").text('本月')
+          }
+        }, {
+          text: "上月",
+          onClick: function () {
+			var params = {
+				"dayTag": 'lastmonth'
+			}         
+			productAndRank(params);
+          	$(obj).find(".dayTagText").text('上月')
+          }
+        }]
+      }); 	
+ 	}     	
+</#macro> 
+
+<@layout>
+<article id="my">
+	<header class="user-box">
+		<div class="user-info">
+			<p class="seller ft16">冠军</p>
+			<p class="name" id="firstName">${(session._logined_user.realname)!}</p>
+		</div>
+		<div class="user-avatar">
+			<img src="${(session._logined_user.avatar)!'${CTPATH}/images/avatar.png'}">
+		</div> 
+		<div class="user-statistics">
+			<div class="weui-flex">
+			<div class="weui-flex__item">
+				<h5>订单数</h5>
+				<p id="orderCount">2500</p>
+			</div>
+			<div class="weui-flex__item"></div>
+			<div class="weui-flex__item">
+				<h5>订单金额</h5>
+				<p id="totalAmount">100</p>
+			</div>
+			</div>
+		</div>
+	</header>
+    <div class="weui-panel weui-panel_access">
+        <div class="weui-panel__hd">
+            <span class="overview-hd-title">销售排行(top10)</span>
+            <span class="briefly" onclick="dayTagSelect(this)">
+				<p class="dayTagText">今日</p>
+			</span> 
+        </div>
+        <div class="weui-panel__bd">
+            <div class="weui-media-box ft14" id="userRankAsc">
+            </div>
+        </div>
+    </div>
+    <div class="weui-panel weui-panel_access">
+        <div class="weui-panel__hd">
+            <span class="overview-hd-title">销售末排行(last5)</span>
+        </div>
+        <div class="weui-panel__bd">
+            <div class="weui-media-box ft14" id="userRankDesc">
+            </div>
+        </div>
+    </div>    
+</article>
+</@layout>
