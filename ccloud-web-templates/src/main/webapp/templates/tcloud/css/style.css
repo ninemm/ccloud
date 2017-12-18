@@ -543,7 +543,6 @@ a {
 #home {
   overflow: auto;
   -webkit-overflow-scrolling: touch;
-  padding-bottom: 1.5rem;
 }
 
 .company {
@@ -780,6 +779,11 @@ a {
   font-size: 0.7rem;
   display: flex;
   justify-content: space-between;
+}
+
+.composition .product_name {
+  height: 3.25rem;
+  line-height: 3.25rem;
 }
 
 .product_unit {
@@ -1251,6 +1255,11 @@ input.street-value {
   line-height: 1rem;
   margin-top: 0.5rem;
   color: #000;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
 }
 
 .customer-href i {
