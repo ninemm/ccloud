@@ -32,17 +32,25 @@
 	};
 	
 	function prints(){
+		$('#post-search-input').val("so.print_time");
 		var startDate= $('#startDate').val();
 		var endDate= $('#endDate').val();
 		window.location.href="${CPATH}/admin/report/mSellerDetail?startDate="+startDate+"&endDate="+endDate+"&k=so.print_time&c=${c!}&p=${p!}"
 	};
 	
 	function complete(){
+		$('#post-search-input').val("sok.create_date");
 		var startDate= $('#startDate').val();
 		var endDate= $('#endDate').val();
 		window.location.href="${CPATH}/admin/report/mSellerDetail?startDate="+startDate+"&endDate="+endDate+"&k=sok.create_date&c=${c!}&p=${p!}"
+	};
+	
+	function derivation(){
+		var startDate= $('#startDate').val();
+		var endDate= $('#endDate').val();
+		var k=$('#post-search-input').val();
+		
 	}
-
 </#macro>
 <@layout active_id=p child_active_id=c>
 
@@ -59,6 +67,7 @@
 	<form class="form-inline" id="form" >
 		<div class="row content-row">
 			<div class="form-group col-sm-12" style="float: right">
+				<input id="post-search-input" class="form-control" type="hidden" value="${k!'so.create_date'}" name="k" >&nbsp;
 				<input onclick="orderTime()" class="btn btn-sm btn-primary" type="button" value="已下单查询">
 				<input onclick="prints()" class="btn btn-sm btn-primary" type="button" value="已打印查询">
 				<input onclick="complete()" class="btn btn-sm btn-primary" type="button" value="已出库查询">
@@ -74,6 +83,9 @@
 						<input id="endDate" class="form-control" value="${endDate!}" name="endDate" placeholder="结束日期" >&nbsp;
 					</div>
 				</div>
+				<a onclick="derivation()" class="btn btn-sm btn-primary btn-flat" style="float: right">
+					<i class="fa fa-download" ></i> 导出
+				</a>
 			</div>
 		</div>
 		<div class="box">
@@ -83,7 +95,7 @@
 						<tr>
 							<#if watchHead??>
 								<#list watchHead as bean>
-										<th>${bean}</th>
+										<th style="text-align:center">${bean}</th>
 								</#list>
 							 </#if>
 						</tr>
@@ -93,7 +105,7 @@
 							<#list mSellerDetailReportList as bean>
 								<tr class="jp-onmouse">
 									<#list bean as value>
-										<td>${value}</td>
+										<td align=center>${value}</td>
 									</#list>
 								</tr>
 							</#list>
@@ -116,7 +128,7 @@
 						<tr>
 							<#if watchHead??>
 								<#list watchHead as bean>
-										<th>${bean}</th>
+										<th style="text-align:center">${bean}</th>
 								</#list>
 							</#if>
 						</tr>
@@ -126,7 +138,7 @@
 							<#list mSellerDetailGiftReportList as bean1>
 								<tr class="jp-onmouse">
 									<#list bean1 as value1>
-										<td>${value1}</td>
+										<td align=center>${value1}</td>
 									</#list>
 								</tr>
 							</#list>

@@ -192,7 +192,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 
 	}
 
-	public Page<Record> findByUserTypeForApp(int pageNumber, int pageSize, Object[] userId, String customerType,
+	public Page<Record> findByUserTypeForApp(int pageNumber, int pageSize, String selectDataArea, String customerType,
 			String isOrdered, String searchKey) {
 		boolean needwhere = false;
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -204,7 +204,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 				"LEFT JOIN cc_customer_join_customer_type ccjct ON cujc.seller_customer_id = ccjct.seller_customer_id ");
 		sql.append("LEFT JOIN cc_seller_customer csc ON cujc.seller_customer_id = csc.id ");
 		sql.append("LEFT JOIN cc_customer c ON csc.customer_id = c.id ");
-		sql.append("LEFT JOIN cc_sales_order cso ON cujc.seller_customer_id = cso.customer_id ");
+		sql.append("LEFT JOIN cc_sales_order cso ON cujc.seller_customer_id = cso.customer_id AND cujc.data_area = cso.data_area ");
 
 		if (StrKit.notBlank(searchKey)) {
 			sql.append("WHERE ( c.customer_name LIKE ? OR c.contact LIKE ? ) ");
@@ -220,7 +220,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 			needwhere = false;
 		}
 
-		needwhere = appendIfNotEmpty(sql, "cujc.user_id", userId, params, needwhere);
+		needwhere = appendIfNotEmptyWithLike(sql, "cujc.data_area", selectDataArea, params, needwhere);
 		needwhere = appendIfNotEmpty(sql, "csc.is_enabled", 1, params, needwhere);
 		needwhere = appendIfNotEmpty(sql, "ccjct.customer_type_id", customerType, params, needwhere);
 

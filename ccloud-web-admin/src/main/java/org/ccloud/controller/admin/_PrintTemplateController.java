@@ -15,6 +15,7 @@
  */
 package org.ccloud.controller.admin;
 
+import java.util.List;
 import java.util.Map;
 
 import org.ccloud.core.JBaseCRUDController;
@@ -56,4 +57,8 @@ public class _PrintTemplateController extends JBaseCRUDController<PrintTemplate>
 		renderJson(map);
 
 	}
+	  public List<PrintTemplate> findPrintTemplateBySellerId(String sellerId) {
+		  List<PrintTemplate> printTemplates = PrintTemplateQuery.me().findPrintTemplateBySellerId(sellerId);
+		  return printTemplates;
+	  }
 }

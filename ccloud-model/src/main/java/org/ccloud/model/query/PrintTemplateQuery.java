@@ -16,6 +16,8 @@
 package org.ccloud.model.query;
 
 import java.util.LinkedList;
+import java.util.List;
+
 import org.ccloud.model.PrintTemplate;
 
 import com.jfinal.plugin.activerecord.Page;
@@ -83,6 +85,12 @@ public class PrintTemplateQuery extends JBaseQuery {
 			return deleteCount;
 		}
 		return 0;
+	}
+
+	public List<PrintTemplate> findPrintTemplateBySellerId(String sellerId) {
+         StringBuilder stringBuilder = new StringBuilder();
+         stringBuilder.append(" SELECT * FROM cc_print_template WHERE id = (SELECT print_template_id FROM cc_seller_join_template WHERE seller_id=?) ");
+		   return DAO.find(stringBuilder.toString(), sellerId);
 	}
 
 }

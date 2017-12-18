@@ -326,6 +326,7 @@ public class _ReportController extends JBaseController {
 			endDate=date;
 		}
 		String keyword = getPara("k");
+		//编码k 页面刷新是k不会乱码
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
 			setAttr("k", keyword);
@@ -362,6 +363,7 @@ public class _ReportController extends JBaseController {
 		}
 		setAttr("startDate", startDate);
 		setAttr("endDate", endDate);
+		setAttr("k", keyword);
 		setAttr("mSellerDetailGiftReportList", mSellerDetailGiftReportList);
 		render("mSellerDetail.html");
 	}
@@ -413,6 +415,7 @@ public class _ReportController extends JBaseController {
 		}
 		setAttr("startDate", startDate);
 		setAttr("endDate", endDate);
+		setAttr("k", keyword);
 		setAttr("mSalesmanDetailGiftReportList", mSalesmanDetailGiftReportList);
 		render("mSalesmanDetail.html");
 	}
