@@ -900,7 +900,8 @@ public class SalesOrderQuery extends JBaseQuery {
 		return Db.queryLong(fromBuilder.toString());
 	}
 	
-	public Record getMyOrderAmount(String startDate, String endDate, String dayTag, String customerType, String sellerId, String dataArea) {
+	public Record getMyOrderAmount(String startDate, String endDate, String dayTag, String customerType,
+			String deptId, String sellerId, String dataArea) {
 		if (dayTag != null) {
 			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
 			startDate = date[0];
@@ -911,7 +912,11 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append("LEFT JOIN cc_customer_type ct on cc.customer_type_id = ct.id ");		
 		
 		boolean needWhere = true;
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, " cc.data_area", dataArea, params, needWhere);
+		if (StringUtils.isNotBlank(deptId)) {
+			needWhere = appendIfNotEmpty(fromBuilder, " cc.dept_id", deptId, params, needWhere);
+		} else {
+			needWhere = appendIfNotEmptyWithLike(fromBuilder, " cc.data_area", dataArea, params, needWhere);
+		}
 		needWhere = appendIfNotEmpty(fromBuilder, " cc.seller_id", sellerId, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "cc.customer_type_id", customerType, params, needWhere);
 		
@@ -1157,15 +1162,15 @@ public class SalesOrderQuery extends JBaseQuery {
 		}
 		LinkedList<Object> params = new LinkedList<Object>();
 		StringBuilder fromBuilder = new StringBuilder("SELECT IFNULL(SUM(cc.total_amount),0) as totalAmount, IFNULL(SUM(cc.total_count),0) as productCount, ");
-		fromBuilder.append("COUNT(cc.id) as orderCount, u.realname, u.avatar ");
+		fromBuilder.append("COUNT(cc.id) as orderCount, u.realname, u.avatar, u.id ");
 		fromBuilder.append("FROM `user` u LEFT JOIN cc_sales_order cc ON cc.biz_user_id = u.id ");
 		boolean needWhere = true;
 		if (StringUtils.isNotBlank(deptId)) {
-			needWhere = appendIfNotEmpty(fromBuilder, " u.dept_id", deptId, params, needWhere);
+			needWhere = appendIfNotEmpty(fromBuilder, " u.department_id", deptId, params, needWhere);
 		} else {
 			needWhere = appendIfNotEmptyWithLike(fromBuilder, " u.data_area", dataArea, params, needWhere);
+			needWhere = appendIfNotEmpty(fromBuilder, " cc.seller_id", sellerId, params, needWhere);
 		}
-		needWhere = appendIfNotEmpty(fromBuilder, " cc.seller_id", sellerId, params, needWhere);
 		if (needWhere) {
 			fromBuilder.append(" where cc.status != 1001");
 		} else {

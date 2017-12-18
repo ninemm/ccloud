@@ -31,7 +31,6 @@ import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SellerProductQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DataAreaUtil;
-import org.ccloud.utils.StringUtils;
 
 import com.alibaba.fastjson.JSON;
 import com.jfinal.plugin.activerecord.Record;
@@ -51,7 +50,8 @@ public class ReportController extends BaseFrontController {
 		String sellerId = getSessionAttr("sellerId");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String customerType = getPara("customerType");
-		Record record = SalesOrderQuery.me().getMyOrderAmount(startDate, endDate, dayTag, customerType, sellerId, dataArea);
+		String deptId = getPara("deptId");
+		Record record = SalesOrderQuery.me().getMyOrderAmount(startDate, endDate, dayTag, customerType, deptId, sellerId, dataArea);
 		renderJson(record);
 	}
 	
@@ -155,6 +155,10 @@ public class ReportController extends BaseFrontController {
 		render("user_rank.html");
 	}
 	
+	public void managerReport() {
+		render("manager_report.html");
+	}	
+	
 	public void getUserRank() {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
@@ -162,13 +166,9 @@ public class ReportController extends BaseFrontController {
 		String sellerId = getSessionAttr("sellerId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String dataArea = DataAreaUtil.getUserDealerDataArea(user.getDataArea());
-		String status = getPara("status");
-		String deptId = null;
-		if (StringUtils.isNotBlank(status)) {
-			deptId = user.getDepartmentId();
-		}
+		String deptId = getPara("deptId");
 		List<Record> record = SalesOrderQuery.me().getUserRank(startDate, endDate, dayTag, deptId, sellerId, dataArea);
 		renderJson(record);
-	}	
+	}
 	
 }
