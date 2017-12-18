@@ -892,12 +892,12 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 	
 	//统计今日订单
-	public int queryCountToDayOrders(String userId,String dataArea) {
+	public long queryCountToDayOrders(String userId,String dataArea) {
 		StringBuilder fromBuilder = new StringBuilder(" select count(cso.order_sn) from cc_sales_order cso inner join `user` u on u.id = cso.biz_user_id ");
 		fromBuilder.append("where DATE_FORMAT(cso.create_date, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d') ");
 		//fromBuilder.append("and cso.biz_user_id <> '"+userId+"' ");
 		fromBuilder.append("and u.data_area like '"+dataArea+"' ");
-		return Db.queryInt(fromBuilder.toString());
+		return Db.queryLong(fromBuilder.toString());
 	}
 	
 	public Record getMyOrderAmount(String startDate, String endDate, String dayTag, String customerType, String sellerId, String dataArea) {
