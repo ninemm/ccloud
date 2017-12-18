@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
+import org.ccloud.message.MessageKit;
 import org.ccloud.model.Dict;
 import org.ccloud.model.Message;
 import org.ccloud.model.User;
@@ -64,6 +65,9 @@ public class MessageController extends BaseFrontController {
 		
 		Message message = MessageQuery.me().findById(id);
 		setAttr("message", message);
+		
+		MessageKit.sendMessage(Message.ACTION_EDIT, id);
+		
 		render("message_edit.html");
 	}
 	

@@ -543,7 +543,6 @@ a {
 #home {
   overflow: auto;
   -webkit-overflow-scrolling: touch;
-  padding-bottom: 1.5rem;
 }
 
 .company {
@@ -658,9 +657,10 @@ a {
   height: 1.25rem;
   line-height: 1.25rem;
   vertical-align: middle;
-  width: 15.2778%;
+/*   width: 15.2778%; */
   text-align: center;
   margin: 0 0.25rem;
+  padding: 0 .5rem;
   border-radius: 2px;
 }
 
@@ -782,6 +782,11 @@ a {
   justify-content: space-between;
 }
 
+.composition .product_name {
+  height: 3.25rem;
+  line-height: 3.25rem;
+}
+
 .product_unit {
   height: 1.25rem;
   line-height: 1.25rem;
@@ -883,30 +888,60 @@ a {
   top: 0;
 }
 
-.product-detail {
+.layui-m-layerchild {
   width: 90%;
+}
+
+.service {
+  width: 70%;
 }
 
 .product-detail img {
   width: 30%;
 }
 
-.product-detail .layui-m-layercont {
+.service img {
+  width: 60%;
+  margin: 5% 20% 0;
+}
+
+.layui-m-layercont {
   padding: 5px 15px!important;
-  margin-bottom: 2rem;
 }
 
-.product-detail .layui-m-layerbtn {
-  height: 2rem;
-  line-height: 2rem;
-  position: absolute;
-  bottom: 0;
-  background:#ea6f5a;
+.layui-m-layerbtn {
+  height: 2rem!important;
+  line-height: 2rem!important;
+}
+
+.layui-m-layerbtn span[yes] {
+  color: #fff!important;
   border-radius: 0;
+  background: #ea6f5a;
 }
 
-.product-detail .layui-m-layerbtn span[yes] {
-  color: #fff;
+.audit .layui-m-layerbtn span[no] {
+  color: #000;
+  border-radius: 0;
+  background: #fff;
+}
+
+.audit .refuse-radio {
+  margin-top: .2rem;
+}
+
+.audit .refuse-radio input {
+  position: relative;
+  top: .1rem;
+  margin-right: .5rem;
+}
+
+.audit textarea {
+  margin-top: .3rem;
+  background: #f3f3f3;
+  border-radius: 5px;
+  padding: .4rem .5rem;
+  box-sizing: border-box;
 }
 
 
@@ -1221,6 +1256,11 @@ input.street-value {
   line-height: 1rem;
   margin-top: 0.5rem;
   color: #000;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
 }
 
 .customer-href i {
@@ -1471,7 +1511,7 @@ input[name=sex] {
   width: 3rem;
   height: auto;
   border-radius: 50%;
-  border: 3px solid #fff;
+  border: 2px solid #fff;
 }
 
 .user-statistics {
