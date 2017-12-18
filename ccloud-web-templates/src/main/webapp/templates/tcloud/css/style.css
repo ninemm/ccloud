@@ -883,7 +883,8 @@ a {
   top: 0;
 }
 
-.product-detail {
+.product-detail,
+.audit {
   width: 90%;
 }
 
@@ -891,22 +892,49 @@ a {
   width: 30%;
 }
 
-.product-detail .layui-m-layercont {
+.product-detail .layui-m-layercont,
+.audit .layui-m-layercont {
   padding: 5px 15px!important;
   margin-bottom: 2rem;
 }
 
-.product-detail .layui-m-layerbtn {
+.product-detail .layui-m-layerbtn,
+.audit .layui-m-layerbtn {
   height: 2rem;
   line-height: 2rem;
   position: absolute;
   bottom: 0;
-  background:#ea6f5a;
-  border-radius: 0;
 }
 
-.product-detail .layui-m-layerbtn span[yes] {
+.product-detail .layui-m-layerbtn span[yes],
+.audit .layui-m-layerbtn span[yes] {
   color: #fff;
+  border-radius: 0;
+  background: #ea6f5a;
+}
+
+.audit .layui-m-layerbtn span[no] {
+  color: #000;
+  border-radius: 0;
+  background: #fff;
+}
+
+.audit .refuse-radio {
+  margin-top: .2rem;
+}
+
+.audit .refuse-radio input {
+  position: relative;
+  top: .1rem;
+  margin-right: .5rem;
+}
+
+.audit textarea {
+  margin-top: .3rem;
+  background: #f3f3f3;
+  border-radius: 5px;
+  padding: .4rem .5rem;
+  box-sizing: border-box;
 }
 
 
