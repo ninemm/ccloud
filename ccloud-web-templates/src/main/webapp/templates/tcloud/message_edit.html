@@ -1,0 +1,32 @@
+<#include "_inc/_layout.html"/>
+
+<#macro script_import>
+</#macro>
+
+<#macro css>
+	.weui-content {
+      	background-color: #fff;
+    }
+    
+    .weui-article h1, .weui-article h3 {
+    	text-align: center;
+    }
+
+</#macro>
+
+<@layout>
+	
+	<div class="weui-content">
+		<article class="weui-article">
+			<h1>${(message.title)!}</h1>
+    		<h3 class="wy-news-time gray">提交时间: ${message.create_date?string('yyyy-MM-dd')}</h3>
+    		<section class="wy-news-info">
+    		    <p>类型：${message.name!}</p>
+    		    <p>提交人：${message.realname!}</p>
+      			<p>审核内容：${(message.content)!}</p>
+      			<p><a href="${CPATH}/user/center" class="blue">去审核</a></p>
+    		</section>
+		</article>
+	</div>
+	<#include "_inc/_goback.html"/>
+</@layout>

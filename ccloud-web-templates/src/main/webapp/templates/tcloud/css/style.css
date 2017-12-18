@@ -657,9 +657,10 @@ a {
   height: 1.25rem;
   line-height: 1.25rem;
   vertical-align: middle;
-  width: 15.2778%;
+/*   width: 15.2778%; */
   text-align: center;
   margin: 0 0.25rem;
+  padding: 0 .5rem;
   border-radius: 2px;
 }
 
@@ -1510,7 +1511,7 @@ input[name=sex] {
   width: 3rem;
   height: auto;
   border-radius: 50%;
-  border: 3px solid #fff;
+  border: 2px solid #fff;
 }
 
 .user-statistics {

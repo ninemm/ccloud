@@ -30,6 +30,7 @@ import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.Department;
 import org.ccloud.model.User;
+import org.ccloud.model.query.CustomerVisitQuery;
 import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SellerCustomerQuery;
@@ -82,6 +83,8 @@ public class _AdminController extends JBaseController {
 		String selDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		setAttr("toDoCustomerList", SellerCustomerQuery.me().getToDo(user.getUsername()));
 		setAttr("toDoOrdersList", SalesOrderQuery.me().getToDo(user.getUsername()));
+		setAttr("toDoCustomerVisitList", CustomerVisitQuery.me().getToDo(user.getUsername()));
+		
 		setAttr("orderCount", StrKit.notBlank(selDataArea)?SalesOrderQuery.me().queryCountToDayOrders(user.getId(), selDataArea):0);
 		setAttr("customerCount",StrKit.notBlank(selDataArea)?UserJoinCustomerQuery.me().customerCount(selDataArea):0);
 		render("index.html");

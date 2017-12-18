@@ -33,6 +33,7 @@ public abstract class BaseMessage<M extends BaseMessage<M>> extends JModel<M> im
 	public static final String ACTION_ADD = "cc_message:add";
 	public static final String ACTION_DELETE = "cc_message:delete";
 	public static final String ACTION_UPDATE = "cc_message:update";
+	public static final String ACTION_EDIT = "cc_message:edit";
 
 	public void removeCache(Object key){
 		if(key == null) return;

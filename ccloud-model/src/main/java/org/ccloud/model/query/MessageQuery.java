@@ -38,11 +38,16 @@ public class MessageQuery extends JBaseQuery {
 		return DAO.getCache(id, new IDataLoader() {
 			@Override
 			public Object load() {
-				return DAO.findById(id);
+				StringBuilder sql = new StringBuilder("SELECT m.*, u.realname, d.`name`");
+				sql.append(" FROM `cc_message` m");
+				sql.append(" LEFT JOIN user u on m.from_user_id = u.id");
+				sql.append(" LEFT JOIN dict d on m.type = d.`value`");
+				sql.append(" WHERE m.id = ? limit 1");
+				return DAO.findFirst(sql.toString(), id);
 			}
 		});
 	}
-
+	
 	public Page<Message> paginate(int pageNumber, int pageSize, String orderby) {
 		String select = "select * ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_message` ");

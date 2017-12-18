@@ -22,7 +22,7 @@
 						<div class="col-sm-9  jp-set-title-line">
 							<div class="col-sm-6 jp-table-distance-top ">
 								<label class="radio-inline">
-			                 		<input type="radio" name="seller_store_check" value="1" <#if value == '1'>checked</#if>>开
+			                 		<input type="radio" name="seller_store_check_'${(session.sellerCode)!}'" value="1" <#if value == '1'>checked</#if>>开
 			                 	</label>
 			                 	<label class="radio-inline">
 			                 		<input type="radio" name="seller_store_check" value="0" <#if value == '0'>checked</#if>>关

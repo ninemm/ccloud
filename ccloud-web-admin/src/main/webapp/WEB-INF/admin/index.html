@@ -236,11 +236,11 @@ function reply(id){
                 <div class="box-body">
                     <div id="subsubsub" class="rss-widget">
                         <ul class="list-unstyled ">
-                            <#if (toDoCustomerList?size > 0)>
-                            <#list toDoCustomerList! as bean>
+                            <#if (toDoCustomerVisitList?size > 0)>
+                            <#list toDoCustomerVisitList! as bean>
                             <li>
                                 <span>${bean.createTime!}</span>
-                                <a href="${CPATH}/admin/customer/audit?id=${bean.id!}&taskId=${bean.taskId!}&assignee=${bean.assignee}" target="_blank">${bean.customer_name!}</a>
+                                <a href="${CPATH}/admin/customerVisit/audit?id=${bean.id!}&taskId=${bean.taskId!}&assignee=${bean.assignee}" target="_blank">${bean.customer_name!}</a>
                             </li>
                             </#list>
                             <#else>

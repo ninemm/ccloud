@@ -88,7 +88,7 @@ $(function() {
 	function initProduct(){
 		var productList = getItemBykey("productList");
 		$.each(productList, function(index, el) {
-			if(el.isGift == 0) {
+			if(index % 2 == 0) {
 				$product.append("<div class='weui-panel weui-panel_access goods-detail common'>" + newHtml + "</div>");
 				var $newProductDetail = $product.find(".common:last");
 				$newProductDetail.find("#productName").text(el.productName);
@@ -109,36 +109,45 @@ $(function() {
 				
 				$newProductDetail.find("#bigNum").val(el.bigNum);
 				$newProductDetail.find("#smallNum").val(el.smallNum);
+
+				$newProductDetail.find("#isGift").val(el.smallNum);
+
+				$newProductDetail.find("#isGift").val(el.isGift);
+				if(el.isGift == 1) {
+					$newProductDetail.find("#isGiftCheckBox").attr('checked','checked');
+				}
 			} else {
-				var $newProductDetail = $product.find(".common:last");
-				$newProductDetail.find("#addGift").attr("checked",'true').trigger("change");
-
-				//默认
-				if($newProductDetail.find("#sellProductId").val() == el.sellProductId){
-					$newProductDetail.find("#isDefault").attr("checked","true");
-				}
-
-				$newProductDetail.find("#giftProduct").val(el.productName);
-				$newProductDetail.find("#giftSellProductId").val(el.sellProductId);
-				$newProductDetail.find("#giftProductId").val(el.productId);
-				$newProductDetail.find("#giftConvert").val(el.convert);
-				$newProductDetail.find("#giftBigPrice").val(el.bigPrice);
-
-				//数量
-				if(el.bigNum > 0 && el.bigUnit){
-					$newProductDetail.find("#giftNum").val(el.bigNum);
-					$newProductDetail.find("#giftUnitName").val(el.bigUnitSpan);
-					$newProductDetail.find("#giftUnitName").attr('data-values', "bigUnit");
-					$newProductDetail.find("#giftUnit").val("bigUnit");
-				}else{
-					$newProductDetail.find("#giftNum").val(el.smallNum);
-					$newProductDetail.find("#giftUnitName").val(el.smallUnitSpan);
-					$newProductDetail.find("#giftUnitName").attr('data-values', "smallUnit");
-					$newProductDetail.find("#giftUnit").val("smallUnit");
-				}
 			
+				if(el.sellProductId != ""){
+					var $newProductDetail = $product.find(".common:last");
+					$newProductDetail.find("#addGift").attr("checked",'true').trigger("change");
+
+					//默认
+					if($newProductDetail.find("#sellProductId").val() == el.sellProductId){
+						$newProductDetail.find("#isDefault").attr("checked","true");
+					}
+
+					$newProductDetail.find("#giftProduct").val(el.productName);
+					$newProductDetail.find("#giftSellProductId").val(el.sellProductId);
+					$newProductDetail.find("#giftProductId").val(el.productId);
+					$newProductDetail.find("#giftConvert").val(el.convert);
+					$newProductDetail.find("#giftBigPrice").val(el.bigPrice);
+
+					//数量
+					if(el.bigNum > 0 && el.bigUnit){
+						$newProductDetail.find("#giftNum").val(el.bigNum);
+						$newProductDetail.find("#giftUnitName").val(el.bigUnitSpan);
+						$newProductDetail.find("#giftUnitName").attr('data-values', "bigUnit");
+						$newProductDetail.find("#giftUnit").val("bigUnit");
+					}else{
+						$newProductDetail.find("#giftNum").val(el.smallNum);
+						$newProductDetail.find("#giftUnitName").val(el.smallUnitSpan);
+						$newProductDetail.find("#giftUnitName").attr('data-values', "smallUnit");
+						$newProductDetail.find("#giftUnit").val("smallUnit");
+					}
+				}
 			}
-	
+
 		});
 	}
 	
@@ -167,14 +176,17 @@ $(function() {
 		var allTotalAmount = 0;
 		$.each(products, function(index, el) {
 			var $el = $(el);
-			var bigNum = parseInt($el.find("#bigNum").val());
-			var convert = parseInt($el.find("#convert").val());
-			var smallNum = parseInt($el.find("#smallNum").val());
-			rowTotal = $el.find("#bigNum").val() * $el.find("#bigPrice").val() + $el.find("#smallNum").val() * $el.find("#smallPrice").val();
-			var number = (smallNum/convert).toFixed(2);
-			allTotalAmount = allTotalAmount + bigNum + number*1;
+			rowTotal = 0;
+			if($el.find("#isGift").val() == 0) {
+				rowTotal = $el.find("#bigNum").val() * $el.find("#bigPrice").val() + $el.find("#smallNum").val() * $el.find("#smallPrice").val();
+				total += rowTotal;
+				var bigNum = parseInt($el.find("#bigNum").val());
+				var convert = parseInt($el.find("#convert").val());
+				var smallNum = parseInt($el.find("#smallNum").val());
+				var number = (smallNum/convert).toFixed(2);
+				allTotalAmount = allTotalAmount + bigNum + number*1;
+			}
 			$el.find("#rowTotal").val(rowTotal);
-			total += rowTotal;
 		});
 
 		var compositions = $(".composition");
@@ -339,10 +351,12 @@ $(function() {
 						<input type="hidden" name="sellProductId" id="sellProductId" value="">
 						<input type="hidden" name="productId" id="productId" value="">
 						<input type="hidden" name="convert" id="convert" value="">
+						<input type="hidden" name="isGift" id="isGift" value="">
 						<div class="product_name" id="productName">
 							35度中国劲酒_125ml_1*24
 			<!-- 				<span class="gift-tag">赠品</span> -->
 						</div>
+						<span class="fr"><input type="checkbox" id="isGiftCheckBox" disabled> 是否赠品</span>
 						<div class="product_unit">
 							规格：<span id="valueName">125ml</span>
 						</div>
