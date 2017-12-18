@@ -107,8 +107,11 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String data = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String sellerId = getSessionAttr("sellerId");
+		Seller seller = SellerQuery.me().findById(sellerId);
 		String p = "";
-		List<PurchaseRefundOutstock> list = PurchaseRefundOutstockQuery.me().findByUser(user.getId(), user.getDataArea());
+		List<PurchaseRefundOutstock> list = PurchaseRefundOutstockQuery.me().findByUser(seller.getDeptId(), data);
 		if(list.size()>0){	
 			String pro = "";
 			for(int i=0;i<list.size();i++){
@@ -118,7 +121,7 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 		}else{
 			p = "''";
 		}
-		Page<Record> page = PurchaseInstockQuery.me().paginateO(getPageNumber(), getPageSize(), keyword, startDate, endDate,user.getId(),user.getDataArea(),p);
+		Page<Record> page = PurchaseInstockQuery.me().paginateO(getPageNumber(), getPageSize(), keyword, startDate, endDate,user.getId(),data,p,seller.getDeptId());
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
@@ -278,7 +281,7 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 			if(inventory!=null){
 				inventory.set("in_count", inventory.getInCount().add(count2.divide(convent, 2, BigDecimal.ROUND_HALF_UP)));
 				inventory.set("in_amount",inventory.getInAmount().add(pi.getProductAmount()));
-				inventory.set("in_price", pi.getProductPrice());
+				inventory.set("in_price", pi.getProductAmount().divide((count2.divide(convent)),2, BigDecimal.ROUND_HALF_UP));
 				inventory.set("balance_count", inventory.getBalanceCount().add(count2.divide(convent, 2, BigDecimal.ROUND_HALF_UP)));
 				inventory.set("balance_amount", inventory.getBalanceAmount().add(pi.getProductAmount()));
 				inventory.set("modify_date", new Date());
@@ -294,7 +297,7 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 				inventory.set("seller_id", seller.getId());
 				inventory.set("in_count", count2.divide(convent, 2, BigDecimal.ROUND_HALF_UP));
 				inventory.set("in_amount",pi.getProductAmount());
-				inventory.set("in_price", pi.getProductPrice());
+				inventory.set("in_price", pi.getProductAmount().divide((count2.divide(convent)),2, BigDecimal.ROUND_HALF_UP));
 				inventory.set("balance_count", count2.divide(convent, 2, BigDecimal.ROUND_HALF_UP));
 				inventory.set("balance_amount", pi.getProductAmount());
 				inventory.set("balance_price", pi.getProductPrice());
@@ -319,10 +322,10 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 			inventoryDetail.set("sell_product_id",pi.getSellerProductId());
 			inventoryDetail.set("in_count", count2.divide(convent, 2, BigDecimal.ROUND_HALF_UP));
 			inventoryDetail.set("in_amount", pi.getProductAmount());
-			inventoryDetail.set("in_price", pi.getProductPrice());
+			inventoryDetail.set("in_price", sellerProduct.getPrice());
 			inventoryDetail.set("balance_count",storeCount );
-			inventoryDetail.set("balance_amount", storeCount.multiply(pi.getProductPrice()));
-			inventoryDetail.set("balance_price", pi.getProductPrice());
+			inventoryDetail.set("balance_amount", storeCount.multiply(sellerProduct.getPrice()));
+			inventoryDetail.set("balance_price", sellerProduct.getPrice());
 			inventoryDetail.set("biz_type", Consts.BIZ_TYPE_INSTOCK);
 			inventoryDetail.set("biz_bill_sn", pi.get("pwarehouse_sn"));
 			inventoryDetail.set("biz_date", new Date());
