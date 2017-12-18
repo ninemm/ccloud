@@ -87,8 +87,8 @@ function reply(id){
 			<!-- small box -->
 			<div class="small-box bg-aqua">
 				<div class="inner">
-					<#if (orderCount??)>
-						<h3>${orderCount!}</h3>
+					<#if (count_order??)>
+						<h3>${count_order!}</h3>
 					<#else>
 						<h3>0</h3>
 					</#if>
@@ -105,8 +105,12 @@ function reply(id){
 			<!-- small box -->
 			<div class="small-box bg-green">
 				<div class="inner">
-					<h3>53<sup style="font-size: 20px">%</sup></h3>
-					<p>Bounce Rate</p>
+					<#if (sum_amount??)>
+						<h3>${sum_amount!}<sup style="font-size: 20px"></sup></h3>
+					<#else>
+						<h3>0.00<sup style="font-size: 20px"></sup></h3>
+					</#if>
+					<p>今日销售额</p>
 				</div>
 				<div class="icon">
 					<i class="fa fa-bar-chart"></i>

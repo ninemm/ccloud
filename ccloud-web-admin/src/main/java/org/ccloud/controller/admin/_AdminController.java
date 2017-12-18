@@ -15,6 +15,7 @@
  */
 package org.ccloud.controller.admin;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -49,6 +50,8 @@ import com.jfinal.aop.Before;
 import com.jfinal.aop.Clear;
 import com.jfinal.kit.StrKit;
 
+import com.jfinal.plugin.activerecord.Record;
+
 @RouterMapping(url = "/admin", viewPath = "/WEB-INF/admin")
 @RouterNotAllowConvert
 public class _AdminController extends JBaseController {
@@ -80,10 +83,16 @@ public class _AdminController extends JBaseController {
 			return;
 		}
 		String selDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		Record count = new Record();
+		if(StrKit.notBlank(selDataArea))
+		count = SalesOrderQuery.me().queryCountToDayOrders(user.getId(), selDataArea);
 		setAttr("toDoCustomerList", SellerCustomerQuery.me().getToDo(user.getUsername()));
 		setAttr("toDoOrdersList", SalesOrderQuery.me().getToDo(user.getUsername()));
-		setAttr("orderCount", StrKit.notBlank(selDataArea)?SalesOrderQuery.me().queryCountToDayOrders(user.getId(), selDataArea):0);
+		setAttr("count_order", StrKit.notBlank(selDataArea)?count.get("count_order"):0);
+		setAttr("sum_amount", StrKit.notBlank(selDataArea)?count.get("sum_amount")!=null?count.get("sum_amount").toString():"0.00":"0.00");
 		setAttr("customerCount",StrKit.notBlank(selDataArea)?UserJoinCustomerQuery.me().customerCount(selDataArea):0);
+		//setAttr("sales_day",SalesOrderQuery.me().queryAmountByDay(selDataArea));
+		//setAttr("sales_month",SalesOrderQuery.me().queryAmountByMonth(selDataArea));
 		render("index.html");
 	}
 	

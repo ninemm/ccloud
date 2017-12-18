@@ -922,13 +922,31 @@ public class SalesOrderQuery extends JBaseQuery {
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
-//统计今日订单
-	public int queryCountToDayOrders(String userId,String dataArea) {
-		StringBuilder fromBuilder = new StringBuilder(" select count(cso.order_sn) from cc_sales_order cso inner join `user` u on u.id = cso.biz_user_id ");
+	//统计今日订单量 销售额
+	public Record queryCountToDayOrders(String userId,String dataArea) {
+		StringBuilder fromBuilder = new StringBuilder(" select count(cso.order_sn) count_order,sum(cso.total_amount) sum_amount from cc_sales_order cso inner join `user` u on u.id = cso.biz_user_id ");
 		fromBuilder.append("where DATE_FORMAT(cso.create_date, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d') ");
-		//fromBuilder.append("and cso.biz_user_id <> '"+userId+"' ");
 		fromBuilder.append("and u.data_area like '"+dataArea+"' ");
-		return Db.queryInt(fromBuilder.toString());
+		return Db.findFirst(fromBuilder.toString());
 	}
-
+	
+	//统计业务员当日销售额排行(前5)
+	public List<Record> queryAmountByDay(String selDataArea){
+		StringBuilder fromBuilder = new StringBuilder("select cso.biz_user_id,u.realname,sum(cso.total_amount) sum_amount ");
+		fromBuilder.append("from cc_sales_order cso inner join `user` u on u.id = cso.biz_user_id ");
+		fromBuilder.append("where DATE_FORMAT(cso.create_date, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d') ");
+		fromBuilder.append("and u.data_area like '"+selDataArea+"%' ");
+		fromBuilder.append(" GROUP BY cso.biz_user_id ORDER BY sum_amount desc limit 0,5 ");
+		return Db.find(fromBuilder.toString());
+	}
+	
+	//统计业务员当月销售额排行(前5)
+	public List<Record> queryAmountByMonth(String selDataArea){
+		StringBuilder fromBuilder = new StringBuilder("select cso.biz_user_id,u.realname,sum(cso.total_amount) sum_amount ");
+		fromBuilder.append("from cc_sales_order cso inner join `user` u on u.id = cso.biz_user_id ");
+		fromBuilder.append("where cso.create_date like CONCAT(DATE_FORMAT(NOW(),'%Y-%m'),'%') ");
+		fromBuilder.append("and u.data_area like '"+selDataArea+"%' ");
+		fromBuilder.append(" GROUP BY cso.biz_user_id ORDER BY sum_amount desc limit 0,5 ");
+		return Db.find(fromBuilder.toString());
+	}
 }
