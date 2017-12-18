@@ -59,7 +59,6 @@ public class CustomerController extends BaseFrontController {
 
 	public void index() {
 
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		
 		String key = getPara("searchKey");
@@ -107,7 +106,6 @@ public class CustomerController extends BaseFrontController {
 	}
 
 	public void refresh() {
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
 		Page<Record> customerList = new Page<>();
