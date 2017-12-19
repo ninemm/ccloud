@@ -1385,11 +1385,6 @@ input[name=sex] {
   padding: .2rem 0;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.modify_price input[type=number] {
-  border: 1px solid #bbb;
-  width:2.5rem;
   display: -webkit-box;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
