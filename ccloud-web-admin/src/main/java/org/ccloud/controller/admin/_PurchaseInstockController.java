@@ -192,7 +192,6 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 		List<PurchaseInstockDetail> instockDetails = PurchaseInstockDetailQuery.me().findAllByPurchaseInstockId(purchaseInstockId);
 		List<PurchaseInstockDetail> details = instockDetails;
 		purchaseInstock.set("status", 1000);//已通过
-		purchaseInstock.set("payment_type", StringUtils.getArrayFirst(paraMap.get("paymentType")));
 		purchaseInstock.set("remark",  StringUtils.getArrayFirst(paraMap.get("remark")));
 		purchaseInstock.set("dept_id", user.getDepartmentId());
 		purchaseInstock.set("data_area", user.getDataArea());

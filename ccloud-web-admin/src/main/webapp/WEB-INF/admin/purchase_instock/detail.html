@@ -104,8 +104,6 @@
 			var $tr = obj.parent().parent().parent();
 			var num = $("#productNum").val();
 			num++;
-			console.log(product.list);
-			console.log(product);
 			$tr.find('td').eq(0).attr("rowspan",product.list.length);
 			$tr.find('td').eq(1).attr("rowspan",product.list.length);
 			$tr.find('td').eq(2).attr("rowspan",product.list.length);
@@ -280,6 +278,12 @@
 				$("#supplierName").val(instock.supplierName);
 				$("#contact").val(instock.contact);
 				$("#mobile").val(instock.supplierMobile);
+				console.log(instock.payment_type);
+				if(instock.payment_type==1){
+					$("#paymentType").val("现金");
+				}else{
+					$("#paymentType").val("应付账款");
+				}
 				$("#remark").val(instock.remark);
 				$("#biz_user_id").val(instock.biz_user_id);
 				$("#deptId").val(instock.dept_id);
@@ -414,12 +418,7 @@
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">付款方式:</label>
 						<div class="input-group col-md-4 col-sm-10">
-							<label class="radio-inline">
-								<input type="radio" name="paymentType" value="1" checked>现结
-							</label>
-							<label class="radio-inline">
-								<input class="minimal" type="radio" name="paymentType" value="0" >应付账款
-							</label>
+								<input type="text" name="paymentType" id="paymentType" class="form-control input-sm" readonly>
 						</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">
