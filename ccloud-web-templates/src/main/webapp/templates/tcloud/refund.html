@@ -146,78 +146,80 @@
 </#macro>
 
 <@layout>
-<body id="my-order" class="ft12">
-	<header class="has-th-list weui-flex">
-		<div class="head-search select-area weui-flex__item">
-			<div class="weui-flex">
-				<div class="weui-flex__item">
-					<input type="text" id="status" class="weui-input" readonly placeholder="订单状态">
-					<i class="icon-sort-desc"></i>
-				</div>
-				<div class="weui-flex__item">
-					<input type="text" id="customerTypeId" placeholder="客户类型" class="weui-input" readonly>
-					<i class="icon-sort-desc"></i>
-				</div>
-				<div class="weui-flex__item">
-					<input type="text" id="datePicker" class="weui-input" readonly>
-					<i class="icon-sort-desc"></i>
+<body id="my-order" class="ft14">
+	<div class="weui-content">
+		<header class="has-th-list weui-flex">
+			<div class="head-search select-area weui-flex__item">
+				<div class="weui-flex">
+					<div class="weui-flex__item">
+						<input type="text" id="status" class="weui-input" readonly placeholder="订单状态">
+						<i class="icon-sort-desc"></i>
+					</div>
+					<div class="weui-flex__item">
+						<input type="text" id="customerTypeId" placeholder="客户类型" class="weui-input" readonly>
+						<i class="icon-sort-desc"></i>
+					</div>
+					<div class="weui-flex__item">
+						<input type="text" id="datePicker" class="weui-input" readonly>
+						<i class="icon-sort-desc"></i>
+					</div>
 				</div>
 			</div>
-		</div>
-		<div id="combin-filter-btn">
-			<i class="icon-th-list"></i>
-		</div>
-	</header>
-	<main>
-		<div id="main">
-			<div class="weui-panel weui-panel_access" style="display: none">
-				<a id="salesOrderId">
-					<div class="ft14 gray">
-						<span class="tag" id="receiveType"></span>
-						<span id="orderSn"></span>
-						<span class="fr blue" id="status"></span>
-					</div>
-					<div id="customerName"></div>
-					<div class="gray">
-						<p>
-							联系人：<span id="contact"></span>
-							<span class="fr" id="customerType"></span>
-						</p>
-					</div>
-					<div class="gray">
-						<p>
-							金额：￥<span id="amount"></span>
-							<span class="fr" id="date"></span>
-						</p>
-					</div>
-				</a>
-				<hr>
-				<div id="refund" class="button white-button fr">退货</div>
+			<div id="combin-filter-btn">
+				<i class="icon-th-list"></i>
 			</div>
-		</div>
-		<div class="weui-loadmore" id="loading" style="display: none;">
-		  <i class="weui-loading"></i>
-		  <span class="weui-loadmore__tips">正在加载</span>
-		</div>
-		<div class="weui-loadmore weui-loadmore_line" id="noMore" style="display: none;">
-		  <span class="weui-loadmore__tips">暂无数据</span>
-		</div>
-	</main>
-	<article id="combin-filter">
-		<div class="filter-item">
-			<h4>下单日期</h4>
-			<div class="relative" id="getDate">
-				<span class="red-button" data-id="0">今天</span>
-				<span data-id="1">最近3天</span>
-				<span data-id="2">最近7天</span>
-				<span data-id="3">最近30天</span>
+		</header>
+		<main>
+			<div id="main">
+				<div class="weui-panel weui-panel_access" style="display: none">
+					<a id="salesOrderId">
+						<div class="ft14 gray">
+							<span class="tag" id="receiveType"></span>
+							<span id="orderSn"></span>
+							<span class="fr blue" id="status"></span>
+						</div>
+						<div id="customerName"></div>
+						<div class="gray">
+							<p>
+								联系人：<span id="contact"></span>
+								<span class="fr" id="customerType"></span>
+							</p>
+						</div>
+						<div class="gray">
+							<p>
+								金额：￥<span id="amount"></span>
+								<span class="fr" id="date"></span>
+							</p>
+						</div>
+					</a>
+					<hr>
+					<div id="refund" class="button white-button fr">退货</div>
+				</div>
 			</div>
-		</div>
-		<footer class="weui-footer weui-footer_fixed-bottom ft16 border-top-1px">
-			<button class="white-button-no-border width-50 cancel-search-btn">取消</button>
-			<button class="red-button width-50 confirm-search-btn" onclick="getDateOrder()">确定</button>
-		</footer>
-	</article>
-	<#include "_inc/_goback.html" />
+			<div class="weui-loadmore" id="loading" style="display: none;">
+			<i class="weui-loading"></i>
+			<span class="weui-loadmore__tips">正在加载</span>
+			</div>
+			<div class="weui-loadmore weui-loadmore_line" id="noMore" style="display: none;">
+			<span class="weui-loadmore__tips">暂无数据</span>
+			</div>
+		</main>
+		<article id="combin-filter">
+			<div class="filter-item">
+				<h4>下单日期</h4>
+				<div class="relative" id="getDate">
+					<span class="red-button" data-id="0">今天</span>
+					<span data-id="1">最近3天</span>
+					<span data-id="2">最近7天</span>
+					<span data-id="3">最近30天</span>
+				</div>
+			</div>
+			<footer class="weui-footer weui-footer_fixed-bottom ft16 border-top-1px">
+				<button class="white-button-no-border width-50 cancel-search-btn">取消</button>
+				<button class="red-button width-50 confirm-search-btn" onclick="getDateOrder()">确定</button>
+			</footer>
+		</article>
+		<#include "_inc/_goback.html" />
+	</div>
 </body>
 </@layout>
