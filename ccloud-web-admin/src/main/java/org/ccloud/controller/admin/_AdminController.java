@@ -15,6 +15,7 @@
  */
 package org.ccloud.controller.admin;
 
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 
@@ -84,7 +85,7 @@ public class _AdminController extends JBaseController {
 			return;
 		}
 		String selDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		
+		DecimalFormat df = new DecimalFormat("###,###,###,##0.00");
 		Record count = new Record();
 		if(StrKit.notBlank(selDataArea)) {
 			count = SalesOrderQuery.me().queryCountToDayOrders(user.getId(), selDataArea);
@@ -109,7 +110,7 @@ public class _AdminController extends JBaseController {
 		setAttr("toDoCustomerList", SellerCustomerQuery.me().getToDo(user.getUsername()));
 		setAttr("toDoOrdersList", SalesOrderQuery.me().getToDo(user.getUsername()));
 		setAttr("count_order", StrKit.notBlank(selDataArea)?count.get("count_order"):0);
-		setAttr("sum_amount", StrKit.notBlank(selDataArea)?count.get("sum_amount")!=null?count.get("sum_amount").toString():"0.00":"0.00");
+		setAttr("sum_amount", StrKit.notBlank(selDataArea)?count.get("sum_amount")!=null?df.format(count.get("sum_amount")):"0.00":"0.00");
 		setAttr("toDoCustomerVisitList", CustomerVisitQuery.me().getToDo(user.getUsername()));
 		
 		setAttr("customerCount",StrKit.notBlank(selDataArea)?UserJoinCustomerQuery.me().customerCount(selDataArea):0);

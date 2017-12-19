@@ -37,7 +37,7 @@
 				<p>${orderDetail.custom_name!}</p>
 				<div class="weui-flex">
 					<div class="weui-flex__item flex-grow2">
-						<div class="fr width-50">
+						<div class="fr width-60">
 							￥${(orderDetail.product_price)!} <span class="gray">（${(orderDetail.price)!}）</span>
 						</div>
 					</div>
@@ -46,7 +46,7 @@
 				</div>
 				<div class="weui-flex">
 					<div class="weui-flex__item flex-grow2">
-						<div class="fr width-50">
+						<div class="fr width-60">
 							￥${(orderDetail.product_price /
 							orderDetail.convert_relate)?string("0.##")} <span class="gray">（${(orderDetail.price
 								/ orderDetail.convert_relate)?string("0.##")}）</span>
@@ -95,20 +95,10 @@
 				<span class="weui-cell__ft"></span>
 			</div>
 		</a> </main>
-		<div class="hidden-menu">
-			<ul>
-				<li><a href="${CPATH}/user/center"> 首页 <i
-						class="icon-home blue"></i>
-				</a></li>
-				<li><a class="goback"> 上一页 <i class="icon-undo green"></i>
-				</a></li>
-			</ul>
-			<i class="icon-menu-open orange fr" id="button"></i>
-		</div>
-		<div class="layer"></div>
-		<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
+		<#include "_inc/_goback.html" />
+		<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex border-top-1px">
 			<#if order.status == 0>
-			<button class="gray-button weui-flex__item">撤销</button>
+			<button class="white-button-no-border weui-flex__item">撤销</button>
 			</#if>
 			<button onclick="orderAgain()" class="red-button weui-flex__item">再次购买</button>
 		</footer>

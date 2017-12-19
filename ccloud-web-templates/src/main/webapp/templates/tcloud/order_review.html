@@ -1,5 +1,5 @@
 <#include "_inc/_layout.html"/>
-<#macro css> </#macro>
+<#macro css></#macro>
 <#macro script>
 	$(function() {
     $(document).on('touchend', '.refuse', function() {
@@ -74,124 +74,119 @@
 
 <@layout>
 <body id="order-detail">
-<main class="ft12">
-  <div class="weui-panel weui-panel_access">
-    <div class="ft14">
-      订单状态
-      <span class="fr blue">${(order.statusName)!}</span>
-    </div>
-    <div class="gray">
-      <p>客户名称&nbsp;${(order.customer_name)!}</p>
-      <p>订货单号&nbsp;${(order.order_sn)!}</p>
-      <p>下单时间&nbsp;${(order.create_date)!}</p>
-      <p>业务员&nbsp;${(order.realname)!}</p>
-    </div>
-    <hr>
-    <div class="ft14">
-      <#if order.receive_type = 0>
-        <input type="checkbox" name="if-account" checked disabled="disabled" >
-        <#else>
-          <input type="checkbox" name="if-account" disabled="disabled">
-      </#if>是否账期
-    </div>
-  </div>
-  <div class="weui-panel weui-panel_access">
-    <div class="ft14">
-      订单详情
-    </div>
-    <#list orderDetailList as orderDetail>
-      <#if orderDetail.is_gift??>
-        <#if orderDetail.is_gift = 0>
-          <div class="p-l-15">
-            <p>${orderDetail.custom_name!}</p>
-            <div class="weui-flex">
-              <div class="weui-flex__item flex-grow2">
-                <div class="fr width-50">
-                  ￥${(orderDetail.product_price)!}
-                  <span class="gray">（${(orderDetail.price)!}）</span>
-                </div>
-              </div>
-              <div class="weui-flex__item t-r">${(orderDetail.product_count / orderDetail.convert_relate)?floor}${(orderDetail.big_unit)!}</div>
-            </div>
-            <div class="weui-flex">
-              <div class="weui-flex__item flex-grow2">
-                <div class="fr width-50">
-                  ￥${(orderDetail.product_price / orderDetail.convert_relate)?string("0.##")}
-                  <span class="gray">（${(orderDetail.price / orderDetail.convert_relate)?string("0.##")}）</span>
-                </div>
-              </div>
-              <div class="weui-flex__item t-r">${(orderDetail.product_count % orderDetail.convert_relate)}${(orderDetail.small_unit)!}</div>
-            </div>
-          </div>
-        </#if>
-        <#if orderDetail.is_gift = 1>
-          <div class="p-l-15">
-            <p>
-              <span class="tag">赠品</span>${orderDetail.custom_name!} / ${(orderDetail.valueName)!}</p>
-            <div class="weui-flex__item t-r">${(orderDetail.product_count / orderDetail.convert_relate)?floor}${(orderDetail.big_unit)!}</div>
-            <div class="weui-flex__item t-r">${(orderDetail.product_count % orderDetail.convert_relate)}${(orderDetail.small_unit)!}</div>
-          </div>
-        </#if>
-      </#if>
-    </#list>
-    <hr>
-    <div class="t-r ft14">
-      总计：
-      <span class="red">${(order.total_amount)!}元</span>
-    </div>
-  </div>
-  <div class="weui-panel weui-panel_access">
-    <div class="ft14">
-      收货信息
-    </div>
-    <div class="gray">
-      <p>
-        收货人：${(order.customer_name)!}
-        <span class="fr"> ${(order.cmobile)!}</span>
-      </p>
-      <p>地址详情：${(order.delivery_address)!}</p>
-    </div>
-    <hr>
-    <div class="ft14">
-      备注信息：
-      <span class="ft12">
-                    <#if order.remark??>
-                        ${(order.remark)!}
-                        <#else>无
-                    </#if>
-                </span>
-    </div>
-  </div>
-  <a class="weui-panel weui-panel_access block" href="${CPATH}/order/operateHistory?id=${(order.id)!}&proc_inst_id=${(order.proc_inst_id)!}">
-    <div class="weui-cell weui-cell_access">
-      <div class="weui-cell__bd ft14">
-        操作记录
+  <div class="weui-content">
+    <main class="ft12">
+      <div class="weui-panel weui-panel_access">
+        <div class="ft14">
+          订单状态
+          <span class="fr blue">${(order.statusName)!}</span>
+        </div>
+        <div class="gray">
+          <p>客户名称&nbsp;${(order.customer_name)!}</p>
+          <p>订货单号&nbsp;${(order.order_sn)!}</p>
+          <p>下单时间&nbsp;${(order.create_date)!}</p>
+          <p>业务员&nbsp;${(order.realname)!}</p>
+        </div>
+        <hr>
+        <div class="ft14">
+          <#if order.receive_type = 0>
+            <input type="checkbox" name="if-account" checked disabled="disabled" >
+            <#else>
+              <input type="checkbox" name="if-account" disabled="disabled">
+          </#if>是否账期
+        </div>
       </div>
-      <span class="weui-cell__ft"></span>
-    </div>
-  </a>
-</main>
-<div class="hidden-menu">
-  <ul>
-    <li>
-      <a href="${CPATH}/index">
-        首页
-        <i class="icon-home blue"></i>
+      <div class="weui-panel weui-panel_access">
+        <div class="ft14">
+          订单详情
+        </div>
+        <#list orderDetailList as orderDetail>
+          <#if orderDetail.is_gift??>
+            <#if orderDetail.is_gift = 0>
+              <div class="p-l-15 modify_price">
+                <p>${orderDetail.custom_name!}</p>
+                <div class="weui-flex">
+                  <div class="weui-flex__item flex-grow2">
+                    <div class="fr width-60">
+                      <!-- ￥${(orderDetail.product_price)!} -->
+                      <input type="number">
+                      <span class="gray">（${(orderDetail.price)!}）</span>
+                    </div>
+                  </div>
+                  <div class="weui-flex__item t-r">
+                    <!-- ${(orderDetail.product_count / orderDetail.convert_relate)?floor} -->
+                    <input type="number" name="" id="">
+                    ${(orderDetail.big_unit)!}
+                  </div>
+                </div>
+                <div class="weui-flex">
+                  <div class="weui-flex__item flex-grow2">
+                    <div class="fr width-60">
+                      <!-- ￥${(orderDetail.product_price / orderDetail.convert_relate)?string("0.##")} -->
+                      <input type="number" name="" id="">
+                      <span class="gray">（${(orderDetail.price / orderDetail.convert_relate)?string("0.##")}）</span>
+                    </div>
+                  </div>
+                  <div class="weui-flex__item t-r">
+                    <!-- ${(orderDetail.product_count % orderDetail.convert_relate)} -->
+                    <input type="number" name="" id="">
+                    ${(orderDetail.small_unit)!}
+                  </div>
+                </div>
+              </div>
+            </#if>
+            <#if orderDetail.is_gift = 1>
+              <div class="p-l-15">
+                <p>
+                  <span class="tag">赠品</span>${orderDetail.custom_name!} / ${(orderDetail.valueName)!}</p>
+                <div class="weui-flex__item t-r">${(orderDetail.product_count / orderDetail.convert_relate)?floor}${(orderDetail.big_unit)!}</div>
+                <div class="weui-flex__item t-r">${(orderDetail.product_count % orderDetail.convert_relate)}${(orderDetail.small_unit)!}</div>
+              </div>
+            </#if>
+          </#if>
+        </#list>
+        <hr>
+        <div class="t-r ft14">
+          总计：
+          <span class="red">${(order.total_amount)!}元</span>
+        </div>
+      </div>
+      <div class="weui-panel weui-panel_access">
+        <div class="ft14">
+          收货信息
+        </div>
+        <div class="gray">
+          <p>
+            收货人：${(order.customer_name)!}
+            <span class="fr"> ${(order.cmobile)!}</span>
+          </p>
+          <p>地址详情：${(order.delivery_address)!}</p>
+        </div>
+        <hr>
+        <div class="ft14">
+          备注信息：
+          <span class="ft12">
+                        <#if order.remark??>
+                            ${(order.remark)!}
+                            <#else>无
+                        </#if>
+                    </span>
+        </div>
+      </div>
+      <a class="weui-panel weui-panel_access block" href="${CPATH}/order/operateHistory?id=${(order.id)!}&proc_inst_id=${(order.proc_inst_id)!}">
+        <div class="weui-cell weui-cell_access">
+          <div class="weui-cell__bd ft14">
+            操作记录
+          </div>
+          <span class="weui-cell__ft"></span>
+        </div>
       </a>
-    </li>
-    <li>
-      <a class="goback">
-        上一页
-        <i class="icon-undo green"></i>
-      </a>
-    </li>
-  </ul>
-  <i class="icon-menu-open orange fr" id="button"></i>
-</div>
-<div class="layer"></div>
-<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex border-top-1px">
-  <button class="white-button-no-border weui-flex__item refuse">拒绝</button>
-  <button class="red-button weui-flex__item" onclick="doSubmit(1)">通过</button>
-</footer>
+    </main>
+    <#include "_inc/_goback.html" />    
+    <footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex border-top-1px">
+      <button class="white-button-no-border weui-flex__item refuse">拒绝</button>
+      <button class="red-button weui-flex__item" onclick="doSubmit(1)">通过</button>
+    </footer>
+  </div>
 </body>
 </@layout>

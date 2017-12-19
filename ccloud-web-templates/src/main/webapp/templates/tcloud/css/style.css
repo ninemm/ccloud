@@ -1135,11 +1135,14 @@ input.street-value {
 
 .remark .weui-cell__bd {
   height: auto!important;
-tomer_name {
+}
+
 .customer_name {
   font-size: .8rem;
   margin: .2rem 0;
-customer-info input,
+}
+
+.order-customer-info input,
 .delivery-info input,
 .activity-detail-item input {
   font-size: 0.7rem;
@@ -1359,8 +1362,8 @@ input[name=sex] {
   background: #ff9800;
   color: #fff;
   font-size: 0.6rem;
-  padd  padding: 0.1rem 0.2rem;
-margin-right: 0.25rem;
+  padding: 0.1rem 0.2rem;
+  margin-right: 0.25rem;
 }
 
 
@@ -1382,13 +1385,14 @@ margin-right: 0.25rem;
   padding: .2rem 0;
   overflow: hidden;
   text-overflow: ellipsis;
-  di.modify_price .weui-flex:last-child {
-  margin-top:.5rem;
 }
 
 .modify_price input[type=number] {
   border: 1px solid #bbb;
   width:2.5rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
 }
 
 #order-detail .weui-cell {

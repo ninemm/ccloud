@@ -47,12 +47,12 @@
             var arrNum = imageArr.length;
             var num = arrNum + files.length;
 
-            if (num > count) {
+            if ($("#uploaderFiles")[0].children.length + 1 > count) {
                 $.alert("最多上传三张图片");
                 return false;
             }
-            
-            $picNum.text(num + '/' + count);
+
+            $picNum.text($("#uploaderFiles")[0].children.length + 1 + '/' + count);
             
             for (var i = 0; i < files.length; i ++) {
                 var file = files[i];
@@ -70,10 +70,10 @@
                         render(this.result, x);
                     }
                 })(file.name)
-                
+
                 reader.readAsDataURL(file);
             }
-        
+
         });
         
         var MAX_HEIGHT = 1000;
@@ -123,12 +123,20 @@
         //删除图片  删除图片的代码也贴出来。
         $(".weui-gallery__del").click(function() { //这部分刚才放错地方了，放到$(function(){})外面去了
             $uploaderFiles.find("li").eq(index).remove();
+            $picNum.text($("#uploaderFiles")[0].children.length + '/' + count);
             imageArr = imageArr.splice(index, 1);
         });
-        
+
     })
     
     function doSubmit() {
+
+        var children = $("#uploaderFiles")[0].children;
+        var oldPic=[];
+        for(var i = 0; i < children.length; i++)
+            if(children[i].style.backgroundImage.length < 200)
+                oldPic.push(children[i].style.backgroundImage.substring(5, children[i].style.backgroundImage.length-2));
+        $("#oldPic").val(JSON.stringify(oldPic));
     
         $.ajax({
             url: '${CPATH}/customer/save',
@@ -145,7 +153,7 @@
                 if($("#customer_type").val().length==0) {$.toptip('客户类型不能为空', 1000, 'error'); return false;}
                 if($("#delivery-address").val().length==0) {$.toptip('配送地址不能为空', 1000, 'error'); return false;}
                 if($("#address").val().length==0) {$.toptip('地址详情不能为空', 1000, 'error'); return false;}
-                
+
                 $('._submit_btn').attr('disabled', true);
                 layer.open({
                     type: 2,
@@ -239,6 +247,7 @@
 		    <form action="${CPATH}/customer/save" method="post" id="form">
 			    <section class="weui-panel weui-panel_access order-customer-info select-area">
 			        <input type="hidden" name="sellerCustomer.id" value="${(sellerCustomer.id)!}">
+                    <input type="hidden" id="oldPic" name="oldPic">
 			        <div class="weui-cell weui-cell_access">
 			            <div class="weui-cell__bd">
 			                <div class="order-customer-info-title">
