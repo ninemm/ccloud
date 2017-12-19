@@ -23,9 +23,6 @@
 
 </#macro>
 
-
-
-
 <#macro script>
 	var $table = $("#_inventory_table");
 	
@@ -72,7 +69,6 @@
 		$(this).siblings().removeClass('active');
 		$(this).addClass('active');
 		warehouse_id = $(this).attr('data');
-		
 		getInventory();
 	});
 	
@@ -111,7 +107,6 @@
 	var initParams = function(params){
 		var product_sn = encodeURIComponent($("input[name='product_sn']").val());
 		var product_name = encodeURIComponent($("input[name='product_name']").val());
-		//var specification = encodeURIComponent($("input[name='specification']").val());
 		
 		var param = {
 			'size': params.limit,

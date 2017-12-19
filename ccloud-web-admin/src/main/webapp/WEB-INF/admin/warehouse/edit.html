@@ -33,7 +33,7 @@ var validatorFields = {
 	'warehouse.code': {
 		validators: {
 			notEmpty: { message: '仓库编码不能为空' },
-	        stringLength: { min: 1, max: 6, message: '供应商编码最少1个字符，最多6字符，请重新输入' }
+	        stringLength: { min: 1, max: 1, message: '供应商编码为1个字符,请重新输入' }
         }
 	},
 	'warehouse.is_enable': {
@@ -123,7 +123,7 @@ function doSubmit(){
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">编码:</label>
 						<div class="input-group col-md-4 col-sm-10">
-		                 	<input class="form-control input-sm" type="text" name="warehouse.code" value="${(warehouse.code)!}" placeholder="2-6个任意字母数字">
+		                 	<input class="form-control input-sm" type="text" name="warehouse.code" value="${(warehouse.code)!}" placeholder="1个任意字母数字">
 		               	</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">
