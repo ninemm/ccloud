@@ -24,12 +24,12 @@
     var auditInfo = new Array();
     var paramId = 0;
     var batchFlg = true;
-    $audit_form = $("#audit_form");
 
     $(function() {
         jQuery.mm.initEditTable('#_customer_visit_table', url, initParams, initFields(), null);
-        jQuery.mm.initValidator('#audit_form', validatorFields);
         initCustomerType();
+        initQuestionType();
+        initStatus();
     });
 
 
@@ -47,12 +47,15 @@
         if (customerType) customerType = encodeURIComponent(customerType);
         var questionType = $('#question_type').val();
         if (questionType) questionType = encodeURIComponent(questionType);
+        var status = $('#status').val();
+        if (status) status = encodeURIComponent(status);
         var param = {
             size: params.limit,
             page: params.offset/params.limit + 1,
             k: keyword,
             'questionType':questionType,
-            'customerType':customerType
+            'customerType':customerType,
+            'status':status
         };
         return param;
     };
@@ -61,35 +64,15 @@
         var fields =
             [
             {field: "customer_name", title: "客户", align: "center", width: '7%', edit:false},
-            {field: "customer_type", title: "客户类型", align: "center", width: '8%',
-                /*formatter: function(value, row, rowIndex){
-                    switch (value){
-                        case '1':return "团购直销";case '2':return "商超";case '3':return "餐饮";
-                        case '4':return "批发";case '5':return "零售终端";
-                        case '6':return "其他";case '7':return "直营商";
-                        case '8':return "餐饮(直供)";default:return "未定";}},*/
-                edit:false
-            },
-            {field: "question_type", title: "问题类型", align: "center", width: '5%',
-            formatter: function (value, row, rowIndex){
-                    switch (value){
-                        case '10':
-                        return "正常";
-                        case '11':
-                        return "异常";
-                        case '19':
-                        return "其他";
-                        default:
-                        return "未定";
-                    }
-                },
-                edit: false
-            },
+            {field: "customer_type", title: "客户类型", align: "center", width: '8%', edit:false},
+            {field: "questionName", title: "问题类型", align: "center", width: '5%', edit: false},
             {field: "question_desc", title: "问题描述", align: "center", width: '28%', edit: false},
             {field: "visit_user", title: "拜访人", align: "center", width: '5%',edit: false},
             {field: "status", title: "状态", align: "center", width: '8%',
             formatter: function (value, row, rowIndex){
-                return value=="0"?"待审核":"已审核";
+                if(value == "100101") return "正常";
+                if(value == "100102") return "待审核";
+                if(value == "100103") return "审核拒绝";
             }, edit: false},
             {field: "review_user", title: "审核人", align: "center", width: '5%', edit: false},
             {field: "create_date", title: "创建时间", align: "center", width: '12%', edit: false},
@@ -98,14 +81,22 @@
             formatter: function(value, row, rowIndex) {
                 var audit = [row.location,row.lng,row.lat,row.advice,row.solution,row.status,row.photo,row.vedio];
                 auditInfo[row.id] = audit;
-                var strHtml = '<a href="javascript:void(0);" class="btn btn-xs btn-primary btn-flat" title="审核拜访结果" onclick="audit(\''+row.id+'\')">审核</a> ';
-                strHtml += '<a href="javascript:void(0);" class="btn btn-xs btn-primary btn-flat" title="查看审核" onclick="showAudit(\''+row.id+'\')">查看</a> ';
+                var strHtml = '';
+                if(row.status == "100102") {
+                    strHtml = '<a href="javascript:void(0);" class="btn btn-xs btn-primary btn-flat" title="审核拜访结果" onclick="audit(\''+row.id+'\', \'' + row.taskId + '\')">审核</a> ';
+                }
+                strHtml += '<a href="javascript:void(0);" class="btn btn-xs btn-primary btn-flat" title="查看审核" onclick="audit(\''+row.id+'\', \'' + row.taskId + '\')">查看</a> ';
                 return strHtml;
                 },
                 edit:false
             }
         ];
         return fields;
+    };
+
+    function audit(id, taskId) {
+        var url = "${(CPATH)!}/admin/customerVisit/audit?id=" + id + "&taskId=" + taskId;
+        location.href = url;
     };
 
     var initCustomerType = function () {
@@ -116,7 +107,7 @@
         type: 'post',
         success: function (result) {
             var customerType = result.data;
-            strHtml = '<option selected="selected" value="0">客户类型</option>';
+            strHtml = '<option selected="selected" value="">客户类型</option>';
             for(index in customerType){
                 var row = customerType[index].columns;
                 strHtml +='<option value="'+row.id+'">'+row.name+'</option>';
@@ -124,107 +115,33 @@
             $("#customer_type").html(strHtml);
         }
         });
-
     }
 
-
-    function audit(rowId){
-        $("#t_rowId").val(rowId);
-        $("#location").html(auditInfo[rowId][0]);
-        $("#lngAndLat").html(auditInfo[rowId][1]+" "+auditInfo[rowId][2]);
-        $("#advice").html(auditInfo[rowId][3]);
-        $("#review_solution").val(auditInfo[rowId][4]);
-        if(auditInfo[rowId][5]!="0"){
-            $("#review_solution").attr("readonly", true);
-            $("#audit_visit").attr("disabled", true);
-        }else{
-            $("#review_solution").attr("readonly", false);
-            $("#audit_visit").attr("disabled", false);
-        }
-        if(auditInfo[rowId][6]==""||auditInfo[rowId][6]==null){
-            $("#visit_pic").html("").html("<lable>未上传拜访图片</lable>");
-        }else{
-            $("#visit_pic").html("").html("<img width='400px' height='300px' id='img_src'/>");
-            $("#img_src").attr('src',auditInfo[rowId][6]);
-        }
-        if(auditInfo[rowId][7]==""||auditInfo[rowId][7]==null){
-            $("#visit_audio").html("").html("<lable id='notFoundAudio'>未上传拜访录音</lable>");
-        }else{
-            $("#visit_audio").html("").html("<audio preload='auto' id='audio_src'/>");
-            audiojs.events.ready(function() {
-                var as = audiojs.createAll();
-                $("#audio_src").attr('src',auditInfo[rowId][7]);
-            });
-        }
-
-
-        $("#exampleModal").modal('show');
-    }
-
-    function showAudit(rowId){
-        $("#s_location").html(auditInfo[rowId][0]);
-        $("#s_lngAndLat").html(auditInfo[rowId][1]+" "+auditInfo[rowId][2]);
-        $("#s_advice").html(auditInfo[rowId][3]);
-        $("#s_review_solution").val(auditInfo[rowId][4]);
-        $("#s_review_solution").attr("readonly", true);
-        $("#s_audit_visit").attr("disabled", true);
-        if(auditInfo[rowId][6]==""||auditInfo[rowId][6]==null){
-            $("#s_visit_pic").html("").html("<lable>未上传拜访图片</lable>");
-        }else{
-            $("#s_visit_pic").html("").html("<img width='400px' height='300px' id='s_img_src'/>");
-            $("#s_img_src").attr('src',auditInfo[rowId][6]);
-        }
-        if(auditInfo[rowId][7]==""||auditInfo[rowId][7]==null){
-            $("#s_visit_audio").html("").html("<lable id='notFoundAudio'>未上传拜访录音</lable>");
-        }else{
-            $("#s_visit_audio").html("").html("<audio preload='auto' id='s_audio_src'/>");
-            audiojs.events.ready(function() {
-                var as = audiojs.createAll();
-                $("#s_audio_src").attr('src',auditInfo[rowId][7]);
-            });
-        }
-
-
-    $("#showReviewModal").modal('show');
-    }
-
-    $("#audit_visit").on('click',function(){
-
-        $audit_form.ajaxSubmit({
-            beforeSubmit: function() {
-                var validate = $audit_form.data('bootstrapValidator');
-                validate.validate();
-                return validate.isValid()
-            },
-            type : "post",
-            data : {
-                "visitId": $("#t_rowId").val(),
-                "review_solution": $("#review_solution").val()
-            },
-            dataType : "json",
-            success : function(data) {
-                $("#exampleModal").modal('hide');
-                if(data.errorCode == 0) {
-                    toastr.success(data.message, '审核成功');
-                    $("#_customer_visit_table").bootstrapTable('refresh');
-                } else {
-                    toastr.error(data.message,'审核失败');
+    var initQuestionType = function () {
+        var strHtml = "";
+        var url = '${CPATH}/admin/customerVisit/queryQuestionType';
+        $.ajax({
+            url: url,
+            type: 'post',
+            success: function (result) {
+                var questionType = result.data;
+                strHtml = '<option selected="selected" value="">活动类型</option>';
+                for(index in questionType){
+                    var row = questionType[index];
+                    strHtml +='<option value="'+row.value+'">'+row.name+'</option>';
                 }
-            },
-            error : function() {
-                $("#exampleModal").modal('hide');
-                toastr.error('审核失败');
+                $("#question_type").html(strHtml);
             }
         });
-    });
+    }
 
-    var validatorFields = {
-        'review_solution': {
-            validators: {
-                notEmpty: { message: '客户名称不能为空' },
-                stringLength: { max: 200, message: '解决办法最多200字，请校验确认' }
-            }
-        }
+    var initStatus = function () {
+        var strHtml = "";
+        strHtml = '<option selected="selected" value="">拜访状态</option>';
+        strHtml +='<option value="100101"> 正常 </option>';
+        strHtml +='<option value="100102"> 待审核 </option>';
+        strHtml +='<option value="100103"> 审核拒绝 </option>';
+        $("#status").html(strHtml);
     };
 
 
@@ -251,10 +168,8 @@
                 <select class="input-sm" name="customer_type" id="customer_type" style="float: left;padding-right:5px;margin-right:5px;">
                 </select>
                 <select class="input-sm" name="question_type" id="question_type" style="float: left;padding-right:5px;margin-right:5px;">
-                    <option selected="selected" value="type">问题类型</option>
-                    <option value="normal">正常</option>
-                    <option value="unusual">异常</option>
-                    <option value="other">其他</option>
+                </select>
+                <select class="input-sm" name="status" id="status" style="float: left;padding-right:5px;margin-right:5px;">
                 </select>
                 <input id="post-search-input" class="form-control" type="search" value="${k!}" name="k" placeholder="搜索名称">&nbsp;
                 <input id="search-submit" class="btn btn-default btn-sm btn-flat" type="button" value="搜索">
@@ -266,92 +181,4 @@
     </form>
     <!-- /.box -->
 </section>
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="padding-top:100px;">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content" style="width: 700px;">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="exampleModalLabel">审核</h4>
-            </div>
-            <div class="modal-body form-group">
-                <form action="${CPATH}/admin/customerVisit/audit_visit" id="audit_form" method="post"  class="form-horizontal">
-                    <table style="width:95%;margin-left:20px;border-collapse:separate; border-spacing:10px;">
-                        <tr>
-                            <td width="15%">客户地址:</td>
-                            <td><lable id="location"></lable></td>
-                        </tr>
-                        <tr>
-                            <td width="15%">拜访人经纬度:</td>
-                            <td><label id="lngAndLat"></label></td>
-                        </tr>
-                        <tr>
-                            <td width="15%">拜访人建议:</td>
-                            <td><lable id="advice"></lable></td>
-                        </tr>
-                        <tr>
-                            <td width="15%">拜访图片:</td>
-                            <td><div id="visit_pic"></div></td>
-                        </tr>
-                        <tr>
-                            <td width="15%">拜访录音:</td>
-                            <td><div id="visit_audio"></div></td>
-                        </tr>
-                        <tr>
-                            <td width="15%">解决方法:</td>
-                            <td><textarea style="width: 95%;height:100px;resize: none;" class="form-control" id="review_solution" name="solution" value="${(customer_visit.solution)!}"  placeholder="字数少于等于200字"></textarea></td>
-                        </tr>
-                    </table>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <input type="hidden" id="t_rowId"/>
-                <button type="button" class="btn btn-primary" id="audit_visit">审核</button>
-                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="modal fade" id="showReviewModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="padding-top:100px;">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content" style="width: 700px;">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="s_exampleModalLabel">审核</h4>
-            </div>
-            <div class="modal-body form-group">
-                <form id="s_audit_form" method="post"  class="form-horizontal">
-                    <table style="width:95%;margin-left:20px;border-collapse:separate; border-spacing:10px;">
-                        <tr>
-                            <td width="15%">客户地址:</td>
-                            <td><lable id="s_location"></lable></td>
-                        </tr>
-                        <tr>
-                            <td width="15%">拜访人经纬度:</td>
-                            <td><label id="s_lngAndLat"></label></td>
-                        </tr>
-                        <tr>
-                            <td width="15%">拜访人建议:</td>
-                            <td><lable id="s_advice"></lable></td>
-                        </tr>
-                        <tr>
-                            <td width="15%">拜访图片:</td>
-                            <td><div id="s_visit_pic"></div></td>
-                        </tr>
-                        <tr>
-                            <td width="15%">拜访录音:</td>
-                            <td><div id="s_visit_audio"></div></td>
-                        </tr>
-                        <tr>
-                            <td width="15%">解决方法:</td>
-                            <td><textarea style="width: 95%;height:100px;resize: none;" class="form-control" id="s_review_solution" name="s_review_solution"></textarea></td>
-                        </tr>
-                    </table>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-            </div>
-        </div>
-    </div>
-</div>
 </@layout>

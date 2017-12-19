@@ -3,6 +3,7 @@ package org.ccloud.controller.admin;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -337,31 +338,36 @@ public class _ReportController extends JBaseController {
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
 		List<Record> list = SalesOrderQuery.me().findByMSellerDetail(startDate,endDate,keyword, dataArea,sellerId);
-		
+		//等到表头
 		List<String>watchHead=new ArrayList<>();
-		if (list.size()!=0) {
-			String[] watchHead1 = list.get(0).getColumnNames();
-			watchHead = Arrays.asList(watchHead1);
-		}else {
-			watchHead.add("直营商名称");
-			List<SellerProduct> findBySellerId = SellerProductQuery.me().findBySellerId(sellerId);
-			for (SellerProduct sellerProduct : findBySellerId) {
-				String customName=sellerProduct.getCustomName();
-				watchHead.add(customName);
-			}
+		watchHead.add("直营商名称");
+		List<SellerProduct> findBySellerId = SellerProductQuery.me().findBySellerId(sellerId);
+		for (SellerProduct sellerProduct : findBySellerId) {
+			String customName=sellerProduct.getCustomName();
+			watchHead.add(customName);
 		}
-		List<Object[]>mSellerDetailReportList=new ArrayList<>();
+		//根据表头  对数据从新排序
+		List<List>mSellerDetailReportList=new ArrayList<>();
 		for (Record record : list) {
-			Object[] columnValues = record.getColumnValues();
-			mSellerDetailReportList.add(columnValues);
+			List mSellerDetailGiftReport=new ArrayList<>();
+			for (int i = 0; i < watchHead.size(); i++) {
+				String key = watchHead.get(i);
+				mSellerDetailGiftReport.add(record.getStr(key));
+			}
+			mSellerDetailReportList.add(mSellerDetailGiftReport);
 		}
 		setAttr("watchHead", watchHead);
 		setAttr("mSellerDetailReportList", mSellerDetailReportList);
 		List<Record> list1 = SalesOrderQuery.me().findByMSellerDetailGift(startDate,endDate,keyword, dataArea,sellerId);
-		List<Object[]>mSellerDetailGiftReportList=new ArrayList<>();
+		//根据表头  对数据从新排序
+		List<List>mSellerDetailGiftReportList=new ArrayList<>();
 		for (Record record : list1) {
-			Object[] columnValues = record.getColumnValues();
-			mSellerDetailGiftReportList.add(columnValues);
+			List mSellerDetailGiftReport=new ArrayList<>();
+			for (int i = 0; i < watchHead.size(); i++) {
+				String key = watchHead.get(i);
+				mSellerDetailGiftReport.add(record.getStr(key));
+			}
+			mSellerDetailGiftReportList.add(mSellerDetailGiftReport);
 		}
 		setAttr("startDate", startDate);
 		setAttr("endDate", endDate);
@@ -388,33 +394,41 @@ public class _ReportController extends JBaseController {
 			setAttr("k", keyword);
 		}
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
 		List<Record> list = SalesOrderQuery.me().findByMSalesmanDetail(startDate,endDate,keyword, dataArea,sellerId);
+		
+		//得到表头
 		List<String>watchHead=new ArrayList<>();
-		if (list.size()!=0) {
-			String[] watchHead1 = list.get(0).getColumnNames();
-			watchHead = Arrays.asList(watchHead1);
-		}else {
-			watchHead.add("业务员名称");
-			List<SellerProduct> findBySellerId = SellerProductQuery.me().findBySellerId(sellerId);
-			for (SellerProduct sellerProduct : findBySellerId) {
-				String customName=sellerProduct.getCustomName();
-				watchHead.add(customName);
-			}
+		watchHead.add("业务员名称");
+		List<SellerProduct> findBySellerId = SellerProductQuery.me().findBySellerId(sellerId);
+		for (SellerProduct sellerProduct : findBySellerId) {
+			String customName=sellerProduct.getCustomName();
+			watchHead.add(customName);
 		}
-		List<Object[]>mSalesmanDetailReportList=new ArrayList<>();
+		
+		//根据表头  对数据从新排序
+		List<List<String>>mSalesmanDetailReportList=new ArrayList<>();
 		for (Record record : list) {
-			Object[] columnValues = record.getColumnValues();
-			mSalesmanDetailReportList.add(columnValues);
+			List<String> mSalesmanDetailReport=new ArrayList<>();
+			for (int i = 0; i < watchHead.size(); i++) {
+				String key = watchHead.get(i);
+				mSalesmanDetailReport.add(record.getStr(key));
+			}
+			mSalesmanDetailReportList.add(mSalesmanDetailReport);
 		}
+		
 		setAttr("watchHead", watchHead);
 		setAttr("mSalesmanDetailReportList", mSalesmanDetailReportList);
 		List<Record> list1 = SalesOrderQuery.me().findByMSalesmanDetailGift(startDate,endDate,keyword, dataArea,sellerId);
-		List<Object[]>mSalesmanDetailGiftReportList=new ArrayList<>();
+		//根据表头  对数据从新排序
+		List<List<String>>mSalesmanDetailGiftReportList=new ArrayList<>();
 		for (Record record : list1) {
-			Object[] columnValues = record.getColumnValues();
-			mSalesmanDetailGiftReportList.add(columnValues);
+			List<String> mSalesmanDetailGiftReport=new ArrayList<>();
+			for (int i = 0; i < watchHead.size(); i++) {
+				String key = watchHead.get(i);
+				mSalesmanDetailGiftReport.add(record.getStr(key));
+			}
+			mSalesmanDetailReportList.add(mSalesmanDetailGiftReport);
 		}
 		setAttr("startDate", startDate);
 		setAttr("endDate", endDate);

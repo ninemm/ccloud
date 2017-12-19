@@ -18,6 +18,7 @@ package org.ccloud.model.query;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Record;
 import org.ccloud.model.CustomerVisit;
@@ -53,21 +54,30 @@ public class CustomerVisitQuery extends JBaseQuery {
 		});
 	}
 
-	public Page<CustomerVisit> paginate(int pageNumber, int pageSize, String keyword, String dataArea,String customerType,String questionType,String groupBy, String orderby) {
+	public Page<CustomerVisit> paginate(int pageNumber, int pageSize, String keyword, String dataArea,String customerType,String questionType,String groupBy, String orderby, String status) {
 		
-		String select = "select cc_v.*,cc.customer_name,(select realname from `user` where id = cc_v.user_id) visit_user,u.realname review_user,GROUP_CONCAT(cc_t.`name`) customer_type ";
+		String select = "select cc_v.*,cc.customer_name,(select realname from `user` where id = cc_v.user_id) visit_user,u.realname review_user,GROUP_CONCAT(cc_t.`name`) customer_type, d.name questionName, art.ID_ taskId ";
 		boolean needWhere = true;
 		StringBuilder fromBuilder = new StringBuilder("from cc_customer_visit cc_v left join cc_seller_customer cc_s on cc_v.seller_customer_id = cc_s.id left join cc_customer cc on cc_s.customer_id = cc.id ");
 		fromBuilder.append("left join `user` u on u.id = cc_v.review_id left join cc_customer_join_customer_type cc_ct on cc_ct.seller_customer_id = cc_s.id left join cc_customer_type cc_t on cc_t.id = cc_ct.customer_type_id ");
+		fromBuilder.append("left join dict d on d.value = cc_v.question_type ");
+		fromBuilder.append("left JOIN act_ru_task art on cc_v.proc_inst_id = art.PROC_INST_ID_ ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cc_v.data_area", dataArea, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cc.customer_name", keyword, params, needWhere);
-		if(!customerType.equals("0")) {
+
+		if(StrKit.notBlank(customerType)) {
 			needWhere = appendIfNotEmpty(fromBuilder, "cc_t.`id`", customerType, params, needWhere);
 		}
-		if(!questionType.equals("0")) {
+
+		if(StrKit.notBlank(questionType)) {
 			needWhere = appendIfNotEmpty(fromBuilder, "cc_v.question_type", questionType, params, needWhere);
 		}
+
+		if(StrKit.notBlank(status)) {
+			needWhere = appendIfNotEmpty(fromBuilder, "cc_v.status", status, params, needWhere);
+		}
+
 		fromBuilder.append(" GROUP BY cc_v.id ");
 		fromBuilder.append(" ORDER BY " + orderby);
 		if (params.isEmpty())
@@ -97,11 +107,12 @@ public class CustomerVisitQuery extends JBaseQuery {
 	}
 
 	public CustomerVisit findMoreById(String id) {
-		StringBuilder sql = new StringBuilder("SELECT ccv.id, ccv.seller_customer_id, cc.customer_name, cc.contact, cc.mobile, ccv.create_date, ccv.`status`, ccv.question_type, ccv.comment, ccv.location, ccv.photo, ccv.question_desc, u.realname, u.mobile as userMobile ");
+		StringBuilder sql = new StringBuilder("SELECT ccv.id, ccv.seller_customer_id, cc.customer_name, cc.contact, cc.mobile, ccv.create_date, ccv.`status`, ccv.question_type, ccv.comment, ccv.location, ccv.photo, ccv.question_desc, u.realname, u.mobile as userMobile, d.name as typeName ");
 		sql.append("FROM cc_customer_visit ccv ");
 		sql.append("LEFT JOIN user u ON ccv.user_id = u.id ");
 		sql.append("LEFT JOIN cc_seller_customer csc ON ccv.seller_customer_id = csc.id ");
 		sql.append("LEFT JOIN cc_customer cc ON csc.customer_id = cc.id ");
+		sql.append("LEFT JOIN dict d ON ccv.question_type = d.value ");
 //		sql.append("LEFT JOIN cc_customer_join_customer_type ccjct ON csc.id = ccjct.seller_customer_id ");
 		sql.append("WHERE ccv.id = ? limit 1");
 
