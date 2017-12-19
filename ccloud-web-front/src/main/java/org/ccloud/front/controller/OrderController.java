@@ -202,7 +202,7 @@ public class OrderController extends BaseFrontController {
 
 				String[] sellProductIds = paraMap.get("sellProductId");
 				// 常规商品
-				if (StrKit.notBlank(sellProductIds)) {
+				if (sellProductIds != null && sellProductIds.length > 0) {
 					for (int index = 0; index < sellProductIds.length; index++) {
 						if (StrKit.notBlank(sellProductIds[index])) {
 							if (!SalesOrderDetailQuery.me().insertForApp(paraMap, orderId, sellerId, user.getId(), date,
@@ -216,7 +216,7 @@ public class OrderController extends BaseFrontController {
 
 				String[] giftSellProductIds = paraMap.get("giftSellProductId");
 				// 赠品
-				if (StrKit.notBlank(giftSellProductIds)) {
+				if (giftSellProductIds != null && giftSellProductIds.length > 0) {
 					for (int index = 0; index < giftSellProductIds.length; index++) {
 						if (StrKit.notBlank(giftSellProductIds[index])) {
 							if (!SalesOrderDetailQuery.me().insertForAppGift(paraMap, orderId, sellerId, user.getId(),
@@ -231,7 +231,7 @@ public class OrderController extends BaseFrontController {
 				String[] compositionIds = paraMap.get("compositionId");
 				String[] compositionNums = paraMap.get("compositionNum");
 				// 组合商品
-				if (StrKit.notBlank(compositionIds)) {
+				if (compositionIds != null && compositionIds.length > 0) {
 					for (int index = 0; index < compositionIds.length; index++) {
 						String productId = compositionIds[index];
 						String number = compositionNums[index];

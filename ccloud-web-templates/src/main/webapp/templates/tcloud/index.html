@@ -134,7 +134,7 @@ $(function () {
                 <a href="${CPATH}/t/article" class="weui-grid js_grid"> 
                     <span class="weui-badge empty-badge">&nbsp;</span>
                     <div class="weui-grid__icon">
-                        <i class="icon-comments-o" style="color: #9c89b9"></i> 
+                        <i class="icon-commenting" style="color: #9c89b9"></i> 
                     </div>
                     <p class="weui-grid__label">企业通知</p>
                 </a>
@@ -153,6 +153,7 @@ $(function () {
 			<div class="index-info">
 				<div class="weui-cells">
 					<#if orderPage ??><#list orderPage.list as bean>
+					    <a href="${CPATH}/message/edit?id=${bean.id}">
 						<div class="weui-cell">
 							<div class="weui-cell__bd">
 								<span>${(bean.title)!}</span>
@@ -160,6 +161,7 @@ $(function () {
 							<div class="check-pass">${DICT_NAME('${bean.type}')}</div>
 							<div class="weui-cell__ft">${(bean.createDate?string('yyyy-MM-dd HH:mm'))!}</div>
 						</div>
+						</a>
 					</#list> </#if>
 					<#if !(orderPage ??) || (orderPage.totalRow = 0)>
 					    <div class="weui-loadmore weui-loadmore_line">
@@ -169,6 +171,7 @@ $(function () {
 				</div>
 				<div class="weui-cells none">
 				    <#if customerPage ??><#list customerPage.list as bean>
+				        <a href="${CPATH}/message/edit?id=${bean.id}">
                         <div class="weui-cell">
                             <div class="weui-cell__bd">
                                 <span>${(bean.title)!}</span>
@@ -176,6 +179,7 @@ $(function () {
                             <div class="check-pass">${DICT_NAME('${bean.type}')}</div>
                             <div class="weui-cell__ft">${(bean.createDate?string('yyyy-MM-dd HH:mm'))!}</div>
                         </div>
+                        </a>
                     </#list> </#if>
                     <#if !(customerPage ??) || (customerPage.totalRow = 0)>
                         <div class="weui-loadmore weui-loadmore_line">
@@ -185,6 +189,7 @@ $(function () {
 				</div>
 				<div class="weui-cells none">
 				    <#if customerVisitPage ??><#list customerVisitPage.list as bean>
+				        <a href="${CPATH}/message/edit?id=${bean.id}">
                         <div class="weui-cell">
                             <div class="weui-cell__bd">
                                 <span>${(bean.title)!}</span>
@@ -192,6 +197,7 @@ $(function () {
                             <div class="check-pass">${DICT_NAME('${bean.type}')}</div>
                             <div class="weui-cell__ft">${(bean.createDate?string('yyyy-MM-dd HH:mm'))!}</div>
                         </div>
+                        </a>
                     </#list> </#if>
                     <#if !(customerVisitPage ??) || (customerVisitPage.totalRow = 0)>
                         <div class="weui-loadmore weui-loadmore_line">

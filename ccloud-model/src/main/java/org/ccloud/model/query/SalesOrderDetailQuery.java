@@ -220,7 +220,9 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 			
 			detail.setProductPrice(new BigDecimal(productPrice));
 			detail.setProductAmount(productAmount);
-			detail.setIsGift(0);//非赠品
+			String isGiftStr = paraMap.get("isGift")[index];
+			Integer isGift = isGiftStr != null ? Integer.valueOf(isGiftStr) : 0;
+			detail.setIsGift(isGift);
 			detail.setCreateDate(date);
 			detail.setDeptId(deptId);
 			detail.setDataArea(dataArea);	

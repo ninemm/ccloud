@@ -543,7 +543,6 @@ a {
 #home {
   overflow: auto;
   -webkit-overflow-scrolling: touch;
-  padding-bottom: 1.5rem;
 }
 
 .company {
@@ -658,9 +657,10 @@ a {
   height: 1.25rem;
   line-height: 1.25rem;
   vertical-align: middle;
-  width: 15.2778%;
+/*   width: 15.2778%; */
   text-align: center;
   margin: 0 0.25rem;
+  padding: 0 .5rem;
   border-radius: 2px;
 }
 
@@ -780,6 +780,11 @@ a {
   font-size: 0.7rem;
   display: flex;
   justify-content: space-between;
+}
+
+.composition .product_name {
+  height: 3.25rem;
+  line-height: 3.25rem;
 }
 
 .product_unit {
@@ -1251,6 +1256,11 @@ input.street-value {
   line-height: 1rem;
   margin-top: 0.5rem;
   color: #000;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
 }
 
 .customer-href i {
@@ -1501,7 +1511,7 @@ input[name=sex] {
   width: 3rem;
   height: auto;
   border-radius: 50%;
-  border: 3px solid #fff;
+  border: 2px solid #fff;
 }
 
 .user-statistics {
