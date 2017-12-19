@@ -29,7 +29,6 @@ import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.SalesOrder;
-import org.ccloud.model.SalesRefundInstock;
 import org.ccloud.model.User;
 import org.ccloud.model.query.OptionQuery;
 import org.ccloud.model.query.SalesOrderDetailQuery;

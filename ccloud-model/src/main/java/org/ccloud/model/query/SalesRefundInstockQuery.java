@@ -73,12 +73,6 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
-		String regex = "^[a-zA-Z][a-zA-Z0-9]*$";
-		if(keyword.matches(regex)){
-			needWhere = appendIfNotEmptyWithLike(fromBuilder, "r.instock_sn", keyword, params, needWhere);
-		}else{
-			needWhere = appendIfNotEmptyWithLike(fromBuilder, "c.customer_name", keyword, params, needWhere);
-		}
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, needWhere);
 		
 		if (needWhere) {
@@ -98,7 +92,7 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 			fromBuilder.append(" and r.status != 0");
 		}
 
-		fromBuilder.append(" order by r.create_date ");
+		fromBuilder.append(" and r.instock_sn like '%"+keyword+"%' or c.customer_name like '%"+keyword+"%' order by r.create_date ");
 
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());

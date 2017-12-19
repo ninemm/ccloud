@@ -72,12 +72,6 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append("left join cc_customer c on cc.customer_id = c.id ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
-		String regex = "^[a-zA-Z][a-zA-Z0-9]*$";
-		if(keyword.matches(regex)){
-			needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.order_sn", keyword, params, needWhere);
-		}else{
-			needWhere = appendIfNotEmptyWithLike(fromBuilder, "c.customer_name", keyword, params, needWhere);
-		}
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
 
@@ -95,7 +89,7 @@ public class SalesOrderQuery extends JBaseQuery {
 			params.add(endDate);
 		}
 
-		fromBuilder.append(" order by o.create_date desc");
+		fromBuilder.append(" and o.order_sn like '%"+keyword+"%' or c.customer_name like '%"+keyword+"%' order by o.create_date desc");
 
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
