@@ -1,0 +1,414 @@
+<#include "_inc/_layout.html"/>
+
+<#macro css>
+    .report {
+        font-size: 0.7rem;
+	    position: absolute;
+	    top: 0;
+	    width: 100%;
+	    bottom: 50px;
+	    overflow: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .report .weui-panel__hd:after {
+        left: 0;
+        height: 0;
+    }
+</#macro>
+
+<#macro css_import>
+<link rel="stylesheet" href="${CTPATH}/css/normalize.css">
+</#macro>
+<#macro script_import>
+<script type='text/javascript' src="${CTPATH}/js/echarts.min.js"></script>
+</#macro>  
+<#macro script>
+  $(function () {
+  
+    $(".end-date").calendar();
+    $(".end-date").val($.today());
+    $(".begin-date").calendar();
+    $(".begin-date").val($.today());
+    var startDate = $.today();
+	var endDate = $.today() + ' 23:59:59';  
+	var params = {
+		"dayTag":  'today',
+		"startDate": startDate,
+		"endDate" : endDate,
+		"userId": '${(userId)!}'
+	}
+	var params2 = {
+		"dayTag":  'today',
+		"startDate": startDate,
+		"endDate" : endDate,
+		"userId": '${(userId)!}',
+		"isGift": 'true'
+	}	  
+ 	orderAmount(params);
+ 	productCount(params);
+ 	giftCount(params2);
+  })
+  
+    function orderAmount(params) {
+		Utils.ajax('${CPATH}/report/orderAmount', params, 
+			function(data){
+				$("#productCount").html(data.productCount+"件/");
+				$("#totalCount").html(data.orderCount+"笔");
+				$("#totalAmount").html(data.totalAmount+"元");
+			}
+		);    	
+    }
+    
+    function productCount(params) {
+		Utils.ajax('${CPATH}/report/productCount', params, 
+			function(data){
+		        var product = document.getElementById('userCount');
+		        var productChart = echarts.init(product);
+	            var productOption = {
+	                title : {
+	                    text: '产品'
+	                },
+	                tooltip : {
+	                    trigger: 'axis'
+	                },
+	                legend: {
+	                    data:[],
+	                    top: 40,
+	                    left: '2%',
+	                    right: '2%',
+	                    itemHeight : 10,
+	                    textStyle : {
+	                        fontSize : 10
+	                    }
+	                },
+	                grid: {
+	                    left: '2%',
+	                    right: '17%',
+	                    bottom: 15,
+	                    top: 60,
+	                    containLabel: true
+	                },
+	                toolbox: {
+	                },
+	                calculable : true,
+	                xAxis : [
+	                {
+	                    show : false,
+	                    name : '数量/件',
+	                    type : 'value',
+	                    boundaryGap: [0, 0.01]
+	
+	                }
+	                ],
+	                yAxis : [
+	                {
+	                    show: false,
+	                    type : 'category',
+	                    data:['']
+	                }
+	                ],
+	                series : []
+	            };
+	            var productTotal = 0;
+	            var $product = $(product);
+	            for (var i = 0; i < data.length; i++) {
+	               productOption.legend.data.push(data[i].custom_name);
+	               productOption.series.push({
+	                name:data[i].custom_name,
+	                type:'bar',
+	                barWidth: 25,
+	                data:[data[i].totalAmount],
+	                label:{
+	                    normal:{
+	                        show:true,
+	                        position: 'right',
+	                        formatter: data[i].productCount+'件'
+	                    }
+	                }
+	
+	              });
+	           }
+	        productChart.resize();
+	        productChart.setOption(productOption, true);
+		    }   		
+		);    	
+    }
+    
+    function giftCount(params) {
+		Utils.ajax('${CPATH}/report/productCount', params, 
+			function(data){
+		        var product = document.getElementById('giftCount');
+		        var productChart = echarts.init(product);
+	            var productOption = {
+	                title : {
+	                    text: '产品'
+	                },
+	                tooltip : {
+	                    trigger: 'axis'
+	                },
+	                legend: {
+	                    data:[],
+	                    top: 40,
+	                    left: '2%',
+	                    right: '2%',
+	                    itemHeight : 10,
+	                    textStyle : {
+	                        fontSize : 10
+	                    }
+	                },
+	                grid: {
+	                    left: '2%',
+	                    right: '17%',
+	                    bottom: 15,
+	                    top: 60,
+	                    containLabel: true
+	                },
+	                toolbox: {
+	                },
+	                calculable : true,
+	                xAxis : [
+	                {
+	                    show : false,
+	                    name : '数量/件',
+	                    type : 'value',
+	                    boundaryGap: [0, 0.01]
+	
+	                }
+	                ],
+	                yAxis : [
+	                {
+	                    show: false,
+	                    type : 'category',
+	                    data:['']
+	                }
+	                ],
+	                series : []
+	            };
+	            var productTotal = 0;
+	            var $product = $(product);
+	            for (var i = 0; i < data.length; i++) {
+	               productOption.legend.data.push(data[i].custom_name);
+	               productOption.series.push({
+	                name:data[i].custom_name,
+	                type:'bar',
+	                barWidth: 25,
+	                data:[data[i].totalAmount],
+	                label:{
+	                    normal:{
+	                        show:true,
+	                        position: 'right',
+	                        formatter: data[i].productCount+'件'
+	                    }
+	                }
+	
+	              });
+	           }
+	        productChart.resize();
+	        productChart.setOption(productOption, true);
+		    }   		
+		);    	
+    }    
+    
+    function urlSelect(params, params2, type){
+    	if (type == 'order') {
+			orderAmount(params);
+		} else {
+			productCount(params);
+			giftCount(params2);
+		}
+    }
+    
+    function startDaySelect(obj,type) {
+		var params = {
+    		"startDate": $(obj).val(),
+			"endDate": $(obj).parent().find('#endDay').val(),
+			"userId": '${(userId)!}'
+		}
+		var params2 = {
+    		"startDate": $(obj).val(),
+			"endDate": $(obj).parent().find('#endDay').val(),
+			"userId": '${(userId)!}',
+			"isGift": 'true'
+		}		
+		urlSelect(params,params2,type); 
+    }
+    
+    function endDaySelect(obj,type) {
+		var params = {
+    		"startDate": $(obj).parent().find('#startDay').val(),
+			"endDate": $(obj).val(),
+			"userId": '${(userId)!}'
+		}
+		var params2 = {
+    		"startDate": $(obj).val(),
+			"endDate": $(obj).parent().find('#endDay').val(),
+			"userId": '${(userId)!}',
+			"isGift": 'true'
+		}		
+		urlSelect(params,params2,type); 
+    }    
+    
+ 	function dayTagSelect(obj,type) {
+      $.actions({
+        actions: [{
+          text: "今日",
+          onClick: function () {
+			var params = {
+				"dayTag": 'today',
+				"userId": '${(userId)!}'
+			}
+			var params2 = {
+				"dayTag": 'today',
+				"userId": '${(userId)!}',
+				"isGift": 'true'
+			}			
+			urlSelect(params,params2,type); 
+            $(obj).find(".dayTagText").text('今日')
+          }
+        }, {
+          text: "昨日",
+          onClick: function () {
+			var params = {
+				"dayTag": 'yesterday',
+				"userId": '${(userId)!}'
+			}
+			var params2 = {
+				"dayTag": 'yesterday',
+				"userId": '${(userId)!}',
+				"isGift": 'true'
+			}			
+          	urlSelect(params,params2,type); 
+            $(obj).find(".dayTagText").text('昨日')
+          }
+        }, {
+          text: "本周",
+          onClick: function () {
+			var params = {
+				"dayTag": 'week',
+				"userId": '${(userId)!}'
+			}
+			var params2 = {
+				"dayTag": 'week',
+				"userId": '${(userId)!}',
+				"isGift": 'true'
+			}			
+			urlSelect(params,params2,type); 			
+          	$(obj).find(".dayTagText").text('本周')
+          }
+        }, {
+          text: "上周",
+          onClick: function () {
+			var params = {
+				"dayTag": 'lastweek',
+				"userId": '${(userId)!}'
+			}
+			var params2 = {
+				"dayTag": 'lastweek',
+				"userId": '${(userId)!}',
+				"isGift": 'true'
+			}			
+			urlSelect(params,params2,type); 
+          $(obj).find(".dayTagText").text('上周')
+          }
+        }, {
+          text: "本月",
+          onClick: function () {
+			var params = {
+				"dayTag": 'month',
+				"userId": '${(userId)!}'
+			}     
+			var params2 = {
+				"dayTag": 'month',
+				"userId": '${(userId)!}',
+				"isGift": 'true'
+			}			
+			urlSelect(params,params2,type);     
+         	$(obj).find(".dayTagText").text('本月')
+          }
+        }, {
+          text: "上月",
+          onClick: function () {
+			var params = {
+				"dayTag": 'lastmonth',
+				"userId": '${(userId)!}'
+			}         
+			var params2 = {
+				"dayTag": 'lastmonth',
+				"userId": '${(userId)!}',
+				"isGift": 'true'
+			}			
+			urlSelect(params,params2,type); 			
+          	$(obj).find(".dayTagText").text('上月')
+          }
+        }]
+      }); 	
+ 	}  
+</#macro>
+<@layout>
+	<div class="weui-content">
+	<div class="report">
+		<div class="weui-panel weui-panel_access report-header">
+			<div class="weui-panel__hd">
+				<span class="overview-hd-title">${userName!}销售简报</span> <span class="briefly" onclick="dayTagSelect(this,'order')">
+					<p class="dayTagText">今日</p>
+					<i class="icon-angle-down"></i>
+				</span> 
+				<input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'order')" readonly="">
+				<span class="overview-hd-segmenting fr"> - </span> 
+				<input class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'order')" readonly="">
+			</div>
+			<div class="weui-panel__bd">
+				<div class="weui-flex overview-block">
+					<div class="weui-flex__item">
+						<div class="overview-title">
+							<img src="${CTPATH}/images/order.png"> <span>订单总数</span>
+						</div>
+						<div class="t-c">
+							<strong id="productCount">0</strong> <small id="totalCount">/ 0笔</small>
+						</div>
+					</div>
+					<div class="weui-flex__item">
+						<div class="overview-title">
+							<img src="${CTPATH}/images/money.png"> <span>订单金额</span>
+						</div>
+						<div class="t-c">
+							<strong id="totalAmount">0</strong>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="weui-panel weui-panel_access">
+			<div class="weui-panel__hd">
+				<span class="overview-hd-title">产品统计</span> <span class="briefly" onclick="dayTagSelect(this,'user')">
+				<p class="dayTagText">今日</p>
+					<i class="icon-angle-down"></i>
+				</span> <input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'user')" readonly="">
+				<span class="overview-hd-segmenting fr"> - </span> <input
+					class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'user')" readonly="">
+			</div>
+			<div class="weui-panel__bd report-area">
+				<div class="weui-media-box ft14">
+					<div id="userCount" style="width:350px; height: 400px;">
+						
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="weui-panel weui-panel_access">
+			<div class="weui-panel__hd">
+				<span class="overview-hd-title">赠品统计</span> 
+			</div>
+			<div class="weui-panel__bd report-area">
+				<div class="weui-media-box ft14">
+					<div id="giftCount" style="width:350px; height: 400px;">
+						
+					</div>
+				</div>
+			</div>
+		</div>		
+		</div>
+		<#include "_inc/_footer_nav.html" />
+	</div>
+</@layout>
