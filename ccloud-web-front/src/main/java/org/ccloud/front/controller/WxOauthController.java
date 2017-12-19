@@ -111,8 +111,8 @@ public class WxOauthController extends BaseFrontController {
 			}
 		}
 		
-		redirect(gotoUrl);
-		//forwardAction(gotoUrl);
+		//redirect(gotoUrl);
+		forwardAction(gotoUrl);
 	}
 	
 	private void init(String username, String password, Boolean rememberMe) {

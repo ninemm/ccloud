@@ -92,7 +92,8 @@ $(function() {
 </#macro>
 
 <@layout>
-<body id="order">
+<div class="weui-content">
+    <div id="order">
 		<main>
 			<section class="weui-panel weui-panel_access order-customer-info">
 				<div class="weui-cell weui-cell_access">
@@ -264,28 +265,11 @@ $(function() {
 				</#list>
 			</div>			
 		</main>
-		<div class="hidden-menu">
-			<ul>
-				<li>
-					<a href="${CPATH}/product/index">
-							首页
-						<i class="icon-home blue"></i>
-					</a>
-				</li>
-				<li>
-					<a class="goback">
-							上一页
-						<i class="icon-undo green"></i>
-					</a>
-				</li>
-			</ul>
-			<i class="icon-menu-open orange fr" id="button"></i>
-		</div>
-		<div class="layer"></div>
+		<#include "_inc/_goback.html" />
 	</form>
 	<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
-		<p class="total bg-gray weui-flex__item" id="totalNum"></p>
-		<button onclick="doSubmit()" class="place-order bg-blue white">提交订单</button>
+		<button onclick="doSubmit()" class="place-order red-button white-100">提交订单</button>
 	</footer>	
-</body>
+    </div>
+</div>
 </@layout>

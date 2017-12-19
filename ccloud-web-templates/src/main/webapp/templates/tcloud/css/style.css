@@ -217,6 +217,10 @@ a {
   border-right: 1px solid #e5e5e5;
 }
 
+.no-bg {
+  background: none!important;
+}
+
 .bg-blue {
   background: #3c8dbc!important;
 }
@@ -295,6 +299,10 @@ a {
 
 .width-40 {
   width: 40%;
+}
+
+.width-60 {
+  width: 60%;
 }
 
 .flex-grow2 {
@@ -1125,16 +1133,13 @@ input.street-value {
   left: 3.2rem;
 }
 
-#customerName {
-    font-size: .8rem;
-    margin: .5rem 0;
-}
-
 .remark .weui-cell__bd {
   height: auto!important;
-}
-
-.order-customer-info input,
+tomer_name {
+.customer_name {
+  font-size: .8rem;
+  margin: .2rem 0;
+customer-info input,
 .delivery-info input,
 .activity-detail-item input {
   font-size: 0.7rem;
@@ -1354,8 +1359,8 @@ input[name=sex] {
   background: #ff9800;
   color: #fff;
   font-size: 0.6rem;
-  padding: 0 0.15rem;
-  margin-right: 0.25rem;
+  padd  padding: 0.1rem 0.2rem;
+margin-right: 0.25rem;
 }
 
 
@@ -1375,10 +1380,28 @@ input[name=sex] {
   height: 1rem;
   line-height: 1rem;
   padding: .2rem 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  di.modify_price .weui-flex:last-child {
+  margin-top:.5rem;
+}
+
+.modify_price input[type=number] {
+  border: 1px solid #bbb;
+  width:2.5rem;
 }
 
 #order-detail .weui-cell {
   padding: 0;
+}
+
+.modify_price .weui-flex:last-child {
+  margin-top:.5rem;
+}
+
+.modify_price input[type=number] {
+  border: 1px solid #bbb;
+  width:2.5rem;
 }
 
 

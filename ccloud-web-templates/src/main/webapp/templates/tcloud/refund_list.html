@@ -3,41 +3,43 @@
 <#macro script>
   $(function () {
   
-	$(document).on("change", "#status", function() {
-		combo();
-	}).on("change", "#customerTypeId", function() {
-		combo();
-	}).on("change", "#datePicker", function() {
-		startDate = $("#datePicker").val();
-		endDate = startDate + ' 23:59:59';
-		combo();
-	});
+		$(document).on("change", "#status", function() {
+			combo();
+		}).on("change", "#customerTypeId", function() {
+			combo();
+		}).on("change", "#datePicker", function() {
+			startDate = $("#datePicker").val();
+			endDate = startDate + ' 23:59:59';
+			combo();
+		});
 
-    $("#datePicker").calendar();
-    $("#datePicker").val($.today());
+        $("#datePicker").calendar();
+        $("#datePicker").val($.today());
 
-	combo();
-  });
+	   combo();
 
-	$("#status").select({
-	  title: "订单状态",
-	  items: [{
-	       title: "全部", value: ""
-	       },{
-	       title: "取消", value: "1001"
-	       },{
-	       title: "待审核", value: "0"
-	       },{
-	       title: "已审核", value: "1000"
-	       },{
-	       title: "部分入库", value: "2000"
-	       },{
-	       title: "全部入库", value: "3000"
-	       }]
-	});
-	$("#customerTypeId").select({
-	  title: "选择客户类型",
-	  items: ${customerTypes!}
+		$("#status").select({
+	        title: "订单状态",
+	        items: [{
+		       title: "全部", value: ""
+		    },{
+		       title: "取消", value: "1001"
+		    },{
+		       title: "待审核", value: "0"
+		    },{
+		       title: "已审核", value: "1000"
+		    },{
+		       title: "部分入库", value: "2000"
+		    },{
+		       title: "全部入库", value: "3000"
+		    }]
+		});
+	
+		$("#customerTypeId").select({
+		  title: "选择客户类型",
+		  items: ${customerTypes!}
+		});
+	
 	});
   
 	var newHtml = $(".weui-panel").eq(0).html();
@@ -70,8 +72,11 @@
 			function(data){
 				$loading.hide();
 
-				if(data.refundList.length == 0){
-					$noMore.show();
+				if(data.refundList.length == 0) {
+				    var childCount = $('.weui-panel').length;
+                    if (childCount == 1)
+					    $noMore.show();
+					    
 					loading = true;
 					return;
 				}
@@ -189,7 +194,7 @@
 						<span id="orderSn">DH-O-20171017-002276</span>
 						<span class="fr blue" id="status">订单待审核</span>
 					</div>
-					<div id="customerName">
+					<div id="customerName" class="customer_name">
 						 小张烤鱼
 					</div>
 					<div class="gray">
