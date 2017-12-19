@@ -104,8 +104,6 @@
 			var $tr = obj.parent().parent().parent();
 			var num = $("#productNum").val();
 			num++;
-			console.log(product.list);
-			console.log(product);
 			$tr.find('td').eq(0).attr("rowspan",product.list.length);
 			$tr.find('td').eq(1).attr("rowspan",product.list.length);
 			$tr.find('td').eq(2).attr("rowspan",product.list.length);
@@ -280,6 +278,12 @@
 				$("#supplierName").val(instock.supplierName);
 				$("#contact").val(instock.contact);
 				$("#mobile").val(instock.supplierMobile);
+				console.log(instock.payment_type);
+				if(instock.payment_type==1){
+					$("#paymentType").val("现金");
+				}else{
+					$("#paymentType").val("应付账款");
+				}
 				$("#remark").val(instock.remark);
 				$("#biz_user_id").val(instock.biz_user_id);
 				$("#deptId").val(instock.dept_id);
@@ -318,8 +322,8 @@
 							<th width="5%">序号</th>
 							<th width="8%">商品名称</th>
 							<th width="8%">规格</th>
-							<th class="dR" width="12%">待入库</th>
-							<th class="dR" width="11%">待入库</th>
+							<th class="dR" width="15%">待入库</th>
+							<th class="dR" width="15%">待入库</th>
 							<th width="5">产品名</th>
 							<th width="5">产品库存</th>
 							<th width="8%">大单位数量</th>
@@ -347,13 +351,13 @@
 							<td style = "vertical-align:middle;">
 								<input type="hidden" name="convert" id="convert" value="" />
 								<div class = "validata-box">
-									<input type="text" readonly="readonly" id="bigNum" name="bigNum" style="width: 30%;background-color:transparent;border:0px;" onblur="rowTotalF(this)" />
+									<input type="text" readonly="readonly" id="bigNum" name="bigNum" style="width: 40%;background-color:transparent;border:0px;" onblur="rowTotalF(this)" />
 									<span id="bigUnit-span"></span>
 								</div>
 							</td>
 							<td style = "vertical-align:middle;">
 								<div class = "validata-box">
-									<input type="text" id="smallNum" readonly="readonly" name="smallNum" style="width: 30%;background-color:transparent;border:0px;" onblur="rowTotalF(this)"  />
+									<input type="text" id="smallNum" readonly="readonly" name="smallNum" style="width:40%;background-color:transparent;border:0px;" onblur="rowTotalF(this)"  />
 									<span id="smallUnit-span"></span>
 								</div>
 							</td>
@@ -414,12 +418,7 @@
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">付款方式:</label>
 						<div class="input-group col-md-4 col-sm-10">
-							<label class="radio-inline">
-								<input type="radio" name="paymentType" value="1" checked>现结
-							</label>
-							<label class="radio-inline">
-								<input class="minimal" type="radio" name="paymentType" value="0" >应付账款
-							</label>
+								<input type="text" name="paymentType" id="paymentType" class="form-control input-sm" readonly>
 						</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">

@@ -720,12 +720,12 @@ function doSubmit(){
 											<th>
 												小单位
 											</th>
-											<th>
+											<!-- <th>
 												库存
 											</th>
 											<th>
 												货位
-											</th>
+											</th> -->
 											<th>
 												上架
 											</th>
@@ -737,7 +737,7 @@ function doSubmit(){
 											<td>
 												<div class="form-group validata-box" style="margin: 0;">
 												<div class="input-group col-md-4 col-sm-10">
-													<input type="text" name="productList[-1].productSn" class="form-control" style="width: 50px;padding:0;height:27px;" disabled />
+													<input type="text" name="productList[-1].productSn" class="form-control" style="width: 100px;padding:0;height:27px;text-align:left;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" disabled placeholder="请输入货号"/>
 												</div>
 											</td>
 											<#list (goods.specificationList)! as goodsSpecificationList>
@@ -762,7 +762,7 @@ function doSubmit(){
 											<td class="goodsSpecificationInsertTd">
 												<div class="form-group validata-box" style="margin: 0;">
 												<div class="input-group col-md-4 col-sm-10">
-													<input type="text" name="productList[-1].price" style="width: 50px;" disabled />
+													<input type="text" name="productList[-1].price" style="width: 100px;text-align:left;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" disabled placeholder="请输入销售价"/>
 												</div>
 											</td>
 											<td>
@@ -778,7 +778,7 @@ function doSubmit(){
 											<td>
 												<div class="form-group validata-box" style="margin: 0;">
 												<div class="input-group col-md-4 col-sm-10">											
-													<input type="text" name="productList[-1].relate" style="width: 30px;" disabled />
+													<input type="text" name="productList[-1].relate" style="width: 130px;text-align:left;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" disabled placeholder="请输入换算关系"/>
 												</div>
 											</td>
 											<td>
@@ -791,12 +791,12 @@ function doSubmit(){
 													</select>										
 												</div>												
 											</td>
-											<td>
-												<input type="text" name="productList[-1].store" style="width: 30px;" disabled />
+											<!-- <td>
+												<input type="text" name="productList[-1].store" style="width: 30px;text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" disabled />
 											</td>
 											<td>
-												<input type="text" name="productList[-1].storePlace" style="width: 30px;" disabled />
-											</td>
+												<input type="text" name="productList[-1].storePlace" style="width: 30px;text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" disabled />
+											</td> -->
 											<td>
 												<input type="checkbox" name="productList[-1].isMarketable" value="true" checked disabled />
 											</td>
@@ -810,7 +810,7 @@ function doSubmit(){
 													<input type="hidden" name="productList[${list_index}].id" value="${list.id}" />
 													<div class="form-group validata-box" style="margin: 0;">
 													<div class="input-group col-md-4 col-sm-10">													
-													<input type="text" name="productList[${list_index}].productSn" class="formText" style="width: 50px;" value="${list.productSn}" />
+													<input type="text" name="productList[${list_index}].productSn" class="formText" style="width: 50px;text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" value="${list.productSn}" />
 													</div>
 												</td>
 												<#list (goods.specificationList)! as goodsSpecification>
@@ -849,7 +849,7 @@ function doSubmit(){
 												<td class="goodsSpecificationInsertTd">
 												<div class="form-group validata-box" style="margin: 0;">
 												<div class="input-group col-md-4 col-sm-10">												
-													<input type="text" name="productList[${list_index}].price" class="formText {required: true, min: 0, messages: {required: '货品销售价信息不完整!', min: '货品销售价不允许小于0!'}}" style="width: 50px;" value="${list.price}" />
+													<input type="text" name="productList[${list_index}].price" class="formText {required: true, min: 0, messages: {required: '货品销售价信息不完整!', min: '货品销售价不允许小于0!'}}" style="width: 50px;text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" value="${list.price}" />
 												</div>
 												</td>
 												<td>
@@ -865,7 +865,7 @@ function doSubmit(){
 												<td>
 												<div class="form-group validata-box" style="margin: 0;">
 												<div class="input-group col-md-4 col-sm-10">												
-													<input type="text" name="productList[${list_index}].relate" class="formText {required: true, min: 0, messages: {required: '货品市场价信息不完整!', min: '货品市场价不允许小于0!'}}" style="width: 50px;" value="${list.convertRelate}" />
+													<input type="text" name="productList[${list_index}].relate" class="formText {required: true, min: 0, messages: {required: '货品市场价信息不完整!', min: '货品市场价不允许小于0!'}}" style="width: 50px;text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" value="${list.convertRelate}" />
 												</div>	
 												</td>
 												<td>
@@ -878,12 +878,12 @@ function doSubmit(){
 													</select>
 												</div>	
 												</td>												
-												<td>
-													<input type="text" name="productList[${list_index}].store" class="formText {digits: true, messages: {digits: '货品库存必须为正整数!'}}" style="width: 30px;" value="${(list.store)!}" />
+												<!-- <td>
+													<input type="text" name="productList[${list_index}].store" class="formText {digits: true, messages: {digits: '货品库存必须为正整数!'}}" style="width: 30px;text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" value="${(list.store)!}" />
 												</td>
 												<td>
-													<input type="text" name="productList[${list_index}].storePlace" class="formText" style="width: 30px;" value="${(list.storePlace)!}" />
-												</td>
+													<input type="text" name="productList[${list_index}].storePlace" class="formText" style="width: 30px;text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" value="${(list.storePlace)!}" />
+												</td> -->
 												<td>
 													<input type="checkbox" name="productList[${list_index}].isMarketable" value="true" <#if list.isMarketable>checked</#if> />
 												</td>

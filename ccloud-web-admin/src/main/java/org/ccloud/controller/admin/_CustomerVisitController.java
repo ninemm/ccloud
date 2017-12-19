@@ -115,7 +115,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 	
 	public void queryCustomerType() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-        String typeDataArea = DataAreaUtil.getUserDealerDataArea(user.getDataArea());
+        String typeDataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea());
         List<Record> typeList = CustomerTypeQuery.me().findCustomerTypeList(typeDataArea);
         renderAjaxResultForSuccess("success",JSON.toJSON(typeList));
         //setAttr("customerTypeList", typeList);

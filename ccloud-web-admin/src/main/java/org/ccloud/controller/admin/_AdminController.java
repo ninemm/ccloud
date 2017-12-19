@@ -144,7 +144,7 @@ public class _AdminController extends JBaseController {
 			if (user != null) {
 				// 数据查看时的数据域
 				if (subject.isPermitted("/admin/all") || subject.isPermitted("/admin/manager")) {
-					String dataArea = DataAreaUtil.getUserDeptDataArea(user.getDataArea()) + "%";
+					String dataArea = DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea()) + "%";
 					setSessionAttr(Consts.SESSION_SELECT_DATAAREA, dataArea);
 				} else {
 					setSessionAttr(Consts.SESSION_SELECT_DATAAREA, user.getDataArea());
@@ -272,7 +272,7 @@ public class _AdminController extends JBaseController {
 				// 数据查看时的数据域
 				if (subject.isPermitted("/admin/all") || subject.isPermitted("/admin/manager")) {
 					setSessionAttr(Consts.SESSION_SELECT_DATAAREA,
-							DataAreaUtil.getUserDeptDataArea(user.getDataArea()) + "%");
+							DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea()) + "%");
 				} else {
 					setSessionAttr(Consts.SESSION_SELECT_DATAAREA, user.getDataArea());
 				}

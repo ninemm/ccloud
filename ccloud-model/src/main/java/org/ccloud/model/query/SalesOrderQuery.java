@@ -914,6 +914,14 @@ public class SalesOrderQuery extends JBaseQuery {
 		return Db.find(fromBuilder.toString());
 	}
 
+	public Long findTotalOrdersCountByDataArea(String dataArea) {
+		StringBuilder sql = new StringBuilder("SELECT COUNT(o.id) ");
+		sql.append("FROM `cc_sales_order` o ");
+		sql.append("JOIN cc_seller_customer c on o.customer_id = c.id ");
+		sql.append("WHERE c.customer_kind = '100401' AND o.data_area like ?");
+		return Db.queryLong(sql.toString(), dataArea);
+	}
+	
 	public Record getMyOrderAmount(String startDate, String endDate, String dayTag, String customerType,
 			String deptId, String sellerId, String dataArea) {
 		if (dayTag != null) {

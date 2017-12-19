@@ -119,7 +119,7 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 	public void list() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String ref_sn = getPara("ref_sn");
-		String deptDataArea = DataAreaUtil.getUserDeptDataArea(user.getDataArea());
+		String deptDataArea = DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea());
 		Page<Receiving> page = ReceivingQuery.me().paginate(getPageNumber(), getPageSize(), ref_sn,deptDataArea);
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(),"ref_sn",ref_sn,"rows", page.getList());
 		

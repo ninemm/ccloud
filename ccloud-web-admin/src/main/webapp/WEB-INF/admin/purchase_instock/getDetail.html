@@ -304,8 +304,8 @@
 							<th width="5%">序号</th>
 							<th width="8%">商品名称</th>
 							<th width="8%">规格</th>
-							<th width="12%">已入库</th>
-							<th width="11%">已入库</th>
+							<th width="15%">已入库</th>
+							<th width="15%">已入库</th>
 							<th width="5">产品名</th>
 							<th width="8%">大单位数量</th>
 							<th width="8%">小单位数量</th>
@@ -332,13 +332,13 @@
 							<td style = "vertical-align:middle;">
 								<input type="hidden" name="convert" id="convert" value="" />
 								<div class = "validata-box">
-									<input type="text" readonly="readonly" id="bigNum" name="bigNum" style="width: 30%;background-color:transparent;border:0px;" onblur="rowTotalF(this)" />
+									<input type="text" readonly="readonly" id="bigNum" name="bigNum" style="width: 40%;background-color:transparent;border:0px;" onblur="rowTotalF(this)" />
 									<span id="bigUnit-span"></span>
 								</div>
 							</td>
 							<td style = "vertical-align:middle;">
 								<div class = "validata-box">
-									<input type="text" id="smallNum" readonly="readonly" name="smallNum" style="width: 30%;background-color:transparent;border:0px;" onblur="rowTotalF(this)"  />
+									<input type="text" id="smallNum" readonly="readonly" name="smallNum" style="width: 40%;background-color:transparent;border:0px;" onblur="rowTotalF(this)"  />
 									<span id="smallUnit-span"></span>
 								</div>
 							</td>
@@ -395,7 +395,7 @@
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">付款方式:</label>
 						<div class="input-group col-md-4 col-sm-10">
-						&nbsp;<span id="paymentType"></span>
+							<span id="paymentType" class="form-control input-sm" type="text" readonly></span>
 						</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">

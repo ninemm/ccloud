@@ -44,7 +44,7 @@ public class RefundController extends BaseFrontController{
 		customerTypes.add(all);
 
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
-				.findByDataArea(DataAreaUtil.getUserDealerDataArea(user.getDataArea()));
+				.findByDataArea(DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea()));
 		for (CustomerType customerType : customerTypeList) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", customerType.getName());
@@ -99,7 +99,7 @@ public class RefundController extends BaseFrontController{
 		customerTypes.add(all);
 
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
-				.findByDataArea(DataAreaUtil.getUserDealerDataArea(user.getDataArea()));
+				.findByDataArea(DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea()));
 		for (CustomerType customerType : customerTypeList) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", customerType.getName());

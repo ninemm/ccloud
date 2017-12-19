@@ -52,7 +52,7 @@ public class ProductController extends BaseFrontController {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 
 		String keyword = getPara("keyword");
-		List<Record> productCompositionList = ProductCompositionQuery.me().findProductBySeller(sellerId, keyword);
+		List<Record> productCompositionList = ProductCompositionQuery.me().findDetailByProductId("", sellerId, keyword);
 		renderJson(productCompositionList);
 	}
 
@@ -110,7 +110,7 @@ public class ProductController extends BaseFrontController {
 		customerTypes.add(all);
 
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
-				.findByDataArea(DataAreaUtil.getUserDealerDataArea(user.getDataArea()));
+				.findByDataArea(DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea()));
 		for (CustomerType customerType : customerTypeList) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", customerType.getName());
@@ -151,7 +151,7 @@ public class ProductController extends BaseFrontController {
 		String customerId = getPara("customerId");
 
 		List<Record> customerTypeList = SalesOrderQuery.me().findCustomerTypeListByCustomerId(customerId,
-				DataAreaUtil.getUserDealerDataArea(user.getDataArea()));
+				DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea()));
 
 		renderJson(customerTypeList);
 	}

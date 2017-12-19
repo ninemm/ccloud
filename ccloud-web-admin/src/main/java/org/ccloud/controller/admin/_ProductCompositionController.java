@@ -190,11 +190,11 @@ public class _ProductCompositionController extends JBaseCRUDController<ProductCo
 	@RequiresPermissions(value={"/admin/productComposition/edit","/admin/all"},logical=Logical.OR)
 	public void edit() {
 		String id = getPara("id");
-		List<ProductComposition> list = new ArrayList<>();
+		List<Record> list = new ArrayList<>();
 		if (StringUtils.isNotBlank(id)) {
-			list = ProductCompositionQuery.me().findDetailByProductId(id);
-			String name = list.get(0).getName();
-			BigDecimal price = list.get(0).getPrice();
+			list = ProductCompositionQuery.me().findDetailByProductId(id, "", "");
+			String name = list.get(0).getStr("name");
+			BigDecimal price = list.get(0).getBigDecimal("price");
 			setAttr("productCompositionName", name);
 			setAttr("productCompositionPrice", price);
 		}
@@ -306,9 +306,9 @@ public class _ProductCompositionController extends JBaseCRUDController<ProductCo
 	@RequiresPermissions(value={"/admin/productComposition","/admin/salesOrder"},logical=Logical.OR)
 	public void getDetail () {
 		String id = getPara("id");
-		List<ProductComposition> list = new ArrayList<>();
+		List<Record> list = new ArrayList<>();
 		if (StringUtils.isNotBlank(id)) {
-			list = ProductCompositionQuery.me().findDetailByProductId(id);
+			list = ProductCompositionQuery.me().findDetailByProductId(id, "", "");
 		}
 		setAttr("list", list);
 		render("product_detail.html");

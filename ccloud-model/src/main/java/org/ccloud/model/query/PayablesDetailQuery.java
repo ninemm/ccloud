@@ -127,5 +127,8 @@ public Page<PayablesDetail> paginate(int pageNumber, int pageSize, String id,Str
 		return payablesDetail.save();
 	}
 
-	
+	public PayablesDetail findByObjIdAndDeptId(String objId,String deptId) {
+		String select = " select * from cc_payables_detail where object_id= '"+objId+"' and dept_id='"+deptId+"'";
+		return DAO.findFirst(select);
+	}
 }

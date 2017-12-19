@@ -47,7 +47,7 @@ public class OrderReviewTaskListener implements TaskListener {
             	task.setAssignee(manager.getUsername());
 //            	task.setVariable("manager", "zhuguan");
             } else if (size == 2) {// 财务
-            	String userNames = getTreasurer(DataAreaUtil.getUserDealerDataArea(user.getDataArea()));
+            	String userNames = getTreasurer(DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea()));
             	task.setAssignee(userNames);
             	//task.setVariable("financer", "caiwu");
             } 
