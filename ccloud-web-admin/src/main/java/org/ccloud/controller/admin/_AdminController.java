@@ -44,11 +44,14 @@ import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.EncryptUtils;
 import org.ccloud.utils.StringUtils;
 
+import com.alibaba.fastjson.JSON;
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Maps;
 import com.jfinal.aop.Before;
 import com.jfinal.aop.Clear;
 import com.jfinal.kit.StrKit;
+
+import com.jfinal.plugin.activerecord.Record;
 
 @RouterMapping(url = "/admin", viewPath = "/WEB-INF/admin")
 @RouterNotAllowConvert
@@ -81,12 +84,39 @@ public class _AdminController extends JBaseController {
 			return;
 		}
 		String selDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		
+		Record count = new Record();
+		if(StrKit.notBlank(selDataArea)) {
+			count = SalesOrderQuery.me().queryCountToDayOrders(user.getId(), selDataArea);
+		}
+		Map<String, List<Record>> salesManAmount = Maps.newHashMap();
+		salesManAmount.put("sales_day", SalesOrderQuery.me().querysalesManAmountBy(selDataArea,"day","asc"));
+		salesManAmount.put("sales_month", SalesOrderQuery.me().querysalesManAmountBy(selDataArea,"month","asc"));
+		
+		Map<String, List<Record>> goodsSales = Maps.newHashMap();
+		goodsSales.put("goodsSalesToDay", SalesOrderQuery.me().queryGoodsSales(selDataArea, true,"asc"));
+		goodsSales.put("goodsSalesAll", SalesOrderQuery.me().queryGoodsSales(selDataArea, false,"asc"));
+		
+		Map<String, List<Record>> directBusinessAmount = Maps.newHashMap();
+		directBusinessAmount.put("directs_day", SalesOrderQuery.me().querySellerSales(selDataArea, "day","asc"));
+		directBusinessAmount.put("directs_month", SalesOrderQuery.me().querySellerSales(selDataArea, "month","asc"));
+		
+		Map<String, List<Record>> amountCollect = Maps.newHashMap();
+		amountCollect.put("amount_weeks", SalesOrderQuery.me().queryAmountBy(selDataArea, "weeks"));
+		amountCollect.put("amount_months", SalesOrderQuery.me().queryAmountBy(selDataArea, "months"));
+		amountCollect.put("amount_quarter", SalesOrderQuery.me().queryAmountBy(selDataArea, "quarter"));
+		
 		setAttr("toDoCustomerList", SellerCustomerQuery.me().getToDo(user.getUsername()));
 		setAttr("toDoOrdersList", SalesOrderQuery.me().getToDo(user.getUsername()));
+		setAttr("count_order", StrKit.notBlank(selDataArea)?count.get("count_order"):0);
+		setAttr("sum_amount", StrKit.notBlank(selDataArea)?count.get("sum_amount")!=null?count.get("sum_amount").toString():"0.00":"0.00");
 		setAttr("toDoCustomerVisitList", CustomerVisitQuery.me().getToDo(user.getUsername()));
 		
-		setAttr("orderCount", StrKit.notBlank(selDataArea)?SalesOrderQuery.me().queryCountToDayOrders(user.getId(), selDataArea):0);
 		setAttr("customerCount",StrKit.notBlank(selDataArea)?UserJoinCustomerQuery.me().customerCount(selDataArea):0);
+		setAttr("salesManAmount",JSON.toJSONString(salesManAmount));
+		setAttr("goodsSales",JSON.toJSONString(goodsSales));
+		setAttr("directAmount",JSON.toJSONString(directBusinessAmount));
+		setAttr("amountCollect",JSON.toJSONString(amountCollect));
 		render("index.html");
 	}
 	

@@ -47,12 +47,17 @@ public class _InventoryDetailController extends JBaseCRUDController<InventoryDet
 	public void list() {
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerId = getSessionAttr("sellerId");
-        String keyword = getPara("k");
-        if (StrKit.notBlank(keyword)) {
-            keyword = StringUtils.urlDecode(keyword);
-            setAttr("k", keyword);
-        }
-		Page<InventoryDetail> page = InventoryDetailQuery.me()._in_paginate(getPageNumber(), getPageSize(),keyword,"cid.create_date",sellerId,dataArea);
+		String stock_taking_sn = getPara("stock_taking_sn");
+		String name = getPara("name");
+		if (StrKit.notBlank(stock_taking_sn)) {
+			stock_taking_sn = StringUtils.urlDecode(stock_taking_sn);
+			setAttr("stock_taking_sn", stock_taking_sn);
+		}
+		if (StrKit.notBlank(name)) {
+			name = StringUtils.urlDecode(name);
+			setAttr("name", name);
+		}
+		Page<InventoryDetail> page = InventoryDetailQuery.me()._in_paginate(getPageNumber(), getPageSize(),name,stock_taking_sn,"cid.create_date",sellerId,dataArea);
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);
 	}

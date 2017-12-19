@@ -272,7 +272,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		purchaseInstock.set("create_date", date);
 		
 		PurchaseOrder order = PurchaseOrderQuery.me().findById(purchaseOrderId);
-		order.set("total_amount", StringUtils.getArrayFirst(paraMap.get("total")));
+		order.set("total_amount", new BigDecimal( StringUtils.getArrayFirst(paraMap.get("total"))));
 		order.set("payment_type", StringUtils.getArrayFirst(paraMap.get("paymentType")));
 		order.set("status", 1000);
 		order.set("modify_date", new Date());
@@ -328,33 +328,46 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		
 		//审核通过，生成对应的应付账款
 		//应付账款汇总
-		Payables payables = new Payables();
-		payables.setId(StrKit.getRandomUUID());
-		payables.setObjId(order.getSupplierId());
-		payables.setObjType("supplier");
-		payables.setPayAmount(order.getTotalAmount());
-		payables.setActAmount(new BigDecimal(0));
-		payables.setBalanceAmount(order.getTotalAmount());
-		payables.setDeptId(user.getDepartmentId());
-		payables.setDataArea(user.getDataArea());
-		payables.setCreateDate(new Date());
-		payables.save();
+		Payables payables = PayablesQuery.me().findByObjId(order.getSupplierId());
+		if(payables==null){
+			Payables payable = new Payables();
+			payable.setId(StrKit.getRandomUUID());
+			payable.setObjId(order.getSupplierId());
+			payable.setObjType("supplier");
+			payable.setPayAmount(order.getTotalAmount());
+			payable.setActAmount(new BigDecimal(0));
+			payable.setBalanceAmount(order.getTotalAmount());
+			payable.setDeptId(user.getDepartmentId());
+			payable.setDataArea(user.getDataArea());
+			payable.setCreateDate(new Date());
+			payable.save();
+		}else
+		{
+			payables.setPayAmount(order.getTotalAmount().add(payables.getPayAmount()));
+			payables.setActAmount(payables.getActAmount());
+			payables.setBalanceAmount((order.getTotalAmount().add(payables.getBalanceAmount())));
+			payables.setModifyDate(new Date());
+			payables.update();
+		}
 		
 		//应付账款明细
-		PayablesDetail  payablesDetail = new PayablesDetail();
-		payablesDetail.setId(StrKit.getRandomUUID());
-		payablesDetail.setObjectId(order.getSupplierId());
-		payablesDetail.setObjectType("supplier");
-		payablesDetail.setPayAmount(order.getTotalAmount());
-		payablesDetail.setActAmount(new BigDecimal(0));
-		payablesDetail.setBalanceAmount(order.getTotalAmount());
-		payablesDetail.setRefSn(order.getPorderSn());
-		payablesDetail.setRefType(Consts.BIZ_TYPE_INSTOCK);
-		payablesDetail.setBizDate(new Date());
-		payablesDetail.setDeptId(user.getDepartmentId());
-		payablesDetail.setDataArea(user.getDataArea());
-		payablesDetail.setCreateDate(new Date());
-		payablesDetail.save();
+		List<PurchaseOrderDetail> purchaseOrderDetails = PurchaseOrderDetailQuery.me().findByPurchaseOrderId(order.getId());
+		for(int i = 0; i<purchaseOrderDetails.size();i++){
+			PayablesDetail  payablesDetail = new PayablesDetail();
+			payablesDetail.setId(StrKit.getRandomUUID());
+			payablesDetail.setObjectId(order.getSupplierId());
+			payablesDetail.setObjectType("supplier");
+			payablesDetail.setPayAmount(purchaseOrderDetails.get(i).getProductAmount());
+			payablesDetail.setActAmount(new BigDecimal(0));
+			payablesDetail.setBalanceAmount(purchaseOrderDetails.get(i).getProductAmount());
+			payablesDetail.setRefSn(order.getPorderSn());
+			payablesDetail.setRefType(Consts.BIZ_TYPE_INSTOCK);
+			payablesDetail.setBizDate(new Date());
+			payablesDetail.setDeptId(user.getDepartmentId());
+			payablesDetail.setDataArea(user.getDataArea());
+			payablesDetail.setCreateDate(new Date());
+			payablesDetail.save();
+		}
 		
 		renderAjaxResultForSuccess("OK");
 	} 

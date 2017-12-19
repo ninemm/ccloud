@@ -9,13 +9,52 @@
 
 	});
 
-	function doReject(url){
+	function refuse(id, taskId, pass) {
+      layer.open({
+        type: 1,
+        title: ['订单审核',
+          'border-bottom: 1px solid #eee;height:2rem;line-height:2rem'
+        ],
+        content: '<p class="t-c">是否确认拒绝该订单？</p>' +
+          '<p class="gray">可选择拒绝原因</p>' +
+          '<div class="refuse-radio"><label><input type="radio" name="refuseReson" id="" value="库存无足够货物">库存无足够货物</label></div>' +
+          '<div class="refuse-radio"><label><input type="radio" name="refuseReson" id="" value="产品价格滞后">产品价格滞后</label></div>' +
+          '<div class="refuse-radio"><label><input type="radio" name="refuseReson" id="" value="该商家已被停用">该商家已被停用</label></div>'+
+          '<div><textarea id="comment" placeholder="补充说明，可选填"></textarea></div>',
+        anim: 'scale',
+        className: 'audit',
+        btn: ['确认拒绝','取消拒绝'],
+        yes: function() {
+          var refuseReson = $("input[name='refuseReson']:checked").val();
+          var comment = $("#comment").val();
+          if (refuseReson == undefined && comment == ""){
+            toastr.warning('请选择一个理由');
+            return;
+          }
+          doReject(id, taskId, pass, refuseReson, comment);
+        },
+        no:function() {
+
+        }
+      });
+	}
+
+	function doReject(id, taskId, pass, refuseReson, comment){
 
 		layer.open({
 			type: 2,
 			content: '保存中...'
 		});
-		$.get(url ,
+		var params = {
+			"id": id,
+			"taskId": taskId,
+			"comment": comment,
+			"refuseReson" : refuseReson,
+			'pass' : pass
+		}
+
+
+		Utils.ajax('${CPATH}/order/complete', params, 
 			function(res){
 				if (res.errorCode == 0) {
 					$.confirm({
@@ -98,7 +137,7 @@
 					</div>
 					<div class="weui-cell weui-cell_access">
 						<div class="weui-flex space-between width-100 ft14">
-							<div class="button white-button" onclick="doReject('${CPATH}/order/complete?id=${(order.id)!}&taskId=${(order.taskId)!}&pass=0')">拒绝</div>
+							<div class="button white-button" onclick="refuse('${(order.id)!}', '${(order.taskId)!}', 0)">拒绝</div>
 							<div class="button red-button" onclick="doSubmit('${CPATH}/order/complete?id=${(order.id)!}&taskId=${(order.taskId)!}&pass=1')">同意</div>
 						</div>
 					</div>

@@ -1,6 +1,8 @@
 <#include "_inc/_layout.html"/>
 <#macro css> 
-	#bigNum,#smallNum {
+	#bigNum,
+	#smallNum,
+	#compositionNum {
 		border: 1px solid #bbb;
 	}
 
@@ -431,24 +433,7 @@ $(function() {
 				</div>
 				<input type="hidden" id="total" name="total" value="">
 			</main>
-			<div class="hidden-menu">
-				<ul>
-					<li>
-						<a href="${CPATH}/product/index">
-								首页
-							<i class="icon-home blue"></i>
-						</a>
-					</li>
-					<li>
-						<a class="goback">
-								上一页
-							<i class="icon-undo green"></i>
-						</a>
-					</li>
-				</ul>
-				<i class="icon-menu-open orange fr" id="button"></i>
-			</div>
-			<div class="layer"></div>
+			<#include "_inc/_goback.html" />
 			<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
 				<p class="total bg-gray weui-flex__item" id="totalNum">共2款，总数10件&nbsp;总额：2600元</p>
 				<button type="button" id="placeOrder" class="place-order red-button">提交订单</button>

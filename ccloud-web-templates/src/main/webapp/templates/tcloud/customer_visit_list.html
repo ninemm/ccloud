@@ -12,6 +12,11 @@
 	    margin: 0;
 	    color: #fff;
     }
+
+    #visit-add {
+        top: 0;
+        bottom: 2.25rem;
+    }
 </#macro>
 <#macro script>
     var pageNumber = 2;
@@ -115,18 +120,20 @@
 	</#if>
 	<header>
 	    <div class="head-search select-area">
-	        <div>
-	            <input type="text" id="customer-type" placeholder="客户类型" class="weui-input" readonly onchange="refresh()">
-	            <i class="icon-sort-desc"></i>
-	        </div>
-	        <div>
-	            <input type="text" id="customer-nature" placeholder="客户性质" class="weui-input" readonly onchange="refresh()">
-	            <i class="icon-sort-desc"></i>
-	        </div>
-	        <div>
-	            <input type="text" id="customer-level" placeholder="客户级别" class="weui-input" readonly onchange="refresh()">
-	            <i class="icon-sort-desc"></i>
-	        </div>
+	        <div class="weui-flex">
+                <div class="weui-flex__item">
+                    <input type="text" id="customer-type" placeholder="客户类型" class="weui-input" readonly onchange="refresh()">
+                    <i class="icon-sort-desc"></i>
+                </div>
+                <div class="weui-flex__item">
+                    <input type="text" id="customer-nature" placeholder="客户性质" class="weui-input" readonly onchange="refresh()">
+                    <i class="icon-sort-desc"></i>
+                </div>
+                <div class="weui-flex__item">
+                    <input type="text" id="customer-level" placeholder="客户级别" class="weui-input" readonly onchange="refresh()">
+                    <i class="icon-sort-desc"></i>
+                </div>
+            </div>
 	    </div>
 	</header> 
 	<main id="visitList" class="infinite">

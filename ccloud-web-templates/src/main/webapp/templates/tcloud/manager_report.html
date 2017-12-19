@@ -70,42 +70,30 @@
 		       	console.log(seriesData);
 		       	var salesIndentChart = echarts.init(salesIndent);
 		
-		       	salesIndentOption = {
-		        	title : {
-		            	text: '业务员'
-		        	},
-		        tooltip : {
-		            trigger: 'axis'
-		        },
-		        legend: {
-		                // data:[],
-		                // top: 40
-		            },
-		            grid: {
-		                left: '2%',
-		                right: '17%',
-		                bottom: 15,
-		                top: 60,
-		                containLabel: true
-		            },
-		            toolbox: {
-		            },
-		            calculable : true,
-		            xAxis : [
-		            {
-		                show : false,
-		                name : '金额/元',
-		                type : 'value',
-		                boundaryGap: [0, 0.01]
-		            }
-		            ],
-		            yAxis : [
-		            {
-		                type : 'category',
-		                data : yData.reverse()
-		            }
-		            ],
-		            series : [
+				option = {
+				    tooltip: {
+				        trigger: 'axis',
+				        axisPointer: {
+				            type: 'shadow'
+				        }
+				    },
+				    legend: {
+				        data: yData,
+				        x: 'left'
+				    },
+				    grid: {
+				        bottom: '3%',
+				        containLabel: true
+				    },
+				    xAxis: {
+				        type: 'value',
+				        boundaryGap: [0, 0.01]
+				    },
+				    yAxis: {
+				        type: 'category',
+				        data: yData
+				    },
+				    series: [
 		            {
 		                type:'bar',
 		                barWidth: 25,
@@ -119,11 +107,11 @@
 		                }
 		
 		            }
-		            ]
-		        };
+				    ]
+				};
 		
 		        salesIndentChart.resize();
-		        salesIndentChart.setOption(salesIndentOption, true);
+		        salesIndentChart.setOption(option, true);
 		        salesIndentChart.on('click',salesClick);
 		    }    		
 		);    	
@@ -131,7 +119,7 @@
     
 	function salesClick(param) {
 	    if (typeof param.seriesIndex != 'undefined') {
-	        window.location.href = "${(CPATH)}/report/userReportDetail?userId=" + salesObj[param.name]; 
+	        window.location.href = "${(CPATH)}/report/userReportDetail?userId=" + salesObj[param.name] + "&userName=" + param.name; 
 	    }
 	}    
     
@@ -247,7 +235,7 @@
 							<img src="${CTPATH}/images/order.png"> <span>订单总数</span>
 						</div>
 						<div class="t-c">
-							<strong id="productCount">0</strong> <small id="totalCount">/ 0笔</small>
+							<strong id="productCount"></strong> <small id="totalCount"></small>
 						</div>
 					</div>
 					<div class="weui-flex__item">
@@ -255,7 +243,7 @@
 							<img src="${CTPATH}/images/money.png"> <span>订单金额</span>
 						</div>
 						<div class="t-c">
-							<strong id="totalAmount">0</strong>
+							<strong id="totalAmount"></strong>
 						</div>
 					</div>
 				</div>
@@ -263,7 +251,7 @@
 		</div>
 		<div class="weui-panel weui-panel_access">
 			<div class="weui-panel__hd">
-				<span class="overview-hd-title">业务员业绩统计</span> <span class="briefly" onclick="dayTagSelect(this,'user')">
+				<span class="overview-hd-title">业务员统计</span> <span class="briefly" onclick="dayTagSelect(this,'user')">
 				<p class="dayTagText">今日</p>
 					<i class="icon-angle-down"></i>
 				</span> <input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'user')" readonly="">
@@ -272,7 +260,7 @@
 			</div>
 			<div class="weui-panel__bd report-area">
 				<div class="weui-media-box ft14">
-					<div id="userCount" style="width:600px; height: 300px;">
+					<div id="userCount" style="height: 300px;">
 						
 					</div>
 				</div>

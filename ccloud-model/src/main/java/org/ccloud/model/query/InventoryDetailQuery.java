@@ -90,7 +90,7 @@ public class InventoryDetailQuery extends JBaseQuery {
 	
 	
 	
-	public Page<InventoryDetail> _in_paginate(int pageNumber, int pageSize,String keyword, String orderby,String sellerId,String dataArea) {
+	public Page<InventoryDetail> _in_paginate(int pageNumber, int pageSize,String name,String stock_taking_sn, String orderby,String sellerId,String dataArea) {
 		String select = "SELECT cid.*,cw.`name` as warehouse,csp.custom_name as sellerName ";
 		StringBuilder fromBuilder = new StringBuilder(" from cc_inventory_detail cid ");
 		fromBuilder.append(" LEFT JOIN cc_warehouse cw on cw.id = cid.warehouse_id ");
@@ -98,8 +98,8 @@ public class InventoryDetailQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_user_join_warehouse cujw on cujw.warehouse_id=cid.warehouse_id ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
-
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cid.biz_bill_sn", keyword, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cid.biz_bill_sn", stock_taking_sn, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "csp.custom_name", name, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cid.data_area", dataArea, params, needWhere);
 		if (needWhere) {
 				fromBuilder.append("where 1=1 and cid.biz_type in ('"+Consts.BIZ_TYPE_INSTOCK+"','"+Consts.BIZ_TYPE_SALES_REFUND_INSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_INSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_PLUS_INSTOCK+"') ");
