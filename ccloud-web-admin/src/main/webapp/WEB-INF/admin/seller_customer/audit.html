@@ -108,7 +108,7 @@
                         </div>
                     </div>
                     <div class="col-sm-5">
-                        <label class="control-label col-sm-4">客户编码:</label>
+                        <label class="control-label col-sm-4">客户编号:</label>
                         <div class="input-group col-sm-8">
                             <p class="form-control-static">${(sellerCustomer.customer_code)!}</p>
                         </div>
@@ -126,11 +126,28 @@
                         <label class="control-label col-sm-4">客户类型:</label>
                         <div class="input-group col-sm-8">
                             <p class="form-control-static">
-                                dddd
+								${(custTypeNames)!}
                             </p>
                         </div>
                     </div>
                 </div>
+
+				<div class="form-group">
+					<div class="col-sm-5">
+						<label class="control-label col-sm-4">客户种类:</label>
+						<div class="input-group col-sm-8">
+							<p class="form-control-static">${(customerType)!}</p>
+						</div>
+					</div>
+					<div class="col-sm-5">
+						<label class="control-label col-sm-4">客户子类:</label>
+						<div class="input-group col-sm-8">
+							<p class="form-control-static">
+								${(subType)!}
+							</p>
+						</div>
+					</div>
+				</div>
                 
                 <div class="form-group col-sm-10">
                     <label for="_title" class="col-sm-2 control-label">详细地址:</label>

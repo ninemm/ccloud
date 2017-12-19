@@ -29,6 +29,7 @@ import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.SalesOrder;
+import org.ccloud.model.SalesRefundInstock;
 import org.ccloud.model.User;
 import org.ccloud.model.query.OptionQuery;
 import org.ccloud.model.query.SalesOrderDetailQuery;
@@ -42,6 +43,7 @@ import org.ccloud.utils.StringUtils;
 import org.ccloud.workflow.service.WorkFlowService;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.jfinal.aop.Before;
@@ -346,6 +348,31 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		
 		renderAjaxResultForSuccess();
 	}
-	
+	//审核通过，对库存总账进行修改
+	@Before(Tx.class)
+	public void passAll(){
+		String ds = getPara("orderItems");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String sellerId = getSessionAttr("sellerId");
+		String sellerCode = getSessionAttr("sellerCode");
+		boolean result=false;
+		JSONArray jsonArray = JSONArray.parseArray(ds);
+		List<SalesOrder> refunds = jsonArray.toJavaList(SalesOrder.class);
+		for(SalesOrder order : refunds){
+			String orderId = order.getId();
+
+			result = SalesOutstockQuery.me().pass(orderId, user.getId(), sellerId, sellerCode);
+			if(result == false){
+				break;
+			}
+		}
+		if (result) {
+			renderAjaxResultForSuccess("审核成功");
+			renderJson(result);
+		} else {
+			renderAjaxResultForError("审核失败");
+			renderJson(result);
+		}
+	}
 	
 }

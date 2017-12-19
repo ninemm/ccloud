@@ -174,6 +174,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 
 			temp.setSubType(sellerCustomer.getSubType());
 			temp.setCustomerKind(sellerCustomer.getCustomerKind());
+			temp.setCustomerCode(customer.getCustomerCode());
 
 			temp.setMobile(customer.getMobile());
 			temp.setAddress(customer.getAddress());
@@ -492,6 +493,8 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		}
 		
 		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(id);
+		Customer customer = CustomerQuery.me().findById(sellerCustomer.getCustomerId());
+
 		setAttr("sellerCustomer", sellerCustomer);
 
 		List<Record> list = UserJoinCustomerQuery.me().findUserListBySellerCustomerId(id, selectDataArea);
@@ -513,7 +516,10 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
 				.findByDataArea(DataAreaUtil.getDealerDataAreaByCurUserDataArea(selectDataArea));
 		setAttr("customerTypeList", customerTypeList);
-		
+
+		setAttr("customerType", DictQuery.me().findName(sellerCustomer.getCustomerKind()));
+		setAttr("subType", DictQuery.me().findName(sellerCustomer.getSubType()));
+
 		WorkFlowService workflowService = new WorkFlowService();
 		Object customerVO = workflowService.getTaskVariableByTaskId(taskId, "customerVO");
 		Object applyer = workflowService.getTaskVariableByTaskId(taskId, "applyUsername");
@@ -525,6 +531,9 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		if (customerVO != null) {
 			CustomerVO src = new CustomerVO();
 			CustomerVO dest = (CustomerVO) customerVO;
+			dest.setSubType(DictQuery.me().findName(dest.getSubType()));
+			dest.setCustomerKind(DictQuery.me().findName(dest.getCustomerKind()));
+
 			
 			src.setNickname(sellerCustomer.getNickname());
 			src.setSellerCustomerId(sellerCustomer.getId());
@@ -535,8 +544,9 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			src.setAddress(sellerCustomer.getStr("address"));
 			src.setCustomerName(sellerCustomer.getStr("customer_name"));
 
-			src.setSubType(sellerCustomer.getSubType());
-			src.setCustomerKind(sellerCustomer.getCustomerKind());
+			src.setSubType(DictQuery.me().findName(sellerCustomer.getSubType()));
+			src.setCustomerKind(DictQuery.me().findName(sellerCustomer.getCustomerKind()));
+			src.setCustomerCode(customer.getCustomerCode());
 
 			List<String> custTypeNameList =  CustomerJoinCustomerTypeQuery.me().findCustomerTypeNameListBySellerCustomerId(id, DataAreaUtil.getDealerDataAreaByCurUserDataArea(selectDataArea));
 
@@ -619,6 +629,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 				customer.setContact(customerVO.getContact());
 				customer.setMobile(customerVO.getMobile());
 				customer.setAddress(customerVO.getAddress());
+				customer.setCustomerCode(customerVO.getCustomerCode());
 
 				if (persiste != null) {
 					customer.setId(persiste.getId());
