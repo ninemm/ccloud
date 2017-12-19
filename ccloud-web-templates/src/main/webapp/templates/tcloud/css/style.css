@@ -217,6 +217,10 @@ a {
   border-right: 1px solid #e5e5e5;
 }
 
+.no-bg {
+  background: none!important;
+}
+
 .bg-blue {
   background: #3c8dbc!important;
 }
@@ -295,6 +299,10 @@ a {
 
 .width-40 {
   width: 40%;
+}
+
+.width-60 {
+  width: 60%;
 }
 
 .flex-grow2 {
@@ -1123,11 +1131,6 @@ input.street-value {
 
 #order .gift .number select {
   left: 3.2rem;
-}
-
-#customerName {
-    font-size: .8rem;
-    margin: .5rem 0;
 }
 
 .remark .weui-cell__bd {

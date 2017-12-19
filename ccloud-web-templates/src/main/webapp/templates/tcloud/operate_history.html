@@ -1,5 +1,9 @@
 <#include "_inc/_layout.html"/>
-<#macro css> </#macro>
+<#macro css> 
+.weui-cells {
+  margin-top: 0;
+}
+</#macro>
 <#macro script>
 
 </#macro>
@@ -60,23 +64,6 @@
       </div>
     </div> -->
   </main>
-<div class="hidden-menu">
-  <ul>
-    <li>
-      <a href="${CPATH}/index">
-        首页
-        <i class="icon-home blue"></i>
-      </a>
-    </li>
-    <li>
-      <a class="goback">
-        上一页
-        <i class="icon-undo green"></i>
-      </a>
-    </li>
-  </ul>
-  <i class="icon-menu-open orange fr" id="button"></i>
-</div>
-<div class="layer"></div>
+  <#include "_inc/_goback.html" />  
 </body>
 </@layout>
