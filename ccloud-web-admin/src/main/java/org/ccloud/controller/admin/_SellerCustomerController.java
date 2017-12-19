@@ -174,7 +174,6 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 
 			temp.setSubType(sellerCustomer.getSubType());
 			temp.setCustomerKind(sellerCustomer.getCustomerKind());
-			temp.setCustomerCode(customer.getCustomerCode());
 
 			temp.setMobile(customer.getMobile());
 			temp.setAddress(customer.getAddress());
@@ -517,6 +516,10 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 				.findByDataArea(DataAreaUtil.getDealerDataAreaByCurUserDataArea(selectDataArea));
 		setAttr("customerTypeList", customerTypeList);
 
+		List<String> custTypeNameList =  CustomerJoinCustomerTypeQuery.me().findCustomerTypeNameListBySellerCustomerId(id, DataAreaUtil.getDealerDataAreaByCurUserDataArea(selectDataArea));
+		String custTypeNames = Joiner.on(",").skipNulls().join(custTypeNameList);
+		setAttr("custTypeNames", custTypeNames);
+
 		setAttr("customerType", DictQuery.me().findName(sellerCustomer.getCustomerKind()));
 		setAttr("subType", DictQuery.me().findName(sellerCustomer.getSubType()));
 
@@ -546,9 +549,6 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 
 			src.setSubType(DictQuery.me().findName(sellerCustomer.getSubType()));
 			src.setCustomerKind(DictQuery.me().findName(sellerCustomer.getCustomerKind()));
-			src.setCustomerCode(customer.getCustomerCode());
-
-			List<String> custTypeNameList =  CustomerJoinCustomerTypeQuery.me().findCustomerTypeNameListBySellerCustomerId(id, DataAreaUtil.getDealerDataAreaByCurUserDataArea(selectDataArea));
 
 			src.setCustTypeNameList(custTypeNameList);
 			
@@ -629,7 +629,6 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 				customer.setContact(customerVO.getContact());
 				customer.setMobile(customerVO.getMobile());
 				customer.setAddress(customerVO.getAddress());
-				customer.setCustomerCode(customerVO.getCustomerCode());
 
 				if (persiste != null) {
 					customer.setId(persiste.getId());
