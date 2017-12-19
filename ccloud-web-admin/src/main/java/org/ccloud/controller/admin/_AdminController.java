@@ -45,6 +45,7 @@ import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.EncryptUtils;
 import org.ccloud.utils.StringUtils;
 
+import com.alibaba.fastjson.JSON;
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Maps;
 import com.jfinal.aop.Before;
@@ -89,14 +90,14 @@ public class _AdminController extends JBaseController {
 			count = SalesOrderQuery.me().queryCountToDayOrders(user.getId(), selDataArea);
 		}
 		Map<String, List<Record>> salesManAmount = Maps.newHashMap();
-		salesManAmount.put("sales_day", SalesOrderQuery.me().querysalesManAmountBy(selDataArea,"day","desc"));
-		salesManAmount.put("sales_month", SalesOrderQuery.me().querysalesManAmountBy(selDataArea,"month","desc"));
+		salesManAmount.put("sales_day", SalesOrderQuery.me().querysalesManAmountBy(selDataArea,"day","asc"));
+		salesManAmount.put("sales_month", SalesOrderQuery.me().querysalesManAmountBy(selDataArea,"month","asc"));
 		Map<String, List<Record>> goodsSales = Maps.newHashMap();
-		goodsSales.put("goodsSalesToDay", SalesOrderQuery.me().queryGoodsSales(selDataArea, true,"desc"));
-		goodsSales.put("goodsSalesAll", SalesOrderQuery.me().queryGoodsSales(selDataArea, false,"desc"));
+		goodsSales.put("goodsSalesToDay", SalesOrderQuery.me().queryGoodsSales(selDataArea, true,"asc"));
+		goodsSales.put("goodsSalesAll", SalesOrderQuery.me().queryGoodsSales(selDataArea, false,"asc"));
 		Map<String, List<Record>> directBusinessAmount = Maps.newHashMap();
-		directBusinessAmount.put("directs_day", SalesOrderQuery.me().querySellerSales(selDataArea, "day","desc"));
-		directBusinessAmount.put("directs_month", SalesOrderQuery.me().querySellerSales(selDataArea, "month","desc"));
+		directBusinessAmount.put("directs_day", SalesOrderQuery.me().querySellerSales(selDataArea, "day","asc"));
+		directBusinessAmount.put("directs_month", SalesOrderQuery.me().querySellerSales(selDataArea, "month","asc"));
 		Map<String, List<Record>> amountCollect = Maps.newHashMap();
 		amountCollect.put("amount_weeks", SalesOrderQuery.me().queryAmountBy(selDataArea, "weeks"));
 		amountCollect.put("amount_months", SalesOrderQuery.me().queryAmountBy(selDataArea, "months"));
@@ -109,10 +110,10 @@ public class _AdminController extends JBaseController {
 		setAttr("toDoCustomerVisitList", CustomerVisitQuery.me().getToDo(user.getUsername()));
 		
 		setAttr("customerCount",StrKit.notBlank(selDataArea)?UserJoinCustomerQuery.me().customerCount(selDataArea):0);
-		setAttr("salesManAmount",salesManAmount);
-		setAttr("goodsSales",goodsSales);
-		setAttr("directAmount",directBusinessAmount);
-		setAttr("amountCollect",amountCollect);
+		setAttr("salesManAmount",JSON.toJSONString(salesManAmount));
+		setAttr("goodsSales",JSON.toJSONString(goodsSales));
+		setAttr("directAmount",JSON.toJSONString(directBusinessAmount));
+		setAttr("amountCollect",JSON.toJSONString(amountCollect));
 		render("index.html");
 	}
 	

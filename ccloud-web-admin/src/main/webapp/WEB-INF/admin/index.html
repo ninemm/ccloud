@@ -1,4 +1,8 @@
 <#include "_inc/_layout.html"/>
+<#macro script_import>
+    <!--Echarts-->
+    <script src="${CPATH}/static/plugins/echarts/echarts.js"></script>
+</#macro>
 <#macro script>
 function trash(id){
 	$.get("${CPATH}/admin/comment/trash?ucode=${ucode}&id="+id, function(result){
@@ -65,9 +69,173 @@ function reply(id){
 }
 
 $(function(){
-	console.log(${amountCollect!});
+    //业务员当日当月
+    var salesManData = ${salesManAmount!};
+    var salesToDay = salesManData.sales_day;
+    var salesToDayChart = echarts.init(document.getElementById('salesManViewByD'));
+    viewCreate('业务员当日销售额排行',salesToDayChart,salesToDay);
+
+    //商品当日汇总
+    var goodsSalesData = ${goodsSales!};
+    var goodsToDay = goodsSalesData.goodsSalesToDay;
+    var goodsChart = echarts.init(document.getElementById('goodsViewByD'));
+    viewCreate('商品当日销售额排行',goodsChart,goodsToDay);
+
+    //直营商当日当月
+    var directAmountData = ${directAmount!};
+    var directToDay = directAmountData.directs_day;
+    var directChart = echarts.init(document.getElementById('directViewByD'));
+    viewCreate('直营商当日销售额排行',directChart,directToDay);
+
+    //销售额走势
+    var amountCollectData = ${amountCollect!};
+    var amountToMonths = amountCollectData.amount_months;
+    var amountChart = echarts.init(document.getElementById('salesChart'));
+    //销售额走势(月统计)
+    lineChartCreate('',amountChart,amountToMonths);
 });
 
+$('li[name="salesViewByD"]').on("click",function(){
+    var salesManData = ${salesManAmount!};
+    var salesToDay = salesManData.sales_day;
+    $("#salesManViewByD").width($("#salesManViewByD").parent().width());
+    var salesToDayChart = echarts.init(document.getElementById('salesManViewByD'));
+    var salesToMonthsChart = echarts.getInstanceByDom(document.getElementById('salesManViewByM'));
+
+    $("#salesManViewByD").css("display","block");
+    $("#salesManViewByM").css("display","none");
+    salesToMonthsChart.clear();
+    salesToMonthsChart.dispose();
+
+    viewCreate('业务员当日销售额排行',salesToDayChart,salesToDay);
+});
+$('li[name="salesViewByM"]').on("click",function(){
+    var salesManData = ${salesManAmount!};
+    var salesToMonths = salesManData.sales_month;
+    $("#salesManViewByM").width($("#salesManViewByM").parent().width());
+    var salesToDayChart = echarts.getInstanceByDom(document.getElementById('salesManViewByD'));
+    var salesToMonthsChart = echarts.init(document.getElementById('salesManViewByM'));
+
+    $("#salesManViewByD").css("display","none");
+    $("#salesManViewByM").css("display","block");
+    salesToDayChart.clear();
+    salesToDayChart.dispose();
+
+    viewCreate('业务员当月销售额排行',salesToMonthsChart,salesToMonths);
+});
+
+$("#goodsByD").on("click",function(){
+    var goodsSalesData = ${goodsSales!};
+    var goodsToDay = goodsSalesData.goodsSalesToDay;
+    $("#goodsViewByD").width($("#goodsViewByD").parent().width());
+    var goodsToDayChart = echarts.init(document.getElementById('goodsViewByD'));
+    var goodsToAllChart = echarts.getInstanceByDom(document.getElementById('goodsViewByA'));
+
+    $("#goodsViewByD").css("display","block");
+    $("#goodsViewByA").css("display","none");
+    goodsToAllChart.clear();
+    goodsToAllChart.dispose();
+
+    viewCreate('商品当日销售额排行',goodsToDayChart,goodsToDay);
+});
+
+$("#goodsByA").on("click",function(){
+    var goodsSalesData = ${goodsSales!};
+    var goodsToAll = goodsSalesData.goodsSalesAll;
+    $("#goodsViewByA").width($("#goodsViewByA").parent().width());
+    var goodsToDayChart = echarts.getInstanceByDom(document.getElementById('goodsViewByD'));
+    var goodsToAllChart = echarts.init(document.getElementById('goodsViewByA'));
+
+    $("#goodsViewByA").css("display","block");
+    $("#goodsViewByD").css("display","none");
+    goodsToDayChart.clear();
+    goodsToDayChart.dispose();
+
+    viewCreate('商品销售额汇总排行',goodsToAllChart,goodsToAll);
+
+});
+
+function viewCreate(title,myChart,viewData){
+    var yTitle = [],xData = [];
+    for(var i =0;i<viewData.length;i++){
+        var data =  viewData[i].columns;
+        yTitle.push(data.title);
+        xData.push(data.sumamount);
+    }
+    myChart.setOption(barGraphOptions(title,yTitle,xData));
+}
+
+function lineChartCreate(title,myChart,viewData){
+    var salesYTitle = [],salesXData = [];
+        for(var i =0;i<viewData.length;i++){
+        var salesData =  viewData[i].columns;
+        salesYTitle.push(salesData.title);
+        salesXData.push(salesData.sumamount);
+    }
+    myChart.setOption(lineChartOptions(title,salesYTitle,salesXData));
+}
+
+function barGraphOptions(title,yTitle,data){
+    var options = {
+        title: {
+            text: title
+        },
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+            type: 'shadow'
+            }
+        },
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+        },
+        xAxis: {
+            type: 'value',
+            boundaryGap: [0, 0.01]
+        },
+        yAxis: {
+            type: 'category',
+            data: yTitle
+        },
+        series: [
+            {
+                type: 'bar',
+                data: data
+            }
+        ]
+    };
+    return options;
+}
+
+function lineChartOptions(viewTitle,xTitle,yData){
+    var options = {
+        title: {
+            text: viewTitle
+        },
+        tooltip: {
+            trigger: 'axis'
+        },
+        xAxis:  {
+            type: 'category',
+            boundaryGap: false,
+            data: xTitle
+        },
+        yAxis: {
+            type: 'value'
+        },
+        series: [
+            {
+                name:'销售额度走势',
+                type:'line',
+                data:yData
+            }
+        ]
+    };
+    return options;
+}
 </#macro> 
 <@layout active_id="dashboard" >
 <!-- Content Header (Page header) -->
@@ -269,30 +437,30 @@ $(function(){
 	    <section class="col-lg-6 connectedSortable">
 	        <div class="nav-tabs-custom">
 	            <ul class="nav nav-tabs pull-right">
-	                <li class="active"><a href="#revenue-chart" data-toggle="tab">今日</a></li>
-	                <li><a href="#sales-chart" data-toggle="tab">本周</a></li>
+	                <li class="active" name="salesViewByD"><a href="#revenue-chart" data-toggle="tab">今日</a></li>
+	                <li name="salesViewByM"><a href="#sales-chart" data-toggle="tab">当月</a></li>
 	                <!-- <li><a href="#sales-chart" data-toggle="tab">本月</a></li> -->
 	                <li class="pull-left header"><i class="fa fa-list-ol"></i> 业务员销售排行</li>
                 </ul>
                 <div class="tab-content no-padding">
 	                <!-- Morris chart - Sales -->
-	                <div class="chart tab-pane active" id="revenue-chart" style="position: relative; height: 300px;"></div>
-	                <div class="chart tab-pane" id="sales-chart" style="position: relative; height: 300px;"></div>
+	                <div class="chart tab-pane active" id="salesManViewByD" style="position: relative; height: 300px;"></div>
+	                <div class="chart tab-pane" id="salesManViewByM" style="position: relative; height: 300px;"></div>
                 </div>
 	        </div>
 	    </section>
 	    <section class="col-lg-6 connectedSortable">
             <div class="nav-tabs-custom">
                 <ul class="nav nav-tabs pull-right">
-                    <li class="active"><a href="#revenue-chart" data-toggle="tab">今日</a></li>
-                    <li><a href="#sales-chart" data-toggle="tab">本周</a></li>
+                    <li class="active" id="goodsByD"><a href="#revenue-chart" data-toggle="tab">今日</a></li>
+                    <li id="goodsByA"><a href="#sales-chart" data-toggle="tab">汇总</a></li>
                     <!-- <li><a href="#sales-chart" data-toggle="tab">本月</a></li> -->
                     <li class="pull-left header"><i class="fa fa-list-ol"></i> 商品销售排行</li>
                 </ul>
                 <div class="tab-content no-padding">
                     <!-- Morris chart - Sales -->
-                    <div class="chart tab-pane active" id="revenue-chart" style="position: relative; height: 300px;"></div>
-                    <div class="chart tab-pane" id="sales-chart" style="position: relative; height: 300px;"></div>
+                    <div class="chart tab-pane active" id="goodsViewByD" style="position: relative; height: 300px;"></div>
+                    <div class="chart tab-pane" id="goodsViewByA" style="position: relative; height: 300px;"></div>
                 </div>
             </div>
         </section>
@@ -303,32 +471,32 @@ $(function(){
             <div class="nav-tabs-custom">
                 <ul class="nav nav-tabs pull-right">
                     <li class="active"><a href="#revenue-chart" data-toggle="tab">今日</a></li>
-                    <li><a href="#sales-chart" data-toggle="tab">本周</a></li>
+                    <li><a href="#sales-chart" data-toggle="tab">当月</a></li>
                     <!-- <li><a href="#sales-chart" data-toggle="tab">本月</a></li> -->
                     <li class="pull-left header"><i class="fa fa-list-ol"></i> 直营商销售排行</li>
                 </ul>
                 <div class="tab-content no-padding">
                     <!-- Morris chart - Sales -->
-                    <div class="chart tab-pane active" id="revenue-chart" style="position: relative; height: 300px;"></div>
-                    <div class="chart tab-pane" id="sales-chart" style="position: relative; height: 300px;"></div>
+                    <div class="chart tab-pane active" id="directViewByD" style="position: relative; height: 300px;"></div>
+                    <div class="chart tab-pane" id="directViewByM" style="position: relative; height: 300px;"></div>
                 </div>
             </div>
         </section>
-        <section class="col-lg-6 connectedSortable">
+<!--        <section class="col-lg-6 connectedSortable">
             <div class="nav-tabs-custom">
                 <ul class="nav nav-tabs pull-right">
                     <li class="active"><a href="#revenue-chart" data-toggle="tab">今日</a></li>
                     <li><a href="#sales-chart" data-toggle="tab">本周</a></li>
-                    <!-- <li><a href="#sales-chart" data-toggle="tab">本月</a></li> -->
+                    &lt;!&ndash; <li><a href="#sales-chart" data-toggle="tab">本月</a></li> &ndash;&gt;
                     <li class="pull-left header"><i class="fa fa-file-text-o"></i> 订单完成统计</li>
                 </ul>
                 <div class="tab-content no-padding">
-                    <!-- Morris chart - Sales -->
+                    &lt;!&ndash; Morris chart - Sales &ndash;&gt;
                     <div class="chart tab-pane active" id="revenue-chart" style="position: relative; height: 300px;"></div>
                     <div class="chart tab-pane" id="sales-chart" style="position: relative; height: 300px;"></div>
                 </div>
             </div>
-        </section>
+        </section>-->
     </div>
     
     <div class="row">
@@ -356,13 +524,9 @@ $(function(){
             <div class="box-body">
               <div class="row">
                 <div class="col-md-8">
-                  <p class="text-center">
-                    <strong>Sales: 1 Jan, 2014 - 30 Jul, 2014</strong>
-                  </p>
-
                   <div class="chart">
                     <!-- Sales Chart Canvas -->
-                    <canvas id="salesChart" style="height: 180px;"></canvas>
+                    <canvas id="salesChart" style="height: 200px;"></canvas>
                   </div>
                   <!-- /.chart-responsive -->
                 </div>
