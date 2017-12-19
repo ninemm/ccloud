@@ -266,7 +266,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 		StringBuilder sql = new StringBuilder("SELECT COUNT(DISTINCT(c.id)) ");
 		sql.append("FROM `cc_user_join_customer` uc ");
 		sql.append("JOIN cc_seller_customer c on c.id = uc.seller_customer_id ");
-		sql.append("WHERE WHERE c.is_enabled = 1 AND uc.data_area like ?");
+		sql.append("WHERE c.is_enabled = 1 AND uc.data_area like ?");
 		return Db.queryLong(sql.toString(), dataArea);
 	}
 }
