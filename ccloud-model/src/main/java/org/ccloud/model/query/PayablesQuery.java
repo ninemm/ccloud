@@ -121,4 +121,9 @@ public class PayablesQuery extends JBaseQuery {
 		return payables.saveOrUpdate();
 	}
 	
+	public Payables findByObjId(String objId) {
+		String select = "select * from cc_payables where obj_id= '"+objId+"'";
+		return DAO.findFirst(select);
+	}
+	
 }
