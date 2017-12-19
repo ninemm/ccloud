@@ -19,10 +19,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -200,13 +198,15 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 		Integer productNum = Integer.valueOf(productNumStr);
 		
 		BigDecimal totalAmount = new BigDecimal(0);
-		Set<String> set = new HashSet<String>();
+		List<String> lists = new ArrayList<String>();
 		for(int i = 1;i<=productNum;i++){
 			String purchaseOederDetailId = StringUtils.getArrayFirst(paraMap.get("purchaseOrderDetailId"+i));
-			set.add(purchaseOederDetailId);
+			if(!lists.contains(purchaseOederDetailId)){
+				lists.add(purchaseOederDetailId);
+            }
 		}
 		int ind = 0 ;
-		for(String pid : set){
+		for(String pid : lists){
 			int productCount = 0;
 			String convertt = "";
 			for(int j = 1; j<=productNum;j++){
