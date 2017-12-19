@@ -66,7 +66,6 @@
 			"endDate" : endDate
 		}
 
-
 		Utils.ajax('${CPATH}/refund/list', params, 
 			function(data){
 				$loading.hide();
@@ -86,12 +85,11 @@
 						$newOrder.find("#receiveType").remove();
 					}
 					
-
 					$newOrder.find("#orderSn").text(el.instock_sn);
-					
 					$newOrder.find("#status").text(getStatus(el.status));
 					$newOrder.find("#customerName").text(el.customer_name);
 					$newOrder.find("#contact").text(el.ccontact + '/' + el.cmobile);
+					
 					$newOrder.find("#customerType").text(el.customerTypeName);
 					$newOrder.find("#refund").on('click', function(){ 
  						 window.location.href = "${CPATH}/refund/refundDetail?id="+el.id
@@ -159,7 +157,8 @@
 </#macro>
 
 <@layout>
-<body id="my-order" class="ft12">
+<div class="weui-content"> 
+<div id="my-order" class="ft14">
 	<header class="has-th-list weui-flex">
 		<div class="head-search select-area weui-flex__item">
 			<div class="weui-flex">
@@ -234,5 +233,6 @@
 		</footer>
 	</article>
 	<#include "_inc/_goback.html" />
-</body>
+</div>
+</div>
 </@layout>
