@@ -1,6 +1,11 @@
 <#include "_inc/_layout.html"/>
 
-<#macro css> </#macro>
+<#macro css>
+    #visit-add main {
+        top: 0;
+        bottom: 2.25rem;
+    }
+</#macro>
 
 <#macro script_import>
     <script type="text/javascript" src="${CPATH}/static/layer_mobile/layer.js"></script>
