@@ -127,7 +127,7 @@ public class ProductCompositionQuery extends JBaseQuery {
 	}
 
 	public List<Record> findProductBySeller(String sellerId, String keyword) {
-		StringBuilder fromBuilder = new StringBuilder("SELECT sp.parent_id as id, sp.name, sp.price ");
+		StringBuilder fromBuilder = new StringBuilder("SELECT sp.parent_id as id, sp.name, sp.price,cs.store_count ");
 		fromBuilder.append("FROM cc_product_composition sp ");
 		fromBuilder.append("JOIN cc_seller_product cs ON cs.id = sp.seller_product_id ");
 
