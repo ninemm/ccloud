@@ -65,7 +65,7 @@ public class _PriceSystemController extends JBaseCRUDController<PriceSystem> {
 		} else {
 			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 			page = PriceSystemQuery.me().paginate(getPageNumber(), getPageSize(), keyword, user.getDepartmentId(),
-					DataAreaUtil.getUserDeptDataArea(user.getDataArea()));
+					DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea()));
 		}
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
@@ -102,7 +102,7 @@ public class _PriceSystemController extends JBaseCRUDController<PriceSystem> {
 			priceSystem.set("data_area", getPara("data_area"));
 		} else {
 			priceSystem.set("dept_id", user.getDepartmentId());
-			priceSystem.set("data_area", DataAreaUtil.getUserDeptDataArea(user.getDataArea()));
+			priceSystem.set("data_area", DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea()));
 		}
 
 		priceSystem.saveOrUpdate();

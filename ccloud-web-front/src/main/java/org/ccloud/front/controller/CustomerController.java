@@ -90,7 +90,7 @@ public class CustomerController extends BaseFrontController {
 			region.add(item);
 		}
 
-		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(DataAreaUtil.getUserDealerDataArea(user.getDataArea()) + "%");
+		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea()) + "%");
 		List<Map<String, Object>> customerTypeList2 = new ArrayList<>();
 		customerTypeList2.add(all);
 
@@ -239,7 +239,7 @@ public class CustomerController extends BaseFrontController {
 		if (StrKit.notBlank(id)) {
 			String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 			SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(id);
-			String dealerDataArea = DataAreaUtil.getUserDealerDataArea(selectDataArea);
+			String dealerDataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(selectDataArea);
 			List<String> typeList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeIdListBySellerCustomerId(id, dealerDataArea + "%");
 
 			List<String> typeName = new ArrayList<>();
@@ -260,7 +260,7 @@ public class CustomerController extends BaseFrontController {
 	public List<Map<String, Object>> getCustomerType(){
 
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		String dataArea = DataAreaUtil.getUserDealerDataArea(selectDataArea);
+		String dataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(selectDataArea);
 		
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(dataArea);
 		List<Map<String, Object>> list = new ArrayList<>();
@@ -384,7 +384,7 @@ public class CustomerController extends BaseFrontController {
 			sellerCustomer.setSubType("100301");
 			sellerCustomer.setCustomerKind("100401");
 			
-			String deptDataArea = DataAreaUtil.getUserDealerDataArea(user.getDataArea());
+			String deptDataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea());
 			Department department =  DepartmentQuery.me().findByDataArea(deptDataArea);
 			sellerCustomer.setDataArea(deptDataArea);
 			sellerCustomer.setDeptId(department.getId());
@@ -440,7 +440,7 @@ public class CustomerController extends BaseFrontController {
 		setAttr("taskId", taskId);
 
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		String dealerDataArea = DataAreaUtil.getUserDealerDataArea(selectDataArea);
+		String dealerDataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(selectDataArea);
 		List<String> custTypeNameList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeNameListBySellerCustomerId(id, dealerDataArea);
 		String custTypeNames = Joiner.on(",").skipNulls().join(custTypeNameList);
 		setAttr("custTypeNames", custTypeNames);
@@ -478,7 +478,7 @@ public class CustomerController extends BaseFrontController {
 					, sellerCustomer.getStr("country_code"));
 			src.setAreaCode(areaCode);
 
-			src.setCustTypeNameList(CustomerJoinCustomerTypeQuery.me().findCustomerTypeNameListBySellerCustomerId(id, DataAreaUtil.getUserDealerDataArea(selectDataArea)));
+			src.setCustTypeNameList(CustomerJoinCustomerTypeQuery.me().findCustomerTypeNameListBySellerCustomerId(id, DataAreaUtil.getDealerDataAreaByCurUserDataArea(selectDataArea)));
 
 
 			List<String> diffAttrList = BeanCompareUtils.contrastObj(src, dest);
@@ -586,7 +586,7 @@ public class CustomerController extends BaseFrontController {
 				sellerCustomer.setIsArchive(1);
 				sellerCustomer.setImageListStore(customerVO.getImageListStore());
 
-				String deptDataArea = DataAreaUtil.getUserDealerDataArea(user.getDataArea());
+				String deptDataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea());
 				Department department =  DepartmentQuery.me().findByDataArea(deptDataArea);
 				sellerCustomer.setDataArea(deptDataArea);
 				sellerCustomer.setDeptId(department.getId());
