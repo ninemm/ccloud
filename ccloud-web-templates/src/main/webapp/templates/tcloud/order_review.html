@@ -13,12 +13,18 @@
           '<div class="refuse-radio"><label><input type="radio" name="refuseReson" id="" value="库存无足够货物">库存无足够货物</label></div>' +
           '<div class="refuse-radio"><label><input type="radio" name="refuseReson" id="" value="产品价格滞后">产品价格滞后</label></div>' +
           '<div class="refuse-radio"><label><input type="radio" name="refuseReson" id="" value="该商家已被停用">该商家已被停用</label></div>'+
-          '<div><textarea placeholder="补充说明，可选填"></textarea></div>',
+          '<div><textarea id="comment" placeholder="补充说明，可选填"></textarea></div>',
         anim: 'scale',
         className: 'audit',
         btn: ['确认拒绝','取消拒绝'],
         yes: function() {
-          doSubmit(0)
+          parent.refuseReson = $("input[name='refuseReson']:checked").val();
+          parent.comment = $("#comment").val();
+          if (parent.refuseReson == undefined && parent.comment == ""){
+            toastr.warning('请选择一个理由');
+            return;
+          }
+          doSubmit(0);
         },
         no:function() {
 
@@ -26,13 +32,25 @@
       });
     })
 	});
+	var comment = '';
+	var refuseReson = '';
 
 	function doSubmit(pass) {
 		layer.open({
 			type: 2,
 			content: '保存中...'
 		});
-		$.get('${CPATH}/order/complete?id=${(order.id)!}&taskId=${(taskId)!}&pass=' + pass ,
+		
+		var params = {
+			"id": '${(order.id)!}',
+			"taskId": '${(taskId)!}',
+			"comment": comment,
+			"refuseReson" : refuseReson,
+			'pass' : pass
+		}
+
+
+		Utils.ajax('${CPATH}/order/complete', params, 
 			function(res){
 				if (res.errorCode == 0) {
 					$.confirm({
