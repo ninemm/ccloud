@@ -1365,10 +1365,12 @@ public class SalesOrderQuery extends JBaseQuery {
 			endDate = date[1];
 		}
 		LinkedList<Object> params = new LinkedList<Object>();
-		StringBuilder fromBuilder = new StringBuilder("SELECT IFNULL(SUM(cc.product_amount),0) as totalAmount, IFNULL(SUM(cc.product_count),0) as productCount, se.seller_name, cs.seller_id ");
+		StringBuilder fromBuilder = new StringBuilder("SELECT IFNULL(SUM(cc.product_amount),0) as totalAmount, IFNULL(SUM(cc.product_count/cp.convert_relate),0) as productCount, se.seller_name, cs.seller_id ");
 		fromBuilder.append("FROM cc_sales_order_detail cc ");
 		fromBuilder.append("LEFT JOIN cc_sales_order cs on cc.order_id = cs.id ");
 		fromBuilder.append("LEFT JOIN cc_seller se on se.id = cs.seller_id ");
+		fromBuilder.append("LEFT JOIN cc_seller_product csp on cc.sell_product_id = csp.id ");
+		fromBuilder.append("LEFT JOIN cc_product cp on cp.id = csp.product_id ");	
 		boolean needWhere = true;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, " cc.data_area", dataArea, params, needWhere);
 		if (needWhere) {
