@@ -75,6 +75,8 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 	
 	public void list() {
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String sellerId = getSessionAttr("sellerId");
+		Seller seller = SellerQuery.me().findById(sellerId);
 		String keyword = getPara("k");
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
@@ -84,7 +86,7 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 		String endDate = getPara("endDate");
 
 		Page<Record> page = PurchaseRefundOutstockQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate,
-				endDate,dataArea);
+				endDate,dataArea,seller.getDeptId());
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
@@ -100,11 +102,11 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 	}
 	
 	public void outstockDetail() {
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String outstockId = getPara(0);
 
-		Record outstock = PurchaseInstockQuery.me().findMoreById(outstockId,user.getDataArea());
-		List<Record> outstockDetail = PurchaseInstockDetailQuery.me().findByOutstockId(outstockId,user.getDataArea());
+		Record outstock = PurchaseInstockQuery.me().findMoreById(outstockId,dataArea);
+		List<Record> outstockDetail = PurchaseInstockDetailQuery.me().findByOutstockId(outstockId,dataArea);
 
 		setAttr("outstock", outstock);
 		setAttr("outstockDetail", outstockDetail);
@@ -115,9 +117,9 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 
 	public void refund() {
 		String outstockId = getPara("outstockId");
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		Record outstock = PurchaseInstockQuery.me().findMoreById(outstockId,user.getDataArea());
-		List<Record> outstockDetail = PurchaseInstockDetailQuery.me().findByOutstockId(outstockId,user.getDataArea());
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		Record outstock = PurchaseInstockQuery.me().findMoreById(outstockId,dataArea);
+		List<Record> outstockDetail = PurchaseInstockDetailQuery.me().findByOutstockId(outstockId,dataArea);
 
 		HashMap<String, Object> result = Maps.newHashMap();
 		result.put("outstock", outstock);

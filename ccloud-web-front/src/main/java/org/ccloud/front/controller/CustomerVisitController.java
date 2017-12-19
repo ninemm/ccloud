@@ -56,7 +56,7 @@ public class CustomerVisitController extends BaseFrontController {
 		String id = getPara("id");
 		String type = getPara("type");
 		String nature = getPara("nature");
-		String subType = getPara("subType");
+		String subType = getPara("level");
 		String dataArea = selectDataArea + "%";
 
 		Page<Record> visitList = CustomerVisitQuery.me().paginateForApp(getPageNumber(), getPageSize(), id, type, nature, subType, dataArea);
@@ -408,7 +408,7 @@ public class CustomerVisitController extends BaseFrontController {
 	    for (Dict dict : visitDictList) {
 	    	Map<String, String> map = Maps.newHashMap();
 	    	map.put("title", dict.getName());
-	    	map.put("value", dict.getKey());
+	    	map.put("value", dict.getValue());
 	    	list.add(map);
 	    }
 	    return list;

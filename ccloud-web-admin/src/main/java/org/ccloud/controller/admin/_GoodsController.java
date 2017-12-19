@@ -193,7 +193,7 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
         		}
         		List<Product> oldList = ProductQuery.me().findByGoodId(goods.getId());
         		int productSize = getLikeByMap(map, "product"); //map取出产品属性信息数量
-        		int loop = productSize / 8; //算出产品数量与循环次数
+        		int loop = productSize / 6; //算出产品数量与循环次数
         		int loopEnd = 0;
         		List<String> newProIds = new ArrayList<>();
         		int market = 0; //上架判断
@@ -218,8 +218,8 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
         				String bigUnit = StringUtils.getArrayFirst(map.get("productList[" + i + "].bigUnit"));
         				String relate = StringUtils.getArrayFirst(map.get("productList[" + i + "].relate"));
         				String smallUnit = StringUtils.getArrayFirst(map.get("productList[" + i + "].smallUnit"));
-        				String productStore = StringUtils.getArrayFirst(map.get("productList[" + i + "].store"));
-        				String productStorePlace = StringUtils.getArrayFirst(map.get("productList[" + i + "].storePlace"));
+//        				String productStore = StringUtils.getArrayFirst(map.get("productList[" + i + "].store"));
+//        				String productStorePlace = StringUtils.getArrayFirst(map.get("productList[" + i + "].storePlace"));
         				String productIsMarketable = StringUtils.getArrayFirst(map.get("productList[" + i + "].isMarketable"));
         				
         				if (productId != null) {
@@ -233,8 +233,8 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
         				product.setBigUnit(bigUnit);
         				product.setConvertRelate(relate == null ? null : Integer.parseInt(relate));
         				product.setSmallUnit(smallUnit);
-        				product.setStore(productStore == null ? null : Integer.parseInt(productStore));
-        				product.setStorePlace(productStorePlace);
+//        				product.setStore(productStore == null ? null : Integer.parseInt(productStore));
+//        				product.setStorePlace(productStorePlace);
         				product.setIsMarketable(Boolean.valueOf(productIsMarketable));
         				if (product.getIsMarketable()) {
         					market++;
