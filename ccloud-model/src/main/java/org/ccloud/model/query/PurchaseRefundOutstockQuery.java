@@ -41,10 +41,11 @@ public class PurchaseRefundOutstockQuery extends JBaseQuery {
 				return DAO.findById(id);
 	}
 
-	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate,String dataArea) {
-		String select = "select r.*, cs.name as supplierName ";
+	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate,String dataArea,String deptId) {
+		String select = "select r.*, CASE WHEN cs.`name` IS NOT NULL THEN cs.`name` ELSE s.seller_name END AS supplierName ";
 		StringBuilder fromBuilder = new StringBuilder(" from `cc_purchase_refund_outstock` r");
-		fromBuilder.append(" join cc_supplier cs on r.supplier_id = cs.id ");
+		fromBuilder.append(" LEFT JOIN cc_supplier cs on r.supplier_id = cs.id "
+				+ " LEFT JOIN cc_seller s on s.id = r.supplier_id ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
@@ -65,7 +66,7 @@ public class PurchaseRefundOutstockQuery extends JBaseQuery {
 			params.add(endDate);
 		}
 
-		fromBuilder.append(" order by r.create_date desc ");
+		fromBuilder.append(" and r.dept_id = '"+deptId+"'  order by r.create_date desc ");
 
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
@@ -97,8 +98,8 @@ public class PurchaseRefundOutstockQuery extends JBaseQuery {
 		return Db.findFirst(fromBuilder.toString(), id);
 	}
 	
-	public List<PurchaseRefundOutstock> findByUser(String userId, String dataArea){
-		String sql = "select c.* from cc_purchase_refund_outstock c LEFT JOIN user u on u.department_id =c.dept_id where u.id='"+userId+"' and c.data_area = '"+dataArea+"' ";
+	public List<PurchaseRefundOutstock> findByUser(String deptId, String dataArea){
+		String sql = "select * from cc_purchase_refund_outstock  where dept_id='"+deptId+"' and data_area like '"+dataArea+"' ";
 		return DAO.find(sql);
 	}
 	

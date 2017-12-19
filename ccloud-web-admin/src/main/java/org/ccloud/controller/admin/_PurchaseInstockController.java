@@ -107,8 +107,11 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String data = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String sellerId = getSessionAttr("sellerId");
+		Seller seller = SellerQuery.me().findById(sellerId);
 		String p = "";
-		List<PurchaseRefundOutstock> list = PurchaseRefundOutstockQuery.me().findByUser(user.getId(), user.getDataArea());
+		List<PurchaseRefundOutstock> list = PurchaseRefundOutstockQuery.me().findByUser(seller.getDeptId(), data);
 		if(list.size()>0){	
 			String pro = "";
 			for(int i=0;i<list.size();i++){
@@ -118,7 +121,7 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 		}else{
 			p = "''";
 		}
-		Page<Record> page = PurchaseInstockQuery.me().paginateO(getPageNumber(), getPageSize(), keyword, startDate, endDate,user.getId(),user.getDataArea(),p);
+		Page<Record> page = PurchaseInstockQuery.me().paginateO(getPageNumber(), getPageSize(), keyword, startDate, endDate,user.getId(),data,p,seller.getDeptId());
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
