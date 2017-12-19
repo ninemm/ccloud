@@ -26,6 +26,7 @@ import org.ccloud.model.query.DictQuery;
 import org.ccloud.model.query.MessageQuery;
 import org.ccloud.model.query.OptionQuery;
 import org.ccloud.route.RouterMapping;
+import org.ccloud.ui.freemarker.tag.IndexPageTag;
 import org.ccloud.utils.StringUtils;
 
 import com.jfinal.kit.StrKit;
@@ -67,6 +68,12 @@ public class IndexController extends BaseFrontController {
 			Dict customerVisit = DictQuery.me().findByKey("message_type", "customer_visit");
 			Page<Message> customerVisitPage = MessageQuery.me().paginate(getPageNumber(), 5, sellerId, customerVisit.getValue(), null, user.getId(), null);
 			setAttr("customerVisitPage", customerVisitPage);
+			
+			if (StringUtils.isBlank(para)) {
+				setAttr(IndexPageTag.TAG_NAME, new IndexPageTag(getRequest(), null, 1, null));
+				render("index.html");
+				return;
+			}
 		}
 
 		

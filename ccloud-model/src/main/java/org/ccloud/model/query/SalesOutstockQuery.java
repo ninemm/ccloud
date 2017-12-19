@@ -20,13 +20,12 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-
 import org.ccloud.Consts;
 import org.ccloud.model.Receivables;
 import org.ccloud.model.SalesOutstock;
 import org.ccloud.utils.DateUtils;
+import org.ccloud.model.vo.printAllNeedInfo;
 import org.ccloud.utils.StringUtils;
-
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.IAtom;
@@ -260,5 +259,49 @@ public class SalesOutstockQuery extends JBaseQuery {
 	}
 
 	
+	public printAllNeedInfo findStockOutForPrint(final String id) {
+		StringBuilder fromBuilder = new StringBuilder("select o.outstock_sn,o.delivery_address,o.total_amount, cs.customer_kind, c.id as customerId, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as customerTypeCode, u.realname, u.mobile, ");
+		fromBuilder.append(" w.code as warehouseCode, cp.factor,w.`name` as warehouseName,w.phone as warehousePhone,o.create_date as placeOrderTime,o.remark,sn.seller_name,so.total_amount,so.id as orderId,so.biz_user_id,o.id as salesOutStockId,sn.id as sellerId,pt.context as printFootContext ");
+		fromBuilder.append(" from `cc_sales_outstock` o ");
+		fromBuilder.append(" left join cc_seller_customer cs on o.customer_id = cs.id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sj on sj.outstock_id = o.id ");
+		fromBuilder.append(" left join cc_customer c on cs.customer_id = c.id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_order so on so.id = sj.order_id ");
+		fromBuilder.append(" LEFT JOIN cc_seller sn on sn.id = so.seller_id ");
+		fromBuilder.append(" left join cc_customer_type ct on o.customer_type_id = ct.id ");
+		fromBuilder.append(" left join cc_price_system cp on cp.id = ct.price_system_id ");
+		fromBuilder.append(" left join user u on so.biz_user_id = u.id ");
+		fromBuilder.append(" left join cc_warehouse w on o.warehouse_id = w.id ");
+		fromBuilder.append(" LEFT JOIN cc_seller_join_template cjt on cjt.seller_id = sn.id ");
+		fromBuilder.append(" LEFT JOIN cc_print_template pt on pt.id = cjt.print_template_id ");
+		fromBuilder.append(" where o.id = ? ");
+		printAllNeedInfo printAllNeedInfo = new printAllNeedInfo();
+		 List<Record> records = Db.find(fromBuilder.toString(), id);
+		 for (Record record : records) {
+			printAllNeedInfo.setOutstockSn(record.getStr("outstock_sn"));
+			printAllNeedInfo.setDeliveryAddress(record.getStr("delivery_address"));
+			printAllNeedInfo.setCustomerName(record.getStr("customer_name"));
+			printAllNeedInfo.setCustomerContacts(record.getStr("ccontact"));
+			printAllNeedInfo.setCustomerPhone(record.getStr("cmobile"));
+			printAllNeedInfo.setPlaceOrderMan(record.getStr("realname"));
+			printAllNeedInfo.setPlaceOrderPhone(record.getStr("mobile"));
+			printAllNeedInfo.setWarehouseName(record.getStr("warehouseName"));
+			printAllNeedInfo.setWarehousePhone(record.getStr("warehousePhone"));
+			printAllNeedInfo.setSalesAmount(record.getBigDecimal("total_amount"));
+			printAllNeedInfo.setSellerName(record.getStr("seller_name"));
+			printAllNeedInfo.setRemark(record.getStr("remark"));
+			printAllNeedInfo.setPlaceOrderTime(record.getDate("placeOrderTime"));
+			printAllNeedInfo.setOrderId(record.getStr("orderId"));
+			printAllNeedInfo.setBizUserId(record.getStr("biz_user_id"));
+			printAllNeedInfo.setSalesOutStockId(record.getStr("salesOutStockId"));
+			printAllNeedInfo.setPrintFootContext(record.getStr("printFootContext"));
+		}
+		    return printAllNeedInfo;
+	}
+	
+	public void updatePrintStatus(String id) {
+		String sql = "update cc_sales_outstock cc set is_print = 1,print_count=print_count+ "+ 1 +" where cc.id = '"+id+"'";
+		Db.update(sql);
+	}
 
 }

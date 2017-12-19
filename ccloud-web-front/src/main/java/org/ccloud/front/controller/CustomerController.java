@@ -59,12 +59,15 @@ public class CustomerController extends BaseFrontController {
 
 	public void index() {
 
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		
+		String key = getPara("searchKey");
+		String hasOrder = getPara("isOrdered");
+		String customerType =  getPara("customerType");
 
-		Page<Record> customerList = SellerCustomerQuery.me().findByUserTypeForApp(getPageNumber(), getPageSize(), getUserIdList(user), getPara("customerType"), getPara("isOrdered"), getPara("searchKey"));
 
+		Page<Record> customerList = SellerCustomerQuery.me().findByUserTypeForApp(getPageNumber(), getPageSize(), selectDataArea, customerType, hasOrder, key);
 		setAttr("customerList", customerList);
-
 		render("customer.html");
 	}
 
@@ -103,13 +106,13 @@ public class CustomerController extends BaseFrontController {
 	}
 
 	public void refresh() {
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
 		Page<Record> customerList = new Page<>();
 		if (StrKit.notBlank(getPara("region"))) {
-			Object[] region = {getPara("region")};
-			 customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), region, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"));
-		} else customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), getUserIdList(user), getPara("customerType"), getPara("isOrdered"), getPara("searchKey"));
+			String dataArea = UserQuery.me().findById(getPara("region")).getDataArea();
+			customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), dataArea, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"));
+		} else customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), selectDataArea, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"));
 
 		StringBuilder html = new StringBuilder();
 		for (Record customer : customerList.getList())
@@ -210,10 +213,12 @@ public class CustomerController extends BaseFrontController {
 	}
 
 	public void historyOrder() {
+		
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String sellerCustomerId = getPara("sellerCustomerId");
+		Page<Record> orderList = SalesOrderQuery.me().findBySellerCustomerId(getPageNumber(), getPageSize(), sellerCustomerId, selectDataArea + "%");
 
-		Page<Record> orderList = SalesOrderQuery.me().findBySellerCustomerId(getPageNumber(), getPageSize(), getPara("sellerCustomerId"), selectDataArea + "%");
-
+		// 需要修改，使用字典来显示，不用在这个地方做查询
 		for(Record record : orderList.getList()){
 			record.set("statusName", getStatusName(record.getInt("status")));
 			record.set("receive_Name", getReceiveName(record.getInt("receive_type")));
@@ -247,28 +252,28 @@ public class CustomerController extends BaseFrontController {
 			setAttr("cTypeName", Joiner.on(",").join(typeName.iterator()));
 		}
 		
+		setAttr("customerType", JSON.toJSONString(getCustomerType()));
+		
 		render("customer_edit.html");
 	}
 
-	public void getCustomerType(){
+	public List<Map<String, Object>> getCustomerType(){
 
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-
-		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
-				.findByDataArea(DataAreaUtil.getUserDealerDataArea(selectDataArea));
-		List<Map<String, Object>> customerTypeList2 = new ArrayList<>();
+		String dataArea = DataAreaUtil.getUserDealerDataArea(selectDataArea);
+		
+		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(dataArea);
+		List<Map<String, Object>> list = new ArrayList<>();
 
 		for(CustomerType customerType : customerTypeList)
 		{
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", customerType.getName());
 			item.put("value", customerType.getId());
-			customerTypeList2.add(item);
+			list.add(item);
 		}
 
-		Map<String, List<Map<String, Object>>> data = new HashMap<>();
-		data.put("customerTypeList", customerTypeList2);
-		renderJson(data);
+		return list;
 	}
 
 	@Before(Tx.class)
@@ -413,7 +418,7 @@ public class CustomerController extends BaseFrontController {
 			return ;
 		}
 		
-		updated = startProcess(sellerCustomer.getId(), map);
+		updated = startProcess(sellerCustomer.getId(), map, 0);
 
 		if (updated)
 			renderAjaxResultForSuccess("操作成功");
@@ -493,7 +498,7 @@ public class CustomerController extends BaseFrontController {
 		//int isEnabled = getParaToInt("isEnabled");
 		if(StrKit.notBlank(id)) {
 
-			boolean updated = startProcess(id, new HashMap<String, Object>());
+			boolean updated = startProcess(id, new HashMap<String, Object>(), 1);
 
 			if (updated) {
 				renderAjaxResultForSuccess("操作成功");
@@ -514,7 +519,7 @@ public class CustomerController extends BaseFrontController {
 		String taskId = getPara("taskId");
 		Integer status = getParaToInt("status");
 		String sellerCustomerId = getPara("id");
-		String comment = (status == 1) ? "批准" : "拒绝";
+		String comment = (status == 1) ? "客户审核批准" : "客户审核拒绝";
 
 		boolean updated = true;
 
@@ -566,7 +571,8 @@ public class CustomerController extends BaseFrontController {
 				} else customer.setId(null);
 				updated = updated && customer.saveOrUpdate();
 
-				sellerCustomer.setNickname(customerVO.getNickname());
+				if (StrKit.notBlank(customerVO.getNickname()))
+					sellerCustomer.setNickname(customerVO.getNickname());
 
 				if (customerVO.getCustTypeList() != null || customerVO.getCustTypeList().size() != 0)
 					sellerCustomer.setCustomerTypeIds(Joiner.on(",").join(customerVO.getCustTypeList().iterator()));
@@ -601,6 +607,9 @@ public class CustomerController extends BaseFrontController {
 					}
 				}
 
+			}else {
+				sellerCustomer.setIsEnabled(0);
+				updated = sellerCustomer.saveOrUpdate();
 			}
 		} else {
 			Kv kv = Kv.create();
@@ -641,7 +650,7 @@ public class CustomerController extends BaseFrontController {
 			renderAjaxResultForError("操作失败");
 	}
 
-	private boolean startProcess(String customerId, Map<String, Object> param) {
+	private boolean startProcess(String customerId, Map<String, Object> param, int isEnable) {
 		
 		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(customerId);
 		boolean isUpdated = true;
@@ -689,9 +698,11 @@ public class CustomerController extends BaseFrontController {
 		message.setTitle(sellerCustomer.getCustomer().getCustomerName());
 		
 		Object customerVO = param.get("customerVO");
-		if (customerVO == null) {
+		if (customerVO == null && isEnable == 0) {
 			message.setContent("新增待审核");
-		} else {
+		} else if(customerVO == null && isEnable == 1) {
+			message.setContent("停用待审核");
+		}else {
 			List<String> list = BeanCompareUtils.contrastObj(sellerCustomer, customerVO);
 			if (list != null)
 				message.setContent(JsonKit.toJson(list));
@@ -699,17 +710,6 @@ public class CustomerController extends BaseFrontController {
 		MessageKit.sendMessage(Actions.ProcessMessage.PROCESS_MESSAGE_SAVE, message);
 		
 		return isUpdated;
-	}
-
-	private Object[] getUserIdList(User user) {
-		List<Record> userList = UserQuery.me().findNextLevelsUserList(getSessionAttr(Consts.SESSION_SELECT_DATAAREA).toString() + "%");
-		if (userList.size() == 0) return null;
-
-		Object[] userIdList = new Object[userList.size()];
-		for (int i = 0; i < userList.size(); i++) {
-			userIdList[i] = userList.get(i).getStr("id");
-		}
-		return userIdList;
 	}
 
 	private String getStatusName (int statusCode) {

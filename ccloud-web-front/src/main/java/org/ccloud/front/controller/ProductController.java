@@ -68,7 +68,7 @@ public class ProductController extends BaseFrontController {
 			Map<String, Object> item = new HashMap<>();
 
 			String sellProductId = record.get("sell_product_id");
-			item.put("title", record.getStr("custom_name") + record.getStr("valueName"));
+			item.put("title", record.getStr("custom_name") + "/" + record.getStr("valueName"));
 			item.put("value", sellProductId);
 
 			sellerProductItems.add(item);

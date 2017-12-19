@@ -2,7 +2,29 @@
 <#macro css> </#macro>
 <#macro script>
 	$(function() {
+    $(document).on('touchend', '.refuse', function() {
+      layer.open({
+        type: 1,
+        title: ['订单审核',
+          'border-bottom: 1px solid #eee;height:2rem;line-height:2rem'
+        ],
+        content: '<p class="t-c">是否确认拒绝该订单？</p>' +
+          '<p class="gray">可选择拒绝原因</p>' +
+          '<div class="refuse-radio"><label><input type="radio" name="refuseReson" id="" value="库存无足够货物">库存无足够货物</label></div>' +
+          '<div class="refuse-radio"><label><input type="radio" name="refuseReson" id="" value="产品价格滞后">产品价格滞后</label></div>' +
+          '<div class="refuse-radio"><label><input type="radio" name="refuseReson" id="" value="该商家已被停用">该商家已被停用</label></div>'+
+          '<div><textarea placeholder="补充说明，可选填"></textarea></div>',
+        anim: 'scale',
+        className: 'audit',
+        btn: ['确认拒绝','取消拒绝'],
+        yes: function() {
+          doSubmit(0)
+        },
+        no:function() {
 
+        }
+      });
+    })
 	});
 
 	function doSubmit(pass) {
@@ -122,7 +144,7 @@
                 </span>
     </div>
   </div>
-  <a class="weui-panel weui-panel_access block" href="./operateHistory.html">
+  <a class="weui-panel weui-panel_access block" href="${CPATH}/order/operateHistory?id=${(order.id)!}&proc_inst_id=${(order.proc_inst_id)!}">
     <div class="weui-cell weui-cell_access">
       <div class="weui-cell__bd ft14">
         操作记录
@@ -149,9 +171,9 @@
   <i class="icon-menu-open orange fr" id="button"></i>
 </div>
 <div class="layer"></div>
-<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
-  <button class="gray-button weui-flex__item" onclick="doSubmit(0)">拒绝</button>
-  <button class="blue-button weui-flex__item" onclick="doSubmit(1)">通过</button>
+<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex border-top-1px">
+  <button class="white-button-no-border weui-flex__item refuse">拒绝</button>
+  <button class="red-button weui-flex__item" onclick="doSubmit(1)">通过</button>
 </footer>
 </body>
 </@layout>

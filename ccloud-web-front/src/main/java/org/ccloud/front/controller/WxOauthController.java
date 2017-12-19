@@ -68,6 +68,13 @@ public class WxOauthController extends BaseFrontController {
 					// 获取用户的相应权限放入缓存
 					init(user.getUsername(), user.getPassword(), true);
 					
+					List<Department> tmpList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
+					if (tmpList.size() > 0) {
+						Department dept = tmpList.get(0);
+						setSessionAttr(Consts.SESSION_SELLER_ID, dept.get("seller_id"));
+						setSessionAttr(Consts.SESSION_SELLER_NAME, dept.get("seller_name"));
+						setSessionAttr(Consts.SESSION_SELLER_CODE, dept.get("seller_code"));
+					}
 					// 更新用户的信息
 					ApiResult wxUserResult = UserApi.getUserInfo(openId);
 					if (wxUserResult.isSucceed()) {
@@ -104,8 +111,8 @@ public class WxOauthController extends BaseFrontController {
 			}
 		}
 		
-		//redirect(gotoUrl);
-		forwardAction(gotoUrl);
+		redirect(gotoUrl);
+		//forwardAction(gotoUrl);
 	}
 	
 	private void init(String username, String password, Boolean rememberMe) {

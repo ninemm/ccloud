@@ -48,6 +48,7 @@ public class Actions {
 		public static final String ACTION_LOG = "action:log";
 	}
 	public class NotifyWechatMessage {
+		public static final String ORDER_AUDIT_MESSAGE = "order:audit";
 		public static final String CUSTOMER_AUDIT_MESSAGE = "customer:audit";
 		public static final String CUSTOMER_VISIT_AUDIT_MESSAGE = "visit:audit";
 	}

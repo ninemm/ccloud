@@ -82,7 +82,16 @@
 					},
 					edit: false
 				},
-				{field: "status", title: "状态", align: "center", width: '5%',edit: false,
+				{field: "is_print", title: "打印状态", align: "center", width: '5%',edit: false,
+					formatter: function(value, row, rowIndex) {
+						if (value == 0) {
+							return '未打印';
+						} else {
+							return '已打印'
+						}
+					}
+				},
+				{field: "status", title: "出库状态", align: "center", width: '5%',edit: false,
 					formatter: function(value, row, rowIndex) {
 						if (value == 0) {
 							return '待出库';
@@ -96,7 +105,7 @@
 					var url = '${CPATH}/admin/salesOutstock/getDetail?id=' + row.id + '&c=${c}&p=${p}';
 					var strHtml ='<a class="label label-table label-info" onclick="detail(\''+row.id+'\')" >详细</a> ';
 
-					strHtml = strHtml + '<a class="label label-table label-success" onclick="detail(\''+row.id+'\')" >打印</a> ';
+					strHtml = strHtml + '<a class="label label-table label-success" onclick="print(\''+row.id+'\')" >打印</a> ';
 					<@shiro.hasPermission name="/admin/salesOutstock/check">
 						if (row.status == 0) {
 							strHtml = strHtml + '<a class="label label-table label-warning" href="' + url + '">出库</a> ';				
@@ -124,6 +133,15 @@
 		}
 	};
 
+	function print(id) {
+		layer.open({
+			title:"出库单打印",
+			type: 2, 
+			area: ['95%', '95%'],
+			content: '${CPATH}/admin/salesOutstock/renderPrintPage/' + id
+		}); 
+	}
+	
 	function detail(id) {
 		layer.open({
 			title:"出库单详细",
@@ -133,6 +151,33 @@
 		}); 
 	}
 
+    function batchAction(){
+   
+   	   ids = new Array();
+		$("[name='dataItem']:checkbox").each(function() {
+			if ($(this).is(":checked")) {
+				ids.push($(this).val());
+			}
+		});
+		if(ids.length == 0){
+		 alert("请选择要打印的出库单");
+		}else{
+	     print(ids);
+		}
+   }
+   
+   function batchCheckAll() {   
+    var items = document.getElementsByName("dataItem");
+	for (var i = 0; i < items.length; i++) {
+	    if(items[i].checked){
+	    items[i].checked = false;
+	    }else{
+	    items[i].checked = true;
+	    }
+	}
+}
+ 
+   
 </#macro>
 
 <@layout active_id=p child_active_id=c>
@@ -154,6 +199,7 @@
 		<div class="row content-row">
 			<div class="jp-left">
 				<button class="btn btn-sm btn-primary" type="button" onclick="batchAction()"><i class="fa fa-gavel"></i> 批量打印 </button>
+				<button class="btn btn-sm btn-primary" type="button" onclick="batchCheckAll()"><i class="fa fa-gavel"></i>全选</button>
 			</div>
 
 			<div class="form-group" style="float: right">

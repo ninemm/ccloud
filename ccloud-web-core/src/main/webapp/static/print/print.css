@@ -1,0 +1,184 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	font-family: Verdana, Geneva, sans-serif;
+	font-size: 12px;
+	width: 690px;
+	text-align: center;
+	margin: 0 auto;
+}
+
+a {
+	text-decoration: none;
+}
+
+.bold {
+	font-weight: bold;
+}
+
+ul, li {
+	list-style: none;
+}
+
+img {
+	border: none;
+}
+
+#content-body {
+	font-family: Verdana, Geneva, sans-serif;
+	font-size: 12px;
+	width: 690px;
+	margin: 0 auto;
+}
+
+#print-content {
+	width: 690px;
+	margin: 10px auto;
+}
+
+#print-content h1 {
+	font-size: 18px;
+	text-align: center;
+}
+
+.floatLeft {
+	float: left;
+}
+
+.floatLeft50 {
+	float: left;
+	margin-left: 50px;
+}
+
+.floatRight {
+	float: right;
+}
+
+
+.signatureArea  .floatCenter {
+	margin-left: 70px;
+}
+
+
+.headInfo {
+	margin: 5px auto;
+	height: 16px;
+}
+
+table {
+	font-size: 12px;
+	border-collapse: collapse;
+	width: 690px;
+	border: 1px solid #999;
+}
+
+.tableTopBorder_3 {
+	border-top: 0px solid #000;
+}
+
+td, th {
+	border: 1px solid #999;
+	text-align: center;
+	padding: 0px 0;
+	/* width: 12.5%; */
+}
+
+.text-pl-3 {
+	padding-left: 3px;
+}
+
+.text-left {
+	text-align: left;
+	padding-left: 3px;
+}
+
+.signatureArea {
+	height: 40px;
+	line-height: 20px;
+}
+
+.signatureArea .firstSpan {
+	margin-right: 200px;
+}
+
+.signatureArea .stat {
+	text-align: left; 
+	width: inherit;
+}
+
+.signatureArea .sign {
+	margin-left: 120px;
+}
+
+#print-content .header .titleArea {
+	height: 25px;
+	position: relative;
+}
+
+#print-content .header h1 {
+	margin-top: 15px;
+}
+
+.printTm {
+	position: absolute;
+	left: 0px;
+	top: 0px;
+}
+
+.printInput {
+	width: 99%;
+	border: none;
+	background: none;
+}
+
+.font24 {
+	font-size: 24px;
+}
+
+.font20 {
+	font-size: 20px;
+}
+
+.width200 {
+	width: 200px;
+}
+
+.width180 {
+	width: 180px;
+}
+
+.width8 {
+	width: 8%;
+}
+
+/* .width16 {
+	width: 16%;
+} */
+
+.btn {
+	cursor: pointer;
+	padding: 2px 5px;
+    margin: 0px 5px;
+}
+
+#action-buttons {
+	text-align: right;
+	margin: 5px auto;
+	width: 690px;
+}
+
+@media print {
+	.pageBreak {
+		page-break-after: always;
+	}
+	.noPrint {
+		display: none;
+	}
+	
+	.print-content {
+		width: 690px;
+	}
+}

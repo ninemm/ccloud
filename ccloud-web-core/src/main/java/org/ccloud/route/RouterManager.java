@@ -25,6 +25,9 @@ import org.ccloud.core.CCloud;
 import org.ccloud.core.addon.HookInvoker;
 import org.ccloud.model.query.OptionQuery;
 import org.ccloud.model.route.RouterConverter;
+import org.ccloud.model.router.ContentRouter;
+import org.ccloud.model.router.PageRouter;
+import org.ccloud.model.router.TaxonomyRouter;
 import org.ccloud.utils.StringUtils;
 
 import com.jfinal.core.Action;
@@ -36,9 +39,9 @@ public class RouterManager {
 	static String[] urlPara = {null};
 	static List<RouterConverter> converters = new ArrayList<RouterConverter>();
 	static{
-//		converters.add(new TaxonomyRouter());
-//		converters.add(new PageRouter());
-//		converters.add(new ContentRouter());
+		converters.add(new TaxonomyRouter());
+		converters.add(new PageRouter());
+		converters.add(new ContentRouter());
 	}
 
 

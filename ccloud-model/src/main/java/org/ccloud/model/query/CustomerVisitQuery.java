@@ -135,6 +135,21 @@ public class CustomerVisitQuery extends JBaseQuery {
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), username);
 	}
 	
+	public List<CustomerVisit> getToDo(String username) {
+		
+		StringBuilder sql = new StringBuilder();
+		sql.append("select cv.*, sc.nickname, c.customer_name, c.customer_code, c.contact, c.mobile, c.prov_name, c.city_name, "
+				+ "c.country_name, c.address, a.ID_ taskId, a.NAME_ taskName, a.ASSIGNEE_ assignee, a.CREATE_TIME_ createTime");
+		sql.append(" FROM cc_customer_visit cv");
+		sql.append(" JOIN cc_seller_customer sc on cv.seller_customer_id = sc.id");
+		sql.append(" JOIN cc_customer c on sc.customer_id = c.id");
+		sql.append(" JOIN act_ru_task a on cv.proc_inst_id = a.PROC_INST_ID_");
+		sql.append(" JOIN act_ru_identitylink u on cv.proc_inst_id = u.PROC_INST_ID_");
+		sql.append(" where c.is_enabled = 1 and locate(?, u.USER_ID_) > 0");
+		
+		return DAO.doFind(sql.toString(), username);
+	}
+	
 	public Page<Record> queryVisitRecord(int pageNumber, int pageSize,String customerLevel,String customerType,String customerNature,String userId){
 		String select = "select ccv.id,ccv.create_date,cc.customer_name,cc.contact,cc.mobile,d.`name` questionType,if(ccv.`status`>0,'已审核','未审核') visitStatus ";
 		StringBuilder fromBuilder = new StringBuilder("from cc_customer_visit ccv left join cc_seller_customer csc on ccv.seller_customer_id = csc.id left join cc_customer cc on csc.customer_id = cc.id left join dict d on ccv.question_type = d.id ");

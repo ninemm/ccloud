@@ -130,8 +130,10 @@ public class _TaxonomyController extends JBaseCRUDController<Taxonomy> {
 			renderAjaxResultForError("别名已经存在！");
 			return;
 		}
-
-		if (m.saveOrUpdate()) {
+		
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		m.setSellerId(sellerId);
+		if (m.saveOrUpdateWithoutDate()) {
 
 			boolean addToMenu = getParaToBoolean("addToMenu", false);
 			if (addToMenu) {

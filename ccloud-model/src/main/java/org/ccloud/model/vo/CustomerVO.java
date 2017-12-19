@@ -41,6 +41,12 @@ public class CustomerVO implements Serializable {
 	
 	@JSONField(name = "定位地址")
 	private String location;
+
+	@JSONField(name = "客户子类")
+	private  String subType;
+
+	@JSONField(name = "客户种类")
+	private  String customerKind;
 	
 	public String getCustomerId() {
 		return customerId;
@@ -160,6 +166,22 @@ public class CustomerVO implements Serializable {
 
 	public void setCustTypeNameList(List<String> custTypeNameList) {
 		this.custTypeNameList = custTypeNameList;
+	}
+
+	public String getSubType() {
+		return subType;
+	}
+
+	public void setSubType(String subType) {
+		this.subType = subType;
+	}
+
+	public String getCustomerKind() {
+		return customerKind;
+	}
+
+	public void setCustomerKind(String customerKind) {
+		this.customerKind = customerKind;
 	}
 	
 }

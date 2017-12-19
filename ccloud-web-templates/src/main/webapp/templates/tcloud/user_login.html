@@ -7,20 +7,32 @@
 	<meta content="black" name="apple-mobile-web-app-status-bar-style">
 	<meta content="telephone=no" name="format-detection">
 	<meta content="email=no" name="format-detection">
-	<link rel="stylesheet" href="${CTPATH}/css/normalize.css">
-	<link rel="stylesheet" href="${CTPATH}/css/weui.min.css">
-	<link rel="stylesheet" href="${CTPATH}/css/jquery-weui.min.css">
-	<link rel="stylesheet" href="${CTPATH}/css/icomoon.css">
-	<link rel="stylesheet" href="${CTPATH}/css/unlock.css">
+	<link type='text/css' rel="stylesheet" href="${CTPATH}/css/normalize.css">
+	<link type='text/css' rel="stylesheet" href="${CTPATH}/css/weui.min.css">
+	<link type='text/css' rel="stylesheet" href="${CTPATH}/css/jquery-weui.min.css">
+	<link type='text/css' rel="stylesheet" href="${CTPATH}/css/icomoon.css">
+	<link type='text/css' rel="stylesheet" href="${CTPATH}/css/unlock.css">
     <title>用户登录</title>
     <style>
 
     input {
-        position: relative;
         left: 0;
+        position: relative;
 		margin-left: 1.5rem;
 		margin-right: 1rem;
     }
+    
+    input:focus {
+        color: #999
+    }
+    
+    ::-webkit-input-placeholder { /* WebKit browsers */
+　　      color: #eee;
+　　  }
+
+    input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
+　　      color: #eee!important;
+　　  }
 
     #bind {
         color: #fff;
@@ -38,6 +50,7 @@
 
     #phone, #code {
         width: 100%;
+        font-size: .8rem;
     }
 
     .input-area {
@@ -64,53 +77,60 @@
 	  top: 0.5rem;
     }
 
-	input:-webkit-autofill { 
-		box-shadow: 0 0 0px 1000px white inset !important;
-	}
+	input:-webkit-autofill {
+      box-shadow: 0 0 0px 1000px white inset !important;
+    }
+    
     </style>
 </head>
 
 <body>
 	<div id="login">
-	<header>
-		<h1>协同云平台</h1>
-        <h3>用户登录</h3>
-	</header>
-	<form action="${CPATH}/user/login" method="post" id="form">
+		<header>
+			<h1>协同云平台</h1>
+	        <h3>用户登录</h3>
+		</header>
+		
 		<main>
-			<div class="input-area">
-				<div>
-					<i class="icon-mobile"></i>
-					<input type="text" name="username" id="phone" maxlength="11" placeholder="手机号">
-					<i class="icon-times-circle"></i>
-					<!-- <div id="get-code">获取验证码</div> -->
+		    <form action="${CPATH}/user/login" method="post" id="form" autocomplete="off">
+				<div class="input-area">
+					<div>
+						<i class="icon-mobile"></i>
+						<input type="text" name="username" id="phone" maxlength="11" placeholder="手机号">
+						<i class="icon-times-circle"></i>
+					</div>
+					<div>
+						<i class="icon-lock"></i>
+						<input type="password" name="password" id="code" placeholder="密码" maxlength="20">
+						<i class="icon-times-circle"></i>
+					</div>
+					<button id="bind">登录</button> 
 				</div>
-				<div>
-					<i class="icon-lock"></i>
-					<input type="password" name="password" id="code" placeholder="密码" maxlength="8">
-					<i class="icon-times-circle"></i>
-				</div>
-			</div>
-			<button id="bind">登录</button>
+		    </form>
 		</main>
-	</form>
 	</div>
 </body>
-<script src="${CTPATH}/js/jquery-3.2.1.min.js"></script>
-<script src="${CTPATH}/js/jquery-weui.min.js"></script>
-<script src="${CTPATH}/js/fastclick.js"></script>
-<script src="${CTPATH}/js/comm.js"></script>
-<!-- <script src="${CTPATH}/js/vconsole.min.js"></script> -->
-<script>
+<script type='text/javascript' src="${CTPATH}/js/jquery-3.2.1.min.js"></script>
+<script type='text/javascript' src="${CPATH}/static/plugins/jquery/jquery.form.min.js"></script>
+<script type='text/javascript' src="${CTPATH}/js/jquery-weui.js"></script>
+<script type='text/javascript' src="${CTPATH}/js/fastclick.js"></script>
+<script type='text/javascript' src="${CTPATH}/js/comm.js"></script>
+<script type='text/javascript' >
+
+	var $bind = $('#bind');
+	var $form = $('#form');
+	var $mobile = $('#phone');
+	var $code = $('#code');
+	
+	var $errorMsg = '${(errorMsg)!}';
+	if ($errorMsg != null) {
+		$.toptip($errorMsg, 3000, 'error');
+	}
+	
+
 	$(function() { 
 		
 		var isSend = false;
-		
-		var $bind = $('#bind');
-	    var $form = $('#form');
-	    var $mobile = $('#phone');
-	    var $code = $('#code');
-		
 		FastClick.attach(document.body);
 		
 		$(document).on("input", "#phone", function () {
@@ -158,36 +178,31 @@
 	    	Utils.ajax(url, {'mobile': mobile}, mobileCallback);
 	    }
 	    
-	    $bind.on('click', function() {
-	    	$form.ajaxSubmit({
-                type: "post", 
-                dataType: "json", 
-                success: function(data) {
-                    if (data.errorCode == 0) {
-                        window.location.href = "/";
-                    } else {
-                        alert(data.message);
-                    }
-                },
-                error: function() {
-                    alert("信息提交错误");
-                }
-            });
-        });
-        
-	    var callback = function(res) {
-	        if (res.errorCode == 0) {
-	        	location.href = "/";
-	        }
-	    }
-	    
 	    var mobileCallback = function(res) {
 	    	if (res.errorCode != 0) {
 	    		$.toptip(res.message, 'error');
 	    	}
 	    }
-		
 	})
+	
+	function doSubmit() {
+		//$bind.attr('disabled', 'disabled');
+        $form.ajaxSubmit({ 
+            type: 'post',
+            dataType: 'json',
+            success: function(res) {
+                if (res.errorCode == 0) {
+                    location.href = "${CPATH}/";
+                } else {
+                    $.toptip(res.message, 3000, 'error');
+                    //$bind.removeAttr('disabled');
+                }
+            },
+            error: function(res) {
+                $.toptip(res.message, 'error');
+            }
+        });
+    }
 </script>
 
 </html>

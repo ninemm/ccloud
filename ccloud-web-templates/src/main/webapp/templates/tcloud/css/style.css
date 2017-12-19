@@ -1,8 +1,12 @@
 html,
 body {
-  height: 100%;
+    height: 100%;
 /*   background: #f3f5f7; */
-  width: 100%;
+    width: 100%;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 auto;
+    font-family: Microsoft YaHei, Helvetica,STHeiti STXihei, Microsoft JhengHei, Arial;
 }
 
 iframe {
@@ -88,7 +92,7 @@ a {
 
 .weui-content {
 	background: #f3f5f7;
-    height: inherit;
+  height: inherit;
 }
 
 .weui-tabbar__item.weui-bar__item--on .weui-tabbar__label,
@@ -145,6 +149,13 @@ a {
 
 .toolbar .title {
   margin: 0;
+}
+
+.toolbar .picker-button,
+.weui-cells_radio .weui-check:checked+.weui-icon-checked:before,
+.picker-calendar-day.picker-calendar-day-selected span,
+.weui-search-bar__cancel-btn {
+  color: #ea6f5a;
 }
 
 .empty-badge {
@@ -532,7 +543,6 @@ a {
 #home {
   overflow: auto;
   -webkit-overflow-scrolling: touch;
-  padding-bottom: 1.5rem;
 }
 
 .company {
@@ -647,9 +657,10 @@ a {
   height: 1.25rem;
   line-height: 1.25rem;
   vertical-align: middle;
-  width: 15.2778%;
+/*   width: 15.2778%; */
   text-align: center;
   margin: 0 0.25rem;
+  padding: 0 .5rem;
   border-radius: 2px;
 }
 
@@ -690,6 +701,17 @@ a {
 .menu-left li.active {
   background: #fff;
   color: #ea6f5a;
+}
+
+.menu-left ul li.active:before {
+    content: " ";
+    position: absolute;
+    display: block;
+    width: 2px;
+    height: 100%;
+    background: #ea6f5a;
+    top: 0;
+    left: 0;
 }
 
 .type {
@@ -758,6 +780,11 @@ a {
   font-size: 0.7rem;
   display: flex;
   justify-content: space-between;
+}
+
+.composition .product_name {
+  height: 3.25rem;
+  line-height: 3.25rem;
 }
 
 .product_unit {
@@ -861,30 +888,60 @@ a {
   top: 0;
 }
 
-.product-detail {
+.layui-m-layerchild {
   width: 90%;
+}
+
+.service {
+  width: 70%;
 }
 
 .product-detail img {
   width: 30%;
 }
 
-.product-detail .layui-m-layercont {
+.service img {
+  width: 60%;
+  margin: 5% 20% 0;
+}
+
+.layui-m-layercont {
   padding: 5px 15px!important;
-  margin-bottom: 2rem;
 }
 
-.product-detail .layui-m-layerbtn {
-  height: 2rem;
-  line-height: 2rem;
-  position: absolute;
-  bottom: 0;
-  background: #3c8dbc;
+.layui-m-layerbtn {
+  height: 2rem!important;
+  line-height: 2rem!important;
+}
+
+.layui-m-layerbtn span[yes] {
+  color: #fff!important;
   border-radius: 0;
+  background: #ea6f5a;
 }
 
-.product-detail .layui-m-layerbtn span[yes] {
-  color: #fff;
+.audit .layui-m-layerbtn span[no] {
+  color: #000;
+  border-radius: 0;
+  background: #fff;
+}
+
+.audit .refuse-radio {
+  margin-top: .2rem;
+}
+
+.audit .refuse-radio input {
+  position: relative;
+  top: .1rem;
+  margin-right: .5rem;
+}
+
+.audit textarea {
+  margin-top: .3rem;
+  background: #f3f3f3;
+  border-radius: 5px;
+  padding: .4rem .5rem;
+  box-sizing: border-box;
 }
 
 
@@ -1030,12 +1087,12 @@ a {
   top: 0.1rem;
 }
 
-.street-value {
+input.street-value {
   border: 1px solid #bbb!important;
-  margin-left: 7.246377%;
   position: absolute;
-  right: 25%;
+  right: 15%;
   top: 0.25rem;
+  width: 3rem;
 }
 
 
@@ -1199,6 +1256,11 @@ a {
   line-height: 1rem;
   margin-top: 0.5rem;
   color: #000;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
 }
 
 .customer-href i {
@@ -1449,7 +1511,7 @@ input[name=sex] {
   width: 3rem;
   height: auto;
   border-radius: 50%;
-  border: 3px solid #fff;
+  border: 2px solid #fff;
 }
 
 .user-statistics {
@@ -1852,6 +1914,142 @@ input[name=input-type] {
   bottom: 2.25rem;
 }
 
+/* 报表 */
+.report-header {
+  background: #ea6f5a;
+}
+
+.report-header .weui-panel__hd {
+  color: #fff;
+  border-bottom: 1px solid #f3f5f7;
+}
+
+.overview-hd-title {
+	font-size: .8rem;
+    width: 5rem; 
+    display: inline-block;
+}
+
+.briefly {
+  border: 1px solid #efeff4;
+  width: 3rem;
+  display: inline-block;
+  border-radius: .5rem;
+  padding: 0 .5rem;
+  box-sizing: border-box;
+  font-size: .7rem;
+  position: relative;
+  margin-right: .5rem;
+}
+
+.briefly .icon-angle-down {
+  position: absolute;
+  right: .3rem;
+  top: .2rem;
+}
+
+.overview-block {
+  margin: .5rem .5rem;
+  padding: .8rem 0 .5rem;
+  background: #fff;
+/*   border: 1px solid #efeff4; */
+}
+
+.report-block {
+  margin: .5rem .5rem;
+  padding: .8rem 0 .5rem;
+}
+
+.overview-title {
+  margin-bottom: .5rem;
+}
+
+.overview-title span{
+  font-size: .7rem;
+  bottom: .8rem;
+  margin-left: .2rem;
+  position: relative;
+  color: #999faa;
+}
+
+.report-header img {
+  width: 2rem;
+  margin-left: 1rem;
+}
+
+.overview-block strong {
+  font-weight: 200;
+  font-size: 1rem;
+  color: #999;
+}
+
+.overview-block small {
+  color: #999faa;
+}
+
+.overview-ft {
+  text-align: center;
+  font-size: .6rem;
+}
+
+.overview-ft span {
+  color: #999faa;
+}
+
+.overview-hd-segmenting {
+  display: inline-block;
+  width: 1rem;
+  text-align: center;
+}
+
+.report-detail {
+  margin-bottom: 15px;
+  float: right;
+  color: #999faa;
+}
+
+.weui-panel__hd .weui-input {
+  width: 22%;
+  font-size: .7rem;
+}
+
+.rank-detail span{
+  display: inline-block;
+  vertical-align: top;
+}
+
+.sequence {
+  height: 3rem;
+  line-height: 3rem;
+}
+
+.rank-detail {
+  width: 100%;
+  position: relative;
+}
+
+.rank-detail img{
+  width: 3rem;
+  margin:0 .5rem;
+}
+
+.good-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  position: absolute;
+  left: 4.5rem;
+  right:0;
+  top: 0;
+}
+
+.good-total {
+  position: absolute;
+  left: 4.5rem;
+  bottom: 0;
+}
 
 /* 媒体查询 */
 
@@ -1862,6 +2060,12 @@ input[name=input-type] {
   }
   #my-order .has-th-list .weui-flex div:last-child i{
     padding: 0;
+  }
+  .user-info {
+    padding: 1.5rem 7% 0;
+  }
+  .user-info .name {
+    padding-left: .5rem;
   }
 }
 

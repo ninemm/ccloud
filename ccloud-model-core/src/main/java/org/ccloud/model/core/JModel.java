@@ -175,6 +175,7 @@ public class JModel<M extends JModel<M>> extends Model<M> {
 	
 	public boolean saveOrUpdateWithoutDate() {
 		if (null == get(getPrimaryKey())) {
+			set("id", StrKit.getRandomUUID());
 			return this.save();
 		}
 		return this.update();

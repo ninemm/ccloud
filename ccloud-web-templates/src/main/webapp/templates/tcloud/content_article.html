@@ -1,0 +1,30 @@
+<#include "_inc/_layout.html"/>
+
+<#macro script_import>
+ 	<script src="${CPATH}/counter?cid=${content.id!}"></script>
+</#macro>
+
+<#macro css>
+	.weui-content {
+      	background-color: #fff;
+    }
+    
+    .weui-article h1, .weui-article h3 {
+    	text-align: center;
+    }
+
+</#macro>
+
+<@layout>
+	
+	<div class="weui-content">
+		<article class="weui-article">
+			<h1>${(content.title)!}</h1>
+    		<h3 class="wy-news-time gray">${content.created?string('yyyy-MM-dd')}</h3>
+    		<section class="wy-news-info">
+      			<p>${(content.text)!}</p>
+    		</section>
+		</article>
+	</div>
+	<#include "_inc/_goback.html"/>
+</@layout>

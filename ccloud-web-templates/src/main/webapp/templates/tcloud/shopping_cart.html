@@ -16,9 +16,9 @@ $(function() {
       total();
   }).on("touchend", ".operate:last-child", function () { //增加商品数量
       total();
-  }).on("change", "#bigPrice", function () { //改小价格
+  }).on("input propertychange", ".bigPrice", function () { //改小价格
       total();
-  }).on("change", "#smallPrice", function () { //改大价格
+  }).on("input propertychange", ".smallPrice", function () { //改大价格
       total();
   });
   
@@ -38,7 +38,7 @@ function initProduct(){
 	var productList = getItemBykey("productList");
 
 	$.each(productList, function(index, el) {
-		if(el.isGift == 0) {
+		if(index % 2 == 0) {
 			$main.append("<div class='weui-panel weui-panel_access common'>" + newHtml + "</div>");
 			var $newProductDetail = $main.find(".common:last");
 			$newProductDetail.find("#productName").text(el.productName);
@@ -60,24 +60,56 @@ function initProduct(){
 			$newProductDetail.find("#bigNum").val(el.bigNum);
 			$newProductDetail.find("#smallNum").val(el.smallNum);
 	
-			//赠品
+			//是否赠品
+			var $isGift = $newProductDetail.find("#isGift");
+			var $addGift = $newProductDetail.find("#addGift");
+			
+			if(el.isGift == 1) {
+				$isGift.attr('checked','checked');
+				$addGift.attr('disabled', 'true');
+			}
+			
+			$isGift.change(function() {
+				if($isGift.is(':checked')) {
+					if($addGift.is(':checked')) {
+						$addGift.trigger('change');
+					}
+					$addGift[0].checked = false;
+					$addGift.attr('disabled', 'true');
+				} else {
+					$addGift.removeAttr('disabled');
+				}
+				total();
+			});
+			
+			//改大价格
+			//$newProductDetail.find("#bigPrice").change(function() {
+			//	var $this = $(this);
+			//	var bPrice = parseFloat($newProductDetail.find("#bigPriceSpan").text().replace("￥", ""));
+			//	if ($this.val() < bPrice){
+			//		$this.val(bPrice);
+			//	}
+			//	total();
+			//});
+
+			//添加赠品
 			$newProductDetail.find("#giftProduct").select({
 				title: "选择商品",
 				items: sellerProductItems,
 				onChange: function(obj){
 					var $gift = $(this)[0].$input.parent().parent().parent();
 					var product = sellerProductInfoMap[obj.values].columns;
-	
+
 					selectGift($gift, product)
 				}
 			});
-			
+
 			//默认商品
 			$newProductDetail.find("#isDefault").change(function() {
 				var $this = $(this);
 				var $gift = $this.parent().parent().parent();
 				var $giftProduct = $gift.find("#giftProduct");
-	
+
 				if($this.is(':checked')) {
 					var sellProductId = $gift.parent().find("#sellProductId").val();
 					var product = sellerProductInfoMap[sellProductId].columns;
@@ -85,7 +117,7 @@ function initProduct(){
 					$giftProduct.val(product.custom_name);
 					$giftProduct.attr('data-values', product.sell_product_id);
 					$giftProduct.attr('disabled', 'true');
-	
+
 					selectGift($gift, product);
 				}else{
 					$giftProduct.removeAttr('disabled');
@@ -93,36 +125,39 @@ function initProduct(){
 			
 			});
 		} else {
-			var $newProductDetail = $main.find(".common:last");
-			$newProductDetail.find("#addGift").attr("checked",'true').trigger("change");
 
-			//默认
-			if($newProductDetail.find("#sellProductId").val() == el.sellProductId){
-				$newProductDetail.find("#isDefault").attr("checked","true");
-				$newProductDetail.find("#giftProduct").attr('disabled', 'true');
-			}
+			if(el.sellProductId != ""){
+				var $newProductDetail = $main.find(".common:last");
+				$newProductDetail.find("#addGift").attr("checked",'true').trigger("change");
 
-			$newProductDetail.find("#giftProduct").val(el.productName);
-			$newProductDetail.find("#giftSellProductId").val(el.sellProductId);
-			$newProductDetail.find("#giftProductId").val(el.productId);
-			$newProductDetail.find("#giftConvert").val(el.convert);
-			$newProductDetail.find("#giftBigPrice").val(el.bigPrice);
-			
-			var $giftUnitName = $newProductDetail.find("#giftUnitName");
+				//默认
+				if($newProductDetail.find("#sellProductId").val() == el.sellProductId){
+					$newProductDetail.find("#isDefault").attr("checked","true");
+					$newProductDetail.find("#giftProduct").attr('disabled', 'true');
+				}
 
-			initGiftUnitName($giftUnitName, sellerProductInfoMap[el.sellProductId].columns);
+				$newProductDetail.find("#giftProduct").val(el.productName);
+				$newProductDetail.find("#giftSellProductId").val(el.sellProductId);
+				$newProductDetail.find("#giftProductId").val(el.productId);
+				$newProductDetail.find("#giftConvert").val(el.convert);
+				$newProductDetail.find("#giftBigPrice").val(el.bigPrice);
+				
+				var $giftUnitName = $newProductDetail.find("#giftUnitName");
 
-			//数量
-			if(el.bigNum > 0 && el.bigUnit){
-				$newProductDetail.find("#giftNum").val(el.bigNum);
-				$giftUnitName.val(el.bigUnitSpan);
-				$giftUnitName.attr('data-values', "bigUnit");
-				$newProductDetail.find("#giftUnit").val("bigUnit");
-			}else{
-				$newProductDetail.find("#giftNum").val(el.smallNum);
-				$giftUnitName.val(el.smallUnitSpan);
-				$giftUnitName.attr('data-values', "smallUnit");
-				$newProductDetail.find("#giftUnit").val("smallUnit");
+				initGiftUnitName($giftUnitName, sellerProductInfoMap[el.sellProductId].columns);
+
+				//数量
+				if(el.bigNum > 0 && el.bigUnit){
+					$newProductDetail.find("#giftNum").val(el.bigNum);
+					$giftUnitName.val(el.bigUnitSpan);
+					$giftUnitName.attr('data-values', "bigUnit");
+					$newProductDetail.find("#giftUnit").val("bigUnit");
+				}else{
+					$newProductDetail.find("#giftNum").val(el.smallNum);
+					$giftUnitName.val(el.smallUnitSpan);
+					$giftUnitName.attr('data-values', "smallUnit");
+					$newProductDetail.find("#giftUnit").val("smallUnit");
+				}
 			}
 		}
 	});
@@ -179,8 +214,10 @@ function total(){
 	var products = $(".common");
 	var total = 0;
 	$.each(products, function(index, el) {
-		total += $(el).find("#bigNum").val() * $(el).find("#bigPrice").val();
-		total += $(el).find("#smallNum").val() * $(el).find("#smallPrice").val();
+		if($(el).find("#isGift").is(':checked') == false) {
+			total += $(el).find("#bigNum").val() * $(el).find("#bigPrice").val();
+			total += $(el).find("#smallNum").val() * $(el).find("#smallPrice").val();
+		}
 	});
 	
 	var compositions = $(".composition");
@@ -199,6 +236,7 @@ function save(){
 		var sellProductId = $el.find("#sellProductId").val();
 		var bigNum = $el.find("#bigNum").val();
 		var smallNum = $el.find("#smallNum").val();
+		var isGift = $el.find("#isGift").is(':checked') == true ? 1 : 0;
 		
 		if(bigNum > 0 || smallNum > 0){
 			productList.push({
@@ -221,13 +259,13 @@ function save(){
 
 				bigNum : bigNum,
 				smallNum : smallNum,
-				isGift : 0
+				isGift : isGift
 			});
 		}
 		
 		//赠品
 		var flag = $el.find("#addGift").is(':checked');
-		if(flag){
+		if(isGift == 0 && flag){
 			var giftBigNum = 0;
 			var giftSmallNum = 0;
 			var giftBigUnitSpan = '';
@@ -271,7 +309,29 @@ function save(){
 				smallNum : giftSmallNum,
 				isGift : 1
 			});
-		
+		} else {
+			productList.push({
+				productName : "",
+				valueName : "",
+				
+				bigPriceSpan : "",
+				smallPriceSpan : "",
+				bigUnitSpan : "",
+				smallUnitSpan : "",
+				stock : "",
+				
+				bigPrice : "",
+				smallPrice : "",
+				bigUnit : "",
+				smallUnit : "",
+				sellProductId : "",
+				productId : "",
+				convert : "",
+
+				bigNum : "",
+				smallNum : "",
+				isGift : 1
+			});
 		}
 		
 	});
@@ -313,108 +373,111 @@ function save(){
 </#macro>
 
 <@layout>
-<div id="shopping-cart">
-	<main>
-		<div class="weui-panel weui-panel_access common" style="display: none">
-			<input type="hidden" id="sellProductId" value="">
-			<input type="hidden" id="productId" value="">
-			<input type="hidden" id="convert" value="">
-			<div class="product_name" id="productName">
-				35度中国劲酒_125ml_1*24
-<!--         <span class="gift-tag">赠品</span> -->
-			</div>
-			<div class="product_unit">
-				规格：<span id="valueName">125ml</span>
-			</div>
-			<div class="product_bUnit">
-				<span class="price" id="bigPriceSpan">￥725</span>
-				<span class="unit" id="bigUnitSpan">&nbsp;/&nbsp;件</span>
-				<div class="spinner">
-					<div class="operate fl">
-						<i class="icon-minus2"></i>
-					</div>
-					<input type="number" min="0" value="0" class="fl" id="bigNum" >
-					<div class="operate fl">
-						<i class="icon-plus2"></i>
-					</div>
+<div class="weui-content">
+	<div id="shopping-cart">
+		<main>
+			<div class="weui-panel weui-panel_access common" style="display: none">
+				<input type="hidden" id="sellProductId" value="">
+				<input type="hidden" id="productId" value="">
+				<input type="hidden" id="convert" value="">
+				<div class="product_name" id="productName">
+					35度中国劲酒_125ml_1*24
+					<!-- <span class="gift-tag">赠品</span> -->
 				</div>
-				<input type="number" class="street-value" id="bigPrice" value="720" >
-			</div>
-			<div class="product_mUnit">
-				<span class="price" id="smallPriceSpan" >￥30</span>
-				<span class="unit" id="smallUnitSpan" >&nbsp;/&nbsp;瓶</span>
-				<div class="spinner">
-					<div class="operate fl">
-						<i class="icon-minus2"></i>
-					</div>
-					<input type="number" min="0" value="0" class="fl" id="smallNum" >
-					<div class="operate fl">
-						<i class="icon-plus2"></i>
-					</div>
+				<span class="fr"><input type="checkbox" name="isGift" id="isGift" value="1"> 是否赠品</span>
+				<div class="product_unit">
+					规格：<span id="valueName">125ml</span>
 				</div>
-				<input type="number" class="street-value" id="smallPrice" value="30" >
-				<i class="icon-trash-o fr ft30 gray"></i>
-			</div>
-			<hr />
-			<div class="gift" id="gift">
-				<input type="hidden" id="giftSellProductId" value="">
-				<input type="hidden" id="giftProductId" value="">
-				<input type="hidden" id="giftConvert" value="">
-				<input type="hidden" id="giftBigPrice" value="" >
-				<div>
-					<input type="checkbox" name="add-gift" id="addGift">
-					<span>添加赠品</span>
-				</div>
-				<div style="display:none" class="select-area">
-					<div class="goods">
-						<span>商品</span>
-						<input type="text" class="choose-good weui-input" placeholder="选择商品" id="giftProduct" readonly>
-						<i class="icon-sort-desc"></i>
-						<input type="checkbox" name="default-goods"  id="isDefault">
-						<span>默认商品</span>
-					</div>
-					<div class="number">
-						<span>数量</span>
-						<div class="spinner">
-							<div class="operate fl">
-								<i class="icon-minus2"></i>
-							</div>
-							<input type="number" min="0" value="1" class="fl" id="giftNum" readyOnly>
-							<div class="operate fl">
-								<i class="icon-plus2"></i>
-							</div>
+				<div class="product_bUnit">
+					<span class="price" id="bigPriceSpan">￥725</span>
+					<span class="unit" id="bigUnitSpan">&nbsp;/&nbsp;件</span>
+					<div class="spinner">
+						<div class="operate fl">
+							<i class="icon-minus2"></i>
 						</div>
-						<input type="hidden" name="giftUnit" id="giftUnit">
-						<input type="text" class="choose-unit weui-input" placeholder="单位" id="giftUnitName" readonly>
-						<i class="icon-sort-desc"></i>
+						<input type="number" min="0" value="0" class="fl" id="bigNum" >
+						<div class="operate fl">
+							<i class="icon-plus2"></i>
+						</div>
+					</div>
+					<input type="number" class="street-value bigPrice" id="bigPrice" value="720" >
+				</div>
+				<div class="product_mUnit">
+					<span class="price" id="smallPriceSpan" >￥30</span>
+					<span class="unit" id="smallUnitSpan" >&nbsp;/&nbsp;瓶</span>
+					<div class="spinner">
+						<div class="operate fl">
+							<i class="icon-minus2"></i>
+						</div>
+						<input type="number" min="0" value="0" class="fl" id="smallNum" >
+						<div class="operate fl">
+							<i class="icon-plus2"></i>
+						</div>
+					</div>
+					<input type="number" class="street-value smallPrice" id="smallPrice" value="30" >
+					<i class="icon-trash-o fr ft30 gray"></i>
+				</div>
+				<hr />
+				<div class="gift" id="gift">
+					<input type="hidden" id="giftSellProductId" value="">
+					<input type="hidden" id="giftProductId" value="">
+					<input type="hidden" id="giftConvert" value="">
+					<input type="hidden" id="giftBigPrice" value="" >
+					<div>
+						<input type="checkbox" name="add-gift" id="addGift">
+						<span>添加赠品</span>
+					</div>
+					<div style="display:none" class="select-area">
+						<div class="goods">
+							<span>商品</span>
+							<input type="text" class="choose-good weui-input" placeholder="选择商品" id="giftProduct" readonly>
+							<i class="icon-sort-desc"></i>
+							<input type="checkbox" name="default-goods"  id="isDefault">
+							<span>默认商品</span>
+						</div>
+						<div class="number">
+							<span>数量</span>
+							<div class="spinner">
+								<div class="operate fl">
+									<i class="icon-minus2"></i>
+								</div>
+								<input type="number" min="0" value="1" class="fl" id="giftNum" readyOnly>
+								<div class="operate fl">
+									<i class="icon-plus2"></i>
+								</div>
+							</div>
+							<input type="hidden" name="giftUnit" id="giftUnit">
+							<input type="text" class="choose-unit weui-input" placeholder="单位" id="giftUnitName" readonly>
+							<i class="icon-sort-desc"></i>
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-		<div class="weui-panel weui-panel_access composition" style="display: none">
-			<input type="hidden" id="compositionId" value="">
-			<div class="product_name" id="compositionName">
-				35度中国劲酒_125ml_1*24
-			</div>
-			<div class="product_bUnit">
-				<span class="price" id="compositionPriceSpan">￥720</span>
-				<div class="spinner">
-					<div class="operate fl">
-						<i class="icon-minus2"></i>
-					</div>
-					<input type="number" min="0" value="0" class="fl" id="compositionNum" >
-					<div class="operate fl">
-						<i class="icon-plus2"></i>
-					</div>
+			<div class="weui-panel weui-panel_access composition" style="display: none">
+				<input type="hidden" id="compositionId" value="">
+				<div class="product_name" id="compositionName">
+					35度中国劲酒_125ml_1*24
 				</div>
-				<input type="number" class="street-value" id="compositionPrice" value="720" >
+				<div class="product_bUnit">
+					<span class="price" id="compositionPriceSpan">￥720</span>
+					<div class="spinner">
+						<div class="operate fl">
+							<i class="icon-minus2"></i>
+						</div>
+						<input type="number" min="0" value="0" class="fl" id="compositionNum" >
+						<div class="operate fl">
+							<i class="icon-plus2"></i>
+						</div>
+					</div>
+					<input type="number" class="street-value" id="compositionPrice" value="720" >
+				</div>
 			</div>
-		</div>
-	</main>
-	<#include "_inc/_goback.html" />
-	<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
-		<p class="total bg-white weui-flex__item" id="totalNum">共2款，总数10件</p>
-		<button id="placeOrder" class="place-order red-button white">下单</button>
-	</footer>
+		</main>
+		<#include "_inc/_goback.html" />
+		<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
+			<p class="total bg-white weui-flex__item" id="totalNum">共2款，总数10件</p>
+			<button id="placeOrder" class="place-order red-button white">下单</button>
+		</footer>
+	</div>
 </div>
 </@layout>

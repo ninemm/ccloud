@@ -117,6 +117,7 @@
 
                 $(".infinite")[0].scrollTop = 0;
                 $("#customerList").empty();
+                if(data.html.length == 0) data.html = data.html +'<div class="weui-loadmore weui-loadmore_line"><span class="weui-loadmore__tips">暂无数据</span></div>';
                 $("#customerList").html(data.html);
                 pageNumber = 2;
             }
@@ -129,8 +130,8 @@
     }
 
     function newVisit(customer){
-    setItemBykey("customerInfo", customer);
-    window.location.href = '${CPATH}/customerVisit/visitAdd';
+        setItemBykey("customerInfo", customer);
+        window.location.href = '${CPATH}/customerVisit/edit';
     }
 
 </#macro>

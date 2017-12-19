@@ -326,14 +326,18 @@ public class _ReportController extends JBaseController {
 			endDate=date;
 		}
 		String keyword = getPara("k");
+		if (keyword==null) {
+			keyword="so.create_date";
+		}
+		//编码k 页面刷新是k不会乱码
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
 			setAttr("k", keyword);
 		}
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
-		Page<Record> page = SalesOrderQuery.me().findByMSellerDetail(getPageNumber(), getPageSize(),startDate,endDate,keyword, dataArea,sellerId);
-		List<Record> list = page.getList();
+		List<Record> list = SalesOrderQuery.me().findByMSellerDetail(startDate,endDate,keyword, dataArea,sellerId);
+		
 		List<String>watchHead=new ArrayList<>();
 		if (list.size()!=0) {
 			String[] watchHead1 = list.get(0).getColumnNames();
@@ -353,8 +357,7 @@ public class _ReportController extends JBaseController {
 		}
 		setAttr("watchHead", watchHead);
 		setAttr("mSellerDetailReportList", mSellerDetailReportList);
-		Page<Record> page1 = SalesOrderQuery.me().findByMSellerDetailGift(getPageNumber(), getPageSize(),startDate,endDate,keyword, dataArea,sellerId);
-		List<Record> list1 = page1.getList();
+		List<Record> list1 = SalesOrderQuery.me().findByMSellerDetailGift(startDate,endDate,keyword, dataArea,sellerId);
 		List<Object[]>mSellerDetailGiftReportList=new ArrayList<>();
 		for (Record record : list1) {
 			Object[] columnValues = record.getColumnValues();
@@ -362,6 +365,7 @@ public class _ReportController extends JBaseController {
 		}
 		setAttr("startDate", startDate);
 		setAttr("endDate", endDate);
+		setAttr("k", keyword);
 		setAttr("mSellerDetailGiftReportList", mSellerDetailGiftReportList);
 		render("mSellerDetail.html");
 	}
@@ -376,6 +380,9 @@ public class _ReportController extends JBaseController {
 			endDate=date;
 		}
 		String keyword = getPara("k");
+		if (keyword==null) {
+			keyword="so.create_date";
+		}
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
 			setAttr("k", keyword);
@@ -383,8 +390,7 @@ public class _ReportController extends JBaseController {
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
-		Page<Record> page = SalesOrderQuery.me().findByMSalesmanDetail(getPageNumber(), getPageSize(),startDate,endDate,keyword, dataArea,sellerId);
-		List<Record> list = page.getList();
+		List<Record> list = SalesOrderQuery.me().findByMSalesmanDetail(startDate,endDate,keyword, dataArea,sellerId);
 		List<String>watchHead=new ArrayList<>();
 		if (list.size()!=0) {
 			String[] watchHead1 = list.get(0).getColumnNames();
@@ -404,8 +410,7 @@ public class _ReportController extends JBaseController {
 		}
 		setAttr("watchHead", watchHead);
 		setAttr("mSalesmanDetailReportList", mSalesmanDetailReportList);
-		Page<Record> page1 = SalesOrderQuery.me().findByMSalesmanDetailGift(getPageNumber(), getPageSize(),startDate,endDate,keyword, dataArea,sellerId);
-		List<Record> list1 = page1.getList();
+		List<Record> list1 = SalesOrderQuery.me().findByMSalesmanDetailGift(startDate,endDate,keyword, dataArea,sellerId);
 		List<Object[]>mSalesmanDetailGiftReportList=new ArrayList<>();
 		for (Record record : list1) {
 			Object[] columnValues = record.getColumnValues();
@@ -413,6 +418,7 @@ public class _ReportController extends JBaseController {
 		}
 		setAttr("startDate", startDate);
 		setAttr("endDate", endDate);
+		setAttr("k", keyword);
 		setAttr("mSalesmanDetailGiftReportList", mSalesmanDetailGiftReportList);
 		render("mSalesmanDetail.html");
 	}
