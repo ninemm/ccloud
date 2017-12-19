@@ -15,6 +15,7 @@
  */
 package org.ccloud.controller.admin;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -27,6 +28,8 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
+import org.ccloud.model.Payables;
+import org.ccloud.model.PayablesDetail;
 import org.ccloud.model.Product;
 import org.ccloud.model.PurchaseInstock;
 import org.ccloud.model.PurchaseInstockDetail;
@@ -37,6 +40,7 @@ import org.ccloud.model.Seller;
 import org.ccloud.model.SellerProduct;
 import org.ccloud.model.User;
 import org.ccloud.model.Warehouse;
+import org.ccloud.model.query.PayablesQuery;
 import org.ccloud.model.query.ProductQuery;
 import org.ccloud.model.query.PurchaseInstockQuery;
 import org.ccloud.model.query.PurchaseOrderDetailQuery;
@@ -179,6 +183,49 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 			}
 		}
 		
+		//审核通过，生成对应的应付账款
+		//应付账款汇总
+		Payables payables = PayablesQuery.me().findByObjId(purchaseOrder.getSupplierId());
+		if(payables==null){
+			Payables payable = new Payables();
+			payable.setId(StrKit.getRandomUUID());
+			payable.setObjId(purchaseOrder.getSupplierId());
+			payable.setObjType("supplier");
+			payable.setPayAmount(purchaseOrder.getTotalAmount());
+			payable.setActAmount(new BigDecimal(0));
+			payable.setBalanceAmount(purchaseOrder.getTotalAmount());
+			payable.setDeptId(user.getDepartmentId());
+			payable.setDataArea(user.getDataArea());
+			payable.setCreateDate(new Date());
+			payable.save();
+		}else
+		{
+			payables.setPayAmount(purchaseOrder.getTotalAmount().add(payables.getPayAmount()));
+			payables.setActAmount(payables.getActAmount());
+			payables.setBalanceAmount((purchaseOrder.getTotalAmount().add(payables.getBalanceAmount())));
+			payables.setModifyDate(new Date());
+			payables.update();
+		}
+		
+		//应付账款明细
+		for(int i = 0; i<purchaseOrderDetails.size();i++){
+			PayablesDetail  payablesDetail = new PayablesDetail();
+			payablesDetail.setId(StrKit.getRandomUUID());
+			payablesDetail.setObjectId(purchaseOrder.getSupplierId());
+			payablesDetail.setObjectType("supplier");
+			payablesDetail.setPayAmount(purchaseOrderDetails.get(i).getProductAmount());
+			payablesDetail.setActAmount(new BigDecimal(0));
+			payablesDetail.setBalanceAmount(purchaseOrderDetails.get(i).getProductAmount());
+			payablesDetail.setRefSn(purchaseOrder.getPorderSn());
+			payablesDetail.setRefType(Consts.BIZ_TYPE_INSTOCK);
+			payablesDetail.setBizDate(new Date());
+			payablesDetail.setDeptId(user.getDepartmentId());
+			payablesDetail.setDataArea(user.getDataArea());
+			payablesDetail.setCreateDate(new Date());
+			payablesDetail.save();
+		}
+		
+		
 		renderAjaxResultForSuccess("OK");
 	}
 
@@ -208,7 +255,6 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
 		String fomatDate = sdf.format(date);
 		String purchaseOrderId=StringUtils.getArrayFirst(paraMap.get("purchaseOrderId"));
-		PurchaseOrder purchaseOrder = PurchaseOrderQuery.me().findById(purchaseOrderId);
 		String pwarehouseSn="PO"+user.getDepartmentId().substring(0, 6)+fomatDate.substring(0,8)+n;
 		purchaseInstock.set("id", purchaseInstockId);
 		purchaseInstock.set("pwarehouse_sn", pwarehouseSn);
@@ -226,7 +272,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		purchaseInstock.set("create_date", date);
 		
 		PurchaseOrder order = PurchaseOrderQuery.me().findById(purchaseOrderId);
-		order.set("total_amount", StringUtils.getArrayFirst(paraMap.get("total")));
+		order.set("total_amount", new BigDecimal( StringUtils.getArrayFirst(paraMap.get("total"))));
 		order.set("payment_type", StringUtils.getArrayFirst(paraMap.get("paymentType")));
 		order.set("status", 1000);
 		order.set("modify_date", new Date());
@@ -269,8 +315,6 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 				purchaseInstockDetail.set("dept_id", user.getDepartmentId());
 				purchaseInstockDetail.set("data_area", user.getDataArea());
 				purchaseInstockDetail.save();
-				purchaseOrder.set("status", 4000);
-				purchaseOrder.update();
 				
 			}
 
@@ -281,6 +325,50 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		purchaseOrderJoinInstock.set("purchase_order_id", StringUtils.getArrayFirst(paraMap.get("purchaseOrderId")));
 		purchaseOrderJoinInstock.set("purchase_instock_id", purchaseInstockId);
 		purchaseOrderJoinInstock.save();
+		
+		//审核通过，生成对应的应付账款
+		//应付账款汇总
+		Payables payables = PayablesQuery.me().findByObjId(order.getSupplierId());
+		if(payables==null){
+			Payables payable = new Payables();
+			payable.setId(StrKit.getRandomUUID());
+			payable.setObjId(order.getSupplierId());
+			payable.setObjType("supplier");
+			payable.setPayAmount(order.getTotalAmount());
+			payable.setActAmount(new BigDecimal(0));
+			payable.setBalanceAmount(order.getTotalAmount());
+			payable.setDeptId(user.getDepartmentId());
+			payable.setDataArea(user.getDataArea());
+			payable.setCreateDate(new Date());
+			payable.save();
+		}else
+		{
+			payables.setPayAmount(order.getTotalAmount().add(payables.getPayAmount()));
+			payables.setActAmount(payables.getActAmount());
+			payables.setBalanceAmount((order.getTotalAmount().add(payables.getBalanceAmount())));
+			payables.setModifyDate(new Date());
+			payables.update();
+		}
+		
+		//应付账款明细
+		List<PurchaseOrderDetail> purchaseOrderDetails = PurchaseOrderDetailQuery.me().findByPurchaseOrderId(order.getId());
+		for(int i = 0; i<purchaseOrderDetails.size();i++){
+			PayablesDetail  payablesDetail = new PayablesDetail();
+			payablesDetail.setId(StrKit.getRandomUUID());
+			payablesDetail.setObjectId(order.getSupplierId());
+			payablesDetail.setObjectType("supplier");
+			payablesDetail.setPayAmount(purchaseOrderDetails.get(i).getProductAmount());
+			payablesDetail.setActAmount(new BigDecimal(0));
+			payablesDetail.setBalanceAmount(purchaseOrderDetails.get(i).getProductAmount());
+			payablesDetail.setRefSn(order.getPorderSn());
+			payablesDetail.setRefType(Consts.BIZ_TYPE_INSTOCK);
+			payablesDetail.setBizDate(new Date());
+			payablesDetail.setDeptId(user.getDepartmentId());
+			payablesDetail.setDataArea(user.getDataArea());
+			payablesDetail.setCreateDate(new Date());
+			payablesDetail.save();
+		}
+		
 		renderAjaxResultForSuccess("OK");
 	} 
 	

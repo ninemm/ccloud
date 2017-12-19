@@ -167,7 +167,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
 		List<Record> customerTypeList = SalesOrderQuery.me().findCustomerTypeListByCustomerId(customerId,
-				DataAreaUtil.getUserDealerDataArea(user.getDataArea()));
+				DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea()));
 		setAttr("customerTypeList", customerTypeList);
 		renderJson(customerTypeList);
 	}
@@ -249,7 +249,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 		String orderId = getPara("orderId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		SalesOrderQuery.me().updateConfirm(orderId, 1002, user.getId(), new Date());// 已审核拒绝
+		SalesOrderQuery.me().updateConfirm(orderId, 1001, user.getId(), new Date());// 已审核拒绝
 
 		renderAjaxResultForSuccess();
 

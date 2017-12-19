@@ -66,7 +66,7 @@ public class OrderController extends BaseFrontController {
 		customerTypes.add(all);
 
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
-				.findByDataArea(DataAreaUtil.getUserDealerDataArea(user.getDataArea()));
+				.findByDataArea(DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea()));
 		for (CustomerType customerType : customerTypeList) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", customerType.getName());
@@ -342,6 +342,7 @@ public class OrderController extends BaseFrontController {
 		
 		String taskId = getPara("taskId");
 		String comment = getPara("comment");
+		String refuseReson = getPara("refuseReson");
 		Integer pass = getParaToInt("pass", 1);
 
 		Map<String, Object> var = Maps.newHashMap();
@@ -349,7 +350,7 @@ public class OrderController extends BaseFrontController {
 		var.put("orderId", orderId);
 		var.put(Consts.WORKFLOW_APPLY_COMFIRM, user);
 		
-		comment = (pass==1 ? "通过" : "拒绝") + " " + (comment==null ? "" : comment);
+		comment = (pass==1 ? "通过" : "拒绝") + " " + (comment==null ? "" : comment) + " " + (refuseReson=="undefined" ? "" : refuseReson);
 		
 		String comments = buildComments(Consts.OPERATE_HISTORY_TITLE_ORDER_REVIEW, DateUtils.now(), user.getRealname(), comment);
 

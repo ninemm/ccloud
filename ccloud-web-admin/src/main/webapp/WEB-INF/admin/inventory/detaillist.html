@@ -31,132 +31,86 @@
 </#macro> 
  
 <#macro script>
-var warehouse_id = '${warehouse_id}';
-var seller_id = '${seller_id}';
-var product_id= '${product_id}';
-
-$(function() {
-	
-	var nowDate = new Date();
-	var thirtyDaysBefoer = new  Date(nowDate - 1000 * 60 * 60 * 24 * 30);
-	initDateValue(thirtyDaysBefoer,nowDate);
-
-	$('#startdate').datetimepicker({
-		language: 'zh-CN',
-		minView: 'month',
-    	format: 'yyyy-mm-dd',
-    	endDate: nowDate,
-    	todayBtn: true,
-    	initialDate: thirtyDaysBefoer
-	});
-	
-	
-	$('#enddate').datetimepicker({
-		language: 'zh-CN',
-		minView: 'month',
-    	format: 'yyyy-mm-dd',
-    	endDate: nowDate,
-    	todayBtn : true,
-    	initialDate: nowDate
-	});
+	var warehouse_id = '${warehouse_id}';
+	var seller_id = '${seller_id}';
+	var product_id= '${product_id}';
+	var $table = $("#_inventory_detail_table");
 	
 	var url = '${CPATH}/admin/inventory/detaillist';
-	jQuery.mm.initEditTable('#_inventory_detail_table', url, initParams, initFields(), null);
+	$(function() {
+		jQuery.mm.initDatetimepicker('form', '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
+		jQuery.mm.initDatetimepicker('form', '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
+		jQuery.mm.initValidator('#form', validatorFields);
+		jQuery.mm.initEditTable('#_inventory_detail_table', url, initParams, initFields(), null);
+	});
 	
-});
+	$("#search-submit").click(function() {
+		$table.bootstrapTable('refresh');
+	});
 
-// 日期选择器初始化
-function initDateValue(startDate,endDate){
-	$("#startdate").val(getDate(startDate));
-	$("#enddate").val(getDate(endDate));
-}
-
-// 获取日期字符串
-function getDate(date){
-	var dateStr = '';
-	if(getObjectClass(date) === 'Date'){
-		var nowY = date.getFullYear();
-		var nowM = date.getMonth()+1;
-		var nowD = date.getDate();
-		dateStr = nowY+"-"+(nowM<10 ? "0" + nowM : nowM)+"-"+(nowD<10 ? "0"+ nowD : nowD);
-	}
-	return dateStr;
-}
-
-// 获取类名
-function getObjectClass(obj){
- if (obj && obj.constructor && obj.constructor.toString()) {
-   	if(obj.constructor.name) {
-    	return obj.constructor.name;
-   	}
-   	var str = obj.constructor.toString();
-
-    if(str.charAt(0) == '[')
-   	{
-     	var arr = str.match(/\[\w+\s*(\w+)\]/);
-   	} else {
-       var arr = str.match(/function\s*(\w+)/);
-    }
-    if (arr && arr.length == 2) {
-        return arr[1];
-     }
-  }
-  return undefined; 
-};
-
-// 初始化表格参数
-var initParams = function(params){
-	var startDate = $("#startdate").val();
-	var endDate = $("#enddate").val();
-	var param = {
-			'size': params.limit,
-			'page': params.offset/params.limit + 1,
-			'start_date': startDate,
-			'end_date': endDate,
+	// 初始化表格参数
+	var initParams = function(params) {
+		var param = {
+			size: params.limit,
+			page: params.offset/params.limit + 1,
+			startDate: $('#startDate').val(),
+			endDate: $('#endDate').val(),
 			'warehouse_id': warehouse_id,
 			'seller_id': seller_id,
 			'product_id': product_id
 		};
+		return param;
+	};
+
+	// 初始化列表
+	var initFields = function(){
+		var fields = [
+			{field: "id", title: "ID", align: "center", visible:false, edit:false},
+			{field: "product_sn", title: "商品编码", align: "center", edit:false},
+			{field: "custom_name", title: "商品名称", align: "center", edit:false,class:'customName'},
+			{field: "in_count", title: "入库数量", align: "center", edit:false},
+			{field: "in_amount", title: "入库金额", align: "center", edit:false},
+			{field: "in_price", title: "入库单价", align: "center", edit:false},
+			{field: "out_count", title: "出库数量", align: "center", edit:false},
+			{field: "out_amount", title: "出库金额", align: "center", edit:false},
+			{field: "out_price", title: "出库单价", align: "center", edit:false},
+			{field: "balance_count", title: "剩余数量", align: "center", edit:false},
+			{field: "balance_amount", title: "剩余金额", align: "center", edit:false},
+			{field: "biz_type", title: "业务类型", align: "center",
+				formatter: function(value, row, rowIndex) {
+	  					if (value == 100209) return '盘亏出库';
+	  					if (value == 100208) return '盘盈入库';
+	  					if (value == 100207) return '调拨出库';
+	  					if (value == 100206) return '调拨入库';
+	  					if (value == 100205) return '销售退货入库';
+	  					if (value == 100204) return '销售出库';
+	  					if (value == 100203) return '采购退货出库';
+	  					if (value == 100202) return '采购入库';
+	  					if (value == 100201) return '库存建账';
+	  				},
+	  				edit: false
+	  			},
+			{field: "realname", title: "业务员", align: "center", edit:false,class:'realName1'},
+			{field: "biz_bill_sn", title: "业务单号", align: "center", edit:false},
+			{field: "biz_date", title: "业务日期", align: "center", edit:false,class:'dateTime'},
+		];
 		
-	return param;
-}
+		return fields;
+	}
 
-// 初始化列表
-var initFields = function(){
-	var fields = [
-		{field: "id", title: "ID", align: "center", visible:false, edit:false},
-		{field: "product_sn", title: "商品编码", align: "center", edit:false},
-		{field: "custom_name", title: "商品名称", align: "center", edit:false,class:'customName'},
-		{field: "in_count", title: "入库数量", align: "center", edit:false},
-		{field: "in_amount", title: "入库金额", align: "center", edit:false},
-		{field: "in_price", title: "入库单价", align: "center", edit:false},
-		{field: "out_count", title: "出库数量", align: "center", edit:false},
-		{field: "out_amount", title: "出库金额", align: "center", edit:false},
-		{field: "out_price", title: "出库单价", align: "center", edit:false},
-		{field: "balance_count", title: "剩余数量", align: "center", edit:false},
-		{field: "balance_amount", title: "剩余金额", align: "center", edit:false},
-		{field: "biz_type", title: "业务类型", align: "center",
-			formatter: function(value, row, rowIndex) {
-  					if (value == 100209) return '盘亏出库';
-  					if (value == 100208) return '盘盈入库';
-  					if (value == 100207) return '调拨出库';
-  					if (value == 100206) return '调拨入库';
-  					if (value == 100205) return '销售退货入库';
-  					if (value == 100204) return '销售出库';
-  					if (value == 100203) return '采购退货出库';
-  					if (value == 100202) return '采购入库';
-  					if (value == 100201) return '库存建账';
-  				},
-  				edit: false
-  			},
-		{field: "realname", title: "业务员", align: "center", edit:false,class:'realName1'},
-		{field: "biz_bill_sn", title: "业务单号", align: "center", edit:false},
-		{field: "biz_date", title: "业务日期", align: "center", edit:false,class:'dateTime'},
-	];
-	
-	return fields;
-}
 
+var validatorFields = {
+		'startDate': {
+			validators: {
+				date : { format : 'YYYY-MM-DD', message : '日期格式不正确' }
+			}
+		},
+		'endDate': {
+			validators: {
+				date : { format : 'YYYY-MM-DD', message : '日期格式不正确' }
+			}
+		}
+	}
 </#macro>
 
 <@layout active_id=p child_active_id=c>
@@ -173,12 +127,26 @@ var initFields = function(){
 
 <!-- Main content -->
 <section class="content">
-	<div class="row content-row">
-		<div class="input-group input-group-sm" style="float: right">
-			<span >开始时间：</span><input type="text" value="" id="startdate" placeholder="开始时间">&nbsp;&nbsp;<span>截止时间：</span><input type="text" value="" id="enddate" placeholder="截止时间">&nbsp;&nbsp;&nbsp;&nbsp;
-			<span id="search-submit" class="btn btn-default btn-sm btn-flat" >搜索</span>
+		<div class="row content-row" >
+			<form class="form-inline" id="form">
+					<div class="form-group col-sm-12" >
+						<input id="search-submit" class="btn btn-sm btn-primary" type="button" value="搜索" style="float: right">
+						<div class="form-group validata-box" style="float: right">
+							<label class="control-label">结束时间:</label>
+							<div class="form-group">
+								<input id="endDate" class="form-control" value="${endDate!}" name="endDate" placeholder="结束日期" >&nbsp;
+							</div>
+						</div>
+						<div class="form-group validata-box" style="float: right">
+							<label class="control-label">开始时间:</label>
+							<div class="form-group">
+								<input id="startDate" class="form-control" value="${startDate!}" name="startDate" placeholder="开始日期" >&nbsp;
+							</div>
+						</div>
+						
+					</div>
+			</form>
 		</div>
-	</div>
 	<div class="box">
 		<table class="table table-striped table-hover table-condensed" id="_inventory_detail_table" ></table>
 	</div>

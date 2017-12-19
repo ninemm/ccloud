@@ -94,18 +94,26 @@ function initProductComposition(){
 				$("#sidebar ul").append("<li id='composition'> 组合商品 <span class='goods-num'>8</span> </li>");
 				$menuRight.append("<div class='type' style='display:none'> </div>");
 			}
-
+			
+			var parentId = '';
 			$.each(data, function(index, el) {
+				if(parentId != el.parent_id) {
+					parentId = el.parent_id;
 
-				var $type = $menuRight.find(".type:last");
-				$type.append("<section class='product_detail weui-panel weui-panel_access composition'>" + compositionHtml + "</section>");
-				var $newProductDetail = $type.find(".composition:last");
-				$newProductDetail.find("#compositionName").text(el.name);
-				
-				$newProductDetail.find("#compositionPriceSpan").text('￥' + el.price);
-
-				$newProductDetail.find("#compositionPrice").val(el.price);
-				$newProductDetail.find("#compositionId").val(el.id);
+					var $type = $menuRight.find(".type:last");
+					$type.append("<section class='product_detail weui-panel weui-panel_access composition'>" + compositionHtml + "</section>");
+					var $newProductDetail = $type.find(".composition:last");
+					$newProductDetail.find("#compositionName").text(el.name);
+					
+					$newProductDetail.find("#compositionPriceSpan").text('￥' + el.price);
+	
+					$newProductDetail.find("#compositionPrice").val(el.price);
+					$newProductDetail.find("#compositionId").val(el.id);
+					$newProductDetail.find("#subProduct").text(el.sub_product_name + el.sub_product_sp + ' x ' + el.sub_product_count + '件')
+				}else{
+					$newProductDetail.find("#sub").append("<a class='fr gift-open' >展开</a>");
+					$newProductDetail.find("#subsubProduct").append("el.sub_product_name + el.sub_product_sp + ' x ' + el.sub_product_count + '件' </br>");
+				}
 
 			});
 		}
@@ -257,8 +265,8 @@ function save(){
 		</aside>
 		
 		<article class="menu-right">
-			<div class="">
-				<section class="product_detail weui-panel weui-panel_access common" style="display: none">
+			<div class="" style="display: none">
+				<section class="product_detail weui-panel weui-panel_access common" >
 					<div>
 						<input type="hidden" id="sellProductId" value="">
 						<input type="hidden" id="productId" value="">
@@ -307,8 +315,8 @@ function save(){
 					</div>
 				</section>
 			</div>
-			<div class="">
-				<section class="product_detail weui-panel weui-panel_access composition" style="display: none">
+			<div class="" style="display: none">
+				<section class="product_detail weui-panel weui-panel_access composition" >
 					<div>
 						<input type="hidden" id="compositionId" value="">
 						<input type="hidden" id="compositionPrice" value="">
@@ -317,6 +325,9 @@ function save(){
 							<div class="weui-cell_access product-top-right">
 								<div class="product_name" id="compositionName">
 									35度中国劲酒
+								</div>
+								<div class="product_unit">
+									规格： <span id="valueName">125ml</span> 
 								</div>
 								<span class="weui-cell__ft"></span>
 							</div>
@@ -336,12 +347,10 @@ function save(){
 						<div id="stock">库存：0件</div>
 					</div>
 					<hr>
-					<div>
-						<p>赠品：参茸劲酒_250ml_1*6
-							<a class="fr gift-open">展开</a>
+					<div id="gift">
+						<p id="sub">赠品：<span id="subProduct">参茸劲酒_250ml_1*6 x 1 件</span>
 						</p>
-						<p class="t-r width-50 none">
-							x 1 件
+						<p class="t-r width-50 none" id="subsubProduct">
 						</p>
 					</div>
 				</section>

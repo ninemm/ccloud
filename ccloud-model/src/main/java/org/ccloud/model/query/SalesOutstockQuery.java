@@ -150,7 +150,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 		return outstock.save();
 	}
 
-	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate, String dataArea) {
+	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate,String printStatus, String stockOutStatus,String custoemName,String dataArea) {
 		String select = "select o.*, c.customer_name ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_sales_outstock` o ");
 		fromBuilder.append("left join cc_seller_customer cs on o.customer_id = cs.id ");
@@ -159,9 +159,9 @@ public class SalesOutstockQuery extends JBaseQuery {
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.instock_sn", keyword, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.outstock_sn", keyword, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
-
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "c.customer_name", custoemName, params, needWhere);
 		if (needWhere) {
 			fromBuilder.append(" where 1 = 1");
 		}
@@ -174,6 +174,17 @@ public class SalesOutstockQuery extends JBaseQuery {
 		if (StrKit.notBlank(endDate)) {
 			fromBuilder.append(" and o.create_date <= ?");
 			params.add(endDate);
+		}
+		
+		if (StrKit.notBlank(printStatus)) {
+			fromBuilder.append(" and o.is_print = ?");
+			params.add(printStatus);
+		}
+		
+		
+		if (StrKit.notBlank(stockOutStatus)) {
+			fromBuilder.append(" and o.status = ?");
+			params.add(stockOutStatus);
 		}
 
 		fromBuilder.append(" order by o.create_date ");

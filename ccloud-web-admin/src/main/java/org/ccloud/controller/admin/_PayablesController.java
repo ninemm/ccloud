@@ -103,7 +103,7 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		String ref_type = getPara("ref_type");
 		String object_id = getPara("object_id");
 		//通过客户Id找到应收账款主表ID
-		Payables payables = PayablesQuery.me().findByObjId(object_id, Consts.RECEIVABLES_OBJECT_TYPE_CUSTOMER);
+		Payables payables = PayablesQuery.me().findByObjId(object_id);
 		
 		String userDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		List<User> list = UserQuery.me().findIdAndNameByDataArea(userDataArea);
@@ -120,7 +120,7 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 	public void list() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String ref_sn = getPara("ref_sn");
-		String deptDataArea = DataAreaUtil.getUserDeptDataArea(user.getDataArea());
+		String deptDataArea = DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea());
 		Page<Payment> page = PaymentQuery.me().paginate(getPageNumber(), getPageSize(), ref_sn,deptDataArea);
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(),"ref_sn",ref_sn,"rows", page.getList());
 		

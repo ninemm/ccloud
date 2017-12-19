@@ -65,7 +65,7 @@ public class _GroupController extends JBaseCRUDController<Group> {
         
         String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
-        Page<Group> page = GroupQuery.me().paginate(getPageNumber(), getPageSize(), keyword, DataAreaUtil.getUserDealerDataArea(dataArea), "g.order_list");
+        Page<Group> page = GroupQuery.me().paginate(getPageNumber(), getPageSize(), keyword, DataAreaUtil.getDealerDataAreaByCurUserDataArea(dataArea), "g.order_list");
         if (page != null) {
             setAttr("page", page);
         }
@@ -111,7 +111,7 @@ public class _GroupController extends JBaseCRUDController<Group> {
                 Group group = getModel(Group.class);
                 User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
             	group.setDeptId(user.getDepartmentId());
-            	group.setDataArea(DataAreaUtil.getUserDeptDataArea(user.getDataArea()));
+            	group.setDataArea(DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea()));
 
                 String roleList = getPara("roleList");
                 String[] roleId = roleList.split(",");
@@ -262,7 +262,7 @@ public class _GroupController extends JBaseCRUDController<Group> {
                 Group group = getModel(Group.class);
                 User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
             	group.setDeptId(user.getDepartmentId());
-            	group.setDataArea(DataAreaUtil.getUserDeptDataArea(user.getDataArea()));
+            	group.setDataArea(DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea()));
 
                 String userList = getPara("uList");
                 String[] userId = userList.split(",");

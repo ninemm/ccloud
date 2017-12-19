@@ -59,7 +59,7 @@ public class _RoleController extends JBaseCRUDController<Role> {
 		if (StrKit.notBlank(keyword)) setAttr("k", keyword);
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		
-		Page<Role> page = RoleQuery.me().paginate(getPageNumber(), getPageSize(), keyword, DataAreaUtil.getUserDealerDataArea(dataArea), "r.order_list");
+		Page<Role> page = RoleQuery.me().paginate(getPageNumber(), getPageSize(), keyword, DataAreaUtil.getDealerDataAreaByCurUserDataArea(dataArea), "r.order_list");
 		if (page != null) {
 			setAttr("page", page);
 		}
@@ -73,7 +73,7 @@ public class _RoleController extends JBaseCRUDController<Role> {
 		Role role = getModel(Role.class);
         User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
         role.setDeptId(user.getDepartmentId());
-        role.setDataArea(DataAreaUtil.getUserDeptDataArea(user.getDataArea()));
+        role.setDataArea(DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea()));
 		if (role.saveOrUpdate())
 			renderAjaxResultForSuccess("新增成功");
 		else

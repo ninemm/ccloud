@@ -14,16 +14,21 @@ public class DataAreaUtil {
 		return dataArea;
 	}
 
-	public static String getUserDeptDataArea(String userDataArea) {
-		String deptDataArea = userDataArea.substring(0, userDataArea.length() - 4);
-		return deptDataArea;
+	public static String getDeptDataAreaByCurUserDataArea(String dataArea) {
+		
+		if (StrKit.notBlank(dataArea))
+			return dataArea.substring(0, dataArea.length() - 4);
+		
+		return null;
 	}
 
-	public static String getUserDealerDataArea(String userDataArea) {
-		if (userDataArea != null && userDataArea.length() >= 10) {
-			return userDataArea.substring(0, 9);
+	public static String getDealerDataAreaByCurUserDataArea(String dataArea) {
+		
+		if (StrKit.notBlank(dataArea) && dataArea.length() > 9) {
+			return dataArea.substring(0, 9);
 		}
-		return userDataArea;
+		
+		return dataArea;
 	}
 
 }

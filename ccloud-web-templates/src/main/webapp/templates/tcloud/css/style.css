@@ -153,8 +153,8 @@ a {
 
 .toolbar .picker-button,
 .weui-cells_radio .weui-check:checked+.weui-icon-checked:before,
-.picker-calendar-day.picker-calendar-day-selected span,
-.weui-search-bar__cancel-btn {
+.weui-search-bar__cancel-btn,
+.weui-cells_checkbox .weui-check:checked+.weui-icon-checked:before {
   color: #ea6f5a;
 }
 
@@ -211,6 +211,10 @@ a {
 
 .border-top-1px {
   border-top: 1px solid #e5e5e5;
+}
+
+.border-right-1px {
+  border-right: 1px solid #e5e5e5;
 }
 
 .bg-blue {
@@ -782,11 +786,6 @@ a {
   justify-content: space-between;
 }
 
-.composition .product_name {
-  height: 3.25rem;
-  line-height: 3.25rem;
-}
-
 .product_unit {
   height: 1.25rem;
   line-height: 1.25rem;
@@ -1202,7 +1201,7 @@ input.street-value {
   right: 0;
 }
 
-.head-search .wuei-flex__item:last-child i {
+.head-search .weui-flex__item:last-child i {
   border: none;
 }
 
@@ -1256,6 +1255,9 @@ input.street-value {
   line-height: 1rem;
   margin-top: 0.5rem;
   color: #000;
+}
+
+.customer-info p {
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
@@ -1841,7 +1843,6 @@ input[name=input-type] {
   width: 95%;
 }
 
-
 /* 客户审核 */
 
 #customer-audit main {
@@ -1926,8 +1927,10 @@ input[name=input-type] {
 
 .overview-hd-title {
 	font-size: .8rem;
-    width: 5rem; 
-    display: inline-block;
+  width: 100%; 
+  display: inline-block;
+  text-align: center;
+  margin-bottom: .5rem;
 }
 
 .briefly {
@@ -2009,7 +2012,7 @@ input[name=input-type] {
 }
 
 .weui-panel__hd .weui-input {
-  width: 22%;
+  width: 4rem;
   font-size: .7rem;
 }
 
@@ -2066,6 +2069,13 @@ input[name=input-type] {
   }
   .user-info .name {
     padding-left: .5rem;
+  }
+  .menu {
+    margin: 0;
+  }
+  
+  .menu:nth-child(2) {
+    margin-left: 0;
   }
 }
 

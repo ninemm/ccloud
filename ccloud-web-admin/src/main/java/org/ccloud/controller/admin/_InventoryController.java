@@ -15,15 +15,20 @@
  */
 package org.ccloud.controller.admin;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.shiro.SecurityUtils;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
+import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Inventory;
 import org.ccloud.model.query.InventoryQuery;
 import org.ccloud.model.InventoryDetail;
@@ -32,6 +37,7 @@ import org.ccloud.model.query.InventoryDetailQuery;
 
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Before;
+import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 /**
@@ -43,9 +49,16 @@ import com.jfinal.plugin.activerecord.Record;
 public class _InventoryController extends JBaseCRUDController<Inventory> { 
 
 	public void getWarehouse() {
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String userId = user.getId();
-		List<Record> list = InventoryQuery.me().getWareHouseInfo(userId);
+		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/dealer/all");
+		List<Record> list=new ArrayList<Record>();
+		if (isSuperAdmin) {
+			String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+			list = InventoryQuery.me().getWareHouse(dataArea);
+		}else {
+			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+			String userId = user.getId();
+			list = InventoryQuery.me().getWareHouseInfo(userId);
+		}
 		renderJson(list);
 	}
 	
@@ -53,9 +66,16 @@ public class _InventoryController extends JBaseCRUDController<Inventory> {
 		String warehouse_id = getPara("warehouse_id");
 		String product_sn = getPara("product_sn");
 		String product_name = getPara("product_name");
+		if (StrKit.notBlank(product_sn)) {
+			product_sn = StringUtils.urlDecode(product_sn);
+			setAttr("product_sn", product_sn);
+		}
+		if (StrKit.notBlank(product_name)) {
+			product_name = StringUtils.urlDecode(product_name);
+			setAttr("product_name", product_name);
+		}
 		String seller_id= getSessionAttr("sellerId").toString();
 		
-		// Map<String, Object> map = new HashMap<String, Object>();
 		Map<String, Object> map;
 		if(seller_id == null) {
 			map = new HashMap<String, Object>();
@@ -68,6 +88,9 @@ public class _InventoryController extends JBaseCRUDController<Inventory> {
 	}
 	
 	public void renderlist() {
+		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
+		setAttr("startDate", date);
+		setAttr("endDate", date);
 		setAttr("warehouse_id", getPara("warehouse_id"));
 		setAttr("product_id", getPara("product_id"));
 		setAttr("seller_id", getPara("seller_id"));
@@ -78,8 +101,8 @@ public class _InventoryController extends JBaseCRUDController<Inventory> {
 		String warehouse_id = getPara("warehouse_id");
 		String product_id = getPara("product_id");
 		String seller_id = getPara("seller_id");
-		String start_date = getPara("start_date");
-		String end_date = getPara("end_date");
+		String start_date = getPara("startDate");
+		String end_date = getPara("endDate");
 
 		Page<InventoryDetail> page = InventoryDetailQuery.me().paginate(getPageNumber(), getPageSize(),warehouse_id,product_id,seller_id,start_date,end_date);
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());

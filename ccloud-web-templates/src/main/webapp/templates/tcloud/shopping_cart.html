@@ -16,10 +16,8 @@ $(function() {
       total();
   }).on("touchend", ".operate:last-child", function () { //增加商品数量
       total();
-  }).on("input propertychange", ".bigPrice", function () { //改小价格
-      total();
-  }).on("input propertychange", ".smallPrice", function () { //改大价格
-      total();
+  }).on('touchend', '#confirm-input', function () {
+	  total();
   });
   
   $main.empty();
@@ -384,7 +382,7 @@ function save(){
 					35度中国劲酒_125ml_1*24
 					<!-- <span class="gift-tag">赠品</span> -->
 				</div>
-				<span class="fr"><input type="checkbox" name="isGift" id="isGift" value="1"> 是否赠品</span>
+				<span class="fr"><input type="checkbox" name="isGift" id="isGift" value="1"><span>是否赠品</span></span>
 				<div class="product_unit">
 					规格：<span id="valueName">125ml</span>
 				</div>
@@ -458,6 +456,9 @@ function save(){
 				<div class="product_name" id="compositionName">
 					35度中国劲酒_125ml_1*24
 				</div>
+				<div class="product_unit">
+					规格：<span id="valueName">125ml</span>
+				</div>
 				<div class="product_bUnit">
 					<span class="price" id="compositionPriceSpan">￥720</span>
 					<div class="spinner">
@@ -470,6 +471,7 @@ function save(){
 						</div>
 					</div>
 					<input type="number" class="street-value" id="compositionPrice" value="720" >
+					<i class="icon-trash-o fr ft30 gray"></i>
 				</div>
 			</div>
 		</main>
