@@ -67,15 +67,20 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 	public static final String COMPANYCODE = "100000";
 
 	public void list() {
-		String keyword = getPara("k");
-		if (StrKit.notBlank(keyword)) {
-			keyword = StringUtils.urlDecode(keyword);
-			setAttr("k", keyword);
+		String stock_taking_sn = getPara("stock_taking_sn");
+		String name = getPara("name");
+		if (StrKit.notBlank(stock_taking_sn)) {
+			stock_taking_sn = StringUtils.urlDecode(stock_taking_sn);
+			setAttr("stock_taking_sn", stock_taking_sn);
+		}
+		if (StrKit.notBlank(name)) {
+			name = StringUtils.urlDecode(name);
+			setAttr("name", name);
 		}
 		String seller_id=getSessionAttr("sellerId").toString();
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String userId = user.getId();
-		Page<StockTaking> page = StockTakingQuery.me().paginate(getPageNumber(), getPageSize(), keyword,seller_id,userId);
+		Page<StockTaking> page = StockTakingQuery.me().paginate(getPageNumber(), getPageSize(), stock_taking_sn,name,seller_id,userId);
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
 	}
