@@ -96,97 +96,113 @@ $(function(){
 });
 
 $('li[name="salesViewByD"]').on("click",function(){
+
+    var salesToMonthsChart = echarts.getInstanceByDom(document.getElementById('salesManViewByM'));
+    $("#salesManViewByD").css("display","block");
+    $("#salesManViewByM").css("display","none");
+    if(typeof(salesToMonthsChart)!="undefined"){
+        salesToMonthsChart.clear();
+        salesToMonthsChart.dispose();
+    }
+
     var salesManData = ${salesManAmount!};
     var salesToDay = salesManData.sales_day;
     $("#salesManViewByD").width($("#salesManViewByD").parent().width());
     var salesToDayChart = echarts.init(document.getElementById('salesManViewByD'));
-    var salesToMonthsChart = echarts.getInstanceByDom(document.getElementById('salesManViewByM'));
-
-    $("#salesManViewByD").css("display","block");
-    $("#salesManViewByM").css("display","none");
-    salesToMonthsChart.clear();
-    salesToMonthsChart.dispose();
 
     viewCreate('业务员当日销售额排行',salesToDayChart,salesToDay);
 });
 $('li[name="salesViewByM"]').on("click",function(){
+
+    var salesToDayChart = echarts.getInstanceByDom(document.getElementById('salesManViewByD'));
+    $("#salesManViewByD").css("display","none");
+    $("#salesManViewByM").css("display","block");
+    if(typeof(salesToDayChart)!="undefined"){
+        salesToDayChart.clear();
+        salesToDayChart.dispose();
+    }
+
     var salesManData = ${salesManAmount!};
     var salesToMonths = salesManData.sales_month;
     $("#salesManViewByM").width($("#salesManViewByM").parent().width());
-    var salesToDayChart = echarts.getInstanceByDom(document.getElementById('salesManViewByD'));
     var salesToMonthsChart = echarts.init(document.getElementById('salesManViewByM'));
-
-    $("#salesManViewByD").css("display","none");
-    $("#salesManViewByM").css("display","block");
-    salesToDayChart.clear();
-    salesToDayChart.dispose();
 
     viewCreate('业务员当月销售额排行',salesToMonthsChart,salesToMonths);
 });
 
 $("#goodsByD").on("click",function(){
+
+    var goodsToAllChart = echarts.getInstanceByDom(document.getElementById('goodsViewByA'));
+    $("#goodsViewByD").css("display","block");
+    $("#goodsViewByA").css("display","none");
+    if(typeof(goodsToAllChart)!="undefined"){
+        goodsToAllChart.clear();
+        goodsToAllChart.dispose();
+    }
+
     var goodsSalesData = ${goodsSales!};
     var goodsToDay = goodsSalesData.goodsSalesToDay;
     $("#goodsViewByD").width($("#goodsViewByD").parent().width());
     var goodsToDayChart = echarts.init(document.getElementById('goodsViewByD'));
-    var goodsToAllChart = echarts.getInstanceByDom(document.getElementById('goodsViewByA'));
-
-    $("#goodsViewByD").css("display","block");
-    $("#goodsViewByA").css("display","none");
-    goodsToAllChart.clear();
-    goodsToAllChart.dispose();
 
     viewCreate('商品当日销售额排行',goodsToDayChart,goodsToDay);
 });
 
 $("#goodsByA").on("click",function(){
+    var goodsToDayChart = echarts.getInstanceByDom(document.getElementById('goodsViewByD'));
+    $("#goodsViewByA").css("display","block");
+    $("#goodsViewByD").css("display","none");
+    if(typeof(goodsToDayChart)!="undefined"){
+        goodsToDayChart.clear();
+        goodsToDayChart.dispose();
+    }
+
     var goodsSalesData = ${goodsSales!};
     var goodsToAll = goodsSalesData.goodsSalesAll;
     $("#goodsViewByA").width($("#goodsViewByA").parent().width());
-    var goodsToDayChart = echarts.getInstanceByDom(document.getElementById('goodsViewByD'));
     var goodsToAllChart = echarts.init(document.getElementById('goodsViewByA'));
-
-    $("#goodsViewByA").css("display","block");
-    $("#goodsViewByD").css("display","none");
-    goodsToDayChart.clear();
-    goodsToDayChart.dispose();
 
     viewCreate('商品销售额汇总排行',goodsToAllChart,goodsToAll);
 
 });
 
 $("#directByD").on("click",function(){
+    var directToMonthsChart = echarts.getInstanceByDom(document.getElementById('directViewByM'));
+    $("#directViewByD").css("display","block");
+    $("#directViewByM").css("display","none");
+    if(typeof(directToMonthsChart)!="undefined"){
+        directToMonthsChart.clear();
+        directToMonthsChart.dispose();
+    }
+
     var directData = ${directAmount!};
     var directToDay = directData.directs_day;
     $("#directViewByD").width($("#directViewByD").parent().width());
     var directToDayChart = echarts.init(document.getElementById('directViewByD'));
-    var directToMonthsChart = echarts.getInstanceByDom(document.getElementById('directViewByM'));
 
-    $("#directViewByD").css("display","block");
-    $("#directViewByM").css("display","none");
-    directToMonthsChart.clear();
-    directToMonthsChart.dispose();
-
-    viewCreate('销售额汇总排行',directToDayChart,directToDay);
+    viewCreate('直营商当日销售额排行',directToDayChart,directToDay);
 });
 
 $("#directByM").on("click",function(){
+    var directToDayChart = echarts.getInstanceByDom(document.getElementById('directViewByD'));
+    $("#directViewByM").css("display","block");
+    $("#directViewByD").css("display","none");
+    if(typeof(directToDayChart)!="undefined"){
+        directToDayChart.clear();
+        directToDayChart.dispose();
+    }
+
     var directData = ${directAmount!};
     var directToMonths = directData.directs_month;
     $("#directViewByM").width($("#directViewByM").parent().width());
-    var directToDayChart = echarts.getInstanceByDom(document.getElementById('directViewByD'));
     var directToMonthsChart = echarts.init(document.getElementById('directViewByM'));
 
-    $("#directViewByM").css("display","block");
-    $("#directViewByD").css("display","none");
-    directToDayChart.clear();
-    directToDayChart.dispose();
-
-    viewCreate('商品销售额汇总排行',directToMonthsChart,directToMonths);
+    viewCreate('直营商当月销售额排行',directToMonthsChart,directToMonths);
 });
 
 function viewCreate(title,myChart,viewData){
     var yTitle = [],xData = [];
+    var t_val = '';
     for(var i =0;i<viewData.length;i++){
         var data =  viewData[i].columns;
         yTitle.push(data.title);
@@ -199,10 +215,10 @@ function lineChartCreate(title,myChart,viewData){
     var salesYTitle = [],salesXData = [];
         for(var i =0;i<viewData.length;i++){
         var salesData =  viewData[i].columns;
-        salesYTitle.push(salesData.title);
-        salesXData.push(salesData.sumamount);
+        yTitle.push(salesData.title);
+        xData.push(salesData.sumamount);
     }
-    myChart.setOption(lineChartOptions(title,salesYTitle,salesXData));
+    myChart.setOption(lineChartOptions(title,yTitle,xData));
 }
 
 function barGraphOptions(title,yTitle,data){
@@ -267,6 +283,7 @@ function lineChartOptions(viewTitle,xTitle,yData){
     };
     return options;
 }
+
 </#macro> 
 <@layout active_id="dashboard" >
 <!-- Content Header (Page header) -->
