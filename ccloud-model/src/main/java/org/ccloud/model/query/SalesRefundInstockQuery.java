@@ -92,7 +92,7 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 			fromBuilder.append(" and r.status != 0");
 		}
 
-		fromBuilder.append(" and r.instock_sn like '%"+keyword+"%' or c.customer_name like '%"+keyword+"%' order by r.create_date ");
+		fromBuilder.append(" and ( r.instock_sn like '%"+keyword+"%' or c.customer_name like '%"+keyword+"%' ) order by r.create_date ");
 
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
