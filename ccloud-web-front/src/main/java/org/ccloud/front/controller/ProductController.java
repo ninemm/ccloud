@@ -52,7 +52,7 @@ public class ProductController extends BaseFrontController {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 
 		String keyword = getPara("keyword");
-		List<Record> productCompositionList = ProductCompositionQuery.me().findProductBySeller(sellerId, keyword);
+		List<Record> productCompositionList = ProductCompositionQuery.me().findDetailByProductId("", sellerId, keyword);
 		renderJson(productCompositionList);
 	}
 
