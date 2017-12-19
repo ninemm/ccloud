@@ -56,7 +56,7 @@ public class CustomerVisitController extends BaseFrontController {
 		String id = getPara("id");
 		String type = getPara("type");
 		String nature = getPara("nature");
-		String subType = getPara("subType");
+		String subType = getPara("level");
 		String dataArea = selectDataArea + "%";
 
 		Page<Record> visitList = CustomerVisitQuery.me().paginateForApp(getPageNumber(), getPageSize(), id, type, nature, subType, dataArea);
