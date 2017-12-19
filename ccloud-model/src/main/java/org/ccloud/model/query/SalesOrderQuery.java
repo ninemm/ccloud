@@ -1286,10 +1286,12 @@ public class SalesOrderQuery extends JBaseQuery {
 			endDate = date[1];
 		}
 		LinkedList<Object> params = new LinkedList<Object>();
-		StringBuilder fromBuilder = new StringBuilder("SELECT IFNULL(SUM(cc.product_amount),0) as totalAmount, IFNULL(SUM(cc.product_count),0) as productCount, u.realname, u.id ");
+		StringBuilder fromBuilder = new StringBuilder("SELECT IFNULL(SUM(cc.product_amount),0) as totalAmount, IFNULL(SUM(cc.product_count/cp.convert_relate),0) as productCount, u.realname, u.id ");
 		fromBuilder.append("FROM cc_sales_order_detail cc ");
 		fromBuilder.append("LEFT JOIN cc_sales_order cs on cc.order_id = cs.id ");
 		fromBuilder.append("LEFT JOIN `user` u ON u.id = cs.biz_user_id ");
+		fromBuilder.append("LEFT JOIN cc_seller_product csp on cc.sell_product_id = csp.id ");
+		fromBuilder.append("LEFT JOIN cc_product cp on cp.id = csp.product_id ");		
 		boolean needWhere = true;
 		if (StringUtils.isNotBlank(deptId)) {
 			needWhere = appendIfNotEmpty(fromBuilder, " u.department_id", deptId, params, needWhere);
