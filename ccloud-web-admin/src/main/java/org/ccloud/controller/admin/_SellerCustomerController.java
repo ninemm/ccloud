@@ -115,11 +115,11 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			setAttr("cUserNames", StrKit.join(realnames, ","));
 
 			setAttr("cTypeList", CustomerJoinCustomerTypeQuery.me().findCustomerTypeIdListBySellerCustomerId(id,
-					DataAreaUtil.getUserDealerDataArea(selectDataArea)));
+					DataAreaUtil.getDealerDataAreaByCurUserDataArea(selectDataArea)));
 		}
 
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
-				.findByDataArea(DataAreaUtil.getUserDealerDataArea(selectDataArea));
+				.findByDataArea(DataAreaUtil.getDealerDataAreaByCurUserDataArea(selectDataArea));
 		setAttr("customerTypeList", customerTypeList);
 
 	}
@@ -203,7 +203,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 
 			sellerCustomer.setCustomerTypeIds(Joiner.on(",").join(Arrays.asList(customerTypes).iterator()));
 
-			String deptDataArea = DataAreaUtil.getUserDealerDataArea(user.getDataArea());
+			String deptDataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea());
 			Department department = DepartmentQuery.me().findByDataArea(deptDataArea);
 			sellerCustomer.setDataArea(deptDataArea);
 			sellerCustomer.setDeptId(department.getId());
@@ -344,7 +344,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr("sellerId");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		String dept_dataArea = DataAreaUtil.getUserDealerDataArea(user.getDataArea());
+		String dept_dataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea());
 		Department dept =  DepartmentQuery.me().findByDataArea(dept_dataArea);
 		
 		File file = getFile().getFile();
@@ -422,7 +422,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		String[] customerTypeNames = customerTypeName.split(",");
 		for (String typeName : customerTypeNames) {
 			String id = CustomerTypeQuery.me().findIdByName(typeName,
-					DataAreaUtil.getUserDealerDataArea(user.getDataArea()));
+					DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea()));
 			if (StrKit.isBlank(id)) {
 				renderAjaxResultForError("你还没有创建这个客户类型：" + typeName + ", 请确认");
 			}
@@ -455,7 +455,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 	
 	public void searchByCustomerName() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String dept_dataArea = DataAreaUtil.getUserDealerDataArea(user.getDataArea());
+		String dept_dataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea());
 		if(StrKit.isBlank(dept_dataArea)) {
 			renderAjaxResultForError("丢失组织数据");
 			return ;
@@ -471,7 +471,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 	
 	public void searchTypeById() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String dept_dataArea = DataAreaUtil.getUserDealerDataArea(user.getDataArea());
+		String dept_dataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea());
 		String sellerCustomerId = getPara("sellerC_Id");
 		List<Record> list = UserJoinCustomerQuery.me().findCustomerTypeBySellerCustomerId(sellerCustomerId, dept_dataArea+"%");
 		renderAjaxResultForSuccess("success",JSON.toJSON(list));
@@ -508,10 +508,10 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		setAttr("cUserIds", StrKit.join(userIds, ","));
 		setAttr("cUserNames", StrKit.join(realnames, ","));
 		setAttr("cTypeList", CustomerJoinCustomerTypeQuery.me().findCustomerTypeIdListBySellerCustomerId(id,
-				DataAreaUtil.getUserDealerDataArea(selectDataArea)));
+				DataAreaUtil.getDealerDataAreaByCurUserDataArea(selectDataArea)));
 
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
-				.findByDataArea(DataAreaUtil.getUserDealerDataArea(selectDataArea));
+				.findByDataArea(DataAreaUtil.getDealerDataAreaByCurUserDataArea(selectDataArea));
 		setAttr("customerTypeList", customerTypeList);
 		
 		WorkFlowService workflowService = new WorkFlowService();
@@ -538,7 +538,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			src.setSubType(sellerCustomer.getSubType());
 			src.setCustomerKind(sellerCustomer.getCustomerKind());
 
-			List<String> custTypeNameList =  CustomerJoinCustomerTypeQuery.me().findCustomerTypeNameListBySellerCustomerId(id, DataAreaUtil.getUserDealerDataArea(selectDataArea));
+			List<String> custTypeNameList =  CustomerJoinCustomerTypeQuery.me().findCustomerTypeNameListBySellerCustomerId(id, DataAreaUtil.getDealerDataAreaByCurUserDataArea(selectDataArea));
 
 			src.setCustTypeNameList(custTypeNameList);
 			
@@ -646,7 +646,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 				sellerCustomer.setIsArchive(1);
 				sellerCustomer.setImageListStore(customerVO.getImageListStore());
 
-				String deptDataArea = DataAreaUtil.getUserDealerDataArea(user.getDataArea());
+				String deptDataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea());
 				Department department = DepartmentQuery.me().findByDataArea(deptDataArea);
 				sellerCustomer.setDataArea(deptDataArea);
 				sellerCustomer.setDeptId(department.getId());

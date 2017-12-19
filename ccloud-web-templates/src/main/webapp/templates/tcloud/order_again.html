@@ -136,193 +136,195 @@ $(function() {
 
 <@layout>
 <body id="order">
-	<form action="${CPATH}/product/salesOrder" method="post" id="form">
-		<main>
-			<section class="weui-panel weui-panel_access order-customer-info">
-				<div class="weui-cell weui-cell_access">
-					<div class="weui-cell__bd">
-						<div class="order-customer-info-title">
-							客户名称
-							<span class="require">*</span>
-						</div>
-						<input type="hidden" id="sellerCustomerId" name="customerId" value="${order.customer_id!}" >
-						<input type="text" placeholder="请选择客户" class="weui-input" id="customerName" name="customerName" value="${order.customer_name!}" readonly>
-						<span class="weui-cell__ft"></span>
-					</div>
-				</div>
-				<div class="weui-cell weui-cell_access">
-					<div class="weui-cell__bd">
-						<div class="order-customer-info-title">
-							联系人
-							<span class="require">*</span>
-						</div>
-						<input type="text" placeholder="请输入客户信息" class="weui-input" id="contact" name="contact" value="${order.ccontact!}" readonly>
-					</div>
-				</div>
-				<div class="weui-cell weui-cell_access">
-					<div class="weui-cell__bd">
-						<div class="order-customer-info-title">
-							 电话号码
-							<span class="require">*</span>
-						</div>
-						<input type="text" placeholder="请输入电话号码" class="weui-input" id="mobile" name="mobile" value="${order.cmobile!}" readonly>
-					</div>
-				</div>
-				<div class="weui-cell weui-cell_access">
-					<div class="weui-cell__bd">
-						<div class="order-customer-info-title">
-							详细地址
-							<span class="require">*</span>
-						</div>
-						<input type="hidden" id="address" name="address" value="${order.caddress!}">
-						<input type="text" placeholder="请输入详细地址" class="weui-input" id="deliveryAddress" name="deliveryAddress" value="${order.caddress!}" readonly>
-					</div>
-				</div>
-				<div class="weui-cell weui-cell_access">
-					<div class="weui-cell__bd select-area">
-						<div class="order-customer-info-title">
-							客户类型
-							<span class="require">*</span>
-						</div>
-						<input type="hidden" id="customerType" name="customerType" value="${order.customer_type_id!}">
-						<input type="hidden" id="customerTypeCode" name="customerTypeCode" value="${order.typeCode!}">
-						<input type="hidden" id="factor" name="factor" value="${order.factor!}">
-						<input type="text" placeholder="请选择客户类型" class="weui-input" id="customerTypeName" name="customerTypeName" value="${order.customerTypeName!}" readonly>
-						<span class="weui-cell__ft"></span>
-					</div>
-				</div>
-			</section>
-			<section class="weui-panel weui-panel_access delivery-info">
-				<div class="weui-cell weui-cell_access">
-					<div class="weui-cell__bd">
-						配送时间
-						<input type="text" placeholder="请选择配送时间" class="weui-input" data-toggle='date' id="deliveryDate" name="deliveryDate" value="${deliveryDate!}" readonly>
-						<span class="weui-cell__ft"></span>
-					</div>
-				</div>
-			</section>
-			<section class="weui-panel weui-panel_access ft14">
-				<div class="weui-cell weui-cell_access">
-					<div class="weui-cell__bd">
-						<div>
-							<input type="checkbox" name="receiveType" value="0"> 是否账期
-						</div>
-					</div>
-				</div>
-			</section>
-			<section class="weui-panel weui-panel_access ft14 remark">
-				<div class="weui-cell weui-cell_access">
-					<div class="weui-cell__bd">
-						<textarea name="remark" placeholder="备注说明（70字以内）"></textarea>
-					</div>
-				</div>
-			</section>
-			<div class="weui-cells__title black">商品明细</div>
-			<div id="productList">
-				<div class="weui-panel weui-panel_access goods-detail common" style="display: none">
-					<input type="hidden" name="sellProductId" id="sellProductId" value="">
-					<input type="hidden" name="productId" id="productId" value="">
-					<input type="hidden" name="convert" id="convert" value="">
-					<div class="product_name" id="productName">
-						35度中国劲酒_125ml_1*24
-		<!-- 				<span class="gift-tag">赠品</span> -->
-					</div>
-					<div class="product_unit">
-						规格：<span id="valueName">125ml</span>
-					</div>
-					<div class="product_bUnit">
-						<span class="price" id="bigPriceSpan">￥725</span>
-						<span class="unit" id="bigUnitSpan">&nbsp;/&nbsp;件</span>
-						<div class="spinner">
-							<input type="number" min="0" value="0" class="fl" id="bigNum" name="bigNum" readonly>
-						</div>
-						<input type="number" class="street-value"  id="bigPrice" value="720" name="bigPrice" readonly>
-					</div>
-					<div class="product_mUnit">
-						<span class="price" id="smallPriceSpan">￥30</span>
-						<span class="unit" id="smallUnitSpan">&nbsp;/&nbsp;瓶</span>
-						<div class="spinner">
-							<input type="number" min="0" value="0" class="fl" id="smallNum" name="smallNum" readonly>
-						</div>
-						<input type="number" class="street-value" value="30" id="smallPrice" name="smallPrice" readonly>
-					</div>
-					<input type="hidden" id="rowTotal" name="rowTotal" value="">
-					<hr />
-					<div class="gift" id="gift">
-						<input type="hidden" name="giftSellProductId" id="giftSellProductId" value="">
-						<input type="hidden" name="giftProductId" id="giftProductId" value="">
-						<input type="hidden" name="giftConvert" id="giftConvert" value="">
-						<input type="hidden" name="giftBigPrice" id="giftBigPrice" value="" >
-						<div>
-							<input type="checkbox" name="add-gift" id="addGift" disabled>
-							<span>赠品</span>
-						</div>
-						<div style="display:none" class="select-area">
-							<div class="goods">
-								<span>商品</span>
-								<input type="text" class="choose-good weui-input" placeholder="选择商品" id="giftProduct" readonly>
-								<i class="icon-sort-desc"></i>
-								<input type="checkbox" name="default-goods" id="isDefault" disabled>
-								<span>默认商品</span>
+	<div class="weui-content">
+		<form action="${CPATH}/product/salesOrder" method="post" id="form">
+			<main>
+				<section class="weui-panel weui-panel_access order-customer-info">
+					<div class="weui-cell weui-cell_access">
+						<div class="weui-cell__bd">
+							<div class="order-customer-info-title">
+								客户名称
+								<span class="require">*</span>
 							</div>
-							<div class="number">
-								<span>数量</span>
-								<div class="spinner">
-									<div class="operate fl">
-										<i class="icon-minus2"></i>
-									</div>
-									<input type="number" min="0" value="0" class="fl" name="giftNum" id="giftNum" readonly>
-									<div class="operate fl">
-										<i class="icon-plus2"></i>
-									</div>
+							<input type="hidden" id="sellerCustomerId" name="customerId" value="${order.customer_id!}" >
+							<input type="text" placeholder="请选择客户" class="weui-input" id="customerName" name="customerName" value="${order.customer_name!}" readonly>
+							<span class="weui-cell__ft"></span>
+						</div>
+					</div>
+					<div class="weui-cell weui-cell_access">
+						<div class="weui-cell__bd">
+							<div class="order-customer-info-title">
+								联系人
+								<span class="require">*</span>
+							</div>
+							<input type="text" placeholder="请输入客户信息" class="weui-input" id="contact" name="contact" value="${order.ccontact!}" readonly>
+						</div>
+					</div>
+					<div class="weui-cell weui-cell_access">
+						<div class="weui-cell__bd">
+							<div class="order-customer-info-title">
+								电话号码
+								<span class="require">*</span>
+							</div>
+							<input type="text" placeholder="请输入电话号码" class="weui-input" id="mobile" name="mobile" value="${order.cmobile!}" readonly>
+						</div>
+					</div>
+					<div class="weui-cell weui-cell_access">
+						<div class="weui-cell__bd">
+							<div class="order-customer-info-title">
+								详细地址
+								<span class="require">*</span>
+							</div>
+							<input type="hidden" id="address" name="address" value="${order.caddress!}">
+							<input type="text" placeholder="请输入详细地址" class="weui-input" id="deliveryAddress" name="deliveryAddress" value="${order.caddress!}" readonly>
+						</div>
+					</div>
+					<div class="weui-cell weui-cell_access">
+						<div class="weui-cell__bd select-area">
+							<div class="order-customer-info-title">
+								客户类型
+								<span class="require">*</span>
+							</div>
+							<input type="hidden" id="customerType" name="customerType" value="${order.customer_type_id!}">
+							<input type="hidden" id="customerTypeCode" name="customerTypeCode" value="${order.typeCode!}">
+							<input type="hidden" id="factor" name="factor" value="${order.factor!}">
+							<input type="text" placeholder="请选择客户类型" class="weui-input" id="customerTypeName" name="customerTypeName" value="${order.customerTypeName!}" readonly>
+							<span class="weui-cell__ft"></span>
+						</div>
+					</div>
+				</section>
+				<section class="weui-panel weui-panel_access delivery-info">
+					<div class="weui-cell weui-cell_access">
+						<div class="weui-cell__bd">
+							配送时间
+							<input type="text" placeholder="请选择配送时间" class="weui-input" data-toggle='date' id="deliveryDate" name="deliveryDate" value="${deliveryDate!}" readonly>
+							<span class="weui-cell__ft"></span>
+						</div>
+					</div>
+				</section>
+				<section class="weui-panel weui-panel_access ft14">
+					<div class="weui-cell weui-cell_access">
+						<div class="weui-cell__bd">
+							<div>
+								<input type="checkbox" name="receiveType" value="0"> 是否账期
+							</div>
+						</div>
+					</div>
+				</section>
+				<section class="weui-panel weui-panel_access ft14 remark">
+					<div class="weui-cell weui-cell_access">
+						<div class="weui-cell__bd">
+							<textarea name="remark" placeholder="备注说明（70字以内）"></textarea>
+						</div>
+					</div>
+				</section>
+				<div class="weui-cells__title black">商品明细</div>
+				<div id="productList">
+					<div class="weui-panel weui-panel_access goods-detail common" style="display: none">
+						<input type="hidden" name="sellProductId" id="sellProductId" value="">
+						<input type="hidden" name="productId" id="productId" value="">
+						<input type="hidden" name="convert" id="convert" value="">
+						<div class="product_name" id="productName">
+							35度中国劲酒_125ml_1*24
+			<!-- 				<span class="gift-tag">赠品</span> -->
+						</div>
+						<div class="product_unit">
+							规格：<span id="valueName">125ml</span>
+						</div>
+						<div class="product_bUnit">
+							<span class="price" id="bigPriceSpan">￥725</span>
+							<span class="unit" id="bigUnitSpan">&nbsp;/&nbsp;件</span>
+							<div class="spinner">
+								<input type="number" min="0" value="0" class="fl" id="bigNum" name="bigNum" readonly>
+							</div>
+							<input type="number" class="street-value"  id="bigPrice" value="720" name="bigPrice" readonly>
+						</div>
+						<div class="product_mUnit">
+							<span class="price" id="smallPriceSpan">￥30</span>
+							<span class="unit" id="smallUnitSpan">&nbsp;/&nbsp;瓶</span>
+							<div class="spinner">
+								<input type="number" min="0" value="0" class="fl" id="smallNum" name="smallNum" readonly>
+							</div>
+							<input type="number" class="street-value" value="30" id="smallPrice" name="smallPrice" readonly>
+						</div>
+						<input type="hidden" id="rowTotal" name="rowTotal" value="">
+						<hr />
+						<div class="gift" id="gift">
+							<input type="hidden" name="giftSellProductId" id="giftSellProductId" value="">
+							<input type="hidden" name="giftProductId" id="giftProductId" value="">
+							<input type="hidden" name="giftConvert" id="giftConvert" value="">
+							<input type="hidden" name="giftBigPrice" id="giftBigPrice" value="" >
+							<div>
+								<input type="checkbox" name="add-gift" id="addGift" disabled>
+								<span>赠品</span>
+							</div>
+							<div style="display:none" class="select-area">
+								<div class="goods">
+									<span>商品</span>
+									<input type="text" class="choose-good weui-input" placeholder="选择商品" id="giftProduct" readonly>
+									<i class="icon-sort-desc"></i>
+									<input type="checkbox" name="default-goods" id="isDefault" disabled>
+									<span>默认商品</span>
 								</div>
-								<input type="hidden" name="giftUnit" id="giftUnit">
-								<input type="text" class="choose-unit weui-input" placeholder="单位" name="giftUnitName" id="giftUnitName" readonly>
-								<i class="icon-sort-desc"></i>
+								<div class="number">
+									<span>数量</span>
+									<div class="spinner">
+										<div class="operate fl">
+											<i class="icon-minus2"></i>
+										</div>
+										<input type="number" min="0" value="0" class="fl" name="giftNum" id="giftNum" readonly>
+										<div class="operate fl">
+											<i class="icon-plus2"></i>
+										</div>
+									</div>
+									<input type="hidden" name="giftUnit" id="giftUnit">
+									<input type="text" class="choose-unit weui-input" placeholder="单位" name="giftUnitName" id="giftUnitName" readonly>
+									<i class="icon-sort-desc"></i>
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>
-				<div class="weui-panel weui-panel_access goods-detail composition" style="display: none">
-					<input type="hidden" id="compositionId" name="compositionId" value="">
-					<div class="product_name" id="compositionName">
-						35度中国劲酒_125ml_1*24
-					</div>
-					<div class="product_bUnit">
-						<span class="price" id="compositionPriceSpan">￥725</span>
-						<div class="spinner">
-							<input type="number" min="0" value="0" class="fl" id="compositionNum" name="compositionNum" readonly>
+					<div class="weui-panel weui-panel_access goods-detail composition" style="display: none">
+						<input type="hidden" id="compositionId" name="compositionId" value="">
+						<div class="product_name" id="compositionName">
+							35度中国劲酒_125ml_1*24
 						</div>
-						<input type="number" class="street-value"  id="compositionPrice" value="720" name="compositionPrice" readonly>
-					</div>
+						<div class="product_bUnit">
+							<span class="price" id="compositionPriceSpan">￥725</span>
+							<div class="spinner">
+								<input type="number" min="0" value="0" class="fl" id="compositionNum" name="compositionNum" readonly>
+							</div>
+							<input type="number" class="street-value"  id="compositionPrice" value="720" name="compositionPrice" readonly>
+						</div>
 
-					<input type="hidden" id="rowTotal" name="rowTotal" value="">
+						<input type="hidden" id="rowTotal" name="rowTotal" value="">
+					</div>
 				</div>
+				<input type="hidden" id="total" name="total" value="">
+			</main>
+			<div class="hidden-menu">
+				<ul>
+					<li>
+						<a href="${CPATH}/product/index">
+								首页
+							<i class="icon-home blue"></i>
+						</a>
+					</li>
+					<li>
+						<a class="goback">
+								上一页
+							<i class="icon-undo green"></i>
+						</a>
+					</li>
+				</ul>
+				<i class="icon-menu-open orange fr" id="button"></i>
 			</div>
-			<input type="hidden" id="total" name="total" value="">
-		</main>
-		<div class="hidden-menu">
-			<ul>
-				<li>
-					<a href="${CPATH}/product/index">
-							首页
-						<i class="icon-home blue"></i>
-					</a>
-				</li>
-				<li>
-					<a class="goback">
-							上一页
-						<i class="icon-undo green"></i>
-					</a>
-				</li>
-			</ul>
-			<i class="icon-menu-open orange fr" id="button"></i>
-		</div>
-		<div class="layer"></div>
-		<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
-			<p class="total bg-gray weui-flex__item" id="totalNum">共2款，总数10件&nbsp;总额：2600元</p>
-			<button onclick="doSubmit()" type="button" id="placeOrder" class="place-order bg-blue white">提交订单</button>
-		</footer>
-	</form>
+			<div class="layer"></div>
+			<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
+				<p class="total bg-gray weui-flex__item" id="totalNum">共2款，总数10件&nbsp;总额：2600元</p>
+				<button onclick="doSubmit()" type="button" id="placeOrder" class="place-order red-button">提交订单</button>
+			</footer>
+		</form>
+	</div>
 </body>
 </@layout>

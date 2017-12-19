@@ -891,13 +891,35 @@ public class SalesOrderQuery extends JBaseQuery {
 		return Db.find(fromBuilder.toString());
 	}
 	
-	//统计今日订单
-	public long queryCountToDayOrders(String userId,String dataArea) {
-		StringBuilder fromBuilder = new StringBuilder(" select count(cso.order_sn) from cc_sales_order cso inner join `user` u on u.id = cso.biz_user_id ");
+	//统计今日订单量 销售额
+	public Record queryCountToDayOrders(String userId,String dataArea) {
+		StringBuilder fromBuilder = new StringBuilder(" select count(cso.order_sn) count_order,sum(cso.total_amount) sum_amount from cc_sales_order cso inner join `user` u on u.id = cso.biz_user_id ");
 		fromBuilder.append("where DATE_FORMAT(cso.create_date, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d') ");
-		//fromBuilder.append("and cso.biz_user_id <> '"+userId+"' ");
 		fromBuilder.append("and u.data_area like '"+dataArea+"' ");
-		return Db.queryLong(fromBuilder.toString());
+		return Db.findFirst(fromBuilder.toString());
+	}
+	
+	//统计业务员当日 当月 销售额排行(前5)
+	public List<Record> querysalesManAmountBy(String selDataArea,String by,String desc){
+		StringBuilder fromBuilder = new StringBuilder("select cso.biz_user_id,u.realname title,sum(cso.total_amount) sumamount ");
+		fromBuilder.append("from cc_sales_order cso inner join `user` u on u.id = cso.biz_user_id ");
+		if(by.equals("day")) {
+			fromBuilder.append("where DATE_FORMAT(cso.create_date, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d') ");
+		}else if(by.equals("month")) {
+			fromBuilder.append("where cso.create_date like CONCAT(DATE_FORMAT(NOW(),'%Y-%m'),'%') ");
+		}
+		fromBuilder.append("and cso.data_area like '"+selDataArea+"%' ");
+		fromBuilder.append(" GROUP BY cso.biz_user_id ORDER BY sumamount ");
+		fromBuilder.append(desc+" limit 0,5 ");
+		return Db.find(fromBuilder.toString());
+	}
+
+	public Long findTotalOrdersCountByDataArea(String dataArea) {
+		StringBuilder sql = new StringBuilder("SELECT COUNT(o.id) ");
+		sql.append("FROM `cc_sales_order` o ");
+		sql.append("JOIN cc_seller_customer c on o.customer_id = c.id ");
+		sql.append("WHERE c.customer_kind = '100401' AND o.data_area like ?");
+		return Db.queryLong(sql.toString(), dataArea);
 	}
 	
 	public Record getMyOrderAmount(String startDate, String endDate, String dayTag, String customerType,
@@ -1195,4 +1217,54 @@ public class SalesOrderQuery extends JBaseQuery {
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}	
 
+	//商品销售排行 当日or汇总
+	public List<Record> queryGoodsSales(String selDataArea,boolean toDay,String desc){
+		StringBuilder fromBuilder = new StringBuilder("select cg.id goodid,cg.`name` title,sum(csod.product_count) countgoods,sum(csod.product_amount) sumamount ");
+		fromBuilder.append("from cc_sales_order_detail csod inner join cc_seller_product csp on csod.sell_product_id = csp.id ");
+		fromBuilder.append("left join cc_product cp on csp.product_id = cp.id left join cc_goods cg on cp.goods_id = cg.id ");
+		fromBuilder.append("where csod.data_area like '"+selDataArea+"' ");
+		if(toDay) {
+			fromBuilder.append("and DATE_FORMAT(csod.create_date, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d') ");
+		}
+		fromBuilder.append("group by cg.id order by sumamount ");
+		fromBuilder.append(desc+" limit 0,5 ");
+		return Db.find(fromBuilder.toString());
+	}
+	
+	//直营商销售排行 当日/当月
+	public List<Record> querySellerSales(String selDataArea,String by,String desc){
+		StringBuilder fromBuilder = new StringBuilder("select cso.seller_id,cs.seller_name title,sum(cso.total_amount) sumamount ");
+		fromBuilder.append("from cc_sales_order cso inner join cc_seller cs on cso.seller_id = cs.id ");
+		fromBuilder.append("where cso.data_area like '"+selDataArea+"' ");
+		if(by.equals("day")) {
+			fromBuilder.append("and DATE_FORMAT(cso.create_date, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d') ");
+		}else if(by.equals("month")) {
+			fromBuilder.append("and cso.create_date like CONCAT(DATE_FORMAT(NOW(),'%Y-%m'),'%') ");
+		}
+		fromBuilder.append("and cs.seller_type = 1 ");
+		fromBuilder.append("group by cso.seller_id order by sumamount ");
+		fromBuilder.append(desc+" limit 0,5 ");
+		return Db.find(fromBuilder.toString());
+	}
+	
+	//销售额 周/月/季度 统计
+	public List<Record> queryAmountBy(String selDataArea,String by){
+		StringBuilder fromBuilder = new StringBuilder("");
+		if(by.equals("weeks")) {
+			fromBuilder.append("select DATE_FORMAT(cso.create_date,'%Y-%u') title,sum(cso.total_amount) sumamount from cc_sales_order cso ");
+			fromBuilder.append("where cso.data_area like '"+selDataArea+"' ");
+			fromBuilder.append("GROUP BY title ");
+		}
+		if(by.equals("months")) {
+			fromBuilder.append("select DATE_FORMAT(cso.create_date,'%Y-%m') title,sum(cso.total_amount) sumamount from cc_sales_order cso ");
+			fromBuilder.append("where cso.data_area like '"+selDataArea+"' ");
+			fromBuilder.append("GROUP BY title ");
+		}
+		if(by.equals("quarter")) {
+			fromBuilder.append("select CONCAT(YEAR(cso.create_date),'-',quarter(cso.create_date)) `title`,sum(cso.total_amount) sumamount from cc_sales_order cso  ");
+			fromBuilder.append("where cso.data_area like '"+selDataArea+"' ");
+			fromBuilder.append("GROUP BY `title`");
+		}
+		return Db.find(fromBuilder.toString());
+	}
 }

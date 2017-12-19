@@ -97,7 +97,7 @@ public class _StationController extends JBaseCRUDController<Station> {
         Station station = getModel(Station.class);
         User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
         station.setDeptId(user.getDepartmentId());
-        station.setDataArea(DataAreaUtil.getUserDeptDataArea(user.getDataArea()));
+        station.setDataArea(DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea()));
         if (StringUtils.isBlank(station.getId())) {
         	station.setIsParent(0);
         }

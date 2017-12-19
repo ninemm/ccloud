@@ -236,7 +236,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				String sellerCustomerId = StrKit.getRandomUUID();
 				sellerCustomer.set("id", sellerCustomerId);
 				if(user.getUsername().equals("admin")){
-					Department department2 = DepartmentQuery.me().findByDataArea(DataAreaUtil.getUserDealerDataArea(department.getDataArea()));
+					Department department2 = DepartmentQuery.me().findByDataArea(DataAreaUtil.getDealerDataAreaByCurUserDataArea(department.getDataArea()));
 					Seller sl = SellerQuery.me().findByDeptId(department2.getId());
 					if(sl==null){
 						renderAjaxResultForError("该公司部门"+department2.getDeptName()+"没有一个经销商，请先创建！");
@@ -262,12 +262,12 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				//添加用户客户中间表
 				userJoinCustomer.set("seller_customer_id", sellerCustomerId);
 				userJoinCustomer.set("user_id", user.getId());
-				userJoinCustomer.set("data_area",DataAreaUtil.getUserDealerDataArea(department.getDataArea()));
+				userJoinCustomer.set("data_area",DataAreaUtil.getDealerDataAreaByCurUserDataArea(department.getDataArea()));
 				userJoinCustomer.set("dept_id", department.getId());
 				userJoinCustomer.save();
 				
 				String code = "G";
-				CustomerType customerType = CustomerTypeQuery.me().findDataAreaAndName(DataAreaUtil.getUserDeptDataArea(user.getDataArea()),code);
+				CustomerType customerType = CustomerTypeQuery.me().findDataAreaAndName(DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea()),code);
 				if(customerType!=null){
 					CustomerJoinCustomerType customerJoinCustomerType = new CustomerJoinCustomerType();
 					customerJoinCustomerType.setSellerCustomerId(sellerCustomerId);
@@ -278,7 +278,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				//初始化直营商产品
 				List<SellerProduct> sellerProducts = new ArrayList<SellerProduct>();
 				if(user.getUsername().equals("admin")){
-					Department department2 = DepartmentQuery.me().findByDataArea(DataAreaUtil.getUserDealerDataArea(department.getDataArea()));
+					Department department2 = DepartmentQuery.me().findByDataArea(DataAreaUtil.getDealerDataAreaByCurUserDataArea(department.getDataArea()));
 					Seller sl = SellerQuery.me().findByDeptId(department2.getId());
 					sellerProducts = SellerProductQuery.me().findBySellerIdAndIsEnable(sl.getId());
 				}else{

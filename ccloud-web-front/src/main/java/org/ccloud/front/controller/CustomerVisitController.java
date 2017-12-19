@@ -77,7 +77,7 @@ public class CustomerVisitController extends BaseFrontController {
 		all.put("title", "全部");
 		all.put("value", "");
 
-		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(DataAreaUtil.getUserDealerDataArea(selectDataArea));
+		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(DataAreaUtil.getDealerDataAreaByCurUserDataArea(selectDataArea));
 		List<Map<String, Object>> customerTypeList2 = new ArrayList<>();
 		customerTypeList2.add(all);
 
@@ -180,7 +180,7 @@ public class CustomerVisitController extends BaseFrontController {
 			return ;
 		}
 		
-		String dataArea = DataAreaUtil.getUserDealerDataArea(selectDataArea) + "%";
+		String dataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(selectDataArea) + "%";
 		List<String> typeList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeNameListBySellerCustomerId(customerVisit.getSellerCustomerId(), dataArea);
 
 		setAttr("customerVisit", customerVisit);
@@ -213,7 +213,7 @@ public class CustomerVisitController extends BaseFrontController {
 		customerTypes.add(all);
 
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
-				.findByDataArea(DataAreaUtil.getUserDealerDataArea(user.getDataArea()));
+				.findByDataArea(DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea()));
 		for (CustomerType customerType : customerTypeList) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", customerType.getName());

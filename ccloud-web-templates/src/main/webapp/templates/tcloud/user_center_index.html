@@ -38,12 +38,12 @@ $(function() {
 			<div class="weui-flex">
 			<div class="weui-flex__item">
 				<h4>订单数</h4>
-				<p>2500</p>
+				<p${totalOrderCount!0}</p>
 			</div>
 			<div class="weui-flex__item"></div>
 			<div class="weui-flex__item">
 				<h4>客户数</h4>
-				<p>100</p>
+				<p>${totalCustomerCount!0}</p>
 			</div>
 			</div>
 		</div>
@@ -157,19 +157,19 @@ $(function() {
 		</div>
 		<div class="weui-cells__title">售后服务</div>
 		<div class="weui-grids">
-			<a href="javascript:void(0);" id="service_btn" class="weui-grid js_grid">
+			<a href="tel:027-8812" id="service_btn" class="weui-grid js_grid">
 				<div class="weui-grid__icon">
 					<i class="icon-phone-square" style="color: #9c89b9"></i>
 				</div>
 				<p class="weui-grid__label">服务热线</p>
 			</a>
-			<a href="${CPATH}/report/userRank" id="service_btn" class="weui-grid js_grid">
+			<a href="${CPATH}/report/userRank" class="weui-grid js_grid">
 				<div class="weui-grid__icon">
 					<i class="icon-phone-square" style="color: #9c89b9"></i>
 				</div>
 				<p class="weui-grid__label">排行榜</p>
 			</a>
-			<a href="${CPATH}/report/managerReport" id="service_btn" class="weui-grid js_grid">
+			<a href="${CPATH}/report/managerReport" class="weui-grid js_grid">
 				<div class="weui-grid__icon">
 					<i class="icon-phone-square" style="color: #9c89b9"></i>
 				</div>

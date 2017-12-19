@@ -117,7 +117,7 @@ public class ReportController extends BaseFrontController {
 		customerTypes.add(all);
 
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
-				.findByDataArea(DataAreaUtil.getUserDealerDataArea(user.getDataArea()));
+				.findByDataArea(DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea()));
 		for (CustomerType customerType : customerTypeList) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", customerType.getName());
@@ -165,7 +165,7 @@ public class ReportController extends BaseFrontController {
 		String dayTag = getPara("dayTag");
 		String sellerId = getSessionAttr("sellerId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String dataArea = DataAreaUtil.getUserDealerDataArea(user.getDataArea());
+		String dataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea());
 		String deptId = getPara("deptId");
 		List<Record> record = SalesOrderQuery.me().getUserRank(startDate, endDate, dayTag, deptId, sellerId, dataArea);
 		renderJson(record);
