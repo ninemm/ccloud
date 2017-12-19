@@ -118,6 +118,7 @@
 	<#if id??>
 	<header class="t-c">${(name)!}</header>
 	</#if>
+    <#if !id??>
 	<header>
 	    <div class="head-search select-area">
 	        <div class="weui-flex">
@@ -135,7 +136,8 @@
                 </div>
             </div>
 	    </div>
-	</header> 
+	</header>
+    </#if>
 	<main id="visitList" class="infinite">
 	    <#if visitList??>
 	        <#list visitList.list as visit>

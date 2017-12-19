@@ -166,8 +166,8 @@ public class UserController extends BaseFrontController {
 		
 		Long totalOrderCount = SalesOrderQuery.me().findTotalOrdersCountByDataArea(dataArea);
 		Long totalCustomerCount = SellerCustomerQuery.me().findTotalCountByDataArea(dataArea);
-		setAttr("totalOrderCount", totalOrderCount);
-		setAttr("totalCustomerCount", totalCustomerCount);
+		setAttr("totalOrderCount", totalOrderCount.intValue());
+		setAttr("totalCustomerCount", totalCustomerCount.intValue());
 		
 		render(String.format("user_center_%s.html", action));
 	}

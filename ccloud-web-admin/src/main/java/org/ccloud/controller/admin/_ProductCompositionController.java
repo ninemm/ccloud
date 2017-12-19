@@ -264,12 +264,14 @@ public class _ProductCompositionController extends JBaseCRUDController<ProductCo
 
 			String sellProductId = record.getStr("id");
 			String customName = record.getStr("name");
+			String storeCount = record.getStr("store_count");
 
 			productInfoMap.put(sellProductId, record);
 
 			productOptionMap.put("id", sellProductId);
 			productOptionMap.put("text", customName);
-
+			productOptionMap.put("store", storeCount);
+			
 			productOptionList.add(productOptionMap);
 		}
 

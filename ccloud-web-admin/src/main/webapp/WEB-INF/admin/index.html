@@ -87,12 +87,12 @@ $(function(){
     var directChart = echarts.init(document.getElementById('directViewByD'));
     viewCreate('直营商当日销售额排行',directChart,directToDay);
 
-    //销售额走势
-    var amountCollectData = ${amountCollect!};
+    //销售额走势(暂时隐藏)
+    /*var amountCollectData = ${amountCollect!};
     var amountToMonths = amountCollectData.amount_months;
     var amountChart = echarts.init(document.getElementById('salesChart'));
     //销售额走势(月统计)
-    lineChartCreate('',amountChart,amountToMonths);
+    lineChartCreate('',amountChart,amountToMonths);*/
 });
 
 $('li[name="salesViewByD"]').on("click",function(){
@@ -155,6 +155,36 @@ $("#goodsByA").on("click",function(){
 
 });
 
+$("#directByD").on("click",function(){
+    var directData = ${directAmount!};
+    var directToDay = directData.directs_day;
+    $("#directViewByD").width($("#directViewByD").parent().width());
+    var directToDayChart = echarts.init(document.getElementById('directViewByD'));
+    var directToMonthsChart = echarts.getInstanceByDom(document.getElementById('directViewByM'));
+
+    $("#directViewByD").css("display","block");
+    $("#directViewByM").css("display","none");
+    directToMonthsChart.clear();
+    directToMonthsChart.dispose();
+
+    viewCreate('销售额汇总排行',directToDayChart,directToDay);
+});
+
+$("#directByM").on("click",function(){
+    var directData = ${directAmount!};
+    var directToMonths = directData.directs_month;
+    $("#directViewByM").width($("#directViewByM").parent().width());
+    var directToDayChart = echarts.getInstanceByDom(document.getElementById('directViewByD'));
+    var directToMonthsChart = echarts.init(document.getElementById('directViewByM'));
+
+    $("#directViewByM").css("display","block");
+    $("#directViewByD").css("display","none");
+    directToDayChart.clear();
+    directToDayChart.dispose();
+
+    viewCreate('商品销售额汇总排行',directToMonthsChart,directToMonths);
+});
+
 function viewCreate(title,myChart,viewData){
     var yTitle = [],xData = [];
     for(var i =0;i<viewData.length;i++){
@@ -203,6 +233,7 @@ function barGraphOptions(title,yTitle,data){
         series: [
             {
                 type: 'bar',
+                barWidth : 30,
                 data: data
             }
         ]
@@ -470,8 +501,8 @@ function lineChartOptions(viewTitle,xTitle,yData){
         <section class="col-lg-6 connectedSortable">
             <div class="nav-tabs-custom">
                 <ul class="nav nav-tabs pull-right">
-                    <li class="active"><a href="#revenue-chart" data-toggle="tab">今日</a></li>
-                    <li><a href="#sales-chart" data-toggle="tab">当月</a></li>
+                    <li class="active" id="directByD"><a href="#revenue-chart" data-toggle="tab">今日</a></li>
+                    <li id="directByM"><a href="#sales-chart" data-toggle="tab">当月</a></li>
                     <!-- <li><a href="#sales-chart" data-toggle="tab">本月</a></li> -->
                     <li class="pull-left header"><i class="fa fa-list-ol"></i> 直营商销售排行</li>
                 </ul>

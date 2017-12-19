@@ -93,6 +93,7 @@ $(function() {
 
 <@layout>
 <body id="order">
+	<div class="weui-content">
 		<main>
 			<section class="weui-panel weui-panel_access order-customer-info">
 				<div class="weui-cell weui-cell_access">
@@ -167,125 +168,108 @@ $(function() {
 				</div>
 			</section>
 			<form action="${CPATH}/refund/refundGood" method="post" id="form">
-			<input type="hidden" name="outStockId" id="outStockId" value="${(outstock.id)!}">
-			<div class="weui-cells__title black">商品明细</div>
-			<div id="productList">
-				<#list salesOutstockDetail as list>
-				<div class="weui-panel weui-panel_access goods-detail">
-					<input type="hidden" name="sellProductId" id="sellProductId" value="${(list.sell_product_id)!}">
-					<input type="hidden" id="productCount" value="${(list.product_count-list.refundCount)!}">
-					<input type="hidden" id="convert" value="${(list.convert_relate)!}">
-					<div class="product_name" id="productName">
-						${(list.custom_name)!} 
-					</div>
-					<div class="product_unit">
-						规格：<span id="valueName">${(list.valueName)!}</span>
-					</div>
-					<div class="product_bUnit">
-						<span class="price" id="bigPriceSpan">￥${(list.product_price)!}</span>
-						<span class="unit" id="bigUnitSpan">&nbsp;/&nbsp;${(list.big_unit)!}</span>
-						<#if list.is_composite == 0>
-						<div class="spinner">
-				          <div class="operate fl">
-				            <i class="icon-minus2"></i>
-				          </div>
-				        		<input name="bNum" type="number" class="fl" value="${((list.product_count-list.refundCount)/list.convert_relate)?int}" id="bNum">
-				          <div class="operate fl">
-				            <i class="icon-plus2"></i>
-				          </div>				        		
+				<input type="hidden" name="outStockId" id="outStockId" value="${(outstock.id)!}">
+				<div class="weui-cells__title black">商品明细</div>
+				<div id="productList">
+					<#list salesOutstockDetail as list>
+					<div class="weui-panel weui-panel_access goods-detail">
+						<input type="hidden" name="sellProductId" id="sellProductId" value="${(list.sell_product_id)!}">
+						<input type="hidden" id="productCount" value="${(list.product_count-list.refundCount)!}">
+						<input type="hidden" id="convert" value="${(list.convert_relate)!}">
+						<div class="product_name" id="productName">
+							${(list.custom_name)!} 
 						</div>
-						<#else>
-						<div class="spinner">
-				        	<input name="bNum" type="number" class="fl bo" value="${((list.product_count-list.refundCount)/list.convert_relate)?int}" id="bNum" readonly>
-				        </div>	
-						</#if> 
-					</div>
-					<div class="product_mUnit">
-						<span class="price" id="smallPriceSpan">￥${((list.product_price/list.convert_relate)!)?string("0.##")}</span>
-						<span class="unit" id="smallUnitSpan">&nbsp;/&nbsp;${(list.small_unit)!}</span>
-						<#if list.is_composite == 0>
-						<div class="spinner">
-				          <div class="operate fl">
-				            <i class="icon-minus2"></i>
-				          </div>
-				        		<input name="sNum" type="number" class="fl" value="${((list.product_count-list.refundCount) % list.convert_relate)!0}" id="sNum">
-				          <div class="operate fl">
-				            <i class="icon-plus2"></i>
-				          </div>
+						<div class="product_unit">
+							规格：<span id="valueName">${(list.valueName)!}</span>
 						</div>
-						<#else>
-						<div class="spinner">
-				        		<input name="sNum" type="number" class="fl bo" value="${((list.product_count-list.refundCount) % list.convert_relate)!0}" id="sNum" readonly>
-						</div>							
-						</#if>
-					</div>
-					<hr />
-					<div class="gift" id="gift">
-						<div>
-							<input type="checkbox" name="add-gift" id="addGift" <#if list.is_gift == 1>checked</#if> disabled>
-							<span>赠品</span>
+						<div class="product_bUnit">
+							<span class="price" id="bigPriceSpan">￥${(list.product_price)!}</span>
+							<span class="unit" id="bigUnitSpan">&nbsp;/&nbsp;${(list.big_unit)!}</span>
+							<#if list.is_composite == 0>
+							<div class="spinner">
+							<div class="operate fl">
+								<i class="icon-minus2"></i>
+							</div>
+									<input name="bNum" type="number" class="fl" value="${((list.product_count-list.refundCount)/list.convert_relate)?int}" id="bNum">
+							<div class="operate fl">
+								<i class="icon-plus2"></i>
+							</div>				        		
+							</div>
+							<#else>
+							<div class="spinner">
+								<input name="bNum" type="number" class="fl bo" value="${((list.product_count-list.refundCount)/list.convert_relate)?int}" id="bNum" readonly>
+							</div>	
+							</#if> 
+						</div>
+						<div class="product_mUnit">
+							<span class="price" id="smallPriceSpan">￥${((list.product_price/list.convert_relate)!)?string("0.##")}</span>
+							<span class="unit" id="smallUnitSpan">&nbsp;/&nbsp;${(list.small_unit)!}</span>
+							<#if list.is_composite == 0>
+							<div class="spinner">
+							<div class="operate fl">
+								<i class="icon-minus2"></i>
+							</div>
+									<input name="sNum" type="number" class="fl" value="${((list.product_count-list.refundCount) % list.convert_relate)!0}" id="sNum">
+							<div class="operate fl">
+								<i class="icon-plus2"></i>
+							</div>
+							</div>
+							<#else>
+							<div class="spinner">
+									<input name="sNum" type="number" class="fl bo" value="${((list.product_count-list.refundCount) % list.convert_relate)!0}" id="sNum" readonly>
+							</div>							
+							</#if>
+						</div>
+						<hr />
+						<div class="gift" id="gift">
+							<div>
+								<input type="checkbox" name="add-gift" id="addGift" <#if list.is_gift == 1>checked</#if> disabled>
+								<span>赠品</span>
+							</div>
 						</div>
 					</div>
+					</#list>
 				</div>
-				</#list>
-			</div>
-			<div class="weui-cells__title black">已退货明细</div>
-			<div id="productList">
-				<#list salesRefundDetail as list>
-				<div class="weui-panel weui-panel_access goods-detail">
-					<div class="product_name" id="productName">
-						${(list.custom_name)!} 
-					</div>
-					<div class="product_unit">
-						规格：<span id="valueName">${(list.valueName)!}</span>
-					</div>
-					<div class="product_bUnit">
-						<span class="price" id="bigPriceSpan">￥${(list.product_price)!}</span>
-						<span class="unit" id="bigUnitSpan">&nbsp;/&nbsp;${(list.big_unit)!}</span>
-						<div class="spinner">
-			        		<input type="number" min="0" class="fl" id="bigNum" value="${(list.reject_product_count/list.convert_relate)?int}" disable>
+				<div class="weui-cells__title black">已退货明细</div>
+				<div id="productList">
+					<#list salesRefundDetail as list>
+					<div class="weui-panel weui-panel_access goods-detail">
+						<div class="product_name" id="productName">
+							${(list.custom_name)!} 
+						</div>
+						<div class="product_unit">
+							规格：<span id="valueName">${(list.valueName)!}</span>
+						</div>
+						<div class="product_bUnit">
+							<span class="price" id="bigPriceSpan">￥${(list.product_price)!}</span>
+							<span class="unit" id="bigUnitSpan">&nbsp;/&nbsp;${(list.big_unit)!}</span>
+							<div class="spinner">
+								<input type="number" min="0" class="fl" id="bigNum" value="${(list.reject_product_count/list.convert_relate)?int}" disable>
+							</div>
+						</div>
+						<div class="product_mUnit">
+							<span class="price" id="smallPriceSpan">￥${((list.product_price/list.convert_relate)!)?string("0.##")}</span>
+							<span class="unit" id="smallUnitSpan">&nbsp;/&nbsp;${(list.small_unit)!}</span>
+							<div class="spinner">
+								<input type="number" min="0" class="fl" id="smallNum" value="${(list.reject_product_count % list.convert_relate)!0}" disable>
+							</div>
+						</div>
+						<hr />
+						<div class="gift" id="gift">
+							<div>
+								<input type="checkbox" name="add-gift" id="addGift" <#if list.is_gift == 1>checked</#if> disabled>
+								<span>赠品</span>
+							</div>
 						</div>
 					</div>
-					<div class="product_mUnit">
-						<span class="price" id="smallPriceSpan">￥${((list.product_price/list.convert_relate)!)?string("0.##")}</span>
-						<span class="unit" id="smallUnitSpan">&nbsp;/&nbsp;${(list.small_unit)!}</span>
-						<div class="spinner">
-				        	<input type="number" min="0" class="fl" id="smallNum" value="${(list.reject_product_count % list.convert_relate)!0}" disable>
-						</div>
-					</div>
-					<hr />
-					<div class="gift" id="gift">
-						<div>
-							<input type="checkbox" name="add-gift" id="addGift" <#if list.is_gift == 1>checked</#if> disabled>
-							<span>赠品</span>
-						</div>
-					</div>
+					</#list>
 				</div>
-				</#list>
-			</div>			
+			</form>			
 		</main>
-		<div class="hidden-menu">
-			<ul>
-				<li>
-					<a href="${CPATH}/product/index">
-							首页
-						<i class="icon-home blue"></i>
-					</a>
-				</li>
-				<li>
-					<a class="goback">
-							上一页
-						<i class="icon-undo green"></i>
-					</a>
-				</li>
-			</ul>
-			<i class="icon-menu-open orange fr" id="button"></i>
-		</div>
-		<div class="layer"></div>
-	</form>
-	<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
-		<p class="total bg-gray weui-flex__item" id="totalNum"></p>
-		<button onclick="doSubmit()" class="place-order bg-blue white">提交订单</button>
-	</footer>	
+		<#include "_inc/_goback.html" />
+		<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
+			<button onclick="doSubmit()" class="place-order red-button width-100">提交订单</button>
+		</footer>
+	</div>
 </body>
 </@layout>

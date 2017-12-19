@@ -17,7 +17,39 @@ $(function() {
   }).on("touchend", ".operate:last-child", function () { //增加商品数量
       total();
   }).on('touchend', '#confirm-input', function () {
-	  total();
+      var $productDetail = $currentInput.parent().parent();
+      var convert = $productDetail.find("#convert").val();
+      var id = $currentInput.attr('id');
+ 
+      if(id == 'bigPrice'){
+        var bPrice = parseFloat($productDetail.find("#bigPriceSpan").text().replace("￥", ""));
+        var bigPrice = $currentInput.val();
+		if(bigPrice < bPrice){
+			$currentInput.val(bPrice);
+			toastr.warning('价格不能小于标准价');
+			return;
+		}
+		$productDetail.find("#smallPrice").val((bigPrice/convert).toFixed(2));
+      } else if(id == 'smallPrice'){
+        var sPrice = parseFloat($productDetail.find("#smallPriceSpan").text().replace("￥", ""));
+        var smallPrice = $currentInput.val();
+		if(smallPrice < sPrice){
+			$currentInput.val(sPrice);
+			toastr.warning('价格不能小于标准价');
+			return;
+		}
+		$productDetail.find("#bigPrice").val((smallPrice*convert).toFixed(2));
+      } else if(id == 'compositionPrice'){
+        var cPrice = parseFloat($productDetail.find("#compositionPriceSpan").text().replace("￥", ""));
+        var compositionPrice = $currentInput.val();
+		if(compositionPrice < cPrice){
+			$currentInput.val(cPrice);
+			toastr.warning('价格不能小于标准价');
+			return;
+		}
+      }
+      
+      total();
   });
   
   $main.empty();
@@ -204,6 +236,8 @@ function initProductComposition(){
 		$newProductDetail.find("#compositionId").val(el.compositionId);
 		
 		$newProductDetail.find("#compositionNum").val(el.compositionNum);
+
+		$newProductDetail.find("#compositionValueName").text(el.compositionValueName);
 	});
 }
 
@@ -356,6 +390,8 @@ function save(){
 				compositionId : compositionId,
 
 				compositionNum : compositionNum,
+				
+				compositionValueName : $el.find("#compositionValueName").text()
 			});
 		}
 	});
@@ -382,9 +418,10 @@ function save(){
 					35度中国劲酒_125ml_1*24
 					<!-- <span class="gift-tag">赠品</span> -->
 				</div>
-				<span class="fr"><input type="checkbox" name="isGift" id="isGift" value="1"><span>是否赠品</span></span>
 				<div class="product_unit">
 					规格：<span id="valueName">125ml</span>
+					<span class="fr no-bg">是否赠品</span>
+					<input type="checkbox" name="isGift" id="isGift" value="1" class="fr">
 				</div>
 				<div class="product_bUnit">
 					<span class="price" id="bigPriceSpan">￥725</span>
@@ -457,7 +494,7 @@ function save(){
 					35度中国劲酒_125ml_1*24
 				</div>
 				<div class="product_unit">
-					规格：<span id="valueName">125ml</span>
+					规格：<span id="compositionValueName">125ml</span>
 				</div>
 				<div class="product_bUnit">
 					<span class="price" id="compositionPriceSpan">￥720</span>

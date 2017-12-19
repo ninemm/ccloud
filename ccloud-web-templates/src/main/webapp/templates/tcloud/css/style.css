@@ -71,7 +71,7 @@ button {
 }
 
 a {
-  color: #000;
+  color: #999;
 }
 
 .t-c {
@@ -217,6 +217,10 @@ a {
   border-right: 1px solid #e5e5e5;
 }
 
+.no-bg {
+  background: none!important;
+}
+
 .bg-blue {
   background: #3c8dbc!important;
 }
@@ -295,6 +299,10 @@ a {
 
 .width-40 {
   width: 40%;
+}
+
+.width-60 {
+  width: 60%;
 }
 
 .flex-grow2 {
@@ -1369,6 +1377,7 @@ input[name=sex] {
 #order-detail p {
   height: 1rem;
   line-height: 1rem;
+  padding: .2rem 0;
 }
 
 #order-detail .weui-cell {
@@ -1481,7 +1490,7 @@ input[name=sex] {
   color: #fff;
   font-size: .7rem;
   box-sizing: border-box;
-  padding: 1.5rem 10% 0;
+  padding: 1rem 10% 0;
 }
 
 .user-info .seller {
