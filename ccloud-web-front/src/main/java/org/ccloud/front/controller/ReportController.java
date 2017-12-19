@@ -15,6 +15,7 @@
  */
 package org.ccloud.front.controller;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -51,7 +52,8 @@ public class ReportController extends BaseFrontController {
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String customerType = getPara("customerType");
 		String deptId = getPara("deptId");
-		Record record = SalesOrderQuery.me().getMyOrderAmount(startDate, endDate, dayTag, customerType, deptId, sellerId, dataArea);
+		String userId = getPara("userId");
+		Record record = SalesOrderQuery.me().getMyOrderAmount(startDate, endDate, dayTag, customerType, deptId, sellerId, userId, dataArea);
 		renderJson(record);
 	}
 	
@@ -81,7 +83,9 @@ public class ReportController extends BaseFrontController {
 		String sellerId = getSessionAttr("sellerId");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String productType = getPara("productType");
-		List<Record> record = SalesOrderQuery.me().getMyOrderByProduct(startDate, endDate, dayTag, productType, sellerId, dataArea);
+		String userId = getPara("userId");
+		String isGift = getPara("isGift");
+		List<Record> record = SalesOrderQuery.me().getMyOrderByProduct(startDate, endDate, dayTag, productType, sellerId, userId, isGift, dataArea);
 		renderJson(record);
 	}
 	
@@ -157,7 +161,19 @@ public class ReportController extends BaseFrontController {
 	
 	public void managerReport() {
 		render("manager_report.html");
-	}	
+	}
+	
+	public void userReportDetail() {
+		String userId = getPara("userId");
+		String userName = getPara("userName");
+        try {
+			setAttr("userName", new String(userName.getBytes("ISO-8859-1"),"UTF-8"));
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}		
+		setAttr("userId", userId);
+		render("user_report.html");
+	}
 	
 	public void getUserRank() {
 		String startDate = getPara("startDate");

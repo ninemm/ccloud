@@ -1,6 +1,10 @@
 <#include "_inc/_layout.html"/>
 
-<#macro css> </#macro>
+<#macro css>
+	.wi {
+		width: 7rem !important;
+	}
+</#macro>
 
 <#macro script>
 	$(function() {
@@ -111,7 +115,7 @@
 	<header class="user-box">
 		<div class="user-info">
 			<p class="seller ft16">冠军</p>
-			<p class="name" id="firstName">${(session._logined_user.realname)!}</p>
+			<p class="name" id="firstName"></p>
 		</div>
 		<div class="user-avatar">
 			<img src="${(session._logined_user.avatar)!'${CTPATH}/images/avatar.png'}">
@@ -120,19 +124,19 @@
 			<div class="weui-flex">
 			<div class="weui-flex__item">
 				<h5>订单数</h5>
-				<p id="orderCount">2500</p>
+				<p id="orderCount"></p>
 			</div>
 			<div class="weui-flex__item"></div>
 			<div class="weui-flex__item">
 				<h5>订单金额</h5>
-				<p id="totalAmount">100</p>
+				<p id="totalAmount"></p>
 			</div>
 			</div>
 		</div>
 	</header>
     <div class="weui-panel weui-panel_access">
         <div class="weui-panel__hd">
-            <span class="overview-hd-title">销售排行(top10)</span>
+            <span class="overview-hd-title wi">销售排行(top10)</span>
             <span class="briefly" onclick="dayTagSelect(this)">
 				<p class="dayTagText">今日</p>
 			</span> 
@@ -144,7 +148,7 @@
     </div>
     <div class="weui-panel weui-panel_access">
         <div class="weui-panel__hd">
-            <span class="overview-hd-title">销售末排行(last5)</span>
+            <span class="overview-hd-title wi">销售末排行(last5)</span>
         </div>
         <div class="weui-panel__bd">
             <div class="weui-media-box ft14" id="userRankDesc">

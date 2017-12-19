@@ -71,7 +71,7 @@ button {
 }
 
 a {
-  color: #000;
+  color: #999;
 }
 
 .t-c {
@@ -1125,6 +1125,11 @@ input.street-value {
   left: 3.2rem;
 }
 
+#customerName {
+    font-size: .8rem;
+    margin: .5rem 0;
+}
+
 .remark .weui-cell__bd {
   height: auto!important;
 }
@@ -1369,6 +1374,7 @@ input[name=sex] {
 #order-detail p {
   height: 1rem;
   line-height: 1rem;
+  padding: .2rem 0;
 }
 
 #order-detail .weui-cell {
@@ -1481,7 +1487,7 @@ input[name=sex] {
   color: #fff;
   font-size: .7rem;
   box-sizing: border-box;
-  padding: 1.5rem 10% 0;
+  padding: 1rem 10% 0;
 }
 
 .user-info .seller {

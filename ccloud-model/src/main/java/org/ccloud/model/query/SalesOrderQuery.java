@@ -72,8 +72,12 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append("left join cc_customer c on cc.customer_id = c.id ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
-
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.order_sn", keyword, params, needWhere);
+		String regex = "^[a-zA-Z][a-zA-Z0-9]*$";
+		if(keyword.matches(regex)){
+			needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.order_sn", keyword, params, needWhere);
+		}else{
+			needWhere = appendIfNotEmptyWithLike(fromBuilder, "c.customer_name", keyword, params, needWhere);
+		}
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
 
@@ -146,7 +150,7 @@ public class SalesOrderQuery extends JBaseQuery {
 				"LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
 		fromBuilder.append(
 				"RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = sg.product_id ");
-		fromBuilder.append("WHERE sg.is_enable = 1 ");
+		fromBuilder.append("WHERE sg.is_enable = 1 and sg.is_gift = 0");
 
 		LinkedList<Object> params = new LinkedList<Object>();
 		appendIfNotEmpty(fromBuilder, "sg.seller_id", sellerId, params, false);
@@ -918,12 +922,12 @@ public class SalesOrderQuery extends JBaseQuery {
 		StringBuilder sql = new StringBuilder("SELECT COUNT(o.id) ");
 		sql.append("FROM `cc_sales_order` o ");
 		sql.append("JOIN cc_seller_customer c on o.customer_id = c.id ");
-		sql.append("WHERE c.customer_kind = '100401' AND o.data_area like ?");
+		sql.append("WHERE c.customer_kind = '100401' AND o.`status` in (2000, 3000) AND o.data_area like ?");
 		return Db.queryLong(sql.toString(), dataArea);
-	}
+	}	
 	
 	public Record getMyOrderAmount(String startDate, String endDate, String dayTag, String customerType,
-			String deptId, String sellerId, String dataArea) {
+			String deptId, String sellerId, String userId, String dataArea) {
 		if (dayTag != null) {
 			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
 			startDate = date[0];
@@ -940,6 +944,7 @@ public class SalesOrderQuery extends JBaseQuery {
 			needWhere = appendIfNotEmptyWithLike(fromBuilder, " cc.data_area", dataArea, params, needWhere);
 		}
 		needWhere = appendIfNotEmpty(fromBuilder, " cc.seller_id", sellerId, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "cc.biz_user_id", userId, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "cc.customer_type_id", customerType, params, needWhere);
 		
 		if (needWhere) {
@@ -1050,8 +1055,8 @@ public class SalesOrderQuery extends JBaseQuery {
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}
 
-	public List<Record> getMyOrderByProduct(String startDate, String endDate, String dayTag, String productType, String sellerId,
-			String dataArea) {
+	public List<Record> getMyOrderByProduct(String startDate, String endDate, String dayTag, String productType, String sellerId, 
+			String userId, String isGift, String dataArea) {
 		if (dayTag != null) {
 			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
 			startDate = date[0];
@@ -1073,11 +1078,18 @@ public class SalesOrderQuery extends JBaseQuery {
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, " cc.data_area", dataArea, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, " c.seller_id", sellerId, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, " gt.id", productType, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "c.biz_user_id", userId, params, needWhere);
 		
 		if (needWhere) {
-			fromBuilder.append(" where c.status not in (1001,1002) and cc.is_gift = 0 ");
+			fromBuilder.append(" where c.status not in (1001,1002) ");
 		} else {
-			fromBuilder.append(" and c.status not in (1001,1002) and cc.is_gift = 0 ");
+			fromBuilder.append(" and c.status not in (1001,1002) ");
+		}
+		
+		if (StrKit.notBlank(isGift)) {
+			fromBuilder.append(" and cc.is_gift = 1 ");
+		} else {
+			fromBuilder.append(" and cc.is_gift = 0 ");
 		}
 
 		if (StrKit.notBlank(startDate)) {
@@ -1194,9 +1206,9 @@ public class SalesOrderQuery extends JBaseQuery {
 			needWhere = appendIfNotEmpty(fromBuilder, " cc.seller_id", sellerId, params, needWhere);
 		}
 		if (needWhere) {
-			fromBuilder.append(" where cc.status != 1001");
+			fromBuilder.append(" where cc.status not in (1001,1002)");
 		} else {
-			fromBuilder.append(" and cc.status != 1001");
+			fromBuilder.append(" and cc.status not in (1001,1002)");
 		}
 
 		if (StrKit.notBlank(startDate)) {

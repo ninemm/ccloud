@@ -249,7 +249,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 		String orderId = getPara("orderId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		SalesOrderQuery.me().updateConfirm(orderId, 1002, user.getId(), new Date());// 已审核拒绝
+		SalesOrderQuery.me().updateConfirm(orderId, 1001, user.getId(), new Date());// 已审核拒绝
 
 		renderAjaxResultForSuccess();
 

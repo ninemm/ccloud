@@ -31,14 +31,15 @@
 		$('#post-search-input').val("");
 	});
 
-	var initParams = function(params) {
+var initParams = function(params) {
 
-		var keyword = $('#post-search-input').val();
-		if (keyword) keyword = encodeURIComponent(keyword);
+		var stock_taking_sn = encodeURIComponent($("input[name='stock_taking_sn']").val());
+		var name = encodeURIComponent($("input[name='name']").val());
 		var param = {
 			size: params.limit,
 			page: params.offset/params.limit + 1,
-			k: keyword
+			stock_taking_sn: stock_taking_sn,
+			name: name
 		};
 		return param;
 	};
@@ -85,8 +86,9 @@
 	<div class="row content-row">
 		<form class="form-horizontal" style="float: right" action="${CPATH}/admin/inventoryDetail?c=${c!}&p=${p!}" method="post">
 			<div class="input-group input-group-sm">
-				<input id="post-search-input" class="form-control" type="search" value="${k!}" name="k" placeholder="搜索名称">&nbsp; 
-				<input id="search-submit" class="btn btn-default btn-sm btn-flat" type="submit" value="搜索">
+				<input id="post-search-input" class="form-control" type="search" value="${stock_taking_sn!}" name="stock_taking_sn" placeholder="搜索单号">&nbsp;
+				<input id="post-search-input" class="form-control" type="search" value="${name!}" name="name" placeholder="搜索商品">&nbsp;
+				<input id="search-submit" class="btn btn-default btn-sm btn-flat" type="button" value="搜索">
 			</div>
 		</form>
 	</div>
