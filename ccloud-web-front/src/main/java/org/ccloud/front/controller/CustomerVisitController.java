@@ -408,7 +408,7 @@ public class CustomerVisitController extends BaseFrontController {
 	    for (Dict dict : visitDictList) {
 	    	Map<String, String> map = Maps.newHashMap();
 	    	map.put("title", dict.getName());
-	    	map.put("value", dict.getKey());
+	    	map.put("value", dict.getValue());
 	    	list.add(map);
 	    }
 	    return list;
