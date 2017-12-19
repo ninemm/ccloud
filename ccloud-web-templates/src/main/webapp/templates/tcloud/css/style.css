@@ -1137,6 +1137,11 @@ input.street-value {
   height: auto!important;
 }
 
+.customer_name {
+  font-size: .8rem;
+  margin: .2rem 0;
+}
+
 .order-customer-info input,
 .delivery-info input,
 .activity-detail-item input {
@@ -1357,7 +1362,7 @@ input[name=sex] {
   background: #ff9800;
   color: #fff;
   font-size: 0.6rem;
-  padding: 0 0.15rem;
+  padding: 0.1rem 0.2rem;
   margin-right: 0.25rem;
 }
 
@@ -1378,10 +1383,24 @@ input[name=sex] {
   height: 1rem;
   line-height: 1rem;
   padding: .2rem 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
 }
 
 #order-detail .weui-cell {
   padding: 0;
+}
+
+.modify_price .weui-flex:last-child {
+  margin-top:.5rem;
+}
+
+.modify_price input[type=number] {
+  border: 1px solid #bbb;
+  width:2.5rem;
 }
 
 

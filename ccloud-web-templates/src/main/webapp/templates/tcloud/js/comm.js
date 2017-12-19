@@ -103,6 +103,15 @@ Utils = {
 	            }
 	        });
 		});
+	},
+	openLoadingWin: function(tips) {
+		layer.open({
+			type: 2,
+			content: tips
+		});
+	},
+	closeLoadingWin: function() {
+		layer.closeAll();
 	}
 }
 

@@ -1,64 +1,67 @@
 <#include "_inc/_layout.html"/>
 <#macro css> </#macro>
 <#macro script>
-  $(function () {
+    $(function () {
   
-	$(document).on("change", "#status", function() {
-		combo();
-	}).on("change", "#customerTypeId", function() {
-		combo();
-	}).on("change", "#datePicker", function() {
-		startDate = $("#datePicker").val();
-		endDate = startDate + ' 23:59:59';
-		combo();
-	});
+		$(document).on("change", "#status", function() {
+			combo();
+		}).on("change", "#customerTypeId", function() {
+			combo();
+		}).on("change", "#datePicker", function() {
+			startDate = $("#datePicker").val();
+			endDate = startDate + ' 23:59:59';
+			combo();
+		});
 
-    $("#datePicker").calendar();
-    $("#datePicker").val($.today());
+        $("#datePicker").calendar();
+        $("#datePicker").val($.today());
 
-	combo();
-  });
+	    combo();
 
-	$("#status").select({
-	  title: "订单状态",
-	  items: [{
-	       title: "全部", value: ""
-	       },{
-	       title: "待审核", value: "0"
-	       },{
-	       title: "已审核", value: "1000"
-	       },{
-	       title: "订单取消", value: "1001"
-	       },{
-	       title: "订单拒绝", value: "1002"
-	       },{
-	       title: "部分出库", value: "2000"
-	       },{
-	       title: "部分出库-订单关闭", value: "2001"
-	       },{
-	       title: "全部出库", value: "3000"
-	       },{
-	       title: "全部出库-订单关闭", value: "3001"
-	    }]
-	});
-	$("#customerTypeId").select({
-	  title: "择客户类型",
-	  items: ${customerTypes!}
+		$("#status").select({
+	        title: "订单状态",
+	        items: [{
+		       title: "全部", value: ""
+		       },{
+		       title: "待审核", value: "0"
+		       },{
+		       title: "已审核", value: "1000"
+		       },{
+		       title: "订单取消", value: "1001"
+		       },{
+		       title: "订单拒绝", value: "1002"
+		       },{
+		       title: "部分出库", value: "2000"
+		       },{
+		       title: "部分出库-订单关闭", value: "2001"
+		       },{
+		       title: "全部出库", value: "3000"
+		       },{
+		       title: "全部出库-订单关闭", value: "3001"
+		    }]
+		});
+	
+		$("#customerTypeId").select({
+		  title: "择客户类型",
+		  items: ${customerTypes!}
+		});
 	});
   
 	var newHtml = $(".weui-panel").eq(0).html();
+	var $panel = $('.weui-panel');
 	var $main = $("#main");
 	var $loading = $("#loading");
 	var $noMore = $("#noMore");
-	var loading = false;
 	
+	var loading = false;
 	var keyword = '';
 	var startDate = $.today();
 	var endDate = $.today() + ' 23:59:59';
 	var page = 1;
 	var size = 10;
 
-	function initMyOrder(){
+	function loadOrderData() {
+		
 		$loading.show();
 		$noMore.hide();
 
@@ -73,11 +76,14 @@
 		}
 
 		Utils.ajax('${CPATH}/order/orderList', params, 
-			function(data){
+			function(data) {
 				$loading.hide();
-
-				if(data.orderList.length == 0){
-					$noMore.show();
+				
+				if(data.orderList.length == 0) {
+				    var childCount = $('.weui-panel').length;
+				    if (childCount == 1) 
+						$noMore.show();
+						
 					loading = true;
 					return;
 				}
@@ -92,25 +98,25 @@
 					}
 					
 					$newOrder.find("#salesOrderId").attr('href', '${CPATH}/order/orderDetail?orderId=' + el.id);
-
 					$newOrder.find("#orderSn").text(el.order_sn);
-					
 					$newOrder.find("#status").text(getStatus(el.status));
 					$newOrder.find("#customerName").text(el.customer_name);
 					$newOrder.find("#contact").text(el.contact + '/' + el.mobile);
 					$newOrder.find("#customerType").text(el.customerTypeName);
 					if(el.status == 0) {
-						$newOrder.find("#cancel").on('click', function(){ 
-								$.get('${CPATH}/order/cancel?orderId=' + el.id,
-									function(result){
-										if (result.errorCode > 0) {
-											toastr.error(result.message);
-										} else {
-											toastr.success(result.message);
-											combo();
-										}
+						$newOrder.find("#cancel").on('click', function() {
+						    Utils.openLoadingWin('撤销中...');
+							$.get('${CPATH}/order/cancel?orderId=' + el.id,
+								function(result) {
+									if (result.errorCode > 0) {
+									    $.toptip(result.message, 'error');
+									} else {
+										$.toptip(result.message, 'success');
+										combo();
 									}
-								);
+									Utils.closeLoadingWin();
+								}
+							);
 						});
 					} else {
 						$newOrder.find("#cancel").remove();
@@ -121,6 +127,7 @@
 
 					$newOrder.find("#amount").text(el.total_amount);
 					$newOrder.find("#date").text('时间：' + el.create_date);
+					$noMore.hide();
 				});
 				page++;
 				loading = false;
@@ -176,14 +183,14 @@
 			return;
 		}
 		loading = true;
-		initMyOrder();
+		loadOrderData();
 	});
 	
 	function combo() {
 		$main.empty();
 		loading = false;
 		page = 1;
-		initMyOrder();
+		loadOrderData();
 	}
 </#macro>
 
@@ -220,9 +227,7 @@
 							<span id="orderSn">DH-O-20171017-002276</span>
 							<span class="fr blue" id="status">订单待审核</span>
 						</div>
-						<div id="customerName">
-							 小张烤鱼
-						</div>
+						<div id="customerName" class="customer_name"></div>
 						<div class="gray">
 							<p>
 								联系人：<span id="contact">小张/18611111111</span>

@@ -287,10 +287,11 @@ public class CustomerController extends BaseFrontController {
 		SellerCustomer sellerCustomer = getModel(SellerCustomer.class);
 		
 		String picJson = getPara("pic");
+		String oldPic = getPara("oldPic");
 		String areaCode = getPara("areaCode");
 		String areaName = getPara("areaName");
-		String customerTypeIds = getPara("customerTypeIds", "");
 
+		String customerTypeIds = getPara("customerTypeIds", "");
 		String custTypeNames = getPara("customer_type");
 
 		List<String> custTypeList = Splitter.on(",")
@@ -318,7 +319,17 @@ public class CustomerController extends BaseFrontController {
 				list.add(image);
 			}
 		}
-		
+
+		if(StrKit.notBlank(oldPic)) {
+			JSONArray picList = JSON.parseArray(oldPic);
+			for(int i = 0; i < picList.size(); i++) {
+				String pic = picList.getString(i);
+				ImageJson image = new ImageJson();
+				image.setSavePath(pic);
+				list.add(image);
+			}
+		}
+
 		if (sellerCustomer != null && StrKit.notBlank(sellerCustomer.getId())) {
 			
 			CustomerVO temp = new CustomerVO();
