@@ -17,6 +17,8 @@ import org.ccloud.model.Department;
 import org.ccloud.model.SmsCode;
 import org.ccloud.model.User;
 import org.ccloud.model.query.DepartmentQuery;
+import org.ccloud.model.query.SalesOrderQuery;
+import org.ccloud.model.query.SellerCustomerQuery;
 import org.ccloud.model.query.SmsCodeQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
@@ -160,6 +162,13 @@ public class UserController extends BaseFrontController {
 	public void center() {
 		keepPara();
 		String action = getPara(0, "index");
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		
+		Long totalOrderCount = SalesOrderQuery.me().findTotalOrdersCountByDataArea(dataArea);
+		Long totalCustomerCount = SellerCustomerQuery.me().findTotalCountByDataArea(dataArea);
+		setAttr("totalOrderCount", totalOrderCount);
+		setAttr("totalCustomerCount", totalCustomerCount);
+		
 		render(String.format("user_center_%s.html", action));
 	}
 	
@@ -306,7 +315,7 @@ public class UserController extends BaseFrontController {
 				// 数据查看时的数据域
 				if (subject.isPermitted("/admin/all") || subject.isPermitted("/admin/manager")) {
 					setSessionAttr(Consts.SESSION_SELECT_DATAAREA,
-							DataAreaUtil.getUserDeptDataArea(user.getDataArea()) + "%");
+							DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea()) + "%");
 				} else {
 					setSessionAttr(Consts.SESSION_SELECT_DATAAREA, user.getDataArea());
 				}

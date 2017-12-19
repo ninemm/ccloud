@@ -56,7 +56,7 @@ public class CustomerVisitController extends BaseFrontController {
 		String id = getPara("id");
 		String type = getPara("type");
 		String nature = getPara("nature");
-		String subType = getPara("subType");
+		String subType = getPara("level");
 		String dataArea = selectDataArea + "%";
 
 		Page<Record> visitList = CustomerVisitQuery.me().paginateForApp(getPageNumber(), getPageSize(), id, type, nature, subType, dataArea);
@@ -77,7 +77,7 @@ public class CustomerVisitController extends BaseFrontController {
 		all.put("title", "全部");
 		all.put("value", "");
 
-		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(DataAreaUtil.getUserDealerDataArea(selectDataArea));
+		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(DataAreaUtil.getDealerDataAreaByCurUserDataArea(selectDataArea));
 		List<Map<String, Object>> customerTypeList2 = new ArrayList<>();
 		customerTypeList2.add(all);
 
@@ -180,7 +180,7 @@ public class CustomerVisitController extends BaseFrontController {
 			return ;
 		}
 		
-		String dataArea = DataAreaUtil.getUserDealerDataArea(selectDataArea) + "%";
+		String dataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(selectDataArea) + "%";
 		List<String> typeList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeNameListBySellerCustomerId(customerVisit.getSellerCustomerId(), dataArea);
 
 		setAttr("customerVisit", customerVisit);
@@ -213,7 +213,7 @@ public class CustomerVisitController extends BaseFrontController {
 		customerTypes.add(all);
 
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
-				.findByDataArea(DataAreaUtil.getUserDealerDataArea(user.getDataArea()));
+				.findByDataArea(DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea()));
 		for (CustomerType customerType : customerTypeList) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", customerType.getName());
@@ -408,7 +408,7 @@ public class CustomerVisitController extends BaseFrontController {
 	    for (Dict dict : visitDictList) {
 	    	Map<String, String> map = Maps.newHashMap();
 	    	map.put("title", dict.getName());
-	    	map.put("value", dict.getKey());
+	    	map.put("value", dict.getValue());
 	    	list.add(map);
 	    }
 	    return list;

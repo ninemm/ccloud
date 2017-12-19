@@ -70,7 +70,7 @@ public class _CustomerTypeController extends JBaseCRUDController<CustomerType> {
 		} else {
 			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 			page = CustomerTypeQuery.me().paginate(getPageNumber(), getPageSize(), keyword, show,
-					DataAreaUtil.getUserDealerDataArea(user.getDataArea()));
+					DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea()));
 		}
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
@@ -111,11 +111,11 @@ public class _CustomerTypeController extends JBaseCRUDController<CustomerType> {
 		} else if (notBlank && !isSuperAdmin) {// 经销商管理员修改
 			setAttr("customerType", CustomerTypeQuery.me().findById(id));
 			setAttr("priceSystemList", PriceSystemQuery.me().findPriceSystemByDeptId(user.getDepartmentId(),
-					DataAreaUtil.getUserDeptDataArea(user.getDataArea())));
+					DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea())));
 
 		} else if (!notBlank && !isSuperAdmin) {// 经销商管理员新增
 			setAttr("priceSystemList", PriceSystemQuery.me().findPriceSystemByDeptId(user.getDepartmentId(),
-					DataAreaUtil.getUserDeptDataArea(user.getDataArea())));
+					DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea())));
 		}
 		
 		List<ActReProcdef> procDefList = ActReProcdefQuery.me().findListInNormal();
@@ -137,7 +137,7 @@ public class _CustomerTypeController extends JBaseCRUDController<CustomerType> {
 			customerType.set("data_area", getPara("data_area"));
 		} else {
 			customerType.set("dept_id", user.getDepartmentId());
-			customerType.set("data_area", DataAreaUtil.getUserDeptDataArea(user.getDataArea()));
+			customerType.set("data_area", DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea()));
 		}
 
 		customerType.saveOrUpdate();

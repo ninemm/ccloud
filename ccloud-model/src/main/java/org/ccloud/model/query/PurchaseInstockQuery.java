@@ -115,17 +115,19 @@ public class PurchaseInstockQuery extends JBaseQuery {
 		return Db.findFirst(fromBuilder.toString(), id);
 	}
 	
-	public Page<Record> paginateO(int pageNumber, int pageSize, String keyword, String startDate, String endDate,String userId,String dataArea,String purchaseRefundOustockIds) {
-		String select = "select i.*, cs.name as supplierName";
+	public Page<Record> paginateO(int pageNumber, int pageSize, String keyword, String startDate, String endDate,String userId,String dataArea,String purchaseRefundOustockIds,String deptId) {
+		String select = "select i.*, CASE WHEN cs.`name` IS NOT NULL THEN cs.`name` ELSE s.seller_name END AS supplierName";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_purchase_instock` i ");
-		fromBuilder.append(" join cc_supplier cs on i.supplier_id = cs.id "
-				+ " join user u on u.department_id = i.dept_id ");
+		fromBuilder.append(" LEFT JOIN cc_supplier cs on i.supplier_id = cs.id "
+				+ " LEFT JOIN cc_seller s on s.id = i.supplier_id "
+				+ " LEFT JOIN user u on u.department_id = i.dept_id ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "i.pwarehouse_sn", keyword, params, needWhere);
-
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "i.data_area", dataArea, params, needWhere);
+		
 		if (needWhere) {
 			fromBuilder.append(" where 1 = 1");
 		}
@@ -140,7 +142,7 @@ public class PurchaseInstockQuery extends JBaseQuery {
 			params.add(endDate);
 		}
 
-		fromBuilder.append(" and u.id = '"+userId+"' and i.data_area = '"+dataArea+"' and i.id not in ("+purchaseRefundOustockIds+") and i.status=1000 order by i.create_date ");
+		fromBuilder.append(" and i.dept_id = '"+deptId+"'  and i.id not in ("+purchaseRefundOustockIds+") and i.status=1000 order by i.create_date ");
 
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());

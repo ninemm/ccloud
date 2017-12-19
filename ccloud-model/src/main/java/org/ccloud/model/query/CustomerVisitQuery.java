@@ -147,7 +147,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 		sql.append(" JOIN act_ru_identitylink u on cv.proc_inst_id = u.PROC_INST_ID_");
 		sql.append(" where c.is_enabled = 1 and locate(?, u.USER_ID_) > 0");
 		
-		return DAO.doFind(sql.toString(), username);
+		return DAO.find(sql.toString(), username);
 	}
 	
 	public Page<Record> queryVisitRecord(int pageNumber, int pageSize,String customerLevel,String customerType,String customerNature,String userId){

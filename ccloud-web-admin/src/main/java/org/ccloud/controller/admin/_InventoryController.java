@@ -24,6 +24,7 @@ import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
+import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Inventory;
 import org.ccloud.model.query.InventoryQuery;
 import org.ccloud.model.InventoryDetail;
@@ -32,6 +33,7 @@ import org.ccloud.model.query.InventoryDetailQuery;
 
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Before;
+import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 /**
@@ -53,9 +55,16 @@ public class _InventoryController extends JBaseCRUDController<Inventory> {
 		String warehouse_id = getPara("warehouse_id");
 		String product_sn = getPara("product_sn");
 		String product_name = getPara("product_name");
+		if (StrKit.notBlank(product_sn)) {
+			product_sn = StringUtils.urlDecode(product_sn);
+			setAttr("product_sn", product_sn);
+		}
+		if (StrKit.notBlank(product_name)) {
+			product_name = StringUtils.urlDecode(product_name);
+			setAttr("product_name", product_name);
+		}
 		String seller_id= getSessionAttr("sellerId").toString();
 		
-		// Map<String, Object> map = new HashMap<String, Object>();
 		Map<String, Object> map;
 		if(seller_id == null) {
 			map = new HashMap<String, Object>();

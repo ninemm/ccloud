@@ -129,7 +129,7 @@
 	        </div>
 	    </div>
 	</header> 
-	<main if="visitList" class="infinite">
+	<main id="visitList" class="infinite">
 	    <#if visitList??>
 	        <#list visitList.list as visit>
 	            <a class="weui-cell weui-cell_access" href="${(CPATH)}/customerVisit/detail?id=${(visit.id)!}">

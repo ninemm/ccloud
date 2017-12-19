@@ -125,8 +125,8 @@ public class WxOauthController extends BaseFrontController {
 			if (user != null) {
 				// 数据查看时的数据域
 				if (subject.isPermitted("/admin/all") || subject.isPermitted("/admin/manager")) {
-					setSessionAttr(Consts.SESSION_SELECT_DATAAREA,
-							DataAreaUtil.getUserDeptDataArea(user.getDataArea()) + "%");
+					String dataArea = DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea());
+					setSessionAttr(Consts.SESSION_SELECT_DATAAREA, dataArea + "%");
 				} else {
 					setSessionAttr(Consts.SESSION_SELECT_DATAAREA, user.getDataArea());
 				}

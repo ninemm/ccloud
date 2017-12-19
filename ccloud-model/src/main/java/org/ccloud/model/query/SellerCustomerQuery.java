@@ -48,9 +48,8 @@ public class SellerCustomerQuery extends JBaseQuery {
 				sql.append(" , c.prov_code, c.city_code, c.country_code, c.address");
 				sql.append(" from `cc_seller_customer` sc");
 				sql.append(" join `cc_customer` c on c.id = sc.customer_id");
-				sql.append(" WHERE sc.id = ? ");
+				sql.append(" WHERE sc.id = ? limit 1");
 				return DAO.findFirst(sql.toString(), id);
-				//return DAO.findById(id);
 			}
 		});
 	}
@@ -261,5 +260,13 @@ public class SellerCustomerQuery extends JBaseQuery {
 		sql.append(" FROM cc_seller_customer ");
 		appendIfNotEmptyWithLike(sql, "data_area", dataArea, param, true );
 		return Db.find(sql.toString(), param);
+	}
+	
+	public Long findTotalCountByDataArea(String dataArea) {
+		StringBuilder sql = new StringBuilder("SELECT COUNT(DISTINCT(c.id)) ");
+		sql.append("FROM `cc_user_join_customer` uc ");
+		sql.append("JOIN cc_seller_customer c on c.id = uc.seller_customer_id ");
+		sql.append("WHERE WHERE c.is_enabled = 1 AND uc.data_area like ?");
+		return Db.queryLong(sql.toString(), dataArea);
 	}
 }
