@@ -73,8 +73,12 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
-
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "r.instock_sn", keyword, params, needWhere);
+		String regex = "^[a-zA-Z][a-zA-Z0-9]*$";
+		if(keyword.matches(regex)){
+			needWhere = appendIfNotEmptyWithLike(fromBuilder, "r.instock_sn", keyword, params, needWhere);
+		}else{
+			needWhere = appendIfNotEmptyWithLike(fromBuilder, "c.customer_name", keyword, params, needWhere);
+		}
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, needWhere);
 		
 		if (needWhere) {
