@@ -34,6 +34,7 @@ public class Dict extends BaseDict<Dict> {
 	public boolean save() {
 		
 		CacheKit.remove(Dict.CACHE_NAME, CACHE_KEY);
+		CacheKit.remove(Dict.CACHE_NAME, getType());
 		return super.save();
 	}
 
@@ -42,6 +43,7 @@ public class Dict extends BaseDict<Dict> {
 		
 		removeCache(getId());
 		CacheKit.remove(Dict.CACHE_NAME, CACHE_KEY);
+		CacheKit.remove(Dict.CACHE_NAME, getType());
 		if (getId() != null) {
 			return super.update();
 		} else {
@@ -54,7 +56,7 @@ public class Dict extends BaseDict<Dict> {
 		
 		removeCache(getId());
 		CacheKit.remove(Dict.CACHE_NAME, CACHE_KEY);
-		
+		CacheKit.remove(Dict.CACHE_NAME, getType());
 		return super.update();
 	}
 
@@ -63,7 +65,7 @@ public class Dict extends BaseDict<Dict> {
 		
 		removeCache(getId());
 		CacheKit.remove(Dict.CACHE_NAME, CACHE_KEY);
-		
+		CacheKit.remove(Dict.CACHE_NAME, getType());
 		return super.delete();
 	}
 	
@@ -72,7 +74,7 @@ public class Dict extends BaseDict<Dict> {
 		
 		removeCache(idValue);
 		CacheKit.remove(Dict.CACHE_NAME, CACHE_KEY);
-		
+		CacheKit.remove(Dict.CACHE_NAME, getType());
 		return super.deleteById(idValue);
 	}
 }

@@ -1,0 +1,284 @@
+<#include "_inc/_layout.html"/>
+
+<#macro css>
+    .report {
+        font-size: 0.7rem;
+	    position: absolute;
+	    top: 0;
+	    width: 100%;
+	    bottom: 50px;
+	    overflow: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .report .weui-panel__hd:after {
+        left: 0;
+        height: 0;
+    }
+</#macro>
+
+<#macro css_import>
+<link rel="stylesheet" href="${CTPATH}/css/normalize.css">
+</#macro>
+<#macro script_import>
+<script type='text/javascript' src="${CTPATH}/js/echarts.min.js"></script>
+</#macro>  
+<#macro script>
+  $(function () {
+  
+    $(".end-date").calendar();
+    $(".end-date").val($.today());
+    $(".begin-date").calendar();
+    $(".begin-date").val($.today());
+    var startDate = $.today();
+	var endDate = $.today() + ' 23:59:59';  
+	var params = {
+		"dayTag":  'today',
+		"startDate": startDate,
+		"endDate" : endDate,
+		"deptId": '${(session._logined_user.department_id)!}'
+	}  
+ 	orderAmount(params);
+ 	userCount(params);
+  })
+  
+    function orderAmount(params) {
+		Utils.ajax('${CPATH}/report/orderAmount', params, 
+			function(data){
+				$("#productCount").html(data.productCount+"件/");
+				$("#totalCount").html(data.orderCount+"笔");
+				$("#totalAmount").html(data.totalAmount+"元");
+			}
+		);    	
+    }
+    
+    var salesObj = [];
+    function userCount(params) {
+		Utils.ajax('${CPATH}/report/getUserRank', params, 
+			function(data){
+	        	var salesIndent = document.getElementById('userCount');
+	        	var salesIndentTotal = 0;
+		        var $salesIndent = $(salesIndent);
+		        var yData = [];
+		        var seriesData = [];
+		        for (var i = 0; i < data.length; i++) {
+		           yData.push(data[i].realname);
+		           seriesData.push(data[i].totalAmount);
+		           salesObj[data[i].realname] = data[i].id;
+		       	}
+		       	console.log(yData);
+		       	console.log(seriesData);
+		       	var salesIndentChart = echarts.init(salesIndent);
+		
+		       	salesIndentOption = {
+		        	title : {
+		            	text: '业务员'
+		        	},
+		        tooltip : {
+		            trigger: 'axis'
+		        },
+		        legend: {
+		                // data:[],
+		                // top: 40
+		            },
+		            grid: {
+		                left: '2%',
+		                right: '17%',
+		                bottom: 15,
+		                top: 60,
+		                containLabel: true
+		            },
+		            toolbox: {
+		            },
+		            calculable : true,
+		            xAxis : [
+		            {
+		                show : false,
+		                name : '金额/元',
+		                type : 'value',
+		                boundaryGap: [0, 0.01]
+		            }
+		            ],
+		            yAxis : [
+		            {
+		                type : 'category',
+		                data : yData.reverse()
+		            }
+		            ],
+		            series : [
+		            {
+		                type:'bar',
+		                barWidth: 25,
+		                data:seriesData.reverse(),
+		                label:{
+		                    normal:{
+		                        show:true,
+		                        position:'right',
+		                        formatter: '{c}元'
+		                    }
+		                }
+		
+		            }
+		            ]
+		        };
+		
+		        salesIndentChart.resize();
+		        salesIndentChart.setOption(salesIndentOption, true);
+		        salesIndentChart.on('click',salesClick);
+		    }    		
+		);    	
+    }
+    
+	function salesClick(param) {
+	    if (typeof param.seriesIndex != 'undefined') {
+	        window.location.href = "${(CPATH)}/report/userReportDetail?userId=" + salesObj[param.name]; 
+	    }
+	}    
+    
+    function urlSelect(params, type){
+    	if (type == 'order') {
+			orderAmount(params);
+		} else {
+			userCount(params);
+		}
+    }
+    
+    function startDaySelect(obj,type) {
+		var params = {
+    		"startDate": $(obj).val(),
+			"endDate": $(obj).parent().find('#endDay').val(),
+			"deptId": '${(session._logined_user.department_id)!}'
+		}
+		urlSelect(params,type); 
+    }
+    
+    function endDaySelect(obj,type) {
+		var params = {
+    		"startDate": $(obj).parent().find('#startDay').val(),
+			"endDate": $(obj).val(),
+			"deptId": '${(session._logined_user.department_id)!}'
+		}
+		urlSelect(params,type); 
+    }    
+    
+ 	function dayTagSelect(obj,type) {
+      $.actions({
+        actions: [{
+          text: "今日",
+          onClick: function () {
+			var params = {
+				"dayTag": 'today',
+				"deptId": '${(session._logined_user.department_id)!}'
+			}
+			urlSelect(params,type); 
+            $(obj).find(".dayTagText").text('今日')
+          }
+        }, {
+          text: "昨日",
+          onClick: function () {
+			var params = {
+				"dayTag": 'yesterday',
+				"deptId": '${(session._logined_user.department_id)!}'
+			}
+          	urlSelect(params,type);
+            $(obj).find(".dayTagText").text('昨日')
+          }
+        }, {
+          text: "本周",
+          onClick: function () {
+			var params = {
+				"dayTag": 'week',
+				"deptId": '${(session._logined_user.department_id)!}'
+			}
+			urlSelect(params,type);   
+          	$(obj).find(".dayTagText").text('本周')
+          }
+        }, {
+          text: "上周",
+          onClick: function () {
+			var params = {
+				"dayTag": 'lastweek',
+				"deptId": '${(session._logined_user.department_id)!}'
+			}
+          urlSelect(params,type);
+          $(obj).find(".dayTagText").text('上周')
+          }
+        }, {
+          text: "本月",
+          onClick: function () {
+			var params = {
+				"dayTag": 'month',
+				"deptId": '${(session._logined_user.department_id)!}'
+			}     
+			urlSelect(params,type);    
+         	$(obj).find(".dayTagText").text('本月')
+          }
+        }, {
+          text: "上月",
+          onClick: function () {
+			var params = {
+				"dayTag": 'lastmonth',
+				"deptId": '${(session._logined_user.department_id)!}'
+			}         
+			urlSelect(params,type);
+          	$(obj).find(".dayTagText").text('上月')
+          }
+        }]
+      }); 	
+ 	}  
+</#macro>
+<@layout>
+	<div class="weui-content">
+	<div class="report">
+		<div class="weui-panel weui-panel_access report-header">
+			<div class="weui-panel__hd">
+				<span class="overview-hd-title">销售简报</span> <span class="briefly" onclick="dayTagSelect(this,'order')">
+					<p class="dayTagText">今日</p>
+					<i class="icon-angle-down"></i>
+				</span> 
+				<input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'order')" readonly="">
+				<span class="overview-hd-segmenting fr"> - </span> 
+				<input class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'order')" readonly="">
+			</div>
+			<div class="weui-panel__bd">
+				<div class="weui-flex overview-block">
+					<div class="weui-flex__item">
+						<div class="overview-title">
+							<img src="${CTPATH}/images/order.png"> <span>订单总数</span>
+						</div>
+						<div class="t-c">
+							<strong id="productCount">0</strong> <small id="totalCount">/ 0笔</small>
+						</div>
+					</div>
+					<div class="weui-flex__item">
+						<div class="overview-title">
+							<img src="${CTPATH}/images/money.png"> <span>订单金额</span>
+						</div>
+						<div class="t-c">
+							<strong id="totalAmount">0</strong>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="weui-panel weui-panel_access">
+			<div class="weui-panel__hd">
+				<span class="overview-hd-title">业务员业绩统计</span> <span class="briefly" onclick="dayTagSelect(this,'user')">
+				<p class="dayTagText">今日</p>
+					<i class="icon-angle-down"></i>
+				</span> <input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'user')" readonly="">
+				<span class="overview-hd-segmenting fr"> - </span> <input
+					class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'user')" readonly="">
+			</div>
+			<div class="weui-panel__bd report-area">
+				<div class="weui-media-box ft14">
+					<div id="userCount" style="width:600px; height: 300px;">
+						
+					</div>
+				</div>
+			</div>
+		</div>
+		</div>
+		<#include "_inc/_footer_nav.html" />
+	</div>
+</@layout>

@@ -92,7 +92,7 @@ a {
 
 .weui-content {
 	background: #f3f5f7;
-    height: inherit;
+  height: inherit;
 }
 
 .weui-tabbar__item.weui-bar__item--on .weui-tabbar__label,
@@ -149,6 +149,13 @@ a {
 
 .toolbar .title {
   margin: 0;
+}
+
+.toolbar .picker-button,
+.weui-cells_radio .weui-check:checked+.weui-icon-checked:before,
+.picker-calendar-day.picker-calendar-day-selected span,
+.weui-search-bar__cancel-btn {
+  color: #ea6f5a;
 }
 
 .empty-badge {
@@ -536,7 +543,6 @@ a {
 #home {
   overflow: auto;
   -webkit-overflow-scrolling: touch;
-  padding-bottom: 1.5rem;
 }
 
 .company {
@@ -651,9 +657,10 @@ a {
   height: 1.25rem;
   line-height: 1.25rem;
   vertical-align: middle;
-  width: 15.2778%;
+/*   width: 15.2778%; */
   text-align: center;
   margin: 0 0.25rem;
+  padding: 0 .5rem;
   border-radius: 2px;
 }
 
@@ -694,6 +701,17 @@ a {
 .menu-left li.active {
   background: #fff;
   color: #ea6f5a;
+}
+
+.menu-left ul li.active:before {
+    content: " ";
+    position: absolute;
+    display: block;
+    width: 2px;
+    height: 100%;
+    background: #ea6f5a;
+    top: 0;
+    left: 0;
 }
 
 .type {
@@ -762,6 +780,11 @@ a {
   font-size: 0.7rem;
   display: flex;
   justify-content: space-between;
+}
+
+.composition .product_name {
+  height: 3.25rem;
+  line-height: 3.25rem;
 }
 
 .product_unit {
@@ -865,30 +888,60 @@ a {
   top: 0;
 }
 
-.product-detail {
+.layui-m-layerchild {
   width: 90%;
+}
+
+.service {
+  width: 70%;
 }
 
 .product-detail img {
   width: 30%;
 }
 
-.product-detail .layui-m-layercont {
+.service img {
+  width: 60%;
+  margin: 5% 20% 0;
+}
+
+.layui-m-layercont {
   padding: 5px 15px!important;
-  margin-bottom: 2rem;
 }
 
-.product-detail .layui-m-layerbtn {
-  height: 2rem;
-  line-height: 2rem;
-  position: absolute;
-  bottom: 0;
-  background: #3c8dbc;
+.layui-m-layerbtn {
+  height: 2rem!important;
+  line-height: 2rem!important;
+}
+
+.layui-m-layerbtn span[yes] {
+  color: #fff!important;
   border-radius: 0;
+  background: #ea6f5a;
 }
 
-.product-detail .layui-m-layerbtn span[yes] {
-  color: #fff;
+.audit .layui-m-layerbtn span[no] {
+  color: #000;
+  border-radius: 0;
+  background: #fff;
+}
+
+.audit .refuse-radio {
+  margin-top: .2rem;
+}
+
+.audit .refuse-radio input {
+  position: relative;
+  top: .1rem;
+  margin-right: .5rem;
+}
+
+.audit textarea {
+  margin-top: .3rem;
+  background: #f3f3f3;
+  border-radius: 5px;
+  padding: .4rem .5rem;
+  box-sizing: border-box;
 }
 
 
@@ -1034,12 +1087,12 @@ a {
   top: 0.1rem;
 }
 
-.street-value {
+input.street-value {
   border: 1px solid #bbb!important;
-  margin-left: 7.246377%;
   position: absolute;
-  right: 25%;
+  right: 15%;
   top: 0.25rem;
+  width: 3rem;
 }
 
 
@@ -1203,6 +1256,11 @@ a {
   line-height: 1rem;
   margin-top: 0.5rem;
   color: #000;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
 }
 
 .customer-href i {
@@ -1453,7 +1511,7 @@ input[name=sex] {
   width: 3rem;
   height: auto;
   border-radius: 50%;
-  border: 3px solid #fff;
+  border: 2px solid #fff;
 }
 
 .user-statistics {
@@ -2002,6 +2060,12 @@ input[name=input-type] {
   }
   #my-order .has-th-list .weui-flex div:last-child i{
     padding: 0;
+  }
+  .user-info {
+    padding: 1.5rem 7% 0;
+  }
+  .user-info .name {
+    padding-left: .5rem;
   }
 }
 

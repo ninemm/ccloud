@@ -27,8 +27,8 @@
 		},
 		'printTemplate.url': {
 			validators: {
-				notEmpty: { message: '基准价格倍数不能为空' },
-				stringLength: { max: 30, message: 'url最大长度是15数字，请重新输入' }
+				notEmpty: { message: 'url不能为空' },
+				stringLength: { max: 30, message: '称最大长度是30字符，请重新输入' }
 			}
 		}
 	};
@@ -71,16 +71,8 @@
 <!-- Main content -->
 <section class="content">
 	<div class="box box-default">
-		<div class="box-header with-border">
-			<h3 class="box-title">价格体系信息</h3>
-			<div class="box-tools">
-				<button type="button" class="btn btn-box-tool" data-widget="collapse">
-					<i class="fa fa-minus"></i>
-				</button>
-			</div>
-		</div>
 		<form action="${CPATH}/admin/printTemplate/save" method="post" id="form" class="form-horizontal" >
-			<input type="hidden" name="priceSystem.id" value="${(printTemplate.id)!}">
+			<input type="hidden" name="printTemplate.id" value="${(printTemplate.id)!}">
 			<div class="box-body">
 				<div class="form-group col-sm-12 validata-box">
 					<label class="control-label col-sm-2">*模板名称:</label>
@@ -91,7 +83,7 @@
 				<div class="form-group col-sm-12 validata-box">
 					<label class="control-label col-sm-2">*url:</label>
 					<div class="input-group col-md-4 col-sm-10">
-						<input class="form-control input-sm" type="text" name="printTemplate.url" value="${(printTemplate.url)!}" placeholder="1-30个任意字符">
+						<input class="form-control input-sm" type="text" name="printTemplate.url" value="${(printTemplate.url)!}" placeholder="请输入print或者print2">
 					</div>
 				</div>
 				<div class="form-group col-sm-12 validata-box">

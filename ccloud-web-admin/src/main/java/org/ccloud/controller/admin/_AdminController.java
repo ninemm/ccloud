@@ -31,6 +31,7 @@ import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.Department;
 import org.ccloud.model.User;
+import org.ccloud.model.query.CustomerVisitQuery;
 import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SellerCustomerQuery;
@@ -105,6 +106,8 @@ public class _AdminController extends JBaseController {
 		setAttr("toDoOrdersList", SalesOrderQuery.me().getToDo(user.getUsername()));
 		setAttr("count_order", StrKit.notBlank(selDataArea)?count.get("count_order"):0);
 		setAttr("sum_amount", StrKit.notBlank(selDataArea)?count.get("sum_amount")!=null?count.get("sum_amount").toString():"0.00":"0.00");
+		setAttr("toDoCustomerVisitList", CustomerVisitQuery.me().getToDo(user.getUsername()));
+		
 		setAttr("customerCount",StrKit.notBlank(selDataArea)?UserJoinCustomerQuery.me().customerCount(selDataArea):0);
 		setAttr("salesManAmount",salesManAmount);
 		setAttr("goodsSales",goodsSales);

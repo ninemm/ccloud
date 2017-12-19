@@ -50,7 +50,8 @@ public class ReportController extends BaseFrontController {
 		String sellerId = getSessionAttr("sellerId");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String customerType = getPara("customerType");
-		Record record = SalesOrderQuery.me().getMyOrderAmount(startDate, endDate, dayTag, customerType, sellerId, dataArea);
+		String deptId = getPara("deptId");
+		Record record = SalesOrderQuery.me().getMyOrderAmount(startDate, endDate, dayTag, customerType, deptId, sellerId, dataArea);
 		renderJson(record);
 	}
 	
@@ -148,6 +149,26 @@ public class ReportController extends BaseFrontController {
 		setAttr("productTypeList", JSON.toJSON(productTypes));
 		
 		render("report_product.html");
+	}
+	
+	public void userRank() {
+		render("user_rank.html");
+	}
+	
+	public void managerReport() {
+		render("manager_report.html");
+	}	
+	
+	public void getUserRank() {
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String dayTag = getPara("dayTag");
+		String sellerId = getSessionAttr("sellerId");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String dataArea = DataAreaUtil.getUserDealerDataArea(user.getDataArea());
+		String deptId = getPara("deptId");
+		List<Record> record = SalesOrderQuery.me().getUserRank(startDate, endDate, dayTag, deptId, sellerId, dataArea);
+		renderJson(record);
 	}
 	
 }

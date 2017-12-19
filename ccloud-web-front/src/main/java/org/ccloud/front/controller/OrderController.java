@@ -21,6 +21,7 @@ import org.ccloud.model.SalesOrder;
 import org.ccloud.model.SellerProduct;
 import org.ccloud.model.User;
 import org.ccloud.model.query.CustomerTypeQuery;
+import org.ccloud.model.query.OutstockPrintQuery;
 import org.ccloud.model.query.ReceivablesQuery;
 import org.ccloud.model.query.SalesOrderDetailQuery;
 import org.ccloud.model.query.SalesOrderJoinOutstockQuery;
@@ -110,7 +111,7 @@ public class OrderController extends BaseFrontController {
 	}
 	
 	public void orderReview() {
-		
+
 		String orderId = getPara("orderId");
 		String taskId = getPara("taskId");
 		Record order = SalesOrderQuery.me().findMoreById(orderId);
@@ -122,6 +123,30 @@ public class OrderController extends BaseFrontController {
 		setAttr("order", order);
 		setAttr("orderDetailList", orderDetailList);
 		render("order_review.html");
+	}
+	
+	public void operateHistory() {
+		keepPara();
+
+		String id = getPara("id");
+
+		Record salesOrder = SalesOrderQuery.me().findMoreById(id);
+		setAttr("salesOrder", salesOrder);
+
+		String proc_inst_id = getPara("proc_inst_id");
+		List<Comment> comments = WorkFlowService.me().getProcessComments(proc_inst_id);
+		setAttr("comments", comments);
+		
+		List<String> printComments = new ArrayList<String>();
+		List<Record> printRecord = OutstockPrintQuery.me().findByOrderId(id);
+		for (Record record : printRecord) {
+			int status = record.getInt("status");
+			printComments.add(buildComments(Consts.OPERATE_HISTORY_TITLE_ORDER_PRINT, record.get("create_date").toString(), record.getStr("realname"),
+					status == 1 ? "打印失败" : "打印成功"));
+		}
+		setAttr("printComment", printComments);
+		
+		render("operate_history.html");
 	}
 
 	private String getStatusName(int statusCode) {
@@ -177,7 +202,7 @@ public class OrderController extends BaseFrontController {
 
 				String[] sellProductIds = paraMap.get("sellProductId");
 				// 常规商品
-				if (StrKit.notBlank(sellProductIds)) {
+				if (sellProductIds != null && sellProductIds.length > 0) {
 					for (int index = 0; index < sellProductIds.length; index++) {
 						if (StrKit.notBlank(sellProductIds[index])) {
 							if (!SalesOrderDetailQuery.me().insertForApp(paraMap, orderId, sellerId, user.getId(), date,
@@ -191,7 +216,7 @@ public class OrderController extends BaseFrontController {
 
 				String[] giftSellProductIds = paraMap.get("giftSellProductId");
 				// 赠品
-				if (StrKit.notBlank(giftSellProductIds)) {
+				if (giftSellProductIds != null && giftSellProductIds.length > 0) {
 					for (int index = 0; index < giftSellProductIds.length; index++) {
 						if (StrKit.notBlank(giftSellProductIds[index])) {
 							if (!SalesOrderDetailQuery.me().insertForAppGift(paraMap, orderId, sellerId, user.getId(),
@@ -206,7 +231,7 @@ public class OrderController extends BaseFrontController {
 				String[] compositionIds = paraMap.get("compositionId");
 				String[] compositionNums = paraMap.get("compositionNum");
 				// 组合商品
-				if (StrKit.notBlank(compositionIds)) {
+				if (compositionIds != null && compositionIds.length > 0) {
 					for (int index = 0; index < compositionIds.length; index++) {
 						String productId = compositionIds[index];
 						String number = compositionNums[index];
@@ -268,7 +293,7 @@ public class OrderController extends BaseFrontController {
 		if (StrKit.isBlank(acount) && StrKit.isBlank(managerName)) {
 			return false;
 		}
-
+		
 		String procInstId = workflow.startProcess(orderId, proc_def_key, param);
 
 		salesOrder.setProcKey(proc_def_key);
@@ -310,27 +335,6 @@ public class OrderController extends BaseFrontController {
 		
 	}
 
-	public void audit() {
-
-		keepPara();
-
-		boolean isCheck = false;
-		String id = getPara("id");
-
-		SalesOrder salesOrder = SalesOrderQuery.me().findById(id);
-		setAttr("salesOrder", salesOrder);
-
-		String taskId = getPara("taskId");
-		List<Comment> comments = WorkFlowService.me().getProcessComments(taskId);
-		setAttr("comments", comments);
-
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		if (user != null && StrKit.equals(getPara("assignee"), user.getUsername())) {
-			isCheck = true;
-		}
-		setAttr("isCheck", isCheck);
-	}
-
 	public void complete() {
 		String orderId = getPara("id");
 		
@@ -344,11 +348,34 @@ public class OrderController extends BaseFrontController {
 		var.put("pass", pass);
 		var.put("orderId", orderId);
 		var.put(Consts.WORKFLOW_APPLY_COMFIRM, user);
+		
+		comment = (pass==1 ? "通过" : "拒绝") + " " + (comment==null ? "" : comment);
+		
+		String comments = buildComments(Consts.OPERATE_HISTORY_TITLE_ORDER_REVIEW, DateUtils.now(), user.getRealname(), comment);
 
 		WorkFlowService workflowService = new WorkFlowService();
-		workflowService.completeTask(taskId, comment, var);
+		workflowService.completeTask(taskId, comments, var);
 
 		renderAjaxResultForSuccess("订单审核成功");
+	}
+	
+	private String buildComments(String title, String date, String realname, String comment) {
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("      <div class=\"weui-cell weui-cell_access\">\n");
+		stringBuilder.append("        <p>");
+		stringBuilder.append(title);
+		stringBuilder.append("<span class=\"fr\">");
+		stringBuilder.append(date);
+		stringBuilder.append("</span></p>\n");
+		stringBuilder.append("        <p>操作人：");
+		stringBuilder.append(realname);
+		stringBuilder.append("</p>\n");
+		stringBuilder.append("        <p>备注：");
+		stringBuilder.append(comment);
+		stringBuilder.append("</p>\n");
+		stringBuilder.append("      </div>\n");
+		
+		return stringBuilder.toString();
 	}
 
 	public void cancel() {

@@ -159,6 +159,29 @@ function save(){
 				smallNum : smallNum,
 				isGift : 0
 			});
+			//子商品
+			productList.push({
+				productName : "",
+				valueName : "",
+				
+				bigPriceSpan : "",
+				smallPriceSpan : "",
+				bigUnitSpan : "",
+				smallUnitSpan : "",
+				stock : "",
+				
+				bigPrice : "",
+				smallPrice : "",
+				bigUnit : "",
+				smallUnit : "",
+				sellProductId : "",
+				productId : "",
+				convert : "",
+
+				bigNum : "",
+				smallNum : "",
+				isGift : 1
+			});
 		}
 	});
 	
@@ -251,7 +274,7 @@ function save(){
 									35度中国劲酒
 								</div>
 								<div class="product_unit">
-									规格： <span>125ml</span> 
+									规格： <span id="valueName">125ml</span> 
 								</div>
 								<span class="weui-cell__ft"></span>
 							</div>
@@ -289,12 +312,14 @@ function save(){
 					<div>
 						<input type="hidden" id="compositionId" value="">
 						<input type="hidden" id="compositionPrice" value="">
-						<div class="product">
+						<div class="product-top">
 							<img src="${CTPATH}/images/jp.jpg" alt="" style="width:2rem;">
-							<div class="product_name" id="compositionName">
-								35度中国劲酒
+							<div class="weui-cell_access product-top-right">
+								<div class="product_name" id="compositionName">
+									35度中国劲酒
+								</div>
+								<span class="weui-cell__ft"></span>
 							</div>
-							<span class="weui-cell__ft"></span>
 						</div>
 						<div class="product_bUnit">
 							<span class="price" id="compositionPriceSpan">￥210</span>
@@ -309,6 +334,15 @@ function save(){
 							</div>
 						</div>
 						<div id="stock">库存：0件</div>
+					</div>
+					<hr>
+					<div>
+						<p>赠品：参茸劲酒_250ml_1*6
+							<a class="fr gift-open">展开</a>
+						</p>
+						<p class="t-r width-50 none">
+							x 1 件
+						</p>
 					</div>
 				</section>
 			</div>

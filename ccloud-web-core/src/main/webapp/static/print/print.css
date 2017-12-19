@@ -6,7 +6,7 @@
 body {
 	font-family: Verdana, Geneva, sans-serif;
 	font-size: 12px;
-	width: 660px;
+	width: 690px;
 	text-align: center;
 	margin: 0 auto;
 }
@@ -30,12 +30,12 @@ img {
 #content-body {
 	font-family: Verdana, Geneva, sans-serif;
 	font-size: 12px;
-	width: 660px;
+	width: 690px;
 	margin: 0 auto;
 }
 
 #print-content {
-	width: 660px;
+	width: 690px;
 	margin: 10px auto;
 }
 
@@ -71,7 +71,7 @@ img {
 table {
 	font-size: 12px;
 	border-collapse: collapse;
-	width: 660px;
+	width: 690px;
 	border: 1px solid #999;
 }
 
@@ -82,7 +82,7 @@ table {
 td, th {
 	border: 1px solid #999;
 	text-align: center;
-	padding: 3px 0;
+	padding: 0px 0;
 	/* width: 12.5%; */
 }
 
@@ -114,7 +114,7 @@ td, th {
 }
 
 #print-content .header .titleArea {
-	height: 30px;
+	height: 25px;
 	position: relative;
 }
 
@@ -166,10 +166,8 @@ td, th {
 
 #action-buttons {
 	text-align: right;
-	line-height: 50px;
-	height: 50px;
 	margin: 5px auto;
-	width: 660px;
+	width: 690px;
 }
 
 @media print {
@@ -181,6 +179,6 @@ td, th {
 	}
 	
 	.print-content {
-		width: 660px;
+		width: 690px;
 	}
 }

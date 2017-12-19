@@ -1,0 +1,43 @@
+<#include "_inc/_layout.html"/>
+
+<#macro css>
+    .weui-content {
+        background: #fff;
+    }
+
+    .weui-panel__hd {
+        font-size: 1rem;
+        color: #ea6f5a;
+    }
+    
+    .weui-cell {
+        padding: .75rem;
+        font-size: .8rem;
+    }
+</#macro>
+
+<@layout>
+	
+	<div class="weui-content">
+        <div class="weui-panel">
+            <div class="weui-panel__hd"><i class="icon-volume-up"></i> 企业公告</div>
+            <div class="weui-panel__bd">
+                <@cc.contentPage pageSize="10">
+                <#if (page.getList().size() > 0)>
+                <#list page.getList() as content>
+                <a href="${CPATH}/c?id=${(content.id)!}">
+	                <div class="weui-media-box weui-media-box_text">
+	                    <h4 class="weui-media-box__title">${(content.title)!}</h4>
+	                    <p class="weui-media-box__desc">${content.created?string('yyyy-MM-dd HH:mm')}</p>
+	                </div>
+                </a>
+                </#list>
+                <#else>
+                    <article>无记录！</article>
+                </#if>
+                </@cc.contentPage>   
+            </div>
+        </div>
+    </div>
+    <#include "_inc/_goback.html" />
+</@layout>  

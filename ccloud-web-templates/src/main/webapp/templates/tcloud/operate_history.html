@@ -1,0 +1,82 @@
+<#include "_inc/_layout.html"/>
+<#macro css> </#macro>
+<#macro script>
+
+</#macro>
+
+<@layout>
+<body id="operate-history">
+  <main class="gray">
+    <div class="weui-cells">
+      <div class="weui-cell weui-cell_access">
+        <div></div>
+        <p>
+          创建订单
+          <span class="fr">${(salesOrder.create_date)!}</span>
+        </p>
+        <p>操作人：${(salesOrder.realname)!}</p>
+      </div>
+      <#list comments as comment>
+        ${(comment.message)!}
+      </#list>
+      <#if printComments?? && printComments?size>0) >
+      <#list printComments as printComment>
+        ${printComment!}
+      </#list>
+      </#if>
+<!--       <div class="weui-cell weui-cell_access">
+        <p>
+          订单出库
+          <span class="fr">2017-10-17 11:11:11</span>
+        </p>
+        <p>出库单号：DO-20171017-001010</p>
+        <p>操作人：小杨</p>
+        <p>备注：小杨</p>
+      </div>
+      <div class="weui-cell weui-cell_access">
+        <p>
+          打印发货单
+          <span class="fr">2017-10-17 11:11:11</span>
+        </p>
+        <p>操作人：小杨</p>
+        <p>备注：第一次打印</p>
+      </div>
+      <div class="weui-cell weui-cell_access">
+        <p>
+          发货确认
+          <span class="fr">2017-10-17 11:11:11</span>
+        </p>
+        <p>操作人：小杨</p>
+        <p>出库单号：DO-20171017-001010</p>
+      </div>
+      <div class="weui-cell weui-cell_access">
+        <p>
+          收款确认
+          <span class="fr">2017-10-17 11:11:11</span>
+        </p>
+        <p>操作人：小杨</p>
+        <p>备注：款已收</p>
+        <div></div>
+      </div>
+    </div> -->
+  </main>
+<div class="hidden-menu">
+  <ul>
+    <li>
+      <a href="${CPATH}/index">
+        首页
+        <i class="icon-home blue"></i>
+      </a>
+    </li>
+    <li>
+      <a class="goback">
+        上一页
+        <i class="icon-undo green"></i>
+      </a>
+    </li>
+  </ul>
+  <i class="icon-menu-open orange fr" id="button"></i>
+</div>
+<div class="layer"></div>
+</body>
+</@layout>
