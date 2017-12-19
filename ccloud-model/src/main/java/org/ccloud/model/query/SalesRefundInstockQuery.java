@@ -74,7 +74,7 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "r.refund_sn", keyword, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "r.instock_sn", keyword, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, needWhere);
 		
 		if (needWhere) {
