@@ -225,8 +225,8 @@
                 var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
                 var geoc = new BMap.Geocoder();                   // 获取百度地址解析器
 
-                $("#lng").val(longitude.toFixed(2));
-                $("#lat").val(latitude.toFixed(2));
+                $("#lng").val(parseFloat(longitude).toFixed(2));
+                $("#lat").val(parseFloat(latitude).toFixed(2));
                 translateCallback = function (point) {            // 回调函数
                     geoc.getLocation(point, function(rs) {
                         var addComp = rs.addressComponents;
