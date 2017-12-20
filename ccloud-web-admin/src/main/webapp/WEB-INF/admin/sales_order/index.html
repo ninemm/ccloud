@@ -64,7 +64,11 @@
 				{field: "id", title: "ID", align: "center", visible:false, edit:false},
 				{field: "checkbox", title: '<input class="jp-common-pad " id="dataItem" onclick="checkAll(this)" title="全选" type="checkbox">', align: "center", width: '2%', 
 					formatter: function(value, row, rowIndex) {
-						return '<input class="jp-common-pad" name="dataItem" type="checkbox" value="' + row.id + '">';
+						if(row.status==0){
+							return '<input class="jp-common-pad" name="dataItem" type="checkbox" value="' + row.id + '">';
+						}else{
+							return '<input class="jp-common-pad" name="dataItem" type="hidden" value="' + row.id + '">';
+						}
 					},
 					edit:false
 				},
@@ -197,6 +201,44 @@
             }
         );
 	}
+	
+	function batchAction(){
+		var flang = confirm("确认通过审核");
+		if(flang == true){
+			var orderItems = new Array();
+			 var flang = true;
+			 var checklist = $('input[name="dataItem"]:checked').parent().parent();
+			 if(checklist.length == 0){
+				alert("未选中任何数据!");
+				flang=false;
+				return;		 
+			 }
+			 $('input[name="dataItem"]:checked').parent().parent().each(function(idx, item) {
+			  	var obj = {
+									"id": $(this).find('td').eq(0).find("input").val(),
+								};
+								orderItems.push(obj);
+							})
+				if(flang==true){			
+					$.ajax({
+						url:"${CPATH}/admin/salesOrder/passAll",
+						type:"post",
+						dataType:"json",
+						data : {orderItems : JSON.stringify(orderItems)},
+						success:function(data){
+							if(data==true){
+								toastr.success(data.message, '添加成功');
+							}else{
+								toastr.error(data.message, '添加失败');
+							}
+							setTimeout( function(){
+							location.reload();
+									}, 2 * 1000 );
+						}
+					});
+				}
+		}
+	}
 
 </#macro>
 
@@ -218,9 +260,9 @@
 		</div>
 		<div class="row content-row">
 			<div class="jp-left">
-				<!-- <@shiro.hasPermission name="/admin/salesOrder/check">
+				<@shiro.hasPermission name="/admin/salesOrder/check">
 					<button class="btn btn-sm btn-primary" type="button" onclick="batchAction()"><i class="fa fa-gavel"></i> 批量审核 </button>
-				</@shiro.hasPermission> -->
+				</@shiro.hasPermission>
 				<a href="${CPATH}/admin/salesOrder/add?c=${c!}&p=${p!}" class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> 新建销售订货单 </a>
 				<a href="${CPATH}/admin/productComposition/add?c=${c!}&p=${p!}" class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> 新建组合订单 </a>
 			</div>

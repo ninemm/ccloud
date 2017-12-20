@@ -35,11 +35,13 @@
 	var params = {
 		"dayTag":  'today',
 		"startDate": startDate,
-		"endDate" : endDate,
-		"deptId": '${(session._logined_user.department_id)!}'
-	}  
+		"endDate" : endDate
+	}
  	orderAmount(params);
  	userCount(params);
+ 	sellerCount(params);
+ 	giftCount(params);
+ 	sellerGiftCount(params);
   })
   
     function orderAmount(params) {
@@ -63,14 +65,147 @@
 		        var seriesData = [];
 		        for (var i = 0; i < data.length; i++) {
 		           yData.push(data[i].realname);
-		           seriesData.push(data[i].totalAmount);
+		           seriesData.push(data[i].productCount);
 		           salesObj[data[i].realname] = data[i].id;
 		       	}
-		       	console.log(yData);
-		       	console.log(seriesData);
 		       	var salesIndentChart = echarts.init(salesIndent);
 		
 				option = {
+				    title: {
+				        text: '业务员',
+				    },				
+				    tooltip: {
+				        trigger: 'axis',
+				        axisPointer: {
+				            type: 'shadow'
+				        }
+				    },
+				    legend: {
+				        data: yData.reverse(),
+				        x: 'left'
+				    },
+				    grid: {
+				        bottom: '3%',
+				        containLabel: true
+				    },
+				    xAxis: {
+				    	show : false,
+				        type: 'value',
+				        boundaryGap: [0, 0.01]
+				    },
+				    yAxis: {
+				        type: 'category',
+				        data: yData
+				    },
+				    series: [
+		            {
+		                type:'bar',
+		                barWidth: 25,
+		                data:seriesData.reverse(),
+		                label:{
+		                    normal:{
+		                        show:true,
+		                        position:'right',
+		                        formatter: '{c}件'
+		                    }
+		                }
+		
+		            }
+				    ]
+				};
+		
+		        salesIndentChart.resize();
+		        salesIndentChart.setOption(option, true);
+		        salesIndentChart.on('click',salesClick);
+		    }    		
+		);    	
+    }
+    
+    var sellerObj = [];
+    function sellerCount(params) {
+		Utils.ajax('${CPATH}/report/getSellerCount', params, 
+			function(data){
+	        	var salesIndent = document.getElementById('dealerCount');
+	        	var salesIndentTotal = 0;
+		        var $salesIndent = $(salesIndent);
+		        var yData = [];
+		        var seriesData = [];
+		        for (var i = 0; i < data.length; i++) {
+		           yData.push(data[i].seller_name);
+		           seriesData.push(data[i].productCount);
+		           sellerObj[data[i].seller_name] = data[i].id;
+		       	}
+		       	var salesIndentChart = echarts.init(salesIndent);
+		
+				option = {
+				    title: {
+				        text: '直营商',
+				    },				
+				    tooltip: {
+				        trigger: 'axis',
+				        axisPointer: {
+				            type: 'shadow'
+				        }
+				    },
+				    legend: {
+				        data: yData,
+				        x: 'left'
+				    },
+				    grid: {
+				        bottom: '3%',
+				        containLabel: true
+				    },
+				    xAxis: {
+				    	show : false,
+				        type: 'value',
+				        boundaryGap: [0, 0.01]
+				    },
+				    yAxis: {
+				        type: 'category',
+				        data: yData
+				    },
+				    series: [
+		            {
+		                type:'bar',
+		                barWidth: 25,
+		                data:seriesData,
+		                label:{
+		                    normal:{
+		                        show:true,
+		                        position:'right',
+		                        formatter: '{c}件'
+		                    }
+		                }
+		
+		            }
+				    ]
+				};
+		
+		        salesIndentChart.resize();
+		        salesIndentChart.setOption(option, true);
+		        salesIndentChart.on('click',sellerClick);
+		    }    		
+		);    	
+    }    
+    
+    function giftCount(params) {
+		Utils.ajax('${CPATH}/report/getGiftCountByUser', params, 
+			function(data){
+	        	var salesIndent = document.getElementById('giftCount');
+	        	var salesIndentTotal = 0;
+		        var $salesIndent = $(salesIndent);
+		        var yData = [];
+		        var seriesData = [];
+		        for (var i = 0; i < data.length; i++) {
+		           yData.push(data[i].realname);
+		           seriesData.push(data[i].productCount);
+		       	}
+		       	var salesIndentChart = echarts.init(salesIndent);
+		
+				option = {
+				    title: {
+				        text: '业务员',
+				    },				
 				    tooltip: {
 				        trigger: 'axis',
 				        axisPointer: {
@@ -97,12 +232,12 @@
 		            {
 		                type:'bar',
 		                barWidth: 25,
-		                data:seriesData.reverse(),
+		                data:seriesData,
 		                label:{
 		                    normal:{
 		                        show:true,
 		                        position:'right',
-		                        formatter: '{c}元'
+		                        formatter: '{c}件'
 		                    }
 		                }
 		
@@ -117,25 +252,95 @@
 		);    	
     }
     
+    function sellerGiftCount(params) {
+		Utils.ajax('${CPATH}/report/getGiftCountBySeller', params, 
+			function(data){
+	        	var salesIndent = document.getElementById('dealerGiftCount');
+	        	var salesIndentTotal = 0;
+		        var $salesIndent = $(salesIndent);
+		        var yData = [];
+		        var seriesData = [];
+		        for (var i = 0; i < data.length; i++) {
+		           yData.push(data[i].seller_name);
+		           seriesData.push(data[i].productCount);
+		       	}
+		       	var salesIndentChart = echarts.init(salesIndent);
+		
+				option = {
+				    title: {
+				        text: '直营商',
+				    },				
+				    tooltip: {
+				        trigger: 'axis',
+				        axisPointer: {
+				            type: 'shadow'
+				        }
+				    },
+				    legend: {
+				        data: yData,
+				        x: 'left'
+				    },
+				    grid: {
+				        bottom: '3%',
+				        containLabel: true
+				    },
+				    xAxis: {
+				        type: 'value',
+				        boundaryGap: [0, 0.01]
+				    },
+				    yAxis: {
+				        type: 'category',
+				        data: yData
+				    },
+				    series: [
+		            {
+		                type:'bar',
+		                barWidth: 25,
+		                data:seriesData,
+		                label:{
+		                    normal:{
+		                        show:true,
+		                        position:'right',
+		                        formatter: '{c}件'
+		                    }
+		                }
+		
+		            }
+				    ]
+				};
+		
+		        salesIndentChart.resize();
+		        salesIndentChart.setOption(option, true);
+		        salesIndentChart.on('click',sellerClick);
+		    }    		
+		);    	
+    }        
+    
 	function salesClick(param) {
 	    if (typeof param.seriesIndex != 'undefined') {
 	        window.location.href = "${(CPATH)}/report/userReportDetail?userId=" + salesObj[param.name] + "&userName=" + param.name; 
 	    }
-	}    
+	}
+	
+	function sellerClick(param) {
+	    if (typeof param.seriesIndex != 'undefined') {
+	        window.location.href = "${(CPATH)}/report/sellerReportDetail?sellerId=" + sellerObj[param.name] + "&sellerName=" + param.name; 
+	    }
+	} 	    
     
     function urlSelect(params, type){
     	if (type == 'order') {
 			orderAmount(params);
 		} else {
 			userCount(params);
+			giftCount(params);
 		}
     }
     
     function startDaySelect(obj,type) {
 		var params = {
     		"startDate": $(obj).val(),
-			"endDate": $(obj).parent().find('#endDay').val(),
-			"deptId": '${(session._logined_user.department_id)!}'
+			"endDate": $(obj).parent().find('#endDay').val()
 		}
 		urlSelect(params,type); 
     }
@@ -143,8 +348,7 @@
     function endDaySelect(obj,type) {
 		var params = {
     		"startDate": $(obj).parent().find('#startDay').val(),
-			"endDate": $(obj).val(),
-			"deptId": '${(session._logined_user.department_id)!}'
+			"endDate": $(obj).val()
 		}
 		urlSelect(params,type); 
     }    
@@ -155,8 +359,7 @@
           text: "今日",
           onClick: function () {
 			var params = {
-				"dayTag": 'today',
-				"deptId": '${(session._logined_user.department_id)!}'
+				"dayTag": 'today'
 			}
 			urlSelect(params,type); 
             $(obj).find(".dayTagText").text('今日')
@@ -165,8 +368,7 @@
           text: "昨日",
           onClick: function () {
 			var params = {
-				"dayTag": 'yesterday',
-				"deptId": '${(session._logined_user.department_id)!}'
+				"dayTag": 'yesterday'
 			}
           	urlSelect(params,type);
             $(obj).find(".dayTagText").text('昨日')
@@ -175,8 +377,7 @@
           text: "本周",
           onClick: function () {
 			var params = {
-				"dayTag": 'week',
-				"deptId": '${(session._logined_user.department_id)!}'
+				"dayTag": 'week'
 			}
 			urlSelect(params,type);   
           	$(obj).find(".dayTagText").text('本周')
@@ -185,8 +386,7 @@
           text: "上周",
           onClick: function () {
 			var params = {
-				"dayTag": 'lastweek',
-				"deptId": '${(session._logined_user.department_id)!}'
+				"dayTag": 'lastweek'
 			}
           urlSelect(params,type);
           $(obj).find(".dayTagText").text('上周')
@@ -195,8 +395,7 @@
           text: "本月",
           onClick: function () {
 			var params = {
-				"dayTag": 'month',
-				"deptId": '${(session._logined_user.department_id)!}'
+				"dayTag": 'month'
 			}     
 			urlSelect(params,type);    
          	$(obj).find(".dayTagText").text('本月')
@@ -205,8 +404,7 @@
           text: "上月",
           onClick: function () {
 			var params = {
-				"dayTag": 'lastmonth',
-				"deptId": '${(session._logined_user.department_id)!}'
+				"dayTag": 'lastmonth'
 			}         
 			urlSelect(params,type);
           	$(obj).find(".dayTagText").text('上月')
@@ -265,7 +463,33 @@
 					</div>
 				</div>
 			</div>
+			<div class="weui-panel__bd report-area">
+				<div class="weui-media-box ft14">
+					<div id="dealerCount" style="height: 300px;">
+						
+					</div>
+				</div>
+			</div>			
 		</div>
+		<div class="weui-panel weui-panel_access">
+			<div class="weui-panel__hd">
+				<span class="overview-hd-title">赠品统计</span>
+			</div>
+			<div class="weui-panel__bd report-area">
+				<div class="weui-media-box ft14">
+					<div id="giftCount" style="height: 300px;">
+						
+					</div>
+				</div>
+			</div>
+			<div class="weui-panel__bd report-area">
+				<div class="weui-media-box ft14">
+					<div id="dealerGiftCount" style="height: 300px;">
+						
+					</div>
+				</div>
+			</div>			
+		</div>		
 		</div>
 		<#include "_inc/_footer_nav.html" />
 	</div>

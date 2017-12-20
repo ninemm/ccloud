@@ -39,6 +39,7 @@ import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
 
+import com.alibaba.fastjson.JSONArray;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.jfinal.aop.Before;
@@ -225,4 +226,27 @@ public class _SalesRefundController extends JBaseCRUDController<SalesRefundInsto
         return isSave;
 	}
 	
+	//审核通过，对库存总账进行修改
+		@Before(Tx.class)
+		public void passAll(){
+			String ds = getPara("orderItems");
+			boolean result=false;
+			JSONArray jsonArray = JSONArray.parseArray(ds);
+			List<SalesRefundInstock> refunds = jsonArray.toJavaList(SalesRefundInstock.class);
+			for(SalesRefundInstock instock : refunds){
+				String inStockId = instock.getId();
+				int status = instock.getStatus();
+				result = this.passSalesRefund(inStockId, status);
+				if(result == false){
+					break;
+				}
+			}
+			if (result) {
+				renderAjaxResultForSuccess("审核成功");
+				renderJson(result);
+			} else {
+				renderAjaxResultForError("审核失败");
+				renderJson(result);
+			}
+		}
 }

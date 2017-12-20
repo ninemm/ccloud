@@ -347,9 +347,9 @@ public class _ReportController extends JBaseController {
 			watchHead.add(customName);
 		}
 		//根据表头  对数据从新排序
-		List<List>mSellerDetailReportList=new ArrayList<>();
+		List<List<String>>mSellerDetailReportList=new ArrayList<>();
 		for (Record record : list) {
-			List mSellerDetailGiftReport=new ArrayList<>();
+			List<String> mSellerDetailGiftReport=new ArrayList<>();
 			for (int i = 0; i < watchHead.size(); i++) {
 				String key = watchHead.get(i);
 				mSellerDetailGiftReport.add(record.getStr(key));
@@ -360,9 +360,9 @@ public class _ReportController extends JBaseController {
 		setAttr("mSellerDetailReportList", mSellerDetailReportList);
 		List<Record> list1 = SalesOrderQuery.me().findByMSellerDetailGift(startDate,endDate,keyword, dataArea,sellerId);
 		//根据表头  对数据从新排序
-		List<List>mSellerDetailGiftReportList=new ArrayList<>();
+		List<List<String>>mSellerDetailGiftReportList=new ArrayList<>();
 		for (Record record : list1) {
-			List mSellerDetailGiftReport=new ArrayList<>();
+			List<String> mSellerDetailGiftReport=new ArrayList<>();
 			for (int i = 0; i < watchHead.size(); i++) {
 				String key = watchHead.get(i);
 				mSellerDetailGiftReport.add(record.getStr(key));

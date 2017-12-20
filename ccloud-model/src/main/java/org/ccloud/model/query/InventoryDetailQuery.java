@@ -136,23 +136,22 @@ public class InventoryDetailQuery extends JBaseQuery {
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
+	//库存明细报表
 	public Page<InventoryDetail> findByDataArea(int pageNumber, int pageSize, String keyword, String create_date,
 			 String startDate, String endDate,String dataArea, String warehouseId) {
-		String select = "SELECT cid.warehouse_id ,cid.sell_product_id , cs.seller_name , w.`name` , sp.custom_name , SUM(cid.in_count) in_count, SUM(cid.out_count) out_count";
-		StringBuilder fromBuilder = new StringBuilder(" FROM cc_inventory i");
-		fromBuilder.append(" LEFT JOIN cc_seller cs ON cs.id = i.seller_id ");
-		fromBuilder.append(" LEFT JOIN cc_warehouse w ON w.id = i.warehouse_id ");
-		fromBuilder.append(" LEFT JOIN cc_inventory_detail cid ON i.warehouse_id = cid.warehouse_id ");
+		String select = "select cid.warehouse_id , cid.sell_product_id , cs.seller_name , w.`name` , sp.custom_name , IFNULL(SUM(cid.out_count) , 0) out_count , IFNULL(SUM(cid.in_count) , 0) in_count";
+		StringBuilder fromBuilder = new StringBuilder(" FROM cc_inventory_detail cid");
+		fromBuilder.append(" LEFT JOIN cc_warehouse w ON w.id = cid.warehouse_id  ");
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id = cid.sell_product_id ");
+		fromBuilder.append(" LEFT JOIN cc_seller cs ON cs.id = sp.seller_id ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "i.data_area", dataArea, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cid.data_area", dataArea, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "w.id", warehouseId, params, needWhere);
 		if (StrKit.notBlank(startDate)) {
 			fromBuilder.append(" and cid.create_date >= ?");
 			params.add(startDate);
 		}
-
 		if (StrKit.notBlank(endDate)) {
 			fromBuilder.append(" and cid.create_date <= ?");
 			params.add(endDate);
@@ -165,29 +164,26 @@ public class InventoryDetailQuery extends JBaseQuery {
 		}
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
-
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 	
 	//库存详细报表 产品总计
 	public Page<InventoryDetail> findByInventoryDetailListTotal(int pageNumber, int pageSize, String string,
 			String dataArea, String seller_id) {
-		String select = "SELECT cs.seller_name ,'总计' as `name` , sp.custom_name , SUM(cid.in_count) in_count, SUM(cid.out_count) out_count,SUM(cid.in_count)-SUM(cid.out_count) as balance_count";
-		StringBuilder fromBuilder = new StringBuilder(" FROM cc_inventory i");
-		fromBuilder.append(" LEFT JOIN cc_seller cs ON cs.id = i.seller_id ");
-		fromBuilder.append(" LEFT JOIN cc_warehouse w ON w.id = i.warehouse_id ");
-		fromBuilder.append(" LEFT JOIN cc_inventory_detail cid ON i.warehouse_id = cid.warehouse_id ");
+		String select = "SELECT cs.seller_name , '总计' AS `name` , sp.custom_name , IFNULL(SUM(cid.out_count) , 0) out_count ,IFNULL(SUM(cid.in_count) , 0)  in_count , SUM(cid.in_count) - IFNULL(SUM(cid.out_count) , 0) AS  balance_count";
+		StringBuilder fromBuilder = new StringBuilder(" FROM cc_inventory_detail cid ");
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id = cid.sell_product_id ");
-		fromBuilder.append(" where cs.id='"+seller_id+"'");
+		fromBuilder.append(" LEFT JOIN cc_seller cs ON cs.id = sp.seller_id ");
 		LinkedList<Object> params = new LinkedList<Object>();
-		boolean needWhere = false;
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "i.data_area", dataArea, params, needWhere);
+		boolean needWhere = true;
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cid.data_area", dataArea, params, needWhere);
 		fromBuilder.append("GROUP BY cid.sell_product_id ");
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
+	//查询当前的剩余商品
 	public InventoryDetail findByInventoryDetail(String sellProductId, String warehouseId1, String startDate,
 			String endDate) {
 		String sql = "select * from cc_inventory_detail c where c.sell_product_id = '"+sellProductId+"' and c.warehouse_id ='";

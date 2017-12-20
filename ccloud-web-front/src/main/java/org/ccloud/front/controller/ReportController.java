@@ -175,6 +175,18 @@ public class ReportController extends BaseFrontController {
 		render("user_report.html");
 	}
 	
+	public void sellerReportDetail() {
+		String sellerId = getPara("sellerId");
+		String sellerName = getPara("sellerName");
+        try {
+			setAttr("sellerName", new String(sellerName.getBytes("ISO-8859-1"),"UTF-8"));
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}		
+		setAttr("sellerId", sellerId);
+		render("seller_report.html");
+	}	
+	
 	public void getUserRank() {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
@@ -186,5 +198,59 @@ public class ReportController extends BaseFrontController {
 		List<Record> record = SalesOrderQuery.me().getUserRank(startDate, endDate, dayTag, deptId, sellerId, dataArea);
 		renderJson(record);
 	}
+	
+	public void getGiftCountByUser() {
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String dayTag = getPara("dayTag");
+		String sellerId = getSessionAttr("sellerId");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String dataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea());
+		String deptId = getPara("deptId");
+		List<Record> record = SalesOrderQuery.me().getGiftCountByUser(startDate, endDate, dayTag, deptId, sellerId, dataArea);
+		renderJson(record);
+	}
+	
+	public void getGiftCountBySeller() {
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String dayTag = getPara("dayTag");
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		List<Record> record = SalesOrderQuery.me().getGiftCountBySeller(startDate, endDate, dayTag, dataArea);
+		renderJson(record);
+	}	
+	
+	public void getSellerCount() {
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String dayTag = getPara("dayTag");
+		String sellerId = getSessionAttr("sellerId");
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		List<Record> record = SalesOrderQuery.me().getSellerCount(startDate, endDate, dayTag, sellerId, dataArea);
+		renderJson(record);
+	}
+	
+	public void sellerProductCount() {
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");	
+		String dayTag = getPara("dayTag");
+		String sellerId = getPara("sellerId");
+		String productType = getPara("productType");
+		String isGift = getPara("isGift");
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		List<Record> record = SalesOrderQuery.me().sellerProductCount(startDate, endDate, dayTag, productType, sellerId, isGift, dataArea);
+		renderJson(record);
+	}
+	
+	public void sellerOrderAmount() {
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String dayTag = getPara("dayTag");
+		String sellerId = getPara("sellerId");
+		String customerType = getPara("customerType");
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		Record record = SalesOrderQuery.me().sellerOrderAmount(startDate, endDate, dayTag, customerType, sellerId, dataArea);
+		renderJson(record);
+	}	
 	
 }

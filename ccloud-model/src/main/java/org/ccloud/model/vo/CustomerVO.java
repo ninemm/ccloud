@@ -47,7 +47,7 @@ public class CustomerVO implements Serializable {
 
 	@JSONField(name = "客户种类")
 	private  String customerKind;
-	
+
 	public String getCustomerId() {
 		return customerId;
 	}
@@ -183,5 +183,6 @@ public class CustomerVO implements Serializable {
 	public void setCustomerKind(String customerKind) {
 		this.customerKind = customerKind;
 	}
+
 	
 }
