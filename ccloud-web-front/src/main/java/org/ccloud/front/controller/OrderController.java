@@ -195,7 +195,7 @@ public class OrderController extends BaseFrontController {
 				String orderSn = "SO" + sellerCode + StringUtils.getArrayFirst(paraMap.get("customerTypeCode"))
 						+ DateUtils.format("yyMMdd", date) + OrderSO;
 
-				if (!SalesOrderQuery.me().insertForApp(paraMap, orderId, orderSn, sellerId, user.getId(), date,
+				if (!SalesOrderQuery.me().insertForApp(paraMap, orderId, orderSn, sellerId, user.getId(), date,	
 						user.getDepartmentId(), user.getDataArea(), allTotalAmount)) {
 					return false;
 				}
@@ -335,6 +335,7 @@ public class OrderController extends BaseFrontController {
 		
 	}
 
+	@Before(Tx.class)
 	public void complete() {
 		String orderId = getPara("id");
 		
@@ -342,22 +343,47 @@ public class OrderController extends BaseFrontController {
 		
 		String taskId = getPara("taskId");
 		String comment = getPara("comment");
-		String refuseReson = getPara("refuseReson");
+		String refuseReson = getPara("refuseReson","");
 		Integer pass = getParaToInt("pass", 1);
-
+		Integer edit = getParaToInt("edit", 0);
+		
 		Map<String, Object> var = Maps.newHashMap();
 		var.put("pass", pass);
 		var.put("orderId", orderId);
 		var.put(Consts.WORKFLOW_APPLY_COMFIRM, user);
 		
-		comment = (pass==1 ? "通过" : "拒绝") + " " + (comment==null ? "" : comment) + " " + (refuseReson=="undefined" ? "" : refuseReson);
-		
+		if (pass == 1 && edit == 1) {
+			editOrder(user.getId());
+
+		} else {
+			comment = (pass == 1 ? "通过" : "拒绝") + " " + (comment == null ? "" : comment) + " "
+					+ (refuseReson == "undefined" ? "" : refuseReson);
+		}
+
 		String comments = buildComments(Consts.OPERATE_HISTORY_TITLE_ORDER_REVIEW, DateUtils.now(), user.getRealname(), comment);
 
 		WorkFlowService workflowService = new WorkFlowService();
 		workflowService.completeTask(taskId, comments, var);
 
 		renderAjaxResultForSuccess("订单审核成功");
+	}
+	
+	//是否改价格
+	private void editOrder(String userId) {
+		Map<String, String[]> paraMap = getParaMap();
+		Date date = new Date();
+		
+		if(!SalesOrderQuery.me().updateForApp(paraMap, userId, date)) {
+			renderAjaxResultForError("订单审核修改价格失败");
+		}
+		
+		String[] orderDetailIds = getParaValues("orderDetailId");
+		for(int index=0;index<orderDetailIds.length;index++) {
+			if(!SalesOrderDetailQuery.me().updateForApp(paraMap, index, date)) {
+				renderAjaxResultForError("订单审核修改价格失败");
+			}
+		}
+		
 	}
 	
 	private String buildComments(String title, String date, String realname, String comment) {

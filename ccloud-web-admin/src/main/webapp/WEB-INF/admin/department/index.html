@@ -37,6 +37,7 @@
 					jQuery.mm.initIconTreeView('#treeview-checkable-station', data.stationList, false, url);
 					jQuery.mm.initIconTreeView('#treeview-checkable-role', data.roleList, false, url);
 					jQuery.mm.initIconTreeView('#treeview-checkable-warehouse', data.wareHouseList, false, url);
+					jQuery.mm.initIconTreeView('#treeview-checkable-user', data.userList, false, url);
 					jQuery.mm.initIconTreeView('#treeview-checkable-seller', data.sellerList, false, url);
 					jQuery.mm.initIconTreeView('#treeview-checkable-group', data.groupList, false, url);
 					jQuery.mm.initIconTreeView('#treeview-checkable-type', data.customTypeList, false, url);
@@ -113,11 +114,17 @@
 						</td>
 						<td>
 							<div id="goodsSpecificationPreview" class="goodsSpecificationPreview" style="height:400px;">
-							    <ul id="myTab" class="nav nav-tabs">  
-							        <li class="active"><a href="#A1" data-toggle="tab">角色人员</a></li>  
+							    <ul id="myTab" class="nav nav-tabs"> 
+							   		<li class="active"><a href="#C1" data-toggle="tab">部门人员</a></li>  
+							        <li><a href="#A1" data-toggle="tab">角色人员</a></li>  
 							        <li><a href="#B1" data-toggle="tab">岗位人员</a></li>  
 							    </ul>
 							    <div id="myTabContent" class="tab-content">  
+							        <div class="tab-pane fade" id="C1">
+								        <div class="col-sm-20">
+								          <div id="treeview-checkable-user" class=""></div>
+								        </div>							        
+							   		</div>							    
 							        <div class="tab-pane fade in active" id="A1">
 								        <div class="col-sm-20">
 								          <div id="treeview-checkable-role" class=""></div>

@@ -87,7 +87,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		String sellerId = getSessionAttr("sellerId");
-
+		
 		Page<Record> page = PurchaseOrderQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate,getSessionAttr(Consts.SESSION_SELECT_DATAAREA).toString(),sellerId);
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());

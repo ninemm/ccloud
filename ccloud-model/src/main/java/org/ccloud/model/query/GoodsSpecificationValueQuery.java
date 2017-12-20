@@ -52,7 +52,7 @@ public class GoodsSpecificationValueQuery extends JBaseQuery {
 		
 		LinkedList<Object> params = new LinkedList<Object>();
 		
-		appendIfNotEmptyWithLike(fromBuilder, "name", keyword, params, true);
+		appendIfNotEmptyWithLike(fromBuilder, "cc.name", keyword, params, true);
 		
 		fromBuilder.append("order by " + orderby);
 

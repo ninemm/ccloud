@@ -178,16 +178,15 @@ $(function() {
 		var allTotalAmount = 0;
 		$.each(products, function(index, el) {
 			var $el = $(el);
-			rowTotal = 0;
+			rowTotal = $el.find("#bigNum").val() * $el.find("#bigPrice").val() + $el.find("#smallNum").val() * $el.find("#smallPrice").val();
 			if($el.find("#isGift").val() == 0) {
-				rowTotal = $el.find("#bigNum").val() * $el.find("#bigPrice").val() + $el.find("#smallNum").val() * $el.find("#smallPrice").val();
 				total += rowTotal;
-				var bigNum = parseInt($el.find("#bigNum").val());
-				var convert = parseInt($el.find("#convert").val());
-				var smallNum = parseInt($el.find("#smallNum").val());
-				var number = (smallNum/convert).toFixed(2);
-				allTotalAmount = allTotalAmount + bigNum + number*1;
 			}
+			var bigNum = parseInt($el.find("#bigNum").val());
+			var convert = parseInt($el.find("#convert").val());
+			var smallNum = parseInt($el.find("#smallNum").val());
+			var number = (smallNum/convert).toFixed(2);
+			allTotalAmount = allTotalAmount + bigNum + number*1;
 			$el.find("#rowTotal").val(rowTotal);
 		});
 
@@ -360,7 +359,7 @@ $(function() {
 						<div class="product_unit">
 							规格：<span id="valueName">125ml</span>
 							<span class="fr no-bg">是否赠品</span>
-							<input type="checkbox" name="isGift" id="isGift" value="1" class="fr">
+							<input type="checkbox" name="isGift" id="isGift" value="1" class="fr" disabled>
 						</div>
 						<div class="product_bUnit">
 							<span class="price" id="bigPriceSpan">￥725</span>

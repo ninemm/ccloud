@@ -275,7 +275,19 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 
 			String productPrice = paraMap.get("giftBigPrice")[index];
 			detail.setProductPrice(new BigDecimal(productPrice));
-			detail.setProductAmount(new BigDecimal(0));
+			
+			BigDecimal productAmount = new BigDecimal(0);
+			if ("bigUnit".equals(giftUnit)) {
+				BigDecimal bigAmount = new BigDecimal(detail.getProductCount()).divide(new BigDecimal(convert), 0 , RoundingMode.DOWN)
+						.multiply(new BigDecimal(productPrice));
+				productAmount = bigAmount;
+			} else {
+				BigDecimal smallPrice = new BigDecimal(productPrice).divide(new BigDecimal(convert), 2, BigDecimal.ROUND_HALF_UP);
+				BigDecimal smallAmount = new BigDecimal(detail.getProductCount()).divideAndRemainder(new BigDecimal(convert))[1].multiply(smallPrice);
+				productAmount = smallAmount;
+			}			
+			
+			detail.setProductAmount(productAmount);
 			detail.setIsGift(1);//赠品
 			detail.setCreateDate(date);
 			detail.setDeptId(deptId);
@@ -340,6 +352,33 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 			return false;
 		}
 		return true;
+	}
+	
+	public boolean updateForApp(Map<String, String[]> paraMap, int index, Date date) {
+		SalesOrderDetail detail = SalesOrderDetailQuery.me().findById(paraMap.get("orderDetailId")[index]);
+	
+		String convert = paraMap.get("convert")[index];
+		String bigNum = paraMap.get("bigNum")[index];
+		String smallNum = paraMap.get("smallNum")[index];
+		Integer productCount = Integer.valueOf(bigNum) * Integer.valueOf(convert) + Integer.valueOf(smallNum);
+
+		detail.setProductCount(productCount);
+		detail.setLeftCount(productCount);
+
+		String productPrice = paraMap.get("bigPrice")[index];
+		BigDecimal bigAmount = new BigDecimal(detail.getProductCount())
+				.divide(new BigDecimal(convert), 0, RoundingMode.DOWN).multiply(new BigDecimal(productPrice));
+		BigDecimal smallPrice = new BigDecimal(productPrice).divide(new BigDecimal(convert), 2,
+				BigDecimal.ROUND_HALF_UP);
+		BigDecimal smallAmount = new BigDecimal(productCount).divideAndRemainder(new BigDecimal(convert))[1]
+				.multiply(smallPrice);
+		BigDecimal productAmount = bigAmount.add(smallAmount);
+
+		detail.setProductPrice(new BigDecimal(productPrice));
+		detail.setProductAmount(productAmount);
+		detail.setModifyDate(date);
+
+		return detail.update();
 	}
 
 

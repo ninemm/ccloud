@@ -30,6 +30,7 @@
 	$(function() {
 		jQuery.mm.initDatetimepicker('form', '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initDatetimepicker('form', '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
+		jQuery.mm.initValidator('#form', validatorFields);
 		$('#datatable1').DataTable({  
 			"searching" : false, 
 	        "bSort": false,  
@@ -83,6 +84,18 @@
 		var startDate= $('#startDate').val();
 		var endDate= $('#endDate').val();
 		window.location.href="${CPATH}/admin/report/mSellerDetail?startDate="+startDate+"&endDate="+endDate+"&k=sok.create_date&c=${c!}&p=${p!}"
+	};
+	var validatorFields = {
+		'startDate': {
+			validators: {
+				date : { format : 'YYYY-MM-DD', message : '日期格式不正确' }
+			}
+		},
+		'endDate': {
+			validators: {
+				date : { format : 'YYYY-MM-DD', message : '日期格式不正确' }
+			}
+		}
 	}
 </#macro>
 <@layout active_id=p child_active_id=c>
@@ -118,7 +131,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="box">
+		<div class="box" style="overflow:auto">
 			<div class="box-body jp-common-pad">
 				<table class="table table-striped"  id="datatable1" style="border:0px">
 					<thead>
@@ -151,7 +164,7 @@
 			</div>
 		</div>
 		<h2>赠品统计</h2>
-		<div class="box">
+		<div class="box" style="overflow:auto">
 			<div class="box-body jp-common-pad">
 				<table class="table table-striped"  id="datatable2" style="border:0px">
 					<thead>

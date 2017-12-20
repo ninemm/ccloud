@@ -110,9 +110,13 @@ public class CustomerQuery extends JBaseQuery {
 	}
 
 	public List<Customer> findByUserId(String id) {
-		StringBuilder sql = new StringBuilder("SELECT cc.* FROM cc_customer cc ");
+/*原		StringBuilder sql = new StringBuilder("SELECT cc.* FROM cc_customer cc ");
 		sql.append("RIGHT JOIN cc_user_join_customer a ON cc.id = a.customer_id ");
-		sql.append("WHERE a.user_id= ? ");
+		sql.append("WHERE a.user_id= ? ");*/
+		StringBuilder sql = new StringBuilder("select cc.* from cc_customer cc ");
+		sql.append("right join cc_seller_customer csc on csc.customer_id = cc.id ");
+		sql.append("inner join cc_user_join_customer a on csc.id = a.seller_customer_id ");
+		sql.append("where user_id = ? ");
 		return DAO.find(sql.toString(), id);
 	}
 
