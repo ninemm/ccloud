@@ -64,7 +64,7 @@
    					formatter: function(value, row, rowIndex) {
    						var url = '${CPATH}/admin/menu/edit?id=' + row.id + '&c=${c}&p=${p}';
    						var url2 = '${CPATH}/admin/menu/permission?id=' + row.id + '&menuName=' + row.name + '&c=${c}&p=${p}';
-   						var strHtml = '<a href="' + url + '" class="btn btn-sm" title="编辑"><i class="fa fa-edit"></i></a> <a href="javascript:void(0);" class="btn btn-sm" onclick="del(\''+row.id+'\')" title="删除"><i class="fa fa-trash-o"></i></a><a href="' + url2 + '" class="btn btn-sm" title="分配"><i class="fa fa-th-list"></i></a>';
+   						var strHtml = '<a href="' + url + '" class="label label-table label-info">编辑</a> <a href="javascript:void(0);" class="label label-table label-danger" onclick="del(\''+row.id+'\')">删除</a> <a href="' + url2 + '" class="label label-table label-success">分配</a>';
     					return strHtml;
    					},
    					edit:false

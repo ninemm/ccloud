@@ -197,7 +197,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			seller.set("dept_id",getPara("dept_id"));
 			
 			Option option = new Option();
-			option.setOptionKey(sellerId+"_store_check");
+			option.setOptionKey("seller_store_check");
 			option.setOptionValue("1");
 			option.set("seller_id",sellerId );
 			
