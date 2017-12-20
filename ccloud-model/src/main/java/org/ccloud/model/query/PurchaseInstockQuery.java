@@ -150,9 +150,9 @@ public class PurchaseInstockQuery extends JBaseQuery {
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 	
-	public String getNewSn(String sellerId) {
-		String sql = "SELECT s.order_sn FROM cc_sales_order s WHERE date(s.create_date) = curdate() AND s.seller_id = ? ORDER BY s.create_date desc";
-		PurchaseInstock purchaseInstock = DAO.findFirst(sql, sellerId);
+	public String getNewSn() {
+		String sql = "SELECT p.pwarehouse_sn FROM cc_purchase_instock p WHERE date(p.create_date) = curdate() ORDER BY p.create_date desc";
+		PurchaseInstock purchaseInstock = DAO.findFirst(sql);
 		String SN = "";
 		if (purchaseInstock == null || StringUtils.isBlank(purchaseInstock.getPwarehouseSn())) {
 			SN = Consts.PURCHASE_IN_STOCK_SN;
