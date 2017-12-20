@@ -144,6 +144,6 @@ public class SellerQuery extends JBaseQuery {
 	
 	public Record findByCustomerId(final String customerId) {
 		
-		return Db.findFirst("select s.* , d.data_area from cc_seller s join department d on s.dept_id = d.id where customer_id = ?" , customerId);
+		return Db.findFirst("select s.* , d.data_area from cc_seller s join department d on s.dept_id = d.id where s.customer_id = ?" , customerId);
 	}
 }
