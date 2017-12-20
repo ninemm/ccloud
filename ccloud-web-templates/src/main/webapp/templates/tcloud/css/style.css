@@ -99,11 +99,6 @@ a {
   height: inherit;
 }
 
-.weui-tabbar__item.weui-bar__item--on .weui-tabbar__label,
-.weui-tabbar__item.weui-bar__item--on .weui-tabbar__icon i {
-  color: #ea6f5a;
-}
-
 .weui-footer {
   height: 2.25rem;
   line-height: 2.25rem;
@@ -158,7 +153,10 @@ a {
 .toolbar .picker-button,
 .weui-cells_radio .weui-check:checked+.weui-icon-checked:before,
 .weui-search-bar__cancel-btn,
-.weui-cells_checkbox .weui-check:checked+.weui-icon-checked:before {
+.weui-cells_checkbox .weui-check:checked+.weui-icon-checked:before,
+.weui-dialog__btn,
+.weui-tabbar__item.weui-bar__item--on .weui-tabbar__label,
+.weui-tabbar__item.weui-bar__item--on .weui-tabbar__icon i {
   color: #ea6f5a;
 }
 
