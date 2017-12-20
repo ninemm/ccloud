@@ -1232,14 +1232,13 @@ public class SalesOrderQuery extends JBaseQuery {
 
 	//商品销售排行 当日or汇总
 	public List<Record> queryGoodsSales(String selDataArea,boolean toDay,String desc){
-		StringBuilder fromBuilder = new StringBuilder("select cg.id goodid,cg.`name` title,sum(csod.product_count) countgoods,sum(csod.product_amount) sumamount ");
+		StringBuilder fromBuilder = new StringBuilder("select csp.id,csp.custom_name title,sum(csod.product_count) countgoods,sum(csod.product_amount) sumamount ");
 		fromBuilder.append("from cc_sales_order_detail csod inner join cc_seller_product csp on csod.sell_product_id = csp.id ");
-		fromBuilder.append("left join cc_product cp on csp.product_id = cp.id left join cc_goods cg on cp.goods_id = cg.id ");
 		fromBuilder.append("where csod.data_area like '"+selDataArea+"' ");
 		if(toDay) {
 			fromBuilder.append("and DATE_FORMAT(csod.create_date, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d') ");
 		}
-		fromBuilder.append("group by cg.id order by sumamount ");
+		fromBuilder.append("group by csp.id order by sumamount ");
 		fromBuilder.append(desc+" limit 0,5 ");
 		return Db.find(fromBuilder.toString());
 	}
