@@ -64,11 +64,9 @@ public class CustomerController extends BaseFrontController {
 		String key = getPara("searchKey");
 		String hasOrder = getPara("isOrdered");
 		String customerType =  getPara("customerType");
-		int pageSize = Consts.PAGE_SIZE;
 
 
-		Page<Record> customerList = SellerCustomerQuery.me().findByUserTypeForApp(getPageNumber(), pageSize, selectDataArea, customerType, hasOrder, key);
-		setAttr("pageSize", pageSize);
+		Page<Record> customerList = SellerCustomerQuery.me().findByUserTypeForApp(getPageNumber(), getPageSize(), selectDataArea, customerType, hasOrder, key);
 		setAttr("customerList", customerList);
 		render("customer.html");
 	}
@@ -219,9 +217,8 @@ public class CustomerController extends BaseFrontController {
 		
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerCustomerId = getPara("sellerCustomerId");
-		int pageSize = Consts.PAGE_SIZE;
 
-		Page<Record> orderList = SalesOrderQuery.me().findBySellerCustomerId(getPageNumber(), pageSize, sellerCustomerId, selectDataArea + "%");
+		Page<Record> orderList = SalesOrderQuery.me().findBySellerCustomerId(getPageNumber(), getPageSize(), sellerCustomerId, selectDataArea + "%");
 
 		// 需要修改，使用字典来显示，不用在这个地方做查询
 		for(Record record : orderList.getList()){
@@ -229,7 +226,6 @@ public class CustomerController extends BaseFrontController {
 			record.set("receive_Name", getReceiveName(record.getInt("receive_type")));
 		}
 
-		setAttr("pageSize", pageSize);
 		setAttr("orderList", orderList);
 		setAttr("sellerCustomerId", getPara("sellerCustomerId"));
 		setAttr("customerName", getPara("customerName"));

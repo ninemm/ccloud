@@ -67,7 +67,6 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
         }
 
         String questionType = getPara("questionType");
-        questionType = DictQuery.me().findName(questionType);
 
         if (StrKit.notBlank(questionType)) {
         	questionType = StringUtils.urlDecode(questionType);

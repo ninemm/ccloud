@@ -1,469 +1,94 @@
 <#include "_inc/_layout.html"/>
 
 <#macro css>
-    .report {
+    .home { 
         font-size: 0.7rem;
-	    position: absolute;
-	    top: 0;
-	    width: 100%;
-	    bottom: 50px;
-	    overflow: auto;
+        position: absolute;
+        top: 0;
+        width: 100%;
+        bottom: 50px;
+        overflow: auto;
         -webkit-overflow-scrolling: touch;
     }
     
-    .report .weui-panel__hd:after {
+    .home .weui-panel__hd:after {
         left: 0;
         height: 0;
     }
 </#macro>
 
-<#macro css_import>
-<link rel="stylesheet" href="${CTPATH}/css/normalize.css">
-</#macro>
-<#macro script_import>
-<script type='text/javascript' src="${CTPATH}/js/echarts.min.js"></script>
-</#macro>  
-<#macro script>
-  $(function () {
-  
-    $(".end-date").calendar();
-    $(".end-date").val($.today());
-    $(".begin-date").calendar();
-    $(".begin-date").val($.today());
-    var startDate = $.today();
-	var endDate = $.today() + ' 23:59:59';  
-	var params = {
-		"dayTag":  'today',
-		"startDate": startDate,
-		"endDate" : endDate
-	}  
- 	orderAmount(params);
- 	refundCount(params);
- 	orderStatus(params);
- 	customerCount(params);
- 	productCount(params);
-  })
-  
-    function orderAmount(params) {
-		Utils.ajax('${CPATH}/report/orderAmount', params, 
-			function(data){
-				$("#productCount").html(data.productCount+"件/");
-				$("#totalCount").html(data.orderCount+"笔");
-				$("#totalAmount").html(data.totalAmount+"元");
-			}
-		);    	
-    }
-    
-    function refundCount(params) {
-		Utils.ajax('${CPATH}/report/refundCount', params, 
-			function(data){
-				$("#refundAmount").html(data.totalAmount);
-				$("#refundCount").html(data.totalCount);
-			}
-		);    	
-    }    
-    
-    function orderStatus(params) {
-		Utils.ajax('${CPATH}/report/orderTypeCount', params, 
-			function(data){
-	            var crSeriesData = [];
-	            var legendData = [];
-	            var length = data.length;
-	            if (length == 0) {
-	                crSeriesData.push({
-	                    name: '暂无数据',
-	                    value: 0
-	                });	            	
-	            }	
-	            for(var i = 0; i < length; i++){
-	            	legendData.push(data[i].status)
-	                crSeriesData.push({
-	                    name: data[i].status,
-	                    value: data[i].count
-	                });
-	            }
-	            var orderStatus = document.getElementById('orderStatus');
-	            var orderStatusChart = echarts.init(orderStatus);
-				option = {
-				    tooltip: {
-				        trigger: 'item',
-				        formatter: "{a} <br/>{b}: {c}笔 ({d}%)"
-				    },
-				    legend: {
-				        orient: 'horizontal',
-				        data:legendData,
-				    },
-				    series: [
-				        {
-				            name:'数据来源',
-				            type:'pie',
-				            radius: ['40%', '60%'],
-				            avoidLabelOverlap: false,
-				            label: {
-				                normal: {
-				                    show: false,
-				                    position: 'center'
-				                },
-				                emphasis: {
-				                    show: true,
-				                    textStyle: {
-				                        fontSize: '15',
-				                        fontWeight: 'bold'
-				                    }
-				                }
-				            },
-				            labelLine: {
-				                normal: {
-				                    show: false
-				                }
-				            },
-				            data:crSeriesData
-				        }
-				    ]
-				};
-	            orderStatusChart.resize();
-	            orderStatusChart.setOption(option,true);
-			}
-		);    	
-    }
-    
-    function customerCount(params) {
-		Utils.ajax('${CPATH}/report/customerCount', params, 
-			function(data){
-	            var crSeriesData = [];
-	            var legendData = [];
-	            var length = data.length;
-	            $("#customerCount").height(40 * length + 100);
-	            if (length == 0) {
-	            	$("#customerCount").height(300);
-	                crSeriesData.push({
-	                    name: '暂无数据',
-	                    value: 0
-	                });	            	
-	            }	
-	            for(var i = 0; i < length; i++){
-	            	legendData.push(data[i].customer_name)
-	                crSeriesData.push({
-	                    name: data[i].customer_name,
-	                    value: data[i].totalAmount
-	                });
-	            }
-	            var customerCount = document.getElementById('customerCount');
-	            var customerCountChart = echarts.init(customerCount);
-				option = {
-				    tooltip: {
-				        trigger: 'item',
-				        formatter: "{a} <br/>{b}: {c}元 ({d}%)"
-				    },
-				    legend: {
-				        orient: 'horizontal',
-				        data:legendData,
-				    },
-				    series: [
-				        {
-				            name:'数据来源',
-				            type:'pie',
-				            radius: ['40%', '60%'],
-				            avoidLabelOverlap: false,
-				            label: {
-				                normal: {
-				                    show: false,
-				                    position: 'center'
-				                },
-				                emphasis: {
-				                    show: true,
-				                    textStyle: {
-				                        fontSize: '15',
-				                        fontWeight: 'bold'
-				                    }
-				                }
-				            },
-				            labelLine: {
-				                normal: {
-				                    show: false
-				                }
-				            },
-				            data:crSeriesData
-				        }
-				    ]
-				};
-	            customerCountChart.resize();
-	            customerCountChart.setOption(option,true);
-			}
-		);     
-    }
-    
-    function productCount(params) {
-		Utils.ajax('${CPATH}/report/productCount', params, 
-			function(data){
-	            var crSeriesData = [];
-	            var legendData = [];
-	            var length = data.length;
-	            $("#productCanve").height(65 * length + 100);
-	            if (length == 0) {
-	            	$("#productCanve").height(300);
-	                crSeriesData.push({
-	                    name: '暂无数据',
-	                    value: 0
-	                });	            	
-	            }
-	
-	            for(var i = 0; i < length; i++){
-	            	legendData.push(data[i].custom_name)
-	                crSeriesData.push({
-	                    name: data[i].custom_name,
-	                    value: data[i].totalAmount
-	                });
-	            }
-	            var productCount = document.getElementById('productCanve');
-	            var productCountChart = echarts.init(productCanve);
-				option = {
-				    tooltip: {
-				        trigger: 'item',
-				        formatter: "{a} <br/>{b}: {c}元 ({d}%)"
-				    },
-				    legend: {
-				        orient: 'horizontal',
-				        x: 'left',
-				        data:legendData
-				    },
-				    series: [
-				        {
-				            name:'数据来源',
-				            type:'pie',
-				            radius: ['40%', '60%'],
-				            avoidLabelOverlap: false,
-				            label: {
-				                normal: {
-				                    show: false,
-				                    position: 'center'
-				                },
-				                emphasis: {
-				                    show: true,
-				                    textStyle: {
-				                        fontSize: '10',
-				                        fontWeight: 'bold'
-				                    }
-				                }
-				            },
-				            labelLine: {
-				                normal: {
-				                    show: false
-				                }
-				            },
-				            data:crSeriesData
-				        }
-				    ]
-				};
-	            productCountChart.resize();
-	            productCountChart.setOption(option,true);
-			}
-		);    	
-    }
-    
-    function urlSelect(params, type){
-    	if (type == 'order') {
-			orderAmount(params);
-		} else if (type == 'customer') {
-			customerCount(params);
-		} else if (type == 'product') {
-			productCount(params);
-		} else {
-			refundCount(params);
-		}
-    }
-    
-    function startDaySelect(obj,type) {
-		var params = {
-    		"startDate": $(obj).val(),
-			"endDate": $(obj).parent().find('#endDay').val()
-		}
-		urlSelect(params,type); 
-    }
-    
-    function endDaySelect(obj,type) {
-		var params = {
-    		"startDate": $(obj).parent().find('#startDay').val(),
-			"endDate": $(obj).val()
-		}
-		urlSelect(params,type); 
-    }    
-    
- 	function dayTagSelect(obj,type) {
-      $.actions({
-        actions: [{
-          text: "今日",
-          onClick: function () {
-			var params = {
-				"dayTag": 'today'
-			}
-			urlSelect(params,type); 
-            $(obj).find(".dayTagText").text('今日')
-          }
-        }, {
-          text: "昨日",
-          onClick: function () {
-			var params = {
-				"dayTag": 'yesterday'
-			}
-          	urlSelect(params,type);
-            $(obj).find(".dayTagText").text('昨日')
-          }
-        }, {
-          text: "本周",
-          onClick: function () {
-			var params = {
-				"dayTag": 'week'
-			}
-			urlSelect(params,type);   
-          	$(obj).find(".dayTagText").text('本周')
-          }
-        }, {
-          text: "上周",
-          onClick: function () {
-			var params = {
-				"dayTag": 'lastweek'
-			}
-          urlSelect(params,type);
-          $(obj).find(".dayTagText").text('上周')
-          }
-        }, {
-          text: "本月",
-          onClick: function () {
-			var params = {
-				"dayTag": 'month'
-			}     
-			urlSelect(params,type);    
-         	$(obj).find(".dayTagText").text('本月')
-          }
-        }, {
-          text: "上月",
-          onClick: function () {
-			var params = {
-				"dayTag": 'lastmonth'
-			}         
-			urlSelect(params,type);
-          	$(obj).find(".dayTagText").text('上月')
-          }
-        }]
-      }); 	
- 	}  
-</#macro>
 <@layout>
-	<div class="weui-content">
-	<div class="report">
-		<div class="weui-panel weui-panel_access report-header">
-			<div class="weui-panel__hd">
-				<span class="overview-hd-title">销售简报</span> 
-				<div>
-					<span class="briefly" onclick="dayTagSelect(this,'order')">
-						<p class="dayTagText">今日</p>
-						<i class="icon-angle-down"></i>
-					</span> 
-					<input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'order')" readonly="">
-					<span class="overview-hd-segmenting fr"> - </span> 
-					<input class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'order')" readonly="">
-				</div>
-			</div>
-			<div class="weui-panel__bd">
-				<div class="weui-flex overview-block">
-					<div class="weui-flex__item">
-						<div class="overview-title">
-							<img src="${CTPATH}/images/order.png"> <span>订单总数</span>
-						</div>
-						<div class="t-c">
-							<strong id="productCount"></strong> <small id="totalCount"></small>
-						</div>
-					</div>
-					<div class="weui-flex__item">
-						<div class="overview-title">
-							<img src="${CTPATH}/images/money.png"> <span>订单金额</span>
-						</div>
-						<div class="t-c">
-							<strong id="totalAmount"></strong>
-						</div>
-					</div>
-				</div>
+<div class="weui-content">
+	<div id="home" class="home"> 
+		<div class="company">业务报表</div>
+		<div class="weui-cells__title">
+            <div class="weui-flex">
+                <div class="weui-flex__item"><b>排行榜</b></div>
+            </div>
+        </div>
+        <div class="weui-grids">
+            <a href="${CPATH}/report/userRank" class="weui-grid js_grid">
+                <div class="weui-grid__icon"><i class="icon-line-chart" style="color: #9c89b9"></i></div>
+                <p class="weui-grid__label">员工排行</p>
+            </a>
+        </div>
+		<div class="weui-cells__title">
+			<div class="weui-flex">
+				<div class="weui-flex__item"><b>业务员</b></div>
 			</div>
 		</div>
-		<div class="weui-panel weui-panel_access">
-			<div class="weui-panel__hd">
-				<span class="overview-hd-title">客户订单统计</span> 
-				<div>
-					<span class="briefly" onclick="dayTagSelect(this,'customer')">
-					<p class="dayTagText">今日</p>
-						<i class="icon-angle-down"></i>
-					</span> <input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'customer')" readonly="">
-					<span class="overview-hd-segmenting fr"> - </span> <input
-						class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'customer')" readonly="">
-				</div>
-			</div>
-			<div class="weui-panel__bd report-area">
-				<div class="weui-media-box ft14">
-					<div id="customerCount" style="height: 300px;">
-						
-					</div>
-					<a class="report-detail" href="${CPATH}/report/customerDetail">详情></a>
-				</div>
-			</div>
+		<div class="weui-grids">
+			<a href="${CPATH}/report/sales" class="weui-grid js_grid">
+				<div class="weui-grid__icon"><i class="icon-line-chart" style="color: #9c89b9"></i></div>
+			    <p class="weui-grid__label">销售报表</p>
+		    </a>
 		</div>
-		<div class="weui-panel weui-panel_access">
-			<div class="weui-panel__hd">
-				<span class="overview-hd-title">商品销售统计</span> 
-				<div>
-					<span class="briefly" onclick="dayTagSelect(this,'product')">
-					<p class="dayTagText">今日</p>
-						<i class="icon-angle-down"></i>
-					</span> <input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'product')" readonly="">
-					<span class="overview-hd-segmenting fr"> - </span> <input
-						class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'product')" readonly="">
-				</div>
-			</div>
-			<div class="weui-panel__bd report-area">
-				<div class="weui-media-box ft14">
-					<div id="productCanve" style="height: 300px;">
-						
-					</div>
-					<a class="report-detail" href="${CPATH}/report/productDetail">详情></a>
-				</div>
-			</div>
-		</div>
-		<div class="weui-panel weui-panel_access margin-0">
-			<div class="weui-panel__hd"><span class="overview-hd-title">订单完成统计</span></div>
-			<div class="weui-panel__bd report-area">
-				<div class="weui-media-box ft14">
-					<div id="orderStatus" style="height: 300px;"></div>
-				</div>
-			</div>
-		</div>		
-		<div class="weui-panel weui-panel_access">
-			<div class="weui-panel__hd">
-				<span class="overview-hd-title">退货统计</span>
-				<div>
-					<span class="briefly" onclick="dayTagSelect(this,'refund')">
-					<p class="dayTagText">今日</p>
-						<i class="icon-angle-down"></i>
-					</span> <input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'refund')" readonly="">
-					<span class="overview-hd-segmenting fr"> - </span> <input
-						class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'refund')" readonly="">
-				</div>
-			</div>
-			<div class="weui-panel__bd report-area">
-				<div class="weui-media-box ft14">
-					<div class="weui-flex t-c">
-						<div class="weui-flex__item border-right-1px">
-							<p class="ft16">退货金额（元）</p>
-							<p class="ft24 orange" id="refundAmount"></p>
-						</div>
-						<div class="weui-flex__item">
-							<p class="ft16">退货数量（笔）</p>
-							<p class="ft24 orange" id="refundCount"></p>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		</div>
+		<div class="weui-cells__title">
+            <div class="weui-flex">
+                <div class="weui-flex__item"><b>业务主管</b></div>
+            </div>
+        </div>
+        <div class="weui-grids">
+            <a href="${CPATH}/product" class="weui-grid js_grid">
+                <div class="weui-grid__icon"><i class="icon-line-chart" style="color: #9c89b9"></i></div>
+                <p class="weui-grid__label">业务员销售报表</p>
+            </a>
+            <a href="${CPATH}/report/userRank" class="weui-grid js_grid">
+                <div class="weui-grid__icon"><i class="icon-bar-chart" style="color: #19c594"></i></div>
+                <p class="weui-grid__label">销售排行</p>
+            </a>
+        </div>
+        <div class="weui-cells__title">
+            <div class="weui-flex">
+                <div class="weui-flex__item"><b>业务经理</b></div>
+            </div>
+        </div>
+        <div class="weui-grids">
+            <a href="${CPATH}/report/managerReport" class="weui-grid js_grid">
+                <div class="weui-grid__icon"><i class="icon-line-chart" style="color: #9c89b9"></i></div>
+                <p class="weui-grid__label">业务员销售报表</p>
+            </a>
+            <a href="${CPATH}/report/userRank" class="weui-grid js_grid">
+                <div class="weui-grid__icon"><i class="icon-bar-chart" style="color: #19c594"></i></div>
+                <p class="weui-grid__label">销售排行</p>
+            </a>
+        </div>
+        <div class="weui-cells__title">
+            <div class="weui-flex">
+                <div class="weui-flex__item"><b>品牌经理</b></div>
+            </div>
+        </div>
+        <div class="weui-grids">
+            <a href="${CPATH}/product" class="weui-grid js_grid">
+                <div class="weui-grid__icon"><i class="icon-line-chart" style="color: #9c89b9"></i></div>
+                <p class="weui-grid__label">业务员销售报表</p>
+            </a>
+            <a href="${CPATH}/report/userRank" class="weui-grid js_grid">
+                <div class="weui-grid__icon"><i class="icon-bar-chart" style="color: #19c594"></i></div>
+                <p class="weui-grid__label">销售排行</p>
+            </a>
+        </div>
 		<#include "_inc/_footer_nav.html" />
 	</div>
+</div>
 </@layout>

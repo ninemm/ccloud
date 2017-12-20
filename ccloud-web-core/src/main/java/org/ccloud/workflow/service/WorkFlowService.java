@@ -304,9 +304,9 @@ public class WorkFlowService {
 	 * 获取流程经办人数据
 	 */
 	public List<Record> getHisTaskParter(String insid) {
-		return Db
-				.find("select i.*,u.name from act_hi_identitylink i,sys_user u where u.username=i.USER_ID_ AND PROC_INST_ID_='"
-						+ insid + "'");
+		
+		String sql = "select i.*, u.name from act_hi_identitylink i, user u where u.username = i.USER_ID_ AND PROC_INST_ID_= ?";
+		return Db.find(sql, insid);
 	}
 	
 	/**

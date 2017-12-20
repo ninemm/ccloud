@@ -40,8 +40,12 @@ import com.jfinal.plugin.activerecord.Record;
 public class ReportController extends BaseFrontController {
 	
 	public void index() {
-		setAttr("deliveryDate", DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
 		render("report.html");
+	}
+	
+	public void sales() {
+		setAttr("deliveryDate", DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
+		render("report_sales.html");
 	}
 	
 	public void orderAmount() {
