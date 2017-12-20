@@ -267,7 +267,8 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				userJoinCustomer.save();
 				
 				String code = "G";
-				CustomerType customerType = CustomerTypeQuery.me().findDataAreaAndName(DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea()),code);
+				String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+				CustomerType customerType = CustomerTypeQuery.me().findDataAreaAndName(dataArea,code);
 				if(customerType!=null){
 					CustomerJoinCustomerType customerJoinCustomerType = new CustomerJoinCustomerType();
 					customerJoinCustomerType.setSellerCustomerId(sellerCustomerId);

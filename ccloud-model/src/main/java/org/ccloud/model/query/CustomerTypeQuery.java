@@ -149,8 +149,8 @@ public class CustomerTypeQuery extends JBaseQuery {
 	}
 	
 	public CustomerType findDataAreaAndName(String dataArea,String code){
-		String sql = "select * from cc_customer_type where data_area = ? and code = ?";
-		return DAO.findFirst(sql, dataArea,code);
+		String sql = "select * from cc_customer_type where data_area like '"+dataArea+"' and code = ?";
+		return DAO.findFirst(sql, code);
 	}
 	
 }
