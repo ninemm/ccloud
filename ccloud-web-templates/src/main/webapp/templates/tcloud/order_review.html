@@ -206,6 +206,9 @@
 	              <input type="hidden" name="convert" id="convert" value="${(orderDetail.convert_relate)!}">
 	              <input type="hidden" name="rowTotal" id="rowTotal" value="${(orderDetail.product_count)!}">
 	              <input type="hidden" name="isGift" id="isGift" value="${(orderDetail.is_gift)!}">
+	              <input type="hidden" name="productName" id="productName" value="${(orderDetail.custom_name)!}/${(orderDetail.valueName)!}">
+	              <input type="hidden" name="bigUnit" id="bigUnit" value="${(orderDetail.big_unit)!}">
+	              <input type="hidden" name="smallUnit" id="smallUnit" value="${(orderDetail.small_unit)!}">
 		          <#if orderDetail.is_gift??>
 		            <#if orderDetail.is_gift = 0>
 		              <div class="p-l-15 modify_price">
