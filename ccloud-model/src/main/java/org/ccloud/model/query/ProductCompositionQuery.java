@@ -47,7 +47,7 @@ public class ProductCompositionQuery extends JBaseQuery {
 	}
 
 	public Page<ProductComposition> paginate(int pageNumber, int pageSize, String keyword, String sellerId, String orderby) {
-		String select = "SELECT cp.name,cp.price,cp.id,cp.seller_product_id,cs.custom_name,t1.valueName,cs.product_id,count(cp.sub_seller_product_id) as type_count,cp.parent_id ";
+		String select = "SELECT cp.name,cp.price,cp.id,cp.seller_product_id,cs.custom_name,cs.store_count,t1.valueName,cs.product_id,count(cp.sub_seller_product_id) as type_count,cp.parent_id ";
 		StringBuilder fromBuilder = new StringBuilder("FROM cc_product_composition cp ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
