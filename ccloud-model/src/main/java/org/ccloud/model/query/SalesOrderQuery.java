@@ -391,7 +391,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	//我的客户
 	public Page<SalesOrder> findByCustomer(int pageNumber, int pageSize, String startDate, String endDate,
 			String keyword, String userId) {
-		String select = "SELECT c.nickname,TRUNCATE(( sum(sd.product_count) / p.convert_relate) , 2) productCountTotal ";
+		String select = "SELECT c.nickname,sp.custom_name,TRUNCATE(( sum(sd.product_count) / p.convert_relate) , 2) productCountTotal ";
 		StringBuilder fromBuilder = new StringBuilder(" FROM cc_sales_order so ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id=sojo.order_id");
 		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id=sojo.outstock_id");
@@ -418,7 +418,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	//我的客户赠品
 	public Page<SalesOrder> findByCustomerGift(int pageNumber, int pageSize, String startDate, String endDate,
 			String keyword, String userId) {
-		String select = "SELECT c.nickname,TRUNCATE(( sum(sd.product_count) / p.convert_relate) , 2) productCountTotal ";
+		String select = "SELECT c.nickname,sp.custom_name,TRUNCATE(( sum(sd.product_count) / p.convert_relate) , 2) productCountTotal ";
 		StringBuilder fromBuilder = new StringBuilder(" FROM cc_sales_order so ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id=sojo.order_id");
 		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id=sojo.outstock_id");
