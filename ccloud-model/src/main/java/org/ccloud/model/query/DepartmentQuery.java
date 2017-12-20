@@ -580,5 +580,31 @@ public class DepartmentQuery extends JBaseQuery {
 		
 		return DAO.find(sql.toString(), subDeptId);
 	}
+
+	public List<Map<String, Object>> findUserTree(String id) {
+		List<User> list = UserQuery.me().findByDeptId(id);
+		List<Map<String, Object>> resTreeList = new ArrayList<>();
+		Map<String, Object> map = new HashMap<>();
+		String title = "所有用户";
+		if (list.size() == 0) {
+			title = "暂无数据";
+		}		
+		map.put("text", title);
+		map.put("tags", Lists.newArrayList(0));
+		map.put("nodes", doBuildUser(list));
+		resTreeList.add(map);
+		return resTreeList;	
+	}
+
+	private List<Map<String, Object>> doBuildUser(List<User> list) {
+		List<Map<String, Object>> resTreeList = new ArrayList<>();
+		for (User user : list) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("text", user.getRealname());
+			map.put("tags", Lists.newArrayList(user.getId()));
+			resTreeList.add(map);
+		}
+		return resTreeList;
+	}
 	
 }
