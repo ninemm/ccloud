@@ -7,7 +7,7 @@
 
 <#macro script>
     var pageNumber = 2;
-    var pageSize = 10;
+    var pageSize = ${(pageSize)!};
     var loading = false;
 
     var $endNode = null;
@@ -238,7 +238,7 @@
 	            <div class="weui-loadmore weui-loadmore_line">
 	                <span class="weui-loadmore__tips">暂无数据</span>
 	            </div>
-	            <#elseif customerList.totalRow &gt; 10>
+	            <#elseif customerList.totalRow &gt; pageSize>
 	                <div class="weui-loadmore">
 	                    <i class="weui-loading"></i>
 	                    <span class="weui-loadmore__tips">正在加载</span>

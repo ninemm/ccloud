@@ -64,9 +64,11 @@ public class CustomerController extends BaseFrontController {
 		String key = getPara("searchKey");
 		String hasOrder = getPara("isOrdered");
 		String customerType =  getPara("customerType");
+		int pageSize = Consts.PAGE_SIZE;
 
 
-		Page<Record> customerList = SellerCustomerQuery.me().findByUserTypeForApp(getPageNumber(), getPageSize(), selectDataArea, customerType, hasOrder, key);
+		Page<Record> customerList = SellerCustomerQuery.me().findByUserTypeForApp(getPageNumber(), pageSize, selectDataArea, customerType, hasOrder, key);
+		setAttr("pageSize", pageSize);
 		setAttr("customerList", customerList);
 		render("customer.html");
 	}
@@ -217,7 +219,9 @@ public class CustomerController extends BaseFrontController {
 		
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerCustomerId = getPara("sellerCustomerId");
-		Page<Record> orderList = SalesOrderQuery.me().findBySellerCustomerId(getPageNumber(), getPageSize(), sellerCustomerId, selectDataArea + "%");
+		int pageSize = Consts.PAGE_SIZE;
+
+		Page<Record> orderList = SalesOrderQuery.me().findBySellerCustomerId(getPageNumber(), pageSize, sellerCustomerId, selectDataArea + "%");
 
 		// 需要修改，使用字典来显示，不用在这个地方做查询
 		for(Record record : orderList.getList()){
@@ -225,6 +229,7 @@ public class CustomerController extends BaseFrontController {
 			record.set("receive_Name", getReceiveName(record.getInt("receive_type")));
 		}
 
+		setAttr("pageSize", pageSize);
 		setAttr("orderList", orderList);
 		setAttr("sellerCustomerId", getPara("sellerCustomerId"));
 		setAttr("customerName", getPara("customerName"));
@@ -459,6 +464,8 @@ public class CustomerController extends BaseFrontController {
 		WorkFlowService workflowService = new WorkFlowService();
 		Object customerVO = workflowService.getTaskVariableByTaskId(taskId, "customerVO");
 		Object applyer = workflowService.getTaskVariableByTaskId(taskId, "applyUsername");
+		String isEnable = workflowService.getTaskVariableByTaskId(taskId, "isEnable").toString();
+
 		if (applyer != null) {
 			User user = UserQuery.me().findUserByUsername(applyer.toString());
 			setAttr("applyer", user);
@@ -491,10 +498,13 @@ public class CustomerController extends BaseFrontController {
 
 			src.setCustTypeNameList(CustomerJoinCustomerTypeQuery.me().findCustomerTypeNameListBySellerCustomerId(id, DataAreaUtil.getDealerDataAreaByCurUserDataArea(selectDataArea)));
 
-
 			List<String> diffAttrList = BeanCompareUtils.contrastObj(src, dest);
 			setAttr("diffAttrList", diffAttrList);
-		} else {
+		} else if(isEnable.equals("0")) {
+			List<String> diffAttrList = new ArrayList<>();
+			diffAttrList.add("新增客户");
+			setAttr("diffAttrList", diffAttrList);
+		}else {
 			List<String> diffAttrList = new ArrayList<>();
 			diffAttrList.add("申请停用");
 			setAttr("diffAttrList", diffAttrList);
@@ -544,6 +554,8 @@ public class CustomerController extends BaseFrontController {
 		if (status == 1) {
 
 			CustomerVO customerVO = (CustomerVO) workFlowService.getTaskVariableByTaskId(taskId,"customerVO");
+			String isEnable = workFlowService.getTaskVariableByTaskId(taskId, "isEnable").toString();
+
 			if(customerVO != null) {
 
 				Customer customer = CustomerQuery.me().findById(sellerCustomer.getCustomerId());
@@ -576,6 +588,7 @@ public class CustomerController extends BaseFrontController {
 				customer.setContact(customerVO.getContact());
 				customer.setMobile(customerVO.getMobile());
 				customer.setAddress(customerVO.getAddress());
+				customer.setCustomerName(customerVO.getCustomerName());
 
 				if (persiste != null) {
 					customer.setId(persiste.getId());
@@ -618,7 +631,7 @@ public class CustomerController extends BaseFrontController {
 					}
 				}
 
-			}else {
+			}else if(isEnable.equals("1")){
 				sellerCustomer.setIsEnabled(0);
 				updated = sellerCustomer.saveOrUpdate();
 			}
@@ -685,6 +698,7 @@ public class CustomerController extends BaseFrontController {
 			
 			String defKey = "_customer_audit";
 			param.put("manager", manager.getUsername());
+			param.put("isEnable", isEnable);
 			
 			WorkFlowService workflow = new WorkFlowService();
 			String procInstId = workflow.startProcess(customerId, defKey, param);

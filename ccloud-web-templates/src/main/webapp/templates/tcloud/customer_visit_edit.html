@@ -48,6 +48,12 @@
     }
 
     $(function() {
+
+        $("#length").text($("#question_desc").val().length + '/' + 70);
+        $(document).on("input", "#question_desc", function() {
+            $("#length").text($("#question_desc").val().length + '/' + 70);
+        });
+
         $(document).on("touchstart", "#customer_name", function () {
 	        window.location.href = '${CPATH}/customerVisit/visitCustomerChoose';
 	    });
@@ -272,15 +278,15 @@
                     <span class="weui-cell__ft"></span>
                 </div>
 
-                <div class="weui-cell">
-                    <div class="weui-cell__bd">
-                        <div class="order-customer-info-title">性别</div>
-                        <label class="fr">
-                            <input type="radio" name="sex" id="" value="female">女</label>
-                        <label class="fr">
-                            <input type="radio" name="sex" id="" value="male">男</label>
-                    </div>
-                </div>
+                <!--<div class="weui-cell">-->
+                    <!--<div class="weui-cell__bd">-->
+                        <!--<div class="order-customer-info-title">性别</div>-->
+                        <!--<label class="fr">-->
+                            <!--<input type="radio" name="sex" id="" value="female">女</label>-->
+                        <!--<label class="fr">-->
+                            <!--<input type="radio" name="sex" id="" value="male">男</label>-->
+                    <!--</div>-->
+                <!--</div>-->
 
                 <div class="weui-cell">
                     <div class="weui-cell__bd">
@@ -311,7 +317,7 @@
                 <div class="weui-cell weui-cell_access">
                     <div class="weui-cell__bd">
                         <textarea class="weui-textarea" rows="3" name="customerVisit.question_desc" id="question_desc" placeholder="备注说明"></textarea>
-                        <div class="weui-textarea-counter"><span>0</span>/70</div>
+                        <div class="weui-textarea-counter" id="length"></div>
                     </div>
                 </div>
             </section>

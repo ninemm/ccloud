@@ -52,6 +52,7 @@ public class CustomerVisitController extends BaseFrontController {
 	public void index() {
 		
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		int pageSize= Consts.PAGE_SIZE;
 		
 		String id = getPara("id");
 		String type = getPara("type");
@@ -59,12 +60,13 @@ public class CustomerVisitController extends BaseFrontController {
 		String subType = getPara("level");
 		String dataArea = selectDataArea + "%";
 
-		Page<Record> visitList = CustomerVisitQuery.me().paginateForApp(getPageNumber(), getPageSize(), id, type, nature, subType, dataArea);
+		Page<Record> visitList = CustomerVisitQuery.me().paginateForApp(getPageNumber(), pageSize, id, type, nature, subType, dataArea);
 
 		if(StrKit.notBlank(getPara("id"))) {
 			setAttr("id", getPara("id"));
 			setAttr("name", getPara("name"));
 		}
+		setAttr("pageSize", pageSize);
 		setAttr("visitList", visitList);
 		render("customer_visit_list.html");
 	}
@@ -278,7 +280,6 @@ public class CustomerVisitController extends BaseFrontController {
 		setAttr("deliveryDate", DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
 		render("customer_visit_edit.html");
 	}
-	
 
 	public void complete() {
 		
@@ -361,8 +362,6 @@ public class CustomerVisitController extends BaseFrontController {
 		else
 			renderAjaxResultForError("操作失败");
 	}
-	
-
 
 	private boolean startProcess(CustomerVisit customerVisit) {
 
@@ -400,8 +399,7 @@ public class CustomerVisitController extends BaseFrontController {
 		
 		return isUpdated;
 	}
-	
-	
+
 	private List<Map<String, String>> getVisitTypeList() {
 		List<Dict> visitDictList = DictQuery.me().findDictByType("customer_visit");
 	    List<Map<String, String>> list = Lists.newArrayList();

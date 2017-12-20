@@ -102,7 +102,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 		needwhere = appendIfNotEmpty(sql, "csc.sub_type", subType, params, needwhere);
 		needwhere = appendIfNotEmpty(sql,"csc.id", id, params, needwhere);
 
-		sql.append("ORDER BY ccv.`status`, ccv.create_date desc");
+		sql.append("ORDER BY  ccv.create_date desc, ccv.`status` ");
 		return Db.paginate(pageNumber, pageSize,select ,sql.toString(), params.toArray());
 	}
 
