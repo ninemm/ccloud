@@ -132,7 +132,7 @@ public class OrderController extends BaseFrontController {
 	
 	public void operateHistory() {
 		keepPara();
-
+		
 		String id = getPara("id");
 
 		Record salesOrder = SalesOrderQuery.me().findRecordById(id);
@@ -144,9 +144,10 @@ public class OrderController extends BaseFrontController {
 		
 		StringBuilder printComments = new StringBuilder();
 		List<Record> printRecord = OutstockPrintQuery.me().findByOrderId(id);
-		for (Record record : printRecord) {
+		for (int i = 0; i < printRecord.size(); i++) {
+			Record record = printRecord.get(i);
 			int status = record.getInt("status");
-			printComments.append(buildComments(Consts.OPERATE_HISTORY_TITLE_ORDER_PRINT, record.get("create_date").toString(), record.getStr("realname"),
+			printComments.append(buildComments(Consts.OPERATE_HISTORY_TITLE_ORDER_PRINT + " 第" + (i+1) + "次", record.get("create_date").toString(), record.getStr("realname"),
 					status == 1 ? "打印失败" : "打印成功"));
 		}
 		setAttr("printComment", printComments.toString());

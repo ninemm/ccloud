@@ -7,6 +7,13 @@
 	<script src="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.min.js"></script>
 	<script src="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.zh-CN.js"></script>
 	<script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
+	
+	<script src="${CPATH}/static/plugins/datatables/jquery.dataTables.js"></script>
+	<script src="${CPATH}/static/plugins/datatables/jquery.dataTables.bootstrap.js"></script>
+	<script src="${CPATH}/static/plugins/datatables/dataTables.select.js"></script>
+	<script src="${CPATH}/static/plugins/datatables/dataTables.buttons.min.js"></script>
+	<script src="${CPATH}/static/plugins/datatables/jszip.js"></script>
+	<script src="${CPATH}/static/plugins/datatables/buttons.html5.min.js"></script>
 
 </#macro>
 
@@ -16,93 +23,71 @@
 <link rel="stylesheet" href="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.min.css">
 <link rel="stylesheet" href="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.css">
 
+<link rel="stylesheet" href="${CPATH}/static/plugins/datatables/jquery.dataTables.min.css" />
+<link rel="stylesheet" href="${CPATH}/static/plugins/datatables/buttons.dataTables.min.css" />
+
+
 </#macro>
 
 <#macro script>	
-	var $table = $("#_customerDetails_table");
-	var $tableGift = $("#_customerDetailsGift_table");
-	var url = '${CPATH}/admin/report/customerDetailsList';
-	var urlGift = '${CPATH}/admin/report/customerDetailsGiftList';
 	$(function() {
 		jQuery.mm.initDatetimepicker('form', '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initDatetimepicker('form', '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initValidator('#form', validatorFields);
-		jQuery.mm.initEditTable('#_customerDetails_table',url, initParams, initFields(), null);
-		jQuery.mm.initEditTable('#_customerDetailsGift_table',urlGift, initParams, initFieldsGift(), null);
-	});
-
-	var initParams = function(params) {
-		var keyword = $('#post-search-input').val();
-		if (keyword) keyword = encodeURIComponent(keyword);
-		var param = {
-			size: params.limit,
-			page: params.offset/params.limit + 1,
-			k: keyword,
-			startDate: $('#startDate').val() + " 00:00:00",
-			endDate: $('#endDate').val() + " 23:59:59"
-		};
-		return param;
-	};
-	
-	$("#search-submit").click(function() {
-		var validate = $('#form').data('bootstrapValidator');
-		validate.validate();
-		if (validate.isValid()){
-			$table.bootstrapTable('refresh');
-			$tableGift.bootstrapTable('refresh');
-		}
+		$('#datatable1').DataTable({  
+			"searching" : false, 
+	        "bSort": false,  
+	        "paging": false,   
+	        "info": false,  
+		    dom: "<'toolbar'>Bfrtip",  
+	        buttons: [{  
+	            extend: 'excelHtml5',  
+	            text: "导出",  
+	            className: "btn-sm",  
+	            customize: function(xlsx) {  
+	                var sheet = xlsx.xl.worksheets['sheet1.xml'];  
+	                $('row c[r^="C"]', sheet).attr('s', '2');  
+	            }  
+	        }],  
+		});
+		$('#datatable2').DataTable({  
+			"searching" : false, 
+	        "bSort": false,  
+	        "paging": false,   
+	        "info": false,  
+		    dom: "<'toolbar'>Bfrtip",  
+	        buttons: [{  
+	            extend: 'excelHtml5',  
+	            text: "导出",  
+	            className: "btn-sm",  
+	            customize: function(xlsx) {  
+	                var sheet = xlsx.xl.worksheets['sheet1.xml'];  
+	                $('row c[r^="C"]', sheet).attr('s', '2');  
+	            }  
+	        }],  
+		})
 	});
 	
 	function orderTime(){
 		$('#post-search-input').val("so.create_date");
-		var validate = $('#form').data('bootstrapValidator');
-		validate.validate();
-		if (validate.isValid()){
-			$table.bootstrapTable('refresh');
-			$tableGift.bootstrapTable('refresh');
-		}
+		var startDate= $('#startDate').val();
+		var endDate= $('#endDate').val();
+		window.location.href="${CPATH}/admin/report/customerDetails?startDate="+startDate+"&endDate="+endDate+"&k=so.create_date&c=${c!}&p=${p!}"
 	};
 	
 	function prints(){
 		$('#post-search-input').val("so.print_time");
-		var validate = $('#form').data('bootstrapValidator');
-		validate.validate();
-		if (validate.isValid()){
-			$table.bootstrapTable('refresh');
-			$tableGift.bootstrapTable('refresh');
-		}
+		var startDate= $('#startDate').val();
+		var endDate= $('#endDate').val();
+		window.location.href="${CPATH}/admin/report/customerDetails?startDate="+startDate+"&endDate="+endDate+"&k=so.print_time&c=${c!}&p=${p!}"
 	};
 	
 	function complete(){
 		$('#post-search-input').val("sok.create_date");
-		var validate = $('#form').data('bootstrapValidator');
-		validate.validate();
-		if (validate.isValid()){
-			$table.bootstrapTable('refresh');
-			$tableGift.bootstrapTable('refresh');
-		}
+		var startDate= $('#startDate').val();
+		var endDate= $('#endDate').val();
+		window.location.href="${CPATH}/admin/report/customerDetails?startDate="+startDate+"&endDate="+endDate+"&k=sok.create_date&c=${c!}&p=${p!}"
 	};
-	
-	var initFields = function() {
-		var fields =
-			[	{title: "序号", align: "center", edit:false, formatter: function (value, row, index) { return index+1; } },
-      			{field: "nickname", title: "客户名称", align: "center",  edit:false},
-      			{field: "custom_name", title: "商品名称", align: "center",  edit:false},
-      			{field: "productCountTotal", title: "数量(件)", align: "center",  edit:false}
-   			];
-   		return fields;
-	}
-	
-	var initFieldsGift = function() {
-		var fields =
-			[	{title: "序号", align: "center", edit:false, formatter: function (value, row, index) { return index+1; } },
-      			{field: "nickname", title: "客户名称", align: "center",  edit:false},
-      			{field: "custom_name", title: "商品名称", align: "center",  edit:false},
-      			{field: "productCountTotal", title: "数量(件)", align: "center",  edit:false}
-   			];
-   		return fields;
-	}
-
 	var validatorFields = {
 		'startDate': {
 			validators: {
@@ -116,7 +101,6 @@
 		}
 	}
 </#macro>
-
 <@layout active_id=p child_active_id=c>
 
 <section class="content-header">
@@ -132,10 +116,10 @@
 	<form class="form-inline" id="form" >
 		<div class="row content-row">
 			<div class="form-group col-sm-12" style="float: right">
-				<input id="post-search-input" class="form-control" type="hidden" value="so.create_date" name="k" >&nbsp;
-					<input onclick="orderTime()" class="btn btn-sm btn-primary" type="button" value="已下单查询">
-					<input onclick="prints()" class="btn btn-sm btn-primary" type="button" value="已打印查询">
-					<input onclick="complete()" class="btn btn-sm btn-primary" type="button" value="已出库查询">
+				<input id="post-search-input" class="form-control" type="hidden" value="${k!'so.create_date'}" name="k" >&nbsp;
+				<input onclick="orderTime()" class="btn btn-sm btn-primary" type="button" value="已下单查询">
+				<input onclick="prints()" class="btn btn-sm btn-primary" type="button" value="已打印查询">
+				<input onclick="complete()" class="btn btn-sm btn-primary" type="button" value="已出库查询">
 				<div class="form-group validata-box">
 					<label class="control-label">开始时间:</label>
 					<div class="form-group">
@@ -148,20 +132,74 @@
 						<input id="endDate" class="form-control" value="${endDate!}" name="endDate" placeholder="结束日期" >&nbsp;
 					</div>
 				</div>
-				
-				<input id="search-submit" class="btn btn-sm btn-primary" type="button" value="搜索">
-				</div>
 			</div>
-		</form>
-		
-	<div class="box">
-		<table class="table table-striped table-hover table-condensed" id="_customerDetails_table" ></table>
-	</div>
-	<h2 >赠品统计</h2>
-	<div class="box">
-		<table class="table table-striped table-hover table-condensed" id="_customerDetailsGift_table" ></table>
-	</div>
-	<!-- /.box -->
+		</div>
+		<div class="box" style="overflow:auto">
+			<div class="box-body jp-common-pad" >
+				<table class="table table-striped" id="datatable1" style="border:0px">
+					<thead>
+						<tr>
+							<#if watchHead??>
+								<#list watchHead as bean>
+									<th style="text-align:center;min-width: 100px">${bean}</th>
+								</#list>
+							 </#if>
+						</tr>
+					</thead>
+					<tbody>
+						<#if CustomerDetailList.size() gt 0>
+							<#list CustomerDetailList as bean>
+								<tr class="jp-onmouse">
+									<#list bean as value>
+										<td align=center>${value}</td>
+									</#list>
+								</tr>
+							</#list>
+							<#else>
+								<tr class="jp-onmouse" >
+									<td colspan="${watchHead?size}" align=center>
+										数据为空
+									</td>
+								</tr>
+						 </#if>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<h2>赠品统计</h2>
+		<div class="box" style="overflow:auto">
+			<div class="box-body jp-common-pad">
+				<table class="table table-striped" id="datatable2" style="border:0px">
+					<thead>
+						<tr>
+							<#if watchHead??>
+								<#list watchHead as bean>
+										<th style="text-align:center;min-width: 100px">${bean}</th>
+								</#list>
+							</#if>
+						</tr>
+					</thead>
+					<tbody>
+						<#if CustomerDetailGiftList.size() gt 0>
+							<#list CustomerDetailGiftList as bean1>
+								<tr class="jp-onmouse">
+									<#list bean1 as value1>
+										<td align=center>${value1}</td>
+									</#list>
+								</tr>
+							</#list>
+							<#else>
+								<tr class="jp-onmouse">
+									<td colspan="${watchHead?size}" align=center>
+										数据为空
+									</td>
+								</tr>
+						 </#if>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</form>
 </section>
 
 </@layout>
