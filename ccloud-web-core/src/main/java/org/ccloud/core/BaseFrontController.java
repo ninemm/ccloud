@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 
+import org.ccloud.Consts;
 import org.ccloud.model.query.OptionQuery;
 import org.ccloud.template.TemplateManager;
 import org.ccloud.utils.FileUtils;
@@ -170,7 +171,7 @@ public class BaseFrontController extends JBaseController {
 			
 			String webRoot = PathKit.getWebRootPath();
 			
-			String rootFilePath = OptionQuery.me().findValue("web_root_file_path");
+			String rootFilePath = OptionQuery.me().findValue(Consts.OPTION_FILE_ROOT_PATH);
 			if (StrKit.notBlank(rootFilePath))
 				webRoot = rootFilePath;
 			
