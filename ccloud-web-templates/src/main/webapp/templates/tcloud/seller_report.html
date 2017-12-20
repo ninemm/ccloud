@@ -63,6 +63,8 @@
     function productCount(params) {
 		Utils.ajax('${CPATH}/report/sellerProductCount', params, 
 			function(data){
+				var height = data.length;
+				$("#userCount").height(60 * height + 100);			
 		        var product = document.getElementById('userCount');
 		        var productChart = echarts.init(product);
 	            var productOption = {
@@ -376,7 +378,7 @@
 			</div>
 			<div class="weui-panel__bd report-area">
 				<div class="weui-media-box ft14">
-					<div id="userCount" style="height: 500px;">
+					<div id="userCount">
 						
 					</div>
 				</div>
