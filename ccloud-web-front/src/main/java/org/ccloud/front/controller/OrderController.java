@@ -29,7 +29,6 @@ import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SalesOutstockDetailQuery;
 import org.ccloud.model.query.SalesOutstockQuery;
 import org.ccloud.model.query.SellerProductQuery;
-import org.ccloud.model.query.UserGroupRelQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DataAreaUtil;
@@ -38,7 +37,6 @@ import org.ccloud.utils.StringUtils;
 import org.ccloud.workflow.service.WorkFlowService;
 
 import com.alibaba.fastjson.JSON;
-import com.google.common.base.Joiner;
 import com.google.common.collect.Maps;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
@@ -111,6 +109,7 @@ public class OrderController extends BaseFrontController {
 	}
 	
 	public void orderReview() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
 		String orderId = getPara("orderId");
 		String taskId = getPara("taskId");
@@ -118,6 +117,12 @@ public class OrderController extends BaseFrontController {
 		List<Record> orderDetailList = SalesOrderDetailQuery.me().findByOrderId(orderId);
 
 		order.set("statusName", getStatusName(order.getInt("status")));
+
+		boolean isCheck = false;
+		if (user != null && getPara("assignee", "").contains(user.getUsername())) {
+			isCheck = true;
+		}
+		setAttr("isCheck", isCheck);
 
 		setAttr("taskId", taskId);
 		setAttr("order", order);
@@ -272,28 +277,21 @@ public class OrderController extends BaseFrontController {
 		param.put(Consts.WORKFLOW_APPLY_USER, user);
 		param.put(Consts.WORKFLOW_APPLY_SELLER_ID, sellerId);
 		param.put(Consts.WORKFLOW_APPLY_SELLER_CODE, sellerCode);
+		param.put("customerName", customerName);
 		
 
-		String acount = "";
-		String managerName = "";
 		String toUserId = "";
 
-		if(Consts.WORKFLOW_PROC_DEF_KEY_ORDER_REVIEW.equals(proc_def_key)) {
-			//一审是账务比较特殊
-			acount = getAcount(user.getId());
-			param.put("account", acount);
+		if(Consts.WORKFLOW_PROC_DEF_KEY_ORDER_REVIEW_ONE.equals(proc_def_key)) {
 			
-		}else {
 			User manager = UserQuery.me().findManagerByDeptId(user.getDepartmentId());
-			managerName = manager.getUsername();
-			param.put("manager", managerName);
+			if (manager == null) {
+				return false;
+			}
+			param.put("manager", manager.getUsername());
 			toUserId = manager.getId();
 		}
 
-		if (StrKit.isBlank(acount) && StrKit.isBlank(managerName)) {
-			return false;
-		}
-		
 		String procInstId = workflow.startProcess(orderId, proc_def_key, param);
 
 		salesOrder.setProcKey(proc_def_key);
@@ -304,19 +302,11 @@ public class OrderController extends BaseFrontController {
 			return false;
 		}
 		
-		sendOrderMessage(sellerId, customerName, "新增订单审核", user.getId(), toUserId, user.getDepartmentId(), user.getDataArea());
+		sendOrderMessage(sellerId, customerName, "订单审核", user.getId(), toUserId, user.getDepartmentId(), user.getDataArea());
 		
 		return true;
 	}
-	
-	private String getAcount(String userId) {
-		List<String> userIdList = UserGroupRelQuery.me().findUserIdsByGroup(Consts.GROUP_CODE_PREFIX_DATA, userId);
-		String userIds = Joiner.on(",").join(userIdList);
-		List<String> userNameList = UserGroupRelQuery.me().findUserNamesByRoleCode(Consts.GROUP_CODE_PREFIX_ROLE, Consts.ROLE_CODE_020, userIds);
 
-		return Joiner.on(",").join(userNameList);
-	}
-	
 	private void sendOrderMessage(String sellerId, String title, String content, String fromUserId, String toUserId, String deptId, String dataArea) {
 		
 		Message message = new Message();
@@ -354,7 +344,7 @@ public class OrderController extends BaseFrontController {
 		
 		if (pass == 1 && edit == 1) {
 			editOrder(user.getId());
-
+			comment = "通过" + " 修改了订单";
 		} else {
 			comment = (pass == 1 ? "通过" : "拒绝") + " " + (comment == null ? "" : comment) + " "
 					+ (refuseReson == "undefined" ? "" : refuseReson);

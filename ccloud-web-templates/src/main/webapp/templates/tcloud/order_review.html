@@ -80,16 +80,7 @@
 		Utils.ajax('${CPATH}/order/complete', params, 
 			function(res){
 				if (res.errorCode == 0) {
-					$.confirm({
-						title: res.message,
-						text: '返回列表页？',
-						onOK: function () {
-							location.href = '${CPATH}/todo/order'
-						},
-						onCancel: function () {
-							$.closeModal();
-						}
-					});
+					location.href = '${CPATH}/todo/order'
 				} else {
 					$.alert(res.message);
 				}
@@ -113,16 +104,7 @@
 			success : function(res) { 
 				layer.closeAll();
 				if (res.errorCode == 0) {
-					$.confirm({
-						title: res.message,
-						text: '返回列表页？',
-						onOK: function () {
-							location.href = '${CPATH}/todo/order'
-						},
-						onCancel: function () {
-							$.closeModal();
-						}
-					});
+					location.href = '${CPATH}/todo/order'
 				} else {
 					$.alert(res.message);
 				}
@@ -316,10 +298,12 @@
       </a>
     </main>
     <#include "_inc/_goback.html" />    
+    <#if isCheck>
     <footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex border-top-1px">
       <button class="white-button-no-border weui-flex__item refuse">拒绝</button>
       <button class="red-button weui-flex__item" onclick="doSubmit()">通过</button>
     </footer>
+    </#if>
   </div>
 </body>
 </@layout>

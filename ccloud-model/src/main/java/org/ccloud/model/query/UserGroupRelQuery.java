@@ -103,9 +103,9 @@ public class UserGroupRelQuery extends JBaseQuery {
 		return Db.query(fromBuilder.toString(), groupCode, userId);
 	}
 	
-	public List<String> findUserNamesByRoleCode(String groupCode, String roleCode, String userIds) {
+	public List<Record> findUsersByRoleCode(String groupCode, String roleCode, String userIds) {
 
-		StringBuilder fromBuilder = new StringBuilder(" SELECT u.username ");
+		StringBuilder fromBuilder = new StringBuilder(" SELECT u.username, u.id ");
 		fromBuilder.append(" FROM `user` u ");
 		fromBuilder.append(" JOIN `user_group_rel` ugr ON u.id = ugr.user_id ");
 		fromBuilder.append(" JOIN `group` g ON ugr.group_id = g.id ");
@@ -115,7 +115,7 @@ public class UserGroupRelQuery extends JBaseQuery {
 		fromBuilder.append(" WHERE r.role_code = ? ");
 		fromBuilder.append(" AND FIND_IN_SET(u.id, ?) ");
 
-		return Db.query(fromBuilder.toString(), groupCode, roleCode, userIds);
+		return Db.find(fromBuilder.toString(), groupCode, roleCode, userIds);
 	}
 	
 }

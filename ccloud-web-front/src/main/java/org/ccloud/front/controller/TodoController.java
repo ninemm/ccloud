@@ -33,6 +33,8 @@ public class TodoController extends BaseFrontController {
 		String username = user.getUsername();
 		List<SalesOrder> list = SalesOrderQuery.me().getToDo(username);
 		if(list.size() !=0 )setAttr("todoList", list);
+		
+		setAttr("username", username);
 		render("todo_order.html");
 	}
 	

@@ -57,16 +57,7 @@
 		Utils.ajax('${CPATH}/order/complete', params, 
 			function(res){
 				if (res.errorCode == 0) {
-					$.confirm({
-						title: res.message,
-						text: '返回列表页？',
-						onOK: function () {
-							location.href = '${CPATH}/todo/order'
-						},
-						onCancel: function () {
-							$.closeModal();
-						}
-					});
+					location.href = '${CPATH}/todo/order'
 				} else {
 					$.alert(res.message);
 				}
@@ -83,16 +74,7 @@
 		$.get(url ,
 			function(res){
 				if (res.errorCode == 0) {
-					$.confirm({
-						title: res.message,
-						text: '返回列表页？',
-						onOK: function () {
-							location.href = '${CPATH}/todo/order'
-						},
-						onCancel: function () {
-							$.closeModal();
-						}
-					});
+					location.href = '${CPATH}/todo/order'
 				} else {
 					$.alert(res.message);
 				}
@@ -137,8 +119,10 @@
 					</div>
 					<div class="weui-cell weui-cell_access">
 						<div class="weui-flex space-between width-100 ft14">
-							<div class="button white-button" onclick="refuse('${(order.id)!}', '${(order.taskId)!}', 0)">拒绝</div>
-							<div class="button red-button" onclick="doSubmit('${CPATH}/order/complete?id=${(order.id)!}&taskId=${(order.taskId)!}&pass=1')">同意</div>
+							<#if order.assignee?contains(username)>
+								<div class="button white-button" onclick="refuse('${(order.id)!}', '${(order.taskId)!}', 0)">拒绝</div>
+								<div class="button red-button" onclick="doSubmit('${CPATH}/order/complete?id=${(order.id)!}&taskId=${(order.taskId)!}&pass=1')">同意</div>
+							</#if>
 						</div>
 					</div>
 				</div>
