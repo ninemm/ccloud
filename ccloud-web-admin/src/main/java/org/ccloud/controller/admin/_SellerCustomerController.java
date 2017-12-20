@@ -492,7 +492,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		}
 		
 		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(id);
-		Customer customer = CustomerQuery.me().findById(sellerCustomer.getCustomerId());
+		//Customer customer = CustomerQuery.me().findById(sellerCustomer.getCustomerId());
 
 		setAttr("sellerCustomer", sellerCustomer);
 
