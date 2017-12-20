@@ -249,7 +249,22 @@ function barGraphOptions(title,yTitle,data){
         series: [
             {
                 type: 'bar',
-                barWidth : 30,
+                barWidth : 15,
+                itemStyle: {
+                normal: {
+                    color: function(params) {
+                    var colorList = [
+                        '#C1232B','#2E8B57','#1E90FF','#E87C25','#27727B'
+                    ];
+                    return colorList[params.dataIndex]
+                    },
+                    label: {
+                        show: true,
+                        position: 'right',
+                        formatter: '{b}\n{c}'
+                    }
+                    }
+                },
                 data: data
             }
         ]
