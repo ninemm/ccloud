@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
@@ -83,12 +84,13 @@ public class _GoodsSpecificationValueController extends JBaseCRUDController<Good
 	@Override
 	public void save() {
 
-		UploadFile uploadFile = getFile();
 		keepPara();
-		final GoodsSpecificationValue ccGoodsSpecificationValue = getModel(GoodsSpecificationValue.class);
+		UploadFile uploadFile = getFile();
+		GoodsSpecificationValue ccGoodsSpecificationValue = getModel(GoodsSpecificationValue.class);
 
 		if (uploadFile != null) {
-			String newPath = AttachmentUtils.moveFile(uploadFile);
+			String fileRootPath = OptionQuery.me().findValue(Consts.OPTION_FILE_ROOT_PATH);
+			String newPath = AttachmentUtils.moveFile(uploadFile, fileRootPath);
 			ccGoodsSpecificationValue.setImagePath(newPath.replace("\\", "/"));
 
 			// processImage(newPath);

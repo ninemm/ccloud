@@ -64,6 +64,7 @@ function group(id) {
 							<th style="width: 20%">组合商品名称</th>
 							<th>商品价格</th>
 							<th>主商品规格</th>
+							<th>主产品库存</th>
 							<th>品类数量</th>
 							<@shiro.hasPermission name="/admin/productComposition/edit,/admin/all">
 							<th style="width: 20%">操作</th>
@@ -83,6 +84,7 @@ function group(id) {
 							</td>
 							<td>${bean.price!}</td>
 							<td>${bean.valueName!}</td>
+							<td>${bean.store_count!}</td>
 							<td>${bean.type_count+1!}</td>
 							<td>
 							<@shiro.hasPermission name="/admin/productComposition/edit,/admin/all">

@@ -55,6 +55,7 @@ import org.ccloud.model.query.GoodsQuery;
 import org.ccloud.model.query.GoodsSpecificationQuery;
 import org.ccloud.model.query.GoodsSpecificationValueQuery;
 import org.ccloud.model.query.GoodsTypeQuery;
+import org.ccloud.model.query.OptionQuery;
 import org.ccloud.model.query.ProductGoodsSpecificationValueQuery;
 import org.ccloud.model.query.ProductQuery;
 import org.ccloud.model.vo.ImageJson;
@@ -438,16 +439,20 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
     public void uploadImg() {
     	String id = getPara("id");
     	if (id != null) {
+    		
     		UploadFile uploadFile = getFile();
 			Goods goods = GoodsQuery.me().findById(id);
     		String imgName = uploadFile.getFileName();
     		String imgList = goods.getProductImageListStore();
+    		
+    		String fileRootPath = OptionQuery.me().findValue(Consts.OPTION_FILE_ROOT_PATH);
+    		
     		if (StringUtils.isNotEmpty(imgList)) {
     			JSONArray jsonArray = JSONArray.parseArray(imgList);
     			List<ImageJson> imageList = jsonArray.toJavaList(ImageJson.class);
     			ImageJson imageJson = new ImageJson();
     			imageJson.setImgName(imgName);
-    			String newPath = AttachmentUtils.moveFile(uploadFile);
+    			String newPath = AttachmentUtils.moveFile(uploadFile, fileRootPath);
     			imageJson.setSavePath(newPath.replace("\\", "/"));
     			imageList.add(imageJson);
     			String json = JSON.toJSONString(imageList);
@@ -457,7 +462,7 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
     			ImageJson[] imageJson = new ImageJson[1];
     			ImageJson image = new ImageJson();
     			image.setImgName(imgName);
-    			String newPath = AttachmentUtils.moveFile(uploadFile);
+    			String newPath = AttachmentUtils.moveFile(uploadFile, fileRootPath);
     			image.setSavePath(newPath.replace("\\", "/"));
     			imageJson [0] = image; 
     			String json = JSON.toJSONString(imageJson);

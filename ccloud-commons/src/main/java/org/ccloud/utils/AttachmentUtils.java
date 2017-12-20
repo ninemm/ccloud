@@ -33,7 +33,7 @@ public class AttachmentUtils {
 	 * @param uploadFile
 	 * @return new file relative path
 	 */
-	public static String moveFile(UploadFile uploadFile) {
+	public static String moveFile(UploadFile uploadFile, String rootFilePath) {
 		if (uploadFile == null)
 			return null;
 
@@ -43,7 +43,7 @@ public class AttachmentUtils {
 		}
 
 		String webRoot = PathKit.getWebRootPath();
-
+		
 		String uuid = UUID.randomUUID().toString().replace("-", "");
 
 		StringBuilder newFileName = new StringBuilder(webRoot).append(File.separator).append("attachment")

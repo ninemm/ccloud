@@ -146,6 +146,7 @@ public class Consts {
 	public static final String RECEIVABLES_OBJECT_TYPE_SUPPLIER = "supplier"; //应收账款供应商类型
 	
 	public static final String OPTION_SELLER_STORE_CHECK = "seller_store_check";//经销商检查库存开关设置
+	public static final String OPTION_FILE_ROOT_PATH = "web_file_root_path";
 	
 	public static final String CUSTOMER_KIND_COMMON = "100401";//普通客户
 	public static final String CUSTOMER_KIND_SELLER = "100402";//直营商客户

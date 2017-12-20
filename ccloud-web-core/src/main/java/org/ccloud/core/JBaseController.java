@@ -26,6 +26,7 @@ import org.ccloud.Consts;
 import org.ccloud.core.render.AjaxResult;
 import org.ccloud.core.render.JCaptchaRender;
 import org.ccloud.model.User;
+import org.ccloud.model.query.OptionQuery;
 import org.ccloud.utils.AttachmentUtils;
 import org.ccloud.utils.JsoupUtils;
 import org.ccloud.utils.RequestUtils;
@@ -338,11 +339,13 @@ public class JBaseController extends Controller {
 			fileList = getFiles();
 		}
 
+		String rootFilePath = OptionQuery.me().findValue("web_root_file_path");
+		
 		HashMap<String, String> filesMap = null;
 		if (fileList != null) {
 			filesMap = new HashMap<String, String>();
 			for (UploadFile ufile : fileList) {
-				String filePath = AttachmentUtils.moveFile(ufile).replace("\\", "/");
+				String filePath = AttachmentUtils.moveFile(ufile, rootFilePath).replace("\\", "/");
 				filesMap.put(ufile.getParameterName(), filePath);
 			}
 		}
