@@ -156,8 +156,6 @@
 	}
 	
 	function batchAction(){
-		var flang = confirm("确认通过审核");
-		if(flang == true){
 			var orderItems = new Array();
 			 var flang = true;
 			 var checklist = $('input[name="dataItem"]:checked').parent().parent();
@@ -191,7 +189,6 @@
 						}
 					});
 				}
-		}
 	}
 	
 </#macro>
@@ -215,7 +212,7 @@
 		<div class="row content-row">
 			<div class="jp-left">
 				<@shiro.hasPermission name="/admin/salesRefund/check">
-					<button class="btn btn-sm btn-primary" type="button" onclick="batchAction()"><i class="fa fa-gavel"></i> 批量审核 </button>
+					<button class="btn btn-sm btn-primary" type="button" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo"><i class="fa fa-gavel"></i> 批量审核 </button>
 				</@shiro.hasPermission>				
 				<a href="${CPATH}/admin/salesRefund/add?c=${c!}&p=${p!}" class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> 新建销售退货单 </a>
 			</div>
@@ -244,5 +241,25 @@
 	</form>
 	<!-- /.box -->
 </section>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="padding-top:10%;">
+  <div class="modal-dialog" role="document" style="width:10%">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="exampleModalLabel">批量审核</h4>
+      </div>
+      <div class="modal-body">
+          <div class="form-group">
+            	<h3>确认批量审核？</h3>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary"  onclick="batchAction()">确认</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 </@layout>
