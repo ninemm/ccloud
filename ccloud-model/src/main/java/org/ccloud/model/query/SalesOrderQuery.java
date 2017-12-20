@@ -400,7 +400,8 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
 		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
 		fromBuilder.append(" LEFT JOIN cc_customer c ON c.id = sc.customer_id ");
-		fromBuilder.append(" WHERE so.biz_user_id='"+userId+"' and sd.is_gift=0");
+		fromBuilder.append(" WHERE so.biz_user_id='"+userId+"' and sd.is_gift=0 ");
+		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
 		LinkedList<Object> params = new LinkedList<Object>();
 		if (StrKit.notBlank(startDate)) {
 			fromBuilder.append(" and "+keyword+" >= ?");
@@ -428,7 +429,8 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
 		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
 		fromBuilder.append(" LEFT JOIN cc_customer c ON c.id = sc.customer_id ");
-		fromBuilder.append(" WHERE so.biz_user_id='"+userId+"' and sd.is_gift=1");
+		fromBuilder.append(" WHERE so.biz_user_id='"+userId+"' and sd.is_gift=1 ");
+		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
 		LinkedList<Object> params = new LinkedList<Object>();
 		if (StrKit.notBlank(startDate)) {
 			fromBuilder.append(" and "+keyword+" >= ?");
@@ -459,6 +461,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
 		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
 		fromBuilder.append(" WHERE so.biz_user_id='"+userId+"'and sd.is_gift=0");
+		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
 		LinkedList<Object> params = new LinkedList<Object>();
 		if (StrKit.notBlank(startDate)) {
 			fromBuilder.append(" and "+keyword+" >= ?");
@@ -489,6 +492,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
 		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
 		fromBuilder.append(" WHERE so.biz_user_id='"+userId+"'and sd.is_gift=1");
+		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
 		LinkedList<Object> params = new LinkedList<Object>();
 		if (StrKit.notBlank(startDate)) {
 			fromBuilder.append(" and "+keyword+" >= ?");
@@ -516,6 +520,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
 		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
 		fromBuilder.append(" WHERE so.biz_user_id='"+userId+"' and sd.is_gift=0");
+		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
 		LinkedList<Object> params = new LinkedList<Object>();
 		if (StrKit.notBlank(startDate)) {
 			fromBuilder.append(" and "+keyword+" >= ?");
@@ -543,6 +548,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
 		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
 		fromBuilder.append(" WHERE so.biz_user_id='"+userId+"' and sd.is_gift=1");
+		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
 		LinkedList<Object> params = new LinkedList<Object>();
 		if (StrKit.notBlank(startDate)) {
 			fromBuilder.append(" and "+keyword+" >= ?");
@@ -570,6 +576,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
 		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
 		fromBuilder.append(" WHERE sd.is_gift=0 ");
+		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = false;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "so.data_area", dataArea, params, needWhere);
@@ -599,6 +606,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
 		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
 		fromBuilder.append(" WHERE sd.is_gift=1");
+		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = false;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "so.data_area", dataArea, params, needWhere);
@@ -629,6 +637,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
 		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
 		fromBuilder.append(" WHERE sd.is_gift=0");
+		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = false;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "so.data_area", dataArea, params, needWhere);
@@ -659,6 +668,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
 		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
 		fromBuilder.append(" WHERE sd.is_gift=1");
+		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = false;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "so.data_area", dataArea, params, needWhere);
@@ -691,6 +701,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id=so.customer_id ");
 		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
 		fromBuilder.append(" WHERE sd.is_gift=0 and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
+		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = false;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, " so.data_area", dataArea, params, needWhere);
@@ -723,6 +734,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id=so.customer_id ");
 		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
 		fromBuilder.append(" WHERE sd.is_gift=1 and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
+		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = false;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, " so.data_area", dataArea, params, needWhere);
@@ -755,6 +767,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
 		fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id=so.customer_id");
 		fromBuilder.append(" WHERE sd.is_gift=1 and sc.customer_kind ="+Consts.CUSTOMER_KIND_SELLER);
+		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = false;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, " so.data_area", dataArea, params, needWhere);
@@ -787,6 +800,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
 		fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id=so.customer_id");
 		fromBuilder.append(" WHERE sd.is_gift=1 and sc.customer_kind ="+Consts.CUSTOMER_KIND_SELLER);
+		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = false;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, " so.data_area", dataArea, params, needWhere);
@@ -824,6 +838,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
 		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
 		fromBuilder.append(" WHERE sd.is_gift=0 and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
+		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
 		startDate=startDate+" 00:00:00";
 		endDate=endDate+" 23:59:59";
 		fromBuilder.append(" AND so.data_area like '"+ dataArea+"' ");
@@ -852,6 +867,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
 		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
 		fromBuilder.append(" WHERE sd.is_gift=1 and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
+		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
 		startDate=startDate+" 00:00:00";
 		endDate=endDate+" 23:59:59";
 		fromBuilder.append(" AND so.data_area like '"+ dataArea+"' ");
@@ -880,6 +896,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
 		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
 		fromBuilder.append(" WHERE sd.is_gift=0 and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
+		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
 		startDate=startDate+" 00:00:00";
 		endDate=endDate+" 23:59:59";
 		startDate=startDate+" 00:00:00";
@@ -910,6 +927,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
 		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
 		fromBuilder.append(" WHERE sd.is_gift=1 and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
+		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
 		startDate=startDate+" 00:00:00";
 		endDate=endDate+" 23:59:59";
 		startDate=startDate+" 00:00:00";
