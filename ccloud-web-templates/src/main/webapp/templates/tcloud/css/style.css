@@ -1394,15 +1394,14 @@ input[name=sex] {
   padding: 0;
 }
 
-.modify_price .weui-flex:last-child {
+.modify_price>div:last-child {
   margin-top:.5rem;
 }
 
-.modify_price input[type=number] {
+.modify_price input[type=number]{
   border: 1px solid #bbb;
   width:2.5rem;
 }
-
 
 /* 订单操作记录 */
 
