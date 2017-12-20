@@ -225,7 +225,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
         			}
 
         		}
-        		if (!SalesOutstockQuery.me().updateStatus(outStockId, Consts.SALES_OUT_STOCK_STATUS_OUT, date) || 
+        		if (!SalesOutstockQuery.me().updateStatus(outStockId, user.getId(), Consts.SALES_OUT_STOCK_STATUS_OUT, date) || 
         				!SalesOrderQuery.me().checkStatus(outStockId, date)) {
         			return false;
         		}
