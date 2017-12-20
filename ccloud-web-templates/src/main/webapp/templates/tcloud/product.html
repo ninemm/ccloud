@@ -31,7 +31,21 @@ $(function() {
       calTotal($(this));
     }).on("touchend", ".operate:last-child", function () { //增加商品数量
       calTotal($(this));
-    });
+    }).on("touchend", ".product-top .weui-cell__ft", function () {
+		layer.open({
+		  type: 1,
+		  title: ['商品详情',
+			'border-bottom: 1px solid #eee;height:2rem;line-height:2rem'
+		  ],
+		  content: '<img src="${CTPATH}/images/jp.jpg" />' +
+			'<p>名称：35度中国劲酒</p>' +
+			'<p>规格：125ml</p>' +
+			'<p>描述：劲牌劲牌劲牌劲牌劲牌劲劲牌劲牌</p>',
+		  anim: 'scale',
+		  className: 'product-detail',
+		  btn: '关闭'
+		});
+	  });
     
     initProduct();
 });

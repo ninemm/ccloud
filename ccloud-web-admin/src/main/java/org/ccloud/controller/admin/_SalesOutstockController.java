@@ -241,7 +241,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
         			String purchaseInstockId =StrKit.getRandomUUID();
         			
         			//PS + 100000(机构编号或企业编号6位) + 20171108(时间) + 000001(流水号)
-        			String pwarehouseSn = "PS" + seller.getStr("seller_code") + DateUtils.format("yyMMdd", date) + PurchaseInstockQuery.me().getNewSn(seller.getStr("id"));
+        			String pwarehouseSn = "PS" + seller.getStr("seller_code") + DateUtils.format("yyMMdd", date) + PurchaseInstockQuery.me().getNewSn();
         
         			Warehouse warehouse = WarehouseQuery.me().findBySellerId(seller.getStr("id"));
         			if(!PurchaseInstockQuery.me().insertBySalesOutStock(paraMap, seller, purchaseInstockId, pwarehouseSn, warehouse.getId(), user.getId(), date,sellerId)) {

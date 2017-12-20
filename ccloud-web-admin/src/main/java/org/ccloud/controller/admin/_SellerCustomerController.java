@@ -477,7 +477,8 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		renderAjaxResultForSuccess("success",JSON.toJSON(list));
 
 	}
-	
+
+	@RequiresPermissions(value = { "/admin/customer/audit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void audit() {
 		
 		keepPara();
@@ -571,7 +572,8 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			setAttr("diffAttrList", diffAttrList);
 		}
 	}
-	
+
+	@RequiresPermissions(value = { "/admin/customer/audit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void complete() {
 		
 		String taskId = getPara("taskId");

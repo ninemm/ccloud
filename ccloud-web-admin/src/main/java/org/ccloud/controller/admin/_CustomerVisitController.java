@@ -21,6 +21,8 @@ import java.util.Map;
 
 import com.google.common.base.Joiner;
 import com.jfinal.kit.Kv;
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
@@ -48,13 +50,14 @@ import org.joda.time.DateTime;
 @RouterMapping(url = "/admin/customerVisit", viewPath = "/WEB-INF/admin/customer_visit")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
-public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit> { 
-	
-	@Override
+public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit> {
+
+	@RequiresPermissions(value = { "/admin/customerVisit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void index() {
 		render("customer_visit.html");
 	}
-	
+
+	@RequiresPermissions(value = { "/admin/customerVisit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void list() {
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
         String keyword = getPara("k");
@@ -87,6 +90,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
         renderJson(map);
 	}
 
+	@RequiresPermissions(value = { "/admin/customerVisit/audit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void audit() {
 
 		keepPara();
@@ -114,6 +118,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 		render("audit.html");
 	}
 
+	@RequiresPermissions(value = { "/admin/customerVisit/audit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void complete() {
 
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);

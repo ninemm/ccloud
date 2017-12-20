@@ -106,14 +106,14 @@
 			var smallUnit = product.small_unit;
 
 	
-			$tr.find("#bigPrice").val(bigPrice);
-			$tr.find("#bigPrice-span").text(bigPrice);
+			$tr.find("#bigPrice").val(bigPrice.toFixed(2));
+			$tr.find("#bigPrice-span").text(bigPrice.toFixed(2));
 			$tr.find("#bigUnit-span").text(product.big_unit + "(x" + convert + smallUnit + ")");
 			
 			$tr.find("#bigNum").val(Math.floor(productCount/convert));
 			
-			$tr.find("#smallPrice").val(smallPrice);
-			$tr.find("#smallPrice-span").text(smallPrice);
+			$tr.find("#smallPrice").val(smallPrice.toFixed(2));
+			$tr.find("#smallPrice-span").text(smallPrice.toFixed(2));
 			$tr.find("#smallUnit-span").text(smallUnit);
 			
 			$tr.find("#smallNum").val(productCount%convert);

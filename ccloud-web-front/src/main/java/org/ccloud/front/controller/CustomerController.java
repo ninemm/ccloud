@@ -90,7 +90,8 @@ public class CustomerController extends BaseFrontController {
 			region.add(item);
 		}
 
-		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea()) + "%");
+		String dataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea());
+		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(dataArea + "%");
 		List<Map<String, Object>> customerTypeList2 = new ArrayList<>();
 		customerTypeList2.add(all);
 
@@ -261,8 +262,7 @@ public class CustomerController extends BaseFrontController {
 
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String dataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(selectDataArea);
-		
-		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(dataArea);
+		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(dataArea + "%");
 		List<Map<String, Object>> list = new ArrayList<>();
 
 		for(CustomerType customerType : customerTypeList)
