@@ -152,7 +152,8 @@ a {
 .weui-search-bar__cancel-btn,
 .weui-cells_checkbox .weui-check:checked+.weui-icon-checked:before,
 .weui-tabbar__item.weui-bar__item--on .weui-tabbar__label,
-.weui-tabbar__item.weui-bar__item--on .weui-tabbar__icon i {
+.weui-tabbar__item.weui-bar__item--on .weui-tabbar__icon i,
+.order-top-btns i {
   color: #ea6f5a;
 }
 
@@ -1160,14 +1161,25 @@ input.street-value {
   margin: .2rem 0;
 }
 
+.order-customer-info {
+  margin-top: 0!important;
+}
+
 .order-customer-info input,
 .delivery-info input,
 .activity-detail-item input {
   font-size: 0.7rem;
   height: inherit;
   line-height: inherit;
-  width: 70%;
-  text-align: right;
+  /* text-align: right; */
+}
+
+.order-top-btns {
+  height: 2rem;
+  line-height: 2rem;
+  border-bottom: 1px solid #bbb;
+  background: #fff;
+  box-sizing: border-box;
 }
 
 #order input::-webkit-input-placeholder {
