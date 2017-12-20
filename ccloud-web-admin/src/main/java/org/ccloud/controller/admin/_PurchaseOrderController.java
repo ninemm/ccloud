@@ -129,17 +129,10 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		PurchaseInstockDetail purchaseInstockDetail = getModel(PurchaseInstockDetail.class);
 		String purchaseInstockId = StrKit.getRandomUUID();
 		//采购入库单： PO + 100000(机构编号或企业编号6位) + 20171108(时间) + 100001(流水号)
-		int m=PurchaseInstockQuery.me().findByUserId(user.getId(),user.getDataArea());
-		m++;
-		String n=Integer.toString(m);
-		int countt =n.length();
-		for(int k=0;k<(6-countt);k++){
-			n= "0"+n;
-		}
 		Date date = new Date();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
 		String fomatDate = sdf.format(date);
-		String pwarehouseSn="PO"+seller.getSellerCode().substring(0, 6)+fomatDate.substring(0,8)+n;
+		String pwarehouseSn="PO"+seller.getSellerCode().substring(0, 6)+fomatDate.substring(0,8)+PurchaseInstockQuery.me().getNewSn();
 		purchaseInstock.set("id", purchaseInstockId);
 		purchaseInstock.set("pwarehouse_sn", pwarehouseSn);
 		purchaseInstock.set("supplier_id", purchaseOrder.getSupplierId());
@@ -244,18 +237,11 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		String purchaseInstockId = StrKit.getRandomUUID();
 
 		//采购入库单： PO + 100000(机构编号或企业编号6位) + 20171108(时间) + 100001(流水号)
-		int m=PurchaseInstockQuery.me().findByUserId(user.getId(),user.getDataArea());
-		m++;
-		String n=Integer.toString(m);
-		int countt =n.length();
-		for(int k=0;k<(6-countt);k++){
-			n= "0"+n;
-		}
 		Date date = new Date();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
 		String fomatDate = sdf.format(date);
 		String purchaseOrderId=StringUtils.getArrayFirst(paraMap.get("purchaseOrderId"));
-		String pwarehouseSn="PO"+user.getDepartmentId().substring(0, 6)+fomatDate.substring(0,8)+n;
+		String pwarehouseSn="PO"+user.getDepartmentId().substring(0, 6)+fomatDate.substring(0,8)+PurchaseInstockQuery.me().getNewSn();
 		purchaseInstock.set("id", purchaseInstockId);
 		purchaseInstock.set("pwarehouse_sn", pwarehouseSn);
 		purchaseInstock.set("supplier_id", StringUtils.getArrayFirst(paraMap.get("supplierId")));

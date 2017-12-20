@@ -15,10 +15,13 @@
  */
 package org.ccloud.model.query;
 
+import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.ccloud.Consts;
 import org.ccloud.model.PurchaseRefundOutstock;
+import org.ccloud.utils.StringUtils;
 
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
@@ -103,4 +106,16 @@ public class PurchaseRefundOutstockQuery extends JBaseQuery {
 		return DAO.find(sql);
 	}
 	
+	public String getNewSn() {
+		String sql = "SELECT p.outstock_sn FROM cc_purchase_refund_outStock p WHERE date(p.create_date) = curdate() ORDER BY p.create_date desc";
+		PurchaseRefundOutstock purchaseRefundOutstock = DAO.findFirst(sql);
+		String SN = "";
+		if (purchaseRefundOutstock == null || StringUtils.isBlank(purchaseRefundOutstock.getOutstockSn())) {
+			SN = Consts.SALES_OUT_STOCK_SN;
+		} else {
+			String endSN = StringUtils.substringSN(Consts.SALES_OUT_STOCK_SN, purchaseRefundOutstock.getOutstockSn());
+			SN = new BigDecimal(endSN).add(new BigDecimal(1)).toString();
+		}
+		return SN;
+	}
 }

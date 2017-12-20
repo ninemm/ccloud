@@ -143,15 +143,7 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 		String str = sdf.format(date);
 		PurchaseInstock purchaseInstock=PurchaseInstockQuery.me().findById(purchaseInstockId);
 		//采购退货单： PR + 100000(机构编号或企业编号6位) + 20171108(时间) + 100001(流水号)
-		List<PurchaseRefundOutstock> list =PurchaseRefundOutstockQuery.me().findByUser(user.getId(),user.getDataArea());
-		int i = list.size();
-		i++;
-		String j=Integer.toString(i);
-		int countt =j.length();
-		for(int m=0;m<(6-countt);m++){
-			j= "0"+j;
-		}
-		String orderSn = "PR" + seller.getSellerCode().substring(0, 6) +str.substring(0, 8) + j;
+		String orderSn = "PR" + seller.getSellerCode().substring(0, 6) +str.substring(0, 8) + PurchaseRefundOutstockQuery.me().getNewSn();
 
 		purchaseRefundOutstock.set("id", orderId);
 		purchaseRefundOutstock.set("outstock_sn", orderSn);
