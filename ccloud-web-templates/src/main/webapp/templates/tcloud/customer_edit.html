@@ -23,6 +23,8 @@
         $("#length").text($("#address").val().length + '/' + 50);
         $(document).on("input", "#address", function() {
             $("#length").text($("#address").val().length + '/' + 50);
+        }).on('touchstart', '#delivery-address', function() {
+            $("#customer_type").select('close');
         });
 
         if($("#delivery-address").val().length == 2) $("#delivery-address").val('');

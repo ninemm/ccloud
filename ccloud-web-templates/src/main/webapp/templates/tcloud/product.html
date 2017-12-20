@@ -31,7 +31,7 @@ $(function() {
       calTotal($(this));
     }).on("touchend", ".operate:last-child", function () { //增加商品数量
       calTotal($(this));
-    }).on("touchend", ".product-top .weui-cell__ft", function () {
+    }).on("touchend", ".product-top .weui-cell__ft, #productName", function () {
 		layer.open({
 		  type: 1,
 		  title: ['商品详情',

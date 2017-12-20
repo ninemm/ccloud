@@ -632,6 +632,13 @@ a {
   color: #ea6f5a;
 }
 
+.notice .weui-cell__ft {
+  position: absolute;
+  right: 0;
+  top: 1rem;
+  right: .5rem;
+}
+
 .index-info {
   background: #fff;
 }
