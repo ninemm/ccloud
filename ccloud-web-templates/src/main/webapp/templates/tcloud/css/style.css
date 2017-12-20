@@ -393,6 +393,19 @@ a {
   color: #666;
 }
 
+.weui-dialog__btn {
+  font-size: .7rem;
+}
+
+.weui-dialog__btn.primary{
+  background: #ea6f5a;
+  color: #fff;
+}
+
+.weui-dialog__btn.default {
+  color: #666;
+}
+
 /* 菜单 */
 
 .hidden-menu {
@@ -638,13 +651,6 @@ a {
     position: absolute;
     right: 0;
     top: 0;
-}
-
-.notice .weui-cell__ft {
-  position: absolute;
-  right: 0;
-  top: 1rem;
-  right: .5rem;
 }
 
 .index-info {

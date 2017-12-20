@@ -9,11 +9,22 @@
 	#order .gift input::-webkit-input-placeholder {
 		text-align: center;
 	}
+	#deliveryDate, #customerTypeName {
+		text-align: right;
+		width: 70%;
+	}
+	main {
+		top: 2rem!important;
+	}
+	.order-customer-info input {
+		text-align: left;
+		width: -webkit-fill-available;
+	}
 </#macro>
 
 <#macro script>
 $(function() {
-  $(document).on("touchstart", "#customerName", function () {
+  $(document).on("touchstart", "#customerName, .choose-customer", function () {
 		window.location.href = '${CPATH}/product/customerChoose';
   }).on("touchstart", "#placeOrder", function () {
 		doSubmit();
@@ -237,14 +248,20 @@ $(function() {
 			success : function(data) { 
 				layer.closeAll();
 				if (data.errorCode == 0) {
-					toastr.success(data.message);
 					removeItemBykey("productList");
 					removeItemBykey("customerInfo");
 					removeItemBykey("productCompositionList");
-
-					setTimeout(function(){
-						window.location.href = "${CPATH}/order/myOrder";
-					},1000);
+					
+					$.confirm({
+						title: data.message,
+						text: '继续下单？',
+						onOK: function () {
+							location.href = '${CPATH}/product'
+						},
+						onCancel: function () {
+							location.href = "${CPATH}/order/myOrder";
+						}
+					});
 					
 				} else {
 					$("#placeOrder").removeAttr('diabled');
@@ -264,45 +281,54 @@ $(function() {
 <body id="order">
 	<div class="weui-content">
 		<form action="${CPATH}/order/salesOrder" method="post" id="form">
+			<div class="weui-flex order-top-btns t-c ft14">
+				<div class="weui-flex__item border-right-1px choose-customer">
+					<span><i class="icon-user"></i></span>
+					选择客户
+				</div>
+				<div class="weui-flex__item nearby-customer">
+					<span><i class="icon-map-marker"></i></span>
+					附近客户</div>
+			</div>
 			<main>
 				<section class="weui-panel weui-panel_access order-customer-info">
 					<div class="weui-cell weui-cell_access">
 						<div class="weui-cell__bd">
-							<div class="order-customer-info-title">
+							<!-- <div class="order-customer-info-title">
 								客户名称
 								<span class="require">*</span>
-							</div>
+							</div> -->
 							<input type="hidden" id="sellerCustomerId" name="customerId" value="" >
-							<input type="text" placeholder="请选择客户" class="weui-input" id="customerName" name="customerName" value="" readonly>
+							<input type="text" class="weui-input" id="customerName" name="customerName" value="" readonly>
 							<span class="weui-cell__ft"></span>
 						</div>
 					</div>
 					<div class="weui-cell weui-cell_access">
 						<div class="weui-cell__bd">
-							<div class="order-customer-info-title">
+							<!-- <div class="order-customer-info-title">
 								联系人
 								<span class="require">*</span>
-							</div>
-							<input type="text" placeholder="请输入客户信息" class="weui-input" id="contact" name="contact" value="" readonly>
+							</div> -->
+							<input type="text" class="weui-input" id="contact" name="contact" value="" readonly>
 						</div>
 					</div>
 					<div class="weui-cell weui-cell_access">
 						<div class="weui-cell__bd">
-							<div class="order-customer-info-title">
+							<!-- <div class="order-customer-info-title">
 								电话号码
 								<span class="require">*</span>
-							</div>
-							<input type="text" placeholder="请输入电话号码" class="weui-input" id="mobile" name="mobile" value="" readonly>
+							</div> -->
+							<input type="text" class="weui-input" id="mobile" name="mobile" value="" readonly>
 						</div>
 					</div>
 					<div class="weui-cell weui-cell_access">
 						<div class="weui-cell__bd">
-							<div class="order-customer-info-title">
+							<!-- <div class="order-customer-info-title">
 								详细地址
 								<span class="require">*</span>
-							</div>
+							</div> -->
 							<input type="hidden" id="address" name="address" value="">
-							<input type="text" placeholder="请输入详细地址" class="weui-input" id="deliveryAddress" name="deliveryAddress" value="" readonly>
+							<input type="text" class="weui-input" id="deliveryAddress" name="deliveryAddress" value="" readonly>
 						</div>
 					</div>
 					<div class="weui-cell weui-cell_access">

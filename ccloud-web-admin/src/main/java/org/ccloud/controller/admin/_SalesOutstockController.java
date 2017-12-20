@@ -174,6 +174,26 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 
 	}	
 	
+	
+//	@RequiresPermissions("/admin/salesOutstock/check")
+//	public void batchOutStock() {
+//
+//		String outstockId = getPara("outstockId");
+//		String[] outId = outstockId.split(",");
+//		String date = getPara("oStockDate");
+//		String remark = getPara("remark");
+//		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+//		String sellerId = getSessionAttr("sellerId");
+//		String sellerCode = getSessionAttr("sellerCode");
+//		boolean isSave = this.out(paraMap, user, sellerId, sellerCode);
+//        if (isSave) {
+//        	renderAjaxResultForSuccess("出库成功");
+//        } else {
+//        	renderAjaxResultForError("出库失败!");
+//        }
+//
+//	}
+	
 	public void recordPrintInfo() {
 		String outstockId = getPara("outstockId");
 		String[] outId = outstockId.split(",");
@@ -225,7 +245,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
         			}
 
         		}
-        		if (!SalesOutstockQuery.me().updateStatus(outStockId, Consts.SALES_OUT_STOCK_STATUS_OUT, date) || 
+        		if (!SalesOutstockQuery.me().updateStatus(outStockId, user.getId(), Consts.SALES_OUT_STOCK_STATUS_OUT, date) || 
         				!SalesOrderQuery.me().checkStatus(outStockId, date)) {
         			return false;
         		}

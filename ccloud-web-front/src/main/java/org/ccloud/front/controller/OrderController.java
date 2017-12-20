@@ -29,7 +29,6 @@ import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SalesOutstockDetailQuery;
 import org.ccloud.model.query.SalesOutstockQuery;
 import org.ccloud.model.query.SellerProductQuery;
-import org.ccloud.model.query.UserGroupRelQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DataAreaUtil;
@@ -38,7 +37,6 @@ import org.ccloud.utils.StringUtils;
 import org.ccloud.workflow.service.WorkFlowService;
 
 import com.alibaba.fastjson.JSON;
-import com.google.common.base.Joiner;
 import com.google.common.collect.Maps;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
@@ -111,6 +109,7 @@ public class OrderController extends BaseFrontController {
 	}
 	
 	public void orderReview() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
 		String orderId = getPara("orderId");
 		String taskId = getPara("taskId");
@@ -118,6 +117,12 @@ public class OrderController extends BaseFrontController {
 		List<Record> orderDetailList = SalesOrderDetailQuery.me().findByOrderId(orderId);
 
 		order.set("statusName", getStatusName(order.getInt("status")));
+
+		boolean isCheck = false;
+		if (user != null && getPara("assignee", "").contains(user.getUsername())) {
+			isCheck = true;
+		}
+		setAttr("isCheck", isCheck);
 
 		setAttr("taskId", taskId);
 		setAttr("order", order);
@@ -130,23 +135,43 @@ public class OrderController extends BaseFrontController {
 
 		String id = getPara("id");
 
-		Record salesOrder = SalesOrderQuery.me().findMoreById(id);
+		Record salesOrder = SalesOrderQuery.me().findRecordById(id);
 		setAttr("salesOrder", salesOrder);
 
 		String proc_inst_id = getPara("proc_inst_id");
 		List<Comment> comments = WorkFlowService.me().getProcessComments(proc_inst_id);
 		setAttr("comments", comments);
 		
-		List<String> printComments = new ArrayList<String>();
+		StringBuilder printComments = new StringBuilder();
 		List<Record> printRecord = OutstockPrintQuery.me().findByOrderId(id);
 		for (Record record : printRecord) {
 			int status = record.getInt("status");
-			printComments.add(buildComments(Consts.OPERATE_HISTORY_TITLE_ORDER_PRINT, record.get("create_date").toString(), record.getStr("realname"),
+			printComments.append(buildComments(Consts.OPERATE_HISTORY_TITLE_ORDER_PRINT, record.get("create_date").toString(), record.getStr("realname"),
 					status == 1 ? "打印失败" : "打印成功"));
 		}
-		setAttr("printComment", printComments);
+		setAttr("printComment", printComments.toString());
+
+		String outstockInfo = buildOutstockInfo(id);
+		setAttr("outstockInfo", outstockInfo);
 		
 		render("operate_history.html");
+	}
+	
+	private String buildOutstockInfo(String ordedId) {
+		List<Record> orderDetails = SalesOrderDetailQuery.me().findByOrderId(ordedId);
+		
+		StringBuilder stringBuilder = new StringBuilder();
+		
+		for (Record record : orderDetails) { // 若修改了产品价格或数量，则写入相关日志信息
+			if (record.getInt("out_count") !=record.getInt("product_count")) {
+					stringBuilder.append("●" + record.getStr("custom_name") + "<br>");
+					int convert = record.getInt("convert_relate");
+					stringBuilder.append("-" + record.getStr("big_unit") + "数量修改为"+ Math.round(record.getInt("out_count")/convert) + "(" + Math.round(record.getInt("product_count")/convert) + ")<br>");
+					stringBuilder.append("-" + record.getStr("small_unit") + "数量修改为"+ Math.round(record.getInt("out_count")%convert) + "(" + Math.round(record.getInt("product_count")%convert) + ")<br>");
+			}
+		}
+		
+		return stringBuilder.toString();
 	}
 
 	private String getStatusName(int statusCode) {
@@ -175,7 +200,7 @@ public class OrderController extends BaseFrontController {
 		Map<String, String[]> paraMap = getParaMap();
 
 		if (this.saveOrder(paraMap, user, sellerId, sellerCode)) {
-			renderAjaxResultForSuccess("保存成功");
+			renderAjaxResultForSuccess("下单成功");
 		} else {
 			renderAjaxResultForError("库存不足或提交失败");
 		}
@@ -272,28 +297,21 @@ public class OrderController extends BaseFrontController {
 		param.put(Consts.WORKFLOW_APPLY_USER, user);
 		param.put(Consts.WORKFLOW_APPLY_SELLER_ID, sellerId);
 		param.put(Consts.WORKFLOW_APPLY_SELLER_CODE, sellerCode);
+		param.put("customerName", customerName);
 		
 
-		String acount = "";
-		String managerName = "";
 		String toUserId = "";
 
-		if(Consts.WORKFLOW_PROC_DEF_KEY_ORDER_REVIEW.equals(proc_def_key)) {
-			//一审是账务比较特殊
-			acount = getAcount(user.getId());
-			param.put("account", acount);
+		if(Consts.WORKFLOW_PROC_DEF_KEY_ORDER_REVIEW_ONE.equals(proc_def_key)) {
 			
-		}else {
 			User manager = UserQuery.me().findManagerByDeptId(user.getDepartmentId());
-			managerName = manager.getUsername();
-			param.put("manager", managerName);
+			if (manager == null) {
+				return false;
+			}
+			param.put("manager", manager.getUsername());
 			toUserId = manager.getId();
 		}
 
-		if (StrKit.isBlank(acount) && StrKit.isBlank(managerName)) {
-			return false;
-		}
-		
 		String procInstId = workflow.startProcess(orderId, proc_def_key, param);
 
 		salesOrder.setProcKey(proc_def_key);
@@ -304,19 +322,11 @@ public class OrderController extends BaseFrontController {
 			return false;
 		}
 		
-		sendOrderMessage(sellerId, customerName, "新增订单审核", user.getId(), toUserId, user.getDepartmentId(), user.getDataArea());
+		sendOrderMessage(sellerId, customerName, "订单审核", user.getId(), toUserId, user.getDepartmentId(), user.getDataArea());
 		
 		return true;
 	}
-	
-	private String getAcount(String userId) {
-		List<String> userIdList = UserGroupRelQuery.me().findUserIdsByGroup(Consts.GROUP_CODE_PREFIX_DATA, userId);
-		String userIds = Joiner.on(",").join(userIdList);
-		List<String> userNameList = UserGroupRelQuery.me().findUserNamesByRoleCode(Consts.GROUP_CODE_PREFIX_ROLE, Consts.ROLE_CODE_020, userIds);
 
-		return Joiner.on(",").join(userNameList);
-	}
-	
 	private void sendOrderMessage(String sellerId, String title, String content, String fromUserId, String toUserId, String deptId, String dataArea) {
 		
 		Message message = new Message();
@@ -352,9 +362,13 @@ public class OrderController extends BaseFrontController {
 		var.put("orderId", orderId);
 		var.put(Consts.WORKFLOW_APPLY_COMFIRM, user);
 		
+		//是否改价格
 		if (pass == 1 && edit == 1) {
-			editOrder(user.getId());
-
+			Map<String, String[]> paraMap = getParaMap();
+			editOrder(paraMap, user.getId());
+			String editInfo = buildEditInfo();
+			
+			comment = "通过" + " 修改订单<br>" + editInfo;
 		} else {
 			comment = (pass == 1 ? "通过" : "拒绝") + " " + (comment == null ? "" : comment) + " "
 					+ (refuseReson == "undefined" ? "" : refuseReson);
@@ -368,22 +382,70 @@ public class OrderController extends BaseFrontController {
 		renderAjaxResultForSuccess("订单审核成功");
 	}
 	
-	//是否改价格
-	private void editOrder(String userId) {
-		Map<String, String[]> paraMap = getParaMap();
+	private void editOrder(Map<String, String[]> paraMap, String userId) {
 		Date date = new Date();
-		
-		if(!SalesOrderQuery.me().updateForApp(paraMap, userId, date)) {
+
+		if (!SalesOrderQuery.me().updateForApp(paraMap, userId, date)) {
 			renderAjaxResultForError("订单审核修改价格失败");
 		}
-		
+
 		String[] orderDetailIds = getParaValues("orderDetailId");
-		for(int index=0;index<orderDetailIds.length;index++) {
-			if(!SalesOrderDetailQuery.me().updateForApp(paraMap, index, date)) {
+		for (int index = 0; index < orderDetailIds.length; index++) {
+			if (!SalesOrderDetailQuery.me().updateForApp(paraMap, index, date)) {
 				renderAjaxResultForError("订单审核修改价格失败");
 			}
 		}
+
+	}
+	
+	private String buildEditInfo() {
+		String[] productNames = getParaValues("productName");
+		String[] bigUnits = getParaValues("bigUnit");
+		String[] smallUnits = getParaValues("smallUnit");
+		String[] bigPrices = getParaValues("bigPrice");
+		String[] bigNums = getParaValues("bigNum");
+		String[] smallPrices = getParaValues("smallPrice");
+		String[] smallNums = getParaValues("smallNum");
+		String[] bigPriceSpans = getParaValues("bigPriceSpan");
+		String[] bigNumSpans = getParaValues("bigNumSpan");
+		String[] smallPriceSpans = getParaValues("smallPriceSpan");
+		String[] smallNumSpans = getParaValues("smallNumSpan");
 		
+		StringBuilder stringBuilder = new StringBuilder();
+		
+		for (int index = 0; index < productNames.length; index++) { // 若修改了产品价格或数量，则写入相关日志信息
+			boolean flag = true;
+			if (!bigPrices[index].equals(bigPriceSpans[index])) {
+				if(flag) {
+					stringBuilder.append("●" + productNames[index] + "<br>");
+				}
+				flag = false;
+				stringBuilder.append("-每" + bigUnits[index] + "价格修改为"+ bigPrices[index]+ "(" + bigPriceSpans[index] + ")<br>");
+			}
+			if (!smallPrices[index].equals(smallPriceSpans[index])) {
+				if(flag) {
+					stringBuilder.append("●" + productNames[index] + "<br>");
+				}
+				flag = false;
+				stringBuilder.append("-每" + smallUnits[index] + "价格修改为"+ smallPrices[index]+ "(" + smallPriceSpans[index] + ")<br>");
+			}
+			if (!bigNums[index].equals(bigNumSpans[index])) {
+				if(flag) {
+					stringBuilder.append("●" + productNames[index] + "<br>");
+				}
+				flag = false;
+				stringBuilder.append("-" + bigUnits[index] + "数量修改为"+ bigNums[index]+ "(" + bigNumSpans[index] + ")<br>");
+			}
+			if (!smallNums[index].equals(smallNumSpans[index])) {
+				if(flag) {
+					stringBuilder.append("●" + productNames[index] + "<br>");
+				}
+				flag = false;
+				stringBuilder.append("-" + smallUnits[index] + "数量修改为"+ smallNums[index]+ "(" + smallNumSpans[index] + ")<br>");
+			}
+		}
+		
+		return stringBuilder.toString();
 	}
 	
 	private String buildComments(String title, String date, String realname, String comment) {
