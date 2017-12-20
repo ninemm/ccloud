@@ -1171,7 +1171,8 @@ input.street-value {
   font-size: 0.7rem;
   height: inherit;
   line-height: inherit;
-  /* text-align: right; */
+  width: 70%;
+  text-align: right;
 }
 
 .order-top-btns {
