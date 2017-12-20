@@ -150,7 +150,7 @@
 </#macro>
 
 <@layout>
-<div id="visit-record">
+<div id="weui-content">
     <article class="visit-record">
         <header class="has-th-list weui-flex">
             <div class="head-search select-area weui-flex__item">
@@ -215,5 +215,5 @@
 <a class="hidden-menu" href="${CPATH}/customerVisit/edit">
     <img src="${CTPATH}/images/customer_add.png" alt="">
 </a>
-<div class="layer"></div>
+<#include "_inc/_goback.html" />
 </@layout>

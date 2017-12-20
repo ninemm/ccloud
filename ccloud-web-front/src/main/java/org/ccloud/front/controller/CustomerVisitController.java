@@ -2,12 +2,10 @@ package org.ccloud.front.controller;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.time.DateFormatUtils;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.message.Actions;
@@ -275,10 +273,9 @@ public class CustomerVisitController extends BaseFrontController {
 	public void visitCustomerInfo() {
 		List<Map<String, String>> list = getVisitTypeList();
 	    setAttr("problem", JSON.toJSONString(list));
-		setAttr("deliveryDate", DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
+		//setAttr("deliveryDate", DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
 		render("customer_visit_edit.html");
 	}
-	
 
 	public void complete() {
 		
@@ -361,8 +358,6 @@ public class CustomerVisitController extends BaseFrontController {
 		else
 			renderAjaxResultForError("操作失败");
 	}
-	
-
 
 	private boolean startProcess(CustomerVisit customerVisit) {
 
@@ -400,8 +395,7 @@ public class CustomerVisitController extends BaseFrontController {
 		
 		return isUpdated;
 	}
-	
-	
+
 	private List<Map<String, String>> getVisitTypeList() {
 		List<Dict> visitDictList = DictQuery.me().findDictByType("customer_visit");
 	    List<Map<String, String>> list = Lists.newArrayList();

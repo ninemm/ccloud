@@ -18,7 +18,6 @@
     var customerSelect = [];
     var problemSelect = [];
 
-
     var imageArr = [];
     var count = 3;
     var $form = $("#form");
@@ -30,11 +29,12 @@
 
     function initCustomer(){
         var customerInfo = getItemBykey("customerInfo");
-        if(customerInfo){
+        if(customerInfo) {
             $("#customer_id").val(customerInfo.sellerCustomerId);
             $("#customer_name").val(customerInfo.customerName);
             $("#contact").val(customerInfo.contact);
             $("#mobile").val(customerInfo.mobile);
+            $('#address').val(customerInfo.address);
             removeItemBykey("customerInfo");
         }
     }
@@ -48,6 +48,12 @@
     }
 
     $(function() {
+
+        $("#length").text($("#question_desc").val().length + '/' + 70);
+        $(document).on("input", "#question_desc", function() {
+            $("#length").text($("#question_desc").val().length + '/' + 70);
+        });
+
         $(document).on("touchstart", "#customer_name", function () {
 	        window.location.href = '${CPATH}/customerVisit/visitCustomerChoose';
 	    });
@@ -88,13 +94,13 @@
 
                 (function(x) {
                     reader.onload = function(e) {
-                        var str = '<li class="weui-uploader__file " style="background-image:url('+this.result+')"><span class="remove" style="color:red">X</span></li>';
+                        var str = '<li class="weui-uploader__file " style="background-image:url('+this.result+')"></li>';
                         $uploaderFiles.append(str);
                         render(this.result, x);
                     }
                 })(file.name)
 
-                    reader.readAsDataURL(file);
+                reader.readAsDataURL(file);
             }
 
         });
@@ -133,7 +139,7 @@
         }
 
         var index; //第几张图片
-            $uploaderFiles.on("click", "li", function() {
+        $uploaderFiles.on("click", "li", function() {
             index = $(this).index();
             $galleryImg.attr("style", this.getAttribute("style"));
             $gallery.fadeIn(100);
@@ -151,7 +157,7 @@
 
     });
 
-    function doSubmit(){
+    function doSubmit() {
         $.ajax({
             url: '${CPATH}/customerVisit/save',
             method: 'post',
@@ -170,13 +176,10 @@
                 }
                 
                 $('._submit_btn').attr('disabled', true);
-                layer.open({
-                    type: 2,
-                    content: '保存中...'
-                });
+                Utils.openLoadingWin('保存中...');
             },
             success: function(res) {
-                layer.closeAll();
+                Utils.closeLoadingWin();
                 if (res.errorCode == 0) {
                     $.confirm({
                         title: res.message,
@@ -193,7 +196,7 @@
                 }
             },
             error: function(res) {
-                layer.closeAll();
+                Utils.closeLoadingWin();
             }
         });
     }
@@ -213,38 +216,38 @@
     wx.ready(function() {
         // 获取定位信息
         wx.getLocation({
-        type: 'wgs84',
-            success: function (res) {
-            var latitude = res.latitude;                      // 纬度，浮点数，范围为90 ~ -90
-            var longitude = res.longitude;                    // 经度，浮点数，范围为180 ~ -180。
-
-            $("#lng").val(longitude.toFixed(2));
-            $("#lat").val(latitude.toFixed(2));
-
-            var speed = res.speed;                            // 速度，以米/每秒计
-            var accuracy = res.accuracy;                      // 位置精度
-
-            var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
-            var geoc = new BMap.Geocoder();                   // 获取百度地址解析器
-
-            translateCallback = function (point) {            // 回调函数
-                geoc.getLocation(point, function(rs) {
-                    var addComp = rs.addressComponents;
-                    var address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
-                    $('#location-span').text(address);
-                    $('#location').val(address);
-                });
-            };
-                setTimeout(function() {
-                BMap.Convertor.translate(point, 0, translateCallback);//真实经纬度转成百度坐标
-                }, 100);
-            },
-            cancel: function (res) {
-                console.log('用户拒绝授权获取地理位置');
-            },
-            fail: function (res) {
-                console.log(JSON.stringify(res));
-            }
+	        type: 'wgs84',
+	        success: function (res) {
+	            var latitude = res.latitude;                      // 纬度，浮点数，范围为90 ~ -90
+	            var longitude = res.longitude;                    // 经度，浮点数，范围为180 ~ -180。
+	            $("#lng").val(parseFloat(longitude).toFixed(2));
+	            $("#lat").val(parseFloat(latitude).toFixed(2));
+	   
+	            var speed = res.speed;                            // 速度，以米/每秒计
+	            var accuracy = res.accuracy;                      // 位置精度
+	
+	            var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
+	            var geoc = new BMap.Geocoder();                   // 获取百度地址解析器
+	
+	            translateCallback = function (point) {            // 回调函数
+	                geoc.getLocation(point, function(rs) {
+	                    var addComp = rs.addressComponents;
+	                    var address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
+	                    $('#location-span').text(address);
+	                    $('#location').val(address);
+	                });
+	            };
+	            
+	            setTimeout(function() {
+	                BMap.Convertor.translate(point, 0, translateCallback);//真实经纬度转成百度坐标
+	            }, 100);
+	        },
+	        cancel: function (res) {
+	            console.log('用户拒绝授权获取地理位置');
+	        },
+	        fail: function (res) {
+	            console.log(JSON.stringify(res));
+	        }
         });
     });
 </#macro>
@@ -259,7 +262,7 @@
                             <span class="require">*</span>
                         </div>
                         <input type="hidden" id="customer_id" name="customerVisit.seller_customer_id" />
-                        <input type="text" class="weui-input" id="customer_name" name="customer_name" placeholder="选择客户" required>
+                        <input type="text" class="weui-input" id="customer_name" name="customer_name" placeholder="选择客户" required readonly>
                     </div>
                     <span class="weui-cell__ft"></span>
                 </div>
@@ -274,18 +277,15 @@
 
                 <div class="weui-cell">
                     <div class="weui-cell__bd">
-                        <div class="order-customer-info-title">性别</div>
-                        <label class="fr">
-                            <input type="radio" name="sex" id="" value="female">女</label>
-                        <label class="fr">
-                            <input type="radio" name="sex" id="" value="male">男</label>
-                    </div>
-                </div>
-
-                <div class="weui-cell">
-                    <div class="weui-cell__bd">
                         <div class="order-customer-info-title">联系电话<span class="require">*</span></div>
                         <input id="mobile" type="text" name="mobile" placeholder="联系电话" class="weui-input" readonly="readonly" />
+                    </div>
+                </div>
+                
+                <div class="weui-cell">
+                    <div class="weui-cell__bd">
+                        <textarea class="weui-textarea" rows="3" name="address" id="address" placeholder="备注说明"></textarea>
+                        <div class="weui-textarea-counter"><span>0</span>/70</div>
                     </div>
                 </div>
 
@@ -311,7 +311,7 @@
                 <div class="weui-cell weui-cell_access">
                     <div class="weui-cell__bd">
                         <textarea class="weui-textarea" rows="3" name="customerVisit.question_desc" id="question_desc" placeholder="备注说明"></textarea>
-                        <div class="weui-textarea-counter"><span>0</span>/70</div>
+                        <div class="weui-textarea-counter" id="length"></div>
                     </div>
                 </div>
             </section>
@@ -350,16 +350,16 @@
                         <input id="location" name="customerVisit.location" type="hidden" />
                         <input id="lng" name="customerVisit.lng" type="hidden" />
                         <input id="lat" name="customerVisit.lat" type="hidden" />
-                        <span id="location-span"></span>
-                    </div>
+                        <span id="location-span">正在搜索地址...</span>
+                    </div> 
                 </div>
             </section>
         </form>
     </main>
 
     <#include "_inc/_goback.html" />
-    <footer class="weui-footer weui-footer_fixed-bottom ft16">
-        <a href="javascript:void(0)" class="red-button width-100 _submit_btn" onclick="doSubmit()" href="">提交</a>
+    <footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
+        <button class="red-button width-100 _submit_btn" onclick="doSubmit()" href="">提交</button>
     </footer>
 </div>
 </@layout>
