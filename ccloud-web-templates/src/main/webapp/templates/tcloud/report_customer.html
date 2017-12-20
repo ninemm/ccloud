@@ -69,49 +69,66 @@
 				$("#customerRank").empty();
 				var rank = $("#customerRank");
 	            var crSeriesData = [];
+	            var legendData = [];
 	            var length = data.length;
+	            $("#customerCount").height(45 * length + 100);
 	            if (length == 0) {
+	            	$("#customerCount").height(300);
 	                crSeriesData.push({
 	                    name: '暂无数据',
 	                    value: 0
 	                });	            	
 	            }	
 	            for(var i = 0; i < length; i++){
+	            	legendData.push(data[i].customer_name)
 	            	rank.append("<div class='ft16'><p>"+data[i].customer_name+"</p><p><span class='orange'>￥"+data[i].totalAmount+"</span><span class='gray ft14'>"+data[i].orderCount+"笔/"+data[i].productCount+"件</span></p></div>");
 	                crSeriesData.push({
-	                    name: data[i].customer_name + '(' + data[i].totalAmount + ')',
+	                    name: data[i].customer_name,
 	                    value: data[i].totalAmount
 	                });
 	            }
 	            var customerCount = document.getElementById('customerCount');
 	            var customerCountChart = echarts.init(customerCount);
-	            var crOption = {
-	                title: [{
-	                    textStyle: {
-	                        fontWeight: 'normal',
-	                        fontSize: 16
-	                    }
-	                }],
-	                color: ['#4ac7f5', '#f36f8a', '#fd9173', '#AF89D6', '#5f71d2'],
-	                series: [
-	                    {
-	                        type:'pie',
-	                        radius: ['25%', '45%'],
-	                        center: ['50%', '50%'],
-	                        avoidLabelOverlap: false,
-	                        label: {
-	                            normal: {
-	                                textStyle: {
-	                                    fontSize: 10
-	                                }
-	                            }
-	                        },
-	                        data:crSeriesData
-	                    }
-	                ]
-	            };
+				option = {
+				    tooltip: {
+				        trigger: 'item',
+				        formatter: "{a} <br/>{b}: {c}元 ({d}%)"
+				    },
+				    legend: {
+				        orient: 'horizontal',
+				        top: '15',
+				        data:legendData,
+				    },
+				    series: [
+				        {
+				            name:'数据来源',
+				            type:'pie',
+				            radius: ['40%', '60%'],
+				            avoidLabelOverlap: false,
+				            label: {
+				                normal: {
+				                    show: false,
+				                    position: 'center'
+				                },
+				                emphasis: {
+				                    show: true,
+				                    textStyle: {
+				                        fontSize: '15',
+				                        fontWeight: 'bold'
+				                    }
+				                }
+				            },
+				            labelLine: {
+				                normal: {
+				                    show: false
+				                }
+				            },
+				            data:crSeriesData
+				        }
+				    ]
+				};
 	            customerCountChart.resize();
-	            customerCountChart.setOption(crOption,true);
+	            customerCountChart.setOption(option,true);
 			}
 		);     
     }
