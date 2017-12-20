@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
@@ -37,6 +38,7 @@ import org.ccloud.model.GoodsSpecificationValue;
 import org.ccloud.model.query.GoodsGoodsSpecificationQuery;
 import org.ccloud.model.query.GoodsSpecificationQuery;
 import org.ccloud.model.query.GoodsSpecificationValueQuery;
+import org.ccloud.model.query.OptionQuery;
 
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Before;
@@ -96,8 +98,12 @@ public class _GoodsSpecificationController extends JBaseCRUDController<GoodsSpec
  			GoodsSpecificationValueQuery.me().batchDeleteAndFile(deleteIds);
 			ccGoodsSpecification.saveOrUpdate();
 		}
+		
 		int update = 0;
 		if (valueName != null) {
+			
+			String fileRootPath = OptionQuery.me().findValue(Consts.OPTION_FILE_ROOT_PATH);
+			
 			for (int i = 0; i < valueName.length; i++) {
 				if (StringUtils.isBlank(valueName[i])) {
 					continue;
@@ -110,12 +116,12 @@ public class _GoodsSpecificationController extends JBaseCRUDController<GoodsSpec
 				if (ccGoodsSpecification.getType().equals("1")) {
 					if (imageUrl != null && imageUrl.length > 0) {
 						if (StringUtils.isNotBlank(imageUrl[i]) && imageUrl[i].equals("add")) {
-							value.setImagePath(AttachmentUtils.moveFile(uploadFiles.get(update)).replace("\\", "/"));
+							value.setImagePath(AttachmentUtils.moveFile(uploadFiles.get(update), fileRootPath).replace("\\", "/"));
 							update++;
 						}
 					} else {
 						if (uploadFiles.size() > 0) {
-							value.setImagePath(AttachmentUtils.moveFile(uploadFiles.get(i)).replace("\\", "/"));
+							value.setImagePath(AttachmentUtils.moveFile(uploadFiles.get(i), fileRootPath).replace("\\", "/"));
 						}
 					}
 				}

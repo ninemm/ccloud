@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 
+import org.ccloud.model.query.OptionQuery;
 import org.ccloud.template.TemplateManager;
 import org.ccloud.utils.FileUtils;
 import org.ccloud.utils.StringUtils;
@@ -168,6 +169,11 @@ public class BaseFrontController extends JBaseController {
 		if (StrKit.notBlank(blobImage)) {
 			
 			String webRoot = PathKit.getWebRootPath();
+			
+			String rootFilePath = OptionQuery.me().findValue("web_root_file_path");
+			if (StrKit.notBlank(rootFilePath))
+				webRoot = rootFilePath;
+			
 			String uuid = StrKit.getRandomUUID();
 			StringBuilder newFileName = new StringBuilder(webRoot).append(File.separator).append("attachment")
 					.append(File.separator).append(DateTime.now().toString("yyyyMMdd")).append(File.separator).append(uuid)

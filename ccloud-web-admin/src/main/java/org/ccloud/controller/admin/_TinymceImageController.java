@@ -25,6 +25,7 @@ import java.net.URL;
 import java.util.Date;
 import java.util.List;
 
+import org.ccloud.Consts;
 import org.ccloud.core.JBaseController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.Attachment;
@@ -76,8 +77,10 @@ public class _TinymceImageController extends JBaseController {
 	 * 上传文件
 	 */
 	public void upload() {
+		
+		String fileRootPath = OptionQuery.me().findValue(Consts.OPTION_FILE_ROOT_PATH);
 		UploadFile uploadFile = getFile();
-		String newPath = AttachmentUtils.moveFile(uploadFile);
+		String newPath = AttachmentUtils.moveFile(uploadFile, fileRootPath);
 		User user = getLoginedUser();
 
 		Attachment attachment = new Attachment();

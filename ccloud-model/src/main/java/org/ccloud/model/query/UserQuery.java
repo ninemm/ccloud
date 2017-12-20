@@ -93,7 +93,7 @@ public class UserQuery extends JBaseQuery {
 	}
 	
 	public List<User> findByWechatOpenid(final String openid) {
-//		return DAO.doFind("wechat_open_id = ? AND status = 1", openid);
+		//return DAO.doFind("wechat_open_id = ? AND status = 1", openid);
 		return DAO.doFindByCache(User.CACHE_NAME, openid, "wechat_open_id = ? AND status = 1", openid);
 	}
 	
@@ -183,10 +183,10 @@ public class UserQuery extends JBaseQuery {
 	}
 
 	public List<User> findByRole(String id) {
-		StringBuilder sql = new StringBuilder("group_id in ");
-		sql.append("(SELECT gr.group_id FROM group_role_rel gr ");
-		sql.append("LEFT JOIN `group` g ON gr.group_id = g.id WHERE gr.role_id=?)");
-		return DAO.doFind(sql.toString(), id);
+		StringBuilder sql = new StringBuilder("SELECT u.* FROM user_group_rel a ");
+		sql.append("LEFT JOIN `user` u ON a.user_id = u.id ");
+		sql.append("where a.group_id in (SELECT b.group_id from group_role_rel b where b.role_id = ?) ");
+		return DAO.find(sql.toString(), id);
 	}
 	
 	public List<User> findUserList(String userId) {

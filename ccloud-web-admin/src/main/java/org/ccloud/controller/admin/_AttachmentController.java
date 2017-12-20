@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.Attachment;
@@ -116,7 +117,9 @@ public class _AttachmentController extends JBaseCRUDController<Attachment> {
 	public void doUpload() {
 		UploadFile uploadFile = getFile();
 		if (null != uploadFile) {
-			String newPath = AttachmentUtils.moveFile(uploadFile);
+			
+			String fileRootPath = OptionQuery.me().findValue(Consts.OPTION_FILE_ROOT_PATH);
+			String newPath = AttachmentUtils.moveFile(uploadFile, fileRootPath);
 			User user = getLoginedUser();
 
 			Attachment attachment = new Attachment();
