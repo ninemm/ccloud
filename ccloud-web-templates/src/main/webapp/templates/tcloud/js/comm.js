@@ -154,9 +154,9 @@ function openPop() {
 			.append(
 					'<div class="pop-input">'
 							+ '<input type="number" value="0">'
-							+ '<div class="pop-button">'
-							+ '<a class="white-button-no-border width-50" id="cancel-input">取消</a>'
-							+ '<a class="red-button width-50" id="confirm-input">确定</a>'
+							+ '<div class="pop-button weui-flex">'
+							+ '<a class="white-button-no-border width-50 weui-flex__item" id="cancel-input">取消</a>'
+							+ '<a class="red-button width-50 weui-flex__item" id="confirm-input">确定</a>'
 							+ '</div>' + '</div>');
 	$(".pop-input").addClass("animated fadeIn");
 	$(".layer").addClass("layer-pop-show");
@@ -316,6 +316,7 @@ function wxLocation() {
 
 $(function() {
 	FastClick.attach(document.body);
+	stopTouchendPropagationAfterScroll();
 	$(document).on("touchstart", "#button", function() {
 		if (finished) {
 			if (!open) {

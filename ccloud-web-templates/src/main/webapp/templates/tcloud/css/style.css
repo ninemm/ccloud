@@ -34,10 +34,6 @@ input[type=checkbox] {
   height: inherit;
 }
 
-input:read-only {
-  color: #999;
-}
-
 hr {
   margin: 0.5rem 0;
   border-top: #f3f5f7 1px solid;
@@ -72,6 +68,7 @@ main {
 
 button {
   border: 0;
+  font-size: inherit;
 }
 
 a {
@@ -154,7 +151,6 @@ a {
 .weui-cells_radio .weui-check:checked+.weui-icon-checked:before,
 .weui-search-bar__cancel-btn,
 .weui-cells_checkbox .weui-check:checked+.weui-icon-checked:before,
-.weui-dialog__btn,
 .weui-tabbar__item.weui-bar__item--on .weui-tabbar__label,
 .weui-tabbar__item.weui-bar__item--on .weui-tabbar__icon i {
   color: #ea6f5a;
@@ -381,6 +377,19 @@ a {
   background: #ea6f5a!important;
   color: #fff!important;
   height: 100%;
+}
+
+.weui-dialog__btn {
+  font-size: .7rem;
+}
+
+.weui-dialog__btn.primary{
+  background: #ea6f5a;
+  color: #fff;
+}
+
+.weui-dialog__btn.default {
+  color: #666;
 }
 
 
@@ -929,7 +938,7 @@ a {
   background: #ea6f5a;
 }
 
-.audit .layui-m-layerbtn span[no] {
+.layui-m-layerbtn span[no] {
   color: #000;
   border-radius: 0;
   background: #fff;

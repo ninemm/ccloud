@@ -1036,6 +1036,8 @@ public class SalesOrderQuery extends JBaseQuery {
 			params.add(endDate);
 		}
 		
+		fromBuilder.append("GROUP BY status");
+		
 		if (params.isEmpty())
 			return Db.find(fromBuilder.toString());
 

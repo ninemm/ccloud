@@ -50,14 +50,16 @@ public class SalesOutstockQuery extends JBaseQuery {
 
 	public Record findMoreById(final String id) {
 		StringBuilder fromBuilder = new StringBuilder(
-				" select o.*, cs.customer_kind, c.id as customerId, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as customerTypeCode, u.realname, u.mobile ");
+				" select o.*, sa.biz_user_id as order_user , cs.customer_kind, c.id as customerId, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as customerTypeCode, u.realname, u.mobile ");
 		fromBuilder.append(" ,w.code as warehouseCode, cp.factor ");
 		fromBuilder.append(" from `cc_sales_outstock` o ");
+		fromBuilder.append(" left join cc_sales_order_join_outstock co ON co.outstock_id = o.id ");
+		fromBuilder.append(" left join cc_sales_order sa on sa.id = co.order_id ");
 		fromBuilder.append(" left join cc_seller_customer cs on o.customer_id = cs.id ");
 		fromBuilder.append(" left join cc_customer c on cs.customer_id = c.id ");
 		fromBuilder.append(" left join cc_customer_type ct on o.customer_type_id = ct.id ");
 		fromBuilder.append(" left join cc_price_system cp on cp.id = ct.price_system_id ");
-		fromBuilder.append(" left join user u on o.biz_user_id = u.id ");
+		fromBuilder.append(" left join user u on sa.biz_user_id = u.id ");
 		fromBuilder.append(" left join cc_warehouse w on o.warehouse_id = w.id ");
 		fromBuilder.append(" where o.id = ? ");
 
@@ -137,7 +139,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 		outstock.setContact(order.getStr("contact"));
 		outstock.setMobile(order.getStr("mobile"));
 		outstock.setAddress(order.getStr("address"));
-		outstock.setBizUserId(order.getStr("biz_user_id"));
+//		outstock.setBizUserId(order.getStr("biz_user_id"));
 		outstock.setTotalAmount(order.getBigDecimal("total_amount"));
 		outstock.setReceiveType(order.getInt("receive_type"));
 		outstock.setDeliveryAddress(order.getStr("delivery_address"));
@@ -187,7 +189,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 			params.add(stockOutStatus);
 		}
 
-		fromBuilder.append(" order by o.create_date ");
+		fromBuilder.append(" order by o.create_date desc ");
 
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
@@ -221,9 +223,9 @@ public class SalesOutstockQuery extends JBaseQuery {
 		return SN;
 	}
 
-	public boolean updateStatus(String id, int salesOutStockStatusOut, Date date) {
-		String sql = "update cc_sales_outstock cc set cc.status = ? AND cc.modify_date = ? where cc.id = ?";
-		int i = Db.update(sql, salesOutStockStatusOut, date, id);
+	public boolean updateStatus(String id, String userId, int salesOutStockStatusOut, Date date) {
+		String sql = "update cc_sales_outstock cc set cc.biz_user_id=? , cc.biz_date=? , cc.status = ? , cc.modify_date = ? where cc.id = ?";
+		int i = Db.update(sql, userId, date, salesOutStockStatusOut, date, id);
 		if (i > 0) {
 			return true;
 		} else {

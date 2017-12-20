@@ -4,7 +4,10 @@
     #customer-audit {
 	    background: #f3f5f7;
 	    height: inherit;
-    }
+	}
+	main{
+		top: 0!important;
+	}
 </#macro>
 <#macro script_import>
 	<script src="${CPATH}/static/layer_mobile/layer.js"></script>
@@ -83,15 +86,15 @@
 <@layout>
 
 <div id="customer-audit">
-    <main style="top:12px">
+    <main>
         <#if todoList ??>
         <#list todoList as customer>
 		<div class="weui-panel weui-panel_access">
 			<div class="weui-cell weui-cell_access">
 			    <a href="${CPATH}/customer/review?id=${customer.id}&taskId=${customer.taskId!}&assignee=${customer.assignee}"> 
-				<div class="weui-cell__bd ft14">
-					<p>${(customer.customer_name)!}</p>
-					<div class="ft12 gray">
+				<div class="weui-cell__bd ft16">
+					<p class="customer_name">${(customer.customer_name)!}</p>
+					<div class="ft14 gray">
 						<p>联系人：${(customer.contact)!} / ${(customer.mobile)!}</p>
 						<p>客户类型：终端</p>
 						<p>配送地址：${(customer.prov_name)!} ${(customer.city_name)!} ${(customer.country_name)!} ${(customer.address)!}</p>
@@ -107,9 +110,9 @@
 				<span class="weui-cell__ft"></span>
 			</div>
 			<div class="weui-cell weui-cell_access">
-				<div class="weui-flex space-between width-100 ft14">
-					<div class="button white-button" onclick="doReject('${CPATH}/customer/complete?id=${(customer.id)!}&taskId=${(customer.taskId)}&status=0')">拒绝</div>
-					<div class="button red-button" onclick="doSubmit('${CPATH}/customer/complete?id=${(customer.id)!}&taskId=${(customer.taskId)}&status=1')">同意</div>
+				<div class="operate-btn width-100 ft14">
+					<div class="button white-button fl" onclick="doReject('${CPATH}/customer/complete?id=${(customer.id)!}&taskId=${(customer.taskId)}&status=0')">拒绝</div>
+					<div class="button red-button fr" onclick="doSubmit('${CPATH}/customer/complete?id=${(customer.id)!}&taskId=${(customer.taskId)}&status=1')">同意</div>
 				</div>
 			</div>
 		</div>

@@ -19,6 +19,12 @@
     var $gallery = $("#gallery"), $galleryImg = $("#galleryImg");
     
     $(function() {
+
+        $("#length").text($("#address").val().length + '/' + 50);
+        $(document).on("input", "#address", function() {
+            $("#length").text($("#address").val().length + '/' + 50);
+        });
+
         if($("#delivery-address").val().length == 2) $("#delivery-address").val('');
 
         $("#delivery-address").cityPicker({
@@ -217,8 +223,10 @@
                 var accuracy = res.accuracy;                      // 位置精度
                 
                 var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
-                var geoc = new BMap.Geocoder();                   // 获取百度地址解析器  
+                var geoc = new BMap.Geocoder();                   // 获取百度地址解析器
 
+                $("#lng").val(parseFloat(longitude).toFixed(2));
+                $("#lat").val(parseFloat(latitude).toFixed(2));
                 translateCallback = function (point) {            // 回调函数
                     geoc.getLocation(point, function(rs) {
                         var addComp = rs.addressComponents;
@@ -310,7 +318,7 @@
 			        <div class="weui-cell weui-cell_access">
 			            <div class="weui-cell__bd">
 		                    <textarea class="weui-textarea" rows="3" name="customer.address" id="address" placeholder="地址详情必填">${(sellerCustomer.address)!}</textarea>
-			                <div class="weui-textarea-counter"><span>0</span>/50</div>
+			                <div class="weui-textarea-counter" id="length"></div>
 			            </div>
 			        </div>
 			    </section>
@@ -352,13 +360,15 @@
 			            <div class="weui-cell__bd">
 			                <span class="icon-map-pin ft16 green"></span>
 			                <span id="location">${(sellerCustomer.location)!'正在搜索地址...'}</span>
-			            </div>
+                            <input type="hidden" name="sellerCustomer.lng" id="lng">
+                            <input type="hidden" name="sellerCustomer.lat" id="lat">
+                        </div>
 			        </div>
 			    </section>
 		    </form>
 		</main>
 		<#include "_inc/_goback.html" />
-		<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex border-1px">
+		<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
 		    <#if sellerCustomer??> 
 		        <button class="white-button-no-border weui-flex__item _submit_btn" onclick="doEnabled()">停用</button>
 		        <button class="red-button weui-flex__item _submit_btn" onclick="doSubmit()">更新</button>
