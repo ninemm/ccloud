@@ -25,8 +25,9 @@
 
 var headerInfo =
 	'<div class="header clear clearheader">' +
-	    '<div class="titleArea">' +
+	    '<div class="titleArea" style="margin-top: 4rem;">' +
 			'<h1>{0}发货单</h1>' +
+			'<img id="imgName"  src="${CPATH}/static/ccloud/admin/image/zxing.png" style="width: 80px;position: absolute;top: -52px;left: 0 "   class="imgStyle"  />'+ 
 		'</div>' +
 	'</div>';
 
@@ -56,8 +57,8 @@ var headerStr =
 		'<tr>' +
 			'<td class="center2">序号</td>' +
 			'<td class="center2">产品名称</td>' +
-			'<td style="width:10%">件数</td>' +
-			'<td style="width:10%">瓶数</td>' +
+			'<td>件数</td>' +
+			'<td>瓶数</td>' +
 			'<td style="width:10%">件单价</td>' +
 			'<td style="width:10%">瓶单价</td>' +
 			'<td style="width:10%">购货价格</td>' +
@@ -126,7 +127,7 @@ function queryPrintDetail() {
                         });
 
                         let len = item.orderProductInfos.length;
-                        for (let i = len; i < 4; i++) {
+                        for (let i = len; i < 5; i++) {
                             content += $.format(contentStr, (i + 1), '', '', '', '', '', '', '', '', '');
                         }
                     }
@@ -152,7 +153,7 @@ function queryPrintDetail() {
 
                     batchPrintContent += headerInfoContent + headerContent + content + footerContent;
 
-                    defaultPageSize = 4;
+                    defaultPageSize = 5;
                 });
 
                 $("#print-content").html(batchPrintContent);
