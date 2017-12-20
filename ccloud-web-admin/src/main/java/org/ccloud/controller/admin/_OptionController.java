@@ -94,9 +94,11 @@ public class _OptionController extends JBaseController {
 	public void saveBySeller() {
 
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
+		
 		HashMap<String, String> datasMap = new HashMap<String, String>();
-
 		Map<String, String[]> paraMap = getParaMap();
+		
 		if (paraMap != null && !paraMap.isEmpty()) {
 			for (Map.Entry<String, String[]> entry : paraMap.entrySet()) {
 				if (entry.getValue() != null && entry.getValue().length > 0) {
@@ -111,7 +113,25 @@ public class _OptionController extends JBaseController {
 				}
 			}
 		}
-
+		String seller_store_check = getPara("seller_store_check_"+sellerCode);
+		String comment_need_procedure = getPara("comment_need_procedure_"+sellerCode);
+		if(!StringUtils.isNotBlank(seller_store_check)) {
+			datasMap.put("seller_store_check_"+sellerCode, "0");
+		}
+		if(!StringUtils.isNotBlank(comment_need_procedure)) {
+			datasMap.put("comment_need_procedure_"+sellerCode, "0");
+		}
+		
+		String comment_need_goods_number = getPara("comment_need_goods_number_"+sellerCode);
+		String comment_need_goods_price = getPara("comment_need_goods_price_"+sellerCode);
+		if(!StringUtils.isNotBlank(comment_need_goods_number)) {
+			datasMap.put("comment_need_goods_number_"+sellerCode, "0");
+		}
+		if(!StringUtils.isNotBlank(comment_need_goods_price)) {
+			datasMap.put("comment_need_goods_price_"+sellerCode, "0");
+		}
+		
+		
 		for (Map.Entry<String, String> entry : datasMap.entrySet()) {
 			OptionQuery.me().saveOrUpdateBySellerId(entry.getKey(), entry.getValue(), sellerId);
 		}
