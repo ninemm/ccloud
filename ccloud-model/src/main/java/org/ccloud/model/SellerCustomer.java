@@ -15,6 +15,7 @@
  */
 package org.ccloud.model;
 
+import java.util.Date;
 import java.util.List;
 
 import org.ccloud.model.base.BaseSellerCustomer;
@@ -50,5 +51,17 @@ public class SellerCustomer extends BaseSellerCustomer<SellerCustomer> {
 		}
 		return null;
 	}
-	
+
+	@Override
+	public boolean saveOrUpdate() {
+		if (null == get(getPrimaryKey())) {
+			set("id", StrKit.getRandomUUID());
+			set("create_date", new Date());
+			removeCache(get("id"));
+			return this.save();
+		}
+		removeCache(get(getPrimaryKey()));
+		set("modify_date", new Date());
+		return this.update();
+	}
 }

@@ -5,7 +5,8 @@
         font-size: .7rem;
         color: #3c8dbc!important;
     }
-</#macro> 
+</#macro>
+
 <#macro script>
 $(function () {
     $(document).on('touchend', '.menu', function () {
@@ -36,19 +37,17 @@ $(function () {
 		<@cc.contents module="article" count="5" orderBy="created" typeSlug="notice">
         <#if (contents ??) && (contents?size > 0)>
 		<div class="notice weui-cell_access">
-            <span class="notice-icon">
-                <i class="icon-volume ft16"></i>
-              </span>
+            <span class="notice-icon"><i class="icon-volume ft16"></i></span>
             <div class="swiper-container">
-              <div class="swiper-wrapper">
-              <#list contents as content>
-              <div class="swiper-slide">
-                  <a href="${(content.url)!}">${(content.title)!}</a>
-              </div>
-              </#list>
-              </div>
-			</div>
-			<a class="weui-cell__ft" href="/t/article"></a>			
+                <div class="swiper-wrapper">
+	                <#list contents as content>
+		                <div class="swiper-slide">
+		                   <a href="${CPATH}/c?id=${(content.id)!}">${(content.title)!}</a>
+		                </div>
+	                </#list>
+                </div>
+            </div> 
+            <a href="${CPATH}/t/article" class="notice-more"><span class="notice-icon"><i class="icon-angle-right gray ft16"></i></span></a>
         </div>
         </#if>
         </@cc.contents>
@@ -84,7 +83,7 @@ $(function () {
 					<p class="weui-grid__label">活动申请</p>
 				</a> -->
                 <a href="${CPATH}/customer/edit" class="weui-grid js_grid">
-                    <span class="weui-badge left-top-tag">NEW</span>
+                    <!-- <span class="weui-badge left-top-tag">NEW</span> -->
 					<div class="weui-grid__icon">
 						<i class="icon-user-plus" style="color: #f7b55d;"></i>
 					</div>
@@ -126,7 +125,7 @@ $(function () {
 				</a>
 			</div>
 		</div>
-		<div>
+		<!-- <div>
             <div class="weui-cells__title">
                 <b>通知</b>
             </div>
@@ -139,11 +138,11 @@ $(function () {
                     <p class="weui-grid__label">企业通知</p>
                 </a>
             </div>
-        </div>
+        </div> -->
 		<div>
 			<div class="weui-cells__title weui-cell_access weui-cell index-info-tab" >
 				<div class="weui-cell__bd">
-					<b style="color:#999">业务消息</b>
+					<b style="color:#999">业务审核消息</b> 
 					<p class="menu red-button">订单</p>
 					<p class="menu">客户</p>
 					<p class="menu">客户拜访</p>
