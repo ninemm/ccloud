@@ -84,45 +84,45 @@
 	        <input type="hidden" name="sellerCustomer.id" value="${(sellerCustomer.id)!}">
 	        <div class="weui-cell">
 	            <div class="weui-cell__bd">
-	                <div class="order-customer-info-title">客户名称: </div>
-	            </div>
-	            <div class="weui-cell__ft">${(sellerCustomer.customer_name)!}</div>
+					<div class="order-customer-info-title">客户名称: </div>
+					<input type="text" class="weui-input" value="${(sellerCustomer.customer_name)!}" readonly>
+				</div>
 	        </div>
 	        <div class="weui-cell">
 	            <div class="weui-cell__bd">
-	                <div class="order-customer-info-title">客户昵称: </div>
+					<div class="order-customer-info-title">客户昵称: </div>
+					<input type="text" class="weui-input" value="${(sellerCustomer.nickname)!'无'}" readonly>
 	            </div>
-	            <div class="weui-cell__ft">${(sellerCustomer.nickname)!'无'}</div>
 	        </div>
 	        <div class="weui-cell">
 	            <div class="weui-cell__bd">
-	                <div class="order-customer-info-title">联系人: </div>
+					<div class="order-customer-info-title">联系人: </div>
+					<input type="text" class="weui-input" value="${(sellerCustomer.contact)!}" readonly>					
 	            </div>
-	            <div class="weui-cell__ft">${(sellerCustomer.contact)!}</div>
 	        </div>
 	        <div class="weui-cell">
 	            <div class="weui-cell__bd">
-	                <div class="order-customer-info-title">联系电话: </div>
+					<div class="order-customer-info-title">联系电话: </div>
+					<input type="text" class="weui-input" value="${(sellerCustomer.mobile)!}" readonly>
 	            </div>
-	            <div class="weui-cell__ft">${(sellerCustomer.mobile)!}</div>
 	        </div>
 	        <div class="weui-cell">
 	            <div class="weui-cell__bd">
-	                <div class="order-customer-info-title">客户类型: </div>
+					<div class="order-customer-info-title">客户类型: </div>
+					<input type="text" class="weui-input" value="${(custTypeNames)!}" readonly>
 	            </div>
-	            <div class="weui-cell__ft">${(custTypeNames)!}</div>
 	        </div>
 	        <div class="weui-cell">
 	            <div class="weui-cell__bd">
-	                <div class="order-customer-info-title">省市区: </div>
+					<div class="order-customer-info-title">省市区: </div>
+					<input type="text" class="weui-input" value="${(sellerCustomer.prov_name)!} ${(sellerCustomer.city_name)!} ${(sellerCustomer.country_name)!}" readonly>
 	            </div>
-	            <div class="weui-cell__ft">${(sellerCustomer.prov_name)!} ${(sellerCustomer.city_name)!} ${(sellerCustomer.country_name)!}</div>
 	        </div>
 	        <div class="weui-cell">
 	            <div class="weui-cell__bd">
-	                <div class="order-customer-info-title">地址详情: </div>
+					<div class="order-customer-info-title">地址详情: </div>
+					<input type="text" class="weui-input" value="${(sellerCustomer.address)!}" readonly>
 	            </div>
-	            <div class="weui-cell__ft">${(sellerCustomer.address)!}</div>
 	        </div>
 	    </section>
 	    <section class="weui-cells weui-cells_form">

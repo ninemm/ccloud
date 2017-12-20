@@ -34,6 +34,10 @@ input[type=checkbox] {
   height: inherit;
 }
 
+input:read-only {
+  color: #999;
+}
+
 hr {
   margin: 0.5rem 0;
   border-top: #f3f5f7 1px solid;

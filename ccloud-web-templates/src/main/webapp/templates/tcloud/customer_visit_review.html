@@ -238,8 +238,8 @@
       <div class="weui-cell">
           <div class="weui-cell__bd">
               <div class="order-customer-info-title">客户名称: </div>
+              <input type="text" class="weui-input" value="${(customerVisit.customer_name)!}" readonly>
           </div>
-          <div class="weui-cell__ft">${(customerVisit.customer_name)!}</div>
       </div>
       <!-- <div class="weui-cell weui-cell_access">
           <div class="weui-cell__bd">
@@ -250,39 +250,39 @@
       <div class="weui-cell">
           <div class="weui-cell__bd">
               <div class="order-customer-info-title">联系人: </div>
+              <input type="text" class="weui-input" value="${(customerVisit.contact)!}" readonly>
           </div>
-          <div class="weui-cell__ft">${(customerVisit.contact)!}</div>
       </div>
       <div class="weui-cell">
           <div class="weui-cell__bd">
               <div class="order-customer-info-title">联系电话: </div>
+              <input type="text" class="weui-input" value="${(customerVisit.mobile)!}" readonly>
           </div>
-          <div class="weui-cell__ft">${(customerVisit.mobile)!}</div>
       </div>
       <div class="weui-cell">
           <div class="weui-cell__bd">
               <div class="order-customer-info-title">客户类型: </div>
+              <input type="text" class="weui-input" value="${(cTypeName)!}" readonly>
           </div>
-          <div class="weui-cell__ft">${(cTypeName)!}</div>
       </div>
       
       <div class="weui-cell">
           <div class="weui-cell__bd">
               <div class="order-customer-info-title">问题类型: </div>
+              <input type="text" class="weui-input" value="${(customerVisit.typeName)!}" readonly>
           </div>
-          <div class="weui-cell__ft">${(customerVisit.typeName)!}</div>
       </div>
       <div class="weui-cell">
           <div class="weui-cell__bd">
               <div class="order-customer-info-title">拜访时间: </div>
+              <input type="text" class="weui-input" value="${(customerVisit.create_date?string('yyyy-MM-dd HH:mm'))!}" readonly>
           </div>
-          <div class="weui-cell__ft">${(customerVisit.create_date?string('yyyy-MM-dd HH:mm'))!}</div>
       </div>
       <div class="weui-cell">
           <div class="weui-cell__bd">
               <div class="order-customer-info-title">描述: </div>
+              <input type="text" class="weui-input" value="${(customerVisit.question_desc)!}" readonly>
           </div>
-          <div class="weui-cell__ft">${(customerVisit.question_desc)!}</div>
       </div>
   </section>
   <section class="weui-cells weui-cells_form">
