@@ -133,6 +133,8 @@
     function giftCount(params) {
 		Utils.ajax('${CPATH}/report/sellerProductCount', params, 
 			function(data){
+				var height = data.length;
+				$("#giftCount").height(60 * height + 100);			
 		        var product = document.getElementById('giftCount');
 		        var productChart = echarts.init(product);
 	            var productOption = {

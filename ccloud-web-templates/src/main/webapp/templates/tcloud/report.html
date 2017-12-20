@@ -67,6 +67,7 @@
 		Utils.ajax('${CPATH}/report/orderTypeCount', params, 
 			function(data){
 	            var crSeriesData = [];
+	            var legendData = [];
 	            var length = data.length;
 	            if (length == 0) {
 	                crSeriesData.push({
@@ -75,40 +76,53 @@
 	                });	            	
 	            }	
 	            for(var i = 0; i < length; i++){
+	            	legendData.push(data[i].status)
 	                crSeriesData.push({
-	                    name: data[i].status + '(' + data[i].count + ')',
+	                    name: data[i].status,
 	                    value: data[i].count
 	                });
 	            }
 	            var orderStatus = document.getElementById('orderStatus');
 	            var orderStatusChart = echarts.init(orderStatus);
-	            var crOption = {
-	                title: [{
-	                    textStyle: {
-	                        fontWeight: 'normal',
-	                        fontSize: 16
-	                    }
-	                }],
-	                color: ['#4ac7f5', '#f36f8a', '#fd9173', '#AF89D6', '#5f71d2'],
-	                series: [
-	                    {
-	                        type:'pie',
-	                        radius: ['25%', '45%'],
-	                        center: ['50%', '50%'],
-	                        avoidLabelOverlap: false,
-	                        label: {
-	                            normal: {
-	                                textStyle: {
-	                                    fontSize: 10
-	                                }
-	                            }
-	                        },
-	                        data:crSeriesData
-	                    }
-	                ]
-	            };
+				option = {
+				    tooltip: {
+				        trigger: 'item',
+				        formatter: "{a} <br/>{b}: {c}笔 ({d}%)"
+				    },
+				    legend: {
+				        orient: 'horizontal',
+				        data:legendData,
+				    },
+				    series: [
+				        {
+				            name:'数据来源',
+				            type:'pie',
+				            radius: ['40%', '60%'],
+				            avoidLabelOverlap: false,
+				            label: {
+				                normal: {
+				                    show: false,
+				                    position: 'center'
+				                },
+				                emphasis: {
+				                    show: true,
+				                    textStyle: {
+				                        fontSize: '15',
+				                        fontWeight: 'bold'
+				                    }
+				                }
+				            },
+				            labelLine: {
+				                normal: {
+				                    show: false
+				                }
+				            },
+				            data:crSeriesData
+				        }
+				    ]
+				};
 	            orderStatusChart.resize();
-	            orderStatusChart.setOption(crOption,true);
+	            orderStatusChart.setOption(option,true);
 			}
 		);    	
     }
@@ -117,48 +131,64 @@
 		Utils.ajax('${CPATH}/report/customerCount', params, 
 			function(data){
 	            var crSeriesData = [];
+	            var legendData = [];
 	            var length = data.length;
+	            $("#customerCount").height(40 * length + 100);
 	            if (length == 0) {
+	            	$("#customerCount").height(300);
 	                crSeriesData.push({
 	                    name: '暂无数据',
 	                    value: 0
 	                });	            	
 	            }	
 	            for(var i = 0; i < length; i++){
+	            	legendData.push(data[i].customer_name)
 	                crSeriesData.push({
-	                    name: data[i].customer_name + '(' + data[i].totalAmount + ')',
+	                    name: data[i].customer_name,
 	                    value: data[i].totalAmount
 	                });
 	            }
 	            var customerCount = document.getElementById('customerCount');
 	            var customerCountChart = echarts.init(customerCount);
-	            var crOption = {
-	                title: [{
-	                    textStyle: {
-	                        fontWeight: 'normal',
-	                        fontSize: 16
-	                    }
-	                }],
-	                color: ['#4ac7f5', '#f36f8a', '#fd9173', '#AF89D6', '#5f71d2'],
-	                series: [
-	                    {
-	                        type:'pie',
-	                        radius: ['25%', '45%'],
-	                        center: ['50%', '50%'],
-	                        avoidLabelOverlap: false,
-	                        label: {
-	                            normal: {
-	                                textStyle: {
-	                                    fontSize: 10
-	                                }
-	                            }
-	                        },
-	                        data:crSeriesData
-	                    }
-	                ]
-	            };
+				option = {
+				    tooltip: {
+				        trigger: 'item',
+				        formatter: "{a} <br/>{b}: {c}元 ({d}%)"
+				    },
+				    legend: {
+				        orient: 'horizontal',
+				        data:legendData,
+				    },
+				    series: [
+				        {
+				            name:'数据来源',
+				            type:'pie',
+				            radius: ['40%', '60%'],
+				            avoidLabelOverlap: false,
+				            label: {
+				                normal: {
+				                    show: false,
+				                    position: 'center'
+				                },
+				                emphasis: {
+				                    show: true,
+				                    textStyle: {
+				                        fontSize: '15',
+				                        fontWeight: 'bold'
+				                    }
+				                }
+				            },
+				            labelLine: {
+				                normal: {
+				                    show: false
+				                }
+				            },
+				            data:crSeriesData
+				        }
+				    ]
+				};
 	            customerCountChart.resize();
-	            customerCountChart.setOption(crOption,true);
+	            customerCountChart.setOption(option,true);
 			}
 		);     
     }
@@ -167,8 +197,11 @@
 		Utils.ajax('${CPATH}/report/productCount', params, 
 			function(data){
 	            var crSeriesData = [];
+	            var legendData = [];
 	            var length = data.length;
+	            $("#productCanve").height(65 * length + 100);
 	            if (length == 0) {
+	            	$("#productCanve").height(300);
 	                crSeriesData.push({
 	                    name: '暂无数据',
 	                    value: 0
@@ -176,40 +209,54 @@
 	            }
 	
 	            for(var i = 0; i < length; i++){
+	            	legendData.push(data[i].custom_name)
 	                crSeriesData.push({
-	                    name: data[i].custom_name + '(' + data[i].totalAmount + ')',
+	                    name: data[i].custom_name,
 	                    value: data[i].totalAmount
 	                });
 	            }
 	            var productCount = document.getElementById('productCanve');
 	            var productCountChart = echarts.init(productCanve);
-	            var crOption = {
-	                title: [{
-	                    textStyle: {
-	                        fontWeight: 'normal',
-	                        fontSize: 16
-	                    }
-	                }],
-	                color: ['#4ac7f5', '#f36f8a', '#fd9173', '#AF89D6', '#5f71d2'],
-	                series: [
-	                    {
-	                        type:'pie',
-	                        radius: ['25%', '45%'],
-	                        center: ['50%', '50%'],
-	                        avoidLabelOverlap: false,
-	                        label: {
-	                            normal: {
-	                                textStyle: {
-	                                    fontSize: 10
-	                                }
-	                            }
-	                        },
-	                        data:crSeriesData
-	                    }
-	                ]
-	            };
+				option = {
+				    tooltip: {
+				        trigger: 'item',
+				        formatter: "{a} <br/>{b}: {c}元 ({d}%)"
+				    },
+				    legend: {
+				        orient: 'horizontal',
+				        x: 'left',
+				        data:legendData
+				    },
+				    series: [
+				        {
+				            name:'数据来源',
+				            type:'pie',
+				            radius: ['40%', '60%'],
+				            avoidLabelOverlap: false,
+				            label: {
+				                normal: {
+				                    show: false,
+				                    position: 'center'
+				                },
+				                emphasis: {
+				                    show: true,
+				                    textStyle: {
+				                        fontSize: '10',
+				                        fontWeight: 'bold'
+				                    }
+				                }
+				            },
+				            labelLine: {
+				                normal: {
+				                    show: false
+				                }
+				            },
+				            data:crSeriesData
+				        }
+				    ]
+				};
 	            productCountChart.resize();
-	            productCountChart.setOption(crOption,true);
+	            productCountChart.setOption(option,true);
 			}
 		);    	
     }
