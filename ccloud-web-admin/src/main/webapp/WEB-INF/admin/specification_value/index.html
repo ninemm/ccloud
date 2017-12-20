@@ -54,7 +54,7 @@
 				{field: "action", title: "操作", align: "center", width: '20%',
 				formatter: function(value, row, rowIndex) {
 					var url = '${CPATH}/admin/specificationValue/edit?id=' + row.id + '&c=${c}&p=${p}';
-					var strHtml = '<a href="' + url + '" class="btn btn-sm" title="编辑"><i class="fa fa-edit"></i></a> <a href="javascript:void(0);" class="btn btn-sm" onclick="del(\''+row.id+'\')" title="删除"><i class="fa fa-trash-o"></i></a>';
+					var strHtml = '<a href="' + url + '" class="label label-table label-info">编辑</a> <a href="javascript:void(0);" class="label label-table label-danger" onclick="del(\''+row.id+'\')">删除</a>';
 					return strHtml;
 				},
 				edit:false

@@ -12,6 +12,8 @@ $(function() {
     })
   }).on("touchstart", "#placeOrder", function () {
       save();
+  }).on("touchstart", "#addGoods", function () {
+	  historyUtils.back();
   }).on("touchend", ".operate:first-child", function () { //减少商品数量
       total();
   }).on("touchend", ".operate:last-child", function () { //增加商品数量
@@ -516,6 +518,7 @@ function save(){
 		<#include "_inc/_goback.html" />
 		<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
 			<p class="total bg-white weui-flex__item" id="totalNum">共2款，总数10件</p>
+			<button id="addGoods" class="place-order yellow-button white">添加商品</button>
 			<button id="placeOrder" class="place-order red-button white">下单</button>
 		</footer>
 	</div>

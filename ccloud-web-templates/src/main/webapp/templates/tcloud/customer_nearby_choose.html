@@ -11,6 +11,10 @@
 		-webkit-overflow-scrolling: touch;
 		width: 100%;
 	}
+	.customer {
+		width: 100%;
+		top: 0;
+	}
 </#macro>
 <#macro script>
 
@@ -47,25 +51,9 @@
     });
 
     //筛选项获取
-    $("#userId").select({
-     title: "选择业务员",
-     items: ${userIds!}
-    });
-
-    $("#customerTypeId").select({
-     title: "选择客户类型",
-     items: ${customerTypes!}
-    });
-
-    $("#isOrdered").select({
-     title: "是否下单",
-     items: [{
-         title: "全部", value: ""
-         },{
-         title: "是", value: "1"
-         },{
-         title: "否",value: "0"
-     }]
+    $("#searchArea").select({
+     title: "选择搜索范围",
+     items: ["100米以内", "500米以内"]
     });
     
 	var newHtml = $(".weui-panel").eq(0).html();
@@ -141,39 +129,11 @@
 <@layout>
 <div class="weui-content">
 	<div id="customer">
-		<header>
-			<div class="weui-search-bar" id="SearchBar">
-				<form class="weui-search-bar__form">
-					<div class="weui-search-bar__box">
-						<i class="weui-icon-search"></i>
-						<input type="search" class="weui-search-bar__input" id="searchInput" placeholder="搜索" required="">
-						<a href="javascript:" class="weui-icon-clear" id="searchClear" ></a>
-					</div>
-					<label class="weui-search-bar__label" id="searchText">
-						<i class="weui-icon-search"></i>
-						<span>请输入客户名或联系人</span>
-					</label>
-				</form>
-				<a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel" >取消</a>
-			</div>
-		</header>
 		<article class="customer">
 			<header class="has-th-list weui-flex">
-				<div class="head-search select-area weui-flex__item">
-					<div class="weui-flex">
-						<div class="weui-flex__item">
-							<input type="text" id="userId" class="weui-input" placeholder="业务员" readonly>
-							<i class="icon-sort-desc"></i>
-						</div>
-						<div class="weui-flex__item">
-							<input type="text" id="customerTypeId" class="weui-input" placeholder="客户类型"  readonly>
-							<i class="icon-sort-desc"></i>
-						</div>
-						<div class="weui-flex__item">
-							<input type="text" id="isOrdered" class="weui-input" placeholder="是否下单" readonly>
-							<i class="icon-sort-desc"></i>
-						</div>
-					</div>
+				<div class="head-search select-area weui-flex__item relative">
+                    <input type="text" id="searchArea" class="weui-input" placeholder="请选择搜索范围" readonly>
+                    <i class="icon-sort-desc"></i>
 				</div>
 				<div id="combin-filter-btn">
 					<i class="icon-th-list"></i>
