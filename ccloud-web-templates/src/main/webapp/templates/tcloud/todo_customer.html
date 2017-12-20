@@ -106,8 +106,8 @@
 				</a>
 			</div>
 			<div class="weui-cell weui-cell_access">
-				<a class="weui-cell__bd" style="color: gray" href="${CPATH}/customer/review?id=${customer.id}&taskId=${customer.taskId!}&assignee=${customer.assignee}">变更详情</a>
-				<span class="weui-cell__ft"></span>
+				<a class="weui-cell__bd weui-cell_link" href="${CPATH}/customer/review?id=${customer.id}&taskId=${customer.taskId!}&assignee=${customer.assignee}">变更详情</a>
+				<span class="weui-cell__ft">${(customer.createTime?string('yyyy-MM-dd HH:mm'))!}</span>
 			</div>
 			<div class="weui-cell weui-cell_access">
 				<div class="operate-btn width-100 ft14">
