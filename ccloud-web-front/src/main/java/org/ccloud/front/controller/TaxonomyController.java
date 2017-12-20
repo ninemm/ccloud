@@ -28,7 +28,7 @@ import org.ccloud.model.query.TaxonomyQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.template.TemplateManager;
 import org.ccloud.template.TplModule;
-import org.ccloud.ui.freemarker.tag.ContentPageTag;
+//import org.ccloud.ui.freemarker.tag.ContentPageTag;
 import org.ccloud.ui.freemarker.tag.MenusTag;
 import org.ccloud.ui.freemarker.tag.TaxonomysTag;
 import org.ccloud.utils.StringUtils;
@@ -86,9 +86,9 @@ public class TaxonomyController extends BaseFrontController {
 		
 		String order = getPara("order"); 
 		if(module.isSupportOrder(order)){
-			setAttr(ContentPageTag.TAG_NAME, new ContentPageTag(getRequest(), page, module.getName(), taxonomys, order));
+			//setAttr(ContentPageTag.TAG_NAME, new ContentPageTag(getRequest(), page, module.getName(), taxonomys, order));
 		}else{
-			setAttr(ContentPageTag.TAG_NAME, new ContentPageTag(getRequest(), page, module.getName(), taxonomys, null));
+			//setAttr(ContentPageTag.TAG_NAME, new ContentPageTag(getRequest(), page, module.getName(), taxonomys, null));
 		}
 
 		
