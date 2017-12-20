@@ -56,7 +56,6 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 	}
 	
 	public void list() {
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
         String keyword = getPara("k");
         if (StrKit.notBlank(keyword)) {

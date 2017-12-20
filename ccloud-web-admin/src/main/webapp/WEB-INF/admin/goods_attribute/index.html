@@ -86,7 +86,7 @@ function batchAction() {
 						</tr>
 					</thead>
 					<tbody>
-						<#if page??> <#list page.getList() as bean>
+						<#if page.getList().size() gt 0> <#list page.getList() as bean>
 						<tr class="jp-onmouse">
 							<td>
 								<label class="jp-common-pad"> 
@@ -123,7 +123,14 @@ function batchAction() {
 							</@shiro.hasPermission>	
 							</td>
 						</tr>
-						</#list> </#if>
+						</#list>
+						<#else>
+							<tr class="jp-onmouse">
+								<td colspan="8" align=center>
+									数据为空
+								</td>
+							</tr> 
+						</#if>
 					</tbody>
 				</table>
 			</form>

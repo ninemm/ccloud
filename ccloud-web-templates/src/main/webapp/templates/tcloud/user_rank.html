@@ -35,8 +35,7 @@
 						$("#orderCount").html(data[i].orderCount);
 						$("#totalAmount").html(data[i].totalAmount);	            		
 	            	}
-	            	rank.append("<div class='rank-detail'><span class='sequence'>"+j+"</span><img src='${CTPATH}/images/jp.jpg'><div class='good-name'>"+data[i].realname+"</div><div class='good-total'>");
-	            	rank.append("<span class='orange'>￥"+data[i].totalAmount+"</span><span class='gray ft14'>/"+data[i].orderCount+"笔("+(data[i].productCount).toFixed(2)+")件</span></div></div>");
+	            	rank.append("<div class='rank-detail'><span class='sequence'>"+j+"</span><img src='${CTPATH}/images/jp.jpg'><div class='good-name'>"+data[i].realname+"</div><div class='good-total'><span class='orange'>￥"+data[i].totalAmount+"</span><span class='gray ft14'>/"+data[i].orderCount+"笔("+(data[i].productCount).toFixed(2)+")件</span></div></div>");
 	            }
 	            for(var i = length-1; i >= descLength; i--){
 	            	j = 1;

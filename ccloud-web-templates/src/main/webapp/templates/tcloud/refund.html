@@ -66,7 +66,10 @@
 				$loading.hide();
 
 				if(data.outStockList.length == 0){
-					$noMore.show();
+				    var childCount = $('.weui-panel').length;
+                    if (childCount == 1) 
+                        $noMore.show();
+
 					loading = true;
 					return;
 				}
@@ -83,7 +86,7 @@
 					$newOrder.find("#orderSn").text(el.outstock_sn);
 					
 					$newOrder.find("#status").text(getStatus(el.status));
-					$newOrder.find("#customerName").text(el.customerName);
+					$newOrder.find("#customerName").text(el.customer_name);
 					$newOrder.find("#contact").text(el.contact + '/' + el.mobile);
 					$newOrder.find("#customerType").text(el.customerTypeName);
 					$newOrder.find("#refund").on('click', function(){ 
@@ -146,8 +149,8 @@
 </#macro>
 
 <@layout>
-<body id="my-order" class="ft14">
-	<div class="weui-content">
+<div class="weui-content">
+    <div id="my-order" class="ft14">
 		<header class="has-th-list weui-flex">
 			<div class="head-search select-area weui-flex__item">
 				<div class="weui-flex">
@@ -174,7 +177,7 @@
 				<div class="weui-panel weui-panel_access" style="display: none">
 					<a id="salesOrderId">
 						<div class="ft14 gray">
-							<span class="tag" id="receiveType"></span>
+							<span class="tag" id="receiveType">账期</span>
 							<span id="orderSn"></span>
 							<span class="fr blue" id="status"></span>
 						</div>
@@ -197,11 +200,11 @@
 				</div>
 			</div>
 			<div class="weui-loadmore" id="loading" style="display: none;">
-			<i class="weui-loading"></i>
-			<span class="weui-loadmore__tips">正在加载</span>
+			    <i class="weui-loading"></i>
+			    <span class="weui-loadmore__tips">正在加载</span>
 			</div>
 			<div class="weui-loadmore weui-loadmore_line" id="noMore" style="display: none;">
-			<span class="weui-loadmore__tips">暂无数据</span>
+			  <span class="weui-loadmore__tips">暂无数据</span>
 			</div>
 		</main>
 		<article id="combin-filter">
@@ -220,6 +223,6 @@
 			</footer>
 		</article>
 		<#include "_inc/_goback.html" />
-	</div>
-</body>
+    </div>
+</div>
 </@layout>
