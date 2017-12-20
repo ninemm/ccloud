@@ -224,6 +224,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 		Customer customer = CustomerQuery.me().findById(id);
 		setAttr("customer", customer);
 
+		//流程的开启
 		WorkFlowService workflowService = new WorkFlowService();
 		Object _applyer = workflowService.getTaskVariableByTaskId(getPara("taskId"), "applyer");
 

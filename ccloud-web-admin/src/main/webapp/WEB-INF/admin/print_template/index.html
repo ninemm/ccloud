@@ -51,9 +51,9 @@
 				{field: "action", title: "操作", align: "center", width: '20%',
 				formatter: function(value, row, rowIndex) {
 					var editUrl = '${CPATH}/admin/printTemplate/edit?id=' + row.id + '&c=${c}&p=${p}';
-					var strHtml = '<a href="' + editUrl + '" class="btn btn-sm" title="编辑"><i class="fa fa-edit"></i></a> ';
+					var strHtml = '<a href="' + editUrl + '" class="label label-table label-info">编辑</a> ';
 
-					strHtml = strHtml + '<a class="btn btn-sm" onclick="del(\''+row.id+'\'' + ',1' + ')" title="删除"><i class="fa fa-trash-o"></i></a>';
+					strHtml = strHtml + '<a class="label label-table label-danger" onclick="del(\''+row.id+'\'' + ',1' + ')">删除</a>';
 
 					return strHtml;
 				},
