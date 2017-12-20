@@ -74,7 +74,7 @@ public class PurchaseRefundOutstockDetailQuery extends JBaseQuery {
 	public List<Record> findByRefundId(String refundId,String dataArea) {
 
 		StringBuilder sqlBuilder = new StringBuilder(
-				" SELECT cprod.*,cp.`name` as productName, cp.big_unit, cp.small_unit, cp.convert_relate,GROUP_CONCAT(distinct cgs.`name`) AS cps_name  ");
+				" SELECT cprod.*,csp.custom_name as productName, cp.big_unit, cp.small_unit, cp.convert_relate,GROUP_CONCAT(distinct cgs.`name`) AS cps_name  ");
 		sqlBuilder.append(" from cc_purchase_refund_outstock_detail cprod ");
 		sqlBuilder.append(" LEFT JOIN cc_seller_product csp on csp.id=cprod.seller_product_id ");
 		sqlBuilder.append(" LEFT JOIN cc_product cp ON  cp.id = csp.product_id ");
