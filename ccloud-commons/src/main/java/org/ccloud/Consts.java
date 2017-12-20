@@ -159,6 +159,4 @@ public class Consts {
 	
 	public static final String OPERATE_HISTORY_TITLE_ORDER_REVIEW= "订单审核";
 	public static final String OPERATE_HISTORY_TITLE_ORDER_PRINT= "订单打印";
-
-	public static final int PAGE_SIZE = 10;//滚动页面显示条数
 }

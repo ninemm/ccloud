@@ -52,7 +52,6 @@ public class CustomerVisitController extends BaseFrontController {
 	public void index() {
 		
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		int pageSize= Consts.PAGE_SIZE;
 		
 		String id = getPara("id");
 		String type = getPara("type");
@@ -60,13 +59,12 @@ public class CustomerVisitController extends BaseFrontController {
 		String subType = getPara("level");
 		String dataArea = selectDataArea + "%";
 
-		Page<Record> visitList = CustomerVisitQuery.me().paginateForApp(getPageNumber(), pageSize, id, type, nature, subType, dataArea);
+		Page<Record> visitList = CustomerVisitQuery.me().paginateForApp(getPageNumber(), getPageSize(), id, type, nature, subType, dataArea);
 
 		if(StrKit.notBlank(getPara("id"))) {
 			setAttr("id", getPara("id"));
 			setAttr("name", getPara("name"));
 		}
-		setAttr("pageSize", pageSize);
 		setAttr("visitList", visitList);
 		render("customer_visit_list.html");
 	}
