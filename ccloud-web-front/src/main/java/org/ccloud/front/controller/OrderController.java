@@ -180,7 +180,7 @@ public class OrderController extends BaseFrontController {
 		Map<String, String[]> paraMap = getParaMap();
 
 		if (this.saveOrder(paraMap, user, sellerId, sellerCode)) {
-			renderAjaxResultForSuccess("保存成功");
+			renderAjaxResultForSuccess("下单成功");
 		} else {
 			renderAjaxResultForError("库存不足或提交失败");
 		}

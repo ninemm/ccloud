@@ -237,14 +237,20 @@ $(function() {
 			success : function(data) { 
 				layer.closeAll();
 				if (data.errorCode == 0) {
-					toastr.success(data.message);
 					removeItemBykey("productList");
 					removeItemBykey("customerInfo");
 					removeItemBykey("productCompositionList");
-
-					setTimeout(function(){
-						window.location.href = "${CPATH}/order/myOrder";
-					},1000);
+					
+					$.confirm({
+						title: data.message,
+						text: '继续下单？',
+						onOK: function () {
+							location.href = '${CPATH}/product'
+						},
+						onCancel: function () {
+							location.href = "${CPATH}/order/myOrder";
+						}
+					});
 					
 				} else {
 					$("#placeOrder").removeAttr('diabled');
