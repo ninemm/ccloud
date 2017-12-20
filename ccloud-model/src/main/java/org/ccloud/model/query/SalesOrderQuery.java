@@ -17,7 +17,6 @@ package org.ccloud.model.query;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -253,6 +252,20 @@ public class SalesOrderQuery extends JBaseQuery {
 		salesOrder.setDeptId(deptId);
 		salesOrder.setDataArea(dataArea);
 		return salesOrder.save();
+	}
+
+	public boolean updateForApp(Map<String, String[]> paraMap, String userId, Date date) {
+		SalesOrder salesOrder = SalesOrderQuery.me().findById(StringUtils.getArrayFirst(paraMap.get("id")));
+
+		String total = StringUtils.getArrayFirst(paraMap.get("total"));
+		salesOrder.setTotalAmount(new BigDecimal(total));
+		String totalNum = StringUtils.getArrayFirst(paraMap.get("totalNum"));
+		salesOrder.setTotalCount(new BigDecimal(totalNum));
+		salesOrder.setConfirmUserId(userId);
+		salesOrder.setConfirmDate(date);
+
+		salesOrder.setModifyDate(date);
+		return salesOrder.update();
 	}
 	
 	public int updateConfirm(String orderId, int status, String userId, Date date) {

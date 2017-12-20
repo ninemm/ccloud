@@ -2,40 +2,67 @@
 <#macro css></#macro>
 <#macro script>
 	$(function() {
-    $(document).on('touchend', '.refuse', function() {
-      layer.open({
-        type: 1,
-        title: ['订单审核',
-          'border-bottom: 1px solid #eee;height:2rem;line-height:2rem'
-        ],
-        content: '<p class="t-c">是否确认拒绝该订单？</p>' +
-          '<p class="gray">可选择拒绝原因</p>' +
-          '<div class="refuse-radio"><label><input type="radio" name="refuseReson" id="" value="库存无足够货物">库存无足够货物</label></div>' +
-          '<div class="refuse-radio"><label><input type="radio" name="refuseReson" id="" value="产品价格滞后">产品价格滞后</label></div>' +
-          '<div class="refuse-radio"><label><input type="radio" name="refuseReson" id="" value="该商家已被停用">该商家已被停用</label></div>'+
-          '<div><textarea id="comment" placeholder="补充说明，可选填"></textarea></div>',
-        anim: 'scale',
-        className: 'audit',
-        btn: ['确认拒绝','取消拒绝'],
-        yes: function() {
-          parent.refuseReson = $("input[name='refuseReson']:checked").val();
-          parent.comment = $("#comment").val();
-          if (parent.refuseReson == undefined && parent.comment == ""){
-            toastr.warning('请选择一个理由');
-            return;
-          }
-          doSubmit(0);
-        },
-        no:function() {
-
-        }
-      });
-    })
+	    $(document).on('touchend', '.refuse', function() {
+	      layer.open({
+	        type: 1,
+	        title: ['订单审核',
+	          'border-bottom: 1px solid #eee;height:2rem;line-height:2rem'
+	        ],
+	        content: '<p class="t-c">是否确认拒绝该订单？</p>' +
+	          '<p class="gray">可选择拒绝原因</p>' +
+	          '<div class="refuse-radio"><label><input type="radio" name="refuseReson" id="" value="库存无足够货物">库存无足够货物</label></div>' +
+	          '<div class="refuse-radio"><label><input type="radio" name="refuseReson" id="" value="产品价格滞后">产品价格滞后</label></div>' +
+	          '<div class="refuse-radio"><label><input type="radio" name="refuseReson" id="" value="该商家已被停用">该商家已被停用</label></div>'+
+	          '<div><textarea id="comment" placeholder="补充说明，可选填"></textarea></div>',
+	        anim: 'scale',
+	        className: 'audit',
+	        btn: ['确认拒绝','取消拒绝'],
+	        yes: function() {
+	          parent.refuseReson = $("input[name='refuseReson']:checked").val();
+	          parent.comment = $("#comment").val();
+	          if (parent.refuseReson == undefined && parent.comment == ""){
+	            toastr.warning('请选择一个理由');
+	            return;
+	          }
+	          doReject(0);
+	        },
+	        no:function() {
+	
+	        }
+	      });
+	    }).on('touchend', '#confirm-input', function () {
+	      var $productDetail = $currentInput.parents('.orderDetail');
+	      var convert = $productDetail.find("#convert").val();
+	      var id = $currentInput.attr('id');
+	 
+	      if(id == 'bigPrice'){
+	        var bPrice = parseFloat($productDetail.find("#bigPriceSpan").val());
+	        var bigPrice = $currentInput.val();
+			if(bigPrice < bPrice){
+				$currentInput.val(bPrice);
+				toastr.warning('价格不能小于标准价');
+				return;
+			}
+			$productDetail.find("#smallPrice").val((bigPrice/convert).toFixed(2));
+	      } else if(id == 'smallPrice'){
+	        var sPrice = parseFloat($productDetail.find("#smallPriceSpan").val());
+	        var smallPrice = $currentInput.val();
+			if(smallPrice < sPrice){
+				$currentInput.val(sPrice);
+				toastr.warning('价格不能小于标准价');
+				return;
+			}
+			$productDetail.find("#bigPrice").val((smallPrice*convert).toFixed(2));
+	      }
+	
+	      total();
+	  });
+	    
 	});
 	var comment = '';
 	var refuseReson = '';
 
-	function doSubmit(pass) {
+	function doReject(pass) {
 		layer.open({
 			type: 2,
 			content: '保存中...'
@@ -70,109 +97,215 @@
 			}
 		)
 	};
+	
+	function doSubmit(){
+		layer.open({
+			type: 2,
+			content: '保存中...'
+		});
+		checkEdit();
+		$("#form").ajaxSubmit({
+			beforeSubmit: function() {
+				return true
+			},
+			type : "post", 
+			dataType : "json", 
+			success : function(res) { 
+				layer.closeAll();
+				if (res.errorCode == 0) {
+					$.confirm({
+						title: res.message,
+						text: '返回列表页？',
+						onOK: function () {
+							location.href = '${CPATH}/todo/order'
+						},
+						onCancel: function () {
+							$.closeModal();
+						}
+					});
+				} else {
+					$.alert(res.message);
+				}
+			},
+			error : function() {
+				layer.closeAll();
+				alert("信息提交错误");
+			}
+		});
+	}
+	
+	function checkEdit(){
+		var $orderDetail = $(".orderDetail");
+		
+		$.each($orderDetail, function(index, el){
+			var $el = $(el);
+			if(parseFloat($el.find("#bigPrice").val()) != parseFloat($el.find("#bigPriceSpan").val())
+				|| parseFloat($el.find("#bigNum").val()) != parseFloat($el.find("#bigNumSpan").val())
+				|| parseFloat($el.find("#smallPrice").val()) != parseFloat($el.find("#smallPriceSpan").val())
+				|| parseFloat($el.find("#smallNum").val()) != parseFloat($el.find("#smallNumSpan").val()))
+			{
+				$("#edit").val(1);
+				return false;
+			};
+			
+		})
+	}
+	
+	function total() {
+		var products = $(".orderDetail");
+		var rowTotal = 0;
+		var total = 0;
+		var allTotalAmount = 0;
+		$.each(products, function(index, el) {
+			var $el = $(el);
+			rowTotal = $el.find("#bigNum").val() * $el.find("#bigPrice").val() + $el.find("#smallNum").val() * $el.find("#smallPrice").val();
+			if($el.find("#isGift").val() == 0) {
+				total += rowTotal;
+			}
+			var bigNum = parseInt($el.find("#bigNum").val());
+			var convert = parseInt($el.find("#convert").val());
+			var smallNum = parseInt($el.find("#smallNum").val());
+			var number = (smallNum/convert).toFixed(2);
+			allTotalAmount = allTotalAmount + bigNum + number*1;
+			$el.find("#rowTotal").val(rowTotal);
+		});
+
+		var factor = $("#factor").val();
+		if (factor != '') {
+			total = total * factor;
+		}
+		$("#total").val(total);
+		$("#totalSpan").text(total + "元")
+		$("#totalNum").val(allTotalAmount);
+	} 
 </#macro>
 
 <@layout>
 <body id="order-detail">
   <div class="weui-content">
     <main class="ft12">
-      <div class="weui-panel weui-panel_access">
-        <div class="ft14">
-          订单状态
-          <span class="fr blue">${(order.statusName)!}</span>
-        </div>
-        <div class="gray">
-          <p>客户名称&nbsp;${(order.customer_name)!}</p>
-          <p>订货单号&nbsp;${(order.order_sn)!}</p>
-          <p>下单时间&nbsp;${(order.create_date)!}</p>
-          <p>业务员&nbsp;${(order.realname)!}</p>
-        </div>
-        <hr>
-        <div class="ft14">
-          <#if order.receive_type = 0>
-            <input type="checkbox" name="if-account" checked disabled="disabled" >
-            <#else>
-              <input type="checkbox" name="if-account" disabled="disabled">
-          </#if>是否账期
-        </div>
-      </div>
-      <div class="weui-panel weui-panel_access">
-        <div class="ft14">
-          订单详情
-        </div>
-        <#list orderDetailList as orderDetail>
-          <#if orderDetail.is_gift??>
-            <#if orderDetail.is_gift = 0>
-              <div class="p-l-15 modify_price">
-                <p>${orderDetail.custom_name!}</p>
-                <div class="weui-flex">
-                  <div class="weui-flex__item flex-grow2">
-                    <div class="fr width-60">
-                      <!-- ￥${(orderDetail.product_price)!} -->
-                      <input type="number">
-                      <span class="gray">（${(orderDetail.price)!}）</span>
-                    </div>
-                  </div>
-                  <div class="weui-flex__item t-r">
-                    <!-- ${(orderDetail.product_count / orderDetail.convert_relate)?floor} -->
-                    <input type="number" name="" id="">
-                    ${(orderDetail.big_unit)!}
-                  </div>
-                </div>
-                <div class="weui-flex">
-                  <div class="weui-flex__item flex-grow2">
-                    <div class="fr width-60">
-                      <!-- ￥${(orderDetail.product_price / orderDetail.convert_relate)?string("0.##")} -->
-                      <input type="number" name="" id="">
-                      <span class="gray">（${(orderDetail.price / orderDetail.convert_relate)?string("0.##")}）</span>
-                    </div>
-                  </div>
-                  <div class="weui-flex__item t-r">
-                    <!-- ${(orderDetail.product_count % orderDetail.convert_relate)} -->
-                    <input type="number" name="" id="">
-                    ${(orderDetail.small_unit)!}
-                  </div>
-                </div>
-              </div>
-            </#if>
-            <#if orderDetail.is_gift = 1>
-              <div class="p-l-15">
-                <p>
-                  <span class="tag">赠品</span>${orderDetail.custom_name!} / ${(orderDetail.valueName)!}</p>
-                <div class="weui-flex__item t-r">${(orderDetail.product_count / orderDetail.convert_relate)?floor}${(orderDetail.big_unit)!}</div>
-                <div class="weui-flex__item t-r">${(orderDetail.product_count % orderDetail.convert_relate)}${(orderDetail.small_unit)!}</div>
-              </div>
-            </#if>
-          </#if>
-        </#list>
-        <hr>
-        <div class="t-r ft14">
-          总计：
-          <span class="red">${(order.total_amount)!}元</span>
-        </div>
-      </div>
-      <div class="weui-panel weui-panel_access">
-        <div class="ft14">
-          收货信息
-        </div>
-        <div class="gray">
-          <p>
-            收货人：${(order.customer_name)!}
-            <span class="fr"> ${(order.cmobile)!}</span>
-          </p>
-          <p>地址详情：${(order.delivery_address)!}</p>
-        </div>
-        <hr>
-        <div class="ft14">
-          备注信息：
-          <span class="ft12">
-                        <#if order.remark??>
-                            ${(order.remark)!}
-                            <#else>无
-                        </#if>
-                    </span>
-        </div>
-      </div>
+	    <form action="${CPATH}/order/complete" id="form">
+	      <input type="hidden" name="id" value="${(order.id)!}">
+	      <input type="hidden" name="taskId" value="${(taskId)!}">
+	      <input type="hidden" name="pass" value="1">
+	      <input type="hidden" name="edit" id="edit" value="0">
+	      <input type="hidden" name="factor" id="factor" value="${(order.factor)!}">
+	      <div class="weui-panel weui-panel_access">
+	        <div class="ft14">
+	          订单状态
+	          <span class="fr blue">${(order.statusName)!}</span>
+	        </div>
+	        <div class="gray">
+	          <p>客户名称&nbsp;${(order.customer_name)!}</p>
+	          <p>订货单号&nbsp;${(order.order_sn)!}</p>
+	          <p>下单时间&nbsp;${(order.create_date)!}</p>
+	          <p>业务员&nbsp;${(order.realname)!}</p>
+	        </div>
+	        <hr>
+	        <div class="ft14">
+	          <#if order.receive_type = 0>
+	            <input type="checkbox" name="if-account" checked disabled="disabled" >
+	            <#else>
+	              <input type="checkbox" name="if-account" disabled="disabled">
+	          </#if>是否账期
+	        </div>
+	      </div>
+	      <div class="weui-panel weui-panel_access">
+	        <div class="ft14">
+	          订单详情
+	        </div>
+	        <#list orderDetailList as orderDetail>
+	          <div class="orderDetail">
+	              <input type="hidden" name="orderDetailId" value="${(orderDetail.id)!}">
+	              <input type="hidden" name="convert" id="convert" value="${(orderDetail.convert_relate)!}">
+	              <input type="hidden" name="rowTotal" id="rowTotal" value="${(orderDetail.product_count)!}">
+	              <input type="hidden" name="isGift" id="isGift" value="${(orderDetail.is_gift)!}">
+		          <#if orderDetail.is_gift??>
+		            <#if orderDetail.is_gift = 0>
+		              <div class="p-l-15 modify_price">
+		                <p>${orderDetail.custom_name!}</p>
+		                <div class="weui-flex">
+		                  <div class="weui-flex__item flex-grow2">
+		                    <div class="fr width-60">
+		                      <input type="hidden" name="bigPriceSpan" id="bigPriceSpan" value="${(orderDetail.product_price)!}">
+		                      <input type="number" name="bigPrice" id="bigPrice" value="${(orderDetail.product_price)!}">
+		                      <span class="gray">（${(orderDetail.price)!}）</span>
+		                    </div>
+		                  </div>
+		                  <div class="weui-flex__item t-r">
+		                    <input type="hidden" name="bigNumSpan" id="bigNumSpan" value="${(orderDetail.product_count / orderDetail.convert_relate)?floor}">
+		                    <input type="number" name="bigNum" id="bigNum" value="${(orderDetail.product_count / orderDetail.convert_relate)?floor}">
+		                    ${(orderDetail.big_unit)!}
+		                  </div>
+		                </div>
+		                <div class="weui-flex">
+		                  <div class="weui-flex__item flex-grow2">
+		                    <div class="fr width-60">
+		                      <input type="hidden" name="smallPriceSpan" id="smallPriceSpan" value="${(orderDetail.product_price / orderDetail.convert_relate)?string('0.##')}">
+		                      <input type="number" name="smallPrice" id="smallPrice" value="${(orderDetail.product_price / orderDetail.convert_relate)?string('0.##')}">
+		                      <span class="gray">（${(orderDetail.price / orderDetail.convert_relate)?string("0.##")}）</span>
+		                    </div>
+		                  </div>
+		                  <div class="weui-flex__item t-r">
+		                    <input type="hidden" name="smallNumSpan" id="smallNumSpan" value="${(orderDetail.product_count % orderDetail.convert_relate)}">
+		                    <input type="number" name="smallNum" id="smallNum" value="${(orderDetail.product_count % orderDetail.convert_relate)}">
+		                    ${(orderDetail.small_unit)!}
+		                  </div>
+		                </div>
+		              </div>
+		            </#if>
+		            <#if orderDetail.is_gift = 1>
+		              <div class="p-l-15">
+		                <p><span class="tag">赠品</span>${orderDetail.custom_name!} / ${(orderDetail.valueName)!}</p>
+		                <div class="weui-flex__item t-r">
+		                	<input type="hidden" name="bigPriceSpan" id="bigPriceSpan" value="${(orderDetail.product_price)!}">
+		                	<input type="hidden" name="bigPrice" id="bigPrice" value="${(orderDetail.product_price)!}">
+		                	<input type="hidden" name="bigNumSpan" id="bigNumSpan" value="${(orderDetail.product_count / orderDetail.convert_relate)?floor}">
+		                	<input type="number" name="bigNum" id="bigNum" value="${(orderDetail.product_count / orderDetail.convert_relate)?floor}">
+		                	${(orderDetail.big_unit)!}
+		                </div>
+		                <div class="weui-flex__item t-r">
+		                	<input type="hidden" name="smallPriceSpan" id="smallPriceSpan" value="${(orderDetail.product_price / orderDetail.convert_relate)?string('0.##')}">
+		                	<input type="hidden" name="smallPrice" id="smallPrice" value="${(orderDetail.product_price / orderDetail.convert_relate)?string('0.##')}">
+		                	<input type="hidden" name="smallNumSpan" id="smallNumSpan" value="${(orderDetail.product_count % orderDetail.convert_relate)}">
+		                	<input type="number" name="smallNum" id="smallNum" value="${(orderDetail.product_count % orderDetail.convert_relate)}">
+		                	${(orderDetail.small_unit)!}
+		                </div>
+		              </div>
+		            </#if>
+		          </#if>
+	          </div>
+	        </#list>
+	        <hr>
+	        <div class="t-r ft14">
+	          总计：       <span class="red" id="totalSpan">${(order.total_amount)!}元</span>
+	        	<input type="hidden" name="totalNum" id="totalNum" value="${(order.total_count)!}">
+				<input type="hidden" name="total" id="total" value="${(order.total_amount)!}">
+	        </div>
+	      </div>
+	      <div class="weui-panel weui-panel_access">
+	        <div class="ft14">
+	          收货信息
+	        </div>
+	        <div class="gray">
+	          <p>
+	            收货人：${(order.customer_name)!}
+	            <span class="fr"> ${(order.cmobile)!}</span>
+	          </p>
+	          <p>地址详情：${(order.delivery_address)!}</p>
+	        </div>
+	        <hr>
+	        <div class="ft14">
+	          备注信息：
+	          <span class="ft12">
+	                        <#if order.remark??>
+	                            ${(order.remark)!}
+	                            <#else>无
+	                        </#if>
+	          </span>
+	        </div>
+	      </div>
+      </form>
       <a class="weui-panel weui-panel_access block" href="${CPATH}/order/operateHistory?id=${(order.id)!}&proc_inst_id=${(order.proc_inst_id)!}">
         <div class="weui-cell weui-cell_access">
           <div class="weui-cell__bd ft14">
@@ -185,7 +318,7 @@
     <#include "_inc/_goback.html" />    
     <footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex border-top-1px">
       <button class="white-button-no-border weui-flex__item refuse">拒绝</button>
-      <button class="red-button weui-flex__item" onclick="doSubmit(1)">通过</button>
+      <button class="red-button weui-flex__item" onclick="doSubmit()">通过</button>
     </footer>
   </div>
 </body>
