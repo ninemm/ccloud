@@ -1,5 +1,17 @@
 <#include "_inc/_layout.html"/>
-<#macro css> </#macro>
+<#macro css> 
+	#customer {
+		bottom: 0;
+	}
+	#customerList {
+		position: absolute;
+		top: 2rem;
+		bottom: 0;
+		overflow: auto;
+		-webkit-overflow-scrolling: touch;
+		width: 100%;
+	}
+</#macro>
 <#macro script>
 
 
@@ -17,7 +29,7 @@
             combo();
         }).on("change", "#isOrdered", function() {
             combo();
-        }).on("touchstart", "#customerInfo", function() {
+        }).on("touchend", "#customerInfo", function() {
 			var el = $(this);
 	        var customerInfo = {
 	        	customerName : el.find("#customerName").text(),

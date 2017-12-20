@@ -122,14 +122,14 @@ public class InventoryDetailQuery extends JBaseQuery {
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cid.biz_bill_sn", keyword, params, needWhere);
+		//needWhere = appendIfNotEmptyWithLike(fromBuilder, "cid.biz_bill_sn", keyword, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cid.data_area", dataArea, params, needWhere);
 		if (needWhere) {
 				fromBuilder.append("where 1 = 1 and  cid.biz_type in ('"+Consts.BIZ_TYPE_P_OUTSTOCK+"','"+Consts.BIZ_TYPE_SALES_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_REDUCE_OUTSTOCK+"') ");
 		}else{
 				fromBuilder.append("and cid.biz_type in ('"+Consts.BIZ_TYPE_P_OUTSTOCK+"','"+Consts.BIZ_TYPE_SALES_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_REDUCE_OUTSTOCK+"') ");
 		}
-		fromBuilder.append(" and csp.seller_id = '"+sellerId+"' GROUP BY cid.id order by " + orderby+" desc");	
+		fromBuilder.append(" and ( cid.biz_bill_sn like '%"+keyword+"%' or csp.custom_name like '%"+keyword+"%' ) and csp.seller_id = '"+sellerId+"' GROUP BY cid.id order by " + orderby+" desc");	
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 

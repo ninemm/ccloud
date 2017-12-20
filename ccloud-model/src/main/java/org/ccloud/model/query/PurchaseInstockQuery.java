@@ -55,7 +55,7 @@ public class PurchaseInstockQuery extends JBaseQuery {
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "i.pwarehouse_sn", keyword, params, needWhere);
+		//needWhere = appendIfNotEmptyWithLike(fromBuilder, "i.pwarehouse_sn", keyword, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "i.data_area", dataArea, params, needWhere);
 
 		if (needWhere) {
@@ -72,7 +72,7 @@ public class PurchaseInstockQuery extends JBaseQuery {
 			params.add(endDate);
 		}
 
-		fromBuilder.append(" and i.dept_id ='"+deptId+"'  order by i.create_date desc ");
+		fromBuilder.append(" and ( i.pwarehouse_sn like '%"+keyword+"%' or cs.name like '%"+keyword+"%' or s.seller_name like '%"+keyword+"%' ) and i.dept_id ='"+deptId+"'  order by i.create_date desc ");
 
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
