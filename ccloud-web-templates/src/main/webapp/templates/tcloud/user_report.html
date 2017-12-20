@@ -64,7 +64,7 @@
 		Utils.ajax('${CPATH}/report/productCount', params, 
 			function(data){
 				var height = data.length;
-				$("#userCount").height(60 * height + 100);
+				$("#userCount").height(50 * height + 100);
 		        var product = document.getElementById('userCount');
 		        var productChart = echarts.init(product);
 	            var productOption = {
@@ -73,6 +73,7 @@
 	                },
 	                legend: {
 	                    data:[],
+	                    x:'left',
 	                    textStyle : {
 	                        fontSize : 10
 	                    }
@@ -112,7 +113,7 @@
 	               productOption.series.push({
 	                name:data[i].custom_name,
 	                type:'bar',
-	                barWidth: 25,
+	                barWidth: 15,
 	                data:[data[i].totalAmount],
 	                label:{
 	                    normal:{
@@ -182,7 +183,7 @@
 	               productOption.series.push({
 	                name:data[i].custom_name,
 	                type:'bar',
-	                barWidth: 25,
+	                barWidth: 15,
 	                data:[data[i].totalAmount],
 	                label:{
 	                    normal:{
