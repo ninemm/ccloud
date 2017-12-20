@@ -90,7 +90,7 @@ public class PurchaseOrderQuery extends JBaseQuery {
 			params.add(endDate);
 		}
 		fromBuilder.append(" and s.id='"+sellerId+"' ");
-		fromBuilder.append(" order by cpo.create_date desc ");
+		fromBuilder.append(" and ( cpo.porder_sn like '%"+keyword+"%' or cs.name like '%"+keyword+"%' ) order by cpo.create_date desc ");
 
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
