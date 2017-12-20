@@ -47,29 +47,46 @@ public class OptionQuery extends JBaseQuery {
 
 	public boolean saveOrUpdate(String key, String value) {
 		CacheKit.remove(Option.CACHE_NAME, key);
+		boolean save = false;
 		Option option = DAO.doFindFirst("option_key =  ?", key);
 		if (null == option) {
 			option = new Option();
+			save = true;
 		}
 
 		option.setOptionKey(key);
 		option.setOptionValue(value);
 
-		return option.saveOrUpdateWithoutDate();
+		if(save) {
+			return option.save();
+		}else {
+			return option.update();
+		}
+		
+		//return option.saveOrUpdateWithoutDate();
 	}
 	
 	public boolean saveOrUpdateBySellerId(String key, String value, String sellerId) {
 		CacheKit.remove(Option.CACHE_NAME, sellerId + key);
 		Option option = DAO.doFindFirst("option_key = ? AND seller_id = ?", key, sellerId);
+		boolean save = false;
 		if (null == option) {
 			option = new Option();
+			save = true;
 		}
 
 		option.setOptionKey(key);
 		option.setOptionValue(value);
 		option.setSellerId(sellerId);
+		
+		if(save) {
+			return option.save();
+		}else {
+			return option.update();
+		}
+		
 
-		return option.saveOrUpdateWithoutDate();
+		//return option.saveOrUpdateWithoutDate();
 	}	
 
 	public Option findByKey(String key) {

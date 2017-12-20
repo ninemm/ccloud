@@ -80,46 +80,6 @@ public class _ReportController extends JBaseController {
 		renderJson(map);
 	}
 	
-	//我的客户
-	public void customerDetails() {
-		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
-		setAttr("startDate", date);
-		setAttr("endDate", date);
-		render("customerDetails.html");
-	}
-	
-	//我的客户list
-	public void customerDetailsList() {
-		String keyword = getPara("k");
-		if (StrKit.notBlank(keyword)) {
-			keyword = StringUtils.urlDecode(keyword);
-			setAttr("k", keyword);
-		}
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String userId = user.getId();
-		String startDate = getPara("startDate");
-		String endDate = getPara("endDate");
-		Page<SalesOrder> page = SalesOrderQuery.me().findByCustomer(getPageNumber(), getPageSize(),startDate,endDate,keyword, userId);
-		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
-		renderJson(map);
-	}
-	
-	//我的客户赠品list
-	public void customerDetailsGiftList() {
-		String keyword = getPara("k");
-		if (StrKit.notBlank(keyword)) {
-			keyword = StringUtils.urlDecode(keyword);
-			setAttr("k", keyword);
-		}
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String userId = user.getId();
-		String startDate = getPara("startDate");
-		String endDate = getPara("endDate");
-		Page<SalesOrder> page = SalesOrderQuery.me().findByCustomerGift(getPageNumber(), getPageSize(),startDate,endDate,keyword, userId);
-		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
-		renderJson(map);
-	}
-	
 	//我的客户类型报表
 	public void clientTypeReport() {
 		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
@@ -477,4 +437,68 @@ public class _ReportController extends JBaseController {
 		setAttr("mSalesmanDetailGiftReportList", mSalesmanDetailGiftReportList);
 		render("mSalesmanDetail.html");
 	}
+	
+	//我的客户详情
+	public void customerDetails() {
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		if (startDate==null) {
+			String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
+			startDate=date;
+			endDate=date;
+		}
+		String keyword = getPara("k");
+		if (keyword==null) {
+			keyword="so.create_date";
+		}
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+		}
+		setAttr("startDate", startDate);
+		setAttr("endDate", endDate);
+		setAttr("k", keyword);
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String userId = user.getId();
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
+		
+		//得到表头
+		List<String>watchHead=new ArrayList<>();
+		watchHead.add("客户名称");
+		List<SellerProduct> findBySellerId = SellerProductQuery.me().findBySellerId(sellerId);
+		for (SellerProduct sellerProduct : findBySellerId) {
+			String customName=sellerProduct.getCustomName();
+			watchHead.add(customName);
+		}
+		setAttr("watchHead", watchHead);
+		
+		//我的客户卖出商品详情
+		List<Record> list = SalesOrderQuery.me().findByCustomerDetail(startDate,endDate,keyword, userId,sellerId);
+		//根据表头  对数据从新排序
+		List<List<String>>CustomerDetailList=new ArrayList<>();
+		for (Record record : list) {
+			List<String> CustomerDetail=new ArrayList<>();
+			for (int i = 0; i < watchHead.size(); i++) {
+				String key = watchHead.get(i);
+				CustomerDetail.add(record.getStr(key));
+			}
+			CustomerDetailList.add(CustomerDetail);
+		}
+		setAttr("CustomerDetailList", CustomerDetailList);
+		
+		//我部门的业务员赠品商品详情
+		List<Record> list1 = SalesOrderQuery.me().findByCustomerDetailGift(startDate,endDate,keyword, userId,sellerId);
+		//根据表头  对数据从新排序
+		List<List<String>>CustomerDetailGiftList=new ArrayList<>();
+		for (Record record : list1) {
+			List<String> CustomerDetailGift=new ArrayList<>();
+			for (int i = 0; i < watchHead.size(); i++) {
+				String key = watchHead.get(i);
+				CustomerDetailGift.add(record.getStr(key));
+			}
+			CustomerDetailGiftList.add(CustomerDetailGift);
+		}
+		setAttr("CustomerDetailGiftList", CustomerDetailGiftList);
+		render("customerDetails.html");
+	}
+	
 }

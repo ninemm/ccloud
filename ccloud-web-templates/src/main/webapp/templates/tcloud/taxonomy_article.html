@@ -17,7 +17,6 @@
 </#macro>
 
 <@layout>
-	
 	<div class="weui-content">
         <div class="weui-panel">
             <div class="weui-panel__hd"><i class="icon-volume-up"></i> 企业公告</div>
@@ -33,7 +32,9 @@
                 </a>
                 </#list>
                 <#else>
-                    <article>无记录！</article>
+                    <div class="weui-loadmore weui-loadmore_line">
+	                    <span class="weui-loadmore__tips">暂无数据</span>
+	                </div>
                 </#if>
                 </@cc.contentPage>   
             </div>

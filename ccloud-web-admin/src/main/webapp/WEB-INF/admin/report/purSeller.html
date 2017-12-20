@@ -87,8 +87,8 @@
 	var initFields = function() {
 		var fields =
 			[ 	{title: "序号", align: "center", edit:false, formatter: function (value, row, index) { return index+1; } },
-				{field: "seller_name", title: "直营商名称", align: "center",  edit:false},
-      			{field: "custom_name", title: "商品名称", align: "center",  edit:false},
+				{field: "cname", title: "直营商名称", align: "center",  edit:false},
+      			{field: "spname", title: "商品名称", align: "center",  edit:false},
       			{field: "productCountTotal", title: "数量(件)", align: "center",  edit:false}
    			];
    		return fields;
@@ -97,8 +97,8 @@
 	var initFieldsGift = function() {
 		var fields =
 			[ 	{title: "序号", align: "center", edit:false, formatter: function (value, row, index) { return index+1; } },
-				{field: "seller_name", title: "直营商名称", align: "center",  edit:false},
-      			{field: "custom_name", title: "商品名称", align: "center",  edit:false},
+				{field: "cname", title: "直营商名称", align: "center",  edit:false},
+      			{field: "spname", title: "商品名称", align: "center",  edit:false},
       			{field: "productCountTotal", title: "数量(件)", align: "center",  edit:false}
    			];
    		return fields;
@@ -121,11 +121,11 @@
 <@layout active_id=p child_active_id=c>
 
 <section class="content-header">
-	<h1>我管理的直营商</h1>
+	<h1>直营商的采购</h1>
 	<ol class="breadcrumb">
 		<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
        	<li><a href="#">报表查询</a></li>
-       	<li class="active">我管理的直营商</li>
+       	<li class="active">直营商的采购</li>
 	</ol>
 </section>
 <!-- Main content -->
@@ -159,7 +159,7 @@
 	</div>
 	<h2>赠品统计</h2>
 	<div class="box">
-		<table class="table table-striped table-hover table-condensed" id="_manageSellerReportGift_table" ></table>
+		<table class="table table-striped table-hover table-condensed" id="_purSellerReportGift_table" ></table>
 	</div>
 	<!-- /.box -->
 </section>

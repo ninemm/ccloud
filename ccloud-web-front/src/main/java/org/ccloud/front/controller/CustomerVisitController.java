@@ -2,12 +2,10 @@ package org.ccloud.front.controller;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.time.DateFormatUtils;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.message.Actions;
@@ -52,7 +50,6 @@ public class CustomerVisitController extends BaseFrontController {
 	public void index() {
 		
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		int pageSize= Consts.PAGE_SIZE;
 		
 		String id = getPara("id");
 		String type = getPara("type");
@@ -60,13 +57,12 @@ public class CustomerVisitController extends BaseFrontController {
 		String subType = getPara("level");
 		String dataArea = selectDataArea + "%";
 
-		Page<Record> visitList = CustomerVisitQuery.me().paginateForApp(getPageNumber(), pageSize, id, type, nature, subType, dataArea);
+		Page<Record> visitList = CustomerVisitQuery.me().paginateForApp(getPageNumber(), getPageSize(), id, type, nature, subType, dataArea);
 
 		if(StrKit.notBlank(getPara("id"))) {
 			setAttr("id", getPara("id"));
 			setAttr("name", getPara("name"));
 		}
-		setAttr("pageSize", pageSize);
 		setAttr("visitList", visitList);
 		render("customer_visit_list.html");
 	}
@@ -277,7 +273,7 @@ public class CustomerVisitController extends BaseFrontController {
 	public void visitCustomerInfo() {
 		List<Map<String, String>> list = getVisitTypeList();
 	    setAttr("problem", JSON.toJSONString(list));
-		setAttr("deliveryDate", DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
+		//setAttr("deliveryDate", DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
 		render("customer_visit_edit.html");
 	}
 
