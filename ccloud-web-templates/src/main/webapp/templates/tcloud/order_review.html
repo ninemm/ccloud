@@ -1,5 +1,9 @@
 <#include "_inc/_layout.html"/>
-<#macro css></#macro>
+<#macro css>
+	main {
+		bottom: 0!important;
+	}
+</#macro>
 <#macro script>
 	$(function() {
 	    $(document).on('touchend', '.refuse', function() {

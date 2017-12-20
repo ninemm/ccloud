@@ -259,7 +259,7 @@
                             <span class="require">*</span>
                         </div>
                         <input type="hidden" id="customer_id" name="customerVisit.seller_customer_id" />
-                        <input type="text" class="weui-input" id="customer_name" name="customer_name" placeholder="选择客户" required>
+                        <input type="text" class="weui-input" id="customer_name" name="customer_name" placeholder="选择客户" required readonly>
                     </div>
                     <span class="weui-cell__ft"></span>
                 </div>
@@ -358,8 +358,8 @@
     </main>
 
     <#include "_inc/_goback.html" />
-    <footer class="weui-footer weui-footer_fixed-bottom ft16">
-        <a href="javascript:void(0)" class="red-button width-100 _submit_btn" onclick="doSubmit()" href="">提交</a>
+    <footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
+        <button class="red-button width-100 _submit_btn" onclick="doSubmit()" href="">提交</button>
     </footer>
 </div>
 </@layout>

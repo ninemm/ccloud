@@ -68,6 +68,7 @@ main {
 
 button {
   border: 0;
+  font-size: inherit;
 }
 
 a {
