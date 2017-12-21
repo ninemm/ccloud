@@ -177,7 +177,7 @@ public class InventoryDetailQuery extends JBaseQuery {
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cid.data_area", dataArea, params, needWhere);
-		fromBuilder.append("GROUP BY cid.sell_product_id ");
+		fromBuilder.append("GROUP BY cid.sell_product_id order by cs.seller_type,cs.id  ");
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
