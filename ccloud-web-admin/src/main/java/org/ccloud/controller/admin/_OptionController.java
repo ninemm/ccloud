@@ -114,21 +114,21 @@ public class _OptionController extends JBaseController {
 			}
 		}
 		String seller_store_check = getPara("seller_store_check_"+sellerCode);
-		String comment_need_procedure = getPara("comment_need_procedure_"+sellerCode);
+		String comment_need_procedure = getPara("web_procedure_review_"+sellerCode);
 		if(!StringUtils.isNotBlank(seller_store_check)) {
 			datasMap.put("seller_store_check_"+sellerCode, "0");
 		}
 		if(!StringUtils.isNotBlank(comment_need_procedure)) {
-			datasMap.put("comment_need_procedure_"+sellerCode, "0");
+			datasMap.put("web_procedure_review_"+sellerCode, "0");
 		}
 		
-		String comment_need_goods_number = getPara("comment_need_goods_number_"+sellerCode);
-		String comment_need_goods_price = getPara("comment_need_goods_price_"+sellerCode);
+		String comment_need_goods_number = getPara("web_proc_num_limit_"+sellerCode);
+		String comment_need_goods_price = getPara("web_proc_price_limit_"+sellerCode);
 		if(!StringUtils.isNotBlank(comment_need_goods_number)) {
-			datasMap.put("comment_need_goods_number_"+sellerCode, "0");
+			datasMap.put("web_proc_num_limit_"+sellerCode, "0");
 		}
 		if(!StringUtils.isNotBlank(comment_need_goods_price)) {
-			datasMap.put("comment_need_goods_price_"+sellerCode, "0");
+			datasMap.put("web_proc_price_limit_"+sellerCode, "0");
 		}
 		
 		

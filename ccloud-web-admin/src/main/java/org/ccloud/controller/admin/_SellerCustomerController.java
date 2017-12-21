@@ -328,8 +328,6 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 
 		updated = startProcess(sellerCustomer.getId(), map, 0);
 
-
-
 		if (updated)
 			renderAjaxResultForSuccess("操作成功");
 		else

@@ -23,6 +23,7 @@ import org.ccloud.model.query.CustomerJoinCustomerTypeQuery;
 import org.ccloud.model.query.CustomerQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.DepartmentQuery;
+import org.ccloud.model.query.OptionQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SellerCustomerQuery;
 import org.ccloud.model.query.UserQuery;
@@ -421,7 +422,9 @@ public class CustomerController extends BaseFrontController {
 			return ;
 		}
 		
-		updated = startProcess(sellerCustomer.getId(), map, 0);
+		Boolean isChecked = OptionQuery.me().findValueAsBool("web_proc_customer_review_" + getSessionAttr("sellerCode"));
+		if (isChecked)
+			updated = startProcess(sellerCustomer.getId(), map, 0);
 
 		if (updated)
 			renderAjaxResultForSuccess("操作成功");

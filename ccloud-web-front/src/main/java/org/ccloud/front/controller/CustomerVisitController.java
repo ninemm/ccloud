@@ -23,6 +23,7 @@ import org.ccloud.model.query.CustomerJoinCustomerTypeQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.CustomerVisitQuery;
 import org.ccloud.model.query.DictQuery;
+import org.ccloud.model.query.OptionQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.query.WxMessageTemplateQuery;
 import org.ccloud.model.vo.ImageJson;
@@ -280,7 +281,9 @@ public class CustomerVisitController extends BaseFrontController {
 			 return ;
 		 }
 		 
-		 updated = startProcess(customerVisit);
+		 Boolean isChecked = OptionQuery.me().findValueAsBool("web_proc_customer_review_" + getSessionAttr("sellerCode"));
+		 if (isChecked)
+			updated = startProcess(customerVisit);
 		 
 		 if (updated)
 			 renderAjaxResultForSuccess("操作成功");
