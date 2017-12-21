@@ -360,6 +360,7 @@ public class _UserController extends JBaseCRUDController<User> {
 			}
 		      for (String s : ids) {
 		    	  UserGroupRel userGroupRel = new UserGroupRel();
+		    	  userGroupRel.setId(StrKit.getRandomUUID());
 				  userGroupRel.setUserId(id);
 				  userGroupRel.setGroupId(s);
 				  userGroupRelList.add(userGroupRel);
