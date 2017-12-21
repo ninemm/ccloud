@@ -65,11 +65,11 @@
 					var url = '${CPATH}/admin/goods/edit?id=' + row.id + '&c=${c}&p=${p}';
 					var url2 = '${CPATH}/admin/goods/imageManager?id=' + row.id + '&goodsName=' + row.name + '&c=${c}&p=${p}';
 					var image = '<a href="' + url2 + '" class="btn btn-sm" title="图片管理"><i class="fa fa-file-image-o"></i></a>';
-					var strHtml = ' <a href="' + url + '" class="label label-table label-info">编辑</a> <a href="javascript:void(0);" class="label label-table label-danger" onclick="del(\''+row.id+'\')">删除</a>';
+					var strHtml = ' <a href="' + url + '" class="btn btn-xs bg-olive btn-flat">编辑</a> <a href="javascript:void(0);" class="btn btn-xs btn-danger btn-flat" onclick="del(\''+row.id+'\')">删除</a>';
 					if(row.state == 1){
-						strHtml = strHtml + ' <a href="javascript:void(0);" class="label label-table label-warning" onclick="enable(\''+row.id+'\'' + ',0' + ')">下架</a>';
+						strHtml = strHtml + ' <a href="javascript:void(0);" class="btn btn-xs btn-warning btn-flat" onclick="enable(\''+row.id+'\'' + ',0' + ')">下架</a>';
 					} else {
-						strHtml = strHtml + ' <a href="javascript:void(0);" class="label label-table label-success" onclick="enable(\''+row.id+'\'' + ',1' + ')">上架</a>';
+						strHtml = strHtml + ' <a href="javascript:void(0);" class="btn btn-xs btn-primary btn-flat" onclick="enable(\''+row.id+'\'' + ',1' + ')">上架</a>';
 					}					
 					return strHtml;
 				},

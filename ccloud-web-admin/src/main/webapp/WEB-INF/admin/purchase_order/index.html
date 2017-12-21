@@ -97,12 +97,12 @@
 				},
 				{field: "action", title: "操作", align: "center", width: '15%',
 				formatter: function(value, row, rowIndex) {
-					var strHtml = '<a class="label label-table label-success" onclick="detail(\''+row.id+'\')" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">详情</a> ';
+					var strHtml = '<a class="btn btn-xs bg-olive btn-flat" onclick="detail(\''+row.id+'\')" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">详情</a> ';
 					if(row.status==0){
-						strHtml += '<a class="label label-table label-info" onclick="pass(\''+row.id+'\')" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">通过</a> ';
+						strHtml += '<a class="btn btn-xs btn-primary btn-flat" onclick="pass(\''+row.id+'\')" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">通过</a> ';
 					}
 					/*else{
-						strHtml += '<a class="label label-table label-info" onclick="instockDetail(\''+row.id+'\')" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">入库明细</a> ';
+						strHtml += '<a class="btn btn-xs bg-olive btn-flat" onclick="instockDetail(\''+row.id+'\')" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">入库明细</a> ';
 					}*/
 					return strHtml;
 				},

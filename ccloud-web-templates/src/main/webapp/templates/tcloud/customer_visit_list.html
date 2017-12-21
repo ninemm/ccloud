@@ -43,6 +43,11 @@
                     title: "选择客户级别",
                     items: data.level
                 });
+
+                $("#customer-status").select({
+                title: "选择审核状态",
+                items: data.status
+                });
             }
         })
     });
@@ -53,7 +58,8 @@
             "pageSize": pageSize,
             "type": $("#customer-type")[0].dataset.values,
             "nature": $("#customer-nature")[0].dataset.values,
-            "level": $("#customer-level")[0].dataset.values
+            "level": $("#customer-level")[0].dataset.values,
+            "status": $("#customer-status")[0].dataset.values
         };
     }
 
@@ -126,12 +132,16 @@
                     <input type="text" id="customer-type" placeholder="客户类型" class="weui-input" readonly onchange="refresh()">
                     <i class="icon-sort-desc"></i>
                 </div>
-                <div class="weui-flex__item">
+                <div class="weui-flex__item" style="display:none; ">
                     <input type="text" id="customer-nature" placeholder="客户性质" class="weui-input" readonly onchange="refresh()">
                     <i class="icon-sort-desc"></i>
                 </div>
                 <div class="weui-flex__item">
                     <input type="text" id="customer-level" placeholder="客户级别" class="weui-input" readonly onchange="refresh()">
+                    <i class="icon-sort-desc"></i>
+                </div>
+                <div class="weui-flex__item">
+                    <input type="text" id="customer-status" placeholder="审核状态" class="weui-input" readonly onchange="refresh()">
                     <i class="icon-sort-desc"></i>
                 </div>
             </div>

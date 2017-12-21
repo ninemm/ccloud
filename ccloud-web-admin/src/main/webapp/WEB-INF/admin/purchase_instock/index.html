@@ -117,9 +117,9 @@
 				formatter: function(value, row, rowIndex) {
 					var strHtml = "";
 					if(row.status ==0){
-					 	strHtml +='<a class="label label-table label-info" onclick="detail(\''+row.id+'\')" >入库</a> ';
+					 	strHtml +='<a class="btn btn-xs btn-primary btn-flat" onclick="detail(\''+row.id+'\')" >入库</a> ';
 					}else{
-						strHtml +='<a class="label label-table label-success" onclick="instockDetail(\''+row.id+'\')" >详情</a> '
+						strHtml +='<a class="btn btn-xs bg-olive btn-flat" onclick="instockDetail(\''+row.id+'\')" >详情</a> '
 					}
 					return strHtml;
 				},

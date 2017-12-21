@@ -67,14 +67,14 @@
    				{field: "DEPLOY_TIME_", title: "部署时间", align: "center", width: '16%', edit:false},
    				{field: "action", title: "操作", align: "center", 
    					formatter: function(value, row, rowIndex) {
-   					    var  strHtml = '<a class="label label-table label-info" href="${SPATH}/processEditor/diagram-viewer/index.html?processDefinitionId='+row.ID_+'" target="_blank">预览</a>&nbsp;';
-                        strHtml += '<a class="label label-table label-success" onclick="convertToModel(\''+row.ID_+'\')" href="javascript:void(0);">转化为模型</a>&nbsp;';
+   					    var  strHtml = '<a class="btn btn-xs bg-olive btn-flat" href="${SPATH}/processEditor/diagram-viewer/index.html?processDefinitionId='+row.ID_+'" target="_blank">预览</a>&nbsp;';
+                        strHtml += '<a class="btn btn-xs btn-warning btn-flat" onclick="convertToModel(\''+row.ID_+'\')" href="javascript:void(0);">转化为模型</a>&nbsp;';
                         if(row.SUSPENSION_STATE_=="1") {//正在运行
-		                    strHtml += '<a class="label label-table label-danger" onclick="updateState(\'suspend\',\''+row.ID_+'\')" href="javascript:void(0);" >挂起</a>&nbsp;';   
+		                    strHtml += '<a class="btn btn-xs btn-primary btn-flat" onclick="updateState(\'suspend\',\''+row.ID_+'\')" href="javascript:void(0);" >挂起</a>&nbsp;';   
                         } else {
-		                    strHtml += '<a class="label label-table label-success" onclick="updateState(\'active\',\''+row.ID_+'\')" href="javascript:void(0);" >激活</a>&nbsp;';
+		                    strHtml += '<a class="btn btn-xs btn-info btn-flat" onclick="updateState(\'active\',\''+row.ID_+'\')" href="javascript:void(0);" >激活</a>&nbsp;';
                         }
-                        strHtml += '<a class="label label-table label-danger" onclick="deleteDeployment(\''+row.DEPLOYMENT_ID_+'\')" href="javascript:void(0);" >删除</a>';
+                        strHtml += '<a class="btn btn-xs btn-danger btn-flat" onclick="deleteDeployment(\''+row.DEPLOYMENT_ID_+'\')" href="javascript:void(0);" >删除</a>';
                         return strHtml;
    					},
    					edit:false

@@ -55,8 +55,8 @@
    				{field: "action", title: "操作", align: "center", 
    					formatter: function(value, row, rowIndex) {
    						var url = '${CPATH}/admin/model/edit?id=' + row.id + '&c=${c}&p=${p}';
-   						var strHtml = '<a class="label label-table label-success" href="${CPATH}/admin/messageTemplate/edit?id='+row.id+'" target="_blank">编辑</a>&nbsp;';
-   						strHtml += '<a class="label label-table label-danger" onclick="del(\''+row.id+'\')" href="javascript:void(0);" >删除</a>';
+   						var strHtml = '<a class="btn btn-xs bg-olive btn-flat" href="${CPATH}/admin/messageTemplate/edit?id='+row.id+'" target="_blank">编辑</a>&nbsp;';
+   						strHtml += '<a class="btn btn-xs btn-danger btn-flat" onclick="del(\''+row.id+'\')" href="javascript:void(0);" >删除</a>';
     					return strHtml;
    					},
    					edit:false

@@ -3,6 +3,8 @@
 <#macro script_import>
 	<!-- bootstrapvalidator -->
  	<script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
+ 	<script src="${CPATH}/static/ladda/spin.min.js"></script>
+	<script src="${CPATH}/static/ladda/ladda.min.js"></script>
  	<!--select2  -->
  	<script src="${CPATH}/static/plugins/select2/js/select2.js"></script>
  	
@@ -13,6 +15,7 @@
     <link rel="stylesheet" href="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.css">
     <!-- select2 -->
     <link rel="stylesheet" href="${CPATH}/static/plugins/select2/css/select2.css">
+    <link rel="stylesheet" href="${CPATH}/static/ladda/ladda-themeless.min.css">
 </#macro>
  
 <#macro script>
@@ -39,17 +42,21 @@ var validatorFields = {
 };
 
 function doSubmit(){
-
+	var l = Ladda.create( document.querySelector( '#do_submit' ) );
 	checkIsTheSameWarehouse();
 	$form.ajaxSubmit({
 		beforeSubmit: function() {
 			var validate = $form.data('bootstrapValidator');
 			validate.validate();
+			if (validate.isValid()) {
+					l.start();
+				}
 			return validate.isValid();
 		},
 		type : "post", 
 		dataType : "json", 
 		success : function(data) { 
+			l.stop();
 			if (data.errorCode == 0) {
 				//location.reload();
 				toastr.success(data.message, '操作成功');
@@ -58,6 +65,7 @@ function doSubmit(){
 			}
 		},
 		error : function() {
+			l.stop();
 			alert("信息提交错误");
 		}
 	});
@@ -341,7 +349,7 @@ function addTr(tid, productList, optionArr) {
                     		</div>
 
 		<div class="box-footer"> 
-			<button type="button" onclick="doSubmit()" class="btn btn-primary">保存更改</button>
+			<button type="button" onclick="doSubmit()" id="do_submit" class="btn btn-primary ladda-button" data-style="expand-right">保存更改</button>
 			<input type="button" class="btn btn-primary" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
 		</div>
 	</form>

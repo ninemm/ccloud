@@ -103,12 +103,12 @@
 				},
 				{field: "action", title: "操作", align: "center", width: '15%',
 				formatter: function(value, row, rowIndex) {
-					var strHtml ='<a class="label label-table label-info" onclick="detail(\''+row.id+'\')" >详细</a> ';
+					var strHtml ='<a class="btn btn-xs bg-olive btn-flat" onclick="detail(\''+row.id+'\')" >详细</a> ';
 					<@shiro.hasPermission name="/admin/salesRefund/check">
 					if (row.status == 0) {
-						strHtml = strHtml + '<a class="label label-table label-success" onclick="pass(\''+row.id+'\',1000)" >通过</a> ';
+						strHtml = strHtml + '<a class="btn btn-xs btn-primary btn-flat" onclick="pass(\''+row.id+'\',1000)" >通过</a> ';
 	
-						strHtml = strHtml + '<a class="label label-table label-warning" onclick="pass(\''+row.id+'\',1001)" >拒绝</a> ';			
+						strHtml = strHtml + '<a class="btn btn-xs btn-danger btn-flat" onclick="pass(\''+row.id+'\',1001)" >拒绝</a> ';			
 					}					
 					</@shiro.hasPermission>						
 
