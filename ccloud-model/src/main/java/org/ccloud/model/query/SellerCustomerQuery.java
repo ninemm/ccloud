@@ -241,12 +241,17 @@ public class SellerCustomerQuery extends JBaseQuery {
 	public List<SellerCustomer> getToDo(String username) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("SELECT sc.*, c.customer_name, c.customer_code, c.contact, c.mobile, c.address, c.prov_name, c.city_name, c.country_name,");
-		sb.append(" a.ID_ taskId, a.NAME_ taskName, a.ASSIGNEE_ assignee, a.CREATE_TIME_ createTime");
+		sb.append(" a.ID_ taskId, a.NAME_ taskName, a.ASSIGNEE_ assignee, a.CREATE_TIME_ createTime, group_concat(ct.name) as customerType");
 		sb.append(" FROM cc_seller_customer sc");
 		sb.append(" JOIN cc_customer c on sc.customer_id = c.id");
+
+		sb.append(" LEFT JOIN cc_customer_join_customer_type cjct ON cjct.seller_customer_id = sc.id ");
+		sb.append(" LEFT JOIN cc_customer_type ct ON cjct.customer_type_id = ct.id ");
+
 		sb.append(" JOIN act_ru_task a on sc.proc_inst_id = a.PROC_INST_ID_");
 		sb.append(" JOIN act_ru_identitylink u on sc.proc_inst_id = u.PROC_INST_ID_");
-		sb.append(" where c.is_enabled = 1 and locate(?, u.USER_ID_) > 0");
+		sb.append(" where locate(?, u.USER_ID_) > 0 and c.is_enabled = 1");
+		sb.append(" GROUP BY sc.id");
 		return DAO.find(sb.toString(), username);
 	}
 	
