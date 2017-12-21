@@ -145,8 +145,9 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		}
 	}
 
-	@Before(Tx.class)
+	
 	@RequiresPermissions(value = { "/admin/sellerCustomer/edit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
+	@Before(Tx.class)
 	public void save() {
 
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);

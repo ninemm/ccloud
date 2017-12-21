@@ -1,5 +1,13 @@
 <#include "_inc/_layout.html"/>
 
+<#macro css_import>
+    <link type='text/css' rel="stylesheet" href="${CTPATH}/css/swiper.min.css">
+</#macro>
+
+<#macro script_import>
+    <script type='text/javascript' src="${CTPATH}/js/swiper.min.js"></script>
+</#macro>
+
 <#macro css>
     .more {
         font-size: .7rem;
@@ -62,6 +70,7 @@ $(function () {
 				</div>
 			</div>
 			<div class="weui-grids">
+				<@shiro.hasPermission name="/admin/salesOrder">
 				<a href="${CPATH}/product" class="weui-grid js_grid">
                     <!-- <span class="weui-badge empty-badge">&nbsp;</span> -->
 					<div class="weui-grid__icon">
@@ -69,18 +78,31 @@ $(function () {
 					</div>
 					<p class="weui-grid__label">下订单</p>
 				</a>
+				
+				<a href="${CPATH}/order/myOrder" class="weui-grid js_grid">
+					<div class="weui-grid__icon">
+						<i class="icon-file" style="color: #9c89b9"></i>
+					</div>
+					<p class="weui-grid__label">我的订单</p>
+				</a>
+				</@shiro.hasPermission>	
+				
+				<@shiro.hasPermission name="/admin/customerVisit">
                 <a href="${CPATH}/customerVisit/edit" class="weui-grid js_grid">
 					<div class="weui-grid__icon">
 						<i class="icon-plane" style="color: #19c594"></i>
 					</div>
 					<p class="weui-grid__label">新增拜访</p>
 				</a>
+				</@shiro.hasPermission>	
 				<!-- <a href="" class="weui-grid js_grid">
 					<div class="weui-grid__icon">
 						<i class="icon-tasks" style="color: #19c594;"></i>
 					</div>
 					<p class="weui-grid__label">活动申请</p>
 				</a> -->
+				
+				<@shiro.hasPermission name="/admin/sellerCustomer/edit">
                 <a href="${CPATH}/customer/edit" class="weui-grid js_grid">
                     <!-- <span class="weui-badge left-top-tag">NEW</span> -->
 					<div class="weui-grid__icon">
@@ -88,13 +110,16 @@ $(function () {
 					</div>
 					<p class="weui-grid__label">新增客户</p>
 				</a>
+				</@shiro.hasPermission>
 			</div>
 		</div>
 		<div>
+			<@shiro.hasPermission name="/admin/salesOrder/check,/admin/customer/audit,/admin/customerVisit/audit">
 			<div class="weui-cells__title">
 				<b>我的待办</b>
 			</div>
 			<div class="weui-grids">
+				<@shiro.hasPermission name="/admin/salesOrder/check">
 			    <a href="${CPATH}/todo/order" class="weui-grid js_grid">
 			        <span class="weui-badge empty-badge">&nbsp;</span>
                     <div class="weui-grid__icon">
@@ -102,6 +127,9 @@ $(function () {
                     </div>
                     <p class="weui-grid__label">订单审核</p>
                 </a>
+                </@shiro.hasPermission>
+                
+                <@shiro.hasPermission name="/admin/customer/audit">
 				<a href="${CPATH}/todo/customer" class="weui-grid js_grid">
                     <span class="weui-badge empty-badge">&nbsp;</span>
 					<div class="weui-grid__icon">
@@ -109,6 +137,7 @@ $(function () {
 					</div>
 					<p class="weui-grid__label">客户审核</p>
 				</a>
+				</@shiro.hasPermission>
                 <!-- <a href="feeAuditList.html" class="weui-grid js_grid"> <span
 					class="weui-badge empty-badge">&nbsp;</span>
 					<div class="weui-grid__icon">
@@ -116,14 +145,18 @@ $(function () {
 					</div>
 					<p class="weui-grid__label">费用审核</p>
 				</a> -->
+				
+				<@shiro.hasPermission name="/admin/customerVisit/audit">
                 <a href="${CPATH}/todo/visit" class="weui-grid js_grid">
 					<div class="weui-grid__icon">
 						<i class="icon-suitcase" style="color: #f7b55d;"></i>
 					</div>
 					<p class="weui-grid__label">拜访审核</p>
 				</a>
+				</@shiro.hasPermission>
 			</div>
 		</div>
+		</@shiro.hasPermission>
 		<!-- <div>
             <div class="weui-cells__title">
                 <b>通知</b>
@@ -141,7 +174,7 @@ $(function () {
 		<div>
 			<div class="weui-cells__title weui-cell_access weui-cell index-info-tab" >
 				<div class="weui-cell__bd">
-					<b style="color:#999">业务审核消息</b> 
+					<b style="color:#999">审核消息</b> 
 					<p class="menu red-button">订单</p>
 					<p class="menu">客户</p>
 					<p class="menu">客户拜访</p>

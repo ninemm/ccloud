@@ -107,7 +107,7 @@ Utils = {
 	openLoadingWin: function(tips) {
 		layer.open({
 			type: 2,
-			content: tips
+			content: tips || '保存中...'
 		});
 	},
 	closeLoadingWin: function() {

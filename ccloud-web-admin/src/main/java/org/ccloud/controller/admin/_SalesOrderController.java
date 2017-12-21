@@ -28,12 +28,16 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
+import org.ccloud.message.Actions;
+import org.ccloud.message.MessageKit;
+import org.ccloud.model.Message;
 import org.ccloud.model.SalesOrder;
 import org.ccloud.model.User;
 import org.ccloud.model.query.OptionQuery;
 import org.ccloud.model.query.SalesOrderDetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SalesOutstockQuery;
+import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.DataAreaUtil;
@@ -107,6 +111,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 	public void add() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
 		String sellerId = getSessionAttr("sellerId");
 		if (user == null || StrKit.isBlank(sellerId)) {
 			// TODO
@@ -150,7 +155,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 			customerOptionList.add(customerOptionMap);
 		}
-		boolean isCheckStore = OptionQuery.me().findStoreCheck(Consts.OPTION_SELLER_STORE_CHECK, sellerId);
+		boolean isCheckStore = OptionQuery.me().findOptionValueToBoolean(Consts.OPTION_SELLER_STORE_CHECK + sellerCode, sellerId);
 		setAttr("isCheckStore", isCheckStore);
 		setAttr("productInfoMap", JSON.toJSON(productInfoMap));
 		setAttr("productOptionList", JSON.toJSON(productOptionList));
@@ -178,8 +183,8 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 		Map<String, String[]> paraMap = getParaMap();
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String sellerId = getSessionAttr("sellerId");
-		String sellerCode = getSessionAttr("sellerCode");
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
 
 		if (this.saveOrder(paraMap, user, sellerId, sellerCode)) {
 			renderAjaxResultForSuccess("保存成功");
@@ -215,7 +220,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
         			index++;
         			String productId = StringUtils.getArrayFirst(paraMap.get("productId" + index));
         			if (StrKit.notBlank(productId)) {
-        				if(!SalesOrderDetailQuery.me().insert(paraMap, orderId, sellerId, user.getId(), date,
+        				if(!SalesOrderDetailQuery.me().insert(paraMap, orderId, sellerId, sellerCode, user.getId(), date,
         						user.getDepartmentId(), user.getDataArea(), index)) {
         					return false;
         				}
@@ -223,10 +228,29 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
         			}
 
         		}
+        		
+        		boolean isStartProc = OptionQuery.me().findOptionValueToBoolean(Consts.OPTION_SELLER_STORE_PROCEDURE_REVIEW + sellerCode
+        				, sellerId);
+        		if (isStartProc) {
+    				String proc_def_key = StringUtils.getArrayFirst(paraMap.get("proc_def_key"));
+    				if (StrKit.notBlank(proc_def_key)) {
+    					if (!start(orderId, StringUtils.getArrayFirst(paraMap.get("customerName")), proc_def_key)) {
+    						return false;
+    					}
+    				}        			
+        		} else {
+        			SalesOutstockQuery.me().pass(orderId, user.getId(), sellerId, sellerCode);
+        			sendOrderMessage(sellerId, StringUtils.getArrayFirst(paraMap.get("customerName")), "订单审核通过", user.getId(), user.getId(),
+        					user.getDepartmentId(), user.getDataArea());        			
+        		}
             	return true;
             }
         });
         return isSave;
+	}
+	
+	public void orderProc() {
+		
 	}
 	
 	@RequiresPermissions("/admin/salesOrder/check")
@@ -256,28 +280,48 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 	}
 	
-	public void start() {
-		
-		String orderId = getPara("orderId");
+	public boolean start(String orderId, String customerName, String proc_def_key) {
+
 		WorkFlowService workflow = new WorkFlowService();
-		String defKey = "_order_review";
-		
+
 		SalesOrder salesOrder = SalesOrderQuery.me().findById(orderId);
-		
+
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
+		
 		Map<String, Object> param = Maps.newHashMap();
-		param.put("applyUsername", user.getUsername());
-		param.put("account", "zhangwu");
+		param.put(Consts.WORKFLOW_APPLY_USER, user);
+		param.put(Consts.WORKFLOW_APPLY_SELLER_ID, sellerId);
+		param.put(Consts.WORKFLOW_APPLY_SELLER_CODE, sellerCode);
+		param.put("customerName", customerName);
 		
-		String procInstId = workflow.startProcess(orderId, defKey, param);
-		
-		salesOrder.setProcKey(defKey);
-		salesOrder.setStatus(1);
+
+		String toUserId = "";
+
+		if(Consts.WORKFLOW_PROC_DEF_KEY_ORDER_REVIEW_ONE.equals(proc_def_key)) {
+			
+			User manager = UserQuery.me().findManagerByDeptId(user.getDepartmentId());
+			if (manager == null) {
+				return false;
+			}
+			param.put("manager", manager.getUsername());
+			toUserId = manager.getId();
+		}
+
+		String procInstId = workflow.startProcess(orderId, proc_def_key, param);
+
+		salesOrder.setProcKey(proc_def_key);
+		salesOrder.setStatus(Consts.SALES_ORDER_STATUS_DEFAULT);
 		salesOrder.setProcInstId(procInstId);
-		salesOrder.set("modify_date", new Date());
-		salesOrder.update();
 		
-		renderAjaxResultForSuccess();
+		if(!salesOrder.update()) {
+			return false;
+		}
+		
+		sendOrderMessage(sellerId, customerName, "订单审核", user.getId(), toUserId, user.getDepartmentId(), user.getDataArea());
+		
+		return true;
 	}
 	
 	public void audit() {
@@ -311,22 +355,145 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		setAttr("isCheck", isCheck);
 	}
 	
+	private void sendOrderMessage(String sellerId, String title, String content, String fromUserId, String toUserId, String deptId, String dataArea) {
+		
+		Message message = new Message();
+		message.setType(Message.ORDER_REVIEW_TYPE_CODE);
+		
+		message.setSellerId(sellerId);
+		message.setTitle(title);
+		message.setContent(content);
+		
+		message.setFromUserId(fromUserId);
+		message.setToUserId(toUserId);
+		message.setDeptId(deptId);
+		message.setDataArea(dataArea);
+		
+		MessageKit.sendMessage(Actions.ProcessMessage.PROCESS_MESSAGE_SAVE, message);
+		
+	}	
+	
+	@Before(Tx.class)
 	public void complete() {
-		SalesOrder salesOrder = getModel(SalesOrder.class);
-
+		String orderId = getPara("id");
+		
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		
 		String taskId = getPara("taskId");
 		String comment = getPara("comment");
+		String refuseReson = getPara("refuseReson","");
 		Integer pass = getParaToInt("pass", 1);
+		Integer edit = getParaToInt("edit", 0);
 		
 		Map<String, Object> var = Maps.newHashMap();
 		var.put("pass", pass);
-		var.put("orderId", salesOrder.getId());
+		var.put("orderId", orderId);
+		var.put(Consts.WORKFLOW_APPLY_COMFIRM, user);
 		
-		WorkFlowService workflowService = new WorkFlowService();
-		workflowService.completeTask(taskId, comment, var);
+		//是否改价格
+		if (pass == 1 && edit == 1) {
+			Map<String, String[]> paraMap = getParaMap();
+			editOrder(paraMap, user.getId());
+			String editInfo = buildEditInfo();
+			
+			comment = "通过" + " 修改订单<br>" + editInfo;
+		} else {
+			comment = (pass == 1 ? "通过" : "拒绝") + " " + (comment == null ? "" : comment) + " "
+					+ (refuseReson == "undefined" ? "" : refuseReson);
+		}
 
-		renderAjaxResultForSuccess("订单审核成功");
+		String comments = buildComments(Consts.OPERATE_HISTORY_TITLE_ORDER_REVIEW, DateUtils.now(), user.getRealname(), comment);
+
+		WorkFlowService workflowService = new WorkFlowService();
+		workflowService.completeTask(taskId, comments, var);
+
+		renderAjaxResultForSuccess("订单审核成功");		
 	}
+	
+	private void editOrder(Map<String, String[]> paraMap, String userId) {
+		Date date = new Date();
+
+		if (!SalesOrderQuery.me().updateForApp(paraMap, userId, date)) {
+			renderAjaxResultForError("订单审核修改价格失败");
+		}
+
+		String[] orderDetailIds = getParaValues("orderDetailId");
+		for (int index = 0; index < orderDetailIds.length; index++) {
+			if (!SalesOrderDetailQuery.me().updateForApp(paraMap, index, date)) {
+				renderAjaxResultForError("订单审核修改价格失败");
+			}
+		}
+
+	}
+	
+	private String buildComments(String title, String date, String realname, String comment) {
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("      <div class=\"weui-cell weui-cell_access\">\n");
+		stringBuilder.append("        <p>");
+		stringBuilder.append(title);
+		stringBuilder.append("<span class=\"fr\">");
+		stringBuilder.append(date);
+		stringBuilder.append("</span></p>\n");
+		stringBuilder.append("        <p>操作人：");
+		stringBuilder.append(realname);
+		stringBuilder.append("</p>\n");
+		stringBuilder.append("        <p>备注：");
+		stringBuilder.append(comment);
+		stringBuilder.append("</p>\n");
+		stringBuilder.append("      </div>\n");
+		
+		return stringBuilder.toString();
+	}
+	
+	private String buildEditInfo() {
+		String[] productNames = getParaValues("productName");
+		String[] bigUnits = getParaValues("bigUnit");
+		String[] smallUnits = getParaValues("smallUnit");
+		String[] bigPrices = getParaValues("bigPrice");
+		String[] bigNums = getParaValues("bigNum");
+		String[] smallPrices = getParaValues("smallPrice");
+		String[] smallNums = getParaValues("smallNum");
+		String[] bigPriceSpans = getParaValues("bigPriceSpan");
+		String[] bigNumSpans = getParaValues("bigNumSpan");
+		String[] smallPriceSpans = getParaValues("smallPriceSpan");
+		String[] smallNumSpans = getParaValues("smallNumSpan");
+		
+		StringBuilder stringBuilder = new StringBuilder();
+		
+		for (int index = 0; index < productNames.length; index++) { // 若修改了产品价格或数量，则写入相关日志信息
+			boolean flag = true;
+			if (!bigPrices[index].equals(bigPriceSpans[index])) {
+				if(flag) {
+					stringBuilder.append("●" + productNames[index] + "<br>");
+				}
+				flag = false;
+				stringBuilder.append("-每" + bigUnits[index] + "价格修改为"+ bigPrices[index]+ "(" + bigPriceSpans[index] + ")<br>");
+			}
+			if (!smallPrices[index].equals(smallPriceSpans[index])) {
+				if(flag) {
+					stringBuilder.append("●" + productNames[index] + "<br>");
+				}
+				flag = false;
+				stringBuilder.append("-每" + smallUnits[index] + "价格修改为"+ smallPrices[index]+ "(" + smallPriceSpans[index] + ")<br>");
+			}
+			if (!bigNums[index].equals(bigNumSpans[index])) {
+				if(flag) {
+					stringBuilder.append("●" + productNames[index] + "<br>");
+				}
+				flag = false;
+				stringBuilder.append("-" + bigUnits[index] + "数量修改为"+ bigNums[index]+ "(" + bigNumSpans[index] + ")<br>");
+			}
+			if (!smallNums[index].equals(smallNumSpans[index])) {
+				if(flag) {
+					stringBuilder.append("●" + productNames[index] + "<br>");
+				}
+				flag = false;
+				stringBuilder.append("-" + smallUnits[index] + "数量修改为"+ smallNums[index]+ "(" + smallNumSpans[index] + ")<br>");
+			}
+		}
+		
+		return stringBuilder.toString();
+	}	
 	
 	public void cancel() {
 		

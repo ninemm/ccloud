@@ -1,11 +1,8 @@
-<#macro script_import>
-</#macro> 
-<#macro script>
-</#macro> 
-<#macro css_import>
-</#macro> 
-<#macro css>
-</#macro> 
+<#macro script_import></#macro> 
+<#macro script></#macro> 
+<#macro css_import></#macro> 
+<#macro css></#macro>
+<#macro title></#macro>
 <#macro layout>
 <!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
@@ -13,7 +10,7 @@
 <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
 <head>
-  	<title>${WEB_TITLE!WEB_NAME!} - ${WEB_SUBTITLE!'协同云平台'}</title>
+  	<title><@title /> - ${WEB_SUBTITLE!'协同云平台'}</title>
   	<meta name="keywords" content="${META_KEYWORDS!}">
   	<meta name="description" content="${META_DESCRIPTION!}">
   	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -37,16 +34,12 @@
 	<link type='text/css' rel="stylesheet" href="${CTPATH}/css/animate.min.css">
 	<link type='text/css' rel="stylesheet" href="${CTPATH}/css/weui.min.css">
 	<link type='text/css' rel="stylesheet" href="${CTPATH}/css/jquery-weui.min.css"> 
-	<link type='text/css' rel="stylesheet" href="${CTPATH}/css/swiper.min.css"> 
 	<link type='text/css' rel="stylesheet" href="${CTPATH}/css/icomoon.css">
 	<link type='text/css' rel="stylesheet" href="${CPATH}/static/plugins/toastr/toastr.css">
 
 	<@css_import />
 
-	<!-- 
-		You can change the style.css (default color purple) to one of these styles
-	-->
-	<link type='text/css' rel="stylesheet" href="${CTPATH}/css/style.css">
+	<link type='text/css' rel="stylesheet" href="${CTPATH}/css/style.css?time=${.now?string['hhmmSSsss']}">
 
   	<#if css ??>
   		<style type="text/css">
@@ -74,7 +67,6 @@
 	<script type='text/javascript' src="${CTPATH}/js/historyUtils.js"></script>
 	<script type='text/javascript' src="${CPATH}/static/plugins/toastr/toastr.js"></script>
 	<script type='text/javascript' src="${CTPATH}/js/city-picker.min.js"></script>
-	<script type='text/javascript' src="${CTPATH}/js/swiper.min.js"></script>
 	<script type='text/javascript' src="${CPATH}/static/layer_mobile/layer.js"></script>
 	<@script_import />
 	<script type='text/javascript' src="${CTPATH}/js/comm.js"></script>

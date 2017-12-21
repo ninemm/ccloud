@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.shiro.SecurityUtils;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
@@ -17,6 +18,7 @@ import org.ccloud.model.Warehouse;
 import org.ccloud.model.query.InventoryDetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SellerProductQuery;
+import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.query.WarehouseQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
@@ -440,6 +442,13 @@ public class _ReportController extends JBaseController {
 	
 	//我的客户详情
 	public void customerDetails() {
+		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/manager");
+		if (isSuperAdmin) {
+			String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+			List<User> ulist = UserQuery.me().findByDataAreaSalesman(dataArea);
+			setAttr("ulist", ulist);
+		}
+		
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		if (startDate==null) {
@@ -457,10 +466,8 @@ public class _ReportController extends JBaseController {
 		setAttr("startDate", startDate);
 		setAttr("endDate", endDate);
 		setAttr("k", keyword);
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String userId = user.getId();
+	
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
-		
 		//得到表头
 		List<String>watchHead=new ArrayList<>();
 		watchHead.add("客户名称");
@@ -470,6 +477,16 @@ public class _ReportController extends JBaseController {
 			watchHead.add(customName);
 		}
 		setAttr("watchHead", watchHead);
+		
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String userId = user.getId();
+
+		//判断有没有user_id传过来
+		String user_id = getPara("user_id");
+		if (StrKit.notBlank(user_id)) {
+			userId = StringUtils.urlDecode(user_id);
+			setAttr("userId", userId);
+		}
 		
 		//我的客户卖出商品详情
 		List<Record> list = SalesOrderQuery.me().findByCustomerDetail(startDate,endDate,keyword, userId,sellerId);

@@ -210,4 +210,14 @@ public class SellerProductQuery extends JBaseQuery {
 		fromBuilder.append("WHERE cg.seller_id = ? and cg.is_enable = 1");
 		return DAO.find(fromBuilder.toString(), sellerId);
 	}
+
+	public List<Record> findConvertRelate(String sellerId) {
+		StringBuilder stringBuilder = new StringBuilder("SELECT sp.custom_name,p.convert_relate");
+		stringBuilder.append(" FROM cc_seller s  ");
+		stringBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.seller_id=s.id ");
+		stringBuilder.append(" LEFT JOIN cc_product p ON sp.product_id =p.id ");
+		stringBuilder.append(" WHERE s.id='"+sellerId+"'");
+		return  Db.find(stringBuilder.toString());
+		
+	}
 }

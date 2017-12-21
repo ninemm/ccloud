@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.message.Actions;
@@ -47,6 +49,8 @@ import com.jfinal.plugin.activerecord.tx.Tx;
 @RouterMapping(url = "/customerVisit")
 public class CustomerVisitController extends BaseFrontController {
 	
+	//库存详情
+	@RequiresPermissions(value = { "/admin/customerVisit", "/admin/dealer/all" }, logical = Logical.OR)
 	public void index() {
 		
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
@@ -55,9 +59,11 @@ public class CustomerVisitController extends BaseFrontController {
 		String type = getPara("type");
 		String nature = getPara("nature");
 		String subType = getPara("level");
+
+		String status = getPara("status");
 		String dataArea = selectDataArea + "%";
 
-		Page<Record> visitList = CustomerVisitQuery.me().paginateForApp(getPageNumber(), getPageSize(), id, type, nature, subType, dataArea);
+		Page<Record> visitList = CustomerVisitQuery.me().paginateForApp(getPageNumber(), getPageSize(), id, type, nature, subType, status, dataArea);
 
 		if(StrKit.notBlank(getPara("id"))) {
 			setAttr("id", getPara("id"));
@@ -100,7 +106,19 @@ public class CustomerVisitController extends BaseFrontController {
 		List<Map<String, Object>> nature = new ArrayList<>();
 		nature.add(all);
 
-		Map<String, List<Map<String, Object>>> data = ImmutableMap.of( "type", customerTypeList2, "nature", nature, "level", customerLevel);
+		List<Dict> statusList = DictQuery.me().findDictByType("customer_audit");
+		List<Map<String, Object>> statusList1 = new ArrayList<>();
+		statusList1.add(all);
+
+		for(Dict status: statusList) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", status.getName());
+			item.put("value", status.getValue());
+			statusList1.add(item);
+		}
+
+
+		Map<String, List<Map<String, Object>>> data = ImmutableMap.of( "type", customerTypeList2, "nature", nature, "level", customerLevel, "status", statusList1);
 		renderJson(data);
 	}
 
@@ -109,7 +127,7 @@ public class CustomerVisitController extends BaseFrontController {
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
 		Page<Record> visitList = new Page<>();
-		visitList = CustomerVisitQuery.me().paginateForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("id"), getPara("type"), getPara("nature"), getPara("level"), selectDataArea);
+		visitList = CustomerVisitQuery.me().paginateForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("id"), getPara("type"), getPara("nature"), getPara("level"), getPara("status"), selectDataArea);
 
 		if(StrKit.notBlank(getPara("id"))) {
 			setAttr("id", getPara("id"));

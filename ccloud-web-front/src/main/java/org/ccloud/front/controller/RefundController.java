@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.CustomerType;
@@ -32,6 +34,8 @@ import com.jfinal.plugin.activerecord.Record;
 @RouterMapping(url = "/refund")
 public class RefundController extends BaseFrontController{
 	
+	//申请退货
+	@RequiresPermissions(value = { "/admin/salesRefund", "/admin/dealer/all" }, logical = Logical.OR)
 	public void index() {
 		
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
@@ -88,6 +92,8 @@ public class RefundController extends BaseFrontController{
 		render("refund_detail.html");
 	}
 	
+	//退货订单
+	@RequiresPermissions(value = { "/admin/salesRefund", "/admin/dealer/all" }, logical = Logical.OR)
 	public void myRefund() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 

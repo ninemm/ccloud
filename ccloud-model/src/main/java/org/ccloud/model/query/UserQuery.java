@@ -20,6 +20,8 @@ import java.util.List;
 
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Record;
+
+import org.ccloud.Consts;
 import org.ccloud.model.User;
 
 import com.jfinal.plugin.activerecord.Page;
@@ -260,6 +262,18 @@ public class UserQuery extends JBaseQuery {
 		fromBuilder.append(" WHERE d.data_area = ? ");
 
 		return Db.query(fromBuilder.toString(), dataArea);
+	}
+
+	//查询该人下的所有业务员
+	public List<User> findByDataAreaSalesman(String dataArea) {
+		StringBuilder fromBuilder = new StringBuilder("SELECT u.id,u.realname ");
+		fromBuilder.append(" FROM `user` u  ");
+		fromBuilder.append(" LEFT JOIN user_group_rel ugr ON ugr.user_id=u.id ");
+		fromBuilder.append(" LEFT JOIN `group` g ON ugr.group_id=g.id ");
+		fromBuilder.append(" LEFT JOIN group_role_rel grr ON grr.group_id=g.id ");
+		fromBuilder.append(" LEFT JOIN role r ON r.id=grr.role_id ");
+		fromBuilder.append(" WHERE u.data_area LIKE '"+dataArea+"'  and r.role_code='"+Consts.ROLE_CODE_010+"'");
+		return DAO.find(fromBuilder.toString());
 	}
 	
 }

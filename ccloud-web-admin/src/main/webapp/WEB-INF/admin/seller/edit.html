@@ -27,6 +27,7 @@
 	var $form = $("#form");
 	var $city = $('#cityPicker');
 	$("#brand_option").select2();
+	$("#product_type_store_option").select2();
 	$(function() {
 		$.ajax({
 			url:"${CPATH}/admin/seller/getBrand",
@@ -40,6 +41,22 @@
 						$("#brand_option").append("<option value=" + data[i].id + ">" + data[i].name + "</option>");
 					} else {
 						$("#brand_option").append("<option value=" + data[i].id + " selected >" + data[i].name + "</option>");
+					}
+				}
+			}
+		});
+		$.ajax({
+			url:"${CPATH}/admin/seller/getGoodsType",
+			type:"post",
+			dataType:"json",
+			data:{"id":'${(seller.id)!}'},
+			success:function(data)
+			{
+				for (var i = 0; i < data.length; i++) {
+					if (data[i].isvalid == 0 ) {
+						$("#product_type_store_option").append("<option value=" + data[i].id + ">" + data[i].name + "</option>");
+					} else {
+						$("#product_type_store_option").append("<option value=" + data[i].id + " selected >" + data[i].name + "</option>");
 					}
 				}
 			}
@@ -125,7 +142,7 @@
 	};
 	
 	function doSubmit(){
-		var l = Ladda.create( document.querySelector( '#do_Submit' ) );
+		var l = Ladda.create( document.querySelector( '#do_submit' ) );
 		$("#areaCodes").val($city.data('citypicker').getCode());
 		$("#areaNames").val($city.data('citypicker').getVal());
 	
@@ -134,7 +151,12 @@
 		if (list != null && list.length > 0) {
 			ids = list.toString();
 		}
-	
+		
+		var listp = $("#product_type_store_option").select2("val")
+		var idps = "";
+		if (list != null && listp.length > 0) {
+			idps = listp.toString();
+		}
 		$form.ajaxSubmit({
 			
 			beforeSubmit: function() {
@@ -147,7 +169,7 @@
 			},
 			type : "post", 
 			data : {
-				"brandList":ids},
+				"brandList":ids,"productTypeList":idps},
 			dataType : "json", 
 			success : function(data) { 
 				l.stop();
@@ -155,7 +177,7 @@
 					toastr.success(data.message, '操作成功');
 					setTimeout( function(){
 						location.href = '${CPATH}/admin/seller/index';
-								}, 2 * 1000 );
+								}, 1 * 1000 );
 				} else {
 					toastr.error(data.message,'操作失败');
 				}
@@ -285,8 +307,11 @@
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">*产品类型:</label>
 							<div class="input-group col-md-4 col-sm-10">
-								<input class="form-control input-sm" type="text" name="seller.product_type_store" value="${(seller.product_type_store)!}" placeholder="1-50个任意字母数字">
-							</div>
+<!-- 								<input class="form-control input-sm" type="text" name="seller.product_type_store" value="${(seller.product_type_store)!}" placeholder="1-50个任意字母数字">
+ -->							
+ 								<select class="form-control input-sm" name="product_type_store" id="product_type_store_option" multiple="multiple" >
+								</select>
+ 							</div>
 						</div>
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">*品牌管理:</label>
@@ -303,7 +328,7 @@
 						</div>
 					</div>
 		<div class="box-footer"> 
-			<button type="button" id="do_Submit" onclick="doSubmit()" class="btn btn-primary ladda-button" data-style="expand-right">保存更改</button>
+			<button type="button" id="do_submit" onclick="doSubmit()" class="btn btn-primary ladda-button" data-style="expand-right">保存更改</button>
 			<input type="button" class="btn btn-primary" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
 		</div>
 		</form>

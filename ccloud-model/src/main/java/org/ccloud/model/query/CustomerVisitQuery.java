@@ -86,7 +86,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
-	public Page<Record> paginateForApp(int pageNumber, int pageSize, String id, String type, String nature, String subType, String dataArea) {
+	public Page<Record> paginateForApp(int pageNumber, int pageSize, String id, String type, String nature, String subType, String status, String dataArea) {
 
 		boolean needwhere = true;
 		List<Object> params = new LinkedList<Object>();
@@ -101,6 +101,8 @@ public class CustomerVisitQuery extends JBaseQuery {
 		needwhere = appendIfNotEmpty(sql, "ccjct.customer_type_id", type, params, needwhere);
 		needwhere = appendIfNotEmpty(sql, "csc.sub_type", subType, params, needwhere);
 		needwhere = appendIfNotEmpty(sql,"csc.id", id, params, needwhere);
+
+		needwhere = appendIfNotEmpty(sql, "ccv.status", status, params, needwhere);
 
 		sql.append("ORDER BY  ccv.create_date desc, ccv.`status` ");
 		return Db.paginate(pageNumber, pageSize,select ,sql.toString(), params.toArray());

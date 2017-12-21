@@ -145,8 +145,12 @@ public class Consts {
 	public static final String RECEIVABLES_OBJECT_TYPE_CUSTOMER = "customer"; //应收账款客户类型
 	public static final String RECEIVABLES_OBJECT_TYPE_SUPPLIER = "supplier"; //应收账款供应商类型
 	
-	public static final String OPTION_SELLER_STORE_CHECK = "seller_store_check";//经销商检查库存开关设置
+	public static final String OPTION_SELLER_STORE_CHECK = "seller_store_check_";//经销商检查库存开关设置
+	public static final String OPTION_SELLER_STORE_PROCEDURE_REVIEW= "web_procedure_review_";//经销商检查库存开关设置
 	public static final String OPTION_FILE_ROOT_PATH = "web_file_root_path";
+	
+	public static final String OPTION_ON = "1";
+	public static final String OPTION_OFF= "0";
 	
 	public static final String CUSTOMER_KIND_COMMON = "100401";//普通客户
 	public static final String CUSTOMER_KIND_SELLER = "100402";//直营商客户
@@ -156,6 +160,8 @@ public class Consts {
 	
 	public static final String ROLE_CODE_007 = "007";//财务
 	public static final String ROLE_CODE_020 = "020";//账务
+	public static final String ROLE_CODE_010 = "010";//业务员
+	
 	
 	public static final String OPERATE_HISTORY_TITLE_ORDER_REVIEW= "订单审核";
 	public static final String OPERATE_HISTORY_TITLE_ORDER_PRINT= "订单打印";
