@@ -78,11 +78,11 @@
 					formatter: function(value, row, rowIndex) {
 						var url = '${CPATH}/admin/customer/edit?id=' + row.id + '&c=${c}&p=${p}';
 						var strHtml = '<@shiro.hasPermission name="/admin/all"> ';
-						strHtml = strHtml + '<a href="' + url + '" class="label label-table label-info">编辑</a> ';
+						strHtml = strHtml + '<a href="' + url + '" class="btn btn-xs bg-olive btn-flat">编辑</a> ';
 						if(row.is_enabled == 1){
-							strHtml = strHtml + ' <a href="javascript:void(0);" class="label label-table label-warning" onclick="enable(\''+row.id+'\'' + ',0' + ')">停用</a>';
+							strHtml = strHtml + ' <a href="javascript:void(0);" class="btn btn-xs btn-warning btn-flat" onclick="enable(\''+row.id+'\'' + ',0' + ')">停用</a>';
 						} else {
-							strHtml = strHtml + ' <a href="javascript:void(0);" class="label label-table label-success" onclick="enable(\''+row.id+'\'' + ',1' + ')">启用</a>';
+							strHtml = strHtml + ' <a href="javascript:void(0);" class="btn btn-xs btn-primary btn-flat" onclick="enable(\''+row.id+'\'' + ',1' + ')">启用</a>';
 						}
 
 						strHtml = strHtml + '</@shiro.hasPermission> ';

@@ -91,9 +91,9 @@
 				formatter: function(value, row, rowIndex) {
 					var url1 = '${CPATH}/admin/seller/edit?id=' + row.id;
 					if(row.is_enabled==0){
-						var strHtml = '<a href="' + url1 + '" class="label label-table label-info">编辑</a> <a href="javascript:void(0);" class="label label-table label-success" onclick="change(\''+row.id+'\')">启用</a>';
+						var strHtml = '<a href="' + url1 + '" class="btn btn-xs bg-olive btn-flat">编辑</a> <a href="javascript:void(0);" class="btn btn-xs btn-warning btn-flat" onclick="change(\''+row.id+'\')">启用</a>';
 					}else{
-						var strHtml = '<a href="' + url1 + '" class="label label-table label-info">编辑</a> <a href="javascript:void(0);" class="label label-table label-warning" onclick="change(\''+row.id+'\')">停用</a>';
+						var strHtml = '<a href="' + url1 + '" class="btn btn-xs bg-olive btn-flat">编辑</a> <a href="javascript:void(0);" class="btn btn-xs btn-primary btn-flat" onclick="change(\''+row.id+'\')">停用</a>';
 					}
 					return strHtml;
 				},

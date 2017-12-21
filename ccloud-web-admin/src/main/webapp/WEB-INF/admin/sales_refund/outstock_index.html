@@ -87,9 +87,9 @@
 				},
 				{field: "action", title: "操作", align: "center", width: '15%',
 				formatter: function(value, row, rowIndex) {
-					var strHtml ='<a class="label label-table label-info" onclick="parent.outstockDetail(\''+row.id+'\')" >详细</a> ';
+					var strHtml ='<a class="btn btn-xs bg-olive btn-flat" onclick="parent.outstockDetail(\''+row.id+'\')" >详细</a> ';
 
-					strHtml = strHtml + '<a class="label label-table label-danger" onclick="parent.refund(\''+row.id+'\')" >退货</a> ';
+					strHtml = strHtml + '<a class="btn btn-xs btn-danger btn-flat" onclick="parent.refund(\''+row.id+'\')" >退货</a> ';
 
 					return strHtml;
 				},
