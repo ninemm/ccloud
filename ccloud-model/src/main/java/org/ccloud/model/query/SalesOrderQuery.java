@@ -766,11 +766,12 @@ public class SalesOrderQuery extends JBaseQuery {
 	//我部门的直营商详情
 	public List<Record> findByMSellerDetail( String startDate, String endDate,
 			String keyword, String dataArea, String sellerId) {
-		List<SellerProduct> findBySellerId = SellerProductQuery.me().findBySellerId(sellerId);
+		List<Record> records = SellerProductQuery.me().findConvertRelate(sellerId);
 		StringBuilder fromBuilder=new StringBuilder("SELECT ");
-		for (SellerProduct sellerProduct : findBySellerId) {
-			String customName=sellerProduct.getCustomName();
-			fromBuilder.append("TRUNCATE((sum( CASE sp.custom_name WHEN '"+customName+"' THEN sd.product_count ELSE 0 END)/p.convert_relate),2)  '"+customName+"' ,");
+		for (Record record : records) {
+			String customName=record.getStr("custom_name");
+			String convertRelate = record.getStr("convert_relate");
+			fromBuilder.append("TRUNCATE((sum( CASE sp.custom_name WHEN '"+customName+"' THEN sd.product_count ELSE 0 END)/"+convertRelate+"),2)  '"+customName+"' ,");
 		}
 		fromBuilder.append("s.seller_name '直营商名称'");
 		fromBuilder.append(" FROM cc_sales_order so ");
@@ -780,7 +781,6 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller s ON s.id=so.seller_id ");
 		fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id = so.customer_id ");
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
-		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
 		fromBuilder.append(" WHERE sd.is_gift=0 and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
 		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
 		startDate=startDate+" 00:00:00";
@@ -795,11 +795,12 @@ public class SalesOrderQuery extends JBaseQuery {
 	//我部门的直营商详情赠品
 	public List<Record> findByMSellerDetailGift(String startDate, String endDate,
 			String keyword, String dataArea, String sellerId) {
-		List<SellerProduct> findBySellerId = SellerProductQuery.me().findBySellerId(sellerId);
+		List<Record> records = SellerProductQuery.me().findConvertRelate(sellerId);
 		StringBuilder fromBuilder=new StringBuilder("SELECT ");
-		for (SellerProduct sellerProduct : findBySellerId) {
-			String customName=sellerProduct.getCustomName();
-			fromBuilder.append("TRUNCATE((sum( CASE sp.custom_name WHEN '"+customName+"' THEN sd.product_count ELSE 0 END)/p.convert_relate),2)  '"+customName+"' ,");
+		for (Record record : records) {
+			String customName=record.getStr("custom_name");
+			String convertRelate = record.getStr("convert_relate");
+			fromBuilder.append("TRUNCATE((sum( CASE sp.custom_name WHEN '"+customName+"' THEN sd.product_count ELSE 0 END)/"+convertRelate+"),2)  '"+customName+"' ,");
 		}
 		fromBuilder.append("s.seller_name '直营商名称'");
 		fromBuilder.append(" FROM cc_sales_order so ");
@@ -809,7 +810,6 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller s ON s.id=so.seller_id ");
 		fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id = so.customer_id ");
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
-		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
 		fromBuilder.append(" WHERE sd.is_gift=1 and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
 		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
 		startDate=startDate+" 00:00:00";
@@ -824,11 +824,12 @@ public class SalesOrderQuery extends JBaseQuery {
 	//我部门的业务员详情
 	public List<Record> findByMSalesmanDetail(String startDate, String endDate,
 			String keyword, String dataArea, String sellerId) {
-		List<SellerProduct> findBySellerId = SellerProductQuery.me().findBySellerId(sellerId);
+		List<Record> records = SellerProductQuery.me().findConvertRelate(sellerId);
 		StringBuilder fromBuilder=new StringBuilder("SELECT ");
-		for (SellerProduct sellerProduct : findBySellerId) {
-			String customName=sellerProduct.getCustomName();
-			fromBuilder.append("TRUNCATE((sum( CASE sp.custom_name WHEN '"+customName+"' THEN sd.product_count ELSE 0 END)/p.convert_relate),2)  '"+customName+"' ,");
+		for (Record record : records) {
+			String customName=record.getStr("custom_name");
+			String convertRelate = record.getStr("convert_relate");
+			fromBuilder.append("TRUNCATE((sum( CASE sp.custom_name WHEN '"+customName+"' THEN sd.product_count ELSE 0 END)/"+convertRelate+"),2)  '"+customName+"' ,");
 		}
 		fromBuilder.append("u.realname '业务员名称'");
 		fromBuilder.append(" FROM cc_sales_order so ");
@@ -838,8 +839,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN `user` u ON u.id = so.biz_user_id ");
 		fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id = so.customer_id ");
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
-		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
-		fromBuilder.append(" WHERE sd.is_gift=0 and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
+		fromBuilder.append(" WHERE sd.is_gift=0 ");
 		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
 		startDate=startDate+" 00:00:00";
 		endDate=endDate+" 23:59:59";
@@ -853,11 +853,12 @@ public class SalesOrderQuery extends JBaseQuery {
 	//我部门的业务员详情赠品
 	public List<Record> findByMSalesmanDetailGift(String startDate, String endDate,
 			String keyword, String dataArea, String sellerId) {
-		List<SellerProduct> findBySellerId = SellerProductQuery.me().findBySellerId(sellerId);
+		List<Record> records = SellerProductQuery.me().findConvertRelate(sellerId);
 		StringBuilder fromBuilder=new StringBuilder("SELECT ");
-		for (SellerProduct sellerProduct : findBySellerId) {
-			String customName=sellerProduct.getCustomName();
-			fromBuilder.append("TRUNCATE((sum( CASE sp.custom_name WHEN '"+customName+"' THEN sd.product_count ELSE 0 END)/p.convert_relate),2)  '"+customName+"' ,");
+		for (Record record : records) {
+			String customName=record.getStr("custom_name");
+			String convertRelate = record.getStr("convert_relate");
+			fromBuilder.append("TRUNCATE((sum( CASE sp.custom_name WHEN '"+customName+"' THEN sd.product_count ELSE 0 END)/"+convertRelate+"),2)  '"+customName+"' ,");
 		}
 		fromBuilder.append("u.realname '业务员名称'");
 		fromBuilder.append(" FROM cc_sales_order so ");
@@ -867,8 +868,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN `user` u ON u.id = so.biz_user_id ");
 		fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id = so.customer_id ");
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
-		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
-		fromBuilder.append(" WHERE sd.is_gift=1 and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
+		fromBuilder.append(" WHERE sd.is_gift=1 ");
 		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
 		startDate=startDate+" 00:00:00";
 		endDate=endDate+" 23:59:59";
@@ -908,32 +908,32 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 	
 	//我客户的赠品详情
-		public List<Record> findByCustomerDetailGift(String startDate, String endDate, String keyword, String userId,
-				String sellerId) {
-			List<SellerProduct> findBySellerId = SellerProductQuery.me().findBySellerId(sellerId);
-			StringBuilder fromBuilder=new StringBuilder("SELECT ");
-			for (SellerProduct sellerProduct : findBySellerId) {
-				String customName=sellerProduct.getCustomName();
-				fromBuilder.append("TRUNCATE((sum( CASE sp.custom_name WHEN '"+customName+"' THEN sd.product_count ELSE 0 END)/p.convert_relate),2)  '"+customName+"' ,");
-			}
-			fromBuilder.append("c.customer_name '客户名称'");
-			fromBuilder.append(" FROM cc_sales_order so ");
-			fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id = sojo.order_id ");
-			fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id = sojo.outstock_id ");
-			fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id = so.customer_id ");
-			fromBuilder.append(" LEFT JOIN cc_sales_order_detail sd ON sd.order_id = so.id ");
-			fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id = sd.sell_product_id ");
-			fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
-			fromBuilder.append(" LEFT JOIN cc_customer c ON c.id = sc.customer_id ");
-			fromBuilder.append(" WHERE sd.is_gift=1 and so.biz_user_id ='"+userId+"'");
-			fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
-			startDate=startDate+" 00:00:00";
-			endDate=endDate+" 23:59:59";
-			fromBuilder.append(" AND "+ keyword+" >= '"+startDate+"'");
-			fromBuilder.append(" AND "+ keyword+" <= '"+endDate+"'");
-			fromBuilder.append(" GROUP BY c.id");
-			return Db.find(fromBuilder.toString());
+	public List<Record> findByCustomerDetailGift(String startDate, String endDate, String keyword, String userId,
+			String sellerId) {
+		List<SellerProduct> findBySellerId = SellerProductQuery.me().findBySellerId(sellerId);
+		StringBuilder fromBuilder=new StringBuilder("SELECT ");
+		for (SellerProduct sellerProduct : findBySellerId) {
+			String customName=sellerProduct.getCustomName();
+			fromBuilder.append("TRUNCATE((sum( CASE sp.custom_name WHEN '"+customName+"' THEN sd.product_count ELSE 0 END)/p.convert_relate),2)  '"+customName+"' ,");
 		}
+		fromBuilder.append("c.customer_name '客户名称'");
+		fromBuilder.append(" FROM cc_sales_order so ");
+		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id = sojo.order_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id = sojo.outstock_id ");
+		fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id = so.customer_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_order_detail sd ON sd.order_id = so.id ");
+		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id = sd.sell_product_id ");
+		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
+		fromBuilder.append(" LEFT JOIN cc_customer c ON c.id = sc.customer_id ");
+		fromBuilder.append(" WHERE sd.is_gift=1 and so.biz_user_id ='"+userId+"'");
+		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
+		startDate=startDate+" 00:00:00";
+		endDate=endDate+" 23:59:59";
+		fromBuilder.append(" AND "+ keyword+" >= '"+startDate+"'");
+		fromBuilder.append(" AND "+ keyword+" <= '"+endDate+"'");
+		fromBuilder.append(" GROUP BY c.id");
+		return Db.find(fromBuilder.toString());
+	}
 	
 	//统计今日订单量 销售额
 	public Record queryCountToDayOrders(String userId,String dataArea) {
