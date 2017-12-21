@@ -300,8 +300,8 @@
 			                    客户类型
 			                    <span class="require">*</span>
 			                </div>
-			                <input type="hidden" name="customerTypeIds" id="customerTypeIds" value="${(cTypeListStr)!}">
-			                <input type="text" id="customer_type" name="customer_type" data-values="${(cTypeList)!}" value="${(cTypeName)!}" placeholder="请选择" class="weui-input">
+			                <input type="hidden" name="customerTypeIds" id="customerTypeIds" value="${(sellerCustomer.cTypeList)!}">
+			                <input type="text" id="customer_type" name="customer_type" data-values="${(sellerCustomer.cTypeList)!}" value="${(sellerCustomer.cTypeName)!}" placeholder="请选择" class="weui-input">
 			            </div>
 			            <span class="weui-cell__ft"></span>
 			        </div>

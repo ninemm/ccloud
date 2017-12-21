@@ -46,9 +46,15 @@ public class SellerCustomerQuery extends JBaseQuery {
 						" select sc.*, c.customer_code, c.customer_name, c.contact, c.mobile");
 				sql.append(" , c.prov_name, c.city_name, c.country_name");
 				sql.append(" , c.prov_code, c.city_code, c.country_code, c.address");
+				sql.append(" , GROUP_CONCAT(ct.id) as cTypeList, GROUP_CONCAT(ct.name) as cTypeName");
+
 				sql.append(" from `cc_seller_customer` sc");
 				sql.append(" join `cc_customer` c on c.id = sc.customer_id");
-				sql.append(" WHERE sc.id = ? limit 1");
+				sql.append(" LEFT JOIN cc_customer_join_customer_type cjct ON cjct.seller_customer_id = sc.id");
+				sql.append(" LEFT JOIN cc_customer_type ct ON cjct.customer_type_id = ct.id");
+
+				sql.append(" WHERE sc.id = ? ");
+				sql.append(" GROUP BY sc.id limit 1");
 				return DAO.findFirst(sql.toString(), id);
 			}
 		});
