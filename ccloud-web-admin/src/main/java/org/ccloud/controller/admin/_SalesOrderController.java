@@ -111,6 +111,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 	public void add() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
 		String sellerId = getSessionAttr("sellerId");
 		if (user == null || StrKit.isBlank(sellerId)) {
 			// TODO
@@ -154,7 +155,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 			customerOptionList.add(customerOptionMap);
 		}
-		boolean isCheckStore = OptionQuery.me().findStoreCheck(Consts.OPTION_SELLER_STORE_CHECK, sellerId);
+		boolean isCheckStore = OptionQuery.me().findOptionValueToBoolean(Consts.OPTION_SELLER_STORE_CHECK + sellerCode, sellerId);
 		setAttr("isCheckStore", isCheckStore);
 		setAttr("productInfoMap", JSON.toJSON(productInfoMap));
 		setAttr("productOptionList", JSON.toJSON(productOptionList));
@@ -182,8 +183,8 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 		Map<String, String[]> paraMap = getParaMap();
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String sellerId = getSessionAttr("sellerId");
-		String sellerCode = getSessionAttr("sellerCode");
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
 
 		if (this.saveOrder(paraMap, user, sellerId, sellerCode)) {
 			renderAjaxResultForSuccess("保存成功");
@@ -219,7 +220,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
         			index++;
         			String productId = StringUtils.getArrayFirst(paraMap.get("productId" + index));
         			if (StrKit.notBlank(productId)) {
-        				if(!SalesOrderDetailQuery.me().insert(paraMap, orderId, sellerId, user.getId(), date,
+        				if(!SalesOrderDetailQuery.me().insert(paraMap, orderId, sellerId, sellerCode, user.getId(), date,
         						user.getDepartmentId(), user.getDataArea(), index)) {
         					return false;
         				}
@@ -227,16 +228,29 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
         			}
 
         		}
-				String proc_def_key = StringUtils.getArrayFirst(paraMap.get("proc_def_key"));
-				if (StrKit.notBlank(proc_def_key)) {
-					if (!start(orderId, StringUtils.getArrayFirst(paraMap.get("customerName")), proc_def_key)) {
-						return false;
-					}
-				}        		
+        		
+        		boolean isStartProc = OptionQuery.me().findOptionValueToBoolean(Consts.OPTION_SELLER_STORE_PROCEDURE_REVIEW + sellerCode
+        				, sellerId);
+        		if (isStartProc) {
+    				String proc_def_key = StringUtils.getArrayFirst(paraMap.get("proc_def_key"));
+    				if (StrKit.notBlank(proc_def_key)) {
+    					if (!start(orderId, StringUtils.getArrayFirst(paraMap.get("customerName")), proc_def_key)) {
+    						return false;
+    					}
+    				}        			
+        		} else {
+        			SalesOutstockQuery.me().pass(orderId, user.getId(), sellerId, sellerCode);
+        			sendOrderMessage(sellerId, StringUtils.getArrayFirst(paraMap.get("customerName")), "订单审核通过", user.getId(), user.getId(),
+        					user.getDepartmentId(), user.getDataArea());        			
+        		}
             	return true;
             }
         });
         return isSave;
+	}
+	
+	public void orderProc() {
+		
 	}
 	
 	@RequiresPermissions("/admin/salesOrder/check")

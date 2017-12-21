@@ -51,8 +51,10 @@ $(function() {
 		</div>
 	</header>
 	<div>
+		<@shiro.hasPermission name="/admin/customer/audit,/admin/salesOrder/check,/admin/customerVisit/audit">
 		<div class="weui-cells__title">我的待办</div>
 		<div class="weui-grids">
+			<@shiro.hasPermission name="/admin/customer/audit">
 			<a href="${CPATH}/todo/customer" class="weui-grid js_grid">
 			    <span class="weui-badge empty-badge">&nbsp;</span>
 				<div class="weui-grid__icon">
@@ -60,6 +62,7 @@ $(function() {
 				</div>
 				<p class="weui-grid__label">客户审核</p>
 			</a>
+			</@shiro.hasPermission>
 			
 			<@shiro.hasPermission name="/admin/salesOrder/check">
 			<a href="${CPATH}/todo/order" class="weui-grid js_grid">
@@ -79,9 +82,10 @@ $(function() {
 			</a>
 			</@shiro.hasPermission>
 		</div>
+		</@shiro.hasPermission>
+		<@shiro.hasPermission name="/admin/salesOrder,/admin/salesRefund,/admin/salesRefund/check,/admin/report/inventoryDetail">
 		<div class="weui-cells__title">我的订单</div>
 		<div class="weui-grids">
-			
 			<@shiro.hasPermission name="/admin/salesOrder">
 			<a href="${CPATH}/order/myOrder" class="weui-grid js_grid">
 				<div class="weui-grid__icon">
@@ -118,6 +122,7 @@ $(function() {
 			</a>
 			</@shiro.hasPermission>
 		</div>
+		</@shiro.hasPermission>
 		<!-- <div class="weui-cells__title">营销活动</div>
 		<div class="weui-grids">
 			<a href="./activityList.html" class="weui-grid js_grid"> <span
@@ -160,16 +165,15 @@ $(function() {
 				<p class="weui-grid__label">签到</p>
 			</a>
 		</div> -->
+		<@shiro.hasPermission name="/admin/customerVisit">
 		<div class="weui-cells__title">客户拜访</div>
 		<div class="weui-grids">
-			<@shiro.hasPermission name="/admin/customerVisit">
 			<a href="${(CPATH)}/customerVisit" class="weui-grid js_grid">
 				<div class="weui-grid__icon">
 					<i class="icon-building" style="color: #9c89b9"></i>
 				</div>
 				<p class="weui-grid__label">拜访记录</p>
 			</a> 
-			</@shiro.hasPermission>
 			
 			<a href="${CPATH}/customerVisit/edit" class="weui-grid js_grid">
 				<div class="weui-grid__icon">
@@ -178,6 +182,7 @@ $(function() {
 				<p class="weui-grid__label">新增拜访</p>
 			</a>
 		</div>
+		</@shiro.hasPermission>
 		<div class="weui-cells__title">售后服务</div>
 		<div class="weui-grids">
 			<a id="service_btn" class="weui-grid js_grid">

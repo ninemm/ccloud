@@ -63,7 +63,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 	}
 
 	@SuppressWarnings("unchecked")
-	public boolean insert(Map<String, String[]> paraMap, String orderId, String sellerId, String userId, Date date,
+	public boolean insert(Map<String, String[]> paraMap, String orderId, String sellerId, String sellerCode, String userId, Date date,
 			String deptId, String dataArea, int index) {
 		List<SalesOrderDetail> detailList = new ArrayList<>();
 		String convert = StringUtils.getArrayFirst(paraMap.get("convert" + index));
@@ -71,7 +71,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		String smallNum = StringUtils.getArrayFirst(paraMap.get("smallNum" + index));
 		Integer productCount = Integer.valueOf(bigNum) * Integer.valueOf(convert) + Integer.valueOf(smallNum);
 		String productId = StringUtils.getArrayFirst(paraMap.get("productId" + index));
-		Map<String, Object> result = this.getWarehouseId(productId, sellerId, productCount, Integer.parseInt(convert));
+		Map<String, Object> result = this.getWarehouseId(productId, sellerId, sellerCode, productCount, Integer.parseInt(convert));
 		String status = result.get("status").toString();
 		List<Map<String, String>> list = (List<Map<String, String>>) result.get("countList");
 		
@@ -118,10 +118,10 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		return true;
 	}
 	
-	private Map<String, Object> getWarehouseId(String productId, String sellerId, Integer productCount, Integer convert) {
+	private Map<String, Object> getWarehouseId(String productId, String sellerId, String sellerCode, Integer productCount, Integer convert) {
 		Map<String, Object> result = new HashMap<>();
 		List<Map<String, String>> countList = new ArrayList<>();
-		boolean isCheckStore = OptionQuery.me().findStoreCheck(Consts.OPTION_SELLER_STORE_CHECK, sellerId);
+		boolean isCheckStore = OptionQuery.me().findOptionValueToBoolean(Consts.OPTION_SELLER_STORE_CHECK + sellerCode, sellerId);
 
 		List<Record> list = InventoryQuery.me().findProductStore(sellerId, productId);
 		if (list.size() == 0) {
@@ -184,7 +184,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public boolean insertForApp(Map<String, String[]> paraMap, String orderId, String sellerId, String userId, Date date,
+	public boolean insertForApp(Map<String, String[]> paraMap, String orderId, String sellerId, String sellerCode, String userId, Date date,
 			String deptId, String dataArea, int index) {
 		List<SalesOrderDetail> detailList = new ArrayList<>();
 		String convert = paraMap.get("convert")[index];
@@ -192,7 +192,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		String smallNum = paraMap.get("smallNum")[index];
 		Integer productCount = Integer.valueOf(bigNum) * Integer.valueOf(convert) + Integer.valueOf(smallNum);
 		String productId = paraMap.get("productId")[index];
-		Map<String, Object> result = this.getWarehouseId(productId, sellerId, productCount, Integer.parseInt(convert));
+		Map<String, Object> result = this.getWarehouseId(productId, sellerId, sellerCode, productCount, Integer.parseInt(convert));
 		String status = result.get("status").toString();
 		List<Map<String, String>> list = (List<Map<String, String>>) result.get("countList");
 		
@@ -240,7 +240,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public boolean insertForAppGift(Map<String, String[]> paraMap, String orderId, String sellerId, String userId, Date date,
+	public boolean insertForAppGift(Map<String, String[]> paraMap, String orderId, String sellerId, String sellerCode, String userId, Date date,
 			String deptId, String dataArea, int index) {
 		List<SalesOrderDetail> detailList = new ArrayList<>();
 		String convert = paraMap.get("giftConvert")[index];
@@ -255,7 +255,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		}
 		
 		String productId = paraMap.get("giftProductId")[index];
-		Map<String, Object> result = this.getWarehouseId(productId, sellerId, productCount, Integer.parseInt(convert));
+		Map<String, Object> result = this.getWarehouseId(productId, sellerId, sellerCode, productCount, Integer.parseInt(convert));
 		String status = result.get("status").toString();
 		List<Map<String, String>> list = (List<Map<String, String>>) result.get("countList");
 		
@@ -306,14 +306,14 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public boolean insertForAppComposition(SellerProduct product, String orderId, String sellerId, String id,
+	public boolean insertForAppComposition(SellerProduct product, String orderId, String sellerId, String sellerCode, String id,
 			Date date, String deptId, String dataArea, Integer number) {
 		List<SalesOrderDetail> detailList = new ArrayList<>();
 		Integer convert = product.getInt("convert_relate");
 		Integer compositionCount = Integer.parseInt(product.getStr("productCount"));
 		Integer productCount = compositionCount * convert * number;
 		String productId = product.getProductId();
-		Map<String, Object> result = this.getWarehouseId(productId, sellerId, productCount, convert);
+		Map<String, Object> result = this.getWarehouseId(productId, sellerId, sellerCode, productCount, convert);
 		String status = result.get("status").toString();
 		List<Map<String, String>> list = (List<Map<String, String>>) result.get("countList");
 		
@@ -416,14 +416,14 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 	}
 
 	@SuppressWarnings("unchecked")
-	public boolean insertDetailByComposition(SellerProduct product, String orderId, String sellerId, String id,
+	public boolean insertDetailByComposition(SellerProduct product, String orderId, String sellerId, String sellerCode, String id,
 			Date date, String deptId, String dataArea, Integer index, Integer number) {
 		List<SalesOrderDetail> detailList = new ArrayList<>();
 		Integer convert = product.getInt("convert_relate");
 		Integer compositionCount = Integer.parseInt(product.getStr("productCount"));
 		Integer productCount = compositionCount * convert * number;
 		String productId = product.getProductId();
-		Map<String, Object> result = this.getWarehouseId(productId, sellerId, productCount, convert);
+		Map<String, Object> result = this.getWarehouseId(productId, sellerId, sellerCode, productCount, convert);
 		String status = result.get("status").toString();
 		List<Map<String, String>> list = (List<Map<String, String>>) result.get("countList");
 		

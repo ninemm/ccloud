@@ -12,6 +12,7 @@
 <div class="weui-content">
 	<div id="report" class="home"> 
 		<div class="company">业务报表</div>
+		<@shiro.hasPermission name="/report/userRank">
 		<div class="weui-cells__title">
             <div class="weui-flex">
                 <div class="weui-flex__item"><b>排行榜</b></div>
@@ -23,6 +24,8 @@
                 <p class="weui-grid__label">员工排行</p>
             </a>
         </div>
+        </@shiro.hasPermission>
+        <@shiro.hasPermission name="/report/userReport">
 		<div class="weui-cells__title">
 			<div class="weui-flex">
 				<div class="weui-flex__item"><b>业务员</b></div>
@@ -34,6 +37,8 @@
 			    <p class="weui-grid__label">销售报表</p>
 		    </a>
 		</div>
+		</@shiro.hasPermission>
+		<@shiro.hasPermission name="/report/userCharge">
 		<div class="weui-cells__title">
             <div class="weui-flex">
                 <div class="weui-flex__item"><b>业务主管</b></div>
@@ -49,6 +54,8 @@
                 <p class="weui-grid__label">销售排行</p>
             </a>
         </div>
+        </@shiro.hasPermission>
+        <@shiro.hasPermission name="/report/userManager">
         <div class="weui-cells__title">
             <div class="weui-flex">
                 <div class="weui-flex__item"><b>业务经理</b></div>
@@ -64,6 +71,8 @@
                 <p class="weui-grid__label">销售排行</p>
             </a>
         </div>
+        </@shiro.hasPermission>
+        <@shiro.hasPermission name="/report/brandManager">
         <div class="weui-cells__title">
             <div class="weui-flex">
                 <div class="weui-flex__item"><b>品牌经理</b></div>
@@ -79,6 +88,7 @@
                 <p class="weui-grid__label">销售排行</p>
             </a>
         </div>
+        </@shiro.hasPermission>
 	</div>
 	<#include "_inc/_footer_nav.html" />
 </div>

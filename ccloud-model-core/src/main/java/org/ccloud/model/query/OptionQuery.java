@@ -15,6 +15,7 @@
  */
 package org.ccloud.model.query;
 
+import org.ccloud.Consts;
 import org.ccloud.model.Option;
 import org.ccloud.utils.StringUtils;
 
@@ -142,9 +143,9 @@ public class OptionQuery extends JBaseQuery {
 		return "".equals(value) ? null : value;
 	}
 	
-	public boolean findStoreCheck(String key, String sellerId) {
+	public boolean findOptionValueToBoolean(String key, String sellerId) {
 		String result = this.findByKeyAndSellerId(key, sellerId);
-		if (result == null || result.equals("1")) {
+		if (result == null || result.equals(Consts.OPTION_ON)) {
 			return true;
 		}
 		return false;

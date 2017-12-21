@@ -23,6 +23,7 @@ import org.ccloud.model.SalesOrder;
 import org.ccloud.model.SellerProduct;
 import org.ccloud.model.User;
 import org.ccloud.model.query.CustomerTypeQuery;
+import org.ccloud.model.query.OptionQuery;
 import org.ccloud.model.query.OutstockPrintQuery;
 import org.ccloud.model.query.ReceivablesQuery;
 import org.ccloud.model.query.SalesOrderDetailQuery;
@@ -235,7 +236,7 @@ public class OrderController extends BaseFrontController {
 				if (sellProductIds != null && sellProductIds.length > 0) {
 					for (int index = 0; index < sellProductIds.length; index++) {
 						if (StrKit.notBlank(sellProductIds[index])) {
-							if (!SalesOrderDetailQuery.me().insertForApp(paraMap, orderId, sellerId, user.getId(), date,
+							if (!SalesOrderDetailQuery.me().insertForApp(paraMap, orderId, sellerId, sellerCode, user.getId(), date,
 									user.getDepartmentId(), user.getDataArea(), index)) {
 								return false;
 							}
@@ -249,7 +250,7 @@ public class OrderController extends BaseFrontController {
 				if (giftSellProductIds != null && giftSellProductIds.length > 0) {
 					for (int index = 0; index < giftSellProductIds.length; index++) {
 						if (StrKit.notBlank(giftSellProductIds[index])) {
-							if (!SalesOrderDetailQuery.me().insertForAppGift(paraMap, orderId, sellerId, user.getId(),
+							if (!SalesOrderDetailQuery.me().insertForAppGift(paraMap, orderId, sellerId, sellerCode, user.getId(),
 									date, user.getDepartmentId(), user.getDataArea(), index)) {
 								return false;
 							}
@@ -267,7 +268,7 @@ public class OrderController extends BaseFrontController {
 						String number = compositionNums[index];
 						List<SellerProduct> list = SellerProductQuery.me().findByCompositionId(productId);
 						for (SellerProduct sellerProduct : list) {
-							if (!SalesOrderDetailQuery.me().insertForAppComposition(sellerProduct, orderId, sellerId,
+							if (!SalesOrderDetailQuery.me().insertForAppComposition(sellerProduct, orderId, sellerId, sellerCode,
 									user.getId(), date, user.getDepartmentId(), user.getDataArea(),
 									Integer.parseInt(number))) {
 								return false;
@@ -275,12 +276,21 @@ public class OrderController extends BaseFrontController {
 						}
 					}
 				}
-				String proc_def_key = StringUtils.getArrayFirst(paraMap.get("proc_def_key"));
-				if (StrKit.notBlank(proc_def_key)) {
-					if (!start(orderId, StringUtils.getArrayFirst(paraMap.get("customerName")), proc_def_key)) {
-						return false;
-					}
-				}
+				
+        		boolean isStartProc = OptionQuery.me().findOptionValueToBoolean(Consts.OPTION_SELLER_STORE_PROCEDURE_REVIEW + sellerCode
+        				, sellerId);
+        		if (isStartProc) {
+    				String proc_def_key = StringUtils.getArrayFirst(paraMap.get("proc_def_key"));
+    				if (StrKit.notBlank(proc_def_key)) {
+    					if (!start(orderId, StringUtils.getArrayFirst(paraMap.get("customerName")), proc_def_key)) {
+    						return false;
+    					}
+    				}      			
+        		} else {
+        			SalesOutstockQuery.me().pass(orderId, user.getId(), sellerId, sellerCode);
+        			sendOrderMessage(sellerId, StringUtils.getArrayFirst(paraMap.get("customerName")), "订单审核通过", user.getId(), user.getId(),
+        					user.getDepartmentId(), user.getDataArea());        			
+        		}				
 
 				return true;
 			}
