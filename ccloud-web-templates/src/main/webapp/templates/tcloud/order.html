@@ -250,8 +250,8 @@ $(function() {
 				layer.closeAll();
 				if (data.errorCode == 0) {
 					removeItemBykey("productList");
+					removeItemBykey("compositionList");
 					removeItemBykey("customerInfo");
-					removeItemBykey("productCompositionList");
 					
 					$.confirm({
 						title: data.message,
