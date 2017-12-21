@@ -125,7 +125,7 @@
             type: 'post',
             success: function (result) {
                 var questionType = result.data;
-                strHtml = '<option selected="selected" value="">活动类型</option>';
+                strHtml = '<option selected="selected" value="">问题类型</option>';
                 for(index in questionType){
                     var row = questionType[index];
                     strHtml +='<option value="'+row.value+'">'+row.name+'</option>';
