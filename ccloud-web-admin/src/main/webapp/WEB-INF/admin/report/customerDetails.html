@@ -72,21 +72,24 @@
 		$('#post-search-input').val("so.create_date");
 		var startDate= $('#startDate').val();
 		var endDate= $('#endDate').val();
-		window.location.href="${CPATH}/admin/report/customerDetails?startDate="+startDate+"&endDate="+endDate+"&k=so.create_date&c=${c!}&p=${p!}"
+		var user_id= $('#user_id').val();
+		window.location.href="${CPATH}/admin/report/customerDetails?startDate="+startDate+"&endDate="+endDate+"&k=so.create_date&user_id="+user_id+"&c=${c!}&p=${p!}"
 	};
 	
 	function prints(){
 		$('#post-search-input').val("so.print_time");
 		var startDate= $('#startDate').val();
 		var endDate= $('#endDate').val();
-		window.location.href="${CPATH}/admin/report/customerDetails?startDate="+startDate+"&endDate="+endDate+"&k=so.print_time&c=${c!}&p=${p!}"
+		var user_id= $('#user_id').val();
+		window.location.href="${CPATH}/admin/report/customerDetails?startDate="+startDate+"&endDate="+endDate+"&k=so.print_time&user_id="+user_id+"&c=${c!}&p=${p!}"
 	};
 	
 	function complete(){
 		$('#post-search-input').val("sok.create_date");
 		var startDate= $('#startDate').val();
 		var endDate= $('#endDate').val();
-		window.location.href="${CPATH}/admin/report/customerDetails?startDate="+startDate+"&endDate="+endDate+"&k=sok.create_date&c=${c!}&p=${p!}"
+		var user_id= $('#user_id').val();
+		window.location.href="${CPATH}/admin/report/customerDetails?startDate="+startDate+"&endDate="+endDate+"&k=sok.create_date&user_id="+user_id+"&c=${c!}&p=${p!}"
 	};
 	var validatorFields = {
 		'startDate': {
@@ -120,6 +123,17 @@
 				<input onclick="orderTime()" class="btn btn-sm btn-primary" type="button" value="已下单查询">
 				<input onclick="prints()" class="btn btn-sm btn-primary" type="button" value="已打印查询">
 				<input onclick="complete()" class="btn btn-sm btn-primary" type="button" value="已出库查询">
+				
+				<label class="control-label">业务员:</label>
+				<div class="input-group col-md-2 col-sm-6">
+					<select class="form-control input-sm" name="user_id" id="user_id">
+						<option value="">--请选择--</option>
+						<#list (ulist)! as user >
+							<option value="${user.id}" <#if user.id == userId!>selected</#if> >${(user.realname)!}</option>
+						</#list>
+					</select>
+               	</div>
+	               	
 				<div class="form-group validata-box">
 					<label class="control-label">开始时间:</label>
 					<div class="form-group">
@@ -174,7 +188,7 @@
 						<tr>
 							<#if watchHead??>
 								<#list watchHead as bean>
-										<th style="text-align:center;min-width: 100px">${bean}</th>
+										<th style="text-align:center;min-width: 120px">${bean}</th>
 								</#list>
 							</#if>
 						</tr>
