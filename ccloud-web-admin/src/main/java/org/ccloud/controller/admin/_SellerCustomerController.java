@@ -26,6 +26,7 @@ import com.google.common.collect.Maps;
 import com.jfinal.kit.JsonKit;
 import com.jfinal.kit.Kv;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
@@ -105,7 +106,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			int length = list.size();
 			String[] userIds = new String[length];
 			String[] realnames = new String[length];
-			
+
 			for (int i = 0; i < length; i++) {
 				userIds[i] = list.get(i).getStr("user_id");
 				realnames[i] = list.get(i).getStr("realname");
@@ -129,7 +130,20 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 	public void enable() {
 
 		String id = getPara("id");
-//		int isEnabled = getParaToInt("isEnabled");
+		int isEnabled = getParaToInt("isEnabled");
+
+		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/all");
+		boolean isDealerAdmin = SecurityUtils.getSubject().isPermitted("/admin/dealer/all");
+
+		if(isDealerAdmin || isSuperAdmin) {
+			if(StrKit.notBlank(id)){
+				SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(id);
+				sellerCustomer.setIsEnabled(isEnabled);
+				if (sellerCustomer.saveOrUpdate()) renderAjaxResultForSuccess("操作成功");
+				else renderAjaxResultForError("操作失败");
+			}
+			return;
+		}
 
 		if(StrKit.notBlank(id)) {
 
@@ -150,6 +164,9 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 	@Before(Tx.class)
 	public void save() {
 
+		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/all");
+		boolean isDealerAdmin = SecurityUtils.getSubject().isPermitted("/admin/dealer/all");
+
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		Customer customer = getModel(Customer.class);
@@ -162,6 +179,77 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 
 		Map<String, Object> map = Maps.newHashMap();
 		boolean updated = true;
+
+		//当是经销商管理员修改时
+		if(isSuperAdmin || isDealerAdmin) {
+			Customer persiste = CustomerQuery.me().findByCustomerNameAndMobile(customer.getCustomerName(), customer.getMobile());
+
+			if (persiste != null) {
+				customer.setId(persiste.getId());
+			}
+			updated = customer.saveOrUpdate();
+
+			if (!updated) {
+				renderError(500);
+				return;
+			}
+
+			sellerCustomer.setSellerId(sellerId);
+			sellerCustomer.setCustomerId(customer.getId());
+			sellerCustomer.setIsEnabled(1);
+			sellerCustomer.setIsArchive(1);
+
+			sellerCustomer.setCustomerTypeIds(Joiner.on(",").join(Arrays.asList(customerTypes).iterator()));
+
+			String deptDataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea());
+			Department department = DepartmentQuery.me().findByDataArea(deptDataArea);
+			sellerCustomer.setDataArea(deptDataArea);
+			sellerCustomer.setDeptId(department.getId());
+
+			updated = sellerCustomer.saveOrUpdate();
+
+			if (!updated) {
+				renderError(500);
+				return;
+			}
+
+			String sellerCustomerId = sellerCustomer.getId();
+			CustomerJoinCustomerTypeQuery.me().deleteBySellerCustomerId(sellerCustomerId);
+
+			for (String custType : customerTypes) {
+				CustomerJoinCustomerType ccType = new CustomerJoinCustomerType();
+				ccType.setSellerCustomerId(sellerCustomerId);
+				ccType.setCustomerTypeId(custType);
+				ccType.save();
+			}
+
+			String _userIds = getPara("userIds");
+
+			if (StrKit.isBlank(_userIds)) {// 业务员修改时
+
+				UserJoinCustomerQuery.me().deleteBySelerCustomerIdAndUserId(sellerCustomerId, user.getId());
+				_userIds = user.getId();
+			} else {
+				UserJoinCustomerQuery.me().deleteBySelerCustomerId(sellerCustomerId);
+			}
+
+			String[] userIdArray = _userIds.split(",");
+
+			for (String userId : userIdArray) {
+
+				User persist = UserQuery.me().findById(userId);
+				UserJoinCustomer uCustomer = new UserJoinCustomer();
+
+				uCustomer.setSellerCustomerId(sellerCustomerId);
+				uCustomer.setUserId(userId);
+				uCustomer.setDeptId(persist.getDepartmentId());
+				uCustomer.setDataArea(persist.getDataArea());
+
+				uCustomer.save();
+			}
+			renderAjaxResultForSuccess("操作成功");
+			return;
+		}
 
 		if (sellerCustomer != null && StrKit.notBlank(sellerCustomer.getId())) {
 
@@ -239,6 +327,8 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		}
 
 		updated = startProcess(sellerCustomer.getId(), map, 0);
+
+
 
 		if (updated)
 			renderAjaxResultForSuccess("操作成功");
@@ -479,7 +569,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 
 	}
 
-	@RequiresPermissions(value = { "/admin/customer/audit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
+	@RequiresPermissions(value = { "/admin/customer/audit", "/admin/dealer/all" }, logical = Logical.OR)
 	public void audit() {
 		
 		keepPara();
@@ -575,12 +665,13 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			setAttr("diffAttrList", diffAttrList);
 		} else {
 			List<String> diffAttrList = new ArrayList<>();
-			diffAttrList.add("申请停用");
+			if(sellerCustomer.getIsEnabled() == 1) diffAttrList.add("申请停用");
+			else diffAttrList.add("申请启用");
 			setAttr("diffAttrList", diffAttrList);
 		}
 	}
 
-	@RequiresPermissions(value = { "/admin/customer/audit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
+	@RequiresPermissions(value = { "/admin/customer/audit", "/admin/dealer/all" }, logical = Logical.OR)
 	public void complete() {
 		
 		String taskId = getPara("taskId");
@@ -690,7 +781,8 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 				}
 
 			} else if(isEnable.equals("1")){
-				sellerCustomer.setIsEnabled(0);
+				if(sellerCustomer.getIsEnabled() == 1) sellerCustomer.setIsEnabled(0);
+				else sellerCustomer.setIsEnabled(1);
 				updated = sellerCustomer.saveOrUpdate();
 			}
 		}else {
