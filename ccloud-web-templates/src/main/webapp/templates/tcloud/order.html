@@ -278,8 +278,8 @@ $(function() {
 </#macro>
 
 <@layout>
-<body id="order">
-	<div class="weui-content">
+<div class="weui-content">
+	<div id="order">
 		<form action="${CPATH}/order/salesOrder" method="post" id="form">
 			<div class="weui-flex order-top-btns t-c ft14">
 				<div class="weui-flex__item border-right-1px choose-customer">
@@ -350,8 +350,8 @@ $(function() {
 				<section class="weui-panel weui-panel_access delivery-info">
 					<div class="weui-cell weui-cell_access">
 						<div class="weui-cell__bd">
-							配送时间
-							<input type="text" placeholder="请选择配送时间" class="weui-input" data-toggle='date' id="deliveryDate" name="deliveryDate" value="${deliveryDate!}" readonly>
+							<i class="icon-clock-o gray"></i> 配送时间
+							<input type="text" class="weui-input" data-toggle='date' id="deliveryDate" name="deliveryDate" value="${deliveryDate!}" readonly>
 							<span class="weui-cell__ft"></span>
 						</div>
 					</div>
@@ -465,5 +465,5 @@ $(function() {
 			</footer>
 		</form>
 	</div>
-</body>
+</div>
 </@layout>

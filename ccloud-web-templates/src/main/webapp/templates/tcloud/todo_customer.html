@@ -8,32 +8,43 @@
 	main{
 		top: 0!important;
 	}
+	
+    .weui-navbar__item.weui-bar__item--on {
+        color: #ea6f5a;
+        font-weight: bold;
+        background-color: #fff;
+    }
+    
+    .weui-navbar__item.weui-bar__item--on:before {
+        content: "";
+        width: 80px;
+        height: 3px;
+        background: #ea6f5a;
+        position: absolute;
+        left: 50%;
+        margin-left: -40px;
+        bottom: -1px;
+        z-index: 10;
+    }
+    
+    .weui-navbar:after {
+        border-bottom: 0;
+    }
+    
+    .weui-navbar__item:after {
+        border-right: 0;
+    }
 </#macro>
 <#macro script_import>
-	<script src="${CPATH}/static/layer_mobile/layer.js"></script>
 </#macro>
 <#macro script>
 	$(function() {
-	    $("#region").select({
-	        title: "选择客户区域",
-	        items: ["全部", "总部-默认区域"]
-	    });
-	    $("#customer-type").select({
-	        title: "选择客户类型",
-	        items: ["全部", "团购直销", "商超"]
-	    });
-	    $("#if-order").select({
-	        title: "是否下单",
-	        items: ["全部", "是", "否"]
-	    });
+	   
 	});
 
 	function doReject(url){
 
-		layer.open({
-			type: 2,
-			content: '保存中...'
-		});
+		Utils.openLoadingWin('处理中...');
 		$.get(url ,
 			function(res){
 				if (res.errorCode == 0) {
@@ -50,16 +61,13 @@
 				} else {
 					$.alert(res.message);
 				}
-				layer.closeAll();
+				Utils.closeLoadingWin();
 			}
 		)
 	};
 
 	function doSubmit(url) {
-		layer.open({
-			type: 2,
-			content: '保存中...'
-		});
+		Utils.openLoadingWin('处理中...');
 		$.get(url ,
 			function(res){
 				if (res.errorCode == 0) {
@@ -85,44 +93,93 @@
 
 <@layout>
 
-<div id="customer-audit">
-    <main>
-        <#if todoList ??>
-        <#list todoList as customer>
-		<div class="weui-panel weui-panel_access">
-			<div class="weui-cell weui-cell_access">
-			    <a href="${CPATH}/customer/review?id=${customer.id}&taskId=${customer.taskId!}&assignee=${customer.assignee}"> 
-				<div class="weui-cell__bd ft16">
-					<p class="customer_name">${(customer.customer_name)!}</p>
-					<div class="ft14 gray">
-						<p>联系人：${(customer.contact)!} / ${(customer.mobile)!}</p>
-						<p>客户类型：终端</p>
-						<p>配送地址：${(customer.prov_name)!} ${(customer.city_name)!} ${(customer.country_name)!} ${(customer.address)!}</p>
-						<p>
-							<i class="icon-map-pin ft16 green"></i>&nbsp;&nbsp; ${(customer.location)!}
-						</p>
-					</div>
-				</div>
-				</a>
-			</div>
-			<div class="weui-cell weui-cell_access">
-				<a class="weui-cell__bd weui-cell_link" href="${CPATH}/customer/review?id=${customer.id}&taskId=${customer.taskId!}&assignee=${customer.assignee}">变更详情</a>
-				<span class="weui-cell__ft">${(customer.createTime?string('yyyy-MM-dd HH:mm'))!}</span>
-			</div>
-			<div class="weui-cell weui-cell_access">
-				<div class="operate-btn width-100 ft14">
-					<div class="button white-button fl" onclick="doReject('${CPATH}/customer/complete?id=${(customer.id)!}&taskId=${(customer.taskId)}&status=0')">拒绝</div>
-					<div class="button red-button fr" onclick="doSubmit('${CPATH}/customer/complete?id=${(customer.id)!}&taskId=${(customer.taskId)}&status=1')">同意</div>
-				</div>
-			</div>
-		</div>
-		</#list>
-			<#else>
-				<div class="weui-loadmore weui-loadmore_line">
-					<span class="weui-loadmore__tips">暂无数据</span>
-				</div>
-		</#if>
-	</main>
+<div id="weui-content">
+    <div class="weui-tab">
+        <div class="weui-navbar">
+            <a class="weui-navbar__item weui-bar__item--on" href="#tab1" type="todo">待审</a>
+            <a class="weui-navbar__item" href="#tab2" type="done">已审 </a>
+        </div>
+        <div class="weui-tab__bd">
+            <div id="tab1" class="infinite weui-tab__bd-item weui-tab__bd-item--active">
+                <main>
+			        <#if todoList ??>
+			        <#list todoList as customer>
+			        <div class="weui-panel weui-panel_access">
+			            <div class="weui-cell weui-cell_access">
+			                <a href="${CPATH}/customer/review?id=${customer.id}&taskId=${customer.taskId!}&assignee=${customer.assignee}"> 
+			                <div class="weui-cell__bd ft16">
+			                    <p class="customer_name">${(customer.customer_name)!}</p>
+			                    <div class="ft14 gray">
+			                        <p>联系人：${(customer.contact)!} / ${(customer.mobile)!}</p>
+			                        <p>客户类型：终端</p>
+			                        <p>配送地址：${(customer.prov_name)!} ${(customer.city_name)!} ${(customer.country_name)!} ${(customer.address)!}</p>
+			                        <p>
+			                            <i class="icon-map-pin ft16 green"></i> ${(customer.location)!}
+			                        </p>
+			                    </div>
+			                </div>
+			                </a>
+			            </div>
+			            <div class="weui-cell weui-cell_access">
+			                <a class="weui-cell__bd weui-cell_link" href="${CPATH}/customer/review?id=${customer.id}&taskId=${customer.taskId!}&assignee=${customer.assignee}">变更详情</a>
+			                <span class="weui-cell__ft">${(customer.createTime?string('yyyy-MM-dd HH:mm'))!}</span>
+			            </div>
+			            <div class="weui-cell weui-cell_access">
+			                <div class="operate-btn width-100 ft14">
+			                    <div class="button white-button fl" onclick="doReject('${CPATH}/customer/complete?id=${(customer.id)!}&taskId=${(customer.taskId)}&status=0')">拒绝</div>
+			                    <div class="button red-button fr" onclick="doSubmit('${CPATH}/customer/complete?id=${(customer.id)!}&taskId=${(customer.taskId)}&status=1')">同意</div>
+			                </div>
+			            </div>
+			        </div>
+			        </#list>
+			        <#else>
+		            <div class="weui-loadmore weui-loadmore_line">
+		                <span class="weui-loadmore__tips">暂无数据</span>
+		            </div>
+			        </#if>
+			    </main>
+            </div>
+            <div id="tab2" class="infinite weui-tab__bd-item weui-tab__bd-item--active">
+                <main>
+                    <#if todoList ??>
+                    <#list todoList as customer>
+                    <div class="weui-panel weui-panel_access">
+                        <div class="weui-cell weui-cell_access">
+                            <a href="${CPATH}/customer/review?id=${customer.id}&taskId=${customer.taskId!}&assignee=${customer.assignee}"> 
+                            <div class="weui-cell__bd ft16">
+                                <p class="customer_name">${(customer.customer_name)!}</p>
+                                <div class="ft14 gray">
+                                    <p>联系人：${(customer.contact)!} / ${(customer.mobile)!}</p>
+                                    <p>客户类型：终端</p>
+                                    <p>配送地址：${(customer.prov_name)!} ${(customer.city_name)!} ${(customer.country_name)!} ${(customer.address)!}</p>
+                                    <p>
+                                        <i class="icon-map-pin ft16 green"></i>&nbsp;&nbsp; ${(customer.location)!}
+                                    </p>
+                                </div>
+                            </div>
+                            </a>
+                        </div>
+                        <div class="weui-cell weui-cell_access">
+                            <a class="weui-cell__bd weui-cell_link" href="${CPATH}/customer/review?id=${customer.id}&taskId=${customer.taskId!}&assignee=${customer.assignee}">变更详情</a>
+                            <span class="weui-cell__ft">${(customer.createTime?string('yyyy-MM-dd HH:mm'))!}</span>
+                        </div>
+                        <div class="weui-cell weui-cell_access">
+                            <div class="operate-btn width-100 ft14">
+                                <div class="button white-button fl" onclick="doReject('${CPATH}/customer/complete?id=${(customer.id)!}&taskId=${(customer.taskId)}&status=0')">拒绝</div>
+                                <div class="button red-button fr" onclick="doSubmit('${CPATH}/customer/complete?id=${(customer.id)!}&taskId=${(customer.taskId)}&status=1')">同意</div>
+                            </div>
+                        </div>
+                    </div>
+                    </#list>
+                    <#else>
+                        <div class="weui-loadmore weui-loadmore_line">
+                            <span class="weui-loadmore__tips">暂无数据</span>
+                        </div>
+                    </#if>
+                </main>
+            </div>
+        </div>
+    </div>    
     <#include "_inc/_goback.html" />
 </div>
 </@layout>

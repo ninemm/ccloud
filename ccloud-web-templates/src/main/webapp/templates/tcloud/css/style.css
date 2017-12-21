@@ -320,6 +320,10 @@ a {
   margin-right: 0.75rem;
 }
 
+.mg10-0{
+	margin: .5rem 0;
+}
+
 .button {
 	border: 0;
   border-radius: 0.2rem;
@@ -711,7 +715,7 @@ a {
 }
 
 .menu:nth-child(2) {
-  margin-left: 1.25rem;
+  margin-left: 1rem;
 }
 
 /* 产品页 */

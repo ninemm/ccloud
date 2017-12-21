@@ -296,7 +296,7 @@ public class WorkFlowService {
 	 */
 	public List<Record> getHisTaskList(String insid) {
 		return Db
-				.find("SELECT t.assignee_,	u.name,	t.name_,t.end_time_,c.message_ FROM	sys_user u ,act_hi_taskinst t LEFT JOIN act_hi_comment c ON t.id_ = c.task_id_ where t.end_time_ IS NOT NULL AND u.username=t.ASSIGNEE_ AND t.proc_inst_id_ = '"
+				.find("SELECT t.assignee_,	u.realname,	t.name_,t.end_time_,c.message_ FROM	sys_user u ,act_hi_taskinst t LEFT JOIN act_hi_comment c ON t.id_ = c.task_id_ where t.end_time_ IS NOT NULL AND u.username=t.ASSIGNEE_ AND t.proc_inst_id_ = '"
 						+ insid + "' ");
 	}
 
@@ -305,8 +305,18 @@ public class WorkFlowService {
 	 */
 	public List<Record> getHisTaskParter(String insid) {
 		
-		String sql = "select i.*, u.name from act_hi_identitylink i, user u where u.username = i.USER_ID_ AND PROC_INST_ID_= ?";
+		String sql = "select i.*, u.realname, u.username from act_hi_identitylink i, user u where u.username = i.USER_ID_ AND PROC_INST_ID_= ?";
 		return Db.find(sql, insid);
+	}
+	
+	public List<Record> getHisProcessList(String procKey, String username) {
+		
+		StringBuilder sql = new StringBuilder("SELECT c.* ");
+		sql.append("FROM cc_seller_customer c ");
+		sql.append("LEFT JOIN act_hi_actinst i on c.proc_inst_id = i.PROC_INST_ID_ ");
+		sql.append("LEFT JOIN act_re_procdef p on p.ID_ = i.PROC_DEF_ID_ ");
+		sql.append("WHERE p.KEY_ = ? and locate(?, ASSIGNEE_) > 0 AND i.DURATION_ is not null");
+		return Db.find(sql.toString(), procKey, username);
 	}
 	
 	/**
