@@ -125,7 +125,7 @@
 	};
 	
 	function doSubmit(){
-		var l = Ladda.create( document.querySelector( '#do_Submit' ) );
+		var l = Ladda.create( document.querySelector( '#do_submit' ) );
 		$("#areaCodes").val($city.data('citypicker').getCode());
 		$("#areaNames").val($city.data('citypicker').getVal());
 	
@@ -155,7 +155,7 @@
 					toastr.success(data.message, '操作成功');
 					setTimeout( function(){
 						location.href = '${CPATH}/admin/seller/index';
-								}, 2 * 1000 );
+								}, 1 * 1000 );
 				} else {
 					toastr.error(data.message,'操作失败');
 				}
@@ -303,7 +303,7 @@
 						</div>
 					</div>
 		<div class="box-footer"> 
-			<button type="button" id="do_Submit" onclick="doSubmit()" class="btn btn-primary ladda-button" data-style="expand-right">保存更改</button>
+			<button type="button" id="do_submit" onclick="doSubmit()" class="btn btn-primary ladda-button" data-style="expand-right">保存更改</button>
 			<input type="button" class="btn btn-primary" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
 		</div>
 		</form>

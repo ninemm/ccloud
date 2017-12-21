@@ -205,7 +205,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 					sellerProducts = SellerProductQuery.me().findBySellerId(getSessionAttr("sellerId").toString());
 				}
 				for(SellerProduct sellerProduct : sellerProducts){
-					this.saveProduct(sellerProduct, sellerId);
+					this.saveProduct(sellerProduct, seller2.getId());
 				}
 			}
 			if(department.getDeptLevel()==2){
