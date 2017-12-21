@@ -239,19 +239,10 @@ public class CustomerController extends BaseFrontController {
 		String id = getPara("sellerCustomerId");
 		
 		if (StrKit.notBlank(id)) {
-			String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+
 			SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(id);
-			String dealerDataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(selectDataArea);
-			List<String> typeList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeIdListBySellerCustomerId(id, dealerDataArea + "%");
-
-			List<String> typeName = new ArrayList<>();
-			for(String type : typeList)
-				typeName.add(CustomerTypeQuery.me().findById(type).getStr("name"));
-
 			setAttr("sellerCustomer", sellerCustomer);
-			setAttr("cTypeList",typeList);
-			setAttr("cTypeListStr", Joiner.on(",").join(typeList.iterator()));
-			setAttr("cTypeName", Joiner.on(",").join(typeName.iterator()));
+
 		}
 		
 		setAttr("customerType", JSON.toJSONString(getCustomerType()));
