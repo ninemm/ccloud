@@ -1447,7 +1447,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 
 	public List<Record> sellerProductCount(String startDate, String endDate, String dayTag, String productType,
-			String sellerId, String isGift, String dataArea) {
+			String sellerId, String isGift, String customerId, String dataArea) {
 		if (dayTag != null) {
 			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
 			startDate = date[0];
@@ -1469,6 +1469,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, " c.data_area", dataArea, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, " c.seller_id", sellerId, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, " gt.id", productType, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, " c.customer_id", customerId, params, needWhere);
 		
 		if (needWhere) {
 			fromBuilder.append(" where c.status not in (1001,1002) ");
@@ -1500,7 +1501,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 
 	public Record sellerOrderAmount(String startDate, String endDate, String dayTag, String customerType,
-			String sellerId, String dataArea) {
+			String sellerId, String purchase, String customerId, String dataArea) {
 		if (dayTag != null) {
 			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
 			startDate = date[0];
@@ -1508,12 +1509,18 @@ public class SalesOrderQuery extends JBaseQuery {
 		}
 		LinkedList<Object> params = new LinkedList<Object>();
 		StringBuilder fromBuilder = new StringBuilder("SELECT IFNULL(SUM(cc.total_count),0) as productCount, IFNULL(SUM(cc.total_amount),0) as totalAmount, count(*) as orderCount FROM cc_sales_order cc ");
-		fromBuilder.append("LEFT JOIN cc_customer_type ct on cc.customer_type_id = ct.id ");		
+		fromBuilder.append("LEFT JOIN cc_customer_type ct on cc.customer_type_id = ct.id ");
+		fromBuilder.append("LEFT JOIN cc_seller_customer cs on cc.customer_id = cs.id ");
+		fromBuilder.append("LEFT JOIN cc_customer cu on cs.customer_id = cu.id ");		
 		
 		boolean needWhere = true;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, " cc.data_area", dataArea, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, " cc.seller_id", sellerId, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "cc.customer_type_id", customerType, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, " cc.customer_id", customerId, params, needWhere);
+		if (StrKit.notBlank(purchase)) {
+			needWhere = appendIfNotEmpty(fromBuilder, "cs.customer_kind", Consts.CUSTOMER_KIND_SELLER, params, needWhere);
+		}
 		
 		if (needWhere) {
 			fromBuilder.append(" where cc.status not in (1001,1002)");
@@ -1547,5 +1554,87 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" where so.id = ? ");
 
 		return Db.findFirst(fromBuilder.toString(), id);
+	}
+
+	public List<Record> getSellerPurchase(String startDate, String endDate, String dayTag, String sellerId,
+			String dataArea) {
+		if (dayTag != null) {
+			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
+			startDate = date[0];
+			endDate = date[1];
+		}
+		LinkedList<Object> params = new LinkedList<Object>();
+		StringBuilder fromBuilder = new StringBuilder("SELECT IFNULL(SUM(cc.total_count),0) as productCount ,IFNULL(sum(cc.total_amount),0) as totalAmount, ");
+		fromBuilder.append("COUNT(cc.id) as orderCount, cu.customer_name ,cc.customer_id FROM cc_sales_order cc ");
+		fromBuilder.append("LEFT JOIN cc_seller_customer cs on cc.customer_id = cs.id ");
+		fromBuilder.append("LEFT JOIN cc_customer cu on cs.customer_id = cu.id ");
+		boolean needWhere = true;
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, " cc.data_area", dataArea, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, " cs.customer_kind", Consts.CUSTOMER_KIND_SELLER, params, needWhere);
+		if (needWhere) {
+			fromBuilder.append(" where cc.status not in (1001,1002) ");
+		} else {
+			fromBuilder.append(" and cc.status not in (1001,1002) ");
+		}
+
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and cc.create_date >= ? ");
+			params.add(startDate);
+		}
+
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and cc.create_date <= ? ");
+			params.add(endDate);
+		}
+		fromBuilder.append("GROUP BY cc.customer_id ");
+		fromBuilder.append("ORDER BY totalAmount desc ");
+		
+		if (params.isEmpty())
+			return Db.find(fromBuilder.toString());
+
+		return Db.find(fromBuilder.toString(), params.toArray());
+	}
+
+	public List<Record> getSellerPurchaseGift(String startDate, String endDate, String dayTag, String sellerId,
+			String dataArea) {
+		if (dayTag != null) {
+			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
+			startDate = date[0];
+			endDate = date[1];
+		}
+		LinkedList<Object> params = new LinkedList<Object>();
+		StringBuilder fromBuilder = new StringBuilder("SELECT IFNULL(SUM(cc.product_amount),0) as totalAmount, IFNULL(SUM(cc.product_count/cp.convert_relate),0) as productCount, ");
+		fromBuilder.append("COUNT(*) as orderCount, cu.customer_name, c.customer_id FROM cc_sales_order_detail cc ");
+		fromBuilder.append("LEFT JOIN cc_seller_product cs on cc.sell_product_id = cs.id ");
+		fromBuilder.append("LEFT JOIN cc_product cp on cp.id = cs.product_id ");
+		fromBuilder.append("LEFT JOIN cc_sales_order c on c.id = cc.order_id ");
+		fromBuilder.append("LEFT JOIN cc_seller_customer csc on c.customer_id = csc.id ");
+		fromBuilder.append("LEFT JOIN cc_customer cu on csc.customer_id = cu.id ");		
+		
+		boolean needWhere = true;
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, " c.data_area", dataArea, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, " csc.customer_kind", Consts.CUSTOMER_KIND_SELLER, params, needWhere);
+		
+		if (needWhere) {
+			fromBuilder.append(" where c.status not in (1001,1002) and cc.is_gift = 1 ");
+		} else {
+			fromBuilder.append(" and c.status not in (1001,1002) and cc.is_gift = 1 ");
+		}
+		
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and cc.create_date >= ? ");
+			params.add(startDate);
+		}
+
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and cc.create_date <= ? ");
+			params.add(endDate);
+		}
+		fromBuilder.append("GROUP BY c.customer_id ");
+		fromBuilder.append("ORDER BY totalAmount desc ");
+		if (params.isEmpty())
+			return Db.find(fromBuilder.toString());
+
+		return Db.find(fromBuilder.toString(), params.toArray());
 	}
 }
