@@ -45,7 +45,7 @@ public class ReceivablesQuery extends JBaseQuery {
 		});
 	}
 
-	public Page<Receivables> paginate(int pageNumber, int pageSize, String id,String type,String seller_id,String dataArea,String deptId) {
+	public Page<Receivables> paginate(int pageNumber, int pageSize, String id,String type,String seller_id,String dataArea) {
 		
 		Boolean b = true;
 		String select;
@@ -69,7 +69,7 @@ public class ReceivablesQuery extends JBaseQuery {
 		}
 		LinkedList<Object> params = new LinkedList<Object>();
 		appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, b);
-		fromBuilder.append(" and r.dept_id = '"+deptId+"' ORDER BY r.create_date DESC");
+		fromBuilder.append(" ORDER BY r.create_date DESC");
 		
 		
 		if (params.isEmpty())

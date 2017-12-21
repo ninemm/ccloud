@@ -84,7 +84,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
         	status = StringUtils.urlDecode(status);
         	setAttr("status", status);
 		}
-        Page<CustomerVisit> page = CustomerVisitQuery.me().paginate(getPageNumber(), getPageSize(), keyword, selectDataArea, customerType, questionType, "id", "create_date", status);
+        Page<CustomerVisit> page = CustomerVisitQuery.me().paginate(getPageNumber(), getPageSize(), keyword, selectDataArea, customerType, questionType, "id", "cc_v.create_date desc", status);
         Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);
 	}
