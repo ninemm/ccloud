@@ -58,7 +58,7 @@ public class PayablesQuery extends JBaseQuery {
 		Db.update(sqlBuilder.toString());
 	}
 	
-    public Page<Payables> paginate(int pageNumber, int pageSize, String id,String type,String seller_id,String dataArea) {
+    public Page<Payables> paginate(int pageNumber, int pageSize, String id,String type,String seller_id,String dataArea,String deptId) {
 		Boolean b = true;
 		String select;
 		StringBuilder fromBuilder;
@@ -80,7 +80,7 @@ public class PayablesQuery extends JBaseQuery {
 		}
 		LinkedList<Object> params = new LinkedList<Object>();
 		appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, b);
-		fromBuilder.append(" ORDER BY r.create_date DESC");
+		fromBuilder.append(" and r.dept_id = '"+deptId+"' ORDER BY r.create_date DESC");
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 

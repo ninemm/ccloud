@@ -76,7 +76,7 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String deptDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		Page<Payables> page = PayablesQuery.me().paginate(getPageNumber(),getPageSize(),customerTypeId,type,user.getId(),deptDataArea);
+		Page<Payables> page = PayablesQuery.me().paginate(getPageNumber(),getPageSize(),customerTypeId,type,user.getId(),deptDataArea,user.getDepartmentId());
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(),"rows", page.getList());
 		
 		renderJson(map);
