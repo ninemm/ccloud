@@ -114,8 +114,8 @@
 					
 					<@shiro.hasPermission name="/admin/salesOrder/check">
 					if (row.status == 0) {
-						strHtml = strHtml + '<a class="btn btn-xs bg-olive btn-flat" onclick="pass(\''+row.id+'\')" >通过</a> ';
-						strHtml = strHtml + '<a class="btn btn-xs btn-warning btn-flat" onclick="reject(\''+row.id+'\')" >取消</a> ';
+						/*strHtml = strHtml + '<a class="btn btn-xs bg-olive btn-flat" onclick="pass(\''+row.id+'\')" >通过</a> ';
+						strHtml = strHtml + '<a class="btn btn-xs btn-warning btn-flat" onclick="reject(\''+row.id+'\')" >取消</a> ';*/
 					}
 					</@shiro.hasPermission>			
                     /*strHtml = strHtml + '<a class="btn btn-xs btn-warning btn-flat" onclick="proc(\''+row.id+'\')" >proc</a> ';
