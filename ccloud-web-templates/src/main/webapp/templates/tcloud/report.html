@@ -1,15 +1,6 @@
 <#include "_inc/_layout.html"/>
 
 <#macro css>
-    .home { 
-        font-size: 0.7rem;
-        position: absolute;
-        top: 0;
-        width: 100%;
-        bottom: 50px;
-        overflow: auto;
-        -webkit-overflow-scrolling: touch;
-    }
     
     .home .weui-panel__hd:after {
         left: 0;
@@ -19,7 +10,7 @@
 
 <@layout>
 <div class="weui-content">
-	<div id="home" class="home"> 
+	<div id="report" class="home"> 
 		<div class="company">业务报表</div>
 		<div class="weui-cells__title">
             <div class="weui-flex">
@@ -88,7 +79,7 @@
                 <p class="weui-grid__label">销售排行</p>
             </a>
         </div>
-		<#include "_inc/_footer_nav.html" />
 	</div>
+	<#include "_inc/_footer_nav.html" />
 </div>
 </@layout>

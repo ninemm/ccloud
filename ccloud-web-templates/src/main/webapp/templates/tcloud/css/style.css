@@ -551,7 +551,7 @@ a {
 #home,
 #product,
 #customer,
-#statistics,
+#report,
 #my {
   font-size: 0.7rem;
   position: absolute;
@@ -567,16 +567,18 @@ a {
 }
 
 #home .weui-grid,
+#report .weui-grid,
 #my .weui-grid {
   width: 25%;
 }
 
 #home i,
+#report i,
 #my i {
   font-size: 1.5rem;
 }
 
-#home {
+#home, #report {
   overflow: auto;
   -webkit-overflow-scrolling: touch;
 }
@@ -1191,7 +1193,7 @@ input.street-value {
 .order-top-btns {
   height: 2rem;
   line-height: 2rem;
-  border-bottom: 1px solid #bbb;
+  border-bottom: 1px solid #f3f5f7;
   background: #fff;
   box-sizing: border-box;
 }
