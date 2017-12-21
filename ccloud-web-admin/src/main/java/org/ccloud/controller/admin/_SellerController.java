@@ -195,9 +195,6 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				
 				//添加直营商客户
 				this.saveSellerCustomer(customer.getId(), user, department);
-				
-				
-				
 				//初始化直营商产品
 				List<SellerProduct> sellerProducts = new ArrayList<SellerProduct>();
 				if(user.getUsername().equals("admin")){
@@ -208,7 +205,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 					sellerProducts = SellerProductQuery.me().findBySellerId(getSessionAttr("sellerId").toString());
 				}
 				for(SellerProduct sellerProduct : sellerProducts){
-					this.saveProduct(sellerProduct, sellerId);
+					this.saveProduct(sellerProduct, seller2.getId());
 				}
 			}
 			if(department.getDeptLevel()==2){
