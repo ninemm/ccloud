@@ -2,6 +2,8 @@ package org.ccloud.front.controller;
 
 import java.util.List;
 
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.CustomerVisit;
@@ -27,6 +29,8 @@ public class TodoController extends BaseFrontController {
 		render("todo_customer.html");
 	}
 	
+	//订单审核
+	@RequiresPermissions(value = { "/admin/salesOrder/check", "/admin/dealer/all" }, logical = Logical.OR)
 	public void order() {
 
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
@@ -37,7 +41,9 @@ public class TodoController extends BaseFrontController {
 		setAttr("username", username);
 		render("todo_order.html");
 	}
-	
+
+	//拜访审核
+	@RequiresPermissions(value = { "/admin/customerVisit/audit", "/admin/dealer/all" }, logical = Logical.OR)
 	public void visit() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String username = user.getUsername();

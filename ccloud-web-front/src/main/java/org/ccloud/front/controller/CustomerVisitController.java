@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.message.Actions;
@@ -47,6 +49,8 @@ import com.jfinal.plugin.activerecord.tx.Tx;
 @RouterMapping(url = "/customerVisit")
 public class CustomerVisitController extends BaseFrontController {
 	
+	//库存详情
+	@RequiresPermissions(value = { "/admin/customerVisit", "/admin/dealer/all" }, logical = Logical.OR)
 	public void index() {
 		
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);

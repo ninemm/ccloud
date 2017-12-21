@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.GoodsType;
@@ -28,6 +30,8 @@ public class InventoryController extends BaseFrontController {
 		render("inventory.html");
 	}
 	
+	//库存详情
+	@RequiresPermissions(value = { "/admin/report/inventoryDetail", "/admin/dealer/all" }, logical = Logical.OR)
 	public void inventory() {
 		String sellerId = getPara("sellerId");
 		String selDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);

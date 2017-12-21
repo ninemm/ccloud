@@ -10,6 +10,8 @@ import java.util.Map;
 
 import org.activiti.engine.task.Comment;
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.message.Actions;
@@ -51,7 +53,9 @@ import com.jfinal.plugin.activerecord.tx.Tx;
  */
 @RouterMapping(url = "/order")
 public class OrderController extends BaseFrontController {
-
+	
+	//我的订单
+	@RequiresPermissions(value = { "/admin/salesOrder", "/admin/dealer/all" }, logical = Logical.OR)
 	public void myOrder() {
 		
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
