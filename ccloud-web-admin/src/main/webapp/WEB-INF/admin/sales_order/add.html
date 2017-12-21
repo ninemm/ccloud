@@ -211,6 +211,7 @@
 
 		$("#contact").val(customer.contact);
 		$("#mobile").val(customer.mobile);
+		$("#customerName").val(customer.customer_name);
 
 		var address = customer.prov_name + customer.city_name + customer.country_name + " " + customer.address
 		$("#address").val(address);
@@ -222,15 +223,16 @@
 			function(data){
 				var $customerTypeSelect = $("#customerType");
 				$customerTypeSelect.empty();
-
+				var proc_def_key = "";
 				$.each(data, function(index, obj){
-					if (index == 0 && obj.factor != null) {
-						discount = obj.factor;
-					} else {
-						discount = 1;
-					}
 					$customerTypeSelect.append("<option value='" + obj.id + "'>" + obj.name + "</option>");
-					customerTypeCodeMap[obj.id] = obj.code;
+					customerTypeCodeMap[obj.id] = {
+							id : obj.id,
+							name : obj.name,
+							code : obj.code,
+							factor : obj.factor,
+							proc_def_key : obj.proc_def_key
+						}
 				});
 
 				$customerTypeSelect.change(function(){
@@ -238,11 +240,6 @@
 				});
 
 				customerTypeChange($customerTypeSelect);
-				if (discount == 1) {
-					$("#discount").val('无');
-				} else {
-					$("#discount").val(discount);
-				}
 				totalF();
 			}
 		);
@@ -250,7 +247,19 @@
 	}
 	
 	function customerTypeChange(obj){
-		$("#customerTypeCode").val(customerTypeCodeMap[obj.val()]);
+		$("#customerTypeCode").val(customerTypeCodeMap[obj.val()].code);
+		$("#proc_def_key").val(customerTypeCodeMap[obj.val()].proc_def_key);
+		var priceoff = customerTypeCodeMap[obj.val()].factor;
+		if (priceoff != null) {
+			discount = priceoff;
+		} else {
+			discount = 1;
+		}		
+		if (discount == 1) {
+			$("#discount").val('无');
+		} else {
+			$("#discount").val(discount);
+		}		
 	}
 	
 	function changeBigPrice(obj){
@@ -512,6 +521,7 @@
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">*客户名称:</label>
 						<div class="input-group col-md-4 col-sm-10">
+							<input type="hidden" id="customerName" name="customerName" value="" >
 							<select id="customerId" name="customerId" class="form-control">
 							</select>
 						</div>
@@ -531,7 +541,8 @@
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">*客户类型:</label>
 						<div class="input-group col-md-4 col-sm-10">
-							<input  type="hidden" id="customerTypeCode" name="customerTypeCode" value="" >
+							<input type="hidden" id="proc_def_key" name="proc_def_key" value="" >
+							<input type="hidden" id="customerTypeCode" name="customerTypeCode" value="" >
 							<select id="customerType" name="customerType" class="form-control">
 							</select>
 						</div>

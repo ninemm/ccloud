@@ -48,6 +48,7 @@ public class ReportController extends BaseFrontController {
 		render("report_sales.html");
 	}
 	
+	//业务员订单总额统计
 	public void orderAmount() {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
@@ -61,6 +62,7 @@ public class ReportController extends BaseFrontController {
 		renderJson(record);
 	}
 	
+	//业务员订单状态统计
 	public void orderTypeCount() {
 		String dayTag = "today";
 		String sellerId = getSessionAttr("sellerId");
@@ -69,6 +71,7 @@ public class ReportController extends BaseFrontController {
 		renderJson(record);
 	}
 	
+	//业务员客户统计
 	public void customerCount() {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");	
@@ -80,6 +83,7 @@ public class ReportController extends BaseFrontController {
 		renderJson(record);
 	}
 	
+	//业务员产品种类统计
 	public void productCount() {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");	
@@ -93,6 +97,7 @@ public class ReportController extends BaseFrontController {
 		renderJson(record);
 	}
 	
+	//业务员产品总额统计
 	public void productAmount() {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");	
@@ -104,6 +109,7 @@ public class ReportController extends BaseFrontController {
 		renderJson(record);
 	}	
 	
+	//业务员退货统计
 	public void refundCount() {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");	
@@ -163,6 +169,14 @@ public class ReportController extends BaseFrontController {
 		render("user_rank.html");
 	}
 	
+	public void purchase() {
+		render("purchase.html");
+	}
+	
+	public void mySeller() {
+		render("mySeller.html");
+	}	
+	
 	public void managerReport() {
 		render("manager_report.html");
 	}
@@ -189,8 +203,21 @@ public class ReportController extends BaseFrontController {
 		}		
 		setAttr("sellerId", sellerId);
 		render("seller_report.html");
-	}	
+	}
 	
+	public void sellerPurchaseReport() {
+		String customerId = getPara("customerId");
+		String sellerName = getPara("sellerName");
+        try {
+			setAttr("sellerName", new String(sellerName.getBytes("ISO-8859-1"),"UTF-8"));
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}		
+		setAttr("customerId", customerId);
+		render("seller_purchase_report.html");
+	}		
+	
+	//经销商下或部门下业务员排行榜
 	public void getUserRank() {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
@@ -203,6 +230,7 @@ public class ReportController extends BaseFrontController {
 		renderJson(record);
 	}
 	
+	//经销商或部门下业务员赠品统计
 	public void getGiftCountByUser() {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
@@ -215,6 +243,7 @@ public class ReportController extends BaseFrontController {
 		renderJson(record);
 	}
 	
+	//经销商下直营商赠品统计
 	public void getGiftCountBySeller() {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
@@ -224,6 +253,7 @@ public class ReportController extends BaseFrontController {
 		renderJson(record);
 	}	
 	
+	//经销商下直营商总额统计
 	public void getSellerCount() {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
@@ -234,6 +264,7 @@ public class ReportController extends BaseFrontController {
 		renderJson(record);
 	}
 	
+	//直营商产品统计
 	public void sellerProductCount() {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");	
@@ -242,10 +273,12 @@ public class ReportController extends BaseFrontController {
 		String productType = getPara("productType");
 		String isGift = getPara("isGift");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		List<Record> record = SalesOrderQuery.me().sellerProductCount(startDate, endDate, dayTag, productType, sellerId, isGift, dataArea);
+		String customerId = getPara("customerId");
+		List<Record> record = SalesOrderQuery.me().sellerProductCount(startDate, endDate, dayTag, productType, sellerId, isGift, customerId, dataArea);
 		renderJson(record);
 	}
 	
+	//直营商订单总额统计
 	public void sellerOrderAmount() {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
@@ -253,8 +286,32 @@ public class ReportController extends BaseFrontController {
 		String sellerId = getPara("sellerId");
 		String customerType = getPara("customerType");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		Record record = SalesOrderQuery.me().sellerOrderAmount(startDate, endDate, dayTag, customerType, sellerId, dataArea);
+		String purchase = getPara("purchase");
+		String customerId = getPara("customerId");
+		Record record = SalesOrderQuery.me().sellerOrderAmount(startDate, endDate, dayTag, customerType, sellerId, purchase, customerId, dataArea);
 		renderJson(record);
-	}	
+	}
+	
+	//直营商采购单统计
+	public void getSellerPurchase() {
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String dayTag = getPara("dayTag");
+		String sellerId = getSessionAttr("sellerId");
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		List<Record> record = SalesOrderQuery.me().getSellerPurchase(startDate, endDate, dayTag, sellerId, dataArea);
+		renderJson(record);
+	}
+	
+	//直营商采购单赠品统计
+	public void getSellerPurchaseGift() {
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String dayTag = getPara("dayTag");
+		String sellerId = getSessionAttr("sellerId");
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		List<Record> record = SalesOrderQuery.me().getSellerPurchaseGift(startDate, endDate, dayTag, sellerId, dataArea);
+		renderJson(record);
+	}
 	
 }

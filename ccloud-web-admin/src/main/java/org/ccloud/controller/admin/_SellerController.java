@@ -37,6 +37,7 @@ import org.ccloud.model.Customer;
 import org.ccloud.model.CustomerJoinCustomerType;
 import org.ccloud.model.CustomerType;
 import org.ccloud.model.Department;
+import org.ccloud.model.GoodsType;
 import org.ccloud.model.Group;
 import org.ccloud.model.GroupRoleRel;
 import org.ccloud.model.Option;
@@ -52,6 +53,7 @@ import org.ccloud.model.UserJoinCustomer;
 import org.ccloud.model.query.BrandQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.DepartmentQuery;
+import org.ccloud.model.query.GoodsTypeQuery;
 import org.ccloud.model.query.GroupQuery;
 import org.ccloud.model.query.ProductQuery;
 import org.ccloud.model.query.RoleOperationRelQuery;
@@ -107,6 +109,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			Seller seller = SellerQuery.me().findById(id);
 			setAttr("seller", seller);
 		}
+		
 	}
 	
 	//保存销售商信息及对应的表
@@ -133,6 +136,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		final Customer customer = getModel(Customer.class);
 		String address = getPara("address");
 		String brandList =getPara("brandList");
+		String productType = getPara("productTypeList");
 		String sellerId = seller.getId();
 		String areaCodes = getPara("areaCodes");
 		String areaNames = getPara("areaNames");
@@ -167,7 +171,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				return;
 			}
 			
-			Seller seller2 = this.saveSeller(seller, department, user);
+			Seller seller2 = this.saveSeller(seller, department, user,productType);
 
 			this.saveOption(seller2.getId());
 			
@@ -221,7 +225,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				this.saveOther(department);
 			}
 		} else {
-			this.updateSeller(seller, department, user);
+			this.updateSeller(seller, department, user,productType);
 			SellerBrandQuery.me().deleteBySellertId(sellerId);
 			for(int i=0;i<brandIds.length;i++){
 				String sellerBrandId = StrKit.getRandomUUID();
@@ -264,6 +268,41 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 					} else {
 						map.put("isvalid", 0);
 					}
+				}
+			} else {
+				map.put("isvalid", 0);
+			}
+			list.add(map);
+		}
+		renderJson(list);
+	}
+	
+	//产品类型
+	public void getGoodsType(){
+		String id = getPara("id");
+		List<GoodsType> goodsTypes = GoodsTypeQuery.me().findAll();
+		List<Map<String, Object>> list = new ArrayList<>();
+		for (GoodsType goodsType : goodsTypes) {
+			if (goodsType.getId().equals("")) {
+				continue;
+			}
+			Map<String, Object> map = new HashMap<>();
+			map.put("id", goodsType.getId());
+			map.put("name",goodsType.getName());
+			if (!StringUtils.isBlank(id)) {
+				String gTs = SellerQuery.me().findById(id).getProductTypeStore();
+				if(gTs!= null){
+					String[] goodsTypeIds = gTs.split(",");
+					for (int i = 0, len = goodsTypeIds.length; i < len; i++) {
+						if(goodsType.getId().equals(goodsTypeIds[i])){
+							map.put("isvalid", 1);
+							break;
+						} else {
+							map.put("isvalid", 0);
+						}
+					}
+				}else{
+					map.put("isvalid", 0);
 				}
 			} else {
 				map.put("isvalid", 0);
@@ -500,7 +539,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		renderJson(sellerProduct);
 	}
 	
-	public Seller saveSeller(Seller seller,Department department,User user){
+	public Seller saveSeller(Seller seller,Department department,User user,String productTypes){
 		
 		List<Seller> list = SellerQuery.me().findAll();
 		int s = list.size();
@@ -523,7 +562,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		seller.set("market_code", seller.getMarketCode());
 		seller.set("jywx_open_id", seller.getJywxOpenId());
 		seller.set("jpwx_open_id", seller.getJpwxOpenId());
-		seller.set("product_type_store", seller.getProductTypeStore());
+		seller.set("product_type_store", productTypes);
 		seller.set("remark", seller.getRemark());
 		seller.set("create_date", new Date());
 		seller.set("modify_user_id", user.getId());
@@ -558,7 +597,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		sellerBrand.save();
 	}
 	
-	public void updateSeller(Seller seller,Department department,User user){
+	public void updateSeller(Seller seller,Department department,User user,String productTypes){
 		seller.set("dept_id",department.getId());
 		seller.set("seller_name",seller.getSellerName());
 		seller.set("contact", seller.getContact());
@@ -568,7 +607,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		seller.set("market_code", seller.getMarketCode());
 		seller.set("jywx_open_id", seller.getJywxOpenId());
 		seller.set("jpwx_open_id", seller.getJpwxOpenId());
-		seller.set("product_type_store", seller.getProductTypeStore());
+		seller.set("product_type_store", productTypes);
 		seller.set("remark", seller.getRemark());
 		seller.set("modify_user_id", user.getId());
 		seller.set("is_inited", 1);

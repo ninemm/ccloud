@@ -36,14 +36,14 @@
 		"dayTag":  'today',
 		"startDate": startDate,
 		"endDate" : endDate,
-		"userId": '${(userId)!}'
+		"customerId": '${(customerId)!}'
 	}
 	var params2 = {
 		"dayTag":  'today',
 		"startDate": startDate,
 		"endDate" : endDate,
-		"userId": '${(userId)!}',
-		"isGift": 'true'
+		"isGift": 'true',
+		"customerId": '${(customerId)!}'
 	}	  
  	orderAmount(params);
  	productCount(params);
@@ -51,7 +51,7 @@
   })
   
     function orderAmount(params) {
-		Utils.ajax('${CPATH}/report/orderAmount', params, 
+		Utils.ajax('${CPATH}/report/sellerOrderAmount', params, 
 			function(data){
 				$("#productCount").html(data.productCount+"件/");
 				$("#totalCount").html(data.orderCount+"笔");
@@ -61,10 +61,10 @@
     }
     
     function productCount(params) {
-		Utils.ajax('${CPATH}/report/productCount', params, 
+		Utils.ajax('${CPATH}/report/sellerProductCount', params, 
 			function(data){
 				var height = data.length;
-				$("#userCount").height(50 * height + 100);
+				$("#userCount").height(60 * height + 100);			
 		        var product = document.getElementById('userCount');
 		        var productChart = echarts.init(product);
 	            var productOption = {
@@ -131,7 +131,7 @@
     }
     
     function giftCount(params) {
-		Utils.ajax('${CPATH}/report/productCount', params, 
+		Utils.ajax('${CPATH}/report/sellerProductCount', params, 
 			function(data){
 				var height = data.length;
 				$("#giftCount").height(60 * height + 100);			
@@ -213,12 +213,12 @@
 		var params = {
     		"startDate": $(obj).val(),
 			"endDate": $(obj).parent().find('#endDay').val(),
-			"userId": '${(userId)!}'
+			"sellerId": '${(sellerId)!}'
 		}
 		var params2 = {
     		"startDate": $(obj).val(),
 			"endDate": $(obj).parent().find('#endDay').val(),
-			"userId": '${(userId)!}',
+			"sellerId": '${(sellerId)!}',
 			"isGift": 'true'
 		}		
 		urlSelect(params,params2,type); 
@@ -228,12 +228,12 @@
 		var params = {
     		"startDate": $(obj).parent().find('#startDay').val(),
 			"endDate": $(obj).val(),
-			"userId": '${(userId)!}'
+			"sellerId": '${(sellerId)!}'
 		}
 		var params2 = {
     		"startDate": $(obj).val(),
 			"endDate": $(obj).parent().find('#endDay').val(),
-			"userId": '${(userId)!}',
+			"sellerId": '${(sellerId)!}',
 			"isGift": 'true'
 		}		
 		urlSelect(params,params2,type); 
@@ -246,11 +246,11 @@
           onClick: function () {
 			var params = {
 				"dayTag": 'today',
-				"userId": '${(userId)!}'
+				"sellerId": '${(sellerId)!}'
 			}
 			var params2 = {
 				"dayTag": 'today',
-				"userId": '${(userId)!}',
+				"sellerId": '${(sellerId)!}',
 				"isGift": 'true'
 			}			
 			urlSelect(params,params2,type); 
@@ -261,11 +261,11 @@
           onClick: function () {
 			var params = {
 				"dayTag": 'yesterday',
-				"userId": '${(userId)!}'
+				"sellerId": '${(sellerId)!}'
 			}
 			var params2 = {
 				"dayTag": 'yesterday',
-				"userId": '${(userId)!}',
+				"sellerId": '${(sellerId)!}',
 				"isGift": 'true'
 			}			
           	urlSelect(params,params2,type); 
@@ -276,11 +276,11 @@
           onClick: function () {
 			var params = {
 				"dayTag": 'week',
-				"userId": '${(userId)!}'
+				"sellerId": '${(sellerId)!}'
 			}
 			var params2 = {
 				"dayTag": 'week',
-				"userId": '${(userId)!}',
+				"sellerId": '${(sellerId)!}',
 				"isGift": 'true'
 			}			
 			urlSelect(params,params2,type); 			
@@ -291,11 +291,11 @@
           onClick: function () {
 			var params = {
 				"dayTag": 'lastweek',
-				"userId": '${(userId)!}'
+				"sellerId": '${(sellerId)!}'
 			}
 			var params2 = {
 				"dayTag": 'lastweek',
-				"userId": '${(userId)!}',
+				"sellerId": '${(sellerId)!}',
 				"isGift": 'true'
 			}			
 			urlSelect(params,params2,type); 
@@ -306,11 +306,11 @@
           onClick: function () {
 			var params = {
 				"dayTag": 'month',
-				"userId": '${(userId)!}'
+				"sellerId": '${(sellerId)!}'
 			}     
 			var params2 = {
 				"dayTag": 'month',
-				"userId": '${(userId)!}',
+				"sellerId": '${(sellerId)!}',
 				"isGift": 'true'
 			}			
 			urlSelect(params,params2,type);     
@@ -321,11 +321,11 @@
           onClick: function () {
 			var params = {
 				"dayTag": 'lastmonth',
-				"userId": '${(userId)!}'
+				"sellerId": '${(sellerId)!}'
 			}         
 			var params2 = {
 				"dayTag": 'lastmonth',
-				"userId": '${(userId)!}',
+				"sellerId": '${(sellerId)!}',
 				"isGift": 'true'
 			}			
 			urlSelect(params,params2,type); 			
@@ -340,7 +340,7 @@
 	<div class="report">
 		<div class="weui-panel weui-panel_access report-header">
 			<div class="weui-panel__hd">
-				<span class="overview-hd-title">${userName!}销售简报</span> <span class="briefly" onclick="dayTagSelect(this,'order')">
+				<span class="overview-hd-title">${sellerName!}采购简报</span> <span class="briefly" onclick="dayTagSelect(this,'order')">
 					<p class="dayTagText">今日</p>
 					<i class="icon-angle-down"></i>
 				</span> 
@@ -352,7 +352,7 @@
 				<div class="weui-flex overview-block">
 					<div class="weui-flex__item">
 						<div class="overview-title">
-							<img src="${CTPATH}/images/order.png"> <span>订单总数</span>
+							<img src="${CTPATH}/images/order.png"> <span>采购订单总数</span>
 						</div>
 						<div class="t-c">
 							<strong id="productCount"></strong> <small id="totalCount"></small>
@@ -360,7 +360,7 @@
 					</div>
 					<div class="weui-flex__item">
 						<div class="overview-title">
-							<img src="${CTPATH}/images/money.png"> <span>订单金额</span>
+							<img src="${CTPATH}/images/money.png"> <span>采购订单金额</span>
 						</div>
 						<div class="t-c">
 							<strong id="totalAmount"></strong>
