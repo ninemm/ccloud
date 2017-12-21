@@ -1,7 +1,10 @@
 <#include "_inc/_layout.html"/>
 <#macro css>
-    
+
 </#macro>
+<#macro script_import>
+	<script type='text/javascript' src="${CTPATH}/js/shopping-cart.js"></script>
+</#macro>  
 
 <#macro script>
 $(function() {
@@ -22,15 +25,33 @@ $(function() {
     }).on("input", "#searchInput", function () {
     	keyword = $(this).val();
 		initProduct();
+		
     }).on("touchstart", "#searchCancel", function () {
     	keyword = $(this).val();
 		initProduct();
+		
     }).on("touchstart", "#shoppingCart", function () {
     	save()
+    	
     }).on("touchend", ".operate:first-child", function () { //减少商品数量
-      calTotal($(this));
+      productChange($(this));
+
+      //calTotal($(this));
+      
     }).on("touchend", ".operate:last-child", function () { //增加商品数量
-      calTotal($(this));
+      productChange($(this));
+      
+      //calTotal($(this));
+      
+    }).on('touchend', '#confirm-input', function () {
+      var val = parseFloat($currentInput.val());
+      if(val < 0 || val == ""){
+        $currentInput.val(0);
+      }else{
+        $currentInput.val(val);
+      }
+      productChange($currentInput);
+    
     }).on("touchend", ".product-top .weui-cell__ft, #productName", function () {
 		layer.open({
 		  type: 1,
@@ -69,7 +90,7 @@ function initProduct(){
 				}
 
 				var $type = $menuRight.find(".type:last");
-				$type.append("<section class='product_detail weui-panel weui-panel_access common'>" + newHtml + "</section>");
+				$type.append("<section class='product_detail weui-panel weui-panel_access common' id='" + el.sell_product_id + "'>" + newHtml + "</section>");
 				var $newProductDetail = $type.find(".common:last");
 				$newProductDetail.find("#productName").text(el.custom_name);
 				$newProductDetail.find("#valueName").text(el.valueName);
@@ -91,13 +112,24 @@ function initProduct(){
 				$newProductDetail.find("#sellProductId").val(el.sell_product_id);
 				$newProductDetail.find("#productId").val(el.product_id);
 				$newProductDetail.find("#convert").val(el.convert_relate);
-
+				
 			});
 			
 		initProductComposition();
+		productNum();
 		}
 	);
 	
+}
+
+function productNum(){
+	var productList = getItemBykey("productList") == undefined ? [] : getItemBykey("productList");
+		$.each(productList, function(index, el){
+			var $newProductDetail =$("#" + el.sellProductId);
+			$newProductDetail.find("#bigNum").val(el.bigNum);
+			$newProductDetail.find("#smallNum").val(el.smallNum);
+			$newProductDetail.find("#isGift").val(el.isGift);
+		});
 }
 
 var compositionHtml = $(".composition").eq(0).html();
@@ -115,7 +147,7 @@ function initProductComposition(){
 					parentId = el.parent_id;
 
 					var $type = $menuRight.find(".type:last");
-					$type.append("<section class='product_detail weui-panel weui-panel_access composition'>" + compositionHtml + "</section>");
+					$type.append("<section class='product_detail weui-panel weui-panel_access composition' id='" + el.id  + "' >" + compositionHtml + "</section>");
 					var $newProductDetail = $type.find(".composition:last");
 					$newProductDetail.find("#compositionName").text(el.name);
 					
@@ -132,8 +164,17 @@ function initProductComposition(){
 				}
 
 			});
+			compositionNum();
 		}
 	);
+}
+
+function compositionNum(){
+	var compositionList = getItemBykey("compositionList") == undefined ? [] : getItemBykey("compositionList");
+		$.each(compositionList, function(index, el){
+			var $newProductDetail =$("#" + el.compositionId);
+			$newProductDetail.find("#compositionNum").val(el.compositionNum);
+		});
 }
 
 function calTotal($this) {
@@ -151,95 +192,91 @@ function calTotal($this) {
   
 }
 
-function save(){
-	var productList = [];
-	var $product = $(".common");
-	$.each($product, function(index, el) {
-		$el = $(el);
-		var sellProductId = $el.find("#sellProductId").val();
-		var bigNum = $el.find("#bigNum").val();
-		var smallNum = $el.find("#smallNum").val();
+function productChange(obj){
+      var $el = obj.parents(".common");
+      if($el.length > 0){
+      	var product = getProduct($el);
+      	cart.changeProduct(product);
+      }else{
+        var $co = obj.parents(".composition");
+        if($co.length > 0){
+          var composition = getComposition($co);
+          cart.changeComposition(composition);
+        }
+      }
+}
+
+function getProduct($el){
+	return product = {
+		productName : $el.find("#productName").text(),
+		valueName : $el.find("#valueName").text(),
 		
-		if(bigNum > 0 || smallNum > 0){
-			productList.push({
-				productName : $el.find("#productName").text(),
-				valueName : $el.find("#valueName").text(),
-				
-				bigPriceSpan : $el.find("#bigPriceSpan").text(),
-				smallPriceSpan : $el.find("#smallPriceSpan").text(),
-				bigUnitSpan : $el.find("#bigUnitSpan").text(),
-				smallUnitSpan : $el.find("#smallUnitSpan").text(),
-				stock : $el.find("#stock").text(),
-				
-				bigPrice : $el.find("#bigPrice").val(),
-				smallPrice : $el.find("#smallPrice").val(),
-				bigUnit : $el.find("#bigUnit").val(),
-				smallUnit : $el.find("#smallUnit").val(),
-				sellProductId : sellProductId,
-				productId : $el.find("#productId").val(),
-				convert : $el.find("#convert").val(),
-
-				bigNum : bigNum,
-				smallNum : smallNum,
-				isGift : 0
-			});
-			//子商品
-			productList.push({
-				productName : "",
-				valueName : "",
-				
-				bigPriceSpan : "",
-				smallPriceSpan : "",
-				bigUnitSpan : "",
-				smallUnitSpan : "",
-				stock : "",
-				
-				bigPrice : "",
-				smallPrice : "",
-				bigUnit : "",
-				smallUnit : "",
-				sellProductId : "",
-				productId : "",
-				convert : "",
-
-				bigNum : "",
-				smallNum : "",
-				isGift : 1
-			});
-		}
-	});
-	
-	setItemBykey("productList",productList);
-	
-	//组合商品
-	var productCompositionList = [];
-	var $composition = $(".composition");
-	
-	$.each($composition, function(index, el) {
-		$el = $(el);
-		var compositionId = $el.find("#compositionId").val();
-		var compositionNum = $el.find("#compositionNum").val();
+		bigPriceSpan : $el.find("#bigPriceSpan").text(),
+		smallPriceSpan : $el.find("#smallPriceSpan").text(),
+		bigUnitSpan : $el.find("#bigUnitSpan").text(),
+		smallUnitSpan : $el.find("#smallUnitSpan").text(),
+		stock : $el.find("#stock").text(),
 		
-		if(compositionNum > 0){
-			productCompositionList.push({
-				compositionName : $el.find("#compositionName").text(),
-				
-				compositionPriceSpan : $el.find("#compositionPriceSpan").text(),
-				stock : $el.find("#stock").text(),
-				
-				compositionPrice : $el.find("#compositionPrice").val(),
-				compositionId : compositionId,
+		bigPrice : $el.find("#bigPrice").val(),
+		smallPrice : $el.find("#smallPrice").val(),
+		bigUnit : $el.find("#bigUnit").val(),
+		smallUnit : $el.find("#smallUnit").val(),
+		sellProductId : $el.find("#sellProductId").val(),
+		productId : $el.find("#productId").val(),
+		convert : $el.find("#convert").val(),
 
-				compositionNum : compositionNum,
-				
-				compositionValueName : $el.find("#compositionValueName").text()
-			});
-		}
-	});
+		bigNum : $el.find("#bigNum").val(),
+		smallNum : $el.find("#smallNum").val(),
+		isGift : $el.find("#isGift").val(),
+		
+		subProduct : [{
+			productName : "",
+			valueName : "",
+					
+			bigPriceSpan : "",
+			smallPriceSpan : "",
+			bigUnitSpan : "",
+			smallUnitSpan : "",
+			stock : "",
+			
+			bigPrice : "",
+			smallPrice : "",
+			bigUnit : "",
+			smallUnit : "",
+			sellProductId : "",
+			productId : "",
+			convert : "",
 	
-	setItemBykey("productCompositionList", productCompositionList);
+			bigNum : "",
+			smallNum : "",
+			isGift : 1
+		}]
+	}
+}
+
+function getComposition($el){
+	return composition = {
+		compositionName : $el.find("#compositionName").text(),
+		
+		compositionPriceSpan : $el.find("#compositionPriceSpan").text(),
+		stock : $el.find("#stock").text(),
+		
+		compositionPrice : $el.find("#compositionPrice").val(),
+		compositionId : $el.find("#compositionId").val(),
+
+		compositionNum : $el.find("#compositionNum").val(),
+		
+		compositionValueName : $el.find("#compositionValueName").text()
+	}
+}
+
+
+function save(){	
+
+	var productList = getItemBykey("productList") == undefined ? [] : getItemBykey("productList");
+	var compositionList = getItemBykey("compositionList") == undefined ? [] : getItemBykey("compositionList");
 	
-	if(productList.length == 0 && productCompositionList.length == 0) {
+	if(productList.length == 0 && compositionList.length == 0) {
 		toastr.warning("你还没有选择商品!"); 
 		return;
 	}
@@ -293,6 +330,7 @@ function save(){
 						<input type="hidden" id="smallPrice" value="">
 						<input type="hidden" id="bigUnit" value="">
 						<input type="hidden" id="smallUnit" value="">
+						<input type="hidden" id="isGift" value="0">
 						<div class="product-top">
 							<img src="${CTPATH}/images/jp.jpg" style="width:2rem;">
 							<div class="weui-cell_access product-top-right">
@@ -362,7 +400,7 @@ function save(){
 								</div>
 							</div>
 						</div>
-						<div id="stock">库存：0件</div>
+						<div id="stock"></div>
 					</div>
 					<hr>
 					<div id="gift">

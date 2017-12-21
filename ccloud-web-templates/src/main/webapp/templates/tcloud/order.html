@@ -101,63 +101,62 @@ $(function() {
 	function initProduct(){
 		var productList = getItemBykey("productList");
 		$.each(productList, function(index, el) {
-			if(index % 2 == 0) {
-				$product.append("<div class='weui-panel weui-panel_access goods-detail common'>" + newHtml + "</div>");
-				var $newProductDetail = $product.find(".common:last");
-				$newProductDetail.find("#productName").text(el.productName);
-				$newProductDetail.find("#valueName").text(el.valueName);
-		
-				$newProductDetail.find("#bigPriceSpan").text(el.bigPriceSpan);
-				$newProductDetail.find("#smallPriceSpan").text(el.smallPriceSpan);
-				$newProductDetail.find("#bigUnitSpan").text(el.bigUnitSpan);
-				$newProductDetail.find("#smallUnitSpan").text(el.smallUnitSpan);
-		
-				$newProductDetail.find("#bigPrice").val(el.bigPrice);
-				$newProductDetail.find("#smallPrice").val(el.smallPrice);
-				$newProductDetail.find("#bigUnit").val(el.bigUnit);
-				$newProductDetail.find("#smallUnit").val(el.smallUnit);
-				$newProductDetail.find("#sellProductId").val(el.sellProductId);
-				$newProductDetail.find("#productId").val(el.productId);
-				$newProductDetail.find("#convert").val(el.convert);
-				
-				$newProductDetail.find("#bigNum").val(el.bigNum);
-				$newProductDetail.find("#smallNum").val(el.smallNum);
-
-				$newProductDetail.find("#isGift").val(el.smallNum);
-
-				$newProductDetail.find("#isGift").val(el.isGift);
-				if(el.isGift == 1) {
-					$newProductDetail.find("#isGiftCheckBox").attr('checked','checked');
-				}
-			} else {
+			$product.append("<div class='weui-panel weui-panel_access goods-detail common'>" + newHtml + "</div>");
+			var $newProductDetail = $product.find(".common:last");
+			$newProductDetail.find("#productName").text(el.productName);
+			$newProductDetail.find("#valueName").text(el.valueName);
+	
+			$newProductDetail.find("#bigPriceSpan").text(el.bigPriceSpan);
+			$newProductDetail.find("#smallPriceSpan").text(el.smallPriceSpan);
+			$newProductDetail.find("#bigUnitSpan").text(el.bigUnitSpan);
+			$newProductDetail.find("#smallUnitSpan").text(el.smallUnitSpan);
+	
+			$newProductDetail.find("#bigPrice").val(el.bigPrice);
+			$newProductDetail.find("#smallPrice").val(el.smallPrice);
+			$newProductDetail.find("#bigUnit").val(el.bigUnit);
+			$newProductDetail.find("#smallUnit").val(el.smallUnit);
+			$newProductDetail.find("#sellProductId").val(el.sellProductId);
+			$newProductDetail.find("#productId").val(el.productId);
+			$newProductDetail.find("#convert").val(el.convert);
 			
-				if(el.sellProductId != ""){
-					var $newProductDetail = $product.find(".common:last");
-					$newProductDetail.find("#addGift").attr("checked",'true').trigger("change");
+			$newProductDetail.find("#bigNum").val(el.bigNum);
+			$newProductDetail.find("#smallNum").val(el.smallNum);
 
-					//默认
-					if($newProductDetail.find("#sellProductId").val() == el.sellProductId){
-						$newProductDetail.find("#isDefault").attr("checked","true");
-					}
+			$newProductDetail.find("#isGift").val(el.smallNum);
 
-					$newProductDetail.find("#giftProduct").val(el.productName);
-					$newProductDetail.find("#giftSellProductId").val(el.sellProductId);
-					$newProductDetail.find("#giftProductId").val(el.productId);
-					$newProductDetail.find("#giftConvert").val(el.convert);
-					$newProductDetail.find("#giftBigPrice").val(el.bigPrice);
+			$newProductDetail.find("#isGift").val(el.isGift);
+			if(el.isGift == 1) {
+				$newProductDetail.find("#isGiftCheckBox").attr('checked','checked');
+			}
 
-					//数量
-					if(el.bigNum > 0 && el.bigUnit){
-						$newProductDetail.find("#giftNum").val(el.bigNum);
-						$newProductDetail.find("#giftUnitName").val(el.bigUnitSpan);
-						$newProductDetail.find("#giftUnitName").attr('data-values', "bigUnit");
-						$newProductDetail.find("#giftUnit").val("bigUnit");
-					}else{
-						$newProductDetail.find("#giftNum").val(el.smallNum);
-						$newProductDetail.find("#giftUnitName").val(el.smallUnitSpan);
-						$newProductDetail.find("#giftUnitName").attr('data-values', "smallUnit");
-						$newProductDetail.find("#giftUnit").val("smallUnit");
-					}
+			//赠品
+			var sub = el.subProduct[0];
+			if(sub.sellProductId != ""){
+				var $newProductDetail = $product.find(".common:last");
+				$newProductDetail.find("#addGift").attr("checked",'true').trigger("change");
+
+				//默认
+				if($newProductDetail.find("#sellProductId").val() == sub.sellProductId){
+					$newProductDetail.find("#isDefault").attr("checked","true");
+				}
+
+				$newProductDetail.find("#giftProduct").val(sub.productName);
+				$newProductDetail.find("#giftSellProductId").val(sub.sellProductId);
+				$newProductDetail.find("#giftProductId").val(sub.productId);
+				$newProductDetail.find("#giftConvert").val(sub.convert);
+				$newProductDetail.find("#giftBigPrice").val(sub.bigPrice);
+
+				//数量
+				if(sub.bigNum > 0 && sub.bigUnit){
+					$newProductDetail.find("#giftNum").val(sub.bigNum);
+					$newProductDetail.find("#giftUnitName").val(sub.bigUnitSpan);
+					$newProductDetail.find("#giftUnitName").attr('data-values', "bigUnit");
+					$newProductDetail.find("#giftUnit").val("bigUnit");
+				}else{
+					$newProductDetail.find("#giftNum").val(sub.smallNum);
+					$newProductDetail.find("#giftUnitName").val(sub.smallUnitSpan);
+					$newProductDetail.find("#giftUnitName").attr('data-values', "smallUnit");
+					$newProductDetail.find("#giftUnit").val("smallUnit");
 				}
 			}
 
@@ -166,9 +165,9 @@ $(function() {
 	
 	var compositionHtml = $(".composition").eq(0).html();
 	function initProductComposition(){
-		var productCompositionList = getItemBykey("productCompositionList");
+		var compositionList = getItemBykey("compositionList");
 	
-		$.each(productCompositionList, function(index, el) {
+		$.each(compositionList, function(index, el) {
 			$product.append("<div class='weui-panel weui-panel_access goods-detail composition'>" + compositionHtml + "</div>");
 			var $newProductDetail = $product.find(".composition:last");
 			$newProductDetail.find("#compositionName").text(el.compositionName);
@@ -179,6 +178,8 @@ $(function() {
 			$newProductDetail.find("#compositionId").val(el.compositionId);
 			
 			$newProductDetail.find("#compositionNum").val(el.compositionNum);
+			
+			$newProductDetail.find("#compositionValueName").text(el.compositionValueName);
 		});
 	}
 
