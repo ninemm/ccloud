@@ -35,13 +35,9 @@ $(function() {
     	
     }).on("touchend", ".operate:first-child", function () { //减少商品数量
       productChange($(this));
-
-      //calTotal($(this));
       
     }).on("touchend", ".operate:last-child", function () { //增加商品数量
       productChange($(this));
-      
-      //calTotal($(this));
       
     }).on('touchend', '#confirm-input', function () {
       var val = parseFloat($currentInput.val());
@@ -51,7 +47,7 @@ $(function() {
         $currentInput.val(val);
       }
       productChange($currentInput);
-    
+
     }).on("touchend", ".product-top .weui-cell__ft, #productName", function () {
 		layer.open({
 		  type: 1,
@@ -85,10 +81,10 @@ function initProduct(){
 				if(typeId != el.typeId) {
 					if(typeId == '') {
 						$sidebar.append("<li id='" + el.typeId + "' class='active'>" + el.typeName + " <span class='goods-num'>8</span> </li>");
-						$menuRight.append("<div class='type'> </div>")
+						$menuRight.append("<div class='type' id='" + el.typeId + "' > </div>")
 					} else {
 						$sidebar.append("<li id='" + el.typeId + "'>" + el.typeName + " <span class='goods-num'>8</span> </li>");
-						$menuRight.append("<div class='type' style='display:none'> </div>")
+						$menuRight.append("<div class='type' id='" + el.typeId + "' style='display:none'> </div>")
 					}
 					typeId = el.typeId;
 				}
@@ -121,6 +117,7 @@ function initProduct(){
 			
 		initComposition(data.compositionList);
 		productNum();
+		calTotal();
 		}
 	);
 	
@@ -140,7 +137,7 @@ var compositionHtml = $(".composition").eq(0).html();
 function initComposition(data){
 	if(data.length > 0) {
 		$sidebar.append("<li id='composition'> 组合商品 <span class='goods-num'>8</span> </li>");
-		$menuRight.append("<div class='type' style='display:none'> </div>");
+		$menuRight.append("<div class='type' id='composition' style='display:none'> </div>");
 	}
 	
 	var parentId = '';
@@ -177,19 +174,30 @@ function compositionNum(){
 		});
 }
 
-function calTotal($this) {
-  var $parents = $this.parents('.type');
-  var $sellProductId = $parents.find('.sellProductId').data('id');
-  var $total = $('#sidebar').find('li[data-id=' + $sellProductId + ']').find('span');
-  var bigNumber = Number($parents.find('.product_bUnit input').val());
-  var smallNumber = Number($parents.find('.product_mUnit input').val());
-  var total = bigNumber + smallNumber;
-  if (total > 0) {
-    $total.show().text(total);
-  } else {
-    $total.hide().text(total);
-  }
+function calTotal() {
+ 	var types = $(".type");
   
+	$.each(types, function(typeIndex, typeEl) {
+		var total = 0;
+		var $typeEl = $(typeEl);
+		var id = $typeEl.attr('id');
+		var products = $typeEl.find('.product_detail')
+		$.each(products, function(index, el) {
+			var $el = $(el);
+			if(id == 'composition'){
+				total += Number($el.find("#compositionNum").val());
+			}else{
+				total += Number($el.find("#bigNum").val()) + Number($el.find("#smallNum").val());
+			}
+		});
+
+		var $total = $sidebar.find("#" + id + " .goods-num");
+		if (total > 0) {
+		    $total.show().text(total);
+		} else {
+		    $total.hide().text(total);
+		}
+	});
 }
 
 function productChange(obj){
@@ -204,6 +212,7 @@ function productChange(obj){
           cart.changeComposition(composition);
         }
       }
+      calTotal();
 }
 
 function getProduct($el){

@@ -264,15 +264,17 @@ function total(){
 	var products = $(".common");
 	var total = 0;
 	$.each(products, function(index, el) {
-		if($(el).find("#isGift").is(':checked') == false) {
-			total += $(el).find("#bigNum").val() * $(el).find("#bigPrice").val();
-			total += $(el).find("#smallNum").val() * $(el).find("#smallPrice").val();
+		var $el = $(el);
+		if($el.find("#isGift").is(':checked') == false) {
+			total += $el.find("#bigNum").val() * $el.find("#bigPrice").val();
+			total += $el.find("#smallNum").val() * $el.find("#smallPrice").val();
 		}
 	});
 	
 	var compositions = $(".composition");
 	$.each(compositions, function(index, el) {
-		total += $(el).find("#compositionNum").val() * $(el).find("#compositionPrice").val();
+		var $el = $(el);
+		total += $el.find("#compositionNum").val() * $el.find("#compositionPrice").val();
 	});
 	$("#totalNum").text("共" + (products.length + compositions.length) + "款,合计:" + total + "元")
 
