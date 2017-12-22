@@ -46,7 +46,7 @@ public class CustomerAuditListener implements MessageListener {
 				.replace("${2}", param.getStr("customerName"));
 			data.set("first", Ret.create("value", title).set("color", "#173177"));
 			data.set("keyword1", Ret.create("value", param.get("contact")));
-			data.set("keyword2", "客户变更");
+			data.set("keyword2", Ret.create("value","客户变更"));
 			
 			data.set("keyword3", Ret.create("value", param.get("status")).set("color", "#ea6f5a"));
 			data.set("keyword4", Ret.create("value", param.get("createTime")));
@@ -61,12 +61,12 @@ public class CustomerAuditListener implements MessageListener {
 			String title = PropKit.get("rejectCustomerVisitFirstTitle").replace("${1}", param.getStr("submit"))
 				.replace("${2}", param.getStr("customerName"));
 			data.set("first", Ret.create("value", title).set("color", "#173177"));
-			data.set("keyword1", Ret.create("value", param.get("contact")));
-			data.set("keyword2", param.getStr("submit"));
+			data.set("keyword1", Ret.create("value", param.get("customerName")));
+			data.set("keyword2", Ret.create("value",param.getStr("submit")));
 			
 			data.set("keyword3", Ret.create("value", param.get("status")).set("color", "#ea6f5a"));
 			data.set("keyword4", Ret.create("value", param.get("createTime")));
-			data.set("keyword5", "无");
+			data.set("keyword5", Ret.create("value", "无"));
 			data.set("remark", PropKit.get("rejectRemarkTitle"));
 			
 		}

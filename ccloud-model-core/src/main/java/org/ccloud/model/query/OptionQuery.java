@@ -79,7 +79,7 @@ public class OptionQuery extends JBaseQuery {
 			} catch (Exception e) {
 			}
 		}
-		return false;
+		return true;
 	}
 
 	public Integer findValueAsInteger(String key) {
