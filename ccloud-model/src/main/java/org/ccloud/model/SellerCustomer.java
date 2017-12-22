@@ -21,6 +21,7 @@ import java.util.List;
 import org.ccloud.model.base.BaseSellerCustomer;
 import org.ccloud.model.core.Table;
 import org.ccloud.model.query.CustomerQuery;
+import org.ccloud.model.query.OptionQuery;
 import org.ccloud.model.vo.ImageJson;
 
 import com.alibaba.fastjson.JSON;
@@ -45,9 +46,21 @@ public class SellerCustomer extends BaseSellerCustomer<SellerCustomer> {
 	public List<ImageJson> getImageList() {
 		
 		String imageListStore = getImageListStore();
-		if (StrKit.notBlank(imageListStore)) {
+		Boolean isEnable = OptionQuery.me().findValueAsBool("cdn_enable");
+		
+		if (isEnable != null && isEnable) {
+			String domain = OptionQuery.me().findValue("cdn_domain");
+//			String bucket = OptionQuery.me().findValue("cdn_bucket");
 			List<ImageJson> list = JSON.parseArray(imageListStore, ImageJson.class);
+			for (ImageJson image : list) {
+				image.setSavePath(domain + "/" + image.getSavePath());
+			}
 			return list;
+		} else {
+			if (StrKit.notBlank(imageListStore)) {
+				List<ImageJson> list = JSON.parseArray(imageListStore, ImageJson.class);
+				return list;
+			}
 		}
 		return null;
 	}
@@ -64,4 +77,5 @@ public class SellerCustomer extends BaseSellerCustomer<SellerCustomer> {
 		set("modify_date", new Date());
 		return this.update();
 	}
+	
 }

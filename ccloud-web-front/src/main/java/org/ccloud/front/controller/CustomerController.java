@@ -299,7 +299,15 @@ public class CustomerController extends BaseFrontController {
 				
 				ImageJson image = new ImageJson();
 				image.setImgName(picname);
-				String newPath = upload(pic);
+				String newPath = null;
+				Boolean isEnable = OptionQuery.me().findValueAsBool("cdn_enable");
+				
+				if (isEnable != null && isEnable) {
+					newPath = qiniuUpload(pic);
+				} else {
+					newPath = upload(pic);
+				}
+				
 				image.setSavePath(newPath.replace("\\", "/"));
 				list.add(image);
 			}
@@ -565,7 +573,7 @@ public class CustomerController extends BaseFrontController {
 			kv.set("touser", toUser.getWechatOpenId());
 			kv.set("templateId", messageTemplate.getTemplateId());
 			kv.set("customerName", sellerCustomer.getCustomer().getCustomerName());
-			kv.set("submit", user.getRealname());
+			kv.set("submit", toUser.getRealname());
 
 			kv.set("contact", sellerCustomer.getCustomer().getContact());
 			kv.set("createTime", DateTime.now().toString("yyyy-MM-dd HH:mm"));
@@ -622,6 +630,7 @@ public class CustomerController extends BaseFrontController {
 			String defKey = "_customer_audit";
 			param.put("manager", manager.getUsername());
 			param.put("isEnable", isEnable);
+			param.put(Consts.WORKFLOW_APPLY_USERNAME, user.getUsername());
 			
 			WorkFlowService workflow = new WorkFlowService();
 			String procInstId = workflow.startProcess(customerId, defKey, param);

@@ -27,6 +27,7 @@ import org.ccloud.core.render.AjaxResult;
 import org.ccloud.core.render.JCaptchaRender;
 import org.ccloud.model.User;
 import org.ccloud.model.query.OptionQuery;
+import org.ccloud.qiniu.QiniuKit;
 import org.ccloud.utils.AttachmentUtils;
 import org.ccloud.utils.JsoupUtils;
 import org.ccloud.utils.RequestUtils;
@@ -38,8 +39,11 @@ import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
 import com.jfinal.ext.interceptor.NotAction;
 import com.jfinal.i18n.Res;
+import com.jfinal.kit.Base64Kit;
+import com.jfinal.kit.StrKit;
 import com.jfinal.render.JsonRender;
 import com.jfinal.upload.UploadFile;
+import com.qiniu.storage.model.DefaultPutRet;
 
 public class JBaseController extends Controller {
 	private static final char URL_PARA_SEPARATOR = JFinal.me().getConstants().getUrlParaSeparator().toCharArray()[0];
@@ -350,6 +354,21 @@ public class JBaseController extends Controller {
 			}
 		}
 		return filesMap;
+	}
+	
+	public String qiniuUpload(String blobImage) {
+		
+		if (StrKit.notBlank(blobImage)) {
+			
+			String bucket = OptionQuery.me().findValue("cdn_bucket");
+			blobImage = blobImage.substring(blobImage.indexOf(",") + 1);
+			byte[] b = Base64Kit.decode(blobImage);
+			String key = StrKit.getRandomUUID();
+			DefaultPutRet putRet = QiniuKit.put(bucket, key, b);
+			if (putRet != null)
+				return putRet.key;
+		}
+		return null;
 	}
 
 }
