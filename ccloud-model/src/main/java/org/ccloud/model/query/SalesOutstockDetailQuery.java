@@ -299,7 +299,7 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 	}
 
 	//批量出库
-	public boolean batchOutStock(List<orderProductInfo> orderProductInfos, String sellerId, Date date, String userId, String deptId, String dataArea, String outStockSN) {
+	public boolean batchOutStock(List<orderProductInfo> orderProductInfos, String sellerId, Date date, String deptId,String userId,String dataArea, String outStockSN) {
 		for (orderProductInfo orderProductInfo : orderProductInfos) {
 			SalesOutstockDetail detail = SalesOutstockDetailQuery.me().findById(orderProductInfo.getSalesOutDetaliId());
 			if (!detail.saveOrUpdate()) {
