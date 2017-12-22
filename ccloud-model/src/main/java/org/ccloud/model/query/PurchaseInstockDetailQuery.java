@@ -174,12 +174,13 @@ public class PurchaseInstockDetailQuery extends JBaseQuery {
 						DateUtils.format("yyMMdd", date), product, request);
 				sellerProducts.add(sellerProduct);
 			}
-
+             
+			for (int i = 0; i < sellerProducts.size(); i++) {
 			PurchaseInstockDetail purchaseInstockDetail = new PurchaseInstockDetail();
 			purchaseInstockDetail.setId(StrKit.getRandomUUID());
 			purchaseInstockDetail.setPurchaseInstockId(purchaseInstockId);
 
-			purchaseInstockDetail.set("seller_product_id", orderProductInfo.getSellerProductId());
+			purchaseInstockDetail.set("seller_product_id", sellerProducts.get(i).getId());
 			purchaseInstockDetail.setProductCount(orderProductInfo.getProductCount());
 			purchaseInstockDetail.setProductAmount(orderProductInfo.getProductAmout());
 			purchaseInstockDetail.setProductPrice(orderProductInfo.getBigPrice());
@@ -193,7 +194,9 @@ public class PurchaseInstockDetailQuery extends JBaseQuery {
 			if (!purchaseInstockDetail.save()) {
 				return false;
 			}
+			
 		}
+	}
 		
 		return true;
 	}

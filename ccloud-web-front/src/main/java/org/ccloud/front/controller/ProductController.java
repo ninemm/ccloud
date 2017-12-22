@@ -23,6 +23,7 @@ import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DataAreaUtil;
 
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.ImmutableMap;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 
@@ -33,10 +34,7 @@ import com.jfinal.plugin.activerecord.Record;
 public class ProductController extends BaseFrontController {
 
 	public void index() {
-		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 
-		List<Record> productTypeList = SellerProductQuery.me().findProductTypeBySellerForApp(sellerId);
-		setAttr("productTypeList", productTypeList);
 		render("product.html");
 	}
 
@@ -45,15 +43,10 @@ public class ProductController extends BaseFrontController {
 
 		String keyword = getPara("keyword");
 		List<Record> productList = SellerProductQuery.me().findProductListForApp(sellerId, keyword);
-		renderJson(productList);
-	}
-
-	public void productCompositionList() {
-		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-
-		String keyword = getPara("keyword");
-		List<Record> productCompositionList = ProductCompositionQuery.me().findDetailByProductId("", sellerId, keyword);
-		renderJson(productCompositionList);
+		List<Record> compositionList = ProductCompositionQuery.me().findDetailByProductId("", sellerId, keyword);
+		
+		Map<String, List<Record>> map = ImmutableMap.of("productList", productList, "compositionList", compositionList);
+		renderJson(map);
 	}
 
 	public void shoppingCart() {

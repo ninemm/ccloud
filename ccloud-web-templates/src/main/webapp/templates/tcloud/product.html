@@ -73,17 +73,21 @@ $(function() {
 
 var keyword = '';
 var newHtml = $(".common").eq(0).html();
+var $sidebar = $("#sidebar ul");
 var $menuRight = $(".menu-right");
 function initProduct(){
+	$sidebar.empty();
 	var typeId = '';
 	Utils.ajax('${CPATH}/product/productList', {'keyword': keyword}, 
 		function(data){
 			$menuRight.empty();
-			$.each(data, function(index, el) {
+			$.each(data.productList, function(index, el) {
 				if(typeId != el.typeId) {
 					if(typeId == '') {
+						$sidebar.append("<li id='" + el.typeId + "' class='active'>" + el.typeName + " <span class='goods-num'>8</span> </li>");
 						$menuRight.append("<div class='type'> </div>")
 					} else {
+						$sidebar.append("<li id='" + el.typeId + "'>" + el.typeName + " <span class='goods-num'>8</span> </li>");
 						$menuRight.append("<div class='type' style='display:none'> </div>")
 					}
 					typeId = el.typeId;
@@ -115,7 +119,7 @@ function initProduct(){
 				
 			});
 			
-		initProductComposition();
+		initComposition(data.compositionList);
 		productNum();
 		}
 	);
@@ -133,40 +137,36 @@ function productNum(){
 }
 
 var compositionHtml = $(".composition").eq(0).html();
-function initProductComposition(){
-	Utils.ajax('${CPATH}/product/productCompositionList', {'keyword': keyword}, 
-		function(data){
-			if(data.length > 0) {
-				$("#sidebar ul").append("<li id='composition'> 组合商品 <span class='goods-num'>8</span> </li>");
-				$menuRight.append("<div class='type' style='display:none'> </div>");
-			}
-			
-			var parentId = '';
-			$.each(data, function(index, el) {
-				if(parentId != el.parent_id) {
-					parentId = el.parent_id;
-
-					var $type = $menuRight.find(".type:last");
-					$type.append("<section class='product_detail weui-panel weui-panel_access composition' id='" + el.id  + "' >" + compositionHtml + "</section>");
-					var $newProductDetail = $type.find(".composition:last");
-					$newProductDetail.find("#compositionName").text(el.name);
-					
-					$newProductDetail.find("#compositionPriceSpan").text('￥' + el.price);
+function initComposition(data){
+	if(data.length > 0) {
+		$sidebar.append("<li id='composition'> 组合商品 <span class='goods-num'>8</span> </li>");
+		$menuRight.append("<div class='type' style='display:none'> </div>");
+	}
 	
-					$newProductDetail.find("#compositionPrice").val(el.price);
-					$newProductDetail.find("#compositionId").val(el.id);
-					
-					$newProductDetail.find("#compositionValueName").text(el.product_sp);
-					$newProductDetail.find("#subProduct").text(el.sub_product_name + el.sub_product_sp + ' x ' + el.sub_product_count + '件')
-				}else{
-					$newProductDetail.find("#sub").append("<a class='fr gift-open' >展开</a>");
-					$newProductDetail.find("#subsubProduct").append("el.sub_product_name + el.sub_product_sp + ' x ' + el.sub_product_count + '件' </br>");
-				}
+	var parentId = '';
+	$.each(data, function(index, el) {
+		if(parentId != el.parent_id) {
+			parentId = el.parent_id;
 
-			});
-			compositionNum();
+			var $type = $menuRight.find(".type:last");
+			$type.append("<section class='product_detail weui-panel weui-panel_access composition' id='" + el.id  + "' >" + compositionHtml + "</section>");
+			var $newProductDetail = $type.find(".composition:last");
+			$newProductDetail.find("#compositionName").text(el.name);
+			
+			$newProductDetail.find("#compositionPriceSpan").text('￥' + el.price);
+
+			$newProductDetail.find("#compositionPrice").val(el.price);
+			$newProductDetail.find("#compositionId").val(el.id);
+			
+			$newProductDetail.find("#compositionValueName").text(el.product_sp);
+			$newProductDetail.find("#subProduct").text(el.sub_product_name + el.sub_product_sp + ' x ' + el.sub_product_count + '件')
+		}else{
+			$newProductDetail.find("#sub").append("<a class='fr gift-open' >展开</a>");
+			$newProductDetail.find("#subsubProduct").append("el.sub_product_name + el.sub_product_sp + ' x ' + el.sub_product_count + '件' </br>");
 		}
-	);
+
+	});
+	compositionNum();
 }
 
 function compositionNum(){
@@ -309,12 +309,7 @@ function save(){
 		<aside>
 			<div id="sidebar" class="menu-left">
 				<ul>
-					<#list productTypeList as productType >
-						<li id='${(productType.id)!}' <#if (productType_index=0)>class="active"</#if>>
-							${(productType.name)!}
-							<span class="goods-num">8</span>
-						</li>
-					</#list>
+
 				</ul>
 			</div>
 		</aside>

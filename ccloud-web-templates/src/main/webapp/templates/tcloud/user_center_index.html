@@ -51,10 +51,10 @@ $(function() {
 		</div>
 	</header>
 	<div>
-		<@shiro.hasPermission name="/admin/customer/audit,/admin/salesOrder/check,/admin/customerVisit/audit">
+		<@shiro.hasPermission name="/admin/sellerCustomer/audit,/admin/salesOrder/check,/admin/customerVisit/audit">
 		<div class="weui-cells__title">我的待办</div>
 		<div class="weui-grids">
-			<@shiro.hasPermission name="/admin/customer/audit">
+			<@shiro.hasPermission name="/admin/sellerCustomer/audit">
 			<a href="${CPATH}/todo/customer" class="weui-grid js_grid">
 			    <span class="weui-badge empty-badge">&nbsp;</span>
 				<div class="weui-grid__icon">
