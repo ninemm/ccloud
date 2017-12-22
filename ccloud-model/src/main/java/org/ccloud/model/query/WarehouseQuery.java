@@ -128,4 +128,10 @@ public class WarehouseQuery extends JBaseQuery {
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
+	
+	//获取经销商或直营商的车销仓库
+	public List<Warehouse> getCarWarehouseBySellerId(String sellerId){
+		String sql = "SELECT id,`name`  FROM `cc_warehouse` where is_enabled='1' and type ='2' AND seller_id= ?";
+		return DAO.find(sql, sellerId);
+	}
  }

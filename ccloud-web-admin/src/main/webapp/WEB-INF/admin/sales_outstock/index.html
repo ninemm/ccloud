@@ -30,6 +30,7 @@
 	var url = '${CPATH}/admin/salesOutstock/list';
 
 	$(function() {
+	    initCarWarehouse();
 	    var curDate = new Date().Format("yyyy-MM-dd");
 		$("#sOutDate").val(curDate);
 		jQuery.mm.initDatetimepicker('form', '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
@@ -303,6 +304,44 @@
      }
    });
  }
+ 
+ //获取车销仓库
+ var initCarWarehouse = function () {
+        var strHtml = "";
+        var url = '${CPATH}/admin/salesOutstock/queryCarWarehouse';
+        $.ajax({
+            url: url,
+            type: 'post',
+            success: function (result) {
+                var carWarehouse = result.data;
+                strHtml = '<option selected="selected" value="">车销仓库选择</option>';
+                for(index in carWarehouse){
+                    var row = carWarehouse[index];
+                    strHtml +='<option value="'+row.id+'">'+row.name+'</option>';
+                }
+                $("#carWarehouse").html(strHtml);
+            }
+        });
+    }
+    
+    <!--打印车销汇总单  -->
+    function batchCarPrint(){
+    var carWarehouseId = $("#carWarehouse").val();
+    var starDate = $("#startDate").val();
+    var endDate = $("#endDate").val();
+    if(carWarehouseId == null){
+    layer.alert("请选择一个车销仓库");
+     return;
+     }
+      else{
+      layer.open({
+			title:"出库单打印",
+			type: 2, 
+			area: ['90%', '90%'],
+			content: '${CPATH}/admin/salesOutstock/renderCarPrintPage?carWarehouseId='+carWarehouseId + "&beginDate=" + starDate + "&endDate=" + endDate
+		}); 
+      }
+    }
     
 </#macro>
 
@@ -349,6 +388,7 @@
 				<button class="btn btn-sm btn-primary" type="button" onclick="batchAction()"><i class="fa fa-gavel"></i> 批量打印 </button>
 				<button class="btn btn-sm btn-primary" type="button" onclick="batchOut()"><i class="fa  fa-check-circle"></i> 批量出库</button>
 				<button class="btn btn-sm btn-primary" type="button" onclick="batchCheckAll()"><i class="fa  fa-circle-o-notch"></i>全选</button>
+				<button class="btn btn-sm btn-primary" type="button" onclick="batchCarPrint()"><i class="fa  fa-train"></i>车销订单汇总打印</button>
 			</div>
             <div class="input-group input-group-sm " style="float: right;">
                <label class="control-label">打印状态&nbsp; </label>
@@ -363,6 +403,9 @@
                     <option value="0">待出库</option>
                     <option value="1000">已出库</option>
                 </select>
+                 <select class="input-sm" name="carWarehouse" id="carWarehouse" style="padding-right:5px;margin-right:55px;">
+                </select>
+                
            </div>
        </div>
 		<div class="box">

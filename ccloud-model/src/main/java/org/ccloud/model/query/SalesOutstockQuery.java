@@ -17,6 +17,7 @@ package org.ccloud.model.query;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,6 +27,7 @@ import org.ccloud.model.Receivables;
 import org.ccloud.model.SalesOutstock;
 import org.ccloud.model.SellerCustomer;
 import org.ccloud.utils.DateUtils;
+import org.ccloud.model.vo.carSalesPrintNeedInfo;
 import org.ccloud.model.vo.printAllNeedInfo;
 import org.ccloud.utils.StringUtils;
 import com.jfinal.kit.StrKit;
@@ -363,4 +365,29 @@ public class SalesOutstockQuery extends JBaseQuery {
 		}
 	}
 
+	public List<carSalesPrintNeedInfo> getCarSalesPrintInfo(String wareHouseId,String beginDate,String endDate){
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append(" SELECT so1.convert_relate, so1.custom_name, w.`name` as wareHouseName, SUM(so1.bigCount)as bigCount, so1.smallCount, so1.is_gift, ");
+		stringBuilder.append(" SUM(so1.product_amount)as product_amount, so1.sell_product_id, so1.bar_code, w.phone as wareHousePhone,so1.big_unit,so1.small_unit  FROM cc_sales_outstock c LEFT JOIN cc_warehouse w  ");
+		stringBuilder.append(" on w.id = c.warehouse_id JOIN(SELECT co.sell_product_id, co.outstock_id, co.is_gift, p.convert_relate,  ");
+		stringBuilder.append(" cs.custom_name,p.big_unit,p.small_unit, floor(co.product_count/p.convert_relate) as bigCount, MOD(co.product_count,p.convert_relate) as ");
+		stringBuilder.append(" smallCount, cs.bar_code, case when co.is_gift = 0  THEN product_amount ELSE 0 END as product_amount FROM ");
+		stringBuilder.append(" cc_sales_outstock_detail co LEFT JOIN cc_seller_product cs on cs.id = co.sell_product_id LEFT JOIN cc_product p ");
+		stringBuilder.append(" on p.id = cs.product_id ) so1 on so1.outstock_id = c.id WHERE c.warehouse_id =? AND c.biz_date >= ? AND c.biz_date <=? GROUP BY so1.sell_product_id,so1.is_gift" );
+		List<Record> records = Db.find(stringBuilder.toString(), wareHouseId,beginDate,endDate);
+		List<carSalesPrintNeedInfo> carSalesPrintNeedInfos = new ArrayList<>();
+		for (Record record : records) {
+		  carSalesPrintNeedInfo carSalesPrintNeedInfo = new carSalesPrintNeedInfo();
+		  carSalesPrintNeedInfo.setWareHouseName(record.getStr("wareHouseName"));
+		  carSalesPrintNeedInfo.setBarCode(record.getStr("bar_code"));
+		  carSalesPrintNeedInfo.setProductName(record.getStr("custom_name"));
+		  carSalesPrintNeedInfo.setBigCount(record.getInt("bigCount"));
+		  carSalesPrintNeedInfo.setIsGift(record.getInt("is_gift"));
+		  carSalesPrintNeedInfo.setSmallCount(record.getInt("smallCount"));
+		  carSalesPrintNeedInfo.setWareHousePhone(record.getStr("wareHousePhone"));
+		  carSalesPrintNeedInfos.add(carSalesPrintNeedInfo);
+		}
+		return carSalesPrintNeedInfos;
+	}
+	
 }
