@@ -265,7 +265,7 @@ public class OrderController extends BaseFrontController {
 						for (SellerProduct sellerProduct : list) {
 							if (!SalesOrderDetailQuery.me().insertForAppComposition(sellerProduct, orderId, sellerId, sellerCode,
 									user.getId(), date, user.getDepartmentId(), user.getDataArea(),
-									Integer.parseInt(number))) {
+									Integer.parseInt(number), user.getId())) {
 								return false;
 							}
 						}

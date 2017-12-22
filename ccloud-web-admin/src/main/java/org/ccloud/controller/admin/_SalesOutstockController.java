@@ -177,7 +177,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 	}	
 	
 	
-//	@RequiresPermissions("/admin/salesOutstock/check")
+	@RequiresPermissions("/admin/salesOutstock/check")
 	public void batchStockOut() throws ParseException {
 		String outstockId = getPara("outstockId");
 	    String[] outId = outstockId.split(",");
