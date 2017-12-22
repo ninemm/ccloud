@@ -48,6 +48,7 @@ import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.tx.Tx;
 
 @RouterMapping(url = "/customerVisit")
+@RequiresPermissions(value = { "/admin/customerVisit", "/admin/dealer/all" }, logical = Logical.OR)
 public class CustomerVisitController extends BaseFrontController {
 	
 	//库存详情

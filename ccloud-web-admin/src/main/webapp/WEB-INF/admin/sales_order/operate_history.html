@@ -1,9 +1,73 @@
 <#include "../_inc/_layer_layout.html"/>
 <#macro title>操作记录</#macro>
 <#macro css> 
-.weui-cells {
-  margin-top: 0;
-}
+  .gray {
+    color: #bbb;
+  }
+  .fr {
+    float: right;
+  }
+  .weui-cells {
+    line-height: 1.5
+  }
+  .weui-cell {
+    margin-left: 3%;
+    padding: 10px 15px;
+    padding-left: 7%;
+    border-left: 1px solid #bbb;
+    position: relative;
+  }
+  .weui-cell:first-child div {
+    height: 50%;
+    position: absolute;
+    width: 1px;
+    top: 0;
+    left: -1px;
+    border-left: 1px solid #fff;
+  }
+  .weui-cell:before {
+    content: " ";
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    height: 1px;
+    border-top: 1px solid #e5e5e5;
+    color: #e5e5e5;
+    -webkit-transform-origin: 0 0;
+    transform-origin: 0 0;
+    -webkit-transform: scaleY(.5);
+    transform: scaleY(.5);
+    left: 15px;
+    z-index: 2;
+  }
+  .weui-cell:first-child:before {
+    content: none;
+  }
+  .weui-cell::after {
+    content: ' ';
+    width: 15px;
+    height: 15px;
+    border-radius: 100%;
+    background: #fff;
+    border: 1px solid #bbb;
+    position: absolute;
+    top: 45%;
+    left: -8px;
+  }
+  .weui-cell:last-child::after {
+    background: #3c8dbc;
+    border: 1px solid #3c8dbc;
+    box-shadow: 0 0.15rem 0.3rem rgba(34, 34, 34, 0.21), 0 0.3rem 0.3rem rgba(34, 34, 34, 0.26);
+  }
+  .weui-cell:last-child div {
+    height: 50%;
+    position: absolute;
+    width: 1px;
+    bottom: 0;
+    left: -1px;
+    border-left: 1px solid #fff;
+  }
 </#macro>
 <#macro script>
 
