@@ -98,8 +98,7 @@ public class OptionQuery extends JBaseQuery {
 		String value = findValue(key);
 		if (StringUtils.isNotBlank(value)) {
 			try {
-				if(value.equals("1")) return true;
-				else return false;
+				return Boolean.parseBoolean(value);
 			} catch (Exception e) {
 			}
 		}
