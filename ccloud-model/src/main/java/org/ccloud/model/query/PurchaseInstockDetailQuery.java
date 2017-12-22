@@ -26,6 +26,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.ccloud.model.Product;
 import org.ccloud.model.PurchaseInstockDetail;
 import org.ccloud.model.SellerProduct;
+import org.ccloud.model.vo.ProductInfo;
+import org.ccloud.model.vo.orderProductInfo;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
 
@@ -158,6 +160,41 @@ public class PurchaseInstockDetailQuery extends JBaseQuery {
 			}
 		}
 
+		return true;
+	}
+	
+	public boolean insertByBatchSalesOrder(List<orderProductInfo> orderProductInfos, String purchaseInstockId, Record seller, Date date, HttpServletRequest request) {
+		for (orderProductInfo orderProductInfo : orderProductInfos) {
+			String sellerId = seller.getStr("id");
+			List<ProductInfo> productInfos = ProductQuery.me().getProductBySellerProId(orderProductInfo.getSellerProductId());
+			Product product = ProductQuery.me().findById(productInfos.get(0).getProductId());
+			List<SellerProduct> sellerProducts = SellerProductQuery.me()._findByProductIdAndSellerId(product.getId(),sellerId);
+			if (sellerProducts.size() == 0) {
+				SellerProduct sellerProduct = SellerProductQuery.me().newProduct(sellerId, date,
+						DateUtils.format("yyMMdd", date), product, request);
+				sellerProducts.add(sellerProduct);
+			}
+
+			PurchaseInstockDetail purchaseInstockDetail = new PurchaseInstockDetail();
+			purchaseInstockDetail.setId(StrKit.getRandomUUID());
+			purchaseInstockDetail.setPurchaseInstockId(purchaseInstockId);
+
+			purchaseInstockDetail.set("seller_product_id", orderProductInfo.getSellerProductId());
+			purchaseInstockDetail.setProductCount(orderProductInfo.getProductCount());
+			purchaseInstockDetail.setProductAmount(orderProductInfo.getProductAmout());
+			purchaseInstockDetail.setProductPrice(orderProductInfo.getBigPrice());
+			purchaseInstockDetail
+					.setPurchaseOrderDetailId(orderProductInfo.getSalesOutDetaliId());
+
+			purchaseInstockDetail.setDeptId(seller.getStr("dept_id"));
+			purchaseInstockDetail.setDataArea(seller.getStr("data_area"));
+			purchaseInstockDetail.setCreateDate(date);
+
+			if (!purchaseInstockDetail.save()) {
+				return false;
+			}
+		}
+		
 		return true;
 	}
 }

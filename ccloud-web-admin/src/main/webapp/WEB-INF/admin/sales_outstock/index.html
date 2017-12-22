@@ -30,6 +30,8 @@
 	var url = '${CPATH}/admin/salesOutstock/list';
 
 	$(function() {
+	    var curDate = new Date().Format("yyyy-MM-dd");
+		$("#sOutDate").val(curDate);
 		jQuery.mm.initDatetimepicker('form', '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initDatetimepicker('form', '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initValidator('#form', validatorFields)
@@ -236,7 +238,8 @@
 		btn1: function() {
 		    var stockOutDate = $("#sOutDate").val();
 		    var remark = $("#remark").val();
-            batchStoutOut(ids,stockOutDate,remark);
+		    if (remark) remark = encodeURIComponent(remark);
+            batchStoutOut(ids.toString(),stockOutDate,remark);
 		}
 	   })
 		jQuery.mm.initDatetimepicker('stockOutConfId', '#sOutDate', 'sOutDate', 'yyyy-MM-dd', 2, 4, 2);
@@ -292,15 +295,15 @@
       "oStockDate":oStockDate,
       "remark":remark
      },
+     type:"POST",
      dataType: "json",
      async: false,
      success: function(data) {
-     
+     toastr.success(data.message, '操作成功');
      }
    });
  }
- 
-   
+    
 </#macro>
 
 <@layout active_id=p child_active_id=c>
@@ -358,7 +361,7 @@
                  <select class="input-sm" name="stockOutStatus" id="stockOutStatus" style="padding-right:5px;margin-right:55px;">
                     <option value="">全部</option>
                     <option value="0">待出库</option>
-                    <option value="1">已出库</option>
+                    <option value="1000">已出库</option>
                 </select>
            </div>
        </div>
@@ -412,8 +415,9 @@
 							</tbody>
 						</table>
 						<div class="col-xs-12" style="margin-top: 10px;clear: both;">
-							<div class="col-sm-2 text-right" style="width:13% !important;padding-left: 2px !important;padding-right: 2px !important;">备注：</div>
-							<div class="col-xs-10 left"><textarea id="remark" rows="3" placeholder="可不填"></textarea></div>
+							<div class="col-xs-10 left" >
+							<label  class="control-label col-sm-2">备注：</label>
+							<textarea id="remark" rows="3" placeholder="可不填"></textarea></div>
 						</div>
 					</div>
 				</div>

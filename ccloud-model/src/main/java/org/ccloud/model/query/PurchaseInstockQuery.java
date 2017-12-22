@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.ccloud.Consts;
 import org.ccloud.model.PurchaseInstock;
+import org.ccloud.model.vo.printAllNeedInfo;
 import org.ccloud.utils.StringUtils;
 
 import com.jfinal.kit.StrKit;
@@ -182,4 +183,23 @@ public class PurchaseInstockQuery extends JBaseQuery {
 		return purchaseInstock.save();
 	}
 	
+	
+	public boolean insertByBatchSalesOutStock(printAllNeedInfo printAllNeedInfo, Record seller, String purchaseInstockId,
+			String pwarehouseSn, String warehouseId, String userId, Date date,String sellerId) {
+		PurchaseInstock purchaseInstock = new PurchaseInstock();
+		purchaseInstock.set("id", purchaseInstockId);
+		purchaseInstock.set("pwarehouse_sn", pwarehouseSn);
+		purchaseInstock.set("warehouse_id", warehouseId);
+		purchaseInstock.set("biz_user_id", userId);
+		purchaseInstock.setSupplierId(sellerId);
+		purchaseInstock.set("input_user_id",userId );
+		purchaseInstock.set("status", 0);// 待入库
+		purchaseInstock.set("total_amount", printAllNeedInfo.getSalesAmount());
+		purchaseInstock.set("payment_type",printAllNeedInfo.getReceiveType());
+		purchaseInstock.set("remark", printAllNeedInfo.getRemark());
+		purchaseInstock.set("dept_id", seller.get("dept_id"));
+		purchaseInstock.set("data_area", seller.get("data_area"));
+		purchaseInstock.set("create_date", date);
+		return purchaseInstock.save();
+	}
 }

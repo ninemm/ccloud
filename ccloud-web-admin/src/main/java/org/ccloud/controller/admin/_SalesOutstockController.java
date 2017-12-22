@@ -16,6 +16,8 @@
 package org.ccloud.controller.admin;
 
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -176,23 +178,27 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 	
 	
 //	@RequiresPermissions("/admin/salesOutstock/check")
-//	public void batchOutStock() {
-//
-//		String outstockId = getPara("outstockId");
-//		String[] outId = outstockId.split(",");
-//		String date = getPara("oStockDate");
-//		String remark = getPara("remark");
-//		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-//		String sellerId = getSessionAttr("sellerId");
-//		String sellerCode = getSessionAttr("sellerCode");
-//		boolean isSave = this.out(paraMap, user, sellerId, sellerCode);
-//        if (isSave) {
-//        	renderAjaxResultForSuccess("出库成功");
-//        } else {
-//        	renderAjaxResultForError("出库失败!");
-//        }
-//
-//	}
+	public void batchStockOut() throws ParseException {
+		String outstockId = getPara("outstockId");
+	    String[] outId = outstockId.split(",");
+		String oStockDate = getPara("oStockDate");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		Date StockDate = sdf.parse(oStockDate);
+		String remark = getPara("remark");
+		if (StrKit.notBlank(remark)) {
+			remark = StringUtils.urlDecode(remark);
+		}
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String sellerId = getSessionAttr("sellerId");
+		String sellerCode = getSessionAttr("sellerCode");
+		Date date = new Date();
+		boolean isSave = this.saveBatchStockOut(outId,StockDate,remark,user,sellerId,sellerCode,date);
+		 if (isSave) {
+	        	renderAjaxResultForSuccess("批量出库成功");
+	        } else {
+	        	renderAjaxResultForError("批量出库失败!");
+	        }
+	}
 	
 	public void recordPrintInfo() {
 		String outstockId = getPara("outstockId");
@@ -322,4 +328,43 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		return isSave;
 	}
 	
+	public boolean saveBatchStockOut(final String[] outId, final Date stockDate, final String remark, final User user, final String sellerId, String sellerCode, final Date date) {
+		boolean isSave =  Db.tx(new IAtom() {
+			@Override
+		  public boolean run() throws SQLException {
+		  for (String s : outId) {
+			printAllNeedInfo printAllNeedInfo = SalesOutstockQuery.me().findStockOutForPrint(s);
+			List<orderProductInfo> orderProductInfos = SalesOutstockDetailQuery.me().findPrintProductInfo(s);
+			if (!SalesOutstockQuery.me().updateStockOutStatus(printAllNeedInfo.getSalesOutStockId(), user.getId(), stockDate, Consts.SALES_OUT_STOCK_STATUS_OUT, date,remark)) {
+					return false;	
+				  }
+			
+			if (!SalesOutstockDetailQuery.me().batchOutStock(orderProductInfos, sellerId, 
+					date, user.getDepartmentId(), user.getDataArea(), user.getId(), printAllNeedInfo.getOutstockSn())) {
+				return false;
+			}
+			
+    		//如果客户种类是直营商，则生成直营商的采购入库单
+			if (Consts.CUSTOMER_KIND_SELLER.equals(printAllNeedInfo.getCustomerKind())) {
+				Record seller = SellerQuery.me().findByCustomerId(printAllNeedInfo.getCustomerId());
+    			String purchaseInstockId =StrKit.getRandomUUID();
+    			
+    			//PS + 100000(机构编号或企业编号6位) + 20171108(时间) + 000001(流水号)
+    			String pwarehouseSn = "PS" + seller.getStr("seller_code") + DateUtils.format("yyMMdd", date) + PurchaseInstockQuery.me().getNewSn();
+    
+    			Warehouse warehouse = WarehouseQuery.me().findBySellerId(seller.getStr("id"));
+    			if(!PurchaseInstockQuery.me().insertByBatchSalesOutStock(printAllNeedInfo, seller, purchaseInstockId, pwarehouseSn, warehouse.getId(), user.getId(), date,sellerId)) {
+    				return false;
+    			}
+    			
+        		   if (!PurchaseInstockDetailQuery.me().insertByBatchSalesOrder(orderProductInfos, purchaseInstockId, seller, date, getRequest())) {
+        			return false;
+        			}
+			   }
+			}
+			return true;
+		  }
+	       });
+		return isSave;
+	}
 }
