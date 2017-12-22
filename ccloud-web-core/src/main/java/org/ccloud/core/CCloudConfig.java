@@ -34,6 +34,7 @@ import org.ccloud.log.SystemLogThread;
 import org.ccloud.message.plugin.MessagePlugin;
 import org.ccloud.model.core.JModelMapping;
 import org.ccloud.model.core.Table;
+import org.ccloud.qiniu.QiniuPlugin;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.shiro.core.ShiroInterceptor;
 import org.ccloud.shiro.core.ShiroPlugin;
@@ -143,6 +144,8 @@ public abstract class CCloudConfig extends JFinalConfig {
 			
 			plugins.add(new ActivitiPlugin());
 			
+			plugins.add(createQiniuPlugin());
+			
 			ShiroPlugin shiroPlugin = createShiroPlugin();
 			plugins.add(shiroPlugin);
 		}
@@ -215,6 +218,12 @@ public abstract class CCloudConfig extends JFinalConfig {
 	    shiroPlugin.setUnauthorizedUrl("/admin/checkRole");//授权url：未授权成功自动跳转
 	    
 	    return shiroPlugin;
+	}
+	
+	public QiniuPlugin createQiniuPlugin() {
+		
+		QiniuPlugin qiniuPlugin = new QiniuPlugin("ccloud.properties");
+		return qiniuPlugin;
 	}
 
 	public void configInterceptor(Interceptors interceptors) {

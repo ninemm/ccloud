@@ -95,8 +95,8 @@ public class UserQuery extends JBaseQuery {
 	}
 	
 	public List<User> findByWechatOpenid(final String openid) {
-		//return DAO.doFind("wechat_open_id = ? AND status = 1", openid);
-		return DAO.doFindByCache(User.CACHE_NAME, openid, "wechat_open_id = ? AND status = 1", openid);
+		return DAO.doFind("wechat_open_id = ? AND status = 1", openid);
+//		return DAO.doFindByCache(User.CACHE_NAME, openid, "wechat_open_id = ? AND status = 1", openid);
 	}
 	
 	public List<User> findByMobile(final String mobile) {

@@ -22,6 +22,8 @@
 	 <script src="${CPATH}/static/plugins/html5/html5shiv.min.js"></script>
 	 <script src="${CPATH}/static/plugins/html5/respond.min.js"></script>
 	<![endif]-->
+	<!-- bootstrapValidator -->
+	<link rel="stylesheet" href="${CPATH}/static/plugins/toastr/toastr.css">
 </head>
 <body class="hold-transition login-page">
 	<div class="login-box">
@@ -32,6 +34,7 @@
 		<div class="login-box-body">
 			<p class="login-box-msg">管理员登录</p>
 			<form action="${CPATH}/admin/login" method="post" id="loginform">
+					<p id="p"><i class="fa fa-exclamation-triangle"></i><span id = "uname"></span><p>
 				<div class="form-group has-feedback">
 					<label>用户名：</label> 
 					<input class="form-control" name="username" value="" id="_username">
@@ -39,7 +42,7 @@
 				</div>
 				<div class="form-group has-feedback">
 					<label>密码：</label> 
-					<input type="password" name="password" class="form-control" value="123456"> 
+					<input type="password" name="password" class="form-control" value=""> 
 					<span class="glyphicon glyphicon-lock form-control-feedback"></span>
 				</div>
 				<!-- <div class="form-group has-feedback" id="_account" style="display:none;">
@@ -69,32 +72,34 @@
 	<!-- jQuery 2.1.4 -->
 	<script src="${CPATH}/static/plugins/jquery/jquery.min.js"></script>
 	<script src="${CPATH}/static/plugins/jquery/jquery.form.min.js"></script>
+	<script src="${CPATH}/static/plugins/toastr/toastr.js"></script>
 	<!-- Bootstrap 3.3.5 -->
 	<script src="${CPATH}/static/bootstrap/js/bootstrap.min.js"></script>
 	<script src="${CPATH}/static/plugins/pace/pace.min.js"></script>
 	<script>
 		$(function() {
+			$("#p").hide();
+			$("#uname").hide();
 			$(document).ajaxStart(function() {
 				Pace.restart();
 			});
-			/* $("#loginform").submit(function() {
+			$("#loginform").submit(function() {
 				$(this).ajaxSubmit({
 					type : "post", 
 					dataType : "json", 
 					success : function(data) { 
-						if (data.errorCode == 0) {
-							var sellerSize = data.data;
-							$("#seller_id").empty();
-							if (sellerSize.length > 1) {
-								for (var i = 0; i < sellerSize.length; i++) {
-									$("#seller_id").append("<option value=" + sellerSize[i].sellerId + ">" + sellerSize[i].sellerName + "</option>");
-								}								
-								$("#sellerModal").modal('show');
-							} else {
-								window.location.href = "${CPATH}/admin/index";
-							}
-						} else {
-							alert(data.message);
+						if(data == false){
+							$("#p").show();
+							$("#uname").show();
+							$("#uname").html("用户名/密码错误,请核对之后重新输入");
+							$("#uname").css("color","red");
+							$("#uname").css("margin-left","5%");
+							//toastr.error(data.message,'用户名/密码错误');
+							/* setTimeout( function(){
+								location.reload();
+										}, 2 * 1000 ); */
+						}else{
+							location.href = "${CPATH}/admin/index";
 						}
 					},
 					error : function() {
@@ -102,7 +107,7 @@
 					}
 				});
 				return false; //不刷新页面  
-			}); */
+			});
 		});
 	</script>
 </body>
