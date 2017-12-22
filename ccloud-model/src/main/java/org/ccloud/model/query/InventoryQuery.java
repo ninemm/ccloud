@@ -130,6 +130,16 @@ public class InventoryQuery extends JBaseQuery {
 		return Db.find(defaultSqlBuilder.toString(), sellerId, productId);
 	}
 	
+	public List<Record> findProductStoreByUser(String sellerId, String productId, String userId) {
+		StringBuilder defaultSqlBuilder = new StringBuilder("SELECT cc.warehouse_id, cc.balance_count FROM cc_inventory cc ");
+		defaultSqlBuilder.append("LEFT JOIN cc_warehouse cw on cw.id = cc.warehouse_id ");
+		defaultSqlBuilder.append("LEFT JOIN (SELECT cu.warehouse_id,cu.user_id FROM cc_user_join_warehouse cu where cu.user_id=?) t1 ");
+		defaultSqlBuilder.append("on t1.warehouse_id = cc.warehouse_id ");
+		defaultSqlBuilder.append("where cc.product_id = ? and cc.seller_id = ? ");
+		defaultSqlBuilder.append("ORDER BY t1.user_id desc, cw.is_default desc ");
+		return Db.find(defaultSqlBuilder.toString(), userId, productId, sellerId);
+	}	
+	
 	public Page<Record> findDetailByApp(int pageNumber, int pageSize,String wareHouseId,String productName, String sellerId, String dataArea, String deptId){
 		String select ="select cc_s.id,cc_s.seller_name,cc_s.seller_code,cc_s.seller_type,cc_i.product_id,cc_p.`name`,IFNULL(sum(cc_i.in_count),0) in_count,IFNULL(sum(cc_i.out_count),0) out_count,IFNULL(sum(cc_i.balance_count),0) balance_count,IFNULL(sum(cc_i.afloat_count),0) afloat_count ";
 		StringBuilder fromBuilder = new StringBuilder("from cc_inventory cc_i left join cc_seller cc_s on cc_i.seller_id = cc_s.id left join cc_product cc_p on cc_i.product_id = cc_p.id ");

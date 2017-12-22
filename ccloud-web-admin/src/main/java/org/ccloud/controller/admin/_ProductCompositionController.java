@@ -364,7 +364,7 @@ public class _ProductCompositionController extends JBaseCRUDController<ProductCo
 	        			List<SellerProduct> list = SellerProductQuery.me().findByCompositionId(productId);
 	        			for (SellerProduct sellerProduct : list) {
 	        				if(!SalesOrderDetailQuery.me().insertDetailByComposition(sellerProduct, orderId, sellerId, sellerCode, user.getId(), date,
-	        						user.getDepartmentId(), user.getDataArea(), index, Integer.parseInt(number))) {
+	        						user.getDepartmentId(), user.getDataArea(), index, Integer.parseInt(number), user.getId())) {
 	        					return false;
 	        				}
 						}
