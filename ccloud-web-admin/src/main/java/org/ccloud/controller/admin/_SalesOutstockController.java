@@ -313,7 +313,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 				  outstockPrint.setDeptId(user.getDepartmentId());
 				  outstockPrint.setDataArea(user.getDataArea());
 				  outstockPrint.setCreateDate(new Date());
-				  outstockPrint.setStatus(1);
+				  outstockPrint.setStatus(0);
 				  outstockPrints.add(outstockPrint);
 			}
 			   try {
@@ -335,14 +335,15 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		  for (String s : outId) {
 			printAllNeedInfo printAllNeedInfo = SalesOutstockQuery.me().findStockOutForPrint(s);
 			List<orderProductInfo> orderProductInfos = SalesOutstockDetailQuery.me().findPrintProductInfo(s);
-			if (!SalesOutstockQuery.me().updateStockOutStatus(printAllNeedInfo.getSalesOutStockId(), user.getId(), stockDate, Consts.SALES_OUT_STOCK_STATUS_OUT, date,remark)) {
-					return false;	
-				  }
 			
 			if (!SalesOutstockDetailQuery.me().batchOutStock(orderProductInfos, sellerId, 
 					date, user.getDepartmentId(), user.getDataArea(), user.getId(), printAllNeedInfo.getOutstockSn())) {
 				return false;
 			}
+			
+			if (!SalesOutstockQuery.me().updateStockOutStatus(printAllNeedInfo.getSalesOutStockId(), user.getId(), stockDate, Consts.SALES_OUT_STOCK_STATUS_OUT, date,remark) ||!SalesOrderQuery.me().checkStatus(printAllNeedInfo.getSalesOutStockId(), date)) {
+					return false;	
+				  }
 			
     		//如果客户种类是直营商，则生成直营商的采购入库单
 			if (Consts.CUSTOMER_KIND_SELLER.equals(printAllNeedInfo.getCustomerKind())) {
