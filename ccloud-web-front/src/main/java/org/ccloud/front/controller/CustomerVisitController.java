@@ -362,7 +362,7 @@ public class CustomerVisitController extends BaseFrontController {
 			kv.set("touser", toUser.getWechatOpenId());
 			kv.set("templateId", messageTemplate.getTemplateId());
 			kv.set("customerName", customerVisit.getSellerCustomer().getCustomer().getCustomerName());
-			kv.set("submit", user.getRealname());
+			kv.set("submit", toUser.getRealname());
 
 			kv.set("createTime", DateTime.now().toString("yyyy-MM-dd HH:mm"));
 			kv.set("status", comment);
@@ -398,6 +398,8 @@ public class CustomerVisitController extends BaseFrontController {
 
 			String defKey = "_customer_visit_review";
 			param.put("manager", manager.getUsername());
+			param.put(Consts.WORKFLOW_APPLY_USERNAME, user.getUsername());
+
 			WorkFlowService workflow = new WorkFlowService();
 			String procInstId = workflow.startProcess(customerVisit.getId(), defKey, param);
 

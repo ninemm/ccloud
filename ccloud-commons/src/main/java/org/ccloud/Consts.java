@@ -149,8 +149,8 @@ public class Consts {
 	public static final String OPTION_SELLER_STORE_PROCEDURE_REVIEW= "web_procedure_review_";//经销商检查库存开关设置
 	public static final String OPTION_FILE_ROOT_PATH = "web_file_root_path";
 	
-	public static final String OPTION_ON = "1";
-	public static final String OPTION_OFF= "0";
+	public static final String OPTION_ON = "true";
+	public static final String OPTION_OFF= "false";
 	
 	public static final String CUSTOMER_KIND_COMMON = "100401";//普通客户
 	public static final String CUSTOMER_KIND_SELLER = "100402";//直营商客户
