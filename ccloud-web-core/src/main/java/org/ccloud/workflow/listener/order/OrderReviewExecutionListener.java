@@ -53,7 +53,7 @@ public class OrderReviewExecutionListener implements ExecutionListener {
 			SalesOrderQuery.me().updateConfirm(orderId, Consts.SALES_ORDER_STATUS_REJECT, confirm.getId(), new Date());// 已审核拒绝
 			this.sendOrderMessage(sellerId, customerName, "订单审核拒绝", confirm.getId(), user.getId(),
 					confirm.getDepartmentId(), confirm.getDataArea());
-			this.sendOrderWxMesssage(user.getWechatOpenId(), orderId, confirm.getRealname());
+			this.sendOrderWxMesssage(user.getWechatOpenId(), orderId, user.getRealname());
 		}
 
 		System.err.println("--------------执行完成---------------");
@@ -78,7 +78,7 @@ public class OrderReviewExecutionListener implements ExecutionListener {
 
 	}
 
-	private void sendOrderWxMesssage(String toWechatOpenId, String orderId, String confirmRealname) {
+	private void sendOrderWxMesssage(String toWechatOpenId, String orderId, String realname) {
 
 		Kv kv = Kv.create();
 
@@ -90,7 +90,7 @@ public class OrderReviewExecutionListener implements ExecutionListener {
 		StringBuilder builder = new StringBuilder();
 		for (Record record : orderDetailList) {
 			int convert_relate = record.get("convert_relate");
-			builder.append(record.get("custom_name") + " " + record.getInt("product_count") / convert_relate + " "
+			builder.append("\n" +record.get("custom_name") + " " + record.getInt("product_count") / convert_relate + " "
 					+ record.get("big_unit") + "\n");
 			builder.append(record.get("custom_name") + " " + record.getInt("product_count") % convert_relate + " "
 					+ record.get("big_unit") + "\n");
@@ -100,7 +100,7 @@ public class OrderReviewExecutionListener implements ExecutionListener {
 		kv.set("templateId", messageTemplate.getTemplateId());
 
 		kv.set("orderId", salesOrder.getOrderSn());
-		kv.set("submit", confirmRealname);
+		kv.set("submit", realname);
 		kv.set("createTime", DateTime.now().toString("yyyy-MM-dd HH:mm"));
 
 		kv.set("product", builder.toString());
