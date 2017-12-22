@@ -302,7 +302,7 @@ public class CustomerController extends BaseFrontController {
 				
 				ImageJson image = new ImageJson();
 				image.setImgName(picname);
-				String newPath = qiniuUpload(pic);;
+				String newPath = qiniuUpload(pic);
 				/*Boolean isEnable = OptionQuery.me().findValueAsBool("cdn_enable");
 				
 				if (isEnable != null && isEnable) {
@@ -318,8 +318,9 @@ public class CustomerController extends BaseFrontController {
 
 		if(StrKit.notBlank(oldPic)) {
 			JSONArray picList = JSON.parseArray(oldPic);
+			int len = OptionQuery.me().findValue("cdn_domain").length();
 			for(int i = 0; i < picList.size(); i++) {
-				String pic = picList.getString(i);
+				String pic = picList.getString(i).substring(len, picList.getString(i).length());
 				ImageJson image = new ImageJson();
 				image.setSavePath(pic);
 				list.add(image);

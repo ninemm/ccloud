@@ -78,7 +78,7 @@
 
                 (function(x) {
                     reader.onload = function(e) {
-                        var str = '<li class="weui-uploader__file " style="background-image:url('+this.result+')"><span class="remove" style="color:red">X</span></li>';
+                        var str = '<li class="weui-uploader__file " style="background-image:url('+this.result+')"></li>';
                         $uploaderFiles.append(str);
                         render(this.result, x);
                     }
@@ -297,7 +297,7 @@
               <div class="weui-uploader">
                   <div class="weui-uploader__hd">
                       <p class="weui-uploader__title">拜访实景图</p>
-                      <!-- <div class="weui-uploader__info">${(customerVisit.imageList?size)!0}/3</div> -->
+                       <div class="weui-uploader__info">${(customerVisit.imageList?size)!0}/3</div>
                   </div>
                   <div class="weui-uploader__bd">
                       <ul class="weui-uploader__files">

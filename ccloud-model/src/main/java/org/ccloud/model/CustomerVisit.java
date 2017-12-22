@@ -16,12 +16,14 @@
 package org.ccloud.model;
 
 import org.ccloud.model.core.Table;
+import org.ccloud.model.query.OptionQuery;
 import org.ccloud.model.query.SellerCustomerQuery;
 import org.ccloud.model.vo.ImageJson;
 
 import com.alibaba.fastjson.JSON;
 import com.jfinal.kit.StrKit;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -36,13 +38,17 @@ public class CustomerVisit extends BaseCustomerVisit<CustomerVisit> {
 	private static final long serialVersionUID = 1L;
 
 	public List<ImageJson> getImageList() {
-		
-		String imageListStore = getPhoto();
+
+		String imageListStore = getStr("photo");
+
 		if (StrKit.notBlank(imageListStore)) {
+			String domain = OptionQuery.me().findValue("cdn_domain");
 			List<ImageJson> list = JSON.parseArray(imageListStore, ImageJson.class);
+			for (ImageJson image : list) {
+				image.setSavePath(domain + "/" + image.getSavePath());
+			}
 			return list;
-		}
-		return null;
+		}else return new ArrayList<>();
 	}
 	
 	public SellerCustomer getSellerCustomer() {
