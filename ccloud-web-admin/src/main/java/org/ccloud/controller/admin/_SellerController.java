@@ -576,12 +576,12 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 	public void saveOption(String sellerId){
 		Option option = new Option();
 		option.setOptionKey("seller_store_check");
-		option.setOptionValue("1");
+		option.setOptionValue("true");
 		option.set("seller_id",sellerId );
 		option.save();
 		Option option01 = new Option();
 		option01.setOptionKey("comment_need_procedure");
-		option01.setOptionValue("1");
+		option01.setOptionValue("true");
 		option01.set("seller_id",sellerId );
 		option01.save();
 	}

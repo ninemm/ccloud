@@ -20,7 +20,6 @@ import java.util.Map;
 
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.ccloud.Consts;
 import org.ccloud.core.JBaseController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
@@ -38,12 +37,12 @@ import com.jfinal.aop.Before;
 @RouterNotAllowConvert
 public class _OptionController extends JBaseController {
 	
-	@RequiresPermissions(value={"/admin/option","/admin/all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/option","/admin/all","/admin/option/seller"},logical=Logical.OR)
 	public void index() {
 		render((getPara() == null ? "web" : getPara()) + ".html");
 	}
 
-	@RequiresPermissions(value={"/admin/option","/admin/all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/option","/admin/all","/admin/option/seller"},logical=Logical.OR)
 	@Before(UCodeInterceptor.class)
 	public void save() {
 
@@ -87,64 +86,6 @@ public class _OptionController extends JBaseController {
 
 		MessageKit.sendMessage(Actions.SETTING_CHANGED, datasMap);
 		renderAjaxResultForSuccess();
-	}
-	
-	@RequiresPermissions(value={"/admin/option/seller"})
-	@Before(UCodeInterceptor.class)
-	public void saveBySeller() {
-
-		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
-		
-		HashMap<String, String> datasMap = new HashMap<String, String>();
-		Map<String, String[]> paraMap = getParaMap();
-		
-		if (paraMap != null && !paraMap.isEmpty()) {
-			for (Map.Entry<String, String[]> entry : paraMap.entrySet()) {
-				if (entry.getValue() != null && entry.getValue().length > 0) {
-					String value = null;
-					for (String v : entry.getValue()) {
-						if (StringUtils.isNotEmpty(v)) {
-							value = v;
-							break;
-						}
-					}
-					datasMap.put(entry.getKey(), value);
-				}
-			}
-		}
-		String seller_store_check = getPara("seller_store_check_"+sellerCode);
-		String comment_need_procedure = getPara("web_procedure_review_"+sellerCode);
-		if(!StringUtils.isNotBlank(seller_store_check)) {
-			datasMap.put("seller_store_check_"+sellerCode, "0");
-		}
-		if(!StringUtils.isNotBlank(comment_need_procedure)) {
-			datasMap.put("web_procedure_review_"+sellerCode, "0");
-		}
-		
-		String comment_need_goods_number = getPara("web_proc_num_limit_"+sellerCode);
-		String comment_need_goods_price = getPara("web_proc_price_limit_"+sellerCode);
-		if(!StringUtils.isNotBlank(comment_need_goods_number)) {
-			datasMap.put("web_proc_num_limit_"+sellerCode, "0");
-		}
-		if(!StringUtils.isNotBlank(comment_need_goods_price)) {
-			datasMap.put("web_proc_price_limit_"+sellerCode, "0");
-		}
-		
-		
-		for (Map.Entry<String, String> entry : datasMap.entrySet()) {
-			OptionQuery.me().saveOrUpdateBySellerId(entry.getKey(), entry.getValue(), sellerId);
-		}
-
-		MessageKit.sendMessage(Actions.SETTING_CHANGED, datasMap);
-		renderAjaxResultForSuccess();
-	}	
-	
-	@RequiresPermissions(value={"/admin/option/seller"})
-	public void seller() {
-		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-		String value = OptionQuery.me().findByKeyAndSellerId(Consts.OPTION_SELLER_STORE_CHECK, sellerId);
-		setAttr("value", value);
 	}
 	
 }

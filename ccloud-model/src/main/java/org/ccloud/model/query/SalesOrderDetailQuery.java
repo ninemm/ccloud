@@ -122,7 +122,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 			Integer productCount, Integer convert, String userId) {
 		Map<String, Object> result = new HashMap<>();
 		List<Map<String, String>> countList = new ArrayList<>();
-		boolean isCheckStore = OptionQuery.me().findOptionValueToBoolean(Consts.OPTION_SELLER_STORE_CHECK + sellerCode, sellerId);
+		boolean isCheckStore = OptionQuery.me().findOptionValueToBoolean(Consts.OPTION_SELLER_STORE_CHECK + sellerCode);
 
 		List<Record> list = InventoryQuery.me().findProductStoreByUser(sellerId, productId, userId);
 		if (list.size() == 0) {
