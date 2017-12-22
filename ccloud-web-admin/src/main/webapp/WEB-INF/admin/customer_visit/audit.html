@@ -155,8 +155,8 @@
 		</form>
 		<div class="box-footer">
 			<@shiro.hasPermission name="/admin/customerVisit/audit,/admin/all">
-			<button type="button" id = "button1" onclick="doSubmit(1)" class="btn btn-primary btn-flat btn_review">通过</button>
-			<button type="button" id = "button2" onclick="doSubmit(0)" class="btn btn-primary btn-flat btn_review">拒绝</button>
+			<button  id = "button1" onclick="doSubmit(1)" class="btn btn-primary btn-flat btn_review">通过</button >
+			<button id = "button2" onclick="doSubmit(0)" class="btn btn-primary btn-flat btn_review">拒绝</button>
 			</@shiro.hasPermission>
 			<input type="button" class="btn btn-primary btn-flat" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
 		</div>

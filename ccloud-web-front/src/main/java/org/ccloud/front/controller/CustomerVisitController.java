@@ -249,11 +249,15 @@ public class CustomerVisitController extends BaseFrontController {
 		 CustomerVisit customerVisit = getModel(CustomerVisit.class);
 		 User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
+		 Boolean isChecked = OptionQuery.me().findValueAsBool("web_proc_customer_visit_" + getSessionAttr("sellerCode"));
+
 		 List<ImageJson> list = Lists.newArrayList();
 		 String picJson = getPara("pic");
-		 
+
+		if (isChecked) customerVisit.setStatus(Customer.CUSTOMER_AUDIT);
+		else customerVisit.setStatus(Customer.CUSTOMER_NORMAL);
+
 		 customerVisit.setUserId(user.getId());
-		 customerVisit.setStatus(Customer.CUSTOMER_AUDIT);
 		 customerVisit.setDataArea(user.getDataArea());
 		 customerVisit.setDeptId(user.getDepartmentId());
 		 
@@ -280,8 +284,7 @@ public class CustomerVisitController extends BaseFrontController {
 			 renderAjaxResultForError("保存客户拜访信息出错");
 			 return ;
 		 }
-		 
-		 Boolean isChecked = OptionQuery.me().findValueAsBool("web_proc_customer_review_" + getSessionAttr("sellerCode"));
+
 		 if (isChecked)
 			updated = startProcess(customerVisit);
 		 
@@ -398,7 +401,6 @@ public class CustomerVisitController extends BaseFrontController {
 
 			String defKey = "_customer_visit_review";
 			param.put("manager", manager.getUsername());
-			param.put(Consts.WORKFLOW_APPLY_USERNAME, user.getUsername());
 
 			WorkFlowService workflow = new WorkFlowService();
 			String procInstId = workflow.startProcess(customerVisit.getId(), defKey, param);
