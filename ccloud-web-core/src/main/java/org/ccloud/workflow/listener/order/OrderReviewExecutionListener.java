@@ -9,7 +9,6 @@ import org.ccloud.Consts;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.Message;
-import org.ccloud.model.SalesOrder;
 import org.ccloud.model.User;
 import org.ccloud.model.WxMessageTemplate;
 import org.ccloud.model.query.SalesOrderDetailQuery;
@@ -84,7 +83,7 @@ public class OrderReviewExecutionListener implements ExecutionListener {
 
 		WxMessageTemplate messageTemplate = WxMessageTemplateQuery.me()
 				.findByCode(Consts.WX_MESSAGE_TEMPLATE_ORDER_REVIEW);
-		SalesOrder salesOrder = SalesOrderQuery.me().findById(orderId);
+		Record salesOrder = SalesOrderQuery.me().findMoreById(orderId);
 		List<Record> orderDetailList = SalesOrderDetailQuery.me().findByOrderId(orderId);
 
 		StringBuilder builder = new StringBuilder();
@@ -93,18 +92,19 @@ public class OrderReviewExecutionListener implements ExecutionListener {
 			builder.append("\n" +record.get("custom_name") + " " + record.getInt("product_count") / convert_relate + " "
 					+ record.get("big_unit") + "\n");
 			builder.append(record.get("custom_name") + " " + record.getInt("product_count") % convert_relate + " "
-					+ record.get("big_unit") + "\n");
+					+ record.get("small_unit") + "\n");
 		}
 
 		kv.set("touser", toWechatOpenId);
 		kv.set("templateId", messageTemplate.getTemplateId());
 
-		kv.set("orderId", salesOrder.getOrderSn());
+		kv.set("orderId", salesOrder.get("order_sn"));
+		kv.set("customerName", salesOrder.get("customer_name"));
 		kv.set("submit", realname);
 		kv.set("createTime", DateTime.now().toString("yyyy-MM-dd HH:mm"));
 
 		kv.set("product", builder.toString());
-		kv.set("total", salesOrder.getTotalAmount());
+		kv.set("total", salesOrder.get("total_amount"));
 		kv.set("status", "已拒绝");
 		MessageKit.sendMessage(Actions.NotifyWechatMessage.ORDER_AUDIT_MESSAGE, kv);
 	}

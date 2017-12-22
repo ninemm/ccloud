@@ -322,7 +322,7 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 			inventory.setBalanceCount(oldBalanceCount.subtract(new BigDecimal(orderProductInfo.getBigCount()))
 					.subtract(new BigDecimal(orderProductInfo.getSmallCount())));
 			inventory.setBalanceAmount(oldBalanceAmount.subtract(detail.getProductAmount()));
-			inventory.setModifyDate(date);
+			inventory.setModifyDate(new Date());
 			
 			if (!inventory.saveOrUpdate()) {
 				return false;
@@ -346,7 +346,7 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 			inventoryDetail.setBizUserId(userId);
 			inventoryDetail.setDeptId(deptId);
 			inventoryDetail.setDataArea(dataArea);
-			inventoryDetail.setCreateDate(date);
+			inventoryDetail.setCreateDate(new Date());
 			
 			if (!inventoryDetail.save()) {
 				return false;
@@ -355,7 +355,7 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 			SellerProduct sellerProduct = SellerProductQuery.me().findById(orderProductInfo.getSellerProductId());
 			sellerProduct.setStoreCount(sellerProduct.getStoreCount().subtract(new BigDecimal(orderProductInfo.getBigCount()))
 					.subtract(new BigDecimal(orderProductInfo.getSmallCount())));
-			sellerProduct.setModifyDate(date);
+			sellerProduct.setModifyDate(new Date());
 			if (!sellerProduct.update()) {
 				return false;
 			}
@@ -363,7 +363,7 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 			SalesOrderDetail salesOrderDetail = SalesOrderDetailQuery.me().findById(detail.getOrderDetailId());
 			salesOrderDetail.setOutCount(salesOrderDetail.getOutCount() + orderProductInfo.getProductCount());
 			salesOrderDetail.setLeftCount(salesOrderDetail.getLeftCount() - orderProductInfo.getProductCount());
-			salesOrderDetail.setModifyDate(date);
+			salesOrderDetail.setModifyDate(new Date());
 			if (!salesOrderDetail.update()) {
 				return false;
 			}

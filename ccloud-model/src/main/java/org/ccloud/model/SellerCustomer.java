@@ -15,6 +15,7 @@
  */
 package org.ccloud.model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -46,15 +47,18 @@ public class SellerCustomer extends BaseSellerCustomer<SellerCustomer> {
 	public List<ImageJson> getImageList() {
 		
 		String imageListStore = getImageListStore();
-		//Boolean isEnable = OptionQuery.me().findValueAsBool("cdn_enable");
-		
-		//if (isEnable != null && isEnable) {
+
+		if(StrKit.notBlank(imageListStore)) {
+			//Boolean isEnable = OptionQuery.me().findValueAsBool("cdn_enable");
+
+			//if (isEnable != null && isEnable) {
 			String domain = OptionQuery.me().findValue("cdn_domain");
 			List<ImageJson> list = JSON.parseArray(imageListStore, ImageJson.class);
 			for (ImageJson image : list) {
 				image.setSavePath(domain + "/" + image.getSavePath());
 			}
 			return list;
+		} else return new ArrayList<>();
 //		} else {
 //			if (StrKit.notBlank(imageListStore)) {
 //				List<ImageJson> list = JSON.parseArray(imageListStore, ImageJson.class);

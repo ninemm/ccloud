@@ -48,6 +48,7 @@ import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.tx.Tx;
 
 @RouterMapping(url = "/customerVisit")
+@RequiresPermissions(value = { "/admin/customerVisit", "/admin/dealer/all" }, logical = Logical.OR)
 public class CustomerVisitController extends BaseFrontController {
 	
 	//库存详情
@@ -271,7 +272,7 @@ public class CustomerVisitController extends BaseFrontController {
 
 				ImageJson image = new ImageJson();
 				image.setImgName(picname);
-				String newPath = upload(pic);
+				String newPath = qiniuUpload(pic);
 				image.setSavePath(newPath.replace("\\", "/"));
 				list.add(image);
 			}
@@ -321,7 +322,7 @@ public class CustomerVisitController extends BaseFrontController {
 
 				ImageJson image = new ImageJson();
 				image.setImgName(picname);
-				String newPath = upload(pic);
+				String newPath = qiniuUpload(pic);
 				image.setSavePath(newPath.replace("\\", "/"));
 				list.add(image);
 			}

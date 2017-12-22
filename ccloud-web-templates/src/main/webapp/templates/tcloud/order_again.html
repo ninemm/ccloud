@@ -52,6 +52,7 @@ $(function() {
 						$newProductDetail.find("#smallNum").val((el.product_count%el.convert_relate));
 						$newProductDetail.find("#bigNum").removeAttr("readonly");
 						$newProductDetail.find("#smallNum").removeAttr("readonly");
+						$newProductDetail.find("#isGift").val(el.is_gift);
 						
 					} else {
 						var $newProductDetail = $product.find(".common:last");
@@ -138,7 +139,7 @@ $(function() {
 <@layout>
 <body id="order">
 	<div class="weui-content">
-		<form action="${CPATH}/product/salesOrder" method="post" id="form">
+		<form action="${CPATH}/order/salesOrder" method="post" id="form">
 			<main>
 				<section class="weui-panel weui-panel_access order-customer-info">
 					<div class="weui-cell weui-cell_access">
@@ -225,6 +226,7 @@ $(function() {
 						<input type="hidden" name="sellProductId" id="sellProductId" value="">
 						<input type="hidden" name="productId" id="productId" value="">
 						<input type="hidden" name="convert" id="convert" value="">
+						<input type="hidden" name="isGift" id="isGift" value="">
 						<div class="product_name" id="productName">
 							35度中国劲酒_125ml_1*24
 			<!-- 				<span class="gift-tag">赠品</span> -->

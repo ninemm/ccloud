@@ -234,8 +234,8 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
         		
         		Boolean startProc = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROCEDURE_REVIEW + sellerCode);
         		boolean isStartProc = startProc == true ? true : false;
-        		
         		String proc_def_key = StringUtils.getArrayFirst(paraMap.get("proc_def_key"));
+        		
         		if (isStartProc && StrKit.notBlank(proc_def_key)) {
 					if (!start(orderId, StringUtils.getArrayFirst(paraMap.get("customerName")), proc_def_key)) {
 						return false;
