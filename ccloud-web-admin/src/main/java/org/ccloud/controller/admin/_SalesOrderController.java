@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.task.Comment;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
@@ -278,7 +277,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 	}
 	
-	public boolean start(String orderId, String customerName, String proc_def_key) {
+	private boolean start(String orderId, String customerName, String proc_def_key) {
 
 		WorkFlowService workflow = new WorkFlowService();
 
@@ -321,16 +320,34 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		
 		return true;
 	}
+
+	private String getStatusName(int statusCode) {
+		if (statusCode == Consts.SALES_ORDER_STATUS_PASS)
+			return "已审核";
+		if (statusCode == Consts.SALES_ORDER_STATUS_DEFAULT)
+			return "待审核";
+		if (statusCode == Consts.SALES_ORDER_STATUS_CANCEL)
+			return "取消";
+		if (statusCode == Consts.SALES_ORDER_STATUS_PART_OUT)
+			return "部分出库";
+		if (statusCode == Consts.SALES_ORDER_STATUS_PART_OUT_CLOSE)
+			return "部分出库-订单关闭";
+		if (statusCode == Consts.SALES_ORDER_STATUS_ALL_OUT)
+			return "全部出库";
+		if (statusCode == Consts.SALES_ORDER_STATUS_ALL_OUT_CLOSE)
+			return "全部出库-订单关闭";
+		return "无";
+	}
 	
 	public void audit() {
 
 		keepPara();
 		
-		boolean isCheck = false;
-		String id = getPara("id");
-
-		SalesOrder salesOrder = SalesOrderQuery.me().findById(id);
-		setAttr("salesOrder", salesOrder);
+//		boolean isCheck = false;
+//		String id = getPara("id");
+//
+//		SalesOrder salesOrder = SalesOrderQuery.me().findById(id);
+//		setAttr("salesOrder", salesOrder);
 		
 //		HistoricTaskInstanceQuery query = ActivitiPlugin.buildProcessEngine().getHistoryService()  
 //                .createHistoricTaskInstanceQuery();  
@@ -342,15 +359,35 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 //                    + hi.getStartTime());  
 //        }
         
-        String taskId = getPara("taskId");
-        List<Comment> comments = WorkFlowService.me().getProcessComments(taskId);
-		setAttr("comments", comments);
+//        String taskId = getPara("taskId");
+//        List<Comment> comments = WorkFlowService.me().getProcessComments(taskId);
+//		setAttr("comments", comments);
+		
+//		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+//		if (user != null && StrKit.equals(getPara("assignee"), user.getUsername())) {
+//			isCheck = true;
+//		}
+//		setAttr("isCheck", isCheck);
 		
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		if (user != null && StrKit.equals(getPara("assignee"), user.getUsername())) {
+
+		String orderId = getPara("id");
+		String taskId = getPara("taskId");
+		Record order = SalesOrderQuery.me().findMoreById(orderId);
+		List<Record> orderDetailList = SalesOrderDetailQuery.me().findByOrderId(orderId);
+
+		order.set("statusName", getStatusName(order.getInt("status")));
+
+		boolean isCheck = false;
+		if (user != null && getPara("assignee", "").contains(user.getUsername())) {
 			isCheck = true;
 		}
 		setAttr("isCheck", isCheck);
+
+		setAttr("taskId", taskId);
+		setAttr("order", order);
+		setAttr("orderDetailList", orderDetailList);
+		render("audit.html");
 	}
 	
 	private void sendOrderMessage(String sellerId, String title, String content, String fromUserId, String toUserId, String deptId, String dataArea) {
