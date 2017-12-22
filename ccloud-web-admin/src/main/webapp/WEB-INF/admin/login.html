@@ -103,7 +103,11 @@
 						}
 					},
 					error : function() {
-						alert("信息提交错误");
+						$("#p").show();
+						$("#uname").show();
+						$("#uname").html("用户名/密码错误,请核对之后重新输入");
+						$("#uname").css("color","red");
+						$("#uname").css("margin-left","5%");
 					}
 				});
 				return false; //不刷新页面  
