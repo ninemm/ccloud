@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.message.Actions;
@@ -48,6 +50,7 @@ import com.jfinal.plugin.activerecord.tx.Tx;
  * Created by WT on 2017/11/29.
  */
 @RouterMapping(url = "/customer")
+@RequiresPermissions(value = { "/admin/sellerCustomer", "/admin/dealer/all" }, logical = Logical.OR)
 public class CustomerController extends BaseFrontController {
 
 	public void index() {
@@ -299,14 +302,14 @@ public class CustomerController extends BaseFrontController {
 				
 				ImageJson image = new ImageJson();
 				image.setImgName(picname);
-				String newPath = null;
-				Boolean isEnable = OptionQuery.me().findValueAsBool("cdn_enable");
+				String newPath = qiniuUpload(pic);;
+				/*Boolean isEnable = OptionQuery.me().findValueAsBool("cdn_enable");
 				
 				if (isEnable != null && isEnable) {
 					newPath = qiniuUpload(pic);
 				} else {
 					newPath = upload(pic);
-				}
+				}*/
 				
 				image.setSavePath(newPath.replace("\\", "/"));
 				list.add(image);

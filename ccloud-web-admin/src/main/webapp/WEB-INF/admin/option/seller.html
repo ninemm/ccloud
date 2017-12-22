@@ -77,6 +77,18 @@
 						</div>
 						<div class="clr checkbox"></div>
 					</li>
+					<li class="jp-set-pad">
+						<div class="col-sm-3 ">
+							<div class="  jp-set-title-line jp-set-info ">新增拜访审核</div>
+						</div>
+						<div class="col-sm-9  jp-set-title-line">
+							<div class="col-sm-6 jp-table-distance-top ">
+								<label><input type="checkbox" value="true" name="web_proc_customer_visit_${(session.sellerCode)!}" ${OPTION_CHECKED('web_proc_customer_visit_${(session.sellerCode)!}')}> 开启新增拜访审核功能 </label>
+								<input type="hidden" name="web_proc_price_limit_${(session.sellerCode)!}" value="false"/>
+							</div>
+						</div>
+						<div class="clr checkbox"></div>
+					</li>					
 				</ul>
 			</div>
 			<!-- /.box -->

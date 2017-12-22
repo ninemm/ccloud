@@ -48,6 +48,7 @@ import com.jfinal.plugin.activerecord.tx.Tx;
  * Created by chen.xuebing on 2017/12/08.
  */
 @RouterMapping(url = "/order")
+@RequiresPermissions(value = { "/admin/salesOrder", "/admin/dealer/all" }, logical = Logical.OR)
 public class OrderController extends BaseFrontController {
 	
 	//我的订单
@@ -272,7 +273,7 @@ public class OrderController extends BaseFrontController {
 					}
 				}
 				
-        		boolean isStartProc = OptionQuery.me().findOptionValueToBoolean(Consts.OPTION_SELLER_STORE_PROCEDURE_REVIEW + sellerCode);
+        		boolean isStartProc = OptionQuery.me().findOptionValueToBoolean(Consts.OPTION_WEB_PROCEDURE_REVIEW + sellerCode);
         		String proc_def_key = StringUtils.getArrayFirst(paraMap.get("proc_def_key"));
         		if (isStartProc && StrKit.notBlank(proc_def_key)) {
 					if (!start(orderId, StringUtils.getArrayFirst(paraMap.get("customerName")), proc_def_key)) {
