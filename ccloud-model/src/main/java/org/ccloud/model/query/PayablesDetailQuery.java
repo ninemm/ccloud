@@ -77,7 +77,7 @@ public Page<PayablesDetail> paginate(int pageNumber, int pageSize, String id,Str
 		}
 		LinkedList<Object> params = new LinkedList<Object>();
 		appendIfNotEmptyWithLike(fromBuilder, "data_area", dataArea, params, false);
-		fromBuilder.append(" GROUP BY c.ref_sn  ORDER BY c.create_date DESC ) t2 ON r.ref_sn = t2.ref_sn ) t3  INNER JOIN dict d on t3.ref_type = d.`value`  GROUP BY t3.ref_sn");
+		fromBuilder.append(" GROUP BY c.ref_sn  ORDER BY c.create_date DESC ) t2 ON r.ref_sn = t2.ref_sn ) t3  INNER JOIN dict d on t3.ref_type = d.`value`  GROUP BY t3.ref_sn ORDER BY t3.create_date desc ");
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 

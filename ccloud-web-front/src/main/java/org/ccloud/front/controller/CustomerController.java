@@ -19,15 +19,7 @@ import org.ccloud.model.User;
 import org.ccloud.model.UserJoinCustomer;
 import org.ccloud.model.WxMessageTemplate;
 import org.ccloud.model.compare.BeanCompareUtils;
-import org.ccloud.model.query.CustomerJoinCustomerTypeQuery;
-import org.ccloud.model.query.CustomerQuery;
-import org.ccloud.model.query.CustomerTypeQuery;
-import org.ccloud.model.query.DepartmentQuery;
-import org.ccloud.model.query.OptionQuery;
-import org.ccloud.model.query.SalesOrderQuery;
-import org.ccloud.model.query.SellerCustomerQuery;
-import org.ccloud.model.query.UserQuery;
-import org.ccloud.model.query.WxMessageTemplateQuery;
+import org.ccloud.model.query.*;
 import org.ccloud.model.vo.CustomerVO;
 import org.ccloud.model.vo.ImageJson;
 import org.ccloud.route.RouterMapping;
@@ -323,6 +315,20 @@ public class CustomerController extends BaseFrontController {
 			}
 		}
 
+		Boolean isChecked = OptionQuery.me().findValueAsBool("web_proc_customer_review_" + getSessionAttr("sellerCode"));
+
+		if(!isChecked) {
+			//如果不走流程直接做操作
+			updated = doSave(sellerCustomer, customer, areaCode, areaName, customerTypeIds, list, custTypeList);
+
+			if (updated)
+				renderAjaxResultForSuccess("操作成功");
+			else
+				renderAjaxResultForError("操作失败");
+
+			return;
+		}
+
 		if (sellerCustomer != null && StrKit.notBlank(sellerCustomer.getId())) {
 			
 			CustomerVO temp = new CustomerVO();
@@ -341,88 +347,14 @@ public class CustomerController extends BaseFrontController {
 			map.put("customerVO", temp);
 
 		} else {
-			// 查看客户库是否存在这个客户
-			Customer persist = CustomerQuery.me().findByCustomerNameAndMobile(customer.getCustomerName(), customer.getMobile());
-			
-			List<String> areaCodeList = Splitter.on(",")
-					.omitEmptyStrings()
-					.trimResults()
-					.splitToList(areaCode);
-			
-			List<String> areaNameList = Splitter.on(",")
-					.omitEmptyStrings()
-					.trimResults()
-					.splitToList(areaName);
-			
-			if (areaCodeList.size() == 3 && areaNameList.size() == 3) {
-				
-				customer.setProvCode(areaCodeList.get(0));
-				customer.setProvName(areaNameList.get(0));
-				customer.setCityCode(areaCodeList.get(1));
-				customer.setCityName(areaNameList.get(1));
-				
-				customer.setCountryCode(areaCodeList.get(2));
-				customer.setCountryName(areaNameList.get(2));
-			}
-			
-			if (persist != null) {
-				customer.setId(persist.getId());
-			}
-			
-			updated = customer.saveOrUpdate();
-			
+
+			updated = doSave(sellerCustomer, customer, areaCode, areaName, customerTypeIds, list, custTypeList);
 			if (!updated) {
-				renderError(500);
-				return ;
+				renderError(404);
+				return;
 			}
-			
-			String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-			
-			sellerCustomer.setSellerId(sellerId);
-			sellerCustomer.setCustomerId(customer.getId());
-			sellerCustomer.setIsEnabled(1);
-			sellerCustomer.setIsArchive(1);
-			
-			sellerCustomer.setCustomerTypeIds(customerTypeIds);
-			sellerCustomer.setSubType("100301");
-			sellerCustomer.setCustomerKind("100401");
-			
-			String deptDataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea());
-			Department department =  DepartmentQuery.me().findByDataArea(deptDataArea);
-			sellerCustomer.setDataArea(deptDataArea);
-			sellerCustomer.setDeptId(department.getId());
-			sellerCustomer.setImageListStore(JSON.toJSONString(list));
-			
-			updated = sellerCustomer.saveOrUpdate();
-			if (!updated) {
-				renderError(500);
-				return ;
-			}
-			
-			for (String custTypeId : custTypeList) {
-				CustomerJoinCustomerType ccType = new CustomerJoinCustomerType();
-				ccType.setSellerCustomerId(sellerCustomer.getId());
-				ccType.setCustomerTypeId(custTypeId);
-				ccType.save();
-			}
-			
-			UserJoinCustomer userJoinCustomer = new UserJoinCustomer();
-	
-			userJoinCustomer.setSellerCustomerId(sellerCustomer.getId());
-			userJoinCustomer.setUserId(user.getId());
-			userJoinCustomer.setDeptId(user.getDepartmentId());
-			userJoinCustomer.setDataArea(user.getDataArea());
-	
-			updated = userJoinCustomer.save();
 		}
-		
-		if (!updated) {
-			renderError(404);
-			return ;
-		}
-		
-		Boolean isChecked = OptionQuery.me().findValueAsBool("web_proc_customer_review_" + getSessionAttr("sellerCode"));
+
 		if (isChecked)
 			updated = startProcess(sellerCustomer.getId(), map, 0);
 
@@ -635,6 +567,7 @@ public class CustomerController extends BaseFrontController {
 			kv.set("customerName", sellerCustomer.getCustomer().getCustomerName());
 			kv.set("submit", user.getRealname());
 
+			kv.set("contact", sellerCustomer.getCustomer().getContact());
 			kv.set("createTime", DateTime.now().toString("yyyy-MM-dd HH:mm"));
 			kv.set("status", comment);
 			MessageKit.sendMessage(Actions.NotifyWechatMessage.CUSTOMER_AUDIT_MESSAGE, kv);
@@ -743,5 +676,87 @@ public class CustomerController extends BaseFrontController {
 		if (receiveCode == Consts.SALES_ORDER_RECEIVE_TYPE_CASH) return "现金";
 		return "";
 	}
-	
+
+	private boolean doSave(SellerCustomer sellerCustomer, Customer customer, String areaCode, String areaName, String customerTypeIds,
+						   List<ImageJson>  list, List<String>  custTypeList  ) {
+
+		boolean updated;
+
+		// 查看客户库是否存在这个客户
+		Customer persist = CustomerQuery.me().findByCustomerNameAndMobile(customer.getCustomerName(), customer.getMobile());
+
+		List<String> areaCodeList = Splitter.on(",")
+				.omitEmptyStrings()
+				.trimResults()
+				.splitToList(areaCode);
+
+		List<String> areaNameList = Splitter.on(",")
+				.omitEmptyStrings()
+				.trimResults()
+				.splitToList(areaName);
+
+		if (areaCodeList.size() == 3 && areaNameList.size() == 3) {
+
+			customer.setProvCode(areaCodeList.get(0));
+			customer.setProvName(areaNameList.get(0));
+			customer.setCityCode(areaCodeList.get(1));
+			customer.setCityName(areaNameList.get(1));
+
+			customer.setCountryCode(areaCodeList.get(2));
+			customer.setCountryName(areaNameList.get(2));
+		}
+
+		if (persist != null) {
+			customer.setId(persist.getId());
+		}
+
+		updated = customer.saveOrUpdate();
+
+		if (!updated) {
+			return false;
+		}
+
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+
+		sellerCustomer.setSellerId(sellerId);
+		sellerCustomer.setCustomerId(customer.getId());
+		sellerCustomer.setIsEnabled(1);
+		sellerCustomer.setIsArchive(1);
+
+		sellerCustomer.setCustomerTypeIds(customerTypeIds);
+		sellerCustomer.setSubType("100301");
+		sellerCustomer.setCustomerKind("100401");
+
+		String deptDataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea());
+		Department department = DepartmentQuery.me().findByDataArea(deptDataArea);
+		sellerCustomer.setDataArea(deptDataArea);
+		sellerCustomer.setDeptId(department.getId());
+		sellerCustomer.setImageListStore(JSON.toJSONString(list));
+
+		updated = sellerCustomer.saveOrUpdate();
+		if (!updated) {
+			return false;
+		}
+
+		CustomerJoinCustomerTypeQuery.me().deleteBySellerCustomerId(sellerCustomer.getId());
+		for (String custTypeId : custTypeList) {
+			CustomerJoinCustomerType ccType = new CustomerJoinCustomerType();
+			ccType.setSellerCustomerId(sellerCustomer.getId());
+			ccType.setCustomerTypeId(custTypeId);
+			ccType.save();
+		}
+
+		UserJoinCustomerQuery.me().deleteBySelerCustomerIdAndUserId(sellerCustomer.getId(), user.getId());
+		UserJoinCustomer userJoinCustomer = new UserJoinCustomer();
+
+		userJoinCustomer.setSellerCustomerId(sellerCustomer.getId());
+		userJoinCustomer.setUserId(user.getId());
+		userJoinCustomer.setDeptId(user.getDepartmentId());
+		userJoinCustomer.setDataArea(user.getDataArea());
+
+		updated = userJoinCustomer.save();
+
+		return updated;
+	}
 }

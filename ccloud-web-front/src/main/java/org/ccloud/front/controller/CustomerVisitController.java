@@ -366,7 +366,7 @@ public class CustomerVisitController extends BaseFrontController {
 
 			kv.set("createTime", DateTime.now().toString("yyyy-MM-dd HH:mm"));
 			kv.set("status", comment);
-			MessageKit.sendMessage(Actions.NotifyWechatMessage.CUSTOMER_AUDIT_MESSAGE, kv);
+			MessageKit.sendMessage(Actions.NotifyWechatMessage.CUSTOMER_VISIT_AUDIT_MESSAGE, kv);
 		}
 		
 		workFlowService.completeTask(taskId, comment, var);
