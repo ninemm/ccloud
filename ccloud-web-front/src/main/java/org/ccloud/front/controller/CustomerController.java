@@ -327,7 +327,7 @@ public class CustomerController extends BaseFrontController {
 
 		if(!isChecked) {
 			//如果不走流程直接做操作
-			updated = doSave(sellerCustomer, customer, areaCode, areaName, customerTypeIds, list, custTypeList);
+			updated = doSave(sellerCustomer, customer, areaCode, areaName, customerTypeIds, list, custTypeList, SellerCustomer.CUSTOMER_NORMAL);
 
 			if (updated)
 				renderAjaxResultForSuccess("操作成功");
@@ -356,7 +356,7 @@ public class CustomerController extends BaseFrontController {
 
 		} else {
 
-			updated = doSave(sellerCustomer, customer, areaCode, areaName, customerTypeIds, list, custTypeList);
+			updated = doSave(sellerCustomer, customer, areaCode, areaName, customerTypeIds, list, custTypeList, SellerCustomer.CUSTOMER_AUDIT);
 			if (!updated) {
 				renderError(404);
 				return;
@@ -630,7 +630,7 @@ public class CustomerController extends BaseFrontController {
 			String defKey = "_customer_audit";
 			param.put("manager", manager.getUsername());
 			param.put("isEnable", isEnable);
-			param.put(Consts.WORKFLOW_APPLY_USERNAME, user.getUsername());
+
 			
 			WorkFlowService workflow = new WorkFlowService();
 			String procInstId = workflow.startProcess(customerId, defKey, param);
@@ -687,7 +687,7 @@ public class CustomerController extends BaseFrontController {
 	}
 
 	private boolean doSave(SellerCustomer sellerCustomer, Customer customer, String areaCode, String areaName, String customerTypeIds,
-						   List<ImageJson>  list, List<String>  custTypeList  ) {
+						   List<ImageJson>  list, List<String>  custTypeList, String status  ) {
 
 		boolean updated;
 
@@ -736,6 +736,7 @@ public class CustomerController extends BaseFrontController {
 		sellerCustomer.setCustomerTypeIds(customerTypeIds);
 		sellerCustomer.setSubType("100301");
 		sellerCustomer.setCustomerKind("100401");
+		sellerCustomer.setStatus(status);
 
 		String deptDataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea());
 		Department department = DepartmentQuery.me().findByDataArea(deptDataArea);

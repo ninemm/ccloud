@@ -152,11 +152,11 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 			kv.set("touser", toUser.getWechatOpenId());
 			kv.set("templateId", messageTemplate.getTemplateId());
 			kv.set("customerName", customerVisit.getSellerCustomer().getCustomer().getCustomerName());
-			kv.set("submit", user.getRealname());
+			kv.set("submit", toUser.getRealname());
 
 			kv.set("createTime", DateTime.now().toString("yyyy-MM-dd HH:mm"));
 			kv.set("status", comment);
-			MessageKit.sendMessage(Actions.NotifyWechatMessage.CUSTOMER_AUDIT_MESSAGE, kv);
+			MessageKit.sendMessage(Actions.NotifyWechatMessage.CUSTOMER_VISIT_AUDIT_MESSAGE, kv);
 		}
 
 		workFlowService.completeTask(taskId, comment, var);
