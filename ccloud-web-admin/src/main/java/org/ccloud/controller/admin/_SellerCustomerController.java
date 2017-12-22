@@ -567,7 +567,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 
 	}
 
-	@RequiresPermissions(value = { "/admin/customer/audit", "/admin/dealer/all" }, logical = Logical.OR)
+	@RequiresPermissions(value = { "/admin/sellerCustomer/audit", "/admin/dealer/all" }, logical = Logical.OR)
 	public void audit() {
 		
 		keepPara();
@@ -669,7 +669,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		}
 	}
 
-	@RequiresPermissions(value = { "/admin/customer/audit", "/admin/dealer/all" }, logical = Logical.OR)
+	@RequiresPermissions(value = { "/admin/sellerCustomer/audit", "/admin/dealer/all" }, logical = Logical.OR)
 	public void complete() {
 		
 		String taskId = getPara("taskId");
