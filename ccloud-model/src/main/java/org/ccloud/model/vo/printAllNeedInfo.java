@@ -12,6 +12,8 @@ public class printAllNeedInfo {
 	private String customerAddress;//客户地址
 	private String customerContacts;//客户联系人
 	private String customerPhone;//客户电话
+	private String customerId;//客户ID
+	private String customerKind;//100401:普通 100402:直营商
 	private String placeOrderMan; //业务员姓名
     private String placeOrderPhone;//业务员电话
 	private Date placeOrderTime;//下单时间
@@ -24,6 +26,8 @@ public class printAllNeedInfo {
 	private String orderId;//订单ID
 	private String bizUserId;//业务员ID
 	private String salesOutStockId;//出库单ID
+	private String stockOutRemark;//出库单备注
+	private Integer receiveType;//出库单收款方式 0:应收账款 1:现金'
 	private String printFootContext;//打印的页脚内容
 	private List<orderProductInfo> orderProductInfos;//订单明细信息
 	public String getOutstockSn() {
@@ -147,5 +151,30 @@ public class printAllNeedInfo {
 	public void setPrintFootContext(String printFootContext) {
 		this.printFootContext = printFootContext;
 	}
+	public String getCustomerKind() {
+		return customerKind;
+	}
+	public void setCustomerKind(String customerKind) {
+		this.customerKind = customerKind;
+	}
+	public String getCustomerId() {
+		return customerId;
+	}
+	public void setCustomerId(String customerId) {
+		this.customerId = customerId;
+	}
+	public String getStockOutRemark() {
+		return stockOutRemark;
+	}
+	public void setStockOutRemark(String stockOutRemark) {
+		this.stockOutRemark = stockOutRemark;
+	}
+	public Integer getReceiveType() {
+		return receiveType;
+	}
+	public void setReceiveType(Integer receiveType) {
+		this.receiveType = receiveType;
+	}
+	
 	
 }

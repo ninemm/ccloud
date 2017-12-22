@@ -137,9 +137,10 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 	
 	public List<orderProductInfo> findPrintProductInfo(String outstockId) {
 		StringBuilder sqlBuilder = new StringBuilder(
-				" SELECT sod.outstock_id,sod.is_gift, sp.custom_name, p.big_unit, p.small_unit, p.convert_relate, sp.seller_id, sp.product_id, t1.valueName, cs.is_composite, IFNULL(t2.refundCount,0) as refundCount,sp.bar_code,sod.product_price,CONVERT( sod.product_price/p.convert_relate,decimal(18,2)) as small_price, ");
-		sqlBuilder.append(" floor(sod.product_count/p.convert_relate) as bigCount,MOD(sod.product_count,p.convert_relate) as smallCount,sod.product_amount ");
+				" SELECT sod.outstock_id,sod.is_gift, sod.sell_product_id,sod.outstock_id,sp.custom_name, p.big_unit, p.small_unit, p.convert_relate, sp.seller_id, sp.product_id, t1.valueName, cs.is_composite, IFNULL(t2.refundCount,0) as refundCount,sp.bar_code,sod.product_price,CONVERT( sod.product_price/p.convert_relate,decimal(18,2)) as small_price, ");
+		sqlBuilder.append(" floor(sod.product_count/p.convert_relate) as bigCount,MOD(sod.product_count,p.convert_relate) as smallCount,sod.product_amount,sod.product_count,sod.id as salesOutDetaliId,cso.warehouse_id,sp.product_id as productId ");
 		sqlBuilder.append(" from `cc_sales_outstock_detail` sod ");
+		sqlBuilder.append(" LEFT JOIN cc_sales_outstock cso on cso.id = sod.outstock_id ");
 		sqlBuilder.append(" LEFT JOIN cc_sales_order_detail cs ON sod.order_detail_id = cs.id ");
 		sqlBuilder.append(" LEFT JOIN cc_seller_product sp ON sod.sell_product_id = sp.id ");
 		sqlBuilder.append(" LEFT JOIN cc_product p ON sp.product_id = p.id ");
@@ -164,6 +165,12 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 			orderProductInfo.setSmallCount(record.getInt("smallCount"));
 			orderProductInfo.setIsgift(record.getInt("is_gift"));
 			orderProductInfo.setProductAmout(record.getBigDecimal("product_amount"));
+			orderProductInfo.setProductCount(record.getInt("product_count"));
+			orderProductInfo.setSellerProductId(record.getStr("sell_product_id"));
+			orderProductInfo.setOutStockId(record.getStr("outstock_id"));
+			orderProductInfo.setSalesOutDetaliId(record.getStr("salesOutDetaliId"));
+			orderProductInfo.setWareHouseId(record.getStr("warehouse_id"));
+			orderProductInfo.setProductId(record.getStr("productId"));
 			orderProductInfos.add(orderProductInfo);
 		}
 		 return orderProductInfos;
@@ -291,4 +298,80 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		return true;
 	}
 
+	//批量出库
+	public boolean batchOutStock(List<orderProductInfo> orderProductInfos, String sellerId, Date date, String userId, String deptId, String dataArea, String outStockSN) {
+		for (orderProductInfo orderProductInfo : orderProductInfos) {
+			SalesOutstockDetail detail = SalesOutstockDetailQuery.me().findById(orderProductInfo.getSalesOutDetaliId());
+			if (!detail.saveOrUpdate()) {
+				return false;
+			}
+			
+			Inventory inventory = InventoryQuery.me().findBySellerIdAndProductIdAndWareHouseId(sellerId, orderProductInfo.getProductId(), orderProductInfo.getWareHouseId());
+			if (inventory == null) {
+				return false;
+			}
+			BigDecimal oldOutCount = inventory.getOutCount() == null? new BigDecimal(0) : inventory.getOutCount();
+			BigDecimal oldOutAmount = inventory.getOutAmount() == null? new BigDecimal(0) : inventory.getOutAmount();
+			//BigDecimal oldOutPrice = inventory.getOutPrice() == null? new BigDecimal(0) : inventory.getOutPrice();
+			BigDecimal oldBalanceAmount = inventory.getBalanceAmount() == null? new BigDecimal(0) : inventory.getBalanceAmount();
+			BigDecimal oldBalanceCount = inventory.getBalanceCount() == null? new BigDecimal(0) : inventory.getBalanceCount();
+					
+			inventory.setOutCount(oldOutCount.add(new BigDecimal(orderProductInfo.getBigCount())).add(new BigDecimal(orderProductInfo.getSmallCount())));
+			inventory.setOutAmount(oldOutAmount.add(detail.getProductAmount()));
+			inventory.setOutPrice(orderProductInfo.getBigPrice());
+			inventory.setBalanceCount(oldBalanceCount.subtract(new BigDecimal(orderProductInfo.getBigCount()))
+					.subtract(new BigDecimal(orderProductInfo.getSmallCount())));
+			inventory.setBalanceAmount(oldBalanceAmount.subtract(detail.getProductAmount()));
+			inventory.setModifyDate(date);
+			
+			if (!inventory.saveOrUpdate()) {
+				return false;
+			}
+			
+			InventoryDetail oldDetail = InventoryDetailQuery.me().findBySellerProductId(orderProductInfo.getSellerProductId(), orderProductInfo.getWareHouseId());
+			InventoryDetail inventoryDetail = new InventoryDetail();
+			inventoryDetail.setId(StrKit.getRandomUUID());
+			inventoryDetail.setWarehouseId(inventory.getWarehouseId());
+			inventoryDetail.setSellProductId(detail.getSellProductId());
+			inventoryDetail.setOutAmount(detail.getProductAmount());
+			inventoryDetail.setOutCount((new BigDecimal(orderProductInfo.getBigCount())).add(new BigDecimal(orderProductInfo.getSmallCount())));
+			inventoryDetail.setOutPrice(inventory.getOutPrice());
+			inventoryDetail.setBalanceAmount(oldDetail.getBalanceAmount().subtract(detail.getProductAmount()));
+			inventoryDetail.setBalanceCount(oldDetail.getBalanceCount().subtract(new BigDecimal(orderProductInfo.getBigCount()))
+					.subtract(new BigDecimal(orderProductInfo.getSmallCount())));
+			inventoryDetail.setBalancePrice(oldDetail.getBalancePrice());
+			inventoryDetail.setBizBillSn(outStockSN);
+			inventoryDetail.setBizDate(detail.getCreateDate());
+			inventoryDetail.setBizType(Consts.BIZ_TYPE_SALES_OUTSTOCK);
+			inventoryDetail.setBizUserId(userId);
+			inventoryDetail.setDeptId(deptId);
+			inventoryDetail.setDataArea(dataArea);
+			inventoryDetail.setCreateDate(date);
+			
+			if (!inventoryDetail.save()) {
+				return false;
+			}
+			
+			SellerProduct sellerProduct = SellerProductQuery.me().findById(orderProductInfo.getSellerProductId());
+			sellerProduct.setStoreCount(sellerProduct.getStoreCount().subtract(new BigDecimal(orderProductInfo.getBigCount()))
+					.subtract(new BigDecimal(orderProductInfo.getSmallCount())));
+			sellerProduct.setModifyDate(date);
+			if (!sellerProduct.update()) {
+				return false;
+			}
+			
+			SalesOrderDetail salesOrderDetail = SalesOrderDetailQuery.me().findById(detail.getOrderDetailId());
+			salesOrderDetail.setOutCount(salesOrderDetail.getOutCount() + orderProductInfo.getProductCount());
+			salesOrderDetail.setLeftCount(salesOrderDetail.getLeftCount() - orderProductInfo.getProductCount());
+			salesOrderDetail.setModifyDate(date);
+			if (!salesOrderDetail.update()) {
+				return false;
+			}
+			
+		}
+		
+		return true;
+	}
+	
+	
 }

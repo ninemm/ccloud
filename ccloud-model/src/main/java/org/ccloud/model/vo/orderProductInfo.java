@@ -16,6 +16,11 @@ public class orderProductInfo {
 	private Integer isgift;//是否赠品
 	private Integer convertRelate;//大单位小单位换算关系
 	private BigDecimal productAmout;//出库单子表，每个品项的金额合计
+	private String sellerProductId;//
+	private String outStockId;//出库单主表Id
+	private String salesOutDetaliId;//出库单子表Id
+	private String wareHouseId;//出库单仓库
+	private String productId;
 	public String getProductName() {
 		return productName;
 	}
@@ -88,6 +93,36 @@ public class orderProductInfo {
 	}
 	public void setProductAmout(BigDecimal productAmout) {
 		this.productAmout = productAmout;
+	}
+	public String getSellerProductId() {
+		return sellerProductId;
+	}
+	public void setSellerProductId(String sellerProductId) {
+		this.sellerProductId = sellerProductId;
+	}
+	public String getOutStockId() {
+		return outStockId;
+	}
+	public void setOutStockId(String outStockId) {
+		this.outStockId = outStockId;
+	}
+	public String getSalesOutDetaliId() {
+		return salesOutDetaliId;
+	}
+	public void setSalesOutDetaliId(String salesOutDetaliId) {
+		this.salesOutDetaliId = salesOutDetaliId;
+	}
+	public String getWareHouseId() {
+		return wareHouseId;
+	}
+	public void setWareHouseId(String wareHouseId) {
+		this.wareHouseId = wareHouseId;
+	}
+	public String getProductId() {
+		return productId;
+	}
+	public void setProductId(String productId) {
+		this.productId = productId;
 	}
 	
 }
