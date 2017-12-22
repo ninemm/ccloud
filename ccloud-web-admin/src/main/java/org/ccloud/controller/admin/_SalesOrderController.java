@@ -231,13 +231,11 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
         		
         		boolean isStartProc = OptionQuery.me().findOptionValueToBoolean(Consts.OPTION_SELLER_STORE_PROCEDURE_REVIEW + sellerCode
         				, sellerId);
-        		if (isStartProc) {
-    				String proc_def_key = StringUtils.getArrayFirst(paraMap.get("proc_def_key"));
-    				if (StrKit.notBlank(proc_def_key)) {
-    					if (!start(orderId, StringUtils.getArrayFirst(paraMap.get("customerName")), proc_def_key)) {
-    						return false;
-    					}
-    				}        			
+        		String proc_def_key = StringUtils.getArrayFirst(paraMap.get("proc_def_key"));
+        		if (isStartProc && StrKit.notBlank(proc_def_key)) {
+					if (!start(orderId, StringUtils.getArrayFirst(paraMap.get("customerName")), proc_def_key)) {
+						return false;
+					}
         		} else {
         			SalesOutstockQuery.me().pass(orderId, user.getId(), sellerId, sellerCode);
         			sendOrderMessage(sellerId, StringUtils.getArrayFirst(paraMap.get("customerName")), "订单审核通过", user.getId(), user.getId(),
