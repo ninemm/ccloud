@@ -32,10 +32,10 @@ import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 
 @RouterMapping(url = "/refund")
+@RequiresPermissions(value = { "/admin/salesRefund", "/admin/dealer/all" }, logical = Logical.OR)
 public class RefundController extends BaseFrontController{
 	
 	//申请退货
-	@RequiresPermissions(value = { "/admin/salesRefund", "/admin/dealer/all" }, logical = Logical.OR)
 	public void index() {
 		
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
@@ -93,7 +93,6 @@ public class RefundController extends BaseFrontController{
 	}
 	
 	//退货订单
-	@RequiresPermissions(value = { "/admin/salesRefund", "/admin/dealer/all" }, logical = Logical.OR)
 	public void myRefund() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 

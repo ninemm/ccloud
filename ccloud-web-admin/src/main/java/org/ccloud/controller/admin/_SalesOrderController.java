@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.engine.task.Comment;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
@@ -33,6 +34,7 @@ import org.ccloud.model.Message;
 import org.ccloud.model.SalesOrder;
 import org.ccloud.model.User;
 import org.ccloud.model.query.OptionQuery;
+import org.ccloud.model.query.OutstockPrintQuery;
 import org.ccloud.model.query.SalesOrderDetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SalesOutstockQuery;
@@ -228,7 +230,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
         		}
         		
-        		boolean isStartProc = OptionQuery.me().findOptionValueToBoolean(Consts.OPTION_SELLER_STORE_PROCEDURE_REVIEW + sellerCode);
+        		boolean isStartProc = OptionQuery.me().findOptionValueToBoolean(Consts.OPTION_WEB_PROCEDURE_REVIEW + sellerCode);
         		String proc_def_key = StringUtils.getArrayFirst(paraMap.get("proc_def_key"));
         		if (isStartProc && StrKit.notBlank(proc_def_key)) {
 					if (!start(orderId, StringUtils.getArrayFirst(paraMap.get("customerName")), proc_def_key)) {
@@ -573,6 +575,51 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 			renderAjaxResultForError("审核失败");
 			renderJson(result);
 		}
+	}
+	
+	public void operateHistory() {
+		keepPara();
+		
+		String id = getPara(0);
+
+		Record salesOrder = SalesOrderQuery.me().findRecordById(id);
+		setAttr("salesOrder", salesOrder);
+
+		String proc_inst_id = getPara(1);
+		List<Comment> comments = WorkFlowService.me().getProcessComments(proc_inst_id);
+		setAttr("comments", comments);
+		
+		StringBuilder printComments = new StringBuilder();
+		List<Record> printRecord = OutstockPrintQuery.me().findByOrderId(id);
+		for (int i = 0; i < printRecord.size(); i++) {
+			Record record = printRecord.get(i);
+			int status = record.getInt("status");
+			printComments.append(buildComments(Consts.OPERATE_HISTORY_TITLE_ORDER_PRINT + " 第" + (i+1) + "次", record.get("create_date").toString(), record.getStr("realname"),
+					status == 1 ? "打印失败" : "打印成功"));
+		}
+		setAttr("printComment", printComments.toString());
+
+		String outstockInfo = buildOutstockInfo(id);
+		setAttr("outstockInfo", outstockInfo);
+		
+		render("operate_history.html");
+	}
+	
+	private String buildOutstockInfo(String ordedId) {
+		List<Record> orderDetails = SalesOrderDetailQuery.me().findByOrderId(ordedId);
+		
+		StringBuilder stringBuilder = new StringBuilder();
+		
+		for (Record record : orderDetails) { // 若修改了产品价格或数量，则写入相关日志信息
+			if (record.getInt("out_count") !=record.getInt("product_count")) {
+					stringBuilder.append("●" + record.getStr("custom_name") + "<br>");
+					int convert = record.getInt("convert_relate");
+					stringBuilder.append("-" + record.getStr("big_unit") + "数量修改为"+ Math.round(record.getInt("out_count")/convert) + "(" + Math.round(record.getInt("product_count")/convert) + ")<br>");
+					stringBuilder.append("-" + record.getStr("small_unit") + "数量修改为"+ Math.round(record.getInt("out_count")%convert) + "(" + Math.round(record.getInt("product_count")%convert) + ")<br>");
+			}
+		}
+		
+		return stringBuilder.toString();
 	}
 	
 }

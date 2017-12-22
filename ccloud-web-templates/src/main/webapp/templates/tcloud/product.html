@@ -417,9 +417,11 @@ function save(){
 				</section>
 			</div>
 		</article>
+		<@shiro.hasPermission name="/admin/salesOrder">
 		<a class="hidden-menu" id="shoppingCart" >
 			<img src="${CTPATH}/images/shopping_cart.png" alt="">
 		</a>
+		</@shiro.hasPermission>
 		<div class="layer"></div>
 	</div>
 </div>
