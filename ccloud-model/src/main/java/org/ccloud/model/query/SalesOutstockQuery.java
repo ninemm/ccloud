@@ -79,7 +79,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 				//应收账款
 				createReceivables(order);
 				//直营商的应付账款
-				if(order.get("customer_type_ids").equals("7")){
+				if(Consts.CUSTOMER_KIND_SELLER.equals(order.getStr("customer_kind"))){
 					createPayables(order);
 				}
 				
