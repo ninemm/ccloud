@@ -103,7 +103,7 @@ public class OptionQuery extends JBaseQuery {
 			} catch (Exception e) {
 			}
 		}
-		return null;
+		return false;
 	}
 
 	public Integer findValueAsInteger(String key) {
