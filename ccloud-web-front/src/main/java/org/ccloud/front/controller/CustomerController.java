@@ -299,14 +299,14 @@ public class CustomerController extends BaseFrontController {
 				
 				ImageJson image = new ImageJson();
 				image.setImgName(picname);
-				String newPath = null;
-				Boolean isEnable = OptionQuery.me().findValueAsBool("cdn_enable");
+				String newPath = qiniuUpload(pic);;
+				/*Boolean isEnable = OptionQuery.me().findValueAsBool("cdn_enable");
 				
 				if (isEnable != null && isEnable) {
 					newPath = qiniuUpload(pic);
 				} else {
 					newPath = upload(pic);
-				}
+				}*/
 				
 				image.setSavePath(newPath.replace("\\", "/"));
 				list.add(image);
