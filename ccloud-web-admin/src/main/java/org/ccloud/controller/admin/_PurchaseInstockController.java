@@ -214,6 +214,12 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 				String convert = StringUtils.getArrayFirst(paraMap.get("convert" + j));
 				String bN = StringUtils.getArrayFirst(paraMap.get("bN" + j));
 				String sN = StringUtils.getArrayFirst(paraMap.get("sN" + j));
+				if(bN==null){
+					bN = "0";
+				}
+				if(sN == null){
+					sN = "0";
+				}
 				Integer productCount0 = Integer.valueOf(bN) * Integer.valueOf(convert) + Integer.valueOf(sN);
 				if(purchaseOederDetailId.equals(pid)){
 					convertt = StringUtils.getArrayFirst(paraMap.get("convert" + j));
@@ -252,6 +258,12 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 				String convert = StringUtils.getArrayFirst(paraMap.get("convert" + index));
 				String bN = StringUtils.getArrayFirst(paraMap.get("bN" + index));
 				String sN = StringUtils.getArrayFirst(paraMap.get("sN" + index));
+				if(bN==null){
+					bN = "0";
+				}
+				if(sN == null){
+					sN = "0";
+				}
 				Integer productCount0 = Integer.valueOf(bN) * Integer.valueOf(convert) + Integer.valueOf(sN);
 				BigDecimal productAmount =  (purchaseInstockDetail.getProductPrice().multiply(new BigDecimal(bN))).add(((purchaseInstockDetail.getProductPrice().divide((new BigDecimal(convert)), 2, BigDecimal.ROUND_HALF_UP))).multiply(new BigDecimal(sN)));
 				purchaseInstockDetail.set("product_count", productCount0);
