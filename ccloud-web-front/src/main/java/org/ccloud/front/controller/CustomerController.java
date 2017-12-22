@@ -567,6 +567,7 @@ public class CustomerController extends BaseFrontController {
 			kv.set("customerName", sellerCustomer.getCustomer().getCustomerName());
 			kv.set("submit", user.getRealname());
 
+			kv.set("contact", sellerCustomer.getCustomer().getContact());
 			kv.set("createTime", DateTime.now().toString("yyyy-MM-dd HH:mm"));
 			kv.set("status", comment);
 			MessageKit.sendMessage(Actions.NotifyWechatMessage.CUSTOMER_AUDIT_MESSAGE, kv);
