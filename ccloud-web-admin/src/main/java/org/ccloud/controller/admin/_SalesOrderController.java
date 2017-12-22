@@ -156,7 +156,9 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 			customerOptionList.add(customerOptionMap);
 		}
-		boolean isCheckStore = OptionQuery.me().findOptionValueToBoolean(Consts.OPTION_SELLER_STORE_CHECK + sellerCode);
+		
+		Boolean checkStore = OptionQuery.me().findValueAsBool(Consts.OPTION_SELLER_STORE_CHECK + sellerCode);
+		boolean isCheckStore = checkStore == true ? true : false;
 		setAttr("isCheckStore", isCheckStore);
 		setAttr("productInfoMap", JSON.toJSON(productInfoMap));
 		setAttr("productOptionList", JSON.toJSON(productOptionList));
@@ -230,7 +232,9 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
         		}
         		
-        		boolean isStartProc = OptionQuery.me().findOptionValueToBoolean(Consts.OPTION_SELLER_STORE_PROCEDURE_REVIEW + sellerCode);
+        		Boolean startProc = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROCEDURE_REVIEW + sellerCode);
+        		boolean isStartProc = startProc == true ? true : false;
+        		
         		String proc_def_key = StringUtils.getArrayFirst(paraMap.get("proc_def_key"));
         		if (isStartProc && StrKit.notBlank(proc_def_key)) {
 					if (!start(orderId, StringUtils.getArrayFirst(paraMap.get("customerName")), proc_def_key)) {

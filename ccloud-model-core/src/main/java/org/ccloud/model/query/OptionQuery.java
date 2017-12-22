@@ -15,7 +15,6 @@
  */
 package org.ccloud.model.query;
 
-import org.ccloud.Consts;
 import org.ccloud.model.Option;
 import org.ccloud.utils.StringUtils;
 
@@ -79,7 +78,7 @@ public class OptionQuery extends JBaseQuery {
 			} catch (Exception e) {
 			}
 		}
-		return true;
+		return null;
 	}
 
 	public Integer findValueAsInteger(String key) {
@@ -104,12 +103,4 @@ public class OptionQuery extends JBaseQuery {
 		return null;
 	}
 	
-	public boolean findOptionValueToBoolean(String key) {
-		String result = this.findValue(key);
-		if (result == null || result.equals(Consts.OPTION_ON)) {
-			return true;
-		}
-		return false;
-	}
-	 
 }
