@@ -272,7 +272,7 @@ public class CustomerVisitController extends BaseFrontController {
 
 				ImageJson image = new ImageJson();
 				image.setImgName(picname);
-				String newPath = upload(pic);
+				String newPath = qiniuUpload(pic);
 				image.setSavePath(newPath.replace("\\", "/"));
 				list.add(image);
 			}
@@ -322,7 +322,7 @@ public class CustomerVisitController extends BaseFrontController {
 
 				ImageJson image = new ImageJson();
 				image.setImgName(picname);
-				String newPath = upload(pic);
+				String newPath = qiniuUpload(pic);
 				image.setSavePath(newPath.replace("\\", "/"));
 				list.add(image);
 			}

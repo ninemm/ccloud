@@ -109,7 +109,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 	}
 
 	public CustomerVisit findMoreById(String id) {
-		StringBuilder sql = new StringBuilder("SELECT ccv.id, ccv.seller_customer_id, cc.customer_name, cc.contact, cc.mobile, ccv.create_date, ccv.`status`, ccv.question_type, ccv.comment, ccv.location, ccv.photo, ccv.question_desc, u.realname, u.mobile as userMobile, d.name as typeName ");
+		StringBuilder sql = new StringBuilder("SELECT ccv.*, cc.customer_name, cc.contact, cc.mobile, u.realname, u.mobile as userMobile, d.name as typeName ");
 		sql.append("FROM cc_customer_visit ccv ");
 		sql.append("LEFT JOIN user u ON ccv.user_id = u.id ");
 		sql.append("LEFT JOIN cc_seller_customer csc ON ccv.seller_customer_id = csc.id ");
