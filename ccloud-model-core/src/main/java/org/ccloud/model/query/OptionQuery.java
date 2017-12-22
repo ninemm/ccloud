@@ -67,29 +67,6 @@ public class OptionQuery extends JBaseQuery {
 		//return option.saveOrUpdateWithoutDate();
 	}
 	
-	public boolean saveOrUpdateBySellerId(String key, String value, String sellerId) {
-		CacheKit.remove(Option.CACHE_NAME, sellerId + key);
-		Option option = DAO.doFindFirst("option_key = ? AND seller_id = ?", key, sellerId);
-		boolean save = false;
-		if (null == option) {
-			option = new Option();
-			save = true;
-		}
-
-		option.setOptionKey(key);
-		option.setOptionValue(value);
-		option.setSellerId(sellerId);
-		
-		if(save) {
-			return option.save();
-		}else {
-			return option.update();
-		}
-		
-
-		//return option.saveOrUpdateWithoutDate();
-	}	
-
 	public Option findByKey(String key) {
 		return DAO.doFindFirst("option_key =  ?", key);
 	}
@@ -127,27 +104,12 @@ public class OptionQuery extends JBaseQuery {
 		return null;
 	}
 	
-	public String findByKeyAndSellerId(final String key, final String sellerId) {
-		String sessionKey = sellerId + key;
-		String value = CacheKit.get(Option.CACHE_NAME, sessionKey, new IDataLoader() {
-			@Override
-			public Object load() {
-				Option option = DAO.doFindFirst("option_key = ? AND seller_id = ?", key, sellerId);
-				if (null != option && option.getOptionValue() != null) {
-					return option.getOptionValue();
-				}
-				return "";
-			}
-		});
-
-		return "".equals(value) ? null : value;
-	}
-	
-	public boolean findOptionValueToBoolean(String key, String sellerId) {
-		String result = this.findByKeyAndSellerId(key, sellerId);
+	public boolean findOptionValueToBoolean(String key) {
+		String result = this.findValue(key);
 		if (result == null || result.equals(Consts.OPTION_ON)) {
 			return true;
 		}
 		return false;
 	}
+	 
 }
