@@ -32,6 +32,7 @@ import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.OutstockPrint;
 import org.ccloud.model.PrintTemplate;
 import org.ccloud.model.SalesOrder;
+import org.ccloud.model.SalesOutstock;
 import org.ccloud.model.User;
 import org.ccloud.model.Warehouse;
 import org.ccloud.model.query.PrintTemplateQuery;
@@ -42,6 +43,7 @@ import org.ccloud.model.query.SalesOutstockDetailQuery;
 import org.ccloud.model.query.SalesOutstockQuery;
 import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.WarehouseQuery;
+import org.ccloud.model.vo.carSalesPrintNeedInfo;
 import org.ccloud.model.vo.orderProductInfo;
 import org.ccloud.model.vo.printAllNeedInfo;
 import org.ccloud.route.RouterMapping;
@@ -49,6 +51,7 @@ import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
 
+import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.jfinal.aop.Before;
@@ -139,8 +142,23 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
         //获取销售商的配置模板地址
         String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
         List<PrintTemplate> printTemplates = PrintTemplateQuery.me().findPrintTemplateBySellerId(sellerId);
-        String url = printTemplates.get(0).getUrl();
-		render(url + ".html");
+        if (printTemplates.size() == 0) {
+        	renderAjaxResultForError("请配置一个打印模板");
+		}else {
+			String url = printTemplates.get(0).getUrl();
+			render(url + ".html");
+		}
+       
+	}
+	
+	
+	public void  renderCarPrintPage() {
+		setAttr("carWarehouseId", getPara("carWarehouseId"));
+		setAttr("beginDate", getPara("beginDate"));
+		setAttr("endDate", getPara("endDate"));
+		
+		
+		render("carPrint.html");
 	}
 	
 	//获取出库单打印的信息
@@ -156,6 +174,17 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		}
 		HashMap<String, Object> result = Maps.newHashMap();
         result.put("rows", printAllNeedInfos);
+        renderJson(result);
+	}
+	
+	
+	public void queryCarStockDetail() {
+		String carWarehouseId = getPara("carWarehouseId");
+		String beginDate = getPara("beginDate");
+		String endDate = getPara("endDate");
+		List<carSalesPrintNeedInfo> carSalesPrintNeedInfos = SalesOutstockQuery.me().getCarSalesPrintInfo(carWarehouseId, beginDate, endDate);
+		HashMap<String, Object> result = Maps.newHashMap();
+        result.put("rows", carSalesPrintNeedInfos);
         renderJson(result);
 	}
 	
@@ -192,12 +221,18 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		String sellerId = getSessionAttr("sellerId");
 		String sellerCode = getSessionAttr("sellerCode");
 		Date date = new Date();
-		boolean isSave = this.saveBatchStockOut(outId,StockDate,remark,user,sellerId,sellerCode,date);
-		 if (isSave) {
-	        	renderAjaxResultForSuccess("批量出库成功");
-	        } else {
-	        	renderAjaxResultForError("批量出库失败!");
-	        }
+		//检查批量出库提交上来单子是否有已出库的
+		boolean isStockOut = this.checkIsStockOut(outId);
+		if (!isStockOut) {
+		  renderAjaxResultForError("批量出库失败,单子已有出库，请检查！");
+		}else {
+			boolean isSave = this.saveBatchStockOut(outId,StockDate,remark,user,sellerId,sellerCode,date);
+			 if (isSave) {
+		        	renderAjaxResultForSuccess("批量出库成功");
+		        } else {
+		        	renderAjaxResultForError("批量出库失败!");
+		      }	
+		}
 	}
 	
 	public void recordPrintInfo() {
@@ -368,4 +403,25 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 	       });
 		return isSave;
 	}
+	
+    //获取车销仓库
+	public void queryCarWarehouse() {
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		List<Warehouse> carWarehouseList = WarehouseQuery.me().getCarWarehouseBySellerId(sellerId);
+        renderAjaxResultForSuccess("success",JSON.toJSON(carWarehouseList));
+	}
+	
+	//检查前台提交的批量出库单子是否有已出库的
+	public boolean checkIsStockOut(String[] outId) {
+		boolean isStockOut = true;
+		for (String s : outId) {
+			SalesOutstock salesOutstock = SalesOutstockQuery.me().findById(s);
+			if (salesOutstock.getStatus().toString().equals("1000")) {
+				isStockOut = false;
+			}
+		}
+		return isStockOut;
+	}
+	
+	
 }

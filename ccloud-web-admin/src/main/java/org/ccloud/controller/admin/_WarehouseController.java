@@ -192,6 +192,7 @@ public class _WarehouseController extends JBaseCRUDController<Warehouse> {
 		    }
 		});
 	}
+	
 }
 
 
