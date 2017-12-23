@@ -172,13 +172,14 @@
 				"brandList":ids,"productTypeList":idps},
 			dataType : "json", 
 			success : function(data) { 
-				l.stop();
 				if(data.errorCode == 0) {
 					toastr.success(data.message, '操作成功');
 					setTimeout( function(){
+						l.stop();
 						location.href = '${CPATH}/admin/seller/index';
 								}, 1 * 1000 );
 				} else {
+					l.stop();
 					toastr.error(data.message,'操作失败');
 				}
 			},
@@ -307,8 +308,6 @@
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">*产品类型:</label>
 							<div class="input-group col-md-4 col-sm-10">
-<!-- 								<input class="form-control input-sm" type="text" name="seller.product_type_store" value="${(seller.product_type_store)!}" placeholder="1-50个任意字母数字">
- -->							
  								<select class="form-control input-sm" name="product_type_store" id="product_type_store_option" multiple="multiple" >
 								</select>
  							</div>

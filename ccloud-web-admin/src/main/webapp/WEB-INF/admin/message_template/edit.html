@@ -3,11 +3,14 @@
 <#macro script_import>
 	<!-- bootstrapvalidator -->
  	<script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
+ 	<script src="${CPATH}/static/ladda/spin.min.js"></script>
+ 	<script src="${CPATH}/static/ladda/ladda.min.js"></script>
 </#macro>
 
 <#macro css_import>
 	<!-- bootstrapvalidator -->
     <link rel="stylesheet" href="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.css">
+	<link rel="stylesheet" href="${CPATH}/static/ladda/ladda-themeless.min.css">
 </#macro>
 
 <#macro css>
@@ -37,10 +40,14 @@
 	};
 	
 	function doSubmit(){
+		var l = Ladda.create( document.querySelector( '#do_submit' ) );
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
 				var validate = $form.data('bootstrapValidator');
 				validate.validate();
+				if (validate.isValid()) {
+					l.start();
+				}
 				return validate.isValid();
 			},
 			type : "post", 
@@ -52,8 +59,12 @@
 				} else {
 					toastr.error(data.message,'操作失败');
 				}
+					setTimeout( function(){
+						l.stop();
+								}, 1 * 1000 );
 			},
 			error : function() {
+				l.stop();
 				alert("信息提交错误");
 			}
 		});
