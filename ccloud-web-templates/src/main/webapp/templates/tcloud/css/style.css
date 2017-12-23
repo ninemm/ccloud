@@ -1372,6 +1372,11 @@ input[name=sex] {
   vertical-align: middle;
 }
 
+.location {
+    margin: 0 .5rem;
+    font-size: .8rem;
+    color: gray;
+}
 
 /* 历史订单 */
 

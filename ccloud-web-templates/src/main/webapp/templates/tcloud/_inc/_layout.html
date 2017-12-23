@@ -18,19 +18,8 @@
   	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
   	<meta name="renderer" content="webkit">
   	
-  	<!-- Facebook and Twitter integration -->
-	<meta property="og:title" content="${WEB_TITLE!WEB_NAME!}"/>
-	<meta property="og:image" content=""/>
-	<meta property="og:url" content=""/>
-	<meta property="og:site_name" content="${WEB_TITLE!WEB_NAME!}"/>
-	<meta property="og:description" content="${META_DESCRIPTION!}"/>
-	<meta name="twitter:title" content="${WEB_TITLE!WEB_NAME!}" />
-	<meta name="twitter:image" content="" />
-	<meta name="twitter:url" content="" />
-	<meta name="twitter:card" content="${META_DESCRIPTION!}" />
-	
 	<!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-  	<link rel="shortcut icon" type="image/x-icon" href="${CTPATH}/images/favicon.ico">
+  	<link type="image/x-icon" rel="shortcut icon" href="${CTPATH}/favicon.ico">
 	<link type='text/css' rel="stylesheet" href="${CTPATH}/css/animate.min.css">
 	<link type='text/css' rel="stylesheet" href="${CTPATH}/css/weui.min.css">
 	<link type='text/css' rel="stylesheet" href="${CTPATH}/css/jquery-weui.min.css"> 
@@ -71,9 +60,9 @@
 	<@script_import />
 	<script type='text/javascript' src="${CTPATH}/js/comm.js"></script>
 	<script type="text/javascript">
-	if (Utils.devMode) {
-        document.write("<script type=\"text/javascript\" src=\"" + '${CTPATH}' + "/js/vconsole.min.js\">" + "<\/script>");
-    }
+		if (Utils.devMode) {
+	        document.write("<script type=\"text/javascript\" src=\"" + '${CTPATH}' + "/js/vconsole.min.js\">" + "<\/script>");
+	    }
 	
 	    $(function() {
         	FastClick.attach(document.body);

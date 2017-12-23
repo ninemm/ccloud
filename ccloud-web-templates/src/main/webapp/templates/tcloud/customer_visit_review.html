@@ -388,12 +388,13 @@
     </section>
     <section class="weui-panel weui-panel_access ft14 remark">
         <div class="weui-cell weui-cell_access">
-	        <div class="weui-cell__bd">
-	            <span class="icon-map-pin ft16 green"></span>
-	            <span id="location">正在定位...</span>
-	            <input id="lng" name="customerVisit.lng" type="hidden" />
-                <input id="lat" name="customerVisit.lat" type="hidden" />
-	        </div>
+	        <div class="weui-cell__hd"><span class="icon-map-pin ft16 green"></span></div>
+            <div class="weui-cell__bd">
+                <div id="location" class="location">${(customerVisit.reviewAddress)!'正在定位...'}</div>
+                <input type="hidden" name="customerVisit.lng" id="lng">
+                <input type="hidden" name="customerVisit.lat" id="lat">
+            </div>
+            <div class="weui-cell__hd" id="refresh"><span class="icon-refresh ft16 gray"></span></div>
         </div>
     </section>
 </main>
