@@ -12,13 +12,95 @@
 
 <#macro script>
 
-
-	$(function() {
-				
-	});
-
-	function doSubmit(pass){
 	
+	$(function() {
+	});
+	
+	function changeBigPrice(obj){
+		var $curTr = $(obj).parent().parent().parent();
+		var bigPrice = $(obj).val();
+		var convert = $curTr.find("#convert").val();
+
+		var smallPrice = (bigPrice / convert).toFixed(2);
+		$curTr.find("#smallPrice").val(smallPrice);
+
+		rowTotalF(obj);
+	}
+
+	function changeSmallPrice(obj){
+		var $curTr = $(obj).parent().parent().parent();
+		var smallPrice = $(obj).val();
+		var convert = $curTr.find("#convert").val();
+
+		var bigPrice = (smallPrice * convert).toFixed(2);
+		$curTr.find("#bigPrice").val(bigPrice);
+
+		rowTotalF(obj);
+	}
+	
+	function rowTotalF(obj){
+		var $curTr = $(obj).parent().parent().parent();
+		var rowTotal = 0;
+
+		var isCheck = $curTr.find("input[type='checkbox']").is(':checked');
+		if (!isCheck) {
+			var bigPrice = $curTr.find("#bigPrice").val();
+			var bigNum = $curTr.find("#bigNum").val();
+			var smallPrice = $curTr.find("#smallPrice").val();
+			var smallNum = $curTr.find("#smallNum").val();
+			rowTotal = Number(bigPrice) * Number(bigNum) + Number(smallPrice) * Number(smallNum);
+			rowTotal.toFixed(2);
+		}
+		$curTr.find(".rowTotal").text(rowTotal);
+		$curTr.find("#inputRowTotal").val(rowTotal);
+
+		totalF();
+	}
+
+	function totalF() {
+		var discount = $("#discount").val();
+		var rows = $(".rowTotal");
+		var allTotalAmount = 0;
+		var total = 0;
+		$.each(rows, function(index, item) {
+			var $el = $(item);
+			total += Number($el.text());
+			var $orderDetail = $el.parents('.orderDetail');
+			var bigNum = parseInt($orderDetail.find("#bigNum").val());
+			var convert = parseInt($orderDetail.find("#convert").val());
+			var smallNum = parseInt($orderDetail.find("#smallNum").val());
+			var number = (smallNum/convert).toFixed(2);
+			allTotalAmount = allTotalAmount + bigNum + number*1;
+		});
+		if(discount==""){
+			total = total
+		}else{
+			total = total * discount
+		}
+		total.toFixed(2);
+		$("#total").text(total);
+		$("#totalNum").val(allTotalAmount);
+		$("#inputTotal").val(total);
+	}
+	
+	function checkEdit(){
+		var $orderDetail = $(".orderDetail");
+		
+		$.each($orderDetail, function(index, el){
+			var $el = $(el);
+			if(parseFloat($el.find("#bigPrice").val()) != parseFloat($el.find("#bigPriceSpan").val())
+				|| parseFloat($el.find("#bigNum").val()) != parseFloat($el.find("#bigNumSpan").val())
+				|| parseFloat($el.find("#smallPrice").val()) != parseFloat($el.find("#smallPriceSpan").val())
+				|| parseFloat($el.find("#smallNum").val()) != parseFloat($el.find("#smallNumSpan").val()))
+			{
+				$("#edit").val(1);
+				return false;
+			};
+			
+		})
+	}
+	function doSubmit(pass){
+		checkEdit();
 		$("#form").ajaxSubmit({
 			beforeSubmit: function() {
 				//var validate = $form.data('bootstrapValidator');
@@ -66,9 +148,83 @@
 			</div>
 		</div>
 		<form action="${CPATH}/admin/salesOrder/complete" method="post" id="form" class="form-horizontal" >
+		
+			<table id="table" class="table table-bordered table-hover text-center" width="100%">
+				<thead>
+					<tr>
+						<th width="5%">序号</th>
+						<th width="20%">商品名称</th>
+						<th width="11%">大单位价格</th>
+						<th width="12%">大单位数量</th>
+						<th width="11%">小单位价格</th>
+						<th width="11%">小单位数量</th>
+						<th width="5%">赠品</th>
+						<th width="7%">小计</th>
+					</tr>
+				</thead>
+				<tbody class="product">
+					<#if orderDetailList??> <#list orderDetailList as orderDetail>
+						<tr class="jp-onmouse orderDetail" >
+							<td>${orderDetail_index+1}</td>
+							<td>${orderDetail.custom_name!}</td>
+							<td>
+								<input type="hidden" name="orderDetailId" id="orderDetailId" value="${orderDetail.id!}" />
+								<input type="hidden" name="productName" id="productName" value="${orderDetail.custom_name!}" />
+								<input type="hidden" name="bigUnit" id="bigUnit" value="${orderDetail.big_unit!}" />
+								<input type="hidden" name="smallUnit" id="smallUnit" value="${orderDetail.small_unit!}" />
+								<input type="hidden" name="convert" id="convert" value="${orderDetail.convert_relate!}" />
+								<div class = "validata-box">
+									<input type="hidden" id="bigPriceSpan" name="bigPriceSpan" value="${orderDetail.product_price!}" />
+									￥<input type="text" id="bigPrice" name="bigPrice" style="width: 60%" onblur="changeBigPrice(this)" value="${orderDetail.product_price!}" />
+									</br>(<span >${orderDetail.price!}</span>)
+								</div>
+							</td>
+							<td>
+								<div class = "validata-box">
+									<input type="hidden" id="bigNumSpan" name="bigNumSpan" value="${(orderDetail.product_count/orderDetail.convert_relate!)?int}" />
+									<input type="text" id="bigNum" name="bigNum" style="width: 60%" onblur="rowTotalF(this)" value="${(orderDetail.product_count/orderDetail.convert_relate!)?int}" />
+									</br><span >${orderDetail.big_unit!}(X${orderDetail.convert_relate!}${orderDetail.small_unit!})</span>
+								</div>
+							</td>
+							<td>
+								<div class = "validata-box">
+									<input type="hidden" id="smallPriceSpan" name="smallPriceSpan" value="${(orderDetail.product_price/orderDetail.convert_relate!)?string('#0.00')}" />	
+									￥<input type="text" id="smallPrice" name="smallPrice" style="width: 60%" onblur="changeSmallPrice(this)" value="${(orderDetail.product_price/orderDetail.convert_relate!)?string('#0.00')}"/>
+									</br>(<span >${(orderDetail.price/orderDetail.convert_relate!)?string('#0.00')}</span>)
+								</div>
+							</td>
+							<td>
+								<div class = "validata-box">
+									<input type="hidden" id="smallNumSpan" name="smallNumSpan" value="${(orderDetail.product_count%orderDetail.convert_relate!)}" />
+									<input type="text" id="smallNum" name="smallNum" style="width: 60%" onblur="rowTotalF(this)" value="${(orderDetail.product_count%orderDetail.convert_relate!)}" />
+									</br><span >${orderDetail.small_unit!}</span>
+								</div>
+							</td>
+							<td>
+								<div class = "validata-box">
+									<input type="checkbox" id="isGift" name="isGift" disabled <#if orderDetail.is_gift ==1> checked</#if>/>
+								</div>
+							</td>
+							<td>￥<span class="rowTotal"><#if orderDetail.is_gift ==0>${orderDetail.product_amount!}<#else>0</#if></span> <input type="hidden" name="rowTotal" id="inputRowTotal" value="${orderDetail.product_amount!}" /></td>
+						</tr>
+					</#list> </#if>
+				</tbody>
+				<tfoot>
+					<tr>
+						<th colspan="7" style="text-align:right">合计:</th>
+						<th>￥<span id="total">${(order.total_amount)!}</span> 
+							<input type="hidden" name="total" id="inputTotal" value="${(order.total_amount)!}" />
+							<input type="hidden" name="discount" id="discount" value="${(order.factor)!}" />
+						</th>
+							<input type="hidden" name="totalNum" id="totalNum" value="${(order.total_count)!}" />
+					</tr>
+				</tfoot>
+			</table>
+		
 			<input type="hidden" name="id" value="${(order.id)!}">
 			<input type="hidden" name="taskId" value="${(taskId)!}">
 			<input type="hidden" name="pass" id="pass" value="1">
+			<input type="hidden" name="edit" id="edit" value="0">
 			<div class="row form-horizontal">
 				<div class="form-group">
 				    <div class="col-sm-5">
