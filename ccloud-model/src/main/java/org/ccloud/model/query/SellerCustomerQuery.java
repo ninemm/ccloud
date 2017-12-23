@@ -15,10 +15,13 @@
  */
 package org.ccloud.model.query;
 
+import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.ccloud.model.SellerCustomer;
+import org.ccloud.model.callback.CustomerNearbyCallback;
 
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
@@ -279,5 +282,17 @@ public class SellerCustomerQuery extends JBaseQuery {
 		sql.append("JOIN cc_seller_customer c on c.id = uc.seller_customer_id ");
 		sql.append("WHERE c.is_enabled = 1 AND uc.data_area like ?");
 		return Db.queryLong(sql.toString(), dataArea);
+	}
+	
+	public List<Map<String, Object>> queryCustomerNearby(double nearby,BigDecimal lng,BigDecimal lat,String userId){
+
+		CustomerNearbyCallback callback = new CustomerNearbyCallback();
+		callback.setLon(lng);
+		callback.setLat(lat);
+		callback.setUserId(userId);
+		callback.setDist(nearby);
+		
+		List<Map<String, Object>> result = (List<Map<String, Object>>) Db.execute(callback);
+		return result;
 	}
 }
