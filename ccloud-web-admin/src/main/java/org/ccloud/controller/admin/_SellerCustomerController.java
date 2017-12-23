@@ -180,8 +180,10 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		Map<String, Object> map = Maps.newHashMap();
 		boolean updated = true;
 
+		Boolean isChecked = OptionQuery.me().findValueAsBool("web_proc_customer_review_" + getSessionAttr("sellerCode"));
+
 		//当是经销商管理员修改时
-		if(isSuperAdmin || isDealerAdmin) {
+		if(isSuperAdmin || isDealerAdmin || !isChecked) {
 			Customer persiste = CustomerQuery.me().findByCustomerNameAndMobile(customer.getCustomerName(), customer.getMobile());
 
 			if (persiste != null) {
@@ -199,6 +201,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			sellerCustomer.setIsEnabled(1);
 			sellerCustomer.setIsArchive(1);
 
+			sellerCustomer.setStatus(SellerCustomer.CUSTOMER_NORMAL);
 			sellerCustomer.setCustomerTypeIds(Joiner.on(",").join(Arrays.asList(customerTypes).iterator()));
 
 			String deptDataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea());
@@ -326,6 +329,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			return ;
 		}
 
+		if(isChecked)
 		updated = startProcess(sellerCustomer.getId(), map, 0);
 
 		if (updated)
@@ -791,8 +795,9 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			kv.set("touser", toUser.getWechatOpenId());
 			kv.set("templateId", messageTemplate.getTemplateId());
 			kv.set("customerName", sellerCustomer.getCustomer().getCustomerName());
-			kv.set("submit", user.getRealname());
+			kv.set("submit", toUser.getRealname());
 
+			kv.set("contact", sellerCustomer.getCustomer().getContact());
 			kv.set("createTime", DateTime.now().toString("yyyy-MM-dd HH:mm"));
 			kv.set("status", comment);
 			MessageKit.sendMessage(Actions.NotifyWechatMessage.CUSTOMER_AUDIT_MESSAGE, kv);

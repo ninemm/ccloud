@@ -1,5 +1,5 @@
 <#include "_inc/_layout.html"/>
-
+<#macro title>订单审核</#macro>
 <#macro css> 
 	main{
 		top: 0!important;
@@ -13,7 +13,7 @@
 
 	});
 
-	function refuse(id, taskId, pass) {
+	function refuse(id, taskId, pass, obj) {
       layer.open({
         type: 1,
         title: ['订单审核',
@@ -35,7 +35,7 @@
             toastr.warning('请选择一个理由');
             return;
           }
-          doReject(id, taskId, pass, refuseReson, comment);
+          doReject(id, taskId, pass, refuseReson, comment, obj);
         },
         no:function() {
 
@@ -43,8 +43,8 @@
       });
 	}
 
-	function doReject(id, taskId, pass, refuseReson, comment){
-
+	function doReject(id, taskId, pass, refuseReson, comment, obj){
+		var $this = $(obj);
 		layer.open({
 			type: 2,
 			content: '保存中...'
@@ -61,7 +61,17 @@
 		Utils.ajax('${CPATH}/order/complete', params, 
 			function(res){
 				if (res.errorCode == 0) {
-					location.href = '${CPATH}/todo/order'
+					$.confirm({
+						title: res.message,
+						text: '返回顶部？',
+						onOK: function () {
+							location.href = '${CPATH}/todo/order'
+						},
+						onCancel: function () {
+							$this.parents('.weui-panel').remove();
+							$.closeModal();
+						}
+					});
 				} else {
 					$.alert(res.message);
 				}
@@ -70,7 +80,8 @@
 		)
 	};
 
-	function doSubmit(url) {
+	function doSubmit(url, obj) {
+		var $this = $(obj);
 		layer.open({
 			type: 2,
 			content: '保存中...'
@@ -78,7 +89,17 @@
 		$.get(url ,
 			function(res){
 				if (res.errorCode == 0) {
-					location.href = '${CPATH}/todo/order'
+					$.confirm({
+						title: res.message,
+						text: '返回顶部？',
+						onOK: function () {
+							location.href = '${CPATH}/todo/order'
+						},
+						onCancel: function () {
+							$this.parents('.weui-panel').remove();
+							$.closeModal();
+						}
+					});
 				} else {
 					$.alert(res.message);
 				}
@@ -124,8 +145,8 @@
 						<#if order.assignee?contains(username)>
 							<div class="weui-cell weui-cell_access">
 								<div class="width-100 ft14 operate-btn">
-										<div class="button white-button fl" onclick="refuse('${(order.id)!}', '${(order.taskId)!}', 0)">拒绝</div>
-										<div class="button red-button fr" onclick="doSubmit('${CPATH}/order/complete?id=${(order.id)!}&taskId=${(order.taskId)!}&pass=1')">同意</div>
+										<div class="button white-button fl" onclick="refuse('${(order.id)!}', '${(order.taskId)!}', 0, this)">拒绝</div>
+										<div class="button red-button fr" onclick="doSubmit('${CPATH}/order/complete?id=${(order.id)!}&taskId=${(order.taskId)!}&pass=1', this)">同意</div>
 								</div>
 							</div>
 						</#if>

@@ -1,5 +1,22 @@
 <#include "_inc/_layout.html"/>
+<#macro title>拜访详情</#macro>
+<#macro script>
+	var $gallery = $("#gallery"), $galleryImg = $("#galleryImg");
+	var $uploaderFiles = $('#uploaderFiles');
 
+	$(function(){
+		var index;
+		$uploaderFiles.on("click", "li", function() {
+			index = $(this).index();
+			$galleryImg.attr("style", this.getAttribute("style"));
+			$gallery.fadeIn(100);
+		});
+
+	$gallery.on("click", function() {
+		$gallery.fadeOut(100);
+	});
+	});
+</#macro>
 <@layout>
 <div class="weui-content">
 	<div id="customer-add">
@@ -60,13 +77,16 @@
 		            </div>
 		        </div>
 		    </section>
+			<div class="weui-gallery" id="gallery">
+				<span class="weui-gallery__img" id="galleryImg"></span>
+			</div>
 		    <section class="weui-cells weui-cells_form">
 		        <div class="weui-cell">
 		            <div class="weui-cell__bd">
 		                <div class="weui-uploader">
 		                    <div class="weui-uploader__hd">
 		                        <p class="weui-uploader__title">附件图片</p>
-		                        <div class="weui-uploader__info">${(visit.imageList?size)!0}/2</div>
+		                        <div class="weui-uploader__info">${(visit.imageList?size)!0}/3</div>
 		                    </div>
 		                    <div class="weui-uploader__bd">
 		                        <ul class="weui-uploader__files" id="uploaderFiles">

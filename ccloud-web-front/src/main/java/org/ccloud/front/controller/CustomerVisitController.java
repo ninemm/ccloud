@@ -48,6 +48,7 @@ import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.tx.Tx;
 
 @RouterMapping(url = "/customerVisit")
+@RequiresPermissions(value = { "/admin/customerVisit", "/admin/dealer/all" }, logical = Logical.OR)
 public class CustomerVisitController extends BaseFrontController {
 	
 	//库存详情
@@ -249,11 +250,15 @@ public class CustomerVisitController extends BaseFrontController {
 		 CustomerVisit customerVisit = getModel(CustomerVisit.class);
 		 User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
+		 Boolean isChecked = OptionQuery.me().findValueAsBool("web_proc_customer_visit_" + getSessionAttr("sellerCode"));
+
 		 List<ImageJson> list = Lists.newArrayList();
 		 String picJson = getPara("pic");
-		 
+
+		if (isChecked) customerVisit.setStatus(Customer.CUSTOMER_AUDIT);
+		else customerVisit.setStatus(Customer.CUSTOMER_NORMAL);
+
 		 customerVisit.setUserId(user.getId());
-		 customerVisit.setStatus(Customer.CUSTOMER_AUDIT);
 		 customerVisit.setDataArea(user.getDataArea());
 		 customerVisit.setDeptId(user.getDepartmentId());
 		 
@@ -267,7 +272,7 @@ public class CustomerVisitController extends BaseFrontController {
 
 				ImageJson image = new ImageJson();
 				image.setImgName(picname);
-				String newPath = upload(pic);
+				String newPath = qiniuUpload(pic);
 				image.setSavePath(newPath.replace("\\", "/"));
 				list.add(image);
 			}
@@ -280,8 +285,7 @@ public class CustomerVisitController extends BaseFrontController {
 			 renderAjaxResultForError("保存客户拜访信息出错");
 			 return ;
 		 }
-		 
-		 Boolean isChecked = OptionQuery.me().findValueAsBool("web_proc_customer_review_" + getSessionAttr("sellerCode"));
+
 		 if (isChecked)
 			updated = startProcess(customerVisit);
 		 
@@ -318,7 +322,7 @@ public class CustomerVisitController extends BaseFrontController {
 
 				ImageJson image = new ImageJson();
 				image.setImgName(picname);
-				String newPath = upload(pic);
+				String newPath = qiniuUpload(pic);
 				image.setSavePath(newPath.replace("\\", "/"));
 				list.add(image);
 			}
@@ -362,11 +366,11 @@ public class CustomerVisitController extends BaseFrontController {
 			kv.set("touser", toUser.getWechatOpenId());
 			kv.set("templateId", messageTemplate.getTemplateId());
 			kv.set("customerName", customerVisit.getSellerCustomer().getCustomer().getCustomerName());
-			kv.set("submit", user.getRealname());
+			kv.set("submit", toUser.getRealname());
 
 			kv.set("createTime", DateTime.now().toString("yyyy-MM-dd HH:mm"));
 			kv.set("status", comment);
-			MessageKit.sendMessage(Actions.NotifyWechatMessage.CUSTOMER_AUDIT_MESSAGE, kv);
+			MessageKit.sendMessage(Actions.NotifyWechatMessage.CUSTOMER_VISIT_AUDIT_MESSAGE, kv);
 		}
 		
 		workFlowService.completeTask(taskId, comment, var);
@@ -398,6 +402,7 @@ public class CustomerVisitController extends BaseFrontController {
 
 			String defKey = "_customer_visit_review";
 			param.put("manager", manager.getUsername());
+
 			WorkFlowService workflow = new WorkFlowService();
 			String procInstId = workflow.startProcess(customerVisit.getId(), defKey, param);
 

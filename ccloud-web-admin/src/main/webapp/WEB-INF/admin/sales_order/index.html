@@ -103,6 +103,8 @@
 						return '部分出库-订单关闭'
 					} else if (value == 3000) {
 						return '全部出库'
+					} else if (value == 1002) {
+						return '订单拒绝'
 					} else {
 						return '全部出库-订单关闭'
 					}
@@ -111,6 +113,7 @@
 				{field: "action", title: "操作", align: "center", width: '15%',
 				formatter: function(value, row, rowIndex) {
 					var strHtml ='<a class="btn btn-xs btn-primary btn-flat" onclick="detail(\''+row.id+'\')" >详细</a> ';
+					strHtml = strHtml + '<a class="btn btn-xs btn-warning btn-flat" onclick="history(\'' + row.id + '\',\'' +row.proc_inst_id + '\')" >操作记录</a> ';
 					
 					<@shiro.hasPermission name="/admin/salesOrder/check">
 					if (row.status == 0) {
@@ -200,6 +203,15 @@
                 }
             }
         );
+	}
+	
+	function history(id, proc_inst_id) {
+		layer.open({
+			title:"操作记录",
+			type: 2, 
+			area: ['580px', '530px'],
+			content: '${CPATH}/admin/salesOrder/operateHistory/' + id + '-' + proc_inst_id
+		}); 
 	}
 	
 	function batchAction(){

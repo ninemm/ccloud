@@ -10,9 +10,10 @@
 	<p class="content-msg">
 	    系统自定义
 	</p>
-	<form action="${CPATH}/admin/option/saveBySeller" method="POST" id="form">
+	<form action="${CPATH}/admin/option/save" method="POST" id="form">
 		<input type="hidden" name="ucode" value="${ucode}">
-
+        <input type="hidden" name="autosave" value="seller_store_check_${(session.sellerCode)!},web_procedure_review_${(session.sellerCode)!},web_proc_customer_review_${(session.sellerCode)!},web_proc_customer_visit_${(session.sellerCode)!}">
+        
 		<div class="row">
 			<div class="col-xs-12">
 				<h4 class="jp-set-title">常规选项</h4>
@@ -23,7 +24,7 @@
 						</div>
 						<div class="col-sm-9  jp-set-title-line">
 							<div class="col-sm-6 jp-table-distance-top ">
-								<label><input type="checkbox" value="1" name="seller_store_check_${(session.sellerCode)!}" ${OPTION_CHECKED('seller_store_check_${(session.sellerCode)!}')}> 开启库存检查功能 </label>
+								<label><input type="checkbox" value="true" name="seller_store_check_${(session.sellerCode)!}" ${OPTION_CHECKED('seller_store_check_${(session.sellerCode)!}')}> 开启库存检查功能 </label>
 							</div>
 						</div>
 						<div class="clr"></div>
@@ -34,7 +35,7 @@
 						</div>
 						<div class="col-sm-9  jp-set-title-line">
 							<div class="col-sm-6 jp-table-distance-top ">
-								<label><input type="checkbox" value="1" name="web_procedure_review_${(session.sellerCode)!}" ${OPTION_CHECKED('web_procedure_review_${(session.sellerCode)!}')}> 开启流程审核功能 </label>
+								<label><input type="checkbox" value="true" name="web_procedure_review_${(session.sellerCode)!}" ${OPTION_CHECKED('web_procedure_review_${(session.sellerCode)!}')}> 开启流程审核功能 </label>
 							</div>
 						</div>
 						<div class="clr checkbox"></div>
@@ -45,21 +46,33 @@
                         </div>
                         <div class="col-sm-9  jp-set-title-line">
                             <div class="col-sm-6 jp-table-distance-top ">
-                                <label><input type="checkbox" value="1" name="web_proc_customer_review_${(session.sellerCode)!}" ${OPTION_CHECKED('web_proc_customer_review_${(session.sellerCode)!}')}> 开启流程审核功能 </label>
+                                <label><input type="checkbox" value="true" name="web_proc_customer_review_${(session.sellerCode)!}" ${OPTION_CHECKED('web_proc_customer_review_${(session.sellerCode)!}')}> 开启流程审核功能 </label>
                             </div>
                         </div>
                         <div class="clr checkbox"></div>
                     </li>
+                    <li class="jp-set-pad">
+                        <div class="col-sm-3 ">
+                            <div class="  jp-set-title-line jp-set-info ">新增拜访审核</div>
+                        </div>
+                        <div class="col-sm-9  jp-set-title-line">
+                            <div class="col-sm-6 jp-table-distance-top ">
+                                <label><input type="checkbox" value="true" name="web_proc_customer_visit_${(session.sellerCode)!}" ${OPTION_CHECKED('web_proc_customer_visit_${(session.sellerCode)!}')}> 开启新增拜访审核功能 </label>
+                            </div>
+                        </div>
+                        <div class="clr checkbox"></div>
+                    </li>                   
 					<li class="jp-set-pad">
 						<div class="col-sm-3 ">
 							<div class="  jp-set-title-line jp-set-info ">商品数量审核</div>
 						</div>
 						<div class="col-sm-9  jp-set-title-line">
 							<div class="col-sm-6 jp-table-distance-top ">
-								<label><input type="checkbox" value="1" name="web_proc_num_limit_${(session.sellerCode)!}" ${OPTION_CHECKED('web_proc_num_limit_${(session.sellerCode)!}')}> 开启商品数量审核功能 </label>
+								<input class="form-control input-md" type="text" name="web_proc_num_limit_${(session.sellerCode)!}" value="${OPTION('web_proc_num_limit_${(session.sellerCode)!}')!}">
 							</div>
+							<p>如：超过10件开启审核流程</p>
 						</div>
-						<div class="clr checkbox"></div>
+						<div class="clr"></div>
 					</li>
 					<li class="jp-set-pad">
 						<div class="col-sm-3 ">
@@ -67,10 +80,11 @@
 						</div>
 						<div class="col-sm-9  jp-set-title-line">
 							<div class="col-sm-6 jp-table-distance-top ">
-								<label><input type="checkbox" value="1" name="web_proc_price_limit_${(session.sellerCode)!}" ${OPTION_CHECKED('web_proc_price_limit_${(session.sellerCode)!}')}> 开启商品价格审核功能 </label>
+								<input class="form-control input-md" type="text" name="web_proc_price_limit_${(session.sellerCode)!}" value="${OPTION('web_proc_price_limit_${(session.sellerCode)!}')!}">
 							</div>
+							<p>如：超过5000元开启审核流程</p>
 						</div>
-						<div class="clr checkbox"></div>
+						<div class="clr"></div>
 					</li>
 				</ul>
 			</div>

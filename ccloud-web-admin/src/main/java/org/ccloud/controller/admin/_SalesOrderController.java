@@ -34,6 +34,7 @@ import org.ccloud.model.Message;
 import org.ccloud.model.SalesOrder;
 import org.ccloud.model.User;
 import org.ccloud.model.query.OptionQuery;
+import org.ccloud.model.query.OutstockPrintQuery;
 import org.ccloud.model.query.SalesOrderDetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SalesOutstockQuery;
@@ -155,7 +156,9 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 			customerOptionList.add(customerOptionMap);
 		}
-		boolean isCheckStore = OptionQuery.me().findOptionValueToBoolean(Consts.OPTION_SELLER_STORE_CHECK + sellerCode, sellerId);
+		
+		Boolean checkStore = OptionQuery.me().findValueAsBool(Consts.OPTION_SELLER_STORE_CHECK + sellerCode);
+		boolean isCheckStore = checkStore == true ? true : false;
 		setAttr("isCheckStore", isCheckStore);
 		setAttr("productInfoMap", JSON.toJSON(productInfoMap));
 		setAttr("productOptionList", JSON.toJSON(productOptionList));
@@ -229,9 +232,10 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
         		}
         		
-        		boolean isStartProc = OptionQuery.me().findOptionValueToBoolean(Consts.OPTION_SELLER_STORE_PROCEDURE_REVIEW + sellerCode
-        				, sellerId);
+        		Boolean startProc = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROCEDURE_REVIEW + sellerCode);
+        		boolean isStartProc = startProc == true ? true : false;
         		String proc_def_key = StringUtils.getArrayFirst(paraMap.get("proc_def_key"));
+        		
         		if (isStartProc && StrKit.notBlank(proc_def_key)) {
 					if (!start(orderId, StringUtils.getArrayFirst(paraMap.get("customerName")), proc_def_key)) {
 						return false;
@@ -278,7 +282,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 	}
 	
-	public boolean start(String orderId, String customerName, String proc_def_key) {
+	private boolean start(String orderId, String customerName, String proc_def_key) {
 
 		WorkFlowService workflow = new WorkFlowService();
 
@@ -321,16 +325,34 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		
 		return true;
 	}
+
+	private String getStatusName(int statusCode) {
+		if (statusCode == Consts.SALES_ORDER_STATUS_PASS)
+			return "已审核";
+		if (statusCode == Consts.SALES_ORDER_STATUS_DEFAULT)
+			return "待审核";
+		if (statusCode == Consts.SALES_ORDER_STATUS_CANCEL)
+			return "取消";
+		if (statusCode == Consts.SALES_ORDER_STATUS_PART_OUT)
+			return "部分出库";
+		if (statusCode == Consts.SALES_ORDER_STATUS_PART_OUT_CLOSE)
+			return "部分出库-订单关闭";
+		if (statusCode == Consts.SALES_ORDER_STATUS_ALL_OUT)
+			return "全部出库";
+		if (statusCode == Consts.SALES_ORDER_STATUS_ALL_OUT_CLOSE)
+			return "全部出库-订单关闭";
+		return "无";
+	}
 	
 	public void audit() {
 
 		keepPara();
 		
-		boolean isCheck = false;
-		String id = getPara("id");
-
-		SalesOrder salesOrder = SalesOrderQuery.me().findById(id);
-		setAttr("salesOrder", salesOrder);
+//		boolean isCheck = false;
+//		String id = getPara("id");
+//
+//		SalesOrder salesOrder = SalesOrderQuery.me().findById(id);
+//		setAttr("salesOrder", salesOrder);
 		
 //		HistoricTaskInstanceQuery query = ActivitiPlugin.buildProcessEngine().getHistoryService()  
 //                .createHistoricTaskInstanceQuery();  
@@ -342,15 +364,35 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 //                    + hi.getStartTime());  
 //        }
         
-        String taskId = getPara("taskId");
-        List<Comment> comments = WorkFlowService.me().getProcessComments(taskId);
-		setAttr("comments", comments);
+//        String taskId = getPara("taskId");
+//        List<Comment> comments = WorkFlowService.me().getProcessComments(taskId);
+//		setAttr("comments", comments);
+		
+//		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+//		if (user != null && StrKit.equals(getPara("assignee"), user.getUsername())) {
+//			isCheck = true;
+//		}
+//		setAttr("isCheck", isCheck);
 		
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		if (user != null && StrKit.equals(getPara("assignee"), user.getUsername())) {
+
+		String orderId = getPara("id");
+		String taskId = getPara("taskId");
+		Record order = SalesOrderQuery.me().findMoreById(orderId);
+		List<Record> orderDetailList = SalesOrderDetailQuery.me().findByOrderId(orderId);
+
+		order.set("statusName", getStatusName(order.getInt("status")));
+
+		boolean isCheck = false;
+		if (user != null && getPara("assignee", "").contains(user.getUsername())) {
 			isCheck = true;
 		}
 		setAttr("isCheck", isCheck);
+
+		setAttr("taskId", taskId);
+		setAttr("order", order);
+		setAttr("orderDetailList", orderDetailList);
+		render("audit.html");
 	}
 	
 	private void sendOrderMessage(String sellerId, String title, String content, String fromUserId, String toUserId, String deptId, String dataArea) {
@@ -537,6 +579,51 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 			renderAjaxResultForError("审核失败");
 			renderJson(result);
 		}
+	}
+	
+	public void operateHistory() {
+		keepPara();
+		
+		String id = getPara(0);
+
+		Record salesOrder = SalesOrderQuery.me().findRecordById(id);
+		setAttr("salesOrder", salesOrder);
+
+		String proc_inst_id = getPara(1);
+		List<Comment> comments = WorkFlowService.me().getProcessComments(proc_inst_id);
+		setAttr("comments", comments);
+		
+		StringBuilder printComments = new StringBuilder();
+		List<Record> printRecord = OutstockPrintQuery.me().findByOrderId(id);
+		for (int i = 0; i < printRecord.size(); i++) {
+			Record record = printRecord.get(i);
+			int status = record.getInt("status");
+			printComments.append(buildComments(Consts.OPERATE_HISTORY_TITLE_ORDER_PRINT + " 第" + (i+1) + "次", record.get("create_date").toString(), record.getStr("realname"),
+					status == 1 ? "打印失败" : "打印成功"));
+		}
+		setAttr("printComment", printComments.toString());
+
+		String outstockInfo = buildOutstockInfo(id);
+		setAttr("outstockInfo", outstockInfo);
+		
+		render("operate_history.html");
+	}
+	
+	private String buildOutstockInfo(String ordedId) {
+		List<Record> orderDetails = SalesOrderDetailQuery.me().findByOrderId(ordedId);
+		
+		StringBuilder stringBuilder = new StringBuilder();
+		
+		for (Record record : orderDetails) { // 若修改了产品价格或数量，则写入相关日志信息
+			if (record.getInt("out_count") !=record.getInt("product_count")) {
+					stringBuilder.append("●" + record.getStr("custom_name") + "<br>");
+					int convert = record.getInt("convert_relate");
+					stringBuilder.append("-" + record.getStr("big_unit") + "数量修改为"+ Math.round(record.getInt("out_count")/convert) + "(" + Math.round(record.getInt("product_count")/convert) + ")<br>");
+					stringBuilder.append("-" + record.getStr("small_unit") + "数量修改为"+ Math.round(record.getInt("out_count")%convert) + "(" + Math.round(record.getInt("product_count")%convert) + ")<br>");
+			}
+		}
+		
+		return stringBuilder.toString();
 	}
 	
 }

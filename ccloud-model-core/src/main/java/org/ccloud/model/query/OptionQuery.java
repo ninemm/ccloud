@@ -15,7 +15,6 @@
  */
 package org.ccloud.model.query;
 
-import org.ccloud.Consts;
 import org.ccloud.model.Option;
 import org.ccloud.utils.StringUtils;
 
@@ -67,29 +66,6 @@ public class OptionQuery extends JBaseQuery {
 		//return option.saveOrUpdateWithoutDate();
 	}
 	
-	public boolean saveOrUpdateBySellerId(String key, String value, String sellerId) {
-		CacheKit.remove(Option.CACHE_NAME, sellerId + key);
-		Option option = DAO.doFindFirst("option_key = ? AND seller_id = ?", key, sellerId);
-		boolean save = false;
-		if (null == option) {
-			option = new Option();
-			save = true;
-		}
-
-		option.setOptionKey(key);
-		option.setOptionValue(value);
-		option.setSellerId(sellerId);
-		
-		if(save) {
-			return option.save();
-		}else {
-			return option.update();
-		}
-		
-
-		//return option.saveOrUpdateWithoutDate();
-	}	
-
 	public Option findByKey(String key) {
 		return DAO.doFindFirst("option_key =  ?", key);
 	}
@@ -98,8 +74,7 @@ public class OptionQuery extends JBaseQuery {
 		String value = findValue(key);
 		if (StringUtils.isNotBlank(value)) {
 			try {
-				if(value.equals("1")) return true;
-				else return false;
+				return Boolean.parseBoolean(value);
 			} catch (Exception e) {
 			}
 		}
@@ -128,27 +103,4 @@ public class OptionQuery extends JBaseQuery {
 		return null;
 	}
 	
-	public String findByKeyAndSellerId(final String key, final String sellerId) {
-		String sessionKey = sellerId + key;
-		String value = CacheKit.get(Option.CACHE_NAME, sessionKey, new IDataLoader() {
-			@Override
-			public Object load() {
-				Option option = DAO.doFindFirst("option_key = ? AND seller_id = ?", key, sellerId);
-				if (null != option && option.getOptionValue() != null) {
-					return option.getOptionValue();
-				}
-				return "";
-			}
-		});
-
-		return "".equals(value) ? null : value;
-	}
-	
-	public boolean findOptionValueToBoolean(String key, String sellerId) {
-		String result = this.findByKeyAndSellerId(key, sellerId);
-		if (result == null || result.equals(Consts.OPTION_ON)) {
-			return true;
-		}
-		return false;
-	}
 }

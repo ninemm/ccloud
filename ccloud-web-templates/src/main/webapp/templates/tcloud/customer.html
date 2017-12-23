@@ -1,4 +1,5 @@
 <#include "_inc/_layout.html"/>
+<#macro title>客户列表</#macro>
 <#macro css>
     #customer {
         background: #f3f5f7;
@@ -194,18 +195,22 @@
 	                                            </p>
 	                                            <p>电话</p>
 	                                        </a>
+	                                        <@shiro.hasPermission name="/admin/salesOrder">
 	                                        <a class="weui-flex__item" href="${(CPATH)!}/customer/historyOrder?sellerCustomerId=${(customer.sellerCustomerId)!}&customerName=${(customer.customer_name)!}">
 	                                            <p>
 	                                                <i class="icon-file-text-o blue"></i>
 	                                            </p>
 	                                            <p>订单</p>
 	                                        </a>
+	                                        </@shiro.hasPermission>
+	                                        <@shiro.hasPermission name="/admin/customerVisit">
 	                                        <a class="weui-flex__item" href="${CPATH}/customerVisit?id=${(customer.sellerCustomerId)!}&name=${(customer.customer_name)!}">
 	                                            <p>
 	                                                <i class="icon-paw" style="color:#ff9800"></i>
 	                                            </p>
 	                                            <p>拜访</p>
 	                                        </a>
+	                                        </@shiro.hasPermission>
 	                                        <a class="weui-flex__item relative" href="/customer/edit?sellerCustomerId=${(customer.sellerCustomerId)!}">
 	                                            <i class="icon-chevron-right gray"></i>
 	                                        </a>
@@ -214,16 +219,20 @@
 	                            </div>
 	                            <hr />
 	                            <div class="operate-btn">
+	                            	<@shiro.hasPermission name="/admin/customerVisit">
 	                                <div class="button white-button fl" onclick="newVisit({customerName:'${(customer.customer_name)}',
                                                                                             sellerCustomerId:'${(customer.sellerCustomerId)}',
                                                                                             contact:'${(customer.contact)}',
                                                                                             mobile:'${(customer.mobile)}',
                                                                                             address:'${(customer.address)}'})">客户拜访</div>
+                                   	</@shiro.hasPermission>
+                                   	<@shiro.hasPermission name="/admin/salesOrder">
                                     <div class="button red-button fr" onclick="newOrder({customerName:'${(customer.customer_name)}',
                                                                                             sellerCustomerId:'${(customer.sellerCustomerId)}',
                                                                                             contact:'${(customer.contact)}',
                                                                                             mobile:'${(customer.mobile)}',
                                                                                             address:'${(customer.address)}'})">下订单</div>
+									</@shiro.hasPermission>                                                                                            
 	                            </div>
 	                            <p class="gray">
 	                                <span class="icon-map-marker ft16 green"></span>
@@ -248,9 +257,11 @@
 	    </article>
     </article>
 </div>
+<@shiro.hasPermission name="/admin/sellerCustomer/edit">
 <a class="hidden-menu" href="/customer/edit">
     <img src="${CTPATH}/images/customer_add.png" alt="">
 </a>
+</@shiro.hasPermission>
 <div class="layer"></div>
 <#include "_inc/_footer_nav.html" />
 </@layout>

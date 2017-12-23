@@ -24,6 +24,7 @@ import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 
 @RouterMapping(url = "/inventory")
+@RequiresPermissions(value = { "/admin/report/inventory", "/admin/dealer/all" }, logical = Logical.OR)
 public class InventoryController extends BaseFrontController {
 	
 	public void index() {

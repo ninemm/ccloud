@@ -146,11 +146,15 @@ public class Consts {
 	public static final String RECEIVABLES_OBJECT_TYPE_SUPPLIER = "supplier"; //应收账款供应商类型
 	
 	public static final String OPTION_SELLER_STORE_CHECK = "seller_store_check_";//经销商检查库存开关设置
-	public static final String OPTION_SELLER_STORE_PROCEDURE_REVIEW= "web_procedure_review_";//经销商检查库存开关设置
+	public static final String OPTION_WEB_PROCEDURE_REVIEW = "web_procedure_review_";//订单审核流程开关设置
+	public static final String OPTION_WEB_PROC_CUSTOMER_REVIEW = "web_proc_customer_review_";//客户流程审核开关设置
+	public static final String OPTION_WEB_PROC_NUM_LIMIT = "web_proc_num_limit_";//商品数量审核开关设置
+	public static final String OPTION_WEB_PROC_PRICE_LIMIT = "web_proc_price_limit_";//商品价格审核开关设置
+	public static final String OPTION_WEB_PROC_CUSTOMER_VISIT = "web_proc_customer_visit_";//新增拜访审核开关设置
 	public static final String OPTION_FILE_ROOT_PATH = "web_file_root_path";
 	
-	public static final String OPTION_ON = "1";
-	public static final String OPTION_OFF= "0";
+	public static final String OPTION_ON = "true";
+	public static final String OPTION_OFF= "false";
 	
 	public static final String CUSTOMER_KIND_COMMON = "100401";//普通客户
 	public static final String CUSTOMER_KIND_SELLER = "100402";//直营商客户
