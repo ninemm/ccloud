@@ -29,6 +29,8 @@ $(function() {
 		window.location.href = '${CPATH}/product/customerChoose';
   }).on("touchstart", "#placeOrder", function () {
 		doSubmit();
+  }).on("touchstart",".nearby-customer",function(){
+		window.location.href = '${CPATH}/product/customerNearbyChose';
   });
 
   initCustomer();
