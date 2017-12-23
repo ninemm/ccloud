@@ -39,6 +39,22 @@
 
 <#macro script>
 
+    var $gallery1 = $("#gallery1"), $galleryImg1 = $("#galleryImg1");
+    var $uploaderFiles1 = $('#uploaderFiles1');
+
+    $(function(){
+    var index;
+    $uploaderFiles1.on("click", "li", function() {
+    index = $(this).index();
+    $galleryImg1.attr("style", this.getAttribute("style"));
+    $gallery1.fadeIn(100);
+    });
+
+    $gallery1.on("click", function() {
+    $gallery1.fadeOut(100);
+    });
+    });
+
     var imageArr = [];
     var count = 3;
     var $picNum = $('.weui-uploader__info');
@@ -291,6 +307,9 @@
           </div>
       </div>
   </section>
+    <div class="weui-gallery" id="gallery1">
+        <span class="weui-gallery__img" id="galleryImg1"></span>
+    </div>
   <section class="weui-cells weui-cells_form">
       <div class="weui-cell">
           <div class="weui-cell__bd">
@@ -300,7 +319,7 @@
                        <div class="weui-uploader__info">${(customerVisit.imageList?size)!0}/3</div>
                   </div>
                   <div class="weui-uploader__bd">
-                      <ul class="weui-uploader__files">
+                      <ul class="weui-uploader__files" id ="uploaderFiles1">
                       <#if (customerVisit.imageList) ??> 
                       <#list customerVisit.imageList as bean>
                           <li class="weui-uploader__file" style="background-image: url(${bean.savePath})"></li>
