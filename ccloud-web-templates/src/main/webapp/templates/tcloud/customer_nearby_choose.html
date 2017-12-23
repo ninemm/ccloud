@@ -48,7 +48,6 @@
     $("#searchArea").select({
      title: "选择搜索范围",
      items:${(areaCoverage)!}
-	//items: [{title:"100米以内",value:"0.1"}, {title:"500米以内",value:"0.5"}, {title:"1000米以内",value:"1"}]
     });
     
 	var newHtml = $(".weui-panel").eq(0).html();
@@ -118,7 +117,7 @@
 	}
 
 	wx.config({
-		debug: true,
+		debug: false,
 		appId: '${appId!}',
 		timestamp: ${timestamp},
 		nonceStr: '${nonceStr!}',
