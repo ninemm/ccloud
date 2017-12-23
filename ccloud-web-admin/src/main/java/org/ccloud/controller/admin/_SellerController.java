@@ -173,7 +173,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			
 			Seller seller2 = this.saveSeller(seller, department, user,productType);
 
-			this.saveOption(seller2.getId());
+			this.saveOption(seller2.getSellerCode());
 			
 			for(int i=0;i<brandIds.length;i++){
 				if(!brandIds[i].equals("")){
@@ -573,17 +573,23 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 	}
 	
 	
-	public void saveOption(String sellerId){
+	public void saveOption(String sellerCode){
 		Option option = new Option();
-		option.setOptionKey("seller_store_check");
+		option.setOptionKey(Consts.OPTION_SELLER_STORE_CHECK + sellerCode);
 		option.setOptionValue("true");
-		option.set("seller_id",sellerId );
 		option.save();
-		Option option01 = new Option();
-		option01.setOptionKey("comment_need_procedure");
-		option01.setOptionValue("true");
-		option01.set("seller_id",sellerId );
-		option01.save();
+		Option option1 = new Option();
+		option1.setOptionKey(Consts.OPTION_WEB_PROCEDURE_REVIEW + sellerCode);
+		option1.setOptionValue("true");
+		option1.save();
+		Option option2 = new Option();
+		option2.setOptionKey(Consts.OPTION_WEB_PROC_CUSTOMER_REVIEW + sellerCode);
+		option2.setOptionValue("true");
+		option2.save();
+		Option option3 = new Option();
+		option3.setOptionKey(Consts.OPTION_WEB_PROC_CUSTOMER_VISIT + sellerCode);
+		option3.setOptionValue("true");
+		option3.save();
 	}
 	
 	public void saveSellerBrand(String brandId,Department department,String sellerId){
