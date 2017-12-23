@@ -201,12 +201,13 @@
 				l.stop();
 				if (data.errorCode == 0) {
 					toastr.success(data.message, '操作成功');
-					setTimeout( function(){
-						parent.refresh();
-								}, 1* 1000 );
 				} else {
 					toastr.error(data.message,'操作失败');
 				}
+					setTimeout( function(){
+						l.stop();	
+						parent.refresh();
+								}, 1* 1000 );
 			},
 			error : function() {
 				l.stop();

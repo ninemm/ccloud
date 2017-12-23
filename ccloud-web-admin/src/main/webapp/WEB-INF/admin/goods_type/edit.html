@@ -46,13 +46,15 @@ function doSubmit(){
 		type : "post", 
 		dataType : "json", 
 		success : function(data) { 
-			l.stop();
 			if (data.errorCode == 0) {
 				//location.reload();
 				toastr.success(data.message, '操作成功');
 			} else {
 				toastr.error(data.message,'操作失败');
 			}
+				setTimeout( function(){
+						l.stop();
+								}, 1 * 1000 );
 		},
 		error : function() {
 			l.stop();

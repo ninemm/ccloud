@@ -82,18 +82,14 @@ function doSubmit(){
 		type : "post", 
 		dataType : "json", 
 		success : function(data) { 
-			l.stop();
 			if (data.errorCode == 0) {
 				toastr.success(data.message, '操作成功');
-				setTimeout( function(){
-					location.reload();
-								}, 2 * 1000 );
 			} else {
 				toastr.error(data.message,'操作失败');
-				setTimeout( function(){
-					location.reload();
-								}, 2 * 1000 );
-			}
+			setTimeout( function(){
+						l.stop();
+						location.reload();
+								}, 1 * 1000 );
 		},
 		error : function() {
 			l.stop();

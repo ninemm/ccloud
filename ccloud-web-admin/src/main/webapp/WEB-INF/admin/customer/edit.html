@@ -8,6 +8,8 @@
 	<!-- cityPicker -->
 	<script src="${CPATH}/static/plugins/city-picker/js/city-picker.data.js"></script>
     <script src="${CPATH}/static/plugins/city-picker/js/city-picker.js"></script>
+    <script src="${CPATH}/static/ladda/spin.min.js"></script>
+	<script src="${CPATH}/static/ladda/ladda.min.js"></script>
 </#macro>
 
 <#macro css_import>
@@ -17,6 +19,7 @@
 	<link rel="stylesheet" href="${CPATH}/static/plugins/select2/css/select2.css">
 	<!-- cityPicker -->
 	<link rel="stylesheet" href="${CPATH}/static/plugins/city-picker/css/city-picker.css">
+	<link rel="stylesheet" href="${CPATH}/static/ladda/ladda-themeless.min.css">
 </#macro>
 
 <#macro script>
@@ -121,12 +124,16 @@
 	}
 
 	function doSubmit(){
+		var l = Ladda.create( document.querySelector( '#do_submit' ) );
 		$("#areaCodes").val($city.data('citypicker').getCode());
 		$("#areaNames").val($city.data('citypicker').getVal());
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
 				var validate = $form.data('bootstrapValidator');
 				validate.validate();
+				if (validate.isValid()) {
+					l.start();
+				}
 				return validate.isValid()
 			},
 			type : "post", 
@@ -138,8 +145,12 @@
 				} else {
 					toastr.error(data.message,'操作失败');
 				}
+					setTimeout( function(){
+						l.stop();
+								}, 1 * 1000 );
 			},
 			error : function() {
+				l.stop();
 				alert("信息提交错误");
 			}
 		});
@@ -235,7 +246,7 @@
 			</div>
 		</form>
 		<div class="box-footer"> 
-			<button type="button" onclick="doSubmit()" class="btn btn-primary">保存更改</button>
+			<button type="button" id="do_submit" onclick="doSubmit()" class="btn btn-primary ladda-button" data-style="expand-right">保存更改</button>
 			<input type="button" class="btn btn-primary" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
 		</div>
 	</div>
