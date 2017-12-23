@@ -49,20 +49,45 @@ $(function() {
       }
       productChange($currentInput);
 
-    }).on("touchend", ".product-top .weui-cell__ft, #productName", function () {
+    }).on("touchend", ".common .product-top .weui-cell__ft, #productName", function () {
+    	var $this = $(this).parents(".common");
+    	var productName = $this.find("#productName").text();
+    	var valueName = $this.find("#valueName").text();
+    	var description = $this.find("#description").val();
 		layer.open({
 		  type: 1,
 		  title: ['商品详情',
 			'border-bottom: 1px solid #eee;height:2rem;line-height:2rem'
 		  ],
 		  content: '<img src="${CTPATH}/images/jp.jpg" />' +
-			'<p>名称：35度中国劲酒</p>' +
-			'<p>规格：125ml</p>' +
-			'<p>描述：劲牌劲牌劲牌劲牌劲牌劲劲牌劲牌</p>',
+			'<p>名称：' + productName + '</p>' +
+			'<p>规格：' + valueName + '</p>' +
+			'<p>描述：' + description + '</p>',
 		  anim: 'scale',
 		  className: 'product-detail',
 		  btn: '关闭'
 		});
+
+	  }).on("touchend", ".composition .product-top .weui-cell__ft, #compositionName", function () {
+    	var $this = $(this).parents(".composition");
+    	var compositionName = $this.find("#compositionName").text();
+    	var compositionValueName = $this.find("#compositionValueName").text();
+    	var subProduct = $this.find("#subProduct").text();
+    	var subsubProduct = $this.find("#subsubProduct").text();
+		layer.open({
+		  type: 1,
+		  title: ['商品详情',
+			'border-bottom: 1px solid #eee;height:2rem;line-height:2rem'
+		  ],
+		  content: '<img src="${CTPATH}/images/jp.jpg" />' +
+			'<p>名称：' + compositionName + '</p>' +
+			'<p>规格：' + compositionValueName + '</p>' +
+			'<p>赠品：' + subProduct + '</br>' + subsubProduct + '</p>',
+		  anim: 'scale',
+		  className: 'product-detail',
+		  btn: '关闭'
+		});
+
 	  });
     
     initProduct();
@@ -74,10 +99,10 @@ var $sidebar = $("#sidebar ul");
 var $menuRight = $(".menu-right");
 function initProduct(){
 	$sidebar.empty();
+	$menuRight.empty();
 	var typeId = '';
 	Utils.ajax('${CPATH}/product/productList', {'keyword': keyword}, 
 		function(data){
-			$menuRight.empty();
 			$.each(data.productList, function(index, el) {
 				if(typeId != el.typeId) {
 					if(typeId == '') {
@@ -113,6 +138,8 @@ function initProduct(){
 				$newProductDetail.find("#sellProductId").val(el.sell_product_id);
 				$newProductDetail.find("#productId").val(el.product_id);
 				$newProductDetail.find("#convert").val(el.convert_relate);
+
+				$newProductDetail.find("#description").val(el.description);
 				
 			});
 			
@@ -336,6 +363,7 @@ function save(){
 						<input type="hidden" id="bigUnit" value="">
 						<input type="hidden" id="smallUnit" value="">
 						<input type="hidden" id="isGift" value="0">
+						<input type="hidden" id="description" value="0">
 						<div class="product-top">
 							<img src="${CTPATH}/images/jp.jpg" style="width:2rem;">
 							<div class="weui-cell_access product-top-right">
