@@ -14,7 +14,49 @@
 	<link rel="stylesheet" href="${CPATH}/static/plugins/select2/css/select2.css">
 </#macro>
 
+<#macro css>
+    .gallery {
+        position: fixed;
+        margin: 0 auto;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 1920px;
+        height: 1000px;
+        background-color: rgba(102,102,102,0.6);
+        display: none;
+        z-index: 1000;
+    }
+    .gallery__img {
+        position: fixed;
+        margin: -200px -100px;
+        left: 40%;
+        top: 50%;
+        z-index: 11;
+    }
+</#macro>
+
 <#macro script>
+
+    var $gallery = $("#gallery"), $galleryImg = $("#galleryImg");
+    var $uploaderFiles = $('#uploaderFiles');
+
+    $(function(){
+        var index;
+        $uploaderFiles.on("click", "li", function() {
+            var src = $(this).children("img").attr("src");
+            var img = " <img src=" + src + " class=' img-responsive' style='height:400px' >" ;
+            index = $(this).index();
+            $galleryImg.empty();
+            $galleryImg.append(img);
+            $gallery.fadeIn(100);
+        });
+
+        $gallery.on("click", function() {
+            $gallery.fadeOut(100);
+        });
+    });
 
 	var $form = $("#form");
 	$(function() {
@@ -79,6 +121,9 @@
 			<input type="hidden" name="taskId" value="${(taskId)!}">
 			<input type="hidden" name="status" id="status">
 			<div class="row form-horizontal">
+                <div class="gallery" id="gallery">
+                    <div class="gallery__img" id="galleryImg"></div>
+                </div>
 				<div class="form-group">
 				    <div class="col-sm-5">
 						<label class="control-label col-sm-4">客户名称:</label>
@@ -126,21 +171,30 @@
 					</div>
 				</div>
 
-				<div class="form-group">
-					<div class="col-sm-5">
-						<label class="control-label col-sm-4">拜访图片：</label>
-						<div class="input-group col-sm-8">
-							<p class="form-control-static">${(customerVisit.photo)!}</p>
-						</div>
-					</div>
-				</div>
+                <div class="form-group">
+                    <div class="col-sm-5">
+                        <label class="control-label col-sm-4">描述：</label>
+                        <div class="input-group col-sm-8">
+                            <p class="form-control-static">${(customerVisit.question_desc)!}</p>
+                        </div>
+                    </div>
+                </div>
 
 				<div class="form-group">
-					<div class="col-sm-5">
-						<label class="control-label col-sm-4">描述：</label>
-						<div class="input-group col-sm-8">
-							<p class="form-control-static">${(customerVisit.question_desc)!}</p>
-						</div>
+					<div class="col-sm-10">
+						<label class="control-label col-sm-2">拜访图片：</label>
+                            <div >
+                                <ul id="uploaderFiles">
+                                <#if (customerVisit.imageList) ??>
+                                    <#list customerVisit.imageList as bean>
+                                        <li class="thumbnail col-sm-3"><img src="${(bean.savePath)}" class=" img-responsive" style="width: 100%; height: 200px "> </li>
+                                    </#list>
+                                </#if>
+                                </ul>
+                            </div>
+						<!--<div class="input-group col-sm-8">-->
+
+						<!--</div>-->
 					</div>
 				</div>
 
