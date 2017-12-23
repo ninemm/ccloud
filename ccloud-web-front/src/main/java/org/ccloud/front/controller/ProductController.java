@@ -1,5 +1,6 @@
 package org.ccloud.front.controller;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -12,8 +13,10 @@ import org.apache.shiro.subject.Subject;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.CustomerType;
+import org.ccloud.model.Dict;
 import org.ccloud.model.User;
 import org.ccloud.model.query.CustomerTypeQuery;
+import org.ccloud.model.query.DictQuery;
 import org.ccloud.model.query.ProductCompositionQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SellerCustomerQuery;
@@ -21,9 +24,11 @@ import org.ccloud.model.query.SellerProductQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DataAreaUtil;
+import org.ccloud.wechat.WechatJSSDKInterceptor;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
+import com.jfinal.aop.Before;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 
@@ -148,5 +153,36 @@ public class ProductController extends BaseFrontController {
 
 		renderJson(customerTypeList);
 	}
+	
+	@Before(WechatJSSDKInterceptor.class)
+	public void customerNearbyChose() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		double nearby = 1;
+		
+		String lngAndLat = getPara("lngAndLat");
+		if(lngAndLat==null) {
+			List<Dict> areaCoverageList = DictQuery.me().findDictByType("area_coverage");
+			List<Map<String, Object>> areaCoverage = new ArrayList<>();
+			for(Dict dict : areaCoverageList) {
+				Map<String, Object> item = new HashMap<>();
+				item.put("title", dict.get("name"));
+				item.put("value", dict.get("value"));
+				areaCoverage.add(item);
+			}
+			setAttr("areaCoverage", JSON.toJSONString(areaCoverage));
+			render("customer_nearby_choose.html");
+		}else {
+			if(getPara("nearby")!=null)
+			nearby = Double.valueOf(getPara("nearby")).doubleValue();
+			String[] address = lngAndLat.split(",");
+			BigDecimal lat = new BigDecimal(address[0]);
+			BigDecimal lng = new BigDecimal(address[1]);
 
+			List<Map<String, Object>> customerList = SellerCustomerQuery.me().queryCustomerNearby(nearby,lng,lat,user.getId());
+			Map<String, Object> map = new HashMap<>();
+			
+			map.put("customerList", customerList);
+			renderJson(map);
+		}
+	}
 }
