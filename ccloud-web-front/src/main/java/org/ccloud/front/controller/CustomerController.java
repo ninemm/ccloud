@@ -329,7 +329,7 @@ public class CustomerController extends BaseFrontController {
 
 		Boolean isChecked = OptionQuery.me().findValueAsBool("web_proc_customer_review_" + getSessionAttr("sellerCode"));
 
-		if(!isChecked) {
+		if(isChecked == null || !isChecked) {
 			//如果不走流程直接做操作
 			updated = doSave(sellerCustomer, customer, areaCode, areaName, customerTypeIds, list, custTypeList, SellerCustomer.CUSTOMER_NORMAL);
 

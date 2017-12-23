@@ -180,8 +180,8 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		Map<String, Object> map = Maps.newHashMap();
 		boolean updated = true;
 
-		Boolean isChecked = OptionQuery.me().findValueAsBool("web_proc_customer_review_" + getSessionAttr("sellerCode"));
-
+		Boolean isCustomerReview = OptionQuery.me().findValueAsBool("web_proc_customer_review_" + getSessionAttr("sellerCode"));
+		boolean isChecked = isCustomerReview == true ? true : false;
 		//当是经销商管理员修改时
 		if(isSuperAdmin || isDealerAdmin || !isChecked) {
 			Customer persiste = CustomerQuery.me().findByCustomerNameAndMobile(customer.getCustomerName(), customer.getMobile());

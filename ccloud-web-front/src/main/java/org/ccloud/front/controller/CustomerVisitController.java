@@ -255,7 +255,7 @@ public class CustomerVisitController extends BaseFrontController {
 		 List<ImageJson> list = Lists.newArrayList();
 		 String picJson = getPara("pic");
 
-		if (isChecked) customerVisit.setStatus(Customer.CUSTOMER_AUDIT);
+		if (isChecked != null && isChecked) customerVisit.setStatus(Customer.CUSTOMER_AUDIT);
 		else customerVisit.setStatus(Customer.CUSTOMER_NORMAL);
 
 		 customerVisit.setUserId(user.getId());
@@ -286,7 +286,7 @@ public class CustomerVisitController extends BaseFrontController {
 			 return ;
 		 }
 
-		 if (isChecked)
+		 if (isChecked != null && isChecked)
 			updated = startProcess(customerVisit);
 		 
 		 if (updated)
