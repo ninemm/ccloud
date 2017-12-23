@@ -37,11 +37,10 @@
 	            	}
 	            	rank.append("<div class='rank-detail'><span class='sequence'>"+j+"</span><img src='${CTPATH}/images/jp.jpg'><div class='good-name'>"+data[i].realname+"</div><div class='good-total'><span class='orange'>￥"+data[i].totalAmount+"</span><span class='gray ft14'>/"+data[i].orderCount+"笔("+(data[i].productCount).toFixed(2)+")件</span></div></div>");
 	            }
+	            var index = 1;
 	            for(var i = length-1; i >= descLength; i--){
-	            	j = 1;
-	            	descRank.append("<div class='rank-detail'><span class='sequence'>"+j+"</span><img src='${CTPATH}/images/jp.jpg'><div class='good-name'>"+data[i].realname+"</div><div class='good-total'>");
-	            	descRank.append("<span class='orange'>￥"+data[i].totalAmount+"</span><span class='gray ft14'>/"+data[i].orderCount+"笔("+(data[i].productCount).toFixed(2)+")件</span></div></div>");
-	            	j++;
+	            	descRank.append("<div class='rank-detail'><span class='sequence'>"+index+"</span><img src='${CTPATH}/images/jp.jpg'><div class='good-name'>"+data[i].realname+"</div><div class='good-total'><span class='orange'>￥"+data[i].totalAmount+"</span><span class='gray ft14'>/"+data[i].orderCount+"笔("+(data[i].productCount).toFixed(2)+")件</span></div></div>");
+	            	index++;
 	            }
 	            
 			}
