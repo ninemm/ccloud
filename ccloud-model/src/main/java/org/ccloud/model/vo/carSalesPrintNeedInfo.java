@@ -10,7 +10,7 @@ public class carSalesPrintNeedInfo {
 	private BigDecimal saleAmount;//销售合计总金额
 	private String barCode;//商品条码
 	private String wareHouseName;//仓库名字
-	private String productAmout;//分品项合计金额
+	private BigDecimal productAmout;//分品项合计金额
 	private Integer isGift;//是否赠品
 	private String wareHousePhone;//仓库电话
 	private String bigUnit;//商品大单位
@@ -51,12 +51,7 @@ public class carSalesPrintNeedInfo {
 	public void setWareHouseName(String wareHouseName) {
 		this.wareHouseName = wareHouseName;
 	}
-	public String getProductAmout() {
-		return productAmout;
-	}
-	public void setProductAmout(String productAmout) {
-		this.productAmout = productAmout;
-	}
+
 	public Integer getIsGift() {
 		return isGift;
 	}
@@ -81,5 +76,12 @@ public class carSalesPrintNeedInfo {
 	public void setSmallUnit(String smallUnit) {
 		this.smallUnit = smallUnit;
 	}
+	public BigDecimal getProductAmout() {
+		return productAmout;
+	}
+	public void setProductAmout(BigDecimal productAmout) {
+		this.productAmout = productAmout;
+	}
+	
 	
 }

@@ -373,7 +373,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 		stringBuilder.append(" cs.custom_name,p.big_unit,p.small_unit, floor(co.product_count/p.convert_relate) as bigCount, MOD(co.product_count,p.convert_relate) as ");
 		stringBuilder.append(" smallCount, cs.bar_code, case when co.is_gift = 0  THEN product_amount ELSE 0 END as product_amount FROM ");
 		stringBuilder.append(" cc_sales_outstock_detail co LEFT JOIN cc_seller_product cs on cs.id = co.sell_product_id LEFT JOIN cc_product p ");
-		stringBuilder.append(" on p.id = cs.product_id ) so1 on so1.outstock_id = c.id WHERE c.warehouse_id =? AND c.biz_date >= ? AND c.biz_date <=? GROUP BY so1.sell_product_id,so1.is_gift" );
+		stringBuilder.append(" on p.id = cs.product_id ) so1 on so1.outstock_id = c.id WHERE c.warehouse_id =? AND c.biz_date >= ? AND c.biz_date <=? and c.`status` ='1000' GROUP BY so1.sell_product_id,so1.is_gift" );
 		List<Record> records = Db.find(stringBuilder.toString(), wareHouseId,beginDate,endDate);
 		List<carSalesPrintNeedInfo> carSalesPrintNeedInfos = new ArrayList<>();
 		for (Record record : records) {
@@ -385,6 +385,9 @@ public class SalesOutstockQuery extends JBaseQuery {
 		  carSalesPrintNeedInfo.setIsGift(record.getInt("is_gift"));
 		  carSalesPrintNeedInfo.setSmallCount(record.getInt("smallCount"));
 		  carSalesPrintNeedInfo.setWareHousePhone(record.getStr("wareHousePhone"));
+		  carSalesPrintNeedInfo.setBigUnit(record.getStr("big_unit"));
+		  carSalesPrintNeedInfo.setSmallUnit(record.getStr("small_unit"));
+		  carSalesPrintNeedInfo.setProductAmout(record.getBigDecimal("product_amount"));
 		  carSalesPrintNeedInfos.add(carSalesPrintNeedInfo);
 		}
 		return carSalesPrintNeedInfos;

@@ -100,6 +100,8 @@ function queryCarStockDetail(carWarehouseId, beginDate, endDate) {
         dataType: "json",
         async: false,
         success: function(data) {
+        var beginDate= '${beginDate}';
+        var endDate = '${endDate}';
            	var date = '';
 			if(beginDate == endDate){
 				date = beginDate;
@@ -122,36 +124,31 @@ function queryCarStockDetail(carWarehouseId, beginDate, endDate) {
 				}else{
 					isGift="";
 				}
-				content += $.format(contentStr, (index + 1), val.cInvName, isGift, val.factBigAmount, '件',
-					 val.factSmallAmount, '瓶', val.totalAmount + '元', barCode);
+				content += $.format(contentStr, (index + 1), val.productName, isGift, val.bigCount, val.bigUnit,
+					 val.smallCount, val.smallUnit, val.productAmout + '元', barCode);
 
-				total += val.totalAmount;
+				total += val.productAmout;
 				num ++;
 			});
 			
-			var len = (data.rows.length % data.printPageSize == 0) ? 0 : (data.printPageSize - (data.rows.length % data.printPageSize));
+			var len = (data.rows.length % 6 == 0) ? 0 : (6 - (data.rows.length % 6));
 			for (var i = 0; i < len; i++) {
 				num ++;
 				content += $.format(contentStr, num, '', '', '', '', '', '', '', '');
 			}
 			content += '</tbody></table>';
 
-			headerInfoContent = $.format(headerInfo, data.rows[0].sellerName, (type == 1) ? '销售': '退货');
+			headerInfoContent = $.format(headerInfo, data.rows[0].wareHouseName, '销售');
 
-			headerContent = $.format(headerStr, date, curDate, '车销客户', data.rows[0].sellerName);
+			headerContent = $.format(headerStr, date, curDate, '车销客户', data.rows[0].wareHouseName);
 
 			var salesAmount = DX(total);
 			
-			footerContent = $.format(footerStr, salesAmount, total, data.rows[0].phone != null ? data.rows[0].phone : '无', '无');
-			dayefooterContent = $.format(dayefooterStr, salesAmount, total, data.rows[0].phone, '无');
-			var dealerCode = getUser().dealerCode;
-			if(dealerCode=='71402022'){
-				batchPrintContent += headerInfoContent + headerContent + content + dayefooterContent;	
-			}else{
+			footerContent = $.format(footerStr, salesAmount, total, data.rows[0].wareHousePhone != null ? data.rows[0].wareHousePhone : '无', '无');
+		
 				batchPrintContent += headerInfoContent + headerContent + content + footerContent;	
-			}
 			
-			defaultPageSize = data.printPageSize;
+			defaultPageSize = 6;
 
 			$("#print-content").html(batchPrintContent);
 			rowNumber(defaultPageSize);
@@ -160,7 +157,7 @@ function queryCarStockDetail(carWarehouseId, beginDate, endDate) {
 				min: 1
 			}).spinner("value", defaultPageSize);
 		} else {
-			layer.alert(date + '无' + (type == 1 ? '送': '退') + '货数据,请确认' + (type == 1 ? '出': '入') + '库后再打印');
+		
 		}
 
         }
