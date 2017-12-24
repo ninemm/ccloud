@@ -137,18 +137,11 @@ public class _AdminController extends JBaseController {
 			return;
 		}
 		
-		User _user;
-		try {
-			_user = UserQuery.me().findUserByUsername(username);
-			password = EncryptUtils.encryptPassword(password, _user.getSalt());
-		} catch (Exception e1) {
-			
-			e1.printStackTrace();
-			renderJson(false);
-			return;
-		}
+		User _user = UserQuery.me().findUserByUsername(username);
+		password = EncryptUtils.encryptPassword(password, _user.getSalt());
 		Subject subject = SecurityUtils.getSubject();
 		CaptchaUsernamePasswordToken token = new CaptchaUsernamePasswordToken(username, password, rememberMe, "", "");
+		
 		try {
 			subject.login(token);
 			User user = (User) subject.getPrincipal();
@@ -204,13 +197,10 @@ public class _AdminController extends JBaseController {
 			MessageKit.sendMessage(Actions.USER_LOGINED, user);
 			CookieUtils.put(this, Consts.COOKIE_LOGINED_USER, user.getId().toString());
 			setSessionAttr(Consts.SESSION_LOGINED_USER, user);
-			renderJson(true);
-			//redirect("/admin/index");
+			redirect("/admin/index");
 		} catch (AuthenticationException e) {
 			e.printStackTrace();
-			//renderAjaxResultForError("用户名或密码错误");
-			renderJson(false);
-			return;
+			render("login.html");
 		}
 	}
 	
