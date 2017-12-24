@@ -123,7 +123,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		Map<String, Object> result = new HashMap<>();
 		List<Map<String, String>> countList = new ArrayList<>();
 		Boolean checkStore = OptionQuery.me().findValueAsBool(Consts.OPTION_SELLER_STORE_CHECK + sellerCode);
-		boolean isCheckStore = checkStore == true ? true : false;
+		boolean isCheckStore = (checkStore != null && checkStore == true) ? true : false;
 
 		List<Record> list = InventoryQuery.me().findProductStoreByUser(sellerId, productId, userId);
 		if (list.size() == 0) {

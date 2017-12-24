@@ -181,7 +181,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		boolean updated = true;
 
 		Boolean isCustomerReview = OptionQuery.me().findValueAsBool("web_proc_customer_review_" + getSessionAttr("sellerCode"));
-		boolean isChecked = isCustomerReview == true ? true : false;
+		boolean isChecked = (isCustomerReview != null && isCustomerReview) ? true : false;
 		//当是经销商管理员修改时
 		if(isSuperAdmin || isDealerAdmin || !isChecked) {
 			Customer persiste = CustomerQuery.me().findByCustomerNameAndMobile(customer.getCustomerName(), customer.getMobile());
