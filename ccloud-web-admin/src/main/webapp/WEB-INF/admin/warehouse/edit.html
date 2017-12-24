@@ -86,6 +86,7 @@ function doSubmit(){
 				toastr.success(data.message, '操作成功');
 			} else {
 				toastr.error(data.message,'操作失败');
+			}	
 			setTimeout( function(){
 						l.stop();
 						location.reload();

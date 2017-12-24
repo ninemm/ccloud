@@ -17,9 +17,8 @@
 </#macro>
 
 <#macro script>
-    var mobile = '${(mobile)!}';
-    var openid = '${(openid)!}';
-    
+    var mobile = '${(session._logined_user.mobile)!}';
+    var openid = '${(session._logined_user.wechat_open_id)!}';
     var callback = function(res) {
         if (res.errorCode == 0) {
             location.href = '${CPATH}/';
@@ -40,8 +39,8 @@
             <div class="weui-panel__bd">
                 <div class="weui-media-box weui-media-box_small-appmsg">
                     <div class="weui-cells">
-                        <#if sellerList ??>
-                        <#list sellerList as bean>
+                        <#if (session.sellerList) ??>
+                        <#list (session.sellerList) as bean>
                         <a class="weui-cell weui-cell_access" href="javascript:void(0);" onclick="doChange('${(bean.seller_id)!}');">
                             <div class="weui-cell__bd weui-cell_primary">
                                 <p>${(bean.seller_name)!}</p>
