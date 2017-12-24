@@ -17,8 +17,8 @@
 </#macro>
 
 <#macro script>
-    var mobile = '${(session._logined_user.mobile)!}';
-    var openid = '${(session._logined_user.wechat_open_id)!}';
+    var mobile = '${mobile!}';
+    var openid = '${openid!}';
     var callback = function(res) {
         if (res.errorCode == 0) {
             location.href = '${CPATH}/';

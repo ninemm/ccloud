@@ -60,6 +60,12 @@ public class UserController extends BaseFrontController {
 		} else {
 			if ("detail".equalsIgnoreCase(action)) {
 				renderError(404);
+			} else if ("choice".equalsIgnoreCase(action)) {
+				User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+				if (user != null) {
+					setAttr("mobile", user.getMobile());
+					setAttr("openid", user.getWechatOpenId());
+				}
 			}
 			
 			render(String.format("user_%s.html", action));
@@ -111,7 +117,6 @@ public class UserController extends BaseFrontController {
 			return ;
 		} else if (sellerList.size() > 1) {
 			setAttr("mobile", username);
-			setAttr("sellerList", sellerList);
 			setSessionAttr("sellerList", sellerList);
 //			redirect("/user/choice", true);
 			forwardAction("/user/choice");
