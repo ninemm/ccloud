@@ -40,7 +40,7 @@
 	        window.location.href = '${CPATH}/product/order';
         });
          
-       combo();
+       //combo();
 
     });
 
@@ -70,8 +70,10 @@
 	    var params = {
 		    "page": page,
 	        "size": size,
-	        "nearby": $("#searchArea").data('values'),
-			"lngAndLat":"30.5270841588,114.3563139439"
+	        "dist": $("#searchArea").data('values'),
+			//"lngAndLat":"30.5270841588,114.3563139439"
+			"lon": $('#lon').val(),
+			"lat": $('#lat').val()
 	    }
 
 		Utils.ajax('${CPATH}/product/customerNearbyChose', params,
@@ -140,10 +142,11 @@
 
 				var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
 				var geoc = new BMap.Geocoder();                   // 获取百度地址解析器
+                $("#lon").val(parseFloat(longitude).toFixed(2));
+                $("#lat").val(parseFloat(latitude).toFixed(2));
+				//$("#lngAndLat").val(parseFloat(longitude).toFixed(2)+" "+parseFloat(latitude).toFixed(2));
 
-				$("#lngAndLat").val(parseFloat(longitude).toFixed(2)+" "+parseFloat(latitude).toFixed(2));
-
-				translateCallback = function (point) {            // 回调函数
+				/*translateCallback = function (point) {            // 回调函数
 					geoc.getLocation(point, function(rs) {
 						var addComp = rs.addressComponents;
 						var address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
@@ -152,7 +155,9 @@
 				};
 				setTimeout(function() {
 					BMap.Convertor.translate(point, 0, translateCallback);//真实经纬度转成百度坐标
-				}, 100);
+				}, 100);*/
+				
+				combo();
 			},
 			cancel: function (res) {
 				console.log('用户拒绝授权获取地理位置');
@@ -174,6 +179,8 @@
                     <input type="text" id="searchArea" class="weui-input" placeholder="请选择搜索范围" readonly>
                     <i class="icon-sort-desc"></i>
 				</div>
+				<input type="hidden" name="lon" id="lon">
+				<input type="hidden" name="lat" id="lat">
 			</header>
 				<div id="customerList">
 					<div class="weui-panel weui-panel_access" style="display: none">

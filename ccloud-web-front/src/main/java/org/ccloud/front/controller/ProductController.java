@@ -29,6 +29,7 @@ import org.ccloud.wechat.WechatJSSDKInterceptor;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Before;
+import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 
@@ -157,10 +158,11 @@ public class ProductController extends BaseFrontController {
 	@Before(WechatJSSDKInterceptor.class)
 	public void customerNearbyChose() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		double nearby = 1;
-		
-		String lngAndLat = getPara("lngAndLat");
-		if(lngAndLat==null) {
+		Double dist = 100d;
+		String lon = getPara("lon");
+		String lat = getPara("lat");
+		//String lngAndLat = getPara("lngAndLat");
+		if(StrKit.isBlank(lon) || StrKit.isBlank(lat)) {
 			List<Dict> areaCoverageList = DictQuery.me().findDictByType("area_coverage");
 			List<Map<String, Object>> areaCoverage = new ArrayList<>();
 			for(Dict dict : areaCoverageList) {
@@ -171,14 +173,16 @@ public class ProductController extends BaseFrontController {
 			}
 			setAttr("areaCoverage", JSON.toJSONString(areaCoverage));
 			render("customer_nearby_choose.html");
-		}else {
+		} else {
 			if(getPara("nearby")!=null)
-			nearby = Double.valueOf(getPara("nearby")).doubleValue();
-			String[] address = lngAndLat.split(",");
-			BigDecimal lat = new BigDecimal(address[0]);
-			BigDecimal lng = new BigDecimal(address[1]);
+				dist = Double.valueOf(getPara("nearby", "100")).doubleValue();
+			
+			
+			//String[] address = lngAndLat.split(",");
+			BigDecimal latitude = new BigDecimal(lat);
+			BigDecimal longitude = new BigDecimal(lon);
 
-			List<Map<String, Object>> customerList = SellerCustomerQuery.me().queryCustomerNearby(nearby,lng,lat,user.getId());
+			List<Map<String, Object>> customerList = SellerCustomerQuery.me().queryCustomerNearby(dist, longitude, latitude, user.getId());
 			Map<String, Object> map = new HashMap<>();
 			
 			map.put("customerList", customerList);
