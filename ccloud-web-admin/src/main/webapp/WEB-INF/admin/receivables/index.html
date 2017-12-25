@@ -95,7 +95,11 @@ var initReceivableDetailTable = function(){
 	var fields = [
 		{field: "ref_type",title:"业务类型编码",align: "center",visible:false, edit: false},	
 	    {field: "ref_Name",title:"业务类型",align: "center", edit: false},		
-		{field: "ref_sn",title:"单号",align: "center",edit: false},
+		{field: "ref_sn",title:"单号",align: "center",
+			formatter: function(value,row,index){
+				return '<a href="#" name="order_sn" onclick="orderInfo(\''+row.ref_sn+'\')">'+row.ref_sn+'</a>';
+			},
+		edit: false},
 		{field: "biz_date",title:"业务日期",align: "center",edit: false},
 		{field: "receive_amount",title:"应收金额",align: "center",edit: false},
 		{field: "act_amount",title:"已收金额",align: "center",edit: false},
@@ -103,13 +107,22 @@ var initReceivableDetailTable = function(){
 		{field: "create_date",title:"创建时间",align:"center",edit:false},
 		{field: "action", title: "收款详情", align: "center",
 			 formatter: function(value, row, rowIndex){
-			 	var url = '${CPATH}/admin/receivables/renderlist?ref_sn='+row.ref_sn+'&&ref_type='+row.ref_type+'&&object_id='+row.object_id;
+			 	var url = '${CPATH}/admin/receivables/renderlist?ref_sn='+row.ref_sn+'&&ref_type='+row.ref_type+'&&object_id='+row.object_id+'&&balance_amount='+row.balance_amount;
 			 	return '<a href="' + url + '" class="btn btn-sm" >收款详情</a>';
 			 },
 			 edit:false}
 	];
 	
 	return fields;
+}
+
+function orderInfo(orderId){
+	layer.open({
+		title:"订单详细",
+		type: 2,
+		area: ['70%', '80%'],
+		content: '${CPATH}/admin/salesOrder/detailBySn/' + orderId
+	});
 }
 
 var getReceivablesDetailParams = function(params){
@@ -134,7 +147,7 @@ function getReceivablesDetail(page){
 				var rows = data.rows;
 				for(var i in rows){
 					detailHtml += '<tr><td>'+rows[i].ref_type+'</td><td>'+rows[i].ref_sn+'</td><td>'+rows[i].biz_date+'</td><td>'+rows[i].receive_amount+'</td><td>'+rows[i].act_amount+'</td><td>'+rows[i].balance_amount+'</td><td>'+rows[i].create_date+'</td>';
-					detailHtml += '<td><a href="'+'${CPATH}/admin/receivables/renderlist?ref_sn='+ rows[i].ref_sn +'&ref_type='+rows[i].ref_type+'">收款详情</a></td></tr>';
+					detailHtml += '<td><a href="'+'${CPATH}/admin/receivables/renderlist?ref_sn='+ rows[i].ref_sn +'&ref_type='+rows[i].ref_type+'&balance_amount='+rows[i].balance_amount+'">收款详情</a></td></tr>';
 				}
 				var pageCount = Math.ceil(data.total/size);
 				$("#detail-page-count").html(pageCount);

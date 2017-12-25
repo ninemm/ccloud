@@ -32,6 +32,7 @@
     var type = '${type}';
 	var userInfo = JSON.parse('${userInfo}');
 	var bill_id = '${bill_id}';
+	var balance_amount = '${balance_amount}';
 	var $form = $("#form");
 	 
 
@@ -162,6 +163,12 @@
 					<label class="control-label col-sm-3">备注:</label>
 					<div class="input-group col-sm-7">
 						<input class="form-control input-sm" type="text" name="remark" value="${(remark)!}" placeholder="备注">
+					</div>
+				</div>
+				<div class="col-sm-5 validata-box">
+					<label class="control-label col-sm-3">*未收金额:</label>
+					<div class="input-group  col-sm-7">
+						<input class="form-control input-sm" type="text" name="balance_amount" value="${(balance_amount)!}" placeholder="未收金额" readonly>
 					</div>
 				</div>
 			</div>
