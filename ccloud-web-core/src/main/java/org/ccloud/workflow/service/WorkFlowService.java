@@ -358,8 +358,8 @@ public class WorkFlowService {
 		HistoryService historyService = ActivitiPlugin.buildProcessEngine().getHistoryService();
         
 		List<HistoricTaskInstance> htiList = historyService.createHistoricTaskInstanceQuery()//历史任务表查询
-				.processInstanceId(procInstId)//使用流程实例ID查询
-				.list();
+				.processInstanceId(procInstId).orderByTaskCreateTime()//使用流程实例ID查询
+				.asc().list();
         for (HistoricTaskInstance  hai : htiList) {
             String historytaskId = hai.getId();
             List<Comment> comments = taskService.getTaskComments(historytaskId);
