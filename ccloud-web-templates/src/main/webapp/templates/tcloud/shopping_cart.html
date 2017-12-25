@@ -30,7 +30,7 @@ $(function() {
   }).on("touchstart", "#placeOrder", function () {
       save();
   }).on("touchstart", "#addGoods", function () {
-	  historyUtils.back();
+	  window.location.href = '${CPATH}/product';
   }).on("touchend", ".operate:first-child", function () { //减少商品数量
       productChange($(this));
   }).on("touchend", ".operate:last-child", function () { //增加商品数量
