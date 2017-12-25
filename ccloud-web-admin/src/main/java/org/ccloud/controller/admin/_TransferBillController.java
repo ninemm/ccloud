@@ -76,7 +76,6 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 		render("index.html");
 	}
 	
-	
 	public void list() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String departmentId = user.getDepartmentId();

@@ -365,6 +365,48 @@ public class ProductQuery extends JBaseQuery {
 		return plist;
 	}
 	
+	//库存调拨  编辑时  回显数据
+	public List<ProductInfo> getProductBySellerProId(String sellerProId,String warehouseId) {
+		StringBuilder fromBuilder = new StringBuilder("SELECT p.create_date as createDate,sp.id as sellerProductId, p.cost, p.is_marketable as isMarketable, p.market_price as marketPrice, p.`name`, p.price, sp.store_count,p.id as productId, ");
+		fromBuilder.append("p.product_sn as productSn,sp.custom_name as customName, p.store, p.store_place,p.big_unit as bigUnit, p.weight, p.weight_unit as weightUnit, g.`code`, b.`name` as brandName, c.`name` as categoryName, t1.valueName,d.balance_count ");
+		fromBuilder.append("FROM cc_product p ");
+		fromBuilder.append("LEFT JOIN cc_seller_product sp ON sp.product_id = p.id ");
+		fromBuilder.append("LEFT JOIN cc_goods g ON p.goods_id = g.id ");
+		fromBuilder.append("LEFT JOIN cc_brand b ON g.brand_id = b.id ");
+		fromBuilder.append("LEFT JOIN cc_goods_category c ON g.goods_category_id = c.id ");
+		fromBuilder.append("LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
+		fromBuilder.append("RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = sp.product_id  INNER JOIN cc_inventory c2 ON p.id = c2.product_id  INNER JOIN cc_inventory_detail d on d.sell_product_id = sp.id ");
+		fromBuilder.append("and c2.warehouse_id = d.warehouse_id  and d.sell_product_id =? AND c2.warehouse_id =?  GROUP BY d.sell_product_id");
+		List<Record> list = Db.find(fromBuilder.toString(),sellerProId,warehouseId);	
+		List<ProductInfo> plist = new ArrayList<>();
+		for (Record record : list) {
+			ProductInfo pro = new ProductInfo();
+			pro.setCustomName(record.getStr("customName"));
+			pro.setBigUnit(record.getStr("bigUnit"));
+			pro.setBrandName(record.getStr("brandName"));
+			pro.setCategoryName(record.getStr("categoryName"));
+			pro.setCode(record.getStr("code"));
+			pro.setCost(record.getBigDecimal("cost"));
+			pro.setCreateDate(record.getDate("createDate"));
+			pro.setIsMarketable(record.getBoolean("isMarketable"));
+			pro.setMarketPrice(record.getBigDecimal("marketPrice"));
+			pro.setName(record.getStr("name"));
+			pro.setPrice(record.getBigDecimal("price"));
+			pro.setProductSn(record.getStr("productSn"));
+			pro.setStore(record.getStr("store"));
+			pro.setStorePlace(record.getStr("storePlace"));
+			pro.setWeight(record.getStr("weight"));
+			pro.setWeightUnit(record.getStr("weightUnit"));
+			pro.setProductId(record.getStr("productId"));
+			pro.setSellerProductId(record.getStr("sellerProductId"));
+			pro.setSpecificationValue(record.getStr("valueName"));
+			pro.setStoreCount(record.getBigDecimal("store_count"));
+			pro.setBalanceCount(record.getBigDecimal("balance_count"));
+			plist.add(pro);
+		}
+		return plist;
+	}
+	
 	
 	public List<ProductInfo> getProductBySellerProId(String sellerProId) {
 		StringBuilder fromBuilder = new StringBuilder("SELECT p.create_date as createDate,sp.id as sellerProductId, p.cost, p.is_marketable as isMarketable, p.market_price as marketPrice, p.`name`, p.price, sp.store_count,p.id as productId, ");
