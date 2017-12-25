@@ -431,7 +431,7 @@ $("#newCustomerBoard").on("click",function(){
                             <#list toDoCustomerList! as bean>
                             <li>
                                 <span>${bean.createTime!}</span>
-                                <a href="${CPATH}/admin/sellerCustomer/audit?id=${bean.id!}&taskId=${bean.taskId!}&assignee=${bean.assignee}" target="_blank">${bean.customer_name!}</a>
+                                <a href="${CPATH}/admin/sellerCustomer/audit?id=${bean.id!}&taskId=${bean.taskId!}&assignee=${bean.assignee}" target="_parent">${bean.customer_name!}</a>
                             </li>
                             </#list>
                             <#else>
@@ -465,7 +465,7 @@ $("#newCustomerBoard").on("click",function(){
                             <#list toDoOrdersList! as bean>
                             <li>
                                 <span>${bean.createTime!}</span>
-                                <a href="${CPATH}/admin/salesOrder/audit?id=${bean.id!}&taskId=${bean.taskId!}&assignee=${bean.assignee}" target="_blank">${bean.orderSn!}</a>
+                                <a href="${CPATH}/admin/salesOrder/audit?id=${bean.id!}&taskId=${bean.taskId!}&assignee=${bean.assignee}" target="_parent">${bean.orderSn!}</a>
                             </li>
                             </#list>
                             <#else>
@@ -502,7 +502,7 @@ $("#newCustomerBoard").on("click",function(){
                             <#list toDoCustomerVisitList! as bean>
                             <li>
                                 <span>${bean.createTime!}</span>
-                                <a href="${CPATH}/admin/customerVisit/audit?id=${bean.id!}&taskId=${bean.taskId!}&assignee=${bean.assignee}" target="_blank">${bean.customer_name!}</a>
+                                <a href="${CPATH}/admin/customerVisit/audit?id=${bean.id!}&taskId=${bean.taskId!}&assignee=${bean.assignee}" target="_parent">${bean.customer_name!}</a>
                             </li>
                             </#list>
                             <#else>
