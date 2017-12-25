@@ -19,71 +19,79 @@
 </#macro>
  
 <#macro script>
-
-var $form = $("#form");
-
-$(function() {
-	
-	jQuery.mm.initValidator('#form', validatorFields)
-	
-});
-
-var validatorFields = {
-	'transferBill.from_warehouse_id': {
-		validators: {
-            notEmpty: { message: '调出仓库不能为空' },
-        }
-	},
-	'transferBill.to_warehouse_id': {
-		validators: {
-            notEmpty: { message: '调入仓库不能为空' },
-        }
-	}
-};
-
-function doSubmit(){
-	var l = Ladda.create( document.querySelector( '#do_submit' ) );
-	checkIsTheSameWarehouse();
-	$form.ajaxSubmit({
-		beforeSubmit: function() {
-			var validate = $form.data('bootstrapValidator');
-			validate.validate();
-			if (validate.isValid()) {
-					l.start();
-				}
-			return validate.isValid();
-		},
-		type : "post", 
-		dataType : "json", 
-		success : function(data) { 
-			if (data.errorCode == 0) {
-				//location.reload();
-				toastr.success(data.message, '操作成功');
-			} else {
-				toastr.error(data.message,'操作失败');
-			}
-			setTimeout( function(){
-						l.stop();
-								}, 1 * 1000 );
-		},
-		error : function() {
-			l.stop();
-			alert("信息提交错误");
-		}
+	var $form = $("#form");
+	var buer=false;
+	$(function() {
+		
+		jQuery.mm.initValidator('#form', validatorFields)
+		
 	});
-}
 
+	var validatorFields = {
+		'transferBill.from_warehouse_id': {
+			validators: {
+	            notEmpty: { message: '调出仓库不能为空' },
+	        }
+		},
+		'transferBill.to_warehouse_id': {
+			validators: {
+	            notEmpty: { message: '调入仓库不能为空' },
+	        }
+		},
+		'transferBill.biz_user_id': {
+			validators: {
+	            notEmpty: { message: '调波人不能为空' },
+	        }
+		}
+	};
 
-//调出仓库和调入仓库不能是同一个仓库
-function checkIsTheSameWarehouse(){
-var to_warehouse_id = $("#to_warehouse_id").val();
- if(from_warehouse_id == to_warehouse_id){
- 	alert("调出仓库和调入仓库不能是同一个仓库");
- }
-}
+	function doSubmit(){
+		var l = Ladda.create( document.querySelector( '#do_submit' ) );
+		checkIsTheSameWarehouse();
+		if(buer){
+			return;
+		}
+		$form.ajaxSubmit({
+			beforeSubmit: function() {
+				var validate = $form.data('bootstrapValidator');
+				validate.validate();
+				if (validate.isValid()) {
+						l.start();
+					}
+				return validate.isValid();
+			},
+			type : "post", 
+			dataType : "json", 
+			success : function(data) { 
+				if (data.errorCode == 0) {
+					//location.reload();
+					toastr.success(data.message, '操作成功');
+				} else {
+					toastr.error(data.message,'操作失败');
+				}
+				setTimeout( function(){
+							l.stop();
+									}, 1 * 1000 );
+			},
+			error : function() {
+				l.stop();
+				alert("信息提交错误");
+			}
+		});
+	}
+	
+	
+	//调出仓库和调入仓库不能是同一个仓库
+	function checkIsTheSameWarehouse(){
+		var to_warehouse_id = $("#to_warehouse_id").val();
+		var from_warehouse_id=$("#from_warehouse_id").val();
+		if(from_warehouse_id == to_warehouse_id){
+			toastr.error("调出仓库和调入仓库不能是同一个仓库");
+			buer=true;
+		}
+	}
 
-
-function initProduct(warehouse_id){
+	function initProduct(warehouse_id){
          var productList = new Array();
          var productOptionArr = new Array();
          var productMap = new Map();
@@ -96,9 +104,8 @@ function initProduct(warehouse_id){
 					productList = data;
 					pList = productList;
 				}
-			});
-
-	if(productList) {
+		});
+		if(productList) {
 			$.each(productList, function(idx, item) {
 				var option = {
 					id: item.productList.sellerProductId,
@@ -110,8 +117,7 @@ function initProduct(warehouse_id){
 				pMap = productMap;
 			});
 		}
-
-}
+	}
 
 <!--商品列表 -->
 var pList = new Array();
