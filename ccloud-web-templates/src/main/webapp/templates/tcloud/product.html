@@ -303,7 +303,8 @@ function getComposition($el){
 
 		compositionNum : $el.find("#compositionNum").val(),
 		
-		compositionValueName : $el.find("#compositionValueName").text()
+		compositionValueName : $el.find("#compositionValueName").text(),
+		compositionSub : $el.find("#gift").html()
 	}
 }
 
@@ -368,16 +369,15 @@ function save(){
 							<img src="${CTPATH}/images/jp.jpg" style="width:2rem;">
 							<div class="weui-cell_access product-top-right">
 								<div class="product_name" id="productName">
-									35度中国劲酒
 								</div>
 								<div class="product_unit">
-									规格： <span id="valueName">125ml</span> 
+									规格： <span id="valueName"></span> 
 								</div>
 								<span class="weui-cell__ft"></span>
 							</div>
 						</div>
 						<div class="product_bUnit">
-							<span class="price" id="bigPriceSpan">￥210</span> <span class="unit" id="bigUnitSpan">&nbsp;/&nbsp;件</span>
+							<span class="price" id="bigPriceSpan"></span> <span class="unit" id="bigUnitSpan"></span>
 							<div class="spinner">
 								<div class="operate fl">
 									<i class="icon-minus2"></i>
@@ -389,7 +389,7 @@ function save(){
 							</div>
 						</div>
 						<div class="product_mUnit">
-							<span class="price" id="smallPriceSpan">￥12</span> <span class="unit" id="smallUnitSpan">&nbsp;/&nbsp;瓶</span>
+							<span class="price" id="smallPriceSpan"></span> <span class="unit" id="smallUnitSpan"></span>
 							<div class="spinner">
 								<div class="operate fl">
 									<i class="icon-minus2"></i>
@@ -400,7 +400,7 @@ function save(){
 								</div>
 							</div>
 						</div>
-						<div id="stock">库存：1000件</div>
+						<div id="stock"></div>
 					</div>
 				</section>
 			</div>
@@ -413,16 +413,15 @@ function save(){
 							<img src="${CTPATH}/images/jp.jpg" alt="" style="width:2rem;">
 							<div class="weui-cell_access product-top-right">
 								<div class="product_name" id="compositionName">
-									35度中国劲酒
 								</div>
 								<div class="product_unit">
-									规格： <span id="compositionValueName">125ml</span> 
+									规格： <span id="compositionValueName"></span> 
 								</div>
 								<span class="weui-cell__ft"></span>
 							</div>
 						</div>
 						<div class="product_bUnit">
-							<span class="price" id="compositionPriceSpan">￥210</span>
+							<span class="price" id="compositionPriceSpan"></span>
 							<div class="spinner">
 								<div class="operate fl">
 									<i class="icon-minus2"></i>
@@ -437,7 +436,7 @@ function save(){
 					</div>
 					<hr>
 					<div id="gift">
-						<p id="sub">赠品：<span id="subProduct">参茸劲酒_250ml_1*6 x 1 件</span>
+						<p id="sub">赠品：<span id="subProduct"> </span>
 						</p>
 						<p class="t-r width-50 none" id="subsubProduct">
 						</p>
