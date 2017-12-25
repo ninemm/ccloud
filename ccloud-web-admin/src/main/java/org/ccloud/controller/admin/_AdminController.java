@@ -120,6 +120,11 @@ public class _AdminController extends JBaseController {
 		setAttr("directAmount",JSON.toJSONString(directBusinessAmount));
 		setAttr("amountCollect",JSON.toJSONString(amountCollect));
 		
+		setSessionAttr("sellerCustomerList", SellerCustomerQuery.me().getToDo(user.getUsername()).size());
+		setSessionAttr("orderList", SalesOrderQuery.me().getToDo(user.getUsername()).size());
+		setSessionAttr("sellerCustomerVisitList", CustomerVisitQuery.me().getToDo(user.getUsername()).size());
+		setSessionAttr("allList", SalesOrderQuery.me().getToDo(user.getUsername()).size()+CustomerVisitQuery.me().getToDo(user.getUsername()).size()+SellerCustomerQuery.me().getToDo(user.getUsername()).size());
+		
 		setAttr("identity",SecurityUtils.getSubject().isPermitted("/admin/manager"));
 		render("index.html");
 	}
