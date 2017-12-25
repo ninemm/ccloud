@@ -15,8 +15,11 @@
  */
 package org.ccloud.controller.admin;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
@@ -25,7 +28,9 @@ import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.model.InventoryDetail;
+import org.ccloud.model.SellerProduct;
 import org.ccloud.model.query.InventoryDetailQuery;
+import org.ccloud.model.query.SellerProductQuery;
 
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Before;
@@ -41,28 +46,35 @@ public class _InventoryDetailController extends JBaseCRUDController<InventoryDet
 	
 	@Override
 	public void index() {
+		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
+		setAttr("startDate", date);
+		setAttr("endDate", date);
+		
 		render("index.html");
 	}
 	@RequiresPermissions("/admin/salesOrder/check")
 	public void list() {
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerId = getSessionAttr("sellerId");
-		String stock_taking_sn = getPara("stock_taking_sn");
-		String name = getPara("name");
-		if (StrKit.notBlank(stock_taking_sn)) {
-			stock_taking_sn = StringUtils.urlDecode(stock_taking_sn);
-			setAttr("stock_taking_sn", stock_taking_sn);
+		String keyword = getPara("k");
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String sellerProductId = getPara("sellerProductId");
+		String sort = getPara("sort");
+		String sortOrder = getPara("sortOrder");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+			setAttr("k", keyword);
 		}
-		if (StrKit.notBlank(name)) {
-			name = StringUtils.urlDecode(name);
-			setAttr("name", name);
-		}
-		Page<InventoryDetail> page = InventoryDetailQuery.me()._in_paginate(getPageNumber(), getPageSize(),name,stock_taking_sn,"cid.create_date",sellerId,dataArea);
+		Page<InventoryDetail> page = InventoryDetailQuery.me()._in_paginate(getPageNumber(), getPageSize(),keyword,sellerId,dataArea,startDate, endDate,sellerProductId,sort,sortOrder);
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);
 	}
 	
 	public void out(){
+		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
+		setAttr("startDate", date);
+		setAttr("endDate", date);
 		render("out.html");
 	}
 	
@@ -70,12 +82,23 @@ public class _InventoryDetailController extends JBaseCRUDController<InventoryDet
 		String sellerId = getSessionAttr("sellerId");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
         String keyword = getPara("k");
+        String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String sellerProductId = getPara("sellerProductId");
+		String sort = getPara("sort");
+		String sortOrder = getPara("sortOrder");
         if (StrKit.notBlank(keyword)) {
             keyword = StringUtils.urlDecode(keyword);
             setAttr("k", keyword);
         }
-		Page<InventoryDetail> page = InventoryDetailQuery.me()._out_paginate(getPageNumber(), getPageSize(),keyword,"cid.create_date",sellerId,dataArea);
+		Page<InventoryDetail> page = InventoryDetailQuery.me()._out_paginate(getPageNumber(), getPageSize(),keyword,sellerId,dataArea,startDate, endDate,sellerProductId,sort,sortOrder);
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);
+	}
+	
+	public void show_sellerProductName(){
+		String sellerId = getSessionAttr("sellerId");
+		List<SellerProduct> lists = SellerProductQuery.me().findBySellerId(sellerId);
+		renderJson(lists);
 	}
 }

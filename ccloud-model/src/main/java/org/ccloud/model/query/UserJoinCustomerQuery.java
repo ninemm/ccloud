@@ -113,9 +113,15 @@ public class UserJoinCustomerQuery extends JBaseQuery {
 		return 0;
 	}
 	
-	public long customerCount(String dataArea) {
-		StringBuilder fromBuilder = new StringBuilder("select count(seller_customer_id) from cc_user_join_customer ");
-		fromBuilder.append("where data_area like '"+dataArea+"'");
-		return Db.queryLong(fromBuilder.toString());
-	}
+	public long customerCount(String dataArea,boolean newCustomer) {
+		/*		StringBuilder fromBuilder = new StringBuilder("select count(seller_customer_id) from cc_user_join_customer ");
+				fromBuilder.append("where data_area like '"+dataArea+"'");*/
+				StringBuilder fromBuilder = new StringBuilder("select count(csc.id) from cc_seller_customer csc inner join cc_user_join_customer cjc on csc.id = cjc.seller_customer_id ");
+				fromBuilder.append("where cjc.data_area like '"+dataArea+"'");
+				if(newCustomer) {
+					fromBuilder.append("and DATE_SUB(CURDATE(), INTERVAL 7 DAY) <= date(csc.create_date)");
+				}
+				
+				return Db.queryLong(fromBuilder.toString());
+			}
 }

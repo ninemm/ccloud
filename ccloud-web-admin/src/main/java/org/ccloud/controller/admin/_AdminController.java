@@ -113,11 +113,14 @@ public class _AdminController extends JBaseController {
 		setAttr("sum_amount", StrKit.notBlank(selDataArea)?count.get("sum_amount")!=null?df.format(count.get("sum_amount")):"0.00":"0.00");
 		setAttr("toDoCustomerVisitList", CustomerVisitQuery.me().getToDo(user.getUsername()));
 		
-		setAttr("customerCount",StrKit.notBlank(selDataArea)?UserJoinCustomerQuery.me().customerCount(selDataArea):0);
+		setAttr("customerCount",StrKit.notBlank(selDataArea)?UserJoinCustomerQuery.me().customerCount(selDataArea,false):0);
+		setAttr("newCustomerCount",StrKit.notBlank(selDataArea)?UserJoinCustomerQuery.me().customerCount(selDataArea,true):0);
 		setAttr("salesManAmount",JSON.toJSONString(salesManAmount));
 		setAttr("goodsSales",JSON.toJSONString(goodsSales));
 		setAttr("directAmount",JSON.toJSONString(directBusinessAmount));
 		setAttr("amountCollect",JSON.toJSONString(amountCollect));
+		
+		setAttr("identity",SecurityUtils.getSubject().isPermitted("/admin/manager"));
 		render("index.html");
 	}
 	
