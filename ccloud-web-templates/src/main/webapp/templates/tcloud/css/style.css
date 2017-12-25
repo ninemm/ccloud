@@ -161,6 +161,19 @@ a {
   min-width: 0.5rem;
   height: 0.5rem;
   padding: 0;
+  position: absolute;
+  right: 20%;
+  top: 15%;
+}
+
+.full-badge {
+  min-width: .8rem;
+  height: .8rem;
+  line-height: .8rem;
+  padding: 0;
+  position: absolute;
+  right: 20%;
+  top: 15%;
 }
 
 .left-top-tag {
@@ -670,12 +683,6 @@ a {
 .index-info-tab .weui-cell__ft {
   height: 100%;
   width: 1rem;
-}
-
-.empty-badge {
-  position: absolute;
-  right: 20%;
-  top: 15%;
 }
 
 #home .weui-cells__title {
