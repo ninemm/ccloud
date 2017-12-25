@@ -5,6 +5,7 @@
     <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
     <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=Ec4VbDTTjjuEGtVGzSvPwwQtvnvWFeGY"></script>
     <script type="text/javascript" src="${CTPATH}/js/convertor.js"></script>
+    <script type="text/javascript" src="${CTPATH}/js/exif.js"></script>
 </#macro>
 <#macro css>
     #visit-add {
@@ -24,6 +25,9 @@
     var $picNum = $('.weui-uploader__info');
     var $uploaderFiles = $("#uploaderFiles");
     var $gallery = $("#gallery"), $galleryImg = $("#galleryImg");
+
+    var Orientation = null;
+    var MAX_HEIGHT = 1000;
 
     initCustomer();
 
@@ -90,52 +94,131 @@
                     return false;
                 }
 
-                var reader = new FileReader();
+                EXIF.getData(file, function() {
+                    EXIF.getAllTags(this);
+                    Orientation = EXIF.getTag(this, 'Orientation');
+                });
 
+                var reader = new FileReader();
                 (function(x) {
                     reader.onload = function(e) {
-                        var str = '<li class="weui-uploader__file " style="background-image:url('+this.result+')"></li>';
-                        $uploaderFiles.append(str);
-                        render(this.result, x);
-                    }
-                })(file.name)
+                        var image = new Image();
+                        image.src = e.target.result;
+                        image.onload = function() {
+                            var expectWidth = this.naturalWidth;
+                            var expectHeight = this.naturalHeight;
 
+                            if (this.naturalWidth > this.naturalHeight && this.naturalWidth > 800) {
+                                expectWidth = 800;
+                                expectHeight = expectWidth * this.naturalHeight / this.naturalWidth;
+                            } else if (this.naturalHeight > this.naturalWidth && this.naturalHeight > 1200) {
+                                expectHeight = 1200;
+                                expectWidth = expectHeight * this.naturalWidth / this.naturalHeight;
+                            }
+
+                            var canvas = document.createElement("canvas");
+                            var ctx = canvas.getContext("2d");
+                            canvas.width = expectWidth;
+                            canvas.height = expectHeight;
+                            ctx.drawImage(this, 0, 0, canvas.width, canvas.height);
+
+                            if (navigator.userAgent.match(/iphone/i)) {
+                                if(Orientation != "" && Orientation != 1){
+                                    switch(Orientation){
+                                        case 6://需要顺时针（向左）90度旋转
+                                            rotateImg(this,'left',canvas);
+                                            break;
+                                        case 8://需要逆时针（向右）90度旋转
+                                            rotateImg(this,'right',canvas);
+                                            break;
+                                        case 3://需要180度旋转
+                                            rotateImg(this,'right',canvas);//转两次
+                                            rotateImg(this,'right',canvas);
+                                            break;
+                                    }
+                                }
+                                blob = canvas.toDataURL('image/jpeg', 0.8);
+                            }else if(navigator.userAgent.match(/Android/i)){
+                                var encoder = new JPEGEncoder();
+                                blob = encoder.encode(ctx.drawImage(0, 0, expectWidth, expectHeight), 80);
+                            } else {
+                                if(Orientation != "" && Orientation != 1){
+                                    switch(Orientation){
+                                    case 6://需要顺时针（向左）90度旋转
+                                        rotateImg(this,'left',canvas);
+                                        break;
+                                    case 8://需要逆时针（向右）90度旋转
+                                        rotateImg(this,'right',canvas);
+                                        break;
+                                    case 3://需要180度旋转
+                                        rotateImg(this,'right',canvas);//转两次
+                                        rotateImg(this,'right',canvas);
+                                        break;
+                                    }
+                                }
+                                blob = canvas.toDataURL("image/jpeg", 0.8);
+                            }
+                            imageArr.push({"pic":blob, "pic_name":x});
+                            $("#pic").val(JSON.stringify(imageArr));
+                            var str = '<li class="weui-uploader__file " style="background-image:url('+blob+')"></li>';
+                            $uploaderFiles.append(str);
+                        };
+                    };
+                })(file.name)
                 reader.readAsDataURL(file);
             }
-
         });
 
-        var MAX_HEIGHT = 1000;
+    function rotateImg(img, direction,canvas) {
+        //最小与最大旋转方向，图片旋转4次后回到原方向
+        var min_step = 0;
+        var max_step = 3;
+        if (img == null) return;
 
-        function render(src, picname) {
+        //img的高度和宽度不能在img元素隐藏后获取，否则会出错
+        var height = img.height;
+        var width = img.width;
 
-            var image = new Image();
-            image.onload = function() {
-
-                var canvas = document.createElement("canvas");
-                if (image.height > MAX_HEIGHT && image.height >= image.width) {
-                    image.width *= MAX_HEIGHT / image.height;
-                    image.height = MAX_HEIGHT;
-                }
-
-                if (image.width > MAX_HEIGHT && image.width > image.height) {
-                    // 宽度等比例缩放 *=
-                    image.height *= MAX_HEIGHT / image.width;
-                    image.width = MAX_HEIGHT;
-                }
-
-                var ctx = canvas.getContext("2d");
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-                canvas.width = image.width;
-                canvas.height = image.height;
-
-                ctx.drawImage(image, 0, 0, image.width, image.height);
-                var blob = canvas.toDataURL('image/jpeg', 0.8);
-                imageArr.push({"pic":blob, "pic_name":picname});
-                $("#pic").val(JSON.stringify(imageArr));
-            };
-            image.src = src;
+        var step = 2;
+        if (step == null) {
+            step = min_step;
+        }
+        if (direction == 'right') {
+            step++;
+            //旋转到原位置，即超过最大值
+            step > max_step && (step = min_step);
+        } else {
+            step--;
+            step < min_step && (step = max_step);
+        }
+        //旋转角度以弧度值为参数
+        var degree = step * 90 * Math.PI / 180;
+        var ctx = canvas.getContext('2d');
+        switch (step) {
+            case 0:
+                canvas.width = width;
+                canvas.height = height;
+                ctx.drawImage(img, 0, 0);
+                break;
+            case 1:
+                canvas.width = height;
+                canvas.height = width;
+                ctx.rotate(degree);
+                ctx.drawImage(img, 0, -height);
+                break;
+            case 2:
+                canvas.width = width;
+                canvas.height = height;
+                ctx.rotate(degree);
+                ctx.drawImage(img, -width, -height);
+                break;
+            case 3:
+                canvas.width = height;
+                canvas.height = width;
+                ctx.rotate(degree);
+                ctx.drawImage(img, -width, 0);
+                break;
+            }
         }
 
         var index; //第几张图片

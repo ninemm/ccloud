@@ -318,7 +318,7 @@ public class CustomerController extends BaseFrontController {
 
 		if(StrKit.notBlank(oldPic)) {
 			JSONArray picList = JSON.parseArray(oldPic);
-			int len = OptionQuery.me().findValue("cdn_domain").length();
+			int len = OptionQuery.me().findValue("cdn_domain").length()+1;
 			for(int i = 0; i < picList.size(); i++) {
 				String pic = picList.getString(i).substring(len, picList.getString(i).length());
 				ImageJson image = new ImageJson();

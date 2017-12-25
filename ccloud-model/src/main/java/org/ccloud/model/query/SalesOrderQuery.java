@@ -1637,4 +1637,17 @@ public class SalesOrderQuery extends JBaseQuery {
 
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}
+	
+	public Record findMoreBySn(final String re_sn) {
+		StringBuilder fromBuilder = new StringBuilder(" select o.*,c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as typeCode,ct.proc_def_key, u.realname, u.mobile, cp.factor ,cc.id as sellerCustomerId,cc.customer_kind ");
+		fromBuilder.append(" from `cc_sales_order` o ");
+		fromBuilder.append(" left join cc_seller_customer cc ON o.customer_id = cc.id ");
+		fromBuilder.append(" left join cc_customer c on cc.customer_id = c.id ");
+		fromBuilder.append(" left join cc_customer_type ct on o.customer_type_id = ct.id ");
+		fromBuilder.append(" left join cc_price_system cp on cp.id = ct.price_system_id ");
+		fromBuilder.append(" left join user u on o.biz_user_id = u.id ");
+		fromBuilder.append(" where o.order_sn = ? ");
+
+		return Db.findFirst(fromBuilder.toString(), re_sn);
+	}
 }
