@@ -63,6 +63,20 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 	public static final String BILLTYPE = "TB";
 	public final static String startNo = "000001";
 	 //目前系统还没有企业编号，先创建一个100000占位	
+	
+	public void index() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		//判断当前用户有几个可用仓库
+		List<Warehouse> wlist = WarehouseQuery.me().findWarehouseByUserId(user.getId());
+		if (wlist.size()<=1) {
+			setAttr("wlistSize", 0);
+		}else {
+			setAttr("wlistSize", 1);
+		}
+		render("index.html");
+	}
+	
+	
 	public void list() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String departmentId = user.getDepartmentId();
@@ -75,7 +89,6 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 		Page<TransferBill> page = TransferBillQuery.me().paginate(getPageNumber(), getPageSize(), keyword, "c.create_date desc",departmentId);
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
-
 	}
 	
 	
