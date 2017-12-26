@@ -25,11 +25,9 @@ import java.util.Map;
 import org.ccloud.Consts;
 import org.ccloud.model.Inventory;
 import org.ccloud.model.InventoryDetail;
-import org.ccloud.model.PayablesDetail;
 import org.ccloud.model.ReceivablesDetail;
 import org.ccloud.model.SalesOrderDetail;
 import org.ccloud.model.SalesOutstockDetail;
-import org.ccloud.model.SellerCustomer;
 import org.ccloud.model.SellerProduct;
 import org.ccloud.model.vo.orderProductInfo;
 import org.ccloud.utils.StringUtils;
@@ -113,23 +111,8 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		receivablesDetail.setDataArea(orderDetail.getStr("data_area"));
 		receivablesDetail.setCreateDate(date);
 		
-		String SellerCustomerId = order.getStr("sellerCustomerId");
-		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(SellerCustomerId);
-		PayablesDetail payablesDetail = new PayablesDetail();
-		payablesDetail.setId(StrKit.getRandomUUID());
-		payablesDetail.setObjectId(order.getStr("customer_id"));
-		payablesDetail.setObjectType(Consts.RECEIVABLES_OBJECT_TYPE_CUSTOMER);
-		payablesDetail.setPayAmount(detail.getProductAmount());
-		payablesDetail.setActAmount(new BigDecimal(0));
-		payablesDetail.setBalanceAmount(detail.getProductAmount());
-		payablesDetail.setRefSn(order.getStr("order_sn"));
-		payablesDetail.setBizDate(date);
-		payablesDetail.setRefType(Consts.BIZ_TYPE_INSTOCK);
-		payablesDetail.setDeptId(sellerCustomer.getDeptId());
-		payablesDetail.setDataArea(sellerCustomer.getDataArea());
-		payablesDetail.setCreateDate(date);
 		
-		return detail.save() && receivablesDetail.save() && payablesDetail.save();
+		return detail.save() && receivablesDetail.save();
 		
 		
 	}

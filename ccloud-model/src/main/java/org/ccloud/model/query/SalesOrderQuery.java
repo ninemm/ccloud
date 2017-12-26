@@ -1670,4 +1670,9 @@ public class SalesOrderQuery extends JBaseQuery {
 
 		return Db.findFirst(fromBuilder.toString(), re_sn);
 	}
+	
+	public SalesOrder findByOrderSn(String orderSn){
+		String sql = "select * from cc_sales_order where order_sn = ?";
+		return DAO.findFirst(sql, orderSn);
+	}
 }
