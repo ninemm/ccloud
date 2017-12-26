@@ -6,8 +6,6 @@ import java.util.Map;
 
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import com.jfinal.kit.StrKit;
-import com.jfinal.plugin.activerecord.Record;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.CustomerVisit;
@@ -19,8 +17,9 @@ import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SellerCustomerQuery;
 import org.ccloud.route.RouterMapping;
 
+import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
-import org.ccloud.workflow.service.WorkFlowService;
+import com.jfinal.plugin.activerecord.Record;
 
 @RouterMapping(url = "/todo")
 public class TodoController extends BaseFrontController {
@@ -32,7 +31,7 @@ public class TodoController extends BaseFrontController {
 		List<SellerCustomer> list = SellerCustomerQuery.me().getToDo(username);
 		if(list.size() !=0 )setAttr("todoList", list);
 
-		Page <Record> historyList = WorkFlowService.me().getHisProcessList(getPageNumber(), getPageSize(), "_customer_audit", username);
+		Page <Record> historyList = SellerCustomerQuery.me().getHisProcessList(getPageNumber(), getPageSize(), "_customer_audit", username);
 		if(historyList.getList().size() != 0) setAttr("historyList", historyList);
 
 		render("todo_customer.html");
@@ -57,6 +56,10 @@ public class TodoController extends BaseFrontController {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String username = user.getUsername();
 		Page<CustomerVisit> page = CustomerVisitQuery.me().getToDo(getPageNumber(), getPageSize(), username);
+		
+		Page <Record> historyList = CustomerVisitQuery.me().getHisProcessList(getPageNumber(), getPageSize(), "_customer_visit", username);
+		if(historyList.getList().size() != 0) setAttr("historyList", historyList);
+
 		setAttr("page", page);
 		render("todo_customer_visit.html");
 	}
@@ -65,7 +68,7 @@ public class TodoController extends BaseFrontController {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String username = user.getUsername();
 
-		Page <Record> historyList = WorkFlowService.me().getHisProcessList(getParaToInt("pageNumber"), getParaToInt("pageSize"), "_customer_audit", username);
+		Page <Record> historyList = SellerCustomerQuery.me().getHisProcessList(getParaToInt("pageNumber"), getParaToInt("pageSize"), "_customer_audit", username);
 		StringBuilder html = new StringBuilder();
 
 		for(Record customer : historyList.getList()) {

@@ -387,6 +387,26 @@ public class SalesOrderQuery extends JBaseQuery {
 		sb.append(" order by o.create_date ");
 		return DAO.find(sb.toString(), username);
 	}
+	
+	public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procKey, String username) {
+		
+		String select = "SELECT o.*, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName ";
+		LinkedList<Object> params = new LinkedList<>();
+		params.add(procKey);
+		params.add(username);
+
+		StringBuilder sql = new StringBuilder(" FROM cc_sales_order o ");
+		sql.append(" left join cc_seller_customer cc ON o.customer_id = cc.id ");
+		sql.append(" left join cc_customer c on cc.customer_id = c.id ");
+		sql.append(" left join cc_customer_type ct on o.customer_type_id = ct.id ");
+
+		sql.append(" JOIN act_hi_actinst i on o.proc_inst_id = i.PROC_INST_ID_ ");
+		sql.append(" JOIN act_re_procdef p on p.ID_ = i.PROC_DEF_ID_ ");
+		sql.append(" WHERE p.KEY_ = ? and locate(?, ASSIGNEE_) > 0 AND i.DURATION_ is not null ");
+		sql.append(" order by i.START_TIME_ desc ");
+
+		return Db.paginate(pageNumber, pageSize, true, select, sql.toString(), params.toArray());
+	}
 
 
 	//我的客户类型
