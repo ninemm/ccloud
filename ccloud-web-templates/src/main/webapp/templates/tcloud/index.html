@@ -121,7 +121,8 @@ $(function () {
 			<div class="weui-grids">
 				<@shiro.hasPermission name="/admin/salesOrder/check">
 			    <a href="${CPATH}/todo/order" class="weui-grid js_grid">
-			        <span class="weui-badge empty-badge">&nbsp;</span>
+			    	<#if orderTotal !=0>
+			        <span class="weui-badge full-badge">${(orderTotal)!}</span></#if>
                     <div class="weui-grid__icon">
                         <i class="icon-calendar-check-o" style="color: #9c89b9"></i>
                     </div>
@@ -131,7 +132,8 @@ $(function () {
                 
                 <@shiro.hasPermission name="/admin/customer/audit">
 				<a href="${CPATH}/todo/customer" class="weui-grid js_grid">
-                    <span class="weui-badge empty-badge">&nbsp;</span>
+					<#if customerTotal !=0>
+                    <span class="weui-badge full-badge">${(customerTotal)!}</span></#if>
 					<div class="weui-grid__icon">
 						<i class="icon-user" style="color: #19c594"></i>
 					</div>
@@ -148,6 +150,8 @@ $(function () {
 				
 				<@shiro.hasPermission name="/admin/customerVisit/audit">
                 <a href="${CPATH}/todo/visit" class="weui-grid js_grid">
+                	<#if customerVisitTotal !=0>
+                	<span class="weui-badge full-badge">${(customerVisitTotal)!}</span></#if>
 					<div class="weui-grid__icon">
 						<i class="icon-suitcase" style="color: #f7b55d;"></i>
 					</div>

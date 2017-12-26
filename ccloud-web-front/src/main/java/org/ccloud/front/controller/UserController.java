@@ -16,6 +16,7 @@ import org.ccloud.message.MessageKit;
 import org.ccloud.model.Department;
 import org.ccloud.model.SmsCode;
 import org.ccloud.model.User;
+import org.ccloud.model.query.CustomerVisitQuery;
 import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SellerCustomerQuery;
@@ -138,6 +139,7 @@ public class UserController extends BaseFrontController {
 				setSessionAttr(Consts.SESSION_SELLER_ID, dept.get("seller_id"));
 				setSessionAttr(Consts.SESSION_SELLER_NAME, dept.get("seller_name"));
 				setSessionAttr(Consts.SESSION_SELLER_CODE, dept.get("seller_code"));
+				setSessionAttr("cont", dept.get("seller_code"));
 			}
 			// 获取用户权限
 			initUserRole(user.getUsername(), user.getPassword(), true);
@@ -167,12 +169,16 @@ public class UserController extends BaseFrontController {
 	public void center() {
 		keepPara();
 		String action = getPara(0, "index");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		
 		Long totalOrderCount = SalesOrderQuery.me().findTotalOrdersCountByDataArea(dataArea);
 		Long totalCustomerCount = SellerCustomerQuery.me().findTotalCountByDataArea(dataArea);
 		setAttr("totalOrderCount", totalOrderCount.intValue());
 		setAttr("totalCustomerCount", totalCustomerCount.intValue());
+		setAttr("orderTotal", SalesOrderQuery.me().getToDo(user.getUsername()).size());
+		setAttr("customerVisitTotal",CustomerVisitQuery.me().getToDo(user.getUsername()).size());
+		setAttr("customerTotal",SellerCustomerQuery.me().getToDo(user.getUsername()).size());
 		
 		render(String.format("user_center_%s.html", action));
 	}
