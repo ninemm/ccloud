@@ -1,14 +1,87 @@
 <#include "_inc/_layout.html"/>
-<#macro title>我的待办(客户拜访)</#macro>
+<#macro title>我的待办(拜访审核)</#macro>
 <#macro css>
 	main{
 		top: 0!important;
+	}
+
+	#customer-audit {
+		background: #f3f5f7;
+		height: inherit;
+	}
+
+	.weui-navbar__item.weui-bar__item--on {
+		color: #ea6f5a;
+		font-weight: bold;
+		background-color: #fff;
+	}
+
+	.weui-navbar__item.weui-bar__item--on:before {
+		content: "";
+		width: 80px;
+		height: 3px;
+		background: #ea6f5a;
+		position: absolute;
+		left: 50%;
+		margin-left: -40px;
+		bottom: -1px;
+		z-index: 10;
+	}
+
+	.weui-navbar:after {
+		border-bottom: 0;
+	}
+
+	.weui-navbar__item:after {
+		border-right: 0;
 	}
 </#macro>
 <#macro script_import>
 	<script src="${CPATH}/static/layer_mobile/layer.js"></script>
 </#macro>
 <#macro script>
+
+	var pageNumber = 2;
+	var pageSize = 10;
+	var loading = false;
+
+	var $endNode = null;
+	var $loadmore = $(".weui-loadmore");
+
+	var paramData = function() {
+		return  {
+			"pageNumber": pageNumber,
+			"pageSize": pageSize,
+		};
+	}
+
+	$(".infinite").infinite().on("infinite", function() {
+		var self = this;
+		$endNode = $(".weui-panel_access:last");
+		$loadmore = $(self).find(".weui-loadmore");
+		if ($loadmore) $loadmore.show();
+		if (loading) return ;
+		loading = true;
+
+		$.ajax({
+			type: "post",
+			url: "${CPATH}/todo/visitHistoryAuditRefresh",
+			data: paramData(),
+			dataType: "json",
+			success:function(data) {
+				if ($loadmore) $loadmore.show();
+				if (data.totalPage >= pageNumber) {
+					$endNode.after(data.html);
+				}
+				if (data.totalPage == pageNumber) {
+					$(".infinite").destroyInfinite();
+					$loadmore.hide();
+				}
+				pageNumber++;
+				loading = false;
+			}
+		});
+	});
 
 	function doReject(url){
 
@@ -68,47 +141,90 @@
 <@layout>
 
 <div class="weui-content">
-<div id="customer-audit">
-    <main>
-        <#if page ??> <#list page.list as bean>
-		<div class="weui-panel weui-panel_access">
-			<div class="weui-cell weui-cell_access">
-			    <a href="${CPATH}/customerVisit/review?id=${bean.id}&taskId=${bean.taskId!}&assignee=${bean.assignee}"> 
-				<div class="weui-cell__bd">
-					<p class="ft16">${(bean.customer_name)!}</p>
-					<div class="ft14 gray">
-						<p>联系人：${(bean.contact)!} / ${(bean.mobile)!}</p>
-						<p>客户类型：终端</p>
-						<p>配送地址：${(bean.prov_name)!} ${(bean.city_name)!} ${(bean.country_name)!} ${(bean.address)!}</p>
-						<p><i class="icon-map-pin ft16 green"></i> ${(bean.location)!}</p>
+	<div class="weui-tab">
+		<div class="weui-navbar">
+			<a class="weui-navbar__item weui-bar__item--on" href="#tab1" type="todo">待审</a>
+			<a class="weui-navbar__item" href="#tab2" type="done">已审 </a>
+		</div>
+		<div class="weui-tab__bd">
+			<div id="tab1" class="infinite weui-tab__bd-item weui-tab__bd-item--active">
+				<main>
+					<#if page ??> <#list page.list as bean>
+					<div class="weui-panel weui-panel_access">
+						<div class="weui-cell weui-cell_access">
+							<a href="${CPATH}/customerVisit/review?id=${bean.id}&taskId=${bean.taskId!}&assignee=${bean.assignee}">
+							<div class="weui-cell__bd">
+								<p class="ft16">${(bean.customer_name)!}</p>
+								<div class="ft14 gray">
+									<p>联系人：${(bean.contact)!} / ${(bean.mobile)!}</p>
+									<p>客户类型：终端</p>
+									<p>配送地址：${(bean.prov_name)!} ${(bean.city_name)!} ${(bean.country_name)!} ${(bean.address)!}</p>
+									<p><i class="icon-map-pin ft16 green"></i> ${(bean.location)!}</p>
+								</div>
+							</div>
+							</a>
+						</div>
+						<div class="weui-cell weui-cell_access">
+							<a class="weui-cell__bd weui-cell_link" href="${CPATH}/customerVisit/review?id=${bean.id}&taskId=${bean.taskId!}&assignee=${bean.assignee}">客户拜访详情</a>
+							<span class="weui-cell__ft">${(bean.createTime?string('yyyy-MM-dd HH:mm'))!}</span>
+						</div>
+						<div class="weui-cell">
+							<div class="operate-btn width-100 ft14">
+								<div class="button white-button fl" onclick="doReject('${CPATH}/customerVisit/complete?id=${(bean.id)!}&taskId=${(bean.taskId)}&status=0')">拒绝</div>
+								<div class="button red-button fr" onclick="doSubmit('${CPATH}/customerVisit/complete?id=${(bean.id)!}&taskId=${(bean.taskId)}&status=1')">同意</div>
+							</div>
+						</div>
 					</div>
-				</div>
-				</a>
+					</#list> </#if>
+					<#if (page.totalRow = 0)>
+					<div class="weui-loadmore weui-loadmore_line">
+						<span class="weui-loadmore__tips">暂无数据</span>
+					</div>
+					<#elseif (page.totalRow > page.pageSize)>
+					<div class="weui-loadmore">
+						<i class="weui-loading"></i>
+						<span class="weui-loadmore__tips">正在加载</span>
+					</div>
+					</#if>
+				</main>
 			</div>
-			<div class="weui-cell weui-cell_access">
-				<a class="weui-cell__bd weui-cell_link" href="${CPATH}/customerVisit/review?id=${bean.id}&taskId=${bean.taskId!}&assignee=${bean.assignee}">客户拜访详情</a>
-				<span class="weui-cell__ft">${(bean.createTime?string('yyyy-MM-dd HH:mm'))!}</span>
-			</div>
-			<div class="weui-cell">
-				<div class="operate-btn width-100 ft14">
-					<div class="button white-button fl" onclick="doReject('${CPATH}/customerVisit/complete?id=${(bean.id)!}&taskId=${(bean.taskId)}&status=0')">拒绝</div>
-					<div class="button red-button fr" onclick="doSubmit('${CPATH}/customerVisit/complete?id=${(bean.id)!}&taskId=${(bean.taskId)}&status=1')">同意</div>
-				</div>
+			<div id="tab2" class="infinite weui-tab__bd-item weui-tab__bd-item">
+				<main>
+					<#if historyList ??>
+						<#list historyList.list as bean>
+							<div class="weui-panel weui-panel_access">
+								<div class="weui-cell weui-cell_access">
+									<div class="weui-cell__bd">
+										<p class="ft16">${(bean.customer_name)!}</p>
+										<div class="ft14 gray">
+											<p>联系人：${(bean.contact)!} / ${(bean.mobile)!}</p>
+											<p>客户类型：终端</p>
+											<p>配送地址：${(bean.prov_name)!} ${(bean.city_name)!} ${(bean.country_name)!} ${(bean.address)!}</p>
+											<p><i class="icon-map-pin ft16 green"></i> ${(bean.location)!}</p>
+										</div>
+									</div>
+								</div>
+								<div class="weui-cell weui-cell_access">
+								</div>
+							</div>
+						</#list>
+					</#if>
+					<#if historyList??>
+						<#if historyList.totalRow = 0>
+							<div class="weui-loadmore weui-loadmore_line">
+								<span class="weui-loadmore__tips">暂无数据</span>
+							</div>
+							<#elseif historyList.totalRow &gt; 10>
+								<div class="weui-loadmore">
+									<i class="weui-loading"></i>
+									<span class="weui-loadmore__tips">正在加载</span>
+								</div>
+						</#if>
+					</#if>
+				</main>
 			</div>
 		</div>
-		</#list> </#if>
-		<#if (page.totalRow = 0)>
-        <div class="weui-loadmore weui-loadmore_line">
-            <span class="weui-loadmore__tips">暂无数据</span>
-        </div>
-        <#elseif (page.totalRow > page.pageSize)>
-        <div class="weui-loadmore">
-            <i class="weui-loading"></i>
-            <span class="weui-loadmore__tips">正在加载</span>
-        </div>
-        </#if> 
-	</main>
-    <#include "_inc/_goback.html" />
-</div>
+	</div>
+	<#include "_inc/_goback.html" />
 </div>
 </@layout>

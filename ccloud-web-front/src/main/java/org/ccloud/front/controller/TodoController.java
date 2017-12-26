@@ -46,6 +46,11 @@ public class TodoController extends BaseFrontController {
 		List<SalesOrder> list = SalesOrderQuery.me().getToDo(username);
 		if(list.size() !=0 )setAttr("todoList", list);
 		
+		//Page<CustomerVisit> page = SalesOrderQuery.me().getToDo(getPageNumber(), getPageSize(), username);
+		//Page <Record> historyList = SalesOrderQuery.me().getHisProcessList(getPageNumber(), getPageSize(), "_customer_visit_review", username);
+		//if(historyList.getList().size() != 0) setAttr("historyList", historyList);
+		
+		
 		setAttr("username", username);
 		render("todo_order.html");
 	}
@@ -57,7 +62,7 @@ public class TodoController extends BaseFrontController {
 		String username = user.getUsername();
 		Page<CustomerVisit> page = CustomerVisitQuery.me().getToDo(getPageNumber(), getPageSize(), username);
 		
-		Page <Record> historyList = CustomerVisitQuery.me().getHisProcessList(getPageNumber(), getPageSize(), "_customer_visit", username);
+		Page <Record> historyList = CustomerVisitQuery.me().getHisProcessList(getPageNumber(), getPageSize(), "_customer_visit_review", username);
 		if(historyList.getList().size() != 0) setAttr("historyList", historyList);
 
 		setAttr("page", page);
@@ -104,6 +109,46 @@ public class TodoController extends BaseFrontController {
 
 		renderJson(map);
 
+	}
+	
+	public void visitHistoryAuditRefresh() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String username = user.getUsername();
+		Page <Record> historyList = SellerCustomerQuery.me().getHisProcessList(getParaToInt("pageNumber"), getParaToInt("pageSize"), "_customer_visit_review", username);
+		StringBuilder html = new StringBuilder();
+		
+		for(Record visit : historyList.getList()) {
+			html.append(
+					"                    <div class=\"weui-panel weui-panel_access\">\n" +
+					"                        <div class=\"weui-cell weui-cell_access\">\n" +
+					"                            <div class=\"weui-cell__bd\">\n" +
+					"                                <p class=\"ft16\">" + visit.getStr("customer_name") + "</p>\n" +
+					"                                <div class=\"ft14 gray\">\n" +
+					"                                    <p>联系人：" + visit.getStr("contact") + "/" + visit.getStr("mobile") + "</p>\n" +
+					"                                    <p>客户类型：终端</p>\n" +
+					"                                    <p>配送地址：" + visit.getStr("prov_name") + " " + visit.getStr("city_name") + " "
+														+ visit.getStr("country_name") + " " + visit.getStr("address")+ "</p>\n" +
+					"                                    <p>\n" +
+					"                                        <i class=\"icon-map-pin ft16 green\"></i>&nbsp;&nbsp; ");
+
+			if (StrKit.notBlank(visit.getStr("location"))) html.append(visit.getStr("location"));
+
+			html.append( "\n" +
+					"                                    </p>\n" +
+					"                                </div>\n" +
+					"                            </div>\n" +
+					"                        </div>\n" +
+					"                        <div class=\"weui-cell weui-cell_access\">\n" +
+					"                        </div>\n" +
+					"                    </div>\n");
+		}
+
+		Map<String, Object> map = new HashMap<>();
+		map.put("html", html.toString());
+		map.put("totalRow", historyList.getTotalRow());
+		map.put("totalPage", historyList.getTotalPage());
+
+		renderJson(map);
 	}
 
 }
