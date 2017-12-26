@@ -68,7 +68,11 @@ public class UserController extends BaseFrontController {
 					setAttr("openid", user.getWechatOpenId());
 				}
 			}
-			
+			/*User user1 = getSessionAttr(Consts.SESSION_LOGINED_USER);
+			if(user1!=null){
+				List<User> userList = UserQuery.me().findByMobile(user1.getMobile());
+				setSessionAttr("sellerListSize", userList.size());
+			}*/
 			render(String.format("user_%s.html", action));
 		}
 	}
