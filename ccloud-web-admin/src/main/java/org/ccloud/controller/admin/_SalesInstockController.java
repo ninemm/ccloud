@@ -27,6 +27,7 @@ import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.SalesOrder;
+import org.ccloud.model.SalesRefundInstock;
 import org.ccloud.model.User;
 import org.ccloud.model.query.SalesRefundInstockDetailQuery;
 import org.ccloud.model.query.SalesRefundInstockQuery;
@@ -165,5 +166,17 @@ public class _SalesInstockController extends JBaseCRUDController<SalesOrder> {
         });
         return isSave;
 	}	
+	
+	public void detailBySn(){
+		String refundSn = getPara(0);
+		SalesRefundInstock salesRefundInstock = SalesRefundInstockQuery.me().findBySn(refundSn);
+		Record refund = SalesRefundInstockQuery.me().findMoreById(salesRefundInstock.getId());
+		List<Record> refundDetail = SalesRefundInstockDetailQuery.me().findByRefundId(salesRefundInstock.getId());
+
+		setAttr("refund", refund);
+		setAttr("refundDetail", refundDetail);
+
+		render("detail.html");
+	}
 
 }
