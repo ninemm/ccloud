@@ -6,6 +6,21 @@
     function orderAgain() {
         window.location.href = "${CPATH}/order/getOldOrder?orderId=${order.id}";
     }
+    
+    function cancel() {
+    	Utils.openLoadingWin('撤销中...');
+		$.get('${CPATH}/order/cancel?orderId=' + '${(order.id)!}',
+			function(result) {
+				if (result.errorCode > 0) {
+				    $.toptip(result.message, 'error');
+				} else {
+					location.reload();
+					$.toptip(result.message, 'success');
+				}
+				Utils.closeLoadingWin();
+			}
+		);
+    }
 </#macro>
 
 <@layout>
@@ -99,7 +114,9 @@
 		<#include "_inc/_goback.html" />
 		<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex border-top-1px">
 			<#if order.status == 0>
-			<button class="white-button-no-border weui-flex__item">撤销</button>
+			<button onclick="cancel()" class="white-button-no-border weui-flex__item">撤销</button>
+			<#else>
+			<button onclick="historyUtils.back();" class="white-button-no-border weui-flex__item">返回</button>
 			</#if>
 			<button onclick="orderAgain()" class="red-button weui-flex__item">再次购买</button>
 		</footer>
