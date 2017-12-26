@@ -202,4 +202,19 @@ public class PurchaseInstockQuery extends JBaseQuery {
 		purchaseInstock.set("create_date", date);
 		return purchaseInstock.save();
 	}
+	
+	public PurchaseInstock findBySn(String orderSn){
+		String sql = "select * from cc_purchase_instock where pwarehouse_sn = ?";
+		return DAO.findFirst(sql, orderSn);
+	}
+	
+	public PurchaseInstock findByPurchaseOrderSn(String orderSn){
+		String sql = "SELECT cpi.* from cc_purchase_instock cpi "
+				+ "LEFT JOIN cc_purchase_instock_detail cpid on cpi.id = cpid.purchase_instock_id "
+				+ "LEFT JOIN cc_purchase_order_detail cpod on cpod.id = cpid.purchase_order_detail_id "
+				+ "LEFT JOIN cc_purchase_order cpo on cpo.id = cpod.purchase_order_id "
+				+ "where cpo.porder_sn = ? "
+				+ "GROUP BY cpi.id";
+		return DAO.findFirst(sql, orderSn);
+	}
 }

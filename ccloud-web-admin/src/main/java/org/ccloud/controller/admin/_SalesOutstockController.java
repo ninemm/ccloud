@@ -15,6 +15,7 @@
  */
 package org.ccloud.controller.admin;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -30,17 +31,21 @@ import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.OutstockPrint;
+import org.ccloud.model.Payables;
 import org.ccloud.model.PrintTemplate;
 import org.ccloud.model.SalesOrder;
 import org.ccloud.model.SalesOutstock;
+import org.ccloud.model.SellerCustomer;
 import org.ccloud.model.User;
 import org.ccloud.model.Warehouse;
+import org.ccloud.model.query.PayablesQuery;
 import org.ccloud.model.query.PrintTemplateQuery;
 import org.ccloud.model.query.PurchaseInstockDetailQuery;
 import org.ccloud.model.query.PurchaseInstockQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SalesOutstockDetailQuery;
 import org.ccloud.model.query.SalesOutstockQuery;
+import org.ccloud.model.query.SellerCustomerQuery;
 import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.WarehouseQuery;
 import org.ccloud.model.vo.carSalesPrintNeedInfo;
@@ -297,25 +302,28 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
         		
         		String customerId =  StringUtils.getArrayFirst(paraMap.get("customerId"));
         		String customerKind =  StringUtils.getArrayFirst(paraMap.get("customerKind"));
+        		String sellerId = getSessionAttr("sellerId");
         		if(Consts.CUSTOMER_KIND_SELLER.equals(customerKind)) {
         			Record seller = SellerQuery.me().findByCustomerId(customerId);
         			String purchaseInstockId =StrKit.getRandomUUID();
-        			
+        			SellerCustomer sellerCustomer = SellerCustomerQuery.me().findBySellerId(sellerId,customerId);
         			//PS + 100000(机构编号或企业编号6位) + 20171108(时间) + 000001(流水号)
-        			String pwarehouseSn = "PS" + seller.getStr("seller_code") + DateUtils.format("yyMMdd", date) + PurchaseInstockQuery.me().getNewSn();
+        			String pwarehouseSn = "PS" + seller.getStr("seller_code") + DateUtils.format("yyyyMMdd", date) + PurchaseInstockQuery.me().getNewSn();
         
         			Warehouse warehouse = WarehouseQuery.me().findBySellerId(seller.getStr("id"));
         			if(!PurchaseInstockQuery.me().insertBySalesOutStock(paraMap, seller, purchaseInstockId, pwarehouseSn, warehouse.getId(), user.getId(), date,sellerId)) {
         				return false;
         			}
-        			
+        			//直营商的应付账款
+        			String countTotal = StringUtils.getArrayFirst(paraMap.get("total"));
+    				createPayables(sellerCustomer,countTotal);
             		count = 0;
             		index = 0;
             		while (productNum > count) {
             			index++;
             			String sellProductId = StringUtils.getArrayFirst(paraMap.get("sellProductId" + index));
             			if (StrKit.notBlank(sellProductId)) {
-            				if (!PurchaseInstockDetailQuery.me().insertBySalesOrder(paraMap, purchaseInstockId, seller, index, date, getRequest())) {
+            				if (!PurchaseInstockDetailQuery.me().insertBySalesOrder(paraMap, purchaseInstockId, seller, index, date, getRequest(),pwarehouseSn,sellerCustomer)) {
             					return false;
             				}
             				count++;
@@ -331,6 +339,28 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
         return isSave;
 	}
 	
+	private void createPayables(SellerCustomer sellerCustomer,String countAll){
+		String payablesType = Consts.RECEIVABLES_OBJECT_TYPE_CUSTOMER; 
+		Payables payables = PayablesQuery.me().findByObjId(sellerCustomer.getId(), payablesType);
+		if(payables == null){
+			payables = new Payables();
+			payables.setId(StrKit.getRandomUUID());
+			payables.setObjId(sellerCustomer.getId());
+			payables.setObjType(payablesType);
+			payables.setPayAmount(new BigDecimal(countAll));
+			payables.setActAmount(new BigDecimal(0));
+			payables.setBalanceAmount(new BigDecimal(countAll));
+			payables.setDeptId(sellerCustomer.getDeptId());
+			payables.setDataArea(sellerCustomer.getDataArea());
+			payables.setCreateDate(new Date());
+			payables.save();
+		}else{
+			payables.setPayAmount(payables.getPayAmount().add(new BigDecimal(countAll)));
+			payables.setBalanceAmount(payables.getBalanceAmount().add(new BigDecimal(countAll)));
+			payables.setModifyDate(new Date());
+			payables.update();
+		}
+	}
 	
 	//把打印记录写到出库打印记录表里
 	public boolean saveOutStockPrint(final List<printAllNeedInfo> printAllNeedInfos) {

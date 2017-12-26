@@ -22,10 +22,8 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import org.ccloud.Consts;
-import org.ccloud.model.Payables;
 import org.ccloud.model.Receivables;
 import org.ccloud.model.SalesOutstock;
-import org.ccloud.model.SellerCustomer;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.model.vo.carSalesPrintNeedInfo;
 import org.ccloud.model.vo.printAllNeedInfo;
@@ -80,10 +78,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 				List<Record> orderDetailList = SalesOrderDetailQuery.me().findByOrderId(orderId);
 				//应收账款
 				createReceivables(order);
-				//直营商的应付账款
-				if(Consts.CUSTOMER_KIND_SELLER.equals(order.getStr("customer_kind"))){
-					createPayables(order);
-				}
+				
 				
 				Date date = new Date();
 
@@ -136,30 +131,6 @@ public class SalesOutstockQuery extends JBaseQuery {
 		receivables.saveOrUpdate();
 	}
 	
-	private void createPayables(Record order){
-		String customeId = order.getStr("customer_id");
-		String SellerCustomerId = order.getStr("sellerCustomerId");
-		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(SellerCustomerId);
-		String payablesType = Consts.RECEIVABLES_OBJECT_TYPE_CUSTOMER; 
-		Payables payables = PayablesQuery.me().findByObjId(customeId, payablesType);
-		if(payables == null){
-			payables = new Payables();
-			payables.setId(StrKit.getRandomUUID());
-			payables.setObjId(customeId);
-			payables.setObjType(payablesType);
-			payables.setPayAmount(order.getBigDecimal("total_amount"));
-			payables.setActAmount(new BigDecimal(0));
-			payables.setBalanceAmount(order.getBigDecimal("total_amount"));
-			payables.setDeptId(sellerCustomer.getDeptId());
-			payables.setDataArea(sellerCustomer.getDataArea());
-			payables.setCreateDate(new Date());
-			payables.save();
-		}else{
-			payables.setPayAmount(payables.getPayAmount().add(order.getBigDecimal("total_amount")));
-			payables.setBalanceAmount(payables.getBalanceAmount().add(order.getBigDecimal("total_amount")));
-			payables.update();
-		}
-	}
 
 	public boolean insert(String outstockId, String outstockSn, String warehouseId, String sellerId, Record order,
 			Date date) {
