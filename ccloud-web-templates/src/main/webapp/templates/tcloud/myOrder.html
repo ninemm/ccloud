@@ -12,8 +12,16 @@
 			startDate = $("#datePicker").val();
 			endDate = startDate + ' 23:59:59';
 			combo();
+		}).on('touchend', '.show-more-btn', function () {
+			var $this = $(this);
+			var $detail = $this.parent().next();
+			$detail.toggle('fast');
+			if ($detail.is(':visible')) {
+			  $this.text('隐藏详情')
+			} else {
+			  $this.text('显示详情')
+			}
 		});
-
         $("#datePicker").calendar();
         $("#datePicker").val($.today());
 
@@ -232,24 +240,55 @@
 						<span id="orderSn"></span>
 						<span class="fr blue" id="status"></span>
 					</div>
-					<a href="" id="salesOrderId">
-						<div id="customerName" class="customer_name"></div>
-						<div class="gray">
-							<p>
-								联系人：<span id="contact"></span>
-								<span class="fr" id="customerType"></span>
-							</p>
-						</div>
-						<div class="gray">
-							<p>
-								金额：￥<span id="amount"></span>
-								<span class="fr" id="date"></span>
-							</p>
-						</div>
-					</a>
-					<hr>
-					<div id="cancel" class="button red-button fl">撤销</div>
-					<div id="orderAgain" class="button white-button fr">再次购买</div>
+					<div class="customer_name gray">
+						<span id="customerName" class=""></span>
+						<span class="fr show-more-btn">显示详情</span>
+					</div>
+					<div class="none">
+						<a href="" id="salesOrderId">
+						<hr>
+							<div>
+								<div>
+								<p>35度中国劲酒_1*24_125ml</p>
+								<div class="weui-flex">
+									<div class="weui-flex__item flex-grow2">
+									<div class="fr width-60">
+										￥720
+										<span class="gray">（710）</span>
+									</div>
+									</div>
+									<div class="weui-flex__item t-r">1件</div>
+								</div>
+								<div class="weui-flex">
+									<div class="weui-flex__item flex-grow2">
+									<div class="fr width-60">
+										￥30
+										<span class="gray">（30）</span>
+									</div>
+									</div>
+									<div class="weui-flex__item t-r">1瓶</div>
+								</div>
+								</div>
+							</div>
+							<hr>							
+							<div class="gray">
+								<p>
+									联系人：<span id="contact"></span>
+									<span class="fr" id="customerType"></span>
+								</p>
+							</div>
+							<div class="gray">
+								<p>
+									金额：￥<span id="amount"></span>
+									<span class="fr" id="date"></span>
+								</p>
+							</div>
+						</a>
+						<hr>
+						<div id="cancel" class="button red-button fl">撤销</div>
+						<div id="orderAgain" class="button white-button fr">再次购买</div>
+						<div id="" class="button yellow-button fr m-r-5 none">审核通过</div>
+					</div>
 				</div>
 			</div>
 			<div class="weui-loadmore" id="loading" style="display: none;">

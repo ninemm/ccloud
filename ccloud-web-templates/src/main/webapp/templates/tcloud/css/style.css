@@ -325,6 +325,10 @@ a {
   padding-left: 0.75rem;
 }
 
+.m-r-5 {
+  margin-right: .25rem;
+}
+
 .m-r-10 {
   margin-right: 0.5rem;
 }
@@ -336,6 +340,8 @@ a {
 .mg10-0{
 	margin: .5rem 0;
 }
+
+
 
 .button {
 	border: 0;
@@ -1630,6 +1636,14 @@ input[name=sex] {
 #my-order main {
   top: 2rem;
   bottom: 0;
+}
+
+.show-more-btn {
+  font-size: .6rem;
+  color: #0463c3;
+  display: inline-block;
+  height: 1.25rem;
+  line-height: 1.25rem;
 }
 
 #combin-filter {
