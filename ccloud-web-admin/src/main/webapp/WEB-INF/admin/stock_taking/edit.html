@@ -20,76 +20,71 @@
 </#macro>
  
 <#macro script>
-
-var $form = $("#form");
-
-$(function() {
-	
-	jQuery.mm.initValidator('#form', validatorFields)
-	
-});
-
-var validatorFields = {
-	'stockTaking.warehouse_id': {
-		validators: {
-            notEmpty: { message: '盘点仓库不能为空' },
-        }
-	},
-	'stockTaking.biz_user_id': {
-		validators: {
-            notEmpty: { message: '盘点人不能为空' },
-        }
-	}
-	
-};
-function doSubmit(){
-	var l = Ladda.create( document.querySelector( '#do_submit' ) );
-	$form.ajaxSubmit({
-		beforeSubmit: function() {
-			var validate = $form.data('bootstrapValidator');
-			validate.validate();
-			if (validate.isValid()) {
-					l.start();
-				}
-			return validate.isValid();
-		},
-		type : "post", 
-		dataType : "json", 
-		success : function(data) { 
-			if (data.errorCode == 0) {
-				//location.reload();
-				toastr.success(data.message, '操作成功');
-			} else {
-				toastr.error(data.message,'操作失败');
-			}
-			setTimeout( function(){
-						l.stop();
-								}, 1 * 1000 );
-		},
-		error : function() {
-			l.stop();
-			alert("信息提交错误");
-		}
+	var $form = $("#form");
+	$(function() {
+		jQuery.mm.initValidator('#form', validatorFields)
 	});
-}
+	
+	var validatorFields = {
+		'stockTaking.warehouse_id': {
+			validators: {
+	            notEmpty: { message: '盘点仓库不能为空' },
+	        }
+		},
+		'stockTaking.biz_user_id': {
+			validators: {
+	            notEmpty: { message: '盘点人不能为空' },
+	        }
+		}
+	};
+	
+	function doSubmit(){
+		var l = Ladda.create( document.querySelector( '#do_submit' ) );
+		$form.ajaxSubmit({
+			beforeSubmit: function() {
+				var validate = $form.data('bootstrapValidator');
+				validate.validate();
+				if (validate.isValid()) {
+						l.start();
+					}
+				return validate.isValid();
+			},
+			type : "post", 
+			dataType : "json", 
+			success : function(data) { 
+				if (data.errorCode == 0) {
+					//location.reload();
+					toastr.success(data.message, '操作成功');
+				} else {
+					toastr.error(data.message,'操作失败');
+				}
+				setTimeout( function(){
+							l.stop();
+									}, 1 * 1000 );
+			},
+			error : function() {
+				l.stop();
+				alert("信息提交错误");
+			}
+		});
+	}
 
-function initProduct(warehouse_id){
+	function initProduct(warehouse_id){
          var productList = new Array();
          var productOptionArr = new Array();
          var productMap = new Map();
          $.ajax({
-				url: "${CPATH}/admin/goods/getProductInfo",
-				data:{"warehouse_id":warehouse_id},
-				dataType: "json",
-				async: false,
-				success: function(data) {
-					productList = data;
-					pList = productList;
-					
-				}
-			});
-
-	if(productList) {
+			url: "${CPATH}/admin/goods/getProductInfo",
+			data:{"warehouse_id":warehouse_id},
+			dataType: "json",
+			async: false,
+			success: function(data) {
+				productList = data;
+				pList = productList;
+				
+			}
+		});
+		if(productList) {
 			$.each(productList, function(idx, item) {
 				var option = {
 					id: item.productList.sellerProductId,
@@ -104,94 +99,120 @@ function initProduct(warehouse_id){
 
 }
 
-
-<!--商品列表 -->
-var pList = new Array();
-var pOptionArr = new Array();
-var pMap = new Map();
-function removeTr(obj) {
-	$(obj).parent().parent().remove();
-}
-
-function deleteTr(obj){
-  $(obj).parent().parent().remove();
-}
-
-
-//切换调入仓库后事件
-$("#warehouse_id").change(function(){
-    var fromWarehouseId = $("#warehouse_id").val();
-    initProduct(fromWarehouseId);
-})
-
-function addNew() {
-   //添加商品验证，是否选择一个调出仓库
-    var fromWarehouseId = $("#warehouse_id").val();
-    if(fromWarehouseId == "" || fromWarehouseId == null || fromWarehouseId == undefined){
-    alert("请先选择一盘点仓库");
-    return;
-    }
-    initProduct(fromWarehouseId);
-	addTr("#dataTable", pList, pOptionArr);
-}
-var index = 1;
-function addTr(tid, productList, optionArr) {
-	var firstProduct = productList[0].productList;
-	var goodsCode = firstProduct.sellerProductId;
-	var goodsName = firstProduct.name;
-	var specification = firstProduct.specificationValue;
-	var big_unit = firstProduct.bigUnit;
-    var balanceCount = firstProduct.balanceCount == null ? "暂未盘点": firstProduct.balanceCount;
+	<!--商品列表 -->
+	var pList = new Array();
+	var pOptionArr = new Array();
+	var pMap = new Map();
+	function removeTr(obj) {
+		$(obj).parent().parent().remove();
+	}
 	
-
-	var $tbody = $(tid + " tbody"),
-	$tr = $tbody.find("tr:eq(0)"),
-	lastTrIdx = $tbody.find("tr:last").index(),
-	newTrIdx = lastTrIdx + 1,
-	trHtml = $tr.html();
-
-	$tbody.append("<tr id='tr" + newTrIdx + "'>" +trHtml+ "</tr>");
-    $tbody.find("tr:last>td>#goodsCode").attr("name","stockTakingList["+ lastTrIdx +"].seller_product_id");
-    $tbody.find("tr:last>td>#stock").attr("name","stockTakingList["+ lastTrIdx +"].product_count"); 
-    $tbody.find("tr:last>td>#remarks").attr("name","stockTakingList["+ lastTrIdx +"].remark");           
-    $tbody.find("tr:last>td>#goodsCode").val(goodsCode);
-    $tbody.find("tr:last>td>#specification").text(specification);
-    $tbody.find("tr:last>td>#big_unit").text(big_unit);
-    $tbody.find("tr:last>td>#balanceCount").text(balanceCount);
-    $tbody.find("tr:last>td>#factIndex").attr("value",lastTrIdx);
-    $tbody.find("tr:last").find(":input").attr("disabled",false);
-    var productCount = 'stockTakingList['+ lastTrIdx +'].product_coun';
-    $tbody.find("tr:last>td>select.pro-slc2").select2({
-       data:optionArr,
-       width: "100%",
-       language: "zh-CN"
-    });
-
-    $tbody.find("tr:last>td>.hide").text($tbody.find("tr:last>td>select").find("option:selected").val());
-    $tbody.find("tr:last>td>select>pro-slc2").focus();
-
-    <!--添加商品的移除-->
-    $tbody.find("tr:last>td>.removeTr").click(function(){
-      $("#tr" + newTrIdx).remove();  
-    });
-
-    <!--切换商品的方法  -->
-    $tbody.find("tr:last>td>select.pro-slc2").change(function(){
-     var result = pMap[$(this).val()].productList;   
-     var cgoodsCode = result.sellerProductId;
-     var cgoodsName = result.name;
-     var cspecification = result.specificationValue;
-     var cbig_unit = result.bigUnit;
-     var balanceCount = result.balanceCount == null ? "暂未盘点":result.balanceCount;
-     var $tr = $(this).parent().parent();
-     
-     $tr.find("td>#goodsCode").val(cgoodsCode);
-     $tr.find("td>#goodsName").html(cgoodsName); 
-     $tr.find("td>#specification").text(cspecification);
-     $tr.find("td>#big_unit").text(cbig_unit);
-     $tr.find("td>#balanceCount").text(balanceCount);     
-     });  
-}
+	function deleteTr(obj){
+	  $(obj).parent().parent().remove();
+	}
+	
+	
+	//切换调入仓库后事件
+	$("#warehouse_id").change(function(){
+	    var fromWarehouseId = $("#warehouse_id").val();
+	    initProduct(fromWarehouseId);
+	})
+	
+	function addNew() {
+	   //添加商品验证，是否选择一个调出仓库
+	    var fromWarehouseId = $("#warehouse_id").val();
+	    if(fromWarehouseId == "" || fromWarehouseId == null || fromWarehouseId == undefined){
+		    alert("请先选择一盘点仓库");
+		    return;
+	    }
+	    initProduct(fromWarehouseId);
+		addTr("#dataTable", pList, pOptionArr);
+	}
+	var index = 1;
+	function addTr(tid, productList, optionArr) {
+		var firstProduct = productList[0].productList;
+		var goodsCode = firstProduct.sellerProductId;
+		var goodsName = firstProduct.name;
+		var specification = firstProduct.specificationValue;
+		var big_unit = firstProduct.bigUnit;
+	    var balanceCount = firstProduct.balanceCount == null ? "暂未盘点": firstProduct.balanceCount;
+		
+	
+		var $tbody = $(tid + " tbody"),
+		$tr = $tbody.find("tr:eq(0)"),
+		lastTrIdx = $tbody.find("tr:last").index(),
+		newTrIdx = lastTrIdx + 1,
+		trHtml = $tr.html();
+	
+		$tbody.append("<tr id='tr" + newTrIdx + "'>" +trHtml+ "</tr>");
+	    $tbody.find("tr:last>td>#goodsCode").attr("name","stockTakingList["+ lastTrIdx +"].seller_product_id");
+	    $tbody.find("tr:last>td>#stock").attr("name","stockTakingList["+ lastTrIdx +"].product_count"); 
+	    $tbody.find("tr:last>td>#remarks").attr("name","stockTakingList["+ lastTrIdx +"].remark");           
+	    $tbody.find("tr:last>td>#goodsCode").val(goodsCode);
+	    $tbody.find("tr:last>td>#specification").text(specification);
+	    $tbody.find("tr:last>td>#big_unit").text(big_unit);
+	    $tbody.find("tr:last>td>#balanceCount").text(balanceCount);
+	    $tbody.find("tr:last>td>#factIndex").attr("value",lastTrIdx);
+	    $tbody.find("tr:last").find(":input").attr("disabled",false);
+	    var productCount = 'stockTakingList['+ lastTrIdx +'].product_coun';
+	    $tbody.find("tr:last>td>select.pro-slc2").select2({
+	       data:optionArr,
+	       width: "100%",
+	       language: "zh-CN"
+	    });
+	
+	    $tbody.find("tr:last>td>.hide").text($tbody.find("tr:last>td>select").find("option:selected").val());
+	    $tbody.find("tr:last>td>select>pro-slc2").focus();
+	
+	    <!--添加商品的移除-->
+	    $tbody.find("tr:last>td>.removeTr").click(function(){
+	      $("#tr" + newTrIdx).remove();  
+	    });
+	
+	    <!--切换商品的方法  -->
+	    $tbody.find("tr:last>td>select.pro-slc2").change(function(){
+	     	 productChange($(this),$(this).val());
+	     });  
+	};
+	
+	function productChange(obj,key){
+		 var result = pMap[key].productList;   
+	     var cgoodsCode = result.sellerProductId;
+	     var cgoodsName = result.name;
+	     var cspecification = result.specificationValue;
+	     var cbig_unit = result.bigUnit;
+	     var balanceCount = result.balanceCount == null ? "暂未盘点":result.balanceCount;
+	     var $tr = obj.parent().parent();
+	     
+	     $tr.find("td>#goodsCode").val(cgoodsCode);
+	     $tr.find("td>#goodsName").html(cgoodsName); 
+	     $tr.find("td>#specification").text(cspecification);
+	     $tr.find("td>#big_unit").text(cbig_unit);
+	     $tr.find("td>#balanceCount").text(balanceCount); 
+	     $tr.find("td>#stock").val(0); 
+	
+	}
+	
+	function selectWarehouse(){
+		var warehouse_id = $('select  option:selected').val(); 
+		$('#dataTable tbody').find("tr:gt(0)").remove();
+		 $.ajax({
+			url: "${CPATH}/admin/stockTaking/getProductInfo",
+			data:{"warehouse_id":warehouse_id},
+			dataType: "json",
+			success: function(data) {
+				if(data!=""){
+					 for(var i=0; i<data.length; i++){
+					 	addNew();
+					 	var sellerProductId = data[i].sellerProductId;
+						var obj=$('#dataTable tbody').find("tr:last>td>select.pro-slc2"); 
+						obj.val(sellerProductId).trigger("change");
+						productChange(obj,sellerProductId);
+	 				 }
+ 				 }
+			}
+		});
+	}
 
 </#macro>
 
@@ -229,115 +250,113 @@ function addTr(tid, productList, optionArr) {
 		                 	<input  type="hidden" name="stockTaking.status" value="${(stockTaking.status)!}">
 		               	</div>
 					</div>
+					<div class="form-group col-sm-12 validata-box">
+							<label class="control-label col-sm-2">盘点仓库:</label>
+							<div class="input-group col-md-4 col-sm-10">
+								<select class="form-control input-sm" name="stockTaking.warehouse_id" id="warehouse_id" onchange=selectWarehouse()>
+									<option value="">--请选择--</option>
+									<#list (wlist)! as warehouse >
+										<option value="${warehouse.id}" <#if stockTaking?? && warehouse.id == stockTaking.warehouse_id>selected="selected"</#if>>${(warehouse.name)!}</option>
+									</#list>
+								</select>
+			               	</div>
+			               	
+						</div>	
+						
 						<div class="form-group col-sm-12 validata-box">
-								<label class="control-label col-sm-2">盘点仓库:</label>
-								<div class="input-group col-md-4 col-sm-10">
-									<select class="form-control input-sm" name="stockTaking.warehouse_id" id="warehouse_id">
-										<option value="">--请选择--</option>
-										<#list (wlist)! as warehouse >
-											<option value="${warehouse.id}" <#if stockTaking?? && warehouse.id == stockTaking.warehouse_id>selected="selected"</#if>>${(warehouse.name)!}</option>
-										</#list>
-									</select>
-				               	</div>
-				               	
-							</div>	
-							
-							<div class="form-group col-sm-12 validata-box">
-								<label class="control-label col-sm-2">盘点人:</label>
-								<div class="input-group col-md-4 col-sm-10">
-									<select class="form-control input-sm" name="stockTaking.biz_user_id" id="biz_user_id">
-										<option value="">--请选择--</option>
-										<#list (ulist)! as user >
-											<option value="${user.id}" <#if stockTaking?? && user.id == stockTaking.biz_user_id>selected="selected"</#if>>${(user.realname)!}</option>
-										</#list>
-									</select>
-				               	</div>	
-				               																								
+							<label class="control-label col-sm-2">盘点人:</label>
+							<div class="input-group col-md-4 col-sm-10">
+								<select class="form-control input-sm" name="stockTaking.biz_user_id" id="biz_user_id">
+									<option value="">--请选择--</option>
+									<#list (ulist)! as user >
+										<option value="${user.id}" <#if stockTaking?? && user.id == stockTaking.biz_user_id>selected="selected"</#if>>${(user.realname)!}</option>
+									</#list>
+								</select>
+			               	</div>	
 				      </div>
-				      
 			      </div>
 
-
-	                            <div style="padding: 5px;clear: both;">
-									<table id="dataTable" class="table table-striped table-bordered" width="100%" >
-										<thead>
-											<tr>
-												<th class="col-sm-1 center">序号</th>
-												<th class="col-sm-3 center">商品名称</th>
-												<th class="col-sm-2 center">规格</th>
-												<th class="col-sm-1 center">单位</th>
-												<th class="col-sm-1 center">库存数量</th>
-												<th class="col-sm-1 center">盘盈(+)/盘亏(-)</th>
-												<th class="col-sm-3 center">备注</th>
-											</tr>
-										</thead>
-										<tbody id="sProdBody">
-											<tr class="hide-always hide">
-												<td class="center">
-													<a class="btn btn-danger btn-xs removeTr" data-toggle="modal" data-target="#deleteBackProModal" ><span class="glyphicon glyphicon-remove"></span></a>
-												</td>
-												<td class="text-left">
-													<input type="hidden" id="goodsCode" name="stockTakingList[-1].seller_product_id" disabled="true" />
-												   <input type="hidden"  id="factIndex" name="factIndex" value="-1"/>
-													<select class="pro-slc2">
-													</select>
-												</td>
-												<td>
-													<span class="specification" id="specification"></span>
-												</td>
-												<td>
-													<span class="big_unit" id="big_unit"></span>
-												</td>
-												</td>
-													<td>
-													<span class="balanceCount" id="balanceCount"></span>
-												</td>
-												<div class="form-group">
-												<td>
-												<input type="text" id="stock" class="stock" name="stockTakingList[-1].product_count" disabled="true" />
-												</td>
-												</div>
-												<td class="text-left">
-													<input type="text"  class="remarks" id="remarks" name="stockTakingList[-1].remark" disabled="true">
-												</td>
-											</tr>
-											<#list (ilist)! as list>
-                                       <tr id="tr${list_index+1}">
-                        	                    <td class="center">
-													<a class="btn btn-danger btn-xs removeTr" data-toggle="modal" data-target="#deleteBackProModal" onclick="deleteTr(this)"><span class="glyphicon glyphicon-remove"></span></a>
-												</td>
-												<#list (list.productInfos)! as plist>
-												<td class="text-left">
-													<input type="hidden" id="goodsCode" name="stockTakingList[${list_index}].seller_product_id"  value="${list.sellerProductId}" />
-													<input type="text" id="goodsName" name="goodsName"  value="${plist.customName}" disabled="disabled"/>
-												   <input type="hidden"  id="factIndex" name="factIndex" value="${list_index}"/>
-												</td>
-												<td>
-													<input name="specification" id="specification" value="${plist.specificationValue!}" disabled="disabled"></input>
-												</td>
-												<td>
-													<input name="balanceCount" id="balanceCount" value="${plist.balanceCount!}" disabled="disabled"></input>
-												</td>
-												</#list>
-												<td>
-												<input type="text" id="stock" class="stock" name="stockTakingList[${list_index}].product_count"  value="${list.productCount}" />
-												</td>
-												<td class="text-left">
-													<input type="text"  class="remarks" id="remarks" name="stockTakingList[${list_index}].remark" value="${list.remark!}">
-												</td>
-                        	           </tr>
-                        	              </#list>
-										</tbody>
-										<tfoot>
-											<tr>
-												<td colspan="6">
-													<button id="btnAddProd" type="button" class="btn btn-xs btn-info" style="width: 80px;" onclick="addNew()">添加商品</button>
-												</td>
-											</tr>
-										</tfoot>
-									</table>
-								</div>
-                    		</div>
+                 <div style="padding: 5px;clear: both;">
+				<table id="dataTable" class="table table-striped table-bordered" width="100%" >
+					<thead>
+						<tr>
+							<th class="col-sm-1 center">序号</th>
+							<th class="col-sm-3 center">商品名称</th>
+							<th class="col-sm-2 center">规格</th>
+							<th class="col-sm-1 center">单位</th>
+							<th class="col-sm-1 center">库存数量</th>
+							<th class="col-sm-1 center">盘盈(+)/盘亏(-)</th>
+							<th class="col-sm-3 center">备注</th>
+						</tr>
+					</thead>
+					<tbody id="sProdBody">
+						<tr class="hide-always hide">
+							<td class="center">
+								<a class="btn btn-danger btn-xs removeTr" data-toggle="modal" data-target="#deleteBackProModal" ><span class="glyphicon glyphicon-remove"></span></a>
+							</td>
+							<td class="text-left">
+								<input type="hidden" id="goodsCode" name="stockTakingList[-1].seller_product_id" disabled="true" />
+							   <input type="hidden"  id="factIndex" name="factIndex" value="-1"/>
+								<select class="pro-slc2">
+								</select>
+							</td>
+							<td>
+								<span class="specification" id="specification"></span>
+							</td>
+							<td>
+								<span class="big_unit" id="big_unit"></span>
+							</td>
+							</td>
+							<td>
+								<span class="balanceCount" id="balanceCount"></span>
+							</td>
+								<td>
+									<input type="text" id="stock" class="stock" name="stockTakingList[-1].product_count" disabled="true" />
+								</td>
+							<td class="text-left">
+								<input type="text"  class="remarks" id="remarks" name="stockTakingList[-1].remark" disabled="true">
+							</td>
+						</tr>
+						<#list (ilist)! as list>
+                                    <tr id="tr${list_index+1}">
+                      	                 <td class="center">
+									<a class="btn btn-danger btn-xs removeTr" data-toggle="modal" data-target="#deleteBackProModal" onclick="deleteTr(this)"><span class="glyphicon glyphicon-remove"></span></a>
+								</td>
+								<#list (list.productInfos)! as plist>
+								<td class="text-left">
+									<input type="hidden" id="goodsCode" name="stockTakingList[${list_index}].seller_product_id"  value="${list.sellerProductId}" />
+									<input type="text" id="goodsName" name="goodsName"  value="${plist.customName}" disabled="disabled"/>
+								   <input type="hidden"  id="factIndex" name="factIndex" value="${list_index}"/>
+								</td>
+								<td>
+									<input name="specification" id="specification" value="${plist.specificationValue!}" disabled="disabled"></input>
+								</td>
+								<td>
+									<input name="big_unit" id="big_unit" value="${plist.bigUnit!}" disabled="disabled"></input>
+								</td>
+								<td>
+									<input name="balanceCount" id="balanceCount" value="${plist.balanceCount!}" disabled="disabled"></input>
+								</td>
+								</#list>
+								<td>
+								<input type="text" id="stock" class="stock" name="stockTakingList[${list_index}].product_count"  value="${list.productCount}" />
+								</td>
+								<td class="text-left">
+									<input type="text"  class="remarks" id="remarks" name="stockTakingList[${list_index}].remark" value="${list.remark!}">
+								</td>
+                     	          	 </tr>
+                   	              </#list>
+					</tbody>
+					<tfoot>
+						<tr>
+							<td colspan="7">
+								<button id="btnAddProd" type="button" class="btn btn-xs btn-info" style="width: 80px;" onclick="addNew()">添加商品</button>
+							</td>
+						</tr>
+					</tfoot>
+				</table>
+			</div>
+        </div>
 
 		<div class="box-footer"> 
 			<button type="button" onclick="doSubmit()" id="do_submit" class="btn btn-primary ladda-button" data-style="expand-right">保存更改</button>
