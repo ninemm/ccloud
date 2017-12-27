@@ -20,7 +20,6 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,7 +40,6 @@ import org.ccloud.model.query.StockTakingDetailQuery;
 import org.ccloud.model.query.StockTakingQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.query.WarehouseQuery;
-import org.ccloud.model.vo.ProductInfo;
 import org.ccloud.model.vo.StockTakingInfo;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
