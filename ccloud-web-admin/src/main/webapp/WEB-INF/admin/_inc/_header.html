@@ -27,12 +27,12 @@
 								<li>
 									<!-- start message --> 
 									<a href="${CPATH}/admin">
-										<i class="fa fa-users text-aqua"></i>你有${(session.sellerCustomerList)!}个待审核客户
+										<i class="fa fa-user-plus text-aqua"></i>你有${(session.sellerCustomerList)!}个待审核客户
 								    </a>
 								</li>
 								<!-- end message -->
 								<li><a href="${CPATH}/admin">
-										<i class="fa fa-warning text-yellow"></i> 你有${(session.orderList)!}个待审核订单
+										<i class="fa fa-file-text-o text-yellow"></i> 你有${(session.orderList)!}个待审核订单
 								</a></li>
 								<li><a href="${CPATH}/admin">
 										<i class="fa fa-users text-red"></i>你有${(session.sellerCustomerVisitList)!}个待审核客户拜访
@@ -80,11 +80,11 @@
 							<div class="pull-left">
 								<a href="${CPATH}/admin/user/info?p=user&c=info" class="btn btn-default btn-flat">资料</a>
 							</div>
-							<#if session['sellerList']?? && session['sellerList']?size gt 1>
+							<!-- <#if session['sellerList']?? && session['sellerList']?size gt 1>
 							<div class="pull-left" style="margin-left: 12px">
 								<a data-toggle="modal" data-target="#gridSystemModal" class="btn btn-default btn-flat">切换账套</a>
 							</div>	
-							</#if>						
+							</#if> -->						
 							<div class="pull-right">
 								<a href="${CPATH}/admin/logout?ucode=${ucode!}" class="btn btn-primary btn-flat">退出</a>
 							</div>
