@@ -232,7 +232,12 @@
 				$("#biz_user_id").val(order.biz_user_id);
 				$("#deptId").val(order.dept_id);
 				$("#dataArea").val(order.data_area);
-
+				if(order.deal_date == null){
+					$("#dealDate").val("暂未交货！");
+				}else{
+					$("#dealDate").val(order.deal_date);
+				}
+								
 				$.each(orderDetail, function(index,element){
 					addProduct(element);
 				});
@@ -362,6 +367,12 @@
 							<label class="radio-inline">
 								<input class="minimal" type="radio" name="paymentType" value="0" >应付账款
 							</label>
+						</div>
+					</div>
+					 <div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">交货时间:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<input class="form-control input-sm" type="text" id="dealDate" name="dealDate" value=""  readonly>
 						</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">
