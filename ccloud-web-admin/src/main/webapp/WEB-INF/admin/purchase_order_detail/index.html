@@ -25,7 +25,7 @@
 <#macro script>
 	$(function() {
 		jQuery.mm.initValidator('#form', validatorFields);
-		jQuery.mm.initDatetimepicker('form', '#deliveryDate', 'deliveryDate', 'yyyy-MM-dd', 2, 4, 2);
+		jQuery.mm.initDatetimepicker('form', '#dealDate', 'dealDate', 'yyyy-MM-dd', 2, 4, 2);
 		addProduct();
 		initsupplier();
 	});
@@ -44,7 +44,7 @@
 				stringLength: { max: 50, message: '配送地址最大长度是50字符，请重新输入' }
 			}
 		},
-		'deliveryDate': {
+		'dealDate': {
 			validators: {
 				date : { format : 'YYYY-MM-DD', message : '日期格式不正确' }
 			}
@@ -380,12 +380,12 @@
 							<input class="form-control input-sm" type="text" id="mobile" name="mobile" value="" readonly>
 						</div>
 					</div>
-					<div class="form-group col-sm-12 validata-box">
+					<!-- <div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">配送时间:</label>
 						<div class="input-group col-md-4 col-sm-10">
-							<input class="form-control input-sm" type="text" id="deliveryDate" name="dealDate" value="${dealDate!}"  >
+							<input class="form-control input-sm" type="text" id="dealDate" name="dealDate" value="${dealDate!}"  >
 						</div>
-					</div>
+					</div> -->
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">付款方式:</label>
 						<div class="input-group col-md-4 col-sm-10">
