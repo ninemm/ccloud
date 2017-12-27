@@ -41,7 +41,7 @@ $(function () {
 <div class="weui-content">
 	<article id="home">
 		<div class="company">${(session.sellerName)!}
-		<#if (session.sellerListSize > 1) >
+		<#if (session.sellerListSize ??) &&(session.sellerListSize > 1) >
 			<a href="${CPATH}/user/choice" class="change-seller">
 					<span><i class="icon-exchange ft20 white" title = "切换账套"></i></span>
 			</a>
@@ -127,7 +127,7 @@ $(function () {
 			<div class="weui-grids">
 				<@shiro.hasPermission name="/admin/salesOrder/check">
 			    <a href="${CPATH}/todo/order" class="weui-grid js_grid">
-			    	<#if orderTotal !=0>
+			    	<#if (orderTotal??) && (orderTotal !=0)>
 			        <span class="weui-badge full-badge">${(orderTotal)!}</span></#if>
                     <div class="weui-grid__icon">
                         <i class="icon-calendar-check-o" style="color: #9c89b9"></i>
@@ -138,7 +138,7 @@ $(function () {
                 
                 <@shiro.hasPermission name="/admin/customer/audit">
 				<a href="${CPATH}/todo/customer" class="weui-grid js_grid">
-					<#if customerTotal !=0>
+					<#if (customerTotal??) && (customerTotal !=0)>
                     <span class="weui-badge full-badge">${(customerTotal)!}</span></#if>
 					<div class="weui-grid__icon">
 						<i class="icon-user" style="color: #19c594"></i>
@@ -156,7 +156,7 @@ $(function () {
 				
 				<@shiro.hasPermission name="/admin/customerVisit/audit">
                 <a href="${CPATH}/todo/visit" class="weui-grid js_grid">
-                	<#if customerVisitTotal !=0>
+                	<#if (customerVisitTotal??) && (customerVisitTotal !=0)>
                 	<span class="weui-badge full-badge">${(customerVisitTotal)!}</span></#if>
 					<div class="weui-grid__icon">
 						<i class="icon-suitcase" style="color: #f7b55d;"></i>
