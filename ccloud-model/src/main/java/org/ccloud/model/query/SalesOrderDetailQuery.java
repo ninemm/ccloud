@@ -312,8 +312,8 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 			Date date, String deptId, String dataArea, Integer number, String userId) {
 		List<SalesOrderDetail> detailList = new ArrayList<>();
 		Integer convert = product.getInt("convert_relate");
-		Integer compositionCount = Integer.parseInt(product.getStr("productCount"));
-		Integer productCount = compositionCount * convert * number;
+		double compositionCount = Double.valueOf(product.getStr("productCount"));
+		Integer productCount = (int) Math.round(compositionCount * convert * number);
 		String productId = product.getProductId();
 		Map<String, Object> result = this.getWarehouseId(productId, sellerId, sellerCode, productCount, convert, userId);
 		String status = result.get("status").toString();
