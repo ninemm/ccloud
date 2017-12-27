@@ -112,6 +112,7 @@
 					$newOrder.find("#status").text(getStatus(el.status));
 					$newOrder.find("#customerName").text(el.customer_name);
 					$newOrder.find("#oId").val(el.id);
+					$newOrder.find(".appendOrdeProductDetail").attr('id',"p"+el.id);
 					$newOrder.find("#contact").text(el.contact + '/' + el.mobile);
 					$newOrder.find("#customerType").text(el.customerTypeName);
 					if(el.status == 0) {
@@ -213,6 +214,7 @@
 	  var orderId =  $(orderDetail).next().val();
 	  var productName = $("#o"+orderId).text();
 	  var str = "";
+	  var smallStr = "";
 	  if(productName == ""){
 	     $.ajax({
             type: "post",
@@ -220,24 +222,37 @@
             dataType: "json",
             success:function(data) {
             $.each(data.orderDetail, function(idx, item) {
+                var productName = "";
+                if(item.is_gift == 0){
+                productName = item.custom_name;
+                }else{
+                productName = "<span class='tag'>赠品</span>";
+                productName = productName + item.custom_name;
+                }
                 var bigCount = parseInt(item.product_count/item.convert_relate);//下单大单位数量
                 var smallPrice = (item.product_amount/item.product_count).toFixed(2);//下单小价格
                 var sPrice = (item.price/item.convert_relate).toFixed(2);//商品标准小价格
-                var smallCount = Math.floor(item.product_count/item.convert_relate);//下单小单位数量
-                str += "<div><p id='o"+ orderId +"'>" +item.custom_name+ "<p>"+
+                var smallCount = (item.product_count %  item.convert_relate);//下单小单位数量
+                
+                str += "<div><p id='o"+ orderId +"'>" +productName+ "</p>"+
                 "<div class='weui-flex'><div class='weui-flex__item flex-grow2'>"+
-                "<div class='fr width-60'>"+item.product_price+" "+
-                "<span class='gray'>"+ item.price +"</span>"+
+                "<div class='fr width-60'>￥"+item.product_price+" "+
+                "<span class='gray'>("+ item.price +")</span>"+
                 "</div></div><div class='weui-flex__item t-r'>"+bigCount+" "+item.big_unit+" "+
                 "</div></div>"+
-                "<div class='weui-flex'><div class='weui-flex__item flex-grow2'>"+
-                "<div class='fr width-60'>"+smallPrice+" "+
-                "<span class='gray'>"+sPrice+"</span></div></div>"+
+                "</div>";
+                smallStr +="<div class='weui-flex'><div class='weui-flex__item flex-grow2'>"+
+                "<div class='fr width-60'>￥"+smallPrice+" "+
+                "<span class='gray'>("+sPrice+")</span></div></div>"+
                 "<div class='weui-flex__item t-r'>"+smallCount+" " +item.small_unit+" "+
-                "</div></div></div>";
+                "</div></div>"; 
+                if(smallCount>0){
+                str = str + smallStr;
+                }
+                
             });
             
-            $("#appendOrdeProductDetail").append(str);
+            $("#p"+orderId).append(str);
             }
         });
 	  }  
@@ -285,7 +300,7 @@
 					<div class="none">
 						<a href="" id="salesOrderId">
 						<hr>
-							<div id="appendOrdeProductDetail">
+							<div class="appendOrdeProductDetail">
 
 							</div>
 							<hr>							
