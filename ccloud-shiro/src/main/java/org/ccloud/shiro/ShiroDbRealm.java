@@ -48,8 +48,8 @@ public class ShiroDbRealm extends AuthorizingRealm {
 	    User user = UserQuery.me().findUserByUsername(authcToken.getUsername());
 	    if (user != null) {
 	    	//String password = EncryptUtils.encryptPassword(new String(authcToken.getPassword()), user.getSalt());
-	    	String password = user.getPassword();
-	        if(!user.getPassword().equals(password)){
+	    	//String password = user.getPassword();
+	        if(!user.getPassword().equals(new String(authcToken.getPassword()))){
 	            throw new AuthenticationException("密码错误");
 	        }
 	        return new SimpleAuthenticationInfo(user, user.getPassword(), getName());
