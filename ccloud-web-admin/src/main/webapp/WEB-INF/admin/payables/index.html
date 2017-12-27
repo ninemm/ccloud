@@ -129,7 +129,7 @@ var getpayablesDetailParams = function(params){
 }
 
 function orderInfo(orderSn){
-	var url = orderSn.indexOf("SR")==0?'${CPATH}/admin/salesInstock/detailBySn/' + orderSn:'${CPATH}/admin/salesRefund/detailBySn/' + orderSn;
+	var url = orderSn.indexOf("SR")==0?'${CPATH}/admin/salesInstock/detailBySn/' + orderSn:'${CPATH}/admin/purchaseInstock/detailBySn/' + orderSn;
 	layer.open({
 		title:"订单详细",
 		type: 2,

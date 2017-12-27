@@ -102,6 +102,7 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		String ref_sn = getPara("ref_sn");
 		String ref_type = getPara("ref_type");
 		String object_id = getPara("object_id");
+		String balance_amount = getPara("balance_amount");
 		//通过客户Id找到应收账款主表ID
 		Payables payables = PayablesQuery.me().findByObjId(object_id);
 		
@@ -109,6 +110,7 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		List<User> list = UserQuery.me().findIdAndNameByDataArea(userDataArea);
 	
 		setAttr("ref_sn",ref_sn);
+		setAttr("balance_amount",balance_amount);
 		setAttr("bill_id",payables.getId());
 		setAttr("ref_type",ref_type);
 		setAttr("type", payables.getObjType());

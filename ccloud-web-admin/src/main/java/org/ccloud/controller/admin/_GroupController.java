@@ -217,18 +217,22 @@ public class _GroupController extends JBaseCRUDController<Group> {
 	public void getRoleCheck() {
 		String id = getPara("groupId");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		List<Record> list = RoleQuery.me().findByRoleCheck(id, dataArea);
+		List<Record> list = RoleQuery.me().findByRoleCheck(dataArea);
+		List<Record> list1 = RoleQuery.me().findByRoleCheck1(id);
 		List<Map<String, Object>> checkList = new ArrayList<>();
 		List<Map<String, Object>> uncheckList = new ArrayList<>();
 		for (Record record : list) {
 			Map<String, Object> map = new HashMap<>();
 			map.put("id", record.getStr("id"));
 			map.put("name", record.getStr("role_name"));
-			if (record.getStr("check_status") == null) {
-				uncheckList.add(map);
-			} else {
-				checkList.add(map);
+			for (Record record1 : list1) {
+				if (record1.getStr("role_id").equals(record.getStr("id"))) {
+					checkList.add(map);
+					continue;
+				}
 			}
+			uncheckList.add(map);
+				
 		}
 		Map<String, List<Map<String, Object>>> data = new HashMap<>();
 		data.put("checkList", checkList);

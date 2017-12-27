@@ -476,4 +476,16 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 			}
 		}
 	}
+	public void detailBySn(){
+		String order_sn = getPara(0);
+		PurchaseInstock purchaseInstock = new PurchaseInstock();
+		if(!order_sn.substring(0, 2).equals("PO")){
+			purchaseInstock = PurchaseInstockQuery.me().findBySn(order_sn);
+		}else{
+			purchaseInstock = PurchaseInstockQuery.me().findByPurchaseOrderSn(order_sn);
+		}
+		
+		setAttr("instockId", purchaseInstock.getId());
+		render("getDetail.html");
+	}
 }

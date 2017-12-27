@@ -285,8 +285,8 @@ public class SellerCustomerQuery extends JBaseQuery {
 		return Db.paginate(pageNumber, pageSize, true, select, sql.toString(), params.toArray());
 	}
 	
-	public SellerCustomer findBySellerId(String sellerId){
-		return DAO.doFindFirst("seller_id = ?", sellerId);
+	public SellerCustomer findBySellerId(String sellerId ,String customerId){
+		return DAO.doFindFirst("seller_id = ? and customer_id = ?", sellerId,customerId);
 	}
 
 	public List<Record> findSubTypeByUserID(String dataArea) {
@@ -313,6 +313,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 		callback.setUserId(userId);
 		callback.setDist(nearby);
 		
+		@SuppressWarnings("unchecked")
 		List<Map<String, Object>> result = (List<Map<String, Object>>) Db.execute(callback);
 		return result;
 	}
