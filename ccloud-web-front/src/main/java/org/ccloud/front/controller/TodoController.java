@@ -121,6 +121,7 @@ public class TodoController extends BaseFrontController {
 			html.append(
 					"                    <div class=\"weui-panel weui-panel_access\">\n" +
 					"                        <div class=\"weui-cell weui-cell_access\">\n" +
+					"<a href=\""+getRequest().getContextPath()+"/customerVisit/detail?id="+visit.getStr("id")+"\">"+		
 					"                            <div class=\"weui-cell__bd\">\n" +
 					"                                <p class=\"ft16\">" + visit.getStr("customer_name") + "</p>\n" +
 					"                                <div class=\"ft14 gray\">\n" +
@@ -137,10 +138,11 @@ public class TodoController extends BaseFrontController {
 					"                                    </p>\n" +
 					"                                </div>\n" +
 					"                            </div>\n" +
+					"							</a>"+
 					"                        </div>\n" +
 					"                        <div class=\"weui-cell weui-cell_access\">\n" +
-					"                        	<a class=\"weui-cell__bd weui-cell_link\" href=\""+getRequest().getContextPath()+"/customerVisit/review?id="+visit.getStr("id")+"&taskId="+visit.getStr("taskId")+"&assignee="+visit.getStr("assignee")+"\">客户拜访详情</a>"+
-					"                        	<span class=\"weui-cell__ft\">"+visit.getStr("createTime")+"</span>"+
+					"                        	<a class=\"weui-cell__bd weui-cell_link\" href=\""+getRequest().getContextPath()+"/customerVisit/detail?id="+visit.getStr("id")+"\">客户拜访详情</a>"+
+					"                        	<span class=\"weui-cell__ft\">"+visit.getStr("endTime")+"</span>"+
 					"                        </div>\n" +
 					"                    </div>\n");
 		}
@@ -162,7 +164,7 @@ public class TodoController extends BaseFrontController {
 			html.append(
 					"                    <div class=\"weui-panel weui-panel_access\">\n" +
 					"                        <div class=\"weui-cell weui-cell_access\">\n" +
-					"							<a href=\""+getRequest().getContextPath()+"/order/orderReview?orderId="+order.getStr("id")+"&taskId="+order.getStr("taskId")+"&assignee="+order.getStr("assignee")+"\">\n");		
+					"							<a href=\""+getRequest().getContextPath()+"/order/orderDetail?orderId="+order.getStr("id")+"\">\n");		
 					if(order.get("receive_type").equals("0")) {
 					html.append("								<span class=\"tag\">账期</span>");
 					}
@@ -171,13 +173,13 @@ public class TodoController extends BaseFrontController {
 					"                                	<div class=\"ft14 gray\">\n" +
 					"                                    	<p>订单号：" + order.getStr("order_sn")+"</p>\n" +
 					"                                    	<p>联系人：<span>"+order.getStr("ccontact")+" / "+order.getStr("cmobile")+"</span><span class=\"fr\">"+order.getStr("customerTypeName")+"</span></p>\n" +
-					"                                    	<p>金额：￥<span>"+order.getStr("total_amount")+"</span><span class=\"fr\" id=\"date\">时间："+order.getStr("create_date")+"</span></p>\n");
+					"                                    	<p>金额：￥<span>"+order.getStr("total_amount")+"</span><span class=\"fr\" id=\"date\">时间："+order.getStr("endTime")+"</span></p>\n");
 					html.append("                    				</div>\n" +
 					"                            	</div>\n" +
 					"							</a>\n"+
 					"                        </div>\n" +
 					"                        <div class=\"weui-cell weui-cell_access\">\n" +
-					"                        	<a class=\"weui-cell__bd\" style=\"color: gray\" href=\""+getRequest().getContextPath()+"/order/orderReview?orderId="+order.getStr("id")+"&taskId="+order.getStr("taskId")+"&assignee="+order.getStr("assignee")+"\">订单详情</a>\n"+
+					"                        	<a class=\"weui-cell__bd\" style=\"color: gray\" href=\""+getRequest().getContextPath()+"/order/orderDetail?orderId="+order.getStr("id")+"\">订单详情</a>\n"+
 					"							<span class=\"weui-cell__ft\"></span>"+
 					"                        </div>\n" +
 					"                    </div>\n");

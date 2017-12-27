@@ -165,7 +165,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 	
 public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procKey, String username) {
 		
-		String select = "select cv.*, sc.nickname, c.customer_name, c.customer_code, c.contact, c.mobile, c.prov_name, c.city_name, c.country_name, c.address,i.TASK_ID_ taskId, i.ACT_NAME_ taskName, i.ASSIGNEE_ assignee, i.START_TIME_ createTime ";
+		String select = "select cv.*, sc.nickname, c.customer_name, c.customer_code, c.contact, c.mobile, c.prov_name, c.city_name, c.country_name, c.address,i.TASK_ID_ taskId, i.ACT_NAME_ taskName, i.ASSIGNEE_ assignee, i.END_TIME_ endTime ";
 		LinkedList<Object> params = new LinkedList<>();
 		params.add(procKey);
 		params.add(username);
@@ -176,7 +176,7 @@ public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procK
 		sql.append(" JOIN act_hi_actinst i on cv.proc_inst_id = i.PROC_INST_ID_ ");
 		sql.append(" JOIN act_re_procdef p on p.ID_ = i.PROC_DEF_ID_ ");
 		sql.append(" WHERE p.KEY_ = ? and locate(?, i.ASSIGNEE_) > 0 AND i.DURATION_ is not null ");
-		sql.append(" order by i.START_TIME_ desc ");
+		sql.append(" order by i.END_TIME_ desc ");
 
 		return Db.paginate(pageNumber, pageSize, select, sql.toString(), params.toArray());
 	}
