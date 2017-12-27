@@ -30,7 +30,7 @@
 $(function() {
   $(document).on("touchstart", "#customerName, .choose-customer", function () {
 		window.location.href = '${CPATH}/product/customerChoose';
-  }).on("touchstart", "#placeOrder", function () {
+  }).on("touchend", "#placeOrder", function () {
 		doSubmit();
   }).on("touchstart",".nearby-customer",function(){
 		window.location.href = '${CPATH}/product/customerNearbyChose';
@@ -233,29 +233,35 @@ $(function() {
 		$("#allTotalAmount").val(allTotalAmount);
 	} 
 
+	var flg = true;
 	function doSubmit(){
+		if (!flg) {
+			return;
+		}
 		if ($("#sellerCustomerId").val() == "") {
 			$.toptip("请选择客户", 'warning'); 
 			return;
 		}
+		
+		
+	//	if (!checkStore()) {
+	//		toastr.error('未选择商品或库存不足!','操作失败');
+	//		return;
+	//	}
 
 		layer.open({
 			type: 2,
 			content: '保存中...'
 		});
 
-	//	if (!checkStore()) {
-	//		toastr.error('未选择商品或库存不足!','操作失败');
-	//		return;
-	//	}
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
-				$("#placeOrder").attr('diabled', 'disabled');
+				flg = false;
 				return true
 			},
 			type : "post", 
 			dataType : "json", 
-			success : function(data) { 
+			success : function(data) {
 				layer.closeAll();
 				if (data.errorCode == 0) {
 					removeItemBykey("productList");
@@ -277,14 +283,14 @@ $(function() {
 					});
 					
 				} else {
-					$("#placeOrder").removeAttr('diabled');
 					$.toptip(data.message, 'error'); 
 				}
+				flg = true;
 			},
 			error : function() {
 				layer.closeAll();
-				$("#placeOrder").removeAttr('diabled');
 				alert("信息提交错误");
+				flg = true;
 			}
 		});
 	}
