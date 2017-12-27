@@ -15,11 +15,12 @@
 		}).on('touchend', '.show-more-btn', function () {
 			var $this = $(this);
 			var $detail = $this.parent().next();
-			$detail.toggle('fast');
 			if ($detail.is(':visible')) {
-			  $this.text('隐藏详情')
+				$detail.hide('fast');
+				$this.text('显示详情');
 			} else {
-			  $this.text('显示详情')
+				$detail.show('fast');
+				$this.text('隐藏详情');
 			}
 		});
         $("#datePicker").calendar();
