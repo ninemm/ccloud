@@ -76,7 +76,7 @@ public class _UserController extends JBaseCRUDController<User> {
 			userId = user.getId();
 		}
 
-		Page<User> page = UserQuery.me().paginate(getPageNumber(), getPageSize(), keyword, dataArea, "create_date",
+		Page<User> page = UserQuery.me().paginateUser(getPageNumber(), getPageSize(), keyword, dataArea, "u.create_date",
 				userId);
 		if (page != null) {
 			setAttr("page", page);

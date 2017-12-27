@@ -20,7 +20,6 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,7 +40,6 @@ import org.ccloud.model.query.StockTakingDetailQuery;
 import org.ccloud.model.query.StockTakingQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.query.WarehouseQuery;
-import org.ccloud.model.vo.ProductInfo;
 import org.ccloud.model.vo.StockTakingInfo;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
@@ -297,7 +295,7 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 						String remark = StringUtils
 								.getArrayFirst(map.get("stockTakingList[" + factIndex[i] + "].remark"));
 						
-						if (productCount.equals("0")) {
+						if ("0".equals(productCount)||null==productCount) {
 							continue;
 						}
 						stockTakingDetail.setSellerProductId(sellerProductId);
@@ -327,18 +325,15 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 					// 存储盘点单子表信息
 					List<StockTakingDetail> iSaveList = new ArrayList<>();
 					String[] factIndex = map.get("factIndex");
-					int loopEnd = 0;
-					for (int i = 0; i < factIndex.length; i++) {
+					for (int i = 1; i < factIndex.length; i++) {
+						
 						StockTakingDetail stockTakingDetail = getModel(StockTakingDetail.class);
-						String sellerProductId = StringUtils.getArrayFirst(map.get("stockTakingList[" + i + "].seller_product_id"));
+						String sellerProductId = StringUtils.getArrayFirst(map.get("stockTakingList[" + factIndex[i] + "].seller_product_id"));
 						String productCount = StringUtils
-								.getArrayFirst(map.get("stockTakingList[" + i + "].product_count"));
-						String remark = StringUtils.getArrayFirst(map.get("stockTakingList[" + i + "].remark"));
-						loopEnd++;
-						if (loopEnd == factIndex.length) {
-							break;
-						}
-						if (productCount.equals("0")) {
+								.getArrayFirst(map.get("stockTakingList[" + factIndex[i] + "].product_count"));
+						String remark = StringUtils.getArrayFirst(map.get("stockTakingList[" + factIndex[i] + "].remark"));
+						
+						if ("0".equals(productCount)||null==productCount) {
 							continue;
 						}
 						stockTakingDetail.setSellerProductId(sellerProductId);

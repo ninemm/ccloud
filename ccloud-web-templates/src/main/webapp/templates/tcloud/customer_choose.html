@@ -4,7 +4,7 @@
 	#customer {
 		bottom: 0;
 	}
-	#customerList {
+	#infinite {
 		position: absolute;
 		top: 2rem;
 		bottom: 0;
@@ -83,9 +83,6 @@
 	
     
     function initCustomer() {
-    	$loading.show();
-		$noMore.hide();
-
 	    var params = {
 		    "page": page,
 	        "size": size,
@@ -97,8 +94,8 @@
 
 		Utils.ajax('${CPATH}/product/customerList', params, 
 			function(data){
-				$loading.hide();
 				if(data.customerList.length == 0){
+					$loading.hide();
 					$noMore.show();
 					loading = true;
 					return;
@@ -122,12 +119,14 @@
     }
 
 	//滑动方法
-	$("main").infinite().on("infinite", function() {
+	$("#infinite").infinite().on("infinite", function() {
 		if(loading) {
 			return;
 		}
 		loading = true;
-		initCustomer();
+		setTimeout(function() {
+			initCustomer();
+		}, 1500);
 	});
 	
 	function combo() {
@@ -180,30 +179,32 @@
 					<i class="icon-th-list"></i>
 				</div>
 			</header>
-				<div id="customerList">
-					<div class="weui-panel weui-panel_access" style="display: none">
-					<div class="weui-flex">
-						<div class="weui-flex__item customer-info" id="customerInfo">
-							<p class="ft14" id="customerName"></p>
-							<p class="gray" id="contactP"></p>
-							<input type="hidden" id="sellerCustomerId" value="">
-							<input type="hidden" id="contact" value="">
-							<input type="hidden" id="mobile" value="">
-							<input type="hidden" id="address" value="">
+				<div id="infinite">
+					<div id="customerList">
+						<div class="weui-panel weui-panel_access" style="display: none">
+							<div class="weui-flex">
+								<div class="weui-flex__item customer-info" id="customerInfo">
+									<p class="ft14" id="customerName"></p>
+									<p class="gray" id="contactP"></p>
+									<input type="hidden" id="sellerCustomerId" value="">
+									<input type="hidden" id="contact" value="">
+									<input type="hidden" id="mobile" value="">
+									<input type="hidden" id="address" value="">
+								</div>
+							</div>
+							<p class="gray">
+								<span class="icon-map-marker ft16 green"></span>
+								<span id="addressSpan"></span>
+							</p>
 						</div>
 					</div>
-					<p class="gray">
-						<span class="icon-map-marker ft16 green"></span>
-						<span id="addressSpan"></span>
-					</p>
-				</div>
-			</div>
-				<div class="weui-loadmore" id="loading" style="display: none;">
-				<i class="weui-loading"></i>
-				<span class="weui-loadmore__tips">正在加载</span>
-				</div>
-				<div class="weui-loadmore weui-loadmore_line" id="noMore" style="display: none;">
-				<span class="weui-loadmore__tips">暂无数据</span>
+					<div class="weui-loadmore" id="loading">
+						<i class="weui-loading"></i>
+						<span class="weui-loadmore__tips">正在加载</span>
+					</div>
+					<div class="weui-loadmore weui-loadmore_line" id="noMore" style="display: none;">
+						<span class="weui-loadmore__tips">暂无数据</span>
+					</div>
 				</div>
 				<#include "_inc/_goback.html" />				
 		</article>

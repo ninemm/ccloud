@@ -157,18 +157,20 @@ public class RoleQuery extends JBaseQuery {
 		return DAO.find(sql);
 	}
 
-	public List<Record> findByRoleCheck(String id, String dataArea) {
-		StringBuilder stringBuilder = new StringBuilder("SELECT r.id,r.role_name,a.id as check_status FROM role r LEFT JOIN ");
-		stringBuilder.append("(SELECT * FROM group_role_rel gr WHERE gr.group_id = ?) a ");
-		stringBuilder.append("ON r.id = a.role_id ");
-		LinkedList<Object> params = new LinkedList<Object>();
-		params.add(id);
-		appendIfNotEmptyWithLike(stringBuilder, "r.data_area", dataArea, params, false);
-		return Db.find(stringBuilder.toString(), params.toArray());
+	//获取所有的角色
+	public List<Record> findByRoleCheck( String dataArea) {
+		StringBuilder stringBuilder = new StringBuilder("SELECT r.id , r.role_name FROM role r WHERE r.data_area LIKE '"+dataArea+"'");
+		return Db.find(stringBuilder.toString());
 	}
-
+	//获取选过的角色
+	public List<Record> findByRoleCheck1(String id) {
+		StringBuilder stringBuilder = new StringBuilder("SELECT * FROM group_role_rel gr WHERE gr.group_id = '"+id+"'");
+		return Db.find(stringBuilder.toString());
+	}
 	public List<Role> findByDeptId(String deptId) {
 		return DAO.doFind("dept_id = ?", deptId);
 	}
+
+	
 }
 

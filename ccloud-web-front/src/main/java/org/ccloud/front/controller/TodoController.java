@@ -1,5 +1,6 @@
 package org.ccloud.front.controller;
 
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,18 +38,18 @@ public class TodoController extends BaseFrontController {
 		render("todo_customer.html");
 	}
 	
+
 	//订单审核
 	@RequiresPermissions(value = { "/admin/salesOrder/check", "/admin/dealer/all" }, logical = Logical.OR)
 	public void order() {
 
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String username = user.getUsername();
+		
 		List<SalesOrder> list = SalesOrderQuery.me().getToDo(username);
 		if(list.size() !=0 )setAttr("todoList", list);
-		
-		//Page<CustomerVisit> page = SalesOrderQuery.me().getToDo(getPageNumber(), getPageSize(), username);
-		//Page <Record> historyList = SalesOrderQuery.me().getHisProcessList(getPageNumber(), getPageSize(), "_customer_visit_review", username);
-		//if(historyList.getList().size() != 0) setAttr("historyList", historyList);
+		Page <Record> historyList = SalesOrderQuery.me().getHisProcessList(getPageNumber(), getPageSize(), "", username);
+		if(historyList.getList().size() != 0) setAttr("historyList", historyList);
 		
 		
 		setAttr("username", username);
@@ -111,12 +112,11 @@ public class TodoController extends BaseFrontController {
 
 	}
 	
-	public void visitHistoryAuditRefresh() {
+	public void visitHistoryAuditRefresh() throws ParseException {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String username = user.getUsername();
-		Page <Record> historyList = SellerCustomerQuery.me().getHisProcessList(getParaToInt("pageNumber"), getParaToInt("pageSize"), "_customer_visit_review", username);
+		Page <Record> historyList = CustomerVisitQuery.me().getHisProcessList(getParaToInt("pageNumber"), getParaToInt("pageSize"), "_customer_visit_review", username);
 		StringBuilder html = new StringBuilder();
-		
 		for(Record visit : historyList.getList()) {
 			html.append(
 					"                    <div class=\"weui-panel weui-panel_access\">\n" +
@@ -139,6 +139,46 @@ public class TodoController extends BaseFrontController {
 					"                            </div>\n" +
 					"                        </div>\n" +
 					"                        <div class=\"weui-cell weui-cell_access\">\n" +
+					"                        	<a class=\"weui-cell__bd weui-cell_link\" href=\""+getRequest().getContextPath()+"/customerVisit/review?id="+visit.getStr("id")+"&taskId="+visit.getStr("taskId")+"&assignee="+visit.getStr("assignee")+"\">客户拜访详情</a>"+
+					"                        	<span class=\"weui-cell__ft\">"+visit.getStr("createTime")+"</span>"+
+					"                        </div>\n" +
+					"                    </div>\n");
+		}
+
+		Map<String, Object> map = new HashMap<>();
+		map.put("html", html.toString());
+		map.put("totalRow", historyList.getTotalRow());
+		map.put("totalPage", historyList.getTotalPage());
+
+		renderJson(map);
+	}
+	
+	public void orderHistoryAuditRefresh() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String username = user.getUsername();
+		Page <Record> historyList = SalesOrderQuery.me().getHisProcessList(getParaToInt("pageNumber"), getParaToInt("pageSize"), "", username);
+		StringBuilder html = new StringBuilder();
+		for(Record order : historyList.getList()) {
+			html.append(
+					"                    <div class=\"weui-panel weui-panel_access\">\n" +
+					"                        <div class=\"weui-cell weui-cell_access\">\n" +
+					"							<a href=\""+getRequest().getContextPath()+"/order/orderReview?orderId="+order.getStr("id")+"&taskId="+order.getStr("taskId")+"&assignee="+order.getStr("assignee")+"\">\n");		
+					if(order.get("receive_type").equals("0")) {
+					html.append("								<span class=\"tag\">账期</span>");
+					}
+					html.append("                            	<div class=\"weui-cell__bd ft16\">\n" +
+					"                                	<p class=\"customer_name\">" + order.getStr("customer_name") + "</p>\n" +
+					"                                	<div class=\"ft14 gray\">\n" +
+					"                                    	<p>订单号：" + order.getStr("order_sn")+"</p>\n" +
+					"                                    	<p>联系人：<span>"+order.getStr("ccontact")+" / "+order.getStr("cmobile")+"</span><span class=\"fr\">"+order.getStr("customerTypeName")+"</span></p>\n" +
+					"                                    	<p>金额：￥<span>"+order.getStr("total_amount")+"</span><span class=\"fr\" id=\"date\">时间："+order.getStr("create_date")+"</span></p>\n");
+					html.append("                    				</div>\n" +
+					"                            	</div>\n" +
+					"							</a>\n"+
+					"                        </div>\n" +
+					"                        <div class=\"weui-cell weui-cell_access\">\n" +
+					"                        	<a class=\"weui-cell__bd\" style=\"color: gray\" href=\""+getRequest().getContextPath()+"/order/orderReview?orderId="+order.getStr("id")+"&taskId="+order.getStr("taskId")+"&assignee="+order.getStr("assignee")+"\">订单详情</a>\n"+
+					"							<span class=\"weui-cell__ft\"></span>"+
 					"                        </div>\n" +
 					"                    </div>\n");
 		}

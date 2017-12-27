@@ -15,6 +15,8 @@
  */
 package org.ccloud.front.controller;
 
+import java.util.List;
+
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.core.addon.HookInvoker;
@@ -28,6 +30,7 @@ import org.ccloud.model.query.MessageQuery;
 import org.ccloud.model.query.OptionQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SellerCustomerQuery;
+import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.ui.freemarker.tag.IndexPageTag;
 import org.ccloud.utils.StringUtils;
@@ -75,6 +78,9 @@ public class IndexController extends BaseFrontController {
 			setAttr("orderTotal", SalesOrderQuery.me().getToDo(user.getUsername()).size());
 			setAttr("customerVisitTotal",CustomerVisitQuery.me().getToDo(user.getUsername()).size());
 			setAttr("customerTotal",SellerCustomerQuery.me().getToDo(user.getUsername()).size());
+			
+			List<User> userList = UserQuery.me().findByMobile(user.getMobile());
+			setSessionAttr("sellerListSize", userList.size());
 			
 			if (StringUtils.isBlank(para)) {
 				setAttr(IndexPageTag.TAG_NAME, new IndexPageTag(getRequest(), null, 1, null));

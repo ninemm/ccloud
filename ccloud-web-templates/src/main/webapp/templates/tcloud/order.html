@@ -21,6 +21,9 @@
 		text-align: left;
 		width: -webkit-fill-available;
 	}
+	.weui-dialog__hd {
+		padding: 1.3rem 1.6rem; 
+	}
 </#macro>
 
 <#macro script>
@@ -259,15 +262,18 @@ $(function() {
 					removeItemBykey("compositionList");
 					removeItemBykey("customerInfo");
 					
-					$.confirm({
+					$.modal({
 						title: data.message,
-						text: '继续下单？',
-						onOK: function () {
-							location.href = '${CPATH}/product'
-						},
-						onCancel: function () {
-							location.href = "${CPATH}/order/myOrder";
-						}
+						buttons: [
+							{ text: "查看订单", className: "default", onClick: function(){ 
+								location.href = "${CPATH}/order/myOrder";
+								} 
+							},
+							{ text: "继续下单", className: "primary", onClick: function(){
+								location.href = '${CPATH}/product';
+								} 
+							},
+						]
 					});
 					
 				} else {
