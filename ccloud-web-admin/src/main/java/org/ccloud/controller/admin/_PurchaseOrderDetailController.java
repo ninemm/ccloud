@@ -112,11 +112,11 @@ public class _PurchaseOrderDetailController extends JBaseCRUDController<Purchase
 		Map<String, String[]> paraMap = getParaMap();
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		Seller seller = SellerQuery.me().findById(getSessionAttr("sellerId").toString());
-		/*采购订单：PS + 100000(机构编号或企业编号6位,这里取销售商编码) + 20171108(时间) + 000001(流水号)*/
+		/*采购订单：PO + 100000(机构编号或企业编号6位,这里取销售商编码) + 20171108(时间) + 000001(流水号)*/
 		Date date = new Date();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
 		String str = sdf.format(date);
-		String porderSn = "PS"+seller.getSellerCode().substring(0, 6)+str.substring(0,8)+PurchaseOrderQuery.me().getNewSn();
+		String porderSn = "PO"+seller.getSellerCode().substring(0, 6)+str.substring(0,8)+PurchaseOrderQuery.me().getNewSn();
 		Date date1 = new Date();
 		String Id = StrKit.getRandomUUID();
 		purchaseOrder.set("id", Id);
