@@ -243,7 +243,7 @@
 						<#list historyList.list as orderInfo>
 							<div class="weui-panel weui-panel_access">
 								<div class="weui-cell weui-cell_access">
-									<a href="${CPATH}/order/orderReview?orderId=${orderInfo.id!}&taskId=${orderInfo.taskId!}&assignee=${orderInfo.assignee!}">
+									<a href="${CPATH}/order/orderDetail?orderId=${orderInfo.id!}">
 										<div class="weui-cell__bd ft16">
 											<#if orderInfo.receive_type == 0>
 												<span class="tag">账期</span>
@@ -257,14 +257,14 @@
 												</p>
 												<p>
 													金额：￥<span>${(orderInfo.total_amount)!}</span>
-													<span class="fr" id="date">时间：${(orderInfo.create_date)!}</span>
+													<span class="fr" id="date">时间：${(orderInfo.endTime)!}</span>
 												</p>
 											</div>
 										</div>
 									</a>
 								</div>
 								<div class="weui-cell weui-cell_access">
-									<a class="weui-cell__bd" style="color: gray" href="${CPATH}/order/orderReview?orderId=${orderInfo.id!}&taskId=${orderInfo.taskId!}&assignee=${orderInfo.assignee!}">订单详情</a>
+									<a class="weui-cell__bd" style="color: gray" href="${CPATH}/order/orderDetail?orderId=${orderInfo.id!}">订单详情</a>
 									<span class="weui-cell__ft"></span>
 								</div>
 							</div>

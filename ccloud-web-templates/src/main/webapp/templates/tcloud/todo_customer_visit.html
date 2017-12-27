@@ -194,7 +194,7 @@
 						<#list historyList.list as bean>
 							<div class="weui-panel weui-panel_access">
 								<div class="weui-cell weui-cell_access">
-									<a href="${CPATH}/customerVisit/review?id=${bean.id}&taskId=${bean.taskId!}&assignee=${bean.assignee}">
+									<a href="${CPATH}/customerVisit/detail?id=${bean.id}">
 									<div class="weui-cell__bd">
 										<p class="ft16">${(bean.customer_name)!}</p>
 										<div class="ft14 gray">
@@ -207,8 +207,8 @@
 									</a>
 								</div>
 								<div class="weui-cell weui-cell_access">
-									<a class="weui-cell__bd weui-cell_link" href="${CPATH}/customerVisit/review?id=${bean.id}&taskId=${bean.taskId!}&assignee=${bean.assignee}">客户拜访详情</a>
-									<span class="weui-cell__ft">${(bean.createTime?string('yyyy-MM-dd HH:mm'))!}</span>
+									<a class="weui-cell__bd weui-cell_link" href="${CPATH}/customerVisit/detail?id=${bean.id}">客户拜访详情</a>
+									<span class="weui-cell__ft">${(bean.endTime?string('yyyy-MM-dd HH:mm'))!}</span>
 								</div>
 							</div>
 						</#list>
