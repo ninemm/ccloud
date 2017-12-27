@@ -8,18 +8,25 @@
     }
     
     function cancel() {
-    	Utils.openLoadingWin('撤销中...');
-		$.get('${CPATH}/order/cancel?orderId=' + '${(order.id)!}',
-			function(result) {
-				if (result.errorCode > 0) {
-				    $.toptip(result.message, 'error');
-				} else {
-					location.reload();
-					$.toptip(result.message, 'success');
-				}
-				Utils.closeLoadingWin();
-			}
-		);
+    	$.confirm({
+						title: "订单撤销",
+						text: '是否撤销订单？',
+						onOK: function () {
+							Utils.openLoadingWin('撤销中...');
+							$.get('${CPATH}/order/cancel?orderId=' + '${(order.id)!}',
+								function(result) {
+									if (result.errorCode > 0) {
+									    $.toptip(result.message, 'error');
+									} else {
+										location.reload();
+										$.toptip(result.message, 'success');
+									}
+									Utils.closeLoadingWin();
+								}
+							);
+						}
+					});
+    	
     }
 </#macro>
 

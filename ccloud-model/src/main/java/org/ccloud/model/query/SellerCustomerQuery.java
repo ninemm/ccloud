@@ -313,6 +313,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 		callback.setUserId(userId);
 		callback.setDist(nearby);
 		
+		@SuppressWarnings("unchecked")
 		List<Map<String, Object>> result = (List<Map<String, Object>>) Db.execute(callback);
 		return result;
 	}

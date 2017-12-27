@@ -8,7 +8,7 @@
 </#macro>
 <#macro script>
 	$(function() {
-	    $(document).on('touchend', '.refuse', function() {
+	    $(document).on('click', '.refuse', function() {
 	      layer.open({
 	        type: 1,
 	        title: ['订单审核',
@@ -309,8 +309,8 @@
     <#include "_inc/_goback.html" />    
     <#if isCheck>
     <footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex border-top-1px">
-      <button class="white-button-no-border weui-flex__item refuse">拒绝</button>
-      <button class="red-button weui-flex__item" onclick="doSubmit()">同意</button>
+      <button type = "button" class="white-button-no-border weui-flex__item refuse">拒绝</button>
+      <button type = "button" class="red-button weui-flex__item" onclick="doSubmit()">同意</button>
     </footer>
     </#if>
   </div>
