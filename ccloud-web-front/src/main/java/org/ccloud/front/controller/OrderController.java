@@ -515,4 +515,13 @@ public class OrderController extends BaseFrontController {
 		map.put("orderDetail", orderDetail);
 		renderJson(map);
 	}
+	
+	public void getOrderProductDetail() {
+		String orderId = getPara("orderId");
+		
+		List<Record> orderDetail = SalesOrderDetailQuery.me().findByOrderId(orderId);
+		Map<String, Object> map = new HashMap<>();
+		map.put("orderDetail", orderDetail);
+		renderJson(map);
+	}
 }
