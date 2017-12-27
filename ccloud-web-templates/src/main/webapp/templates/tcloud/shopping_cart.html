@@ -52,7 +52,7 @@ $(function() {
         var bigPrice = $currentInput.val();
 		if(bigPrice < bPrice){
 			$currentInput.val(bPrice);
-			toastr.warning('价格不能小于标准价');
+			$.toptip("价格不能小于标准价!", 'warning'); 
 			return;
 		}
 		$productDetail.find("#smallPrice").val((bigPrice/convert).toFixed(2));
@@ -61,7 +61,7 @@ $(function() {
         var smallPrice = $currentInput.val();
 		if(smallPrice < sPrice){
 			$currentInput.val(sPrice);
-			toastr.warning('价格不能小于标准价');
+			$.toptip("价格不能小于标准价!", 'warning'); 
 			return;
 		}
 		$productDetail.find("#bigPrice").val((smallPrice*convert).toFixed(2));
@@ -70,7 +70,7 @@ $(function() {
         var compositionPrice = $currentInput.val();
 		if(compositionPrice < cPrice){
 			$currentInput.val(cPrice);
-			toastr.warning('价格不能小于标准价');
+			$.toptip("价格不能小于标准价!", 'warning'); 
 			return;
 		}
       }
@@ -416,7 +416,7 @@ function save(){
 	var compositionList = getItemBykey("compositionList") == undefined ? [] : getItemBykey("compositionList");
 
 	if(productList.length == 0 && compositionList.length == 0) {
-		toastr.warning("你的购物车内没有商品!"); 
+		$.toptip("你的购物车内没有商品!", 'warning'); 
 		return;
 	}
 	window.location.href = '${CPATH}/product/order';

@@ -235,7 +235,7 @@ $(function() {
 
 	function doSubmit(){
 		if ($("#sellerCustomerId").val() == "") {
-			toastr.warning('请选择客户');
+			$.toptip("请选择客户", 'warning'); 
 			return;
 		}
 
@@ -278,7 +278,7 @@ $(function() {
 					
 				} else {
 					$("#placeOrder").removeAttr('diabled');
-					toastr.error(data.message);
+					$.toptip(data.message, 'error'); 
 				}
 			},
 			error : function() {

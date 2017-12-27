@@ -204,7 +204,7 @@ public class OrderController extends BaseFrontController {
 		if (this.saveOrder(paraMap, user, sellerId, sellerCode)) {
 			renderAjaxResultForSuccess("下单成功");
 		} else {
-			renderAjaxResultForError("库存不足或提交失败");
+			renderAjaxResultForError("库存不足");
 		}
 	}
 

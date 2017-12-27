@@ -315,7 +315,7 @@ function save(){
 	var compositionList = getItemBykey("compositionList") == undefined ? [] : getItemBykey("compositionList");
 	
 	if(productList.length == 0 && compositionList.length == 0) {
-		toastr.warning("你还没有选择商品!"); 
+		$.toptip("你还没有选择商品!", 'warning'); 
 		return;
 	}
 	window.location.href = '${CPATH}/product/shoppingCart';

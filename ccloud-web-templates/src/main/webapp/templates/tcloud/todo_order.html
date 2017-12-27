@@ -104,7 +104,7 @@
           var refuseReson = $("input[name='refuseReson']:checked").val();
           var comment = $("#comment").val();
           if (refuseReson == undefined && comment == ""){
-            toastr.warning('请选择一个理由');
+         	$.toptip('请选择一个理由', 'warning');
             return;
           }
           doReject(id, taskId, pass, refuseReson, comment, obj);
