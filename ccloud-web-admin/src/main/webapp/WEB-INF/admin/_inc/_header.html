@@ -24,19 +24,23 @@
 						<li>
 							<!-- inner menu: contains the actual data -->
 							<ul class="menu">
-								<li>
+								
 									<!-- start message --> 
-									<a href="${CPATH}/admin">
+									<#if (session.sellerCustomerList??) && (session.sellerCustomerList >0)>
+									<li><a href="${CPATH}/admin">
 										<i class="fa fa-user-plus text-aqua"></i>你有${(session.sellerCustomerList)!}个待审核客户
-								    </a>
-								</li>
+								    </a></li>
+								    </#if>
+								
 								<!-- end message -->
+								<#if (session.orderList??) && (session.orderList > 0)>
 								<li><a href="${CPATH}/admin">
 										<i class="fa fa-file-text-o text-yellow"></i> 你有${(session.orderList)!}个待审核订单
-								</a></li>
+								</a></li></#if>
+								<#if (session.sellerCustomerVisitList??) && (session.sellerCustomerVisitList > 0)>
 								<li><a href="${CPATH}/admin">
 										<i class="fa fa-users text-red"></i>你有${(session.sellerCustomerVisitList)!}个待审核客户拜访
-								</a></li>
+								</a></li></#if>
 							</ul>
 						</li>
 						<li class="footer"><a href="${CPATH}/admin">查看所有</a></li>
