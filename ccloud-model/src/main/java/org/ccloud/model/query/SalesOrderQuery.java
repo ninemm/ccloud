@@ -956,7 +956,7 @@ public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procK
 	//统计今日订单量 销售额
 	public Record queryCountToDayOrders(String userId,String dataArea) {
 		StringBuilder fromBuilder = new StringBuilder(" select count(cso.order_sn) count_order,sum(cso.total_amount) sum_amount from cc_sales_order cso inner join `user` u on u.id = cso.biz_user_id ");
-		fromBuilder.append("where DATE_FORMAT(cso.create_date, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d') ");
+		fromBuilder.append("where DATE_FORMAT(cso.create_date, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d') and cso.`status` <> "+Consts.SALES_ORDER_STATUS_CANCEL+" ");
 		fromBuilder.append("and u.data_area like '"+dataArea+"' ");
 		return Db.findFirst(fromBuilder.toString());
 	}
