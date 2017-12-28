@@ -81,13 +81,13 @@ public class UserGroupRelQuery extends JBaseQuery {
 	}
 	
 	
-	public List<Record> findByUserIdAndGroupId(String id,String groupId) {
+	public Record findByUserIdAndGroupId(String id,String groupId) {
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append("select id from user_group_rel where user_id = ? and group_id =?");
 		LinkedList<Object> params = new LinkedList<Object>();
 		params.add(id);
 		params.add(groupId);
-		return Db.find(stringBuilder.toString(), params.toArray());
+		return Db.findFirst(stringBuilder.toString(), params.toArray());
 
 	}
 	
