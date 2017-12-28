@@ -179,19 +179,19 @@ function confirmInput() {
 }
 
 //阻止滚动后触发touchend事件
-function stopTouchendPropagationAfterScroll() {
-  var locked = false;
-
-  window.addEventListener('touchmove', function (ev) {
-    locked || (locked = true, window.addEventListener('touchend', stopTouchendPropagation, true));
-  }, true);
-
-  function stopTouchendPropagation(ev) {
-    ev.stopPropagation();
-    window.removeEventListener('touchend', stopTouchendPropagation, true);
-    locked = false;
-  }
-}
+//function stopTouchendPropagationAfterScroll() {
+//  var locked = false;
+//
+//  window.addEventListener('touchmove', function (ev) {
+//    locked || (locked = true, window.addEventListener('touchend', stopTouchendPropagation, true));
+//  }, true);
+//
+//  function stopTouchendPropagation(ev) {
+//    ev.stopPropagation();
+//    window.removeEventListener('touchend', stopTouchendPropagation, true);
+//    locked = false;
+//  }
+//}
 
 
 //打开组合搜索
@@ -316,7 +316,7 @@ function wxLocation() {
 
 $(function() {
 	FastClick.attach(document.body);
-	stopTouchendPropagationAfterScroll();
+	// stopTouchendPropagationAfterScroll();
 	$(document).on("touchstart", "#button", function() {
 		if (finished) {
 			if (!open) {
