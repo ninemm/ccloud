@@ -112,6 +112,7 @@ public class OrderController extends BaseFrontController {
 	
 	public void orderReview() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
 
 		String orderId = getPara("orderId");
 		String taskId = getPara("taskId");
@@ -125,6 +126,10 @@ public class OrderController extends BaseFrontController {
 			isCheck = true;
 		}
 		setAttr("isCheck", isCheck);
+		
+		Boolean isEdit = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROCEDURE_REVIEW_EDIT + sellerCode) ;
+		isEdit = (isEdit != null && isEdit) ? true : false;
+		setAttr("isEdit", isEdit);
 
 		setAttr("taskId", taskId);
 		setAttr("order", order);

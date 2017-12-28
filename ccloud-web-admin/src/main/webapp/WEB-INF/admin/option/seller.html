@@ -12,7 +12,7 @@
 	</p>
 	<form action="${CPATH}/admin/option/save" method="POST" id="form">
 		<input type="hidden" name="ucode" value="${ucode}">
-        <input type="hidden" name="autosave" value="seller_store_check_${(session.sellerCode)!},web_procedure_review_${(session.sellerCode)!},web_proc_customer_review_${(session.sellerCode)!},web_proc_customer_visit_${(session.sellerCode)!}">
+        <input type="hidden" name="autosave" value="seller_store_check_${(session.sellerCode)!},web_procedure_review_${(session.sellerCode)!},web_procedure_review_edit_${(session.sellerCode)!},web_proc_customer_review_${(session.sellerCode)!},web_proc_customer_visit_${(session.sellerCode)!}">
         
 		<div class="row">
 			<div class="col-xs-12">
@@ -36,6 +36,17 @@
 						<div class="col-sm-9  jp-set-title-line">
 							<div class="col-sm-6 jp-table-distance-top ">
 								<label><input type="checkbox" value="true" name="web_procedure_review_${(session.sellerCode)!}" ${OPTION_CHECKED('web_procedure_review_${(session.sellerCode)!}')}> 开启流程审核功能 </label>
+							</div>
+						</div>
+						<div class="clr checkbox"></div>
+					</li>
+					<li class="jp-set-pad">
+						<div class="col-sm-3 ">
+							<div class="  jp-set-title-line jp-set-info ">流程审核(订单修改)</div>
+						</div>
+						<div class="col-sm-9  jp-set-title-line">
+							<div class="col-sm-6 jp-table-distance-top ">
+								<label><input type="checkbox" value="true" name="web_procedure_review_edit_${(session.sellerCode)!}" ${OPTION_CHECKED('web_procedure_review_edit_${(session.sellerCode)!}')}> 开启流程审核(订单修改)功能 </label>
 							</div>
 						</div>
 						<div class="clr checkbox"></div>
