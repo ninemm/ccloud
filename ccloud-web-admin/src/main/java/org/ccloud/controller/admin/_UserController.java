@@ -63,10 +63,10 @@ import cn.afterturn.easypoi.excel.entity.ImportParams;
 @RouterMapping(url = "/admin/user", viewPath = "/WEB-INF/admin/user")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
-@RequiresPermissions(value = { "/admin/user", "/admin/all" }, logical = Logical.OR)
 public class _UserController extends JBaseCRUDController<User> {
 
 	@Override
+	@RequiresPermissions(value = { "/admin/user", "/admin/all" }, logical = Logical.OR)
 	public void index() {
 
 		String keyword = getPara("k");
@@ -90,6 +90,7 @@ public class _UserController extends JBaseCRUDController<User> {
 	}
 
 	@Override
+	@RequiresPermissions(value = { "/admin/user", "/admin/all" }, logical = Logical.OR)
 	public void save() {
 
 		final User user = getModel(User.class);
@@ -268,6 +269,7 @@ public class _UserController extends JBaseCRUDController<User> {
 		renderJson(data);
 	}
 
+	@RequiresPermissions(value = { "/admin/user", "/admin/all" }, logical = Logical.OR)
 	public void saveStation() {
 		String id = getPara("userId");
 		String[] ids = getParaValues("stationIds[]");
