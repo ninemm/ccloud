@@ -335,7 +335,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 			detail.setSellProductId(product.getId());
 
 			detail.setProductPrice(product.getPrice());
-			BigDecimal productAmount = new BigDecimal(detail.getProductCount()).divide(new BigDecimal(convert), 2, BigDecimal.ROUND_HALF_UP)
+			BigDecimal productAmount = new BigDecimal(detail.getProductCount()).divide(new BigDecimal(convert))
 					.multiply(product.getPrice());
 			detail.setProductAmount(productAmount);
 			detail.setIsGift(product.getInt("is_gift"));
@@ -422,8 +422,8 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 			Date date, String deptId, String dataArea, Integer index, Integer number, String userId) {
 		List<SalesOrderDetail> detailList = new ArrayList<>();
 		Integer convert = product.getInt("convert_relate");
-		Integer compositionCount = Integer.parseInt(product.getStr("productCount"));
-		Integer productCount = compositionCount * convert * number;
+		double compositionCount = Double.valueOf(product.getStr("productCount"));
+		Integer productCount = (int) Math.round(compositionCount * convert * number);
 		String productId = product.getProductId();
 		Map<String, Object> result = this.getWarehouseId(productId, sellerId, sellerCode, productCount, convert, userId);
 		String status = result.get("status").toString();
@@ -445,7 +445,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 			detail.setSellProductId(product.getId());
 
 			detail.setProductPrice(product.getPrice());
-			BigDecimal productAmount = new BigDecimal(detail.getProductCount()).divide(new BigDecimal(convert), 2, BigDecimal.ROUND_HALF_UP)
+			BigDecimal productAmount = new BigDecimal(detail.getProductCount()).divide(new BigDecimal(convert))
 					.multiply(product.getPrice());
 //			BigDecimal amount = new BigDecimal(product.getInt("productCount")).multiply(product.getPrice());
 			detail.setProductAmount(productAmount);
