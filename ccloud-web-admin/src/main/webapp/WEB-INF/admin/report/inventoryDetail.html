@@ -5,6 +5,8 @@
 	<!-- bootstrap-table -->
 	<script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table.js"></script>
 	<script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table-zh-CN.js"></script>
+	<script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table-export.js"></script>
+	<script src="${CPATH}/static/plugins/bootstrap-table/tableExport.js"></script>
 	<!-- bootstrap-datetimepicker -->
 	<script src="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.min.js"></script>
 	<script src="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.zh-CN.js"></script>
@@ -33,20 +35,22 @@
 		jQuery.mm.initDatetimepicker('form', '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initDatetimepicker('form', '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initValidator('#form', validatorFields)
-		jQuery.mm.initEditTable('#_inventoryDetail_table', url, initParams, initFields(), null);
+		jQuery.mm.initEditTableExport('#_inventoryDetail_table', url, initParams, initFields(), null);
 	});
 	
-	function sequencing(){
-		$('#post-search-input').val("sp.custom_name");
-		 var opt = {
-	        url: "${CPATH}/admin/report/inventoryDetailList",
-	        silent: true,
-	        query:{
-	            type:1,
-	            level:2
-	        }
-	    };
-		$table.bootstrapTable('refresh',opt);
+	var initParams = function(params) {
+		var keyword = $('#post-search-input').val();
+		if (keyword) keyword = encodeURIComponent(keyword);
+		var param = {
+			size: params.limit,
+			page: params.offset/params.limit + 1,
+			warehouse_id: $('#warehouse_id').find("option:selected").val(),
+			startDate: $('#startDate').val() + " 00:00:00",
+			endDate: $('#endDate').val() + " 23:59:59",
+			sortName:params
+		};
+		console.log(params);
+		return param;
 	};
 	
 	function total(){
@@ -74,28 +78,22 @@
 		$table.bootstrapTable('refresh',opt);
 	});
 	
-	var initParams = function(params) {
-
-		var keyword = $('#post-search-input').val();
-		if (keyword) keyword = encodeURIComponent(keyword);
+	$("#export").click(function() {
 		var param = {
-			size: params.limit,
-			page: params.offset/params.limit + 1,
-			k: keyword,
 			warehouse_id: $('#warehouse_id').find("option:selected").val(),
 			startDate: $('#startDate').val() + " 00:00:00",
-			endDate: $('#endDate').val() + " 23:59:59"
-		};
-		return param;
-	};
-
+			endDate: $('#endDate').val() + " 23:59:59",
+		};	
+		jQuery.mm.ajax( '${CPATH}/admin/report/inventoryDetailExport', param, 'json', null);
+	});
+	
 	var initFields = function() {
 		var fields =
 			[
       			{title: "序号", align: "center", edit:false, formatter: function (value, row, index) { return index+1; } },
-      			{field: "seller_name", title: "销售商", align: "center",  edit:false},
-      			{field: "name", title: "仓库", align: "center",  edit:false},
-      			{field: "custom_name", title: "产品", align: "center", edit:false},
+      			{field: "seller_name", title: "销售商", align: "center",  edit:false,sortable: true},
+      			{field: "name", title: "仓库", align: "center",  edit:false,sortable: true},
+      			{field: "custom_name", title: "产品", align: "center", edit:false,sortable: true},
       			{field: "out_count", title: "出库(件)", align: "center", edit:false},
       			{field: "in_count", title: "入库(件)", align: "center", edit:false},
       			{field: "balance_count", title: "剩余(件)", align: "center", edit:false}
@@ -115,7 +113,6 @@
 			}
 		}
 	}
-	
 </#macro>
 
 <@layout active_id=p child_active_id=c>
@@ -133,18 +130,16 @@
 	<form class="form-inline" id="form" >
 		<div class="row content-row">
 			<div class="form-group col-sm-12" style="float: right">
-					<input id="post-search-input" class="form-control" type="hidden" value="${k!}" name="k" >&nbsp;
-					<input onclick="sequencing()" class="btn btn-sm btn-primary" type="button" value="产品排序">
-					<input onclick="total()" class="btn btn-sm btn-primary" type="button" value="产品总计">
-					<label class="control-label">盘点仓库:</label>
-					<div class="input-group col-md-3 col-sm-6">
-						<select class="form-control input-sm" name="warehouse_id" id="warehouse_id">
-							<option value="">--请选择--</option>
-							<#list (wlist)! as warehouse >
-								<option value="${warehouse.id}">${(warehouse.name)!}</option>
-							</#list>
-						</select>
-	               	</div>
+				<input onclick="total()" class="btn btn-sm btn-primary" type="button" value="产品总计">
+				<label class="control-label">盘点仓库:</label>
+				<div class="input-group col-md-2 col-sm-3">
+					<select class="form-control input-sm" name="warehouse_id" id="warehouse_id" style="height:34px">
+						<option value="">--请选择--</option>
+						<#list (wlist)! as warehouse >
+							<option value="${warehouse.id}">${(warehouse.name)!}</option>
+						</#list>
+					</select>
+               	</div>
 				
 				<div class="form-group validata-box">
 					<label class="control-label">开始时间:</label>
@@ -158,13 +153,12 @@
 						<input id="endDate" class="form-control" value="${endDate!}" name="endDate" placeholder="结束日期" >&nbsp;
 					</div>
 				</div>
-				
-				<input id="search-submit" class="btn btn-sm btn-primary" type="button" value="搜索">
+				<input id="search-submit" class="btn btn-sm btn-primary " type="button" value="搜索">
 				</div>
 			</div>
 		</form>
 	<div class="box">
-		<table class="table table-striped table-hover table-condensed" id="_inventoryDetail_table" ></table>
+		<table class="table table-striped table-hover table-condensed" id="_inventoryDetail_table"></table>
 	</div>
 	<!-- /.box -->
 </section>

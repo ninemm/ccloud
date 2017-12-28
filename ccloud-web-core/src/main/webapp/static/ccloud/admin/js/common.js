@@ -505,37 +505,47 @@ jQuery.mm = {
 			columns: fields,
 			onEditableSave: editableSaveFunc || function () {},
 			onClickCell: clickCellFunc || function () {}
+			
 		});
+	},
+	
+	initEditTableExport : function(tableId, url, queryParams, fields, editableSaveFunc, clickCellFunc) {
 		
+		tableId = tableId || "_table";
+		
+		$(tableId).bootstrapTable({
+			url: url,
+			method: 'get',
+			editable: true,//开启编辑模式
+			clickToSelect: true,
+			uniqueId: 'id',
+			striped: true,
+			classes: 'table-no-bordered',
+			sortable: true,                  //是否启用排序
+			sortOrder: "asc",                //排序方式
+			cache: false,					// 是否使用缓存
+			pagination: true,				// 是否显示分页
+			queryParams: queryParams,		// 传递参数
+			sidePagination: 'server', 		//分页方式：client客户端分页，server服务端分页（*）
+			paginationLoop: false,
+			paginationPreText: '上一页',
+			paginationNextText: '下一页',
+			pageNumber: 1,
+			pageSize: 10,
+			smartDisplay: false,
+			undefinedText: '',
+			columns: fields,
+			showExport: true,  //是否显示导出按钮  
+			buttonsAlign:"right",  //按钮位置  
+			exportTypes:['excel'],  //导出文件类型  
+			exportDataType: "all",
+			onEditableSave: editableSaveFunc || function () {},
+			onClickCell: clickCellFunc || function () {}
+			
+		});
 	},
 
     initUnPageEditTable : function(tableId, url, queryParams, fields, editableSaveFunc, clickCellFunc) {
-
-        tableId = tableId || "_table";
-
-        $(tableId).bootstrapTable({
-            url: url,
-            method: 'get',
-            editable: true,//开启编辑模式
-            clickToSelect: true,
-            uniqueId: 'id',
-            striped: true,
-            classes: 'table-no-bordered',
-            cache: false,					// 是否使用缓存
-            pagination: false,				// 是否显示分页
-            queryParams: queryParams,		// 传递参数
-            sidePagination: 'server', 		//分页方式：client客户端分页，server服务端分页（*）
-            paginationLoop: false,
-            smartDisplay: false,
-            undefinedText: '',
-            columns: fields,
-            onEditableSave: editableSaveFunc,
-            onClickCell: clickCellFunc || function () {}
-        });
-
-    },
-    
-    initUnPageEditTable1 : function(tableId, url, queryParams, fields, editableSaveFunc, clickCellFunc) {
 
         tableId = tableId || "_table";
 

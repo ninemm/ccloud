@@ -16,6 +16,7 @@
 package org.ccloud.controller.admin;
 
 import java.text.DecimalFormat;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,13 +31,11 @@ import org.ccloud.interceptor.UCodeInterceptor;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.Department;
-import org.ccloud.model.Seller;
 import org.ccloud.model.User;
 import org.ccloud.model.query.CustomerVisitQuery;
 import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SellerCustomerQuery;
-import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.UserJoinCustomerQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
@@ -196,8 +195,11 @@ public class _AdminController extends JBaseController {
 					setAttr("sellerList", sellerList);
 					setSessionAttr("sellerList", sellerList);
 					forwardAction("/admin/choice");
-					int i = sellerList.size();
-					renderJson(i);
+					Map<String, Object> map = new HashMap<>();
+					map.put("mobile", mobile);
+					map.put("sellerList", sellerList);
+					map.put("size", sellerList.size());
+					renderJson(map);
 					return ;
 				}
 				
@@ -229,9 +231,9 @@ public class _AdminController extends JBaseController {
 	@Clear(AdminInterceptor.class)
 	public void choice() { 
 		List<Map<String, String>> sellerList = getSessionAttr("sellerList");
+		String moblie = getPara("mobile");
 		setAttr("sellerList", sellerList);
-		Seller seller = SellerQuery.me().findById(sellerList.get(0).get("seller_id"));
-		setAttr("mobile",seller.getPhone());
+		setAttr("mobile",moblie);
 		//keepPara();
 		render("choice.html");
 		

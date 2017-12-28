@@ -63,10 +63,10 @@ import cn.afterturn.easypoi.excel.entity.ImportParams;
 @RouterMapping(url = "/admin/user", viewPath = "/WEB-INF/admin/user")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
-@RequiresPermissions(value = { "/admin/user", "/admin/all" }, logical = Logical.OR)
 public class _UserController extends JBaseCRUDController<User> {
 
 	@Override
+	@RequiresPermissions(value = { "/admin/user", "/admin/all" }, logical = Logical.OR)
 	public void index() {
 
 		String keyword = getPara("k");
@@ -90,6 +90,7 @@ public class _UserController extends JBaseCRUDController<User> {
 	}
 
 	@Override
+	@RequiresPermissions(value = { "/admin/user", "/admin/all" }, logical = Logical.OR)
 	public void save() {
 
 		final User user = getModel(User.class);
@@ -268,6 +269,7 @@ public class _UserController extends JBaseCRUDController<User> {
 		renderJson(data);
 	}
 
+	@RequiresPermissions(value = { "/admin/user", "/admin/all" }, logical = Logical.OR)
 	public void saveStation() {
 		String id = getPara("userId");
 		String[] ids = getParaValues("stationIds[]");
@@ -446,5 +448,25 @@ public class _UserController extends JBaseCRUDController<User> {
 		user.set("mobile", excel.getMobile());
 		user.set("status", 1);
 		user.set("create_date", new Date());
-	}	
+	}
+	
+	public void updatePassword() {
+		render("password.html");
+	}
+	
+	public void changePassword() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String oldPassword = getPara("oldPassword");
+		oldPassword = EncryptUtils.encryptPassword(new String(oldPassword), user.getSalt());
+		if (!oldPassword.equals(user.getPassword())) {
+			renderAjaxResultForError("旧密码错误,请重新输入!");
+		} else {
+			String newPassword = getPara("newPassword");
+			newPassword = EncryptUtils.encryptPassword(new String(newPassword), user.getSalt());
+			user.setPassword(newPassword);
+			user.update();
+			renderAjaxResultForSuccess("修改成功");
+		}
+	}
+	
 }

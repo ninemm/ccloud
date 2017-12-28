@@ -1,13 +1,13 @@
 <#include "../_inc/_layout.html"/>
 
 <#macro script_import>
-
 	<script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table.js"></script>
 	<script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table-zh-CN.js"></script>
 	<script src="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.min.js"></script>
 	<script src="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.zh-CN.js"></script>
 	<script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
-
+	<script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table-export.js"></script>
+	<script src="${CPATH}/static/plugins/bootstrap-table/tableExport.js"></script>
 </#macro>
 
 <#macro css_import>
@@ -28,8 +28,8 @@
 		jQuery.mm.initDatetimepicker('form', '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initDatetimepicker('form', '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initValidator('#form', validatorFields);
-		jQuery.mm.initEditTable('#_productReport_table',url, initParams, initFields(), null);
-		jQuery.mm.initEditTable('#_productReportGift_table',urlGift, initParams, initFieldsGift(), null);
+		jQuery.mm.initEditTableExport('#_productReport_table',url, initParams, initFields(), null);
+		jQuery.mm.initEditTableExport('#_productReportGift_table',urlGift, initParams, initFieldsGift(), null);
 	});
 
 	var initParams = function(params) {
