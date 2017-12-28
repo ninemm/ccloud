@@ -1252,7 +1252,7 @@ public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procK
 	}
 	
 	public List<Record> getUserRank(String startDate, String endDate, String dayTag, String deptId, String sellerId,
-			String dataArea) {
+			String orderTag, String dataArea) {
 		if (dayTag != null) {
 			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
 			startDate = date[0];
@@ -1285,7 +1285,12 @@ public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procK
 			params.add(endDate);
 		}
 		fromBuilder.append("GROUP BY u.id ");
-		fromBuilder.append("ORDER BY productCount desc ");
+		
+		if (StrKit.notBlank(orderTag)) {
+			fromBuilder.append("ORDER BY "+ orderTag + " desc ");
+		} else {
+			fromBuilder.append("ORDER BY productCount desc ");
+		}
 		
 		if (params.isEmpty())
 			return Db.find(fromBuilder.toString());
