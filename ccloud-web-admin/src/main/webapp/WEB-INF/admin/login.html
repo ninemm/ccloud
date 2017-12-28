@@ -88,8 +88,9 @@
 					type : "post", 
 					dataType : "json", 
 					success : function(data) { 
-						if(data>1){
-							location.href = "${CPATH}/admin/choice?sellerList="+'${(sellerList)!}';
+						if(data.size>1){
+							console.log('${(session.mobile)!}');
+							location.href = "${CPATH}/admin/choice?sellerList="+data.sellerList+"&mobile="+data.mobile;
 						}else if(data == false){
 							$("#p").show();
 							$("#uname").show();
