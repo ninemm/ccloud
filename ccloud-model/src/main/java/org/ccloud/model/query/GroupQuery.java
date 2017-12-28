@@ -115,4 +115,9 @@ public class GroupQuery extends JBaseQuery {
 	public List<Group> findByDeptId(String id) {
 		return DAO.doFind("dept_id = ?", id);
 	}
+	
+	public Group findDataAreaAndGroupName(String dataArea,String groupName){
+		String sql = "select * from `group` where data_area = ? and group_name = ?";
+		return DAO.findFirst(sql, dataArea,groupName);
+	}
 }

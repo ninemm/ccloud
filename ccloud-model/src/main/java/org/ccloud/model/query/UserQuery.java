@@ -299,4 +299,10 @@ public class UserQuery extends JBaseQuery {
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 	
+	public User findByUsernameAndMobileAndDeptId(String username,String moblie,String deptId){
+		String sql = "select * from user where username = ? or ( mobile = ? and department_id = ?)";
+		return DAO.findFirst(sql, username , moblie , deptId);
+	}
+	
+	
 }
