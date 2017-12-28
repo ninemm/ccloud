@@ -19,18 +19,37 @@
 	          '<div class="refuse-radio"><label><input type="radio" name="refuseReson" id="" value="库存无足够货物">库存无足够货物</label></div>' +
 	          '<div class="refuse-radio"><label><input type="radio" name="refuseReson" id="" value="产品价格滞后">产品价格滞后</label></div>' +
 	          '<div class="refuse-radio"><label><input type="radio" name="refuseReson" id="" value="该商家已被停用">该商家已被停用</label></div>'+
-	          '<div><textarea id="comment" placeholder="补充说明，可选填"></textarea></div>',
+	          '<div><textarea id="comments" placeholder="补充说明，可选填"></textarea></div>',
 	        anim: 'scale',
 	        className: 'audit',
 	        btn: ['确认拒绝','取消拒绝'],
 	        yes: function() {
 	          parent.refuseReson = $("input[name='refuseReson']:checked").val();
-	          parent.comment = $("#comment").val();
+	          parent.comment = $("#comments").val();
 	          if (parent.refuseReson == undefined && parent.comment == ""){
-	            $.toptip('请选择一个理由', 'warning');;
+	            $.toptip('请选择一个理由', 'warning');
 	            return;
 	          }
 	          doReject(0);
+	        },
+	        no:function() {
+	
+	        }
+	      });
+	    }).on('click', '.agree', function() {
+	      layer.open({
+	        type: 1,
+	        title: ['订单审核',
+	          'border-bottom: 1px solid #eee;height:2rem;line-height:2rem'
+	        ],
+	        content: '<p class="t-c">是否确认通过该订单？</p>' +
+	          '<div><textarea id="comments" placeholder="补充说明，可选填"></textarea></div>',
+	        anim: 'scale',
+	        className: 'audit',
+	        btn: ['通过','取消'],
+	        yes: function() {
+	          parent.$("#comment").val($("#comments").val());
+	          doPass();
 	        },
 	        no:function() {
 	
@@ -95,7 +114,7 @@
 		)
 	};
 	
-	function doSubmit(){
+	function doPass(){
 		layer.open({
 			type: 2,
 			content: '保存中...'
@@ -176,6 +195,7 @@
 	      <input type="hidden" name="id" value="${(order.id)!}">
 	      <input type="hidden" name="taskId" value="${(taskId)!}">
 	      <input type="hidden" name="pass" value="1">
+	      <input type="hidden" name="comment" id="comment" value="">
 	      <input type="hidden" name="edit" id="edit" value="0">
 	      <input type="hidden" name="factor" id="factor" value="${(order.factor)!}">
 	      <div class="weui-panel weui-panel_access">
@@ -310,7 +330,7 @@
     <#if isCheck>
     <footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex border-top-1px">
       <button type = "button" class="white-button-no-border weui-flex__item refuse">拒绝</button>
-      <button type = "button" class="red-button weui-flex__item" onclick="doSubmit()">同意</button>
+      <button type = "button" class="red-button weui-flex__item agree">同意</button>
     </footer>
     </#if>
   </div>

@@ -78,7 +78,7 @@ public class OrderController extends BaseFrontController {
 	}
 
 	public void orderList() {
-		
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 
@@ -94,6 +94,7 @@ public class OrderController extends BaseFrontController {
 
 		Map<String, Object> map = new HashMap<>();
 		map.put("orderList", orderList.getList());
+		map.put("username", user.getUsername());
 		renderJson(map);
 	}
 

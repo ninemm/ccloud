@@ -114,6 +114,27 @@
         }
       });
 	}
+	
+    function agree(id, taskId, pass, obj) {
+      layer.open({
+        type: 1,
+        title: ['订单审核',
+          'border-bottom: 1px solid #eee;height:2rem;line-height:2rem'
+        ],
+        content: '<p class="t-c">是否确认通过该订单？</p>' +
+          '<div><textarea id="comment" placeholder="补充说明，可选填"></textarea></div>',
+        anim: 'scale',
+        className: 'audit',
+        btn: ['通过','取消'],
+        yes: function() {
+          var comment = $("#comment").val();
+          doPass(id, taskId, pass, comment, obj);
+        },
+        no:function() {
+
+        }
+      });
+	}
 
 	function doReject(id, taskId, pass, refuseReson, comment, obj){
 		var $this = $(obj);
@@ -152,13 +173,19 @@
 		)
 	};
 
-	function doSubmit(url, obj) {
+	function doPass(id, taskId, pass, comment, obj) {
 		var $this = $(obj);
 		layer.open({
 			type: 2,
 			content: '保存中...'
 		});
-		$.get(url ,
+		var params = {
+			"id": id,
+			"taskId": taskId,
+			"comment": comment,
+			'pass' : pass
+		}
+		Utils.ajax('${CPATH}/order/complete', params, 
 			function(res){
 				if (res.errorCode == 0) {
 					$.confirm({
@@ -224,7 +251,7 @@
 									<div class="weui-cell weui-cell_access">
 										<div class="width-100 ft14 operate-btn">
 												<div class="button white-button fl" onclick="refuse('${(order.id)!}', '${(order.taskId)!}', 0, this)">拒绝</div>
-												<div class="button red-button fr" onclick="doSubmit('${CPATH}/order/complete?id=${(order.id)!}&taskId=${(order.taskId)!}&pass=1', this)">同意</div>
+												<div class="button red-button fr" onclick="agree('${(order.id)!}', '${(order.taskId)!}', 1, this)">同意</div>
 										</div>
 									</div>
 								</#if>

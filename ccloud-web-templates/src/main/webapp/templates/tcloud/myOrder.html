@@ -113,7 +113,7 @@
 					$newOrder.find("#customerName").text(el.customer_name);
 					$newOrder.find("#oId").val(el.id);
 					$newOrder.find(".appendOrdeProductDetail").attr('id',"p"+el.id);
-					$newOrder.find("#contact").text(el.contact + '/' + el.mobile);
+					$newOrder.find("#contact").text(el.ccontact + '/' + el.cmobile);
 					$newOrder.find("#customerType").text(el.customerTypeName);
 					if(el.status == 0) {
 						$newOrder.find("#cancel").on('click', function() {
@@ -141,6 +141,15 @@
  						 window.location.href = "${CPATH}/order/operateHistory?id=" + el.id + "&proc_inst_id=" + el.proc_inst_id;
  						 event.stopPropagation();
 					});
+
+					var assignee = el.assignee == null ? '' : el.assignee.split(',');
+					if(el.taskId != null && $.inArray(data.username, assignee) != -1) {
+						$newOrder.find("#pass").on('click', function() {
+							agree(el.id, el.taskId, 1);
+						});
+					} else {
+						$newOrder.find("#pass").remove();
+					}
 
 					$newOrder.find("#amount").text(el.total_amount);
 					$newOrder.find("#date").text('时间：' + el.create_date);
@@ -223,10 +232,10 @@
             $.each(data.orderDetail, function(idx, item) {
                 var productName = "";
                 if(item.is_gift == 0){
-                productName = item.custom_name;
+                    productName = item.custom_name;
                 }else{
-                productName = "<span class='tag'>赠品</span>";
-                productName = productName + item.custom_name;
+                    productName = "<span class='tag'>赠品</span>";
+                    productName = productName + item.custom_name;
                 }
                 var bigCount = parseInt(item.product_count/item.convert_relate);//下单大单位数量
                 var smallPrice = (item.product_amount/item.product_count).toFixed(2);//下单小价格
@@ -234,16 +243,16 @@
                 var smallCount = (item.product_count %  item.convert_relate);//下单小单位数量
                 
                 str += "<div><p id='o"+ orderId +"'>" +productName+ "</p>"+
-                "<div class='weui-flex'><div class='weui-flex__item flex-grow2'>"+
-                "<div class='fr width-60'>￥"+item.product_price+" "+
-                "<span class='gray'>("+ item.price +")</span>"+
-                "</div></div><div class='weui-flex__item t-r'>"+bigCount+" "+item.big_unit+" "+
-                "</div></div></div>"+
-                "<div class='weui-flex'><div class='weui-flex__item flex-grow2'>"+
-                "<div class='fr width-60'>￥"+smallPrice+" "+
-                "<span class='gray'>("+sPrice+")</span></div></div>"+
-                "<div class='weui-flex__item t-r'>"+smallCount+" " +item.small_unit+" "+
-                "</div></div>"; 
+                    "<div class='weui-flex'><div class='weui-flex__item flex-grow2'>"+
+                    "<div class='fr width-60'>￥"+item.product_price+" "+
+                    "<span class='gray'>("+ item.price +")</span>"+
+                    "</div></div><div class='weui-flex__item t-r'>"+bigCount+" "+item.big_unit+" "+
+                    "</div></div></div>"+
+                    "<div class='weui-flex'><div class='weui-flex__item flex-grow2'>"+
+                    "<div class='fr width-60'>￥"+smallPrice+" "+
+                    "<span class='gray'>("+sPrice+")</span></div></div>"+
+                    "<div class='weui-flex__item t-r'>"+smallCount+" " +item.small_unit+" "+
+                    "</div></div>"; 
             });
             
             $("#p"+orderId).append(str);
@@ -251,6 +260,51 @@
         });
 	  }  
 	}
+	
+    function agree(id, taskId, pass) {
+      layer.open({
+        type: 1,
+        title: ['订单审核',
+          'border-bottom: 1px solid #eee;height:2rem;line-height:2rem'
+        ],
+        content: '<p class="t-c">是否确认通过该订单？</p>' +
+          '<div><textarea id="comment" placeholder="补充说明，可选填"></textarea></div>',
+        anim: 'scale',
+        className: 'audit',
+        btn: ['通过','取消'],
+        yes: function() {
+          var comment = $("#comment").val();
+          doPass(id, taskId, pass, comment);
+        },
+        no:function() {
+
+        }
+      });
+	}
+	
+	function doPass(id, taskId, pass, comment){
+		layer.open({
+			type: 2,
+			content: '保存中...'
+		});
+		var params = {
+			"id": id,
+			"taskId": taskId,
+			"comment": comment,
+			'pass' : pass
+		}
+		Utils.ajax('${CPATH}/order/complete', params, 
+			function(res){
+				if (res.errorCode > 0) {
+				    $.toptip(res.message, 'error');
+				} else {
+					$.toptip(res.message, 'success');
+					combo();
+				}
+				layer.closeAll();
+			}
+		)
+	};
 	
 </#macro>
 
@@ -314,7 +368,7 @@
 						<hr>
 						<div id="cancel" class="button red-button fl">撤销</div>
 						<div id="orderAgain" class="button white-button fr">再次购买</div>
-						<div id="" class="button yellow-button fr m-r-5 none">审核通过</div>
+						<div id="pass" class="button yellow-button fr m-r-5">审核通过</div>
 					</div>
 				</div>
 			</div>
