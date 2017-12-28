@@ -94,7 +94,7 @@ public class GoodsCategoryQuery extends JBaseQuery {
 	}
 
 	public List<Map<String, Object>> findCategoryListAsTree(int i) {
-		List<GoodsCategory> list = findCategoryList(null, "cc.grade asc");
+		List<GoodsCategory> list = findCategoryList(null, "");
 		ModelSorter.tree(list);
 		List<Map<String, Object>> resTreeList = new ArrayList<>();
 		Map<String, Object> map = new HashMap<>();
@@ -162,14 +162,14 @@ public class GoodsCategoryQuery extends JBaseQuery {
 
 		fromBuilder.append(" order by ");
 		if (StrKit.isBlank(orderBy)) {
-			fromBuilder.append("cc.order_list asc ");
+			fromBuilder.append("cc.grade,cc.order_list asc ");
 			return;
 		}
 
 		String orderbyInfo[] = orderBy.trim().split("\\s+");
 		orderBy = orderbyInfo[0];
 
-		fromBuilder.append("cc.order_list ");
+		fromBuilder.append("cc.grade,cc.order_list ");
 
 		if (orderbyInfo.length == 1) {
 			fromBuilder.append("asc");

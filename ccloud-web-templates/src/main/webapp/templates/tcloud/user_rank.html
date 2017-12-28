@@ -57,6 +57,7 @@
 			}
 			productAndRank(params); 
             $(obj).find(".dayTagText").text('今日')
+            $("#dayTag").val('today');
           }
         }, {
           text: "昨日",
@@ -66,6 +67,7 @@
 			}
           	productAndRank(params);
             $(obj).find(".dayTagText").text('昨日')
+            $("#dayTag").val('yesterday');
           }
         }, {
           text: "本周",
@@ -75,6 +77,7 @@
 			}
 			productAndRank(params);   
           	$(obj).find(".dayTagText").text('本周')
+          	$("#dayTag").val('week');
           }
         }, {
           text: "上周",
@@ -84,6 +87,7 @@
 			}
           productAndRank(params);
           $(obj).find(".dayTagText").text('上周')
+          $("#dayTag").val('lastweek');
           }
         }, {
           text: "本月",
@@ -93,6 +97,7 @@
 			}     
 			productAndRank(params);   
          	$(obj).find(".dayTagText").text('本月')
+         	$("#dayTag").val('month');
           }
         }, {
           text: "上月",
@@ -102,10 +107,47 @@
 			}         
 			productAndRank(params);
           	$(obj).find(".dayTagText").text('上月')
+          	$("#dayTag").val('lastmonth');
           }
         }]
       }); 	
- 	}     	
+ 	}
+ 	
+ 	function orderSelect(obj,type) {
+      $.actions({
+        actions: [{
+          text: "金额",
+          onClick: function () {
+			var params = {
+				"orderTag": 'totalAmount',
+				"dayTag": $("#dayTag").val()
+			}
+			productAndRank(params); 
+            $(obj).find(".orderTagText").text('金额')
+          }
+        }, {
+          text: "件数",
+          onClick: function () {
+			var params = {
+				"orderTag": 'productCount',
+				"dayTag": $("#dayTag").val()
+			}
+          	productAndRank(params);
+            $(obj).find(".orderTagText").text('件数')
+          }
+        }, {
+          text: "笔数",
+          onClick: function () {
+			var params = {
+				"orderTag": 'orderCount',
+				"dayTag": $("#dayTag").val()
+			}
+			productAndRank(params);   
+          	$(obj).find(".orderTagText").text('笔数')
+          }
+        }]
+      }); 	
+ 	}  	   	
 </#macro> 
 
 <@layout>
@@ -136,8 +178,12 @@
         <div class="weui-panel__hd">
             <span class="overview-hd-title wi">销售排行(top10)</span>
             <span class="briefly" onclick="dayTagSelect(this)">
+            	<input type="hidden" id="dayTag">
 				<p class="dayTagText">今日</p>
-			</span> 
+			</span>
+            <span class="briefly" onclick="orderSelect(this)">
+				<p class="orderTagText">金额</p>
+			</span> 			
         </div>
         <div class="weui-panel__bd">
             <div class="weui-media-box ft14" id="userRankAsc">
@@ -154,4 +200,5 @@
         </div>
     </div>    
 </article>
+<#include "_inc/_footer_nav.html" />
 </@layout>
