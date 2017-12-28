@@ -67,7 +67,7 @@ public class _GoodsCategoryController extends JBaseCRUDController<GoodsCategory>
         String parentId = getPara("parentId", "0");
 
         Page<GoodsCategory> page = GoodsCategoryQuery.me().
-        		paginate(getPageNumber(), getPageSize(), parentId, keyword, "order_list");
+        		paginate(getPageNumber(), getPageSize(), parentId, keyword, "cc.order_list asc");
         Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);		
 		
