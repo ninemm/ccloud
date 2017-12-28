@@ -387,6 +387,24 @@ public class SalesOrderQuery extends JBaseQuery {
 		sb.append(" order by o.create_date ");
 		return DAO.find(sb.toString(), username);
 	}
+	
+public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procKey, String username) {
+		
+		String select = "SELECT o.*, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName,i.TASK_ID_ taskId, i.ACT_NAME_ taskName, i.ASSIGNEE_ assignee, i.END_TIME_ endTime  ";
+		LinkedList<Object> params = new LinkedList<>();
+		params.add(username);
+
+		StringBuilder sql = new StringBuilder(" FROM cc_sales_order o ");
+		sql.append(" left join cc_seller_customer cc ON o.customer_id = cc.id ");
+		sql.append(" left join cc_customer c on cc.customer_id = c.id ");
+		sql.append(" left join cc_customer_type ct on o.customer_type_id = ct.id ");
+		sql.append(" JOIN act_hi_actinst i on o.proc_inst_id = i.PROC_INST_ID_ ");
+		sql.append(" JOIN act_re_procdef p on p.ID_ = i.PROC_DEF_ID_ ");
+		sql.append(" WHERE p.KEY_ not in ('_customer_visit_review','_customer_audit') and o.status <>0 and locate(?, i.ASSIGNEE_) > 0 AND i.DURATION_ is not null ");
+		sql.append(" order by i.END_TIME_ desc ");
+
+		return Db.paginate(pageNumber, pageSize, select, sql.toString(), params.toArray());
+	}
 
 
 	//我的客户类型
@@ -938,7 +956,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	//统计今日订单量 销售额
 	public Record queryCountToDayOrders(String userId,String dataArea) {
 		StringBuilder fromBuilder = new StringBuilder(" select count(cso.order_sn) count_order,sum(cso.total_amount) sum_amount from cc_sales_order cso inner join `user` u on u.id = cso.biz_user_id ");
-		fromBuilder.append("where DATE_FORMAT(cso.create_date, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d') ");
+		fromBuilder.append("where DATE_FORMAT(cso.create_date, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d') and cso.`status` <> "+Consts.SALES_ORDER_STATUS_CANCEL+" ");
 		fromBuilder.append("and u.data_area like '"+dataArea+"' ");
 		return Db.findFirst(fromBuilder.toString());
 	}
@@ -1636,5 +1654,23 @@ public class SalesOrderQuery extends JBaseQuery {
 			return Db.find(fromBuilder.toString());
 
 		return Db.find(fromBuilder.toString(), params.toArray());
+	}
+	
+	public Record findMoreBySn(final String re_sn) {
+		StringBuilder fromBuilder = new StringBuilder(" select o.*,c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as typeCode,ct.proc_def_key, u.realname, u.mobile, cp.factor ,cc.id as sellerCustomerId,cc.customer_kind ");
+		fromBuilder.append(" from `cc_sales_order` o ");
+		fromBuilder.append(" left join cc_seller_customer cc ON o.customer_id = cc.id ");
+		fromBuilder.append(" left join cc_customer c on cc.customer_id = c.id ");
+		fromBuilder.append(" left join cc_customer_type ct on o.customer_type_id = ct.id ");
+		fromBuilder.append(" left join cc_price_system cp on cp.id = ct.price_system_id ");
+		fromBuilder.append(" left join user u on o.biz_user_id = u.id ");
+		fromBuilder.append(" where o.order_sn = ? ");
+
+		return Db.findFirst(fromBuilder.toString(), re_sn);
+	}
+	
+	public SalesOrder findByOrderSn(String orderSn){
+		String sql = "select * from cc_sales_order where order_sn = ?";
+		return DAO.findFirst(sql, orderSn);
 	}
 }

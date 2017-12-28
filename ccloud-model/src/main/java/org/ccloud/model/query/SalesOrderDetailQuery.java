@@ -312,8 +312,8 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 			Date date, String deptId, String dataArea, Integer number, String userId) {
 		List<SalesOrderDetail> detailList = new ArrayList<>();
 		Integer convert = product.getInt("convert_relate");
-		Integer compositionCount = Integer.parseInt(product.getStr("productCount"));
-		Integer productCount = compositionCount * convert * number;
+		double compositionCount = Double.valueOf(product.getStr("productCount"));
+		Integer productCount = (int) Math.round(compositionCount * convert * number);
 		String productId = product.getProductId();
 		Map<String, Object> result = this.getWarehouseId(productId, sellerId, sellerCode, productCount, convert, userId);
 		String status = result.get("status").toString();
@@ -335,7 +335,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 			detail.setSellProductId(product.getId());
 
 			detail.setProductPrice(product.getPrice());
-			BigDecimal productAmount = new BigDecimal(detail.getProductCount()).divide(new BigDecimal(convert), 2, BigDecimal.ROUND_HALF_UP)
+			BigDecimal productAmount = new BigDecimal(detail.getProductCount()).divide(new BigDecimal(convert))
 					.multiply(product.getPrice());
 			detail.setProductAmount(productAmount);
 			detail.setIsGift(product.getInt("is_gift"));
@@ -422,8 +422,8 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 			Date date, String deptId, String dataArea, Integer index, Integer number, String userId) {
 		List<SalesOrderDetail> detailList = new ArrayList<>();
 		Integer convert = product.getInt("convert_relate");
-		Integer compositionCount = Integer.parseInt(product.getStr("productCount"));
-		Integer productCount = compositionCount * convert * number;
+		double compositionCount = Double.valueOf(product.getStr("productCount"));
+		Integer productCount = (int) Math.round(compositionCount * convert * number);
 		String productId = product.getProductId();
 		Map<String, Object> result = this.getWarehouseId(productId, sellerId, sellerCode, productCount, convert, userId);
 		String status = result.get("status").toString();
@@ -445,7 +445,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 			detail.setSellProductId(product.getId());
 
 			detail.setProductPrice(product.getPrice());
-			BigDecimal productAmount = new BigDecimal(detail.getProductCount()).divide(new BigDecimal(convert), 2, BigDecimal.ROUND_HALF_UP)
+			BigDecimal productAmount = new BigDecimal(detail.getProductCount()).divide(new BigDecimal(convert))
 					.multiply(product.getPrice());
 //			BigDecimal amount = new BigDecimal(product.getInt("productCount")).multiply(product.getPrice());
 			detail.setProductAmount(productAmount);
@@ -465,6 +465,23 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 			return false;
 		}
 		return true;
+	}
+	
+	public List<Record> findByOrderSn(String order_sn) {
+
+		StringBuilder sqlBuilder = new StringBuilder(
+				" SELECT sod.*, sp.custom_name, sp.price, p.big_unit, p.small_unit, p.convert_relate, p.id as productId, w.code as warehouseCode, t1.valueName ");
+		sqlBuilder.append(" from `cc_sales_order_detail` sod ");
+		sqlBuilder.append(" INNER JOIN cc_sales_order cso on cso.id = sod.order_id ");
+		sqlBuilder.append(" LEFT JOIN cc_seller_product sp ON sod.sell_product_id = sp.id ");
+		sqlBuilder.append(" LEFT JOIN cc_product p ON sp.product_id = p.id ");
+		sqlBuilder.append(" LEFT JOIN cc_warehouse w ON sod.warehouse_id = w.id ");
+		sqlBuilder.append("LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
+		sqlBuilder.append("RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = p.id ");			
+		sqlBuilder.append(" WHERE cso.order_sn = ? ");
+		sqlBuilder.append(" ORDER BY sod.warehouse_id, sod.is_gift ");
+
+		return Db.find(sqlBuilder.toString(), order_sn);
 	}
 
 }

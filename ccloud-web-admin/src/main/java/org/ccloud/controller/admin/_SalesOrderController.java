@@ -626,4 +626,17 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		return stringBuilder.toString();
 	}
 	
+	public void detailBySn() {
+
+		String order_sn = getPara(0);
+
+		Record order = SalesOrderQuery.me().findMoreBySn(order_sn);
+		List<Record> orderDetail = SalesOrderDetailQuery.me().findByOrderSn(order_sn);
+
+		setAttr("order", order);
+		setAttr("orderDetail", orderDetail);
+
+		render("detail.html");
+
+	}
 }

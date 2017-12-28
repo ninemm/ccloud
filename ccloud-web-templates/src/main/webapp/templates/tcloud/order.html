@@ -21,16 +21,21 @@
 		text-align: left;
 		width: -webkit-fill-available;
 	}
+	.weui-dialog__hd {
+		padding: 1.3rem 1.6rem; 
+	}
 </#macro>
 
 <#macro script>
 $(function() {
   $(document).on("touchstart", "#customerName, .choose-customer", function () {
 		window.location.href = '${CPATH}/product/customerChoose';
-  }).on("touchstart", "#placeOrder", function () {
+  }).on("touchend", "#placeOrder", function () {
 		doSubmit();
   }).on("touchstart",".nearby-customer",function(){
 		window.location.href = '${CPATH}/product/customerNearbyChose';
+  }).on("touchstart","#shoppingCart",function(){
+		window.location.href = '${CPATH}/product/shoppingCart';
   });
 
   initCustomer();
@@ -183,6 +188,7 @@ $(function() {
 			$newProductDetail.find("#compositionNum").val(el.compositionNum);
 			
 			$newProductDetail.find("#compositionValueName").text(el.compositionValueName);
+			$newProductDetail.find("#gift").html(el.compositionSub);
 		});
 	}
 
@@ -227,55 +233,64 @@ $(function() {
 		$("#allTotalAmount").val(allTotalAmount);
 	} 
 
+	var flg = true;
 	function doSubmit(){
-		if ($("#sellerCustomerId").val() == "") {
-			toastr.warning('请选择客户');
+		if (!flg) {
 			return;
 		}
+		if ($("#sellerCustomerId").val() == "") {
+			$.toptip("请选择客户", 'warning'); 
+			return;
+		}
+		
+		
+	//	if (!checkStore()) {
+	//		toastr.error('未选择商品或库存不足!','操作失败');
+	//		return;
+	//	}
 
 		layer.open({
 			type: 2,
 			content: '保存中...'
 		});
 
-	//	if (!checkStore()) {
-	//		toastr.error('未选择商品或库存不足!','操作失败');
-	//		return;
-	//	}
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
-				$("#placeOrder").attr('diabled', 'disabled');
+				flg = false;
 				return true
 			},
 			type : "post", 
 			dataType : "json", 
-			success : function(data) { 
+			success : function(data) {
 				layer.closeAll();
 				if (data.errorCode == 0) {
 					removeItemBykey("productList");
 					removeItemBykey("compositionList");
 					removeItemBykey("customerInfo");
 					
-					$.confirm({
+					$.modal({
 						title: data.message,
-						text: '继续下单？',
-						onOK: function () {
-							location.href = '${CPATH}/product'
-						},
-						onCancel: function () {
-							location.href = "${CPATH}/order/myOrder";
-						}
+						buttons: [
+							{ text: "查看订单", className: "default", onClick: function(){ 
+								location.href = "${CPATH}/order/myOrder";
+								} 
+							},
+							{ text: "继续下单", className: "primary", onClick: function(){
+								location.href = '${CPATH}/product';
+								} 
+							},
+						]
 					});
 					
 				} else {
-					$("#placeOrder").removeAttr('diabled');
-					toastr.error(data.message);
+					$.toptip(data.message, 'error'); 
 				}
+				flg = true;
 			},
 			error : function() {
 				layer.closeAll();
-				$("#placeOrder").removeAttr('diabled');
 				alert("信息提交错误");
+				flg = true;
 			}
 		});
 	}
@@ -383,29 +398,28 @@ $(function() {
 						<input type="hidden" name="convert" id="convert" value="">
 						<input type="hidden" name="isGift" id="isGift" value="">
 						<div class="product_name" id="productName">
-							35度中国劲酒_125ml_1*24
 			<!-- 				<span class="gift-tag">赠品</span> -->
 						</div>
 						<div class="product_unit">
-							规格：<span id="valueName">125ml</span>
+							规格：<span id="valueName"></span>
 							<span class="fr no-bg">是否赠品</span>
 							<input type="checkbox" name="isGift" id="isGift" value="1" class="fr" disabled>
 						</div>
 						<div class="product_bUnit">
-							<span class="price" id="bigPriceSpan">￥725</span>
-							<span class="unit" id="bigUnitSpan">&nbsp;/&nbsp;件</span>
+							<span class="price" id="bigPriceSpan"></span>
+							<span class="unit" id="bigUnitSpan"></span>
 							<div class="spinner">
 								<input type="number" min="0" value="0" class="fl" id="bigNum" name="bigNum" readonly>
 							</div>
-							<input type="number" class="street-value"  id="bigPrice" value="720" name="bigPrice" readonly>
+							<input type="number" class="street-value"  id="bigPrice" value="0" name="bigPrice" readonly>
 						</div>
 						<div class="product_mUnit">
-							<span class="price" id="smallPriceSpan">￥30</span>
-							<span class="unit" id="smallUnitSpan">&nbsp;/&nbsp;瓶</span>
+							<span class="price" id="smallPriceSpan"></span>
+							<span class="unit" id="smallUnitSpan"></span>
 							<div class="spinner">
 								<input type="number" min="0" value="0" class="fl" id="smallNum" name="smallNum" readonly>
 							</div>
-							<input type="number" class="street-value" value="30" id="smallPrice" name="smallPrice" readonly>
+							<input type="number" class="street-value" value="0" id="smallPrice" name="smallPrice" readonly>
 						</div>
 						<input type="hidden" id="rowTotal" name="rowTotal" value="">
 						<hr />
@@ -447,14 +461,20 @@ $(function() {
 					<div class="weui-panel weui-panel_access goods-detail composition" style="display: none">
 						<input type="hidden" id="compositionId" name="compositionId" value="">
 						<div class="product_name" id="compositionName">
-							35度中国劲酒_125ml_1*24
 						</div>
 						<div class="product_bUnit">
-							<span class="price" id="compositionPriceSpan">￥725</span>
+							<span class="price" id="compositionPriceSpan"></span>
 							<div class="spinner">
 								<input type="number" min="0" value="0" class="fl" id="compositionNum" name="compositionNum" readonly>
 							</div>
-							<input type="number" class="street-value"  id="compositionPrice" value="720" name="compositionPrice" readonly>
+							<input type="number" class="street-value"  id="compositionPrice" value="0" name="compositionPrice" readonly>
+						</div>
+						<hr>
+						<div id="gift">
+							<p id="sub">赠品：<span id="subProduct"> </span>
+							</p>
+							<p class="t-r width-50 none" id="subsubProduct">
+							</p>
 						</div>
 
 						<input type="hidden" id="rowTotal" name="rowTotal" value="">
@@ -464,7 +484,8 @@ $(function() {
 			</main>
 			<#include "_inc/_goback.html" />
 			<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
-				<p class="total bg-gray weui-flex__item" id="totalNum">共2款，总数10件&nbsp;总额：2600元</p>
+				<p class="total bg-gray weui-flex__item" id="totalNum"></p>
+				<button type="button" id="shoppingCart" class="place-order yellow-button white">购物车</button>
 				<button type="button" id="placeOrder" class="place-order red-button">提交订单</button>
 			</footer>
 		</form>

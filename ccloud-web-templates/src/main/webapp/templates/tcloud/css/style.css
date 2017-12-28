@@ -161,6 +161,19 @@ a {
   min-width: 0.5rem;
   height: 0.5rem;
   padding: 0;
+  position: absolute;
+  right: 20%;
+  top: 15%;
+}
+
+.full-badge {
+  min-width: .8rem;
+  height: .8rem;
+  line-height: .8rem;
+  padding: 0;
+  position: absolute;
+  right: 20%;
+  top: 15%;
 }
 
 .left-top-tag {
@@ -312,6 +325,10 @@ a {
   padding-left: 0.75rem;
 }
 
+.m-r-5 {
+  margin-right: .25rem;
+}
+
 .m-r-10 {
   margin-right: 0.5rem;
 }
@@ -323,6 +340,8 @@ a {
 .mg10-0{
 	margin: .5rem 0;
 }
+
+
 
 .button {
 	border: 0;
@@ -382,19 +401,6 @@ a {
   background: #ea6f5a!important;
   color: #fff!important;
   height: 100%;
-}
-
-.weui-dialog__btn {
-  font-size: .7rem;
-}
-
-.weui-dialog__btn.primary{
-  background: #ea6f5a;
-  color: #fff;
-}
-
-.weui-dialog__btn.default {
-  color: #666;
 }
 
 .weui-dialog__btn {
@@ -670,12 +676,6 @@ a {
 .index-info-tab .weui-cell__ft {
   height: 100%;
   width: 1rem;
-}
-
-.empty-badge {
-  position: absolute;
-  right: 20%;
-  top: 15%;
 }
 
 #home .weui-cells__title {
@@ -1623,6 +1623,14 @@ input[name=sex] {
 #my-order main {
   top: 2rem;
   bottom: 0;
+}
+
+.show-more-btn {
+  font-size: .6rem;
+  color: #0463c3;
+  display: inline-block;
+  height: 1.25rem;
+  line-height: 1.25rem;
 }
 
 #combin-filter {

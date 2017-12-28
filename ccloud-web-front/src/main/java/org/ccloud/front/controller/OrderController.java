@@ -204,7 +204,7 @@ public class OrderController extends BaseFrontController {
 		if (this.saveOrder(paraMap, user, sellerId, sellerCode)) {
 			renderAjaxResultForSuccess("下单成功");
 		} else {
-			renderAjaxResultForError("库存不足或提交失败");
+			renderAjaxResultForError("库存不足");
 		}
 	}
 
@@ -508,6 +508,15 @@ public class OrderController extends BaseFrontController {
 	}	
 	
 	public void orderAgain() {
+		String orderId = getPara("orderId");
+		
+		List<Record> orderDetail = SalesOrderDetailQuery.me().findByOrderId(orderId);
+		Map<String, Object> map = new HashMap<>();
+		map.put("orderDetail", orderDetail);
+		renderJson(map);
+	}
+	
+	public void getOrderProductDetail() {
 		String orderId = getPara("orderId");
 		
 		List<Record> orderDetail = SalesOrderDetailQuery.me().findByOrderId(orderId);

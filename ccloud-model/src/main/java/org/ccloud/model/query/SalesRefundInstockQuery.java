@@ -345,5 +345,10 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
+	
+	public SalesRefundInstock findBySn(String refundSn){
+		String sql = "select * from cc_sales_refund_instock where instock_sn = ?";
+		return DAO.findFirst(sql, refundSn);
+	}
 
 }

@@ -28,6 +28,10 @@
     function doChange(sellerId) {
         var url = "${CPATH}/user/change";
         Utils.ajax(url, {'mobile': mobile, 'openid': openid, 'sellerId': sellerId}, callback);
+        
+		removeItemBykey("productList");
+		removeItemBykey("compositionList");
+		removeItemBykey("customerInfo");
     }
     
 </#macro>

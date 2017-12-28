@@ -41,7 +41,8 @@ public class User extends BaseUser<User> {
 	
 	@Override
 	public boolean save() {
-		
+		removeCache(getMobile());
+		removeCache(getWechatOpenId());
 		CacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
 		return super.save();
 	}
@@ -50,6 +51,8 @@ public class User extends BaseUser<User> {
 	public boolean saveOrUpdate() {
 		
 		removeCache(getId());
+		removeCache(getMobile());
+		removeCache(getWechatOpenId());
 		CacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
 		
 		return super.saveOrUpdate();
@@ -59,6 +62,8 @@ public class User extends BaseUser<User> {
 	public boolean update() {
 		
 		removeCache(getId());
+		removeCache(getMobile());
+		removeCache(getWechatOpenId());
 		CacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
 		
 		return super.update();
@@ -68,6 +73,8 @@ public class User extends BaseUser<User> {
 	public boolean delete() {
 		
 		removeCache(getId());
+		removeCache(getMobile());
+		removeCache(getWechatOpenId());
 		CacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
 		
 		return super.delete();

@@ -3,11 +3,14 @@
 <#macro script_import>
 	<!-- bootstrapValidator -->
 	<script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
+	<script src="${CPATH}/static/ladda/spin.min.js"></script>
+	<script src="${CPATH}/static/ladda/ladda.min.js"></script>
 </#macro>
 
 <#macro css_import>
 	<!-- bootstrapValidator -->
 	<link rel="stylesheet" href="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.css">
+	<link rel="stylesheet" href="${CPATH}/static/ladda/ladda-themeless.min.css">
 </#macro>
 
 <#macro script>
@@ -100,6 +103,7 @@
 		})
 	}
 	function doSubmit(pass){
+		var l = Ladda.create( document.querySelector( '#do_submit' ) );
 		checkEdit();
 		$("#form").ajaxSubmit({
 			beforeSubmit: function() {
@@ -107,6 +111,7 @@
 				//validate.validate();
 				//return validate.isValid()
 				$("#pass").val(pass);
+				l.start();
 			},
 			type : "post", 
 			dataType : "json", 
@@ -117,8 +122,13 @@
 				} else {
 					toastr.error(data.message,'操作失败');
 				}
+				setTimeout( function(){
+						l.stop();
+						location.href = '${CPATH}/admin/index';
+								}, 2 * 1000 );
 			},
 			error : function() {
+				l.stop();
 				alert("信息提交错误");
 			}
 		});
@@ -271,11 +281,10 @@
 		</form>
 		<div class="box-footer">
 		    <#if isCheck>
-			<button type="button" onclick="doSubmit(1)" class="btn btn-primary btn-flat">确认</button>
-			<button type="button" onclick="doSubmit(0)" class="btn btn-primary btn-flat">拒绝</button>
+			<button type="button" id="do_submit" onclick="doSubmit(1)" class="btn btn-primary btn-flat ladda-button" data-style="expand-right">确认</button>
+			<button type="button" id="do_submit" onclick="doSubmit(0)" class="btn btn-primary btn-flat ladda-button" data-style="expand-right">拒绝</button>
 			</#if>
-			<input type="button" class="btn btn-primary btn-flat" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
-		</div>
+			<input type="button" class="btn btn-primary" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />		</div>
 	</div>
 </section>
 

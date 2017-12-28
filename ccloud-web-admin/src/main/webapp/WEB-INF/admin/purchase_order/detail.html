@@ -31,6 +31,7 @@
 <#macro script>
 	$(function() {
 		jQuery.mm.initValidator('#form', validatorFields);
+		jQuery.mm.initDatetimepicker('form', '#dealDate', 'dealDate', 'yyyy-MM-dd', 2, 4, 2);
 		var id='${(orderId)}';
 		refund(id)
 	});
@@ -232,7 +233,10 @@
 				$("#biz_user_id").val(order.biz_user_id);
 				$("#deptId").val(order.dept_id);
 				$("#dataArea").val(order.data_area);
-
+				$("#dealDate").val(order.deal_date);
+				console.log($("input [name = 'paymentType']").val());
+				$("input [name = 'paymentType']").val()
+								
 				$.each(orderDetail, function(index,element){
 					addProduct(element);
 				});
@@ -362,6 +366,12 @@
 							<label class="radio-inline">
 								<input class="minimal" type="radio" name="paymentType" value="0" >应付账款
 							</label>
+						</div>
+					</div>
+					 <div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">交货时间:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<input class="form-control input-sm" type="text" id="dealDate" name="dealDate" value="">
 						</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">

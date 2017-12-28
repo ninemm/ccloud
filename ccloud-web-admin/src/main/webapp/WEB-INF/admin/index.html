@@ -69,6 +69,13 @@ function reply(id){
 }
 
 $(function(){
+
+	var identity = ${identity?c};
+    if(identity){
+        $("#salesBoardInfo").attr('href','${CPATH}/admin/report/departSalesman?p=report&c=departSalesman');
+    }else{
+        $("#salesBoardInfo").attr('href','${CPATH}/admin/report/customerDetails?p=report&c=customerDetails');
+    }	
     //业务员当日当月
     var salesManData = ${salesManAmount!};
     var salesToDay = salesManData.sales_day;
@@ -299,6 +306,18 @@ function lineChartOptions(viewTitle,xTitle,yData){
     return options;
 }
 
+$("#orderBoardInfo").on("click",function(){
+    window.location.href = '${CPATH}/admin/salesOrder?p=sales&c=orderList';
+});
+
+$("#customerCountBoard").on("click",function(){
+    window.location.href = '${CPATH}/admin/sellerCustomer?p=customManage&c=customList';
+});
+
+$("#newCustomerBoard").on("click",function(){
+    window.location.href = '${CPATH}/admin/sellerCustomer?p=customManage&c=customList';
+});
+
 </#macro> 
 <@layout active_id="dashboard" >
 <!-- Content Header (Page header) -->
@@ -332,7 +351,7 @@ function lineChartOptions(viewTitle,xTitle,yData){
 				<div class="icon">
 					<i class="fa fa-shopping-bag"></i>
 				</div>
-				<a href="#" class="small-box-footer">详情 <i class="fa fa-arrow-circle-right"></i></a>
+				<a href="#" id="orderBoardInfo" class="small-box-footer">详情 <i class="fa fa-arrow-circle-right"></i></a>
 			</div>
 		</div>
 		<!-- ./col -->
@@ -350,7 +369,7 @@ function lineChartOptions(viewTitle,xTitle,yData){
 				<div class="icon">
 					<i class="fa fa-bar-chart"></i>
 				</div>
-				<a href="#" class="small-box-footer">详情 <i class="fa fa-arrow-circle-right"></i></a>
+				<a href="#" id="salesBoardInfo" class="small-box-footer">详情 <i class="fa fa-arrow-circle-right"></i></a>
 			</div>
 		</div>
 		<!-- ./col -->
@@ -368,7 +387,7 @@ function lineChartOptions(viewTitle,xTitle,yData){
 				<div class="icon">
 					<i class="fa fa-user-plus"></i>
 				</div>
-				<a href="#" class="small-box-footer">详情 <i class="fa fa-arrow-circle-right"></i></a>
+				<a href="#" id="customerCountBoard" class="small-box-footer">详情 <i class="fa fa-arrow-circle-right"></i></a>
 			</div>
 		</div>
 		<!-- ./col -->
@@ -376,13 +395,17 @@ function lineChartOptions(viewTitle,xTitle,yData){
 			<!-- small box -->
 			<div class="small-box bg-red">
 				<div class="inner">
-					<h3>65</h3>
+					<#if (newCustomerCount??)>
+                        <h3>${newCustomerCount!}</h3>
+                        <#else>
+                            <h3>0</h3>
+                    </#if>
 					<p>新增客户数</p>
 				</div>
 				<div class="icon">
 					<i class="fa fa-pie-chart"></i>
 				</div>
-				<a href="#" class="small-box-footer">详情 <i class="fa fa-arrow-circle-right"></i></a>
+				<a href="#" id="newCustomerBoard" class="small-box-footer">详情 <i class="fa fa-arrow-circle-right"></i></a>
 			</div>
 		</div>
 		<!-- ./col -->
@@ -408,7 +431,7 @@ function lineChartOptions(viewTitle,xTitle,yData){
                             <#list toDoCustomerList! as bean>
                             <li>
                                 <span>${bean.createTime!}</span>
-                                <a href="${CPATH}/admin/sellerCustomer/audit?id=${bean.id!}&taskId=${bean.taskId!}&assignee=${bean.assignee}" target="_blank">${bean.customer_name!}</a>
+                                <a href="${CPATH}/admin/sellerCustomer/audit?id=${bean.id!}&taskId=${bean.taskId!}&assignee=${bean.assignee}" target="_parent">${bean.customer_name!}</a>
                             </li>
                             </#list>
                             <#else>
@@ -442,7 +465,7 @@ function lineChartOptions(viewTitle,xTitle,yData){
                             <#list toDoOrdersList! as bean>
                             <li>
                                 <span>${bean.createTime!}</span>
-                                <a href="${CPATH}/admin/salesOrder/audit?id=${bean.id!}&taskId=${bean.taskId!}&assignee=${bean.assignee}" target="_blank">${bean.orderSn!}</a>
+                                <a href="${CPATH}/admin/salesOrder/audit?id=${bean.id!}&taskId=${bean.taskId!}&assignee=${bean.assignee}" target="_parent">${bean.orderSn!}</a>
                             </li>
                             </#list>
                             <#else>
@@ -479,7 +502,7 @@ function lineChartOptions(viewTitle,xTitle,yData){
                             <#list toDoCustomerVisitList! as bean>
                             <li>
                                 <span>${bean.createTime!}</span>
-                                <a href="${CPATH}/admin/customerVisit/audit?id=${bean.id!}&taskId=${bean.taskId!}&assignee=${bean.assignee}" target="_blank">${bean.customer_name!}</a>
+                                <a href="${CPATH}/admin/customerVisit/audit?id=${bean.id!}&taskId=${bean.taskId!}&assignee=${bean.assignee}" target="_parent">${bean.customer_name!}</a>
                             </li>
                             </#list>
                             <#else>

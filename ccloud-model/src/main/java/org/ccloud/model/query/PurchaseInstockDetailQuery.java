@@ -23,8 +23,11 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.ccloud.Consts;
+import org.ccloud.model.PayablesDetail;
 import org.ccloud.model.Product;
 import org.ccloud.model.PurchaseInstockDetail;
+import org.ccloud.model.SellerCustomer;
 import org.ccloud.model.SellerProduct;
 import org.ccloud.model.vo.ProductInfo;
 import org.ccloud.model.vo.orderProductInfo;
@@ -116,7 +119,7 @@ public class PurchaseInstockDetailQuery extends JBaseQuery {
 	
 	
 	public boolean insertBySalesOrder(Map<String, String[]> paraMap, String purchaseInstockId, Record seller, int index,
-			Date date, HttpServletRequest request) {
+			Date date, HttpServletRequest request,String pwarehouseSn,SellerCustomer sellerCustomer) {
 		String convert = StringUtils.getArrayFirst(paraMap.get("convert" + index));
 		String bigNum = StringUtils.getArrayFirst(paraMap.get("bigNum" + index));
 		String smallNum = StringUtils.getArrayFirst(paraMap.get("smallNum" + index));
@@ -159,7 +162,22 @@ public class PurchaseInstockDetailQuery extends JBaseQuery {
 				return false;
 			}
 		}
+		
 
+		PayablesDetail payablesDetail = new PayablesDetail();
+		payablesDetail.setId(StrKit.getRandomUUID());
+		payablesDetail.setObjectId(sellerCustomer.getId());
+		payablesDetail.setObjectType(Consts.RECEIVABLES_OBJECT_TYPE_CUSTOMER);
+		payablesDetail.setPayAmount(new BigDecimal(productAmount));
+		payablesDetail.setActAmount(new BigDecimal(0));
+		payablesDetail.setBalanceAmount(new BigDecimal(productAmount));
+		payablesDetail.setRefSn(pwarehouseSn);
+		payablesDetail.setBizDate(date);
+		payablesDetail.setRefType(Consts.BIZ_TYPE_INSTOCK);
+		payablesDetail.setDeptId(sellerCustomer.getDeptId());
+		payablesDetail.setDataArea(sellerCustomer.getDataArea());
+		payablesDetail.setCreateDate(date);
+		payablesDetail.save();
 		return true;
 	}
 	

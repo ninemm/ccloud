@@ -8,6 +8,8 @@
 	<!-- cityPicker -->
 	<script src="${CPATH}/static/plugins/city-picker/js/city-picker.data.js"></script>
 	<script src="${CPATH}/static/plugins/city-picker/js/city-picker.js"></script>
+	<script src="${CPATH}/static/ladda/spin.min.js"></script>
+	<script src="${CPATH}/static/ladda/ladda.min.js"></script>
 </#macro>
 
 <#macro css_import>
@@ -17,6 +19,7 @@
 	<link rel="stylesheet" href="${CPATH}/static/plugins/select2/css/select2.css">
 	<!-- cityPicker -->
 	<link rel="stylesheet" href="${CPATH}/static/plugins/city-picker/css/city-picker.css">
+	<link rel="stylesheet" href="${CPATH}/static/ladda/ladda-themeless.min.css">
 </#macro>
 
 <#macro script>
@@ -31,6 +34,7 @@
 	});
 
 	function doSubmit(value){
+	var l = Ladda.create( document.querySelector( '#do_submit' ) );	
 	$('#status').val(value);
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
@@ -39,6 +43,7 @@
 			        toastr.error('请输入拒绝原因','操作失败');
 			        return false;
 				}
+				l.start();
 			},
 			type : "post", 
 			dataType : "json", 
@@ -46,12 +51,16 @@
 				if(data.errorCode == 0) {
 					//location.reload();
 					toastr.success(data.message, '操作成功');
-					$('.btn_review').hide();
 				} else {
 					toastr.error(data.message,'操作失败');
 				}
+				setTimeout( function(){
+						l.stop();
+						location.href = '${CPATH}/admin/index';
+								}, 2 * 1000 );
 			},
 			error : function() {
+				l.stop();
 				alert("信息提交错误");
 			}
 		});
@@ -190,8 +199,8 @@
 			</div>
 		</form>
 		<div class="box-footer"> 
-			<button onclick="doSubmit(1)" class="btn btn-primary btn-flat btn_review">确认</button>
-			<button onclick="doSubmit(0)" class="btn btn-primary btn-flat btn_review">拒绝</button>
+			<button onclick="doSubmit(1)" id="do_submit" class="btn btn-primary btn-flat btn_review ladda-button" data-style="expand-right">确认</button>
+			<button onclick="doSubmit(0)" id="do_submit" class="btn btn-primary btn-flat btn_review ladda-button" data-style="expand-right">拒绝</button>
 			<!--<a href="${CPATH}/admin" class="btn btn-primary btn-flat">返回</a>-->
 			<input type="button" class="btn btn-primary btn-flat" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
 		</div>

@@ -128,11 +128,11 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		final PurchaseInstock purchaseInstock = getModel(PurchaseInstock.class);
 		PurchaseInstockDetail purchaseInstockDetail = getModel(PurchaseInstockDetail.class);
 		String purchaseInstockId = StrKit.getRandomUUID();
-		//采购入库单： PO + 100000(机构编号或企业编号6位) + 20171108(时间) + 100001(流水号)
+		//采购入库单： PS + 100000(机构编号或企业编号6位) + 20171108(时间) + 100001(流水号)
 		Date date = new Date();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
 		String fomatDate = sdf.format(date);
-		String pwarehouseSn="PO"+seller.getSellerCode().substring(0, 6)+fomatDate.substring(0,8)+PurchaseInstockQuery.me().getNewSn();
+		String pwarehouseSn="PS"+seller.getSellerCode()+fomatDate.substring(0,8)+PurchaseInstockQuery.me().getNewSn();
 		purchaseInstock.set("id", purchaseInstockId);
 		purchaseInstock.set("pwarehouse_sn", pwarehouseSn);
 		purchaseInstock.set("supplier_id", purchaseOrder.getSupplierId());
@@ -241,7 +241,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
 		String fomatDate = sdf.format(date);
 		String purchaseOrderId=StringUtils.getArrayFirst(paraMap.get("purchaseOrderId"));
-		String pwarehouseSn="PO"+user.getDepartmentId().substring(0, 6)+fomatDate.substring(0,8)+PurchaseInstockQuery.me().getNewSn();
+		String pwarehouseSn="PO"+seller.getSellerCode()+fomatDate.substring(0,8)+PurchaseInstockQuery.me().getNewSn();
 		purchaseInstock.set("id", purchaseInstockId);
 		purchaseInstock.set("pwarehouse_sn", pwarehouseSn);
 		purchaseInstock.set("supplier_id", StringUtils.getArrayFirst(paraMap.get("supplierId")));
@@ -260,6 +260,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		PurchaseOrder order = PurchaseOrderQuery.me().findById(purchaseOrderId);
 		order.set("total_amount", new BigDecimal( StringUtils.getArrayFirst(paraMap.get("total"))));
 		order.set("payment_type", StringUtils.getArrayFirst(paraMap.get("paymentType")));
+		order.set("deal_date",StringUtils.getArrayFirst(paraMap.get("dealDate")));
 		order.set("status", 1000);
 		order.set("modify_date", new Date());
 		String productNumStr = StringUtils.getArrayFirst(paraMap.get("productNum"));

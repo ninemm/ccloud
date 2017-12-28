@@ -163,6 +163,24 @@ public class CustomerVisitQuery extends JBaseQuery {
 		return DAO.find(sql.toString(), username);
 	}
 	
+public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procKey, String username) {
+		
+		String select = "select cv.*, sc.nickname, c.customer_name, c.customer_code, c.contact, c.mobile, c.prov_name, c.city_name, c.country_name, c.address,i.TASK_ID_ taskId, i.ACT_NAME_ taskName, i.ASSIGNEE_ assignee, i.END_TIME_ endTime ";
+		LinkedList<Object> params = new LinkedList<>();
+		params.add(procKey);
+		params.add(username);
+
+		StringBuilder sql = new StringBuilder(" FROM cc_customer_visit cv ");
+		sql.append(" JOIN cc_seller_customer sc on cv.seller_customer_id = sc.id");
+		sql.append(" JOIN cc_customer c on sc.customer_id = c.id");
+		sql.append(" JOIN act_hi_actinst i on cv.proc_inst_id = i.PROC_INST_ID_ ");
+		sql.append(" JOIN act_re_procdef p on p.ID_ = i.PROC_DEF_ID_ ");
+		sql.append(" WHERE p.KEY_ = ? and locate(?, i.ASSIGNEE_) > 0 AND i.DURATION_ is not null ");
+		sql.append(" order by i.END_TIME_ desc ");
+
+		return Db.paginate(pageNumber, pageSize, select, sql.toString(), params.toArray());
+	}
+	
 	public Page<Record> queryVisitRecord(int pageNumber, int pageSize,String customerLevel,String customerType,String customerNature,String userId){
 		String select = "select ccv.id,ccv.create_date,cc.customer_name,cc.contact,cc.mobile,d.`name` questionType,if(ccv.`status`>0,'已审核','未审核') visitStatus ";
 		StringBuilder fromBuilder = new StringBuilder("from cc_customer_visit ccv left join cc_seller_customer csc on ccv.seller_customer_id = csc.id left join cc_customer cc on csc.customer_id = cc.id left join dict d on ccv.question_type = d.id ");

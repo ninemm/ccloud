@@ -22,7 +22,20 @@
     		    <p>类型：${message.name!}</p>
     		    <p>提交人：${message.realname!}</p>
       			<p>审核内容：${(message.content)!}</p>
-      			<p><a href="${CPATH}/user/center" class="blue">去审核</a></p>
+      			<#if message.type == '100601'>
+      				<@shiro.hasPermission name="/admin/salesOrder/check">
+      				<p><a href="${CPATH}/todo/order" class="blue">前往</a></p>
+      				</@shiro.hasPermission>
+				<#elseif message.type == '100602'>
+					<@shiro.hasPermission name="/admin/customer/audit">
+					<p><a href="${CPATH}/todo/customer" class="blue">前往</a></p>
+					</@shiro.hasPermission>
+				<#elseif message.type == '100603'>
+					<@shiro.hasPermission name="/admin/customerVisit/audit">
+					<p><a href="${CPATH}/todo/visit" class="blue">前往</a></p>
+					</@shiro.hasPermission>
+      			</#if>
+				<p><a href="${CPATH}/user/center" class="blue">个人中心</a></p>
     		</section>
 		</article>
 	</div>

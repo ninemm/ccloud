@@ -100,6 +100,7 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 		setAttr("ulist", ulist);
 		List<StockTakingInfo> ilist = StockTakingDetailQuery.me().findByStockTakingDetailId(id);
 		setAttr("ilist", ilist);
+		
 	}
 
 	public void enable() {
@@ -266,6 +267,7 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 		}
 	}
 
+	//添加盘点明细
 	public boolean saveStockTakingInfo(final Map<String, String[]> map, final StockTaking stockTaking,
 			final boolean update) {
 		boolean isSave = Db.tx(new IAtom() {
@@ -285,12 +287,17 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 					String[] factIndex = map.get("factIndex");
 					for (int i = 1; i < factIndex.length; i++) {
 						StockTakingDetail stockTakingDetail = getModel(StockTakingDetail.class);
+					
 						String sellerProductId = StringUtils
 								.getArrayFirst(map.get("stockTakingList[" + factIndex[i] + "].seller_product_id"));
 						String productCount = StringUtils
 								.getArrayFirst(map.get("stockTakingList[" + factIndex[i] + "].product_count"));
 						String remark = StringUtils
 								.getArrayFirst(map.get("stockTakingList[" + factIndex[i] + "].remark"));
+						
+						if ("0".equals(productCount)||null==productCount) {
+							continue;
+						}
 						stockTakingDetail.setSellerProductId(sellerProductId);
 						stockTakingDetail.setProductCount(new BigDecimal(productCount));
 						stockTakingDetail.setRemark(remark);
@@ -318,14 +325,17 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 					// 存储盘点单子表信息
 					List<StockTakingDetail> iSaveList = new ArrayList<>();
 					String[] factIndex = map.get("factIndex");
-					int loopEnd = 1;
-					for (int i = 0; i < factIndex.length; i++) {
+					for (int i = 1; i < factIndex.length; i++) {
+						
 						StockTakingDetail stockTakingDetail = getModel(StockTakingDetail.class);
-						String sellerProductId = StringUtils.getArrayFirst(map.get("stockTakingList[" + i + "].seller_product_id"));
+						String sellerProductId = StringUtils.getArrayFirst(map.get("stockTakingList[" + factIndex[i] + "].seller_product_id"));
 						String productCount = StringUtils
-								.getArrayFirst(map.get("stockTakingList[" + i + "].product_count"));
-						String remark = StringUtils.getArrayFirst(map.get("stockTakingList[" + i + "].remark"));
-
+								.getArrayFirst(map.get("stockTakingList[" + factIndex[i] + "].product_count"));
+						String remark = StringUtils.getArrayFirst(map.get("stockTakingList[" + factIndex[i] + "].remark"));
+						
+						if ("0".equals(productCount)||null==productCount) {
+							continue;
+						}
 						stockTakingDetail.setSellerProductId(sellerProductId);
 						stockTakingDetail.setProductCount(new BigDecimal(productCount));
 						stockTakingDetail.setRemark(remark);
@@ -336,10 +346,6 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 						stockTakingDetail.setDataArea(stockTaking.getDataArea());
 						stockTakingDetail.setCreateDate(new Date());
 						iSaveList.add(stockTakingDetail);
-						loopEnd++;
-						if (loopEnd == factIndex.length) {
-							break;
-						}
 					}
 					try {
 						Db.batchSave(iSaveList, iSaveList.size());
@@ -415,4 +421,9 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 		return sBuilder.toString();
 	}
 
+	public void getProductInfo() {
+		String  warehouseId = getPara("warehouse_id");
+		List<Record>list=StockTakingDetailQuery.me().findByWarehouseId(warehouseId);
+		renderJson(list);
+	}
 }

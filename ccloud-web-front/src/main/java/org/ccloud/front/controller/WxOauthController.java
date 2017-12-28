@@ -105,7 +105,7 @@ public class WxOauthController extends BaseFrontController {
 						}
 					}
 					setAttr("openid", openId);
-					setAttr("sellerList", sellerList);
+					setSessionAttr("sellerList", sellerList);
 					gotoUrl = "/user/choice";
 				}
 			}

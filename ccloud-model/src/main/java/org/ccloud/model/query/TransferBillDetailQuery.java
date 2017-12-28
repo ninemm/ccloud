@@ -95,7 +95,7 @@ public List<transferBillInfo> findByTransferBillDetailId(String id,String seller
 			transferBillInfo.setSellerProductId(record.getStr("seller_product_id"));
 			transferBillInfo.setProductCount(record.getBigDecimal("product_count"));
 			transferBillInfo.setDataArea(record.getStr("data_area"));
-			List<ProductInfo> ProductInfo = ProductQuery.me().getProductBySellerProId(record.getStr("seller_product_id"));
+			List<ProductInfo> ProductInfo = ProductQuery.me().getProductBySellerProId(record.getStr("seller_product_id"),record.getStr("from_warehouse_id"));
 			transferBillInfo.setProductInfos(ProductInfo);
 			iList.add(transferBillInfo);
 		}

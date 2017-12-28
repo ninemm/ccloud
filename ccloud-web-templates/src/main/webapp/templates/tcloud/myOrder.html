@@ -12,8 +12,17 @@
 			startDate = $("#datePicker").val();
 			endDate = startDate + ' 23:59:59';
 			combo();
+		}).on('touchend', '.show-more-btn', function () {
+			var $this = $(this);
+			var $detail = $this.parent().next();
+			if ($detail.is(':visible')) {
+				$detail.hide('fast');
+				$this.text('显示详情');
+			} else {
+				$detail.show('fast');
+				$this.text('隐藏详情');
+			}
 		});
-
         $("#datePicker").calendar();
         $("#datePicker").val($.today());
 
@@ -102,6 +111,8 @@
 					$newOrder.find("#orderSn").text(el.order_sn);
 					$newOrder.find("#status").text(getStatus(el.status));
 					$newOrder.find("#customerName").text(el.customer_name);
+					$newOrder.find("#oId").val(el.id);
+					$newOrder.find(".appendOrdeProductDetail").attr('id',"p"+el.id);
 					$newOrder.find("#contact").text(el.contact + '/' + el.mobile);
 					$newOrder.find("#customerType").text(el.customerTypeName);
 					if(el.status == 0) {
@@ -123,7 +134,12 @@
 						$newOrder.find("#cancel").remove();
 					}
 					$newOrder.find("#orderAgain").on('click', function(){ 
- 						 window.location.href = "${CPATH}/order/getOldOrder?orderId="+el.id
+ 						 window.location.href = "${CPATH}/order/getOldOrder?orderId="+el.id;
+					});
+
+					$newOrder.find("#status").on('click', function(){ 
+ 						 window.location.href = "${CPATH}/order/operateHistory?id=" + el.id + "&proc_inst_id=" + el.proc_inst_id;
+ 						 event.stopPropagation();
 					});
 
 					$newOrder.find("#amount").text(el.total_amount);
@@ -137,7 +153,7 @@
 	}
 	
 	function getDateOrder(){
-		var dateType = $("#getDate").find(".blue-button").data("id");
+		var dateType = $("#getDate").find(".red-button").data("id");
 		var date = new Date();
 		if(dateType == 0){
 			startDate = $.today();
@@ -193,6 +209,49 @@
 		page = 1;
 		loadOrderData();
 	}
+	
+	function showOrderProductDetail(orderDetail){
+	  var orderId =  $(orderDetail).next().val();
+	  var productName = $("#o"+orderId).text();
+	  var str = "";
+	  if(productName == ""){
+	     $.ajax({
+            type: "post",
+            url: "${CPATH}/order/getOrderProductDetail?orderId="+orderId,
+            dataType: "json",
+            success:function(data) {
+            $.each(data.orderDetail, function(idx, item) {
+                var productName = "";
+                if(item.is_gift == 0){
+                productName = item.custom_name;
+                }else{
+                productName = "<span class='tag'>赠品</span>";
+                productName = productName + item.custom_name;
+                }
+                var bigCount = parseInt(item.product_count/item.convert_relate);//下单大单位数量
+                var smallPrice = (item.product_amount/item.product_count).toFixed(2);//下单小价格
+                var sPrice = (item.price/item.convert_relate).toFixed(2);//商品标准小价格
+                var smallCount = (item.product_count %  item.convert_relate);//下单小单位数量
+                
+                str += "<div><p id='o"+ orderId +"'>" +productName+ "</p>"+
+                "<div class='weui-flex'><div class='weui-flex__item flex-grow2'>"+
+                "<div class='fr width-60'>￥"+item.product_price+" "+
+                "<span class='gray'>("+ item.price +")</span>"+
+                "</div></div><div class='weui-flex__item t-r'>"+bigCount+" "+item.big_unit+" "+
+                "</div></div></div>"+
+                "<div class='weui-flex'><div class='weui-flex__item flex-grow2'>"+
+                "<div class='fr width-60'>￥"+smallPrice+" "+
+                "<span class='gray'>("+sPrice+")</span></div></div>"+
+                "<div class='weui-flex__item t-r'>"+smallCount+" " +item.small_unit+" "+
+                "</div></div>"; 
+            });
+            
+            $("#p"+orderId).append(str);
+            }
+        });
+	  }  
+	}
+	
 </#macro>
 
 <@layout>
@@ -222,29 +281,41 @@
 		<main>
 			<div id="main">
 				<div class="weui-panel weui-panel_access" style="display: none">
-					<a href="" id="salesOrderId">
-						<div class="ft14 gray">
-							<span class="tag" id="receiveType">账期</span>
-							<span id="orderSn">DH-O-20171017-002276</span>
-							<span class="fr blue" id="status">订单待审核</span>
-						</div>
-						<div id="customerName" class="customer_name"></div>
-						<div class="gray">
-							<p>
-								联系人：<span id="contact">小张/18611111111</span>
-								<span class="fr" id="customerType">终端客户</span>
-							</p>
-						</div>
-						<div class="gray">
-							<p>
-								金额：￥<span id="amount">200</span>
-								<span class="fr" id="date">时间： 2017-10-17 06:03:04</span>
-							</p>
-						</div>
-					</a>
-					<hr>
-					<div id="cancel" class="button red-button fl">撤销</div>
-					<div id="orderAgain" class="button white-button fr">再次购买</div>
+					<div class="ft14 gray">
+						<span class="tag" id="receiveType">账期</span>
+						<span id="orderSn"></span>
+						<span class="fr blue" id="status"></span>
+					</div>
+					<div class="customer_name gray">
+						<span id="customerName" class=""></span>
+						<span class="fr show-more-btn" id="showOrderProductDetail" onclick="showOrderProductDetail(this)">显示详情</span>
+						<input type="hidden" id="oId"></input>
+					</div>
+					<div class="none">
+						<a href="" id="salesOrderId">
+						<hr>
+							<div class="appendOrdeProductDetail">
+
+							</div>
+							<hr>							
+							<div class="gray">
+								<p>
+									联系人：<span id="contact"></span>
+									<span class="fr" id="customerType"></span>
+								</p>
+							</div>
+							<div class="gray">
+								<p>
+									金额：￥<span id="amount"></span>
+									<span class="fr" id="date"></span>
+								</p>
+							</div>
+						</a>
+						<hr>
+						<div id="cancel" class="button red-button fl">撤销</div>
+						<div id="orderAgain" class="button white-button fr">再次购买</div>
+						<div id="" class="button yellow-button fr m-r-5 none">审核通过</div>
+					</div>
 				</div>
 			</div>
 			<div class="weui-loadmore" id="loading" style="display: none;">

@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +12,6 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import com.jfinal.plugin.activerecord.Page;
 import org.activiti.bpmn.converter.BpmnXMLConverter;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.editor.constants.ModelDataJsonConstants;
@@ -311,27 +309,6 @@ public class WorkFlowService {
 		return Db.find(sql, insid);
 	}
 	
-	public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procKey, String username) {
-		
-		String select = "SELECT c.*,cc.customer_name, cc.mobile, cc.contact, cc.prov_name, cc.city_name, cc.country_name, cc.address, group_concat(ct.name) as customerType  ";
-		LinkedList<Object> params = new LinkedList<>();
-		params.add(procKey);
-		params.add(username);
-
-		StringBuilder sql = new StringBuilder("FROM cc_seller_customer c ");
-		sql.append("LEFT JOIN cc_customer cc ON c.customer_id = cc.id ");
-		sql.append("LEFT JOIN cc_customer_join_customer_type cjct ON cjct.seller_customer_id = c.id ");
-		sql.append("LEFT JOIN cc_customer_type ct ON cjct.customer_type_id = ct.id ");
-
-		sql.append("LEFT JOIN act_hi_actinst i on c.proc_inst_id = i.PROC_INST_ID_ ");
-		sql.append("LEFT JOIN act_re_procdef p on p.ID_ = i.PROC_DEF_ID_ ");
-		sql.append("WHERE p.KEY_ = ? and locate(?, ASSIGNEE_) > 0 AND i.DURATION_ is not null ");
-		sql.append("group by c.id ");
-
-
-		return Db.paginate(pageNumber, pageSize, true, select, sql.toString(), params.toArray());
-	}
-	
 	/**
 	 * 获取流程中的变量值
 	 * @param taskId
@@ -358,8 +335,8 @@ public class WorkFlowService {
 		HistoryService historyService = ActivitiPlugin.buildProcessEngine().getHistoryService();
         
 		List<HistoricTaskInstance> htiList = historyService.createHistoricTaskInstanceQuery()//历史任务表查询
-				.processInstanceId(procInstId)//使用流程实例ID查询
-				.list();
+				.processInstanceId(procInstId).orderByTaskCreateTime()//使用流程实例ID查询
+				.asc().list();
         for (HistoricTaskInstance  hai : htiList) {
             String historytaskId = hai.getId();
             List<Comment> comments = taskService.getTaskComments(historytaskId);

@@ -5,6 +5,9 @@
 	<script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
 	<!-- select2 -->
 	<script src="${CPATH}/static/plugins/select2/js/select2.js"></script>
+	
+	<script src="${CPATH}/static/ladda/spin.min.js"></script>
+	<script src="${CPATH}/static/ladda/ladda.min.js"></script>
 </#macro>
 
 <#macro css_import>
@@ -12,6 +15,7 @@
 	<link rel="stylesheet" href="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.css">
 	<!-- select2 -->
 	<link rel="stylesheet" href="${CPATH}/static/plugins/select2/css/select2.css">
+	<link rel="stylesheet" href="${CPATH}/static/ladda/ladda-themeless.min.css">
 </#macro>
 
 <#macro css>
@@ -61,12 +65,13 @@
 	var $form = $("#form");
 	$(function() {
 	if('${(taskId)}' == 'null' || '${(taskId)}' == '') {
-			$("#button1").hide();
-			$("#button2").hide();
+			$("#do_submit").hide();
+			$("#do_submit").hide();
 			$("#auditComment").hide();
 		}
 	})
 	function doSubmit(value){
+	var l = Ladda.create( document.querySelector( '#do_submit' ) );
 	$('#status').val(value);
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
@@ -75,6 +80,7 @@
 			        toastr.error('请输入拒绝原因','操作失败');
 			        return false;
 				}
+				l.start();
 			},
 			type : "post", 
 			dataType : "json", 
@@ -82,12 +88,16 @@
 				if(data.errorCode == 0) {
 					//location.reload();
 					toastr.success(data.message, '操作成功');
-					$('.btn_review').hide();
 				} else {
 					toastr.error(data.message,'操作失败');
 				}
+				setTimeout( function(){
+						l.stop();
+						location.href = '${CPATH}/admin/index';
+								}, 2 * 1000 );
 			},
 			error : function() {
+				l.stop();
 				alert("信息提交错误");
 			}
 		});
@@ -209,8 +219,8 @@
 		</form>
 		<div class="box-footer">
 			<@shiro.hasPermission name="/admin/customerVisit/audit,/admin/all">
-			<button  id = "button1" onclick="doSubmit(1)" class="btn btn-primary btn-flat btn_review">通过</button >
-			<button id = "button2" onclick="doSubmit(0)" class="btn btn-primary btn-flat btn_review">拒绝</button>
+			<button  id="do_submit" onclick="doSubmit(1)" class="btn btn-primary btn-flat btn_review ladda-button" data-style="expand-right">通过</button >
+			<button id="do_submit" onclick="doSubmit(0)" class="btn btn-primary btn-flat btn_review ladda-button" data-style="expand-right">拒绝</button>
 			</@shiro.hasPermission>
 			<input type="button" class="btn btn-primary btn-flat" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
 		</div>

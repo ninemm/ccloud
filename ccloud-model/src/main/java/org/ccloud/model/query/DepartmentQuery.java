@@ -165,7 +165,6 @@ public class DepartmentQuery extends JBaseQuery {
 	}
 	
 	public List<Map<String, Object>> findDeptListAsTree(String dataArea, boolean hasUser) {
-		
 
 		Map<String, Object> map = new HashMap<String, Object>();
 		List<Department> list = findDeptList(dataArea, "order_list asc");
@@ -183,6 +182,22 @@ public class DepartmentQuery extends JBaseQuery {
 		
 		return deptTreeList;
 	}
+	
+	public List<Map<String, Object>> findDeptListAsTree(String dataArea, boolean hasUser,
+			List<UserJoinWarehouse> listUserJoinWarehouse) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		List<Department> list = findDeptList(dataArea, "order_list asc");
+		List<Map<String, Object>> deptTreeList = new ArrayList<Map<String, Object>>();
+		Department department = list.get(0);
+		map.put("text", department.getDeptName());// 父子表第一级名称,以后可以存储在字典表或字典类
+		map.put("tags", Lists.newArrayList(0));
+		list.remove(0);
+		ModelSorter.tree(list);
+		map.put("nodes", doBuild(list, hasUser,listUserJoinWarehouse));
+		deptTreeList.add(map);
+		return deptTreeList;
+	}
+
 	
 	public List<Map<String, Object>> findDeptListAsTree(int i, String dataArea, boolean isAdmin) {
 		List<Department> list = findDeptList(dataArea, "order_list asc");
@@ -506,19 +521,6 @@ public class DepartmentQuery extends JBaseQuery {
 			resTreeList.add(map);
 		}
 		return resTreeList;
-	}
-
-	public List<Map<String, Object>> findDeptListAsTree(String dataArea, boolean hasUser,
-			List<UserJoinWarehouse> listUserJoinWarehouse) {
-		Map<String, Object> map = new HashMap<String, Object>();
-		List<Department> list = findDeptList(dataArea, "order_list asc");
-		List<Map<String, Object>> deptTreeList = new ArrayList<Map<String, Object>>();
-		ModelSorter.tree(list);
-		map.put("text", "总部");// 父子表第一级名称,以后可以存储在字典表或字典类
-		map.put("tags", Lists.newArrayList(0));
-		map.put("nodes", doBuild(list, hasUser,listUserJoinWarehouse));
-		deptTreeList.add(map);
-		return deptTreeList;
 	}
 	
 	private List<Map<String, Object>> doBuild(List<Department> list, boolean addUserFlg,List<UserJoinWarehouse> listUserJoinWarehouse) {

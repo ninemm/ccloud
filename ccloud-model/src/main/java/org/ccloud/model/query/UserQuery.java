@@ -256,7 +256,7 @@ public class UserQuery extends JBaseQuery {
 	
 	public List<String> findUserIdsByDeptDataArea(String dataArea) {
 
-		StringBuilder fromBuilder = new StringBuilder(" SELECT u.username ");
+		StringBuilder fromBuilder = new StringBuilder(" SELECT u.id ");
 		fromBuilder.append(" FROM department d ");
 		fromBuilder.append(" JOIN `user` u ON d.id = u.department_id ");
 		fromBuilder.append(" WHERE d.data_area = ? ");
@@ -274,6 +274,29 @@ public class UserQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN role r ON r.id=grr.role_id ");
 		fromBuilder.append(" WHERE u.data_area LIKE '"+dataArea+"'  and r.role_code='"+Consts.ROLE_CODE_010+"'");
 		return DAO.find(fromBuilder.toString());
+	}
+
+	public Page<User> paginateUser(int pageNumber, int pageSize, String keyword, String dataArea, String orderby,
+			String userId) {
+		String select = "select u.id,u.username,u.realname,u.nickname,u.mobile,u.department_name,u.station_name,u.status,group_concat(g.group_name) group_name";
+		StringBuilder fromBuilder = new StringBuilder(" from user u ");
+		fromBuilder.append(" LEFT JOIN user_group_rel ugr ON ugr.user_id=u.id ");
+		fromBuilder.append(" LEFT JOIN `group` g ON g.id=ugr.group_id ");
+		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "u.username", keyword, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "u.data_area", dataArea, params, needWhere);
+		if (userId != null) {
+			fromBuilder.append("AND u.id != ? ");
+			params.add(userId);
+		}
+		
+		fromBuilder.append("GROUP BY u.id order by " + orderby);
+		
+		if (params.isEmpty())
+			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+
+		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 	
 }

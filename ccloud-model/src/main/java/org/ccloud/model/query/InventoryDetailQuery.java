@@ -90,7 +90,7 @@ public class InventoryDetailQuery extends JBaseQuery {
 	
 	
 	
-	public Page<InventoryDetail> _in_paginate(int pageNumber, int pageSize,String name,String stock_taking_sn, String orderby,String sellerId,String dataArea) {
+	public Page<InventoryDetail> _in_paginate(int pageNumber, int pageSize,String keyword,String sellerId,String dataArea, String startDate, String endDate,String sellerProductId,String sort,String sortOrder) {
 		String select = "SELECT cid.*,cw.`name` as warehouse,csp.custom_name as sellerName ";
 		StringBuilder fromBuilder = new StringBuilder(" from cc_inventory_detail cid ");
 		fromBuilder.append(" LEFT JOIN cc_warehouse cw on cw.id = cid.warehouse_id ");
@@ -98,22 +98,37 @@ public class InventoryDetailQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_user_join_warehouse cujw on cujw.warehouse_id=cid.warehouse_id ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cid.biz_bill_sn", stock_taking_sn, params, needWhere);
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "csp.custom_name", name, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cid.data_area", dataArea, params, needWhere);
+		
 		if (needWhere) {
-				fromBuilder.append("where 1=1 and cid.biz_type in ('"+Consts.BIZ_TYPE_INSTOCK+"','"+Consts.BIZ_TYPE_SALES_REFUND_INSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_INSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_PLUS_INSTOCK+"') ");
-		}else{
-				fromBuilder.append("and cid.biz_type in ('"+Consts.BIZ_TYPE_INSTOCK+"','"+Consts.BIZ_TYPE_SALES_REFUND_INSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_INSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_PLUS_INSTOCK+"') ");
+			fromBuilder.append(" where 1 = 1");
 		}
-		fromBuilder.append(" and csp.seller_id = '"+sellerId+"' GROUP BY cid.id order by " + orderby+" desc");	
+
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and cid.create_date >= ?");
+			params.add(startDate);
+		}
+
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and cid.create_date <= ?");
+			params.add(endDate);
+		}
+		if(!sellerProductId.equals("")){
+			fromBuilder.append(" and csp.id = '"+sellerProductId+"' ");
+		}
+		fromBuilder.append("and cid.biz_type in ('"+Consts.BIZ_TYPE_INSTOCK+"','"+Consts.BIZ_TYPE_SALES_REFUND_INSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_INSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_PLUS_INSTOCK+"') ");
+		if(sort==null){
+			fromBuilder.append(" and ( cid.biz_bill_sn like '%"+keyword+"%' or csp.custom_name like '%"+keyword+"%' ) and csp.seller_id = '"+sellerId+"' GROUP BY cid.id ");	
+		}else{
+			fromBuilder.append(" and ( cid.biz_bill_sn like '%"+keyword+"%' or csp.custom_name like '%"+keyword+"%' ) and csp.seller_id = '"+sellerId+"' GROUP BY cid.id order by "+sort+" "+ sortOrder);	
+		}
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 	
-	public Page<InventoryDetail> _out_paginate(int pageNumber, int pageSize,String keyword, String orderby,String sellerId,String dataArea) {
+	public Page<InventoryDetail> _out_paginate(int pageNumber, int pageSize,String keyword,String sellerId,String dataArea, String startDate, String endDate,String sellerProductId,String sort,String sortOrder) {
 		String select = "SELECT cid.*,cw.`name` as warehouse,csp.custom_name as sellerName ";
 		StringBuilder fromBuilder = new StringBuilder(" from cc_inventory_detail cid ");
 		fromBuilder.append(" LEFT JOIN cc_warehouse cw on cw.id = cid.warehouse_id ");
@@ -121,15 +136,29 @@ public class InventoryDetailQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_user_join_warehouse cujw on cujw.warehouse_id=cid.warehouse_id ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
-
-		//needWhere = appendIfNotEmptyWithLike(fromBuilder, "cid.biz_bill_sn", keyword, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cid.data_area", dataArea, params, needWhere);
 		if (needWhere) {
-				fromBuilder.append("where 1 = 1 and  cid.biz_type in ('"+Consts.BIZ_TYPE_P_OUTSTOCK+"','"+Consts.BIZ_TYPE_SALES_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_REDUCE_OUTSTOCK+"') ");
-		}else{
-				fromBuilder.append("and cid.biz_type in ('"+Consts.BIZ_TYPE_P_OUTSTOCK+"','"+Consts.BIZ_TYPE_SALES_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_REDUCE_OUTSTOCK+"') ");
+			fromBuilder.append(" where 1 = 1");
 		}
-		fromBuilder.append(" and ( cid.biz_bill_sn like '%"+keyword+"%' or csp.custom_name like '%"+keyword+"%' ) and csp.seller_id = '"+sellerId+"' GROUP BY cid.id order by " + orderby+" desc");	
+
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and cid.create_date >= ?");
+			params.add(startDate);
+		}
+
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and cid.create_date <= ?");
+			params.add(endDate);
+		}
+		if(!sellerProductId.equals("")){
+			fromBuilder.append(" and csp.id = '"+sellerProductId+"' ");
+		}
+		fromBuilder.append("and cid.biz_type in ('"+Consts.BIZ_TYPE_P_OUTSTOCK+"','"+Consts.BIZ_TYPE_SALES_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_REDUCE_OUTSTOCK+"') ");
+		if(sort==null){
+			fromBuilder.append(" and ( cid.biz_bill_sn like '%"+keyword+"%' or csp.custom_name like '%"+keyword+"%' ) and csp.seller_id = '"+sellerId+"' GROUP BY cid.id ");	
+		}else{
+			fromBuilder.append(" and ( cid.biz_bill_sn like '%"+keyword+"%' or csp.custom_name like '%"+keyword+"%' ) and csp.seller_id = '"+sellerId+"' GROUP BY cid.id order by "+sort+" "+ sortOrder);	
+		}
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 

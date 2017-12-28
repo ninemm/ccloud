@@ -252,6 +252,7 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 				PurchaseOrderDetail purchaseOrderDetail = PurchaseOrderDetailQuery.me().findById(purchaseInstockDetail.getPurchaseOrderDetailId());
 				PurchaseOrder purchaseOrder = PurchaseOrderQuery.me().findById(purchaseOrderDetail.getPurchaseOrderId());
 				purchaseOrder.set("status", 3000);
+				purchaseOrder.set("modify_date",new Date());
 				purchaseOrder.update();
 			}
 			if (StrKit.notBlank(sellerProductId)) {
@@ -475,5 +476,17 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 				purchaseInstockDetailInfo.setList(product);
 			}
 		}
+	}
+	public void detailBySn(){
+		String order_sn = getPara(0);
+		PurchaseInstock purchaseInstock = new PurchaseInstock();
+		if(!order_sn.substring(0, 2).equals("PO")){
+			purchaseInstock = PurchaseInstockQuery.me().findBySn(order_sn);
+		}else{
+			purchaseInstock = PurchaseInstockQuery.me().findByPurchaseOrderSn(order_sn);
+		}
+		
+		setAttr("instockId", purchaseInstock.getId());
+		render("getDetail.html");
 	}
 }

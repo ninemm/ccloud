@@ -8,7 +8,7 @@
 </#macro>
 <#macro script>
 	$(function() {
-	    $(document).on('touchend', '.refuse', function() {
+	    $(document).on('click', '.refuse', function() {
 	      layer.open({
 	        type: 1,
 	        title: ['订单审核',
@@ -27,7 +27,7 @@
 	          parent.refuseReson = $("input[name='refuseReson']:checked").val();
 	          parent.comment = $("#comment").val();
 	          if (parent.refuseReson == undefined && parent.comment == ""){
-	            toastr.warning('请选择一个理由');
+	            $.toptip('请选择一个理由', 'warning');;
 	            return;
 	          }
 	          doReject(0);
@@ -46,7 +46,7 @@
 	        var bigPrice = $currentInput.val();
 			if(bigPrice < bPrice){
 				$currentInput.val(bPrice);
-				toastr.warning('价格不能小于标准价');
+				$.toptip('价格不能小于标准价', 'warning');
 				return;
 			}
 			$productDetail.find("#smallPrice").val((bigPrice/convert).toFixed(2));
@@ -55,7 +55,7 @@
 	        var smallPrice = $currentInput.val();
 			if(smallPrice < sPrice){
 				$currentInput.val(sPrice);
-				toastr.warning('价格不能小于标准价');
+				$.toptip('价格不能小于标准价', 'warning');
 				return;
 			}
 			$productDetail.find("#bigPrice").val((smallPrice*convert).toFixed(2));
@@ -309,8 +309,8 @@
     <#include "_inc/_goback.html" />    
     <#if isCheck>
     <footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex border-top-1px">
-      <button class="white-button-no-border weui-flex__item refuse">拒绝</button>
-      <button class="red-button weui-flex__item" onclick="doSubmit()">通过</button>
+      <button type = "button" class="white-button-no-border weui-flex__item refuse">拒绝</button>
+      <button type = "button" class="red-button weui-flex__item" onclick="doSubmit()">同意</button>
     </footer>
     </#if>
   </div>

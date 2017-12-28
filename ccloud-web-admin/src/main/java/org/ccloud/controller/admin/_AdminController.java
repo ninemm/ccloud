@@ -30,11 +30,13 @@ import org.ccloud.interceptor.UCodeInterceptor;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.Department;
+import org.ccloud.model.Seller;
 import org.ccloud.model.User;
 import org.ccloud.model.query.CustomerVisitQuery;
 import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SellerCustomerQuery;
+import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.UserJoinCustomerQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
@@ -113,11 +115,19 @@ public class _AdminController extends JBaseController {
 		setAttr("sum_amount", StrKit.notBlank(selDataArea)?count.get("sum_amount")!=null?df.format(count.get("sum_amount")):"0.00":"0.00");
 		setAttr("toDoCustomerVisitList", CustomerVisitQuery.me().getToDo(user.getUsername()));
 		
-		setAttr("customerCount",StrKit.notBlank(selDataArea)?UserJoinCustomerQuery.me().customerCount(selDataArea):0);
+		setAttr("customerCount",StrKit.notBlank(selDataArea)?UserJoinCustomerQuery.me().customerCount(selDataArea,false):0);
+		setAttr("newCustomerCount",StrKit.notBlank(selDataArea)?UserJoinCustomerQuery.me().customerCount(selDataArea,true):0);
 		setAttr("salesManAmount",JSON.toJSONString(salesManAmount));
 		setAttr("goodsSales",JSON.toJSONString(goodsSales));
 		setAttr("directAmount",JSON.toJSONString(directBusinessAmount));
 		setAttr("amountCollect",JSON.toJSONString(amountCollect));
+		
+		setSessionAttr("sellerCustomerList", SellerCustomerQuery.me().getToDo(user.getUsername()).size());
+		setSessionAttr("orderList", SalesOrderQuery.me().getToDo(user.getUsername()).size());
+		setSessionAttr("sellerCustomerVisitList", CustomerVisitQuery.me().getToDo(user.getUsername()).size());
+		setSessionAttr("allList", SalesOrderQuery.me().getToDo(user.getUsername()).size()+CustomerVisitQuery.me().getToDo(user.getUsername()).size()+SellerCustomerQuery.me().getToDo(user.getUsername()).size());
+		
+		setAttr("identity",SecurityUtils.getSubject().isPermitted("/admin/manager"));
 		render("index.html");
 	}
 	
@@ -137,11 +147,18 @@ public class _AdminController extends JBaseController {
 			return;
 		}
 		
-		User _user = UserQuery.me().findUserByUsername(username);
-		password = EncryptUtils.encryptPassword(password, _user.getSalt());
+		User _user;
+		try {
+			_user = UserQuery.me().findUserByUsername(username);
+			password = EncryptUtils.encryptPassword(password, _user.getSalt());
+		} catch (Exception e1) {
+			
+			e1.printStackTrace();
+			renderJson(false);
+			return;
+		}
 		Subject subject = SecurityUtils.getSubject();
 		CaptchaUsernamePasswordToken token = new CaptchaUsernamePasswordToken(username, password, rememberMe, "", "");
-		
 		try {
 			subject.login(token);
 			User user = (User) subject.getPrincipal();
@@ -179,6 +196,8 @@ public class _AdminController extends JBaseController {
 					setAttr("sellerList", sellerList);
 					setSessionAttr("sellerList", sellerList);
 					forwardAction("/admin/choice");
+					int i = sellerList.size();
+					renderJson(i);
 					return ;
 				}
 				
@@ -197,17 +216,23 @@ public class _AdminController extends JBaseController {
 			MessageKit.sendMessage(Actions.USER_LOGINED, user);
 			CookieUtils.put(this, Consts.COOKIE_LOGINED_USER, user.getId().toString());
 			setSessionAttr(Consts.SESSION_LOGINED_USER, user);
-			redirect("/admin/index");
+			renderJson(true);
+			//redirect("/admin/index");
 		} catch (AuthenticationException e) {
 			e.printStackTrace();
-			render("login.html");
+			//renderAjaxResultForError("用户名或密码错误");
+			renderJson(false);
+			return;
 		}
 	}
 	
 	@Clear(AdminInterceptor.class)
 	public void choice() { 
-		
-		keepPara();
+		List<Map<String, String>> sellerList = getSessionAttr("sellerList");
+		setAttr("sellerList", sellerList);
+		Seller seller = SellerQuery.me().findById(sellerList.get(0).get("seller_id"));
+		setAttr("mobile",seller.getPhone());
+		//keepPara();
 		render("choice.html");
 		
 	}
