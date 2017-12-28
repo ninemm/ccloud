@@ -446,5 +446,25 @@ public class _UserController extends JBaseCRUDController<User> {
 		user.set("mobile", excel.getMobile());
 		user.set("status", 1);
 		user.set("create_date", new Date());
-	}	
+	}
+	
+	public void updatePassword() {
+		render("password.html");
+	}
+	
+	public void changePassword() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String oldPassword = getPara("oldPassword");
+		oldPassword = EncryptUtils.encryptPassword(new String(oldPassword), user.getSalt());
+		if (!oldPassword.equals(user.getPassword())) {
+			renderAjaxResultForError("旧密码错误,请重新输入!");
+		} else {
+			String newPassword = getPara("newPassword");
+			newPassword = EncryptUtils.encryptPassword(new String(newPassword), user.getSalt());
+			user.setPassword(newPassword);
+			user.update();
+			renderAjaxResultForSuccess("修改成功");
+		}
+	}
+	
 }
