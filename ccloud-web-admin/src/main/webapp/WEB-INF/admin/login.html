@@ -89,7 +89,7 @@
 					dataType : "json", 
 					success : function(data) { 
 						if(data>1){
-							location.href = "${CPATH}/admin/choice?sellerList = "+'${(session.sellerList)!}';
+							location.href = "${CPATH}/admin/choice?sellerList="+'${(session.sellerList)!}';
 						}else if(data == false){
 							$("#p").show();
 							$("#uname").show();

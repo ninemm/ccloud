@@ -252,7 +252,6 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 				PurchaseOrderDetail purchaseOrderDetail = PurchaseOrderDetailQuery.me().findById(purchaseInstockDetail.getPurchaseOrderDetailId());
 				PurchaseOrder purchaseOrder = PurchaseOrderQuery.me().findById(purchaseOrderDetail.getPurchaseOrderId());
 				purchaseOrder.set("status", 3000);
-				purchaseOrder.set("deal_date",new Date());
 				purchaseOrder.set("modify_date",new Date());
 				purchaseOrder.update();
 			}

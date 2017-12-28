@@ -260,6 +260,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		PurchaseOrder order = PurchaseOrderQuery.me().findById(purchaseOrderId);
 		order.set("total_amount", new BigDecimal( StringUtils.getArrayFirst(paraMap.get("total"))));
 		order.set("payment_type", StringUtils.getArrayFirst(paraMap.get("paymentType")));
+		order.set("deal_date",StringUtils.getArrayFirst(paraMap.get("dealDate")));
 		order.set("status", 1000);
 		order.set("modify_date", new Date());
 		String productNumStr = StringUtils.getArrayFirst(paraMap.get("productNum"));

@@ -132,7 +132,7 @@ public class _PurchaseOrderDetailController extends JBaseCRUDController<Purchase
 		purchaseOrder.set("remark", StringUtils.getArrayFirst(paraMap.get("remark")));
 		purchaseOrder.set("dept_id", user.getDepartmentId());
 		purchaseOrder.set("data_area", user.getDataArea());
-		purchaseOrder.set("deal_date", StringUtils.getArrayFirst(paraMap.get("deliveryDate")));
+		purchaseOrder.set("deal_date",StringUtils.getArrayFirst(paraMap.get("dealDate")));
 		purchaseOrder.set("create_date", date1);
 		purchaseOrder.save();
 		
