@@ -16,12 +16,16 @@
 package org.ccloud.controller.admin;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -47,6 +51,7 @@ import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.EncryptUtils;
 import org.ccloud.utils.StringUtils;
 
+import com.google.common.collect.Lists;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
@@ -54,7 +59,9 @@ import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.tx.Tx;
 
+import cn.afterturn.easypoi.excel.ExcelExportUtil;
 import cn.afterturn.easypoi.excel.ExcelImportUtil;
+import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.afterturn.easypoi.excel.entity.ImportParams;
 
 /**
@@ -410,7 +417,10 @@ public class _UserController extends JBaseCRUDController<User> {
 			UserGroupRel userGroupRel = null;
 
 			// 检查用户是否存在
-			us = UserQuery.me().findByUsernameAndMobileAndDeptId(excel.getUserName(), excel.getMobile(),deptId);
+			us = UserQuery.me().findByMobileAndDeptId(excel.getMobile(),deptId);
+			List<User> users = UserQuery.me().findAll();
+			int count = users.size();
+			String nickName = "qdyuser"+(++count);
 			Group group = GroupQuery.me().findDataAreaAndGroupName(DataAreaUtil.getDealerDataAreaByCurUserDataArea(dept.getDataArea()), excel.getUserGroup());
 			if (us == null) {
 				us = new User();
@@ -419,6 +429,7 @@ public class _UserController extends JBaseCRUDController<User> {
 				this.setUser(us, excel);
 				us.set("create_date", new Date());
 				us.set("group_name",excel.getUserGroup());
+				us.set("username", nickName);
 				String dataArea = DataAreaUtil.dataAreaSetByUser(dept.getDataArea());
 				us.set("data_area", dataArea);
 				us.set("salt", EncryptUtils.salt());
@@ -436,13 +447,13 @@ public class _UserController extends JBaseCRUDController<User> {
 			} else {
 				existCnt++;
 			}
+
 		}
 
 		renderAjaxResultForSuccess("成功导入客户" + inCnt + "个,已存在客户" + existCnt + "个");
 	}
 	
 	private void setUser(User user, UserExecel excel) {
-		user.set("username", excel.getUserName());
 		user.set("realname", excel.getContact());
 		user.set("nickname", excel.getNickname());
 		user.set("mobile", excel.getMobile());
@@ -467,6 +478,73 @@ public class _UserController extends JBaseCRUDController<User> {
 			user.update();
 			renderAjaxResultForSuccess("修改成功");
 		}
+	}
+	
+	@RequiresPermissions(value = { "/admin/user/downloading", "/admin/dealer/all",
+	"/admin/all" }, logical = Logical.OR)
+	public void download() {
+	
+		render("download.html");
+	}
+	
+	@RequiresPermissions(value = { "/admin/sellerCustomer/downloading", "/admin/dealer/all",
+	"/admin/all" }, logical = Logical.OR)
+	public void downloading() throws UnsupportedEncodingException {
+	
+		String dataArea = getPara("data_area");
+		
+		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\user\\"
+				+ "userInfo.xlsx";
+		
+		Page<Record> page = UserQuery.me().paginateAll(1, Integer.MAX_VALUE, "", dataArea + "%");
+		List<Record> userList = page.getList();
+		
+		List<UserExecel> excellist = Lists.newArrayList();
+		for (Record record : userList) {
+		
+			UserExecel excel = new UserExecel();
+			excel.setNickname((String) record.get("nickname"));
+			excel.setContact((String) record.get("realname"));
+			excel.setMobile((String) record.get("mobile"));
+			excel.setUserGroup((String) record.get("groupNames"));
+			excel.setDeptName((String) record.get("department_name"));
+			excellist.add(excel);
+		}
+		
+		ExportParams params = new ExportParams();
+		Workbook wb = ExcelExportUtil.exportBigExcel(params, UserExecel.class, excellist);
+		File file = new File(filePath);
+		FileOutputStream out = null;
+		try {
+			out = new FileOutputStream(file);
+			wb.write(out);
+			out.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				out.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		ExcelExportUtil.closeExportBigExcel();
+		
+		renderFile(new File(filePath));
+	}	
+	
+	@Before(UCodeInterceptor.class)
+	@RequiresPermissions(value = { "/admin/user/edit", "/admin/all" }, logical = Logical.OR)
+	public void resetPassword() {
+		String[] ids = getParaValues("dataItem");
+		int count = UserQuery.me().batchReset(ids);
+		if (count > 0) {
+			MenuManager.clearListByKeys(ids);
+			renderAjaxResultForSuccess("删除成功");
+		} else {
+			renderAjaxResultForError("删除失败!");
+		}		
 	}
 	
 }

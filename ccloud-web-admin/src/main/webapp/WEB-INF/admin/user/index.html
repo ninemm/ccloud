@@ -189,12 +189,17 @@ function saveGroup() {
 	});     
 }
 
-function batchAction() {
-	var $form = $("#form");
-	$form.attr("action", "${CPATH}/admin/user/batchDelete?ucode=${ucode}&c=${c!}&p=${p!}");
+	function batchAction(type) {
+		var $form = $("#form");
+		if (type == 'delete') {
+			$form.attr("action", "${CPATH}/admin/user/batchDelete?ucode=${ucode}&c=${c!}&p=${p!}");
+		} else {
+			$form.attr("action", "${CPATH}/admin/user/resetPassword?ucode=${ucode}&c=${c!}&p=${p!}");
+		}
+		
+		jQuery.mm.batchAction('#form', '请选择用户记录');
+	}
 	
-	jQuery.mm.batchAction('#form', '请选择系统记录');
-}
 	$("input").on("keydown",function(){
 		if (event.keyCode == 13) {
 			event.keyCode = 0;
@@ -219,8 +224,10 @@ function batchAction() {
 		<div class="jp-left">
 		<@shiro.hasPermission name="/admin/user/edit,/admin/all">
 			<a href="${CPATH}/admin/user/edit?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-plus"></i> 新增 </a>
-			<a href="javascript:void(0);" onclick="batchAction()" class="btn btn-sm btn-danger btn-flat"><i class="fa fa-remove"></i> 删除 </a>			
+			<a href="javascript:void(0);" onclick="batchAction('reset')" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-plus"></i> 重置密码 </a>
+			<a href="javascript:void(0);" onclick="batchAction('delete')" class="btn btn-sm btn-danger btn-flat"><i class="fa fa-remove"></i> 删除 </a>			
 		</@shiro.hasPermission>
+		&nbsp;&nbsp;
 			<a href="${CPATH}/admin/user/upload?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-upload"></i> 导入</a>
 			<a href="${CPATH}/admin/user/download?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-download"></i> 导出</a>
 		</div>
