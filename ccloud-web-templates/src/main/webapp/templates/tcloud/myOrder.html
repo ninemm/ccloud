@@ -214,7 +214,6 @@
 	  var orderId =  $(orderDetail).next().val();
 	  var productName = $("#o"+orderId).text();
 	  var str = "";
-	  var smallStr = "";
 	  if(productName == ""){
 	     $.ajax({
             type: "post",
@@ -239,17 +238,12 @@
                 "<div class='fr width-60'>￥"+item.product_price+" "+
                 "<span class='gray'>("+ item.price +")</span>"+
                 "</div></div><div class='weui-flex__item t-r'>"+bigCount+" "+item.big_unit+" "+
-                "</div></div>"+
-                "</div>";
-                smallStr +="<div class='weui-flex'><div class='weui-flex__item flex-grow2'>"+
+                "</div></div></div>"+
+                "<div class='weui-flex'><div class='weui-flex__item flex-grow2'>"+
                 "<div class='fr width-60'>￥"+smallPrice+" "+
                 "<span class='gray'>("+sPrice+")</span></div></div>"+
                 "<div class='weui-flex__item t-r'>"+smallCount+" " +item.small_unit+" "+
                 "</div></div>"; 
-                if(smallCount>0){
-                str = str + smallStr;
-                }
-                
             });
             
             $("#p"+orderId).append(str);
