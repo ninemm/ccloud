@@ -3,27 +3,16 @@ package org.ccloud.model.vo;
 import cn.afterturn.easypoi.excel.annotation.Excel;
 
 public class UserExecel {
-	@Excel(name = "用户名")
-	private String userName;
 	@Excel(name = "呢称")
 	private String nickname;
 	@Excel(name = "真实姓名")
 	private String contact;
 	@Excel(name = "手机")
 	private String mobile;
-	@Excel(name = "密码")
-	private String password;
-
-	@Excel(name = "用户分组")
+	@Excel(name = "部门名称")
+	private String deptName;
+	@Excel(name = "职位")
 	private String userGroup;
-
-	public String getUserName() {
-		return userName;
-	}
-
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
 
 	public String getNickname() {
 		return nickname;
@@ -49,14 +38,6 @@ public class UserExecel {
 		this.mobile = mobile;
 	}
 
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
 	public String getUserGroup() {
 		return userGroup;
 	}
@@ -64,6 +45,14 @@ public class UserExecel {
 	public void setUserGroup(String userGroup) {
 		this.userGroup = userGroup;
 	}
-	
+
+	public String getDeptName() {
+		return deptName;
+	}
+
+	public void setDeptName(String deptName) {
+		this.deptName = deptName;
+	}
+
 	
 }
