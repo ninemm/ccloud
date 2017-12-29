@@ -78,15 +78,6 @@
 		$table.bootstrapTable('refresh',opt);
 	});
 	
-	$("#export").click(function() {
-		var param = {
-			warehouse_id: $('#warehouse_id').find("option:selected").val(),
-			startDate: $('#startDate').val() + " 00:00:00",
-			endDate: $('#endDate').val() + " 23:59:59",
-		};	
-		jQuery.mm.ajax( '${CPATH}/admin/report/inventoryDetailExport', param, 'json', null);
-	});
-	
 	var initFields = function() {
 		var fields =
 			[
