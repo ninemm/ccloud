@@ -482,16 +482,10 @@ public class _UserController extends JBaseCRUDController<User> {
 	
 	@RequiresPermissions(value = { "/admin/user/downloading", "/admin/dealer/all",
 	"/admin/all" }, logical = Logical.OR)
-	public void download() {
-	
-		render("download.html");
-	}
-	
-	@RequiresPermissions(value = { "/admin/user/downloading", "/admin/dealer/all",
-	"/admin/all" }, logical = Logical.OR)
 	public void downloading() throws UnsupportedEncodingException {
 	
-		String dataArea = getPara("data_area");
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		
 		
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\user\\"
 				+ "userInfo.xlsx";

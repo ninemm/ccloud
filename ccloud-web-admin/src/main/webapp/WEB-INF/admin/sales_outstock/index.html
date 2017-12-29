@@ -354,7 +354,7 @@
     }
     
     function batchDown(){
-    	location.href = "${CPATH}/admin/salesOutstock/download?c=${c!}&p=${p!}";
+    	location.href = "${CPATH}/admin/salesOutstock/downloading?startDate=" + $('#startDate').val() + " 00:00:00" + "&endDate=" + $('#endDate').val() + " 23:59:59" + "&printStatus=" + $("#printStatus").val() + "&stockOutStatus="+$("#stockOutStatus").val();
     }
     
 </#macro>
