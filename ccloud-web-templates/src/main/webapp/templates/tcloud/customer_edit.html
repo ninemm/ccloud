@@ -379,7 +379,7 @@
 <@layout>
 <div class="weui-content">
 	<div id="customer-add">
-		<div style="margin-bottom: 2.25rem">
+		<main>
 		    <form action="${CPATH}/customer/save" method="post" id="form">
 			    <section class="weui-panel weui-panel_access order-customer-info select-area">
 			        <input type="hidden" name="sellerCustomer.id" value="${(sellerCustomer.id)!}">
@@ -462,14 +462,6 @@
                         <div class="weui-cell__hd" id="refresh"><span class="icon-refresh ft16 gray" onclick="refreshLocation()"></span></div>
                     </div>
                 </section>
-			    <div class="weui-gallery" id="gallery">
-			        <span class="weui-gallery__img" id="galleryImg"></span>
-			        <div class="weui-gallery__opr">
-			            <a href="javascript:" rel="nofollow" target="_blank"  class="weui-gallery__del">
-			                <i class="weui-icon-delete weui-icon_gallery-delete"></i>
-			            </a>
-			        </div>
-			    </div>
 			    <section class="weui-cells weui-cells_form">
 			        <div class="weui-cell">
 			            <div class="weui-cell__bd">
@@ -496,7 +488,15 @@
 			        </div>
 			    </section>
 		    </form>
-		</div>
+        </main>
+        <div class="weui-gallery" id="gallery">
+                <span class="weui-gallery__img" id="galleryImg"></span>
+                <div class="weui-gallery__opr">
+                    <a href="javascript:" rel="nofollow" target="_blank"  class="weui-gallery__del">
+                        <i class="weui-icon-delete weui-icon_gallery-delete"></i>
+                    </a>
+                </div>
+            </div>
 		<#include "_inc/_goback.html" />
 		<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex border-top-1px">
 		    <#if sellerCustomer??> 
