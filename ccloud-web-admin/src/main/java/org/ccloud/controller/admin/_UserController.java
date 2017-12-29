@@ -389,11 +389,11 @@ public class _UserController extends JBaseCRUDController<User> {
 		render("upload.html");
 	}
 	
-	@RequiresPermissions(value = { "/admin/sellerCustomer/uploading", "/admin/dealer/all",
+	@RequiresPermissions(value = { "/admin/user/uploading", "/admin/dealer/all",
 	"/admin/all" }, logical = Logical.OR)
 	public void userTemplate() {
 		String realPath = getSession().getServletContext().getRealPath("\\");
-		renderFile(new File(realPath + "\\WEB-INF\\admin\\user\\user.xlsx"));
+		renderFile(new File(realPath + "\\WEB-INF\\admin\\user\\userTemplate.xlsx"));
 	}
 	
 	@Before(Tx.class)
@@ -487,7 +487,7 @@ public class _UserController extends JBaseCRUDController<User> {
 		render("download.html");
 	}
 	
-	@RequiresPermissions(value = { "/admin/sellerCustomer/downloading", "/admin/dealer/all",
+	@RequiresPermissions(value = { "/admin/user/downloading", "/admin/dealer/all",
 	"/admin/all" }, logical = Logical.OR)
 	public void downloading() throws UnsupportedEncodingException {
 	
