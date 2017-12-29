@@ -144,7 +144,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 		outstock.setContact(order.getStr("contact"));
 		outstock.setMobile(order.getStr("mobile"));
 		outstock.setAddress(order.getStr("address"));
-//		outstock.setBizUserId(order.getStr("biz_user_id"));
+		outstock.setBizUserId(order.getStr("biz_user_id"));
 		outstock.setTotalAmount(order.getBigDecimal("total_amount"));
 		outstock.setReceiveType(order.getInt("receive_type"));
 		outstock.setDeliveryAddress(order.getStr("delivery_address"));
