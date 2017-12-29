@@ -122,39 +122,22 @@
                             canvas.height = expectHeight;
                             ctx.drawImage(this, 0, 0, canvas.width, canvas.height);
 
-                            if (navigator.userAgent.match(/iphone/i)) {
-                                if(Orientation != "" && Orientation != 1){
-                                    switch(Orientation){
-                                        case 6://需要顺时针（向左）90度旋转
-                                            rotateImg(this,'left',canvas);
-                                            break;
-                                        case 8://需要逆时针（向右）90度旋转
-                                            rotateImg(this,'right',canvas);
-                                            break;
-                                        case 3://需要180度旋转
-                                            rotateImg(this,'right',canvas);//转两次
-                                            rotateImg(this,'right',canvas);
-                                            break;
-                                    }
+                            if(Orientation != "" && Orientation != 1){
+                                switch(Orientation){
+                                case 6://需要顺时针（向左）90度旋转
+                                    rotateImg(this,'left',canvas);
+                                    break;
+                                case 8://需要逆时针（向右）90度旋转
+                                    rotateImg(this,'right',canvas);
+                                    break;
+                                case 3://需要180度旋转
+                                    rotateImg(this,'right',canvas);//转两次
+                                    rotateImg(this,'right',canvas);
+                                    break;
                                 }
-                                blob = canvas.toDataURL('image/jpeg', 0.5);
-                            } else {
-                                if(Orientation != "" && Orientation != 1){
-                                    switch(Orientation){
-                                    case 6://需要顺时针（向左）90度旋转
-                                        rotateImg(this,'left',canvas);
-                                        break;
-                                    case 8://需要逆时针（向右）90度旋转
-                                        rotateImg(this,'right',canvas);
-                                        break;
-                                    case 3://需要180度旋转
-                                        rotateImg(this,'right',canvas);//转两次
-                                        rotateImg(this,'right',canvas);
-                                        break;
-                                    }
-                                }
-                                blob = canvas.toDataURL("image/jpeg", 0.8);
                             }
+                            blob = canvas.toDataURL("image/jpeg", 0.1);
+
                             imageArr.push({"pic":blob, "pic_name":x});
                             $("#pic").val(JSON.stringify(imageArr));
                             var str = '<li class="weui-uploader__file " style="background-image:url('+blob+')"></li>';
