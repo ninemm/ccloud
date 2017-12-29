@@ -20,18 +20,18 @@
 </#macro>
 
 <#macro script>
-	function productEnable(id, state) {
+	function productEnable(id, obj) {
 		$.get('${CPATH}/admin/goods/productEnable?ucode=${ucode}&id=' + id,
 			function(result){
 				if (result.errorCode > 0) {
 					toastr.error(result.message, '操作失败');
 				} else {
-					if ($("#state").html() == "下架") {
-						$("#state").attr("class","btn btn-xs btn-primary btn-flat");
-						$("#state").html("上架");
+					if ($(obj).html() == "下架") {
+						$(obj).attr("class","btn btn-xs btn-primary btn-flat");
+						$(obj).html("上架");
 					} else {
-						$("#state").attr("class","btn btn-xs btn-warning btn-flat");
-						$("#state").html("下架");
+						$(obj).attr("class","btn btn-xs btn-warning btn-flat");
+						$(obj).html("下架");
 					}			
 				}
 			}
@@ -69,9 +69,9 @@
 								<td>${bean.small_unit!}</td>
 								<td>
 								<#if bean.is_marketable>
-									<a href="javascript:void(0);" id="state" class="btn btn-xs btn-warning btn-flat" onclick="productEnable('${bean.id}')">下架</a>
+									<a href="javascript:void(0);" id="state" class="btn btn-xs btn-warning btn-flat" onclick="productEnable('${bean.id}',this)">下架</a>
 								<#else>
-									<a href="javascript:void(0);" id="state" class="btn btn-xs btn-primary btn-flat" onclick="productEnable('${bean.id}')">上架</a>
+									<a href="javascript:void(0);" id="state" class="btn btn-xs btn-primary btn-flat" onclick="productEnable('${bean.id}',this)">上架</a>
 								</#if>
 								</td>
 							</tr>
