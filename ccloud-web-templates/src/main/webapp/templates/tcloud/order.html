@@ -24,11 +24,23 @@
 	.weui-dialog__hd {
 		padding: 1.3rem 1.6rem; 
 	}
+	#customer {
+		bottom: 0;
+	}
+	#infinite {
+		position: absolute;
+		top: 2rem;
+		bottom: 0;
+		overflow: auto;
+		-webkit-overflow-scrolling: touch;
+		width: 100%;
+		background: #f3f5f7;
+	}
 </#macro>
 
 <#macro script>
 $(function() {
-  $(document).on("touchstart", "#customerName, .choose-customer", function () {
+  $(document).on("touchstart", ".choose-customer", function () {
 		window.location.href = '${CPATH}/product/customerChoose';
   }).on("touchend", "#placeOrder", function () {
 		doSubmit();
@@ -318,7 +330,7 @@ $(function() {
 								<span class="require">*</span>
 							</div> -->
 							<input type="hidden" id="sellerCustomerId" name="customerId" value="" >
-							<input type="text" class="weui-input" id="customerName" name="customerName" value="" readonly>
+							<input type="text" class="weui-input select-customer" id="customerName" name="customerName" value="" readonly>
 							<span class="weui-cell__ft"></span>
 						</div>
 					</div>
@@ -490,5 +502,112 @@ $(function() {
 			</footer>
 		</form>
 	</div>
+	<article id="combin-filter">
+		<div id="customer">
+			<header>
+				<div class="weui-search-bar" id="searchBar">
+					<form class="weui-search-bar__form">
+						<div class="weui-search-bar__box">
+							<i class="weui-icon-search"></i>
+							<input type="search" class="weui-search-bar__input" id="searchInput" placeholder="搜索" required="">
+							<a href="javascript:" class="weui-icon-clear" id="searchClear"></a>
+						</div>
+						<label class="weui-search-bar__label" id="searchText">
+							<i class="weui-icon-search"></i>
+							<span>请输入商品名称</span>
+						</label>
+					</form>
+					<a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
+				</div>
+			</header>
+			<article class="customer">
+				<header>
+					<div class="head-search select-area">
+						<div class="weui-flex">
+							<div class="weui-flex__item">
+								<input type="text" id="customer-type" placeholder="客户类型" class="weui-input" readonly>
+								<i class="icon-sort-desc"></i>
+							</div>
+							<div class="weui-flex__item">
+								<input type="text" id="customer-nearby" placeholder="附近客户" class="weui-input" readonly>
+								<i class="icon-sort-desc"></i>
+							</div>
+						</div>
+					</div>
+				</header>
+				<article id="infinite">
+					<div id="customerList">
+						<div class="weui-panel weui-panel_access">
+							<div class="weui-flex">
+								<div class="weui-flex__item customer-info">
+									<p class="ft14">小张烤鱼</p>
+									<p class="gray">小张/18611111111</p>
+								</div>
+							</div>
+							<p class="gray">
+								<span class="icon-map-marker ft16 green"></span>
+								湖北省 武汉市 江汉区 德盛街
+							</p>
+						</div>
+						<div class="weui-panel weui-panel_access">
+							<div class="weui-flex">
+								<div class="weui-flex__item customer-info">
+									<p class="ft14">小张烤鱼</p>
+									<p class="gray">小张/18611111111</p>
+								</div>
+							</div>
+							<p class="gray">
+								<span class="icon-map-marker ft16 green"></span>
+								湖北省 武汉市 江汉区 德盛街
+							</p>
+						</div>
+						<div class="weui-panel weui-panel_access">
+							<div class="weui-flex">
+								<div class="weui-flex__item customer-info">
+									<p class="ft14">小张烤鱼</p>
+									<p class="gray">小张/18611111111</p>
+								</div>
+							</div>
+							<p class="gray">
+								<span class="icon-map-marker ft16 green"></span>
+								湖北省 武汉市 江汉区 德盛街
+							</p>
+						</div>
+						<div class="weui-panel weui-panel_access">
+							<div class="weui-flex">
+								<div class="weui-flex__item customer-info">
+									<p class="ft14">小张烤鱼</p>
+									<p class="gray">小张/18611111111</p>
+								</div>
+							</div>
+							<p class="gray">
+								<span class="icon-map-marker ft16 green"></span>
+								湖北省 武汉市 江汉区 德盛街
+							</p>
+						</div>
+						<div class="weui-panel weui-panel_access">
+							<div class="weui-flex">
+								<div class="weui-flex__item customer-info">
+									<p class="ft14">小张烤鱼</p>
+									<p class="gray">小张/18611111111</p>
+								</div>
+							</div>
+							<p class="gray">
+								<span class="icon-map-marker ft16 green"></span>
+								湖北省 武汉市 江汉区 德盛街
+							</p>
+						</div>
+					</div>
+					<div class="weui-loadmore" id="loading">
+						<i class="weui-loading"></i>
+						<span class="weui-loadmore__tips">正在加载</span>
+					</div>
+					<div class="weui-loadmore weui-loadmore_line" id="noMore" style="display: none;">
+						<span class="weui-loadmore__tips">暂无数据</span>
+					</div>
+				</article>
+			</article>
+		</div>
+	</article>
 </div>
 </@layout>
