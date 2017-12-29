@@ -158,10 +158,12 @@ public class SalesOutstockQuery extends JBaseQuery {
 	}
 
 	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate,String printStatus, String stockOutStatus,String custoemName,String dataArea) {
-		String select = "select o.*, c.customer_name ";
+		String select = "select o.*, c.customer_name,u.realname,ct.name as customerName ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_sales_outstock` o ");
 		fromBuilder.append("left join cc_seller_customer cs on o.customer_id = cs.id ");
 		fromBuilder.append("left join cc_customer c on c.id = cs.customer_id ");
+		fromBuilder.append("left join user u on u.id = o.biz_user_id ");
+		fromBuilder.append("left join cc_customer_type ct on ct.id = o.customer_type_id ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
