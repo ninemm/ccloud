@@ -1,0 +1,98 @@
+<#include "../_inc/_layout.html"/>
+
+<#macro script_import>
+	<!-- bootstrapvalidator -->
+	<script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
+	<!-- bootstrapvalidator -->
+</#macro>
+
+<#macro css_import>
+	<!-- bootstrapvalidator -->
+	<link rel="stylesheet" href="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.css">
+</#macro>
+
+<#macro script>
+
+	var $form = $("#form");
+
+	$(function() {
+
+		jQuery.mm.initValidator('#form', validatorFields)
+
+	});
+
+	var validatorFields = {
+		'dept_name': {
+			validators: {
+				notEmpty: { message: '部门不能为空' },
+			}
+		}
+	};
+
+	$('#_department_tree').click(function() {
+		layer.open({
+			title:'所属部门',
+		    type: 2,
+		    area: ['580px', '530px'],
+		    fix: false, //不固定
+		    content: '${CPATH}/admin/user/dept_tree'
+		});
+		});
+
+	function doSubmit(){
+		var validate = $form.data('bootstrapValidator');
+		validate.validate();
+		if(!validate.isValid()){
+			return;
+		}
+		
+		window.open('${CPATH}/admin/user/downloading?deptId=' + $('#dept_id').val() + '&dept_name=' + $('#dept_name').val() + '&data_area=' + $('#data_area').val());
+	}
+</#macro>
+
+<@layout active_id=p child_active_id=c>
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+	<h1>导出用户</h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+	<li>用户管理</li>
+		<li class="active">导出用户</li>
+	</ol>
+</section>
+<!-- Main content -->
+<section class="content">
+	<div class="box box-default">
+		<div class="box-header with-border">
+			<h3 class="box-title">导出</h3>
+			<div class="box-tools">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse">
+					<i class="fa fa-minus"></i>
+				</button>
+			</div>
+		</div>
+		<form id="form" class="form-horizontal" >
+			<div class="box-body">
+				<div class="form-group col-sm-12 validata-box">
+					<label class="control-label col-sm-2">*部门:</label>
+					<div class="input-group col-md-4 col-sm-10">
+						<input type="hidden" name="dept_id" id="dept_id" value="">
+						<input type="hidden" name="data_area" id="data_area" value="">
+						<input class="form-control input-sm" type="text" id="dept_name" name="dept_name" value="" readonly>
+						<div class="input-group-addon" id="_department_tree" style="cursor:pointer;">
+							<i class="fa fa-search"></i> 选择
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	
+		<div class="box-footer"> 
+			<button type="button" onclick="doSubmit()" class="btn btn-primary">导出</button>
+			<input type="button" class="btn btn-primary" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
+		</div>
+	</div>
+</section>
+
+</@layout>
