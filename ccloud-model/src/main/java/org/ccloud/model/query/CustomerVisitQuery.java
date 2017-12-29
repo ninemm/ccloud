@@ -202,4 +202,35 @@ public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procK
 		return Db.findFirst(fromBuilder.toString(), visitId);
 	}
 	
+	public List<Record> exportVisit(String keyword, String dataArea,String customerType,String questionType,String groupBy, String orderby, String status){
+
+		StringBuilder fromBuilder = new StringBuilder("select cc_v.*,(select `name` from dict where type='customer_audit' and `value`=cc_v.`status`) visitStatus,cc.customer_name,(select realname from `user` where id = cc_v.user_id) visit_user,u.realname review_user,GROUP_CONCAT(cc_t.`name`) customer_type, d.name questionName, art.ID_ taskId,cc.mobile customerMobile ");
+		fromBuilder.append("from cc_customer_visit cc_v left join cc_seller_customer cc_s on cc_v.seller_customer_id = cc_s.id left join cc_customer cc on cc_s.customer_id = cc.id ");
+		fromBuilder.append("left join `user` u on u.id = cc_v.review_id left join cc_customer_join_customer_type cc_ct on cc_ct.seller_customer_id = cc_s.id left join cc_customer_type cc_t on cc_t.id = cc_ct.customer_type_id ");
+		fromBuilder.append("left join dict d on d.value = cc_v.question_type ");
+		fromBuilder.append("left JOIN act_ru_task art on cc_v.proc_inst_id = art.PROC_INST_ID_ ");
+		fromBuilder.append("where cc_v.data_area like '"+dataArea+"' ");
+		
+		if(StrKit.notBlank(keyword)) {
+			fromBuilder.append("and cc.customer_name like '%"+keyword+"%' ");
+		}
+
+		if(StrKit.notBlank(customerType)) {
+			fromBuilder.append("and cc_t.`id` = '"+customerType+"' ");
+		}
+
+		if(StrKit.notBlank(questionType)) {
+			fromBuilder.append("and cc_v.question_type = '"+questionType+"' ");
+		}
+
+		if(StrKit.notBlank(status)) {
+			fromBuilder.append("and cc_v.status = '"+status+"' ");
+		}
+
+		fromBuilder.append(" GROUP BY cc_v.id ");
+		fromBuilder.append(" ORDER BY " + orderby);
+
+		return Db.find(fromBuilder.toString());
+	}
+	
 }

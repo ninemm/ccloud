@@ -138,11 +138,11 @@ public class _UserController extends JBaseCRUDController<User> {
 			  for (UserGroupRel userGroupRel : userGroupRels) {
 				  gList.add(userGroupRel.getGroupId());
 			}
-			  for (String groupId : groupLists) {
+			  /*for (String groupId : groupLists) {
 				if (gList.contains(groupId)) {
 					gList.remove(groupId);
 				}
-			}
+			}*/
 			  for (String deleteGroupId : gList) {
 					Record record = UserGroupRelQuery.me().findByUserIdAndGroupId(user.getId(), deleteGroupId);
 					UserGroupRelQuery.me().batchDelete(record.get("id").toString());
