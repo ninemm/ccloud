@@ -108,11 +108,11 @@
                             var expectWidth = this.naturalWidth;
                             var expectHeight = this.naturalHeight;
 
-                            if (this.naturalWidth > this.naturalHeight && this.naturalWidth > 800) {
-                                expectWidth = 800;
+                            if (this.naturalWidth > this.naturalHeight && this.naturalWidth > 480) {
+                                expectWidth = 480;
                                 expectHeight = expectWidth * this.naturalHeight / this.naturalWidth;
-                            } else if (this.naturalHeight > this.naturalWidth && this.naturalHeight > 1200) {
-                                expectHeight = 1200;
+                            } else if (this.naturalHeight > this.naturalWidth && this.naturalHeight > 640) {
+                                expectHeight = 640;
                                 expectWidth = expectHeight * this.naturalWidth / this.naturalHeight;
                             }
 
@@ -137,10 +137,7 @@
                                             break;
                                     }
                                 }
-                                blob = canvas.toDataURL('image/jpeg', 0.8);
-                            }else if(navigator.userAgent.match(/Android/i)){
-                                var encoder = new JPEGEncoder();
-                                blob = encoder.encode(ctx.drawImage(0, 0, expectWidth, expectHeight), 80);
+                                blob = canvas.toDataURL('image/jpeg', 0.5);
                             } else {
                                 if(Orientation != "" && Orientation != 1){
                                     switch(Orientation){
@@ -387,7 +384,7 @@
 <@layout>
 <div class="weui-content">
     <div id="visit-add">
-        <div style="margin-bottom: 2.25rem">
+        <main>
         <form action="${CPATH}/customerVisit/save" method="post" id="form">
             <section class="weui-panel weui-panel_access order-customer-info select-area">
                 <div class="weui-cell weui-cell_access">
@@ -446,14 +443,6 @@
                     </div>
                 </div>
             </section>
-            <div class="weui-gallery" id="gallery">
-                <span class="weui-gallery__img" id="galleryImg"></span>
-                <div class="weui-gallery__opr">
-                    <a href="javascript:" rel="nofollow" target="_blank"  class="weui-gallery__del">
-                        <i class="weui-icon-delete weui-icon_gallery-delete"></i>
-                    </a>
-                </div>
-            </div>
             <section class="weui-panel weui-panel_access ft14 remark">
                 <div class="weui-cell weui-cell_access">
                     <div class="weui-cell__hd"><span class="icon-map-pin ft16 green"></span></div>
@@ -486,6 +475,14 @@
                 </div>
             </section>
         </form>
+        </main>
+        <div class="weui-gallery" id="gallery">
+            <span class="weui-gallery__img" id="galleryImg"></span>
+            <div class="weui-gallery__opr">
+                <a href="javascript:" rel="nofollow" target="_blank"  class="weui-gallery__del">
+                    <i class="weui-icon-delete weui-icon_gallery-delete"></i>
+                </a>
+            </div>
         </div>
     </div>
 
