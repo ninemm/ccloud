@@ -608,5 +608,10 @@ public class DepartmentQuery extends JBaseQuery {
 		}
 		return resTreeList;
 	}
-	
+	//多选树
+	/*public List<Map<String, Object>> findDepartmentListAsTree(Integer enable, String dataArea) {
+		List<Department> list = findDeptList(dataArea, "order_list asc");
+		ModelSorter.tree(list);
+		return doBuild(list);
+	}*/
 }

@@ -485,7 +485,8 @@ public class _UserController extends JBaseCRUDController<User> {
 	public void downloading() throws UnsupportedEncodingException {
 	
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		
+		//多选部门ID集合
+		//String deptIds = getPara("deptId");
 		
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\user\\"
 				+ "userInfo.xlsx";
@@ -540,5 +541,11 @@ public class _UserController extends JBaseCRUDController<User> {
 			renderAjaxResultForError("删除失败!");
 		}		
 	}
+	
+	/*public void station_tree() {
+    	String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+        List<Map<String, Object>> list = DepartmentQuery.me().findDepartmentListAsTree(1, dataArea);
+        setAttr("treeData", JSON.toJSON(list));
+    }*/
 	
 }
