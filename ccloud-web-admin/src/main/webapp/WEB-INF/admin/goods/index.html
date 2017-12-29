@@ -42,6 +42,16 @@
 		};
 		return param;
 	};
+	
+	function goodsDetail(id) {
+		var goodId = id;
+		layer.open({
+			title:"货品详情",
+			type: 2, 
+			area: ['50%', '55%'],
+			content: '${CPATH}/admin/goods/getDetail?id='+goodId
+		});		
+	}	
 
 	var initFields = function() {
 		var fields =
@@ -66,11 +76,12 @@
 					var url2 = '${CPATH}/admin/goods/imageManager?id=' + row.id + '&goodsName=' + row.name + '&c=${c}&p=${p}';
 					var image = '<a href="' + url2 + '" class="btn btn-sm" title="图片管理"><i class="fa fa-file-image-o"></i></a>';
 					var strHtml = ' <a href="' + url + '" class="btn btn-xs bg-olive btn-flat">编辑</a> <a href="javascript:void(0);" class="btn btn-xs btn-danger btn-flat" onclick="del(\''+row.id+'\')">删除</a>';
+					strHtml = strHtml + ' <a onclick="goodsDetail(\''+row.id+'\')" class="btn btn-xs btn-primary btn-flat">货品详情</a>';	
 					if(row.state == 1){
 						strHtml = strHtml + ' <a href="javascript:void(0);" class="btn btn-xs btn-warning btn-flat" onclick="enable(\''+row.id+'\'' + ',0' + ')">下架</a>';
 					} else {
 						strHtml = strHtml + ' <a href="javascript:void(0);" class="btn btn-xs btn-primary btn-flat" onclick="enable(\''+row.id+'\'' + ',1' + ')">上架</a>';
-					}					
+					}
 					return strHtml;
 				},
 				edit:false
