@@ -314,7 +314,8 @@
                     geoc.getLocation(point, function(rs) {
                         var addComp = rs.addressComponents;
                         var address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
-                        $('#location').text(address);
+                        $('#location-span').text(address);
+                        $('#location').val(address);
                     });
                  };
                  setTimeout(function() {
@@ -330,15 +331,15 @@
 	    });
     });
     function refreshLocation() {
-    $("#location").empty();
-    $("#location").css('text-align','center');
-    $("#location").append('<i class="weui-loading"></i>');
+        $("#location-span").empty();
+        $("#location-span").css('text-align','center');
+        $("#location-span").append('<i class="weui-loading"></i>');
 
         wx.getLocation({
             type: 'wgs84',
             success: function (res) {
-                $("#location").empty();
-                $("#location").removeAttr("style");
+                $("#location-span").empty();
+                $("#location-span").removeAttr("style");
                 var latitude = res.latitude;                      // 纬度，浮点数，范围为90 ~ -90
                 var longitude = res.longitude;                    // 经度，浮点数，范围为180 ~ -180。
                 var speed = res.speed;                            // 速度，以米/每秒计
@@ -353,7 +354,8 @@
                     geoc.getLocation(point, function(rs) {
                         var addComp = rs.addressComponents;
                         var address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
-                        $('#location').text(address);
+                        $('#location-span').text(address);
+                        $('#location').val(address);
                     });
                 };
                 setTimeout(function() {
@@ -361,14 +363,14 @@
                 }, 100);
             },
             cancel: function (res) {
-                $("#location").empty();
-                $("#location").removeAttr("style");
-                $("#location").text('用户拒绝授权获取地理位置');
+                $("#location-span").empty();
+                $("#location-span").removeAttr("style");
+                $("#location-span").text('用户拒绝授权获取地理位置');
             },
             fail: function (res) {
-                $("#location").empty();
-                $("#location").removeAttr("style");
-                $("#location").text(JSON.stringify(res));
+                $("#location-span").empty();
+                $("#location-span").removeAttr("style");
+                $("#location-span").text(JSON.stringify(res));
             }
         });
     }
@@ -377,7 +379,7 @@
 <@layout>
 <div class="weui-content">
 	<div id="customer-add">
-		<main>
+		<div style="margin-bottom: 2.25rem">
 		    <form action="${CPATH}/customer/save" method="post" id="form">
 			    <section class="weui-panel weui-panel_access order-customer-info select-area">
 			        <input type="hidden" name="sellerCustomer.id" value="${(sellerCustomer.id)!}">
@@ -452,9 +454,10 @@
                     <div class="weui-cell weui-cell_access">
                         <div class="weui-cell__hd"><span class="icon-map-pin ft16 green"></span></div>
                         <div class="weui-cell__bd">
-                            <div id="location" class="location">${(sellerCustomer.location)!'正在定位...'}</div>
+                            <div id="location-span" class="location">${(sellerCustomer.location)!'正在定位...'}</div>
                             <input type="hidden" name="sellerCustomer.lng" id="lng">
                             <input type="hidden" name="sellerCustomer.lat" id="lat">
+                            <input type="hidden" name="sellerCustomer.location" id="location">
                         </div>
                         <div class="weui-cell__hd" id="refresh"><span class="icon-refresh ft16 gray" onclick="refreshLocation()"></span></div>
                     </div>
@@ -493,7 +496,7 @@
 			        </div>
 			    </section>
 		    </form>
-		</main>
+		</div>
 		<#include "_inc/_goback.html" />
 		<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex border-top-1px">
 		    <#if sellerCustomer??> 
