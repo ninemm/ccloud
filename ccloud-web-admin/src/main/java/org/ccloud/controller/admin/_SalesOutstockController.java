@@ -488,36 +488,58 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		List<SalesOutstockExcel> excellist = Lists.newArrayList();
 		for (Record record : salesOutstckList) {
 		
-			SalesOutstockExcel excel = new SalesOutstockExcel();
-			
-			excel.setOutstockSn(record.get("outstock_sn").toString());
-			excel.setCustomer(record.get("customer_name").toString());
-			excel.setCustomerType(record.get("customerName").toString());
-			excel.setTotalAmount(record.get("total_amount").toString());
-			excel.setContact(record.get("contact").toString());
-			excel.setMobile(record.get("mobile").toString());
-			if(record.get("realname")==null){
-				excel.setBizUser("");
-			}else{
-				excel.setBizUser(record.get("realname").toString());
+			String outOrderId = record.get("id");
+			List<Record> outstockDetail = SalesOutstockDetailQuery.me().findByOutstockId(outOrderId);
+			for(Record re : outstockDetail){
+				SalesOutstockExcel excel = new SalesOutstockExcel();
+				BigDecimal creatconverRelate = new BigDecimal(re.get("convert_relate").toString());
+				BigDecimal bigPrice = new BigDecimal(re.get("product_price").toString());
+				BigDecimal count = new BigDecimal(re.get("product_count").toString());
+				String bigCount =(count.intValue())/(creatconverRelate.intValue())+"";
+				String smallCount = (count.intValue())%(creatconverRelate.intValue())+"";
+				BigDecimal smallPrice = bigPrice.divide(creatconverRelate, 2, BigDecimal.ROUND_HALF_UP);
+				excel.setProductName(re.get("custom_name").toString());
+				excel.setValueName(re.get("valueName").toString());
+				excel.setProductCount(bigCount);
+				excel.setCreatconvertRelate(re.get("convert_relate").toString()+re.get("small_unit").toString()+"/"+re.get("big_unit").toString());
+				excel.setProductPrice(re.get("product_price").toString());
+				excel.setSmallCount(smallCount);
+				excel.setSmallPrice(smallPrice.toString());
+				excel.setTotalAmount(re.get("product_amount").toString());
+				excel.setOutstockSn(record.get("outstock_sn").toString());
+				excel.setCustomer(record.get("customer_name").toString());
+				excel.setCustomerType(record.get("customerName").toString());
+				excel.setContact(record.get("contact").toString());
+				excel.setMobile(record.get("mobile").toString());
+				if(record.get("realname")==null){
+					excel.setBizUser("");
+				}else{
+					excel.setBizUser(record.get("realname").toString());
+				}
+				if(record.get("receive_type").toString().equals("0")){
+					excel.setReceiveType("应收账款");
+				}else{
+					excel.setReceiveType("现金");
+				}
+				if(record.get("is_print").toString().equals("0")){
+					excel.setIsPrint("未打印");
+				}else{
+					excel.setIsPrint("已打印");
+				}
+				if(record.get("status").toString().equals("0")){
+					excel.setStatus("待出库");
+				}else{
+					excel.setStatus("已出库");
+				}
+				if(re.get("is_gift").toString().equals("0")){
+					excel.setIsGift("否");
+				}else{
+					excel.setIsGift("是");
+				}
+				excel.setCreateDate(record.get("create_date").toString());
+				excellist.add(excel);
+				
 			}
-			if(record.get("receive_type").toString().equals("0")){
-				excel.setReceiveType("应收账款");
-			}else{
-				excel.setReceiveType("现金");
-			}
-			if(record.get("is_print").toString().equals("0")){
-				excel.setIsPrint("未打印");
-			}else{
-				excel.setIsPrint("已打印");
-			}
-			if(record.get("status").toString().equals("0")){
-				excel.setStatus("待出库");
-			}else{
-				excel.setStatus("已出库");
-			}
-			excel.setCreateDate(record.get("create_date").toString());
-			excellist.add(excel);
 		}
 		
 		ExportParams params = new ExportParams();

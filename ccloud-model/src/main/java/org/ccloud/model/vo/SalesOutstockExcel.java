@@ -25,6 +25,23 @@ public class SalesOutstockExcel {
 	private String status;
 	@Excel(name = "创建时间")
 	private String createDate;
+	@Excel(name = "商品名	")
+	private String productName;
+	@Excel(name = "规格")
+	private String valueName;
+	@Excel(name = "大单位数量")
+	private String productCount;
+	@Excel(name = "单位换算")
+	private String creatconvertRelate;
+	@Excel(name = "小单位数量")
+	private String smallCount;
+	@Excel(name = "大单位价格")
+	private String productPrice;
+	@Excel(name = "小单位价格")
+	private String smallPrice;
+	@Excel(name = "是否为赠品")
+	private String isGift;
+	
 	public String getOutstockSn() {
 		return outstockSn;
 	}
@@ -92,6 +109,53 @@ public class SalesOutstockExcel {
 	public void setBizUser(String bizUser) {
 		this.bizUser = bizUser;
 	}
+	public String getProductName() {
+		return productName;
+	}
+	public void setProductName(String productName) {
+		this.productName = productName;
+	}
+	public String getValueName() {
+		return valueName;
+	}
+	public void setValueName(String valueName) {
+		this.valueName = valueName;
+	}
+	public String getProductCount() {
+		return productCount;
+	}
+	public void setProductCount(String productCount) {
+		this.productCount = productCount;
+	}
 	
-	
+	public String getCreatconvertRelate() {
+		return creatconvertRelate;
+	}
+	public void setCreatconvertRelate(String creatconvertRelate) {
+		this.creatconvertRelate = creatconvertRelate;
+	}
+	public String getSmallCount() {
+		return smallCount;
+	}
+	public void setSmallCount(String smallCount) {
+		this.smallCount = smallCount;
+	}
+	public String getProductPrice() {
+		return productPrice;
+	}
+	public void setProductPrice(String productPrice) {
+		this.productPrice = productPrice;
+	}
+	public String getSmallPrice() {
+		return smallPrice;
+	}
+	public void setSmallPrice(String smallPrice) {
+		this.smallPrice = smallPrice;
+	}
+	public String getIsGift() {
+		return isGift;
+	}
+	public void setIsGift(String isGift) {
+		this.isGift = isGift;
+	}
 }
