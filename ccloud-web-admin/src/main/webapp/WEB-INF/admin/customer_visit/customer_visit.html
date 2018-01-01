@@ -144,6 +144,17 @@
         $("#status").html(strHtml);
     };
 
+	$("#exportVisit").click(function(){
+        var keyword = $('#post-search-input').val();
+        if (keyword) keyword = encodeURIComponent(keyword);
+        var customerType = $('#customer_type').val();
+        if (customerType) customerType = encodeURIComponent(customerType);
+        var questionType = $('#question_type').val();
+        if (questionType) questionType = encodeURIComponent(questionType);
+        var status = $('#status').val();
+        if (status) status = encodeURIComponent(status);
+        window.open("${CPATH}/admin/customerVisit/exportVisit?k="+keyword+"&questionType="+questionType+"&customerType="+customerType+"&status="+status,"_parent","","");
+    });
 
 
 </#macro>
@@ -164,6 +175,9 @@
             <input type="hidden" name="searchParams" id="searchParams" value="">
         </div>
         <div class="row content-row">
+      		<div class="input-group input-group-sm " style="float: left">
+                <input id="exportVisit" class="btn btn-sm btn-primary" type="button" value="拜访导出"/>
+            </div>
             <div class="input-group input-group-sm " style="float: right">
                 <select class="input-sm" name="customer_type" id="customer_type" style="float: left;padding-right:5px;margin-right:5px;">
                 </select>

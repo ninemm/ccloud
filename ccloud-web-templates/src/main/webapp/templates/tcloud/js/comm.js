@@ -349,7 +349,7 @@ $(function() {
 	}).on("touchend", ".layer", function () { //点击遮罩关闭菜单、组合筛选
 	    closeMenu();
 	    closeCombinSearch();
-	}).on('touchend', '#combin-filter-btn', function () { //打开组合筛选
+	}).on('touchend', '#combin-filter-btn, .select-customer', function () { //打开组合筛选
 	    if ($combinSearch.length > 0) {
 	      openCombinSearch();
 	    }

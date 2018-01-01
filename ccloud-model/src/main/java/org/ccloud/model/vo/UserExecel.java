@@ -3,10 +3,11 @@ package org.ccloud.model.vo;
 import cn.afterturn.easypoi.excel.annotation.Excel;
 
 public class UserExecel {
-	@Excel(name = "呢称（选填）")
-	private String nickname;
-	@Excel(name = "真实姓名")
+	
+	@Excel(name = "姓名")
 	private String contact;
+	@Excel(name = "昵称")
+	private String nickname;
 	@Excel(name = "手机")
 	private String mobile;
 	@Excel(name = "部门名称")

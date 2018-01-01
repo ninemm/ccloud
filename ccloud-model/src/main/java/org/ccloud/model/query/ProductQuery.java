@@ -454,4 +454,13 @@ public class ProductQuery extends JBaseQuery {
 		String select ="select distinct cp.`name` from cc_product cp left join cc_goods cg on cp.goods_id = cg.id left join cc_goods_type cgt on cg.goods_type_id = cgt.id where cgt.id = '"+goodsType+"'";
 		return DAO.find(select);
 	}
+	
+	public List<Record> findProductByGoodsId(String goodsId){
+		StringBuilder fromBuilder = new StringBuilder("SELECT p.*, t1.valueName ");
+		fromBuilder.append("FROM cc_product p ");
+		fromBuilder.append("LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
+		fromBuilder.append("RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = p.id where p.goods_id=?");
+		return Db.find(fromBuilder.toString(), goodsId);
+	}	
+	
 }

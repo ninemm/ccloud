@@ -15,12 +15,42 @@
  */
 package org.ccloud.controller.admin;
 
+import java.awt.Graphics;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.HeadlessException;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.Transparency;
+import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+
 import com.google.common.base.Joiner;
 import com.jfinal.kit.Kv;
+
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
+import org.apache.poi.hssf.usermodel.HSSFPatriarch;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
@@ -41,6 +71,7 @@ import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
+
 import org.ccloud.workflow.service.WorkFlowService;
 import org.joda.time.DateTime;
 
@@ -197,5 +228,172 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 
 		message.setTitle(title);
 		MessageKit.sendMessage(Actions.ProcessMessage.PROCESS_MESSAGE_SAVE, message);
+	}
+	
+	public void exportVisit() throws IOException {
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		
+        String keyword = getPara("k");
+        String questionType = getPara("questionType");
+        String customerType = getPara("customerType");
+        String status = getPara("status");
+        
+        if (StrKit.notBlank(keyword)) {
+            keyword = StringUtils.urlDecode(keyword);
+            setAttr("k", keyword);
+        }
+
+        if (StrKit.notBlank(questionType)) {
+        	questionType = StringUtils.urlDecode(questionType);
+            setAttr("questionType", questionType);
+        }
+
+        if (StrKit.notBlank(customerType)) {
+        	customerType = StringUtils.urlDecode(customerType);
+            setAttr("customerType", customerType);
+        }
+
+        if(StrKit.notBlank(status)) {
+        	status = StringUtils.urlDecode(status);
+        	setAttr("status", status);
+		}
+        
+        List<Record> visitList = CustomerVisitQuery.me().exportVisit(keyword, selectDataArea, customerType, questionType, "id", "cc_v.create_date desc", status);
+        exportExcel(visitList);
+        
+	}
+	
+	public void exportExcel(List<Record> dataList) throws IOException {
+
+		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\customer_visit\\"
+				+ "customerVisitInfo.xls";
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		
+		FileOutputStream fileOut = null;
+		BufferedImage bufferImg = null;
+
+		try {
+		    HSSFWorkbook wb = new HSSFWorkbook();  
+			HSSFSheet sheet=wb.createSheet("拜访记录");  
+			HSSFRow row1=sheet.createRow(0);  
+			HSSFCell cell=row1.createCell(0); 
+			
+			HSSFPatriarch patriarch = sheet.createDrawingPatriarch();
+			cell.setCellValue("拜访记录导出表");  
+			sheet.addMergedRegion(new CellRangeAddress(0,0,0,13));  
+			HSSFRow rowTitle=sheet.createRow(1);  
+			
+			//sheet.setDefaultRowHeight((short) (15.625*20));
+			sheet.setDefaultColumnWidth( (short) (20));
+
+			rowTitle.createCell(0).setCellValue("客户名称");
+			rowTitle.createCell(1).setCellValue("客户类型");
+			rowTitle.createCell(2).setCellValue("客户电话");
+			rowTitle.createCell(3).setCellValue("问题类型");  
+			
+			rowTitle.createCell(4).setCellValue("问题描述");      
+			rowTitle.createCell(5).setCellValue("拜访人");
+			rowTitle.createCell(6).setCellValue("审核状态");
+			rowTitle.createCell(7).setCellValue("创建时间");  
+			
+			rowTitle.createCell(8).setCellValue("拜访图片1"); 
+			rowTitle.createCell(9).setCellValue("拜访图片2");
+			rowTitle.createCell(10).setCellValue("拜访图片3");
+			
+			rowTitle.createCell(11).setCellValue("审核建议");
+			rowTitle.createCell(12).setCellValue("审核人");  
+			rowTitle.createCell(13).setCellValue("审核时间"); 
+			
+			int rowNum = 1;
+			for (Record record : dataList) {
+				rowNum++;
+				HSSFRow row=sheet.createRow(rowNum);
+				row.setHeight((short) (15.625*50));
+				row.createCell(0).setCellValue((String) record.get("customer_name"));
+				row.createCell(1).setCellValue((String)record.get("customer_type"));
+				row.createCell(2).setCellValue((String)record.get("customerMobile"));
+				row.createCell(3).setCellValue((String)record.get("questionName"));
+				
+				row.createCell(4).setCellValue((String)record.get("question_desc"));
+				row.createCell(5).setCellValue((String)record.get("visit_user"));
+				row.createCell(6).setCellValue((String)record.get("visitStatus"));
+				row.createCell(7).setCellValue(record.get("create_date")!=null?(String)sdf.format(record.get("create_date")):"");
+				
+				String picsrc = (String)record.get("photo");
+				String[] picArray = new String[3];
+				if(picsrc.length()>5) {
+					if(picsrc.contains(",")) {
+						picArray = picsrc.split(",");
+					}else {
+						picArray[0] = picsrc;
+					}
+				}
+				
+				for(int i =0;i<picArray.length;i++) {
+					if(picArray[i]==null) {break;}
+					ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream();
+					Image src=Toolkit.getDefaultToolkit().getImage(picArray[i].substring(picArray[i].indexOf("\":\""), picArray[i].indexOf("\"}"))); 
+					bufferImg=toBufferedImage(src);
+					ImageIO.write(bufferImg, "jpg", byteArrayOut);
+					HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 250, (short) (8+i), rowNum, (short) (9+i), rowNum);
+					anchor.setAnchorType(0);
+					patriarch.createPicture(anchor, wb.addPicture(byteArrayOut.toByteArray(), HSSFWorkbook.PICTURE_TYPE_JPEG));
+					byteArrayOut.close();
+
+				}
+
+				row.createCell(11).setCellValue((String)record.get("comment"));
+				row.createCell(12).setCellValue((String)record.get("review_user"));
+				row.createCell(13).setCellValue(record.get("review_date")!=null?(String)sdf.format(record.get("review_date")):"");
+			}
+      
+		   fileOut = new FileOutputStream(filePath);
+		   wb.write(fileOut);  
+		} catch (IOException io) {
+			io.printStackTrace();
+			System.out.println("io erorr : " + io.getMessage());
+		} finally {
+			if (fileOut != null) {
+				try {
+					fileOut.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		renderFile(new File(filePath));
+
+	}
+	
+	public static BufferedImage toBufferedImage(Image image) { 
+		if (image instanceof BufferedImage) { 
+			return (BufferedImage) image; 
+		} 
+
+		image = new ImageIcon(image).getImage(); 
+		BufferedImage bimage = null; 
+		GraphicsEnvironment ge = GraphicsEnvironment 
+		.getLocalGraphicsEnvironment(); 
+		
+		try { 
+			int transparency = Transparency.OPAQUE; 
+			GraphicsDevice gs = ge.getDefaultScreenDevice(); 
+			GraphicsConfiguration gc = gs.getDefaultConfiguration(); 
+			bimage = gc.createCompatibleImage(image.getWidth(null), 
+			image.getHeight(null), transparency); 
+		} catch (HeadlessException e) { 
+			e.getStackTrace();
+		} 
+		
+		if (bimage == null) { 
+			int type = BufferedImage.TYPE_INT_RGB; 
+			bimage = new BufferedImage(image.getWidth(null), 
+			image.getHeight(null), type); 
+		} 
+		
+		Graphics g = bimage.createGraphics(); 
+		g.drawImage(image, 0, 0, null); 
+		g.dispose(); 
+		return bimage; 
 	}
 }

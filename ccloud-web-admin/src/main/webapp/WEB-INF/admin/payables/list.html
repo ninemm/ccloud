@@ -34,7 +34,8 @@
 	var type = '${type}';
 	var userInfo = JSON.parse('${userInfo}');
 	var bill_id = '${bill_id}';
-	var $form = $("#form");	 
+	var $form = $("#form");
+	var balance_amount = ${(balance_amount)!}; 
 
 	$(function(){
 		var url = '${CPATH}/admin/payables/list?ref_sn='+ref_sn;
@@ -52,7 +53,8 @@
   		'act_amount':{
   			validators: {
 				notEmpty: { message: '付款金额不能为空' },
-				regexp:{regexp:/[1-9]\d*\.?\d*/, message:'付款金额为数字'}
+				regexp:{regexp:/[1-9]\d*\.?\d*/, message:'付款金额为数字'},
+				between:{min:0,max:balance_amount,message:'请确认付款金额'}
 			}
   		}
   	  };
@@ -97,6 +99,8 @@
 			if(data.errorCode == 0) {
 				//location.reload();
 				toastr.success(data.message, '操作成功');
+				var act_amount = $('input[name="act_amount"]').val();
+				balance_amount = balance_amount-act_amount;
 			    $('#_payment_table').bootstrapTable('refresh');
 			} else {
 				toastr.error(data.message,'操作失败');
@@ -108,7 +112,15 @@
 	});
 }
 
-
+$('input[name="act_amount"]').on("blur",function(){
+		var act_amount = $('input[name="act_amount"]').val();
+		$('input[name="balance_amount"]').val(balance_amount-act_amount);
+		if(act_amount>balance_amount){
+			$("#save").attr("disabled",true);
+		}else{
+			$("#save").attr("disabled",false);
+		}
+	});
 
 </#macro>
 
@@ -179,7 +191,7 @@
 		</form>
 		
 		<div class="box-footer">
-			<button type="button" onclick="doSubmit()" class="btn btn-primary">保存</button>
+			<button type="button" id="save" onclick="doSubmit()" class="btn btn-primary">保存</button>
 			<input type="button" class="btn btn-primary" onclick="window.history.back()" value="返  回" hidefocus="true" />
 		</div>
 	</div>

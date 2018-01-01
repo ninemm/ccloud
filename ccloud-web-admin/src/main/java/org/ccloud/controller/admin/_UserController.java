@@ -138,11 +138,11 @@ public class _UserController extends JBaseCRUDController<User> {
 			  for (UserGroupRel userGroupRel : userGroupRels) {
 				  gList.add(userGroupRel.getGroupId());
 			}
-			  for (String groupId : groupLists) {
+			  /*for (String groupId : groupLists) {
 				if (gList.contains(groupId)) {
 					gList.remove(groupId);
 				}
-			}
+			}*/
 			  for (String deleteGroupId : gList) {
 					Record record = UserGroupRelQuery.me().findByUserIdAndGroupId(user.getId(), deleteGroupId);
 					UserGroupRelQuery.me().batchDelete(record.get("id").toString());
@@ -482,16 +482,11 @@ public class _UserController extends JBaseCRUDController<User> {
 	
 	@RequiresPermissions(value = { "/admin/user/downloading", "/admin/dealer/all",
 	"/admin/all" }, logical = Logical.OR)
-	public void download() {
-	
-		render("download.html");
-	}
-	
-	@RequiresPermissions(value = { "/admin/user/downloading", "/admin/dealer/all",
-	"/admin/all" }, logical = Logical.OR)
 	public void downloading() throws UnsupportedEncodingException {
 	
-		String dataArea = getPara("data_area");
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		//多选部门ID集合
+		//String deptIds = getPara("deptId");
 		
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\user\\"
 				+ "userInfo.xlsx";
@@ -546,5 +541,11 @@ public class _UserController extends JBaseCRUDController<User> {
 			renderAjaxResultForError("删除失败!");
 		}		
 	}
+	
+	/*public void station_tree() {
+    	String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+        List<Map<String, Object>> list = DepartmentQuery.me().findDepartmentListAsTree(1, dataArea);
+        setAttr("treeData", JSON.toJSON(list));
+    }*/
 	
 }

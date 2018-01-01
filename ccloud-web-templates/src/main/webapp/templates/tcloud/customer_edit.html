@@ -84,11 +84,11 @@
                             var expectWidth = this.naturalWidth;
                             var expectHeight = this.naturalHeight;
 
-                            if (this.naturalWidth > this.naturalHeight && this.naturalWidth > 800) {
-                                expectWidth = 800;
+                            if (this.naturalWidth > this.naturalHeight && this.naturalWidth > 480) {
+                                expectWidth = 480;
                                 expectHeight = expectWidth * this.naturalHeight / this.naturalWidth;
-                            } else if (this.naturalHeight > this.naturalWidth && this.naturalHeight > 1200) {
-                                expectHeight = 1200;
+                            } else if (this.naturalHeight > this.naturalWidth && this.naturalHeight > 640) {
+                                expectHeight = 640;
                                 expectWidth = expectHeight * this.naturalWidth / this.naturalHeight;
                             }
 
@@ -98,52 +98,31 @@
                             canvas.height = expectHeight;
                             ctx.drawImage(this, 0, 0, canvas.width, canvas.height);
 
-                            if (navigator.userAgent.match(/iphone/i)) {
-                                if(Orientation != "" && Orientation != 1){
-                                    switch(Orientation){
-                                        case 6://需要顺时针（向左）90度旋转
-                                            rotateImg(this,'left',canvas);
-                                            break;
-                                        case 8://需要逆时针（向右）90度旋转
-                                            rotateImg(this,'right',canvas);
-                                            break;
-                                        case 3://需要180度旋转
-                                            rotateImg(this,'right',canvas);//转两次
-                                            rotateImg(this,'right',canvas);
-                                            break;
-                                    }
+                            if(Orientation != "" && Orientation != 1){
+                                switch(Orientation){
+                                    case 6://需要顺时针（向左）90度旋转
+                                        rotateImg(this,'left',canvas);
+                                        break;
+                                    case 8://需要逆时针（向右）90度旋转
+                                        rotateImg(this,'right',canvas);
+                                        break;
+                                    case 3://需要180度旋转
+                                        rotateImg(this,'right',canvas);//转两次
+                                        rotateImg(this,'right',canvas);
+                                        break;
                                 }
-                                blob = canvas.toDataURL('image/jpeg', 0.8);
-                            }else if(navigator.userAgent.match(/Android/i)){
-                                var encoder = new JPEGEncoder();
-                                blob = encoder.encode(ctx.drawImage(0, 0, expectWidth, expectHeight), 80);
-                            } else {
-                                if(Orientation != "" && Orientation != 1){
-                                    switch(Orientation){
-                                        case 6://需要顺时针（向左）90度旋转
-                                            rotateImg(this,'left',canvas);
-                                            break;
-                                        case 8://需要逆时针（向右）90度旋转
-                                            rotateImg(this,'right',canvas);
-                                            break;
-                                        case 3://需要180度旋转
-                                            rotateImg(this,'right',canvas);//转两次
-                                            rotateImg(this,'right',canvas);
-                                            break;
-                                    }
-                                }
-                                blob = canvas.toDataURL("image/jpeg", 0.8);
                             }
-                        imageArr.push({"pic":blob, "pic_name":x});
-                        $("#pic").val(JSON.stringify(imageArr));
-                        var str = '<li class="weui-uploader__file " style="background-image:url('+blob+')"></li>';
-                        $uploaderFiles.append(str);
+                            blob = canvas.toDataURL("image/jpeg", 0.1);
+                            imageArr.push({"pic":blob, "pic_name":x});
+                            $("#pic").val(JSON.stringify(imageArr));
+                            var str = '<li class="weui-uploader__file " style="background-image:url('+blob+')"></li>';
+                            $uploaderFiles.append(str);
+                        };
                     };
-                };
-            })(file.name)
-            reader.readAsDataURL(file);
-        }
-    });
+                })(file.name)
+                reader.readAsDataURL(file);
+            }
+        });
 
     function rotateImg(img, direction,canvas) {
         //最小与最大旋转方向，图片旋转4次后回到原方向
@@ -241,6 +220,7 @@
                 if($("#customer_type").val().length==0) {$.toptip('客户类型不能为空', 1000, 'error'); return false;}
                 if($("#delivery-address").val().length==0) {$.toptip('配送地址不能为空', 1000, 'error'); return false;}
                 if($("#address").val().length==0) {$.toptip('地址详情不能为空', 1000, 'error'); return false;}
+                if($("#location").val().length==0) {$.toptip('定位地址不能为空,请刷新定位', 1000, 'error'); return false;}
 
                 $('._submit_btn').attr('disabled', true);
                 layer.open({
@@ -313,7 +293,8 @@
                     geoc.getLocation(point, function(rs) {
                         var addComp = rs.addressComponents;
                         var address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
-                        $('#location').text(address);
+                        $('#location-span').text(address);
+                        $('#location').val(address);
                     });
                  };
                  setTimeout(function() {
@@ -328,6 +309,50 @@
 	        }
 	    });
     });
+    function refreshLocation() {
+        $("#location-span").empty();
+        $("#location-span").css('text-align','center');
+        $("#location-span").append('<i class="weui-loading"></i>');
+
+        wx.getLocation({
+            type: 'wgs84',
+            success: function (res) {
+                $("#location-span").empty();
+                $("#location-span").removeAttr("style");
+                var latitude = res.latitude;                      // 纬度，浮点数，范围为90 ~ -90
+                var longitude = res.longitude;                    // 经度，浮点数，范围为180 ~ -180。
+                var speed = res.speed;                            // 速度，以米/每秒计
+                var accuracy = res.accuracy;                      // 位置精度
+
+                var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
+                var geoc = new BMap.Geocoder();                   // 获取百度地址解析器
+
+                $("#lng").val(parseFloat(longitude).toFixed(2));
+                $("#lat").val(parseFloat(latitude).toFixed(2));
+                translateCallback = function (point) {            // 回调函数
+                    geoc.getLocation(point, function(rs) {
+                        var addComp = rs.addressComponents;
+                        var address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
+                        $('#location-span').text(address);
+                        $('#location').val(address);
+                    });
+                };
+                setTimeout(function() {
+                    BMap.Convertor.translate(point, 0, translateCallback);//真实经纬度转成百度坐标
+                }, 100);
+            },
+            cancel: function (res) {
+                $("#location-span").empty();
+                $("#location-span").removeAttr("style");
+                $("#location-span").text('用户拒绝授权获取地理位置');
+            },
+            fail: function (res) {
+                $("#location-span").empty();
+                $("#location-span").removeAttr("style");
+                $("#location-span").text(JSON.stringify(res));
+            }
+        });
+    }
 </#macro>
 
 <@layout>
@@ -404,14 +429,18 @@
 			            </div>
 			        </div>
 			    </section>
-			    <div class="weui-gallery" id="gallery">
-			        <span class="weui-gallery__img" id="galleryImg"></span>
-			        <div class="weui-gallery__opr">
-			            <a href="javascript:" rel="nofollow" target="_blank"  class="weui-gallery__del">
-			                <i class="weui-icon-delete weui-icon_gallery-delete"></i>
-			            </a>
-			        </div>
-			    </div>
+                <section class="weui-panel weui-panel_access ft14 remark">
+                    <div class="weui-cell weui-cell_access">
+                        <div class="weui-cell__hd"><span class="icon-map-pin ft16 green"></span></div>
+                        <div class="weui-cell__bd">
+                            <div id="location-span" class="location">${(sellerCustomer.location)!'正在定位...'}</div>
+                            <input type="hidden" name="sellerCustomer.lng" id="lng">
+                            <input type="hidden" name="sellerCustomer.lat" id="lat">
+                            <input type="hidden" name="sellerCustomer.location" id="location">
+                        </div>
+                        <div class="weui-cell__hd" id="refresh"><span class="icon-refresh ft16 gray" onclick="refreshLocation()"></span></div>
+                    </div>
+                </section>
 			    <section class="weui-cells weui-cells_form">
 			        <div class="weui-cell">
 			            <div class="weui-cell__bd">
@@ -437,19 +466,16 @@
 			            </div>
 			        </div>
 			    </section>
-			    <section class="weui-panel weui-panel_access ft14 remark">
-			        <div class="weui-cell weui-cell_access">
-			            <div class="weui-cell__hd"><span class="icon-map-pin ft16 green"></span></div>
-			            <div class="weui-cell__bd">
-			                <div id="location" class="location">${(sellerCustomer.location)!'正在定位...'}</div>
-                            <input type="hidden" name="sellerCustomer.lng" id="lng">
-                            <input type="hidden" name="sellerCustomer.lat" id="lat">
-                        </div>
-                        <div class="weui-cell__hd" id="refresh"><span class="icon-refresh ft16 gray"></span></div>
-			        </div>
-			    </section>
 		    </form>
-		</main>
+        </main>
+        <div class="weui-gallery" id="gallery">
+                <span class="weui-gallery__img" id="galleryImg"></span>
+                <div class="weui-gallery__opr">
+                    <a href="javascript:" rel="nofollow" target="_blank"  class="weui-gallery__del">
+                        <i class="weui-icon-delete weui-icon_gallery-delete"></i>
+                    </a>
+                </div>
+            </div>
 		<#include "_inc/_goback.html" />
 		<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex border-top-1px">
 		    <#if sellerCustomer??> 

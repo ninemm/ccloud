@@ -570,5 +570,24 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
         renderJson(list);
 	}
 	
+	public void getDetail() {
+		String id = getPara("id");
+		List<Record> list = ProductQuery.me().findProductByGoodsId(id);
+		setAttr("list", list);
+		render("product_detail.html");
+	}
+	
+	public void productEnable() {
+		String id = getPara("id");
+		Product product = ProductQuery.me().findById(id);
+		if (product.getIsMarketable()) {
+			product.setIsMarketable(false);
+		} else {
+			product.setIsMarketable(true);
+		}
+		product.update();
+		renderAjaxResultForSuccess("更新成功");
+	}
+	
 }
 
