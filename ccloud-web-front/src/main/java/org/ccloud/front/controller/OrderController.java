@@ -223,13 +223,12 @@ public class OrderController extends BaseFrontController {
 				String orderId = StrKit.getRandomUUID();
 				Date date = new Date();
 				String OrderSO = SalesOrderQuery.me().getNewSn(sellerId);
-				String allTotalAmount = StringUtils.getArrayFirst(paraMap.get("allTotalAmount"));
 				// 销售订单：SO + 100000(机构编号或企业编号6位) + A(客户类型) + 171108(时间) + 100001(流水号)
 				String orderSn = "SO" + sellerCode + StringUtils.getArrayFirst(paraMap.get("customerTypeCode"))
 						+ DateUtils.format("yyMMdd", date) + OrderSO;
 
 				if (!SalesOrderQuery.me().insertForApp(paraMap, orderId, orderSn, sellerId, user.getId(), date,	
-						user.getDepartmentId(), user.getDataArea(), allTotalAmount)) {
+						user.getDepartmentId(), user.getDataArea())) {
 					return false;
 				}
 
@@ -279,8 +278,8 @@ public class OrderController extends BaseFrontController {
 					}
 				}
 				
-				Boolean startProc = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROCEDURE_REVIEW + sellerCode);
-        		boolean isStartProc = (startProc != null && startProc) ? true : false;
+				//是否开启
+				boolean isStartProc = isStart(sellerCode, paraMap);
         		String proc_def_key = StringUtils.getArrayFirst(paraMap.get("proc_def_key"));
         		
         		if (isStartProc && StrKit.notBlank(proc_def_key)) {
@@ -297,6 +296,28 @@ public class OrderController extends BaseFrontController {
 			}
 		});
 		return isSave;
+	}
+	
+	private boolean isStart(String sellerCode, Map<String, String[]> paraMap) {
+		//是否开启
+		Boolean startProc = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROCEDURE_REVIEW + sellerCode);
+		if(startProc != null && startProc) { 
+			return true;
+		}
+		//超过数量(件)
+		Float startNum = OptionQuery.me().findValueAsFloat(Consts.OPTION_WEB_PROC_NUM_LIMIT + sellerCode);
+		Float totalNum = Float.valueOf(StringUtils.getArrayFirst(paraMap.get("totalNum")));
+		if(startNum != null && totalNum > startNum) { 
+			return true;
+		}
+		//超过金额(元)
+		Float startPrice = OptionQuery.me().findValueAsFloat(Consts.OPTION_WEB_PROC_PRICE_LIMIT + sellerCode);
+		Float total = Float.valueOf(StringUtils.getArrayFirst(paraMap.get("total")));
+		if(startPrice != null && total > startPrice) { 
+			return true;
+		}
+		
+		return false;
 	}
 
 	private boolean start(String orderId, String customerName, String proc_def_key) {

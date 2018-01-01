@@ -196,7 +196,7 @@ $(function() {
 		var products = $(".common");
 		var rowTotal = 0;
 		var total = 0;
-		var allTotalAmount = 0;
+		var totalNum = 0;
 		$.each(products, function(index, el) {
 			var $el = $(el);
 			rowTotal = $el.find("#bigNum").val() * $el.find("#bigPrice").val() + $el.find("#smallNum").val() * $el.find("#smallPrice").val();
@@ -207,7 +207,7 @@ $(function() {
 			var convert = parseInt($el.find("#convert").val());
 			var smallNum = parseInt($el.find("#smallNum").val());
 			var number = (smallNum/convert).toFixed(2);
-			allTotalAmount = allTotalAmount + bigNum + number*1;
+			totalNum = totalNum + bigNum + number*1;
 			$el.find("#rowTotal").val(rowTotal);
 		});
 
@@ -221,7 +221,7 @@ $(function() {
 			if (!comNum) {
 				comNum = 0;
 			}
-			allTotalAmount = allTotalAmount + comNum*1;
+			totalNum = totalNum + comNum*1;
 		});
 
 		var factor = $("#factor").val();
@@ -229,8 +229,8 @@ $(function() {
 			total = total * factor;
 		}
 		$("#total").val(total);
-		$("#totalNum").text("共" + (products.length + compositions.length) + "款,合计:" + total + "元")
-		$("#allTotalAmount").val(allTotalAmount);
+		$("#totalNum").val(totalNum);
+		$("#totalNumSpan").text("共" + (products.length + compositions.length) + "款,合计:" + total + "元")
 	} 
 
 	var flg = true;
@@ -356,7 +356,6 @@ $(function() {
 								客户类型
 								<span class="require">*</span>
 							</div>
-							<input type="hidden" id="allTotalAmount" name="allTotalAmount" value="">
 							<input type="hidden" id="customerType" name="customerType" value="">
 							<input type="hidden" id="customerTypeCode" name="customerTypeCode" value="">
 							<input type="hidden" id="factor" name="factor" value="">
@@ -481,10 +480,11 @@ $(function() {
 					</div>
 				</div>
 				<input type="hidden" id="total" name="total" value="">
+				<input type="hidden" id="totalNum" name="totalNum" value="">
 			</main>
 			<#include "_inc/_goback.html" />
 			<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
-				<p class="total bg-gray weui-flex__item" id="totalNum"></p>
+				<p class="total bg-gray weui-flex__item" id="totalNumSpan"></p>
 				<button type="button" id="shoppingCart" class="place-order yellow-button white">购物车</button>
 				<button type="button" id="placeOrder" class="place-order red-button">提交订单</button>
 			</footer>

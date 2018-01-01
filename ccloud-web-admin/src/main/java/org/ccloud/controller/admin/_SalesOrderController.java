@@ -232,8 +232,8 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
         		}
         		
-        		Boolean startProc = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROCEDURE_REVIEW + sellerCode);
-        		boolean isStartProc = (startProc != null && startProc) ? true : false;
+				//是否开启
+				boolean isStartProc = isStart(sellerCode, paraMap);
         		String proc_def_key = StringUtils.getArrayFirst(paraMap.get("proc_def_key"));
         		
         		if (isStartProc && StrKit.notBlank(proc_def_key)) {
@@ -249,6 +249,28 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
             }
         });
         return isSave;
+	}
+	
+	private boolean isStart(String sellerCode, Map<String, String[]> paraMap) {
+		//是否开启
+		Boolean startProc = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROCEDURE_REVIEW + sellerCode);
+		if(startProc != null && startProc) { 
+			return true;
+		}
+		//超过数量(件)
+		Float startNum = OptionQuery.me().findValueAsFloat(Consts.OPTION_WEB_PROC_NUM_LIMIT + sellerCode);
+		Float productTotal = Float.valueOf(StringUtils.getArrayFirst(paraMap.get("productTotal")));
+		if(startNum != null && productTotal > startNum) { 
+			return true;
+		}
+		//超过金额(元)
+		Float startPrice = OptionQuery.me().findValueAsFloat(Consts.OPTION_WEB_PROC_PRICE_LIMIT + sellerCode);
+		Float total = Float.valueOf(StringUtils.getArrayFirst(paraMap.get("total")));
+		if(startPrice != null && total > startPrice) { 
+			return true;
+		}
+		
+		return false;
 	}
 	
 	public void orderProc() {
