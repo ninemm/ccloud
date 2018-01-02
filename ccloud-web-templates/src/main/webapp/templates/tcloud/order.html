@@ -380,7 +380,9 @@ $(function() {
 				<section class="weui-panel weui-panel_access delivery-info">
 					<div class="weui-cell weui-cell_access">
 						<div class="weui-cell__bd">
-							<i class="icon-clock-o top-btns" style="margin-top: 14px;color:#ea6f5a;"></i> 配送时间
+							<div class="order-customer-info-title">
+								<i class="icon-clock-o top-btns" style="margin-top: 14px;color:#ea6f5a;"></i> 配送时间
+							</div>
 							<input type="text" class="weui-input" data-toggle='date' id="deliveryDate" name="deliveryDate" value="${deliveryDate!}" readonly>
 							<span class="weui-cell__ft"></span>
 						</div>
@@ -389,7 +391,7 @@ $(function() {
 				<section class="weui-panel weui-panel_access ft14">
 					<div class="weui-cell weui-cell_access">
 						<div class="weui-cell__bd" style="justify-content:flex-start">
-							<input type="checkbox" name="receiveType" value="0" style="margin-right:.5rem;"> 
+							<input type="checkbox" name="receiveType" value="0" style="margin-right:.5rem;margin-top:.7rem" class="weui-agree__checkbox"> 
 							<span>是否账期</span>
 						</div>
 					</div>
@@ -413,8 +415,10 @@ $(function() {
 						</div>
 						<div class="product_unit">
 							规格：<span id="valueName"></span>
-							<span class="fr no-bg">是否赠品</span>
-							<input type="checkbox" name="isGift" id="isGift" value="1" class="fr" disabled>
+							<div class="fr">
+								<span class="no-bg">是否赠品</span>
+								<input type="checkbox" name="isGift" id="isGift" value="1" class="weui-agree__checkbox" disabled>
+							</div>
 						</div>
 						<div class="product_bUnit">
 							<span class="price" id="bigPriceSpan"></span>
@@ -440,7 +444,7 @@ $(function() {
 							<input type="hidden" name="giftConvert" id="giftConvert" value="">
 							<input type="hidden" name="giftBigPrice" id="giftBigPrice" value="" >
 							<div>
-								<input type="checkbox" name="add-gift" id="addGift" disabled>
+								<input type="checkbox" name="add-gift" id="addGift" disabled class="weui-agree__checkbox">
 								<span>赠品</span>
 							</div>
 							<div style="display:none" class="select-area">
@@ -448,7 +452,7 @@ $(function() {
 									<span>商品</span>
 									<input type="text" class="choose-good weui-input" placeholder="选择商品" id="giftProduct" readonly>
 									<i class="icon-sort-desc"></i>
-									<input type="checkbox" name="default-goods" id="isDefault" disabled>
+									<input type="checkbox" name="default-goods" id="isDefault" disabled class="weui-agree__checkbox">
 									<span>默认商品</span>
 								</div>
 								<div class="number">

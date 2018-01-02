@@ -436,8 +436,10 @@ function save(){
 				</div>
 				<div class="product_unit">
 					规格：<span id="valueName"></span>
-					<span class="fr no-bg">是否赠品</span>
-					<input type="checkbox" name="isGift" id="isGift" value="1" class="fr">
+					<div class="fr">
+						<span class="no-bg">是否赠品</span>
+						<input type="checkbox" name="isGift" id="isGift" value="1" class="weui-agree__checkbox">
+					</div>
 				</div>
 				<div class="product_bUnit">
 					<span class="price" id="bigPriceSpan"></span>
@@ -483,7 +485,7 @@ function save(){
 					<input type="hidden" id="giftConvert" value="">
 					<input type="hidden" id="giftBigPrice" value="" >
 					<div>
-						<input type="checkbox" name="add-gift" id="addGift">
+						<input type="checkbox" name="add-gift" id="addGift" class="weui-agree__checkbox">
 						<span>添加赠品</span>
 					</div>
 					<div style="display:none" class="select-area">
@@ -491,7 +493,7 @@ function save(){
 							<span>商品</span>
 							<input type="text" class="choose-good weui-input" placeholder="选择商品" id="giftProduct" readonly>
 							<i class="icon-sort-desc"></i>
-							<input type="checkbox" name="default-goods"  id="isDefault">
+							<input type="checkbox" name="default-goods"  id="isDefault" class="weui-agree__checkbox">
 							<span>默认商品</span>
 						</div>
 						<div class="number">

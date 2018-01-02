@@ -30,10 +30,6 @@ input[type=number] {
   -webkit-appearance: none;
 }
 
-input[type=checkbox] {
-  height: inherit;
-}
-
 hr {
   margin: 0.5rem 0;
   border-top: #f3f5f7 1px solid;
@@ -1132,7 +1128,7 @@ a {
 .gift input[name=add-gift] {
   position: absolute;
   left: 0;
-  height: inherit;
+  top: .15rem;
 }
 
 .gift span:first-child {
