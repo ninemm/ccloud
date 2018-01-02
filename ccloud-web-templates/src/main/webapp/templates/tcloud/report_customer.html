@@ -10,8 +10,10 @@
 <#macro script>
 	$(function () {
 		var params = {
-			"dayTag":  'today'
-		}	
+			"dayTag":  '${(dayTag)!'today'}',
+			"startDate": '${(startDate)!}',
+			"endDate" : '${(endDate)!}'
+		}
 		orderAmount(params);
 		customerCountAndRank(params);
 		
@@ -48,7 +50,7 @@
 	       title: "上月", value: "lastmonth"
 	       }]
 	});
-	  	
+	
 	$("#customeType").select({
 	  title: "选择客户类型",
 	  items: ${customerTypes!}
@@ -72,7 +74,12 @@
 	            var crSeriesData = [];
 	            var legendData = [];
 	            var length = data.length;
-	            $("#customerCount").height(45 * length + 100);
+	            var high = 40 * length + 100;
+	            if (high < 300) {
+	            	$("#customerCount").height(300);
+	            } else {
+	            	$("#customerCount").height(high);
+	            }
 	            if (length == 0) {
 	            	$("#customerCount").height(300);
 	                crSeriesData.push({
@@ -145,7 +152,7 @@
         <i class="icon-sort-desc"></i>
       </div>
       <div class="weui-flex__item">
-        <input type="text" id="time" placeholder="今日" class="weui-input" readonly>
+        <input type="text" id="time" placeholder="今日" class="weui-input" readonly value="${(dayText)!'今日'}" data-values="${(dayTag)!'today'}">
         <i class="icon-sort-desc"></i>
       </div>
     </div>

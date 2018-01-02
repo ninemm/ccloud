@@ -34,6 +34,7 @@ import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DataAreaUtil;
 
 import com.alibaba.fastjson.JSON;
+import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Record;
 
 @RouterMapping(url = "/report")
@@ -64,10 +65,12 @@ public class ReportController extends BaseFrontController {
 	
 	//业务员订单状态统计
 	public void orderTypeCount() {
-		String dayTag = "today";
+		String dayTag = getPara("dayTag");
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");		
 		String sellerId = getSessionAttr("sellerId");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		List<Record> record = SalesOrderQuery.me().getMyOrderStatucCount(null, null, dayTag, sellerId, dataArea);
+		List<Record> record = SalesOrderQuery.me().getMyOrderStatucCount(startDate, endDate, dayTag, sellerId, dataArea);
 		renderJson(record);
 	}
 	
@@ -79,7 +82,8 @@ public class ReportController extends BaseFrontController {
 		String sellerId = getSessionAttr("sellerId");
 		String customerType = getPara("customerType");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		List<Record> record = SalesOrderQuery.me().getMyOrderByCustomer(startDate, endDate, dayTag, customerType, sellerId, dataArea);
+		String userId = getPara("userId");
+		List<Record> record = SalesOrderQuery.me().getMyOrderByCustomer(startDate, endDate, dayTag, customerType, sellerId, userId, dataArea);
 		renderJson(record);
 	}
 	
@@ -93,7 +97,8 @@ public class ReportController extends BaseFrontController {
 		String productType = getPara("productType");
 		String userId = getPara("userId");
 		String isGift = getPara("isGift");
-		List<Record> record = SalesOrderQuery.me().getMyOrderByProduct(startDate, endDate, dayTag, productType, sellerId, userId, isGift, dataArea);
+		String customerId = getPara("customerId");
+		List<Record> record = SalesOrderQuery.me().getMyOrderByProduct(startDate, endDate, dayTag, productType, sellerId, userId, customerId, isGift, dataArea);
 		renderJson(record);
 	}
 	
@@ -122,7 +127,11 @@ public class ReportController extends BaseFrontController {
 	
 	public void customerDetail() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-
+		String dayTag = getPara("dayTag");
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String dayText = dayText(dayTag);
+		
 		Map<String, Object> all = new HashMap<>();
 		all.put("title", "全部");
 		all.put("value", "");
@@ -138,13 +147,21 @@ public class ReportController extends BaseFrontController {
 			item.put("value", customerType.getId());
 			customerTypes.add(item);
 		}
-		setAttr("customerTypes", JSON.toJSON(customerTypes));			
+		setAttr("customerTypes", JSON.toJSON(customerTypes));
+		setAttr("dayTag", dayTag);
+		setAttr("startDate", startDate);
+		setAttr("endDate", endDate);
+		setAttr("dayText", dayText);
 		
 		render("report_customer.html");
 	}
 	
 	public void productDetail() {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		String dayTag = getPara("dayTag");
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String dayText = dayText(dayTag);
 		
 		Map<String, Object> all = new HashMap<>();
 		all.put("title", "全部");
@@ -161,8 +178,30 @@ public class ReportController extends BaseFrontController {
 			productTypes.add(item);
 		}
 		setAttr("productTypeList", JSON.toJSON(productTypes));
+		setAttr("dayTag", dayTag);
+		setAttr("startDate", startDate);
+		setAttr("endDate", endDate);
+		setAttr("dayText", dayText);
 		
 		render("report_product.html");
+	}
+	
+	private String dayText(String day) {
+		String dayText = "";
+		if (day.equals("today")) {
+			dayText = "今日";
+		} else if (day.equals("yesterday")) {
+			dayText = "昨日";
+		} else if (day.equals("week")) {
+			dayText = "本周";
+		} else if (day.equals("lastweek")) {
+			dayText = "上周";
+		} else if (day.equals("month")) {
+			dayText = "本月";
+		} else {
+			dayText = "上月";
+		}
+		return dayText;
 	}
 	
 	public void userRank() {
@@ -184,36 +223,54 @@ public class ReportController extends BaseFrontController {
 	public void userReportDetail() {
 		String userId = getPara("userId");
 		String userName = getPara("userName");
+		String dayTag = getPara("dayTag");
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
         try {
 			setAttr("userName", new String(userName.getBytes("ISO-8859-1"),"UTF-8"));
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}		
 		setAttr("userId", userId);
+		setAttr("dayTag", dayTag);
+		setAttr("startDate", startDate);
+		setAttr("endDate", endDate);
 		render("user_report.html");
 	}
 	
 	public void sellerReportDetail() {
 		String sellerId = getPara("sellerId");
 		String sellerName = getPara("sellerName");
+		String dayTag = getPara("dayTag");
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");		
         try {
 			setAttr("sellerName", new String(sellerName.getBytes("ISO-8859-1"),"UTF-8"));
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}		
 		setAttr("sellerId", sellerId);
+		setAttr("dayTag", dayTag);
+		setAttr("startDate", startDate);
+		setAttr("endDate", endDate);		
 		render("seller_report.html");
 	}
 	
 	public void sellerPurchaseReport() {
 		String customerId = getPara("customerId");
 		String sellerName = getPara("sellerName");
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String dayTag = getPara("dayTag");		
         try {
 			setAttr("sellerName", new String(sellerName.getBytes("ISO-8859-1"),"UTF-8"));
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}		
 		setAttr("customerId", customerId);
+		setAttr("dayTag", dayTag);
+		setAttr("startDate", startDate);
+		setAttr("endDate", endDate);		
 		render("seller_purchase_report.html");
 	}		
 	
@@ -222,7 +279,10 @@ public class ReportController extends BaseFrontController {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		String dayTag = getPara("dayTag");
-		String sellerId = getSessionAttr("sellerId");
+		String sellerId = getPara("sellerId");
+		if (StrKit.isBlank(sellerId)) {
+			sellerId = getSessionAttr("sellerId");
+		}
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String dataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea());
 		String deptId = getPara("deptId");
@@ -236,7 +296,10 @@ public class ReportController extends BaseFrontController {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		String dayTag = getPara("dayTag");
-		String sellerId = getSessionAttr("sellerId");
+		String sellerId = getPara("sellerId");
+		if (StrKit.isBlank(sellerId)) {
+			sellerId = getSessionAttr("sellerId");
+		}
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String dataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea());
 		String deptId = getPara("deptId");

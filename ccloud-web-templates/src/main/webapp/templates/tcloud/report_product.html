@@ -9,7 +9,9 @@
 <#macro script>
 	$(function () {
 		var params = {
-			"dayTag":  'today'
+			"dayTag":  '${(dayTag)!'today'}',
+			"startDate": '${(startDate)!}',
+			"endDate" : '${(endDate)!}'
 		}
 		
 		productAmount(params);
@@ -72,7 +74,12 @@
 	            var crSeriesData = [];
 	            var legendData = [];
 	            var length = data.length;
-	            $("#productCanve").height(65 * length + 100);
+	            var high = 65 * length + 100;
+	            if (high < 300) {
+	            	$("#productCanve").height(300);
+	            } else {
+	            	$("#productCanve").height(high);
+	            }	            
 	            if (length == 0) {
 	            	$("#productCanve").height(300);
 	                crSeriesData.push({
@@ -147,7 +154,7 @@
                 <i class="icon-sort-desc"></i>
             </div>
             <div class="weui-flex__item">
-                <input type="text" id="time" placeholder="今日" class="weui-input" readonly>
+                <input type="text" id="time" placeholder="今日" class="weui-input" value="${(dayText)!'今日'}" data-values="${(dayTag)!'today'}" readonly>
                 <i class="icon-sort-desc"></i>
             </div>
         </div>
