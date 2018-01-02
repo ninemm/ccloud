@@ -60,7 +60,6 @@ public class _ReportController extends JBaseController {
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sort = getPara("sortName[sort]");
 		String order = getPara("sortName[order]");
-		Map<String, String[]> paraMap = getParaMap();
 		Page<InventoryDetail> page=new Page<>();
 		if(null==getPara("sortName[offset]")) {
 			page = InventoryDetailQuery.me().findByDataArea(1, Integer.MAX_VALUE, startDate,endDate,dataArea,warehouseId,sort,order);

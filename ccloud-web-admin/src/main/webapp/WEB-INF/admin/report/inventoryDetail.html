@@ -78,6 +78,11 @@
 		$table.bootstrapTable('refresh',opt);
 	});
 	
+	$("#export").click(function() {
+		alert(123);
+
+	});
+	
 	var initFields = function() {
 		var fields =
 			[
@@ -118,19 +123,19 @@
 </section>
 <!-- Main content -->
 <section class="content">
-	<form class="form-inline" id="form" >
-		<div class="row content-row">
-			<div class="form-group col-sm-12" style="float: right">
+	<div id="toolbar">
+		<form class="form-inline" id="form" >
+			<div class="row content-row" style="width:920px">
 				<input onclick="total()" class="btn btn-sm btn-primary" type="button" value="产品总计">
 				<label class="control-label">盘点仓库:</label>
 				<div class="input-group col-md-2 col-sm-3">
-					<select class="form-control input-sm" name="warehouse_id" id="warehouse_id" style="height:34px">
+					<select class="form-control " name="warehouse_id" id="warehouse_id" style="height:34px">
 						<option value="">--请选择--</option>
 						<#list (wlist)! as warehouse >
 							<option value="${warehouse.id}">${(warehouse.name)!}</option>
 						</#list>
 					</select>
-               	</div>
+		       	</div>
 				
 				<div class="form-group validata-box">
 					<label class="control-label">开始时间:</label>
@@ -138,20 +143,19 @@
 						<input id="startDate" class="form-control" value="${startDate!}" name="startDate" placeholder="开始日期" >&nbsp;
 					</div>
 				</div>
+				
 				<div class="form-group validata-box">
 					<label class="control-label">结束时间:</label>
 					<div class="form-group">
 						<input id="endDate" class="form-control" value="${endDate!}" name="endDate" placeholder="结束日期" >&nbsp;
 					</div>
 				</div>
+				
 				<input id="search-submit" class="btn btn-sm btn-primary " type="button" value="搜索">
-				</div>
+				
 			</div>
 		</form>
-	<div class="box">
-		<table class="table table-striped table-hover table-condensed" id="_inventoryDetail_table"></table>
 	</div>
-	<!-- /.box -->
+	<table class="table table-striped table-hover table-condensed" id="_inventoryDetail_table" > </table>
 </section>
-
 </@layout>
