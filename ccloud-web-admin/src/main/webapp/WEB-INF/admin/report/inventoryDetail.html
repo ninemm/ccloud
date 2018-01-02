@@ -36,6 +36,7 @@
 		jQuery.mm.initDatetimepicker('form', '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initValidator('#form', validatorFields)
 		jQuery.mm.initEditTableExport('#_inventoryDetail_table', url, initParams, initFields(), null);
+		$('button[title^=Export]').html('导出').addClass('btn-primary btn-sm');
 	});
 	
 	var initParams = function(params) {
@@ -53,18 +54,6 @@
 		return param;
 	};
 	
-	function total(){
-	   var opt = {
-	        url: "${CPATH}/admin/report/inventoryDetailListTotal",
-	        silent: true,
-	        query:{
-	            type:1,
-	            level:2
-	        }
-	    };
-		$table.bootstrapTable('refresh',opt);
-	};
-	
 	$("#search-submit").click(function() {
 		$('#post-search-input').val("sp.id");
 		 var opt = {
@@ -76,11 +65,6 @@
 	        }
 	    };
 		$table.bootstrapTable('refresh',opt);
-	});
-	
-	$("#export").click(function() {
-		alert(123);
-
 	});
 	
 	var initFields = function() {
@@ -126,7 +110,6 @@
 	<div id="toolbar">
 		<form class="form-inline" id="form" >
 			<div class="row content-row" style="width:920px">
-				<input onclick="total()" class="btn btn-sm btn-primary" type="button" value="产品总计">
 				<label class="control-label">盘点仓库:</label>
 				<div class="input-group col-md-2 col-sm-3">
 					<select class="form-control " name="warehouse_id" id="warehouse_id" style="height:34px">

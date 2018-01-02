@@ -30,6 +30,7 @@
 		jQuery.mm.initValidator('#form', validatorFields);
 		jQuery.mm.initEditTableExport('#_clientTypeReport_table',url, initParams, initFields(), null);
 		jQuery.mm.initEditTableExport2('#_clientTypeReportGift_table',urlGift, initParams, initFieldsGift(), null);
+		$('button[title^=Export]').html('导出').addClass('btn-primary btn-sm');
 	});
 
 	var initParams = function(params) {

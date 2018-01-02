@@ -12,12 +12,14 @@ import org.ccloud.core.JBaseController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.InventoryDetail;
 import org.ccloud.model.SalesOrder;
+import org.ccloud.model.Seller;
 import org.ccloud.model.SellerProduct;
 import org.ccloud.model.User;
 import org.ccloud.model.Warehouse;
 import org.ccloud.model.query.InventoryDetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SellerProductQuery;
+import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.query.WarehouseQuery;
 import org.ccloud.route.RouterMapping;
@@ -49,11 +51,6 @@ public class _ReportController extends JBaseController {
 	
 	//库存详细list
 	public void inventoryDetailList() {
-		String keyword = getPara("k");
-		if (StrKit.notBlank(keyword)) {
-			keyword = StringUtils.urlDecode(keyword);
-			setAttr("k", keyword);
-		}
 		String startDate = getPara("startDate");
 		String warehouseId = getPara("warehouse_id");
 		String endDate = getPara("endDate");
@@ -80,19 +77,42 @@ public class _ReportController extends JBaseController {
 		renderJson(map);
 	}
 	
-	//库存详细 产品总计
-	public void inventoryDetailListTotal() {
+	//产品总计
+	public void productTotal() {
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		List<Seller> slist = SellerQuery.me().findByDataArea(dataArea);
+		setAttr("slist", slist);
+		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
+		setAttr("startDate", date);
+		setAttr("endDate", date);
+		render("productTotal.html");
+	}
+	
+	//产品总计
+	public void productTotalList() {
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String seller_id=getSessionAttr("sellerId").toString();
 		String sort = getPara("sortName[sort]");
 		String order = getPara("sortName[order]");
+		String sellerId = getPara("seller_id");
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
 		Page<InventoryDetail> page=new Page<>();
 		if(null==getPara("sortName[offset]")) {
-			page = InventoryDetailQuery.me().findByInventoryDetailListTotal(1, Integer.MAX_VALUE,dataArea,seller_id,sort,order);
+			page = InventoryDetailQuery.me().findByInventoryDetailListTotal(1, Integer.MAX_VALUE,dataArea,seller_id,sort,order,sellerId,startDate,endDate);
 		}else {
-			page = InventoryDetailQuery.me().findByInventoryDetailListTotal(getPageNumber(), getPageSize(),dataArea,seller_id,sort,order);
+			page = InventoryDetailQuery.me().findByInventoryDetailListTotal(getPageNumber(), getPageSize(),dataArea,seller_id,sort,order,sellerId,startDate,endDate);
 		}
-		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
+		List<InventoryDetail> list = page.getList();
+		List<InventoryDetail> list1=new ArrayList<>();
+		for (InventoryDetail inventoryDetail : list) {
+			String sellProductId = inventoryDetail.getSellProductId();
+			//得到查询时间段中最新的剩余商品件数
+			InventoryDetail inventoryDetail1 = InventoryDetailQuery.me().findByInventoryDetail1(sellProductId,endDate);
+			inventoryDetail.setBalanceCount(inventoryDetail1.getBalanceCount());
+			list1.add(inventoryDetail);
+		}
+		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", list1);
 		renderJson(map);
 	}
 	
