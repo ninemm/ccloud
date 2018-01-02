@@ -66,11 +66,13 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 	}
 
 	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate, String status,String dataArea) {
-		String select = "select r.*, c.customer_name ";
+		String select = "select r.*, c.customer_name,c.contact,c.mobile,w.name as warehouseName,ct.name as customerTypeName,u.realname ";
 		StringBuilder fromBuilder = new StringBuilder(" from `cc_sales_refund_instock` r");
 		fromBuilder.append(" left join cc_seller_customer cc ON r.customer_id = cc.id ");
 		fromBuilder.append(" left join cc_customer c on cc.customer_id = c.id ");
-
+		fromBuilder.append(" left join cc_warehouse w on r.warehouse_id = w.id ");
+		fromBuilder.append(" left join cc_customer_type ct on r.customer_type_id = ct.id ");
+		fromBuilder.append(" left join user u on r.biz_user_id = u.id ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, needWhere);
