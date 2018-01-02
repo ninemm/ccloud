@@ -29,7 +29,7 @@
 <#macro script>
 
 	var $table = $("#_inventoryDetail_table");
-	var url = '${CPATH}/admin/report/inventoryDetailList';
+	var url = '${CPATH}/admin/report/productTotalList';
 
 	$(function() {
 		jQuery.mm.initDatetimepicker('form', '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
@@ -45,7 +45,7 @@
 		var param = {
 			size: params.limit,
 			page: params.offset/params.limit + 1,
-			warehouse_id: $('#warehouse_id').find("option:selected").val(),
+			seller_id: $('#seller_id').find("option:selected").val(),
 			startDate: $('#startDate').val() + " 00:00:00",
 			endDate: $('#endDate').val() + " 23:59:59",
 			sortName:params
@@ -57,7 +57,7 @@
 	$("#search-submit").click(function() {
 		$('#post-search-input').val("sp.id");
 		 var opt = {
-	        url: "${CPATH}/admin/report/inventoryDetailList",
+	        url: "${CPATH}/admin/report/productTotalList",
 	        silent: true,
 	        query:{
 	            type:1,
@@ -72,7 +72,6 @@
 			[
       			{title: "序号", align: "center", edit:false, formatter: function (value, row, index) { return index+1; } },
       			{field: "seller_name", title: "销售商", align: "center",  edit:false,sortable: true},
-      			{field: "name", title: "仓库", align: "center",  edit:false,sortable: true},
       			{field: "custom_name", title: "产品", align: "center", edit:false,sortable: true},
       			{field: "out_count", title: "出库(件)", align: "center", edit:false},
       			{field: "in_count", title: "入库(件)", align: "center", edit:false},
@@ -98,11 +97,11 @@
 <@layout active_id=p child_active_id=c>
 
 <section class="content-header">
-	<h1>库存详细</h1>
+	<h1>产品总计</h1>
 	<ol class="breadcrumb">
 		<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
        	<li><a href="#">报表查询</a></li>
-       	<li class="active">库存详细</li>
+       	<li class="active">产品总计</li>
 	</ol>
 </section>
 <!-- Main content -->
@@ -110,12 +109,12 @@
 	<div id="toolbar">
 		<form class="form-inline" id="form" >
 			<div class="row content-row" style="width:920px">
-				<label class="control-label">盘点仓库:</label>
+				<label class="control-label">销售商名称:</label>
 				<div class="input-group col-md-2 col-sm-3">
-					<select class="form-control " name="warehouse_id" id="warehouse_id" style="height:34px">
+					<select class="form-control " name="seller_id" id="seller_id" style="height:34px">
 						<option value="">--请选择--</option>
-						<#list (wlist)! as warehouse >
-							<option value="${warehouse.id}">${(warehouse.name)!}</option>
+						<#list (slist)! as seller >
+							<option value="${seller.id}">${(seller.seller_name)!}</option>
 						</#list>
 					</select>
 		       	</div>

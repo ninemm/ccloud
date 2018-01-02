@@ -146,4 +146,10 @@ public class SellerQuery extends JBaseQuery {
 		
 		return Db.findFirst("select s.* , d.data_area from cc_seller s join department d on s.dept_id = d.id where s.customer_id = ?" , customerId);
 	}
+
+	public List<Seller> findByDataArea(String dataArea) {
+		StringBuilder sqlBuilder = new StringBuilder("SELECT cs.* FROM `cc_seller` cs LEFT JOIN USER u ON u.department_id = cs.dept_id LEFT JOIN department d ON d.id = cs.dept_id WHERE d.data_area LIKE '"+dataArea+"'");
+		sqlBuilder.append(" GROUP BY cs.id ORDER BY cs.seller_type");
+		return DAO.find(sqlBuilder.toString());
+	}
 }

@@ -29,7 +29,8 @@
 		jQuery.mm.initDatetimepicker('form', '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initValidator('#form', validatorFields);
 		jQuery.mm.initEditTableExport('#_purSellerReport_table',url, initParams, initFields(), null);
-		jQuery.mm.initEditTableExport('#_purSellerReportGift_table',urlGift, initParams, initFieldsGift(), null);
+		jQuery.mm.initEditTableExport2('#_purSellerReportGift_table',urlGift, initParams, initFieldsGift(), null);
+		$('button[title^=Export]').html('导出').addClass('btn-primary btn-sm');
 	});
 
 	var initParams = function(params) {
@@ -40,7 +41,8 @@
 			page: params.offset/params.limit + 1,
 			k: keyword,
 			startDate: $('#startDate').val() + " 00:00:00",
-			endDate: $('#endDate').val() + " 23:59:59"
+			endDate: $('#endDate').val() + " 23:59:59",
+			sortName:params
 		};
 		return param;
 	};
@@ -130,38 +132,37 @@
 </section>
 <!-- Main content -->
 <section class="content">
-	<form class="form-inline" id="form" >
-		<div class="row content-row">
-			<div class="form-group col-sm-12" style="float: right">
-				<input id="post-search-input" class="form-control" type="hidden" value="so.create_date" name="k" >&nbsp;
-				<input onclick="orderTime()" class="btn btn-sm btn-primary" type="button" value="已下单查询">
-				<input onclick="prints()" class="btn btn-sm btn-primary" type="button" value="已打印查询">
-				<input onclick="complete()" class="btn btn-sm btn-primary" type="button" value="已出库查询">
-				<div class="form-group validata-box">
-					<label class="control-label">开始时间:</label>
-					<div class="form-group">
-						<input id="startDate" class="form-control" value="${startDate!}" name="startDate" placeholder="开始日期" >&nbsp;
+	<div id="toolbar">
+		<form class="form-inline" id="form" >
+			<div class="row content-row">
+				<div class="form-group col-sm-12" style="float: right">
+					<input id="post-search-input" class="form-control" type="hidden" value="so.create_date" name="k" >&nbsp;
+					<input onclick="orderTime()" class="btn btn-sm btn-primary" type="button" value="已下单查询">
+					<input onclick="prints()" class="btn btn-sm btn-primary" type="button" value="已打印查询">
+					<input onclick="complete()" class="btn btn-sm btn-primary" type="button" value="已出库查询">
+					<div class="form-group validata-box">
+						<label class="control-label">开始时间:</label>
+						<div class="form-group">
+							<input id="startDate" class="form-control" value="${startDate!}" name="startDate" placeholder="开始日期" >&nbsp;
+						</div>
 					</div>
-				</div>
-				<div class="form-group validata-box">
-					<label class="control-label">结束时间:</label>
-					<div class="form-group">
-						<input id="endDate" class="form-control" value="${endDate!}" name="endDate" placeholder="结束日期" >&nbsp;
+					<div class="form-group validata-box">
+						<label class="control-label">结束时间:</label>
+						<div class="form-group">
+							<input id="endDate" class="form-control" value="${endDate!}" name="endDate" placeholder="结束日期" >&nbsp;
+						</div>
 					</div>
+					<input id="search-submit" class="btn btn-sm btn-primary" type="button" value="搜索">
 				</div>
-				<input id="search-submit" class="btn btn-sm btn-primary" type="button" value="搜索">
 			</div>
-		</div>
-	</form>
-		
-	<div class="box">
-		<table class="table table-striped table-hover table-condensed" id="_purSellerReport_table" ></table>
+		</form>
 	</div>
-	<h2>赠品统计</h2>
-	<div class="box">
-		<table class="table table-striped table-hover table-condensed" id="_purSellerReportGift_table" ></table>
-	</div>
-	<!-- /.box -->
+	<table class="table table-striped table-hover table-condensed" id="_purSellerReport_table" ></table>
+
+	<div id="toolbar2">
+		<h2>赠品统计</h2>
+	</div>	
+	<table class="table table-striped table-hover table-condensed" id="_purSellerReportGift_table" ></table>
 </section>
 
 </@layout>

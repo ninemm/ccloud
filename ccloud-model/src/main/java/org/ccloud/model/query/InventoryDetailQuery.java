@@ -197,14 +197,23 @@ public class InventoryDetailQuery extends JBaseQuery {
 	
 	//库存详细报表 产品总计
 	public Page<InventoryDetail> findByInventoryDetailListTotal(int pageNumber, int pageSize,
-			String dataArea, String seller_id, String sort, String order) {
-		String select = "SELECT cs.seller_name , '总计' AS `name` , sp.custom_name , IFNULL(SUM(cid.out_count) , 0) out_count ,IFNULL(SUM(cid.in_count) , 0)  in_count , SUM(cid.in_count) - IFNULL(SUM(cid.out_count) , 0) AS  balance_count";
+			String dataArea, String seller_id, String sort, String order, String sellerId, String startDate, String endDate) {
+		String select = "SELECT cid.sell_product_id ,cs.seller_name ,  sp.custom_name , IFNULL(SUM(cid.out_count) , 0) out_count ,IFNULL(SUM(cid.in_count) , 0)  in_count ";
 		StringBuilder fromBuilder = new StringBuilder(" FROM cc_inventory_detail cid ");
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id = cid.sell_product_id ");
 		fromBuilder.append(" LEFT JOIN cc_seller cs ON cs.id = sp.seller_id ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cid.data_area", dataArea, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "cs.id", sellerId, params, needWhere);
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and cid.create_date >= ?");
+			params.add(startDate);
+		}
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and cid.create_date <= ?");
+			params.add(endDate);
+		}
 		if (sort==""||null==sort) {
 			fromBuilder.append("GROUP BY cid.sell_product_id order by cs.seller_type,cs.id ");
 		}else {
@@ -215,11 +224,18 @@ public class InventoryDetailQuery extends JBaseQuery {
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
-	//查询当前的剩余商品
+	//查询当前的商品剩余
 	public InventoryDetail findByInventoryDetail(String sellProductId, String warehouseId1, String startDate,
 			String endDate) {
 		String sql = "select * from cc_inventory_detail c where c.sell_product_id = '"+sellProductId+"' and c.warehouse_id ='";
 		sql=sql+warehouseId1+"'and c.create_date >= '"+startDate+"' and c.create_date <= '"+endDate+"' ORDER BY c.create_date DESC ";
+		return DAO.findFirst(sql);
+	}
+	
+	//查询所有仓库当前商品剩余
+	public InventoryDetail findByInventoryDetail1( String sellProductId, String endDate) {
+		String sql = "SELECT SUM(cid.in_count) - IFNULL(SUM(cid.out_count) , 0) AS  balance_count FROM cc_inventory_detail cid WHERE cid.sell_product_id='"+sellProductId+"'";
+		sql=sql+"and cid.create_date <= '"+endDate+"'";
 		return DAO.findFirst(sql);
 	}
 }

@@ -66,10 +66,12 @@ public class SalesOrderQuery extends JBaseQuery {
 
 	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate,
 			String sellerId, String dataArea) {
-		String select = "select o.*, c.customer_name ";
+		String select = "select o.*, c.customer_name,ct.`name` as customerTypeName,u.realname ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_sales_order` o ");
 		fromBuilder.append("left join cc_seller_customer cc ON o.customer_id = cc.id ");
 		fromBuilder.append("left join cc_customer c on cc.customer_id = c.id ");
+		fromBuilder.append("LEFT JOIN cc_customer_type ct on ct.id = o.customer_type_id ");
+		fromBuilder.append("LEFT JOIN user u on u.id = o.biz_user_id ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);

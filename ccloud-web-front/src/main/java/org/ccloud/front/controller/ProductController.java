@@ -17,6 +17,7 @@ import org.ccloud.model.Dict;
 import org.ccloud.model.User;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.DictQuery;
+import org.ccloud.model.query.OptionQuery;
 import org.ccloud.model.query.ProductCompositionQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SellerCustomerQuery;
@@ -57,6 +58,7 @@ public class ProductController extends BaseFrontController {
 
 	public void shoppingCart() {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
 
 		List<Record> productList = SellerProductQuery.me().findProductListForApp(sellerId, "");
 
@@ -77,6 +79,10 @@ public class ProductController extends BaseFrontController {
 		setAttr("sellerProductInfoMap", JSON.toJSON(sellerProductInfoMap));
 		setAttr("sellerProductItems", JSON.toJSON(sellerProductItems));
 
+		Boolean isEdit = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_ORDER_PRICE_EDIT + sellerCode);
+		isEdit = (isEdit != null && isEdit) ? true : false;
+
+		setAttr("isEdit", isEdit);
 		render("shopping_cart.html");
 	}
 
