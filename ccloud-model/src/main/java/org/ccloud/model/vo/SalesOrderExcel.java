@@ -21,14 +21,14 @@ public class SalesOrderExcel {
 	private String productName;
 	@Excel(name = "规格")
 	private String valueName;
-	@Excel(name = "大单位数量")
-	private String productCount;
 	@Excel(name = "单位换算")
 	private String creatconvertRelate;
-	@Excel(name = "小单位数量")
-	private String smallCount;
+	@Excel(name = "大单位数量")
+	private String productCount;
 	@Excel(name = "大单位价格")
 	private String productPrice;
+	@Excel(name = "小单位数量")
+	private String smallCount;
 	@Excel(name = "小单位价格")
 	private String smallPrice;
 	@Excel(name = "已出库数量（大）")
