@@ -1080,7 +1080,7 @@ public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procK
 	}
 
 	public List<Record> getMyOrderByCustomer(String startDate, String endDate, String dayTag, String customerType, String sellerId,
-			String dataArea) {
+			String userId, String dataArea) {
 		if (dayTag != null) {
 			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
 			startDate = date[0];
@@ -1088,13 +1088,18 @@ public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procK
 		}
 		LinkedList<Object> params = new LinkedList<Object>();
 		StringBuilder fromBuilder = new StringBuilder("SELECT IFNULL(SUM(cc.total_count),0) as productCount, IFNULL(sum(cc.total_amount),0) as totalAmount, ");
-		fromBuilder.append("COUNT(*) as orderCount, cu.customer_name FROM cc_sales_order cc ");
+		fromBuilder.append("COUNT(*) as orderCount, cu.customer_name, cc.customer_id as customerId FROM cc_sales_order cc ");
 		fromBuilder.append("LEFT JOIN cc_seller_customer cs on cs.id = cc.customer_id ");
 		fromBuilder.append("LEFT JOIN cc_customer cu on cu.id = cs.customer_id ");
 		fromBuilder.append("LEFT JOIN cc_customer_type ct on cc.customer_type_id = ct.id ");
 		boolean needWhere = true;
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, " cc.data_area", dataArea, params, needWhere);
-		needWhere = appendIfNotEmpty(fromBuilder, " cc.seller_id", sellerId, params, needWhere);
+		
+		if (StrKit.notBlank(userId)) {
+			needWhere = appendIfNotEmpty(fromBuilder, " cc.biz_user_id", userId, params, needWhere);
+		} else {
+			needWhere = appendIfNotEmptyWithLike(fromBuilder, " cc.data_area", dataArea, params, needWhere);
+			needWhere = appendIfNotEmpty(fromBuilder, " cc.seller_id", sellerId, params, needWhere);
+		}
 		needWhere = appendIfNotEmpty(fromBuilder, "cc.customer_type_id", customerType, params, needWhere);
 		
 		if (needWhere) {
@@ -1121,7 +1126,7 @@ public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procK
 	}
 
 	public List<Record> getMyOrderByProduct(String startDate, String endDate, String dayTag, String productType, String sellerId, 
-			String userId, String isGift, String dataArea) {
+			String userId, String customerId, String isGift, String dataArea) {
 		if (dayTag != null) {
 			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
 			startDate = date[0];
@@ -1146,6 +1151,7 @@ public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procK
 		}
 		needWhere = appendIfNotEmpty(fromBuilder, " gt.id", productType, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "c.biz_user_id", userId, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "c.customer_id", customerId, params, needWhere);
 		
 		if (needWhere) {
 			fromBuilder.append(" where c.status not in (1001,1002) ");

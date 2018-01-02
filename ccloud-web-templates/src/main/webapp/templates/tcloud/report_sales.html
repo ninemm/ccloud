@@ -30,6 +30,7 @@
     $(".end-date").val($.today());
     $(".begin-date").calendar();
     $(".begin-date").val($.today());
+    $("#dayTag").val("today");
     var startDate = $.today();
 	var endDate = $.today() + ' 23:59:59';  
 	var params = {
@@ -133,9 +134,13 @@
 	            var crSeriesData = [];
 	            var legendData = [];
 	            var length = data.length;
-	            $("#customerCount").height(40 * length + 100);
-	            if (length == 0) {
+	            var high = 40 * length + 100;
+	            if (high < 300) {
 	            	$("#customerCount").height(300);
+	            } else {
+	            	$("#customerCount").height(high);
+	            }
+	            if (length == 0) {
 	                crSeriesData.push({
 	                    name: '暂无数据',
 	                    value: 0
@@ -199,7 +204,12 @@
 	            var crSeriesData = [];
 	            var legendData = [];
 	            var length = data.length;
-	            $("#productCanve").height(65 * length + 100);
+	            var high = 65 * length + 100;
+	            if (high < 300) {
+	            	$("#productCanve").height(300);
+	            } else {
+	            	$("#productCanve").height(high);
+	            }	            
 	            if (length == 0) {
 	            	$("#productCanve").height(300);
 	                crSeriesData.push({
@@ -262,15 +272,20 @@
     }
     
     function urlSelect(params, type){
-    	if (type == 'order') {
-			orderAmount(params);
-		} else if (type == 'customer') {
-			customerCount(params);
-		} else if (type == 'product') {
-			productCount(params);
-		} else {
-			refundCount(params);
-		}
+<!--     	if (type == 'order') { -->
+<!-- 			orderAmount(params); -->
+<!-- 		} else if (type == 'customer') { -->
+<!-- 			customerCount(params); -->
+<!-- 		} else if (type == 'product') { -->
+<!-- 			productCount(params); -->
+<!-- 		} else { -->
+<!-- 			refundCount(params); -->
+<!-- 		} -->
+	 	orderAmount(params);
+	 	refundCount(params);
+	 	orderStatus(params);
+	 	customerCount(params);
+	 	productCount(params);	
     }
     
     function startDaySelect(obj,type) {
@@ -299,6 +314,7 @@
 			}
 			urlSelect(params,type); 
             $(obj).find(".dayTagText").text('今日')
+            $("#dayTag").val("today");
           }
         }, {
           text: "昨日",
@@ -308,6 +324,7 @@
 			}
           	urlSelect(params,type);
             $(obj).find(".dayTagText").text('昨日')
+            $("#dayTag").val("yesterday");
           }
         }, {
           text: "本周",
@@ -317,6 +334,7 @@
 			}
 			urlSelect(params,type);   
           	$(obj).find(".dayTagText").text('本周')
+          	$("#dayTag").val("week");
           }
         }, {
           text: "上周",
@@ -326,6 +344,7 @@
 			}
           urlSelect(params,type);
           $(obj).find(".dayTagText").text('上周')
+          $("#dayTag").val("lastweek");
           }
         }, {
           text: "本月",
@@ -335,6 +354,7 @@
 			}     
 			urlSelect(params,type);    
          	$(obj).find(".dayTagText").text('本月')
+         	$("#dayTag").val("month");
           }
         }, {
           text: "上月",
@@ -344,10 +364,26 @@
 			}         
 			urlSelect(params,type);
           	$(obj).find(".dayTagText").text('上月')
+          	$("#dayTag").val("lastmonth");
           }
         }]
       }); 	
- 	}  
+ 	}
+ 	
+	function cusDetail(param) {
+		var tag = $("#dayTag").val();
+		var startDate = $("#startDay").val();
+		var endDate = $("#endDay").val();		
+        window.location.href = "${CPATH}/report/customerDetail?dayTag=" + tag + "&startDate=" + startDate + "&endDate=" + endDate; 
+	}
+	
+	function proDetail(param) {
+		var tag = $("#dayTag").val();
+		var startDate = $("#startDay").val();
+		var endDate = $("#endDay").val();		
+        window.location.href = "${CPATH}/report/productDetail?dayTag=" + tag + "&startDate=" + startDate + "&endDate=" + endDate; 
+	}	
+ 	
 </#macro>
 <@layout>
 	<div class="weui-content">
@@ -359,7 +395,8 @@
 					<span class="briefly" onclick="dayTagSelect(this,'order')">
 						<p class="dayTagText">今日</p>
 						<i class="icon-angle-down"></i>
-					</span> 
+					</span>
+					<input type="hidden" id="dayTag">
 					<input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'order')" readonly="">
 					<span class="overview-hd-segmenting fr"> - </span> 
 					<input class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'order')" readonly="">
@@ -389,42 +426,42 @@
 		<div class="weui-panel weui-panel_access">
 			<div class="weui-panel__hd">
 				<span class="overview-hd-title">客户订单统计</span> 
-				<div>
+				<!--<div>
 					<span class="briefly" onclick="dayTagSelect(this,'customer')">
 					<p class="dayTagText">今日</p>
 						<i class="icon-angle-down"></i>
 					</span> <input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'customer')" readonly="">
 					<span class="overview-hd-segmenting fr"> - </span> <input
 						class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'customer')" readonly="">
-				</div>
+				</div>  -->
 			</div>
 			<div class="weui-panel__bd report-area">
 				<div class="weui-media-box ft14">
 					<div id="customerCount" style="height: 300px;">
 						
 					</div>
-					<a class="report-detail" href="${CPATH}/report/customerDetail">详情></a>
+					<a class="report-detail" onClick="cusDetail()">详情></a>
 				</div>
 			</div>
 		</div>
 		<div class="weui-panel weui-panel_access">
 			<div class="weui-panel__hd">
 				<span class="overview-hd-title">商品销售统计</span> 
-				<div>
+				<!--<div>
 					<span class="briefly" onclick="dayTagSelect(this,'product')">
 					<p class="dayTagText">今日</p>
 						<i class="icon-angle-down"></i>
 					</span> <input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'product')" readonly="">
 					<span class="overview-hd-segmenting fr"> - </span> <input
 						class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'product')" readonly="">
-				</div>
+				</div>-->
 			</div>
 			<div class="weui-panel__bd report-area">
 				<div class="weui-media-box ft14">
 					<div id="productCanve" style="height: 300px;">
 						
 					</div>
-					<a class="report-detail" href="${CPATH}/report/productDetail">详情></a>
+					<a class="report-detail" onClick="proDetail()">详情></a>
 				</div>
 			</div>
 		</div>
@@ -439,14 +476,14 @@
 		<div class="weui-panel weui-panel_access">
 			<div class="weui-panel__hd">
 				<span class="overview-hd-title">退货统计</span>
-				<div>
+				<!--<div>
 					<span class="briefly" onclick="dayTagSelect(this,'refund')">
 					<p class="dayTagText">今日</p>
 						<i class="icon-angle-down"></i>
 					</span> <input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'refund')" readonly="">
 					<span class="overview-hd-segmenting fr"> - </span> <input
 						class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'refund')" readonly="">
-				</div>
+				</div>-->
 			</div>
 			<div class="weui-panel__bd report-area">
 				<div class="weui-media-box ft14">

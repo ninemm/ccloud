@@ -30,10 +30,6 @@ input[type=number] {
   -webkit-appearance: none;
 }
 
-input[type=checkbox] {
-  height: inherit;
-}
-
 hr {
   margin: 0.5rem 0;
   border-top: #f3f5f7 1px solid;
@@ -748,9 +744,22 @@ a {
   width: 100%;
 }
 
-.menu-left li.active {
+.menu-left li.active,
+.product-content .swiper-slide.active {
   background: #fff;
   color: #ea6f5a;
+}
+
+.product-content .swiper-slide.active::before {
+  content: "";
+  width: 60px;
+  height: 3px;
+  background: #ea6f5a;
+  position: absolute;
+  left: 50%;
+  margin-left: -30px;
+  bottom: -1px;
+  z-index: 10;
 }
 
 .menu-left ul li.active:before {
@@ -762,6 +771,24 @@ a {
     background: #ea6f5a;
     top: 0;
     left: 0;
+}
+
+.product-content {
+  position: absolute;
+  top: 44px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.product-content .menu-left,
+.product-content .menu-right {
+  top: 2rem;
+}
+
+.product-content .swiper-slide {
+  height: 2rem;
+  line-height: 2rem;
 }
 
 .type {
@@ -934,7 +961,7 @@ a {
 }
 
 .layui-m-layerchild {
-  width: 90%;
+  width: 80%;
 }
 
 .service {
@@ -957,6 +984,7 @@ a {
 .layui-m-layerbtn {
   height: 2rem!important;
   line-height: 2rem!important;
+  border-top: 0!important;
 }
 
 .layui-m-layerbtn span[yes] {
@@ -969,6 +997,15 @@ a {
   color: #000;
   border-radius: 0;
   background: #fff;
+  border-right: 0!important;
+  border-top: 1px solid #d0d0d0;
+}
+
+.audit img {
+  width: 100%;
+  position: absolute;
+  top: -2.5rem;
+  left: 0;
 }
 
 .audit .refuse-radio {
@@ -1091,7 +1128,7 @@ a {
 .gift input[name=add-gift] {
   position: absolute;
   left: 0;
-  height: inherit;
+  top: .15rem;
 }
 
 .gift span:first-child {

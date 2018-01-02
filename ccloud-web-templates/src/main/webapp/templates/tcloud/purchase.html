@@ -30,6 +30,7 @@
     $(".end-date").val($.today());
     $(".begin-date").calendar();
     $(".begin-date").val($.today());
+    $("#dayTag").val("today");
     var startDate = $.today();
 	var endDate = $.today() + ' 23:59:59';  
 	var params = {
@@ -185,24 +186,31 @@
     }        
     
 	function sellerClick(param) {
+		var tag = $("#dayTag").val();
+		var startDate = $("#startDay").val();
+		var endDate = $("#endDay").val();	
 	    if (typeof param.seriesIndex != 'undefined') {
-	        window.location.href = "${(CPATH)}/report/sellerPurchaseReport?customerId=" + sellerObj[param.name] + "&sellerName=" + param.name; 
+	        window.location.href = "${(CPATH)}/report/sellerPurchaseReport?customerId=" + sellerObj[param.name] + "&sellerName=" + param.name + "&dayTag=" + tag + "&startDate=" + startDate + "&endDate=" + endDate; 
 	    }
 	} 	    
     
     function urlSelect(params, type){
-    	if (type == 'order') {
-			orderAmount(params);
-		} else {
-			userCount(params);
-			giftCount(params);
-		}
+<!--     	if (type == 'order') { -->
+<!-- 			orderAmount(params); -->
+<!-- 		} else { -->
+<!-- 			sellerCount(params); -->
+<!-- 			sellerGiftCount(params); -->
+<!-- 		} -->
+	 	orderAmount(params);
+	 	sellerCount(params);
+	 	sellerGiftCount(params);
     }
     
     function startDaySelect(obj,type) {
 		var params = {
     		"startDate": $(obj).val(),
-			"endDate": $(obj).parent().find('#endDay').val()
+			"endDate": $(obj).parent().find('#endDay').val(),
+			"purchase": 'true'
 		}
 		urlSelect(params,type); 
     }
@@ -210,7 +218,8 @@
     function endDaySelect(obj,type) {
 		var params = {
     		"startDate": $(obj).parent().find('#startDay').val(),
-			"endDate": $(obj).val()
+			"endDate": $(obj).val(),
+			"purchase": 'true'
 		}
 		urlSelect(params,type); 
     }    
@@ -221,55 +230,67 @@
           text: "今日",
           onClick: function () {
 			var params = {
-				"dayTag": 'today'
+				"dayTag": 'today',
+				"purchase": 'true'
 			}
 			urlSelect(params,type); 
             $(obj).find(".dayTagText").text('今日')
+            $("#dayTag").val("today");
           }
         }, {
           text: "昨日",
           onClick: function () {
 			var params = {
-				"dayTag": 'yesterday'
+				"dayTag": 'yesterday',
+				"purchase": 'true'
 			}
           	urlSelect(params,type);
             $(obj).find(".dayTagText").text('昨日')
+            $("#dayTag").val("yesterday");
           }
         }, {
           text: "本周",
           onClick: function () {
 			var params = {
-				"dayTag": 'week'
+				"dayTag": 'week',
+				"purchase": 'true'
 			}
 			urlSelect(params,type);   
           	$(obj).find(".dayTagText").text('本周')
+          	$("#dayTag").val("week");
           }
         }, {
           text: "上周",
           onClick: function () {
 			var params = {
-				"dayTag": 'lastweek'
+				"dayTag": 'lastweek',
+				"purchase": 'true'
 			}
           urlSelect(params,type);
           $(obj).find(".dayTagText").text('上周')
+          $("#dayTag").val("lastweek");
           }
         }, {
           text: "本月",
           onClick: function () {
 			var params = {
-				"dayTag": 'month'
+				"dayTag": 'month',
+				"purchase": 'true'
 			}     
 			urlSelect(params,type);    
          	$(obj).find(".dayTagText").text('本月')
+         	$("#dayTag").val("month");
           }
         }, {
           text: "上月",
           onClick: function () {
 			var params = {
-				"dayTag": 'lastmonth'
+				"dayTag": 'lastmonth',
+				"purchase": 'true'
 			}         
 			urlSelect(params,type);
           	$(obj).find(".dayTagText").text('上月')
+          	$("#dayTag").val("lastmonth");
           }
         }]
       }); 	
@@ -283,7 +304,8 @@
 				<span class="overview-hd-title">采购简报</span> <span class="briefly" onclick="dayTagSelect(this,'order')">
 					<p class="dayTagText">今日</p>
 					<i class="icon-angle-down"></i>
-				</span> 
+				</span>
+				<input type="hidden" id="dayTag">
 				<input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'order')" readonly="">
 				<span class="overview-hd-segmenting fr"> - </span> 
 				<input class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'order')" readonly="">
@@ -311,12 +333,12 @@
 		</div>
 		<div class="weui-panel weui-panel_access">
 			<div class="weui-panel__hd">
-				<span class="overview-hd-title">直营商采购统计</span> <span class="briefly" onclick="dayTagSelect(this,'user')">
+				<span class="overview-hd-title">直营商采购统计</span><!--<span class="briefly" onclick="dayTagSelect(this,'user')">
 				<p class="dayTagText">今日</p>
 					<i class="icon-angle-down"></i>
 				</span> <input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'user')" readonly="">
 				<span class="overview-hd-segmenting fr"> - </span> <input
-					class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'user')" readonly="">
+					class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'user')" readonly="">  --> 
 			</div>
 			<div class="weui-panel__bd report-area">
 				<div class="weui-media-box ft14">

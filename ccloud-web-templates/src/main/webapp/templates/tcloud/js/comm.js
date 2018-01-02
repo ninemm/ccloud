@@ -338,10 +338,10 @@ $(function() {
 		closePop();
 	}).on("touchstart", "#confirm-input", function() {
 		confirmInput();
-	}).on("touchstart", ".operate:first-child", function() {//减少商品数量
+	}).on("click", ".operate:first-child", function() {//减少商品数量
 		var $input = $(this).next();
 		Number($input.val())-1 >= 0 ? $input.val(Number($input.val()) - 1) : "";
-	}).on("touchstart", ".operate:last-child", function() {//增加商品数量
+	}).on("click", ".operate:last-child", function() {//增加商品数量
 		var $input = $(this).prev();
 		$input.val(Number($input.val()) + 1);
 	}).on("change", "input[name=add-gift]", function() {//点击遮罩关闭菜单

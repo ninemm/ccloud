@@ -265,9 +265,10 @@
       layer.open({
         type: 1,
         title: ['订单审核',
-          'border-bottom: 1px solid #eee;height:2rem;line-height:2rem'
+          'border-bottom: 1px solid #eee;height:2rem;line-height:2rem;margin-top:2.5rem'
         ],
-        content: '<p class="t-c">是否确认通过该订单？</p>' +
+		content: '<img src="${CTPATH}/images/image_orderpopups.png">' +
+		  '<p class="t-c">是否确认通过该订单？</p>' +
           '<div><textarea id="comment" placeholder="补充说明，可选填"></textarea></div>',
         anim: 'scale',
         className: 'audit',
@@ -338,7 +339,7 @@
 					<div class="ft14 gray">
 						<span class="tag" id="receiveType">账期</span>
 						<span id="orderSn"></span>
-						<span class="fr blue" id="status"></span>
+						<span class="fr orange" id="status"></span>
 					</div>
 					<div class="customer_name gray">
 						<span id="customerName" class=""></span>

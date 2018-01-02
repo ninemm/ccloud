@@ -89,7 +89,7 @@ jQuery.mm = {
 		if (count == 0) {
 			toastr.warning(message);
 		} else {
-			layer.confirm('确认批量删除吗?', {
+			layer.confirm('确认批量操作吗?', {
 				btn: ['确认', '取消']
 			}, function() {
 				layer.closeAll();
