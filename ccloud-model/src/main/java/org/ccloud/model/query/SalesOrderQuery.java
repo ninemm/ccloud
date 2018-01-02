@@ -386,8 +386,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		sb.append(" left join cc_customer c on cc.customer_id = c.id ");
 		sb.append(" left join cc_customer_type ct on o.customer_type_id = ct.id ");
 		sb.append(" JOIN act_ru_task a on o.proc_inst_id = a.PROC_INST_ID_ ");
-		sb.append(" JOIN act_ru_identitylink u on o.proc_inst_id = u.PROC_INST_ID_ ");
-		sb.append(" where locate(?, u.USER_ID_) > 0 ");
+		sb.append(" where FIND_IN_SET(?, a.ASSIGNEE_) ");
 		sb.append(" order by o.create_date ");
 		return DAO.find(sb.toString(), username);
 	}
@@ -404,7 +403,7 @@ public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procK
 		sql.append(" left join cc_customer_type ct on o.customer_type_id = ct.id ");
 		sql.append(" JOIN act_hi_actinst i on o.proc_inst_id = i.PROC_INST_ID_ ");
 		sql.append(" JOIN act_re_procdef p on p.ID_ = i.PROC_DEF_ID_ ");
-		sql.append(" WHERE p.KEY_ not in ('_customer_visit_review','_customer_audit') and o.status <>0 and locate(?, i.ASSIGNEE_) > 0 AND i.DURATION_ is not null ");
+		sql.append(" WHERE p.KEY_ not in ('_customer_visit_review','_customer_audit') and FIND_IN_SET(?, i.ASSIGNEE_) AND i.DURATION_ is not null ");
 		sql.append(" order by i.END_TIME_ desc ");
 
 		return Db.paginate(pageNumber, pageSize, select, sql.toString(), params.toArray());
