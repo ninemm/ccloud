@@ -451,7 +451,11 @@ function save(){
 							<i class="icon-plus2"></i>
 						</div>
 					</div>
-					<input type="number" class="street-value bigPrice" id="bigPrice" value="0" >
+					<#if isEdit>
+						<input type="number" class="street-value bigPrice" id="bigPrice" value="0" >
+					<#else>
+						<input type="number" class="street-value bigPrice" id="bigPrice" value="0" readonly>
+					</#if>
 				</div>
 				<div class="product_mUnit">
 					<span class="price" id="smallPriceSpan" ></span>
@@ -465,7 +469,11 @@ function save(){
 							<i class="icon-plus2"></i>
 						</div>
 					</div>
-					<input type="number" class="street-value smallPrice" id="smallPrice" value="0" >
+					<#if isEdit>
+						<input type="number" class="street-value smallPrice" id="smallPrice" value="0" >
+					<#else>
+						<input type="number" class="street-value smallPrice" id="smallPrice" value="0" readonly>
+					</#if>
 					<i class="icon-trash-o fr ft30 gray"></i>
 				</div>
 				<hr />
@@ -522,7 +530,11 @@ function save(){
 							<i class="icon-plus2"></i>
 						</div>
 					</div>
-					<input type="number" class="street-value" id="compositionPrice" value="0" >
+					<#if isEdit>
+						<input type="number" class="street-value" id="compositionPrice" value="0" >
+					<#else>
+						<input type="number" class="street-value" id="compositionPrice" value="0" readonly>
+					</#if>
 					<i class="icon-trash-o fr ft30 gray"></i>
 				</div>
 				<hr>
