@@ -30,10 +30,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.io.*;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.net.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.swing.ImageIcon;
 
@@ -60,6 +65,7 @@ import org.ccloud.model.vo.ImageJson;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.DataAreaUtil;
+import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
 
 import com.alibaba.fastjson.JSON;
@@ -143,6 +149,19 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 		setAttr("cTypeName", Joiner.on(",").join(typeList.iterator()));
 
 		render("audit.html");
+	}
+
+	public void image() {
+
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String typeDataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea());
+		List<Record> typeList = CustomerTypeQuery.me().findCustomerTypeList(typeDataArea + "%");
+		setAttr("customerType",JSON.toJSON(typeList));
+
+		List<Record> nameList = SellerCustomerQuery.me().findName(getSessionAttr(Consts.SESSION_SELECT_DATAAREA)+ "%");
+		setAttr("customerName", JSON.toJSON(nameList));
+
+		render("image.html");
 	}
 
 	@RequiresPermissions(value = { "/admin/customerVisit/audit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
@@ -265,13 +284,14 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
         
 	}
 	
-	public void exportExcel(List<Record> dataList) throws Exception {
+	public void exportExcel(List<Record> dataList) throws IOException {
 
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\customer_visit\\"
 				+ "customerVisitInfo.xls";
 		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		
 		FileOutputStream fileOut = null;
+		BufferedImage bufferImg = null;
 
 		try {
 		    HSSFWorkbook wb = new HSSFWorkbook();  
@@ -326,16 +346,16 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 					if(list.get(i)==null) {break;}
 					ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream();
 					String domain = OptionQuery.me().findValue("cdn_domain");
-					
-					URL url = new URL(domain+"/"+list.get(i).getSavePath());  
-					HttpURLConnection conn = (HttpURLConnection)url.openConnection();  
-					conn.setRequestMethod("GET");  
-					
-					conn.setConnectTimeout(5 * 1000);  
-					InputStream inStream = conn.getInputStream();    
+
+					URL url = new URL(domain+"/"+list.get(i).getSavePath());
+					HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+					conn.setRequestMethod("GET");
+
+					conn.setConnectTimeout(5 * 1000);
+					InputStream inStream = conn.getInputStream();
 					byte[] data = readInputStream(inStream);
 					conn.disconnect();
-					
+
 					HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 250, (short) (8+i), rowNum, (short) (9+i), rowNum);
 					anchor.setAnchorType(0);
 					patriarch.createPicture(anchor, wb.addPicture( data, HSSFWorkbook.PICTURE_TYPE_JPEG));
@@ -350,14 +370,14 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
       
 		   fileOut = new FileOutputStream(filePath);
 		   wb.write(fileOut);  
-		} catch (IOException io) {
+		} catch (Exception io) {
 			io.printStackTrace();
 			System.out.println("io erorr : " + io.getMessage());
 		} finally {
 			if (fileOut != null) {
 				try {
 					fileOut.close();
-				} catch (IOException e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
@@ -373,17 +393,17 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 
 		image = new ImageIcon(image).getImage(); 
 		BufferedImage bimage = null; 
-		
+
 		int w = image.getWidth(null)== -1?600:image.getWidth(null);
 		int h = image.getHeight(null)== -1? 500:image.getHeight(null);
 
-		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment(); 
+		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		
 		try { 
 			int transparency = Transparency.OPAQUE; 
 			GraphicsDevice gs = ge.getDefaultScreenDevice(); 
 			GraphicsConfiguration gc = gs.getDefaultConfiguration(); 
-			bimage = gc.createCompatibleImage(w, h, transparency); 
+			bimage = gc.createCompatibleImage(w, h, transparency);
 		} catch (HeadlessException e) { 
 			e.getStackTrace();
 		} 
@@ -399,15 +419,108 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 		g.dispose(); 
 		return bimage; 
 	}
-	
-	private static byte[] readInputStream(InputStream inStream) throws Exception{  
-	    ByteArrayOutputStream outStream = new ByteArrayOutputStream();  
-	    byte[] buffer = new byte[1024];  
-	    int len = 0;  
-	    while( (len=inStream.read(buffer)) != -1 ){  
-	        outStream.write(buffer, 0, len);  
-	    }  
-	    inStream.close();  
-	    return outStream.toByteArray();  
+
+	private static byte[] readInputStream(InputStream inStream) throws Exception{
+	    ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+	    byte[] buffer = new byte[1024];
+	    int len = 0;
+	    while( (len=inStream.read(buffer)) != -1 ){
+	        outStream.write(buffer, 0, len);
+	    }
+	    inStream.close();
+	    return outStream.toByteArray();
 	}
+	public void count() {
+		String customerType = getPara("customer_type");
+		String customerName = getPara("customer_name");
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+
+		List<Record> imageList = CustomerVisitQuery.me().findPhoto(customerType, customerName, selectDataArea + "%");
+		if(imageList.size() == 0) renderAjaxResultForError();
+		else renderAjaxResultForSuccess();
+	}
+
+	public void exportImage() throws Exception {
+		String customerType = getPara("customer_type");
+		String customerName = getPara("customer_name");
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+
+		String domain = OptionQuery.me().findByKey("cdn_domain").getOptionValue();
+		List<Record> imageList = CustomerVisitQuery.me().findPhoto(customerType, customerName, selectDataArea + "%");
+
+		String zipFileName = "拜访图片.zip";
+
+		if(StrKit.notBlank(customerName)) zipFileName = SellerCustomerQuery.me().findById(customerName).getCustomer().getCustomerName() + zipFileName;
+		if(StrKit.notBlank(customerType)) zipFileName = CustomerTypeQuery.me().findById(customerType).getStr("name") + zipFileName;
+		zipFileName = URLEncoder.encode(zipFileName, "UTF-8");
+
+		ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFileName));
+
+		List<File> fileList = new ArrayList<>();
+		for(Record record : imageList) {
+			List<ImageJson> list = JSON.parseArray(record.getStr("photo"), ImageJson.class);
+			for (int i = 0; i < list.size(); i++){
+				ImageJson image = list.get(i);
+
+				String fileName = image.getSavePath();
+				String filePath = DateUtils.dateToStr(record.getDate("create_date"), "yyyy-MM-dd" )
+						+ record.getStr("realname") + "拜访" + record.getStr("customer_name")
+						+  "图片" + (i+1) + ".jpg";
+				fileList.add(getImage(domain, fileName, filePath));
+
+			}
+		}
+
+		File[] files = fileList.toArray(new File[fileList.size()]);
+		zipFile(files, "", zos);
+
+		zos.flush();
+		zos.close();
+
+		renderFile(new File(zipFileName));
+
+	}
+
+	private File getImage(String domain, String fileName, String filePath) throws Exception {
+
+		String encodedFileName = URLEncoder.encode(fileName, "utf-8");
+
+		String finalUrl = String.format("%s/%s", domain, encodedFileName);
+
+		URL url = new URL(finalUrl);
+		HttpURLConnection urlCon = (HttpURLConnection) url.openConnection();
+		urlCon.setConnectTimeout(6000);
+		urlCon.setReadTimeout(6000);
+		int code = urlCon.getResponseCode();
+
+		if (code != HttpURLConnection.HTTP_OK) {
+			throw  new Exception("文件读取失败");
+		}
+
+		DataInputStream in = new DataInputStream(urlCon.getInputStream());
+		DataOutputStream out = new DataOutputStream(new FileOutputStream(filePath));
+		byte[] buffer = new byte[2048];
+		int count = 0;
+		while ((count = in.read(buffer)) != -1) {
+			out.write(buffer, 0, count);
+		}
+		out.close();
+		in.close();
+		return new File(filePath);
+	}
+
+	private void zipFile(File[] subs, String baseName, ZipOutputStream zos) throws  IOException{
+		for (int i = 0; i < subs.length; i++) {
+			File f = subs[i];
+			zos.putNextEntry(new ZipEntry(baseName + f.getName()));
+			FileInputStream fis = new FileInputStream(f);
+			byte[] buffer = new byte[2048];
+			int r = 0;
+			while ((r = fis.read(buffer)) != -1) {
+				zos.write(buffer, 0, r);
+			}
+			fis.close();
+		}
+	}
+
 }

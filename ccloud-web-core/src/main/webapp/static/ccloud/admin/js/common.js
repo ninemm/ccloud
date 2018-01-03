@@ -583,6 +583,66 @@ jQuery.mm = {
 		});
 	},
 	
+	initEditTableExport3 : function(tableId, url, queryParams, fields, editableSaveFunc, clickCellFunc) {
+		
+		tableId = tableId || "_table";
+		
+		$(tableId).bootstrapTable({
+			url: url,
+			method: 'get',
+			editable: true,//开启编辑模式
+			clickToSelect: true,
+			uniqueId: 'id',
+			striped: true,
+			classes: 'table-no-bordered',
+			sortable: true,                  //是否启用排序
+			sortOrder: "asc",                //排序方式
+			cache: false,					// 是否使用缓存
+			queryParams: queryParams,		// 传递参数
+			toolbar:	'#toolbar',
+			smartDisplay: false,
+			undefinedText: '',
+			columns: fields,
+			showExport: true,  //是否显示导出按钮  
+			buttonsAlign:"right",  //按钮位置  
+			exportTypes:['excel'],  //导出文件类型  
+			exportDataType: "all",
+			onEditableSave: editableSaveFunc || function () {},
+			onClickCell: clickCellFunc || function () {}
+			
+		});
+	},
+	
+	initEditTableExport4 : function(tableId, url, queryParams, fields, editableSaveFunc, clickCellFunc) {
+		
+		tableId = tableId || "_table";
+		
+		$(tableId).bootstrapTable({
+			url: url,
+			method: 'get',
+			editable: true,//开启编辑模式
+			clickToSelect: true,
+			uniqueId: 'id',
+			striped: true,
+			classes: 'table-no-bordered',
+			sortable: true,                  //是否启用排序
+			sortOrder: "asc",                //排序方式
+			cache: false,					// 是否使用缓存
+			queryParams: queryParams,		// 传递参数
+			toolbar:	'#toolbar2',
+			smartDisplay: false,
+			undefinedText: '',
+			columns: fields,
+			showExport: true,  //是否显示导出按钮  
+			buttonsAlign:"right",  //按钮位置  
+			exportTypes:['excel'],  //导出文件类型  
+			exportDataType: "all",
+			onEditableSave: editableSaveFunc || function () {},
+			onClickCell: clickCellFunc || function () {}
+			
+		});
+	},
+	
     initUnPageEditTable : function(tableId, url, queryParams, fields, editableSaveFunc, clickCellFunc) {
 
         tableId = tableId || "_table";

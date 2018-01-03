@@ -157,14 +157,16 @@
 	$('#exampleModal1').on('show.bs.modal', function (event) {
 		$(".modal-body").html("");
 		$.ajax({
-				url:"${CPATH}/admin/purchaseOrderDetail/show_supplier",
+				url:"${CPATH}/admin/purchaseOrderDetail/show_supplier_warehouse",
 				type:"post",
 				dataType:"json",
 				success:function(data){
-					var Html = '<div class="input-group col-md-2 col-sm-8" style="padding-top:10px;">'
-							  +'<select class="form-control input-sm" style="width:180px;" name="id" id="supplierId" >'
-							  +'<option value="">----请选择供应商----</option>'
-							  +'</select></div>';
+					var Html = '<div class="control-label" style="margin-top:20px;">'
+							+'<label class="control-label col-sm-2" style="font-size:18px;"><strong>供应商:</strong>&nbsp;</label>'
+							+'<div class="input-group col-md-4 col-sm-10">'
+							+'<select class="form-control" style="padding-right:5px;margin-right:55px;" name="id" id="supplierId" >'
+							+'<option value="">----请选择供应商----</option>'
+							+'</select></div>';
 					$(".modal-body").append(Html);
 					$.each(data,function(index, item) {
 							var html ='<option value="'+item.id+'">'+item.name+'</option>';
@@ -236,7 +238,7 @@
 	    <div class="modal-content">
 	      <div class="modal-header">
 	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-	        <h4 class="modal-title" id="exampleModalLabel">选择供应商</h4>
+	        <h4 class="modal-title" id="exampleModalLabel">选择供应商和入货仓库</h4>
 	      </div>
 	      <div class="modal-body">
 	      </div>

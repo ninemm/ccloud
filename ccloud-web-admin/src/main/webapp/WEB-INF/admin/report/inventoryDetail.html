@@ -109,9 +109,9 @@
 <section class="content">
 	<div id="toolbar">
 		<form class="form-inline" id="form" >
-			<div class="row content-row" style="width:920px">
+			<div class="row content-row" >
 				<label class="control-label">盘点仓库:</label>
-				<div class="input-group col-md-2 col-sm-3">
+				<div class="input-group ">
 					<select class="form-control " name="warehouse_id" id="warehouse_id" style="height:34px">
 						<option value="">--请选择--</option>
 						<#list (wlist)! as warehouse >
@@ -133,8 +133,8 @@
 						<input id="endDate" class="form-control" value="${endDate!}" name="endDate" placeholder="结束日期" >&nbsp;
 					</div>
 				</div>
-				
 				<input id="search-submit" class="btn btn-sm btn-primary " type="button" value="搜索">
+				
 				
 			</div>
 		</form>

@@ -317,4 +317,13 @@ public class SellerCustomerQuery extends JBaseQuery {
 		List<Map<String, Object>> result = (List<Map<String, Object>>) Db.execute(callback);
 		return result;
 	}
+
+	public List<Record> findName(String dataArea) {
+		List<Object> param = new LinkedList<Object>();
+		StringBuilder sql = new StringBuilder("SELECT DISTINCT(csc.id), cc.customer_name as name ");
+		sql.append("FROM cc_seller_customer csc LEFT JOIN cc_customer cc ON csc.customer_id = cc.id ");
+		sql.append("LEFT JOIN cc_user_join_customer cujc ON cujc.seller_customer_id = csc.id ");
+		appendIfNotEmptyWithLike(sql, "cujc.data_area", dataArea, param, true);
+		return Db.find(sql.toString(), param.toArray());
+	}
 }

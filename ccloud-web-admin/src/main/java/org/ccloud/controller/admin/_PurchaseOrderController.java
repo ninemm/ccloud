@@ -28,6 +28,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
+import org.ccloud.model.Department;
 import org.ccloud.model.Payables;
 import org.ccloud.model.PayablesDetail;
 import org.ccloud.model.Product;
@@ -40,6 +41,7 @@ import org.ccloud.model.Seller;
 import org.ccloud.model.SellerProduct;
 import org.ccloud.model.User;
 import org.ccloud.model.Warehouse;
+import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.PayablesQuery;
 import org.ccloud.model.query.ProductQuery;
 import org.ccloud.model.query.PurchaseInstockQuery;
@@ -124,7 +126,19 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		Seller seller = SellerQuery.me().findById(getSessionAttr("sellerId").toString());
 		PurchaseOrder purchaseOrder=PurchaseOrderQuery.me().findById(orderId);
 		purchaseOrder.set("status", 1000);
-		Warehouse warehouse = WarehouseQuery.me().findOneByUserId(user.getId());
+		
+		//默认仓库
+		Warehouse warehouse = new Warehouse();
+		List<Department> tmpList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
+		for(Department dept : tmpList) {
+			Seller sr = SellerQuery.me().findById(dept.getStr("seller_id"));
+			if(sr.getHasStore()==1) {
+				warehouse = WarehouseQuery.me().findBySellerId(sr.getId());
+				break;
+			}else {
+				continue;
+			}
+		}
 		final PurchaseInstock purchaseInstock = getModel(PurchaseInstock.class);
 		PurchaseInstockDetail purchaseInstockDetail = getModel(PurchaseInstockDetail.class);
 		String purchaseInstockId = StrKit.getRandomUUID();
@@ -233,7 +247,18 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		Map<String, String[]> paraMap = getParaMap();
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		Seller seller = SellerQuery.me().findById(getSessionAttr("sellerId").toString());
-		Warehouse warehouse = WarehouseQuery.me().findOneByUserId(user.getId());
+		//默认仓库
+		Warehouse warehouse = new Warehouse();
+		List<Department> tmpList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
+		for(Department dept : tmpList) {
+			Seller sr = SellerQuery.me().findById(dept.getStr("seller_id"));
+			if(sr.getHasStore()==1) {
+				warehouse = WarehouseQuery.me().findBySellerId(sr.getId());
+				break;
+			}else {
+				continue;
+			}
+		}
 		String purchaseInstockId = StrKit.getRandomUUID();
 
 		//采购入库单： PO + 100000(机构编号或企业编号6位) + 20171108(时间) + 100001(流水号)
