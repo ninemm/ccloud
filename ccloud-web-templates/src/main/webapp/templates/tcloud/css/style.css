@@ -750,13 +750,6 @@ a {
   color: #ea6f5a;
 }
 
-.menu-left li img {
-  width: 20%;
-  position: absolute;
-  left: .1rem;
-  top: .2rem;
-}
-
 .product-content .swiper-slide.active::before {
   content: "";
   width: 60px;
@@ -977,7 +970,7 @@ a {
 }
 
 .product-detail img {
-  width: 30%;
+  width: 100%;
 }
 
 .service img {
