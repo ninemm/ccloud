@@ -258,10 +258,21 @@
 										<label class="control-label col-sm-2">是否启用:</label>
 										<div class="input-group col-md-4 col-sm-10">
 											<label class="radio-inline">
-						                 		<input type="radio" name="seller.is_enabled" value="1" <#if !seller?? || seller.is_enabled == 1>checked</#if>>是
+						                 		<input type="radio" name="seller.is_enabled" value="1" <#if !seller?? || (seller.is_enabled)! == 1>checked</#if> />是
 						                 	</label>
 						                 	<label class="radio-inline">
-						                 		<input type="radio" name="seller.is_enabled" value="0" <#if seller?? && seller.is_enabled == 0>checked</#if>>否
+						                 		<input type="radio" name="seller.is_enabled" value="0" <#if seller?? && (seller.is_enabled)! == 0>checked</#if> />否
+											</label>		                 		
+						               	</div>
+						</div>
+						<div class="form-group col-sm-12 validata-box">
+										<label class="control-label col-sm-2">是否有私有仓库:</label>
+										<div class="input-group col-md-4 col-sm-10">
+											<label class="radio-inline">
+						                 		<input type="radio" name="seller.has_store" value="1" <#if !seller?? || (seller.has_store)! == 1>checked</#if>>是
+						                 	</label>
+						                 	<label class="radio-inline">
+						                 		<input type="radio" name="seller.has_store" value="0" <#if seller?? && (seller.has_store)! == 0>checked</#if>>否
 											</label>		                 		
 						               	</div>
 						</div>
