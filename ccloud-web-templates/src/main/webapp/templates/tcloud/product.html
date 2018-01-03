@@ -149,7 +149,7 @@ function initProduct(){
 				$newProductDetail.find("#convert").val(el.convert_relate);
 
 				$newProductDetail.find("#description").val(el.description);
-				
+				$newProductDetail.find("#image").attr("src", getImageUrl(el.product_image_list_store, el.product_sn));
 			});
 			
 		initComposition(data.compositionList);
@@ -193,6 +193,8 @@ function initComposition(data){
 			$newProductDetail.find("#compositionId").val(el.id);
 			
 			$newProductDetail.find("#compositionValueName").text(el.product_sp);
+			$newProductDetail.find("#compositionImage").attr("src", getImageUrl(el.product_image_list_store, el.product_sn));
+
 			$newProductDetail.find("#subProduct").text(el.sub_product_name + el.sub_product_sp + ' x ' + el.sub_product_count + '件')
 		}else{
 			$newProductDetail.find("#sub").append("<a class='fr gift-open' >展开</a>");
@@ -209,6 +211,16 @@ function compositionNum(){
 			var $newProductDetail =$("#" + el.compositionId);
 			$newProductDetail.find("#compositionNum").val(el.compositionNum);
 		});
+}
+
+function getImageUrl(product_image_list_store, product_sn) {
+	$.each(JSON.parse(product_image_list_store), function(index, el) {
+		if(el.imgName.indexOf(product_sn + "_1") != -1) {
+			return "${CTPATH}" + el.savePath;
+		}
+	})
+
+	return "${CTPATH}/images/jp.jpg";
 }
 
 function calTotal() {
@@ -384,7 +396,7 @@ function save(){
 							<input type="hidden" id="isGift" value="0">
 							<input type="hidden" id="description" value="0">
 							<div class="product-top">
-								<img src="${CTPATH}/images/jp.jpg" style="width:2rem;">
+								<img src="" id="image" style="width:2rem;">
 								<div class="weui-cell_access product-top-right">
 									<div class="product_name" id="productName">
 									</div>
@@ -431,7 +443,7 @@ function save(){
 							<input type="hidden" id="compositionId" value="">
 							<input type="hidden" id="compositionPrice" value="">
 							<div class="product-top">
-								<img src="${CTPATH}/images/jp.jpg" alt="" style="width:2rem;">
+								<img src="" id="compositionImage" style="width:2rem;">
 								<div class="weui-cell_access product-top-right">
 									<div class="product_name" id="compositionName">
 									</div>
