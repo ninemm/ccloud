@@ -244,13 +244,15 @@ function compositionNum(){
 }
 
 function getImageUrl(product_image_list_store, product_sn) {
+	var imageUrl = "${CTPATH}/images/jp.jpg";
 	$.each(JSON.parse(product_image_list_store), function(index, el) {
 		if(el.imgName.indexOf(product_sn + "_1") != -1) {
-			return "${CTPATH}" + el.savePath;
+			imageUrl = el.savePath;
+			return false;
 		}
-	})
+	});
 
-	return "${CTPATH}/images/jp.jpg";
+	return imageUrl;
 }
 
 function calTotal() {
