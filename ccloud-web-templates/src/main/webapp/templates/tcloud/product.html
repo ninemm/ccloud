@@ -62,15 +62,16 @@ $(function() {
     	var product_image_list_store = $this.find("#product_image_list_store").val();
     	var product_sn = $this.find("#product_sn").val();
     	var imageS = getImageS(product_image_list_store, product_sn);
-    	
+		var imgSwiper;
+		
 		layer.open({
 		  type: 1,
 		  title: ['商品详情',
 			'border-bottom: 1px solid #eee;height:2rem;line-height:2rem'
 		  ],
 		  content: '<div class="swiper-container">' +
-			'<div class="swiper-wrapper">' + imageS +
-			'</div>' +
+			'<div class="swiper-wrapper">' + imageS + '</div>' +
+			'<div class="swiper-pagination"></div>' +
 			'</div>' +
 			'<p>名称：' + productName + '</p>' +
 			'<p>规格：' + valueName + '</p>' +
@@ -79,7 +80,9 @@ $(function() {
 		  className: 'product-detail',
 		  success: function () {
 			imgSwiper = new Swiper('.product-detail .swiper-container', {
-				slidesPerView: 2,
+				pagination: {
+					el: '.swiper-pagination',
+				},
 			})
 		  },
 		  btn: '关闭',
@@ -97,15 +100,16 @@ $(function() {
     	var product_image_list_store = $this.find("#product_image_list_store").val();
     	var product_sn = $this.find("#product_sn").val();
     	var imageS = getImageS(product_image_list_store, product_sn);
-    	
+		var imgSwiper;
+		
 		layer.open({
 		  type: 1,
 		  title: ['商品详情',
 			'border-bottom: 1px solid #eee;height:2rem;line-height:2rem'
 		  ],
 		  content: '<div class="swiper-container">' +
-			'<div class="swiper-wrapper">' + imageS +
-			'</div>' +
+			'<div class="swiper-wrapper">' + imageS + '</div>' +
+			'<div class="swiper-pagination"></div>' +
 			'</div>' +
 			'<p>名称：' + compositionName + '</p>' +
 			'<p>规格：' + compositionValueName + '</p>' +
@@ -113,8 +117,10 @@ $(function() {
 		  anim: 'scale',
 		  className: 'product-detail',
 		  success: function () {
-			var imgSwiper = new Swiper('.product-detail .swiper-container', {
-				slidesPerView: 2,
+			imgSwiper = new Swiper('.product-detail .swiper-container', {
+				pagination: {
+					el: '.swiper-pagination',
+				},
 			})
 		  },
 		  btn: '关闭',
