@@ -271,12 +271,24 @@ function getImageS(product_image_list_store, product_sn) {
 	var images = "";
 	$.each(JSON.parse(product_image_list_store), function(index, el) {
 		if(el.imgName.indexOf(product_sn) != -1) {
-			images += "<div class='swiper-slide'><img src='" + el.savePath + "' onerror=\"" + "javascript:this.src='${CTPATH}/images/jp.jpg'" + "\"></div>";
+			images += "<div class='swiper-slide'><img src='" + el.savePath + "' onerror=\"" + "javascript:this.src='${CTPATH}/images/jp.jpg'" + "\" onClick='imageClick(this)'></div>";
 		}
 	});
 
-	return images != "" ? images : "<div class='swiper-slide'><img src='" + "${CTPATH}/images/jp.jpg" +"' /></div>";
+	return images != "" ? images : "<div class='swiper-slide'><img src='" + "${CTPATH}/images/jp.jpg" +"' onClick='imageClick(this)'></div>";
 }
+
+var $gallery = $("#gallery"), $galleryImg = $("#galleryImg");
+function imageClick(obj){
+	$this = $(obj);
+	var style = "background-image: url(" + $this.attr("src") + ")";
+	$galleryImg.attr("style", style);
+	$gallery.fadeIn(100);
+}
+
+$gallery.on("click", function() {
+	$gallery.fadeOut(100);
+});
 
 function calTotal() {
  	var types = $(".type");
@@ -453,7 +465,7 @@ function save(){
 							<input type="hidden" id="product_image_list_store" value="">
 							<input type="hidden" id="product_sn" value="">
 							<div class="product-top">
-								<img src="" id="image" style="width:2rem;" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'">
+								<img src="" id="image" style="width:2rem;" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'" onClick="imageClick(this)">
 								<div class="weui-cell_access product-top-right">
 									<div class="product_name" id="productName">
 									</div>
@@ -502,7 +514,7 @@ function save(){
 							<input type="hidden" id="product_image_list_store" value="">
 							<input type="hidden" id="product_sn" value="">
 							<div class="product-top">
-								<img src="" id="compositionImage" style="width:2rem;" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'">
+								<img src="" id="compositionImage" style="width:2rem;" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'" onClick="imageClick(this)">
 								<div class="weui-cell_access product-top-right">
 									<div class="product_name" id="compositionName">
 									</div>
@@ -545,7 +557,12 @@ function save(){
 		</a>
 		</@shiro.hasPermission>
 		<div class="layer"></div>
-	</div>
+		</div>
+		<div class="weui-gallery" id="gallery">
+			<span class="weui-gallery__img" id="galleryImg"></span>
+			<div class="weui-gallery__opr">
+			</div>
+		</div>
 </div>
 <#include "_inc/_footer_nav.html" />
 </@layout>
