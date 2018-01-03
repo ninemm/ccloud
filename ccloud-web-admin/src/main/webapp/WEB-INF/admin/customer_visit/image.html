@@ -33,7 +33,14 @@
 	})
 
 	function doSubmit(){
-		window.open('${CPATH}/admin/customerVisit/exportImage?customer_type=' + $('#customer_type').val() + '&customer_name=' + $('#customer_name').val());
+		$.get('${CPATH}/admin/customerVisit/count?customer_type=' + $('#customer_type').val() + '&customer_name=' + $('#customer_name').val() ,
+		function(result){
+			if (result.errorCode > 0) {
+				toastr.error(result.message, '没有图片');
+			} else {
+				window.open('${CPATH}/admin/customerVisit/exportImage?customer_type=' + $('#customer_type').val() + '&customer_name=' + $('#customer_name').val());
+			}
+		})
 	}
 </#macro>
 

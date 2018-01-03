@@ -430,6 +430,15 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 	    inStream.close();
 	    return outStream.toByteArray();
 	}
+	public void count() {
+		String customerType = getPara("customer_type");
+		String customerName = getPara("customer_name");
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+
+		List<Record> imageList = CustomerVisitQuery.me().findPhoto(customerType, customerName, selectDataArea + "%");
+		if(imageList.size() == 0) renderAjaxResultForError();
+		else renderAjaxResultForSuccess();
+	}
 
 	public void exportImage() throws Exception {
 		String customerType = getPara("customer_type");
@@ -438,15 +447,11 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 
 		String domain = OptionQuery.me().findByKey("cdn_domain").getOptionValue();
 		List<Record> imageList = CustomerVisitQuery.me().findPhoto(customerType, customerName, selectDataArea + "%");
-		if(imageList.size()==0) {
-			renderError(500, "没有图片");
-			return;
-		}
 
 		String zipFileName = "拜访图片.zip";
 
 		if(StrKit.notBlank(customerName)) zipFileName = SellerCustomerQuery.me().findById(customerName).getCustomer().getCustomerName() + zipFileName;
-		else if(StrKit.notBlank(customerType)) zipFileName = CustomerTypeQuery.me().findById(customerType).getStr("name") + zipFileName;
+		if(StrKit.notBlank(customerType)) zipFileName = CustomerTypeQuery.me().findById(customerType).getStr("name") + zipFileName;
 		zipFileName = URLEncoder.encode(zipFileName, "UTF-8");
 
 		ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFileName));
