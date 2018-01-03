@@ -161,6 +161,14 @@ public abstract class BaseSeller<M extends BaseSeller<M>> extends JModel<M> impl
 	public java.lang.Integer getIsEnabled() {
 		return getInt("is_enabled");
 	}
+	
+	public void setHasStore(java.lang.Integer isEnabled) {
+		set("has_store", isEnabled);
+	}
+
+	public java.lang.Integer getHasStore() {
+		return getInt("has_store");
+	}
 
 	public void setIsHeadquarter(java.lang.Integer isHeadquarter) {
 		set("is_headquarter", isHeadquarter);

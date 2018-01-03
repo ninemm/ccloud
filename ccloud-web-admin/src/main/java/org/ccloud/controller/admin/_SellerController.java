@@ -551,6 +551,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		seller.set("seller_code",w);
 		seller.set("contact", seller.getContact());
 		seller.set("phone", seller.getPhone());
+		seller.set("has_store", seller.getHasStore());
 		seller.set("is_enabled", seller.getIsEnabled());
 		seller.set("market_name", seller.getMarketName());
 		seller.set("market_code", seller.getMarketCode());
