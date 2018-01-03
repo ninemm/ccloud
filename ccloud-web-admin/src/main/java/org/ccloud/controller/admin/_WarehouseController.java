@@ -58,13 +58,13 @@ public class _WarehouseController extends JBaseCRUDController<Warehouse> {
 		}
 		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/dealer/all");
 		Page<Warehouse> page=new  Page<Warehouse>();
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String user_id = user.getId();
 		//判断登录的人是不是经销商管理员
 		if (isSuperAdmin) {
 			String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-			page = WarehouseQuery.me().paginateDataArea(getPageNumber(), getPageSize(), keyword, "c.create_date", dataArea);
+			page = WarehouseQuery.me().paginateDataArea(getPageNumber(), getPageSize(), keyword, "c.create_date", dataArea,user_id);
 		}else {
-			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-			String user_id = user.getId();
 			page = WarehouseQuery.me().paginate(getPageNumber(), getPageSize(), keyword, "c.create_date", user_id);
 		}
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
