@@ -21,24 +21,20 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
 import java.awt.Image;
-import java.awt.Toolkit;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
 import com.google.common.base.Joiner;
@@ -60,6 +56,7 @@ import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.*;
 import org.ccloud.model.query.*;
+import org.ccloud.model.vo.ImageJson;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.DataAreaUtil;
@@ -259,18 +256,22 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 		}
         
         List<Record> visitList = CustomerVisitQuery.me().exportVisit(keyword, selectDataArea, customerType, questionType, "id", "cc_v.create_date desc", status);
-        exportExcel(visitList);
+        try {
+			exportExcel(visitList);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         
 	}
 	
-	public void exportExcel(List<Record> dataList) throws IOException {
+	public void exportExcel(List<Record> dataList) throws Exception {
 
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\customer_visit\\"
 				+ "customerVisitInfo.xls";
 		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		
 		FileOutputStream fileOut = null;
-		BufferedImage bufferImg = null;
 
 		try {
 		    HSSFWorkbook wb = new HSSFWorkbook();  
@@ -320,24 +321,24 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 				row.createCell(7).setCellValue(record.get("create_date")!=null?(String)sdf.format(record.get("create_date")):"");
 				
 				String picsrc = (String)record.get("photo");
-				String[] picArray = new String[3];
-				if(picsrc.length()>5) {
-					if(picsrc.contains(",")) {
-						picArray = picsrc.split(",");
-					}else {
-						picArray[0] = picsrc;
-					}
-				}
-				
-				for(int i =0;i<picArray.length;i++) {
-					if(picArray[i]==null) {break;}
+				List<ImageJson> list = JSON.parseArray(picsrc, ImageJson.class);
+				for(int i =0;i<list.size();i++) {
+					if(list.get(i)==null) {break;}
 					ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream();
-					Image src=Toolkit.getDefaultToolkit().getImage(picArray[i].substring(picArray[i].indexOf("\":\""), picArray[i].indexOf("\"}"))); 
-					bufferImg=toBufferedImage(src);
-					ImageIO.write(bufferImg, "jpg", byteArrayOut);
+					String domain = OptionQuery.me().findValue("cdn_domain");
+					
+					URL url = new URL(domain+"/"+list.get(i).getSavePath());  
+					HttpURLConnection conn = (HttpURLConnection)url.openConnection();  
+					conn.setRequestMethod("GET");  
+					
+					conn.setConnectTimeout(5 * 1000);  
+					InputStream inStream = conn.getInputStream();    
+					byte[] data = readInputStream(inStream);
+					conn.disconnect();
+					
 					HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 250, (short) (8+i), rowNum, (short) (9+i), rowNum);
 					anchor.setAnchorType(0);
-					patriarch.createPicture(anchor, wb.addPicture(byteArrayOut.toByteArray(), HSSFWorkbook.PICTURE_TYPE_JPEG));
+					patriarch.createPicture(anchor, wb.addPicture( data, HSSFWorkbook.PICTURE_TYPE_JPEG));
 					byteArrayOut.close();
 
 				}
@@ -372,15 +373,17 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 
 		image = new ImageIcon(image).getImage(); 
 		BufferedImage bimage = null; 
-		GraphicsEnvironment ge = GraphicsEnvironment 
-		.getLocalGraphicsEnvironment(); 
+		
+		int w = image.getWidth(null)== -1?600:image.getWidth(null);
+		int h = image.getHeight(null)== -1? 500:image.getHeight(null);
+
+		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment(); 
 		
 		try { 
 			int transparency = Transparency.OPAQUE; 
 			GraphicsDevice gs = ge.getDefaultScreenDevice(); 
 			GraphicsConfiguration gc = gs.getDefaultConfiguration(); 
-			bimage = gc.createCompatibleImage(image.getWidth(null), 
-			image.getHeight(null), transparency); 
+			bimage = gc.createCompatibleImage(w, h, transparency); 
 		} catch (HeadlessException e) { 
 			e.getStackTrace();
 		} 
@@ -395,5 +398,16 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 		g.drawImage(image, 0, 0, null); 
 		g.dispose(); 
 		return bimage; 
+	}
+	
+	private static byte[] readInputStream(InputStream inStream) throws Exception{  
+	    ByteArrayOutputStream outStream = new ByteArrayOutputStream();  
+	    byte[] buffer = new byte[1024];  
+	    int len = 0;  
+	    while( (len=inStream.read(buffer)) != -1 ){  
+	        outStream.write(buffer, 0, len);  
+	    }  
+	    inStream.close();  
+	    return outStream.toByteArray();  
 	}
 }

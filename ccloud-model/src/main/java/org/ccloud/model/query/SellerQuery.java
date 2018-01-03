@@ -56,17 +56,17 @@ public class SellerQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN department d on d.id=cs.dept_id ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		
-		appendIfNotEmptyWithLike(fromBuilder, "cs.seller_name", keyword, params, true);
-		
+		boolean needWhere = true;
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cs.seller_name", keyword, params, true);
 
-		if(keyword.equals("")){
-			if(!username.equals("admin")){
-				fromBuilder.append("where cs.seller_type =1 and cs.dept_id in ("+child+")  ");
-			}
-		}else{
-			if(!username.equals("admin")){
-				fromBuilder.append("and cs.seller_type =1  ");
-			}
+		if(needWhere) {
+			fromBuilder.append("where 1=1 ");
+		}
+
+		if(!username.equals("admin")){
+			fromBuilder.append("and cs.seller_type =1 and cs.dept_id in ("+child+")  ");
+		}else {
+			fromBuilder.append("and cs.seller_type =0 ");
 		}
 		fromBuilder.append(" GROUP BY cs.id order by " + orderby);	
 		if (params.isEmpty())
@@ -114,8 +114,8 @@ public class SellerQuery extends JBaseQuery {
 		return DAO.findFirst(sql, userId);
 	}
 	
-	public Seller findByDeptAndSellerType(String deptId){
-		String sql = "select * from cc_seller where dept_id = '"+deptId+"' and seller_type =0";
+	public Seller findByDeptAndSellerType(String deptId,int sellerType){
+		String sql = "select * from cc_seller where dept_id = '"+deptId+"' and seller_type ="+sellerType;
 		return DAO.findFirst(sql);
 	}
 	

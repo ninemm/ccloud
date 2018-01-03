@@ -120,7 +120,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 	public void save() {
 		Department department=DepartmentQuery.me().findById(getPara("dept_id"));
 		User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
-		if(user.getUsername().equals("admin")){
+		/*if(user.getUsername().equals("admin")){
 			if(department.getDeptLevel()<2){
 				renderAjaxResultForError("部门选择错误，请重新选择！");
 				return;
@@ -130,7 +130,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				renderAjaxResultForError("部门选择错误，请重新选择！");
 				return;
 			}
-		}
+		}*/
 		final Seller seller = getModel(Seller.class);
 		final SellerBrand sellerBrand = getModel(SellerBrand.class);
 		final Customer customer = getModel(Customer.class);
@@ -165,12 +165,16 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		
 		String [] brandIds= brandList.split(",");
 		if (StrKit.isBlank(sellerId)) {
-			Seller seller1=SellerQuery.me().findByDeptAndSellerType(department.getId());
+			Seller seller1=SellerQuery.me().findByDeptAndSellerType(department.getId(),0);
 			if(seller1!=null){
 				renderAjaxResultForError("该公司部门已有一个经销商，请确认");
 				return;
 			}
-			
+			Seller seller0=SellerQuery.me().findByDeptAndSellerType(department.getId(),1);
+			if(seller0!=null){
+				renderAjaxResultForError("该公司部门已有一个直营商，请确认");
+				return;
+			}
 			Seller seller2 = this.saveSeller(seller, department, user,productType);
 
 			this.saveOption(seller2.getSellerCode());
@@ -183,7 +187,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			
 			
 			//添加直营商客户时 初始化数据
-			if(department.getDeptLevel()>2){
+			if(!user.getUsername().equals("admin")){
 				String customerId = StrKit.getRandomUUID();
 				//添加客户
 				customer.set("id", customerId);
@@ -201,27 +205,17 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				this.saveSellerCustomer(customer.getId(), user, department);
 				//初始化直营商产品
 				List<SellerProduct> sellerProducts = new ArrayList<SellerProduct>();
-				if(user.getUsername().equals("admin")){
-					Department department2 = DepartmentQuery.me().findByDataArea(DataAreaUtil.getDealerDataAreaByCurUserDataArea(department.getDataArea()));
-					Seller sl = SellerQuery.me().findByDeptId(department2.getId());
-					sellerProducts = SellerProductQuery.me().findBySellerIdAndIsEnable(sl.getId());
-				}else{
-					sellerProducts = SellerProductQuery.me().findBySellerId(getSessionAttr("sellerId").toString());
-				}
+				sellerProducts = SellerProductQuery.me().findBySellerId(getSessionAttr("sellerId").toString());
 				for(SellerProduct sellerProduct : sellerProducts){
 					this.saveProduct(sellerProduct, seller2.getId());
 				}
-			}
-			if(department.getDeptLevel()==2){
-				seller2.set("seller_type", 0);
-				seller2.update();
-			}else{
 				seller2.set("seller_type", 1);
 				seller2.setCustomerId(customer.getId());
 				seller2.update();
-			}
-			//新建销售商时默认创建分组  角色  及中间表 客户类型
-			if(department.getDeptLevel()==2){
+			}else{
+				seller2.set("seller_type", 0);
+				seller2.update();
+				//新建销售商时默认创建分组  角色  及中间表 客户类型
 				this.saveOther(department);
 			}
 		} else {
