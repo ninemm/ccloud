@@ -309,25 +309,6 @@ public class UserQuery extends JBaseQuery {
 		return DAO.doFind();
 	}
 	
-	public Page<Record> paginateAll(int pageNumber, int pageSize, String keyword, String dataArea){
-		LinkedList<Object> params = new LinkedList<Object>();
-		String select = "SELECT u.* ,GROUP_CONCAT(g.group_name) AS groupNames  ";
-		StringBuilder fromBuilder = new StringBuilder(" from `user` u ");
-		fromBuilder.append("LEFT JOIN department d on d.id = u.department_id ");
-		fromBuilder.append("LEFT JOIN  user_group_rel ug on ug.user_id = u.id ");
-		fromBuilder.append("LEFT JOIN `group` g on g.id = ug.group_id ");
-		
-		appendIfNotEmptyWithLike(fromBuilder, "u.data_area", dataArea, params, true);
-		
-		
-		
-		fromBuilder.append(" and g.group_code not in ('role01','role02','role03') GROUP BY u.id ");
-		if (params.isEmpty())
-			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
-
-		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
-	}
-	
 	public int batchReset(String[] ids) {
 		if (ids != null && ids.length > 0) {
 			int deleteCount = 0;

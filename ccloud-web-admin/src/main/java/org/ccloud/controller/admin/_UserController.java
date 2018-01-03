@@ -483,25 +483,25 @@ public class _UserController extends JBaseCRUDController<User> {
 	@RequiresPermissions(value = { "/admin/user/downloading", "/admin/dealer/all",
 	"/admin/all" }, logical = Logical.OR)
 	public void downloading() throws UnsupportedEncodingException {
-	
+		String keyword = getPara("k");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		//多选部门ID集合
 		//String deptIds = getPara("deptId");
 		
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\user\\"
 				+ "userInfo.xlsx";
-		
-		Page<Record> page = UserQuery.me().paginateAll(1, Integer.MAX_VALUE, "", dataArea + "%");
-		List<Record> userList = page.getList();
+		String userId = "";
+		Page<User> page = UserQuery.me().paginateUser(1, Integer.MAX_VALUE,  keyword, dataArea, "u.create_date",userId);
+		List<User> userList = page.getList();
 		
 		List<UserExecel> excellist = Lists.newArrayList();
-		for (Record record : userList) {
+		for (User record : userList) {
 		
 			UserExecel excel = new UserExecel();
 			excel.setNickname((String) record.get("nickname"));
 			excel.setContact((String) record.get("realname"));
 			excel.setMobile((String) record.get("mobile"));
-			excel.setUserGroup((String) record.get("groupNames"));
+			excel.setUserGroup((String) record.get("group_name"));
 			excel.setDeptName((String) record.get("department_name"));
 			excellist.add(excel);
 		}
