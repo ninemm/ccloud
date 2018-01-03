@@ -266,14 +266,14 @@
 				<table id="table" class="table table-bordered table-hover text-center" width="100%">
 					<thead>
 						<tr>
-							<th width="2%"></th>
+							<th width="1%"></th>
 							<th width="5%">序号</th>
-							<th width="20%">商品名称</th>
+							<th width="16%">商品名称</th>
 							<th width="9%">规格</th>
 							<th width="11%">大单位价格</th>
-							<th width="12%">大单位数量</th>
+							<th width="15%">大单位数量</th>
 							<th width="11%">小单位价格</th>
-							<th width="11%">小单位数量</th>
+							<th width="15%">小单位数量</th>
 							<th width="7%">小计</th>
 						</tr>
 					</thead>
@@ -287,7 +287,7 @@
 							</td>
 							<td>
 								<div class = "validata-box">
-									<span id="sellerProductName" ></span>
+									<span id="sellerProductName" style="font-size:12px;"></span>
 									<input type="hidden" id="productId" name="productId" />
 									<input type="hidden" id="purchaseOrderDetailId" name="purchaseOrderDetailId" />
 								</div>
@@ -304,8 +304,8 @@
 							</td>
 							<td>
 								<div class = "validata-box">
-									<input type="text" id="bigNum" name="bigNum" style="width: 30%" onblur="rowTotalF(this)" value="1" />
-									<span id="bigUnit-span"></span>
+									<input type="text" id="bigNum" name="bigNum" style="width: 45%" onblur="rowTotalF(this)" value="1" />
+									<span id="bigUnit-span" style="font-size:12px;"></span>
 								</div>
 							</td>
 							<td>
@@ -317,7 +317,7 @@
 							<td>
 								<div class = "validata-box">
 									<input type="text" id="smallNum" name="smallNum" style="width: 30%" onblur="rowTotalF(this)" value="0" />
-									<span id="smallUnit-span"></span>
+									<span id="smallUnit-span" style="font-size:12px;"></span>
 								</div>
 							</td>
 							<td>￥<span class="rowTotal">0</span> <input type="hidden" name="rowTotal" id="inputRowTotal" value="0" /></td>
@@ -326,7 +326,7 @@
 					</tbody>
 					<tfoot>
 						<tr>
-							<th colspan="9" style="text-align:right">合计:</th>
+							<th colspan="8" style="text-align:right">合计:</th>
 							<th>￥<span id="total">0</span> <input type="hidden" name="total" id="inputTotal" value="0" /></th>
 							<input type="hidden" name="productNum" id="productNum" value="0" />
 						</tr>

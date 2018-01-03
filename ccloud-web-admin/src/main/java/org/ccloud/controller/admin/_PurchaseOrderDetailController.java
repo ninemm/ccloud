@@ -179,9 +179,26 @@ public class _PurchaseOrderDetailController extends JBaseCRUDController<Purchase
 		renderAjaxResultForSuccess();
 
 	}
-	public void show_supplier(){
+	public void show_supplier_warehouse(){
+		//查询供应商
 		String sellerId = getSessionAttr("sellerId");
 		List<Supplier> suppliers = SupplierQuery.me().findBySellerId(sellerId);
+		/*//查询账号所拥有的仓库
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		List<Department> tmpList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
+		List<Warehouse> wares = new ArrayList<Warehouse>();
+		for(Department dept : tmpList) {
+			Seller seller = SellerQuery.me().findById(dept.getStr("seller_id"));
+			if(seller.getHasStore()==1) {
+				wares = WarehouseQuery.me().findAllBySellerId(dept.getStr("seller_id"));
+				break;
+			}else {
+				continue;
+			}
+		}
+		Map<String, Object> map = new HashMap<>();
+		map.put("supplier", suppliers);
+		map.put("warehouse", wares);*/
 		renderJson(suppliers);
 	}
 }
