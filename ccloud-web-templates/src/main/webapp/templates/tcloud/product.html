@@ -59,17 +59,17 @@ $(function() {
     	var productName = $this.find("#productName").text();
     	var valueName = $this.find("#valueName").text();
     	var description = $this.find("#description").val();
+    	var product_image_list_store = $this.find("#product_image_list_store").val();
+    	var product_sn = $this.find("#product_sn").val();
+    	var imageS = getImageS(product_image_list_store, product_sn);
+    	
 		layer.open({
 		  type: 1,
 		  title: ['商品详情',
 			'border-bottom: 1px solid #eee;height:2rem;line-height:2rem'
 		  ],
 		  content: '<div class="swiper-container">' +
-			'<div class="swiper-wrapper">' +
-			'<div class="swiper-slide"><img src="${CTPATH}/images/jp.jpg" /></div>' +
-			'<div class="swiper-slide"><img src="${CTPATH}/images/jp.jpg" /></div>' +
-			'<div class="swiper-slide"><img src="${CTPATH}/images/jp.jpg" /></div>' +
-			'<div class="swiper-slide"><img src="${CTPATH}/images/jp.jpg" /></div>' +
+			'<div class="swiper-wrapper">' + imageS +
 			'</div>' +
 			'</div>' +
 			'<p>名称：' + productName + '</p>' +
@@ -79,7 +79,7 @@ $(function() {
 		  className: 'product-detail',
 		  success: function () {
 			imgSwiper = new Swiper('.product-detail .swiper-container', {
-				slidesPerView: 4,
+				slidesPerView: 2,
 			})
 		  },
 		  btn: '关闭',
@@ -94,17 +94,17 @@ $(function() {
     	var compositionValueName = $this.find("#compositionValueName").text();
     	var subProduct = $this.find("#subProduct").text();
     	var subsubProduct = $this.find("#subsubProduct").text();
+    	var product_image_list_store = $this.find("#product_image_list_store").val();
+    	var product_sn = $this.find("#product_sn").val();
+    	var imageS = getImageS(product_image_list_store, product_sn);
+    	
 		layer.open({
 		  type: 1,
 		  title: ['商品详情',
 			'border-bottom: 1px solid #eee;height:2rem;line-height:2rem'
 		  ],
 		  content: '<div class="swiper-container">' +
-			'<div class="swiper-wrapper">' +
-			'<div class="swiper-slide"><img src="${CTPATH}/images/jp.jpg" /></div>' +
-			'<div class="swiper-slide"><img src="${CTPATH}/images/jp.jpg" /></div>' +
-			'<div class="swiper-slide"><img src="${CTPATH}/images/jp.jpg" /></div>' +
-			'<div class="swiper-slide"><img src="${CTPATH}/images/jp.jpg" /></div>' +
+			'<div class="swiper-wrapper">' + imageS +
 			'</div>' +
 			'</div>' +
 			'<p>名称：' + compositionName + '</p>' +
@@ -114,7 +114,7 @@ $(function() {
 		  className: 'product-detail',
 		  success: function () {
 			var imgSwiper = new Swiper('.product-detail .swiper-container', {
-				slidesPerView: 4,
+				slidesPerView: 2,
 			})
 		  },
 		  btn: '关闭',
@@ -179,7 +179,10 @@ function initProduct(){
 				$newProductDetail.find("#convert").val(el.convert_relate);
 
 				$newProductDetail.find("#description").val(el.description);
+
 				$newProductDetail.find("#image").attr("src", getImageUrl(el.product_image_list_store, el.product_sn));
+				$newProductDetail.find("#product_image_list_store").val(el.product_image_list_store);
+				$newProductDetail.find("#product_sn").val(el.product_sn);
 			});
 			
 		initComposition(data.compositionList);
@@ -223,7 +226,10 @@ function initComposition(data){
 			$newProductDetail.find("#compositionId").val(el.id);
 			
 			$newProductDetail.find("#compositionValueName").text(el.product_sp);
+
 			$newProductDetail.find("#compositionImage").attr("src", getImageUrl(el.product_image_list_store, el.product_sn));
+			$newProductDetail.find("#product_image_list_store").val(el.product_image_list_store);
+			$newProductDetail.find("#product_sn").val(el.product_sn);
 
 			$newProductDetail.find("#subProduct").text(el.sub_product_name + el.sub_product_sp + ' x ' + el.sub_product_count + '件')
 		}else{
@@ -253,6 +259,17 @@ function getImageUrl(product_image_list_store, product_sn) {
 	});
 
 	return imageUrl;
+}
+
+function getImageS(product_image_list_store, product_sn) {
+	var images = "";
+	$.each(JSON.parse(product_image_list_store), function(index, el) {
+		if(el.imgName.indexOf(product_sn) != -1) {
+			images += "<div class='swiper-slide'><img src='" + el.savePath + "' onerror=\"" + "javascript:this.src='${CTPATH}/images/jp.jpg'" + "\"></div>";
+		}
+	});
+
+	return images != "" ? images : "<div class='swiper-slide'><img src='" + "${CTPATH}/images/jp.jpg" +"' /></div>";
 }
 
 function calTotal() {
@@ -427,8 +444,10 @@ function save(){
 							<input type="hidden" id="smallUnit" value="">
 							<input type="hidden" id="isGift" value="0">
 							<input type="hidden" id="description" value="0">
+							<input type="hidden" id="product_image_list_store" value="">
+							<input type="hidden" id="product_sn" value="">
 							<div class="product-top">
-								<img src="" id="image" style="width:2rem;">
+								<img src="" id="image" style="width:2rem;" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'">
 								<div class="weui-cell_access product-top-right">
 									<div class="product_name" id="productName">
 									</div>
@@ -474,8 +493,10 @@ function save(){
 						<div>
 							<input type="hidden" id="compositionId" value="">
 							<input type="hidden" id="compositionPrice" value="">
+							<input type="hidden" id="product_image_list_store" value="">
+							<input type="hidden" id="product_sn" value="">
 							<div class="product-top">
-								<img src="" id="compositionImage" style="width:2rem;">
+								<img src="" id="compositionImage" style="width:2rem;" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'">
 								<div class="weui-cell_access product-top-right">
 									<div class="product_name" id="compositionName">
 									</div>
