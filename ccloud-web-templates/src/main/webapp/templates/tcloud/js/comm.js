@@ -153,7 +153,7 @@ function openPop() {
 	$("body")
 			.append(
 					'<div class="pop-input">'
-							+ '<input type="number" value="0">'
+							+ '<input type="number" value="0" class="ft20">'
 							+ '<div class="pop-button weui-flex">'
 							+ '<a class="white-button-no-border width-50 weui-flex__item" id="cancel-input">取消</a>'
 							+ '<a class="red-button width-50 weui-flex__item" id="confirm-input">确定</a>'
@@ -329,7 +329,7 @@ $(function() {
 		;
 	}).on("touchmove", ".layer", function() {
 		event.preventDefault();
-	}).on("click", "input[type=number]:not([readonly])", function() {
+	}).on("touchend", "input[type=number]:not([readonly])", function() {
 		if (!open) {
 			$currentInput = $(this);
 			openPop();
