@@ -450,6 +450,7 @@ public class _ReportController extends JBaseController {
 		setAttr("watchHead", watchHead);
 		render("mSalesmanDetail.html");
 	}
+	
 	//我部门的业务员详情
 	public void mSalesmanDetailReportList() {
 		String keyword = getPara("k");
@@ -461,28 +462,10 @@ public class _ReportController extends JBaseController {
 		String endDate = getPara("endDate");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
-		//得到表头
-		List<String>watchHead=new ArrayList<>();
-		watchHead.add("业务员名称");
-		List<SellerProduct> findBySellerId = SellerProductQuery.me().findBySellerId(sellerId);
-		for (SellerProduct sellerProduct : findBySellerId) {
-			String customName=sellerProduct.getCustomName();
-			watchHead.add(customName);
-		}
-		//我部门的业务员卖出商品详情
 		List<Record> list = SalesOrderQuery.me().findByMSalesmanDetail(startDate,endDate,keyword, dataArea,sellerId);
-		//根据表头  对数据从新排序
-		List<Map<String, String>>mSalesmanDetailReportList=new ArrayList<>();
-		for (Record record : list) {
-			Map<String, String>mSalesmanDetailReport=new HashMap<>();
-			for (int i = 0; i < watchHead.size(); i++) {
-				String key = watchHead.get(i);
-				mSalesmanDetailReport.put( key,record.getStr(key));
-			}
-			mSalesmanDetailReportList.add(mSalesmanDetailReport);
-		}
-		renderJson(mSalesmanDetailReportList);
+		renderJson(list);
 	}
+	
 	//我部门的业务员赠品详情
 	public void mSalesmanDetailGiftReportList() {
 		String keyword = getPara("k");
@@ -494,26 +477,8 @@ public class _ReportController extends JBaseController {
 		String endDate = getPara("endDate");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
-		//得到表头
-		List<String>watchHead=new ArrayList<>();
-		watchHead.add("业务员名称");
-		List<SellerProduct> findBySellerId = SellerProductQuery.me().findBySellerId(sellerId);
-		for (SellerProduct sellerProduct : findBySellerId) {
-			String customName=sellerProduct.getCustomName();
-			watchHead.add(customName);
-		}
-		List<Record> list1 = SalesOrderQuery.me().findByMSalesmanDetailGift(startDate,endDate,keyword, dataArea,sellerId);
-		//根据表头  对数据从新排序
-		List<Map<String, String>>mSalesmanDetailGiftReportList=new ArrayList<>();
-		for (Record record : list1) {
-			Map<String, String>mSalesmanDetailGiftReport=new HashMap<>();
-			for (int i = 0; i < watchHead.size(); i++) {
-				String key = watchHead.get(i);
-				mSalesmanDetailGiftReport.put( key,record.getStr(key));
-			}
-			mSalesmanDetailGiftReportList.add(mSalesmanDetailGiftReport);
-		}
-		renderJson(mSalesmanDetailGiftReportList);
+		List<Record> list = SalesOrderQuery.me().findByMSalesmanDetailGift(startDate,endDate,keyword, dataArea,sellerId);
+		renderJson(list);
 	}
 	
 	//我部门的直营商详情
@@ -534,6 +499,7 @@ public class _ReportController extends JBaseController {
 		render("mSellerDetail.html");
 	}
 	
+	//我部门的直营商详情
 	public void mSellerDetailReportList() {
 		String keyword = getPara("k");
 		if (StrKit.notBlank(keyword)) {
@@ -544,30 +510,11 @@ public class _ReportController extends JBaseController {
 		String endDate = getPara("endDate");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
-		//得到表头
-		List<String>watchHead=new ArrayList<>();
-		watchHead.add("直营商名称");
-		List<SellerProduct> findBySellerId = SellerProductQuery.me().findBySellerId(sellerId);
-		for (SellerProduct sellerProduct : findBySellerId) {
-			String customName=sellerProduct.getCustomName();
-			watchHead.add(customName);
-		}
-		//我部门的直营商详情
 		List<Record> list = SalesOrderQuery.me().findByMSellerDetail(startDate,endDate,keyword, dataArea,sellerId);
-		//根据表头  对数据从新排序
-		List<Map<String, String>>mSellerDetailReportList=new ArrayList<>();
-		for (Record record : list) {
-			Map<String, String> mSellerDetailGiftReport=new HashMap<>();
-			for (int i = 0; i < watchHead.size(); i++) {
-				String key = watchHead.get(i);
-				mSellerDetailGiftReport.put( key,record.getStr(key));
-			}
-			mSellerDetailReportList.add(mSellerDetailGiftReport);
-		}
-		renderJson(mSellerDetailReportList);
+		renderJson(list);
 	}
 	
-	
+	//我部门的直营商赠品详情
 	public void mSellerDetailGiftReportList() {
 		String keyword = getPara("k");
 		if (StrKit.notBlank(keyword)) {
@@ -577,28 +524,9 @@ public class _ReportController extends JBaseController {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
-		//得到表头
-		List<String>watchHead=new ArrayList<>();
-		watchHead.add("直营商名称");
-		List<SellerProduct> findBySellerId = SellerProductQuery.me().findBySellerId(sellerId);
-		for (SellerProduct sellerProduct : findBySellerId) {
-			String customName=sellerProduct.getCustomName();
-			watchHead.add(customName);
-		}
-		//我部门的直营商赠品详情
-		List<Record> list1 = SalesOrderQuery.me().findByMSellerDetailGift(startDate,endDate,keyword, dataArea,sellerId);
-		//根据表头  对数据从新排序
-		List<Map<String, String>>mSellerDetailGiftReportList=new ArrayList<>();
-		for (Record record : list1) {
-			Map<String, String> mSellerDetailGiftReport=new HashMap<>();
-			for (int i = 0; i < watchHead.size(); i++) {
-				String key = watchHead.get(i);
-				mSellerDetailGiftReport.put( key,record.getStr(key));
-			}
-			mSellerDetailGiftReportList.add(mSellerDetailGiftReport);
-		}
-		renderJson(mSellerDetailGiftReportList);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString(); 
+		List<Record> list = SalesOrderQuery.me().findByMSellerDetailGift(startDate,endDate,keyword, dataArea,sellerId);
+		renderJson(list);
 	}
 	
 	
@@ -627,10 +555,10 @@ public class _ReportController extends JBaseController {
 		render("customerDetails.html");
 	}
 	
+	//我的客户详情
 	public void customerDetailsReportList() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String userId = user.getId();
-
 		//判断有没有user_id传过来
 		String user_id = getPara("user_id");
 		if (StrKit.notBlank(user_id)) {
@@ -645,29 +573,12 @@ public class _ReportController extends JBaseController {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
-		//得到表头
-		List<String>watchHead=new ArrayList<>();
-		watchHead.add("客户名称");
-		List<SellerProduct> findBySellerId = SellerProductQuery.me().findBySellerId(sellerId);
-		for (SellerProduct sellerProduct : findBySellerId) {
-			String customName=sellerProduct.getCustomName();
-			watchHead.add(customName);
-		}
 		//我的客户卖出商品详情
 		List<Record> list = SalesOrderQuery.me().findByCustomerDetail(startDate,endDate,keyword, userId,sellerId);
-		//根据表头  对数据从新排序
-		List<Map<String, String>>CustomerDetailList=new ArrayList<>();
-		for (Record record : list) {
-			Map<String, String> CustomerDetail=new HashMap<>();
-			for (int i = 0; i < watchHead.size(); i++) {
-				String key = watchHead.get(i);
-				CustomerDetail.put( key,record.getStr(key));
-			}
-			CustomerDetailList.add(CustomerDetail);
-		}
-		renderJson(CustomerDetailList);
+		renderJson(list);
 	}
 	
+	//我部门的业务员赠品商品详情
 	public void customerDetailsGiftReportList() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String userId = user.getId();
@@ -686,27 +597,8 @@ public class _ReportController extends JBaseController {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
-		//得到表头
-		List<String>watchHead=new ArrayList<>();
-		watchHead.add("客户名称");
-		List<SellerProduct> findBySellerId = SellerProductQuery.me().findBySellerId(sellerId);
-		for (SellerProduct sellerProduct : findBySellerId) {
-			String customName=sellerProduct.getCustomName();
-			watchHead.add(customName);
-		}
-		//我部门的业务员赠品商品详情
-		List<Record> list1 = SalesOrderQuery.me().findByCustomerDetailGift(startDate,endDate,keyword, userId,sellerId);
-		//根据表头  对数据从新排序
-		List<Map<String, String>>CustomerDetailGiftList=new ArrayList<>();
-		for (Record record : list1) {
-			Map<String, String> CustomerDetailGift=new HashMap<>();
-			for (int i = 0; i < watchHead.size(); i++) {
-				String key = watchHead.get(i);
-				CustomerDetailGift.put( key,record.getStr(key));
-			}
-			CustomerDetailGiftList.add(CustomerDetailGift);
-		}
-		renderJson(CustomerDetailGiftList);
+		List<Record> list = SalesOrderQuery.me().findByCustomerDetailGift(startDate,endDate,keyword, userId,sellerId);
+		renderJson(list);
 	}
 	
 }
