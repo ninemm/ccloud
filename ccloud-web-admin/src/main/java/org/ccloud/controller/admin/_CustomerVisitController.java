@@ -427,6 +427,8 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 	    inStream.close();
 	    return outStream.toByteArray();
 	}
+
+	@RequiresPermissions(value = { "/admin/customerVisit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void count() {
 		String customerType = getPara("customer_type");
 		String customerName = getPara("customer_name");
@@ -437,6 +439,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 		else renderAjaxResultForSuccess();
 	}
 
+	@RequiresPermissions(value = { "/admin/customerVisit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void exportImage() throws Exception {
 		String customerType = getPara("customer_type");
 		String customerName = getPara("customer_name");

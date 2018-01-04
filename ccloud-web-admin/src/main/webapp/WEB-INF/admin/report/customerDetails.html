@@ -136,9 +136,9 @@
 		<form class="form-horizontal" id="form" >
 			
 			<div class="form-group">
-				<div class="col-md-3">
-					<label class="col-md-4 control-label">业务员:</label>
-					<div class="col-md-8">
+				<div class="col-md-3" >
+					<span class="col-md-5" style="line-height:30px">业务员:</span>
+					<div class="col-md-7">
 						<select class="form-control" name="user_id" id="user_id" style="height:34px">
 						<option value="">--请选择--</option>
 							<#list (ulist)! as user >
@@ -151,27 +151,27 @@
 				<div class="col-md-4">
 					<label class="col-md-4 control-label">开始时间:</label>
 					<div class="col-md-8">
-						<input id="startDate" class="form-control" value="${startDate!}" name="startDate" placeholder="开始日期" >&nbsp;
+						<input id="startDate" class="form-control" value="${startDate!}" name="startDate" placeholder="开始日期" >
 					</div>
 				</div>
 				
 				<div class="col-md-4">
 					<label class="col-md-4 control-label">结束时间:</label>
 					<div class="col-md-8">
-						<input id="endDate" class="form-control" value="${endDate!}" name="endDate" placeholder="结束日期" >&nbsp;
+						<input id="endDate" class="form-control" value="${endDate!}" name="endDate" placeholder="结束日期" >
 					</div>
 				</div>
 			</div>
 			
 			<div class="form-group">
 				<input id="post-search-input" class="form-control" type="hidden" value="so.create_date" name="k" >
-				<div class="col-md-1">
+				<div class="col-md-2">
 					<input onclick="orderTime()" class="btn btn-sm btn-primary" type="button" value="已下单查询">
 				</div>
-				<div class="col-md-1">
+				<div class="col-md-2">
 					<input onclick="prints()" class="btn btn-sm btn-primary" type="button" value="已打印查询">
 				</div>
-				<div class="col-md-1">
+				<div class="col-md-2">
 					<input onclick="complete()" class="btn btn-sm btn-primary" type="button" value="已出库查询">
 				</div>
 			</div>
