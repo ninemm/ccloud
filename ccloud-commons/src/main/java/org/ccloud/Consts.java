@@ -24,6 +24,7 @@ public class Consts {
 	public static final String SESSION_SELLER_ID = "sellerId";
 	public static final String SESSION_SELLER_CODE = "sellerCode";
 	public static final String SESSION_SELLER_NAME = "sellerName";
+	public static final String SESSION_SELLER_HAS_STORE = "hasStore";
 	
 	public static final String WORKFLOW_APPLY_USER = "applyUser";
 	public static final String WORKFLOW_APPLY_COMFIRM = "applyComfirm";
@@ -173,5 +174,13 @@ public class Consts {
 	public static final String OPERATE_HISTORY_TITLE_ORDER_PRINT= "订单打印";
 	
 	public static final String USER_DEFAULT_PASSWORD = "123456";// 重置初始密码
+
+	public static Integer SELLER_HAS_STORE_TRUE = 1;// 是否有仓库
+	public static Integer SELLER_HAS_STORE_FALSE = 0;
+
+	public static String SESSION_DEALER_DATA_AREA = "dealer_data_area";//经销商ID
+	
+	public static String SELLER_TYPE_DEALER= "0";//账套类型：经销商
+	public static String SELLER_TYPE_SELLER = "1";//直营商
 	
 }

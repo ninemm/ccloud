@@ -48,7 +48,6 @@ import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.vo.SalesOrderExcel;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
-import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.workflow.service.WorkFlowService;
@@ -184,10 +183,9 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 	public void customerTypeById() {
 		String customerId = getPara("customerId");
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
 		List<Record> customerTypeList = SalesOrderQuery.me().findCustomerTypeListByCustomerId(customerId,
-				DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea()));
+				getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
 		setAttr("customerTypeList", customerTypeList);
 		renderJson(customerTypeList);
 	}
