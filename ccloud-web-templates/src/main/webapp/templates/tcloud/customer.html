@@ -125,9 +125,8 @@
             data:paramData(),
             dataType:"json",
             success:function(data) {
-                $loadmore = $(this).find(".weui-loadmore");
+                $(".weui-loadmore").hide();
                 $(".infinite").destroyInfinite();
-                $loadmore.hide();
 
                 if (data.totalPage > pageNumber) {
                     loading = false;
@@ -152,7 +151,18 @@
         }
     }
 
+    function reset() {
+        $("#searchInput")[0].value = '';
+        $("#customer-type")[0].dataset.values = '';
+        $("#region")[0].dataset.values = '';
+        $("#if-order")[0].dataset.values = '';
+        $("#customer-type").val("客户类型");
+        $("#region").val("客户区域");
+        $("#if-order").val("是否下单");
+    }
+
     function getAreaCustomer(){
+        reset();
         pageNumber = 1;
         $.ajax({
             url:"${CPATH}/customer/getAreaCustomer",
@@ -160,15 +170,9 @@
             data:paramData2(),
             dataType:"json",
             success:function(data) {
-                $loadmore = $(this).find(".weui-loadmore");
                 $(".infinite").destroyInfinite();
-                $loadmore.hide();
-
-                if (data.totalPage > pageNumber) {
-                    loading = false;
-                    $(".infinite").infinite();
-                    $(".weui-loadmore").removeAttr("style");
-                }
+                $(".weui-loadmore").hide();
+                loading = false;
 
                 $(".infinite")[0].scrollTop = 0;
                 $("#customerList").empty();
