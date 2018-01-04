@@ -22,6 +22,7 @@ import org.ccloud.model.Receivables;
 
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
 /**
@@ -45,17 +46,17 @@ public class ReceivablesQuery extends JBaseQuery {
 		});
 	}
 
-	public Page<Receivables> paginate(int pageNumber, int pageSize, String id,String type,String seller_id,String dataArea) {
+	public Page<Record> paginate(int pageNumber, int pageSize, String id,String type,String seller_id,String dataArea) {
 		
 		Boolean b = true;
 		String select;
 		StringBuilder fromBuilder;
 		
 		if("1".equals(type)) {
-			select = "SELECT r.object_id AS id,c.customer_code AS code,c.customer_name AS name,r.receive_amount,r.act_amount,r.balance_amount";
-			fromBuilder = new StringBuilder(" FROM `cc_receivables` AS r INNER JOIN `cc_customer_join_customer_type` AS ct ON r.object_id=ct.seller_customer_id LEFT JOIN `cc_seller_customer` AS sc ON sc.id=ct.seller_customer_id LEFT JOIN `cc_customer` AS c ON c.id=sc.customer_id ");
+			select = " SELECT r.object_id AS id, t1.customerTypeNames, c.customer_name AS name, r.receive_amount, r.act_amount,r.balance_amount ";
+			fromBuilder = new StringBuilder(" FROM `cc_receivables` AS r LEFT JOIN (SELECT c1.id, c1.customer_id,ct.id as customer_type_id, GROUP_CONCAT(ct. NAME) AS customerTypeNames FROM cc_seller_customer c1 LEFT JOIN cc_customer_join_customer_type cjct ON c1.id = cjct.seller_customer_id LEFT JOIN cc_customer_type ct ON cjct.customer_type_id = ct.id GROUP BY c1.id ) t1 ON r.object_id = t1.id LEFT JOIN `cc_customer` AS c ON c.id = t1.customer_id ");
 			if(!("0".equals(id)) && id != null){
-				fromBuilder.append(" WHERE ct.customer_type_id = '"+ id+"'");
+				fromBuilder.append(" WHERE t1.customer_type_id = '"+ id+"'");
 				b = false;
 			}
 			
@@ -73,9 +74,9 @@ public class ReceivablesQuery extends JBaseQuery {
 		
 		
 		if (params.isEmpty())
-			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
-		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
 	public int batchDelete(String... ids) {

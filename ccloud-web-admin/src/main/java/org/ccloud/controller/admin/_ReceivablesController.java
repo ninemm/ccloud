@@ -15,6 +15,10 @@
  */
 package org.ccloud.controller.admin;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.poi.ss.usermodel.Workbook;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
@@ -37,13 +42,19 @@ import org.ccloud.model.query.ReceivablesDetailQuery;
 import org.ccloud.model.Receiving;
 import org.ccloud.model.query.ReceivingQuery;
 import org.ccloud.model.query.UserQuery;
+import org.ccloud.model.vo.receivablesExcel;
 import org.ccloud.model.User;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.jfinal.aop.Before;
 import com.jfinal.plugin.activerecord.IAtom;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
+
+import cn.afterturn.easypoi.excel.ExcelExportUtil;
+import cn.afterturn.easypoi.excel.entity.ExportParams;
+
 import com.jfinal.kit.JsonKit;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
@@ -76,8 +87,9 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String deptDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		Page<Receivables> page = ReceivablesQuery.me().paginate(getPageNumber(),getPageSize(),customerTypeId,type,user.getId(),deptDataArea);
-		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(),"rows", page.getList());
+		Page<Record> page = ReceivablesQuery.me().paginate(getPageNumber(),getPageSize(),customerTypeId,type,user.getId(),deptDataArea);
+		List<Record> receivablesList = page.getList();
+		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(),"rows", receivablesList);
 		
 		renderJson(map);
 	}
@@ -166,4 +178,51 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 		if (isAdd) renderAjaxResultForSuccess("添加收款记录成功");
         else renderAjaxResultForError("添加收款记录失败");
 	}
+	
+	
+	public void downloading() throws UnsupportedEncodingException {
+		String type = getPara("type");
+		String customerTypeId = getPara("customerTypeId");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String deptDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);	
+		
+		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\receivables\\"
+				+ "receivables.xlsx";
+		Page<Record> page = ReceivablesQuery.me().paginate(1,Integer.MAX_VALUE,customerTypeId,type,user.getId(),deptDataArea);
+		List<Record> receivablesList = page.getList();
+		
+		List<receivablesExcel> excellist = Lists.newArrayList();
+		for (Record record : receivablesList) {
+		
+			receivablesExcel excel = new receivablesExcel();
+			excel.setCustomerType(record.getStr("customerTypeNames"));
+			excel.setCustomerName(record.getStr("name"));
+			excel.setReceiveAmount(record.getBigDecimal("receive_amount"));
+			excel.setActAmount(record.getBigDecimal("act_amount"));
+			excel.setBalanceAmount(record.getBigDecimal("balance_amount"));
+			excellist.add(excel);
+		}
+		
+		ExportParams params = new ExportParams();
+		Workbook wb = ExcelExportUtil.exportBigExcel(params, receivablesExcel.class, excellist);
+		File file = new File(filePath);
+		FileOutputStream out = null;
+		try {
+			out = new FileOutputStream(file);
+			wb.write(out);
+			out.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				out.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		ExcelExportUtil.closeExportBigExcel();
+		
+		renderFile(new File(filePath));
+	} 
 }
