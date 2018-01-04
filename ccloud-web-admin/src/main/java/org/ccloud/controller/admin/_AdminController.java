@@ -209,7 +209,7 @@ public class _AdminController extends JBaseController {
 						renderError(404);
 						return ;
 					}
-					String dealerDataArea = getDealerDataArea(tmpList);
+					String dealerDataArea = DepartmentQuery.me().getDealerDataArea(tmpList);
 					setSessionAttr(Consts.SESSION_DEALER_DATA_AREA, dealerDataArea);
 					setSessionAttr(Consts.SESSION_SELLER_ID, dept.get("seller_id"));
 					setSessionAttr(Consts.SESSION_SELLER_NAME, dept.get("seller_name"));
@@ -230,17 +230,6 @@ public class _AdminController extends JBaseController {
 		}
 	}
 	
-	private String getDealerDataArea(List<Department> tmpList) {
-		String dealerId = "";
-		for (Department dept : tmpList) {
-			if (dept.getStr("seller_type").equals(Consts.SELLER_TYPE_DEALER)) {
-				dealerId = dept.get("data_area");
-				break;
-			}
-		}
-		return dealerId;
-	}
-
 	@Clear(AdminInterceptor.class)
 	public void choice() { 
 		List<Map<String, String>> sellerList = getSessionAttr("sellerList");
