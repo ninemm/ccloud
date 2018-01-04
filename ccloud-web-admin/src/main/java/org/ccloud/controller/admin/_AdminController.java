@@ -209,10 +209,12 @@ public class _AdminController extends JBaseController {
 						renderError(404);
 						return ;
 					}
-					
+					String dealerDataArea = getDealerDataArea(tmpList);
+					setSessionAttr(Consts.SESSION_DEALER_DATA_AREA, dealerDataArea);
 					setSessionAttr(Consts.SESSION_SELLER_ID, dept.get("seller_id"));
 					setSessionAttr(Consts.SESSION_SELLER_NAME, dept.get("seller_name"));
 					setSessionAttr(Consts.SESSION_SELLER_CODE, dept.get("seller_code"));
+					setSessionAttr(Consts.SESSION_SELLER_HAS_STORE, dept.get("has_store"));
 				}
 			}
 			MessageKit.sendMessage(Actions.USER_LOGINED, user);
@@ -228,6 +230,17 @@ public class _AdminController extends JBaseController {
 		}
 	}
 	
+	private String getDealerDataArea(List<Department> tmpList) {
+		String dealerId = "";
+		for (Department dept : tmpList) {
+			if (dept.getStr("seller_type").equals(Consts.SELLER_TYPE_DEALER)) {
+				dealerId = dept.get("data_area");
+				break;
+			}
+		}
+		return dealerId;
+	}
+
 	@Clear(AdminInterceptor.class)
 	public void choice() { 
 		List<Map<String, String>> sellerList = getSessionAttr("sellerList");
@@ -277,6 +290,7 @@ public class _AdminController extends JBaseController {
 					setSessionAttr(Consts.SESSION_SELLER_ID, dept.get("seller_id"));
 					setSessionAttr(Consts.SESSION_SELLER_NAME, dept.get("seller_name"));
 					setSessionAttr(Consts.SESSION_SELLER_CODE, dept.get("seller_code"));
+					setSessionAttr(Consts.SESSION_SELLER_HAS_STORE, dept.get("has_store"));
 					break;
 				}
 			}

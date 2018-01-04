@@ -136,7 +136,7 @@ $(function () {
                 </a>
                 </@shiro.hasPermission>
                 
-                <@shiro.hasPermission name="/admin/customer/audit">
+                <@shiro.hasPermission name="/admin/sellerCustomer/audit">
 				<a href="${CPATH}/todo/customer" class="weui-grid js_grid">
 					<#if (customerTotal??) && (customerTotal !=0)>
                     <span class="weui-badge full-badge">${(customerTotal)!}</span></#if>
