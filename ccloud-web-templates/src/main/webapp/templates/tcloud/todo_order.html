@@ -94,10 +94,10 @@
 		content: '<img src="${CTPATH}/images/image_orderpopups.png">' +
 		  '<p class="t-c">是否确认拒绝该订单？</p>' +
           '<p class="gray">拒绝原因</p>' +
-          '<div class="refuse-radio"><label><input type="radio" name="refuseReson" id="" value="库存无足够货物" class="weui-agree__checkbox">库存无足够货物</label></div>' +
-          '<div class="refuse-radio"><label><input type="radio" name="refuseReson" id="" value="产品价格滞后" class="weui-agree__checkbox">产品价格滞后</label></div>' +
-          '<div class="refuse-radio"><label><input type="radio" name="refuseReson" id="" value="该商家已被停用" class="weui-agree__checkbox">该商家已被停用</label></div>'+
-          '<div><textarea id="comment" placeholder="补充说明，可选填"></textarea></div>',
+          '<div class="refuse-radio"><input type="radio" name="refuseReson" id="reason1" value="库存无足够货物" class="weui-agree__checkbox"><label for="reason1">库存无足够货物</label></div>' +
+			'<div class="refuse-radio"><input type="radio" name="refuseReson" id="reason2" value="产品价格滞后" class="weui-agree__checkbox"><label for="reason2">产品价格滞后</label></div>' +
+			'<div class="refuse-radio"><input type="radio" name="refuseReson" id="reason3" value="该商家已被停用" class="weui-agree__checkbox"><label for="reason3">该商家已被停用</label></div>'+
+			'<div><textarea id="comment" placeholder="补充说明，可选填"></textarea></div>',
         anim: 'scale',
         className: 'audit',
         btn: ['确认','取消'],
