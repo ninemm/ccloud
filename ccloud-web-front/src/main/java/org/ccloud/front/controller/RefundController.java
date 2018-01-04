@@ -22,7 +22,6 @@ import org.ccloud.model.query.SalesOutstockQuery;
 import org.ccloud.model.query.SalesRefundInstockDetailQuery;
 import org.ccloud.model.query.SalesRefundInstockQuery;
 import org.ccloud.route.RouterMapping;
-import org.ccloud.utils.DataAreaUtil;
 
 import com.alibaba.fastjson.JSON;
 import com.jfinal.kit.StrKit;
@@ -38,8 +37,6 @@ public class RefundController extends BaseFrontController{
 	//申请退货
 	public void index() {
 		
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-
 		Map<String, Object> all = new HashMap<>();
 		all.put("title", "全部");
 		all.put("value", "");
@@ -48,7 +45,7 @@ public class RefundController extends BaseFrontController{
 		customerTypes.add(all);
 
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
-				.findByDataArea(DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea()));
+				.findByDataArea(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
 		for (CustomerType customerType : customerTypeList) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", customerType.getName());
@@ -94,7 +91,6 @@ public class RefundController extends BaseFrontController{
 	
 	//退货订单
 	public void myRefund() {
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
 		Map<String, Object> all = new HashMap<>();
 		all.put("title", "全部");
@@ -104,7 +100,7 @@ public class RefundController extends BaseFrontController{
 		customerTypes.add(all);
 
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
-				.findByDataArea(DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea()));
+				.findByDataArea(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
 		for (CustomerType customerType : customerTypeList) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", customerType.getName());

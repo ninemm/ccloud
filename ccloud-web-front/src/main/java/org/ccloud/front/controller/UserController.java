@@ -140,6 +140,8 @@ public class UserController extends BaseFrontController {
 					renderError(404);
 					return ;
 				}
+				String dealerDataArea = DepartmentQuery.me().getDealerDataArea(tmpList);
+				setSessionAttr(Consts.SESSION_DEALER_DATA_AREA, dealerDataArea);
 				setSessionAttr(Consts.SESSION_SELLER_ID, dept.get("seller_id"));
 				setSessionAttr(Consts.SESSION_SELLER_NAME, dept.get("seller_name"));
 				setSessionAttr(Consts.SESSION_SELLER_CODE, dept.get("seller_code"));
@@ -238,6 +240,8 @@ public class UserController extends BaseFrontController {
 			for (Department dept : deptList) {
 				if (StrKit.equals(sellerId, dept.getStr("seller_id"))) {
 					curUser = user;
+					String dealerDataArea = DepartmentQuery.me().getDealerDataArea(deptList);
+					setSessionAttr(Consts.SESSION_DEALER_DATA_AREA, dealerDataArea);					
 					setSessionAttr(Consts.SESSION_SELLER_ID, dept.get("seller_id"));
 					setSessionAttr(Consts.SESSION_SELLER_NAME, dept.get("seller_name"));
 					setSessionAttr(Consts.SESSION_SELLER_CODE, dept.get("seller_code"));

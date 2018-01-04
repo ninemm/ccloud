@@ -24,7 +24,6 @@ import org.ccloud.model.query.SellerCustomerQuery;
 import org.ccloud.model.query.SellerProductQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
-import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.wechat.WechatJSSDKInterceptor;
 
 import com.alibaba.fastjson.JSON;
@@ -87,13 +86,43 @@ public class ProductController extends BaseFrontController {
 	}
 
 	public void order() {
+
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+
+		Map<String, Object> all = new HashMap<>();
+		all.put("title", "全部");
+		all.put("value", "");
+		List<Map<String, Object>> customerTypes = new ArrayList<>();
+		customerTypes.add(all);
+		
+		List<Map<String, Object>> userIds = new ArrayList<>();
+		userIds.add(all);
+
+		List<Record> userList = UserQuery.me().findNextLevelsUserList(selectDataArea);
+		for (Record record : userList) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", record.get("realname"));
+			item.put("value", record.get("id"));
+			userIds.add(item);
+		}
+
+		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
+				.findByDataArea(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
+		for (CustomerType customerType : customerTypeList) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", customerType.getName());
+			item.put("value", customerType.getId());
+			customerTypes.add(item);
+		}
+
+		setAttr("userIds", JSON.toJSON(userIds));
+		setAttr("customerTypes", JSON.toJSON(customerTypes));
 		setAttr("deliveryDate", DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
 		render("order.html");
 	}
 
 	public void customerChoose() {
 
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
 		Map<String, Object> all = new HashMap<>();
@@ -115,7 +144,7 @@ public class ProductController extends BaseFrontController {
 		customerTypes.add(all);
 
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
-				.findByDataArea(DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea()));
+				.findByDataArea(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
 		for (CustomerType customerType : customerTypeList) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", customerType.getName());
@@ -152,11 +181,10 @@ public class ProductController extends BaseFrontController {
 	}
 
 	public void customerTypeById() {
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String customerId = getPara("customerId");
 
 		List<Record> customerTypeList = SalesOrderQuery.me().findCustomerTypeListByCustomerId(customerId,
-				DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea()));
+				getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
 
 		renderJson(customerTypeList);
 	}
