@@ -87,6 +87,38 @@ public class ProductController extends BaseFrontController {
 	}
 
 	public void order() {
+
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+
+		Map<String, Object> all = new HashMap<>();
+		all.put("title", "全部");
+		all.put("value", "");
+		List<Map<String, Object>> customerTypes = new ArrayList<>();
+		customerTypes.add(all);
+		
+		List<Map<String, Object>> userIds = new ArrayList<>();
+		userIds.add(all);
+
+		List<Record> userList = UserQuery.me().findNextLevelsUserList(selectDataArea);
+		for (Record record : userList) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", record.get("realname"));
+			item.put("value", record.get("id"));
+			userIds.add(item);
+		}
+
+		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
+				.findByDataArea(DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea()));
+		for (CustomerType customerType : customerTypeList) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", customerType.getName());
+			item.put("value", customerType.getId());
+			customerTypes.add(item);
+		}
+
+		setAttr("userIds", JSON.toJSON(userIds));
+		setAttr("customerTypes", JSON.toJSON(customerTypes));
 		setAttr("deliveryDate", DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
 		render("order.html");
 	}
