@@ -157,7 +157,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 		return outstock.save();
 	}
 
-	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate,String printStatus, String stockOutStatus,String custoemName,String dataArea) {
+	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate,String printStatus, String stockOutStatus,String dataArea) {
 		String select = "select o.*, c.customer_name,u.realname,ct.name as customerName ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_sales_outstock` o ");
 		fromBuilder.append("left join cc_seller_customer cs on o.customer_id = cs.id ");
@@ -168,9 +168,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.outstock_sn", keyword, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "c.customer_name", custoemName, params, needWhere);
 		if (needWhere) {
 			fromBuilder.append(" where 1 = 1");
 		}
@@ -196,7 +194,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 			params.add(stockOutStatus);
 		}
 
-		fromBuilder.append(" order by o.create_date desc ");
+		fromBuilder.append(" and ( o.outstock_sn like '%"+keyword+"%' or c.customer_name like '%"+keyword+"%' ) order by o.create_date desc ");
 
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());

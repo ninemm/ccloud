@@ -103,18 +103,13 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
 		}
-        
-		String customerName = getPara("customerName");
-		if (StrKit.notBlank(customerName)) {
-			customerName = StringUtils.urlDecode(customerName);
-		}
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		String printStatus = getPara("printStatus");
 		String stockOutStatus = getPara("stockOutStatus");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
-		Page<Record> page = SalesOutstockQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate,printStatus,stockOutStatus,customerName, dataArea);
+		Page<Record> page = SalesOutstockQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate,printStatus,stockOutStatus,dataArea);
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
@@ -472,7 +467,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 	@RequiresPermissions(value = { "/admin/salesOutstock/downloading", "/admin/dealer/all",
 	"/admin/all" }, logical = Logical.OR)
 	public void downloading() throws UnsupportedEncodingException {
-	
+		String keyword = new String(getPara("k").getBytes("ISO8859-1"), "UTF-8");
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		String printStatus = getPara("printStatus");
@@ -482,7 +477,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\sales_outstock\\"
 				+ "salesOutstockInfo.xlsx";
 		
-		Page<Record> page = SalesOutstockQuery.me().paginate(1, Integer.MAX_VALUE, "", startDate, endDate,printStatus,stockOutStatus,"", dataArea);
+		Page<Record> page = SalesOutstockQuery.me().paginate(1, Integer.MAX_VALUE, keyword, startDate, endDate,printStatus,stockOutStatus,dataArea);
 		List<Record> salesOutstckList = page.getList();
 		
 		List<SalesOutstockExcel> excellist = Lists.newArrayList();
