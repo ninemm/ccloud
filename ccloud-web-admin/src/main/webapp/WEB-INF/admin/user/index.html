@@ -44,7 +44,7 @@
 	}  
 	    
 	function del(id) {
-		jQuery.mm.del('${CPATH}/admin/user/delete?ucode=${ucode}&id=' + id);
+		location.href = '${CPATH}/admin/user/delete?ucode=${ucode}&id=' + id;
 	}
 
 	function enable(obj,id) {
@@ -207,7 +207,7 @@ function saveGroup() {
 		}
 	});
 	function batchDown(){
-		location.href = "${CPATH}/admin/user/downloading?k="+$('#post-search-input').val();
+		jQuery.mm.down('${CPATH}/admin/user/downloading?k='+$('#post-search-input').val());
 	}
 </#macro>
 

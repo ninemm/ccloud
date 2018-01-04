@@ -13,9 +13,9 @@ import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.Message;
 import org.ccloud.model.User;
+import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.UserGroupRelQuery;
 import org.ccloud.model.query.UserQuery;
-import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.workflow.plugin.ActivitiPlugin;
 
 import com.google.common.base.Joiner;
@@ -72,7 +72,7 @@ public class OrderReviewTaskListener implements TaskListener {
 			} else if (size == 2) {// 财务
 				String treasurerUserName = "";
 				List<Record> treasurers = getTreasurer(
-						DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea()));
+						DepartmentQuery.me().findDealerDataArea(user.getDepartmentId()));
 				for (Record record : treasurers) {
 					if (StrKit.notBlank(treasurerUserName)) {
 						treasurerUserName = treasurerUserName + ",";

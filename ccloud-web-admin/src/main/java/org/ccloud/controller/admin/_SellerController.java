@@ -699,17 +699,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		SellerCustomer sellerCustomer = new SellerCustomer();
 		String sellerCustomerId = StrKit.getRandomUUID();
 		sellerCustomer.set("id", sellerCustomerId);
-		if(user.getUsername().equals("admin")){
-			Department department2 = DepartmentQuery.me().findByDataArea(DataAreaUtil.getDealerDataAreaByCurUserDataArea(department.getDataArea()));
-			Seller sl = SellerQuery.me().findByDeptId(department2.getId());
-			/*if(sl==null){
-				renderAjaxResultForError("该公司部门"+department2.getDeptName()+"没有一个经销商，请先创建！");
-				return;
-			}*/
-			sellerCustomer.set("seller_id",sl.getId());
-		}else{
-			sellerCustomer.set("seller_id",getSessionAttr("sellerId").toString());
-		}
+		sellerCustomer.set("seller_id",getSessionAttr("sellerId").toString());
 		sellerCustomer.set("customer_id", customerId);
 		sellerCustomer.set("nickname", getPara("seller.seller_name"));
 		sellerCustomer.set("is_checked", 1);

@@ -41,7 +41,6 @@ import org.ccloud.model.vo.CustomerExcel;
 import org.ccloud.model.vo.CustomerVO;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
-import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.workflow.service.WorkFlowService;
 
@@ -116,11 +115,11 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			setAttr("cUserNames", StrKit.join(realnames, ","));
 
 			setAttr("cTypeList", CustomerJoinCustomerTypeQuery.me().findCustomerTypeIdListBySellerCustomerId(id,
-					DataAreaUtil.getDealerDataAreaByCurUserDataArea(selectDataArea)));
+					getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString()));
 		}
 
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
-				.findByDataArea(DataAreaUtil.getDealerDataAreaByCurUserDataArea(selectDataArea));
+				.findByDataArea(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
 		setAttr("customerTypeList", customerTypeList);
 
 	}
@@ -204,7 +203,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			sellerCustomer.setStatus(SellerCustomer.CUSTOMER_NORMAL);
 			sellerCustomer.setCustomerTypeIds(Joiner.on(",").join(Arrays.asList(customerTypes).iterator()));
 
-			String deptDataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea());
+			String deptDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString();
 			Department department = DepartmentQuery.me().findByDataArea(deptDataArea);
 			sellerCustomer.setDataArea(deptDataArea);
 			sellerCustomer.setDeptId(department.getId());
@@ -295,7 +294,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 
 			sellerCustomer.setCustomerTypeIds(Joiner.on(",").join(Arrays.asList(customerTypes).iterator()));
 
-			String deptDataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea());
+			String deptDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString();
 			Department department = DepartmentQuery.me().findByDataArea(deptDataArea);
 			sellerCustomer.setDataArea(deptDataArea);
 			sellerCustomer.setDeptId(department.getId());
@@ -437,7 +436,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr("sellerId");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		String dept_dataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea());
+		String dept_dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString();
 		Department dept =  DepartmentQuery.me().findByDataArea(dept_dataArea);
 		
 		File file = getFile().getFile();
@@ -515,7 +514,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		String[] customerTypeNames = customerTypeName.split(",");
 		for (String typeName : customerTypeNames) {
 			String id = CustomerTypeQuery.me().findIdByName(typeName,
-					DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea()));
+					getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
 			if (StrKit.isBlank(id)) {
 				renderAjaxResultForError("你还没有创建这个客户类型：" + typeName + ", 请确认");
 			}
@@ -547,8 +546,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 	}
 	
 	public void searchByCustomerName() {
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String dept_dataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea());
+		String dept_dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString();
 		if(StrKit.isBlank(dept_dataArea)) {
 			renderAjaxResultForError("丢失组织数据");
 			return ;
@@ -563,8 +561,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 	}
 	
 	public void searchTypeById() {
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String dept_dataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea());
+		String dept_dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString();
 		String sellerCustomerId = getPara("sellerC_Id");
 		List<Record> list = UserJoinCustomerQuery.me().findCustomerTypeBySellerCustomerId(sellerCustomerId, dept_dataArea+"%");
 		renderAjaxResultForSuccess("success",JSON.toJSON(list));
@@ -604,13 +601,13 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		setAttr("cUserIds", StrKit.join(userIds, ","));
 		setAttr("cUserNames", StrKit.join(realnames, ","));
 		setAttr("cTypeList", CustomerJoinCustomerTypeQuery.me().findCustomerTypeIdListBySellerCustomerId(id,
-				DataAreaUtil.getDealerDataAreaByCurUserDataArea(selectDataArea)));
+				getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString()));
 
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
-				.findByDataArea(DataAreaUtil.getDealerDataAreaByCurUserDataArea(selectDataArea));
+				.findByDataArea(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
 		setAttr("customerTypeList", customerTypeList);
 
-		List<String> custTypeNameList =  CustomerJoinCustomerTypeQuery.me().findCustomerTypeNameListBySellerCustomerId(id, DataAreaUtil.getDealerDataAreaByCurUserDataArea(selectDataArea));
+		List<String> custTypeNameList =  CustomerJoinCustomerTypeQuery.me().findCustomerTypeNameListBySellerCustomerId(id, getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
 		String custTypeNames = Joiner.on(",").skipNulls().join(custTypeNameList);
 		setAttr("custTypeNames", custTypeNames);
 
@@ -761,7 +758,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 				sellerCustomer.setIsArchive(1);
 				sellerCustomer.setImageListStore(customerVO.getImageListStore());
 
-				String deptDataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea());
+				String deptDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString();
 				Department department = DepartmentQuery.me().findByDataArea(deptDataArea);
 				sellerCustomer.setDataArea(deptDataArea);
 				sellerCustomer.setDeptId(department.getId());

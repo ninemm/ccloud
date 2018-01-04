@@ -129,7 +129,6 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 		keepPara();
 
 		String id = getPara("id");
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
 		if (StrKit.isBlank(id)) {
 			renderError(404);
@@ -142,7 +141,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 			return ;
 		}
 
-		String dataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(selectDataArea) + "%";
+		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString() + "%";
 		List<String> typeList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeNameListBySellerCustomerId(customerVisit.getSellerCustomerId(), dataArea);
 
 		setAttr("customerVisit", customerVisit);
@@ -153,8 +152,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 
 	public void image() {
 
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String typeDataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea());
+		String typeDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString();
 		List<Record> typeList = CustomerTypeQuery.me().findCustomerTypeList(typeDataArea + "%");
 		setAttr("customerType",JSON.toJSON(typeList));
 
@@ -218,8 +216,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 	}
 
 	public void queryCustomerType() {
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-        String typeDataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea());
+        String typeDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString();
         List<Record> typeList = CustomerTypeQuery.me().findCustomerTypeList(typeDataArea);
         renderAjaxResultForSuccess("success",JSON.toJSON(typeList));
         //setAttr("customerTypeList", typeList);
@@ -430,6 +427,8 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 	    inStream.close();
 	    return outStream.toByteArray();
 	}
+
+	@RequiresPermissions(value = { "/admin/customerVisit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void count() {
 		String customerType = getPara("customer_type");
 		String customerName = getPara("customer_name");
@@ -440,6 +439,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 		else renderAjaxResultForSuccess();
 	}
 
+	@RequiresPermissions(value = { "/admin/customerVisit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void exportImage() throws Exception {
 		String customerType = getPara("customer_type");
 		String customerName = getPara("customer_name");

@@ -614,4 +614,21 @@ public class DepartmentQuery extends JBaseQuery {
 		ModelSorter.tree(list);
 		return doBuild(list);
 	}*/
+
+	public String findDealerDataArea(String departmentId) {
+		List<Department> list = findAllParentDepartmentsBySubDeptId(departmentId);
+		String dealerId = getDealerDataArea(list);
+		return dealerId;
+	}
+
+	public String getDealerDataArea(List<Department> tmpList) {
+		String dealerId = "";
+		for (Department dept : tmpList) {
+			if (dept.getStr("seller_type").equals(Consts.SELLER_TYPE_DEALER)) {
+				dealerId = dept.get("data_area");
+				break;
+			}
+		}
+		return dealerId;
+	}
 }

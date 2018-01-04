@@ -73,6 +73,7 @@
    					},
    					edit: false
    				},
+   				<@shiro.hasPermission name="/admin/warehouse/edit,/admin/all">
 				{field: "action", title: "操作", align: "center", width: '20%',
 					formatter: function(value, row, rowIndex) {
 						var url = '${CPATH}/admin/warehouse/edit?id=' + row.id + '&c=${c}&p=${p}';
@@ -85,7 +86,8 @@
 						return strHtml;
 					},
 					edit:false
-				},	
+				},
+				</@shiro.hasPermission>
 				{field: "accredit", title: "授权", align: "center", width: '10%', 
 					formatter: function(value, row, rowIndex) {
 					var strHtml1 = '<a href="javascript:void(0);" class="btn btn-sm" onclick="accredit(\''+row.id+'\')" ><i class="fa fa-search"></i> 选择';
@@ -147,7 +149,9 @@
 <section class="content">
 	<div class="row content-row">
 		<div class="jp-left">
+		<@shiro.hasPermission name="/admin/warehouse/edit,/admin/all">
 			<a href="${CPATH}/admin/warehouse/edit?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-plus"></i> 新增 </a>
+		</@shiro.hasPermission>
 			<!--<a href="javascript:void(0);" onclick="batchAction()" class="btn btn-sm btn-danger btn-flat"><i class="fa fa-remove"></i> 删除 </a>-->
 		</div>
 		<form class="form-horizontal" style="float: right" action="${CPATH}/admin/warehouse?c=${c!}&p=${p!}" method="post">
