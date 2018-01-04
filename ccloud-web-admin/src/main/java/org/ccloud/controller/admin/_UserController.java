@@ -300,8 +300,7 @@ public class _UserController extends JBaseCRUDController<User> {
 
 	public void getGroup() {
 		String id = getPara("userid");
-		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		List<Group> groups = GroupQuery.me().findByDept(DataAreaUtil.getDealerDataAreaByCurUserDataArea(dataArea));
+		List<Group> groups = GroupQuery.me().findByDept(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
 		List<Map<String, Object>> list = new ArrayList<>();
 		for (Group group : groups) {
 			if (group.getId().equals("0")) {
@@ -421,7 +420,7 @@ public class _UserController extends JBaseCRUDController<User> {
 			List<User> users = UserQuery.me().findAll();
 			int count = users.size();
 			String nickName = "qdyuser"+(++count);
-			Group group = GroupQuery.me().findDataAreaAndGroupName(DataAreaUtil.getDealerDataAreaByCurUserDataArea(dept.getDataArea()), excel.getUserGroup());
+			Group group = GroupQuery.me().findDataAreaAndGroupName(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString(), excel.getUserGroup());
 			if (us == null) {
 				us = new User();
 				userId = StrKit.getRandomUUID();

@@ -43,7 +43,7 @@ $(function () {
 		<div class="company">${(session.sellerName)!}
 		<#if (session.sellerListSize ??) &&(session.sellerListSize > 1) >
 			<a href="${CPATH}/user/choice" class="change-seller">
-					<span><i class="icon-exchange ft20 white" title = "切换账套"></i></span>
+					<span><i class="icon-users white" style="font-size: .8rem;position:  absolute;top: 2.6%;right:  4%;" title = "切换账套"></i></span>
 			</a>
 		</#if>
 		</div>
@@ -136,7 +136,7 @@ $(function () {
                 </a>
                 </@shiro.hasPermission>
                 
-                <@shiro.hasPermission name="/admin/customer/audit">
+                <@shiro.hasPermission name="/admin/sellerCustomer/audit">
 				<a href="${CPATH}/todo/customer" class="weui-grid js_grid">
 					<#if (customerTotal??) && (customerTotal !=0)>
                     <span class="weui-badge full-badge">${(customerTotal)!}</span></#if>

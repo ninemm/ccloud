@@ -2,6 +2,7 @@ package org.ccloud.controller.admin;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -432,90 +433,12 @@ public class _ReportController extends JBaseController {
 		renderJson(map);
 	}
 	
-	//我部门的直营商详情
-	public void mSellerDetail() {
-		String startDate = getPara("startDate");
-		String endDate = getPara("endDate");
-		if (startDate==null) {
-			String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
-			startDate=date;
-			endDate=date;
-		}
-		String keyword = getPara("k");
-		if (keyword==null) {
-			keyword="so.create_date";
-		}
-		//编码k 页面刷新是k不会乱码
-		if (StrKit.notBlank(keyword)) {
-			keyword = StringUtils.urlDecode(keyword);
-		}
-		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
-		setAttr("startDate", startDate);
-		setAttr("endDate", endDate);
-		setAttr("k", keyword);
-		//得到表头
-		List<String>watchHead=new ArrayList<>();
-		watchHead.add("直营商名称");
-		List<SellerProduct> findBySellerId = SellerProductQuery.me().findBySellerId(sellerId);
-		for (SellerProduct sellerProduct : findBySellerId) {
-			String customName=sellerProduct.getCustomName();
-			watchHead.add(customName);
-		}
-		setAttr("watchHead", watchHead);
-		
-		//我部门的直营商详情
-		List<Record> list = SalesOrderQuery.me().findByMSellerDetail(startDate,endDate,keyword, dataArea,sellerId);
-		//根据表头  对数据从新排序
-		List<List<String>>mSellerDetailReportList=new ArrayList<>();
-		for (Record record : list) {
-			List<String> mSellerDetailGiftReport=new ArrayList<>();
-			for (int i = 0; i < watchHead.size(); i++) {
-				String key = watchHead.get(i);
-				mSellerDetailGiftReport.add(record.getStr(key));
-			}
-			mSellerDetailReportList.add(mSellerDetailGiftReport);
-		}
-		setAttr("mSellerDetailReportList", mSellerDetailReportList);
-		
-		//我部门的直营商赠品详情
-		List<Record> list1 = SalesOrderQuery.me().findByMSellerDetailGift(startDate,endDate,keyword, dataArea,sellerId);
-		//根据表头  对数据从新排序
-		List<List<String>>mSellerDetailGiftReportList=new ArrayList<>();
-		for (Record record : list1) {
-			List<String> mSellerDetailGiftReport=new ArrayList<>();
-			for (int i = 0; i < watchHead.size(); i++) {
-				String key = watchHead.get(i);
-				mSellerDetailGiftReport.add(record.getStr(key));
-			}
-			mSellerDetailGiftReportList.add(mSellerDetailGiftReport);
-		}
-		setAttr("mSellerDetailGiftReportList", mSellerDetailGiftReportList);
-		render("mSellerDetail.html");
-	}
-	
 	//我部门的业务员详情
 	public void mSalesmanDetail() {
-		String startDate = getPara("startDate");
-		String endDate = getPara("endDate");
-		if (startDate==null) {
-			String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
-			startDate=date;
-			endDate=date;
-		}
-		String keyword = getPara("k");
-		if (keyword==null) {
-			keyword="so.create_date";
-		}
-		if (StrKit.notBlank(keyword)) {
-			keyword = StringUtils.urlDecode(keyword);
-		}
-		setAttr("startDate", startDate);
-		setAttr("endDate", endDate);
-		setAttr("k", keyword);
-		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
+		setAttr("startDate", date);
+		setAttr("endDate", date);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
-		
 		//得到表头
 		List<String>watchHead=new ArrayList<>();
 		watchHead.add("业务员名称");
@@ -525,36 +448,87 @@ public class _ReportController extends JBaseController {
 			watchHead.add(customName);
 		}
 		setAttr("watchHead", watchHead);
-		
-		//我部门的业务员卖出商品详情
-		List<Record> list = SalesOrderQuery.me().findByMSalesmanDetail(startDate,endDate,keyword, dataArea,sellerId);
-		//根据表头  对数据从新排序
-		List<List<String>>mSalesmanDetailReportList=new ArrayList<>();
-		for (Record record : list) {
-			List<String> mSalesmanDetailReport=new ArrayList<>();
-			for (int i = 0; i < watchHead.size(); i++) {
-				String key = watchHead.get(i);
-				mSalesmanDetailReport.add(record.getStr(key));
-			}
-			mSalesmanDetailReportList.add(mSalesmanDetailReport);
-		}
-		setAttr("mSalesmanDetailReportList", mSalesmanDetailReportList);
-		
-		//我部门的业务员赠品商品详情
-		List<Record> list1 = SalesOrderQuery.me().findByMSalesmanDetailGift(startDate,endDate,keyword, dataArea,sellerId);
-		//根据表头  对数据从新排序
-		List<List<String>>mSalesmanDetailGiftReportList=new ArrayList<>();
-		for (Record record : list1) {
-			List<String> mSalesmanDetailGiftReport=new ArrayList<>();
-			for (int i = 0; i < watchHead.size(); i++) {
-				String key = watchHead.get(i);
-				mSalesmanDetailGiftReport.add(record.getStr(key));
-			}
-			mSalesmanDetailGiftReportList.add(mSalesmanDetailGiftReport);
-		}
-		setAttr("mSalesmanDetailGiftReportList", mSalesmanDetailGiftReportList);
 		render("mSalesmanDetail.html");
 	}
+	
+	//我部门的业务员详情
+	public void mSalesmanDetailReportList() {
+		String keyword = getPara("k");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+			setAttr("k", keyword);
+		}
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
+		List<Record> list = SalesOrderQuery.me().findByMSalesmanDetail(startDate,endDate,keyword, dataArea,sellerId);
+		renderJson(list);
+	}
+	
+	//我部门的业务员赠品详情
+	public void mSalesmanDetailGiftReportList() {
+		String keyword = getPara("k");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+			setAttr("k", keyword);
+		}
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
+		List<Record> list = SalesOrderQuery.me().findByMSalesmanDetailGift(startDate,endDate,keyword, dataArea,sellerId);
+		renderJson(list);
+	}
+	
+	//我部门的直营商详情
+	public void mSellerDetail() {
+		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
+		setAttr("startDate", date);
+		setAttr("endDate", date);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
+		//得到表头
+		List<String>watchHead=new ArrayList<>();
+		watchHead.add("直营商名称");
+		List<SellerProduct> findBySellerId = SellerProductQuery.me().findBySellerId(sellerId);
+		for (SellerProduct sellerProduct : findBySellerId) {
+			String customName=sellerProduct.getCustomName();
+			watchHead.add(customName);
+		}
+		setAttr("watchHead", watchHead);
+		render("mSellerDetail.html");
+	}
+	
+	//我部门的直营商详情
+	public void mSellerDetailReportList() {
+		String keyword = getPara("k");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+			setAttr("k", keyword);
+		}
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
+		List<Record> list = SalesOrderQuery.me().findByMSellerDetail(startDate,endDate,keyword, dataArea,sellerId);
+		renderJson(list);
+	}
+	
+	//我部门的直营商赠品详情
+	public void mSellerDetailGiftReportList() {
+		String keyword = getPara("k");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+			setAttr("k", keyword);
+		}
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString(); 
+		List<Record> list = SalesOrderQuery.me().findByMSellerDetailGift(startDate,endDate,keyword, dataArea,sellerId);
+		renderJson(list);
+	}
+	
 	
 	//我的客户详情
 	public void customerDetails() {
@@ -565,24 +539,9 @@ public class _ReportController extends JBaseController {
 			setAttr("ulist", ulist);
 		}
 		
-		String startDate = getPara("startDate");
-		String endDate = getPara("endDate");
-		if (startDate==null) {
-			String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
-			startDate=date;
-			endDate=date;
-		}
-		String keyword = getPara("k");
-		if (keyword==null) {
-			keyword="so.create_date";
-		}
-		if (StrKit.notBlank(keyword)) {
-			keyword = StringUtils.urlDecode(keyword);
-		}
-		setAttr("startDate", startDate);
-		setAttr("endDate", endDate);
-		setAttr("k", keyword);
-	
+		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
+		setAttr("startDate", date);
+		setAttr("endDate", date);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
 		//得到表头
 		List<String>watchHead=new ArrayList<>();
@@ -593,7 +552,34 @@ public class _ReportController extends JBaseController {
 			watchHead.add(customName);
 		}
 		setAttr("watchHead", watchHead);
-		
+		render("customerDetails.html");
+	}
+	
+	//我的客户详情
+	public void customerDetailsReportList() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String userId = user.getId();
+		//判断有没有user_id传过来
+		String user_id = getPara("user_id");
+		if (StrKit.notBlank(user_id)) {
+			userId = StringUtils.urlDecode(user_id);
+			setAttr("userId", userId);
+		}
+		String keyword = getPara("k");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+			setAttr("k", keyword);
+		}
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
+		//我的客户卖出商品详情
+		List<Record> list = SalesOrderQuery.me().findByCustomerDetail(startDate,endDate,keyword, userId,sellerId);
+		renderJson(list);
+	}
+	
+	//我部门的业务员赠品商品详情
+	public void customerDetailsGiftReportList() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String userId = user.getId();
 
@@ -603,35 +589,16 @@ public class _ReportController extends JBaseController {
 			userId = StringUtils.urlDecode(user_id);
 			setAttr("userId", userId);
 		}
-		
-		//我的客户卖出商品详情
-		List<Record> list = SalesOrderQuery.me().findByCustomerDetail(startDate,endDate,keyword, userId,sellerId);
-		//根据表头  对数据从新排序
-		List<List<String>>CustomerDetailList=new ArrayList<>();
-		for (Record record : list) {
-			List<String> CustomerDetail=new ArrayList<>();
-			for (int i = 0; i < watchHead.size(); i++) {
-				String key = watchHead.get(i);
-				CustomerDetail.add(record.getStr(key));
-			}
-			CustomerDetailList.add(CustomerDetail);
+		String keyword = getPara("k");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+			setAttr("k", keyword);
 		}
-		setAttr("CustomerDetailList", CustomerDetailList);
-		
-		//我部门的业务员赠品商品详情
-		List<Record> list1 = SalesOrderQuery.me().findByCustomerDetailGift(startDate,endDate,keyword, userId,sellerId);
-		//根据表头  对数据从新排序
-		List<List<String>>CustomerDetailGiftList=new ArrayList<>();
-		for (Record record : list1) {
-			List<String> CustomerDetailGift=new ArrayList<>();
-			for (int i = 0; i < watchHead.size(); i++) {
-				String key = watchHead.get(i);
-				CustomerDetailGift.add(record.getStr(key));
-			}
-			CustomerDetailGiftList.add(CustomerDetailGift);
-		}
-		setAttr("CustomerDetailGiftList", CustomerDetailGiftList);
-		render("customerDetails.html");
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
+		List<Record> list = SalesOrderQuery.me().findByCustomerDetailGift(startDate,endDate,keyword, userId,sellerId);
+		renderJson(list);
 	}
 	
 }

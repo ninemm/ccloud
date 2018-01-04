@@ -744,6 +744,13 @@ a {
   width: 100%;
 }
 
+.menu-left li img {
+  width: 20%;
+  position: absolute;
+  left: .1rem;
+  top: .2rem;
+}
+
 .menu-left li.active,
 .product-content .swiper-slide.active {
   background: #fff;
@@ -783,12 +790,24 @@ a {
 
 .product-content .menu-left,
 .product-content .menu-right {
-  top: 2rem;
+  top: 0;
 }
 
 .product-content .swiper-slide {
   height: 2rem;
   line-height: 2rem;
+}
+
+.product-inner-content {
+  position: absolute;
+  bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.swiper-container+.product-inner-content {
+  top: 2rem;
 }
 
 .type {
@@ -906,6 +925,7 @@ a {
 .operate:first-child {
   border-top-left-radius: 2px;
   border-bottom-left-radius: 2px;
+  background: #fff;
 }
 
 .operate:last-child {
@@ -961,7 +981,7 @@ a {
 }
 
 .layui-m-layerchild {
-  width: 80%;
+  width: 13rem;
 }
 
 .service {
@@ -969,7 +989,7 @@ a {
 }
 
 .product-detail img {
-  width: 30%;
+  width: 100%;
 }
 
 .service img {

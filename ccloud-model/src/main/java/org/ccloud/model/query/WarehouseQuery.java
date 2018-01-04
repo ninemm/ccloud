@@ -115,13 +115,14 @@ public class WarehouseQuery extends JBaseQuery {
 
 	//经销商管理员登录查看所有的直营商仓库
 	public Page<Warehouse> paginateDataArea(int pageNumber, int pageSize, String keyword, String orderby,
-			String dataArea) {
+			String dataArea, String user_id) {
 		String select = "select c.id,c.name,c.code,c.contact,c.phone,c.is_inited,c.is_enabled,c.is_default,d.dept_name as deptName";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_warehouse` c ");
 		fromBuilder.append(" LEFT JOIN department d ON c.dept_id = d.id ");
+		fromBuilder.append(" WHERE c.id IN (SELECT uw.warehouse_id FROM cc_user_join_warehouse uw WHERE uw.user_id = '"+user_id+"') ");
+		fromBuilder.append(" OR d.data_area LIKE '"+dataArea+"' ");
 		LinkedList<Object> params = new LinkedList<Object>();
-		boolean needWhere = true;
-		needWhere=appendIfNotEmptyWithLike(fromBuilder, "d.data_area", dataArea, params, needWhere);
+		boolean needWhere = false;
 		needWhere=appendIfNotEmptyWithLike(fromBuilder, "c.name", keyword, params, needWhere);
 		fromBuilder.append("order by " + orderby);
 		if (params.isEmpty())

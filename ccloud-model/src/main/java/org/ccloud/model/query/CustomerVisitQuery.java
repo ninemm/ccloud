@@ -21,6 +21,7 @@ import java.util.List;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Record;
+import com.sun.org.apache.bcel.internal.generic.Select;
 import org.ccloud.model.CustomerVisit;
 
 import com.jfinal.plugin.activerecord.Page;
@@ -163,7 +164,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 		return DAO.find(sql.toString(), username);
 	}
 	
-public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procKey, String username) {
+	public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procKey, String username) {
 		
 		String select = "select cv.*, sc.nickname, c.customer_name, c.customer_code, c.contact, c.mobile, c.prov_name, c.city_name, c.country_name, c.address,i.TASK_ID_ taskId, i.ACT_NAME_ taskName, i.ASSIGNEE_ assignee, i.END_TIME_ endTime ";
 		LinkedList<Object> params = new LinkedList<>();
@@ -231,6 +232,28 @@ public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procK
 		fromBuilder.append(" ORDER BY " + orderby);
 
 		return Db.find(fromBuilder.toString());
+	}
+
+	public List<Record> findPhoto(String customerType, String customerName, String data_area){
+
+		LinkedList<Object> params = new LinkedList<Object>();
+		StringBuilder sql = new StringBuilder("SELECT DISTINCT(ccv.id), u.realname, ccv.photo, cc.customer_name, ccv.create_date ");
+
+		sql.append("FROM cc_customer_visit ccv ");
+		sql.append("LEFT JOIN cc_seller_customer csc ON csc.id = ccv.seller_customer_id ");
+		sql.append("LEFT JOIN cc_customer cc ON cc.id = csc.customer_id ");
+		sql.append("LEFT JOIN cc_customer_join_customer_type ccjct ON ccv.seller_customer_id = ccjct.seller_customer_id ");
+
+		sql.append("LEFT JOIN `user` u ON u.id = ccv.user_id ");
+		sql.append(" WHERE LENGTH(ccv.photo) > 2 ");
+
+		appendIfNotEmpty(sql,"ccv.seller_customer_id", customerName, params, false);
+		appendIfNotEmpty(sql,"ccjct.customer_type_id", customerType, params, false);
+		appendIfNotEmptyWithLike(sql, "ccv.data_area", data_area, params, false);
+
+		sql.append("ORDER BY ccv.create_date");
+
+		return Db.find(sql.toString(), params.toArray());
 	}
 	
 }
