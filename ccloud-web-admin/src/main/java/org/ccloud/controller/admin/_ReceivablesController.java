@@ -69,7 +69,7 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 	
 	public void getOptions(){
 		String type = getPara("type");
-		String DataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String DataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		List<Record> list = new ArrayList();
 		if(type != null) {
@@ -86,7 +86,7 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 		String type = getPara("type");
 		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String deptDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String deptDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 		Page<Record> page = ReceivablesQuery.me().paginate(getPageNumber(),getPageSize(),customerTypeId,type,user.getId(),deptDataArea);
 		List<Record> receivablesList = page.getList();
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(),"rows", receivablesList);
@@ -179,12 +179,12 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
         else renderAjaxResultForError("添加收款记录失败");
 	}
 	
-	
+	//导出应收记录
 	public void downloading() throws UnsupportedEncodingException {
 		String type = getPara("type");
 		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String deptDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);	
+		String deptDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);	
 		
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\receivables\\"
 				+ "receivables.xlsx";

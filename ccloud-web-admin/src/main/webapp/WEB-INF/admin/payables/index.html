@@ -70,7 +70,7 @@ function updateOptions(){
 var initpayablesTable = function(){
 	var fields = [
 		{field: "object_id",title: "ID", align: "center", visible:false, edit:false},
-		{field: "code",title:"编码",align: "center", width: '8%', edit:false},
+		{field: "customerTypeNames",title:"客户类型",align: "center", width: '12%', edit:false},
 		{field: "name",title:"名称",align: "center", width: '12%', edit:false},
 		{field: "pay_amount",title:"应付金额",align: "center",edit:false},
 		{field: "act_amount",title:"已付金额",align: "center",edit:false},
@@ -80,8 +80,10 @@ var initpayablesTable = function(){
 	return fields;
 };
 
+var  cusType = "";
 var getpayablesParams = function(params){
 var customerTypeId = $('#category-or-customer').val();
+cusType = customerTypeId;
 	var param = {
         size: params.limit,
         page: params.offset/params.limit + 1,
@@ -116,6 +118,7 @@ var initpayableDetailTable = function(){
 	return fields;
 }
 
+
 var getpayablesDetailParams = function(params){
 
 	var param = {
@@ -138,6 +141,10 @@ function orderInfo(orderSn){
 	});
 }
 
+function batchDown(){
+		location.href = "${CPATH}/admin/payables/downloading?type="+type +"&customerTypeId=" + cusType;
+	}
+
 </#macro>
 <@layout active_id=p child_active_id=c>
 	
@@ -152,6 +159,9 @@ function orderInfo(orderSn){
 <!-- Main content -->
 <section class="content">
 	<div class="row content-row">
+	<div class="jp-left">
+	 	<button onclick="batchDown()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-upload"></i> 导出</button>
+	  </div>
 		<div class="input-group input-group-sm" style="float:right;">
 			<span>往来单位：</span>
 			<select id="selecttype" style="width:200px">
