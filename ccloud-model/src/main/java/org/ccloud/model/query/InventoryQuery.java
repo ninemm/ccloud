@@ -181,8 +181,8 @@ public class InventoryQuery extends JBaseQuery {
 		return Db.paginate(page, pageSize,select, fromBuilder.toString(),params.toArray());
 	}
 
-	public List<Record> getWareHouse(String dataArea) {
-		StringBuilder fromBuilder = new StringBuilder("select w.id,w.code,w.name from  cc_warehouse w where w.is_enabled=1 and w.data_area like '"+dataArea+"'");
+	public List<Record> getWareHouse(String dataArea, String userId) {
+		StringBuilder fromBuilder = new StringBuilder("select w.id,w.code,w.name from  cc_warehouse w where w.is_enabled=1 and w.data_area like '"+dataArea+"' OR w.id IN (SELECT uw.warehouse_id FROM cc_user_join_warehouse uw WHERE uw.user_id = '"+userId+"')");
 		List<Record> list = Db.find(fromBuilder.toString());
 		return list;
 	}
