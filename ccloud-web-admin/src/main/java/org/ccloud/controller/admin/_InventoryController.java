@@ -51,12 +51,13 @@ public class _InventoryController extends JBaseCRUDController<Inventory> {
 	public void getWarehouse() {
 		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/dealer/all");
 		List<Record> list=new ArrayList<Record>();
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String userId = user.getId();
 		if (isSuperAdmin) {
 			String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-			list = InventoryQuery.me().getWareHouse(dataArea);
+			list = InventoryQuery.me().getWareHouse(dataArea,userId);
 		}else {
-			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-			String userId = user.getId();
+			
 			list = InventoryQuery.me().getWareHouseInfo(userId);
 		}
 		renderJson(list);
