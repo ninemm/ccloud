@@ -118,16 +118,21 @@ $(function() {
 					});
 
 					var $customerTypeName = $("#customerTypeName");
-					$customerTypeName.select({
-				         title: "客户类型",
-				         items: items,
-				         onChange: function(data) {
-				         	$("#customerType").val(customerTypeInfoMap[data.values].id);
-					        $("#customerTypeCode").val(customerTypeInfoMap[data.values].code);
-					        $("#factor").val(customerTypeInfoMap[data.values].factor);
-					        $("#proc_def_key").val(customerTypeInfoMap[data.values].proc_def_key);
-				         }
-			        });
+					if($customerTypeName.data('values') === undefined){
+						$customerTypeName.select({
+					         title: "客户类型",
+					         items: items,
+					         onChange: function(data) {
+					         	$("#customerType").val(customerTypeInfoMap[data.values].id);
+						        $("#customerTypeCode").val(customerTypeInfoMap[data.values].code);
+						        $("#factor").val(customerTypeInfoMap[data.values].factor);
+						        $("#proc_def_key").val(customerTypeInfoMap[data.values].proc_def_key);
+					         }
+				        });
+			        }else{
+			        	$customerTypeName.select("update", {items : items})
+			        }
+			        
 			        $customerTypeName.val(items[0].title);
 			        $customerTypeName.attr('data-values', items[0].value);
 	
