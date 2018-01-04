@@ -96,7 +96,7 @@ public class WxOauthController extends BaseFrontController {
 					for (User user : userList) {
 						deptList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
 						if (deptList.size() > 0) {
-							Department dept = deptList.get(deptList.size() - 1);
+							Department dept = deptList.get(0);
 							Map<String, String> seller = Maps.newHashMap();
 							seller.put("seller_id", dept.getStr("seller_id"));
 							seller.put("seller_name", dept.getStr("seller_name"));

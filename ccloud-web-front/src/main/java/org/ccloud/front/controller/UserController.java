@@ -104,7 +104,7 @@ public class UserController extends BaseFrontController {
 		for (User temp : userList) {
 			tmpList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(temp.getDepartmentId());
 			if (tmpList.size() > 0) {
-				Department dept = tmpList.get(tmpList.size() - 1);
+				Department dept = tmpList.get(0);
 				Map<String, String> seller = Maps.newHashMap();
 				seller.put("seller_id", dept.getStr("seller_id"));
 				seller.put("seller_name", dept.getStr("seller_name"));
