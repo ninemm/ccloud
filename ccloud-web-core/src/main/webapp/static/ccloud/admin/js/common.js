@@ -119,6 +119,19 @@ jQuery.mm = {
 		);
 	},
 	
+	down: function(url) {
+		layer.confirm('确定导出吗？', 
+			{btn : ['确定', '取消']},
+			function() {
+				layer.closeAll();
+				location.href = url;
+			},
+			function() {
+				layer.close();
+			}
+		);
+	},
+	
 	update: function(message, url, data, dataType) {
 		layer.confirm(message, 
 			{btn : ['确定', '取消']},

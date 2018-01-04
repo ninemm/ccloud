@@ -191,7 +191,7 @@
 				}
 	}
 	function batchDown(){
-    	location.href = "${CPATH}/admin/salesRefund/downloading?startDate=" + $('#startDate').val() + " 00:00:00" + "&endDate=" + $('#endDate').val() + " 23:59:59" + "&k="+$('#post-search-input').val();
+		jQuery.mm.down("${CPATH}/admin/salesRefund/downloading?startDate=" + $('#startDate').val() + " 00:00:00" + "&endDate=" + $('#endDate').val() + " 23:59:59" + "&k="+$('#post-search-input').val());
     }
 </#macro>
 
