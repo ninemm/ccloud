@@ -215,6 +215,8 @@ public class _AdminController extends JBaseController {
 					setSessionAttr(Consts.SESSION_SELLER_NAME, dept.get("seller_name"));
 					setSessionAttr(Consts.SESSION_SELLER_CODE, dept.get("seller_code"));
 					setSessionAttr(Consts.SESSION_SELLER_HAS_STORE, dept.get("has_store"));
+				} else {
+					setSessionAttr(Consts.SESSION_DEALER_DATA_AREA, DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea()) + "%");
 				}
 			}
 			MessageKit.sendMessage(Actions.USER_LOGINED, user);
