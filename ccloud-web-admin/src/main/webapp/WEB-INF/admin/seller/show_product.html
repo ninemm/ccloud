@@ -79,7 +79,7 @@
       					return strHtml;
       				},
       			edit:false},
-      			{field: "bigPrice", title: "销售价格(大单位)", align: "center", width: '7%',
+      			{field: "bigPrice", title: "销售价格(整)", align: "center", width: '7%',
       				formatter: function(value, row, rowIndex) {
 					var strHtml = '￥<input type="text" size="9" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="bigPrice" value="'+row.price.toFixed(2)+'" onblur="changeMoney(this)"/>';
 					strHtml += '/<input type="text" size="1" readonly style="text-align:center;background-color:transparent;border:0px;" name="big_unit" value="'+row.big_unit+'"/>';
@@ -87,7 +87,7 @@
 				},
       			 edit:false},
       			 {field: "convert_relate", title: "换算", align: "center", width: '2%',edit:false},
-      			 {field: "samllPrice", title: "销售价格(小单位)", align: "center", width: '7%',
+      			 {field: "samllPrice", title: "销售价格(零)", align: "center", width: '7%',
       				formatter: function(value, row, rowIndex) {
 					var strHtml = '￥<input type="text" size="9" readonly style="text-align:center;background-color:transparent;border:0px;" name="smallPrice" value="'+(row.price/row.convert_relate).toFixed(2)+'"/>';
 					strHtml += '/<input type="text" size="1" readonly style="text-align:center;background-color:transparent;border:0px;" name="samll_unit" value="'+row.small_unit+'"/>';
