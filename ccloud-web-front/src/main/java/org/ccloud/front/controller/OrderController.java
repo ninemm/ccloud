@@ -29,7 +29,6 @@ import org.ccloud.model.query.SalesOutstockQuery;
 import org.ccloud.model.query.SellerProductQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
-import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.workflow.service.WorkFlowService;
@@ -55,8 +54,6 @@ public class OrderController extends BaseFrontController {
 	@RequiresPermissions(value = { "/admin/salesOrder", "/admin/dealer/all" }, logical = Logical.OR)
 	public void myOrder() {
 		
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-
 		Map<String, Object> all = new HashMap<>();
 		all.put("title", "全部");
 		all.put("value", "");
@@ -65,7 +62,7 @@ public class OrderController extends BaseFrontController {
 		customerTypes.add(all);
 
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
-				.findByDataArea(DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea()));
+				.findByDataArea(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
 		for (CustomerType customerType : customerTypeList) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", customerType.getName());

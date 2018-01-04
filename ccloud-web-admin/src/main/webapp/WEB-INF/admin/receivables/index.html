@@ -70,7 +70,6 @@ function updateOptions(){
 var initReceivablesTable = function(){
 	var fields = [
 		{field: "object_id",title: "ID", align: "center", visible:false, edit:false},
-		{field: "code",title:"编码",align: "center", width: '8%', edit:false},
 		{field: "name",title:"名称",align: "center", width: '12%', edit:false},
 		{field: "receive_amount",title:"应收金额",align: "center",edit:false},
 		{field: "act_amount",title:"实收金额",align: "center",edit:false},
@@ -80,8 +79,10 @@ var initReceivablesTable = function(){
 	return fields;
 };
 
+var  cusType = "";
 var getReceivablesParams = function(params){
 var customerTypeId = $('#category-or-customer').val();
+cusType = customerTypeId;
 	var param = {
         size: params.limit,
         page: params.offset/params.limit + 1,
@@ -159,6 +160,10 @@ function getReceivablesDetail(page){
 	});
 }
 
+function batchDown(){
+		location.href = "${CPATH}/admin/receivables/downloading?type="+type +"&customerTypeId=" + cusType;
+	}
+
 
 </#macro>
 <@layout active_id=p child_active_id=c>
@@ -174,6 +179,9 @@ function getReceivablesDetail(page){
 <!-- Main content -->
 <section class="content">
 	<div class="row content-row">
+	 <div class="jp-left">
+	 	<button onclick="batchDown()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-upload"></i> 导出</button>
+	  </div>
 		<div class="input-group input-group-sm" style="float:right;">
 			<span>往来单位：</span>
 			<select id="selecttype" style="width:200px">

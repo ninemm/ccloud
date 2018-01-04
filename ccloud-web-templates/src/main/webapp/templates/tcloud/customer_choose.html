@@ -20,8 +20,6 @@
         //搜索框监听
         $(document).on("input", "#searchInput", function() {
             combo();
-        }).on("input", "#searchInput", function() {
-            combo();
         }).on("input", "#searchCancel", function() {
             combo();
         }).on("change", "#userId", function() {
@@ -83,6 +81,10 @@
 	
     
     function initCustomer() {
+
+		$loading.show();
+		$noMore.hide();
+
 	    var params = {
 		    "page": page,
 	        "size": size,
@@ -124,9 +126,7 @@
 			return;
 		}
 		loading = true;
-		setTimeout(function() {
-			initCustomer();
-		}, 1500);
+		initCustomer();
 	});
 	
 	function combo() {
@@ -198,7 +198,7 @@
 							</p>
 						</div>
 					</div>
-					<div class="weui-loadmore" id="loading">
+					<div class="weui-loadmore" id="loading" style="display: none;">
 						<i class="weui-loading"></i>
 						<span class="weui-loadmore__tips">正在加载</span>
 					</div>

@@ -5,6 +5,10 @@
         background: #f3f5f7;
     }
 </#macro>
+<#macro script_import>
+    <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=Ec4VbDTTjjuEGtVGzSvPwwQtvnvWFeGY"></script>
+</#macro>
 
 <#macro script>
     var pageNumber = 2;
@@ -17,6 +21,15 @@
     $(function() {
         //搜索框监听
         $(document).on("input", "#searchInput", function() {
+            refresh();
+        });
+        $(document).on("change", "#region", function() {
+            refresh();
+        });
+        $(document).on("change", "#customer-type", function() {
+            refresh();
+        });
+        $(document).on("change", "#if-order", function() {
             refresh();
         });
 
@@ -47,6 +60,12 @@
                     title: "否",value: "0"
                     }]
                 });
+
+                var str = '';
+                for(var i = 0; i < data.searchArea.length; i++)
+                    if(i == 0) str = str + '<span class="red-button" data-id="' + data.searchArea[i].value + '">'+ data.searchArea[i].title + '</span>';
+                    else str = str + '<span data-id="' + data.searchArea[i].value + '">'+ data.searchArea[i].title + '</span>';
+                $("#getDate").append(str);
             }
         });
     });
@@ -125,6 +144,41 @@
         });
     }
 
+    var paramData2 = function() {
+        return  {
+            "searchArea": $("#getDate").find(".red-button").data("id"),
+            "lon": $('#lon').val(),
+            "lat": $('#lat').val()
+        }
+    }
+
+    function getAreaCustomer(){
+        pageNumber = 1;
+        $.ajax({
+            url:"${CPATH}/customer/getAreaCustomer",
+            type:"post",
+            data:paramData2(),
+            dataType:"json",
+            success:function(data) {
+                $loadmore = $(this).find(".weui-loadmore");
+                $(".infinite").destroyInfinite();
+                $loadmore.hide();
+
+                if (data.totalPage > pageNumber) {
+                    loading = false;
+                    $(".infinite").infinite();
+                    $(".weui-loadmore").removeAttr("style");
+                }
+
+                $(".infinite")[0].scrollTop = 0;
+                $("#customerList").empty();
+                if(data.html.length == 0) data.html = data.html +'<div class="weui-loadmore weui-loadmore_line"><span class="weui-loadmore__tips">暂无数据</span></div>';
+                $("#customerList").html(data.html);
+                pageNumber = 2;
+            }
+        });
+    }
+
     function newOrder(customer){
         setItemBykey("customerInfo", customer);
         window.location.href = '${CPATH}/product';
@@ -134,6 +188,42 @@
         setItemBykey("customerInfo", customer);
         window.location.href = '${CPATH}/customerVisit/edit';
     }
+
+    wx.config({
+        debug: false,
+        appId: '${appId!}',
+        timestamp: ${timestamp},
+        nonceStr: '${nonceStr!}',
+        signature: '${signature!}',
+        jsApiList: [
+            'checkJsApi',
+            'getLocation'
+        ]
+    });
+
+    wx.ready(function() {
+        // 获取定位信息
+        wx.getLocation({
+            type: 'wgs84',
+            success: function (res) {
+                var latitude = res.latitude;                      // 纬度，浮点数，范围为90 ~ -90
+                var longitude = res.longitude;                    // 经度，浮点数，范围为180 ~ -180。
+                var speed = res.speed;                            // 速度，以米/每秒计
+                var accuracy = res.accuracy;                      // 位置精度
+
+                var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
+                var geoc = new BMap.Geocoder();                   // 获取百度地址解析器
+                $("#lon").val(parseFloat(longitude).toFixed(2));
+                $("#lat").val(parseFloat(latitude).toFixed(2));
+            },
+            cancel: function (res) {
+                console.log('用户拒绝授权获取地理位置');
+            },
+            fail: function (res) {
+                console.log(JSON.stringify(res));
+            }
+        });
+    });
 
 </#macro>
 
@@ -160,17 +250,19 @@
             <div class="head-search select-area weui-flex__item">
                 <div class="weui-flex">
                 <div class="weui-flex__item">
-                    <input type="text" id="region" placeholder="客户区域" class="weui-input" readonly onchange="refresh()">
+                    <input type="text" id="region" placeholder="客户区域" class="weui-input" readonly>
                     <i class="icon-sort-desc"></i>
                 </div>
                 <div class="weui-flex__item">
-                    <input type="text" id="customer-type" placeholder="客户类型" class="weui-input" readonly onchange="refresh()">
+                    <input type="text" id="customer-type" placeholder="客户类型" class="weui-input" readonly>
                     <i class="icon-sort-desc"></i>
                 </div>
                 <div class="weui-flex__item">
-                    <input type="text" id="if-order" placeholder="是否下单" class="weui-input" readonly onchange="refresh()">
+                    <input type="text" id="if-order" placeholder="是否下单" class="weui-input" readonly>
                     <i class="icon-sort-desc"></i>
                 </div>
+                    <input type="hidden" name="lon" id="lon">
+                    <input type="hidden" name="lat" id="lat">
                 </div>
             </div>
             <div id="combin-filter-btn">
@@ -264,4 +356,15 @@
 </@shiro.hasPermission>
 <div class="layer"></div>
 <#include "_inc/_footer_nav.html" />
+<article id="combin-filter">
+    <div class="filter-item">
+        <h4 class="ft14">选择搜索范围</h4>
+        <div class="relative ft12" id="getDate">
+        </div>
+    </div>
+    <footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
+        <button class="white-button-no-border  cancel-search-btn weui-flex__item border-top-1px">取消</button>
+        <button class="red-button confirm-search-btn weui-flex__item" onclick="getAreaCustomer()">确定</button>
+    </footer>
+</article>
 </@layout>

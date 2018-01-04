@@ -28,7 +28,6 @@ import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.query.WxMessageTemplateQuery;
 import org.ccloud.model.vo.ImageJson;
 import org.ccloud.route.RouterMapping;
-import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.wechat.WechatJSSDKInterceptor;
 import org.ccloud.workflow.service.WorkFlowService;
 import org.joda.time.DateTime;
@@ -77,13 +76,11 @@ public class CustomerVisitController extends BaseFrontController {
 
 	public void getSelect() {
 
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-
 		Map<String, Object> all = new HashMap<>();
 		all.put("title", "全部");
 		all.put("value", "");
 
-		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(DataAreaUtil.getDealerDataAreaByCurUserDataArea(selectDataArea));
+		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
 		List<Map<String, Object>> customerTypeList2 = new ArrayList<>();
 		customerTypeList2.add(all);
 
@@ -185,7 +182,6 @@ public class CustomerVisitController extends BaseFrontController {
 		keepPara();
 		
 		String id = getPara("id");
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
 		if (StrKit.isBlank(id)) {
 			renderError(404);
@@ -198,7 +194,7 @@ public class CustomerVisitController extends BaseFrontController {
 			return ;
 		}
 		
-		String dataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(selectDataArea) + "%";
+		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 		List<String> typeList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeNameListBySellerCustomerId(customerVisit.getSellerCustomerId(), dataArea);
 
 		setAttr("customerVisit", customerVisit);
@@ -209,7 +205,6 @@ public class CustomerVisitController extends BaseFrontController {
 
 	public void visitCustomerChoose() {
 
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
 		Map<String, Object> all = new HashMap<>();
@@ -231,7 +226,7 @@ public class CustomerVisitController extends BaseFrontController {
 		customerTypes.add(all);
 
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
-				.findByDataArea(DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea()));
+				.findByDataArea(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
 		for (CustomerType customerType : customerTypeList) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", customerType.getName());

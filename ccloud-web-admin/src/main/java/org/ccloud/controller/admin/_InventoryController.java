@@ -48,6 +48,7 @@ import com.jfinal.plugin.activerecord.Record;
 @RouterNotAllowConvert
 public class _InventoryController extends JBaseCRUDController<Inventory> { 
 
+	//库存总账  选择仓库
 	public void getWarehouse() {
 		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/dealer/all");
 		List<Record> list=new ArrayList<Record>();
@@ -63,6 +64,7 @@ public class _InventoryController extends JBaseCRUDController<Inventory> {
 		renderJson(list);
 	}
 	
+	//库存总账
 	public void list() {
 		String warehouse_id = getPara("warehouse_id");
 		String product_sn = getPara("product_sn");
@@ -88,6 +90,7 @@ public class _InventoryController extends JBaseCRUDController<Inventory> {
 		renderJson(map);
 	}
 	
+	//库存总账明细向页面跳转
 	public void renderlist() {
 		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
 		setAttr("startDate", date);
@@ -98,6 +101,7 @@ public class _InventoryController extends JBaseCRUDController<Inventory> {
 		render("detaillist.html");
 	}
 	
+	//库存总账明细
 	public void detaillist() {
 		String warehouse_id = getPara("warehouse_id");
 		String product_id = getPara("product_id");

@@ -1,5 +1,6 @@
 package org.ccloud.front.controller;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,21 +12,12 @@ import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
-import org.ccloud.model.Customer;
-import org.ccloud.model.CustomerJoinCustomerType;
-import org.ccloud.model.CustomerType;
-import org.ccloud.model.Department;
-import org.ccloud.model.Message;
-import org.ccloud.model.SellerCustomer;
-import org.ccloud.model.User;
-import org.ccloud.model.UserJoinCustomer;
-import org.ccloud.model.WxMessageTemplate;
+import org.ccloud.model.*;
 import org.ccloud.model.compare.BeanCompareUtils;
 import org.ccloud.model.query.*;
 import org.ccloud.model.vo.CustomerVO;
 import org.ccloud.model.vo.ImageJson;
 import org.ccloud.route.RouterMapping;
-import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.wechat.WechatJSSDKInterceptor;
 import org.ccloud.workflow.service.WorkFlowService;
 import org.joda.time.DateTime;
@@ -53,6 +45,7 @@ import com.jfinal.plugin.activerecord.tx.Tx;
 @RequiresPermissions(value = { "/admin/sellerCustomer", "/admin/dealer/all" }, logical = Logical.OR)
 public class CustomerController extends BaseFrontController {
 
+	@Before(WechatJSSDKInterceptor.class)
 	public void index() {
 
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
@@ -69,7 +62,6 @@ public class CustomerController extends BaseFrontController {
 
 	public void getCustomerRegionAndType() {
 
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
 		List<Record> userList = UserQuery.me().findNextLevelsUserList(selectDataArea);
@@ -86,7 +78,7 @@ public class CustomerController extends BaseFrontController {
 			region.add(item);
 		}
 
-		String dataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea());
+		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(dataArea + "%");
 		List<Map<String, Object>> customerTypeList2 = new ArrayList<>();
 		customerTypeList2.add(all);
@@ -98,7 +90,16 @@ public class CustomerController extends BaseFrontController {
 			customerTypeList2.add(item);
 		}
 
-		Map<String, List<Map<String, Object>>> data = ImmutableMap.of("region", region, "customerType", customerTypeList2);
+		List<Dict> nearByList = DictQuery.me().findDictByType("area_coverage");
+		List<Map<String, Object>> nearBy = new ArrayList<>();
+		for(Dict dict : nearByList) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", dict.get("name"));
+			item.put("value", dict.get("value"));
+			nearBy.add(item);
+		}
+
+		Map<String, List<Map<String, Object>>> data = ImmutableMap.of("region", region, "customerType", customerTypeList2, "searchArea", nearBy);
 		renderJson(data);
 	}
 
@@ -165,6 +166,79 @@ public class CustomerController extends BaseFrontController {
 		map.put("totalRow", customerList.getTotalRow());
 		map.put("totalPage", customerList.getTotalPage());
 		renderJson(map);
+	}
+
+	public void getAreaCustomer() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+
+		Double dist = 100d;
+		String lon = getPara("lon");
+		String lat = getPara("lat");
+
+		if(StrKit.notBlank(getPara("searchArea"))) {
+			dist = Double.valueOf(getPara("searchArea", "100")).doubleValue();
+
+			BigDecimal latitude = new BigDecimal(lat);
+			BigDecimal longitude = new BigDecimal(lon);
+
+			List<Map<String, Object>> customerList = SellerCustomerQuery.me().queryCustomerNearby(dist, longitude, latitude, user.getId());
+			Map<String, Object> map = new HashMap<>();
+
+			StringBuilder html = new StringBuilder();
+			for (Map<String, Object> customer : customerList)
+			{
+				html.append("<div class=\"weui-panel weui-panel_access\">\n");
+				html.append("	<div class=\"weui-flex\">\n");
+				html.append("		<div class=\"weui-flex__item customer-info\">\n");
+				html.append("			<p class=\"ft14\">" + customer.get("customer_name").toString() + "</p>\n");
+				html.append("			<p class=\"gray\">" + customer.get("contact").toString() + "/" + customer.get("mobile").toString() + "</p>\n");
+				html.append("		</div>\n");
+				html.append("		<div class=\"weui-flex__item customer-href\">\n");
+				html.append("			<div class=\"weui-flex\">\n");
+				html.append("				<a href=\"tel:\"" + customer.get("mobile").toString() + " class=\"weui-flex__item\">\n");
+				html.append("					<p><i class=\"icon-phone green\"></i></p>\n");
+				html.append("					<p>电话</p>\n");
+				html.append("				</a>\n");
+				html.append("				<a class=\"weui-flex__item\" href=\"/customer/historyOrder?sellerCustomerId=" + customer.get("id").toString() + "&customerName=" + customer.get("customer_name").toString() + "\">\n");
+				html.append("					<p><i class=\"icon-file-text-o blue\"></i></p>\n");
+				html.append("					<p>订单</p>\n");
+				html.append("				</a>\n");
+				html.append("				<a class=\"weui-flex__item\" href=\"/customerVisit?id=" + customer.get("id").toString() +"&name=" + customer.get("customer_name").toString() + "\">\n");
+				html.append("					<p><i class=\"icon-paw\" style=\"color:#ff9800\"></i></p>\n");
+				html.append("					<p>拜访</p>\n");
+				html.append("				</a>\n");
+				html.append("				<a class=\"weui-flex__item relative\" href=\"/customer/edit?sellerCustomerId=" + customer.get("id").toString() + "\">\n");
+				html.append("					<i class=\"icon-chevron-right gray\"></i>\n");
+				html.append("				</a>\n");
+				html.append("			</div>\n");
+				html.append("		</div>\n");
+				html.append("	</div>\n");
+				html.append("	<hr />\n");
+				html.append("	<div class=\"operate-btn\">\n");
+				html.append("		<div class=\"button white-button fl border-1px\" onclick=\"newVisit({customerName:'" + customer.get("customer_name").toString() + "',\n" +
+						"                                                                     sellerCustomerId:'" + customer.get("id").toString() + "',\n" +
+						"                                                                     contact:'" + customer.get("contact").toString() + "',\n" +
+						"                                                                     mobile:'" + customer.get("mobile").toString() + "',\n" +
+						"                                                                     address:'" + customer.get("address").toString() + "'})\">客户拜访</div>\n");
+				html.append("		<div class=\"button red-button fr\" onclick=\"newOrder({customerName:'" + customer.get("customer_name").toString() + "',\n" +
+						"                                                                    sellerCustomerId:'" + customer.get("id").toString() + "',\n" +
+						"                                                                    contact:'" + customer.get("contact").toString() + "',\n" +
+						"                                                                    mobile:'" + customer.get("mobile").toString() + "',\n" +
+						"                                                                    address:'" + customer.get("address").toString() + "'})\" >下订单</div>\n");
+				html.append("	</div>\n");
+				html.append("	<p class=\"gray\">\n");
+				html.append("		<span class=\"icon-map-marker ft16 green\"></span>\n");
+				html.append(		customer.get("prov_name").toString() + " " + customer.get("city_name").toString() + " " + customer.get("country_name").toString() + " " + customer.get("address").toString() + "\n");
+				html.append("	</p>\n");
+				html.append("</div>\n" );
+			}
+
+			map.put("html", html.toString());
+			map.put("totalRow", 9);
+			map.put("totalPage", 1);
+			renderJson(map);
+			return;
+		}
 	}
 
 	public void refreshHistoryOrder() {
@@ -248,8 +322,7 @@ public class CustomerController extends BaseFrontController {
 
 	public List<Map<String, Object>> getCustomerType(){
 
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		String dataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(selectDataArea);
+		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(dataArea + "%");
 		List<Map<String, Object>> list = new ArrayList<>();
 
@@ -389,8 +462,7 @@ public class CustomerController extends BaseFrontController {
 		setAttr("sellerCustomer", sellerCustomer);
 		setAttr("taskId", taskId);
 
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		String dealerDataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(selectDataArea);
+		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 		List<String> custTypeNameList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeNameListBySellerCustomerId(id, dealerDataArea);
 		String custTypeNames = Joiner.on(",").skipNulls().join(custTypeNameList);
 		setAttr("custTypeNames", custTypeNames);
@@ -430,7 +502,7 @@ public class CustomerController extends BaseFrontController {
 					, sellerCustomer.getStr("country_code"));
 			src.setAreaCode(areaCode);
 
-			src.setCustTypeNameList(CustomerJoinCustomerTypeQuery.me().findCustomerTypeNameListBySellerCustomerId(id, DataAreaUtil.getDealerDataAreaByCurUserDataArea(selectDataArea)));
+			src.setCustTypeNameList(CustomerJoinCustomerTypeQuery.me().findCustomerTypeNameListBySellerCustomerId(id, getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString()));
 
 			List<String> diffAttrList = BeanCompareUtils.contrastObj(src, dest);
 			setAttr("diffAttrList", diffAttrList);
@@ -544,7 +616,7 @@ public class CustomerController extends BaseFrontController {
 				sellerCustomer.setIsArchive(1);
 				sellerCustomer.setImageListStore(customerVO.getImageListStore());
 
-				String deptDataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea());
+				String deptDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 				Department department =  DepartmentQuery.me().findByDataArea(deptDataArea);
 				sellerCustomer.setDataArea(deptDataArea);
 				sellerCustomer.setDeptId(department.getId());
@@ -742,7 +814,7 @@ public class CustomerController extends BaseFrontController {
 		sellerCustomer.setCustomerKind("100401");
 		sellerCustomer.setStatus(status);
 
-		String deptDataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea());
+		String deptDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 		Department department = DepartmentQuery.me().findByDataArea(deptDataArea);
 		sellerCustomer.setDataArea(deptDataArea);
 		sellerCustomer.setDeptId(department.getId());
