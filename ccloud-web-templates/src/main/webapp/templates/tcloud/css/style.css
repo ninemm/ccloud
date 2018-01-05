@@ -538,9 +538,9 @@ a {
 }
 
 .layer-pop-show {
-  opacity: 1;
-  visibility: visible;
-  z-index: 900;
+  opacity: 1!important;
+  visibility: visible!important;
+  z-index: 900!important;
 }
 
 .weui-panel:before {
@@ -596,6 +596,71 @@ a {
   font-size: .8rem;
   background: #ea6f5a;
   color: #fff;
+}
+
+.top-right-menu-btn {
+  height: inherit;
+  width: 2rem;
+  position: absolute;
+  right: .9rem;
+}
+
+.top-right-menu {
+  background: rgba(0, 0, 0, 0.6);
+  position: absolute;
+  width: 6rem;
+  right: .5rem;
+  top: 2.4rem;
+  z-index: 800;
+  font-size: .7rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: all .3s;
+}
+
+.top-right-menu-layer {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0);
+}
+
+.top-right-menu::before {
+  content: ' ';
+  width: 0;
+  height: 0;
+  border-left: .3rem solid transparent;
+  border-right: .3rem solid transparent;
+  border-bottom: .6rem solid rgba(0, 0, 0, 0.6);
+  position: absolute;
+  top: -.58rem;
+  right: 1.1rem;
+}
+
+.top-right-menu ul {
+  padding: 0 0.5rem;
+}
+
+.top-right-menu li {
+  position: relative;
+  height: 2rem;
+  line-height: 2rem;
+}
+
+.top-right-menu li::before {
+  content: ' ';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.top-right-menu li:first-child::before {
+  content: none;
 }
 
 .index-footer {
@@ -874,8 +939,9 @@ a {
   height: 2rem;
   line-height: 2rem;
   font-size: 0.7rem;
-  display: flex;
-  justify-content: space-between;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 1;
 }
 
 .product_unit {
