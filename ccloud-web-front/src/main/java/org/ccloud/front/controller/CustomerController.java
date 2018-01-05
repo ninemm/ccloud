@@ -18,7 +18,6 @@ import org.ccloud.model.query.*;
 import org.ccloud.model.vo.CustomerVO;
 import org.ccloud.model.vo.ImageJson;
 import org.ccloud.route.RouterMapping;
-import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.wechat.WechatJSSDKInterceptor;
 import org.ccloud.workflow.service.WorkFlowService;
 import org.joda.time.DateTime;
@@ -63,7 +62,6 @@ public class CustomerController extends BaseFrontController {
 
 	public void getCustomerRegionAndType() {
 
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
 		List<Record> userList = UserQuery.me().findNextLevelsUserList(selectDataArea);
@@ -80,7 +78,7 @@ public class CustomerController extends BaseFrontController {
 			region.add(item);
 		}
 
-		String dataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea());
+		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(dataArea + "%");
 		List<Map<String, Object>> customerTypeList2 = new ArrayList<>();
 		customerTypeList2.add(all);
@@ -201,15 +199,15 @@ public class CustomerController extends BaseFrontController {
 				html.append("					<p><i class=\"icon-phone green\"></i></p>\n");
 				html.append("					<p>电话</p>\n");
 				html.append("				</a>\n");
-				html.append("				<a class=\"weui-flex__item\" href=\"/customer/historyOrder?sellerCustomerId=" + customer.get("sellerCustomerId").toString() + "&customerName=" + customer.get("customer_name").toString() + "\">\n");
+				html.append("				<a class=\"weui-flex__item\" href=\"/customer/historyOrder?sellerCustomerId=" + customer.get("id").toString() + "&customerName=" + customer.get("customer_name").toString() + "\">\n");
 				html.append("					<p><i class=\"icon-file-text-o blue\"></i></p>\n");
 				html.append("					<p>订单</p>\n");
 				html.append("				</a>\n");
-				html.append("				<a class=\"weui-flex__item\" href=\"/customerVisit?id=" + customer.get("sellerCustomerId").toString() +"&name=" + customer.get("customer_name").toString() + "\">\n");
+				html.append("				<a class=\"weui-flex__item\" href=\"/customerVisit?id=" + customer.get("id").toString() +"&name=" + customer.get("customer_name").toString() + "\">\n");
 				html.append("					<p><i class=\"icon-paw\" style=\"color:#ff9800\"></i></p>\n");
 				html.append("					<p>拜访</p>\n");
 				html.append("				</a>\n");
-				html.append("				<a class=\"weui-flex__item relative\" href=\"/customer/edit?sellerCustomerId=" + customer.get("sellerCustomerId").toString() + "\">\n");
+				html.append("				<a class=\"weui-flex__item relative\" href=\"/customer/edit?sellerCustomerId=" + customer.get("id").toString() + "\">\n");
 				html.append("					<i class=\"icon-chevron-right gray\"></i>\n");
 				html.append("				</a>\n");
 				html.append("			</div>\n");
@@ -218,12 +216,12 @@ public class CustomerController extends BaseFrontController {
 				html.append("	<hr />\n");
 				html.append("	<div class=\"operate-btn\">\n");
 				html.append("		<div class=\"button white-button fl border-1px\" onclick=\"newVisit({customerName:'" + customer.get("customer_name").toString() + "',\n" +
-						"                                                                     sellerCustomerId:'" + customer.get("sellerCustomerId").toString() + "',\n" +
+						"                                                                     sellerCustomerId:'" + customer.get("id").toString() + "',\n" +
 						"                                                                     contact:'" + customer.get("contact").toString() + "',\n" +
 						"                                                                     mobile:'" + customer.get("mobile").toString() + "',\n" +
 						"                                                                     address:'" + customer.get("address").toString() + "'})\">客户拜访</div>\n");
 				html.append("		<div class=\"button red-button fr\" onclick=\"newOrder({customerName:'" + customer.get("customer_name").toString() + "',\n" +
-						"                                                                    sellerCustomerId:'" + customer.get("sellerCustomerId").toString() + "',\n" +
+						"                                                                    sellerCustomerId:'" + customer.get("id").toString() + "',\n" +
 						"                                                                    contact:'" + customer.get("contact").toString() + "',\n" +
 						"                                                                    mobile:'" + customer.get("mobile").toString() + "',\n" +
 						"                                                                    address:'" + customer.get("address").toString() + "'})\" >下订单</div>\n");
@@ -324,8 +322,7 @@ public class CustomerController extends BaseFrontController {
 
 	public List<Map<String, Object>> getCustomerType(){
 
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		String dataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(selectDataArea);
+		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(dataArea + "%");
 		List<Map<String, Object>> list = new ArrayList<>();
 
@@ -465,8 +462,7 @@ public class CustomerController extends BaseFrontController {
 		setAttr("sellerCustomer", sellerCustomer);
 		setAttr("taskId", taskId);
 
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		String dealerDataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(selectDataArea);
+		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 		List<String> custTypeNameList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeNameListBySellerCustomerId(id, dealerDataArea);
 		String custTypeNames = Joiner.on(",").skipNulls().join(custTypeNameList);
 		setAttr("custTypeNames", custTypeNames);
@@ -506,7 +502,7 @@ public class CustomerController extends BaseFrontController {
 					, sellerCustomer.getStr("country_code"));
 			src.setAreaCode(areaCode);
 
-			src.setCustTypeNameList(CustomerJoinCustomerTypeQuery.me().findCustomerTypeNameListBySellerCustomerId(id, DataAreaUtil.getDealerDataAreaByCurUserDataArea(selectDataArea)));
+			src.setCustTypeNameList(CustomerJoinCustomerTypeQuery.me().findCustomerTypeNameListBySellerCustomerId(id, getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString()));
 
 			List<String> diffAttrList = BeanCompareUtils.contrastObj(src, dest);
 			setAttr("diffAttrList", diffAttrList);
@@ -620,7 +616,7 @@ public class CustomerController extends BaseFrontController {
 				sellerCustomer.setIsArchive(1);
 				sellerCustomer.setImageListStore(customerVO.getImageListStore());
 
-				String deptDataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea());
+				String deptDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 				Department department =  DepartmentQuery.me().findByDataArea(deptDataArea);
 				sellerCustomer.setDataArea(deptDataArea);
 				sellerCustomer.setDeptId(department.getId());
@@ -818,7 +814,7 @@ public class CustomerController extends BaseFrontController {
 		sellerCustomer.setCustomerKind("100401");
 		sellerCustomer.setStatus(status);
 
-		String deptDataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea());
+		String deptDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 		Department department = DepartmentQuery.me().findByDataArea(deptDataArea);
 		sellerCustomer.setDataArea(deptDataArea);
 		sellerCustomer.setDeptId(department.getId());

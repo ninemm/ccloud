@@ -1,5 +1,5 @@
 <#include "_inc/_layout.html"/>
-<#macro title>订单</#macro>
+<#macro title>提交订单</#macro>
 <#macro css> 
 	#bigNum,
 	#smallNum,
@@ -48,6 +48,30 @@ $(function() {
 		window.location.href = '${CPATH}/product/customerNearbyChose';
   }).on("touchstart","#shoppingCart",function(){
 		window.location.href = '${CPATH}/product/shoppingCart';
+  }).on("change", "#receiveType", function(){
+		var isCheck = $(this).is(':checked');
+		var products = $(".common");
+		var productList = getItemBykey("productList");
+		$.each(productList, function(index, el) {
+			var $productDetail = products.eq(index);
+			if (isCheck) {
+				$productDetail.find("#bigPrice").val(el.bigAccountPrice);
+				$productDetail.find("#smallPrice").val(el.smallAccountPrice);
+			} else {
+				$productDetail.find("#bigPrice").val(el.bigPrice);
+				$productDetail.find("#smallPrice").val(el.smallPrice);
+			}
+		});
+		
+		var $remark = $("#remark");
+		var re = $remark.val();
+		if (isCheck && re.indexOf("账期") == -1) {
+			$remark.val("账期 " + re);
+		} else if ((!isCheck) && re.indexOf("账期") != -1) {
+			$remark.val(re.replace(/账期 /g, ""));
+		}
+
+		total();
   });
 
   initCustomer();
@@ -57,7 +81,30 @@ $(function() {
   initProduct();
   initProductComposition();
   total();
-
+  
+  //客户选择部分
+  $(document).on("input", "#searchInput", function() {
+        combo();
+  }).on("input", "#searchCancel", function() {
+        combo();
+  }).on("change", "#userId", function() {
+        combo();
+  }).on("change", "#customerTypeId", function() {
+        combo();
+  }).on("touchend", "#customerInfo", function() {
+		var el = $(this);
+        var customerInfo = {
+        	customerName : el.find("#customerName").text(),
+        	sellerCustomerId : el.find("#sellerCustomerId").val(),
+        	contact : el.find("#contact").val(),
+        	mobile : el.find("#mobile").val(),
+        	address : el.find("#address").val()
+        }
+        setItemBykey("customerInfo", customerInfo);
+        initCustomer();
+        closeCombinSearch();
+  });
+   combo();
 })
 	var $form = $('#form');
 	var newHtml = $(".common").eq(0).html();
@@ -95,16 +142,21 @@ $(function() {
 					});
 
 					var $customerTypeName = $("#customerTypeName");
-					$customerTypeName.select({
-				         title: "客户类型",
-				         items: items,
-				         onChange: function(data) {
-				         	$("#customerType").val(customerTypeInfoMap[data.values].id);
-					        $("#customerTypeCode").val(customerTypeInfoMap[data.values].code);
-					        $("#factor").val(customerTypeInfoMap[data.values].factor);
-					        $("#proc_def_key").val(customerTypeInfoMap[data.values].proc_def_key);
-				         }
-			        });
+					if($customerTypeName.data('values') === undefined){
+						$customerTypeName.select({
+					         title: "客户类型",
+					         items: items,
+					         onChange: function(data) {
+					         	$("#customerType").val(customerTypeInfoMap[data.values].id);
+						        $("#customerTypeCode").val(customerTypeInfoMap[data.values].code);
+						        $("#factor").val(customerTypeInfoMap[data.values].factor);
+						        $("#proc_def_key").val(customerTypeInfoMap[data.values].proc_def_key);
+					         }
+				        });
+			        }else{
+			        	$customerTypeName.select("update", {items : items})
+			        }
+			        
 			        $customerTypeName.val(items[0].title);
 			        $customerTypeName.attr('data-values', items[0].value);
 	
@@ -306,6 +358,87 @@ $(function() {
 			}
 		});
 	}
+	
+	//---------------------------------------------------------客户选择部分----------------------------------------------------------
+	$("#userId").select({
+     title: "选择业务员",
+     items: ${userIds!}
+    });
+
+	$("#customerTypeId").select({
+     title: "选择客户类型",
+     items: ${customerTypes!}
+    });
+    
+	var customerHtml = $(".customerSelect").eq(0).html();
+	var $loading = $("#loading");
+	var $noMore = $("#noMore");
+	var loading = false;
+    
+    var keyword = '';
+    var page = 1;
+	var size = 10;
+
+	var $customerList = $("#customerList");
+	$customerList.empty();
+
+	function initCustomerSelect() {
+
+		$loading.show();
+		$noMore.hide();
+
+	    var params = {
+		    "page": page,
+	        "size": size,
+	        "keyword": $("#searchInput").val(),
+	        "userId": $("#userId").data('values'),
+	        "customerTypeId": $("#customerTypeId").data('values'),
+	        "isOrdered": $("#isOrdered").data('values')
+	    }
+
+		Utils.ajax('${CPATH}/product/customerList', params, 
+			function(data){
+				if(data.customerList.length == 0){
+					$loading.hide();
+					$noMore.show();
+					loading = true;
+					return;
+				}
+				$.each(data.customerList, function(index, el) {
+					$customerList.append("<div class='weui-panel weui-panel_access customerSelect'>" + customerHtml + "</div>");
+					var $newCustomer = $customerList.find(".weui-panel:last");
+					$newCustomer.find("#customerName").text(el.customer_name);
+					$newCustomer.find("#contactP").text(el.contact + "/" + el.mobile);
+					$newCustomer.find("#addressSpan").text(el.prov_name + " " + el.city_name + " " + el.country_name + " " + el.address);
+
+					$newCustomer.find("#sellerCustomerId").val(el.id);
+					$newCustomer.find("#contact").val(el.contact);
+					$newCustomer.find("#mobile").val(el.mobile);
+					$newCustomer.find("#address").val(el.prov_name + " " + el.city_name + " " + el.country_name + " " + el.address);
+				});
+				page++;
+				loading = false;
+			}
+		);
+    }
+
+	//滑动方法
+	$("#infinite").infinite().on("infinite", function() {
+		if(loading) {
+			return;
+		}
+		loading = true;
+		initCustomerSelect();
+	});
+	
+	function combo() {
+		$customerList.empty();
+		loading = false;
+		page = 1;
+		initCustomerSelect();
+	}
+	
+	
 </#macro>
 
 <@layout>
@@ -391,7 +524,7 @@ $(function() {
 				<section class="weui-panel weui-panel_access ft14">
 					<div class="weui-cell weui-cell_access">
 						<div class="weui-cell__bd" style="justify-content:flex-start">
-							<input type="checkbox" name="receiveType" value="0" style="margin-right:.5rem;margin-top:.7rem" class="weui-agree__checkbox"> 
+							<input type="checkbox" id="receiveType" name="receiveType" value="0" style="margin-right:.5rem;margin-top:.7rem" class="weui-agree__checkbox"> 
 							<span>是否账期</span>
 						</div>
 					</div>
@@ -399,7 +532,7 @@ $(function() {
 				<section class="weui-panel weui-panel_access ft14 remark">
 					<div class="weui-cell weui-cell_access">
 						<div class="weui-cell__bd">
-							<textarea name="remark" placeholder="备注说明（70字以内）"></textarea>
+							<textarea id="remark" name="remark" placeholder="备注说明（70字以内）"></textarea>
 						</div>
 					</div>
 				</section>
@@ -529,11 +662,11 @@ $(function() {
 					<div class="head-search select-area">
 						<div class="weui-flex">
 							<div class="weui-flex__item">
-								<input type="text" id="customer-type" placeholder="客户类型" class="weui-input" readonly>
+								<input type="text" id="userId" placeholder="业务员" class="weui-input" readonly>
 								<i class="icon-sort-desc"></i>
 							</div>
 							<div class="weui-flex__item">
-								<input type="text" id="customer-nearby" placeholder="附近客户" class="weui-input" readonly>
+								<input type="text" id="customerTypeId" placeholder="客户类型" class="weui-input" readonly>
 								<i class="icon-sort-desc"></i>
 							</div>
 						</div>
@@ -541,68 +674,24 @@ $(function() {
 				</header>
 				<article id="infinite">
 					<div id="customerList">
-						<div class="weui-panel weui-panel_access">
+						<div class="weui-panel weui-panel_access customerSelect" style="display: none">
 							<div class="weui-flex">
-								<div class="weui-flex__item customer-info">
-									<p class="ft14">小张烤鱼</p>
-									<p class="gray">小张/18611111111</p>
+								<div class="weui-flex__item customer-info" id="customerInfo">
+									<p class="ft14" id="customerName"></p>
+									<p class="gray" id="contactP"></p>
+									<input type="hidden" id="sellerCustomerId" value="">
+									<input type="hidden" id="contact" value="">
+									<input type="hidden" id="mobile" value="">
+									<input type="hidden" id="address" value="">
 								</div>
 							</div>
 							<p class="gray">
 								<span class="icon-map-marker ft16 green"></span>
-								湖北省 武汉市 江汉区 德盛街
-							</p>
-						</div>
-						<div class="weui-panel weui-panel_access">
-							<div class="weui-flex">
-								<div class="weui-flex__item customer-info">
-									<p class="ft14">小张烤鱼</p>
-									<p class="gray">小张/18611111111</p>
-								</div>
-							</div>
-							<p class="gray">
-								<span class="icon-map-marker ft16 green"></span>
-								湖北省 武汉市 江汉区 德盛街
-							</p>
-						</div>
-						<div class="weui-panel weui-panel_access">
-							<div class="weui-flex">
-								<div class="weui-flex__item customer-info">
-									<p class="ft14">小张烤鱼</p>
-									<p class="gray">小张/18611111111</p>
-								</div>
-							</div>
-							<p class="gray">
-								<span class="icon-map-marker ft16 green"></span>
-								湖北省 武汉市 江汉区 德盛街
-							</p>
-						</div>
-						<div class="weui-panel weui-panel_access">
-							<div class="weui-flex">
-								<div class="weui-flex__item customer-info">
-									<p class="ft14">小张烤鱼</p>
-									<p class="gray">小张/18611111111</p>
-								</div>
-							</div>
-							<p class="gray">
-								<span class="icon-map-marker ft16 green"></span>
-								湖北省 武汉市 江汉区 德盛街
-							</p>
-						</div>
-						<div class="weui-panel weui-panel_access">
-							<div class="weui-flex">
-								<div class="weui-flex__item customer-info">
-									<p class="ft14">小张烤鱼</p>
-									<p class="gray">小张/18611111111</p>
-								</div>
-							</div>
-							<p class="gray">
-								<span class="icon-map-marker ft16 green"></span>
-								湖北省 武汉市 江汉区 德盛街
+								<span id="addressSpan"></span>
 							</p>
 						</div>
 					</div>
-					<div class="weui-loadmore" id="loading">
+					<div class="weui-loadmore" id="loading" style="display: none;">
 						<i class="weui-loading"></i>
 						<span class="weui-loadmore__tips">正在加载</span>
 					</div>

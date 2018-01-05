@@ -172,11 +172,17 @@ function initProduct(){
 				var convert = el.convert_relate;
 				var smallPrice = (bigPrice / convert).toFixed(2);
 
+				var bigAccountPrice = el.account_price;
+				var smallAccountPrice = (bigAccountPrice / convert).toFixed(2);
+
 				$newProductDetail.find("#bigPriceSpan").text('￥' + bigPrice);
 				$newProductDetail.find("#smallPriceSpan").text('￥' + smallPrice);
 				$newProductDetail.find("#bigUnitSpan").text(' / '+ el.big_unit);
 				$newProductDetail.find("#smallUnitSpan").text(' / ' + el.small_unit);
 				$newProductDetail.find("#stock").text('库存：' + el.store_count + el.big_unit);
+
+				$newProductDetail.find("#bigAccountPrice").val(bigAccountPrice);
+				$newProductDetail.find("#smallAccountPrice").val(smallAccountPrice);
 
 				$newProductDetail.find("#bigPrice").val(bigPrice);
 				$newProductDetail.find("#smallPrice").val(smallPrice);
@@ -343,7 +349,10 @@ function getProduct($el){
 		bigUnitSpan : $el.find("#bigUnitSpan").text(),
 		smallUnitSpan : $el.find("#smallUnitSpan").text(),
 		stock : $el.find("#stock").text(),
-		
+
+		bigAccountPrice : $el.find("#bigAccountPrice").val(),
+		smallAccountPrice : $el.find("#smallAccountPrice").val(),
+
 		bigPrice : $el.find("#bigPrice").val(),
 		smallPrice : $el.find("#smallPrice").val(),
 		bigUnit : $el.find("#bigUnit").val(),
@@ -463,6 +472,8 @@ function save(){
 								<input type="hidden" id="smallPrice" value="">
 								<input type="hidden" id="bigUnit" value="">
 								<input type="hidden" id="smallUnit" value="">
+								<input type="hidden" id="bigAccountPrice" value="">
+								<input type="hidden" id="smallAccountPrice" value="">
 								<input type="hidden" id="isGift" value="0">
 								<input type="hidden" id="description" value="0">
 								<input type="hidden" id="product_image_list_store" value="">
