@@ -411,6 +411,61 @@
 			}
 		});
 	}
+	
+	/*function changeMoney(obj){
+		var type = $(obj).val();
+		var $productSelect = $newTr.find("#sellProductId")
+		$productSelect.select2({
+			data: productOptionList,
+			width: "100%",
+			language: "zh-CN"
+		});
+		alert(type);
+		if(type == 1){
+			productChange($productSelect);
+		}else{
+			
+			
+			<!--切换商品的方法  -->
+			$productSelect.change (function(){
+				productChangeAccount($(this));
+			});
+	
+			<!--触发一次 -->
+			productChangeAccount($productSelect);
+		}
+	}
+	
+	function productChangeAccount(obj){
+			var product = productInfoMap[obj.val()].columns;
+
+			var $tr = obj.parent().parent().parent();
+
+			$tr.find("#productId").val(product.product_id);
+			if (product.store_count == null) {
+				$tr.find("#stock").text(0);
+			} else {
+				$tr.find("#stock").text(product.store_count);
+			}
+
+			var convert = product.convert_relate;
+			$tr.find("#convert").val(convert);
+
+			var smallPrice = (product.account_price/convert).toFixed(2);
+			var smallUnit = product.small_unit;
+
+			var bigPrice = product.account_price;
+	
+			$tr.find("#bigPrice").val(bigPrice);
+			$tr.find("#bigPrice-span").text(bigPrice);
+			$tr.find("#bigUnit-span").text(product.big_unit + "(x" + convert + smallUnit + ")");
+			
+			$tr.find("#smallPrice").val(smallPrice);
+			$tr.find("#smallPrice-span").text(smallPrice);
+			$tr.find("#smallUnit-span").text(smallUnit);
+			
+			rowTotalF(obj);
+	}*/
 </#macro>
 
 <@layout active_id=p child_active_id=c>
@@ -466,6 +521,8 @@
 									</select>
 									<input type="hidden" name="productId" id="productId" value="" />
 									<input type="hidden" name="productTotal" id="productTotal" value="" />
+									<input type="hidden" name="accountPrice" id="accountPrice" value="" />
+									<input type="hidden" name="price" id="price" value="" />
 								</div>
 							</td>
 							
@@ -572,10 +629,10 @@
 						<label class="control-label col-sm-2">收款方式:</label>
 						<div class="input-group col-md-4 col-sm-10">
 							<label class="radio-inline">
-								<input type="radio" name="receiveType" value="1" checked>现结
+								<input type="radio" name="receiveType" value="1" checked onclick = "changeMoney(this)">现结
 							</label>
 							<label class="radio-inline">
-								<input class="minimal" type="radio" name="receiveType" value="0" >应收账款
+								<input class="minimal" type="radio" name="receiveType" value="0" onclick = "changeMoney(this)">账期账款
 							</label>
 						</div>
 					</div>

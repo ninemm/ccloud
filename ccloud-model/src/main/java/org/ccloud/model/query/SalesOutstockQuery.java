@@ -245,6 +245,8 @@ public class SalesOutstockQuery extends JBaseQuery {
 		fromBuilder.append("left join cc_seller_customer cc ON o.customer_id = cc.id ");
 		fromBuilder.append("left join cc_customer c on cc.customer_id = c.id ");
 		fromBuilder.append("left join cc_customer_type ct on o.customer_type_id = ct.id ");
+		fromBuilder.append("LEFT JOIN (SELECT IFNULL(SUM(cso.product_count),0) as outCount,IFNULL(SUM(cr.reject_product_count),0) as refundCount,cso.outstock_id FROM cc_sales_outstock_detail cso ");
+		fromBuilder.append("LEFT JOIN cc_sales_refund_instock_detail cr on cr.outstock_detail_id = cso.id GROUP BY cso.outstock_id) t2 on t2.outstock_id = o.id ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 
@@ -255,7 +257,9 @@ public class SalesOutstockQuery extends JBaseQuery {
 		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
 
 		if (needWhere) {
-			fromBuilder.append(" where 1 = 1");
+			fromBuilder.append(" where refundCount < outCount");
+		} else {
+			fromBuilder.append(" AND refundCount < outCount");
 		}
 
 		if (StrKit.notBlank(startDate)) {
