@@ -295,7 +295,7 @@
 			var smallPrice = $curTr.find("#smallPrice").val();
 			var smallNum = $curTr.find("#smallNum").val();
 			rowTotal = Number(bigPrice) * Number(bigNum) + Number(smallPrice) * Number(smallNum);
-			rowTotal.toFixed(2);
+			rowTotal = rowTotal.toFixed(2);
 		}
 		$curTr.find(".rowTotal").text(rowTotal);
 		$curTr.find("#inputRowTotal").val(rowTotal);
@@ -310,7 +310,7 @@
 			total += Number($(item).text());
 		});
 		total = total * discount
-		total.toFixed(2);
+		total = total.toFixed(2);
 		$("#total").text(total);
 		$("#inputTotal").val(total);
 	}

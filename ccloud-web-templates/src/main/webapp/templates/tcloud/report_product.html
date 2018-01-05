@@ -60,7 +60,7 @@
 		Utils.ajax('${CPATH}/report/productAmount', params, 
 			function(data){
 				$("#productCount").html((data.productCount).toFixed(2)+"件");
-				$("#totalCount").html(data.orderCount+"笔");
+				$("#orderCount").html(data.orderCount+"笔");
 				$("#totalAmount").html(data.totalAmount+"元");
 			}
 		);    	
