@@ -127,13 +127,25 @@ public class _AdminController extends JBaseController {
 		setSessionAttr("allList", SalesOrderQuery.me().getToDo(user.getUsername()).size()+CustomerVisitQuery.me().getToDo(user.getUsername()).size()+SellerCustomerQuery.me().getToDo(user.getUsername()).size());
 		
 		setAttr("identity",SecurityUtils.getSubject().isPermitted("/admin/manager"));
+		
+		String mobile = user.getMobile();
+		String change=CookieUtils.get(this, user.getMobile());
+		if (!mobile.equals(change)) {
+			if (user.getPassword().equals(EncryptUtils.encryptPassword("123456", user.getSalt()))) {
+				CookieUtils.put(this, mobile,mobile);
+				setAttr("changePassword",true);
+			}
+		}else {
+			setAttr("changePassword",false);
+		}
+		
 		render("index.html");
 	}
 	
 	@Clear(AdminInterceptor.class)
 	public void login() {
 		
-		String username = getPara("username");
+		String usernameORmobile = getPara("usernameORmobile");
 		String password = getPara("password");
 		String rememberMeStr = getPara("remember_me");
 		boolean rememberMe = false;
@@ -141,14 +153,17 @@ public class _AdminController extends JBaseController {
 			rememberMe = true;
 		}
 
-		if (!StringUtils.areNotEmpty(username, password)) {
+		if (!StringUtils.areNotEmpty(usernameORmobile, password)) {
 			render("login.html");
 			return;
 		}
 		
 		User _user;
 		try {
-			_user = UserQuery.me().findUserByUsername(username);
+			_user = UserQuery.me().findUserByMobile(usernameORmobile);
+			if (null==_user) {
+				_user = UserQuery.me().findUserByUsername(usernameORmobile);
+			}
 			password = EncryptUtils.encryptPassword(password, _user.getSalt());
 		} catch (Exception e1) {
 			
@@ -157,7 +172,7 @@ public class _AdminController extends JBaseController {
 			return;
 		}
 		Subject subject = SecurityUtils.getSubject();
-		CaptchaUsernamePasswordToken token = new CaptchaUsernamePasswordToken(username, password, rememberMe, "", "");
+		CaptchaUsernamePasswordToken token = new CaptchaUsernamePasswordToken(_user.getUsername(), password, rememberMe, "", "");
 		try {
 			subject.login(token);
 			User user = (User) subject.getPrincipal();
@@ -169,7 +184,6 @@ public class _AdminController extends JBaseController {
 				} else {
 					setSessionAttr(Consts.SESSION_SELECT_DATAAREA, user.getDataArea());
 				}
-				
 				String mobile = user.getMobile();
 				List<User> userList = UserQuery.me().findByMobile(mobile);
 				List<Map<String, String>> sellerList = Lists.newArrayList();
@@ -222,6 +236,14 @@ public class _AdminController extends JBaseController {
 			MessageKit.sendMessage(Actions.USER_LOGINED, user);
 			CookieUtils.put(this, Consts.COOKIE_LOGINED_USER, user.getId().toString());
 			setSessionAttr(Consts.SESSION_LOGINED_USER, user);
+//			String change=CookieUtils.get(this, mobile);
+//			if (!mobile.equals(change)) {
+//				if (password.equals(EncryptUtils.encryptPassword("123456", _user.getSalt()))) {
+//					CookieUtils.put(this, mobile,mobile);
+//					renderAjaxResultForSuccess("change");
+//					return;
+//				}
+//			}
 			renderJson(true);
 			//redirect("/admin/index");
 		} catch (AuthenticationException e) {

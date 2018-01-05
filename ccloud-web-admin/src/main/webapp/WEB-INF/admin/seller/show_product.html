@@ -79,7 +79,7 @@
       					return strHtml;
       				},
       			edit:false},
-      			{field: "bigPrice", title: "销售价格(大单位)", align: "center", width: '7%',
+      			{field: "bigPrice", title: "销售价格(整)", align: "center", width: '7%',
       				formatter: function(value, row, rowIndex) {
 					var strHtml = '￥<input type="text" size="9" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="bigPrice" value="'+row.price.toFixed(2)+'" onblur="changeMoney(this)"/>';
 					strHtml += '/<input type="text" size="1" readonly style="text-align:center;background-color:transparent;border:0px;" name="big_unit" value="'+row.big_unit+'"/>';
@@ -87,7 +87,7 @@
 				},
       			 edit:false},
       			 {field: "convert_relate", title: "换算", align: "center", width: '2%',edit:false},
-      			 {field: "samllPrice", title: "销售价格(小单位)", align: "center", width: '7%',
+      			 {field: "samllPrice", title: "销售价格(零)", align: "center", width: '7%',
       				formatter: function(value, row, rowIndex) {
 					var strHtml = '￥<input type="text" size="9" readonly style="text-align:center;background-color:transparent;border:0px;" name="smallPrice" value="'+(row.price/row.convert_relate).toFixed(2)+'"/>';
 					strHtml += '/<input type="text" size="1" readonly style="text-align:center;background-color:transparent;border:0px;" name="samll_unit" value="'+row.small_unit+'"/>';
@@ -101,6 +101,12 @@
 				},
 				edit:false
 				},
+				{field: "", title: "账期价格(整)", align: "center", width: '7%',
+      				formatter: function(value, row, rowIndex) {
+					var strHtml = '￥<input type="text" size="9" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="accountPrice" value="'+row.account_price+'" onblur="changeAccountPrice(this)"/>';
+					return strHtml;
+				},
+      			 edit:false},
 				{field: "bar_code", title: "条码", align: "center", width: '5%',
       				formatter: function(value, row, rowIndex) {
       				if(value==null){
@@ -111,6 +117,30 @@
 					return strHtml;
 				},
       				edit:false},
+      			{field: "", title: "是否热销", align: "center", width: '1%',
+					formatter: function(value, row, rowIndex) {
+						var strHtml = '';
+						if(row.is_hot == 1){
+							strHtml = '<input type="checkbox" name="isHot" id="isHot" value="1" checked="checked" onclick="changeHot(this)"/>';
+						}else{
+							strHtml = '<input type="checkbox" name="isHot" id="isHot" value="0" onclick="changeHot(this)"/>';
+						}
+						return strHtml;
+					},
+						edit:false
+				},
+				{field: "", title: "赠品", align: "center", width: '1%',
+					formatter: function(value, row, rowIndex) {
+						var strHtml = '';
+						if(row.is_gift == 1){
+							strHtml = '<input type="checkbox" name="isGift" id="isGift" value="1" checked="checked" onclick="changeGift(this)"/>';
+						}else{
+							strHtml = '<input type="checkbox" name="isGift" id="isGift" value="0" onclick="changeGift(this)"/>';
+						}
+						return strHtml;
+					},
+					edit:false
+				},
 				{field: "action", title: "操作", align: "center", width: '7%',
 				formatter: function(value, row, rowIndex) {
 					if(row.is_enable == 0){
@@ -155,7 +185,8 @@
 								"order_list": $(this).find('td').eq(1).find("input").val(),
 								"custom_name": $(this).find('td').eq(4).find("input").val(),
 								"price": $(this).find('td').eq(7).find("input[name='bigPrice']").val(),
-								"bar_code": $(this).find('td').eq(11).find("input").val(),
+								"account_price": $(this).find('td').eq(11).find("input").val(),
+								"bar_code": $(this).find('td').eq(12).find("input").val(),
 							};
 							orderItems.push(obj);
 		})
@@ -203,8 +234,59 @@
 	}
 	
 	function changeMoney(obj){
+		var price = $(obj).val();
+		var accountPrice = $(obj).parent().parent().find("td").eq(11).find("input").val();
+		if(price>accountPrice){
+			toastr.error('销售价格不可大于账期价格！');
+			setTimeout( function(){
+						location.reload();
+								}, 2 * 1000 );
+		}
 		var smallprice=($(obj).val()/$(obj).parent().parent().find("td").eq(8).html()).toFixed(2);
 		$(obj).parent().parent().find("td").eq(9).find("input[name='smallPrice']").val(smallprice);
+	}
+	
+	function changeAccountPrice(obj){
+		var accountPrice = $(obj).val();
+		var price = $(obj).parent().parent().find('td').eq(7).find("input[name='bigPrice']").val();
+		if(price>accountPrice){
+			toastr.error('销售价格不可大于账期价格！');
+			setTimeout( function(){
+						location.reload();
+								}, 2 * 1000 );
+		}
+	}
+	
+	function changeHot(obj){
+		var isHot = $(obj).val();
+		var id = $(obj).parent().parent().find('td').eq(0).find("input").val();
+		var url = '${CPATH}/admin/seller/upIsHot?isHot='+isHot+'&sellerProductId='+id;
+		$.get(url, function(result){
+					if(result==true){
+						toastr.success(result.message, '操作成功');
+					}else{
+						toastr.error(result.message, '操作失败');
+						setTimeout( function(){
+						location.reload();
+								}, 2 * 1000 );
+					}
+				});
+	}
+	
+	function changeGift(obj){
+		var isGift = $(obj).val();
+		var id = $(obj).parent().parent().find('td').eq(0).find("input").val();
+		var url = '${CPATH}/admin/seller/upIsGift?isGift='+isGift+'&sellerProductId='+id;
+		$.get(url, function(result){
+					if(result==true){
+						toastr.success(result.message, '操作成功');
+					}else{
+						toastr.error(result.message, '操作失败');
+						setTimeout( function(){
+						location.reload();
+								}, 2 * 1000 );
+					}
+				});
 	}
 	
 	function upIsenable(){

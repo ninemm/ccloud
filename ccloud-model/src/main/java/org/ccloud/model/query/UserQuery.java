@@ -95,14 +95,30 @@ public class UserQuery extends JBaseQuery {
 		});
 	}
 	
+	public User findUserByMobile(final String mobile) {
+		return DAO.getCache(mobile, new IDataLoader() {
+			@Override
+			public Object load() {
+				return DAO.doFindFirst("mobile = ? AND status = 1", mobile);
+			}
+		});
+	}
+	
 	public List<User> findByWechatOpenid(final String openid) {
 		return DAO.doFind("wechat_open_id = ? AND status = 1", openid);
 //		return DAO.doFindByCache(User.CACHE_NAME, openid, "wechat_open_id = ? AND status = 1", openid);
 	}
 	
-	public List<User> findByMobile(final String mobile) {
-		return DAO.doFindByCache(User.CACHE_NAME, mobile, "mobile = ? AND status = 1", mobile);
+	public List<User> findByMobile(String mobile) {
+		StringBuilder sqlBuilder = new StringBuilder("select * ");
+		sqlBuilder.append("from `user` ");
+		sqlBuilder.append("where mobile = ? AND status = 1");
+		return DAO.find(sqlBuilder.toString(), mobile);
 	}
+	
+//	public List<User> findByMobile(final String mobile) {
+//		return DAO.doFindByCache(User.CACHE_NAME, mobile, "mobile = ? AND status = 1", mobile);
+//	}
 	
 	public List<User> findByMobileOrWechatOpenid(String value) {
 		return DAO.doFindByCache(User.CACHE_NAME, value, "(mobile = ? OR wechat_open_id = ?) AND status = 1", value, value);

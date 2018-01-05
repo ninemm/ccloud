@@ -81,7 +81,7 @@ public class SellerProductQuery extends JBaseQuery {
 	}
 
 	public Page<SellerProduct> paginate_sel(int pageNumber, int pageSize,String keyword,String userId) {
-		String select = "SELECT csp.id,csp.product_id,csp.bar_code,csp.qrcode_url,cgc.name as cgc_name,cp.name as productName, csp.custom_name,csp.store_count,csp.price,cp.big_unit,cp.small_unit,cp.convert_relate,csp.is_enable, csp.order_list ,GROUP_CONCAT(distinct cgs.`name` order by css.id) AS cps_name";
+		String select = "SELECT csp.*,cgc.name as cgc_name,cp.name as productName, csp.custom_name,csp.store_count,csp.price,cp.big_unit,cp.small_unit,cp.convert_relate,csp.is_enable, csp.order_list ,GROUP_CONCAT(distinct cgs.`name` order by css.id) AS cps_name";
 		StringBuilder fromBuilder = new StringBuilder("from cc_seller_product csp LEFT JOIN cc_product cp ON  csp.product_id = cp.id LEFT JOIN cc_product_goods_specification_value cpg ON  cp.id = cpg.product_set_id "
 				+ " LEFT JOIN cc_goods_specification_value cgs ON cpg.goods_specification_value_set_id = cgs.id "
 				+ " LEFT JOIN cc_goods_specification css on css.id = cgs.goods_specification_id "
@@ -137,7 +137,7 @@ public class SellerProductQuery extends JBaseQuery {
 	
 	public List<Record> findProductListForApp(String sellerId, String keyword) {
 		StringBuilder fromBuilder = new StringBuilder(
-				" SELECT sp.id AS sell_product_id, sp.product_id, sp.custom_name, sp.store_count, sp.price, p.convert_relate, p.product_sn, p.big_unit, p.small_unit, p.description, t1.valueName, g.`name` AS goodsName, g.product_image_list_store, gc.`name` AS categoryName, gt.`id` as typeId, gt.`name` as typeName ");
+				" SELECT sp.id AS sell_product_id, sp.product_id, sp.custom_name, sp.store_count, sp.price, sp.account_price, p.convert_relate, p.product_sn, p.big_unit, p.small_unit, p.description, t1.valueName, g.`name` AS goodsName, g.product_image_list_store, gc.`name` AS categoryName, gt.`id` as typeId, gt.`name` as typeName ");
 		fromBuilder.append(" FROM cc_seller_product sp JOIN cc_product p ON sp.product_id = p.id ");
 		fromBuilder.append(" LEFT JOIN (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv.`name`) AS valueName FROM cc_goods_specification_value sv RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id ) t1 ON t1.product_set_id = p.id ");
 		fromBuilder.append(" JOIN cc_goods g ON p.goods_id = g.id JOIN cc_goods_category gc ON g.goods_category_id = gc.id JOIN cc_goods_type gt on g.goods_type_id = gt.id ");
