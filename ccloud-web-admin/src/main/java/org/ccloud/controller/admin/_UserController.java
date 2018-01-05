@@ -39,6 +39,7 @@ import org.ccloud.model.Group;
 import org.ccloud.model.Station;
 import org.ccloud.model.User;
 import org.ccloud.model.UserGroupRel;
+import org.ccloud.model.UserHistory;
 import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.GroupQuery;
 import org.ccloud.model.query.StationQuery;
@@ -244,11 +245,13 @@ public class _UserController extends JBaseCRUDController<User> {
 	public void enable() {
 		String id = getPara("id");
 		User user = UserQuery.me().findById(id);
+		UserHistory userHistory = new UserHistory();
 		if (user.getStatus() == 0) {
 			user.setStatus(1);
 		} else {
 			user.setStatus(0);
 			user.setUnableDate(new Date());
+			
 		}
 		user.update();
 		renderAjaxResultForSuccess("更新成功");
@@ -546,5 +549,40 @@ public class _UserController extends JBaseCRUDController<User> {
         List<Map<String, Object>> list = DepartmentQuery.me().findDepartmentListAsTree(1, dataArea);
         setAttr("treeData", JSON.toJSON(list));
     }*/
-	
+	@RequiresPermissions(value = { "/admin/user/edit", "/admin/all" }, logical = Logical.OR)
+	public void leave() {
+		String id = getPara("id");
+		User user = UserQuery.me().findById(id);
+		UserHistory userHistory = new UserHistory();
+		userHistory.setId(user.getId());
+		userHistory.setUsername(user.getUsername());
+		userHistory.setRealname(user.getRealname());
+		userHistory.setNickname(user.getNickname());
+		userHistory.setMobile(user.getMobile());
+		userHistory.setPassword(user.getPassword());
+		userHistory.setAvatar(user.getAvatar());
+		userHistory.setSalt(user.getSalt());
+		userHistory.setStatus(user.getStatus());
+		userHistory.setUnableDate(new Date());
+		userHistory.setDepartmentId(user.getDepartmentId());
+		userHistory.setDepartmentName(user.getDepartmentName());
+		userHistory.setStationId(user.getStationId());
+		userHistory.setStationName(user.getStationName());
+		userHistory.setGroupId(user.getGroupId());
+		userHistory.setGroupName(user.getGroupName());
+		userHistory.setDeptIds(user.getDeptIds());
+		userHistory.setDeptNames(user.getDeptNames());
+		userHistory.setUserIds(user.getUserIds());
+		userHistory.setUserNames(user.getUserNames());
+		userHistory.setDataArea(user.getDataArea());
+		userHistory.setWechatOpenId(user.getWechatOpenId());
+		userHistory.setWechatUserid(user.getWechatUseriId());
+		userHistory.setCreateDate(new Date());
+		userHistory.save();
+		
+		user.setUnableDate(new Date());
+		user.setStatus(0);
+		user.update();
+		renderAjaxResultForSuccess("更新成功");
+	}
 }

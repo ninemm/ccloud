@@ -99,6 +99,11 @@
 				stringLength: { max: 15, message: '联系人名称最大长度是15字符，请重新输入' }
 			}
 		},
+		'seller_type': {
+			validators: {
+				notEmpty: { message: '产品类型不能为空' }
+			}
+		},
 		'seller.jywx_open_id': {
 			validators: {
 				notEmpty: { message: '带*的企业微信号不能为空' },
@@ -241,6 +246,20 @@
 								<input class="form-control input-sm" type="text" readonly name="seller.seller_code" value="${(seller.seller_code)!}">
 							</div>
 						</div>
+						</#if>
+						<#if !(seller.id) ??>
+						<@shiro.hasPermission name="/admin/all">
+						<div class="form-group col-sm-12 validata-box">
+										<label class="control-label col-sm-2">*销售商类型:</label>
+										<div class="input-group col-md-4 col-sm-10">
+											<select class="form-control input-sm" name="seller_type" id="seller_type">
+												<option value="" selected="selected">--请选择--</option>
+												<option value="0">经销商</option>
+												<option value="1">直营商</option>
+											</select>
+						               	</div>
+						</div>							
+						</@shiro.hasPermission>	
 						</#if>
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">*联系人:</label>
