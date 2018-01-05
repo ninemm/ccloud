@@ -774,5 +774,33 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		sPro.setCreateDate(date);
 		sPro.save();
 	}
+	
+	public void upIsHot() {
+		String isHot = getPara("isHot");
+		String sellerProductId = getPara("sellerProductId");
+		SellerProduct sellerProduct = SellerProductQuery.me().findById(sellerProductId);
+		if(isHot.equals("1")) {
+			sellerProduct.setIisHot(0);
+		}else {
+			sellerProduct.setIisHot(1);
+		}
+		boolean success = false;
+		success = sellerProduct.update();
+		renderJson(success);
+	}
+	
+	public void upIsGift() {
+		String isGift = getPara("isGift");
+		String sellerProductId = getPara("sellerProductId");
+		SellerProduct sellerProduct = SellerProductQuery.me().findById(sellerProductId);
+		if(isGift.equals("1")) {
+			sellerProduct.setIsGift(0);
+		}else {
+			sellerProduct.setIsGift(1);
+		}
+		boolean success = false;
+		success = sellerProduct.update();
+		renderJson(success);
+	}
 }
 

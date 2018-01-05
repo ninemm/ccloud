@@ -103,7 +103,7 @@
 				},
 				{field: "", title: "账期价格(整)", align: "center", width: '7%',
       				formatter: function(value, row, rowIndex) {
-					var strHtml = '￥<input type="text" size="9" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="accountPrice" value="'+row.account_price+'"/>';
+					var strHtml = '￥<input type="text" size="9" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="accountPrice" value="'+row.account_price+'" onblur="changeAccountPrice(this)"/>';
 					return strHtml;
 				},
       			 edit:false},
@@ -121,7 +121,7 @@
 					formatter: function(value, row, rowIndex) {
 						var strHtml = '';
 						if(row.is_hot == 1){
-							strHtml = '<input type="checkbox" name="isHot" id="isHot" value="1" checked="checked" onblur="changeHot(this)"/>';
+							strHtml = '<input type="checkbox" name="isHot" id="isHot" value="1" checked="checked" onclick="changeHot(this)"/>';
 						}else{
 							strHtml = '<input type="checkbox" name="isHot" id="isHot" value="0" onclick="changeHot(this)"/>';
 						}
@@ -131,7 +131,12 @@
 				},
 				{field: "", title: "赠品", align: "center", width: '1%',
 					formatter: function(value, row, rowIndex) {
-						var strHtml = '<input type="checkbox" name="isGift" id="isGift" value="'+row.id+'"/>';
+						var strHtml = '';
+						if(row.is_gift == 1){
+							strHtml = '<input type="checkbox" name="isGift" id="isGift" value="1" checked="checked" onclick="changeGift(this)"/>';
+						}else{
+							strHtml = '<input type="checkbox" name="isGift" id="isGift" value="0" onclick="changeGift(this)"/>';
+						}
 						return strHtml;
 					},
 					edit:false
@@ -229,21 +234,59 @@
 	}
 	
 	function changeMoney(obj){
+		var price = $(obj).val();
+		var accountPrice = $(obj).parent().parent().find("td").eq(11).find("input").val();
+		if(price>accountPrice){
+			toastr.error('销售价格不可大于账期价格！');
+			setTimeout( function(){
+						location.reload();
+								}, 2 * 1000 );
+		}
 		var smallprice=($(obj).val()/$(obj).parent().parent().find("td").eq(8).html()).toFixed(2);
-		alert("1");
 		$(obj).parent().parent().find("td").eq(9).find("input[name='smallPrice']").val(smallprice);
+	}
+	
+	function changeAccountPrice(obj){
+		var accountPrice = $(obj).val();
+		var price = $(obj).parent().parent().find('td').eq(7).find("input[name='bigPrice']").val();
+		if(price>accountPrice){
+			toastr.error('销售价格不可大于账期价格！');
+			setTimeout( function(){
+						location.reload();
+								}, 2 * 1000 );
+		}
 	}
 	
 	function changeHot(obj){
 		var isHot = $(obj).val();
-		/*$.get(url, function(result){
-					if (result.errorCode > 0) {
+		var id = $(obj).parent().parent().find('td').eq(0).find("input").val();
+		var url = '${CPATH}/admin/seller/upIsHot?isHot='+isHot+'&sellerProductId='+id;
+		$.get(url, function(result){
+					if(result==true){
+						toastr.success(result.message, '操作成功');
+					}else{
 						toastr.error(result.message, '操作失败');
-					} else {
+						setTimeout( function(){
 						location.reload();
+								}, 2 * 1000 );
 					}
-				});*/
-		alert(isHot);
+				});
+	}
+	
+	function changeGift(obj){
+		var isGift = $(obj).val();
+		var id = $(obj).parent().parent().find('td').eq(0).find("input").val();
+		var url = '${CPATH}/admin/seller/upIsGift?isGift='+isGift+'&sellerProductId='+id;
+		$.get(url, function(result){
+					if(result==true){
+						toastr.success(result.message, '操作成功');
+					}else{
+						toastr.error(result.message, '操作失败');
+						setTimeout( function(){
+						location.reload();
+								}, 2 * 1000 );
+					}
+				});
 	}
 	
 	function upIsenable(){
