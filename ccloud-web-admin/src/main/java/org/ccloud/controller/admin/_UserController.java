@@ -44,6 +44,7 @@ import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.GroupQuery;
 import org.ccloud.model.query.StationQuery;
 import org.ccloud.model.query.UserGroupRelQuery;
+import org.ccloud.model.query.UserHistoryQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.vo.UserExecel;
 import org.ccloud.route.RouterMapping;
@@ -245,13 +246,40 @@ public class _UserController extends JBaseCRUDController<User> {
 	public void enable() {
 		String id = getPara("id");
 		User user = UserQuery.me().findById(id);
-		UserHistory userHistory = new UserHistory();
+		UserHistory userHistory = UserHistoryQuery.me().findById(user.getId());
 		if (user.getStatus() == 0) {
 			user.setStatus(1);
 		} else {
 			user.setStatus(0);
 			user.setUnableDate(new Date());
-			
+			if(userHistory == null) {
+				userHistory = new UserHistory();
+				userHistory.setId(user.getId());
+				userHistory.setUsername(user.getUsername());
+				userHistory.setRealname(user.getRealname());
+				userHistory.setNickname(user.getNickname());
+				userHistory.setMobile(user.getMobile());
+				userHistory.setPassword(user.getPassword());
+				userHistory.setAvatar(user.getAvatar());
+				userHistory.setSalt(user.getSalt());
+				userHistory.setStatus(user.getStatus());
+				userHistory.setUnableDate(new Date());
+				userHistory.setDepartmentId(user.getDepartmentId());
+				userHistory.setDepartmentName(user.getDepartmentName());
+				userHistory.setStationId(user.getStationId());
+				userHistory.setStationName(user.getStationName());
+				userHistory.setGroupId(user.getGroupId());
+				userHistory.setGroupName(user.getGroupName());
+				userHistory.setDeptIds(user.getDeptIds());
+				userHistory.setDeptNames(user.getDeptNames());
+				userHistory.setUserIds(user.getUserIds());
+				userHistory.setUserNames(user.getUserNames());
+				userHistory.setDataArea(user.getDataArea());
+				userHistory.setWechatOpenId(user.getWechatOpenId());
+				userHistory.setWechatUserid(user.getWechatUseriId());
+				userHistory.setCreateDate(new Date());
+				userHistory.save();
+			}
 		}
 		user.update();
 		renderAjaxResultForSuccess("更新成功");
@@ -549,7 +577,7 @@ public class _UserController extends JBaseCRUDController<User> {
         List<Map<String, Object>> list = DepartmentQuery.me().findDepartmentListAsTree(1, dataArea);
         setAttr("treeData", JSON.toJSON(list));
     }*/
-	@RequiresPermissions(value = { "/admin/user/edit", "/admin/all" }, logical = Logical.OR)
+	/*@RequiresPermissions(value = { "/admin/user/edit", "/admin/all" }, logical = Logical.OR)
 	public void leave() {
 		String id = getPara("id");
 		User user = UserQuery.me().findById(id);
@@ -584,5 +612,5 @@ public class _UserController extends JBaseCRUDController<User> {
 		user.setStatus(0);
 		user.update();
 		renderAjaxResultForSuccess("更新成功");
-	}
+	}*/
 }

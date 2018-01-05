@@ -140,7 +140,7 @@ public class SalesOrderQuery extends JBaseQuery {
 
 	public List<Record> findProductListBySeller(String sellerId) {
 		StringBuilder fromBuilder = new StringBuilder(
-				" SELECT sg.id, sg.product_id, sg.custom_name, sg.store_count, sg.price, sg.warehouse_id, t1.valueName, p.big_unit, p.small_unit, p.convert_relate ");
+				" SELECT sg.id, sg.product_id, sg.custom_name, sg.store_count,sg.account_price, sg.price, sg.warehouse_id, t1.valueName, p.big_unit, p.small_unit, p.convert_relate ");
 		fromBuilder.append("FROM cc_seller_product sg ");
 		fromBuilder.append("LEFT JOIN cc_product p ON sg.product_id = p.id ");
 		fromBuilder.append(
