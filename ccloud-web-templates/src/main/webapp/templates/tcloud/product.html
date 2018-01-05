@@ -147,19 +147,19 @@ var $menuRight = $(".menu-right");
 function initProduct(){
 	$sidebar.empty();
 	$menuRight.empty();
-	var typeId = '';
+	var categoryId = '';
 	Utils.ajax('${CPATH}/product/productList', {'keyword': keyword}, 
 		function(data){
 			$.each(data.productList, function(index, el) {
-				if(typeId != el.typeId) {
-					if(typeId == '') {
-						$sidebar.append("<li id='" + el.typeId + "' class='active'>" + el.typeName + " <span class='goods-num'>8</span> </li>");
-						$menuRight.append("<div class='type' id='" + el.typeId + "' > </div>")
+				if(categoryId != el.categoryId) {
+					if(categoryId == '') {
+						$sidebar.append("<li id='" + el.categoryId + "' class='active'>" + el.categoryName + " <span class='goods-num'>8</span> </li>");
+						$menuRight.append("<div class='type' id='" + el.categoryId + "' > </div>")
 					} else {
-						$sidebar.append("<li id='" + el.typeId + "'>" + el.typeName + " <span class='goods-num'>8</span> </li>");
-						$menuRight.append("<div class='type' id='" + el.typeId + "' style='display:none'> </div>")
+						$sidebar.append("<li id='" + el.categoryId + "'>" + el.categoryName + " <span class='goods-num'>8</span> </li>");
+						$menuRight.append("<div class='type' id='" + el.categoryId + "' style='display:none'> </div>")
 					}
-					typeId = el.typeId;
+					categoryId = el.categoryId;
 				}
 
 				var $type = $menuRight.find(".type:last");
@@ -444,7 +444,7 @@ function save(){
 			</div>
 		</header>
 		<div class="product-content">
-			<div class="swiper-container t-c">
+<!-- 			<div class="swiper-container t-c">
 				<div class="swiper-wrapper">
 					<div class="swiper-slide active">分类1</div>
 					<div class="swiper-slide">分类2</div>
@@ -452,7 +452,7 @@ function save(){
 					<div class="swiper-slide">分类4</div>
 					<div class="swiper-slide">分类5</div>
 				</div>
-			</div>
+			</div> -->
 			<div class="product-inner-content">
 				<aside>
 					<div id="sidebar" class="menu-left">
