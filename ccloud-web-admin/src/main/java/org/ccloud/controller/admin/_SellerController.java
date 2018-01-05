@@ -437,6 +437,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 						issellerProducts.set("custom_name",sellerProduct.getCustomName());
 						issellerProducts.set("order_list", sellerProduct.getOrderList());
 						issellerProducts.set("price", sellerProduct.getPrice());
+						issellerProducts.set("account_price", sellerProduct.getAccountPrice());
 						issellerProducts.set("bar_code", sellerProduct.getBarCode());
 						issellerProducts.set("modify_date", new Date());
 						

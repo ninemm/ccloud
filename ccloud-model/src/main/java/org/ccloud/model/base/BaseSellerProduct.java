@@ -249,5 +249,20 @@ public abstract class BaseSellerProduct<M extends BaseSellerProduct<M>> extends 
 	public java.util.Date getModifyDate() {
 		return get("modify_date");
 	}
+	
+	public void setAccountPrice(java.math.BigDecimal accountPrice) {
+		set("account_price", accountPrice);
+	}
 
+	public java.math.BigDecimal getAccountPrice() {
+		return get("account_price");
+	}
+	
+	public void setIisHot(java.lang.Integer isHot) {
+		set("is_hot", isHot);
+	}
+
+	public java.lang.Integer getIisHot() {
+		return getInt("is_hot");
+	}
 }
