@@ -355,7 +355,7 @@ $(function() {
 	    }
 	}).on('touchend', '#combin-filter .cancel-search-btn, #combin-filter .confirm-search-btn', function () { //关闭组合筛选
 	    closeCombinSearch();
-	}).on('touchend', '#combin-filter span', function () {
+	}).on('touchend', '#combin-filter .filter-item span', function () {
 		$(this).addClass('red-button').siblings().removeClass('red-button');
 	}).on('touchend', '.goback', function() {
 		historyUtils.back();

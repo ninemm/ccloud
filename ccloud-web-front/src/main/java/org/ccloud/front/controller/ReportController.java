@@ -26,12 +26,10 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.CustomerType;
-import org.ccloud.model.User;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SellerProductQuery;
 import org.ccloud.route.RouterMapping;
-import org.ccloud.utils.DataAreaUtil;
 
 import com.alibaba.fastjson.JSON;
 import com.jfinal.kit.StrKit;
@@ -126,7 +124,6 @@ public class ReportController extends BaseFrontController {
 	}
 	
 	public void customerDetail() {
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String dayTag = getPara("dayTag");
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
@@ -140,7 +137,7 @@ public class ReportController extends BaseFrontController {
 		customerTypes.add(all);
 
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
-				.findByDataArea(DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea()));
+				.findByDataArea(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
 		for (CustomerType customerType : customerTypeList) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", customerType.getName());
@@ -283,8 +280,7 @@ public class ReportController extends BaseFrontController {
 		if (StrKit.isBlank(sellerId)) {
 			sellerId = getSessionAttr("sellerId");
 		}
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String dataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea());
+		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 		String deptId = getPara("deptId");
 		String orderTag = getPara("orderTag");
 		List<Record> record = SalesOrderQuery.me().getUserRank(startDate, endDate, dayTag, deptId, sellerId, orderTag, dataArea);
@@ -300,8 +296,7 @@ public class ReportController extends BaseFrontController {
 		if (StrKit.isBlank(sellerId)) {
 			sellerId = getSessionAttr("sellerId");
 		}
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String dataArea = DataAreaUtil.getDealerDataAreaByCurUserDataArea(user.getDataArea());
+		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 		String deptId = getPara("deptId");
 		List<Record> record = SalesOrderQuery.me().getGiftCountByUser(startDate, endDate, dayTag, deptId, sellerId, dataArea);
 		renderJson(record);

@@ -477,9 +477,9 @@
                 </div>
             </div>
 		<#include "_inc/_goback.html" />
-		<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex border-top-1px">
+		<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
 		    <#if sellerCustomer??> 
-		        <button class="white-button-no-border weui-flex__item _submit_btn" onclick="doEnabled()">停用</button>
+		        <button class="white-button-no-border weui-flex__item _submit_btn border-top-1px" onclick="doEnabled()">停用</button>
 		        <button class="red-button weui-flex__item _submit_btn" onclick="doSubmit()">更新</button>
 		    <#else>
 		        <button class="red-button width-100 _submit_btn" onclick="doSubmit()">新增客户</button>
