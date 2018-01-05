@@ -16,6 +16,12 @@
 </#macro>
 
 <#macro script>
+function openTopRightMenu() {
+	$('.top-right-menu').addClass('layer-pop-show');
+}
+function closeTopRightMenu() {
+	$('.top-right-menu').removeClass('layer-pop-show');
+}
 $(function () {
     $(document).on('touchend', '.menu', function () {
         var $this = $(this);
@@ -23,7 +29,8 @@ $(function () {
         $this.addClass('red-button').siblings().removeClass('red-button');
         $('.index-info').find('.weui-cells:eq(' + index + ')').show().siblings().hide();
         return false;
-	});
+	}).on('touchstart', '.top-right-menu-btn', openTopRightMenu)
+	.on('touchstart', '.top-right-menu-layer', closeTopRightMenu);
 	
 	$('.week').text($.week());
     $('.day').text($.today());
@@ -42,9 +49,20 @@ $(function () {
 	<article id="home">
 		<div class="company">${(session.sellerName)!}
 		<#if (session.sellerListSize ??) &&(session.sellerListSize > 1) >
-			<a href="${CPATH}/user/choice" class="change-seller">
-					<span><i class="icon-users white" style="font-size: .8rem;position:  absolute;top: 2.6%;right:  4%;" title = "切换账套"></i></span>
+			<a class="top-right-menu-btn">
+				<span><i class="icon-exchange white" style="font-size: .8rem;" title = "切换账套"></i></span>
 			</a>
+			<div class="top-right-menu">
+				<div class="top-right-menu-layer"></div>
+				<ul>
+					<li>
+						稻花香
+					</li>
+					<li>
+						武大测试
+					</li>
+				</ul>
+			</div>
 		</#if>
 		</div>
 		<@cc.contents module="article" count="5" orderBy="created" typeSlug="notice">
