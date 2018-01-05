@@ -70,6 +70,20 @@ function reply(id){
 
 $(function(){
 
+	var changePassword = ${changePassword?c};
+	if(changePassword){
+		layer.confirm('你的密码为初始密码,您需要修改吗？', {
+			btn : ['确定', '取消']},
+			function() {
+				layer.closeAll();
+				location.href = "${CPATH}/admin/user/updatePassword";
+			},
+			function() {
+				layer.close();
+			}
+		); 
+	};
+	
 	var identity = ${identity?c};
     if(identity){
         $("#salesBoardInfo").attr('href','${CPATH}/admin/report/departSalesman?p=report&c=departSalesman');
