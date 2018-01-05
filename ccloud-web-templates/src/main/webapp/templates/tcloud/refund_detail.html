@@ -177,9 +177,11 @@ $(function() {
 						<input type="hidden" name="sellProductId" id="sellProductId" value="${(list.sell_product_id)!}">
 						<input type="hidden" id="productCount" value="${(list.product_count-list.refundCount)!}">
 						<input type="hidden" id="convert" value="${(list.convert_relate)!}">
-						<div class="product_name" id="productName">
-							${(list.custom_name)!} 
-						</div>
+						<nobr>
+							<p class="product_name" id="productName">
+								${(list.custom_name)!} 
+							</p>
+						</nobr>
 						<div class="product_unit">
 							规格：<span id="valueName">${(list.valueName)!}</span>
 						</div>
@@ -235,9 +237,11 @@ $(function() {
 				<div id="productList">
 					<#list salesRefundDetail as list>
 					<div class="weui-panel weui-panel_access goods-detail">
-						<div class="product_name" id="productName">
-							${(list.custom_name)!} 
-						</div>
+						<nobr>
+							<p class="product_name" id="productName">
+								${(list.custom_name)!} 
+							</p>
+						</nobr>
 						<div class="product_unit">
 							规格：<span id="valueName">${(list.valueName)!}</span>
 						</div>

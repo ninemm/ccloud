@@ -24,6 +24,11 @@
 	<![endif]-->
 	<!-- bootstrapValidator -->
 	<link rel="stylesheet" href="${CPATH}/static/plugins/toastr/toastr.css">
+	<!-- jQuery 2.1.4 -->
+	<script src="${CPATH}/static/plugins/jquery/jquery.min.js"></script>
+	<script src="${CPATH}/static/plugins/jquery/jquery.form.min.js"></script>
+	<!-- layer -->
+	<script src="${CPATH}/static/layer/layer.js"></script>
 </head>
 <body class="hold-transition login-page">
 	<div class="login-box">
@@ -36,8 +41,8 @@
 			<form action="${CPATH}/admin/login" method="post" id="loginform">
 					<p id="p"><i class="fa fa-exclamation-triangle"></i><span id = "uname"></span><p>
 				<div class="form-group has-feedback">
-					<label>用户名：</label> 
-					<input class="form-control" name="username" value="" id="_username">
+					<label>用户名/手机号：</label> 
+					<input class="form-control" name="usernameORmobile" value="" id="_usernameORmobile">
 					<span class="glyphicon glyphicon-user form-control-feedback"></span>
 				</div>
 				<div class="form-group has-feedback">
@@ -94,21 +99,33 @@
 						}else if(data == false){
 							$("#p").show();
 							$("#uname").show();
-							$("#uname").html("用户名/密码错误,请核对之后重新输入");
+							$("#uname").html("用户名/手机号/密码错误,请核对之后重新输入");
 							$("#uname").css("color","red");
 							$("#uname").css("margin-left","5%");
 							//toastr.error(data.message,'用户名/密码错误');
 							/* setTimeout( function(){
 								location.reload();
 										}, 2 * 1000 ); */
-						}else{
+						}/* else if(data.message == "change"){
+							layer.confirm('你的密码为初始密码,您需要修改吗？', {
+								btn : ['确定', '取消']},
+								function() {
+									layer.closeAll();
+									location.href = "${CPATH}/admin/user/updatePassword";
+								},
+								function() {
+									layer.close();
+									location.href = "${CPATH}/admin/index";
+								}
+							); 
+						} */else{
 							location.href = "${CPATH}/admin/index";
 						}
 					},
 					error : function() {
 						$("#p").show();
 						$("#uname").show();
-						$("#uname").html("用户名/密码错误,请核对之后重新输入");
+						$("#uname").html("用户名/手机号/密码错误,请核对之后重新输入");
 						$("#uname").css("color","red");
 						$("#uname").css("margin-left","5%");
 					}

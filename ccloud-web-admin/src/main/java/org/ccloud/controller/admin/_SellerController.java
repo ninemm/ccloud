@@ -187,7 +187,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			
 			
 			//添加直营商客户时 初始化数据
-			if(!user.getUsername().equals("admin")){
+			if(!user.getUsername().equals("admin") || Integer.parseInt(getPara("seller_type"))==1){
 				String customerId = StrKit.getRandomUUID();
 				//添加客户
 				customer.set("id", customerId);
@@ -200,12 +200,19 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				customer.set("create_date", new Date());
 				customer.set("status", 0);
 				customer.save();
-				
+				//找到最近的经销商
+				String sId = "";
+				if(!user.getUsername().equals("admin")) {
+					sId = getSessionAttr("sellerId").toString();
+				}else {
+					List<Department> depts = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(department.getId());
+					sId = depts.get(1).getStr("seller_id");
+				}
 				//添加直营商客户
-				this.saveSellerCustomer(customer.getId(), user, department);
+				this.saveSellerCustomer(customer.getId(), user, department,sId);
 				//初始化直营商产品
 				List<SellerProduct> sellerProducts = new ArrayList<SellerProduct>();
-				sellerProducts = SellerProductQuery.me().findBySellerId(getSessionAttr("sellerId").toString());
+				sellerProducts = SellerProductQuery.me().findBySellerId(sId);
 				for(SellerProduct sellerProduct : sellerProducts){
 					this.saveProduct(sellerProduct, seller2.getId());
 				}
@@ -430,6 +437,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 						issellerProducts.set("custom_name",sellerProduct.getCustomName());
 						issellerProducts.set("order_list", sellerProduct.getOrderList());
 						issellerProducts.set("price", sellerProduct.getPrice());
+						issellerProducts.set("account_price", sellerProduct.getAccountPrice());
 						issellerProducts.set("bar_code", sellerProduct.getBarCode());
 						issellerProducts.set("modify_date", new Date());
 						
@@ -695,11 +703,12 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		}
 	}
 	
-	public void saveSellerCustomer(String customerId,User user,Department department){
+	public void saveSellerCustomer(String customerId,User user,Department department,String sellerId){
+		
 		SellerCustomer sellerCustomer = new SellerCustomer();
 		String sellerCustomerId = StrKit.getRandomUUID();
 		sellerCustomer.set("id", sellerCustomerId);
-		sellerCustomer.set("seller_id",getSessionAttr("sellerId").toString());
+		sellerCustomer.set("seller_id",sellerId);
 		sellerCustomer.set("customer_id", customerId);
 		sellerCustomer.set("nickname", getPara("seller.seller_name"));
 		sellerCustomer.set("is_checked", 1);
@@ -764,6 +773,34 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		sPro.setOrderList(sellerProduct.getOrderList());
 		sPro.setCreateDate(date);
 		sPro.save();
+	}
+	
+	public void upIsHot() {
+		String isHot = getPara("isHot");
+		String sellerProductId = getPara("sellerProductId");
+		SellerProduct sellerProduct = SellerProductQuery.me().findById(sellerProductId);
+		if(isHot.equals("1")) {
+			sellerProduct.setIisHot(0);
+		}else {
+			sellerProduct.setIisHot(1);
+		}
+		boolean success = false;
+		success = sellerProduct.update();
+		renderJson(success);
+	}
+	
+	public void upIsGift() {
+		String isGift = getPara("isGift");
+		String sellerProductId = getPara("sellerProductId");
+		SellerProduct sellerProduct = SellerProductQuery.me().findById(sellerProductId);
+		if(isGift.equals("1")) {
+			sellerProduct.setIsGift(0);
+		}else {
+			sellerProduct.setIsGift(1);
+		}
+		boolean success = false;
+		success = sellerProduct.update();
+		renderJson(success);
 	}
 }
 

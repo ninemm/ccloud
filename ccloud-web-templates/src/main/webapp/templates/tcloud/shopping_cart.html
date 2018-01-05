@@ -103,7 +103,10 @@ function initProduct(){
 			$newProductDetail.find("#smallPriceSpan").text(el.smallPriceSpan);
 			$newProductDetail.find("#bigUnitSpan").text(el.bigUnitSpan);
 			$newProductDetail.find("#smallUnitSpan").text(el.smallUnitSpan);
-	
+
+			$newProductDetail.find("#bigAccountPrice").val(el.bigAccountPrice);
+			$newProductDetail.find("#smallAccountPrice").val(el.smallAccountPrice);
+
 			$newProductDetail.find("#bigPrice").val(el.bigPrice);
 			$newProductDetail.find("#smallPrice").val(el.smallPrice);
 			$newProductDetail.find("#bigUnit").val(el.bigUnit);
@@ -357,6 +360,9 @@ function getProduct($el){
 		smallUnitSpan : $el.find("#smallUnitSpan").text(),
 		stock : $el.find("#stock").text(),
 		
+		bigAccountPrice : $el.find("#bigAccountPrice").val(),
+		smallAccountPrice : $el.find("#smallAccountPrice").val(),
+		
 		bigPrice : $el.find("#bigPrice").val(),
 		smallPrice : $el.find("#smallPrice").val(),
 		bigUnit : $el.find("#bigUnit").val(),
@@ -431,9 +437,13 @@ function save(){
 				<input type="hidden" id="sellProductId" value="">
 				<input type="hidden" id="productId" value="">
 				<input type="hidden" id="convert" value="">
-				<div class="product_name" id="productName">
-					<!-- <span class="gift-tag">赠品</span> -->
-				</div>
+				<input type="hidden" id="bigAccountPrice" value="">
+				<input type="hidden" id="smallAccountPrice" value="">
+				<nobr>
+					<p class="product_name" id="productName">
+						<!-- <span class="gift-tag">赠品</span> -->
+					</p>
+				</nobr>
 				<div class="product_unit">
 					规格：<span id="valueName"></span>
 					<div class="fr">
@@ -516,8 +526,9 @@ function save(){
 			</div>
 			<div class="weui-panel weui-panel_access composition" style="display: none">
 				<input type="hidden" id="compositionId" value="">
-				<div class="product_name" id="compositionName">
-				</div>
+				<nobr>
+					<p class="product_name" id="compositionName"></p>
+				</nobr>
 				<div class="product_unit">
 					规格：<span id="compositionValueName"></span>
 				</div>

@@ -147,19 +147,19 @@ var $menuRight = $(".menu-right");
 function initProduct(){
 	$sidebar.empty();
 	$menuRight.empty();
-	var typeId = '';
+	var categoryId = '';
 	Utils.ajax('${CPATH}/product/productList', {'keyword': keyword}, 
 		function(data){
 			$.each(data.productList, function(index, el) {
-				if(typeId != el.typeId) {
-					if(typeId == '') {
-						$sidebar.append("<li id='" + el.typeId + "' class='active'>" + el.typeName + " <span class='goods-num'>8</span> </li>");
-						$menuRight.append("<div class='type' id='" + el.typeId + "' > </div>")
+				if(categoryId != el.categoryId) {
+					if(categoryId == '') {
+						$sidebar.append("<li id='" + el.categoryId + "' class='active'>" + el.categoryName + " <span class='goods-num'>8</span> </li>");
+						$menuRight.append("<div class='type' id='" + el.categoryId + "' > </div>")
 					} else {
-						$sidebar.append("<li id='" + el.typeId + "'>" + el.typeName + " <span class='goods-num'>8</span> </li>");
-						$menuRight.append("<div class='type' id='" + el.typeId + "' style='display:none'> </div>")
+						$sidebar.append("<li id='" + el.categoryId + "'>" + el.categoryName + " <span class='goods-num'>8</span> </li>");
+						$menuRight.append("<div class='type' id='" + el.categoryId + "' style='display:none'> </div>")
 					}
-					typeId = el.typeId;
+					categoryId = el.categoryId;
 				}
 
 				var $type = $menuRight.find(".type:last");
@@ -172,11 +172,17 @@ function initProduct(){
 				var convert = el.convert_relate;
 				var smallPrice = (bigPrice / convert).toFixed(2);
 
+				var bigAccountPrice = el.account_price;
+				var smallAccountPrice = (bigAccountPrice / convert).toFixed(2);
+
 				$newProductDetail.find("#bigPriceSpan").text('￥' + bigPrice);
 				$newProductDetail.find("#smallPriceSpan").text('￥' + smallPrice);
 				$newProductDetail.find("#bigUnitSpan").text(' / '+ el.big_unit);
 				$newProductDetail.find("#smallUnitSpan").text(' / ' + el.small_unit);
 				$newProductDetail.find("#stock").text('库存：' + el.store_count + el.big_unit);
+
+				$newProductDetail.find("#bigAccountPrice").val(bigAccountPrice);
+				$newProductDetail.find("#smallAccountPrice").val(smallAccountPrice);
 
 				$newProductDetail.find("#bigPrice").val(bigPrice);
 				$newProductDetail.find("#smallPrice").val(smallPrice);
@@ -343,7 +349,10 @@ function getProduct($el){
 		bigUnitSpan : $el.find("#bigUnitSpan").text(),
 		smallUnitSpan : $el.find("#smallUnitSpan").text(),
 		stock : $el.find("#stock").text(),
-		
+
+		bigAccountPrice : $el.find("#bigAccountPrice").val(),
+		smallAccountPrice : $el.find("#smallAccountPrice").val(),
+
 		bigPrice : $el.find("#bigPrice").val(),
 		smallPrice : $el.find("#smallPrice").val(),
 		bigUnit : $el.find("#bigUnit").val(),
@@ -435,7 +444,7 @@ function save(){
 			</div>
 		</header>
 		<div class="product-content">
-			<div class="swiper-container t-c">
+<!-- 			<div class="swiper-container t-c">
 				<div class="swiper-wrapper">
 					<div class="swiper-slide active">分类1</div>
 					<div class="swiper-slide">分类2</div>
@@ -443,7 +452,7 @@ function save(){
 					<div class="swiper-slide">分类4</div>
 					<div class="swiper-slide">分类5</div>
 				</div>
-			</div>
+			</div> -->
 			<div class="product-inner-content">
 				<aside>
 					<div id="sidebar" class="menu-left">
@@ -463,6 +472,8 @@ function save(){
 								<input type="hidden" id="smallPrice" value="">
 								<input type="hidden" id="bigUnit" value="">
 								<input type="hidden" id="smallUnit" value="">
+								<input type="hidden" id="bigAccountPrice" value="">
+								<input type="hidden" id="smallAccountPrice" value="">
 								<input type="hidden" id="isGift" value="0">
 								<input type="hidden" id="description" value="0">
 								<input type="hidden" id="product_image_list_store" value="">
@@ -470,8 +481,9 @@ function save(){
 								<div class="product-top">
 									<img src="" id="image" style="width:2rem;" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'" onClick="imageClick(this)">
 									<div class="weui-cell_access product-top-right">
-										<div class="product_name" id="productName">
-										</div>
+										<nobr>
+											<p class="product_name" id="productName"></p>
+										</nobr>
 										<div class="product_unit">
 											规格：
 											<span id="valueName"></span>
@@ -519,8 +531,9 @@ function save(){
 								<div class="product-top">
 									<img src="" id="compositionImage" style="width:2rem;" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'" onClick="imageClick(this)">
 									<div class="weui-cell_access product-top-right">
-										<div class="product_name" id="compositionName">
-										</div>
+										<nobr>
+											<p class="product_name" id="compositionName"></p>
+										</nobr>
 										<div class="product_unit">
 											规格：
 											<span id="compositionValueName"></span>

@@ -48,6 +48,30 @@ $(function() {
 		window.location.href = '${CPATH}/product/customerNearbyChose';
   }).on("touchstart","#shoppingCart",function(){
 		window.location.href = '${CPATH}/product/shoppingCart';
+  }).on("change", "#receiveType", function(){
+		var isCheck = $(this).is(':checked');
+		var products = $(".common");
+		var productList = getItemBykey("productList");
+		$.each(productList, function(index, el) {
+			var $productDetail = products.eq(index);
+			if (isCheck) {
+				$productDetail.find("#bigPrice").val(el.bigAccountPrice);
+				$productDetail.find("#smallPrice").val(el.smallAccountPrice);
+			} else {
+				$productDetail.find("#bigPrice").val(el.bigPrice);
+				$productDetail.find("#smallPrice").val(el.smallPrice);
+			}
+		});
+		
+		var $remark = $("#remark");
+		var re = $remark.val();
+		if (isCheck && re.indexOf("账期") == -1) {
+			$remark.val("账期 " + re);
+		} else if ((!isCheck) && re.indexOf("账期") != -1) {
+			$remark.val(re.replace(/账期 /g, ""));
+		}
+
+		total();
   });
 
   initCustomer();
@@ -500,7 +524,7 @@ $(function() {
 				<section class="weui-panel weui-panel_access ft14">
 					<div class="weui-cell weui-cell_access">
 						<div class="weui-cell__bd" style="justify-content:flex-start">
-							<input type="checkbox" name="receiveType" value="0" style="margin-right:.5rem;margin-top:.7rem" class="weui-agree__checkbox"> 
+							<input type="checkbox" id="receiveType" name="receiveType" value="0" style="margin-right:.5rem;margin-top:.7rem" class="weui-agree__checkbox"> 
 							<span>是否账期</span>
 						</div>
 					</div>
@@ -508,7 +532,7 @@ $(function() {
 				<section class="weui-panel weui-panel_access ft14 remark">
 					<div class="weui-cell weui-cell_access">
 						<div class="weui-cell__bd">
-							<textarea name="remark" placeholder="备注说明（70字以内）"></textarea>
+							<textarea id="remark" name="remark" placeholder="备注说明（70字以内）"></textarea>
 						</div>
 					</div>
 				</section>
@@ -519,9 +543,11 @@ $(function() {
 						<input type="hidden" name="productId" id="productId" value="">
 						<input type="hidden" name="convert" id="convert" value="">
 						<input type="hidden" name="isGift" id="isGift" value="">
-						<div class="product_name" id="productName">
-			<!-- 				<span class="gift-tag">赠品</span> -->
-						</div>
+						<nobr>
+							<p class="product_name" id="productName">
+				<!-- 				<span class="gift-tag">赠品</span> -->
+							</p>
+						</nobr>
 						<div class="product_unit">
 							规格：<span id="valueName"></span>
 							<div class="fr">
@@ -584,8 +610,9 @@ $(function() {
 					</div>
 					<div class="weui-panel weui-panel_access goods-detail composition" style="display: none">
 						<input type="hidden" id="compositionId" name="compositionId" value="">
-						<div class="product_name" id="compositionName">
-						</div>
+						<nobr>
+							<p class="product_name" id="compositionName"></p>
+						</nobr>
 						<div class="product_bUnit">
 							<span class="price" id="compositionPriceSpan"></span>
 							<div class="spinner">

@@ -96,9 +96,11 @@
 			<div id="productList">
 				<#list refundDetail as list>
 				<div class="weui-panel weui-panel_access goods-detail">
-					<div class="product_name" id="productName">
-						${(list.custom_name)!} 
-					</div>
+					<nobr>
+						<p class="product_name" id="productName">
+							${(list.custom_name)!} 
+						</p>
+					</nobr>
 					<div class="product_unit">
 						规格：<span id="valueName">${(list.valueName)!}</span>
 					</div>

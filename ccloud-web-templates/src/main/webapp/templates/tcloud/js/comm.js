@@ -327,7 +327,7 @@ $(function() {
 			;
 		}
 		;
-	}).on("touchmove", ".layer", function() {
+	}).on("touchmove", ".layer, .top-right-menu-layer", function() {
 		event.preventDefault();
 	}).on("touchend", "input[type=number]:not([readonly])", function() {
 		if (!open) {
