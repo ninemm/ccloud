@@ -192,7 +192,7 @@ public class _ProductCompositionController extends JBaseCRUDController<ProductCo
 		String id = getPara("id");
 		List<Record> list = new ArrayList<>();
 		if (StringUtils.isNotBlank(id)) {
-			list = ProductCompositionQuery.me().findDetailByProductId(id, "", "");
+			list = ProductCompositionQuery.me().findDetailByProductId(id, "", "", "");
 			String name = list.get(0).getStr("name");
 			BigDecimal price = list.get(0).getBigDecimal("price");
 			setAttr("productCompositionName", name);
@@ -310,7 +310,7 @@ public class _ProductCompositionController extends JBaseCRUDController<ProductCo
 		String id = getPara("id");
 		List<Record> list = new ArrayList<>();
 		if (StringUtils.isNotBlank(id)) {
-			list = ProductCompositionQuery.me().findDetailByProductId(id, "", "");
+			list = ProductCompositionQuery.me().findDetailByProductId(id, "", "", "");
 		}
 		setAttr("list", list);
 		render("product_detail.html");

@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.ccloud.model.ProductComposition;
 
+import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
@@ -96,7 +97,7 @@ public class ProductCompositionQuery extends JBaseQuery {
 		return 0;
 	}
 
-	public List<Record> findDetailByProductId(String id, String sellerId, String keyword) {
+	public List<Record> findDetailByProductId(String id, String sellerId, String keyword, String tag) {
  		StringBuilder fromBuilder = new StringBuilder("SELECT cp.id,cp.name,cp.price,cp.seller_product_id,cp.sub_seller_product_id,cs.product_id as product_id,cg.product_id as sub_product_id, ");
 		fromBuilder.append("t1.valueName as product_sp, t2.valueName as sub_product_sp, cs.price as price, cg.price as sub_price, ");
 		fromBuilder.append("cs.custom_name as product_name,cg.custom_name as sub_product_name,cp.sub_product_count,cp.parent_id,p.product_sn,g.product_image_list_store ");
@@ -115,6 +116,12 @@ public class ProductCompositionQuery extends JBaseQuery {
 		needWhere = appendIfNotEmpty(fromBuilder, "cp.parent_id", id, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "cs.seller_id", sellerId, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cp.name", keyword, params, needWhere);
+		
+		if (StrKit.notBlank(tag)) {
+			appendWhereOrAnd(fromBuilder, needWhere);
+			fromBuilder.append(" FIND_IN_SET(?, cs.tags)");
+			params.add(tag);
+		}
 		
 		fromBuilder.append("order by cp.parent_id");
 		return Db.find(fromBuilder.toString(), params.toArray());
