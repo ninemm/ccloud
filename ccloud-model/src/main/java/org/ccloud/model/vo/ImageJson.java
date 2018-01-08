@@ -4,6 +4,7 @@ public class ImageJson {
 	
 	private String imgName;
 	private String savePath;
+	private String originalPath;
 	
 	public String getImgName() {
 		return imgName;
@@ -16,6 +17,12 @@ public class ImageJson {
 	}
 	public void setSavePath(String savePath) {
 		this.savePath = savePath;
+	}
+	public String getOriginalPath() {
+		return originalPath;
+	}
+	public void setOriginalPath(String originalPath) {
+		this.originalPath = originalPath;
 	}
 	
 	

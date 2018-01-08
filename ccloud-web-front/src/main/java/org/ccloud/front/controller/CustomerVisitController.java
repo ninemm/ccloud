@@ -1,10 +1,9 @@
 package org.ccloud.front.controller;
 
+import java.awt.*;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -29,6 +28,7 @@ import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.query.WxMessageTemplateQuery;
 import org.ccloud.model.vo.ImageJson;
 import org.ccloud.route.RouterMapping;
+import org.ccloud.utils.DateUtils;
 import org.ccloud.wechat.WechatJSSDKInterceptor;
 import org.ccloud.workflow.service.WorkFlowService;
 import org.joda.time.DateTime;
@@ -268,8 +268,14 @@ public class CustomerVisitController extends BaseFrontController {
 
 				ImageJson image = new ImageJson();
 				image.setImgName(picname);
-				String newPath = qiniuUpload(pic);
-				image.setSavePath(newPath.replace("\\", "/"));
+				String originalPath = qiniuUpload(pic);
+
+				String waterFont1 = DateUtils.dateToStr(new Date(), "yyyy-MM-dd" ) + customerVisit.getLocation();
+				String waterFont2 = user.getRealname() + "拜访" + customerVisit.getSellerCustomer().getCustomer().getCustomerName();
+				String savePath = qiniuUpload(waterMark(pic, Color.WHITE, waterFont1, waterFont2));
+
+				image.setSavePath(savePath.replace("\\", "/"));
+				image.setOriginalPath(originalPath.replace("\\", "/"));
 				list.add(image);
 			}
 		 }
@@ -306,6 +312,15 @@ public class CustomerVisitController extends BaseFrontController {
 		String id = getPara("id");
 		String taskId = getPara("taskId");
 
+		String location = getPara("location");
+		String commentDesc = getPara("comment");
+		String lat = getPara("lat");
+		String lng = getPara("lng");
+
+		CustomerVisit customerVisit = CustomerVisitQuery.me().findById(id);
+		Integer status = getParaToInt("status");
+		String comment = (status == 1) ? "批准" : "拒绝";
+
 		String picJson = getPara("pic");
 		List<ImageJson> list = Lists.newArrayList();
 		if (StrKit.notBlank(picJson)) {
@@ -318,20 +333,18 @@ public class CustomerVisitController extends BaseFrontController {
 
 				ImageJson image = new ImageJson();
 				image.setImgName(picname);
-				String newPath = qiniuUpload(pic);
-				image.setSavePath(newPath.replace("\\", "/"));
+				String originalPath = qiniuUpload(pic);
+
+				String waterFont1 = DateUtils.dateToStr(new Date(), "yyyy-MM-dd" ) + location;
+				String waterFont2 = user.getRealname() + "审核" + comment + customerVisit.getSellerCustomer().getCustomer().getCustomerName();
+				String savePath = qiniuUpload(waterMark(pic, Color.WHITE, waterFont1, waterFont2));
+
+				image.setSavePath(savePath.replace("\\", "/"));
+				image.setOriginalPath(originalPath.replace("\\", "/"));
 				list.add(image);
 			}
 		}
-		
-		String location = getPara("location");
-		String commentDesc = getPara("comment");
-		String lat = getPara("lat");
-		String lng = getPara("lng");
 
-		CustomerVisit customerVisit = CustomerVisitQuery.me().findById(id);
-		Integer status = getParaToInt("status");
-		String comment = (status == 1) ? "批准" : "拒绝";
 		if(StrKit.notBlank(location)) 
 			customerVisit.setReviewAddress(location);
 		

@@ -56,6 +56,7 @@ public class SellerCustomer extends BaseSellerCustomer<SellerCustomer> {
 			List<ImageJson> list = JSON.parseArray(imageListStore, ImageJson.class);
 			for (ImageJson image : list) {
 				image.setSavePath(domain + "/" + image.getSavePath());
+				image.setOriginalPath(domain + "/" +image.getOriginalPath());
 			}
 			return list;
 		} else return new ArrayList<>();

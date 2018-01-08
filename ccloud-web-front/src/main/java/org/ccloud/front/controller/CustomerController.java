@@ -1,10 +1,9 @@
 package org.ccloud.front.controller;
 
+import java.awt.*;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -18,6 +17,7 @@ import org.ccloud.model.query.*;
 import org.ccloud.model.vo.CustomerVO;
 import org.ccloud.model.vo.ImageJson;
 import org.ccloud.route.RouterMapping;
+import org.ccloud.utils.DateUtils;
 import org.ccloud.wechat.WechatJSSDKInterceptor;
 import org.ccloud.workflow.service.WorkFlowService;
 import org.joda.time.DateTime;
@@ -341,6 +341,7 @@ public class CustomerController extends BaseFrontController {
 	public void save() {
 		
 		boolean updated = true;
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		Map<String, Object> map = Maps.newHashMap();
 		List<ImageJson> list = Lists.newArrayList();
 		
@@ -375,7 +376,7 @@ public class CustomerController extends BaseFrontController {
 				
 				ImageJson image = new ImageJson();
 				image.setImgName(picname);
-				String newPath = qiniuUpload(pic);
+				String originalPath = qiniuUpload(pic);
 				/*Boolean isEnable = OptionQuery.me().findValueAsBool("cdn_enable");
 				
 				if (isEnable != null && isEnable) {
@@ -383,8 +384,13 @@ public class CustomerController extends BaseFrontController {
 				} else {
 					newPath = upload(pic);
 				}*/
-				
-				image.setSavePath(newPath.replace("\\", "/"));
+
+				String waterFont1 = user.getRealname() + "  " + DateUtils.dateToStr(new Date(), "yyyy-MM-dd" );
+				String waterFont2 = customer.getCustomerName() + sellerCustomer.getLocation();
+				String savePath = qiniuUpload(waterMark(pic, Color.WHITE, waterFont1, waterFont2));
+
+				image.setSavePath(savePath.replace("\\", "/"));
+				image.setOriginalPath(originalPath.replace("\\", "/"));
 				list.add(image);
 			}
 		}
@@ -392,10 +398,16 @@ public class CustomerController extends BaseFrontController {
 		if(StrKit.notBlank(oldPic)) {
 			JSONArray picList = JSON.parseArray(oldPic);
 			int len = OptionQuery.me().findValue("cdn_domain").length()+1;
-			for(int i = 0; i < picList.size(); i++) {
-				String pic = picList.getString(i).substring(len, picList.getString(i).length());
+
+			for (int i = 0; i <picList.size(); i++) {
+
+				JSONObject obj = picList.getJSONObject(i);
+				String savePath = obj.getString("savePath");
+				String originalPath = obj.getString("originalPath");
+
 				ImageJson image = new ImageJson();
-				image.setSavePath(pic);
+				image.setOriginalPath(originalPath.substring(len, originalPath.length()));
+				image.setSavePath(savePath.substring(len, savePath.length()));
 				list.add(image);
 			}
 		}

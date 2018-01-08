@@ -202,7 +202,7 @@
         var oldPic=[];
         for(var i = 0; i < children.length; i++)
             if(children[i].style.backgroundImage.length < 200)
-                oldPic.push(children[i].style.backgroundImage.substring(5, children[i].style.backgroundImage.length-2));
+                oldPic.push({"savePath":children[i].children[0].value,"originalPath":children[i].children[1].value});
         $("#oldPic").val(JSON.stringify(oldPic));
     
         $.ajax({
@@ -453,7 +453,7 @@
 			                        <ul class="weui-uploader__files" id="uploaderFiles">
 			                        <#if (sellerCustomer.imageList) ??> 
 			                        <#list sellerCustomer.imageList as bean>
-			                            <li class="weui-uploader__file" style="background-image: url(${bean.savePath})"></li>
+			                            <li class="weui-uploader__file" style="background-image: url(${bean.savePath})"><input type="hidden" value="${bean.savePath}"><input type="hidden" value="${bean.originalPath}"></li>
 			                        </#list>
 			                        </#if>
 			                        </ul>
