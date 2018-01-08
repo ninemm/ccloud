@@ -324,6 +324,9 @@ public class SalesOrderQuery extends JBaseQuery {
 			outOrderStatus = Consts.SALES_OUT_STOCK_STATUS_PART_OUT;
 		}
 		salesOrder.setModifyDate(date);
+		if (salesOrder.getPrintTime() == null) {
+			salesOrder.setPrintTime(new Date());
+		}
 		if (!SalesOutstockQuery.me().updateStatus(outStockId, userId, outOrderStatus, date) || !salesOrder.update()) {
 			return false;
 		}
