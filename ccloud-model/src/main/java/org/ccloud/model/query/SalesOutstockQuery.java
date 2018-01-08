@@ -315,8 +315,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_print_template pt on pt.id = cjt.print_template_id ");
 		fromBuilder.append(" where o.id = ? ");
 		printAllNeedInfo printAllNeedInfo = new printAllNeedInfo();
-		 List<Record> records = Db.find(fromBuilder.toString(), id);
-		 for (Record record : records) {
+		 Record record = Db.findFirst(fromBuilder.toString(), id);	 
 			printAllNeedInfo.setOutstockSn(record.getStr("outstock_sn"));
 			printAllNeedInfo.setDeliveryAddress(record.getStr("delivery_address"));
 			printAllNeedInfo.setCustomerName(record.getStr("customer_name"));
@@ -338,7 +337,6 @@ public class SalesOutstockQuery extends JBaseQuery {
 			printAllNeedInfo.setReceiveType(record.getInt("receive_type"));
 			printAllNeedInfo.setSalesOutStockId(record.getStr("salesOutStockId"));
 			printAllNeedInfo.setPrintFootContext(record.getStr("printFootContext"));
-		}
 		    return printAllNeedInfo;
 	}
 	
