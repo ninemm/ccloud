@@ -33,6 +33,7 @@ import org.ccloud.utils.RequestUtils;
 import org.ccloud.utils.StringUtils;
 import org.joda.time.DateTime;
 
+import com.jfinal.core.JFinal;
 import com.jfinal.handler.Handler;
 import com.jfinal.kit.HandlerKit;
 import com.jfinal.kit.StrKit;
@@ -88,6 +89,12 @@ public class JHandler extends Handler {
 		if (isDisableAccess(target)) {
 			HandlerKit.renderError404(request, response, isHandled);
 		}
+		
+		if (isWechatRequest(request, target)) {
+			
+				HandlerKit.renderError404(request, response, isHandled);
+				return ;
+		}
 
 		String originalTarget = target;
 		target = RouterManager.converte(target, request, response);
@@ -129,6 +136,15 @@ public class JHandler extends Handler {
 			return true;
 		}
 
+		return false;
+	}
+	
+	private static boolean isWechatRequest(HttpServletRequest request, String target) {
+		
+		if (!JFinal.me().getConstants().getDevMode()) {
+			if (!target.contains("/admin") && !RequestUtils.isWechatBrowser(request)) 
+				return true;
+		}
 		return false;
 	}
 
