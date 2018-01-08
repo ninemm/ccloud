@@ -154,7 +154,7 @@ public class SellerProductQuery extends JBaseQuery {
 			params.add(tag);
 		}
 
-		fromBuilder.append(" ORDER BY gc.`grade`, gc.`order_list`, sp.order_list ");
+		fromBuilder.append(" ORDER BY gc.`parent_id`, gc.`order_list`, sp.order_list ");
 
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}
