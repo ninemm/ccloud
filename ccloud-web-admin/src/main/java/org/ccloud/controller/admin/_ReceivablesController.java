@@ -86,8 +86,9 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 		String type = getPara("type");
 		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String deptDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		Page<Record> page = ReceivablesQuery.me().paginate(getPageNumber(),getPageSize(),customerTypeId,type,user.getId(),deptDataArea);
+		Page<Record> page = ReceivablesQuery.me().paginate(getPageNumber(),getPageSize(),customerTypeId,type,user.getId(),deptDataArea,sellerId);
 		List<Record> receivablesList = page.getList();
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(),"rows", receivablesList);
 		
@@ -184,11 +185,12 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 		String type = getPara("type");
 		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String deptDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);	
 		
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\receivables\\"
 				+ "receivables.xlsx";
-		Page<Record> page = ReceivablesQuery.me().paginate(1,Integer.MAX_VALUE,customerTypeId,type,user.getId(),deptDataArea);
+		Page<Record> page = ReceivablesQuery.me().paginate(1,Integer.MAX_VALUE,customerTypeId,type,user.getId(),deptDataArea,sellerId);
 		List<Record> receivablesList = page.getList();
 		
 		List<receivablesExcel> excellist = Lists.newArrayList();

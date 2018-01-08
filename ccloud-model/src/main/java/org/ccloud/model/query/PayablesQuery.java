@@ -58,7 +58,7 @@ public class PayablesQuery extends JBaseQuery {
 		Db.update(sqlBuilder.toString());
 	}
 	
-    public Page<Record> paginate(int pageNumber, int pageSize, String id,String type,String seller_id,String dataArea) {
+    public Page<Record> paginate(int pageNumber, int pageSize, String id,String type,String userId,String dataArea,String sellerId) {
 		Boolean b = true;
 		String select;
 		StringBuilder fromBuilder;
@@ -70,7 +70,7 @@ public class PayablesQuery extends JBaseQuery {
 				fromBuilder.append(" WHERE cjct.customer_type_id = '"+ id+"'");
 				b = false;
 			}
-			fromBuilder.append(" GROUP BY c1.id ) t1 ON r.obj_id = t1.id INNER JOIN `cc_customer` AS c ON c.id = t1.customer_id ");
+			fromBuilder.append(" WHERE c1.seller_id = ? GROUP BY c1.id ) t1 ON r.obj_id = t1.id INNER JOIN `cc_customer` AS c ON c.id = t1.customer_id ");
 		}else {
 			select = "SELECT s.id,s.code,s.name,r.pay_amount,r.act_amount,r.balance_amount";
 			fromBuilder = new StringBuilder(" FROM `cc_payables` AS r INNER JOIN `cc_supplier` AS s on r.obj_id=s.id ");
@@ -80,6 +80,7 @@ public class PayablesQuery extends JBaseQuery {
 			}
 		}
 		LinkedList<Object> params = new LinkedList<Object>();
+		params.add(sellerId);
 		appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, b);
 		fromBuilder.append(" ORDER BY r.create_date DESC");
 		if (params.isEmpty())
