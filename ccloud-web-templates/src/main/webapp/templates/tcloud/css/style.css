@@ -1534,7 +1534,7 @@ input[name=sex] {
 
 #history main {
   top: 2rem;
-  bottom: 0;
+  bottom: 2.25rem;
 }
 
 .tag {
@@ -1746,7 +1746,7 @@ input[name=sex] {
 
 #my-order main {
   top: 2rem;
-  bottom: 0;
+  bottom: 2.25rem;
 }
 
 .show-more-btn {

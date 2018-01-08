@@ -31,6 +31,10 @@
     .weui-navbar__item:after {
         border-right: 0;
     }
+
+    .weui-tab__bd {
+        padding-bottom: 2.25rem;
+    }
 </#macro>
 
 <#macro script>
@@ -192,7 +196,9 @@
             </div>
         </div>
     </div>  
-    <#include "_inc/_goback.html" /> 
+    <footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
+        <a class="red-button width-100 _submit_btn" href="${CPATH}/">返回</a>
+    </footer>
 </div>
 
 </@layout>
