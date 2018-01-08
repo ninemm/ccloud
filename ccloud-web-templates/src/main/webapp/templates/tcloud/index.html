@@ -16,51 +16,77 @@
 </#macro>
 
 <#macro script>
-function openTopRightMenu() {
-	$('.top-right-menu').addClass('layer-pop-show');
-}
-function closeTopRightMenu() {
-	$('.top-right-menu').removeClass('layer-pop-show');
-}
-$(function () {
-    $(document).on('touchend', '.menu', function () {
-        var $this = $(this);
-        var index = $this.index()-1;
-        $this.addClass('red-button').siblings().removeClass('red-button');
-        $('.index-info').find('.weui-cells:eq(' + index + ')').show().siblings().hide();
-        return false;
-	}).on('touchstart', '.top-right-menu-btn', openTopRightMenu)
-	.on('touchstart', '.top-right-menu-layer', closeTopRightMenu);
-	
-	$('.week').text($.week());
-    $('.day').text($.today());
 
-	var mySwiper = new Swiper('.swiper-container', {
-		loop: true,
-		paginationHide: true,
-		autoplay: {
-            disableOnInteraction: false,
-		},
-		allowTouchMove: false
+	$(function () {
+	    $(document).on('touchend', '.menu', function () {
+	        var $this = $(this);
+	        var index = $this.index()-1;
+	        $this.addClass('red-button').siblings().removeClass('red-button');
+	        $('.index-info').find('.weui-cells:eq(' + index + ')').show().siblings().hide();
+	        return false;
+		})
+		.on('touchstart', '.top-right-menu-btn', openTopRightMenu)
+		.on('touchstart', '.top-right-menu-layer', closeTopRightMenu);
+		
+		$('.week').text($.week());
+	    $('.day').text($.today());
+	
+		var mySwiper = new Swiper('.swiper-container', {
+			loop: true,
+			paginationHide: true,
+			autoplay: {
+	            disableOnInteraction: false,
+			},
+			allowTouchMove: false
+		})
 	})
-})
-</#macro> <@layout>
+	
+	function openTopRightMenu() {
+        $('.top-right-menu').addClass('layer-pop-show');
+    }
+    
+    function closeTopRightMenu() {
+        $('.top-right-menu').removeClass('layer-pop-show');
+    }
+    
+
+    var mobile = '${mobile!}';
+    var openid = '${openid!}';
+    var callback = function(res) {
+        if (res.errorCode == 0) {
+            Utils.closeLoadingWin();
+            location.href = '${CPATH}/';
+        }
+    }
+    
+    function doChange(sellerId) {
+    
+        Utils.openLoadingWin("账号切换中，请稍后...");
+        var url = "${CPATH}/user/change";
+        Utils.ajax(url, {'mobile': mobile, 'openid': openid, 'sellerId': sellerId}, callback);
+        
+        removeItemBykey("productList");
+        removeItemBykey("compositionList");
+        removeItemBykey("customerInfo");
+    }
+</#macro>
+
+<@layout>
 <div class="weui-content">
 	<article id="home">
 		<div class="company">${(session.sellerName)!}
 		<#if (session.sellerListSize ??) &&(session.sellerListSize > 1) >
 			<a class="top-right-menu-btn">
-				<span><i class="icon-exchange white" style="font-size: .8rem;" title = "切换账套"></i></span>
+				<span class="white ft13">账套 <i class="icon-caret-down" style="font-size: .7rem;" title = "切换账套"></i></span>
 			</a>
 			<div class="top-right-menu">
 				<div class="top-right-menu-layer"></div>
 				<ul>
-					<li>
-						稻花香
+                    <#list (session.sellerList) as bean>
+  					<li>
+ 					    <a href="javascript:void(0);" onclick="doChange('${(bean.seller_id)!}');">${(bean.seller_name)!}</a>
 					</li>
-					<li>
-						武大测试
-					</li>
+					</#list>
 				</ul>
 			</div>
 		</#if>

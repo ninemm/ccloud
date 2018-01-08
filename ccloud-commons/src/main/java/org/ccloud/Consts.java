@@ -18,6 +18,8 @@ package org.ccloud;
 public class Consts {
 
 	public static final String COOKIE_LOGINED_USER = "user";
+	public static final String COOKIE_SELECTED_SELLER_ID = "_seller_id";
+	public static final String COOKIE_SELECTED_USER_ID = "_user_id";
 
 	public static final String SESSION_LOGINED_USER = "_logined_user";
 	public static final String SESSION_SELECT_DATAAREA = "_data_area";//数据查看时的数据域
@@ -119,6 +121,7 @@ public class Consts {
 	public static final int SALES_ORDER_RECEIVE_TYPE_CASH = 1;//现金
 
 	public static final int SALES_OUT_STOCK_STATUS_OUT = 1000;//出库单出库
+	public static final int SALES_OUT_STOCK_STATUS_PART_OUT= 2000;//出库单部分出库
 	public static final int SALES_OUT_STOCK_STATUS_DEFUALT = 0;//出库单待出库
 	
 	public static final int SALES_REFUND_INSTOCK_DEFUALT = 0;//退货单待审核

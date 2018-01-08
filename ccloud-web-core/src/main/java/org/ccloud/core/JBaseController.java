@@ -61,7 +61,7 @@ public class JBaseController extends Controller {
 	@Override
 	public String getPara(String name, String defaultValue) {
 		String html = getRequest().getParameter(name);
-		if (null != html) {
+		if (null != html && !html.isEmpty()) {
 			return JsoupUtils.clear(html);
 		}
 		return defaultValue;

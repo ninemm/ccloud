@@ -40,7 +40,7 @@ public class WxOauthController extends BaseFrontController {
 		
 		String openId = null;
 		String accessToken = null;
-		String gotoUrl = getPara("goto", "/");
+		String gotoUrl = getPara("goto", Consts.INDEX_URL);
 		String wechatUserJson = getSessionAttr(Consts.SESSION_WECHAT_USER);
 		
 		if (StrKit.notBlank(wechatUserJson)) {
@@ -106,8 +106,19 @@ public class WxOauthController extends BaseFrontController {
 							sellerList.add(seller);
 						}
 					}
+					
 					setAttr("openid", openId);
 					setSessionAttr("sellerList", sellerList);
+					String cookieUserId = getCookie(Consts.COOKIE_SELECTED_USER_ID);
+					String cookieSellerId = getCookie(Consts.COOKIE_SELECTED_SELLER_ID);
+					
+					if (StrKit.notBlank(cookieSellerId, cookieUserId)) {
+						User curUser = UserQuery.me().findById(cookieUserId);
+						init(curUser.getUsername(), curUser.getPassword(), true);
+						forwardAction(Consts.INDEX_URL);
+						return ;
+					}
+					
 					gotoUrl = "/user/choice";
 				}
 			}
