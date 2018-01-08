@@ -112,7 +112,7 @@
                                         break;
                                 }
                             }
-                            blob = canvas.toDataURL("image/jpeg", 0.1);
+                            blob = canvas.toDataURL("image/jpeg", 0.3);
                             imageArr.push({"pic":blob, "pic_name":x});
                             $("#pic").val(JSON.stringify(imageArr));
                             var str = '<li class="weui-uploader__file " style="background-image:url('+blob+')"></li>';
