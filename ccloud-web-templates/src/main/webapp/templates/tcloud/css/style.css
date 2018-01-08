@@ -1529,6 +1529,7 @@ input[name=sex] {
   line-height: 1.25rem;
   width: 19.444444%;
   box-sizing: border-box;
+  display: table;
 }
 
 #history main {
