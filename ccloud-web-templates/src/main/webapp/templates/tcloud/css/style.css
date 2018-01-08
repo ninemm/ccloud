@@ -1529,11 +1529,12 @@ input[name=sex] {
   line-height: 1.25rem;
   width: 19.444444%;
   box-sizing: border-box;
+  display: table;
 }
 
 #history main {
   top: 2rem;
-  bottom: 0;
+  bottom: 2.25rem;
 }
 
 .tag {
@@ -1745,7 +1746,7 @@ input[name=sex] {
 
 #my-order main {
   top: 2rem;
-  bottom: 0;
+  bottom: 2.25rem;
 }
 
 .show-more-btn {

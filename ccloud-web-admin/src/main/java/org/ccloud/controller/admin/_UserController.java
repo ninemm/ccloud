@@ -503,9 +503,11 @@ public class _UserController extends JBaseCRUDController<User> {
 			renderAjaxResultForError("旧密码错误,请重新输入!");
 		} else {
 			String newPassword = getPara("newPassword");
-			newPassword = EncryptUtils.encryptPassword(new String(newPassword), user.getSalt());
-			user.setPassword(newPassword);
-			user.update();
+			List<User> list = UserQuery.me().findByMobile(user.getMobile());
+			for (User users : list) {
+				users.setPassword(EncryptUtils.encryptPassword(new String(newPassword), users.getSalt()));
+				users.update();
+			}
 			renderAjaxResultForSuccess("修改成功");
 		}
 	}

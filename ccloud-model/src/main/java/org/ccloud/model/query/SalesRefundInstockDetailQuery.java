@@ -22,7 +22,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.ccloud.Consts;
+import org.ccloud.model.Inventory;
+import org.ccloud.model.InventoryDetail;
 import org.ccloud.model.SalesRefundInstockDetail;
+import org.ccloud.model.SellerProduct;
 import org.ccloud.utils.StringUtils;
 
 import com.jfinal.kit.StrKit;
@@ -154,5 +158,72 @@ public class SalesRefundInstockDetailQuery extends JBaseQuery {
 		return map;
 	}
 
+	
+	   //批量入库
+		public boolean batchInStock(List<Record> productInfos, String sellerId, Date date, String deptId,String dataArea,String userId, String inStockSN) {
+			for (Record record : productInfos) {
+				SalesRefundInstockDetail detail = SalesRefundInstockDetailQuery.me().findById(record.getStr("refundInstockDetailId"));
+				if (!detail.saveOrUpdate()) {
+					return false;
+				}
+				
+				Inventory inventory = InventoryQuery.me().findBySellerIdAndProductIdAndWareHouseId(sellerId, record.getStr("product_id"), record.getStr("warehouse_id"));
+				if (inventory == null) {
+					return false;
+				}
+				BigDecimal oldInCount = inventory.getInCount() == null? new BigDecimal(0) : inventory.getInCount();
+				BigDecimal oldInAmount = inventory.getInAmount() == null? new BigDecimal(0) : inventory.getInAmount();
+				//BigDecimal oldOutPrice = inventory.getOutPrice() == null? new BigDecimal(0) : inventory.getOutPrice();
+				BigDecimal oldBalanceAmount = inventory.getBalanceAmount() == null? new BigDecimal(0) : inventory.getBalanceAmount();
+				BigDecimal oldBalanceCount = inventory.getBalanceCount() == null? new BigDecimal(0) : inventory.getBalanceCount();
+						
+				inventory.setInCount(oldInCount.add(new BigDecimal(record.getInt("bigCount")).add(new BigDecimal(record.getInt("smallCount")))));
+				inventory.setInAmount(oldInAmount.add(new BigDecimal(record.getStr("reject_amount"))));
+				inventory.setInPrice(record.getBigDecimal("big_Price"));
+				inventory.setBalanceCount(oldBalanceCount.add(new BigDecimal(record.getInt("bigCount"))
+						.add(new BigDecimal(record.getInt("smallCount")))));
+				inventory.setBalanceAmount(oldBalanceAmount.add(record.getBigDecimal("reject_amount")));
+				inventory.setModifyDate(new Date());
+				
+				if (!inventory.saveOrUpdate()) {
+					return false;
+				}
+				
+				InventoryDetail oldDetail = InventoryDetailQuery.me().findBySellerProductId(record.getStr("sell_product_id"), record.getStr("warehouse_id"));
+				InventoryDetail inventoryDetail = new InventoryDetail();
+				inventoryDetail.setId(StrKit.getRandomUUID());
+				inventoryDetail.setWarehouseId(inventory.getWarehouseId());
+				inventoryDetail.setSellProductId(detail.getSellProductId());
+				inventoryDetail.setInAmount(detail.getProductAmount());
+				inventoryDetail.setInCount(new BigDecimal(record.getInt("bigCount")).add(new BigDecimal(record.getInt("smallCount"))));
+				inventoryDetail.setInPrice(inventory.getOutPrice());
+				inventoryDetail.setBalanceAmount(oldDetail.getBalanceAmount().subtract(detail.getProductAmount()));
+				inventoryDetail.setBalanceCount(oldDetail.getBalanceCount().add(new BigDecimal(record.getInt("bigCount"))
+						.add(new BigDecimal(record.getInt("smallCount")))));
+				inventoryDetail.setBalancePrice(oldDetail.getBalancePrice());
+				inventoryDetail.setBizBillSn(inStockSN);
+				inventoryDetail.setBizDate(detail.getCreateDate());
+				inventoryDetail.setBizType(Consts.BIZ_TYPE_SALES_REFUND_INSTOCK);
+				inventoryDetail.setBizUserId(userId);
+				inventoryDetail.setDeptId(deptId);
+				inventoryDetail.setDataArea(dataArea);
+				inventoryDetail.setCreateDate(new Date());
+				
+				if (!inventoryDetail.save()) {
+					return false;
+				}
+				
+				SellerProduct sellerProduct = SellerProductQuery.me().findById(record.getStr("sell_product_id"));
+				sellerProduct.setStoreCount(sellerProduct.getStoreCount().add(new BigDecimal(record.getInt("bigCount"))
+						.add(new BigDecimal(record.getInt("smallCount")))));
+				sellerProduct.setModifyDate(new Date());
+				if (!sellerProduct.update()) {
+					return false;
+				}
+				
+			}
+			return true;
+		}
+	
 	
 }

@@ -108,8 +108,10 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		String printStatus = getPara("printStatus");
 		String stockOutStatus = getPara("stockOutStatus");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String status = getPara("status");
 
-		Page<Record> page = SalesOutstockQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate,printStatus,stockOutStatus,dataArea);
+		Page<Record> page = SalesOutstockQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, 
+				endDate, printStatus, stockOutStatus, status, dataArea);
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
@@ -297,8 +299,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
         			}
 
         		}
-        		if (!SalesOutstockQuery.me().updateStatus(outStockId, user.getId(), Consts.SALES_OUT_STOCK_STATUS_OUT, date) || 
-        				!SalesOrderQuery.me().checkStatus(outStockId, date)) {
+        		if (!SalesOrderQuery.me().checkStatus(outStockId, user.getId(), date)) {
         			return false;
         		}
         		
@@ -412,7 +413,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 				return false;
 			}
 			
-			if (!SalesOutstockQuery.me().updateStockOutStatus(printAllNeedInfo.getSalesOutStockId(), user.getId(), stockDate, Consts.SALES_OUT_STOCK_STATUS_OUT, date,remark) ||!SalesOrderQuery.me().checkStatus(printAllNeedInfo.getSalesOutStockId(), date)) {
+			if (!SalesOutstockQuery.me().updateStockOutStatus(printAllNeedInfo.getSalesOutStockId(), user.getId(), stockDate, Consts.SALES_OUT_STOCK_STATUS_OUT, date,remark) ||!SalesOrderQuery.me().checkStatus(printAllNeedInfo.getSalesOutStockId(), user.getId(), date)) {
 					return false;	
 				  }
 			
@@ -477,7 +478,8 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\sales_outstock\\"
 				+ "salesOutstockInfo.xlsx";
 		
-		Page<Record> page = SalesOutstockQuery.me().paginate(1, Integer.MAX_VALUE, keyword, startDate, endDate,printStatus,stockOutStatus,dataArea);
+		Page<Record> page = SalesOutstockQuery.me().paginate(1, Integer.MAX_VALUE, keyword, startDate,
+				endDate, printStatus, stockOutStatus, null, dataArea);
 		List<Record> salesOutstckList = page.getList();
 		
 		List<SalesOutstockExcel> excellist = Lists.newArrayList();

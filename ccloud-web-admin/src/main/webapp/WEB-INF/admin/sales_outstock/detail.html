@@ -42,7 +42,14 @@ function doSubmit(){
 			<span class="pull-left">
 			单号：${(outstock.outstock_sn)!}
 			</br>
-			状态：${(outstock.status)!} 
+			状态：
+			<#if outstock.status = 0>
+				待出库
+			<#elseif outstock.status = 1000>
+				已出库
+			<#else>
+				部分出库
+			</#if>			
 			</span>
 			<span class="pull-right">
 			下单人员：${(outstock.realname)!}/ ${(outstock.mobile)!} 
@@ -125,7 +132,7 @@ function doSubmit(){
 			<div class="form-group col-sm-12 validata-box">
 				<label class="control-label col-sm-2">收款方式:</label>
 				<div class="input-group col-md-4 col-sm-10">
-					<span class="control-span"> <#if outstock.receive_type == 1>现金<#else>应收账款</#if> </span>
+					<span class="control-span"> <#if outstock.receive_type == 1>现金<#else>账期账款</#if> </span>
 				</div>
 			</div>
 			<div class="form-group col-sm-12 validata-box">

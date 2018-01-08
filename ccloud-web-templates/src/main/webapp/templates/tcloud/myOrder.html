@@ -17,10 +17,10 @@
 			var $detail = $this.parent().next();
 			if ($detail.is(':visible')) {
 				$detail.hide('fast');
-				$this.text('显示详情');
+				$this.html('显示详情 <i class="icon-angle-down"></i>');
 			} else {
 				$detail.show('fast');
-				$this.text('隐藏详情');
+				$this.html('隐藏详情 <i class="icon-angle-up"></i>');
 			}
 		});
         $("#datePicker").calendar();
@@ -339,11 +339,16 @@
 					<div class="ft14 gray">
 						<span class="tag" id="receiveType">账期</span>
 						<span id="orderSn"></span>
+						<span class="fr orange">
+							&nbsp;<i class="icon-angle-right"></i>
+						</span>
 						<span class="fr orange" id="status"></span>
 					</div>
 					<div class="customer_name gray">
 						<span id="customerName" class=""></span>
-						<span class="fr show-more-btn" id="showOrderProductDetail" onclick="showOrderProductDetail(this)">显示详情</span>
+						<span class="fr show-more-btn" id="showOrderProductDetail" onclick="showOrderProductDetail(this)">
+							显示详情 <i class="icon-angle-down"></i>
+						</span>
 						<input type="hidden" id="oId"></input>
 					</div>
 					<div class="none">
@@ -367,8 +372,8 @@
 							</div>
 						</a>
 						<hr>
-						<div id="cancel" class="button red-button fl">撤销</div>
-						<div id="orderAgain" class="button white-button fr">再次购买</div>
+						<div id="cancel" class="button white-button fl">撤销</div>
+						<div id="orderAgain" class="button red-button fr">再次购买</div>
 						<div id="pass" class="button yellow-button fr m-r-5">审核通过</div>
 					</div>
 				</div>
@@ -396,7 +401,7 @@
 				<button class="red-button confirm-search-btn weui-flex__item" onclick="getDateOrder()">确定</button>
 			</footer>
 		</article>
-		<#include "_inc/_goback.html" />
+		<#include "_inc/_goback_bottom.html" />
 	</div>
 </div>
 </@layout>

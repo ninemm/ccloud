@@ -92,7 +92,7 @@ public class _SalesRefundController extends JBaseCRUDController<SalesRefundInsto
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
 		Page<Record> page = SalesRefundInstockQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate,
-				endDate, null, dataArea);
+				endDate, null,null, dataArea);
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
@@ -270,7 +270,7 @@ public class _SalesRefundController extends JBaseCRUDController<SalesRefundInsto
 			String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\sales_outstock\\"
 					+ "salesRefundInfo.xlsx";
 			Page<Record> page = SalesRefundInstockQuery.me().paginate(1,Integer.MAX_VALUE, keyword, startDate,
-					endDate, null, dataArea);
+					endDate, null,null, dataArea);
 			List<Record> salesRefundList = page.getList();
 			
 			List<SalesRefundExcel> excellist = Lists.newArrayList();
