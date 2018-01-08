@@ -618,6 +618,10 @@ a {
   transition: all .3s;
 }
 
+.top-right-menu a {
+  color: #fff;
+}
+
 .top-right-menu-layer {
   position: fixed;
   top: 0;

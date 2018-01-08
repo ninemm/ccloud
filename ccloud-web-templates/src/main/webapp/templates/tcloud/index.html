@@ -65,14 +65,16 @@
     }
     
     function doChange(sellerId) {
-    
-        Utils.openLoadingWin("账号切换中，请稍后...");
-        var url = "${CPATH}/user/change";
-        Utils.ajax(url, {'mobile': mobile, 'openid': openid, 'sellerId': sellerId}, callback);
-        
-        removeItemBykey("productList");
-        removeItemBykey("compositionList");
-        removeItemBykey("customerInfo");
+		closeTopRightMenu();
+		Utils.openLoadingWin("账号切换中，请稍后...");
+		setTimeout(function() {
+			var url = "${CPATH}/user/change";
+			Utils.ajax(url, {'mobile': mobile, 'openid': openid, 'sellerId': sellerId}, callback);
+			
+			removeItemBykey("productList");
+			removeItemBykey("compositionList");
+			removeItemBykey("customerInfo");
+		}, 1000);
     }
 </#macro>
 
