@@ -29,6 +29,7 @@ import org.ccloud.model.query.WxMessageTemplateQuery;
 import org.ccloud.model.vo.ImageJson;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DateUtils;
+import org.ccloud.utils.ImageUtils;
 import org.ccloud.wechat.WechatJSSDKInterceptor;
 import org.ccloud.workflow.service.WorkFlowService;
 import org.joda.time.DateTime;
@@ -270,9 +271,10 @@ public class CustomerVisitController extends BaseFrontController {
 				image.setImgName(picname);
 				String originalPath = qiniuUpload(pic);
 
-				String waterFont1 = DateUtils.dateToStr(new Date(), "yyyy-MM-dd" ) + customerVisit.getLocation();
-				String waterFont2 = user.getRealname() + "拜访" + customerVisit.getSellerCustomer().getCustomer().getCustomerName();
-				String savePath = qiniuUpload(waterMark(pic, Color.WHITE, waterFont1, waterFont2));
+				String waterFont1 = customerVisit.getSellerCustomer().getCustomer().getCustomerName();
+				String waterFont2 = user.getRealname() +  DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
+				String waterFont3 =  customerVisit.getLocation();
+				String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
 
 				image.setSavePath(savePath.replace("\\", "/"));
 				image.setOriginalPath(originalPath.replace("\\", "/"));
@@ -335,9 +337,10 @@ public class CustomerVisitController extends BaseFrontController {
 				image.setImgName(picname);
 				String originalPath = qiniuUpload(pic);
 
-				String waterFont1 = DateUtils.dateToStr(new Date(), "yyyy-MM-dd" ) + location;
-				String waterFont2 = user.getRealname() + "审核" + comment + customerVisit.getSellerCustomer().getCustomer().getCustomerName();
-				String savePath = qiniuUpload(waterMark(pic, Color.WHITE, waterFont1, waterFont2));
+				String waterFont1 = customerVisit.getSellerCustomer().getCustomer().getCustomerName();
+				String waterFont2 = user.getRealname() + "审核" + comment + "    " + DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
+				String waterFont3 = location;
+				String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
 
 				image.setSavePath(savePath.replace("\\", "/"));
 				image.setOriginalPath(originalPath.replace("\\", "/"));
