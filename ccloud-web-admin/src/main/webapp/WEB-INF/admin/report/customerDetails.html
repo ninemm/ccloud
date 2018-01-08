@@ -3,8 +3,12 @@
 <#macro script_import>
 	<script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table.js"></script>
 	<script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table-zh-CN.js"></script>
-	<script src="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.min.js"></script>
-	<script src="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="${CPATH}/static/plugins/datetimepicker/bootstrap-
+
+datetimepicker.min.js"></script>
+	<script src="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.zh-
+
+CN.js"></script>
 	<script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
 	<script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table-export.js"></script>
 	<script src="${CPATH}/static/plugins/bootstrap-table/tableExport.js"></script>
@@ -13,7 +17,9 @@
 <#macro css_import>
 
 <link rel="stylesheet" href="${CPATH}/static/plugins/bootstrap-table/bootstrap-table.css">
-<link rel="stylesheet" href="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.min.css">
+<link rel="stylesheet" href="${CPATH}/static/plugins/datetimepicker/bootstrap-
+
+datetimepicker.min.css">
 <link rel="stylesheet" href="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.css">
 
 </#macro>
@@ -30,16 +36,28 @@
 	var urlGift = '${CPATH}/admin/report/customerDetailsGiftReportList';
 
 	$(function() {
-		jQuery.mm.initDatetimepicker('form', '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
-		jQuery.mm.initDatetimepicker('form', '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
+		jQuery.mm.initDatetimepicker('form', '#startDate', 'startDate', 'yyyy-MM-dd', 2, 
+
+4, 2);
+		jQuery.mm.initDatetimepicker('form', '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 
+
+2);
 		jQuery.mm.initValidator('#form', validatorFields);
-		jQuery.mm.initEditTableExport3('#_customerDetailsReport_table',url, initParams, initFields(), null);
-		jQuery.mm.initEditTableExport4('#_customerDetailsReportGift_table',urlGift, initParams, initFieldsGift(), null);
+		jQuery.mm.initEditTableExport3('#_customerDetailsReport_table',url, initParams, 
+
+initFields(), null);
+		jQuery.mm.initEditTableExport4('#_customerDetailsReportGift_table',urlGift, 
+
+initParams, initFieldsGift(), null);
 		$('button[title^=Export]').html('导出').addClass('btn-primary btn-sm');
 	});
 
 	var initParams = function(params) {
-		var keyword = $('#post-search-input').val();
+		
+		var keyword = $('#status  option:selected').val();
+		if(keyword == ""){
+			keyword = "so.create_date";
+		}
 		if (keyword) keyword = encodeURIComponent(keyword);
 		var param = {
 			k: keyword,
@@ -83,10 +101,14 @@
 	
 	var initFields = function() {
 		var fields =
-			[ 	{title: "序号", align: "center", edit:false, formatter: function (value, row, index) { return index+1; } },
+			[ 	{title: "序号", align: "center", edit:false, formatter: function 
+
+(value, row, index) { return index+1; } },
 				<#if watchHead??>
 					<#list watchHead as bean>
-						{field: "${bean}", title: "${bean}", align: "center",  edit:false},
+						{field: "${bean}", title: "${bean}", align: 
+
+"center",  edit:false},
 	   				</#list>
 				</#if>
    			];
@@ -95,10 +117,14 @@
 	
 	var initFieldsGift = function() {
 		var fields =
-			[ 	{title: "序号", align: "center", edit:false, formatter: function (value, row, index) { return index+1; } },
+			[ 	{title: "序号", align: "center", edit:false, formatter: function 
+
+(value, row, index) { return index+1; } },
 				<#if watchHead??>
 					<#list watchHead as bean>
-						{field: "${bean}", title: "${bean}", align: "center",  edit:false},
+						{field: "${bean}", title: "${bean}", align: 
+
+"center",  edit:false},
 	   				</#list>
 				</#if>
    			];
@@ -132,12 +158,12 @@
 <!-- Main content -->  
   
 <section class="content">
-	
+		<br>
 		<form class="form-horizontal" id="form" >
 			
-			<div class="form-group">
-				<div class="col-md-3" >
-					<span class="col-md-5" style="line-height:30px">业务员:</span>
+			<div class="form-group" style="float:left;">
+				<div class="col-md-3" style="margin-left:-30px;" >
+					<label class="col-md-5 control-label">业务员:</label>
 					<div class="col-md-7">
 						<select class="form-control" name="user_id" id="user_id" style="height:34px">
 						<option value="">--请选择--</option>
@@ -147,33 +173,32 @@
 						</select>
 					</div>
 				</div>
+				<div class="col-md-3" style="width:25%;margin-left:-50px;">
+					<label class="col-md-5 control-label">状态:</label>
+					<div class="col-md-7">
+						<select class="form-control" name="status" id="status" style="height:34px">
+							<option value="">--请选择--</option>
+							<option value="so.create_date">已下单</option>
+							<option value="so.print_time">已打印</option>
+							<option value="sok.create_date">已出库</option>
+						</select>
+					</div>
+				</div>
 				
-				<div class="col-md-4">
-					<label class="col-md-4 control-label">开始时间:</label>
-					<div class="col-md-8">
+				<div class="col-md-4" style="width:25%;">
+					<label class="col-md-5 control-label">开始时间:</label>
+					<div class="col-md-7">
 						<input id="startDate" class="form-control" value="${startDate!}" name="startDate" placeholder="开始日期" >
 					</div>
 				</div>
 				
-				<div class="col-md-4">
-					<label class="col-md-4 control-label">结束时间:</label>
-					<div class="col-md-8">
+				<div class="col-md-4" style="width:25%;">
+					<label class="col-md-5 control-label">结束时间:</label>
+					<div class="col-md-7">
 						<input id="endDate" class="form-control" value="${endDate!}" name="endDate" placeholder="结束日期" >
 					</div>
 				</div>
-			</div>
-			
-			<div class="form-group">
-				<input id="post-search-input" class="form-control" type="hidden" value="so.create_date" name="k" >
-				<div class="col-md-2">
-					<input onclick="orderTime()" class="btn btn-sm btn-primary" type="button" value="已下单查询">
-				</div>
-				<div class="col-md-2">
-					<input onclick="prints()" class="btn btn-sm btn-primary" type="button" value="已打印查询">
-				</div>
-				<div class="col-md-2">
-					<input onclick="complete()" class="btn btn-sm btn-primary" type="button" value="已出库查询">
-				</div>
+				<input onclick="prints()" class="btn btn-sm btn-primary" type="button" value="查询">
 			</div>
 		</form>
 		

@@ -34,7 +34,10 @@
 	});
 
 	var initParams = function(params) {
-		var keyword = $('#post-search-input').val();
+		var keyword = $('#status  option:selected').val();
+		if(keyword == ""){
+			keyword = "so.create_date";
+		}
 		if (keyword) keyword = encodeURIComponent(keyword);
 		var param = {
 			size: params.limit,
@@ -135,11 +138,18 @@
 	<div id="toolbar">
 		<form class="form-inline" id="form" >
 			<div class="row content-row">
-				<div class="form-group col-sm-12" style="float: right">
-					<input id="post-search-input" class="form-control" type="hidden" value="so.create_date" name="k" >&nbsp;
-					<input onclick="orderTime()" class="btn btn-sm btn-primary" type="button" value="已下单查询">
-					<input onclick="prints()" class="btn btn-sm btn-primary" type="button" value="已打印查询">
-					<input onclick="complete()" class="btn btn-sm btn-primary" type="button" value="已出库查询">
+				<div class="form-group col-sm-12" style="float: right;width:1000px;">
+					<div class="col-md-3" style="width:25%;">
+						<label class="control-label">状态:</label>
+						<div class="form-group">
+							<select class="form-control" name="status" id="status" style="height:34px">
+								<option value="">--请选择--</option>
+								<option value="so.create_date">已下单</option>
+								<option value="so.print_time">已打印</option>
+								<option value="sok.create_date">已出库</option>
+							</select>
+						</div>
+					</div>
 					<div class="form-group validata-box">
 						<label class="control-label">开始时间:</label>
 						<div class="form-group">
