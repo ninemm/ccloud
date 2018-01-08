@@ -65,7 +65,7 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		return Db.findFirst(fromBuilder.toString(), id);
 	}
 
-	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate, String status,String dataArea) {
+	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate, String printStatus,String stockInStatus ,String dataArea) {
 		String select = "select r.*, c.customer_name,c.contact,c.mobile,w.name as warehouseName,ct.name as customerTypeName,u.realname ";
 		StringBuilder fromBuilder = new StringBuilder(" from `cc_sales_refund_instock` r");
 		fromBuilder.append(" left join cc_seller_customer cc ON r.customer_id = cc.id ");
@@ -90,8 +90,14 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 			fromBuilder.append(" and r.create_date <= ?");
 			params.add(endDate);
 		}
-		if (StrKit.notBlank(status)) {
-			fromBuilder.append(" and r.status != 0");
+		if (StrKit.notBlank(stockInStatus)) {
+			fromBuilder.append(" and r.status = ?");
+			params.add(stockInStatus);
+		}
+		
+		if (StrKit.notBlank(printStatus)) {
+			fromBuilder.append(" and r.is_print = ?");
+			params.add(printStatus);
 		}
 
 		fromBuilder.append(" and ( r.instock_sn like '%"+keyword+"%' or c.customer_name like '%"+keyword+"%' ) order by r.create_date desc");
@@ -352,5 +358,50 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		String sql = "select * from cc_sales_refund_instock where instock_sn = ?";
 		return DAO.findFirst(sql, refundSn);
 	}
+	
+	public  Record findStockInForPrint(String inStockId) {
+	StringBuilder stringBuilder = new StringBuilder();
+	stringBuilder.append(" SELECT sr.id as salesRefundInstockId, sr.instock_sn, sr.payment_type, sr.remark AS stockInRemark, o.delivery_address, sr.total_reject_amount, ");
+	stringBuilder.append(" cs.customer_kind, c.id AS customerId, c.customer_name, c.contact AS ccontact, c.mobile AS cmobile, c.address AS ");
+	stringBuilder.append(" caddress, ct. NAME AS customerTypeName, ct. CODE AS customerTypeCode, u.realname, u.mobile, w. CODE AS ");
+	stringBuilder.append(" warehouseCode, cp.factor, w.`name` AS warehouseName, w.phone AS warehousePhone, sr.create_date AS returnOrderTime, ");
+	stringBuilder.append(" so.remark, sn.seller_name as sellerName, so.total_amount, so.id AS orderId, so.biz_user_id, o.id AS salesOutStockId, sn.id AS sellerId, pt.context AS printFootContext ");
+	stringBuilder.append(" FROM cc_sales_refund_instock  sr LEFT JOIN cc_sales_outstock o on o.id = sr.outstock_id LEFT JOIN cc_seller_customer cs ON o.customer_id = cs.id LEFT JOIN cc_sales_order_join_outstock sj ");
+	stringBuilder.append(" ON sj.outstock_id = o.id LEFT JOIN cc_customer c ON cs.customer_id = c.id LEFT JOIN cc_sales_order so ON so.id = ");
+	stringBuilder.append(" sj.order_id LEFT JOIN cc_seller sn ON sn.id = so.seller_id LEFT JOIN cc_customer_type ct ON o.customer_type_id = ");
+	stringBuilder.append(" ct.id LEFT JOIN cc_price_system cp ON cp.id = ct.price_system_id LEFT JOIN USER u ON so.biz_user_id = u.id LEFT ");
+	stringBuilder.append(" JOIN cc_warehouse w ON o.warehouse_id = w.id LEFT JOIN cc_seller_join_template cjt ON cjt.seller_id = sn.id LEFT ");
+	stringBuilder.append(" JOIN cc_print_template pt ON pt.id = cjt.print_template_id WHERE sr.id = ? ");
+	
+	return Db.findFirst(stringBuilder.toString(), inStockId);
+	}
+	
+	
+	public List<Record> findPrintProductInfo(String inStockId) {
+	   StringBuilder stringBuilder = new StringBuilder();
+	   stringBuilder.append(" SELECT sod.id as refundInstockDetailId, sod.refund_instock_id, sod.is_gift, sod.sell_product_id, sp.custom_name, p.big_unit, p.small_unit, ");
+	   stringBuilder.append(" p.convert_relate, sp.seller_id, sp.product_id, t1.valueName, sp.bar_code, sod.reject_product_price as big_Price, CONVERT ( ");
+	   stringBuilder.append(" sod.reject_product_price / p.convert_relate, DECIMAL (18, 2) ) AS small_price, floor(sod.reject_product_count / ");
+	   stringBuilder.append(" p.convert_relate ) AS bigCount, MOD (sod.reject_product_count, p.convert_relate ) AS smallCount, sod.reject_amount, sod.reject_product_count, cso.warehouse_id ");
+	   stringBuilder.append(" FROM `cc_sales_refund_instock_detail` sod LEFT JOIN cc_sales_refund_instock cso ON cso.id = sod.refund_instock_id LEFT JOIN cc_seller_product sp ON ");
+	   stringBuilder.append(" sod.sell_product_id = sp.id LEFT JOIN cc_product p ON sp.product_id = p.id LEFT JOIN (SELECT sv.id, ");
+	   stringBuilder.append(" cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv RIGHT JOIN ");
+	   stringBuilder.append(" cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id ");
+	   stringBuilder.append(" ) t1 ON t1.product_set_id = p.id WHERE sod.refund_instock_id = ? ");
+		
+	   return Db.find(stringBuilder.toString(),inStockId);
+	}
 
+	public boolean updatePrintStatus(String id) {
+		String sql = "update cc_sales_refund_instock cc set is_print = 1 where cc.id = '"+id+"'";
+		int i = Db.update(sql);
+		return (i > 0) ? true : false;
+	}
+	
+	
+	public boolean updateStockInStatus(String id, String userId, Date stockInDate,int salesInStockStatusOut,Date modifyDate, String remark) {
+		String sql = "update cc_sales_refund_instock cc set cc.biz_user_id=? , cc.biz_date=? , cc.status = ? , cc.modify_date = ?,cc.remark = ? where cc.id = ?";
+		int i = Db.update(sql, userId, stockInDate, salesInStockStatusOut, modifyDate,remark, id);
+		return (i > 0) ? true : false;
+	}
 }

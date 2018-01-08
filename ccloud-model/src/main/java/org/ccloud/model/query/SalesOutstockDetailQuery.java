@@ -120,7 +120,7 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 	
 	public List<orderProductInfo> findPrintProductInfo(String outstockId) {
 		StringBuilder sqlBuilder = new StringBuilder(
-				" SELECT sod.outstock_id,sod.is_gift, sod.sell_product_id,sod.outstock_id,sp.custom_name, p.big_unit, p.small_unit, p.convert_relate, sp.seller_id, sp.product_id, t1.valueName, cs.is_composite, IFNULL(t2.refundCount,0) as refundCount,sp.bar_code,sod.product_price,CONVERT( sod.product_price/p.convert_relate,decimal(18,2)) as small_price, ");
+				" SELECT sod.outstock_id,sod.is_gift, sod.sell_product_id,sp.custom_name, p.big_unit, p.small_unit, p.convert_relate, sp.seller_id, sp.product_id, t1.valueName, cs.is_composite,sp.bar_code,sod.product_price,CONVERT( sod.product_price/p.convert_relate,decimal(18,2)) as small_price, ");
 		sqlBuilder.append(" floor(sod.product_count/p.convert_relate) as bigCount,MOD(sod.product_count,p.convert_relate) as smallCount,sod.product_amount,sod.product_count,sod.id as salesOutDetaliId,cso.warehouse_id,sp.product_id as productId ");
 		sqlBuilder.append(" from `cc_sales_outstock_detail` sod ");
 		sqlBuilder.append(" LEFT JOIN cc_sales_outstock cso on cso.id = sod.outstock_id ");
@@ -129,8 +129,6 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		sqlBuilder.append(" LEFT JOIN cc_product p ON sp.product_id = p.id ");
 		sqlBuilder.append("LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
 		sqlBuilder.append("RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = p.id ");
-		sqlBuilder.append("LEFT JOIN (SELECT SUM(cr.reject_product_count) as refundCount,cr.outstock_detail_id FROM cc_sales_refund_instock_detail cr GROUP BY cr.outstock_detail_id) t2 ");
-		sqlBuilder.append("on t2.outstock_detail_id = sod.id ");
 		sqlBuilder.append(" WHERE sod.outstock_id = ? ");
 
 		List<Record> records = Db.find(sqlBuilder.toString(), outstockId);

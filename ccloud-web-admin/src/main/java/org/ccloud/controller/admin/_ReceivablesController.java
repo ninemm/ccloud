@@ -86,7 +86,7 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 		String type = getPara("type");
 		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String deptDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String deptDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		Page<Record> page = ReceivablesQuery.me().paginate(getPageNumber(),getPageSize(),customerTypeId,type,user.getId(),deptDataArea);
 		List<Record> receivablesList = page.getList();
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(),"rows", receivablesList);
