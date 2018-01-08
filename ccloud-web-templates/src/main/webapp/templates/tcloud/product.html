@@ -46,7 +46,10 @@ $(function() {
 		changeInit();
 		
     }).on("touchstart", "#shoppingCart", function () {
-    	save()
+    	shoppingCart();
+    	
+    }).on("touchstart", "#placeOrder", function () {
+    	order();
     	
     }).on("touchend", ".operate:first-child", function () { //减少商品数量
       productChange($(this));
@@ -141,6 +144,7 @@ $(function() {
 	});
 
     firstInit();
+    total();
 });
 
 var tag = '';
@@ -370,6 +374,7 @@ function productChange(obj){
         }
       }
       calTotal();
+      total();
 }
 
 function getProduct($el){
@@ -440,9 +445,25 @@ function getComposition($el){
 	}
 }
 
+function total(){
+	var productList = getItemBykey("productList") == undefined ? [] : getItemBykey("productList");;
+	var total = 0;
+	$.each(productList, function(index, el) {
+		if(el.isGift == 0) {
+			total += el.bigNum * el.bigPrice;
+			total += el.smallNum * el.smallPrice;
+		}
+	});
+	
+	var compositionList = getItemBykey("compositionList") == undefined ? [] : getItemBykey("compositionList");
+	$.each(compositionList, function(index, el) {
+		total += el.compositionNum * el.compositionPrice;
+	});
+	$("#totalNum").text("共" + (productList.length + compositionList.length) + "款,合计:" + total + "元")
 
-function save(){	
+} 
 
+function shoppingCart(){	
 	var productList = getItemBykey("productList") == undefined ? [] : getItemBykey("productList");
 	var compositionList = getItemBykey("compositionList") == undefined ? [] : getItemBykey("compositionList");
 	
@@ -453,6 +474,16 @@ function save(){
 	window.location.href = '${CPATH}/product/shoppingCart';
 }
 
+function order(){
+	var productList = getItemBykey("productList") == undefined ? [] : getItemBykey("productList");
+	var compositionList = getItemBykey("compositionList") == undefined ? [] : getItemBykey("compositionList");
+
+	if(productList.length == 0 && compositionList.length == 0) {
+		$.toptip("你的购物车内没有商品!", 'warning'); 
+		return;
+	}
+	window.location.href = '${CPATH}/product/order';
+}
 
 </#macro>
 
@@ -597,12 +628,16 @@ function save(){
 				</article>
 			</div>
 		</div>
-		<@shiro.hasPermission name="/admin/salesOrder">
-		<a class="hidden-menu" id="shoppingCart" >
-			<img src="${CTPATH}/images/shopping_cart.png" alt="">
-		</a>
-		</@shiro.hasPermission>
-		<div class="layer"></div>
+			<#if !footerEdit>
+				<@shiro.hasPermission name="/admin/salesOrder">
+				<a class="hidden-menu" id="shoppingCart" >
+					<img src="${CTPATH}/images/shopping_cart.png" alt="">
+				</a>
+				</@shiro.hasPermission>
+			<#else>
+				<#include "_inc/_goback.html" />
+			</#if>
+			<div class="layer"></div>
 		</div>
 		<div class="weui-gallery" id="gallery">
 			<span class="weui-gallery__img" id="galleryImg"></span>
@@ -610,5 +645,13 @@ function save(){
 			</div>
 		</div>
 </div>
-<#include "_inc/_footer_nav.html" />
+<#if !footerEdit>
+	<#include "_inc/_footer_nav.html" />
+<#else>
+	<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
+		<p class="total bg-white weui-flex__item" id="totalNum"></p>
+		<button id="shoppingCart" class="place-order yellow-button white">购物车</button>
+		<button id="placeOrder" class="place-order red-button white">下单</button>
+	</footer>
+</#if>
 </@layout>

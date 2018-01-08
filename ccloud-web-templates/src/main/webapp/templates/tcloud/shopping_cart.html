@@ -28,9 +28,9 @@ $(function() {
     }, function() {
     })
   }).on("touchstart", "#placeOrder", function () {
-      save();
+      order();
   }).on("touchstart", "#addGoods", function () {
-	  window.location.href = '${CPATH}/product';
+       window.location.href = '${CPATH}/product';
   }).on("touchend", ".operate:first-child", function () { //减少商品数量
       productChange($(this));
   }).on("touchend", ".operate:last-child", function () { //增加商品数量
@@ -417,7 +417,7 @@ function getComposition($el){
 	}
 }
 
-function save(){
+function order(){
 	var productList = getItemBykey("productList") == undefined ? [] : getItemBykey("productList");
 	var compositionList = getItemBykey("compositionList") == undefined ? [] : getItemBykey("compositionList");
 
