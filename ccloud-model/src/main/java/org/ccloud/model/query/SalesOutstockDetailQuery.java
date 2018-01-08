@@ -52,7 +52,7 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 	public List<Record> findByOutstockId(String outstockId) {
 
 		StringBuilder sqlBuilder = new StringBuilder(
-				" SELECT sod.*, sp.custom_name, p.big_unit, p.small_unit, p.convert_relate, sp.seller_id, sp.product_id, t1.valueName, cs.is_composite, t2.refundCount as refundCount ");
+				" SELECT sod.*, sp.custom_name, p.big_unit, p.small_unit, p.convert_relate, sp.seller_id, sp.product_id, t1.valueName, cs.is_composite, IFNULL(t2.refundCount,0) as refundCount ");
 		sqlBuilder.append(" from `cc_sales_outstock_detail` sod ");
 		sqlBuilder.append(" LEFT JOIN cc_sales_order_detail cs ON sod.order_detail_id = cs.id ");
 		sqlBuilder.append(" LEFT JOIN cc_seller_product sp ON sod.sell_product_id = sp.id ");
