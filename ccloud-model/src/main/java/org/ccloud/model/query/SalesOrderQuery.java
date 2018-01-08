@@ -304,7 +304,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		return SN;
 	}
 
-	public boolean checkStatus(String outStockId, Date date) {
+	public boolean checkStatus(String outStockId, String userId, Date date) {
 		SalesOrder salesOrder = this.findByOutStockId(outStockId);
 		List<SalesOrderDetail> list = SalesOrderDetailQuery.me().findBySalesOrderId(salesOrder.getId());
 		boolean status = true;
@@ -314,15 +314,17 @@ public class SalesOrderQuery extends JBaseQuery {
 				break;
 			}
 		}
-
+		
+		Integer outOrderStatus = 0;
 		if (status) {
 			salesOrder.setStatus(Consts.SALES_ORDER_STATUS_ALL_OUT);
+			outOrderStatus = Consts.SALES_OUT_STOCK_STATUS_OUT;
 		} else {
 			salesOrder.setStatus(Consts.SALES_ORDER_STATUS_PART_OUT);
+			outOrderStatus = Consts.SALES_OUT_STOCK_STATUS_PART_OUT;
 		}
 		salesOrder.setModifyDate(date);
-
-		if (!salesOrder.update()) {
+		if (!SalesOutstockQuery.me().updateStatus(outStockId, userId, outOrderStatus, date) || !salesOrder.update()) {
 			return false;
 		}
 		return true;

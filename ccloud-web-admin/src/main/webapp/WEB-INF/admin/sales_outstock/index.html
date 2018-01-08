@@ -104,8 +104,10 @@
 					formatter: function(value, row, rowIndex) {
 						if (value == 0) {
 							return '待出库';
-						} else {
+						} else if(value == 1000) {
 							return '已出库'
+						} else {
+							return '部分出库'
 						}
 					}
 				},

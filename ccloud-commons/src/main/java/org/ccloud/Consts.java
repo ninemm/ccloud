@@ -119,6 +119,7 @@ public class Consts {
 	public static final int SALES_ORDER_RECEIVE_TYPE_CASH = 1;//现金
 
 	public static final int SALES_OUT_STOCK_STATUS_OUT = 1000;//出库单出库
+	public static final int SALES_OUT_STOCK_STATUS_PART_OUT= 2000;//出库单部分出库
 	public static final int SALES_OUT_STOCK_STATUS_DEFUALT = 0;//出库单待出库
 	
 	public static final int SALES_REFUND_INSTOCK_DEFUALT = 0;//退货单待审核

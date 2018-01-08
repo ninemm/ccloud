@@ -297,8 +297,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
         			}
 
         		}
-        		if (!SalesOutstockQuery.me().updateStatus(outStockId, user.getId(), Consts.SALES_OUT_STOCK_STATUS_OUT, date) || 
-        				!SalesOrderQuery.me().checkStatus(outStockId, date)) {
+        		if (!SalesOrderQuery.me().checkStatus(outStockId, user.getId(), date)) {
         			return false;
         		}
         		
@@ -412,7 +411,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 				return false;
 			}
 			
-			if (!SalesOutstockQuery.me().updateStockOutStatus(printAllNeedInfo.getSalesOutStockId(), user.getId(), stockDate, Consts.SALES_OUT_STOCK_STATUS_OUT, date,remark) ||!SalesOrderQuery.me().checkStatus(printAllNeedInfo.getSalesOutStockId(), date)) {
+			if (!SalesOutstockQuery.me().updateStockOutStatus(printAllNeedInfo.getSalesOutStockId(), user.getId(), stockDate, Consts.SALES_OUT_STOCK_STATUS_OUT, date,remark) ||!SalesOrderQuery.me().checkStatus(printAllNeedInfo.getSalesOutStockId(), user.getId(), date)) {
 					return false;	
 				  }
 			

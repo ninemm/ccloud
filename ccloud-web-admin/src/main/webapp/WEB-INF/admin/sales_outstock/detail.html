@@ -42,7 +42,14 @@ function doSubmit(){
 			<span class="pull-left">
 			单号：${(outstock.outstock_sn)!}
 			</br>
-			状态：${(outstock.status)!} 
+			状态：
+			<#if outstock.status = 0>
+				待出库
+			<#elseif outstock.status = 1000>
+				已出库
+			<#else>
+				部分出库
+			</#if>			
 			</span>
 			<span class="pull-right">
 			下单人员：${(outstock.realname)!}/ ${(outstock.mobile)!} 
