@@ -28,15 +28,22 @@ $(function() {
         $(this).addClass("active").siblings().removeClass("active");
         var index = $(this).index();
      	$('.type').eq(index).show().siblings('.type').hide();
+
     }).on("click", ".product-content .swiper-slide", function () {
         $(this).addClass("active").siblings().removeClass("active");
+		tag = $(this).text();
+		if(tag == '全部') {
+			tag = '';
+		}
+		changeInit();
+
     }).on("input", "#searchInput", function () {
     	keyword = $(this).val();
-		initProduct();
+		changeInit();
 		
     }).on("touchstart", "#searchCancel", function () {
     	keyword = $(this).val();
-		initProduct();
+		changeInit();
 		
     }).on("touchstart", "#shoppingCart", function () {
     	save()
@@ -133,78 +140,105 @@ $(function() {
 
 	});
 
+    firstInit();
+});
+
+var tag = '';
+var keyword = '';
+var newHtml = $(".common").eq(0).html();
+var $tags = $("#tags");
+var $sidebar = $("#sidebar ul");
+var $menuRight = $(".menu-right");
+
+function firstInit(){
+	var tags = ${tags!};
+	initTags(tags);
+	var productList = ${productList!};
+	var compositionList = ${compositionList!};
+	combo(productList, compositionList);
+}
+
+function changeInit(){
+	$sidebar.empty();
+	$menuRight.empty();
+	Utils.ajax('${CPATH}/product/productList', {'tag' : tag, 'keyword' : keyword}, 
+		function(data){
+			combo(data.productList, data.compositionList);
+		}
+	);
+}
+
+function combo(productList, compositionList){
+	initProduct(productList);
+	initComposition(compositionList);
+	productNum();
+	compositionNum();
+	calTotal();
+}
+
+function initTags(tags) {
+	$tags.empty();
+	$tags.append("<div class='swiper-slide active'>全部</div>")
+	$.each(tags, function (index, el) {
+		$tags.append("<div class='swiper-slide'>" + el + "</div>");
+	});
+
 	var mySwiper = new Swiper('.product-content .swiper-container', {
 		slidesPerView: 4,
 	})
-	  
-    initProduct();
-});
+}
 
-var keyword = '';
-var newHtml = $(".common").eq(0).html();
-var $sidebar = $("#sidebar ul");
-var $menuRight = $(".menu-right");
-function initProduct(){
-	$sidebar.empty();
-	$menuRight.empty();
+function initProduct(productList){
 	var categoryId = '';
-	Utils.ajax('${CPATH}/product/productList', {'keyword': keyword}, 
-		function(data){
-			$.each(data.productList, function(index, el) {
-				if(categoryId != el.categoryId) {
-					if(categoryId == '') {
-						$sidebar.append("<li id='" + el.categoryId + "' class='active'>" + el.categoryName + " <span class='goods-num'>8</span> </li>");
-						$menuRight.append("<div class='type' id='" + el.categoryId + "' > </div>")
-					} else {
-						$sidebar.append("<li id='" + el.categoryId + "'>" + el.categoryName + " <span class='goods-num'>8</span> </li>");
-						$menuRight.append("<div class='type' id='" + el.categoryId + "' style='display:none'> </div>")
-					}
-					categoryId = el.categoryId;
-				}
 
-				var $type = $menuRight.find(".type:last");
-				$type.append("<section class='product_detail weui-panel weui-panel_access common' id='" + el.sell_product_id + "'>" + newHtml + "</section>");
-				var $newProductDetail = $type.find(".common:last");
-				$newProductDetail.find("#productName").text(el.custom_name);
-				$newProductDetail.find("#valueName").text(el.valueName);
-				
-				var bigPrice = el.price;
-				var convert = el.convert_relate;
-				var smallPrice = (bigPrice / convert).toFixed(2);
-
-				var bigAccountPrice = el.account_price;
-				var smallAccountPrice = (bigAccountPrice / convert).toFixed(2);
-
-				$newProductDetail.find("#bigPriceSpan").text('￥' + bigPrice);
-				$newProductDetail.find("#smallPriceSpan").text('￥' + smallPrice);
-				$newProductDetail.find("#bigUnitSpan").text(' / '+ el.big_unit);
-				$newProductDetail.find("#smallUnitSpan").text(' / ' + el.small_unit);
-				$newProductDetail.find("#stock").text('库存：' + el.store_count + el.big_unit);
-
-				$newProductDetail.find("#bigAccountPrice").val(bigAccountPrice);
-				$newProductDetail.find("#smallAccountPrice").val(smallAccountPrice);
-
-				$newProductDetail.find("#bigPrice").val(bigPrice);
-				$newProductDetail.find("#smallPrice").val(smallPrice);
-				$newProductDetail.find("#bigUnit").val(el.big_unit);
-				$newProductDetail.find("#smallUnit").val(el.small_unit);
-				$newProductDetail.find("#sellProductId").val(el.sell_product_id);
-				$newProductDetail.find("#productId").val(el.product_id);
-				$newProductDetail.find("#convert").val(el.convert_relate);
-
-				$newProductDetail.find("#description").val(el.description);
-
-				$newProductDetail.find("#image").attr("src", getImageUrl(el.product_image_list_store, el.product_sn));
-				$newProductDetail.find("#product_image_list_store").val(el.product_image_list_store);
-				$newProductDetail.find("#product_sn").val(el.product_sn);
-			});
-			
-		initComposition(data.compositionList);
-		productNum();
-		calTotal();
+	$.each(productList, function(index, el) {
+		if(categoryId != el.categoryId) {
+			if(categoryId == '') {
+				$sidebar.append("<li id='" + el.categoryId + "' class='active'>" + el.categoryName + " <span class='goods-num'>8</span> </li>");
+				$menuRight.append("<div class='type' id='" + el.categoryId + "' > </div>")
+			} else {
+				$sidebar.append("<li id='" + el.categoryId + "'>" + el.categoryName + " <span class='goods-num'>8</span> </li>");
+				$menuRight.append("<div class='type' id='" + el.categoryId + "' style='display:none'> </div>")
+			}
+			categoryId = el.categoryId;
 		}
-	);
-	
+
+		var $type = $menuRight.find(".type:last");
+		$type.append("<section class='product_detail weui-panel weui-panel_access common' id='" + el.sell_product_id + "'>" + newHtml + "</section>");
+		var $newProductDetail = $type.find(".common:last");
+		$newProductDetail.find("#productName").text(el.custom_name);
+		$newProductDetail.find("#valueName").text(el.valueName);
+		
+		var bigPrice = el.price;
+		var convert = el.convert_relate;
+		var smallPrice = (bigPrice / convert).toFixed(2);
+
+		var bigAccountPrice = el.account_price;
+		var smallAccountPrice = (bigAccountPrice / convert).toFixed(2);
+
+		$newProductDetail.find("#bigPriceSpan").text('￥' + bigPrice);
+		$newProductDetail.find("#smallPriceSpan").text('￥' + smallPrice);
+		$newProductDetail.find("#bigUnitSpan").text(' / '+ el.big_unit);
+		$newProductDetail.find("#smallUnitSpan").text(' / ' + el.small_unit);
+		$newProductDetail.find("#stock").text('库存：' + el.store_count + el.big_unit);
+
+		$newProductDetail.find("#bigAccountPrice").val(bigAccountPrice);
+		$newProductDetail.find("#smallAccountPrice").val(smallAccountPrice);
+
+		$newProductDetail.find("#bigPrice").val(bigPrice);
+		$newProductDetail.find("#smallPrice").val(smallPrice);
+		$newProductDetail.find("#bigUnit").val(el.big_unit);
+		$newProductDetail.find("#smallUnit").val(el.small_unit);
+		$newProductDetail.find("#sellProductId").val(el.sell_product_id);
+		$newProductDetail.find("#productId").val(el.product_id);
+		$newProductDetail.find("#convert").val(el.convert_relate);
+
+		$newProductDetail.find("#description").val(el.description);
+
+		$newProductDetail.find("#image").attr("src", getImageUrl(el.product_image_list_store, el.product_sn));
+		$newProductDetail.find("#product_image_list_store").val(el.product_image_list_store);
+		$newProductDetail.find("#product_sn").val(el.product_sn);
+	});
 }
 
 function productNum(){
@@ -218,14 +252,14 @@ function productNum(){
 }
 
 var compositionHtml = $(".composition").eq(0).html();
-function initComposition(data){
-	if(data.length > 0) {
+function initComposition(compositionList){
+	if(compositionList.length > 0) {
 		$sidebar.append("<li id='composition'> 组合商品 <span class='goods-num'>8</span> </li>");
 		$menuRight.append("<div class='type' id='composition' style='display:none'> </div>");
 	}
 	
 	var parentId = '';
-	$.each(data, function(index, el) {
+	$.each(compositionList, function(index, el) {
 		if(parentId != el.parent_id) {
 			parentId = el.parent_id;
 
@@ -252,7 +286,6 @@ function initComposition(data){
 		}
 
 	});
-	compositionNum();
 }
 
 function compositionNum(){
@@ -444,15 +477,11 @@ function save(){
 			</div>
 		</header>
 		<div class="product-content">
-<!-- 			<div class="swiper-container t-c">
-				<div class="swiper-wrapper">
-					<div class="swiper-slide active">分类1</div>
-					<div class="swiper-slide">分类2</div>
-					<div class="swiper-slide">分类3</div>
-					<div class="swiper-slide">分类4</div>
-					<div class="swiper-slide">分类5</div>
+			<div class="swiper-container t-c">
+				<div class="swiper-wrapper" id="tags">
+					<div class="swiper-slide active">全部</div>
 				</div>
-			</div> -->
+			</div>
 			<div class="product-inner-content">
 				<aside>
 					<div id="sidebar" class="menu-left">

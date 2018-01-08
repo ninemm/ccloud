@@ -194,11 +194,11 @@
 			</div>
 		</section>
 	</article>
-	<#include "_inc/_goback.html" />
 	<footer class="weui-footer weui-footer_fixed-bottom">
 	    <#if feedback??>
 	    <a class="place-order red-button white width-100 goback">返回</a>
-	    <#else> 
+		<#else> 
+		<#include "_inc/_goback.html" />
 		<button id="_submit_btn" onclick="doSubmit()" class="place-order red-button white width-100" style="border: 0 ;">确定</button>
 		</#if>
 	</footer>

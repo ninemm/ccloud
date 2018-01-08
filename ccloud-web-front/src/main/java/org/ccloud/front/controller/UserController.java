@@ -123,7 +123,6 @@ public class UserController extends BaseFrontController {
 		} else if (sellerList.size() > 1) {
 			setAttr("mobile", username);
 			setSessionAttr("sellerList", sellerList);
-//			redirect("/user/choice", true);
 			forwardAction("/user/choice");
 			return ;
 		}
@@ -219,14 +218,20 @@ public class UserController extends BaseFrontController {
 			renderAjaxResultForSuccess("切换账号成功");
 			return ;
 		}
-		redirect("/"); 
+		redirect(Consts.INDEX_URL);
 	}
 	
 	private User initSellerAccount() {
+		User curUser = null;
 		String mobile = getPara("mobile");
 		String openid = getPara("openid");
 		String sellerId = getPara("sellerId");
-		User curUser = null;
+		
+		User tmpUser = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		if (tmpUser != null) {
+			openid = getPara("openid", tmpUser.getWechatOpenId());
+			mobile = getPara("mobile", tmpUser.getMobile());
+		}
 		
 		List<User> userList = UserQuery.me().findByWechatOpenid(openid);
 		if (userList == null || userList.size() == 0)
@@ -245,6 +250,9 @@ public class UserController extends BaseFrontController {
 					setSessionAttr(Consts.SESSION_SELLER_ID, dept.get("seller_id"));
 					setSessionAttr(Consts.SESSION_SELLER_NAME, dept.get("seller_name"));
 					setSessionAttr(Consts.SESSION_SELLER_CODE, dept.get("seller_code"));
+					
+					setCookie(Consts.COOKIE_SELECTED_SELLER_ID, sellerId, 60 * 60 * 24 * 7);
+					setCookie(Consts.COOKIE_SELECTED_USER_ID, curUser.getId(), 60 * 60 * 24 * 7);
 					break;
 				}
 			}

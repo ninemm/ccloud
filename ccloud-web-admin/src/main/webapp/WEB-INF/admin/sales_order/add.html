@@ -59,9 +59,9 @@
 		}
 	};
 
-	function addProduct(){
+	function addProduct(type){
+		var type = $("input[name='receiveType']:checked").val();
 		var $tbody = $("#table tbody");
-
 		var newTrHtml = $tbody.find("tr:first").html();
 		newTrIdx = newTrIdx + 1;
 		var newTrId = 'tr' + newTrIdx;
@@ -78,15 +78,17 @@
 		
 		<!--切换商品的方法  -->
 		$productSelect.change(function(){
-			productChange($(this));
+			productChange($(this),type);
 		});
 
 		<!--触发一次 -->
-		productChange($productSelect);
+		productChange($productSelect,type);
 		
 		<!--添加validate -->
 		var bigPriceName = "bigPrice" + newTrIdx;
 		$newTr.find("#bigPrice").attr("name", bigPriceName)
+		$newTr.find("#accountPrice").attr("name","accountPrice" + newTrIdx);
+		$newTr.find("#price").attr("name","price" + newTrIdx);
 		$form.data('bootstrapValidator').addField(bigPriceName,
 			{
 				validators: {
@@ -134,9 +136,8 @@
 		orderNum();
 	}
 	
-	function productChange(obj){
+	function productChange(obj,type){
 			var product = productInfoMap[obj.val()].columns;
-
 			var $tr = obj.parent().parent().parent();
 
 			$tr.find("#productId").val(product.product_id);
@@ -148,13 +149,17 @@
 
 			var convert = product.convert_relate;
 			$tr.find("#convert").val(convert);
-
-			var smallPrice = (product.price/convert).toFixed(2);
 			var smallUnit = product.small_unit;
-
-			var bigPrice = product.price;
-	
+			if(type == 1){
+				var smallPrice = (product.price/convert).toFixed(2);
+				var bigPrice = product.price;
+			}else{
+				var smallPrice = (product.account_price/convert).toFixed(2);
+				var bigPrice = product.account_price;
+			}
 			$tr.find("#bigPrice").val(bigPrice);
+			$tr.find("#accountPrice").val(product.account_price);
+			$tr.find("#price").val(product.price);
 			$tr.find("#bigPrice-span").text(bigPrice);
 			$tr.find("#bigUnit-span").text(product.big_unit + "(x" + convert + smallUnit + ")");
 			
@@ -295,7 +300,7 @@
 			var smallPrice = $curTr.find("#smallPrice").val();
 			var smallNum = $curTr.find("#smallNum").val();
 			rowTotal = Number(bigPrice) * Number(bigNum) + Number(smallPrice) * Number(smallNum);
-			rowTotal = rowTotal.toFixed(2);
+			rowTotal.toFixed(2);
 		}
 		$curTr.find(".rowTotal").text(rowTotal);
 		$curTr.find("#inputRowTotal").val(rowTotal);
@@ -310,7 +315,7 @@
 			total += Number($(item).text());
 		});
 		total = total * discount
-		total = total.toFixed(2);
+		total.toFixed(2);
 		$("#total").text(total);
 		$("#inputTotal").val(total);
 	}
@@ -366,13 +371,14 @@
 	    		check = true;
 	    	}
 	    	alltotal = alltotal + producttotal;
-	    	$("#productTotal").val(alltotal);
 		});
+    	$("#productTotalCount").val(alltotal);
 		
 		return check;	
 	}
 
 	function doSubmit(){
+		$("#productTotalCount").text($("#total").text());
 		$("#productNum").val($(".rowNum").length - 1);
 		if (!checkStore()) {
 			toastr.error('未选择商品或库存不足!','操作失败');
@@ -412,60 +418,27 @@
 		});
 	}
 	
-	/*function changeMoney(obj){
+	function changeMoney(obj){
 		var type = $(obj).val();
-		var $productSelect = $newTr.find("#sellProductId")
-		$productSelect.select2({
-			data: productOptionList,
-			width: "100%",
-			language: "zh-CN"
-		});
-		alert(type);
-		if(type == 1){
-			productChange($productSelect);
-		}else{
-			
-			
-			<!--切换商品的方法  -->
-			$productSelect.change (function(){
-				productChangeAccount($(this));
-			});
-	
-			<!--触发一次 -->
-			productChangeAccount($productSelect);
+		var num = $(".rowNum").length-1;
+		var index = 1;
+		for(index = 1;index<=num;index++){
+			var accountPriceName = 'accountPrice' +index;
+			var bigPriceName = 'bigPrice'+index;
+			var convert = 'convert'+index;
+			var priceName = 'price'+index;
+			var accountPrice = $("input[name='"+accountPriceName+"']").val();
+			var price = $("input[name='"+priceName+"']").val();
+			if(type == 0){
+				$("input[name='"+bigPriceName+"']").val(accountPrice);
+				changeBigPrice($("input[name='"+bigPriceName+"']"));
+			}else{
+				$("input[name='"+bigPriceName+"']").val(price);
+				changeBigPrice($("input[name='"+bigPriceName+"']"));
+			}
 		}
 	}
 	
-	function productChangeAccount(obj){
-			var product = productInfoMap[obj.val()].columns;
-
-			var $tr = obj.parent().parent().parent();
-
-			$tr.find("#productId").val(product.product_id);
-			if (product.store_count == null) {
-				$tr.find("#stock").text(0);
-			} else {
-				$tr.find("#stock").text(product.store_count);
-			}
-
-			var convert = product.convert_relate;
-			$tr.find("#convert").val(convert);
-
-			var smallPrice = (product.account_price/convert).toFixed(2);
-			var smallUnit = product.small_unit;
-
-			var bigPrice = product.account_price;
-	
-			$tr.find("#bigPrice").val(bigPrice);
-			$tr.find("#bigPrice-span").text(bigPrice);
-			$tr.find("#bigUnit-span").text(product.big_unit + "(x" + convert + smallUnit + ")");
-			
-			$tr.find("#smallPrice").val(smallPrice);
-			$tr.find("#smallPrice-span").text(smallPrice);
-			$tr.find("#smallUnit-span").text(smallUnit);
-			
-			rowTotalF(obj);
-	}*/
 </#macro>
 
 <@layout active_id=p child_active_id=c>
@@ -520,8 +493,7 @@
 									<select id="sellProductId" name="sellProductId" class="form-control">
 									</select>
 									<input type="hidden" name="productId" id="productId" value="" />
-									<input type="hidden" name="productTotal" id="productTotal" value="" />
-									<input type="hidden" name="accountPrice" id="accountPrice" value="" />
+									<input type="hidden" name="productTotalCount" id="productTotalCount" value="" />
 									<input type="hidden" name="price" id="price" value="" />
 								</div>
 							</td>
@@ -532,6 +504,8 @@
 							<td>
 								<input type="hidden" name="convert" id="convert" value="" />
 								<div class = "validata-box">
+									<input type="hidden" id = "accountPrice" name = "accountPrice" value = "">								
+									<input type="hidden" name="price" id="price" value="" />
 									￥<input type="text" id="bigPrice" name="bigPrice" style="width: 60%" onblur="changeBigPrice(this)" value="0" />
 									</br>(<span id="bigPrice-span"></span>)
 								</div>

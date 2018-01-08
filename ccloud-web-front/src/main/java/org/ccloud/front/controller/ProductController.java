@@ -1,11 +1,15 @@
 package org.ccloud.front.controller;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.shiro.SecurityUtils;
@@ -40,6 +44,44 @@ import com.jfinal.plugin.activerecord.Record;
 public class ProductController extends BaseFrontController {
 
 	public void index() {
+		Boolean footerEdit = getParaToBoolean("footerEdit", false);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		
+		List<Record> productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", "");
+		List<Record> compositionRecords = ProductCompositionQuery.me().findDetailByProductId("", sellerId, "", "");
+
+		List<Map<String, Object>> productList = new ArrayList<Map<String, Object>>();
+		List<Map<String, Object>> compositionList = new ArrayList<Map<String, Object>>();
+		
+		Set<String> tagSet = new LinkedHashSet<String>();
+		
+		for (Record record : productRecords) {
+			productList.add(record.getColumns());
+			String tags = record.getStr("tags");
+			if (StrKit.notBlank(tags)) {
+				String[] tagArray = tags.split(",", -1);
+				for (String tag : tagArray) {
+					tagSet.add(tag);
+				}
+			}
+		}
+		
+		for (Record record : compositionRecords) {
+			compositionList.add(record.getColumns());
+			String tags = record.getStr("tags");
+			if (StrKit.notBlank(tags)) {
+				String[] tagArray = tags.split(",", -1);
+				for (String tag : tagArray) {
+					tagSet.add(tag);
+				}
+			}
+		}
+		
+		setAttr("productList", JSON.toJSON(productList));
+		setAttr("compositionList", JSON.toJSON(compositionList));
+		setAttr("tags", JSON.toJSON(tagSet));
+		
+		setAttr("footerEdit", footerEdit);
 
 		render("product.html");
 	}
@@ -48,10 +90,24 @@ public class ProductController extends BaseFrontController {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 
 		String keyword = getPara("keyword");
-		List<Record> productList = SellerProductQuery.me().findProductListForApp(sellerId, keyword);
-		List<Record> compositionList = ProductCompositionQuery.me().findDetailByProductId("", sellerId, keyword);
+		String tag = getPara("tag");
+
+		List<Record> productList = SellerProductQuery.me().findProductListForApp(sellerId, keyword, tag);
+		List<Record> compositionList = ProductCompositionQuery.me().findDetailByProductId("", sellerId, keyword, tag);
 		
-		Map<String, List<Record>> map = ImmutableMap.of("productList", productList, "compositionList", compositionList);
+		Set<String> tagSet = new LinkedHashSet<String>();
+		
+		for (Record record : productList) {
+			String tags = record.getStr("tags");
+			if (tags != null) {
+				String[] tagArray = tags.split(",", -1);
+				for (String str : tagArray) {
+					tagSet.add(str);
+				}
+			}
+		}
+		
+		Map<String, Collection<? extends Serializable>> map = ImmutableMap.of("productList", productList, "compositionList", compositionList, "tags", tagSet);
 		renderJson(map);
 	}
 
@@ -59,7 +115,7 @@ public class ProductController extends BaseFrontController {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
 
-		List<Record> productList = SellerProductQuery.me().findProductListForApp(sellerId, "");
+		List<Record> productList = SellerProductQuery.me().findProductListForApp(sellerId, "", "");
 
 		Map<String, Object> sellerProductInfoMap = new HashMap<String, Object>();
 		List<Map<String, Object>> sellerProductItems = new ArrayList<>();

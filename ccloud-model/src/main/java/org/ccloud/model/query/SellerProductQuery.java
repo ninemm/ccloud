@@ -135,9 +135,9 @@ public class SellerProductQuery extends JBaseQuery {
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}
 	
-	public List<Record> findProductListForApp(String sellerId, String keyword) {
+	public List<Record> findProductListForApp(String sellerId, String keyword, String tag) {
 		StringBuilder fromBuilder = new StringBuilder(
-				" SELECT sp.id AS sell_product_id, sp.product_id, sp.custom_name, sp.store_count, sp.price, sp.account_price, "
+				" SELECT sp.id AS sell_product_id, sp.product_id, sp.custom_name, sp.store_count, sp.price, sp.account_price, sp.tags,"
 				+ " p.convert_relate, p.product_sn, p.big_unit, p.small_unit, p.description, t1.valueName,"
 				+ " g.`name` AS goodsName, g.product_image_list_store, gc.`id` AS categoryId, gc.`name` AS categoryName, gt.`id` as typeId, gt.`name` as typeName ");
 		fromBuilder.append(" FROM cc_seller_product sp JOIN cc_product p ON sp.product_id = p.id ");
@@ -148,8 +148,13 @@ public class SellerProductQuery extends JBaseQuery {
 		LinkedList<Object> params = new LinkedList<Object>();
 		appendIfNotEmpty(fromBuilder, "sp.seller_id", sellerId, params, false);
 		appendIfNotEmptyWithLike(fromBuilder, "sp.custom_name", keyword, params, false);
+		
+		if (StrKit.notBlank(tag)) {
+			fromBuilder.append(" AND FIND_IN_SET(?, sp.tags)");
+			params.add(tag);
+		}
 
-		fromBuilder.append(" ORDER BY gc.`grade`, gc.`order_list`, sp.order_list ");
+		fromBuilder.append(" ORDER BY gc.`parent_id`, gc.`order_list`, sp.order_list ");
 
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}
