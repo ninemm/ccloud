@@ -12,8 +12,10 @@ import org.ccloud.core.cache.ActionCache;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.Department;
+import org.ccloud.model.Seller;
 import org.ccloud.model.User;
 import org.ccloud.model.query.DepartmentQuery;
+import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.shiro.CaptchaUsernamePasswordToken;
@@ -72,10 +74,8 @@ public class WxOauthController extends BaseFrontController {
 					if (tmpList.size() > 0) {
 						Department dept = tmpList.get(0);
 						String dealerDataArea = DepartmentQuery.me().getDealerDataArea(tmpList);
-						setSessionAttr(Consts.SESSION_DEALER_DATA_AREA, dealerDataArea);						
-						setSessionAttr(Consts.SESSION_SELLER_ID, dept.get("seller_id"));
-						setSessionAttr(Consts.SESSION_SELLER_NAME, dept.get("seller_name"));
-						setSessionAttr(Consts.SESSION_SELLER_CODE, dept.get("seller_code"));
+						setSessionAttr(Consts.SESSION_DEALER_DATA_AREA, dealerDataArea);
+						setSellerSession(dept.getStr("seller_id"), dept.getStr("seller_name"), dept.getStr("seller_code"));
 					}
 					// 更新用户的信息
 					ApiResult wxUserResult = UserApi.getUserInfo(openId);
@@ -113,8 +113,12 @@ public class WxOauthController extends BaseFrontController {
 					String cookieSellerId = getCookie(Consts.COOKIE_SELECTED_SELLER_ID);
 					
 					if (StrKit.notBlank(cookieSellerId, cookieUserId)) {
+						
 						User curUser = UserQuery.me().findById(cookieUserId);
 						init(curUser.getUsername(), curUser.getPassword(), true);
+						Seller seller = SellerQuery.me().findById(cookieSellerId);
+						setSellerSession(seller.getId(), seller.getSellerName(), seller.getSellerCode());
+						
 						forwardAction(Consts.INDEX_URL);
 						return ;
 					}
@@ -150,6 +154,12 @@ public class WxOauthController extends BaseFrontController {
 		} catch (AuthenticationException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private void setSellerSession(String sellerId, String sellerName, String sellerCode) {
+		setSessionAttr(Consts.SESSION_SELLER_ID, sellerId);
+		setSessionAttr(Consts.SESSION_SELLER_NAME, sellerName);
+		setSessionAttr(Consts.SESSION_SELLER_CODE, sellerCode);
 	}
 	
 }

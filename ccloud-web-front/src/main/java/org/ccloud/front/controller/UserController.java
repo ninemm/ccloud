@@ -55,10 +55,7 @@ public class UserController extends BaseFrontController {
 		keepPara();
 
 		BigInteger userId = StringUtils.toBigInteger(action, null);
-		if (userId != null) {
-			
-			
-		} else {
+		if (userId == null) {
 			if ("detail".equalsIgnoreCase(action)) {
 				renderError(404);
 			} else if ("choice".equalsIgnoreCase(action)) {
