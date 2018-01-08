@@ -52,15 +52,16 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 	public List<Record> findByOutstockId(String outstockId) {
 
 		StringBuilder sqlBuilder = new StringBuilder(
-				" SELECT sod.*, sp.custom_name, p.big_unit, p.small_unit, p.convert_relate, sp.seller_id, sp.product_id, t1.valueName, cs.is_composite, IFNULL(t2.refundCount,0) as refundCount ");
+				" SELECT sod.*, sp.custom_name, p.big_unit, p.small_unit, p.convert_relate, sp.seller_id, sp.product_id, t1.valueName, cs.is_composite, t2.refundCount as refundCount ");
 		sqlBuilder.append(" from `cc_sales_outstock_detail` sod ");
 		sqlBuilder.append(" LEFT JOIN cc_sales_order_detail cs ON sod.order_detail_id = cs.id ");
 		sqlBuilder.append(" LEFT JOIN cc_seller_product sp ON sod.sell_product_id = sp.id ");
 		sqlBuilder.append(" LEFT JOIN cc_product p ON sp.product_id = p.id ");
 		sqlBuilder.append("LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
 		sqlBuilder.append("RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = p.id ");
-		sqlBuilder.append("LEFT JOIN (SELECT SUM(cr.reject_product_count) as refundCount,cr.outstock_detail_id FROM cc_sales_refund_instock_detail cr GROUP BY cr.outstock_detail_id) t2 ");
-		sqlBuilder.append("on t2.outstock_detail_id = sod.id ");
+		sqlBuilder.append("LEFT JOIN (SELECT if(cri.`status` = 1001,0,IFNULL(SUM(cr.reject_product_count),0)) as refundCount,cr.outstock_detail_id FROM cc_sales_refund_instock_detail cr ");
+		sqlBuilder.append("LEFT JOIN cc_sales_refund_instock cri on cri.id = cr.refund_instock_id ");
+		sqlBuilder.append("GROUP BY cr.outstock_detail_id) t2 on t2.outstock_detail_id = sod.id ");
 		sqlBuilder.append(" WHERE sod.outstock_id = ? ");
 
 		return Db.find(sqlBuilder.toString(), outstockId);

@@ -299,13 +299,14 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		StringBuilder sqlBuilder = new StringBuilder(
 				" SELECT sod.*, sp.custom_name, p.big_unit, p.small_unit, p.convert_relate, sp.seller_id, sp.product_id, t1.valueName ");
 		sqlBuilder.append(" from `cc_sales_refund_instock_detail` sod ");
+		sqlBuilder.append(" LEFT JOIN cc_sales_refund_instock cri ON cri.id = sod.refund_instock_id ");
 		sqlBuilder.append(" LEFT JOIN cc_sales_outstock_detail cd ON cd.id = sod.outstock_detail_id ");
 		sqlBuilder.append(" LEFT JOIN cc_sales_outstock co ON co.id = cd.outstock_id ");
 		sqlBuilder.append(" LEFT JOIN cc_seller_product sp ON sod.sell_product_id = sp.id ");
 		sqlBuilder.append(" LEFT JOIN cc_product p ON sp.product_id = p.id ");
 		sqlBuilder.append("LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
 		sqlBuilder.append("RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = p.id ");
-		sqlBuilder.append(" WHERE co.id = ? ");
+		sqlBuilder.append(" WHERE co.id = ? and cri.status != 1001");
 
 		return Db.find(sqlBuilder.toString(), outstockId);
 	}

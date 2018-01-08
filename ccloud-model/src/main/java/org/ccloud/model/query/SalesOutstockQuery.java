@@ -272,9 +272,11 @@ public class SalesOutstockQuery extends JBaseQuery {
 		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
 
 		if (needWhere) {
-			fromBuilder.append(" where refundCount < outCount");
+			fromBuilder.append(" where refundCount < outCount AND o.status != ? ");
+			params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
 		} else {
-			fromBuilder.append(" AND refundCount < outCount");
+			fromBuilder.append(" AND refundCount < outCount AND o.status != ? ");
+			params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
 		}
 
 		if (StrKit.notBlank(startDate)) {
