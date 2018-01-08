@@ -268,7 +268,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		}
 		//超过数量(件)
 		Float startNum = OptionQuery.me().findValueAsFloat(Consts.OPTION_WEB_PROC_NUM_LIMIT + sellerCode);
-		Float productTotal = Float.valueOf(StringUtils.getArrayFirst(paraMap.get("productTotal")));
+		Float productTotal = Float.valueOf(StringUtils.getArrayFirst(paraMap.get("productTotalCount")));
 		if(startNum != null && productTotal > startNum) { 
 			return true;
 		}
