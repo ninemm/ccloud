@@ -408,6 +408,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 						sellerProducts.set("custom_name",sellerProduct.getCustomName());
 						sellerProducts.set("store_count",new BigDecimal(0));
 						sellerProducts.set("price", sellerProduct.getPrice());
+						sellerProducts.set("account_price", sellerProduct.getPrice());
 						sellerProducts.setCost(sellerProduct.getCost());
 						sellerProducts.setIsSource(1);
 						sellerProducts.setMarketPrice(sellerProduct.getMarketPrice());
@@ -438,6 +439,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 						issellerProducts.set("order_list", sellerProduct.getOrderList());
 						issellerProducts.set("price", sellerProduct.getPrice());
 						issellerProducts.set("account_price", sellerProduct.getAccountPrice());
+						issellerProducts.set("tags", sellerProduct.getTags());
 						issellerProducts.set("bar_code", sellerProduct.getBarCode());
 						issellerProducts.set("modify_date", new Date());
 						

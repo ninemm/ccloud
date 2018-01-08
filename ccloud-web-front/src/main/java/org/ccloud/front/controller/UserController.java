@@ -223,8 +223,8 @@ public class UserController extends BaseFrontController {
 	
 	private User initSellerAccount() {
 		User curUser = null;
-		String mobile = null;
-		String openid = null;
+		String mobile = getPara("mobile");
+		String openid = getPara("openid");
 		String sellerId = getPara("sellerId");
 		
 		User tmpUser = getSessionAttr(Consts.SESSION_LOGINED_USER);

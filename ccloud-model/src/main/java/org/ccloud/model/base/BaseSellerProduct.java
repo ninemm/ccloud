@@ -154,6 +154,14 @@ public abstract class BaseSellerProduct<M extends BaseSellerProduct<M>> extends 
 		return get("market_price");
 	}
 
+	public void setWeightUnit(java.lang.String weightUnit) {
+		set("weight_unit", weightUnit);
+	}
+
+	public java.lang.String getWeightUnit() {
+		return getStr("weight_unit");
+	}
+	
 	public void setWeight(java.math.BigDecimal weight) {
 		set("weight", weight);
 	}
@@ -162,12 +170,12 @@ public abstract class BaseSellerProduct<M extends BaseSellerProduct<M>> extends 
 		return get("weight");
 	}
 
-	public void setWeightUnit(java.lang.String weightUnit) {
-		set("weight_unit", weightUnit);
+	public void setTags(java.lang.String tags) {
+		set("tags", tags);
 	}
 
-	public java.lang.String getWeightUnit() {
-		return getStr("weight_unit");
+	public java.lang.String getTags() {
+		return getStr("tags");
 	}
 
 	public void setWarehouseId(java.lang.String warehouseId) {
