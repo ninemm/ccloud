@@ -20,7 +20,7 @@ public class Generator {
 	public static void main(String[] args) {
 		
 		String modelPackage = "org.ccloud";
-		String outputPath = "D:/";
+		String outputPath = "/Users/yangfan/git";
 		String dbHost = "120.76.29.52";//外网开发数据库IP
 		String dbName = "ccloud_v2_test";
 		String dbUser = "qdy";
