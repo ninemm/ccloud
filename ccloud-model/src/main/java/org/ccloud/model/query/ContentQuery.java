@@ -376,23 +376,23 @@ public class ContentQuery extends JBaseQuery {
 
 	public List<Content> findListInNormal(int page, int pagesize) {
 		return findListInNormal(page, pagesize, null, null, null, null, null, null, null, null, null, null, null, null,
-				null);
+				null, null);
 	}
 
 	public List<Content> findListInNormal(int page, int pagesize, String module) {
 		String[] modules = new String[] { module };
 		return findListInNormal(page, pagesize, null, null, null, null, modules, null, null, null, null, null, null,
-				null, null);
+				null, null, null);
 	}
 
 	public List<Content> findListInNormalByTaxonomyId(int page, int pagesize, String taxonomyId) {
 		return findListInNormal(page, pagesize, null, null, new String[] { taxonomyId }, null, null, null, null,
-				null, null, null, null, null, null);
+				null, null, null, null, null, null, null);
 	}
 
 	public List<Content> findListInNormal(int page, int pagesize, String orderBy, String keyword, String[] typeIds,
 			String[] typeSlugs, String[] modules, String[] styles, String[] flags, String[] slugs, String[] userIds,
-			String[] parentIds, String[] tags, Boolean hasThumbnail, String month) {
+			String[] parentIds, String[] tags, Boolean hasThumbnail, String month, String sellerId) {
 
 		if (modules == null) {
 			modules = TemplateManager.me().currentTemplateModulesAsArray();
@@ -405,6 +405,7 @@ public class ContentQuery extends JBaseQuery {
 		sql.append(" where c.status = 'normal' ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		appendIfNotEmpty(sql, "m.taxonomy_id", typeIds, params, false);
+		appendIfNotEmpty(sql, "c.seller_id", sellerId, params, false);
 		appendIfNotEmpty(sql, "c.module", modules, params, false);
 		appendIfNotEmpty(sql, "c.style", styles, params, false);
 		appendIfNotEmpty(sql, "c.slug", slugs, params, false);

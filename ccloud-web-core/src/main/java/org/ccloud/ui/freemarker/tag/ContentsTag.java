@@ -33,6 +33,7 @@ public class ContentsTag extends JTag {
 	@Override
 	public void onRender() {
 
+		String sellerId = getParam("sellerId");
 		String orderBy = getParam("orderBy");
 		String keyword = getParam("keyword");
 
@@ -88,7 +89,7 @@ public class ContentsTag extends JTag {
 		}
 
 		List<Content> data = ContentQuery.me().findListInNormal(pageNumber, pageSize, orderBy, keyword, typeIds,
-				typeSlugs, modules, styles, flags, slugs, userIds, parentIds, tags, hasThumbnail, null);
+				typeSlugs, modules, styles, flags, slugs, userIds, parentIds, tags, hasThumbnail, null, sellerId);
 
 		if (data == null || data.isEmpty()) {
 			renderText("");
