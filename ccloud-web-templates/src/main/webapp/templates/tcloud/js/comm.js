@@ -359,5 +359,7 @@ $(function() {
 		$(this).addClass('red-button').siblings().removeClass('red-button');
 	}).on('touchend', '.goback', function() {
 		historyUtils.back();
+	}).on('touchend', '.return_index', function() {
+		location.href = "/";
 	});
 })
