@@ -16,6 +16,19 @@
 
 <#macro script>
 $(function() {
+	$(document).off('click', '.operate:last-child')
+	.off('touchstart', '#confirm-input')
+	.on('click', '.operate:last-child', function() {
+		var $this = $(this);
+		var max = $this.parent().parent().find('.max').val();
+		var $input = $this.prev();
+		$input.val()==max?'':$input.val(Number($input.val()) + 1);
+	}).on("touchstart", "#confirm-input", function() {
+		var max = $currentInput.parent().parent().find('.max').val();
+		var $newInput = $(".pop-input input");
+		$newInput.val()>max?$newInput.val(max):'';
+		confirmInput();
+	})
 })
 	var $form = $('#form');
 
@@ -71,7 +84,7 @@ $(function() {
 			receiveType = "0";
 		}
     	if (!checkProductNumber()) {
-			toastr.error('退货大于购买数量或数量为0!','操作失败');
+			toastr.error('退货数量为0!','操作失败');
 			return;			
 		}
         $form.ajaxSubmit({
@@ -186,6 +199,7 @@ $(function() {
 							规格：<span id="valueName">${(list.valueName)!}</span>
 						</div>
 						<div class="product_bUnit">
+							<input type="hidden" class="max" value="${((list.product_count-list.refundCount)/list.convert_relate)?int}">
 							<span class="price" id="bigPriceSpan">￥${(list.product_price)!}</span>
 							<span class="unit" id="bigUnitSpan">&nbsp;/&nbsp;${(list.big_unit)!}</span>
 							<#if list.is_composite == 0>
@@ -205,6 +219,7 @@ $(function() {
 							</#if> 
 						</div>
 						<div class="product_mUnit">
+							<input type="hidden" class="max" value="${((list.product_count-list.refundCount) % list.convert_relate)!0}">
 							<span class="price" id="smallPriceSpan">￥${((list.product_price/list.convert_relate)!)?string("0.##")}</span>
 							<span class="unit" id="smallUnitSpan">&nbsp;/&nbsp;${(list.small_unit)!}</span>
 							<#if list.is_composite == 0>
