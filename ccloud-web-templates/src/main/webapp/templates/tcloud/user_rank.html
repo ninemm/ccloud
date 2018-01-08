@@ -12,6 +12,7 @@
 			"dayTag":  'today',
 		}
 		productAndRank(params);
+		$("#dayTag").val("today");
 	});
     function productAndRank(params) {
 		Utils.ajax('${CPATH}/report/getUserRank', params, 

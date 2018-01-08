@@ -79,11 +79,13 @@ public class GroupQuery extends JBaseQuery {
 		return DAO.deleteById(id);
 	}
 
-	public List<Group> findByDept(String dataArea) {
-		StringBuilder sqlBuilder = new StringBuilder("select * ");
+	public List<Group> findByDept(String dataArea, String userId) {
+		StringBuilder sqlBuilder = new StringBuilder("select g.*, t1.user_id ");
 
 		sqlBuilder.append("from `group` g ");
+		sqlBuilder.append("LEFT JOIN (SELECT u.group_id,u.user_id FROM user_group_rel u where u.user_id = ?) t1 on t1.group_id = g.id ");
 		final List<Object> params = new LinkedList<Object>();
+		params.add(userId);
 		appendIfNotEmptyWithLike(sqlBuilder, "g.data_area", dataArea, params, true);
 		if (params.isEmpty()) {
 			return DAO.find(sqlBuilder.toString());

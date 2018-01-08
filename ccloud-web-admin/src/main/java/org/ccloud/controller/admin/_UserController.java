@@ -331,7 +331,7 @@ public class _UserController extends JBaseCRUDController<User> {
 
 	public void getGroup() {
 		String id = getPara("userid");
-		List<Group> groups = GroupQuery.me().findByDept(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
+		List<Group> groups = GroupQuery.me().findByDept(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString(), id);
 		List<Map<String, Object>> list = new ArrayList<>();
 		for (Group group : groups) {
 			if (group.getId().equals("0")) {
@@ -340,15 +340,11 @@ public class _UserController extends JBaseCRUDController<User> {
 			Map<String, Object> map = new HashMap<>();
 			map.put("id", group.getId());
 			map.put("name", group.getGroupName());
-			if (!StringUtils.isBlank(id)) {
-				List<UserGroupRel> userGroups = UserGroupRelQuery.me().findByUserId(id);
-				for (UserGroupRel usergroup : userGroups) {
-					if (usergroup.getGroupId().equals(group.getId())) {
-						map.put("isvalid", 1);
-						break;
-					} else {
-						map.put("isvalid", 0);
-					}
+			if (StringUtils.isNotBlank(id)) {
+				if (StringUtils.isNotBlank(group.getStr("user_id"))) {
+					map.put("isvalid", 1);
+				} else {
+					map.put("isvalid", 0);
 				}
 			} else {
 				map.put("isvalid", 0);
