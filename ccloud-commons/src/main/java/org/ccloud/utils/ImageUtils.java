@@ -15,16 +15,9 @@
  */
 package org.ccloud.utils;
 
-import java.awt.AlphaComposite;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Iterator;
 
 import javax.imageio.ImageIO;
@@ -32,6 +25,8 @@ import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 
+import com.jfinal.kit.Base64Kit;
+import com.jfinal.kit.StrKit;
 import com.jfinal.log.Log;
 
 public class ImageUtils {
@@ -207,6 +202,72 @@ public class ImageUtils {
 		} catch (Exception e) {
 			log.warn("ImageUtils pressImage error", e);
 		}
+	}
+
+	public final static String waterMark(String srcImgString, Color markContentColor, String content1, String content2, String content3) {
+		if (StrKit.notBlank(srcImgString)) {
+			try {
+				srcImgString = srcImgString.substring(srcImgString.indexOf(",") + 1);
+				byte[] b = Base64Kit.decode(srcImgString);
+				Image srcImg = ImageIO.read(new ByteArrayInputStream(b));
+
+				int srcImgWidth = srcImg.getWidth(null);
+				int srcImgHeight = srcImg.getHeight(null);
+				double bili;
+
+				if(srcImgWidth > 480){
+
+					bili=480 / (double) srcImgWidth;
+					srcImgWidth = 480;
+					srcImgHeight = (int) (srcImgHeight*bili);
+
+				}else{
+					if(srcImgHeight > 640){
+
+						bili=640 / (double) srcImgHeight;
+						srcImgHeight = 640;
+						srcImgWidth = (int) (srcImgWidth*bili);
+
+					}
+				}
+
+				BufferedImage bufImg = new BufferedImage(srcImgWidth, srcImgHeight, BufferedImage.TYPE_INT_RGB);
+				Graphics2D g = bufImg.createGraphics();
+				g.drawImage(srcImg, 0, 0, srcImgWidth, srcImgHeight, null);
+
+				Font font = new Font("宋体", Font.PLAIN, 24);
+				g.setColor(markContentColor);
+				g.setFont(font);
+				g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.7f));
+
+				int x = srcImgWidth - getWatermarkLength(content3, g) - 30;
+				int y = srcImgHeight - 20;
+				g.drawString(content3, x, y);
+
+				x = srcImgWidth - getWatermarkLength(content2, g) - 30;
+				y = srcImgHeight - 65;
+				g.drawString(content2, x, y);
+
+				x = srcImgWidth - getWatermarkLength(content1, g) - 30;
+				y = srcImgHeight - 110;
+				g.drawString(content1, x, y);
+
+				g.dispose();
+
+				ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+				ImageIO.write(bufImg,"jpg", byteOut);
+				String base64Img = Base64Kit.encode(byteOut.toByteArray());
+
+				return base64Img;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+
+	private final static int getWatermarkLength(String waterMarkContent, Graphics2D g) {
+		return g.getFontMetrics(g.getFont()).charsWidth(waterMarkContent.toCharArray(), 0, waterMarkContent.length());
 	}
 
 }

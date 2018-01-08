@@ -18,6 +18,7 @@ import org.ccloud.model.vo.CustomerVO;
 import org.ccloud.model.vo.ImageJson;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DateUtils;
+import org.ccloud.utils.ImageUtils;
 import org.ccloud.wechat.WechatJSSDKInterceptor;
 import org.ccloud.workflow.service.WorkFlowService;
 import org.joda.time.DateTime;
@@ -385,9 +386,10 @@ public class CustomerController extends BaseFrontController {
 					newPath = upload(pic);
 				}*/
 
-				String waterFont1 = user.getRealname() + "  " + DateUtils.dateToStr(new Date(), "yyyy-MM-dd" );
-				String waterFont2 = customer.getCustomerName() + sellerCustomer.getLocation();
-				String savePath = qiniuUpload(waterMark(pic, Color.WHITE, waterFont1, waterFont2));
+				String waterFont1 = customer.getCustomerName();
+				String waterFont2 = user.getRealname() + DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
+				String waterFont3 = sellerCustomer.getLocation();
+				String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
 
 				image.setSavePath(savePath.replace("\\", "/"));
 				image.setOriginalPath(originalPath.replace("\\", "/"));
