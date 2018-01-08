@@ -372,13 +372,13 @@
 	    	}
 	    	alltotal = alltotal + producttotal;
 		});
-    	$("#productTotal").val(alltotal);
+    	$("#productTotalCount").val(alltotal);
 		
 		return check;	
 	}
 
 	function doSubmit(){
-		$("#productTotal").text($("#total").text());
+		$("#productTotalCount").text($("#total").text());
 		$("#productNum").val($(".rowNum").length - 1);
 		if (!checkStore()) {
 			toastr.error('未选择商品或库存不足!','操作失败');
@@ -493,7 +493,7 @@
 									<select id="sellProductId" name="sellProductId" class="form-control">
 									</select>
 									<input type="hidden" name="productId" id="productId" value="" />
-									<input type="hidden" name="productTotal" id="productTotal" value="" />
+									<input type="hidden" name="productTotalCount" id="productTotalCount" value="" />
 									<input type="hidden" name="price" id="price" value="" />
 								</div>
 							</td>
