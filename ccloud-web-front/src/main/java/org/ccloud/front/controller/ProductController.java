@@ -44,6 +44,7 @@ import com.jfinal.plugin.activerecord.Record;
 public class ProductController extends BaseFrontController {
 
 	public void index() {
+		Boolean footerEdit = getParaToBoolean("footerEdit", false);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		
 		List<Record> productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", "");
@@ -57,7 +58,7 @@ public class ProductController extends BaseFrontController {
 		for (Record record : productRecords) {
 			productList.add(record.getColumns());
 			String tags = record.getStr("tags");
-			if (tags != null) {
+			if (StrKit.notBlank(tags)) {
 				String[] tagArray = tags.split(",", -1);
 				for (String tag : tagArray) {
 					tagSet.add(tag);
@@ -68,7 +69,7 @@ public class ProductController extends BaseFrontController {
 		for (Record record : compositionRecords) {
 			compositionList.add(record.getColumns());
 			String tags = record.getStr("tags");
-			if (tags != null) {
+			if (StrKit.notBlank(tags)) {
 				String[] tagArray = tags.split(",", -1);
 				for (String tag : tagArray) {
 					tagSet.add(tag);
@@ -79,6 +80,8 @@ public class ProductController extends BaseFrontController {
 		setAttr("productList", JSON.toJSON(productList));
 		setAttr("compositionList", JSON.toJSON(compositionList));
 		setAttr("tags", JSON.toJSON(tagSet));
+		
+		setAttr("footerEdit", footerEdit);
 
 		render("product.html");
 	}
