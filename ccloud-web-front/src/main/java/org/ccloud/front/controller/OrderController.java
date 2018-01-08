@@ -21,6 +21,7 @@ import org.ccloud.model.SalesOrder;
 import org.ccloud.model.SellerProduct;
 import org.ccloud.model.User;
 import org.ccloud.model.query.CustomerTypeQuery;
+import org.ccloud.model.query.MessageQuery;
 import org.ccloud.model.query.OptionQuery;
 import org.ccloud.model.query.OutstockPrintQuery;
 import org.ccloud.model.query.SalesOrderDetailQuery;
@@ -286,7 +287,7 @@ public class OrderController extends BaseFrontController {
         		} else {
         			SalesOutstockQuery.me().pass(orderId, user.getId(), sellerId, sellerCode);
         			sendOrderMessage(sellerId, StringUtils.getArrayFirst(paraMap.get("customerName")), "订单审核通过", user.getId(), user.getId(),
-        					user.getDepartmentId(), user.getDataArea());        			
+        					user.getDepartmentId(), user.getDataArea(),orderId);        			
         		}				
 
 				return true;
@@ -356,12 +357,12 @@ public class OrderController extends BaseFrontController {
 			return false;
 		}
 		
-		sendOrderMessage(sellerId, customerName, "订单审核", user.getId(), toUserId, user.getDepartmentId(), user.getDataArea());
+		sendOrderMessage(sellerId, customerName, "订单审核", user.getId(), toUserId, user.getDepartmentId(), user.getDataArea(),orderId);
 		
 		return true;
 	}
 
-	private void sendOrderMessage(String sellerId, String title, String content, String fromUserId, String toUserId, String deptId, String dataArea) {
+	private void sendOrderMessage(String sellerId, String title, String content, String fromUserId, String toUserId, String deptId, String dataArea, String orderId) {
 		
 		Message message = new Message();
 		message.setType(Message.ORDER_REVIEW_TYPE_CODE);
@@ -369,6 +370,10 @@ public class OrderController extends BaseFrontController {
 		message.setSellerId(sellerId);
 		message.setTitle(title);
 		message.setContent(content);
+		
+		message.setObjectId(orderId);
+		message.setIsRead(Consts.NO_READ);
+		message.setObjectType(Consts.OBJECT_TYPE_ORDER);
 		
 		message.setFromUserId(fromUserId);
 		message.setToUserId(toUserId);
@@ -412,7 +417,12 @@ public class OrderController extends BaseFrontController {
 
 		WorkFlowService workflowService = new WorkFlowService();
 		workflowService.completeTask(taskId, comments, var);
-
+		
+		//审核订单后将message中是否阅读改为是
+		Message message=MessageQuery.me().findByObjectIdAndToUserId(orderId,user.getId());
+		message.setIsRead(Consts.IS_READ);
+		message.update();
+		
 		renderAjaxResultForSuccess("订单审核成功");
 	}
 	

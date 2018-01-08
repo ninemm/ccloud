@@ -66,7 +66,7 @@ public abstract class BaseMessage<M extends BaseMessage<M>> extends JModel<M> im
 	@Override
 	public boolean save() {
 		boolean saved = super.save();
-		//if (saved) { MessageKit.sendMessage(ACTION_ADD, this); }
+		if (saved) { MessageKit.sendMessage(ACTION_ADD, this); }
 		return saved;
 	}
 
@@ -145,6 +145,22 @@ public abstract class BaseMessage<M extends BaseMessage<M>> extends JModel<M> im
 
 	public java.lang.String getToUserId() {
 		return getStr("to_user_id");
+	}
+
+	public void setObjectId(java.lang.String objectId) {
+		set("object_id", objectId);
+	}
+
+	public java.lang.String getObjectId() {
+		return getStr("object_id");
+	}
+
+	public void setObjectType(java.lang.String objectType) {
+		set("object_type", objectType);
+	}
+
+	public java.lang.String getObjectType() {
+		return getStr("object_type");
 	}
 
 	public void setIsRead(java.lang.Integer isRead) {

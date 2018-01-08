@@ -39,6 +39,7 @@ import org.ccloud.message.MessageKit;
 import org.ccloud.model.Message;
 import org.ccloud.model.SalesOrder;
 import org.ccloud.model.User;
+import org.ccloud.model.query.MessageQuery;
 import org.ccloud.model.query.OptionQuery;
 import org.ccloud.model.query.OutstockPrintQuery;
 import org.ccloud.model.query.SalesOrderDetailQuery;
@@ -268,7 +269,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		}
 		//超过数量(件)
 		Float startNum = OptionQuery.me().findValueAsFloat(Consts.OPTION_WEB_PROC_NUM_LIMIT + sellerCode);
-		Float productTotal = Float.valueOf(StringUtils.getArrayFirst(paraMap.get("productTotal")));
+		Float productTotal = Float.valueOf(StringUtils.getArrayFirst(paraMap.get("productTotalCount")));
 		if(startNum != null && productTotal > startNum) { 
 			return true;
 		}
@@ -418,6 +419,11 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		if (user != null && getPara("assignee", "").contains(user.getUsername())) {
 			isCheck = true;
 		}
+		//审核后将message中是否阅读改为是
+		Message message=MessageQuery.me().findByObjectIdAndToUserId(orderId, user.getId());
+		message.setIsRead(Consts.IS_READ);
+		message.update();
+
 		setAttr("isCheck", isCheck);
 
 		setAttr("taskId", taskId);

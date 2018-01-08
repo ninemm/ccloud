@@ -28,6 +28,7 @@ import org.ccloud.model.query.DictQuery;
 import org.ccloud.model.query.MessageQuery;
 import org.ccloud.route.RouterMapping;
 
+import com.jfinal.core.Const;
 import com.jfinal.kit.Ret;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
@@ -64,6 +65,8 @@ public class MessageController extends BaseFrontController {
 		}
 		
 		Message message = MessageQuery.me().findById(id);
+		message.setIsRead(Consts.IS_READ);
+		message.update();
 		setAttr("message", message);
 		
 		MessageKit.sendMessage(Message.ACTION_EDIT, id);

@@ -671,8 +671,17 @@ public class CustomerController extends BaseFrontController {
 		message.setDataArea(user.getDataArea());
 		message.setType(Message.CUSTOMER_REVIEW_TYPE_CODE);
 		
+		message.setObjectId(sellerCustomerId);
+		message.setIsRead(0);
+		message.setObjectType(Consts.OBJECT_TYPE_CUSTOMER);
+		
 		message.setTitle(sellerCustomer.getCustomer().getCustomerName());
 		MessageKit.sendMessage(Actions.ProcessMessage.PROCESS_MESSAGE_SAVE, message);
+		
+		//审核订单后将message中是否阅读改为是
+		Message message1=MessageQuery.me().findByObjectIdAndToUserId(sellerCustomerId,user.getId());
+		message1.setIsRead(Consts.IS_READ);
+		message1.update();
 
 		if (updated){
 			renderAjaxResultForSuccess("操作成功");
@@ -729,6 +738,9 @@ public class CustomerController extends BaseFrontController {
 		message.setSellerId(sellerId);
 		message.setType(Message.CUSTOMER_REVIEW_TYPE_CODE);
 		message.setTitle(sellerCustomer.getCustomer().getCustomerName());
+		message.setObjectId(customerId);
+		message.setIsRead(Consts.NO_READ);
+		message.setObjectType(Consts.OBJECT_TYPE_CUSTOMER);
 		
 		Object customerVO = param.get("customerVO");
 		if (customerVO == null && isEnable == 0) {

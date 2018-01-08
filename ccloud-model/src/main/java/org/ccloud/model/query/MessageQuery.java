@@ -16,6 +16,8 @@
 package org.ccloud.model.query;
 
 import java.util.LinkedList;
+
+import org.ccloud.Consts;
 import org.ccloud.model.Message;
 
 import com.jfinal.kit.StrKit;
@@ -72,6 +74,7 @@ public class MessageQuery extends JBaseQuery {
 		needWhere = appendIfNotEmpty(fromBuilder, "type", type, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "from_user_id", fromUserId, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "to_user_id", toUserId, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "is_read", Consts.NO_READ, params, needWhere);
 		
 		orderby = StrKit.isBlank(orderby) == true ? "create_date" : orderby;
 		fromBuilder.append("order by " + orderby +" desc");
@@ -94,6 +97,11 @@ public class MessageQuery extends JBaseQuery {
 			return deleteCount;
 		}
 		return 0;
+	}
+
+	public Message findByObjectIdAndToUserId(String orderId, String id) {
+		String sql="SELECT * FROM cc_message WHERE object_id='"+orderId+"' And to_user_id='"+id+"'";
+		return DAO.findFirst(sql.toString());
 	}
 
 	

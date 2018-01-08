@@ -25,6 +25,7 @@ import com.jfinal.plugin.activerecord.Record;
 @RouterMapping(url = "/todo")
 public class TodoController extends BaseFrontController {
 
+	//客户审核
 	public void customer() {
 		
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);

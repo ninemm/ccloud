@@ -18,6 +18,8 @@ package org.ccloud;
 public class Consts {
 
 	public static final String COOKIE_LOGINED_USER = "user";
+	public static final String COOKIE_SELECTED_SELLER_ID = "_seller_id";
+	public static final String COOKIE_SELECTED_USER_ID = "_user_id";
 
 	public static final String SESSION_LOGINED_USER = "_logined_user";
 	public static final String SESSION_SELECT_DATAAREA = "_data_area";//数据查看时的数据域
@@ -183,5 +185,12 @@ public class Consts {
 	
 	public static String SELLER_TYPE_DEALER= "0";//账套类型：经销商
 	public static String SELLER_TYPE_SELLER = "1";//直营商
+	
+	public static String OBJECT_TYPE_ORDER= "订单";//订单
+	public static String OBJECT_TYPE_CUSTOMER = "客户";//客户
+	public static String OBJECT_TYPE_CUSTOMER_VISIT= "拜访";//拜访
+	//是否阅读 0:否 1:是
+	public static Integer IS_READ= 1;
+	public static Integer NO_READ= 0;
 	
 }

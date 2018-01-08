@@ -23,6 +23,7 @@ import org.ccloud.model.query.CustomerJoinCustomerTypeQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.CustomerVisitQuery;
 import org.ccloud.model.query.DictQuery;
+import org.ccloud.model.query.MessageQuery;
 import org.ccloud.model.query.OptionQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.query.WxMessageTemplateQuery;
@@ -371,7 +372,12 @@ public class CustomerVisitController extends BaseFrontController {
 		workFlowService.completeTask(taskId, comment, var);
 		
 		sendMessage(sellerId, comment, user.getId(), toUser.getId(), user.getDepartmentId(), user.getDataArea()
-				, Message.CUSTOMER_VISIT_REVIEW_TYPE_CODE, customerVisit.getSellerCustomer().getCustomer().getCustomerName());
+				, Message.CUSTOMER_VISIT_REVIEW_TYPE_CODE, customerVisit.getSellerCustomer().getCustomer().getCustomerName(),id);
+		
+		//审核后将message中是否阅读改为是
+		Message message1=MessageQuery.me().findByObjectIdAndToUserId(id,user.getId());
+		message1.setIsRead(Consts.IS_READ);
+		message1.update();
 		
 		if (customerVisit.saveOrUpdate())
 			renderAjaxResultForSuccess("操作成功");
@@ -412,7 +418,7 @@ public class CustomerVisitController extends BaseFrontController {
 			return false;
 		
 		sendMessage(sellerId, customerVisit.getQuestionDesc(), user.getId(), manager.getId(), user.getDepartmentId(), user.getDataArea()
-				, Message.CUSTOMER_VISIT_REVIEW_TYPE_CODE, customerVisit.getSellerCustomer().getCustomer().getCustomerName());
+				, Message.CUSTOMER_VISIT_REVIEW_TYPE_CODE, customerVisit.getSellerCustomer().getCustomer().getCustomerName(),customerVisit.getId());
 		
 		return isUpdated;
 	}
@@ -430,7 +436,7 @@ public class CustomerVisitController extends BaseFrontController {
 	}
 	
 	private void sendMessage(String sellerId, String comment, String fromUserId, String toUserId, String deptId
-			, String dataArea, String type, String title) {
+			, String dataArea, String type, String title, String id) {
 		Message message = new Message();
 		message.setSellerId(sellerId);
 		message.setContent(comment);
@@ -442,6 +448,10 @@ public class CustomerVisitController extends BaseFrontController {
 		message.setType(type);
 		
 		message.setTitle(title);
+		
+		message.setObjectId(id);
+		message.setIsRead(Consts.NO_READ);
+		message.setObjectType(Consts.OBJECT_TYPE_CUSTOMER_VISIT);
 		MessageKit.sendMessage(Actions.ProcessMessage.PROCESS_MESSAGE_SAVE, message);
 	}
 }
