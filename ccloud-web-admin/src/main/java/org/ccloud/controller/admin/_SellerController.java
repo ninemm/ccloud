@@ -210,11 +210,11 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				}
 				//添加直营商客户
 				this.saveSellerCustomer(customer.getId(), user, department,sId);
-				seller2.set("seller_type", 1);
+				seller2.set("seller_type", Consts.SELLER_TYPE_SELLER);
 				seller2.setCustomerId(customer.getId());
 				seller2.update();
 			}else{
-				seller2.set("seller_type", 0);
+				seller2.set("seller_type", Consts.SELLER_TYPE_DEALER);
 				seller2.update();
 				//新建销售商时默认创建分组  角色  及中间表 客户类型
 				this.saveOther(department);

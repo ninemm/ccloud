@@ -27,9 +27,11 @@ var receivablesUrl = '${CPATH}/admin/receivables/getReceivables';
 var receivableDetailUrl = '${CPATH}/admin/receivables/getReceivablesDetail';
 $(function() {
 	updateOptions();
+	updateBizUser();
 	
 	$("#selecttype").change(function(){
 		updateOptions();
+		updateBizUser();
 		type = $(this).val();
 	});
 
@@ -67,6 +69,23 @@ function updateOptions(){
 	});
 }
 
+function updateBizUser(){
+	var type = $("#selecttype").val();
+	$.ajax({
+		url: "${CPATH}/admin/receivables/getBizUsers?type="+type,
+		async: false,
+		success: function(data){
+			var optionsHtml = '<option value="0" >全部</option>';
+			if(data.length && data.length>=1){
+				for(var i in data){
+					optionsHtml += '<option value="'+data[i].id+'" >'+data[i].realname+'</option>';
+				}
+			}
+			$("#biz_user").html(optionsHtml);
+		}
+	});
+}
+
 var initReceivablesTable = function(){
 	var fields = [
 		{field: "object_id",title: "ID", align: "center", visible:false, edit:false},
@@ -81,13 +100,15 @@ var initReceivablesTable = function(){
 
 var  cusType = "";
 var getReceivablesParams = function(params){
-var customerTypeId = $('#category-or-customer').val();
+var customerTypeId = $('#category-or-customer').find("option:selected").val();
+var bizUserId = $('#biz_user').find("option:selected").val();
 cusType = customerTypeId;
 	var param = {
         size: params.limit,
         page: params.offset/params.limit + 1,
         type : type,
-        customerTypeId:customerTypeId
+        customerTypeId:customerTypeId,
+        bizUserId : bizUserId
     };
     return param;
 }
@@ -183,6 +204,10 @@ function batchDown(){
 	 	<button onclick="batchDown()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-upload"></i> 导出</button>
 	  </div>
 		<div class="input-group input-group-sm" style="float:right;">
+			<span>业务员：</span>
+			<select id="biz_user" style="width:200px">
+				<option value="0">全部</option>
+			</select>&nbsp;&nbsp;&nbsp;
 			<span>往来单位：</span>
 			<select id="selecttype" style="width:200px">
 				<option value="1" >客户</option>
