@@ -215,13 +215,18 @@
                         </p>
                     </div>
                 </div>
-                <div class="weui-loadmore" id="loading">
-                    <i class="weui-loading"></i>
-                    <span class="weui-loadmore__tips">正在加载</span>
-                </div>
-                <div class="weui-loadmore weui-loadmore_line" id="noMore" style="display: none;">
-                    <span class="weui-loadmore__tips">暂无数据</span>
-                </div>
+                <#if customerList??>
+                    <#if customerList.totalRow = 0>
+                        <div class="weui-loadmore weui-loadmore_line">
+                            <span class="weui-loadmore__tips">暂无数据</span>
+                        </div>
+                        <#elseif customerList.totalRow &gt; 10>
+                            <div class="weui-loadmore">
+                                <i class="weui-loading"></i>
+                                <span class="weui-loadmore__tips">正在加载</span>
+                            </div>
+                    </#if>
+                </#if>
             </div>
 	    </article>
     </div>
