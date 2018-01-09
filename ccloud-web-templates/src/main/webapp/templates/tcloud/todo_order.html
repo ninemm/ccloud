@@ -158,8 +158,8 @@
 			function(res){
 				if (res.errorCode == 0) {
 					$.confirm({
-						title: res.message,
-						text: '返回顶部？',
+						title: '订单审核',
+						text: res.message,
 						onOK: function () {
 							location.href = '${CPATH}/todo/order'
 						},
@@ -192,8 +192,8 @@
 			function(res){
 				if (res.errorCode == 0) {
 					$.confirm({
-						title: res.message,
-						text: '返回顶部？',
+						title: '订单审核',
+						text: res.message,
 						onOK: function () {
 							location.href = '${CPATH}/todo/order'
 						},
