@@ -44,7 +44,6 @@ import com.jfinal.plugin.activerecord.Record;
 public class ProductController extends BaseFrontController {
 
 	public void index() {
-		Boolean footerEdit = getParaToBoolean("footerEdit", false);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		
 		List<Record> productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", "");
@@ -80,8 +79,6 @@ public class ProductController extends BaseFrontController {
 		setAttr("productList", JSON.toJSON(productList));
 		setAttr("compositionList", JSON.toJSON(compositionList));
 		setAttr("tags", JSON.toJSON(tagSet));
-		
-		setAttr("footerEdit", footerEdit);
 
 		render("product.html");
 	}
