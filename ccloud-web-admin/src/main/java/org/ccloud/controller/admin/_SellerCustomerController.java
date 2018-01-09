@@ -592,8 +592,10 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		User user1 = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		//审核后将message中是否阅读改为是
 		Message message=MessageQuery.me().findByObjectIdAndToUserId(id, user1.getId());
-		message.setIsRead(Consts.IS_READ);
-		message.update();
+		if (null!=message) {
+			message.setIsRead(Consts.IS_READ);
+			message.update();
+		}
 		
 		int length = list.size();
 		String[] userIds = new String[length];

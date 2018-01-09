@@ -529,7 +529,15 @@ public class CustomerController extends BaseFrontController {
 			diffAttrList.add("申请停用");
 			setAttr("diffAttrList", diffAttrList);
 		}
-
+		
+		//审核后将message中是否阅读改为是
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		Message message=MessageQuery.me().findByObjectIdAndToUserId(id,user.getId());
+		if (null!=message) {
+			message.setIsRead(Consts.IS_READ);
+			message.update();
+		}
+		
 		render("customer_review.html");
 	}
 
@@ -692,11 +700,6 @@ public class CustomerController extends BaseFrontController {
 		message.setTitle(sellerCustomer.getCustomer().getCustomerName());
 		MessageKit.sendMessage(Actions.ProcessMessage.PROCESS_MESSAGE_SAVE, message);
 		
-		//审核订单后将message中是否阅读改为是
-		Message message1=MessageQuery.me().findByObjectIdAndToUserId(sellerCustomerId,user.getId());
-		message1.setIsRead(Consts.IS_READ);
-		message1.update();
-
 		if (updated){
 			renderAjaxResultForSuccess("操作成功");
 		}
@@ -870,5 +873,19 @@ public class CustomerController extends BaseFrontController {
 		updated = userJoinCustomer.save();
 
 		return updated;
+	}
+	
+	public void detail() {
+		String id = getPara("id");
+		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(id);
+		setAttr("sellerCustomer", sellerCustomer);
+		//审核后将message中是否阅读改为是
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		Message message=MessageQuery.me().findByObjectIdAndToUserId(id,user.getId());
+		if (null!=message) {
+			message.setIsRead(Consts.IS_READ);
+			message.update();
+		}
+		render("customer_detail.html");
 	}
 }

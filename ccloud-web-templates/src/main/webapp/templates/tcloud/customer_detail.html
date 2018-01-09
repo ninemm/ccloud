@@ -1,0 +1,106 @@
+<#include "_inc/_layout.html"/>
+<#macro title>拜访详情</#macro>
+<#macro script>
+	var $gallery = $("#gallery"), $galleryImg = $("#galleryImg");
+	var $uploaderFiles = $('#uploaderFiles');
+
+	$(function(){
+		var index;
+		$uploaderFiles.on("click", "li", function() {
+			index = $(this).index();
+			$galleryImg.attr("style", this.getAttribute("style"));
+			$gallery.fadeIn(100);
+		});
+
+	$gallery.on("click", function() {
+		$gallery.fadeOut(100);
+	});
+	});
+</#macro>
+<@layout>
+<div class="weui-content">
+	<div id="customer-add">
+		<main>
+		    <section class="weui-panel weui-panel_access order-customer-info">
+	        <input type="hidden" name="sellerCustomer.id" value="${(sellerCustomer.id)!}">
+	        <div class="weui-cell">
+	            <div class="weui-cell__bd">
+					<div class="order-customer-info-title">客户名称: </div>
+					<input type="text" class="weui-input" value="${(sellerCustomer.customer_name)!}" readonly>
+				</div>
+	        </div>
+	        <div class="weui-cell">
+	            <div class="weui-cell__bd">
+					<div class="order-customer-info-title">客户昵称: </div>
+					<input type="text" class="weui-input" value="${(sellerCustomer.nickname)!'无'}" readonly>
+	            </div>
+	        </div>
+	        <div class="weui-cell">
+	            <div class="weui-cell__bd">
+					<div class="order-customer-info-title">联系人: </div>
+					<input type="text" class="weui-input" value="${(sellerCustomer.contact)!}" readonly>					
+	            </div>
+	        </div>
+	        <div class="weui-cell">
+	            <div class="weui-cell__bd">
+					<div class="order-customer-info-title">联系电话: </div>
+					<input type="text" class="weui-input" value="${(sellerCustomer.mobile)!}" readonly>
+	            </div>
+	        </div>
+	        <div class="weui-cell">
+	            <div class="weui-cell__bd">
+					<div class="order-customer-info-title">客户类型: </div>
+					<input type="text" class="weui-input" value="${(custTypeNames)!}" readonly>
+	            </div>
+	        </div>
+	        <div class="weui-cell">
+	            <div class="weui-cell__bd">
+					<div class="order-customer-info-title">省市区: </div>
+					<input type="text" class="weui-input" value="${(sellerCustomer.prov_name)!} ${(sellerCustomer.city_name)!} ${(sellerCustomer.country_name)!}" readonly>
+	            </div>
+	        </div>
+	        <div class="weui-cell">
+	            <div class="weui-cell__bd">
+					<div class="order-customer-info-title">地址详情: </div>
+					<input type="text" class="weui-input" value="${(sellerCustomer.address)!}" readonly>
+	            </div>
+	        </div>
+	    </section>
+	    <section class="weui-cells weui-cells_form">
+	        <div class="weui-cell">
+	            <div class="weui-cell__bd">
+	                <div class="weui-uploader">
+	                    <div class="weui-uploader__hd">
+	                        <p class="weui-uploader__title">附件图片</p>
+	                        <div class="weui-uploader__info">${(sellerCustomer.imageList?size)!0}/3</div>
+	                    </div>
+	                    <div class="weui-uploader__bd">
+	                        <ul class="weui-uploader__files" id="uploaderFiles">
+	                        <#if (sellerCustomer.imageList) ??>
+	                        <#list sellerCustomer.imageList as bean>
+	                            <li class="weui-uploader__file" style="background-image: url(${bean.savePath})"></li>
+	                        </#list>
+	                        </#if>
+	                        </ul>
+	                        <div class="weui-uploader__input-box">
+	                            <!--<input id="uploaderInput" name="customer.img_path" class="weui-uploader__input" type="file" accept="image/*" multiple="">-->
+	                            <input type="hidden" name="pic" id="pic">
+	                        </div>
+	                    </div>
+	                </div>
+	            </div>
+	        </div>
+	    </section>
+	    <section class="weui-panel weui-panel_access ft14 remark">
+	        <div class="weui-cell weui-cell_access">
+	            <div class="weui-cell__bd">
+	                <span class="icon-map-pin ft16 green"></span>
+	                <span id="location">${(sellerCustomer.location)!}</span>
+	            </div>
+	        </div>
+	    </section>
+		</main>
+		<#include "_inc/_goback_bottom.html" />
+	</div>
+</div>
+</@layout>

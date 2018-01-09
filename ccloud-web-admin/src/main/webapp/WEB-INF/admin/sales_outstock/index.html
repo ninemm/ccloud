@@ -59,6 +59,7 @@
 			endDate: $('#endDate').val() + " 23:59:59",
 			printStatus:$("#printStatus").val(),
 			stockOutStatus:$("#stockOutStatus").val(),
+			sortName:params
 		};
 		return param;
 	};
@@ -77,14 +78,14 @@
 					},
 					edit:false
 				},
-				{field: "", title: "出库单号/创建时间", align: "center", width: '10%',
+				{field: "create_date", title: "出库单号/创建时间", align: "center", width: '10%',
 					formatter: function(value, row, rowIndex) {
 						return row.outstock_sn + '<br>' + row.create_date;
 					},
-					edit: false
-				},
-				{field: "customer_name", title: "客户名称", align: "center", width: '8%', edit:false},
-				{field: "total_amount", title: "订单总额", align: "center", width: '5%', edit:false},
+					edit: false,
+				sortable: true},
+				{field: "customer_name", title: "客户名称", align: "center", width: '8%', edit:false,sortable: true},
+				{field: "total_amount", title: "订单总额", align: "center", width: '5%', edit:false,sortable: true},
 				{field: "receive_type", title: "付款方式", align: "center", width: '5%',
 					formatter: function(value, row, rowIndex) {
 						return value == 0 ? '应收账款' : '现金';
@@ -152,11 +153,11 @@
 			area: ['90%', '90%'],
 			content: '${CPATH}/admin/salesOutstock/renderPrintPage/' + id,
 			end: function() {
-            location.reload();
+			$("#search-submit").click();
     		},
 		}); 
 	}
-	
+		
 	function batchOutConfirmPage(id) {
 		layer.open({
 			title:"批量出库确认",
@@ -304,9 +305,7 @@
      async: false,
      success: function(data) {
      toastr.success(data.message, '操作成功');	
-     setTimeout( function(){
-		location.reload();
-		}, 2 * 1000 );      
+     $table.bootstrapTable('refresh');     
      }
    });
  }

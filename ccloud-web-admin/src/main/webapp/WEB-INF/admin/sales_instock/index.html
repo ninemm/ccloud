@@ -58,6 +58,7 @@
 			endDate: $('#endDate').val() + " 23:59:59",
 			printStatus:$("#printStatus").val(),
 			stockInStatus:$("#stockInStatus").val(),
+			sortName:params
 		};
 		return param;
 	};
@@ -76,14 +77,14 @@
 					},
 					edit:false
 				},
-				{field: "", title: "入库单号/创建时间", align: "center", width: '10%',
+				{field: "create_date", title: "入库单号/创建时间", align: "center", width: '10%',
 					formatter: function(value, row, rowIndex) {
 						return row.instock_sn + '<br>' + row.create_date;
 					},
-					edit: false
-				},
-				{field: "customer_name", title: "客户名称", align: "center", width: '8%', edit:false},
-				{field: "total_reject_amount", title: "订单总额", align: "center", width: '5%', edit:false},
+					edit: false,
+				sortable: true},
+				{field: "customer_name", title: "客户名称", align: "center", width: '8%', edit:false,sortable: true},
+				{field: "total_reject_amount", title: "订单总额", align: "center", width: '5%', edit:false,sortable: true},
 				{field: "payment_type", title: "付款方式", align: "center", width: '5%',
 					formatter: function(value, row, rowIndex) {
 						return value == 0 ? '应收账款' : '现金';
@@ -191,7 +192,7 @@
 			area: ['90%', '90%'],
 			content: '${CPATH}/admin/salesInstock/renderPrintPage/' + id,
 			end: function() {
-            location.reload();
+            $("#search-submit").click();
     		},
 		}); 
 	}
@@ -268,9 +269,7 @@
      async: false,
      success: function(data) {
      toastr.success(data.message);	
-     setTimeout( function(){
-		location.reload();
-		}, 2 * 1000 );      
+     $table.bootstrapTable('refresh');       
      }
    });
  }

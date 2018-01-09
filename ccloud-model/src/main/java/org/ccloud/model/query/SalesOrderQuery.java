@@ -392,7 +392,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		sb.append(" left join cc_customer_type ct on o.customer_type_id = ct.id ");
 		sb.append(" JOIN act_ru_task a on o.proc_inst_id = a.PROC_INST_ID_ ");
 		sb.append(" where FIND_IN_SET(?, a.ASSIGNEE_) ");
-		sb.append(" order by o.create_date ");
+		sb.append(" order by o.create_date DESC");
 		return DAO.find(sb.toString(), username);
 	}
 	

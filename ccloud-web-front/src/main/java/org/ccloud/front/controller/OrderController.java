@@ -125,6 +125,13 @@ public class OrderController extends BaseFrontController {
 		}
 		setAttr("isCheck", isCheck);
 		
+		//审核订单后将message中是否阅读改为是
+		Message message=MessageQuery.me().findByObjectIdAndToUserId(orderId,user.getId());
+		if (null!=message) {
+			message.setIsRead(Consts.IS_READ);
+			message.update();
+		}
+		
 		Boolean isEdit = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROCEDURE_REVIEW_EDIT + sellerCode) ;
 		isEdit = (isEdit != null && isEdit) ? true : false;
 		setAttr("isEdit", isEdit);
@@ -417,11 +424,6 @@ public class OrderController extends BaseFrontController {
 
 		WorkFlowService workflowService = new WorkFlowService();
 		workflowService.completeTask(taskId, comments, var);
-		
-		//审核订单后将message中是否阅读改为是
-		Message message=MessageQuery.me().findByObjectIdAndToUserId(orderId,user.getId());
-		message.setIsRead(Consts.IS_READ);
-		message.update();
 		
 		renderAjaxResultForSuccess("订单审核成功");
 	}

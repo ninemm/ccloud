@@ -47,11 +47,11 @@ public class OrderReviewExecutionListener implements ExecutionListener {
 		if (pass == 1) {
 			SalesOutstockQuery.me().pass(orderId, confirm.getId(), sellerId, sellerCode);
 			this.sendOrderMessage(sellerId, customerName, "订单审核通过", confirm.getId(), user.getId(),
-					confirm.getDepartmentId(), confirm.getDataArea());
+					confirm.getDepartmentId(), confirm.getDataArea(),orderId);
 		} else {
 			SalesOrderQuery.me().updateConfirm(orderId, Consts.SALES_ORDER_STATUS_REJECT, confirm.getId(), new Date());// 已审核拒绝
 			this.sendOrderMessage(sellerId, customerName, "订单审核拒绝", confirm.getId(), user.getId(),
-					confirm.getDepartmentId(), confirm.getDataArea());
+					confirm.getDepartmentId(), confirm.getDataArea(),orderId);
 			this.sendOrderWxMesssage(user.getWechatOpenId(), orderId, user.getRealname());
 		}
 
@@ -59,7 +59,7 @@ public class OrderReviewExecutionListener implements ExecutionListener {
 	}
 
 	private void sendOrderMessage(String sellerId, String title, String content, String fromUserId, String toUserId,
-			String deptId, String dataArea) {
+			String deptId, String dataArea, String orderId) {
 
 		Message message = new Message();
 		message.setType(Message.ORDER_REVIEW_TYPE_CODE);
@@ -67,6 +67,10 @@ public class OrderReviewExecutionListener implements ExecutionListener {
 		message.setSellerId(sellerId);
 		message.setTitle(title);
 		message.setContent(content);
+		
+		message.setObjectId(orderId);
+		message.setIsRead(Consts.NO_READ);
+		message.setObjectType(Consts.OBJECT_TYPE_ORDER);
 
 		message.setFromUserId(fromUserId);
 		message.setToUserId(toUserId);

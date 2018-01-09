@@ -837,7 +837,7 @@ a {
   z-index: 10;
 }
 
-.menu-left ul li.active:before {
+/* .menu-left ul li.active:before {
     content: " ";
     position: absolute;
     display: block;
@@ -846,7 +846,7 @@ a {
     background: #ea6f5a;
     top: 0;
     left: 0;
-}
+} */
 
 .product-content {
   position: absolute;
@@ -976,7 +976,6 @@ a {
   color: #e6292f;
   font-weight: 600;
   display: inline-block;
-  width: 3rem;
 }
 
 .operate {
@@ -1015,7 +1014,7 @@ a {
 }
 
 .unit {
-  margin-right: 10%;
+  margin-left: .2rem;
 }
 
 .enter-shopping-cart {
@@ -1769,7 +1768,6 @@ input[name=sex] {
   z-index: 802;
   background: #fff;
   display: none;
-  animation-duration: .3s;
 }
 
 .filter-item {

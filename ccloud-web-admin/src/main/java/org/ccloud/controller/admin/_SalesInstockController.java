@@ -80,7 +80,10 @@ public class _SalesInstockController extends JBaseCRUDController<SalesOrder> {
 		String printStatus = getPara("printStatus");
 		String stockInStatus = getPara("stockInStatus");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		Page<Record> page = SalesRefundInstockQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate, printStatus,stockInStatus,dataArea);
+		//获取排序相关信息
+		String sort = getPara("sortName[sort]");
+		String order = getPara("sortName[order]");
+		Page<Record> page = SalesRefundInstockQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate, printStatus,stockInStatus,dataArea,sort,order);
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
