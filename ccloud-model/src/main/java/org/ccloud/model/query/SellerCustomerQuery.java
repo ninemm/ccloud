@@ -63,7 +63,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 		});
 	}
 
-	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String dataArea) {
+	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String dataArea,String sort,String sortOrder) {
 
 		boolean needWhere = true;
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -92,7 +92,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "c.customer_name", keyword, params, needWhere);
 
 		fromBuilder.append("  GROUP BY sc.id ");
-		fromBuilder.append(" order by sc.create_date ");
+		fromBuilder.append(" order by "+sort+" "+ sortOrder);
 
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());

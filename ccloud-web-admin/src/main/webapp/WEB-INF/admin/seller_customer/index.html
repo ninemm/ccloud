@@ -43,7 +43,9 @@
 		var param = {
 			size: params.limit,
 			page: params.offset/params.limit + 1,
-			k: keyword
+			k: keyword,
+			sort: params.sort,      //排序列名  
+            sortOrder: params.order //排位命令（desc,asc）
 		};
 		return param;
 	};
@@ -58,20 +60,20 @@
 					},
 					edit:false
 				},
-				{field: "customer_name", title: "客户名称", align: "center", width: '8%', edit:false},
-				{field: "nickname", title: "客户昵称", align: "center", width: '5%', edit: false},
-				{field: "contact", title: "联系人", align: "center", width: '5%', edit: false},
-				{field: "mobile", title: "手机号", align: "center", width: '5%', edit: false},
-				{field: "adr", title: "地址", align: "center", width: '15%',
+				{field: "customer_name", title: "客户名称", align: "center", width: '8%',sortable: true, edit:false},
+				{field: "nickname", title: "客户昵称", align: "center", width: '5%',sortable: true, edit: false},
+				{field: "contact", title: "联系人", align: "center", width: '5%',sortable: true, edit: false},
+				{field: "mobile", title: "手机号", align: "center", width: '5%',sortable: true, edit: false},
+				{field: "adr", title: "地址", align: "center", width: '15%',sortable: true,
 					formatter: function(value, row, rowIndex) {
 						//return row.prov_name + row.city_name + row.country_name + row.address;
 						return row.address;
 					},
 					edit: false
 				},
-				{field: "customerTypeNames", title: "客户类型", align: "center", width: '15%', edit: false},
-				{field: "realnames", title: "负责人", align: "center", width: '10%', edit: false},
-				{field: "customer_kind", title: "客户种类", align: "center", width: '5%',
+				{field: "customerTypeNames", title: "客户类型", align: "center", width: '15%',sortable: true, edit: false},
+				{field: "realnames", title: "负责人", align: "center", width: '10%',sortable: true, edit: false},
+				{field: "customer_kind", title: "客户种类", align: "center",sortable: true, width: '5%',
 					formatter: function(value, row, rowIndex) {
 						return value != 100401 ? '直营商' : '普通';
 					},
