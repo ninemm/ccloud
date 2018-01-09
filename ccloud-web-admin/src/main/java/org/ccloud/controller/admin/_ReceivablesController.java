@@ -41,6 +41,7 @@ import org.ccloud.model.ReceivablesDetail;
 import org.ccloud.model.query.ReceivablesDetailQuery;
 import org.ccloud.model.Receiving;
 import org.ccloud.model.query.ReceivingQuery;
+import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.vo.receivablesExcel;
 import org.ccloud.model.User;
@@ -85,10 +86,11 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 	public void getReceivables() {
 		String type = getPara("type");
 		String customerTypeId = getPara("customerTypeId");
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String bizUserId = getPara("bizUserId");
+		//User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String deptDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		Page<Record> page = ReceivablesQuery.me().paginate(getPageNumber(),getPageSize(),customerTypeId,type,user.getId(),deptDataArea,sellerId);
+		Page<Record> page = ReceivablesQuery.me().paginate(getPageNumber(),getPageSize(),customerTypeId,type,bizUserId,deptDataArea,sellerId);
 		List<Record> receivablesList = page.getList();
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(),"rows", receivablesList);
 		
@@ -227,4 +229,10 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 		
 		renderFile(new File(filePath));
 	} 
+	
+	public void getBizUsers() {
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		List<Record> record = SalesOrderQuery.me().findByDataArea(dataArea);
+		renderJson(record);
+	}
 }

@@ -78,7 +78,7 @@ function updateBizUser(){
 			var optionsHtml = '<option value="0" >全部</option>';
 			if(data.length && data.length>=1){
 				for(var i in data){
-					optionsHtml += '<option value="'+data[i].id+'" >'+data[i].name+'</option>';
+					optionsHtml += '<option value="'+data[i].id+'" >'+data[i].realname+'</option>';
 				}
 			}
 			$("#biz_user").html(optionsHtml);
@@ -100,13 +100,15 @@ var initReceivablesTable = function(){
 
 var  cusType = "";
 var getReceivablesParams = function(params){
-var customerTypeId = $('#category-or-customer').val();
+var customerTypeId = $('#category-or-customer').find("option:selected").val();
+var bizUserId = $('#biz_user').find("option:selected").val();
 cusType = customerTypeId;
 	var param = {
         size: params.limit,
         page: params.offset/params.limit + 1,
         type : type,
-        customerTypeId:customerTypeId
+        customerTypeId:customerTypeId,
+        bizUserId : bizUserId
     };
     return param;
 }

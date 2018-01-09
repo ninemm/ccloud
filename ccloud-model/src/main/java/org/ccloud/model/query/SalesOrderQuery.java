@@ -1692,4 +1692,9 @@ public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procK
 		String sql = "select * from cc_sales_order where order_sn = ?";
 		return DAO.findFirst(sql, orderSn);
 	}
+	
+	public List<Record> findByDataArea(String dataArea){
+		String sql = "select DISTINCT u.id,u.realname from cc_sales_order o LEFT JOIN user u on u.id = o.biz_user_id where o.data_area like '"+dataArea+"'";
+		return Db.find(sql);
+	}
 }
