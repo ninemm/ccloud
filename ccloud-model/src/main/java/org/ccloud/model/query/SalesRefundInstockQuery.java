@@ -65,7 +65,7 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		return Db.findFirst(fromBuilder.toString(), id);
 	}
 
-	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate, String printStatus,String stockInStatus ,String dataArea) {
+	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate, String printStatus,String stockInStatus ,String dataArea,String sort,String order) {
 		String select = "select r.*, c.customer_name,c.contact,c.mobile,w.name as warehouseName,ct.name as customerTypeName,u.realname ";
 		StringBuilder fromBuilder = new StringBuilder(" from `cc_sales_refund_instock` r");
 		fromBuilder.append(" left join cc_seller_customer cc ON r.customer_id = cc.id ");
@@ -100,7 +100,13 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 			params.add(printStatus);
 		}
 
-		fromBuilder.append(" and ( r.instock_sn like '%"+keyword+"%' or c.customer_name like '%"+keyword+"%' ) order by r.create_date desc");
+		fromBuilder.append(" and ( r.instock_sn like '%"+keyword+"%' or c.customer_name like '%"+keyword+"%' ) ");
+		
+		if (sort==""||null==sort) {
+			fromBuilder.append("order by "+"r.create_date desc");
+		}else {
+			fromBuilder.append("order by "+sort+" "+order);
+		}
 
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
