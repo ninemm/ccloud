@@ -12,24 +12,57 @@
     } 
 </#macro>
 <#macro script>
-    var pageNumber = 1;
-    var pageSize = 10;
-    var goodsType = "";
-    var loading = false;
+    var page = 1;
+    var size = 10;
+    var categoryId = "";
+	var startDate = $.today();
+	var endDate = $.today();
+	var $loading = $("#loading");
+	var $noMore = $("#noMore");
+	var loading = false;	
+	var $main = $("#inventory_detailList");
+	var newHtml = $(".product_detail").eq(0).html();
 
     var $endNode = null;
     var $loadmore = $(".weui-loadmore");
+    var params = function() {
+        return  {
+            "search": $("#searchInput")[0].value,
+            "page": page,
+            "size": size,
+            "startDate": startDate,
+            "endDate": endDate + " 23:59:59",
+            "warehouseId": $("#wareHouse").data('values'),
+            categoryId: categoryId
+        };
+    }
+    
     $(function () {
-        //FastClick.attach(document.body);
         initMenuData();
         var data = $(".weui-flex__item");
         for(var i = 0 ;i<data.length;i++){
-            console.log($($(data[i])[0]).find("span").text());
             $($(data[i])[0]).find("span").text(toMoney($($(data[i])[0]).find("span").text()),2);
-            //$(data[index])[0].find("span").text().toFixed(2);
         }
-
-
+        $("#startDate").calendar();
+        $("#endDate").calendar();
+        $("#startDate").val(startDate);
+        $("#endDate").val(startDate);
+		$(document).on("change", "#wareHouse", function() {
+			page = 1;
+			$main.empty();
+			loadInventoryDetail();
+		}).on("change", "#startDate", function() {
+			page = 1;
+			startDate = $("#startDate").val();
+			$main.empty();
+			loadInventoryDetail();
+		}).on("change", "#endDate", function() {
+			page = 1;
+			endDate = $("#endDate").val();
+			$main.empty();
+			loadInventoryDetail();
+		});     
+		loadInventoryDetail();          
     });
 
     function searchCancel() {
@@ -37,123 +70,75 @@
     }
 
     function initMenuData(){
-        $.ajax({
-        url:"${CPATH}/inventory/appLoadRegionAndProductType",
-        type:"post",
-        dataType:"json",
-        data:{"goodsType":goodsType,"queryType":"All"},
-        success:function(data) {
-            $("#region").select({
-                title: "客户区域",
-                items: data.region
-            });
-
-            $("#product-type").select({
-                title: "产品类型",
-                items: data.productType
-            });
-
-            $("#if-order").select({
-                title: "是否下单",
-                items: [{
-                    title: "全部", value: "00"
-                },{
-                    title: "是", value: "1"
-                },{
-                    title: "否",value: "0"
-                }]
-            });
-            }
-        });
+	    $("#wareHouse").select({
+	        title: "仓库",
+	        items: ${(wareHouseList)!}
+	    });
     }
 
-    var paramData = function() {
-        return  {
-            "search": $("#searchInput")[0].value,
-            "pageNumber": pageNumber,
-            "pageSize": pageSize,
-            "region": $("#region")[0].dataset.values,
-            "productType": $("#product-type")[0].value,
-            "isOrdered": $("#if-order")[0].dataset.values,
-            "goodsType": goodsType
-        };
-    }
     //搜索框监听
     $(document).on("input", "#searchInput", function() {
-        pageNumber = 1;
+        page = 1;
+        $main.empty();
         loadInventoryDetail();
     });
     //监听滚动
     $(".infinite").infinite().on("infinite", function() {
-        var self = this;
-        $endNode = $(".product_detail:last");
-        $loadmore = $(self).find(".weui-loadmore");
-        if ($loadmore) $loadmore.show();
-        if (loading) return ;
-        loading = true;
-        pageNumber++;
-        $.ajax({
-            type: "post",
-            url: "${CPATH}/inventory/appLoadFollowUpData",
-            data: paramData(),
-            dataType: "json",
-            success:function(result) {
-                    if ($loadmore) $loadmore.show();
-                    if (result.totalPage >= pageNumber) {
-                        $endNode.after(result.inventoryHtml);
-                    }
-                    if (result.totalPage == pageNumber) {
-                        $(".infinite").destroyInfinite();
-                        $loadmore.hide();
-                    }
-                loading = false;
-            }
-        });
+		if(loading) {
+			return;
+		}
+		loading = true;
+		page++;
+		loadInventoryDetail();
     });
 
     $("#products ul li").on("click",function(){
-        pageNumber = 1;
+        page = 1;
         $product = this;
-        goodsType = $($product).attr("value");
+        $main.empty();
+        categoryId = $($product).attr("value");
         loadInventoryDetail();
         $('#products ul li').removeClass("active");
         $($product).addClass("active");
-        $.ajax({
-            url:"${CPATH}/inventory/appLoadRegionAndProductType",
-            type:"post",
-            dataType:"json",
-            data:{"goodsType":goodsType,"queryType":"productType"},
-            success:function(data) {
-                $("#product-type").select("update", { items: data.productType });
-            }
-        });
-
     });
-    $(".weui-input").on("change",function(){
-        pageNumber = 1;
-        loadInventoryDetail();
-    });
-
+    
     function loadInventoryDetail(){
-        $.ajax({
-        url: '${CPATH}/inventory/appLoadFollowUpData',
-        type: 'post',
-        data:paramData(),
-        success: function (result) {
-            $loadmore = $("#inventory").find(".weui-loadmore");
-            $(".infinite").destroyInfinite();
-            $loadmore.hide();
-            if (result.totalPage > pageNumber) {
-                loading = false;
-                $(".infinite").infinite();
-                $(".weui-loadmore").removeAttr("style");
-            }
+		$loading.show();
+		$noMore.hide();
+		var params = {
+            "search": $("#searchInput")[0].value,
+            "page": page,
+            "size": size,
+            "startDate": startDate,
+            "endDate": endDate + " 23:59:59",
+            "warehouseId": $("#wareHouse").data('values'),
+            categoryId: categoryId
+		}		
+		Utils.ajax('${CPATH}/inventory/inventory', params, 
+			function(data) {
+				$loading.hide();
+				
+				if(data.rows.length == 0) {
+					$noMore.show();
+					loading = true;
+					return;
+				}
 
-            $(".infinite")[0].scrollTop = 0;
-            $("#inventory_detailList").empty();
-            $("#inventory_detailList").html(result.inventoryHtml);
-            }
-        });
+				$.each(data.rows, function(index, el) {
+	
+					$main.append("<div class='product_detail'>" + newHtml + "</div>");
+					var $newOrder = $main.find(".product_detail:last");
+					
+					$newOrder.find("#productName").text(el.custom_name);
+					$newOrder.find("#inCount").text(el.inCount);
+					$newOrder.find("#outCount").text(el.outCount);
+					$newOrder.find("#balanceCount").text(el.balance_count);
+					$newOrder.find("#sellerName").append(el.seller_name);
+					$noMore.hide();
+				});
+				loading = false;
+			}
+		);
     }
 
     function toMoney(val, num) {
@@ -188,80 +173,61 @@
         </header>
 
         <main  class="inventory">
-            <header class="has-th-list weui-flex">
+        	 <header class="has-th-list weui-flex">
                 <div class="head-search select-area wewui weui-flex__item">
                     <div class="weui-flex">
                         <div class="weui-flex__item">
-                            <input type="text" id="region" placeholder="客户区域" class="weui-input" readonly>
+                            <input type="text" id="wareHouse" placeholder="仓库" class="weui-input" readonly>
                             <i class="icon-sort-desc"></i>
                         </div>
-                        <div class="weui-flex__item">
-                            <input type="text" id="product-type" placeholder="产品类型" class="weui-input" readonly>
-                            <i class="icon-sort-desc"></i>
-                        </div>
-                        <div class="weui-flex__item">
-                            <input type="text" id="if-order" placeholder="是否下单" class="weui-input" readonly>
-                            <i class="icon-sort-desc"></i>
-                        </div>
+						<div class="weui-flex__item">
+							<input type="text" id="startDate" class="weui-input" readonly>
+							<i class="icon-sort-desc"></i>
+						</div>
+						<div class="weui-flex__item">
+							<input type="text" id="endDate" class="weui-input" readonly>
+							<i class="icon-sort-desc"></i>
+						</div>						
                     </div>
-                </div>
-                <div id="combin-filter-btn">
-                    <i class="icon-th-list"></i>
                 </div>
             </header>
             <div id="products" class="menu-left ft14">
                 <ul>
-                    <#if goodsTypeList??&&(goodsTypeList?size>0)>
-                        <li id="allProduct" class="active" value="00">商品类型</li>
+                    <#if categoryList?? && (categoryList?size gt 0)>
+                        <li id="allProduct" class="active" value="">全部</li>
                     </#if>
-                    <#list goodsTypeList as goodsType >
+                    <#list categoryList as goodsType >
                         <li value="${(goodsType.id)!}">${(goodsType.name)!}</li>
                     </#list>
                 </ul>
             </div>
-            <article class="menu-right infinite" id="inventory_detailList">
-                <#if inventoryList??>
-                    <#assign total = inventoryList.totalRow>
-                        <#if total &gt; 0>
-                            <#list inventoryList.list as inventory >
-                                <div class="product_detail">
-                                    <div class="inventory_name" style="font-size: 0.7rem;">
-                                        ${(inventory.name)!}
-                                    </div>
-                                    <!--<div class="weui-flex">
-                                        <div class="weui-flex__item">期初结存：<span>${(inventory.in_count)!}</span>
-                                        </div>
-                                        <div class="weui-flex__item">期末结存：<span>${(inventory.out_count)!}</span>
-                                        </div>
-                                    </div>-->
-                                    <div class="weui-flex" style="margin:0.1rem;">
-                                        <div class="weui-flex__item">出库：<span class="green-button">${(inventory.in_count)!}</span>
-                                        </div>
-                                        <div class="weui-flex__item">入库：<span class="yellow-button">${(inventory.out_count)!}</span>
-                                        </div>
-                                    </div>
-                                    <div class="weui-flex">
-                                        <div class="weui-flex__item">库存：<span class="blue-button">${(inventory.balance_count)!}</span></div>
-                                        <div class="weui-flex__item"><!-- 在途：<span>${(inventory.afloat_count)!}</span> --></div>
-                                    </div>
-                                    <div class="weui-flex">
-                                        <span class="seller-name"><i class="icon-map-pin blue ft16"></i> ${(inventory.seller_name)!}</span>
-                                    </div>
-                                </div>
-                            </#list>
-                        </#if>
-                </#if>
-                <#if total = 0>
-                    <div class="weui-loadmore weui-loadmore_line">
-                        <span class="weui-loadmore__tips"  style="float: inherit;">暂无数据</span>
-                    </div>
-                    <#elseif total &gt; 10>
-                        <div class="weui-loadmore">
-                            <i class="weui-loading"></i>
-                            <span class="weui-loadmore__tips">正在加载</span>
+            <article class="menu-right infinite" >
+            		<div id="inventory_detailList">
+                    <div class="product_detail" style="display: none;">
+                        <div class="inventory_name" style="font-size: 0.7rem;" id="productName">
                         </div>
-                </#if>
-            </article>
+                        <div class="weui-flex" style="margin:0.1rem;">
+                            <div class="weui-flex__item">出库：<span class="green-button" id="inCount"></span>
+                            </div>
+                            <div class="weui-flex__item">入库：<span class="yellow-button" id="outCount"></span>
+                            </div>
+                        </div>
+                        <div class="weui-flex">
+                            <div class="weui-flex__item">库存：<span class="blue-button" id="balanceCount"></span></div>
+                        </div>
+                        <div class="weui-flex">
+                            <span class="seller-name" id="sellerName"><i class="icon-map-pin blue ft16"></i>&nbsp;&nbsp;</span>
+                        </div>
+                    </div>
+                    </div>
+					<div class="weui-loadmore" id="loading" style="display: none;">
+					  <i class="weui-loading"></i>
+					  <span class="weui-loadmore__tips">正在加载</span>
+					</div>
+					<div class="weui-loadmore weui-loadmore_line" id="noMore" style="display: none;">
+					  <span class="weui-loadmore__tips">暂无数据</span>
+					</div>
+	        </article>
         </main>
     </div>
     <#include "_inc/_goback.html" />
