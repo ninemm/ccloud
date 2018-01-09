@@ -1,6 +1,10 @@
 <#include "_inc/_layout.html"/>
 <#macro title>我的订单</#macro>
-<#macro css> </#macro>
+<#macro css>
+	#orderSn {
+		color: #999;
+	}
+</#macro>
 <#macro script>
     $(function () {
   
@@ -90,10 +94,7 @@
 				$loading.hide();
 				
 				if(data.orderList.length == 0) {
-				    var childCount = $('.weui-panel').length;
-				    if (childCount == 1) 
-						$noMore.show();
-						
+					$noMore.show();
 					loading = true;
 					return;
 				}
@@ -386,7 +387,7 @@
 			  <span class="weui-loadmore__tips">暂无数据</span>
 			</div>
 		</main>
-		<article id="combin-filter">
+		<article id="combin-filter" class="animated">
 			<div class="filter-item">
 				<h4>下单日期</h4>
 				<div class="relative" id="getDate">

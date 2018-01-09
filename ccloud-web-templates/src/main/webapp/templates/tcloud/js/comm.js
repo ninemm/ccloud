@@ -196,19 +196,15 @@ function addStopTouchendPropagationListener (ev) {
 
 //打开组合搜索
 function openCombinSearch() {
-  $combinSearch.show().addClass("animated bounceInRight");
   $layer.addClass("layer-show");
-  setTimeout(function () {
-    $combinSearch.removeClass("animated bounceInRight");
-  }, 300);
+  $combinSearch.show().removeClass("slideOutRight").addClass("slideInRight");
 }
 
 //关闭组合搜索
 function closeCombinSearch() {
-  $combinSearch.addClass("animated bounceOutRight");
-  setTimeout(function () {
-    $layer.removeClass("layer-show");
-    $combinSearch.hide().removeClass("animated bounceOutRight");
+  $combinSearch.removeClass("slideInRight").addClass("slideOutRight");
+  setTimeout(function() {
+	$layer.removeClass("layer-show");
   }, 300);
 }
 
