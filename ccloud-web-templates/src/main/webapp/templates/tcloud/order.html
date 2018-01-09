@@ -42,7 +42,7 @@
 $(function() {
   $(document).on("touchstart", ".choose-customer", function () {
 		window.location.href = '${CPATH}/product/customerChoose';
-  }).on("touchend", "#placeOrder", function () {
+  }).on("click", "#placeOrder", function () {
 		doSubmit();
   }).on("touchstart",".nearby-customer",function(){
 		window.location.href = '${CPATH}/product/customerNearbyChose';
@@ -91,7 +91,7 @@ $(function() {
         combo();
   }).on("change", "#customerTypeId", function() {
         combo();
-  }).on("touchend", "#customerInfo", function() {
+  }).on("click", "#customerInfo", function() {
 		var el = $(this);
         var customerInfo = {
         	customerName : el.find("#customerName").text(),
