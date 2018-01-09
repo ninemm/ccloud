@@ -44,7 +44,7 @@
 	}  
 	    
 	function del(id) {
-		location.href = '${CPATH}/admin/user/delete?ucode=${ucode}&id=' + id;
+		jQuery.mm.del('${CPATH}/admin/user/delete?ucode=${ucode}&id=' + id);
 	}
 
 	function enable(obj,id) {
