@@ -90,9 +90,11 @@ public class _SalesRefundController extends JBaseCRUDController<SalesRefundInsto
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-
+		//获取排序相关信息
+		String sort = getPara("sortName[sort]");
+		String order = getPara("sortName[order]");
 		Page<Record> page = SalesRefundInstockQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate,
-				endDate, null,null, dataArea);
+				endDate, null,null, dataArea,sort,order);
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
@@ -270,7 +272,7 @@ public class _SalesRefundController extends JBaseCRUDController<SalesRefundInsto
 			String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\sales_outstock\\"
 					+ "salesRefundInfo.xlsx";
 			Page<Record> page = SalesRefundInstockQuery.me().paginate(1,Integer.MAX_VALUE, keyword, startDate,
-					endDate, null,null, dataArea);
+					endDate, null,null, dataArea,null,null);
 			List<Record> salesRefundList = page.getList();
 			
 			List<SalesRefundExcel> excellist = Lists.newArrayList();
