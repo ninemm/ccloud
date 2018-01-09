@@ -421,8 +421,10 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		}
 		//审核后将message中是否阅读改为是
 		Message message=MessageQuery.me().findByObjectIdAndToUserId(orderId, user.getId());
-		message.setIsRead(Consts.IS_READ);
-		message.update();
+		if (null!=message) {
+			message.setIsRead(Consts.IS_READ);
+			message.update();
+		}
 
 		setAttr("isCheck", isCheck);
 
