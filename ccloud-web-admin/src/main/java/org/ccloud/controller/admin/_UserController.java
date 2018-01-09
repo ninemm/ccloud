@@ -107,6 +107,8 @@ public class _UserController extends JBaseCRUDController<User> {
 		String stationName = getPara("stationName");
 		String groupList = getPara("groupList");
 		String groupName = getPara("groupName");
+		//用于判断操作人员点击的是编辑按钮还是转用按钮
+		String t = getPara("t");
 		String NewGroupName = groupName.substring(0, groupName.length() -1);
 		String deptName = getPara("parent_name");
 		user.setDepartmentName(deptName);
@@ -130,11 +132,14 @@ public class _UserController extends JBaseCRUDController<User> {
 		List<UserGroupRel> userGroupRelList = new ArrayList<>();
 		List<String> gList = new ArrayList<>();
 
-
+		
 		if (user.getId() == null) {
 			user.setSalt(EncryptUtils.salt());
 			user.setPassword(EncryptUtils.encryptPassword(user.getPassword(), user.getSalt()));
 		}else {
+			if(t.equals("1")) {
+				user.setWechatOpenId("");
+			}
 			//更新用户组信息
 			List<UserGroupRel> userGroupRels = UserGroupRelQuery.me().findByUserId(user.getId());
 			  for (UserGroupRel userGroupRel : userGroupRels) {
@@ -170,9 +175,11 @@ public class _UserController extends JBaseCRUDController<User> {
 	@RequiresPermissions(value = { "/admin/user/edit", "/admin/all" }, logical = Logical.OR)
 	public void edit() {
 		String id = getPara("id");
+		String t = getPara("t");
 		if (id != null) {
 			User user = UserQuery.me().findById(id);
 			setAttr("user", user);
+			setAttr("t",t);
 		}
 	}
 
@@ -575,9 +582,12 @@ public class _UserController extends JBaseCRUDController<User> {
         List<Map<String, Object>> list = DepartmentQuery.me().findDepartmentListAsTree(1, dataArea);
         setAttr("treeData", JSON.toJSON(list));
     }*/
-	/*@RequiresPermissions(value = { "/admin/user/edit", "/admin/all" }, logical = Logical.OR)
-	public void leave() {
-		String id = getPara("id");
+	@RequiresPermissions(value = { "/admin/user/edit", "/admin/all" }, logical = Logical.OR)
+	public void send() {
+		
+	}
+	
+	public void sendSave(String id) {
 		User user = UserQuery.me().findById(id);
 		UserHistory userHistory = new UserHistory();
 		userHistory.setId(user.getId());
@@ -605,10 +615,6 @@ public class _UserController extends JBaseCRUDController<User> {
 		userHistory.setWechatUserid(user.getWechatUseriId());
 		userHistory.setCreateDate(new Date());
 		userHistory.save();
-		
-		user.setUnableDate(new Date());
-		user.setStatus(0);
-		user.update();
-		renderAjaxResultForSuccess("更新成功");
-	}*/
+//		renderAjaxResultForSuccess("更新成功");
+	}
 }

@@ -116,6 +116,8 @@ var validatorFields = {
 
 function doSubmit(){
 	var l = Ladda.create( document.querySelector( '#do_submit' ) );
+	var t = ${(t)!};
+	alert(t);
 	var count = $("#station_option").select2("data").length;
 	var list = $("#station_option").select2("val");
 	var ids = "";
@@ -169,7 +171,8 @@ function doSubmit(){
 		"stationList":ids,
 		"stationName":name,
 		"groupList":groupIds,
-		"groupName":groupName
+		"groupName":groupName,
+		"t":t
 		},
 		dataType : "json", 
 		success : function(data) { 
