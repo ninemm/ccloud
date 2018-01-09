@@ -45,9 +45,9 @@
 		return param;
 	};
 	
+	var $tables = $("#product_table");
 	function productPei(id){
 		//弹出层信息展现
-		var $tables = $("#product_table");
 		$('#exampleModal').on('show.bs.modal', function (event) {
 			$("#product_table").bootstrapTable('destroy');
 			var _url = '${CPATH}/admin/seller/showProduct?sellerId='+id;
@@ -198,6 +198,9 @@
 				}else{
 					toastr.error(data.message,'操作失败');
 				}
+				setTimeout( function(){
+						$tables.bootstrapTable('refresh');
+								}, 2 * 1000 );
 			}
 		});
 	}
@@ -227,6 +230,9 @@
 				}else{
 					toastr.error(data.message,'操作失败');
 				}
+				setTimeout( function(){
+						$tables.bootstrapTable('refresh');
+								}, 2 * 1000 );
 			}
 		});
 	}
@@ -236,6 +242,11 @@
 		for (var i = 0; i < items.length; i++) {
 			items[i].checked = checkbox.checked;
 		}
+	}
+	
+	function closeAddProuduct(){
+		layer.closeAll();
+		location.reload();
 	}
 </#macro>
 
@@ -270,23 +281,24 @@
 
 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="padding-top:200px;">
   <div class="modal-dialog" role="document">
-    <div class="modal-content">
+    <div class="modal-content" style="width:800px;">
      <!-- Main content -->
 		<section class="content">
 			<div class="row content-row">
-				<div class="jp-left">
-					<button type="button" class="btn btn-primary" onclick="saveP()">保存</button>
-					<button type="button" class="btn btn-success" onclick="saveAll()">全部导入</button>
-					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-				</div>
-				<form class="form-inline jp-right">
-					<div class="input-group input-group-sm ">
-						<input id="_post-search-input" class="form-control" type="search" value="${k!}" name="k" placeholder="搜索名称">
+				
+				<form class="form-inline jp-left">
+					<div class="input-group input-group-sm " style="width:300px;">
+						<input id="_post-search-input" class="form-control" type="search" value="${k!}" name="k" placeholder="搜索名称" style="width:80%;">
 						<input  type="hidden" id ="sellerId">
 						&nbsp;
 						<input id="_search-submit" class="btn btn-default btn-sm btn-flat" type="button" value="搜索">
 					</div>
 				</form>
+				<div class="jp-right">
+					<button type="button" class="btn btn-primary" onclick="saveP()">保存</button>
+					<button type="button" class="btn btn-success" onclick="saveAll()">全部导入</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal" onclick="closeAddProuduct()">关闭</button>
+				</div>
 			</div>
 			<div class="box">
 				<table class="table table-striped table-hover table-condensed" id="product_table" ></table>
