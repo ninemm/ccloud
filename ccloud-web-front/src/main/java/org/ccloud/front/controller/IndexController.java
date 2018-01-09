@@ -37,6 +37,7 @@ import org.ccloud.utils.StringUtils;
 
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.render.Render;
 
 @RouterMapping(url = "/")
@@ -64,15 +65,15 @@ public class IndexController extends BaseFrontController {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		if (user != null) {
 			Dict order = DictQuery.me().findByKey("message_type", "order");
-			Page<Message> orderPage = MessageQuery.me().paginate(getPageNumber(), Integer.MAX_VALUE, sellerId, order.getValue(), null, user.getId(), null);
+			Page<Record> orderPage = MessageQuery.me().paginate1(getPageNumber(), 15, sellerId, order.getValue(), null, user.getId(), null);
 			setAttr("orderPage", orderPage);
 			
 			Dict customer = DictQuery.me().findByKey("message_type", "customer");
-			Page<Message> customerPage = MessageQuery.me().paginate(getPageNumber(), Integer.MAX_VALUE, sellerId, customer.getValue(), null, user.getId(), null);
+			Page<Record> customerPage = MessageQuery.me().paginate1(getPageNumber(), 15, sellerId, customer.getValue(), null, user.getId(), null);
 			setAttr("customerPage", customerPage);
 			
 			Dict customerVisit = DictQuery.me().findByKey("message_type", "customer_visit");
-			Page<Message> customerVisitPage = MessageQuery.me().paginate(getPageNumber(), Integer.MAX_VALUE, sellerId, customerVisit.getValue(), null, user.getId(), null);
+			Page<Record> customerVisitPage = MessageQuery.me().paginate1(getPageNumber(), 15, sellerId, customerVisit.getValue(), null, user.getId(), null);
 			setAttr("customerVisitPage", customerVisitPage);
 			
 			setAttr("orderTotal", SalesOrderQuery.me().getToDo(user.getUsername()).size());

@@ -128,7 +128,7 @@
 			</div>
 			<div class="weui-grids">
 				<@shiro.hasPermission name="/admin/salesOrder">
-				<a href="${CPATH}/product?footerEdit=true" class="weui-grid js_grid">
+				<a href="${CPATH}/product" class="weui-grid js_grid">
                     <!-- <span class="weui-badge empty-badge">&nbsp;</span> -->
 					<div class="weui-grid__icon">
 						<i class="icon-file-text" style="color: #9c89b9"></i>
@@ -245,7 +245,12 @@
 			<div class="index-info">
 				<div class="weui-cells">
 					<#if orderPage ??><#list orderPage.list as bean>
-					    <a href="${CPATH}/message/edit?id=${bean.id}">
+						<#if (bean.taskId) ??>							
+							<a href="${CPATH}/order/orderReview?orderId=${bean.object_id!}&taskId=${bean.taskId!}&assignee=${bean.assignee!}">
+						<#else>
+							<a href="${CPATH}/order/orderReview?orderId=${bean.object_id!}">
+						</#if>
+					    
 						<div class="weui-cell">
 							<div class="weui-cell__bd">
 								<span>${(bean.title)!}</span>
