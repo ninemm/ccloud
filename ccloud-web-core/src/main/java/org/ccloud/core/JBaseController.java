@@ -19,7 +19,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
@@ -50,7 +49,6 @@ import com.jfinal.kit.StrKit;
 import com.jfinal.render.JsonRender;
 import com.jfinal.upload.UploadFile;
 import com.qiniu.storage.model.DefaultPutRet;
-import sun.misc.BASE64Encoder;
 
 public class JBaseController extends Controller {
 	private static final char URL_PARA_SEPARATOR = JFinal.me().getConstants().getUrlParaSeparator().toCharArray()[0];

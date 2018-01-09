@@ -80,7 +80,7 @@ public class SellerProductQuery extends JBaseQuery {
 		return 0;
 	}
 
-	public Page<SellerProduct> paginate_sel(int pageNumber, int pageSize,String keyword,String userId) {
+	public Page<SellerProduct> paginate_sel(int pageNumber, int pageSize,String keyword,String userId,String sta,String sellerProductIds) {
 		String select = "SELECT csp.*,cgc.name as cgc_name,cp.name as productName, csp.custom_name,csp.store_count,csp.price,cp.big_unit,cp.small_unit,cp.convert_relate,csp.is_enable, csp.order_list ,GROUP_CONCAT(distinct cgs.`name` order by css.id) AS cps_name";
 		StringBuilder fromBuilder = new StringBuilder("from cc_seller_product csp LEFT JOIN cc_product cp ON  csp.product_id = cp.id LEFT JOIN cc_product_goods_specification_value cpg ON  cp.id = cpg.product_set_id "
 				+ " LEFT JOIN cc_goods_specification_value cgs ON cpg.goods_specification_value_set_id = cgs.id "
@@ -95,6 +95,9 @@ public class SellerProductQuery extends JBaseQuery {
 			fromBuilder.append(" and  cs.is_enabled=1 and u.id='"+userId+"' ");
 		}else{
 			fromBuilder.append(" where  cs.is_enabled=1 and u.id='"+userId+"' ");
+		}
+		if(sta.equals("1") && !sellerProductIds.equals("")) {
+			fromBuilder.append(" and csp.id  not in ("+sellerProductIds+")");
 		}
 		fromBuilder.append(" GROUP BY csp.id ORDER BY csp.is_enable desc,csp.order_list,cgs.name,css.name ");
 		
@@ -186,6 +189,7 @@ public class SellerProductQuery extends JBaseQuery {
 		sellerProduct.set("custom_name", product.getName());
 		sellerProduct.setStoreCount(new BigDecimal(0));
 		sellerProduct.set("price", product.getPrice());
+		sellerProduct.setAccountPrice(product.getPrice());
 		sellerProduct.set("cost", product.getCost());
 		sellerProduct.set("market_price", product.getMarketPrice());
 		sellerProduct.set("weight", product.getWeight());
@@ -226,5 +230,10 @@ public class SellerProductQuery extends JBaseQuery {
 		stringBuilder.append(" WHERE s.id='"+sellerId+"'");
 		return  Db.find(stringBuilder.toString());
 		
+	}
+	
+	public SellerProduct findbyCustomerNameAndSellerIdAndProductId(String customName,String sellerId,String productId) {
+		String sql = "select * from cc_seller_product where custom_name = ? and seller_id = ? and product_id = ?";
+		return DAO.findFirst(sql, customName,sellerId,productId);
 	}
 }
