@@ -142,18 +142,24 @@
 					$newOrder.find("#customerType").text(el.customerTypeName);
 					if(el.status == 0) {
 						$newOrder.find("#cancel").on('click', function() {
-						    Utils.openLoadingWin('撤销中...');
-							$.get('${CPATH}/order/cancel?orderId=' + el.id,
-								function(result) {
-									if (result.errorCode > 0) {
-									    $.toptip(result.message, 'error');
-									} else {
-										$.toptip(result.message, 'success');
-										combo();
-									}
-									Utils.closeLoadingWin();
+							$.confirm({
+								title: "订单撤销",
+								text: '是否撤销订单？',
+								onOK: function () {
+									Utils.openLoadingWin('撤销中...');
+									$.get('${CPATH}/order/cancel?orderId=' + el.id,
+										function(result) {
+											if (result.errorCode > 0) {
+												$.toptip(result.message, 'error');
+											} else {
+												$.toptip(result.message, 'success');
+												combo();
+											}
+											Utils.closeLoadingWin();
+										}
+									);
 								}
-							);
+							});
 						});
 					} else {
 						$newOrder.find("#cancel").remove();

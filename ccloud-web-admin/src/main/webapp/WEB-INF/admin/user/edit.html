@@ -116,7 +116,7 @@ var validatorFields = {
 
 function doSubmit(){
 	var l = Ladda.create( document.querySelector( '#do_submit' ) );
-	var t = ${(t)!};
+	var t = '${(t)!}';
 	alert(t);
 	var count = $("#station_option").select2("data").length;
 	var list = $("#station_option").select2("val");
