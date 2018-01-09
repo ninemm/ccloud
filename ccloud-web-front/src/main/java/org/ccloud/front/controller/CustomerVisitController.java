@@ -171,6 +171,13 @@ public class CustomerVisitController extends BaseFrontController {
 		String id = getPara("id");
 		CustomerVisit visit = CustomerVisitQuery.me().findMoreById(id);
 		setAttr("visit", visit);
+		//审核后将message中是否阅读改为是
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		Message message=MessageQuery.me().findByObjectIdAndToUserId(id,user.getId());
+		if (null!=message) {
+			message.setIsRead(Consts.IS_READ);
+			message.update();
+		}
 		render("customer_visit_detail.html");
 	}
 
@@ -205,8 +212,10 @@ public class CustomerVisitController extends BaseFrontController {
 		//审核后将message中是否阅读改为是
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		Message message=MessageQuery.me().findByObjectIdAndToUserId(id,user.getId());
-		message.setIsRead(Consts.IS_READ);
-		message.update();
+		if (null!=message) {
+			message.setIsRead(Consts.IS_READ);
+			message.update();
+		}
 				
 		render("customer_visit_review.html");
 	}

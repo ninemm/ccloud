@@ -268,7 +268,13 @@
 				</div>
 				<div class="weui-cells none">
 				    <#if customerPage ??><#list customerPage.list as bean>
-				        <a href="${CPATH}/message/edit?id=${bean.id}">
+				    
+				    		<#if (bean.taskId) ??>							
+							<a href="${CPATH}/customer/review?id=${bean.object_id!}&taskId=${bean.taskId!}&assignee=${bean.assignee!}">
+						<#else>
+							<a href="${CPATH}/customer/detail?id=${bean.object_id!}">
+						</#if>
+				        
                         <div class="weui-cell">
                             <div class="weui-cell__bd">
                                 <span>${(bean.title)!}</span>
@@ -286,7 +292,11 @@
 				</div>
 				<div class="weui-cells none">
 				    <#if customerVisitPage ??><#list customerVisitPage.list as bean>
-				        <a href="${CPATH}/message/edit?id=${bean.id}">
+				       <#if (bean.taskId) ??>							
+							<a href="${CPATH}/customerVisit/review?id=${bean.object_id!}&taskId=${bean.taskId!}&assignee=${bean.assignee!}">
+						<#else>
+							<a href="${CPATH}/customerVisit/detail?id=${bean.object_id!}">
+						</#if>
                         <div class="weui-cell">
                             <div class="weui-cell__bd">
                                 <span>${(bean.title)!}</span>

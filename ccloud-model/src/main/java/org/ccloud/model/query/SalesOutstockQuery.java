@@ -158,7 +158,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 	}
 
 	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, 
-			String endDate, String printStatus, String stockOutStatus, String status, String dataArea) {
+			String endDate, String printStatus, String stockOutStatus, String status, String dataArea,String order,String sort) {
 		String select = "select o.*, c.customer_name,u.realname,ct.name as customerName ";
 		if (StrKit.notBlank(status)) {
 			select = select + ",t2.refundCount, t2.outCount ";
@@ -208,8 +208,14 @@ public class SalesOutstockQuery extends JBaseQuery {
 			params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
 		}		
 
-		fromBuilder.append(" and ( o.outstock_sn like '%"+keyword+"%' or c.customer_name like '%"+keyword+"%' ) order by o.create_date desc ");
+		fromBuilder.append(" and ( o.outstock_sn like '%"+keyword+"%' or c.customer_name like '%"+keyword+"%' ) ");
 
+		if (sort==""||null==sort) {
+			fromBuilder.append("order by "+"o.create_date desc");
+		}else {
+			fromBuilder.append("order by "+sort+" "+order);
+		}
+		
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 

@@ -135,4 +135,13 @@ public class WarehouseQuery extends JBaseQuery {
 		String sql = "SELECT id,`name`  FROM `cc_warehouse` where is_enabled='1' and type ='2' AND seller_id= ?";
 		return DAO.find(sql, sellerId);
 	}
+
+	public List<Warehouse> findWarehouseByDataArea(String user_id, String dataArea) {
+		StringBuilder fromBuilder = new StringBuilder(" select c.* from `cc_warehouse` c ");
+		fromBuilder.append(" LEFT JOIN department d ON c.dept_id = d.id ");
+		fromBuilder.append(" WHERE c.id IN (SELECT uw.warehouse_id FROM cc_user_join_warehouse uw WHERE uw.user_id = '"+user_id+"') ");
+		fromBuilder.append(" OR d.data_area LIKE '"+dataArea+"' ");
+		fromBuilder.append(" order by c.create_date");
+		return DAO.find(fromBuilder.toString());
+	}
  }
