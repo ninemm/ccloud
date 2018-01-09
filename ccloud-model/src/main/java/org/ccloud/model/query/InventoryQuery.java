@@ -186,5 +186,31 @@ public class InventoryQuery extends JBaseQuery {
 		List<Record> list = Db.find(fromBuilder.toString());
 		return list;
 	}
+
+	public Page<Record> findInventoryDetailByParams(int pageNumber, int pageSize, String startDate, String endDate,
+			String warehouseId, String categoryId, String dataArea, String search) {
+		String select = "select cc.warehouse_id, cc.sell_product_id, cc.data_area, se.seller_name, se.id, cw.`name`, cs.custom_name, cgc.`name` as categoryName, cgc.id as categoryId, IFNULL(SUM(t1.outCount), 0) as outCount, IFNULL(SUM(t1.inCount), 0) as inCount, cc.balance_count ";
+		StringBuilder fromBuilder = new StringBuilder("FROM cc_inventory_detail cc ");
+		fromBuilder.append("LEFT JOIN cc_seller_product cs on cs.id = cc.sell_product_id ");
+		fromBuilder.append("LEFT JOIN cc_seller se on se.id = cs.seller_id ");
+		fromBuilder.append("LEFT JOIN cc_product cp on cp.id = cs.product_id ");
+		fromBuilder.append("LEFT JOIN cc_goods cg on cg.id = cp.goods_id ");
+		fromBuilder.append("LEFT JOIN cc_goods_category cgc on cgc.id = cg.goods_category_id ");
+		fromBuilder.append("LEFT JOIN cc_warehouse cw on cc.warehouse_id = cw.id ");
+		fromBuilder.append("LEFT JOIN (SELECT a.id as cid, a.create_date, SUM(a.out_count) AS outCount, SUM(a.in_count) AS inCount, a.balance_count ");
+		fromBuilder.append("FROM cc_inventory_detail a ");
+		fromBuilder.append("WHERE a.create_date >= ? And a.create_date <= ? ");
+		fromBuilder.append("GROUP BY a.warehouse_id,a.sell_product_id ORDER BY a.create_date desc) t1 ON t1.cid = cc.id ");
+		LinkedList<Object> params = new LinkedList<Object>();
+		params.add(startDate);
+		params.add(endDate);
+		boolean needWhere = true;
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cc.data_area", dataArea, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "cgc.id", categoryId, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "cc.warehouse_id", warehouseId, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cs.custom_name", search, params, needWhere);
+		fromBuilder.append("GROUP BY cc.warehouse_id, cc.sell_product_id ORDER BY cc.create_date desc");
+		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
 	
 }

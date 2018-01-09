@@ -262,4 +262,13 @@ public class GoodsCategoryQuery extends JBaseQuery {
 		List<Record> list = Db.find(fromBuilder.toString());
 		return list;
 	}
+
+	public List<GoodsCategory> findProductCategory(String sellerId) {
+		StringBuilder fromBuilder = new StringBuilder("SELECT cgc.`name`,cgc.id FROM cc_seller_product cc ");
+		fromBuilder.append("LEFT JOIN cc_product cp on cp.id = cc.product_id ");
+		fromBuilder.append("LEFT JOIN cc_goods cg on cg.id = cp.goods_id ");
+		fromBuilder.append("LEFT JOIN cc_goods_category cgc on cgc.id = cg.goods_category_id ");
+		fromBuilder.append("where cc.seller_id = ? GROUP BY cgc.id ");
+		return DAO.find(fromBuilder.toString(), sellerId);
+	}
 }
