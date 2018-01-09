@@ -20,8 +20,11 @@ import java.util.LinkedList;
 import org.ccloud.Consts;
 import org.ccloud.model.Message;
 
+import com.jfinal.core.Const;
 import com.jfinal.kit.StrKit;
+import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
 /**
@@ -85,6 +88,28 @@ public class MessageQuery extends JBaseQuery {
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 	
+	public Page<Record> paginate1(int pageNumber, int pageSize, String sellerId, String type, String fromUserId, 
+			String toUserId, String orderby) {
+		String select = "select m.*,t1.ID_ taskId,t1.ASSIGNEE_ assignee  ";
+		StringBuilder fromBuilder = new StringBuilder("from `cc_message` m");
+		fromBuilder.append(" LEFT JOIN cc_sales_order o ON m.object_id=o.id ");
+		fromBuilder.append(" LEFT JOIN (SELECT a.ID_ ,a.ASSIGNEE_, a.PROC_INST_ID_ FROM act_ru_task a) t1 on o.proc_inst_id = t1.PROC_INST_ID_ ");
+		boolean needWhere = true;
+		LinkedList<Object> params = new LinkedList<Object>();
+		needWhere = appendIfNotEmpty(fromBuilder, "m.seller_id", sellerId, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "m.type", type, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "m.from_user_id", fromUserId, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "m.to_user_id", toUserId, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "m.is_read", Consts.NO_READ, params, needWhere);
+		
+		fromBuilder.append("order by m.create_date desc");
+		
+		if (params.isEmpty())
+			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+
+		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+	
 
 	public int batchDelete(String... ids) {
 		if (ids != null && ids.length > 0) {
@@ -100,9 +125,10 @@ public class MessageQuery extends JBaseQuery {
 	}
 
 	public Message findByObjectIdAndToUserId(String orderId, String id) {
-		String sql="SELECT * FROM cc_message WHERE object_id='"+orderId+"' And to_user_id='"+id+"'";
+		String sql="SELECT * FROM cc_message WHERE object_id='"+orderId+"' And to_user_id='"+id+"' And is_read=0";
 		return DAO.findFirst(sql.toString());
 	}
+
 
 	
 }

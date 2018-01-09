@@ -34,6 +34,8 @@ public class OrderReviewTwoTaskListener implements TaskListener {
 		String sellerId = _sellerId.toString();
 		Object _customerName = task.getVariable("customerName");
 		String customerName = _customerName.toString();
+		Object _orderId = task.getVariable("orderId");
+		String orderId = _orderId.toString();
 
 		String executeInstanceId = task.getProcessInstanceId();
 		ProcessEngine processEngine = ActivitiPlugin.buildProcessEngine();
@@ -43,7 +45,7 @@ public class OrderReviewTwoTaskListener implements TaskListener {
 			User manager = UserQuery.me().findManagerByDeptId(user.getDepartmentId());
 			task.setAssignee(manager.getUsername());
 			sendOrderMessage(sellerId, customerName, "订单审核", manager.getId(), user.getId(), user.getDepartmentId(),
-					user.getDataArea());
+					user.getDataArea(),orderId);
 		} else if (taskList != null && taskList.size() > 0) {
 
 			List<HistoricTaskInstance> list = processEngine.getHistoryService().createHistoricTaskInstanceQuery()
@@ -61,7 +63,7 @@ public class OrderReviewTwoTaskListener implements TaskListener {
 
 					treasurerUserName += record.getStr("username");
 					sendOrderMessage(sellerId, customerName, "订单审核", record.getStr("id"), user.getId(),
-							user.getDepartmentId(), user.getDataArea());
+							user.getDepartmentId(), user.getDataArea(),orderId);
 				}
 				task.setAssignee(treasurerUserName);
 			} 
@@ -78,7 +80,7 @@ public class OrderReviewTwoTaskListener implements TaskListener {
 	}
 
 	private void sendOrderMessage(String sellerId, String title, String content, String fromUserId, String toUserId,
-			String deptId, String dataArea) {
+			String deptId, String dataArea, String orderId) {
 
 		Message message = new Message();
 		message.setType(Message.ORDER_REVIEW_TYPE_CODE);
@@ -86,6 +88,10 @@ public class OrderReviewTwoTaskListener implements TaskListener {
 		message.setSellerId(sellerId);
 		message.setTitle(title);
 		message.setContent(content);
+		
+		message.setObjectId(orderId);
+		message.setIsRead(Consts.NO_READ);
+		message.setObjectType(Consts.OBJECT_TYPE_ORDER);
 
 		message.setFromUserId(fromUserId);
 		message.setToUserId(toUserId);

@@ -114,8 +114,14 @@ public class WxOauthController extends BaseFrontController {
 					
 					if (StrKit.notBlank(cookieSellerId, cookieUserId)) {
 						
+						// 用户模拟登录
 						User curUser = UserQuery.me().findById(cookieUserId);
 						init(curUser.getUsername(), curUser.getPassword(), true);
+						// 获取用户所处的经销商账套
+						List<Department> tmpList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(curUser.getDepartmentId());
+						String dealerDataArea = DepartmentQuery.me().getDealerDataArea(tmpList);
+						setSessionAttr(Consts.SESSION_DEALER_DATA_AREA, dealerDataArea);
+						// 缓存用户的账套信息
 						Seller seller = SellerQuery.me().findById(cookieSellerId);
 						setSellerSession(seller.getId(), seller.getSellerName(), seller.getSellerCode());
 						
@@ -128,7 +134,6 @@ public class WxOauthController extends BaseFrontController {
 			}
 		}
 		
-		//redirect(gotoUrl);
 		forwardAction(gotoUrl);
 	}
 	

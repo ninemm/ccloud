@@ -392,7 +392,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		sb.append(" left join cc_customer_type ct on o.customer_type_id = ct.id ");
 		sb.append(" JOIN act_ru_task a on o.proc_inst_id = a.PROC_INST_ID_ ");
 		sb.append(" where FIND_IN_SET(?, a.ASSIGNEE_) ");
-		sb.append(" order by o.create_date ");
+		sb.append(" order by o.create_date DESC");
 		return DAO.find(sb.toString(), username);
 	}
 	
@@ -1691,5 +1691,10 @@ public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procK
 	public SalesOrder findByOrderSn(String orderSn){
 		String sql = "select * from cc_sales_order where order_sn = ?";
 		return DAO.findFirst(sql, orderSn);
+	}
+	
+	public List<Record> findByDataArea(String dataArea){
+		String sql = "select DISTINCT u.id,u.realname from cc_sales_order o LEFT JOIN user u on u.id = o.biz_user_id where o.data_area like '"+dataArea+"'";
+		return Db.find(sql);
 	}
 }

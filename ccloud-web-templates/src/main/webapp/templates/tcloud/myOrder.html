@@ -12,9 +12,12 @@
 			combo();
 		}).on("change", "#customerTypeId", function() {
 			combo();
-		}).on("change", "#datePicker", function() {
-			startDate = $("#datePicker").val();
-			endDate = startDate + ' 23:59:59';
+		}).on("change", "#date", function() {
+			getDateOrder();
+		}).off("touchend", "#combin-filter .confirm-search-btn")
+		.on("touchend", "#combin-filter .confirm-search-btn", function() {
+			startDate = $('#start-date').val();
+			endDate = $('#end-date').val() + ' 23:59:59';
 			combo();
 		}).on('touchend', '.show-more-btn', function () {
 			var $this = $(this);
@@ -27,8 +30,20 @@
 				$this.html('隐藏详情 <i class="icon-angle-up"></i>');
 			}
 		});
-        $("#datePicker").calendar();
-        $("#datePicker").val($.today());
+        $("#start-date").calendar({
+			maxDate: function() {
+				return $('#end-date').val()
+			}
+		});
+		$("#start-date").val($.today());
+		$("#end-date").calendar({
+			minDate: function() {
+				var date = new Date($('#start-date').val().replace(/-/g,"/"));
+				date.setDate(date.getDate() - 1);
+				return date.Format("yyyy-MM-dd")
+			}
+ 		});
+        $("#end-date").val($.today());
 
 	    combo();
 
@@ -59,6 +74,15 @@
 		  title: "择客户类型",
 		  items: ${customerTypes!}
 		});
+		$('#date').select({
+			title: '选择时间',
+			items: [{
+				title: '今天', value: '0'
+				},{title: "最近3天", value: "1"
+				},{title: "最近7天", value: "2"
+				},{title: "最近30天", value: "3"
+			}]
+		})
 	});
   
 	var newHtml = $(".weui-panel").eq(0).html();
@@ -118,18 +142,24 @@
 					$newOrder.find("#customerType").text(el.customerTypeName);
 					if(el.status == 0) {
 						$newOrder.find("#cancel").on('click', function() {
-						    Utils.openLoadingWin('撤销中...');
-							$.get('${CPATH}/order/cancel?orderId=' + el.id,
-								function(result) {
-									if (result.errorCode > 0) {
-									    $.toptip(result.message, 'error');
-									} else {
-										$.toptip(result.message, 'success');
-										combo();
-									}
-									Utils.closeLoadingWin();
+							$.confirm({
+								title: "订单撤销",
+								text: '是否撤销订单？',
+								onOK: function () {
+									Utils.openLoadingWin('撤销中...');
+									$.get('${CPATH}/order/cancel?orderId=' + el.id,
+										function(result) {
+											if (result.errorCode > 0) {
+												$.toptip(result.message, 'error');
+											} else {
+												$.toptip(result.message, 'success');
+												combo();
+											}
+											Utils.closeLoadingWin();
+										}
+									);
 								}
-							);
+							});
 						});
 					} else {
 						$newOrder.find("#cancel").remove();
@@ -163,7 +193,7 @@
 	}
 	
 	function getDateOrder(){
-		var dateType = $("#getDate").find(".red-button").data("id");
+		var dateType = $("#date").data('values');
 		var date = new Date();
 		if(dateType == 0){
 			startDate = $.today();
@@ -325,7 +355,7 @@
 						<i class="icon-sort-desc"></i>
 					</div>
 					<div class="weui-flex__item">
-						<input type="text" id="datePicker" class="weui-input" readonly>
+						<input type="text" id="date" placeholder="今天" class="weui-input" readonly>
 						<i class="icon-sort-desc"></i>
 					</div>
 				</div>
@@ -389,21 +419,23 @@
 		</main>
 		<article id="combin-filter" class="animated">
 			<div class="filter-item">
-				<h4>下单日期</h4>
-				<div class="relative" id="getDate">
-					<span class="red-button" data-id="0">今天</span>
-					<span data-id="1">最近3天</span>
-					<span data-id="2">最近7天</span>
-					<span data-id="3">最近30天</span>
+				<h4>日期区间</h4>
+				<div class="relative weui-flex" id="getDate">
+					<input type="text" id="start-date" class="weui-input weui-flex__item" readonly>
+					<div style="width:1rem" class="t-c">-</div>
+					<input type="text" id="end-date" class="weui-input weui-flex__item" readonly>
 				</div>
 			</div>
 			<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
 				<button class="white-button-no-border  cancel-search-btn weui-flex__item border-top-1px">取消</button>
-				<button class="red-button confirm-search-btn weui-flex__item" onclick="getDateOrder()">确定</button>
+				<button class="red-button confirm-search-btn weui-flex__item">确定</button>
 			</footer>
 		</article>
 		<div class="layer"></div>
-		<#include "_inc/_goback_bottom.html" />
 	</div>
 </div>
+<a class="hidden-menu" href="${CPATH}/product">
+    <img src="${CTPATH}/images/order_add.png" alt="">
+</a>
+<#include "_inc/_footer_nav.html" />
 </@layout>

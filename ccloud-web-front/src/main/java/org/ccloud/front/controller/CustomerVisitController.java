@@ -171,6 +171,13 @@ public class CustomerVisitController extends BaseFrontController {
 		String id = getPara("id");
 		CustomerVisit visit = CustomerVisitQuery.me().findMoreById(id);
 		setAttr("visit", visit);
+		//审核后将message中是否阅读改为是
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		Message message=MessageQuery.me().findByObjectIdAndToUserId(id,user.getId());
+		if (null!=message) {
+			message.setIsRead(Consts.IS_READ);
+			message.update();
+		}
 		render("customer_visit_detail.html");
 	}
 
@@ -202,6 +209,14 @@ public class CustomerVisitController extends BaseFrontController {
 		setAttr("customerVisit", customerVisit);
 		setAttr("cTypeName", Joiner.on(",").join(typeList.iterator()));
 		
+		//审核后将message中是否阅读改为是
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		Message message=MessageQuery.me().findByObjectIdAndToUserId(id,user.getId());
+		if (null!=message) {
+			message.setIsRead(Consts.IS_READ);
+			message.update();
+		}
+				
 		render("customer_visit_review.html");
 	}
 
@@ -389,11 +404,6 @@ public class CustomerVisitController extends BaseFrontController {
 		
 		sendMessage(sellerId, comment, user.getId(), toUser.getId(), user.getDepartmentId(), user.getDataArea()
 				, Message.CUSTOMER_VISIT_REVIEW_TYPE_CODE, customerVisit.getSellerCustomer().getCustomer().getCustomerName(),id);
-		
-		//审核后将message中是否阅读改为是
-		Message message1=MessageQuery.me().findByObjectIdAndToUserId(id,user.getId());
-		message1.setIsRead(Consts.IS_READ);
-		message1.update();
 		
 		if (customerVisit.saveOrUpdate())
 			renderAjaxResultForSuccess("操作成功");

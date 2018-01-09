@@ -152,4 +152,5 @@ public class WarehouseQuery extends JBaseQuery {
 		fromBuilder.append(" order by c.create_date");
 		return DAO.find(fromBuilder.toString());
 	}	
+	
  }

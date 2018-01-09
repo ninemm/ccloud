@@ -62,12 +62,13 @@ public class PrintTemplateQuery extends JBaseQuery {
 		StringBuilder fromBuilder = new StringBuilder("from `cc_print_template` ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
-		if(!keyword.equals("")){
-			appendIfNotEmptyWithLike(fromBuilder, ".template_name", keyword, params, true);
-			fromBuilder.append(" and  id not in (select print_template_id from cc_seller_join_template where seller_id='"+sellerId+"')");
-		}else{
-			fromBuilder.append(" where id not in (select print_template_id from cc_seller_join_template where seller_id='"+sellerId+"')");
+		
+		boolean needWhere = true;
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "template_name", keyword, params, needWhere);
+		if (needWhere) {
+			fromBuilder.append(" where 1 = 1");
 		}
+		fromBuilder.append(" and  id not in (select print_template_id from cc_seller_join_template where seller_id='"+sellerId+"')");
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 

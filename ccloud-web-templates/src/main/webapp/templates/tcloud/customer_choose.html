@@ -96,8 +96,8 @@
 
 		Utils.ajax('${CPATH}/product/customerList', params, 
 			function(data){
+				$loading.hide();
 				if(data.customerList.length == 0){
-					$loading.hide();
 					$noMore.show();
 					loading = true;
 					return;

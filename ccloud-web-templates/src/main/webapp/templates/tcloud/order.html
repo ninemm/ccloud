@@ -42,7 +42,7 @@
 $(function() {
   $(document).on("touchstart", ".choose-customer", function () {
 		window.location.href = '${CPATH}/product/customerChoose';
-  }).on("touchend", "#placeOrder", function () {
+  }).on("click", "#placeOrder", function () {
 		doSubmit();
   }).on("touchstart",".nearby-customer",function(){
 		window.location.href = '${CPATH}/product/customerNearbyChose';
@@ -91,7 +91,7 @@ $(function() {
         combo();
   }).on("change", "#customerTypeId", function() {
         combo();
-  }).on("touchend", "#customerInfo", function() {
+  }).on("click", "#customerInfo", function() {
 		var el = $(this);
         var customerInfo = {
         	customerName : el.find("#customerName").text(),
@@ -398,8 +398,8 @@ $(function() {
 
 		Utils.ajax('${CPATH}/product/customerList', params, 
 			function(data){
+				$loading.hide();
 				if(data.customerList.length == 0){
-					$loading.hide();
 					$noMore.show();
 					loading = true;
 					return;
@@ -552,7 +552,7 @@ $(function() {
 							规格：<span id="valueName"></span>
 							<div class="fr">
 								<span class="no-bg">是否赠品</span>
-								<input type="checkbox" name="isGift" id="isGift" value="1" class="weui-agree__checkbox" disabled>
+								<input type="checkbox" name="isGiftCheckBox" id="isGiftCheckBox" value="1" class="weui-agree__checkbox" disabled>
 							</div>
 						</div>
 						<div class="product_bUnit">
@@ -654,7 +654,7 @@ $(function() {
 						</div>
 						<label class="weui-search-bar__label" id="searchText">
 							<i class="weui-icon-search"></i>
-							<span>请输入商品名称</span>
+							<span>请输入客户名称</span>
 						</label>
 					</form>
 					<a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>

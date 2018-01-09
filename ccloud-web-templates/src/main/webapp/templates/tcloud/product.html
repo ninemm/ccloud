@@ -7,6 +7,9 @@
 	.layui-m-layer {
 		z-index: 501!important;
 	}
+	#product {
+		bottom: 2.25rem;
+	}
 </#macro>
 <#macro script_import>
 	<script type='text/javascript' src="${CTPATH}/js/swiper.min.js"></script>
@@ -51,13 +54,13 @@ $(function() {
     }).on("touchstart", "#placeOrder", function () {
     	order();
     	
-    }).on("touchend", ".operate:first-child", function () { //减少商品数量
+    }).on("click", ".operate:first-child", function () { //减少商品数量
       productChange($(this));
       
-    }).on("touchend", ".operate:last-child", function () { //增加商品数量
+    }).on("click", ".operate:last-child", function () { //增加商品数量
       productChange($(this));
       
-    }).on('touchend', '#confirm-input', function () {
+    }).on('click', '#confirm-input', function () {
       var val = parseFloat($currentInput.val());
       if(val < 0 || val == ""){
         $currentInput.val(0);
@@ -635,9 +638,10 @@ function order(){
 			</div>
 		</div>
 </div>
-	<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
-		<p class="total bg-white weui-flex__item" id="totalNum"></p>
-		<button id="shoppingCart" class="place-order yellow-button white">购物车</button>
-		<button id="placeOrder" class="place-order red-button white">下单</button>
-	</footer>
+<#include "_inc/_goback.html" />
+<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
+	<p class="total bg-white weui-flex__item" id="totalNum"></p>
+	<button id="shoppingCart" class="place-order yellow-button white">购物车</button>
+	<button id="placeOrder" class="place-order red-button white">下单</button>
+</footer>
 </@layout>
