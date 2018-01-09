@@ -1769,6 +1769,7 @@ input[name=sex] {
   z-index: 802;
   background: #fff;
   display: none;
+  animation-duration: .3s;
 }
 
 .filter-item {
