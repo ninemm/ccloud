@@ -628,15 +628,6 @@ function order(){
 				</article>
 			</div>
 		</div>
-			<#if !footerEdit>
-				<@shiro.hasPermission name="/admin/salesOrder">
-				<a class="hidden-menu" id="shoppingCart" >
-					<img src="${CTPATH}/images/shopping_cart.png" alt="">
-				</a>
-				</@shiro.hasPermission>
-			<#else>
-				<#include "_inc/_goback.html" />
-			</#if>
 		</div>
 		<div class="weui-gallery" id="gallery">
 			<span class="weui-gallery__img" id="galleryImg"></span>
@@ -644,13 +635,9 @@ function order(){
 			</div>
 		</div>
 </div>
-<#if !footerEdit>
-	<#include "_inc/_footer_nav.html" />
-<#else>
 	<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
 		<p class="total bg-white weui-flex__item" id="totalNum"></p>
 		<button id="shoppingCart" class="place-order yellow-button white">购物车</button>
 		<button id="placeOrder" class="place-order red-button white">下单</button>
 	</footer>
-</#if>
 </@layout>
