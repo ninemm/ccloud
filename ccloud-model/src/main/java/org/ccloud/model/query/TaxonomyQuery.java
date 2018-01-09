@@ -60,25 +60,26 @@ public class TaxonomyQuery extends JBaseQuery {
 		return DAO.doFind("parent_id = ?", parentId);
 	}
 
-	public Page<Taxonomy> doPaginate(int page, int pagesize, String module) {
-		return DAO.doPaginate(page, pagesize, "content_module = ?", module);
+	public Page<Taxonomy> doPaginate(int page, int pagesize, String module, String sellerId) {
+		return DAO.doPaginate(page, pagesize, "content_module = ? AND seller_id = ?", module, sellerId);
 	}
 
-	public List<Taxonomy> findListByModuleAndType(String module, String type) {
-		return findListByModuleAndType(module, type, null, null, null);
+	public List<Taxonomy> findListByModuleAndType(String module, String type, String sellerId) {
+		return findListByModuleAndType(module, type, null, null, null, sellerId);
 	}
 	
-	public List<Taxonomy> findListByModuleAndType(String module, String type, String orderBy) {
-		return findListByModuleAndType(module, type, null, null, orderBy);
+	public List<Taxonomy> findListByModuleAndType(String module, String type, String orderBy, String sellerId) {
+		return findListByModuleAndType(module, type, null, null, orderBy, sellerId);
 	}
 
 	public List<Taxonomy> findListByModuleAndType(String module, String type, String parentId, Integer limit,
-			String orderby) {
+			String orderby, String sellerId) {
 
 		final StringBuilder sqlBuilder = new StringBuilder("SELECT * FROM taxonomy t");
 
 		boolean needWhere = true;
 		final List<Object> params = new LinkedList<Object>();
+		needWhere = appendIfNotEmpty(sqlBuilder, "t.seller_id", sellerId, params, needWhere);
 		needWhere = appendIfNotEmpty(sqlBuilder, "t.content_module", module, params, needWhere);
 		needWhere = appendIfNotEmpty(sqlBuilder, "t.`type`", type, params, needWhere);
 		needWhere = appendIfNotEmpty(sqlBuilder, "t.`parent_id`", parentId, params, needWhere);
@@ -106,22 +107,22 @@ public class TaxonomyQuery extends JBaseQuery {
 		return new ArrayList<Taxonomy>(data);
 	}
 
-	public List<Taxonomy> findListByModuleAndTypeAsTree(String module, String type) {
+	public List<Taxonomy> findListByModuleAndTypeAsTree(String module, String type, String sellerId) {
 		// 修复第一次进文档编辑页面，分类树错误的bug
-		List<Taxonomy> list = findListByModuleAndType(module, type, "parent_id asc");
+		List<Taxonomy> list = findListByModuleAndType(module, type, "parent_id asc", sellerId);
 		ModelSorter.tree(list);
 		return list;
 	}
 
-	public List<Taxonomy> findListByModuleAndTypeAsSort(String module, String type) {
-		List<Taxonomy> list = findListByModuleAndType(module, type);
+	public List<Taxonomy> findListByModuleAndTypeAsSort(String module, String type, String sellerId) {
+		List<Taxonomy> list = findListByModuleAndType(module, type, sellerId);
 		ModelSorter.sort(list);
 		return list;
 	}
 
 	public Page<Taxonomy> doPaginate(int pageNumber, int pageSize, String module, String type, String sellerId) {
 		return DAO.doPaginate(pageNumber, pageSize, "content_module = ? and type = ? and seller_id = ? order by created desc", module,
-				type,sellerId);
+				type, sellerId);
 	}
 
 	public List<Taxonomy> findListByContentId(String contentId) {

@@ -55,6 +55,7 @@ public class ContentPageTag extends JTag {
 	public void onRender() {
 
 		int pagesize = getParamToInt("pageSize", 10);
+		String sellerId = getParam("sellerId");
 		orderBy = StringUtils.isBlank(orderBy) ? getParam("orderBy") : orderBy;
 
 		String[] taxonomyIds = null;
@@ -69,7 +70,7 @@ public class ContentPageTag extends JTag {
 			boolean containChild = getParamToBool("containChild", false);
 			if (containChild == true) {
 				for (Taxonomy taxonomy : taxonomys) {
-					List<Taxonomy> childs = TaxonomyQuery.me().findListByModuleAndType(moduleName, taxonomy.getType());
+					List<Taxonomy> childs = TaxonomyQuery.me().findListByModuleAndType(moduleName, taxonomy.getType(), sellerId);
 					if (childs != null && childs.size() > 0) {
 						ModelSorter.sort(childs, taxonomy.getId());
 						String[] newIds = Arrays.copyOf(taxonomyIds, taxonomyIds.length + childs.size());
@@ -82,7 +83,7 @@ public class ContentPageTag extends JTag {
 			}
 		}
 
-		Page<Content> page = ContentQuery.me().paginateInNormal(pageNumber, pagesize, moduleName, taxonomyIds, orderBy);
+		Page<Content> page = ContentQuery.me().paginateInNormal(pageNumber, pagesize, moduleName, taxonomyIds, orderBy, sellerId);
 		setVariable("page", page);
 		setVariable("contents", page.getList());
 

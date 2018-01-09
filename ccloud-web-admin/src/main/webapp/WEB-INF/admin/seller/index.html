@@ -19,12 +19,14 @@
 <#macro script>
 
 	var $table = $("#_seller_table");
+	var $productTable = $("#product_table");
 
 	$(function() {
 
 		var url = '${CPATH}/admin/seller/list';
-
+		var urlPro = '';
 		jQuery.mm.initEditTable('#_seller_table', url, initParams, initFields(), null);
+		jQuery.mm.initEditTable('#product_table', urlPro, initParams, initFields(), null);
 		$("#search-submit").click(function() {
 			$table.bootstrapTable('refresh');
 		});
@@ -42,7 +44,50 @@
 		};
 		return param;
 	};
+	
+	var $tables = $("#product_table");
+	function productPei(id){
+		//弹出层信息展现
+		$('#exampleModal').on('show.bs.modal', function (event) {
+			$("#product_table").bootstrapTable('destroy');
+			var _url = '${CPATH}/admin/seller/showProduct?sellerId='+id;
+			$("#sellerId").val(id);
+			jQuery.mm.initEditTable('#product_table', _url, initParamss, initFieldss(), null);
+		})
+	}
+	
+	var initParamss = function(params) {
 
+		var keyword = $('#_post-search-input').val();
+		if (keyword) keyword = encodeURIComponent(keyword);
+		var param = {
+			size: params.limit,
+			page: params.offset/params.limit + 1,
+			k: keyword,
+			sta: 1
+		};
+		return param;
+	};
+	$("#_search-submit").click(function() {
+		$tables.bootstrapTable('refresh');
+	}); 
+	var initFieldss = function() {
+		var fields =
+			[
+				{field: "", title: "<input type='checkbox' onclick='checkA(this)' name='data1' value=''/>", align: "center", width: '5%',
+				formatter: function(value, row, rowIndex) {
+					var strHtml = '<input type="checkbox" name="data" id="data" value="'+row.id+'"/>';
+					return strHtml;
+				},
+				edit:false
+				},
+				{field: "productName", title: "产品名", align: "center", width: '10%', edit:false},
+				{field: "custom_name", title: "自定义名", align: "center", width: '10%', edit:false},
+				{field: "cps_name", title: "产品规格", align: "center", width: '10%', edit:false}
+			];
+		return fields;
+	}
+	
 	var initFields = function() {
 		var fields =
 			[
@@ -91,9 +136,9 @@
 				formatter: function(value, row, rowIndex) {
 					var url1 = '${CPATH}/admin/seller/edit?id=' + row.id;
 					if(row.is_enabled==0){
-						var strHtml = '<a href="' + url1 + '" class="btn btn-xs bg-olive btn-flat">编辑</a> <a href="javascript:void(0);" class="btn btn-xs btn-primary btn-flat" onclick="change(\''+row.id+'\')">启用</a>';
+						var strHtml = '<a href="' + url1 + '" class="btn btn-xs bg-olive btn-flat">编辑</a> <a href="javascript:void(0);" class="btn btn-xs btn-primary btn-flat" onclick="change(\''+row.id+'\')">启用</a> <a href="javascript:void(0);" class="btn btn-xs btn-primary btn-flat" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo" onclick="productPei(\''+row.id+'\')">产品配置</a>';
 					}else{
-						var strHtml = '<a href="' + url1 + '" class="btn btn-xs bg-olive btn-flat">编辑</a> <a href="javascript:void(0);" class="btn btn-xs btn-warning btn-flat" onclick="change(\''+row.id+'\')">停用</a>';
+						var strHtml = '<a href="' + url1 + '" class="btn btn-xs bg-olive btn-flat">编辑</a> <a href="javascript:void(0);" class="btn btn-xs btn-warning btn-flat" onclick="change(\''+row.id+'\')">停用</a> <a href="javascript:void(0);" class="btn btn-xs btn-primary btn-flat" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo" onclick="productPei(\''+row.id+'\')">产品配置</a>';
 					}
 					return strHtml;
 				},
@@ -139,6 +184,70 @@
 			}
 		});
 	}
+	
+	function saveAll(){
+		var sellerId = $("#sellerId").val();
+		$.ajax({
+			url:"${CPATH}/admin/seller/savePt",
+			type:"post",
+			dataType:"json",
+			data : {status:"0",sellerId:sellerId},
+			success:function(data){
+				if(data==true){
+					toastr.success(data.message,'操作成功');
+				}else{
+					toastr.error(data.message,'操作失败');
+				}
+				setTimeout( function(){
+						$tables.bootstrapTable('refresh');
+								}, 2 * 1000 );
+			}
+		});
+	}
+	
+	function saveP(){
+		 var orderItems = new Array();
+		 var sellerId = $("#sellerId").val();
+		 var checklist = $('input[name="data"]:checked').parent().parent();
+		 if(checklist.length == 0){
+			alert("未选中任何产品!");
+			return;		 
+		 }
+		 $('input[name="data"]:checked').parent().parent().each(function(idx, item) {
+		  	var obj = {
+								"id":  $(this).find('td').eq(0).find("input").val(),
+						};
+							orderItems.push(obj);
+		});
+		$.ajax({
+			url:"${CPATH}/admin/seller/savePt",
+			type:"post",
+			dataType:"json",
+			data : {orderItems : JSON.stringify(orderItems),status:"1",sellerId:sellerId},
+			success:function(data){
+				if(data==true){
+					toastr.success(data.message,'操作成功');
+				}else{
+					toastr.error(data.message,'操作失败');
+				}
+				setTimeout( function(){
+						$tables.bootstrapTable('refresh');
+								}, 2 * 1000 );
+			}
+		});
+	}
+	
+	function checkA(checkbox){
+		var items = document.getElementsByName("data");
+		for (var i = 0; i < items.length; i++) {
+			items[i].checked = checkbox.checked;
+		}
+	}
+	
+	function closeAddProuduct(){
+		layer.closeAll();
+		location.reload();
+	}
 </#macro>
 
 <@layout active_id=p child_active_id=c>
@@ -170,4 +279,33 @@
 	<!-- /.box -->
 </section>
 
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="padding-top:200px;">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content" style="width:800px;">
+     <!-- Main content -->
+		<section class="content">
+			<div class="row content-row">
+				
+				<form class="form-inline jp-left">
+					<div class="input-group input-group-sm " style="width:300px;">
+						<input id="_post-search-input" class="form-control" type="search" value="${k!}" name="k" placeholder="搜索名称" style="width:80%;">
+						<input  type="hidden" id ="sellerId">
+						&nbsp;
+						<input id="_search-submit" class="btn btn-default btn-sm btn-flat" type="button" value="搜索">
+					</div>
+				</form>
+				<div class="jp-right">
+					<button type="button" class="btn btn-primary" onclick="saveP()">保存</button>
+					<button type="button" class="btn btn-success" onclick="saveAll()">全部导入</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal" onclick="closeAddProuduct()">关闭</button>
+				</div>
+			</div>
+			<div class="box">
+				<table class="table table-striped table-hover table-condensed" id="product_table" ></table>
+			</div>
+			<!-- /.box -->
+		</section>
+    </div>
+  </div>
+</div>
 </@layout>

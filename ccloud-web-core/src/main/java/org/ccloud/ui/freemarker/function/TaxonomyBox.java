@@ -27,6 +27,7 @@ public class TaxonomyBox extends JFunction {
 
 	private TplTaxonomyType taxonomyType;
 	private Content content;
+	private String sellerId;
 	private List<Taxonomy> contentTaxonomyList;
 
 	@Override
@@ -39,6 +40,7 @@ public class TaxonomyBox extends JFunction {
 
 		this.taxonomyType = (TplTaxonomyType) get(0);
 		this.content = (Content) get(1);
+		this.sellerId = getToString(2);
 
 		if (content != null) {
 			contentTaxonomyList = TaxonomyQuery.me().findListByContentId(content.getId());
@@ -48,10 +50,10 @@ public class TaxonomyBox extends JFunction {
 	}
 
 	private Object doExec() {
-
+		
 		String moduleName = taxonomyType.getModule().getName();
 		String txType = taxonomyType.getName();
-		List<Taxonomy> list = TaxonomyQuery.me().findListByModuleAndTypeAsTree(moduleName, txType);
+		List<Taxonomy> list = TaxonomyQuery.me().findListByModuleAndTypeAsTree(moduleName, txType, sellerId);
 		StringBuilder htmlBuilder = new StringBuilder();
 		if (list != null && list.size() > 0) {
 			doBuilder(list, htmlBuilder);

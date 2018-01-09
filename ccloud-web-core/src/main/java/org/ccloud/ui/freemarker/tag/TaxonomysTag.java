@@ -38,6 +38,7 @@ public class TaxonomysTag extends JTag {
 	@Override
 	public void onRender() {
 
+		String sellerId = getParam("sellerId");
 		Integer count = getParamToInt("count");
 		String module = getParam("module");
 		String activeClass = getParam("activeClass", "active");
@@ -46,7 +47,7 @@ public class TaxonomysTag extends JTag {
 		String parentId = getParam("parentId");
 		Boolean asTree = getParamToBool("asTree");
 
-		List<Taxonomy> list = TaxonomyQuery.me().findListByModuleAndType(module, type, parentId, count, orderby);
+		List<Taxonomy> list = TaxonomyQuery.me().findListByModuleAndType(module, type, parentId, count, orderby, sellerId);
 		if (filterList != null && list != null && list.size() > 0) {
 			for (Taxonomy taxonomy : list) {
 				taxonomy.initFilterList(filterList, activeClass);

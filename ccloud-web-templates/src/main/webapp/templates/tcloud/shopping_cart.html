@@ -31,11 +31,11 @@ $(function() {
       order();
   }).on("touchstart", "#addGoods", function () {
        window.location.href = '${CPATH}/product';
-  }).on("touchend", ".operate:first-child", function () { //减少商品数量
+  }).on("click", ".operate:first-child", function () { //减少商品数量
       productChange($(this));
-  }).on("touchend", ".operate:last-child", function () { //增加商品数量
+  }).on("click", ".operate:last-child", function () { //增加商品数量
       productChange($(this));
-  }).on('touchend', '#confirm-input', function () {
+  }).on('click', '#confirm-input', function () {
       var val = parseFloat($currentInput.val());
       if(val < 0 || val == ""){
         $currentInput.val(0);

@@ -21,7 +21,7 @@
         <div class="weui-panel">
             <div class="weui-panel__hd"><i class="icon-volume-up"></i> 企业公告</div>
             <div class="weui-panel__bd">
-                <@cc.contentPage pageSize="10">
+                <@cc.contentPage pageSize="10" sellerId="${(session.sellerId)!}">
                 <#if (page.getList().size() > 0)>
                 <#list page.getList() as content>
                 <a href="${CPATH}/c?id=${(content.id)!}">
