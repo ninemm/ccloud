@@ -343,8 +343,11 @@ $(function() {
 	}).on("change", "input[name=add-gift]", function() {//点击遮罩关闭菜单
 		$(this).parent().next().slideToggle("fast");
 	}).on("touchend", ".layer", function () { //点击遮罩关闭菜单、组合筛选
-	    closeMenu();
-	    closeCombinSearch();
+		if ($('#combin-filter').hasClass('slideInRight')) {
+			closeCombinSearch();
+		} else {
+			closeMenu();
+		}
 	}).on('touchend', '#combin-filter-btn, .select-customer', function () { //打开组合筛选
 	    if ($combinSearch.length > 0) {
 	      openCombinSearch();
