@@ -65,9 +65,9 @@ public class SellerQuery extends JBaseQuery {
 
 		if(!username.equals("admin")){
 			fromBuilder.append("and cs.seller_type =1 and cs.dept_id in ("+child+")  ");
-		}/*else {
+		}else {
 			fromBuilder.append("and cs.seller_type =0 ");
-		}*/
+		}
 		fromBuilder.append(" GROUP BY cs.id order by " + orderby);	
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());

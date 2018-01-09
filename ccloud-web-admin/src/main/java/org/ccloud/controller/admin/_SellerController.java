@@ -187,7 +187,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			
 			
 			//添加直营商客户时 初始化数据
-			if(!user.getUsername().equals("admin") || Integer.parseInt(getPara("seller_type"))==1){
+			if(!user.getUsername().equals("admin")){
 				String customerId = StrKit.getRandomUUID();
 				//添加客户
 				customer.set("id", customerId);
@@ -210,12 +210,6 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				}
 				//添加直营商客户
 				this.saveSellerCustomer(customer.getId(), user, department,sId);
-				/*//初始化直营商产品
-				List<SellerProduct> sellerProducts = new ArrayList<SellerProduct>();
-				sellerProducts = SellerProductQuery.me().findBySellerId(sId);
-				for(SellerProduct sellerProduct : sellerProducts){
-					this.saveProduct(sellerProduct, seller2.getId());
-				}*/
 				seller2.set("seller_type", 1);
 				seller2.setCustomerId(customer.getId());
 				seller2.update();
