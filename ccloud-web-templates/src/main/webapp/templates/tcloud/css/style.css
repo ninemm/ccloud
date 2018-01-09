@@ -837,7 +837,7 @@ a {
   z-index: 10;
 }
 
-.menu-left ul li.active:before {
+/* .menu-left ul li.active:before {
     content: " ";
     position: absolute;
     display: block;
@@ -846,7 +846,7 @@ a {
     background: #ea6f5a;
     top: 0;
     left: 0;
-}
+} */
 
 .product-content {
   position: absolute;

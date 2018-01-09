@@ -148,8 +148,8 @@
 			<a class="weui-navbar__item" href="#tab2" type="done">已审 </a>
 		</div>
 		<div class="weui-tab__bd">
-			<div id="tab1" class="infinite weui-tab__bd-item weui-tab__bd-item--active">
-				<main>
+			<div id="tab1" class="weui-tab__bd-item weui-tab__bd-item--active">
+				<main class="infinite">
 					<#if page ??> <#list page.list as bean>
 					<div class="weui-panel weui-panel_access">
 						<div class="weui-cell weui-cell_access">
@@ -189,8 +189,8 @@
 					</#if>
 				</main>
 			</div>
-			<div id="tab2" class="infinite weui-tab__bd-item weui-tab__bd-item">
-				<main>
+			<div id="tab2" class="weui-tab__bd-item weui-tab__bd-item">
+				<main class="infinite">
 					<#if historyList ??>
 						<#list historyList.list as bean>
 							<div class="weui-panel weui-panel_access">
