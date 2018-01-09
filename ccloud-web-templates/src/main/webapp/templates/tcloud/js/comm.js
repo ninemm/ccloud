@@ -205,7 +205,7 @@ function closeCombinSearch() {
   $combinSearch.removeClass("slideInRight").addClass("slideOutRight");
   setTimeout(function() {
 	$layer.removeClass("layer-show");
-  }, 300);
+  }, 1000);
 }
 
 //设定storage
