@@ -52,7 +52,7 @@
 						<td>${(detail.product_count / detail.convert_relate)?floor} ${detail.big_unit + ' (x' + detail.convert_relate + detail.small_unit + ')' }</td>
 						<td>${detail.product_count % detail.convert_relate} ${detail.small_unit}</td>
 						<td><#if detail.is_gift?? && detail.is_gift == 1>是<#else>否</#if></td>
-						<td>￥ ${detail.product_amount!}</td>
+						<td>￥ <#if detail.is_gift?? && detail.is_gift == 1>0<#else>${detail.product_amount!}</#if></td>
 					</tr>
 				</#list>
 			</tbody>
