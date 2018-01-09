@@ -42,7 +42,18 @@ public class _ReportController extends JBaseController {
 	//库存详细
 	public void inventoryDetail() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		List<Warehouse> wlist = WarehouseQuery.me().findWarehouseByUserId(user.getId());
+		
+		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/dealer/all");
+		List<Warehouse> wlist= new ArrayList<>();
+		String user_id = user.getId();
+		//判断登录的人是不是经销商管理员
+		if (isSuperAdmin) {
+			String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+			wlist = WarehouseQuery.me().findWarehouseByDataArea(user_id,dataArea);
+		}else {
+			wlist = WarehouseQuery.me().findWarehouseByUserId(user.getId());
+		}
+		
 		setAttr("wlist", wlist);
 		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
 		setAttr("startDate", date);
