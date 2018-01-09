@@ -28,13 +28,14 @@ public class TagsTag extends JTag {
 	@Override
 	public void onRender() {
 
+		String sellerId = getParam("sellerId");
 		int count = getParamToInt("count", 0);
 		count = count <= 0 ? 10 : count;
 
 		String orderby = getParam("orderBy");
 
 		String module = getParam("module", Consts.MODULE_ARTICLE);
-		List<Taxonomy> list = TaxonomyQuery.me().findListByModuleAndType(module, "tag", null, count, orderby);
+		List<Taxonomy> list = TaxonomyQuery.me().findListByModuleAndType(module, "tag", null, count, orderby, sellerId);
 		setVariable("tags", list);
 
 		renderBody();

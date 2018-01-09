@@ -55,12 +55,14 @@ public class _TaxonomyController extends JBaseCRUDController<Taxonomy> {
 	}
 
 	public void index() {
+		String sellerId = getSessionAttr("sellerId");
+		
 		String moduleName = getContentModule();
 		TplModule module = TemplateManager.me().currentTemplateModule(moduleName);
 		TplTaxonomyType type = module.getTaxonomyTypeByType(getType());
 		String id = getPara("id");
 
-		List<Taxonomy> taxonomys = TaxonomyQuery.me().findListByModuleAndTypeAsSort(moduleName, type.getName());
+		List<Taxonomy> taxonomys = TaxonomyQuery.me().findListByModuleAndTypeAsSort(moduleName, type.getName(), sellerId);
 
 		if (id != null) {
 			Taxonomy taxonomy = TaxonomyQuery.me().findById(id);
@@ -74,7 +76,6 @@ public class _TaxonomyController extends JBaseCRUDController<Taxonomy> {
 		if (id != null && taxonomys != null) {
 			ModelSorter.removeTreeBranch(taxonomys, id);
 		}
-		String sellerId = getSessionAttr("sellerId").toString();
 		if (TplTaxonomyType.TYPE_SELECT.equals(type.getFormType())) {
 			Page<Taxonomy> page = TaxonomyQuery.me().doPaginate(1, Integer.MAX_VALUE, getContentModule(), getType(),sellerId);
 			ModelSorter.sort(page.getList());

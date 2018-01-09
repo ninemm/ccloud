@@ -147,7 +147,7 @@ public class ContentQuery extends JBaseQuery {
 	}
 
 	public Page<Content> paginateInNormal(int page, int pagesize, String module, String[] taxonomyIds,
-			String orderBy) {
+			String orderBy, String sellerId) {
 
 		LinkedList<Object> params = new LinkedList<Object>();
 
@@ -165,6 +165,7 @@ public class ContentQuery extends JBaseQuery {
 
 		sql.append(" WHERE c.status = 'normal' ");
 
+		appendIfNotEmpty(sql, "c.seller_id", sellerId, params, false);
 		appendIfNotEmpty(sql, "c.module", module, params, false);
 
 		if (taxonomyIds != null && taxonomyIds.length > 0) {
@@ -374,20 +375,20 @@ public class ContentQuery extends JBaseQuery {
 		return DAO.doFindCount("module = ? and status=?", module, status);
 	}
 
-	public List<Content> findListInNormal(int page, int pagesize) {
+	public List<Content> findListInNormal(int page, int pagesize, String sellerId) {
 		return findListInNormal(page, pagesize, null, null, null, null, null, null, null, null, null, null, null, null,
-				null, null);
+				null, sellerId);
 	}
 
-	public List<Content> findListInNormal(int page, int pagesize, String module) {
+	public List<Content> findListInNormal(int page, int pagesize, String module, String sellerId) {
 		String[] modules = new String[] { module };
 		return findListInNormal(page, pagesize, null, null, null, null, modules, null, null, null, null, null, null,
-				null, null, null);
+				null, null, sellerId);
 	}
 
-	public List<Content> findListInNormalByTaxonomyId(int page, int pagesize, String taxonomyId) {
+	public List<Content> findListInNormalByTaxonomyId(int page, int pagesize, String taxonomyId,  String sellerId) {
 		return findListInNormal(page, pagesize, null, null, new String[] { taxonomyId }, null, null, null, null,
-				null, null, null, null, null, null, null);
+				null, null, null, null, null, null, sellerId);
 	}
 
 	public List<Content> findListInNormal(int page, int pagesize, String orderBy, String keyword, String[] typeIds,

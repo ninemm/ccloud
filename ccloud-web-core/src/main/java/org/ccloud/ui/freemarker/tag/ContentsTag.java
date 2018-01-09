@@ -74,7 +74,7 @@ public class ContentsTag extends JTag {
 		}
 
 		if (upperTaxonomy != null) {
-			List<Taxonomy> list = TaxonomyQuery.me().findListByModuleAndType(modules[0], null);
+			List<Taxonomy> list = TaxonomyQuery.me().findListByModuleAndType(modules[0], null, sellerId);
 			// 找到taxonomy id的所有孩子或孙子
 			List<Taxonomy> newlist = new ArrayList<Taxonomy>();
 			ModelSorter.sort(list, newlist, upperTaxonomy.getId(), 0);

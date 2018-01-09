@@ -75,7 +75,7 @@ public class _ContentController extends JBaseCRUDController<Content> {
 
 	@Override
 	public void index() {
-		String sellerId = getSessionAttr("sellerId").toString();
+		String sellerId = getSessionAttr("sellerId");
 		TplModule module = TemplateManager.me().currentTemplateModule(getModuleName());
 		setAttr("module", module);
 		setAttr("delete_count", ContentQuery.me().findCountByModuleAndStatus(getModuleName(), Content.STATUS_DELETE,sellerId));
@@ -107,7 +107,7 @@ public class _ContentController extends JBaseCRUDController<Content> {
 					keyword, tids, null,sellerId);
 		}
 
-		filterUI(tids);
+		filterUI(tids, sellerId);
 
 		setAttr("page", page);
 
@@ -123,7 +123,7 @@ public class _ContentController extends JBaseCRUDController<Content> {
 
 	}
 
-	private void filterUI(String[] tids) {
+	private void filterUI(String[] tids, String sellerId) {
 		TplModule module = TemplateManager.me().currentTemplateModule(getModuleName());
 
 		if (module == null) {
@@ -138,7 +138,7 @@ public class _ContentController extends JBaseCRUDController<Content> {
 				// 排除标签类的分类删选
 				if (TplTaxonomyType.TYPE_SELECT.equals(type.getFormType())) {
 					List<Taxonomy> taxonomys = TaxonomyQuery.me().findListByModuleAndTypeAsSort(getModuleName(),
-							type.getName());
+							type.getName(), sellerId);
 					processSelected(tids, taxonomys);
 					_taxonomyMap.put(type.getTitle(), taxonomys);
 				}
@@ -311,6 +311,7 @@ public class _ContentController extends JBaseCRUDController<Content> {
 	}
 
 	public List<String> getOrCreateTaxonomyIds(String moduleName) {
+		String sellerId = getSessionAttr("sellerId");
 		TplModule module = TemplateManager.me().currentTemplateModule(moduleName);
 		List<TplTaxonomyType> types = module.getTaxonomyTypes();
 		List<String> tIds = new ArrayList<String>();
@@ -321,7 +322,7 @@ public class _ContentController extends JBaseCRUDController<Content> {
 					continue;
 				}
 
-				List<Taxonomy> taxonomyList = TaxonomyQuery.me().findListByModuleAndType(moduleName, type.getName());
+				List<Taxonomy> taxonomyList = TaxonomyQuery.me().findListByModuleAndType(moduleName, type.getName(), sellerId);
 
 				String[] slugs = slugsData.split(",");
 				for (String slug : slugs) {
