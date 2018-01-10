@@ -101,31 +101,11 @@ public class _ReportController extends JBaseController {
 		String endDate = getPara("endDate");
 		Page<InventoryDetail> page=new Page<>();
 		if(null==getPara("sortName[offset]")) {
-			page = InventoryDetailQuery.me().findByInventoryDetailListTotal(1, Integer.MAX_VALUE,dataArea,seller_id,sort,order,sellerId);
+			page = InventoryDetailQuery.me().findByInventoryDetailListTotal(1, Integer.MAX_VALUE,dataArea,seller_id,sort,order,sellerId,startDate,endDate);
 		}else {
-			page = InventoryDetailQuery.me().findByInventoryDetailListTotal(getPageNumber(), getPageSize(),dataArea,seller_id,sort,order,sellerId);
+			page = InventoryDetailQuery.me().findByInventoryDetailListTotal(getPageNumber(), getPageSize(),dataArea,seller_id,sort,order,sellerId,startDate,endDate);
 		}
-		List<InventoryDetail> list = page.getList();
-		List<InventoryDetail> list1=new ArrayList<>();
-		for (InventoryDetail inventoryDetail : list) {
-			String sellProductId = inventoryDetail.getSellProductId();
-			//得到查询时间段中最新的剩余商品件数
-			InventoryDetail inventoryDetail1 = InventoryDetailQuery.me().findByInventoryDetail2(sellProductId,endDate);
-			inventoryDetail.setBalanceCount(inventoryDetail1.getBalanceCount());
-			Record findByInventoryDetail2 = InventoryDetailQuery.me().findByInventoryDetail3(sellProductId,startDate,endDate);
-			BigDecimal out_count = findByInventoryDetail2.getBigDecimal("out_count");
-			if (null==out_count) {
-				out_count=new BigDecimal("0");
-			}
-			BigDecimal in_count = findByInventoryDetail2.getBigDecimal("in_count");
-			if (null==in_count) {
-				in_count=new BigDecimal("0");
-			}
-			inventoryDetail.setInCount(in_count);
-			inventoryDetail.setOutCount(out_count);
-			list1.add(inventoryDetail);
-		}
-		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", list1);
+		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
 	}
 	
