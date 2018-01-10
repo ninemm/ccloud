@@ -105,7 +105,7 @@ public class OrderReviewExecutionListener implements ExecutionListener {
 		kv.set("orderId", salesOrder.get("order_sn"));
 		kv.set("customerName", salesOrder.get("customer_name"));
 		kv.set("submit", realname);
-		kv.set("createTime", DateTime.now().toString("yyyy-MM-dd HH:mm"));
+		kv.set("createTime", salesOrder.get("create_date"));
 
 		kv.set("product", builder.toString());
 		kv.set("total", salesOrder.get("total_amount"));
