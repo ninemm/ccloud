@@ -1702,11 +1702,22 @@ input[name=sex] {
   box-sizing: border-box;
 }
 
+.user-rank .user-info {
+  height: 5rem;
+  padding: 1rem 10% 0;
+}
+
 .user-info .seller {
   height: 2rem;
   line-height: 2rem;
   text-align: center;
   width: 100%;
+}
+
+.user-rank .user-info .seller{
+  height: 1.5rem;
+  line-height: 1.5rem;
+  margin-bottom: .5rem;
 }
 
 .user-info .name {
@@ -1715,16 +1726,32 @@ input[name=sex] {
   line-height: 1.5rem;
 }
 
+.user-rank .user-info .name {
+  float: left;
+  padding-left: .3rem;
+}
+
 .user-info .mobile {
   padding-left: 4.5rem;
   height: 1.5rem;
   line-height: 1.5rem;
 }
 
+.user-rank .user-info .mobile {
+  float: right;
+  padding-right: .2rem;
+}
+
 .user-avatar {
   position: absolute;
   left: .5rem;
   
+}
+
+.user-rank .user-avatar {
+  left: 50%;
+  margin-left: -1.5rem;
+  top: 3rem;
 }
 
 .user-avatar img {
@@ -1755,6 +1782,11 @@ input[name=sex] {
   color: #fff;
   font-size: .7rem;
   right: 0;
+}
+
+.user-rank .change-seller {
+  top: .5rem;
+  right: .5rem;
 }
 
 /* 我的订单 */
@@ -2339,6 +2371,12 @@ input[name=input-type] {
   .order-customer-info-title {
     width: 25%;
     font-size: 0.7rem;
+  }
+  .user-rank .user-info {
+    padding: 1.5rem 7% 0;
+  }
+  .user-rank .user-info .name {
+    padding-left: .5rem;
   }
   .menu {
     margin: 0;
