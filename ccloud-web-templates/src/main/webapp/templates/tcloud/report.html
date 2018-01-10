@@ -11,7 +11,18 @@
 <@layout>
 <div class="weui-content">
 	<div id="report" class="home"> 
-		<div class="company">业务报表</div>
+        <div class="report-top weui-flex">
+            <div class="weui-flex__item">
+                <div class="border-right-1px">
+                    <p class="ft16">订单数</p>
+                    <p class="ft14">12</p>
+                </div>
+            </div>
+            <div class="weui-flex__item">
+                <p class="ft16">客户数</p>
+                <p class="ft14">16</p>
+            </div>
+        </div>
 		<@shiro.hasPermission name="/report/userRank">
 		<div class="weui-cells__title">
             <div class="weui-flex">
