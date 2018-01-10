@@ -134,13 +134,17 @@ public class SellerCustomerQuery extends JBaseQuery {
 		appendIfNotEmpty(fromBuilder, "ujc.user_id", userId, params, false);
 		fromBuilder.append(" GROUP BY c2.id) t2 ON sc.id = t2.id ");
 
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "c.customer_name", keyword, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "sc.customer_kind", customerKind, params, needWhere);
 
 		if (needWhere) {
 			fromBuilder.append(" WHERE 1 = 1 ");
 			needWhere = false;
 		}
+		
+		if (StrKit.notBlank(keyword)) {
+			fromBuilder.append(" and (c.customer_name like '%" + keyword + "%' or c.contact like '%" + keyword + "%')");
+		}
+		
 		if (StrKit.notBlank(isOrdered)) {
 			if ("1".equals(isOrdered)) {
 

@@ -13,7 +13,11 @@
 <#macro script>
     $(function () {
   
-		$(document).on("change", "#status", function() {
+		$(document).on("input", "#searchInput", function() {
+			combo();
+		}).on("click", "#searchCancel", function() {
+			combo();
+		}).on("change", "#status", function() {
 			combo();
 		}).on("change", "#customerTypeId", function() {
 			combo();
@@ -35,7 +39,7 @@
 				$this.html('隐藏详情 <i class="icon-angle-up"></i>');
 			}
 		});
-        $("#start-date").calendar({
+		$("#start-date").calendar({
 			maxDate: function() {
 				return $('#end-date').val()
 			}
@@ -111,7 +115,7 @@
 		var params = {
 			"page": page,
 			"size": size,
-			"keyword": keyword,
+			"keyword": $("#searchInput").val(),
 			"status": $("#status").data('values'),
 			"customerTypeId": $("#customerTypeId").data('values'),
 			"startDate": startDate,
@@ -357,7 +361,7 @@
 				</div>
 				<label class="weui-search-bar__label" id="searchText">
 					<i class="weui-icon-search"></i>
-					<span>请输入客户名</span>
+					<span>请输入客户名或订单号</span>
 				</label>
 			</form>
 			<a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel" >取消</a>
