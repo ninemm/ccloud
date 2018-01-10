@@ -1,11 +1,7 @@
 <#include "_inc/_layout.html"/>
 <#macro title>订单评审</#macro>
 
-<#macro css>
-	main {
-		bottom: 0!important;
-	}
-</#macro>
+<#macro css></#macro>
 <#macro script>
 	$(function() {
 	    $(document).on('click', '.refuse', function() {
@@ -238,8 +234,8 @@
 		              <div class="p-l-15 modify_price">
 		                <p>${orderDetail.custom_name!}</p>
 		                <div class="weui-flex">
-		                  <div class="weui-flex__item flex-grow2">
-		                    <div class="fr width-60">
+		                  <div class="weui-flex__item">
+		                    <div class="fr">
 		                      <input type="hidden" name="bigPriceSpan" id="bigPriceSpan" value="${(orderDetail.product_price)!}">
 		                      <#if isEdit>
 		                        <input type="number" name="bigPrice" id="bigPrice" value="${(orderDetail.product_price)!}">
@@ -250,10 +246,18 @@
 		                      <span class="gray">（${(orderDetail.price)!}）</span>
 		                    </div>
 		                  </div>
-		                  <div class="weui-flex__item t-r">
+		                  <div class="weui-flex__item t-r relative">
 		                    <input type="hidden" name="bigNumSpan" id="bigNumSpan" value="${(orderDetail.product_count / orderDetail.convert_relate)?floor}">
-		                      <#if isEdit>
-		                        <input type="number" name="bigNum" id="bigNum" value="${(orderDetail.product_count / orderDetail.convert_relate)?floor}">
+													<#if isEdit>
+														<div class="spinner">
+															<div class="operate fl">
+																<i class="icon-minus2"></i>
+															</div>
+															<input type="number" class="fl" name="bigNum" id="bigNum" value="${(orderDetail.product_count / orderDetail.convert_relate)?floor}">
+															<div class="operate fl">
+																<i class="icon-plus2"></i>
+															</div>
+														</div>
 		                      <#else>
 		                        ${(orderDetail.product_count / orderDetail.convert_relate)?floor}
 		                        <input type="hidden" name="bigNum" id="bigNum" value="${(orderDetail.product_count / orderDetail.convert_relate)?floor}">
@@ -262,8 +266,8 @@
 		                  </div>
 		                </div>
 		                <div class="weui-flex">
-		                  <div class="weui-flex__item flex-grow2">
-		                    <div class="fr width-60">
+		                  <div class="weui-flex__item">
+		                    <div class="fr">
 		                      <input type="hidden" name="smallPriceSpan" id="smallPriceSpan" value="${(orderDetail.product_price / orderDetail.convert_relate)?string('0.##')}">
 		                      <#if isEdit>
 		                        <input type="number" name="smallPrice" id="smallPrice" value="${(orderDetail.product_price / orderDetail.convert_relate)?string('0.##')}">
@@ -274,10 +278,18 @@
 		                      <span class="gray">（${(orderDetail.price / orderDetail.convert_relate)?string("0.##")}）</span>
 		                    </div>
 		                  </div>
-		                  <div class="weui-flex__item t-r">
+		                  <div class="weui-flex__item t-r relative">
 		                    <input type="hidden" name="smallNumSpan" id="smallNumSpan" value="${(orderDetail.product_count % orderDetail.convert_relate)}">
-		                    <#if isEdit>
-		                      <input type="number" name="smallNum" id="smallNum" value="${(orderDetail.product_count % orderDetail.convert_relate)}">
+												<#if isEdit>
+													<div class="spinner">
+														<div class="operate fl">
+															<i class="icon-minus2"></i>
+														</div>
+														<input type="number" class="fl" name="smallNum" id="smallNum" value="${(orderDetail.product_count % orderDetail.convert_relate)}">
+														<div class="operate fl">
+															<i class="icon-plus2"></i>
+														</div>
+													</div>
 		                    <#else>
 		                      ${(orderDetail.product_count % orderDetail.convert_relate)}
 		                      <input type="hidden" name="smallNum" id="smallNum" value="${(orderDetail.product_count % orderDetail.convert_relate)}">
@@ -290,24 +302,40 @@
 		            <#if orderDetail.is_gift = 1>
 		              <div class="p-l-15 modify_price">
 		                <p><span class="tag">赠品</span>${orderDetail.custom_name!} / ${(orderDetail.valueName)!}</p>
-		                <div class="t-r">
+		                <div class="t-r relative">
 		                	<input type="hidden" name="bigPriceSpan" id="bigPriceSpan" value="${(orderDetail.product_price)!}">
 		                	<input type="hidden" name="bigPrice" id="bigPrice" value="${(orderDetail.product_price)!}">
 		                	<input type="hidden" name="bigNumSpan" id="bigNumSpan" value="${(orderDetail.product_count / orderDetail.convert_relate)?floor}">
-		                    <#if isEdit>
-		                      <input type="number" name="bigNum" id="bigNum" value="${(orderDetail.product_count / orderDetail.convert_relate)?floor}">
+												<#if isEdit>
+													<div class="spinner">
+														<div class="operate fl">
+															<i class="icon-minus2"></i>
+														</div>
+														<input type="number" class="fl" name="bigNum" id="bigNum" value="${(orderDetail.product_count / orderDetail.convert_relate)?floor}">
+														<div class="operate fl">
+															<i class="icon-plus2"></i>
+														</div>
+													</div>
 		                    <#else>
 		                      ${(orderDetail.product_count / orderDetail.convert_relate)?floor}
 		                      <input type="hidden" name="bigNum" id="bigNum" value="${(orderDetail.product_count / orderDetail.convert_relate)?floor}">
 		                    </#if>
 		                	${(orderDetail.big_unit)!}
 		                </div>
-		                <div class="t-r">
+		                <div class="t-r relative">
 		                	<input type="hidden" name="smallPriceSpan" id="smallPriceSpan" value="${(orderDetail.product_price / orderDetail.convert_relate)?string('0.##')}">
 		                	<input type="hidden" name="smallPrice" id="smallPrice" value="${(orderDetail.product_price / orderDetail.convert_relate)?string('0.##')}">
 		                	<input type="hidden" name="smallNumSpan" id="smallNumSpan" value="${(orderDetail.product_count % orderDetail.convert_relate)}">
-		                    <#if isEdit>
-		                      <input type="number" name="smallNum" id="smallNum" value="${(orderDetail.product_count % orderDetail.convert_relate)}">
+												<#if isEdit>
+													<div class="spinner">
+														<div class="operate fl">
+															<i class="icon-minus2"></i>
+														</div>
+														<input type="number" class="fl" name="smallNum" id="smallNum" value="${(orderDetail.product_count % orderDetail.convert_relate)}">
+														<div class="operate fl">
+															<i class="icon-plus2"></i>
+														</div>
+													</div>
 		                    <#else>
 		                      ${(orderDetail.product_count % orderDetail.convert_relate)}
 		                      <input type="hidden" name="smallNum" id="smallNum" value="${(orderDetail.product_count % orderDetail.convert_relate)}">
