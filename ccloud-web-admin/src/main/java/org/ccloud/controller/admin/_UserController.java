@@ -480,7 +480,7 @@ public class _UserController extends JBaseCRUDController<User> {
 
 		}
 
-		renderAjaxResultForSuccess("成功导入客户" + inCnt + "个,已存在客户" + existCnt + "个");
+		renderAjaxResultForSuccess("成功导入用户" + inCnt + "个,已存在用户" + existCnt + "个");
 	}
 	
 	private void setUser(User user, UserExecel excel) {
