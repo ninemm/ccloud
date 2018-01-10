@@ -1,6 +1,12 @@
 <#include "_inc/_layout.html"/>
 <#macro title>退货列表</#macro>
-<#macro css> </#macro>
+<#macro css> 
+	#my-order {
+		top: 44px;
+		position: absolute;
+		bottom: 0;
+	}
+</#macro>
 <#macro script>
   $(function () {
   
@@ -187,7 +193,23 @@
 
 <@layout>
 <div class="weui-content"> 
-<div id="my-order" class="ft14">
+<header>
+	<div class="weui-search-bar" id="SearchBar">
+		<form class="weui-search-bar__form">
+			<div class="weui-search-bar__box">
+				<i class="weui-icon-search"></i>
+				<input type="search" class="weui-search-bar__input" id="searchInput" placeholder="搜索" required="">
+				<a href="javascript:" class="weui-icon-clear" id="searchClear" ></a>
+			</div>
+			<label class="weui-search-bar__label" id="searchText">
+				<i class="weui-icon-search"></i>
+				<span>请输入客户名</span>
+			</label>
+		</form>
+		<a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel" >取消</a>
+	</div>
+</header>
+<article id="my-order" class="ft14">
 	<header class="has-th-list weui-flex">
 		<div class="head-search select-area weui-flex__item">
 			<div class="weui-flex">
@@ -262,6 +284,6 @@
 	</article>
 	<div class="layer"></div>
 	<#include "_inc/_goback_bottom.html" />
-</div>
+</article>
 </div>
 </@layout>

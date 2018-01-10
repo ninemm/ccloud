@@ -1301,7 +1301,7 @@ input.street-value {
 }
 
 .customer_name {
-  font-size: .8rem;
+  font-size: .7rem;
   margin: .2rem 0;
 }
 
@@ -1611,8 +1611,8 @@ input[name=sex] {
 }
 
 #operate-history .weui-cell:last-child::after {
-  background: #3c8dbc;
-  border: 1px solid #3c8dbc;
+  background: #ea6f5a;
+  border: 1px solid #ea6f5a;
   box-shadow: 0 0.15rem 0.3rem rgba(34, 34, 34, 0.21), 0 0.3rem 0.3rem rgba(34, 34, 34, 0.26);
 }
 

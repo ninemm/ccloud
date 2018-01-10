@@ -4,6 +4,11 @@
 	#orderSn {
 		color: #999;
 	}
+	#my-order {
+		top: 44px;
+		position: absolute;
+		bottom: 0;
+	}
 </#macro>
 <#macro script>
     $(function () {
@@ -342,7 +347,23 @@
 
 <@layout>
 <div class="weui-content">
-	<div id="my-order" class="ft14">
+	<header>
+		<div class="weui-search-bar" id="SearchBar">
+			<form class="weui-search-bar__form">
+				<div class="weui-search-bar__box">
+					<i class="weui-icon-search"></i>
+					<input type="search" class="weui-search-bar__input" id="searchInput" placeholder="搜索" required="">
+					<a href="javascript:" class="weui-icon-clear" id="searchClear" ></a>
+				</div>
+				<label class="weui-search-bar__label" id="searchText">
+					<i class="weui-icon-search"></i>
+					<span>请输入客户名</span>
+				</label>
+			</form>
+			<a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel" >取消</a>
+		</div>
+	</header>
+	<article id="my-order" class="ft14">
 		<header class="has-th-list weui-flex">
 			<div class="head-search select-area weui-flex__item">
 				<div class="weui-flex">
@@ -417,23 +438,23 @@
 			  <span class="weui-loadmore__tips">暂无数据</span>
 			</div>
 		</main>
-		<article id="combin-filter" class="animated">
-			<div class="filter-item">
-				<h4>日期区间</h4>
-				<div class="relative weui-flex" id="getDate">
-					<input type="text" id="start-date" class="weui-input weui-flex__item" readonly>
-					<div style="width:1rem" class="t-c">-</div>
-					<input type="text" id="end-date" class="weui-input weui-flex__item" readonly>
-				</div>
-			</div>
-			<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
-				<button class="white-button-no-border  cancel-search-btn weui-flex__item border-top-1px">取消</button>
-				<button class="red-button confirm-search-btn weui-flex__item">确定</button>
-			</footer>
-		</article>
-		<div class="layer"></div>
-	</div>
+	</article>
 </div>
+<article id="combin-filter" class="animated">
+	<div class="filter-item">
+		<h4>日期区间</h4>
+		<div class="relative weui-flex" id="getDate">
+			<input type="text" id="start-date" class="weui-input weui-flex__item" readonly>
+			<div style="width:1rem" class="t-c">-</div>
+			<input type="text" id="end-date" class="weui-input weui-flex__item" readonly>
+		</div>
+	</div>
+	<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
+		<button class="white-button-no-border  cancel-search-btn weui-flex__item border-top-1px">取消</button>
+		<button class="red-button confirm-search-btn weui-flex__item">确定</button>
+	</footer>
+</article>
+<div class="layer"></div>
 <a class="hidden-menu" href="${CPATH}/product">
     <img src="${CTPATH}/images/order_add.png" alt="">
 </a>
