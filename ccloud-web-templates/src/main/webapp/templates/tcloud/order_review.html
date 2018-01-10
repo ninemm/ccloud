@@ -235,7 +235,7 @@
 		                <p>${orderDetail.custom_name!}</p>
 		                <div class="weui-flex">
 		                  <div class="weui-flex__item">
-		                    <div class="fr">
+		                    <div class="fl">
 		                      <input type="hidden" name="bigPriceSpan" id="bigPriceSpan" value="${(orderDetail.product_price)!}">
 		                      <#if isEdit>
 		                        <input type="number" name="bigPrice" id="bigPrice" value="${(orderDetail.product_price)!}">
@@ -267,7 +267,7 @@
 		                </div>
 		                <div class="weui-flex">
 		                  <div class="weui-flex__item">
-		                    <div class="fr">
+		                    <div class="fl">
 		                      <input type="hidden" name="smallPriceSpan" id="smallPriceSpan" value="${(orderDetail.product_price / orderDetail.convert_relate)?string('0.##')}">
 		                      <#if isEdit>
 		                        <input type="number" name="smallPrice" id="smallPrice" value="${(orderDetail.product_price / orderDetail.convert_relate)?string('0.##')}">

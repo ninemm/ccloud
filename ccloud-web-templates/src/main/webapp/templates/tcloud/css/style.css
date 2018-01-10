@@ -1591,6 +1591,10 @@ input[name=sex] {
   top: 0;
 }
 
+.modify_price>.weui-flex {
+  padding-left: 1rem;
+}
+
 /* 订单操作记录 */
 
 #operate-history .weui-cell {
