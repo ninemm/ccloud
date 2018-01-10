@@ -149,7 +149,8 @@ a {
 .weui-cells_checkbox .weui-check:checked+.weui-icon-checked:before,
 .weui-tabbar__item.weui-bar__item--on .weui-tabbar__label,
 .weui-tabbar__item.weui-bar__item--on .weui-tabbar__icon i,
-.order-top-btns i {
+.order-top-btns i,
+.weui-agree__checkbox:checked:before {
   color: #ea6f5a;
 }
 
@@ -1137,7 +1138,8 @@ a {
   display: inline-block;
   width: 72.222222%;
   height: 100%;
-  border-top: .05rem solid #efeff4;
+  border-top: 1px solid #efeff4;
+  box-sizing: border-box;
 }
 
 .place-order {
@@ -2281,6 +2283,32 @@ input[name=input-type] {
   left: 4.5rem;
   bottom: 0;
 }
+
+/* 多选客户 */ 
+.customerMulti .check-box{
+  width: 1.3rem;
+  position: relative;
+}
+
+.customerMulti input[type=checkbox] {
+  position: absolute;
+  top: 50%;
+  transform:translateY(-50%);
+  left: 0;
+  border-radius: 50%;
+  width: .8rem;
+  height: .8rem;
+}
+
+.customerMulti .total {
+  padding-left: 2rem;
+  text-align: left;
+}
+
+.customerMulti  .select-all {
+  left: .75rem!important;
+}
+
 
 /* 媒体查询 */
 

@@ -1,0 +1,124 @@
+<#include "_inc/_layout.html"/>
+<#macro title>勾选客户</#macro>
+<#macro css>
+</#macro>
+<#macro script>
+	$(function(){
+
+		$(document).on('click', '.select-all', function() {
+			var _this = this;
+			$('#customerList input[type=checkbox]').each(function() {
+				this.checked = _this.checked
+			})
+		}).on('click', '#customerList input[type=checkbox]', function() {
+			var all = $('#customerList input[type=checkbox]').length;
+			var now = $('#customerList input[type=checkbox]:checked').length
+			if (all == now) {
+				$('.select-all')[0].checked = true
+			} else {
+				$('.select-all')[0].checked = false
+			}
+		})
+	})
+</#macro>
+
+<@layout>
+    <div class="weui-content customerMulti">
+        <div id="customer">
+            <header>
+                <div class="weui-search-bar" id="searchBar">
+                    <form class="weui-search-bar__form">
+                        <div class="weui-search-bar__box">
+                            <i class="weui-icon-search"></i>
+                            <input type="search" class="weui-search-bar__input" id="searchInput" placeholder="搜索" required="">
+                            <a href="javascript:" class="weui-icon-clear" id="searchClear"></a>
+                        </div>
+                        <label class="weui-search-bar__label" id="searchText">
+                            <i class="weui-icon-search"></i>
+                            <span>请输入客户名称</span>
+                        </label>
+                    </form>
+                    <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
+                </div>
+            </header>
+            <article class="customer">
+                <header>
+                    <div class="head-search select-area">
+                        <div class="weui-flex">
+                            <div class="weui-flex__item">
+                                <input type="text" id="userId" placeholder="业务员" class="weui-input" readonly>
+                                <i class="icon-sort-desc"></i>
+                            </div>
+                            <div class="weui-flex__item">
+                                <input type="text" id="customerTypeId" placeholder="客户类型" class="weui-input" readonly>
+                                <i class="icon-sort-desc"></i>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+                <article id="infinite">
+                    <div id="customerList">
+                        <div class="weui-panel weui-panel_access weui-flex">
+                            <div class="check-box">
+                                <input type="checkbox" name="" id="" class="weui-agree__checkbox">
+                            </div>
+                            <div class="weui-flex__item">
+                                <div class="weui-flex">
+                                    <div class="weui-flex__item customer-info" id="customerInfo">
+                                        <p class="ft14" id="customerName">华润万家</p>
+                                        <p class="gray" id="contactP">华/13812356105</p>
+                                        <input type="hidden" id="sellerCustomerId" value="0c2efc0a884c4d558516f66ab9f87f2e">
+                                        <input type="hidden" id="contact" value="华">
+                                        <input type="hidden" id="mobile" value="13812356105">
+                                        <input type="hidden" id="address" value="湖北省 武汉市 武昌区 八一路460号">
+                                    </div>
+                                </div>
+                                <p class="gray">
+                                    <span class="icon-map-marker ft16 green"></span>
+                                    <span id="addressSpan">湖北省 武汉市 武昌区 八一路460号</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="weui-panel weui-panel_access customerMulti weui-flex">
+                            <div class="check-box">
+                                <input type="checkbox" name="" id="" class="weui-agree__checkbox">
+                            </div>
+                            <div class="weui-flex__item">
+                                <div class="weui-flex">
+                                    <div class="weui-flex__item customer-info" id="customerInfo">
+                                        <p class="ft14" id="customerName">华润万家</p>
+                                        <p class="gray" id="contactP">华/13812356105</p>
+                                        <input type="hidden" id="sellerCustomerId" value="0c2efc0a884c4d558516f66ab9f87f2e">
+                                        <input type="hidden" id="contact" value="华">
+                                        <input type="hidden" id="mobile" value="13812356105">
+                                        <input type="hidden" id="address" value="湖北省 武汉市 武昌区 八一路460号">
+                                    </div>
+                                </div>
+                                <p class="gray">
+                                    <span class="icon-map-marker ft16 green"></span>
+                                    <span id="addressSpan">湖北省 武汉市 武昌区 八一路460号</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="weui-loadmore" id="loading" style="display: none;">
+                        <i class="weui-loading"></i>
+                        <span class="weui-loadmore__tips">正在加载</span>
+                    </div>
+                    <div class="weui-loadmore weui-loadmore_line" id="noMore" style="display: none;">
+                        <span class="weui-loadmore__tips">暂无数据</span>
+                    </div>
+                </article>
+            </article>
+        </div>
+        <footer class="weui-footer weui-footer_fixed-bottom weui-flex">
+            <div class="total bg-white weui-flex__item t-l">
+                <input type="checkbox" name="" id="" class="weui-agree__checkbox select-all">
+                <span class="ft12">全选</span>
+                <span>&nbsp;&nbsp;合计:</span>
+                <span class="ft12">12</span>
+            </div>
+            <button id="placeOrder" class="place-order red-button white">确定</button>
+        </footer>
+    </div>
+</@layout>
