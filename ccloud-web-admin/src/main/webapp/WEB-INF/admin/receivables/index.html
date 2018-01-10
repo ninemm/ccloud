@@ -108,8 +108,8 @@
 			{field: "create_date",title:"创建时间",align:"center",edit:false},
 			{field: "action", title: "收款详情", align: "center",
 				 formatter: function(value, row, rowIndex){
-				 	var url = '${CPATH}/admin/receivables/renderlist?ref_sn='+row.ref_sn+'&&ref_type='+row.ref_type+'&&object_id='+row.object_id+'&&balance_amount='+row.balance_amount;
-				 	return '<a href="' + url + '" class="btn btn-sm" >收款详情</a>';
+				 	return '<a href="javascript:void(0);" onclick="detailMoney(\''
+				 			+row.ref_sn +'\',\''+row.ref_type+'\',\''+row.object_id+'\',\''+row.balance_amount+'\')" class="btn btn-sm" >收款详情</a>';
 				 },
 				 edit:false}
 		];
@@ -118,23 +118,24 @@
 	}
 	
 	function orderInfo(orderId){
-		alert(orderId);
-		layer.open({
-			title:"退货详细",
-			type: 2, 
-			area: ['70%', '80%'],
-			content: '${CPATH}/admin/purchaseRefundOutstock/detail/' + orderId
-		}); 
-		/*layer.open({
-			title:"订单详细",
-			type: 2,
-			area: ['70%', '80%'],
-			content: '${CPATH}/admin/salesOrder/detailBySn/' + orderId
-		});*/
+		if($("#selecttype").val()==2){
+			layer.open({
+				title:"退货详细",
+				type: 2, 
+				area: ['70%', '80%'],
+				content: '${CPATH}/admin/purchaseRefundOutstock/_detail/' + orderId
+			}); 
+		}else{
+			layer.open({
+				title:"订单详细",
+				type: 2,
+				area: ['70%', '80%'],
+				content: '${CPATH}/admin/salesOrder/detailBySn/' + orderId
+			});
+		}
 	}
 	
 	var getReceivablesDetailParams = function(params){
-	
 		var param = {
 	        size: params.limit,
 	        page: params.offset/params.limit + 1,
@@ -171,7 +172,10 @@
 			location.href = "${CPATH}/admin/receivables/downloading?type="+type +"&customerTypeId=" + cusType;
 		}
 
-
+	function detailMoney(ref_sn,ref_type,object_id,balance_amount){
+		var type = $("#selecttype").val();
+		location.href = '${CPATH}/admin/receivables/renderlist?type='+type+'&&ref_sn='+ref_sn+'&&ref_type='+ref_type+'&&object_id='+object_id+'&&balance_amount='+balance_amount;
+	}
 </#macro>
 <@layout active_id=p child_active_id=c>
 	

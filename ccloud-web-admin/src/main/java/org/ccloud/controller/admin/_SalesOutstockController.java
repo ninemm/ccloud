@@ -36,6 +36,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
+import org.ccloud.model.Department;
 import org.ccloud.model.OutstockPrint;
 import org.ccloud.model.Payables;
 import org.ccloud.model.PrintTemplate;
@@ -44,6 +45,7 @@ import org.ccloud.model.SalesOutstock;
 import org.ccloud.model.SellerCustomer;
 import org.ccloud.model.User;
 import org.ccloud.model.Warehouse;
+import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.PayablesQuery;
 import org.ccloud.model.query.PrintTemplateQuery;
 import org.ccloud.model.query.PurchaseInstockDetailQuery;
@@ -351,18 +353,19 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 	}
 	
 	private void createPayables(SellerCustomer sellerCustomer,String countAll){
-		String payablesType = Consts.RECEIVABLES_OBJECT_TYPE_CUSTOMER; 
-		Payables payables = PayablesQuery.me().findByObjId(sellerCustomer.getId(), payablesType);
+		String payablesType = Consts.RECEIVABLES_OBJECT_TYPE_SUPPLIER; 
+		Payables payables = PayablesQuery.me().findByObjId(sellerCustomer.getSellerId(), payablesType);
+		Department department = DepartmentQuery.me().findById(sellerCustomer.getDeptId());
 		if(payables == null){
 			payables = new Payables();
 			payables.setId(StrKit.getRandomUUID());
-			payables.setObjId(sellerCustomer.getId());
+			payables.setObjId(sellerCustomer.getSellerId());
 			payables.setObjType(payablesType);
 			payables.setPayAmount(new BigDecimal(countAll));
 			payables.setActAmount(new BigDecimal(0));
 			payables.setBalanceAmount(new BigDecimal(countAll));
 			payables.setDeptId(sellerCustomer.getDeptId());
-			payables.setDataArea(sellerCustomer.getDataArea());
+			payables.setDataArea(department.getDataArea());
 			payables.setCreateDate(new Date());
 			payables.save();
 		}else{
