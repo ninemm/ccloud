@@ -254,15 +254,19 @@
     }
 
     function doSubmit(status) {
-		layer.open({
-			type: 2,
-			content: '保存中...'
-		});
         $.ajax({
             url: '${CPATH}/customerVisit/complete',
             method: 'post',
             dataType: 'json',
             data: paramData(status),
+            beforeSend: function() {
+                if($("#location").val().length==0) {
+                    $.toptip('定位地址不能为空,请刷新定位', 1000, 'error');
+                    return false;
+                }
+                $('._submit_btn').attr('disabled', true);
+                Utils.openLoadingWin('保存中...');
+            },
 			success:function(res){
 				if (res.errorCode == 0) {
 					$.confirm({
@@ -337,157 +341,159 @@
 </#macro>
 
 <@layout>
-<div id="customer-add">
-<main>
-    <section class="weui-panel weui-panel_access order-customer-info">
-      <input type="hidden" name="customerVisit.id" id ="id" value="${(customerVisit.id)!}">
-        <input type="hidden" id ="taskId" value="${(taskId)!}">
-      <div class="weui-cell">
-          <div class="weui-cell__bd">
-              <div class="order-customer-info-title">客户名称: </div>
-              <input type="text" class="weui-input" value="${(customerVisit.customer_name)!}" readonly>
-          </div>
-      </div>
-      <!-- <div class="weui-cell weui-cell_access">
-          <div class="weui-cell__bd">
-              <div class="order-customer-info-title">客户昵称: </div>
-              <input class="txt-gray" value="${(customerVisit.nickname)!'无'}">
-          </div>
-      </div> -->
-      <div class="weui-cell">
-          <div class="weui-cell__bd">
-              <div class="order-customer-info-title">联系人: </div>
-              <input type="text" class="weui-input" value="${(customerVisit.contact)!}" readonly>
-          </div>
-      </div>
-      <div class="weui-cell">
-          <div class="weui-cell__bd">
-              <div class="order-customer-info-title">联系电话: </div>
-              <input type="text" class="weui-input" value="${(customerVisit.mobile)!}" readonly>
-          </div>
-      </div>
-      <div class="weui-cell">
-          <div class="weui-cell__bd">
-              <div class="order-customer-info-title">客户类型: </div>
-              <input type="text" class="weui-input" value="${(cTypeName)!}" readonly>
-          </div>
-      </div>
-      
-      <div class="weui-cell">
-          <div class="weui-cell__bd">
-              <div class="order-customer-info-title">问题类型: </div>
-              <input type="text" class="weui-input" value="${(customerVisit.typeName)!}" readonly>
-          </div>
-      </div>
-      <div class="weui-cell">
-          <div class="weui-cell__bd">
-              <div class="order-customer-info-title">拜访时间: </div>
-              <input type="text" class="weui-input" value="${(customerVisit.create_date?string('yyyy-MM-dd HH:mm'))!}" readonly>
-          </div>
-      </div>
-      <div class="weui-cell">
-          <div class="weui-cell__bd">
-              <div class="order-customer-info-title">描述: </div>
-              <input type="text" class="weui-input" value="${(customerVisit.question_desc)!}" readonly>
-          </div>
-      </div>
-  </section>
-    <div class="weui-gallery" id="gallery1">
-        <span class="weui-gallery__img" id="galleryImg1"></span>
-    </div>
-  <section class="weui-cells weui-cells_form">
-      <div class="weui-cell">
-          <div class="weui-cell__bd">
-              <div class="weui-uploader">
-                  <div class="weui-uploader__hd">
-                      <p class="weui-uploader__title">拜访实景图</p>
-                       <div class="weui-uploader__info">${(customerVisit.imageList?size)!0}/3</div>
-                  </div>
-                  <div class="weui-uploader__bd">
-                      <ul class="weui-uploader__files" id ="uploaderFiles1">
-                      <#if (customerVisit.imageList) ??> 
-                      <#list customerVisit.imageList as bean>
-                          <li class="weui-uploader__file" style="background-image: url(${bean.savePath})"></li>
-                      </#list>
-                      </#if>
-                      </ul>
-                   </div>
-               </div>
-           </div>
-       </div>
-   </section>
-   <section class="weui-panel weui-panel_access ft14 remark">
-       <div class="weui-cell weui-cell_access">
-           <div class="weui-cell__bd">
-               <span class="icon-map-pin ft16 green"></span>
-               <span id="locationVisit">${(customerVisit.location)!}</span>
-           </div>
-       </div>
-   </section>
-	
-	<section class="weui-panel weui-panel_access ft14 remark"> 
-        <div class="weui-cell weui-cell_access space-between">
-	        <p>业务员：${(customerVisit.realname)!} / ${(customerVisit.userMobile)!}</p>
-        </div>
-    </section>
-    
-    <section class="weui-panel weui-panel_access ft14 remark">
-        <div class="weui-cells__title">建议</div>
-        <div class="weui-cells weui-cells_form">
+<div class="weui-content">
+    <div id="customer-add">
+    <main>
+        <section class="weui-panel weui-panel_access order-customer-info">
+            <input type="hidden" name="customerVisit.id" id ="id" value="${(customerVisit.id)!}">
+            <input type="hidden" id ="taskId" value="${(taskId)!}">
             <div class="weui-cell">
-	            <div class="weui-cell__bd">
-	                <textarea class="weui-textarea" name="customerVisit.comment" id="comment" placeholder="审核建议" rows="3"></textarea>
-                    <div class="weui-textarea-counter" id="length"></div>
-	            </div>
+                <div class="weui-cell__bd">
+                    <div class="order-customer-info-title">客户名称: </div>
+                    <input type="text" class="weui-input" value="${(customerVisit.customer_name)!}" readonly>
+                </div>
             </div>
-        </div>
-        <div class="weui-gallery" id="gallery">
-            <span class="weui-gallery__img" id="galleryImg"></span>
-            <div class="weui-gallery__opr">
-                <a href="javascript:" rel="nofollow" target="_blank"  class="weui-gallery__del">
-                    <i class="weui-icon-delete weui-icon_gallery-delete"></i>
-                </a>
-            </div>
-        </div>
-        <section>
-        <div class="weui-cells weui-cells_form">
+          <!-- <div class="weui-cell weui-cell_access">
+              <div class="weui-cell__bd">
+                  <div class="order-customer-info-title">客户昵称: </div>
+                  <input class="txt-gray" value="${(customerVisit.nickname)!'无'}">
+              </div>
+          </div> -->
             <div class="weui-cell">
-	            <div class="weui-cell__bd">
-		            <div class="weui-uploader">
-		                <div class="weui-uploader__hd">
-		                    <p class="weui-uploader__title">附件图片</p>
-		                    <div class="weui-uploader__info">0/3</div>
-		                </div>
-		                <div class="weui-uploader__bd">
-			                <ul class="weui-uploader__files" id="uploaderFiles"></ul>
-			                <div class="weui-uploader__input-box">
-			                <div class="weui-uploader__input-box">
-			                  <input id="uploaderInput" class="weui-uploader__input" type="file" accept="image/*" multiple="">
-                                <input type="hidden" name="pic" id="pic">
-			                </div>
-		                </div>
-		            </div>
-	            </div>
+                <div class="weui-cell__bd">
+                    <div class="order-customer-info-title">联系人: </div>
+                    <input type="text" class="weui-input" value="${(customerVisit.contact)!}" readonly>
+                </div>
             </div>
-        </div>
+            <div class="weui-cell">
+                <div class="weui-cell__bd">
+                    <div class="order-customer-info-title">联系电话: </div>
+                    <input type="text" class="weui-input" value="${(customerVisit.mobile)!}" readonly>
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__bd">
+                    <div class="order-customer-info-title">客户类型: </div>
+                    <input type="text" class="weui-input" value="${(cTypeName)!}" readonly>
+                </div>
+            </div>
+
+            <div class="weui-cell">
+                <div class="weui-cell__bd">
+                    <div class="order-customer-info-title">问题类型: </div>
+                    <input type="text" class="weui-input" value="${(customerVisit.typeName)!}" readonly>
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__bd">
+                    <div class="order-customer-info-title">拜访时间: </div>
+                    <input type="text" class="weui-input" value="${(customerVisit.create_date?string('yyyy-MM-dd HH:mm'))!}" readonly>
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__bd">
+                    <div class="order-customer-info-title">描述: </div>
+                    <input type="text" class="weui-input" value="${(customerVisit.question_desc)!}" readonly>
+                </div>
+            </div>
         </section>
-    </section>
-    <section class="weui-panel weui-panel_access ft14 remark">
-        <div class="weui-cell weui-cell_access">
-	        <div class="weui-cell__hd"><span class="icon-map-pin ft16 green"></span></div>
-            <div class="weui-cell__bd">
-                <div id="location" class="location">${(customerVisit.reviewAddress)!'正在定位...'}</div>
-                <input type="hidden" name="customerVisit.lng" id="lng">
-                <input type="hidden" name="customerVisit.lat" id="lat">
-            </div>
-            <div class="weui-cell__hd" id="refresh"><span class="icon-refresh ft16 gray"></span></div>
+        <div class="weui-gallery" id="gallery1">
+            <span class="weui-gallery__img" id="galleryImg1"></span>
         </div>
-    </section>
-</main>
-<#include "_inc/_goback.html" />
-<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
-    <button class="white-button-no-border width-50 _submit_btn weui-flex__item border-top-1px" onclick="doSubmit(0)">拒绝</button>
-    <button class="red-button width-50 _submit_btn weui-flex__item" onclick="doSubmit(1)">通过</button>
-</footer>
+        <section class="weui-cells weui-cells_form">
+            <div class="weui-cell">
+                <div class="weui-cell__bd">
+                    <div class="weui-uploader">
+                        <div class="weui-uploader__hd">
+                            <p class="weui-uploader__title">拜访实景图</p>
+                            <div class="weui-uploader__info">${(customerVisit.imageList?size)!0}/3</div>
+                        </div>
+                        <div class="weui-uploader__bd">
+                            <ul class="weui-uploader__files" id ="uploaderFiles1">
+                                <#if (customerVisit.imageList) ??>
+                                    <#list customerVisit.imageList as bean>
+                                        <li class="weui-uploader__file" style="background-image: url(${bean.savePath})"></li>
+                                    </#list>
+                                </#if>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="weui-panel weui-panel_access ft14 remark">
+            <div class="weui-cell weui-cell_access">
+                <div class="weui-cell__bd">
+                    <span class="icon-map-pin ft16 green"></span>
+                    <span id="locationVisit">${(customerVisit.location)!}</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="weui-panel weui-panel_access ft14 remark">
+            <div class="weui-cell weui-cell_access space-between">
+                <p>业务员：${(customerVisit.realname)!} / ${(customerVisit.userMobile)!}</p>
+            </div>
+        </section>
+
+        <section class="weui-panel weui-panel_access ft14 remark">
+            <div class="weui-cells__title">建议</div>
+            <div class="weui-cells weui-cells_form">
+                <div class="weui-cell">
+                    <div class="weui-cell__bd">
+                        <textarea class="weui-textarea" name="customerVisit.comment" id="comment" placeholder="审核建议" rows="3"></textarea>
+                        <div class="weui-textarea-counter" id="length"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="weui-gallery" id="gallery">
+                <span class="weui-gallery__img" id="galleryImg"></span>
+                <div class="weui-gallery__opr">
+                    <a href="javascript:" rel="nofollow" target="_blank"  class="weui-gallery__del">
+                        <i class="weui-icon-delete weui-icon_gallery-delete"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+        <section class="weui-panel weui-panel_access ft14 remark">
+            <div class="weui-cell weui-cell_access">
+                <div class="weui-cell__hd"><span class="icon-map-pin ft16 green"></span></div>
+                <div class="weui-cell__bd">
+                    <div id="location" class="location">${(customerVisit.reviewAddress)!'正在定位...'}</div>
+                    <input type="hidden" name="customerVisit.lng" id="lng">
+                    <input type="hidden" name="customerVisit.lat" id="lat">
+                </div>
+                <div class="weui-cell__hd" id="refresh"><span class="icon-refresh ft16 gray"></span></div>
+            </div>
+        </section>
+        <section>
+            <div class="weui-cells weui-cells_form">
+                <div class="weui-cell">
+                    <div class="weui-cell__bd">
+                        <div class="weui-uploader">
+                            <div class="weui-uploader__hd">
+                                <p class="weui-uploader__title">附件图片</p>
+                                <div class="weui-uploader__info">0/3</div>
+                            </div>
+                            <div class="weui-uploader__bd">
+                                <ul class="weui-uploader__files" id="uploaderFiles"></ul>
+                                <div class="weui-uploader__input-box">
+                                    <div class="weui-uploader__input-box">
+                                        <input id="uploaderInput" class="weui-uploader__input" type="file" accept="image/*" multiple="">
+                                        <input type="hidden" name="pic" id="pic">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </section>
+    </main>
+    <#include "_inc/_goback.html" />
+        <footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
+            <button class="white-button-no-border width-50 _submit_btn weui-flex__item border-top-1px" onclick="doSubmit(0)">拒绝</button>
+            <button class="red-button width-50 _submit_btn weui-flex__item" onclick="doSubmit(1)">通过</button>
+        </footer>
+    </div>
 </div>
 </@layout>
