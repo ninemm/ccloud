@@ -19,171 +19,157 @@
 </#macro>
 
 <#macro script>
-var type = $("#selecttype").val();
-
-var detail_object_id = "";
-
-var receivablesUrl = '${CPATH}/admin/receivables/getReceivables';
-var receivableDetailUrl = '${CPATH}/admin/receivables/getReceivablesDetail';
-$(function() {
-	updateOptions();
-	updateBizUser();
+	var type = $("#selecttype").val();
 	
-	$("#selecttype").change(function(){
+	var detail_object_id = "";
+	
+	var receivablesUrl = '${CPATH}/admin/receivables/getReceivables';
+	var receivableDetailUrl = '${CPATH}/admin/receivables/getReceivablesDetail';
+	$(function() {
 		updateOptions();
-		updateBizUser();
-		type = $(this).val();
-	});
-
-	jQuery.mm.initEditTable('#_receivables_table', receivablesUrl, getReceivablesParams, initReceivablesTable(), null);
-	$("#search-receivables").click(function(){
-		$('#_receivables_table').bootstrapTable('refresh');
+		
+		$("#selecttype").change(function(){
+			updateOptions();
+			type = $(this).val();
+		});
+	
+		jQuery.mm.initEditTable('#_receivables_table', receivablesUrl, getReceivablesParams, initReceivablesTable(), null);
+		$("#search-receivables").click(function(){
+			$('#_receivables_table').bootstrapTable('refresh');
+		});
+		
+		// 委托点击事件
+		$("#_receivables_table").on('click','tr[data-uniqueid]',function(){
+			var $this = $(this);
+			detail_object_id = $this.attr("data-uniqueid");
+			$this.siblings().css("background-color","#ffffff");
+			$this.css("background-color","#428bca");
+			$('#_receivables_detail_table').bootstrapTable('refresh');
+		});
+		
+		jQuery.mm.initEditTable('#_receivables_detail_table', receivableDetailUrl, getReceivablesDetailParams, initReceivableDetailTable() , null);
 	});
 	
-	// 委托点击事件
-	$("#_receivables_table").on('click','tr[data-uniqueid]',function(){
-		var $this = $(this);
-		detail_object_id = $this.attr("data-uniqueid");
-		$this.siblings().css("background-color","#ffffff");
-		$this.css("background-color","#428bca");
-		$('#_receivables_detail_table').bootstrapTable('refresh');
-	});
-	
-	jQuery.mm.initEditTable('#_receivables_detail_table', receivableDetailUrl, getReceivablesDetailParams, initReceivableDetailTable() , null);
-});
-
-function updateOptions(){
-	var type = $("#selecttype").val();
-	$.ajax({
-		url: "${CPATH}/admin/receivables/getOptions?type="+type,
-		async: false,
-		success: function(data){
-			var optionsHtml = '<option value="0" >全部</option>';
-			if(data.length && data.length>=1){
-				for(var i in data){
-					optionsHtml += '<option value="'+data[i].id+'" >'+data[i].name+'</option>';
+	function updateOptions(){
+		var type = $("#selecttype").val();
+		$.ajax({
+			url: "${CPATH}/admin/receivables/getOptions?type="+type,
+			async: false,
+			success: function(data){
+				var optionsHtml = '<option value="0" >全部</option>';
+				if(data.length && data.length>=1){
+					for(var i in data){
+						optionsHtml += '<option value="'+data[i].id+'" >'+data[i].name+'</option>';
+					}
 				}
+				$("#category-or-customer").html(optionsHtml);
 			}
-			$("#category-or-customer").html(optionsHtml);
-		}
-	});
-}
-
-function updateBizUser(){
-	var type = $("#selecttype").val();
-	$.ajax({
-		url: "${CPATH}/admin/receivables/getBizUsers?type="+type,
-		async: false,
-		success: function(data){
-			var optionsHtml = '<option value="0" >全部</option>';
-			if(data.length && data.length>=1){
-				for(var i in data){
-					optionsHtml += '<option value="'+data[i].id+'" >'+data[i].realname+'</option>';
-				}
-			}
-			$("#biz_user").html(optionsHtml);
-		}
-	});
-}
-
-var initReceivablesTable = function(){
-	var fields = [
-		{field: "object_id",title: "ID", align: "center", visible:false, edit:false},
-		{field: "name",title:"名称",align: "center", width: '12%', edit:false},
-		{field: "receive_amount",title:"应收金额",align: "center",edit:false},
-		{field: "act_amount",title:"实收金额",align: "center",edit:false},
-		{field: "balance_amount",title:"未收金额",align: "center",edit:false}
-	];
-	
-	return fields;
-};
-
-var  cusType = "";
-var getReceivablesParams = function(params){
-var customerTypeId = $('#category-or-customer').find("option:selected").val();
-var bizUserId = $('#biz_user').find("option:selected").val();
-cusType = customerTypeId;
-	var param = {
-        size: params.limit,
-        page: params.offset/params.limit + 1,
-        type : type,
-        customerTypeId:customerTypeId,
-        bizUserId : bizUserId
-    };
-    return param;
-}
-
-var initReceivableDetailTable = function(){
-	var fields = [
-		{field: "ref_type",title:"业务类型编码",align: "center",visible:false, edit: false},	
-	    {field: "ref_Name",title:"业务类型",align: "center", edit: false},		
-		{field: "ref_sn",title:"单号",align: "center",
-			formatter: function(value,row,index){
-				return '<a href="#" name="order_sn" onclick="orderInfo(\''+row.ref_sn+'\')">'+row.ref_sn+'</a>';
-			},
-		edit: false},
-		{field: "biz_date",title:"业务日期",align: "center",edit: false},
-		{field: "receive_amount",title:"应收金额",align: "center",edit: false},
-		{field: "act_amount",title:"已收金额",align: "center",edit: false},
-		{field: "balance_amount",title:"未收金额",align: "center",edit: false},
-		{field: "create_date",title:"创建时间",align:"center",edit:false},
-		{field: "action", title: "收款详情", align: "center",
-			 formatter: function(value, row, rowIndex){
-			 	var url = '${CPATH}/admin/receivables/renderlist?ref_sn='+row.ref_sn+'&&ref_type='+row.ref_type+'&&object_id='+row.object_id+'&&balance_amount='+row.balance_amount;
-			 	return '<a href="' + url + '" class="btn btn-sm" >收款详情</a>';
-			 },
-			 edit:false}
-	];
-	
-	return fields;
-}
-
-function orderInfo(orderId){
-	layer.open({
-		title:"订单详细",
-		type: 2,
-		area: ['70%', '80%'],
-		content: '${CPATH}/admin/salesOrder/detailBySn/' + orderId
-	});
-}
-
-var getReceivablesDetailParams = function(params){
-
-	var param = {
-        size: params.limit,
-        page: params.offset/params.limit + 1,
-        type : type,
-        id: detail_object_id
-    };
-    
-	return param;
-}
-
-function getReceivablesDetail(page){
-	$.ajax({
-		url: "${CPATH}/admin/receivables/getReceivablesDetail?type="+type+"&page="+page+"&id="+detail_object_id,
-		async: false,
-		success: function(data){
-			var detailHtml = "";
-			if(data.total >= 1){
-				var rows = data.rows;
-				for(var i in rows){
-					detailHtml += '<tr><td>'+rows[i].ref_type+'</td><td>'+rows[i].ref_sn+'</td><td>'+rows[i].biz_date+'</td><td>'+rows[i].receive_amount+'</td><td>'+rows[i].act_amount+'</td><td>'+rows[i].balance_amount+'</td><td>'+rows[i].create_date+'</td>';
-					detailHtml += '<td><a href="'+'${CPATH}/admin/receivables/renderlist?ref_sn='+ rows[i].ref_sn +'&ref_type='+rows[i].ref_type+'&balance_amount='+rows[i].balance_amount+'">收款详情</a></td></tr>';
-				}
-				var pageCount = Math.ceil(data.total/size);
-				$("#detail-page-count").html(pageCount);
-				$("#detail-current-page").val(data.page);
-			}
-			
-			$('#receivables-detail-tbody').html(detailHtml);
-		}
-	});
-}
-
-function batchDown(){
-		location.href = "${CPATH}/admin/receivables/downloading?type="+type +"&customerTypeId=" + cusType;
+		});
 	}
+	
+	var initReceivablesTable = function(){
+		var fields = [
+			{field: "object_id",title: "ID", align: "center", visible:false, edit:false},
+			{field: "name",title:"名称",align: "center", width: '12%', edit:false},
+			{field: "receive_amount",title:"应收金额",align: "center",edit:false},
+			{field: "act_amount",title:"实收金额",align: "center",edit:false},
+			{field: "balance_amount",title:"未收金额",align: "center",edit:false}
+		];
+		
+		return fields;
+	};
+	
+		var  cusType = "";
+		var getReceivablesParams = function(params){
+		var customerTypeId = $('#category-or-customer').find("option:selected").val();
+		cusType = customerTypeId;
+			var param = {
+		        size: params.limit,
+		        page: params.offset/params.limit + 1,
+		        type : type,
+		        customerTypeId:customerTypeId
+		    };
+		    return param;
+		}
+	
+	var initReceivableDetailTable = function(){
+		var fields = [
+			{field: "ref_type",title:"业务类型编码",align: "center",visible:false, edit: false},	
+		    {field: "ref_Name",title:"业务类型",align: "center", edit: false},		
+			{field: "ref_sn",title:"单号",align: "center",
+				formatter: function(value,row,index){
+					return '<a href="#" name="order_sn" onclick="orderInfo(\''+row.ref_sn+'\')">'+row.ref_sn+'</a>';
+				},
+			edit: false},
+			{field: "biz_date",title:"业务日期",align: "center",edit: false},
+			{field: "receive_amount",title:"应收金额",align: "center",edit: false},
+			{field: "act_amount",title:"已收金额",align: "center",edit: false},
+			{field: "balance_amount",title:"未收金额",align: "center",edit: false},
+			{field: "create_date",title:"创建时间",align:"center",edit:false},
+			{field: "action", title: "收款详情", align: "center",
+				 formatter: function(value, row, rowIndex){
+				 	var url = '${CPATH}/admin/receivables/renderlist?ref_sn='+row.ref_sn+'&&ref_type='+row.ref_type+'&&object_id='+row.object_id+'&&balance_amount='+row.balance_amount;
+				 	return '<a href="' + url + '" class="btn btn-sm" >收款详情</a>';
+				 },
+				 edit:false}
+		];
+		
+		return fields;
+	}
+	
+	function orderInfo(orderId){
+		alert(orderId);
+		layer.open({
+			title:"退货详细",
+			type: 2, 
+			area: ['70%', '80%'],
+			content: '${CPATH}/admin/purchaseRefundOutstock/detail/' + orderId
+		}); 
+		/*layer.open({
+			title:"订单详细",
+			type: 2,
+			area: ['70%', '80%'],
+			content: '${CPATH}/admin/salesOrder/detailBySn/' + orderId
+		});*/
+	}
+	
+	var getReceivablesDetailParams = function(params){
+	
+		var param = {
+	        size: params.limit,
+	        page: params.offset/params.limit + 1,
+	        type : type,
+	        id: detail_object_id
+	    };
+	    
+		return param;
+	}
+	
+	function getReceivablesDetail(page){
+		$.ajax({
+			url: "${CPATH}/admin/receivables/getReceivablesDetail?type="+type+"&page="+page+"&id="+detail_object_id,
+			async: false,
+			success: function(data){
+				var detailHtml = "";
+				if(data.total >= 1){
+					var rows = data.rows;
+					for(var i in rows){
+						detailHtml += '<tr><td>'+rows[i].ref_type+'</td><td>'+rows[i].ref_sn+'</td><td>'+rows[i].biz_date+'</td><td>'+rows[i].receive_amount+'</td><td>'+rows[i].act_amount+'</td><td>'+rows[i].balance_amount+'</td><td>'+rows[i].create_date+'</td>';
+						detailHtml += '<td><a href="'+'${CPATH}/admin/receivables/renderlist?ref_sn='+ rows[i].ref_sn +'&ref_type='+rows[i].ref_type+'&balance_amount='+rows[i].balance_amount+'">收款详情</a></td></tr>';
+					}
+					var pageCount = Math.ceil(data.total/size);
+					$("#detail-page-count").html(pageCount);
+					$("#detail-current-page").val(data.page);
+				}
+				
+				$('#receivables-detail-tbody').html(detailHtml);
+			}
+		});
+	}
+	
+	function batchDown(){
+			location.href = "${CPATH}/admin/receivables/downloading?type="+type +"&customerTypeId=" + cusType;
+		}
 
 
 </#macro>
@@ -204,10 +190,6 @@ function batchDown(){
 	 	<button onclick="batchDown()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-upload"></i> 导出</button>
 	  </div>
 		<div class="input-group input-group-sm" style="float:right;">
-			<span>业务员：</span>
-			<select id="biz_user" style="width:200px">
-				<option value="0">全部</option>
-			</select>&nbsp;&nbsp;&nbsp;
 			<span>往来单位：</span>
 			<select id="selecttype" style="width:200px">
 				<option value="1" >客户</option>

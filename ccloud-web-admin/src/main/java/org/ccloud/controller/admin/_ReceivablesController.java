@@ -36,13 +36,11 @@ import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.model.Receivables;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.GoodsCategoryQuery;
-import org.ccloud.model.query.PurchaseRefundOutstockQuery;
 import org.ccloud.model.query.ReceivablesQuery;
 import org.ccloud.model.ReceivablesDetail;
 import org.ccloud.model.query.ReceivablesDetailQuery;
 import org.ccloud.model.Receiving;
 import org.ccloud.model.query.ReceivingQuery;
-import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.vo.receivablesExcel;
 import org.ccloud.model.User;
@@ -87,11 +85,10 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 	public void getReceivables() {
 		String type = getPara("type");
 		String customerTypeId = getPara("customerTypeId");
-		String bizUserId = getPara("bizUserId");
-		//User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String deptDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		Page<Record> page = ReceivablesQuery.me().paginate(getPageNumber(),getPageSize(),customerTypeId,type,bizUserId,deptDataArea,sellerId);
+		Page<Record> page = ReceivablesQuery.me().paginate(getPageNumber(),getPageSize(),customerTypeId,type,user.getId(),deptDataArea,sellerId);
 		List<Record> receivablesList = page.getList();
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(),"rows", receivablesList);
 		
@@ -114,13 +111,18 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 	}
 	
 	public void renderlist() {
+		String type = getPara("type");
 		String ref_sn = getPara("ref_sn");
 		String ref_type = getPara("ref_type");
 		String object_id = getPara("object_id");
 		String balance_amount = getPara("balance_amount");
+		Receivables receivables = new Receivables();
 		//通过客户Id找到应收账款主表ID
-		Receivables receivables = ReceivablesQuery.me().findByObjId(object_id, Consts.RECEIVABLES_OBJECT_TYPE_CUSTOMER);
-		
+		if("1".equals(type)) {
+			receivables = ReceivablesQuery.me().findByObjId(object_id, Consts.RECEIVABLES_OBJECT_TYPE_CUSTOMER);
+		}else {
+			receivables = ReceivablesQuery.me().findByObjId(object_id, Consts.RECEIVABLES_OBJECT_TYPE_SUPPLIER);
+		}
 		String userDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		List<User> list = UserQuery.me().findIdAndNameByDataArea(userDataArea);
 	
@@ -230,18 +232,4 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 		
 		renderFile(new File(filePath));
 	} 
-	
-	public void getBizUsers() {
-		String type = getPara("type");
-		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		List<Record> record = new ArrayList();
-		if(type != null) {
-			if("1".equals(type)) {
-				record = SalesOrderQuery.me().findByDataArea(dataArea);
-			}else if("2".equals(type)) {
-				record = PurchaseRefundOutstockQuery.me().findByDataArea(dataArea);
-			}
-		}
-		renderJson(record);
-	}
 }
