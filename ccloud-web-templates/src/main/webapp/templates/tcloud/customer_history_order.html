@@ -111,10 +111,10 @@
                             <span class="fr blue">${(order.statusName)!}</span>
                         </div>
                         <div class="gray">
-                            <p>数量：${(order.total_count)!}件
+                            <p>数量：${order.total_count?string("0.00")}件
                                 <span class="fr">时间：${(order.create_date)!}</span>
                             </p>
-                            <p>金额：${(order.total_amount)!}
+                            <p>金额：${order.total_amount?string("0.00")}
                                 <span class="fr">业务员：${(order.realname)!}</span>
                             </p>
                         </div>
