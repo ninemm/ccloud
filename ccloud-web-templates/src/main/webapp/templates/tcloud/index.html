@@ -127,7 +127,7 @@
 				</div>
 			</div>
 			<div class="weui-grids">
-				<@shiro.hasPermission name="/admin/salesOrder">
+				<@shiro.hasPermission name="/admin/salesOrder/add,/admin/salesOrder/seller">
 				<a href="${CPATH}/product" class="weui-grid js_grid">
                     <!-- <span class="weui-badge empty-badge">&nbsp;</span> -->
 					<div class="weui-grid__icon">
@@ -135,7 +135,9 @@
 					</div>
 					<p class="weui-grid__label">下订单</p>
 				</a>
+				</@shiro.hasPermission>
 				
+				<@shiro.hasPermission name="/admin/salesOrder">
 				<a href="${CPATH}/order/myOrder" class="weui-grid js_grid">
 					<div class="weui-grid__icon">
 						<i class="icon-file" style="color: #9c89b9"></i>
@@ -144,7 +146,7 @@
 				</a>
 				</@shiro.hasPermission>	
 				
-				<@shiro.hasPermission name="/admin/customerVisit">
+				<@shiro.hasPermission name="/admin/customerVisit/add">
                 <a href="${CPATH}/customerVisit/edit" class="weui-grid js_grid">
 					<div class="weui-grid__icon">
 						<i class="icon-plane" style="color: #19c594"></i>

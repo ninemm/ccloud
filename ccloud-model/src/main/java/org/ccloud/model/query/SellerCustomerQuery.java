@@ -205,9 +205,9 @@ public class SellerCustomerQuery extends JBaseQuery {
 		boolean needwhere = false;
 		LinkedList<Object> params = new LinkedList<Object>();
 
-		String select = "SELECT c.id,c.customer_name,c.contact,c.mobile,c.prov_name,c.city_name,c.country_name,c.address,c.sellerCustomerId,c.image_list_store ";
+		String select = "SELECT c.id,c.customer_name,c.contact,c.mobile,c.prov_name,c.city_name,c.country_name,c.address,c.sellerCustomerId,c.image_list_store,c.customer_kind ";
 		StringBuilder sql = new StringBuilder(
-				"FROM (SELECT c.id,c.customer_name,c.contact,c.mobile,c.prov_name,c.city_name,c.country_name,c.address,csc.id as sellerCustomerId,csc.image_list_store  FROM cc_user_join_customer cujc ");
+				"FROM (SELECT c.id,c.customer_name,c.contact,c.mobile,c.prov_name,c.city_name,c.country_name,c.address,csc.id as sellerCustomerId,csc.image_list_store,csc.customer_kind  FROM cc_user_join_customer cujc ");
 		sql.append(
 				"LEFT JOIN cc_customer_join_customer_type ccjct ON cujc.seller_customer_id = ccjct.seller_customer_id ");
 		sql.append("LEFT JOIN cc_seller_customer csc ON cujc.seller_customer_id = csc.id ");

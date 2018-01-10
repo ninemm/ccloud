@@ -455,8 +455,10 @@
 	</footer>
 </article>
 <div class="layer"></div>
+<@shiro.hasPermission name="/admin/salesOrder/add,/admin/salesOrder/seller">
 <a class="hidden-menu" href="${CPATH}/product">
     <img src="${CTPATH}/images/order_add.png" alt="">
 </a>
+</@shiro.hasPermission>
 <#include "_inc/_footer_nav.html" />
 </@layout>

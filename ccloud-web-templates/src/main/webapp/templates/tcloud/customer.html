@@ -322,13 +322,21 @@
                                                                                             mobile:'${(customer.mobile)}',
                                                                                             address:'${(customer.address)}'})">客户拜访</div>
                                    	</@shiro.hasPermission>
-                                   	<@shiro.hasPermission name="/admin/salesOrder">
+                                   	<#if customer_kind == '100402'>
                                     <div class="button red-button fr" onclick="newOrder({customerName:'${(customer.customer_name)}',
                                                                                             sellerCustomerId:'${(customer.sellerCustomerId)}',
                                                                                             contact:'${(customer.contact)}',
                                                                                             mobile:'${(customer.mobile)}',
                                                                                             address:'${(customer.address)}'})">下订单</div>
-									</@shiro.hasPermission>                                                                                            
+									<#else>
+									<@shiro.hasPermission name="/admin/salesOrder">
+                                    <div class="button red-button fr" onclick="newOrder({customerName:'${(customer.customer_name)}',
+                                                                                            sellerCustomerId:'${(customer.sellerCustomerId)}',
+                                                                                            contact:'${(customer.contact)}',
+                                                                                            mobile:'${(customer.mobile)}',
+                                                                                            address:'${(customer.address)}'})">下订单</div>
+									</@shiro.hasPermission>									
+									</#if>                                                                                    
 	                            </div>
 	                            <p class="gray">
 	                                <span class="icon-map-marker ft16 green"></span>
