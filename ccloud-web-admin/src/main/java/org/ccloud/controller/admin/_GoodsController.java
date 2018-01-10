@@ -258,6 +258,9 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
         				for (int j = 0;j < ids.length;j++) {
         					String spId = ids[j];
         					String spvalueId = StringUtils.getArrayFirst(map.get(spId + "[" + i + "]"));
+        					if (StringUtils.isBlank(spvalueId)) {
+        						continue;
+        					}
         					ProductGoodsSpecificationValue pgsValue = getModel(ProductGoodsSpecificationValue.class);
         					pgsValue.setGoodsSpecificationValueSetId(spvalueId);
         					pgsValue.setProductSetId(product.getId());

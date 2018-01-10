@@ -468,10 +468,10 @@ function checkSpValue() {
 }
 
 function doSubmit(){
-	if(!checkSpValue()) {
-		toastr.error(data.message,'请选择规格值');
-		return false;
-	}
+<!-- 	if(!checkSpValue()) { -->
+<!-- 		toastr.error(data.message,'请选择规格值'); -->
+<!-- 		return false; -->
+<!-- 	} -->
 	var l = Ladda.create( document.querySelector( '.ladda-button' ) );
 	$form.ajaxSubmit({
 		beforeSubmit: function() {
