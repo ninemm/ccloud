@@ -88,12 +88,20 @@ public class MessageQuery extends JBaseQuery {
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 	
-	public Page<Record> paginate1(int pageNumber, int pageSize, String sellerId, String type, String fromUserId, 
+	public Page<Record> paginateObj(int pageNumber, int pageSize, String sellerId, String type, String fromUserId, 
 			String toUserId, String orderby) {
 		String select = "select m.*,t1.ID_ taskId,t1.ASSIGNEE_ assignee  ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_message` m");
-		fromBuilder.append(" LEFT JOIN cc_sales_order o ON m.object_id=o.id ");
-		fromBuilder.append(" LEFT JOIN (SELECT a.ID_ ,a.ASSIGNEE_, a.PROC_INST_ID_ FROM act_ru_task a) t1 on o.proc_inst_id = t1.PROC_INST_ID_ ");
+		if (type.equals(DictQuery.me().findByKey("message_type", "order").getValue())) {
+			fromBuilder.append(" LEFT JOIN cc_sales_order obj ON m.object_id=obj.id ");
+		}
+		if (type.equals(DictQuery.me().findByKey("message_type", "customer").getValue())) {
+			fromBuilder.append(" LEFT JOIN cc_seller_customer obj ON m.object_id = obj.id ");
+		}
+		if (type.equals(DictQuery.me().findByKey("message_type", "customer_visit").getValue())) {
+			fromBuilder.append(" LEFT JOIN cc_customer_visit obj ON m.object_id=obj.id ");
+		}
+		fromBuilder.append(" LEFT JOIN (SELECT a.ID_ ,a.ASSIGNEE_, a.PROC_INST_ID_ FROM act_ru_task a) t1 on obj.proc_inst_id = t1.PROC_INST_ID_ ");
 		boolean needWhere = true;
 		LinkedList<Object> params = new LinkedList<Object>();
 		needWhere = appendIfNotEmpty(fromBuilder, "m.seller_id", sellerId, params, needWhere);

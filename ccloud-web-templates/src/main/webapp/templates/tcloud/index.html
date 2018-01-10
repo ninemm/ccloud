@@ -270,7 +270,7 @@
 				    <#if customerPage ??><#list customerPage.list as bean>
 				    
 				    		<#if (bean.taskId) ??>							
-							<a href="${CPATH}/customer/review?id=${bean.object_id!}&taskId=${bean.taskId!}&assignee=${bean.assignee!}">
+							<a href="${CPATH}/customer/review?id=${bean.object_id!}&taskId=${bean.taskId!}&assignee=${bean.assignee}">
 						<#else>
 							<a href="${CPATH}/customer/detail?id=${bean.object_id!}">
 						</#if>
