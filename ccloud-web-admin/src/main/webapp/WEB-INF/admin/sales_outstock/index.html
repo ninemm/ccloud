@@ -121,6 +121,8 @@
 					<@shiro.hasPermission name="/admin/salesOutstock/check">
 						if (row.status == 0) {
 							strHtml = strHtml + '<a class="btn btn-xs btn-info btn-flat" onclick="checkIsPrint(\''+row.is_print+'\',\''+url+'\')">出库</a> ';				
+						}else{
+							strHtml = strHtml + '<div class="btn btn-xs" style="visibility: hidden;"><font style="color:transparent">已出</font></div> ';
 						}
 					</@shiro.hasPermission>						
 					
