@@ -110,7 +110,6 @@ public class SalesOrderQuery extends JBaseQuery {
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.order_sn", keyword, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "o.status", status, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "o.customer_type_id", customerTypeId, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
@@ -118,6 +117,10 @@ public class SalesOrderQuery extends JBaseQuery {
 
 		if (needWhere) {
 			fromBuilder.append(" where 1 = 1");
+		}
+		
+		if (StrKit.notBlank(keyword)) {
+			fromBuilder.append(" and (o.order_sn like '%" + keyword + "%' or c.customer_name like '%" + keyword + "%')");
 		}
 
 		if (StrKit.notBlank(startDate)) {
