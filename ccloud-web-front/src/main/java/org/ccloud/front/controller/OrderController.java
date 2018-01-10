@@ -342,6 +342,7 @@ public class OrderController extends BaseFrontController {
 		param.put(Consts.WORKFLOW_APPLY_SELLER_ID, sellerId);
 		param.put(Consts.WORKFLOW_APPLY_SELLER_CODE, sellerCode);
 		param.put("customerName", customerName);
+		param.put("orderId", orderId);
 		
 
 		String toUserId = "";
