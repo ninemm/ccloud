@@ -22,7 +22,6 @@ import org.ccloud.core.BaseFrontController;
 import org.ccloud.core.addon.HookInvoker;
 import org.ccloud.core.cache.ActionCache;
 import org.ccloud.model.Dict;
-import org.ccloud.model.Message;
 import org.ccloud.model.User;
 import org.ccloud.model.query.CustomerVisitQuery;
 import org.ccloud.model.query.DictQuery;
