@@ -17,6 +17,7 @@ import org.ccloud.model.query.*;
 import org.ccloud.model.vo.CustomerVO;
 import org.ccloud.model.vo.ImageJson;
 import org.ccloud.route.RouterMapping;
+import org.ccloud.utils.CookieUtils;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.ImageUtils;
 import org.ccloud.wechat.WechatJSSDKInterceptor;
@@ -476,6 +477,14 @@ public class CustomerController extends BaseFrontController {
 		setAttr("sellerCustomer", sellerCustomer);
 		setAttr("taskId", taskId);
 
+		//判断是否审核过了
+		String task_id=CookieUtils.get(this, taskId);
+		if (task_id!=null) {
+			redirect("../");
+			return;
+		}
+		CookieUtils.put(this, taskId,taskId);
+		
 		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 		List<String> custTypeNameList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeNameListBySellerCustomerId(id, dealerDataArea);
 		String custTypeNames = Joiner.on(",").skipNulls().join(custTypeNameList);

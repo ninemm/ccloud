@@ -127,6 +127,12 @@
             <div id="tab1" class="infinite weui-tab__bd-item weui-tab__bd-item--active">
                 <div class="weui-cells message">
                 <#list orderPage.list as bean>
+                   
+				<#if (bean.taskId) ??>							
+					<a href="${CPATH}/order/orderReview?orderId=${bean.object_id!}&taskId=${bean.taskId!}&assignee=${bean.assignee!}">
+				<#else>
+					<a href="${CPATH}/order/orderReview?orderId=${bean.object_id!}">
+				</#if>
                     <div class="weui-cell">
                         <div class="weui-cell__bd">
                             <span>${(bean.title)!}</span>
@@ -150,6 +156,13 @@
             <div id="tab2" class="infinite weui-tab__bd-item">
                 <div class="weui-cells message">
                     <#list customerPage.list as bean>
+                    
+                    <#if (bean.taskId) ??>							
+						<a href="${CPATH}/customer/review?id=${bean.object_id!}&taskId=${bean.taskId!}&assignee=${bean.assignee}">
+					<#else>
+						<a href="${CPATH}/customer/detail?id=${bean.object_id!}">
+					</#if>
+                    
                     <div class="weui-cell">
                         <div class="weui-cell__bd">
                             <span>${(bean.title)!}</span>
@@ -173,6 +186,11 @@
             <div id="tab3" class="infinite weui-tab__bd-item">
                 <div class="weui-cells message">
                     <#list customerVisitPage.list as bean>
+                     <#if (bean.taskId) ??>							
+						<a href="${CPATH}/customerVisit/review?id=${bean.object_id!}&taskId=${bean.taskId!}&assignee=${bean.assignee!}">
+					<#else>
+						<a href="${CPATH}/customerVisit/detail?id=${bean.object_id!}">
+					</#if>
                     <div class="weui-cell">
                         <div class="weui-cell__bd">
                             <span>${(bean.title)!}</span>
