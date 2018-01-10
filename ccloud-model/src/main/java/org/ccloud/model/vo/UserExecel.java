@@ -6,7 +6,7 @@ public class UserExecel {
 	
 	@Excel(name = "姓名")
 	private String contact;
-	@Excel(name = "昵称")
+	@Excel(name = "昵称/员工号")
 	private String nickname;
 	@Excel(name = "手机")
 	private String mobile;

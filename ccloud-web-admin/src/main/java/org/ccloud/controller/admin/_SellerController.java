@@ -29,7 +29,6 @@ import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
-import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.QRCodeUtils;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Brand;
@@ -41,12 +40,14 @@ import org.ccloud.model.GoodsType;
 import org.ccloud.model.Group;
 import org.ccloud.model.GroupRoleRel;
 import org.ccloud.model.Option;
+import org.ccloud.model.PrintTemplate;
 import org.ccloud.model.Product;
 import org.ccloud.model.Role;
 import org.ccloud.model.RoleOperationRel;
 import org.ccloud.model.Seller;
 import org.ccloud.model.SellerBrand;
 import org.ccloud.model.SellerCustomer;
+import org.ccloud.model.SellerJoinTemplate;
 import org.ccloud.model.SellerProduct;
 import org.ccloud.model.User;
 import org.ccloud.model.UserJoinCustomer;
@@ -55,10 +56,12 @@ import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.GoodsTypeQuery;
 import org.ccloud.model.query.GroupQuery;
+import org.ccloud.model.query.PrintTemplateQuery;
 import org.ccloud.model.query.ProductQuery;
 import org.ccloud.model.query.RoleOperationRelQuery;
 import org.ccloud.model.query.RoleQuery;
 import org.ccloud.model.query.SellerBrandQuery;
+import org.ccloud.model.query.SellerJoinTemplateQuery;
 import org.ccloud.model.query.SellerProductQuery;
 import org.ccloud.model.query.SellerQuery;
 
@@ -187,6 +190,10 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 					this.saveSellerBrand(brandIds[i], department, seller2.getId());
 				}
 			}
+			
+			//保存通用打印模板,通用模板的ID：2f3681125aa44771b289e12cda1b4f99
+			this.saveSellerJoinTemplate(seller2.getId());
+			
 			
 			
 			//添加直营商客户时 初始化数据
@@ -562,6 +569,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		renderJson(sellerProduct);
 	}
 	
+	@Before(Tx.class)
 	public Seller saveSeller(Seller seller,Department department,User user,String productTypes){
 		
 		List<Seller> list = SellerQuery.me().findAll();
@@ -596,7 +604,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		return seller;
 	}
 	
-	
+	@Before(Tx.class)
 	public void saveOption(String sellerCode){
 		Option option = new Option();
 		option.setOptionKey(Consts.OPTION_SELLER_STORE_CHECK + sellerCode);
@@ -615,7 +623,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		option3.setOptionValue("true");
 		option3.save();
 	}
-	
+	@Before(Tx.class)
 	public void saveSellerBrand(String brandId,Department department,String sellerId){
 		SellerBrand sellerBrand = new SellerBrand();
 		String sellerBrandId = StrKit.getRandomUUID();
@@ -645,7 +653,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		seller.set("modify_user_id", user.getId());
 		seller.update();
 	}
-	
+	@Before(Tx.class)
 	public void saveCustomerType(CustomerType cT,Department department){
 		CustomerType customerType = new CustomerType();
 		customerType.setId(StrKit.getRandomUUID());
@@ -660,7 +668,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		customerType.setCreateDate(new Date());
 		customerType.save();
 	}
-	
+	@Before(Tx.class)
 	public void saveOther(Department department){
 		List<Group> groupList = GroupQuery.me().findByDeptId();
 		if(groupList.size()>0){
@@ -723,7 +731,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			}
 		}
 	}
-	
+	@Before(Tx.class)
 	public void saveSellerCustomer(String customerId,User user,Department department,String sellerId,String dataArea){
 		
 		SellerCustomer sellerCustomer = new SellerCustomer();
@@ -747,7 +755,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		UserJoinCustomer userJoinCustomer = new UserJoinCustomer();
 		userJoinCustomer.set("seller_customer_id", sellerCustomerId);
 		userJoinCustomer.set("user_id", user.getId());
-		userJoinCustomer.set("data_area",department.getDataArea());
+		userJoinCustomer.set("data_area",user.getDataArea());
 		userJoinCustomer.set("dept_id", department.getId());
 		userJoinCustomer.save();
 		
@@ -760,7 +768,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			customerJoinCustomerType.save();
 		}
 	}
-	
+	@Before(Tx.class)
 	public int saveProduct(SellerProduct sellerProduct,String sellerId){
 		
 		SellerProduct sPro = new SellerProduct();
@@ -882,6 +890,22 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			}
 		}
 		renderJson(result);
+	}
+	
+	public void saveSellerJoinTemplate(String sellerId) {
+		//通用模板的ID：2f3681125aa44771b289e12cda1b4f99
+		SellerJoinTemplate sellerJoinTemplate = new SellerJoinTemplate();
+		String id = "2f3681125aa44771b289e12cda1b4f99";
+		PrintTemplate printTemplate = PrintTemplateQuery.me().findById(id);
+		sellerJoinTemplate = SellerJoinTemplateQuery.me().findByTemplateId(id, sellerId);
+		if(sellerJoinTemplate == null) {
+			sellerJoinTemplate = new SellerJoinTemplate();
+			sellerJoinTemplate.setId(StrKit.getRandomUUID());
+			sellerJoinTemplate.setSellerId(sellerId);
+			sellerJoinTemplate.setPrintTemplateId(id);
+			sellerJoinTemplate.setName(printTemplate.getTemplateName());
+			sellerJoinTemplate.save();                                                                                                                        
+		}
 	}
 }
 

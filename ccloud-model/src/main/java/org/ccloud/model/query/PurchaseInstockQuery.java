@@ -117,7 +117,7 @@ public class PurchaseInstockQuery extends JBaseQuery {
 	}
 	
 	public Page<Record> paginateO(int pageNumber, int pageSize, String keyword, String startDate, String endDate,String userId,String dataArea,String purchaseRefundOustockIds,String deptId) {
-		String select = "select i.*, CASE WHEN cs.`name` IS NOT NULL THEN cs.`name` ELSE s.seller_name END AS supplierName";
+		String select = "select DISTINCT i.*, CASE WHEN cs.`name` IS NOT NULL THEN cs.`name` ELSE s.seller_name END AS supplierName";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_purchase_instock` i ");
 		fromBuilder.append(" LEFT JOIN cc_supplier cs on i.supplier_id = cs.id "
 				+ " LEFT JOIN cc_seller s on s.id = i.supplier_id "

@@ -36,6 +36,7 @@ import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.model.Receivables;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.GoodsCategoryQuery;
+import org.ccloud.model.query.PurchaseRefundOutstockQuery;
 import org.ccloud.model.query.ReceivablesQuery;
 import org.ccloud.model.ReceivablesDetail;
 import org.ccloud.model.query.ReceivablesDetailQuery;
@@ -231,8 +232,16 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 	} 
 	
 	public void getBizUsers() {
+		String type = getPara("type");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		List<Record> record = SalesOrderQuery.me().findByDataArea(dataArea);
+		List<Record> record = new ArrayList();
+		if(type != null) {
+			if("1".equals(type)) {
+				record = SalesOrderQuery.me().findByDataArea(dataArea);
+			}else if("2".equals(type)) {
+				record = PurchaseRefundOutstockQuery.me().findByDataArea(dataArea);
+			}
+		}
 		renderJson(record);
 	}
 }

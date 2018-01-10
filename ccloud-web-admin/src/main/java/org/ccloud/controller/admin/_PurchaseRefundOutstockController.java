@@ -36,6 +36,8 @@ import org.ccloud.model.PurchaseInstock;
 import org.ccloud.model.PurchaseInstockDetail;
 import org.ccloud.model.PurchaseRefundOutstock;
 import org.ccloud.model.PurchaseRefundOutstockDetail;
+import org.ccloud.model.Receivables;
+import org.ccloud.model.ReceivablesDetail;
 import org.ccloud.model.Seller;
 import org.ccloud.model.SellerProduct;
 import org.ccloud.model.User;
@@ -44,6 +46,7 @@ import org.ccloud.model.query.PurchaseInstockDetailQuery;
 import org.ccloud.model.query.PurchaseInstockQuery;
 import org.ccloud.model.query.PurchaseRefundOutstockDetailQuery;
 import org.ccloud.model.query.PurchaseRefundOutstockQuery;
+import org.ccloud.model.query.ReceivablesQuery;
 import org.ccloud.model.query.SellerProductQuery;
 import org.ccloud.model.query.SellerQuery;
 
@@ -290,7 +293,52 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 			purchaseRefundOutstock.set("status", 1000);
 			purchaseRefundOutstock.update();
 		}
+		
+		//生成应收账款和应收账款明细
+		this.saveReceivales(purchaseRefundOutstock,list,user);
 		renderAjaxResultForSuccess("OK");
-
+		
+	}
+	
+	public void saveReceivales(PurchaseRefundOutstock purchaseRefundOutstock,List<PurchaseRefundOutstockDetail> purchaseRefundOutstockDetails,User user){
+		Receivables receivables = ReceivablesQuery.me().findByObjId(purchaseRefundOutstock.getSupplierId(), "supplier");
+		if(receivables==null){
+			Receivables receivable = new Receivables();
+			receivable.setId(StrKit.getRandomUUID());
+			receivable.setObjectId(purchaseRefundOutstock.getSupplierId());
+			receivable.setObjectType("supplier");
+			receivable.setReceiveAmount(purchaseRefundOutstock.getTotalRejectAmount());
+			receivable.setActAmount(new BigDecimal(0));
+			receivable.setBalanceAmount(purchaseRefundOutstock.getTotalRejectAmount());
+			receivable.setDeptId(user.getDepartmentId());
+			receivable.setDataArea(user.getDataArea());
+			receivable.setCreateDate(new Date());
+			receivable.save();
+		}else
+		{
+			receivables.setReceiveAmount(purchaseRefundOutstock.getTotalRejectAmount().add(receivables.getReceiveAmount()));
+			receivables.setActAmount(receivables.getActAmount());
+			receivables.setBalanceAmount((purchaseRefundOutstock.getTotalRejectAmount().add(receivables.getBalanceAmount())));
+			receivables.setModifyDate(new Date());
+			receivables.update();
+		}
+		
+		//应付账款明细
+		for(int i = 0; i<purchaseRefundOutstockDetails.size();i++){
+			ReceivablesDetail  receivablesDetail = new ReceivablesDetail();
+			receivablesDetail.setId(StrKit.getRandomUUID());
+			receivablesDetail.setObjectId(purchaseRefundOutstock.getSupplierId());
+			receivablesDetail.setObjectType("supplier");
+			receivablesDetail.setReceiveAmount(purchaseRefundOutstockDetails.get(i).getProductAmount());
+			receivablesDetail.setActAmount(new BigDecimal(0));
+			receivablesDetail.setBalanceAmount(purchaseRefundOutstockDetails.get(i).getProductAmount());
+			receivablesDetail.setRefSn(purchaseRefundOutstock.getOutstockSn());
+			receivablesDetail.setRefType(Consts.BIZ_TYPE_P_OUTSTOCK);
+			receivablesDetail.setBizDate(new Date());
+			receivablesDetail.setDeptId(user.getDepartmentId());
+			receivablesDetail.setDataArea(user.getDataArea());
+			receivablesDetail.setCreateDate(new Date());
+			receivablesDetail.save();
+		}
 	}
 }

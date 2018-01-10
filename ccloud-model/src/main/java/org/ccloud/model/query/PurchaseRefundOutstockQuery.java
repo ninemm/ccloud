@@ -102,7 +102,7 @@ public class PurchaseRefundOutstockQuery extends JBaseQuery {
 	}
 	
 	public List<PurchaseRefundOutstock> findByUser(String deptId, String dataArea){
-		String sql = "select * from cc_purchase_refund_outstock  where dept_id='"+deptId+"' and data_area like '"+dataArea+"' ";
+		String sql = "select DISTINCT * from cc_purchase_refund_outstock  where dept_id='"+deptId+"' and data_area like '"+dataArea+"' ";
 		return DAO.find(sql);
 	}
 	
@@ -117,5 +117,10 @@ public class PurchaseRefundOutstockQuery extends JBaseQuery {
 			SN = new BigDecimal(endSN).add(new BigDecimal(1)).toString();
 		}
 		return SN;
+	}
+	
+	public List<Record> findByDataArea(String dataArea){
+		String sql = "select DISTINCT u.id,u.realname from cc_purchase_refund_outstock o LEFT JOIN user u on u.id = o.biz_user_id where o.data_area like '"+dataArea+"'";
+		return Db.find(sql);
 	}
 }

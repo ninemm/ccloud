@@ -451,9 +451,6 @@ public class _UserController extends JBaseCRUDController<User> {
 
 			// 检查用户是否存在
 			us = UserQuery.me().findByMobileAndDeptId(excel.getMobile(),deptId);
-			List<User> users = UserQuery.me().findAll();
-			int count = users.size();
-			String nickName = "qdyuser"+(++count);
 			Group group = GroupQuery.me().findDataAreaAndGroupName(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString(), excel.getUserGroup());
 			if (us == null) {
 				us = new User();
@@ -462,7 +459,7 @@ public class _UserController extends JBaseCRUDController<User> {
 				this.setUser(us, excel);
 				us.set("create_date", new Date());
 				us.set("group_name",excel.getUserGroup());
-				us.set("username", nickName);
+				us.set("username", excel.getNickname());
 				String dataArea = DataAreaUtil.dataAreaSetByUser(dept.getDataArea());
 				us.set("data_area", dataArea);
 				us.set("salt", EncryptUtils.salt());
