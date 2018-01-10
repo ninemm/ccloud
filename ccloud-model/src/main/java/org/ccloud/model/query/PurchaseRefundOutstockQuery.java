@@ -123,4 +123,9 @@ public class PurchaseRefundOutstockQuery extends JBaseQuery {
 		String sql = "select DISTINCT u.id,u.realname from cc_purchase_refund_outstock o LEFT JOIN user u on u.id = o.biz_user_id where o.data_area like '"+dataArea+"'";
 		return Db.find(sql);
 	}
+	
+	public PurchaseRefundOutstock findBySn(String refundSn) {
+		String sql = "select * from cc_purchase_refund_outstock where outstock_sn = ?";
+		return DAO.findFirst(sql, refundSn);
+	}
 }

@@ -341,4 +341,20 @@ public class _PurchaseRefundOutstockController extends JBaseCRUDController<Purch
 			receivablesDetail.save();
 		}
 	}
+	
+	//应收账款中详情查询
+	public void _detail() {
+
+		String refundSn = getPara(0);
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		PurchaseRefundOutstock purchaseRefundOutstock = PurchaseRefundOutstockQuery.me().findBySn(refundSn);
+		Record refund = PurchaseRefundOutstockQuery.me().findMoreById(purchaseRefundOutstock.getId(),user.getDataArea());
+		List<Record> refundDetail = PurchaseRefundOutstockDetailQuery.me().findByRefundId(purchaseRefundOutstock.getId(),user.getDataArea());
+
+		setAttr("refund", refund);
+		setAttr("refundDetail", refundDetail);
+
+		render("detail.html");
+
+	}
 }

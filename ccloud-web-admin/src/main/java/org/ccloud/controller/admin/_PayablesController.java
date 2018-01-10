@@ -84,7 +84,7 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		String type = getPara("type");
 		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String deptDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String deptDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		Page<Record> page = PayablesQuery.me().paginate(getPageNumber(),getPageSize(),customerTypeId,type,user.getId(),deptDataArea,sellerId);
 		List<Record> payList = page.getList();
