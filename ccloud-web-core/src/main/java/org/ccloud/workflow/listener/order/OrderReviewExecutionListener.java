@@ -15,7 +15,6 @@ import org.ccloud.model.query.SalesOrderDetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SalesOutstockQuery;
 import org.ccloud.model.query.WxMessageTemplateQuery;
-import org.joda.time.DateTime;
 
 import com.jfinal.kit.Kv;
 import com.jfinal.plugin.activerecord.Record;
@@ -105,7 +104,7 @@ public class OrderReviewExecutionListener implements ExecutionListener {
 		kv.set("orderId", salesOrder.get("order_sn"));
 		kv.set("customerName", salesOrder.get("customer_name"));
 		kv.set("submit", realname);
-		kv.set("createTime", DateTime.now().toString("yyyy-MM-dd HH:mm"));
+		kv.set("createTime", salesOrder.get("create_date"));
 
 		kv.set("product", builder.toString());
 		kv.set("total", salesOrder.get("total_amount"));

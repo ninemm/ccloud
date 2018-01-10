@@ -893,9 +893,9 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 	}
 	
 	public void saveSellerJoinTemplate(String sellerId) {
-		//通用模板的ID：2f3681125aa44771b289e12cda1b4f99
+		//通用模板的ID：0
 		SellerJoinTemplate sellerJoinTemplate = new SellerJoinTemplate();
-		String id = "2f3681125aa44771b289e12cda1b4f99";
+		String id = "0";
 		PrintTemplate printTemplate = PrintTemplateQuery.me().findById(id);
 		sellerJoinTemplate = SellerJoinTemplateQuery.me().findByTemplateId(id, sellerId);
 		if(sellerJoinTemplate == null) {

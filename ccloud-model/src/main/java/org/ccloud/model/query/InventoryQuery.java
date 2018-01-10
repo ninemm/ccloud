@@ -189,7 +189,7 @@ public class InventoryQuery extends JBaseQuery {
 
 	public Page<Record> findInventoryDetailByParams(int pageNumber, int pageSize, String startDate, String endDate,
 			String warehouseId, String categoryId, String dataArea, String search) {
-		String select = "select cc.warehouse_id, cc.sell_product_id, cc.data_area, se.seller_name, se.id, cw.`name`, cs.custom_name, cgc.`name` as categoryName, cgc.id as categoryId, IFNULL(SUM(t1.outCount), 0) as outCount, IFNULL(SUM(t1.inCount), 0) as inCount, cc.balance_count ";
+		String select = "select cc.warehouse_id, cc.sell_product_id, cc.data_area, se.seller_name, se.id, cw.`name`, cs.custom_name, cgc.`name` as categoryName, cgc.id as categoryId, IFNULL(SUM(t1.outCount), 0) as outCount, IFNULL(SUM(t1.inCount), 0) as inCount, IFNULL(t2.balance_count,0) as balance_count";
 		StringBuilder fromBuilder = new StringBuilder("FROM cc_inventory_detail cc ");
 		fromBuilder.append("LEFT JOIN cc_seller_product cs on cs.id = cc.sell_product_id ");
 		fromBuilder.append("LEFT JOIN cc_seller se on se.id = cs.seller_id ");
@@ -201,8 +201,11 @@ public class InventoryQuery extends JBaseQuery {
 		fromBuilder.append("FROM cc_inventory_detail a ");
 		fromBuilder.append("WHERE a.create_date >= ? And a.create_date <= ? ");
 		fromBuilder.append("GROUP BY a.warehouse_id,a.sell_product_id ORDER BY a.create_date desc) t1 ON t1.cid = cc.id ");
+		fromBuilder.append("LEFT JOIN (SELECT b.id as cid, IFNULL(SUM(b.in_count), 0) - IFNULL(SUM(b.out_count), 0) as balance_count FROM cc_inventory_detail b where b.create_date <= ? GROUP BY b.warehouse_id,b.sell_product_id) t2 ");
+		fromBuilder.append("ON t2.cid = cc.id ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		params.add(startDate);
+		params.add(endDate);
 		params.add(endDate);
 		boolean needWhere = true;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cc.data_area", dataArea, params, needWhere);

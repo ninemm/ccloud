@@ -1691,37 +1691,36 @@ input[name=sex] {
 }
 
 .user-info {
-  height: 5rem;
+  height: 6rem;
   background: #ea6f5a;
   color: #fff;
   font-size: .7rem;
   box-sizing: border-box;
-  padding: 1rem 10% 0;
 }
 
 .user-info .seller {
-  height: 1.5rem;
-  line-height: 1.5rem;
+  height: 2rem;
+  line-height: 2rem;
   text-align: center;
   width: 100%;
-  margin-bottom: .5rem;
 }
 
 .user-info .name {
-  float: left;
-  padding-left: .3rem;
+  padding-left: 4.5rem;
+  height: 1.5rem;
+  line-height: 1.5rem;
 }
 
 .user-info .mobile {
-  float: right;
-  padding-right: .2rem;
+  padding-left: 4.5rem;
+  height: 1.5rem;
+  line-height: 1.5rem;
 }
 
 .user-avatar {
   position: absolute;
-  left: 50%;
-  margin-left: -1.5rem;
-  top: 3rem;
+  left: .5rem;
+  
 }
 
 .user-avatar img {
@@ -1747,8 +1746,11 @@ input[name=sex] {
 
 .change-seller{
   position: absolute;
-  top: .5rem;
-  right: .5rem;
+  width: 2rem;
+  text-align: center;
+  color: #fff;
+  font-size: .7rem;
+  right: 0;
 }
 
 /* 我的订单 */
@@ -2146,8 +2148,24 @@ input[name=input-type] {
 }
 
 /* 报表 */
+.report-top {
+  padding:.5rem;
+  background: url('../images/bg0.jpg') no-repeat;
+  background-size: cover;
+  text-align: center;
+}
+.report-top>div {
+  background: rgba(255, 255, 255, 0.9);
+  padding: .5rem 0;
+}
+.report-top p {
+  height: 1.5rem;
+  line-height: 1.5rem;
+  color: #606060;
+}
 .report-header {
-  background: #ea6f5a;
+  background: url(../images/bg.jpg) no-repeat;
+  background-size: cover;
 }
 
 .report-header .weui-panel__hd {
@@ -2185,6 +2203,7 @@ input[name=input-type] {
   margin: .5rem .5rem;
   padding: .8rem 0 .5rem;
   background: #fff;
+  opacity: .8
 /*   border: 1px solid #efeff4; */
 }
 
@@ -2316,12 +2335,6 @@ input[name=input-type] {
   .order-customer-info-title {
     width: 25%;
     font-size: 0.7rem;
-  }
-  .user-info {
-    padding: 1.5rem 7% 0;
-  }
-  .user-info .name {
-    padding-left: .5rem;
   }
   .menu {
     margin: 0;

@@ -221,6 +221,7 @@
                 if($("#delivery-address").val().length==0) {$.toptip('配送地址不能为空', 1000, 'error'); return false;}
                 if($("#address").val().length==0) {$.toptip('地址详情不能为空', 1000, 'error'); return false;}
                 if($("#location").val().length==0) {$.toptip('定位地址不能为空,请刷新定位', 1000, 'error'); return false;}
+                if($("#location").val().indexOf($("#areaName").val().replace(",", "").replace(",", ""))!=0)  {$.toptip('配送地址与定位地址不符', 1000, 'error'); return false;}
 
                 $('._submit_btn').attr('disabled', true);
                 layer.open({
