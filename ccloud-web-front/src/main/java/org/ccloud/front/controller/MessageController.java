@@ -31,6 +31,7 @@ import org.ccloud.route.RouterMapping;
 import com.jfinal.kit.Ret;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.Record;
 
 @RouterMapping(url = "/message")
 public class MessageController extends BaseFrontController {
@@ -41,15 +42,15 @@ public class MessageController extends BaseFrontController {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		
 		Dict dict = DictQuery.me().findByKey("message_type", "order");
-		Page<Message> orderPage = MessageQuery.me().paginate(getPageNumber(), 15, sellerId, dict.getValue(), null, user.getId(), null);
+		Page<Record> orderPage = MessageQuery.me().paginateObj(getPageNumber(), 15, sellerId, dict.getValue(), null, user.getId(), null);
 		setAttr("orderPage", orderPage);
 		
 		Dict customer = DictQuery.me().findByKey("message_type", "customer");
-		Page<Message> customerPage = MessageQuery.me().paginate(getPageNumber(), 15, sellerId, customer.getValue(), null, user.getId(), null);
+		Page<Record> customerPage = MessageQuery.me().paginateObj(getPageNumber(), 15, sellerId, customer.getValue(), null, user.getId(), null);
 		setAttr("customerPage", customerPage);
 		
 		Dict customerVisit = DictQuery.me().findByKey("message_type", "customer_visit");
-		Page<Message> customerVisitPage = MessageQuery.me().paginate(getPageNumber(), 15, sellerId, customerVisit.getValue(), null, user.getId(), null);
+		Page<Record> customerVisitPage = MessageQuery.me().paginateObj(getPageNumber(), 15, sellerId, customerVisit.getValue(), null, user.getId(), null);
 		setAttr("customerVisitPage", customerVisitPage);
 		
 		render("message_list.html");
