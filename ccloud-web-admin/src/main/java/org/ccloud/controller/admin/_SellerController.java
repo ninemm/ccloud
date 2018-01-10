@@ -165,15 +165,18 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		
 		String [] brandIds= brandList.split(",");
 		if (StrKit.isBlank(sellerId)) {
-			Seller seller1=SellerQuery.me().findByDeptAndSellerType(department.getId(),0);
-			if(seller1!=null){
-				renderAjaxResultForError("该公司部门已有一个经销商，请确认");
-				return;
-			}
-			Seller seller0=SellerQuery.me().findByDeptAndSellerType(department.getId(),1);
-			if(seller0!=null){
-				renderAjaxResultForError("该公司部门已有一个直营商，请确认");
-				return;
+			if(user.getUsername().equals("admin")) {
+				Seller seller1=SellerQuery.me().findByDeptAndSellerType(department.getId(),0);
+				if(seller1!=null){
+					renderAjaxResultForError("该公司部门已有一个经销商，请确认");
+					return;
+				}
+			}else {
+				Seller seller0=SellerQuery.me().findByDeptAndSellerType(department.getId(),1);
+				if(seller0!=null){
+					renderAjaxResultForError("该公司部门已有一个直营商，请确认");
+					return;
+				}
 			}
 			Seller seller2 = this.saveSeller(seller, department, user,productType);
 
@@ -202,14 +205,11 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				customer.save();
 				//找到最近的经销商
 				String sId = "";
-				if(!user.getUsername().equals("admin")) {
-					sId = getSessionAttr(Consts.SESSION_SELLER_ID);
-				}else {
-					List<Department> depts = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(department.getId());
-					sId = depts.get(1).getStr("seller_id");
-				}
+				List<Department> depts = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(department.getId());
+				sId = depts.get(1).getStr("seller_id");
+				String dataArea = depts.get(1).getStr("data_area");
 				//添加直营商客户
-				this.saveSellerCustomer(customer.getId(), user, department,sId);
+				this.saveSellerCustomer(customer.getId(), user, department,sId,dataArea);
 				seller2.set("seller_type", Consts.SELLER_TYPE_SELLER);
 				seller2.setCustomerId(customer.getId());
 				seller2.update();
@@ -724,7 +724,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		}
 	}
 	
-	public void saveSellerCustomer(String customerId,User user,Department department,String sellerId){
+	public void saveSellerCustomer(String customerId,User user,Department department,String sellerId,String dataArea){
 		
 		SellerCustomer sellerCustomer = new SellerCustomer();
 		String sellerCustomerId = StrKit.getRandomUUID();
@@ -738,7 +738,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		sellerCustomer.set("customer_type_ids", 7);
 		sellerCustomer.set("customer_kind", 100402);
 		sellerCustomer.set("status", 0);
-		sellerCustomer.set("data_area", department.getDataArea());
+		sellerCustomer.set("data_area", dataArea);
 		sellerCustomer.set("dept_id", department.getId());
 		sellerCustomer.set("create_date", new Date());
 		sellerCustomer.save();
@@ -747,12 +747,11 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		UserJoinCustomer userJoinCustomer = new UserJoinCustomer();
 		userJoinCustomer.set("seller_customer_id", sellerCustomerId);
 		userJoinCustomer.set("user_id", user.getId());
-		userJoinCustomer.set("data_area",DataAreaUtil.getDealerDataAreaByCurUserDataArea(department.getDataArea()));
+		userJoinCustomer.set("data_area",department.getDataArea());
 		userJoinCustomer.set("dept_id", department.getId());
 		userJoinCustomer.save();
 		
 		String code = "G";
-		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		CustomerType customerType = CustomerTypeQuery.me().findDataAreaAndName(dataArea,code);
 		if(customerType!=null){
 			CustomerJoinCustomerType customerJoinCustomerType = new CustomerJoinCustomerType();
