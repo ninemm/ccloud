@@ -24,7 +24,7 @@ import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 
 @RouterMapping(url = "/inventory")
-@RequiresPermissions(value = { "/admin/report/inventory", "/admin/dealer/all" }, logical = Logical.OR)
+@RequiresPermissions(value = { "/front/inventory", "/admin/dealer/all" }, logical = Logical.OR)
 public class InventoryController extends BaseFrontController {
 	
 	public void index() {
@@ -56,7 +56,7 @@ public class InventoryController extends BaseFrontController {
 	}
 	
 	//库存详情
-	@RequiresPermissions(value = { "/admin/report/inventoryDetail", "/admin/dealer/all" }, logical = Logical.OR)
+	@RequiresPermissions(value = { "/front/inventory", "/admin/dealer/all" }, logical = Logical.OR)
 	public void inventory() {
 		String warehouseId = getPara("warehouseId");
 		String categoryId = getPara("categoryId");

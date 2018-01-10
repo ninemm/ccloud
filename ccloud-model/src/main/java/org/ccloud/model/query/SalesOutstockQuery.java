@@ -248,9 +248,18 @@ public class SalesOutstockQuery extends JBaseQuery {
 		return SN;
 	}
 
-	public boolean updateStatus(String id, String userId, int salesOutStockStatusOut, Date date) {
-		String sql = "update cc_sales_outstock cc set cc.biz_user_id=? , cc.biz_date=? , cc.status = ? , cc.modify_date = ? where cc.id = ?";
-		int i = Db.update(sql, userId, date, salesOutStockStatusOut, date, id);
+	public boolean updateStatus(String id, String userId, int salesOutStockStatusOut, Date date, String total) {
+		StringBuilder fromBuilder = new StringBuilder("update cc_sales_outstock cc set cc.biz_user_id=? , cc.biz_date=? , cc.status = ? , cc.modify_date = ? ");
+		if (total != null) {
+			fromBuilder.append(", cc.total_amount = ? ");
+		}
+		fromBuilder.append("where cc.id = ?");
+		int i = 0;
+		if (total != null) {
+			i = Db.update(fromBuilder.toString(), userId, date, salesOutStockStatusOut, date, total, id);
+		} else {
+			i = Db.update(fromBuilder.toString(), userId, date, salesOutStockStatusOut, date, id);
+		}
 		if (i > 0) {
 			return true;
 		} else {

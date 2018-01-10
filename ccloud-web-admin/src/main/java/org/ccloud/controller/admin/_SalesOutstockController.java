@@ -287,6 +287,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
         		Date date = new Date();
         		String productNumStr = StringUtils.getArrayFirst(paraMap.get("productNum"));
         		Integer productNum = Integer.valueOf(productNumStr);
+        		String total = StringUtils.getArrayFirst(paraMap.get("total"));
         		Integer count = 0;
         		Integer index = 0;
         		
@@ -302,7 +303,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
         			}
 
         		}
-        		if (!SalesOrderQuery.me().checkStatus(outStockId, user.getId(), date)) {
+        		if (!SalesOrderQuery.me().checkStatus(outStockId, user.getId(), date, total)) {
         			return false;
         		}
         		
@@ -416,7 +417,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 				return false;
 			}
 			
-			if (!SalesOutstockQuery.me().updateStockOutStatus(printAllNeedInfo.getSalesOutStockId(), user.getId(), stockDate, Consts.SALES_OUT_STOCK_STATUS_OUT, date,remark) ||!SalesOrderQuery.me().checkStatus(printAllNeedInfo.getSalesOutStockId(), user.getId(), date)) {
+			if (!SalesOutstockQuery.me().updateStockOutStatus(printAllNeedInfo.getSalesOutStockId(), user.getId(), stockDate, Consts.SALES_OUT_STOCK_STATUS_OUT, date,remark) ||!SalesOrderQuery.me().checkStatus(printAllNeedInfo.getSalesOutStockId(), user.getId(), date, null)) {
 					return false;	
 				  }
 			
