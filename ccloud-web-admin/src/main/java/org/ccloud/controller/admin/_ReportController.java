@@ -1,6 +1,5 @@
 package org.ccloud.controller.admin;
-
-import java.math.BigDecimal;
+ 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -70,10 +69,22 @@ public class _ReportController extends JBaseController {
 		String sort = getPara("sortName[sort]");
 		String order = getPara("sortName[order]");
 		Page<InventoryDetail> page=new Page<>();
-		if(null==getPara("sortName[offset]")) {
-			page = InventoryDetailQuery.me().findByDataArea(1, Integer.MAX_VALUE,dataArea,warehouseId,sort,order,startDate,endDate);
+		
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/dealer/all");
+		String user_id = user.getId();
+		boolean admin;
+		//判断登录的人是不是经销商管理员
+		if (isSuperAdmin) {
+			admin=true;
 		}else {
-			page = InventoryDetailQuery.me().findByDataArea(getPageNumber(), getPageSize(),dataArea,warehouseId,sort,order,startDate,endDate);
+			admin=false;
+		}
+		
+		if(null==getPara("sortName[offset]")) {
+			page = InventoryDetailQuery.me().findByDataArea(1, Integer.MAX_VALUE,dataArea,warehouseId,sort,order,startDate,endDate,user_id,admin);
+		}else {
+			page = InventoryDetailQuery.me().findByDataArea(getPageNumber(), getPageSize(),dataArea,warehouseId,sort,order,startDate,endDate,user_id,admin);
 		}
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
@@ -93,17 +104,27 @@ public class _ReportController extends JBaseController {
 	//产品总计
 	public void productTotalList() {
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		String seller_id=getSessionAttr("sellerId").toString();
 		String sort = getPara("sortName[sort]");
 		String order = getPara("sortName[order]");
 		String sellerId = getPara("seller_id");
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
+		
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/dealer/all");
+		String user_id = user.getId();
+		boolean admin;
+		//判断登录的人是不是经销商管理员
+		if (isSuperAdmin) {
+			admin=true;
+		}else {
+			admin=false;
+		}
 		Page<InventoryDetail> page=new Page<>();
 		if(null==getPara("sortName[offset]")) {
-			page = InventoryDetailQuery.me().findByInventoryDetailListTotal(1, Integer.MAX_VALUE,dataArea,seller_id,sort,order,sellerId,startDate,endDate);
+			page = InventoryDetailQuery.me().findByInventoryDetailListTotal(1, Integer.MAX_VALUE,dataArea,sort,order,sellerId,startDate,endDate,user_id,admin);
 		}else {
-			page = InventoryDetailQuery.me().findByInventoryDetailListTotal(getPageNumber(), getPageSize(),dataArea,seller_id,sort,order,sellerId,startDate,endDate);
+			page = InventoryDetailQuery.me().findByInventoryDetailListTotal(getPageNumber(), getPageSize(),dataArea,sort,order,sellerId,startDate,endDate,user_id,admin);
 		}
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
