@@ -304,7 +304,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		return SN;
 	}
 
-	public boolean checkStatus(String outStockId, String userId, Date date) {
+	public boolean checkStatus(String outStockId, String userId, Date date, String total) {
 		SalesOrder salesOrder = this.findByOutStockId(outStockId);
 		List<SalesOrderDetail> list = SalesOrderDetailQuery.me().findBySalesOrderId(salesOrder.getId());
 		boolean status = true;
@@ -327,7 +327,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		if (salesOrder.getPrintTime() == null) {
 			salesOrder.setPrintTime(new Date());
 		}
-		if (!SalesOutstockQuery.me().updateStatus(outStockId, userId, outOrderStatus, date) || !salesOrder.update()) {
+		if (!SalesOutstockQuery.me().updateStatus(outStockId, userId, outOrderStatus, date, total) || !salesOrder.update()) {
 			return false;
 		}
 		return true;
