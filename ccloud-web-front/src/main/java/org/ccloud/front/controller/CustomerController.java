@@ -786,7 +786,8 @@ public class CustomerController extends BaseFrontController {
 	private String getStatusName (int statusCode) {
 		if (statusCode == Consts.SALES_ORDER_STATUS_PASS) return "已审核";
 		if (statusCode == Consts.SALES_ORDER_STATUS_DEFAULT) return "待审核";
-		if (statusCode == Consts.SALES_ORDER_STATUS_CANCEL) return "取消";
+		if (statusCode == Consts.SALES_ORDER_STATUS_CANCEL) return "订单取消";
+		if (statusCode == Consts.SALES_ORDER_STATUS_REJECT) return "订单拒绝";
 		if (statusCode == Consts.SALES_ORDER_STATUS_PART_OUT) return "部分出库";
 		if (statusCode == Consts.SALES_ORDER_STATUS_PART_OUT_CLOSE) return "部分出库-订单关闭";
 		if (statusCode == Consts.SALES_ORDER_STATUS_ALL_OUT) return "全部出库";

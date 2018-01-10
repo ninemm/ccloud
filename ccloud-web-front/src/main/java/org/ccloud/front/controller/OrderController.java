@@ -193,7 +193,9 @@ public class OrderController extends BaseFrontController {
 		if (statusCode == Consts.SALES_ORDER_STATUS_DEFAULT)
 			return "待审核";
 		if (statusCode == Consts.SALES_ORDER_STATUS_CANCEL)
-			return "取消";
+			return "订单取消";
+		if (statusCode == Consts.SALES_ORDER_STATUS_REJECT)
+			return "订单拒绝";
 		if (statusCode == Consts.SALES_ORDER_STATUS_PART_OUT)
 			return "部分出库";
 		if (statusCode == Consts.SALES_ORDER_STATUS_PART_OUT_CLOSE)
