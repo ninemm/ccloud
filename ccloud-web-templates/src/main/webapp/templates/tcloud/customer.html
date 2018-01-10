@@ -322,7 +322,7 @@
                                                                                             mobile:'${(customer.mobile)}',
                                                                                             address:'${(customer.address)}'})">客户拜访</div>
                                    	</@shiro.hasPermission>
-                                   	<#if customer_kind == '100402'>
+                                   	<#if customer.customer_kind == '100402'>
                                     <div class="button red-button fr" onclick="newOrder({customerName:'${(customer.customer_name)}',
                                                                                             sellerCustomerId:'${(customer.sellerCustomerId)}',
                                                                                             contact:'${(customer.contact)}',
