@@ -348,7 +348,7 @@ $(function() {
 		} else {
 			closeMenu();
 		}
-	}).on('touchend', '#combin-filter-btn, .select-customer', function () { //打开组合筛选
+	}).on('click', '#combin-filter-btn, .select-customer', function () { //打开组合筛选
 	    if ($combinSearch.length > 0) {
 	      openCombinSearch();
 	    }
