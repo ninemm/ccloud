@@ -174,11 +174,11 @@ public class InventoryDetailQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id = cid.sell_product_id ");
 		fromBuilder.append(" LEFT JOIN cc_seller cs ON cs.id = sp.seller_id ");
 		
-		fromBuilder.append(" LEFT JOIN( SELECT IFNULL(SUM(c.out_count) , 0) out_count , IFNULL(SUM(c.in_count) , 0) in_count , c.sell_product_id FROM cc_inventory_detail c WHERE");
-		fromBuilder.append(" c.create_date >= '"+startDate+"' AND c.create_date <= '"+endDate+"' GROUP BY c.sell_product_id) t1 ON t1.sell_product_id = sp.id ");
+		fromBuilder.append(" LEFT JOIN( SELECT IFNULL(SUM(c.out_count) , 0) out_count , IFNULL(SUM(c.in_count) , 0) in_count , c.sell_product_id ,c.warehouse_id FROM cc_inventory_detail c WHERE");
+		fromBuilder.append(" c.create_date >= '"+startDate+"' AND c.create_date <= '"+endDate+"' GROUP BY c.sell_product_id,c.warehouse_id) t1 ON t1.sell_product_id = sp.id AND t1.warehouse_id=cid.warehouse_id");
 		
-		fromBuilder.append(" LEFT JOIN( SELECT( IFNULL(SUM(c.in_count) , 0) - IFNULL(SUM(c.out_count) , 0)) balance_count , c.sell_product_id FROM cc_inventory_detail c WHERE ");
-		fromBuilder.append(" c.create_date <= '"+endDate+"' GROUP BY c.sell_product_id) t2 ON t2.sell_product_id = sp.id ");
+		fromBuilder.append(" LEFT JOIN( SELECT( IFNULL(SUM(c.in_count) , 0) - IFNULL(SUM(c.out_count) , 0)) balance_count , c.sell_product_id ,c.warehouse_id FROM cc_inventory_detail c WHERE ");
+		fromBuilder.append(" c.create_date <= '"+endDate+"' GROUP BY c.sell_product_id,c.warehouse_id) t2 ON t2.sell_product_id = sp.id AND t2.warehouse_id=cid.warehouse_id");
 		
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
@@ -197,53 +197,30 @@ public class InventoryDetailQuery extends JBaseQuery {
 	
 	//库存详细报表 产品总计
 	public Page<InventoryDetail> findByInventoryDetailListTotal(int pageNumber, int pageSize,
-			String dataArea, String seller_id, String sort, String order, String sellerId) {
-		String select = "SELECT cc.warehouse_id , cc.sell_product_id , se.seller_name , se.id , cw.`name` , cs.custom_name , cgc.`name` AS categoryName , cgc.id AS categoryId , IFNULL(SUM(t1.outCount) , 0) AS outCount ,";
-		StringBuilder fromBuilder = new StringBuilder("  IFNULL(SUM(t1.inCount) , 0) AS inCount , cc.balance_count ");
-		fromBuilder.append(" FROM cc_inventory_detail cc ");
-		fromBuilder.append(" LEFT JOIN cc_seller_product cs ON cs.id = cc.sell_product_id ");
-		fromBuilder.append(" LEFT JOIN cc_seller se ON se.id = cs.seller_id ");
-		fromBuilder.append(" LEFT JOIN cc_product cp ON cp.id = cs.product_id ");
-		fromBuilder.append(" LEFT JOIN cc_goods cg ON cg.id = cp.goods_id ");
-		fromBuilder.append(" LEFT JOIN cc_goods_category cgc ON cgc.id = cg.goods_category_id ");
-		fromBuilder.append(" LEFT JOIN cc_warehouse cw ON cc.warehouse_id = cw.id ");
+			String dataArea, String seller_id, String sort, String order, String sellerId, String startDate, String endDate) {
+		String select = "SELECT cid.warehouse_id , cid.sell_product_id , cs.seller_name ,  sp.custom_name , IFNULL(SUM(t1.out_count),0) out_count, IFNULL(SUM(t1.in_count),0) in_count, t2.balance_count balance_count ";
+		StringBuilder fromBuilder = new StringBuilder(" FROM cc_inventory_detail cid");
+		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id = cid.sell_product_id ");
+		fromBuilder.append(" LEFT JOIN cc_seller cs ON cs.id = sp.seller_id ");
+		
+		fromBuilder.append(" LEFT JOIN( SELECT IFNULL(SUM(c.out_count) , 0) out_count , IFNULL(SUM(c.in_count) , 0) in_count , c.sell_product_id FROM cc_inventory_detail c WHERE");
+		fromBuilder.append(" c.create_date >= '"+startDate+"' AND c.create_date <= '"+endDate+"' GROUP BY c.sell_product_id) t1 ON t1.sell_product_id = sp.id ");
+		
+		fromBuilder.append(" LEFT JOIN( SELECT( IFNULL(SUM(c.in_count) , 0) - IFNULL(SUM(c.out_count) , 0)) balance_count , c.sell_product_id FROM cc_inventory_detail c WHERE ");
+		fromBuilder.append(" c.create_date <= '"+endDate+"' GROUP BY c.sell_product_id) t2 ON t2.sell_product_id = sp.id ");
+		
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cid.data_area", dataArea, params, needWhere);
-		needWhere = appendIfNotEmpty(fromBuilder, "cs.id", sellerId, params, needWhere);
-		
+		fromBuilder.append("GROUP BY cid.sell_product_id ");
 		if (sort==""||null==sort) {
-			fromBuilder.append("GROUP BY cid.sell_product_id order by cs.seller_type,cs.id ");
+			fromBuilder.append("order by "+"cid.create_date");
 		}else {
-			fromBuilder.append("GROUP BY cid.sell_product_id order by "+sort+" "+order);
+			fromBuilder.append("order by "+sort+" "+order);
 		}
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
-	}
-
-	//查询所有仓库当前商品剩余
-	public InventoryDetail findByInventoryDetail2( String sellProductId, String endDate) {
-		String sql = "SELECT SUM(cid.in_count) - IFNULL(SUM(cid.out_count) , 0) AS  balance_count FROM cc_inventory_detail cid WHERE cid.sell_product_id='"+sellProductId+"'";
-		sql=sql+"and cid.create_date <= '"+endDate+"'";
-		return DAO.findFirst(sql);
-	}
-	
-	//查询所有仓库当前商品在这段时间出库  入库
-	public Record findByInventoryDetail3(String sellProductId, String startDate, String endDate) {
-		StringBuilder fromBuilder = new StringBuilder("select IFNULL(SUM(c.out_count) , 0) out_count ,IFNULL(SUM(c.in_count) , 0)  in_count  from cc_inventory_detail c ");
-		LinkedList<Object> params = new LinkedList<Object>();
-		boolean needWhere = true;
-		needWhere = appendIfNotEmpty(fromBuilder, "c.sell_product_id", sellProductId, params, needWhere);
-		if (StrKit.notBlank(startDate)) {
-			fromBuilder.append(" and c.create_date >= ?");
-			params.add(startDate);
-		}
-		if (StrKit.notBlank(endDate)) {
-			fromBuilder.append(" and c.create_date <= ?");
-			params.add(endDate);
-		}
-		return Db.findFirst(fromBuilder.toString(), params.toArray());
 	}
 
 }

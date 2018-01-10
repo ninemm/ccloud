@@ -26,29 +26,17 @@ $(function() {
 <article id="my">
 	<header class="user-box">
 		<div class="user-info">
-			<p class="seller ft16">${(session.sellerName)!}</p>
+			<p class="seller ft16"> ${(session.sellerName)!}
+			<a href="${CPATH}/user/config" class="change-seller">
+				设置
+			</a>
+			</p>
+			<div class="user-avatar">
+				<img src="${(session._logined_user.avatar)!'${CTPATH}/images/avatar.png'}">
+			</div>
 			<p class="name">${(session._logined_user.realname)!}</p>
 			<p class="mobile">${(session._logined_user.mobile)!}</p>
-			<a href="${CPATH}/user/config" class="change-seller">
-				<span><i class="icon-cog ft20 white"></i></span>
-			</a>
-		</div>
-		<div class="user-avatar">
-			<img src="${(session._logined_user.avatar)!'${CTPATH}/images/avatar.png'}">
-		</div> 
-		<div class="user-statistics">
-			<div class="weui-flex">
-			<div class="weui-flex__item">
-				<h4>订单数</h4>
-				<p>${totalOrderCount!0}</p>
 			</div>
-			<div class="weui-flex__item"></div>
-			<div class="weui-flex__item">
-				<h4>客户数</h4>
-				<p>${totalCustomerCount!0}</p>
-			</div>
-			</div>
-		</div>
 	</header>
 	<div>
 		<@shiro.hasPermission name="/admin/sellerCustomer/audit,/admin/salesOrder/check,/admin/customerVisit/audit">

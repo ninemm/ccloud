@@ -15,7 +15,6 @@
  */
 package org.ccloud.front.controller;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -28,7 +27,10 @@ import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.CustomerType;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.SalesOrderQuery;
+import org.ccloud.model.query.SellerCustomerQuery;
 import org.ccloud.model.query.SellerProductQuery;
+import org.ccloud.model.query.SellerQuery;
+import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
 
 import com.alibaba.fastjson.JSON;
@@ -219,15 +221,10 @@ public class ReportController extends BaseFrontController {
 	
 	public void userReportDetail() {
 		String userId = getPara("userId");
-		String userName = getPara("userName");
 		String dayTag = getPara("dayTag");
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
-        try {
-			setAttr("userName", new String(userName.getBytes("ISO-8859-1"),"UTF-8"));
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}		
+		setAttr("userName", UserQuery.me().findById(userId).getRealname());
 		setAttr("userId", userId);
 		setAttr("dayTag", dayTag);
 		setAttr("startDate", startDate);
@@ -237,15 +234,10 @@ public class ReportController extends BaseFrontController {
 	
 	public void sellerReportDetail() {
 		String sellerId = getPara("sellerId");
-		String sellerName = getPara("sellerName");
 		String dayTag = getPara("dayTag");
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");		
-        try {
-			setAttr("sellerName", new String(sellerName.getBytes("ISO-8859-1"),"UTF-8"));
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}		
+		setAttr("sellerName", SellerQuery.me().findById(sellerId).getSellerName());
 		setAttr("sellerId", sellerId);
 		setAttr("dayTag", dayTag);
 		setAttr("startDate", startDate);
@@ -255,15 +247,10 @@ public class ReportController extends BaseFrontController {
 	
 	public void sellerPurchaseReport() {
 		String customerId = getPara("customerId");
-		String sellerName = getPara("sellerName");
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		String dayTag = getPara("dayTag");		
-        try {
-			setAttr("sellerName", new String(sellerName.getBytes("ISO-8859-1"),"UTF-8"));
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}		
+		setAttr("sellerName", SellerCustomerQuery.me().findById(customerId).getStr("customer_name"));
 		setAttr("customerId", customerId);
 		setAttr("dayTag", dayTag);
 		setAttr("startDate", startDate);

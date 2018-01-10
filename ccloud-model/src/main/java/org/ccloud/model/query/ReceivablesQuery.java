@@ -46,7 +46,7 @@ public class ReceivablesQuery extends JBaseQuery {
 		});
 	}
 
-	public Page<Record> paginate(int pageNumber, int pageSize, String id,String type,String bizUserId,String dataArea,String sellerId) {
+	public Page<Record> paginate(int pageNumber, int pageSize, String id,String type,String seller_id,String dataArea,String sellerId) {
 		
 		Boolean b = true;
 		String select;
@@ -62,7 +62,7 @@ public class ReceivablesQuery extends JBaseQuery {
 			if(b) {
 				fromBuilder.append(" WHERE 1=1 ");
 			}
-			fromBuilder.append(" and c1.seller_id = ? GROUP BY c1.id ) t1 ON r.object_id = t1.id inner JOIN `cc_customer` AS c ON c.id = t1.customer_id INNER JOIN cc_seller_customer AS csc on csc.customer_id = c.id INNER JOIN cc_user_join_customer AS cujc on cujc.seller_customer_id = csc.id ");
+			fromBuilder.append(" and c1.seller_id = ? GROUP BY c1.id ) t1 ON r.object_id = t1.id inner JOIN `cc_customer` AS c ON c.id = t1.customer_id ");
 			params.add(sellerId);
 			
 		}else {
@@ -73,16 +73,9 @@ public class ReceivablesQuery extends JBaseQuery {
 				b = false;
 			}
 		}
-		if("1".equals(type) && !bizUserId.equals("0")) {
-			fromBuilder.append(" and cujc.user_id = '"+bizUserId+"'");
-		}
-		appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, b);
-		if("1".equals(type)) {
-			fromBuilder.append(" GROUP BY r.object_id ORDER BY r.create_date DESC");
-		}else {
-			fromBuilder.append(" GROUP BY s.id ORDER BY r.create_date DESC");
-		}
 		
+		appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, b);
+		fromBuilder.append(" ORDER BY r.create_date DESC");
 		
 		
 		if (params.isEmpty())
