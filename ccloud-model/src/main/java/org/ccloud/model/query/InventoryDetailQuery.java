@@ -168,7 +168,7 @@ public class InventoryDetailQuery extends JBaseQuery {
 
 	//库存明细报表
 	public Page<InventoryDetail> findByDataArea(int pageNumber, int pageSize, String dataArea, String warehouseId, String sort, String order) {
-		String select = "select cid.warehouse_id , cid.sell_product_id , cs.seller_name , w.`name` , sp.custom_name , IFNULL(SUM(cid.out_count) , 0) out_count , IFNULL(SUM(cid.in_count) , 0) in_count";
+		String select = "select cid.warehouse_id , cid.sell_product_id , cs.seller_name , w.`name` , sp.custom_name ";
 		StringBuilder fromBuilder = new StringBuilder(" FROM cc_inventory_detail cid");
 		fromBuilder.append(" LEFT JOIN cc_warehouse w ON w.id = cid.warehouse_id  ");
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id = cid.sell_product_id ");
@@ -192,10 +192,15 @@ public class InventoryDetailQuery extends JBaseQuery {
 	//库存详细报表 产品总计
 	public Page<InventoryDetail> findByInventoryDetailListTotal(int pageNumber, int pageSize,
 			String dataArea, String seller_id, String sort, String order, String sellerId) {
-		String select = "SELECT cid.sell_product_id ,cs.seller_name ,  sp.custom_name ";
-		StringBuilder fromBuilder = new StringBuilder(" FROM cc_inventory_detail cid ");
-		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id = cid.sell_product_id ");
-		fromBuilder.append(" LEFT JOIN cc_seller cs ON cs.id = sp.seller_id ");
+		String select = "SELECT cc.warehouse_id , cc.sell_product_id , se.seller_name , se.id , cw.`name` , cs.custom_name , cgc.`name` AS categoryName , cgc.id AS categoryId , IFNULL(SUM(t1.outCount) , 0) AS outCount ,";
+		StringBuilder fromBuilder = new StringBuilder("  IFNULL(SUM(t1.inCount) , 0) AS inCount , cc.balance_count ");
+		fromBuilder.append(" FROM cc_inventory_detail cc ");
+		fromBuilder.append(" LEFT JOIN cc_seller_product cs ON cs.id = cc.sell_product_id ");
+		fromBuilder.append(" LEFT JOIN cc_seller se ON se.id = cs.seller_id ");
+		fromBuilder.append(" LEFT JOIN cc_product cp ON cp.id = cs.product_id ");
+		fromBuilder.append(" LEFT JOIN cc_goods cg ON cg.id = cp.goods_id ");
+		fromBuilder.append(" LEFT JOIN cc_goods_category cgc ON cgc.id = cg.goods_category_id ");
+		fromBuilder.append(" LEFT JOIN cc_warehouse cw ON cc.warehouse_id = cw.id ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cid.data_area", dataArea, params, needWhere);

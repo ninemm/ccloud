@@ -423,7 +423,8 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 
 	public void getProductInfo() {
 		String  warehouseId = getPara("warehouse_id");
-		List<Record>list=StockTakingDetailQuery.me().findByWarehouseId(warehouseId);
+		String seller_id=getSessionAttr("sellerId").toString();
+		List<Record>list=StockTakingDetailQuery.me().findByWarehouseIdAndSellerId(warehouseId,seller_id);
 		renderJson(list);
 	}
 }

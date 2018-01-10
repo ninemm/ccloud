@@ -141,21 +141,16 @@ public class StockTakingDetailQuery extends JBaseQuery {
 		
 	}
 
-	public List<Record> selectSellProductId(String product_id, String seller_id) {
-		return null;
-	}
-
-	//第二次盘点 查询出所有盘点商品
-	public List<Record> findByWarehouseId(String warehouseId) {
-		StringBuilder fromBuilder = new StringBuilder("SELECT sp.id sellerProductId,p.`name` , t1.valueName specificationValue, p.big_unit bigUnit, i.balance_count balanceCount");
-		fromBuilder.append(" FROM cc_inventory_detail i ");
-	 	fromBuilder.append(" LEFT JOIN cc_warehouse w ON w.id = i.warehouse_id");
-	 	fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id = i.sell_product_id");
-	 	fromBuilder.append(" LEFT JOIN cc_product p ON sp.product_id = p.id");
-	 	fromBuilder.append(" LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
-	 	fromBuilder.append(" RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = sp.product_id ");
-	 	fromBuilder.append("WHERE i.warehouse_id =? GROUP BY i.sell_product_id ");
-	 	return Db.find(fromBuilder.toString(), warehouseId);
+	//盘点 查询出经销商所有商品
+	public List<Record> findByWarehouseIdAndSellerId(String warehouseId, String seller_id) {
+		StringBuilder fromBuilder = new StringBuilder("SELECT sp.id sellerProductId , p.`name` , t1.valueName specificationValue , p.big_unit bigUnit , t2.balance_count ");
+		fromBuilder.append(" FROM cc_seller_product sp  ");
+	 	fromBuilder.append(" LEFT JOIN cc_product p ON sp.product_id = p.id ");
+	 	fromBuilder.append(" LEFT JOIN( SELECT sv.id , cv.product_set_id , GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
+	 	fromBuilder.append(" RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 ON t1.product_set_id = sp.product_id ");
+	 	fromBuilder.append(" LEFT JOIN( SELECT i.balance_count , i.sell_product_id FROM cc_inventory_detail i WHERE i.warehouse_id = ? GROUP BY i.sell_product_id ORDER BY i.create_date DESC) t2 ON t2.sell_product_id = sp.id ");
+	 	fromBuilder.append(" WHERE sp.seller_id =? ORDER BY sp.order_list");
+	 	return Db.find(fromBuilder.toString(), warehouseId,seller_id);
 	}
 	
 }
