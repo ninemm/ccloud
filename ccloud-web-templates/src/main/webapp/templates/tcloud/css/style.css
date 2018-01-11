@@ -1563,14 +1563,8 @@ input[name=sex] {
 }
 
 #order-detail p {
-  height: 1rem;
   line-height: 1rem;
   padding: .2rem 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
 }
 
 #order-detail .weui-cell {
@@ -1589,10 +1583,6 @@ input[name=sex] {
 
 .modify_price .spinner{
   top: 0;
-}
-
-.modify_price>.weui-flex {
-  padding-left: 1rem;
 }
 
 /* 订单操作记录 */
@@ -2364,7 +2354,23 @@ input[name=input-type] {
   left: .75rem!important;
 }
 
+/* 订单审核 */
+.todo-product-box {
+  padding-left: 3rem;
+  position: relative;
+}
 
+.todo-product-box img {
+  width: 2.5rem;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.todo-product-box>.weui-flex {
+  padding-left: .5rem;
+}
 /* 媒体查询 */
 
 @media screen and (max-width:320px) {
