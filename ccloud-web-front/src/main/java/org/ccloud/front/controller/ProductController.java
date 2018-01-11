@@ -221,9 +221,9 @@ public class ProductController extends BaseFrontController {
 		
 		String customerKind = "";
 		Subject subject = SecurityUtils.getSubject();
-		if (subject.isPermitted("/admin/salesOrder") && subject.isPermitted("/admin/salesOrder/seller")) {
+		if (subject.isPermitted("/admin/salesOrder/add") && subject.isPermitted("/admin/salesOrder/seller")) {
 			customerKind = "";
-		} else if (subject.isPermitted("/admin/salesOrder")) {
+		} else if (subject.isPermitted("/admin/salesOrder/add")) {
 			customerKind = Consts.CUSTOMER_KIND_COMMON;
 		} else if (subject.isPermitted("/admin/salesOrder/seller")) {
 			customerKind = Consts.CUSTOMER_KIND_SELLER;
