@@ -214,7 +214,7 @@ public class _GroupController extends JBaseCRUDController<Group> {
 	
 	public void getRoleCheck() {
 		String id = getPara("groupId");
-		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 		List<Record> list = RoleQuery.me().findByRoleCheck(dataArea);
 		List<Record> list1 = RoleQuery.me().findByRoleCheck1(id);
 		List<Map<String, Object>> checkList = new ArrayList<>();

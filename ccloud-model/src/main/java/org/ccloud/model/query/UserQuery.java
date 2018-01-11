@@ -235,7 +235,7 @@ public class UserQuery extends JBaseQuery {
 		stringBuilder.append("ON u.id = a.user_id ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		params.add(id);
-		appendIfNotEmptyWithLike(stringBuilder, "u.data_area", dataArea, params, false);
+		stringBuilder.append("where u.data_area like '"+dataArea+"' ");
 		return Db.find(stringBuilder.toString(), params.toArray());
 	}
 	
