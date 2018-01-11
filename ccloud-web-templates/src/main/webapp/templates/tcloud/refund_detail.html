@@ -244,6 +244,11 @@ $(function() {
 								<input type="checkbox" name="add-gift" id="addGift" class="weui-agree__checkbox" <#if list.is_gift == 1>checked</#if> disabled>
 								<span>赠品</span>
 							</div>
+							<#if list.is_gift == 1>
+							<input type="hidden" name="isGift" value="1">
+							<#else>
+							<input type="hidden" name="isGift" value="0">
+							</#if>
 						</div>
 					</div>
 					</#list>
