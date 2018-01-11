@@ -463,4 +463,8 @@ public class ProductQuery extends JBaseQuery {
 		return Db.find(fromBuilder.toString(), goodsId);
 	}	
 	
+	public Product findbyProductSn(String productSn) {
+		return DAO.doFindFirst("product_sn",productSn);
+	}
+  	
 }

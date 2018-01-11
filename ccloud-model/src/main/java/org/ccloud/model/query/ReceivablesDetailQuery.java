@@ -43,17 +43,17 @@ public class ReceivablesDetailQuery extends JBaseQuery {
 		});
 	}
 
-	public Page<ReceivablesDetail> paginate(int pageNumber, int pageSize, String id,String type,String dataArea) {
+	public Page<ReceivablesDetail> paginate(int pageNumber, int pageSize, String id,String dataArea) {
 		
 		String select = "SELECT COALESCE(SUM(t3.act_amount),0) as act_amount, t3.ref_sn, t3.receive_amount,(t3.receive_amount) - COALESCE(SUM(t3.act_amount),0) as balance_amount, t3.object_id, d.name as ref_Name,t3.ref_type, t3.create_date, t3.biz_date ";
 		StringBuilder fromBuilder = new StringBuilder(" FROM (SELECT r.act_amount AS act_amount, t2.ref_sn, t2.receive_amount AS receive_amount, t2.receive_amount - r.act_amount AS ");
 		fromBuilder.append("balance_amount, t2.object_id, t2.ref_type, t2.create_date, t2.biz_date FROM cc_receiving r RIGHT JOIN (SELECT SUM(receive_amount) AS receive_amount, object_id, ref_type, create_date, biz_date, ref_sn FROM `cc_receivables_detail` c ");
 		fromBuilder.append(" WHERE c.object_id ='"+id+"'");
-		if("1".equals(type)) {
+//		if("1".equals(type)) {
 			fromBuilder.append(" AND c.object_type = 'customer' ");
-		}else {
-			fromBuilder.append(" AND c.object_type = 'supplier' ");
-		}
+//		}else {
+//			fromBuilder.append(" AND c.object_type = 'supplier' ");
+//		}
 		LinkedList<Object> params = new LinkedList<Object>();
 		appendIfNotEmptyWithLike(fromBuilder, "data_area", dataArea, params, false);
 		fromBuilder.append(" GROUP BY c.ref_sn  ORDER BY c.create_date DESC ) t2 ON r.ref_sn = t2.ref_sn ) t3  INNER JOIN dict d on t3.ref_type = d.`value`  GROUP BY t3.ref_sn ORDER BY t3.create_date desc ");

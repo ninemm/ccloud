@@ -339,7 +339,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 	}	
 	
 	
-	//添加产品信息
+	//展示销售商产品信息
 	public void showProduct(){
 		User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String keyword = getPara("k");

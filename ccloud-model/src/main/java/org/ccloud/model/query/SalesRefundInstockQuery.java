@@ -333,7 +333,6 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.instock_sn", keyword, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "o.status", status, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "o.customer_type_id", customerTypeId, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
@@ -341,6 +340,10 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 
 		if (needWhere) {
 			fromBuilder.append(" where 1 = 1");
+		}
+		
+		if (StrKit.notBlank(keyword)) {
+			fromBuilder.append(" and (o.instock_sn like '%" + keyword + "%' or c.customer_name like '%" + keyword + "%')");
 		}
 
 		if (StrKit.notBlank(startDate)) {

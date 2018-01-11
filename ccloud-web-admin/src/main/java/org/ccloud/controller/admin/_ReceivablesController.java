@@ -35,7 +35,6 @@ import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.model.Receivables;
 import org.ccloud.model.query.CustomerTypeQuery;
-import org.ccloud.model.query.GoodsCategoryQuery;
 import org.ccloud.model.query.ReceivablesQuery;
 import org.ccloud.model.ReceivablesDetail;
 import org.ccloud.model.query.ReceivablesDetailQuery;
@@ -68,27 +67,27 @@ import com.jfinal.plugin.activerecord.Db;
 public class _ReceivablesController extends JBaseCRUDController<Receivables> { 
 	
 	public void getOptions(){
-		String type = getPara("type");
+//		String type = getPara("type");
 		String DataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		List<Record> list = new ArrayList();
-		if(type != null) {
-			if("1".equals(type)) {
-				list = CustomerTypeQuery.me().getCustomerTypes(DataArea);
-			}else if("2".equals(type)) {
-				list = GoodsCategoryQuery.me().getLeafTypes();
-			}
-		}
+//		if(type != null) {
+//			if("1".equals(type)) {
+//			}else if("2".equals(type)) {
+//				list = GoodsCategoryQuery.me().getLeafTypes();
+//			}
+//		}
+		list = CustomerTypeQuery.me().getCustomerTypes(DataArea);
 		renderJson(list);
 	}
 	
 	public void getReceivables() {
-		String type = getPara("type");
+//		String type = getPara("type");
 		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String deptDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		Page<Record> page = ReceivablesQuery.me().paginate(getPageNumber(),getPageSize(),customerTypeId,type,user.getId(),deptDataArea,sellerId);
+		Page<Record> page = ReceivablesQuery.me().paginate(getPageNumber(),getPageSize(),customerTypeId,user.getId(),deptDataArea,sellerId);
 		List<Record> receivablesList = page.getList();
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(),"rows", receivablesList);
 		
@@ -96,12 +95,12 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 	}
 	
 	public void getReceivablesDetail() {
-		String type = getPara("type");
+//		String type = getPara("type");
 		String id = getPara("id");
 		String deptDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		Map<String, Object> map;
-		if(type != null && id!=null) {
-			Page<ReceivablesDetail> page = ReceivablesDetailQuery.me().paginate(getPageNumber(), getPageSize(), id,type,deptDataArea);
+		if(id!=null) {
+			Page<ReceivablesDetail> page = ReceivablesDetailQuery.me().paginate(getPageNumber(), getPageSize(), id,deptDataArea);
 			map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		}else {
 			map = new HashMap<String, Object>();
@@ -111,18 +110,18 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 	}
 	
 	public void renderlist() {
-		String type = getPara("type");
+//		String type = getPara("type");
 		String ref_sn = getPara("ref_sn");
 		String ref_type = getPara("ref_type");
 		String object_id = getPara("object_id");
 		String balance_amount = getPara("balance_amount");
 		Receivables receivables = new Receivables();
 		//通过客户Id找到应收账款主表ID
-		if("1".equals(type)) {
-			receivables = ReceivablesQuery.me().findByObjId(object_id, Consts.RECEIVABLES_OBJECT_TYPE_CUSTOMER);
-		}else {
-			receivables = ReceivablesQuery.me().findByObjId(object_id, Consts.RECEIVABLES_OBJECT_TYPE_SUPPLIER);
-		}
+//		if("1".equals(type)) {
+		receivables = ReceivablesQuery.me().findByObjId(object_id, Consts.RECEIVABLES_OBJECT_TYPE_CUSTOMER);
+//		}else {
+//			receivables = ReceivablesQuery.me().findByObjId(object_id, Consts.RECEIVABLES_OBJECT_TYPE_SUPPLIER);
+//		}
 		String userDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		List<User> list = UserQuery.me().findIdAndNameByDataArea(userDataArea);
 	
@@ -187,7 +186,7 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 	
 	//导出应收记录
 	public void downloading() throws UnsupportedEncodingException {
-		String type = getPara("type");
+//		String type = getPara("type");
 		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
@@ -195,7 +194,7 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 		
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\receivables\\"
 				+ "receivables.xlsx";
-		Page<Record> page = ReceivablesQuery.me().paginate(1,Integer.MAX_VALUE,customerTypeId,type,user.getId(),deptDataArea,sellerId);
+		Page<Record> page = ReceivablesQuery.me().paginate(1,Integer.MAX_VALUE,customerTypeId,user.getId(),deptDataArea,sellerId);
 		List<Record> receivablesList = page.getList();
 		
 		List<receivablesExcel> excellist = Lists.newArrayList();

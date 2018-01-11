@@ -283,7 +283,7 @@ public class _UserController extends JBaseCRUDController<User> {
 				userHistory.setUserNames(user.getUserNames());
 				userHistory.setDataArea(user.getDataArea());
 				userHistory.setWechatOpenId(user.getWechatOpenId());
-				userHistory.setWechatUserid(user.getWechatUserid());
+				userHistory.setWechatUserid(user.getWechatUseriId());
 				userHistory.setCreateDate(new Date());
 				userHistory.save();
 			}
@@ -609,7 +609,7 @@ public class _UserController extends JBaseCRUDController<User> {
 		userHistory.setUserNames(user.getUserNames());
 		userHistory.setDataArea(user.getDataArea());
 		userHistory.setWechatOpenId(user.getWechatOpenId());
-		userHistory.setWechatUserid(user.getWechatUserid());
+		userHistory.setWechatUserid(user.getWechatUseriId());
 		userHistory.setCreateDate(new Date());
 		userHistory.save();
 //		renderAjaxResultForSuccess("更新成功");

@@ -52,7 +52,9 @@ public class RefundController extends BaseFrontController{
 			item.put("value", customerType.getId());
 			customerTypes.add(item);
 		}
-
+		
+		String history = getPara("history");
+		setAttr("history", history);		
 		setAttr("customerTypes", JSON.toJSON(customerTypes));
 		render("refund.html");		
 	}
@@ -107,7 +109,9 @@ public class RefundController extends BaseFrontController{
 			item.put("value", customerType.getId());
 			customerTypes.add(item);
 		}
-
+		
+		String history = getPara("history");
+		setAttr("history", history);
 		setAttr("customerTypes", JSON.toJSON(customerTypes));
 		render("refund_list.html");
 	}
@@ -158,6 +162,7 @@ public class RefundController extends BaseFrontController{
         		String[] bNum = getParaValues("bNum");
         		String[] sNum = getParaValues("sNum");
         		String[] sellerProductIds = getParaValues("sellProductId");
+        		String[] isGift = getParaValues("isGift");
         		String remark = getPara("remark");
         		String paymentType = getPara("receiveType");
         		//退货商品总价格  
@@ -168,7 +173,7 @@ public class RefundController extends BaseFrontController{
         				.insertByApp(instockId, outstock, user.getId(), sellerId, sellerCode, paymentType, date, remark);
         		for (int i = 0; i < sellerProductIds.length; i++) {
         			for (Record record : outstockDetail) {
-        				if (record.getStr("sell_product_id").equals(sellerProductIds[i])) {
+        				if (record.getStr("sell_product_id").equals(sellerProductIds[i]) && record.getStr("is_gift").equals(isGift[i])) {
         					Map<String, Object> map = SalesRefundInstockDetailQuery.me().insertByApp(record, instockId, sellerId, date, 
         							bNum[i], sNum[i]);
         					String status = map.get("status").toString();
