@@ -1027,19 +1027,23 @@ a {
 
 .product-top {
   position: relative;
-  height: 3.25rem;
 }
 
 .product-top img {
   position: absolute;
   top: 50%;
-  margin-top: -1rem;
+  transform: translateY(-50%);
+}
+
+.product-top .product_name {
+  height: auto;
+  line-height: 1rem;
+  overflow: visible;
+  margin: .2rem 0;
 }
 
 .product-top-right {
-  position: absolute;
-  left: 2rem;
-  right: 0;
+  margin-left: 2rem;
 }
 
 .product-top .weui-cell__ft {
