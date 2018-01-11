@@ -45,7 +45,7 @@ public class OrderReviewTwoTaskListener implements TaskListener {
 			User manager = UserQuery.me().findManagerByDeptId(user.getDepartmentId());
 			task.setAssignee(manager.getUsername());
 			sendOrderMessage(sellerId, customerName, "订单审核", manager.getId(), user.getId(), user.getDepartmentId(),
-					user.getDataArea(),orderId);
+					user.getDataArea(), orderId);
 		} else if (taskList != null && taskList.size() > 0) {
 
 			List<HistoricTaskInstance> list = processEngine.getHistoryService().createHistoricTaskInstanceQuery()
@@ -63,7 +63,7 @@ public class OrderReviewTwoTaskListener implements TaskListener {
 
 					treasurerUserName += record.getStr("username");
 					sendOrderMessage(sellerId, customerName, "订单审核", record.getStr("id"), user.getId(),
-							user.getDepartmentId(), user.getDataArea(),orderId);
+							user.getDepartmentId(), user.getDataArea(), orderId);
 				}
 				task.setAssignee(treasurerUserName);
 			} 

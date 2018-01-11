@@ -15,6 +15,7 @@ import org.ccloud.model.query.SalesOrderDetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SalesOutstockQuery;
 import org.ccloud.model.query.WxMessageTemplateQuery;
+import org.joda.time.DateTime;
 
 import com.jfinal.kit.Kv;
 import com.jfinal.plugin.activerecord.Record;
@@ -46,12 +47,15 @@ public class OrderReviewExecutionListener implements ExecutionListener {
 		if (pass == 1) {
 			SalesOutstockQuery.me().pass(orderId, confirm.getId(), sellerId, sellerCode);
 			this.sendOrderMessage(sellerId, customerName, "订单审核通过", confirm.getId(), user.getId(),
-					confirm.getDepartmentId(), confirm.getDataArea(),orderId);
+					confirm.getDepartmentId(), confirm.getDataArea(), orderId);
 		} else {
 			SalesOrderQuery.me().updateConfirm(orderId, Consts.SALES_ORDER_STATUS_REJECT, confirm.getId(), new Date());// 已审核拒绝
 			this.sendOrderMessage(sellerId, customerName, "订单审核拒绝", confirm.getId(), user.getId(),
-					confirm.getDepartmentId(), confirm.getDataArea(),orderId);
-			this.sendOrderWxMesssage(user.getWechatOpenId(), orderId, user.getRealname());
+					confirm.getDepartmentId(), confirm.getDataArea(), orderId);
+
+			Object _comment = execution.getVariable("comment");
+			String comment = _comment.toString();
+			this.sendOrderWxMesssage(user.getWechatOpenId(), orderId, user.getRealname(), comment);
 		}
 
 		System.err.println("--------------执行完成---------------");
@@ -80,7 +84,7 @@ public class OrderReviewExecutionListener implements ExecutionListener {
 
 	}
 
-	private void sendOrderWxMesssage(String toWechatOpenId, String orderId, String realname) {
+	private void sendOrderWxMesssage(String toWechatOpenId, String orderId, String realname, String comment) {
 
 		Kv kv = Kv.create();
 
@@ -108,7 +112,8 @@ public class OrderReviewExecutionListener implements ExecutionListener {
 
 		kv.set("product", builder.toString());
 		kv.set("total", salesOrder.get("total_amount"));
-		kv.set("status", "已拒绝");
+		kv.set("status", comment);
+		kv.set("remark", "审核时间：" + DateTime.now().toString("yyyy-MM-dd HH:mm:ss"));
 		MessageKit.sendMessage(Actions.NotifyWechatMessage.ORDER_AUDIT_MESSAGE, kv);
 	}
 

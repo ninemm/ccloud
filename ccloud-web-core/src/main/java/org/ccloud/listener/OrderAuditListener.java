@@ -36,7 +36,7 @@ public class OrderAuditListener implements MessageListener {
 		data.set("keyword3", Ret.create("value", param.get("total")));
 		data.set("keyword4", Ret.create("value", param.get("product")));
 		data.set("keyword5", Ret.create("value", param.get("createTime")));
-		data.set("remark", PropKit.get("remark"));
+		data.set("remark", Ret.create("value", param.get("remark")));
 
 		ret.set("data", data);
 		String jsonStr = JsonKit.toJson(ret);

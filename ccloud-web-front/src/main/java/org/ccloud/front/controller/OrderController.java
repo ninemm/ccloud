@@ -396,8 +396,7 @@ public class OrderController extends BaseFrontController {
 
 	@Before(Tx.class)
 	public void complete() {
-		String orderId = getPara("id");
-		
+
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		
 		String taskId = getPara("taskId");
@@ -408,7 +407,6 @@ public class OrderController extends BaseFrontController {
 		
 		Map<String, Object> var = Maps.newHashMap();
 		var.put("pass", pass);
-		var.put("orderId", orderId);
 		var.put(Consts.WORKFLOW_APPLY_COMFIRM, user);
 		
 		//是否改价格
@@ -421,6 +419,7 @@ public class OrderController extends BaseFrontController {
 		} else {
 			comment = (pass == 1 ? "通过" : "拒绝") + " " + (comment == null ? "" : comment) + " "
 					+ (refuseReson == "undefined" ? "" : refuseReson);
+			var.put("comment", comment);
 		}
 
 		String comments = buildComments(Consts.OPERATE_HISTORY_TITLE_ORDER_REVIEW, DateUtils.now(), user.getRealname(), comment);
