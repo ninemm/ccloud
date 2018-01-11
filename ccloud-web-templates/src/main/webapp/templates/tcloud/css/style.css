@@ -1027,19 +1027,23 @@ a {
 
 .product-top {
   position: relative;
-  height: 3.25rem;
 }
 
 .product-top img {
   position: absolute;
   top: 50%;
-  margin-top: -1rem;
+  transform: translateY(-50%);
+}
+
+.product-top .product_name {
+  height: auto;
+  line-height: 1rem;
+  overflow: visible;
+  margin: .2rem 0;
 }
 
 .product-top-right {
-  position: absolute;
-  left: 2rem;
-  right: 0;
+  margin-left: 2rem;
 }
 
 .product-top .weui-cell__ft {
@@ -2291,14 +2295,10 @@ input[name=input-type] {
   font-size: .7rem;
 }
 
-.rank-detail span{
-  display: inline-block;
-  vertical-align: top;
-}
-
-.sequence {
-  height: 3rem;
-  line-height: 3rem;
+.rank-detail .sequence{
+  top: 50%;
+  transform: translateY(-50%);
+  position: absolute;
 }
 
 .rank-detail {
@@ -2308,7 +2308,16 @@ input[name=input-type] {
 
 .rank-detail img{
   width: 3rem;
-  margin:0 .5rem;
+  margin-left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  position: absolute;
+
+}
+
+.rank-box {
+  display: inline-block;
+  margin-left: 4.5rem;
 }
 
 .good-name {
@@ -2317,16 +2326,6 @@ input[name=input-type] {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
-  position: absolute;
-  left: 4.5rem;
-  right:0;
-  top: 0;
-}
-
-.good-total {
-  position: absolute;
-  left: 4.5rem;
-  bottom: 0;
 }
 
 /* 多选客户 */ 
@@ -2356,7 +2355,7 @@ input[name=input-type] {
 
 /* 订单审核 */
 .todo-product-box {
-  padding-left: 3rem;
+  padding-left: 2.5rem;
   position: relative;
 }
 

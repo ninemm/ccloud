@@ -189,7 +189,7 @@ public class InventoryQuery extends JBaseQuery {
 	}
 
 	public Page<Record> findInventoryDetailByParams(int pageNumber, int pageSize, String startDate, String endDate,
-			String warehouseId, String[] warehouseIds, String categoryId, String dataArea, String search) {
+			String warehouseId, String[] warehouseIds, String categoryId, String search) {
 		String select = "select cc.warehouse_id, cc.sell_product_id, cc.data_area, se.seller_name, se.id, cw.`name`, cs.custom_name, cgc.`name` as categoryName, cgc.id as categoryId, IFNULL(SUM(t1.outCount), 0) as outCount, IFNULL(SUM(t1.inCount), 0) as inCount, IFNULL(t2.balance_count,0) as balance_count";
 		StringBuilder fromBuilder = new StringBuilder("FROM cc_inventory_detail cc ");
 		fromBuilder.append("LEFT JOIN cc_seller_product cs on cs.id = cc.sell_product_id ");
@@ -209,7 +209,6 @@ public class InventoryQuery extends JBaseQuery {
 		params.add(endDate);
 		params.add(endDate);
 		boolean needWhere = true;
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cc.data_area", dataArea, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "cgc.id", categoryId, params, needWhere);
 		if (StrKit.notBlank(warehouseId)) {
 			needWhere = appendIfNotEmpty(fromBuilder, "cc.warehouse_id", warehouseId, params, needWhere);

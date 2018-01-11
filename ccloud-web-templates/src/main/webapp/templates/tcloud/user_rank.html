@@ -4,6 +4,9 @@
 	.wi {
 		width: 7rem !important;
 	}
+	.weui-media-box:before {
+		content: none;
+	}
 </#macro>
 
 <#macro script>
@@ -36,11 +39,11 @@
 						$("#orderCount").html(data[i].orderCount);
 						$("#totalAmount").html(data[i].totalAmount);	            		
 	            	}
-	            	rank.append("<div class='rank-detail'><span class='sequence'>"+j+"</span><img src='${CTPATH}/images/jp.jpg'><div class='good-name'>"+data[i].realname+"</div><div class='good-total'><span class='orange'>￥"+data[i].totalAmount+"</span><span class='gray ft14'>/"+data[i].orderCount+"笔("+(data[i].productCount).toFixed(2)+")件</span></div></div>");
+	            	rank.append("<div class='weui-media-box ft14'><div class='rank-detail'><span class='sequence'>"+j+"</span><img src='${CTPATH}/images/jp.jpg'><div class='rank-box'><div class='good-name'>"+data[i].realname+"</div><div class='good-total'><span class='orange'>￥"+data[i].totalAmount+"</span><span class='gray ft14'>/"+data[i].orderCount+"笔("+(data[i].productCount).toFixed(2)+")件</span></div></div></div></div>");
 	            }
 	            var index = 1;
 	            for(var i = length-1; i >= descLength; i--){
-	            	descRank.append("<div class='rank-detail'><span class='sequence'>"+index+"</span><img src='${CTPATH}/images/jp.jpg'><div class='good-name'>"+data[i].realname+"</div><div class='good-total'><span class='orange'>￥"+data[i].totalAmount+"</span><span class='gray ft14'>/"+data[i].orderCount+"笔("+(data[i].productCount).toFixed(2)+")件</span></div></div>");
+	            	descRank.append("<div class='weui-media-box ft14'><div class='rank-detail'><span class='sequence'>"+index+"</span><img src='${CTPATH}/images/jp.jpg'><div class='rank-box'><div class='good-name'>"+data[i].realname+"</div><div class='good-total'><span class='orange'>￥"+data[i].totalAmount+"</span><span class='gray ft14'>/"+data[i].orderCount+"笔("+(data[i].productCount).toFixed(2)+")件</span></div></div></div></div>");
 	            	index++;
 	            }
 	            
@@ -176,28 +179,26 @@
 		</div>
 	</header>
     <div class="weui-panel weui-panel_access">
-        <div class="weui-panel__hd">
-            <span class="overview-hd-title wi">销售排行(top10)</span>
-            <span class="briefly" onclick="dayTagSelect(this)">
-            	<input type="hidden" id="dayTag">
-				<p class="dayTagText">今日</p>
-			</span>
-            <span class="briefly" onclick="orderSelect(this)">
-				<p class="orderTagText">金额</p>
-			</span> 			
-        </div>
-        <div class="weui-panel__bd">
-            <div class="weui-media-box ft14" id="userRankAsc">
-            </div>
-        </div>
+				<div class="weui-panel__hd">
+					<span class="overview-hd-title wi">销售排行(TOP10)</span>
+					<span class="briefly" onclick="dayTagSelect(this)">
+						<input type="hidden" id="dayTag">
+						<p class="dayTagText">今日</p>
+						<i class="icon-angle-down ft14"></i>
+					</span>
+					<span class="briefly" onclick="orderSelect(this)">
+						<p class="orderTagText">金额</p>
+						<i class="icon-angle-down ft14"></i>
+					</span>
+				</div>
+				<div class="weui-panel__bd" id="userRankAsc">
+				</div>
     </div>
     <div class="weui-panel weui-panel_access">
         <div class="weui-panel__hd">
-            <span class="overview-hd-title wi">销售末排行(last5)</span>
+            <span class="overview-hd-title wi">销售末排行(LAST5)</span>
         </div>
-        <div class="weui-panel__bd">
-            <div class="weui-media-box ft14" id="userRankDesc">
-            </div>
+        <div class="weui-panel__bd" id="userRankDesc">
         </div>
     </div>    
 </article>

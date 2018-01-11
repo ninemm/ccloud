@@ -191,7 +191,6 @@ public class DepartmentQuery extends JBaseQuery {
 		Department department = list.get(0);
 		map.put("text", department.getDeptName());// 父子表第一级名称,以后可以存储在字典表或字典类
 		map.put("tags", Lists.newArrayList(0));
-		list.remove(0);
 		ModelSorter.tree(list);
 		map.put("nodes", doBuild(list, hasUser,listUserJoinWarehouse));
 		deptTreeList.add(map);

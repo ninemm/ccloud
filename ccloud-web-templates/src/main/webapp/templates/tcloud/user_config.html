@@ -17,10 +17,20 @@
 	.weui-cells:first-child {
 		margin-top: 0;
 	}
+	#city-picker {
+		text-align: right;
+		font-size: inherit;
+		border: none;
+		color: inherit;
+	}
 </#macro>
 
 <#macro script>
     $(function() {
+		window.removeEventListener('touchmove', addStopTouchendPropagationListener, true);
+		$("#city-picker").cityPicker({
+			title: "请选择物理区域"
+		});
     
         var $iosActionsheet = $('#weui-actionsheet');
         var $iosMask = $('#iosMask');
@@ -95,6 +105,14 @@
 				<p>切换账套</p>
 			</div>
 			<div class="weui-cell__ft">${(session.sellerName)!}</div>
+		</a>
+	</div>
+	<div class="weui-cells">
+		<a class="weui-cell weui-cell_access">
+			<div class="weui-cell__bd">
+				<p>负责区域设置</p>
+			</div>
+			<div class="weui-cell__ft"><input type="text" id="city-picker"/></div>
 		</a>
 	</div>
 	<!-- <div class="weui-cells">

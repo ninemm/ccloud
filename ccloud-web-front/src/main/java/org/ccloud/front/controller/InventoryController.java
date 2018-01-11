@@ -71,12 +71,11 @@ public class InventoryController extends BaseFrontController {
 		String[] warehouseIds = getWareHouseIdsList(getPara("warehouseIds"));
 		String warehouseId = getPara("warehouseId");
 		String categoryId = getPara("categoryId");
-		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		String search = getPara("search");
 		Page<Record> inventoryList = InventoryQuery.me().
-				findInventoryDetailByParams(getPageNumber(), getPageSize(), startDate, endDate, warehouseId, warehouseIds, categoryId, dataArea, search);
+				findInventoryDetailByParams(getPageNumber(), getPageSize(), startDate, endDate, warehouseId, warehouseIds, categoryId, search);
 		Map<String, Object> map = ImmutableMap.of("total", inventoryList.getTotalRow(), "rows", inventoryList.getList());
 		renderJson(map);
 	}

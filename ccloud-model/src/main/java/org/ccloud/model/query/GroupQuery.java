@@ -86,7 +86,7 @@ public class GroupQuery extends JBaseQuery {
 		sqlBuilder.append("LEFT JOIN (SELECT u.group_id,u.user_id FROM user_group_rel u where u.user_id = ?) t1 on t1.group_id = g.id ");
 		final List<Object> params = new LinkedList<Object>();
 		params.add(userId);
-		appendIfNotEmptyWithLike(sqlBuilder, "g.data_area", dataArea, params, true);
+		sqlBuilder.append(" where g.data_area like '"+dataArea+"' ");
 		if (params.isEmpty()) {
 			return DAO.find(sqlBuilder.toString());
 		}
@@ -99,13 +99,13 @@ public class GroupQuery extends JBaseQuery {
 	}
 	
 	public List<Record> findByUserCheck(String id, String dataArea) {
-		StringBuilder stringBuilder = new StringBuilder("SELECT g.group_name,g.id,r.id as userRelId FROM `group` g ");
+		StringBuilder stringBuilder = new StringBuilder("SELECT DISTINCT g.group_name,g.id,r.id as userRelId FROM `group` g ");
 		stringBuilder.append("LEFT JOIN (SELECT * FROM `user_group_rel` r  where user_id=?) r ");
 		stringBuilder.append("ON LOCATE(g.id,r.group_id) > 0 ");
 		stringBuilder.append("WHERE g.id <> '0' ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		params.add(id);
-		appendIfNotEmptyWithLike(stringBuilder, "g.data_area", dataArea, params, false);
+		stringBuilder.append("and g.data_area like '"+dataArea+"' ");
 		return Db.find(stringBuilder.toString(), params.toArray());
 	}
 	
