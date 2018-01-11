@@ -354,7 +354,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 	
 	private void createPayables(SellerCustomer sellerCustomer,String countAll){
 		String payablesType = Consts.RECEIVABLES_OBJECT_TYPE_SUPPLIER; 
-		Payables payables = PayablesQuery.me().findByObjId(sellerCustomer.getSellerId(), payablesType);
+		Payables payables = PayablesQuery.me().findByObjIdAndDeptId(sellerCustomer.getSellerId(), payablesType,sellerCustomer.getDeptId());
 		Department department = DepartmentQuery.me().findById(sellerCustomer.getDeptId());
 		if(payables == null){
 			payables = new Payables();

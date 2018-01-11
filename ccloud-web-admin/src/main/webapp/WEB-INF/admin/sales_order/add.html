@@ -388,7 +388,7 @@
 			toastr.error('商品购买数量不能为零!','操作失败');
 			return;			
 		}
-		var l = Ladda.create( document.querySelector( '.ladda-button' ) );
+		var l = Ladda.create( document.querySelector( '.btn-flat' ) );
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
 				var validate = $form.data('bootstrapValidator');
