@@ -162,16 +162,16 @@ function batchDown(){
 	 	<button onclick="batchDown()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-upload"></i> 导出</button>
 	  </div>
 		<div class="input-group input-group-sm" style="float:right;">
-			<span>往来单位：</span>
-			<select id="selecttype" style="width:200px">
+			<label class="control-label">往来单位：</label>
+			<select id="selecttype" style="width:200px;float: none;" class="form-control">
 				<option value="1" >客户</option>
 				<option value="2" >供应商</option>
 			</select>&nbsp;&nbsp;&nbsp;
-			<span>分类：</span>
-			<select id="category-or-customer" style="width:200px">
+			<label class="control-label">分类：</label>
+			<select id="category-or-customer" style="width:200px;float: none;" class="form-control">
 				<option value="0">全部</option>
 			</select>&nbsp;&nbsp;&nbsp;
-			<span id="search-payables" class="btn btn-default btn-sm btn-flat" >搜索</span>
+			<span id="search-payables" class="btn btn-primary btn-sm btn-flat" >搜索</span>
 		</div>
 	</div>
 	<div class="box">
