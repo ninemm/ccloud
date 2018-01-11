@@ -52,7 +52,9 @@ public class RefundController extends BaseFrontController{
 			item.put("value", customerType.getId());
 			customerTypes.add(item);
 		}
-
+		
+		String history = getPara("history");
+		setAttr("history", history);		
 		setAttr("customerTypes", JSON.toJSON(customerTypes));
 		render("refund.html");		
 	}
@@ -107,7 +109,9 @@ public class RefundController extends BaseFrontController{
 			item.put("value", customerType.getId());
 			customerTypes.add(item);
 		}
-
+		
+		String history = getPara("history");
+		setAttr("history", history);
 		setAttr("customerTypes", JSON.toJSON(customerTypes));
 		render("refund_list.html");
 	}
