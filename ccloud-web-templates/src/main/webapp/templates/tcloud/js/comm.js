@@ -205,6 +205,7 @@ function closeCombinSearch() {
   $combinSearch.removeClass("slideInRight").addClass("slideOutRight");
   setTimeout(function() {
 	$layer.removeClass("layer-show");
+	$combinSearch.hide();
   }, 300);
 }
 

@@ -9,6 +9,14 @@
 		position: absolute;
 		bottom: 0;
 	}
+	.list-layer {
+		position: absolute;
+		top:0;
+		bottom:0;
+		left:0;
+		right:4rem;
+		background: rgba(0,0,0,0);
+	}
 </#macro>
 <#macro script>
     $(function () {
@@ -28,7 +36,11 @@
 			startDate = $('#start-date').val();
 			endDate = $('#end-date').val() + ' 23:59:59';
 			combo();
+		}).on('touchend', '.list-layer', function () {
+			var $this = $(this);
+			$this.parent().find('.customer_name').find('.show-more-btn').trigger('touchend');
 		}).on('touchend', '.show-more-btn', function () {
+			showOrderProductDetail(this);
 			var $this = $(this);
 			var $detail = $this.parent().next();
 			if ($detail.is(':visible')) {
@@ -392,6 +404,7 @@
 		<main>
 			<div id="main">
 				<div class="weui-panel weui-panel_access" style="display: none">
+					<div class="list-layer"></div>
 					<div class="ft14 gray">
 						<span class="tag" id="receiveType">账期</span>
 						<span id="orderSn"></span>
@@ -402,7 +415,7 @@
 					</div>
 					<div class="customer_name gray">
 						<span id="customerName" class=""></span>
-						<span class="fr show-more-btn" id="showOrderProductDetail" onclick="showOrderProductDetail(this)">
+						<span class="fr show-more-btn" id="showOrderProductDetail">
 							显示详情 <i class="icon-angle-down"></i>
 						</span>
 						<input type="hidden" id="oId"></input>
