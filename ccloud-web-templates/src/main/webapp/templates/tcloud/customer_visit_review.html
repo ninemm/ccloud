@@ -109,11 +109,11 @@
                             var expectWidth = this.naturalWidth;
                             var expectHeight = this.naturalHeight;
 
-                            if (this.naturalWidth > this.naturalHeight && this.naturalWidth > 800) {
-                                expectWidth = 800;
+                            if (this.naturalWidth > this.naturalHeight && this.naturalWidth > 480) {
+                                expectWidth = 480;
                                 expectHeight = expectWidth * this.naturalHeight / this.naturalWidth;
-                            } else if (this.naturalHeight > this.naturalWidth && this.naturalHeight > 1200) {
-                                expectHeight = 1200;
+                            } else if (this.naturalHeight > this.naturalWidth && this.naturalHeight > 640) {
+                                expectHeight = 640;
                                 expectWidth = expectHeight * this.naturalWidth / this.naturalHeight;
                             }
 
