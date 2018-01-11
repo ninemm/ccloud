@@ -269,15 +269,17 @@ public class SalesOutstockQuery extends JBaseQuery {
 
 	public Page<Record> paginateForApp(int pageNumber, int pageSize, String keyword, String status,
 			String customerTypeId, String startDate, String endDate, String sellerId, String dataArea) {
-		String select = "select o.*, c.customer_name, ct.name as customerTypeName ";
+		String select = "select o.*, c.customer_name, ct.name as customerTypeName, t2.refundCount, t2.outCount ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_sales_outstock` o ");
 		fromBuilder.append("left join cc_seller_customer cc ON o.customer_id = cc.id ");
 		fromBuilder.append("left join cc_customer c on cc.customer_id = c.id ");
 		fromBuilder.append("left join cc_customer_type ct on o.customer_type_id = ct.id ");
-		fromBuilder.append("LEFT JOIN (SELECT IFNULL(SUM(cso.product_count),0) as outCount,if(cri.`status` = 1001,0,IFNULL(SUM(cr.reject_product_count),0)) as refundCount,cso.outstock_id FROM cc_sales_outstock_detail cso ");
-		fromBuilder.append("LEFT JOIN cc_sales_refund_instock_detail cr on cr.outstock_detail_id = cso.id ");
-		fromBuilder.append("LEFT JOIN cc_sales_refund_instock cri on cri.id = cr.refund_instock_id GROUP BY cso.outstock_id) t2 on t2.outstock_id = o.id "); 
+		fromBuilder.append("left join (SELECT cc.id, cc.outstock_id, IFNULL(SUM(cc.product_count),0) as outCount, IFNULL(t1.count, 0) AS refundCount ");
+		fromBuilder.append("FROM cc_sales_outstock_detail cc LEFT JOIN (SELECT SUM(cr.reject_product_count) AS count, cr.outstock_detail_id FROM cc_sales_refund_instock_detail cr ");
+		fromBuilder.append("LEFT JOIN cc_sales_refund_instock ci ON ci.id = cr.refund_instock_id where ci.`status` != ? ");
+		fromBuilder.append("GROUP BY cr.outstock_detail_id ) t1 ON cc.id = t1.outstock_detail_id GROUP BY cc.outstock_id ) t2 on t2.outstock_id = o.id ");
 		LinkedList<Object> params = new LinkedList<Object>();
+		params.add(Consts.SALES_REFUND_INSTOCK_CANCEL);
 		boolean needWhere = true;
 
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.outstock_sn", keyword, params, needWhere);
