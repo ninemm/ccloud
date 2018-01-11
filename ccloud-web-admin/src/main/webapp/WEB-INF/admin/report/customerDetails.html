@@ -49,7 +49,7 @@ initFields(), null);
 		jQuery.mm.initEditTableExport4('#_customerDetailsReportGift_table',urlGift, 
 
 initParams, initFieldsGift(), null);
-		$('button[title^=Export]').html('导出').addClass('btn-primary btn-sm');
+		$('button[title^=Export]').html('导出').attr('class','btn btn-sm btn-primary btn-flat');
 	});
 
 	var initParams = function(params) {
@@ -198,7 +198,7 @@ initParams, initFieldsGift(), null);
 						<input id="endDate" class="form-control" value="${endDate!}" name="endDate" placeholder="结束日期" >
 					</div>
 				</div>
-				<input onclick="prints()" class="btn btn-sm btn-primary" type="button" value="查询">
+				<input onclick="prints()" class="btn btn-sm btn-primary btn-flat" type="button" value="查询">
 			</div>
 		</form>
 		

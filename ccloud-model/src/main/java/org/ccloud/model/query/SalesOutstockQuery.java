@@ -286,7 +286,6 @@ public class SalesOutstockQuery extends JBaseQuery {
 		params.add(Consts.SALES_REFUND_INSTOCK_CANCEL);
 		boolean needWhere = true;
 
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.outstock_sn", keyword, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "o.status", status, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "o.customer_type_id", customerTypeId, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
@@ -298,6 +297,10 @@ public class SalesOutstockQuery extends JBaseQuery {
 		} else {
 			fromBuilder.append(" AND refundCount < outCount AND o.status != ? ");
 			params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
+		}
+		
+		if (StrKit.notBlank(keyword)) {
+			fromBuilder.append(" and (o.outstock_sn like '%" + keyword + "%' or c.customer_name like '%" + keyword + "%')");
 		}
 
 		if (StrKit.notBlank(startDate)) {

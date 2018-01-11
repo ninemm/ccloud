@@ -9,10 +9,28 @@
 </#macro>
 <#macro script>
   $(function () {
-  
-	$(document).on("change", "#status", function() {
+	<#if history??>
+		var statusName = getItemBykey("statusName");
+		var customerTypeName = getItemBykey("customerTypeName");
+		var dayName = getItemBykey("dayName");
+		var keywordName = getItemBykey("keyword");
+		$("#status").val(statusName);
+		$("#customerTypeId").val(customerTypeName);
+		$("#date").val(dayName);
+		$("#searchInput").val(keywordName);
+	<#else>
+		clearStorage();
+	</#if>
+	$(document).on("input", "#searchInput", function() {
+		setItemBykey("keyword", $("#searchInput").val());
+		combo();
+	}).on("change", "#status", function() {
+		setItemBykey("status", $("#status").data('values'));
+		setItemBykey("statusName", $("#status").val());	
 		combo();
 	}).on("change", "#customerTypeId", function() {
+		setItemBykey("customerTypeId", $("#customerTypeId").data('values'));
+		setItemBykey("customerTypeName", $("#customerTypeId").val());	
 		combo();
 	}).on("change", "#date", function() {
 		getDateOrder();
@@ -20,6 +38,8 @@
 	.on("touchend", "#combin-filter .confirm-search-btn", function() {
 		startDate = $('#start-date').val();
 		endDate = $('#end-date').val() + ' 23:59:59';
+		setItemBykey("startDate", startDate);
+		setItemBykey("endDate", endDate);	
 		combo();
 	});
 
@@ -81,17 +101,7 @@
 		$loading.show();
 		$noMore.hide();
 
-		var params = {
-			"page": page,
-			"size": size,
-			"keyword": keyword,
-			"status": $("#status").data('values'),
-			"customerTypeId": $("#customerTypeId").data('values'),
-			"startDate": startDate,
-			"endDate" : endDate
-		}
-
-
+		var params = getParam();
 		Utils.ajax('${CPATH}/refund/stockOrder', params, 
 			function(data){
 				$loading.hide();
@@ -133,6 +143,36 @@
 		);
 	}
 	
+	function getParam () {
+		<#if !history??>
+		var params = {
+			"page": page,
+			"size": size,
+			"keyword": $("#searchInput").val(),
+			"status": $("#status").data('values'),
+			"customerTypeId": $("#customerTypeId").data('values'),
+			"startDate": startDate,
+			"endDate" : endDate
+		}
+		<#else>
+		var keywordSession = getItemBykey("keyword");
+		var statusSession = getItemBykey("status");
+		var customerTypeIdSession = getItemBykey("customerTypeId");
+		var startDateSession = getItemBykey("startDate");
+		var endDateSession = getItemBykey("endDate");
+		var params = {
+			"page": page,
+			"size": size,
+			"keyword": keywordSession,
+			"status": statusSession,
+			"customerTypeId": customerTypeIdSession,
+			"startDate": startDateSession,
+			"endDate" : endDateSession
+		}		
+		</#if>		
+		return params;
+	}	
+	
 	function getDateOrder(){
 		var dateType = $("#date").data('values');
 		var date = new Date();
@@ -150,6 +190,9 @@
 		}
 
 		endDate = $.today() + ' 23:59:59';
+		setItemBykey("dayName", $("#date").val());
+		setItemBykey("startDate", startDate);
+		setItemBykey("endDate", endDate);			
 		combo();
 	}
 
@@ -191,7 +234,7 @@
 				</div>
 				<label class="weui-search-bar__label" id="searchText">
 					<i class="weui-icon-search"></i>
-					<span>请输入客户名</span>
+					<span>请输入客户名或出库单号</span>
 				</label>
 			</form>
 			<a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel" >取消</a>
@@ -254,7 +297,7 @@
 			  <span class="weui-loadmore__tips">暂无数据</span>
 			</div>
 		</main>
-		<article id="combin-filter" class="animated">
+		<article id="combin-filter" >
 			<div class="filter-item">
 				<h4>日期区间</h4>
 				<div class="relative weui-flex" id="getDate">

@@ -12,22 +12,38 @@
 	.list-layer {
 		position: absolute;
 		top:0;
-		bottom:0;
 		left:0;
 		right:4rem;
+		height:3rem;
 		background: rgba(0,0,0,0);
 	}
 </#macro>
 <#macro script>
     $(function () {
-  
+  		<#if history??>
+  			var statusName = getItemBykey("statusName");
+  			var customerTypeName = getItemBykey("customerTypeName");
+  			var dayName = getItemBykey("dayName");
+  			var keywordName = getItemBykey("keyword");
+  			$("#status").val(statusName);
+  			$("#customerTypeId").val(customerTypeName);
+  			$("#date").val(dayName);
+  			$("#searchInput").val(keywordName);
+  		<#else>
+  			clearStorage();
+  		</#if>  
 		$(document).on("input", "#searchInput", function() {
+			setItemBykey("keyword", $("#searchInput").val());
 			combo();
 		}).on("click", "#searchCancel", function() {
 			combo();
 		}).on("change", "#status", function() {
+			setItemBykey("status", $("#status").data('values'));
+			setItemBykey("statusName", $("#status").val());		
 			combo();
 		}).on("change", "#customerTypeId", function() {
+			setItemBykey("customerTypeId", $("#customerTypeId").data('values'));
+			setItemBykey("customerTypeName", $("#customerTypeId").val());		
 			combo();
 		}).on("change", "#date", function() {
 			getDateOrder();
@@ -35,6 +51,8 @@
 		.on("touchend", "#combin-filter .confirm-search-btn", function() {
 			startDate = $('#start-date').val();
 			endDate = $('#end-date').val() + ' 23:59:59';
+			setItemBykey("startDate", startDate);
+			setItemBykey("endDate", endDate);				
 			combo();
 		}).on('touchend', '.list-layer', function () {
 			var $this = $(this);
@@ -124,16 +142,7 @@
 		$loading.show();
 		$noMore.hide();
 
-		var params = {
-			"page": page,
-			"size": size,
-			"keyword": $("#searchInput").val(),
-			"status": $("#status").data('values'),
-			"customerTypeId": $("#customerTypeId").data('values'),
-			"startDate": startDate,
-			"endDate" : endDate
-		}
-
+		var params = getParam();
 		Utils.ajax('${CPATH}/order/orderList', params, 
 			function(data) {
 				$loading.hide();
@@ -213,6 +222,36 @@
 		);
 	}
 	
+	function getParam () {
+		<#if !history??>
+		var params = {
+			"page": page,
+			"size": size,
+			"keyword": $("#searchInput").val(),
+			"status": $("#status").data('values'),
+			"customerTypeId": $("#customerTypeId").data('values'),
+			"startDate": startDate,
+			"endDate" : endDate
+		}
+		<#else>
+		var keywordSession = getItemBykey("keyword");
+		var statusSession = getItemBykey("status");
+		var customerTypeIdSession = getItemBykey("customerTypeId");
+		var startDateSession = getItemBykey("startDate");
+		var endDateSession = getItemBykey("endDate");
+		var params = {
+			"page": page,
+			"size": size,
+			"keyword": keywordSession,
+			"status": statusSession,
+			"customerTypeId": customerTypeIdSession,
+			"startDate": startDateSession,
+			"endDate" : endDateSession
+		}		
+		</#if>		
+		return params;
+	}	
+	
 	function getDateOrder(){
 		var dateType = $("#date").data('values');
 		var date = new Date();
@@ -230,6 +269,9 @@
 		}
 
 		endDate = $.today() + ' 23:59:59';
+		setItemBykey("dayName", $("#date").val());
+		setItemBykey("startDate", startDate);
+		setItemBykey("endDate", endDate);		
 		combo();
 	}
 
@@ -457,7 +499,7 @@
 		</main>
 	</article>
 </div>
-<article id="combin-filter" class="animated">
+<article id="combin-filter" >
 	<div class="filter-item">
 		<h4>日期区间</h4>
 		<div class="relative weui-flex" id="getDate">

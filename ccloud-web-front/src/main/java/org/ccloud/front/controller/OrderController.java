@@ -71,6 +71,8 @@ public class OrderController extends BaseFrontController {
 			customerTypes.add(item);
 		}
 
+		String history = getPara("history");
+		setAttr("history", history);		
 		setAttr("customerTypes", JSON.toJSON(customerTypes));
 		render("myOrder.html");
 	}

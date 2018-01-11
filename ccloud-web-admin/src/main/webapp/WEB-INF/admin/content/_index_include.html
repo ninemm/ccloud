@@ -37,7 +37,7 @@
 		<form class="form-horizontal" method="POST" style="float: right" action="${CPATH}/admin/content?m=${m!}&p=${p!}&c=${c!}&s=${s!}&tids=${tids!}">
 			<div class="input-group input-group-sm">
 				<input id="post-search-input" class="form-control" type="search" value="${k!}" name="k" placeholder="请输入关键词">&nbsp;&nbsp;
-				<input id="search-submit" class="btn btn-default btn-sm" type="submit" value="搜索">
+				<input id="search-submit" class="btn btn-sm btn-primary btn-flat" type="submit" value="搜索">
 			</div>
 		</form>
 	</div>
@@ -51,7 +51,7 @@
 			</select>
 		</div>
 		<div class="jp-left  ">
-			<button class="btn btn-block btn-sm btn-default" type="button" onclick="batchAction()">应用</button>
+			<button class="btn btn-sm btn-primary btn-flat" type="button" onclick="batchAction()">应用</button>
 		</div>
 		
 		<#if _taxonomyMap ??>
@@ -73,7 +73,7 @@
 		<div class="jp-left  ">
 			<form action="${CPATH}/admin/content?m=${m!}&p=${p!}&c=${c!}&s=${s!}&k=${k!}" method="POST">
 			<input type="hidden"  class="tids" name="tids" >
-			<input type="submit" class="btn btn-block btn-sm btn-default" value="筛选" />
+			<input type="submit" class="btn btn-sm btn-primary btn-flat" value="筛选" />
 			</form>
 		</div>
 		</#if>	

@@ -35,14 +35,14 @@ function batchAction() {
 	<div class="row content-row">
 		<div class="jp-left">
 		<@shiro.hasPermission name="/admin/role/edit,/admin/all">
-			<a href="${CPATH}/admin/role/edit?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-plus"></i> 新增 </a>
+			<a href="${CPATH}/admin/role/edit?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat btn-flat"><i class="fa fa-plus"></i> 新增 </a>
 			<a href="javascript:void(0);" onclick="batchAction()" class="btn btn-sm btn-danger btn-flat"><i class="fa fa-remove"></i> 删除 </a>
 		</@shiro.hasPermission>
 		</div>
 		<form class="form-horizontal" style="float: right" action="${CPATH}/admin/role?c=${c!}&p=${p!}" method="post">
 			<div class="input-group input-group-sm">
 				<input id="post-search-input" class="form-control" type="search" value="${k!}" name="k" placeholder="搜索名称">&nbsp; 
-				<input id="search-submit" class="btn btn-default btn-sm btn-flat" type="submit" value="搜索">
+				<input id="search-submit" class="btn btn-sm btn-primary btn-flat" type="submit" value="搜索">
 			</div>
 		</form>
 	</div>
@@ -55,11 +55,11 @@ function batchAction() {
 		</div>
 		
 		<div class="jp-left">
-			<button class="btn btn-sm btn-default" type="button" onclick="batchAction()">&nbsp;应用</button>
+			<button class="btn btn-sm btn-primary btn-flat" type="button" onclick="batchAction()">&nbsp;应用</button>
 		</div>
 		
 		<div class="jp-right">
-			<a href="${CPATH}/admin/systems/edit?c=${c!}&p=${p!}" class="btn btn-sm btn-primary"> 新增 </a>
+			<a href="${CPATH}/admin/systems/edit?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"> 新增 </a>
 		</div>
 	</div> -->
 	<div class="box ">
