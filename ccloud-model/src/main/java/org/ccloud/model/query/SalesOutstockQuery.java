@@ -170,12 +170,16 @@ public class SalesOutstockQuery extends JBaseQuery {
 		fromBuilder.append("left join cc_customer_type ct on ct.id = o.customer_type_id ");
 		
 		if (StrKit.notBlank(status)) {
-			fromBuilder.append("LEFT JOIN (SELECT IFNULL(SUM(cso.product_count),0) as outCount,if(cri.`status` = 1001,0,IFNULL(SUM(cr.reject_product_count),0)) as refundCount,cso.outstock_id FROM cc_sales_outstock_detail cso ");
-			fromBuilder.append("LEFT JOIN cc_sales_refund_instock_detail cr on cr.outstock_detail_id = cso.id ");
-			fromBuilder.append("LEFT JOIN cc_sales_refund_instock cri on cri.id = cr.refund_instock_id GROUP BY cso.outstock_id) t2 on t2.outstock_id = o.id "); 
+			fromBuilder.append("left join (SELECT cc.id, cc.outstock_id, IFNULL(SUM(cc.product_count),0) as outCount, IFNULL(t1.count, 0) AS refundCount ");
+			fromBuilder.append("FROM cc_sales_outstock_detail cc LEFT JOIN (SELECT SUM(cr.reject_product_count) AS count, cr.outstock_detail_id FROM cc_sales_refund_instock_detail cr ");
+			fromBuilder.append("LEFT JOIN cc_sales_refund_instock ci ON ci.id = cr.refund_instock_id where ci.`status` != ? ");
+			fromBuilder.append("GROUP BY cr.outstock_detail_id ) t1 ON cc.id = t1.outstock_detail_id GROUP BY cc.outstock_id ) t2 on t2.outstock_id = o.id ");
 		}
 
 		LinkedList<Object> params = new LinkedList<Object>();
+		if (StrKit.notBlank(status)) {
+			params.add(Consts.SALES_REFUND_INSTOCK_CANCEL);
+		}		
 		boolean needWhere = true;
 
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
