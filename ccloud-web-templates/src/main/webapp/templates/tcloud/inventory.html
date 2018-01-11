@@ -22,6 +22,7 @@
 	var loading = false;	
 	var $main = $("#inventory_detailList");
 	var newHtml = $(".product_detail").eq(0).html();
+	var warehouseIds = "${(wareHouseIds)!}";
 
     var $endNode = null;
     var $loadmore = $(".weui-loadmore");
@@ -33,6 +34,7 @@
             "startDate": startDate,
             "endDate": endDate + " 23:59:59",
             "warehouseId": $("#wareHouse").data('values'),
+            "warehouseIds": $("#wids").val(),
             categoryId: categoryId
         };
     }
@@ -112,6 +114,7 @@
             "startDate": startDate,
             "endDate": endDate + " 23:59:59",
             "warehouseId": $("#wareHouse").data('values'),
+            "warehouseIds": $("#wids").val(),
             categoryId: categoryId
 		}		
 		Utils.ajax('${CPATH}/inventory/inventory', params, 
@@ -180,6 +183,7 @@
                             <input type="text" id="wareHouse" placeholder="仓库" class="weui-input" readonly>
                             <i class="icon-sort-desc"></i>
                         </div>
+                        <input type="hidden" id="wids" name="wids[]" value="${(wareHouseIds)!}">
 						<div class="weui-flex__item">
 							<input type="text" id="startDate" class="weui-input" readonly>
 							<i class="icon-sort-desc"></i>

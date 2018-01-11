@@ -91,6 +91,10 @@
             }
         });
     }
+    
+    function orderAgain(id) {
+		 window.location.href = "${CPATH}/order/getOldOrder?orderId=" + id;
+    }
 </#macro>
 <@layout>
 <div id="history" class="ft12 weui-content">
@@ -122,7 +126,7 @@
                         <hr>
                         <div>
                             <#if order.status = 0><div class="button white-button fl">撤销</div></#if>
-                            <div class="button red-button fr">再次购买</div>
+                            <div class="button red-button fr" onclick="orderAgain('${(order.id)!}')">再次购买</div>
                         </div>
                     </div>
             </#list>

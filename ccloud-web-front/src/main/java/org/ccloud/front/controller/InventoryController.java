@@ -20,6 +20,7 @@ import org.ccloud.route.RouterMapping;
 
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.kit.JsonKit;
+import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 
@@ -32,11 +33,19 @@ public class InventoryController extends BaseFrontController {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		List<Warehouse> wareHouseList = new ArrayList<>();
+		String wareHouseIds = "";
 		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/dealer/all");
 		if (isSuperAdmin) {
 			wareHouseList = WarehouseQuery.me().findByDataArea(dataArea);
 		} else {
 			wareHouseList = WarehouseQuery.me().findWarehouseByUserId(user.getId());
+		}
+		for (int i = 0; i < wareHouseList.size(); i++) {
+			if (i == wareHouseList.size() - 1) {
+				wareHouseIds = wareHouseIds + wareHouseList.get(i).getId();
+			} else {
+				wareHouseIds = wareHouseIds + wareHouseList.get(i).getId() + ",";
+			}
 		}
 		List<GoodsCategory> categoryList = GoodsCategoryQuery.me().findProductCategory(sellerId);
 		List<Map<String, Object>> regionList = new ArrayList<>();
@@ -49,7 +58,8 @@ public class InventoryController extends BaseFrontController {
 			item.put("title", wareHouse.getName());
 			item.put("value", wareHouse.getId());
 			regionList.add(item);
-		}		
+		}	
+		setAttr("wareHouseIds", wareHouseIds);
 		setAttr("categoryList", categoryList);
 		setAttr("wareHouseList", JsonKit.toJson(regionList));
 		render("inventory.html");
@@ -58,6 +68,7 @@ public class InventoryController extends BaseFrontController {
 	//库存详情
 	@RequiresPermissions(value = { "/front/inventory", "/admin/dealer/all" }, logical = Logical.OR)
 	public void inventory() {
+		String[] warehouseIds = getWareHouseIdsList(getPara("warehouseIds"));
 		String warehouseId = getPara("warehouseId");
 		String categoryId = getPara("categoryId");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
@@ -65,9 +76,17 @@ public class InventoryController extends BaseFrontController {
 		String endDate = getPara("endDate");
 		String search = getPara("search");
 		Page<Record> inventoryList = InventoryQuery.me().
-				findInventoryDetailByParams(getPageNumber(), getPageSize(), startDate, endDate, warehouseId, categoryId, dataArea, search);
+				findInventoryDetailByParams(getPageNumber(), getPageSize(), startDate, endDate, warehouseId, warehouseIds, categoryId, dataArea, search);
 		Map<String, Object> map = ImmutableMap.of("total", inventoryList.getTotalRow(), "rows", inventoryList.getList());
 		renderJson(map);
+	}
+
+	private String[] getWareHouseIdsList(String para) {
+		if (StrKit.notBlank(para)) {
+			String[] ids = para.split(",");
+			return ids;
+		}
+		return null;
 	}
 	
 }
