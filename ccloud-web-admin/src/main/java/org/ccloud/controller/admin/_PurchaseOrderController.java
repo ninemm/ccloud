@@ -234,8 +234,6 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		
 		renderAjaxResultForSuccess("OK");
 	}
-
-
 	
 	@Override
 	@Before(Tx.class)
@@ -382,6 +380,4 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		
 		renderAjaxResultForSuccess("OK");
 	} 
-	
-	
 }
