@@ -231,10 +231,10 @@
 	              <input type="hidden" name="smallUnit" id="smallUnit" value="${(orderDetail.small_unit)!}">
 		          <#if orderDetail.is_gift??>
 		            <#if orderDetail.is_gift = 0>
-		              <div class="p-l-15 modify_price todo-product-box">
+		              <div class="modify_price todo-product-box">
 										<img src="${CTPATH}/images/jp.jpg" alt="">
 		                <p>${orderDetail.custom_name!}</p>
-		                <div class="weui-flex">
+		                <div class="p-l-15">
 		                  <div class="weui-flex__item">
 		                    <div class="fl">
 		                      <input type="hidden" name="bigPriceSpan" id="bigPriceSpan" value="${(orderDetail.product_price)!}">
@@ -266,7 +266,7 @@
 		                    ${(orderDetail.big_unit)!}
 		                  </div>
 		                </div>
-		                <div class="weui-flex">
+		                <div class="p-l-15">
 		                  <div class="weui-flex__item">
 		                    <div class="fl">
 		                      <input type="hidden" name="smallPriceSpan" id="smallPriceSpan" value="${(orderDetail.product_price / orderDetail.convert_relate)?string('0.##')}">
@@ -301,7 +301,7 @@
 		              </div>
 		            </#if>
 		            <#if orderDetail.is_gift = 1>
-		              <div class="p-l-15 modify_price todo-product-box">
+		              <div class="modify_price todo-product-box">
 										<img src="${CTPATH}/images/jp.jpg" alt="">
 		                <p><span class="tag">赠品</span>${orderDetail.custom_name!} / ${(orderDetail.valueName)!}</p>
 		                <div class="t-r relative">
