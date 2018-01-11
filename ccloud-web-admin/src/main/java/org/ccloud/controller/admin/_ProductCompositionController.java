@@ -35,6 +35,7 @@ import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.model.ProductComposition;
+import org.ccloud.model.SalesOrder;
 import org.ccloud.model.SellerProduct;
 import org.ccloud.model.User;
 import org.ccloud.model.query.ProductCompositionQuery;
@@ -344,15 +345,14 @@ public class _ProductCompositionController extends JBaseCRUDController<ProductCo
         		String orderId = StrKit.getRandomUUID();
         		Date date = new Date();
         		String OrderSO = SalesOrderQuery.me().getNewSn(sellerId);
+        		BigDecimal totalCount = new BigDecimal(0);
 
         		// 销售订单：SO + 100000(机构编号或企业编号6位) + A(客户类型) + 171108(时间) + 100001(流水号)
         		String orderSn = "SO" + sellerCode + StringUtils.getArrayFirst(paraMap.get("customerTypeCode"))
         				+ DateUtils.format("yyMMdd", date) + OrderSO;
 
-        		if(!SalesOrderQuery.me().insertOrderByComposition(paraMap, orderId, orderSn, sellerId, user.getId(), date, user.getDepartmentId(),
-        				user.getDataArea())) {
-        			return false;
-        		}
+        		SalesOrder salesOrder =  SalesOrderQuery.me().insertOrderByComposition(paraMap, orderId, orderSn, sellerId, user.getId(), date, user.getDepartmentId(),
+        				user.getDataArea());
 
         		while (productNum > count) {
         			index++;
@@ -363,6 +363,7 @@ public class _ProductCompositionController extends JBaseCRUDController<ProductCo
         			if (StrKit.notBlank(productId)) {
 	        			List<SellerProduct> list = SellerProductQuery.me().findByCompositionId(productId);
 	        			for (SellerProduct sellerProduct : list) {
+	        				totalCount = totalCount.add(calculateTotalCount(sellerProduct, Integer.parseInt(number)));
 	        				if(!SalesOrderDetailQuery.me().insertDetailByComposition(sellerProduct, orderId, sellerId, sellerCode, user.getId(), date,
 	        						user.getDepartmentId(), user.getDataArea(), index, Integer.parseInt(number), user.getId())) {
 	        					return false;
@@ -371,10 +372,21 @@ public class _ProductCompositionController extends JBaseCRUDController<ProductCo
 	        			count++;
         			}
         		}
+        		salesOrder.setTotalCount(totalCount);
+        		if (!salesOrder.save()) {
+        			return false;
+        		}
             	return true;
             }
+
         });
         return isSave;
-	}	
+	}
+	
+	private BigDecimal calculateTotalCount(SellerProduct sellerProduct, Integer num) {
+		BigDecimal total = new BigDecimal(0);
+		total = new BigDecimal(sellerProduct.getStr("productCount")).multiply(new BigDecimal(num));
+		return total;
+	}
 	
 }

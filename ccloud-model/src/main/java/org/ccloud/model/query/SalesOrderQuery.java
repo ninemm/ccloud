@@ -359,7 +359,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		return Db.paginate(pageNumber, pageSize, select, sql.toString(), params.toArray());
 	}
 
-	public boolean insertOrderByComposition(Map<String, String[]> paraMap, String orderId, String orderSn,
+	public SalesOrder insertOrderByComposition(Map<String, String[]> paraMap, String orderId, String orderSn,
 			String sellerId, String userId, Date date, String deptId, String dataArea) {
 		SalesOrder salesOrder = new SalesOrder();
 		salesOrder.setId(orderId);
@@ -383,7 +383,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		salesOrder.setCreateDate(date);
 		salesOrder.setDeptId(deptId);
 		salesOrder.setDataArea(dataArea);
-		return salesOrder.save();
+		return salesOrder;
 	}
 	
 	public List<SalesOrder> getToDo(String username) {

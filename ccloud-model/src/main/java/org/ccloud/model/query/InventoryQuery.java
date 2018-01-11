@@ -22,6 +22,7 @@ import java.util.List;
 import org.ccloud.Consts;
 import org.ccloud.model.Inventory;
 
+import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
@@ -188,7 +189,7 @@ public class InventoryQuery extends JBaseQuery {
 	}
 
 	public Page<Record> findInventoryDetailByParams(int pageNumber, int pageSize, String startDate, String endDate,
-			String warehouseId, String categoryId, String dataArea, String search) {
+			String warehouseId, String[] warehouseIds, String categoryId, String dataArea, String search) {
 		String select = "select cc.warehouse_id, cc.sell_product_id, cc.data_area, se.seller_name, se.id, cw.`name`, cs.custom_name, cgc.`name` as categoryName, cgc.id as categoryId, IFNULL(SUM(t1.outCount), 0) as outCount, IFNULL(SUM(t1.inCount), 0) as inCount, IFNULL(t2.balance_count,0) as balance_count";
 		StringBuilder fromBuilder = new StringBuilder("FROM cc_inventory_detail cc ");
 		fromBuilder.append("LEFT JOIN cc_seller_product cs on cs.id = cc.sell_product_id ");
@@ -210,7 +211,11 @@ public class InventoryQuery extends JBaseQuery {
 		boolean needWhere = true;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cc.data_area", dataArea, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "cgc.id", categoryId, params, needWhere);
-		needWhere = appendIfNotEmpty(fromBuilder, "cc.warehouse_id", warehouseId, params, needWhere);
+		if (StrKit.notBlank(warehouseId)) {
+			needWhere = appendIfNotEmpty(fromBuilder, "cc.warehouse_id", warehouseId, params, needWhere);
+		} else {
+			needWhere = appendIfNotEmpty(fromBuilder, "cc.warehouse_id", warehouseIds, params, needWhere);
+		}
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cs.custom_name", search, params, needWhere);
 		fromBuilder.append("GROUP BY cc.warehouse_id, cc.sell_product_id ORDER BY cc.create_date desc");
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
