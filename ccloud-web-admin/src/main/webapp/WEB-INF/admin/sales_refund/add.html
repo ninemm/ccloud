@@ -224,7 +224,7 @@
 			toastr.error('商品退货数量不能为零!','操作失败');
 			return;			
 		}		
-		var l = Ladda.create( document.querySelector( '.btn-flat' ) );
+		var l = Ladda.create( document.querySelector( '.ladda-button' ) );
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
 				var validate = $form.data('bootstrapValidator');
@@ -479,7 +479,7 @@
 			</div>
 
 			<div class="box-footer"> 
-				<button type="button" onclick="doSubmit()" class="btn btn-sm btn-primary btn-flat" data-style="expand-right"><span class="ladda-label">提交订单</span></button>
+				<button type="button" onclick="doSubmit()" class="btn btn-sm btn-primary btn-flat ladda-button" data-style="expand-right"><span class="ladda-label">提交订单</span></button>
 				<input type="button" class="btn btn-sm btn-danger btn-flat" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
 			</div>
 		</form>
