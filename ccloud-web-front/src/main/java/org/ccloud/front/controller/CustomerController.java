@@ -50,7 +50,7 @@ public class CustomerController extends BaseFrontController {
 	@Before(WechatJSSDKInterceptor.class)
 	public void index() {
 
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
 		
 		String key = getPara("searchKey");
 		String hasOrder = getPara("isOrdered");
@@ -64,7 +64,7 @@ public class CustomerController extends BaseFrontController {
 
 	public void getCustomerRegionAndType() {
 
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
 
 		List<Record> userList = UserQuery.me().findNextLevelsUserList(selectDataArea);
 		List<Map<String, Object>> region = new ArrayList<>();
@@ -80,8 +80,8 @@ public class CustomerController extends BaseFrontController {
 			region.add(item);
 		}
 
-		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
-		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(dataArea + "%");
+		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
+		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(dataArea);
 		List<Map<String, Object>> customerTypeList2 = new ArrayList<>();
 		customerTypeList2.add(all);
 
@@ -106,7 +106,7 @@ public class CustomerController extends BaseFrontController {
 	}
 
 	public void refresh() {
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
 
 		Page<Record> customerList = new Page<>();
 		if (StrKit.notBlank(getPara("region"))) {
@@ -244,10 +244,10 @@ public class CustomerController extends BaseFrontController {
 	}
 
 	public void refreshHistoryOrder() {
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
 
 		Page<Record> orderList = new Page<>();
-		orderList = SalesOrderQuery.me().findBySellerCustomerId(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("sellerCustomerId"), selectDataArea + "%");
+		orderList = SalesOrderQuery.me().findBySellerCustomerId(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("sellerCustomerId"), selectDataArea);
 
 		StringBuilder html = new StringBuilder();
 		for(Record order : orderList.getList()){
@@ -287,10 +287,10 @@ public class CustomerController extends BaseFrontController {
 
 	public void historyOrder() {
 		
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
 		String sellerCustomerId = getPara("sellerCustomerId");
 
-		Page<Record> orderList = SalesOrderQuery.me().findBySellerCustomerId(getPageNumber(), getPageSize(), sellerCustomerId, selectDataArea + "%");
+		Page<Record> orderList = SalesOrderQuery.me().findBySellerCustomerId(getPageNumber(), getPageSize(), sellerCustomerId, selectDataArea);
 
 		// 需要修改，使用字典来显示，不用在这个地方做查询
 		for(Record record : orderList.getList()){
@@ -324,8 +324,8 @@ public class CustomerController extends BaseFrontController {
 
 	public List<Map<String, Object>> getCustomerType(){
 
-		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
-		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(dataArea + "%");
+		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
+		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(dataArea);
 		List<Map<String, Object>> list = new ArrayList<>();
 
 		for(CustomerType customerType : customerTypeList)
@@ -485,7 +485,7 @@ public class CustomerController extends BaseFrontController {
 		}
 		CookieUtils.put(this, taskId,taskId);
 		
-		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 		List<String> custTypeNameList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeNameListBySellerCustomerId(id, dealerDataArea);
 		String custTypeNames = Joiner.on(",").skipNulls().join(custTypeNameList);
 		setAttr("custTypeNames", custTypeNames);
@@ -897,5 +897,36 @@ public class CustomerController extends BaseFrontController {
 			message.update();
 		}
 		render("customer_detail.html");
+	}
+
+	public void importCustomer() {
+		render("customer_import.html");
+	}
+
+	public void  getImportCustomerList(){
+		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
+		User user = (User) getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String dataArea = user.getDataArea();
+		String customerName = getPara("keyword");
+
+		Page<Record> customerList = SellerCustomerQuery.me().findImportCustomer(getPageNumber(), getPageSize(), dealerDataArea, dataArea, customerName);
+		Map<String, Object> map = new HashMap<>();
+		map.put("customerList", customerList.getList());
+		renderJson(map);
+	}
+
+	@Before(WechatJSSDKInterceptor.class)
+	public void gotoEdit() {
+		String id = getPara("id");
+
+		if (StrKit.notBlank(id)) {
+
+			SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(id);
+			setAttr("sellerCustomer", sellerCustomer);
+
+		}
+		setAttr("type", "add");
+		setAttr("customerType", JSON.toJSONString(getCustomerType()));
+		render("customer_edit.html");
 	}
 }

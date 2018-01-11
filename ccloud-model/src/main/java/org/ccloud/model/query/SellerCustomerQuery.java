@@ -330,4 +330,49 @@ public class SellerCustomerQuery extends JBaseQuery {
 		appendIfNotEmptyWithLike(sql, "cujc.data_area", dataArea, param, true);
 		return Db.find(sql.toString(), param.toArray());
 	}
+
+	public Page<Record> findImportCustomer(int pageNumber, int pageSize, String selectDataArea, String userDataArea, String searchKey) {
+		boolean needwhere = false;
+		LinkedList<Object> params = new LinkedList<Object>();
+
+		String select = "SELECT c.id,c.customer_name,c.contact,c.mobile,c.prov_name,c.city_name,c.country_name,c.address,c.sellerCustomerId ";
+		StringBuilder sql = new StringBuilder(
+				"FROM (SELECT c.id,c.customer_name,c.contact,c.mobile,c.prov_name,c.city_name,c.country_name,c.address,csc.id as sellerCustomerId ");
+		sql.append("FROM cc_user_join_customer cujc ");
+		sql.append("LEFT JOIN cc_customer_join_customer_type ccjct ON cujc.seller_customer_id = ccjct.seller_customer_id ");
+		sql.append("LEFT JOIN cc_seller_customer csc ON cujc.seller_customer_id = csc.id ");
+		sql.append("LEFT JOIN cc_customer c ON csc.customer_id = c.id ");
+		sql.append("LEFT JOIN cc_sales_order cso ON cujc.seller_customer_id = cso.customer_id AND cujc.data_area = cso.data_area ");
+
+		if (StrKit.notBlank(searchKey)) {
+			sql.append("WHERE ( c.customer_name LIKE ? OR c.contact LIKE ? ) ");
+			if (searchKey.contains("%")) {
+				params.add(searchKey);
+				params.add(searchKey);
+			} else {
+				params.add("%" + searchKey + "%");
+				params.add("%" + searchKey + "%");
+			}
+		} else {
+			sql.append("WHERE c.customer_name is not null ");
+			needwhere = false;
+		}
+
+		needwhere = appendIfNotEmptyWithLike(sql, "cujc.data_area", selectDataArea, params, needwhere);
+		sql.append(" AND csc.customer_id not in ( ");
+		sql.append("SELECT cc.id ");
+
+		sql.append("FROM cc_user_join_customer cujc ");
+		sql.append("LEFT JOIN cc_seller_customer csc ON cujc.seller_customer_id = csc.id ");
+		sql.append("LEFT JOIN cc_customer cc ON csc.customer_id = cc.id ");
+		sql.append("WHERE cujc.data_area = ?) ");
+
+		params.add(userDataArea);
+
+		sql.append("GROUP BY c.id ");
+
+		sql.append(") AS c");
+		return Db.paginate(pageNumber, pageSize, select, sql.toString(), params.toArray());
+
+	}
 }
