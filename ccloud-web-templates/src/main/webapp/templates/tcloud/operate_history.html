@@ -6,7 +6,9 @@
 }
 </#macro>
 <#macro script>
-
+	function getback() {
+		window.location.href = '${CPATH}/order/myOrder?history=' + 1;	
+	}
 </#macro>
 
 <@layout>
@@ -88,6 +90,9 @@
       </div>
     </div> -->
   </main>
-  <#include "_inc/_goback_bottom.html" />
+<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
+    <button class="white-button-no-border weui-flex__item _submit_btn border-top-1px return_index">首页</button>
+    <button class="red-button weui-flex__item _submit_btn" onClick="getback()">返回</button>
+</footer>
 </body>
 </@layout>

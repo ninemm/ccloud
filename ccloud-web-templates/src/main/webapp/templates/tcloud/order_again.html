@@ -137,6 +137,10 @@ $(function() {
 			}
 		});
 	}
+	
+	function getback() {
+		window.location.href = '${CPATH}/order/myOrder?history=' + 1;	
+	} 	
 </#macro>
 
 <@layout>
@@ -314,7 +318,14 @@ $(function() {
 				</div>
 				<input type="hidden" id="total" name="total" value="">
 			</main>
-			<#include "_inc/_goback.html" />
+			<div class="hidden-menu">
+				<ul>
+					<li><a href="${CPATH}/">首页<img src="${CTPATH}/images/home.png" alt=""></a></li>
+					<li><a onclick="getback()">返回<img src="${CTPATH}/images/goback.png" alt=""></a></li>
+				</ul>
+				<img src="${CTPATH}/images/add.png" alt="" id="button" class="fr">
+			</div>
+			<div class="layer"></div>
 			<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
 				<p class="total bg-gray weui-flex__item" id="totalNum">共2款，总数10件&nbsp;总额：2600元</p>
 				<button onclick="doSubmit()" type="button" id="placeOrder" class="place-order red-button">提交订单</button>

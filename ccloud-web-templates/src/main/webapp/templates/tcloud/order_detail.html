@@ -6,7 +6,9 @@
     function orderAgain() {
         window.location.href = "${CPATH}/order/getOldOrder?orderId=${order.id}";
     }
-    
+	function getback() {
+		window.location.href = '${CPATH}/order/myOrder?history=' + 1;	
+	}    
     function cancel() {
     	$.confirm({
 						title: "订单撤销",
@@ -120,12 +122,19 @@
 				<span class="weui-cell__ft"></span>
 			</div>
 		</a> </main>
-		<#include "_inc/_goback.html" />
+		<div class="hidden-menu">
+			<ul>
+				<li><a href="${CPATH}/">首页<img src="${CTPATH}/images/home.png" alt=""></a></li>
+				<li><a onclick="getback()">返回<img src="${CTPATH}/images/goback.png" alt=""></a></li>
+			</ul>
+			<img src="${CTPATH}/images/add.png" alt="" id="button" class="fr">
+		</div>
+		<div class="layer"></div>
 		<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
 			<#if order.status == 0>
 			<button onclick="cancel()" class="white-button-no-border weui-flex__item border-top-1px">撤销</button>
 			<#else>
-			<button onclick="historyUtils.back();" class="white-button-no-border weui-flex__item">返回</button>
+			<button onclick="getback()" class="white-button-no-border weui-flex__item">返回</button>
 			</#if>
 			<button onclick="orderAgain()" class="red-button weui-flex__item">再次购买</button>
 		</footer>

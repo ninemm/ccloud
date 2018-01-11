@@ -103,6 +103,10 @@ $(function() {
 			}
         });
 	}
+	
+	function getback() {
+		window.location.href = '${CPATH}/refund/index?history=' + 1;	
+	}	
 </#macro>
 
 <@layout>
@@ -291,7 +295,14 @@ $(function() {
 				</div>
 			</form>			
 		</main>
-		<#include "_inc/_goback.html" />
+		<div class="hidden-menu">
+			<ul>
+				<li><a href="${CPATH}/">首页<img src="${CTPATH}/images/home.png" alt=""></a></li>
+				<li><a onClick="getback()">返回<img src="${CTPATH}/images/goback.png" alt=""></a></li>
+			</ul>
+			<img src="${CTPATH}/images/add.png" alt="" id="button" class="fr">
+		</div>
+		<div class="layer"></div>
 		<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
 			<button onclick="doSubmit()" class="place-order red-button width-100">提交订单</button>
 		</footer>
