@@ -339,7 +339,7 @@
 
 		<form action="${CPATH}/admin/salesRefund/save" method="post" id="form" class="form-horizontal" >
 			<div class="box-body">
-				<a onclick="outstockIndex()" class="btn btn-sm btn-primary"> 选择出库单 </a>
+				<a onclick="outstockIndex()" class="btn btn-sm btn-primary btn-flat"> 选择出库单 </a>
 				<table id="table" class="table table-bordered table-hover text-center" width="100%">
 					<thead>
 						<tr>
@@ -479,8 +479,8 @@
 			</div>
 
 			<div class="box-footer"> 
-				<button type="button" onclick="doSubmit()" class="btn btn-primary ladda-button" data-style="expand-right"><span class="ladda-label">提交订单</span></button>
-				<input type="button" class="btn btn-primary" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
+				<button type="button" onclick="doSubmit()" class="btn btn-sm btn-primary btn-flat" data-style="expand-right"><span class="ladda-label">提交订单</span></button>
+				<input type="button" class="btn btn-sm btn-danger btn-flat" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
 			</div>
 		</form>
 	</div>

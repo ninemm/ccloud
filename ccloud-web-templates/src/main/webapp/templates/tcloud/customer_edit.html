@@ -271,7 +271,7 @@
             'getLocation'
         ]
     });
-    
+
     wx.ready(function() {
         // 获取定位信息
         wx.getLocation({
@@ -281,7 +281,7 @@
                 var longitude = res.longitude;                    // 经度，浮点数，范围为180 ~ -180。
                 var speed = res.speed;                            // 速度，以米/每秒计
                 var accuracy = res.accuracy;                      // 位置精度
-                
+
                 var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
                 var geoc = new BMap.Geocoder();                   // 获取百度地址解析器
 
@@ -359,7 +359,9 @@
 		<main>
 		    <form action="${CPATH}/customer/save" method="post" id="form">
 			    <section class="weui-panel weui-panel_access order-customer-info select-area">
+                    <#if !type??>
 			        <input type="hidden" name="sellerCustomer.id" value="${(sellerCustomer.id)!}">
+                    </#if>
                     <input type="hidden" id="oldPic" name="oldPic">
 			        <div class="weui-cell weui-cell_access">
 			            <div class="weui-cell__bd">
@@ -476,12 +478,16 @@
             </div>
 		<#include "_inc/_goback.html" />
 		<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
-		    <#if sellerCustomer??> 
+		    <#if type??>
+                <button class="white-button-no-border weui-flex__item _submit_btn border-top-1px" onclick="window.location.href='${CPATH}/customer/importCustomer'">导入</button>
+                <button class="red-button weui-flex__item _submit_btn" onclick="doSubmit()">新增</button>
+            <#elseif sellerCustomer??>
 		        <button class="white-button-no-border weui-flex__item _submit_btn border-top-1px" onclick="doEnabled()">停用</button>
 		        <button class="red-button weui-flex__item _submit_btn" onclick="doSubmit()">更新</button>
 		    <#else>
-		        <button class="red-button width-100 _submit_btn" onclick="doSubmit()">新增客户</button>
-		    </#if>
+                <button class="white-button-no-border weui-flex__item _submit_btn border-top-1px" onclick="window.location.href='${CPATH}/customer/importCustomer'">导入</button>
+                <button class="red-button weui-flex__item _submit_btn" onclick="doSubmit()">新增</button>
+            </#if>
 		</footer>
 	</div>
 </div>

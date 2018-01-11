@@ -30,7 +30,7 @@
 		jQuery.mm.initValidator('#form', validatorFields);
 		jQuery.mm.initEditTableExport('#_departmentProductReport_table',url, initParams, initFields(), null);
 		jQuery.mm.initEditTableExport2('#_departmentProductReportGift_table',urlGift, initParams, initFieldsGift(), null);
-		$('button[title^=Export]').html('导出').addClass('btn-primary btn-sm');
+		$('button[title^=Export]').html('导出').attr('class','btn btn-sm btn-primary btn-flat');
 	});
 
 	var initParams = function(params) {
@@ -161,7 +161,7 @@
 						</div>
 					</div>
 					
-					<input id="search-submit" class="btn btn-sm btn-primary" type="button" value="搜索">
+					<input id="search-submit" class="btn btn-sm btn-primary btn-flat" type="button" value="搜索">
 				</div>
 			</div>
 		</form>

@@ -83,6 +83,10 @@
 
 
     function initCustomer() {
+
+        $loading.show();
+        $noMore.hide();
+
         var params = {
             "page": page,
             "size": size,
@@ -122,9 +126,9 @@
             return;
         }
         loading = true;
-        setTimeout(function() {
-			initCustomer();
-		}, 1500);
+
+        initCustomer();
+
     });
 
     function combo() {
@@ -215,18 +219,13 @@
                         </p>
                     </div>
                 </div>
-                <#if customerList??>
-                    <#if customerList.totalRow = 0>
-                        <div class="weui-loadmore weui-loadmore_line">
-                            <span class="weui-loadmore__tips">暂无数据</span>
-                        </div>
-                        <#elseif customerList.totalRow &gt; 10>
-                            <div class="weui-loadmore">
-                                <i class="weui-loading"></i>
-                                <span class="weui-loadmore__tips">正在加载</span>
-                            </div>
-                    </#if>
-                </#if>
+                <div class="weui-loadmore" id="loading">
+                    <i class="weui-loading"></i>
+                    <span class="weui-loadmore__tips">正在加载</span>
+                </div>
+                <div class="weui-loadmore weui-loadmore_line" id="noMore" style="display: none;">
+                    <span class="weui-loadmore__tips">暂无数据</span>
+                </div>
             </div>
 	    </article>
     </div>

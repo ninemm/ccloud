@@ -19,7 +19,7 @@
 </#macro>
 
 <#macro script>
-	var type = $("#selecttype").val();
+	//var type = $("#selecttype").val();
 	
 	var detail_object_id = "";
 	
@@ -28,10 +28,10 @@
 	$(function() {
 		updateOptions();
 		
-		$("#selecttype").change(function(){
+		/*$("#selecttype").change(function(){
 			updateOptions();
 			type = $(this).val();
-		});
+		});*/
 	
 		jQuery.mm.initEditTable('#_receivables_table', receivablesUrl, getReceivablesParams, initReceivablesTable(), null);
 		$("#search-receivables").click(function(){
@@ -51,9 +51,9 @@
 	});
 	
 	function updateOptions(){
-		var type = $("#selecttype").val();
+		//var type = $("#selecttype").val();
 		$.ajax({
-			url: "${CPATH}/admin/receivables/getOptions?type="+type,
+			url: "${CPATH}/admin/receivables/getOptions",
 			async: false,
 			success: function(data){
 				var optionsHtml = '<option value="0" >全部</option>';
@@ -86,7 +86,7 @@
 			var param = {
 		        size: params.limit,
 		        page: params.offset/params.limit + 1,
-		        type : type,
+//		        type : type,
 		        customerTypeId:customerTypeId
 		    };
 		    return param;
@@ -108,8 +108,10 @@
 			{field: "create_date",title:"创建时间",align:"center",edit:false},
 			{field: "action", title: "收款详情", align: "center",
 				 formatter: function(value, row, rowIndex){
-				 	return '<a href="javascript:void(0);" onclick="detailMoney(\''
-				 			+row.ref_sn +'\',\''+row.ref_type+'\',\''+row.object_id+'\',\''+row.balance_amount+'\')" class="btn btn-sm" >收款详情</a>';
+				 	/*return '<a href="javascript:void(0);" onclick="detailMoney(\''
+				 			+row.ref_sn +'\',\''+row.ref_type+'\',\''+row.object_id+'\',\''+row.balance_amount+'\')" class="btn btn-sm" >收款详情</a>';*/
+				 	var url = '${CPATH}/admin/receivables/renderlist?ref_sn='+row.ref_sn+'&&ref_type='+row.ref_type+'&&object_id='+row.object_id+'&&balance_amount='+row.balance_amount;
+			 		return '<a href="' + url + '" class="btn btn-sm" >收款详情</a>';
 				 },
 				 edit:false}
 		];
@@ -118,28 +120,28 @@
 	}
 	
 	function orderInfo(orderId){
-		if($("#selecttype").val()==2){
+		/*if($("#selecttype").val()==2){
 			layer.open({
 				title:"退货详细",
 				type: 2, 
 				area: ['70%', '80%'],
 				content: '${CPATH}/admin/purchaseRefundOutstock/_detail/' + orderId
 			}); 
-		}else{
+		}else{*/
 			layer.open({
 				title:"订单详细",
 				type: 2,
 				area: ['70%', '80%'],
 				content: '${CPATH}/admin/salesOrder/detailBySn/' + orderId
 			});
-		}
+	//	}
 	}
 	
 	var getReceivablesDetailParams = function(params){
 		var param = {
 	        size: params.limit,
 	        page: params.offset/params.limit + 1,
-	        type : type,
+//	        type : type,
 	        id: detail_object_id
 	    };
 	    
@@ -148,7 +150,8 @@
 	
 	function getReceivablesDetail(page){
 		$.ajax({
-			url: "${CPATH}/admin/receivables/getReceivablesDetail?type="+type+"&page="+page+"&id="+detail_object_id,
+//			url: "${CPATH}/admin/receivables/getReceivablesDetail?type="+type+"&page="+page+"&id="+detail_object_id,
+			url: "${CPATH}/admin/receivables/getReceivablesDetail?page="+page+"&id="+detail_object_id,
 			async: false,
 			success: function(data){
 				var detailHtml = "";
@@ -169,13 +172,14 @@
 	}
 	
 	function batchDown(){
-			location.href = "${CPATH}/admin/receivables/downloading?type="+type +"&customerTypeId=" + cusType;
+//			location.href = "${CPATH}/admin/receivables/downloading?type="+type +"&customerTypeId=" + cusType;
+			location.href = "${CPATH}/admin/receivables/downloading?customerTypeId=" + cusType;
 		}
 
-	function detailMoney(ref_sn,ref_type,object_id,balance_amount){
+	/* function detailMoney(ref_sn,ref_type,object_id,balance_amount){
 		var type = $("#selecttype").val();
 		location.href = '${CPATH}/admin/receivables/renderlist?type='+type+'&&ref_sn='+ref_sn+'&&ref_type='+ref_type+'&&object_id='+object_id+'&&balance_amount='+balance_amount;
-	}
+	} */
 </#macro>
 <@layout active_id=p child_active_id=c>
 	
@@ -190,20 +194,20 @@
 <!-- Main content -->
 <section class="content">
 	<div class="row content-row">
-	 <div class="jp-left">
-	 	<button onclick="batchDown()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-upload"></i> 导出</button>
-	  </div>
+		<div class="jp-left">
+	 		<button onclick="batchDown()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-upload"></i> 导出</button>
+	 	 </div>
 		<div class="input-group input-group-sm" style="float:right;">
-			<span>往来单位：</span>
+			<!--  <span>往来单位：</span>
 			<select id="selecttype" style="width:200px">
 				<option value="1" >客户</option>
 				<option value="2" >供应商</option>
-			</select>&nbsp;&nbsp;&nbsp;
-			<span>分类：</span>
-			<select id="category-or-customer" style="width:200px">
+			</select>&nbsp;&nbsp;&nbsp;-->
+			<label class="control-label">客户类型：</label>
+			<select id="category-or-customer" style="width:200px;float: none;" class="form-control">
 				<option value="0">全部</option>
 			</select>&nbsp;&nbsp;&nbsp;
-			<span id="search-receivables" class="btn btn-default btn-sm btn-flat" >搜索</span>
+			<span id="search-receivables" class="btn btn-primary btn-sm btn-flat" >搜索</span>
 		</div>
 	</div>
 	<div class="box">
