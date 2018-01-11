@@ -12,6 +12,9 @@
 	.bo {
 		border: 1px solid #bbb !important;
 	}
+	.weui-dialog__hd {
+		padding: 1.3rem 1.6rem;
+	}
 </#macro>
 
 <#macro script>
@@ -87,6 +90,10 @@ $(function() {
 			toastr.error('退货数量为0!','操作失败');
 			return;			
 		}
+		layer.open({
+			type: 2,
+			content: '保存中...'
+		});
         $form.ajaxSubmit({
 			type: "post",
 			dataType: "json",
@@ -95,10 +102,23 @@ $(function() {
 				"remark": remark
 			},
 			success: function(result){
+				layer.closeAll();
 	            if (result.errorCode > 0) {
 	                toastr.error(result.message, '操作失败');
 	            } else {
-	                window.location.href = "${CPATH}/refund/index"
+					$.modal({
+						title: result.message,
+						buttons: [
+							{ text: "查看退货单", className: "default", onClick: function(){ 
+								location.href = "${CPATH}/refund/myRefund";
+								} 
+							},
+							{ text: "继续退货", className: "primary", onClick: function(){
+								location.href = '${CPATH}/refund/index';
+								} 
+							},
+						]
+					});
 	            }
 			}
         });
