@@ -351,4 +351,23 @@ public class UserController extends BaseFrontController {
 			e.printStackTrace();
 		}
 	}
+	
+	public void config() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		User nowUser = UserQuery.me().findById(user.getId());
+		setAttr("user", nowUser);
+		render("user_config.html");
+	}
+	
+	public void alterUser() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		User nowUser = UserQuery.me().findById(user.getId());
+		String areaName = getPara("areaName");
+		String[] split = areaName.split(",");
+		nowUser.setProvince(split[0]);
+		nowUser.setCity(split[1]);
+		nowUser.setRegion(split[2]);
+		nowUser.update();
+		render("user_config.html");
+	}
 }

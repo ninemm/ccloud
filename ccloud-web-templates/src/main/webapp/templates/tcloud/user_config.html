@@ -29,7 +29,17 @@
     $(function() {
 		window.removeEventListener('touchmove', addStopTouchendPropagationListener, true);
 		$("#city-picker").cityPicker({
-			title: "请选择物理区域"
+			title: "请选择物理区域",
+			onClose: function(obj) {
+				var areaName = obj.displayValue.join(",");
+				$('#areaName').val(areaName);
+				$.ajax({     
+					type: "POST",     
+					url: "${CPATH}/user/alterUser",
+					data: {areaName:areaName},      
+					contentType:'application/x-www-form-urlencoded; charset=UTF-8',
+				});
+			}
 		});
     
         var $iosActionsheet = $('#weui-actionsheet');
@@ -112,7 +122,10 @@
 			<div class="weui-cell__bd">
 				<p>负责区域设置</p>
 			</div>
-			<div class="weui-cell__ft"><input type="text" id="city-picker"/></div>
+			<div class="weui-cell__ft">
+				 <input type="hidden" name="areaName" id="areaName" value="${(user.province)!''} ${(user.city)!''} ${(user.region)!''}" >
+				<input type="text" id="city-picker" value="${(user.province)!''} ${(user.city)!''} ${(user.region)!''}" />
+			</div>
 		</a>
 	</div>
 	<!-- <div class="weui-cells">

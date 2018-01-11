@@ -17,7 +17,6 @@ package org.ccloud.model.base;
 
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.core.JModel;
-
 import com.jfinal.plugin.activerecord.IBean;
 import com.jfinal.plugin.ehcache.CacheKit;
 import com.jfinal.plugin.ehcache.IDataLoader;
@@ -96,7 +95,7 @@ public abstract class BaseUser<M extends BaseUser<M>> extends JModel<M> implemen
 	}
 
 	public java.lang.String getId() {
-		return get("id");
+		return getStr("id");
 	}
 
 	public void setUsername(java.lang.String username) {
@@ -104,7 +103,7 @@ public abstract class BaseUser<M extends BaseUser<M>> extends JModel<M> implemen
 	}
 
 	public java.lang.String getUsername() {
-		return get("username");
+		return getStr("username");
 	}
 
 	public void setRealname(java.lang.String realname) {
@@ -112,7 +111,7 @@ public abstract class BaseUser<M extends BaseUser<M>> extends JModel<M> implemen
 	}
 
 	public java.lang.String getRealname() {
-		return get("realname");
+		return getStr("realname");
 	}
 
 	public void setNickname(java.lang.String nickname) {
@@ -120,7 +119,7 @@ public abstract class BaseUser<M extends BaseUser<M>> extends JModel<M> implemen
 	}
 
 	public java.lang.String getNickname() {
-		return get("nickname");
+		return getStr("nickname");
 	}
 
 	public void setMobile(java.lang.String mobile) {
@@ -128,7 +127,7 @@ public abstract class BaseUser<M extends BaseUser<M>> extends JModel<M> implemen
 	}
 
 	public java.lang.String getMobile() {
-		return get("mobile");
+		return getStr("mobile");
 	}
 
 	public void setPassword(java.lang.String password) {
@@ -136,15 +135,15 @@ public abstract class BaseUser<M extends BaseUser<M>> extends JModel<M> implemen
 	}
 
 	public java.lang.String getPassword() {
-		return get("password");
+		return getStr("password");
 	}
-	
+
 	public void setAvatar(java.lang.String avatar) {
 		set("avatar", avatar);
 	}
 
 	public java.lang.String getAvatar() {
-		return get("avatar");
+		return getStr("avatar");
 	}
 
 	public void setSalt(java.lang.String salt) {
@@ -152,7 +151,7 @@ public abstract class BaseUser<M extends BaseUser<M>> extends JModel<M> implemen
 	}
 
 	public java.lang.String getSalt() {
-		return get("salt");
+		return getStr("salt");
 	}
 
 	public void setStatus(java.lang.Integer status) {
@@ -160,7 +159,7 @@ public abstract class BaseUser<M extends BaseUser<M>> extends JModel<M> implemen
 	}
 
 	public java.lang.Integer getStatus() {
-		return get("status");
+		return getInt("status");
 	}
 
 	public void setUnableDate(java.util.Date unableDate) {
@@ -176,7 +175,7 @@ public abstract class BaseUser<M extends BaseUser<M>> extends JModel<M> implemen
 	}
 
 	public java.lang.String getDepartmentId() {
-		return get("department_id");
+		return getStr("department_id");
 	}
 
 	public void setDepartmentName(java.lang.String departmentName) {
@@ -184,7 +183,7 @@ public abstract class BaseUser<M extends BaseUser<M>> extends JModel<M> implemen
 	}
 
 	public java.lang.String getDepartmentName() {
-		return get("department_name");
+		return getStr("department_name");
 	}
 
 	public void setStationId(java.lang.String stationId) {
@@ -192,7 +191,7 @@ public abstract class BaseUser<M extends BaseUser<M>> extends JModel<M> implemen
 	}
 
 	public java.lang.String getStationId() {
-		return get("station_id");
+		return getStr("station_id");
 	}
 
 	public void setStationName(java.lang.String stationName) {
@@ -200,7 +199,7 @@ public abstract class BaseUser<M extends BaseUser<M>> extends JModel<M> implemen
 	}
 
 	public java.lang.String getStationName() {
-		return get("station_name");
+		return getStr("station_name");
 	}
 
 	public void setGroupId(java.lang.String groupId) {
@@ -208,7 +207,7 @@ public abstract class BaseUser<M extends BaseUser<M>> extends JModel<M> implemen
 	}
 
 	public java.lang.String getGroupId() {
-		return get("group_id");
+		return getStr("group_id");
 	}
 
 	public void setGroupName(java.lang.String groupName) {
@@ -216,7 +215,7 @@ public abstract class BaseUser<M extends BaseUser<M>> extends JModel<M> implemen
 	}
 
 	public java.lang.String getGroupName() {
-		return get("group_name");
+		return getStr("group_name");
 	}
 
 	public void setDeptIds(java.lang.String deptIds) {
@@ -224,7 +223,7 @@ public abstract class BaseUser<M extends BaseUser<M>> extends JModel<M> implemen
 	}
 
 	public java.lang.String getDeptIds() {
-		return get("dept_ids");
+		return getStr("dept_ids");
 	}
 
 	public void setDeptNames(java.lang.String deptNames) {
@@ -232,7 +231,7 @@ public abstract class BaseUser<M extends BaseUser<M>> extends JModel<M> implemen
 	}
 
 	public java.lang.String getDeptNames() {
-		return get("dept_names");
+		return getStr("dept_names");
 	}
 
 	public void setUserIds(java.lang.String userIds) {
@@ -240,7 +239,7 @@ public abstract class BaseUser<M extends BaseUser<M>> extends JModel<M> implemen
 	}
 
 	public java.lang.String getUserIds() {
-		return get("user_ids");
+		return getStr("user_ids");
 	}
 
 	public void setUserNames(java.lang.String userNames) {
@@ -248,7 +247,39 @@ public abstract class BaseUser<M extends BaseUser<M>> extends JModel<M> implemen
 	}
 
 	public java.lang.String getUserNames() {
-		return get("user_names");
+		return getStr("user_names");
+	}
+
+	public void setProvince(java.lang.String province) {
+		set("province", province);
+	}
+
+	public java.lang.String getProvince() {
+		return getStr("province");
+	}
+
+	public void setCity(java.lang.String city) {
+		set("city", city);
+	}
+
+	public java.lang.String getCity() {
+		return getStr("city");
+	}
+
+	public void setRegion(java.lang.String region) {
+		set("region", region);
+	}
+
+	public java.lang.String getRegion() {
+		return getStr("region");
+	}
+
+	public void setDataArea(java.lang.String dataArea) {
+		set("data_area", dataArea);
+	}
+
+	public java.lang.String getDataArea() {
+		return getStr("data_area");
 	}
 
 	public void setWechatOpenId(java.lang.String wechatOpenId) {
@@ -256,15 +287,15 @@ public abstract class BaseUser<M extends BaseUser<M>> extends JModel<M> implemen
 	}
 
 	public java.lang.String getWechatOpenId() {
-		return get("wechat_open_id");
-	}
-	
-	public void setWechatUseriId(java.lang.String wechatUseriId) {
-		set("wechat_userid", wechatUseriId);
+		return getStr("wechat_open_id");
 	}
 
-	public java.lang.String getWechatUseriId() {
-		return get("wechat_userid");
+	public void setWechatUserid(java.lang.String wechatUserid) {
+		set("wechat_userid", wechatUserid);
+	}
+
+	public java.lang.String getWechatUserid() {
+		return getStr("wechat_userid");
 	}
 
 	public void setCreateDate(java.util.Date createDate) {
@@ -281,14 +312,6 @@ public abstract class BaseUser<M extends BaseUser<M>> extends JModel<M> implemen
 
 	public java.util.Date getModifyDate() {
 		return get("modify_date");
-	}
-	
-	public void setDataArea(java.lang.String dataArea) {
-		set("data_area", dataArea);
-	}
-	
-	public java.lang.String getDataArea() {
-		return get("data_area");
 	}
 
 }
