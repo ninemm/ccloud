@@ -299,7 +299,8 @@
                     geoc.getLocation(point, function(rs) {
                     var addComp = rs.addressComponents;
                     var address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
-                    $('#location').text(address);
+                    $('#location-span').text(address);
+                    $('#location').val(address);
                     });
                 };
                 setTimeout(function() {
@@ -314,6 +315,51 @@
             }
         });
     });
+
+    function refreshLocation() {
+        $("#location-span").empty();
+        $("#location-span").css('text-align','center');
+        $("#location-span").append('<i class="weui-loading"></i>');
+
+        wx.getLocation({
+            type: 'wgs84',
+            success: function (res) {
+                $("#location-span").empty();
+                $("#location-span").removeAttr("style");
+                var latitude = res.latitude;                      // 纬度，浮点数，范围为90 ~ -90
+                var longitude = res.longitude;                    // 经度，浮点数，范围为180 ~ -180。
+                var speed = res.speed;                            // 速度，以米/每秒计
+                var accuracy = res.accuracy;                      // 位置精度
+
+                var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
+                var geoc = new BMap.Geocoder();                   // 获取百度地址解析器
+
+                $("#lng").val(parseFloat(longitude).toFixed(2));
+                $("#lat").val(parseFloat(latitude).toFixed(2));
+                translateCallback = function (point) {            // 回调函数
+                    geoc.getLocation(point, function(rs) {
+                        var addComp = rs.addressComponents;
+                        var address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
+                        $('#location-span').text(address);
+                        $('#location').val(address);
+                    });
+                };
+                setTimeout(function() {
+                    BMap.Convertor.translate(point, 0, translateCallback);//真实经纬度转成百度坐标
+                }, 100);
+            },
+            cancel: function (res) {
+                $("#location-span").empty();
+                $("#location-span").removeAttr("style");
+                $("#location-span").text('用户拒绝授权获取地理位置');
+            },
+            fail: function (res) {
+                $("#location-span").empty();
+                $("#location-span").removeAttr("style");
+                $("#location-span").text(JSON.stringify(res));
+            }
+        });
+    }
     
 </#macro>
 
@@ -436,9 +482,10 @@
             <div class="weui-cell weui-cell_access">
                 <div class="weui-cell__hd"><span class="icon-map-pin ft16 green"></span></div>
                 <div class="weui-cell__bd">
-                    <div id="location" class="location">${(customerVisit.reviewAddress)!'正在定位...'}</div>
+                    <div id="location-span" class="location">${(customerVisit.reviewAddress)!'正在定位...'}</div>
                     <input type="hidden" name="customerVisit.lng" id="lng">
                     <input type="hidden" name="customerVisit.lat" id="lat">
+                    <input type="hidden" name="customerVisit.reviewAddress" id="location">
                 </div>
                 <div class="weui-cell__hd" id="refresh"><span class="icon-refresh ft16 gray"></span></div>
             </div>

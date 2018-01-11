@@ -279,10 +279,10 @@
 	                    <#list customerList.list as customer>
 	                         <div class="weui-panel weui-panel_access">
 	                            <div class="weui-flex">
-	                                <div class="weui-flex__item customer-info">
+	                                <a class="weui-flex__item customer-info" href="/customer/edit?sellerCustomerId=${(customer.sellerCustomerId)!}">
 	                                    <p class="ft14">${(customer.customer_name)!}</p>
 	                                    <p class="gray">${(customer.contact)!}/${(customer.mobile)!}</p>
-	                                </div>
+	                                </a>
 	                                <div class="weui-flex__item customer-href">
 	                                    <div class="weui-flex">
 	                                        <a href="tel:${(customer.mobile)!}"class="weui-flex__item">
@@ -368,7 +368,7 @@
 </@shiro.hasPermission>
 <div class="layer"></div>
 <#include "_inc/_footer_nav.html" />
-<article id="combin-filter" class="animated">
+<article id="combin-filter">
     <div class="filter-item">
         <h4 class="ft14">选择搜索范围</h4>
         <div class="relative ft12" id="getDate">

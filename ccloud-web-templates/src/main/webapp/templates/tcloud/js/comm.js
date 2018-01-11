@@ -197,14 +197,18 @@ function addStopTouchendPropagationListener (ev) {
 //打开组合搜索
 function openCombinSearch() {
   $layer.addClass("layer-show");
-  $combinSearch.show().removeClass("slideOutRight").addClass("slideInRight");
+  $combinSearch.show().addClass("animated slideInRight");
+  setTimeout(function() {
+	$combinSearch.removeClass("animated slideInRight")
+  }, 300);
 }
 
 //关闭组合搜索
 function closeCombinSearch() {
-  $combinSearch.removeClass("slideInRight").addClass("slideOutRight");
+  $combinSearch.addClass("animated slideOutRight");
   setTimeout(function() {
 	$layer.removeClass("layer-show");
+	$combinSearch.hide().removeClass("animated slideOutRight");
   }, 300);
 }
 
@@ -343,7 +347,7 @@ $(function() {
 	}).on("change", "input[name=add-gift]", function() {//点击遮罩关闭菜单
 		$(this).parent().next().slideToggle("fast");
 	}).on("touchend", ".layer", function () { //点击遮罩关闭菜单、组合筛选
-		if ($('#combin-filter').hasClass('slideInRight')) {
+		if ($('#combin-filter').is(':visible')) {
 			closeCombinSearch();
 		} else {
 			closeMenu();

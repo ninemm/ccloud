@@ -219,7 +219,7 @@ public class _UserController extends JBaseCRUDController<User> {
 
 	public void getStation() {
 		String id = getPara("userid");
-		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 		List<Station> stations = StationQuery.me().findByDept(dataArea);
 		List<Map<String, Object>> list = new ArrayList<>();
 		for (Station station : stations) {
@@ -283,7 +283,7 @@ public class _UserController extends JBaseCRUDController<User> {
 				userHistory.setUserNames(user.getUserNames());
 				userHistory.setDataArea(user.getDataArea());
 				userHistory.setWechatOpenId(user.getWechatOpenId());
-				userHistory.setWechatUserid(user.getWechatUseriId());
+				userHistory.setWechatUserid(user.getWechatUserid());
 				userHistory.setCreateDate(new Date());
 				userHistory.save();
 			}
@@ -363,7 +363,7 @@ public class _UserController extends JBaseCRUDController<User> {
 
 	public void getUserGroupCheck() {
 		String id = getPara("userId");
-		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 		List<Record> list = GroupQuery.me().findByUserCheck(id, dataArea);
 		List<Map<String, Object>> checkList = new ArrayList<>();
 		List<Map<String, Object>> uncheckList = new ArrayList<>();
@@ -609,7 +609,7 @@ public class _UserController extends JBaseCRUDController<User> {
 		userHistory.setUserNames(user.getUserNames());
 		userHistory.setDataArea(user.getDataArea());
 		userHistory.setWechatOpenId(user.getWechatOpenId());
-		userHistory.setWechatUserid(user.getWechatUseriId());
+		userHistory.setWechatUserid(user.getWechatUserid());
 		userHistory.setCreateDate(new Date());
 		userHistory.save();
 //		renderAjaxResultForSuccess("更新成功");
