@@ -98,7 +98,19 @@ $(function() {
 	            if (result.errorCode > 0) {
 	                toastr.error(result.message, '操作失败');
 	            } else {
-	                window.location.href = "${CPATH}/refund/index"
+					$.modal({
+						title: result.message,
+						buttons: [
+							{ text: "查看退货单", className: "default", onClick: function(){ 
+								location.href = "${CPATH}/refund/myRefund";
+								} 
+							},
+							{ text: "继续退货", className: "primary", onClick: function(){
+								location.href = '${CPATH}/refund/index';
+								} 
+							},
+						]
+					});
 	            }
 			}
         });
