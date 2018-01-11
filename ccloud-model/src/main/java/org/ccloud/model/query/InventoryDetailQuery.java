@@ -15,6 +15,8 @@
  */
 package org.ccloud.model.query;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedList;
 
 import org.ccloud.Consts;
@@ -82,12 +84,6 @@ public class InventoryDetailQuery extends JBaseQuery {
 		return DAO.findFirst(sql);
 	}
 
-	public InventoryDetail findBySellerProductId(String seller_product_id,String warehouse_id) {
-		String sql = "select * from cc_inventory_detail c where c.sell_product_id = '"+seller_product_id+"' and c.warehouse_id ='"+warehouse_id+"' ORDER BY  c.create_date DESC ";
-		return DAO.findFirst(sql);
-	}
-	
-	
 	
 	public Page<InventoryDetail> _in_paginate(int pageNumber, int pageSize,String keyword,String sellerId,String dataArea, String startDate, String endDate,String sellerProductId,String sort,String sortOrder) {
 		String select = "SELECT cid.*,cw.`name` as warehouse,csp.custom_name as sellerName ";
@@ -231,6 +227,17 @@ public class InventoryDetailQuery extends JBaseQuery {
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+
+	//查询当前商品在库存中的数量
+	public InventoryDetail findBySellerProductId(String seller_product_id, String warehouse_id) {
+		SimpleDateFormat bartDateFormat = new SimpleDateFormat ("yyyy-MM-dd"); 
+		Date date = new Date(); 
+		StringBuilder fromBuilder = new StringBuilder("SELECT (IFNULL(SUM(c.in_count) , 0) - IFNULL(SUM(c.out_count) , 0)) balance_count,");
+		fromBuilder.append("(IFNULL(SUM(c.in_amount) , 0) - IFNULL(SUM(c.out_amount) , 0)) balance_amount,c.balance_price ");
+		fromBuilder.append("FROM cc_inventory_detail c WHERE c.create_date <= '"+bartDateFormat.format(date)+" 23:59:59'");
+		fromBuilder.append(" AND c.sell_product_id = '"+seller_product_id+"' AND c.warehouse_id = '"+warehouse_id+"' GROUP BY c.sell_product_id");
+		return DAO.findFirst(fromBuilder.toString());
 	}
 
 }

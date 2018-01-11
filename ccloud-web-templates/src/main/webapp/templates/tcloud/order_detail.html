@@ -56,11 +56,12 @@
 			<div class="ft16">订单详情</div>
 			<#list orderDetailList as orderDetail> <#if orderDetail.is_gift??>
 			<#if orderDetail.is_gift = 0>
-			<div class="p-l-15">
+			<div class="todo-product-box">
+				<img src="${CTPATH}/images/jp.jpg" alt="">
 				<p>${orderDetail.custom_name!}</p>
 				<div class="weui-flex">
 					<div class="weui-flex__item flex-grow2">
-						<div class="fr width-60">
+						<div class="fl">
 							￥${(orderDetail.product_price)!} <span class="gray">（${(orderDetail.price)!}）</span>
 						</div>
 					</div>
@@ -69,7 +70,7 @@
 				</div>
 				<div class="weui-flex">
 					<div class="weui-flex__item flex-grow2">
-						<div class="fr width-60">
+						<div class="fl">
 							￥${(orderDetail.product_price /
 							orderDetail.convert_relate)?string("0.##")} <span class="gray">（${(orderDetail.price
 								/ orderDetail.convert_relate)?string("0.##")}）</span>
@@ -80,7 +81,8 @@
 				</div>
 			</div>
 			</#if> <#if orderDetail.is_gift = 1>
-			<div class="p-l-15">
+			<div class="todo-product-box">
+				<img src="${CTPATH}/images/jp.jpg" alt="">
 				<p>
 					<span class="tag">赠品</span>${orderDetail.custom_name!} /
 					${(orderDetail.valueName)!}
