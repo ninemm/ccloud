@@ -236,7 +236,7 @@
 			toastr.error('出库数量为零或超过默认出库数量!','操作失败');
 			return;			
 		}		
-		var l = Ladda.create( document.querySelector( '.ladda-button' ) );
+		var l = Ladda.create( document.querySelector( '.btn-flat' ) );
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
 				var validate = $form.data('bootstrapValidator');
