@@ -50,13 +50,19 @@ public class CustomerController extends BaseFrontController {
 	@Before(WechatJSSDKInterceptor.class)
 	public void index() {
 
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
-		String key = getPara("searchKey");
-		String hasOrder = getPara("isOrdered");
-		String customerType =  getPara("customerType");
-		Page<Record> customerList = SellerCustomerQuery.me().findByUserTypeForApp(getPageNumber(), getPageSize(), selectDataArea, customerType, hasOrder, key);
+//		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
+//		String key = getPara("searchKey");
+//		String hasOrder = getPara("isOrdered");
+//		String customerType =  getPara("customerType");
+//		Page<Record> customerList = SellerCustomerQuery.me().findByUserTypeForApp(getPageNumber(), getPageSize(), selectDataArea, customerType, hasOrder, key);
+//		setAttr("customerList", customerList);
+
+		Map<String, Object> customerList = new HashMap<>();
+		List<String> list = new ArrayList<>();
+		customerList.put("list", list);
+		customerList.put("totalRow", 11);
 		setAttr("customerList", customerList);
-		
+
 		String history = getPara("history");
 		setAttr("history", history);		
 		render("customer.html");
@@ -133,7 +139,7 @@ public class CustomerController extends BaseFrontController {
 			html.append("					<p><i class=\"icon-file-text-o blue\"></i></p>\n");
 			html.append("					<p>订单</p>\n");
 			html.append("				</a>\n");
-			html.append("				<a class=\"weui-flex__item\" href=\"/customerVisit?id=" + customer.getStr("sellerCustomerId") +"&name=" + customer.getStr("customer_name") + "\">\n");
+			html.append("				<a class=\"weui-flex__item\" href=\"/customerVisit/one?id=" + customer.getStr("sellerCustomerId") +"&name=" + customer.getStr("customer_name") + "\">\n");
 			html.append("					<p><i class=\"icon-paw\" style=\"color:#ff9800\"></i></p>\n");
 			html.append("					<p>拜访</p>\n");
 			html.append("				</a>\n");
@@ -205,7 +211,7 @@ public class CustomerController extends BaseFrontController {
 				html.append("					<p><i class=\"icon-file-text-o blue\"></i></p>\n");
 				html.append("					<p>订单</p>\n");
 				html.append("				</a>\n");
-				html.append("				<a class=\"weui-flex__item\" href=\"/customerVisit?id=" + customer.get("id").toString() +"&name=" + customer.get("customer_name").toString() + "\">\n");
+				html.append("				<a class=\"weui-flex__item\" href=\"/customerVisit/one?id=" + customer.get("id").toString() +"&name=" + customer.get("customer_name").toString() + "\">\n");
 				html.append("					<p><i class=\"icon-paw\" style=\"color:#ff9800\"></i></p>\n");
 				html.append("					<p>拜访</p>\n");
 				html.append("				</a>\n");
