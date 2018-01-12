@@ -300,8 +300,8 @@ public class UserQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN user_group_rel ugr ON ugr.user_id=u.id ");
 		fromBuilder.append(" LEFT JOIN `group` g ON g.id=ugr.group_id ");
 		boolean needWhere = true;
-		if (null!=keyword) {
-			fromBuilder.append(" WHERE u.username LIKE '%"+keyword+"%' OR u.realname LIKE '%"+keyword+"%' OR u.nickname LIKE '%"+keyword+"%' OR u.mobile LIKE '%"+keyword+"%' ");
+		if (null!=keyword || keyword == "") {
+			fromBuilder.append(" WHERE (u.username LIKE '%"+keyword+"%' OR u.realname LIKE '%"+keyword+"%' OR u.nickname LIKE '%"+keyword+"%' OR u.mobile LIKE '%"+keyword+"%') ");
 			needWhere=false;
 		}
 		LinkedList<Object> params = new LinkedList<Object>();
