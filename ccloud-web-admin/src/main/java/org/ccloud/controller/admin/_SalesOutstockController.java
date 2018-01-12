@@ -134,6 +134,19 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 
 		render("detail.html");
 
+	}
+	
+	public void stockdetailBySn() {
+
+		String outstockSn = getPara(0);
+
+		Record outstock = SalesOutstockQuery.me().findMoreBySn(outstockSn);
+		List<Record> outstockDetail = SalesOutstockDetailQuery.me().findByOutstockSn(outstockSn);
+		setAttr("outstock", outstock);
+		setAttr("outstockDetail", outstockDetail);
+
+		render("detail.html");
+
 	}	
 	
 	public void getDetail() {

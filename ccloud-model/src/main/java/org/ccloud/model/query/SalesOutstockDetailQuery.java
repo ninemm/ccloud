@@ -67,6 +67,25 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		return Db.find(sqlBuilder.toString(), Consts.SALES_REFUND_INSTOCK_CANCEL, outstockId);
 	}
 	
+	public List<Record> findByOutstockSn(String sn) {
+
+		StringBuilder sqlBuilder = new StringBuilder(
+				" SELECT sod.*, sp.custom_name, p.big_unit, p.small_unit, p.convert_relate, sp.seller_id, sp.product_id, t1.valueName, cs.is_composite, IFNULL(t2.refundCount,0) as refundCount ");
+		sqlBuilder.append(" from `cc_sales_outstock_detail` sod ");
+		sqlBuilder.append(" LEFT JOIN cc_sales_outstock cso ON cso.id = sod.outstock_id ");
+		sqlBuilder.append(" LEFT JOIN cc_sales_order_detail cs ON sod.order_detail_id = cs.id ");
+		sqlBuilder.append(" LEFT JOIN cc_seller_product sp ON sod.sell_product_id = sp.id ");
+		sqlBuilder.append(" LEFT JOIN cc_product p ON sp.product_id = p.id ");
+		sqlBuilder.append("LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
+		sqlBuilder.append("RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = p.id ");
+		sqlBuilder.append("LEFT JOIN (SELECT IFNULL(SUM(cr.reject_product_count),0) as refundCount,cr.outstock_detail_id FROM cc_sales_refund_instock_detail cr ");
+		sqlBuilder.append("LEFT JOIN cc_sales_refund_instock cri on cri.id = cr.refund_instock_id where cri.status != ? ");
+		sqlBuilder.append("GROUP BY cr.outstock_detail_id) t2 on t2.outstock_detail_id = sod.id ");
+		sqlBuilder.append(" WHERE cso.outstock_sn = ? ");
+
+		return Db.find(sqlBuilder.toString(), Consts.SALES_REFUND_INSTOCK_CANCEL, sn);
+	}	
+	
 	public List<Record> getPrintDetailById(String outstockId) {
 
 		StringBuilder sqlBuilder = new StringBuilder(

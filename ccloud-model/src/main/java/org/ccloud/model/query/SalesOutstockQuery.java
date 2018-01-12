@@ -67,6 +67,24 @@ public class SalesOutstockQuery extends JBaseQuery {
 		return Db.findFirst(fromBuilder.toString(), id);
 	}
 	
+	public Record findMoreBySn(final String sn) {
+		StringBuilder fromBuilder = new StringBuilder(
+				" select o.*, sa.biz_user_id as order_user , cs.customer_kind, c.id as customerId, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as customerTypeCode, u.realname, u.mobile ");
+		fromBuilder.append(" ,w.code as warehouseCode, cp.factor ");
+		fromBuilder.append(" from `cc_sales_outstock` o ");
+		fromBuilder.append(" left join cc_sales_order_join_outstock co ON co.outstock_id = o.id ");
+		fromBuilder.append(" left join cc_sales_order sa on sa.id = co.order_id ");
+		fromBuilder.append(" left join cc_seller_customer cs on o.customer_id = cs.id ");
+		fromBuilder.append(" left join cc_customer c on cs.customer_id = c.id ");
+		fromBuilder.append(" left join cc_customer_type ct on o.customer_type_id = ct.id ");
+		fromBuilder.append(" left join cc_price_system cp on cp.id = ct.price_system_id ");
+		fromBuilder.append(" left join user u on sa.biz_user_id = u.id ");
+		fromBuilder.append(" left join cc_warehouse w on o.warehouse_id = w.id ");
+		fromBuilder.append(" where o.outstock_sn = ? ");
+
+		return Db.findFirst(fromBuilder.toString(), sn);
+	}	
+	
 	public boolean pass(final String orderId, final String userId, final String sellerId, final String sellerCode) {
 		boolean isSave = Db.tx(new IAtom() {
 
