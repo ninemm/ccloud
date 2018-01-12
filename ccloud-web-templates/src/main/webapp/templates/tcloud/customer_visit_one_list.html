@@ -119,13 +119,6 @@
             </#if>
         </main>
     </div>
-    <#if !id??>
-        <#include "_inc/_goback.html" />
-        <footer class="weui-footer weui-footer_fixed-bottom">
-            <a href="${CPATH}/customerVisit/edit" class="place-order red-button white width-100">添加拜访</a>
-        </footer>
-        <#else>
-            <#include "_inc/_goback_bottom.html" />
-    </#if>
+        <#include "_inc/_goback_bottom.html" />
     </body>
 </@layout>
