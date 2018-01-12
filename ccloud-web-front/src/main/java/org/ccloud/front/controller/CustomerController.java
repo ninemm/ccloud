@@ -50,15 +50,18 @@ public class CustomerController extends BaseFrontController {
 	@Before(WechatJSSDKInterceptor.class)
 	public void index() {
 
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
+//		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
+//		
+//		String key = getPara("searchKey");
+//		String hasOrder = getPara("isOrdered");
+//		String customerType =  getPara("customerType");
+
+
+//		Page<Record> customerList = SellerCustomerQuery.me().findByUserTypeForApp(getPageNumber(), getPageSize(), selectDataArea, customerType, hasOrder, key);
 		
-		String key = getPara("searchKey");
-		String hasOrder = getPara("isOrdered");
-		String customerType =  getPara("customerType");
-
-
-		Page<Record> customerList = SellerCustomerQuery.me().findByUserTypeForApp(getPageNumber(), getPageSize(), selectDataArea, customerType, hasOrder, key);
-		setAttr("customerList", customerList);
+		String history = getPara("history");
+		setAttr("history", history);		
+//		setAttr("customerList", customerList);
 		render("customer.html");
 	}
 
@@ -100,7 +103,7 @@ public class CustomerController extends BaseFrontController {
 			item.put("value", dict.get("value"));
 			nearBy.add(item);
 		}
-
+			
 		Map<String, List<Map<String, Object>>> data = ImmutableMap.of("region", region, "customerType", customerTypeList2, "searchArea", nearBy);
 		renderJson(data);
 	}
@@ -316,7 +319,8 @@ public class CustomerController extends BaseFrontController {
 			setAttr("sellerCustomer", sellerCustomer);
 
 		}
-		
+		String history = getPara("history");
+		setAttr("history", history);	
 		setAttr("customerType", JSON.toJSONString(getCustomerType()));
 		
 		render("customer_edit.html");
