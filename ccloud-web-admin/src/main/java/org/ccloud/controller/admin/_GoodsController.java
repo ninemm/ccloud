@@ -187,15 +187,9 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
         boolean isSave = Db.tx(new IAtom() {
             @Override
             public boolean run() throws SQLException {
-        		if (update) {
-        			goods.saveOrUpdate();
-        		} else {
-        			goods.save();
-        		}
         		List<Product> oldList = ProductQuery.me().findByGoodId(goods.getId());
-        		int productSize = getLikeByMap(map, "product"); //map取出产品属性信息数量
-        		int loop = productSize / 6; //算出产品数量与循环次数
-        		int loopEnd = 0;
+//        		int productSize = getLikeByMap(map, "product"); //map取出产品属性信息数量
+        		int loop = Integer.parseInt(StringUtils.getArrayFirst(map.get("loop"))); //算出产品数量与循环次数
         		List<String> newProIds = new ArrayList<>();
         		int market = 0; //上架判断
         		
@@ -205,86 +199,73 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
         		List<GoodsGoodsSpecification> gsList = new ArrayList<>();
         		List<String> cggIds = new ArrayList<>();
         		
-        		if (loop > 0) {
-        			for (int i = 0; i >= 0; i++) {
-        				Product product = getModel(Product.class);
-        				String productId = StringUtils.getArrayFirst(map.get("productList[" + i + "].id"));
-        				String productSn = StringUtils.getArrayFirst(map.get("productList[" + i + "].productSn"));
-        				if (StringUtils.isBlank(productSn)) {
-        					continue;
-        				} else {
-        					loopEnd++;
-        				}
-        				String productPrice = StringUtils.getArrayFirst(map.get("productList[" + i + "].price"));
-        				String bigUnit = StringUtils.getArrayFirst(map.get("productList[" + i + "].bigUnit"));
-        				String relate = StringUtils.getArrayFirst(map.get("productList[" + i + "].relate"));
-        				String smallUnit = StringUtils.getArrayFirst(map.get("productList[" + i + "].smallUnit"));
+    			for (int i = 0; i < loop; i++) {
+    				Product product = getModel(Product.class);
+    				String productId = StringUtils.getArrayFirst(map.get("productList[" + i + "].id"));
+    				String productSn = StringUtils.getArrayFirst(map.get("productList[" + i + "].productSn"));
+    				if (StringUtils.isBlank(productSn)) {
+    					continue;
+    				}
+    				String productPrice = StringUtils.getArrayFirst(map.get("productList[" + i + "].price"));
+    				String bigUnit = StringUtils.getArrayFirst(map.get("productList[" + i + "].bigUnit"));
+    				String relate = StringUtils.getArrayFirst(map.get("productList[" + i + "].relate"));
+    				String smallUnit = StringUtils.getArrayFirst(map.get("productList[" + i + "].smallUnit"));
 //        				String productStore = StringUtils.getArrayFirst(map.get("productList[" + i + "].store"));
 //        				String productStorePlace = StringUtils.getArrayFirst(map.get("productList[" + i + "].storePlace"));
-        				String productIsMarketable = StringUtils.getArrayFirst(map.get("productList[" + i + "].isMarketable"));
-        				
-        				if (productId != null) {
-        					newProIds.add(productId);
-        				}
-        				product.setId(productId);
-        				product.setProductSn(productSn);
-        				product.setPrice(new BigDecimal(productPrice));
-        				product.setCost(new BigDecimal(productPrice));
-        				product.setMarketPrice(new BigDecimal(productPrice));
-        				product.setBigUnit(bigUnit);
-        				product.setConvertRelate(relate == null ? null : Integer.parseInt(relate));
-        				product.setSmallUnit(smallUnit);
+    				String productIsMarketable = StringUtils.getArrayFirst(map.get("productList[" + i + "].isMarketable"));
+    				
+    				if (productId != null) {
+    					newProIds.add(productId);
+    				}
+    				product.setId(productId);
+    				product.setProductSn(productSn);
+    				product.setPrice(new BigDecimal(productPrice));
+    				product.setCost(new BigDecimal(productPrice));
+    				product.setMarketPrice(new BigDecimal(productPrice));
+    				product.setBigUnit(bigUnit);
+    				product.setConvertRelate(relate == null ? null : Integer.parseInt(relate));
+    				product.setSmallUnit(smallUnit);
 //        				product.setStore(productStore == null ? null : Integer.parseInt(productStore));
 //        				product.setStorePlace(productStorePlace);
-        				product.setIsMarketable(Boolean.valueOf(productIsMarketable));
-        				if (product.getIsMarketable()) {
-        					market++;
-        				}
-        				product.setGoodsId(goods.getId());
-        				product.setName(goods.getName());
-        				product.setFreezeStore(0);
-        				
-        				if (StringUtils.isBlank(productId)) {
-        					product.setId(StrKit.getRandomUUID());
-        					product.setCreateDate(new Date());
-        					saveProList.add(product);
-        				} else {
-        					updateProList.add(product);
-        				}
-        				
-        				String[] ids = map.get("goodsSpecificationIds");
-        				
-        				//存储关联表信息
-        				for (int j = 0;j < ids.length;j++) {
-        					String spId = ids[j];
-        					String spvalueId = StringUtils.getArrayFirst(map.get(spId + "[" + i + "]"));
-        					if (StringUtils.isBlank(spvalueId)) {
-        						continue;
-        					}
-        					ProductGoodsSpecificationValue pgsValue = getModel(ProductGoodsSpecificationValue.class);
-        					pgsValue.setGoodsSpecificationValueSetId(spvalueId);
-        					pgsValue.setProductSetId(product.getId());
-        					psList.add(pgsValue);
-        					
-        					if (cggIds.indexOf(spId) == -1) {
-            					GoodsGoodsSpecification cggs = getModel(GoodsGoodsSpecification.class);
-            					cggs.setGoodsSpecificationId(spId);
-            					cggs.setGoodsId(goods.getId());
-            					gsList.add(cggs);
-            					cggIds.add(spId);
-        					}
-        				}
-        				
-        				if (loopEnd == loop) {
-        					break;
-        				}
-        			}
-        		}
-        		
-        		if (market > 0 && goods.getState() == 0) {
-        			goods.setState(1);
-        			goods.update();
-        		}
+    				product.setIsMarketable(Boolean.valueOf(productIsMarketable));
+    				if (product.getIsMarketable()) {
+    					market++;
+    				}
+    				product.setGoodsId(goods.getId());
+    				product.setName(goods.getName());
+    				product.setFreezeStore(0);
+    				
+    				if (StringUtils.isBlank(productId)) {
+    					product.setId(StrKit.getRandomUUID());
+    					product.setCreateDate(new Date());
+    					saveProList.add(product);
+    				} else {
+    					updateProList.add(product);
+    				}
+    				
+    				String[] ids = map.get("goodsSpecificationIds");
+    				
+    				//存储关联表信息
+    				for (int j = 0;j < ids.length;j++) {
+    					String spId = ids[j];
+    					String spvalueId = StringUtils.getArrayFirst(map.get(spId + "[" + i + "]"));
+    					if (StringUtils.isBlank(spvalueId)) {
+    						continue;
+    					}
+    					ProductGoodsSpecificationValue pgsValue = getModel(ProductGoodsSpecificationValue.class);
+    					pgsValue.setGoodsSpecificationValueSetId(spvalueId);
+    					pgsValue.setProductSetId(product.getId());
+    					psList.add(pgsValue);
+    					
+    					if (cggIds.indexOf(spId) == -1) {
+        					GoodsGoodsSpecification cggs = getModel(GoodsGoodsSpecification.class);
+        					cggs.setGoodsSpecificationId(spId);
+        					cggs.setGoodsId(goods.getId());
+        					gsList.add(cggs);
+        					cggIds.add(spId);
+    					}
+    				}
+    			}
         		
         		List<GoodsGoodsAttributeMapStore> attributeMap = new ArrayList<>();
         		//储存属性信息
@@ -303,6 +284,14 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
         		//删除用户删掉的产品及关联信息
         		List<String> ids = getDiffrent(oldList, newProIds);
         		try {
+            		if (market > 0 && goods.getState() == 0) {
+            			goods.setState(1);
+            		}         			
+            		if (update) {
+            			goods.saveOrUpdate();
+            		} else {
+            			goods.save();
+            		}        
     				newProIds.addAll(ids);
     				ProductGoodsSpecificationValueQuery.me().batchDeleteByProIds(newProIds);
     				GoodsGoodsSpecificationQuery.me().deleteByGoodsId(goods.getId());
@@ -338,6 +327,7 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
 	}
 	
 	//map key模糊查询
+	@SuppressWarnings("unused")
     private int getLikeByMap(Map<String, String[]>map, String keyLike){
         int i = 0;        
         for (Map.Entry<String, String[]> entity : map.entrySet()) {
