@@ -154,6 +154,12 @@ a {
   color: #ea6f5a;
 }
 
+.weui-grid__label {
+  font-size: .6rem;
+}
+
+
+
 .empty-badge {
   min-width: 0.5rem;
   height: 0.5rem;
@@ -2186,12 +2192,25 @@ input[name=input-type] {
 }
 .report-top>div {
   background: rgba(255, 255, 255, 0.9);
-  padding: .5rem 0;
+  padding: .5rem;
+  position: relative;
 }
 .report-top p {
   height: 1.5rem;
   line-height: 1.5rem;
   color: #606060;
+}
+
+.report-top img {
+  position: absolute;
+  left: 1rem;
+  width: 2rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.report-top .weui-flex__item>div {
+  padding-left: 1.5rem;
 }
 .report-header {
   background: url(../images/bg.jpg) no-repeat;
