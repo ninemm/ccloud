@@ -67,7 +67,7 @@ public class PayablesQuery extends JBaseQuery {
 			select = "SELECT CASE WHEN cs.id IS NOT NULL THEN cs.id ELSE s.id END AS id,CASE WHEN cs.`name` IS NOT NULL THEN cs.`name` ELSE s.seller_name END AS name,r.pay_amount,r.act_amount,r.balance_amount";
 			fromBuilder = new StringBuilder(" FROM `cc_payables` AS r LEFT JOIN `cc_supplier` AS cs on r.obj_id=cs.id LEFT JOIN cc_seller s ON r.obj_id = s.id ");
 			appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, b);if(!keyword.equals("")) {
-				fromBuilder.append(" and CASE WHEN cs.`name` IS NOT NULL THEN cs.`name` ELSE s.seller_name END like '%"+keyword+"%' ");
+			fromBuilder.append(" and CASE WHEN cs.`name` IS NOT NULL THEN cs.`name` ELSE s.seller_name END like '%"+keyword+"%' ");
 			}
 		}else {
 			select = " SELECT  r.obj_id AS id  , t1.customerTypeNames,CASE WHEN cs.`name` IS NOT NULL THEN  cs.`name` WHEN c.customer_name IS NOT NULL THEN c.customer_name ELSE s.seller_name END AS name , r.pay_amount, r.act_amount, r.balance_amount  ";
