@@ -36,7 +36,7 @@
 		jQuery.mm.initDatetimepicker('form', '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initValidator('#form', validatorFields)
 		jQuery.mm.initEditTableExport('#_inventoryDetail_table', url, initParams, initFields(), null);
-		$('button[title^=Export]').html('导出').attr('class','btn btn-sm btn-primary btn-flat');
+		$('button[title^=Export]').html('导出').addClass('btn-primary btn-sm');
 	});
 	
 	var initParams = function(params) {
