@@ -25,9 +25,8 @@
 
 var headerInfo =
 	'<div class="header clear clearheader">' +
-	    '<div class="titleArea" style="margin-top: 4rem;">' +
+	    '<div class="titleArea">' +
 			'<h1>{0}发货单</h1>' +
-			'<img id="imgName"  src="${CPATH}/static/ccloud/admin/image/zxing.png" style="width: 80px;position: absolute;top: -52px;left: 0 "   class="imgStyle"  />'+ 
 		'</div>' +
 	'</div>';
 
@@ -127,7 +126,7 @@ function queryPrintDetail() {
                         });
 
                         let len = item.orderProductInfos.length;
-                        for (let i = len; i < 5; i++) {
+                        for (let i = len; i < 6; i++) {
                             content += $.format(contentStr, (i + 1), '', '', '', '', '', '', '', '', '');
                         }
                     }
@@ -153,7 +152,7 @@ function queryPrintDetail() {
 
                     batchPrintContent += headerInfoContent + headerContent + content + footerContent;
 
-                    defaultPageSize = 5;
+                    defaultPageSize = 6;
                 });
 
                 $("#print-content").html(batchPrintContent);
