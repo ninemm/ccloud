@@ -25,11 +25,13 @@
   			var customerType = getItemBykey("customerType");
   			var ifOrder = getItemBykey("ifOrder");
   			var keywordName = getItemBykey("keyword");
-	  		$('.weui-search-bar').addClass('weui-search-bar_focusing');
   			$("#region").val(region);
   			$("#customer-type").val(customerType);
   			$("#if-order").val(ifOrder);
-  			$("#searchInput").val(keywordName);
+            if(keywordName !=null && keywordName.length!=0) {
+                $('.weui-search-bar').addClass('weui-search-bar_focusing');
+  			    $("#searchInput").val(keywordName);
+                }
   		<#else>
   			clearStorage();
   		</#if>
@@ -158,7 +160,6 @@
                 if (data.totalPage > pageNumber) {
                     loading = false;
                     $(".infinite").infinite();
-                    $(".weui-loadmore").removeAttr("style");
                 }
 
                 $(".infinite")[0].scrollTop = 0;
