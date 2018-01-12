@@ -275,6 +275,7 @@
 				var outstockDetail = result.outstockDetail;
 
 				$("#customerId").val(outstock.customerId);
+				$("#sellerCustomerId").val(outstock.customer_id);
 				$("#customerName").val(outstock.customer_name);
 				$("#contact").val(outstock.ccontact);
 				$("#mobile").val(outstock.cmobile);
@@ -424,6 +425,7 @@
 						<label class="control-label col-sm-2">*客户名称:</label>
 						<div class="input-group col-md-4 col-sm-10">
 							<input class="form-control input-sm" type="text" id="customerName" name="customerName" value="" readonly>
+							<input type="hidden" id="sellerCustomerId" name="sellerCustomerId" />
 							<input type="hidden" id="customerId" name="customerId" />
 						</div>
 					</div>

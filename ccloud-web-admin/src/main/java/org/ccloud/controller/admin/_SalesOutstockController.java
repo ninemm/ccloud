@@ -287,6 +287,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
         		String outStockSN =  StringUtils.getArrayFirst(paraMap.get("salesStockSN"));
         		String wareHouseId =  StringUtils.getArrayFirst(paraMap.get("wareHouseId"));
         		String customerId = StringUtils.getArrayFirst(paraMap.get("customerId"));
+        		String sellerCustomerId = StringUtils.getArrayFirst(paraMap.get("sellerCustomerId"));
         		Date date = new Date();
         		String productNumStr = StringUtils.getArrayFirst(paraMap.get("productNum"));
         		Integer productNum = Integer.valueOf(productNumStr);
@@ -299,7 +300,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
         			String sellProductId = StringUtils.getArrayFirst(paraMap.get("sellProductId" + index));
         			if (StrKit.notBlank(sellProductId)) {
         				if (!SalesOutstockDetailQuery.me().outStock(paraMap, sellerId, 
-        						date, deptId, dataArea, index, user.getId(), outStockSN, wareHouseId, sellProductId, customerId)) {
+        						date, deptId, dataArea, index, user.getId(), outStockSN, wareHouseId, sellProductId, sellerCustomerId)) {
         					return false;
         				}
         				count++;
