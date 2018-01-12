@@ -142,7 +142,7 @@
  						 window.location.href = "${CPATH}/refund/refundDetail?id="+el.id
 					}); 
 
-					$newOrder.find("#amount").text(el.reject_amount);
+					$newOrder.find("#amount").text(el.total_reject_amount);
 					$newOrder.find("#date").text('时间：' + el.create_date);
 				});
 				page++;
@@ -281,23 +281,23 @@
 			<div class="weui-panel weui-panel_access" style="display: none">
 				<a id="salesOrderId">
 					<div class="ft14">
-						<span class="tag" id="receiveType">账期</span>
-						<span id="orderSn">DH-O-20171017-002276</span>
-						<span class="fr blue" id="status">订单待审核</span>
+						<span class="tag" id="receiveType"></span>
+						<span id="orderSn"></span>
+						<span class="fr blue" id="status"></span>
 					</div>
 					<div id="customerName" class="customer_name">
 						 小张烤鱼
 					</div>
 					<div class="gray">
 						<p>
-							联系人：<span id="contact">小张/18611111111</span>
-							<span class="fr" id="customerType">终端客户</span>
+							联系人：<span id="contact"></span>
+							<span class="fr" id="customerType"></span>
 						</p>
 					</div>
 					<div class="gray">
 						<p>
-							金额：￥<span id="amount">200</span>
-							<span class="fr" id="date">时间： 2017-10-17 06:03:04</span>
+							金额：￥<span id="amount"></span>
+							<span class="fr" id="date"></span>
 						</p>
 					</div>
 				</a>
