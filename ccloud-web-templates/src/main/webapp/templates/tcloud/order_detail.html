@@ -61,11 +61,7 @@
 			<div class="todo-product-box">
 				<#list images! as list>
 					<#if list.productSn == orderDetail.product_sn>
-						<#if list.savePath??>
-							<img src=list.savePath alt="">
-						<#else>
-							<img src="${CTPATH}/images/jp.jpg" alt="">
-						</#if>
+						<img src="${list.savePath!}" alt="" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'">
 						<#break>
 					</#if>
 				</#list>
@@ -95,11 +91,7 @@
 			<div class="todo-product-box">
 				<#list images! as list>
 					<#if list.productSn == orderDetail.product_sn>
-						<#if list.savePath??>
-							<img src=list.savePath alt="">
-						<#else>
-							<img src="${CTPATH}/images/jp.jpg" alt="">
-						</#if>
+						<img src="${list.savePath!}" alt="" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'">
 						<#break>
 					</#if>
 				</#list>

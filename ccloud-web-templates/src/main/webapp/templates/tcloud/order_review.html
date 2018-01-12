@@ -232,7 +232,12 @@
 		          <#if orderDetail.is_gift??>
 		            <#if orderDetail.is_gift = 0>
 		              <div class="modify_price todo-product-box">
-										<img src="${CTPATH}/images/jp.jpg" alt="">
+						<#list images! as list>
+							<#if list.productSn == orderDetail.product_sn>
+								<img src="${list.savePath!}" alt="" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'">
+								<#break>
+							</#if>
+						</#list>
 		                <p>${orderDetail.custom_name!}</p>
 		                <div class="p-l-15">
 		                  <div class="weui-flex__item">
@@ -302,7 +307,12 @@
 		            </#if>
 		            <#if orderDetail.is_gift = 1>
 		              <div class="modify_price todo-product-box">
-										<img src="${CTPATH}/images/jp.jpg" alt="">
+						<#list images! as list>
+							<#if list.productSn == orderDetail.product_sn>
+								<img src="${list.savePath!}" alt="" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'">
+								<#break>
+							</#if>
+						</#list>
 		                <p><span class="tag">赠品</span>${orderDetail.custom_name!} / ${(orderDetail.valueName)!}</p>
 		                <div class="t-r relative">
 		                	<input type="hidden" name="bigPriceSpan" id="bigPriceSpan" value="${(orderDetail.product_price)!}">
