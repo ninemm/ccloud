@@ -150,7 +150,7 @@
 				$loading.hide();
 				
 				if(data.orderList.length == 0) {
-					$noMore.show();
+					if($('.weui-panel').length == 0) $noMore.show();
 					loading = true;
 					return;
 				}
@@ -496,7 +496,7 @@
 			  <span class="weui-loadmore__tips">正在加载</span>
 			</div>
 			<div class="weui-loadmore weui-loadmore_line" id="noMore" style="display: none;">
-			  <span class="weui-loadmore__tips">已加载完全部数据</span>
+			  <span class="weui-loadmore__tips">暂无数据</span>
 			</div>
 		</main>
 	</article>

@@ -400,7 +400,7 @@ $(function() {
 			function(data){
 				$loading.hide();
 				if(data.customerList.length == 0){
-					$noMore.show();
+					if($('.customerSelect').length == 0) $noMore.show();
 					loading = true;
 					return;
 				}
@@ -697,7 +697,7 @@ $(function() {
 						<span class="weui-loadmore__tips">正在加载</span>
 					</div>
 					<div class="weui-loadmore weui-loadmore_line" id="noMore" style="display: none;">
-						<span class="weui-loadmore__tips">已加载完全部数据</span>
+						<span class="weui-loadmore__tips">暂无数据</span>
 					</div>
 				</article>
 			</article>

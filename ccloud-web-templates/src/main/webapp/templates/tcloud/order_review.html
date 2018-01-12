@@ -233,7 +233,7 @@
 		            <#if orderDetail.is_gift = 0>
 		              <div class="modify_price todo-product-box">
 										<img src="${CTPATH}/images/jp.jpg" alt="">
-		                <p>${orderDetail.custom_name!}</p>
+		                <p>${(orderDetail.custom_name)!}</p>
 		                <div class="p-l-15">
 		                  <div class="weui-flex__item">
 		                    <div class="fl">
@@ -303,7 +303,7 @@
 		            <#if orderDetail.is_gift = 1>
 		              <div class="modify_price todo-product-box">
 										<img src="${CTPATH}/images/jp.jpg" alt="">
-		                <p><span class="tag">赠品</span>${orderDetail.custom_name!} / ${(orderDetail.valueName)!}</p>
+		                <p><span class="tag">赠品</span>${(orderDetail.custom_name)!}</p>
 		                <div class="t-r relative">
 		                	<input type="hidden" name="bigPriceSpan" id="bigPriceSpan" value="${(orderDetail.product_price)!}">
 		                	<input type="hidden" name="bigPrice" id="bigPrice" value="${(orderDetail.product_price)!}">
