@@ -64,10 +64,10 @@
 			var $this = $(this);
 			var $detail = $this.parent().next();
 			if ($detail.is(':visible')) {
-				$detail.hide('fast');
+				$detail.slideUp('fast');
 				$this.html('显示详情 <i class="icon-angle-down"></i>');
 			} else {
-				$detail.show('fast');
+				$detail.slideDown('fast');
 				$this.html('隐藏详情 <i class="icon-angle-up"></i>');
 			}
 		});
