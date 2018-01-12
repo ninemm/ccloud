@@ -25,6 +25,7 @@
   			var customerType = getItemBykey("customerType");
   			var ifOrder = getItemBykey("ifOrder");
   			var keywordName = getItemBykey("keyword");
+	  		$('.weui-search-bar').addClass('weui-search-bar_focusing');
   			$("#region").val(region);
   			$("#customer-type").val(customerType);
   			$("#if-order").val(ifOrder);
@@ -35,31 +36,21 @@
   		refresh();
     		$(document).on("input", "#searchInput", function() {
 			setItemBykey("keyword", $("#searchInput").val());
+			refresh();
 		}).on("change", "#region", function() {
 			setItemBykey("regionId", $("#region").data('values'));
 			setItemBykey("region", $("#region").val());
+			refresh();
 		}).on("change", "#customer-type", function() {
 			setItemBykey("customerTypeId", $("#customer-type").data('values'));
 			setItemBykey("customerType", $("#customer-type").val());
+			refresh();
 		}).on("change", "#if-order", function() {
 			setItemBykey("ifOrderId", $("#if-order").data('values'));
 			setItemBykey("ifOrder", $("#if-order").val());
+			refresh();
 		});
     
-        
-        //搜索框监听
-        $(document).on("input", "#searchInput", function() {
-            refresh();
-        });
-        $(document).on("change", "#region", function() {
-            refresh();
-        });
-        $(document).on("change", "#customer-type", function() {
-            refresh();
-        });
-        $(document).on("change", "#if-order", function() {
-            refresh();
-        });
 
         //筛选项获取
         $.ajax({
@@ -152,13 +143,6 @@
             }
         });
     });
-
-
-    //搜索框叉掉和取消时，先清input值，再调用接口
-    function searchCancel() {
-        $("#searchInput")[0].value = "";
-        refresh();
-    }
 
     function refresh() {
         pageNumber = 1;
@@ -272,6 +256,11 @@
         });
     });
 
+    //搜索框叉掉和取消时，先清input值，再调用接口
+    function searchCancel() {
+        $("#searchInput")[0].value = "";
+        refresh();
+    }
 </#macro>
 
 <@layout>
