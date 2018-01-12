@@ -83,11 +83,17 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 	
 	public void getReceivables() {
 //		String type = getPara("type");
+		String keyword="";
+		try {
+			keyword = new String(getPara("keyword").getBytes("ISO8859-1"), "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
 		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String deptDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		Page<Record> page = ReceivablesQuery.me().paginate(getPageNumber(),getPageSize(),customerTypeId,user.getId(),deptDataArea,sellerId);
+		Page<Record> page = ReceivablesQuery.me().paginate(getPageNumber(),getPageSize(),customerTypeId,user.getId(),deptDataArea,sellerId,keyword);
 		List<Record> receivablesList = page.getList();
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(),"rows", receivablesList);
 		
@@ -187,6 +193,13 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 	//导出应收记录
 	public void downloading() throws UnsupportedEncodingException {
 //		String type = getPara("type");
+		String keyword="";
+		try {
+			keyword = new String(getPara("keyword").getBytes("ISO8859-1"), "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
@@ -194,7 +207,7 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 		
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\receivables\\"
 				+ "receivables.xlsx";
-		Page<Record> page = ReceivablesQuery.me().paginate(1,Integer.MAX_VALUE,customerTypeId,user.getId(),deptDataArea,sellerId);
+		Page<Record> page = ReceivablesQuery.me().paginate(1,Integer.MAX_VALUE,customerTypeId,user.getId(),deptDataArea,sellerId,keyword);
 		List<Record> receivablesList = page.getList();
 		
 		List<receivablesExcel> excellist = Lists.newArrayList();

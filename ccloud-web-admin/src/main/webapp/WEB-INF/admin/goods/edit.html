@@ -30,9 +30,11 @@ var $form = $("#form");
 $(function() {
 	jQuery.mm.initValidator('#form', validatorFields)
 	<#if pList??>
-		var loop = ${(pList?size)!0};
-		$("#loop").val(loop);
+		var loop = ${(pList?size)};
+	<#else>
+		var loop = 0;
 	</#if>
+	$("#loop").val(loop);
 	<#list (pList)! as list>
 		var productSn = 'productList[' + ${list_index} + '].productSn';
 		var price = 'productList[' + ${list_index} + '].price';
@@ -820,7 +822,7 @@ function doSubmit(){
 													<input type="hidden" name="productList[${list_index}].id" value="${list.id}" />
 													<div class="form-group validata-box" style="margin: 0;">
 													<div class="input-group col-md-4 col-sm-10">													
-													<input type="text" name="productList[${list_index}].productSn" class="formText" style="width: 50px;text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" value="${list.productSn}" />
+													<input type="text" name="productList[${list_index}].productSn" class="formText" style="width: 100px;text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" value="${list.productSn}" />
 													</div>
 												</td>
 												<#list (goods.specificationList)! as goodsSpecification>

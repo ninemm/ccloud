@@ -38,7 +38,6 @@ import org.ccloud.model.PayablesDetail;
 import org.ccloud.model.Payment;
 import org.ccloud.model.User;
 import org.ccloud.model.query.CustomerTypeQuery;
-import org.ccloud.model.query.GoodsCategoryQuery;
 import org.ccloud.model.query.PayablesDetailQuery;
 import org.ccloud.model.query.PayablesQuery;
 import org.ccloud.model.query.PaymentQuery;
@@ -65,28 +64,34 @@ import cn.afterturn.easypoi.excel.entity.ExportParams;
 public class _PayablesController extends JBaseCRUDController<Payables> { 
 	
 	public void getOptions(){
-		String type = getPara("type");
+//		String type = getPara("type");
 		String DataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		List<Record> list = new ArrayList();
-		if(type != null) {
-			if("1".equals(type)) {
-				list = CustomerTypeQuery.me().getCustomerTypes(DataArea);
-			}else if("2".equals(type)) {
-				list = GoodsCategoryQuery.me().getLeafTypes();
-			}
-		}
+//		if(type != null) {
+//			if("1".equals(type)) {
+		list = CustomerTypeQuery.me().getCustomerTypes(DataArea);
+//			}else if("2".equals(type)) {
+//				list = GoodsCategoryQuery.me().getLeafTypes();
+//			}
+//		}
 		renderJson(list);
 	}
 	
 	
 	public void getPayables() {
-		String type = getPara("type");
+//		String type = getPara("type");
+		String keyword = "";
+		try {
+			keyword = new String(getPara("keyword").getBytes("ISO8859-1"), "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
 		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String deptDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-		Page<Record> page = PayablesQuery.me().paginate(getPageNumber(),getPageSize(),customerTypeId,type,user.getId(),deptDataArea,sellerId,user.getDepartmentId());
+		Page<Record> page = PayablesQuery.me().paginate(getPageNumber(),getPageSize(),customerTypeId,user.getId(),deptDataArea,sellerId,user.getDepartmentId(),keyword);
 		List<Record> payList = page.getList();
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(),"rows", payList);
 		
@@ -94,12 +99,12 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 	}
 	
 	public void getpayablesDetail() {
-		String type = getPara("type");
+//		String type = getPara("type");
 		String id = getPara("id");
 		String deptDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		Map<String, Object> map;
-		if(type != null && id!=null) {
-			Page<PayablesDetail> page = PayablesDetailQuery.me().paginate(getPageNumber(), getPageSize(), id,type,deptDataArea);
+		if(!id.equals("")) {
+			Page<PayablesDetail> page = PayablesDetailQuery.me().paginate(getPageNumber(), getPageSize(), id,deptDataArea);
 			map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		}else {
 			map = new HashMap<String, Object>();
@@ -182,7 +187,13 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 	
 	//导出应付记录
 	public void downloading() throws UnsupportedEncodingException {
-		String type = getPara("type");
+//		String type = getPara("type");
+		String keyword="";
+		try {
+			keyword = new String(getPara("keyword").getBytes("ISO8859-1"), "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
 		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String deptDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);	
@@ -190,7 +201,7 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\payables\\"
 				+ "payables.xlsx";
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-		Page<Record> page = PayablesQuery.me().paginate(1,Integer.MAX_VALUE,customerTypeId,type,user.getId(),deptDataArea,sellerId,user.getDepartmentId());
+		Page<Record> page = PayablesQuery.me().paginate(1,Integer.MAX_VALUE,customerTypeId,user.getId(),deptDataArea,sellerId,user.getDepartmentId(),keyword);
 		List<Record> payablesList = page.getList();
 		
 		List<payablesExcel> excellist = Lists.newArrayList();

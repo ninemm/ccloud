@@ -19,7 +19,7 @@
 </#macro>
 
 <#macro script>
-var type = $("#selecttype").val();
+//var type = $("#selecttype").val();
 
 var detail_object_id = "";
 
@@ -28,10 +28,10 @@ var payableDetailUrl = '${CPATH}/admin/payables/getpayablesDetail';
 $(function() {
 	updateOptions();
 	
-	$("#selecttype").change(function(){
+	/* $("#selecttype").change(function(){
 		updateOptions();
 		type = $(this).val();
-	});
+	}); */
 
 	jQuery.mm.initEditTable('#_payables_table', payablesUrl, getpayablesParams, initpayablesTable(), null);
 	$("#search-payables").click(function(){
@@ -51,12 +51,13 @@ $(function() {
 });
 
 function updateOptions(){
-	var type = $("#selecttype").val();
+	//var type = $("#selecttype").val();
 	$.ajax({
-		url: "${CPATH}/admin/payables/getOptions?type="+type,
+		url: "${CPATH}/admin/payables/getOptions",
 		async: false,
 		success: function(data){
 			var optionsHtml = '<option value="0" >全部</option>';
+			optionsHtml += '<option value="1" >供应商</option>';
 			if(data.length && data.length>=1){
 				for(var i in data){
 					optionsHtml += '<option value="'+data[i].id+'" >'+data[i].name+'</option>';
@@ -81,15 +82,17 @@ var initpayablesTable = function(){
 
 var  cusType = "";
 var getpayablesParams = function(params){
-var customerTypeId = $('#category-or-customer').val();
-cusType = customerTypeId;
-	var param = {
-        size: params.limit,
-        page: params.offset/params.limit + 1,
-        type : type,
-        customerTypeId:customerTypeId
-    };
-    return param;
+	var customerTypeId = $('#category-or-customer').val();
+	var keyword = $('#post-search-input').val();
+	cusType = customerTypeId;
+		var param = {
+	        size: params.limit,
+	        page: params.offset/params.limit + 1,
+	        keyword :keyword,
+	//        type : type,
+	        customerTypeId:customerTypeId
+	    };
+	    return param;
 }
 
 var initpayableDetailTable = function(){
@@ -123,7 +126,7 @@ var getpayablesDetailParams = function(params){
 	var param = {
         size: params.limit,
         page: params.offset/params.limit + 1,
-        type : type,
+//        type : type,
         id: detail_object_id
     };
     
@@ -141,7 +144,8 @@ function orderInfo(orderSn){
 }
 
 function batchDown(){
-		location.href = "${CPATH}/admin/payables/downloading?type="+type +"&customerTypeId=" + cusType;
+		var keyword = $('#post-search-input').val();
+		location.href = "${CPATH}/admin/payables/downloading?customerTypeId=" + cusType+"&keyword"+keyword;
 	}
 
 </#macro>
@@ -157,24 +161,29 @@ function batchDown(){
 </section>
 <!-- Main content -->
 <section class="content">
-	<div class="row content-row">
+	<div class="form-inline">
 	<div class="jp-left">
 	 	<button onclick="batchDown()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-upload"></i> 导出</button>
 	  </div>
-		<div class="input-group input-group-sm" style="float:right;">
-			<label class="control-label">往来单位：</label>
+		<div class="form-group" style="float:right;">
+			<!--  <label class="control-label">往来单位：</label>
 			<select id="selecttype" style="width:200px;float: none;" class="form-control">
 				<option value="1" >客户</option>
 				<option value="2" >供应商</option>
-			</select>&nbsp;&nbsp;&nbsp;
-			<label class="control-label">分类：</label>
-			<select id="category-or-customer" style="width:200px;float: none;" class="form-control">
-				<option value="0">全部</option>
-			</select>&nbsp;&nbsp;&nbsp;
+			</select>&nbsp;&nbsp;&nbsp;-->
+			<div class="form-group validata-box">
+				<label class="control-label">客户类型：</label>
+				<select id="category-or-customer" style="width:200px;float: none;" class="form-control">
+					<option value="0">全部</option>
+					<option value="1">供应商</option>
+				</select>&nbsp;&nbsp;&nbsp;
+			</div>
+			<input id="post-search-input" class="form-control" type="search" value="${k!}" name="k" placeholder="搜索名称">&nbsp;
 			<span id="search-payables" class="btn btn-primary btn-sm btn-flat" >搜索</span>
 		</div>
 	</div>
-	<div class="box">
+	
+	<div class="box" style="margin-top:50px;">
         <table class="table table-striped table-hover table-condensed" id="_payables_table" ></table>
     </div>
     <div class="box">
