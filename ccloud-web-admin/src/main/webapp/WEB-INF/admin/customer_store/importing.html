@@ -1,0 +1,79 @@
+<#include "../_inc/_layer_layout.html"/>
+
+<#macro script_import>
+	<script src="${CPATH}/static/ladda/spin.min.js"></script>
+	<script src="${CPATH}/static/ladda/ladda.min.js"></script>
+</#macro> 
+
+<#macro css_import>
+	<link rel="stylesheet" href="${CPATH}/static/ladda/ladda-themeless.min.css">
+</#macro>
+
+<#macro script>
+	
+	var $saveBtn = $("#save_btn");
+	
+	$(document).ready(function() {
+		$saveBtn.click(function() {
+			var btn = Ladda.create( document.querySelector("#save_btn") );
+			if($("#query").val().trim() == '') {
+				parent.toastr.warning('关键字不能为空', '操作失败');
+				return;
+			}
+			if($("#region").val().trim() == '') {
+				parent.toastr.warning('不能为空', '操作失败');
+				return;
+			}
+			btn.start();
+			var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+			$('#form').ajaxSubmit({
+				type : "post",
+				dataType : "json",
+				success : function(result) {
+					btn.stop();
+					if (result.errorCode > 0) {
+						parent.toastr.error(result.message, '操作失败');
+					} else {
+						parent.toastr.success(result.message, '操作成功');
+						parent.$table.bootstrapTable('refresh');
+						parent.layer.close(index);
+					}
+				},
+				error : function() {
+					btn.stop();
+					parent.toastr.error("信息提交错误", '操作失败');
+				}
+			});
+		});
+	  	
+	}); 
+	
+</#macro>
+
+<@layout>
+<div style="padding: 10px;">
+	<div class="container">
+		<div class="row content-row">
+			<form action="${CPATH}/admin/customerStore/save" method="post" id="form" class="form-horizontal" >
+                <div class="form-group">
+                    <div class="col-sm-5 validata-box">
+                        <label class="control-label col-sm-4">关键字:</label>
+                        <div class="input-group col-sm-8">
+                            <input class="form-control input-sm" type="text" name="query" id="query" placeholder="如：餐厅（必填）">
+                        </div>
+                    </div>
+                    <div class="col-sm-5 validata-box">
+                        <label class="control-label col-sm-4">市名称:</label>
+                        <div class="input-group col-sm-8">
+                            <input class="form-control input-sm" type="text" name="region" id="region" placeholder="如：武汉市（必填）">
+                        </div>
+                    </div>
+                </div>
+			</form>
+		</div>
+		<div class="box-footer"> 
+			<button type="button" id="save_btn" class="btn btn-sm btn-primary btn-flat ladda-button" data-style="expand-right">导入</button>
+		</div>
+	</div>
+</div>	
+</@layout>
