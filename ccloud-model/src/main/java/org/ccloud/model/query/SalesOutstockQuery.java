@@ -102,9 +102,14 @@ public class SalesOutstockQuery extends JBaseQuery {
 				String outstockId = "";
 				String warehouseId = "";
 				String outstockSn = "";
+				BigDecimal outTotalAmount = new BigDecimal(0);
+				int i = 1;
 				for (Record orderDetail : orderDetailList) {
 					if (!warehouseId.equals(orderDetail.getStr("warehouse_id"))) {
-
+						if (StringUtils.isNotBlank(outstockId)) {
+							SalesOutstockQuery.me().updateTotalAmount(outstockId, outTotalAmount.toString());
+							outTotalAmount = new BigDecimal(0);
+						}
 						outstockId = StrKit.getRandomUUID();
 						warehouseId = orderDetail.getStr("warehouse_id");
 						String OrderSO = SalesOutstockQuery.me().getNewSn(sellerId);
@@ -116,7 +121,11 @@ public class SalesOutstockQuery extends JBaseQuery {
 						SalesOrderJoinOutstockQuery.me().insert(orderId, outstockId);
 					}
 
-					SalesOutstockDetailQuery.me().insert(outstockId, orderDetail, date, order);
+					outTotalAmount = outTotalAmount.add(SalesOutstockDetailQuery.me().insert(outstockId, orderDetail, date, order));
+					if (i == orderDetailList.size()) {
+						SalesOutstockQuery.me().updateTotalAmount(outstockId, outTotalAmount.toString());
+					}
+					i++;
 				}
 
 				SalesOrderQuery.me().updateConfirm(orderId, Consts.SALES_ORDER_AUDIT_STATUS_PASS, userId, date);// 已审核通过
@@ -128,6 +137,11 @@ public class SalesOutstockQuery extends JBaseQuery {
 		return isSave;
 	}
 	
+	public int updateTotalAmount(String outstockId, String outTotalAmount) {
+		StringBuilder fromBuilder = new StringBuilder("update cc_sales_outstock cc set cc.total_amount = ? where cc.id = ? ");
+		return Db.update(fromBuilder.toString(), outTotalAmount, outstockId);
+	}
+
 	public boolean insert(String outstockId, String outstockSn, String warehouseId, String sellerId, Record order,
 			Date date) {
 		SalesOutstock outstock = new SalesOutstock();
@@ -141,7 +155,6 @@ public class SalesOutstockQuery extends JBaseQuery {
 		outstock.setMobile(order.getStr("mobile"));
 		outstock.setAddress(order.getStr("address"));
 		outstock.setBizUserId(order.getStr("biz_user_id"));
-		outstock.setTotalAmount(order.getBigDecimal("total_amount"));
 		outstock.setReceiveType(order.getInt("receive_type"));
 		outstock.setDeliveryAddress(order.getStr("delivery_address"));
 		outstock.setDeliveryDate(order.getDate("delivery_date"));

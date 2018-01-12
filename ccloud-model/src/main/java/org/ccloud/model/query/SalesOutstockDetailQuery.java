@@ -103,7 +103,7 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		return Db.find(sqlBuilder.toString(), outstockId);
 	}
 
-	public boolean insert(String outstockId, Record orderDetail, Date date, Record order) {
+	public BigDecimal insert(String outstockId, Record orderDetail, Date date, Record order) {
 		SalesOutstockDetail detail = new SalesOutstockDetail();
 		detail.setId(StrKit.getRandomUUID());
 		detail.setOutstockId(outstockId);
@@ -133,7 +133,8 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		
 		
 //		return detail.save() && receivablesDetail.save();
-		return detail.save();
+		detail.save();
+		return orderDetail.getBigDecimal("product_amount");
 		
 	}
 	
