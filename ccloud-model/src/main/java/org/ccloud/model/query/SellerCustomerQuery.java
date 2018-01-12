@@ -340,6 +340,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 				"FROM (SELECT c.id,c.customer_name,c.contact,c.mobile,c.prov_name,c.city_name,c.country_name,c.address,csc.id as sellerCustomerId ");
 		sql.append("FROM cc_user_join_customer cujc ");
 		sql.append("LEFT JOIN cc_customer_join_customer_type ccjct ON cujc.seller_customer_id = ccjct.seller_customer_id ");
+		sql.append("LEFT JOIN cc_customer_type cct ON ccjct.customer_type_id = cct.id ");
 		sql.append("LEFT JOIN cc_seller_customer csc ON cujc.seller_customer_id = csc.id ");
 		sql.append("LEFT JOIN cc_customer c ON csc.customer_id = c.id ");
 		sql.append("LEFT JOIN cc_sales_order cso ON cujc.seller_customer_id = cso.customer_id AND cujc.data_area = cso.data_area ");
@@ -359,6 +360,9 @@ public class SellerCustomerQuery extends JBaseQuery {
 		}
 
 		needwhere = appendIfNotEmptyWithLike(sql, "cujc.data_area", selectDataArea, params, needwhere);
+		sql.append(" AND cct.name != ? ");
+		params.add("直营商");
+
 		sql.append(" AND csc.customer_id not in ( ");
 		sql.append("SELECT cc.id ");
 

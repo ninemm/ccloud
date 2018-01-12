@@ -14,7 +14,6 @@
         color: #3c8dbc!important;
     }
     .index-info .weui-cells {
-		max-height: 20rem;
 		overflow: auto; 
 		-webkit-overflow-scrolling: touch;
 	}
@@ -46,6 +45,10 @@
 		})
 	})
 	
+	var _top = $('.index-info').offset().top;
+	var _bottom = $('.weui-tabbar').offset().top;
+	$('.weui-cells').css('max-height', _bottom-_top + 'px');
+
 	function openTopRightMenu() {
         $('.top-right-menu').addClass('layer-pop-show');
     }

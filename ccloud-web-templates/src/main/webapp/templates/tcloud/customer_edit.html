@@ -218,7 +218,6 @@
                 if($("#delivery-address").val().length==0) {$.toptip('配送地址不能为空', 1000, 'error'); return false;}
                 if($("#address").val().length==0) {$.toptip('地址详情不能为空', 1000, 'error'); return false;}
                 if($("#location").val().length==0) {$.toptip('定位地址不能为空,请刷新定位', 1000, 'error'); return false;}
-                if($("#location").val().indexOf($("#areaName").val().replace(",", "").replace(",", ""))!=0)  {$.toptip('配送地址与定位地址不符', 1000, 'error'); return false;}
 
                 $('._submit_btn').attr('disabled', true);
                 layer.open({
@@ -252,11 +251,21 @@
     function doEnabled() {
         $.get("${CPATH}/customer/enable?id=${(sellerCustomer.id)!""}&isEnabled=0" ,
         function(result){
-            if (result.errorCode > 0) {
-                toastr.error(result.message, '操作失败');
+            if (result.errorCode == 0) {
+                $.confirm({
+                    title: result.message,
+                    text: '返回列表页？',
+                    onOK: function () {
+                        location.href = '${CPATH}/customer'
+                    },
+                    onCancel: function () {
+                        $.closeModal();
+                    }
+                });
             } else {
-                toastr.success(result.message, '操作成功');
+                $.alert(result.message);
             }
+            layer.closeAll();
         }
     )};
     
@@ -291,6 +300,9 @@
                     geoc.getLocation(point, function(rs) {
                         var addComp = rs.addressComponents;
                         var address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
+                        $("#delivery-address")[0].value = addComp.province + " " + addComp.city + " " + addComp.district;
+                        $('#areaCode').val(addComp.provinceNumber + "," + addComp.cityNumber + "," + addComp.districtNumber);
+                        $('#areaName').val(addComp.province + "," + addComp.city + "," + addComp.district);
                         $('#location-span').text(address);
                         $('#location').val(address);
                     });
@@ -331,6 +343,9 @@
                     geoc.getLocation(point, function(rs) {
                         var addComp = rs.addressComponents;
                         var address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
+                        $("#delivery-address")[0].value = addComp.province + " " + addComp.city + " " + addComp.district;
+                        $('#areaCode').val(addComp.provinceNumber + "," + addComp.cityNumber + "," + addComp.districtNumber);
+                        $('#areaName').val(addComp.province + "," + addComp.city + "," + addComp.district);
                         $('#location-span').text(address);
                         $('#location').val(address);
                     });
@@ -354,7 +369,30 @@
     
     function getback() {
 		window.location.href = '${CPATH}/customer?history=' + 1;	
-	} 
+	}
+
+    function doReceive(){
+
+        $.get("${CPATH}/customer/receive?id=${(sellerCustomer.id)!""}&isEnabled=0" ,
+            function(result){
+                if (result.errorCode == 0) {
+                    $.confirm({
+                        title: result.message,
+                        text: '返回列表页？',
+                        onOK: function () {
+                            location.href = '${CPATH}/customer'
+                        },
+                        onCancel: function () {
+                            $.closeModal();
+                        }
+                    });
+                } else {
+                    $.alert(result.message);
+                }
+                layer.closeAll();
+            }
+        )
+    };
 </#macro>
 
 <@layout>
@@ -363,9 +401,7 @@
 		<main>
 		    <form action="${CPATH}/customer/save" method="post" id="form">
 			    <section class="weui-panel weui-panel_access order-customer-info select-area">
-                    <#if !type??>
 			        <input type="hidden" name="sellerCustomer.id" value="${(sellerCustomer.id)!}">
-                    </#if>
                     <input type="hidden" id="oldPic" name="oldPic">
 			        <div class="weui-cell weui-cell_access">
 			            <div class="weui-cell__bd">
@@ -489,8 +525,8 @@
 		</div>
 		<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
 		    <#if type??>
-                <button class="white-button-no-border weui-flex__item _submit_btn border-top-1px" onclick="window.location.href='${CPATH}/customer/importCustomer'">导入</button>
-                <button class="red-button weui-flex__item _submit_btn" onclick="doSubmit()">新增</button>
+                <button class="white-button-no-border weui-flex__item _submit_btn border-top-1px" onclick="window.location.href='${CPATH}/customer/importCustomer'">重新导入</button>
+                <button class="red-button weui-flex__item _submit_btn" onclick="doReceive()">确定</button>
             <#elseif sellerCustomer??>
 		        <button class="white-button-no-border weui-flex__item _submit_btn border-top-1px" onclick="doEnabled()">停用</button>
 		        <button class="red-button weui-flex__item _submit_btn" onclick="doSubmit()">更新</button>

@@ -50,12 +50,12 @@ public class CustomerController extends BaseFrontController {
 	@Before(WechatJSSDKInterceptor.class)
 	public void index() {
 
-//		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
-//		String key = getPara("searchKey");
-//		String hasOrder = getPara("isOrdered");
-//		String customerType =  getPara("customerType");
-//		Page<Record> customerList = SellerCustomerQuery.me().findByUserTypeForApp(getPageNumber(), getPageSize(), selectDataArea, customerType, hasOrder, key);
-//		setAttr("customerList", customerList);
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
+		String key = getPara("searchKey");
+		String hasOrder = getPara("isOrdered");
+		String customerType =  getPara("customerType");
+		Page<Record> customerList = SellerCustomerQuery.me().findByUserTypeForApp(getPageNumber(), getPageSize(), selectDataArea, customerType, hasOrder, key);
+		setAttr("customerList", customerList);
 		
 		String history = getPara("history");
 		setAttr("history", history);		
@@ -926,8 +926,25 @@ public class CustomerController extends BaseFrontController {
 			setAttr("sellerCustomer", sellerCustomer);
 
 		}
-		setAttr("type", "add");
+		setAttr("type", "save");
 		setAttr("customerType", JSON.toJSONString(getCustomerType()));
 		render("customer_edit.html");
+	}
+
+	public void receive(){
+		String sellerCustomerId = getPara("id");
+		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(sellerCustomerId);
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+
+		UserJoinCustomer userJoinCustomer = new UserJoinCustomer();
+
+		userJoinCustomer.setSellerCustomerId(sellerCustomer.getId());
+		userJoinCustomer.setUserId(user.getId());
+		userJoinCustomer.setDeptId(user.getDepartmentId());
+		userJoinCustomer.setDataArea(user.getDataArea());
+
+		if (userJoinCustomer.save()) renderAjaxResultForSuccess("操作成功");
+		else renderAjaxResultForError("操作失败");
+
 	}
 }

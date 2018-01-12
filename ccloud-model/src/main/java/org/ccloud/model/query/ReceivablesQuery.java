@@ -46,7 +46,7 @@ public class ReceivablesQuery extends JBaseQuery {
 		});
 	}
 
-	public Page<Record> paginate(int pageNumber, int pageSize, String id,String seller_id,String dataArea,String sellerId) {
+	public Page<Record> paginate(int pageNumber, int pageSize, String id,String seller_id,String dataArea,String sellerId,String keyword) {
 		
 		Boolean b = true;
 		String select;
@@ -62,6 +62,7 @@ public class ReceivablesQuery extends JBaseQuery {
 			if(b) {
 				fromBuilder.append(" WHERE 1=1 ");
 			}
+			
 			fromBuilder.append(" and c1.seller_id = ? GROUP BY c1.id ) t1 ON r.object_id = t1.id inner JOIN `cc_customer` AS c ON c.id = t1.customer_id ");
 			params.add(sellerId);
 			
@@ -75,6 +76,9 @@ public class ReceivablesQuery extends JBaseQuery {
 //		}
 		
 		appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, b);
+		if(!keyword.equals("")) {
+			fromBuilder.append(" and c.customer_name like '%"+keyword+"%' ");
+		}
 		fromBuilder.append(" ORDER BY r.create_date DESC");
 		
 		

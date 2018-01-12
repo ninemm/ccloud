@@ -13,6 +13,11 @@
 	    margin: 0;
 	    color: #fff;
     }
+    .list-box {
+        position: absolute;
+        top: 44px;
+        bottom: 0;
+    }
 </#macro>
 <#macro script>
     var pageNumber = 2;
@@ -22,48 +27,42 @@
     var $endNode = null;
     var $loadmore = $(".weui-loadmore");
     $(function () {
-
-		<#if history??>
+  		<#if history??>
   			var type = getItemBykey("type");
   			var nature = getItemBykey("nature");
   			var level = getItemBykey("level");
   			var status = getItemBykey("status");
+  			var keywordName = getItemBykey("keyword");
+  			$('.weui-search-bar').addClass('weui-search-bar_focusing');
   			$("#customer-type").val(type);
   			$("#customer-nature").val(nature);
   			$("#customer-level").val(level);
   			$("#customer-status").val(status);
+  			$("#searchInput").val(keywordName);
   		<#else>
   			clearStorage();
   		</#if>
   		refresh();
-    		$(document).on("change", "#customer-type", function() {
+    		$(document).on("input", "#searchInput", function() {
+			setItemBykey("keyword", $("#searchInput").val());
+			refresh();
+		}).on("change", "#customer-type", function() {
 			setItemBykey("typeId", $("#customer-type").data('values'));
 			setItemBykey("type", $("#customer-type").val());
+			refresh();
 		}).on("change", "#customer-nature", function() {
 			setItemBykey("natureId", $("#customer-nature").data('values'));
 			setItemBykey("nature", $("#customer-nature").val());
+			refresh();
 		}).on("change", "#customer-level", function() {
 			setItemBykey("levelId", $("#customer-level").data('values'));
 			setItemBykey("level", $("#customer-level").val());
+			refresh();
 		}).on("change", "#customer-status", function() {
 			setItemBykey("statusId", $("#customer-status").data('values'));
 			setItemBykey("status", $("#customer-status").val());
-		});    
-    
-       //搜索框监听
-	    $(document).on("change", "#customer-type", function() {
-	        refresh();
-	    });
-	    $(document).on("change", "#customer-nature", function() {
-	        refresh();
-	    });
-	    $(document).on("change", "#customer-level", function() {
-	        refresh();
-	    });
-	    $(document).on("change", "#customer-status", function() {
-	        refresh();
-	    });
-    
+			refresh();
+		});   
     
         $.ajax({
             url:"${CPATH}/customerVisit/getSelect",
@@ -94,6 +93,7 @@
     var paramData = function() {
        <#if !history??>
         return  {
+        		"searchKey": $("#searchInput")[0].value,
             "pageNumber": pageNumber,
             "pageSize": pageSize,
             "type": $("#customer-type")[0].dataset.values,
@@ -106,7 +106,9 @@
   			var nature = getItemBykey("natureId");
   			var level = getItemBykey("levelId");
   			var status = getItemBykey("statusId");
+  			var searchKey = getItemBykey("keyword");
 			return  {
+				"searchKey": searchKey,
 			    "pageNumber": pageNumber,
 	            "pageSize": pageSize,
 	            "type": type,
@@ -145,10 +147,6 @@
         });
     });
     
- 
-    
-    
-
     function refresh() {
         pageNumber = 1;
         $.ajax({
@@ -176,67 +174,89 @@
         });
     }
 
+
+	//搜索框叉掉和取消时，先清input值，再调用接口
+    function searchCancel() {
+        $("#searchInput")[0].value = "";
+        refresh();
+    }
 </#macro>
 <@layout>
 <div id="visit-record">
-	<#if id??>
-	<header class="t-c">${(name)!}</header>
-	</#if>
-    <#if !id??>
-	<header>
-	    <div class="head-search select-area">
-	        <div class="weui-flex">
-                <div class="weui-flex__item">
-                    <input type="text" id="customer-type" placeholder="客户类型" class="weui-input" readonly onchange="refresh()">
-                    <i class="icon-sort-desc"></i>
-                </div>
-                <div class="weui-flex__item" style="display:none; ">
-                    <input type="text" id="customer-nature" placeholder="客户性质" class="weui-input" readonly onchange="refresh()">
-                    <i class="icon-sort-desc"></i>
-                </div>
-                <div class="weui-flex__item">
-                    <input type="text" id="customer-level" placeholder="客户级别" class="weui-input" readonly onchange="refresh()">
-                    <i class="icon-sort-desc"></i>
-                </div>
-                <div class="weui-flex__item">
-                    <input type="text" id="customer-status" placeholder="审核状态" class="weui-input" readonly onchange="refresh()">
-                    <i class="icon-sort-desc"></i>
+    <div class="weui-search-bar" id="SearchBar">
+        <form class="weui-search-bar__form">
+            <div class="weui-search-bar__box">
+                <i class="weui-icon-search"></i>
+                <input type="search" class="weui-search-bar__input" id="searchInput" placeholder="搜索" required="">
+                <a href="javascript:" class="weui-icon-clear" id="searchClear"></a>
+            </div>
+            <label class="weui-search-bar__label" id="searchText">
+                <i class="weui-icon-search"></i>
+                <span>请输入客户名或联系人</span>
+            </label>
+        </form>
+        <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
+    </div>
+    <div class="list-box">
+        <#if id??>
+        <header class="t-c">${(name)!}</header>
+        </#if>
+        <#if !id??>
+        <header>
+            <div class="head-search select-area">
+                <div class="weui-flex">
+                    <div class="weui-flex__item">
+                        <input type="text" id="customer-type" placeholder="客户类型" class="weui-input" readonly >
+                        <i class="icon-sort-desc"></i>
+                    </div>
+                    <div class="weui-flex__item" style="display:none; ">
+                        <input type="text" id="customer-nature" placeholder="客户性质" class="weui-input" readonly >
+                        <i class="icon-sort-desc"></i>
+                    </div>
+                    <div class="weui-flex__item">
+                        <input type="text" id="customer-level" placeholder="客户级别" class="weui-input" readonly >
+                        <i class="icon-sort-desc"></i>
+                    </div>
+                    <div class="weui-flex__item">
+                        <input type="text" id="customer-status" placeholder="审核状态" class="weui-input" readonly >
+                        <i class="icon-sort-desc"></i>
+                    </div>
                 </div>
             </div>
-	    </div>
-	</header>
-    </#if>
-	<main id="visitList" class="infinite">
-	    <#if visitList??>
-	        <#list visitList.list as visit>
-	            <a class="weui-cell weui-cell_access" href="${(CPATH)}/customerVisit/detail?id=${(visit.id)!}">
-	                <div class="weui-cell__bd ft14">
-	                    <p>${(visit.customer_name)!}</p>
-	                    <p class="gray ft12">${(visit.contact)!}/${(visit.mobile)!}
-	                        <span class="fr">${(visit.create_date)!}</span>
-	                    </p>
-	                    <p>活动类型：
-	                        <span class="orange">${DICT_NAME(visit.question_type)}</span>
-	                        <span class="green fr">${DICT_NAME(visit.status)}</span>
-	                    </p>
-	                </div>
-	                <span class="weui-cell__ft"></span>
-	            </a>
-	        </#list>
-	    </#if>
-	    <#if visitList??>
-	        <#if visitList.totalRow = 0>
-	            <div class="weui-loadmore weui-loadmore_line">
-	                <span class="weui-loadmore__tips">暂无数据</span>
-	            </div>
-	            <#elseif visitList.totalRow &gt; 10>
-	                <div class="weui-loadmore">
-	                    <i class="weui-loading"></i>
-	                    <span class="weui-loadmore__tips">正在加载</span>
-	                </div>
-	        </#if>
-	    </#if>
-	</main>
+        </header>
+        </#if>
+        <main id="visitList" class="infinite">
+            <#if visitList??>
+                <#list visitList.list as visit>
+                    <a class="weui-cell weui-cell_access" href="${(CPATH)}/customerVisit/detail?id=${(visit.id)!}">
+                        <div class="weui-cell__bd ft14">
+                            <p>${(visit.customer_name)!}</p>
+                            <p class="gray ft12">${(visit.contact)!}/${(visit.mobile)!}
+                                <span class="fr">${(visit.create_date)!}</span>
+                            </p>
+                            <p>活动类型：
+                                <span class="orange">${DICT_NAME(visit.question_type)}</span>
+                                <span class="green fr">${DICT_NAME(visit.status)}</span>
+                            </p>
+                        </div>
+                        <span class="weui-cell__ft"></span>
+                    </a>
+                </#list>
+            </#if>
+            <#if visitList??>
+                <#if visitList.totalRow = 0>
+                    <div class="weui-loadmore weui-loadmore_line">
+                        <span class="weui-loadmore__tips">暂无数据</span>
+                    </div>
+                    <#elseif visitList.totalRow &gt; 10>
+                        <div class="weui-loadmore">
+                            <i class="weui-loading"></i>
+                            <span class="weui-loadmore__tips">正在加载</span>
+                        </div>
+                </#if>
+            </#if>
+        </main>
+    </div>
     <#if !id??>
         <#include "_inc/_goback.html" />
         <footer class="weui-footer weui-footer_fixed-bottom">

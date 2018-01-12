@@ -286,10 +286,10 @@ function initComposition(compositionList){
 			$newProductDetail.find("#product_image_list_store").val(el.product_image_list_store);
 			$newProductDetail.find("#product_sn").val(el.product_sn);
 
-			$newProductDetail.find("#subProduct").text(el.sub_product_name + el.sub_product_sp + ' x ' + el.sub_product_count + '件')
+			$newProductDetail.find("#subProduct").text(el.sub_product_name + ' ' + el.sub_product_count + '件')
 		}else{
 			$newProductDetail.find("#sub").append("<a class='fr gift-open' >展开</a>");
-			$newProductDetail.find("#subsubProduct").append("el.sub_product_name + el.sub_product_sp + ' x ' + el.sub_product_count + '件' </br>");
+			$newProductDetail.find("#subsubProduct").append("el.sub_product_name + ' ' + el.sub_product_count + '件' </br>");
 		}
 
 	});
@@ -592,9 +592,7 @@ function order(){
 								<div class="product-top">
 									<img src="" id="compositionImage" style="width:2rem;" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'" onClick="imageClick(this)">
 									<div class="weui-cell_access product-top-right">
-										<nobr>
-											<p class="product_name" id="compositionName"></p>
-										</nobr>
+										<p class="product_name" id="compositionName"></p>
 										<div class="product_unit">
 											规格：
 											<span id="compositionValueName"></span>

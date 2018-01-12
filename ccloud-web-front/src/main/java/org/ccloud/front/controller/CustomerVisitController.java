@@ -128,7 +128,7 @@ public class CustomerVisitController extends BaseFrontController {
 	public void refresh() {
 
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-
+		
 		Page<Record> visitList = new Page<>();
 		visitList = CustomerVisitQuery.me().paginateForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("id"), getPara("type"), getPara("nature"), getPara("level"), getPara("status"), selectDataArea, getPara("searchKey"));
 
