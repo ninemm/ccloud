@@ -86,7 +86,7 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String deptDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-		Page<Record> page = PayablesQuery.me().paginate(getPageNumber(),getPageSize(),customerTypeId,type,user.getId(),deptDataArea,sellerId);
+		Page<Record> page = PayablesQuery.me().paginate(getPageNumber(),getPageSize(),customerTypeId,type,user.getId(),deptDataArea,sellerId,user.getDepartmentId());
 		List<Record> payList = page.getList();
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(),"rows", payList);
 		
@@ -190,7 +190,7 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\payables\\"
 				+ "payables.xlsx";
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-		Page<Record> page = PayablesQuery.me().paginate(1,Integer.MAX_VALUE,customerTypeId,type,user.getId(),deptDataArea,sellerId);
+		Page<Record> page = PayablesQuery.me().paginate(1,Integer.MAX_VALUE,customerTypeId,type,user.getId(),deptDataArea,sellerId,user.getDepartmentId());
 		List<Record> payablesList = page.getList();
 		
 		List<payablesExcel> excellist = Lists.newArrayList();

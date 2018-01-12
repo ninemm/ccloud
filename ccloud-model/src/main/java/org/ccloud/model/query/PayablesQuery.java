@@ -58,7 +58,7 @@ public class PayablesQuery extends JBaseQuery {
 		Db.update(sqlBuilder.toString());
 	}
 	
-    public Page<Record> paginate(int pageNumber, int pageSize, String id,String type,String userId,String dataArea,String sellerId) {
+    public Page<Record> paginate(int pageNumber, int pageSize, String id,String type,String userId,String dataArea,String sellerId,String deptId) {
 		Boolean b = true;
 		String select;
 		StringBuilder fromBuilder;
@@ -86,7 +86,7 @@ public class PayablesQuery extends JBaseQuery {
 		
 		
 		appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, b);
-		fromBuilder.append(" ORDER BY r.create_date DESC");
+		fromBuilder.append(" and r.dept_id = '"+deptId+"' ORDER BY r.create_date DESC");
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
@@ -129,6 +129,11 @@ public class PayablesQuery extends JBaseQuery {
 	
 	public Payables findByObjId(String objId) {
 		String select = "select * from cc_payables where obj_id= '"+objId+"'";
+		return DAO.findFirst(select);
+	}
+	
+	public Payables findByObjIdAndDeptId(String objId, String objType,String deptId) {
+		String select = "select * from cc_payables where obj_id= '"+objId+"' and obj_type= '"+objType+"' and dept_id = '"+deptId+"'";
 		return DAO.findFirst(select);
 	}
 	
