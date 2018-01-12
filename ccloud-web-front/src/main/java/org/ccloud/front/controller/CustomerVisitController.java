@@ -55,26 +55,26 @@ public class CustomerVisitController extends BaseFrontController {
 	//库存详情
 	@RequiresPermissions(value = { "/admin/customerVisit", "/admin/dealer/all" }, logical = Logical.OR)
 	public void index() {
-		
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		
-		String id = getPara("id");
-		String type = getPara("type");
-		String nature = getPara("nature");
-		String subType = getPara("level");
-
-		String status = getPara("status");
-		String dataArea = selectDataArea + "%";
-
-		Page<Record> visitList = CustomerVisitQuery.me().paginateForApp(getPageNumber(), getPageSize(), id, type, nature, subType, status, dataArea);
-
-		if(StrKit.notBlank(getPara("id"))) {
-			setAttr("id", getPara("id"));
-			setAttr("name", getPara("name"));
-		}
+//		
+//		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+//		
+//		String id = getPara("id");
+//		String type = getPara("type");
+//		String nature = getPara("nature");
+//		String subType = getPara("level");
+//
+//		String status = getPara("status");
+//		String dataArea = selectDataArea + "%";
+//
+//		Page<Record> visitList = CustomerVisitQuery.me().paginateForApp(getPageNumber(), getPageSize(), id, type, nature, subType, status, dataArea);
+//
+//		if(StrKit.notBlank(getPara("id"))) {
+//			setAttr("id", getPara("id"));
+//			setAttr("name", getPara("name"));
+//		}
+//		setAttr("visitList", visitList);
 		String history = getPara("history");
 		setAttr("history", history);	
-		setAttr("visitList", visitList);
 		render("customer_visit_list.html");
 	}
 
@@ -130,7 +130,7 @@ public class CustomerVisitController extends BaseFrontController {
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
 		Page<Record> visitList = new Page<>();
-		visitList = CustomerVisitQuery.me().paginateForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("id"), getPara("type"), getPara("nature"), getPara("level"), getPara("status"), selectDataArea);
+		visitList = CustomerVisitQuery.me().paginateForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("id"), getPara("type"), getPara("nature"), getPara("level"), getPara("status"), selectDataArea, getPara("searchKey"));
 
 		if(StrKit.notBlank(getPara("id"))) {
 			setAttr("id", getPara("id"));

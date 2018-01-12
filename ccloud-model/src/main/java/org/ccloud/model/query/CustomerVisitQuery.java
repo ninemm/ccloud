@@ -87,9 +87,9 @@ public class CustomerVisitQuery extends JBaseQuery {
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
-	public Page<Record> paginateForApp(int pageNumber, int pageSize, String id, String type, String nature, String subType, String status, String dataArea) {
+	public Page<Record> paginateForApp(int pageNumber, int pageSize, String id, String type, String nature, String subType, String status, String dataArea, String searchKey) {
 
-		boolean needwhere = true;
+		boolean needwhere = false;
 		List<Object> params = new LinkedList<Object>();
 
 		String select  ="SELECT DISTINCT(ccv.id), cc.customer_name, cc.contact, cc.mobile, ccv.create_date, ccv.`status`, ccv.question_type ";
@@ -98,6 +98,20 @@ public class CustomerVisitQuery extends JBaseQuery {
 		sql.append("LEFT JOIN cc_customer cc ON csc.customer_id = cc.id ");
 		sql.append("LEFT JOIN cc_customer_join_customer_type ccjct ON csc.id = ccjct.seller_customer_id ");
 
+		if (StrKit.notBlank(searchKey)) {
+			sql.append("WHERE ( cc.customer_name LIKE ? OR cc.contact LIKE ? ) ");
+			if (searchKey.contains("%")) {
+				params.add(searchKey);
+				params.add(searchKey);
+			} else {
+				params.add("%" + searchKey + "%");
+				params.add("%" + searchKey + "%");
+			}
+		} else {
+			sql.append("WHERE cc.customer_name is not null ");
+			needwhere = false;
+		}
+		
 		needwhere = appendIfNotEmptyWithLike(sql, "ccv.data_area", dataArea, params, needwhere);
 		needwhere = appendIfNotEmpty(sql, "ccjct.customer_type_id", type, params, needwhere);
 		needwhere = appendIfNotEmpty(sql, "csc.sub_type", subType, params, needwhere);

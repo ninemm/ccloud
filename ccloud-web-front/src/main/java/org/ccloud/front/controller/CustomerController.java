@@ -51,17 +51,14 @@ public class CustomerController extends BaseFrontController {
 	public void index() {
 
 //		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
-//		
 //		String key = getPara("searchKey");
 //		String hasOrder = getPara("isOrdered");
 //		String customerType =  getPara("customerType");
-
-
 //		Page<Record> customerList = SellerCustomerQuery.me().findByUserTypeForApp(getPageNumber(), getPageSize(), selectDataArea, customerType, hasOrder, key);
+//		setAttr("customerList", customerList);
 		
 		String history = getPara("history");
 		setAttr("history", history);		
-//		setAttr("customerList", customerList);
 		render("customer.html");
 	}
 

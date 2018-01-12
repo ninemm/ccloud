@@ -186,9 +186,9 @@ public class Consts {
 	public static String SELLER_TYPE_DEALER= "0";//账套类型：经销商
 	public static String SELLER_TYPE_SELLER = "1";//直营商
 	
-	public static String OBJECT_TYPE_ORDER= "订单";//订单
-	public static String OBJECT_TYPE_CUSTOMER = "客户";//客户
-	public static String OBJECT_TYPE_CUSTOMER_VISIT= "拜访";//拜访
+	public static String OBJECT_TYPE_ORDER= "order";//订单
+	public static String OBJECT_TYPE_CUSTOMER = "customer";//客户
+	public static String OBJECT_TYPE_CUSTOMER_VISIT= "visit";//拜访
 	//是否阅读 0:否 1:是
 	public static Integer IS_READ= 1;
 	public static Integer NO_READ= 0;
