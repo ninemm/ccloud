@@ -29,12 +29,14 @@ import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SalesOutstockQuery;
 import org.ccloud.model.query.SellerProductQuery;
 import org.ccloud.model.query.UserQuery;
+import org.ccloud.model.vo.ImageJson;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.workflow.service.WorkFlowService;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.google.common.collect.Maps;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
@@ -103,13 +105,41 @@ public class OrderController extends BaseFrontController {
 		String orderId = getPara("orderId");
 		Record order = SalesOrderQuery.me().findMoreById(orderId);
 		List<Record> orderDetailList = SalesOrderDetailQuery.me().findByOrderId(orderId);
+		List<Map<String, String>> images = getImageSrc(orderDetailList);
 		order.set("statusName", getStatusName(order.getInt("status")));
 		
 		setAttr("order", order);
 		setAttr("orderDetailList", orderDetailList);
+		setAttr("images", images);
 		render("order_detail.html");
 	}
 	
+	private List<Map<String, String>> getImageSrc(List<Record> orderDetailList) {
+		List<Map<String, String>> imagePaths = new ArrayList<>();
+		for (Record record : orderDetailList) {
+			JSONArray jsonArray = JSONArray.parseArray(record.getStr("product_image_list_store"));
+			List<ImageJson> imageList = jsonArray.toJavaList(ImageJson.class);
+			Map<String, String> map = new HashMap<>();
+			map.put("productSn", record.getStr("product_sn"));
+			if (imageList.size() == 0) {
+				map.put("savePath", null);
+				imagePaths.add(map);
+			}
+			for (int i = 0; i < imageList.size(); i++) {
+				if (imageList.get(i).getImgName().indexOf(record.getStr("product_sn") + "_1") != -1) {
+					map.put("savePath", imageList.get(i).getSavePath());
+					imagePaths.add(map);
+					break;
+				}
+				if (i == imageList.size() - 1) {
+					map.put("savePath", null);
+					imagePaths.add(map);
+				}
+			}
+		}
+		return imagePaths;
+	}
+
 	public void orderReview() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);

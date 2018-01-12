@@ -59,7 +59,16 @@
 			<#list orderDetailList as orderDetail> <#if orderDetail.is_gift??>
 			<#if orderDetail.is_gift = 0>
 			<div class="todo-product-box">
-				<img src="${CTPATH}/images/jp.jpg" alt="">
+				<#list images! as list>
+					<#if list.productSn == orderDetail.product_sn>
+						<#if list.savePath??>
+							<img src=list.savePath alt="">
+						<#else>
+							<img src="${CTPATH}/images/jp.jpg" alt="">
+						</#if>
+						<#break>
+					</#if>
+				</#list>
 				<p>${orderDetail.custom_name!}</p>
 				<div class="weui-flex">
 					<div class="weui-flex__item flex-grow2">
@@ -84,7 +93,16 @@
 			</div>
 			</#if> <#if orderDetail.is_gift = 1>
 			<div class="todo-product-box">
-				<img src="${CTPATH}/images/jp.jpg" alt="">
+				<#list images! as list>
+					<#if list.productSn == orderDetail.product_sn>
+						<#if list.savePath??>
+							<img src=list.savePath alt="">
+						<#else>
+							<img src="${CTPATH}/images/jp.jpg" alt="">
+						</#if>
+						<#break>
+					</#if>
+				</#list>
 				<p>
 					<span class="tag">赠品</span>${orderDetail.custom_name!} /
 					${(orderDetail.valueName)!}
