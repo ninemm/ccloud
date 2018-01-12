@@ -286,10 +286,10 @@ function initComposition(compositionList){
 			$newProductDetail.find("#product_image_list_store").val(el.product_image_list_store);
 			$newProductDetail.find("#product_sn").val(el.product_sn);
 
-			$newProductDetail.find("#subProduct").text(el.sub_product_name + el.sub_product_sp + ' x ' + el.sub_product_count + '件')
+			$newProductDetail.find("#subProduct").text(el.sub_product_name + ' ' + el.sub_product_count + '件')
 		}else{
 			$newProductDetail.find("#sub").append("<a class='fr gift-open' >展开</a>");
-			$newProductDetail.find("#subsubProduct").append("el.sub_product_name + el.sub_product_sp + ' x ' + el.sub_product_count + '件' </br>");
+			$newProductDetail.find("#subsubProduct").append("el.sub_product_name + ' ' + el.sub_product_count + '件' </br>");
 		}
 
 	});
