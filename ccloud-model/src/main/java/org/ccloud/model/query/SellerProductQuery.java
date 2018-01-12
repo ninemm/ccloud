@@ -189,6 +189,7 @@ public class SellerProductQuery extends JBaseQuery {
 		sellerProduct.set("custom_name", product.getName());
 		sellerProduct.setStoreCount(new BigDecimal(0));
 		sellerProduct.set("price", product.getPrice());
+		sellerProduct.setCost(product.getPrice());
 		sellerProduct.setAccountPrice(product.getPrice());
 		sellerProduct.set("cost", product.getCost());
 		sellerProduct.set("market_price", product.getMarketPrice());

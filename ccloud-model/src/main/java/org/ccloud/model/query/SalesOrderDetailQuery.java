@@ -483,5 +483,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 
 		return Db.find(sqlBuilder.toString(), order_sn);
 	}
+	
+	
 
 }
