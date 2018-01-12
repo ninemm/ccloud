@@ -19,6 +19,34 @@
     var $loadmore = $(".weui-loadmore");
 
     $(function() {
+      
+    		<#if history??>
+  			var region = getItemBykey("region");
+  			var customerType = getItemBykey("customerType");
+  			var ifOrder = getItemBykey("ifOrder");
+  			var keywordName = getItemBykey("keyword");
+  			$("#region").val(region);
+  			$("#customer-type").val(customerType);
+  			$("#if-order").val(ifOrder);
+  			$("#searchInput").val(keywordName);
+  		<#else>
+  			clearStorage();
+  		</#if>
+  		refresh();
+    		$(document).on("input", "#searchInput", function() {
+			setItemBykey("keyword", $("#searchInput").val());
+		}).on("change", "#region", function() {
+			setItemBykey("regionId", $("#region").data('values'));
+			setItemBykey("region", $("#region").val());
+		}).on("change", "#customer-type", function() {
+			setItemBykey("customerTypeId", $("#customer-type").data('values'));
+			setItemBykey("customerType", $("#customer-type").val());
+		}).on("change", "#if-order", function() {
+			setItemBykey("ifOrderId", $("#if-order").data('values'));
+			setItemBykey("ifOrder", $("#if-order").val());
+		});
+    
+        
         //搜索框监听
         $(document).on("input", "#searchInput", function() {
             refresh();
@@ -71,14 +99,29 @@
     });
 
     var paramData = function() {
-        return  {
-            "searchKey": $("#searchInput")[0].value,
-            "pageNumber": pageNumber,
-            "pageSize": pageSize,
-            "region": $("#region")[0].dataset.values,
-            "customerType": $("#customer-type")[0].dataset.values,
-            "isOrdered": $("#if-order")[0].dataset.values
-        };
+		<#if !history??>
+			return  {
+			    "searchKey": $("#searchInput")[0].value,
+			    "pageNumber": pageNumber,
+			    "pageSize": pageSize,
+			    "region": $("#region")[0].dataset.values,
+			    "customerType": $("#customer-type")[0].dataset.values,
+			    "isOrdered": $("#if-order")[0].dataset.values
+			};
+		<#else>
+			var region = getItemBykey("regionId");
+  			var customerType = getItemBykey("customerTypeId");
+  			var ifOrder = getItemBykey("ifOrderId");
+  			var keywordName = getItemBykey("keyword");
+			return  {
+			    "searchKey": keywordName,
+			    "pageNumber": pageNumber,
+			    "pageSize": pageSize,
+			    "region": region,
+			    "customerType": customerType,
+			    "isOrdered": ifOrder
+			};
+       </#if>
     }
 
     //监听滚动
@@ -315,7 +358,7 @@
 	                            </div>
 	                            <hr />
 	                            <div class="operate-btn">
-	                            	<@shiro.hasPermission name="/admin/customerVisit">
+	                            	<@shiro.hasPermission name="/admin/customerVisit/add">
 	                                <div class="button white-button fl" onclick="newVisit({customerName:'${(customer.customer_name)}',
                                                                                             sellerCustomerId:'${(customer.sellerCustomerId)}',
                                                                                             contact:'${(customer.contact)}',
@@ -329,7 +372,7 @@
                                                                                             mobile:'${(customer.mobile)}',
                                                                                             address:'${(customer.address)}'})">下订单</div>
 									<#else>
-									<@shiro.hasPermission name="/admin/salesOrder">
+									<@shiro.hasPermission name="/admin/salesOrder/add">
                                     <div class="button red-button fr" onclick="newOrder({customerName:'${(customer.customer_name)}',
                                                                                             sellerCustomerId:'${(customer.sellerCustomerId)}',
                                                                                             contact:'${(customer.contact)}',

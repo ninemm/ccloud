@@ -72,6 +72,8 @@ public class CustomerVisitController extends BaseFrontController {
 			setAttr("id", getPara("id"));
 			setAttr("name", getPara("name"));
 		}
+		String history = getPara("history");
+		setAttr("history", history);	
 		setAttr("visitList", visitList);
 		render("customer_visit_list.html");
 	}
@@ -178,6 +180,8 @@ public class CustomerVisitController extends BaseFrontController {
 			message.setIsRead(Consts.IS_READ);
 			message.update();
 		}
+		String history = getPara("history");
+		setAttr("history", history);	
 		render("customer_visit_detail.html");
 	}
 
