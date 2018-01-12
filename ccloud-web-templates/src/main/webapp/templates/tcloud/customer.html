@@ -315,7 +315,7 @@
 	                            </div>
 	                            <hr />
 	                            <div class="operate-btn">
-	                            	<@shiro.hasPermission name="/admin/customerVisit">
+	                            	<@shiro.hasPermission name="/admin/customerVisit/add">
 	                                <div class="button white-button fl" onclick="newVisit({customerName:'${(customer.customer_name)}',
                                                                                             sellerCustomerId:'${(customer.sellerCustomerId)}',
                                                                                             contact:'${(customer.contact)}',
@@ -329,7 +329,7 @@
                                                                                             mobile:'${(customer.mobile)}',
                                                                                             address:'${(customer.address)}'})">下订单</div>
 									<#else>
-									<@shiro.hasPermission name="/admin/salesOrder">
+									<@shiro.hasPermission name="/admin/salesOrder/add">
                                     <div class="button red-button fr" onclick="newOrder({customerName:'${(customer.customer_name)}',
                                                                                             sellerCustomerId:'${(customer.sellerCustomerId)}',
                                                                                             contact:'${(customer.contact)}',

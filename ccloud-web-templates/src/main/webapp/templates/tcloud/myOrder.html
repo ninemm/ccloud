@@ -31,6 +31,8 @@
   			$("#searchInput").val(keywordName);
   		<#else>
   			clearStorage();
+			setItemBykey("startDate", $.today());
+			setItemBykey("endDate", $.today() + ' 23:59:59');    			
   		</#if>  
 		$(document).on("input", "#searchInput", function() {
 			setItemBykey("keyword", $("#searchInput").val());
