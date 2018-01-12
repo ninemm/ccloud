@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.ccloud.Consts;
+import org.ccloud.model.Receivables;
 import org.ccloud.model.SalesOrder;
 import org.ccloud.model.SalesOrderDetail;
 import org.ccloud.model.SellerProduct;
@@ -309,6 +310,7 @@ public class SalesOrderQuery extends JBaseQuery {
 
 	public boolean checkStatus(String outStockId, String userId, Date date, String total) {
 		SalesOrder salesOrder = this.findByOutStockId(outStockId);
+		createReceivables(salesOrder, total);
 		List<SalesOrderDetail> list = SalesOrderDetailQuery.me().findBySalesOrderId(salesOrder.getId());
 		boolean status = true;
 		for (SalesOrderDetail salesOrderDetail : list) {
@@ -335,6 +337,30 @@ public class SalesOrderQuery extends JBaseQuery {
 		}
 		return true;
 	}
+	
+	private void createReceivables(SalesOrder order, String total) {
+		String customeId = order.getCustomerId();
+		BigDecimal totalAmount = new BigDecimal(0);
+		if (StrKit.notBlank(total)) {
+			totalAmount = new BigDecimal(total);
+		}
+		Receivables receivables = ReceivablesQuery.me().findByCustomerId(customeId);
+		if (receivables == null) {
+			receivables = new Receivables();
+			receivables.setObjectId(customeId);
+			receivables.setObjectType(Consts.RECEIVABLES_OBJECT_TYPE_CUSTOMER);
+			receivables.setReceiveAmount(totalAmount);
+			receivables.setActAmount(new BigDecimal(0));
+			receivables.setBalanceAmount(totalAmount);
+			receivables.setDeptId(order.getDeptId());
+			receivables.setDataArea(order.getDataArea());
+			receivables.setCreateDate(new Date());
+		} else {
+			receivables.setReceiveAmount(receivables.getReceiveAmount().add(totalAmount));
+			receivables.setBalanceAmount(receivables.getBalanceAmount().add(totalAmount));
+		}
+		receivables.saveOrUpdate();
+	}	
 
 	private SalesOrder findByOutStockId(String outStockId) {
 		String sql = "SELECT cs.* FROM cc_sales_order cs LEFT JOIN cc_sales_order_join_outstock cj ON cs.id = cj.order_id where cj.outstock_id=? ";
