@@ -32,15 +32,21 @@
   			var nature = getItemBykey("nature");
   			var level = getItemBykey("level");
   			var status = getItemBykey("status");
+  			var keywordName = getItemBykey("keyword");
+  			$('.weui-search-bar').addClass('weui-search-bar_focusing');
   			$("#customer-type").val(type);
   			$("#customer-nature").val(nature);
   			$("#customer-level").val(level);
   			$("#customer-status").val(status);
+  			$("#searchInput").val(keywordName);
   		<#else>
   			clearStorage();
   		</#if>
   		refresh();
-    		$(document).on("change", "#customer-type", function() {
+    		$(document).on("input", "#searchInput", function() {
+			setItemBykey("keyword", $("#searchInput").val());
+			refresh();
+		}).on("change", "#customer-type", function() {
 			setItemBykey("typeId", $("#customer-type").data('values'));
 			setItemBykey("type", $("#customer-type").val());
 			refresh();
@@ -87,6 +93,7 @@
     var paramData = function() {
        <#if !history??>
         return  {
+        		"searchKey": $("#searchInput")[0].value,
             "pageNumber": pageNumber,
             "pageSize": pageSize,
             "type": $("#customer-type")[0].dataset.values,
@@ -99,7 +106,9 @@
   			var nature = getItemBykey("natureId");
   			var level = getItemBykey("levelId");
   			var status = getItemBykey("statusId");
+  			var searchKey = getItemBykey("keyword");
 			return  {
+				"searchKey": searchKey,
 			    "pageNumber": pageNumber,
 	            "pageSize": pageSize,
 	            "type": type,
@@ -165,6 +174,12 @@
         });
     }
 
+
+	//搜索框叉掉和取消时，先清input值，再调用接口
+    function searchCancel() {
+        $("#searchInput")[0].value = "";
+        refresh();
+    }
 </#macro>
 <@layout>
 <div id="visit-record">
