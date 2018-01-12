@@ -19,7 +19,7 @@
     var $loadmore = $(".weui-loadmore");
 
     $(function() {
-      
+
     		<#if history??>
   			var region = getItemBykey("region");
   			var customerType = getItemBykey("customerType");
@@ -333,7 +333,7 @@
 	                                        </a>
 	                                        </@shiro.hasPermission>
 	                                        <@shiro.hasPermission name="/admin/customerVisit">
-	                                        <a class="weui-flex__item" href="${CPATH}/customerVisit?id=${(customer.sellerCustomerId)!}&name=${(customer.customer_name)!}">
+	                                        <a class="weui-flex__item" href="${CPATH}/customerVisit/one?id=${(customer.sellerCustomerId)!}&name=${(customer.customer_name)!}">
 	                                            <p>
 	                                                <i class="icon-paw" style="color:#ff9800"></i>
 	                                            </p>

@@ -33,17 +33,19 @@
   			var level = getItemBykey("level");
   			var status = getItemBykey("status");
   			var keywordName = getItemBykey("keyword");
-  			$('.weui-search-bar').addClass('weui-search-bar_focusing');
   			$("#customer-type").val(type);
   			$("#customer-nature").val(nature);
   			$("#customer-level").val(level);
   			$("#customer-status").val(status);
-  			$("#searchInput").val(keywordName);
+            if(keywordName !=null && keywordName.length!=0) {
+                $('.weui-search-bar').addClass('weui-search-bar_focusing');
+                $("#searchInput").val(keywordName);
+            }
   		<#else>
   			clearStorage();
   		</#if>
-  		refresh();
-    		$(document).on("input", "#searchInput", function() {
+        refresh();
+        $(document).on("input", "#searchInput", function() {
 			setItemBykey("keyword", $("#searchInput").val());
 			refresh();
 		}).on("change", "#customer-type", function() {
@@ -93,7 +95,7 @@
     var paramData = function() {
        <#if !history??>
         return  {
-        		"searchKey": $("#searchInput")[0].value,
+           "searchKey": $("#searchInput")[0].value,
             "pageNumber": pageNumber,
             "pageSize": pageSize,
             "type": $("#customer-type")[0].dataset.values,
@@ -155,14 +157,12 @@
             data:paramData(),
             dataType:"json",
             success:function(data) {
-                $loadmore = $(this).find(".weui-loadmore");
+                $(".weui-loadmore").hide();
                 $(".infinite").destroyInfinite();
-                $loadmore.hide();
 
                 if (data.totalPage > pageNumber) {
                     loading = false;
                     $(".infinite").infinite();
-                    $(".weui-loadmore").removeAttr("style");
                 }
 
                 $(".infinite")[0].scrollTop = 0;
@@ -197,11 +197,7 @@
         </form>
         <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
     </div>
-    <div class="list-box">
-        <#if id??>
-        <header class="t-c">${(name)!}</header>
-        </#if>
-        <#if !id??>
+    <div class="list-box"style="width: 100%">
         <header>
             <div class="head-search select-area">
                 <div class="weui-flex">
@@ -224,25 +220,26 @@
                 </div>
             </div>
         </header>
-        </#if>
-        <main id="visitList" class="infinite">
-            <#if visitList??>
-                <#list visitList.list as visit>
-                    <a class="weui-cell weui-cell_access" href="${(CPATH)}/customerVisit/detail?id=${(visit.id)!}">
-                        <div class="weui-cell__bd ft14">
-                            <p>${(visit.customer_name)!}</p>
-                            <p class="gray ft12">${(visit.contact)!}/${(visit.mobile)!}
-                                <span class="fr">${(visit.create_date)!}</span>
-                            </p>
-                            <p>活动类型：
-                                <span class="orange">${DICT_NAME(visit.question_type)}</span>
-                                <span class="green fr">${DICT_NAME(visit.status)}</span>
-                            </p>
-                        </div>
-                        <span class="weui-cell__ft"></span>
-                    </a>
-                </#list>
-            </#if>
+        <main  class="infinite">
+            <div id="visitList">
+                <#if visitList??>
+                    <#list visitList.list as visit>
+                        <a class="weui-cell weui-cell_access" href="${(CPATH)}/customerVisit/detail?id=${(visit.id)!}">
+                            <div class="weui-cell__bd ft14">
+                                <p>${(visit.customer_name)!}</p>
+                                <p class="gray ft12">${(visit.contact)!}/${(visit.mobile)!}
+                                    <span class="fr">${(visit.create_date)!}</span>
+                                </p>
+                                <p>活动类型：
+                                    <span class="orange">${DICT_NAME(visit.question_type)}</span>
+                                    <span class="green fr">${DICT_NAME(visit.status)}</span>
+                                </p>
+                            </div>
+                            <span class="weui-cell__ft"></span>
+                        </a>
+                    </#list>
+                </#if>
+            </div>
             <#if visitList??>
                 <#if visitList.totalRow = 0>
                     <div class="weui-loadmore weui-loadmore_line">

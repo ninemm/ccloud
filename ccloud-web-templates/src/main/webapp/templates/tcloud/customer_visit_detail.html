@@ -18,7 +18,11 @@
 	});
 	
 	 function getback() {
-		window.location.href = '${CPATH}/customerVisit?history=' + 1;	
+	<#if one??>
+		window.location.href = '${CPATH}/customerVisit/one?id=${visit.seller_customer_id}&name=${visit.customer_name}';
+	<#else>
+		window.location.href = '${CPATH}/customerVisit?history=' + 1;
+	</#if>
 	} 
 </#macro>
 <@layout>

@@ -55,27 +55,82 @@ public class CustomerVisitController extends BaseFrontController {
 	//库存详情
 	@RequiresPermissions(value = { "/admin/customerVisit", "/admin/dealer/all" }, logical = Logical.OR)
 	public void index() {
-//		
+
 //		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-//		
-//		String id = getPara("id");
-//		String type = getPara("type");
-//		String nature = getPara("nature");
-//		String subType = getPara("level");
 //
-//		String status = getPara("status");
-//		String dataArea = selectDataArea + "%";
-//
-//		Page<Record> visitList = CustomerVisitQuery.me().paginateForApp(getPageNumber(), getPageSize(), id, type, nature, subType, status, dataArea);
+//		Page<Record> visitList = CustomerVisitQuery.me().paginateForApp(getPageNumber(), getPageSize(), null, null, null, null, null, selectDataArea, null);
 //
 //		if(StrKit.notBlank(getPara("id"))) {
 //			setAttr("id", getPara("id"));
 //			setAttr("name", getPara("name"));
 //		}
 //		setAttr("visitList", visitList);
+//
+		Map<String, Object> visitList = new HashMap<>();
+		List<String> list = new ArrayList<>();
+		visitList.put("list", list);
+		visitList.put("totalRow", 11);
+		setAttr("visitList", visitList);
+
 		String history = getPara("history");
 		setAttr("history", history);	
 		render("customer_visit_list.html");
+	}
+
+	@RequiresPermissions(value = { "/admin/customerVisit", "/admin/dealer/all" }, logical = Logical.OR)
+	public void one() {
+
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+
+		Page<Record> visitList = CustomerVisitQuery.me().paginateForApp(getPageNumber(), getPageSize(), getPara("id"), null, null, null, null, selectDataArea, null);
+
+		if(StrKit.notBlank(getPara("id"))) {
+			setAttr("id", getPara("id"));
+			setAttr("name", getPara("name"));
+		}
+		setAttr("visitList", visitList);
+
+		String history = getPara("history");
+		setAttr("history", history);
+
+		render("customer_visit_one_list.html");
+	}
+
+	public void oneRefresh() {
+
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+
+		Page<Record> visitList = new Page<>();
+		visitList = CustomerVisitQuery.me().paginateForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("id"), getPara("type"), getPara("nature"), getPara("level"), getPara("status"), selectDataArea, getPara("searchKey"));
+
+		if(StrKit.notBlank(getPara("id"))) {
+			setAttr("id", getPara("id"));
+			setAttr("name", getPara("name"));
+		}
+
+		StringBuilder html = new StringBuilder();
+		for (Record visit : visitList.getList())
+		{
+			html.append("<a class=\"weui-cell weui-cell_access\" href=\"/customerVisit/detail?id=" + visit.getStr("id") + "&one=1\">\n" +
+					"                <div class=\"weui-cell__bd ft14\">\n" +
+					"                    <p>" + visit.getStr("customer_name") + "</p>\n" +
+					"                    <p class=\"gray ft12\">" + visit.getStr("contact") + "/" + visit.getStr("mobile") + "\n" +
+					"                        <span class=\"fr\">" + visit.get("create_date").toString() + "</span>\n" +
+					"                    </p>\n" +
+					"                    <p>活动类型：\n" +
+					"                        <span class=\"orange\">" + DictQuery.me().findName(visit.getStr("question_type")) + "</span>\n" +
+					"                        <span class=\"green fr\">" + DictQuery.me().findName(visit.getStr("status")) + "</span>\n" +
+					"                    </p>\n" +
+					"                </div>\n" +
+					"                <span class=\"weui-cell__ft\"></span>\n" +
+					"            </a>");
+		}
+
+		Map<String, Object> map = new HashMap<>();
+		map.put("html", html.toString());
+		map.put("totalRow", visitList.getTotalRow());
+		map.put("totalPage", visitList.getTotalPage());
+		renderJson(map);
 	}
 
 	public void getSelect() {
@@ -171,15 +226,21 @@ public class CustomerVisitController extends BaseFrontController {
 
 	public void detail() {
 		String id = getPara("id");
+		if(StrKit.notBlank(getPara("one"))) {
+			setAttr("one", getPara("one"));
+		}
+
 		CustomerVisit visit = CustomerVisitQuery.me().findMoreById(id);
 		setAttr("visit", visit);
+
 		//审核后将message中是否阅读改为是
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		Message message=MessageQuery.me().findByObjectIdAndToUserId(id,user.getId());
-		if (null!=message) {
+		if (null != message) {
 			message.setIsRead(Consts.IS_READ);
 			message.update();
 		}
+
 		String history = getPara("history");
 		setAttr("history", history);	
 		render("customer_visit_detail.html");

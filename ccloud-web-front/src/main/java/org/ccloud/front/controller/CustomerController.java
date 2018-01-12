@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.List;
 
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
@@ -50,13 +51,19 @@ public class CustomerController extends BaseFrontController {
 	@Before(WechatJSSDKInterceptor.class)
 	public void index() {
 
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
-		String key = getPara("searchKey");
-		String hasOrder = getPara("isOrdered");
-		String customerType =  getPara("customerType");
-		Page<Record> customerList = SellerCustomerQuery.me().findByUserTypeForApp(getPageNumber(), getPageSize(), selectDataArea, customerType, hasOrder, key);
+//		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
+//		String key = getPara("searchKey");
+//		String hasOrder = getPara("isOrdered");
+//		String customerType =  getPara("customerType");
+//		Page<Record> customerList = SellerCustomerQuery.me().findByUserTypeForApp(getPageNumber(), getPageSize(), selectDataArea, customerType, hasOrder, key);
+//		setAttr("customerList", customerList);
+
+		Map<String, Object> customerList = new HashMap<>();
+		List<String> list = new ArrayList<>();
+		customerList.put("list", list);
+		customerList.put("totalRow", 11);
 		setAttr("customerList", customerList);
-		
+
 		String history = getPara("history");
 		setAttr("history", history);		
 		render("customer.html");
@@ -107,7 +114,11 @@ public class CustomerController extends BaseFrontController {
 
 	public void refresh() {
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
-
+		boolean visitAdd = SecurityUtils.getSubject().isPermitted("/admin/customerVisit/add");
+		boolean salesOrderAdd = SecurityUtils.getSubject().isPermitted("/admin/salesOrder/add");
+		boolean salesOrder = SecurityUtils.getSubject().isPermitted("/admin/salesOrder");
+		boolean visit = SecurityUtils.getSubject().isPermitted("/admin/customerVisit");
+		
 		Page<Record> customerList = new Page<>();
 		if (StrKit.notBlank(getPara("region"))) {
 			String dataArea = UserQuery.me().findById(getPara("region")).getDataArea();
@@ -129,14 +140,18 @@ public class CustomerController extends BaseFrontController {
 			html.append("					<p><i class=\"icon-phone green\"></i></p>\n");
 			html.append("					<p>电话</p>\n");
 			html.append("				</a>\n");
-			html.append("				<a class=\"weui-flex__item\" href=\"/customer/historyOrder?sellerCustomerId=" + customer.getStr("sellerCustomerId") + "&customerName=" + customer.getStr("customer_name") + "\">\n");
-			html.append("					<p><i class=\"icon-file-text-o blue\"></i></p>\n");
-			html.append("					<p>订单</p>\n");
-			html.append("				</a>\n");
-			html.append("				<a class=\"weui-flex__item\" href=\"/customerVisit?id=" + customer.getStr("sellerCustomerId") +"&name=" + customer.getStr("customer_name") + "\">\n");
-			html.append("					<p><i class=\"icon-paw\" style=\"color:#ff9800\"></i></p>\n");
-			html.append("					<p>拜访</p>\n");
-			html.append("				</a>\n");
+			if (salesOrder) {
+				html.append("				<a class=\"weui-flex__item\" href=\"/customer/historyOrder?sellerCustomerId=" + customer.getStr("sellerCustomerId") + "&customerName=" + customer.getStr("customer_name") + "\">\n");
+				html.append("					<p><i class=\"icon-file-text-o blue\"></i></p>\n");
+				html.append("					<p>订单</p>\n");
+				html.append("				</a>\n");
+			}
+			if (visit) {
+				html.append("				<a class=\"weui-flex__item\" href=\"/customerVisit/one?id=" + customer.getStr("sellerCustomerId") +"&name=" + customer.getStr("customer_name") + "\">\n");
+				html.append("					<p><i class=\"icon-paw\" style=\"color:#ff9800\"></i></p>\n");
+				html.append("					<p>拜访</p>\n");
+				html.append("				</a>\n");
+			}
 			html.append("				<a class=\"weui-flex__item relative\" href=\"/customer/edit?sellerCustomerId=" + customer.getStr("sellerCustomerId") + "\">\n");
 			html.append("					<i class=\"icon-chevron-right gray\"></i>\n");
 			html.append("				</a>\n");
@@ -145,16 +160,20 @@ public class CustomerController extends BaseFrontController {
 			html.append("	</div>\n");
 			html.append("	<hr />\n");
 			html.append("	<div class=\"operate-btn\">\n");
-			html.append("		<div class=\"button white-button fl border-1px\" onclick=\"newVisit({customerName:'" + customer.getStr("customer_name") + "',\n" +
-					"                                                                     sellerCustomerId:'" + customer.getStr("sellerCustomerId") + "',\n" +
-					"                                                                     contact:'" + customer.getStr("contact") + "',\n" +
-					"                                                                     mobile:'" + customer.getStr("mobile") + "',\n" +
-					"                                                                     address:'" + customer.getStr("address") + "'})\">客户拜访</div>\n");
-			html.append("		<div class=\"button red-button fr\" onclick=\"newOrder({customerName:'" + customer.getStr("customer_name") + "',\n" +
-					"                                                                    sellerCustomerId:'" + customer.getStr("sellerCustomerId") + "',\n" +
-					"                                                                    contact:'" + customer.getStr("contact") + "',\n" +
-					"                                                                    mobile:'" + customer.getStr("mobile") + "',\n" +
-					"                                                                    address:'" + customer.getStr("address") + "'})\" >下订单</div>\n");
+			if (visitAdd) {
+				html.append("		<div class=\"button white-button fl border-1px\" onclick=\"newVisit({customerName:'" + customer.getStr("customer_name") + "',\n" +
+						"                                                                     sellerCustomerId:'" + customer.getStr("sellerCustomerId") + "',\n" +
+						"                                                                     contact:'" + customer.getStr("contact") + "',\n" +
+						"                                                                     mobile:'" + customer.getStr("mobile") + "',\n" +
+						"                                                                     address:'" + customer.getStr("address") + "'})\">客户拜访</div>\n");				
+			}
+			if (salesOrderAdd) {
+				html.append("		<div class=\"button red-button fr\" onclick=\"newOrder({customerName:'" + customer.getStr("customer_name") + "',\n" +
+						"                                                                    sellerCustomerId:'" + customer.getStr("sellerCustomerId") + "',\n" +
+						"                                                                    contact:'" + customer.getStr("contact") + "',\n" +
+						"                                                                    mobile:'" + customer.getStr("mobile") + "',\n" +
+						"                                                                    address:'" + customer.getStr("address") + "'})\" >下订单</div>\n");				
+			}
 			html.append("	</div>\n");
 			html.append("	<p class=\"gray\">\n");
 			html.append("		<span class=\"icon-map-marker ft16 green\"></span>\n");
@@ -205,7 +224,7 @@ public class CustomerController extends BaseFrontController {
 				html.append("					<p><i class=\"icon-file-text-o blue\"></i></p>\n");
 				html.append("					<p>订单</p>\n");
 				html.append("				</a>\n");
-				html.append("				<a class=\"weui-flex__item\" href=\"/customerVisit?id=" + customer.get("id").toString() +"&name=" + customer.get("customer_name").toString() + "\">\n");
+				html.append("				<a class=\"weui-flex__item\" href=\"/customerVisit/one?id=" + customer.get("id").toString() +"&name=" + customer.get("customer_name").toString() + "\">\n");
 				html.append("					<p><i class=\"icon-paw\" style=\"color:#ff9800\"></i></p>\n");
 				html.append("					<p>拜访</p>\n");
 				html.append("				</a>\n");

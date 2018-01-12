@@ -148,6 +148,7 @@ public class OrderController extends BaseFrontController {
 		String taskId = getPara("taskId");
 		Record order = SalesOrderQuery.me().findMoreById(orderId);
 		List<Record> orderDetailList = SalesOrderDetailQuery.me().findByOrderId(orderId);
+		List<Map<String, String>> images = getImageSrc(orderDetailList);
 
 		order.set("statusName", getStatusName(order.getInt("status")));
 
@@ -170,6 +171,7 @@ public class OrderController extends BaseFrontController {
 
 		setAttr("taskId", taskId);
 		setAttr("order", order);
+		setAttr("images", images);
 		setAttr("orderDetailList", orderDetailList);
 		render("order_review.html");
 	}
