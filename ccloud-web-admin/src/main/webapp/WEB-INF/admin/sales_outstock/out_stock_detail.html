@@ -275,6 +275,7 @@
 				var outstockDetail = result.outstockDetail;
 
 				$("#customerId").val(outstock.customerId);
+				$("#sellerCustomerId").val(outstock.customer_id);
 				$("#customerName").val(outstock.customer_name);
 				$("#contact").val(outstock.ccontact);
 				$("#mobile").val(outstock.cmobile);
@@ -424,6 +425,7 @@
 						<label class="control-label col-sm-2">*客户名称:</label>
 						<div class="input-group col-md-4 col-sm-10">
 							<input class="form-control input-sm" type="text" id="customerName" name="customerName" value="" readonly>
+							<input type="hidden" id="sellerCustomerId" name="sellerCustomerId" />
 							<input type="hidden" id="customerId" name="customerId" />
 						</div>
 					</div>
@@ -480,8 +482,8 @@
 			</div>
 
 			<div class="box-footer"> 
-				<button type="button" onclick="doSubmit()" class="btn btn-sm btn-primary btn-flat" data-style="expand-right"><span class="ladda-label">确认出库</span></button>
-				<input type="button" class="btn btn-primary" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
+				<button type="button" onclick="doSubmit()" class="btn btn-sm bg-olive btn-flat ladda-button" data-style="expand-right"><span class="ladda-label">确认出库</span></button>
+				<input type="button" class="btn btn-sm btn-primary btn-flat" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
 			</div>
 		</form>
 	</div>

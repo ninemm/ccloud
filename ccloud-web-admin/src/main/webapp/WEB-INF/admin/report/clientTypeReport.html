@@ -31,6 +31,8 @@
 		jQuery.mm.initEditTableExport('#_clientTypeReport_table',url, initParams, initFields(), null);
 		jQuery.mm.initEditTableExport2('#_clientTypeReportGift_table',urlGift, initParams, initFieldsGift(), null);
 		$('button[title^=Export]').html('导出').attr('class','btn btn-sm btn-primary btn-flat');;
+		$('button[title^=Export]').html('导出').css('border-radius',0);
+		$('button[title^=Export]').html('导出').css('margin-top','2px');
 	});
 
 	var initParams = function(params) {

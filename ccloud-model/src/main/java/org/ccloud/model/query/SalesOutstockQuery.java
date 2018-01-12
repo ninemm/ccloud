@@ -22,7 +22,6 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import org.ccloud.Consts;
-import org.ccloud.model.Receivables;
 import org.ccloud.model.SalesOutstock;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.model.vo.carSalesPrintNeedInfo;
@@ -76,8 +75,8 @@ public class SalesOutstockQuery extends JBaseQuery {
 
 				Record order = SalesOrderQuery.me().findMoreById(orderId);
 				List<Record> orderDetailList = SalesOrderDetailQuery.me().findByOrderId(orderId);
-				//应收账款
-				createReceivables(order);
+//				//应收账款
+//				createReceivables(order);
 				
 				
 				Date date = new Date();
@@ -111,27 +110,6 @@ public class SalesOutstockQuery extends JBaseQuery {
 		return isSave;
 	}
 	
-	private void createReceivables(Record order) {
-		String customeId = order.getStr("customer_id");
-		Receivables receivables = ReceivablesQuery.me().findByCustomerId(customeId);
-		if (receivables == null) {
-			receivables = new Receivables();
-			receivables.setObjectId(order.getStr("customer_id"));
-			receivables.setObjectType(Consts.RECEIVABLES_OBJECT_TYPE_CUSTOMER);
-			receivables.setReceiveAmount(order.getBigDecimal("total_amount"));
-			receivables.setActAmount(new BigDecimal(0));
-			receivables.setBalanceAmount(order.getBigDecimal("total_amount"));
-			receivables.setDeptId(order.getStr("dept_id"));
-			receivables.setDataArea(order.getStr("data_area"));
-			receivables.setCreateDate(new Date());
-		} else {
-			receivables.setReceiveAmount(receivables.getReceiveAmount().add(order.getBigDecimal("total_amount")));
-			receivables.setBalanceAmount(receivables.getBalanceAmount().add(order.getBigDecimal("total_amount")));
-		}
-		receivables.saveOrUpdate();
-	}
-	
-
 	public boolean insert(String outstockId, String outstockSn, String warehouseId, String sellerId, Record order,
 			Date date) {
 		SalesOutstock outstock = new SalesOutstock();

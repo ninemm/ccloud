@@ -286,6 +286,8 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
         		String outStockId =  StringUtils.getArrayFirst(paraMap.get("salesStockId"));
         		String outStockSN =  StringUtils.getArrayFirst(paraMap.get("salesStockSN"));
         		String wareHouseId =  StringUtils.getArrayFirst(paraMap.get("wareHouseId"));
+        		String customerId = StringUtils.getArrayFirst(paraMap.get("customerId"));
+        		String sellerCustomerId = StringUtils.getArrayFirst(paraMap.get("sellerCustomerId"));
         		Date date = new Date();
         		String productNumStr = StringUtils.getArrayFirst(paraMap.get("productNum"));
         		Integer productNum = Integer.valueOf(productNumStr);
@@ -298,7 +300,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
         			String sellProductId = StringUtils.getArrayFirst(paraMap.get("sellProductId" + index));
         			if (StrKit.notBlank(sellProductId)) {
         				if (!SalesOutstockDetailQuery.me().outStock(paraMap, sellerId, 
-        						date, deptId, dataArea, index, user.getId(), outStockSN, wareHouseId, sellProductId)) {
+        						date, deptId, dataArea, index, user.getId(), outStockSN, wareHouseId, sellProductId, sellerCustomerId)) {
         					return false;
         				}
         				count++;
@@ -313,7 +315,6 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
         		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
         		
         		
-        		String customerId =  StringUtils.getArrayFirst(paraMap.get("customerId"));
         		String customerKind =  StringUtils.getArrayFirst(paraMap.get("customerKind"));
         		String sellerId = getSessionAttr("sellerId");
         		if(Consts.CUSTOMER_KIND_SELLER.equals(customerKind)) {
@@ -354,7 +355,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 	
 	private void createPayables(SellerCustomer sellerCustomer,String countAll){
 		String payablesType = Consts.RECEIVABLES_OBJECT_TYPE_SUPPLIER; 
-		Payables payables = PayablesQuery.me().findByObjId(sellerCustomer.getSellerId(), payablesType);
+		Payables payables = PayablesQuery.me().findByObjIdAndDeptId(sellerCustomer.getSellerId(), payablesType,sellerCustomer.getDeptId());
 		Department department = DepartmentQuery.me().findById(sellerCustomer.getDeptId());
 		if(payables == null){
 			payables = new Payables();

@@ -98,23 +98,23 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		detail.setDeptId(orderDetail.getStr("dept_id"));
 		detail.setDataArea(orderDetail.getStr("data_area"));
 		
-		ReceivablesDetail receivablesDetail = new ReceivablesDetail();
-		receivablesDetail.setId(StrKit.getRandomUUID());
-		receivablesDetail.setObjectId(order.getStr("customer_id"));
-		receivablesDetail.setObjectType(Consts.RECEIVABLES_OBJECT_TYPE_CUSTOMER);
-		receivablesDetail.setReceiveAmount(detail.getProductAmount());
-		receivablesDetail.setActAmount(new BigDecimal(0));
-		receivablesDetail.setBalanceAmount(detail.getProductAmount());
-		receivablesDetail.setBizDate(date);
-		receivablesDetail.setRefSn(order.getStr("order_sn"));
-		receivablesDetail.setRefType(Consts.BIZ_TYPE_SALES_ORDER);
-		receivablesDetail.setDeptId(orderDetail.getStr("dept_id"));
-		receivablesDetail.setDataArea(orderDetail.getStr("data_area"));
-		receivablesDetail.setCreateDate(date);
+//		ReceivablesDetail receivablesDetail = new ReceivablesDetail();
+//		receivablesDetail.setId(StrKit.getRandomUUID());
+//		receivablesDetail.setObjectId(order.getStr("customer_id"));
+//		receivablesDetail.setObjectType(Consts.RECEIVABLES_OBJECT_TYPE_CUSTOMER);
+//		receivablesDetail.setReceiveAmount(detail.getProductAmount());
+//		receivablesDetail.setActAmount(new BigDecimal(0));
+//		receivablesDetail.setBalanceAmount(detail.getProductAmount());
+//		receivablesDetail.setBizDate(date);
+//		receivablesDetail.setRefSn(order.getStr("order_sn"));
+//		receivablesDetail.setRefType(Consts.BIZ_TYPE_SALES_ORDER);
+//		receivablesDetail.setDeptId(orderDetail.getStr("dept_id"));
+//		receivablesDetail.setDataArea(orderDetail.getStr("data_area"));
+//		receivablesDetail.setCreateDate(date);
 		
 		
-		return detail.save() && receivablesDetail.save();
-		
+//		return detail.save() && receivablesDetail.save();
+		return detail.save();
 		
 	}
 	
@@ -188,7 +188,7 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 	}
 
 	public boolean outStock(Map<String, String[]> paraMap, String sellerId, Date date, String deptId,
-			String dataArea, Integer index, String userId, String outStockSN, String wareHouseId, String sellerProductId) {
+			String dataArea, Integer index, String userId, String outStockSN, String wareHouseId, String sellerProductId, String customerId) {
 		SalesOutstockDetail detail = SalesOutstockDetailQuery.me().
 				findById(StringUtils.getArrayFirst(paraMap.get("outstockDetailId" + index)));
 		String convert = StringUtils.getArrayFirst(paraMap.get("convert" + index));
@@ -274,6 +274,25 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		salesOrderDetail.setLeftCount(salesOrderDetail.getLeftCount() - productCount);
 		salesOrderDetail.setModifyDate(date);
 		if (!salesOrderDetail.update()) {
+			return false;
+		}
+		
+		
+		ReceivablesDetail receivablesDetail = new ReceivablesDetail();
+		receivablesDetail.setId(StrKit.getRandomUUID());
+		receivablesDetail.setObjectId(customerId);
+		receivablesDetail.setObjectType(Consts.RECEIVABLES_OBJECT_TYPE_CUSTOMER);
+		receivablesDetail.setReceiveAmount(detail.getProductAmount());
+		receivablesDetail.setActAmount(new BigDecimal(0));
+		receivablesDetail.setBalanceAmount(detail.getProductAmount());
+		receivablesDetail.setBizDate(date);
+		receivablesDetail.setRefSn(outStockSN);
+		receivablesDetail.setRefType(Consts.BIZ_TYPE_SALES_ORDER);
+		receivablesDetail.setDeptId(deptId);
+		receivablesDetail.setDataArea(dataArea);
+		receivablesDetail.setCreateDate(date);		
+		
+		if (!receivablesDetail.save()) {
 			return false;
 		}
 		

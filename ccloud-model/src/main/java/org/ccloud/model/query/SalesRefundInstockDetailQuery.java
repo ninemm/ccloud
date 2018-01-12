@@ -154,7 +154,11 @@ public class SalesRefundInstockDetailQuery extends JBaseQuery {
 		
 		Map<String, Object> map = new HashMap<>();
 		map.put("status", detail.save());
-		map.put("productAmount", productAmount);
+		if (isGift == 0) {
+			map.put("productAmount", productAmount);
+		} else {
+			map.put("productAmount", new BigDecimal(0));
+		}
 		return map;
 	}
 
