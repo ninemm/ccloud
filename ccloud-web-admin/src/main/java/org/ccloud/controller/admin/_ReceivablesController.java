@@ -83,12 +83,7 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 	
 	public void getReceivables() {
 //		String type = getPara("type");
-		String keyword="";
-		try {
-			keyword = new String(getPara("keyword").getBytes("ISO8859-1"), "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
+		String keyword=getPara("keyword");
 		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
@@ -193,13 +188,7 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 	//导出应收记录
 	public void downloading() throws UnsupportedEncodingException {
 //		String type = getPara("type");
-		String keyword="";
-		try {
-			keyword = new String(getPara("keyword").getBytes("ISO8859-1"), "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		String keyword=getPara("keyword");
 		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
