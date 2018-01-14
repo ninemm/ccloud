@@ -6,6 +6,11 @@
 <#macro script_import>
 <script type='text/javascript' src="${CTPATH}/js/echarts.min.js"></script>
 </#macro>
+<#macro css>
+	.weui-media-box:before {
+		content: none;
+	}
+</#macro>
 <#macro script>
 	$(function () {
 		var params = {
@@ -91,7 +96,7 @@
 	            for(var i = 0; i < length; i++){
 	            	j = i + 1;
 	            	legendData.push(data[i].custom_name)
-	            	rank.append("<div class='rank-detail'><span class='sequence'>"+j+"</span><img src='${CTPATH}/images/jp.jpg'><div class='good-name'>"+data[i].custom_name+"</div><div class='good-total'><span class='orange'>￥"+data[i].totalAmount+"</span><span class='gray ft14'>/"+data[i].orderCount+"笔("+(data[i].productCount).toFixed(2)+")件</span></div></div>");
+	            	rank.append("<div class='weui-media-box ft14'><div class='rank-detail'><span class='sequence'>"+j+"</span><img src='${CTPATH}/images/jp.jpg'><div class='rank-box'><div class='good-name'>"+data[i].custom_name+"</div><div class='good-total'><span class='orange'>￥"+data[i].totalAmount+"</span><span class='gray ft14'>/"+data[i].orderCount+"笔("+(data[i].productCount).toFixed(2)+")件</span></div></div></div></div>");
 	                crSeriesData.push({
 	                    name: data[i].custom_name,
 	                    value: data[i].totalAmount
@@ -186,9 +191,7 @@
         <div class="weui-panel__hd">
             <span class="overview-hd-title">商品销售排行</span>
         </div>
-        <div class="weui-panel__bd">
-            <div class="weui-media-box ft14" id="productRank">
-            </div>
+        <div class="weui-panel__bd" id="productRank">
         </div>
     </div>
 </div>
