@@ -105,7 +105,6 @@
 				{field: "action", title: "操作", align: "center", width: '15%',
 				formatter: function(value, row, rowIndex) {
 					var strHtml ='<a class="btn btn-xs bg-olive btn-flat" onclick="detail(\''+row.id+'\')" >详细</a> ';
-					strHtml = strHtml + '<a class="btn btn-xs btn-warning btn-flat" onclick="history(\'' + row.id + '\',\'' +row.proc_inst_id + '\')" >操作记录</a> ';
 					<@shiro.hasPermission name="/admin/salesRefund/check">
 					if (row.status == 0) {
 						strHtml = strHtml + '<a class="btn btn-xs btn-primary btn-flat" onclick="pass(\''+row.id+'\',1000)" >通过</a> ';
@@ -113,6 +112,7 @@
 						strHtml = strHtml + '<a class="btn btn-xs btn-danger btn-flat" onclick="pass(\''+row.id+'\',1001)" >拒绝</a> ';			
 					}					
 					</@shiro.hasPermission>						
+					strHtml = strHtml + '<a class="btn btn-xs btn-warning btn-flat" onclick="history(\'' + row.id + '\',\'' +row.proc_inst_id + '\')" >操作记录</a> ';
 
 					return strHtml;
 				},
