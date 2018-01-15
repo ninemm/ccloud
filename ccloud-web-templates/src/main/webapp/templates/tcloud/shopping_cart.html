@@ -48,20 +48,20 @@ $(function() {
       var id = $currentInput.attr('id');
  
       if(id == 'bigPrice'){
-        var bPrice = parseFloat($productDetail.find("#bigPriceSpan").text().replace("￥", ""));
+        var bPrice = parseFloat($productDetail.find("#bigCost").val());
         var bigPrice = $currentInput.val();
 		if(bigPrice < bPrice){
 			$currentInput.val(bPrice);
-			$.toptip("价格不能小于标准价!", 'warning'); 
+			$.toptip("价格不能小于成本价!", 'warning');
 			return;
 		}
 		$productDetail.find("#smallPrice").val((bigPrice/convert).toFixed(2));
       } else if(id == 'smallPrice'){
-        var sPrice = parseFloat($productDetail.find("#smallPriceSpan").text().replace("￥", ""));
+        var sPrice = parseFloat($productDetail.find("#smallCost").val());
         var smallPrice = $currentInput.val();
 		if(smallPrice < sPrice){
 			$currentInput.val(sPrice);
-			$.toptip("价格不能小于标准价!", 'warning'); 
+			$.toptip("价格不能小于成本价!", 'warning');
 			return;
 		}
 		$productDetail.find("#bigPrice").val((smallPrice*convert).toFixed(2));
@@ -70,7 +70,7 @@ $(function() {
         var compositionPrice = $currentInput.val();
 		if(compositionPrice < cPrice){
 			$currentInput.val(cPrice);
-			$.toptip("价格不能小于标准价!", 'warning'); 
+			$.toptip("价格不能小于销售价!", 'warning');
 			return;
 		}
       }
@@ -104,6 +104,8 @@ function initProduct(){
 			$newProductDetail.find("#bigUnitSpan").text(el.bigUnitSpan);
 			$newProductDetail.find("#smallUnitSpan").text(el.smallUnitSpan);
 
+			$newProductDetail.find("#bigCost").val(el.bigCost);
+			$newProductDetail.find("#smallCost").val(el.smallCost);
 			$newProductDetail.find("#bigAccountPrice").val(el.bigAccountPrice);
 			$newProductDetail.find("#smallAccountPrice").val(el.smallAccountPrice);
 
@@ -359,7 +361,9 @@ function getProduct($el){
 		bigUnitSpan : $el.find("#bigUnitSpan").text(),
 		smallUnitSpan : $el.find("#smallUnitSpan").text(),
 		stock : $el.find("#stock").text(),
-		
+
+		bigCost : $el.find("#bigCost").val(),
+		smallCost : $el.find("#smallCost").val(),
 		bigAccountPrice : $el.find("#bigAccountPrice").val(),
 		smallAccountPrice : $el.find("#smallAccountPrice").val(),
 		
@@ -437,6 +441,8 @@ function order(){
 				<input type="hidden" id="sellProductId" value="">
 				<input type="hidden" id="productId" value="">
 				<input type="hidden" id="convert" value="">
+				<input type="hidden" id="bigCost" value="">
+				<input type="hidden" id="smallCost" value="">
 				<input type="hidden" id="bigAccountPrice" value="">
 				<input type="hidden" id="smallAccountPrice" value="">
 				<nobr>
