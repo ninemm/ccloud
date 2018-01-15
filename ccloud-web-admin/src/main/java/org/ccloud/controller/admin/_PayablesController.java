@@ -33,6 +33,7 @@ import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.DataAreaUtil;
+import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Payables;
 import org.ccloud.model.PayablesDetail;
 import org.ccloud.model.Payment;
@@ -82,6 +83,9 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 	public void getPayables() {
 //		String type = getPara("type");
 		String keyword = getPara("keyword");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+		}
 		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String deptDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
@@ -184,6 +188,9 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 	public void downloading() throws UnsupportedEncodingException {
 //		String type = getPara("type");
 		String keyword=getPara("keyword");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+		}
 		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String deptDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);	

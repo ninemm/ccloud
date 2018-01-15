@@ -53,6 +53,7 @@ import com.jfinal.plugin.activerecord.Record;
 
 import cn.afterturn.easypoi.excel.ExcelExportUtil;
 import cn.afterturn.easypoi.excel.entity.ExportParams;
+import org.ccloud.utils.StringUtils;
 
 import com.jfinal.kit.JsonKit;
 import com.jfinal.kit.StrKit;
@@ -84,6 +85,9 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 	public void getReceivables() {
 //		String type = getPara("type");
 		String keyword=getPara("keyword");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+		}
 		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
@@ -189,6 +193,9 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 	public void downloading() throws UnsupportedEncodingException {
 //		String type = getPara("type");
 		String keyword=getPara("keyword");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+		}
 		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);

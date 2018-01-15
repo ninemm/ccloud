@@ -82,6 +82,7 @@
 	var  cusType = "";
 	var getReceivablesParams = function(params){
 		var keyword = $('#post-search-input').val();
+		if (keyword) keyword = encodeURIComponent(keyword);
 		var customerTypeId = $('#category-or-customer').find("option:selected").val();
 		cusType = customerTypeId;
 			var param = {
@@ -176,6 +177,7 @@
 	function batchDown(){
 //			location.href = "${CPATH}/admin/receivables/downloading?type="+type +"&customerTypeId=" + cusType;
 			var keyword = $('#post-search-input').val();
+			if (keyword) keyword = encodeURIComponent(keyword);
 			location.href = "${CPATH}/admin/receivables/downloading?customerTypeId=" + cusType+"&keyword="+keyword;
 		}
 

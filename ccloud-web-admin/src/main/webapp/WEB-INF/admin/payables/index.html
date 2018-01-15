@@ -84,6 +84,7 @@ var  cusType = "";
 var getpayablesParams = function(params){
 	var customerTypeId = $('#category-or-customer').val();
 	var keyword = $('#post-search-input').val();
+	if (keyword) keyword = encodeURIComponent(keyword);
 	cusType = customerTypeId;
 		var param = {
 	        size: params.limit,
@@ -145,6 +146,7 @@ function orderInfo(orderSn){
 
 function batchDown(){
 		var keyword = $('#post-search-input').val();
+		if (keyword) keyword = encodeURIComponent(keyword);
 		location.href = "${CPATH}/admin/payables/downloading?customerTypeId=" + cusType+"&keyword"+keyword;
 	}
 
