@@ -162,7 +162,7 @@ public class InventoryDetailQuery extends JBaseQuery {
 
 	//库存明细报表
 	public Page<InventoryDetail> findByDataArea(int pageNumber, int pageSize, String dataArea, String warehouseId, String sort, String order, String startDate, String endDate, String user_id, boolean admin) {
-		String select = "SELECT cid.warehouse_id , cid.sell_product_id , cs.seller_name , w.`name` , sp.custom_name , IFNULL(t1.out_count,0) out_count, IFNULL(t1.in_count,0) in_count, t2.balance_count balance_count ";
+		String select = "SELECT cid.warehouse_id , cid.sell_product_id , cs.seller_name , w.`name` , sp.custom_name , IFNULL(t1.out_count,0) out_count, IFNULL(t1.in_count,0) in_count, IFNULL(t2.balance_count,0) balance_count ";
 		StringBuilder fromBuilder = new StringBuilder(" FROM cc_inventory_detail cid");
 		fromBuilder.append(" LEFT JOIN cc_warehouse w ON w.id = cid.warehouse_id  ");
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id = cid.sell_product_id ");
@@ -198,7 +198,7 @@ public class InventoryDetailQuery extends JBaseQuery {
 	//库存详细报表 产品总计
 	public Page<InventoryDetail> findByInventoryDetailListTotal(int pageNumber, int pageSize,
 			String dataArea, String sort, String order, String sellerId, String startDate, String endDate, String user_id, boolean admin) {
-		String select = "SELECT cid.warehouse_id , cid.sell_product_id , cs.seller_name ,  sp.custom_name , IFNULL(SUM(t1.out_count),0) out_count, IFNULL(SUM(t1.in_count),0) in_count, t2.balance_count balance_count ";
+		String select = "SELECT cid.warehouse_id , cid.sell_product_id , cs.seller_name ,  sp.custom_name , IFNULL(SUM(t1.out_count),0) out_count, IFNULL(SUM(t1.in_count),0) in_count, IFNULL(t2.balance_count,0) balance_count ";
 		StringBuilder fromBuilder = new StringBuilder(" FROM cc_inventory_detail cid");
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id = cid.sell_product_id ");
 		fromBuilder.append(" LEFT JOIN cc_seller cs ON cs.id = sp.seller_id ");
