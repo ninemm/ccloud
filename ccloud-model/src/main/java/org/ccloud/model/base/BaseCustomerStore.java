@@ -27,12 +27,12 @@ import com.jfinal.plugin.ehcache.IDataLoader;
 @SuppressWarnings("serial")
 public abstract class BaseCustomerStore<M extends BaseCustomerStore<M>> extends JModel<M> implements IBean {
 
-	public static final String CACHE_NAME = "customer_store";
-	public static final String METADATA_TYPE = "customer_store";
+	public static final String CACHE_NAME = "cc_customer_store";
+	public static final String METADATA_TYPE = "cc_customer_store";
 
-	public static final String ACTION_ADD = "customer_store:add";
-	public static final String ACTION_DELETE = "customer_store:delete";
-	public static final String ACTION_UPDATE = "customer_store:update";
+	public static final String ACTION_ADD = "cc_customer_store:add";
+	public static final String ACTION_DELETE = "cc_customer_store:delete";
+	public static final String ACTION_UPDATE = "cc_customer_store:update";
 
 	public void removeCache(Object key){
 		if(key == null) return;
