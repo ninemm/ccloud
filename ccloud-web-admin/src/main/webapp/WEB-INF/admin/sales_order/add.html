@@ -376,6 +376,27 @@
 		
 		return check;	
 	}
+	
+	function checkPrice() {
+		var store = $(".product tr");
+		var check = false;
+		if (store.length <= 1) {
+			check = false;
+			return check;
+		}
+		store.each(function(index,obj){
+			var bigPrice = $(obj).find("#bigPrice").val();
+			var minPrice = parseInt($(obj).find("#bigPrice-span").html());
+		  	if (bigPrice < minPrice) {
+				return false;
+		 	}
+	    	if (index == store.length-1) {
+	    		check = true;
+	    	}
+		});
+		
+		return check;	
+	}	
 
 	function doSubmit(){
 		$("#productTotalCount").text($("#total").text());
@@ -388,6 +409,10 @@
 			toastr.error('商品购买数量不能为零!','操作失败');
 			return;			
 		}
+		if (!checkPrice()) {
+			toastr.error('商品价格不能低于销售价!','操作失败');
+			return;
+		}		
 		var l = Ladda.create( document.querySelector( '.ladda-button' ) );
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
