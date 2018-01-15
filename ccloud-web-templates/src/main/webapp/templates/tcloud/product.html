@@ -166,10 +166,16 @@ function firstInit(){
 }
 
 function changeInit(){
+	layer.open({
+		type: 2,
+		content: '保存中...'
+	});
+
 	$sidebar.empty();
 	$menuRight.empty();
 	Utils.ajax('${CPATH}/product/productList', {'tag' : tag, 'keyword' : keyword}, 
 		function(data){
+			layer.closeAll();
 			combo(data.productList, data.compositionList);
 		}
 	);
