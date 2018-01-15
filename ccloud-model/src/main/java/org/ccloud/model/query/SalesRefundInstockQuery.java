@@ -100,7 +100,7 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 			params.add(printStatus);
 		}
 
-		fromBuilder.append(" and ( r.instock_sn like '%"+keyword+"%' or c.customer_name like '%"+keyword+"%' ) ");
+		fromBuilder.append(" and r.status !=1001 and ( r.instock_sn like '%"+keyword+"%' or c.customer_name like '%"+keyword+"%' ) ");
 		
 		if (sort==""||null==sort) {
 			fromBuilder.append("order by "+"r.create_date desc");
@@ -419,6 +419,15 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		StringBuilder fromBuilder = new StringBuilder("select sr.instock_sn,sr.create_date AS createDate,u.realname AS salesName,sr.biz_date AS bizDate ");
 		fromBuilder.append(" from `cc_sales_refund_instock` sr ");
 		fromBuilder.append(" LEFT JOIN `user` u on u.id = sr.biz_user_id ");
+		fromBuilder.append(" where sr.id = ? ");
+		return Db.findFirst(fromBuilder.toString(), id);
+	}
+	
+	public Record _findRecordById(final String id) {
+		StringBuilder fromBuilder = new StringBuilder("select sr.instock_sn,sr.status,sr.create_date AS createDate,t1.name AS bizName,t2.name AS inputName,sr.biz_date AS bizDate,sr.modify_date ");
+		fromBuilder.append(" from `cc_sales_refund_instock` sr ");
+		fromBuilder.append(" LEFT JOIN (SELECT id ,realname as name from `user` ) t1 on sr.biz_user_id = t1.id  ");
+		fromBuilder.append(" LEFT JOIN (SELECT id ,realname as name from `user` ) t2 on sr.input_user_id = t2.id ");
 		fromBuilder.append(" where sr.id = ? ");
 		return Db.findFirst(fromBuilder.toString(), id);
 	}

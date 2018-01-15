@@ -381,7 +381,7 @@ public class _SalesRefundController extends JBaseCRUDController<SalesRefundInsto
 			
 			String id = getPara(0);
 
-			Record salesRefund = SalesRefundInstockQuery.me().findRecordById(id);
+			Record salesRefund = SalesRefundInstockQuery.me()._findRecordById(id);
 			setAttr("salesRefund", salesRefund);
 
 			String salesRefundInfo = buildOutstockInfo(id);
@@ -396,11 +396,11 @@ public class _SalesRefundController extends JBaseCRUDController<SalesRefundInsto
 			StringBuilder stringBuilder = new StringBuilder();
 			
 			for (Record record : rfundDetails) { // 若修改了产品价格或数量，则写入相关日志信息
-				if (record.getInt("out_count") !=record.getInt("product_count")) {
+				if (record.getInt("reject_product_count") !=record.getInt("product_count")) {
 						stringBuilder.append("●" + record.getStr("custom_name") + "<br>");
 						int convert = record.getInt("convert_relate");
-						stringBuilder.append("-" + record.getStr("big_unit") + "数量修改为"+ Math.round(record.getInt("reject_amount")/convert) + "(" + Math.round(record.getInt("product_count")/convert) + ")<br>");
-						stringBuilder.append("-" + record.getStr("small_unit") + "数量修改为"+ Math.round(record.getInt("reject_amount")%convert) + "(" + Math.round(record.getInt("product_count")%convert) + ")<br>");
+						stringBuilder.append("-" + record.getStr("big_unit") + "数量修改为"+ Math.round(record.getInt("reject_product_count")/convert) + "(" + Math.round(record.getInt("product_count")/convert) + ")<br>");
+						stringBuilder.append("-" + record.getStr("small_unit") + "数量修改为"+ Math.round(record.getInt("reject_product_count")%convert) + "(" + Math.round(record.getInt("product_count")%convert) + ")<br>");
 				}
 			}
 			
