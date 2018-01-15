@@ -33,6 +33,7 @@ import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.DataAreaUtil;
+import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Payables;
 import org.ccloud.model.PayablesDetail;
 import org.ccloud.model.Payment;
@@ -81,11 +82,9 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 	
 	public void getPayables() {
 //		String type = getPara("type");
-		String keyword = "";
-		try {
-			keyword = new String(getPara("keyword").getBytes("ISO8859-1"), "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+		String keyword = getPara("keyword");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
 		}
 		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
@@ -188,11 +187,9 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 	//导出应付记录
 	public void downloading() throws UnsupportedEncodingException {
 //		String type = getPara("type");
-		String keyword="";
-		try {
-			keyword = new String(getPara("keyword").getBytes("ISO8859-1"), "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+		String keyword=getPara("keyword");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
 		}
 		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);

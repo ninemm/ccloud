@@ -53,6 +53,7 @@ import com.jfinal.plugin.activerecord.Record;
 
 import cn.afterturn.easypoi.excel.ExcelExportUtil;
 import cn.afterturn.easypoi.excel.entity.ExportParams;
+import org.ccloud.utils.StringUtils;
 
 import com.jfinal.kit.JsonKit;
 import com.jfinal.kit.StrKit;
@@ -83,11 +84,9 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 	
 	public void getReceivables() {
 //		String type = getPara("type");
-		String keyword="";
-		try {
-			keyword = new String(getPara("keyword").getBytes("ISO8859-1"), "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+		String keyword=getPara("keyword");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
 		}
 		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
@@ -193,12 +192,9 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 	//导出应收记录
 	public void downloading() throws UnsupportedEncodingException {
 //		String type = getPara("type");
-		String keyword="";
-		try {
-			keyword = new String(getPara("keyword").getBytes("ISO8859-1"), "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		String keyword=getPara("keyword");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
 		}
 		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);

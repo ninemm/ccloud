@@ -414,4 +414,12 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		int i = Db.update(sql, userId, stockInDate, salesInStockStatusOut, modifyDate,remark, id);
 		return (i > 0) ? true : false;
 	}
+	
+	public Record findRecordById(final String id) {
+		StringBuilder fromBuilder = new StringBuilder("select sr.instock_sn,sr.create_date AS createDate,u.realname AS salesName,sr.biz_date AS bizDate ");
+		fromBuilder.append(" from `cc_sales_refund_instock` sr ");
+		fromBuilder.append(" LEFT JOIN `user` u on u.id = sr.biz_user_id ");
+		fromBuilder.append(" where sr.id = ? ");
+		return Db.findFirst(fromBuilder.toString(), id);
+	}
 }
