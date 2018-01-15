@@ -210,7 +210,7 @@ public class OrderController extends BaseFrontController {
 		StringBuilder stringBuilder = new StringBuilder();
 		
 		for (Record record : orderDetails) { // 若修改了产品价格或数量，则写入相关日志信息
-			if (record.getInt("out_count") !=record.getInt("product_count")) {
+			if (!record.getInt("out_count").equals(record.getInt("product_count"))) {
 					stringBuilder.append("●" + record.getStr("custom_name") + "<br>");
 					int convert = record.getInt("convert_relate");
 					stringBuilder.append("-" + record.getStr("big_unit") + "数量修改为"+ Math.round(record.getInt("out_count")/convert) + "(" + Math.round(record.getInt("product_count")/convert) + ")<br>");
