@@ -138,6 +138,7 @@ public class _UserController extends JBaseCRUDController<User> {
 			user.setPassword(EncryptUtils.encryptPassword(user.getPassword(), user.getSalt()));
 		}else {
 			if(t.equals("1")) {
+				user.setStatus(1);
 				user.setWechatOpenId("");
 			}
 			//更新用户组信息
