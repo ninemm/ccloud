@@ -67,12 +67,13 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 	public boolean insert(Map<String, String[]> paraMap, String orderId, String sellerId, String sellerCode, String userId, Date date,
 			String deptId, String dataArea, int index) {
 		List<SalesOrderDetail> detailList = new ArrayList<>();
+		String sellerProductId = StringUtils.getArrayFirst(paraMap.get("sellProductId" + index));
 		String convert = StringUtils.getArrayFirst(paraMap.get("convert" + index));
 		String bigNum = StringUtils.getArrayFirst(paraMap.get("bigNum" + index));
 		String smallNum = StringUtils.getArrayFirst(paraMap.get("smallNum" + index));
 		Integer productCount = Integer.valueOf(bigNum) * Integer.valueOf(convert) + Integer.valueOf(smallNum);
 		String productId = StringUtils.getArrayFirst(paraMap.get("productId" + index));
-		Map<String, Object> result = this.getWarehouseId(productId, sellerId, sellerCode, productCount, Integer.parseInt(convert), userId);
+		Map<String, Object> result = this.getWarehouseId(productId, sellerId, sellerCode, productCount, Integer.parseInt(convert), userId, sellerProductId);
 		String status = result.get("status").toString();
 		List<Map<String, String>> list = (List<Map<String, String>>) result.get("countList");
 		
@@ -90,7 +91,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 			
 			detail.setId(StrKit.getRandomUUID());
 			detail.setOrderId(orderId);
-			detail.setSellProductId(StringUtils.getArrayFirst(paraMap.get("sellProductId" + index)));
+			detail.setSellProductId(sellerProductId);
 
 			String productPrice = StringUtils.getArrayFirst(paraMap.get("bigPrice" + index));
 //			String productAmount = StringUtils.getArrayFirst(paraMap.get("rowTotal" + index));
@@ -120,12 +121,19 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 	}
 	
 	private Map<String, Object> getWarehouseId(String productId, String sellerId, String sellerCode, 
-			Integer productCount, Integer convert, String userId) {
+			Integer productCount, Integer convert, String userId, String sellerProductId) {
 		Map<String, Object> result = new HashMap<>();
 		List<Map<String, String>> countList = new ArrayList<>();
 		Boolean checkStore = OptionQuery.me().findValueAsBool(Consts.OPTION_SELLER_STORE_CHECK + sellerCode);
 		boolean isCheckStore = (checkStore != null && checkStore == true) ? true : false;
-
+		
+		SellerProduct sellerProduct = SellerProductQuery.me().findById(sellerProductId);
+		if (sellerProduct.getStoreCount().compareTo(new BigDecimal(productCount)) == -1 && isCheckStore) {
+			result.put("status", "notEnough");
+			result.put("countList", countList);	
+			return result;
+		}
+		
 		List<Record> list = InventoryQuery.me().findProductStoreByUser(sellerId, productId, userId);
 		if (list.size() == 0) {
 			result.put("status", "notEnough");
@@ -190,12 +198,13 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 	public boolean insertForApp(Map<String, String[]> paraMap, String orderId, String sellerId, String sellerCode, String userId, Date date,
 			String deptId, String dataArea, int index) {
 		List<SalesOrderDetail> detailList = new ArrayList<>();
+		String sellerProductId = paraMap.get("sellProductId")[index];
 		String convert = paraMap.get("convert")[index];
 		String bigNum = paraMap.get("bigNum")[index];
 		String smallNum = paraMap.get("smallNum")[index];
 		Integer productCount = Integer.valueOf(bigNum) * Integer.valueOf(convert) + Integer.valueOf(smallNum);
 		String productId = paraMap.get("productId")[index];
-		Map<String, Object> result = this.getWarehouseId(productId, sellerId, sellerCode, productCount, Integer.parseInt(convert), userId);
+		Map<String, Object> result = this.getWarehouseId(productId, sellerId, sellerCode, productCount, Integer.parseInt(convert), userId, sellerProductId);
 		String status = result.get("status").toString();
 		List<Map<String, String>> list = (List<Map<String, String>>) result.get("countList");
 		
@@ -211,7 +220,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 			
 			detail.setId(StrKit.getRandomUUID());
 			detail.setOrderId(orderId);
-			detail.setSellProductId(paraMap.get("sellProductId")[index]);
+			detail.setSellProductId(sellerProductId);
 
 			String productPrice = paraMap.get("bigPrice")[index];
 			
@@ -246,6 +255,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 	public boolean insertForAppGift(Map<String, String[]> paraMap, String orderId, String sellerId, String sellerCode, String userId, Date date,
 			String deptId, String dataArea, int index) {
 		List<SalesOrderDetail> detailList = new ArrayList<>();
+		String giftSellerProductId = paraMap.get("giftSellProductId")[index];
 		String convert = paraMap.get("giftConvert")[index];
 		String giftNum = paraMap.get("giftNum")[index];
 		String giftUnit = paraMap.get("giftUnit")[index];
@@ -258,7 +268,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		}
 		
 		String productId = paraMap.get("giftProductId")[index];
-		Map<String, Object> result = this.getWarehouseId(productId, sellerId, sellerCode, productCount, Integer.parseInt(convert), userId);
+		Map<String, Object> result = this.getWarehouseId(productId, sellerId, sellerCode, productCount, Integer.parseInt(convert), userId, giftSellerProductId);
 		String status = result.get("status").toString();
 		List<Map<String, String>> list = (List<Map<String, String>>) result.get("countList");
 		
@@ -274,7 +284,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 			
 			detail.setId(StrKit.getRandomUUID());
 			detail.setOrderId(orderId);
-			detail.setSellProductId(paraMap.get("giftSellProductId")[index]);
+			detail.setSellProductId(giftSellerProductId);
 
 			String productPrice = paraMap.get("giftBigPrice")[index];
 			detail.setProductPrice(new BigDecimal(productPrice));
@@ -312,11 +322,12 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 	public boolean insertForAppComposition(SellerProduct product, String orderId, String sellerId, String sellerCode, String id,
 			Date date, String deptId, String dataArea, Integer number, String userId) {
 		List<SalesOrderDetail> detailList = new ArrayList<>();
+		String sellerProductId = product.getId();
 		Integer convert = product.getInt("convert_relate");
 		double compositionCount = Double.valueOf(product.getStr("productCount"));
 		Integer productCount = (int) Math.round(compositionCount * convert * number);
 		String productId = product.getProductId();
-		Map<String, Object> result = this.getWarehouseId(productId, sellerId, sellerCode, productCount, convert, userId);
+		Map<String, Object> result = this.getWarehouseId(productId, sellerId, sellerCode, productCount, convert, userId, sellerProductId);
 		String status = result.get("status").toString();
 		List<Map<String, String>> list = (List<Map<String, String>>) result.get("countList");
 		
@@ -333,7 +344,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 			
 			detail.setId(StrKit.getRandomUUID());
 			detail.setOrderId(orderId);
-			detail.setSellProductId(product.getId());
+			detail.setSellProductId(sellerProductId);
 
 			detail.setProductPrice(product.getPrice());
 			BigDecimal productAmount = new BigDecimal(detail.getProductCount()).divide(new BigDecimal(convert))
@@ -422,11 +433,12 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 	public boolean insertDetailByComposition(SellerProduct product, String orderId, String sellerId, String sellerCode, String id,
 			Date date, String deptId, String dataArea, Integer index, Integer number, String userId) {
 		List<SalesOrderDetail> detailList = new ArrayList<>();
+		String sellerProductId = product.getId();
 		Integer convert = product.getInt("convert_relate");
 		double compositionCount = Double.valueOf(product.getStr("productCount"));
 		Integer productCount = (int) Math.round(compositionCount * convert * number);
 		String productId = product.getProductId();
-		Map<String, Object> result = this.getWarehouseId(productId, sellerId, sellerCode, productCount, convert, userId);
+		Map<String, Object> result = this.getWarehouseId(productId, sellerId, sellerCode, productCount, convert, userId, sellerProductId);
 		String status = result.get("status").toString();
 		List<Map<String, String>> list = (List<Map<String, String>>) result.get("countList");
 		
@@ -443,7 +455,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 			
 			detail.setId(StrKit.getRandomUUID());
 			detail.setOrderId(orderId);
-			detail.setSellProductId(product.getId());
+			detail.setSellProductId(sellerProductId);
 
 			detail.setProductPrice(product.getPrice());
 			BigDecimal productAmount = new BigDecimal(detail.getProductCount()).divide(new BigDecimal(convert))

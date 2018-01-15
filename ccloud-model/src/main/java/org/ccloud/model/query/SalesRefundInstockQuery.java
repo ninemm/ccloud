@@ -424,7 +424,7 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 	}
 	
 	public Record _findRecordById(final String id) {
-		StringBuilder fromBuilder = new StringBuilder("select sr.instock_sn,sr.status,sr.create_date AS createDate,t1.name AS bizName,t2.name AS inputName,sr.biz_date AS bizDate,sr.modify_date ");
+		StringBuilder fromBuilder = new StringBuilder("select sr.id, sr.instock_sn,sr.status,sr.create_date AS createDate,t1.name AS bizName,t2.name AS inputName,sr.biz_date AS bizDate,sr.modify_date ");
 		fromBuilder.append(" from `cc_sales_refund_instock` sr ");
 		fromBuilder.append(" LEFT JOIN (SELECT id ,realname as name from `user` ) t1 on sr.biz_user_id = t1.id  ");
 		fromBuilder.append(" LEFT JOIN (SELECT id ,realname as name from `user` ) t2 on sr.input_user_id = t2.id ");
