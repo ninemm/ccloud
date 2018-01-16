@@ -117,6 +117,15 @@ public class _UserController extends JBaseCRUDController<User> {
 		// user.setGroupId(groupList);
 		 user.setGroupName(NewGroupName);
 		if (StringUtils.isBlank(user.getId())) {
+			List<User> users = UserQuery.me().findByMobile(user.getMobile());
+			for(User us : users) {
+				if(StringUtils.isBlank(us.getWechatOpenId())) {
+					continue;
+				}else {
+					user.setWechatOpenId(us.getWechatOpenId());
+					break;
+				}
+			}
 			Department dept = DepartmentQuery.me().findById(user.getDepartmentId());
 			String dataArea = DataAreaUtil.dataAreaSetByUser(dept.getDataArea());
 			user.setDataArea(dataArea);
