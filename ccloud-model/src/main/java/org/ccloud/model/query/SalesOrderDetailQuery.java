@@ -155,7 +155,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		if (defaultCount.compareTo(new BigDecimal(0)) == 1) {
 			Map<String, String> map = new HashMap<>();
 			map.put("warehouse_id", record.getStr("warehouse_id"));
-			map.put("productCount", productCount.toString());
+			map.put("productCount", defaultCount.toString());
 			countList.add(map);
 		}
 		list.remove(0);

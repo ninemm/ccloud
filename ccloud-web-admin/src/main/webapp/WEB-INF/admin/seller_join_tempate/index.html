@@ -20,59 +20,11 @@
 
 	var $table = $("#_sellerJoinTemplate_table");
 	
-	$("#sellerId").change(function(){
-			$('#post-search-input').val("");
-			$("#_sellerJoinTemplate_table").bootstrapTable('destroy');
-			var url = '${CPATH}/admin/sellerJoinTemplate/list?seller_id=' + this.value;
+	$(function() {
+		var url = '${CPATH}/admin/sellerJoinTemplate/list';
 			jQuery.mm.initEditTable('#_sellerJoinTemplate_table', url, initParams, initFields(), null);
 			$("#search-submit").click(function() {
 				$table.bootstrapTable('refresh');
-			});
-			if(this.value==""){
-				$(".content").hide();
-				$(".jp-left").hide();
-				$(".box").hide();
-			}else{
-				$(".jp-left").show();
-				$(".box").show();
-				$(".content").show();
-			}
-	})
-	$(function() {
-		$(".jp-left").hide();
-		$(".content").hide();
-		$.ajax({
-				url:"${CPATH}/admin/seller/show_sellerName",
-				type:"post",
-				dataType:"json",
-				success:function(data){
-					
-					$.each(data,function(index, item) {
-						if(item.seller_type==0){
-							var html ='<option value="'+item.id+'" selected = "selected">'+item.seller_name+'</option>';
-							$("#sellerId").append(html);
-							$('#post-search-input').val("");
-							$("#_sellerJoinTemplate_table").bootstrapTable('destroy');
-							var url = '${CPATH}/admin/sellerJoinTemplate/list?seller_id=' + item.id;
-							jQuery.mm.initEditTable('#_sellerJoinTemplate_table', url, initParams, initFields(), null);
-							$("#search-submit").click(function() {
-								$table.bootstrapTable('refresh');
-							});
-							if(this.value==""){
-								$(".content").hide();
-								$(".jp-left").hide();
-								$(".box").hide();
-							}else{
-								$(".jp-left").show();
-								$(".box").show();
-								$(".content").show();
-							}
-						}else{
-							var Html ='<option value="'+item.id+'">'+item.seller_name+'</option>';
-							$("#sellerId").append(Html);
-						}
-					});
-				}
 			});
 	});
 
@@ -255,11 +207,6 @@
 
 <section class="content-header">
 	<h1>销售商模版管理</h1>
-	<div class="input-group col-md-2 col-sm-8" style="padding-top:10px;">
-		<select class="form-control input-sm" name="id" id="sellerId" >
-			<option value="">----请选择销售商----</option>
-		</select>
-    </div>
 	<ol class="breadcrumb">
 		<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
    	<li><a href="#">销售商管理</a></li>

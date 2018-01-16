@@ -350,4 +350,10 @@ public class UserQuery extends JBaseQuery {
 		return user.update(); 
 	}
 	
+	public List<User> _findByMobile(String mobile) {
+		StringBuilder sqlBuilder = new StringBuilder("select * ");
+		sqlBuilder.append("from `user` ");
+		sqlBuilder.append("where mobile = ?");
+		return DAO.find(sqlBuilder.toString(), mobile);
+	}
 }
