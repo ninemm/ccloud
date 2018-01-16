@@ -576,7 +576,7 @@ public class DepartmentQuery extends JBaseQuery {
 		sql.append(" ) d1");
 		sql.append(" JOIN department d2 ON d1._id = d2.id");
 		sql.append(" JOIN cc_seller s on d2.id = s.dept_id");
-		sql.append(" WHERE d2.parent_id > '0'");
+//		sql.append(" WHERE d2.parent_id > '0'");
 		sql.append(" ORDER BY d2.dept_level desc");
 		
 		return DAO.find(sql.toString(), subDeptId);
