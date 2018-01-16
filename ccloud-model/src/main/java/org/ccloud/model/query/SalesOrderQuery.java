@@ -1000,14 +1000,17 @@ public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procK
 	
 	//统计业务员当日 当月 销售额排行(前5)
 	public List<Record> querysalesManAmountBy(String selDataArea,String by,String desc){
-		StringBuilder fromBuilder = new StringBuilder("select cso.biz_user_id,u.realname title,sum(cso.total_amount) sumamount ");
-		fromBuilder.append("from cc_sales_order cso inner join `user` u on u.id = cso.biz_user_id ");
+		StringBuilder fromBuilder = new StringBuilder("SELECT cso.biz_user_id , u.realname title , SUM(so.total_amount) sumamount ");
+		fromBuilder.append(" FROM cc_sales_outstock so ");
+		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON sojo.outstock_id = so.id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_order cso ON cso.id = sojo.order_id ");
+		fromBuilder.append(" LEFT JOIN `user` u ON u.id = cso.biz_user_id ");
 		if(by.equals("day")) {
-			fromBuilder.append("where DATE_FORMAT(cso.create_date, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d') ");
+			fromBuilder.append(" where DATE_FORMAT(so.create_date, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d') ");
 		}else if(by.equals("month")) {
-			fromBuilder.append("where cso.create_date like CONCAT(DATE_FORMAT(NOW(),'%Y-%m'),'%') ");
+			fromBuilder.append(" where so.create_date like CONCAT(DATE_FORMAT(NOW(),'%Y-%m'),'%') ");
 		}
-		fromBuilder.append("and cso.data_area like '"+selDataArea+"%' ");
+		fromBuilder.append(" and cso.data_area like '"+selDataArea+"%' ");
 		fromBuilder.append(" GROUP BY cso.biz_user_id ORDER BY sumamount ");
 		fromBuilder.append(desc+" limit 0,5 ");
 		return Db.find(fromBuilder.toString());
@@ -1343,9 +1346,13 @@ public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procK
 
 	//商品销售排行 当日or汇总
 	public List<Record> queryGoodsSales(String selDataArea,boolean toDay,String desc){
-		StringBuilder fromBuilder = new StringBuilder("select csp.id,csp.custom_name title,sum(csod.product_count) countgoods,sum(csod.product_amount) sumamount ");
-		fromBuilder.append("from cc_sales_order_detail csod inner join cc_seller_product csp on csod.sell_product_id = csp.id ");
-		fromBuilder.append("where csod.data_area like '"+selDataArea+"' ");
+		StringBuilder fromBuilder = new StringBuilder("SELECT csp.id , csp.custom_name title , sum(csod.product_count) countgoods , sum(csod.product_amount) sumamount ");
+		fromBuilder.append(" FROM cc_sales_outstock so ");
+		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON sojo.outstock_id = so.id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_order cso ON cso.id = sojo.order_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_outstock_detail csod ON csod.outstock_id=so.id ");
+		fromBuilder.append(" LEFT JOIN cc_seller_product csp ON csod.sell_product_id = csp.id ");
+		fromBuilder.append(" where csod.data_area like '"+selDataArea+"' ");
 		if(toDay) {
 			fromBuilder.append("and DATE_FORMAT(csod.create_date, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d') ");
 		}
@@ -1356,13 +1363,17 @@ public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procK
 	
 	//直营商销售排行 当日/当月
 	public List<Record> querySellerSales(String selDataArea,String by,String desc){
-		StringBuilder fromBuilder = new StringBuilder("select cso.seller_id,cs.seller_name title,sum(cso.total_amount) sumamount ");
-		fromBuilder.append("from cc_sales_order cso inner join cc_seller cs on cso.seller_id = cs.id ");
-		fromBuilder.append("where cso.data_area like '"+selDataArea+"' ");
+		StringBuilder fromBuilder = new StringBuilder("SELECT cso.seller_id , cs.seller_name title , sum(so.total_amount) sumamount ");
+		fromBuilder.append(" FROM cc_sales_outstock so ");
+		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON sojo.outstock_id = so.id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_order cso ON cso.id = sojo.order_id ");
+		fromBuilder.append(" LEFT JOIN cc_seller cs ON cso.seller_id = cs.id ");
+		
+		fromBuilder.append(" where cso.data_area like '"+selDataArea+"' ");
 		if(by.equals("day")) {
-			fromBuilder.append("and DATE_FORMAT(cso.create_date, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d') ");
+			fromBuilder.append("and DATE_FORMAT(so.create_date, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d') ");
 		}else if(by.equals("month")) {
-			fromBuilder.append("and cso.create_date like CONCAT(DATE_FORMAT(NOW(),'%Y-%m'),'%') ");
+			fromBuilder.append("and so.create_date like CONCAT(DATE_FORMAT(NOW(),'%Y-%m'),'%') ");
 		}
 		fromBuilder.append("and cs.seller_type = 1 ");
 		fromBuilder.append("group by cso.seller_id order by sumamount ");
