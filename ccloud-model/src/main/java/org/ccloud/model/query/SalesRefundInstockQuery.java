@@ -27,6 +27,7 @@ import org.ccloud.model.InventoryDetail;
 import org.ccloud.model.SalesRefundInstock;
 import org.ccloud.model.SalesRefundInstockDetail;
 import org.ccloud.model.SellerProduct;
+import org.ccloud.model.User;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
 
@@ -100,7 +101,7 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 			params.add(printStatus);
 		}
 
-		fromBuilder.append(" and r.status !=1001 and ( r.instock_sn like '%"+keyword+"%' or c.customer_name like '%"+keyword+"%' ) ");
+		fromBuilder.append(" and ( r.instock_sn like '%"+keyword+"%' or c.customer_name like '%"+keyword+"%' ) ");
 		
 		if (sort==""||null==sort) {
 			fromBuilder.append("order by "+"r.create_date desc");
@@ -234,7 +235,7 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		return true;
 	}
 
-	public boolean updateStatus(String inStockId, Date date) {
+	public boolean updateStatus(String inStockId, Date date,User user) {
 		SalesRefundInstock sales = this.findById(inStockId);
 		List<SalesRefundInstockDetail> list = SalesRefundInstockDetailQuery.me().findByInId(inStockId);
 		boolean status = true;
@@ -247,8 +248,12 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		
 		if (status) {
 			sales.setStatus(Consts.SALES_REFUND_INSTOCK_ALL_OUT);
+			sales.setBizUserId(user.getId());
+			sales.setBizDate(date);
 		} else {
 			sales.setStatus(Consts.SALES_REFUND_INSTOCK_PART_OUT);
+			sales.setBizUserId(user.getId());
+			sales.setBizDate(date);
 		}
 		sales.setModifyDate(date);
 		
@@ -258,10 +263,10 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		return true;
 	}
 
-	public int updateConfirm(String inStockId, int status, Date date) {
+	public int updateConfirm(String inStockId, int status, Date date,String userId) {
 		return Db.update(
-				"update cc_sales_refund_instock set status = ?, modify_date = ? where id = ?",
-				status, date, inStockId);
+				"update cc_sales_refund_instock set status = ?, modify_date = ?,confirm_user_id = ?,confirm_date = ?  where id = ?",
+				status, date,userId,date, inStockId);
 	}
 
 	public String getNewSn(String sellerId) {
@@ -424,10 +429,11 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 	}
 	
 	public Record _findRecordById(final String id) {
-		StringBuilder fromBuilder = new StringBuilder("select sr.id, sr.instock_sn,sr.status,sr.create_date AS createDate,t1.name AS bizName,t2.name AS inputName,sr.biz_date AS bizDate,sr.modify_date ");
+		StringBuilder fromBuilder = new StringBuilder("select sr.id, sr.instock_sn,sr.status,sr.create_date AS createDate,t1.name AS bizName,t2.name AS confirmName,t3.name AS inputName,sr.biz_date AS bizDate,sr.confirm_date ");
 		fromBuilder.append(" from `cc_sales_refund_instock` sr ");
 		fromBuilder.append(" LEFT JOIN (SELECT id ,realname as name from `user` ) t1 on sr.biz_user_id = t1.id  ");
-		fromBuilder.append(" LEFT JOIN (SELECT id ,realname as name from `user` ) t2 on sr.input_user_id = t2.id ");
+		fromBuilder.append(" LEFT JOIN (SELECT id ,realname as name from `user` ) t2 on sr.confirm_user_id = t2.id ");
+		fromBuilder.append(" LEFT JOIN (SELECT id ,realname as name from `user` ) t3 on sr.input_user_id = t3.id ");
 		fromBuilder.append(" where sr.id = ? ");
 		return Db.findFirst(fromBuilder.toString(), id);
 	}

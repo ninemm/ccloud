@@ -10,9 +10,9 @@ public class SalesOrderExcel {
 	@Excel(name = "客户类型")
 	private String customerType;
 	@Excel(name = "联系人")
-	private String contact;
+	private String ccontact;
 	@Excel(name = "联系电话")
-	private String mobile;
+	private String cmobile;
 	@Excel(name = "业务员")
 	private String bizUser;
 	@Excel(name = "订单金额")
@@ -68,18 +68,6 @@ public class SalesOrderExcel {
 	}
 	public void setCustomerType(String customerType) {
 		this.customerType = customerType;
-	}
-	public String getContact() {
-		return contact;
-	}
-	public void setContact(String contact) {
-		this.contact = contact;
-	}
-	public String getMobile() {
-		return mobile;
-	}
-	public void setMobile(String mobile) {
-		this.mobile = mobile;
 	}
 	public String getBizUser() {
 		return bizUser;
@@ -195,6 +183,19 @@ public class SalesOrderExcel {
 	public void setSmallLeftCount(int smallLeftCount) {
 		this.smallLeftCount = smallLeftCount;
 	}
+	public String getCcontact() {
+		return ccontact;
+	}
+	public void setCcontact(String ccontact) {
+		this.ccontact = ccontact;
+	}
+	public String getCmobile() {
+		return cmobile;
+	}
+	public void setCmobile(String cmobile) {
+		this.cmobile = cmobile;
+	}
+	
 	
 	
 }
