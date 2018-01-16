@@ -128,7 +128,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		boolean isCheckStore = (checkStore != null && checkStore == true) ? true : false;
 		
 		SellerProduct sellerProduct = SellerProductQuery.me().findById(sellerProductId);
-		if (sellerProduct.getStoreCount().compareTo(new BigDecimal(productCount)) == -1 && isCheckStore) {
+		if (sellerProduct.getStoreCount().multiply(new BigDecimal(convert)).compareTo(new BigDecimal(productCount)) == -1 && isCheckStore) {
 			result.put("status", "notEnough");
 			result.put("countList", countList);	
 			return result;
@@ -213,7 +213,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		}
 		for (Map<String, String> map : list) {
 			SalesOrderDetail detail = new SalesOrderDetail();
-			detail.setProductCount(Integer.parseInt(map.get("productCount").toString()));
+			detail.setProductCount(new BigDecimal(map.get("productCount").toString()).intValue());
 			detail.setLeftCount(detail.getProductCount());
 			detail.setOutCount(0);
 			detail.setWarehouseId(map.get("warehouse_id").toString());
@@ -277,7 +277,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		}
 		for (Map<String, String> map : list) {
 			SalesOrderDetail detail = new SalesOrderDetail();
-			detail.setProductCount(Integer.parseInt(map.get("productCount").toString()));
+			detail.setProductCount(new BigDecimal(map.get("productCount").toString()).intValue());
 			detail.setLeftCount(detail.getProductCount());
 			detail.setOutCount(0);
 			detail.setWarehouseId(map.get("warehouse_id").toString());
@@ -336,7 +336,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		}
 		for (Map<String, String> map : list) {
 			SalesOrderDetail detail = new SalesOrderDetail();
-			detail.setProductCount(Integer.parseInt(map.get("productCount").toString()));
+			detail.setProductCount(new BigDecimal(map.get("productCount").toString()).intValue());
 			detail.setLeftCount(detail.getProductCount());
 			detail.setOutCount(0);
 	
@@ -447,7 +447,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		}
 		for (Map<String, String> map : list) {
 			SalesOrderDetail detail = new SalesOrderDetail();
-			detail.setProductCount(Integer.parseInt(map.get("productCount").toString()));
+			detail.setProductCount(new BigDecimal(map.get("productCount").toString()).intValue());
 			detail.setLeftCount(detail.getProductCount());
 			detail.setOutCount(0);
 			// 库存盘点写入库存总账未完成
