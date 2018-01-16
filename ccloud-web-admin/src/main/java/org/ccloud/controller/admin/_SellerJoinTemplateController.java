@@ -47,7 +47,7 @@ public class _SellerJoinTemplateController extends JBaseCRUDController<SellerJoi
 	}
 	
 	public void list() {
-		String sellerId = getPara("seller_id");
+		String sellerId = getSessionAttr("sellerId");
         String keyword = getPara("k");
         if (StrKit.notBlank(keyword)) {
             keyword = StringUtils.urlDecode(keyword);
