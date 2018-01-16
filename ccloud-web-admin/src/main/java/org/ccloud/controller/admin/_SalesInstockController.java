@@ -168,7 +168,7 @@ public class _SalesInstockController extends JBaseCRUDController<SalesOrder> {
         			}
 
         		}
-        		if (!SalesRefundInstockQuery.me().updateStatus(inStockId, date)) {
+        		if (!SalesRefundInstockQuery.me().updateStatus(inStockId, date,user)) {
         			return false;
         		}
         		return true;

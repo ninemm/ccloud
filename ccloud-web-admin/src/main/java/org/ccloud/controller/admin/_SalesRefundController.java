@@ -215,7 +215,8 @@ public class _SalesRefundController extends JBaseCRUDController<SalesRefundInsto
             @Override
             public boolean run() throws SQLException {
             	Date date = new Date();
-            	int i = SalesRefundInstockQuery.me().updateConfirm(inStockId, status, date);
+            	User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
+            	int i = SalesRefundInstockQuery.me().updateConfirm(inStockId, status, date,user.getId());
             	if (i <= 0) {
             		return false;
             	}
