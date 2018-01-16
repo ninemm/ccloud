@@ -1,12 +1,12 @@
 /**
  * Copyright (c) 2015-2016, Eric Huang 黄鑫 (hx50859042@gmail.com).
- *
+ * <p>
  * Licensed under the GNU Lesser General Public License (LGPL) ,Version 3.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
+ * <p>
+ * http://www.gnu.org/licenses/lgpl-3.0.txt
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,8 +25,10 @@ import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.CustomerType;
+import org.ccloud.model.Department;
 import org.ccloud.model.User;
 import org.ccloud.model.query.CustomerTypeQuery;
+import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.PriceSystemQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
@@ -49,109 +51,113 @@ import com.jfinal.plugin.activerecord.Record;
 @RouterNotAllowConvert
 public class _CustomerTypeController extends JBaseCRUDController<CustomerType> {
 
-	@Override
-	@RequiresPermissions(value = { "/admin/customerType", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
-	public void index() {
-		render("index.html");
-	}
+    @Override
+    @RequiresPermissions(value = {"/admin/customerType", "/admin/dealer/all", "/admin/all"}, logical = Logical.OR)
+    public void index() {
+        render("index.html");
+    }
 
-	@RequiresPermissions(value = { "/admin/customerType", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
-	public void list() {
+    @RequiresPermissions(value = {"/admin/customerType", "/admin/dealer/all", "/admin/all"}, logical = Logical.OR)
+    public void list() {
+        String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 
-		String keyword = getPara("k");
-		if (StrKit.notBlank(keyword)) {
-			keyword = StringUtils.urlDecode(keyword);
-		}
-		String show = getPara("show");
+        String keyword = getPara("k");
+        if (StrKit.notBlank(keyword)) {
+            keyword = StringUtils.urlDecode(keyword);
+        }
+        String show = getPara("show");
 
-		Page<Record> page = null;
-		if (SecurityUtils.getSubject().isPermitted("/admin/all")) {
-			page = CustomerTypeQuery.me().paginate(getPageNumber(), getPageSize(), keyword, show,  null);
-		} else {
-			page = CustomerTypeQuery.me().paginate(getPageNumber(), getPageSize(), keyword, show,
-					getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
-		}
-		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
-		renderJson(map);
+        Page<Record> page = null;
+        if (SecurityUtils.getSubject().isPermitted("/admin/all")) {
+            page = CustomerTypeQuery.me().paginate(getPageNumber(), getPageSize(), keyword, show, null);
+        } else {
+            page = CustomerTypeQuery.me().paginate(getPageNumber(), getPageSize(), keyword, show,
+                    dealerDataArea);
+        }
+        Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
+        renderJson(map);
 
-	}
+    }
 
-	@RequiresPermissions(value = { "/admin/customerType/edit", "/admin/dealer/all",
-			"/admin/all" }, logical = Logical.OR)
-	public void enable() {
+    @RequiresPermissions(value = {"/admin/customerType/edit", "/admin/dealer/all",
+            "/admin/all"}, logical = Logical.OR)
+    public void enable() {
 
-		String id = getPara("id");
-		int show = getParaToInt("show");
+        String id = getPara("id");
+        int show = getParaToInt("show");
 
-		if (CustomerTypeQuery.me().enable(id, show)) {
-			renderAjaxResultForSuccess();
-		} else {
-			renderAjaxResultForError();
-		}
-	}
+        if (CustomerTypeQuery.me().enable(id, show)) {
+            renderAjaxResultForSuccess();
+        } else {
+            renderAjaxResultForError();
+        }
+    }
 
-	@Override
-	@RequiresPermissions(value = { "/admin/customerType/edit", "/admin/dealer/all",
-			"/admin/all" }, logical = Logical.OR)
-	public void edit() {
-		String id = getPara("id");
+    @Override
+    @RequiresPermissions(value = {"/admin/customerType/edit", "/admin/dealer/all",
+            "/admin/all"}, logical = Logical.OR)
+    public void edit() {
+        String id = getPara("id");
 
-		boolean notBlank = StrKit.notBlank(id);
-		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/all");
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+        boolean notBlank = StrKit.notBlank(id);
+        boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/all");
 
-		if (notBlank && isSuperAdmin) {// 超级管理员修改
-			Record customerType = CustomerTypeQuery.me().findMoreById(id);
-			List<Record> priceSystemList = PriceSystemQuery.me().findPriceSystemByDeptId(customerType.getStr("dept_id"),
-					customerType.getStr("data_area"));
-			setAttr("customerType", customerType);
-			setAttr("priceSystemList", priceSystemList);
+        String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+        Department dealerDept = DepartmentQuery.me().findByDataArea(dealerDataArea);
 
-		} else if (notBlank && !isSuperAdmin) {// 经销商管理员修改
-			setAttr("customerType", CustomerTypeQuery.me().findById(id));
-			setAttr("priceSystemList", PriceSystemQuery.me().findPriceSystemByDeptId(user.getDepartmentId(),
-					DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea())));
+        if (notBlank && isSuperAdmin) {// 超级管理员修改
+            Record customerType = CustomerTypeQuery.me().findMoreById(id);
+            List<Record> priceSystemList = PriceSystemQuery.me().findPriceSystemByDeptId(customerType.getStr("dept_id"),
+                    customerType.getStr("data_area"));
+            setAttr("customerType", customerType);
+            setAttr("priceSystemList", priceSystemList);
 
-		} else if (!notBlank && !isSuperAdmin) {// 经销商管理员新增
-			setAttr("priceSystemList", PriceSystemQuery.me().findPriceSystemByDeptId(user.getDepartmentId(),
-					DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea())));
-		}
-		
-		List<ActReProcdef> procDefList = ActReProcdefQuery.me().findListInNormal();
-		setAttr("procDefList", procDefList);
+        } else if (notBlank && !isSuperAdmin) {// 经销商管理员修改
+            setAttr("customerType", CustomerTypeQuery.me().findById(id));
+            setAttr("priceSystemList", PriceSystemQuery.me().findPriceSystemByDeptId(dealerDept.getId(),
+                    dealerDataArea));
 
-		render("edit.html");
-	}
+        } else if (!notBlank && !isSuperAdmin) {// 经销商管理员新增
+            setAttr("priceSystemList", PriceSystemQuery.me().findPriceSystemByDeptId(dealerDept.getId(),
+                    dealerDataArea));
+        }
 
-	@Override
-	@RequiresPermissions(value = { "/admin/customerType/edit", "/admin/dealer/all",
-			"/admin/all" }, logical = Logical.OR)
-	public void save() {
+        List<ActReProcdef> procDefList = ActReProcdefQuery.me().findListInNormal();
+        setAttr("procDefList", procDefList);
 
-		CustomerType customerType = getModel(CustomerType.class);
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+        render("edit.html");
+    }
 
-		if (SecurityUtils.getSubject().isPermitted("/admin/all")) {
-			customerType.set("dept_id", getPara("parent_id"));
-			customerType.set("data_area", getPara("data_area"));
-		} else {
-			customerType.set("dept_id", user.getDepartmentId());
-			customerType.set("data_area", DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea()));
-		}
+    @Override
+    @RequiresPermissions(value = {"/admin/customerType/edit", "/admin/dealer/all",
+            "/admin/all"}, logical = Logical.OR)
+    public void save() {
 
-		customerType.saveOrUpdate();
+        CustomerType customerType = getModel(CustomerType.class);
+        String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+        Department dealerDept = DepartmentQuery.me().findByDataArea(dealerDataArea);
 
-		renderAjaxResultForSuccess();
+        if (SecurityUtils.getSubject().isPermitted("/admin/all")) {
+            customerType.set("dept_id", getPara("parent_id"));
+            customerType.set("data_area", getPara("data_area"));
+        } else {
+            customerType.set("dept_id", dealerDept.getId());
+            customerType.set("data_area", dealerDataArea);
+        }
 
-	}
+        customerType.saveOrUpdate();
 
-	@RequiresPermissions(value = { "/admin/customerType/edit", "/admin/dealer/all",
-			"/admin/all" }, logical = Logical.OR)
-	public void findPriceSystemByDeptId() {
-		List<Record> priceSystemList = PriceSystemQuery.me().findPriceSystemByDeptId(getPara("parent_id"),
-				getPara("data_area"));
+        renderAjaxResultForSuccess();
 
-		renderJson(priceSystemList);
+    }
 
-	}
+    @RequiresPermissions(value = {"/admin/customerType/edit", "/admin/dealer/all",
+            "/admin/all"}, logical = Logical.OR)
+    public void findPriceSystemByDeptId() {
+        List<Record> priceSystemList = PriceSystemQuery.me().findPriceSystemByDeptId(getPara("parent_id"),
+                getPara("data_area"));
+
+        renderJson(priceSystemList);
+
+    }
 }

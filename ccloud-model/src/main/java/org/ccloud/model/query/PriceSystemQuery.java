@@ -49,7 +49,7 @@ public class PriceSystemQuery extends JBaseQuery {
 		return Db.findFirst(fromBuilder.toString(), id);
 	}
 
-	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String deptId, String dataArea) {
+	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String dataArea) {
 		String select = "select c.id, c.name, c.factor, d.dept_name ";
 		StringBuilder fromBuilder = new StringBuilder(" from `cc_price_system` c ");
 		fromBuilder.append(" left join department d on c.dept_id = d.id ");
@@ -58,8 +58,7 @@ public class PriceSystemQuery extends JBaseQuery {
 		boolean needWhere = true;
 
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "c.name", keyword, params, needWhere);
-		needWhere = appendIfNotEmpty(fromBuilder, "c.dept_id", deptId, params, needWhere);
-		needWhere = appendIfNotEmpty(fromBuilder, "c.data_area", dataArea, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "c.data_area", dataArea, params, needWhere);
 
 		fromBuilder.append(" order by c.create_date ");
 

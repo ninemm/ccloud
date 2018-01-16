@@ -23,8 +23,10 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
+import org.ccloud.model.Department;
 import org.ccloud.model.PriceSystem;
 import org.ccloud.model.User;
+import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.PriceSystemQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
@@ -61,11 +63,10 @@ public class _PriceSystemController extends JBaseCRUDController<PriceSystem> {
 
 		Page<Record> page = null;
 		if (SecurityUtils.getSubject().isPermitted("/admin/all")) {
-			page = PriceSystemQuery.me().paginate(getPageNumber(), getPageSize(), keyword, null, null);
+			page = PriceSystemQuery.me().paginate(getPageNumber(), getPageSize(), keyword, null);
 		} else {
-			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-			page = PriceSystemQuery.me().paginate(getPageNumber(), getPageSize(), keyword, user.getDepartmentId(),
-					DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea()));
+			String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+			page = PriceSystemQuery.me().paginate(getPageNumber(), getPageSize(), keyword, dealerDataArea);
 		}
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
@@ -95,14 +96,15 @@ public class _PriceSystemController extends JBaseCRUDController<PriceSystem> {
 	public void save() {
 
 		PriceSystem priceSystem = getModel(PriceSystem.class);
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+        String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+        Department dealerDept = DepartmentQuery.me().findByDataArea(dealerDataArea);
 
 		if (SecurityUtils.getSubject().isPermitted("/admin/all")) {
 			priceSystem.set("dept_id", getPara("parent_id"));
 			priceSystem.set("data_area", getPara("data_area"));
 		} else {
-			priceSystem.set("dept_id", user.getDepartmentId());
-			priceSystem.set("data_area", DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea()));
+			priceSystem.set("dept_id", dealerDept.getId());
+			priceSystem.set("data_area", dealerDataArea);
 		}
 
 		priceSystem.saveOrUpdate();

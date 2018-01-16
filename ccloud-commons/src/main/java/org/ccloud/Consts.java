@@ -27,7 +27,8 @@ public class Consts {
 	public static final String SESSION_SELLER_CODE = "sellerCode";
 	public static final String SESSION_SELLER_NAME = "sellerName";
 	public static final String SESSION_SELLER_HAS_STORE = "hasStore";
-	
+	public static final String SESSION_DEALER_DATA_AREA = "dealer_data_area";//经销商ID
+
 	public static final String WORKFLOW_APPLY_USER = "applyUser";
 	public static final String WORKFLOW_APPLY_COMFIRM = "applyComfirm";
 	public static final String WORKFLOW_APPLY_USERNAME = "applyUsername";
@@ -35,11 +36,11 @@ public class Consts {
 	public static final String WORKFLOW_APPLY_SELLER_CODE = "sellerCode";
 
 	public static final String WORKFLOW_PROC_DEF_KEY_ORDER_REVIEW_ONE = "_order_review_1";//1审
-	
+
 	public static final String WX_MESSAGE_TEMPLATE_ORDER_REVIEW  = "_order_review";
 
 	public static final String CHARTSET_UTF8 = "UTF-8";
-	
+
 	public static final String INDEX_URL = "/";
 
 	public static final String ROUTER_CONTENT = "/c";
@@ -88,26 +89,26 @@ public class Consts {
 	public static final String MODULE_USER_COLLECTION = "user_collection"; // 用户搜藏
 	public static final String MODULE_USER_RELATIONSHIP = "user_relationship"; // 用户关系（比如：好友，关注等）
 	public static final String MODULE_API_APPLICATION = "api_application"; // API应用，可以对应用进行管理
-	
+
 	public static final String TAXONOMY_TEMPLATE_PREFIX = "for$";
-	
+
 	public static final String QRCODE_PATH = "/qrcode/";// 二维码生成路径
-	
+
 	public static final String DICT_UNIT_CODE = "unit";//单位类型字典编码
-	
+
 	public static final String DEPT_HQ_ID = "0";//珈研部门ID
 	public static final String DEPT_HQ_DATAAREA = "001";//珈研部门数据域
 	public static final String DEPT_HQ_DATAAREA_LIKE = "001%";//珈研部门数据域子部门查询条件
 	public static final String DEPT_HQ_LEVEL = "0";//珈研部门等级
-	
+
 	public static final String SALES_ORDER_SN = "100001";//订单流水每日起始数
 	public static final String SALES_OUT_STOCK_SN = "100001";//出库单单流水每日起始数
 	public static final String PURCHASE_IN_STOCK_SN = "100001";//采购入库单单流水每日起始数
-	
-	
+
+
 	public static final int SALES_ORDER_AUDIT_STATUS_PASS = 1000;//销售订单审核通过
-	
-	
+
+
 	public static final int SALES_ORDER_STATUS_PASS = 1000;//订单已审核
 	public static final int SALES_ORDER_STATUS_DEFAULT = 0;//订单待审核
 	public static final int SALES_ORDER_STATUS_CANCEL= 1001;//订单取消
@@ -123,13 +124,13 @@ public class Consts {
 	public static final int SALES_OUT_STOCK_STATUS_OUT = 1000;//出库单出库
 	public static final int SALES_OUT_STOCK_STATUS_PART_OUT= 2000;//出库单部分出库
 	public static final int SALES_OUT_STOCK_STATUS_DEFUALT = 0;//出库单待出库
-	
+
 	public static final int SALES_REFUND_INSTOCK_DEFUALT = 0;//退货单待审核
 	public static final int SALES_REFUND_INSTOCK_PASS = 1000;//退货单已审核
 	public static final int SALES_REFUND_INSTOCK_CANCEL= 1001;//退货单取消
 	public static final int SALES_REFUND_INSTOCK_PART_OUT= 2000;//退货单部分入库
 	public static final int SALES_REFUND_INSTOCK_ALL_OUT= 3000;//退货单全部入库
-	
+
 	public static final String BIZ_TYPE_INIT = "100201";//库存建账
 	public static final String BIZ_TYPE_INSTOCK = "100202";//采购入库
 	public static final String BIZ_TYPE_P_OUTSTOCK = "100203";//采购退货出库
@@ -140,15 +141,15 @@ public class Consts {
 	public static final String BIZ_TYPE_TRANSFER_PLUS_INSTOCK = "100208";//盘盈入库
 	public static final String BIZ_TYPE_TRANSFER_REDUCE_OUTSTOCK = "100209";//盘亏出库
 	public static final String BIZ_TYPE_SALES_ORDER = "100210";//商品销售
-	
+
 	public static final int INVENTORY_TYPE_IN = 0;//库存总账入库
 	public static final int INVENTORY_TYPE_OUT = 1;//库存总账出库
-	
+
 	public static final String SELLER_OPTION_STORE_SWITCH = "store_switch"; //经销商设置尾缀
-	
+
 	public static final String RECEIVABLES_OBJECT_TYPE_CUSTOMER = "customer"; //应收账款客户类型
 	public static final String RECEIVABLES_OBJECT_TYPE_SUPPLIER = "supplier"; //应收账款供应商类型
-	
+
 	public static final String OPTION_SELLER_STORE_CHECK = "seller_store_check_";//经销商检查库存开关设置
 	public static final String OPTION_WEB_ORDER_PRICE_EDIT = "web_order_price_edit_";//下单修改价格开关设置
 	public static final String OPTION_WEB_PROCEDURE_REVIEW = "web_procedure_review_";//订单审核流程开关设置
@@ -158,31 +159,30 @@ public class Consts {
 	public static final String OPTION_WEB_PROC_PRICE_LIMIT = "web_proc_price_limit_";//商品价格审核开关设置
 	public static final String OPTION_WEB_PROC_CUSTOMER_VISIT = "web_proc_customer_visit_";//新增拜访审核开关设置
 	public static final String OPTION_FILE_ROOT_PATH = "web_file_root_path";
-	
+
 	public static final String OPTION_ON = "true";
 	public static final String OPTION_OFF= "false";
-	
+
 	public static final String CUSTOMER_KIND_COMMON = "100401";//普通客户
 	public static final String CUSTOMER_KIND_SELLER = "100402";//直营商客户
-	
+
 	public static final String GROUP_CODE_PREFIX_DATA = "data";//用户组
 	public static final String GROUP_CODE_PREFIX_ROLE = "role";//权限组
-	
+
 	public static final String ROLE_CODE_007 = "007";//财务
 	public static final String ROLE_CODE_020 = "020";//账务
 	public static final String ROLE_CODE_010 = "010";//业务员
-	
-	
+
+
 	public static final String OPERATE_HISTORY_TITLE_ORDER_REVIEW= "订单审核";
 	public static final String OPERATE_HISTORY_TITLE_ORDER_PRINT= "订单打印";
-	
+
 	public static final String USER_DEFAULT_PASSWORD = "123456";// 重置初始密码
 
 	public static Integer SELLER_HAS_STORE_TRUE = 1;// 是否有仓库
 	public static Integer SELLER_HAS_STORE_FALSE = 0;
 
-	public static String SESSION_DEALER_DATA_AREA = "dealer_data_area";//经销商ID
-	
+
 	public static String SELLER_TYPE_DEALER= "0";//账套类型：经销商
 	public static String SELLER_TYPE_SELLER = "1";//直营商
 	
