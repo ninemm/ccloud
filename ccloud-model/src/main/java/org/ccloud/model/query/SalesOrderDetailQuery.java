@@ -128,7 +128,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		boolean isCheckStore = (checkStore != null && checkStore == true) ? true : false;
 		
 		SellerProduct sellerProduct = SellerProductQuery.me().findById(sellerProductId);
-		if (sellerProduct.getStoreCount().compareTo(new BigDecimal(productCount)) == -1 && isCheckStore) {
+		if (sellerProduct.getStoreCount().multiply(new BigDecimal(convert)).compareTo(new BigDecimal(productCount)) == -1 && isCheckStore) {
 			result.put("status", "notEnough");
 			result.put("countList", countList);	
 			return result;
