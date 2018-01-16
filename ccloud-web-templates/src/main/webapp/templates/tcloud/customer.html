@@ -72,13 +72,21 @@
                 });
 
                 $("#if-order").select({
-                title: "是否下单",
-                items: [{
-                    title: "全部", value: ""
-                    },{
-                    title: "是", value: "1"
-                    },{
-                    title: "否",value: "0"
+                    title: "是否下单",
+                    items: [{
+                        title: "全部客户", value: ""
+                        },{
+                        title: "已下单", value: "0"
+                        },{
+                        title: "未下单", value: "1"
+                        },{
+                        title: "近一周未下单", value: "2"
+                        },{
+                        title: "近一月未下单", value: "3"
+                        },{
+                        title: "近三月未下单", value: "4"
+                        },{
+                        title: "近六月未下单", value: "5"
                     }]
                 });
 
