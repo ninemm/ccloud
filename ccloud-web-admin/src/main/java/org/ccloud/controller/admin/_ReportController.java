@@ -152,9 +152,9 @@ public class _ReportController extends JBaseController {
 		
 		Page<SalesOrder> page=new Page<>();
 		if(null==getPara("sortName[offset]")) {
-			page =SalesOrderQuery.me().findByCustomerType(1, Integer.MAX_VALUE,startDate,endDate,keyword, userId);
+			page =SalesOrderQuery.me().findByCustomerType(1, Integer.MAX_VALUE,startDate,endDate,keyword, userId,false);
 		}else {
-			page = SalesOrderQuery.me().findByCustomerType(getPageNumber(), getPageSize(),startDate,endDate,keyword, userId);
+			page = SalesOrderQuery.me().findByCustomerType(getPageNumber(), getPageSize(),startDate,endDate,keyword, userId,false);
 		}
 		
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
@@ -174,9 +174,9 @@ public class _ReportController extends JBaseController {
 		String endDate = getPara("endDate");
 		Page<SalesOrder> page=new Page<>();
 		if(null==getPara("sortName[offset]")) {
-			page =SalesOrderQuery.me().findByCustomerTypeGift(1, Integer.MAX_VALUE,startDate,endDate,keyword, userId);
+			page =SalesOrderQuery.me().findByCustomerType(1, Integer.MAX_VALUE,startDate,endDate,keyword, userId,true);
 		}else {
-			page = SalesOrderQuery.me().findByCustomerTypeGift(getPageNumber(), getPageSize(),startDate,endDate,keyword, userId);
+			page = SalesOrderQuery.me().findByCustomerType(getPageNumber(), getPageSize(),startDate,endDate,keyword, userId,true);
 		}
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
@@ -204,9 +204,9 @@ public class _ReportController extends JBaseController {
 		
 		Page<SalesOrder> page=new Page<>();
 		if(null==getPara("sortName[offset]")) {
-			page =SalesOrderQuery.me().findByProduct(1, Integer.MAX_VALUE,startDate,endDate,keyword, userId);
+			page =SalesOrderQuery.me().findByProduct(1, Integer.MAX_VALUE,startDate,endDate,keyword, userId,false);
 		}else {
-			page = SalesOrderQuery.me().findByProduct(getPageNumber(), getPageSize(),startDate,endDate,keyword, userId);
+			page = SalesOrderQuery.me().findByProduct(getPageNumber(), getPageSize(),startDate,endDate,keyword, userId,false);
 		}
 		
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
@@ -227,9 +227,9 @@ public class _ReportController extends JBaseController {
 		
 		Page<SalesOrder> page=new Page<>();
 		if(null==getPara("sortName[offset]")) {
-			page =SalesOrderQuery.me().findByProductGift(1, Integer.MAX_VALUE,startDate,endDate,keyword, userId);
+			page =SalesOrderQuery.me().findByProduct(1, Integer.MAX_VALUE,startDate,endDate,keyword, userId,true);
 		}else {
-			page = SalesOrderQuery.me().findByProductGift(getPageNumber(), getPageSize(),startDate,endDate,keyword, userId);
+			page = SalesOrderQuery.me().findByProduct(getPageNumber(), getPageSize(),startDate,endDate,keyword, userId,true);
 		}
 		
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
@@ -257,9 +257,9 @@ public class _ReportController extends JBaseController {
 		
 		Page<SalesOrder> page=new Page<>();
 		if(null==getPara("sortName[offset]")) {
-			page =SalesOrderQuery.me().findByDepartmentProduct(1, Integer.MAX_VALUE,startDate,endDate,keyword, dataArea);
+			page =SalesOrderQuery.me().findByDepartmentProduct(1, Integer.MAX_VALUE,startDate,endDate,keyword, dataArea,false);
 		}else {
-			page = SalesOrderQuery.me().findByDepartmentProduct(getPageNumber(), getPageSize(),startDate,endDate,keyword, dataArea);
+			page = SalesOrderQuery.me().findByDepartmentProduct(getPageNumber(), getPageSize(),startDate,endDate,keyword, dataArea,false);
 		}
 		
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
@@ -279,9 +279,9 @@ public class _ReportController extends JBaseController {
 		
 		Page<SalesOrder> page=new Page<>();
 		if(null==getPara("sortName[offset]")) {
-			page =SalesOrderQuery.me().findByDepartmentProductGift(1, Integer.MAX_VALUE,startDate,endDate,keyword, dataArea);
+			page =SalesOrderQuery.me().findByDepartmentProduct(1, Integer.MAX_VALUE,startDate,endDate,keyword, dataArea,true);
 		}else {
-			page = SalesOrderQuery.me().findByDepartmentProductGift(getPageNumber(), getPageSize(),startDate,endDate,keyword, dataArea);
+			page = SalesOrderQuery.me().findByDepartmentProduct(getPageNumber(), getPageSize(),startDate,endDate,keyword, dataArea,true);
 		}
 		
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
@@ -309,9 +309,9 @@ public class _ReportController extends JBaseController {
 		
 		Page<SalesOrder> page=new Page<>();
 		if(null==getPara("sortName[offset]")) {
-			page =SalesOrderQuery.me().findByDepartSalesman(1, Integer.MAX_VALUE,startDate,endDate,keyword, dataArea);
+			page =SalesOrderQuery.me().findByDepartSalesman(1, Integer.MAX_VALUE,startDate,endDate,keyword, dataArea,false);
 		}else {
-			page = SalesOrderQuery.me().findByDepartSalesman(getPageNumber(), getPageSize(),startDate,endDate,keyword, dataArea);
+			page = SalesOrderQuery.me().findByDepartSalesman(getPageNumber(), getPageSize(),startDate,endDate,keyword, dataArea,false);
 		}
 		
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
@@ -331,9 +331,9 @@ public class _ReportController extends JBaseController {
 		
 		Page<SalesOrder> page=new Page<>();
 		if(null==getPara("sortName[offset]")) {
-			page =SalesOrderQuery.me().findByDepartSalesmanGift(1, Integer.MAX_VALUE,startDate,endDate,keyword, dataArea);
+			page =SalesOrderQuery.me().findByDepartSalesman(1, Integer.MAX_VALUE,startDate,endDate,keyword, dataArea,true);
 		}else {
-			page = SalesOrderQuery.me().findByDepartSalesmanGift(getPageNumber(), getPageSize(),startDate,endDate,keyword, dataArea);
+			page = SalesOrderQuery.me().findByDepartSalesman(getPageNumber(), getPageSize(),startDate,endDate,keyword, dataArea,true);
 		}
 		
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
@@ -362,9 +362,9 @@ public class _ReportController extends JBaseController {
 		
 		Page<SalesOrder> page=new Page<>();
 		if(null==getPara("sortName[offset]")) {
-			page =SalesOrderQuery.me().findByManageSeller(1, Integer.MAX_VALUE,startDate,endDate,keyword, dataArea);
+			page =SalesOrderQuery.me().findByManageSeller(1, Integer.MAX_VALUE,startDate,endDate,keyword, dataArea,false);
 		}else {
-			page = SalesOrderQuery.me().findByManageSeller(getPageNumber(), getPageSize(),startDate,endDate,keyword, dataArea);
+			page = SalesOrderQuery.me().findByManageSeller(getPageNumber(), getPageSize(),startDate,endDate,keyword, dataArea,false);
 		}
 		
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
@@ -384,9 +384,9 @@ public class _ReportController extends JBaseController {
 		
 		Page<SalesOrder> page=new Page<>();
 		if(null==getPara("sortName[offset]")) {
-			page =SalesOrderQuery.me().findByManageSellerGift(1, Integer.MAX_VALUE,startDate,endDate,keyword, dataArea);
+			page =SalesOrderQuery.me().findByManageSeller(1, Integer.MAX_VALUE,startDate,endDate,keyword, dataArea,true);
 		}else {
-			page = SalesOrderQuery.me().findByManageSellerGift(getPageNumber(), getPageSize(),startDate,endDate,keyword, dataArea);
+			page = SalesOrderQuery.me().findByManageSeller(getPageNumber(), getPageSize(),startDate,endDate,keyword, dataArea,true);
 		}
 		
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
@@ -415,9 +415,9 @@ public class _ReportController extends JBaseController {
 		
 		Page<SalesOrder> page=new Page<>();
 		if(null==getPara("sortName[offset]")) {
-			page =SalesOrderQuery.me().findBypurSeller(1, Integer.MAX_VALUE,startDate,endDate,keyword, dataArea);
+			page =SalesOrderQuery.me().findBypurSeller(1, Integer.MAX_VALUE,startDate,endDate,keyword, dataArea,false);
 		}else {
-			page = SalesOrderQuery.me().findBypurSeller(getPageNumber(), getPageSize(),startDate,endDate,keyword, dataArea);
+			page = SalesOrderQuery.me().findBypurSeller(getPageNumber(), getPageSize(),startDate,endDate,keyword, dataArea,false);
 		}
 		
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
@@ -437,9 +437,9 @@ public class _ReportController extends JBaseController {
 		Page<SalesOrder> page=new Page<>();
 
 		if(null==getPara("sortName[offset]")) {
-			page =SalesOrderQuery.me().findBypurSellerGift(1, Integer.MAX_VALUE,startDate,endDate,keyword, dataArea);
+			page =SalesOrderQuery.me().findBypurSeller(1, Integer.MAX_VALUE,startDate,endDate,keyword, dataArea,true);
 		}else {
-			page = SalesOrderQuery.me().findBypurSellerGift(getPageNumber(), getPageSize(),startDate,endDate,keyword, dataArea);
+			page = SalesOrderQuery.me().findBypurSeller(getPageNumber(), getPageSize(),startDate,endDate,keyword, dataArea,true);
 		}
 		
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
@@ -475,7 +475,7 @@ public class _ReportController extends JBaseController {
 		String endDate = getPara("endDate");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
-		List<Record> list = SalesOrderQuery.me().findByMSalesmanDetail(startDate,endDate,keyword, dataArea,sellerId);
+		List<Record> list = SalesOrderQuery.me().findByMSalesmanDetail(startDate,endDate,keyword, dataArea,sellerId,false);
 		renderJson(list);
 	}
 	
@@ -490,7 +490,7 @@ public class _ReportController extends JBaseController {
 		String endDate = getPara("endDate");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
-		List<Record> list = SalesOrderQuery.me().findByMSalesmanDetailGift(startDate,endDate,keyword, dataArea,sellerId);
+		List<Record> list = SalesOrderQuery.me().findByMSalesmanDetail(startDate,endDate,keyword, dataArea,sellerId,true);
 		renderJson(list);
 	}
 	
@@ -523,7 +523,7 @@ public class _ReportController extends JBaseController {
 		String endDate = getPara("endDate");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
-		List<Record> list = SalesOrderQuery.me().findByMSellerDetail(startDate,endDate,keyword, dataArea,sellerId);
+		List<Record> list = SalesOrderQuery.me().findByMSellerDetail(startDate,endDate,keyword, dataArea,sellerId,false);
 		renderJson(list);
 	}
 	
@@ -538,7 +538,7 @@ public class _ReportController extends JBaseController {
 		String endDate = getPara("endDate");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString(); 
-		List<Record> list = SalesOrderQuery.me().findByMSellerDetailGift(startDate,endDate,keyword, dataArea,sellerId);
+		List<Record> list = SalesOrderQuery.me().findByMSellerDetail(startDate,endDate,keyword, dataArea,sellerId,true);
 		renderJson(list);
 	}
 	
@@ -587,7 +587,7 @@ public class _ReportController extends JBaseController {
 		String endDate = getPara("endDate");
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
 		//我的客户卖出商品详情
-		List<Record> list = SalesOrderQuery.me().findByCustomerDetail(startDate,endDate,keyword, userId,sellerId);
+		List<Record> list = SalesOrderQuery.me().findByCustomerDetail(startDate,endDate,keyword, userId,sellerId,false);
 		renderJson(list);
 	}
 	
@@ -610,7 +610,7 @@ public class _ReportController extends JBaseController {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
-		List<Record> list = SalesOrderQuery.me().findByCustomerDetailGift(startDate,endDate,keyword, userId,sellerId);
+		List<Record> list = SalesOrderQuery.me().findByCustomerDetail(startDate,endDate,keyword, userId,sellerId,true);
 		renderJson(list);
 	}
 	
