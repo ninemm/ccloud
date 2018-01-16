@@ -68,7 +68,7 @@ public class CustomerTypeQuery extends JBaseQuery {
 
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "c.name", keyword, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "c.is_show", show, params, needWhere);
-		needWhere = appendIfNotEmpty(fromBuilder, "c.data_area", dataArea, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "c.data_area", dataArea, params, needWhere);
 
 		fromBuilder.append(" order by c.create_date ");
 

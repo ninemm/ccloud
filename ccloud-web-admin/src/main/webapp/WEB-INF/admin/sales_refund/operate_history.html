@@ -90,7 +90,10 @@
       <#if salesRefund.status?? && (salesRefund.status>0)>
 	      <div class="weui-cell weui-cell_access">
 	        <div></div>
-	        	<p>操作人：${(salesRefund.bizName)!}</p>
+	       		<p>
+		          <span class="fr">${(salesRefund.confirm_date)!}</span>
+		        </p>
+	        	<p>操作人：${(salesRefund.confirmName)!}</p>
 	      	  	<p>操作状态：	<#if salesRefund.status?? && (salesRefund.status==1000)>审核通过</#if>
 	      	  				<#if salesRefund.status?? && (salesRefund.status==2000)>部分入库</#if>
 	      	  				<#if salesRefund.status?? && (salesRefund.status==3000)>全部入库</#if>
@@ -101,6 +104,7 @@
 		        <div></div>
 		        <p>
 		        	  订单入库
+		        	  <span class="fr">${(salesRefund.bizDate)!}</span>
 		        </p>
 		        <p>操作人：${(salesRefund.bizName)!}</p>
 		        <#if salesRefundInfo?? && salesRefundInfo?length gt 1>

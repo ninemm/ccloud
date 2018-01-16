@@ -290,7 +290,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 	@RequiresPermissions("/admin/salesOrder/check")
 	@Before(Tx.class)
 	public void pass() {
-
+		
 		String orderId = getPara("orderId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr("sellerId");
@@ -723,8 +723,8 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 				excel.setOrderSn(record.get("order_sn").toString());
 				excel.setCustomer(record.get("customer_name").toString());
 				excel.setCustomerType(record.get("customerTypeName").toString());
-				excel.setContact(record.get("contact").toString());
-				excel.setMobile(record.get("mobile").toString());
+				excel.setCcontact(record.get("contact").toString());
+				excel.setCmobile(record.get("mobile").toString());
 				if(record.get("realname")==null){
 					excel.setBizUser("");
 				}else{
