@@ -102,15 +102,16 @@
 			
 		})
 	}
-	function doSubmit(pass){
-		var l = Ladda.create( document.querySelector( '#do_submit' ) );
+	function doSubmit(pass,obj){
+		var l = Ladda.create( document.querySelector('#' + $(obj).attr('id')) );
+		if($('#comment').val() == '' && pass == 0){
+			toastr.warning('拒绝理由不能为空');
+			return;
+		}
 		checkEdit();
+		$("#pass").val(pass);
 		$("#form").ajaxSubmit({
 			beforeSubmit: function() {
-				//var validate = $form.data('bootstrapValidator');
-				//validate.validate();
-				//return validate.isValid()
-				$("#pass").val(pass);
 				l.start();
 			},
 			type : "post", 
@@ -268,7 +269,7 @@
                 <div class="form-group col-sm-10">
 		            <label for="_remark" class="col-sm-2 control-label">备注:</label>
 		            <div class="input-group col-sm-10">
-		                <textarea class="form-control" rows="3" name="comment" id="_remark" placeholder="在此输入补充内容"></textarea>
+		                <textarea class="form-control" rows="3" name="comment" id="comment" placeholder="在此输入补充内容"></textarea>
 		            </div>
 		        </div>
 			</div>
@@ -281,8 +282,8 @@
 		</form>
 		<div class="box-footer">
 		    <#if isCheck>
-			<button type="button" id="do_submit" onclick="doSubmit(1)" class="btn btn-sm bg-olive btn-flat ladda-button" data-style="expand-right">确认</button>
-			<button type="button" id="do_submit" onclick="doSubmit(0)" class="btn btn-sm btn-danger btn-flat ladda-button" data-style="expand-right">拒绝</button>
+			<button type="button" id="agree" onclick="doSubmit(1,this)" class="btn btn-sm bg-olive btn-flat ladda-button" data-style="expand-right">确认</button>
+			<button type="button" id="reject" onclick="doSubmit(0,this)" class="btn btn-sm btn-danger btn-flat ladda-button" data-style="expand-right">拒绝</button>
 			</#if>
 			<input type="button" class="btn btn-sm btn-primary btn-flat" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />		</div>
 	</div>
