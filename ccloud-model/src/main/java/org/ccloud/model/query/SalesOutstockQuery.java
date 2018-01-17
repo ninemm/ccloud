@@ -329,6 +329,51 @@ public class SalesOutstockQuery extends JBaseQuery {
 
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
+	
+	public Page<Record> paginateForReceivables(int pageNumber, int pageSize, String keyword, String status,
+			String customerTypeId, String startDate, String endDate, String sellerId, String dataArea) {
+		String select = "select o.*, c.customer_name, ct.name as customerTypeName ";
+		StringBuilder fromBuilder = new StringBuilder("from `cc_sales_outstock` o ");
+		fromBuilder.append("left join cc_seller_customer cc ON o.customer_id = cc.id ");
+		fromBuilder.append("left join cc_customer c on cc.customer_id = c.id ");
+		fromBuilder.append("left join cc_customer_type ct on o.customer_type_id = ct.id ");
+		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
+
+		needWhere = appendIfNotEmpty(fromBuilder, "o.status", status, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "o.customer_type_id", customerTypeId, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
+
+		if (needWhere) {
+			fromBuilder.append(" where o.status != ? ");
+			params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
+		} else {
+			fromBuilder.append(" AND o.status != ? ");
+			params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
+		}
+		
+		if (StrKit.notBlank(keyword)) {
+			fromBuilder.append(" and (o.outstock_sn like '%" + keyword + "%' or c.customer_name like '%" + keyword + "%')");
+		}
+
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and o.create_date >= ?");
+			params.add(startDate);
+		}
+
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and o.create_date <= ?");
+			params.add(endDate);
+		}
+
+		fromBuilder.append(" order by o.create_date desc ");
+
+		if (params.isEmpty())
+			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+
+		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}	
 
 	
 	public printAllNeedInfo findStockOutForPrint(final String id) {

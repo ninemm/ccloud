@@ -116,6 +116,12 @@ public class WxOauthController extends BaseFrontController {
 						
 						// 用户模拟登录
 						User curUser = UserQuery.me().findById(cookieUserId);
+						if (curUser == null) {
+							gotoUrl = "/user/choice";
+							forwardAction(gotoUrl);
+							return ;
+						}
+						
 						init(curUser.getUsername(), curUser.getPassword(), true);
 						// 获取用户所处的经销商账套
 						List<Department> tmpList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(curUser.getDepartmentId());

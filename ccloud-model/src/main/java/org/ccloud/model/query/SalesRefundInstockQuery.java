@@ -240,7 +240,7 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		List<SalesRefundInstockDetail> list = SalesRefundInstockDetailQuery.me().findByInId(inStockId);
 		boolean status = true;
 		for (SalesRefundInstockDetail detail : list) {
-			if (detail.getRejectProductCount() != detail.getProductCount()) {
+			if (!detail.getRejectProductCount().toString().equals(detail.getProductCount().toString())) {
 				status = false;
 				break;
 			}
@@ -436,5 +436,54 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN (SELECT id ,realname as name from `user` ) t3 on sr.input_user_id = t3.id ");
 		fromBuilder.append(" where sr.id = ? ");
 		return Db.findFirst(fromBuilder.toString(), id);
+	}
+	
+	public Page<Record> _paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate, String printStatus,String stockInStatus ,String dataArea,String sort,String order) {
+		String select = "select r.*, c.customer_name,c.contact,c.mobile,w.name as warehouseName,ct.name as customerTypeName,u.realname ";
+		StringBuilder fromBuilder = new StringBuilder(" from `cc_sales_refund_instock` r");
+		fromBuilder.append(" left join cc_seller_customer cc ON r.customer_id = cc.id ");
+		fromBuilder.append(" left join cc_customer c on cc.customer_id = c.id ");
+		fromBuilder.append(" left join cc_warehouse w on r.warehouse_id = w.id ");
+		fromBuilder.append(" left join cc_customer_type ct on r.customer_type_id = ct.id ");
+		fromBuilder.append(" left join user u on r.biz_user_id = u.id ");
+		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, needWhere);
+		
+		if (needWhere) {
+			fromBuilder.append(" where 1 = 1 ");
+		}
+
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and r.create_date >= ?");
+			params.add(startDate);
+		}
+
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and r.create_date <= ?");
+			params.add(endDate);
+		}
+		if (StrKit.notBlank(stockInStatus)) {
+			fromBuilder.append(" and r.status = ?");
+			params.add(stockInStatus);
+		}
+		
+		if (StrKit.notBlank(printStatus)) {
+			fromBuilder.append(" and r.is_print = ?");
+			params.add(printStatus);
+		}
+
+		fromBuilder.append(" and r.status not in ('0','1001')  and ( r.instock_sn like '%"+keyword+"%' or c.customer_name like '%"+keyword+"%' ) ");
+		
+		if (sort==""||null==sort) {
+			fromBuilder.append("order by "+"r.create_date desc");
+		}else {
+			fromBuilder.append("order by "+sort+" "+order);
+		}
+
+		if (params.isEmpty())
+			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+
+		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 }

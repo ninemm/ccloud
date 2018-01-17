@@ -171,14 +171,15 @@ input {
   text-align: center;
   font-size: .8rem;
   /* background: #3c8dbc; */
-  background: #ea6f5a;
-  color: #b6ddec;
+  background: #ffa292;
+  color: #fff;
   height: 2rem;
   line-height: 2rem;
   border: 0;
 }
 
 .can-bind {
+  background: #ea6f5a!important;
   color: #fff!important;
 }
 

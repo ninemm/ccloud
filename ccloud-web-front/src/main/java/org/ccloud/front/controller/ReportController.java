@@ -35,12 +35,26 @@ import org.ccloud.route.RouterMapping;
 
 import com.alibaba.fastjson.JSON;
 import com.jfinal.kit.StrKit;
+import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 
 @RouterMapping(url = "/report")
 public class ReportController extends BaseFrontController {
 	
 	public void index() {
+		
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
+		String startDate = date + " 00:00:00";
+		String endDate =  date + " 23:59:59";
+
+		Page<Record> orderList = SalesOrderQuery.me().paginateForApp(1, Integer.MAX_VALUE, "", null,
+				"", startDate, endDate, sellerId, selectDataArea);
+		setAttr("orderNum", orderList.getTotalRow());
+		Page<Record> customerList = new Page<>();
+		customerList = SellerCustomerQuery.me().findByUserTypeForApp(1, Integer.MAX_VALUE, selectDataArea, "", "", "");
+		setAttr("customerNum", customerList.getTotalRow());
 		render("report.html");
 	}
 	

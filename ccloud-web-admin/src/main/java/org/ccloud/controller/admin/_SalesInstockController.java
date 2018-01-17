@@ -83,7 +83,7 @@ public class _SalesInstockController extends JBaseCRUDController<SalesOrder> {
 		//获取排序相关信息
 		String sort = getPara("sortName[sort]");
 		String order = getPara("sortName[order]");
-		Page<Record> page = SalesRefundInstockQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate, printStatus,stockInStatus,dataArea,sort,order);
+		Page<Record> page = SalesRefundInstockQuery.me()._paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate, printStatus,stockInStatus,dataArea,sort,order);
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);

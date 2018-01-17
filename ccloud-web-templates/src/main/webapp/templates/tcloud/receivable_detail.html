@@ -1,0 +1,151 @@
+<#include "_inc/_layout.html"/>
+<#macro title>收款详细</#macro>
+<#macro css> 
+	#bigNum,#smallNum {
+		border: 1px solid #bbb;
+	}
+
+	#order .gift input::-webkit-input-placeholder {
+		text-align: center;
+	}
+	
+	.bo {
+		border: 1px solid #bbb !important;
+	}
+	.weui-dialog__hd {
+		padding: 1.3rem 1.6rem;
+	}
+</#macro>
+
+<#macro script>
+$(function() {
+	$('#user').select({
+		title: '选择收款人',
+		items: ${userList!}
+	})
+    $("#deliveryDate").calendar();	
+    $("#deliveryDate").val($.today());
+})
+	var $form = $('#form');
+
+	function doSubmit(){
+		layer.open({
+			type: 2,
+			content: '保存中...'
+		});
+        $form.ajaxSubmit({
+			type: "post",
+			dataType: "json",
+			data:{
+				"userId": $("#user").data('values'),
+				"deliveryDate": $('#deliveryDate').val() + ' 00:00:00'
+			},
+			success: function(result){
+				layer.closeAll();
+	            if (result.errorCode > 0) {
+	                toastr.error(result.message, '操作失败');
+	            } else {
+					$.modal({
+						title: result.message,
+						buttons: [
+							{ text: "查看收款单", className: "default", onClick: function(){ 
+								location.reload();
+								} 
+							},
+							{ text: "继续收款", className: "primary", onClick: function(){
+								location.href = '${CPATH}/receivables/index';
+								} 
+							},
+						]
+					});
+	            }
+			}
+        });
+	}
+	
+	function getback() {
+		window.location.href = '${CPATH}/receivables/index?history=' + 1;	
+	}	
+</#macro>
+
+<@layout>
+<div class="weui-content select-area">
+    <div id="order">
+		<main>
+		<form action="${CPATH}/receivables/save" method="post" id="form">
+			<input type="hidden" name="ref_type" value="${(receivable.ref_type)!}">
+			<section class="weui-panel weui-panel_access order-customer-info">
+				<div class="weui-cell weui-cell_access">
+					<div class="weui-cell__bd">
+						<div class="order-customer-info-title">
+							单号
+							<span class="require">*</span>
+						</div>
+						<input type="text" class="weui-input" name="outstock_sn" value="${(outstock_sn)!}" readonly>
+					</div>
+				</div>
+				<div class="weui-cell weui-cell_access">
+					<div class="weui-cell__bd">
+						<div class="order-customer-info-title">
+							收款人
+							<span class="require">*</span>
+						</div>
+						<input type="text" class="weui-input" id="user" value="">
+					</div>
+				</div>
+				<div class="weui-cell weui-cell_access">
+					<div class="weui-cell__bd">
+						<div class="order-customer-info-title">
+							收款金额
+							<span class="require">*</span>
+						</div>
+						<input type="text" class="weui-input" id="money" name="money">
+					</div>
+				</div>
+				<div class="weui-cell weui-cell_access">
+					<div class="weui-cell__bd">
+						<div class="order-customer-info-title">
+							未收金额
+							<span class="require">*</span>
+						</div>
+						<input type="text" class="weui-input" value="${(receivable.count)!}" readonly>
+					</div>
+				</div>
+			</section>
+			<section class="weui-panel weui-panel_access delivery-info">
+				<div class="weui-cell weui-cell_access">
+					<div class="weui-cell__bd">
+						<div class="order-customer-info-title">
+							<i class="icon-clock-o top-btns" style="margin-top: 14px;color:#ea6f5a;"></i> 收款时间
+						</div>
+						<input type="text" class="weui-input" data-toggle='date' id="deliveryDate" value="${deliveryDate!}">
+						<span class="weui-cell__ft"></span>
+					</div>
+				</div>
+			</section>
+			<section class="weui-panel weui-panel_access ft14 remark">
+				<div class="weui-cell weui-cell_access">
+					<div class="weui-cell__bd">
+						<textarea id="remark" name="remark" placeholder="备注说明（70字以内）"></textarea>
+					</div>
+				</div>
+			</section>
+		</form>	
+			<div class="weui-cells__title black">收款明细</div>
+			<div id="productList">
+			</div>
+		</main>
+		<div class="hidden-menu">
+			<ul>
+				<li><a href="${CPATH}/">首页<img src="${CTPATH}/images/home.png" alt=""></a></li>
+				<li><a onClick="getback()">返回<img src="${CTPATH}/images/goback.png" alt=""></a></li>
+			</ul>
+			<img src="${CTPATH}/images/add.png" alt="" id="button" class="fr">
+		</div>
+		<div class="layer"></div>
+		<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
+			<button onclick="doSubmit()" class="place-order red-button width-100">确认收款</button>
+		</footer>
+    </div>
+</div>
+</@layout>

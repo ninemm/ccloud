@@ -101,9 +101,9 @@ public class ReceivablesQuery extends JBaseQuery {
 		return 0;
 	}
 
-	public void updateAmountById(String id,String act_amount) {
+	public int updateAmountById(String id,String act_amount) {
 		StringBuilder sqlBuilder = new StringBuilder("UPDATE `cc_receivables` SET act_amount = act_amount +"+act_amount+" , balance_amount = balance_amount-"+act_amount+" WHERE id='"+id+"'");
-		Db.update(sqlBuilder.toString());
+		return Db.update(sqlBuilder.toString());
 	}
 	
 	public Receivables findByObjId(String objId,String object_type) {
@@ -114,5 +114,10 @@ public class ReceivablesQuery extends JBaseQuery {
 	public Receivables findByCustomerId(String customeId) {
 		String receivableType = Consts.RECEIVABLES_OBJECT_TYPE_CUSTOMER; 
 		return DAO.doFindFirst("object_id = ? and object_type = ?", customeId, receivableType);
+	}
+
+	public Receivables findBySn(String outstock_sn) {;
+		String select = "SELECT cc.* FROM cc_receivables cc LEFT JOIN cc_receivables_detail cr on cc.object_id = cr.object_id where cr.ref_sn = ? ";
+		return DAO.findFirst(select, outstock_sn);
 	}
 }
