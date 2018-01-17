@@ -132,12 +132,12 @@ public class InventoryQuery extends JBaseQuery {
 	}
 	
 	public List<Record> findProductStoreByUser(String sellerId, String productId, String userId) {
-		StringBuilder defaultSqlBuilder = new StringBuilder("SELECT cc.warehouse_id, cc.balance_count FROM cc_inventory cc ");
+		StringBuilder defaultSqlBuilder = new StringBuilder("SELECT cc.warehouse_id, cc.balance_count, cw.type FROM cc_inventory cc ");
 		defaultSqlBuilder.append("LEFT JOIN cc_warehouse cw on cw.id = cc.warehouse_id ");
 		defaultSqlBuilder.append("LEFT JOIN (SELECT cu.warehouse_id,cu.user_id FROM cc_user_join_warehouse cu where cu.user_id=?) t1 ");
 		defaultSqlBuilder.append("on t1.warehouse_id = cc.warehouse_id ");
 		defaultSqlBuilder.append("where cc.product_id = ? and cc.seller_id = ? ");
-		defaultSqlBuilder.append("ORDER BY t1.user_id desc, cw.is_default desc ");
+		defaultSqlBuilder.append("ORDER BY t1.user_id desc, cw.type desc, cw.is_default desc ");
 		return Db.find(defaultSqlBuilder.toString(), userId, productId, sellerId);
 	}	
 	
