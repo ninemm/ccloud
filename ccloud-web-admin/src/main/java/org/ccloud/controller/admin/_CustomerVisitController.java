@@ -295,11 +295,9 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		
 		FileOutputStream fileOut = null;
-		BufferedImage bufferImg = null;
-
+		HSSFWorkbook wb = new HSSFWorkbook();  
 		try {
-		    HSSFWorkbook wb = new HSSFWorkbook();  
-			HSSFSheet sheet=wb.createSheet("拜访记录");  
+			HSSFSheet sheet = wb.createSheet("拜访记录");  
 			HSSFRow row1=sheet.createRow(0);  
 			HSSFCell cell=row1.createCell(0); 
 			
@@ -385,6 +383,8 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 					e.printStackTrace();
 				}
 			}
+			if (wb != null)
+				wb.close();
 		}
 		renderFile(new File(filePath));
 
