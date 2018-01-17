@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.CustomerType;
@@ -35,6 +36,7 @@ import com.jfinal.plugin.activerecord.Record;
  */
 
 @RouterMapping(url = "/receivables")
+@RequiresPermissions("/admin/receivables")
 public class ReceivablesController extends BaseFrontController {
 	
 	public void index() {

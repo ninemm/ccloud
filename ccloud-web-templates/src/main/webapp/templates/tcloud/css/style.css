@@ -220,6 +220,10 @@ a {
   color: #ff5722;
 }
 
+.no-border {
+  border: 0!important;
+}
+
 .border-1px {
   border: 1px solid #e5e5e5;
 }
@@ -2389,6 +2393,19 @@ input[name=input-type] {
 .todo-product-box>.weui-flex {
   padding-left: .5rem;
 }
+
+/* 收款明细 */
+.receivable-detail {
+  padding: .5rem .75rem;
+  font-size: .65rem;
+}
+
+.receivable-detail-title {
+  width: 3.5rem;
+  display: inline-block;
+}
+
+
 /* 媒体查询 */
 
 @media screen and (max-width:320px) {
