@@ -34,7 +34,7 @@
 				dataType:"json",
 				success:function(data) {
 					for (var i = 0; i < data.length; i++) {
-						$("#seller_id").append("<option value=" + data[i].sellerId + ">" + data[i].seller_name + "</option>");
+						$("#seller_id").append("<option value=" + data[i].sellerId + "<#if transferBill?? && "+data[i].sellerId+" == transferBill.seller_id>selected="selected"</#if>>" + data[i].seller_name + "</option>");
 					}
 				}
 			});
