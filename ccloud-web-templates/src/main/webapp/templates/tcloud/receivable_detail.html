@@ -30,6 +30,19 @@ $(function() {
 	var $form = $('#form');
 
 	function doSubmit(){
+		var userId = $("#user").data('values');
+		var money = parseInt($("#money").val());
+		var maxMoney = parseInt($("#maxMoney").val());
+		if (!userId) {
+			toastr.error('请选择收款人','操作失败');
+			return;
+		}
+		
+		if (!money || money <= 0 || money > maxMoney) {
+			toastr.error('输入金额有误或大于待收','操作失败');
+			return;		
+		}
+	
 		layer.open({
 			type: 2,
 			content: '保存中...'
@@ -109,7 +122,7 @@ $(function() {
 								未收金额
 								<span class="require">*</span>
 							</div>
-							<input type="text" class="weui-input" value="${(receivable.count)!}" readonly>
+							<input type="text" class="weui-input" id="maxMoney" value="${(receivable.count)!}" readonly>
 						</div>
 					</div>
 				</section>
@@ -134,46 +147,28 @@ $(function() {
 			</form>
 			<div class="weui-cells__title black">收款明细</div>
 			<div>
+				<#list list as bean>
 				<div class="weui-panel receivable-detail gray">
 					<div>
-						<div class="receivable-detail-title">收款日期：</div>2018-01-16 00:00:00
+						<div class="receivable-detail-title">收款日期：</div>${bean.biz_date!}
 					</div>
 					<div>
-						<div class="receivable-detail-title">收款金额：</div>100
+						<div class="receivable-detail-title">收款金额：</div>${bean.act_amount!}
 					</div>
 					<div>
-						<div class="receivable-detail-title">收款人：</div>腾谷管理员	
+						<div class="receivable-detail-title">收款人：</div>${bean.receive_user_name!}	
 					</div>
 					<div>
-						<div class="receivable-detail-title">录入时间：</div>2018-01-16 15:36:24
+						<div class="receivable-detail-title">录入时间：</div>${bean.create_date!}
 					</div>
 					<div>
-						<div class="receivable-detail-title">录入人：</div>启光管理员（劲酒）
+						<div class="receivable-detail-title">录入人：</div>${bean.input_user_name!}
 					</div>
 					<div>
-						<div class="receivable-detail-title">备注：</div>dxx
+						<div class="receivable-detail-title">备注：</div>${bean.remark!}
 					</div>
 				</div>
-				<div class="weui-panel receivable-detail gray">
-						<div>
-							<div class="receivable-detail-title">收款日期：</div>2018-01-16 00:00:00
-						</div>
-						<div>
-							<div class="receivable-detail-title">收款金额：</div>100
-						</div>
-						<div>
-							<div class="receivable-detail-title">收款人：</div>腾谷管理员	
-						</div>
-						<div>
-							<div class="receivable-detail-title">录入时间：</div>2018-01-16 15:36:24
-						</div>
-						<div>
-							<div class="receivable-detail-title">录入人：</div>启光管理员（劲酒）
-						</div>
-						<div>
-							<div class="receivable-detail-title">备注：</div>dxx
-						</div>
-					</div>
+				</#list>
 			</div>
 		</main>
 		<div class="hidden-menu">
