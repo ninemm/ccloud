@@ -134,8 +134,9 @@ a {
   z-index: 802;
 }
 
-.weui-badge {
-  /* background: #ff7043; */
+.weui-badge,
+.picker-calendar-day.picker-calendar-day-selected span
+{
   background: #ea6f5a;
 }
 
@@ -152,6 +153,14 @@ a {
 .order-top-btns i,
 .weui-agree__checkbox:checked:before {
   color: #ea6f5a;
+}
+
+i.icon.icon-prev {
+  background-image: url(../images/left.svg)
+}
+
+i.icon.icon-next {
+  background-image: url(../images/right.svg)
 }
 
 .weui-grid__label {
