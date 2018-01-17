@@ -1348,7 +1348,7 @@ input.street-value {
 }
 
 .order-customer-info-title {
-  width: 4rem;
+  width: 4.5rem;
   text-align: right;
   display: inline-block;
 }
@@ -2425,6 +2425,9 @@ input[name=input-type] {
   
   .menu:nth-child(2) {
     margin-left: 0;
+  }
+  .order-customer-info-title {
+    width: 4rem;
   }
 }
 
