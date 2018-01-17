@@ -161,10 +161,10 @@ public class MenuManager {
     }
 	
     public static void clearListByKey(String userId) {
+    	Operation.clearListByKey(userId);
         String htmlBuilder = CacheKit.get(CACHE_NAME, userId);
         if (htmlBuilder != null) {
         	CacheKit.remove(CACHE_NAME, userId);
-        	Operation.clearListByKey(userId);
         }
         
     }

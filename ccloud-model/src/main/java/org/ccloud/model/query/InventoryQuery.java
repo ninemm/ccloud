@@ -51,7 +51,7 @@ public class InventoryQuery extends JBaseQuery {
 
 	public Page<Inventory> paginate(int pageNumber, int pageSize,String product_sn,String product_name,String warehouse_id, String seller_id) {
 		String select = "SELECT sp.custom_name,i.seller_id,i.product_id,p.name as product_name ,p.product_sn,i.in_count, i.in_amount, i.in_price, i.out_count, i.out_amount, i.out_price, i.balance_count, i.balance_amount, i.balance_price, i.afloat_count, i.afloat_amount, i.afloat_price, i.create_date, i.modify_date,t1.valueName";
-		StringBuilder fromBuilder = new StringBuilder("from `cc_inventory` as i INNER JOIN  `cc_product` as p ON i.product_id = p.id INNER JOIN cc_seller_product as sp on sp.seller_id=i.seller_id and sp.product_id=p.id ");
+		StringBuilder fromBuilder = new StringBuilder("from `cc_inventory` as i INNER JOIN  `cc_product` as p ON i.product_id = p.id INNER JOIN cc_seller_product as sp on sp.product_id=p.id ");
 		fromBuilder.append("LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
 		fromBuilder.append("RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = sp.product_id ");		
 		fromBuilder.append("WHERE i.warehouse_id = '"+ warehouse_id+"'and i.seller_id='"+seller_id+"'");
@@ -132,12 +132,12 @@ public class InventoryQuery extends JBaseQuery {
 	}
 	
 	public List<Record> findProductStoreByUser(String sellerId, String productId, String userId) {
-		StringBuilder defaultSqlBuilder = new StringBuilder("SELECT cc.warehouse_id, cc.balance_count FROM cc_inventory cc ");
+		StringBuilder defaultSqlBuilder = new StringBuilder("SELECT cc.warehouse_id, cc.balance_count, cw.type FROM cc_inventory cc ");
 		defaultSqlBuilder.append("LEFT JOIN cc_warehouse cw on cw.id = cc.warehouse_id ");
 		defaultSqlBuilder.append("LEFT JOIN (SELECT cu.warehouse_id,cu.user_id FROM cc_user_join_warehouse cu where cu.user_id=?) t1 ");
 		defaultSqlBuilder.append("on t1.warehouse_id = cc.warehouse_id ");
 		defaultSqlBuilder.append("where cc.product_id = ? and cc.seller_id = ? ");
-		defaultSqlBuilder.append("ORDER BY t1.user_id desc, cw.is_default desc ");
+		defaultSqlBuilder.append("ORDER BY t1.user_id desc, cw.type desc, cw.is_default desc ");
 		return Db.find(defaultSqlBuilder.toString(), userId, productId, sellerId);
 	}	
 	

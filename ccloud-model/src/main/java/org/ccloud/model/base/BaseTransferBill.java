@@ -106,6 +106,14 @@ public abstract class BaseTransferBill<M extends BaseTransferBill<M>> extends JM
 		return getStr("transfer_bill_sn");
 	}
 
+	public void setSellerId(java.lang.String sellerId) {
+		set("seller_id", sellerId);
+	}
+
+	public java.lang.String getSellerId() {
+		return getStr("seller_id");
+	}
+	
 	public void setFromWarehouseId(java.lang.String fromWarehouseId) {
 		set("from_warehouse_id", fromWarehouseId);
 	}

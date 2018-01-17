@@ -16,6 +16,8 @@
 package org.ccloud.model.query;
 
 import java.util.LinkedList;
+import java.util.List;
+
 import org.ccloud.model.Receiving;
 
 import com.jfinal.plugin.activerecord.Page;
@@ -66,6 +68,14 @@ public class ReceivingQuery extends JBaseQuery {
 			return deleteCount;
 		}
 		return 0;
+	}
+
+	public List<Receiving> findBySn(String outstock_sn) {
+		StringBuilder fromBuilder = new StringBuilder("SELECT cc.*, u.realname as input_user_name, u1.realname as receive_user_name FROM cc_receiving cc ");
+		fromBuilder.append("LEFT JOIN `user` u ON cc.input_user_id = u.id ");
+		fromBuilder.append("LEFT JOIN `user` u1 ON u1.id = cc.receive_user_id ");
+		fromBuilder.append("WHERE cc.ref_sn = ? ");
+		return DAO.find(fromBuilder.toString(), outstock_sn);
 	}
 
 	

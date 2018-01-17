@@ -200,4 +200,8 @@ public class Consts {
 	public static final Integer ACTIVITY_APPLY_STATUS_REJECT = 3;
 	public static final Integer ACTIVITY_APPLY_STATUS_END = 4;
 	
+	public static String WAREHOUSE_TYPE_MY = "0";// 直属仓库
+	public static String WAREHOUSE_TYPE_SELLER = "1";// 销售商仓库
+	public static String WAREHOUSE_TYPE_CAR = "2";// 车销仓库
+	
 }

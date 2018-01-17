@@ -24,7 +24,21 @@
 	$(function() {
 		
 		jQuery.mm.initValidator('#form', validatorFields)
-		
+		$("#to_warehouse_id").change(function() {
+		var toWarehouseId = $("#to_warehouse_id").find("option:selected").val(); 
+			$("#seller_id").empty().append("<option value=''>--请选择--</option>");
+			$.ajax({
+				url:"${CPATH}/admin/warehouse/getSeller",
+				type:"post",
+				data:{"toWarehouseId":toWarehouseId},
+				dataType:"json",
+				success:function(data) {
+					for (var i = 0; i < data.length; i++) {
+						$("#seller_id").append("<option value=" + data[i].sellerId + "<#if transferBill?? && "+data[i].sellerId+" == transferBill.seller_id>selected="selected"</#if>>" + data[i].seller_name + "</option>");
+					}
+				}
+			});
+		});
 	});
 
 	var validatorFields = {
@@ -36,6 +50,11 @@
 		'transferBill.to_warehouse_id': {
 			validators: {
 	            notEmpty: { message: '调入仓库不能为空' },
+	        }
+		},
+		'transferBill.seller_id': {
+			validators: {
+	            notEmpty: { message: '调入销售商不能为空' },
 	        }
 		},
 		'transferBill.biz_user_id': {
@@ -246,115 +265,126 @@ function addTr(tid, productList, optionArr) {
 					</div>
 					
 					<div class="form-group col-sm-12 validata-box">
-								<label class="control-label col-sm-2">调出仓库:</label>
-								<div class="input-group col-md-4 col-sm-10">
-									<select class="form-control input-sm" name="transferBill.from_warehouse_id" id="from_warehouse_id">
-										<option value="">--请选择--</option>
-										<#list (wlist)! as warehouse >
-											<option value="${warehouse.id}" <#if transferBill?? && warehouse.id == transferBill.from_warehouse_id>selected="selected"</#if>>${(warehouse.name)!}</option>
-										</#list>
-									</select>
-				               	</div>
-							</div>					
+						<label class="control-label col-sm-2">调出仓库:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<select class="form-control input-sm" name="transferBill.from_warehouse_id" id="from_warehouse_id">
+								<option value="">--请选择--</option>
+								<#list (wlist)! as warehouse >
+									<option value="${warehouse.id}" <#if transferBill?? && warehouse.id == transferBill.from_warehouse_id>selected="selected"</#if>>${(warehouse.name)!}</option>
+								</#list>
+							</select>
+		               	</div>
+					</div>					
+			
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">调入仓库:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<select class="form-control input-sm" name="transferBill.to_warehouse_id" id="to_warehouse_id">
+								<option value="">--请选择--</option>
+								<#list (wlist)! as warehouse >
+									<option value="${warehouse.id}" <#if transferBill?? && warehouse.id == transferBill.to_warehouse_id>selected="selected"</#if>>${(warehouse.name)!}</option>
+								</#list>
+							</select>
+		               	</div>
+					</div>	
 					
-						<div class="form-group col-sm-12 validata-box">
-								<label class="control-label col-sm-2">调入仓库:</label>
-								<div class="input-group col-md-4 col-sm-10">
-									<select class="form-control input-sm" name="transferBill.to_warehouse_id" id="to_warehouse_id">
-										<option value="">--请选择--</option>
-										<#list (wlist)! as warehouse >
-											<option value="${warehouse.id}" <#if transferBill?? && warehouse.id == transferBill.to_warehouse_id>selected="selected"</#if>>${(warehouse.name)!}</option>
-										</#list>
-									</select>
-				               	</div>
-							</div>	
-				        </div>
-			         </div>
-			         
-			         <div class="form-group col-sm-12 validata-box">
-								<label class="control-label col-sm-2">调拨人:</label>
-								<div class="input-group col-md-4 col-sm-10">
-									<select class="form-control input-sm" name="transferBill.biz_user_id" id="biz_user_id">
-										<option value="">--请选择--</option>
-										<#list (ulist)! as user >
-											<option value="${user.id}" <#if transferBill?? && user.id == transferBill.biz_user_id>selected="selected"</#if>>${(user.realname)!}</option>
-										</#list>
-									</select>
-				               	</div>	
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">调入销售商:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<select class="form-control input-sm" name="transferBill.seller_id" id="seller_id">
+								<option value="">--请选择--</option>
+								<#list (slist)! as seller >
+									<option value="${seller.sellerId}" <#if transferBill?? && seller.sellerId == transferBill.seller_id>selected="selected"</#if>>${(seller.seller_name)!}</option>
+								</#list>	
+							</select>
+		               	</div>
+					</div>	
+		        </div>
+	         </div>
+			 <div class="form-group col-sm-12 validata-box">
+				<label class="control-label col-sm-2">调拨人:</label>
+				<div class="input-group col-md-4 col-sm-10">
+					<select class="form-control input-sm" name="transferBill.biz_user_id" id="biz_user_id">
+						<option value="">--请选择--</option>
+						<#list (ulist)! as user >
+							<option value="${user.id}" <#if transferBill?? && user.id == transferBill.biz_user_id>selected="selected"</#if>>${(user.realname)!}</option>
+						</#list>
+					</select>
+               	</div>	
 
-	                            <div style="padding: 5px;clear: both;">
-									<table id="dataTable" class="table table-striped table-bordered" width="100%" >
-										<thead>
-											<tr>
-												<th class="col-sm-1 center"  style="text-align:center;">序号</th>
-												<th class="col-sm-2 center"  style="text-align:center;">商品名称</th>
-												<th class="col-sm-1 center"  style="text-align:center;">规格</th>
-												<th class="col-sm-1 center"  style="text-align:center;">单位</th>
-												<th class="col-sm-1 center"  style="text-align:center;">库存数量</th>
-												<th class="col-sm-1 center"  style="text-align:center;">调拨数量</th>
-											</tr>
-										</thead>
-										<tbody id="sProdBody">
-											<tr class="hide-always hide">
-												<td class="center text-center">
-													<a class="btn btn-danger btn-xs removeTr" data-toggle="modal" data-target="#deleteBackProModal" ><span class="glyphicon glyphicon-remove"></span></a>
-												</td>
-												<td class="text-left">
-													<input type="hidden" id="productId" name="transferBillDetailList[-1].product_id" disabled="true" />
-												   <input type="hidden"  id="factIndex" name="factIndex" value="-1"/>
-													<select class="pro-slc2">
-													</select>
-												</td>
-												<td class="text-center">
-													<span class="specification" id="specification"></span>
-												</td>
-												<td class="text-center">
-													<span class="big_unit" id="big_unit"></span>
-												</td>
-													<td class="text-center">
-													<span class="balanceCount" id="balanceCount"></span>
-												</td>
-												<td class="text-center">
-												<input type="text" id="stock" class="stock" name="transferBillDetailList[-1].product_count" disabled="true" />
-												</td>
-											</tr>
-											<#list (ilist)! as list>
-                                       <tr id="tr${list_index+1}">
-                        	                    <td class="center text-center">
-													<a class="btn btn-danger btn-xs removeTr" data-toggle="modal" data-target="#deleteBackProModal" onclick="deleteTr(this)"><span class="glyphicon glyphicon-remove"></span></a>
-												</td>
-												<#list (list.productInfos)! as plist>
-												<td class="text-left">
-													<input type="hidden" id="productId" name="transferBillDetailList[${list_index}].product_id"  value="${list.sellerProductId}" />
-													<input type="text" id="goodsName" name="goodsName"  value="${plist.name}" disabled="disabled"/>
-												   <input type="hidden"  id="factIndex" name="factIndex" value="${list_index}"/>
-												</td>
-												<td class="text-center">
-													<input name="specification" id="specification" value="${plist.specificationValue!}" disabled="disabled"></input>
-												</td>
-												<td class="text-center">
-													<input name="big_unit" id="big_unit" value="${plist.bigUnit!}" disabled="disabled"></input>
-												</td>
-												<td class="text-center">
-													<input name="balanceCount" id="balanceCount" value="${plist.balanceCount!}" disabled="disabled"></input>
-												</td>
-												</#list>
-												<td class="text-center">
-												<input type="text" id="stock" class="stock" name="transferBillDetailList[${list_index}].product_count"  value="${list.productCount}" />
-												</td>
-                        	           </tr>
-                        	              </#list>
-										</tbody>
-										<tfoot>
-											<tr>
-												<td colspan="6" style="padding-left:5%;">
-													<button id="btnAddProd" type="button" class="btn btn-xs btn-info" style="width: 80px;" onclick="addNew()">添加商品</button>
-												</td>
-											</tr>
-										</tfoot>
-									</table>
-								</div>
-                    		</div>
+                <div style="padding: 5px;clear: both;">
+					<table id="dataTable" class="table table-striped table-bordered" width="100%" >
+						<thead>
+							<tr>
+								<th class="col-sm-1 center"  style="text-align:center;">序号</th>
+								<th class="col-sm-2 center"  style="text-align:center;">商品名称</th>
+								<th class="col-sm-1 center"  style="text-align:center;">规格</th>
+								<th class="col-sm-1 center"  style="text-align:center;">单位</th>
+								<th class="col-sm-1 center"  style="text-align:center;">库存数量</th>
+								<th class="col-sm-1 center"  style="text-align:center;">调拨数量</th>
+							</tr>
+						</thead>
+						<tbody id="sProdBody">
+							<tr class="hide-always hide">
+								<td class="center text-center">
+									<a class="btn btn-danger btn-xs removeTr" data-toggle="modal" data-target="#deleteBackProModal" ><span class="glyphicon glyphicon-remove"></span></a>
+								</td>
+								<td class="text-left">
+									<input type="hidden" id="productId" name="transferBillDetailList[-1].product_id" disabled="true" />
+								   <input type="hidden"  id="factIndex" name="factIndex" value="-1"/>
+									<select class="pro-slc2">
+									</select>
+								</td>
+								<td class="text-center">
+									<span class="specification" id="specification"></span>
+								</td>
+								<td class="text-center">
+									<span class="big_unit" id="big_unit"></span>
+								</td>
+									<td class="text-center">
+									<span class="balanceCount" id="balanceCount"></span>
+								</td>
+								<td class="text-center">
+								<input type="text" id="stock" class="stock" name="transferBillDetailList[-1].product_count" disabled="true" />
+								</td>
+							</tr>
+							<#list (ilist)! as list>
+                                 <tr id="tr${list_index+1}">
+	                   	            <td class="center text-center">
+										<a class="btn btn-danger btn-xs removeTr" data-toggle="modal" data-target="#deleteBackProModal" onclick="deleteTr(this)"><span class="glyphicon glyphicon-remove"></span></a>
+									</td>
+									<#list (list.productInfos)! as plist>
+									<td class="text-left">
+										<input type="hidden" id="productId" name="transferBillDetailList[${list_index}].product_id"  value="${list.sellerProductId}" />
+										<input type="text" id="goodsName" name="goodsName"  value="${plist.name}" disabled="disabled"/>
+									   <input type="hidden"  id="factIndex" name="factIndex" value="${list_index}"/>
+									</td>
+									<td class="text-center">
+										<input name="specification" id="specification" value="${plist.specificationValue!}" disabled="disabled"></input>
+									</td>
+									<td class="text-center">
+										<input name="big_unit" id="big_unit" value="${plist.bigUnit!}" disabled="disabled"></input>
+									</td>
+									<td class="text-center">
+										<input name="balanceCount" id="balanceCount" value="${plist.balanceCount!}" disabled="disabled"></input>
+									</td>
+									</#list>
+									<td class="text-center">
+									<input type="text" id="stock" class="stock" name="transferBillDetailList[${list_index}].product_count"  value="${list.productCount}" />
+									</td>
+		              	           		</tr>
+		              	              </#list>
+									</tbody>
+								<tfoot>
+								<tr>
+							<td colspan="6" style="padding-left:5%;">
+								<button id="btnAddProd" type="button" class="btn btn-xs btn-info" style="width: 80px;" onclick="addNew()">添加商品</button>
+							</td>
+						</tr>
+					</tfoot>
+				</table>
+			</div>
+     	</div>
 
 		<div class="box-footer"> 
 			<button type="button" onclick="doSubmit()" id="do_submit" class="btn btn-sm bg-olive btn-flat ladda-button" data-style="expand-right">保存更改</button>

@@ -20,7 +20,9 @@ import java.util.List;
 
 import org.ccloud.model.Warehouse;
 
+import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
 /**
@@ -151,6 +153,15 @@ public class WarehouseQuery extends JBaseQuery {
 		fromBuilder.append(" OR d.data_area LIKE '"+dataArea+"' ");
 		fromBuilder.append(" order by c.create_date");
 		return DAO.find(fromBuilder.toString());
+	}
+
+	public List<Record> findBySeller(String toWarehouseId) {
+		StringBuilder fromBuilder = new StringBuilder(" select s.seller_name,w.id warehouseId,s.id sellerId");
+		fromBuilder.append(" FROM cc_warehouse w ");
+		fromBuilder.append(" LEFT JOIN cc_inventory i ON i.warehouse_id=w.id ");
+		fromBuilder.append(" LEFT JOIN cc_seller s ON s.id=i.seller_id  ");
+		fromBuilder.append(" where w.id='"+toWarehouseId+"' GROUP BY s.id,w.id ");
+		return Db.find(fromBuilder.toString());
 	}	
 	
  }

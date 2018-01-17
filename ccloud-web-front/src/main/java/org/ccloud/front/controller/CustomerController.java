@@ -291,8 +291,9 @@ public class CustomerController extends BaseFrontController {
 					"                        </a>\n" +
 					"                        <hr>\n" +
 					"                        <div>\n");
-			if(order.get("status").toString().equals("0")) html.append("<div class=\"button blue-button fl\">撤销</div>\n" +
-					"                            <div class=\"button white-button fr\">再次购买</div>\n" +
+			if(order.get("status").toString().equals("0")) html.append("<div class=\"button white-button fl\">撤销</div>\n");
+			html.append(
+					"                            <div class=\"button red-button fr\">再次购买</div>\n" +
 					"                        </div>\n" +
 					"                    </div>");
 		}

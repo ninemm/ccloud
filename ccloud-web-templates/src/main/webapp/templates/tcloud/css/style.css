@@ -134,8 +134,9 @@ a {
   z-index: 802;
 }
 
-.weui-badge {
-  /* background: #ff7043; */
+.weui-badge,
+.picker-calendar-day.picker-calendar-day-selected span
+{
   background: #ea6f5a;
 }
 
@@ -152,6 +153,14 @@ a {
 .order-top-btns i,
 .weui-agree__checkbox:checked:before {
   color: #ea6f5a;
+}
+
+i.icon.icon-prev {
+  background-image: url(../images/left.svg)
+}
+
+i.icon.icon-next {
+  background-image: url(../images/right.svg)
 }
 
 .weui-grid__label {
@@ -218,6 +227,10 @@ a {
 
 .orange {
   color: #ff5722;
+}
+
+.no-border {
+  border: 0!important;
 }
 
 .border-1px {
@@ -1344,7 +1357,7 @@ input.street-value {
 }
 
 .order-customer-info-title {
-  width: 4rem;
+  width: 4.5rem;
   text-align: right;
   display: inline-block;
 }
@@ -2389,6 +2402,19 @@ input[name=input-type] {
 .todo-product-box>.weui-flex {
   padding-left: .5rem;
 }
+
+/* 收款明细 */
+.receivable-detail {
+  padding: .5rem .75rem;
+  font-size: .65rem;
+}
+
+.receivable-detail-title {
+  width: 3.5rem;
+  display: inline-block;
+}
+
+
 /* 媒体查询 */
 
 @media screen and (max-width:320px) {
@@ -2408,6 +2434,9 @@ input[name=input-type] {
   
   .menu:nth-child(2) {
     margin-left: 0;
+  }
+  .order-customer-info-title {
+    width: 4rem;
   }
 }
 
