@@ -365,9 +365,10 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 					SellerProduct findBySellerAndId = new SellerProduct();
 					// 判断是否是不同销售商之间调拨
 					if (!sellerId.equals(transferBill.getSellerId())) {
+						isSeller=false;
 						// 判断调入销售商是否有此商品
 						findBySellerAndId = SellerProductQuery.me()
-								.findBySellerAndId(transferBillInfo.getSellerProductId(), sellerId);
+								.findBySellerAndId(transferBillInfo.getSellerProductId(), transferBill.getSellerId());
 						// 若不存在改商品 需要建立一个新商品
 						if (null == findBySellerAndId) {
 							findBySellerAndId = sellerProduct;
