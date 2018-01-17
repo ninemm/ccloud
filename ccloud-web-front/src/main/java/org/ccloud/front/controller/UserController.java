@@ -141,7 +141,7 @@ public class UserController extends BaseFrontController {
 				setSessionAttr(Consts.SESSION_SELLER_ID, dept.get("seller_id"));
 				setSessionAttr(Consts.SESSION_SELLER_NAME, dept.get("seller_name"));
 				setSessionAttr(Consts.SESSION_SELLER_CODE, dept.get("seller_code"));
-				setSessionAttr("cont", dept.get("seller_code"));
+//				setSessionAttr("cont", dept.get("seller_code"));
 			}
 			// 获取用户权限
 			initUserRole(user.getUsername(), user.getPassword(), true);

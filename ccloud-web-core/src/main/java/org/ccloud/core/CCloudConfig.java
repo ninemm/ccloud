@@ -138,7 +138,7 @@ public abstract class CCloudConfig extends JFinalConfig {
 
 			//plugins.add(new SearcherPlugin());
 			
-			// plugins.add(createCron4jPlugin());
+			plugins.add(createCron4jPlugin());
 
 			plugins.add(new MessagePlugin());
 			
