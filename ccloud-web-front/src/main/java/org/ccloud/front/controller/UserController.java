@@ -208,7 +208,7 @@ public class UserController extends BaseFrontController {
 				renderError(404);
 			return ;
 		}
-		
+		setSessionAttr(Consts.SESSION_LOGINED_USER, curUser);
 		initUserRole(curUser.getUsername(), curUser.getPassword(), true);
 		
 		if (isAjaxRequest()) {
