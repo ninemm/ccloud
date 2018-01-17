@@ -193,4 +193,8 @@ public class Consts {
 	public static Integer IS_READ= 1;
 	public static Integer NO_READ= 0;
 	
+	public static String WAREHOUSE_TYPE_MY = "0";// 直属仓库
+	public static String WAREHOUSE_TYPE_SELLER = "1";// 销售商仓库
+	public static String WAREHOUSE_TYPE_CAR = "2";// 车销仓库
+	
 }

@@ -152,6 +152,11 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 			result.put("countList", countList);
 			return result;
 		}
+		if (record.getStr("type").equals(Consts.WAREHOUSE_TYPE_CAR)) {
+			result.put("status", "notEnough");
+			result.put("countList", countList);	
+			return result;			
+		}
 		if (defaultCount.compareTo(new BigDecimal(0)) == 1) {
 			Map<String, String> map = new HashMap<>();
 			map.put("warehouse_id", record.getStr("warehouse_id"));
