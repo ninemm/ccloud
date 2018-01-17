@@ -34,7 +34,7 @@
 				dataType:"json",
 				success:function(data) {
 					for (var i = 0; i < data.length; i++) {
-						$("#seller_id").append("<option value=" + data[i].sellerId + "<#if transferBill?? && seller.sellerId == transferBill.seller_id>selected="selected"</#if>>" + data[i].seller_name + "</option>");
+						$("#seller_id").append("<option value=" + data[i].sellerId + "<#if transferBill?? && "+data[i].sellerId+" == transferBill.seller_id>selected="selected"</#if>>" + data[i].seller_name + "</option>");
 					}
 				}
 			});
@@ -293,10 +293,12 @@ function addTr(tid, productList, optionArr) {
 						<div class="input-group col-md-4 col-sm-10">
 							<select class="form-control input-sm" name="transferBill.seller_id" id="seller_id">
 								<option value="">--请选择--</option>
+								<#list (slist)! as seller >
+									<option value="${seller.sellerId}" <#if transferBill?? && seller.sellerId == transferBill.seller_id>selected="selected"</#if>>${(seller.seller_name)!}</option>
+								</#list>	
 							</select>
 		               	</div>
 					</div>	
-					
 		        </div>
 	         </div>
 			 <div class="form-group col-sm-12 validata-box">
