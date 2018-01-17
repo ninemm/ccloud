@@ -27,7 +27,6 @@ import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
-import org.ccloud.model.Brand;
 import org.ccloud.model.User;
 import org.ccloud.model.UserJoinWarehouse;
 import org.ccloud.model.Warehouse;
