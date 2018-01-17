@@ -86,10 +86,10 @@ import cn.afterturn.easypoi.excel.entity.ExportParams;
 @RouterMapping(url = "/admin/salesOutstock", viewPath = "/WEB-INF/admin/sales_outstock")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
-@RequiresPermissions("/admin/salesOutstock")
 public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 
 	@Override
+	@RequiresPermissions(value = { "/admin/salesOutstock", "/admin/dealer/all", "/admin/salesRefund"}, logical = Logical.OR)
 	public void index() {
 		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
 
@@ -123,6 +123,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 
 	}
 	
+	@RequiresPermissions("/admin/salesOutstock")
 	public void stockdetail() {
 
 		String outstockId = getPara(0);
@@ -136,6 +137,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 
 	}
 	
+	@RequiresPermissions("/admin/salesOutstock")
 	public void stockdetailBySn() {
 
 		String outstockSn = getPara(0);
@@ -149,6 +151,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 
 	}	
 	
+	@RequiresPermissions("/admin/salesOutstock")
 	public void getDetail() {
 		String id = getPara("id");
 		setAttr("id", id);
@@ -182,7 +185,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
        
 	}
 	
-	
+	@RequiresPermissions("/admin/salesOutstock")
 	public void  renderCarPrintPage() {
 		setAttr("carWarehouseId", getPara("carWarehouseId"));
 		setAttr("beginDate", getPara("beginDate"));
