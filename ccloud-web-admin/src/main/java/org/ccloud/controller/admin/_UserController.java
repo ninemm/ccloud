@@ -29,6 +29,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.mgt.RealmSecurityManager;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
@@ -49,6 +50,7 @@ import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.vo.UserExecel;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
+import org.ccloud.shiro.ShiroDbRealm;
 import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.EncryptUtils;
 import org.ccloud.utils.StringUtils;
@@ -101,8 +103,8 @@ public class _UserController extends JBaseCRUDController<User> {
 	@Override
 	@RequiresPermissions(value = { "/admin/user", "/admin/all" }, logical = Logical.OR)
 	public void save() {
-
 		final User user = getModel(User.class);
+		User oldUser = UserQuery.me().findById(user.getId());
 		String stationList = getPara("stationList");
 		String stationName = getPara("stationName");
 		String groupList = getPara("groupList");
@@ -174,6 +176,10 @@ public class _UserController extends JBaseCRUDController<User> {
 			}
 	    	Db.batchSave(userGroupRelList, userGroupRelList.size());
 			MenuManager.clearListByKey(user.getId());
+			
+			RealmSecurityManager rsm = (RealmSecurityManager)SecurityUtils.getSecurityManager();    
+	        ShiroDbRealm realm = (ShiroDbRealm)rsm.getRealms().iterator().next();   
+	        realm.clearCachedAuthorizationInfo(oldUser);
 			renderAjaxResultForSuccess("ok");
 		} else {
 			renderAjaxResultForError("false");
