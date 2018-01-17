@@ -50,11 +50,11 @@ import com.jfinal.upload.UploadFile;
 @RouterMapping(url = "/admin/attachment", viewPath = "/WEB-INF/admin/attachment")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
-@RequiresPermissions(value={"/admin/attachment/","/admin/all"},logical=Logical.OR)
 public class _AttachmentController extends JBaseCRUDController<Attachment> {
 	private static final Log log = Log.getLog(_AttachmentController.class);
 
 	@Override
+	@RequiresPermissions(value={"/admin/attachment/","/admin/all"},logical=Logical.OR)
 	public void index() {
 		keepPara();
 		Page<Attachment> page = AttachmentQuery.me().paginate(getPageNumber(), getPageSize(), null, null, null, null,
@@ -97,6 +97,7 @@ public class _AttachmentController extends JBaseCRUDController<Attachment> {
 		}
 	}
 
+//	@RequiresPermissions(value={"/admin/attachment/","/admin/all"},logical=Logical.OR)
 	public void choose_layer() {
 		keepPara();
 		Page<Attachment> page = AttachmentQuery.me().paginate(getPageNumber(), getPageSize(), null, null, null, null,
@@ -202,6 +203,16 @@ public class _AttachmentController extends JBaseCRUDController<Attachment> {
 
 			ImageUtils.pressImage(watermarkFile.getAbsolutePath(), srcImageFile, srcImageFile, position, transparency);
 		}
+	}
+	
+	//@RequiresPermissions(value={"/admin/attachment/","/admin/all"},logical=Logical.OR)
+	public void _choose_layer() {
+		keepPara();
+//		User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
+		Page<Attachment> page = AttachmentQuery.me().paginate(getPageNumber(), getPageSize(),null, null, null, null,
+				getPara("k", "").trim(), getPara("dm"), getPara("mime"), null);
+		setAttr("page", page);
+		render("choose_layer.html");
 	}
 
 }

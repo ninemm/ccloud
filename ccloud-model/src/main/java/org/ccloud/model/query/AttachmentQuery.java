@@ -189,5 +189,36 @@ public class AttachmentQuery extends JBaseQuery {
 
 		return datas;
 	}
+	
+	public Page<Attachment> _paginate(int pageNumber, int pageSize, String userId, BigInteger contentId, String type,
+			String flag, String keyword, String month, String mime, String orderBy) {
+
+		StringBuilder fromBuilder = new StringBuilder(" FROM attachment a ");
+		LinkedList<Object> params = new LinkedList<Object>();
+
+		boolean needWhere = true;
+
+		needWhere = appendIfNotEmpty(fromBuilder, "a.user_id", userId, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "a.content_id", contentId, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "a.`type`", type, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "a.`flag`", flag, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, " a.title", keyword, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, " a.mime_type", mime, params, needWhere);
+
+		if (StringUtils.isNotBlank(month)) {
+			needWhere = appendWhereOrAnd(fromBuilder, needWhere);
+			fromBuilder.append(" DATE_FORMAT( a.created, \"%Y-%m\" ) = ? ");
+			params.add(month);
+		}
+
+		buildOrderBy(orderBy, fromBuilder);
+
+		if (params.isEmpty()) {
+			return DAO.paginate(pageNumber, pageSize, "SELECT * ", fromBuilder.toString());
+		} else {
+			return DAO.paginate(pageNumber, pageSize, "SELECT * ", fromBuilder.toString(), params.toArray());
+		}
+
+	}
 
 }

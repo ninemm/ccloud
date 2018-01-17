@@ -193,4 +193,26 @@ public class Consts {
 	public static Integer IS_READ= 1;
 	public static Integer NO_READ= 0;
 	
+	//活动类型
+	public static String CATEGORY_NORMAL="01" ; //普通活动
+	public static String CATEGORY_INVEST="02" ; //投入活动
+	
+	//投入类型
+	public static String INVEST_SHOP="001" ; //商品
+	public static String INVEST_MATTER="002" ; //物料
+	public static String INVEST_ACTIVITY="003" ; //费用活动费
+	
+	//客户参与活动的时间区间
+	public static String TIME_INTERVAL_ONE="101";//1个月
+	public static String TIME_INTERVAL_TWO="102";//2个月
+	public static String TIME_INTERVAL_THREE="103";//3个月
+	public static String TIME_INTERVAL_FOUR="104";//4个月
+	public static String TIME_INTERVAL_FIVE="105";//5个月
+	public static String TIME_INTERVAL_SIX="106";//6个月
+	public static String TIME_INTERVAL_SEVEN="107";//7个月
+	public static String TIME_INTERVAL_EIGHT="108";//8个月
+	public static String TIME_INTERVAL_NINE="109";//9个月
+	public static String TIME_INTERVAL_TEN="110";//10个月
+	public static String TIME_INTERVAL_ELEVEN="111";//11个月
+	public static String TIME_INTERVAL_TWELVE="112";//12个月
 }
