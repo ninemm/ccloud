@@ -45,6 +45,7 @@ import org.ccloud.model.GoodsSpecificationValue;
 import org.ccloud.model.GoodsType;
 import org.ccloud.model.Product;
 import org.ccloud.model.ProductGoodsSpecificationValue;
+import org.ccloud.model.Warehouse;
 import org.ccloud.model.query.BrandQuery;
 import org.ccloud.model.query.DictQuery;
 import org.ccloud.model.query.GoodsAttributeQuery;
@@ -58,6 +59,7 @@ import org.ccloud.model.query.GoodsTypeQuery;
 import org.ccloud.model.query.OptionQuery;
 import org.ccloud.model.query.ProductGoodsSpecificationValueQuery;
 import org.ccloud.model.query.ProductQuery;
+import org.ccloud.model.query.WarehouseQuery;
 import org.ccloud.model.vo.ImageJson;
 import org.ccloud.model.vo.ProductInfo;
 
@@ -553,7 +555,14 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
 	public void getProductInfoBySellerIdAndWhouse() {
 		String sellerId = getSessionAttr("sellerId").toString();
 		String  warehouseId = getPara("warehouse_id");
-		List<ProductInfo> productList = ProductQuery.me().getProductInfoByInventory(sellerId,warehouseId);
+		Warehouse warehouse = WarehouseQuery.me().findById(warehouseId);
+		List<ProductInfo> productList=new ArrayList<>();
+		//判断仓库是不是自己的  是自己的的仓库查出此仓库所有商品
+		if (sellerId.equals(warehouse.getSellerId())) {
+			productList = ProductQuery.me().getProductInfoByInventory(null,warehouseId);
+		}else {
+			productList = ProductQuery.me().getProductInfoByInventory(sellerId,warehouseId);
+		}
         List<Map<String, Object>> list = new ArrayList<>();
         for (ProductInfo productInfo : productList) {
            Map<String, Object> map = new HashMap<>();

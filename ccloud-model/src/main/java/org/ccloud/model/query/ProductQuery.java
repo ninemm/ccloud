@@ -336,8 +336,12 @@ public class ProductQuery extends JBaseQuery {
 		fromBuilder.append("LEFT JOIN cc_goods_category c ON g.goods_category_id = c.id ");
 		fromBuilder.append("LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
 		fromBuilder.append("RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = sp.product_id  INNER JOIN cc_inventory c2 ON p.id = c2.product_id  INNER JOIN cc_inventory_detail d on d.sell_product_id = sp.id ");
-		fromBuilder.append("and c2.warehouse_id = d.warehouse_id  and c2.seller_id =? AND c2.warehouse_id =? GROUP BY d.sell_product_id  ORDER BY sp.order_list");
-		List<Record> list = Db.find(fromBuilder.toString(),sellerId,warehouseId);	
+		fromBuilder.append("and c2.warehouse_id = d.warehouse_id  and c2.warehouse_id=? ");
+		if (null!=sellerId) {
+			fromBuilder.append("AND c2.seller_id ='"+sellerId+"'");
+		}
+		fromBuilder.append(" GROUP BY d.sell_product_id  ORDER BY sp.order_list");
+		List<Record> list = Db.find(fromBuilder.toString(),warehouseId);	
 		List<ProductInfo> plist = new ArrayList<>();
 		for (Record record : list) {
 			ProductInfo pro = new ProductInfo();
