@@ -24,7 +24,21 @@
 	$(function() {
 		
 		jQuery.mm.initValidator('#form', validatorFields)
-		
+		$("#to_warehouse_id").change(function() {
+		var toWarehouseId = $("#to_warehouse_id").find("option:selected").val(); 
+			$("#seller_id").empty().append("<option value=''>--请选择--</option>");
+			$.ajax({
+				url:"${CPATH}/admin/warehouse/getSeller",
+				type:"post",
+				data:{"toWarehouseId":toWarehouseId},
+				dataType:"json",
+				success:function(data) {
+					for (var i = 0; i < data.length; i++) {
+						$("#seller_id").append("<option value=" + data[i].sellerId + "<#if transferBill?? && seller.sellerId == transferBill.seller_id>selected="selected"</#if>>" + data[i].seller_name + "</option>");
+					}
+				}
+			});
+		});
 	});
 
 	var validatorFields = {
@@ -36,6 +50,11 @@
 		'transferBill.to_warehouse_id': {
 			validators: {
 	            notEmpty: { message: '调入仓库不能为空' },
+	        }
+		},
+		'transferBill.seller_id': {
+			validators: {
+	            notEmpty: { message: '调入销售商不能为空' },
 	        }
 		},
 		'transferBill.biz_user_id': {
@@ -268,6 +287,16 @@ function addTr(tid, productList, optionArr) {
 							</select>
 		               	</div>
 					</div>	
+					
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">调入销售商:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<select class="form-control input-sm" name="transferBill.seller_id" id="seller_id">
+								<option value="">--请选择--</option>
+							</select>
+		               	</div>
+					</div>	
+					
 		        </div>
 	         </div>
 			 <div class="form-group col-sm-12 validata-box">
