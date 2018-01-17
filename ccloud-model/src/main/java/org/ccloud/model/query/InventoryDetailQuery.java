@@ -73,16 +73,16 @@ public class InventoryDetailQuery extends JBaseQuery {
 		}
 		return 0;
 	}
-
-	public InventoryDetail findByWarehouseIdAndProductId(String warehouseId, String productId){
-		String sql = "select * from cc_inventory_detail where warehouse_id = '"+warehouseId+"' and sell_product_id = '"+productId+"'";
-		return DAO.findFirst(sql);
-	}
 	
-	public InventoryDetail findBalanceCountByWarehouseIdId(String warehouseId, String productId){
-		String sql = "select MAX(create_date),balance_count from cc_inventory_detail where warehouse_id = '"+warehouseId+"' and sell_product_id = '"+productId+"'";
-		return DAO.findFirst(sql);
-	}
+//	public InventoryDetail findByWarehouseIdAndProductId(String warehouseId, String productId){
+//		String sql = "select * from cc_inventory_detail where warehouse_id = '"+warehouseId+"' and sell_product_id = '"+productId+"'";
+//		return DAO.findFirst(sql);
+//	}
+//	
+//	public InventoryDetail findBalanceCountByWarehouseIdId(String warehouseId, String productId){
+//		String sql = "select MAX(create_date),balance_count from cc_inventory_detail where warehouse_id = '"+warehouseId+"' and sell_product_id = '"+productId+"'";
+//		return DAO.findFirst(sql);
+//	}
 
 	
 	public Page<InventoryDetail> _in_paginate(int pageNumber, int pageSize,String keyword,String sellerId,String dataArea, String startDate, String endDate,String sellerProductId,String sort,String sortOrder) {

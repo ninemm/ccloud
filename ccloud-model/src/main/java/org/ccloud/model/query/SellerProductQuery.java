@@ -237,4 +237,9 @@ public class SellerProductQuery extends JBaseQuery {
 		String sql = "select * from cc_seller_product where custom_name = ? and seller_id = ? and product_id = ?";
 		return DAO.findFirst(sql, customName,sellerId,productId);
 	}
+
+	public SellerProduct findBySellerAndId(String sellerProductId, String sellerId) {
+		String sql = "SELECT * FROM cc_seller_product s WHERE s.product_id IN( SELECT p.id FROM cc_seller_product sp LEFT JOIN cc_product p ON p.id = sp.product_id WHERE sp.id = ?) AND s.seller_id = ?";
+		return DAO.findFirst(sql, sellerProductId,sellerId);
+	}
 }

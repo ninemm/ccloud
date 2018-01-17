@@ -94,7 +94,6 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 
 	public void edit() {
 		String id = getPara("id");
-		final String sellerId = getSessionAttr("sellerId").toString();
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String userId = user.getId();
 		if (id != null) {
@@ -105,7 +104,7 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 		setAttr("wlist", wlist);
 		List<User> ulist = UserQuery.me().findUserList(userId);
 		setAttr("ulist", ulist);
-		List<transferBillInfo> ilist = TransferBillDetailQuery.me().findByTransferBillDetailId(id, sellerId);
+		List<transferBillInfo> ilist = TransferBillDetailQuery.me().findByTransferBillDetailId(id);
 		setAttr("ilist", ilist);
 	}
 
@@ -223,15 +222,13 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 	public void enable() {
 		String id = getPara("id");
 		int isEnabled = getParaToInt("isEnabled");
-		final String sellerId = getSessionAttr("sellerId").toString();
 		// 获取调拨单明细
-		List<transferBillInfo> transferBillInfos = TransferBillDetailQuery.me().findByTransferBillDetailId(id,
-				sellerId);
+		List<transferBillInfo> transferBillInfos = TransferBillDetailQuery.me().findByTransferBillDetailId(id);
 		// 查找商品的库存数量并和调拨数量做比较
 		this.checkStoreCount(transferBillInfos);
-		Boolean status = this.inserIntoInventoryInfo(transferBillInfos);
+		TransferBill transferBill = TransferBillQuery.me().findById(id);
+		Boolean status = this.inserIntoInventoryInfo(transferBillInfos, transferBill);
 		if (status) {
-			TransferBill transferBill = TransferBillQuery.me().findById(id);
 			transferBill.setStatus(isEnabled);
 			if (transferBill.saveOrUpdate()) {
 				renderAjaxResultForSuccess("更新成功");
@@ -246,29 +243,31 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 	/**
 	 * 
 	 * @Title: 检查待调拨数量和现在库存总账库存数量大小关系 @Description: TODO @param @param
-	 * transferBillInfos @return void @throws
+	 *         transferBillInfos @return void @throws
 	 */
 	private void checkStoreCount(List<transferBillInfo> transferBillInfos) {
 		for (transferBillInfo transferBillInfo : transferBillInfos) {
-			InventoryDetail inventoryDetail = InventoryDetailQuery.me().findByWarehouseIdAndProductId(
-					transferBillInfo.getFromWarehouseId(), transferBillInfo.getSellerProductId());
+			InventoryDetail inventoryDetail = InventoryDetailQuery.me().findBySellerProductId(
+					transferBillInfo.getSellerProductId(), transferBillInfo.getFromWarehouseId());
 			if (inventoryDetail.getBalanceCount().subtract(transferBillInfo.getProductCount()).doubleValue() < 0) {
 				renderAjaxResultForError("商品库存不足，无法调拨");
 			}
 		}
 	}
 
-	private Boolean inserIntoInventoryInfo(final List<transferBillInfo> transferBill) {
-		final String sellerId = getSessionAttr("sellerId").toString();
-		final User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+	private Boolean inserIntoInventoryInfo(final List<transferBillInfo> transferBillList,
+			final TransferBill transferBill) {
 		boolean isSave = Db.tx(new IAtom() {
+			final User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+
 			@Override
 			public boolean run() throws SQLException {
 				// List<Inventory> updateList = new ArrayList<>();
 				// List<Inventory> saveList = new ArrayList<>();
-				for (transferBillInfo transferBillInfo : transferBill) {
+				for (transferBillInfo transferBillInfo : transferBillList) {
 					SellerProduct sellerProduct = SellerProductQuery.me()
 							.findById(transferBillInfo.getSellerProductId());
+					final String sellerId = sellerProduct.getSellerId();
 
 					// 先处理调出仓库的总账
 					Inventory outInventory = InventoryQuery.me().findBySellerIdAndProductIdAndWareHouseId(sellerId,
@@ -287,8 +286,8 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 
 					// 处理调出仓库的总账子表信息
 					// 查询目前子表该品项的最新库存
-					InventoryDetail outDetail = InventoryDetailQuery.me().findByWarehouseIdAndProductId(
-							transferBillInfo.getFromWarehouseId(), transferBillInfo.getSellerProductId());
+					InventoryDetail outDetail = InventoryDetailQuery.me().findBySellerProductId(
+							transferBillInfo.getSellerProductId(), transferBillInfo.getFromWarehouseId());
 					InventoryDetail outInventoryDetail = new InventoryDetail();
 					outInventoryDetail.setId(StrKit.getRandomUUID());
 					outInventoryDetail.setWarehouseId(transferBillInfo.getFromWarehouseId());
@@ -316,15 +315,16 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 					if (!outInventoryDetail.save()) {
 						return false;
 					}
-					// //处理调入仓库的库存总账
-					Inventory inInventory = InventoryQuery.me().findBySellerIdAndProductIdAndWareHouseId(sellerId,
-							sellerProduct.getProductId(), transferBillInfo.getToWarehouseId());
+					// 处理调入仓库的库存总账
+					Inventory inInventory = InventoryQuery.me().findBySellerIdAndProductIdAndWareHouseId(
+							transferBill.getSellerId(), sellerProduct.getProductId(),
+							transferBillInfo.getToWarehouseId());
 					if (inInventory == null) {
 						inInventory = new Inventory();
 						inInventory.setId(StrKit.getRandomUUID());
 						inInventory.setWarehouseId(transferBillInfo.getToWarehouseId());
 						inInventory.setProductId(sellerProduct.getProductId());
-						inInventory.setSellerId(sellerId);
+						inInventory.setSellerId(transferBill.getSellerId());
 						inInventory.setOutCount(new BigDecimal(0));
 						inInventory.setOutPrice(new BigDecimal(0));
 						inInventory.setOutAmount(new BigDecimal(0));
@@ -356,14 +356,40 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 							return false;
 						}
 					}
-					InventoryDetail inDetail = InventoryDetailQuery.me().findBalanceCountByWarehouseIdId(
-							transferBillInfo.getToWarehouseId(), transferBillInfo.getSellerProductId());
-					if ("null".equals(String.valueOf(inDetail.getBalanceCount()))) {
-						inDetail.setBalanceCount(new BigDecimal(0));
+					////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+					// 处理调入仓库的库存明细
+					InventoryDetail inDetail = InventoryDetailQuery.me().findBySellerProductId(
+							transferBillInfo.getSellerProductId(), transferBillInfo.getToWarehouseId());
+
+					Boolean isSeller = true;
+					SellerProduct findBySellerAndId = new SellerProduct();
+					// 判断是否是不同销售商之间调拨
+					if (!sellerId.equals(transferBill.getSellerId())) {
+						// 判断调入销售商是否有此商品
+						findBySellerAndId = SellerProductQuery.me()
+								.findBySellerAndId(transferBillInfo.getSellerProductId(), sellerId);
+						// 若不存在改商品 需要建立一个新商品
+						if (null == findBySellerAndId) {
+							findBySellerAndId = sellerProduct;
+							findBySellerAndId.setId(StrKit.getRandomUUID());
+							findBySellerAndId.setSellerId(transferBill.getSellerId());
+							findBySellerAndId.setQrcodeUrl(null);
+							findBySellerAndId.setCreateDate(new Date());
+							findBySellerAndId.setModifyDate(null);
+							findBySellerAndId.setFreezeStore(new BigDecimal("0"));
+							findBySellerAndId.save();
+						}
+					}
+
+					if (null == inDetail) {
 						InventoryDetail inInventoryDetail = new InventoryDetail();
 						inInventoryDetail.setId(StrKit.getRandomUUID());
-						inInventoryDetail.setSellProductId(transferBillInfo.getSellerProductId());
 						inInventoryDetail.setWarehouseId(transferBillInfo.getToWarehouseId());
+						if (isSeller) {
+							inInventoryDetail.setSellProductId(transferBillInfo.getSellerProductId());
+						} else {
+							inInventoryDetail.setSellProductId(findBySellerAndId.getId());
+						}
 						inInventoryDetail.setOutCount(new BigDecimal(0));
 						inInventoryDetail.setOutPrice(new BigDecimal(0));
 						inInventoryDetail.setOutAmount(new BigDecimal(0));
@@ -371,8 +397,7 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 						inInventoryDetail.setInPrice(outInventory.getInPrice());
 						inInventoryDetail
 								.setInAmount(transferBillInfo.getProductCount().multiply(outInventory.getInPrice()));
-						inInventoryDetail
-								.setBalanceCount(inDetail.getBalanceCount().add(transferBillInfo.getProductCount()));
+						inInventoryDetail.setBalanceCount(transferBillInfo.getProductCount());
 						inInventoryDetail.setBalancePrice(outInventory.getInPrice());
 						inInventoryDetail.setBalanceAmount(
 								inInventoryDetail.getBalanceCount().multiply(outInventory.getInPrice()));
@@ -389,7 +414,11 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 					} else {
 						InventoryDetail inInventoryDetail = new InventoryDetail();
 						inInventoryDetail.setId(StrKit.getRandomUUID());
-						inInventoryDetail.setSellProductId(transferBillInfo.getSellerProductId());
+						if (isSeller) {
+							inInventoryDetail.setSellProductId(transferBillInfo.getSellerProductId());
+						} else {
+							inInventoryDetail.setSellProductId(findBySellerAndId.getId());
+						}
 						inInventoryDetail.setWarehouseId(transferBillInfo.getToWarehouseId());
 						inInventoryDetail.setOutCount(new BigDecimal(0));
 						inInventoryDetail.setOutPrice(new BigDecimal(0));

@@ -76,7 +76,7 @@ public class TransferBillDetailQuery extends JBaseQuery {
 	
 	
 	
-public List<transferBillInfo> findByTransferBillDetailId(String id,String sellerId) {
+	public List<transferBillInfo> findByTransferBillDetailId(String id) {
 	 	StringBuilder fromBuilder = new StringBuilder("select c1.transfer_bill_sn,c1.from_warehouse_id,c1.to_warehouse_id,c1.biz_user_id,c1.biz_date,c1.`status`,c1.create_date,c1.data_area,  ");
 	 	fromBuilder.append("c2.seller_product_id,c2.product_count");
 	 	fromBuilder.append(" FROM cc_transfer_bill c1 ");
