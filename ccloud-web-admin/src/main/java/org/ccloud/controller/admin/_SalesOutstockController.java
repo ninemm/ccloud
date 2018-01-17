@@ -215,7 +215,9 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 	public void queryCarStockDetail() {
 		String carWarehouseId = getPara("carWarehouseId");
 		String beginDate = getPara("beginDate");
+		beginDate = beginDate + " 00:00:00";
 		String endDate = getPara("endDate");
+		endDate = endDate + " 23:59:59";
 		List<carSalesPrintNeedInfo> carSalesPrintNeedInfos = SalesOutstockQuery.me().getCarSalesPrintInfo(carWarehouseId, beginDate, endDate);
 		HashMap<String, Object> result = Maps.newHashMap();
         result.put("rows", carSalesPrintNeedInfos);
