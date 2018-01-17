@@ -179,18 +179,25 @@ public class Consts {
 
 	public static final String USER_DEFAULT_PASSWORD = "123456";// 重置初始密码
 
-	public static Integer SELLER_HAS_STORE_TRUE = 1;// 是否有仓库
-	public static Integer SELLER_HAS_STORE_FALSE = 0;
+	public static final Integer SELLER_HAS_STORE_TRUE = 1;// 是否有仓库
+	public static final Integer SELLER_HAS_STORE_FALSE = 0;
 
 
-	public static String SELLER_TYPE_DEALER= "0";//账套类型：经销商
-	public static String SELLER_TYPE_SELLER = "1";//直营商
+	public static final String SELLER_TYPE_DEALER= "0";//账套类型：经销商
+	public static final String SELLER_TYPE_SELLER = "1";//直营商
 	
-	public static String OBJECT_TYPE_ORDER= "order";//订单
-	public static String OBJECT_TYPE_CUSTOMER = "customer";//客户
-	public static String OBJECT_TYPE_CUSTOMER_VISIT= "visit";//拜访
+	public static final String OBJECT_TYPE_ORDER= "order";//订单
+	public static final String OBJECT_TYPE_CUSTOMER = "customer";//客户
+	public static final String OBJECT_TYPE_CUSTOMER_VISIT= "visit";//拜访
 	//是否阅读 0:否 1:是
-	public static Integer IS_READ= 1;
-	public static Integer NO_READ= 0;
+	public static final Integer IS_READ= 1;
+	public static final Integer NO_READ= 0;
+	
+	//活动申请状态 0:待审 1 已审 2 撤回 3 拒绝 4 结束
+	public static final Integer ACTIVITY_APPLY_STATUS_WAIT = 0;
+	public static final Integer ACTIVITY_APPLY_STATUS_PASS = 1;
+	public static final Integer ACTIVITY_APPLY_STATUS_CANCEL = 2;
+	public static final Integer ACTIVITY_APPLY_STATUS_REJECT = 3;
+	public static final Integer ACTIVITY_APPLY_STATUS_END = 4;
 	
 }
