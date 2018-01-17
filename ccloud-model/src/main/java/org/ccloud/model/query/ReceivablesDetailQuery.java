@@ -20,6 +20,7 @@ import org.ccloud.model.ReceivablesDetail;
 
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
 /**
@@ -84,5 +85,13 @@ public class ReceivablesDetailQuery extends JBaseQuery {
 	public ReceivablesDetail findByRefSn(String objId,String deptId,String refSn) {
 		String select = "select * from `cc_receivables_detail` where object_id= '"+objId+"' and dept_id='"+deptId+"' and ref_sn ='"+refSn+"' ";
 		return DAO.findFirst(select);
+	}
+
+	public Record findByBalanceCountBySn(String outstock_sn) {
+		StringBuilder sqlBuilder = new StringBuilder("SELECT IFNULL(SUM(cc.balance_amount),0) - IFNULL(t1.act_amount,0) as count,cc.ref_type FROM cc_receivables_detail cc ");
+		sqlBuilder.append("LEFT JOIN (SELECT cr.ref_sn, SUM(cr.act_amount) as act_amount FROM cc_receiving cr GROUP BY cr.ref_sn) t1 ON t1.ref_sn = cc.ref_sn ");
+		sqlBuilder.append("WHERE cc.ref_sn = ? ");
+		sqlBuilder.append("GROUP BY cc.ref_sn ");
+		return Db.findFirst(sqlBuilder.toString(), outstock_sn);
 	}
 }

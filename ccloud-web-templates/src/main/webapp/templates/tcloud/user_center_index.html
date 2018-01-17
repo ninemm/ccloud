@@ -74,6 +74,12 @@ $(function() {
 				<p class="weui-grid__label">拜访审核</p>
 			</a>
 			</@shiro.hasPermission>
+			<a href="${CPATH}/receivables/index" class="weui-grid js_grid">
+				<div class="weui-grid__icon">
+					<i class="icon-cc-visa" style="color: #f7b55d;"></i>
+				</div>
+				<p class="weui-grid__label">收款管理</p>
+			</a>			
 		</div>
 		</@shiro.hasPermission>
 		<@shiro.hasPermission name="/admin/salesOrder,/admin/salesRefund,/admin/salesRefund/check,/admin/report/inventoryDetail">

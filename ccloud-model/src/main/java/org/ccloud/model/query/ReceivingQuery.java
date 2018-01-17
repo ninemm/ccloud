@@ -16,6 +16,8 @@
 package org.ccloud.model.query;
 
 import java.util.LinkedList;
+import java.util.List;
+
 import org.ccloud.model.Receiving;
 
 import com.jfinal.plugin.activerecord.Page;
@@ -66,6 +68,10 @@ public class ReceivingQuery extends JBaseQuery {
 			return deleteCount;
 		}
 		return 0;
+	}
+
+	public List<Receiving> findBySn(String outstock_sn) {
+		return DAO.doFind("ref_sn = ? ", outstock_sn);
 	}
 
 	
