@@ -41,12 +41,16 @@ public class ReceivablesController extends BaseFrontController {
 	
 	public void index() {
 		
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		Map<String, Object> all = new HashMap<>();
 		all.put("title", "全部");
 		all.put("value", "");
 
 		List<Map<String, Object>> customerTypes = new ArrayList<>();
 		customerTypes.add(all);
+		
+		List<Map<String, Object>> userList = new ArrayList<>();
+		userList.add(all);		
 
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
 				.findByDataArea(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
@@ -57,9 +61,18 @@ public class ReceivablesController extends BaseFrontController {
 			customerTypes.add(item);
 		}
 		
+		List<User> list = UserQuery.me().findByDeptDataArea(selectDataArea);
+		for (User user : list) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", user.getRealname());
+			item.put("value", user.getId());
+			userList.add(item);
+		}
+		
 		String history = getPara("history");
 		setAttr("history", history);		
 		setAttr("customerTypes", JSON.toJSON(customerTypes));
+		setAttr("userList", JSON.toJSON(userList));
 		render("out_stock_list.html");		
 	}
 	
@@ -69,12 +82,12 @@ public class ReceivablesController extends BaseFrontController {
 
 		String keyword = getPara("keyword");
 
-		String status = getPara("status");
+		String userId = getPara("status");
 		String customerTypeId = getPara("customerTypeId");
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 
-		Page<Record> outStockList = SalesOutstockQuery.me().paginateForReceivables(getPageNumber(), getPageSize(), keyword, status,
+		Page<Record> outStockList = SalesOutstockQuery.me().paginateForReceivables(getPageNumber(), getPageSize(), keyword, userId,
 				customerTypeId, startDate, endDate, sellerId, selectDataArea);
 
 		Map<String, Object> map = new HashMap<>();

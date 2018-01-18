@@ -166,9 +166,9 @@ public class SalesOutstockQuery extends JBaseQuery {
 		return outstock.save();
 	}
 
-	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, 
+	public Page<Record> paginate(int pageNumber, int pageSize, String sellerId, String keyword, String startDate, 
 			String endDate, String printStatus, String stockOutStatus, String status, String dataArea,String order,String sort) {
-		String select = "select o.*, c.customer_name,u.realname,ct.name as customerName ";
+		String select = "select o.*,  c.prov_name,c.city_name,c.country_name,c.address, c.customer_name,u.realname,ct.name as customerName ";
 		if (StrKit.notBlank(status)) {
 			select = select + ",t2.refundCount, t2.outCount ";
 		}
@@ -192,6 +192,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 		boolean needWhere = true;
 
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.seller_id", sellerId, params, needWhere);
 		if (needWhere) {
 			fromBuilder.append(" where 1 = 1");
 		}
@@ -330,20 +331,22 @@ public class SalesOutstockQuery extends JBaseQuery {
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 	
-	public Page<Record> paginateForReceivables(int pageNumber, int pageSize, String keyword, String status,
+	public Page<Record> paginateForReceivables(int pageNumber, int pageSize, String keyword, String userId,
 			String customerTypeId, String startDate, String endDate, String sellerId, String dataArea) {
 		String select = "select o.*, c.customer_name, ct.name as customerTypeName ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_sales_outstock` o ");
 		fromBuilder.append("left join cc_seller_customer cc ON o.customer_id = cc.id ");
 		fromBuilder.append("left join cc_customer c on cc.customer_id = c.id ");
 		fromBuilder.append("left join cc_customer_type ct on o.customer_type_id = ct.id ");
+		fromBuilder.append("LEFT JOIN cc_sales_order_join_outstock cso ON o.id = cso.outstock_id ");
+		fromBuilder.append("LEFT JOIN cc_sales_order cs ON cso.order_id = cs.id ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 
-		needWhere = appendIfNotEmpty(fromBuilder, "o.status", status, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "o.customer_type_id", customerTypeId, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "cs.biz_user_id", userId, params, needWhere);
 
 		if (needWhere) {
 			fromBuilder.append(" where o.status != ? ");
@@ -377,7 +380,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 
 	
 	public printAllNeedInfo findStockOutForPrint(final String id) {
-		StringBuilder fromBuilder = new StringBuilder("select o.outstock_sn,o.receive_type,o.remark as stockOutRemark,o.delivery_address,o.total_amount, cs.customer_kind, c.id as customerId, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as customerTypeCode, u.realname, u.mobile, ");
+		StringBuilder fromBuilder = new StringBuilder("select o.outstock_sn,o.receive_type,o.remark as stockOutRemark,o.delivery_address,o.total_amount, cs.customer_kind, cs.id as customerId, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as customerTypeCode, u.realname, u.mobile, ");
 		fromBuilder.append(" w.code as warehouseCode, cp.factor,w.`name` as warehouseName,w.phone as warehousePhone,o.create_date as placeOrderTime,so.remark,sn.seller_name,so.total_amount,so.id as orderId,so.biz_user_id,o.id as salesOutStockId,sn.id as sellerId,pt.context as printFootContext ");
 		fromBuilder.append(" from `cc_sales_outstock` o ");
 		fromBuilder.append(" left join cc_seller_customer cs on o.customer_id = cs.id ");

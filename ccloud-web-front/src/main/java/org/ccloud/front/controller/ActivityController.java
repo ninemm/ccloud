@@ -1,6 +1,7 @@
 package org.ccloud.front.controller;
 
 import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -10,15 +11,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.jfinal.plugin.activerecord.Page;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.ActivityApply;
 import org.ccloud.model.CustomerType;
+import org.ccloud.model.Dict;
 import org.ccloud.model.User;
 import org.ccloud.model.query.ActivityQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
-import org.ccloud.model.query.SellerProductQuery;
 import org.ccloud.model.query.UserQuery;
+import org.ccloud.model.query.*;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.StringUtils;
 
@@ -145,22 +148,130 @@ public class ActivityController extends BaseFrontController {
 
 	public void apply() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		final String content = getPara("content");
+		final Date createDate = new Date();
 
-		String[] sellerCustomerArray = getParaValues("sellerCustomerId");
+		String sellerCustomerIds = getPara("sellerCustomerIds");
+		String[] sellerCustomerArray = sellerCustomerIds.split(",", -1);
+
+		String[] activity_ids = getParaValues("activity_id");
+		Integer[] visit_nums = getParaValuesToInt("visit_num");
 		for (String sellerCustomerId : sellerCustomerArray) {
-			ActivityApply activityApply = new ActivityApply();
-			activityApply.setId(StringUtils.getUUID());
-			activityApply.setActivityId(getPara("activity_id"));
-			activityApply.setSellerCustomerId(sellerCustomerId);
-			activityApply.setBizUserId(user.getId());
-			activityApply.setNum(getParaToInt("visit_num"));
-			activityApply.setContent(getPara("content"));
-			activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_WAIT);
-			activityApply.setCreateDate(new Date());
-			activityApply.save();
+			for (int i = 0; i < activity_ids.length; i++) {
+				ActivityApply activityApply = new ActivityApply();
+				activityApply.setId(StringUtils.getUUID());
+				activityApply.setActivityId(activity_ids[i]);
+				activityApply.setSellerCustomerId(sellerCustomerId);
+				activityApply.setBizUserId(user.getId());
+				activityApply.setNum(visit_nums[i]);
+				activityApply.setContent(content);
+				activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_WAIT);
+				activityApply.setDataArea(user.getDataArea());
+				activityApply.setCreateDate(createDate);
+				activityApply.save();
+			}
 		}
-
 		renderAjaxResultForSuccess("申请成功");
 	}
 
+	public void applyList() {
+		List<Dict> activityTypeList = DictQuery.me().findDictByType("activity_category");
+
+		List<Map<String, Object>> activityType = new ArrayList<>();
+		Map<String, Object> all = new HashMap<>();
+		all.put("title", "全部");
+		all.put("value", "");
+
+		activityType.add(all);
+		for(Dict record : activityTypeList) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", record.get("name"));
+			item.put("value", record.get("value"));
+			activityType.add(item);
+		}
+		setAttr("activityType", JSON.toJSON(activityType));
+
+		String history = getPara("history");
+		setAttr("history", history);
+
+		render("user_apply_list.html");
+	}
+
+	public void refreshApply() {
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
+
+		String category = getPara("category");
+		String status = getPara("status");
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String keyword = getPara("keyword");
+
+
+		Page<Record> applyList = ActivityApplyQuery.me().findList(getParaToInt("pageNumber"), getParaToInt("pageSize"), selectDataArea, category, status, startDate, endDate, keyword);
+
+		DecimalFormat df   = new DecimalFormat("######0.00");
+		StringBuilder html = new StringBuilder();
+		for (Record apply : applyList.getList()) {
+			html.append("<section>\n");
+			html.append("<div class=\"weui-cells__title\"></div>");
+
+			if (apply.getStr("status").equals("0")) html.append("<div class=\"checking\">\n");
+			else if (apply.getStr("status").equals("1")) html.append("<div class=\"passed\">\n");
+			else if (apply.getStr("status").equals("2")) html.append("<div class=\"widthdraw\">\n");
+			else if (apply.getStr("status").equals("3")) html.append("<div class=\"failed\">\n");
+			else html.append("<div class=\"checking\">\n");
+
+			html.append("                        <a class=\"weui-cell weui-cell_access\" href=\"/activity/applyDetail?id=" + apply.getStr("id") + "\">\n" +
+					"                            <i class=\"icon-tags\"></i>\n" +
+					"                            <div class=\"weui-cell__bd\">" + apply.getStr("customer_name") + "</div>\n" +
+					"                            <span class=\"weui-cell__ft\">\n" );
+			if (apply.getStr("status").equals("0")) html.append("待审核\n");
+			else if (apply.getStr("status").equals("1")) html.append("已通过\n");
+			else if (apply.getStr("status").equals("2")) html.append("已撤回\n");
+			else if (apply.getStr("status").equals("3")) html.append("已拒绝\n");
+			else html.append("结束\n");
+
+			html.append("                            </span>\n" +
+					"                        </a>\n" +
+					"                        <div class=\"weui-flex\">\n" +
+					"                            <div class=\"weui-flex__item\">\n" +
+					"                                <p>开始日期</p>\n" +
+					"                                <p>" + apply.getStr("start_time") + "</p>\n" +
+					"                            </div>\n" +
+					"                            <div class=\"weui-flex__item\">\n" +
+					"                                <p>结束日期</p>\n" +
+					"                                <p>" + apply.getStr("end_time") + "</p>\n" +
+					"                            </div>\n" +
+					"                            <div class=\"weui-flex__item\">\n" +
+					"                                <p>活动类型</p>\n" +
+					"                                <p>" + apply.getStr("name") + "</p>\n" +
+					"                            </div>\n" +
+					"                            <div class=\"weui-flex__item\">\n" +
+					"                                <p>预计费用</p>\n" +
+					"                                <p>");
+			if(apply.get("invest_amount")!=null) html.append(df.format(Double.parseDouble(apply.get("invest_amount").toString())));
+			else html.append("0.00");
+			html.append( "</p>\n" +
+					"                            </div>\n" +
+					"                        </div>\n" +
+					"                    </div>\n" +
+					"                </section>");
+		}
+
+		Map<String, Object> map = new HashMap<>();
+		map.put("html", html.toString());
+		map.put("totalRow", applyList.getTotalRow());
+		map.put("totalPage", applyList.getTotalPage());
+		renderJson(map);
+	}
+
+	public void applyDetail() {
+		String id = getPara("id");
+		ActivityApply activityApply = ActivityApplyQuery.me().findById(id);
+
+		setAttr("apply", activityApply);
+
+		render("apply_detail.html");
+
+	}
 }

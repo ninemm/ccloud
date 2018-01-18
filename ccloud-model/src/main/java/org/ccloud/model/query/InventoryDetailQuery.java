@@ -114,7 +114,8 @@ public class InventoryDetailQuery extends JBaseQuery {
 		}
 		fromBuilder.append(" and cid.biz_type in ('"+Consts.BIZ_TYPE_INSTOCK+"','"+Consts.BIZ_TYPE_SALES_REFUND_INSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_INSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_PLUS_INSTOCK+"') ");
 		fromBuilder.append(" and ( cid.biz_bill_sn like '%"+keyword+"%' or csp.custom_name like '%"+keyword+"%' ) and csp.seller_id = '"+sellerId+"' ");
-		fromBuilder.append(" ) OR csp.id IN( SELECT id.sell_product_id FROM cc_inventory_detail id WHERE id.warehouse_id IN( SELECT w.id FROM cc_warehouse w WHERE w.seller_id ='"+sellerId+"' ) GROUP BY id.sell_product_id)");
+		fromBuilder.append(" ) OR (csp.id IN( SELECT id.sell_product_id FROM cc_inventory_detail id WHERE id.warehouse_id IN( SELECT w.id FROM cc_warehouse w WHERE w.seller_id ='"+sellerId+"' ) GROUP BY id.sell_product_id)");
+		fromBuilder.append(" and cid.biz_type in ('"+Consts.BIZ_TYPE_INSTOCK+"','"+Consts.BIZ_TYPE_SALES_REFUND_INSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_INSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_PLUS_INSTOCK+"') )");
 		fromBuilder.append(" GROUP BY cid.id");
 		if(sort!=null){
 			fromBuilder.append(" order by "+sort+" "+ sortOrder);	
@@ -151,7 +152,8 @@ public class InventoryDetailQuery extends JBaseQuery {
 		}
 		fromBuilder.append(" and cid.biz_type in ('"+Consts.BIZ_TYPE_P_OUTSTOCK+"','"+Consts.BIZ_TYPE_SALES_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_REDUCE_OUTSTOCK+"') ");
 		fromBuilder.append(" and ( cid.biz_bill_sn like '%"+keyword+"%' or csp.custom_name like '%"+keyword+"%' ) and csp.seller_id = '"+sellerId+"'");	
-		fromBuilder.append(" ) OR csp.id IN( SELECT id.sell_product_id FROM cc_inventory_detail id WHERE id.warehouse_id IN( SELECT w.id FROM cc_warehouse w WHERE w.seller_id ='"+sellerId+"' ) GROUP BY id.sell_product_id)");
+		fromBuilder.append(" ) OR (csp.id IN( SELECT id.sell_product_id FROM cc_inventory_detail id WHERE id.warehouse_id IN( SELECT w.id FROM cc_warehouse w WHERE w.seller_id ='"+sellerId+"' ) GROUP BY id.sell_product_id)");
+		fromBuilder.append(" and cid.biz_type in ('"+Consts.BIZ_TYPE_P_OUTSTOCK+"','"+Consts.BIZ_TYPE_SALES_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_REDUCE_OUTSTOCK+"')) ");
 		fromBuilder.append(" GROUP BY cid.id ");
 		if(sort!=null){
 			fromBuilder.append(" order by "+sort+" "+ sortOrder);	
@@ -201,16 +203,16 @@ public class InventoryDetailQuery extends JBaseQuery {
 	//库存详细报表 产品总计
 	public Page<InventoryDetail> findByInventoryDetailListTotal(int pageNumber, int pageSize,
 			String dataArea, String sort, String order, String sellerId, String startDate, String endDate, String user_id, boolean admin) {
-		String select = "SELECT cid.warehouse_id , cid.sell_product_id , cs.seller_name ,  sp.custom_name , IFNULL(SUM(t1.out_count),0) out_count, IFNULL(SUM(t1.in_count),0) in_count, IFNULL(t2.balance_count,0) balance_count ";
+		String select = "SELECT cid.warehouse_id , cid.sell_product_id , cs.seller_name ,  sp.custom_name , IFNULL(t1.out_count,0) out_count, IFNULL(t1.in_count,0) in_count, IFNULL(t2.balance_count,0) balance_count ";
 		StringBuilder fromBuilder = new StringBuilder(" FROM cc_inventory_detail cid");
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id = cid.sell_product_id ");
 		fromBuilder.append(" LEFT JOIN cc_seller cs ON cs.id = sp.seller_id ");
 		
 		fromBuilder.append(" LEFT JOIN( SELECT IFNULL(SUM(c.out_count) , 0) out_count , IFNULL(SUM(c.in_count) , 0) in_count , c.sell_product_id FROM cc_inventory_detail c WHERE");
-		fromBuilder.append(" c.create_date >= '"+startDate+"' AND c.create_date <= '"+endDate+"' GROUP BY c.sell_product_id) t1 ON t1.sell_product_id = sp.id ");
+		fromBuilder.append(" c.create_date >= '"+startDate+"' AND c.create_date <= '"+endDate+"' GROUP BY c.sell_product_id) t1 ON t1.sell_product_id = cid.sell_product_id ");
 		
 		fromBuilder.append(" LEFT JOIN( SELECT( IFNULL(SUM(c.in_count) , 0) - IFNULL(SUM(c.out_count) , 0)) balance_count , c.sell_product_id FROM cc_inventory_detail c WHERE ");
-		fromBuilder.append(" c.create_date <= '"+endDate+"' GROUP BY c.sell_product_id) t2 ON t2.sell_product_id = sp.id ");
+		fromBuilder.append(" c.create_date <= '"+endDate+"' GROUP BY c.sell_product_id) t2 ON t2.sell_product_id = cid.sell_product_id ");
 		
 		if (admin) {
 			fromBuilder.append(" where cid.warehouse_id IN(SELECT c.id FROM `cc_warehouse` c LEFT JOIN department d ON c.dept_id = d.id WHERE c.id IN");

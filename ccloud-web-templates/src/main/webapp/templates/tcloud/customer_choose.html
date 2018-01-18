@@ -28,7 +28,7 @@
             combo();
         }).on("change", "#isOrdered", function() {
             combo();
-        }).on("touchend", "#customerInfo", function() {
+        }).on("click", "#customerInfo", function() {
 			var el = $(this);
 	        var customerInfo = {
 	        	customerName : el.find("#customerName").text(),

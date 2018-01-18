@@ -16,6 +16,10 @@
 package org.ccloud.model.query;
 
 import java.util.LinkedList;
+
+import com.jfinal.kit.StrKit;
+import com.jfinal.plugin.activerecord.Db;
+import com.jfinal.plugin.activerecord.Record;
 import org.ccloud.model.ActivityApply;
 
 import com.jfinal.plugin.activerecord.Page;
@@ -37,9 +41,21 @@ public class ActivityApplyQuery extends JBaseQuery {
 		return DAO.getCache(id, new IDataLoader() {
 			@Override
 			public Object load() {
-				return DAO.findById(id);
+				StringBuilder sql = new StringBuilder("SELECT caa.*, cc.customer_name, DATE_FORMAT(ca.start_time, '%m-%d') as start_date, DATE_FORMAT(ca.end_time, '%m-%d') as end_date, " +
+						"d.name, ca.invest_type, cc.contact, cc.mobile, u.realname, DATE_FORMAT(caa.create_date, '%Y-%m-%d') as format_create_date, ca.invest_amount, ca.code ");
+
+				sql.append("FROM cc_activity_apply caa ");
+				sql.append("LEFT JOIN cc_activity ca ON caa.activity_id = ca.id ");
+				sql.append("LEFT JOIN cc_seller_customer csc ON caa.seller_customer_id = csc.id ");
+				sql.append("LEFT JOIN cc_customer cc ON csc.customer_id = cc.id ");
+
+				sql.append("LEFT JOIN dict d ON ca.category = d.`key` ");
+				sql.append("LEFT JOIN `user` u ON caa.biz_user_id = u.id ");
+				sql.append("WHERE caa.id = ? limit 1 ");
+				return DAO.findFirst(sql.toString(), id);
 			}
 		});
+
 	}
 
 	public Page<ActivityApply> paginate(int pageNumber, int pageSize, String orderby) {
@@ -65,6 +81,35 @@ public class ActivityApplyQuery extends JBaseQuery {
 			return deleteCount;
 		}
 		return 0;
+	}
+
+	public Page<Record> findList(int pageNumber, int pageSize, String dataArea, String category, String status, String startDate, String endDate, String keyword ){
+		String select = "SELECT caa.id, cc.customer_name, caa.`status`, DATE_FORMAT(ca.start_time,'%m-%d') as start_time, " +
+				"DATE_FORMAT(ca.end_time, '%m-%d') as end_time, ca.invest_type, d.`name`, ca.invest_amount ";
+		LinkedList<Object> params = new LinkedList<Object>();
+
+		StringBuilder sql = new StringBuilder("FROM cc_activity_apply caa ");
+		sql.append("LEFT JOIN cc_seller_customer csc ON csc.id = caa.seller_customer_id ");
+		sql.append("LEFT JOIN cc_customer cc ON csc.customer_id = cc.id ");
+		sql.append("LEFT JOIN cc_activity ca ON ca.id = caa.activity_id ");
+		sql.append("LEFT JOIN dict d ON ca.category = d.`key` ");
+
+		boolean needwhere = true;
+		needwhere = appendIfNotEmptyWithLike(sql, "caa.data_area", dataArea, params, needwhere);
+		needwhere = appendIfNotEmpty(sql, "ca.category", category, params, needwhere);
+		needwhere = appendIfNotEmpty(sql, "caa.status", status, params, needwhere);
+		needwhere = appendIfNotEmptyWithLike(sql, "cc.customer_name", keyword, params, needwhere);
+
+		if (StrKit.notBlank(startDate)) {
+			sql.append(" and caa.create_date >= ?");
+			params.add(startDate);
+		}
+
+		if (StrKit.notBlank(endDate)) {
+			sql.append(" and caa.create_date <= ?");
+			params.add(endDate);
+		}
+		return Db.paginate(pageNumber, pageSize, select, sql.toString(), params.toArray());
 	}
 
 	

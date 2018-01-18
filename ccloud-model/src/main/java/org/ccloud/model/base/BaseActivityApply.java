@@ -178,4 +178,12 @@ public abstract class BaseActivityApply<M extends BaseActivityApply<M>> extends 
 		return get("modify_date");
 	}
 
+	public void setDataArea(String dataArea) {
+		set("data_area", dataArea);
+	}
+
+	public String getDataArea() {
+		return getStr("data_area");
+	}
+
 }

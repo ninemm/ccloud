@@ -6,7 +6,7 @@
 </#macro>  
 <#macro script>
 $(function() {
-  $(document).on("touchstart", ".icon-trash-o", function() {
+  $(document).on("click", ".icon-trash-o", function() {
     var _this = $(this);
     $.confirm("确认删除商品？", function() {
       var $el = _this.parents(".common");
@@ -27,9 +27,9 @@ $(function() {
       total();
     }, function() {
     })
-  }).on("touchstart", "#placeOrder", function () {
+  }).on("click", "#placeOrder", function () {
       order();
-  }).on("touchstart", "#addGoods", function () {
+  }).on("click", "#addGoods", function () {
        window.location.href = '${CPATH}/product';
   }).on("click", ".operate:first-child", function () { //减少商品数量
       productChange($(this));

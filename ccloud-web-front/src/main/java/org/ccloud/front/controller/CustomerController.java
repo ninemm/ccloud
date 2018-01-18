@@ -2,6 +2,7 @@ package org.ccloud.front.controller;
 
 import java.awt.*;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.List;
 
@@ -52,19 +53,6 @@ public class CustomerController extends BaseFrontController {
 	@Before(WechatJSSDKInterceptor.class)
 	public void index() {
 
-		Ret ret = Ret.create();
-		List<String> list = new ArrayList<>();
-		ret.set("list", list);
-		ret.set("totalRow", 11);
-		setAttr("customerList", ret);
-
-		String history = getPara("history");
-		setAttr("history", history);		
-		render("customer.html");
-	}
-
-	public void getCustomerRegionAndType() {
-
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
 
 		List<Record> userList = UserQuery.me().findNextLevelsUserList(selectDataArea);
@@ -101,9 +89,14 @@ public class CustomerController extends BaseFrontController {
 			item.put("value", dict.get("value"));
 			nearBy.add(item);
 		}
-			
-		Map<String, List<Map<String, Object>>> data = ImmutableMap.of("region", region, "customerType", customerTypeList2, "searchArea", nearBy);
-		renderJson(data);
+
+		setAttr("region", JSON.toJSON(region));
+		setAttr("customerType", JSON.toJSON(customerTypeList2));
+		setAttr("searchArea", JSON.toJSON(nearBy));
+
+		String history = getPara("history");
+		setAttr("history", history);		
+		render("customer.html");
 	}
 
 	public void refresh() {
@@ -264,6 +257,7 @@ public class CustomerController extends BaseFrontController {
 		Page<Record> orderList = new Page<>();
 		orderList = SalesOrderQuery.me().findBySellerCustomerId(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("sellerCustomerId"), selectDataArea);
 
+		DecimalFormat df   = new DecimalFormat("######0.00");
 		StringBuilder html = new StringBuilder();
 		for(Record order : orderList.getList()){
 			order.set("statusName", getStatusName(order.getInt("status")));
@@ -277,11 +271,16 @@ public class CustomerController extends BaseFrontController {
 					"                            <span class=\"fr blue\">" + order.getStr("statusName") + "</span>\n" +
 					"                        </div>\n" +
 					"                        <div class=\"gray\">\n" +
-					"                            <p>数量：" + order.getStr("total_count") + "件\n" +
+					"                            <p>数量：" );
+			if(order.get("total_count")!=null) html.append(df.format(Double.parseDouble(order.get("total_count").toString())));
+			else html.append("0.00");
+			html.append( "件\n" +
 					"                                <span class=\"fr\">时间：" + order.get("create_date").toString() + "</span>\n" +
 					"                            </p>\n" +
-					"                            <p>金额：" + order.get("total_amount").toString() + "" +
-					"							 <span class=\"fr\">业务员：" + order.getStr("realname") + "</span>" +
+					"                            <p>金额：" );
+			if(order.get("total_amount")!=null) html.append(df.format(Double.parseDouble(order.get("total_amount").toString())));
+			else html.append("0.00");
+			html.append("							 <span class=\"fr\">业务员：" + order.getStr("realname") + "</span>" +
 					"							 </p>\n" +
 					"                        </div>\n" +
 					"                        </a>\n" +

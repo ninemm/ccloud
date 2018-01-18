@@ -36,8 +36,8 @@
 		combo();
 	}).on("change", "#date", function() {
 		getDateOrder();
-	}).off("touchend", "#combin-filter .confirm-search-btn")
-	.on("touchend", "#combin-filter .confirm-search-btn", function() {
+	}).off("click", "#combin-filter .confirm-search-btn")
+	.on("click", "#combin-filter .confirm-search-btn", function() {
 		startDate = $('#start-date').val();
 		endDate = $('#end-date').val() + ' 23:59:59';
 		setItemBykey("startDate", startDate);
@@ -62,14 +62,8 @@
 
 	combo();
 	$("#status").select({
-		title: "订单状态",
-		items: [{
-			 title: "全部", value: ""
-			 },{
-			 title: "全部出库", value: "1000"
-			 },{
-			 title: "部分出库", value: "2000"
-			 }]
+		title: "业务员",
+		items: ${userList!}
 	});
 	$("#customerTypeId").select({
 	title: "选择客户类型",
@@ -247,7 +241,7 @@
 			<div class="head-search select-area weui-flex__item">
 				<div class="weui-flex">
 					<div class="weui-flex__item">
-						<input type="text" id="status" class="weui-input" readonly placeholder="订单状态">
+						<input type="text" id="status" class="weui-input" readonly placeholder="业务员">
 						<i class="icon-sort-desc"></i>
 					</div>
 					<div class="weui-flex__item">
