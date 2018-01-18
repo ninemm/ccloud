@@ -320,7 +320,7 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 	}
 
 	//批量出库
-	public boolean batchOutStock(List<orderProductInfo> orderProductInfos, String sellerId, Date date, String deptId,String dataArea,String userId, String outStockSN) {
+	public boolean batchOutStock(List<orderProductInfo> orderProductInfos, String sellerId, Date date, String deptId,String dataArea,String userId, String outStockSN, String customerId) {
 		for (orderProductInfo orderProductInfo : orderProductInfos) {
 			SalesOutstockDetail detail = SalesOutstockDetailQuery.me().findById(orderProductInfo.getSalesOutDetaliId());
 			if (!detail.saveOrUpdate()) {
@@ -391,6 +391,23 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 				return false;
 			}
 			
+			ReceivablesDetail receivablesDetail = new ReceivablesDetail();
+			receivablesDetail.setId(StrKit.getRandomUUID());
+			receivablesDetail.setObjectId(customerId);
+			receivablesDetail.setObjectType(Consts.RECEIVABLES_OBJECT_TYPE_CUSTOMER);
+			receivablesDetail.setReceiveAmount(detail.getProductAmount());
+			receivablesDetail.setActAmount(new BigDecimal(0));
+			receivablesDetail.setBalanceAmount(detail.getProductAmount());
+			receivablesDetail.setBizDate(date);
+			receivablesDetail.setRefSn(outStockSN);
+			receivablesDetail.setRefType(Consts.BIZ_TYPE_SALES_ORDER);
+			receivablesDetail.setDeptId(deptId);
+			receivablesDetail.setDataArea(dataArea);
+			receivablesDetail.setCreateDate(date);		
+			
+			if (!receivablesDetail.save()) {
+				return false;
+			}
 		}
 		
 		return true;
