@@ -1,0 +1,286 @@
+<#include "_inc/_layout.html"/>
+<#macro title>申请列表</#macro>
+<#macro css>
+</#macro>
+
+<#macro script>
+    var pageNumber = 2;
+    var pageSize = 10;
+    var loading = false;
+    var startDate = $.today();
+    var endDate = $.today() + ' 23:59:59';
+
+    var $endNode = null;
+    var $loadmore = $(".weui-loadmore");
+
+    $(function () {
+        <#if history??>
+            var statusName = getItemBykey("statusName");
+            var applyTypeName = getItemBykey("applyTypeName");
+            var dayName = getItemBykey("dayName");
+            var keyword = getItemBykey("keyword");
+
+            $("#status").val(statusName);
+            $("#apply-type").val(applyTypeName);
+            $("#date").val(dayName);
+            if(keyword !=null && keyword.length!=0) {
+                $('.weui-search-bar').addClass('weui-search-bar_focusing');
+                $("#searchInput").val(keyword);
+            }
+            <#else>
+                clearStorage();
+                setItemBykey("startDate", $.today());
+                setItemBykey("endDate", $.today() + ' 23:59:59');
+        </#if>
+        refresh();
+
+        $("#apply-type").select({
+            title: "选择申请类型",
+            items: ${activityType!}
+        });
+
+        $("#status").select({
+            title: "选择申请状态",
+            items: [{
+            title: "全部", valut: ''
+            },{title: "待审核", value: '0'
+            },{title: "已审核", value: "1"
+            },{title: "已撤回", value: "2"
+            },{title: "已拒绝", value: "3"
+            },{title: "已结束", value: "4"
+            }]
+        });
+
+        $('#date').select({
+            title: '选择时间',
+            items: [{
+                title: '今天', value: '0'
+                },{title: "最近3天", value: "1"
+                },{title: "最近7天", value: "2"
+                },{title: "最近30天", value: "3"
+            }]
+        })
+
+        $(document).on("input", "#searchInput", function() {
+            setItemBykey("keyword", $("#searchInput").val());
+            refresh();
+        }).on("change", "#status", function() {
+            setItemBykey("status", $("#status").data('values'));
+            setItemBykey("statusName", $("#status").val());
+            refresh();
+        }).on("change", "#apply-type", function() {
+            setItemBykey("applyTypeId", $("#apply-type").data('values'));
+            setItemBykey("applyTypeName", $("#apply-typeId").val());
+            refresh();
+        }).on("change", "#date", function() {
+            getDateOrder();
+        }).off("touchend", "#combin-filter .confirm-search-btn")
+            .on("touchend", "#combin-filter .confirm-search-btn", function() {
+                startDate = $('#start-date').val();
+                endDate = $('#end-date').val() + ' 23:59:59';
+                setItemBykey("startDate", startDate);
+                setItemBykey("endDate", endDate);
+                refresh();
+            });
+
+        $("#start-date").calendar({
+            maxDate: function() {
+                return $('#end-date').val()
+            }
+        });
+
+        $("#start-date").val($.today());
+
+        $("#end-date").calendar({
+            minDate: function() {
+                var date = new Date($('#start-date').val().replace(/-/g,"/"));
+                date.setDate(date.getDate() - 1);
+                return date.Format("yyyy-MM-dd")
+            }
+        });
+
+        $("#end-date").val($.today());
+    });
+
+    function getDateOrder(){
+        var dateType = $("#date").data('values');
+        var date = new Date();
+        if(dateType == 0){
+            startDate = $.today();
+        }else if(dateType == 1){
+            date.setDate(date.getDate() - 3);
+            startDate = date.Format("yyyy-MM-dd");
+        }else if(dateType == 2){
+            date.setDate(date.getDate() - 7);
+            startDate = date.Format("yyyy-MM-dd");
+            }else if(dateType == 3){
+            date.setDate(date.getDate() - 30);
+            startDate = date.Format("yyyy-MM-dd");
+        }
+
+        endDate = $.today() + ' 23:59:59';
+        setItemBykey("dayName", $("#date").val());
+        setItemBykey("startDate", startDate);
+        setItemBykey("endDate", endDate);
+        refresh();
+    }
+
+    var paramData = function() {
+    <#if !history??>
+        return  {
+        "pageNumber": pageNumber,
+        "pageSize": pageSize,
+        "keyword": $("#searchInput")[0].value,
+        "category": $("#apply-type")[0].dataset.values,
+        "status": $("#status")[0].dataset.values,
+        "startDate": startDate,
+        "endDate" : endDate
+        };
+        <#else>
+            var category = getItemBykey("applyTypeId");
+            var status = getItemBykey("status");
+            var startDate = getItemBykey("startDate");
+            var endDate = getItemBykey("endDate");
+            var keyword = getItemBykey("keyword");
+            return  {
+            "pageNumber": pageNumber,
+            "pageSize": pageSize,
+            "keyword": keyword,
+            "category": category,
+            "status": status,
+            "startDate": startDate,
+            "endDate" : endDate
+            };
+    </#if>
+    }
+
+    //监听滚动
+    $(".infinite").infinite().on("infinite", function() {
+        var self = this;
+        $endNode = $("section:last");
+        $loadmore = $(self).find(".weui-loadmore");
+        if ($loadmore) $loadmore.show();
+        if (loading) return ;
+        loading = true;
+
+        $.ajax({
+            type: "post",
+            url: "${CPATH}/activity/refreshApply",
+            data: paramData(),
+            dataType: "json",
+            success:function(data) {
+                if ($loadmore) $loadmore.show();
+                if (data.totalPage >= pageNumber) {
+                    $endNode.after(data.html);
+                }
+                if (data.totalPage == pageNumber) {
+                    $(".infinite").destroyInfinite();
+                    $loadmore.hide();
+                }
+                pageNumber++;
+                loading = false;
+            }
+        });
+    });
+
+    function refresh() {
+        pageNumber = 1;
+        $.ajax({
+            url:"${CPATH}/activity/refreshApply",
+            type:"post",
+            data:paramData(),
+            dataType:"json",
+            success:function(data) {
+                $(".weui-loadmore").hide();
+                $(".infinite").destroyInfinite();
+
+                if (data.totalPage > pageNumber) {
+                    loading = false;
+                    $(".infinite").infinite();
+                }
+
+                $(".infinite")[0].scrollTop = 0;
+                $("#applyList").empty();
+                if(data.html.length == 0) data.html = data.html +'<div class="weui-loadmore weui-loadmore_line"><span class="weui-loadmore__tips">暂无数据</span></div>';
+                $("#applyList").html(data.html);
+                pageNumber = 2;
+            }
+        });
+    }
+
+    function searchCancel() {
+        $("#searchInput")[0].value = "";
+        refresh();
+    }
+</#macro>
+
+<@layout>
+<body id="application-record">
+    <header>
+        <div class="weui-search-bar" id="SearchBar">
+            <form class="weui-search-bar__form">
+                <div class="weui-search-bar__box">
+                    <i class="weui-icon-search"></i>
+                    <input type="search" class="weui-search-bar__input" id="searchInput" placeholder="搜索" required="">
+                    <a href="javascript:" class="weui-icon-clear" id="searchClear" ></a>
+                </div>
+                <label class="weui-search-bar__label" id="searchText">
+                    <i class="weui-icon-search"></i>
+                    <span>请输入客户名</span>
+                </label>
+            </form>
+            <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel" >取消</a>
+        </div>
+    </header>
+    <article class="customer">
+        <header class="has-th-list weui-flex">
+            <div class="head-search select-area weui-flex__item">
+                <div class="weui-flex">
+                    <div class="weui-flex__item">
+                        <input type="text" id="apply-type" placeholder="全部申请" class="weui-input" readonly>
+                        <i class="icon-sort-desc"></i>
+                    </div>
+                    <div class="weui-flex__item">
+                        <input type="text" id="status" placeholder="全部状态" class="weui-input" readonly>
+                        <i class="icon-sort-desc"></i>
+                    </div>
+                    <div class="weui-flex__item">
+                        <input type="text" id="date" placeholder="今天" class="weui-input" readonly>
+                        <i class="icon-sort-desc"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div id="combin-filter-btn">
+                <i class="icon-th-list"></i>
+            </div>
+        </header>
+        <article class="infinite">
+            <div id = "applyList">
+            </div>
+            <div class="weui-loadmore">
+                <i class="weui-loading"></i>
+                <span class="weui-loadmore__tips">正在加载</span>
+            </div>
+        </article>
+    </article>
+    <article id="combin-filter" >
+        <div class="filter-item">
+            <h4>日期区间</h4>
+            <div class="relative weui-flex" id="getDate">
+                <input type="text" id="start-date" class="weui-input weui-flex__item" readonly>
+                <div style="width:1rem" class="t-c">-</div>
+                <input type="text" id="end-date" class="weui-input weui-flex__item" readonly>
+            </div>
+        </div>
+        <footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
+            <button class="white-button-no-border  cancel-search-btn weui-flex__item border-top-1px">取消</button>
+            <button class="red-button confirm-search-btn weui-flex__item">确定</button>
+        </footer>
+    </article>
+    <#include "_inc/_goback.html" />
+    <footer class="weui-footer weui-footer_fixed-bottom">
+        <button class="red-button weui-flex__item _submit_btn">活动申请</button>
+    </footer>
+</body>
+</@layout>
