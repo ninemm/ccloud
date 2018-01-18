@@ -1,0 +1,554 @@
+<#include "_inc/_layout.html"/>
+<#macro title>业务员销售统计</#macro>
+<#macro css>
+    .report {
+        font-size: 0.7rem;
+	    position: absolute;
+	    top: 0;
+	    width: 100%;
+	    bottom: 50px;
+	    overflow: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .report .weui-panel__hd:after {
+        left: 0;
+        height: 0;
+    }
+</#macro>
+
+<#macro css_import>
+<link rel="stylesheet" href="${CTPATH}/css/normalize.css">
+</#macro>
+<#macro script_import>
+<script type='text/javascript' src="${CTPATH}/js/echarts.min.js"></script>
+</#macro>  
+<#macro script>
+  $(function () {
+  
+    $(".end-date").calendar();
+    $(".end-date").val($.today());
+    $(".begin-date").calendar();
+    $(".begin-date").val($.today());
+    $("#dayTag").val("today");
+   	$("#orderTag").val("productCount");
+    var startDate = $.today();
+	var endDate = $.today() + ' 23:59:59';  
+	var params = {
+		"dayTag":  'today',
+		"startDate": startDate,
+		"endDate" : endDate,
+	}
+ 	orderAmount(params);
+ 	deptCount(params);
+ 	productCount(params);
+ 	userCount(params);
+  })
+  
+    function orderAmount(params) {
+		Utils.ajax('${CPATH}/report/orderAmount', params, 
+			function(data){
+				$("#productAmount").html(data.productCount+"件/");
+				$("#orderCount").html(data.orderCount+"笔");
+				$("#totalAmount").html(data.totalAmount+"元");
+			}
+		);    	
+    }
+    
+    var deptObj = [];
+    var unit = '件';
+    function deptCount(params) {
+		Utils.ajax('${CPATH}/report/getDepartmentCountForSales', params, 
+			function(data){
+				var orderTag = $("#orderTag").val();
+	        	var salesIndent = document.getElementById('deptCount');
+	        	var salesIndentTotal = 0;
+		        var $salesIndent = $(salesIndent);
+		        var yData = [];
+		        var seriesData = [];
+		        for (var i = 0; i < data.length; i++) {
+		           yData.push(data[i].dept_name);
+		           if (orderTag == 'productCount') {
+		           		seriesData.push(data[i].productCount);
+		           } else if (orderTag == 'totalAmount') {
+		           		seriesData.push(data[i].totalAmount);
+		           } else {
+		           		seriesData.push(data[i].orderCount);
+		           }
+		           deptObj[data[i].dept_name] = data[i].id;
+		       	}
+		       	var salesIndentChart = echarts.init(salesIndent);
+				option = {
+				    title: {
+				        text: '部门统计',
+				    },				
+				    tooltip: {
+				        trigger: 'axis',
+				        axisPointer: {
+				            type: 'shadow'
+				        }
+				    },
+				    legend: {
+				        data: yData.reverse(),
+				        x: 'left'
+				    },
+				    grid: {
+				        bottom: '3%',
+				        containLabel: true
+				    },
+				    xAxis: {
+				    	show : false,
+				        type: 'value',
+				        boundaryGap: [0, 0.01]
+				    },
+				    yAxis: {
+				        type: 'category',
+				        data: yData
+				    },
+				    series: [
+		            {
+		                type:'bar',
+		                barWidth: 15,
+		                data:seriesData.reverse(),
+		                label:{
+		                    normal:{
+		                        show:true,
+		                        position:'right',
+		                        formatter: '{c}'+ unit
+		                    }
+		                }
+		
+		            }
+				    ]
+				};
+		
+		        salesIndentChart.resize();
+		        salesIndentChart.setOption(option, true);
+		        salesIndentChart.on('click',deptClick);
+		    }    		
+		);    	
+    }
+    
+    function getUnit(orderTag) {
+	    if (orderTag == 'productCount') {
+	   		unit = '件';
+	    } else if (orderTag == 'totalAmount') {
+	   		unit = '元';
+	    } else {
+	   		unit = '笔';
+	    }
+    }
+    
+    function productCount(params) {
+		Utils.ajax('${CPATH}/report/productCount', params, 
+			function(data){
+				var orderTag = $("#orderTag").val();
+				var height = data.length;
+				$("#productCount").height(50 * height + 100);
+		        var product = document.getElementById('productCount');
+		        var productChart = echarts.init(product);
+	            var productOption = {
+	                tooltip : {
+	                    trigger: 'axis'
+	                },
+	                legend: {
+	                    data:[],
+	                    textStyle : {
+	                        fontSize : 10
+	                    }
+	                },
+	                grid: {
+	                    left: '2%',
+	                    right: '17%',
+	                    bottom: 15,
+	                    top: 60,
+	                    containLabel: true
+	                },
+	                toolbox: {
+	                },
+	                calculable : true,
+	                xAxis : [
+	                {
+	                    show : false,
+	                    name : '数量/件',
+	                    type : 'value',
+	                    boundaryGap: [0, 0.01]
+	
+	                }
+	                ],
+	                yAxis : [
+	                {
+	                    show: false,
+	                    type : 'category',
+	                    data:['']
+	                }
+	                ],
+	                series : []
+	            };
+	            var productTotal = 0;
+	            var $product = $(product);
+	            for (var i = 0; i < data.length; i++) {
+	               var count = data[i].productCount;
+		           if (orderTag == 'productCount') {
+		           		count = data[i].productCount;
+		           } else if (orderTag == 'totalAmount') {
+		           		count = data[i].totalAmount;
+		           } else {
+		           		count = data[i].orderCount;
+		           }		            
+	               productOption.legend.data.push(data[i].custom_name);
+	               productOption.series.push({
+	                name:data[i].custom_name,
+	                type:'bar',
+	                barWidth: 15,
+	                data:[count],
+	                label:{
+	                    normal:{
+	                        show:true,
+	                        position: 'right',
+	                        formatter: count + unit
+	                    }
+	                }
+	
+	              });
+	           }
+	        productChart.resize();
+	        productChart.setOption(productOption, true);
+		    }   		
+		);    	
+    }    
+    
+    var salesObj = [];
+    function userCount(params) {
+		Utils.ajax('${CPATH}/report/getUserRank', params, 
+			function(data){
+				var orderTag = $("#orderTag").val();
+	        	var salesIndent = document.getElementById('userCount');
+	        	var salesIndentTotal = 0;
+		        var $salesIndent = $(salesIndent);
+		        var yData = [];
+		        var seriesData = [];
+	            var length = data.length;
+            	$("#userCount").height(300);
+		        for (var i = 0; i < data.length; i++) {
+		           yData.push(data[i].realname);
+		           if (orderTag == 'productCount') {
+		           		seriesData.push(data[i].productCount);
+		           } else if (orderTag == 'totalAmount') {
+		           		seriesData.push(data[i].totalAmount);
+		           } else {
+		           		seriesData.push(data[i].orderCount);
+		           }		           
+		           salesObj[data[i].realname] = data[i].id;
+		       	}
+		       	var salesIndentChart = echarts.init(salesIndent);
+		
+				option = {
+				    title: {
+				        text: '业务员',
+				    },				
+				    tooltip: {
+				        trigger: 'axis',
+				        axisPointer: {
+				            type: 'shadow'
+				        }
+				    },
+				    legend: {
+				        data: yData.reverse(),
+				        x: 'left'
+				    },
+				    grid: {
+				        bottom: '3%',
+				        containLabel: true
+				    },
+				    xAxis: {
+				    	show : false,
+				        type: 'value',
+				        boundaryGap: [0, 0.01]
+				    },
+				    yAxis: {
+				        type: 'category',
+				        data: yData
+				    },
+				    series: [
+		            {
+		                type:'bar',
+		                barWidth: 15,
+		                data:seriesData.reverse(),
+		                label:{
+		                    normal:{
+		                        show:true,
+		                        position:'right',
+		                        formatter: '{c}' + unit
+		                    }
+		                }
+		
+		            }
+				    ]
+				};
+		
+		        salesIndentChart.resize();
+		        salesIndentChart.setOption(option, true);
+		        salesIndentChart.on('click',salesClick);
+		    }    		
+		);    	
+    }
+    
+	function salesClick(param) {
+		var tag = $("#dayTag").val();
+		var startDate = $("#startDay").val();
+		var endDate = $("#endDay").val();		
+	    if (typeof param.seriesIndex != 'undefined') {
+	        window.location.href = "${(CPATH)}/report/userReportDetail?userId=" + salesObj[param.name] + "&userName=" + param.name + "&dayTag=" + tag + "&startDate=" + startDate + "&endDate=" + endDate; 
+	    }
+	}
+	
+	function deptClick(param) {
+	    if (typeof param.seriesIndex != 'undefined') {
+			var params = {
+				"dayTag":  $("#dayTag").val(),
+				"startDate": $("#startDay").val(),
+				"endDate" : $("#endDay").val(),
+				"deptId": deptObj[param.name]
+			}
+	    	productCount(params);
+	    	userCount(params);
+	    }
+	}
+	
+    function urlSelect(params, type){
+    	if (type == 'day') {
+		 	orderAmount(params);
+		 	deptCount(params);
+		 	productCount(params);
+		 	userCount(params);    	
+    	} else {
+		 	deptCount(params);
+		 	productCount(params);
+		 	userCount(params);     	
+    	}
+    }
+    
+    function startDaySelect(obj,type) {
+		var params = {
+    		"startDate": $(obj).val(),
+			"endDate": $(obj).parent().find('#endDay').val(),
+			"orderTag": $("#orderTag").val()
+		}
+		urlSelect(params,type); 
+    }
+    
+    function endDaySelect(obj,type) {
+		var params = {
+    		"startDate": $(obj).parent().find('#startDay').val(),
+			"endDate": $(obj).val(),
+			"orderTag": $("#orderTag").val()
+		}
+		urlSelect(params,type); 
+    }    
+    
+ 	function dayTagSelect(obj,type) {
+      $.actions({
+        actions: [{
+          text: "今日",
+          onClick: function () {
+			var params = {
+				"dayTag": 'today',
+				"orderTag": $("#orderTag").val()
+			}
+			urlSelect(params,type);
+            $(obj).find(".dayTagText").text('今日')
+            $("#dayTag").val("today");
+          }
+        }, {
+          text: "昨日",
+          onClick: function () {
+			var params = {
+				"dayTag": 'yesterday',
+				"orderTag": $("#orderTag").val()
+			}
+          	urlSelect(params,type);
+            $(obj).find(".dayTagText").text('昨日')
+            $("#dayTag").val("yesterday");
+          }
+        }, {
+          text: "本周",
+          onClick: function () {
+			var params = {
+				"dayTag": 'week',
+				"orderTag": $("#orderTag").val()
+			}
+			urlSelect(params,type);   
+          	$(obj).find(".dayTagText").text('本周')
+          	$("#dayTag").val("week");
+          }
+        }, {
+          text: "上周",
+          onClick: function () {
+			var params = {
+				"dayTag": 'lastweek',
+				"orderTag": $("#orderTag").val()
+			}
+          urlSelect(params,type);
+          $(obj).find(".dayTagText").text('上周')
+          $("#dayTag").val("lastweek");
+          }
+        }, {
+          text: "本月",
+          onClick: function () {
+			var params = {
+				"dayTag": 'month',
+				"orderTag": $("#orderTag").val()
+			}     
+			urlSelect(params,type);    
+         	$(obj).find(".dayTagText").text('本月')
+         	$("#dayTag").val("month");
+          }
+        }, {
+          text: "上月",
+          onClick: function () {
+			var params = {
+				"dayTag": 'lastmonth',
+				"orderTag": $("#orderTag").val()
+			}         
+			urlSelect(params,type);
+          	$(obj).find(".dayTagText").text('上月')
+          	$("#dayTag").val("lastmonth");
+          }
+        }]
+      }); 	
+ 	}
+ 	
+ 	function orderTagSelect(obj,type) {
+      $.actions({
+        actions: [{
+          text: "件数",
+          onClick: function () {
+			var params = {
+				"dayTag":  $("#dayTag").val(),
+				"startDate": $("#startDay").val(),
+				"endDate" : $("#endDay").val(),
+				"orderTag": 'productCount'
+			}
+			urlSelect(params,type); 
+			getUnit("productCount");
+            $(obj).find(".orderTagText").text('件数')
+            $("#orderTag").val("productCount");
+          }
+        }, {
+          text: "金额",
+          onClick: function () {
+			var params = {
+				"dayTag":  $("#dayTag").val(),
+				"startDate": $("#startDay").val(),
+				"endDate" : $("#endDay").val(),			
+				"orderTag": 'totalAmount'
+			}
+          	urlSelect(params,type);
+          	getUnit("totalAmount");
+            $(obj).find(".orderTagText").text('金额')
+            $("#orderTag").val("totalAmount");
+          }
+        }, {
+          text: "笔数",
+          onClick: function () {
+			var params = {
+				"dayTag":  $("#dayTag").val(),
+				"startDate": $("#startDay").val(),
+				"endDate" : $("#endDay").val(),			
+				"orderTag": 'orderCount'
+			}
+			urlSelect(params,type);   
+			getUnit("orderCount");
+          	$(obj).find(".orderTagText").text('笔数')
+          	$("#orderTag").val("orderCount");
+          }
+        }]
+      }); 	
+ 	}  	
+</#macro>
+<@layout>
+	<div class="weui-content">
+	<div class="report">
+		<div class="weui-panel weui-panel_access report-header">
+			<div class="weui-panel__hd">
+				<span class="overview-hd-title">销售简报</span> <span class="briefly" onclick="dayTagSelect(this,'day')">
+					<p class="dayTagText">今日</p>
+					<i class="icon-angle-down"></i>
+				</span>
+				<span class="briefly" onclick="orderTagSelect(this,'order')">
+					<p class="orderTagText">件数</p>
+					<i class="icon-angle-down"></i>
+				</span>	
+				<input type="hidden" id="orderTag">			
+				<input type="hidden" id="dayTag">
+				<input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'day')" readonly="">
+				<span class="overview-hd-segmenting fr"> - </span> 
+				<input class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'day')" readonly="">
+			</div>
+			<div class="weui-panel__bd">
+				<div class="weui-flex overview-block">
+					<div class="weui-flex__item">
+						<div class="overview-title">
+							<img src="${CTPATH}/images/order.png"> <span>订单总数</span>
+						</div>
+						<div class="t-c">
+							<strong id="productAmount"></strong> <small id="orderCount"></small>
+						</div>
+					</div>
+					<div class="weui-flex__item">
+						<div class="overview-title">
+							<img src="${CTPATH}/images/money.png"> <span>订单金额</span>
+						</div>
+						<div class="t-c">
+							<strong id="totalAmount"></strong>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="weui-panel weui-panel_access">
+			<div class="weui-panel__hd">
+				<span class="overview-hd-title">部门销售统计</span> <!--<span class="briefly" onclick="dayTagSelect(this,'user')">
+				<p class="dayTagText">今日</p>
+					<i class="icon-angle-down"></i>
+				</span> <input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'user')" readonly="">
+				<span class="overview-hd-segmenting fr"> - </span> <input
+					class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'user')" readonly="">  -->
+			</div>
+			<div class="weui-panel__bd report-area">
+				<div class="weui-media-box ft14">
+					<div id="deptCount" style="height: 300px;">
+						
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="weui-panel weui-panel_access">
+			<div class="weui-panel__hd">
+				<span class="overview-hd-title">产品统计</span>
+			</div>
+			<div class="weui-panel__bd report-area">
+				<div class="weui-media-box ft14">
+					<div id="productCount" style="height: 300px;">
+						
+					</div>
+				</div>
+			</div>
+		</div>		
+		<div class="weui-panel weui-panel_access">
+			<div class="weui-panel__hd">
+				<span class="overview-hd-title">业务员统计</span>
+			</div>
+			<div class="weui-panel__bd report-area">
+				<div class="weui-media-box ft14">
+					<div id="userCount" style="height: 300px;">
+						
+					</div>
+				</div>
+			</div>
+		</div>		
+		</div>
+		<#include "_inc/_footer_nav.html" />
+	</div>
+</@layout>

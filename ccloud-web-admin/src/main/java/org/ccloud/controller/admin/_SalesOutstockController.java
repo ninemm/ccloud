@@ -89,7 +89,8 @@ import cn.afterturn.easypoi.excel.entity.ExportParams;
 public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 
 	@Override
-	@RequiresPermissions(value = { "/admin/salesOutstock", "/admin/dealer/all", "/admin/salesRefund"}, logical = Logical.OR)
+	@RequiresPermissions(value = { "/admin/salesOutstock", "/admin/dealer/all",
+			"/admin/salesRefund" }, logical = Logical.OR)
 	public void index() {
 		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
 
@@ -111,18 +112,18 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		String stockOutStatus = getPara("stockOutStatus");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String status = getPara("status");
-		//获取排序相关信息
+		// 获取排序相关信息
 		String sort = getPara("sortName[sort]");
 		String order = getPara("sortName[order]");
 
-		Page<Record> page = SalesOutstockQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, 
-				endDate, printStatus, stockOutStatus, status, dataArea,order,sort);
+		Page<Record> page = SalesOutstockQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate,
+				endDate, printStatus, stockOutStatus, status, dataArea, order, sort);
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
 
 	}
-	
+
 	@RequiresPermissions("/admin/salesOutstock")
 	public void stockdetail() {
 
@@ -136,7 +137,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		render("detail.html");
 
 	}
-	
+
 	@RequiresPermissions("/admin/salesOutstock")
 	public void stockdetailBySn() {
 
@@ -149,15 +150,15 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 
 		render("detail.html");
 
-	}	
-	
+	}
+
 	@RequiresPermissions("/admin/salesOutstock")
 	public void getDetail() {
 		String id = getPara("id");
 		setAttr("id", id);
 		render("out_stock_detail.html");
 	}
-	
+
 	public void detail() {
 
 		String outstockId = getPara("outstockId");
@@ -170,32 +171,31 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 
 		renderJson(result);
 	}
-	
+
 	public void renderPrintPage() {
-        setAttr("outstockId", getPara(0));
-        //获取销售商的配置模板地址
-        String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-        List<PrintTemplate> printTemplates = PrintTemplateQuery.me().findPrintTemplateBySellerId(sellerId);
-        if (printTemplates.size() == 0) {
-        	renderAjaxResultForError("请配置一个打印模板");
-		}else {
+		setAttr("outstockId", getPara(0));
+		// 获取销售商的配置模板地址
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		List<PrintTemplate> printTemplates = PrintTemplateQuery.me().findPrintTemplateBySellerId(sellerId);
+		if (printTemplates.size() == 0) {
+			renderAjaxResultForError("请配置一个打印模板");
+		} else {
 			String url = printTemplates.get(0).getUrl();
 			render(url + ".html");
 		}
-       
+
 	}
-	
+
 	@RequiresPermissions("/admin/salesOutstock")
-	public void  renderCarPrintPage() {
+	public void renderCarPrintPage() {
 		setAttr("carWarehouseId", getPara("carWarehouseId"));
 		setAttr("beginDate", getPara("beginDate"));
 		setAttr("endDate", getPara("endDate"));
-		
-		
+
 		render("carPrint.html");
 	}
-	
-	//获取出库单打印的信息
+
+	// 获取出库单打印的信息
 	public void getPrintInfo() {
 		String outstockId = getPara("outstockId");
 		String[] outId = outstockId.split(",");
@@ -207,24 +207,24 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 			printAllNeedInfos.add(printAllNeedInfo);
 		}
 		HashMap<String, Object> result = Maps.newHashMap();
-        result.put("rows", printAllNeedInfos);
-        renderJson(result);
+		result.put("rows", printAllNeedInfos);
+		renderJson(result);
 	}
-	
-	
+
 	public void queryCarStockDetail() {
 		String carWarehouseId = getPara("carWarehouseId");
 		String beginDate = getPara("beginDate");
 		beginDate = beginDate + " 00:00:00";
 		String endDate = getPara("endDate");
 		endDate = endDate + " 23:59:59";
-		List<carSalesPrintNeedInfo> carSalesPrintNeedInfos = SalesOutstockQuery.me().getCarSalesPrintInfo(carWarehouseId, beginDate, endDate);
+		List<carSalesPrintNeedInfo> carSalesPrintNeedInfos = SalesOutstockQuery.me()
+				.getCarSalesPrintInfo(carWarehouseId, beginDate, endDate);
 		HashMap<String, Object> result = Maps.newHashMap();
-        result.put("rows", carSalesPrintNeedInfos);
-        renderJson(result);
+		result.put("rows", carSalesPrintNeedInfos);
+		renderJson(result);
 	}
-	
-	
+
+	// 销售订货单出库
 	@RequiresPermissions("/admin/salesOutstock/check")
 	public void outStock() {
 
@@ -233,19 +233,19 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		String sellerId = getSessionAttr("sellerId");
 		String sellerCode = getSessionAttr("sellerCode");
 		boolean isSave = this.out(paraMap, user, sellerId, sellerCode);
-        if (isSave) {
-        	renderAjaxResultForSuccess("出库成功");
-        } else {
-        	renderAjaxResultForError("出库失败!");
-        }
+		if (isSave) {
+			renderAjaxResultForSuccess("出库成功");
+		} else {
+			renderAjaxResultForError("出库失败!");
+		}
 
-	}	
-	
-	
+	}
+
+	// 销售订货单批量出库
 	@RequiresPermissions("/admin/salesOutstock/check")
 	public void batchStockOut() throws ParseException {
 		String outstockId = getPara("outstockId");
-	    String[] outId = outstockId.split(",");
+		String[] outId = outstockId.split(",");
 		String oStockDate = getPara("oStockDate");
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		Date StockDate = sdf.parse(oStockDate);
@@ -257,125 +257,128 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		String sellerId = getSessionAttr("sellerId");
 		String sellerCode = getSessionAttr("sellerCode");
 		Date date = new Date();
-		//检查批量出库提交上来单子是否有已出库的
+		// 检查批量出库提交上来单子是否有已出库的
 		boolean isStockOut = this.checkIsStockOut(outId);
 		if (!isStockOut) {
-		  renderAjaxResultForError("批量出库失败,单子已有出库，请检查！");
-		}else {
-			boolean isSave = this.saveBatchStockOut(outId,StockDate,remark,user,sellerId,sellerCode,date);
-			 if (isSave) {
-		        	renderAjaxResultForSuccess("批量出库成功");
-		        } else {
-		        	renderAjaxResultForError("批量出库失败!");
-		      }	
+			renderAjaxResultForError("批量出库失败,单子已有出库，请检查！");
+		} else {
+			boolean isSave = this.saveBatchStockOut(outId, StockDate, remark, user, sellerId, sellerCode, date);
+			if (isSave) {
+				renderAjaxResultForSuccess("批量出库成功");
+			} else {
+				renderAjaxResultForError("批量出库失败!");
+			}
 		}
 	}
-	
+
 	public void recordPrintInfo() {
 		String outstockId = getPara("outstockId");
 		String[] outId = outstockId.split(",");
 		List<printAllNeedInfo> printAllNeedInfos = new ArrayList<>();
-        for (String s : outId) {
+		for (String s : outId) {
 			printAllNeedInfo printAllNeedInfo = SalesOutstockQuery.me().findStockOutForPrint(s);
 			printAllNeedInfos.add(printAllNeedInfo);
 			updateStockOutPrintStatus(printAllNeedInfo);
-     		}
-		    boolean saveOutStockPrint = saveOutStockPrint(printAllNeedInfos);
-		    if (saveOutStockPrint) {
-		    	  HashMap<String, Object> result = Maps.newHashMap();
-			       result.put("result", 200);
-			       renderJson(result);
-			}
-		  
-    	}
-	  
-	
+		}
+		boolean saveOutStockPrint = saveOutStockPrint(printAllNeedInfos);
+		if (saveOutStockPrint) {
+			HashMap<String, Object> result = Maps.newHashMap();
+			result.put("result", 200);
+			renderJson(result);
+		}
+
+	}
+
 	@Before(Tx.class)
 	private void updateStockOutPrintStatus(printAllNeedInfo printAllNeedInfo) {
-          SalesOutstockQuery.me().updatePrintStatus(printAllNeedInfo.getSalesOutStockId());
+		SalesOutstockQuery.me().updatePrintStatus(printAllNeedInfo.getSalesOutStockId());
 	}
 
-	public boolean out(final Map<String, String[]> paraMap, final User user, final String sellerId, final String sellerCode) {
-        boolean isSave = Db.tx(new IAtom() {
-            @Override
-            public boolean run() throws SQLException {
-        		String deptId = StringUtils.getArrayFirst(paraMap.get("deptId"));
-        		String dataArea = StringUtils.getArrayFirst(paraMap.get("dataArea"));
-        		String outStockId =  StringUtils.getArrayFirst(paraMap.get("salesStockId"));
-        		String outStockSN =  StringUtils.getArrayFirst(paraMap.get("salesStockSN"));
-        		String wareHouseId =  StringUtils.getArrayFirst(paraMap.get("wareHouseId"));
-        		String customerId = StringUtils.getArrayFirst(paraMap.get("customerId"));
-        		String sellerCustomerId = StringUtils.getArrayFirst(paraMap.get("sellerCustomerId"));
-        		Date date = new Date();
-        		String productNumStr = StringUtils.getArrayFirst(paraMap.get("productNum"));
-        		Integer productNum = Integer.valueOf(productNumStr);
-        		String total = StringUtils.getArrayFirst(paraMap.get("total"));
-        		Integer count = 0;
-        		Integer index = 0;
-        		
-        		while (productNum > count) {
-        			index++;
-        			String sellProductId = StringUtils.getArrayFirst(paraMap.get("sellProductId" + index));
-        			if (StrKit.notBlank(sellProductId)) {
-        				if (!SalesOutstockDetailQuery.me().outStock(paraMap, sellerId, 
-        						date, deptId, dataArea, index, user.getId(), outStockSN, wareHouseId, sellProductId, sellerCustomerId)) {
-        					return false;
-        				}
-        				count++;
-        			}
+	public boolean out(final Map<String, String[]> paraMap, final User user, final String sellerId,
+			final String sellerCode) {
+		boolean isSave = Db.tx(new IAtom() {
+			@Override
+			public boolean run() throws SQLException {
+				String deptId = StringUtils.getArrayFirst(paraMap.get("deptId"));
+				String dataArea = StringUtils.getArrayFirst(paraMap.get("dataArea"));
+				String outStockId = StringUtils.getArrayFirst(paraMap.get("salesStockId"));
+				String outStockSN = StringUtils.getArrayFirst(paraMap.get("salesStockSN"));
+				String wareHouseId = StringUtils.getArrayFirst(paraMap.get("wareHouseId"));
+				String customerId = StringUtils.getArrayFirst(paraMap.get("customerId"));
+				String sellerCustomerId = StringUtils.getArrayFirst(paraMap.get("sellerCustomerId"));
+				Date date = new Date();
+				String productNumStr = StringUtils.getArrayFirst(paraMap.get("productNum"));
+				Integer productNum = Integer.valueOf(productNumStr);
+				String total = StringUtils.getArrayFirst(paraMap.get("total"));
+				Integer count = 0;
+				Integer index = 0;
 
-        		}
-        		if (!SalesOrderQuery.me().checkStatus(outStockId, user.getId(), date, total)) {
-        			return false;
-        		}
-        		
-        		//如果客户种类是直营商，则生成直营商的采购入库单
-        		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-        		
-        		
-        		String customerKind =  StringUtils.getArrayFirst(paraMap.get("customerKind"));
-        		String sellerId = getSessionAttr("sellerId");
-        		if(Consts.CUSTOMER_KIND_SELLER.equals(customerKind)) {
-        			Record seller = SellerQuery.me().findByCustomerId(customerId);
-        			String purchaseInstockId =StrKit.getRandomUUID();
-        			SellerCustomer sellerCustomer = SellerCustomerQuery.me().findBySellerId(sellerId,customerId);
-        			//PS + 100000(机构编号或企业编号6位) + 20171108(时间) + 000001(流水号)
-        			String pwarehouseSn = "PS" + seller.getStr("seller_code") + DateUtils.format("yyyyMMdd", date) + PurchaseInstockQuery.me().getNewSn();
-        
-        			Warehouse warehouse = WarehouseQuery.me().findBySellerId(seller.getStr("id"));
-        			if(!PurchaseInstockQuery.me().insertBySalesOutStock(paraMap, seller, purchaseInstockId, pwarehouseSn, warehouse.getId(), user.getId(), date,sellerId)) {
-        				return false;
-        			}
-        			//直营商的应付账款
-        			String countTotal = StringUtils.getArrayFirst(paraMap.get("total"));
-    				createPayables(sellerCustomer,countTotal);
-            		count = 0;
-            		index = 0;
-            		while (productNum > count) {
-            			index++;
-            			String sellProductId = StringUtils.getArrayFirst(paraMap.get("sellProductId" + index));
-            			if (StrKit.notBlank(sellProductId)) {
-            				if (!PurchaseInstockDetailQuery.me().insertBySalesOrder(paraMap, purchaseInstockId, seller, index, date, getRequest(),pwarehouseSn,sellerCustomer)) {
-            					return false;
-            				}
-            				count++;
-            			}
+				while (productNum > count) {
+					index++;
+					String sellProductId = StringUtils.getArrayFirst(paraMap.get("sellProductId" + index));
+					if (StrKit.notBlank(sellProductId)) {
+						if (!SalesOutstockDetailQuery.me().outStock(paraMap, sellerId, date, deptId, dataArea, index,
+								user.getId(), outStockSN, wareHouseId, sellProductId, sellerCustomerId)) {
+							return false;
+						}
+						count++;
+					}
 
-            		}
-        			
-        		}
-        		
-        		return true;
-            }
-        });
-        return isSave;
+				}
+				if (!SalesOrderQuery.me().checkStatus(outStockId, user.getId(), date, total)) {
+					return false;
+				}
+
+				// 如果客户种类是直营商，则生成直营商的采购入库单
+				User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+
+				String customerKind = StringUtils.getArrayFirst(paraMap.get("customerKind"));
+				String sellerId = getSessionAttr("sellerId");
+				if (Consts.CUSTOMER_KIND_SELLER.equals(customerKind)) {
+					Record seller = SellerQuery.me().findByCustomerId(customerId);
+					String purchaseInstockId = StrKit.getRandomUUID();
+					SellerCustomer sellerCustomer = SellerCustomerQuery.me().findBySellerId(sellerId, customerId);
+					// PS + 100000(机构编号或企业编号6位) + 20171108(时间) + 000001(流水号)
+					String pwarehouseSn = "PS" + seller.getStr("seller_code") + DateUtils.format("yyyyMMdd", date)
+							+ PurchaseInstockQuery.me().getNewSn();
+
+					Warehouse warehouse = WarehouseQuery.me().findBySellerId(seller.getStr("id"));
+					if (!PurchaseInstockQuery.me().insertBySalesOutStock(paraMap, seller, purchaseInstockId,
+							pwarehouseSn, warehouse.getId(), user.getId(), date, sellerId)) {
+						return false;
+					}
+					// 直营商的应付账款
+					String countTotal = StringUtils.getArrayFirst(paraMap.get("total"));
+					createPayables(sellerCustomer, countTotal);
+					count = 0;
+					index = 0;
+					while (productNum > count) {
+						index++;
+						String sellProductId = StringUtils.getArrayFirst(paraMap.get("sellProductId" + index));
+						if (StrKit.notBlank(sellProductId)) {
+							if (!PurchaseInstockDetailQuery.me().insertBySalesOrder(paraMap, purchaseInstockId, seller,
+									index, date, getRequest(), pwarehouseSn, sellerCustomer)) {
+								return false;
+							}
+							count++;
+						}
+
+					}
+
+				}
+
+				return true;
+			}
+		});
+		return isSave;
 	}
-	
-	private void createPayables(SellerCustomer sellerCustomer,String countAll){
-		String payablesType = Consts.RECEIVABLES_OBJECT_TYPE_SUPPLIER; 
-		Payables payables = PayablesQuery.me().findByObjIdAndDeptId(sellerCustomer.getSellerId(), payablesType,sellerCustomer.getDeptId());
+
+	private void createPayables(SellerCustomer sellerCustomer, String countAll) {
+		String payablesType = Consts.RECEIVABLES_OBJECT_TYPE_SUPPLIER;
+		Payables payables = PayablesQuery.me().findByObjIdAndDeptId(sellerCustomer.getSellerId(), payablesType,
+				sellerCustomer.getDeptId());
 		Department department = DepartmentQuery.me().findById(sellerCustomer.getDeptId());
-		if(payables == null){
+		if (payables == null) {
 			payables = new Payables();
 			payables.setId(StrKit.getRandomUUID());
 			payables.setObjId(sellerCustomer.getSellerId());
@@ -387,94 +390,107 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 			payables.setDataArea(department.getDataArea());
 			payables.setCreateDate(new Date());
 			payables.save();
-		}else{
+		} else {
 			payables.setPayAmount(payables.getPayAmount().add(new BigDecimal(countAll)));
 			payables.setBalanceAmount(payables.getBalanceAmount().add(new BigDecimal(countAll)));
 			payables.setModifyDate(new Date());
 			payables.update();
 		}
 	}
-	
-	//把打印记录写到出库打印记录表里
+
+	// 把打印记录写到出库打印记录表里
 	public boolean saveOutStockPrint(final List<printAllNeedInfo> printAllNeedInfos) {
 		boolean isSave = Db.tx(new IAtom() {
-			
+
 			List<OutstockPrint> outstockPrints = new ArrayList<>();
 			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+
 			@Override
 			public boolean run() throws SQLException {
-			 for (printAllNeedInfo printAllNeedInfo : printAllNeedInfos) {
-				 OutstockPrint outstockPrint = new OutstockPrint();
-				  outstockPrint.setId(StrKit.getRandomUUID());
-				  outstockPrint.setOrderId(printAllNeedInfo.getOrderId());
-				  outstockPrint.setBizUserId(printAllNeedInfo.getBizUserId());
-				  outstockPrint.setDeptId(user.getDepartmentId());
-				  outstockPrint.setDataArea(user.getDataArea());
-				  outstockPrint.setCreateDate(new Date());
-				  outstockPrint.setStatus(0);
-				  outstockPrints.add(outstockPrint);
-			}
-			   try {
-				Db.batchSave(outstockPrints, outstockPrints.size());
-			} catch (Exception e) {
-				e.printStackTrace();
-				return false;
-			  }
-			return true;
+				for (printAllNeedInfo printAllNeedInfo : printAllNeedInfos) {
+					OutstockPrint outstockPrint = new OutstockPrint();
+					outstockPrint.setId(StrKit.getRandomUUID());
+					outstockPrint.setOrderId(printAllNeedInfo.getOrderId());
+					outstockPrint.setBizUserId(printAllNeedInfo.getBizUserId());
+					outstockPrint.setDeptId(user.getDepartmentId());
+					outstockPrint.setDataArea(user.getDataArea());
+					outstockPrint.setCreateDate(new Date());
+					outstockPrint.setStatus(0);
+					outstockPrints.add(outstockPrint);
+				}
+				try {
+					Db.batchSave(outstockPrints, outstockPrints.size());
+				} catch (Exception e) {
+					e.printStackTrace();
+					return false;
+				}
+				return true;
 			}
 		});
 		return isSave;
 	}
-	
-	public boolean saveBatchStockOut(final String[] outId, final Date stockDate, final String remark, final User user, final String sellerId, String sellerCode, final Date date) {
-		boolean isSave =  Db.tx(new IAtom() {
+
+	public boolean saveBatchStockOut(final String[] outId, final Date stockDate, final String remark, final User user,
+			final String sellerId, String sellerCode, final Date date) {
+		boolean isSave = Db.tx(new IAtom() {
 			@Override
-		  public boolean run() throws SQLException {
-		  for (String s : outId) {
-			printAllNeedInfo printAllNeedInfo = SalesOutstockQuery.me().findStockOutForPrint(s);
-			List<orderProductInfo> orderProductInfos = SalesOutstockDetailQuery.me().findPrintProductInfo(s);
-			
-			if (!SalesOutstockDetailQuery.me().batchOutStock(orderProductInfos, sellerId, 
-					date, user.getDepartmentId(), user.getDataArea(), user.getId(), printAllNeedInfo.getOutstockSn())) {
-				return false;
+			public boolean run() throws SQLException {
+				for (String s : outId) {
+					printAllNeedInfo printAllNeedInfo = SalesOutstockQuery.me().findStockOutForPrint(s);
+					List<orderProductInfo> orderProductInfos = SalesOutstockDetailQuery.me().findPrintProductInfo(s);
+					BigDecimal productAmout=new BigDecimal("0");
+					for (orderProductInfo orderProductInfo : orderProductInfos) {
+						productAmout=productAmout.add(orderProductInfo.getProductAmout());
+					}
+					String total=productAmout.toString();
+					if (!SalesOutstockDetailQuery.me().batchOutStock(orderProductInfos, sellerId, date,
+							user.getDepartmentId(), user.getDataArea(), user.getId(),
+							printAllNeedInfo.getOutstockSn(),printAllNeedInfo.getCustomerId())) {
+						return false;
+					}
+
+					if (!SalesOutstockQuery.me().updateStockOutStatus(printAllNeedInfo.getSalesOutStockId(),
+							user.getId(), stockDate, Consts.SALES_OUT_STOCK_STATUS_OUT, date, remark)
+							| !SalesOrderQuery.me().checkStatus(printAllNeedInfo.getSalesOutStockId(), user.getId(),
+									date, total)) {
+						return false;
+					}
+
+					// 如果客户种类是直营商，则生成直营商的采购入库单
+					if (Consts.CUSTOMER_KIND_SELLER.equals(printAllNeedInfo.getCustomerKind())) {
+						Record seller = SellerQuery.me().findByCustomerId(printAllNeedInfo.getCustomerId());
+						String purchaseInstockId = StrKit.getRandomUUID();
+
+						// PS + 100000(机构编号或企业编号6位) + 20171108(时间) + 000001(流水号)
+						String pwarehouseSn = "PS" + seller.getStr("seller_code") + DateUtils.format("yyMMdd", date)
+								+ PurchaseInstockQuery.me().getNewSn();
+
+						Warehouse warehouse = WarehouseQuery.me().findBySellerId(seller.getStr("id"));
+						if (!PurchaseInstockQuery.me().insertByBatchSalesOutStock(printAllNeedInfo, seller,
+								purchaseInstockId, pwarehouseSn, warehouse.getId(), user.getId(), date, sellerId)) {
+							return false;
+						}
+
+						if (!PurchaseInstockDetailQuery.me().insertByBatchSalesOrder(orderProductInfos,
+								purchaseInstockId, seller, date, getRequest())) {
+							return false;
+						}
+					}
+				}
+				return true;
 			}
-			
-			if (!SalesOutstockQuery.me().updateStockOutStatus(printAllNeedInfo.getSalesOutStockId(), user.getId(), stockDate, Consts.SALES_OUT_STOCK_STATUS_OUT, date,remark) ||!SalesOrderQuery.me().checkStatus(printAllNeedInfo.getSalesOutStockId(), user.getId(), date, null)) {
-					return false;	
-				  }
-			
-    		//如果客户种类是直营商，则生成直营商的采购入库单
-			if (Consts.CUSTOMER_KIND_SELLER.equals(printAllNeedInfo.getCustomerKind())) {
-				Record seller = SellerQuery.me().findByCustomerId(printAllNeedInfo.getCustomerId());
-    			String purchaseInstockId =StrKit.getRandomUUID();
-    			
-    			//PS + 100000(机构编号或企业编号6位) + 20171108(时间) + 000001(流水号)
-    			String pwarehouseSn = "PS" + seller.getStr("seller_code") + DateUtils.format("yyMMdd", date) + PurchaseInstockQuery.me().getNewSn();
-    
-    			Warehouse warehouse = WarehouseQuery.me().findBySellerId(seller.getStr("id"));
-    			if(!PurchaseInstockQuery.me().insertByBatchSalesOutStock(printAllNeedInfo, seller, purchaseInstockId, pwarehouseSn, warehouse.getId(), user.getId(), date,sellerId)) {
-    				return false;
-    			}
-    			
-        		   if (!PurchaseInstockDetailQuery.me().insertByBatchSalesOrder(orderProductInfos, purchaseInstockId, seller, date, getRequest())) {
-        			return false;
-        			}
-			   }
-			}
-			return true;
-		  }
-	       });
+		});
 		return isSave;
 	}
-	
-    //获取车销仓库
+
+	// 获取车销仓库
 	public void queryCarWarehouse() {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		List<Warehouse> carWarehouseList = WarehouseQuery.me().getCarWarehouseBySellerId(sellerId);
-        renderAjaxResultForSuccess("success",JSON.toJSON(carWarehouseList));
+		renderAjaxResultForSuccess("success", JSON.toJSON(carWarehouseList));
 	}
-	
-	//检查前台提交的批量出库单子是否有已出库的
+
+	// 检查前台提交的批量出库单子是否有已出库的
 	public boolean checkIsStockOut(String[] outId) {
 		boolean isStockOut = true;
 		for (String s : outId) {
@@ -485,14 +501,15 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		}
 		return isStockOut;
 	}
+
 	@RequiresPermissions(value = { "/admin/salesOutstock/downloading", "/admin/dealer/all",
-	"/admin/all" }, logical = Logical.OR)
-	public void download(){
+			"/admin/all" }, logical = Logical.OR)
+	public void download() {
 		render("download.html");
 	}
-	
+
 	@RequiresPermissions(value = { "/admin/salesOutstock/downloading", "/admin/dealer/all",
-	"/admin/all" }, logical = Logical.OR)
+			"/admin/all" }, logical = Logical.OR)
 	public void downloading() throws UnsupportedEncodingException {
 		String keyword = new String(getPara("k").getBytes("ISO8859-1"), "UTF-8");
 		String startDate = getPara("startDate");
@@ -500,31 +517,32 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		String printStatus = getPara("printStatus");
 		String stockOutStatus = getPara("stockOutStatus");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		
+
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\sales_outstock\\"
 				+ "salesOutstockInfo.xlsx";
-		
-		Page<Record> page = SalesOutstockQuery.me().paginate(1, Integer.MAX_VALUE, keyword, startDate,
-				endDate, printStatus, stockOutStatus, null, dataArea,null,null);
+
+		Page<Record> page = SalesOutstockQuery.me().paginate(1, Integer.MAX_VALUE, keyword, startDate, endDate,
+				printStatus, stockOutStatus, null, dataArea, null, null);
 		List<Record> salesOutstckList = page.getList();
-		
+
 		List<SalesOutstockExcel> excellist = Lists.newArrayList();
 		for (Record record : salesOutstckList) {
-		
+
 			String outOrderId = record.get("id");
 			List<Record> outstockDetail = SalesOutstockDetailQuery.me().findByOutstockId(outOrderId);
-			for(Record re : outstockDetail){
+			for (Record re : outstockDetail) {
 				SalesOutstockExcel excel = new SalesOutstockExcel();
 				BigDecimal creatconverRelate = new BigDecimal(re.get("convert_relate").toString());
 				BigDecimal bigPrice = new BigDecimal(re.get("product_price").toString());
 				BigDecimal count = new BigDecimal(re.get("product_count").toString());
-				String bigCount =(count.intValue())/(creatconverRelate.intValue())+"";
-				String smallCount = (count.intValue())%(creatconverRelate.intValue())+"";
+				String bigCount = (count.intValue()) / (creatconverRelate.intValue()) + "";
+				String smallCount = (count.intValue()) % (creatconverRelate.intValue()) + "";
 				BigDecimal smallPrice = bigPrice.divide(creatconverRelate, 2, BigDecimal.ROUND_HALF_UP);
 				excel.setProductName(re.get("custom_name").toString());
 				excel.setValueName(re.get("valueName").toString());
 				excel.setProductCount(bigCount);
-				excel.setCreatconvertRelate(re.get("convert_relate").toString()+re.get("small_unit").toString()+"/"+re.get("big_unit").toString());
+				excel.setCreatconvertRelate(re.get("convert_relate").toString() + re.get("small_unit").toString() + "/"
+						+ re.get("big_unit").toString());
 				excel.setProductPrice(re.get("product_price").toString());
 				excel.setSmallCount(smallCount);
 				excel.setSmallPrice(smallPrice.toString());
@@ -534,37 +552,37 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 				excel.setCustomerType(record.get("customerName").toString());
 				excel.setContact(record.get("contact").toString());
 				excel.setMobile(record.get("mobile").toString());
-				if(record.get("realname")==null){
+				if (record.get("realname") == null) {
 					excel.setBizUser("");
-				}else{
+				} else {
 					excel.setBizUser(record.get("realname").toString());
 				}
-				if(record.get("receive_type").toString().equals("0")){
+				if (record.get("receive_type").toString().equals("0")) {
 					excel.setReceiveType("应收账款");
-				}else{
+				} else {
 					excel.setReceiveType("现金");
 				}
-				if(record.get("is_print").toString().equals("0")){
+				if (record.get("is_print").toString().equals("0")) {
 					excel.setIsPrint("未打印");
-				}else{
+				} else {
 					excel.setIsPrint("已打印");
 				}
-				if(record.get("status").toString().equals("0")){
+				if (record.get("status").toString().equals("0")) {
 					excel.setStatus("待出库");
-				}else{
+				} else {
 					excel.setStatus("已出库");
 				}
-				if(re.get("is_gift").toString().equals("0")){
+				if (re.get("is_gift").toString().equals("0")) {
 					excel.setIsGift("否");
-				}else{
+				} else {
 					excel.setIsGift("是");
 				}
 				excel.setCreateDate(record.get("create_date").toString());
 				excellist.add(excel);
-				
+
 			}
 		}
-		
+
 		ExportParams params = new ExportParams();
 		Workbook wb = ExcelExportUtil.exportBigExcel(params, SalesOutstockExcel.class, excellist);
 		File file = new File(filePath);
@@ -582,9 +600,9 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 				e.printStackTrace();
 			}
 		}
-		
+
 		ExcelExportUtil.closeExportBigExcel();
-		
+
 		renderFile(new File(filePath));
 	}
 }

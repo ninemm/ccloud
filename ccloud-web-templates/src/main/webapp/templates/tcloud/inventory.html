@@ -7,9 +7,18 @@
         background-color: white!important;
     }
     
-    .menu-left {
+    .menu-left,
+    .menu-right {
         background: #f3f5f7!important;
+    }
+    main {
+        bottom:2.25rem!important;
     } 
+
+    .inventory_name {
+        line-height: 1rem;
+        padding: .2rem 0;
+    }
 </#macro>
 <#macro script>
     var page = 1;
@@ -21,7 +30,7 @@
 	var $noMore = $("#noMore");
 	var loading = false;	
 	var $main = $("#inventory_detailList");
-	var newHtml = $(".product_detail").eq(0).html();
+	var newHtml = $(".model").html();
 	var warehouseIds = "${(wareHouseIds)!}";
 
     var $endNode = null;
@@ -45,8 +54,18 @@
         for(var i = 0 ;i<data.length;i++){
             $($(data[i])[0]).find("span").text(toMoney($($(data[i])[0]).find("span").text()),2);
         }
-        $("#startDate").calendar();
-        $("#endDate").calendar();
+        $("#startDate").calendar({
+			maxDate: function() {
+				return $('#endDate').val()
+			}
+		});
+        $("#endDate").calendar({
+			minDate: function() {
+				var date = new Date($('#startDate').val().replace(/-/g,"/"));
+				date.setDate(date.getDate() - 1);
+				return date.Format("yyyy-MM-dd")
+			}
+ 		});
         $("#startDate").val(startDate);
         $("#endDate").val(startDate);
 		$(document).on("change", "#wareHouse", function() {
@@ -174,9 +193,9 @@
                 <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
             </div>
         </header>
-
-        <main  class="inventory">
-        	 <header class="has-th-list weui-flex">
+    
+        <main class="inventory">
+            <header class="has-th-list weui-flex">
                 <div class="head-search select-area wewui weui-flex__item">
                     <div class="weui-flex">
                         <div class="weui-flex__item">
@@ -184,14 +203,14 @@
                             <i class="icon-sort-desc"></i>
                         </div>
                         <input type="hidden" id="wids" name="wids[]" value="${(wareHouseIds)!}">
-						<div class="weui-flex__item">
-							<input type="text" id="startDate" class="weui-input" readonly>
-							<i class="icon-sort-desc"></i>
-						</div>
-						<div class="weui-flex__item">
-							<input type="text" id="endDate" class="weui-input" readonly>
-							<i class="icon-sort-desc"></i>
-						</div>						
+                        <div class="weui-flex__item">
+                            <input type="text" id="startDate" class="weui-input" readonly>
+                            <i class="icon-sort-desc"></i>
+                        </div>
+                        <div class="weui-flex__item">
+                            <input type="text" id="endDate" class="weui-input" readonly>
+                            <i class="icon-sort-desc no-border"></i>
+                        </div>
                     </div>
                 </div>
             </header>
@@ -200,39 +219,43 @@
                     <#if categoryList?? && (categoryList?size gt 0)>
                         <li id="allProduct" class="active" value="">全部</li>
                     </#if>
-                    <#list categoryList as goodsType >
+                    <#list categoryList as goodsType>
                         <li value="${(goodsType.id)!}">${(goodsType.name)!}</li>
                     </#list>
                 </ul>
             </div>
-            <article class="menu-right infinite" >
-            		<div id="inventory_detailList">
-                    <div class="product_detail" style="display: none;">
-                        <div class="inventory_name" style="font-size: 0.7rem;" id="productName">
-                        </div>
-                        <div class="weui-flex" style="margin:0.1rem;">
-                            <div class="weui-flex__item">出库：<span class="green-button" id="outCount"></span>
-                            </div>
-                            <div class="weui-flex__item">入库：<span class="yellow-button" id="inCount"></span>
-                            </div>
-                        </div>
-                        <div class="weui-flex">
-                            <div class="weui-flex__item">库存：<span class="blue-button" id="balanceCount"></span></div>
-                        </div>
-                        <div class="weui-flex">
-                            <span class="seller-name" id="sellerName"><i class="icon-map-pin blue ft16"></i>&nbsp;&nbsp;</span>
-                        </div>
-                    </div>
-                    </div>
-					<div class="weui-loadmore" id="loading" style="display: none;">
-					  <i class="weui-loading"></i>
-					  <span class="weui-loadmore__tips">正在加载</span>
-					</div>
-					<div class="weui-loadmore weui-loadmore_line" id="noMore" style="display: none;">
-					  <span class="weui-loadmore__tips">暂无数据</span>
-					</div>
-	        </article>
+            <article class="menu-right infinite">
+                <div id="inventory_detailList"></div>
+                <!-- <div class="weui-loadmore" id="loading" style="display: none;">
+    					  <i class="weui-loading"></i>
+    					  <span class="weui-loadmore__tips">正在加载</span>
+    					</div>
+    					<div class="weui-loadmore weui-loadmore_line" id="noMore" style="display: none;">
+    					  <span class="weui-loadmore__tips">暂无数据</span>
+    					</div> -->
+            </article>
         </main>
     </div>
-    <#include "_inc/_goback.html" />
+    <div class="model" style="display: none;">
+        <div class="inventory_name" style="font-size: 0.7rem;" id="productName">
+        </div>
+        <div class="weui-flex" style="margin:0.1rem;">
+            <div class="weui-flex__item">出库：
+                <span class="green-button" id="outCount"></span>
+            </div>
+            <div class="weui-flex__item">入库：
+                <span class="yellow-button" id="inCount"></span>
+            </div>
+        </div>
+        <div class="weui-flex">
+            <div class="weui-flex__item">库存：
+                <span class="blue-button" id="balanceCount"></span>
+            </div>
+        </div>
+        <div class="weui-flex">
+            <span class="seller-name" id="sellerName">
+                <i class="icon-map-pin blue ft16"></i>&nbsp;&nbsp;</span>
+        </div>
+    </div>
+<#include "_inc/_goback_bottom.html" />
 </@layout>

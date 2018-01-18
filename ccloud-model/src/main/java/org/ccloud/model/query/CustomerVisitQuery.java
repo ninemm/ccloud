@@ -21,7 +21,6 @@ import java.util.List;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Record;
-import com.sun.org.apache.bcel.internal.generic.Select;
 import org.ccloud.model.CustomerVisit;
 
 import com.jfinal.plugin.activerecord.Page;

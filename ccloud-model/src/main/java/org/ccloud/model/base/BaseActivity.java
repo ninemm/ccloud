@@ -97,6 +97,13 @@ public abstract class BaseActivity<M extends BaseActivity<M>> extends JModel<M> 
 	public String getId() {
 		return getStr("id");
 	}
+	public void setSellerId(String sellerId) {
+		set("seller_id", sellerId);
+	}
+
+	public String getSellerId() {
+		return getStr("seller_id");
+	}
 
 	public void setCode(String code) {
 		set("code", code);

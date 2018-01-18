@@ -94,7 +94,7 @@ public class GroupQuery extends JBaseQuery {
 	}
 
 	public List<Group> findByDeptId() {
-		String sql = "SELECT * from `group` where dept_id = '0' and SUBSTRING(group_code,5 )>SUBSTRING('role02',5) and SUBSTRING(group_code,5)<SUBSTRING('role21',5)";
+		String sql = "SELECT * from `group` where dept_id = '0' and SUBSTRING(group_code,5 )>SUBSTRING('role01',5) and SUBSTRING(group_code,5)<SUBSTRING('role21',5)";
 		return DAO.find(sql);
 	}
 	

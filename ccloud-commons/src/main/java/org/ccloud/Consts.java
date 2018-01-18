@@ -186,6 +186,9 @@ public class Consts {
 	public static final String SELLER_TYPE_DEALER= "0";//账套类型：经销商
 	public static final String SELLER_TYPE_SELLER = "1";//直营商
 	
+	public static final Integer SELLER_PRODUCT_SOURCE_DEALER= 0;//产品来源：经销商
+	public static final Integer SELLER_PRODUCT_SOURCE_OWN = 1;//自己	
+	
 	public static final String OBJECT_TYPE_ORDER= "order";//订单
 	public static final String OBJECT_TYPE_CUSTOMER = "customer";//客户
 	public static final String OBJECT_TYPE_CUSTOMER_VISIT= "visit";//拜访
@@ -204,4 +207,27 @@ public class Consts {
 	public static String WAREHOUSE_TYPE_SELLER = "1";// 销售商仓库
 	public static String WAREHOUSE_TYPE_CAR = "2";// 车销仓库
 	
+	//活动类型
+	public static String CATEGORY_NORMAL="101101" ; //普通活动
+	public static String CATEGORY_INVEST="101101" ; //投入活动
+	
+	//投入类型
+	public static String INVEST_TYPE = "activity_invest";//投入的类型
+	public static String INVEST_SHOP="110001" ; //商品
+	public static String INVEST_MATTER="110002" ; //物料
+	public static String INVEST_ACTIVITY="110003" ; //费用活动费
+	
+	//客户参与活动的时间区间
+	public static String TIME_INTERVAL_ONE="100101";//1个月
+	public static String TIME_INTERVAL_TWO="100102";//2个月
+	public static String TIME_INTERVAL_THREE="100103";//3个月
+	public static String TIME_INTERVAL_FOUR="100104";//4个月
+	public static String TIME_INTERVAL_FIVE="100105";//5个月
+	public static String TIME_INTERVAL_SIX="100106";//6个月
+	public static String TIME_INTERVAL_SEVEN="100107";//7个月
+	public static String TIME_INTERVAL_EIGHT="100108";//8个月
+	public static String TIME_INTERVAL_NINE="100109";//9个月
+	public static String TIME_INTERVAL_TEN="100110";//10个月
+	public static String TIME_INTERVAL_ELEVEN="100111";//11个月
+	public static String TIME_INTERVAL_TWELVE="100112";//12个月
 }

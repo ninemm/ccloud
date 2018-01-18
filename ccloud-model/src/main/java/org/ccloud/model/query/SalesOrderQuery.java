@@ -1331,7 +1331,7 @@ public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procK
 	}
 
 	public List<Record> getMyOrderByProduct(String startDate, String endDate, String dayTag, String productType, String sellerId, 
-			String userId, String customerId, String isGift, String dataArea) {
+			String userId, String customerId, String isGift, String dataArea, String deptId, String orderTag, String isHide) {
 		if (dayTag != null) {
 			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
 			startDate = date[0];
@@ -1354,9 +1354,13 @@ public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procK
 			needWhere = appendIfNotEmptyWithLike(fromBuilder, " cc.data_area", dataArea, params, needWhere);
 			needWhere = appendIfNotEmpty(fromBuilder, " c.seller_id", sellerId, params, needWhere);
 		}
+		if (StrKit.notBlank(isHide)) {
+			needWhere = appendIfNotEmpty(fromBuilder, "cs.is_source", Consts.SELLER_PRODUCT_SOURCE_DEALER, params, needWhere);
+		}
 		needWhere = appendIfNotEmpty(fromBuilder, " gt.id", productType, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "c.biz_user_id", userId, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "c.customer_id", customerId, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "cc.dept_id", deptId, params, needWhere);
 		
 		if (needWhere) {
 			fromBuilder.append(" where c.status not in (1001,1002) ");
@@ -1380,7 +1384,13 @@ public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procK
 			params.add(endDate);
 		}
 		fromBuilder.append("GROUP BY cs.custom_name ");
-		fromBuilder.append("ORDER BY totalAmount desc ");
+		
+		if (StrKit.notBlank(orderTag)) {
+			fromBuilder.append("ORDER BY "+ orderTag +" desc ");
+		} else {
+			fromBuilder.append("ORDER BY totalAmount desc ");
+		}
+		
 		if (params.isEmpty())
 			return Db.find(fromBuilder.toString());
 
@@ -1904,5 +1914,49 @@ public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procK
 	public List<Record> findByDataArea(String dataArea){
 		String sql = "select DISTINCT u.id,u.realname from cc_sales_order o LEFT JOIN user u on u.id = o.biz_user_id where o.data_area like '"+dataArea+"'";
 		return Db.find(sql);
+	}
+
+	public List<Record> getDepartmentCount(String startDate, String endDate, String dayTag, String sellerId,
+			String dataArea, String orderTag) {
+		if (dayTag != null) {
+			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
+			startDate = date[0];
+			endDate = date[1];
+		}
+		LinkedList<Object> params = new LinkedList<Object>();
+		StringBuilder fromBuilder = new StringBuilder("SELECT IFNULL(SUM(cc.total_count),0) as productCount, IFNULL(sum(cc.total_amount),0) as totalAmount, ");
+		fromBuilder.append("COUNT(*) as orderCount, d.dept_name, d.id FROM cc_sales_order cc ");
+		fromBuilder.append("LEFT JOIN department d ON cc.dept_id = d.id ");
+		boolean needWhere = true;
+		
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, " cc.data_area", dataArea, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, " cc.seller_id", sellerId, params, needWhere);
+		
+		if (needWhere) {
+			fromBuilder.append(" where cc.status not in (1001,1002)");
+		} else {
+			fromBuilder.append(" and cc.status not in (1001,1002)");
+		}
+
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and cc.create_date >= ? ");
+			params.add(startDate);
+		}
+
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and cc.create_date <= ? ");
+			params.add(endDate);
+		}
+		fromBuilder.append("GROUP BY d.id ");
+		
+		if (StrKit.notBlank(orderTag)) {
+			fromBuilder.append("ORDER BY "+ orderTag + " desc ");
+		} else {
+			fromBuilder.append("ORDER BY totalAmount desc ");
+		}		
+		if (params.isEmpty())
+			return Db.find(fromBuilder.toString());
+
+		return Db.find(fromBuilder.toString(), params.toArray());
 	}
 }
