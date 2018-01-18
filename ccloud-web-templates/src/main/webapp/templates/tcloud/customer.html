@@ -20,7 +20,7 @@
 
     $(function() {
 
-    		<#if history??>
+        <#if history??>
   			var region = getItemBykey("region");
   			var customerType = getItemBykey("customerType");
   			var ifOrder = getItemBykey("ifOrder");
@@ -52,51 +52,43 @@
 			setItemBykey("ifOrder", $("#if-order").val());
 			refresh();
 		});
-    
 
-        //筛选项获取
-        $.ajax({
-            url:"${CPATH}/customer/getCustomerRegionAndType",
-            type:"post",
-            dataType:"json",
-            success:function(data) {
-
-                $("#region").select({
-                title: "选择业务员",
-                items: data.region
-                });
-
-                $("#customer-type").select({
-                title: "选择客户类型",
-                items: data.customerType
-                });
-
-                $("#if-order").select({
-                    title: "是否下单",
-                    items: [{
-                        title: "全部客户", value: ""
-                        },{
-                        title: "已下单", value: "0"
-                        },{
-                        title: "未下单", value: "1"
-                        },{
-                        title: "近一周未下单", value: "2"
-                        },{
-                        title: "近一月未下单", value: "3"
-                        },{
-                        title: "近三月未下单", value: "4"
-                        },{
-                        title: "近六月未下单", value: "5"
-                    }]
-                });
-
-                var str = '';
-                for(var i = 0; i < data.searchArea.length; i++)
-                    if(i == 0) str = str + '<span class="red-button" data-id="' + data.searchArea[i].value + '">'+ data.searchArea[i].title + '</span>';
-                    else str = str + '<span data-id="' + data.searchArea[i].value + '">'+ data.searchArea[i].title + '</span>';
-                $("#getDate").append(str);
-            }
+        $("#region").select({
+            title: "选择业务员",
+            items: ${region!}
         });
+
+        $("#customer-type").select({
+            title: "选择客户类型",
+            items: ${customerType!}
+        });
+
+        $("#if-order").select({
+            title: "是否下单",
+            items: [{
+                title: "全部客户", value: ""
+            },{
+                title: "已下单", value: "0"
+            },{
+                title: "未下单", value: "1"
+            },{
+                title: "近一周未下单", value: "2"
+            },{
+                title: "近一月未下单", value: "3"
+            },{
+                title: "近三月未下单", value: "4"
+            },{
+                title: "近六月未下单", value: "5"
+            }]
+        });
+
+        var str = '';
+        var searchArea = ${searchArea!};
+        for(var i = 0; i < searchArea.length; i++)
+            if(i == 0) str = str + '<span class="red-button" data-id="' + searchArea[i].value + '">'+ searchArea[i].title + '</span>';
+            else str = str + '<span data-id="' + searchArea[i].value + '">'+ searchArea[i].title + '</span>';
+        $("#getDate").append(str);
+
     });
 
     var paramData = function() {
@@ -315,90 +307,12 @@
             </div>
         </header>
 	    <article  class="infinite">
-	        <div id = "customerList">
-	            <#if customerList??>
-	                    <#list customerList.list as customer>
-	                         <div class="weui-panel weui-panel_access">
-	                            <div class="weui-flex">
-	                                <a class="weui-flex__item customer-info" href="/customer/edit?sellerCustomerId=${(customer.sellerCustomerId)!}">
-	                                    <p class="ft14">${(customer.customer_name)!}</p>
-	                                    <p class="gray">${(customer.contact)!}/${(customer.mobile)!}</p>
-	                                </a>
-	                                <div class="weui-flex__item customer-href">
-	                                    <div class="weui-flex">
-	                                        <a href="tel:${(customer.mobile)!}"class="weui-flex__item">
-	                                            <p>
-	                                                <i class="icon-phone green"></i>
-	                                            </p>
-	                                            <p>电话</p>
-	                                        </a>
-	                                        <@shiro.hasPermission name="/admin/salesOrder">
-	                                        <a class="weui-flex__item" href="${(CPATH)!}/customer/historyOrder?sellerCustomerId=${(customer.sellerCustomerId)!}&customerName=${(customer.customer_name)!}">
-	                                            <p>
-	                                                <i class="icon-file-text-o blue"></i>
-	                                            </p>
-	                                            <p>订单</p>
-	                                        </a>
-	                                        </@shiro.hasPermission>
-	                                        <@shiro.hasPermission name="/admin/customerVisit">
-	                                        <a class="weui-flex__item" href="${CPATH}/customerVisit/one?id=${(customer.sellerCustomerId)!}&name=${(customer.customer_name)!}">
-	                                            <p>
-	                                                <i class="icon-paw" style="color:#ff9800"></i>
-	                                            </p>
-	                                            <p>拜访</p>
-	                                        </a>
-	                                        </@shiro.hasPermission>
-	                                        <a class="weui-flex__item relative" href="/customer/edit?sellerCustomerId=${(customer.sellerCustomerId)!}">
-	                                            <i class="icon-chevron-right gray"></i>
-	                                        </a>
-	                                    </div>
-	                                </div>
-	                            </div>
-	                            <hr />
-	                            <div class="operate-btn">
-	                            	<@shiro.hasPermission name="/admin/customerVisit/add">
-	                                <div class="button white-button fl" onclick="newVisit({customerName:'${(customer.customer_name)}',
-                                                                                            sellerCustomerId:'${(customer.sellerCustomerId)}',
-                                                                                            contact:'${(customer.contact)}',
-                                                                                            mobile:'${(customer.mobile)}',
-                                                                                            address:'${(customer.address)}'})">客户拜访</div>
-                                   	</@shiro.hasPermission>
-                                   	<#if customer.customer_kind == '100402'>
-                                    <div class="button red-button fr" onclick="newOrder({customerName:'${(customer.customer_name)}',
-                                                                                            sellerCustomerId:'${(customer.sellerCustomerId)}',
-                                                                                            contact:'${(customer.contact)}',
-                                                                                            mobile:'${(customer.mobile)}',
-                                                                                            address:'${(customer.address)}'})">下订单</div>
-									<#else>
-									<@shiro.hasPermission name="/admin/salesOrder/add">
-                                    <div class="button red-button fr" onclick="newOrder({customerName:'${(customer.customer_name)}',
-                                                                                            sellerCustomerId:'${(customer.sellerCustomerId)}',
-                                                                                            contact:'${(customer.contact)}',
-                                                                                            mobile:'${(customer.mobile)}',
-                                                                                            address:'${(customer.address)}'})">下订单</div>
-									</@shiro.hasPermission>									
-									</#if>                                                                                    
-	                            </div>
-	                            <p class="gray">
-	                                <span class="icon-map-marker ft16 green"></span>
-	                                ${(customer.prov_name)!} ${(customer.city_name)!} ${(customer.country_name)!} ${(customer.address)!}
-	                            </p>
-	                        </div>
-	                    </#list>
-	            </#if>
+	        <div id="customerList">
 	        </div>
-            <#if customerList??>
-	        <#if customerList.totalRow = 0>
-	            <div class="weui-loadmore weui-loadmore_line">
-	                <span class="weui-loadmore__tips">暂无数据</span>
-	            </div>
-	            <#elseif customerList.totalRow &gt; 10>
-	                <div class="weui-loadmore">
-	                    <i class="weui-loading"></i>
-	                    <span class="weui-loadmore__tips">正在加载</span>
-	                </div>
-	        </#if>
-            </#if>
+            <div class="weui-loadmore">
+                <i class="weui-loading"></i>
+                <span class="weui-loadmore__tips">正在加载</span>
+            </div>
 	    </article>
     </article>
 </div>

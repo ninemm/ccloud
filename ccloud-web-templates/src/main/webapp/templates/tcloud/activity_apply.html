@@ -6,6 +6,10 @@
 	#customerList {
 		background: #f7f7f7;
 	}
+	.select-customer {
+		text-align: left!important;
+		width: -webkit-fill-available!important;
+	}
 </#macro>
 <#macro script_import>
 </#macro>
@@ -60,7 +64,7 @@ var $activity = $("#activityList");
 
 function addActivity(){
 
-	$activity.append("<section class='weui-panel weui-panel_access activity-detail-item'>" + newHtml + "</section>");
+	$activity.append("<section class='weui-panel weui-panel_access activity-detail-item ft14'>" + newHtml + "</section>");
 	var $newActivityDetail = $activity.find(".activity-detail-item:last");
 	initActivityChange($newActivityDetail);
 
@@ -222,82 +226,69 @@ function doChange(key){
 <@layout>
 <body id="fee-application" class="weui-content">
 <form action="${CPATH}/activity/apply" method="post" id="form">
-  <main>
-    <section class="weui-panel weui-panel_access order-customer-info">
-      <div class="weui-cell weui-cell_access">
-        <div class="weui-cell__bd">
-          <div class="order-customer-info-title">
-            客户名称
-            <span class="require">*</span>
-          </div>
-			<input type="hidden" name="sellerCustomerIds" id="sellerCustomerIds" value="">
-          <input type="text" placeholder="请选择客户" class="weui-input select-customer" id="sellerCustomerNames" readonly>
-        </div>
-        <span class="weui-cell__ft"></span>
-      </div>
-      <div class="weui-cell weui-cell_access">
-        <div class="weui-cell__bd">
-          <div class="order-customer-info-title">
-            客户信息
-            <span class="require">*</span>
-          </div>
-          <input type="text" placeholder="请输入客户信息" class="weui-input">
-        </div>
-      </div>
-      <div class="weui-cell weui-cell_access">
-        <div class="weui-cell__bd">
-          <textarea placeholder="备注说明（70字以内）" name="content" class="fr"></textarea>
-        </div>
-      </div>
-    </section>
-    <div class="weui-cells__title">活动明细</div>
-	  <div id="activityList">
-		<section class="weui-panel weui-panel_access activity-detail-item">
-		  <div class="weui-cell weui-cell_access select-area">
-			<input type="text" class="weui-input activity-item" id="title" readonly placeholder="请选择活动项目">
-			<input type="hidden" name="acticity_id" id="acticityId">
-			<input type="hidden" name="visit_num" id="visitNum">
-			<i class="icon-sort-desc"></i>
-			<p class="orange ft14" id="delActivity">删除</p>
-		  </div>
-		  <div class="weui-cell weui-cell_access">
-			<div class="weui-cell__bd">
-			  <div class="order-customer-info-title">
-				开始日期
-				<span class="require"></span>
-			  </div>
-			  <input type="text" class="weui-input fr" id="startTime" readonly>
+	<main>
+		<section class="weui-panel weui-panel_access order-customer-info">
+			<div class="weui-cell weui-cell_access">
+				<div class="weui-cell__bd">
+					<input type="hidden" name="sellerCustomerIds" id="sellerCustomerIds" value="">
+					<input type="text" class="weui-input select-customer" id="sellerCustomerNames" readonly>
+				</div>
+				<span class="weui-cell__ft"></span>
 			</div>
-		  </div>
-		  <div class="weui-cell weui-cell_access">
-			<div class="weui-cell__bd">
-			  <div class="order-customer-info-title">
-				结束日期
-				<span class="require"></span>
-			  </div>
-			  <input type="text" class="weui-input fr" id="endTime" readonly>
+			<div class="weui-cell weui-cell_access">
+				<div class="weui-cell__bd">
+					<textarea placeholder="备注说明（70字以内）" name="content" class="width-100"></textarea>
+				</div>
 			</div>
-		  </div>
-		  <div class="weui-cell weui-cell_access">
-			<div class="weui-cell__bd">
-			  <div class="order-customer-info-title">
-				预计金额
-				<span class="require"></span>
-			  </div>
-			  <div class="fr t-r">
-				<input type="text" class="weui-input" id="investAmount" readonly>&nbsp;&nbsp;元
-			  </div>
-			</div>
-		  </div>
 		</section>
-	  </div>
-    <section class="weui-panel weui-panel_access" id="addActivity">
-      <div class="weui-cell weui-cell_access t-c ft14">
-        <p class="width-100 blue">
-          <i class="icon-plus-circle"></i>添加活动</p>
-      </div>
-    </section>
-	  <!--    <section class="weui-cells weui-cells_form">
+		<div class="weui-cells__title">活动明细</div>
+		<div id="activityList">
+			<section class="weui-panel weui-panel_access activity-detail-item ft14">
+				<div class="weui-cell weui-cell_access select-area">
+					<input type="text" class="weui-input activity-item" id="title" readonly placeholder="请选择活动项目">
+					<input type="hidden" name="acticity_id" id="acticityId">
+					<input type="hidden" name="visit_num" id="visitNum">
+					<i class="icon-sort-desc"></i>
+					<p class="orange ft14" id="delActivity">删除</p>
+				</div>
+				<div class="weui-cell weui-cell_access">
+					<div class="weui-cell__bd">
+						<span>
+							开始日期
+							<span class="require"></span>
+						</span>
+						<input type="text" class="weui-input fr" id="startTime" readonly>
+					</div>
+				</div>
+				<div class="weui-cell weui-cell_access">
+					<div class="weui-cell__bd">
+						<span>
+							结束日期
+							<span class="require"></span>
+						</span>
+						<input type="text" class="weui-input fr" id="endTime" readonly>
+					</div>
+				</div>
+				<div class="weui-cell weui-cell_access">
+					<div class="weui-cell__bd">
+						<span>
+							预计金额
+							<span class="require"></span>
+						</span>
+						<div class="fr t-r">
+							<input type="text" class="weui-input" id="investAmount" readonly>&nbsp;&nbsp;元
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+		<section class="weui-panel weui-panel_access" id="addActivity">
+			<div class="weui-cell weui-cell_access t-c ft14">
+				<p class="width-100 blue">
+					<i class="icon-plus-circle"></i>添加活动</p>
+			</div>
+		</section>
+		<!--    <section class="weui-cells weui-cells_form">
 			<div class="weui-cell">
 			  <div class="weui-cell__bd">
 				<div class="weui-uploader">
@@ -324,7 +315,8 @@ function doChange(key){
 			  </div>
 			</div>
 		  </section>-->
-	  <article id="combin-filter" class="customerMulti">
+	</main>
+	<article id="combin-filter" class="customerMulti">
 		<div id="customer">
 			<header>
 				<div class="weui-search-bar" id="searchBar">
@@ -361,8 +353,7 @@ function doChange(key){
 					<div id="customerList">
 						<div class="weui-panel weui-panel_access weui-flex customerSelect" style="display: none">
 							<div class="check-box">
-								<input type="checkbox" name="sellerCustomerId" id="sellerCustomerId"
-									   class="weui-agree__checkbox">
+								<input type="checkbox" name="sellerCustomerId" id="sellerCustomerId" class="weui-agree__checkbox">
 							</div>
 							<div class="weui-flex__item">
 								<div class="weui-flex">
@@ -392,22 +383,20 @@ function doChange(key){
 			</article>
 		</div>
 		<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
-            <div class="total bg-white weui-flex__item t-l">
-               <input type="checkbox" name="" id="" class="weui-agree__checkbox select-all">
+			<div class="total bg-white weui-flex__item t-l">
+				<input type="checkbox" name="" id="" class="weui-agree__checkbox select-all">
 				<span class="ft12">全选</span>
-                <span>&nbsp;&nbsp;合计:</span>
-                <span class="ft12">12</span>
-            </div>
+				<span>&nbsp;&nbsp;合计:</span>
+				<span class="ft12">12</span>
+			</div>
 			<button id="confirm" type="button" class="place-order red-button white">确认</button>
-        </footer>
+		</footer>
 	</article>
-	</main>
 </form>
-  
-  <#include "_inc/_goback.html" />
-  <div class="layer"></div>
-  <footer class="weui-footer weui-footer_fixed-bottom weui-flex">
-    <button id="apply" class="red-button width-100">提交申请</button>
-  </footer>
+
+<#include "_inc/_goback.html" />
+<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
+	<button id="apply" class="red-button width-100">提交申请</button>
+</footer>
 </body>
 </@layout>

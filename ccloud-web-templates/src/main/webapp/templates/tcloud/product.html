@@ -18,8 +18,7 @@
 
 <#macro script>
 $(function() {
-	window.removeEventListener('touchmove', addStopTouchendPropagationListener, true);
-    $(document).on("touchstart", ".gift-open", function () {
+    $(document).on("click", ".gift-open", function () {
         if ($(this).text() === "展开") {
 	        $(this).text("收起");
 	        $(this).parent().next().show();
@@ -27,7 +26,7 @@ $(function() {
 	        $(this).text("展开");
 	        $(this).parent().next().hide();
         }
-    }).on("touchstart", "#sidebar li", function () {
+    }).on("click", "#sidebar li", function () {
         $(this).addClass("active").siblings().removeClass("active");
         var index = $(this).index();
      	$('.type').eq(index).show().siblings('.type').hide();
@@ -44,14 +43,14 @@ $(function() {
     	keyword = $(this).val();
 		changeInit();
 		
-    }).on("touchstart", "#searchCancel", function () {
+    }).on("click", "#searchCancel", function () {
     	keyword = $(this).val();
 		changeInit();
 		
-    }).on("touchstart", "#shoppingCart", function () {
+    }).on("click", "#shoppingCart", function () {
     	shoppingCart();
     	
-    }).on("touchstart", "#placeOrder", function () {
+    }).on("click", "#placeOrder", function () {
     	order();
     	
     }).on("click", ".operate:first-child", function () { //减少商品数量

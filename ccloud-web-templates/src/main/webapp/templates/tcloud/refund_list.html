@@ -37,8 +37,8 @@
 			combo();
 		}).on("change", "#date", function() {
 			getDateOrder();
-		}).off("touchend", "#combin-filter .confirm-search-btn")
-		.on("touchend", "#combin-filter .confirm-search-btn", function() {
+		}).off("click", "#combin-filter .confirm-search-btn")
+		.on("click", "#combin-filter .confirm-search-btn", function() {
 			startDate = $('#start-date').val();
 			endDate = $('#end-date').val() + ' 23:59:59';
 			setItemBykey("startDate", startDate);

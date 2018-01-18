@@ -15,7 +15,7 @@
 </#macro>
 <#macro script>
 	$(function() {
-		$(document).on("touchstart", "#sidebar li", function () {
+		$(document).on("click", "#sidebar li", function () {
 			$(this).addClass("active").siblings().removeClass("active");
 		})
 	})

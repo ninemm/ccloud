@@ -22,15 +22,15 @@
 <#macro script>
 
 	$(function () {
-	    $(document).on('touchend', '.menu', function () {
+	    $(document).on('click', '.menu', function () {
 	        var $this = $(this);
 	        var index = $this.index()-1;
 	        $this.addClass('red-button').siblings().removeClass('red-button');
 	        $('.index-info').find('.weui-cells:eq(' + index + ')').show().siblings().hide();
 	        return false;
 		})
-		.on('touchstart', '.top-right-menu-btn', openTopRightMenu)
-		.on('touchstart', '.top-right-menu-layer', closeTopRightMenu);
+		.on('click', '.top-right-menu-btn', openTopRightMenu)
+		.on('click', '.top-right-menu-layer', closeTopRightMenu);
 		
 		$('.week').text($.week());
 	    $('.day').text($.today());
