@@ -39,19 +39,17 @@
 		});
 		$('#post-search-input').val("");
 		
-		
 		$.ajax({
-				url:"${CPATH}/admin/inventoryDetail/show_sellerProductName",
-				type:"post",
-				dataType:"json",
-				success:function(data){
-					
-					$.each(data,function(index, item) {
-							var html ='<option value="'+item.id+'">'+item.custom_name+'</option>';
-							$("#sellerProductId").append(html);
-						});
-				}
-			});
+			url:"${CPATH}/admin/inventoryDetail/show_sellerProductName",
+			type:"post",
+			dataType:"json",
+			success:function(data){
+				$.each(data,function(index, item) {
+					var html ='<option value="'+item.id+'">'+item.custom_name+'</option>';
+					$("#sellerProductId").append(html);
+				});
+			}
+		});
 	});
 
 var validatorFields = {

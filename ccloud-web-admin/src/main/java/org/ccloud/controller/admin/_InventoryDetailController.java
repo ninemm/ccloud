@@ -54,7 +54,6 @@ public class _InventoryDetailController extends JBaseCRUDController<InventoryDet
 	}
 	@RequiresPermissions("/admin/salesOrder/check")
 	public void list() {
-		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerId = getSessionAttr("sellerId");
 		String keyword = getPara("k");
 		String startDate = getPara("startDate");
@@ -66,7 +65,7 @@ public class _InventoryDetailController extends JBaseCRUDController<InventoryDet
 			keyword = StringUtils.urlDecode(keyword);
 			setAttr("k", keyword);
 		}
-		Page<InventoryDetail> page = InventoryDetailQuery.me()._in_paginate(getPageNumber(), getPageSize(),keyword,sellerId,dataArea,startDate, endDate,sellerProductId,sort,sortOrder);
+		Page<InventoryDetail> page = InventoryDetailQuery.me()._in_paginate(getPageNumber(), getPageSize(),keyword,sellerId,startDate, endDate,sellerProductId,sort,sortOrder);
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);
 	}
@@ -80,7 +79,6 @@ public class _InventoryDetailController extends JBaseCRUDController<InventoryDet
 	
 	public void outList(){
 		String sellerId = getSessionAttr("sellerId");
-		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
         String keyword = getPara("k");
         String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
@@ -91,7 +89,7 @@ public class _InventoryDetailController extends JBaseCRUDController<InventoryDet
             keyword = StringUtils.urlDecode(keyword);
             setAttr("k", keyword);
         }
-		Page<InventoryDetail> page = InventoryDetailQuery.me()._out_paginate(getPageNumber(), getPageSize(),keyword,sellerId,dataArea,startDate, endDate,sellerProductId,sort,sortOrder);
+		Page<InventoryDetail> page = InventoryDetailQuery.me()._out_paginate(getPageNumber(), getPageSize(),keyword,sellerId,startDate, endDate,sellerProductId,sort,sortOrder);
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);
 	}
