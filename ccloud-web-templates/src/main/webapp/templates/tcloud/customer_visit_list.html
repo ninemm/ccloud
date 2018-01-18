@@ -64,32 +64,25 @@
 			setItemBykey("statusId", $("#customer-status").data('values'));
 			setItemBykey("status", $("#customer-status").val());
 			refresh();
-		});   
-    
-        $.ajax({
-            url:"${CPATH}/customerVisit/getSelect",
-            type:"post",
-            dataType:"json",
-            success:function(data) {
-                $("#customer-type").select({
-                    title: "选择客户类型",
-                    items: data.type
-                });
-                $("#customer-nature").select({
-                    title: "选择客户性质",
-                    items: data.nature
-                });
-                $("#customer-level").select({
-                    title: "选择客户级别",
-                    items: data.level
-                });
+		});
 
-                $("#customer-status").select({
-                title: "选择审核状态",
-                items: data.status
-                });
-            }
-        })
+        $("#customer-type").select({
+            title: "选择客户类型",
+            items: ${type!}
+        });
+        $("#customer-nature").select({
+            title: "选择客户性质",
+            items: ${nature!}
+        });
+        $("#customer-level").select({
+            title: "选择客户级别",
+            items: ${level!}
+        });
+
+        $("#customer-status").select({
+            title: "选择审核状态",
+            items: ${status!}
+        });
     });
 
     var paramData = function() {
@@ -222,36 +215,11 @@
         </header>
         <main  class="infinite">
             <div id="visitList">
-                <#if visitList??>
-                    <#list visitList.list as visit>
-                        <a class="weui-cell weui-cell_access" href="${(CPATH)}/customerVisit/detail?id=${(visit.id)!}">
-                            <div class="weui-cell__bd ft14">
-                                <p>${(visit.customer_name)!}</p>
-                                <p class="gray ft12">${(visit.contact)!}/${(visit.mobile)!}
-                                    <span class="fr">${(visit.create_date)!}</span>
-                                </p>
-                                <p>活动类型：
-                                    <span class="orange">${DICT_NAME(visit.question_type)}</span>
-                                    <span class="green fr">${DICT_NAME(visit.status)}</span>
-                                </p>
-                            </div>
-                            <span class="weui-cell__ft"></span>
-                        </a>
-                    </#list>
-                </#if>
             </div>
-            <#if visitList??>
-                <#if visitList.totalRow = 0>
-                    <div class="weui-loadmore weui-loadmore_line">
-                        <span class="weui-loadmore__tips">暂无数据</span>
-                    </div>
-                    <#elseif visitList.totalRow &gt; 10>
-                        <div class="weui-loadmore">
-                            <i class="weui-loading"></i>
-                            <span class="weui-loadmore__tips">正在加载</span>
-                        </div>
-                </#if>
-            </#if>
+                <div class="weui-loadmore">
+                    <i class="weui-loading"></i>
+                    <span class="weui-loadmore__tips">正在加载</span>
+                </div>
         </main>
     </div>
     <#if !id??>
