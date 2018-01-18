@@ -64,11 +64,12 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		String keyword = getPara("k");
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
+			setAttr("k", keyword);
 		}
-
+		String sellerId = getSessionAttr("sellerId");
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
-		Page<Activity> page = ActivityQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate);
+		Page<Activity> page = ActivityQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate,sellerId);
 		
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
@@ -99,32 +100,40 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 	}
 	public void edit() {
 		String id = getPara("id");
-		Activity activity = ActivityQuery.me().findById(id);
-		setAttr("activity", activity);
-		String[] imags = activity.getImageListStore().split(",");
-		List<String> imageList = new ArrayList<String>();
-		for(int i=0;i<imags.length;i++) {
-			imageList.add(imags[i]);
+		List<Dict> dicts = DictQuery.me().findDictByType(Consts.INVEST_TYPE);
+		setAttr("dicts",dicts);
+		if(!StrKit.isBlank(id)) {
+			Activity activity = ActivityQuery.me().findById(id);
+			setAttr("activity", activity);
+			String[] imags = activity.getImageListStore().split(",");
+			List<String> imageList = new ArrayList<String>();
+			for(int i=0;i<imags.length;i++) {
+				imageList.add(imags[i]);
+			}
+			setAttr("imageList", imageList);
+			String[] area = activity.getAreaType().split("-");
+			List<String> areaList = new ArrayList<String>();
+			for(int i=0;i<area.length;i++) {
+				areaList.add(area[i]);
+			}
+			setAttr("areaList",areaList);
+			String[] investType = activity.getInvestType().split(",");
+			List<String> investTypeList = new ArrayList<String>();
+			for(int i=0;i<investType.length;i++) {
+				investTypeList.add(investType[i]);
+			}
+			setAttr("investTypeList",investTypeList);
+			setAttr("startDate",  DateFormatUtils.format(activity.getStartTime(), "yyyy-MM-dd"));
+			setAttr("endDate", DateFormatUtils.format(activity.getEndTime(), "yyyy-MM-dd"));
 		}
-		setAttr("imageList", imageList);
-		String[] area = activity.getAreaType().split("/");
-		List<String> areaList = new ArrayList<String>();
-		for(int i=0;i<area.length;i++) {
-			areaList.add(area[i]);
-		}
-		setAttr("areaList",areaList);
-		setAttr("startDate",  DateFormatUtils.format(activity.getStartTime(), "yyyy-MM-dd"));
-		setAttr("endDate", DateFormatUtils.format(activity.getEndTime(), "yyyy-MM-dd"));
 	}
 	
 	@Before(Tx.class)
 	public void save() {
 		final Activity activity = getModel(Activity.class);
 		String sellerId = getSessionAttr("sellerId");
-		String investType = getPara("invest_type");
 		String [] imagePath = getParaValues("imageUrl[]");
-//		String areaCodes = getPara("areaCodes");
-		
+		String investTypes = getPara("investType");
 		//存储路径
 		String imagPath = "";
 		if (imagePath != null) {
@@ -135,7 +144,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		activity.setImageListStore(imagPath.substring(0, (imagPath.length()-1)));
 		String unit = getPara("unit");
 		String customerTypeId = getPara("customerType");
-		String areaNames = getPara("areaNames");
+		String areaNames = getPara("areaNames").replace("/", "-");
 		String startDate = getPara("startDate")+" 00:00:00";
 		String endDate = getPara("endDate")+" 23:59:59";
 		 Date sdate=null; 
@@ -148,7 +157,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			e.printStackTrace();
 		}  
 	    activity.setUnit(unit);
-	    activity.setInvestType(investType);
+	    activity.setInvestType(investTypes);
 		activity.setSellerId(sellerId);
 		activity.setAreaType(areaNames);
 		activity.setStartTime(sdate);
@@ -180,5 +189,19 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			list.add(map);
 		}
 		renderJson(list);
+	}
+	
+	public void changeIspublish() {
+		String id = getPara("id");
+		Activity activity =ActivityQuery.me().findById(id);
+		boolean flang = false;
+		if(activity.getIsPublish()==1){
+			activity.set("is_publish", 0);
+		}else{
+			activity.set("is_publish", 1);
+		}
+		activity.set("modify_date", new Date());
+		flang=activity.update();
+		renderJson(flang);
 	}
 }

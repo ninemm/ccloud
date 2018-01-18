@@ -208,8 +208,8 @@ public class _AttachmentController extends JBaseCRUDController<Attachment> {
 	//@RequiresPermissions(value={"/admin/attachment/","/admin/all"},logical=Logical.OR)
 	public void _choose_layer() {
 		keepPara();
-//		User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
-		Page<Attachment> page = AttachmentQuery.me().paginate(getPageNumber(), getPageSize(),null, null, null, null,
+		User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
+		Page<Attachment> page = AttachmentQuery.me()._paginate(getPageNumber(), getPageSize(),user.getId(), null, null, null,
 				getPara("k", "").trim(), getPara("dm"), getPara("mime"), null);
 		setAttr("page", page);
 		render("choose_layer.html");

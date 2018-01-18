@@ -37,10 +37,10 @@ public class ActivityQuery extends JBaseQuery {
 				return DAO.findById(id);
 	}
 
-	public Page<Activity> paginate(int pageNumber, int pageSize, String keyword,String startDate, String endDate) {
-		String select = "select * ";
-		StringBuilder fromBuilder = new StringBuilder("from `cc_activity` ");
-
+	public Page<Activity> paginate(int pageNumber, int pageSize, String keyword,String startDate, String endDate,String sellerId) {
+		String select = "select ca.*,ct.name as customerName ";
+		StringBuilder fromBuilder = new StringBuilder("from `cc_activity` ca ");
+		fromBuilder.append(" LEFT JOIN cc_customer_type ct on ct.id=ca.customer_type");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "title", keyword, params, needWhere);
@@ -50,15 +50,15 @@ public class ActivityQuery extends JBaseQuery {
 		}
 
 		if (StrKit.notBlank(startDate)) {
-			fromBuilder.append(" and create_date >= ?");
+			fromBuilder.append(" and ca.create_date >= ?");
 			params.add(startDate);
 		}
 
 		if (StrKit.notBlank(endDate)) {
-			fromBuilder.append(" and create_date <= ?");
+			fromBuilder.append(" and ca.create_date <= ?");
 			params.add(endDate);
 		}
-		
+		fromBuilder.append(" and ca.seller_id='"+sellerId+"' ORDER BY ca.is_publish desc,ca.create_date desc");
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
