@@ -1,0 +1,131 @@
+<#include "_inc/_layout.html"/>
+<#macro title>申请详情</#macro>
+<#macro css>
+</#macro>
+
+<#macro script>
+    function getback() {
+    window.location.href = '${CPATH}/activity/applyList?history=' + 1;
+    }
+</#macro>
+
+<@layout>
+<body id="fee-application-detail">
+<!--<header class="bg-white">-->
+    <!--<div class="weui-cell weui-cell_access">-->
+        <!--<i class="icon-clock-o blue ft24 m-r-15"></i>-->
+        <!--<div class="weui-cell__bd ft14">-->
+            <!--<p>已提交，等待-->
+                <!--<span class="blue">[张总]</span>审批</p>-->
+            <!--<p class="gray">2017-4-1 10:23:04</p>-->
+        <!--</div>-->
+        <!--<span class="weui-cell__ft"></span>-->
+    <!--</div>-->
+<!--</header>-->
+<div>
+    <section class="weui-panel weui-panel_access order-customer-info">
+        <div class="weui-cell weui-cell_access orange">
+            <i class="icon-tags ft24 m-r-10"></i>
+            <div class="weui-cell__bd">
+                ${apply.customer_name}
+                <span class="gray fr ft14">${apply.code}</span>
+            </div>
+        </div>
+        <div class="weui-cell weui-cell_access gray ft13">
+            <div class="width-100">
+                <p>活动日期
+                    <span>${(apply.start_date)!} ~ ${(apply.end_date)!}</span>
+                </p>
+                <p>活动类型
+                    <span>${apply.name}</span>
+                </p>
+                <p>投入类型
+                    <span>商品</span>
+                </p>
+                <p>客户信息
+                    <span>${apply.contact}（${apply.mobile}）</span>
+                </p>
+                <p>备注
+                    <span>${(apply.content)!}</span>
+                </p>
+                <p>申请人
+                    <span>${(apply.realname)!}</span>
+                </p>
+                <p>申请日期
+                    <span>${(apply.format_create_date)!}</span>
+                </p>
+                <!--<p>-->
+                    <!--附件图片-->
+                    <!--<span>-->
+              <!--<img src="static/images/avatar.png" alt="">-->
+              <!--<img src="static/images/avatar.png" alt="">-->
+              <!--<img src="static/images/avatar.png" alt="">-->
+              <!--<img src="static/images/avatar.png" alt="">-->
+            <!--</span>-->
+                <!--</p>-->
+            </div>
+        </div>
+        <div class="weui-cell weui-cell_access">
+            <div class="weui-cell__bd">
+                申请总金额
+                <span class="fr">
+            <span class="ft20 orange">${apply.invest_amount?string("0.00")}</span>&nbsp;元</span>
+            </div>
+        </div>
+        <!--<div class="weui-cell weui-cell_access">
+            <div class="weui-cell__bd">
+                <div>
+            <span>
+              产品费用
+              <span class="fr">
+                <span class="orange">900</span>&nbsp;元</span>
+              <br>
+              <span class="gray ft13">4月1日-4月30日</span>
+            </span>
+                </div>
+                <div>
+            <span>
+              物料费用
+              <span class="fr">
+                <span class="orange">100</span>&nbsp;元</span>
+              <br>
+              <span class="gray ft13">4月1日-4月30日</span>
+            </span>
+                </div>
+            </div>
+        </div>-->
+        <!--<div class="weui-cell weui-cell_access">-->
+            <!--<div class="weui-cell__bd blue t-c ft13">-->
+                <!--收起明细-->
+            <!--</div>-->
+        <!--</div>-->
+    </section>
+</div>
+<div class="hidden-menu">
+    <ul>
+        <li><a href="${CPATH}/">首页<img src="${CTPATH}/images/home.png" alt=""></a></li>
+        <li><a onclick="getback()">返回<img src="${CTPATH}/images/goback.png" alt=""></a></li>
+    </ul>
+    <img src="${CTPATH}/images/add.png" alt="" id="button" class="fr">
+</div>
+<div class="layer"></div>
+<!--<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">-->
+    <!--<button class="weui-flex__item">-->
+        <!--<i class="icon-undo ft20"></i>-->
+        <!--撤回-->
+    <!--</button>-->
+    <!--<button class="weui-flex__item">-->
+        <!--<i class="icon-pencil-square-o ft20"></i>-->
+        <!--修改-->
+    <!--</button>-->
+    <!--<button class="weui-flex__item">-->
+        <!--<i class="icon-share-square-o ft20"></i>-->
+        <!--提交-->
+    <!--</button>-->
+<!--</footer>-->
+<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
+    <!--<button class="white-button-no-border weui-flex__item _submit_btn border-top-1px" onclick="window.location.href='${CPATH}/customer/importCustomer'">导入</button>-->
+    <button class="red-button weui-flex__item _submit_btn" onclick="doSubmit()">撤回</button>
+</footer>
+</body>
+</@layout>

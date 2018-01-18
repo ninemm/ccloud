@@ -111,12 +111,13 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		String printStatus = getPara("printStatus");
 		String stockOutStatus = getPara("stockOutStatus");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String status = getPara("status");
 		// 获取排序相关信息
 		String sort = getPara("sortName[sort]");
 		String order = getPara("sortName[order]");
 
-		Page<Record> page = SalesOutstockQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate,
+		Page<Record> page = SalesOutstockQuery.me().paginate(getPageNumber(), getPageSize(), sellerId, keyword, startDate,
 				endDate, printStatus, stockOutStatus, status, dataArea, order, sort);
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
@@ -517,11 +518,12 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		String printStatus = getPara("printStatus");
 		String stockOutStatus = getPara("stockOutStatus");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\sales_outstock\\"
 				+ "salesOutstockInfo.xlsx";
 
-		Page<Record> page = SalesOutstockQuery.me().paginate(1, Integer.MAX_VALUE, keyword, startDate, endDate,
+		Page<Record> page = SalesOutstockQuery.me().paginate(1, Integer.MAX_VALUE, sellerId, keyword, startDate, endDate,
 				printStatus, stockOutStatus, null, dataArea, null, null);
 		List<Record> salesOutstckList = page.getList();
 

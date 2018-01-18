@@ -2097,9 +2097,9 @@ input[name=input-type] {
 
 #fee-application-detail img,
 #fee-application-approval-list img {
-  width: 2.5rem;
-  top: 0.5rem;
-  position: relative;
+  /*width: 2.5rem;*/
+  /*top: 0.5rem;*/
+  /*position: relative;*/
 }
 
 #fee-application-detail .weui-footer {

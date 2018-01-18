@@ -529,5 +529,12 @@
 		</footer>
 	</div>
 </div>
-<#include "_inc/_goback.html" />	
+<div class="hidden-menu">
+    <ul>
+        <li><a href="${CPATH}/">首页<img src="${CTPATH}/images/home.png" alt=""></a></li>
+        <li><a onclick="getback()">返回<img src="${CTPATH}/images/goback.png" alt=""></a></li>
+    </ul>
+    <img src="${CTPATH}/images/add.png" alt="" id="button" class="fr">
+</div>
+<div class="layer"></div>
 </@layout>
