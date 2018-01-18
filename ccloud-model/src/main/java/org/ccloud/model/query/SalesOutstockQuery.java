@@ -85,14 +85,18 @@ public class SalesOutstockQuery extends JBaseQuery {
 		return Db.findFirst(fromBuilder.toString(), sn);
 	}	
 	
-	public boolean pass(final String orderId, final String userId, final String sellerId, final String sellerCode) {
+	public boolean pass(final String orderId, final String userId, final String sellerId, 
+
+final String sellerCode) {
 		boolean isSave = Db.tx(new IAtom() {
 
 			@Override
 			public boolean run() throws SQLException {
 
 				Record order = SalesOrderQuery.me().findMoreById(orderId);
-				List<Record> orderDetailList = SalesOrderDetailQuery.me().findByOrderId(orderId);
+				List<Record> orderDetailList = SalesOrderDetailQuery.me
+
+().findByOrderId(orderId);
 //				//应收账款
 //				createReceivables(order);
 				
@@ -113,9 +117,8 @@ public class SalesOutstockQuery extends JBaseQuery {
 						outstockId = StrKit.getRandomUUID();
 						warehouseId = orderDetail.getStr("warehouse_id");
 						String OrderSO = SalesOutstockQuery.me().getNewSn(sellerId);
-						// 销售出库单：SS + 100000(机构编号或企业编号6位) + A(客户类型) + W(仓库编号) + 171108(时间) + 100001(流水号)
-						outstockSn = "SS" + sellerCode + order.getStr("typeCode") + orderDetail.getStr("warehouseCode")
-								+ DateUtils.format("yyMMdd", date) + OrderSO;
+						// 销售出库单：SS + 100000(机构编号或企业编号6位) + A(客户类型) + W(仓库编号) + 171108(时间) + 100001(流水号)	
+						outstockSn = "SS" + sellerCode + order.getStr("typeCode") + orderDetail.getStr("warehouseCode")+ DateUtils.format("yyMMdd", date) + OrderSO;
 
 						SalesOutstockQuery.me().insert(outstockId, outstockSn, warehouseId, sellerId, order, date);
 						SalesOrderJoinOutstockQuery.me().insert(orderId, outstockId);
@@ -142,8 +145,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 		return Db.update(fromBuilder.toString(), outTotalAmount, outstockId);
 	}
 
-	public boolean insert(String outstockId, String outstockSn, String warehouseId, String sellerId, Record order,
-			Date date) {
+	public boolean insert(String outstockId, String outstockSn, String warehouseId, String sellerId, Record order,Date date) {
 		SalesOutstock outstock = new SalesOutstock();
 		outstock.setId(outstockId);
 		outstock.setOutstockSn(outstockSn);
@@ -166,9 +168,8 @@ public class SalesOutstockQuery extends JBaseQuery {
 		return outstock.save();
 	}
 
-	public Page<Record> paginate(int pageNumber, int pageSize, String sellerId, String keyword, String startDate, 
-			String endDate, String printStatus, String stockOutStatus, String status, String dataArea,String order,String sort) {
-		String select = "select o.*, c.customer_name,u.realname,ct.name as customerName ";
+	public Page<Record> paginate(int pageNumber, int pageSize, String sellerId, String keyword, String startDate, String endDate, String printStatus, String stockOutStatus, String status,String dataArea,String order,String sort) {
+		String select = "select o.*,  c.prov_name,c.city_name,c.country_name,c.address, c.customer_name,u.realname,ct.name as customerName ";
 		if (StrKit.notBlank(status)) {
 			select = select + ",t2.refundCount, t2.outCount ";
 		}
@@ -233,7 +234,9 @@ public class SalesOutstockQuery extends JBaseQuery {
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
-		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), 
+
+params.toArray());
 	}
 
 	public int batchDelete(String... ids) {
@@ -262,7 +265,9 @@ public class SalesOutstockQuery extends JBaseQuery {
 		return SN;
 	}
 
-	public boolean updateStatus(String id, String userId, int salesOutStockStatusOut, Date date, String total) {
+	public boolean updateStatus(String id, String userId, int salesOutStockStatusOut, Date 
+
+date, String total) {
 		StringBuilder fromBuilder = new StringBuilder("update cc_sales_outstock cc set cc.biz_user_id=? , cc.biz_date=? , cc.status = ? , cc.modify_date = ? ");
 		if (total != null) {
 			fromBuilder.append(", cc.total_amount = ? ");
@@ -270,9 +275,13 @@ public class SalesOutstockQuery extends JBaseQuery {
 		fromBuilder.append("where cc.id = ?");
 		int i = 0;
 		if (total != null) {
-			i = Db.update(fromBuilder.toString(), userId, date, salesOutStockStatusOut, date, total, id);
+			i = Db.update(fromBuilder.toString(), userId, date, 
+
+salesOutStockStatusOut, date, total, id);
 		} else {
-			i = Db.update(fromBuilder.toString(), userId, date, salesOutStockStatusOut, date, id);
+			i = Db.update(fromBuilder.toString(), userId, date, 
+
+salesOutStockStatusOut, date, id);
 		}
 		if (i > 0) {
 			return true;
@@ -281,8 +290,12 @@ public class SalesOutstockQuery extends JBaseQuery {
 		}
 	}
 
-	public Page<Record> paginateForApp(int pageNumber, int pageSize, String keyword, String status,
-			String customerTypeId, String startDate, String endDate, String sellerId, String dataArea) {
+	public Page<Record> paginateForApp(int pageNumber, int pageSize, String keyword, String 
+
+status,
+			String customerTypeId, String startDate, String endDate, String sellerId, 
+
+String dataArea) {
 		String select = "select o.*, c.customer_name, ct.name as customerTypeName, t2.refundCount, t2.outCount ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_sales_outstock` o ");
 		fromBuilder.append("left join cc_seller_customer cc ON o.customer_id = cc.id ");
@@ -331,8 +344,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 	
-	public Page<Record> paginateForReceivables(int pageNumber, int pageSize, String keyword, String status,
-			String customerTypeId, String startDate, String endDate, String sellerId, String dataArea) {
+	public Page<Record> paginateForReceivables(int pageNumber, int pageSize, String keyword, String status,	String customerTypeId, String startDate, String endDate, String sellerId, String dataArea) {
 		String select = "select o.*, c.customer_name, ct.name as customerTypeName ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_sales_outstock` o ");
 		fromBuilder.append("left join cc_seller_customer cc ON o.customer_id = cc.id ");
@@ -373,12 +385,14 @@ public class SalesOutstockQuery extends JBaseQuery {
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
-		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), 
+
+params.toArray());
 	}	
 
 	
 	public printAllNeedInfo findStockOutForPrint(final String id) {
-		StringBuilder fromBuilder = new StringBuilder("select o.outstock_sn,o.receive_type,o.remark as stockOutRemark,o.delivery_address,o.total_amount, cs.customer_kind, c.id as customerId, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as customerTypeCode, u.realname, u.mobile, ");
+		StringBuilder fromBuilder = new StringBuilder("select o.outstock_sn,o.receive_type,o.remark as stockOutRemark,o.delivery_address,o.total_amount, cs.customer_kind, c.id as customerId, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as customerTypeCode,u.realname, u.mobile, ");
 		fromBuilder.append(" w.code as warehouseCode, cp.factor,w.`name` as warehouseName,w.phone as warehousePhone,o.create_date as placeOrderTime,so.remark,sn.seller_name,so.total_amount,so.id as orderId,so.biz_user_id,o.id as salesOutStockId,sn.id as sellerId,pt.context as printFootContext ");
 		fromBuilder.append(" from `cc_sales_outstock` o ");
 		fromBuilder.append(" left join cc_seller_customer cs on o.customer_id = cs.id ");
@@ -424,9 +438,13 @@ public class SalesOutstockQuery extends JBaseQuery {
 		Db.update(sql);
 	}
 	
-	public boolean updateStockOutStatus(String id, String userId, Date stockOutDate,int salesOutStockStatusOut,Date modafyDate, String remark) {
+	public boolean updateStockOutStatus(String id, String userId, Date stockOutDate,int 
+
+salesOutStockStatusOut,Date modafyDate, String remark) {
 		String sql = "update cc_sales_outstock cc set cc.biz_user_id=? , cc.biz_date=? , cc.status = ? , cc.modify_date = ?,cc.remark = ? where cc.id = ?";
-		int i = Db.update(sql, userId, stockOutDate, salesOutStockStatusOut, modafyDate,remark, id);
+		int i = Db.update(sql, userId, stockOutDate, salesOutStockStatusOut, 
+
+modafyDate,remark, id);
 		if (i > 0) {
 			return true;
 		} else {
@@ -434,7 +452,9 @@ public class SalesOutstockQuery extends JBaseQuery {
 		}
 	}
 
-	public List<carSalesPrintNeedInfo> getCarSalesPrintInfo(String wareHouseId,String beginDate,String endDate){
+	public List<carSalesPrintNeedInfo> getCarSalesPrintInfo(String wareHouseId,String 
+
+beginDate,String endDate){
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append(" SELECT so1.convert_relate, so1.custom_name, w.`name` as wareHouseName, SUM(so1.bigCount)as bigCount, so1.smallCount, so1.is_gift, ");
 		stringBuilder.append(" SUM(so1.product_amount)as product_amount, so1.sell_product_id, so1.bar_code, w.phone as wareHousePhone,so1.big_unit,so1.small_unit  FROM cc_sales_outstock c LEFT JOIN cc_warehouse w  ");
@@ -443,7 +463,9 @@ public class SalesOutstockQuery extends JBaseQuery {
 		stringBuilder.append(" smallCount, cs.bar_code, case when co.is_gift = 0  THEN product_amount ELSE 0 END as product_amount FROM ");
 		stringBuilder.append(" cc_sales_outstock_detail co LEFT JOIN cc_seller_product cs on cs.id = co.sell_product_id LEFT JOIN cc_product p ");
 		stringBuilder.append(" on p.id = cs.product_id ) so1 on so1.outstock_id = c.id WHERE c.warehouse_id =? AND c.biz_date >= ? AND c.biz_date <=? and c.`status` ='1000' GROUP BY so1.sell_product_id,so1.is_gift" );
-		List<Record> records = Db.find(stringBuilder.toString(), wareHouseId,beginDate,endDate);
+		List<Record> records = Db.find(stringBuilder.toString(), 
+
+wareHouseId,beginDate,endDate);
 		List<carSalesPrintNeedInfo> carSalesPrintNeedInfos = new ArrayList<>();
 		for (Record record : records) {
 		  carSalesPrintNeedInfo carSalesPrintNeedInfo = new carSalesPrintNeedInfo();
