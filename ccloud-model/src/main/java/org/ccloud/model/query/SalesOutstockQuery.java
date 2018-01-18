@@ -166,7 +166,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 		return outstock.save();
 	}
 
-	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, 
+	public Page<Record> paginate(int pageNumber, int pageSize, String sellerId, String keyword, String startDate, 
 			String endDate, String printStatus, String stockOutStatus, String status, String dataArea,String order,String sort) {
 		String select = "select o.*, c.customer_name,u.realname,ct.name as customerName ";
 		if (StrKit.notBlank(status)) {
@@ -192,6 +192,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 		boolean needWhere = true;
 
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.seller_id", sellerId, params, needWhere);
 		if (needWhere) {
 			fromBuilder.append(" where 1 = 1");
 		}
