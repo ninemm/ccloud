@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.ccloud.model.Seller;
 
+import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
@@ -50,7 +51,7 @@ public class SellerQuery extends JBaseQuery {
 		return DAO.doDelete("id = ?", sellerId);
 	}
 	
-	public Page<Seller> paginate(int pageNumber, int pageSize,String keyword, String orderby,String username,String child) {
+	public Page<Seller> paginate(int pageNumber, int pageSize,String keyword, String orderby,String username,String child,String sellerId) {
 		String select = "select DISTINCT cs.* ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_seller` cs LEFT JOIN user u on u.department_id =cs.dept_id ");
 		fromBuilder.append(" LEFT JOIN department d on d.id=cs.dept_id ");
@@ -59,16 +60,19 @@ public class SellerQuery extends JBaseQuery {
 		boolean needWhere = true;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cs.seller_name", keyword, params, true);
 
+		
 		if(needWhere) {
 			fromBuilder.append("where 1=1 ");
 		}
-
-		if(!username.equals("admin")){
+/*		if(!username.equals("admin")){
 			fromBuilder.append("and cs.seller_type =1 and cs.dept_id in ("+child+")  ");
 		}else {
 			fromBuilder.append("and cs.seller_type =0 ");
 		}
-		fromBuilder.append(" GROUP BY cs.id order by " + orderby);	
+*/		if(StrKit.notBlank(sellerId)) {
+			fromBuilder.append(" and cs.dept_id in ("+child+") and cs.id not in ('"+sellerId+"')  ");
+		}
+		fromBuilder.append("  GROUP BY cs.id order by " + orderby);	
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 

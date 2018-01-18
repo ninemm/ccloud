@@ -19,7 +19,6 @@ import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
-import com.jfinal.plugin.ehcache.IDataLoader;
 import org.ccloud.model.Activity;
 
 import java.util.LinkedList;
@@ -37,24 +36,35 @@ public class ActivityQuery extends JBaseQuery {
         return QUERY;
     }
 
-    public Activity findById(final String id) {
-        return DAO.getCache(id, new IDataLoader() {
-            @Override
-            public Object load() {
-                return DAO.findById(id);
-            }
-        });
-    }
-
-    public Page<Activity> paginate(int pageNumber, int pageSize, String orderby) {
-        String select = "select * ";
-        StringBuilder fromBuilder = new StringBuilder("from `cc_activity` ");
-
-        LinkedList<Object> params = new LinkedList<Object>();
+	public Activity findById(final String id) {
+				return DAO.findById(id);
+	}
+	public Page<Activity> paginate(int pageNumber, int pageSize, String keyword,String startDate, String endDate,String sellerId) {
+		String select = "select ca.*,ct.name as customerName ";
+		StringBuilder fromBuilder = new StringBuilder("from `cc_activity` ca ");
+		fromBuilder.append(" LEFT JOIN cc_customer_type ct on ct.id=ca.customer_type");
+		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "title", keyword, params, needWhere);
+		
+		if (needWhere) {
+			fromBuilder.append(" where 1 = 1");
+		}
 
         if (params.isEmpty())
             return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and ca.create_date >= ?");
+			params.add(startDate);
+		}
 
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and ca.create_date <= ?");
+			params.add(endDate);
+		}
+		fromBuilder.append(" and ca.seller_id='"+sellerId+"' ORDER BY ca.is_publish desc,ca.create_date desc");
+		if (params.isEmpty())
+			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
         return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
     }
 

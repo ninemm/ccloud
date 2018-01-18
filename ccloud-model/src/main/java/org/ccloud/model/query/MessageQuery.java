@@ -20,7 +20,6 @@ import java.util.LinkedList;
 import org.ccloud.Consts;
 import org.ccloud.model.Message;
 
-import com.jfinal.core.Const;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
