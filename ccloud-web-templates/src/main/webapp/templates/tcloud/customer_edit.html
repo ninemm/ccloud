@@ -516,13 +516,6 @@
                     </a>
                 </div>
             </div>
-		<div class="hidden-menu">
-			<ul>
-				<li><a href="${CPATH}/">首页<img src="${CTPATH}/images/home.png" alt=""></a></li>
-				<li><a onclick="getback()">返回<img src="${CTPATH}/images/goback.png" alt=""></a></li>
-			</ul>
-			<img src="${CTPATH}/images/add.png" alt="" id="button" class="fr">
-		</div>
 		<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
 		    <#if type??>
                 <button class="white-button-no-border weui-flex__item _submit_btn border-top-1px" onclick="window.location.href='${CPATH}/customer/importCustomer'">重新导入</button>
@@ -537,4 +530,5 @@
 		</footer>
 	</div>
 </div>
+<#include "_inc/_goback.html" />	
 </@layout>
