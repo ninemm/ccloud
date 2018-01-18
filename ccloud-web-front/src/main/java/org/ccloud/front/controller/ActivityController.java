@@ -145,21 +145,28 @@ public class ActivityController extends BaseFrontController {
 
 	public void apply() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		final String content = getPara("content");
+		final Date createDate = new Date();
 
-		String[] sellerCustomerArray = getParaValues("sellerCustomerId");
+		String sellerCustomerIds = getPara("sellerCustomerIds");
+		String[] sellerCustomerArray = sellerCustomerIds.split(",", -1);
+
+		String[] activity_ids = getParaValues("activity_id");
+		Integer[] visit_nums = getParaValuesToInt("visit_num");
 		for (String sellerCustomerId : sellerCustomerArray) {
-			ActivityApply activityApply = new ActivityApply();
-			activityApply.setId(StringUtils.getUUID());
-			activityApply.setActivityId(getPara("activity_id"));
-			activityApply.setSellerCustomerId(sellerCustomerId);
-			activityApply.setBizUserId(user.getId());
-			activityApply.setNum(getParaToInt("visit_num"));
-			activityApply.setContent(getPara("content"));
-			activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_WAIT);
-			activityApply.setCreateDate(new Date());
-			activityApply.save();
+			for (int i = 0; i < activity_ids.length; i++) {
+				ActivityApply activityApply = new ActivityApply();
+				activityApply.setId(StringUtils.getUUID());
+				activityApply.setActivityId(activity_ids[i]);
+				activityApply.setSellerCustomerId(sellerCustomerId);
+				activityApply.setBizUserId(user.getId());
+				activityApply.setNum(visit_nums[i]);
+				activityApply.setContent(content);
+				activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_WAIT);
+				activityApply.setCreateDate(createDate);
+				activityApply.save();
+			}
 		}
-
 		renderAjaxResultForSuccess("申请成功");
 	}
 
