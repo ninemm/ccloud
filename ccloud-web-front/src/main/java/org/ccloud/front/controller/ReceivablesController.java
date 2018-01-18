@@ -83,11 +83,11 @@ public class ReceivablesController extends BaseFrontController {
 	}
 	
 	public void detail() {
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 		String outstock_sn = getPara("sn");
 		Record receivable = ReceivablesDetailQuery.me().findByBalanceCountBySn(outstock_sn);
 		List<Receiving> list = ReceivingQuery.me().findBySn(outstock_sn);
-		List<User> userLists = UserQuery.me().findByDeptId(user.getDepartmentId());
+		List<User> userLists = UserQuery.me().findByDeptDataArea(dataArea + "%");
 		
 		Map<String, Object> all = new HashMap<>();
 		all.put("title", "全部");
