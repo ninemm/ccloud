@@ -20,11 +20,10 @@
     var $gallery = $("#gallery"), $galleryImg = $("#galleryImg");
     
     $(function() {
-        window.removeEventListener('touchmove', addStopTouchendPropagationListener, true);
         $("#length").text($("#address").val().length + '/' + 50);
         $(document).on("input", "#address", function() {
             $("#length").text($("#address").val().length + '/' + 50);
-        }).on('touchstart', '#delivery-address', function() {
+        }).on('click', '#delivery-address', function() {
             $("#customer_type").select('close');
         });
 

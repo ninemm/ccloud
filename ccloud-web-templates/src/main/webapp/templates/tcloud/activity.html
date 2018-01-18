@@ -20,8 +20,7 @@
 
 <#macro script>
 $(function() {
-	window.removeEventListener('touchmove', addStopTouchendPropagationListener, true);
-    $(document).on("touchstart", "#sidebar li", function () {
+    $(document).on("click", "#sidebar li", function () {
         $(this).addClass("active").siblings().removeClass("active");
         var index = $(this).index();
      	$('.type').eq(index).show().siblings('.type').hide();
