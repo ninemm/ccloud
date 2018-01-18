@@ -94,7 +94,6 @@
 					dataType : "json", 
 					success : function(data) { 
 						if(data.size>1){
-							console.log('${(session.mobile)!}');
 							location.href = "${CPATH}/admin/choice?sellerList="+data.sellerList+"&mobile="+data.mobile;
 						}else if(data == false){
 							$("#p").show();
