@@ -57,12 +57,32 @@ public class ReportController extends BaseFrontController {
 		setAttr("customerNum", customerList.getTotalRow());
 		render("report.html");
 	}
+
+	public void userRank() {
+		render("user_rank.html");
+	}
+	
+	public void purchase() {
+		render("purchase.html");
+	}
+	
+	public void mySeller() {
+		render("mySeller.html");
+	}	
+	
+	public void managerReport() {
+		render("manager_report.html");
+	}
+	
+	public void departmentReport() {
+		render("department_report.html");
+	}
 	
 	public void sales() {
 		setAttr("deliveryDate", DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
 		render("report_sales.html");
 	}
-	
+
 	//业务员订单总额统计
 	public void orderAmount() {
 		String startDate = getPara("startDate");
@@ -112,7 +132,10 @@ public class ReportController extends BaseFrontController {
 		String userId = getPara("userId");
 		String isGift = getPara("isGift");
 		String customerId = getPara("customerId");
-		List<Record> record = SalesOrderQuery.me().getMyOrderByProduct(startDate, endDate, dayTag, productType, sellerId, userId, customerId, isGift, dataArea);
+		String deptId = getPara("deptId");
+		String orderTag = getPara("orderTag");
+		String isHide = getPara("isHide");
+		List<Record> record = SalesOrderQuery.me().getMyOrderByProduct(startDate, endDate, dayTag, productType, sellerId, userId, customerId, isGift, dataArea, deptId, orderTag, isHide);
 		renderJson(record);
 	}
 	
@@ -215,22 +238,6 @@ public class ReportController extends BaseFrontController {
 			dayText = "上月";
 		}
 		return dayText;
-	}
-	
-	public void userRank() {
-		render("user_rank.html");
-	}
-	
-	public void purchase() {
-		render("purchase.html");
-	}
-	
-	public void mySeller() {
-		render("mySeller.html");
-	}	
-	
-	public void managerReport() {
-		render("manager_report.html");
 	}
 	
 	public void userReportDetail() {
@@ -372,6 +379,18 @@ public class ReportController extends BaseFrontController {
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		List<Record> record = SalesOrderQuery.me().getSellerPurchaseGift(startDate, endDate, dayTag, sellerId, dataArea);
 		renderJson(record);
+	}
+	
+	//部门销售单统计
+	public void getDepartmentCountForSales() {
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String dayTag = getPara("dayTag");
+		String sellerId = getSessionAttr("sellerId");
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String orderTag = getPara("orderTag");
+		List<Record> record = SalesOrderQuery.me().getDepartmentCount(startDate, endDate, dayTag, sellerId, dataArea, orderTag);
+		renderJson(record);		
 	}
 	
 }
