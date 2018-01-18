@@ -209,15 +209,20 @@ function doChange(key){
         if (!flg) {
             return;
         }
-//      if ($("#sellerCustomerId").val() == "") {
-//          $.toptip("请选择客户", 'warning');
-//          return;
-//      }
+		if ($(".activity-item").length == 0) {
+			$.toptip("请添加活动", 'warning');
+			return;
+		}
+		if ($("#sellerCustomerIds").val() == "") {
+			$.toptip("请选择客户", 'warning');
+			return;
+		}
 
         layer.open({
             type: 2,
             content: '保存中...'
         });
+
 		$("#form").ajaxSubmit({
 			beforeSubmit: function() {
 				flg = false;
