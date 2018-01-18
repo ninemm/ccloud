@@ -17,6 +17,7 @@ import org.ccloud.model.CustomerType;
 import org.ccloud.model.User;
 import org.ccloud.model.query.ActivityQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
+import org.ccloud.model.query.SellerProductQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.StringUtils;
@@ -33,7 +34,6 @@ import com.jfinal.plugin.activerecord.Record;
 public class ActivityController extends BaseFrontController {
 
 	public void index() {
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 
 		List<Record> activityRecords = ActivityQuery.me().findActivityListForApp(sellerId, "", "");
@@ -55,36 +55,6 @@ public class ActivityController extends BaseFrontController {
 
 		setAttr("activityList", JSON.toJSON(activityList));
 		setAttr("tags", JSON.toJSON(tagSet));
-		
-		//客户选择部分
-		Map<String, Object> all = new HashMap<>();
-		all.put("title", "全部");
-		all.put("value", "");
-		List<Map<String, Object>> customerTypes = new ArrayList<>();
-		customerTypes.add(all);
-		
-		List<Map<String, Object>> userIds = new ArrayList<>();
-		userIds.add(all);
-
-		List<Record> userList = UserQuery.me().findNextLevelsUserList(selectDataArea);
-		for (Record record : userList) {
-			Map<String, Object> item = new HashMap<>();
-			item.put("title", record.get("realname"));
-			item.put("value", record.get("id"));
-			userIds.add(item);
-		}
-
-		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
-				.findByDataArea(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
-		for (CustomerType customerType : customerTypeList) {
-			Map<String, Object> item = new HashMap<>();
-			item.put("title", customerType.getName());
-			item.put("value", customerType.getId());
-			customerTypes.add(item);
-		}
-
-		setAttr("userIds", JSON.toJSON(userIds));
-		setAttr("customerTypes", JSON.toJSON(customerTypes));
 
 		render("activity.html");
 	}
@@ -115,9 +85,64 @@ public class ActivityController extends BaseFrontController {
 	}
 
 	public void activityApply() {
+		setAttr("activity_id", getPara("activity_id"));
+
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+
+		List<Record> activityList = ActivityQuery.me().findActivityListForApp(sellerId, "", "");
+
+		Map<String, Object> activityInfoMap = new HashMap<String, Object>();
+		List<Map<String, Object>> activityItems = new ArrayList<>();
+
+		for (Record record : activityList) {
+			Map<String, Object> item = new HashMap<>();
+
+			String activityId = record.get("id");
+			item.put("title", record.getStr("title"));
+			item.put("value", activityId);
+
+			activityItems.add(item);
+			activityInfoMap.put(activityId, record);
+		}
+
+		setAttr("activityInfoMap", JSON.toJSON(activityInfoMap));
+		setAttr("activityItems", JSON.toJSON(activityItems));
+
+
+		//客户选择部分
+		Map<String, Object> all = new HashMap<>();
+		all.put("title", "全部");
+		all.put("value", "");
+		List<Map<String, Object>> customerTypes = new ArrayList<>();
+		customerTypes.add(all);
+
+		List<Map<String, Object>> userIds = new ArrayList<>();
+		userIds.add(all);
+
+		List<Record> userList = UserQuery.me().findNextLevelsUserList(selectDataArea);
+		for (Record record : userList) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", record.get("realname"));
+			item.put("value", record.get("id"));
+			userIds.add(item);
+		}
+
+		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
+				                                      .findByDataArea(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
+		for (CustomerType customerType : customerTypeList) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", customerType.getName());
+			item.put("value", customerType.getId());
+			customerTypes.add(item);
+		}
+
+		setAttr("userIds", JSON.toJSON(userIds));
+		setAttr("customerTypes", JSON.toJSON(customerTypes));
+
 		render("activity_apply.html");
 	}
-	
+
 	public void apply() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
