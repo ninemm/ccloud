@@ -10,9 +10,6 @@
 	#product {
 		bottom: 2.25rem;
 	}
-	#customerList {
-		background: #f7f7f7;
-	}
 </#macro>
 <#macro script_import>
 	<script type='text/javascript' src="${CTPATH}/js/swiper.min.js"></script>
@@ -41,13 +38,11 @@ $(function() {
     	keyword = $(this).val();
 		changeInit();
 		
-    }).on("click", ".select-customer", function () {
+    }).on("click", ".product-top", function () {
     	var $this = $(this);
-    	var $productDiv = $this.parents(".common");
-    	$("#_title").text($productDiv.find("#title").text());
-    	$("#activity_id").val($productDiv.find("#activityId").val());
-    	$("#visit_num").val($productDiv.find("#visitNum").val());
-    	
+    	var $activityDiv = $this.parents(".common");
+		window.location.href = "${CPATH}/activity/activityApply?activity_id=" + $activityDiv.find("#activityId").val();
+    
     }).on("click", "#content", function () {
     	var $this = $(this).parents(".common");
     	var productName = $this.find("#productName").text();
@@ -88,33 +83,6 @@ $(function() {
 	});
 
     firstInit();
-
-    //客户选择部分
-    $(document).on("input", "#customerSearchInput", function() {
-        customerCombo();
-    }).on("click", "#customerSearchCancel", function() {
-        customerCombo();
-    }).on("change", "#userId", function() {
-        customerCombo();
-    }).on("change", "#customerTypeId", function() {
-        customerCombo();
-    }).on("click", "#activityApply", function() {
-        doSubmit();
-    }).on('click', '.select-all', function() {
-			var _this = this;
-			$('#customerList input[type=checkbox]').each(function() {
-				this.checked = _this.checked
-			})
-	}).on('click', '#customerList input[type=checkbox]', function() {
-//			var all = $('#customerList input[type=checkbox]').length;
-//			var now = $('#customerList input[type=checkbox]:checked').length
-//			if (all == now) {
-//				$('.select-all')[0].checked = true
-//			} else {
-//				$('.select-all')[0].checked = false
-//			}
-	});
-    customerCombo();
 });
 
 var tag = '';
@@ -149,8 +117,6 @@ function changeInit(){
 
 function combo(activityList){
 	initActivity(activityList);
-	activityNum();
-	calTotal();
 }
 
 function initTags(tags) {
@@ -194,16 +160,6 @@ function initActivity(activityList){
 	});
 }
 
-function activityNum(){
-	var productList = getItemBykey("productList") == undefined ? [] : getItemBykey("productList");
-		$.each(productList, function(index, el){
-			var $newProductDetail =$("#" + el.sellProductId);
-			$newProductDetail.find("#bigNum").val(el.bigNum);
-			$newProductDetail.find("#smallNum").val(el.smallNum);
-			$newProductDetail.find("#isGift").val(el.isGift);
-		});
-}
-
 function getImageUrl(product_image_list_store, product_sn) {
 	var imageUrl = "${CTPATH}/images/jp.jpg";
 	$.each(JSON.parse(product_image_list_store), function(index, el) {
@@ -239,151 +195,10 @@ $gallery.on("click", function() {
 	$gallery.fadeOut(100);
 });
 
-function calTotal() {
- 	var types = $(".type");
-  
-	$.each(types, function(typeIndex, typeEl) {
-		var total = 0;
-		var $typeEl = $(typeEl);
-		var id = $typeEl.attr('id');
-		var products = $typeEl.find('.product_detail')
-		$.each(products, function(index, el) {
-			var $el = $(el);
-			if(id == 'composition'){
-				total += Number($el.find("#compositionNum").val());
-			}else{
-				total += Number($el.find("#bigNum").val()) + Number($el.find("#smallNum").val());
-			}
-		});
-
-		var $total = $sidebar.find("#" + id + " .goods-num");
-		if (total > 0) {
-		    $total.show().text(total);
-		} else {
-		    $total.hide().text(total);
-		}
-	});
-}
-
-function productChange(obj){
-      var $el = obj.parents(".common");
-      if($el.length > 0){
-      	var product = getProduct($el);
-      	cart.changeProduct(product);
-      }else{
-        var $co = obj.parents(".composition");
-        if($co.length > 0){
-          var composition = getComposition($co);
-          cart.changeComposition(composition);
-        }
-      }
-      calTotal();
-      total();
-}
-
-	//---------------------------------------------------------客户选择部分----------------------------------------------------------
-
-	$("#userId").select({
-     title: "选择业务员",
-     items: ${userIds!}
-    });
-
-	$("#customerTypeId").select({
-     title: "选择客户类型",
-     items: ${customerTypes!}
-    });
-    
-	var customerHtml = $(".customerSelect").eq(0).html();
-	var $loading = $("#loading");
-	var $noMore = $("#noMore");
-	var loading = false;
-    
-    var keyword = '';
-    var page = 1;
-	var size = 10;
-
-	var $customerList = $("#customerList");
-	$customerList.empty();
-
-	function initCustomerSelect() {
-
-		$loading.show();
-		$noMore.hide();
-
-	    var params = {
-		    "page": page,
-	        "size": size,
-	        "keyword": $("#searchInput").val(),
-	        "userId": $("#userId").data('values'),
-	        "customerTypeId": $("#customerTypeId").data('values'),
-	        "isOrdered": $("#isOrdered").data('values')
-	    }
-
-		Utils.ajax('${CPATH}/product/customerList', params, 
-			function(data){
-				$loading.hide();
-				if(data.customerList.length == 0){
-					if($('.customerSelect').length == 0) $noMore.show();
-					loading = true;
-					return;
-				}
-				$.each(data.customerList, function(index, el) {
-					$customerList.append("<div class='weui-panel weui-panel_access weui-flex customerSelect'>" + customerHtml + "</div>");
-					var $newCustomer = $customerList.find(".customerSelect:last");
-					$newCustomer.find("#customerName").text(el.customer_name);
-					$newCustomer.find("#contactP").text(el.contact + "/" + el.mobile);
-					$newCustomer.find("#addressSpan").text(el.prov_name + " " + el.city_name + " " + el.country_name + " " + el.address);
-
-					$newCustomer.find("#sellerCustomerId").val(el.id);
-					$newCustomer.find("#contact").val(el.contact);
-					$newCustomer.find("#mobile").val(el.mobile);
-					$newCustomer.find("#address").val(el.prov_name + " " + el.city_name + " " + el.country_name + " " + el.address);
-				});
-				page++;
-				loading = false;
-			}
-		);
-    }
-
-	//滑动方法
-	$("#infinite").infinite().on("infinite", function() {
-		if(loading) {
-			return;
-		}
-		loading = true;
-		initCustomerSelect();
-	});
-
-	function customerCombo() {
-		$customerList.empty();
-		loading = false;
-		page = 1;
-		initCustomerSelect();
-	}
-	
-	//提交表单
-	var flg = true;
-	function doSubmit(){
-		if (!flg) {
-			return;
-		}
-//		if ($("#sellerCustomerId").val() == "") {
-//			$.toptip("请选择客户", 'warning'); 
-//			return;
-//		}
-
-		layer.open({
-			type: 2,
-			content: '保存中...'
-		});
-		$("#form").submit();
-	}
-
 </#macro>
 
 <@layout>
 <div class="weui-content">
-<form action="${CPATH}/activity/activityApply" method="post" id="form">
 	<div id="product">
 		<header>
 			<div class="weui-search-bar" id="searchBar">
@@ -423,7 +238,7 @@ function productChange(obj){
 								<input type="hidden" id="activityId" value="">
 								<input type="hidden" id="visitNum" value="">
 								<img src="" id="image" class="width-100 mg10-0" onerror="javascript:this.src='${CTPATH}/images/poster.jpg'" onClick="imageClick(this)">
-								<div class="product-top select-customer">
+								<div class="product-top">
 									<div class="weui-cell_access">
 										<p class="product_name" id="title"></p>
 										<div class="product_unit">
@@ -448,92 +263,7 @@ function productChange(obj){
 		<div class="weui-gallery__opr">
 		</div>
 	</div>
-	<article id="combin-filter" class="customerMulti">
-		<div id="customer">
-			<header>
-				<div class="weui-search-bar" id="searchBar">
-					<div class="weui-search-bar__form">
-						<div class="weui-search-bar__box">
-							<i class="weui-icon-search"></i>
-							<input type="search" class="weui-search-bar__input" id="searchInput" placeholder="搜索" >
-							<a href="javascript:" class="weui-icon-clear" id="searchClear"></a>
-						</div>
-						<label class="weui-search-bar__label" id="searchText">
-							<i class="weui-icon-search"></i>
-							<span>请输入客户名或联系人</span>
-						</label>
-					</div>
-					<a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
-				</div>
-			</header>
-			<article class="customer">
-				<header>
-					<div class="head-search select-area">
-						<div class="weui-flex">
-							<div class="weui-flex__item">
-								<input type="text" id="userId" placeholder="业务员" class="weui-input" readonly>
-								<i class="icon-sort-desc"></i>
-							</div>
-							<div class="weui-flex__item">
-								<input type="text" id="customerTypeId" placeholder="客户类型" class="weui-input" readonly>
-								<i class="icon-sort-desc"></i>
-							</div>
-						</div>
-					</div>
-				</header>
-				<article id="infinite">
-					<div id="customerList">
-						<div class="weui-panel weui-panel_access weui-flex customerSelect" style="display: none">
-							<div class="check-box">
-								<input type="checkbox" name="sellerCustomerId" id="sellerCustomerId" class="weui-agree__checkbox">
-							</div>
-							<div class="weui-flex__item">
-								<div class="weui-flex">
-									<div class="weui-flex__item customer-info" id="customerInfo">
-										<p class="ft14" id="customerName"></p>
-										<p class="gray" id="contactP"></p>
-										<input type="hidden" id="contact" value="">
-										<input type="hidden" id="mobile" value="">
-										<input type="hidden" id="address" value="">
-									</div>
-								</div>
-								<p class="gray">
-									<span class="icon-map-marker ft16 green"></span>
-									<span id="addressSpan"></span>
-								</p>
-							</div>
-						</div>
-					</div>
-					<div class="weui-loadmore" id="loading" style="display: none;">
-						<i class="weui-loading"></i>
-						<span class="weui-loadmore__tips">正在加载</span>
-					</div>
-					<div class="weui-loadmore weui-loadmore_line" id="noMore" style="display: none;">
-						<span class="weui-loadmore__tips">暂无数据</span>
-					</div>
-				</article>
-			</article>
-		</div>
-		<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
-            <div class="total bg-white weui-flex__item t-l">
-<!--                <input type="checkbox" name="" id="" class="weui-agree__checkbox select-all">
-                 <span class="ft12">全选</span>
-                <span>&nbsp;&nbsp;合计:</span>
-                <span class="ft12">12</span> -->
-                <input type="hidden" id="activity_id" name="activity_id" value="">
-                <input type="hidden" id="visit_num" name="visit_num" value="">
-                活动<span id="_title"></span>
-            </div>
-            <button id="activityApply" type="button" class="place-order red-button white">申请活动</button>
-        </footer>
-	</article>
-</form>
 </div>
 <div class="layer"></div>
 <#include "_inc/_goback_bottom.html" />
-<!-- <footer class="weui-footer weui-footer_fixed-bottom weui-flex">
-	<p class="total bg-white weui-flex__item" id="totalNum"></p>
-	<button id="shoppingCart" class="place-order yellow-button white">购物车</button>
-	<button id="placeOrder" class="place-order red-button white">下单</button>
-</footer> -->
 </@layout>

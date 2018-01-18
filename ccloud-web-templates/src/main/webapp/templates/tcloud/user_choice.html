@@ -25,7 +25,7 @@
         }
     }
     
-    function doChange(sellerId) {
+    function doSelected(sellerId) {
         var url = "${CPATH}/user/change";
         Utils.ajax(url, {'mobile': mobile, 'openid': openid, 'sellerId': sellerId}, callback);
         
@@ -45,7 +45,7 @@
                     <div class="weui-cells">
                         <#if (session.sellerList) ??>
                         <#list (session.sellerList) as bean>
-                        <a class="weui-cell weui-cell_access" href="javascript:void(0);" onclick="doChange('${(bean.seller_id)!}');">
+                        <a class="weui-cell weui-cell_access" href="javascript:void(0);" onclick="doSelected('${(bean.seller_id)!}'); return false;"> 
                             <div class="weui-cell__bd weui-cell_primary">
                                 <p>${(bean.seller_name)!}</p>
                             </div>

@@ -3,48 +3,225 @@
 <#macro css_import>
 </#macro>
 <#macro css>
+	#customerList {
+		background: #f7f7f7;
+	}
 </#macro>
 <#macro script_import>
 </#macro>
 <#macro script>
 $(function () {
-    $(".activity-item").select({
-        title: "选择活动项目",
-        items: ["交通费", "交通补贴", "住宿费"]
-    });
-    $("#start-date-1").calendar({
-        maxDate: function () {
-        return $("#end-date-1").val();
-    }
-    });
-    $("#start-date-1").val($.today());
-    $("#end-date-1").calendar({
-      minDate: function() {
-				var date = new Date($('#start-date-1').val().replace(/-/g,"/"));
-				date.setDate(date.getDate() - 1);
-				return date.Format("yyyy-MM-dd")
+	$(document).on("click", "#addActivity", function () {
+		addActivity();
+	}).on("click", "#delActivity", function () {
+		$(this).parents(".activity-detail-item").remove();
+	});
+
+	$activity.empty();
+	addActivity();
+	doChange(activityId);
+
+	//客户选择部分
+	$(document).on("input", "#customerSearchInput", function() {
+		customerCombo();
+	}).on("click", "#customerSearchCancel", function() {
+		customerCombo();
+	}).on("change", "#userId", function() {
+		customerCombo();
+	}).on("change", "#customerTypeId", function() {
+		customerCombo();
+	}).on('click', '.select-all', function() {
+		var _this = this;
+		$('#customerList input[type=checkbox]').each(function() {
+			this.checked = _this.checked
+		})
+	}).on('click', '#customerList input[type=checkbox]', function() {
+			var all = $('#customerList input[type=checkbox]').length;
+			var now = $('#customerList input[type=checkbox]:checked').length
+			if (all == now) {
+				$('.select-all')[0].checked = true
+			} else {
+				$('.select-all')[0].checked = false
 			}
-    });
-    $("#end-date-1").val($.today());
-    $("#start-date-2").calendar({
-        maxDate: function () {
-            return $("#end-date-2").val();
-        }
-    });
-    $("#start-date-2").val($.today());
-    $("#end-date-2").calendar({
-      minDate: function() {
-				var date = new Date($('#start-date-2').val().replace(/-/g,"/"));
-				date.setDate(date.getDate() - 1);
-				return date.Format("yyyy-MM-dd")
-			}
-    });
-    $("#end-date-2").val($.today());
+	}).on("click", "#confirm", function() {
+		confirm();
+	});
+	customerCombo();
+
+	$(document).on("click", "#apply", function() {
+		doSubmit();
+	})
 });
+var activityId = '${activity_id!}';
+var activityInfoMap = ${activityInfoMap!};
+var activityItems = ${activityItems!};
+var newHtml = $(".activity-detail-item").eq(0).html();
+var $activity = $("#activityList");
+
+function addActivity(){
+
+	$activity.append("<section class='weui-panel weui-panel_access activity-detail-item'>" + newHtml + "</section>");
+	var $newActivityDetail = $activity.find(".activity-detail-item:last");
+	initActivityChange($newActivityDetail);
+
+}
+
+function initActivityChange($obj){
+	var $title = $obj.find("#title");
+	$title.select({
+		title: "选择活动项目",
+		items: activityItems,
+		onChange: function(data) {
+		var activity = activityInfoMap[data.values].columns;
+		changeEvent(activity, $obj);
+		}
+	});
+}
+function changeEvent(activity,$obj){
+	$obj.find("#acticityId").val(activity.id);
+	$obj.find("#visitNum").val(activity.visit_num);
+	$obj.find("#startTime").val(new Date(activity.start_time).Format("yyyy-MM-dd"));
+	$obj.find("#endTime").val(new Date(activity.end_time).Format("yyyy-MM-dd"));
+	$obj.find("#investAmount").val(activity.invest_amount);
+}
+
+function doChange(key){
+	var activity = activityInfoMap[key].columns;
+	var $newActivityDetail = $activity.find(".activity-detail-item:last");
+	var $title = $newActivityDetail.find("#title");
+
+	$title.val(activity.title);
+	$title.attr('data-values', activity.id);
+
+	changeEvent(activity, $newActivityDetail);
+}
+
+    //---------------------------------------------------------客户选择部分----------------------------------------------------------
+
+    $("#userId").select({
+     title: "选择业务员",
+     items: ${userIds!}
+    });
+
+    $("#customerTypeId").select({
+     title: "选择客户类型",
+     items: ${customerTypes!}
+    });
+    
+    var customerHtml = $(".customerSelect").eq(0).html();
+    var $loading = $("#loading");
+    var $noMore = $("#noMore");
+    var loading = false;
+    
+    var keyword = '';
+    var page = 1;
+    var size = 10;
+
+    var $customerList = $("#customerList");
+    $customerList.empty();
+
+    function initCustomerSelect() {
+
+        $loading.show();
+        $noMore.hide();
+
+        var params = {
+            "page": page,
+            "size": size,
+            "keyword": $("#searchInput").val(),
+            "userId": $("#userId").data('values'),
+            "customerTypeId": $("#customerTypeId").data('values'),
+            "isOrdered": $("#isOrdered").data('values')
+        }
+
+        Utils.ajax('${CPATH}/product/customerList', params,
+            function(data){
+                $loading.hide();
+                if(data.customerList.length == 0){
+                    if($('.customerSelect').length == 0) $noMore.show();
+                    loading = true;
+                    return;
+                }
+                $.each(data.customerList, function(index, el) {
+                    $customerList.append("<div class='weui-panel weui-panel_access weui-flex customerSelect'>" + customerHtml + "</div>");
+                    var $newCustomer = $customerList.find(".customerSelect:last");
+                    $newCustomer.find("#customerName").text(el.customer_name);
+                    $newCustomer.find("#contactP").text(el.contact + "/" + el.mobile);
+                    $newCustomer.find("#addressSpan").text(el.prov_name + " " + el.city_name + " " + el.country_name + " " + el.address);
+
+                    $newCustomer.find("#sellerCustomerId").val(el.id);
+                    $newCustomer.find("#contact").val(el.contact);
+                    $newCustomer.find("#mobile").val(el.mobile);
+                    $newCustomer.find("#address").val(el.prov_name + " " + el.city_name + " " + el.country_name + " " + el.address);
+                });
+                page++;
+                loading = false;
+            }
+        );
+    }
+
+    //滑动方法
+    $("#infinite").infinite().on("infinite", function() {
+        if(loading) {
+            return;
+        }
+        loading = true;
+        initCustomerSelect();
+    });
+
+    function customerCombo() {
+        $customerList.empty();
+        loading = false;
+        page = 1;
+        initCustomerSelect();
+    }
+
+	function confirm(){
+		var $chechboxs = $('#customerList input[type=checkbox]:checked');
+		var sellerCustomerIds = "";
+		var sellerCustomerNames = ""
+		$.each($chechboxs, function(index, el) {
+			var $el = $(el);
+			var $customer = $el.parents(".customerSelect");
+			if(index == 0){
+				sellerCustomerIds += $el.val();
+				sellerCustomerNames += $customer.find("#customerName").text();
+			}else{
+				sellerCustomerIds += ',';
+				sellerCustomerIds += $el.val();
+				sellerCustomerNames += ',';
+				sellerCustomerNames += $customer.find("#customerName").text();
+			}
+			
+		});
+		$("#sellerCustomerNames").val(sellerCustomerNames);
+		$("#sellerCustomerIds").val(sellerCustomerIds);
+		closeCombinSearch();
+	}
+    
+    //---------------------------------------------提交表单------------------------------------------------------------------
+    var flg = true;
+    function doSubmit(){
+        if (!flg) {
+            return;
+        }
+//      if ($("#sellerCustomerId").val() == "") {
+//          $.toptip("请选择客户", 'warning');
+//          return;
+//      }
+
+        layer.open({
+            type: 2,
+            content: '保存中...'
+        });
+        $("#form").submit();
+    }
+
 </#macro>
 
 <@layout>
 <body id="fee-application" class="weui-content">
+<form action="${CPATH}/activity/apply" method="post" id="form">
   <main>
     <section class="weui-panel weui-panel_access order-customer-info">
       <div class="weui-cell weui-cell_access">
@@ -53,7 +230,8 @@ $(function () {
             客户名称
             <span class="require">*</span>
           </div>
-          <input type="text" placeholder="请选择客户" class="weui-input">
+			<input type="hidden" name="sellerCustomerIds" id="sellerCustomerIds" value="">
+          <input type="text" placeholder="请选择客户" class="weui-input select-customer" id="sellerCustomerNames" readonly>
         </div>
         <span class="weui-cell__ft"></span>
       </div>
@@ -68,125 +246,168 @@ $(function () {
       </div>
       <div class="weui-cell weui-cell_access">
         <div class="weui-cell__bd">
-          <div class="order-customer-info-title">
-            使用说明
-            <span class="require">*</span>
-          </div>
-          <textarea placeholder="请输入使用说明" class="fr"></textarea>
+          <textarea placeholder="备注说明（70字以内）" name="content" class="fr"></textarea>
         </div>
       </div>
     </section>
     <div class="weui-cells__title">活动明细</div>
-    <section class="weui-panel weui-panel_access activity-detail-item">
-      <div class="weui-cell weui-cell_access select-area">
-        <input type="text" class="weui-input activity-item" readonly placeholder="请选择活动项目">
-        <i class="icon-sort-desc"></i>
-        <p class="orange ft14">删除</p>
-      </div>
-      <div class="weui-cell weui-cell_access">
-        <div class="weui-cell__bd">
-          <div class="order-customer-info-title">
-            开始日期
-            <span class="require">*</span>
-          </div>
-          <input type="text" class="weui-input fr" id="start-date-1">
-        </div>
-      </div>
-      <div class="weui-cell weui-cell_access">
-        <div class="weui-cell__bd">
-          <div class="order-customer-info-title">
-            结束日期
-            <span class="require">*</span>
-          </div>
-          <input type="text" class="weui-input fr" id="end-date-1">
-        </div>
-      </div>
-      <div class="weui-cell weui-cell_access">
-        <div class="weui-cell__bd">
-          <div class="order-customer-info-title">
-            预计金额
-            <span class="require">*</span>
-          </div>
-          <div class="fr t-r">
-            <input type="text" class="weui-input" placeholder="请输入预计金额">&nbsp;&nbsp;元
-          </div>
-        </div>
-      </div>
-    </section>
-    <section class="weui-panel weui-panel_access activity-detail-item">
-      <div class="weui-cell weui-cell_access select-area">
-        <input type="text" class="weui-input activity-item" readonly placeholder="请选择活动项目">
-        <i class="icon-sort-desc"></i>
-        <p class="orange ft14">删除</p>
-      </div>
-      <div class="weui-cell weui-cell_access">
-        <div class="weui-cell__bd">
-          <div class="order-customer-info-title">
-            开始日期
-            <span class="require">*</span>
-          </div>
-          <input type="text" class="weui-input fr" id="start-date-2">
-        </div>
-      </div>
-      <div class="weui-cell weui-cell_access">
-        <div class="weui-cell__bd">
-          <div class="order-customer-info-title">
-            结束日期
-            <span class="require">*</span>
-          </div>
-          <input type="text" class="weui-input fr" id="end-date-2">
-        </div>
-      </div>
-      <div class="weui-cell weui-cell_access">
-        <div class="weui-cell__bd">
-          <div class="order-customer-info-title">
-            预计金额
-            <span class="require">*</span>
-          </div>
-          <div class="fr t-r">
-            <input type="text" class="weui-input" placeholder="请输入预计金额">&nbsp;&nbsp;元
-          </div>
-        </div>
-      </div>
-    </section>
-    <section class="weui-panel weui-panel_access">
+	  <div id="activityList">
+		<section class="weui-panel weui-panel_access activity-detail-item">
+		  <div class="weui-cell weui-cell_access select-area">
+			<input type="text" class="weui-input activity-item" id="title" readonly placeholder="请选择活动项目">
+			<input type="hidden" name="acticity_id" id="acticityId">
+			<input type="hidden" name="visit_num" id="visitNum">
+			<i class="icon-sort-desc"></i>
+			<p class="orange ft14" id="delActivity">删除</p>
+		  </div>
+		  <div class="weui-cell weui-cell_access">
+			<div class="weui-cell__bd">
+			  <div class="order-customer-info-title">
+				开始日期
+				<span class="require"></span>
+			  </div>
+			  <input type="text" class="weui-input fr" id="startTime" readonly>
+			</div>
+		  </div>
+		  <div class="weui-cell weui-cell_access">
+			<div class="weui-cell__bd">
+			  <div class="order-customer-info-title">
+				结束日期
+				<span class="require"></span>
+			  </div>
+			  <input type="text" class="weui-input fr" id="endTime" readonly>
+			</div>
+		  </div>
+		  <div class="weui-cell weui-cell_access">
+			<div class="weui-cell__bd">
+			  <div class="order-customer-info-title">
+				预计金额
+				<span class="require"></span>
+			  </div>
+			  <div class="fr t-r">
+				<input type="text" class="weui-input" id="investAmount" readonly>&nbsp;&nbsp;元
+			  </div>
+			</div>
+		  </div>
+		</section>
+	  </div>
+    <section class="weui-panel weui-panel_access" id="addActivity">
       <div class="weui-cell weui-cell_access t-c ft14">
         <p class="width-100 blue">
           <i class="icon-plus-circle"></i>添加活动</p>
       </div>
     </section>
-<!--    <section class="weui-cells weui-cells_form">
-      <div class="weui-cell">
-        <div class="weui-cell__bd">
-          <div class="weui-uploader">
-            <div class="weui-uploader__hd">
-              <p class="weui-uploader__title">附件图片</p>
-              <div class="weui-uploader__info">0/2</div>
+	  <!--    <section class="weui-cells weui-cells_form">
+			<div class="weui-cell">
+			  <div class="weui-cell__bd">
+				<div class="weui-uploader">
+				  <div class="weui-uploader__hd">
+					<p class="weui-uploader__title">附件图片</p>
+					<div class="weui-uploader__info">0/2</div>
+				  </div>
+				  <div class="weui-uploader__bd">
+					<ul class="weui-uploader__files" id="uploaderFiles">
+					  <li class="weui-uploader__file weui-uploader__file_status" style="background-image:url(./images/pic_160.png)">
+						<div class="weui-uploader__file-content">
+						  <i class="weui-icon-warn"></i>
+						</div>
+					  </li>
+					  <li class="weui-uploader__file weui-uploader__file_status" style="background-image:url(./images/pic_160.png)">
+						<div class="weui-uploader__file-content">50%</div>
+					  </li>
+					</ul>
+					<div class="weui-uploader__input-box">
+					  <input id="uploaderInput" class="weui-uploader__input" type="file" accept="image/*" multiple="">
+					</div>
+				  </div>
+				</div>
+			  </div>
+			</div>
+		  </section>-->
+	  <article id="combin-filter" class="customerMulti">
+		<div id="customer">
+			<header>
+				<div class="weui-search-bar" id="searchBar">
+					<div class="weui-search-bar__form">
+						<div class="weui-search-bar__box">
+							<i class="weui-icon-search"></i>
+							<input type="search" class="weui-search-bar__input" id="searchInput" placeholder="搜索">
+							<a href="javascript:" class="weui-icon-clear" id="searchClear"></a>
+						</div>
+						<label class="weui-search-bar__label" id="searchText">
+							<i class="weui-icon-search"></i>
+							<span>请输入客户名或联系人</span>
+						</label>
+					</div>
+					<a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
+				</div>
+			</header>
+			<article class="customer">
+				<header>
+					<div class="head-search select-area">
+						<div class="weui-flex">
+							<div class="weui-flex__item">
+								<input type="text" id="userId" placeholder="业务员" class="weui-input" readonly>
+								<i class="icon-sort-desc"></i>
+							</div>
+							<div class="weui-flex__item">
+								<input type="text" id="customerTypeId" placeholder="客户类型" class="weui-input" readonly>
+								<i class="icon-sort-desc"></i>
+							</div>
+						</div>
+					</div>
+				</header>
+				<article id="infinite">
+					<div id="customerList">
+						<div class="weui-panel weui-panel_access weui-flex customerSelect" style="display: none">
+							<div class="check-box">
+								<input type="checkbox" name="sellerCustomerId" id="sellerCustomerId"
+									   class="weui-agree__checkbox">
+							</div>
+							<div class="weui-flex__item">
+								<div class="weui-flex">
+									<div class="weui-flex__item customer-info" id="customerInfo">
+										<p class="ft14" id="customerName"></p>
+										<p class="gray" id="contactP"></p>
+										<input type="hidden" id="contact" value="">
+										<input type="hidden" id="mobile" value="">
+										<input type="hidden" id="address" value="">
+									</div>
+								</div>
+								<p class="gray">
+									<span class="icon-map-marker ft16 green"></span>
+									<span id="addressSpan"></span>
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="weui-loadmore" id="loading" style="display: none;">
+						<i class="weui-loading"></i>
+						<span class="weui-loadmore__tips">正在加载</span>
+					</div>
+					<div class="weui-loadmore weui-loadmore_line" id="noMore" style="display: none;">
+						<span class="weui-loadmore__tips">暂无数据</span>
+					</div>
+				</article>
+			</article>
+		</div>
+		<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
+            <div class="total bg-white weui-flex__item t-l">
+               <input type="checkbox" name="" id="" class="weui-agree__checkbox select-all">
+				<span class="ft12">全选</span>
+                <span>&nbsp;&nbsp;合计:</span>
+                <span class="ft12">12</span>
             </div>
-            <div class="weui-uploader__bd">
-              <ul class="weui-uploader__files" id="uploaderFiles">
-                <li class="weui-uploader__file weui-uploader__file_status" style="background-image:url(./images/pic_160.png)">
-                  <div class="weui-uploader__file-content">
-                    <i class="weui-icon-warn"></i>
-                  </div>
-                </li>
-                <li class="weui-uploader__file weui-uploader__file_status" style="background-image:url(./images/pic_160.png)">
-                  <div class="weui-uploader__file-content">50%</div>
-                </li>
-              </ul>
-              <div class="weui-uploader__input-box">
-                <input id="uploaderInput" class="weui-uploader__input" type="file" accept="image/*" multiple="">
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>-->
-  </main>
+			<button id="confirm" type="button" class="place-order red-button white">确认</button>
+        </footer>
+	</article>
+	</main>
+</form>
+  
   <#include "_inc/_goback.html" />
   <div class="layer"></div>
   <footer class="weui-footer weui-footer_fixed-bottom weui-flex">
-    <button id="pply" class="red-button width-100">确定</button>
+    <button id="apply" class="red-button width-100">提交申请</button>
   </footer>
 </body>
 </@layout>
