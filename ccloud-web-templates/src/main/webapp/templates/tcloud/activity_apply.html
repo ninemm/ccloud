@@ -19,9 +19,11 @@ $(function () {
     });
     $("#start-date-1").val($.today());
     $("#end-date-1").calendar({
-       minDate: function () {
-           return $("#start-date-1").val();
-        }
+      minDate: function() {
+				var date = new Date($('#start-date-1').val().replace(/-/g,"/"));
+				date.setDate(date.getDate() - 1);
+				return date.Format("yyyy-MM-dd")
+			}
     });
     $("#end-date-1").val($.today());
     $("#start-date-2").calendar({
@@ -31,16 +33,18 @@ $(function () {
     });
     $("#start-date-2").val($.today());
     $("#end-date-2").calendar({
-        minDate: function () {
-           return $("#start-date-2").val();
-        }
+      minDate: function() {
+				var date = new Date($('#start-date-2').val().replace(/-/g,"/"));
+				date.setDate(date.getDate() - 1);
+				return date.Format("yyyy-MM-dd")
+			}
     });
     $("#end-date-2").val($.today());
 });
 </#macro>
 
 <@layout>
-<body id="fee-application">
+<body id="fee-application" class="weui-content">
   <main>
     <section class="weui-panel weui-panel_access order-customer-info">
       <div class="weui-cell weui-cell_access">

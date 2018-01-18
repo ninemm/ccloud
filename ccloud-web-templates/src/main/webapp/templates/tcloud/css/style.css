@@ -1343,8 +1343,10 @@ input.street-value {
   font-size: 0.7rem;
   height: inherit;
   line-height: inherit;
-  width: 70%;
+  width: 69%;
   text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .order-top-btns {

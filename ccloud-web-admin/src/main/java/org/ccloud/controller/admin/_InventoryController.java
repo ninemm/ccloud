@@ -31,8 +31,10 @@ import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Inventory;
 import org.ccloud.model.query.InventoryQuery;
+import org.ccloud.model.query.WarehouseQuery;
 import org.ccloud.model.InventoryDetail;
 import org.ccloud.model.User;
+import org.ccloud.model.Warehouse;
 import org.ccloud.model.query.InventoryDetailQuery;
 
 import com.google.common.collect.ImmutableMap;
@@ -78,12 +80,18 @@ public class _InventoryController extends JBaseCRUDController<Inventory> {
 			setAttr("product_name", product_name);
 		}
 		String seller_id= getSessionAttr("sellerId").toString();
-		
 		Map<String, Object> map;
-		if(seller_id == null) {
+		if(seller_id == null ||warehouse_id=="") {
 			map = new HashMap<String, Object>();
 		}else {
-			Page<Inventory> page = InventoryQuery.me().paginate(getPageNumber(), getPageSize(),product_sn,product_name,warehouse_id,seller_id);
+			Warehouse warehouse = WarehouseQuery.me().findById(warehouse_id);
+			//判断仓库是不是自己的  是自己的的仓库查出此仓库所有商品
+			Page<Inventory> page=new Page<>();
+			if (seller_id.equals(warehouse.getSellerId())) {
+				page = InventoryQuery.me().paginate(getPageNumber(), getPageSize(),product_sn,product_name,warehouse_id,null);
+			}else {
+				page = InventoryQuery.me().paginate(getPageNumber(), getPageSize(),product_sn,product_name,warehouse_id,seller_id);
+			}
 			map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		}
 		
@@ -105,11 +113,19 @@ public class _InventoryController extends JBaseCRUDController<Inventory> {
 	public void detaillist() {
 		String warehouse_id = getPara("warehouse_id");
 		String product_id = getPara("product_id");
-		String seller_id = getPara("seller_id");
+		
 		String start_date = getPara("startDate");
 		String end_date = getPara("endDate");
-
-		Page<InventoryDetail> page = InventoryDetailQuery.me().paginate(getPageNumber(), getPageSize(),warehouse_id,product_id,seller_id,start_date,end_date);
+		String seller_id= getSessionAttr("sellerId").toString();
+		Warehouse warehouse = WarehouseQuery.me().findById(warehouse_id);
+		//判断仓库是不是自己的  是自己的的仓库查出此仓库所有商品
+		Page<InventoryDetail> page=new Page<>();
+		if (seller_id.equals(warehouse.getSellerId())) {
+			page = InventoryDetailQuery.me().paginate(getPageNumber(), getPageSize(),warehouse_id,product_id,null,start_date,end_date);
+		}else {
+			page = InventoryDetailQuery.me().paginate(getPageNumber(), getPageSize(),warehouse_id,product_id,seller_id,start_date,end_date);
+		}
+		
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
 	}
