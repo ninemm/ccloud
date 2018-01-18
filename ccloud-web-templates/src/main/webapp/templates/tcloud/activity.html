@@ -462,13 +462,13 @@ function productChange(obj){
 							<div>
 								<input type="hidden" id="activityId" value="">
 								<input type="hidden" id="visitNum" value="">
+								<img src="" id="image" class="width-100 mg10-0" onerror="javascript:this.src='${CTPATH}/images/poster.jpg'" onClick="imageClick(this)">
 								<div class="product-top select-customer">
-									<img src="" id="image" style="width:2rem;" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'" onClick="imageClick(this)">
-									<div class="weui-cell_access product-top-right">
+									<div class="weui-cell_access">
 										<p class="product_name" id="title"></p>
 										<div class="product_unit">
 											时间：
-											<span id="time"></span>
+											<span id="time" class="no-bg"></span>
 										</div>
 										<span class="weui-cell__ft"></span>
 									</div>
