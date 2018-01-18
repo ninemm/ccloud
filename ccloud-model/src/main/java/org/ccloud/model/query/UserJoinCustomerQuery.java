@@ -114,14 +114,15 @@ public class UserJoinCustomerQuery extends JBaseQuery {
 	}
 	
 	public long customerCount(String dataArea,boolean newCustomer) {
-		/*		StringBuilder fromBuilder = new StringBuilder("select count(seller_customer_id) from cc_user_join_customer ");
-				fromBuilder.append("where data_area like '"+dataArea+"'");*/
-				StringBuilder fromBuilder = new StringBuilder("select count(csc.id) from cc_seller_customer csc inner join cc_user_join_customer cjc on csc.id = cjc.seller_customer_id ");
-				fromBuilder.append("where cjc.data_area like '"+dataArea+"'");
-				if(newCustomer) {
-					fromBuilder.append("and DATE_SUB(CURDATE(), INTERVAL 7 DAY) <= date(csc.create_date)");
-				}
-				
-				return Db.queryLong(fromBuilder.toString());
-			}
+//		StringBuilder fromBuilder = new StringBuilder("select count(seller_customer_id) from cc_user_join_customer ");
+//		fromBuilder.append("where data_area like '"+dataArea+"'");
+		StringBuilder fromBuilder = new StringBuilder("SELECT COUNT(*) ");
+		fromBuilder.append(" FROM ( SELECT count(*) FROM cc_seller_customer csc INNER JOIN cc_user_join_customer cjc ON csc.id = cjc.seller_customer_id ");
+		fromBuilder.append(" where cjc.data_area like '"+dataArea+"' ");
+		if(newCustomer) {
+			fromBuilder.append(" and DATE_SUB(CURDATE(), INTERVAL 7 DAY) <= date(csc.create_date)");
+		}
+		fromBuilder.append(" GROUP BY csc.customer_id ) t1");
+		return Db.queryLong(fromBuilder.toString());
+	}
 }

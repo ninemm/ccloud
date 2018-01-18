@@ -332,7 +332,7 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 						inInventory.setProductId(sellerProduct.getProductId());
 						inInventory.setSellerId(transferBill.getSellerId());
 						inInventory.setOutCount(new BigDecimal(0));
-						inInventory.setOutPrice(new BigDecimal(0));
+						inInventory.setOutPrice(outInventory.getInPrice());
 						inInventory.setOutAmount(new BigDecimal(0));
 						inInventory.setInCount(transferBillInfo.getProductCount());
 						inInventory.setInPrice(outInventory.getInPrice());
@@ -398,7 +398,7 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 							inInventoryDetail.setSellProductId(findBySellerAndId.getId());
 						}
 						inInventoryDetail.setOutCount(new BigDecimal(0));
-						inInventoryDetail.setOutPrice(new BigDecimal(0));
+						inInventoryDetail.setOutPrice(outInventory.getInPrice());
 						inInventoryDetail.setOutAmount(new BigDecimal(0));
 						inInventoryDetail.setInCount(transferBillInfo.getProductCount());
 						inInventoryDetail.setInPrice(outInventory.getInPrice());
