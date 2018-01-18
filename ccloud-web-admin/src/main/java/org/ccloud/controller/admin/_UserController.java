@@ -104,7 +104,10 @@ public class _UserController extends JBaseCRUDController<User> {
 	@RequiresPermissions(value = { "/admin/user", "/admin/all" }, logical = Logical.OR)
 	public void save() {
 		final User user = getModel(User.class);
-		User oldUser = UserQuery.me().findById(user.getId());
+		User oldUser = null;
+		if (StrKit.notBlank(user.getId())) {
+			oldUser = UserQuery.me().findById(user.getId());
+		}
 		String stationList = getPara("stationList");
 		String stationName = getPara("stationName");
 		String groupList = getPara("groupList");
@@ -175,14 +178,19 @@ public class _UserController extends JBaseCRUDController<User> {
 				userGroupRelList.add(userGroupRel);
 			}
 	    	Db.batchSave(userGroupRelList, userGroupRelList.size());
-			MenuManager.clearListByKey(user.getId());
-			
-			RealmSecurityManager rsm = (RealmSecurityManager)SecurityUtils.getSecurityManager();    
-	        ShiroDbRealm realm = (ShiroDbRealm)rsm.getRealms().iterator().next();   
-	        realm.clearCachedAuthorizationInfo(oldUser);
+	    	clearUserCache(user, oldUser);
 			renderAjaxResultForSuccess("ok");
 		} else {
 			renderAjaxResultForError("false");
+		}
+	}
+
+	private void clearUserCache(User user, User oldUser) {
+		if (oldUser != null) {
+			MenuManager.clearListByKey(user.getId());
+			RealmSecurityManager rsm = (RealmSecurityManager)SecurityUtils.getSecurityManager();    
+	        ShiroDbRealm realm = (ShiroDbRealm)rsm.getRealms().iterator().next();   
+	        realm.clearCachedAuthorizationInfo(oldUser);
 		}
 	}
 
