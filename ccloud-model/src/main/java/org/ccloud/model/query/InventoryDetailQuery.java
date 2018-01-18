@@ -49,11 +49,14 @@ public class InventoryDetailQuery extends JBaseQuery {
 	public Page<InventoryDetail> paginate(int pageNumber, int pageSize, String warehouse_id,String product_id,String seller_id,String start_date,String end_date) {
 		String select = "SELECT sp.custom_name, p.product_sn, p.name AS product_name,i.in_count, i.in_amount, i.in_price, i.out_count,i.out_amount,i.out_price,i.balance_count,i.balance_amount,i.balance_price,i.biz_type,u.realname,i.biz_bill_sn,i.biz_date ";
 		StringBuilder fromBuilder = new StringBuilder(" FROM `cc_inventory_detail` AS i ");
-		fromBuilder.append(" INNER JOIN `cc_product` AS p ON  i.sell_product_id in (select sp.id from cc_seller_product sp where sp.product_id ='");
-		fromBuilder.append(product_id+"'and sp.seller_id='"+seller_id+"' )INNER JOIN `user` AS u ON i.biz_user_id = u.id ");
-		fromBuilder.append("INNER JOIN cc_seller_product AS sp ON sp.id=i.sell_product_id ");
-		fromBuilder.append("WHERE i.warehouse_id = '"+ warehouse_id+"'and p.id='"+product_id+"' AND i.biz_date >='"+start_date+" 00:00:00' AND i.biz_date <='"+end_date+" 23:59:59'");
-		fromBuilder.append("ORDER BY sp.custom_name, i.create_date DESC");
+		fromBuilder.append(" INNER JOIN `cc_product` AS p ON  i.sell_product_id in (select sp.id from cc_seller_product sp where sp.product_id ='"+product_id+"'");
+		if (null!=seller_id) {
+			fromBuilder.append("AND sp.seller_id='"+seller_id+"'");
+		}
+		fromBuilder.append(" )INNER JOIN `user` AS u ON i.biz_user_id = u.id");
+		fromBuilder.append(" INNER JOIN cc_seller_product AS sp ON sp.id=i.sell_product_id ");
+		fromBuilder.append(" WHERE i.warehouse_id = '"+ warehouse_id+"'and p.id='"+product_id+"' AND i.biz_date >='"+start_date+" 00:00:00' AND i.biz_date <='"+end_date+" 23:59:59'");
+		fromBuilder.append(" ORDER BY sp.custom_name, i.create_date DESC");
 		LinkedList<Object> params = new LinkedList<Object>();
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());

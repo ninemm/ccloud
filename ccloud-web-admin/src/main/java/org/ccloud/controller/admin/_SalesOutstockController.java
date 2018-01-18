@@ -455,7 +455,6 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 									date, total)) {
 						return false;
 					}
-					
 
 					// 如果客户种类是直营商，则生成直营商的采购入库单
 					if (Consts.CUSTOMER_KIND_SELLER.equals(printAllNeedInfo.getCustomerKind())) {
