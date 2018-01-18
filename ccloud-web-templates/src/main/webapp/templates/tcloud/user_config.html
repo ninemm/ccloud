@@ -27,7 +27,6 @@
 
 <#macro script>
     $(function() {
-		window.removeEventListener('touchmove', addStopTouchendPropagationListener, true);
 		$("#city-picker").cityPicker({
 			title: "请选择物理区域",
 			onClose: function(obj) {

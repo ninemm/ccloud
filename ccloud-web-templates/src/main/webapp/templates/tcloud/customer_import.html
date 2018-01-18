@@ -19,7 +19,7 @@
     $(function() {
         $(document).on("input", "#searchInput", function() {
             combo();
-        }).on("touchend", "#customerInfo", function() {
+        }).on("click", "#customerInfo", function() {
             window.location.href = "${CPATH}/customer/gotoEdit?id=" + $(this).find("#sellerCustomerId").val();
         });
 

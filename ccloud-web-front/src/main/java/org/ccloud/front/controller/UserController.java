@@ -230,8 +230,10 @@ public class UserController extends BaseFrontController {
 			mobile = getPara("mobile", tmpUser.getMobile());
 		}
 		
-		List<User> userList = UserQuery.me().findByWechatOpenid(openid);
-		if (userList == null || userList.size() == 0)
+		List<User> userList = Lists.newArrayList();
+		if (StrKit.notBlank(openid))
+			userList = UserQuery.me().findByWechatOpenid(openid);
+		else if (StrKit.notBlank(mobile))
 			userList = UserQuery.me().findByMobile(mobile);
 		
 		for (User user : userList) {

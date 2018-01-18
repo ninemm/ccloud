@@ -166,9 +166,9 @@ public class SalesOutstockQuery extends JBaseQuery {
 		return outstock.save();
 	}
 
-	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, 
+	public Page<Record> paginate(int pageNumber, int pageSize, String sellerId, String keyword, String startDate, 
 			String endDate, String printStatus, String stockOutStatus, String status, String dataArea,String order,String sort) {
-		String select = "select o.*, c.customer_name,u.realname,ct.name as customerName ";
+		String select = "select o.*,  c.prov_name,c.city_name,c.country_name,c.address, c.customer_name,u.realname,ct.name as customerName ";
 		if (StrKit.notBlank(status)) {
 			select = select + ",t2.refundCount, t2.outCount ";
 		}
@@ -192,6 +192,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 		boolean needWhere = true;
 
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.seller_id", sellerId, params, needWhere);
 		if (needWhere) {
 			fromBuilder.append(" where 1 = 1");
 		}
@@ -330,20 +331,22 @@ public class SalesOutstockQuery extends JBaseQuery {
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 	
-	public Page<Record> paginateForReceivables(int pageNumber, int pageSize, String keyword, String status,
+	public Page<Record> paginateForReceivables(int pageNumber, int pageSize, String keyword, String userId,
 			String customerTypeId, String startDate, String endDate, String sellerId, String dataArea) {
 		String select = "select o.*, c.customer_name, ct.name as customerTypeName ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_sales_outstock` o ");
 		fromBuilder.append("left join cc_seller_customer cc ON o.customer_id = cc.id ");
 		fromBuilder.append("left join cc_customer c on cc.customer_id = c.id ");
 		fromBuilder.append("left join cc_customer_type ct on o.customer_type_id = ct.id ");
+		fromBuilder.append("LEFT JOIN cc_sales_order_join_outstock cso ON o.id = cso.outstock_id ");
+		fromBuilder.append("LEFT JOIN cc_sales_order cs ON cso.order_id = cs.id ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 
-		needWhere = appendIfNotEmpty(fromBuilder, "o.status", status, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "o.customer_type_id", customerTypeId, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "cs.biz_user_id", userId, params, needWhere);
 
 		if (needWhere) {
 			fromBuilder.append(" where o.status != ? ");

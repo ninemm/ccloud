@@ -20,11 +20,10 @@
     var $gallery = $("#gallery"), $galleryImg = $("#galleryImg");
     
     $(function() {
-        window.removeEventListener('touchmove', addStopTouchendPropagationListener, true);
         $("#length").text($("#address").val().length + '/' + 50);
         $(document).on("input", "#address", function() {
             $("#length").text($("#address").val().length + '/' + 50);
-        }).on('touchstart', '#delivery-address', function() {
+        }).on('click', '#delivery-address', function() {
             $("#customer_type").select('close');
         });
 
@@ -283,41 +282,43 @@
 
     wx.ready(function() {
         // 获取定位信息
-        wx.getLocation({
-            type: 'wgs84',
-	        success: function (res) {
-	            var latitude = res.latitude;                      // 纬度，浮点数，范围为90 ~ -90
-                var longitude = res.longitude;                    // 经度，浮点数，范围为180 ~ -180。
-                var speed = res.speed;                            // 速度，以米/每秒计
-                var accuracy = res.accuracy;                      // 位置精度
+        <#if !type?? || type?? && !sellerCustomer.location?? >
+            wx.getLocation({
+                type: 'wgs84',
+                success: function (res) {
+                    var latitude = res.latitude;                      // 纬度，浮点数，范围为90 ~ -90
+                    var longitude = res.longitude;                    // 经度，浮点数，范围为180 ~ -180。
+                    var speed = res.speed;                            // 速度，以米/每秒计
+                    var accuracy = res.accuracy;                      // 位置精度
 
-                var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
-                var geoc = new BMap.Geocoder();                   // 获取百度地址解析器
+                    var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
+                    var geoc = new BMap.Geocoder();                   // 获取百度地址解析器
 
-                $("#lng").val(parseFloat(longitude).toFixed(2));
-                $("#lat").val(parseFloat(latitude).toFixed(2));
-                translateCallback = function (point) {            // 回调函数
-                    geoc.getLocation(point, function(rs) {
-                        var addComp = rs.addressComponents;
-                        var address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
-                        //$("#delivery-address")[0].value = addComp.province + " " + addComp.city + " " + addComp.district;
-                        //$('#areaCode').val(addComp.provinceNumber + "," + addComp.cityNumber + "," + addComp.districtNumber);
-                        //$('#areaName').val(addComp.province + "," + addComp.city + "," + addComp.district);
-                        $('#location-span').text(address);
-                        $('#location').val(address);
-                    });
-                 };
-                 setTimeout(function() {
-                     BMap.Convertor.translate(point, 0, translateCallback);//真实经纬度转成百度坐标
-                 }, 100);
-	        },
-	        cancel: function (res) {
-	            console.log('用户拒绝授权获取地理位置');
-	        },
-	        fail: function (res) {
-	           console.log(JSON.stringify(res));
-	        }
-	    });
+                    $("#lng").val(parseFloat(longitude).toFixed(2));
+                    $("#lat").val(parseFloat(latitude).toFixed(2));
+                    translateCallback = function (point) {            // 回调函数
+                        geoc.getLocation(point, function(rs) {
+                            var addComp = rs.addressComponents;
+                            var address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
+                            //$("#delivery-address")[0].value = addComp.province + " " + addComp.city + " " + addComp.district;
+                            //$('#areaCode').val(addComp.provinceNumber + "," + addComp.cityNumber + "," + addComp.districtNumber);
+                            //$('#areaName').val(addComp.province + "," + addComp.city + "," + addComp.district);
+                            $('#location-span').text(address);
+                            $('#location').val(address);
+                        });
+                     };
+                     setTimeout(function() {
+                         BMap.Convertor.translate(point, 0, translateCallback);//真实经纬度转成百度坐标
+                     }, 100);
+                },
+                cancel: function (res) {
+                    console.log('用户拒绝授权获取地理位置');
+                },
+                fail: function (res) {
+                   console.log(JSON.stringify(res));
+                }
+	        });
+        </#if>
     });
     function refreshLocation() {
         $("#location-span").empty();
@@ -530,5 +531,12 @@
 		</footer>
 	</div>
 </div>
-<#include "_inc/_goback.html" />	
+<div class="hidden-menu">
+    <ul>
+        <li><a href="${CPATH}/">首页<img src="${CTPATH}/images/home.png" alt=""></a></li>
+        <li><a onclick="getback()">返回<img src="${CTPATH}/images/goback.png" alt=""></a></li>
+    </ul>
+    <img src="${CTPATH}/images/add.png" alt="" id="button" class="fr">
+</div>
+<div class="layer"></div>
 </@layout>

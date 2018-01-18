@@ -502,6 +502,9 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		return Db.find(sqlBuilder.toString(), order_sn);
 	}
 	
-	
+	public SalesOrderDetail findOutOrderId(String outstockId){
+		String sql = "SELECT csod.* from cc_sales_order_detail csod LEFT JOIN cc_sales_outstock_detail cso on cso.order_detail_id =csod.id where cso.outstock_id = '"+outstockId+"'";
+		return DAO.findFirst(sql);
+	}
 
 }

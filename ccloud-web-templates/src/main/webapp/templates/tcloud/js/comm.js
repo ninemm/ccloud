@@ -178,22 +178,6 @@ function confirmInput() {
 	closePop();
 }
 
-//阻止滚动后触发touchend事件
-var locked = false;
-
-function stopTouchendPropagationAfterScroll() {
- window.addEventListener('touchmove', addStopTouchendPropagationListener, true);
-}
-
-function addStopTouchendPropagationListener (ev) {
-	locked || (locked = true, window.addEventListener('touchend', stopTouchendPropagation, true));
-	function stopTouchendPropagation(ev) {
-		ev.stopPropagation();
-		window.removeEventListener('touchend', stopTouchendPropagation, true);
-		locked = false;
-	}
-}
-
 //打开组合搜索
 function openCombinSearch() {
   $layer.addClass("layer-show");
@@ -316,8 +300,7 @@ function wxLocation() {
 
 $(function() {
 	FastClick.attach(document.body);
-	stopTouchendPropagationAfterScroll();
-	$(document).on("touchstart", "#button", function() {
+	$(document).on("click", "#button", function() {
 		if (finished) {
 			if (!open) {
 				openMenu();
@@ -329,14 +312,14 @@ $(function() {
 		;
 	}).on("touchmove", ".layer, .top-right-menu-layer", function() {
 		event.preventDefault();
-	}).on("touchend", "input[type=number]:not([readonly])", function() {
+	}).on("touchstart", "input[type=number]:not([readonly])", function() {
 		if (!open) {
 			$currentInput = $(this);
 			openPop();
 		}
-	}).on("touchstart", "#cancel-input", function() {
+	}).on("click", "#cancel-input", function() {
 		closePop();
-	}).on("touchstart", "#confirm-input", function() {
+	}).on("click", "#confirm-input", function() {
 		confirmInput();
 	}).on("click", ".operate:first-child", function() {//减少商品数量
 		var $input = $(this).next();
@@ -346,7 +329,7 @@ $(function() {
 		$input.val(Number($input.val()) + 1);
 	}).on("change", "input[name=add-gift]", function() {//点击遮罩关闭菜单
 		$(this).parent().next().slideToggle("fast");
-	}).on("touchend", ".layer", function () { //点击遮罩关闭菜单、组合筛选
+	}).on("click", ".layer", function () { //点击遮罩关闭菜单、组合筛选
 		if ($('#combin-filter').is(':visible')) {
 			closeCombinSearch();
 		} else {
@@ -356,13 +339,13 @@ $(function() {
 	    if ($combinSearch.length > 0) {
 	      openCombinSearch();
 	    }
-	}).on('touchend', '#combin-filter .cancel-search-btn, #combin-filter .confirm-search-btn', function () { //关闭组合筛选
+	}).on('click', '#combin-filter .cancel-search-btn, #combin-filter .confirm-search-btn', function () { //关闭组合筛选
 	    closeCombinSearch();
-	}).on('touchend', '#combin-filter .filter-item span', function () {
+	}).on('click', '#combin-filter .filter-item span', function () {
 		$(this).addClass('red-button').siblings().removeClass('red-button');
-	}).on('touchend', '.goback', function() {
+	}).on('click', '.goback', function() {
 		historyUtils.back();
-	}).on('touchend', '.return_index', function() {
+	}).on('click', '.return_index', function() {
 		location.href = "/";
 	});
 })

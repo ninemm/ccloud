@@ -41,15 +41,18 @@ import org.ccloud.model.OutstockPrint;
 import org.ccloud.model.Payables;
 import org.ccloud.model.PrintTemplate;
 import org.ccloud.model.SalesOrder;
+import org.ccloud.model.SalesOrderDetail;
 import org.ccloud.model.SalesOutstock;
 import org.ccloud.model.SellerCustomer;
 import org.ccloud.model.User;
 import org.ccloud.model.Warehouse;
 import org.ccloud.model.query.DepartmentQuery;
+import org.ccloud.model.query.OutstockPrintQuery;
 import org.ccloud.model.query.PayablesQuery;
 import org.ccloud.model.query.PrintTemplateQuery;
 import org.ccloud.model.query.PurchaseInstockDetailQuery;
 import org.ccloud.model.query.PurchaseInstockQuery;
+import org.ccloud.model.query.SalesOrderDetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SalesOutstockDetailQuery;
 import org.ccloud.model.query.SalesOutstockQuery;
@@ -111,12 +114,13 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		String printStatus = getPara("printStatus");
 		String stockOutStatus = getPara("stockOutStatus");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String status = getPara("status");
 		// 获取排序相关信息
 		String sort = getPara("sortName[sort]");
 		String order = getPara("sortName[order]");
 
-		Page<Record> page = SalesOutstockQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate,
+		Page<Record> page = SalesOutstockQuery.me().paginate(getPageNumber(), getPageSize(), sellerId, keyword, startDate,
 				endDate, printStatus, stockOutStatus, status, dataArea, order, sort);
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
@@ -517,68 +521,50 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		String printStatus = getPara("printStatus");
 		String stockOutStatus = getPara("stockOutStatus");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\sales_outstock\\"
 				+ "salesOutstockInfo.xlsx";
 
-		Page<Record> page = SalesOutstockQuery.me().paginate(1, Integer.MAX_VALUE, keyword, startDate, endDate,
+		Page<Record> page = SalesOutstockQuery.me().paginate(1, Integer.MAX_VALUE, sellerId, keyword, startDate, endDate,
 				printStatus, stockOutStatus, null, dataArea, null, null);
 		List<Record> salesOutstckList = page.getList();
 
 		List<SalesOutstockExcel> excellist = Lists.newArrayList();
 		for (Record record : salesOutstckList) {
-
-			String outOrderId = record.get("id");
-			List<Record> outstockDetail = SalesOutstockDetailQuery.me().findByOutstockId(outOrderId);
+			String outStockId = record.get("id");
+			//客户信息
+			String customerInfo = record.get("customer_name").toString()+"," + record.get("prov_name")+record.get("city_name")+record.get("country_name")+record.get("address");
+			//下单日期
+			String saveDate =record.get("create_date").toString().substring(0, 10); 
+			//下单时间
+			String createDate = record.get("create_date").toString();
+			List<Record> outstockDetail = SalesOutstockDetailQuery.me().findByOutstockId(outStockId);
 			for (Record re : outstockDetail) {
-				SalesOutstockExcel excel = new SalesOutstockExcel();
+				SalesOrderDetail salesOrderDetail = SalesOrderDetailQuery.me().findOutOrderId(outStockId);
+				//打印时间
+				List<Record> outstockPrints = OutstockPrintQuery.me().findByOrderId(salesOrderDetail.getOrderId());
+				String printDate = "";
+				if(outstockPrints.size()>0) {
+					printDate =(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(outstockPrints.get(0).get("create_date")) ;
+				}
+				//条码
 				BigDecimal creatconverRelate = new BigDecimal(re.get("convert_relate").toString());
 				BigDecimal bigPrice = new BigDecimal(re.get("product_price").toString());
 				BigDecimal count = new BigDecimal(re.get("product_count").toString());
 				String bigCount = (count.intValue()) / (creatconverRelate.intValue()) + "";
 				String smallCount = (count.intValue()) % (creatconverRelate.intValue()) + "";
 				BigDecimal smallPrice = bigPrice.divide(creatconverRelate, 2, BigDecimal.ROUND_HALF_UP);
-				excel.setProductName(re.get("custom_name").toString());
-				excel.setValueName(re.get("valueName").toString());
-				excel.setProductCount(bigCount);
-				excel.setCreatconvertRelate(re.get("convert_relate").toString() + re.get("small_unit").toString() + "/"
-						+ re.get("big_unit").toString());
-				excel.setProductPrice(re.get("product_price").toString());
-				excel.setSmallCount(smallCount);
-				excel.setSmallPrice(smallPrice.toString());
-				excel.setTotalAmount(re.get("product_amount").toString());
-				excel.setOutstockSn(record.get("outstock_sn").toString());
-				excel.setCustomer(record.get("customer_name").toString());
-				excel.setCustomerType(record.get("customerName").toString());
-				excel.setContact(record.get("contact").toString());
-				excel.setMobile(record.get("mobile").toString());
-				if (record.get("realname") == null) {
-					excel.setBizUser("");
-				} else {
-					excel.setBizUser(record.get("realname").toString());
+				if(!bigCount.equals("0")) {
+					SalesOutstockExcel excel = new SalesOutstockExcel();
+					excel = saveExcel(re,record,bigPrice,bigCount,customerInfo,saveDate,createDate,printDate,re.get("big_unit").toString());
+					excellist.add(excel);
 				}
-				if (record.get("receive_type").toString().equals("0")) {
-					excel.setReceiveType("应收账款");
-				} else {
-					excel.setReceiveType("现金");
+				if(!smallCount.equals("0")){
+					SalesOutstockExcel excel = new SalesOutstockExcel();
+					excel = saveExcel(re,record,smallPrice,smallCount,customerInfo,saveDate,createDate,printDate,re.get("small_unit").toString());
+					excellist.add(excel);
 				}
-				if (record.get("is_print").toString().equals("0")) {
-					excel.setIsPrint("未打印");
-				} else {
-					excel.setIsPrint("已打印");
-				}
-				if (record.get("status").toString().equals("0")) {
-					excel.setStatus("待出库");
-				} else {
-					excel.setStatus("已出库");
-				}
-				if (re.get("is_gift").toString().equals("0")) {
-					excel.setIsGift("否");
-				} else {
-					excel.setIsGift("是");
-				}
-				excel.setCreateDate(record.get("create_date").toString());
-				excellist.add(excel);
 
 			}
 		}
@@ -604,5 +590,54 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		ExcelExportUtil.closeExportBigExcel();
 
 		renderFile(new File(filePath));
+	}
+	
+	public SalesOutstockExcel saveExcel(Record re,Record record,BigDecimal price,String count,String customerInfo,String saveDate,String createDate,String printDate,String unit) {
+		SalesOutstockExcel excel = new SalesOutstockExcel();
+		excel.setProductName(re.get("custom_name").toString());
+		excel.setValueName(re.get("valueName").toString());
+		excel.setProductCount(count);
+		excel.setUnit(unit);
+		excel.setCreatconvertRelate(re.get("convert_relate").toString() + re.get("small_unit").toString() + "/"
+				+ re.get("big_unit").toString());
+		excel.setProductPrice(price.toString());
+		excel.setTotalAmount(price.multiply(new BigDecimal(count)).toString());
+		excel.setOutstockSn(record.get("outstock_sn").toString());
+		excel.setCustomer(customerInfo);
+		excel.setCustomerType(record.get("customerName").toString());
+		excel.setContact(record.get("contact").toString());
+		excel.setMobile(record.get("mobile").toString());
+		excel.setProductPrice(price.toString());
+		excel.setSaveDate(saveDate);
+		excel.setCreateDate(createDate);
+		excel.setPrintDate(printDate);
+		if (record.get("realname") == null) {
+			excel.setBizUser("");
+		} else {
+			excel.setBizUser(record.get("realname").toString());
+		}
+		if (record.get("receive_type").toString().equals("0")) {
+			excel.setReceiveType("应收账款");
+		} else {
+			excel.setReceiveType("现金");
+		}
+		if (record.get("is_print").toString().equals("0")) {
+			excel.setIsPrint("未打印");
+		} else {
+			excel.setIsPrint("已打印");
+		}
+		if (record.get("status").toString().equals("0")) {
+			excel.setStatus("待出库");
+		} else {
+			excel.setStatus("已出库");
+		}
+		if (re.get("is_gift").toString().equals("0")) {
+			excel.setIsGift("否");
+		} else {
+			excel.setIsGift("是");
+		}
+		excel.setBarCode(re.get("bar_code").toString());
+		excel.setCreateDate(record.get("create_date").toString());
+		return excel;
 	}
 }
