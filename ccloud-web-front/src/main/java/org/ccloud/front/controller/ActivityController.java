@@ -113,6 +113,10 @@ public class ActivityController extends BaseFrontController {
 				tagSet);
 		renderJson(map);
 	}
+
+	public void activityApply() {
+		render("activity_apply.html");
+	}
 	
 	public void apply() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);

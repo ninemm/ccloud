@@ -1,0 +1,188 @@
+<#include "_inc/_layout.html"/>
+<#macro title>活动申请</#macro>
+<#macro css_import>
+</#macro>
+<#macro css>
+</#macro>
+<#macro script_import>
+</#macro>
+<#macro script>
+$(function () {
+    $(".activity-item").select({
+        title: "选择活动项目",
+        items: ["交通费", "交通补贴", "住宿费"]
+    });
+    $("#start-date-1").calendar({
+        maxDate: function () {
+        return $("#end-date-1").val();
+    }
+    });
+    $("#start-date-1").val($.today());
+    $("#end-date-1").calendar({
+       minDate: function () {
+           return $("#start-date-1").val();
+        }
+    });
+    $("#end-date-1").val($.today());
+    $("#start-date-2").calendar({
+        maxDate: function () {
+            return $("#end-date-2").val();
+        }
+    });
+    $("#start-date-2").val($.today());
+    $("#end-date-2").calendar({
+        minDate: function () {
+           return $("#start-date-2").val();
+        }
+    });
+    $("#end-date-2").val($.today());
+});
+</#macro>
+
+<@layout>
+<body id="fee-application">
+  <main>
+    <section class="weui-panel weui-panel_access order-customer-info">
+      <div class="weui-cell weui-cell_access">
+        <div class="weui-cell__bd">
+          <div class="order-customer-info-title">
+            客户名称
+            <span class="require">*</span>
+          </div>
+          <input type="text" placeholder="请选择客户" class="weui-input">
+        </div>
+        <span class="weui-cell__ft"></span>
+      </div>
+      <div class="weui-cell weui-cell_access">
+        <div class="weui-cell__bd">
+          <div class="order-customer-info-title">
+            客户信息
+            <span class="require">*</span>
+          </div>
+          <input type="text" placeholder="请输入客户信息" class="weui-input">
+        </div>
+      </div>
+      <div class="weui-cell weui-cell_access">
+        <div class="weui-cell__bd">
+          <div class="order-customer-info-title">
+            使用说明
+            <span class="require">*</span>
+          </div>
+          <textarea placeholder="请输入使用说明" class="fr"></textarea>
+        </div>
+      </div>
+    </section>
+    <div class="weui-cells__title">活动明细</div>
+    <section class="weui-panel weui-panel_access activity-detail-item">
+      <div class="weui-cell weui-cell_access select-area">
+        <input type="text" class="weui-input activity-item" readonly placeholder="请选择活动项目">
+        <i class="icon-sort-desc"></i>
+        <p class="orange ft14">删除</p>
+      </div>
+      <div class="weui-cell weui-cell_access">
+        <div class="weui-cell__bd">
+          <div class="order-customer-info-title">
+            开始日期
+            <span class="require">*</span>
+          </div>
+          <input type="text" class="weui-input fr" id="start-date-1">
+        </div>
+      </div>
+      <div class="weui-cell weui-cell_access">
+        <div class="weui-cell__bd">
+          <div class="order-customer-info-title">
+            结束日期
+            <span class="require">*</span>
+          </div>
+          <input type="text" class="weui-input fr" id="end-date-1">
+        </div>
+      </div>
+      <div class="weui-cell weui-cell_access">
+        <div class="weui-cell__bd">
+          <div class="order-customer-info-title">
+            预计金额
+            <span class="require">*</span>
+          </div>
+          <div class="fr t-r">
+            <input type="text" class="weui-input" placeholder="请输入预计金额">&nbsp;&nbsp;元
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="weui-panel weui-panel_access activity-detail-item">
+      <div class="weui-cell weui-cell_access select-area">
+        <input type="text" class="weui-input activity-item" readonly placeholder="请选择活动项目">
+        <i class="icon-sort-desc"></i>
+        <p class="orange ft14">删除</p>
+      </div>
+      <div class="weui-cell weui-cell_access">
+        <div class="weui-cell__bd">
+          <div class="order-customer-info-title">
+            开始日期
+            <span class="require">*</span>
+          </div>
+          <input type="text" class="weui-input fr" id="start-date-2">
+        </div>
+      </div>
+      <div class="weui-cell weui-cell_access">
+        <div class="weui-cell__bd">
+          <div class="order-customer-info-title">
+            结束日期
+            <span class="require">*</span>
+          </div>
+          <input type="text" class="weui-input fr" id="end-date-2">
+        </div>
+      </div>
+      <div class="weui-cell weui-cell_access">
+        <div class="weui-cell__bd">
+          <div class="order-customer-info-title">
+            预计金额
+            <span class="require">*</span>
+          </div>
+          <div class="fr t-r">
+            <input type="text" class="weui-input" placeholder="请输入预计金额">&nbsp;&nbsp;元
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="weui-panel weui-panel_access">
+      <div class="weui-cell weui-cell_access t-c ft14">
+        <p class="width-100 blue">
+          <i class="icon-plus-circle"></i>添加活动</p>
+      </div>
+    </section>
+<!--    <section class="weui-cells weui-cells_form">
+      <div class="weui-cell">
+        <div class="weui-cell__bd">
+          <div class="weui-uploader">
+            <div class="weui-uploader__hd">
+              <p class="weui-uploader__title">附件图片</p>
+              <div class="weui-uploader__info">0/2</div>
+            </div>
+            <div class="weui-uploader__bd">
+              <ul class="weui-uploader__files" id="uploaderFiles">
+                <li class="weui-uploader__file weui-uploader__file_status" style="background-image:url(./images/pic_160.png)">
+                  <div class="weui-uploader__file-content">
+                    <i class="weui-icon-warn"></i>
+                  </div>
+                </li>
+                <li class="weui-uploader__file weui-uploader__file_status" style="background-image:url(./images/pic_160.png)">
+                  <div class="weui-uploader__file-content">50%</div>
+                </li>
+              </ul>
+              <div class="weui-uploader__input-box">
+                <input id="uploaderInput" class="weui-uploader__input" type="file" accept="image/*" multiple="">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>-->
+  </main>
+  <#include "_inc/_goback.html" />
+  <div class="layer"></div>
+  <footer class="weui-footer weui-footer_fixed-bottom weui-flex">
+    <button id="pply" class="red-button width-100">确定</button>
+  </footer>
+</body>
+</@layout>
