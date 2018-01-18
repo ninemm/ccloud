@@ -49,9 +49,6 @@ $(function() {
     	$("#activity_id").val($productDiv.find("#activityId").val());
     	$("#visit_num").val($productDiv.find("#visitNum").val());
     	
-    }).on("touchstart", "#placeOrder", function () {
-    	order();
-    	
     }).on("click", "#content", function () {
     	var $this = $(this).parents(".common");
     	var productName = $this.find("#productName").text();
@@ -102,7 +99,7 @@ $(function() {
         customerCombo();
     }).on("change", "#customerTypeId", function() {
         customerCombo();
-    }).on("click", "#apply", function() {
+    }).on("click", "#activityApply", function() {
         doSubmit();
     }).on('click', '.select-all', function() {
 			var _this = this;
@@ -380,50 +377,14 @@ function productChange(obj){
 			type: 2,
 			content: '保存中...'
 		});
-
-		$("#form").ajaxSubmit({
-			beforeSubmit: function() {
-				flg = false;
-				return true
-			},
-			type : "post", 
-			dataType : "json", 
-			success : function(data) {
-				layer.closeAll();
-				if (data.errorCode == 0) {
-
-					$.modal({
-						title: data.message,
-						buttons: [
-							{ text: "查看订单", className: "default", onClick: function(){ 
-								location.href = "${CPATH}/order/myOrder";
-								} 
-							},
-							{ text: "继续申请", className: "primary", onClick: function(){
-								location.href = '${CPATH}/activity';
-								} 
-							},
-						]
-					});
-					
-				} else {
-					$.toptip(data.message, 'error'); 
-				}
-				flg = true;
-			},
-			error : function() {
-				layer.closeAll();
-				alert("信息提交错误");
-				flg = true;
-			}
-		});
+		$("#form").submit();
 	}
 
 </#macro>
 
 <@layout>
 <div class="weui-content">
-<form action="${CPATH}/activity/apply" method="post" id="form">
+<form action="${CPATH}/activity/activityApply" method="post" id="form">
 	<div id="product">
 		<header>
 			<div class="weui-search-bar" id="searchBar">
@@ -564,7 +525,7 @@ function productChange(obj){
                 <input type="hidden" id="visit_num" name="visit_num" value="">
                 活动<span id="_title"></span>
             </div>
-            <button id="apply" type="button" class="place-order red-button white">申请活动</button>
+            <button id="activityApply" type="button" class="place-order red-button white">申请活动</button>
         </footer>
 	</article>
 </form>
