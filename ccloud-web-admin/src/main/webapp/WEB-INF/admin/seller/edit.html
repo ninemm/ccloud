@@ -95,11 +95,6 @@
 				stringLength: { max: 15, message: '联系人名称最大长度是15字符，请重新输入' }
 			}
 		},
-		'seller_type': {
-			validators: {
-				notEmpty: { message: '产品类型不能为空' }
-			}
-		},
 		'seller.jywx_open_id': {
 			validators: {
 				notEmpty: { message: '带*的企业微信号不能为空' },
@@ -243,20 +238,16 @@
 							</div>
 						</div>
 						</#if>
-						<!--  <#if !(seller.id) ??>
-						<@shiro.hasPermission name="/admin/all">
+						<#if !(seller.id) ??>
 						<div class="form-group col-sm-12 validata-box">
-										<label class="control-label col-sm-2">*销售商类型:</label>
-										<div class="input-group col-md-4 col-sm-10">
-											<select class="form-control input-sm" name="seller_type" id="seller_type">
-												<option value="" selected="selected">--请选择--</option>
-												<option value="0">经销商</option>
-												<option value="1">直营商</option>
-											</select>
-						               	</div>
-						</div>							
-						</@shiro.hasPermission>	
-						</#if>-->
+							<label class="control-label col-sm-2">*销售商类型:</label>
+							<div class="input-group col-md-4 col-sm-10">
+								<select class="form-control input-sm" name="seller.seller_type" id="seller_type">
+									${DICT_BOX('seller_type', 'select', (seller.seller_type)!)}
+								</select>
+			               	</div>
+						</div>	
+						</#if>						
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">*联系人:</label>
 							<div class="input-group col-md-4 col-sm-10">
@@ -270,26 +261,26 @@
 							</div>
 						</div>
 						<div class="form-group col-sm-12 validata-box">
-										<label class="control-label col-sm-2">是否启用:</label>
-										<div class="input-group col-md-4 col-sm-10">
-											<label class="radio-inline">
-						                 		<input type="radio" name="seller.is_enabled" value="1" <#if !seller?? || (seller.is_enabled)! == 1>checked</#if> />是
-						                 	</label>
-						                 	<label class="radio-inline">
-						                 		<input type="radio" name="seller.is_enabled" value="0" <#if seller?? && (seller.is_enabled)! == 0>checked</#if> />否
-											</label>		                 		
-						               	</div>
+							<label class="control-label col-sm-2">是否启用:</label>
+							<div class="input-group col-md-4 col-sm-10">
+								<label class="radio-inline">
+			                 		<input type="radio" name="seller.is_enabled" value="1" <#if !seller?? || (seller.is_enabled)! == 1>checked</#if> />是
+			                 	</label>
+			                 	<label class="radio-inline">
+			                 		<input type="radio" name="seller.is_enabled" value="0" <#if seller?? && (seller.is_enabled)! == 0>checked</#if> />否
+								</label>		                 		
+			               	</div>
 						</div>
 						<div class="form-group col-sm-12 validata-box">
-										<label class="control-label col-sm-2">是否有私有仓库:</label>
-										<div class="input-group col-md-4 col-sm-10">
-											<label class="radio-inline">
-						                 		<input type="radio" name="seller.has_store" value="1" <#if !seller?? || (seller.has_store)! == 1>checked</#if>>是
-						                 	</label>
-						                 	<label class="radio-inline">
-						                 		<input type="radio" name="seller.has_store" value="0" <#if seller?? && (seller.has_store)! == 0>checked</#if>>否
-											</label>		                 		
-						               	</div>
+							<label class="control-label col-sm-2">是否有私有仓库:</label>
+							<div class="input-group col-md-4 col-sm-10">
+								<label class="radio-inline">
+			                 		<input type="radio" name="seller.has_store" value="1" <#if !seller?? || (seller.has_store)! == 1>checked</#if>>是
+			                 	</label>
+			                 	<label class="radio-inline">
+			                 		<input type="radio" name="seller.has_store" value="0" <#if seller?? && (seller.has_store)! == 0>checked</#if>>否
+								</label>		                 		
+			               	</div>
 						</div>
 						<div class="form-group col-sm-12 validata-box">
 		                    <label for="_title" class="col-sm-2 control-label">省市区:</label>
