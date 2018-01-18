@@ -36,6 +36,7 @@ import com.google.common.collect.Maps;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.JsonKit;
 import com.jfinal.kit.Kv;
+import com.jfinal.kit.Ret;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
@@ -51,18 +52,11 @@ public class CustomerController extends BaseFrontController {
 	@Before(WechatJSSDKInterceptor.class)
 	public void index() {
 
-//		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
-//		String key = getPara("searchKey");
-//		String hasOrder = getPara("isOrdered");
-//		String customerType =  getPara("customerType");
-//		Page<Record> customerList = SellerCustomerQuery.me().findByUserTypeForApp(getPageNumber(), getPageSize(), selectDataArea, customerType, hasOrder, key);
-//		setAttr("customerList", customerList);
-
-		Map<String, Object> customerList = new HashMap<>();
+		Ret ret = Ret.create();
 		List<String> list = new ArrayList<>();
-		customerList.put("list", list);
-		customerList.put("totalRow", 11);
-		setAttr("customerList", customerList);
+		ret.set("list", list);
+		ret.set("totalRow", 11);
+		setAttr("customerList", ret);
 
 		String history = getPara("history");
 		setAttr("history", history);		
@@ -136,7 +130,7 @@ public class CustomerController extends BaseFrontController {
 			html.append("		</div>\n");
 			html.append("		<div class=\"weui-flex__item customer-href\">\n");
 			html.append("			<div class=\"weui-flex\">\n");
-			html.append("				<a href=\"tel:\"" + customer.getStr("mobile") + " class=\"weui-flex__item\">\n");
+			html.append("				<a href=\"tel:" + customer.getStr("mobile") + "\" class=\"weui-flex__item\">\n");
 			html.append("					<p><i class=\"icon-phone green\"></i></p>\n");
 			html.append("					<p>电话</p>\n");
 			html.append("				</a>\n");
@@ -159,22 +153,24 @@ public class CustomerController extends BaseFrontController {
 			html.append("		</div>\n");
 			html.append("	</div>\n");
 			html.append("	<hr />\n");
-			html.append("	<div class=\"operate-btn\">\n");
-			if (visitAdd) {
-				html.append("		<div class=\"button white-button fl border-1px\" onclick=\"newVisit({customerName:'" + customer.getStr("customer_name") + "',\n" +
-						"                                                                     sellerCustomerId:'" + customer.getStr("sellerCustomerId") + "',\n" +
-						"                                                                     contact:'" + customer.getStr("contact") + "',\n" +
-						"                                                                     mobile:'" + customer.getStr("mobile") + "',\n" +
-						"                                                                     address:'" + customer.getStr("address") + "'})\">客户拜访</div>\n");				
+			if (visitAdd || salesOrderAdd) {
+				html.append("	<div class=\"operate-btn\">\n");
+				if (visitAdd) {
+					html.append("		<div class=\"button white-button fl border-1px\" onclick=\"newVisit({customerName:'" + customer.getStr("customer_name") + "',\n" +
+							"                                                                     sellerCustomerId:'" + customer.getStr("sellerCustomerId") + "',\n" +
+							"                                                                     contact:'" + customer.getStr("contact") + "',\n" +
+							"                                                                     mobile:'" + customer.getStr("mobile") + "',\n" +
+							"                                                                     address:'" + customer.getStr("address") + "'})\">客户拜访</div>\n");				
+				}
+				if (salesOrderAdd) {
+					html.append("		<div class=\"button red-button fr\" onclick=\"newOrder({customerName:'" + customer.getStr("customer_name") + "',\n" +
+							"                                                                    sellerCustomerId:'" + customer.getStr("sellerCustomerId") + "',\n" +
+							"                                                                    contact:'" + customer.getStr("contact") + "',\n" +
+							"                                                                    mobile:'" + customer.getStr("mobile") + "',\n" +
+							"                                                                    address:'" + customer.getStr("address") + "'})\" >下订单</div>\n");				
+				}
+				html.append("	</div>\n");
 			}
-			if (salesOrderAdd) {
-				html.append("		<div class=\"button red-button fr\" onclick=\"newOrder({customerName:'" + customer.getStr("customer_name") + "',\n" +
-						"                                                                    sellerCustomerId:'" + customer.getStr("sellerCustomerId") + "',\n" +
-						"                                                                    contact:'" + customer.getStr("contact") + "',\n" +
-						"                                                                    mobile:'" + customer.getStr("mobile") + "',\n" +
-						"                                                                    address:'" + customer.getStr("address") + "'})\" >下订单</div>\n");				
-			}
-			html.append("	</div>\n");
 			html.append("	<p class=\"gray\">\n");
 			html.append("		<span class=\"icon-map-marker ft16 green\"></span>\n");
 			html.append(		customer.getStr("prov_name") + " " + customer.getStr("city_name") + " " + customer.getStr("country_name") + " " + customer.getStr("address") + "\n");
