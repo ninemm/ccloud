@@ -156,6 +156,7 @@
 
     //监听滚动
     $(".infinite").infinite().on("infinite", function() {
+    console.log(111);
         var self = this;
         $endNode = $("section:last");
         $loadmore = $(self).find(".weui-loadmore");
@@ -215,7 +216,7 @@
 </#macro>
 
 <@layout>
-<body id="application-record">
+<div id="application-record">
     <header>
         <div class="weui-search-bar" id="SearchBar">
             <form class="weui-search-bar__form">
@@ -232,7 +233,7 @@
             <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel" >取消</a>
         </div>
     </header>
-    <article class="customer">
+    <article class="customer" style="bottom: 44px;">
         <header class="has-th-list weui-flex">
             <div class="head-search select-area weui-flex__item">
                 <div class="weui-flex">
@@ -282,5 +283,5 @@
     <footer class="weui-footer weui-footer_fixed-bottom">
         <button class="red-button weui-flex__item _submit_btn">活动申请</button>
     </footer>
-</body>
+</div>
 </@layout>
