@@ -47,6 +47,7 @@
 	function doSubmit(){
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
+			    var index = layer.load(1, {shade: false}); //0代表加载的风格，支持0-2
 				var validate = $form.data('bootstrapValidator');
 				validate.validate();
 				return validate.isValid()
@@ -54,6 +55,7 @@
 			type : "post", 
 			dataType : "json", 
 			success : function(data) { 
+			    layer.closeAll();
 				if(data.errorCode == 0) {
 					//location.reload();
 					toastr.success(data.message, '操作成功');
@@ -62,6 +64,7 @@
 				}
 			},
 			error : function() {
+			    layer.closeAll();
 				alert("信息提交错误");
 			}
 		});
