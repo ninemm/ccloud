@@ -168,7 +168,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 
 	public Page<Record> paginate(int pageNumber, int pageSize, String sellerId, String keyword, String startDate, 
 			String endDate, String printStatus, String stockOutStatus, String status, String dataArea,String order,String sort) {
-		String select = "select o.*, c.customer_name,u.realname,ct.name as customerName ";
+		String select = "select o.*,  c.prov_name,c.city_name,c.country_name,c.address, c.customer_name,u.realname,ct.name as customerName ";
 		if (StrKit.notBlank(status)) {
 			select = select + ",t2.refundCount, t2.outCount ";
 		}
