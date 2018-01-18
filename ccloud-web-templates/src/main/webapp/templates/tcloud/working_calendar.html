@@ -1,0 +1,42 @@
+<#include "_inc/_layout.html"/>
+<#macro title>工作日历</#macro>
+<#macro css>
+    .weui-cells__title {
+        font-size: .8rem;
+        height: 2rem;
+        margin: 0;
+        padding: 0 0.75rem;
+        line-height: 2rem;
+    }
+</#macro>
+<#macro script>
+    $("#calendar-container").calendar({
+        container: "#calendar-container",
+        input: "#calendar",
+        multiple: true
+    });
+</#macro>
+<@layout>
+<div class="weui-content">
+    <input type="hidden" name="" id="calendar">
+    <div id="calendar-container"></div>
+    <div class="weui-cells__title">待办事项</div>
+    <div class="weui-cells">
+        <div class="weui-cell">
+            <div class="weui-cell__bd">
+                <p>拜访</p>
+            </div>
+        </div>
+        <div class="weui-cell">
+            <div class="weui-cell__bd">
+                <p>进货</p>
+            </div>
+        </div>
+        <div class="weui-cell">
+            <div class="weui-cell__bd">
+                <p>送货</p>
+            </div>
+        </div>
+    </div>
+</div>
+</@layout>
