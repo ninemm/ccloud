@@ -82,7 +82,7 @@ function initActivityChange($obj){
 	});
 }
 function changeEvent(activity,$obj){
-	$obj.find("#acticityId").val(activity.id);
+	$obj.find("#activityId").val(activity.id);
 	$obj.find("#visitNum").val(activity.visit_num);
 	$obj.find("#startTime").val(new Date(activity.start_time).Format("yyyy-MM-dd"));
 	$obj.find("#endTime").val(new Date(activity.end_time).Format("yyyy-MM-dd"));
@@ -286,7 +286,7 @@ function doChange(key){
 			<section class="weui-panel weui-panel_access activity-detail-item ft14">
 				<div class="weui-cell weui-cell_access select-area">
 					<input type="text" class="weui-input activity-item" id="title" readonly placeholder="请选择活动项目">
-					<input type="hidden" name="activity_id" id="actiityId">
+					<input type="hidden" name="activity_id" id="activityId">
 					<input type="hidden" name="visit_num" id="visitNum">
 					<i class="icon-sort-desc"></i>
 					<p class="orange ft14" id="delActivity">删除</p>
