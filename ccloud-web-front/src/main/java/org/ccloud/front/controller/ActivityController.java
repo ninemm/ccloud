@@ -166,6 +166,7 @@ public class ActivityController extends BaseFrontController {
 				activityApply.setNum(visit_nums[i]);
 				activityApply.setContent(content);
 				activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_WAIT);
+				activityApply.setDataArea(user.getDataArea());
 				activityApply.setCreateDate(createDate);
 				activityApply.save();
 			}

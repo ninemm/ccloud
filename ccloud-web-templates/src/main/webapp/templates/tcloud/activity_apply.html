@@ -218,7 +218,42 @@ function doChange(key){
             type: 2,
             content: '保存中...'
         });
-        $("#form").submit();
+		$("#form").ajaxSubmit({
+			beforeSubmit: function() {
+				flg = false;
+				return true
+			},
+			type : "post",
+			dataType : "json",
+			success : function(data) {
+				layer.closeAll();
+				if (data.errorCode == 0) {
+		
+					$.modal({
+						title: data.message,
+						buttons: [
+							{ text: "查看申请", className: "default", onClick: function(){
+								location.href = "${CPATH}/activity/applyList";
+							}
+						},
+							{ text: "继续申请", className: "primary", onClick: function(){
+								location.href = '${CPATH}/activity';
+							}
+						},
+						]
+					});
+			
+				} else {
+					$.toptip(data.message, 'error');
+				}
+				flg = true;
+			},
+			error : function() {
+				layer.closeAll();
+				alert("信息提交错误");
+				flg = true;
+			}
+		});
     }
 
 </#macro>
@@ -246,7 +281,7 @@ function doChange(key){
 			<section class="weui-panel weui-panel_access activity-detail-item ft14">
 				<div class="weui-cell weui-cell_access select-area">
 					<input type="text" class="weui-input activity-item" id="title" readonly placeholder="请选择活动项目">
-					<input type="hidden" name="acticity_id" id="acticityId">
+					<input type="hidden" name="activity_id" id="actiityId">
 					<input type="hidden" name="visit_num" id="visitNum">
 					<i class="icon-sort-desc"></i>
 					<p class="orange ft14" id="delActivity">删除</p>
@@ -396,7 +431,7 @@ function doChange(key){
 
 <#include "_inc/_goback.html" />
 <footer class="weui-footer weui-footer_fixed-bottom weui-flex">
-	<button id="apply" class="red-button width-100">提交申请</button>
+	<button id="apply" type="button" class="red-button width-100">提交申请</button>
 </footer>
 </body>
 </@layout>
