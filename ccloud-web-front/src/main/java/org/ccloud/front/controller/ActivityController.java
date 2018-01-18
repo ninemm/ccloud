@@ -248,7 +248,10 @@ public class ActivityController extends BaseFrontController {
 					"                            </div>\n" +
 					"                            <div class=\"weui-flex__item\">\n" +
 					"                                <p>预计费用</p>\n" +
-					"                                <p>" + df.format(Double.parseDouble(apply.get("invest_amount").toString())) + "</p>\n" +
+					"                                <p>");
+			if(apply.get("invest_amount")!=null) html.append(df.format(Double.parseDouble(apply.get("invest_amount").toString())));
+			else html.append("0.00");
+			html.append( "</p>\n" +
 					"                            </div>\n" +
 					"                        </div>\n" +
 					"                    </div>\n" +

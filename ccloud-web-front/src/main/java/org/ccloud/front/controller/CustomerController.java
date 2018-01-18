@@ -271,11 +271,16 @@ public class CustomerController extends BaseFrontController {
 					"                            <span class=\"fr blue\">" + order.getStr("statusName") + "</span>\n" +
 					"                        </div>\n" +
 					"                        <div class=\"gray\">\n" +
-					"                            <p>数量：" +df.format(Double.parseDouble(order.get("total_count").toString())) + "件\n" +
+					"                            <p>数量：" );
+			if(order.get("total_count")!=null) html.append(df.format(Double.parseDouble(order.get("total_count").toString())));
+			else html.append("0.00");
+			html.append( "件\n" +
 					"                                <span class=\"fr\">时间：" + order.get("create_date").toString() + "</span>\n" +
 					"                            </p>\n" +
-					"                            <p>金额：" + df.format(Double.parseDouble(order.get("total_amount").toString())) + "" +
-					"							 <span class=\"fr\">业务员：" + order.getStr("realname") + "</span>" +
+					"                            <p>金额：" );
+			if(order.get("total_amount")!=null) html.append(df.format(Double.parseDouble(order.get("total_amount").toString())));
+			else html.append("0.00");
+			html.append("							 <span class=\"fr\">业务员：" + order.getStr("realname") + "</span>" +
 					"							 </p>\n" +
 					"                        </div>\n" +
 					"                        </a>\n" +

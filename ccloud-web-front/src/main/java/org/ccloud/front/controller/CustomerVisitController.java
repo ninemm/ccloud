@@ -60,7 +60,8 @@ public class CustomerVisitController extends BaseFrontController {
 		all.put("title", "全部");
 		all.put("value", "");
 
-		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
+		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString() + "%";
+		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(dealerDataArea);
 		List<Map<String, Object>> customerTypeList2 = new ArrayList<>();
 		customerTypeList2.add(all);
 
@@ -109,7 +110,7 @@ public class CustomerVisitController extends BaseFrontController {
 	@RequiresPermissions(value = { "/admin/customerVisit", "/admin/dealer/all" }, logical = Logical.OR)
 	public void one() {
 
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
 
 		Page<Record> visitList = CustomerVisitQuery.me().paginateForApp(getPageNumber(), getPageSize(), getPara("id"), null, null, null, null, selectDataArea, null);
 
@@ -127,7 +128,7 @@ public class CustomerVisitController extends BaseFrontController {
 
 	public void oneRefresh() {
 
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
 
 		Page<Record> visitList = new Page<>();
 		visitList = CustomerVisitQuery.me().paginateForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("id"), getPara("type"), getPara("nature"), getPara("level"), getPara("status"), selectDataArea, getPara("searchKey"));
@@ -165,7 +166,7 @@ public class CustomerVisitController extends BaseFrontController {
 
 	public void refresh() {
 
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
 		
 		Page<Record> visitList = new Page<>();
 		visitList = CustomerVisitQuery.me().paginateForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("id"), getPara("type"), getPara("nature"), getPara("level"), getPara("status"), selectDataArea, getPara("searchKey"));
@@ -270,7 +271,7 @@ public class CustomerVisitController extends BaseFrontController {
 
 	public void visitCustomerChoose() {
 
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
 
 		Map<String, Object> all = new HashMap<>();
 		all.put("title", "全部");
@@ -290,8 +291,8 @@ public class CustomerVisitController extends BaseFrontController {
 		List<Map<String, Object>> customerTypes = new ArrayList<>();
 		customerTypes.add(all);
 
-		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
-				.findByDataArea(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
+		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString() + "%";
+		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(dealerDataArea);
 		for (CustomerType customerType : customerTypeList) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", customerType.getName());
