@@ -56,21 +56,50 @@ public class CustomerVisitController extends BaseFrontController {
 	@RequiresPermissions(value = { "/admin/customerVisit", "/admin/dealer/all" }, logical = Logical.OR)
 	public void index() {
 
-//		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-//
-//		Page<Record> visitList = CustomerVisitQuery.me().paginateForApp(getPageNumber(), getPageSize(), null, null, null, null, null, selectDataArea, null);
-//
-//		if(StrKit.notBlank(getPara("id"))) {
-//			setAttr("id", getPara("id"));
-//			setAttr("name", getPara("name"));
-//		}
-//		setAttr("visitList", visitList);
-//
-		Map<String, Object> visitList = new HashMap<>();
-		List<String> list = new ArrayList<>();
-		visitList.put("list", list);
-		visitList.put("totalRow", 11);
-		setAttr("visitList", visitList);
+		Map<String, Object> all = new HashMap<>();
+		all.put("title", "全部");
+		all.put("value", "");
+
+		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
+		List<Map<String, Object>> customerTypeList2 = new ArrayList<>();
+		customerTypeList2.add(all);
+
+		for(CustomerType customerType : customerTypeList) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", customerType.getName());
+			item.put("value", customerType.getId());
+			customerTypeList2.add(item);
+		}
+
+		List<Dict> subTypeList = DictQuery.me().findDictByType("customer_subtype");
+		List<Map<String, Object>> customerLevel = new ArrayList<>();
+		customerLevel.add(all);
+
+		for(Dict subType : subTypeList) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", subType.getName());
+			item.put("value", subType.getValue());
+			customerLevel.add(item);
+		}
+
+		List<Map<String, Object>> nature = new ArrayList<>();
+		nature.add(all);
+
+		List<Dict> statusList = DictQuery.me().findDictByType("customer_audit");
+		List<Map<String, Object>> statusList1 = new ArrayList<>();
+		statusList1.add(all);
+
+		for(Dict status: statusList) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", status.getName());
+			item.put("value", status.getValue());
+			statusList1.add(item);
+		}
+
+		setAttr("type", JSON.toJSON(customerTypeList2));
+		setAttr("nature", JSON.toJSON(nature));
+		setAttr("level", JSON.toJSON(customerLevel));
+		setAttr("status", JSON.toJSON(statusList1));
 
 		String history = getPara("history");
 		setAttr("history", history);	
@@ -133,52 +162,6 @@ public class CustomerVisitController extends BaseFrontController {
 		renderJson(map);
 	}
 
-	public void getSelect() {
-
-		Map<String, Object> all = new HashMap<>();
-		all.put("title", "全部");
-		all.put("value", "");
-
-		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
-		List<Map<String, Object>> customerTypeList2 = new ArrayList<>();
-		customerTypeList2.add(all);
-
-		for(CustomerType customerType : customerTypeList) {
-			Map<String, Object> item = new HashMap<>();
-			item.put("title", customerType.getName());
-			item.put("value", customerType.getId());
-			customerTypeList2.add(item);
-		}
-
-		List<Dict> subTypeList = DictQuery.me().findDictByType("customer_subtype");
-		List<Map<String, Object>> customerLevel = new ArrayList<>();
-		customerLevel.add(all);
-
-		for(Dict subType : subTypeList) {
-			Map<String, Object> item = new HashMap<>();
-			item.put("title", subType.getName());
-			item.put("value", subType.getValue());
-			customerLevel.add(item);
-		}
-
-		List<Map<String, Object>> nature = new ArrayList<>();
-		nature.add(all);
-
-		List<Dict> statusList = DictQuery.me().findDictByType("customer_audit");
-		List<Map<String, Object>> statusList1 = new ArrayList<>();
-		statusList1.add(all);
-
-		for(Dict status: statusList) {
-			Map<String, Object> item = new HashMap<>();
-			item.put("title", status.getName());
-			item.put("value", status.getValue());
-			statusList1.add(item);
-		}
-
-
-		Map<String, List<Map<String, Object>>> data = ImmutableMap.of( "type", customerTypeList2, "nature", nature, "level", customerLevel, "status", statusList1);
-		renderJson(data);
-	}
 
 	public void refresh() {
 

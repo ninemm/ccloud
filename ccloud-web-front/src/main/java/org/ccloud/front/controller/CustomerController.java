@@ -53,19 +53,6 @@ public class CustomerController extends BaseFrontController {
 	@Before(WechatJSSDKInterceptor.class)
 	public void index() {
 
-		Ret ret = Ret.create();
-		List<String> list = new ArrayList<>();
-		ret.set("list", list);
-		ret.set("totalRow", 11);
-		setAttr("customerList", ret);
-
-		String history = getPara("history");
-		setAttr("history", history);		
-		render("customer.html");
-	}
-
-	public void getCustomerRegionAndType() {
-
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
 
 		List<Record> userList = UserQuery.me().findNextLevelsUserList(selectDataArea);
@@ -102,9 +89,14 @@ public class CustomerController extends BaseFrontController {
 			item.put("value", dict.get("value"));
 			nearBy.add(item);
 		}
-			
-		Map<String, List<Map<String, Object>>> data = ImmutableMap.of("region", region, "customerType", customerTypeList2, "searchArea", nearBy);
-		renderJson(data);
+
+		setAttr("region", JSON.toJSON(region));
+		setAttr("customerType", JSON.toJSON(customerTypeList2));
+		setAttr("searchArea", JSON.toJSON(nearBy));
+
+		String history = getPara("history");
+		setAttr("history", history);		
+		render("customer.html");
 	}
 
 	public void refresh() {
