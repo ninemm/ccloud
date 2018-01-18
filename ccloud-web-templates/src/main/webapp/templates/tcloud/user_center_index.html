@@ -124,6 +124,7 @@ $(function() {
 			</@shiro.hasPermission>
 		</div>
 		</@shiro.hasPermission>
+		<@shiro.hasPermission name="/admin/activityApply">
 		<div class="weui-cells__title">营销活动</div>
 		<div class="weui-grids">
 			<!--<a href="/activityList" class="weui-grid js_grid"> <span
@@ -133,13 +134,16 @@ $(function() {
 				</div>
 				<p class="weui-grid__label">活动列表</p>
 			</a>-->
+			<@shiro.hasPermission name="/admin/activityApply">
 			<a href="${CPATH}/activity/applyList" class="weui-grid js_grid">
 				<div class="weui-grid__icon">
 					<i class="icon-table" style="color: #ffa042"></i>
 				</div>
 				<p class="weui-grid__label">申请记录</p>
 			</a>
+			</@shiro.hasPermission>
 		</div>
+		</@shiro.hasPermission>
 			<!--
 			<a href="./feeApplication.html" class="weui-grid js_grid">
 				<div class="weui-grid__icon">
