@@ -178,9 +178,7 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 						inventoryDetail.setId(StrKit.getRandomUUID());
 						inventoryDetail.setWarehouseId(warehouse_id);
 						inventoryDetail.setSellProductId(seller_product_id);
-						inventoryDetail.setInCount(productCount);
-						inventoryDetail.setInAmount(amount);
-						inventoryDetail.setInPrice(price);
+						
 						//根据seller_product_id添加各自的库存明细
 						InventoryDetail findByInventoryDetail = InventoryDetailQuery.me().findBySellerProductId(seller_product_id,warehouse_id);
 						if (findByInventoryDetail==null) {
@@ -190,15 +188,21 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 							inventoryDetail.setBalanceCount(findByInventoryDetail.getBalanceCount().add(productCount));
 							inventoryDetail.setBalanceAmount(findByInventoryDetail.getBalanceAmount().add(amount));
 						}
-						inventoryDetail.setBalancePrice(price);
 						
-						//业务类型  盘盈入库--100208  盘亏入库--100209
+						//业务类型  盘盈入库--100208  盘亏出库--100209
 						int compareTo = productCount.compareTo(new BigDecimal(0));
 						if (compareTo<0) {
+							inventoryDetail.setOutCount(productCount);
+							inventoryDetail.setOutAmount(amount);
+							inventoryDetail.setOutPrice(price);
 							inventoryDetail.setBizType(Consts.BIZ_TYPE_TRANSFER_REDUCE_OUTSTOCK);
 						}else {
+							inventoryDetail.setInCount(productCount);
+							inventoryDetail.setInAmount(amount);
+							inventoryDetail.setInPrice(price);
 							inventoryDetail.setBizType(Consts.BIZ_TYPE_TRANSFER_PLUS_INSTOCK);
 						}
+						inventoryDetail.setBalancePrice(price);
 						inventoryDetail.setBizBillSn(stockTaking.getStockTakingSn());
 						inventoryDetail.setBizDate(stockTaking.getBizDate());
 						inventoryDetail.setBizUserId(stockTaking.getBizUserId());
