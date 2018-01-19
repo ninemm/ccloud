@@ -69,7 +69,7 @@ public class OrderController extends BaseFrontController {
 		for (CustomerType customerType : customerTypeList) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", customerType.getName());
-			item.put("value", customerType.getId());
+			item.put("value", customerType.getName());
 			customerTypes.add(item);
 		}
 
@@ -433,6 +433,7 @@ public class OrderController extends BaseFrontController {
 
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		
+		String orderId = getPara("id");
 		String taskId = getPara("taskId");
 		String comment = getPara("comment");
 		String refuseReson = getPara("refuseReson","");
@@ -460,6 +461,13 @@ public class OrderController extends BaseFrontController {
 
 		WorkFlowService workflowService = new WorkFlowService();
 		workflowService.completeTask(taskId, comments, var);
+		
+		//审核订单后将message中是否阅读改为是
+		Message message=MessageQuery.me().findByObjectIdAndToUserId(orderId,user.getId());
+		if (null!=message) {
+			message.setIsRead(Consts.IS_READ);
+			message.update();
+		}
 		
 		renderAjaxResultForSuccess("订单审核成功");
 	}

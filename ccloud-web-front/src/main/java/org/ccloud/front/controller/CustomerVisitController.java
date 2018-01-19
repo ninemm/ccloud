@@ -456,6 +456,12 @@ public class CustomerVisitController extends BaseFrontController {
 		sendMessage(sellerId, comment, user.getId(), toUser.getId(), user.getDepartmentId(), user.getDataArea()
 				, Message.CUSTOMER_VISIT_REVIEW_TYPE_CODE, customerVisit.getSellerCustomer().getCustomer().getCustomerName(),id);
 		
+		//审核订单后将message中是否阅读改为是
+		Message message=MessageQuery.me().findByObjectIdAndToUserId(id,user.getId());
+		if (null!=message) {
+			message.setIsRead(Consts.IS_READ);
+			message.update();
+		}
 		if (customerVisit.saveOrUpdate())
 			renderAjaxResultForSuccess("操作成功");
 		else

@@ -617,7 +617,12 @@ public class CustomerController extends BaseFrontController {
 		String comment = (status == 1) ? "客户审核批准" : "客户审核拒绝";
 
 		boolean updated = true;
-
+		//审核订单后将message中是否阅读改为是
+		Message oldMessage=MessageQuery.me().findByObjectIdAndToUserId(sellerCustomerId,user.getId());
+		if (null!=oldMessage) {
+			oldMessage.setIsRead(Consts.IS_READ);
+			oldMessage.update();
+		}
 		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(sellerCustomerId);
 		sellerCustomer.setStatus(status == 1 ? SellerCustomer.CUSTOMER_NORMAL : SellerCustomer.CUSTOMER_REJECT);
 
