@@ -274,9 +274,9 @@
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">活动时间:</label>
 							<div class="input-group col-md-4 col-sm-10">
-								<input id="startDate" class="form-control" value="${startDate!}" name="startDate" placeholder="活动开始日期" style="width:230px;" >
-									<label class="control-label col-sm-2">—</label>
-								<input id="endDate" class="form-control" value="${endDate!}" name="endDate" placeholder="活动结束日期" style="width:250px;margin-left:20px;float:right;" >
+								<input id="startDate" class="form-control" value="${startDate!}" name="startDate" placeholder="开始日期" style="width:40%;" >
+									<label class="col-sm-2"></label>
+								<input id="endDate" class="form-control" value="${endDate!}" name="endDate" placeholder="结束日期" style="width:40%;margin-left:20px;float:right;" >
 							</div>
 						</div>
 						<div class="form-group col-sm-12 validata-box">
@@ -329,7 +329,7 @@
 						</div>
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">*投入类型:</label>
-							<div class="input-group col-md-4 col-sm-7" style="width:32.2%;">
+							<div class="input-group col-md-4 col-sm-7" style="width:33.4%;">
 								<select class="form-control input-sm" name="invest_type" id="invest_type" multiple="multiple" >
 									<#if activity??>
 										<#list (dicts)! as dict>
@@ -352,10 +352,10 @@
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">投入数量:</label>
 							<div class="input-group col-md-4 col-sm-10">
-								<input class="form-control input-sm" type="text" name="activity.invest_num" value="${(activity.invest_num)!}" style="width:350px;">
+								<input class="form-control input-sm" type="text" name="activity.invest_num" value="${(activity.invest_num)!}" style="width:48%;">
 									<label class="control-label col-sm-2">单位：</label>
 									
-								<select id="unit" name="unit" class="form-control input-sm" style="width:150px;float: none;">
+								<select id="unit" name="unit" class="form-control input-sm" style="width: 35%;float: none;">
 								</select>
 							</div>
 						</div>
