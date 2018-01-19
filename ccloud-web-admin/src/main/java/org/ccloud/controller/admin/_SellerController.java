@@ -184,12 +184,20 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				}
 			}
 			
+			//找到最近的经销商
+			String sId = "";
+			String dataArea = "";
+			String deptId = "";
+			List<Department> depts = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(department.getId());
+			sId = depts.get(0).getStr("seller_id");
+			dataArea = depts.get(0).getStr("data_area");
+			deptId = depts.get(0).getStr("id");
 			//保存通用打印模板,通用模板的ID：0
 			this.saveSellerJoinTemplate(seller.getId());
 			
 			if(seller.getSellerType().equals(Integer.parseInt(Consts.SELLER_TYPE_DEALER))) {
 				//新建销售商时默认创建分组  角色  及中间表 客户类型
-				this.saveOther(department);
+				this.saveOther(department,deptId);
 			}
 			
 			//添加直营商客户时 初始化数据
@@ -206,14 +214,6 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				customer.setCreateDate(new Date());
 				customer.setStatus("0");
 				customer.save();
-				//找到最近的经销商
-				String sId = "";
-				String dataArea = "";
-				String deptId = "";
-				List<Department> depts = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(department.getId());
-				sId = depts.get(0).getStr("seller_id");
-				dataArea = depts.get(0).getStr("data_area");
-				deptId = depts.get(0).getStr("id");
 				//添加直营商客户
 				this.saveSellerCustomer(customer.getId(), user, department,sId,dataArea,deptId);
 				seller.setCustomerId(customer.getId());
@@ -649,8 +649,8 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		customerType.save();
 	}
 	@Before(Tx.class)
-	public void saveOther(Department department){
-		List<Group> groupList = GroupQuery.me().findByDeptId();
+	public void saveOther(Department department,String deptId){
+		List<Group> groupList = GroupQuery.me()._findByDeptId(deptId);
 		if(groupList.size()>0){
 			for (Group group : groupList) {
 				Group newGroup=new Group();
@@ -666,7 +666,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				newGroup.save();
 			}
 		}
-		List<Role> roleList = RoleQuery.me().findByDeptId();
+		List<Role> roleList = RoleQuery.me()._findByDeptId(deptId);
 		if(roleList.size()>0){
 			for (Role role : roleList) {
 				Role newRole = new Role();

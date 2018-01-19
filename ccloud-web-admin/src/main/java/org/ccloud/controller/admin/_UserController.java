@@ -476,7 +476,7 @@ public class _UserController extends JBaseCRUDController<User> {
 				this.setUser(us, excel);
 				us.set("create_date", new Date());
 				us.set("group_name",excel.getUserGroup());
-				us.set("username", excel.getNickname());
+				us.set("username", excel.getUsername());
 				String dataArea = DataAreaUtil.dataAreaSetByUser(dept.getDataArea());
 				us.set("data_area", dataArea);
 				us.set("salt", EncryptUtils.salt());
@@ -502,7 +502,6 @@ public class _UserController extends JBaseCRUDController<User> {
 	
 	private void setUser(User user, UserExecel excel) {
 		user.set("realname", excel.getContact());
-		user.set("nickname", excel.getNickname());
 		user.set("mobile", excel.getMobile());
 		user.set("status", 1);
 		user.set("create_date", new Date());
@@ -547,7 +546,7 @@ public class _UserController extends JBaseCRUDController<User> {
 		for (User record : userList) {
 		
 			UserExecel excel = new UserExecel();
-			excel.setNickname((String) record.get("nickname"));
+			excel.setUsername((String) record.get("username"));
 			excel.setContact((String) record.get("realname"));
 			excel.setMobile((String) record.get("mobile"));
 			excel.setUserGroup((String) record.get("group_name"));
