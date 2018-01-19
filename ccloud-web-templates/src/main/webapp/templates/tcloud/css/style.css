@@ -2442,6 +2442,11 @@ input[name=input-type] {
   .order-customer-info-title {
     width: 4rem;
   }
+  .briefly {
+    width: 2.5rem;
+    padding: 0 .2rem;
+    margin-right: 0;
+  }
 }
 
 @media screen and (max-height:500px) {
