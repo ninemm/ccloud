@@ -31,12 +31,18 @@
 
 	$(function() {
 	    initCarWarehouse();
+	    initUser();
 	    var curDate = new Date().Format("yyyy-MM-dd");
 		$("#sOutDate").val(curDate);
 		jQuery.mm.initDatetimepicker('form', '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initDatetimepicker('form', '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initValidator('#form', validatorFields)
 		jQuery.mm.initEditTable('#_salesOutstock_table', url, initParams, initFields(), null);
+		$(document).on("change", "#startDate", function() {
+          initUser();
+	    }).on("change", "#endDate", function() {
+          initUser();
+	    })
 	});
 
 	$("#search-submit").click(function() {
@@ -59,6 +65,7 @@
 			endDate: $('#endDate').val() + " 23:59:59",
 			printStatus:$("#printStatus").val(),
 			stockOutStatus:$("#stockOutStatus").val(),
+			salesman:$("#salesman").val(),
 			sortName:params
 		};
 		return param;
@@ -347,6 +354,31 @@ function orderDetail(id) {
         });
     }
     
+    
+   <!-- 初始化业务员选择框 -->
+ var initUser = function () {
+        var strHtml = "";
+        var url = '${CPATH}/receivables/initUser';
+        $.ajax({
+            url: url,
+            type: 'post',
+            data:{
+            "startDate": $('#startDate').val() + " 00:00:00",
+			"endDate": $('#endDate').val() + " 23:59:59",
+			"print":0
+            },
+            success: function (result) {
+                var user = result.userList;
+                strHtml = '<option selected="selected" value="">业务员选择</option>';
+                for(index in user){
+                    var row = user[index];
+                    strHtml +='<option value="'+row.value+'">'+row.title+'</option>';
+                }
+                $("#salesman").html(strHtml);
+            }
+        });
+    }
+    
     <!--打印车销汇总单  -->
     function batchCarPrint(){
     var carWarehouseId = $("#carWarehouse").val();
@@ -393,7 +425,8 @@ function orderDetail(id) {
 			<input type="hidden" name="userIds" id="userIds" value="">
 		</div>
 		<div class="row content-row">
-			
+			 <select class="input-sm" name="salesman" id="salesman" style="padding-right:5px;margin-right:55px;">
+             </select>
 			<div class="form-group" style="float: right">
 				<div class="form-group validata-box">
 					<label class="control-label">开始时间:</label>
