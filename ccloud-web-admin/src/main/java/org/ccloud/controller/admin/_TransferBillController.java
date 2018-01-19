@@ -26,6 +26,7 @@ import java.util.Map;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
+import org.ccloud.model.Department;
 import org.ccloud.model.Inventory;
 import org.ccloud.model.InventoryDetail;
 import org.ccloud.model.SellerProduct;
@@ -33,6 +34,7 @@ import org.ccloud.model.TransferBill;
 import org.ccloud.model.TransferBillDetail;
 import org.ccloud.model.User;
 import org.ccloud.model.Warehouse;
+import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.InventoryDetailQuery;
 import org.ccloud.model.query.InventoryQuery;
 import org.ccloud.model.query.SellerProductQuery;
@@ -265,18 +267,17 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 	private Boolean inserIntoInventoryInfo(final List<transferBillInfo> transferBillList,
 			final TransferBill transferBill) {
 		boolean isSave = Db.tx(new IAtom() {
-			final User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-
 			@Override
 			public boolean run() throws SQLException {
 				for (transferBillInfo transferBillInfo : transferBillList) {
-					// 调拨出库的商品ID 详情 销售商 仓库ID 商品数量
+					// 调拨出库的商品ID 详情 销售商 仓库ID 商品数量  调拨人
 					String outSellerProductId = transferBillInfo.getSellerProductId();
 					SellerProduct outSellerProduct = SellerProductQuery.me().findById(outSellerProductId);
 					final String outSellerId = outSellerProduct.getSellerId();
 					String outProductId = outSellerProduct.getProductId();
 					String outWarehouseId = transferBillInfo.getFromWarehouseId();
 					BigDecimal outProductCount = transferBillInfo.getProductCount();
+					String bizUserId = transferBillInfo.getBizUserId();
 					// 先处理调出仓库的总账
 					Inventory outInventory = InventoryQuery.me().findBySellerIdAndProductIdAndWareHouseId(outSellerId,outProductId, outWarehouseId);
 					outInventory.setOutCount(outInventory.getOutCount().add(outProductCount));
@@ -308,10 +309,9 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 					outInventoryDetail.setBizType(Consts.BIZ_TYPE_TRANSFER_OUTSTOCK);
 					outInventoryDetail.setBizBillSn(transferBillInfo.getTransferBillSn());
 					outInventoryDetail.setBizDate(new Date());
-					outInventoryDetail.setBizUserId(transferBillInfo.getBizUserId());
-					outInventoryDetail.setDataArea(transferBillInfo.getDataArea());
-					outInventoryDetail.setDeptId(user.getDepartmentId());
-					outInventoryDetail.setBizUserId(transferBillInfo.getBizUserId());
+					outInventoryDetail.setDataArea(outInventory.getDataArea());
+					outInventoryDetail.setDeptId(outInventory.getDeptId());
+					outInventoryDetail.setBizUserId(bizUserId);
 					outInventoryDetail.setCreateDate(new Date());
 					if (!outInventoryDetail.save()) {
 						return false;
@@ -347,6 +347,7 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 					}else {
 						inSellerProduct=outSellerProduct;
 					}
+					Department department = DepartmentQuery.me().findBySellerId(inSellerId);
 					String inProductId = inSellerProduct.getProductId();
 					// 处理调入仓库的库存总账
 					Inventory inInventory = InventoryQuery.me().findBySellerIdAndProductIdAndWareHouseId(inSellerId, inProductId,inWarehouseId);
@@ -365,8 +366,8 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 						inInventory.setBalanceCount(outProductCount);
 						inInventory.setBalancePrice(outInventory.getInPrice());
 						inInventory.setBalanceAmount(outProductCount.multiply(outInventory.getInPrice()));
-						inInventory.setDataArea(user.getDataArea());
-						inInventory.setDeptId(user.getDepartmentId());
+						inInventory.setDataArea(department.getDataArea());
+						inInventory.setDeptId(department.getId());
 						inInventory.setCreateDate(new Date());
 						inInventory.setModifyDate(new Date());
 						if (!inInventory.save()) {
@@ -409,9 +410,9 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 					inInventoryDetail.setBizType(Consts.BIZ_TYPE_TRANSFER_INSTOCK);
 					inInventoryDetail.setBizBillSn(transferBillInfo.getTransferBillSn());
 					inInventoryDetail.setBizDate(new Date());
-					inInventoryDetail.setBizUserId(transferBillInfo.getBizUserId());
-					inInventoryDetail.setDataArea(transferBillInfo.getDataArea());
-					inInventoryDetail.setDeptId(user.getDepartmentId());
+					inInventoryDetail.setBizUserId(bizUserId);
+					inInventoryDetail.setDataArea(inInventory.getDataArea());
+					inInventoryDetail.setDeptId(department.getId());
 					inInventoryDetail.setCreateDate(new Date());
 					if (!inInventoryDetail.save()) {
 						return false;
