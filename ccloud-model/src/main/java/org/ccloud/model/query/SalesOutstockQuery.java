@@ -463,5 +463,41 @@ public class SalesOutstockQuery extends JBaseQuery {
 		}
 		return carSalesPrintNeedInfos;
 	}
+
+	public List<Record> findReceivablesUserList(String sellerId, String selectDataArea, String startDate, String endDate) {
+		StringBuilder fromBuilder = new StringBuilder("SELECT u.realname, u.id FROM cc_sales_outstock o ");
+		fromBuilder.append("LEFT JOIN cc_sales_order_join_outstock cj on cj.outstock_id = o.id ");
+		fromBuilder.append("LEFT JOIN cc_sales_order cs on cs.id = cj.order_id ");
+		fromBuilder.append("LEFT JOIN `user` u on u.id = cs.biz_user_id ");
+		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
+
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", selectDataArea, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
+
+		if (needWhere) {
+			fromBuilder.append(" where o.status != ? ");
+			params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
+		} else {
+			fromBuilder.append(" AND o.status != ? ");
+			params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
+		}
+		
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and o.create_date >= ?");
+			params.add(startDate);
+		}
+
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and o.create_date <= ?");
+			params.add(endDate);
+		}
+		fromBuilder.append("GROUP BY u.id ");
+
+		if (params.isEmpty())
+			return Db.find(fromBuilder.toString());
+
+		return Db.find(fromBuilder.toString(), params.toArray());
+	}
 	
 }

@@ -43,6 +43,7 @@
 		setItemBykey("startDate", startDate);
 		setItemBykey("endDate", endDate);	
 		combo();
+		initUser();
 	});
 
     $("#start-date").calendar({
@@ -61,10 +62,7 @@
 	$("#end-date").val($.today());
 
 	combo();
-	$("#status").select({
-		title: "业务员",
-		items: ${userList!}
-	});
+	initUser(1);
 	$("#customerTypeId").select({
 	title: "选择客户类型",
 	items: ${customerTypes!}
@@ -188,7 +186,8 @@
 		endDate = $.today() + ' 23:59:59';
 		setItemBykey("dayName", $("#date").val());
 		setItemBykey("startDate", startDate);
-		setItemBykey("endDate", endDate);			
+		setItemBykey("endDate", endDate);
+		initUser();		
 		combo();
 	}
 
@@ -215,6 +214,22 @@
 		loading = false;
 		page = 1;
 		initMyOrder();
+	}
+	
+	function initUser(type) {
+		var params = getParam();
+		Utils.ajax('${CPATH}/receivables/initUser', params, 
+			function(data){
+				if (type == 1) {
+					$("#status").select({
+						title: "业务员",
+						items: data.userList
+					});				
+				} else {
+					$("#status").select("update", { items: data.userList });
+				}
+			}
+		);	
 	}
 </#macro>
 
