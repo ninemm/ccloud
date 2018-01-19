@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
@@ -63,7 +64,12 @@ public class _GroupController extends JBaseCRUDController<Group> {
         String keyword = getPara("k");
         if (StrKit.notBlank(keyword)) setAttr("k", keyword);
         
-        Page<Group> page = GroupQuery.me().paginate(getPageNumber(), getPageSize(), keyword, getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString(), "g.order_list");
+        boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/all");
+		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		if (isSuperAdmin) {
+			dataArea = null;
+		}
+        Page<Group> page = GroupQuery.me().paginate(getPageNumber(), getPageSize(), keyword, dataArea, "g.order_list");
         if (page != null) {
             setAttr("page", page);
         }

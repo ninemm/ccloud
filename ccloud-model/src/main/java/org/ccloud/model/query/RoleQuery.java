@@ -53,7 +53,7 @@ public class RoleQuery extends JBaseQuery {
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "r.role_name", keyword, params, needWhere);
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "r.data_area", dataArea, params, needWhere);
 		fromBuilder.append("order by " + orderby);
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
