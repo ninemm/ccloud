@@ -319,7 +319,7 @@ $(function() {
 		}
 	}).on("click", "#cancel-input", function() {
 		closePop();
-	}).on("click", "#confirm-input", function() {
+	}).on("touchstart", "#confirm-input", function() {
 		confirmInput();
 	}).on("click", ".operate:first-child", function() {//减少商品数量
 		var $input = $(this).next();
