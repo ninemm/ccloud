@@ -192,8 +192,8 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 						//业务类型  盘盈入库--100208  盘亏出库--100209
 						int compareTo = productCount.compareTo(new BigDecimal(0));
 						if (compareTo<0) {
-							inventoryDetail.setOutCount(productCount);
-							inventoryDetail.setOutAmount(amount);
+							inventoryDetail.setOutCount(productCount.abs());
+							inventoryDetail.setOutAmount(amount.abs());
 							inventoryDetail.setOutPrice(price);
 							inventoryDetail.setBizType(Consts.BIZ_TYPE_TRANSFER_REDUCE_OUTSTOCK);
 						}else {
