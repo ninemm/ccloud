@@ -117,10 +117,7 @@
 				$loading.hide();
 
 				if(data.refundList.length == 0) {
-				    var childCount = $('.weui-panel').length;
-                    if (childCount == 1)
-					    $noMore.show();
-					    
+					if($('.weui-panel').length == 0) $noMore.show();
 					loading = true;
 					return;
 				}

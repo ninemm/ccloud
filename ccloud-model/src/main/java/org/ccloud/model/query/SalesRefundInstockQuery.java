@@ -339,7 +339,8 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		boolean needWhere = true;
 
 		needWhere = appendIfNotEmpty(fromBuilder, "o.status", status, params, needWhere);
-		needWhere = appendIfNotEmpty(fromBuilder, "o.customer_type_id", customerTypeId, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "ct.name", customerTypeId, params, needWhere);
+//		needWhere = appendIfNotEmpty(fromBuilder, "o.customer_type_id", customerTypeId, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
 

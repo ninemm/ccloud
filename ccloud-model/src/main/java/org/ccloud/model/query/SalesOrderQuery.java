@@ -108,11 +108,18 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append("left join cc_customer c on cc.customer_id = c.id ");
 		fromBuilder.append("left join cc_customer_type ct on o.customer_type_id = ct.id ");
 		fromBuilder.append("left join act_ru_task a on o.proc_inst_id = a.PROC_INST_ID_ ");
+
+		fromBuilder.append("LEFT JOIN (SELECT c1.id,GROUP_CONCAT(ct. NAME) AS customerTypeNames ");
+		fromBuilder.append("FROM cc_seller_customer c1 ");
+		fromBuilder.append("LEFT JOIN cc_customer_join_customer_type cjct ON c1.id = cjct.seller_customer_id ");
+		fromBuilder.append("LEFT JOIN cc_customer_type ct ON cjct.customer_type_id = ct.id ");
+		fromBuilder.append("GROUP BY c1.id) t1 ON cc.id = t1.id ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 
 		needWhere = appendIfNotEmpty(fromBuilder, "o.status", status, params, needWhere);
-		needWhere = appendIfNotEmpty(fromBuilder, "o.customer_type_id", customerTypeId, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "t1.customerTypeNames", customerTypeId, params, needWhere);
+//		needWhere = appendIfNotEmpty(fromBuilder, "o.customer_type_id", customerTypeId, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
 
