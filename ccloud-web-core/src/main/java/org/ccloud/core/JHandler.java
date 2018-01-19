@@ -91,9 +91,8 @@ public class JHandler extends Handler {
 		}
 		
 		if (isWechatRequest(request, target)) {
-			
-				HandlerKit.renderError404(request, response, isHandled);
-				return ;
+			HandlerKit.renderError404(request, response, isHandled);
+			return ;
 		}
 
 		String originalTarget = target;
@@ -141,10 +140,17 @@ public class JHandler extends Handler {
 	
 	private static boolean isWechatRequest(HttpServletRequest request, String target) {
 		
-		if (!JFinal.me().getConstants().getDevMode()) {
-			if (!target.contains("/admin") && !RequestUtils.isWechatBrowser(request)) 
-				return true;
+		if (JFinal.me().getConstants().getDevMode())
+			return false;
+		
+		Boolean mobileBrowseEnable = OptionQuery.me().findValueAsBool("mobile_browse_enable");
+		if (mobileBrowseEnable != null && mobileBrowseEnable == true) {
+			return false;
 		}
+		
+		if (!target.contains("/admin") && !RequestUtils.isWechatBrowser(request)) 
+			return true;
+		
 		return false;
 	}
 
