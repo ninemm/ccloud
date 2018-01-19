@@ -90,7 +90,7 @@ public class CustomerController extends BaseFrontController {
 			region.add(item);
 		}
 
-		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
+		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(dataArea);
 		List<Map<String, Object>> customerTypeList2 = new ArrayList<>();
 		customerTypeList2.add(all);
@@ -98,7 +98,7 @@ public class CustomerController extends BaseFrontController {
 		for(CustomerType customerType : customerTypeList) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", customerType.getName());
-			item.put("value", customerType.getId());
+			item.put("value", customerType.getName());
 			customerTypeList2.add(item);
 		}
 
@@ -361,7 +361,7 @@ public class CustomerController extends BaseFrontController {
 
 	public List<Map<String, Object>> getCustomerType(){
 
-		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
+		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(dataArea);
 		List<Map<String, Object>> list = new ArrayList<>();
 

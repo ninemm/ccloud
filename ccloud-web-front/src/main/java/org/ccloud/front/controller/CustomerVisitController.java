@@ -62,7 +62,7 @@ public class CustomerVisitController extends BaseFrontController {
 		all.put("title", "全部");
 		all.put("value", "");
 
-		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString() + "%";
+		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString();
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(dealerDataArea);
 		List<Map<String, Object>> customerTypeList2 = new ArrayList<>();
 		customerTypeList2.add(all);
@@ -70,7 +70,7 @@ public class CustomerVisitController extends BaseFrontController {
 		for(CustomerType customerType : customerTypeList) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", customerType.getName());
-			item.put("value", customerType.getId());
+			item.put("value", customerType.getName());
 			customerTypeList2.add(item);
 		}
 
@@ -133,7 +133,7 @@ public class CustomerVisitController extends BaseFrontController {
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
 
 		Page<Record> visitList = new Page<>();
-		visitList = CustomerVisitQuery.me().paginateForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("id"), getPara("type"), getPara("nature"), getPara("level"), getPara("status"), selectDataArea, getPara("searchKey"));
+		visitList = CustomerVisitQuery.me().paginateForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("id"), null, null, null, null, selectDataArea, null);
 
 		if(StrKit.notBlank(getPara("id"))) {
 			setAttr("id", getPara("id"));
