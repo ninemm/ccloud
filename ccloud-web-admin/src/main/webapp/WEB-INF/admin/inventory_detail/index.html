@@ -85,7 +85,11 @@ var initParams = function(params) {
 		var fields =
 			[
       			{field: "id", title: "ID", align: "center", visible:false, edit:false},
-      			{field: "biz_bill_sn", title: "业务单号", align: "center", width: '7%',sortable: true, edit:false},
+      			{field: "biz_bill_sn", title: "业务单号", align: "center", width: '7%',sortable: true,
+				formatter:	function(value,row,index){
+						return '<a href="#" name="order_sn" onclick="orderInfo(\''+row.biz_bill_sn+'\')">'+row.biz_bill_sn+'</a>';
+					},
+				edit: false},
       			{field: "cc_warehouse", title: "仓库", align: "center", width: '8%',sortable: true, edit:false},
       			{field: "sellerName", title: "产品名", align: "center", width: '10%', edit:false},
       			{field: "in_count", title: "入库数量", align: "center", width: '5%',sortable: true, edit:false},
@@ -105,7 +109,23 @@ var initParams = function(params) {
    			];
    		return fields;
 	}
-	
+	function orderInfo(orderSn){
+		var url = "";
+		if(orderSn.indexOf("SR")==0){
+			url = '${CPATH}/admin/salesInstock/detailBySn/' + orderSn;
+		}else if(orderSn.indexOf("PS")==0){
+			url = '${CPATH}/admin/purchaseInstock/detailBySn/' + orderSn;
+		}else{
+			url = '${CPATH}/admin/inventoryDetail/detailBySn/' + orderSn;
+		}
+		orderSn.indexOf("SR")==0?'${CPATH}/admin/salesInstock/detailBySn/' + orderSn:'${CPATH}/admin/purchaseInstock/detailBySn/' + orderSn;
+		layer.open({
+			title:"订单详细",
+			type: 2,
+			area: ['70%', '80%'],
+			content: url
+		});
+	}
 </#macro>
 
 <@layout active_id=p child_active_id=c>

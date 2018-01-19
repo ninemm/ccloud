@@ -51,7 +51,7 @@ public class InventoryDetailQuery extends JBaseQuery {
 		StringBuilder fromBuilder = new StringBuilder(" FROM `cc_inventory_detail` AS i ");
 		fromBuilder.append(" INNER JOIN `cc_product` AS p ON  i.sell_product_id in (select sp.id from cc_seller_product sp where sp.product_id ='"+product_id+"'");
 		if (null!=seller_id) {
-			fromBuilder.append("AND sp.seller_id='"+seller_id+"'");
+			fromBuilder.append("and sp.seller_id in (SELECT s.id FROM cc_seller s LEFT JOIN department d ON s.dept_id=d.id WHERE d.data_area LIKE (SELECT CONCAT(d.data_area,'%') FROM cc_seller s LEFT JOIN department d ON s.dept_id=d.id WHERE s.id='"+seller_id+"'))");
 		}
 		fromBuilder.append(" )INNER JOIN `user` AS u ON i.biz_user_id = u.id");
 		fromBuilder.append(" INNER JOIN cc_seller_product AS sp ON sp.id=i.sell_product_id ");

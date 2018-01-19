@@ -41,7 +41,6 @@ public class ReceivablesController extends BaseFrontController {
 	
 	public void index() {
 		
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		Map<String, Object> all = new HashMap<>();
 		all.put("title", "全部");
 		all.put("value", "");
@@ -49,9 +48,6 @@ public class ReceivablesController extends BaseFrontController {
 		List<Map<String, Object>> customerTypes = new ArrayList<>();
 		customerTypes.add(all);
 		
-		List<Map<String, Object>> userList = new ArrayList<>();
-		userList.add(all);		
-
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
 				.findByDataArea(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
 		for (CustomerType customerType : customerTypeList) {
@@ -61,18 +57,9 @@ public class ReceivablesController extends BaseFrontController {
 			customerTypes.add(item);
 		}
 		
-		List<User> list = UserQuery.me().findByDeptDataArea(selectDataArea);
-		for (User user : list) {
-			Map<String, Object> item = new HashMap<>();
-			item.put("title", user.getRealname());
-			item.put("value", user.getId());
-			userList.add(item);
-		}
-		
 		String history = getPara("history");
 		setAttr("history", history);		
 		setAttr("customerTypes", JSON.toJSON(customerTypes));
-		setAttr("userList", JSON.toJSON(userList));
 		render("out_stock_list.html");		
 	}
 	
@@ -92,6 +79,28 @@ public class ReceivablesController extends BaseFrontController {
 
 		Map<String, Object> map = new HashMap<>();
 		map.put("outStockList", outStockList.getList());
+		renderJson(map);
+	}
+	
+	public void initUser() {
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);		
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		Map<String, Object> all = new HashMap<>();
+		all.put("title", "全部");
+		all.put("value", "");
+		List<Map<String, Object>> userList = new ArrayList<>();
+		userList.add(all);
+		List<Record> list = SalesOutstockQuery.me().findReceivablesUserList(sellerId, selectDataArea, startDate, endDate, Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
+		for (Record record : list) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", record.getStr("realname"));
+			item.put("value", record.getStr("id"));
+			userList.add(item);
+		}		
+		Map<String, Object> map = new HashMap<>();
+		map.put("userList", userList);		
 		renderJson(map);
 	}
 	

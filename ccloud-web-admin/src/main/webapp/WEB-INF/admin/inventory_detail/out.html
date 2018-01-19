@@ -86,7 +86,12 @@
 		var fields =
 			[
       			{field: "id", title: "ID", align: "center", visible:false, edit:false},
-      			{field: "biz_bill_sn", title: "业务单号", align: "center", width: '7%',sortable: true, edit:false},
+      			{field: "biz_bill_sn", title: "业务单号", align: "center", width: '7%',sortable: true,
+      			formatter: function(value, row, rowIndex) {
+	      				var strHtml = '<a href="#" name="order_sn" onclick="orderInfo(\''+row.biz_bill_sn+'\')">'+row.biz_bill_sn+'</a>';
+						return strHtml;
+					},
+      			edit:false},
       			{field: "cc_warehouse", title: "仓库", align: "center", width: '8%',sortable: true, edit:false},
       			{field: "sellerName", title: "产品名", align: "center", width: '10%', edit:false},
       			{field: "out_count", title: "出库数量", align: "center", width: '5%',sortable: true, edit:false},
@@ -107,6 +112,24 @@
    		return fields;
 	}
 	
+	
+	function orderInfo(sn){
+	if(sn.substring(0,2)!="SS"){
+			layer.open({
+				title:"退货详细",
+				type: 2, 
+				area: ['70%', '80%'],
+				content: '${CPATH}/admin/purchaseRefundOutstock/_detail/' + sn
+			}); 
+		}else{
+			layer.open({
+				title:"销售出库订单详细",
+				type: 2,
+				area: ['70%', '80%'],
+				content: '${CPATH}/admin/salesOutstock/stockdetailBySn/' + sn
+			});
+		}
+	}
 </#macro>
 
 <@layout active_id=p child_active_id=c>

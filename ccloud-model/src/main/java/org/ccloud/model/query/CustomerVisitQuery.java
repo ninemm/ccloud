@@ -259,11 +259,17 @@ public class CustomerVisitQuery extends JBaseQuery {
 		sql.append("LEFT JOIN cc_customer cc ON cc.id = csc.customer_id ");
 		sql.append("LEFT JOIN cc_customer_join_customer_type ccjct ON ccv.seller_customer_id = ccjct.seller_customer_id ");
 
+		sql.append("LEFT JOIN ( SELECT c1.id,GROUP_CONCAT(ct. NAME) AS customerTypeNames ");
+		sql.append("FROM cc_seller_customer c1 ");
+		sql.append("LEFT JOIN cc_customer_join_customer_type cjct ON c1.id = cjct.seller_customer_id ");
+		sql.append("LEFT JOIN cc_customer_type ct ON cjct.customer_type_id = ct.id ");
+		sql.append("GROUP BY c1.id) t1 ON t1.id = csc.id ");
+
 		sql.append("LEFT JOIN `user` u ON u.id = ccv.user_id ");
 		sql.append(" WHERE LENGTH(ccv.photo) > 2 ");
 
 		appendIfNotEmpty(sql,"ccv.seller_customer_id", customerName, params, false);
-		appendIfNotEmpty(sql,"ccjct.customer_type_id", customerType, params, false);
+		appendIfNotEmpty(sql,"t1.customerTypeNames", customerType, params, false);
 		appendIfNotEmptyWithLike(sql, "ccv.data_area", data_area, params, false);
 
 		sql.append("ORDER BY ccv.create_date");

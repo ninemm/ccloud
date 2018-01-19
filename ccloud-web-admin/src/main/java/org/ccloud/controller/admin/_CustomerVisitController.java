@@ -160,7 +160,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 	public void image() {
 
 		String typeDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString();
-		List<Record> typeList = CustomerTypeQuery.me().findCustomerTypeList(typeDataArea + "%");
+		List<Record> typeList = CustomerTypeQuery.me().findCustomerTypeList(typeDataArea);
 		setAttr("customerType",JSON.toJSON(typeList));
 
 		List<Record> nameList = SellerCustomerQuery.me().findName(getSessionAttr(Consts.SESSION_SELECT_DATAAREA)+ "%");
@@ -226,7 +226,6 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
         String typeDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString();
         List<Record> typeList = CustomerTypeQuery.me().findCustomerTypeList(typeDataArea);
         renderAjaxResultForSuccess("success",JSON.toJSON(typeList));
-        //setAttr("customerTypeList", typeList);
 	}
 
 	public void queryQuestionType() {

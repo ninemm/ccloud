@@ -24,7 +24,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.ccloud.Consts;
-import org.ccloud.model.Department;
 import org.ccloud.model.PayablesDetail;
 import org.ccloud.model.Product;
 import org.ccloud.model.PurchaseInstockDetail;
@@ -164,7 +163,6 @@ public class PurchaseInstockDetailQuery extends JBaseQuery {
 			}
 		}
 		
-		Department department = DepartmentQuery.me().findById(sellerCustomer.getDeptId());
 		PayablesDetail payablesDetail = new PayablesDetail();
 		payablesDetail.setId(StrKit.getRandomUUID());
 		payablesDetail.setObjectId(sellerCustomer.getSellerId());
@@ -175,8 +173,8 @@ public class PurchaseInstockDetailQuery extends JBaseQuery {
 		payablesDetail.setRefSn(pwarehouseSn);
 		payablesDetail.setBizDate(date);
 		payablesDetail.setRefType(Consts.BIZ_TYPE_INSTOCK);
-		payablesDetail.setDeptId(sellerCustomer.getDeptId());
-		payablesDetail.setDataArea(department.getDataArea());
+		payablesDetail.setDeptId(seller.getStr("dept_id"));
+		payablesDetail.setDataArea(seller.getStr("data_area"));
 		payablesDetail.setCreateDate(date);
 		payablesDetail.save();
 		return true;

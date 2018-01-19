@@ -91,7 +91,9 @@ public class CustomerTypeQuery extends JBaseQuery {
 		StringBuilder sqlBuilder = new StringBuilder(" select c.id, c.name ");
 		sqlBuilder.append(" from `cc_customer_type` c ");
 		sqlBuilder.append(" where c.is_show = 1 ");
-		appendIfNotEmptyWithLike(sqlBuilder, "c.data_area", dataArea, params, false);
+		sqlBuilder.append(" and c.data_area = ? ");
+		params.add(dataArea);
+//		appendIfNotEmptyWithLike(sqlBuilder, "c.data_area", dataArea, params, false);
 		sqlBuilder.append(" order by c.create_date ");
 
 		return Db.find(sqlBuilder.toString(), params.toArray());

@@ -134,7 +134,11 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		
 //		return detail.save() && receivablesDetail.save();
 		detail.save();
-		return orderDetail.getBigDecimal("product_amount");
+		BigDecimal totalMoney = orderDetail.getBigDecimal("product_amount");
+		if (detail.getIsGift() == 1) {
+			totalMoney = new BigDecimal(0);
+		}
+		return totalMoney;
 		
 	}
 	

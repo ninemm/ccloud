@@ -1960,4 +1960,11 @@ public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procK
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}
 	
+	public SalesOrder findOutOrderId(String outStockId) {
+		String sql = "select o.* from cc_sales_order o "
+				+ "LEFT join  cc_sales_order_join_outstock sojo on sojo.order_id = o.id "
+				+ "where sojo.outstock_id = '"+outStockId+"'";
+		return DAO.findFirst(sql);
+	}
+	
  }

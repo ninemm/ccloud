@@ -168,7 +168,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 
 	public Page<Record> paginate(int pageNumber, int pageSize, String sellerId, String keyword, String startDate, 
 			String endDate, String printStatus, String stockOutStatus, String status, String dataArea,String order,String sort) {
-		String select = "select o.*,  c.prov_name,c.city_name,c.country_name,c.address, c.customer_name,u.realname,ct.name as customerName ";
+		String select = "select o.*,  c.prov_name,c.city_name,c.country_name,c.address, c.customer_name,u.realname,ct.name as customerName,cso.id as orderId,cso.order_sn,cso.create_date as orderDate ";
 		if (StrKit.notBlank(status)) {
 			select = select + ",t2.refundCount, t2.outCount ";
 		}
@@ -177,6 +177,8 @@ public class SalesOutstockQuery extends JBaseQuery {
 		fromBuilder.append("left join cc_customer c on c.id = cs.customer_id ");
 		fromBuilder.append("left join user u on u.id = o.biz_user_id ");
 		fromBuilder.append("left join cc_customer_type ct on ct.id = o.customer_type_id ");
+		fromBuilder.append("left join cc_sales_order_join_outstock sojo on sojo.outstock_id = o.id ");
+		fromBuilder.append("left join cc_sales_order cso on sojo.order_id = cso.id ");
 		
 		if (StrKit.notBlank(status)) {
 			fromBuilder.append("left join (SELECT cc.id, cc.outstock_id, IFNULL(SUM(cc.product_count),0) as outCount, IFNULL(SUM(t1.count), 0) AS refundCount ");
@@ -462,6 +464,48 @@ public class SalesOutstockQuery extends JBaseQuery {
 		  carSalesPrintNeedInfos.add(carSalesPrintNeedInfo);
 		}
 		return carSalesPrintNeedInfos;
+	}
+
+	public List<Record> findReceivablesUserList(String sellerId, String selectDataArea, String startDate, String endDate, Integer status) {
+		StringBuilder fromBuilder = new StringBuilder("SELECT u.realname, u.id FROM cc_sales_outstock o ");
+		fromBuilder.append("LEFT JOIN cc_sales_order_join_outstock cj on cj.outstock_id = o.id ");
+		fromBuilder.append("LEFT JOIN cc_sales_order cs on cs.id = cj.order_id ");
+		fromBuilder.append("LEFT JOIN `user` u on u.id = cs.biz_user_id ");
+		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
+
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", selectDataArea, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
+
+		if (needWhere) {
+			if (status != null) {
+				fromBuilder.append(" where o.status != ? ");
+				params.add(status);
+			} else {
+				fromBuilder.append(" where 1 = 1 ");
+			}
+		} else {
+			if (status != null) {
+				fromBuilder.append("  AND o.status != ? ");
+				params.add(status);
+			}
+		}
+		
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and o.create_date >= ?");
+			params.add(startDate);
+		}
+
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and o.create_date <= ?");
+			params.add(endDate);
+		}
+		fromBuilder.append("GROUP BY u.id ");
+
+		if (params.isEmpty())
+			return Db.find(fromBuilder.toString());
+
+		return Db.find(fromBuilder.toString(), params.toArray());
 	}
 	
 }

@@ -100,7 +100,7 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 		if (id != null) {
 			TransferBill transferBill = TransferBillQuery.me().findById(id);
 			setAttr("transferBill", transferBill);
-			
+
 			List<Record> findBySeller = WarehouseQuery.me().findBySeller(transferBill.getToWarehouseId());
 			setAttr("slist", findBySeller);
 		}
@@ -223,6 +223,7 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 		return isSave;
 	}
 
+	// 新建或编辑调拨单
 	public void enable() {
 		String id = getPara("id");
 		int isEnabled = getParaToInt("isEnabled");
@@ -230,7 +231,9 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 		List<transferBillInfo> transferBillInfos = TransferBillDetailQuery.me().findByTransferBillDetailId(id);
 		// 查找商品的库存数量并和调拨数量做比较
 		this.checkStoreCount(transferBillInfos);
+		// 获取调拨单
 		TransferBill transferBill = TransferBillQuery.me().findById(id);
+		// 调拨操作
 		Boolean status = this.inserIntoInventoryInfo(transferBillInfos, transferBill);
 		if (status) {
 			transferBill.setStatus(isEnabled);
@@ -266,47 +269,42 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 
 			@Override
 			public boolean run() throws SQLException {
-				// List<Inventory> updateList = new ArrayList<>();
-				// List<Inventory> saveList = new ArrayList<>();
 				for (transferBillInfo transferBillInfo : transferBillList) {
-					SellerProduct sellerProduct = SellerProductQuery.me().findById(transferBillInfo.getSellerProductId());
-					final String sellerId = sellerProduct.getSellerId();
-
+					// 调拨出库的商品ID 详情 销售商 仓库ID 商品数量
+					String outSellerProductId = transferBillInfo.getSellerProductId();
+					SellerProduct outSellerProduct = SellerProductQuery.me().findById(outSellerProductId);
+					final String outSellerId = outSellerProduct.getSellerId();
+					String outProductId = outSellerProduct.getProductId();
+					String outWarehouseId = transferBillInfo.getFromWarehouseId();
+					BigDecimal outProductCount = transferBillInfo.getProductCount();
 					// 先处理调出仓库的总账
-					Inventory outInventory = InventoryQuery.me().findBySellerIdAndProductIdAndWareHouseId(sellerId,
-							sellerProduct.getProductId(), transferBillInfo.getFromWarehouseId());
-					outInventory.setOutCount(outInventory.getOutCount().add(transferBillInfo.getProductCount()));
+					Inventory outInventory = InventoryQuery.me().findBySellerIdAndProductIdAndWareHouseId(outSellerId,outProductId, outWarehouseId);
+					outInventory.setOutCount(outInventory.getOutCount().add(outProductCount));
 					outInventory.setOutPrice(outInventory.getInPrice());
 					outInventory.setOutAmount(outInventory.getOutCount().multiply(outInventory.getInPrice()));
-					outInventory.setBalanceCount(
-							outInventory.getBalanceCount().subtract(transferBillInfo.getProductCount()));
+					outInventory.setBalanceCount(outInventory.getBalanceCount().subtract(outProductCount));
 					outInventory.setBalancePrice(outInventory.getInPrice());
 					outInventory.setBalanceAmount(outInventory.getBalanceCount().multiply(outInventory.getInPrice()));
 					outInventory.setModifyDate(new Date());
 					if (!outInventory.saveOrUpdate()) {
 						return false;
 					}
-
-					// 处理调出仓库的总账子表信息
+					// 处理调出仓库的总账子表信息 添加一条库存详细数据
 					// 查询目前子表该品项的最新库存
-					InventoryDetail outDetail = InventoryDetailQuery.me().findBySellerProductId(
-							transferBillInfo.getSellerProductId(), transferBillInfo.getFromWarehouseId());
+					InventoryDetail outDetail = InventoryDetailQuery.me().findBySellerProductId(outSellerProductId,outWarehouseId);
 					InventoryDetail outInventoryDetail = new InventoryDetail();
 					outInventoryDetail.setId(StrKit.getRandomUUID());
-					outInventoryDetail.setWarehouseId(transferBillInfo.getFromWarehouseId());
-					outInventoryDetail.setSellProductId(transferBillInfo.getSellerProductId());
+					outInventoryDetail.setWarehouseId(outWarehouseId);
+					outInventoryDetail.setSellProductId(outSellerProductId);
 					outInventoryDetail.setInCount(new BigDecimal(0));
 					outInventoryDetail.setInPrice(outInventory.getInPrice());
 					outInventoryDetail.setInAmount(new BigDecimal(0));
-					outInventoryDetail.setOutCount(transferBillInfo.getProductCount());
+					outInventoryDetail.setOutCount(outProductCount);
 					outInventoryDetail.setOutPrice(outInventory.getOutPrice());
-					outInventoryDetail
-							.setOutAmount(outInventoryDetail.getOutCount().multiply(outInventoryDetail.getOutPrice()));
-					outInventoryDetail
-							.setBalanceCount(outDetail.getBalanceCount().subtract(transferBillInfo.getProductCount()));
+					outInventoryDetail.setOutAmount(outInventoryDetail.getOutCount().multiply(outInventoryDetail.getOutPrice()));
+					outInventoryDetail.setBalanceCount(outDetail.getBalanceCount().subtract(outProductCount));
 					outInventoryDetail.setBalancePrice(outInventory.getInPrice());
-					outInventoryDetail
-							.setBalanceAmount(outInventoryDetail.getBalanceCount().multiply(outInventory.getInPrice()));
+					outInventoryDetail.setBalanceAmount(outInventoryDetail.getBalanceCount().multiply(outInventory.getInPrice()));
 					outInventoryDetail.setBizType(Consts.BIZ_TYPE_TRANSFER_OUTSTOCK);
 					outInventoryDetail.setBizBillSn(transferBillInfo.getTransferBillSn());
 					outInventoryDetail.setBizDate(new Date());
@@ -318,64 +316,55 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 					if (!outInventoryDetail.save()) {
 						return false;
 					}
-					
-					//更新库存
-					SellerProduct outSellerProduct = SellerProductQuery.me().findById(transferBillInfo.getSellerProductId());
-					BigDecimal storeCount = sellerProduct.getStoreCount();
-					outSellerProduct.setStoreCount(transferBillInfo.getProductCount().subtract(storeCount));
+					// 更新库存
+					BigDecimal storeCount = outSellerProduct.getStoreCount();
+					outSellerProduct.setStoreCount(storeCount.subtract(outProductCount));
 					boolean updateSellerProduct = outSellerProduct.update();
 					if (!updateSellerProduct) {
 						return false;
 					}
-					
-					Boolean isSeller = true;
-					SellerProduct findBySellerAndId = new SellerProduct();
+
+					//调拨入库销售商的id 仓库id
+					String inSellerId=transferBill.getSellerId();
+					String inWarehouseId = transferBillInfo.getToWarehouseId();
+					SellerProduct inSellerProduct = new SellerProduct();
 					// 判断是否是不同销售商之间调拨
-					if (!sellerId.equals(transferBill.getSellerId())) {
-						isSeller=false;
+					if (!outSellerId.equals(inSellerId)) {
 						// 判断调入销售商是否有此商品
-						findBySellerAndId = SellerProductQuery.me()
-								.findBySellerAndId(transferBillInfo.getSellerProductId(), transferBill.getSellerId());
+						inSellerProduct = SellerProductQuery.me().findBySellerAndId(outSellerProductId,inSellerId);
 						// 若不存在改商品 需要建立一个新商品
-						if (null == findBySellerAndId) {
-							findBySellerAndId = sellerProduct;
-							findBySellerAndId.setId(StrKit.getRandomUUID());
-							findBySellerAndId.setSellerId(transferBill.getSellerId());
-							findBySellerAndId.setStoreCount(new BigDecimal("0"));
-							findBySellerAndId.setQrcodeUrl(null);
-							findBySellerAndId.setCreateDate(new Date());
-							findBySellerAndId.setModifyDate(null);
-							findBySellerAndId.setFreezeStore(new BigDecimal("0"));
-							findBySellerAndId.save();
+						if (null == inSellerProduct) {
+							inSellerProduct = outSellerProduct;
+							inSellerProduct.setId(StrKit.getRandomUUID());
+							inSellerProduct.setSellerId(inSellerId);
+							inSellerProduct.setStoreCount(new BigDecimal("0"));
+							inSellerProduct.setQrcodeUrl(null);
+							inSellerProduct.setCreateDate(new Date());
+							inSellerProduct.setModifyDate(null);
+							inSellerProduct.setFreezeStore(new BigDecimal("0"));
+							inSellerProduct.save();
 						}
-					}
-					
-					String ProductId="";
-					if (isSeller) {
-						ProductId=sellerProduct.getProductId();
 					}else {
-						ProductId=findBySellerAndId.getProductId();
+						inSellerProduct=outSellerProduct;
 					}
-					
+					String inProductId = inSellerProduct.getProductId();
 					// 处理调入仓库的库存总账
-					Inventory inInventory = InventoryQuery.me().findBySellerIdAndProductIdAndWareHouseId(
-							transferBill.getSellerId(), ProductId,transferBillInfo.getToWarehouseId());
+					Inventory inInventory = InventoryQuery.me().findBySellerIdAndProductIdAndWareHouseId(inSellerId, inProductId,inWarehouseId);
 					if (inInventory == null) {
 						inInventory = new Inventory();
 						inInventory.setId(StrKit.getRandomUUID());
-						inInventory.setWarehouseId(transferBillInfo.getToWarehouseId());
-						inInventory.setProductId(sellerProduct.getProductId());
-						inInventory.setSellerId(transferBill.getSellerId());
+						inInventory.setWarehouseId(inWarehouseId);
+						inInventory.setProductId(inProductId);
+						inInventory.setSellerId(inSellerId);
 						inInventory.setOutCount(new BigDecimal(0));
 						inInventory.setOutPrice(outInventory.getInPrice());
 						inInventory.setOutAmount(new BigDecimal(0));
-						inInventory.setInCount(transferBillInfo.getProductCount());
+						inInventory.setInCount(outProductCount);
 						inInventory.setInPrice(outInventory.getInPrice());
-						inInventory.setInAmount(transferBillInfo.getProductCount().multiply(outInventory.getInPrice()));
-						inInventory.setBalanceCount(transferBillInfo.getProductCount());
+						inInventory.setInAmount(outProductCount.multiply(outInventory.getInPrice()));
+						inInventory.setBalanceCount(outProductCount);
 						inInventory.setBalancePrice(outInventory.getInPrice());
-						inInventory.setBalanceAmount(
-								transferBillInfo.getProductCount().multiply(outInventory.getInPrice()));
+						inInventory.setBalanceAmount(outProductCount.multiply(outInventory.getInPrice()));
 						inInventory.setDataArea(user.getDataArea());
 						inInventory.setDeptId(user.getDepartmentId());
 						inInventory.setCreateDate(new Date());
@@ -384,112 +373,61 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 							return false;
 						}
 					} else {
-						inInventory.setWarehouseId(transferBillInfo.getToWarehouseId());
-						inInventory.setInCount(inInventory.getInCount().add(transferBillInfo.getProductCount()));
+						inInventory.setInCount(inInventory.getInCount().add(outProductCount));
 						inInventory.setInPrice(outInventory.getInPrice());
 						inInventory.setInAmount(inInventory.getInCount().multiply(inInventory.getInPrice()));
-						inInventory
-								.setBalanceCount(inInventory.getBalanceCount().add(transferBillInfo.getProductCount()));
+						inInventory.setBalanceCount(inInventory.getBalanceCount().add(outProductCount));
 						inInventory.setBalancePrice(outInventory.getBalancePrice());
-						inInventory.setBalanceAmount(inInventory.getBalanceCount().multiply(outInventory.getInPrice()));
+						inInventory.setBalanceAmount(inInventory.getBalanceCount().multiply(inInventory.getInPrice()));
 						inInventory.setModifyDate(new Date());
 						if (!inInventory.saveOrUpdate()) {
 							return false;
 						}
 					}
-					////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-					// 处理调入仓库的库存明细
-					String SellerProductId="";
-					if (isSeller) {
-						SellerProductId=transferBillInfo.getSellerProductId();
-					}else {
-						SellerProductId = findBySellerAndId.getId();
-					}
-					InventoryDetail inDetail = InventoryDetailQuery.me().findBySellerProductId(SellerProductId, transferBillInfo.getToWarehouseId());
-
-					if (null == inDetail) {
-						InventoryDetail inInventoryDetail = new InventoryDetail();
-						inInventoryDetail.setId(StrKit.getRandomUUID());
-						inInventoryDetail.setWarehouseId(transferBillInfo.getToWarehouseId());
-						if (isSeller) {
-							inInventoryDetail.setSellProductId(transferBillInfo.getSellerProductId());
-						} else {
-							inInventoryDetail.setSellProductId(findBySellerAndId.getId());
-						}
-						inInventoryDetail.setOutCount(new BigDecimal(0));
-						inInventoryDetail.setOutPrice(outInventory.getInPrice());
-						inInventoryDetail.setOutAmount(new BigDecimal(0));
-						inInventoryDetail.setInCount(transferBillInfo.getProductCount());
-						inInventoryDetail.setInPrice(outInventory.getInPrice());
-						inInventoryDetail
-								.setInAmount(transferBillInfo.getProductCount().multiply(outInventory.getInPrice()));
-						inInventoryDetail.setBalanceCount(transferBillInfo.getProductCount());
-						inInventoryDetail.setBalancePrice(outInventory.getInPrice());
-						inInventoryDetail.setBalanceAmount(
-								inInventoryDetail.getBalanceCount().multiply(outInventory.getInPrice()));
-						inInventoryDetail.setBizType(Consts.BIZ_TYPE_TRANSFER_INSTOCK);
-						inInventoryDetail.setBizBillSn(transferBillInfo.getTransferBillSn());
-						inInventoryDetail.setBizDate(new Date());
-						inInventoryDetail.setBizUserId(transferBillInfo.getBizUserId());
-						inInventoryDetail.setDataArea(transferBillInfo.getDataArea());
-						inInventoryDetail.setDeptId(user.getDepartmentId());
-						inInventoryDetail.setCreateDate(new Date());
-						if (!inInventoryDetail.save()) {
-							return false;
-						}
-					} else {
-						InventoryDetail inInventoryDetail = new InventoryDetail();
-						inInventoryDetail.setId(StrKit.getRandomUUID());
-						if (isSeller) {
-							inInventoryDetail.setSellProductId(transferBillInfo.getSellerProductId());
-						} else {
-							inInventoryDetail.setSellProductId(findBySellerAndId.getId());
-						}
-						inInventoryDetail.setWarehouseId(transferBillInfo.getToWarehouseId());
-						inInventoryDetail.setOutCount(new BigDecimal(0));
-						inInventoryDetail.setOutPrice(outInventory.getInPrice());
-						inInventoryDetail.setOutAmount(new BigDecimal(0));
-						inInventoryDetail.setInCount(transferBillInfo.getProductCount());
-						inInventoryDetail.setInPrice(outInventory.getInPrice());
-						inInventoryDetail
-								.setInAmount(transferBillInfo.getProductCount().multiply(outInventory.getInPrice()));
-						inInventoryDetail
-								.setBalanceCount(inDetail.getBalanceCount().add(transferBillInfo.getProductCount()));
-						inInventoryDetail.setBalancePrice(outInventory.getInPrice());
-						inInventoryDetail.setBalanceAmount(
-								inInventoryDetail.getBalanceCount().multiply(outInventory.getInPrice()));
-						inInventoryDetail.setBizType(Consts.BIZ_TYPE_TRANSFER_INSTOCK);
-						inInventoryDetail.setBizBillSn(transferBillInfo.getTransferBillSn());
-						inInventoryDetail.setBizDate(new Date());
-						inInventoryDetail.setBizUserId(transferBillInfo.getBizUserId());
-						inInventoryDetail.setDataArea(transferBillInfo.getDataArea());
-						inInventoryDetail.setDeptId(user.getDepartmentId());
-						inInventoryDetail.setCreateDate(new Date());
-						if (!inInventoryDetail.save()) {
-							return false;
-						}
-					}
 					
-					//更新库存
-					SellerProduct inSellerProduct = SellerProductQuery.me().findById(SellerProductId);
+					// 处理调入仓库的库存明细
+					String inSellerProductId = inSellerProduct.getId();
+					InventoryDetail inDetail = InventoryDetailQuery.me().findBySellerProductId(inSellerProductId,inWarehouseId);
+					InventoryDetail inInventoryDetail = new InventoryDetail();
+					inInventoryDetail.setId(StrKit.getRandomUUID());
+					inInventoryDetail.setWarehouseId(inWarehouseId);
+					inInventoryDetail.setSellProductId(inSellerProductId);
+					inInventoryDetail.setOutCount(new BigDecimal(0));
+					inInventoryDetail.setOutPrice(outInventory.getInPrice());
+					inInventoryDetail.setOutAmount(new BigDecimal(0));
+					inInventoryDetail.setInCount(outProductCount);
+					inInventoryDetail.setInPrice(outInventory.getInPrice());
+					inInventoryDetail.setInAmount(outProductCount.multiply(outInventory.getInPrice()));
+					if (null == inDetail) {
+						inInventoryDetail.setBalanceCount(outProductCount);
+						inInventoryDetail.setBalanceAmount(outProductCount.multiply(inInventory.getInPrice()));
+					} else {
+						inInventoryDetail.setBalanceCount(inDetail.getBalanceCount().add(outProductCount));
+						inInventoryDetail.setBalanceAmount(inInventoryDetail.getBalanceCount().multiply(inInventory.getInPrice()));
+					}
+					inInventoryDetail.setBalancePrice(outInventory.getInPrice());
+					inInventoryDetail.setBizType(Consts.BIZ_TYPE_TRANSFER_INSTOCK);
+					inInventoryDetail.setBizBillSn(transferBillInfo.getTransferBillSn());
+					inInventoryDetail.setBizDate(new Date());
+					inInventoryDetail.setBizUserId(transferBillInfo.getBizUserId());
+					inInventoryDetail.setDataArea(transferBillInfo.getDataArea());
+					inInventoryDetail.setDeptId(user.getDepartmentId());
+					inInventoryDetail.setCreateDate(new Date());
+					if (!inInventoryDetail.save()) {
+						return false;
+					}
+					// 更新库存
 					BigDecimal instoreCount = inSellerProduct.getStoreCount();
-					if (instoreCount==null) {
-						inSellerProduct.setStoreCount(transferBillInfo.getProductCount());
-					}else {
-						inSellerProduct.setStoreCount(transferBillInfo.getProductCount().add(instoreCount));
+					if (instoreCount == null) {
+						inSellerProduct.setStoreCount(outProductCount);
+					} else {
+						inSellerProduct.setStoreCount(outProductCount.add(instoreCount));
 					}
 					boolean inupdateSellerProduct = inSellerProduct.update();
 					if (!inupdateSellerProduct) {
 						return false;
 					}
 				}
-				// try {
-				// Db.batchUpdate(updateList, updateList.size());
-				// Db.batchSave(saveList, saveList.size());
-				// } catch (Exception e) {
-				// e.printStackTrace();
-				// return false;
-				// }
 				return true;
 			}
 		});

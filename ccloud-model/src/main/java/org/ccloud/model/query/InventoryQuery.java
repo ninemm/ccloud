@@ -60,7 +60,7 @@ public class InventoryQuery extends JBaseQuery {
 				"RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = sp.product_id ");
 		fromBuilder.append("WHERE i.warehouse_id = '" + warehouse_id + "'");
 		if (null != seller_id) {
-			fromBuilder.append(" and i.seller_id = '" + seller_id + "' ");
+			fromBuilder.append("and i.seller_id in (SELECT s.id FROM cc_seller s LEFT JOIN department d ON s.dept_id=d.id WHERE d.data_area LIKE (SELECT CONCAT(d.data_area,'%') FROM cc_seller s LEFT JOIN department d ON s.dept_id=d.id WHERE s.id='"+seller_id+"'))");
 		}
 		LinkedList<Object> params = new LinkedList<Object>();
 		appendIfNotEmptyWithLike(fromBuilder, "p.name", product_name, params, false);

@@ -65,7 +65,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 		});
 	}
 
-	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String dataArea,String sort,String sortOrder) {
+	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String dataArea,String sort,String sortOrder, String customerType) {
 
 		boolean needWhere = true;
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -91,7 +91,17 @@ public class SellerCustomerQuery extends JBaseQuery {
 		appendIfNotEmptyWithLike(fromBuilder, "ujc.data_area", dataArea, params, true);
 		fromBuilder.append(" GROUP BY c2.id) t2 ON sc.id = t2.id ");
 
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "c.customer_name", keyword, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "t1.customerTypeNames", customerType, params, needWhere);
+		if (StrKit.notBlank(keyword))
+			if ( needWhere ){
+				fromBuilder.append(" WHERE c.customer_name LIKE ? OR t2.realnames LIKE ? ");
+				params.add("%" + keyword + "%");
+				params.add("%" + keyword + "%");
+			} else {
+				fromBuilder.append(" AND (c.customer_name LIKE ? OR t2.realnames LIKE ? ) ");
+				params.add("%" + keyword + "%");
+				params.add("%" + keyword + "%");
+			}
 
 		fromBuilder.append("  GROUP BY sc.id ");
 		fromBuilder.append(" order by "+sort+" "+ sortOrder);

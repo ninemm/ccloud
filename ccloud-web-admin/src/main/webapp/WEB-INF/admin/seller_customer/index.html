@@ -30,6 +30,7 @@
 		jQuery.mm.initEditTable('#_customer_table', url, initParams, initFields(), null);
 
 		jQuery.mm.initValidator('#form', validatorFields);
+		initCustomerType();
 	});
 
 	$("#search-submit").click(function() {
@@ -39,10 +40,11 @@
 	var initParams = function(params) {
 
 		var keyword = $('#post-search-input').val();
-		if (keyword) keyword = encodeURIComponent(keyword);
+		var customerType = $('#customer_type').val();
 		var param = {
 			size: params.limit,
 			page: params.offset/params.limit + 1,
+			customerType: customerType,
 			k: keyword,
 			sort: params.sort,      //排序列名  
             sortOrder: params.order //排位命令（desc,asc）
@@ -138,6 +140,24 @@
 			}
 		}
 	};
+
+	var initCustomerType = function () {
+		var strHtml = "";
+		var url = '${CPATH}/admin/sellerCustomer/queryCustomerType';
+		$.ajax({
+			url: url,
+			type: 'post',
+			success: function (result) {
+				var customerType = result.data;
+				strHtml = '<option selected="selected" value="">客户类型</option>';
+				for(index in customerType){
+					var row = customerType[index].columns;
+					strHtml +='<option value="'+row.name+'">'+row.name+'</option>';
+				}
+				$("#customer_type").html(strHtml);
+			}
+		});
+	}
 	
 </#macro>
 
@@ -157,29 +177,28 @@
 		<div class="validata-box">
 			<input type="hidden" name="userIds" id="userIds" value="">
 		</div>
-		<div class="row content-row">
-			<div class="input-group input-group-sm " style="float: right">
-				<input id="post-search-input" class="form-control" type="search" value="${k!}" name="k" placeholder="搜索名称">&nbsp;
-				<input id="search-submit" class="btn btn-sm btn-primary btn-flat" type="button" value="搜索">
-			</div>
-		</div>
-		
+
 		<div class="row content-row">
 			<div class="jp-left">
-				<@shiro.hasPermission name="/admin/sellerCustomer/batchSetUser, /admin/dealer/all, /admin/all"> 
-					<label class="control-label">批量操作:</label>
+				<@shiro.hasPermission name="/admin/sellerCustomer/batchSetUser, /admin/dealer/all, /admin/all">
 					<button class="btn btn-sm btn-primary btn-flat" type="button" onclick="batchAction('setUser')"> 设置负责人 </button>
 				</@shiro.hasPermission>
-			</div>
-			
-			<div class="jp-right">
-				<@shiro.hasPermission name="/admin/sellerCustomer/uploading, /admin/dealer/all, /admin/all"> 
+				<a href="${CPATH}/admin/sellerCustomer/edit?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-plus"></i> 新增 </a>
+				<@shiro.hasPermission name="/admin/sellerCustomer/uploading, /admin/dealer/all, /admin/all">
 					<a href="${CPATH}/admin/sellerCustomer/upload?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-upload"></i> 导入</a>
 				</@shiro.hasPermission>
-				<@shiro.hasPermission name="/admin/sellerCustomer/downloading, /admin/dealer/all, /admin/all"> 
+				<@shiro.hasPermission name="/admin/sellerCustomer/downloading, /admin/dealer/all, /admin/all">
 					<a href="${CPATH}/admin/sellerCustomer/download?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-download"></i> 导出</a>
 				</@shiro.hasPermission>
-				<a href="${CPATH}/admin/sellerCustomer/edit?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-plus"></i> 新增 </a>
+			</div>
+
+			<div class="jp-right">
+				<select class="input-sm" name="customer_type" id="customer_type" style="float: left;padding-right:5px;margin-right:5px;">
+				</select>
+				<div class="input-group input-group-sm " style="float: right">
+					<input id="post-search-input" class="form-control" type="search" value="${k!}" name="k" placeholder="搜索名称或负责人">&nbsp;
+					<input id="search-submit" class="btn btn-sm btn-primary btn-flat" type="button" value="搜索">
+				</div>
 			</div>
 		</div>
 	
