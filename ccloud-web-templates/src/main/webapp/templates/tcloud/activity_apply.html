@@ -39,6 +39,7 @@ $(function () {
 		$('#customerList input[type=checkbox]').each(function() {
 			this.checked = _this.checked
 		})
+		$("#totalNum").text($('#customerList input[type=checkbox]:checked').length);
 	}).on('click', '#customerList input[type=checkbox]', function() {
 			var all = $('#customerList input[type=checkbox]').length;
 			var now = $('#customerList input[type=checkbox]:checked').length
@@ -47,6 +48,7 @@ $(function () {
 			} else {
 				$('.select-all')[0].checked = false
 			}
+			$("#totalNum").text(now);
 	}).on("click", "#confirm", function() {
 		confirm();
 	});
@@ -427,7 +429,7 @@ function doChange(key){
 				<input type="checkbox" name="" id="" class="weui-agree__checkbox select-all">
 				<span class="ft12">全选</span>
 				<span>&nbsp;&nbsp;合计:</span>
-				<span class="ft12">12</span>
+				<span class="ft12" id="totalNum"></span>
 			</div>
 			<button id="confirm" type="button" class="place-order red-button white">确认</button>
 		</footer>
