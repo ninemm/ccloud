@@ -164,7 +164,9 @@ public class Consts {
 	public static final String OPTION_OFF= "false";
 
 	public static final String CUSTOMER_KIND_COMMON = "100401";//普通客户
-	public static final String CUSTOMER_KIND_SELLER = "100402";//直营商客户
+	public static final String CUSTOMER_KIND_SELLER = "100402";//销售商客户
+
+	public static final String CUSTOMER_TYPE_CODE_SELLER = "G";//销售商类型
 
 	public static final String GROUP_CODE_PREFIX_DATA = "data";//用户组
 	public static final String GROUP_CODE_PREFIX_ROLE = "role";//权限组

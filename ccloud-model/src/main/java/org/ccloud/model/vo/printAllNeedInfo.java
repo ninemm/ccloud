@@ -13,7 +13,7 @@ public class printAllNeedInfo {
 	private String customerContacts;//客户联系人
 	private String customerPhone;//客户电话
 	private String customerId;//客户ID
-	private String customerKind;//100401:普通 100402:直营商
+	private String customerKind;//100401:普通 100402:销售商
 	private String placeOrderMan; //业务员姓名
     private String placeOrderPhone;//业务员电话
 	private Date placeOrderTime;//下单时间

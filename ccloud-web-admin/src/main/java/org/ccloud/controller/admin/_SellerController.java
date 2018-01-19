@@ -729,8 +729,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 	}
 	@Before(Tx.class)
 	public void saveSellerCustomer(String customerId,User user,Department department,String sellerId,String dataArea){
-		String code = "G";
-		CustomerType customerType = CustomerTypeQuery.me().findDataAreaAndName(dataArea,code);
+		CustomerType customerType = CustomerTypeQuery.me().findDataAreaAndName(dataArea,Consts.CUSTOMER_TYPE_CODE_SELLER);
 		
 		SellerCustomer sellerCustomer = new SellerCustomer();
 		String sellerCustomerId = StrKit.getRandomUUID();

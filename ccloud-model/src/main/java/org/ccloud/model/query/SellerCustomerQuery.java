@@ -20,6 +20,7 @@ import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.ehcache.IDataLoader;
+import org.ccloud.Consts;
 import org.ccloud.model.SellerCustomer;
 import org.ccloud.model.callback.CustomerNearbyCallback;
 import org.ccloud.utils.DateUtils;
@@ -399,8 +400,8 @@ public class SellerCustomerQuery extends JBaseQuery {
 		}
 
 		needwhere = appendIfNotEmptyWithLike(sql, "cujc.data_area", selectDataArea, params, needwhere);
-		sql.append(" AND cct.name != ? ");
-		params.add("直营商");
+		sql.append(" AND cct.code != ? ");
+		params.add(Consts.CUSTOMER_TYPE_CODE_SELLER);
 
 		sql.append(" AND csc.customer_id not in ( ");
 		sql.append("SELECT cc.id ");
