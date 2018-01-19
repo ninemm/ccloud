@@ -169,18 +169,10 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		
 		String [] brandIds= brandList.split(",");
 		if (StrKit.isBlank(sellerId)) {
-			if(seller.getSellerType() == Integer.parseInt(Consts.SELLER_TYPE_DEALER)) {
-				Seller seller1=SellerQuery.me().findByDeptAndSellerType(department.getId(),Integer.parseInt(Consts.SELLER_TYPE_DEALER));
-				if(seller1!=null){
-					renderAjaxResultForError("该公司部门已有一个经销商，请确认");
+			Seller seller1=SellerQuery.me().findByDeptId(department.getId());
+			if(seller1!=null){
+					renderAjaxResultForError("该公司部门已有一个经销商或者直营商，请确认");
 					return;
-				}
-			}else {
-				Seller seller0=SellerQuery.me().findByDeptAndSellerType(department.getId(),Integer.parseInt(Consts.SELLER_TYPE_SELLER));
-				if(seller0!=null){
-					renderAjaxResultForError("该公司部门已有一个直营商，请确认");
-					return;
-				}
 			}
 			this.saveSeller(seller, department, user,productType);
 
@@ -195,10 +187,13 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			//保存通用打印模板,通用模板的ID：0
 			this.saveSellerJoinTemplate(seller.getId());
 			
-			
+			if(seller.getSellerType().equals(Integer.parseInt(Consts.SELLER_TYPE_DEALER))) {
+				//新建销售商时默认创建分组  角色  及中间表 客户类型
+				this.saveOther(department);
+			}
 			
 			//添加直营商客户时 初始化数据
-			if(seller.getSellerType()==Integer.parseInt(Consts.SELLER_TYPE_SELLER)){
+			if(!user.getUsername().equals("admin") || seller.getSellerType().equals(Integer.parseInt(Consts.SELLER_TYPE_SELLER))){
 				String customerId = StrKit.getRandomUUID();
 				//添加客户
 				customer.setId(customerId);
@@ -214,34 +209,23 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				//找到最近的经销商
 				String sId = "";
 				String dataArea = "";
+				String deptId = "";
 				List<Department> depts = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(department.getId());
-				if(depts.size()>1) {
-					sId = depts.get(1).getStr("seller_id");
-					dataArea = depts.get(1).getStr("data_area");
-				}else {
-					sId = depts.get(0).getStr("seller_id");
-					dataArea = depts.get(0).getStr("data_area");
-				}
+				sId = depts.get(0).getStr("seller_id");
+				dataArea = depts.get(0).getStr("data_area");
+				deptId = depts.get(0).getStr("id");
 				//添加直营商客户
-				this.saveSellerCustomer(customer.getId(), user, department,sId,dataArea);
+				this.saveSellerCustomer(customer.getId(), user, department,sId,dataArea,deptId);
 				seller.setCustomerId(customer.getId());
-			}else{
-				//新建销售商时默认创建分组  角色  及中间表 客户类型
-				this.saveOther(department);
-			}
+				}
 			seller.save();
 		} else {
 			Seller s = SellerQuery.me().findById(seller.getId());
 			if(!s.getDeptId().equals(department.getId())){
-				Seller seller1=SellerQuery.me().findByDeptAndSellerType(department.getId(),Integer.parseInt(Consts.SELLER_TYPE_DEALER));
+				Seller seller1=SellerQuery.me().findByDeptId(department.getId());
 				if(seller1!=null){
-					renderAjaxResultForError("该公司部门已有一个经销商，请确认");
-					return;
-				}
-				Seller seller0=SellerQuery.me().findByDeptAndSellerType(department.getId(),Integer.parseInt(Consts.SELLER_TYPE_SELLER));
-				if(seller0!=null){
-					renderAjaxResultForError("该公司部门已有一个直营商，请确认");
-					return;
+						renderAjaxResultForError("该公司部门已有一个经销商或者直营商，请确认");
+						return;
 				}	
 			}
 			this.updateSeller(seller, department, user,productType);
@@ -728,8 +712,9 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		}
 	}
 	@Before(Tx.class)
-	public void saveSellerCustomer(String customerId,User user,Department department,String sellerId,String dataArea){
-		CustomerType customerType = CustomerTypeQuery.me().findDataAreaAndName(dataArea,Consts.CUSTOMER_TYPE_CODE_SELLER);
+	public void saveSellerCustomer(String customerId,User user,Department department,String sellerId,String dataArea,String deptId){
+		String code = Consts.CUSTOMER_TYPE_CODE_SELLER;
+		CustomerType customerType = CustomerTypeQuery.me().findDataAreaAndName(dataArea,code);
 		
 		SellerCustomer sellerCustomer = new SellerCustomer();
 		String sellerCustomerId = StrKit.getRandomUUID();
@@ -744,7 +729,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		sellerCustomer.setCustomerKind(Consts.CUSTOMER_KIND_SELLER);
 		sellerCustomer.setStatus("0");
 		sellerCustomer.setDataArea(dataArea);
-		sellerCustomer.setDeptId(user.getDepartmentId());
+		sellerCustomer.setDeptId(deptId);
 		sellerCustomer.setCreateDate(new Date());
 		sellerCustomer.save();
 		
@@ -752,8 +737,8 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		UserJoinCustomer userJoinCustomer = new UserJoinCustomer();
 		userJoinCustomer.setSellerCustomerId(sellerCustomerId);
 		userJoinCustomer.setUserId(user.getId());
-		userJoinCustomer.setDataArea(user.getDataArea());
-		userJoinCustomer.setDeptId(department.getId());
+		userJoinCustomer.setDataArea(dataArea);
+		userJoinCustomer.setDeptId(deptId);
 		userJoinCustomer.save();
 		
 		if(customerType!=null){
