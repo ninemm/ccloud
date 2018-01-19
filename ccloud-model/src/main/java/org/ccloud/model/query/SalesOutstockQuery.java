@@ -471,7 +471,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 		return carSalesPrintNeedInfos;
 	}
 
-	public List<Record> findReceivablesUserList(String sellerId, String selectDataArea, String startDate, String endDate, Integer status) {
+	public List<Record> findReceivablesUserList(String sellerId, String startDate, String endDate, Integer status) {
 		StringBuilder fromBuilder = new StringBuilder("SELECT u.realname, u.id FROM cc_sales_outstock o ");
 		fromBuilder.append("LEFT JOIN cc_sales_order_join_outstock cj on cj.outstock_id = o.id ");
 		fromBuilder.append("LEFT JOIN cc_sales_order cs on cs.id = cj.order_id ");
@@ -479,7 +479,6 @@ public class SalesOutstockQuery extends JBaseQuery {
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", selectDataArea, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
 
 		if (needWhere) {
