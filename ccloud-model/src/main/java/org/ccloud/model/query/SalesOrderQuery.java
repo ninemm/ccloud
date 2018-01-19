@@ -1581,14 +1581,14 @@ public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procK
 	}
 
 	public List<Record> getGiftCountByUser(String startDate, String endDate, String dayTag, String deptId,
-			String sellerId, String dataArea) {
+			String sellerId, String dataArea, String orderTag) {
 		if (dayTag != null) {
 			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
 			startDate = date[0];
 			endDate = date[1];
 		}
 		LinkedList<Object> params = new LinkedList<Object>();
-		StringBuilder fromBuilder = new StringBuilder("SELECT IFNULL(SUM(cc.product_amount),0) as totalAmount, IFNULL(SUM(cc.product_count/cp.convert_relate),0) as productCount, u.realname, u.id ");
+		StringBuilder fromBuilder = new StringBuilder("SELECT IFNULL(SUM(cc.product_amount),0) as totalAmount, IFNULL(SUM(cc.product_count/cp.convert_relate),0) as productCount, COUNT(*) as orderCount, u.realname, u.id ");
 		fromBuilder.append("FROM cc_sales_order_detail cc ");
 		fromBuilder.append("LEFT JOIN cc_sales_order cs on cc.order_id = cs.id ");
 		fromBuilder.append("LEFT JOIN `user` u ON u.id = cs.biz_user_id ");
@@ -1617,7 +1617,11 @@ public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procK
 			params.add(endDate);
 		}
 		fromBuilder.append("GROUP BY u.id ");
-		fromBuilder.append("ORDER BY totalAmount desc ");
+		if (StrKit.notBlank(orderTag)) {
+			fromBuilder.append("ORDER BY "+ orderTag + " desc ");
+		} else {
+			fromBuilder.append("ORDER BY productCount desc ");
+		}
 		
 		if (params.isEmpty())
 			return Db.find(fromBuilder.toString());
@@ -1626,7 +1630,7 @@ public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procK
 	}
 
 	public List<Record> getSellerCount(String startDate, String endDate, String dayTag, String sellerId,
-			String dataArea) {
+			String dataArea, String orderTag) {
 		if (dayTag != null) {
 			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
 			startDate = date[0];
@@ -1654,7 +1658,11 @@ public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procK
 			params.add(endDate);
 		}
 		fromBuilder.append("GROUP BY cc.seller_id ");
-		fromBuilder.append("ORDER BY totalAmount desc ");
+		if (StrKit.notBlank(orderTag)) {
+			fromBuilder.append("ORDER BY "+ orderTag + " desc ");
+		} else {
+			fromBuilder.append("ORDER BY productCount desc ");
+		}
 		
 		if (params.isEmpty())
 			return Db.find(fromBuilder.toString());
@@ -1662,14 +1670,14 @@ public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procK
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}
 
-	public List<Record> getGiftCountBySeller(String startDate, String endDate, String dayTag, String dataArea) {
+	public List<Record> getGiftCountBySeller(String startDate, String endDate, String dayTag, String dataArea, String orderTag) {
 		if (dayTag != null) {
 			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
 			startDate = date[0];
 			endDate = date[1];
 		}
 		LinkedList<Object> params = new LinkedList<Object>();
-		StringBuilder fromBuilder = new StringBuilder("SELECT IFNULL(SUM(cc.product_amount),0) as totalAmount, IFNULL(SUM(cc.product_count/cp.convert_relate),0) as productCount, se.seller_name, cs.seller_id ");
+		StringBuilder fromBuilder = new StringBuilder("SELECT IFNULL(SUM(cc.product_amount),0) as totalAmount, IFNULL(SUM(cc.product_count/cp.convert_relate),0) as productCount, COUNT(*) as orderCount, se.seller_name, cs.seller_id ");
 		fromBuilder.append("FROM cc_sales_order_detail cc ");
 		fromBuilder.append("LEFT JOIN cc_sales_order cs on cc.order_id = cs.id ");
 		fromBuilder.append("LEFT JOIN cc_seller se on se.id = cs.seller_id ");
@@ -1693,7 +1701,11 @@ public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procK
 			params.add(endDate);
 		}
 		fromBuilder.append("GROUP BY cs.seller_id ");
-		fromBuilder.append("ORDER BY totalAmount desc ");
+		if (StrKit.notBlank(orderTag)) {
+			fromBuilder.append("ORDER BY "+ orderTag + " desc ");
+		} else {
+			fromBuilder.append("ORDER BY productCount desc ");
+		}
 		
 		if (params.isEmpty())
 			return Db.find(fromBuilder.toString());

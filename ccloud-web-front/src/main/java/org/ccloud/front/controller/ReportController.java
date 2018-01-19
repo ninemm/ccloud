@@ -306,7 +306,8 @@ public class ReportController extends BaseFrontController {
 		}
 		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 		String deptId = getPara("deptId");
-		List<Record> record = SalesOrderQuery.me().getGiftCountByUser(startDate, endDate, dayTag, deptId, sellerId, dataArea);
+		String orderTag = getPara("orderTag");
+		List<Record> record = SalesOrderQuery.me().getGiftCountByUser(startDate, endDate, dayTag, deptId, sellerId, dataArea, orderTag);
 		renderJson(record);
 	}
 	
@@ -316,7 +317,8 @@ public class ReportController extends BaseFrontController {
 		String endDate = getPara("endDate");
 		String dayTag = getPara("dayTag");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		List<Record> record = SalesOrderQuery.me().getGiftCountBySeller(startDate, endDate, dayTag, dataArea);
+		String orderTag = getPara("orderTag");
+		List<Record> record = SalesOrderQuery.me().getGiftCountBySeller(startDate, endDate, dayTag, dataArea, orderTag);
 		renderJson(record);
 	}	
 	
@@ -327,7 +329,8 @@ public class ReportController extends BaseFrontController {
 		String dayTag = getPara("dayTag");
 		String sellerId = getSessionAttr("sellerId");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		List<Record> record = SalesOrderQuery.me().getSellerCount(startDate, endDate, dayTag, sellerId, dataArea);
+		String orderTag = getPara("orderTag");
+		List<Record> record = SalesOrderQuery.me().getSellerCount(startDate, endDate, dayTag, sellerId, dataArea, orderTag);
 		renderJson(record);
 	}
 	
