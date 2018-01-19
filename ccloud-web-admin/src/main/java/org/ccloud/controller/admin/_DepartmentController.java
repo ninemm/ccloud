@@ -84,8 +84,6 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 		String id = getPara("id");
 		if (id != null) {
 			setAttr("dept", DepartmentQuery.me().findById(id));
-			List<User> list = UserQuery.me().findByDeptId(id);
-			setAttr("list", list);
 		}
 
 	}
@@ -156,6 +154,14 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/all");
 		List<Map<String, Object>> list = DepartmentQuery.me().findDeptListAsTree(1, dataArea, isSuperAdmin);
 		setAttr("treeData", JSON.toJSON(list));
+	}
+
+	public void user_tree() {
+
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		List<Map<String, Object>> treeData = DepartmentQuery.me().findDeptListAsTree(dataArea, true);
+		setAttr("treeData", JSON.toJSON(treeData));
+
 	}
 	
 	public void getAboutInfo() {

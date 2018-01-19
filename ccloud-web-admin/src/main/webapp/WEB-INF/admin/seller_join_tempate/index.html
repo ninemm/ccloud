@@ -66,8 +66,7 @@
 	var $tables = $("#_printTemplate_table");
 	$('#exampleModal').on('show.bs.modal', function (event) {
 		$("#_printTemplate_table").bootstrapTable('destroy');
-		var sellerId = $("#sellerId").find("option:selected").val();
-		var _url = '${CPATH}/admin/sellerJoinTemplate/listTemplate?sellerId='+ sellerId;
+		var _url = '${CPATH}/admin/sellerJoinTemplate/listTemplate';
 		jQuery.mm.initEditTable('#_printTemplate_table', _url, initParamss, initFieldss(), null);
 	})
 	$("#_search-submit").click(function() {
@@ -158,7 +157,6 @@
 		jQuery.mm.del('${CPATH}/admin/sellerJoinTemplate/delete?ucode=${ucode}&id=' + id);
 	}
 	function saveTemplate(){
-	var sellerId = $("#sellerId").find("option:selected").val();
 		var orderItems = new Array();
 		 var checklist = $('input[name="data"]:checked').parent().parent();
 		 if(checklist.length == 0){
@@ -177,7 +175,7 @@
 			url:"${CPATH}/admin/sellerJoinTemplate/saveTemplate",
 			type:"post",
 			dataType:"json",
-			data : {orderItems : JSON.stringify(orderItems),sellerId:sellerId},
+			data : {orderItems : JSON.stringify(orderItems)},
 			success:function(data){
 				if(data==true){
 					toastr.success(data.message,'操作成功');

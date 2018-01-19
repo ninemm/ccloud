@@ -68,7 +68,6 @@ import org.ccloud.model.query.SellerQuery;
 import com.alibaba.fastjson.JSONArray;
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Before;
-import com.jfinal.core.Const;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.tx.Tx;
@@ -202,15 +201,15 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			if(seller.getSellerType()==Integer.parseInt(Consts.SELLER_TYPE_SELLER)){
 				String customerId = StrKit.getRandomUUID();
 				//添加客户
-				customer.set("id", customerId);
-				customer.set("customer_code", seller.getSellerCode());
-				customer.set("customer_name", seller.getSellerName());
-				customer.set("contact", seller.getContact());
-				customer.set("mobile", seller.getPhone());
-				customer.set("is_enabled", 1);
-				customer.set("address", address);
-				customer.set("create_date", new Date());
-				customer.set("status", 0);
+				customer.setId(customerId);
+				customer.setCustomerCode(seller.getSellerCode());
+				customer.setCustomerName(seller.getSellerName());
+				customer.setContact(seller.getContact());
+				customer.setMobile(seller.getPhone());
+				customer.setIsEnabled(1);
+				customer.setAddress(address);
+				customer.setCreateDate(new Date());
+				customer.setStatus("0");
 				customer.save();
 				//找到最近的经销商
 				String sId = "";
@@ -233,29 +232,28 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			seller.save();
 		} else {
 			Seller s = SellerQuery.me().findById(seller.getId());
-			if(s.getSellerType() == Integer.parseInt(Consts.SELLER_TYPE_DEALER)) {
+			if(!s.getDeptId().equals(department.getId())){
 				Seller seller1=SellerQuery.me().findByDeptAndSellerType(department.getId(),Integer.parseInt(Consts.SELLER_TYPE_DEALER));
 				if(seller1!=null){
 					renderAjaxResultForError("该公司部门已有一个经销商，请确认");
 					return;
 				}
-			}else {
 				Seller seller0=SellerQuery.me().findByDeptAndSellerType(department.getId(),Integer.parseInt(Consts.SELLER_TYPE_SELLER));
 				if(seller0!=null){
 					renderAjaxResultForError("该公司部门已有一个直营商，请确认");
 					return;
-				}
+				}	
 			}
 			this.updateSeller(seller, department, user,productType);
 			SellerBrandQuery.me().deleteBySellertId(sellerId);
 			for(int i=0;i<brandIds.length;i++){
 				String sellerBrandId = StrKit.getRandomUUID();
 				if(!brandIds[i].equals("")){
-					sellerBrand.set("id",sellerBrandId);
-					sellerBrand.set("brand_id", brandIds[i]);
-					sellerBrand.set("seller_id",sellerId);
-						sellerBrand.set("data_area",department.getDataArea());
-						sellerBrand.set("dept_id", department.getId());
+					sellerBrand.setId(sellerBrandId);
+					sellerBrand.setBrandId(brandIds[i]);
+					sellerBrand.setSellerId(sellerId);
+						sellerBrand.setDataArea(department.getDataArea());
+						sellerBrand.setDeptId(department.getId());
 					}
 					sellerBrand.save();
 				}
@@ -389,14 +387,14 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		boolean flang=false;
 		SellerProduct sellerProducts = SellerProductQuery.me().findById(id);
 		if(sellerProducts.getIsEnable() == 1){
-			sellerProducts.set("is_enable",0);
+			sellerProducts.setIsEnable(0);
 		}else{
-			sellerProducts.set("is_enable",1);
+			sellerProducts.setIsEnable(1);
 		}
 		
 		
 		if(sellerProducts!=null){
-			sellerProducts.set("modify_date", new Date());
+			sellerProducts.setModifyDate(new Date());
 			flang=sellerProducts.update();
 		}
 		renderJson(flang);
@@ -437,13 +435,13 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 							continue;
 						}else {
 							String Id = StrKit.getRandomUUID();
-							sellerProducts.set("id",Id);
-							sellerProducts.set("product_id",sellerProduct.getProductId());
-							sellerProducts.set("seller_id",getSessionAttr(Consts.SESSION_SELLER_ID).toString());
-							sellerProducts.set("custom_name",sellerProduct.getCustomName());
-							sellerProducts.set("store_count",new BigDecimal(0));
-							sellerProducts.set("price", sellerProduct.getPrice());
-							sellerProducts.set("account_price", sellerProduct.getPrice());
+							sellerProducts.setId(Id);
+							sellerProducts.setProductId(sellerProduct.getProductId());
+							sellerProducts.setSellerId(getSessionAttr(Consts.SESSION_SELLER_ID).toString());
+							sellerProducts.setCustomName(sellerProduct.getCustomName());
+							sellerProducts.setStoreCount(new BigDecimal(0));
+							sellerProducts.setPrice(sellerProduct.getPrice());
+							sellerProducts.setAccountPrice(sellerProduct.getPrice());
 							sellerProducts.setCost(sellerProduct.getPrice());
 							Seller seller = SellerQuery.me().findById(getSessionAttr(Consts.SESSION_SELLER_ID).toString());
 							if(seller.getSellerType()==Integer.parseInt(Consts.SELLER_TYPE_SELLER)) {
@@ -452,9 +450,9 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 								sellerProducts.setIsSource(0);
 							}
 							sellerProducts.setMarketPrice(sellerProduct.getMarketPrice());
-							sellerProducts.set("is_enable", sellerProduct.getIsEnable());
-							sellerProducts.set("order_list", sellerProduct.getOrderList());
-							sellerProducts.set("create_date", new Date());
+							sellerProducts.setIsEnable(sellerProduct.getIsEnable());
+							sellerProducts.setOrderList(sellerProduct.getOrderList());
+							sellerProducts.setCreateDate(new Date());
 							//生成二维码
 							
 							Date date = new Date();
@@ -465,7 +463,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 							//String contents = getRequest().getScheme() + "://" + getRequest().getServerName()+":"+getRequest().getLocalPort()+getRequest().getContextPath()+"/admin/seller/fn"+"?id="+Id;
 							String imagePath = getRequest().getSession().getServletContext().getRealPath(Consts.QRCODE_PATH);
 							QRCodeUtils.genQRCode(contents, imagePath, fileName);
-							sellerProducts.set("qrcode_url", imagePath+"\\"+fileName);
+							sellerProducts.setQrcodeUrl(imagePath+"\\"+fileName);
 							result=sellerProducts.save();
 							if(result == false){
 								break;
@@ -480,14 +478,14 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 								File file = new File(issellerProducts.getQrcodeUrl());
 								file.delete();
 							}
-							issellerProducts.set("custom_name",sellerProduct.getCustomName());
-							issellerProducts.set("order_list", sellerProduct.getOrderList());
-							issellerProducts.set("price", sellerProduct.getPrice());
-							issellerProducts.set("cost", sellerProduct.getCost());
-							issellerProducts.set("account_price", sellerProduct.getAccountPrice());
-							issellerProducts.set("tags", sellerProduct.getTags());
-							issellerProducts.set("bar_code", sellerProduct.getBarCode());
-							issellerProducts.set("modify_date", new Date());
+							issellerProducts.setCustomName(sellerProduct.getCustomName());
+							issellerProducts.setOrderList(sellerProduct.getOrderList());
+							issellerProducts.setPrice(sellerProduct.getPrice());
+							issellerProducts.setCost(sellerProduct.getCost());
+							issellerProducts.setAccountPrice(sellerProduct.getAccountPrice());
+							issellerProducts.setTags(sellerProduct.getTags());
+							issellerProducts.setBarCode(sellerProduct.getBarCode());
+							issellerProducts.setModifyDate(new Date());
 							
 							//生成二维码
 							
@@ -499,7 +497,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 							//String contents = getRequest().getScheme() + "://" + getRequest().getServerName()+":"+getRequest().getLocalPort()+getRequest().getContextPath()+"/admin/seller/fn"+"?id="+Id;
 							String imagePath = getRequest().getSession().getServletContext().getRealPath(Consts.QRCODE_PATH);
 							QRCodeUtils.genQRCode(contents, imagePath, fileName);
-							issellerProducts.set("qrcode_url", imagePath+"\\"+fileName);
+							issellerProducts.setQrcodeUrl(imagePath+"\\"+fileName);
 							result=issellerProducts.update();
 							if(result == false){
 								break;
@@ -524,11 +522,11 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		Seller seller = SellerQuery.me().findById(id);
 		boolean flang = false;
 		if(seller.getIsEnabled()==1){
-			seller.set("is_enabled", 0);
+			seller.setIsEnabled(0);
 		}else{
-			seller.set("is_enabled", 1);
+			seller.setIsEnabled(1);
 		}
-		seller.set("modify_date", new Date());
+		seller.setModifyDate(new Date());
 		flang=seller.update();
 		renderJson(flang);
 	}
@@ -558,7 +556,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		List<SellerProduct> imageList = jsonArray.toJavaList(SellerProduct.class);
 		for (SellerProduct sellerProduct : imageList) {
 			  SellerProduct issellerProducts = SellerProductQuery.me().findById(sellerProduct.getId());
-				issellerProducts.set("is_enable", 1);
+				issellerProducts.setIsEnable(1);
 				flang=issellerProducts.update();
 		}
 		renderJson(flang);
@@ -603,13 +601,13 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		}
 		w += j;
 		String sellerId = StrKit.getRandomUUID();
-		seller.set("id", sellerId);
-		seller.set("seller_code",w);
-		seller.set("product_type_store", productTypes);
-		seller.set("create_date", new Date());
-		seller.set("modify_user_id", user.getId());
-		seller.set("is_inited", 0);
-		seller.set("dept_id",department.getId());
+		seller.setId(sellerId);
+		seller.setSellerCode(w);
+		seller.setProductTypeStore(productTypes);
+		seller.setCreateDate(new Date());
+		seller.setModifyUserId(user.getId());
+		seller.setIsInited(0);
+		seller.setDeptId(department.getId());
 	}
 	
 	@Before(Tx.class)
@@ -635,21 +633,20 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 	public void saveSellerBrand(String brandId,Department department,String sellerId){
 		SellerBrand sellerBrand = new SellerBrand();
 		String sellerBrandId = StrKit.getRandomUUID();
-		sellerBrand.set("id",sellerBrandId);
-		sellerBrand.set("brand_id", brandId);
-		sellerBrand.set("seller_id",sellerId);
-		sellerBrand.set("data_area",department.getDataArea());
-		sellerBrand.set("dept_id", department.getId());
+		sellerBrand.setId(sellerBrandId);
+		sellerBrand.setBrandId(brandId);
+		sellerBrand.setSellerId(sellerId);
+		sellerBrand.setDataArea(department.getDataArea());
+		sellerBrand.setDeptId(department.getId());
 		sellerBrand.save();
 	}
 	
 	public void updateSeller(Seller seller,Department department,User user,String productTypes){
-		seller.set("dept_id",department.getId());
-		seller.set("product_type_store", productTypes);
-		seller.set("modify_user_id", user.getId());
-		seller.set("is_inited", 1);
-		seller.set("modify_date", new Date());
-		seller.set("modify_user_id", user.getId());
+		seller.setDeptId(department.getId());
+		seller.setProductTypeStore(productTypes);
+		seller.setModifyUserId(user.getId());
+		seller.setIsInited(1);
+		seller.setModifyDate(new Date());
 		seller.update();
 	}
 	@Before(Tx.class)
@@ -737,27 +734,27 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		
 		SellerCustomer sellerCustomer = new SellerCustomer();
 		String sellerCustomerId = StrKit.getRandomUUID();
-		sellerCustomer.set("id", sellerCustomerId);
-		sellerCustomer.set("seller_id",sellerId);
-		sellerCustomer.set("customer_id", customerId);
-		sellerCustomer.set("nickname", getPara("seller.seller_name"));
-		sellerCustomer.set("is_checked", 1);
-		sellerCustomer.set("is_enabled", 1);
-		sellerCustomer.set("is_archive", 1);
-		sellerCustomer.set("customer_type_ids", customerType.getId());
-		sellerCustomer.set("customer_kind", Consts.CUSTOMER_KIND_SELLER);
-		sellerCustomer.set("status", 0);
-		sellerCustomer.set("data_area", dataArea);
-		sellerCustomer.set("dept_id", user.getDepartmentId());
-		sellerCustomer.set("create_date", new Date());
+		sellerCustomer.setId(sellerCustomerId);
+		sellerCustomer.setSellerId(sellerId);
+		sellerCustomer.setCustomerId(customerId);
+		sellerCustomer.setNickname(getPara("seller.seller_name"));
+		sellerCustomer.setIsChecked(1);
+		sellerCustomer.setIsEnabled(1);
+		sellerCustomer.setIsArchive(1);
+		sellerCustomer.setCustomerTypeIds(customerType.getId());
+		sellerCustomer.setCustomerKind(Consts.CUSTOMER_KIND_SELLER);
+		sellerCustomer.setStatus("0");
+		sellerCustomer.setDataArea(dataArea);
+		sellerCustomer.setDeptId(user.getDepartmentId());
+		sellerCustomer.setCreateDate(new Date());
 		sellerCustomer.save();
 		
 		//添加用户客户中间表
 		UserJoinCustomer userJoinCustomer = new UserJoinCustomer();
-		userJoinCustomer.set("seller_customer_id", sellerCustomerId);
-		userJoinCustomer.set("user_id", user.getId());
-		userJoinCustomer.set("data_area",user.getDataArea());
-		userJoinCustomer.set("dept_id", department.getId());
+		userJoinCustomer.setSellerCustomerId(sellerCustomerId);
+		userJoinCustomer.setUserId(user.getId());
+		userJoinCustomer.setDataArea(user.getDataArea());
+		userJoinCustomer.setDeptId(department.getId());
 		userJoinCustomer.save();
 		
 		if(customerType!=null){

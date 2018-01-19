@@ -63,7 +63,7 @@ public class _SellerJoinTemplateController extends JBaseCRUDController<SellerJoi
 	public void saveTemplate(){
 		final SellerJoinTemplate template = getModel(SellerJoinTemplate.class);
 		String ds = getPara("orderItems");
-		String sellerId = getPara("sellerId");
+		String sellerId = getSessionAttr("sellerId");
 		boolean result = false;
 		JSONArray jsonArray = JSONArray.parseArray(ds);
 		List<SellerJoinTemplate> imageList = jsonArray.toJavaList(SellerJoinTemplate.class);
@@ -74,10 +74,10 @@ public class _SellerJoinTemplateController extends JBaseCRUDController<SellerJoi
 			if(sellerJoinTemplate2 !=null){
 				continue;
 			}
-			template.set("id", sellerJoinTemplateId);
-			template.set("seller_id", sellerId);
-			template.set("print_template_id", sellerJoinTemplate.getPrintTemplateId());
-			template.set("name", sellerJoinTemplate.getName());
+			template.setId(sellerJoinTemplateId);
+			template.setSellerId(sellerId);
+			template.setPrintTemplateId(sellerJoinTemplate.getPrintTemplateId());
+			template.setName(sellerJoinTemplate.getName());
 			result=template.save();
 			if(result == false){
 				break;
@@ -124,7 +124,7 @@ public class _SellerJoinTemplateController extends JBaseCRUDController<SellerJoi
 	
 	public void listTemplate(){
 		String keyword = getPara("k");
-		String sellerId = getPara("sellerId");
+		String sellerId = getSessionAttr("sellerId");
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
 		}

@@ -75,7 +75,7 @@ public class _WarehouseController extends JBaseCRUDController<Warehouse> {
 	}
 	
 	//删除仓库  删除UserJoinWarehouse
-	public void delete() {
+	/*public void delete() {
 		Db.tx(new IAtom() {
 		    @Override
 		    public boolean run() throws SQLException {
@@ -94,7 +94,7 @@ public class _WarehouseController extends JBaseCRUDController<Warehouse> {
 		        return true;                	
 		    }
 		});
-	}
+	}*/
 	
 	@Before(UCodeInterceptor.class)
 	public void batchDelete() {
@@ -133,7 +133,7 @@ public class _WarehouseController extends JBaseCRUDController<Warehouse> {
 				return;
 			}
 		}
-		String seller_id=getSessionAttr("sellerId").toString();
+		String seller_id=getSessionAttr("sellerId");
 		warehouse.setDeptId(user.getDepartmentId());
 		warehouse.setDataArea(user.getDataArea());
 		warehouse.setSellerId(seller_id);
@@ -210,8 +210,3 @@ public class _WarehouseController extends JBaseCRUDController<Warehouse> {
 		 renderJson(list);
 	}
 }
-
-
-
-
-    		

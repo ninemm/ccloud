@@ -111,9 +111,9 @@ var initParams = function(params) {
 	}
 	function orderInfo(orderSn){
 		var url = "";
-		if(orderSn.indexOf("SR")){
+		if(orderSn.indexOf("SR")==0){
 			url = '${CPATH}/admin/salesInstock/detailBySn/' + orderSn;
-		}else if(orderSn.indexOf("PS")){
+		}else if(orderSn.indexOf("PS")==0){
 			url = '${CPATH}/admin/purchaseInstock/detailBySn/' + orderSn;
 		}else{
 			url = '${CPATH}/admin/inventoryDetail/detailBySn/' + orderSn;
