@@ -156,4 +156,9 @@ public class SellerQuery extends JBaseQuery {
 		sqlBuilder.append(" GROUP BY cs.id ORDER BY cs.seller_type");
 		return DAO.find(sqlBuilder.toString());
 	}
+
+	public Seller findBySellerCustomerId(String customerId) {
+		StringBuilder sqlBuilder = new StringBuilder("SELECT * FROM cc_seller cs  LEFT JOIN cc_seller_customer csc ON csc.seller_id=cs.id WHERE csc.id='"+customerId+"'");
+		return DAO.findFirst(sqlBuilder.toString());
+	}
 }

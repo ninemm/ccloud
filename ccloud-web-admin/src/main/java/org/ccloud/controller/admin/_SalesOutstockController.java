@@ -41,6 +41,7 @@ import org.ccloud.model.Payables;
 import org.ccloud.model.PrintTemplate;
 import org.ccloud.model.SalesOrder;
 import org.ccloud.model.SalesOutstock;
+import org.ccloud.model.Seller;
 import org.ccloud.model.SellerCustomer;
 import org.ccloud.model.User;
 import org.ccloud.model.Warehouse;
@@ -429,14 +430,19 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		return isSave;
 	}
 
+	
+	//批量出库  应收账款
 	public boolean saveBatchStockOut(final String[] outId, final Date stockDate, final String remark, final User user,
 			final String sellerId, String sellerCode, final Date date) {
 		boolean isSave = Db.tx(new IAtom() {
 			@Override
 			public boolean run() throws SQLException {
 				for (String s : outId) {
+					//获取打印单
 					printAllNeedInfo printAllNeedInfo = SalesOutstockQuery.me().findStockOutForPrint(s);
+					//获取订单明细
 					List<orderProductInfo> orderProductInfos = SalesOutstockDetailQuery.me().findPrintProductInfo(s);
+				
 					BigDecimal productAmout=new BigDecimal("0");
 					for (orderProductInfo orderProductInfo : orderProductInfos) {
 						productAmout=productAmout.add(orderProductInfo.getProductAmout());
@@ -447,17 +453,16 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 							printAllNeedInfo.getOutstockSn(),printAllNeedInfo.getCustomerId())) {
 						return false;
 					}
-
 					if (!SalesOutstockQuery.me().updateStockOutStatus(printAllNeedInfo.getSalesOutStockId(),
 							user.getId(), stockDate, Consts.SALES_OUT_STOCK_STATUS_OUT, date, remark)
 							| !SalesOrderQuery.me().checkStatus(printAllNeedInfo.getSalesOutStockId(), user.getId(),
 									date, total)) {
 						return false;
 					}
-
 					// 如果客户种类是直营商，则生成直营商的采购入库单
 					if (Consts.CUSTOMER_KIND_SELLER.equals(printAllNeedInfo.getCustomerKind())) {
-						Record seller = SellerQuery.me().findByCustomerId(printAllNeedInfo.getCustomerId());
+						Seller SellerCustomer = SellerQuery.me().findBySellerCustomerId(printAllNeedInfo.getCustomerId());
+						Record seller = SellerQuery.me().findByCustomerId(SellerCustomer.getCustomerId());
 						String purchaseInstockId = StrKit.getRandomUUID();
 
 						// PS + 100000(机构编号或企业编号6位) + 20171108(时间) + 000001(流水号)
