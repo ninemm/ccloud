@@ -330,12 +330,12 @@
     function startDaySelect(obj,type) {
 		var params = {
     		"startDate": $(obj).val(),
-			"endDate": $(obj).parent().find('#endDay').val(),
+			"endDate": $(obj).parent().find('#endDay').val() + ' 23:59:59',
 			"userId": '${(userId)!}'
 		}
 		var params2 = {
     		"startDate": $(obj).val(),
-			"endDate": $(obj).parent().find('#endDay').val(),
+			"endDate": $(obj).parent().find('#endDay').val() + ' 23:59:59',
 			"userId": '${(userId)!}',
 			"isGift": 'true'
 		}		
@@ -345,12 +345,12 @@
     function endDaySelect(obj,type) {
 		var params = {
     		"startDate": $(obj).parent().find('#startDay').val(),
-			"endDate": $(obj).val(),
+			"endDate": $(obj).val() + ' 23:59:59',
 			"userId": '${(userId)!}'
 		}
 		var params2 = {
-    		"startDate": $(obj).val(),
-			"endDate": $(obj).parent().find('#endDay').val(),
+    		"startDate": $(obj).parent().find('#startDay').val(),
+			"endDate": $(obj).val() + ' 23:59:59',
 			"userId": '${(userId)!}',
 			"isGift": 'true'
 		}		

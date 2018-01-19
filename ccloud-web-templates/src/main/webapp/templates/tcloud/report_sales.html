@@ -27,7 +27,7 @@
   $(function () {
   
     $(".end-date").calendar();
-    $(".end-date").val($.today()+ ' 23:59:59');
+    $(".end-date").val($.today());
     $(".begin-date").calendar();
     $(".begin-date").val($.today());
     $("#dayTag").val("today");
@@ -291,7 +291,7 @@
     function startDaySelect(obj,type) {
 		var params = {
     		"startDate": $(obj).val(),
-			"endDate": $(obj).parent().find('#endDay').val()
+			"endDate": $(obj).parent().find('#endDay').val() + ' 23:59:59'
 		}
 		urlSelect(params,type); 
     }
@@ -299,7 +299,7 @@
     function endDaySelect(obj,type) {
 		var params = {
     		"startDate": $(obj).parent().find('#startDay').val(),
-			"endDate": $(obj).val()
+			"endDate": $(obj).val() + ' 23:59:59'
 		}
 		urlSelect(params,type); 
     }    
