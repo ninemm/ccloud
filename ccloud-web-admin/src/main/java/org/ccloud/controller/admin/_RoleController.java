@@ -56,9 +56,14 @@ public class _RoleController extends JBaseCRUDController<Role> {
 	public void index() {
 		
 		String keyword = getPara("k");
+		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/all");
+		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		if (isSuperAdmin) {
+			dataArea = null;
+		}
 		if (StrKit.notBlank(keyword)) setAttr("k", keyword);
 		
-		Page<Role> page = RoleQuery.me().paginate(getPageNumber(), getPageSize(), keyword, getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString(), "r.order_list");
+		Page<Role> page = RoleQuery.me().paginate(getPageNumber(), getPageSize(), keyword, dataArea, "r.order_list");
 		if (page != null) {
 			setAttr("page", page);
 		}
