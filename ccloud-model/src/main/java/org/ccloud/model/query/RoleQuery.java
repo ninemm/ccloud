@@ -152,8 +152,8 @@ public class RoleQuery extends JBaseQuery {
 		return list;
 	}
 
-	public List<Role> findByDeptId() {
-		String sql = "SELECT * from `role` where dept_id = '0' and role_code >'001' and role_code<'021'";
+	public List<Role> _findByDeptId(String deptId) {
+		String sql = "SELECT * from `role` where dept_id = '"+deptId+"' and role_code >'001' and role_code<'021'";
 		return DAO.find(sql);
 	}
 

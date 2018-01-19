@@ -49,7 +49,7 @@ public class RefundController extends BaseFrontController{
 		for (CustomerType customerType : customerTypeList) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", customerType.getName());
-			item.put("value", customerType.getId());
+			item.put("value", customerType.getName());
 			customerTypes.add(item);
 		}
 		
@@ -106,7 +106,7 @@ public class RefundController extends BaseFrontController{
 		for (CustomerType customerType : customerTypeList) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", customerType.getName());
-			item.put("value", customerType.getId());
+			item.put("value", customerType.getName());
 			customerTypes.add(item);
 		}
 		

@@ -97,7 +97,7 @@ public class _AttachmentController extends JBaseCRUDController<Attachment> {
 		}
 	}
 
-//	@RequiresPermissions(value={"/admin/attachment/","/admin/all"},logical=Logical.OR)
+	@RequiresPermissions(value={"/admin/attachment/","/admin/all"},logical=Logical.OR)
 	public void choose_layer() {
 		keepPara();
 		Page<Attachment> page = AttachmentQuery.me().paginate(getPageNumber(), getPageSize(), null, null, null, null,

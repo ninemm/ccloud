@@ -96,7 +96,7 @@ function firstInit(){
 	var tags = ${tags!};
 	initTags(tags);
 	var activityList = ${activityList!};
-	combo(activityList);
+	initActivity(activityList, true);
 }
 
 function changeInit(){
@@ -110,14 +110,14 @@ function changeInit(){
 	Utils.ajax('${CPATH}/activity/activityList', {'tag' : tag, 'keyword' : keyword}, 
 		function(data){
 			layer.closeAll();
-			combo(data.activityList);
+			initActivity(data.activityList, false);
 		}
 	);
 }
 
-function combo(activityList){
-	initActivity(activityList);
-}
+//function combo(activityList){
+//	initActivity(activityList);
+//}
 
 function initTags(tags) {
 	$tags.empty();
@@ -131,7 +131,7 @@ function initTags(tags) {
 	})
 }
 
-function initActivity(activityList){
+function initActivity(activityList,flg){
 	var category = '';
 
 	$.each(activityList, function(index, el) {
@@ -150,7 +150,11 @@ function initActivity(activityList){
 		$type.append("<section class='product_detail weui-panel weui-panel_access common' id='" + el.sell_product_id + "'>" + newHtml + "</section>");
 		var $newProductDetail = $type.find(".common:last");
 		$newProductDetail.find("#title").text(el.title);
-		$newProductDetail.find("#time").text(new Date(el.start_time).Format("yyyy-MM-dd") + ' ~ ' + new Date(el.end_time).Format("yyyy-MM-dd"));
+		if(flg){
+			$newProductDetail.find("#time").text(new Date(el.start_time).Format("yyyy-MM-dd") + ' ~ ' + new Date(el.end_time).Format("yyyy-MM-dd"));
+		}else{
+			$newProductDetail.find("#time").text((el.start_time).substring(0,10) + ' ~ ' + (el.end_time).substring(0,10));
+		}
 		$newProductDetail.find("#content").text(el.content);
 
 		$newProductDetail.find("#activityId").val(el.id);
@@ -252,6 +256,9 @@ $gallery.on("click", function() {
 								</div>
 								<div >
 									内容:<span id="content"></span>
+								</div>
+								<div >
+									参与次数:<span id=></span>
 								</div>
 							</div>
 						</section>
