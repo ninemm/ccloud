@@ -6,8 +6,8 @@ public class UserExecel {
 	
 	@Excel(name = "姓名")
 	private String contact;
-	@Excel(name = "昵称/员工号")
-	private String nickname;
+	@Excel(name = "用户名/员工号")
+	private String username;
 	@Excel(name = "手机")
 	private String mobile;
 	@Excel(name = "部门名称")
@@ -15,12 +15,13 @@ public class UserExecel {
 	@Excel(name = "职位")
 	private String userGroup;
 
-	public String getNickname() {
-		return nickname;
+
+	public String getUsername() {
+		return username;
 	}
 
-	public void setNickname(String nickname) {
-		this.nickname = nickname;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
 	public String getContact() {
