@@ -153,4 +153,8 @@ public class StockTakingDetailQuery extends JBaseQuery {
 	 	return Db.find(fromBuilder.toString(), warehouseId,seller_id);
 	}
 	
+	public List<Record> findByStockTakingId (String stockTakingId){
+		String sql = "select st.*,cs.custom_name from cc_stock_taking_detail st LEFT JOIN cc_seller_product cs on cs.id = st.seller_product_id where st.stock_taking_id='"+stockTakingId+"'";
+		return Db.find(sql);
+	}
 }

@@ -175,8 +175,8 @@ public class PurchaseInstockDetailQuery extends JBaseQuery {
 		payablesDetail.setRefSn(pwarehouseSn);
 		payablesDetail.setBizDate(date);
 		payablesDetail.setRefType(Consts.BIZ_TYPE_INSTOCK);
-		payablesDetail.setDeptId(sellerCustomer.getDeptId());
-		payablesDetail.setDataArea(department.getDataArea());
+		payablesDetail.setDeptId(seller.getStr("dept_id"));
+		payablesDetail.setDataArea(seller.getStr("data_area"));
 		payablesDetail.setCreateDate(date);
 		payablesDetail.save();
 		return true;

@@ -36,7 +36,6 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
-import org.ccloud.model.Department;
 import org.ccloud.model.OutstockPrint;
 import org.ccloud.model.Payables;
 import org.ccloud.model.PrintTemplate;
@@ -46,7 +45,6 @@ import org.ccloud.model.SalesOutstock;
 import org.ccloud.model.SellerCustomer;
 import org.ccloud.model.User;
 import org.ccloud.model.Warehouse;
-import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.OutstockPrintQuery;
 import org.ccloud.model.query.PayablesQuery;
 import org.ccloud.model.query.PrintTemplateQuery;
@@ -353,7 +351,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 					}
 					// 直营商的应付账款
 					String countTotal = StringUtils.getArrayFirst(paraMap.get("total"));
-					createPayables(sellerCustomer, countTotal);
+					createPayables(sellerCustomer, countTotal,seller);
 					count = 0;
 					index = 0;
 					while (productNum > count) {
@@ -377,11 +375,10 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		return isSave;
 	}
 
-	private void createPayables(SellerCustomer sellerCustomer, String countAll) {
+	private void createPayables(SellerCustomer sellerCustomer, String countAll,Record seller) {
 		String payablesType = Consts.RECEIVABLES_OBJECT_TYPE_SUPPLIER;
 		Payables payables = PayablesQuery.me().findByObjIdAndDeptId(sellerCustomer.getSellerId(), payablesType,
-				sellerCustomer.getDeptId());
-		Department department = DepartmentQuery.me().findById(sellerCustomer.getDeptId());
+				seller.getStr("dept_id"));
 		if (payables == null) {
 			payables = new Payables();
 			payables.setId(StrKit.getRandomUUID());
@@ -390,8 +387,8 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 			payables.setPayAmount(new BigDecimal(countAll));
 			payables.setActAmount(new BigDecimal(0));
 			payables.setBalanceAmount(new BigDecimal(countAll));
-			payables.setDeptId(sellerCustomer.getDeptId());
-			payables.setDataArea(department.getDataArea());
+			payables.setDeptId(seller.getStr("dept_id"));
+			payables.setDataArea(seller.getStr("data_area"));
 			payables.setCreateDate(new Date());
 			payables.save();
 		} else {

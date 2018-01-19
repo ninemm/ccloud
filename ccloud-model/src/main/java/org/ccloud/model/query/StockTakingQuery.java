@@ -25,6 +25,7 @@ import org.ccloud.model.StockTakingDetail;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.IAtom;
 import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
 /**
@@ -101,6 +102,12 @@ public class StockTakingQuery extends JBaseQuery {
 	  public List<StockTaking> findByBillSn(String date){
 			return DAO.doFind("biz_date = ?", date);
 	  }
-
+	  
+	  public Record findBySn(String  order_sn) {
+		  String sql = "select s.id, s.stock_taking_sn,w.name,s.biz_date,s.status,s.create_date,u.realname "
+		  		+ " from cc_stock_taking s LEFT JOIN cc_warehouse w ON  s.warehouse_id=w.id LEFT JOIN `user`  u ON u.id=s.input_user_id "
+		  		+ " where s.stock_taking_sn = '"+order_sn+"'";
+		  return Db.findFirst(sql);
+	  }
 	
 }

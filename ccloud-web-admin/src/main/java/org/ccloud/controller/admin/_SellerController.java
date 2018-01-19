@@ -68,6 +68,7 @@ import org.ccloud.model.query.SellerQuery;
 import com.alibaba.fastjson.JSONArray;
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Before;
+import com.jfinal.core.Const;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.tx.Tx;
@@ -444,7 +445,12 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 							sellerProducts.set("price", sellerProduct.getPrice());
 							sellerProducts.set("account_price", sellerProduct.getPrice());
 							sellerProducts.setCost(sellerProduct.getPrice());
-							sellerProducts.setIsSource(1);
+							Seller seller = SellerQuery.me().findById(getSessionAttr(Consts.SESSION_SELLER_ID).toString());
+							if(seller.getSellerType()==Integer.parseInt(Consts.SELLER_TYPE_SELLER)) {
+								sellerProducts.setIsSource(1);
+							}else {
+								sellerProducts.setIsSource(0);
+							}
 							sellerProducts.setMarketPrice(sellerProduct.getMarketPrice());
 							sellerProducts.set("is_enable", sellerProduct.getIsEnable());
 							sellerProducts.set("order_list", sellerProduct.getOrderList());
@@ -726,6 +732,8 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 	}
 	@Before(Tx.class)
 	public void saveSellerCustomer(String customerId,User user,Department department,String sellerId,String dataArea){
+		String code = "G";
+		CustomerType customerType = CustomerTypeQuery.me().findDataAreaAndName(dataArea,code);
 		
 		SellerCustomer sellerCustomer = new SellerCustomer();
 		String sellerCustomerId = StrKit.getRandomUUID();
@@ -736,11 +744,11 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		sellerCustomer.set("is_checked", 1);
 		sellerCustomer.set("is_enabled", 1);
 		sellerCustomer.set("is_archive", 1);
-		sellerCustomer.set("customer_type_ids", 7);
-		sellerCustomer.set("customer_kind", 100402);
+		sellerCustomer.set("customer_type_ids", customerType.getId());
+		sellerCustomer.set("customer_kind", Consts.CUSTOMER_KIND_SELLER);
 		sellerCustomer.set("status", 0);
 		sellerCustomer.set("data_area", dataArea);
-		sellerCustomer.set("dept_id", department.getId());
+		sellerCustomer.set("dept_id", user.getDepartmentId());
 		sellerCustomer.set("create_date", new Date());
 		sellerCustomer.save();
 		
@@ -752,8 +760,6 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		userJoinCustomer.set("dept_id", department.getId());
 		userJoinCustomer.save();
 		
-		String code = "G";
-		CustomerType customerType = CustomerTypeQuery.me().findDataAreaAndName(dataArea,code);
 		if(customerType!=null){
 			CustomerJoinCustomerType customerJoinCustomerType = new CustomerJoinCustomerType();
 			customerJoinCustomerType.setSellerCustomerId(sellerCustomerId);
