@@ -78,6 +78,11 @@ public class ShiroDbRealm extends AuthorizingRealm {
         }
     }
     
+    protected Object getAuthorizationCacheKey(PrincipalCollection principals) {
+    	 User userInPrincipal = (User) principals.getPrimaryPrincipal();
+        return userInPrincipal.getId();
+    }    
+    
     /** 
      * 认证密码匹配调用方法 
      */  
