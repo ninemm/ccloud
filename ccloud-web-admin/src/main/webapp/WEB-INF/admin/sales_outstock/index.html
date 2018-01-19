@@ -84,6 +84,13 @@
 					},
 					edit: false,
 				sortable: true},
+				
+				{field: "create_date", title: "销售订单单号/创建时间", align: "center", width: '10%',
+					formatter: function(value, row, rowIndex) {
+						return '<a href="#" onclick="orderDetail(\''+row.orderId+'\')" >'+row.order_sn + '<br>' + row.orderDate+'</a>';
+					},
+					edit: false,
+				sortable: true},
 				{field: "customer_name", title: "客户名称", align: "center", width: '8%', edit:false,sortable: true},
 				{field: "total_amount", title: "订单总额", align: "center", width: '5%', edit:false,sortable: true},
 				{field: "receive_type", title: "付款方式", align: "center", width: '5%',
@@ -146,6 +153,15 @@
 			}
 		}
 	};
+	
+function orderDetail(id) {
+		layer.open({
+			title:"订单详细",
+			type: 2, 
+			area: ['70%', '80%'],
+			content: '${CPATH}/admin/salesOrder/detail/' + id
+		}); 
+	}
 
 <!-- 单个打印或批量打印调用方法 -->
 	function print(id) {

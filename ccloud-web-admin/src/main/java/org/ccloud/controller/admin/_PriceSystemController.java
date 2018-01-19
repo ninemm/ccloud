@@ -25,12 +25,10 @@ import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.Department;
 import org.ccloud.model.PriceSystem;
-import org.ccloud.model.User;
 import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.PriceSystemQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
-import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.StringUtils;
 
 import com.google.common.collect.ImmutableMap;
