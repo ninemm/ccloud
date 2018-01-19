@@ -571,7 +571,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 	public void searchTypeById() {
 		String dept_dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString();
 		String sellerCustomerId = getPara("sellerC_Id");
-		List<Record> list = UserJoinCustomerQuery.me().findCustomerTypeBySellerCustomerId(sellerCustomerId, dept_dataArea+"%");
+		List<Record> list = UserJoinCustomerQuery.me().findCustomerTypeBySellerCustomerId(sellerCustomerId, dept_dataArea);
 		renderAjaxResultForSuccess("success",JSON.toJSON(list));
 
 	}

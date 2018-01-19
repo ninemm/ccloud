@@ -57,7 +57,7 @@ public class UserJoinCustomerQuery extends JBaseQuery {
 		sqlBuilder.append("from cc_customer_join_customer_type cc inner join cc_customer_type cct on cc.customer_type_id = cct.id ");
 		boolean needWhere = true;
 		needWhere = appendIfNotEmpty(sqlBuilder,"cc.seller_customer_id",sellerCustomerId,params,needWhere);
-		needWhere = appendIfNotEmptyWithLike(sqlBuilder, "cct.data_area", dataArea, params, needWhere);
+		needWhere = appendIfNotEmpty(sqlBuilder, "cct.data_area", dataArea, params, needWhere);
 		return Db.find(sqlBuilder.toString(), params.toArray());
 	}
 
