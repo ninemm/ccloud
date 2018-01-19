@@ -803,7 +803,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		}else {
 			Kv kv = Kv.create();
 
-			WxMessageTemplate messageTemplate = WxMessageTemplateQuery.me().findByCode("_customer_audit");
+			WxMessageTemplate messageTemplate = WxMessageTemplateQuery.me().findByCode(Consts.PROC_CUSTOMER_REVIEW);
 
 			kv.set("touser", toUser.getWechatOpenId());
 			kv.set("templateId", messageTemplate.getTemplateId());
@@ -861,7 +861,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 				return false;
 			}
 
-			String defKey = "_customer_audit";
+			String defKey = Consts.PROC_CUSTOMER_REVIEW;
 			param.put("manager", manager.getUsername());
 			param.put("isEnable", isEnable);
 

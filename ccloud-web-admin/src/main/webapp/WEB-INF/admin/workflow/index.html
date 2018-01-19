@@ -47,12 +47,12 @@
 		var fields =  
 			[
       			{field: "ID_", title: "ID", align: "center", visible:false, edit:false},
-      			{field: "SUSPENSION_STATE_", title: "是否挂起", align: "center", visible:false, width: '15%', edit:false},
-      			{field: "DEPLOYMENT_ID_", title: "部署ID", align: "center", visible:false, width: '18%', edit:false},
+      			{field: "SUSPENSION_STATE_", title: "是否挂起", align: "center", visible:false, edit:false},
+      			{field: "DEPLOYMENT_ID_", title: "部署ID", align: "center", visible:false, edit:false},
       			{field: "KEY_", title: "流程标识", align: "center", width: '8%', edit:false},
-      			{field: "NAME_", title: "流程名称", align: "center", width: '25%', edit:false},
+      			{field: "NAME_", title: "流程名称", align: "center", width: '15%', edit:false},
       			{field: "VERSION_", title: "流程版本", align: "center", width: '8%', edit:false},
-   				{field: "RESOURCE_NAME_", title: "流程XML", align: "center", visible:false, width: '15%', 
+   				{field: "RESOURCE_NAME_", title: "流程XML", align: "center", visible:false,
    					formatter: function(value, row, rowIndex) {
    					    return "<a target='_blank' href='${CPATH}/admin/workflow/resourceRead?procDefId="+row.ID_+"&resType=xml' style='color:#2EB6FF;'>"+value+"</a>";
    					},
@@ -60,7 +60,7 @@
    				},
    				{field: "DGRM_RESOURCE_NAME_", title: "流程图片", align: "center", width: '20%', 
                     formatter: function(value, row, rowIndex) {
-                        return "<a target='_blank' href='${CPATH}/admin/workflow/resourceRead?procDefId="+row.ID_+"&resType=image' style='color:#2EB6FF;'>"+value+"</a>";
+                        return "<a target='_blank' href='${CPATH}/admin/workflow/resourceRead?procDefId="+row.ID_+"&resType=image' style='color:#2EB6FF;'>"+row.NAME_+"</a>";
                     },
                     edit: false
                 },

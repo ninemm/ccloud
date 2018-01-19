@@ -333,7 +333,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 		String toUserId = "";
 
-		if(Consts.WORKFLOW_PROC_DEF_KEY_ORDER_REVIEW_ONE.equals(proc_def_key)) {
+		if(Consts.PROC_ORDER_REVIEW_ONE.equals(proc_def_key)) {
 			
 			User manager = UserQuery.me().findManagerByDeptId(user.getDepartmentId());
 			if (manager == null) {

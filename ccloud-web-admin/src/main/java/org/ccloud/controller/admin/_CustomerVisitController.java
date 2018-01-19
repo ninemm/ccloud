@@ -199,7 +199,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 			customerVisit.setStatus(Customer.CUSTOMER_REJECT);
 			Kv kv = Kv.create();
 
-			WxMessageTemplate messageTemplate = WxMessageTemplateQuery.me().findByCode("_customer_visit_review");
+			WxMessageTemplate messageTemplate = WxMessageTemplateQuery.me().findByCode(Consts.PROC_CUSTOMER_VISIT_REVIEW);
 
 			kv.set("touser", toUser.getWechatOpenId());
 			kv.set("templateId", messageTemplate.getTemplateId());
@@ -287,6 +287,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
         
 	}
 	
+	@SuppressWarnings("deprecation")
 	public void exportExcel(List<Record> dataList) throws IOException {
 
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\customer_visit\\"

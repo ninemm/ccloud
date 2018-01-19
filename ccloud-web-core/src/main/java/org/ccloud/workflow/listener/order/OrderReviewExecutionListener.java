@@ -88,8 +88,7 @@ public class OrderReviewExecutionListener implements ExecutionListener {
 
 		Kv kv = Kv.create();
 
-		WxMessageTemplate messageTemplate = WxMessageTemplateQuery.me()
-				.findByCode(Consts.WX_MESSAGE_TEMPLATE_ORDER_REVIEW);
+		WxMessageTemplate messageTemplate = WxMessageTemplateQuery.me().findByCode(Consts.PROC_ORDER_REVIEW);
 		Record salesOrder = SalesOrderQuery.me().findMoreById(orderId);
 		List<Record> orderDetailList = SalesOrderDetailQuery.me().findByOrderId(orderId);
 

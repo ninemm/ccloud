@@ -35,10 +35,6 @@ public class Consts {
 	public static final String WORKFLOW_APPLY_SELLER_ID = "sellerId";
 	public static final String WORKFLOW_APPLY_SELLER_CODE = "sellerCode";
 
-	public static final String WORKFLOW_PROC_DEF_KEY_ORDER_REVIEW_ONE = "_order_review_1";//1审
-
-	public static final String WX_MESSAGE_TEMPLATE_ORDER_REVIEW  = "_order_review";
-
 	public static final String CHARTSET_UTF8 = "UTF-8";
 
 	public static final String INDEX_URL = "/";
@@ -175,7 +171,6 @@ public class Consts {
 	public static final String ROLE_CODE_020 = "020";//账务
 	public static final String ROLE_CODE_010 = "010";//业务员
 
-
 	public static final String OPERATE_HISTORY_TITLE_ORDER_REVIEW= "订单审核";
 	public static final String OPERATE_HISTORY_TITLE_ORDER_PRINT= "订单打印";
 
@@ -205,31 +200,40 @@ public class Consts {
 	public static final Integer ACTIVITY_APPLY_STATUS_REJECT = 3;
 	public static final Integer ACTIVITY_APPLY_STATUS_END = 4;
 	
-	public static String WAREHOUSE_TYPE_MY = "0";// 直属仓库
-	public static String WAREHOUSE_TYPE_SELLER = "1";// 销售商仓库
-	public static String WAREHOUSE_TYPE_CAR = "2";// 车销仓库
+	public static final String WAREHOUSE_TYPE_MY = "0";// 直属仓库
+	public static final String WAREHOUSE_TYPE_SELLER = "1";// 销售商仓库
+	public static final String WAREHOUSE_TYPE_CAR = "2";// 车销仓库
 	
 	//活动类型
-	public static String CATEGORY_NORMAL="101101" ; //普通活动
-	public static String CATEGORY_INVEST="101101" ; //投入活动
+	public static final String CATEGORY_NORMAL="101101" ; //普通活动
+	public static final String CATEGORY_INVEST="101101" ; //投入活动
 	
 	//投入类型
-	public static String INVEST_TYPE = "activity_invest";//投入的类型
-	public static String INVEST_SHOP="110001" ; //商品
-	public static String INVEST_MATTER="110002" ; //物料
-	public static String INVEST_ACTIVITY="110003" ; //费用活动费
+	public static final String INVEST_TYPE = "activity_invest";//投入的类型
+	public static final String INVEST_SHOP="110001" ; //商品
+	public static final String INVEST_MATTER="110002" ; //物料
+	public static final String INVEST_ACTIVITY="110003" ; //费用活动费
 	
 	//客户参与活动的时间区间
-	public static String TIME_INTERVAL_ONE="100101";//1个月
-	public static String TIME_INTERVAL_TWO="100102";//2个月
-	public static String TIME_INTERVAL_THREE="100103";//3个月
-	public static String TIME_INTERVAL_FOUR="100104";//4个月
-	public static String TIME_INTERVAL_FIVE="100105";//5个月
-	public static String TIME_INTERVAL_SIX="100106";//6个月
-	public static String TIME_INTERVAL_SEVEN="100107";//7个月
-	public static String TIME_INTERVAL_EIGHT="100108";//8个月
-	public static String TIME_INTERVAL_NINE="100109";//9个月
-	public static String TIME_INTERVAL_TEN="100110";//10个月
-	public static String TIME_INTERVAL_ELEVEN="100111";//11个月
-	public static String TIME_INTERVAL_TWELVE="100112";//12个月
+	public static final String TIME_INTERVAL_ONE="100101";//1个月
+	public static final String TIME_INTERVAL_TWO="100102";//2个月
+	public static final String TIME_INTERVAL_THREE="100103";//3个月
+	public static final String TIME_INTERVAL_FOUR="100104";//4个月
+	public static final String TIME_INTERVAL_FIVE="100105";//5个月
+	public static final String TIME_INTERVAL_SIX="100106";//6个月
+	public static final String TIME_INTERVAL_SEVEN="100107";//7个月
+	public static final String TIME_INTERVAL_EIGHT="100108";//8个月
+	public static final String TIME_INTERVAL_NINE="100109";//9个月
+	public static final String TIME_INTERVAL_TEN="100110";//10个月
+	public static final String TIME_INTERVAL_ELEVEN="100111";//11个月
+	public static final String TIME_INTERVAL_TWELVE="100112";//12个月
+	
+	
+	public static final String PROC_CUSTOMER_REVIEW = "_customer_review";				// 客户审核
+	public static final String PROC_CUSTOMER_VISIT_REVIEW = "_customer_visit_review";	// 拜访审核
+	public static final String PROC_ORDER_REVIEW = "_order_review";						// 餐饮直供
+	public static final String PROC_ORDER_REVIEW_ONE = "_order_review_1";				// 订单1审
+	public static final String PROC_ORDER_REVIEW_TWO = "_order_review_2";				// 订单2审
+	public static final String PROC_ORDER_REVIEW_THREE = "_order_review_3";				// 订单3审
+	
 }

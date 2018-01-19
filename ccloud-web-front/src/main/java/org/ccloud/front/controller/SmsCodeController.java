@@ -31,7 +31,7 @@ public class SmsCodeController extends BaseFrontController{
 		SmsCode smsCode = new SmsCode();
 		smsCode.setAuthCode(code);
 		smsCode.setMobile(mobile);
-		smsCode.setContent(content.replace("${code}", code).replace("${product}", "渠道云平台"));
+		smsCode.setContent(content.replace("${code}", code).replace("${product}", "协同云平台"));
 		smsCode.setSendTime(new Date());
 		
 		smsCode.saveOrUpdate();
@@ -41,7 +41,7 @@ public class SmsCodeController extends BaseFrontController{
 		sms.setContent(content);
 		sms.setRec_num(mobile);
 		sms.setTemplate(prop.get("sms_template_id", "SMS_69840314"));
-		sms.setParam("{\"code\":\"" + code + "\",\"product\":\"渠道云平台\"}");
+		sms.setParam("{\"code\":\"" + code + "\",\"product\":\"协同云平台\"}");
 		sms.setSign_name(prop.get("sms_sign_name_jy"));
 		
 		boolean sendOk = new AlidayuSmsSender().send(sms);

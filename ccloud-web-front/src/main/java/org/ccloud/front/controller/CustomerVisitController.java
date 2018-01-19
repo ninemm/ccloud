@@ -439,7 +439,7 @@ public class CustomerVisitController extends BaseFrontController {
 			customerVisit.setStatus(Customer.CUSTOMER_REJECT);
 			Kv kv = Kv.create();
 
-			WxMessageTemplate messageTemplate = WxMessageTemplateQuery.me().findByCode("_customer_visit_review");
+			WxMessageTemplate messageTemplate = WxMessageTemplateQuery.me().findByCode(Consts.PROC_CUSTOMER_VISIT_REVIEW);
 
 			kv.set("touser", toUser.getWechatOpenId());
 			kv.set("templateId", messageTemplate.getTemplateId());
@@ -456,6 +456,12 @@ public class CustomerVisitController extends BaseFrontController {
 		sendMessage(sellerId, comment, user.getId(), toUser.getId(), user.getDepartmentId(), user.getDataArea()
 				, Message.CUSTOMER_VISIT_REVIEW_TYPE_CODE, customerVisit.getSellerCustomer().getCustomer().getCustomerName(),id);
 		
+		//审核订单后将message中是否阅读改为是
+		Message message=MessageQuery.me().findByObjectIdAndToUserId(id,user.getId());
+		if (null!=message) {
+			message.setIsRead(Consts.IS_READ);
+			message.update();
+		}
 		if (customerVisit.saveOrUpdate())
 			renderAjaxResultForSuccess("操作成功");
 		else
@@ -478,7 +484,7 @@ public class CustomerVisitController extends BaseFrontController {
 		
 		if (isCustomerVisit != null && isCustomerVisit.booleanValue()) {
 
-			String defKey = "_customer_visit_review";
+			String defKey = Consts.PROC_CUSTOMER_VISIT_REVIEW;
 			param.put("manager", manager.getUsername());
 
 			WorkFlowService workflow = new WorkFlowService();

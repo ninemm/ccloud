@@ -33,7 +33,7 @@ public class TodoController extends BaseFrontController {
 		List<SellerCustomer> list = SellerCustomerQuery.me().getToDo(username);
 		if(list.size() !=0 )setAttr("todoList", list);
 
-		Page <Record> historyList = SellerCustomerQuery.me().getHisProcessList(getPageNumber(), getPageSize(), "_customer_audit", username);
+		Page <Record> historyList = SellerCustomerQuery.me().getHisProcessList(getPageNumber(), getPageSize(), Consts.PROC_CUSTOMER_REVIEW, username);
 		if(historyList.getList().size() != 0) setAttr("historyList", historyList);
 
 		render("todo_customer.html");
@@ -64,7 +64,7 @@ public class TodoController extends BaseFrontController {
 		String username = user.getUsername();
 		Page<CustomerVisit> page = CustomerVisitQuery.me().getToDo(getPageNumber(), getPageSize(), username);
 		
-		Page <Record> historyList = CustomerVisitQuery.me().getHisProcessList(getPageNumber(), getPageSize(), "_customer_visit_review", username);
+		Page <Record> historyList = CustomerVisitQuery.me().getHisProcessList(getPageNumber(), getPageSize(), Consts.PROC_CUSTOMER_VISIT_REVIEW, username);
 		if(historyList.getList().size() != 0) setAttr("historyList", historyList);
 
 		setAttr("page", page);
@@ -75,7 +75,7 @@ public class TodoController extends BaseFrontController {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String username = user.getUsername();
 
-		Page <Record> historyList = SellerCustomerQuery.me().getHisProcessList(getParaToInt("pageNumber"), getParaToInt("pageSize"), "_customer_audit", username);
+		Page <Record> historyList = SellerCustomerQuery.me().getHisProcessList(getParaToInt("pageNumber"), getParaToInt("pageSize"), Consts.PROC_CUSTOMER_REVIEW, username);
 		StringBuilder html = new StringBuilder();
 
 		for(Record customer : historyList.getList()) {
@@ -116,7 +116,7 @@ public class TodoController extends BaseFrontController {
 	public void visitHistoryAuditRefresh() throws ParseException {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String username = user.getUsername();
-		Page <Record> historyList = CustomerVisitQuery.me().getHisProcessList(getParaToInt("pageNumber"), getParaToInt("pageSize"), "_customer_visit_review", username);
+		Page <Record> historyList = CustomerVisitQuery.me().getHisProcessList(getParaToInt("pageNumber"), getParaToInt("pageSize"), Consts.PROC_CUSTOMER_VISIT_REVIEW, username);
 		StringBuilder html = new StringBuilder();
 		for(Record visit : historyList.getList()) {
 			html.append(

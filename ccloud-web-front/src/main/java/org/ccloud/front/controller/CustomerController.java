@@ -617,7 +617,12 @@ public class CustomerController extends BaseFrontController {
 		String comment = (status == 1) ? "客户审核批准" : "客户审核拒绝";
 
 		boolean updated = true;
-
+		//审核订单后将message中是否阅读改为是
+		Message oldMessage=MessageQuery.me().findByObjectIdAndToUserId(sellerCustomerId,user.getId());
+		if (null!=oldMessage) {
+			oldMessage.setIsRead(Consts.IS_READ);
+			oldMessage.update();
+		}
 		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(sellerCustomerId);
 		sellerCustomer.setStatus(status == 1 ? SellerCustomer.CUSTOMER_NORMAL : SellerCustomer.CUSTOMER_REJECT);
 
@@ -712,7 +717,7 @@ public class CustomerController extends BaseFrontController {
 		} else {
 			Kv kv = Kv.create();
 
-			WxMessageTemplate messageTemplate = WxMessageTemplateQuery.me().findByCode("_customer_audit");
+			WxMessageTemplate messageTemplate = WxMessageTemplateQuery.me().findByCode(Consts.PROC_CUSTOMER_REVIEW);
 
 			kv.set("touser", toUser.getWechatOpenId());
 			kv.set("templateId", messageTemplate.getTemplateId());
@@ -775,7 +780,7 @@ public class CustomerController extends BaseFrontController {
 				return false;
 			}
 			
-			String defKey = "_customer_audit";
+			String defKey = Consts.PROC_CUSTOMER_REVIEW;
 			param.put("manager", manager.getUsername());
 			param.put("isEnable", isEnable);
 

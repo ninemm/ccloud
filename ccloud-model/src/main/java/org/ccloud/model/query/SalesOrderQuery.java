@@ -108,11 +108,13 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append("left join cc_customer c on cc.customer_id = c.id ");
 		fromBuilder.append("left join cc_customer_type ct on o.customer_type_id = ct.id ");
 		fromBuilder.append("left join act_ru_task a on o.proc_inst_id = a.PROC_INST_ID_ ");
+
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 
 		needWhere = appendIfNotEmpty(fromBuilder, "o.status", status, params, needWhere);
-		needWhere = appendIfNotEmpty(fromBuilder, "o.customer_type_id", customerTypeId, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "ct.name", customerTypeId, params, needWhere);
+//		needWhere = appendIfNotEmpty(fromBuilder, "o.customer_type_id", customerTypeId, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
 
@@ -425,21 +427,28 @@ public class SalesOrderQuery extends JBaseQuery {
 		return DAO.find(sb.toString(), username);
 	}
 	
-public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procKey, String username) {
+	public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procKey, String username) {
 		
 		String select = "SELECT o.*, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName,i.TASK_ID_ taskId, i.ACT_NAME_ taskName, i.ASSIGNEE_ assignee, i.END_TIME_ endTime  ";
+		
 		LinkedList<Object> params = new LinkedList<>();
-		params.add(username);
-
 		StringBuilder sql = new StringBuilder(" FROM cc_sales_order o ");
 		sql.append(" left join cc_seller_customer cc ON o.customer_id = cc.id ");
 		sql.append(" left join cc_customer c on cc.customer_id = c.id ");
+		
 		sql.append(" left join cc_customer_type ct on o.customer_type_id = ct.id ");
 		sql.append(" JOIN act_hi_actinst i on o.proc_inst_id = i.PROC_INST_ID_ ");
 		sql.append(" JOIN act_re_procdef p on p.ID_ = i.PROC_DEF_ID_ ");
-		sql.append(" WHERE p.KEY_ not in ('_customer_visit_review','_customer_audit') and FIND_IN_SET(?, i.ASSIGNEE_) AND i.DURATION_ is not null ");
+		sql.append(" WHERE i.DURATION_ is not null AND p.KEY_ not in (?,?) ");
+		
+		params.add(Consts.PROC_CUSTOMER_VISIT_REVIEW);
+		params.add(Consts.PROC_CUSTOMER_REVIEW);
+		if (StrKit.notBlank(username)) {
+			sql.append(" AND FIND_IN_SET(?, i.ASSIGNEE_)");
+			params.add(username);
+		}
 		sql.append(" order by i.END_TIME_ desc ");
-
+		
 		return Db.paginate(pageNumber, pageSize, select, sql.toString(), params.toArray());
 	}
 
