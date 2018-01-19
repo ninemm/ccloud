@@ -194,7 +194,7 @@
 		    shadeClose: true,
 		    shade: 0.8,
 		    area: ['92%', '90%'],
-		    content: '${CPATH}/admin/attachment/choose_layer',
+		    content: '${CPATH}/admin/attachment/_choose_layer',
 		    end:function(){
 		    	if(''!=data.url && null != data.url){
 		    		$("#imageDiv").append("<li><div class='imgDiv'><img src="+ data.url +" path=${CPATH}"+ data.url +" class='jp-grids-photos img-responsive' ><input type='hidden' name='imageUrl[]' value="+ data.url +"><input type='hidden' name='title[]' value="+ data.alt +"><div class='delete'></div></div></li>");
@@ -275,7 +275,7 @@
 							<label class="control-label col-sm-2">活动时间:</label>
 							<div class="input-group col-md-4 col-sm-10">
 								<input id="startDate" class="form-control" value="${startDate!}" name="startDate" placeholder="活动开始日期" style="width:230px;" >
-									<label class="control-label col-sm-2">————</label>
+									<label class="control-label col-sm-2">—</label>
 								<input id="endDate" class="form-control" value="${endDate!}" name="endDate" placeholder="活动结束日期" style="width:250px;margin-left:20px;float:right;" >
 							</div>
 						</div>
@@ -313,7 +313,7 @@
 						</div>			
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">客户类型:</label>
-							<div class="input-group col-md-4 col-sm-10" style="width=300px;">
+							<div class="input-group col-md-4 col-sm-10" style="width:33.4%;">
 								<select id="customerType" class="form-control input-sm" name = "customerType">
 								</select>
 	                        </select>
@@ -329,7 +329,7 @@
 						</div>
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">*投入类型:</label>
-							<div class="input-group col-md-4 col-sm-8" style="width=300px;">
+							<div class="input-group col-md-4 col-sm-7" style="width:32.2%;">
 								<select class="form-control input-sm" name="invest_type" id="invest_type" multiple="multiple" >
 									<#if activity??>
 										<#list (dicts)! as dict>
