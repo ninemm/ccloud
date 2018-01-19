@@ -479,15 +479,19 @@ public class SalesOutstockQuery extends JBaseQuery {
 
 		if (needWhere) {
 			if (status != null) {
-				fromBuilder.append(" where o.status != ? ");
-				params.add(status);
+				fromBuilder.append(" where o.status = ? ");
+				params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
 			} else {
-				fromBuilder.append(" where 1 = 1 ");
+				fromBuilder.append(" where o.status != ? ");
+				params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
 			}
 		} else {
 			if (status != null) {
+				fromBuilder.append("  AND o.status = ? ");
+				params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
+			} else {
 				fromBuilder.append("  AND o.status != ? ");
-				params.add(status);
+				params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);				
 			}
 		}
 		
