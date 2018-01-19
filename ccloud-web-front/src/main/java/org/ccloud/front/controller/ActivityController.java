@@ -194,7 +194,7 @@ public class ActivityController extends BaseFrontController {
 		String history = getPara("history");
 		setAttr("history", history);
 
-		render("user_apply_list.html");
+		render("activity_apply_list.html");
 	}
 
 	public void refreshApply() {

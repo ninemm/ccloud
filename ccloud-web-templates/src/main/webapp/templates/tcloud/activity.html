@@ -156,19 +156,21 @@ function initActivity(activityList){
 		$newProductDetail.find("#activityId").val(el.id);
 		$newProductDetail.find("#visitNum").val(el.visit_num);
 
-		$newProductDetail.find("#image").attr("src", "");
+		$newProductDetail.find("#image").attr("src", getImageUrl(el.image_list_store, el.code));
 	});
 }
 
-function getImageUrl(product_image_list_store, product_sn) {
-	var imageUrl = "${CTPATH}/images/jp.jpg";
-	$.each(JSON.parse(product_image_list_store), function(index, el) {
-		if(el.imgName.indexOf(product_sn + "_1") != -1) {
-			imageUrl = el.savePath;
-			return false;
-		}
-	});
+function getImageUrl(image_list_store, code) {
+	var imageUrl = "${CTPATH}/images/poster.jpg";
+	var imageArray = image_list_store.split(',');
+//	$.each(imageArray, function(index, el) {
+//		if(el.indexOf(code + "_1") != -1) {
+//			imageUrl = el;
+//			return false;
+//		}
+//	});
 
+	imageUrl = imageArray[0];
 	return imageUrl;
 }
 
