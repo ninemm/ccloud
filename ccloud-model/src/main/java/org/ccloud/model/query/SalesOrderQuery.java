@@ -108,11 +108,13 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append("left join cc_customer c on cc.customer_id = c.id ");
 		fromBuilder.append("left join cc_customer_type ct on o.customer_type_id = ct.id ");
 		fromBuilder.append("left join act_ru_task a on o.proc_inst_id = a.PROC_INST_ID_ ");
+
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 
 		needWhere = appendIfNotEmpty(fromBuilder, "o.status", status, params, needWhere);
-		needWhere = appendIfNotEmpty(fromBuilder, "o.customer_type_id", customerTypeId, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "ct.name", customerTypeId, params, needWhere);
+//		needWhere = appendIfNotEmpty(fromBuilder, "o.customer_type_id", customerTypeId, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
 
