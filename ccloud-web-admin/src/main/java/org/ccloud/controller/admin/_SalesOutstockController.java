@@ -187,6 +187,15 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 
 	}
 
+	//业务员出库单汇总打印
+	public void renderPrintAll() {
+		setAttr("outstockId", getPara("stockOutId"));
+		setAttr("userId", getPara("userId"));
+		setAttr("beginDate", getPara("beginDate"));
+		setAttr("endDate", getPara("endDate"));
+		render("salesman.html");
+	}
+
 	@RequiresPermissions("/admin/salesOutstock")
 	public void renderCarPrintPage() {
 		setAttr("carWarehouseId", getPara("carWarehouseId"));
@@ -636,4 +645,19 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		excel.setCreateDate(record.getStr("create_date"));
 		return excel;
 	}
+	
+	//业务员汇总打印信息
+	public void queryUserStockDetail() {
+		String outstockId = getPara("outstockId");
+		String[] outId = outstockId.split(",");
+		String userId = getPara("userId");
+		String beginDate = getPara("beginDate");
+		beginDate = beginDate + " 00:00:00";
+		String endDate = getPara("endDate");
+		endDate = endDate + " 23:59:59";
+	    
+		List<Record> records = SalesOutstockQuery.me().getUserPrintInfo(outId, userId);
+		renderJson(records);
+	}
+	
 }

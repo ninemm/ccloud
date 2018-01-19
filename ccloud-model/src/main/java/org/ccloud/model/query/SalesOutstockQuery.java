@@ -167,7 +167,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 	}
 
 	public Page<Record> paginate(int pageNumber, int pageSize, String sellerId, String keyword, String startDate, 
-			String endDate, String printStatus, String stockOutStatus, String status, String dataArea,String order,String sort,String salesman) {
+			String endDate, String printStatus, String stockOutStatus, String status, String dataArea,String order,String sort,String salesmanId) {
 		String select = "select o.*,  c.prov_name,c.city_name,c.country_name,c.address, c.customer_name,u.realname,ct.name as customerName,cso.id as orderId,cso.order_sn,cso.create_date as orderDate ";
 		if (StrKit.notBlank(status)) {
 			select = select + ",t2.refundCount, t2.outCount ";
@@ -217,6 +217,10 @@ public class SalesOutstockQuery extends JBaseQuery {
 		if (StrKit.notBlank(stockOutStatus)) {
 			fromBuilder.append(" and o.status = ?");
 			params.add(stockOutStatus);
+		}
+		if (StrKit.notBlank(salesmanId)) {
+			fromBuilder.append(" and cso.biz_user_id = ?");
+			params.add(salesmanId);
 		}
 		
 		if (StrKit.notBlank(status)) {
@@ -510,6 +514,27 @@ public class SalesOutstockQuery extends JBaseQuery {
 			return Db.find(fromBuilder.toString());
 
 		return Db.find(fromBuilder.toString(), params.toArray());
+	}
+	
+	public List<Record> getUserPrintInfo(String[] stockOutId,String userId) {
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append(" SELECT SUM(sod.bigCount) as bigCount, SUM(sod.smallCount) as smallCount, sod.bar_code, SUM(sod.product_amount) as productAmout, sod.is_gift, u.realname, sod.custom_name,u.mobile ");
+		stringBuilder.append(" FROM cc_sales_outstock c JOIN (SELECT floor(d.product_count / p.convert_relate ) AS bigCount, MOD (d.product_count, p.convert_relate ) ");
+		stringBuilder.append(" AS smallCount, d.product_amount, sp.bar_code, d.outstock_id, d.is_gift, sp.custom_name ");
+		stringBuilder.append(" FROM cc_sales_outstock_detail d INNER JOIN cc_seller_product sp ON d.sell_product_id = sp.id INNER ");
+		stringBuilder.append(" JOIN cc_product p ON p.id = sp.product_id ) sod ON sod.outstock_id = c.id INNER JOIN cc_sales_order_join_outstock ");
+		stringBuilder.append(" cj on cj.outstock_id = c.id INNER JOIN cc_sales_order s on s.id = cj.order_id INNER JOIN `user` u on u.id = s.biz_user_id ");
+		stringBuilder.append(" where 1 = 1 ");
+		LinkedList<Object> params = new LinkedList<Object>();
+		appendIfNotEmpty(stringBuilder, "c.id", stockOutId, params, false);
+		
+		if (StrKit.notBlank(userId)) {
+			stringBuilder.append(" and s.biz_user_id= ? GROUP BY sod.custom_name,sod.is_gift ");
+			params.add(userId);
+		}
+		
+		return Db.find(stringBuilder.toString(), params.toArray());
+
 	}
 	
 }
