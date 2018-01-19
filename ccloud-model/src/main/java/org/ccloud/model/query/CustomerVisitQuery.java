@@ -98,6 +98,12 @@ public class CustomerVisitQuery extends JBaseQuery {
 		sql.append("LEFT JOIN cc_customer cc ON csc.customer_id = cc.id ");
 		sql.append("LEFT JOIN cc_customer_join_customer_type ccjct ON csc.id = ccjct.seller_customer_id ");
 
+		sql.append("LEFT JOIN (SELECT c1.id,GROUP_CONCAT(ct. NAME) AS customerTypeNames ");
+		sql.append("FROM cc_seller_customer c1 ");
+		sql.append("LEFT JOIN cc_customer_join_customer_type cjct ON c1.id = cjct.seller_customer_id ");
+		sql.append("LEFT JOIN cc_customer_type ct ON cjct.customer_type_id = ct.id ");
+		sql.append("GROUP BY c1.id) t1 ON csc.id = t1.id ");
+
 		if (StrKit.notBlank(searchKey)) {
 			sql.append("WHERE ( cc.customer_name LIKE ? OR cc.contact LIKE ? ) ");
 			if (searchKey.contains("%")) {
@@ -113,7 +119,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 		}
 		
 		needwhere = appendIfNotEmptyWithLike(sql, "ccv.data_area", dataArea, params, needwhere);
-		needwhere = appendIfNotEmpty(sql, "ccjct.customer_type_id", type, params, needwhere);
+		needwhere = appendIfNotEmptyWithLike(sql, "t1.customerTypeNames", type, params, needwhere);
 		needwhere = appendIfNotEmpty(sql, "csc.sub_type", subType, params, needwhere);
 		needwhere = appendIfNotEmpty(sql,"csc.id", id, params, needwhere);
 

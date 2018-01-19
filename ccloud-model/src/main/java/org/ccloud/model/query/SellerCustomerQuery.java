@@ -245,6 +245,12 @@ public class SellerCustomerQuery extends JBaseQuery {
 		sql.append("LEFT JOIN cc_customer c ON csc.customer_id = c.id ");
 		sql.append("LEFT JOIN cc_sales_outstock cso ON cujc.seller_customer_id = cso.customer_id ");
 
+		sql.append("LEFT JOIN (SELECT c1.id,GROUP_CONCAT(ct. NAME) AS customerTypeNames ");
+		sql.append("FROM cc_seller_customer c1 ");
+		sql.append("LEFT JOIN cc_customer_join_customer_type cjct ON c1.id = cjct.seller_customer_id ");
+		sql.append("LEFT JOIN cc_customer_type ct ON cjct.customer_type_id = ct.id ");
+		sql.append("GROUP BY c1.id) t1 ON csc.id = t1.id ");
+
 		DateTime dateTime = new DateTime(new Date());
 		if ("2".equals(isOrdered)) {
 			sql.append("AND cso.create_date > '" + DateUtils.format(dateTime.plusWeeks(-1).toDate()) + "' ");
@@ -272,7 +278,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 
 		needwhere = appendIfNotEmptyWithLike(sql, "cujc.data_area", selectDataArea, params, needwhere);
 		needwhere = appendIfNotEmpty(sql, "csc.is_enabled", 1, params, needwhere);
-		needwhere = appendIfNotEmpty(sql, "ccjct.customer_type_id", customerType, params, needwhere);
+		needwhere = appendIfNotEmptyWithLike(sql, "t1.customerTypeNames", customerType, params, needwhere);
 
 		sql.append("GROUP BY c.id ");
 
