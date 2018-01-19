@@ -27,7 +27,7 @@
   $(function () {
   
     $(".end-date").calendar();
-    $(".end-date").val($.today());
+    $(".end-date").val($.today() + ' 23:59:59');
     $(".begin-date").calendar();
     $(".begin-date").val($.today());
     $("#dayTag").val("today");
