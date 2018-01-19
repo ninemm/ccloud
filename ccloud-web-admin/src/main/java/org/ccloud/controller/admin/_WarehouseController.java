@@ -125,9 +125,10 @@ public class _WarehouseController extends JBaseCRUDController<Warehouse> {
 	public void save() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		Warehouse warehouse = getModel(Warehouse.class); 
+		String sellerId = getSessionAttr("sellerId").toString();
 		//判断仓库是否有默认仓库
 		if (warehouse.getIsDefault()==1) {
-			List<Warehouse> list = WarehouseQuery.me().findIsDefault(user.getId());
+			List<Warehouse> list = WarehouseQuery.me().findIsDefault(user.getId(),sellerId);
 			if (list.size()!=0&&!list.get(0).getId().equals(warehouse.getId())) {
 				renderAjaxResultForError("请求错误,已有默认仓库");
 				return;
