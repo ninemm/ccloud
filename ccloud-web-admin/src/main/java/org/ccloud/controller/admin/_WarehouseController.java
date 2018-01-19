@@ -75,26 +75,26 @@ public class _WarehouseController extends JBaseCRUDController<Warehouse> {
 	}
 	
 	//删除仓库  删除UserJoinWarehouse
-//	public void delete() {
-//		Db.tx(new IAtom() {
-//		    @Override
-//		    public boolean run() throws SQLException {
-//		    		String warehouse_id = getPara("id");
-//				int deleteWarehouse = WarehouseQuery.me().deleteWarehouseId(warehouse_id);
-//				if (!(deleteWarehouse>0)) {
-//		    			renderAjaxResultForError("删除失败!");
-//		    			return false;
-//				}
-//		    		int deleteUserJoinWarehouse = UserJoinWarehouseQuery.me().deleteWarehouseId(warehouse_id);
-//		    		if (!(deleteUserJoinWarehouse>0)) {
-//		    			renderAjaxResultForError("删除失败!");
-//		    			return false;
-//				}
-//		    		renderAjaxResultForSuccess("删除成功");
-//		        return true;                	
-//		    }
-//		});
-//	}
+	/*public void delete() {
+		Db.tx(new IAtom() {
+		    @Override
+		    public boolean run() throws SQLException {
+		    		String warehouse_id = getPara("id");
+				int deleteWarehouse = WarehouseQuery.me().deleteWarehouseId(warehouse_id);
+				if (!(deleteWarehouse>0)) {
+		    			renderAjaxResultForError("删除失败!");
+		    			return false;
+				}
+		    		int deleteUserJoinWarehouse = UserJoinWarehouseQuery.me().deleteWarehouseId(warehouse_id);
+		    		if (!(deleteUserJoinWarehouse>0)) {
+		    			renderAjaxResultForError("删除失败!");
+		    			return false;
+				}
+		    		renderAjaxResultForSuccess("删除成功");
+		        return true;                	
+		    }
+		});
+	}*/
 	
 	@Before(UCodeInterceptor.class)
 	public void batchDelete() {
@@ -133,7 +133,7 @@ public class _WarehouseController extends JBaseCRUDController<Warehouse> {
 				return;
 			}
 		}
-		String seller_id=getSessionAttr("sellerId").toString();
+		String seller_id=getSessionAttr("sellerId");
 		warehouse.setDeptId(user.getDepartmentId());
 		warehouse.setDataArea(user.getDataArea());
 		warehouse.setSellerId(seller_id);
@@ -210,8 +210,3 @@ public class _WarehouseController extends JBaseCRUDController<Warehouse> {
 		 renderJson(list);
 	}
 }
-
-
-
-
-    		
