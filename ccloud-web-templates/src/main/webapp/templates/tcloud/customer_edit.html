@@ -216,7 +216,7 @@
                 if($("#customer_type").val().length==0) {$.toptip('客户类型不能为空', 1000, 'error'); return false;}
                 if($("#delivery-address").val().length==0) {$.toptip('配送地址不能为空', 1000, 'error'); return false;}
                 if($("#address").val().length==0) {$.toptip('地址详情不能为空', 1000, 'error'); return false;}
-                if($("#location").val().length==0) {$.toptip('定位地址不能为空,请刷新定位', 1000, 'error'); return false;}
+                if($("#location").val().length==0) {$.toptip('定位地址不能为空,请刷新定位', 1000, 'error'); return false;} 
 
                 $('._submit_btn').attr('disabled', true);
                 layer.open({
@@ -338,8 +338,8 @@
                 var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
                 var geoc = new BMap.Geocoder();                   // 获取百度地址解析器
 
-                $("#lng").val(parseFloat(longitude).toFixed(2));
-                $("#lat").val(parseFloat(latitude).toFixed(2));
+                $("#lng").val(parseFloat(longitude).toFixed(6));
+                $("#lat").val(parseFloat(latitude).toFixed(6));
                 translateCallback = function (point) {            // 回调函数
                     geoc.getLocation(point, function(rs) {
                         var addComp = rs.addressComponents;

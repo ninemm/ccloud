@@ -762,8 +762,7 @@ public class CustomerController extends BaseFrontController {
 		
 		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(customerId);
 		boolean isUpdated = true;
-//		Boolean isCustomerAudit = OptionQuery.me().findValueAsBool("isCustomerAudit");
-		Boolean isCustomerAudit = true;
+		Boolean isCustomerAudit = OptionQuery.me().findValueAsBool("isCustomerAudit");
 		
 		if (sellerCustomer == null) {
 			renderError(404);
