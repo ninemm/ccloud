@@ -75,26 +75,26 @@ public class _WarehouseController extends JBaseCRUDController<Warehouse> {
 	}
 	
 	//删除仓库  删除UserJoinWarehouse
-//	public void delete() {
-//		Db.tx(new IAtom() {
-//		    @Override
-//		    public boolean run() throws SQLException {
-//		    		String warehouse_id = getPara("id");
-//				int deleteWarehouse = WarehouseQuery.me().deleteWarehouseId(warehouse_id);
-//				if (!(deleteWarehouse>0)) {
-//		    			renderAjaxResultForError("删除失败!");
-//		    			return false;
-//				}
-//		    		int deleteUserJoinWarehouse = UserJoinWarehouseQuery.me().deleteWarehouseId(warehouse_id);
-//		    		if (!(deleteUserJoinWarehouse>0)) {
-//		    			renderAjaxResultForError("删除失败!");
-//		    			return false;
-//				}
-//		    		renderAjaxResultForSuccess("删除成功");
-//		        return true;                	
-//		    }
-//		});
-//	}
+	/*public void delete() {
+		Db.tx(new IAtom() {
+		    @Override
+		    public boolean run() throws SQLException {
+		    		String warehouse_id = getPara("id");
+				int deleteWarehouse = WarehouseQuery.me().deleteWarehouseId(warehouse_id);
+				if (!(deleteWarehouse>0)) {
+		    			renderAjaxResultForError("删除失败!");
+		    			return false;
+				}
+		    		int deleteUserJoinWarehouse = UserJoinWarehouseQuery.me().deleteWarehouseId(warehouse_id);
+		    		if (!(deleteUserJoinWarehouse>0)) {
+		    			renderAjaxResultForError("删除失败!");
+		    			return false;
+				}
+		    		renderAjaxResultForSuccess("删除成功");
+		        return true;                	
+		    }
+		});
+	}*/
 	
 	@Before(UCodeInterceptor.class)
 	public void batchDelete() {
@@ -125,15 +125,15 @@ public class _WarehouseController extends JBaseCRUDController<Warehouse> {
 	public void save() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		Warehouse warehouse = getModel(Warehouse.class); 
+		String seller_id=getSessionAttr("sellerId").toString();
 		//判断仓库是否有默认仓库
 		if (warehouse.getIsDefault()==1) {
-			List<Warehouse> list = WarehouseQuery.me().findIsDefault(user.getId());
+			List<Warehouse> list = WarehouseQuery.me().findIsDefault(user.getId(),seller_id);
 			if (list.size()!=0&&!list.get(0).getId().equals(warehouse.getId())) {
 				renderAjaxResultForError("请求错误,已有默认仓库");
 				return;
 			}
 		}
-		String seller_id=getSessionAttr("sellerId").toString();
 		warehouse.setDeptId(user.getDepartmentId());
 		warehouse.setDataArea(user.getDataArea());
 		warehouse.setSellerId(seller_id);
@@ -210,8 +210,3 @@ public class _WarehouseController extends JBaseCRUDController<Warehouse> {
 		 renderJson(list);
 	}
 }
-
-
-
-
-    		

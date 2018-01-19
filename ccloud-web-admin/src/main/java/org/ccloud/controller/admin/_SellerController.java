@@ -232,18 +232,17 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			seller.save();
 		} else {
 			Seller s = SellerQuery.me().findById(seller.getId());
-			if(s.getSellerType() == Integer.parseInt(Consts.SELLER_TYPE_DEALER)) {
+			if(!s.getDeptId().equals(department.getId())){
 				Seller seller1=SellerQuery.me().findByDeptAndSellerType(department.getId(),Integer.parseInt(Consts.SELLER_TYPE_DEALER));
 				if(seller1!=null){
 					renderAjaxResultForError("该公司部门已有一个经销商，请确认");
 					return;
 				}
-			}else {
 				Seller seller0=SellerQuery.me().findByDeptAndSellerType(department.getId(),Integer.parseInt(Consts.SELLER_TYPE_SELLER));
 				if(seller0!=null){
 					renderAjaxResultForError("该公司部门已有一个直营商，请确认");
 					return;
-				}
+				}	
 			}
 			this.updateSeller(seller, department, user,productType);
 			SellerBrandQuery.me().deleteBySellertId(sellerId);
