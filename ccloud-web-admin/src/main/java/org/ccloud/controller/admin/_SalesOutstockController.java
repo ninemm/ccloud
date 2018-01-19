@@ -101,7 +101,6 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 	}
 
 	public void list() {
-
 		String keyword = getPara("k");
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
@@ -440,7 +439,6 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		return isSave;
 	}
 
-	
 	//批量出库  应收账款
 	public boolean saveBatchStockOut(final String[] outId, final Date stockDate, final String remark, final User user,
 			final String sellerId, String sellerCode, final Date date) {
@@ -452,7 +450,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 					printAllNeedInfo printAllNeedInfo = SalesOutstockQuery.me().findStockOutForPrint(s);
 					//获取订单明细
 					List<orderProductInfo> orderProductInfos = SalesOutstockDetailQuery.me().findPrintProductInfo(s);
-				
+					//订单总金额
 					BigDecimal productAmout=new BigDecimal("0");
 					for (orderProductInfo orderProductInfo : orderProductInfos) {
 						productAmout=productAmout.add(orderProductInfo.getProductAmout());

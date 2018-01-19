@@ -95,16 +95,12 @@ public class InventoryDetailQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller_product csp on csp.id = cid.sell_product_id ");
 		fromBuilder.append(" LEFT JOIN cc_user_join_warehouse cujw on cujw.warehouse_id=cid.warehouse_id ");
 		LinkedList<Object> params = new LinkedList<Object>();
-		boolean needWhere = true;
-		if (needWhere) {
-			fromBuilder.append(" where ( 1 = 1");
-		}
-
+		fromBuilder.append(" where cid.biz_type in ('"+Consts.BIZ_TYPE_INSTOCK+"','"+Consts.BIZ_TYPE_SALES_REFUND_INSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_INSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_PLUS_INSTOCK+"') ");
+		
 		if (StrKit.notBlank(startDate)) {
 			fromBuilder.append(" and cid.create_date >= ?");
 			params.add(startDate);
 		}
-
 		if (StrKit.notBlank(endDate)) {
 			fromBuilder.append(" and cid.create_date <= ?");
 			params.add(endDate);
@@ -112,10 +108,8 @@ public class InventoryDetailQuery extends JBaseQuery {
 		if(!sellerProductId.equals("")){
 			fromBuilder.append(" and csp.id = '"+sellerProductId+"' ");
 		}
-		fromBuilder.append(" and cid.biz_type in ('"+Consts.BIZ_TYPE_INSTOCK+"','"+Consts.BIZ_TYPE_SALES_REFUND_INSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_INSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_PLUS_INSTOCK+"') ");
-		fromBuilder.append(" and ( cid.biz_bill_sn like '%"+keyword+"%' or csp.custom_name like '%"+keyword+"%' ) and csp.seller_id = '"+sellerId+"' ");
-		fromBuilder.append(" ) OR (csp.id IN( SELECT id.sell_product_id FROM cc_inventory_detail id WHERE id.warehouse_id IN( SELECT w.id FROM cc_warehouse w WHERE w.seller_id ='"+sellerId+"' ) GROUP BY id.sell_product_id)");
-		fromBuilder.append(" and cid.biz_type in ('"+Consts.BIZ_TYPE_INSTOCK+"','"+Consts.BIZ_TYPE_SALES_REFUND_INSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_INSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_PLUS_INSTOCK+"') )");
+		fromBuilder.append("AND (csp.seller_id='"+sellerId+"' OR csp.id IN( SELECT id.sell_product_id FROM cc_inventory_detail id WHERE id.warehouse_id IN( SELECT w.id FROM cc_warehouse w WHERE w.seller_id = '"+sellerId+"') GROUP BY id.sell_product_id))");
+		
 		fromBuilder.append(" GROUP BY cid.id");
 		if(sort!=null){
 			fromBuilder.append(" order by "+sort+" "+ sortOrder);	
@@ -132,11 +126,8 @@ public class InventoryDetailQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_warehouse cw on cw.id = cid.warehouse_id ");
 		fromBuilder.append(" LEFT JOIN cc_seller_product csp on csp.id = cid.sell_product_id ");
 		fromBuilder.append(" LEFT JOIN cc_user_join_warehouse cujw on cujw.warehouse_id=cid.warehouse_id ");
+		fromBuilder.append(" where cid.biz_type in ('"+Consts.BIZ_TYPE_P_OUTSTOCK+"','"+Consts.BIZ_TYPE_SALES_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_REDUCE_OUTSTOCK+"') ");
 		LinkedList<Object> params = new LinkedList<Object>();
-		boolean needWhere = true;
-		if (needWhere) {
-			fromBuilder.append(" where ( 1 = 1");
-		}
 
 		if (StrKit.notBlank(startDate)) {
 			fromBuilder.append(" and cid.create_date >= ?");
@@ -150,10 +141,8 @@ public class InventoryDetailQuery extends JBaseQuery {
 		if(!sellerProductId.equals("")){
 			fromBuilder.append(" and csp.id = '"+sellerProductId+"' ");
 		}
-		fromBuilder.append(" and cid.biz_type in ('"+Consts.BIZ_TYPE_P_OUTSTOCK+"','"+Consts.BIZ_TYPE_SALES_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_REDUCE_OUTSTOCK+"') ");
-		fromBuilder.append(" and ( cid.biz_bill_sn like '%"+keyword+"%' or csp.custom_name like '%"+keyword+"%' ) and csp.seller_id = '"+sellerId+"'");	
-		fromBuilder.append(" ) OR (csp.id IN( SELECT id.sell_product_id FROM cc_inventory_detail id WHERE id.warehouse_id IN( SELECT w.id FROM cc_warehouse w WHERE w.seller_id ='"+sellerId+"' ) GROUP BY id.sell_product_id)");
-		fromBuilder.append(" and cid.biz_type in ('"+Consts.BIZ_TYPE_P_OUTSTOCK+"','"+Consts.BIZ_TYPE_SALES_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_REDUCE_OUTSTOCK+"')) ");
+		fromBuilder.append(" and ( cid.biz_bill_sn like '%"+keyword+"%' or csp.custom_name like '%"+keyword+"%' ) ");	
+		fromBuilder.append(" and ( csp.seller_id = '"+sellerId+"' OR csp.id IN( SELECT id.sell_product_id FROM cc_inventory_detail id WHERE id.warehouse_id IN( SELECT w.id FROM cc_warehouse w WHERE w.seller_id ='"+sellerId+"' ) GROUP BY id.sell_product_id))");
 		fromBuilder.append(" GROUP BY cid.id ");
 		if(sort!=null){
 			fromBuilder.append(" order by "+sort+" "+ sortOrder);	
