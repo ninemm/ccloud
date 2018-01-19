@@ -80,15 +80,22 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		String sortOrder = getPara("sortOrder");
 		Map<String, String[]> paraMap = getParaMap();
 		String keyword = StringUtils.getArrayFirst(paraMap.get("k"));
+		String customerType = getPara("customerType");
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
 		}
 
-		Page<Record> page = SellerCustomerQuery.me().paginate(getPageNumber(), getPageSize(), keyword, selectDataArea,sort,sortOrder);
+		Page<Record> page = SellerCustomerQuery.me().paginate(getPageNumber(), getPageSize(), keyword, selectDataArea,sort,sortOrder, customerType);
 		List<Record> customerList = page.getList();
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", customerList);
 		renderJson(map);
+	}
+
+	public void queryCustomerType() {
+		String typeDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString();
+		List<Record> typeList = CustomerTypeQuery.me().findCustomerTypeList(typeDataArea);
+		renderAjaxResultForSuccess("success",JSON.toJSON(typeList));
 	}
 
 	@RequiresPermissions(value = { "/admin/sellerCustomer/edit", "/admin/dealer/all",
@@ -369,7 +376,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\seller_customer\\"
 				+ "customerInfo.xlsx";
 
-		Page<Record> page = SellerCustomerQuery.me().paginate(1, Integer.MAX_VALUE, "", dataArea + "%","","");
+		Page<Record> page = SellerCustomerQuery.me().paginate(1, Integer.MAX_VALUE, "", dataArea + "%","","", "");
 		List<Record> customerList = page.getList();
 
 		List<CustomerExcel> excellist = Lists.newArrayList();
