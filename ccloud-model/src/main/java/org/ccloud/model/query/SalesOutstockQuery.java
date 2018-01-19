@@ -464,7 +464,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 		return carSalesPrintNeedInfos;
 	}
 
-	public List<Record> findReceivablesUserList(String sellerId, String selectDataArea, String startDate, String endDate) {
+	public List<Record> findReceivablesUserList(String sellerId, String selectDataArea, String startDate, String endDate, Integer status) {
 		StringBuilder fromBuilder = new StringBuilder("SELECT u.realname, u.id FROM cc_sales_outstock o ");
 		fromBuilder.append("LEFT JOIN cc_sales_order_join_outstock cj on cj.outstock_id = o.id ");
 		fromBuilder.append("LEFT JOIN cc_sales_order cs on cs.id = cj.order_id ");
@@ -476,11 +476,17 @@ public class SalesOutstockQuery extends JBaseQuery {
 		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
 
 		if (needWhere) {
-			fromBuilder.append(" where o.status != ? ");
-			params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
+			if (status != null) {
+				fromBuilder.append(" where o.status != ? ");
+				params.add(status);
+			} else {
+				fromBuilder.append(" where 1 = 1 ");
+			}
 		} else {
-			fromBuilder.append(" AND o.status != ? ");
-			params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
+			if (status != null) {
+				fromBuilder.append("  AND o.status != ? ");
+				params.add(status);
+			}
 		}
 		
 		if (StrKit.notBlank(startDate)) {

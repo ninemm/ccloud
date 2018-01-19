@@ -92,7 +92,7 @@ public class ReceivablesController extends BaseFrontController {
 		all.put("value", "");
 		List<Map<String, Object>> userList = new ArrayList<>();
 		userList.add(all);
-		List<Record> list = SalesOutstockQuery.me().findReceivablesUserList(sellerId, selectDataArea, startDate, endDate);
+		List<Record> list = SalesOutstockQuery.me().findReceivablesUserList(sellerId, selectDataArea, startDate, endDate, Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
 		for (Record record : list) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", record.getStr("realname"));
