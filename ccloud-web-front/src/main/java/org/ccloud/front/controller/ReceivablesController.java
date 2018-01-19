@@ -87,12 +87,13 @@ public class ReceivablesController extends BaseFrontController {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);		
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
+		Integer print = getParaToInt("print");
 		Map<String, Object> all = new HashMap<>();
 		all.put("title", "全部");
 		all.put("value", "");
 		List<Map<String, Object>> userList = new ArrayList<>();
 		userList.add(all);
-		List<Record> list = SalesOutstockQuery.me().findReceivablesUserList(sellerId, selectDataArea, startDate, endDate, Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
+		List<Record> list = SalesOutstockQuery.me().findReceivablesUserList(sellerId, selectDataArea, startDate, endDate, print);
 		for (Record record : list) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", record.getStr("realname"));
