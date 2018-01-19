@@ -19,7 +19,7 @@
 		strHtml = '<option selected="selected" value="">全部</option>';
 		for(index in customerType){
 			var row = customerType[index].columns;
-			strHtml +='<option value="'+row.id+'">'+row.name+'</option>';
+			strHtml +='<option value="'+row.name+'">'+row.name+'</option>';
 		}
 		$("#customer_type").html(strHtml);
 

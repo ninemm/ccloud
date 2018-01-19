@@ -77,7 +77,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 		StringBuilder fromBuilder = new StringBuilder(" from `cc_seller_customer` sc ");
 		fromBuilder.append(" join `cc_customer` c on c.id = sc.customer_id ");
 
-		fromBuilder.append(" LEFT JOIN (SELECT c1.id,GROUP_CONCAT(ct. NAME) AS customerTypeNames,GROUP_CONCAT(ct.id) AS customerTypeIds ");
+		fromBuilder.append(" LEFT JOIN (SELECT c1.id,GROUP_CONCAT(ct. NAME) AS customerTypeNames ");
 		fromBuilder.append(" FROM cc_seller_customer c1 ");
 		fromBuilder.append(" LEFT JOIN cc_customer_join_customer_type cjct ON c1.id = cjct.seller_customer_id ");
 		fromBuilder.append(" LEFT JOIN cc_customer_type ct ON cjct.customer_type_id = ct.id ");
@@ -91,7 +91,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 		appendIfNotEmptyWithLike(fromBuilder, "ujc.data_area", dataArea, params, true);
 		fromBuilder.append(" GROUP BY c2.id) t2 ON sc.id = t2.id ");
 
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "t1.customerTypeIds", customerType, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "t1.customerTypeNames", customerType, params, needWhere);
 		if (StrKit.notBlank(keyword))
 			if ( needWhere ){
 				fromBuilder.append(" WHERE c.customer_name LIKE ? OR t2.realnames LIKE ? ");

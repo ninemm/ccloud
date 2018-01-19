@@ -40,7 +40,6 @@
 	var initParams = function(params) {
 
 		var keyword = $('#post-search-input').val();
-		if (keyword) keyword = encodeURIComponent(keyword);
 		var customerType = $('#customer_type').val();
 		var param = {
 			size: params.limit,
@@ -153,7 +152,7 @@
 				strHtml = '<option selected="selected" value="">客户类型</option>';
 				for(index in customerType){
 					var row = customerType[index].columns;
-					strHtml +='<option value="'+row.id+'">'+row.name+'</option>';
+					strHtml +='<option value="'+row.name+'">'+row.name+'</option>';
 				}
 				$("#customer_type").html(strHtml);
 			}

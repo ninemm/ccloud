@@ -36,26 +36,20 @@
 
     $("#search-submit").click(function() {
         $table.bootstrapTable('refresh');
-        paramId = 0;
-        $("#_customer_visit_table").bootstrapTable('refresh');
     });
 
     var initParams = function(params) {
         var keyword = $('#post-search-input').val();
-        if (keyword) keyword = encodeURIComponent(keyword);
         var customerType = $('#customer_type').val();
-        if (customerType) customerType = encodeURIComponent(customerType);
         var questionType = $('#question_type').val();
-        if (questionType) questionType = encodeURIComponent(questionType);
         var status = $('#status').val();
-        if (status) status = encodeURIComponent(status);
         var param = {
             size: params.limit,
             page: params.offset/params.limit + 1,
             k: keyword,
-            'questionType':questionType,
-            'customerType':customerType,
-            'status':status
+            questionType: questionType,
+            customerType: customerType,
+            status: status
         };
         return param;
     };
@@ -110,7 +104,7 @@
             strHtml = '<option selected="selected" value="">客户类型</option>';
             for(index in customerType){
                 var row = customerType[index].columns;
-                strHtml +='<option value="'+row.id+'">'+row.name+'</option>';
+                strHtml +='<option value="'+row.name+'">'+row.name+'</option>';
             }
             $("#customer_type").html(strHtml);
         }
@@ -146,13 +140,9 @@
 
 	$("#exportVisit").click(function(){
         var keyword = $('#post-search-input').val();
-        if (keyword) keyword = encodeURIComponent(keyword);
         var customerType = $('#customer_type').val();
-        if (customerType) customerType = encodeURIComponent(customerType);
         var questionType = $('#question_type').val();
-        if (questionType) questionType = encodeURIComponent(questionType);
         var status = $('#status').val();
-        if (status) status = encodeURIComponent(status);
         window.open("${CPATH}/admin/customerVisit/exportVisit?k="+keyword+"&questionType="+questionType+"&customerType="+customerType+"&status="+status,"_parent","","");
     });
 
