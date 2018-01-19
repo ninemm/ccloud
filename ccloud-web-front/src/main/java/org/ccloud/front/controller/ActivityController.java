@@ -274,4 +274,12 @@ public class ActivityController extends BaseFrontController {
 		render("apply_detail.html");
 
 	}
+
+	public void withdraw(){
+		String id = getPara("id");
+		ActivityApply activityApply = ActivityApplyQuery.me().findById(id);
+		activityApply.setStatus(2);
+		if( activityApply.saveOrUpdate()) renderAjaxResultForSuccess("操作成功");
+		else renderAjaxResultForError("操作失败");
+	}
 }

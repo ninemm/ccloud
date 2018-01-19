@@ -13,7 +13,7 @@
 <#macro script>
 $(function() {
   $("body").on("click","#confirm-input" ,function(){
-  	total();
+	total();
   });
   $("#deliveryDate").calendar();
   var id = "${id}";
@@ -106,6 +106,7 @@ $(function() {
 		});
 
 		$("#total").val(total);
+		console.log(total);
 		$("#totalNum").text("共" + (products.length) + "款,合计:" + total + "元")
 	
 	}

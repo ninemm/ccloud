@@ -19,18 +19,14 @@
 
 <#macro script>
 $(function() {
-	$(document).off('click', '.operate:last-child')
-	.off('click', '#confirm-input')
-	.on('click', '.operate:last-child', function() {
+	$(document).on('click', '.operate:last-child', function() {
 		var $this = $(this);
-		var max = $this.parent().parent().find('.max').val();
+		var max = parseInt($this.parent().parent().find('.max').val());
 		var $input = $this.prev();
-		$input.val()==max?'':$input.val(Number($input.val()) + 1);
+		parseInt($input.val())>max?$input.val(max):'';
 	}).on("click", "#confirm-input", function() {
-		var max = $currentInput.parent().parent().find('.max').val();
-		var $newInput = $(".pop-input input");
-		$newInput.val()>max?$newInput.val(max):'';
-		confirmInput();
+		var max = parseInt($currentInput.parent().parent().find('.max').val());
+		parseInt($currentInput.val())>max?$currentInput.val(max):'';
 	})
 })
 	var $form = $('#form');
