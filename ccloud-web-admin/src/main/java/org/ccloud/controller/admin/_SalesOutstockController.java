@@ -113,12 +113,13 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String status = getPara("status");
+		String salesmanId = getPara("salesman");//业务员Id
 		// 获取排序相关信息
 		String sort = getPara("sortName[sort]");
 		String order = getPara("sortName[order]");
 
 		Page<Record> page = SalesOutstockQuery.me().paginate(getPageNumber(), getPageSize(), sellerId, keyword, startDate,
-				endDate, printStatus, stockOutStatus, status, dataArea, order, sort);
+				endDate, printStatus, stockOutStatus, status, dataArea, order, sort,salesmanId);
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
@@ -185,6 +186,15 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 			render(url + ".html");
 		}
 
+	}
+
+	//业务员出库单汇总打印
+	public void renderPrintAll() {
+		setAttr("outstockId", getPara("stockOutId"));
+		setAttr("userId", getPara("userId"));
+		setAttr("beginDate", getPara("beginDate"));
+		setAttr("endDate", getPara("endDate"));
+		render("salesman.html");
 	}
 
 	@RequiresPermissions("/admin/salesOutstock")
@@ -527,7 +537,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 				+ "salesOutstockInfo.xlsx";
 
 		Page<Record> page = SalesOutstockQuery.me().paginate(1, Integer.MAX_VALUE, sellerId, keyword, startDate, endDate,
-				printStatus, stockOutStatus, null, dataArea, null, null);
+				printStatus, stockOutStatus, null, dataArea, null, null,null);
 		List<Record> salesOutstckList = page.getList();
 
 		List<SalesOutstockExcel> excellist = Lists.newArrayList();
@@ -640,4 +650,19 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		excel.setCreateDate(record.getStr("create_date"));
 		return excel;
 	}
+	
+	//业务员汇总打印信息
+	public void queryUserStockDetail() {
+		String outstockId = getPara("outstockId");
+		String[] outId = outstockId.split(",");
+		String userId = getPara("userId");
+		String beginDate = getPara("beginDate");
+		beginDate = beginDate + " 00:00:00";
+		String endDate = getPara("endDate");
+		endDate = endDate + " 23:59:59";
+	    
+		List<Record> records = SalesOutstockQuery.me().getUserPrintInfo(outId, userId);
+		renderJson(records);
+	}
+	
 }

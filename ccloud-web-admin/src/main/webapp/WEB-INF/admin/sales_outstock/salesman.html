@@ -1,0 +1,286 @@
+<#include "../_inc/_layer_layout.html"/>
+
+<#macro script_import>
+	<script src="${CPATH}/static/plugins/jquery/jquery-1.9.1.min.js"></script>
+	<script src="${CPATH}/static/plugins/jquery/jquery-ui.js"></script>
+	<script src="${CPATH}/static/layer/layer.min.js"></script>
+	<script src="${CPATH}/static/plugins/jquery/jquery.all.print.table.js"></script>
+
+</#macro>
+
+<#macro css_import>
+	<link rel="stylesheet"  href="${CPATH}/static/print/print.css">
+	<link rel="stylesheet"  href="${CPATH}/static/layer/skin/layer.min.css">
+	<link rel="stylesheet"  href="${CPATH}/static/plugins/jquery/jquery-ui.css">
+</#macro>
+
+<#macro script>
+var $pagesize = $("#pagesize");
+$(function() {
+    initEvent();
+	queryUsertockDetail();
+
+});
+
+var defaultPageSize = 8;
+
+var headerInfo =
+	'<div class="header clear clearheader">' +
+	    '<div class="titleArea">' +
+			'<h1>{0}{1}</h1>' +
+		'</div>' +
+	'</div>';
+
+var headerStr =
+	'<table class="printContent clearcontent">' +
+		'<thead>' +
+		'<tr>' +
+			'<td class="text-center width8">发货时间</td>' +
+			'<td class="text-left width24">{0}</td>' +
+			'<td class="text-center width8">制单时间</td>' +
+			'<td colspan="3" class="text-left">{1}</td>' +
+		'</tr>' +
+		'<tr>' +
+			'<td class="text-center width8">序号</td>' +
+			'<td class="text-center width20">产品名称</td>' +
+			'<td class="width8">件数</td>' +
+			'<td class="width8">瓶数</td>' +
+			'<td class="width10">金额</td>' +
+			'<td class="width10">条码</td>' +
+		'</tr>' +
+	'</thead>';
+
+var contentStr = '<tr>' +
+	'<td class="text-center width8">{0}</td>' +
+	'<td class="text-center width20">{1}{2}</td>' +
+	'<td class="width8">{3}</td>' +
+	'<td class="width8">{4}</td>' +
+	'<td class="width10">{5}</td>' +
+	'<td class="width10">{6}</td>' +
+	'</tr>';
+
+var footerStr =
+	'<div class="signatureArea clearfooter">' +
+		'<div class="stat">' + 
+			'<span class="">应收合计：{0} ({1} 元)</span><span class="pageNum floatRight">1/1</span>' + 
+		'</div>' + 
+		'<div class="stat">' +
+			'<div><span>联系电话：{2}</span><span class="sign" >收货单位签字盖章</span></div>' +
+		'</div>' +
+		'<div style="text-align: left; width: inherit; font-size: 10px; line-height: 12px;">' +
+			'<span class="width200">备注：{3}</span><span style="float: right;">白联：客户 红联：提单 蓝联：结算</span>' +
+		'</div>' +
+	'</div>';
+
+
+function queryUsertockDetail() {
+
+	var batchPrintContent = '';
+	var headerContent = null;
+	var footerContent = null;
+	var headerInfoContent = null;
+
+    var batchPrintContent = '';
+    var headerContent = null;
+    var footerContent = null;
+    var headerInfoContent = null;
+    $.ajax({
+        url: "${CPATH}/admin/salesOutstock/queryUserStockDetail",
+        data: {
+        "outstockId":'${outstockId}',
+        "userId":'${userId}',
+        "beginDate":'${beginDate}', 
+        "endDate":'${endDate}'
+        },
+        dataType: "json",
+        async: false,
+        success: function(data) {
+        var beginDate= '${beginDate}';
+        var endDate = '${endDate}';
+           	var date = '';
+			if(beginDate == endDate){
+				date = beginDate;
+			} else {
+				date = beginDate + '至' + endDate;
+			}
+            var content = '<tbody>';
+            var curDate = (new Date()).Format("yyyy-MM-dd hh:mm");
+            var total = 0;
+			$.each(data, function(index, val) {
+				var barCode = val.bar_code;
+				if (!barCode) barCode = '无';
+				var isGift = val.is_gift;
+				var productAmout =  val.productAmout;
+				if (isGift != 0){
+					isGift = '(赠品)';
+					productAmout = 0;
+				}else{
+					isGift="";
+				}
+				content += $.format(contentStr, (index + 1), val.custom_name, isGift, val.bigCount, 
+					 val.smallCount,  productAmout + '元', barCode);
+
+				total += productAmout;
+		
+			 });
+			var len = data.length;
+			for (let i = len; i < 8; i++) {
+				content += $.format(contentStr, (i + 1), '', '', '', '', '', '', '', '');
+			}
+			content += '</tbody></table>';
+
+			headerInfoContent = $.format(headerInfo, data[0].realname, '出库合计');
+
+			headerContent = $.format(headerStr, date, curDate);
+
+			var salesAmount = DX(total);
+			
+			footerContent = $.format(footerStr, salesAmount, total, data[0].mobile != null ? data[0].mobile : '无', '无');
+		
+			batchPrintContent += headerInfoContent + headerContent + content + footerContent;
+				
+			defaultPageSize = 8;
+
+			$("#print-content").html(batchPrintContent);
+			rowNumber(defaultPageSize);
+
+			$("#pagesize").spinner({
+				min: 1
+			}).spinner("value", defaultPageSize);
+       }
+    });
+}
+
+
+$.format = function(source, params) {
+    if (arguments.length == 1) return function() {
+        var args = $.makeArray(arguments);
+        args.unshift(source);
+        return $.format.apply(this, args);
+    };
+    if (arguments.length > 2) {
+        params = $.makeArray(arguments).slice(1);
+    }
+    if (params.constructor != Array) {
+        params = [params];
+    }
+    $.each(params,
+    function(i, n) {
+        source = source.replace(new RegExp("\\{" + i + "\\}", "g"), n);
+    });
+    return source;
+};
+
+
+function initEvent() {
+    $("#preview").click(function() {
+
+        $("#print-content .header").not(".clearheader").remove();
+        $("#print-content .printContent").not(".clearcontent").remove();
+        $("#print-content .signatureArea").not(".clearfooter").remove();
+        $("#print-content .pageBreak").remove();
+
+        var pagesize = $pagesize.val();
+        if (pagesize != null || pagesize != "") {
+            rowNumber(Number(pagesize));
+            return;
+        }
+        rowNumber(defaultPageSize);
+    });
+}
+
+function DX(n) {
+    if (!/^(0|[1-9]\d*)(\.\d+)?$/.test(n))
+        return "数据非法";
+    var unit = "千佰拾亿千佰拾万千佰拾元角分", str = "";
+        n += "00";
+    var p = n.indexOf('.');
+    if (p >= 0)
+        n = n.substring(0, p) + n.substr(p+1, 2);
+        unit = unit.substr(unit.length - n.length);
+    for (var i=0; i < n.length; i++)
+        str += '零壹贰叁肆伍陆柒捌玖'.charAt(n.charAt(i)) + unit.charAt(i);
+    return str.replace(/零(千|佰|拾|角)/g, "零").replace(/(零)+/g, "零").replace(/零(万|亿|元)/g, "$1").replace(/(亿)万|壹(拾)/g, "$1$2").replace(/^元零?|零分/g, "").replace(/元$/g, "元整");
+}
+
+function rowNumber(pageSize){
+	$(".printContent").printTable({
+		 mode          : "rowNumber",
+		 header        : ".clearheader",
+		 footer        : ".clearfooter",
+		 content       : ".clearcontent",
+		 pageNumStyle  : "第#p页/共#P页",
+		 pageNumClass  : ".pageNum",
+		 pageSize      : pageSize
+	});
+}
+
+
+Date.prototype.Format = function (fmt) { //author: meizz 
+    var o = {
+        "M+": this.getMonth() + 1, //月份 
+        "d+": this.getDate(), //日 
+        "h+": this.getHours(), //小时 
+        "m+": this.getMinutes(), //分 
+        "s+": this.getSeconds(), //秒 
+        "q+": Math.floor((this.getMonth() + 3) / 3), //季度 
+        "S": this.getMilliseconds() //毫秒 
+    };
+    if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+    for (var k in o)
+    if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+    return fmt;
+}
+
+
+$( "#preview" ).click(function() {
+
+	$("#print-content .header").not(".clearheader").remove();
+	$("#print-content .printContent").not(".clearcontent").remove();
+	$("#print-content .signatureArea").not(".clearfooter").remove();
+	$("#print-content .pageBreak").remove();
+	var pagesize = $("#pagesize").val();
+
+	if ($.isNotEmpty(pagesize)) {
+		rowNumber(Number(pagesize));
+		return ;
+	}
+	rowNumber(defaultPageSize);
+});
+
+$("#print").click(function() {
+
+    if (window.confirm('确认打印吗(订单状态会变为已打印)?')) {
+    $.ajax({
+      url: "${CPATH}/admin/salesOutstock/recordPrintInfo",
+        data: {
+            "outstockId": '${outstockId!}'
+        },
+        dataType: "json",
+        async: false,
+        success: function(data) {
+          if (data.result == 200) {
+			window.print();
+		  } else {
+		alert("记录打印日志出错，请联系管理员!");
+			}
+        }
+    })
+    }
+});
+
+</#macro>
+
+
+<@layout>
+<div id="content-body">
+	<div id="action-buttons" class="noPrint">
+		<span>每页打印商品数量：<input type="text" id="pagesize" style="width:40px;height: 25px"></span>
+		<input type="button" value="分页预览" class="btn" id="preview" >
+		<input type="button" value="打印" class="btn" id="print">
+	</div>
+	<div id="print-content">
+
+	</div>
+</div>
+</@layout>

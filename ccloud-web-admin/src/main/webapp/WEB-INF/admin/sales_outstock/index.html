@@ -31,12 +31,18 @@
 
 	$(function() {
 	    initCarWarehouse();
+	    initUser();
 	    var curDate = new Date().Format("yyyy-MM-dd");
 		$("#sOutDate").val(curDate);
 		jQuery.mm.initDatetimepicker('form', '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initDatetimepicker('form', '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initValidator('#form', validatorFields)
 		jQuery.mm.initEditTable('#_salesOutstock_table', url, initParams, initFields(), null);
+		$(document).on("change", "#startDate", function() {
+          initUser();
+	    }).on("change", "#endDate", function() {
+          initUser();
+	    })
 	});
 
 	$("#search-submit").click(function() {
@@ -59,6 +65,7 @@
 			endDate: $('#endDate').val() + " 23:59:59",
 			printStatus:$("#printStatus").val(),
 			stockOutStatus:$("#stockOutStatus").val(),
+			salesman:$("#salesman").val(),
 			sortName:params
 		};
 		return param;
@@ -175,6 +182,8 @@ function orderDetail(id) {
     		},
 		}); 
 	}
+	
+	
 		
 	function batchOutConfirmPage(id) {
 		layer.open({
@@ -209,6 +218,45 @@ function orderDetail(id) {
 	     print(ids);
 		}
    }
+   
+   
+       //分业务员汇总打印
+    function batchPrintAll(){
+      var userId = $("#salesman").val();
+      if(userId == ""){
+      layer.alert("请选择要打印的业务员");
+      return;
+      }
+    
+   	   ids = new Array();
+		$("[name='dataItem']:checkbox").each(function() {
+			if ($(this).is(":checked")) {
+				ids.push($(this).val());
+			}
+		});
+		if(ids.length == 0){
+		 layer.alert("请选择要打印的出库单");
+		}else{
+	     printAll(ids);
+		}
+   }
+   
+   
+	function printAll(id) {
+	   var starDate = $("#startDate").val();
+       var endDate = $("#endDate").val();
+       var userId = $("#salesman").val();
+		layer.open({
+			title:"业务员出库单汇总打印",
+			type: 2, 
+			area: ['90%', '90%'],
+			content: '${CPATH}/admin/salesOutstock/renderPrintAll/?stockOutId='+id + "&beginDate=" + starDate + "&endDate=" + endDate + "&userId=" + userId,
+			end: function() {
+			$("#search-submit").click();
+    		},
+		}); 
+	}
+   
    
    var cOutTrStr = '<tr><td class="center">{0}</td><td>{1}</td><td class="hidden-xs">{2}</td><td class="hidden-xs">{3}</td></tr>';
    
@@ -347,6 +395,31 @@ function orderDetail(id) {
         });
     }
     
+    
+   <!-- 初始化业务员选择框 -->
+ var initUser = function () {
+        var strHtml = "";
+        var url = '${CPATH}/receivables/initUser';
+        $.ajax({
+            url: url,
+            type: 'post',
+            data:{
+            "startDate": $('#startDate').val() + " 00:00:00",
+			"endDate": $('#endDate').val() + " 23:59:59",
+			"print":0
+            },
+            success: function (result) {
+                var user = result.userList;
+                strHtml = '<option selected="selected" value="">业务员选择</option>';
+                for(index in user){
+                    var row = user[index];
+                    strHtml +='<option value="'+row.value+'">'+row.title+'</option>';
+                }
+                $("#salesman").html(strHtml);
+            }
+        });
+    }
+    
     <!--打印车销汇总单  -->
     function batchCarPrint(){
     var carWarehouseId = $("#carWarehouse").val();
@@ -363,7 +436,7 @@ function orderDetail(id) {
 			area: ['90%', '90%'],
 			content: '${CPATH}/admin/salesOutstock/renderCarPrintPage?carWarehouseId='+carWarehouseId + "&beginDate=" + starDate + "&endDate=" + endDate,
 		    end: function() {
-            location.reload();
+            $("#search-submit").click();
     		},
 		}); 
       }
@@ -393,7 +466,8 @@ function orderDetail(id) {
 			<input type="hidden" name="userIds" id="userIds" value="">
 		</div>
 		<div class="row content-row">
-			
+			 <select class="input-sm" name="salesman" id="salesman" style="padding-right:5px;margin-right:55px;">
+             </select>
 			<div class="form-group" style="float: right">
 				<div class="form-group validata-box">
 					<label class="control-label">开始时间:</label>
@@ -417,9 +491,10 @@ function orderDetail(id) {
 		<div class="jp-left">
 				<button class="btn btn-sm btn-primary btn-flat" type="button" onclick="batchAction()"><i class="fa fa-gavel"></i> 批量打印 </button>
 				<button class="btn btn-sm btn-primary btn-flat" type="button" onclick="batchOut()"><i class="fa  fa-check-circle"></i> 批量出库</button>
-				<button class="btn btn-sm btn-primary btn-flat" type="button" onclick="batchCheckAll()"><i class="fa  fa-circle-o-notch"></i>全选</button>
-				<button class="btn btn-sm btn-primary btn-flat" type="button" onclick="batchCarPrint()"><i class="fa  fa-train"></i>车销订单汇总打印</button>
+<!-- 				<button class="btn btn-sm btn-primary btn-flat" type="button" onclick="batchCheckAll()"><i class="fa  fa-circle-o-notch"></i>全选</button> -->
+				<button class="btn btn-sm btn-primary btn-flat" type="button" onclick="batchCarPrint()"><i class="fa  fa-train"></i>车销订单打印</button>
 				<button class="btn btn-sm btn-primary btn-flat" type="button" onclick="batchDown()"><i class="fa fa-download"></i> 导出</button>
+				<button class="btn btn-sm btn-primary btn-flat" type="button" onclick="batchPrintAll()"><i class="fa  fa-rebel"></i> 业务员汇总打印</button>
 			</div>
             <div class="input-group input-group-sm " style="float: right;">
                <label class="control-label">打印状态&nbsp; </label>
