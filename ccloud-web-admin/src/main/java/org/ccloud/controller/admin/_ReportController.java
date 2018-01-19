@@ -35,7 +35,6 @@ import com.jfinal.plugin.activerecord.Record;
 @RouterMapping(url = "/admin/report", viewPath = "/WEB-INF/admin/report")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
-//报表模块
 public class _ReportController extends JBaseController {
 	
 	//库存详细
