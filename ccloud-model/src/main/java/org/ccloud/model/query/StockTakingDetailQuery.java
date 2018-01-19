@@ -154,7 +154,12 @@ public class StockTakingDetailQuery extends JBaseQuery {
 	}
 	
 	public List<Record> findByStockTakingId (String stockTakingId){
-		String sql = "select st.*,cs.custom_name from cc_stock_taking_detail st LEFT JOIN cc_seller_product cs on cs.id = st.seller_product_id where st.stock_taking_id='"+stockTakingId+"'";
+		String sql = "select st.*,cs.custom_name,GROUP_CONCAT(DISTINCT cgs.`name`) AS cps_name,cp.big_unit AS unit from cc_stock_taking_detail st "
+				+ "LEFT JOIN cc_seller_product cs on cs.id = st.seller_product_id "
+				+ "LEFT JOIN cc_product cp on cp.id = cs.product_id "
+				+ "LEFT JOIN cc_product_goods_specification_value cpg ON cp.id = cpg.product_set_id "
+				+ "LEFT JOIN cc_goods_specification_value cgs ON cpg.goods_specification_value_set_id = cgs.id "
+				+ "where st.stock_taking_id='"+stockTakingId+"' GROUP BY st.id";
 		return Db.find(sql);
 	}
 }
