@@ -189,9 +189,31 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			String dataArea = "";
 			String deptId = "";
 			List<Department> depts = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(department.getId());
-			sId = depts.get(0).getStr("seller_id");
-			dataArea = depts.get(0).getStr("data_area");
-			deptId = depts.get(0).getStr("id");
+			if(depts.size()>0){
+				sId = depts.get(0).getStr("seller_id");
+				dataArea = depts.get(0).getStr("data_area");
+				deptId = depts.get(0).getStr("id");
+				//添加直营商客户时 初始化数据
+				if(!user.getUsername().equals("admin") || seller.getSellerType().equals(Integer.parseInt(Consts.SELLER_TYPE_SELLER))){
+					String customerId = StrKit.getRandomUUID();
+					//添加客户
+					customer.setId(customerId);
+					customer.setCustomerCode(seller.getSellerCode());
+					customer.setCustomerName(seller.getSellerName());
+					customer.setContact(seller.getContact());
+					customer.setMobile(seller.getPhone());
+					customer.setIsEnabled(1);
+					customer.setAddress(address);
+					customer.setCreateDate(new Date());
+					customer.setStatus("0");
+					customer.save();
+					//添加直营商客户
+					this.saveSellerCustomer(customer.getId(), user, department,sId,dataArea,deptId);
+					seller.setCustomerId(customer.getId());
+					}
+			}else{
+				deptId = user.getDepartmentId();
+			}
 			//保存通用打印模板,通用模板的ID：0
 			this.saveSellerJoinTemplate(seller.getId());
 			
@@ -200,24 +222,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				this.saveOther(department,deptId);
 			}
 			
-			//添加直营商客户时 初始化数据
-			if(!user.getUsername().equals("admin") || seller.getSellerType().equals(Integer.parseInt(Consts.SELLER_TYPE_SELLER))){
-				String customerId = StrKit.getRandomUUID();
-				//添加客户
-				customer.setId(customerId);
-				customer.setCustomerCode(seller.getSellerCode());
-				customer.setCustomerName(seller.getSellerName());
-				customer.setContact(seller.getContact());
-				customer.setMobile(seller.getPhone());
-				customer.setIsEnabled(1);
-				customer.setAddress(address);
-				customer.setCreateDate(new Date());
-				customer.setStatus("0");
-				customer.save();
-				//添加直营商客户
-				this.saveSellerCustomer(customer.getId(), user, department,sId,dataArea,deptId);
-				seller.setCustomerId(customer.getId());
-				}
+			
 			seller.save();
 		} else {
 			Seller s = SellerQuery.me().findById(seller.getId());
