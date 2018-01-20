@@ -116,10 +116,17 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 	public void renderlist() {
 		String ref_sn = getPara("ref_sn");
 		String ref_type = getPara("ref_type");
+		String obj_type = "";
+		if(ref_type.equals(Consts.BIZ_TYPE_INSTOCK)){
+			obj_type = Consts.RECEIVABLES_OBJECT_TYPE_SUPPLIER;
+		}else{
+			obj_type = Consts.RECEIVABLES_OBJECT_TYPE_CUSTOMER;
+		}
 		String object_id = getPara("object_id");
 		String balance_amount = getPara("balance_amount");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		//通过客户Id找到应收账款主表ID
-		Payables payables = PayablesQuery.me().findByObjId(object_id);
+		Payables payables = PayablesQuery.me().findByObjIdAndDeptId(object_id, obj_type, user.getDepartmentId() );
 		
 		String userDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		List<User> list = UserQuery.me().findIdAndNameByDataArea(userDataArea);
