@@ -36,9 +36,9 @@ import com.jfinal.plugin.activerecord.Record;
  */
 
 @RouterMapping(url = "/receivables")
-@RequiresPermissions("/admin/receivables")
 public class ReceivablesController extends BaseFrontController {
 	
+	@RequiresPermissions("/admin/receivables")
 	public void index() {
 		
 		Map<String, Object> all = new HashMap<>();
@@ -63,6 +63,7 @@ public class ReceivablesController extends BaseFrontController {
 		render("out_stock_list.html");		
 	}
 	
+	@RequiresPermissions("/admin/receivables")
 	public void stockOrder() {
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
@@ -104,6 +105,7 @@ public class ReceivablesController extends BaseFrontController {
 		renderJson(map);
 	}
 	
+	@RequiresPermissions("/admin/receivables")
 	public void detail() {
 		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 		String outstock_sn = getPara("sn");
@@ -132,6 +134,7 @@ public class ReceivablesController extends BaseFrontController {
 		render("receivable_detail.html");
 	}
 	
+	@RequiresPermissions("/admin/receivables")
 	public void save() {
         boolean isSave = Db.tx(new IAtom() {
             @Override
