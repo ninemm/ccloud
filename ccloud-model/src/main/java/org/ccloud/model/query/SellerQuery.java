@@ -161,4 +161,9 @@ public class SellerQuery extends JBaseQuery {
 		StringBuilder sqlBuilder = new StringBuilder("SELECT * FROM cc_seller cs  LEFT JOIN cc_seller_customer csc ON csc.seller_id=cs.id WHERE csc.id='"+customerId+"'");
 		return DAO.findFirst(sqlBuilder.toString());
 	}
+	
+	public Seller findbyCode(String sellerCode) {
+		String sql = "select * from cc_seller where seller_code = ?";
+		return DAO.findFirst(sql, sellerCode);
+	}
 }

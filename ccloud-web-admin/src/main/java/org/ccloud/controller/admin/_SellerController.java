@@ -166,9 +166,13 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		customer.setProvCode(areaCodeArray[0]);
 		customer.setCityName(areaNameArray[1]);
 		customer.setCityCode(areaCodeArray[1]);
-		
 		String [] brandIds= brandList.split(",");
 		if (StrKit.isBlank(sellerId)) {
+			Seller sr = SellerQuery.me().findbyCode(seller.getSellerCode());
+			if(sr!=null){
+				renderAjaxResultForError("销售商编码不可重复，请重新输入！");
+				return;
+			}
 			Seller seller1=SellerQuery.me().findByDeptId(department.getId());
 			if(seller1!=null){
 					renderAjaxResultForError("该公司部门已有一个经销商或者直营商，请确认");

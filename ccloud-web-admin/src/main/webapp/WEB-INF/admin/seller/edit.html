@@ -233,7 +233,7 @@
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">销售商编码:</label>
 							<div class="input-group col-md-4 col-sm-10">
-								<input class="form-control input-sm" type="text" name="seller.seller_code" value="${(seller.seller_code)!}">
+								<input class="form-control input-sm" type="text" <#if seller??>readonly</#if> name="seller.seller_code" value="${(seller.seller_code)!}">
 							</div>
 						</div>
 						<#if !(seller.id) ??>
