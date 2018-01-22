@@ -31,6 +31,7 @@
     $(".begin-date").calendar();
     $(".begin-date").val($.today());
     $("#dayTag").val("today");
+    $("#orderTag").val("productCount");
     var startDate = $.today();
 	var endDate = $.today() + ' 23:59:59';  
 	var params = {
@@ -128,9 +129,11 @@
 		);    	
     }
     
+    var unit = '件';
     function customerCount(params) {
 		Utils.ajax('${CPATH}/report/customerCount', params, 
 			function(data){
+				var orderTag = $("#orderTag").val();
 	            var crSeriesData = [];
 	            var legendData = [];
 	            var length = data.length;
@@ -148,17 +151,29 @@
 	            }	
 	            for(var i = 0; i < length; i++){
 	            	legendData.push(data[i].customer_name)
-	                crSeriesData.push({
-	                    name: data[i].customer_name,
-	                    value: data[i].totalAmount
-	                });
+		           if (orderTag == 'productCount') {
+		                crSeriesData.push({
+		                    name: data[i].customer_name,
+		                    value: data[i].productCount
+		                });
+		           } else if (orderTag == 'totalAmount') {
+		                crSeriesData.push({
+		                    name: data[i].customer_name,
+		                    value: data[i].totalAmount
+		                });
+		           } else {
+		                crSeriesData.push({
+		                    name: data[i].customer_name,
+		                    value: data[i].orderCount
+		                });
+		           }	            	
 	            }
 	            var customerCount = document.getElementById('customerCount');
 	            var customerCountChart = echarts.init(customerCount);
 				option = {
 				    tooltip: {
 				        trigger: 'item',
-				        formatter: "{a} <br/>{b}: {c}元 ({d}%)"
+				        formatter: "{a} <br/>{b}: {c}"+unit+"({d}%)"
 				    },
 				    legend: {
 				        orient: 'horizontal',
@@ -201,6 +216,7 @@
     function productCount(params) {
 		Utils.ajax('${CPATH}/report/productCount', params, 
 			function(data){
+				var orderTag = $("#orderTag").val();
 	            var crSeriesData = [];
 	            var legendData = [];
 	            var length = data.length;
@@ -217,20 +233,31 @@
 	                    value: 0
 	                });	            	
 	            }
-	
 	            for(var i = 0; i < length; i++){
 	            	legendData.push(data[i].custom_name)
-	                crSeriesData.push({
-	                    name: data[i].custom_name,
-	                    value: data[i].totalAmount
-	                });
+					if (orderTag == 'productCount') {
+					     crSeriesData.push({
+					         name: data[i].custom_name,
+					         value: data[i].productCount
+					     });
+					} else if (orderTag == 'totalAmount') {
+					     crSeriesData.push({
+					         name: data[i].custom_name,
+					         value: data[i].totalAmount
+					     });
+					} else {
+					     crSeriesData.push({
+					         name: data[i].custom_name,
+					         value: data[i].orderCount
+					     });
+					}
 	            }
 	            var productCount = document.getElementById('productCanve');
 	            var productCountChart = echarts.init(productCanve);
 				option = {
 				    tooltip: {
 				        trigger: 'item',
-				        formatter: "{a} <br/>{b}: {c}元 ({d}%)"
+				        formatter: "{a} <br/>{b}: {c}"+unit+"({d}%)"
 				    },
 				    legend: {
 				        orient: 'horizontal',
@@ -272,21 +299,27 @@
     }
     
     function urlSelect(params, type){
-<!--     	if (type == 'order') { -->
-<!-- 			orderAmount(params); -->
-<!-- 		} else if (type == 'customer') { -->
-<!-- 			customerCount(params); -->
-<!-- 		} else if (type == 'product') { -->
-<!-- 			productCount(params); -->
-<!-- 		} else { -->
-<!-- 			refundCount(params); -->
-<!-- 		} -->
-	 	orderAmount(params);
-	 	refundCount(params);
-	 	orderStatus(params);
-	 	customerCount(params);
-	 	productCount(params);	
+    	if (type == 'day') {
+		 	orderAmount(params);
+		 	refundCount(params);
+		 	orderStatus(params);
+		 	customerCount(params);
+		 	productCount(params);
+		} else {
+		 	customerCount(params);
+		 	productCount(params);
+		}
     }
+    
+    function getUnit(orderTag) {
+	    if (orderTag == 'productCount') {
+	   		unit = '件';
+	    } else if (orderTag == 'totalAmount') {
+	   		unit = '元';
+	    } else {
+	   		unit = '笔';
+	    }
+    }    
     
     function startDaySelect(obj,type) {
 		var params = {
@@ -310,7 +343,8 @@
           text: "今日",
           onClick: function () {
 			var params = {
-				"dayTag": 'today'
+				"dayTag": 'today',
+				"orderTag": $("#orderTag").val()
 			}
 			urlSelect(params,type); 
             $(obj).find(".dayTagText").text('今日')
@@ -320,7 +354,8 @@
           text: "昨日",
           onClick: function () {
 			var params = {
-				"dayTag": 'yesterday'
+				"dayTag": 'yesterday',
+				"orderTag": $("#orderTag").val()
 			}
           	urlSelect(params,type);
             $(obj).find(".dayTagText").text('昨日')
@@ -330,7 +365,8 @@
           text: "本周",
           onClick: function () {
 			var params = {
-				"dayTag": 'week'
+				"dayTag": 'week',
+				"orderTag": $("#orderTag").val()
 			}
 			urlSelect(params,type);   
           	$(obj).find(".dayTagText").text('本周')
@@ -340,7 +376,8 @@
           text: "上周",
           onClick: function () {
 			var params = {
-				"dayTag": 'lastweek'
+				"dayTag": 'lastweek',
+				"orderTag": $("#orderTag").val()
 			}
           urlSelect(params,type);
           $(obj).find(".dayTagText").text('上周')
@@ -350,7 +387,8 @@
           text: "本月",
           onClick: function () {
 			var params = {
-				"dayTag": 'month'
+				"dayTag": 'month',
+				"orderTag": $("#orderTag").val()
 			}     
 			urlSelect(params,type);    
          	$(obj).find(".dayTagText").text('本月')
@@ -360,7 +398,8 @@
           text: "上月",
           onClick: function () {
 			var params = {
-				"dayTag": 'lastmonth'
+				"dayTag": 'lastmonth',
+				"orderTag": $("#orderTag").val()
 			}         
 			urlSelect(params,type);
           	$(obj).find(".dayTagText").text('上月')
@@ -369,6 +408,54 @@
         }]
       }); 	
  	}
+ 	
+ 	function orderTagSelect(obj,type) {
+      $.actions({
+        actions: [{
+          text: "件数",
+          onClick: function () {
+			var params = {
+				"dayTag":  $("#dayTag").val(),
+				"startDate": $("#startDay").val(),
+				"endDate" : $("#endDay").val(),
+				"orderTag": 'productCount'
+			}
+			urlSelect(params,type); 
+			getUnit("productCount");
+            $(obj).find(".orderTagText").text('件数')
+            $("#orderTag").val("productCount");
+          }
+        }, {
+          text: "金额",
+          onClick: function () {
+			var params = {
+				"dayTag":  $("#dayTag").val(),
+				"startDate": $("#startDay").val(),
+				"endDate" : $("#endDay").val(),			
+				"orderTag": 'totalAmount'
+			}
+          	urlSelect(params,type);
+          	getUnit("totalAmount");
+            $(obj).find(".orderTagText").text('金额')
+            $("#orderTag").val("totalAmount");
+          }
+        }, {
+          text: "笔数",
+          onClick: function () {
+			var params = {
+				"dayTag":  $("#dayTag").val(),
+				"startDate": $("#startDay").val(),
+				"endDate" : $("#endDay").val(),			
+				"orderTag": 'orderCount'
+			}
+			urlSelect(params,type);   
+			getUnit("orderCount");
+          	$(obj).find(".orderTagText").text('笔数')
+          	$("#orderTag").val("orderCount");
+          }
+        }]
+      }); 	
+ 	} 	
  	
 	function cusDetail(param) {
 		var tag = $("#dayTag").val();
@@ -392,14 +479,19 @@
 			<div class="weui-panel__hd">
 				<span class="overview-hd-title">销售简报</span> 
 				<div>
-					<span class="briefly" onclick="dayTagSelect(this,'order')">
+					<span class="briefly" onclick="dayTagSelect(this,'day')">
 						<p class="dayTagText">今日</p>
 						<i class="icon-angle-down"></i>
 					</span>
+					<span class="briefly" onclick="orderTagSelect(this,'order')">
+						<p class="orderTagText">件数</p>
+						<i class="icon-angle-down"></i>
+					</span>
 					<input type="hidden" id="dayTag">
-					<input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'order')" readonly="">
+					<input type="hidden" id="orderTag">
+					<input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'day')" readonly="">
 					<span class="overview-hd-segmenting fr"> - </span> 
-					<input class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'order')" readonly="">
+					<input class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'day')" readonly="">
 				</div>
 			</div>
 			<div class="weui-panel__bd">

@@ -1202,7 +1202,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	}	
 	
 	public Record getMyOrderAmount(String startDate, String endDate, String dayTag, String customerType,
-			String deptId, String sellerId, String userId, String dataArea) {
+			String deptId, String sellerId, String userId, String dataArea, String print) {
 		if (dayTag != null) {
 			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
 			startDate = date[0];
@@ -1229,7 +1229,71 @@ public class SalesOrderQuery extends JBaseQuery {
 		} else {
 			fromBuilder.append(" and cc.status not in (1001,1002)");
 		}
+		
+		if (StrKit.notBlank(print)) {
+			if (StrKit.notBlank(startDate)) {
+				fromBuilder.append(" and cc.print_time >= ?");
+				params.add(startDate);
+			}
 
+			if (StrKit.notBlank(endDate)) {
+				fromBuilder.append(" and cc.print_time <= ?");
+				params.add(endDate);
+			}
+		} else {
+			if (StrKit.notBlank(startDate)) {
+				fromBuilder.append(" and cc.create_date >= ?");
+				params.add(startDate);
+			}
+
+			if (StrKit.notBlank(endDate)) {
+				fromBuilder.append(" and cc.create_date <= ?");
+				params.add(endDate);
+			}
+		}
+
+		
+		if (params.isEmpty())
+			return Db.findFirst(fromBuilder.toString());
+
+		return Db.findFirst(fromBuilder.toString(), params.toArray());
+	}
+	
+	public Record getMyOrderAmountByOutStock(String startDate, String endDate, String dayTag, String customerType,
+			String deptId, String sellerId, String userId, String dataArea) {
+		if (dayTag != null) {
+			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
+			startDate = date[0];
+			endDate = date[1];
+		}
+		LinkedList<Object> params = new LinkedList<Object>();
+		StringBuilder fromBuilder = new StringBuilder("SELECT IFNULL(SUM(t1.productCount), 0) AS productCount, IFNULL(SUM(cc.total_amount),0) as totalAmount, count(*) as orderCount FROM cc_sales_outstock cc ");
+		fromBuilder.append("LEFT JOIN (SELECT SUM(cd.product_count/cp.convert_relate) as productCount, cd.outstock_id FROM cc_sales_outstock_detail cd ");
+		fromBuilder.append("LEFT JOIN cc_seller_product sp ON sp.id = cd.sell_product_id ");
+		fromBuilder.append("LEFT JOIN cc_product cp on cp.id = sp.product_id ");
+		fromBuilder.append("GROUP BY cd.outstock_id) t1 on t1.outstock_id = cc.id ");
+		fromBuilder.append("LEFT JOIN cc_customer_type ct on cc.customer_type_id = ct.id ");		
+		fromBuilder.append("LEFT JOIN cc_sales_order_join_outstock cso ON cso.outstock_id = cc.id ");
+		fromBuilder.append("LEFT JOIN cc_sales_order cs ON cs.id = cso.order_id ");
+		
+		boolean needWhere = true;
+		if (StringUtils.isBlank(userId)) {
+			if (StringUtils.isNotBlank(deptId)) {
+				needWhere = appendIfNotEmpty(fromBuilder, " cc.dept_id", deptId, params, needWhere);
+			} else {
+				needWhere = appendIfNotEmptyWithLike(fromBuilder, " cc.data_area", dataArea, params, needWhere);
+				needWhere = appendIfNotEmpty(fromBuilder, " cc.seller_id", sellerId, params, needWhere);
+			}			
+		}
+		needWhere = appendIfNotEmpty(fromBuilder, "cs.biz_user_id", userId, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "cc.customer_type_id", customerType, params, needWhere);
+		
+		if (needWhere) {
+			fromBuilder.append(" where cc.status != ? ");
+		} else {
+			fromBuilder.append(" and cc.status != ? ");
+		}
+		params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
 		if (StrKit.notBlank(startDate)) {
 			fromBuilder.append(" and cc.create_date >= ?");
 			params.add(startDate);
@@ -1239,12 +1303,12 @@ public class SalesOrderQuery extends JBaseQuery {
 			fromBuilder.append(" and cc.create_date <= ?");
 			params.add(endDate);
 		}
-		
+
 		if (params.isEmpty())
 			return Db.findFirst(fromBuilder.toString());
 
 		return Db.findFirst(fromBuilder.toString(), params.toArray());
-	}
+	}	
 
 	public List<Record> getMyOrderStatucCount(String startDate, String endDate, String dayTag, String sellerId,
 			String dataArea) {
@@ -1294,7 +1358,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 
 	public List<Record> getMyOrderByCustomer(String startDate, String endDate, String dayTag, String customerType, String sellerId,
-			String userId, String dataArea) {
+			String userId, String dataArea, String orderTag) {
 		if (dayTag != null) {
 			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
 			startDate = date[0];
@@ -1332,7 +1396,11 @@ public class SalesOrderQuery extends JBaseQuery {
 			params.add(endDate);
 		}
 		fromBuilder.append("GROUP BY cu.customer_name ");
-		fromBuilder.append("ORDER BY totalAmount desc ");
+		if (StrKit.notBlank(orderTag)) {
+			fromBuilder.append("ORDER BY "+ orderTag +" desc ");
+		} else {
+			fromBuilder.append("ORDER BY totalAmount desc ");
+		}
 		if (params.isEmpty())
 			return Db.find(fromBuilder.toString());
 
@@ -1485,7 +1553,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 	
 	public List<Record> getUserRank(String startDate, String endDate, String dayTag, String deptId, String sellerId,
-			String orderTag, String dataArea) {
+			String orderTag, String dataArea, String print) {
 		if (dayTag != null) {
 			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
 			startDate = date[0];
@@ -1507,14 +1575,80 @@ public class SalesOrderQuery extends JBaseQuery {
 		} else {
 			fromBuilder.append(" and cc.status not in (1001,1002)");
 		}
+		
+		if (StrKit.notBlank(print)) {
+			if (StrKit.notBlank(startDate)) {
+				fromBuilder.append(" and cc.print_time >= ? ");
+				params.add(startDate);
+			}
 
+			if (StrKit.notBlank(endDate)) {
+				fromBuilder.append(" and cc.print_time <= ? ");
+				params.add(endDate);
+			}
+		} else {
+			if (StrKit.notBlank(startDate)) {
+				fromBuilder.append(" and cc.create_date >= ? ");
+				params.add(startDate);
+			}
+
+			if (StrKit.notBlank(endDate)) {
+				fromBuilder.append(" and cc.create_date <= ? ");
+				params.add(endDate);
+			}
+		}
+
+		fromBuilder.append("GROUP BY u.id ");
+		
+		if (StrKit.notBlank(orderTag)) {
+			fromBuilder.append("ORDER BY "+ orderTag + " desc ");
+		} else {
+			fromBuilder.append("ORDER BY productCount desc ");
+		}
+		
+		if (params.isEmpty())
+			return Db.find(fromBuilder.toString());
+
+		return Db.find(fromBuilder.toString(), params.toArray());
+	}
+	
+	public List<Record> getUserRankByOutStock(String startDate, String endDate, String dayTag, String deptId,
+			String sellerId, String orderTag, String dataArea) {
+		if (dayTag != null) {
+			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
+			startDate = date[0];
+			endDate = date[1];
+		}
+		LinkedList<Object> params = new LinkedList<Object>();
+		StringBuilder fromBuilder = new StringBuilder("SELECT u.realname, u.avatar, u.id, ");
+		fromBuilder.append("SUM(o.total_amount) as totalAmount,IFNULL(t1.productCount,0) as productCount, COUNT(o.id) as orderCount FROM cc_sales_outstock o ");
+		fromBuilder.append("LEFT JOIN (SELECT SUM(cd.product_count/cp.convert_relate) as productCount, cd.outstock_id FROM cc_sales_outstock_detail cd ");
+		fromBuilder.append("LEFT JOIN cc_seller_product sp ON sp.id = cd.sell_product_id ");
+		fromBuilder.append("LEFT JOIN cc_product cp on cp.id = sp.product_id ");
+		fromBuilder.append("GROUP BY cd.outstock_id) t1 on t1.outstock_id = o.id ");
+		fromBuilder.append("LEFT JOIN cc_sales_order_join_outstock cso ON cso.outstock_id = o.id ");
+		fromBuilder.append("LEFT JOIN cc_sales_order cc ON cc.id = cso.order_id ");
+		fromBuilder.append("LEFT JOIN `user` u ON u.id = cc.biz_user_id ");
+		boolean needWhere = true;
+		if (StringUtils.isNotBlank(deptId)) {
+			needWhere = appendIfNotEmpty(fromBuilder, " u.department_id", deptId, params, needWhere);
+		} else {
+			needWhere = appendIfNotEmptyWithLike(fromBuilder, " u.data_area", dataArea, params, needWhere);
+			needWhere = appendIfNotEmpty(fromBuilder, " o.seller_id", sellerId, params, needWhere);
+		}
+		if (needWhere) {
+			fromBuilder.append(" where o.`status` != ? ");
+		} else {
+			fromBuilder.append(" and o.`status` != ? ");
+		}
+		params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
 		if (StrKit.notBlank(startDate)) {
-			fromBuilder.append(" and cc.create_date >= ? ");
+			fromBuilder.append(" and o.create_date >= ? ");
 			params.add(startDate);
 		}
 
 		if (StrKit.notBlank(endDate)) {
-			fromBuilder.append(" and cc.create_date <= ? ");
+			fromBuilder.append(" and o.create_date <= ? ");
 			params.add(endDate);
 		}
 		fromBuilder.append("GROUP BY u.id ");
@@ -1987,5 +2121,5 @@ public class SalesOrderQuery extends JBaseQuery {
 				+ "where sojo.outstock_id = '"+outStockId+"'";
 		return DAO.findFirst(sql);
 	}
-	
+
  }

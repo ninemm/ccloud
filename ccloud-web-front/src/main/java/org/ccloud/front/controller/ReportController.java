@@ -82,8 +82,18 @@ public class ReportController extends BaseFrontController {
 		setAttr("deliveryDate", DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
 		render("report_sales.html");
 	}
+	
+	//经销商下或部门下业务员排行榜状态选择
+	public void orderAmountMenu() {
+		String typeTag = getPara("typeTag");
+		if (typeTag.equals("outStock")) {
+			orderAmountByOutStock();
+		} else {
+			orderAmount();
+		}
+	}	
 
-	//业务员订单总额统计
+	//业务员订单总额统计(订单或打印)
 	public void orderAmount() {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
@@ -93,8 +103,23 @@ public class ReportController extends BaseFrontController {
 		String customerType = getPara("customerType");
 		String deptId = getPara("deptId");
 		String userId = getPara("userId");
-		Record record = SalesOrderQuery.me().getMyOrderAmount(startDate, endDate, dayTag, customerType, deptId, sellerId, userId, dataArea);
+		String print = getPara("print");
+		Record record = SalesOrderQuery.me().getMyOrderAmount(startDate, endDate, dayTag, customerType, deptId, sellerId, userId, dataArea, print);
 		renderJson(record);
+	}
+	
+	//业务员订单总额统计(出库)
+	public void orderAmountByOutStock() {
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String dayTag = getPara("dayTag");
+		String sellerId = getSessionAttr("sellerId");
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String customerType = getPara("customerType");
+		String deptId = getPara("deptId");
+		String userId = getPara("userId");
+		Record record = SalesOrderQuery.me().getMyOrderAmountByOutStock(startDate, endDate, dayTag, customerType, deptId, sellerId, userId, dataArea);
+		renderJson(record);		
 	}
 	
 	//业务员订单状态统计
@@ -117,7 +142,8 @@ public class ReportController extends BaseFrontController {
 		String customerType = getPara("customerType");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String userId = getPara("userId");
-		List<Record> record = SalesOrderQuery.me().getMyOrderByCustomer(startDate, endDate, dayTag, customerType, sellerId, userId, dataArea);
+		String orderTag = getPara("orderTag");
+		List<Record> record = SalesOrderQuery.me().getMyOrderByCustomer(startDate, endDate, dayTag, customerType, sellerId, userId, dataArea, orderTag);
 		renderJson(record);
 	}
 	
@@ -277,9 +303,19 @@ public class ReportController extends BaseFrontController {
 		setAttr("startDate", startDate);
 		setAttr("endDate", endDate);		
 		render("seller_purchase_report.html");
-	}		
+	}
 	
-	//经销商下或部门下业务员排行榜
+	//经销商下或部门下业务员排行榜状态选择
+	public void getUserRankMenu() {
+		String typeTag = getPara("typeTag");
+		if (typeTag.equals("outStock")) {
+			getUserRankByOutStock();
+		} else {
+			getUserRank();
+		}
+	}
+	
+	//经销商下或部门下业务员排行榜(订单或打印)
 	public void getUserRank() {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
@@ -291,9 +327,26 @@ public class ReportController extends BaseFrontController {
 		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 		String deptId = getPara("deptId");
 		String orderTag = getPara("orderTag");
-		List<Record> record = SalesOrderQuery.me().getUserRank(startDate, endDate, dayTag, deptId, sellerId, orderTag, dataArea);
+		String print = getPara("print");
+		List<Record> record = SalesOrderQuery.me().getUserRank(startDate, endDate, dayTag, deptId, sellerId, orderTag, dataArea, print);
 		renderJson(record);
 	}
+	
+	//经销商下或部门下业务员排行榜(出库)
+	public void getUserRankByOutStock() {
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String dayTag = getPara("dayTag");
+		String sellerId = getPara("sellerId");
+		if (StrKit.isBlank(sellerId)) {
+			sellerId = getSessionAttr("sellerId");
+		}
+		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String deptId = getPara("deptId");
+		String orderTag = getPara("orderTag");
+		List<Record> record = SalesOrderQuery.me().getUserRankByOutStock(startDate, endDate, dayTag, deptId, sellerId, orderTag, dataArea);
+		renderJson(record);
+	}	
 	
 	//经销商或部门下业务员赠品统计
 	public void getGiftCountByUser() {
