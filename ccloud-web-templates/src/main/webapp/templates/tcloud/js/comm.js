@@ -312,14 +312,14 @@ $(function() {
 		;
 	}).on("touchmove", ".layer, .top-right-menu-layer", function() {
 		event.preventDefault();
-	}).on("touchstart", "input[type=number]:not([readonly])", function() {
+	}).on("click", "input[type=number]:not([readonly])", function() {
 		if (!open) {
 			$currentInput = $(this);
 			openPop();
 		}
 	}).on("click", "#cancel-input", function() {
 		closePop();
-	}).on("touchstart", "#confirm-input", function() {
+	}).on("click", "#confirm-input", function() {
 		confirmInput();
 	}).on("click", ".operate:first-child", function() {//减少商品数量
 		var $input = $(this).next();
