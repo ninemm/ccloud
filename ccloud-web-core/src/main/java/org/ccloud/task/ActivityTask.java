@@ -15,19 +15,34 @@
  */
 package org.ccloud.task;
 
+import java.util.Date;
+import java.util.List;
+
+import org.ccloud.model.Activity;
+import org.ccloud.model.query.ActivityQuery;
+
 import com.jfinal.kit.LogKit;
 import com.jfinal.plugin.cron4j.ITask;
 
 public class ActivityTask implements ITask {
-
+	
 	@Override
 	public void run() {
-		System.out.println("------------1-----------");
+		List<Activity> activitys = ActivityQuery.me().findAll();
+		for(Activity activity: activitys) {
+			Date endTime =activity.getEndTime();
+			if(endTime.before(new Date())) {
+				activity.setIsPublish(0);
+				activity.update();
+			}
+		}
 	}
 
 	@Override
 	public void stop() {
 		LogKit.info("stop activity task " + ActivityTask.class.getName());
 	}
+
+
 
 }

@@ -99,5 +99,9 @@ public class ActivityQuery extends JBaseQuery {
 
         return Db.find(fromBuilder.toString(), params.toArray());
     }
-
+    
+    public List<Activity> findAll(){
+    	String sql = "select * from cc_activity";
+    	return DAO.find(sql);
+    }
 }
