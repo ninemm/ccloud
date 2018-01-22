@@ -154,6 +154,7 @@ public class Consts {
 	public static final String OPTION_WEB_PROC_NUM_LIMIT = "web_proc_num_limit_";//商品数量审核开关设置
 	public static final String OPTION_WEB_PROC_PRICE_LIMIT = "web_proc_price_limit_";//商品价格审核开关设置
 	public static final String OPTION_WEB_PROC_CUSTOMER_VISIT = "web_proc_customer_visit_";//新增拜访审核开关设置
+	public static final String OPTION_WEB_PROC_ACTIVITY_APPLY = "web_proc_activity_apply_";//申请活动审核开关设置
 	public static final String OPTION_FILE_ROOT_PATH = "web_file_root_path";
 
 	public static final String OPTION_ON = "true";
@@ -235,5 +236,6 @@ public class Consts {
 	public static final String PROC_ORDER_REVIEW_ONE = "_order_review_1";				// 订单1审
 	public static final String PROC_ORDER_REVIEW_TWO = "_order_review_2";				// 订单2审
 	public static final String PROC_ORDER_REVIEW_THREE = "_order_review_3";				// 订单3审
-	
+	public static final String PROC_ACTIVITY_APPLY_REVIEW = "_activity_apply_review";	// 活动审核
+
 }

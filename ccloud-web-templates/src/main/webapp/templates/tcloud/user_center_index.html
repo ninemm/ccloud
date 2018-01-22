@@ -39,20 +39,9 @@ $(function() {
 			</div>
 	</header>
 	<div>
-		<@shiro.hasPermission name="/admin/sellerCustomer/audit,/admin/salesOrder/check,/admin/customerVisit/audit">
+		<@shiro.hasPermission name="/admin/salesOrder/check,/admin/sellerCustomer/audit,/admin/customerVisit/audit,/admin/activityApply/check">
 		<div class="weui-cells__title">我的待办</div>
 		<div class="weui-grids">
-			<@shiro.hasPermission name="/admin/sellerCustomer/audit">
-			<a href="${CPATH}/todo/customer" class="weui-grid js_grid">
-				<#if (customerTotal??) && (customerTotal != 0)>
-			    <span class="weui-badge full-badge">${customerTotal!0}</span></#if>
-				<div class="weui-grid__icon">
-					<i class="icon-user" style="color: #9c89b9"></i>
-				</div>
-				<p class="weui-grid__label">客户审核</p>
-			</a>
-			</@shiro.hasPermission>
-			
 			<@shiro.hasPermission name="/admin/salesOrder/check">
 			<a href="${CPATH}/todo/order" class="weui-grid js_grid">
 				<#if (orderTotal??) && (orderTotal != 0)>
@@ -61,6 +50,17 @@ $(function() {
 					<i class="icon-file-text" style="color: #19c594"></i>
 				</div>
 				<p class="weui-grid__label">订单审核</p>
+			</a>
+			</@shiro.hasPermission>
+		
+			<@shiro.hasPermission name="/admin/sellerCustomer/audit">
+			<a href="${CPATH}/todo/customer" class="weui-grid js_grid">
+				<#if (customerTotal??) && (customerTotal != 0)>
+			    <span class="weui-badge full-badge">${customerTotal!0}</span></#if>
+				<div class="weui-grid__icon">
+					<i class="icon-user" style="color: #9c89b9"></i>
+				</div>
+				<p class="weui-grid__label">客户审核</p>
 			</a>
 			</@shiro.hasPermission>
 			
@@ -74,6 +74,18 @@ $(function() {
 				<p class="weui-grid__label">拜访审核</p>
 			</a>
 			</@shiro.hasPermission>
+
+			<@shiro.hasPermission name="/admin/activityApply/check">
+			 <a href="${CPATH}/todo/activityApply" class="weui-grid js_grid">
+				 <#if (activityApplyTotal??) && (activityApplyTotal !=0)>
+				 <span class="weui-badge full-badge">&nbsp;</span></#if>
+				<div class="weui-grid__icon">
+					<i class="icon-exchange" style="color: #f1745e;"></i>
+				</div>
+				<p class="weui-grid__label">活动审核</p>
+			</a>
+			</@shiro.hasPermission>
+
 			<@shiro.hasPermission name="/admin/receivables">
 			<a href="${CPATH}/receivables/index" class="weui-grid js_grid">
 				<div class="weui-grid__icon relative">
@@ -124,16 +136,17 @@ $(function() {
 			</@shiro.hasPermission>
 		</div>
 		</@shiro.hasPermission>
-		<@shiro.hasPermission name="/admin/activityApply">
+		<@shiro.hasPermission name="/admin/activityApply/add,/admin/activityApply">
 		<div class="weui-cells__title">营销活动</div>
 		<div class="weui-grids">
-			<!--<a href="/activityList" class="weui-grid js_grid"> <span
-				class="weui-badge empty-badge">&nbsp;</span>
+			<@shiro.hasPermission name="/admin/activityApply/add">
+			<a href="${CPATH}/activity" class="weui-grid js_grid">
 				<div class="weui-grid__icon">
-					<i class="icon-file-text blue"></i>
+					<i class="icon-tasks" style="color: #19c594;"></i>
 				</div>
-				<p class="weui-grid__label">活动列表</p>
-			</a>-->
+				<p class="weui-grid__label">活动申请</p>
+			</a>
+			</@shiro.hasPermission>
 			<@shiro.hasPermission name="/admin/activityApply">
 			<a href="${CPATH}/activity/applyList" class="weui-grid js_grid">
 				<div class="weui-grid__icon">
@@ -145,17 +158,7 @@ $(function() {
 		</div>
 		</@shiro.hasPermission>
 			<!--
-			<a href="./feeApplication.html" class="weui-grid js_grid">
-				<div class="weui-grid__icon">
-					<i class="icon-tasks" style="color: #19c594;"></i>
-				</div>
-				<p class="weui-grid__label">费用申请</p>
-			</a> <a href="./feeAuditList.html" class="weui-grid js_grid">
-				<div class="weui-grid__icon">
-					<i class="icon-exchange" style="color: #f1745e;"></i>
-				</div>
-				<p class="weui-grid__label">费用审批</p>
-			</a> <a class="weui-grid js_grid">
+			 <a class="weui-grid js_grid">
 				<div class="weui-grid__icon">
 					<i class="icon-envelope-o" style="color: #5F97F4;"></i>
 				</div>

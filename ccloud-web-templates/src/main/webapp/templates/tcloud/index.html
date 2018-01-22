@@ -157,14 +157,7 @@
 					<p class="weui-grid__label">新增拜访</p>
 				</a>
 				</@shiro.hasPermission>
-				<@shiro.hasPermission name="/admin/activityApply/add">
-				<a href="${CPATH}/activity" class="weui-grid js_grid">
-					<div class="weui-grid__icon">
-						<i class="icon-tasks" style="color: #19c594;"></i>
-					</div>
-					<p class="weui-grid__label">申请活动</p>
-				</a>
-				</@shiro.hasPermission>
+	
 				<@shiro.hasPermission name="/admin/sellerCustomer/edit">
                 <a href="${CPATH}/customer/edit" class="weui-grid js_grid">
                     <!-- <span class="weui-badge left-top-tag">NEW</span> -->
@@ -177,7 +170,7 @@
 			</div>
 		</div>
 		<div>
-			<@shiro.hasPermission name="/admin/salesOrder/check,/admin/customer/audit,/admin/customerVisit/audit">
+			<@shiro.hasPermission name="/admin/salesOrder/check,/admin/customer/audit,/admin/customerVisit/audit,/admin/activityApply/check">
 			<div class="weui-cells__title">
 				<b>我的待办</b>
 			</div>
@@ -203,14 +196,7 @@
 					<p class="weui-grid__label">客户审核</p>
 				</a>
 				</@shiro.hasPermission>
-                <!-- <a href="feeAuditList.html" class="weui-grid js_grid"> <span
-					class="weui-badge empty-badge">&nbsp;</span>
-					<div class="weui-grid__icon">
-						<i class="icon-check-square-o" style="color: #19c594"></i>
-					</div>
-					<p class="weui-grid__label">费用审核</p>
-				</a> -->
-				
+
 				<@shiro.hasPermission name="/admin/customerVisit/audit">
                 <a href="${CPATH}/todo/visit" class="weui-grid js_grid">
                 	<#if (customerVisitTotal??) && (customerVisitTotal !=0)>
@@ -219,6 +205,17 @@
 						<i class="icon-suitcase" style="color: #f7b55d;"></i>
 					</div>
 					<p class="weui-grid__label">拜访审核</p>
+				</a>
+				</@shiro.hasPermission>
+
+				<@shiro.hasPermission name="/admin/activityApply/check">
+                <a href="${CPATH}/todo/activityApply" class="weui-grid js_grid">
+					<#if (activityApplyTotal??) && (activityApplyTotal !=0)>
+					<span class="weui-badge full-badge">&nbsp;</span></#if>
+					<div class="weui-grid__icon">
+						<i class="icon-check-square-o" style="color: #19c594"></i>
+					</div>
+					<p class="weui-grid__label">活动审核</p>
 				</a>
 				</@shiro.hasPermission>
 			</div>

@@ -11,13 +11,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Maps;
+import com.jfinal.aop.Before;
 import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.tx.Tx;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
-import org.ccloud.model.ActivityApply;
-import org.ccloud.model.CustomerType;
-import org.ccloud.model.Dict;
-import org.ccloud.model.User;
+import org.ccloud.message.Actions;
+import org.ccloud.message.MessageKit;
+import org.ccloud.model.*;
 import org.ccloud.model.query.ActivityQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.UserQuery;
@@ -29,6 +31,7 @@ import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Record;
+import org.ccloud.workflow.service.WorkFlowService;
 
 /**
  * Created by WT on 2017/11/30.
@@ -148,30 +151,136 @@ public class ActivityController extends BaseFrontController {
 
 	public void apply() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
 		final String content = getPara("content");
 		final Date createDate = new Date();
 
-		String sellerCustomerIds = getPara("sellerCustomerIds");
-		String[] sellerCustomerArray = sellerCustomerIds.split(",", -1);
+		String[] sellerCustomerIdArray = getPara("sellerCustomerIds").split(",", -1);
+		String[] sellerCustomerNameArray = getPara("sellerCustomerNames").split(",", -1);
+
+
+		Boolean startProc = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_ACTIVITY_APPLY + sellerCode);
 
 		String[] activity_ids = getParaValues("activity_id");
 		Integer[] visit_nums = getParaValuesToInt("visit_num");
-		for (String sellerCustomerId : sellerCustomerArray) {
+		for (String sellerCustomerId : sellerCustomerIdArray) {
 			for (int i = 0; i < activity_ids.length; i++) {
+				//活动申请check
+				this.check(activity_ids[i], sellerCustomerId,sellerCustomerNameArray[i]);
+
 				ActivityApply activityApply = new ActivityApply();
-				activityApply.setId(StringUtils.getUUID());
+				String activityApplyId = StringUtils.getUUID();
+				activityApply.setId(activityApplyId);
 				activityApply.setActivityId(activity_ids[i]);
 				activityApply.setSellerCustomerId(sellerCustomerId);
 				activityApply.setBizUserId(user.getId());
 				activityApply.setNum(visit_nums[i]);
 				activityApply.setContent(content);
-				activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_WAIT);
+
+				if (startProc != null && startProc) {
+					activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_WAIT);
+					activityApply.setProcInstId(Consts.PROC_ACTIVITY_APPLY_REVIEW);
+					String procInstId = this.start(activityApplyId, sellerCustomerNameArray[i], Consts.PROC_ACTIVITY_APPLY_REVIEW);
+					activityApply.setProcInstId(procInstId);
+				}else {
+					activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_PASS);
+				}
+
 				activityApply.setDataArea(user.getDataArea());
 				activityApply.setCreateDate(createDate);
 				activityApply.save();
 			}
 		}
 		renderAjaxResultForSuccess("申请成功");
+	}
+
+	private String start(String activityApplyId, String customerName, String proc_def_key) {
+
+		WorkFlowService workflow = new WorkFlowService();
+
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
+
+		Map<String, Object> param = Maps.newHashMap();
+		param.put(Consts.WORKFLOW_APPLY_USER, user);
+		param.put(Consts.WORKFLOW_APPLY_SELLER_ID, sellerId);
+		param.put(Consts.WORKFLOW_APPLY_SELLER_CODE, sellerCode);
+		param.put("customerName", customerName);
+		param.put("orderId", activityApplyId);
+
+
+		String toUserId = "";
+
+		User manager = UserQuery.me().findManagerByDeptId(user.getDepartmentId());
+		if (manager == null) {
+			renderAjaxResultForError("你的申请没有对应的人审核，请联系管理员");
+		}
+		param.put("manager", manager.getUsername());
+		toUserId = manager.getId();
+
+		String procInstId = workflow.startProcess(activityApplyId, proc_def_key, param);
+
+
+		sendOrderMessage(sellerId, customerName, "活动审核", user.getId(), toUserId, user.getDepartmentId(), user.getDataArea(),activityApplyId);
+
+		return procInstId;
+	}
+
+	private void check(String activityApplyId,String sellerCustomerId, String customerName) {
+//		renderAjaxResultForError("");
+	}
+
+	private void sendOrderMessage(String sellerId, String title, String content, String fromUserId, String toUserId, String deptId, String dataArea, String orderId) {
+
+		Message message = new Message();
+		message.setType(Message.ORDER_REVIEW_TYPE_CODE);
+
+		message.setSellerId(sellerId);
+		message.setTitle(title);
+		message.setContent(content);
+
+		message.setObjectId(orderId);
+		message.setIsRead(Consts.NO_READ);
+		message.setObjectType(Consts.OBJECT_TYPE_ORDER);
+
+		message.setFromUserId(fromUserId);
+		message.setToUserId(toUserId);
+		message.setDeptId(deptId);
+		message.setDataArea(dataArea);
+
+		MessageKit.sendMessage(Actions.ProcessMessage.PROCESS_MESSAGE_SAVE, message);
+
+	}
+
+	@Before(Tx.class)
+	public void complete() {
+
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+
+		String activityApplyId = getPara("id");
+		String taskId = getPara("taskId");
+		String comment = getPara("comment");
+		Integer pass = getParaToInt("pass", 1);
+
+		Map<String, Object> var = Maps.newHashMap();
+		var.put("pass", pass);
+		var.put(Consts.WORKFLOW_APPLY_COMFIRM, user);
+
+		comment = (pass == 1 ? "通过" : "拒绝") + " " + (comment == null ? "" : comment);
+		var.put("comment", comment);
+
+		WorkFlowService workflowService = new WorkFlowService();
+		workflowService.completeTask(taskId, comment, var);
+
+		//审核订单后将message中是否阅读改为是
+		Message message = MessageQuery.me().findByObjectIdAndToUserId(activityApplyId, user.getId());
+		if (null != message) {
+			message.setIsRead(Consts.IS_READ);
+			message.update();
+		}
+
+		renderAjaxResultForSuccess("活动审核成功");
 	}
 
 	public void applyList() {

@@ -1,5 +1,5 @@
 <#include "_inc/_layout.html"/>
-<#macro title>订单审核</#macro>
+<#macro title>活动审核</#macro>
 
 <#macro css></#macro>
 <#macro script>
@@ -10,21 +10,16 @@
 	        title: ['订单审核',
 	          'border-bottom: 1px solid #eee;height:2rem;line-height:2rem;margin-top:2.5rem'
 	        ],
-					content: '<img src="${CTPATH}/images/image_orderpopups.png">' +
-						'<p class="t-c">是否确认拒绝该订单？</p>' +
-	          '<p class="gray">拒绝原因</p>' +
-	          '<div class="refuse-radio"><input type="radio" name="refuseReson" id="reason1" value="库存无足够货物" class="weui-agree__checkbox"><label for="reason1">库存无足够货物</label></div>' +
-	          '<div class="refuse-radio"><input type="radio" name="refuseReson" id="reason2" value="产品价格滞后" class="weui-agree__checkbox"><label for="reason2">产品价格滞后</label></div>' +
-	          '<div class="refuse-radio"><input type="radio" name="refuseReson" id="reason3" value="该商家已被停用" class="weui-agree__checkbox"><label for="reason3">该商家已被停用</label></div>'+
-	          '<div><textarea id="comments" placeholder="补充说明，可选填"></textarea></div>',
+				content: '<img src="${CTPATH}/images/image_orderpopups.png">' +
+				'<p class="t-c">是否确认拒绝该订单？</p>' +
+				'<div><textarea id="comments" placeholder="补充说明，必填"></textarea></div>',
 	        anim: 'scale',
 	        className: 'audit',
 	        btn: ['确认','取消'],
 	        yes: function() {
-	          parent.refuseReson = $("input[name='refuseReson']:checked").val();
 	          parent.comment = $("#comments").val();
-	          if (parent.refuseReson == undefined && parent.comment == ""){
-	            $.toptip('请选择一个理由', 'warning');
+	          if (parent.comment == ""){
+	            $.toptip('请注明拒绝理由', 'warning');
 	            return;
 	          }
 	          doReject(0);
@@ -78,7 +73,6 @@
 			$productDetail.find("#bigPrice").val((smallPrice*convert).toFixed(2));
 	      }
 	
-	      total();
 	  });
 	    
 	});
@@ -103,7 +97,7 @@
 		Utils.ajax('${CPATH}/order/complete', params, 
 			function(res){
 				if (res.errorCode == 0) {
-					location.href = '${CPATH}/todo/order'
+					location.href = '${CPATH}/todo/activityApply'
 				} else {
 					$.alert(res.message);
 				}
@@ -127,7 +121,7 @@
 			success : function(res) { 
 				layer.closeAll();
 				if (res.errorCode == 0) {
-					location.href = '${CPATH}/todo/order'
+					location.href = '${CPATH}/todo/activityApply'
 				} else {
 					$.alert(res.message);
 				}
@@ -138,51 +132,7 @@
 			}
 		});
 	}
-	
-	function checkEdit(){
-		var $orderDetail = $(".orderDetail");
-		
-		$.each($orderDetail, function(index, el){
-			var $el = $(el);
-			if(parseFloat($el.find("#bigPrice").val()) != parseFloat($el.find("#bigPriceSpan").val())
-				|| parseFloat($el.find("#bigNum").val()) != parseFloat($el.find("#bigNumSpan").val())
-				|| parseFloat($el.find("#smallPrice").val()) != parseFloat($el.find("#smallPriceSpan").val())
-				|| parseFloat($el.find("#smallNum").val()) != parseFloat($el.find("#smallNumSpan").val()))
-			{
-				$("#edit").val(1);
-				return false;
-			};
-			
-		})
-	}
-	
-	function total() {
-		var products = $(".orderDetail");
-		var rowTotal = 0;
-		var total = 0;
-		var allTotalAmount = 0;
-		$.each(products, function(index, el) {
-			var $el = $(el);
-			rowTotal = $el.find("#bigNum").val() * $el.find("#bigPrice").val() + $el.find("#smallNum").val() * $el.find("#smallPrice").val();
-			if($el.find("#isGift").val() == 0) {
-				total += rowTotal;
-			}
-			var bigNum = parseInt($el.find("#bigNum").val());
-			var convert = parseInt($el.find("#convert").val());
-			var smallNum = parseInt($el.find("#smallNum").val());
-			var number = (smallNum/convert).toFixed(2);
-			allTotalAmount = allTotalAmount + bigNum + number*1;
-			$el.find("#rowTotal").val(rowTotal);
-		});
 
-		var factor = $("#factor").val();
-		if (factor != '') {
-			total = total * factor;
-		}
-		$("#total").val(total);
-		$("#totalSpan").text(total + "元")
-		$("#totalNum").val(allTotalAmount);
-	} 
 </#macro>
 
 <@layout>
@@ -393,14 +343,6 @@
 	        </div>
 	      </div>
       </form>
-      <a class="weui-panel weui-panel_access block" href="${CPATH}/order/operateHistory?id=${(order.id)!}&proc_inst_id=${(order.proc_inst_id)!}">
-        <div class="weui-cell weui-cell_access">
-          <div class="weui-cell__bd ft14">
-            操作记录
-          </div>
-          <span class="weui-cell__ft"></span>
-        </div>
-      </a>
     </main>
     <#include "_inc/_goback.html" />    
     <#if isCheck>

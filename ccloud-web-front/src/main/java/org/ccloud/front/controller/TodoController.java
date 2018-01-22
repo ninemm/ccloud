@@ -13,6 +13,7 @@ import org.ccloud.model.CustomerVisit;
 import org.ccloud.model.SalesOrder;
 import org.ccloud.model.SellerCustomer;
 import org.ccloud.model.User;
+import org.ccloud.model.query.ActivityApplyQuery;
 import org.ccloud.model.query.CustomerVisitQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SellerCustomerQuery;
@@ -38,7 +39,6 @@ public class TodoController extends BaseFrontController {
 
 		render("todo_customer.html");
 	}
-	
 
 	//订单审核
 	@RequiresPermissions(value = { "/admin/salesOrder/check", "/admin/dealer/all" }, logical = Logical.OR)
@@ -51,8 +51,7 @@ public class TodoController extends BaseFrontController {
 		if(list.size() !=0 )setAttr("todoList", list);
 		Page <Record> historyList = SalesOrderQuery.me().getHisProcessList(getPageNumber(), getPageSize(), "", username);
 		if(historyList.getList().size() != 0) setAttr("historyList", historyList);
-		
-		
+
 		setAttr("username", username);
 		render("todo_order.html");
 	}
@@ -69,6 +68,22 @@ public class TodoController extends BaseFrontController {
 
 		setAttr("page", page);
 		render("todo_customer_visit.html");
+	}
+
+	//活动审核
+	@RequiresPermissions(value = { "/admin/activityApply/check", "/admin/dealer/all" }, logical = Logical.OR)
+	public void activityApply() {
+
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String username = user.getUsername();
+
+		List<Record> list = ActivityApplyQuery.me().getToDo(username);
+		if(list.size() !=0 )setAttr("todoList", list);
+		Page <Record> historyList = SalesOrderQuery.me().getHisProcessList(getPageNumber(), getPageSize(), Consts.PROC_ACTIVITY_APPLY_REVIEW, username);
+		if(historyList.getList().size() != 0) setAttr("historyList", historyList);
+
+		setAttr("username", username);
+		render("todo_activity_apply.html");
 	}
 
 	public void historyAuditRefresh() {
