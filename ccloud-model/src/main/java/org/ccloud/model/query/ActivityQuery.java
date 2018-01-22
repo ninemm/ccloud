@@ -51,8 +51,6 @@ public class ActivityQuery extends JBaseQuery {
 			fromBuilder.append(" where 1 = 1");
 		}
 
-        if (params.isEmpty())
-            return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 		if (StrKit.notBlank(startDate)) {
 			fromBuilder.append(" and ca.create_date >= ?");
 			params.add(startDate);
