@@ -442,8 +442,8 @@ public class _UserController extends JBaseCRUDController<User> {
 	@RequiresPermissions(value = { "/admin/user/uploading", "/admin/dealer/all",
 	"/admin/all" }, logical = Logical.OR)
 	public void userTemplate() {
-		String realPath = getSession().getServletContext().getRealPath("\\");
-		renderFile(new File(realPath + "\\WEB-INF\\admin\\user\\userTemplate.xlsx"));
+		String realPath = getSession().getServletContext().getRealPath("\\") +"\\WEB-INF\\admin\\user\\userTemplate.xlsx";
+		renderFile(new File(realPath.replace("\\", "/")));
 	}
 	
 	@Before(Tx.class)

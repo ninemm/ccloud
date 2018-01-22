@@ -101,7 +101,7 @@ public class ActivityQuery extends JBaseQuery {
     }
     
     public List<Activity> findAll(){
-    	String sql = "select * from cc_activity";
+    	String sql = "select * from cc_activity where is_publish = 1";
     	return DAO.find(sql);
     }
 }
