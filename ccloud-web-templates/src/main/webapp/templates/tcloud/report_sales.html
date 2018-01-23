@@ -66,8 +66,12 @@
     }    
     
     function orderStatus(params) {
+        var orderStatus = document.getElementById('orderStatus');
+        var orderStatusChart = echarts.init(orderStatus);
+        orderStatusChart.showLoading();
 		Utils.ajax('${CPATH}/report/orderTypeCount', params, 
 			function(data){
+				orderStatusChart.hideLoading();
 	            var crSeriesData = [];
 	            var legendData = [];
 	            var length = data.length;
@@ -84,8 +88,6 @@
 	                    value: data[i].count
 	                });
 	            }
-	            var orderStatus = document.getElementById('orderStatus');
-	            var orderStatusChart = echarts.init(orderStatus);
 				option = {
 				    tooltip: {
 				        trigger: 'item',
@@ -131,8 +133,12 @@
     
     var unit = '件';
     function customerCount(params) {
+        var customerCount = document.getElementById('customerCount');
+        var customerCountChart = echarts.init(customerCount);
+        customerCountChart.showLoading();    
 		Utils.ajax('${CPATH}/report/customerCount', params, 
 			function(data){
+				customerCountChart.hideLoading();
 				var orderTag = $("#orderTag").val();
 	            var crSeriesData = [];
 	            var legendData = [];
@@ -168,8 +174,6 @@
 		                });
 		           }	            	
 	            }
-	            var customerCount = document.getElementById('customerCount');
-	            var customerCountChart = echarts.init(customerCount);
 				option = {
 				    tooltip: {
 				        trigger: 'item',
@@ -214,8 +218,12 @@
     }
     
     function productCount(params) {
+        var productCount = document.getElementById('productCanve');
+        var productCountChart = echarts.init(productCanve);
+    	productCountChart.showLoading(); 
 		Utils.ajax('${CPATH}/report/productCount', params, 
 			function(data){
+				productCountChart.hideLoading(); 
 				var orderTag = $("#orderTag").val();
 	            var crSeriesData = [];
 	            var legendData = [];
@@ -252,8 +260,6 @@
 					     });
 					}
 	            }
-	            var productCount = document.getElementById('productCanve');
-	            var productCountChart = echarts.init(productCanve);
 				option = {
 				    tooltip: {
 				        trigger: 'item',

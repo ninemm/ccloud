@@ -25,7 +25,6 @@
 </#macro>  
 <#macro script>
   $(function () {
-  
     $(".end-date").calendar();
     $(".end-date").val($.today());
     $(".begin-date").calendar();
@@ -61,12 +60,13 @@
     var salesObj = [];
     var unit = '件';
     function userCount(params) {
+    	var salesIndent = document.getElementById('userCount');
+       	var salesIndentChart = echarts.init(salesIndent);
+		salesIndentChart.showLoading();    	
 		Utils.ajax('${CPATH}/report/getUserRankMenu', params, 
 			function(data){
+				salesIndentChart.hideLoading();
 				var orderTag = $("#orderTag").val();
-	        	var salesIndent = document.getElementById('userCount');
-	        	var salesIndentTotal = 0;
-		        var $salesIndent = $(salesIndent);
 		        var yData = [];
 		        var seriesData = [];
 		        for (var i = 0; i < data.length; i++) {
@@ -80,8 +80,6 @@
 		           }		           
 		           salesObj[data[i].realname] = data[i].id;
 		       	}
-		       	var salesIndentChart = echarts.init(salesIndent);
-		
 				option = {
 				    title: {
 				        text: '业务员',
@@ -135,12 +133,13 @@
     
     var sellerObj = [];
     function sellerCount(params) {
+    	var salesIndent = document.getElementById('dealerCount');
+    	var salesIndentChart = echarts.init(salesIndent);
+    	salesIndentChart.showLoading();
 		Utils.ajax('${CPATH}/report/getSellerCountMenu', params, 
 			function(data){
+				salesIndentChart.hideLoading();
 				var orderTag = $("#orderTag").val();
-	        	var salesIndent = document.getElementById('dealerCount');
-	        	var salesIndentTotal = 0;
-		        var $salesIndent = $(salesIndent);
 		        var yData = [];
 		        var seriesData = [];
 		        for (var i = 0; i < data.length; i++) {
@@ -154,7 +153,6 @@
 		           }			           
 		           sellerObj[data[i].seller_name] = data[i].id;
 		       	}
-		       	var salesIndentChart = echarts.init(salesIndent);
 		
 				option = {
 				    title: {
@@ -208,12 +206,13 @@
     }    
     
     function giftCount(params) {
+    	var salesIndent = document.getElementById('giftCount');
+    	var salesIndentChart = echarts.init(salesIndent);
+    	salesIndentChart.showLoading();    
 		Utils.ajax('${CPATH}/report/getGiftCountByUserMenu', params, 
 			function(data){
+				salesIndentChart.hideLoading();
 				var orderTag = $("#orderTag").val();
-	        	var salesIndent = document.getElementById('giftCount');
-	        	var salesIndentTotal = 0;
-		        var $salesIndent = $(salesIndent);
 		        var yData = [];
 		        var seriesData = [];
 		        for (var i = 0; i < data.length; i++) {
@@ -226,7 +225,6 @@
 		           		seriesData.push(data[i].orderCount);
 		           }		           
 		       	}
-		       	var salesIndentChart = echarts.init(salesIndent);
 		
 				option = {
 				    title: {
@@ -279,12 +277,13 @@
     }
     
     function sellerGiftCount(params) {
+    	var salesIndent = document.getElementById('dealerGiftCount');
+    	var salesIndentChart = echarts.init(salesIndent);
+    	salesIndentChart.showLoading();
 		Utils.ajax('${CPATH}/report/getGiftCountBySellerMenu', params, 
 			function(data){
+				salesIndentChart.hideLoading();
 				var orderTag = $("#orderTag").val();
-	        	var salesIndent = document.getElementById('dealerGiftCount');
-	        	var salesIndentTotal = 0;
-		        var $salesIndent = $(salesIndent);
 		        var yData = [];
 		        var seriesData = [];
 		        for (var i = 0; i < data.length; i++) {
@@ -297,7 +296,6 @@
 		           		seriesData.push(data[i].orderCount);
 		           }		           
 		       	}
-		       	var salesIndentChart = echarts.init(salesIndent);
 		
 				option = {
 				    title: {

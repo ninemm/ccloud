@@ -25,12 +25,8 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.CustomerType;
-import org.ccloud.model.query.CustomerTypeQuery;
-import org.ccloud.model.query.SalesOrderQuery;
-import org.ccloud.model.query.SellerCustomerQuery;
-import org.ccloud.model.query.SellerProductQuery;
-import org.ccloud.model.query.SellerQuery;
-import org.ccloud.model.query.UserQuery;
+import org.ccloud.model.User;
+import org.ccloud.model.query.*;
 import org.ccloud.route.RouterMapping;
 
 import com.alibaba.fastjson.JSON;
@@ -516,6 +512,16 @@ public class ReportController extends BaseFrontController {
 		String orderTag = getPara("orderTag");
 		List<Record> record = SalesOrderQuery.me().getDepartmentCount(startDate, endDate, dayTag, sellerId, dataArea, orderTag);
 		renderJson(record);		
+	}
+
+	public void visit() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String startDate = org.ccloud.utils.DateUtils.dateToStr(new Date(), "yyyy-MM-dd") + " 00:00:00";
+//		String startDate = "2017-01-01 00:00:00";
+		String endDate = org.ccloud.utils.DateUtils.dateToStr(new Date(), "yyyy-MM-dd") + " 23:59:59";
+		List<Record> visitList = CustomerVisitQuery.me().findLngLat(user.getId(), startDate, endDate);
+		setAttr("visitList", JSON.toJSON(visitList));
+		render("report_visit.html");
 	}
 	
 }

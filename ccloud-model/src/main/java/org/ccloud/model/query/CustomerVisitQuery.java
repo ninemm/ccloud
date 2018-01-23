@@ -282,5 +282,19 @@ public class CustomerVisitQuery extends JBaseQuery {
 
 		return Db.find(sql.toString(), params.toArray());
 	}
-	
+
+	public List<Record> findLngLat(String userId, String startDate, String endDate) {
+
+		StringBuilder sql = new StringBuilder("SELECT ccv.*, cc.customer_name ,u.realname ");
+		sql.append("FROM cc_customer_visit ccv ");
+
+		sql.append("LEFT JOIN cc_seller_customer csc ON ccv.seller_customer_id = csc.id ");
+		sql.append("LEFT JOIN cc_customer cc ON csc.customer_id = cc.id ");
+		sql.append("LEFT JOIN `user` u ON ccv.user_id = u.id ");
+
+		sql.append("WHERE ccv.user_id = ? AND ccv.create_date >= ? AND ccv.create_date <= ? AND ccv.lat is not null ");
+		sql.append("ORDER BY ccv.create_date");
+		return Db.find(sql.toString(), userId, startDate, endDate);
+
+	}
 }
