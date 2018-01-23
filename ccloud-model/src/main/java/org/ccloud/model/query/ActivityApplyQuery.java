@@ -115,8 +115,9 @@ public class ActivityApplyQuery extends JBaseQuery {
 
 	public List<Record> getToDo(String username) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(" SELECT o.*, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, t1.customerTypeNames, a.ID_ taskId, a.NAME_ taskName, a.ASSIGNEE_ assignee, a.CREATE_TIME_ createTime ");
+		sb.append(" SELECT o.*, ca.title, ca.invest_amount, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, t1.customerTypeNames, a.ID_ taskId, a.NAME_ taskName, a.ASSIGNEE_ assignee, a.CREATE_TIME_ createTime ");
 		sb.append(" FROM cc_activity_apply o ");
+		sb.append(" left join cc_activity ca on o.activity_id = ca.id");
 		sb.append(" left join cc_seller_customer cc ON o.seller_customer_id = cc.id ");
 		sb.append(" left join cc_customer c on cc.customer_id = c.id ");
 
@@ -124,7 +125,7 @@ public class ActivityApplyQuery extends JBaseQuery {
 		sb.append(" FROM cc_seller_customer c1 ");
 		sb.append(" LEFT JOIN cc_customer_join_customer_type cjct ON c1.id = cjct.seller_customer_id ");
 		sb.append(" LEFT JOIN cc_customer_type ct ON cjct.customer_type_id = ct.id ");
-		sb.append(" GROUP BY c1.id) t1 ON o.id = t1.id ");
+		sb.append(" GROUP BY c1.id) t1 ON o.seller_customer_id = t1.id ");
 
 		sb.append(" JOIN act_ru_task a on o.proc_inst_id = a.PROC_INST_ID_ ");
 		sb.append(" where FIND_IN_SET(?, a.ASSIGNEE_) ");

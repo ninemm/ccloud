@@ -93,7 +93,7 @@
           'border-bottom: 1px solid #eee;height:2rem;line-height:2rem;margin-top:2.5rem'
         ],
 		content: '<img src="${CTPATH}/images/image_orderpopups.png">' +
-		  '<p class="t-c">是否确认拒绝该订单？</p>' +
+		  '<p class="t-c">是否确认拒绝该活动申请？</p>' +
 			'<div><textarea id="comment" placeholder="补充说明，必填"></textarea></div>',
         anim: 'scale',
         className: 'audit',
@@ -115,11 +115,11 @@
     function agree(id, taskId, pass, obj) {
       layer.open({
         type: 1,
-        title: ['订单审核',
+        title: ['活动审核',
           'border-bottom: 1px solid #eee;height:2rem;line-height:2rem;margin-top:2.5rem'
         ],
 		content: '<img src="${CTPATH}/images/image_orderpopups.png">' +
-		  '<p class="t-c">是否确认通过该订单？</p>' +
+		  '<p class="t-c">是否确认通过该活动申请？</p>' +
           '<div><textarea id="comment" placeholder="补充说明，可选填"></textarea></div>',
         anim: 'scale',
         className: 'audit',
@@ -148,14 +148,14 @@
 		}
 
 
-		Utils.ajax('${CPATH}/order/complete', params, 
+		Utils.ajax('${CPATH}/activity/complete', params,
 			function(res){
 				if (res.errorCode == 0) {
 					$.confirm({
 						title: '活动审核',
 						text: res.message,
 						onOK: function () {
-							location.href = '${CPATH}/todo/order'
+							location.href = '${CPATH}/todo/activityApply'
 						},
 						onCancel: function () {
 							$this.parents('.weui-panel').remove();
@@ -182,14 +182,14 @@
 			"comment": comment,
 			'pass' : pass
 		}
-		Utils.ajax('${CPATH}/order/complete', params, 
+		Utils.ajax('${CPATH}/activity/complete', params,
 			function(res){
 				if (res.errorCode == 0) {
 					$.confirm({
 						title: '活动审核',
 						text: res.message,
 						onOK: function () {
-							location.href = '${CPATH}/todo/order'
+							location.href = '${CPATH}/todo/activityApply'
 						},
 						onCancel: function () {
 							$this.parents('.weui-panel').remove();
@@ -217,40 +217,37 @@
 			<div id="tab1" class="weui-tab__bd-item weui-tab__bd-item--active">
 				<main class="infinite">
 					<#if (todoList?? && todoList?size>0) >
-						<#list todoList as order>
+						<#list todoList as activity>
 							<div class="weui-panel weui-panel_access">
 								<div class="weui-cell weui-cell_access">
-									<a href="${CPATH}/order/orderReview?orderId=${order.id!}&taskId=${order.taskId!}&assignee=${order.assignee!}" style="display:block;width:100%;">
+									<a href="${CPATH}/activity/activityReview?activityId=${activity.id!}&taskId=${activity.taskId!}&assignee=${activity.assignee!}" style="display:block;width:100%;">
 										<div class="weui-cell__bd ft16">
 											<p class="customer_name">
-												<#if order.receive_type == 0>
-													<span class="tag">账期</span>
-												</#if>
-												${(order.customer_name)!}
+												${(activity.customer_name)!}
 											</p>
 											<div class="ft14 gray">
-												<p>订单号：${(order.order_sn)!}</p>
+												<p>活动名称：${(activity.title)!}</p>
 												<p>
-													联系人：<span>${(order.ccontact)!} / ${(order.cmobile)!}</span>
-													<span class="fr">${(order.customerTypeName)!}</span>
+													联系人：<span>${(activity.ccontact)!} / ${(activity.cmobile)!}</span>
+													<span class="fr">${(activity.customerTypeNames)!}</span>
 												</p>
 												<p>
-													金额：￥<span>${(order.total_amount)!}</span>
-													<span class="fr" id="date">时间：${(order.create_date)!}</span>
+													投入金额：￥<span>${(activity.invest_amount)!}</span>
+													<span class="fr" id="date">时间：${(activity.create_date)!}</span>
 												</p>
 											</div>
 										</div>
 									</a>
 								</div>
 								<div class="weui-cell weui-cell_access">
-									<a class="weui-cell__bd" style="color: gray" href="${CPATH}/order/orderReview?orderId=${order.id!}&taskId=${order.taskId!}&assignee=${order.assignee!}">订单详情</a>
+									<a class="weui-cell__bd" style="color: gray" href="${CPATH}/activity/activityReview?activityId=${activity.id!}&taskId=${activity.taskId!}&assignee=${activity.assignee!}">订单详情</a>
 									<span class="weui-cell__ft"></span>
 								</div>
-								<#if order.assignee?contains(username)>
+								<#if activity.assignee?contains(username)>
 									<div class="weui-cell weui-cell_access">
 										<div class="width-100 ft14 operate-btn">
-												<div class="button white-button fl" onclick="refuse('${(order.id)!}', '${(order.taskId)!}', 0, this)">拒绝</div>
-												<div class="button red-button fr" onclick="agree('${(order.id)!}', '${(order.taskId)!}', 1, this)">同意</div>
+												<div class="button white-button fl" onclick="refuse('${(activity.id)!}', '${(activity.taskId)!}', 0, this)">拒绝</div>
+												<div class="button red-button fr" onclick="agree('${(activity.id)!}', '${(activity.taskId)!}', 1, this)">同意</div>
 										</div>
 									</div>
 								</#if>
