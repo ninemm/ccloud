@@ -217,19 +217,23 @@ function doChange(key){
 	function confirm(){
 		$section.empty();
 		var $chechboxs = $('#customerList input[type=checkbox]:checked');
-		$.each($chechboxs, function(index, el) {
+		if( $chechboxs.length == 0) {
 			$section.append(customerInfoHtml);
-			var $customerInfo = $section.find(".customerInfo:last");
-			var $el = $(el);
-			var $customer = $el.parents(".customerSelect");
-			var customerName = $customer.find("#customerName").text();
-			$customerInfo.find(".customerName").text(customerName);
-			$customerInfo.find(".contact").text($customer.find("#contact").val());
-			$customerInfo.find(".mobile").text($customer.find("#mobile").val());
-			$customerInfo.find("#sellerCustomerName").val(customerName);
-			$customerInfo.find("#sellerCustomerId").val($el.val());
-			
-		});
+		} else {
+			$.each($chechboxs, function(index, el) {
+				$section.append(customerInfoHtml);
+				var $customerInfo = $section.find(".customerInfo:last");
+				var $el = $(el);
+				var $customer = $el.parents(".customerSelect");
+				var customerName = $customer.find("#customerName").text();
+				$customerInfo.find(".customerName").text(customerName);
+				$customerInfo.find(".contact").text($customer.find("#contact").val());
+				$customerInfo.find(".mobile").text($customer.find("#mobile").val());
+				$customerInfo.find("#sellerCustomerName").val(customerName);
+				$customerInfo.find("#sellerCustomerId").val($el.val());
+				
+			});
+		}
 		closeCombinSearch();
 	}
     
