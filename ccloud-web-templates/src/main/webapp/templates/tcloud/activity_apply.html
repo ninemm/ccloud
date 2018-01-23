@@ -16,23 +16,46 @@
 	.weui-cells__title+.order-customer-info {
 		margin-top: 0!important;
 	}
+	.order-customer-info+.weui-cell_access {
+		position: absolute;
+		top: 1rem;
+		right: .25rem;
+	}
+	.customerName,
+	.contact,
+	.mobile {
+		display: inline-block;
+		overflow:hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		font-size: .7rem;
+	}
+	.customerName {
+		width:40%;
+	}
+	.contact {
+		width:25%;
+	}
+	.mobile {
+		width: 32%;
+		text-align: right;
+		float: right;
+	}
 </#macro>
 <#macro script_import>
 </#macro>
 <#macro script>
 $(function () {
-	$(document).on("click", "#addActivity", function () {
-		addActivity();
-	}).on("click", "#delActivity", function () {
-		$(this).parents(".activity-detail-item").remove();
-	});
-
 	$activity.empty();
 	addActivity();
 	doChange(activityId);
 
 	//客户选择部分
-	$(document).on("input", "#customerSearchInput", function() {
+	$(document).on("click", "#addActivity", function () {
+		addActivity();
+	}).on("click", "#delActivity", function () {
+		$(this).parents(".activity-detail-item").remove();
+	}).on("input", "#customerSearchInput", function() {
 		customerCombo();
 	}).on("click", "#customerSearchCancel", function() {
 		customerCombo();
@@ -57,12 +80,13 @@ $(function () {
 			$("#totalNum").text(now);
 	}).on("click", "#confirm", function() {
 		confirm();
+	}).on("click", "#apply", function() {
+		doSubmit();
+	}).on("click", ".check-box+.weui-flex__item", function() {
+		var $checkbox = $(this).prev().find('input[type=checkbox]')[0];
+		$checkbox.checked = !$checkbox.checked;
 	});
 	customerCombo();
-
-	$(document).on("click", "#apply", function() {
-		doSubmit();
-	})
 });
 var activityId = '${activity_id!}';
 var activityInfoMap = ${activityInfoMap!};
@@ -199,7 +223,9 @@ function doChange(key){
 			var $el = $(el);
 			var $customer = $el.parents(".customerSelect");
 			var customerName = $customer.find("#customerName").text();
-			$customerInfo.find("#sellerCustomerInfo").val(customerName + " " + $customer.find("#contact").val() + " " + $customer.find("#mobile").val());
+			$customerInfo.find(".customerName").text(customerName);
+			$customerInfo.find(".contact").text($customer.find("#contact").val());
+			$customerInfo.find(".mobile").text($customer.find("#mobile").val());
 			$customerInfo.find("#sellerCustomerName").val(customerName);
 			$customerInfo.find("#sellerCustomerId").val($el.val());
 			
@@ -323,16 +349,24 @@ function doChange(key){
 					</div>
 				</section> -->
 			<div class="weui-cells__title">客户信息</div>
-			<section class="weui-panel weui-panel_access order-customer-info">
-				<div class="weui-cell weui-cell_access customerInfo">
-					<div class="weui-cell__bd">
-						<input type="hidden" name="sellerCustomerId" id="sellerCustomerId" value="">
-						<input type="hidden" name="sellerCustomerName" id="sellerCustomerName" value="">
-						<input type="text" class="weui-input select-customer" id="sellerCustomerInfo" readonly>
+			<div class="relative">
+				<section class="weui-panel weui-panel_access order-customer-info">
+					<div class="weui-cell weui-cell_access customerInfo select-customer">
+						<div class="weui-cell__bd weui-flex">
+							<input type="hidden" name="sellerCustomerId" id="sellerCustomerId" value="">
+							<input type="hidden" name="sellerCustomerName" id="sellerCustomerName" value="">
+							<div class="customerName">
+								&nbsp;
+							</div>
+							<div class="contact"></div>
+							<div class="mobile"></div>
+						</div>
 					</div>
+				</section>
+				<div class="weui-cell_access">
 					<div class="weui-cell__ft"></div>
 				</div>
-			</section>
+			</div>
 			<!--    <section class="weui-cells weui-cells_form">
 			<div class="weui-cell">
 			  <div class="weui-cell__bd">

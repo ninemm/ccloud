@@ -1,0 +1,81 @@
+<#include "_inc/_layout.html"/>
+<#macro title>月度计划</#macro>
+<#macro css_import>
+</#macro>
+<#macro css>
+	input {
+		width: 65%!important;
+		text-align: right;
+		color: #666!important;
+	}
+	input+.weui-cell__ft {
+		margin-left: .3rem;
+	}
+</#macro>
+<#macro script_import>
+</#macro>
+<#macro script>
+$(function() {
+ })
+</#macro>
+<@layout>
+	<div class="weui-content">
+		<div class="weui-panel weui-panel_access plane-select-box">
+			<div class="weui-cells mg-0 select-area">
+				<div class="weui-cell">
+					<div class="weui-cell__bd">
+						业务员
+					</div>
+					<div class="weui-cell__ft">张三</div>
+				</div>
+				<div class="weui-cell">
+					<div class="weui-cell__bd">
+						计划类型
+					</div>
+					<div class="weui-cell__ft">年度计划</div>
+				</div>
+				<div class="weui-cell">
+					<div class="weui-cell__bd">
+						开始时间
+					</div>
+					<div class="weui-cell__ft">2018-01-02</div>
+				</div>
+				<div class="weui-cell">
+					<div class="weui-cell__bd">
+						结束时间
+					</div>
+					<div class="weui-cell__ft">2018-02-02</div>
+				</div>
+			</div>
+		</div>
+		<div class="weui-cells__title">产品明细</div>
+		<div class="weui-panel weui-panel_access">
+			<div class="weui-cells mg-0">
+				<div class="weui-cell">
+					<div class="weui-cell__bd">
+						产品名称
+					</div>
+					<div class="weui-cell__ft">劲酒</div>
+				</div>
+				<div class="weui-cell">
+					<div class="weui-cell__bd">
+						计划数量
+					</div>
+					<div class="weui-cell__ft">20件</div>
+				</div>
+				<div class="weui-cell">
+					<div class="weui-cell__bd">
+						完成数量
+					</div>
+					<div class="weui-cell__ft">15件</div>
+				</div>
+				<div class="weui-cell">
+					<div class="weui-cell__bd">
+						完成度
+					</div>
+					<div class="weui-cell__ft">50%</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</@layout>
