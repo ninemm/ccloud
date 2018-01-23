@@ -1,0 +1,97 @@
+<#include "_inc/_layout.html"/>
+<#macro title>月度计划</#macro>
+<#macro css_import>
+</#macro>
+<#macro css>
+	input {
+		width: 65%!important;
+		text-align: right;
+	}
+	.icon-sort-desc {
+		margin-left: .5rem;
+	}
+</#macro>
+<#macro script_import>
+</#macro>
+<#macro script>
+$(function() {
+	$("#type").select({
+		title: "选择计划类型",
+		items: ["月度计划", "年计划"]
+	});
+	$("#start-date").calendar({
+		maxDate: function() {
+			return $('#end-date').val()
+		}
+	});
+	$("#start-date").val($.today());
+	$("#end-date").calendar({
+		minDate: function() {
+			var date = new Date($('#start-date').val().replace(/-/g,"/"));
+			date.setDate(date.getDate() - 1);
+			return date.Format("yyyy-MM-dd")
+		}
+	});
+	$("#end-date").val($.today());
+ })
+</#macro>
+<@layout>
+	<div class="weui-content">
+		<div class="weui-panel weui-panel_access plane-select-box">
+			<div class="weui-cells mg-0 select-area">
+				<div class="weui-cell">
+					<div class="weui-cell__bd">
+						<div class="order-customer-info-title">计划类型
+							<span class="require">*</span>
+						</div>
+						<i class="icon-sort-desc fr"></i>
+						<input type="text" class="weui-input fr" id="type" readonly="" placeholder="请选择计划类型">
+					</div>
+				</div>
+				<div class="weui-cell">
+					<div class="weui-cell__bd">
+						<div class="order-customer-info-title">开始时间
+							<span class="require">*</span>
+						</div>
+						<i class="icon-sort-desc fr"></i>
+						<input type="text" class="weui-input fr" id="start-date" readonly="">
+					</div>
+				</div>
+				<div class="weui-cell">
+					<div class="weui-cell__bd">
+						<div class="order-customer-info-title">结束时间
+							<span class="require">*</span>
+						</div>
+						<i class="icon-sort-desc fr"></i>
+						<input type="text" class="weui-input fr" id="end-date" readonly="">
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="weui-cells__title">活动明细</div>
+		<div class="weui-panel weui-panel_access">
+			<div class="weui-cells mg-0">
+				<div class="weui-cell weui-cell_access">
+					<div class="weui-cell__bd">
+						产品名称
+					</div>
+					<input type="text" name="" id="" class="weui-input">
+					<div class="weui-cell__ft"></div>
+				</div>
+				<div class="weui-cell">
+					<div class="weui-cell__bd">
+						数量
+					</div>
+					<input type="text" class="weui-input">
+					<div class="weui-cell__ft">件</div>
+				</div>
+			</div>
+		</div>
+		<section class="weui-panel weui-panel_access">
+			<div class="weui-cell weui-cell_access t-c ft14">
+				<p class="width-100 blue">
+					<i class="icon-plus-circle"></i>  新增产品</p>
+			</div>
+		</section>
+	</div>
+</@layout>
