@@ -135,7 +135,7 @@
     
     var sellerObj = [];
     function sellerCount(params) {
-		Utils.ajax('${CPATH}/report/getSellerCount', params, 
+		Utils.ajax('${CPATH}/report/getSellerCountMenu', params, 
 			function(data){
 				var orderTag = $("#orderTag").val();
 	        	var salesIndent = document.getElementById('dealerCount');
@@ -208,7 +208,7 @@
     }    
     
     function giftCount(params) {
-		Utils.ajax('${CPATH}/report/getGiftCountByUser', params, 
+		Utils.ajax('${CPATH}/report/getGiftCountByUserMenu', params, 
 			function(data){
 				var orderTag = $("#orderTag").val();
 	        	var salesIndent = document.getElementById('giftCount');
@@ -279,7 +279,7 @@
     }
     
     function sellerGiftCount(params) {
-		Utils.ajax('${CPATH}/report/getGiftCountBySeller', params, 
+		Utils.ajax('${CPATH}/report/getGiftCountBySellerMenu', params, 
 			function(data){
 				var orderTag = $("#orderTag").val();
 	        	var salesIndent = document.getElementById('dealerGiftCount');
@@ -409,7 +409,8 @@
           onClick: function () {
 			var params = {
 				"dayTag": 'today',
-				"orderTag": $("#orderTag").val()
+				"orderTag": $("#orderTag").val(),
+				"typeTag": $("#typeTag").val()
 			}
 			urlSelect(params,type); 
             $(obj).find(".dayTagText").text('今日')
@@ -420,7 +421,8 @@
           onClick: function () {
 			var params = {
 				"dayTag": 'yesterday',
-				"orderTag": $("#orderTag").val()
+				"orderTag": $("#orderTag").val(),
+				"typeTag": $("#typeTag").val()
 			}
           	urlSelect(params,type);
             $(obj).find(".dayTagText").text('昨日')
@@ -431,7 +433,8 @@
           onClick: function () {
 			var params = {
 				"dayTag": 'week',
-				"orderTag": $("#orderTag").val()
+				"orderTag": $("#orderTag").val(),
+				"typeTag": $("#typeTag").val()
 			}
 			urlSelect(params,type);   
           	$(obj).find(".dayTagText").text('本周')
@@ -442,7 +445,8 @@
           onClick: function () {
 			var params = {
 				"dayTag": 'lastweek',
-				"orderTag": $("#orderTag").val()
+				"orderTag": $("#orderTag").val(),
+				"typeTag": $("#typeTag").val()
 			}
           urlSelect(params,type);
           $(obj).find(".dayTagText").text('上周')
@@ -453,7 +457,8 @@
           onClick: function () {
 			var params = {
 				"dayTag": 'month',
-				"orderTag": $("#orderTag").val()
+				"orderTag": $("#orderTag").val(),
+				"typeTag": $("#typeTag").val()
 			}     
 			urlSelect(params,type);    
          	$(obj).find(".dayTagText").text('本月')
@@ -464,7 +469,8 @@
           onClick: function () {
 			var params = {
 				"dayTag": 'lastmonth',
-				"orderTag": $("#orderTag").val()
+				"orderTag": $("#orderTag").val(),
+				"typeTag": $("#typeTag").val()
 			}         
 			urlSelect(params,type);
           	$(obj).find(".dayTagText").text('上月')
