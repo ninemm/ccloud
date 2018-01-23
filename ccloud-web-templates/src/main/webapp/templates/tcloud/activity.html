@@ -162,6 +162,10 @@ function initActivity(activityList,flg){
 
 		$newProductDetail.find("#activityId").val(el.id);
 		$newProductDetail.find("#visitNum").val(el.visit_num);
+		$newProductDetail.find("#customerTypeName").text(el.customerTypeName);
+		$newProductDetail.find("#areaType").text(el.area_type);
+		$newProductDetail.find("#totalCustomerNum").text(el.total_customer_num);
+		$newProductDetail.find("#joinNum").text(el.timeIntervalName + "可以参加" + el.join_num + "次");
 
 		$newProductDetail.find("#image").attr("src", getImageUrl(el.image_list_store, el.code));
 	});
@@ -258,10 +262,19 @@ $gallery.on("click", function() {
 									</div>
 								</div>
 								<div >
-									内容:<span id="content"></span>
+									客户类型：<span id="customerTypeName"></span>
 								</div>
 								<div >
-									参与次数:<span id=></span>
+									区域：<span id="areaType"></span>
+								</div>
+								<div >
+									名额：<span id="totalCustomerNum"></span>
+								</div>
+								<div >
+									规则：<span id="joinNum"></span>
+								</div>
+								<div >
+									内容：<span id="content"></span>
 								</div>
 							</div>
 						</section>

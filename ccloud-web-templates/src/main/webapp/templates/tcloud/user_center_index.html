@@ -78,7 +78,7 @@ $(function() {
 			<@shiro.hasPermission name="/admin/activityApply/check">
 			 <a href="${CPATH}/todo/activityApply" class="weui-grid js_grid">
 				 <#if (activityApplyTotal??) && (activityApplyTotal !=0)>
-				 <span class="weui-badge full-badge">&nbsp;</span></#if>
+				 <span class="weui-badge full-badge">${(activityApplyTotal)!}</span></#if>
 				<div class="weui-grid__icon">
 					<i class="icon-check-square-o"></i>
 				</div>

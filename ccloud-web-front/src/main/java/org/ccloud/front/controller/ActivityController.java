@@ -26,6 +26,7 @@ import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.query.*;
 import org.ccloud.route.RouterMapping;
+import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
 
 import com.alibaba.fastjson.JSON;
@@ -33,6 +34,7 @@ import com.google.common.collect.ImmutableMap;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Record;
 import org.ccloud.workflow.service.WorkFlowService;
+import org.joda.time.DateTime;
 
 /**
  * Created by WT on 2017/11/30.
@@ -167,22 +169,11 @@ public class ActivityController extends BaseFrontController {
 		for (String sellerCustomerId : sellerCustomerIdArray) {
 			for (int i = 0; i < activity_ids.length; i++) {
 				Activity activity = ActivityQuery.me().findById(activity_ids[i]);
-				//客户信息
-				Customer customer =CustomerQuery.me().findSellerCustomerId(sellerCustomerId);
 				//活动申请check
-				int result = this.check(activity_ids[i], sellerCustomerId);
+				String result = this.check(activity_ids[i], sellerCustomerId, sellerCustomerNameArray[i]);
 				
-				if(result == 0) {
-					renderAjaxResultForError("活动参与的人数已经达到上限");
-					return;
-				}
-				else if(result == 2) {
-					renderAjaxResultForError(customer.getCustomerName()+"参与的次数已经达到上限，每个客户参与次数为："+activity.getJoinNum());
-					return;
-				}
-				else if(result == 3) {
-					renderAjaxResultForError(customer.getCustomerName()+"超过了每个客户参与活动的时间限制，每个客户参与时限为："+activity.getTimeInterval());
-					return;
+				if(StrKit.notBlank(result)) {
+					renderAjaxResultForError(result);
 				}
 
 				ActivityApply activityApply = new ActivityApply();
@@ -244,25 +235,61 @@ public class ActivityController extends BaseFrontController {
 		return procInstId;
 	}
 
-	private int check(String activityId,String sellerCustomerId) {
+	private String check(String activityId, String sellerCustomerId, String customerName) {
 		Activity activity = ActivityQuery.me().findById(activityId);
-		List<ActivityApply> activityApplies = ActivityApplyQuery.me().findByActivityId(activityId);
-		if(activity.getTotalCustomerNum()==activityApplies.size() || activity.getTotalCustomerNum()<activityApplies.size()) {
-			return 0;
+		long total = ActivityApplyQuery.me().findByActivityId(activityId);
+		if (total >= activity.getTotalCustomerNum()) {
+			return "活动参与的人数已经达到上限";
 		}
-		
-		List<ActivityApply> applies = ActivityApplyQuery.me().findBySellerCustomerIdAndActivityId(activityId,sellerCustomerId);
-		if(activity.getJoinNum()==applies.size() || activity.getJoinNum()<applies.size()) {
+		int interval = this.getStartDate(activity.getTimeInterval());
+		DateTime dateTime = new DateTime(new Date());
+		long cnt = ActivityApplyQuery.me().findBySellerCustomerIdAndActivityId(activityId, sellerCustomerId, DateUtils.format(dateTime.plusMonths(-interval).toDate()));
+		if (cnt >= activity.getJoinNum()) {
+			return customerName + "参与的次数已经达到上限，每个客户" + interval + "个月中参与次数为：" + activity.getJoinNum();
+		}
+
+		return "";
+	}
+
+	private int getStartDate(String timeInterval){
+		if(Consts.TIME_INTERVAL_ONE.equals(timeInterval)){
+			return 1;
+		}
+		if(Consts.TIME_INTERVAL_TWO.equals(timeInterval)){
 			return 2;
 		}
-		//对客户参与活动日期限制的判断
-		GregorianCalendar gc=new GregorianCalendar(); 
-		gc.setTime(applies.get(0).getCreateDate()); 
-		gc.add(2,+Integer.parseInt(activity.getTimeInterval().substring(5)));  
-		if(gc.getTime().before(new Date())) {
+		if(Consts.TIME_INTERVAL_THREE.equals(timeInterval)){
 			return 3;
 		}
-//		renderAjaxResultForError("");
+		if(Consts.TIME_INTERVAL_FOUR.equals(timeInterval)){
+			return 4;
+		}
+		if(Consts.TIME_INTERVAL_FIVE.equals(timeInterval)){
+			return 5;
+		}
+		if(Consts.TIME_INTERVAL_SIX.equals(timeInterval)){
+			return 6;
+		}
+		if(Consts.TIME_INTERVAL_SEVEN.equals(timeInterval)){
+			return 7;
+		}
+		if(Consts.TIME_INTERVAL_EIGHT.equals(timeInterval)){
+			return 8;
+		}
+		if(Consts.TIME_INTERVAL_NINE.equals(timeInterval)){
+			return 9;
+		}
+		if(Consts.TIME_INTERVAL_TEN.equals(timeInterval)){
+			return 10;
+		}
+		if(Consts.TIME_INTERVAL_ELEVEN.equals(timeInterval)){
+			return 11;
+		}
+		if(Consts.TIME_INTERVAL_TWELVE.equals(timeInterval)){
+			return 12;
+		}
+
+
 		return 1;
 	}
 
