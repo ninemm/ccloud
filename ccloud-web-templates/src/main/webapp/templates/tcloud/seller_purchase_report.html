@@ -77,12 +77,14 @@
     }
     
     function productCount(params) {
+        var product = document.getElementById('userCount');
+        var productChart = echarts.init(product); 
+       	productChart.showLoading();
 		Utils.ajax('${CPATH}/report/sellerProductCount', params, 
 			function(data){
+				productChart.hideLoading();
 				var height = data.length;
 				$("#userCount").height(60 * height + 100);			
-		        var product = document.getElementById('userCount');
-		        var productChart = echarts.init(product);
 	            var productOption = {
 	                tooltip : {
 	                    trigger: 'axis'
@@ -121,8 +123,6 @@
 	                ],
 	                series : []
 	            };
-	            var productTotal = 0;
-	            var $product = $(product);
 	            for (var i = 0; i < data.length; i++) {
 	               productOption.legend.data.push(data[i].custom_name);
 	               productOption.series.push({
@@ -147,12 +147,14 @@
     }
     
     function giftCount(params) {
+        var product = document.getElementById('giftCount');
+        var productChart = echarts.init(product);    
+    	productChart.showLoading();
 		Utils.ajax('${CPATH}/report/sellerProductCount', params, 
 			function(data){
+				productChart.hideLoading();
 				var height = data.length;
 				$("#giftCount").height(60 * height + 100);			
-		        var product = document.getElementById('giftCount');
-		        var productChart = echarts.init(product);
 	            var productOption = {
 	                tooltip : {
 	                    trigger: 'axis'
@@ -191,8 +193,6 @@
 	                ],
 	                series : []
 	            };
-	            var productTotal = 0;
-	            var $product = $(product);
 	            for (var i = 0; i < data.length; i++) {
 	               productOption.legend.data.push(data[i].custom_name);
 	               productOption.series.push({

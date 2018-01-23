@@ -72,8 +72,12 @@
     }	
 	
     function productAndRank(params) {
+        var productCount = document.getElementById('productCanve');
+        var productCountChart = echarts.init(productCanve);
+        productCountChart.showLoading();  
 		Utils.ajax('${CPATH}/report/productCount', params, 
 			function(data){
+				productCountChart.hideLoading(); 
 				$("#productRank").empty();
 				var rank = $("#productRank");			
 	            var crSeriesData = [];
@@ -102,8 +106,6 @@
 	                    value: data[i].totalAmount
 	                });
 	            }
-	            var productCount = document.getElementById('productCanve');
-	            var productCountChart = echarts.init(productCanve);
 				option = {
 				    tooltip: {
 				        trigger: 'item',

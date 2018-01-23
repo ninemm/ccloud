@@ -56,11 +56,12 @@
     
     var sellerObj = [];
     function sellerCount(params) {
+    	var salesIndent = document.getElementById('dealerCount');
+    	var salesIndentChart = echarts.init(salesIndent);
+    	salesIndentChart.showLoading();
 		Utils.ajax('${CPATH}/report/getSellerPurchase', params, 
 			function(data){
-	        	var salesIndent = document.getElementById('dealerCount');
-	        	var salesIndentTotal = 0;
-		        var $salesIndent = $(salesIndent);
+				salesIndentChart.hideLoading();
 		        var yData = [];
 		        var seriesData = [];
 		        for (var i = 0; i < data.length; i++) {
@@ -68,7 +69,6 @@
 		           seriesData.push(data[i].productCount);
 		           sellerObj[data[i].customer_name] = data[i].customer_id;
 		       	}
-		       	var salesIndentChart = echarts.init(salesIndent);
 		
 				option = {
 				    title: {
@@ -122,18 +122,18 @@
     }    
     
     function sellerGiftCount(params) {
+    	var salesIndent = document.getElementById('dealerGiftCount');
+    	var salesIndentChart = echarts.init(salesIndent);
+    	salesIndentChart.showLoading();    
 		Utils.ajax('${CPATH}/report/getSellerPurchaseGift', params, 
 			function(data){
-	        	var salesIndent = document.getElementById('dealerGiftCount');
-	        	var salesIndentTotal = 0;
-		        var $salesIndent = $(salesIndent);
+				salesIndentChart.hideLoading(); 
 		        var yData = [];
 		        var seriesData = [];
 		        for (var i = 0; i < data.length; i++) {
 		           yData.push(data[i].customer_name);
 		           seriesData.push(data[i].productCount);
 		       	}
-		       	var salesIndentChart = echarts.init(salesIndent);
 		
 				option = {
 				    title: {

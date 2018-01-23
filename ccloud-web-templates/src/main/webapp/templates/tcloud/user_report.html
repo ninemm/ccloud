@@ -70,8 +70,12 @@
   
   	var customerObj = [];
     function customerCount(params) {
+        var customerCount = document.getElementById('customerCount');
+        var customerCountChart = echarts.init(customerCount);   
+        customerCountChart.showLoading();     	
 		Utils.ajax('${CPATH}/report/customerCount', params, 
 			function(data){
+				customerCountChart.hideLoading();
 	            var crSeriesData = [];
 	            var legendData = [];
 	            var length = data.length;
@@ -96,8 +100,6 @@
 	                });
 	                customerObj[data[i].customer_name] = data[i].customerId;
 	            }
-	            var customerCount = document.getElementById('customerCount');
-	            var customerCountChart = echarts.init(customerCount);
 				option = {
 				    tooltip: {
 				        trigger: 'item',
@@ -175,12 +177,14 @@
     }
     
     function productCount(params) {
+    	var product = document.getElementById('userCount');
+       	var productChart = echarts.init(product);
+		productChart.showLoading();    
 		Utils.ajax('${CPATH}/report/productCount', params, 
 			function(data){
+				productChart.hideLoading();
 				var height = data.length;
 				$("#userCount").height(50 * height + 100);
-		        var product = document.getElementById('userCount');
-		        var productChart = echarts.init(product);
 	            var productOption = {
 	                tooltip : {
 	                    trigger: 'axis'
@@ -245,12 +249,14 @@
     }
     
     function giftCount(params) {
+    	var product = document.getElementById('giftCount');
+       	var productChart = echarts.init(product);
+		productChart.showLoading();    
 		Utils.ajax('${CPATH}/report/productCount', params, 
 			function(data){
+				productChart.hideLoading();
 				var height = data.length;
 				$("#giftCount").height(60 * height + 100);			
-		        var product = document.getElementById('giftCount');
-		        var productChart = echarts.init(product);
 	            var productOption = {
 	                tooltip : {
 	                    trigger: 'axis'
