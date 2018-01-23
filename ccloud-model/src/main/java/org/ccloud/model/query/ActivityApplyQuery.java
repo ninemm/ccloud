@@ -43,7 +43,7 @@ public class ActivityApplyQuery extends JBaseQuery {
 			@Override
 			public Object load() {
 				StringBuilder sql = new StringBuilder("SELECT caa.*, cc.customer_name, DATE_FORMAT(ca.start_time, '%m-%d') as start_date, DATE_FORMAT(ca.end_time, '%m-%d') as end_date, " +
-						"d.name, ca.invest_type, cc.contact, cc.mobile, u.realname, DATE_FORMAT(caa.create_date, '%Y-%m-%d') as format_create_date, ca.invest_amount, ca.code ");
+						"d.name, ca.invest_type, cc.contact, cc.mobile, u.realname, DATE_FORMAT(caa.create_date, '%Y-%m-%d') as format_create_date, ca.invest_amount, ca.title, ca.code ");
 
 				sql.append("FROM cc_activity_apply caa ");
 				sql.append("LEFT JOIN cc_activity ca ON caa.activity_id = ca.id ");
@@ -110,6 +110,7 @@ public class ActivityApplyQuery extends JBaseQuery {
 			sql.append(" and caa.create_date <= ?");
 			params.add(endDate);
 		}
+		sql.append(" order by caa.create_date desc ");
 		return Db.paginate(pageNumber, pageSize, select, sql.toString(), params.toArray());
 	}
 

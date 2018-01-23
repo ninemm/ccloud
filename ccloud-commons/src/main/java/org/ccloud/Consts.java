@@ -190,6 +190,7 @@ public class Consts {
 	public static final String OBJECT_TYPE_ORDER= "order";//订单
 	public static final String OBJECT_TYPE_CUSTOMER = "customer";//客户
 	public static final String OBJECT_TYPE_CUSTOMER_VISIT= "visit";//拜访
+	public static final String OBJECT_TYPE_ACTIVITY_APPLY= "activity";//活动
 	//是否阅读 0:否 1:是
 	public static final Integer IS_READ= 1;
 	public static final Integer NO_READ= 0;

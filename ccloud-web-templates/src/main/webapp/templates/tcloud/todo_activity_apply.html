@@ -217,37 +217,37 @@
 			<div id="tab1" class="weui-tab__bd-item weui-tab__bd-item--active">
 				<main class="infinite">
 					<#if (todoList?? && todoList?size>0) >
-						<#list todoList as activity>
+						<#list todoList as activityApply>
 							<div class="weui-panel weui-panel_access">
 								<div class="weui-cell weui-cell_access">
-									<a href="${CPATH}/activity/activityReview?activityId=${activity.id!}&taskId=${activity.taskId!}&assignee=${activity.assignee!}" style="display:block;width:100%;">
+									<a href="${CPATH}/activity/activityApplyReview?activityApplyId=${activityApply.id!}&taskId=${activityApply.taskId!}&assignee=${activityApply.assignee!}" style="display:block;width:100%;">
 										<div class="weui-cell__bd ft16">
 											<p class="customer_name">
-												${(activity.customer_name)!}
+												${(activityApply.customer_name)!}
 											</p>
 											<div class="ft14 gray">
-												<p>活动名称：${(activity.title)!}</p>
+												<p>活动名称：${(activityApply.title)!}</p>
 												<p>
-													联系人：<span>${(activity.ccontact)!} / ${(activity.cmobile)!}</span>
-													<span class="fr">${(activity.customerTypeNames)!}</span>
+													联系人：<span>${(activityApply.ccontact)!} / ${(activityApply.cmobile)!}</span>
+													<span class="fr">${(activityApply.customerTypeNames)!}</span>
 												</p>
 												<p>
-													投入金额：￥<span>${(activity.invest_amount)!}</span>
-													<span class="fr" id="date">时间：${(activity.create_date)!}</span>
+													投入金额：￥<span>${(activityApply.invest_amount)!}</span>
+													<span class="fr" id="date">时间：${(activityApply.create_date)!}</span>
 												</p>
 											</div>
 										</div>
 									</a>
 								</div>
 								<div class="weui-cell weui-cell_access">
-									<a class="weui-cell__bd" style="color: gray" href="${CPATH}/activity/activityReview?activityId=${activity.id!}&taskId=${activity.taskId!}&assignee=${activity.assignee!}">订单详情</a>
+									<a class="weui-cell__bd" style="color: gray" href="${CPATH}/activity/activityApplyReview?activityApplyId=${activityApply.id!}&taskId=${activityApply.taskId!}&assignee=${activityApply.assignee!}">活动详情</a>
 									<span class="weui-cell__ft"></span>
 								</div>
-								<#if activity.assignee?contains(username)>
+								<#if activityApply.assignee?contains(username)>
 									<div class="weui-cell weui-cell_access">
 										<div class="width-100 ft14 operate-btn">
-												<div class="button white-button fl" onclick="refuse('${(activity.id)!}', '${(activity.taskId)!}', 0, this)">拒绝</div>
-												<div class="button red-button fr" onclick="agree('${(activity.id)!}', '${(activity.taskId)!}', 1, this)">同意</div>
+												<div class="button white-button fl" onclick="refuse('${(activityApply.id)!}', '${(activityApply.taskId)!}', 0, this)">拒绝</div>
+												<div class="button red-button fr" onclick="agree('${(activityApply.id)!}', '${(activityApply.taskId)!}', 1, this)">同意</div>
 										</div>
 									</div>
 								</#if>
@@ -275,13 +275,13 @@
 												${(orderInfo.customer_name)!}
 											</p>
 											<div class="ft14 gray">
-												<p>订单号：${(orderInfo.order_sn)!}</p>
+												<p>活动名称：${(orderInfo.order_sn)!}</p>
 												<p>
 													联系人：<span>${(orderInfo.ccontact)!} / ${(orderInfo.cmobile)!}</span>
 													<span class="fr">${(orderInfo.customerTypeName)!}</span>
 												</p>
 												<p>
-													金额：￥<span>${(orderInfo.total_amount)!}</span>
+													投入金额：￥<span>${(orderInfo.total_amount)!}</span>
 													<span class="fr" id="date">时间：${(orderInfo.endTime)!}</span>
 												</p>
 											</div>
@@ -289,7 +289,7 @@
 									</a>
 								</div>
 								<div class="weui-cell weui-cell_access">
-									<a class="weui-cell__bd" style="color: gray" href="${CPATH}/order/orderReview?orderId=${orderInfo.id!}">订单详情</a>
+									<a class="weui-cell__bd" style="color: gray" href="${CPATH}/order/orderReview?orderId=${orderInfo.id!}">活动详情</a>
 									<span class="weui-cell__ft"></span>
 								</div>
 							</div>

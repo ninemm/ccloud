@@ -29,6 +29,7 @@ public class Message extends BaseMessage<Message> {
 	public static final String ORDER_REVIEW_TYPE_CODE = "100601";
 	public static final String CUSTOMER_REVIEW_TYPE_CODE = "100602";
 	public static final String CUSTOMER_VISIT_REVIEW_TYPE_CODE = "100603";
-	
+	public static final String ACTIVITY_APPLY_REVIEW_TYPE_CODE = "100604";
+
 
 }

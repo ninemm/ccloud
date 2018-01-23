@@ -269,7 +269,7 @@ public class ActivityController extends BaseFrontController {
 	private void sendOrderMessage(String sellerId, String title, String content, String fromUserId, String toUserId, String deptId, String dataArea, String orderId) {
 
 		Message message = new Message();
-		message.setType(Message.ORDER_REVIEW_TYPE_CODE);
+		message.setType(Message.ACTIVITY_APPLY_REVIEW_TYPE_CODE);
 
 		message.setSellerId(sellerId);
 		message.setTitle(title);
@@ -277,7 +277,7 @@ public class ActivityController extends BaseFrontController {
 
 		message.setObjectId(orderId);
 		message.setIsRead(Consts.NO_READ);
-		message.setObjectType(Consts.OBJECT_TYPE_ORDER);
+		message.setObjectType(Consts.OBJECT_TYPE_ACTIVITY_APPLY);
 
 		message.setFromUserId(fromUserId);
 		message.setToUserId(toUserId);
@@ -292,6 +292,7 @@ public class ActivityController extends BaseFrontController {
 	public void complete() {
 
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 
 		String activityApplyId = getPara("id");
 		String taskId = getPara("taskId");
@@ -308,6 +309,13 @@ public class ActivityController extends BaseFrontController {
 		WorkFlowService workflowService = new WorkFlowService();
 		workflowService.completeTask(taskId, comment, var);
 
+		ActivityApply activityApply = ActivityApplyQuery.me().findById(activityApplyId);
+		String customerName = activityApply.get("customer_name");
+		String toUserId = activityApply.get("biz_user_id");
+		sendOrderMessage(sellerId, customerName, (pass == 1 ? "活动审核通过" : "活动审核拒绝"), user.getId(), toUserId, user.getDepartmentId(), user.getDataArea(), activityApplyId);
+		activityApply.setStatus(pass == 1 ? Consts.ACTIVITY_APPLY_STATUS_PASS : Consts.ACTIVITY_APPLY_STATUS_REJECT);
+		activityApply.update();
+
 		//审核订单后将message中是否阅读改为是
 		Message message = MessageQuery.me().findByObjectIdAndToUserId(activityApplyId, user.getId());
 		if (null != message) {
@@ -316,6 +324,47 @@ public class ActivityController extends BaseFrontController {
 		}
 
 		renderAjaxResultForSuccess("活动审核成功");
+	}
+
+	public void activityApplyReview() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+
+		String activityApplyId = getPara("activityApplyId");
+		String taskId = getPara("taskId");
+		ActivityApply activityApply = ActivityApplyQuery.me().findById(activityApplyId);
+
+		boolean isCheck = false;
+		if (user != null && getPara("assignee", "").contains(user.getUsername())) {
+			isCheck = true;
+		}
+		setAttr("isCheck", isCheck);
+
+		//审核订单后将message中是否阅读改为是
+		Message message = MessageQuery.me().findByObjectIdAndToUserId(activityApplyId, user.getId());
+		if (null != message) {
+			message.setIsRead(Consts.IS_READ);
+			message.update();
+		}
+
+		setAttr("taskId", taskId);
+		setAttr("activityApply", activityApply);
+		setAttr("statusName", getStatusName(activityApply.getInt("status")));
+		render("activity_apply_review.html");
+	}
+
+	private String getStatusName(int status) {
+		if (status == Consts.ACTIVITY_APPLY_STATUS_WAIT)
+			return "待审核";
+		if (status == Consts.ACTIVITY_APPLY_STATUS_PASS)
+			return "审核通过";
+		if (status == Consts.ACTIVITY_APPLY_STATUS_CANCEL)
+			return "申请取消";
+		if (status == Consts.ACTIVITY_APPLY_STATUS_REJECT)
+			return "审核拒绝";
+		if (status == Consts.ACTIVITY_APPLY_STATUS_END)
+			return "活动结束";
+
+		return "无";
 	}
 
 	public void applyList() {
