@@ -65,7 +65,7 @@
 
 		$.ajax({
 			type: "post",
-			url: "${CPATH}/todo/orderHistoryAuditRefresh",
+			url: "${CPATH}/todo/activityHistoryRefresh",
 			data: paramData(),
 			dataType: "json",
 			success:function(data) {
@@ -204,7 +204,7 @@
 		)
 	};
 
-</#macro> 
+</#macro>
 
 <@layout>
 <div class="weui-content">
@@ -263,33 +263,30 @@
 			<div id="tab2" class="weui-tab__bd-item weui-tab__bd-item">
 				<main class="infinite">
 					<#if historyList ??>
-						<#list historyList.list as orderInfo>
+						<#list historyList.list as activityApplyInfo>
 							<div class="weui-panel weui-panel_access">
 								<div class="weui-cell weui-cell_access">
-									<a href="${CPATH}/order/orderReview?orderId=${orderInfo.id!}" style="display:block;width:100%;">
+									<a href="${CPATH}/activity/activityApplyReview?activityApplyId=${activityApplyInfo.id!}" style="display:block;width:100%;">
 										<div class="weui-cell__bd ft16">
 											<p class="customer_name">
-												<#if orderInfo.receive_type == 0>
-													<span class="tag">账期</span>
-												</#if>
-												${(orderInfo.customer_name)!}
+												${(activityApplyInfo.customer_name)!}
 											</p>
 											<div class="ft14 gray">
-												<p>活动名称：${(orderInfo.order_sn)!}</p>
+												<p>活动名称：${(activityApplyInfo.title)!}</p>
 												<p>
-													联系人：<span>${(orderInfo.ccontact)!} / ${(orderInfo.cmobile)!}</span>
-													<span class="fr">${(orderInfo.customerTypeName)!}</span>
+													联系人：<span>${(activityApplyInfo.ccontact)!} / ${(activityApplyInfo.cmobile)!}</span>
+													<span class="fr">${(activityApplyInfo.customerTypeNames)!}</span>
 												</p>
 												<p>
-													投入金额：￥<span>${(orderInfo.total_amount)!}</span>
-													<span class="fr" id="date">时间：${(orderInfo.endTime)!}</span>
+													投入金额：￥<span>${(activityApplyInfo.invest_amount)!}</span>
+													<span class="fr" id="date">时间：${(activityApplyInfo.endTime)!}</span>
 												</p>
 											</div>
 										</div>
 									</a>
 								</div>
 								<div class="weui-cell weui-cell_access">
-									<a class="weui-cell__bd" style="color: gray" href="${CPATH}/order/orderReview?orderId=${orderInfo.id!}">活动详情</a>
+									<a class="weui-cell__bd" style="color: gray" href="${CPATH}/activity/activityApplyReview?activityApplyId=${activityApplyInfo.id!}">活动详情</a>
 									<span class="weui-cell__ft"></span>
 								</div>
 							</div>

@@ -1,6 +1,7 @@
 package org.ccloud.front.controller;
 
 import java.text.ParseException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ import org.ccloud.route.RouterMapping;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
+import org.ccloud.utils.DateUtils;
 
 @RouterMapping(url = "/todo")
 public class TodoController extends BaseFrontController {
@@ -79,7 +81,7 @@ public class TodoController extends BaseFrontController {
 
 		List<Record> list = ActivityApplyQuery.me().getToDo(username);
 		if(list.size() !=0 )setAttr("todoList", list);
-		Page <Record> historyList = SalesOrderQuery.me().getHisProcessList(getPageNumber(), getPageSize(), Consts.PROC_ACTIVITY_APPLY_REVIEW, username);
+		Page <Record> historyList = ActivityApplyQuery.me().getHisProcessList(getPageNumber(), getPageSize(), Consts.PROC_ACTIVITY_APPLY_REVIEW, username);
 		if(historyList.getList().size() != 0) setAttr("historyList", historyList);
 
 		setAttr("username", username);
@@ -180,7 +182,7 @@ public class TodoController extends BaseFrontController {
 			html.append(
 					"                    <div class=\"weui-panel weui-panel_access\">\n" +
 					"                        <div class=\"weui-cell weui-cell_access\">\n" +
-					"							<a href=\""+getRequest().getContextPath()+"/order/orderDetail?orderId="+order.getStr("id")+"\">\n");		
+					"							<a href=\""+getRequest().getContextPath()+"/order/orderDetail?orderId="+order.getStr("id")+"\">\n");
 					if(order.get("receive_type").equals("0")) {
 					html.append("								<span class=\"tag\">账期</span>");
 					}
@@ -189,7 +191,7 @@ public class TodoController extends BaseFrontController {
 					"                                	<div class=\"ft14 gray\">\n" +
 					"                                    	<p>订单号：" + order.getStr("order_sn")+"</p>\n" +
 					"                                    	<p>联系人：<span>"+order.getStr("ccontact")+" / "+order.getStr("cmobile")+"</span><span class=\"fr\">"+order.getStr("customerTypeName")+"</span></p>\n" +
-					"                                    	<p>金额：￥<span>"+order.getStr("total_amount")+"</span><span class=\"fr\" id=\"date\">时间："+order.getStr("endTime")+"</span></p>\n");
+					"                                    	<p>金额：￥<span>"+order.getStr("total_amount")+"</span><span class=\"fr\" id=\"date\">时间："+ DateUtils.format(order.getDate("endTime"))+"</span></p>\n");
 					html.append("                    				</div>\n" +
 					"                            	</div>\n" +
 					"							</a>\n"+
@@ -209,4 +211,38 @@ public class TodoController extends BaseFrontController {
 		renderJson(map);
 	}
 
+	public void activityHistoryRefresh() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String username = user.getUsername();
+		Page <Record> historyList = ActivityApplyQuery.me().getHisProcessList(getParaToInt("pageNumber"), getParaToInt("pageSize"), Consts.PROC_ACTIVITY_APPLY_REVIEW, username);
+		StringBuilder html = new StringBuilder();
+		for(Record activityApply : historyList.getList()) {
+			html.append(
+					"                    <div class=\"weui-panel weui-panel_access\">\n" +
+							"                        <div class=\"weui-cell weui-cell_access\">\n" +
+							"							<a href=\""+getRequest().getContextPath()+"/activity/applyDetail?id="+activityApply.getStr("id")+"\">\n");
+			html.append("                            	<div class=\"weui-cell__bd ft16\">\n" +
+					            "                                	<p class=\"customer_name\">" + activityApply.getStr("customer_name") + "</p>\n" +
+					            "                                	<div class=\"ft14 gray\">\n" +
+					            "                                    	<p>活动名称：" + activityApply.getStr("title")+"</p>\n" +
+					            "                                    	<p>联系人：<span>"+activityApply.getStr("ccontact")+" / "+activityApply.getStr("cmobile")+"</span><span class=\"fr\">"+activityApply.getStr("customerTypeNames")+"</span></p>\n" +
+					            "                                    	<p>投入金额：￥<span>"+activityApply.getStr("invest_amount")+"</span><span class=\"fr\" id=\"date\">时间："+ DateUtils.format(activityApply.getDate("endTime"))+"</span></p>\n");
+			html.append("                    				</div>\n" +
+					            "                            	</div>\n" +
+					            "							</a>\n"+
+					            "                        </div>\n" +
+					            "                        <div class=\"weui-cell weui-cell_access\">\n" +
+					            "                        	<a class=\"weui-cell__bd\" style=\"color: gray\" href=\""+getRequest().getContextPath()+"/activity/applyDetail?id="+ activityApply.getStr("id")+"\">活动详情</a>\n"+
+					            "							<span class=\"weui-cell__ft\"></span>"+
+					            "                        </div>\n" +
+					            "                    </div>\n");
+		}
+
+		Map<String, Object> map = new HashMap<>();
+		map.put("html", html.toString());
+		map.put("totalRow", historyList.getTotalRow());
+		map.put("totalPage", historyList.getTotalPage());
+
+		renderJson(map);
+	}
 }
