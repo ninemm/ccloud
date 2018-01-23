@@ -5,6 +5,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -165,8 +166,24 @@ public class ActivityController extends BaseFrontController {
 		Integer[] visit_nums = getParaValuesToInt("visit_num");
 		for (String sellerCustomerId : sellerCustomerIdArray) {
 			for (int i = 0; i < activity_ids.length; i++) {
+				Activity activity = ActivityQuery.me().findById(activity_ids[i]);
+				//客户信息
+				Customer customer =CustomerQuery.me().findSellerCustomerId(sellerCustomerId);
 				//活动申请check
-				this.check(activity_ids[i], sellerCustomerId,sellerCustomerNameArray[i]);
+				int result = this.check(activity_ids[i], sellerCustomerId);
+				
+				if(result == 0) {
+					renderAjaxResultForError("活动参与的人数已经达到上限");
+					return;
+				}
+				else if(result == 2) {
+					renderAjaxResultForError(customer.getCustomerName()+"参与的次数已经达到上限，每个客户参与次数为："+activity.getJoinNum());
+					return;
+				}
+				else if(result == 3) {
+					renderAjaxResultForError(customer.getCustomerName()+"超过了每个客户参与活动的时间限制，每个客户参与时限为："+activity.getTimeInterval());
+					return;
+				}
 
 				ActivityApply activityApply = new ActivityApply();
 				String activityApplyId = StringUtils.getUUID();
@@ -227,8 +244,26 @@ public class ActivityController extends BaseFrontController {
 		return procInstId;
 	}
 
-	private void check(String activityApplyId,String sellerCustomerId, String customerName) {
+	private int check(String activityId,String sellerCustomerId) {
+		Activity activity = ActivityQuery.me().findById(activityId);
+		List<ActivityApply> activityApplies = ActivityApplyQuery.me().findByActivityId(activityId);
+		if(activity.getTotalCustomerNum()==activityApplies.size() || activity.getTotalCustomerNum()<activityApplies.size()) {
+			return 0;
+		}
+		
+		List<ActivityApply> applies = ActivityApplyQuery.me().findBySellerCustomerIdAndActivityId(activityId,sellerCustomerId);
+		if(activity.getJoinNum()==applies.size() || activity.getJoinNum()<applies.size()) {
+			return 2;
+		}
+		//对客户参与活动日期限制的判断
+		GregorianCalendar gc=new GregorianCalendar(); 
+		gc.setTime(applies.get(0).getCreateDate()); 
+		gc.add(2,+Integer.parseInt(activity.getTimeInterval().substring(5)));  
+		if(gc.getTime().before(new Date())) {
+			return 3;
+		}
 //		renderAjaxResultForError("");
+		return 1;
 	}
 
 	private void sendOrderMessage(String sellerId, String title, String content, String fromUserId, String toUserId, String deptId, String dataArea, String orderId) {

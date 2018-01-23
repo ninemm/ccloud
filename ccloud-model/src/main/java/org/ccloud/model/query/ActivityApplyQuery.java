@@ -134,4 +134,13 @@ public class ActivityApplyQuery extends JBaseQuery {
 		return Db.find(sb.toString(), username);
 	}
 	
+	public List<ActivityApply> findByActivityId(String activityId){
+		String sql = "select * from cc_activity_apply where activity_id = ?";
+		return DAO.find(sql, activityId);
+	}
+	
+	public List<ActivityApply> findBySellerCustomerIdAndActivityId(String activityId,String sellerCustomerId){
+		String sql = "select * from cc_activity_apply where activity_id = ? and seller_customer_id = ? ORDER BY create_date";
+		return DAO.find(sql,activityId,sellerCustomerId);
+	}
 }

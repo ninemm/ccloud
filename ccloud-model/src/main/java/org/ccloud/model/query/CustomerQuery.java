@@ -135,5 +135,9 @@ public class CustomerQuery extends JBaseQuery {
 		List<Record> list = Db.find(fromBuilder.toString());
 		return list;
 	}
-
+	
+	public Customer findSellerCustomerId(String sellerCustomerId){
+		String sql = "select c.* from cc_customer c LEFT JOIN cc_seller_customer s on s.customer_id = c.id where s.id = ?";
+		return DAO.findFirst(sql, sellerCustomerId);
+	}
 }
