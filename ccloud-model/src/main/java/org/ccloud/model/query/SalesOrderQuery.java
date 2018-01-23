@@ -439,10 +439,11 @@ public class SalesOrderQuery extends JBaseQuery {
 		sql.append(" left join cc_customer_type ct on o.customer_type_id = ct.id ");
 		sql.append(" JOIN act_hi_actinst i on o.proc_inst_id = i.PROC_INST_ID_ ");
 		sql.append(" JOIN act_re_procdef p on p.ID_ = i.PROC_DEF_ID_ ");
-		sql.append(" WHERE i.DURATION_ is not null AND p.KEY_ not in (?,?) ");
+		sql.append(" WHERE i.DURATION_ is not null AND p.KEY_ not in (?,?,?) ");
 		
 		params.add(Consts.PROC_CUSTOMER_VISIT_REVIEW);
 		params.add(Consts.PROC_CUSTOMER_REVIEW);
+		params.add(Consts.PROC_ACTIVITY_APPLY_REVIEW);
 		if (StrKit.notBlank(username)) {
 			sql.append(" AND FIND_IN_SET(?, i.ASSIGNEE_)");
 			params.add(username);

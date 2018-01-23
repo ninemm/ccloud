@@ -188,26 +188,22 @@ function doChange(key){
         initCustomerSelect();
     }
 
+	var $section = $(".order-customer-info");
+	var customerInfoHtml = $section.html();
 	function confirm(){
+		$section.empty();
 		var $chechboxs = $('#customerList input[type=checkbox]:checked');
-		var sellerCustomerIds = "";
-		var sellerCustomerNames = ""
 		$.each($chechboxs, function(index, el) {
+			$section.append(customerInfoHtml);
+			var $customerInfo = $section.find(".customerInfo:last");
 			var $el = $(el);
 			var $customer = $el.parents(".customerSelect");
-			if(index == 0){
-				sellerCustomerIds += $el.val();
-				sellerCustomerNames += $customer.find("#customerName").text();
-			}else{
-				sellerCustomerIds += ',';
-				sellerCustomerIds += $el.val();
-				sellerCustomerNames += ',';
-				sellerCustomerNames += $customer.find("#customerName").text();
-			}
+			var customerName = $customer.find("#customerName").text();
+			$customerInfo.find("#sellerCustomerInfo").val(customerName + " " + $customer.find("#contact").val() + " " + $customer.find("#mobile").val());
+			$customerInfo.find("#sellerCustomerName").val(customerName);
+			$customerInfo.find("#sellerCustomerId").val($el.val());
 			
 		});
-		$("#sellerCustomerNames").val(sellerCustomerNames);
-		$("#sellerCustomerIds").val(sellerCustomerIds);
 		closeCombinSearch();
 	}
     
@@ -328,32 +324,13 @@ function doChange(key){
 				</section> -->
 			<div class="weui-cells__title">客户信息</div>
 			<section class="weui-panel weui-panel_access order-customer-info">
-				<div class="weui-cell weui-cell_access">
+				<div class="weui-cell weui-cell_access customerInfo">
 					<div class="weui-cell__bd">
-						<input type="hidden" name="sellerCustomerIds" id="sellerCustomerIds" value="">
-						<input type="text" class="weui-input select-customer" id="sellerCustomerNames" readonly>
+						<input type="hidden" name="sellerCustomerId" id="sellerCustomerId" value="">
+						<input type="hidden" name="sellerCustomerName" id="sellerCustomerName" value="">
+						<input type="text" class="weui-input select-customer" id="sellerCustomerInfo" readonly>
 					</div>
 					<div class="weui-cell__ft"></div>
-				</div>
-				<div class="weui-cell weui-cell_access">
-					<div class="weui-cell__bd">
-						<input type="text" class="weui-input select-customer" id="" readonly>
-					</div>
-				</div>
-				<div class="weui-cell weui-cell_access">
-					<div class="weui-cell__bd">
-						<input type="text" class="weui-input select-customer" id="" readonly>
-					</div>
-				</div>
-				<div class="weui-cell weui-cell_access">
-					<div class="weui-cell__bd">
-						<input type="text" class="weui-input select-customer" id="" readonly>
-					</div>
-				</div>
-				<div class="weui-cell weui-cell_access">
-					<div class="weui-cell__bd">
-						<input type="text" class="weui-input select-customer" id="" readonly>
-					</div>
 				</div>
 			</section>
 			<!--    <section class="weui-cells weui-cells_form">
