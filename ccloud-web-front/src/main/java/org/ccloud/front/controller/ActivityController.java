@@ -155,8 +155,8 @@ public class ActivityController extends BaseFrontController {
 		final String content = getPara("content");
 		final Date createDate = new Date();
 
-		String[] sellerCustomerIdArray = getPara("sellerCustomerIds").split(",", -1);
-		String[] sellerCustomerNameArray = getPara("sellerCustomerNames").split(",", -1);
+		String[] sellerCustomerIdArray = getParaValues("sellerCustomerId");
+		String[] sellerCustomerNameArray = getParaValues("sellerCustomerName");
 
 
 		Boolean startProc = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_ACTIVITY_APPLY + sellerCode);
