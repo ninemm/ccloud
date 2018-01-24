@@ -278,9 +278,11 @@
             <button class="red-button confirm-search-btn weui-flex__item">确定</button>
         </footer>
     </article>
+    <@shiro.hasPermission name="/admin/activityApply/add">
     <a class="hidden-menu" href="${CPATH}/activity">
         <img src="${CTPATH}/images/order_add.png" alt="">
     </a>
+    </@shiro.hasPermission>
     <#include "_inc/_goback_bottom.html" />
 </div>
 </@layout>
