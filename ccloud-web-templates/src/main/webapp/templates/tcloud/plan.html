@@ -19,7 +19,6 @@ var productInfoMap = ${productItems!};
 		  title: "选择产品",
 		  items: productInfoMap,
 		  onChange:function(obj){
-		  	console.log(this.data['values']);
 		  	var $product = $(this)[0].$input.parents(".productInfo");
 		  	$product.find("#productId").val(this.data['values']);
 		  }
@@ -38,7 +37,6 @@ $(function() {
 			      value: "y"
 			    }],
 		 onChange:function(obj){
-		  	console.log(this.data['values']);
 		  	var $product = $(this)[0].$input.parents(".type");
 		  	$product.find("#typeId").val(this.data['values']);
 		  }
@@ -69,7 +67,6 @@ function addProduct(){
 		  title: "选择产品",
 		  items: productInfoMap,
 		  onChange:function(obj){
-		  	console.log(this.data['values']);
 		  	var $product = $(this)[0].$input.parents(".productInfo");
 		  	$product.find("#productId").val(this.data['values']);
 		  }
