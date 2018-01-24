@@ -9,15 +9,33 @@
 	}
 </#macro>
 <#macro script>	
-$(function() {
+	$(function() {
+		combo();
+	});
+
+	$(document).on("input", "#searchInput", function() {
+		setItemBykey("keyword", $("#searchInput").val());
+		combo();
+	}).on("click", "#searchCancel", function() {
+		combo();
+	})
+
 	$("#type").select({
 		title: "选择计划类型",
-		items: ["月度计划", "年计划"]
+		items: [{
+			title: "周计划", value: "101201"
+		},{
+			title: "月计划", value: "101202"
+		},{
+			title: "年计划", value: "101203"
+		}]
 	});
-	$("#user").select({
+
+	$("#userId").select({
 		title: "选择业务员",
-		items: ["张三", "李四"]
+		items: ${userIds!}
 	});
+
 	$("#start-date").calendar({
 		maxDate: function() {
 			return $('#end-date').val()
@@ -32,7 +50,79 @@ $(function() {
 		}
 	});
 	$("#end-date").val($.today());
-})
+
+	var $planList = $(".planList");
+	var newHtml = $(".planList").html();
+	var $loading = $("#loading");
+	var $noMore = $("#noMore");
+
+	var loading = false;
+	var startDate = $.today();
+	var endDate = $.today() + ' 23:59:59';
+	var page = 1;
+	var size = 10;
+
+	function loadPlanData() {
+
+		$loading.show();
+		$noMore.hide();
+	
+		var params = {
+			"page": page,
+			"size": size,
+			"keyword": $("#searchInput").val(),
+			"userId": $("#userId").data('values'),
+			"type": $("#type").data('values'),
+			"startDate": startDate,
+			"endDate": endDate
+		}
+
+		Utils.ajax('${CPATH}/plans/planList', params,
+			function(data) {
+				$loading.hide();
+		
+				if(data.planList.length == 0) {
+					if($('.planList').length == 0) $noMore.show();
+					loading = true;
+					return;
+				}
+		
+				$.each(data.planList, function(index, el) {
+		
+					$planList.append(newHtml);
+					var $newPlan = $planList.find(".plan-list-box:last");
+					$newPlan.find("#userName").text(el.realname);
+					$newPlan.find("#typeName").text(el.typeName);
+					$newPlan.find("#startDate").text(el.start_date);
+					$newPlan.find("#endDate").text(el.end_date);
+					$newPlan.find("#productName").text(el.custom_name);
+					$newPlan.find("#planNum").text(el.plan_num);
+					$newPlan.find("#completeNum").text(el.complete_num);
+					$newPlan.find("#completeRatio").text(el.complete_ratio);
+	
+				});
+				page++;
+				loading = false;
+			}
+		);
+	}
+
+	//滑动方法
+	$("main").infinite().on("infinite", function() {
+		if(loading) {
+			return;
+		}
+		loading = true;
+		loadPlanData();
+	});
+
+	function combo() {
+		$planList.empty();
+		loading = false;
+		page = 1;
+		loadPlanData();
+	}
+
 </#macro>
 <@layout>
 <div class="weui-content">
@@ -61,7 +151,7 @@ $(function() {
 						<i class="icon-sort-desc"></i>
 					</div>
 					<div class="weui-flex__item">
-						<input type="text" id="user" placeholder="业务员" class="weui-input" readonly>
+						<input type="text" id="userId" placeholder="业务员" class="weui-input" readonly>
 						<i class="icon-sort-desc"></i>
 					</div>
 				</div>
@@ -71,74 +161,37 @@ $(function() {
 			</div>
 		</header>
 		<main>
-			<div class="ft12">
+			<div class="ft12 planList">
 				<div class="plan-list-box">
 					<div class="weui-panel weui-panel_access">
 						<div class="customer_name">
-							<span>张三</span>
-							<span class="fr orange ft12">年计划</span>
+							<span id="userName"></span>
+							<span class="fr orange ft12" id="typeName"></span>
 						</div>
 						<div class="weui-flex gray">
-							<div class="weui-flex__item">开始时间：2018-01-02</div>
+							<div class="weui-flex__item">开始时间：<span id="startDate"></span></div>
 							<span style="width:1rem" class="t-c">-</span>
-							<div class="weui-flex__item t-r">结束时间：2018-02-02</div>
+							<div class="weui-flex__item t-r">结束时间：<span id="endDate"></span></div>
 						</div>
 					</div>
 					<div class="weui-cells mg-0">
 						<div class="weui-cell">
-							<div class="weui-cell__bd t-c">
-								劲酒
+							<div class="weui-cell__bd t-c" id="productName">
 							</div>
 						</div>
 						<div class="weui-cell">
 							<div class="weui-cell__bd weui-flex t-c">
 								<div class="weui-flex__item">
 									<p>计划数量</p>
-									<p>20件</p>
+									<p id="planNum"></p>
 								</div>
 								<div class="weui-flex__item">
 									<p>完成数量</p>
-									<p>10件</p>
+									<p id="completeNum"></p>
 								</div>
 								<div class="weui-flex__item">
-									<p>完成度</p>
-									<p>50%</p>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="plan-list-box">
-					<div class="weui-panel weui-panel_access">
-						<div class="customer_name">
-							<span>李四</span>
-							<span class="fr orange ft12">月度计划</span>
-						</div>
-						<div class="weui-flex gray">
-							<div class="weui-flex__item">开始时间：2018-01-02</div>
-							<span style="width:1rem" class="t-c">-</span>
-							<div class="weui-flex__item t-r">结束时间：2018-02-02</div>
-						</div>
-					</div>
-					<div class="weui-cells mg-0">
-						<div class="weui-cell">
-							<div class="weui-cell__bd t-c">
-								劲酒
-							</div>
-						</div>
-						<div class="weui-cell">
-							<div class="weui-cell__bd weui-flex t-c">
-								<div class="weui-flex__item">
-									<p>计划数量</p>
-									<p>20件</p>
-								</div>
-								<div class="weui-flex__item">
-									<p>完成数量</p>
-									<p>10件</p>
-								</div>
-								<div class="weui-flex__item">
-									<p>完成度</p>
-									<p>50%</p>
+									<p>完成比率</p>
+									<p id="completeRatio"></p>
 								</div>
 							</div>
 						</div>

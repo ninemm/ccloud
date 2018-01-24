@@ -61,10 +61,10 @@ public class PlansQuery extends JBaseQuery {
 
 	public Page<Record> paginateForApp(int pageNumber, int pageSize, String keyword, String userId, String type,
 	                                   String startDate, String endDate, String sellerId, String dataArea) {
-		String select = "select o.*, u.realname ";
+		String select = "select o.*, u.realname, sp.custom_name ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_plans` o ");
-		fromBuilder.append("join user u ON o.id = o.userId ");
-
+		fromBuilder.append("join user u ON o.user_id = u.id ");
+		fromBuilder.append("left join cc_seller_product sp ON o.seller_product_id = sp.id ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
