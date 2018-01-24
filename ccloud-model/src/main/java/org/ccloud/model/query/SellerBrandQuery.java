@@ -45,7 +45,7 @@ public class SellerBrandQuery extends JBaseQuery {
 	}
 	
 	public List<SellerBrand> findBySellerId (String id){
-		StringBuilder sqlBuilder = new StringBuilder("select *from cc_seller_brand ");
+		StringBuilder sqlBuilder = new StringBuilder("select * from cc_seller_brand ");
 		sqlBuilder.append("where seller_id = ?");
 		return DAO.find(sqlBuilder.toString(), id);
 	}

@@ -81,5 +81,10 @@ public class BrandQuery extends JBaseQuery {
 	public List<Brand> findAll() {
 		return DAO.doFind();
 	}
+	
+	public List<Brand> findBySellerId(String sellerId){
+		String sql = "select b.* from cc_brand b LEFT JOIN cc_seller_brand s on s.brand_id=b.id where s.seller_id = ?";
+		return DAO.find(sql, sellerId);
+	}
 
 }
