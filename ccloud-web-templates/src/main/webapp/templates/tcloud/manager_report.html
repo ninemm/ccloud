@@ -25,19 +25,20 @@
 </#macro>  
 <#macro script>
   $(function () {
-  
     $(".end-date").calendar();
     $(".end-date").val($.today());
     $(".begin-date").calendar();
     $(".begin-date").val($.today());
     $("#dayTag").val("today");
     $("#orderTag").val("productCount");
+    $("#typeTag").val("order");
     var startDate = $.today();
 	var endDate = $.today() + ' 23:59:59';  
 	var params = {
 		"dayTag":  'today',
 		"startDate": startDate,
-		"endDate" : endDate
+		"endDate" : endDate,
+		"typeTag": $("#typeTag").val()
 	}
  	orderAmount(params);
  	userCount(params);
@@ -47,7 +48,7 @@
   })
   
     function orderAmount(params) {
-		Utils.ajax('${CPATH}/report/orderAmount', params, 
+		Utils.ajax('${CPATH}/report/orderAmountMenu', params, 
 			function(data){
 				$("#productCount").html(data.productCount+"件/");
 				$("#totalCount").html(data.orderCount+"笔");
@@ -59,12 +60,13 @@
     var salesObj = [];
     var unit = '件';
     function userCount(params) {
-		Utils.ajax('${CPATH}/report/getUserRank', params, 
+    	var salesIndent = document.getElementById('userCount');
+       	var salesIndentChart = echarts.init(salesIndent);
+		salesIndentChart.showLoading();    	
+		Utils.ajax('${CPATH}/report/getUserRankMenu', params, 
 			function(data){
+				salesIndentChart.hideLoading();
 				var orderTag = $("#orderTag").val();
-	        	var salesIndent = document.getElementById('userCount');
-	        	var salesIndentTotal = 0;
-		        var $salesIndent = $(salesIndent);
 		        var yData = [];
 		        var seriesData = [];
 		        for (var i = 0; i < data.length; i++) {
@@ -78,8 +80,6 @@
 		           }		           
 		           salesObj[data[i].realname] = data[i].id;
 		       	}
-		       	var salesIndentChart = echarts.init(salesIndent);
-		
 				option = {
 				    title: {
 				        text: '业务员',
@@ -133,12 +133,13 @@
     
     var sellerObj = [];
     function sellerCount(params) {
-		Utils.ajax('${CPATH}/report/getSellerCount', params, 
+    	var salesIndent = document.getElementById('dealerCount');
+    	var salesIndentChart = echarts.init(salesIndent);
+    	salesIndentChart.showLoading();
+		Utils.ajax('${CPATH}/report/getSellerCountMenu', params, 
 			function(data){
+				salesIndentChart.hideLoading();
 				var orderTag = $("#orderTag").val();
-	        	var salesIndent = document.getElementById('dealerCount');
-	        	var salesIndentTotal = 0;
-		        var $salesIndent = $(salesIndent);
 		        var yData = [];
 		        var seriesData = [];
 		        for (var i = 0; i < data.length; i++) {
@@ -152,7 +153,6 @@
 		           }			           
 		           sellerObj[data[i].seller_name] = data[i].id;
 		       	}
-		       	var salesIndentChart = echarts.init(salesIndent);
 		
 				option = {
 				    title: {
@@ -206,12 +206,13 @@
     }    
     
     function giftCount(params) {
-		Utils.ajax('${CPATH}/report/getGiftCountByUser', params, 
+    	var salesIndent = document.getElementById('giftCount');
+    	var salesIndentChart = echarts.init(salesIndent);
+    	salesIndentChart.showLoading();    
+		Utils.ajax('${CPATH}/report/getGiftCountByUserMenu', params, 
 			function(data){
+				salesIndentChart.hideLoading();
 				var orderTag = $("#orderTag").val();
-	        	var salesIndent = document.getElementById('giftCount');
-	        	var salesIndentTotal = 0;
-		        var $salesIndent = $(salesIndent);
 		        var yData = [];
 		        var seriesData = [];
 		        for (var i = 0; i < data.length; i++) {
@@ -224,7 +225,6 @@
 		           		seriesData.push(data[i].orderCount);
 		           }		           
 		       	}
-		       	var salesIndentChart = echarts.init(salesIndent);
 		
 				option = {
 				    title: {
@@ -277,12 +277,13 @@
     }
     
     function sellerGiftCount(params) {
-		Utils.ajax('${CPATH}/report/getGiftCountBySeller', params, 
+    	var salesIndent = document.getElementById('dealerGiftCount');
+    	var salesIndentChart = echarts.init(salesIndent);
+    	salesIndentChart.showLoading();
+		Utils.ajax('${CPATH}/report/getGiftCountBySellerMenu', params, 
 			function(data){
+				salesIndentChart.hideLoading();
 				var orderTag = $("#orderTag").val();
-	        	var salesIndent = document.getElementById('dealerGiftCount');
-	        	var salesIndentTotal = 0;
-		        var $salesIndent = $(salesIndent);
 		        var yData = [];
 		        var seriesData = [];
 		        for (var i = 0; i < data.length; i++) {
@@ -295,7 +296,6 @@
 		           		seriesData.push(data[i].orderCount);
 		           }		           
 		       	}
-		       	var salesIndentChart = echarts.init(salesIndent);
 		
 				option = {
 				    title: {
@@ -380,6 +380,10 @@
 		}
     }
     
+    function getUrl() {
+    	var type = $("#type")
+    }
+    
     function startDaySelect(obj,type) {
 		var params = {
     		"startDate": $(obj).val(),
@@ -403,7 +407,8 @@
           onClick: function () {
 			var params = {
 				"dayTag": 'today',
-				"orderTag": $("#orderTag").val()
+				"orderTag": $("#orderTag").val(),
+				"typeTag": $("#typeTag").val()
 			}
 			urlSelect(params,type); 
             $(obj).find(".dayTagText").text('今日')
@@ -414,7 +419,8 @@
           onClick: function () {
 			var params = {
 				"dayTag": 'yesterday',
-				"orderTag": $("#orderTag").val()
+				"orderTag": $("#orderTag").val(),
+				"typeTag": $("#typeTag").val()
 			}
           	urlSelect(params,type);
             $(obj).find(".dayTagText").text('昨日')
@@ -425,7 +431,8 @@
           onClick: function () {
 			var params = {
 				"dayTag": 'week',
-				"orderTag": $("#orderTag").val()
+				"orderTag": $("#orderTag").val(),
+				"typeTag": $("#typeTag").val()
 			}
 			urlSelect(params,type);   
           	$(obj).find(".dayTagText").text('本周')
@@ -436,7 +443,8 @@
           onClick: function () {
 			var params = {
 				"dayTag": 'lastweek',
-				"orderTag": $("#orderTag").val()
+				"orderTag": $("#orderTag").val(),
+				"typeTag": $("#typeTag").val()
 			}
           urlSelect(params,type);
           $(obj).find(".dayTagText").text('上周')
@@ -447,7 +455,8 @@
           onClick: function () {
 			var params = {
 				"dayTag": 'month',
-				"orderTag": $("#orderTag").val()
+				"orderTag": $("#orderTag").val(),
+				"typeTag": $("#typeTag").val()
 			}     
 			urlSelect(params,type);    
          	$(obj).find(".dayTagText").text('本月')
@@ -458,7 +467,8 @@
           onClick: function () {
 			var params = {
 				"dayTag": 'lastmonth',
-				"orderTag": $("#orderTag").val()
+				"orderTag": $("#orderTag").val(),
+				"typeTag": $("#typeTag").val()
 			}         
 			urlSelect(params,type);
           	$(obj).find(".dayTagText").text('上月')
@@ -524,7 +534,56 @@
 	    } else {
 	   		unit = '笔';
 	    }
-    } 	 	 
+    }
+    
+ 	function typeSelect(obj,type) {
+      $.actions({
+        actions: [{
+          text: "订单",
+          onClick: function () {
+			var params = {
+				"dayTag":  $("#dayTag").val(),
+				"startDate": $("#startDay").val(),
+				"endDate" : $("#endDay").val(),
+				"orderTag": $("#orderTag").val(),
+				"typeTag": 'order'
+			}
+			urlSelect(params,type); 
+            $(obj).find(".typeText").text('订单')
+            $("#typeTag").val("order");
+          }
+        }, {
+          text: "打印",
+          onClick: function () {
+			var params = {
+				"dayTag":  $("#dayTag").val(),
+				"startDate": $("#startDay").val(),
+				"endDate" : $("#endDay").val(),			
+				"orderTag": $("#orderTag").val(),
+				"print" : 'true',
+				"typeTag": 'print'
+			}
+          	urlSelect(params,type);
+            $(obj).find(".typeText").text('打印')
+            $("#typeTag").val("print");
+          }
+        }, {
+          text: "出库",
+          onClick: function () {
+			var params = {
+				"dayTag":  $("#dayTag").val(),
+				"startDate": $("#startDay").val(),
+				"endDate" : $("#endDay").val(),			
+				"orderTag": $("#orderTag").val(),
+				"typeTag": 'outStock'
+			}
+			urlSelect(params,type);   
+          	$(obj).find(".typeText").text('出库')
+          	$("#typeTag").val("outStock");
+          }
+        }]
+      });
+ 	}      
 </#macro>
 <@layout>
 	<div class="weui-content">
@@ -541,6 +600,7 @@
 				</span>
 				<input type="hidden" id="orderTag">	
 				<input type="hidden" id="dayTag">
+				<input type="hidden" id="typeTag">
 				<input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'day')" readonly="">
 				<span class="overview-hd-segmenting fr"> - </span> 
 				<input class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'day')" readonly="">
@@ -568,10 +628,12 @@
 		</div>
 		<div class="weui-panel weui-panel_access">
 			<div class="weui-panel__hd">
-				<span class="overview-hd-title">业务员统计</span> <!--<span class="briefly" onclick="dayTagSelect(this,'user')">
-				<p class="dayTagText">今日</p>
+				<span class="overview-hd-title">业务员统计</span> 
+				<span class="briefly" onclick="typeSelect(this,'day')">
+					<p class="typeText">订单</p>
 					<i class="icon-angle-down"></i>
-				</span> <input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'user')" readonly="">
+				</span> 
+				<!--<input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'user')" readonly="">
 				<span class="overview-hd-segmenting fr"> - </span> <input
 					class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'user')" readonly="">  -->
 			</div>

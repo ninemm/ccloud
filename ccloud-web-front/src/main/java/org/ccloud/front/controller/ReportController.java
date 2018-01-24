@@ -25,12 +25,8 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.CustomerType;
-import org.ccloud.model.query.CustomerTypeQuery;
-import org.ccloud.model.query.SalesOrderQuery;
-import org.ccloud.model.query.SellerCustomerQuery;
-import org.ccloud.model.query.SellerProductQuery;
-import org.ccloud.model.query.SellerQuery;
-import org.ccloud.model.query.UserQuery;
+import org.ccloud.model.User;
+import org.ccloud.model.query.*;
 import org.ccloud.route.RouterMapping;
 
 import com.alibaba.fastjson.JSON;
@@ -82,8 +78,18 @@ public class ReportController extends BaseFrontController {
 		setAttr("deliveryDate", DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
 		render("report_sales.html");
 	}
+	
+	//经销商下或部门下业务员排行榜状态选择
+	public void orderAmountMenu() {
+		String typeTag = getPara("typeTag");
+		if (typeTag.equals("outStock")) {
+			orderAmountByOutStock();
+		} else {
+			orderAmount();
+		}
+	}	
 
-	//业务员订单总额统计
+	//业务员订单总额统计(订单或打印)
 	public void orderAmount() {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
@@ -93,8 +99,23 @@ public class ReportController extends BaseFrontController {
 		String customerType = getPara("customerType");
 		String deptId = getPara("deptId");
 		String userId = getPara("userId");
-		Record record = SalesOrderQuery.me().getMyOrderAmount(startDate, endDate, dayTag, customerType, deptId, sellerId, userId, dataArea);
+		String print = getPara("print");
+		Record record = SalesOrderQuery.me().getMyOrderAmount(startDate, endDate, dayTag, customerType, deptId, sellerId, userId, dataArea, print);
 		renderJson(record);
+	}
+	
+	//业务员订单总额统计(出库)
+	public void orderAmountByOutStock() {
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String dayTag = getPara("dayTag");
+		String sellerId = getSessionAttr("sellerId");
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String customerType = getPara("customerType");
+		String deptId = getPara("deptId");
+		String userId = getPara("userId");
+		Record record = SalesOrderQuery.me().getMyOrderAmountByOutStock(startDate, endDate, dayTag, customerType, deptId, sellerId, userId, dataArea);
+		renderJson(record);		
 	}
 	
 	//业务员订单状态统计
@@ -117,7 +138,8 @@ public class ReportController extends BaseFrontController {
 		String customerType = getPara("customerType");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String userId = getPara("userId");
-		List<Record> record = SalesOrderQuery.me().getMyOrderByCustomer(startDate, endDate, dayTag, customerType, sellerId, userId, dataArea);
+		String orderTag = getPara("orderTag");
+		List<Record> record = SalesOrderQuery.me().getMyOrderByCustomer(startDate, endDate, dayTag, customerType, sellerId, userId, dataArea, orderTag);
 		renderJson(record);
 	}
 	
@@ -277,9 +299,19 @@ public class ReportController extends BaseFrontController {
 		setAttr("startDate", startDate);
 		setAttr("endDate", endDate);		
 		render("seller_purchase_report.html");
-	}		
+	}
 	
-	//经销商下或部门下业务员排行榜
+	//经销商下或部门下业务员排行榜状态选择
+	public void getUserRankMenu() {
+		String typeTag = getPara("typeTag");
+		if (typeTag.equals("outStock")) {
+			getUserRankByOutStock();
+		} else {
+			getUserRank();
+		}
+	}
+	
+	//经销商下或部门下业务员排行榜(订单或打印)
 	public void getUserRank() {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
@@ -291,11 +323,37 @@ public class ReportController extends BaseFrontController {
 		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 		String deptId = getPara("deptId");
 		String orderTag = getPara("orderTag");
-		List<Record> record = SalesOrderQuery.me().getUserRank(startDate, endDate, dayTag, deptId, sellerId, orderTag, dataArea);
+		String print = getPara("print");
+		List<Record> record = SalesOrderQuery.me().getUserRank(startDate, endDate, dayTag, deptId, sellerId, orderTag, dataArea, print);
 		renderJson(record);
 	}
 	
-	//经销商或部门下业务员赠品统计
+	//经销商下或部门下业务员排行榜(出库)
+	public void getUserRankByOutStock() {
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String dayTag = getPara("dayTag");
+		String sellerId = getPara("sellerId");
+		if (StrKit.isBlank(sellerId)) {
+			sellerId = getSessionAttr("sellerId");
+		}
+		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String deptId = getPara("deptId");
+		String orderTag = getPara("orderTag");
+		List<Record> record = SalesOrderQuery.me().getUserRankByOutStock(startDate, endDate, dayTag, deptId, sellerId, orderTag, dataArea);
+		renderJson(record);
+	}
+	
+	public void getGiftCountByUserMenu() {
+		String typeTag = getPara("typeTag");
+		if (typeTag.equals("outStock")) {
+			getGiftCountByUserByOutStock();
+		} else {
+			getGiftCountByUser();
+		}
+	}
+	
+	//经销商或部门下业务员赠品统计(订单或打印)
 	public void getGiftCountByUser() {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
@@ -307,22 +365,69 @@ public class ReportController extends BaseFrontController {
 		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 		String deptId = getPara("deptId");
 		String orderTag = getPara("orderTag");
-		List<Record> record = SalesOrderQuery.me().getGiftCountByUser(startDate, endDate, dayTag, deptId, sellerId, dataArea, orderTag);
+		String print = getPara("print");
+		List<Record> record = SalesOrderQuery.me().getGiftCountByUser(startDate, endDate, dayTag, deptId, sellerId, dataArea, orderTag, print);
 		renderJson(record);
 	}
 	
-	//经销商下直营商赠品统计
+	//经销商或部门下业务员赠品统计(出库)
+	public void getGiftCountByUserByOutStock() {
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String dayTag = getPara("dayTag");
+		String sellerId = getPara("sellerId");
+		if (StrKit.isBlank(sellerId)) {
+			sellerId = getSessionAttr("sellerId");
+		}
+		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String deptId = getPara("deptId");
+		String orderTag = getPara("orderTag");
+		List<Record> record = SalesOrderQuery.me().getGiftCountByUserByOutStock(startDate, endDate, dayTag, deptId, sellerId, dataArea, orderTag);
+		renderJson(record);
+	}
+	
+	public void getGiftCountBySellerMenu() {
+		String typeTag = getPara("typeTag");
+		if (typeTag.equals("outStock")) {
+			getGiftCountBySellerByOutStock();
+		} else {
+			getGiftCountBySeller();
+		}
+	}
+	
+	//经销商下直营商赠品统计(订单或打印)
 	public void getGiftCountBySeller() {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		String dayTag = getPara("dayTag");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String orderTag = getPara("orderTag");
-		List<Record> record = SalesOrderQuery.me().getGiftCountBySeller(startDate, endDate, dayTag, dataArea, orderTag);
+		String print = getPara("print");
+		List<Record> record = SalesOrderQuery.me().getGiftCountBySeller(startDate, endDate, dayTag, dataArea, orderTag, print);
+		renderJson(record);
+	}
+	
+	//经销商下直营商赠品统计(出库)
+	public void getGiftCountBySellerByOutStock() {
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String dayTag = getPara("dayTag");
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String orderTag = getPara("orderTag");
+		List<Record> record = SalesOrderQuery.me().getGiftCountBySellerByOutStock(startDate, endDate, dayTag, dataArea, orderTag);
 		renderJson(record);
 	}	
 	
-	//经销商下直营商总额统计
+	public void getSellerCountMenu() {
+		String typeTag = getPara("typeTag");
+		if (typeTag.equals("outStock")) {
+			getSellerCountByOutStock();
+		} else {
+			getSellerCount();
+		}
+	}
+	
+	//经销商下直营商总额统计(订单或打印)
 	public void getSellerCount() {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
@@ -330,9 +435,22 @@ public class ReportController extends BaseFrontController {
 		String sellerId = getSessionAttr("sellerId");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String orderTag = getPara("orderTag");
-		List<Record> record = SalesOrderQuery.me().getSellerCount(startDate, endDate, dayTag, sellerId, dataArea, orderTag);
+		String print = getPara("print");
+		List<Record> record = SalesOrderQuery.me().getSellerCount(startDate, endDate, dayTag, sellerId, dataArea, orderTag, print);
 		renderJson(record);
 	}
+	
+	//经销商下直营商总额统计(出库)
+	public void getSellerCountByOutStock() {
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String dayTag = getPara("dayTag");
+		String sellerId = getSessionAttr("sellerId");
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String orderTag = getPara("orderTag");
+		List<Record> record = SalesOrderQuery.me().getSellerCountByOutStock(startDate, endDate, dayTag, sellerId, dataArea, orderTag);
+		renderJson(record);
+	}	
 	
 	//直营商产品统计
 	public void sellerProductCount() {
@@ -394,6 +512,16 @@ public class ReportController extends BaseFrontController {
 		String orderTag = getPara("orderTag");
 		List<Record> record = SalesOrderQuery.me().getDepartmentCount(startDate, endDate, dayTag, sellerId, dataArea, orderTag);
 		renderJson(record);		
+	}
+
+	public void visit() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String startDate = org.ccloud.utils.DateUtils.dateToStr(new Date(), "yyyy-MM-dd") + " 00:00:00";
+//		String startDate = "2017-01-01 00:00:00";
+		String endDate = org.ccloud.utils.DateUtils.dateToStr(new Date(), "yyyy-MM-dd") + " 23:59:59";
+		List<Record> visitList = CustomerVisitQuery.me().findLngLat(user.getId(), startDate, endDate);
+		setAttr("visitList", JSON.toJSON(visitList));
+		render("report_visit.html");
 	}
 	
 }

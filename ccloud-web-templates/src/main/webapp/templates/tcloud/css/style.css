@@ -155,6 +155,22 @@ a {
   color: #ea6f5a;
 }
 
+.weui-grid:nth-child(4n+1) .weui-grid__icon i {
+  color: #9c89b9;
+}
+
+.weui-grid:nth-child(4n+2) .weui-grid__icon i {
+  color: #19c594;
+}
+
+.weui-grid:nth-child(4n+3) .weui-grid__icon i {
+  color: #f7b55d;
+}
+
+.weui-grid:nth-child(4n+4) .weui-grid__icon i {
+  color: #f1745e;
+}
+
 i.icon.icon-prev {
   background-image: url(../images/left.svg)
 }

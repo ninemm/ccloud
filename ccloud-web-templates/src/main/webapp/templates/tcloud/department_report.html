@@ -58,12 +58,13 @@
     var deptObj = [];
     var unit = '件';
     function deptCount(params) {
+    	var salesIndent = document.getElementById('deptCount');
+    	var salesIndentChart = echarts.init(salesIndent);
+    	salesIndentChart.showLoading();    
 		Utils.ajax('${CPATH}/report/getDepartmentCountForSales', params, 
 			function(data){
+				salesIndentChart.hideLoading();
 				var orderTag = $("#orderTag").val();
-	        	var salesIndent = document.getElementById('deptCount');
-	        	var salesIndentTotal = 0;
-		        var $salesIndent = $(salesIndent);
 		        var yData = [];
 		        var seriesData = [];
 		        for (var i = 0; i < data.length; i++) {
@@ -77,7 +78,6 @@
 		           }
 		           deptObj[data[i].dept_name] = data[i].id;
 		       	}
-		       	var salesIndentChart = echarts.init(salesIndent);
 				option = {
 				    title: {
 				        text: '部门统计',
@@ -140,13 +140,15 @@
     }
     
     function productCount(params) {
+    	var product = document.getElementById('productCount');
+    	var productChart = echarts.init(product);
+    	productChart.showLoading();       
 		Utils.ajax('${CPATH}/report/productCount', params, 
 			function(data){
+				productChart.hideLoading();
 				var orderTag = $("#orderTag").val();
 				var height = data.length;
 				$("#productCount").height(50 * height + 100);
-		        var product = document.getElementById('productCount');
-		        var productChart = echarts.init(product);
 	            var productOption = {
 	                tooltip : {
 	                    trigger: 'axis'
@@ -185,8 +187,6 @@
 	                ],
 	                series : []
 	            };
-	            var productTotal = 0;
-	            var $product = $(product);
 	            for (var i = 0; i < data.length; i++) {
 	               var count = data[i].productCount;
 		           if (orderTag == 'productCount') {
@@ -220,12 +220,13 @@
     
     var salesObj = [];
     function userCount(params) {
+    	var salesIndent = document.getElementById('userCount');
+    	var salesIndentChart = echarts.init(salesIndent);
+    	salesIndentChart.showLoading();    
 		Utils.ajax('${CPATH}/report/getUserRank', params, 
 			function(data){
+				salesIndentChart.hideLoading();
 				var orderTag = $("#orderTag").val();
-	        	var salesIndent = document.getElementById('userCount');
-	        	var salesIndentTotal = 0;
-		        var $salesIndent = $(salesIndent);
 		        var yData = [];
 		        var seriesData = [];
 	            var length = data.length;
@@ -241,7 +242,6 @@
 		           }		           
 		           salesObj[data[i].realname] = data[i].id;
 		       	}
-		       	var salesIndentChart = echarts.init(salesIndent);
 		
 				option = {
 				    title: {

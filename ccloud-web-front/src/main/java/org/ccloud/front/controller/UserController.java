@@ -16,12 +16,7 @@ import org.ccloud.message.MessageKit;
 import org.ccloud.model.Department;
 import org.ccloud.model.SmsCode;
 import org.ccloud.model.User;
-import org.ccloud.model.query.CustomerVisitQuery;
-import org.ccloud.model.query.DepartmentQuery;
-import org.ccloud.model.query.SalesOrderQuery;
-import org.ccloud.model.query.SellerCustomerQuery;
-import org.ccloud.model.query.SmsCodeQuery;
-import org.ccloud.model.query.UserQuery;
+import org.ccloud.model.query.*;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.shiro.CaptchaUsernamePasswordToken;
 import org.ccloud.utils.CookieUtils;
@@ -181,6 +176,7 @@ public class UserController extends BaseFrontController {
 		setAttr("orderTotal", SalesOrderQuery.me().getToDo(user.getUsername()).size());
 		setAttr("customerVisitTotal",CustomerVisitQuery.me().getToDo(user.getUsername()).size());
 		setAttr("customerTotal",SellerCustomerQuery.me().getToDo(user.getUsername()).size());
+		setAttr("activityApplyTotal", ActivityApplyQuery.me().getToDo(user.getUsername()).size());
 		
 		render(String.format("user_center_%s.html", action));
 	}

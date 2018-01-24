@@ -39,28 +39,28 @@ $(function() {
 			</div>
 	</header>
 	<div>
-		<@shiro.hasPermission name="/admin/sellerCustomer/audit,/admin/salesOrder/check,/admin/customerVisit/audit">
+		<@shiro.hasPermission name="/admin/salesOrder/check,/admin/sellerCustomer/audit,/admin/customerVisit/audit,/admin/activityApply/check">
 		<div class="weui-cells__title">我的待办</div>
 		<div class="weui-grids">
-			<@shiro.hasPermission name="/admin/sellerCustomer/audit">
-			<a href="${CPATH}/todo/customer" class="weui-grid js_grid">
-				<#if (customerTotal??) && (customerTotal != 0)>
-			    <span class="weui-badge full-badge">${customerTotal!0}</span></#if>
-				<div class="weui-grid__icon">
-					<i class="icon-user" style="color: #9c89b9"></i>
-				</div>
-				<p class="weui-grid__label">客户审核</p>
-			</a>
-			</@shiro.hasPermission>
-			
 			<@shiro.hasPermission name="/admin/salesOrder/check">
 			<a href="${CPATH}/todo/order" class="weui-grid js_grid">
 				<#if (orderTotal??) && (orderTotal != 0)>
 				<span class="weui-badge full-badge">${orderTotal!0}</span></#if>
 				<div class="weui-grid__icon">
-					<i class="icon-file-text" style="color: #19c594"></i>
+					<i class="icon-calendar-check-o"></i>
 				</div>
 				<p class="weui-grid__label">订单审核</p>
+			</a>
+			</@shiro.hasPermission>
+		
+			<@shiro.hasPermission name="/admin/sellerCustomer/audit">
+			<a href="${CPATH}/todo/customer" class="weui-grid js_grid">
+				<#if (customerTotal??) && (customerTotal != 0)>
+			    <span class="weui-badge full-badge">${customerTotal!0}</span></#if>
+				<div class="weui-grid__icon">
+					<i class="icon-user"></i>
+				</div>
+				<p class="weui-grid__label">客户审核</p>
 			</a>
 			</@shiro.hasPermission>
 			
@@ -69,15 +69,27 @@ $(function() {
 				<#if (customerVisitTotal??) && (customerVisitTotal != 0)>
 				<span class="weui-badge full-badge">${customerVisitTotal!0}</span></#if>
 				<div class="weui-grid__icon">
-					<i class="icon-suitcase" style="color: #f7b55d;"></i>
+					<i class="icon-suitcase"></i>
 				</div>
 				<p class="weui-grid__label">拜访审核</p>
 			</a>
 			</@shiro.hasPermission>
+
+			<@shiro.hasPermission name="/admin/activityApply/check">
+			 <a href="${CPATH}/todo/activityApply" class="weui-grid js_grid">
+				 <#if (activityApplyTotal??) && (activityApplyTotal !=0)>
+				 <span class="weui-badge full-badge">${(activityApplyTotal)!}</span></#if>
+				<div class="weui-grid__icon">
+					<i class="icon-check-square-o"></i>
+				</div>
+				<p class="weui-grid__label">活动审核</p>
+			</a>
+			</@shiro.hasPermission>
+
 			<@shiro.hasPermission name="/admin/receivables">
 			<a href="${CPATH}/receivables/index" class="weui-grid js_grid">
 				<div class="weui-grid__icon relative">
-					<i class="icon-cc-visa" style="color: #f1745e;position: absolute;left: 50%;transform: translateX(-50%);"></i>
+					<i class="icon-cc-visa" style="position: absolute;left: 50%;transform: translateX(-50%);"></i>
 				</div>
 				<p class="weui-grid__label">收款管理</p>
 			</a>
@@ -90,7 +102,7 @@ $(function() {
 			<@shiro.hasPermission name="/admin/salesOrder">
 			<a href="${CPATH}/order/myOrder" class="weui-grid js_grid">
 				<div class="weui-grid__icon">
-					<i class="icon-file" style="color: #9c89b9"></i>
+					<i class="icon-file"></i>
 				</div>
 				<p class="weui-grid__label">我的订单</p>
 			</a>
@@ -99,7 +111,7 @@ $(function() {
 			<@shiro.hasPermission name="/admin/salesRefund">
 			<a href="${CPATH}/refund/myRefund" class="weui-grid js_grid">
 				<div class="weui-grid__icon">
-					<i class="icon-check-square-o" style="color: #19c594"></i>
+					<i class="icon-exchange"></i>
 				</div>
 				<p class="weui-grid__label">退货订单</p>
 			</a>
@@ -108,7 +120,7 @@ $(function() {
 			<@shiro.hasPermission name="/admin/salesRefund/add">
 			<a class="weui-grid js_grid" href="${CPATH}/refund/index">
 				<div class="weui-grid__icon">
-					<i class="icon-paper" style="color: #f7b55d;"></i>
+					<i class="icon-paper"></i>
 				</div>
 				<p class="weui-grid__label">申请退货</p>
 			</a>
@@ -117,59 +129,56 @@ $(function() {
 			<@shiro.hasPermission name="/front/inventory">
 			<a class="weui-grid js_grid" href="${CPATH}/inventory/index">
 				<div class="weui-grid__icon">
-					<i class="icon-database" style="color: #f1745e;"></i>
+					<i class="icon-database"></i>
 				</div>
 				<p class="weui-grid__label">库存详情</p>
 			</a>
 			</@shiro.hasPermission>
 		</div>
 		</@shiro.hasPermission>
-		<@shiro.hasPermission name="/admin/activityApply">
+		<@shiro.hasPermission name="/admin/activityApply/add,/admin/activityApply">
 		<div class="weui-cells__title">营销活动</div>
 		<div class="weui-grids">
-			<!--<a href="/activityList" class="weui-grid js_grid"> <span
-				class="weui-badge empty-badge">&nbsp;</span>
+			<@shiro.hasPermission name="/admin/activityApply/add">
+			<a href="${CPATH}/activity" class="weui-grid js_grid">
 				<div class="weui-grid__icon">
-					<i class="icon-file-text blue"></i>
+					<i class="icon-tasks"></i>
 				</div>
-				<p class="weui-grid__label">活动列表</p>
-			</a>-->
+				<p class="weui-grid__label">活动申请</p>
+			</a>
+			</@shiro.hasPermission>
 			<@shiro.hasPermission name="/admin/activityApply">
 			<a href="${CPATH}/activity/applyList" class="weui-grid js_grid">
 				<div class="weui-grid__icon">
-					<i class="icon-table" style="color: #ffa042"></i>
+					<i class="icon-table"></i>
 				</div>
 				<p class="weui-grid__label">申请记录</p>
 			</a>
 			</@shiro.hasPermission>
+			<a href="${CPATH}/plans" class="weui-grid js_grid">
+				<div class="weui-grid__icon">
+					<i class="icon-tasks"></i>
+				</div>
+				<p class="weui-grid__label">工作计划</p>
+			</a>
 		</div>
 		</@shiro.hasPermission>
 			<!--
-			<a href="./feeApplication.html" class="weui-grid js_grid">
+			 <a class="weui-grid js_grid">
 				<div class="weui-grid__icon">
-					<i class="icon-tasks" style="color: #19c594;"></i>
-				</div>
-				<p class="weui-grid__label">费用申请</p>
-			</a> <a href="./feeAuditList.html" class="weui-grid js_grid">
-				<div class="weui-grid__icon">
-					<i class="icon-exchange" style="color: #f1745e;"></i>
-				</div>
-				<p class="weui-grid__label">费用审批</p>
-			</a> <a class="weui-grid js_grid">
-				<div class="weui-grid__icon">
-					<i class="icon-envelope-o" style="color: #5F97F4;"></i>
+					<i class="icon-envelope-o"></i>
 				</div>
 				<p class="weui-grid__label">结案</p>
 			</a> <a class="weui-grid js_grid"> <span
 				class="weui-badge left-top-tag">NEW</span>
 				<div class="weui-grid__icon">
-					<i class="icon-air-play" style="color: #9C89B9;"></i>
+					<i class="icon-air-play"></i>
 				</div>
 				<p class="weui-grid__label">费用核销</p>
 			</a> <a class="weui-grid js_grid"> <span
 				class="weui-badge left-top-tag">NEW</span>
 				<div class="weui-grid__icon">
-					<i class="icon-list-alt" style="color: #f7b55d;"></i>
+					<i class="icon-list-alt"></i>
 				</div>
 				<p class="weui-grid__label">签到</p>
 			</a>
@@ -180,7 +189,7 @@ $(function() {
 		<@shiro.hasPermission name="/admin/customerVisit">
 			<a href="${(CPATH)}/customerVisit" class="weui-grid js_grid">
 				<div class="weui-grid__icon">
-					<i class="icon-building" style="color: #9c89b9"></i>
+					<i class="icon-building"></i>
 				</div>
 				<p class="weui-grid__label">拜访记录</p>
 			</a> 
@@ -188,7 +197,7 @@ $(function() {
 		<@shiro.hasPermission name="/admin/customerVisit/add">
 			<a href="${CPATH}/customerVisit/edit" class="weui-grid js_grid">
 				<div class="weui-grid__icon">
-					<i class="icon-plane" style="color: #19c594"></i>
+					<i class="icon-plane"></i>
 				</div>
 				<p class="weui-grid__label">新增拜访</p>
 			</a>
@@ -199,13 +208,13 @@ $(function() {
 		<div class="weui-grids">
 			<a id="service_btn" class="weui-grid js_grid">
 				<div class="weui-grid__icon">
-					<i class="icon-phone-square" style="color: #9c89b9"></i>
+					<i class="icon-phone-square"></i>
 				</div>
 				<p class="weui-grid__label">服务热线</p>
 			</a>
 			<a href="${CPATH}/feedback" class="weui-grid js_grid">
 				<div class="weui-grid__icon">
-					<i class="icon-comment" style="color: #19c594"></i>
+					<i class="icon-comment"></i>
 				</div>
 				<p class="weui-grid__label">意见反馈</p>
 			</a>

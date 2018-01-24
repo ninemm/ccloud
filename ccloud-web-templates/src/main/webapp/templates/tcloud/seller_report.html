@@ -77,11 +77,12 @@
     
     var salesObj = [];
     function userCount(params) {
+    	var salesIndent = document.getElementById('userCount');
+    	var salesIndentChart = echarts.init(salesIndent);
+    	salesIndentChart.showLoading();
 		Utils.ajax('${CPATH}/report/getUserRank', params, 
 			function(data){
-	        	var salesIndent = document.getElementById('userCount');
-	        	var salesIndentTotal = 0;
-		        var $salesIndent = $(salesIndent);
+				salesIndentChart.hideLoading();
 		        var yData = [];
 		        var seriesData = [];
 		        for (var i = 0; i < data.length; i++) {
@@ -89,7 +90,6 @@
 		           seriesData.push(data[i].productCount);
 		           salesObj[data[i].realname] = data[i].id;
 		       	}
-		       	var salesIndentChart = echarts.init(salesIndent);
 		
 				option = {
 				    title: {
@@ -143,18 +143,18 @@
     }
     
     function giftCount(params) {
+    	var salesIndent = document.getElementById('giftCount');
+    	var salesIndentChart = echarts.init(salesIndent);
+    	salesIndentChart.showLoading();
 		Utils.ajax('${CPATH}/report/getGiftCountByUser', params, 
 			function(data){
-	        	var salesIndent = document.getElementById('giftCount');
-	        	var salesIndentTotal = 0;
-		        var $salesIndent = $(salesIndent);
+				salesIndentChart.hideLoading();
 		        var yData = [];
 		        var seriesData = [];
 		        for (var i = 0; i < data.length; i++) {
 		           yData.push(data[i].realname);
 		           seriesData.push(data[i].productCount);
 		       	}
-		       	var salesIndentChart = echarts.init(salesIndent);
 		
 				option = {
 				    title: {

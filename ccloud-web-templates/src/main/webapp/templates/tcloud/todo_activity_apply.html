@@ -1,0 +1,313 @@
+<#include "_inc/_layout.html"/>
+<#macro title>我的待办(活动审核)</#macro>
+<#macro css> 
+	main{
+		top: 0!important;
+		bottom: 2.25rem;
+	}
+	
+	#customer-audit {
+		background: #f3f5f7;
+		height: inherit;
+	}
+
+	.weui-navbar__item.weui-bar__item--on {
+		color: #ea6f5a;
+		font-weight: bold;
+		background-color: #fff;
+	}
+
+	.weui-navbar__item.weui-bar__item--on:before {
+		content: "";
+		width: 80px;
+		height: 3px;
+		background: #ea6f5a;
+		position: absolute;
+		left: 50%;
+		margin-left: -40px;
+		bottom: -1px;
+		z-index: 10;
+	}
+
+	.weui-navbar:after {
+		border-bottom: 0;
+	}
+
+	.weui-navbar__item:after {
+		border-right: 0;
+	}
+</#macro>
+<#macro script_import>
+	<script src="${CPATH}/static/layer_mobile/layer.js"></script>
+</#macro>
+<#macro script>
+	var pageNumber = 2;
+	var pageSize = 10;
+	var loading = false;
+
+	var $endNode = null;
+	var $loadmore = $(".weui-loadmore");
+
+	var paramData = function() {
+		return  {
+			"pageNumber": pageNumber,
+			"pageSize": pageSize,
+		};
+	}
+
+	$(".infinite").infinite().on("infinite", function() {
+		var self = this;
+		$endNode = $(".weui-panel_access:last");
+		$loadmore = $(self).find(".weui-loadmore");
+		if ($loadmore) $loadmore.show();
+		if (loading) return ;
+		loading = true;
+
+		$.ajax({
+			type: "post",
+			url: "${CPATH}/todo/activityHistoryRefresh",
+			data: paramData(),
+			dataType: "json",
+			success:function(data) {
+				if ($loadmore) $loadmore.show();
+				if (data.totalPage >= pageNumber) {
+					$endNode.after(data.html);
+				}
+				if (data.totalPage == pageNumber) {
+					$(".infinite").destroyInfinite();
+					$loadmore.hide();
+				}
+					pageNumber++;
+					loading = false;
+			}
+		});
+	});
+	$(function() {
+
+	});
+
+	function refuse(id, taskId, pass, obj) {
+      layer.open({
+        type: 1,
+        title: ['活动审核',
+          'border-bottom: 1px solid #eee;height:2rem;line-height:2rem;margin-top:2.5rem'
+        ],
+		content: '<img src="${CTPATH}/images/image_orderpopups.png">' +
+		  '<p class="t-c">是否确认拒绝该活动申请？</p>' +
+			'<div><textarea id="comment" placeholder="补充说明，必填"></textarea></div>',
+        anim: 'scale',
+        className: 'audit',
+        btn: ['确认','取消'],
+        yes: function() {
+          var comment = $("#comment").val();
+          if (comment == ""){
+         	$.toptip('请注明拒绝理由', 'warning');
+            return;
+          }
+          doReject(id, taskId, pass, comment, obj);
+        },
+        no:function() {
+
+        }
+      });
+	}
+	
+    function agree(id, taskId, pass, obj) {
+      layer.open({
+        type: 1,
+        title: ['活动审核',
+          'border-bottom: 1px solid #eee;height:2rem;line-height:2rem;margin-top:2.5rem'
+        ],
+		content: '<img src="${CTPATH}/images/image_orderpopups.png">' +
+		  '<p class="t-c">是否确认通过该活动申请？</p>' +
+          '<div><textarea id="comment" placeholder="补充说明，可选填"></textarea></div>',
+        anim: 'scale',
+        className: 'audit',
+        btn: ['通过','取消'],
+        yes: function() {
+          var comment = $("#comment").val();
+          doPass(id, taskId, pass, comment, obj);
+        },
+        no:function() {
+
+        }
+      });
+	}
+
+	function doReject(id, taskId, pass, comment, obj){
+		var $this = $(obj);
+		layer.open({
+			type: 2,
+			content: '保存中...'
+		});
+		var params = {
+			"id": id,
+			"taskId": taskId,
+			"comment": comment,
+			'pass' : pass
+		}
+
+
+		Utils.ajax('${CPATH}/activity/complete', params,
+			function(res){
+				if (res.errorCode == 0) {
+					$.confirm({
+						title: '活动审核',
+						text: res.message,
+						onOK: function () {
+							location.href = '${CPATH}/todo/activityApply'
+						},
+						onCancel: function () {
+							$this.parents('.weui-panel').remove();
+							$.closeModal();
+						}
+					});
+				} else {
+					$.alert(res.message);
+				}
+				layer.closeAll();
+			}
+		)
+	};
+
+	function doPass(id, taskId, pass, comment, obj) {
+		var $this = $(obj);
+		layer.open({
+			type: 2,
+			content: '保存中...'
+		});
+		var params = {
+			"id": id,
+			"taskId": taskId,
+			"comment": comment,
+			'pass' : pass
+		}
+		Utils.ajax('${CPATH}/activity/complete', params,
+			function(res){
+				if (res.errorCode == 0) {
+					$.confirm({
+						title: '活动审核',
+						text: res.message,
+						onOK: function () {
+							location.href = '${CPATH}/todo/activityApply'
+						},
+						onCancel: function () {
+							$this.parents('.weui-panel').remove();
+							$.closeModal();
+						}
+					});
+				} else {
+					$.alert(res.message);
+				}
+				layer.closeAll();
+			}
+		)
+	};
+
+</#macro>
+
+<@layout>
+<div class="weui-content">
+	<div class="weui-tab">
+		<div class="weui-navbar">
+			<a class="weui-navbar__item weui-bar__item--on" href="#tab1" type="todo">待审</a>
+			<a class="weui-navbar__item" href="#tab2" type="done">已审 </a>
+		</div>
+		<div class="weui-tab__bd">
+			<div id="tab1" class="weui-tab__bd-item weui-tab__bd-item--active">
+				<main class="infinite">
+					<#if (todoList?? && todoList?size>0) >
+						<#list todoList as activityApply>
+							<div class="weui-panel weui-panel_access">
+								<div class="weui-cell weui-cell_access">
+									<a href="${CPATH}/activity/activityApplyReview?activityApplyId=${activityApply.id!}&taskId=${activityApply.taskId!}&assignee=${activityApply.assignee!}" style="display:block;width:100%;">
+										<div class="weui-cell__bd ft16">
+											<p class="customer_name">
+												${(activityApply.customer_name)!}
+											</p>
+											<div class="ft14 gray">
+												<p>活动名称：${(activityApply.title)!}</p>
+												<p>
+													联系人：<span>${(activityApply.ccontact)!} / ${(activityApply.cmobile)!}</span>
+													<span class="fr">${(activityApply.customerTypeNames)!}</span>
+												</p>
+												<p>
+													投入金额：￥<span>${(activityApply.invest_amount)!}</span>
+													<span class="fr" id="date">时间：${(activityApply.create_date)!}</span>
+												</p>
+											</div>
+										</div>
+									</a>
+								</div>
+								<div class="weui-cell weui-cell_access">
+									<a class="weui-cell__bd" style="color: gray" href="${CPATH}/activity/activityApplyReview?activityApplyId=${activityApply.id!}&taskId=${activityApply.taskId!}&assignee=${activityApply.assignee!}">活动详情</a>
+									<span class="weui-cell__ft"></span>
+								</div>
+								<#if activityApply.assignee?contains(username)>
+									<div class="weui-cell weui-cell_access">
+										<div class="width-100 ft14 operate-btn">
+												<div class="button white-button fl" onclick="refuse('${(activityApply.id)!}', '${(activityApply.taskId)!}', 0, this)">拒绝</div>
+												<div class="button red-button fr" onclick="agree('${(activityApply.id)!}', '${(activityApply.taskId)!}', 1, this)">同意</div>
+										</div>
+									</div>
+								</#if>
+							</div>
+						</#list>
+					<#else>
+						<div class="weui-loadmore weui-loadmore_line">
+							<span class="weui-loadmore__tips">暂无数据</span>
+						</div>
+					</#if>
+				</main>
+			</div>
+			<div id="tab2" class="weui-tab__bd-item weui-tab__bd-item">
+				<main class="infinite">
+					<#if historyList ??>
+						<#list historyList.list as activityApplyInfo>
+							<div class="weui-panel weui-panel_access">
+								<div class="weui-cell weui-cell_access">
+									<a href="${CPATH}/activity/activityApplyReview?activityApplyId=${activityApplyInfo.id!}" style="display:block;width:100%;">
+										<div class="weui-cell__bd ft16">
+											<p class="customer_name">
+												${(activityApplyInfo.customer_name)!}
+											</p>
+											<div class="ft14 gray">
+												<p>活动名称：${(activityApplyInfo.title)!}</p>
+												<p>
+													联系人：<span>${(activityApplyInfo.ccontact)!} / ${(activityApplyInfo.cmobile)!}</span>
+													<span class="fr">${(activityApplyInfo.customerTypeNames)!}</span>
+												</p>
+												<p>
+													投入金额：￥<span>${(activityApplyInfo.invest_amount)!}</span>
+													<span class="fr" id="date">时间：${(activityApplyInfo.endTime)!}</span>
+												</p>
+											</div>
+										</div>
+									</a>
+								</div>
+								<div class="weui-cell weui-cell_access">
+									<a class="weui-cell__bd" style="color: gray" href="${CPATH}/activity/activityApplyReview?activityApplyId=${activityApplyInfo.id!}">活动详情</a>
+									<span class="weui-cell__ft"></span>
+								</div>
+							</div>
+						</#list>
+					</#if>
+					<#if historyList??>
+						<#if historyList.totalRow = 0>
+							<div class="weui-loadmore weui-loadmore_line">
+								<span class="weui-loadmore__tips">暂无数据</span>
+							</div>
+							<#elseif historyList.totalRow &gt; 10>
+								<div class="weui-loadmore">
+									<i class="weui-loading"></i>
+									<span class="weui-loadmore__tips">正在加载</span>
+								</div>
+						</#if>
+					</#if>
+				</main>
+			</div>
+		</div>
+	</div>
+<#include "_inc/_goback_bottom.html" />
+</div>
+</@layout>

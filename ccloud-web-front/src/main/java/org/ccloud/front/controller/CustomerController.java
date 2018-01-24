@@ -452,7 +452,7 @@ public class CustomerController extends BaseFrontController {
 			}
 		}
 
-		Boolean isChecked = OptionQuery.me().findValueAsBool("web_proc_customer_review_" + getSessionAttr("sellerCode"));
+		Boolean isChecked = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_CUSTOMER_REVIEW + getSessionAttr("sellerCode"));
 
 		if(isChecked == null || !isChecked) {
 			//如果不走流程直接做操作
@@ -762,7 +762,7 @@ public class CustomerController extends BaseFrontController {
 		
 		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(customerId);
 		boolean isUpdated = true;
-		Boolean isCustomerAudit = OptionQuery.me().findValueAsBool("isCustomerAudit");
+		Boolean isCustomerAudit = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_CUSTOMER_REVIEW + getSessionAttr("sellerCode"));
 		
 		if (sellerCustomer == null) {
 			renderError(404);

@@ -2000,5 +2000,5 @@ public class SalesOrderQuery extends JBaseQuery {
 				+ "where sojo.outstock_id = '"+outStockId+"'";
 		return DAO.findFirst(sql);
 	}
-	
+
  }

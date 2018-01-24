@@ -51,8 +51,6 @@ public class ActivityQuery extends JBaseQuery {
 			fromBuilder.append(" where 1 = 1");
 		}
 
-        if (params.isEmpty())
-            return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 		if (StrKit.notBlank(startDate)) {
 			fromBuilder.append(" and ca.create_date >= ?");
 			params.add(startDate);
@@ -82,8 +80,10 @@ public class ActivityQuery extends JBaseQuery {
     }
 
     public List<Record> findActivityListForApp(String sellerId, String keyword, String tag) {
-        StringBuilder fromBuilder = new StringBuilder(" SELECT a.*, d.name as categoryName FROM cc_activity a");
+        StringBuilder fromBuilder = new StringBuilder(" SELECT a.*, d.name as categoryName, ct.name as customerTypeName, dd.name as timeIntervalName FROM cc_activity a");
         fromBuilder.append(" left join dict d on a.category = d.value ");
+	    fromBuilder.append(" left join cc_customer_type ct on a.customer_type = ct.id ");
+	    fromBuilder.append(" left join dict dd on a.time_interval = dd.value ");
         fromBuilder.append(" WHERE a.is_publish = 1 ");
 
         LinkedList<Object> params = new LinkedList<Object>();
@@ -99,5 +99,9 @@ public class ActivityQuery extends JBaseQuery {
 
         return Db.find(fromBuilder.toString(), params.toArray());
     }
-
+    
+    public List<Activity> findAll(){
+    	String sql = "select * from cc_activity where is_publish = 1";
+    	return DAO.find(sql);
+    }
 }

@@ -1,0 +1,164 @@
+<#include "_inc/_layout.html"/>
+<#macro title>月度计划</#macro>
+<#macro css_import>
+</#macro>
+<#macro css>
+	input {
+		width: 65%!important;
+		text-align: right;
+	}
+	.icon-sort-desc {
+		margin-left: .5rem;
+	}
+</#macro>
+<#macro script_import>
+</#macro>
+<#macro script>
+var productInfoMap = ${productItems!};
+	$("#productName").select({
+		  title: "选择产品",
+		  items: productInfoMap,
+		  onChange:function(obj){
+		  	console.log(this.data['values']);
+		  	var $product = $(this)[0].$input.parents(".productInfo");
+		  	$product.find("#productId").val(this.data['values']);
+		  }
+		});
+var $productList = $(".productList");
+var newHtml = $(".productList").html();
+$(function() {
+	$("#type").select({
+		title: "选择计划类型",
+		items: [ {
+			      title: "月度计划",
+			      value: "m"
+			    },
+			    {
+			      title: "年计划",
+			      value: "y"
+			    }],
+		 onChange:function(obj){
+		  	console.log(this.data['values']);
+		  	var $product = $(this)[0].$input.parents(".type");
+		  	$product.find("#typeId").val(this.data['values']);
+		  }
+	});
+	$("#start-date").calendar({
+		maxDate: function() {
+			return $('#end-date').val()
+		}
+	});
+	$("#start-date").val($.today());
+	$("#end-date").calendar({
+		minDate: function() {
+			var date = new Date($('#start-date').val().replace(/-/g,"/"));
+			date.setDate(date.getDate() - 1);
+			return date.Format("yyyy-MM-dd")
+		}
+	});
+	$("#end-date").val($.today());
+	
+	$(document).on("click", "#plans", function() {
+		doSubmit();
+	})
+ })
+function addProduct(){
+	$productList.append(newHtml);
+	var $productInfo = $productList.find(".productInfo:last");
+	$productInfo.find("#productName").select({
+		  title: "选择产品",
+		  items: productInfoMap,
+		  onChange:function(obj){
+		  	console.log(this.data['values']);
+		  	var $product = $(this)[0].$input.parents(".productInfo");
+		  	$product.find("#productId").val(this.data['values']);
+		  }
+	});
+}
+
+function doSubmit(){
+	$("#form").ajaxSubmit({
+			beforeSubmit: function() {
+				return true
+			},
+			type : "post",
+			dataType : "json",
+			success : function(data) {
+				layer.closeAll();
+				alert("信息提交成功");
+			},
+			error : function() {
+				layer.closeAll();
+				alert("信息提交错误");
+			}
+		});
+}
+</#macro>
+<@layout>
+<form action="${CPATH}/plans/makePlan" method="post" id="form">
+	<div class="weui-content">
+		<div class="weui-panel weui-panel_access plane-select-box">
+			<div class="weui-cells mg-0 select-area">
+				<div class="weui-cell">
+					<div class="weui-cell__bd type">
+						<div class="order-customer-info-title">计划类型
+							<span class="require">*</span>
+						</div>
+						<i class="icon-sort-desc fr"></i>
+						<input type="text" class="weui-input fr" id="type" name="type" readonly="" placeholder="请选择计划类型">
+						<input type="hidden" class="weui-input fr" id="typeId" name="typeId" value="">
+					</div>
+				</div>
+				<div class="weui-cell">
+					<div class="weui-cell__bd">
+						<div class="order-customer-info-title">开始时间
+							<span class="require">*</span>
+						</div>
+						<i class="icon-sort-desc fr"></i>
+						<input type="text" class="weui-input fr" id="start-date" name="start-date" readonly="">
+					</div>
+				</div>
+				<div class="weui-cell">
+					<div class="weui-cell__bd">
+						<div class="order-customer-info-title">结束时间
+							<span class="require">*</span>
+						</div>
+						<i class="icon-sort-desc fr"></i>
+						<input type="text" class="weui-input fr" id="end-date" name="end-date" readonly="">
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="weui-cells__title">计划明细</div>
+		<div class="weui-panel weui-panel_access productList">
+			<div class="weui-cells mg-0 productInfo">
+				<div class="weui-cell weui-cell_access">
+					<div class="weui-cell__bd">
+						产品名称
+					</div>
+					<input type="text" name="productName" id="productName" class="weui-input">
+					<input type="hidden" name="productId" id="productId" class="weui-input">
+					<div class="weui-cell__ft"></div>
+				</div>
+				<div class="weui-cell">
+					<div class="weui-cell__bd">
+						数量
+					</div>
+					<input type="text" class="weui-input" name="productNum">
+					<div class="weui-cell__ft">件</div>
+				</div>
+			</div>
+		</div>
+		<section class="weui-panel weui-panel_access">
+			<div class="weui-cell weui-cell_access t-c ft14">
+				<p class="width-100 blue" onclick="addProduct()">
+					<i class="icon-plus-circle"></i>新增产品</p>
+			</div>
+		</section>
+	</div>
+	<#include "_inc/_goback.html" />
+	<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
+		<button id="plans" type="button" class="red-button width-100">提交</button>
+	</footer>
+</form>
+</@layout>

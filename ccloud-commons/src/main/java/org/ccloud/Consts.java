@@ -154,6 +154,7 @@ public class Consts {
 	public static final String OPTION_WEB_PROC_NUM_LIMIT = "web_proc_num_limit_";//商品数量审核开关设置
 	public static final String OPTION_WEB_PROC_PRICE_LIMIT = "web_proc_price_limit_";//商品价格审核开关设置
 	public static final String OPTION_WEB_PROC_CUSTOMER_VISIT = "web_proc_customer_visit_";//新增拜访审核开关设置
+	public static final String OPTION_WEB_PROC_ACTIVITY_APPLY = "web_proc_activity_apply_";//申请活动审核开关设置
 	public static final String OPTION_FILE_ROOT_PATH = "web_file_root_path";
 
 	public static final String OPTION_ON = "true";
@@ -189,6 +190,7 @@ public class Consts {
 	public static final String OBJECT_TYPE_ORDER= "order";//订单
 	public static final String OBJECT_TYPE_CUSTOMER = "customer";//客户
 	public static final String OBJECT_TYPE_CUSTOMER_VISIT= "visit";//拜访
+	public static final String OBJECT_TYPE_ACTIVITY_APPLY= "activity";//活动
 	//是否阅读 0:否 1:是
 	public static final Integer IS_READ= 1;
 	public static final Integer NO_READ= 0;
@@ -205,28 +207,28 @@ public class Consts {
 	public static final String WAREHOUSE_TYPE_CAR = "2";// 车销仓库
 	
 	//活动类型
-	public static final String CATEGORY_NORMAL="101101" ; //普通活动
-	public static final String CATEGORY_INVEST="101101" ; //投入活动
+	public static final String CATEGORY_NORMAL="101001" ; //普通活动
+	public static final String CATEGORY_INVEST="101002" ; //投入活动
 	
 	//投入类型
 	public static final String INVEST_TYPE = "activity_invest";//投入的类型
-	public static final String INVEST_SHOP="110001" ; //商品
-	public static final String INVEST_MATTER="110002" ; //物料
-	public static final String INVEST_ACTIVITY="110003" ; //费用活动费
+	public static final String INVEST_SHOP="101101" ; //商品
+	public static final String INVEST_MATTER="101102" ; //物料
+	public static final String INVEST_ACTIVITY="101103" ; //费用活动费
 	
 	//客户参与活动的时间区间
-	public static final String TIME_INTERVAL_ONE="100101";//1个月
-	public static final String TIME_INTERVAL_TWO="100102";//2个月
-	public static final String TIME_INTERVAL_THREE="100103";//3个月
-	public static final String TIME_INTERVAL_FOUR="100104";//4个月
-	public static final String TIME_INTERVAL_FIVE="100105";//5个月
-	public static final String TIME_INTERVAL_SIX="100106";//6个月
-	public static final String TIME_INTERVAL_SEVEN="100107";//7个月
-	public static final String TIME_INTERVAL_EIGHT="100108";//8个月
-	public static final String TIME_INTERVAL_NINE="100109";//9个月
-	public static final String TIME_INTERVAL_TEN="100110";//10个月
-	public static final String TIME_INTERVAL_ELEVEN="100111";//11个月
-	public static final String TIME_INTERVAL_TWELVE="100112";//12个月
+	public static final String TIME_INTERVAL_ONE="100801";//1个月
+	public static final String TIME_INTERVAL_TWO="100802";//2个月
+	public static final String TIME_INTERVAL_THREE="100803";//3个月
+	public static final String TIME_INTERVAL_FOUR="100804";//4个月
+	public static final String TIME_INTERVAL_FIVE="100805";//5个月
+	public static final String TIME_INTERVAL_SIX="100806";//6个月
+	public static final String TIME_INTERVAL_SEVEN="100807";//7个月
+	public static final String TIME_INTERVAL_EIGHT="100808";//8个月
+	public static final String TIME_INTERVAL_NINE="100809";//9个月
+	public static final String TIME_INTERVAL_TEN="100810";//10个月
+	public static final String TIME_INTERVAL_ELEVEN="100811";//11个月
+	public static final String TIME_INTERVAL_TWELVE="100812";//12个月
 	
 	
 	public static final String PROC_CUSTOMER_REVIEW = "_customer_review";				// 客户审核
@@ -235,5 +237,6 @@ public class Consts {
 	public static final String PROC_ORDER_REVIEW_ONE = "_order_review_1";				// 订单1审
 	public static final String PROC_ORDER_REVIEW_TWO = "_order_review_2";				// 订单2审
 	public static final String PROC_ORDER_REVIEW_THREE = "_order_review_3";				// 订单3审
-	
+	public static final String PROC_ACTIVITY_APPLY_REVIEW = "_activity_apply_review";	// 活动审核
+
 }

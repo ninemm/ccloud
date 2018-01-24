@@ -216,7 +216,7 @@
                 if($("#customer_type").val().length==0) {$.toptip('客户类型不能为空', 1000, 'error'); return false;}
                 if($("#delivery-address").val().length==0) {$.toptip('配送地址不能为空', 1000, 'error'); return false;}
                 if($("#address").val().length==0) {$.toptip('地址详情不能为空', 1000, 'error'); return false;}
-                if($("#location").val().length==0) {$.toptip('定位地址不能为空,请刷新定位', 1000, 'error'); return false;} 
+                if($("#location").val().length==0) {$.toptip('定位地址不能为空,请刷新定位', 1000, 'error'); return false;}
 
                 $('._submit_btn').attr('disabled', true);
                 layer.open({
@@ -475,9 +475,9 @@
                         <div class="weui-cell__hd"><span class="icon-map-pin ft16 green"></span></div>
                         <div class="weui-cell__bd">
                             <div id="location-span" class="location">${(sellerCustomer.location)!'正在定位...'}</div>
-                            <input type="hidden" name="sellerCustomer.lng" id="lng">
-                            <input type="hidden" name="sellerCustomer.lat" id="lat">
-                            <input type="hidden" name="sellerCustomer.location" id="location">
+                            <input type="hidden" name="sellerCustomer.lng" id="lng" value="${(sellerCustomer.lng)!}">
+                            <input type="hidden" name="sellerCustomer.lat" id="lat" value="${(sellerCustomer.lat)!}">
+                            <input type="hidden" name="sellerCustomer.location" id="location" value="${(sellerCustomer.location)!}">
                         </div>
                         <div class="weui-cell__hd" id="refresh"><span class="icon-refresh ft16 gray" onclick="refreshLocation()"></span></div>
                     </div>

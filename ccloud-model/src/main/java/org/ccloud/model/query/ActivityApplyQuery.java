@@ -16,10 +16,12 @@
 package org.ccloud.model.query;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Record;
+import org.ccloud.Consts;
 import org.ccloud.model.ActivityApply;
 
 import com.jfinal.plugin.activerecord.Page;
@@ -42,7 +44,7 @@ public class ActivityApplyQuery extends JBaseQuery {
 			@Override
 			public Object load() {
 				StringBuilder sql = new StringBuilder("SELECT caa.*, cc.customer_name, DATE_FORMAT(ca.start_time, '%m-%d') as start_date, DATE_FORMAT(ca.end_time, '%m-%d') as end_date, " +
-						"d.name, ca.invest_type, cc.contact, cc.mobile, u.realname, DATE_FORMAT(caa.create_date, '%Y-%m-%d') as format_create_date, ca.invest_amount, ca.code ");
+						"d.name, ca.invest_type, cc.contact, cc.mobile, u.realname, DATE_FORMAT(caa.create_date, '%Y-%m-%d') as format_create_date, ca.invest_amount, ca.title, ca.code ");
 
 				sql.append("FROM cc_activity_apply caa ");
 				sql.append("LEFT JOIN cc_activity ca ON caa.activity_id = ca.id ");
@@ -109,8 +111,69 @@ public class ActivityApplyQuery extends JBaseQuery {
 			sql.append(" and caa.create_date <= ?");
 			params.add(endDate);
 		}
+		sql.append(" order by caa.create_date desc ");
 		return Db.paginate(pageNumber, pageSize, select, sql.toString(), params.toArray());
 	}
 
+	public List<Record> getToDo(String username) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(" SELECT o.*, ca.title, ca.invest_amount, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, t1.customerTypeNames, a.ID_ taskId, a.NAME_ taskName, a.ASSIGNEE_ assignee, a.CREATE_TIME_ createTime ");
+		sb.append(" FROM cc_activity_apply o ");
+		sb.append(" left join cc_activity ca on o.activity_id = ca.id");
+		sb.append(" left join cc_seller_customer cc ON o.seller_customer_id = cc.id ");
+		sb.append(" left join cc_customer c on cc.customer_id = c.id ");
+
+		sb.append(" LEFT JOIN (SELECT c1.id,GROUP_CONCAT(ct. NAME) AS customerTypeNames ");
+		sb.append(" FROM cc_seller_customer c1 ");
+		sb.append(" LEFT JOIN cc_customer_join_customer_type cjct ON c1.id = cjct.seller_customer_id ");
+		sb.append(" LEFT JOIN cc_customer_type ct ON cjct.customer_type_id = ct.id ");
+		sb.append(" GROUP BY c1.id) t1 ON o.seller_customer_id = t1.id ");
+
+		sb.append(" JOIN act_ru_task a on o.proc_inst_id = a.PROC_INST_ID_ ");
+		sb.append(" where FIND_IN_SET(?, a.ASSIGNEE_) ");
+
+		sb.append(" GROUP BY o.id ");
+		sb.append(" order by o.create_date DESC");
+		return Db.find(sb.toString(), username);
+	}
+
+	public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procKey, String username) {
+
+		String select = "SELECT o.*, ca.title, ca.invest_amount, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, t1.customerTypeNames, i.TASK_ID_ taskId, i.ACT_NAME_ taskName, i.ASSIGNEE_ assignee, i.END_TIME_ endTime  ";
+
+		LinkedList<Object> params = new LinkedList<>();
+		StringBuilder sql = new StringBuilder(" FROM cc_activity_apply o ");
+		sql.append(" left join cc_activity ca on o.activity_id = ca.id");
+		sql.append(" left join cc_seller_customer cc ON o.seller_customer_id = cc.id ");
+		sql.append(" left join cc_customer c on cc.customer_id = c.id ");
+
+		sql.append(" LEFT JOIN (SELECT c1.id,GROUP_CONCAT(ct. NAME) AS customerTypeNames ");
+		sql.append(" FROM cc_seller_customer c1 ");
+		sql.append(" LEFT JOIN cc_customer_join_customer_type cjct ON c1.id = cjct.seller_customer_id ");
+		sql.append(" LEFT JOIN cc_customer_type ct ON cjct.customer_type_id = ct.id ");
+		sql.append(" GROUP BY c1.id) t1 ON o.seller_customer_id = t1.id ");
+
+		sql.append(" JOIN act_hi_actinst i on o.proc_inst_id = i.PROC_INST_ID_ ");
+		sql.append(" JOIN act_re_procdef p on p.ID_ = i.PROC_DEF_ID_ ");
+		sql.append(" WHERE i.DURATION_ is not null AND p.KEY_ = ? ");
+		params.add(procKey);
+		if (StrKit.notBlank(username)) {
+			sql.append(" AND FIND_IN_SET(?, i.ASSIGNEE_)");
+			params.add(username);
+		}
+		sql.append(" GROUP BY o.id ");
+		sql.append(" order by i.END_TIME_ desc ");
+
+		return Db.paginate(pageNumber, pageSize, select, sql.toString(), params.toArray());
+	}
 	
+	public long findByActivityId(String activityId){
+		String sql = "activity_id = ?";
+		return DAO.doFindCount(sql, activityId);
+	}
+	
+	public Long findBySellerCustomerIdAndActivityId(String activityId,String sellerCustomerId,String date){
+		String sql = "activity_id = ? and seller_customer_id = ? and create_date > ?";
+		return DAO.doFindCount(sql, activityId, sellerCustomerId, date);
+	}
 }

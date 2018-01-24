@@ -1,0 +1,134 @@
+<#include "_inc/_layout.html"/>
+<#macro title>计划列表</#macro>
+<#macro css>
+	#my-order {
+		position: absolute;
+		top: 44px;
+		bottom: 0;
+	}
+	.weui-panel {
+		padding-right: 1.5rem!important;
+	}
+	.icon-chevron-right {
+		position: absolute;
+		right: .5rem;
+		top: 50%;
+		transform: translateY(-50%);
+	}
+</#macro>
+<#macro script>	
+$(function() {
+	$("#type").select({
+		title: "选择计划类型",
+		items: ["月度计划", "年计划"]
+	});
+	$("#user").select({
+		title: "选择业务员",
+		items: ["张三", "李四"]
+	});
+	$("#start-date").calendar({
+		maxDate: function() {
+			return $('#end-date').val()
+		}
+	});
+	$("#start-date").val($.today());
+	$("#end-date").calendar({
+		minDate: function() {
+			var date = new Date($('#start-date').val().replace(/-/g,"/"));
+			date.setDate(date.getDate() - 1);
+			return date.Format("yyyy-MM-dd")
+		}
+	});
+	$("#end-date").val($.today());
+})
+</#macro>
+<@layout>
+<div class="weui-content">
+	<header>
+		<div class="weui-search-bar" id="SearchBar">
+			<form class="weui-search-bar__form">
+				<div class="weui-search-bar__box">
+					<i class="weui-icon-search"></i>
+					<input type="search" class="weui-search-bar__input" id="searchInput" placeholder="搜索" required="">
+					<a href="javascript:" class="weui-icon-clear" id="searchClear" ></a>
+				</div>
+				<label class="weui-search-bar__label" id="searchText">
+					<i class="weui-icon-search"></i>
+					<span>请输入业务员名称</span>
+				</label>
+			</form>
+			<a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel" >取消</a>
+		</div>
+	</header>
+	<article id="my-order" class="ft14">
+		<header class="has-th-list weui-flex">
+			<div class="head-search select-area weui-flex__item">
+				<div class="weui-flex">
+					<div class="weui-flex__item">
+						<input type="text" id="type" class="weui-input" readonly placeholder="计划类型">
+						<i class="icon-sort-desc"></i>
+					</div>
+					<div class="weui-flex__item">
+						<input type="text" id="user" placeholder="业务员" class="weui-input" readonly>
+						<i class="icon-sort-desc"></i>
+					</div>
+				</div>
+			</div>
+			<div id="combin-filter-btn">
+				<i class="icon-th-list"></i>
+			</div>
+		</header>
+		<main>
+			<div class="ft12">
+				<div class="weui-panel weui-panel_access">
+					<div class="customer_name">
+						<span>张三</span>
+						<span class="fr orange ft12">年计划</span>
+					</div>
+					<div class="weui-flex gray">
+						<div class="weui-flex__item">开始时间：2018-01-02</div>
+						<span style="width:1rem" class="t-c">-</span>
+						<div class="weui-flex__item t-r">结束时间：2018-02-02</div>
+					</div>
+					<i class="icon-chevron-right gray"></i>
+				</div>
+				<div class="weui-panel weui-panel_access">
+					<div class="customer_name">
+						<span>李四</span>
+						<span class="fr orange ft12">月度计划</span>
+					</div>
+					<div class="weui-flex gray">
+						<div class="weui-flex__item">开始时间：2018-01-02</div>
+						<span style="width:1rem" class="t-c">-</span>
+						<div class="weui-flex__item t-r">结束时间：2018-02-02</div>
+					</div>
+					<i class="icon-chevron-right gray"></i>
+				</div>
+			</div>
+			<div class="weui-loadmore" id="loading" style="display: none;">
+			  <i class="weui-loading"></i>
+			  <span class="weui-loadmore__tips">正在加载</span>
+			</div>
+			<div class="weui-loadmore weui-loadmore_line" id="noMore" style="display: none;">
+			  <span class="weui-loadmore__tips">暂无数据</span>
+			</div>
+		</main>
+	</article>
+</div>
+<article id="combin-filter" >
+	<div class="filter-item">
+		<h4>日期区间</h4>
+		<div class="relative weui-flex" id="getDate">
+			<input type="text" id="start-date" class="weui-input weui-flex__item" readonly>
+			<div style="width:1rem" class="t-c">-</div>
+			<input type="text" id="end-date" class="weui-input weui-flex__item" readonly>
+		</div>
+	</div>
+	<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
+		<button class="white-button-no-border  cancel-search-btn weui-flex__item border-top-1px">取消</button>
+		<button class="red-button confirm-search-btn weui-flex__item">确定</button>
+	</footer>
+</article>
+<div class="layer"></div>
+<#include "_inc/_goback_bottom.html" />
+</@layout>

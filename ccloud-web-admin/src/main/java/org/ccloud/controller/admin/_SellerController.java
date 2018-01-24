@@ -166,9 +166,13 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		customer.setProvCode(areaCodeArray[0]);
 		customer.setCityName(areaNameArray[1]);
 		customer.setCityCode(areaCodeArray[1]);
-		
 		String [] brandIds= brandList.split(",");
 		if (StrKit.isBlank(sellerId)) {
+			Seller sr = SellerQuery.me().findbyCode(seller.getSellerCode());
+			if(sr!=null){
+				renderAjaxResultForError("销售商编码不可重复，请重新输入！");
+				return;
+			}
 			Seller seller1=SellerQuery.me().findByDeptId(department.getId());
 			if(seller1!=null){
 					renderAjaxResultForError("该公司部门已有一个经销商或者直营商，请确认");
@@ -578,7 +582,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 	
 	@Before(Tx.class)
 	public void saveSeller(Seller seller,Department department,User user,String productTypes){
-		
+		/*//销售商自动生成销售商编码
 		List<Seller> list = SellerQuery.me().findAll();
 		int s = list.size();
 		s++;
@@ -588,10 +592,9 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		for(int m=0;m<(5-countt);m++){
 			j= "0"+j;
 		}
-		w += j;
+		w += j;*/
 		String sellerId = StrKit.getRandomUUID();
 		seller.setId(sellerId);
-		seller.setSellerCode(w);
 		seller.setProductTypeStore(productTypes);
 		seller.setCreateDate(new Date());
 		seller.setModifyUserId(user.getId());
@@ -891,6 +894,17 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			sellerJoinTemplate.setName(printTemplate.getTemplateName());
 			sellerJoinTemplate.save();                                                                                                                        
 		}
+	}
+	
+	//检查用户填写的编码是否已经存在了
+	public void checkCode() {
+		String code = getPara("code");
+		Seller sr = SellerQuery.me().findbyCode(code);
+		boolean result = false;
+		if(sr!=null){
+			result = true;
+		}
+		renderJson(result);
 	}
 }
 

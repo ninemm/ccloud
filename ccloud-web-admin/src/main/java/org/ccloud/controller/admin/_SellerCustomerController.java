@@ -430,8 +430,8 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 	@RequiresPermissions(value = { "/admin/sellerCustomer/uploading", "/admin/dealer/all",
 			"/admin/all" }, logical = Logical.OR)
 	public void customerTemplate() {
-		String realPath = getSession().getServletContext().getRealPath("\\");
-		renderFile(new File(realPath + "\\WEB-INF\\admin\\seller_customer\\customerTemplate.xlsx"));
+		String realPath = getSession().getServletContext().getRealPath("\\")+ "\\WEB-INF\\admin\\seller_customer\\customerTemplate.xlsx";
+		renderFile(new File(realPath.replace("\\", "/")));
 	}
 
 	@Before(Tx.class)

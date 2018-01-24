@@ -67,8 +67,12 @@
     }
     
     function customerCountAndRank(params) {
+        var customerCount = document.getElementById('customerCount');
+        var customerCountChart = echarts.init(customerCount);
+        customerCountChart.showLoading();   
 		Utils.ajax('${CPATH}/report/customerCount', params, 
 			function(data){
+				customerCountChart.hideLoading();
 				$("#customerRank").empty();
 				var rank = $("#customerRank");
 	            var crSeriesData = [];
@@ -95,8 +99,6 @@
 	                    value: data[i].totalAmount
 	                });
 	            }
-	            var customerCount = document.getElementById('customerCount');
-	            var customerCountChart = echarts.init(customerCount);
 				option = {
 				    tooltip: {
 				        trigger: 'item',

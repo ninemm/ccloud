@@ -26,9 +26,11 @@
 	
 	var $form = $("#form");
 	var $city = $('#cityPicker');
+	var flang = true;
 	$("#brand_option").select2();
 	$("#product_type_store_option").select2();
 	$(function() {
+		$("#checkWarn").hide();
 		$.ajax({
 			url:"${CPATH}/admin/seller/getBrand",
 			type:"post",
@@ -138,6 +140,11 @@
 	};
 	
 	function doSubmit(){
+		if(flang==false){
+			alert("销售商编码错误，请重新输入");
+			return;
+		}
+		
 		var l = Ladda.create( document.querySelector( '#do_submit' ) );
 		$("#areaCodes").val($city.data('citypicker').getCode());
 		$("#areaNames").val($city.data('citypicker').getVal());
@@ -182,6 +189,27 @@
 			error : function() {
 				l.stop();
 				alert("信息提交错误");
+			}
+		});
+	}
+	
+	function changeCode(){
+		var code = $(".seller_code").val();
+		$.ajax({
+			url:"${CPATH}/admin/seller/checkCode",
+			type:"post",
+			dataType:"json",
+			data:{"code":code},
+			success:function(data)
+			{
+				if(data==true){
+					$("#checkWarn").show();
+					$("#checkWarn").css("color","red");
+					$("#checkWarn").css("font-size","12px");
+					flang=false;
+				}else{
+					$("#checkWarn").hide();
+				}
 			}
 		});
 	}
@@ -230,14 +258,13 @@
 								<input class="form-control input-sm" type="text" name="seller.seller_name" value="${(seller.seller_name)!}" placeholder="1-25个任意字母数字">
 							</div>
 						</div>
-						<#if (seller.id) ??>
 						<div class="form-group col-sm-12 validata-box">
-							<label class="control-label col-sm-2">*销售商编码:</label>
+							<label class="control-label col-sm-2">销售商编码:</label>
 							<div class="input-group col-md-4 col-sm-10">
-								<input class="form-control input-sm" type="text" readonly name="seller.seller_code" value="${(seller.seller_code)!}">
+								<input class="form-control input-sm seller_code" type="text" onblur="changeCode()" <#if seller??>readonly</#if> name="seller.seller_code" value="${(seller.seller_code)!}">
+								<span id="checkWarn">已经存在该编码，请重新输入</span>
 							</div>
 						</div>
-						</#if>
 						<#if !(seller.id) ??>
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">销售商类型:</label>
