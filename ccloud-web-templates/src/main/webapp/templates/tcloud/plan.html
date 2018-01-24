@@ -47,22 +47,29 @@ var newHtml = $(".productList").html();
 
 $("#type").select({
 	title: "选择计划类型",
-	items: [ {
-		title: "月度计划",
-		value: "m"
-	},
-	{
-		title: "年计划",
-		value: "y"
-	}]
+	items: [{
+		title: "周计划", value: "101201"
+	},{
+		title: "月计划", value: "101202"
+	},{
+		title: "年计划", value: "101203"
+	}],
+	onChange: function(obj){
+		var $product = $(this)[0].$input.parents(".productInfo");
+		$("#typeId").val(this.data['values']);
+	}
 });
 
 function addProduct(){
 	$productList.append(newHtml);
 	var $productInfo = $productList.find(".productInfo:last");
 	$productInfo.find("#productName").select({
-		  title: "选择产品",
-		  items: productInfoMap
+			title: "选择产品",
+			items: productInfoMap,
+			onChange: function(obj){
+				var $product = $(this)[0].$input.parents(".productInfo");
+				$product.find("#productId").val(this.data['values']);
+			}
 	});
 }
 
@@ -75,7 +82,19 @@ function doSubmit(){
 			dataType : "json",
 			success : function(data) {
 				layer.closeAll();
-				alert("信息提交成功");
+				$.modal({
+					title: data.message,
+					buttons: [
+						{ text: "查看计划", className: "default", onClick: function(){
+							location.href = "${CPATH}/plans/myPlans";
+						}
+						},
+						{ text: "继续新增", className: "primary", onClick: function(){
+							location.href = '${CPATH}/plans';
+						}
+						},
+					]
+				});
 			},
 			error : function() {
 				layer.closeAll();
