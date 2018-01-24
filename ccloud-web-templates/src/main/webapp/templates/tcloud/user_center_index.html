@@ -96,7 +96,7 @@ $(function() {
 			</@shiro.hasPermission>			
 		</div>
 		</@shiro.hasPermission>
-		<@shiro.hasPermission name="/admin/salesOrder,/admin/salesRefund,/admin/salesRefund/check,/admin/report/inventoryDetail">
+		<@shiro.hasPermission name="/admin/salesOrder,/admin/salesRefund,/admin/salesRefund/check,/admin/plans,/admin/report/inventoryDetail">
 		<div class="weui-cells__title">我的订单</div>
 		<div class="weui-grids">
 			<@shiro.hasPermission name="/admin/salesOrder">
@@ -126,12 +126,14 @@ $(function() {
 			</a>
 			</@shiro.hasPermission>
 
+			<@shiro.hasPermission name="/admin/plans">
 			<a href="${CPATH}/plans/myPlans" class="weui-grid js_grid">
 				<div class="weui-grid__icon">
 					<i class="icon-tasks"></i>
 				</div>
 				<p class="weui-grid__label">销售计划</p>
 			</a>
+			</@shiro.hasPermission>
 			
 			<@shiro.hasPermission name="/front/inventory">
 			<a class="weui-grid js_grid" href="${CPATH}/inventory/index">
