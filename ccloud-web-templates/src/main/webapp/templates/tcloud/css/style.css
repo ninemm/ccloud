@@ -2438,6 +2438,16 @@ input[name=input-type] {
   display: inline-block;
 }
 
+/* 计划列表 */
+
+.plan-list-box {
+  padding-top: .5rem;
+}
+
+.plan-list-box:first-child {
+  padding-top: 0;
+}
+
 
 /* 媒体查询 */
 

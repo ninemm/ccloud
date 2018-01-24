@@ -5,15 +5,7 @@
 		position: absolute;
 		top: 44px;
 		bottom: 0;
-	}
-	.weui-panel {
-		padding-right: 1.5rem!important;
-	}
-	.icon-chevron-right {
-		position: absolute;
-		right: .5rem;
-		top: 50%;
-		transform: translateY(-50%);
+		width: 100%;
 	}
 </#macro>
 <#macro script>	
@@ -80,51 +72,77 @@ $(function() {
 		</header>
 		<main>
 			<div class="ft12">
-				<div class="weui-panel weui-panel_access">
-					<div class="customer_name">
-						<span>张三</span>
-						<span class="fr orange ft12">年计划</span>
+				<div class="plan-list-box">
+					<div class="weui-panel weui-panel_access">
+						<div class="customer_name">
+							<span>张三</span>
+							<span class="fr orange ft12">年计划</span>
+						</div>
+						<div class="weui-flex gray">
+							<div class="weui-flex__item">开始时间：2018-01-02</div>
+							<span style="width:1rem" class="t-c">-</span>
+							<div class="weui-flex__item t-r">结束时间：2018-02-02</div>
+						</div>
 					</div>
-					<div class="weui-flex gray">
-						<div class="weui-flex__item">开始时间：2018-01-02</div>
-						<span style="width:1rem" class="t-c">-</span>
-						<div class="weui-flex__item t-r">结束时间：2018-02-02</div>
-					</div>
-					<i class="icon-chevron-right gray"></i>
-				</div>
-				<div class="weui-panel weui-panel_access">
-					<div class="customer_name">
-						<span>李四</span>
-						<span class="fr orange ft12">月度计划</span>
-					</div>
-					<div class="weui-flex gray">
-						<div class="weui-flex__item">开始时间：2018-01-02</div>
-						<span style="width:1rem" class="t-c">-</span>
-						<div class="weui-flex__item t-r">结束时间：2018-02-02</div>
-					</div>
-						<div class="weui-cells mg-0">
-							<div class="weui-cell">
-								<div class="weui-cell__bd">
-									劲酒
-								</div>
+					<div class="weui-cells mg-0">
+						<div class="weui-cell">
+							<div class="weui-cell__bd t-c">
+								劲酒
 							</div>
-							<div class="weui-cell">
-								<div class="weui-cell__bd weui-flex t-c">
-									<div class="weui-flex__item">
-										<p>计划数量</p>
-										<p>20件</p>
-									</div>
-									<div class="weui-flex__item">
-										<p>完成数量</p>
-										<p>10件</p>
-										</div>
-									<div class="weui-flex__item">
-										<p>完成度</p>
-										<p>50%</p>
-									</div>
+						</div>
+						<div class="weui-cell">
+							<div class="weui-cell__bd weui-flex t-c">
+								<div class="weui-flex__item">
+									<p>计划数量</p>
+									<p>20件</p>
+								</div>
+								<div class="weui-flex__item">
+									<p>完成数量</p>
+									<p>10件</p>
+								</div>
+								<div class="weui-flex__item">
+									<p>完成度</p>
+									<p>50%</p>
 								</div>
 							</div>
 						</div>
+					</div>
+				</div>
+				<div class="plan-list-box">
+					<div class="weui-panel weui-panel_access">
+						<div class="customer_name">
+							<span>李四</span>
+							<span class="fr orange ft12">月度计划</span>
+						</div>
+						<div class="weui-flex gray">
+							<div class="weui-flex__item">开始时间：2018-01-02</div>
+							<span style="width:1rem" class="t-c">-</span>
+							<div class="weui-flex__item t-r">结束时间：2018-02-02</div>
+						</div>
+					</div>
+					<div class="weui-cells mg-0">
+						<div class="weui-cell">
+							<div class="weui-cell__bd t-c">
+								劲酒
+							</div>
+						</div>
+						<div class="weui-cell">
+							<div class="weui-cell__bd weui-flex t-c">
+								<div class="weui-flex__item">
+									<p>计划数量</p>
+									<p>20件</p>
+								</div>
+								<div class="weui-flex__item">
+									<p>完成数量</p>
+									<p>10件</p>
+								</div>
+								<div class="weui-flex__item">
+									<p>完成度</p>
+									<p>50%</p>
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 			<div class="weui-loadmore" id="loading" style="display: none;">
