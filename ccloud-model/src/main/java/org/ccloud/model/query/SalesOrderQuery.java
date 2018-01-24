@@ -739,7 +739,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		for (Record record : records) {
 			String customName=record.getStr("custom_name");
 			String convertRelate = record.getStr("convert_relate");
-			fromBuilder.append("TRUNCATE(((sum( CASE sp.custom_name WHEN '"+customName+"' THEN "+product_count+" ELSE 0 END) -IFNULL(sum(srid.reject_product_count),0))/"+convertRelate+"),2)  '"+customName+"' ,");
+			fromBuilder.append("TRUNCATE(((sum( CASE sp.custom_name WHEN '"+customName+"' THEN "+product_count+" ELSE 0 END) - sum((CASE sp.custom_name WHEN '"+customName+"' THEN srid.reject_product_count ELSE 0 END)))/"+convertRelate+"),2)  '"+customName+"' ,");
 		}
 		fromBuilder.append("s.seller_name '直营商名称'");
 		fromBuilder.append(" FROM cc_sales_order so ");
@@ -758,8 +758,6 @@ public class SalesOrderQuery extends JBaseQuery {
 		}else {
 			fromBuilder.append(" and sd.is_gift=0 ");
 		}
-		startDate=startDate+" 00:00:00";
-		endDate=endDate+" 23:59:59";
 		fromBuilder.append(" AND so.data_area like '"+ dataArea+"' ");
 		fromBuilder.append(" AND "+ keyword+" >= '"+startDate+"'");
 		fromBuilder.append(" AND "+ keyword+" <= '"+endDate+"'");
@@ -782,7 +780,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		for (Record record : records) {
 			String customName=record.getStr("custom_name");
 			String convertRelate = record.getStr("convert_relate");
-			fromBuilder.append("TRUNCATE(((sum( CASE sp.custom_name WHEN '"+customName+"' THEN "+product_count+" ELSE 0 END) -IFNULL(sum(srid.reject_product_count),0))/"+convertRelate+"),2)  '"+customName+"' ,");
+			fromBuilder.append("TRUNCATE(((sum( CASE sp.custom_name WHEN '"+customName+"' THEN "+product_count+" ELSE 0 END) - sum((CASE sp.custom_name WHEN '"+customName+"' THEN srid.reject_product_count ELSE 0 END)))/"+convertRelate+"),2)  '"+customName+"' ,");
 		}
 		fromBuilder.append("u.realname '业务员名称'");
 		fromBuilder.append(" FROM cc_sales_order so ");
@@ -800,8 +798,6 @@ public class SalesOrderQuery extends JBaseQuery {
 		}else {
 			fromBuilder.append(" and sd.is_gift=0 ");
 		}
-		startDate=startDate+" 00:00:00";
-		endDate=endDate+" 23:59:59";
 		fromBuilder.append(" AND so.data_area like '"+ dataArea+"' ");
 		fromBuilder.append(" AND "+ keyword+" >= '"+startDate+"'");
 		fromBuilder.append(" AND "+ keyword+" <= '"+endDate+"'");
@@ -822,8 +818,8 @@ public class SalesOrderQuery extends JBaseQuery {
 		List<SellerProduct> findBySellerId = SellerProductQuery.me().findBySellerId(sellerId);
 		StringBuilder fromBuilder=new StringBuilder("SELECT ");
 		for (SellerProduct sellerProduct : findBySellerId) {
-			String customName=sellerProduct.getCustomName();
-			fromBuilder.append("TRUNCATE(((sum( CASE sp.custom_name WHEN '"+customName+"' THEN "+product_count+" ELSE 0 END) -IFNULL(sum(srid.reject_product_count),0))/p.convert_relate),2)  '"+customName+"' ,");
+			String customName=sellerProduct.getCustomName(); 
+			fromBuilder.append("TRUNCATE(((sum( CASE sp.custom_name WHEN '"+customName+"' THEN "+product_count+" ELSE 0 END) - sum((CASE sp.custom_name WHEN '"+customName+"' THEN srid.reject_product_count ELSE 0 END)))/p.convert_relate),2) '"+customName+"' ,");
 		}
 		fromBuilder.append("c.customer_name '客户名称'");
 		fromBuilder.append(" FROM cc_sales_order so ");
@@ -843,8 +839,6 @@ public class SalesOrderQuery extends JBaseQuery {
 		}else {
 			fromBuilder.append(" and sd.is_gift=0 ");
 		}
-		startDate=startDate+" 00:00:00";
-		endDate=endDate+" 23:59:59";
 		fromBuilder.append(" AND "+ keyword+" >= '"+startDate+"'");
 		fromBuilder.append(" AND "+ keyword+" <= '"+endDate+"'");
 		if (keyword.equals("sok.create_date")) {
