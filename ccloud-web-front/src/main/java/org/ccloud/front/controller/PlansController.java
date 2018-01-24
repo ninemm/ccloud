@@ -60,7 +60,6 @@ public class PlansController extends BaseFrontController {
 		String endDate = getPara("end-date")+" 23:59:59";
 		String[] productIds = getParaValues("productId");
 		String[] productNum = getParaValues("productNum");
-		boolean result = false;
 		for(int i=0;i<productIds.length;i++) {
 			Plans plans = new Plans();
 			plans.setId(StrKit.getRandomUUID());
@@ -79,7 +78,7 @@ public class PlansController extends BaseFrontController {
 			plans.setDeptId(user.getDepartmentId());
 			plans.setDataArea(user.getDataArea());
 			plans.setCreateDate(new Date());
-			result = plans.save();
+			plans.save();
 			
 		}
 		renderAjaxResultForSuccess("申请成功");

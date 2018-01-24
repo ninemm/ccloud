@@ -21,7 +21,6 @@ import java.util.List;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Record;
-import org.ccloud.Consts;
 import org.ccloud.model.ActivityApply;
 
 import com.jfinal.plugin.activerecord.Page;

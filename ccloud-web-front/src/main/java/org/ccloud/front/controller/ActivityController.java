@@ -5,7 +5,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -159,6 +158,7 @@ public class ActivityController extends BaseFrontController {
 
 		setAttr("userIds", JSON.toJSON(userIds));
 		setAttr("customerTypes", JSON.toJSON(customerTypes));
+		setAttr("customerTypeId", customer_type);
 		setAttr("areaType", activity.getStr("area_type"));
 
 		render("activity_apply.html");
@@ -180,7 +180,6 @@ public class ActivityController extends BaseFrontController {
 		Integer[] visit_nums = getParaValuesToInt("visit_num");
 		for (String sellerCustomerId : sellerCustomerIdArray) {
 			for (int i = 0; i < activity_ids.length; i++) {
-				Activity activity = ActivityQuery.me().findById(activity_ids[i]);
 				//活动申请check
 				String result = this.check(activity_ids[i], sellerCustomerId, sellerCustomerNameArray[i]);
 				
