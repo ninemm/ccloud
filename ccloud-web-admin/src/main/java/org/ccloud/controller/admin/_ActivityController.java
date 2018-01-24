@@ -52,11 +52,6 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 
 	@Override
 	public void index() {
-		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
-
-		setAttr("startDate", date);
-		setAttr("endDate", date);
-
 		render("index.html");
 	}
 	
