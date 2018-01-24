@@ -144,6 +144,10 @@ function doChange(key){
      items: ${customerTypes!}
     });
 
+	var customerTypeId = '${customerTypeId!}';
+	if(customerTypeId != ""){
+		$("#customerTypeId").attr('data-values',customerTypeId);
+	}
     var areaType = '${areaType!}';
 	var provName = '';
 	var cityName = '';

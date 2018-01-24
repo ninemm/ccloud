@@ -159,6 +159,7 @@ public class ActivityController extends BaseFrontController {
 
 		setAttr("userIds", JSON.toJSON(userIds));
 		setAttr("customerTypes", JSON.toJSON(customerTypes));
+		setAttr("customerTypeId", customer_type);
 		setAttr("areaType", activity.getStr("area_type"));
 
 		render("activity_apply.html");
