@@ -460,22 +460,24 @@ public class SalesOrderQuery extends JBaseQuery {
 		if (keyword.equals("sok.create_date")) {
 			product_count="sd.out_count";
 		}
-		String select = "SELECT ct.`name`,sp.custom_name,TRUNCATE((sum("+product_count+") / p.convert_relate),2) productCountTotal ";
+		String select = "SELECT ct.`name`,sp.custom_name,TRUNCATE(((IFNULL(sum("+product_count+"),0)-IFNULL(sum(srid.reject_product_count),0)) / p.convert_relate),2) productCountTotal ";
 		StringBuilder fromBuilder = new StringBuilder(" FROM cc_sales_order so ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id=sojo.order_id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id=sojo.outstock_id ");
-		fromBuilder.append(" LEFT JOIN cc_seller_customer c ON c.id=so.customer_id ");
-		fromBuilder.append(" LEFT JOIN cc_customer_join_customer_type cct ON cct.seller_customer_id=c.id ");
+		fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id=so.customer_id ");
+		fromBuilder.append(" LEFT JOIN cc_customer_join_customer_type cct ON cct.seller_customer_id=sc.id ");
 		fromBuilder.append(" LEFT JOIN cc_customer_type ct ON ct.id=cct.customer_type_id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_detail sd ON sd.order_id=so.id ");
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
 		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_refund_instock sri ON sri.outstock_id=sojo.outstock_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_refund_instock_detail srid ON srid.refund_instock_id=sri.id ");
 		fromBuilder.append(" WHERE so.biz_user_id='"+userId+"'");
-		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_DEFAULT+","+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
+		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+") and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
 		if (ifGift) {
-			fromBuilder.append("and sd.is_gift=1 ");
+			fromBuilder.append(" and sd.is_gift=1 ");
 		}else {
-			fromBuilder.append("and sd.is_gift=0 ");
+			fromBuilder.append(" and sd.is_gift=0 ");
 		}
 		if (keyword.equals("sok.create_date")) {
 			fromBuilder.append(" AND sd.out_count != 0");
@@ -495,44 +497,6 @@ public class SalesOrderQuery extends JBaseQuery {
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
-
-	//我的客户类型赠品
-//	public Page<SalesOrder> findByCustomerTypeGift(int pageNumber, int pageSize, String startDate, String endDate,
-//			String keyword, String userId) {
-//		String product_count="sd.product_count";
-//		if (keyword.equals("sok.create_date")) {
-//			product_count="sd.out_count";
-//		}
-//		String select = "SELECT ct.`name`,sp.custom_name,TRUNCATE((sum("+product_count+") / p.convert_relate),2) productCountTotal ";
-//		StringBuilder fromBuilder = new StringBuilder(" FROM cc_sales_order so ");
-//		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id=sojo.order_id ");
-//		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id=sojo.outstock_id ");
-//		fromBuilder.append(" LEFT JOIN cc_seller_customer c ON c.id=so.customer_id ");
-//		fromBuilder.append(" LEFT JOIN cc_customer_join_customer_type cct ON cct.seller_customer_id=c.id ");
-//		fromBuilder.append(" LEFT JOIN cc_customer_type ct ON ct.id=cct.customer_type_id ");
-//		fromBuilder.append(" LEFT JOIN cc_sales_order_detail sd ON sd.order_id=so.id ");
-//		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
-//		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
-//		fromBuilder.append(" WHERE so.biz_user_id='"+userId+"'and sd.is_gift=1");
-//		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_DEFAULT+","+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
-//		if (keyword.equals("sok.create_date")) {
-//			fromBuilder.append(" AND sd.out_count != 0");
-//		}
-//		LinkedList<Object> params = new LinkedList<Object>();
-//		if (StrKit.notBlank(startDate)) {
-//			fromBuilder.append(" and "+keyword+" >= ?");
-//			params.add(startDate);
-//		}
-//		if (StrKit.notBlank(endDate)) {
-//			fromBuilder.append(" and "+keyword+" <= ?");
-//			params.add(endDate);
-//		}
-//		fromBuilder.append("GROUP BY cct.customer_type_id,sp.id");
-//		
-//		if (params.isEmpty())
-//			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
-//		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
-//	}
 	
 	//我的产品
 	public Page<SalesOrder> findByProduct(int pageNumber, int pageSize, String startDate, String endDate,
@@ -540,20 +504,23 @@ public class SalesOrderQuery extends JBaseQuery {
 		String product_count="sd.product_count";
 		if (keyword.equals("sok.create_date")) {
 			product_count="sd.out_count";
-		}
-		String select = "SELECT sp.custom_name,TRUNCATE((sum("+product_count+")/ p.convert_relate),2) productCountTotal";
+		}	
+		String select = "SELECT sp.custom_name,TRUNCATE(((IFNULL(sum("+product_count+"),0)-IFNULL(sum(srid.reject_product_count),0))/ p.convert_relate),2) productCountTotal";
 		StringBuilder fromBuilder = new StringBuilder(" FROM cc_sales_order so ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id=sojo.order_id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id=sojo.outstock_id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_detail sd ON sd.order_id=so.id ");
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
 		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
+		fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id=so.customer_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_refund_instock sri ON sri.outstock_id=sojo.outstock_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_refund_instock_detail srid ON srid.refund_instock_id=sri.id ");
 		fromBuilder.append(" WHERE so.biz_user_id='"+userId+"'");
-		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_DEFAULT+","+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
+		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+") and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
 		if (ifGift) {
-			fromBuilder.append("and sd.is_gift=1 ");
+			fromBuilder.append(" and sd.is_gift=1 ");
 		}else {
-			fromBuilder.append("and sd.is_gift=0 ");
+			fromBuilder.append(" and sd.is_gift=0 ");
 		}
 		if (keyword.equals("sok.create_date")) {
 			fromBuilder.append(" AND sd.out_count != 0");
@@ -574,41 +541,6 @@ public class SalesOrderQuery extends JBaseQuery {
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
-	//我的产品赠品
-//	public Page<SalesOrder> findByProductGift(int pageNumber, int pageSize, String startDate, String endDate,
-//			String keyword, String userId) {
-//		String product_count="sd.product_count";
-//		if (keyword.equals("sok.create_date")) {
-//			product_count="sd.out_count";
-//		}
-//		String select = "SELECT sp.custom_name,TRUNCATE((sum("+product_count+") / p.convert_relate),2) productCountTotal";
-//		StringBuilder fromBuilder = new StringBuilder(" FROM cc_sales_order so ");
-//		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id=sojo.order_id ");
-//		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id=sojo.outstock_id ");
-//		fromBuilder.append(" LEFT JOIN cc_sales_order_detail sd ON sd.order_id=so.id ");
-//		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
-//		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
-//		fromBuilder.append(" WHERE so.biz_user_id='"+userId+"' and sd.is_gift=1");
-//		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_DEFAULT+","+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
-//		if (keyword.equals("sok.create_date")) {
-//			fromBuilder.append(" AND sd.out_count != 0");
-//		}
-//		LinkedList<Object> params = new LinkedList<Object>();
-//		if (StrKit.notBlank(startDate)) {
-//			fromBuilder.append(" and "+keyword+" >= ?");
-//			params.add(startDate);
-//		}
-//		if (StrKit.notBlank(endDate)) {
-//			fromBuilder.append(" and "+keyword+" <= ?");
-//			params.add(endDate);
-//		}
-//		fromBuilder.append("GROUP BY sp.id");
-//		
-//		if (params.isEmpty())
-//			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
-//		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
-//	}
-
 	//我部门的产品
 	public Page<SalesOrder> findByDepartmentProduct(int pageNumber, int pageSize, String startDate, String endDate,
 			String keyword, String dataArea, boolean ifGift) {
@@ -616,18 +548,21 @@ public class SalesOrderQuery extends JBaseQuery {
 		if (keyword.equals("sok.create_date")) {
 			product_count="sd.out_count";
 		}
-		String select = "SELECT sp.custom_name,TRUNCATE((sum("+product_count+") / p.convert_relate),2) productCountTotal";
+		String select = "SELECT sp.custom_name,TRUNCATE(((IFNULL(sum("+product_count+"),0)-IFNULL(sum(srid.reject_product_count),0)) / p.convert_relate),2) productCountTotal";
 		StringBuilder fromBuilder = new StringBuilder(" FROM cc_sales_order so ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id=sojo.order_id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id=sojo.outstock_id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_detail sd ON sd.order_id=so.id ");
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
 		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
-		fromBuilder.append(" WHERE so.status NOT in("+Consts.SALES_ORDER_STATUS_DEFAULT+","+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
+		fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id=so.customer_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_refund_instock sri ON sri.outstock_id=sojo.outstock_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_refund_instock_detail srid ON srid.refund_instock_id=sri.id ");
+		fromBuilder.append(" WHERE so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+") and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
 		if (ifGift) {
-			fromBuilder.append("and sd.is_gift=1 ");
+			fromBuilder.append(" and sd.is_gift=1 ");
 		}else {
-			fromBuilder.append("and sd.is_gift=0 ");
+			fromBuilder.append(" and sd.is_gift=0 ");
 		}
 		if (keyword.equals("sok.create_date")) {
 			fromBuilder.append(" AND sd.out_count != 0");
@@ -650,43 +585,6 @@ public class SalesOrderQuery extends JBaseQuery {
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
-	//我部门的产品赠品
-//	public Page<SalesOrder> findByDepartmentProductGift(int pageNumber, int pageSize, String startDate, String endDate,
-//			String keyword, String dataArea) {
-//		String product_count="sd.product_count";
-//		if (keyword.equals("sok.create_date")) {
-//			product_count="sd.out_count";
-//		}
-//		String select = "SELECT sp.custom_name,TRUNCATE((sum("+product_count+") / p.convert_relate),2) productCountTotal";
-//		StringBuilder fromBuilder = new StringBuilder(" FROM cc_sales_order so ");
-//		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id=sojo.order_id ");
-//		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id=sojo.outstock_id ");
-//		fromBuilder.append(" LEFT JOIN cc_sales_order_detail sd ON sd.order_id=so.id ");
-//		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
-//		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
-//		fromBuilder.append(" WHERE sd.is_gift=1");
-//		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_DEFAULT+","+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
-//		if (keyword.equals("sok.create_date")) {
-//			fromBuilder.append(" AND sd.out_count != 0");
-//		}
-//		LinkedList<Object> params = new LinkedList<Object>();
-//		boolean needWhere = false;
-//		needWhere = appendIfNotEmptyWithLike(fromBuilder, "so.data_area", dataArea, params, needWhere);
-//		if (StrKit.notBlank(startDate)) {
-//			fromBuilder.append(" and "+keyword+" >= ?");
-//			params.add(startDate);
-//		}
-//		if (StrKit.notBlank(endDate)) {
-//			fromBuilder.append(" and "+keyword+" <= ?");
-//			params.add(endDate);
-//		}
-//		fromBuilder.append("GROUP BY sp.id");
-//		
-//		if (params.isEmpty())
-//			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
-//		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
-//	}
-
 	//我部门的业务员
 	public Page<SalesOrder> findByDepartSalesman(int pageNumber, int pageSize, String startDate, String endDate,
 			String keyword, String dataArea, boolean ifGift) {
@@ -694,7 +592,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		if (keyword.equals("sok.create_date")) {
 			product_count="sd.out_count";
 		}
-		String select = "SELECT u.realname , TRUNCATE((sum("+product_count+") / p.convert_relate),2) productCountTotal , sp.custom_name ";
+		String select = "SELECT u.realname ,TRUNCATE(((IFNULL(sum("+product_count+"),0)-IFNULL(sum(srid.reject_product_count),0)) / p.convert_relate),2) productCountTotal , sp.custom_name ";
 		StringBuilder fromBuilder = new StringBuilder(" FROM cc_sales_order so ");
 		fromBuilder.append(" LEFT JOIN `user` u ON u.id = so.biz_user_id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id=sojo.order_id ");
@@ -702,11 +600,14 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_sales_order_detail sd ON sd.order_id=so.id ");
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
 		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
-		fromBuilder.append(" WHERE so.status NOT in("+Consts.SALES_ORDER_STATUS_DEFAULT+","+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
+		fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id=so.customer_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_refund_instock sri ON sri.outstock_id=sojo.outstock_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_refund_instock_detail srid ON srid.refund_instock_id=sri.id ");
+		fromBuilder.append(" WHERE so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+") and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
 		if (ifGift) {
-			fromBuilder.append("and sd.is_gift=1 ");
+			fromBuilder.append(" and sd.is_gift=1 ");
 		}else {
-			fromBuilder.append("and sd.is_gift=0 ");
+			fromBuilder.append(" and sd.is_gift=0 ");
 		}
 		if (keyword.equals("sok.create_date")) {
 			fromBuilder.append(" AND sd.out_count != 0");
@@ -729,43 +630,6 @@ public class SalesOrderQuery extends JBaseQuery {
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
-	//我部门的业务员赠品
-//	public Page<SalesOrder> findByDepartSalesmanGift(int pageNumber, int pageSize, String startDate, String endDate,
-//			String keyword, String dataArea) {
-//		String product_count="sd.product_count";
-//		if (keyword.equals("sok.create_date")) {
-//			product_count="sd.out_count";
-//		}
-//		String select = "SELECT u.realname , TRUNCATE((sum("+product_count+") / p.convert_relate),2) productCountTotal , sp.custom_name ";
-//		StringBuilder fromBuilder = new StringBuilder(" FROM cc_sales_order so ");
-//		fromBuilder.append(" LEFT JOIN `user` u ON u.id = so.biz_user_id ");
-//		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id=sojo.order_id ");
-//		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id=sojo.outstock_id ");
-//		fromBuilder.append(" LEFT JOIN cc_sales_order_detail sd ON sd.order_id=so.id ");
-//		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
-//		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
-//		fromBuilder.append(" WHERE sd.is_gift=1");
-//		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_DEFAULT+","+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
-//		if (keyword.equals("sok.create_date")) {
-//			fromBuilder.append(" AND sd.out_count != 0");
-//		}
-//		LinkedList<Object> params = new LinkedList<Object>();
-//		boolean needWhere = false;
-//		needWhere = appendIfNotEmptyWithLike(fromBuilder, "so.data_area", dataArea, params, needWhere);
-//		if (StrKit.notBlank(startDate)) {
-//			fromBuilder.append(" and "+keyword+" >= ?");
-//			params.add(startDate);
-//		}
-//		if (StrKit.notBlank(endDate)) {
-//			fromBuilder.append(" and "+keyword+" <= ?");
-//			params.add(endDate);
-//		}
-//		fromBuilder.append("GROUP BY so.biz_user_id ,sp.id");
-//		
-//		if (params.isEmpty())
-//			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
-//		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
-//	}
 
 	//我部门的直营商
 	public Page<SalesOrder> findByManageSeller(int pageNumber, int pageSize, String startDate, String endDate,
@@ -774,7 +638,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		if (keyword.equals("sok.create_date")) {
 			product_count="sd.out_count";
 		}
-		String select = "SELECT sp.custom_name,s.seller_name,TRUNCATE((sum("+product_count+") / p.convert_relate),2) productCountTotal ";
+		String select = "SELECT sp.custom_name,s.seller_name,TRUNCATE(((IFNULL(sum("+product_count+"),0)-IFNULL(sum(srid.reject_product_count),0)) / p.convert_relate),2) productCountTotal ";
 		StringBuilder fromBuilder = new StringBuilder(" FROM cc_sales_order so ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id=sojo.order_id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id=sojo.outstock_id ");
@@ -784,12 +648,14 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
 		fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id=so.customer_id ");
 		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_refund_instock sri ON sri.outstock_id=sojo.outstock_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_refund_instock_detail srid ON srid.refund_instock_id=sri.id ");
 		fromBuilder.append(" WHERE sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
-		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_DEFAULT+","+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
+		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
 		if (ifGift) {
-			fromBuilder.append("and sd.is_gift=1 ");
+			fromBuilder.append(" and sd.is_gift=1 ");
 		}else {
-			fromBuilder.append("and sd.is_gift=0 ");
+			fromBuilder.append(" and sd.is_gift=0 ");
 		}
 		if (keyword.equals("sok.create_date")) {
 			fromBuilder.append(" AND sd.out_count != 0");
@@ -812,46 +678,6 @@ public class SalesOrderQuery extends JBaseQuery {
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
-	//我部门的直营商赠品
-//	public Page<SalesOrder> findByManageSellerGift(int pageNumber, int pageSize, String startDate, String endDate,
-//			String keyword, String dataArea) {
-//		String product_count="sd.product_count";
-//		if (keyword.equals("sok.create_date")) {
-//			product_count="sd.out_count";
-//		}
-//		String select = "SELECT sp.custom_name,s.seller_name,TRUNCATE((sum("+product_count+") / p.convert_relate),2) productCountTotal ";
-//		StringBuilder fromBuilder = new StringBuilder(" FROM cc_sales_order so ");
-//		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id=sojo.order_id ");
-//		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id=sojo.outstock_id ");
-//		fromBuilder.append(" LEFT JOIN cc_sales_order_detail sd ON sd.order_id=so.id ");
-//		fromBuilder.append(" LEFT JOIN cc_seller s ON s.id=so.seller_id ");
-//		fromBuilder.append(" LEFT JOIN department d ON d.id=s.dept_id ");
-//		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
-//		fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id=so.customer_id ");
-//		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
-//		fromBuilder.append(" WHERE sd.is_gift=1 and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
-//		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_DEFAULT+","+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
-//		if (keyword.equals("sok.create_date")) {
-//			fromBuilder.append(" AND sd.out_count != 0");
-//		}
-//		LinkedList<Object> params = new LinkedList<Object>();
-//		boolean needWhere = false;
-//		needWhere = appendIfNotEmptyWithLike(fromBuilder, " so.data_area", dataArea, params, needWhere);
-//		if (StrKit.notBlank(startDate)) {
-//			fromBuilder.append(" and "+keyword+" >= ?");
-//			params.add(startDate);
-//		}
-//		if (StrKit.notBlank(endDate)) {
-//			fromBuilder.append(" and "+keyword+" <= ?");
-//			params.add(endDate);
-//		}
-//		fromBuilder.append("GROUP BY d.id,sp.id");
-//		
-//		if (params.isEmpty())
-//			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
-//		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
-//	}
-
 	//经销商的直营商的采购
 	public Page<SalesOrder> findBypurSeller(int pageNumber, int pageSize, String startDate, String endDate,
 			String keyword, String dataArea, boolean ifGift) {
@@ -859,7 +685,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		if (keyword.equals("sok.create_date")) {
 			product_count="sd.out_count";
 		}
-		String select = "SELECT sp.custom_name spname,c.customer_name cname,TRUNCATE((sum("+product_count+") / p.convert_relate),2) productCountTotal ";
+		String select = "SELECT sp.custom_name spname,c.customer_name cname,TRUNCATE(((IFNULL(sum("+product_count+"),0)-IFNULL(sum(srid.reject_product_count),0)) / p.convert_relate),2) productCountTotal ";
 		StringBuilder fromBuilder = new StringBuilder(" FROM cc_sales_order so ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id=sojo.order_id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id=sojo.outstock_id ");
@@ -870,12 +696,14 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
 		fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id=so.customer_id ");
 		fromBuilder.append(" LEFT JOIN cc_customer c ON c.id = sc.customer_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_refund_instock sri ON sri.outstock_id=sojo.outstock_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_refund_instock_detail srid ON srid.refund_instock_id=sri.id ");
 		fromBuilder.append(" WHERE sc.customer_kind ="+Consts.CUSTOMER_KIND_SELLER);
-		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_DEFAULT+","+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
+		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
 		if (ifGift) {
-			fromBuilder.append("and sd.is_gift=1 ");
+			fromBuilder.append(" and sd.is_gift=1 ");
 		}else {
-			fromBuilder.append("and sd.is_gift=0 ");
+			fromBuilder.append(" and sd.is_gift=0 ");
 		}
 		if (keyword.equals("sok.create_date")) {
 			fromBuilder.append(" AND sd.out_count != 0");
@@ -897,47 +725,6 @@ public class SalesOrderQuery extends JBaseQuery {
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
-	
-	//经销商的直营商的采购赠品
-//	public Page<SalesOrder> findBypurSellerGift(int pageNumber, int pageSize, String startDate, String endDate,
-//			String keyword, String dataArea) {
-//		String product_count="sd.product_count";
-//		if (keyword.equals("sok.create_date")) {
-//			product_count="sd.out_count";
-//		}
-//		String select = "SELECT sp.custom_name spname,c.customer_name cname,TRUNCATE((sum("+product_count+") / p.convert_relate),2) productCountTotal ";
-//		StringBuilder fromBuilder = new StringBuilder(" FROM cc_sales_order so ");
-//		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id=sojo.order_id ");
-//		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id=sojo.outstock_id ");
-//		fromBuilder.append(" LEFT JOIN cc_sales_order_detail sd ON sd.order_id=so.id ");
-//		fromBuilder.append(" LEFT JOIN cc_seller s ON s.id=so.seller_id ");
-//		fromBuilder.append(" LEFT JOIN department d ON d.id=s.dept_id ");
-//		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
-//		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
-//		fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id=so.customer_id");
-//		fromBuilder.append(" LEFT JOIN cc_customer c ON c.id = sc.customer_id ");
-//		fromBuilder.append(" WHERE sd.is_gift=1 and sc.customer_kind ="+Consts.CUSTOMER_KIND_SELLER);
-//		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_DEFAULT+","+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
-//		if (keyword.equals("sok.create_date")) {
-//			fromBuilder.append(" AND sd.out_count != 0");
-//		}
-//		LinkedList<Object> params = new LinkedList<Object>();
-//		boolean needWhere = false;
-//		needWhere = appendIfNotEmptyWithLike(fromBuilder, " so.data_area", dataArea, params, needWhere);
-//		if (StrKit.notBlank(startDate)) {
-//			fromBuilder.append(" and "+keyword+" >= ?");
-//			params.add(startDate);
-//		}
-//		if (StrKit.notBlank(endDate)) {
-//			fromBuilder.append(" and "+keyword+" <= ?");
-//			params.add(endDate);
-//		}
-//		fromBuilder.append("GROUP BY d.id,sp.id");
-//		
-//		if (params.isEmpty())
-//			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
-//		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
-//	}
 	
 	//我部门的直营商详情
 	public List<Record> findByMSellerDetail( String startDate, String endDate,
@@ -951,7 +738,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		for (Record record : records) {
 			String customName=record.getStr("custom_name");
 			String convertRelate = record.getStr("convert_relate");
-			fromBuilder.append("TRUNCATE((sum( CASE sp.custom_name WHEN '"+customName+"' THEN "+product_count+" ELSE 0 END)/"+convertRelate+"),2)  '"+customName+"' ,");
+			fromBuilder.append("TRUNCATE(((sum( CASE sp.custom_name WHEN '"+customName+"' THEN "+product_count+" ELSE 0 END) -IFNULL(sum(srid.reject_product_count),0))/"+convertRelate+"),2)  '"+customName+"' ,");
 		}
 		fromBuilder.append("s.seller_name '直营商名称'");
 		fromBuilder.append(" FROM cc_sales_order so ");
@@ -961,12 +748,14 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller s ON s.id=so.seller_id ");
 		fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id = so.customer_id ");
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_refund_instock sri ON sri.outstock_id=sojo.outstock_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_refund_instock_detail srid ON srid.refund_instock_id=sri.id ");
 		fromBuilder.append(" WHERE sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
-		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_DEFAULT+","+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
+		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
 		if (ifGift) {
-			fromBuilder.append("and sd.is_gift=1 ");
+			fromBuilder.append(" and sd.is_gift=1 ");
 		}else {
-			fromBuilder.append("and sd.is_gift=0 ");
+			fromBuilder.append(" and sd.is_gift=0 ");
 		}
 		startDate=startDate+" 00:00:00";
 		endDate=endDate+" 23:59:59";
@@ -980,42 +769,6 @@ public class SalesOrderQuery extends JBaseQuery {
 		return Db.find(fromBuilder.toString());
 	}
 
-	//我部门的直营商详情赠品
-//	public List<Record> findByMSellerDetailGift(String startDate, String endDate,
-//			String keyword, String dataArea, String sellerId) {
-//		String product_count="sd.product_count";
-//		if (keyword.equals("sok.create_date")) {
-//			product_count="sd.out_count";
-//		}
-//		List<Record> records = SellerProductQuery.me().findConvertRelate(sellerId);
-//		StringBuilder fromBuilder=new StringBuilder("SELECT ");
-//		for (Record record : records) {
-//			String customName=record.getStr("custom_name");
-//			String convertRelate = record.getStr("convert_relate");
-//			fromBuilder.append("TRUNCATE((sum( CASE sp.custom_name WHEN '"+customName+"' THEN "+product_count+" ELSE 0 END)/"+convertRelate+"),2)  '"+customName+"' ,");
-//		}
-//		fromBuilder.append("s.seller_name '直营商名称'");
-//		fromBuilder.append(" FROM cc_sales_order so ");
-//		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id=sojo.order_id ");
-//		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id=sojo.outstock_id ");
-//		fromBuilder.append(" LEFT JOIN cc_sales_order_detail sd ON sd.order_id=so.id ");
-//		fromBuilder.append(" LEFT JOIN cc_seller s ON s.id=so.seller_id ");
-//		fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id = so.customer_id ");
-//		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
-//		fromBuilder.append(" WHERE sd.is_gift=1 and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
-//		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_DEFAULT+","+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
-//		startDate=startDate+" 00:00:00";
-//		endDate=endDate+" 23:59:59";
-//		fromBuilder.append(" AND so.data_area like '"+ dataArea+"' ");
-//		fromBuilder.append(" AND "+ keyword+" >= '"+startDate+"'");
-//		fromBuilder.append(" AND "+ keyword+" <= '"+endDate+"'");
-//		if (keyword.equals("sok.create_date")) {
-//			fromBuilder.append(" AND sd.out_count != 0");
-//		}
-//		fromBuilder.append(" GROUP BY s.id");
-//		return Db.find(fromBuilder.toString());
-//	}
-	
 	//我部门的业务员详情
 	public List<Record> findByMSalesmanDetail(String startDate, String endDate,
 			String keyword, String dataArea, String sellerId, boolean ifGift) {
@@ -1028,7 +781,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		for (Record record : records) {
 			String customName=record.getStr("custom_name");
 			String convertRelate = record.getStr("convert_relate");
-			fromBuilder.append("TRUNCATE((sum( CASE sp.custom_name WHEN '"+customName+"' THEN "+product_count+" ELSE 0 END)/"+convertRelate+"),2)  '"+customName+"' ,");
+			fromBuilder.append("TRUNCATE(((sum( CASE sp.custom_name WHEN '"+customName+"' THEN "+product_count+" ELSE 0 END) -IFNULL(sum(srid.reject_product_count),0))/"+convertRelate+"),2)  '"+customName+"' ,");
 		}
 		fromBuilder.append("u.realname '业务员名称'");
 		fromBuilder.append(" FROM cc_sales_order so ");
@@ -1038,11 +791,13 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN `user` u ON u.id = so.biz_user_id ");
 		fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id = so.customer_id ");
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
-		fromBuilder.append(" WHERE so.status NOT in("+Consts.SALES_ORDER_STATUS_DEFAULT+","+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
+		fromBuilder.append(" LEFT JOIN cc_sales_refund_instock sri ON sri.outstock_id=sojo.outstock_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_refund_instock_detail srid ON srid.refund_instock_id=sri.id ");
+		fromBuilder.append(" WHERE so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+") and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
 		if (ifGift) {
-			fromBuilder.append("and sd.is_gift=1 ");
+			fromBuilder.append(" and sd.is_gift=1 ");
 		}else {
-			fromBuilder.append("and sd.is_gift=0 ");
+			fromBuilder.append(" and sd.is_gift=0 ");
 		}
 		startDate=startDate+" 00:00:00";
 		endDate=endDate+" 23:59:59";
@@ -1055,43 +810,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" GROUP BY u.id");
 		return Db.find(fromBuilder.toString());
 	}
-	
-	//我部门的业务员详情赠品
-//	public List<Record> findByMSalesmanDetailGift(String startDate, String endDate,
-//			String keyword, String dataArea, String sellerId) {
-//		String product_count="sd.product_count";
-//		if (keyword.equals("sok.create_date")) {
-//			product_count="sd.out_count";
-//		}
-//		List<Record> records = SellerProductQuery.me().findConvertRelate(sellerId);
-//		StringBuilder fromBuilder=new StringBuilder("SELECT ");
-//		for (Record record : records) {
-//			String customName=record.getStr("custom_name");
-//			String convertRelate = record.getStr("convert_relate");
-//			fromBuilder.append("TRUNCATE((sum( CASE sp.custom_name WHEN '"+customName+"' THEN "+product_count+" ELSE 0 END)/"+convertRelate+"),2)  '"+customName+"' ,");
-//		}
-//		fromBuilder.append("u.realname '业务员名称'");
-//		fromBuilder.append(" FROM cc_sales_order so ");
-//		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id=sojo.order_id ");
-//		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id=sojo.outstock_id ");
-//		fromBuilder.append(" LEFT JOIN cc_sales_order_detail sd ON sd.order_id=so.id ");
-//		fromBuilder.append(" LEFT JOIN `user` u ON u.id = so.biz_user_id ");
-//		fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id = so.customer_id ");
-//		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
-//		fromBuilder.append(" WHERE sd.is_gift=1 ");
-//		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_DEFAULT+","+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
-//		startDate=startDate+" 00:00:00";
-//		endDate=endDate+" 23:59:59";
-//		fromBuilder.append(" AND so.data_area like '"+ dataArea+"' ");
-//		fromBuilder.append(" AND "+ keyword+" >= '"+startDate+"'");
-//		fromBuilder.append(" AND "+ keyword+" <= '"+endDate+"'");
-//		if (keyword.equals("sok.create_date")) {
-//			fromBuilder.append(" AND sd.out_count != 0");
-//		}
-//		fromBuilder.append(" GROUP BY u.id");
-//		return Db.find(fromBuilder.toString());
-//	}
-	
+
 	//我客户的详情
 	public List<Record> findByCustomerDetail(String startDate, String endDate, String keyword, String userId,
 			String sellerId, boolean ifGift) {
@@ -1103,7 +822,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		StringBuilder fromBuilder=new StringBuilder("SELECT ");
 		for (SellerProduct sellerProduct : findBySellerId) {
 			String customName=sellerProduct.getCustomName();
-			fromBuilder.append("TRUNCATE((sum( CASE sp.custom_name WHEN '"+customName+"' THEN "+product_count+" ELSE 0 END)/p.convert_relate),2)  '"+customName+"' ,");
+			fromBuilder.append("TRUNCATE(((sum( CASE sp.custom_name WHEN '"+customName+"' THEN "+product_count+" ELSE 0 END) -IFNULL(sum(srid.reject_product_count),0))/p.convert_relate),2)  '"+customName+"' ,");
 		}
 		fromBuilder.append("c.customer_name '客户名称'");
 		fromBuilder.append(" FROM cc_sales_order so ");
@@ -1114,12 +833,14 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id = sd.sell_product_id ");
 		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
 		fromBuilder.append(" LEFT JOIN cc_customer c ON c.id = sc.customer_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_refund_instock sri ON sri.outstock_id=sojo.outstock_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_refund_instock_detail srid ON srid.refund_instock_id=sri.id ");
 		fromBuilder.append(" WHERE so.biz_user_id ='"+userId+"'");
-		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_DEFAULT+","+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
+		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+") and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
 		if (ifGift) {
-			fromBuilder.append("and sd.is_gift=1 ");
+			fromBuilder.append(" and sd.is_gift=1 ");
 		}else {
-			fromBuilder.append("and sd.is_gift=0 ");
+			fromBuilder.append(" and sd.is_gift=0 ");
 		}
 		startDate=startDate+" 00:00:00";
 		endDate=endDate+" 23:59:59";
@@ -1128,49 +849,14 @@ public class SalesOrderQuery extends JBaseQuery {
 		if (keyword.equals("sok.create_date")) {
 			fromBuilder.append(" AND sd.out_count != 0");
 		}
-		fromBuilder.append(" GROUP BY c.id");
+		fromBuilder.append(" GROUP BY sc.id");
 		return Db.find(fromBuilder.toString());
 	}
-	
-	//我客户的赠品详情
-//	public List<Record> findByCustomerDetailGift(String startDate, String endDate, String keyword, String userId,
-//			String sellerId) {
-//		String product_count="sd.product_count";
-//		if (keyword.equals("sok.create_date")) {
-//			product_count="sd.out_count";
-//		}
-//		List<SellerProduct> findBySellerId = SellerProductQuery.me().findBySellerId(sellerId);
-//		StringBuilder fromBuilder=new StringBuilder("SELECT ");
-//		for (SellerProduct sellerProduct : findBySellerId) {
-//			String customName=sellerProduct.getCustomName();
-//			fromBuilder.append("TRUNCATE((sum( CASE sp.custom_name WHEN '"+customName+"' THEN "+product_count+" ELSE 0 END)/p.convert_relate),2)  '"+customName+"' ,");
-//		}
-//		fromBuilder.append("c.customer_name '客户名称'");
-//		fromBuilder.append(" FROM cc_sales_order so ");
-//		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id = sojo.order_id ");
-//		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id = sojo.outstock_id ");
-//		fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id = so.customer_id ");
-//		fromBuilder.append(" LEFT JOIN cc_sales_order_detail sd ON sd.order_id = so.id ");
-//		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id = sd.sell_product_id ");
-//		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
-//		fromBuilder.append(" LEFT JOIN cc_customer c ON c.id = sc.customer_id ");
-//		fromBuilder.append(" WHERE sd.is_gift=1 and so.biz_user_id ='"+userId+"'");
-//		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_DEFAULT+","+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
-//		startDate=startDate+" 00:00:00";
-//		endDate=endDate+" 23:59:59";
-//		fromBuilder.append(" AND "+ keyword+" >= '"+startDate+"'");
-//		fromBuilder.append(" AND "+ keyword+" <= '"+endDate+"'");
-//		if (keyword.equals("sok.create_date")) {
-//			fromBuilder.append(" AND sd.out_count != 0");
-//		}
-//		fromBuilder.append(" GROUP BY c.id");
-//		return Db.find(fromBuilder.toString());
-//	}
 	
 	//统计今日订单量 销售额
 	public Record queryCountToDayOrders(String userId,String dataArea) {
 		StringBuilder fromBuilder = new StringBuilder(" select count(cso.order_sn) count_order,sum(cso.total_amount) sum_amount from cc_sales_order cso inner join `user` u on u.id = cso.biz_user_id ");
-		fromBuilder.append("where DATE_FORMAT(cso.create_date, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d') and cso.status NOT in("+Consts.SALES_ORDER_STATUS_DEFAULT+","+Consts.SALES_ORDER_STATUS_CANCEL+",");
+		fromBuilder.append("where DATE_FORMAT(cso.create_date, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d') and cso.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+",");
 		fromBuilder.append(Consts.SALES_ORDER_STATUS_REJECT+") and u.data_area like '"+dataArea+"' ");
 		return Db.findFirst(fromBuilder.toString());
 	}
