@@ -107,7 +107,8 @@
             var pointArray = [];
             for(var i = 1; i <= visitList.length; i++)
                 {
-                    var point = new BMap.Point(visitList[i-1].lng + (i-1)*0.01, visitList[i-1].lat + (i-1)*0.01);
+                    //var point = new BMap.Point(visitList[i-1].lng + (i-1)*0.01, visitList[i-1].lat + (i-1)*0.01);
+                    var point = new BMap.Point(visitList[i-1].lng, visitList[i-1].lat);
                     pointArray.push(point);
                     var marker = new BMap.Marker(point);
                     map.addOverlay(marker);
