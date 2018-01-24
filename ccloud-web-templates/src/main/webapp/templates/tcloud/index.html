@@ -242,6 +242,7 @@
 					<p class="menu red-button">订单</p>
 					<p class="menu">客户</p>
 					<p class="menu">客户拜访</p>
+					<p class="menu">活动</p>
 				</div>
 				<!-- <a href="${CPATH}/message" class="more">更多 </a> -->
 			</div>
@@ -310,6 +311,30 @@
                         </a>
                     </#list> </#if>
                     <#if !(customerVisitPage ??) || (customerVisitPage.totalRow = 0)>
+                        <div class="weui-loadmore weui-loadmore_line">
+                            <span class="weui-loadmore__tips"  style="float: inherit;">暂无数据</span>
+                        </div>
+                    </#if>
+				</div>
+			    <div class="weui-cells none">
+				    <#if activityPage ??><#list activityPage.list as bean>
+				    
+				    		<#if (bean.taskId) ??>							
+							<a href="${CPATH}/activity/activityApplyReview?activityApplyId=${bean.object_id!}&taskId=${bean.taskId!}&assignee=${bean.assignee}">
+						<#else>
+							<a href="${CPATH}/activity/apply_detail?id=${bean.object_id!}">
+						</#if>
+				        
+                        <div class="weui-cell">
+                            <div class="weui-cell__bd">
+                                <span>${(bean.title)!}</span>
+                            </div>
+                            <div class="check-pass">${DICT_NAME('${bean.type}')}</div>
+                            <div class="weui-cell__ft">${(bean.create_date?string('yyyy-MM-dd HH:mm'))!}</div>
+                        </div>
+                        </a>
+                    </#list> </#if>
+                    <#if !(activityPage ??) || (activityPage.totalRow = 0)>
                         <div class="weui-loadmore weui-loadmore_line">
                             <span class="weui-loadmore__tips"  style="float: inherit;">暂无数据</span>
                         </div>

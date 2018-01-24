@@ -69,6 +69,11 @@ public class IndexController extends BaseFrontController {
 			Page<Record> customerVisitPage = MessageQuery.me().paginateObj(getPageNumber(), Integer.MAX_VALUE, sellerId, customerVisit.getValue(), null, user.getId(), null);
 			setAttr("customerVisitPage", customerVisitPage);
 			
+			
+			Dict activity = DictQuery.me().findByKey("message_type", "activity");
+			Page<Record> activityPage = MessageQuery.me().paginateObj(getPageNumber(), Integer.MAX_VALUE, sellerId, activity.getValue(), null, user.getId(), null);
+			setAttr("activityPage",activityPage);
+			
 			setAttr("orderTotal", SalesOrderQuery.me().getToDo(user.getUsername()).size());
 			setAttr("customerVisitTotal",CustomerVisitQuery.me().getToDo(user.getUsername()).size());
 			setAttr("customerTotal",SellerCustomerQuery.me().getToDo(user.getUsername()).size());

@@ -100,6 +100,9 @@ public class MessageQuery extends JBaseQuery {
 		if (type.equals(DictQuery.me().findByKey("message_type", "customer_visit").getValue())) {
 			fromBuilder.append(" LEFT JOIN cc_customer_visit obj ON m.object_id=obj.id ");
 		}
+		if(type.equals(DictQuery.me().findByKey("message_type", "activity").getValue())){
+			fromBuilder.append(" LEFT JOIN cc_activity_apply obj ON m.object_id=obj.id ");
+		}
 		fromBuilder.append(" LEFT JOIN (SELECT a.ID_ ,a.ASSIGNEE_, a.PROC_INST_ID_ FROM act_ru_task a) t1 on obj.proc_inst_id = t1.PROC_INST_ID_ ");
 		boolean needWhere = true;
 		LinkedList<Object> params = new LinkedList<Object>();
