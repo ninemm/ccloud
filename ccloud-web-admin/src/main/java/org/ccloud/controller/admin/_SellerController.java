@@ -895,5 +895,16 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			sellerJoinTemplate.save();                                                                                                                        
 		}
 	}
+	
+	//检查用户填写的编码是否已经存在了
+	public void checkCode() {
+		String code = getPara("code");
+		Seller sr = SellerQuery.me().findbyCode(code);
+		boolean result = false;
+		if(sr!=null){
+			result = true;
+		}
+		renderJson(result);
+	}
 }
 
