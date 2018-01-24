@@ -36,26 +36,8 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
-import org.ccloud.model.OutstockPrint;
-import org.ccloud.model.Payables;
-import org.ccloud.model.PrintTemplate;
-import org.ccloud.model.SalesOrder;
-import org.ccloud.model.SalesOutstock;
-import org.ccloud.model.Seller;
-import org.ccloud.model.SellerCustomer;
-import org.ccloud.model.User;
-import org.ccloud.model.Warehouse;
-import org.ccloud.model.query.OutstockPrintQuery;
-import org.ccloud.model.query.PayablesQuery;
-import org.ccloud.model.query.PrintTemplateQuery;
-import org.ccloud.model.query.PurchaseInstockDetailQuery;
-import org.ccloud.model.query.PurchaseInstockQuery;
-import org.ccloud.model.query.SalesOrderQuery;
-import org.ccloud.model.query.SalesOutstockDetailQuery;
-import org.ccloud.model.query.SalesOutstockQuery;
-import org.ccloud.model.query.SellerCustomerQuery;
-import org.ccloud.model.query.SellerQuery;
-import org.ccloud.model.query.WarehouseQuery;
+import org.ccloud.model.*;
+import org.ccloud.model.query.*;
 import org.ccloud.model.vo.SalesOutstockExcel;
 import org.ccloud.model.vo.carSalesPrintNeedInfo;
 import org.ccloud.model.vo.orderProductInfo;
@@ -309,6 +291,8 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		boolean isSave = Db.tx(new IAtom() {
 			@Override
 			public boolean run() throws SQLException {
+				String order_user = StringUtils.getArrayFirst(paraMap.get("order_user"));
+				String order_date = StringUtils.getArrayFirst(paraMap.get("order_date"));
 				String deptId = StringUtils.getArrayFirst(paraMap.get("deptId"));
 				String dataArea = StringUtils.getArrayFirst(paraMap.get("dataArea"));
 				String outStockId = StringUtils.getArrayFirst(paraMap.get("salesStockId"));
@@ -328,7 +312,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 					String sellProductId = StringUtils.getArrayFirst(paraMap.get("sellProductId" + index));
 					if (StrKit.notBlank(sellProductId)) {
 						if (!SalesOutstockDetailQuery.me().outStock(paraMap, sellerId, date, deptId, dataArea, index,
-								user.getId(), outStockSN, wareHouseId, sellProductId, sellerCustomerId)) {
+								user.getId(), outStockSN, wareHouseId, sellProductId, sellerCustomerId, order_user, order_date)) {
 							return false;
 						}
 						count++;

@@ -102,7 +102,29 @@ $(function() {
 						<span style="width:1rem" class="t-c">-</span>
 						<div class="weui-flex__item t-r">结束时间：2018-02-02</div>
 					</div>
-					<i class="icon-chevron-right gray"></i>
+						<div class="weui-cells mg-0">
+							<div class="weui-cell">
+								<div class="weui-cell__bd">
+									劲酒
+								</div>
+							</div>
+							<div class="weui-cell">
+								<div class="weui-cell__bd weui-flex t-c">
+									<div class="weui-flex__item">
+										<p>计划数量</p>
+										<p>20件</p>
+									</div>
+									<div class="weui-flex__item">
+										<p>完成数量</p>
+										<p>10件</p>
+										</div>
+									<div class="weui-flex__item">
+										<p>完成度</p>
+										<p>50%</p>
+									</div>
+								</div>
+							</div>
+						</div>
 				</div>
 			</div>
 			<div class="weui-loadmore" id="loading" style="display: none;">
@@ -125,8 +147,7 @@ $(function() {
 		</div>
 	</div>
 	<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
-		<button class="white-button-no-border  cancel-search-btn weui-flex__item border-top-1px">取消</button>
-		<button class="red-button confirm-search-btn weui-flex__item">确定</button>
+		<button class="red-button weui-flex__item _submit_btn" onclick="window.location.href='${CPATH}/plans'">新增计划</button>
 	</footer>
 </article>
 <div class="layer"></div>

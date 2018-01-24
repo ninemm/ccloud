@@ -9,11 +9,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.jfinal.plugin.activerecord.Page;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
+import org.ccloud.model.CustomerType;
 import org.ccloud.model.Plans;
 import org.ccloud.model.User;
-import org.ccloud.model.query.SellerProductQuery;
+import org.ccloud.model.query.*;
 import org.ccloud.route.RouterMapping;
 
 import com.alibaba.fastjson.JSON;
@@ -44,6 +46,7 @@ public class PlansController extends BaseFrontController {
 		setAttr("productItems",JSON.toJSON(productItems));
 		render("plan.html");
 	}
+
 	public void getProduct() {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		List<Record> productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", "");
@@ -51,6 +54,7 @@ public class PlansController extends BaseFrontController {
 		map.put("productList", productRecords);
 		renderJson(map);
 	}
+
 	@Before(Tx.class)
 	public void makePlan() {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
@@ -72,7 +76,6 @@ public class PlansController extends BaseFrontController {
 				plans.setStartDate(( new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).parse(startDate));
 				plans.setEndDate(( new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).parse(endDate));
 			} catch (ParseException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			plans.setDeptId(user.getDepartmentId());
@@ -81,6 +84,47 @@ public class PlansController extends BaseFrontController {
 			plans.save();
 			
 		}
-		renderAjaxResultForSuccess("申请成功");
+		renderAjaxResultForSuccess("新增成功");
 	}
+
+	public void myPlans() {
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		Map<String, Object> all = new HashMap<>();
+		all.put("title", "全部");
+		all.put("value", "");
+
+		List<Map<String, Object>> userIds = new ArrayList<>();
+		userIds.add(all);
+
+		List<Record> userList = UserQuery.me().findNextLevelsUserList(selectDataArea);
+		for (Record record : userList) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", record.get("realname"));
+			item.put("value", record.get("id"));
+			userIds.add(item);
+		}
+
+		setAttr("userIds", JSON.toJSON(userIds));
+		render("plan_list.html");
+	}
+
+	public void planList() {
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+
+		String keyword = getPara("keyword");
+
+		String userId = getPara("user");
+		String type = getPara("type");
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+
+		Page<Record> planList = PlansQuery.me().paginateForApp(getPageNumber(), getPageSize(), keyword, userId, type, startDate, endDate, sellerId, selectDataArea);
+
+		Map<String, Object> map = new HashMap<>();
+		map.put("planList", planList.getList());
+
+		renderJson(map);
+	}
+
 }

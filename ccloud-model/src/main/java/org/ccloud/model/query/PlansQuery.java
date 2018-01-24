@@ -16,6 +16,11 @@
 package org.ccloud.model.query;
 
 import java.util.LinkedList;
+import java.util.List;
+
+import com.jfinal.kit.StrKit;
+import com.jfinal.plugin.activerecord.Db;
+import com.jfinal.plugin.activerecord.Record;
 import org.ccloud.model.Plans;
 
 import com.jfinal.plugin.activerecord.Page;
@@ -52,6 +57,48 @@ public class PlansQuery extends JBaseQuery {
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+
+	public Page<Record> paginateForApp(int pageNumber, int pageSize, String keyword, String userId, String type,
+	                                   String startDate, String endDate, String sellerId, String dataArea) {
+		String select = "select o.*, u.realname ";
+		StringBuilder fromBuilder = new StringBuilder("from `cc_plans` o ");
+		fromBuilder.append("join user u ON o.id = o.userId ");
+
+
+		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
+
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "u.realname", keyword, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "o.user_id", userId, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "o.type", type, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
+
+		if (needWhere) {
+			fromBuilder.append(" where 1 = 1");
+		}
+
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and o.start_date >= ?");
+			params.add(startDate);
+		}
+
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and o.end_date <= ?");
+			params.add(endDate);
+		}
+
+		fromBuilder.append(" order by o.start_date desc, o.create_date desc ");
+
+		if (params.isEmpty())
+			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+
+		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+
+	public List<Plans> findBySales(String userId, String sellerProductId,String date) {
+		return DAO.doFind("user_id = ? and seller_product_id = ? and start_date < ? and end_date > ? ", userId, sellerProductId, date, date);
 	}
 
 	public int batchDelete(String... ids) {

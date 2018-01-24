@@ -51,7 +51,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 
 	public Record findMoreById(final String id) {
 		StringBuilder fromBuilder = new StringBuilder(
-				" select o.*, sa.biz_user_id as order_user , cs.customer_kind, c.id as customerId, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as customerTypeCode, u.realname, u.mobile ");
+				" select o.*, sa.biz_user_id as order_user, sa.create_date as order_date, cs.customer_kind, c.id as customerId, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as customerTypeCode, u.realname, u.mobile ");
 		fromBuilder.append(" ,w.code as warehouseCode, cp.factor ");
 		fromBuilder.append(" from `cc_sales_outstock` o ");
 		fromBuilder.append(" left join cc_sales_order_join_outstock co ON co.outstock_id = o.id ");

@@ -14,33 +14,9 @@
 <#macro script_import>
 </#macro>
 <#macro script>
-var productInfoMap = ${productItems!};
-	$("#productName").select({
-		  title: "选择产品",
-		  items: productInfoMap,
-		  onChange:function(obj){
-		  	var $product = $(this)[0].$input.parents(".productInfo");
-		  	$product.find("#productId").val(this.data['values']);
-		  }
-		});
-var $productList = $(".productList");
-var newHtml = $(".productList").html();
+
 $(function() {
-	$("#type").select({
-		title: "选择计划类型",
-		items: [ {
-			      title: "月度计划",
-			      value: "m"
-			    },
-			    {
-			      title: "年计划",
-			      value: "y"
-			    }],
-		 onChange:function(obj){
-		  	var $product = $(this)[0].$input.parents(".type");
-		  	$product.find("#typeId").val(this.data['values']);
-		  }
-	});
+
 	$("#start-date").calendar({
 		maxDate: function() {
 			return $('#end-date').val()
@@ -59,17 +35,34 @@ $(function() {
 	$(document).on("click", "#plans", function() {
 		doSubmit();
 	})
+
+	$productList.empty();
+	addProduct();
  })
+
+var productInfoMap = ${productItems!};
+
+var $productList = $(".productList");
+var newHtml = $(".productList").html();
+
+$("#type").select({
+	title: "选择计划类型",
+	items: [ {
+		title: "月度计划",
+		value: "m"
+	},
+	{
+		title: "年计划",
+		value: "y"
+	}]
+});
+
 function addProduct(){
 	$productList.append(newHtml);
 	var $productInfo = $productList.find(".productInfo:last");
 	$productInfo.find("#productName").select({
 		  title: "选择产品",
-		  items: productInfoMap,
-		  onChange:function(obj){
-		  	var $product = $(this)[0].$input.parents(".productInfo");
-		  	$product.find("#productId").val(this.data['values']);
-		  }
+		  items: productInfoMap
 	});
 }
 
@@ -129,7 +122,7 @@ function doSubmit(){
 		<div class="weui-cells__title">计划明细</div>
 		<div class="weui-panel weui-panel_access productList">
 			<div class="weui-cells mg-0 productInfo">
-				<div class="weui-cell weui-cell_access">
+				<div class="weui-cell weui-cell_access select-area ">
 					<div class="weui-cell__bd">
 						产品名称
 					</div>
@@ -146,12 +139,12 @@ function doSubmit(){
 				</div>
 			</div>
 		</div>
-		<section class="weui-panel weui-panel_access">
+<!--		<section class="weui-panel weui-panel_access">
 			<div class="weui-cell weui-cell_access t-c ft14">
 				<p class="width-100 blue" onclick="addProduct()">
 					<i class="icon-plus-circle"></i>新增产品</p>
 			</div>
-		</section>
+		</section>-->
 	</div>
 	<#include "_inc/_goback.html" />
 	<footer class="weui-footer weui-footer_fixed-bottom weui-flex">

@@ -125,6 +125,13 @@ $(function() {
 				<p class="weui-grid__label">申请退货</p>
 			</a>
 			</@shiro.hasPermission>
+
+			<a href="${CPATH}/plans/myPlans" class="weui-grid js_grid">
+				<div class="weui-grid__icon">
+					<i class="icon-tasks"></i>
+				</div>
+				<p class="weui-grid__label">销售计划</p>
+			</a>
 			
 			<@shiro.hasPermission name="/front/inventory">
 			<a class="weui-grid js_grid" href="${CPATH}/inventory/index">
@@ -155,12 +162,6 @@ $(function() {
 				<p class="weui-grid__label">申请记录</p>
 			</a>
 			</@shiro.hasPermission>
-			<a href="${CPATH}/plans" class="weui-grid js_grid">
-				<div class="weui-grid__icon">
-					<i class="icon-tasks"></i>
-				</div>
-				<p class="weui-grid__label">工作计划</p>
-			</a>
 		</div>
 		</@shiro.hasPermission>
 			<!--

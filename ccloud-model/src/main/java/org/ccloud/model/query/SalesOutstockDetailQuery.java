@@ -23,12 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.ccloud.Consts;
-import org.ccloud.model.Inventory;
-import org.ccloud.model.InventoryDetail;
-import org.ccloud.model.ReceivablesDetail;
-import org.ccloud.model.SalesOrderDetail;
-import org.ccloud.model.SalesOutstockDetail;
-import org.ccloud.model.SellerProduct;
+import org.ccloud.model.*;
 import org.ccloud.model.vo.orderProductInfo;
 import org.ccloud.utils.StringUtils;
 
@@ -211,8 +206,9 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		return 0;
 	}
 
-	public boolean outStock(Map<String, String[]> paraMap, String sellerId, Date date, String deptId,
-			String dataArea, Integer index, String userId, String outStockSN, String wareHouseId, String sellerProductId, String customerId) {
+	public boolean outStock(Map<String, String[]> paraMap, String sellerId, Date date, String deptId, String dataArea,
+	                        Integer index, String userId, String outStockSN, String wareHouseId, String sellerProductId, String customerId,
+			                String order_user, String order_date) {
 		SalesOutstockDetail detail = SalesOutstockDetailQuery.me().
 				findById(StringUtils.getArrayFirst(paraMap.get("outstockDetailId" + index)));
 		String convert = StringUtils.getArrayFirst(paraMap.get("convert" + index));
@@ -319,7 +315,28 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		if (!receivablesDetail.save()) {
 			return false;
 		}
+
+		BigDecimal bigProductCount = new BigDecimal(bigCount).add(new BigDecimal(smallCount).divide(new BigDecimal(productConvert)));
+		if (!updatePlans(order_user, sellerProductId, order_date, bigProductCount)) {
+			return false;
+		}
 		
+		return true;
+	}
+
+	private boolean updatePlans(String order_user, String sellerProductId, String orderDate, BigDecimal productCount) {
+		List<Plans> plans = PlansQuery.me().findBySales(order_user, sellerProductId, orderDate);
+		for (Plans plan : plans) {
+			BigDecimal planNum = plan.getPlanNum();
+			BigDecimal completeNum = (productCount.add(plan.getCompleteNum())).setScale(2, BigDecimal.ROUND_HALF_UP);
+			plan.setCompleteNum(completeNum);
+			plan.setCompleteRatio((completeNum.divide(planNum)).setScale(2, BigDecimal.ROUND_HALF_UP));
+			plan.setModifyDate(new Date());
+			if(plan.update()){
+				return  false;
+			}
+		}
+
 		return true;
 	}
 
