@@ -85,12 +85,12 @@ function doSubmit(){
 }
 </#macro>
 <@layout>
-<form action="${CPATH}/plans/makePlan" method="post" id="form">
-	<div class="weui-content">
+<div class="weui-content">
+	<form action="${CPATH}/plans/makePlan" method="post" id="form">
 		<div class="weui-panel weui-panel_access plane-select-box">
 			<div class="weui-cells mg-0 select-area">
 				<div class="weui-cell">
-					<div class="weui-cell__bd type">
+					<div class="weui-cell__bd">
 						<div class="order-customer-info-title">计划类型
 							<span class="require">*</span>
 						</div>
@@ -134,21 +134,21 @@ function doSubmit(){
 					<div class="weui-cell__bd">
 						数量
 					</div>
-					<input type="text" class="weui-input" name="productNum">
+					<input type="tel" class="weui-input" name="productNum">
 					<div class="weui-cell__ft">件</div>
 				</div>
 			</div>
 		</div>
-<!--		<section class="weui-panel weui-panel_access">
+		<!--		<section class="weui-panel weui-panel_access">
 			<div class="weui-cell weui-cell_access t-c ft14">
 				<p class="width-100 blue" onclick="addProduct()">
 					<i class="icon-plus-circle"></i>新增产品</p>
 			</div>
 		</section>-->
-	</div>
-	<#include "_inc/_goback.html" />
-	<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
-		<button id="plans" type="button" class="red-button width-100">提交</button>
-	</footer>
-</form>
+		<#include "_inc/_goback.html" />
+		<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
+			<button id="plans" type="button" class="red-button width-100">提交</button>
+		</footer>
+	</form>
+</div>
 </@layout>
