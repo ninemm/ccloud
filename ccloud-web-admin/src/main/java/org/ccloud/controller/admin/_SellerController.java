@@ -257,7 +257,14 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 	
 	public void getBrand() {
 		String id = getPara("id");
-		List<Brand> brands = BrandQuery.me().findAll();
+		User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		List<Brand> brands = new ArrayList<Brand>();
+		if(user.getUsername().equals("admin")) {
+			brands = BrandQuery.me().findAll();
+		}else {
+			brands = BrandQuery.me().findBySellerId(sellerId);
+		}
 		List<Map<String, Object>> list = new ArrayList<>();
 		for (Brand brand : brands) {
 			if (brand.getId().equals("")) {
