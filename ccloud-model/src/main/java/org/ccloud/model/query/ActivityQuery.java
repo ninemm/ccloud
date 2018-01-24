@@ -62,12 +62,12 @@ public class ActivityQuery extends JBaseQuery {
 		}
 
 		if (StrKit.notBlank(startDate)) {
-			fromBuilder.append(" and ca.start_date >= ?");
+			fromBuilder.append(" and ca.start_time >= ?");
 			params.add(startDate);
 		}
 
 		if (StrKit.notBlank(endDate)) {
-			fromBuilder.append(" and ca.end_date <= ?");
+			fromBuilder.append(" and ca.end_time <= ?");
 			params.add(endDate);
 		}
 		fromBuilder.append(" and ca.seller_id='"+sellerId+"' ORDER BY ca.is_publish desc,ca.create_date desc");
