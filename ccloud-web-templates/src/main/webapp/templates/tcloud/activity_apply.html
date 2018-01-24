@@ -41,6 +41,7 @@
 		text-align: right;
 		float: right;
 	}
+
 </#macro>
 <#macro script_import>
 </#macro>
@@ -85,6 +86,14 @@ $(function () {
 	}).on("click", ".check-box+.weui-flex__item", function() {
 		var $checkbox = $(this).prev().find('input[type=checkbox]')[0];
 		$checkbox.checked = !$checkbox.checked;
+		var all = $('#customerList input[type=checkbox]').length;
+		var now = $('#customerList input[type=checkbox]:checked').length
+		if (all == now) {
+			$('.select-all')[0].checked = true
+		} else {
+			$('.select-all')[0].checked = false
+		}
+		$("#totalNum").text(now);
 	});
 	customerCombo();
 });
@@ -481,8 +490,8 @@ function doChange(key){
 			</div>
 			<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
 				<div class="total bg-white weui-flex__item t-l">
-					<input type="checkbox" name="" id="" class="weui-agree__checkbox select-all">
-					<span class="ft12">全选</span>
+					<input type="checkbox" name="" id="select-all" class="weui-agree__checkbox select-all">
+					<label for="select-all" class="ft12">全选</label>
 					<span>&nbsp;&nbsp;合计:</span>
 					<span class="ft12" id="totalNum"></span>
 				</div>

@@ -1491,6 +1491,10 @@ input.street-value {
   color: #000;
 }
 
+#combin-filter .customer p {
+  height: auto;
+}
+
 .customer-info p {
   overflow: hidden;
   text-overflow: ellipsis;
