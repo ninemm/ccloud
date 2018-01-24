@@ -278,9 +278,9 @@
             <button class="red-button confirm-search-btn weui-flex__item">确定</button>
         </footer>
     </article>
-    <#include "_inc/_goback.html" />
-    <footer class="weui-footer weui-footer_fixed-bottom">
-        <button class="red-button weui-flex__item _submit_btn" onclick="window.location.href='${CPATH}/activity'">活动申请</button>
-    </footer>
+    <a class="hidden-menu" href="${CPATH}/activity">
+        <img src="${CTPATH}/images/order_add.png" alt="">
+    </a>
+    <#include "_inc/_goback_bottom.html" />
 </div>
 </@layout>

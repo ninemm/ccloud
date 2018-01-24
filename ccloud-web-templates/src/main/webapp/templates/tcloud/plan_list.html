@@ -218,9 +218,13 @@
 		</div>
 	</div>
 	<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
-		<button class="red-button weui-flex__item _submit_btn" onclick="window.location.href='${CPATH}/plans'">新增计划</button>
+            <button class="white-button-no-border  cancel-search-btn weui-flex__item border-top-1px">取消</button>
+            <button class="red-button confirm-search-btn weui-flex__item">确定</button>
 	</footer>
 </article>
+<a class="hidden-menu" href="${CPATH}/plans">
+	<img src="${CTPATH}/images/order_add.png" alt="">
+</a>
 <div class="layer"></div>
 <#include "_inc/_goback_bottom.html" />
 </@layout>
