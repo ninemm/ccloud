@@ -132,6 +132,11 @@
 				notEmpty: { message: '组织机构不能为空' },
 			}
 		},
+		'seller_type':{
+			validators: {
+				notEmpty: { message: '销售商类型不能为空' },
+			}
+		},
 		'brand':{
 			validators: {
 				notEmpty: { message: '品牌不能为空' },
@@ -267,13 +272,15 @@
 						</div>
 						<#if !(seller.id) ??>
 						<div class="form-group col-sm-12 validata-box">
-							<label class="control-label col-sm-2">销售商类型:</label>
-							<div class="input-group col-md-4 col-sm-10">
-								<select class="form-control input-sm" name="seller.seller_type" id="seller_type">
-									${DICT_BOX('seller_type', 'select', (seller.seller_type)!)}
-								</select>
-			               	</div>
-						</div>	
+										<label class="control-label col-sm-2">*销售商类型:</label>
+										<div class="input-group col-md-4 col-sm-10">
+											<select class="form-control input-sm" name="seller_type" id="seller_type">
+												<option value="" selected="selected">--请选择--</option>
+												<option value="0">经销商</option>
+												<option value="1">直营商</option>
+											</select>
+						               	</div>
+						</div>		
 						</#if>						
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">联系人:</label>

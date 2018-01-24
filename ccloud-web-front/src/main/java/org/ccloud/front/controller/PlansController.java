@@ -25,10 +25,10 @@ import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.tx.Tx;
 
 @RouterMapping(url = "/plans")
-public class PlansController extends BaseFrontController { 
-	public static final String WEEK_PLAN = "w";//周计划
-	public static final String MONTH_PLAN = "m";//周计划
-	public static final String YEAR_PLAN = "y";//周计划
+public class PlansController extends BaseFrontController {
+	public static final String WEEK_PLAN = "101201";//周计划
+	public static final String MONTH_PLAN = "101202";//月计划
+	public static final String YEAR_PLAN = "101203";//年计划
 	public void index() {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		List<Record> productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", "");

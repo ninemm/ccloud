@@ -47,26 +47,48 @@ var newHtml = $(".productList").html();
 
 $("#type").select({
 	title: "选择计划类型",
-	items: [ {
-		title: "月度计划",
-		value: "m"
-	},
-	{
-		title: "年计划",
-		value: "y"
-	}]
+	items: [{
+		title: "周计划", value: "101201"
+	},{
+		title: "月计划", value: "101202"
+	},{
+		title: "年计划", value: "101203"
+	}],
+	onChange: function(obj){
+		var $product = $(this)[0].$input.parents(".productInfo");
+		$("#typeId").val(this.data['values']);
+	}
 });
 
 function addProduct(){
 	$productList.append(newHtml);
 	var $productInfo = $productList.find(".productInfo:last");
 	$productInfo.find("#productName").select({
-		  title: "选择产品",
-		  items: productInfoMap
+			title: "选择产品",
+			items: productInfoMap,
+			onChange: function(obj){
+				var $product = $(this)[0].$input.parents(".productInfo");
+				$product.find("#productId").val(this.data['values']);
+			}
 	});
 }
 
 function doSubmit(){
+	if($("#typeId").val() == '') {
+		$.toptip("请选择计划类型!", 'warning');
+		return;
+	}
+
+	if($("#productId").val() == '') {
+		$.toptip("请选择产品!", 'warning');
+		return;
+	}
+
+	if($("#productNum").val() == '') {
+		$.toptip("请填写数量!", 'warning');
+		return;
+	}
+
 	$("#form").ajaxSubmit({
 			beforeSubmit: function() {
 				return true
@@ -75,7 +97,19 @@ function doSubmit(){
 			dataType : "json",
 			success : function(data) {
 				layer.closeAll();
-				alert("信息提交成功");
+				$.modal({
+					title: data.message,
+					buttons: [
+						{ text: "查看计划", className: "default", onClick: function(){
+							location.href = "${CPATH}/plans/myPlans";
+						}
+						},
+						{ text: "继续新增", className: "primary", onClick: function(){
+							location.href = '${CPATH}/plans';
+						}
+						},
+					]
+				});
 			},
 			error : function() {
 				layer.closeAll();
@@ -126,15 +160,15 @@ function doSubmit(){
 					<div class="weui-cell__bd">
 						产品名称
 					</div>
-					<input type="text" name="productName" id="productName" class="weui-input">
-					<input type="hidden" name="productId" id="productId" class="weui-input">
+					<input type="text" name="productName" id="productName" class="weui-input" value="">
+					<input type="hidden" name="productId" id="productId" class="weui-input" value="">
 					<div class="weui-cell__ft"></div>
 				</div>
 				<div class="weui-cell">
 					<div class="weui-cell__bd">
 						数量
 					</div>
-					<input type="tel" class="weui-input" name="productNum">
+					<input type="tel" class="weui-input" name="productNum" id="productNum" value="">
 					<div class="weui-cell__ft">件</div>
 				</div>
 			</div>

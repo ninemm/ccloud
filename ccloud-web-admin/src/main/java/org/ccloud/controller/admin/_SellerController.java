@@ -144,6 +144,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		String sellerId = seller.getId();
 		String areaCodes = getPara("areaCodes");
 		String areaNames = getPara("areaNames");
+		String sellerType = getPara("seller_type");
 		String[] areaCodeArray = areaCodes.split("/");
 		String[] areaNameArray = areaNames.split("/");
 
@@ -178,6 +179,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 					renderAjaxResultForError("该公司部门已有一个经销商或者直营商，请确认");
 					return;
 			}
+			seller.setSellerType(Integer.parseInt(sellerType));
 			this.saveSeller(seller, department, user,productType);
 
 			this.saveOption(seller.getSellerCode());
@@ -198,7 +200,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 				dataArea = depts.get(0).getStr("data_area");
 				deptId = depts.get(0).getStr("id");
 				//添加直营商客户时 初始化数据
-				if(!user.getUsername().equals("admin") || seller.getSellerType().equals(Integer.parseInt(Consts.SELLER_TYPE_SELLER))){
+				if(!user.getUsername().equals("admin") || sellerType.equals(Consts.SELLER_TYPE_SELLER)){
 					String customerId = StrKit.getRandomUUID();
 					//添加客户
 					customer.setId(customerId);
@@ -221,7 +223,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			//保存通用打印模板,通用模板的ID：0
 			this.saveSellerJoinTemplate(seller.getId());
 			
-			if(seller.getSellerType().equals(Integer.parseInt(Consts.SELLER_TYPE_DEALER))) {
+			if(sellerType.equals(Consts.SELLER_TYPE_DEALER)) {
 				//新建销售商时默认创建分组  角色  及中间表 客户类型
 				this.saveOther(department,deptId);
 			}
