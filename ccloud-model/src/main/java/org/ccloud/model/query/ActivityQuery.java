@@ -39,8 +39,18 @@ public class ActivityQuery extends JBaseQuery {
 	public Activity findById(final String id) {
 				return DAO.findById(id);
 	}
-	public Page<Activity> paginate(int pageNumber, int pageSize, String keyword,String startDate, String endDate,String sellerId) {
-		String select = "select ca.*,ct.name as customerName ";
+
+	public Record findMoreById(final String id) {
+		StringBuilder fromBuilder = new StringBuilder(" select o.*, ct.name as customerTypeName ");
+		fromBuilder.append(" from `cc_activity` o ");
+		fromBuilder.append(" LEFT JOIN cc_customer_type ct on o.customer_type = ct.id");
+		fromBuilder.append(" where o.id = ? ");
+
+		return Db.findFirst(fromBuilder.toString(), id);
+	}
+
+	public Page<Record> paginate(int pageNumber, int pageSize, String keyword,String startDate, String endDate,String sellerId) {
+		String select = "select ca.*,ct.name as customerTypeName ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_activity` ca ");
 		fromBuilder.append(" LEFT JOIN cc_customer_type ct on ct.id=ca.customer_type");
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -62,8 +72,8 @@ public class ActivityQuery extends JBaseQuery {
 		}
 		fromBuilder.append(" and ca.seller_id='"+sellerId+"' ORDER BY ca.is_publish desc,ca.create_date desc");
 		if (params.isEmpty())
-			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
-        return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+        return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
     }
 
     public int batchDelete(String... ids) {

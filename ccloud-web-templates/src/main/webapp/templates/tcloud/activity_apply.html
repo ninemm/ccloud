@@ -143,6 +143,17 @@ function doChange(key){
      title: "选择客户类型",
      items: ${customerTypes!}
     });
+
+    var areaType = '${areaType!}';
+	var provName = '';
+	var cityName = '';
+	var countryName = ''
+	if(areaType != ''){
+		var areaTypeArr = areaType.split('-');
+        provName = areaTypeArr[0];
+		cityName = areaTypeArr[1];
+		countryName = areaTypeArr[2];
+	}
     
     var customerHtml = $(".customerSelect").eq(0).html();
     var $loading = $("#loading");
@@ -167,7 +178,10 @@ function doChange(key){
             "keyword": $("#searchInput").val(),
             "userId": $("#userId").data('values'),
             "customerTypeId": $("#customerTypeId").data('values'),
-            "isOrdered": $("#isOrdered").data('values')
+            "isOrdered": $("#isOrdered").data('values'),
+            "provName": provName,
+            "cityName": cityName,
+            "countryName": countryName
         }
 
         Utils.ajax('${CPATH}/product/customerList', params,

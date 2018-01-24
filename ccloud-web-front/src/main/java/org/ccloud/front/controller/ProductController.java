@@ -218,7 +218,10 @@ public class ProductController extends BaseFrontController {
 		String userId = getPara("userId");
 		String customerTypeId = getPara("customerTypeId");
 		String isOrdered = getPara("isOrdered");
-		
+		String provName = getPara("provName", "");
+		String cityName = getPara("cityName", "");
+		String countryName = getPara("countryName", "");
+
 		String customerKind = "";
 		Subject subject = SecurityUtils.getSubject();
 		if (subject.isPermitted("/admin/salesOrder/add") && subject.isPermitted("/admin/salesOrder/seller")) {
@@ -230,7 +233,7 @@ public class ProductController extends BaseFrontController {
 		}
 
 		Page<Record> customerList = SellerCustomerQuery.me().paginateForApp(getPageNumber(), getPageSize(), keyword,
-				selectDataArea, userId, customerTypeId, isOrdered, customerKind);
+				selectDataArea, userId, customerTypeId, isOrdered, customerKind, provName, cityName, countryName);
 
 		Map<String, Object> map = new HashMap<>();
 		map.put("customerList", customerList.getList());

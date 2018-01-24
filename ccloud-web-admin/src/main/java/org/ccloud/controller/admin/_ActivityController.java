@@ -69,7 +69,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		String sellerId = getSessionAttr("sellerId");
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
-		Page<Activity> page = ActivityQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate,sellerId);
+		Page<Record> page = ActivityQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate,sellerId);
 		
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);

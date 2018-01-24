@@ -114,7 +114,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 	}
 
 	public Page<Record> paginateForApp(int pageNumber, int pageSize, String keyword, String dataArea, String userId,
-			String customerTypeId, String isOrdered, String customerKind) {
+			String customerTypeId, String isOrdered, String customerKind, String provName, String cityName, String countryName) {
 
 		boolean needWhere = true;
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -148,6 +148,9 @@ public class SellerCustomerQuery extends JBaseQuery {
 		fromBuilder.append(" GROUP BY c2.id) t2 ON sc.id = t2.id ");
 
 		needWhere = appendIfNotEmpty(fromBuilder, "sc.customer_kind", customerKind, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "c.prov_name", provName, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "c.city_name", cityName, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "c.country_name", countryName, params, needWhere);
 
 		if (needWhere) {
 			fromBuilder.append(" WHERE 1 = 1 ");

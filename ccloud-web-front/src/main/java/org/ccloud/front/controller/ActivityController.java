@@ -94,7 +94,9 @@ public class ActivityController extends BaseFrontController {
 	}
 
 	public void activityApply() {
-		setAttr("activity_id", getPara("activity_id"));
+		String activity_id = getPara("activity_id");
+		setAttr("activity_id", activity_id);
+		Record activity = ActivityQuery.me().findMoreById(activity_id);
 
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
@@ -124,7 +126,6 @@ public class ActivityController extends BaseFrontController {
 		all.put("title", "全部");
 		all.put("value", "");
 		List<Map<String, Object>> customerTypes = new ArrayList<>();
-		customerTypes.add(all);
 
 		List<Map<String, Object>> userIds = new ArrayList<>();
 		userIds.add(all);
@@ -137,17 +138,28 @@ public class ActivityController extends BaseFrontController {
 			userIds.add(item);
 		}
 
-		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
-				                                      .findByDataArea(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
-		for (CustomerType customerType : customerTypeList) {
+		//客户类型限制
+		String customer_type = activity.getStr("customer_type");
+		if(StrKit.isBlank(customer_type)) {
+			customerTypes.add(all);
+			List<CustomerType> customerTypeList = CustomerTypeQuery.me()
+					                                      .findByDataArea(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
+			for (CustomerType customerType : customerTypeList) {
+				Map<String, Object> item = new HashMap<>();
+				item.put("title", customerType.getName());
+				item.put("value", customerType.getId());
+				customerTypes.add(item);
+			}
+		}else {
 			Map<String, Object> item = new HashMap<>();
-			item.put("title", customerType.getName());
-			item.put("value", customerType.getId());
+			item.put("title", activity.getStr("customerTypeName"));
+			item.put("value", customer_type);
 			customerTypes.add(item);
 		}
 
 		setAttr("userIds", JSON.toJSON(userIds));
 		setAttr("customerTypes", JSON.toJSON(customerTypes));
+		setAttr("areaType", activity.getStr("area_type"));
 
 		render("activity_apply.html");
 	}
