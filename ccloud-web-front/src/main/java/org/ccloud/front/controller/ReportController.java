@@ -513,15 +513,5 @@ public class ReportController extends BaseFrontController {
 		List<Record> record = SalesOrderQuery.me().getDepartmentCount(startDate, endDate, dayTag, sellerId, dataArea, orderTag);
 		renderJson(record);		
 	}
-
-	public void visit() {
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String startDate = org.ccloud.utils.DateUtils.dateToStr(new Date(), "yyyy-MM-dd") + " 00:00:00";
-//		String startDate = "2017-01-01 00:00:00";
-		String endDate = org.ccloud.utils.DateUtils.dateToStr(new Date(), "yyyy-MM-dd") + " 23:59:59";
-		List<Record> visitList = CustomerVisitQuery.me().findLngLat(user.getId(), startDate, endDate);
-		setAttr("visitList", JSON.toJSON(visitList));
-		render("report_visit.html");
-	}
 	
 }

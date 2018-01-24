@@ -537,4 +537,34 @@ public class CustomerVisitController extends BaseFrontController {
 		message.setObjectType(Consts.OBJECT_TYPE_CUSTOMER_VISIT);
 		MessageKit.sendMessage(Actions.ProcessMessage.PROCESS_MESSAGE_SAVE, message);
 	}
+
+	public void trajectory() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
+		List<Record> userList = UserQuery.me().findNextLevelsUserList(selectDataArea);
+		List<Map<String, Object>> users = new ArrayList<>();
+
+		for(Record record : userList) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", record.get("realname"));
+			item.put("value", record.get("id"));
+			users.add(item);
+		}
+		setAttr("users", JSON.toJSON(users));
+
+		render("visit_trajectory.html");
+	}
+
+	public void trajectoryRefresh() {
+		String userId = getPara("userId");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		if(StrKit.notBlank(userId)) user = UserQuery.me().findById(userId);
+
+		String startDate = getPara("startDate");
+//		String startDate = "2017-01-01 00:00:00";
+		String endDate = getPara("endDate");
+		List<Record> visitList = CustomerVisitQuery.me().findLngLat(user.getId(), startDate, endDate);
+		setAttr("visitList", JSON.toJSON(visitList));
+		renderJson(visitList);
+	}
 }
