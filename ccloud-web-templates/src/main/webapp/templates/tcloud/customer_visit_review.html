@@ -289,11 +289,11 @@
                 var speed = res.speed;                            // 速度，以米/每秒计
                 var accuracy = res.accuracy;                      // 位置精度
 
-                $("#review_lng").val(longitude.toFixed(6));
-                $("#review_lat").val(latitude.toFixed(6));
-
                 var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
                 var geoc = new BMap.Geocoder();                   // 获取百度地址解析器
+
+                $("#review_lng").val(parseFloat(longitude).toFixed(6));
+                $("#review_lat").val(parseFloat(latitude).toFixed(6));
 
                 translateCallback = function (point) {            // 回调函数
                     geoc.getLocation(point, function(rs) {
