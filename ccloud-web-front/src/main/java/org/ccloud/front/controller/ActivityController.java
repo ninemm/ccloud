@@ -185,6 +185,7 @@ public class ActivityController extends BaseFrontController {
 				
 				if(StrKit.notBlank(result)) {
 					renderAjaxResultForError(result);
+					return;
 				}
 
 				ActivityApply activityApply = new ActivityApply();
