@@ -119,15 +119,22 @@ function initActivityChange($obj){
 		onChange: function(data) {
 		var activity = activityInfoMap[data.values].columns;
 		changeEvent(activity, $obj);
+		showCustomer(activity);
 		}
 	});
 }
+
+function showCustomer(activity){
+	window.location.href = "${CPATH}/activity/activityApply?activity_id=" + activity.id;
+}
+
 function changeEvent(activity,$obj){
 	$obj.find("#activityId").val(activity.id);
 	$obj.find("#visitNum").val(activity.visit_num);
 	$obj.find("#startTime").val(new Date(activity.start_time).Format("yyyy-MM-dd"));
 	$obj.find("#endTime").val(new Date(activity.end_time).Format("yyyy-MM-dd"));
 	$obj.find("#investAmount").val(activity.invest_amount);
+	
 }
 
 function doChange(key){
@@ -181,7 +188,6 @@ function doChange(key){
     $customerList.empty();
 
     function initCustomerSelect() {
-
         $loading.show();
         $noMore.hide();
 
