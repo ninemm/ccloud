@@ -14,11 +14,18 @@
 	});
 
 	$(document).on("input", "#searchInput", function() {
-		setItemBykey("keyword", $("#searchInput").val());
 		combo();
 	}).on("click", "#searchCancel", function() {
 		combo();
-	})
+	}).on("change", "#type", function() {
+		combo();
+	}).on("change", "#userId", function() {
+		combo();
+	}).on("click", "#confirm", function() {
+		startDate = $('#start-date').val();
+		endDate = $('#end-date').val();
+		combo();
+	});
 
 	$("#type").select({
 		title: "选择计划类型",
@@ -219,7 +226,7 @@
 	</div>
 	<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
             <button class="white-button-no-border  cancel-search-btn weui-flex__item border-top-1px">取消</button>
-            <button class="red-button confirm-search-btn weui-flex__item">确定</button>
+            <button class="red-button confirm-search-btn weui-flex__item" id="confirm">确定</button>
 	</footer>
 </article>
 <@shiro.hasPermission name="/admin/plans/add">

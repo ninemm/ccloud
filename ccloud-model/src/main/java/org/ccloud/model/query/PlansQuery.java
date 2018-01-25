@@ -90,7 +90,7 @@ public class PlansQuery extends JBaseQuery {
 			params.add(endDate);
 		}
 
-		fromBuilder.append(" order by o.start_date desc, o.create_date desc ");
+		fromBuilder.append(" order by o.start_date desc,o.complete_ratio desc, o.create_date desc ");
 
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());

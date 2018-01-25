@@ -114,7 +114,7 @@ public class PlansController extends BaseFrontController {
 
 		String keyword = getPara("keyword");
 
-		String userId = getPara("user");
+		String userId = getPara("userId");
 		String type = getPara("type");
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
