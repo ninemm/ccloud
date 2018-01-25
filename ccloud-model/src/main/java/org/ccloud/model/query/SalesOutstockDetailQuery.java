@@ -16,6 +16,9 @@
 package org.ccloud.model.query;
 
 import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
@@ -25,6 +28,7 @@ import java.util.Map;
 import org.ccloud.Consts;
 import org.ccloud.model.*;
 import org.ccloud.model.vo.orderProductInfo;
+import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
 
 import com.jfinal.kit.StrKit;
@@ -325,14 +329,15 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 	}
 
 	private boolean updatePlans(String order_user, String sellerProductId, String orderDate, BigDecimal productCount) {
-		List<Plans> plans = PlansQuery.me().findBySales(order_user, sellerProductId, orderDate);
+
+		List<Plans> plans = PlansQuery.me().findBySales(order_user, sellerProductId, orderDate.substring(0,10));
 		for (Plans plan : plans) {
 			BigDecimal planNum = plan.getPlanNum();
 			BigDecimal completeNum = (productCount.add(plan.getCompleteNum())).setScale(2, BigDecimal.ROUND_HALF_UP);
 			plan.setCompleteNum(completeNum);
-			plan.setCompleteRatio((completeNum.divide(planNum)).setScale(2, BigDecimal.ROUND_HALF_UP));
+			plan.setCompleteRatio(completeNum.multiply(new BigDecimal(100)).divide(planNum, 2, BigDecimal.ROUND_HALF_UP));
 			plan.setModifyDate(new Date());
-			if(plan.update()){
+			if(!plan.update()){
 				return  false;
 			}
 		}

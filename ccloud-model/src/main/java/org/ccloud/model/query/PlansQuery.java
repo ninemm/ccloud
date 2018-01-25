@@ -15,6 +15,7 @@
  */
 package org.ccloud.model.query;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -99,7 +100,7 @@ public class PlansQuery extends JBaseQuery {
 	}
 
 	public List<Plans> findBySales(String userId, String sellerProductId,String date) {
-		return DAO.doFind("user_id = ? and seller_product_id = ? and start_date < ? and end_date > ? ", userId, sellerProductId, date, date);
+		return DAO.doFind("user_id = ? and seller_product_id = ? and start_date <= ? and end_date >= ? ", userId, sellerProductId, date, date);
 	}
 
 	public int batchDelete(String... ids) {
