@@ -75,7 +75,6 @@
 		    "page": page,
 	        "size": size,
 	        "dist": $("#searchArea").data('values'),
-			//"lngAndLat":"30.5270841588,114.3563139439"
 			"lon": $('#lon').val(),
 			"lat": $('#lat').val()
 	    }
@@ -146,9 +145,8 @@
 
 				var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
 				var geoc = new BMap.Geocoder();                   // 获取百度地址解析器
-                $("#lon").val(parseFloat(longitude).toFixed(2));
-                $("#lat").val(parseFloat(latitude).toFixed(2));
-				//$("#lngAndLat").val(parseFloat(longitude).toFixed(2)+" "+parseFloat(latitude).toFixed(2));
+                $("#lon").val(parseFloat(longitude).toFixed(6));
+                $("#lat").val(parseFloat(latitude).toFixed(6));
 
 				/*translateCallback = function (point) {            // 回调函数
 					geoc.getLocation(point, function(rs) {

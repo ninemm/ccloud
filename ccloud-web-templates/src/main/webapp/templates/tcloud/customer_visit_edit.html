@@ -283,8 +283,8 @@
 	        success: function (res) {
 	            var latitude = res.latitude;                      // 纬度，浮点数，范围为90 ~ -90
 	            var longitude = res.longitude;                    // 经度，浮点数，范围为180 ~ -180。
-	            $("#lng").val(parseFloat(longitude).toFixed(2));
-	            $("#lat").val(parseFloat(latitude).toFixed(2));
+	            $("#lng").val(parseFloat(longitude).toFixed(6));
+	            $("#lat").val(parseFloat(latitude).toFixed(6));
 	   
 	            var speed = res.speed;                            // 速度，以米/每秒计
 	            var accuracy = res.accuracy;                      // 位置精度
@@ -332,8 +332,8 @@
                 var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
                 var geoc = new BMap.Geocoder();                   // 获取百度地址解析器
 
-                $("#lng").val(parseFloat(longitude).toFixed(2));
-                $("#lat").val(parseFloat(latitude).toFixed(2));
+                $("#lng").val(parseFloat(longitude).toFixed(6));
+                $("#lat").val(parseFloat(latitude).toFixed(6));
                 translateCallback = function (point) {            // 回调函数
                     geoc.getLocation(point, function(rs) {
                         var addComp = rs.addressComponents;
