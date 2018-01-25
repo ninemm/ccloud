@@ -384,7 +384,18 @@ public class ActivityController extends BaseFrontController {
 			message.setIsRead(Consts.IS_READ);
 			message.update();
 		}
-
+		String[] investTypes = activityApply.getStr("invest_type").split(",");
+		String investType = "";
+		for(int i=0;i<investTypes.length;i++){
+			if(investTypes[i].equals(Consts.INVEST_SHOP)){
+				investType +="商品、";
+			}else if (investTypes[i].equals(Consts.INVEST_MATTER)){
+				investType +="物料、";
+			}else if (investTypes[i].equals(Consts.INVEST_MATTER)){
+				investType +="费用活动费、";
+			}
+		}
+		setAttr("investType",investType.substring(0, investType.length()-1));
 		setAttr("taskId", taskId);
 		setAttr("activityApply", activityApply);
 		setAttr("statusName", getStatusName(activityApply.getInt("status")));
