@@ -200,7 +200,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public boolean insertForApp(Map<String, String[]> paraMap, String orderId, String sellerId, String sellerCode, String userId, Date date,
+	public String insertForApp(Map<String, String[]> paraMap, String orderId, String sellerId, String sellerCode, String userId, Date date,
 			String deptId, String dataArea, int index) {
 		List<SalesOrderDetail> detailList = new ArrayList<>();
 		String sellerProductId = paraMap.get("sellProductId")[index];
@@ -214,7 +214,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		List<Map<String, String>> list = (List<Map<String, String>>) result.get("countList");
 		
 		if (!status.equals("enough")) {
-			return false;
+			return "库存不足";
 		}
 		for (Map<String, String> map : list) {
 			SalesOrderDetail detail = new SalesOrderDetail();
@@ -251,13 +251,13 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 			count = count + j;
 		}
 		if (count != detailList.size()) {
-			return false;
+			return "下单失败";
 		}
-		return true;
+		return "";
 	}
 	
 	@SuppressWarnings("unchecked")
-	public boolean insertForAppGift(Map<String, String[]> paraMap, String orderId, String sellerId, String sellerCode, String userId, Date date,
+	public String insertForAppGift(Map<String, String[]> paraMap, String orderId, String sellerId, String sellerCode, String userId, Date date,
 			String deptId, String dataArea, int index) {
 		List<SalesOrderDetail> detailList = new ArrayList<>();
 		String giftSellerProductId = paraMap.get("giftSellProductId")[index];
@@ -278,7 +278,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		List<Map<String, String>> list = (List<Map<String, String>>) result.get("countList");
 		
 		if (!status.equals("enough")) {
-			return false;
+			return "库存不足";
 		}
 		for (Map<String, String> map : list) {
 			SalesOrderDetail detail = new SalesOrderDetail();
@@ -318,13 +318,13 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 			count = count + j;
 		}
 		if (count != detailList.size()) {
-			return false;
+			return "下单失败";
 		}
-		return true;
+		return "";
 	}
 	
 	@SuppressWarnings("unchecked")
-	public boolean insertForAppComposition(SellerProduct product, String orderId, String sellerId, String sellerCode, String id,
+	public String insertForAppComposition(SellerProduct product, String orderId, String sellerId, String sellerCode, String id,
 			Date date, String deptId, String dataArea, Integer number, String userId) {
 		List<SalesOrderDetail> detailList = new ArrayList<>();
 		String sellerProductId = product.getId();
@@ -337,7 +337,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		List<Map<String, String>> list = (List<Map<String, String>>) result.get("countList");
 		
 		if (!status.equals("enough")) {
-			return false;
+			return "库存不足";
 		}
 		for (Map<String, String> map : list) {
 			SalesOrderDetail detail = new SalesOrderDetail();
@@ -368,9 +368,9 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 			count = count + j;
 		}
 		if (count != detailList.size()) {
-			return false;
+			return "下单失败";
 		}
-		return true;
+		return "";
 	}
 	
 	public boolean updateForApp(Map<String, String[]> paraMap, int index, Date date) {

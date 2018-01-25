@@ -241,25 +241,23 @@ public class OrderController extends BaseFrontController {
 		return "无";
 	}
 
+	@Before(Tx.class)
 	public synchronized void salesOrder() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
 
 		Map<String, String[]> paraMap = getParaMap();
-
-		if (this.saveOrder(paraMap, user, sellerId, sellerCode)) {
+		String result = this.saveOrder(paraMap, user, sellerId, sellerCode);
+		if (StrKit.isBlank(result)) {
 			renderAjaxResultForSuccess("下单成功");
 		} else {
-			renderAjaxResultForError("库存不足");
+			renderAjaxResultForError(result);
 		}
 	}
 
-	private boolean saveOrder(final Map<String, String[]> paraMap, final User user, final String sellerId,
+	private String saveOrder(final Map<String, String[]> paraMap, final User user, final String sellerId,
 			final String sellerCode) {
-		boolean isSave = Db.tx(new IAtom() {
-			@Override
-			public boolean run() throws SQLException {
 
 				String orderId = StrKit.getRandomUUID();
 				Date date = new Date();
@@ -270,7 +268,7 @@ public class OrderController extends BaseFrontController {
 
 				if (!SalesOrderQuery.me().insertForApp(paraMap, orderId, orderSn, sellerId, user.getId(), date,	
 						user.getDepartmentId(), user.getDataArea())) {
-					return false;
+					return "下单失败";
 				}
 
 				String[] sellProductIds = paraMap.get("sellProductId");
@@ -278,9 +276,10 @@ public class OrderController extends BaseFrontController {
 				if (sellProductIds != null && sellProductIds.length > 0) {
 					for (int index = 0; index < sellProductIds.length; index++) {
 						if (StrKit.notBlank(sellProductIds[index])) {
-							if (!SalesOrderDetailQuery.me().insertForApp(paraMap, orderId, sellerId, sellerCode, user.getId(), date,
-									user.getDepartmentId(), user.getDataArea(), index)) {
-								return false;
+							String result = SalesOrderDetailQuery.me().insertForApp(paraMap, orderId, sellerId, sellerCode, user.getId(), date,
+									user.getDepartmentId(), user.getDataArea(), index);
+							if (StrKit.notBlank(result)) {
+								return result;
 							}
 						}
 
@@ -292,9 +291,10 @@ public class OrderController extends BaseFrontController {
 				if (giftSellProductIds != null && giftSellProductIds.length > 0) {
 					for (int index = 0; index < giftSellProductIds.length; index++) {
 						if (StrKit.notBlank(giftSellProductIds[index])) {
-							if (!SalesOrderDetailQuery.me().insertForAppGift(paraMap, orderId, sellerId, sellerCode, user.getId(),
-									date, user.getDepartmentId(), user.getDataArea(), index)) {
-								return false;
+							String result = SalesOrderDetailQuery.me().insertForAppGift(paraMap, orderId, sellerId, sellerCode, user.getId(),
+									date, user.getDepartmentId(), user.getDataArea(), index);
+							if (StrKit.notBlank(result)) {
+								return result;
 							}
 						}
 
@@ -310,10 +310,11 @@ public class OrderController extends BaseFrontController {
 						String number = compositionNums[index];
 						List<SellerProduct> list = SellerProductQuery.me().findByCompositionId(productId);
 						for (SellerProduct sellerProduct : list) {
-							if (!SalesOrderDetailQuery.me().insertForAppComposition(sellerProduct, orderId, sellerId, sellerCode,
+							String result = SalesOrderDetailQuery.me().insertForAppComposition(sellerProduct, orderId, sellerId, sellerCode,
 									user.getId(), date, user.getDepartmentId(), user.getDataArea(),
-									Integer.parseInt(number), user.getId())) {
-								return false;
+									Integer.parseInt(number), user.getId());
+							if (StrKit.notBlank(result)) {
+								return result;
 							}
 						}
 					}
@@ -324,8 +325,9 @@ public class OrderController extends BaseFrontController {
         		String proc_def_key = StringUtils.getArrayFirst(paraMap.get("proc_def_key"));
         		
         		if (isStartProc && StrKit.notBlank(proc_def_key)) {
-					if (!start(orderId, StringUtils.getArrayFirst(paraMap.get("customerName")), proc_def_key)) {
-						return false;
+			        String result = start(orderId, StringUtils.getArrayFirst(paraMap.get("customerName")), proc_def_key);
+			        if (StrKit.notBlank(result)) {
+						return result;
 					}
         		} else {
         			SalesOutstockQuery.me().pass(orderId, user.getId(), sellerId, sellerCode);
@@ -333,10 +335,7 @@ public class OrderController extends BaseFrontController {
         					user.getDepartmentId(), user.getDataArea(),orderId);        			
         		}				
 
-				return true;
-			}
-		});
-		return isSave;
+		return "";
 	}
 	
 	private boolean isStart(String sellerCode, Map<String, String[]> paraMap) {
@@ -361,7 +360,7 @@ public class OrderController extends BaseFrontController {
 		return false;
 	}
 
-	private boolean start(String orderId, String customerName, String proc_def_key) {
+	private String start(String orderId, String customerName, String proc_def_key) {
 
 		WorkFlowService workflow = new WorkFlowService();
 
@@ -385,7 +384,7 @@ public class OrderController extends BaseFrontController {
 			
 			User manager = UserQuery.me().findManagerByDeptId(user.getDepartmentId());
 			if (manager == null) {
-				return false;
+				return "您没有配置审核人,请联系管理员";
 			}
 			param.put("manager", manager.getUsername());
 			toUserId = manager.getId();
@@ -398,12 +397,12 @@ public class OrderController extends BaseFrontController {
 		salesOrder.setProcInstId(procInstId);
 		
 		if(!salesOrder.update()) {
-			return false;
+			return "下单失败";
 		}
 		
 		sendOrderMessage(sellerId, customerName, "订单审核", user.getId(), toUserId, user.getDepartmentId(), user.getDataArea(),orderId);
 		
-		return true;
+		return "";
 	}
 
 	private void sendOrderMessage(String sellerId, String title, String content, String fromUserId, String toUserId, String deptId, String dataArea, String orderId) {
