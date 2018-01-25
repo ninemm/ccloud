@@ -539,7 +539,6 @@ public class CustomerVisitController extends BaseFrontController {
 	}
 
 	public void trajectory() {
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
 		List<Record> userList = UserQuery.me().findNextLevelsUserList(selectDataArea);
 		List<Map<String, Object>> users = new ArrayList<>();

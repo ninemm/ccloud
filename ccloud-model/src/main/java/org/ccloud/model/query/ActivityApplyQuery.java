@@ -42,7 +42,7 @@ public class ActivityApplyQuery extends JBaseQuery {
 		return DAO.getCache(id, new IDataLoader() {
 			@Override
 			public Object load() {
-				StringBuilder sql = new StringBuilder("SELECT caa.*, cc.customer_name, DATE_FORMAT(ca.start_time, '%m-%d') as start_date, DATE_FORMAT(ca.end_time, '%m-%d') as end_date, " +
+				StringBuilder sql = new StringBuilder("SELECT caa.*, cc.customer_name, DATE_FORMAT(ca.start_time, '%Y-%m-%d') as start_date, DATE_FORMAT(ca.end_time, '%Y-%m-%d') as end_date, " +
 						"d.name, ca.invest_type, cc.contact, cc.mobile, u.realname, DATE_FORMAT(caa.create_date, '%Y-%m-%d') as format_create_date, ca.invest_amount, ca.title, ca.code ");
 
 				sql.append("FROM cc_activity_apply caa ");
