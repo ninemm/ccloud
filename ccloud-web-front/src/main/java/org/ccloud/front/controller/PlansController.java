@@ -12,7 +12,6 @@ import java.util.Map;
 import com.jfinal.plugin.activerecord.Page;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
-import org.ccloud.model.CustomerType;
 import org.ccloud.model.Plans;
 import org.ccloud.model.User;
 import org.ccloud.model.query.*;
