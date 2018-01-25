@@ -514,13 +514,14 @@ public class CustomerController extends BaseFrontController {
 		setAttr("sellerCustomer", sellerCustomer);
 		setAttr("taskId", taskId);
 
-		//判断是否审核过了
-		String task_id=CookieUtils.get(this, taskId);
-		if (task_id!=null) {
-			redirect("../");
-			return;
-		}
-		CookieUtils.put(this, taskId,taskId);
+		//（修复没审核时第二次不能进入审核详情的bug）
+//		//判断是否审核过了
+//		String task_id=CookieUtils.get(this, taskId);
+//		if (task_id!=null) {
+//			redirect("../");
+//			return;
+//		}
+//		CookieUtils.put(this, taskId,taskId);
 		
 		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 		List<String> custTypeNameList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeNameListBySellerCustomerId(id, dealerDataArea);
