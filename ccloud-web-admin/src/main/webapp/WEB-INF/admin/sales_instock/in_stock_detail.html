@@ -290,6 +290,8 @@
 				$("#salesStockId").val(outstock.id);
 				$("#salesStockSN").val(outstock.instock_sn);
 				$("#wareHouseId").val(outstock.warehouse_id);
+				$("#order_user").val(outstock.order_user);
+				$("#order_date").val(outstock.order_date);
 				var dprice = outstock.factor;
 				if (dprice != null) {
 					discount = dprice;
@@ -477,6 +479,8 @@
 				<input  type="hidden" id="biz_user_id" name="biz_user_id" value="" >
 				<input  type="hidden" id="deptId" name="deptId" value="" >
 				<input  type="hidden" id="dataArea" name="dataArea" value="" >
+				<input  type="hidden" id="order_user" name="order_user" value="" >
+				<input  type="hidden" id="order_date" name="order_date" value="" >
 			</div>
 
 			<div class="box-footer"> 

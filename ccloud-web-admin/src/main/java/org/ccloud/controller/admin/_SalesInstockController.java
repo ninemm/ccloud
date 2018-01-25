@@ -145,6 +145,8 @@ public class _SalesInstockController extends JBaseCRUDController<SalesOrder> {
         boolean isSave = Db.tx(new IAtom() {
             @Override
             public boolean run() throws SQLException {
+	            String order_user = StringUtils.getArrayFirst(paraMap.get("order_user"));
+	            String order_date = StringUtils.getArrayFirst(paraMap.get("order_date"));
         		String deptId = StringUtils.getArrayFirst(paraMap.get("deptId"));
         		String dataArea = StringUtils.getArrayFirst(paraMap.get("dataArea"));
         		String inStockId =  StringUtils.getArrayFirst(paraMap.get("salesStockId"));
@@ -161,7 +163,7 @@ public class _SalesInstockController extends JBaseCRUDController<SalesOrder> {
         			String sellProductId = StringUtils.getArrayFirst(paraMap.get("sellProductId" + index));
         			if (StrKit.notBlank(sellProductId)) {
         				if (!SalesRefundInstockQuery.me().inStock(paraMap, sellerId, 
-        						date, deptId, dataArea, index, user.getId(), inStockSN, wareHouseId, sellProductId)) {
+        						date, deptId, dataArea, index, user.getId(), inStockSN, wareHouseId, sellProductId, order_user, order_date)) {
         					return false;
         				}
         				count++;

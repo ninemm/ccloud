@@ -22,12 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.ccloud.Consts;
-import org.ccloud.model.Inventory;
-import org.ccloud.model.InventoryDetail;
-import org.ccloud.model.SalesRefundInstock;
-import org.ccloud.model.SalesRefundInstockDetail;
-import org.ccloud.model.SellerProduct;
-import org.ccloud.model.User;
+import org.ccloud.model.*;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
 
@@ -54,13 +49,17 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 
 	public Record findMoreById(final String id) {
 		StringBuilder fromBuilder = new StringBuilder(
-				" select o.*,c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, u.realname, u.mobile, cp.factor ");
+				" select o.*,c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, u.realname, u.mobile, cp.factor " +
+						", csa.biz_user_id as order_user, csa.create_date as order_date");
 		fromBuilder.append(" from `cc_sales_refund_instock` o ");
 		fromBuilder.append(" left join cc_seller_customer cs on o.customer_id = cs.id ");
 		fromBuilder.append(" left join cc_customer c on cs.customer_id = c.id ");
 		fromBuilder.append(" left join cc_customer_type ct on o.customer_type_id = ct.id ");
 		fromBuilder.append(" left join cc_price_system cp on cp.id = ct.price_system_id ");
 		fromBuilder.append(" left join user u on o.biz_user_id = u.id ");
+		fromBuilder.append(" left join cc_sales_outstock cso ON o.outstock_id = cso.id ");
+		fromBuilder.append(" left join cc_sales_order_join_outstock sojo ON cso.id = sojo.outstock_id ");
+		fromBuilder.append(" left join cc_sales_order csa on sojo.order_id = csa.id ");
 		fromBuilder.append(" where o.id = ? ");
 
 		return Db.findFirst(fromBuilder.toString(), id);
@@ -156,7 +155,7 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 	}
 
 	public boolean inStock(Map<String, String[]> paraMap, String sellerId, Date date, String deptId, String dataArea,
-			Integer index, String userId, String inStockSN, String wareHouseId, String sellerProductId) {
+			Integer index, String userId, String inStockSN, String wareHouseId, String sellerProductId, String order_user, String order_date) {
 		SalesRefundInstockDetail detail = SalesRefundInstockDetailQuery.me().
 				findById(StringUtils.getArrayFirst(paraMap.get("outstockDetailId" + index)));
 		String convert = StringUtils.getArrayFirst(paraMap.get("convert" + index));
@@ -231,7 +230,30 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		if (!sellerProduct.update()) {
 			return false;
 		}
+
+		//更新计划
+		BigDecimal bigProductCount = new BigDecimal(bigCount).add(new BigDecimal(smallCount).divide(new BigDecimal(productConvert)));
+		if (!updatePlans(order_user, sellerProductId, order_date, bigProductCount)) {
+			return false;
+		}
 		
+		return true;
+	}
+
+	private boolean updatePlans(String order_user, String sellerProductId, String orderDate, BigDecimal productCount) {
+
+		List<Plans> plans = PlansQuery.me().findBySales(order_user, sellerProductId, orderDate.substring(0,10));
+		for (Plans plan : plans) {
+			BigDecimal planNum = plan.getPlanNum();
+			BigDecimal completeNum = (plan.getCompleteNum().subtract(productCount)).setScale(2, BigDecimal.ROUND_HALF_UP);
+			plan.setCompleteNum(completeNum);
+			plan.setCompleteRatio(completeNum.multiply(new BigDecimal(100)).divide(planNum, 2, BigDecimal.ROUND_HALF_UP));
+			plan.setModifyDate(new Date());
+			if(!plan.update()){
+				return  false;
+			}
+		}
+
 		return true;
 	}
 

@@ -320,6 +320,7 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 			return false;
 		}
 
+		//更新计划
 		BigDecimal bigProductCount = new BigDecimal(bigCount).add(new BigDecimal(smallCount).divide(new BigDecimal(productConvert)));
 		if (!updatePlans(order_user, sellerProductId, order_date, bigProductCount)) {
 			return false;
