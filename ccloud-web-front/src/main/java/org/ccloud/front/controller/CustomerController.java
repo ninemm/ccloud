@@ -680,14 +680,14 @@ public class CustomerController extends BaseFrontController {
 				if (customerVO.getCustTypeList() != null || customerVO.getCustTypeList().size() != 0)
 					sellerCustomer.setCustomerTypeIds(Joiner.on(",").join(customerVO.getCustTypeList().iterator()));
 
-				if (StrKit.notBlank(customerVO.getImageListStore()))
+				if (StrKit.notBlank(customerVO.getImageListStore()) && customerVO.getImageListStore().length() > 2)
 					sellerCustomer.setImageListStore(customerVO.getImageListStore());
+				else sellerCustomer.setImageListStore(null);
 
 				sellerCustomer.setSellerId(sellerId);
 				sellerCustomer.setCustomerId(customer.getId());
 				sellerCustomer.setIsEnabled(1);
 				sellerCustomer.setIsArchive(1);
-				sellerCustomer.setImageListStore(customerVO.getImageListStore());
 
 				String deptDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 				Department department =  DepartmentQuery.me().findByDataArea(deptDataArea);
@@ -898,7 +898,8 @@ public class CustomerController extends BaseFrontController {
 		Department department = DepartmentQuery.me().findByDataArea(deptDataArea);
 		sellerCustomer.setDataArea(deptDataArea);
 		sellerCustomer.setDeptId(department.getId());
-		sellerCustomer.setImageListStore(JSON.toJSONString(list));
+		if (list.size()!=0) sellerCustomer.setImageListStore(JSON.toJSONString(list));
+		else sellerCustomer.setImageListStore(null);
 
 		updated = sellerCustomer.saveOrUpdate();
 		if (!updated) {

@@ -347,7 +347,7 @@ public class CustomerVisitController extends BaseFrontController {
 				list.add(image);
 			}
 		 }
-		 customerVisit.setPhoto(JSON.toJSONString(list));
+		 if (list.size()!=0) customerVisit.setPhoto(JSON.toJSONString(list));
 
 		 boolean updated = customerVisit.saveOrUpdate();
 		 
@@ -422,9 +422,9 @@ public class CustomerVisitController extends BaseFrontController {
 		if (StrKit.notBlank(lng))
 			customerVisit.setReviewLng(new BigDecimal(lng));
 		
-		if(StrKit.notBlank(commentDesc)) 
+		if (StrKit.notBlank(commentDesc))
 			customerVisit.setComment(commentDesc);
-		if(list.size() > 0) 
+		if (list.size() > 0)
 			customerVisit.setImageListStore(JSON.toJSONString(list));
 		
 		WorkFlowService workFlowService = new WorkFlowService();
