@@ -94,6 +94,7 @@
 		  className: 'audit',
 		  btn: ['通过','取消'],
 		  yes: function() {
+			url = url + "&comment=" + $("#comment").val();
 			doSubmit(url);
 		  },
 		  no:function() {
@@ -115,6 +116,7 @@
 		  className: 'audit',
 		  btn: ['确认','取消'],
 		  yes: function() {
+			url = url + "&comment=" + $("#comment").val();
 			doReject(url);
 		  },
 		  no:function() {
