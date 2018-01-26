@@ -238,5 +238,8 @@ public class Consts {
 	public static final String PROC_ORDER_REVIEW_TWO = "_order_review_2";				// 订单2审
 	public static final String PROC_ORDER_REVIEW_THREE = "_order_review_3";				// 订单3审
 	public static final String PROC_ACTIVITY_APPLY_REVIEW = "_activity_apply_review";	// 活动审核
+	
+	public static final Integer STATUS_STATE_PUT = 1;// 通用上架
+	public static final Integer STATUS_STATE_DOWN = 0;// 通用下架
 
 }

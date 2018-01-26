@@ -66,6 +66,8 @@ function group(id) {
 							<th>主商品规格</th>
 							<th>主产品库存</th>
 							<th>品类数量</th>
+							<th>活动名称</th>
+							<th>是否上架</th>
 							<@shiro.hasPermission name="/admin/productComposition/edit,/admin/all">
 							<th style="width: 20%">操作</th>
 							</@shiro.hasPermission>
@@ -86,6 +88,14 @@ function group(id) {
 							<td>${bean.valueName!}</td>
 							<td>${bean.store_count!}</td>
 							<td>${bean.type_count+1!}</td>
+							<td>${bean.act_name!}</td>
+							<td>
+								<#if bean.state! == 1>
+									是
+								<#else>
+									否
+								</#if>
+							</td>
 							<td>
 							<@shiro.hasPermission name="/admin/productComposition/edit,/admin/all">
 								<a href="${CPATH}/admin/productComposition/edit?id=${bean.parent_id}&c=${c!}&p=${p!}" class="btn btn-xs bg-olive btn-flat">编辑</a>

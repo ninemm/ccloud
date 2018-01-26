@@ -18,6 +18,7 @@ package org.ccloud.model.query;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.ccloud.Consts;
 import org.ccloud.model.ProductComposition;
 
 import com.jfinal.kit.StrKit;
@@ -48,11 +49,12 @@ public class ProductCompositionQuery extends JBaseQuery {
 	}
 
 	public Page<ProductComposition> paginate(int pageNumber, int pageSize, String keyword, String sellerId, String orderby) {
-		String select = "SELECT cp.name,cp.price,cp.id,cp.seller_product_id,cs.custom_name,cs.store_count,t1.valueName,cs.product_id,count(cp.sub_seller_product_id) as type_count,cp.parent_id ";
+		String select = "SELECT cp.name,cp.price,cp.id,cp.seller_product_id,cs.custom_name,cs.store_count,t1.valueName,cs.product_id,count(cp.sub_seller_product_id) as type_count,cp.parent_id, cp.state, ac.title as act_name ";
 		StringBuilder fromBuilder = new StringBuilder("FROM cc_product_composition cp ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
 		fromBuilder.append("LEFT JOIN cc_seller_product cs ON cs.id = cp.seller_product_id ");
+		fromBuilder.append("LEFT JOIN cc_activity ac ON ac.id = cp.activity_id ");
 		fromBuilder.append("LEFT JOIN (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
 		fromBuilder.append("RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = cs.product_id ");
 		appendIfNotEmpty(fromBuilder, "cs.seller_id", sellerId, params, true);
@@ -99,7 +101,7 @@ public class ProductCompositionQuery extends JBaseQuery {
 
 	public List<Record> findDetailByProductId(String id, String sellerId, String keyword, String tag) {
  		StringBuilder fromBuilder = new StringBuilder("SELECT cp.id,cp.name,cp.price,cp.seller_product_id,cp.sub_seller_product_id,cs.product_id as product_id,cg.product_id as sub_product_id, ");
-		fromBuilder.append("t1.valueName as product_sp, t2.valueName as sub_product_sp, cs.price as price, cg.price as sub_price, ");
+		fromBuilder.append("t1.valueName as product_sp, t2.valueName as sub_product_sp, cp.price as price, cg.price as sub_price, cp.activity_id as actId, cp.state as state, ");
 		fromBuilder.append("cs.custom_name as product_name,cg.custom_name as sub_product_name,cp.sub_product_count,cp.parent_id,p.product_sn,g.product_image_list_store ");
 		fromBuilder.append("from `cc_product_composition` cp ");
 		fromBuilder.append("JOIN cc_seller_product cs ON cs.id = cp.seller_product_id ");
@@ -144,6 +146,7 @@ public class ProductCompositionQuery extends JBaseQuery {
 		boolean needWhere = true;
 		needWhere = appendIfNotEmpty(fromBuilder, "cs.seller_id", sellerId, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "sp.name", keyword, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "sp.state", Consts.STATUS_STATE_PUT, params, needWhere);
 
 		fromBuilder.append(" GROUP BY sp.parent_id");
 

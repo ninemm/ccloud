@@ -34,10 +34,12 @@ import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
+import org.ccloud.model.Activity;
 import org.ccloud.model.ProductComposition;
 import org.ccloud.model.SalesOrder;
 import org.ccloud.model.SellerProduct;
 import org.ccloud.model.User;
+import org.ccloud.model.query.ActivityQuery;
 import org.ccloud.model.query.ProductCompositionQuery;
 import org.ccloud.model.query.SalesOrderDetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
@@ -102,7 +104,11 @@ public class _ProductCompositionController extends JBaseCRUDController<ProductCo
 					String name = StringUtils
 							.getArrayFirst(map.get("productComposition.name"));
 					String price = StringUtils
-							.getArrayFirst(map.get("productComposition.price"));						
+							.getArrayFirst(map.get("productComposition.price"));
+					String state = StringUtils
+							.getArrayFirst(map.get("productComposition.state"));
+					String activityId = StringUtils
+							.getArrayFirst(map.get("productComposition.activityId"));					
 					List<ProductComposition> oldList = new ArrayList<>();
 					if (mainId != null) {
 						oldList = ProductCompositionQuery.me().findByParentId(mainId);
@@ -120,6 +126,8 @@ public class _ProductCompositionController extends JBaseCRUDController<ProductCo
 						composition.setSellerProductId(productId);
 						composition.setSubProductCount(subProductCount);
 						composition.setSubSellerProductId(subProductId);
+						composition.setState(Integer.parseInt(state));
+						composition.setActivityId(activityId);
 						if (compositionId != null) {
 							composition.setId(compositionId);
 							composition.setParentId(mainId);
@@ -191,16 +199,23 @@ public class _ProductCompositionController extends JBaseCRUDController<ProductCo
 	@RequiresPermissions(value={"/admin/productComposition/edit","/admin/all"},logical=Logical.OR)
 	public void edit() {
 		String id = getPara("id");
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		List<Record> list = new ArrayList<>();
+		List<Activity> actList = ActivityQuery.me().findBySellerId(sellerId);
 		if (StringUtils.isNotBlank(id)) {
 			list = ProductCompositionQuery.me().findDetailByProductId(id, "", "", "");
 			String name = list.get(0).getStr("name");
 			BigDecimal price = list.get(0).getBigDecimal("price");
+			String actId = list.get(0).getStr("actId");
+			Integer state = list.get(0).getInt("state");
 			setAttr("productCompositionName", name);
 			setAttr("productCompositionPrice", price);
+			setAttr("productCompositionAct", actId);
+			setAttr("productCompositionState", state);
 		}
 		setAttr("list", list);
 		setAttr("parentId", id);
+		setAttr("actList", actList);
 	}
 	
 	@Override
@@ -227,7 +242,7 @@ public class _ProductCompositionController extends JBaseCRUDController<ProductCo
 			renderAjaxResultForError("删除失败!");
 		}
 		
-	}	
+	}
 	
 	public void getProductInfo() {
 		String sellerId = getSessionAttr("sellerId");

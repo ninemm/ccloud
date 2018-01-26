@@ -469,6 +469,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 			detail.setProductAmount(productAmount);
 			detail.setIsGift(product.getIsGift());
 			detail.setIsComposite(1);
+			detail.setCompositeId(product.getStr("parentId"));
 			detail.setCreateDate(date);
 			detail.setDeptId(deptId);
 			detail.setDataArea(dataArea);

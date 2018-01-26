@@ -145,4 +145,21 @@ public abstract class BaseProductComposition<M extends BaseProductComposition<M>
 	public java.math.BigDecimal getPrice() {
 		return get("price");
 	}
+	
+	public void setActivityId(java.lang.String activityId) {
+		set("activity_id", activityId);
+	}
+
+	public java.lang.String getActivityId() {
+		return getStr("activity_id");
+	}
+	
+	public void setState(java.lang.Integer state) {
+		set("state", state);
+	}
+
+	public java.lang.Integer getState() {
+		return get("state");
+	}
+
 }
