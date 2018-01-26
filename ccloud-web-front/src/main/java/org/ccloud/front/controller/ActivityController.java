@@ -391,7 +391,7 @@ public class ActivityController extends BaseFrontController {
 				investType +="商品、";
 			}else if (investTypes[i].equals(Consts.INVEST_MATTER)){
 				investType +="物料、";
-			}else if (investTypes[i].equals(Consts.INVEST_MATTER)){
+			}else if (investTypes[i].equals(Consts.INVEST_ACTIVITY)){
 				investType +="费用活动费、";
 			}
 		}
