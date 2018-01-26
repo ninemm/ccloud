@@ -452,6 +452,7 @@ public class _UserController extends JBaseCRUDController<User> {
 	public void uploading() {
 		int inCnt = 0;
 		int existCnt = 0;
+		int errorCnt = 0;
 		File file = getFile().getFile();
 		
 		String deptId = getPara("departmentId");
@@ -460,12 +461,17 @@ public class _UserController extends JBaseCRUDController<User> {
 		ImportParams params = new ImportParams();
 
 		List<UserExecel> list = ExcelImportUtil.importExcel(file, UserExecel.class, params);
-		
+		String  username = "";
 		for (UserExecel excel : list) {
 			String userId = "";
 			User us = null;
 			UserGroupRel userGroupRel = null;
-
+			User user = UserQuery.me()._findUserByUsername(excel.getUsername());
+			if(user !=null) {
+				username +=excel.getUsername()+"、";
+				errorCnt++;
+				continue;
+			}
 			// 检查用户是否存在
 			us = UserQuery.me().findByMobileAndDeptId(excel.getMobile(),deptId);
 			Group group = GroupQuery.me().findDataAreaAndGroupName(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString(), excel.getUserGroup());
@@ -496,8 +502,15 @@ public class _UserController extends JBaseCRUDController<User> {
 			}
 
 		}
-
-		renderAjaxResultForSuccess("成功导入用户" + inCnt + "个,已存在用户" + existCnt + "个");
+		Map<String, Object> map = new HashMap<>();
+		map.put("inCnt", inCnt);
+		map.put("existCnt", existCnt);
+		map.put("errorCnt", errorCnt);
+		if(!username.equals("")) {
+			map.put("usName", username.substring(0, username.length()-1));
+		}
+		renderJson(map);
+//		renderAjaxResultForSuccess("成功导入用户" + inCnt + "个,已存在用户" + existCnt + "个,导入失败"+errorCnt+"个");
 	}
 	
 	private void setUser(User user, UserExecel excel) {
@@ -629,5 +642,17 @@ public class _UserController extends JBaseCRUDController<User> {
 		userHistory.setCreateDate(new Date());
 		userHistory.save();
 //		renderAjaxResultForSuccess("更新成功");
+	}
+	
+	//验证用户名不能重复
+	public void checkUserName(){
+		//用户名唯一
+		String username = getPara("username");
+		User user = UserQuery.me()._findUserByUsername(username);
+		boolean result = true;
+		if(user!=null) {
+			result = false;
+		}
+		renderJson(result);
 	}
 }

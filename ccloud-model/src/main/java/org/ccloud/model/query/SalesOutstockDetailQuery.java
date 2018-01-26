@@ -16,9 +16,6 @@
 package org.ccloud.model.query;
 
 import java.math.BigDecimal;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
@@ -28,7 +25,6 @@ import java.util.Map;
 import org.ccloud.Consts;
 import org.ccloud.model.*;
 import org.ccloud.model.vo.orderProductInfo;
-import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
 
 import com.jfinal.kit.StrKit;

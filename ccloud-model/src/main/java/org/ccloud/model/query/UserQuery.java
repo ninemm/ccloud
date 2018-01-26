@@ -95,6 +95,15 @@ public class UserQuery extends JBaseQuery {
 		});
 	}
 	
+	public User _findUserByUsername(final String username) {
+		return DAO.getCache(username, new IDataLoader() {
+			@Override
+			public Object load() {
+				return DAO.doFindFirst("username = ? ", username);
+			}
+		});
+	}
+	
 	public User findUserByMobile(final String mobile) {
 		return DAO.getCache(mobile, new IDataLoader() {
 			@Override

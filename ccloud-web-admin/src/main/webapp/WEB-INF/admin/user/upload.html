@@ -53,12 +53,14 @@
 			type : "post", 
 			dataType : "json", 
 			success : function(data) { 
-				if(data.errorCode == 0) {
-					//location.reload();
-					toastr.success(data.message, '操作成功');
-				} else {
-					toastr.error(data.message,'操作失败');
+				if(data.errorCnt > 0) {
+					setTimeout( function(){
+							alert("成功导入用户" + data.inCnt + "个,已存在用户" + data.existCnt + "个,导入失败"+data.errorCnt+"个"+"\n"+data.usName+"用户名已存在")
+									}, 2 * 1000 );
+				}else{
+					toastr.success(data.message, "成功导入用户" + data.inCnt + "个,已存在用户" + data.existCnt + "个,导入失败"+data.errorCnt+"个");
 				}
+
 			},
 			error : function() {
 				alert("信息提交错误");
