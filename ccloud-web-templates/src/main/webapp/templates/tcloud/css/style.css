@@ -144,6 +144,10 @@ a {
   margin: 0;
 }
 
+.weui-toptips {
+  z-index: 19891015;
+}
+
 .toolbar .picker-button,
 .weui-cells_radio .weui-check:checked+.weui-icon-checked:before,
 .weui-search-bar__cancel-btn,

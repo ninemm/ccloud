@@ -47,7 +47,6 @@
 		className: 'audit',
 		btn: ['通过','取消'],
 		yes: function() {
-			url = url + "&comment=" + $("#comment").val();
 			doSubmit(1);
 		},
 		no:function() {
@@ -69,7 +68,11 @@
 		className: 'audit',
 		btn: ['确认','取消'],
 		yes: function() {
-			url = url + "&comment=" + $("#comment").val();
+			var comment = $("#comment").val();
+			if (comment == ""){
+				$.toptip('请注明拒绝理由', 'warning');
+				return;
+			}
 			doSubmit(0);
 		},
 		no:function() {
