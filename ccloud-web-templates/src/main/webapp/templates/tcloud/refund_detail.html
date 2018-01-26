@@ -12,9 +12,6 @@
 	.bo {
 		border: 1px solid #bbb !important;
 	}
-	.weui-dialog__hd {
-		padding: 1.3rem 1.6rem;
-	}
 </#macro>
 
 <#macro script>
@@ -75,6 +72,16 @@ $(function() {
 		}
 		return check;	
 	}		
+
+	function submit() {
+    	if (!checkProductNumber()) {
+			toastr.error('退货数量为0!','操作失败');
+			return;			
+		}
+        $.confirm("您确定要退货吗？","确认退货", function() {
+            doSubmit();
+        });
+	}
 	
 	function doSubmit(){
 		var receiveType = "1";
@@ -82,10 +89,7 @@ $(function() {
 		if ($("#receiveType").is(":checked")) {
 			receiveType = "0";
 		}
-    	if (!checkProductNumber()) {
-			toastr.error('退货数量为0!','操作失败');
-			return;			
-		}
+
 		layer.open({
 			type: 2,
 			content: '保存中...'
@@ -320,7 +324,7 @@ $(function() {
 		</div>
 		<div class="layer"></div>
 		<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
-			<button onclick="doSubmit()" class="place-order red-button width-100">提交订单</button>
+			<button onclick="submit()" class="place-order red-button width-100">提交订单</button>
 		</footer>
     </div>
 </div>

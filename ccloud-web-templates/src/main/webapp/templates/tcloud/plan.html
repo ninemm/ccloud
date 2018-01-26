@@ -33,7 +33,23 @@ $(function() {
 	$("#end-date").val($.today());
 	
 	$(document).on("click", "#plans", function() {
-		doSubmit();
+		if($("#typeId").val() == '') {
+			$.toptip("请选择计划类型!", 'warning');
+			return;
+		}
+	
+		if($("#productId").val() == '') {
+			$.toptip("请选择产品!", 'warning');
+			return;
+		}
+	
+		if($("#productNum").val() == '') {
+			$.toptip("请填写数量!", 'warning');
+			return;
+		}
+		$.confirm("您确定要新增计划吗？","新增计划", function() {
+			doSubmit();
+		});
 	})
 
 	$productList.empty();
@@ -74,21 +90,6 @@ function addProduct(){
 }
 
 function doSubmit(){
-	if($("#typeId").val() == '') {
-		$.toptip("请选择计划类型!", 'warning');
-		return;
-	}
-
-	if($("#productId").val() == '') {
-		$.toptip("请选择产品!", 'warning');
-		return;
-	}
-
-	if($("#productNum").val() == '') {
-		$.toptip("请填写数量!", 'warning');
-		return;
-	}
-
 	$("#form").ajaxSubmit({
 			beforeSubmit: function() {
 				return true

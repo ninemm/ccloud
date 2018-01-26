@@ -12,25 +12,21 @@
 	.bo {
 		border: 1px solid #bbb !important;
 	}
-	.weui-dialog__hd {
-		padding: 1.3rem 1.6rem;
-	}
 </#macro>
 
 <#macro script>
-$(function() {
-	$(document).off("click", "input[type=number]:not([readonly])");
-	$('#user').select({
-		title: '选择收款人',
-		items: ${userList!}
+	$(function() {
+		$(document).off("click", "input[type=number]:not([readonly])");
+		$('#user').select({
+			title: '选择收款人',
+			items: ${userList!}
+		})
+		$("#deliveryDate").calendar();	
+		$("#deliveryDate").val($.today());
 	})
-    $("#deliveryDate").calendar();	
-    $("#deliveryDate").val($.today());
-})
-	var $form = $('#form');
 
-	function doSubmit(){
-		var userId = $("#user").data('values');
+	function submit() {
+        var userId = $("#user").data('values');
 		var money = parseInt($("#money").val());
 		var maxMoney = parseInt($("#maxMoney").val());
 		if (!userId) {
@@ -42,7 +38,14 @@ $(function() {
 			toastr.error('输入金额有误或大于待收','操作失败');
 			return;		
 		}
+        $.confirm("您确定要确认收款吗？","确认收款", function() {
+            doSubmit();
+        });
+	}
 	
+	var $form = $('#form');
+
+	function doSubmit(){	
 		layer.open({
 			type: 2,
 			content: '保存中...'
@@ -188,7 +191,7 @@ $(function() {
 		</div>
 		<div class="layer"></div>
 		<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
-			<button onclick="doSubmit()" class="place-order red-button width-100">确认收款</button>
+			<button onclick="submit()" class="place-order red-button width-100">确认收款</button>
 		</footer>
 	</div>
 </div>
