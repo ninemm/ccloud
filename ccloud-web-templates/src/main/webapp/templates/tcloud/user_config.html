@@ -97,7 +97,7 @@
 			<div class="weui-cell__bd">
 				<p>账号</p>
 			</div>
-			<div class="weui-cell__ft"></div>
+			<div class="weui-cell__ft">${(user.username)!}</div>
 		</a>
 	</div>
 	<div class="weui-cells">
@@ -122,7 +122,7 @@
 				<p>负责区域设置</p>
 			</div>
 			<div class="weui-cell__ft">
-				 <input type="hidden" name="areaName" id="areaName" value="${(user.province)!''} ${(user.city)!''} ${(user.region)!''}" >
+				<input type="hidden" name="areaName" id="areaName" value="${(user.province)!''} ${(user.city)!''} ${(user.region)!''}" >
 				<input type="text" id="city-picker" value="${(user.province)!''} ${(user.city)!''} ${(user.region)!''}" />
 			</div>
 		</a>
