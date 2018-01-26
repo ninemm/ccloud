@@ -117,6 +117,19 @@ public class _UserController extends JBaseCRUDController<User> {
 		user.setStationName(stationName);
 		// user.setGroupId(groupList);
 		 user.setGroupName(NewGroupName);
+		 if(StringUtils.isBlank(user.getId())) {
+			 User u = UserQuery.me()._findUserByUsername(user.getUsername());
+			 if(u!=null) {
+				 renderAjaxResultForError("用户名已存在！");
+				 return;
+			 }
+		 }else{
+			 User ur = UserQuery.me().findById(user.getId());
+			 if(!ur.getUsername().equals(user.getUsername())) {
+				renderAjaxResultForError("用户名已存在！");
+				return;
+			 }
+		 }
 		if (StringUtils.isBlank(user.getId())) {
 			List<User> users = UserQuery.me().findByMobile(user.getMobile());
 			for(User us : users) {
@@ -648,10 +661,23 @@ public class _UserController extends JBaseCRUDController<User> {
 	public void checkUserName(){
 		//用户名唯一
 		String username = getPara("username");
-		User user = UserQuery.me()._findUserByUsername(username);
+		String userId = getPara("userId");
 		boolean result = true;
-		if(user!=null) {
-			result = false;
+		if(!StringUtils.isBlank(userId)) {
+			User user = UserQuery.me()._findUserByUsername(username);
+			if(user!=null) {
+				result = false;
+			}
+		}else {
+			User us = UserQuery.me().findById(userId);
+			if(us.getUsername().equals(username)) {
+				result = true;
+			}else {
+				User user = UserQuery.me()._findUserByUsername(username);
+				if(user!=null) {
+					result = false;
+				}
+			}
 		}
 		renderJson(result);
 	}

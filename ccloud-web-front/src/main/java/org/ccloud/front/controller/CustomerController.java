@@ -42,7 +42,6 @@ import org.ccloud.model.query.WxMessageTemplateQuery;
 import org.ccloud.model.vo.CustomerVO;
 import org.ccloud.model.vo.ImageJson;
 import org.ccloud.route.RouterMapping;
-import org.ccloud.utils.CookieUtils;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.ImageUtils;
 import org.ccloud.wechat.WechatJSSDKInterceptor;
