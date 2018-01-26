@@ -395,7 +395,9 @@ public class ActivityController extends BaseFrontController {
 				investType +="费用活动费、";
 			}
 		}
-		setAttr("investType",investType.substring(0, investType.length()-1));
+		if(!investType.equals("")) {
+			setAttr("investType",investType.substring(0, investType.length()-1));
+		}
 		setAttr("taskId", taskId);
 		setAttr("activityApply", activityApply);
 		setAttr("statusName", getStatusName(activityApply.getInt("status")));
