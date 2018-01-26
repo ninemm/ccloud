@@ -567,7 +567,7 @@ public class CustomerVisitController extends BaseFrontController {
 		String startDate = getPara("startDate");
 //		String startDate = "2017-01-01 00:00:00";
 		String endDate = getPara("endDate");
-		List<Record> visitList = CustomerVisitQuery.me().findLngLat(user.getId(), startDate, endDate);
+		List<Record> visitList = CustomerVisitQuery.me().findLngLat(user.getId(), startDate, endDate, "100101");
 		setAttr("visitList", JSON.toJSON(visitList));
 		renderJson(visitList);
 	}
