@@ -403,7 +403,7 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 	stringBuilder.append(" cs.customer_kind, c.id AS customerId, c.customer_name, c.contact AS ccontact, c.mobile AS cmobile, c.address AS ");
 	stringBuilder.append(" caddress, ct. NAME AS customerTypeName, ct. CODE AS customerTypeCode, u.realname, u.mobile, w. CODE AS ");
 	stringBuilder.append(" warehouseCode, cp.factor, w.`name` AS warehouseName, w.phone AS warehousePhone, sr.create_date AS returnOrderTime, ");
-	stringBuilder.append(" so.remark, sn.seller_name as sellerName, so.total_amount, so.id AS orderId, so.biz_user_id, o.id AS salesOutStockId, sn.id AS sellerId, pt.context AS printFootContext ");
+	stringBuilder.append(" so.remark, sn.seller_name as sellerName, so.total_amount, so.id AS orderId, so.biz_user_id, so.create_date as order_date, o.id AS salesOutStockId, sn.id AS sellerId, pt.context AS printFootContext ");
 	stringBuilder.append(" FROM cc_sales_refund_instock  sr LEFT JOIN cc_sales_outstock o on o.id = sr.outstock_id LEFT JOIN cc_seller_customer cs ON o.customer_id = cs.id LEFT JOIN cc_sales_order_join_outstock sj ");
 	stringBuilder.append(" ON sj.outstock_id = o.id LEFT JOIN cc_customer c ON cs.customer_id = c.id LEFT JOIN cc_sales_order so ON so.id = ");
 	stringBuilder.append(" sj.order_id LEFT JOIN cc_seller sn ON sn.id = so.seller_id LEFT JOIN cc_customer_type ct ON o.customer_type_id = ");

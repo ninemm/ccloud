@@ -347,7 +347,8 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 	}
 
 	//批量出库
-	public boolean batchOutStock(List<orderProductInfo> orderProductInfos, String sellerId, Date date, String deptId,String dataArea,String userId, String outStockSN, String customerId) {
+	public boolean batchOutStock(List<orderProductInfo> orderProductInfos, String sellerId, Date date, String deptId,String dataArea,String userId, String outStockSN, String customerId
+								,String order_user, String order_date) {
 		for (orderProductInfo orderProductInfo : orderProductInfos) {
 			SalesOutstockDetail detail = SalesOutstockDetailQuery.me().findById(orderProductInfo.getSalesOutDetaliId());
 			if (!detail.saveOrUpdate()) {
@@ -433,6 +434,12 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 			receivablesDetail.setCreateDate(date);		
 			
 			if (!receivablesDetail.save()) {
+				return false;
+			}
+
+			//更新计划
+			BigDecimal bigProductCount = new BigDecimal(orderProductInfo.getBigCount()).add(new BigDecimal(orderProductInfo.getSmallCount()).divide(new BigDecimal(orderProductInfo.getConvertRelate())));
+			if (!updatePlans(order_user, orderProductInfo.getSellerProductId(), order_date, bigProductCount)) {
 				return false;
 			}
 		}

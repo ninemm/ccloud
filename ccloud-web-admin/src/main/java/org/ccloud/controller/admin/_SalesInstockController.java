@@ -297,7 +297,8 @@ public class _SalesInstockController extends JBaseCRUDController<SalesOrder> {
 				List<Record> ProductInfos = SalesRefundInstockQuery.me().findPrintProductInfo(s);
 				
 				if (!SalesRefundInstockDetailQuery.me().batchInStock(ProductInfos, sellerId, 
-						date, user.getDepartmentId(), user.getDataArea(), user.getId(), salesRefundInstockRecord.getStr("instock_sn"))) {
+						date, user.getDepartmentId(), user.getDataArea(), user.getId(), salesRefundInstockRecord.getStr("instock_sn"),
+						salesRefundInstockRecord.getStr("biz_user_id"), salesRefundInstockRecord.getStr("order_date"))) {
 					return false;
 				}
 				

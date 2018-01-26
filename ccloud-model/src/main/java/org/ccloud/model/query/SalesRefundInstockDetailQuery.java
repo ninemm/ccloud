@@ -23,10 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.ccloud.Consts;
-import org.ccloud.model.Inventory;
-import org.ccloud.model.InventoryDetail;
-import org.ccloud.model.SalesRefundInstockDetail;
-import org.ccloud.model.SellerProduct;
+import org.ccloud.model.*;
 import org.ccloud.utils.StringUtils;
 
 import com.jfinal.kit.StrKit;
@@ -164,7 +161,8 @@ public class SalesRefundInstockDetailQuery extends JBaseQuery {
 
 	
 	   //批量入库
-		public boolean batchInStock(List<Record> productInfos, String sellerId, Date date, String deptId,String dataArea,String userId, String inStockSN) {
+		public boolean batchInStock(List<Record> productInfos, String sellerId, Date date, String deptId,String dataArea,String userId, String inStockSN,
+		                            String order_user, String order_date) {
 			for (Record record : productInfos) {
 				SalesRefundInstockDetail detail = SalesRefundInstockDetailQuery.me().findById(record.getStr("refundInstockDetailId"));
 				if (!detail.saveOrUpdate()) {
@@ -224,10 +222,34 @@ public class SalesRefundInstockDetailQuery extends JBaseQuery {
 				if (!sellerProduct.update()) {
 					return false;
 				}
+
+				//更新计划
+				BigDecimal bigProductCount = new BigDecimal(record.getInt("bigCount")).add(new BigDecimal(record.getInt("smallCount")).divide(new BigDecimal(record.getInt("convert_relate"))));
+				if (!updatePlans(order_user, record.getStr("sell_product_id"), order_date, bigProductCount)) {
+					return false;
+				}
 				
 			}
 			return true;
 		}
-	
-	
+
+	private boolean updatePlans(String order_user, String sellerProductId, String orderDate, BigDecimal productCount) {
+
+		List<Plans> plans = PlansQuery.me().findBySales(order_user, sellerProductId, orderDate.substring(0,10));
+		for (Plans plan : plans) {
+			BigDecimal planNum = plan.getPlanNum();
+			BigDecimal completeNum = (plan.getCompleteNum().subtract(productCount)).setScale(2, BigDecimal.ROUND_HALF_UP);
+			plan.setCompleteNum(completeNum);
+			plan.setCompleteRatio(completeNum.multiply(new BigDecimal(100)).divide(planNum, 2, BigDecimal.ROUND_HALF_UP));
+			plan.setModifyDate(new Date());
+			if(!plan.update()){
+				return  false;
+			}
+		}
+
+		return true;
+	}
+
+
+
 }

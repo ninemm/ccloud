@@ -442,7 +442,8 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 					String total=productAmout.toString();
 					if (!SalesOutstockDetailQuery.me().batchOutStock(orderProductInfos, sellerId, date,
 							user.getDepartmentId(), user.getDataArea(), user.getId(),
-							printAllNeedInfo.getOutstockSn(),printAllNeedInfo.getCustomerId())) {
+							printAllNeedInfo.getOutstockSn(),printAllNeedInfo.getCustomerId(),
+							printAllNeedInfo.getBizUserId(),printAllNeedInfo.getPlaceOrderTime().toString())) {
 						return false;
 					}
 					if (!SalesOutstockQuery.me().updateStockOutStatus(printAllNeedInfo.getSalesOutStockId(),
