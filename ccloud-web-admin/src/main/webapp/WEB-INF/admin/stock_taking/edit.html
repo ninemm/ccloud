@@ -96,8 +96,7 @@
 				pMap = productMap;
 			});
 		}
-
-}
+	}
 
 	<!--商品列表 -->
 	var pList = new Array();
@@ -119,7 +118,7 @@
 	})
 	
 	function addNew() {
-	   //添加商品验证，是否选择一个调出仓库
+	   //添加商品验证，是否选择一个盘点仓库
 	    var fromWarehouseId = $("#warehouse_id").val();
 	    if(fromWarehouseId == "" || fromWarehouseId == null || fromWarehouseId == undefined){
 		    alert("请先选择一盘点仓库");
@@ -128,15 +127,16 @@
 	    initProduct(fromWarehouseId);
 		addTr("#dataTable", pList, pOptionArr);
 	}
+	
 	var index = 1;
+	
 	function addTr(tid, productList, optionArr) {
 		var firstProduct = productList[0].productList;
 		var goodsCode = firstProduct.sellerProductId;
 		var goodsName = firstProduct.name;
 		var specification = firstProduct.specificationValue;
 		var big_unit = firstProduct.bigUnit;
-	    var balanceCount = firstProduct.balanceCount == null ? "暂未盘点": firstProduct.balanceCount;
-		
+	    var balanceCount = firstProduct.balanceCount == null ? "暂未盘点": firstProduct.balanceCount;	
 	
 		var $tbody = $(tid + " tbody"),
 		$tr = $tbody.find("tr:eq(0)"),
@@ -202,7 +202,7 @@
 			dataType: "json",
 			success: function(data) {
 				if(data!=""){
-					 for(var i=0; i<data.length; i++){
+					 for(var i=0; i<data.length-1; i++){
 					 	addNew();
 					 	var sellerProductId = data[i].sellerProductId;
 						var obj=$('#dataTable tbody').find("tr:last>td>select.pro-slc2"); 
@@ -318,34 +318,34 @@
 							</td>
 						</tr>
 						<#list (ilist)! as list>
-                                    <tr id="tr${list_index+1}">
-                      	                 <td class="center">
-									<a class="btn btn-danger btn-xs removeTr" data-toggle="modal" data-target="#deleteBackProModal" onclick="deleteTr(this)"><span class="glyphicon glyphicon-remove"></span></a>
-								</td>
-								<#list (list.productInfos)! as plist>
-								<td class="text-left">
-									<input type="hidden" id="goodsCode" name="stockTakingList[${list_index}].seller_product_id"  value="${list.sellerProductId}" />
-									<input type="text" id="goodsName" name="goodsName"  value="${plist.customName}" disabled="disabled"/>
-								   <input type="hidden"  id="factIndex" name="factIndex" value="${list_index}"/>
-								</td>
-								<td>
-									<input name="specification" id="specification" value="${plist.specificationValue!}" disabled="disabled"></input>
-								</td>
-								<td>
-									<input name="big_unit" id="big_unit" value="${plist.bigUnit!}" disabled="disabled"></input>
-								</td>
-								<td>
-									<input name="balanceCount" id="balanceCount" value="${plist.balanceCount!}" disabled="disabled"></input>
-								</td>
-								</#list>
-								<td>
-								<input type="text" id="stock" class="stock" name="stockTakingList[${list_index}].product_count"  value="${list.productCount}" />
-								</td>
-								<td class="text-left">
-									<input type="text"  class="remarks" id="remarks" name="stockTakingList[${list_index}].remark" value="${list.remark!}">
-								</td>
-                     	          	 </tr>
-                   	              </#list>
+							<tr id="tr${list_index+1}">
+							    <td class="center">
+							<a class="btn btn-danger btn-xs removeTr" data-toggle="modal" data-target="#deleteBackProModal" onclick="deleteTr(this)"><span class="glyphicon glyphicon-remove"></span></a>
+							</td>
+							<#list (list.productInfos)! as plist>
+							<td class="text-left">
+								<input type="hidden" id="goodsCode" name="stockTakingList[${list_index}].seller_product_id"  value="${list.sellerProductId}" />
+								<input type="text" id="goodsName" name="goodsName"  value="${plist.customName}" disabled="disabled"/>
+							   <input type="hidden"  id="factIndex" name="factIndex" value="${list_index}"/>
+							</td>
+							<td>
+								<input name="specification" id="specification" value="${plist.specificationValue!}" disabled="disabled"></input>
+							</td>
+							<td>
+								<input name="big_unit" id="big_unit" value="${plist.bigUnit!}" disabled="disabled"></input>
+							</td>
+							<td>
+								<input name="balanceCount" id="balanceCount" value="${plist.balanceCount!}" disabled="disabled"></input>
+							</td>
+							</#list>
+							<td>
+							<input type="text" id="stock" class="stock" name="stockTakingList[${list_index}].product_count"  value="${list.productCount}" />
+							</td>
+							<td class="text-left">
+								<input type="text"  class="remarks" id="remarks" name="stockTakingList[${list_index}].remark" value="${list.remark!}">
+							</td>
+							</tr>
+						</#list>
 					</tbody>
 					<tfoot>
 						<tr>

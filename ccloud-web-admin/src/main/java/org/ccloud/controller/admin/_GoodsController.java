@@ -538,6 +538,7 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
 		setAttr("treeData", JSON.toJSON(list));
 	}
 	
+	//盘点时将该经销商所有商品展示出来
 	public void getProductInfo() {
 		String sellerId = getSessionAttr("sellerId").toString();
 		String  warehouseId = getPara("warehouse_id");
