@@ -322,7 +322,7 @@
 				    		<#if (bean.taskId) ??>							
 							<a href="${CPATH}/activity/activityApplyReview?activityApplyId=${bean.object_id!}&taskId=${bean.taskId!}&assignee=${bean.assignee}">
 						<#else>
-							<a href="${CPATH}/activity/apply_detail?id=${bean.object_id!}">
+							<a href="${CPATH}/activity/activityApplyReview?activityApplyId=${bean.object_id!}">
 						</#if>
 				        
                         <div class="weui-cell">
