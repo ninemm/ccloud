@@ -538,8 +538,10 @@ public class CustomerVisitController extends BaseFrontController {
 		MessageKit.sendMessage(Actions.ProcessMessage.PROCESS_MESSAGE_SAVE, message);
 	}
 
+	@Before(WechatJSSDKInterceptor.class)
 	public void trajectory() {
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		List<Record> userList = UserQuery.me().findNextLevelsUserList(selectDataArea);
 		List<Map<String, Object>> users = new ArrayList<>();
 
@@ -549,11 +551,14 @@ public class CustomerVisitController extends BaseFrontController {
 			item.put("value", record.get("id"));
 			users.add(item);
 		}
+		setAttr("userId", user.getId());
+		setAttr("userName", user.getRealname());
 		setAttr("users", JSON.toJSON(users));
 
 		render("visit_trajectory.html");
 	}
 
+	@Before(WechatJSSDKInterceptor.class)
 	public void trajectoryRefresh() {
 		String userId = getPara("userId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
