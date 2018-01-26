@@ -196,20 +196,20 @@
 	function selectWarehouse(){
 		var warehouse_id = $('select  option:selected').val(); 
 		$('#dataTable tbody').find("tr:gt(0)").remove();
-		 $.ajax({
+		$.ajax({
 			url: "${CPATH}/admin/stockTaking/getProductInfo",
 			data:{"warehouse_id":warehouse_id},
 			dataType: "json",
 			success: function(data) {
 				if(data!=""){
-					 for(var i=0; i<data.length-1; i++){
+					 for(var i=0; i<data.length; i++){
 					 	addNew();
 					 	var sellerProductId = data[i].sellerProductId;
 						var obj=$('#dataTable tbody').find("tr:last>td>select.pro-slc2"); 
 						obj.val(sellerProductId).trigger("change");
 						productChange(obj,sellerProductId);
-	 				 }
- 				 }
+					}
+				}
 			}
 		});
 	}
