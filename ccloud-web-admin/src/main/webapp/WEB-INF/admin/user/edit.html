@@ -20,7 +20,7 @@
 var $form = $("#form");
 $("#station_option").select2();
 $("#group_id").select2();
-
+var flang = true;
 function getStation(){
 	$.ajax({
 	url:"${CPATH}/admin/user/getStation",
@@ -60,7 +60,7 @@ function getStation(){
  }
 
 $(function() {
-	
+	$("#checkWarn").hide();
 	jQuery.mm.initValidator('#form', validatorFields)
 	getStation();
 	getGroup();
@@ -80,7 +80,30 @@ var validatorFields = {
 	'user.username': {
 		validators: {
             notEmpty: { message: '用户名不能为空' },
-            stringLength: { max: 15, message: '用户名最大长度是15字符，请重新输入' }
+            stringLength: { max: 15, message: '用户名最大长度是15字符，请重新输入' },
+            callback: {
+		        message: '该用户名已存在，请重新输入',
+		        callback: function(value, validator) {
+		            var flag = true;
+		            var username = $(".username").val();
+					$.ajax({
+						url:"${CPATH}/admin/user/checkUserName",
+						type:"post",
+						async: false, 
+						dataType:"json",
+						data:{"username":username},
+						success:function(data)
+						{
+							if(data==false){
+								flag = false;
+							}
+						}
+					});
+					return flag;
+		            
+		        }
+		    }
+            
         }
 	},
 	'user.password': {
@@ -115,6 +138,10 @@ var validatorFields = {
 };
 
 function doSubmit(){
+	if(flang==false){
+			alert("销售商编码错误，请重新输入");
+			return;
+		}
 	var l = Ladda.create( document.querySelector( '#do_submit' ) );
 	var t = '${(t)!}';
 	var count = $("#station_option").select2("data").length;
@@ -223,7 +250,7 @@ function doSubmit(){
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">用户名:</label>
 						<div class="input-group col-md-4 col-sm-10">
-		                 	<input class="form-control input-sm" type="text" name="user.username" value="${(user.username)!}" placeholder="1-15个任意字符">
+		                 	<input class="form-control input-sm username" type="text" name="user.username" value="${(user.username)!}" placeholder="1-15个任意字符">
 		               	</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">
