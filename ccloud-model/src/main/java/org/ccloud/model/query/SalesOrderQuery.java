@@ -815,11 +815,12 @@ public class SalesOrderQuery extends JBaseQuery {
 		if (keyword.equals("sok.create_date")) {
 			product_count="sd.out_count";
 		}
-		List<SellerProduct> findBySellerId = SellerProductQuery.me().findBySellerId(sellerId);
+		List<Record> records = SellerProductQuery.me().findConvertRelate(sellerId);
 		StringBuilder fromBuilder=new StringBuilder("SELECT ");
-		for (SellerProduct sellerProduct : findBySellerId) {
-			String customName=sellerProduct.getCustomName(); 
-			fromBuilder.append("TRUNCATE(((sum( CASE sp.custom_name WHEN '"+customName+"' THEN "+product_count+" ELSE 0 END) - sum((CASE sp.custom_name WHEN '"+customName+"' THEN srid.reject_product_count ELSE 0 END)))/p.convert_relate),2) '"+customName+"' ,");
+		for (Record record : records) {
+			String customName=record.getStr("custom_name");
+			String convertRelate = record.getStr("convert_relate");
+			fromBuilder.append("TRUNCATE(((sum( CASE sp.custom_name WHEN '"+customName+"' THEN "+product_count+" ELSE 0 END) - sum((CASE sp.custom_name WHEN '"+customName+"' THEN srid.reject_product_count ELSE 0 END)))/"+convertRelate+"),2) '"+customName+"' ,");
 		}
 		fromBuilder.append("c.customer_name '客户名称'");
 		fromBuilder.append(" FROM cc_sales_order so ");
