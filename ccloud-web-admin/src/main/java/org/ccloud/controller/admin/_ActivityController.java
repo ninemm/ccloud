@@ -15,6 +15,7 @@
  */
 package org.ccloud.controller.admin;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -65,7 +66,9 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		Page<Record> page = ActivityQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate,sellerId);
-		
+		for(int i = 0; i <page.getList().size();i++){
+			page.getList().get(i).set("customer_type", ActivityQuery.me().getCustomerTypes(page.getList().get(i).getStr("customer_type")));
+		}
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
 	}
@@ -129,6 +132,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		String sellerId = getSessionAttr("sellerId");
 		String [] imagePath = getParaValues("imageUrl[]");
 		String investTypes = getPara("investType");
+		String customerTypes = getPara("customerType");
 		//存储路径
 		String imagPath = "";
 		if (imagePath != null) {
@@ -140,7 +144,6 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			activity.setImageListStore(imagPath.substring(0, (imagPath.length()-1)));
 		}
 		String unit = getPara("unit");
-		String customerTypeId = getPara("customerType");
 		String areaNames = getPara("areaNames").replace("/", "-");
 		String startDate = getPara("startDate")+" 00:00:00";
 		String endDate = getPara("endDate")+" 23:59:59";
@@ -153,13 +156,20 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}  
+	    if(activity.getCategory().equals(Consts.CATEGORY_NORMAL)){
+	    	activity.setInvestAmount(new BigDecimal(0));
+	    	activity.setVisitNum(0);
+	    	activity.setInvestType("");
+	    }else{
+	    	activity.setInvestType(investTypes);
+	    }
 	    activity.setUnit(unit);
-	    activity.setInvestType(investTypes);
+	    
 		activity.setSellerId(sellerId);
 		activity.setAreaType(areaNames);
 		activity.setStartTime(sdate);
 		activity.setEndTime(edate);
-		activity.setCustomerType(customerTypeId);
+		activity.setCustomerType(customerTypes);
 		activity.saveOrUpdate();
 		renderAjaxResultForSuccess();
 	}
@@ -175,11 +185,15 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			map.put("name",record.get("name").toString());
 			if (!StringUtils.isBlank(id)) {
 				Activity activity = ActivityQuery.me().findById(id);
-						if((record.get("id").toString()).equals(activity.getCustomerType())){
+				String[] customerTypes = activity.getCustomerType().split(",");
+					for(int i = 0;i<customerTypes.length;i++){
+						if((record.get("id").toString()).equals(customerTypes[i])){
 							map.put("isvalid", 1);
+							break;
 						} else {
 							map.put("isvalid", 0);
 						}
+					}
 			}else {
 					map.put("isvalid", 0);
 			}
@@ -201,4 +215,6 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		flang=activity.update();
 		renderJson(flang);
 	}
+	
+
 }

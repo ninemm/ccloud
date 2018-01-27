@@ -216,7 +216,7 @@ function doChange(key){
             "countryName": countryName
         }
 
-        Utils.ajax('${CPATH}/product/customerList', params,
+        Utils.ajax('${CPATH}/activity/customerList', params,
             function(data){
                 $loading.hide();
                 if(data.customerList.length == 0){

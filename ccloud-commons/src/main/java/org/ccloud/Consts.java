@@ -207,14 +207,19 @@ public class Consts {
 	public static final String WAREHOUSE_TYPE_CAR = "2";// 车销仓库
 	
 	//活动类型
-	public static final String CATEGORY_NORMAL="101001" ; //普通活动
+	public static final String CATEGORY_NORMAL="101001" ; //商品销售营销活动
 	public static final String CATEGORY_INVEST="101002" ; //投入活动
 	
 	//投入类型
 	public static final String INVEST_TYPE = "activity_invest";//投入的类型
-	public static final String INVEST_SHOP="101101" ; //商品
-	public static final String INVEST_MATTER="101102" ; //物料
-	public static final String INVEST_ACTIVITY="101103" ; //费用活动费
+	public static final String INVES_PUBLICK="101101" ; //公关赞助
+	public static final String INVEST_MATTER="101102" ; //宣传物料
+	public static final String INVEST_SHOP="101103" ; //消费培育
+	public static final String INVEST_TERMINSL_ADVERTISWMENT="101104" ; //终端广告
+	public static final String INVEST_TERMINSL_DISPLAY="101105" ; //终端陈列
+	public static final String INVEST_TERMINSL_CUSTOMER_VISITE="101106" ; //终端客情
+	public static final String INVEST_VEHICLE_COST="101107" ; //车辆费用
+	public static final String INVEST_PERSONAL_SELLING="101108" ; //人员推广
 	
 	//客户参与活动的时间区间
 	public static final String TIME_INTERVAL_ONE="100801";//1个月
@@ -241,5 +246,4 @@ public class Consts {
 	
 	public static final Integer STATUS_STATE_PUT = 1;// 通用上架
 	public static final Integer STATUS_STATE_DOWN = 0;// 通用下架
-
 }

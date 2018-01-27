@@ -15,14 +15,14 @@ import com.google.common.collect.Maps;
 import com.jfinal.aop.Before;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.tx.Tx;
+
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.*;
-import org.ccloud.model.query.ActivityQuery;
-import org.ccloud.model.query.CustomerTypeQuery;
-import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.query.*;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DateUtils;
@@ -45,9 +45,11 @@ public class ActivityController extends BaseFrontController {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 
 		List<Record> activityRecords = ActivityQuery.me().findActivityListForApp(sellerId, "", "");
-
+		for(int i = 0; i <activityRecords.size();i++){
+			activityRecords.get(i).set("customerTypeName", ActivityQuery.me().getCustomerTypes(activityRecords.get(i).getStr("customer_type")));
+		}
 		List<Map<String, Object>> activityList = new ArrayList<Map<String, Object>>();
-
+		
 		Set<String> tagSet = new LinkedHashSet<String>();
 
 		for (Record record : activityRecords) {
@@ -60,7 +62,7 @@ public class ActivityController extends BaseFrontController {
 				}
 			}
 		}
-
+		
 		setAttr("activityList", JSON.toJSON(activityList));
 		setAttr("tags", JSON.toJSON(tagSet));
 
@@ -74,7 +76,9 @@ public class ActivityController extends BaseFrontController {
 		String tag = getPara("tag");
 
 		List<Record> activityList = ActivityQuery.me().findActivityListForApp(sellerId, keyword, tag);
-
+		for(int i = 0; i <activityList.size();i++){
+			activityList.get(i).set("customerTypeName", ActivityQuery.me().getCustomerTypes(activityList.get(i).getStr("customer_type")));
+		}
 		Set<String> tagSet = new LinkedHashSet<String>();
 
 		for (Record record : activityList) {
@@ -253,12 +257,12 @@ public class ActivityController extends BaseFrontController {
 		if (total >= activity.getTotalCustomerNum()) {
 			return "活动参与的人数已经达到上限";
 		}
-		int interval = this.getStartDate(activity.getTimeInterval());
+		/*int interval = this.getStartDate(activity.getTimeInterval());
 		DateTime dateTime = new DateTime(new Date());
 		long cnt = ActivityApplyQuery.me().findBySellerCustomerIdAndActivityId(activityId, sellerCustomerId, DateUtils.format(dateTime.plusMonths(-interval).toDate()));
 		if (cnt >= activity.getJoinNum()) {
 			return customerName + "参与的次数已经达到上限，每个客户" + interval + "个月中参与次数为：" + activity.getJoinNum();
-		}
+		}*/
 
 		return "";
 	}
@@ -387,12 +391,22 @@ public class ActivityController extends BaseFrontController {
 		String[] investTypes = activityApply.getStr("invest_type").split(",");
 		String investType = "";
 		for(int i=0;i<investTypes.length;i++){
-			if(investTypes[i].equals(Consts.INVEST_SHOP)){
-				investType +="商品、";
+			if(investTypes[i].equals(Consts.INVES_PUBLICK)){
+				investType +="公关赞助";
 			}else if (investTypes[i].equals(Consts.INVEST_MATTER)){
-				investType +="物料、";
-			}else if (investTypes[i].equals(Consts.INVEST_ACTIVITY)){
-				investType +="费用活动费、";
+				investType +="宣传物料、";
+			}else if (investTypes[i].equals(Consts.INVEST_SHOP)){
+				investType +="消费培育、";
+			}else if (investTypes[i].equals(Consts.INVEST_TERMINSL_ADVERTISWMENT)){
+				investType +="终端广告、";
+			}else if (investTypes[i].equals(Consts.INVEST_TERMINSL_DISPLAY)){
+				investType +="终端陈列、";
+			}else if (investTypes[i].equals(Consts.INVEST_TERMINSL_CUSTOMER_VISITE)){
+				investType +="终端客情、";
+			}else if (investTypes[i].equals(Consts.INVEST_VEHICLE_COST)){
+				investType +="车辆费用、";
+			}else if (investTypes[i].equals(Consts.INVEST_PERSONAL_SELLING)){
+				investType +="人员推广、";
 			}
 		}
 		if(!investType.equals("")) {
@@ -526,5 +540,42 @@ public class ActivityController extends BaseFrontController {
 		activityApply.setStatus(2);
 		if( activityApply.saveOrUpdate()) renderAjaxResultForSuccess("操作成功");
 		else renderAjaxResultForError("操作失败");
+	}
+	
+	public void customerList(){
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+
+		String keyword = getPara("keyword");
+		String userId = getPara("userId");
+		String[] customerTypeIds = getPara("customerTypeId").split(",");
+		String customerType = "'";
+		String customerTypeId = "";
+		for(int i = 0;i<customerTypeIds.length;i++){
+			customerType += customerTypeIds[i]+"','";
+		}
+		if(customerTypeIds!=null){
+			customerTypeId = customerType.substring(0, customerType.length()-2);
+		}
+		String isOrdered = getPara("isOrdered");
+		String provName = getPara("provName", "");
+		String cityName = getPara("cityName", "");
+		String countryName = getPara("countryName", "");
+
+		String customerKind = "";
+		Subject subject = SecurityUtils.getSubject();
+		if (subject.isPermitted("/admin/salesOrder/add") && subject.isPermitted("/admin/salesOrder/seller")) {
+			customerKind = "";
+		} else if (subject.isPermitted("/admin/salesOrder/add")) {
+			customerKind = Consts.CUSTOMER_KIND_COMMON;
+		} else if (subject.isPermitted("/admin/salesOrder/seller")) {
+			customerKind = Consts.CUSTOMER_KIND_SELLER;
+		}
+
+		Page<Record> customerList = SellerCustomerQuery.me()._paginateForApp(getPageNumber(), getPageSize(), keyword,
+				selectDataArea, userId, customerTypeId, isOrdered, customerKind, provName, cityName, countryName);
+
+		Map<String, Object> map = new HashMap<>();
+		map.put("customerList", customerList.getList());
+		renderJson(map);
 	}
 }

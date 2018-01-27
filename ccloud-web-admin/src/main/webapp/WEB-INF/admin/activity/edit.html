@@ -54,7 +54,27 @@
 	var data = {url: '', alt: ''};
 	$("#invest_type").select2();
 	$("#customer_type_store_option").select2();
+	$("#customerType").select2();
 	$(function() {
+		if($(".category").val()==101002){
+			$(".investType").show();
+			$(".visitNum").show();
+			var list = $("#invest_type").select2("val");
+			if (list != null && list.length > 0) {
+				var type = parseInt(list.toString());
+				if(type==101101 || type==101102 || type==101103 ||type==101104 ||type==101105 ||type==101106 ){
+					$(".investAmount").show();
+				}else{
+					$(".investAmount").hide();
+				}
+			}else{
+				$(".investAmount").hide();
+			}
+		}else{
+			$(".investType").hide();
+			$(".visitNum").hide();
+			$(".investAmount").hide();
+		}
 		
 		jQuery.mm.initValidator('#form', validatorFields)
 		jQuery.mm.initDatetimepicker(null, '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
@@ -82,7 +102,7 @@
 			async: false,
 			data:{"id":'${(activity.id)!}'},
 			success: function(data){
-				var optionsHtml = '<option value="0" >---请选择---</option>';
+				var optionsHtml = '<option value="0" >请选择</option>';
 				if(data.length && data.length>=1){
 					for(var i in data){
 						if (data[i].isvalid == 0 ) {
@@ -122,6 +142,31 @@
         });
 		
 	});
+	
+	$(document).on("change", ".category", function() {
+		if($(".category").val()==101002){
+			$(".investType").show();
+			$(".visitNum").show();
+		}else{
+			$(".investType").hide();
+			$(".visitNum").hide();
+		}
+	});
+	
+	$(document).on("change", ".investType", function() {
+		var list = $("#invest_type").select2("val");
+		if (list != null && list.length > 0) {
+			var type = parseInt(list.toString());
+			if(type==101101 || type==101102 || type==101103 ||type==101104 ||type==101105 ||type==101106 ){
+				$(".investAmount").show();
+			}else{
+				$(".investAmount").hide();
+			}
+		}else{
+			$(".investAmount").hide();
+		}
+	});
+	
 	$("body").on("click", ".delete", function(){
 		var $this = $(this);
 		if (confirm("您确定要删除吗？") == true) {
@@ -193,6 +238,11 @@
 		var l = Ladda.create( document.querySelector( '#do_submit' ) );
 		$("#areaCodes").val($city.data('citypicker').getCode());
 		$("#areaNames").val($city.data('citypicker').getVal());
+		var listc = $("#customerType").select2("val");
+		var cIds = "";
+		if (listc != null && listc.length > 0) {
+			cIds = listc.toString();
+		}
 		var list = $("#invest_type").select2("val");
 		var ids = "";
 		if (list != null && list.length > 0) {
@@ -209,7 +259,7 @@
 			},
 			type : "post", 
 			data : {
-				"investType":ids},
+				"investType":ids,"customerType":cIds},
 			dataType : "json", 
 			success : function(data) { 
 				if(data.errorCode == 0) {
@@ -260,7 +310,7 @@
 					<div class="col-sm-5 validata-box">
 						<label class="control-label col-sm-4">活动名称:</label>
 						<div class="input-group col-sm-8">
-							<input class="form-control input-sm" type="text" name="activity.title" value="${(activity.title)!}" style="width:257%;">
+							<input class="form-control input-sm" type="text" name="activity.title" value="${(activity.title)!}" style="width:261%;">
 						</div>
 					</div>
 				</div>
@@ -304,7 +354,7 @@
 					<div class="col-sm-5 validata-box">
 						<label class="control-label col-sm-4">活动类型:</label>
 						<div class="input-group col-sm-8">
-							<select class="form-control input-sm" name="activity.category" id="activity.category">
+							<select class="form-control input-sm category" name="activity.category" id="activity.category">
 								${DICT_BOX('activity_category', 'select', (activity.category)!)}
 							</select>
 		               	</div>
@@ -314,7 +364,7 @@
 					<div class="col-sm-5 validata-box">
 						<label class="control-label col-sm-4">客户类型:</label>
 						<div class="input-group col-sm-8">
-							<select id="customerType" class="form-control input-sm" name = "customerType">
+							<select id="customerType" class="form-control input-sm" name = "customerTy" multiple="multiple">
 							</select>
                         </select>
 						</div>
@@ -334,7 +384,7 @@
 							<input class="form-control input-sm" type="text" name="activity.tags" value="${(activity.tags)!}">
 						</div>
 					</div>
-					<div class="col-sm-5 validata-box">
+					<div class="col-sm-5 validata-box investType" >
 							<label class="control-label col-sm-4">投入类型:</label>
 							<div class="input-group col-sm-8">
 								<select class="form-control input-sm" name="invest_type" id="invest_type" multiple="multiple" >
@@ -372,22 +422,22 @@
 						</div>
 					</div>
 				</div><div class="form-group">
-					<div class="col-sm-5 validata-box invest_num">
+					<div class="col-sm-5 validata-box investNum">
 						<label class="control-label col-sm-4">投入数量:</label>
 						<div class="input-group col-sm-8">
-							<input class="form-control input-sm" type="text" name="activity.invest_num" value="${(activity.invest_num)!}" style="width:69%;">
+							<input class="form-control input-sm" type="text" name="activity.invest_num" value="${(activity.invest_num)!}" style="width:67%;">
 							&nbsp;<select id="unit" name="unit" class="form-control input-sm" style="width: 30%;float: none;">
 							</select>
 						</div>
 					</div>
-					<div class="col-sm-5 validata-box invest_amount">
+					<div class="col-sm-5 validata-box investAmount">
 	                    <label for="_title" class="control-label col-sm-4">投入金额:</label>
 	                    <div class="input-group col-sm-8">
 	                        <input class="form-control input-sm" type="text" name="activity.invest_amount" value="${(activity.invest_amount)!}">
 	                    </div>
 	                </div>
 	             </div><div class="form-group">
-					<div class="col-sm-5 validata-box">
+					<div class="col-sm-5 validata-box visitNum">
 						<label class="control-label col-sm-4">拜访次数：</label>
 						<div class="input-group col-sm-8">
 							<input class="form-control input-sm" type="text" name="activity.visit_num" value="${(activity.visit_num)!}">
@@ -410,7 +460,7 @@
 					<div class="col-sm-5 validata-box">
 						<label class="control-label col-sm-4">活动内容:</label>
 						<div class="input-group col-sm-8">
-		                 	<textarea class="form-control" rows="3" name="activity.content" value="${(activity.content)!}" style="width:257%;">${(activity.content)!}</textarea>
+		                 	<textarea class="form-control" rows="3" name="activity.content" value="${(activity.content)!}" style="width:261%;">${(activity.content)!}</textarea>
 		               	</div>
 					</div>
 				</div><div class="form-group">

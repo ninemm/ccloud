@@ -165,6 +165,12 @@ function initActivity(activityList,flg){
 		$newProductDetail.find("#customerTypeName").text(el.customerTypeName);
 		$newProductDetail.find("#areaType").text(el.area_type);
 		$newProductDetail.find("#totalCustomerNum").text(el.total_customer_num);
+		if(el.surplus_num==null){
+			$newProductDetail.find("#surplusNum").text(0);
+		}else{
+			$newProductDetail.find("#surplusNum").text(el.surplus_num);
+		}
+		$newProductDetail.find("#surplusNum").text(el.surplus_num);
 		$newProductDetail.find("#joinNum").text(el.timeIntervalName + "可以参加" + el.join_num + "次");
 
 		$newProductDetail.find("#image").attr("src", getImageUrl(el.image_list_store, el.code));
@@ -270,6 +276,9 @@ $gallery.on("click", function() {
 								<div >
 									名额：<span id="totalCustomerNum"></span>
 								</div>
+								<!-- <div >
+									剩余：<span id="surplusNum"></span>
+								</div> -->
 								<div >
 									规则：<span id="joinNum"></span>
 								</div>

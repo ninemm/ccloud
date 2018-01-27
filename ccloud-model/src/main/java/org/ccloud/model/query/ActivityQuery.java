@@ -52,7 +52,7 @@ public class ActivityQuery extends JBaseQuery {
 	}
 
 	public Page<Record> paginate(int pageNumber, int pageSize, String keyword,String startDate, String endDate,String sellerId) {
-		String select = "select ca.*,(SELECT COUNT(*) from cc_activity_apply where activity_id = ca.id and `status` not in ("+Consts.ACTIVITY_APPLY_STATUS_REJECT+","+Consts.ACTIVITY_APPLY_STATUS_CANCEL+")) AS activityApplyNum,ct.name as customerTypeName ";
+		String select = "select ca.*,(SELECT COUNT(*) from cc_activity_apply where activity_id = ca.id and `status` not in ("+Consts.ACTIVITY_APPLY_STATUS_REJECT+","+Consts.ACTIVITY_APPLY_STATUS_CANCEL+")) AS activityApplyNum ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_activity` ca ");
 		fromBuilder.append(" LEFT JOIN cc_customer_type ct on ct.id=ca.customer_type");
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -116,8 +116,21 @@ public class ActivityQuery extends JBaseQuery {
     	String sql = "select * from cc_activity where is_publish = 1";
     	return DAO.find(sql);
     }
-
+    
 	public List<Activity> findBySellerId(String sellerId) {
 		return DAO.doFind("seller_id = ? and is_publish = 1 ", sellerId);
+	}
+    
+	public String getCustomerTypes(String customerTypeIds){
+		String[] customerTypes = customerTypeIds.split(",");
+		String types = "";
+		String typeNames = "";
+		if(customerTypes!=null){
+			for(int i = 0;i<customerTypes.length;i++){
+				types += CustomerTypeQuery.me().findById(customerTypes[i]).getStr("name")+",";
+			}
+			typeNames = types.substring(0, types.length()-1);
+		}
+		return typeNames;
 	}
 }

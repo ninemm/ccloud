@@ -65,7 +65,7 @@
       			{field: "code", title: "活动编号", align: "center", visible:false, edit:false},
       			{field: "title", title: "活动标题", align: "center", width: '10%', edit:false},
       			{field: "category", title: "活动类型", align: "center", width: '3%', edit:false},
-      			{field: "customerTypeName", title: "客户类型", align: "center", width: '7%', edit:false},
+      			{field: "customer_type", title: "客户类型", align: "center", width: '7%',edit:false},
       			{field: "area_type", title: "区域类型", align: "center", width: '10%',edit:false},
       			{field: "start_time", title: "活动时间", align: "center", width: '10%',
       				formatter: function(value, row, rowIndex) {
@@ -80,12 +80,15 @@
    						else return '否';
    					},
    					edit: false
-   				},   
-   				{field: "activityApplyNum", title: "活动进度", align: "center", width: '5%',
+   				},  
+   				{field: "join_num", title: "每个客户参与数", align: "center", width: '10%',edit:false},
+   				{field: "total_customer_num", title: "名额", align: "center", width: '10%',edit:false}, 
+   				/*{field: "activityApplyNum", title: "活动进度", align: "center", width: '5%',
    				formatter: function(value, row, rowIndex) {
    						return (parseInt(value)/row.total_customer_num*100).toFixed(2)+"%";
    					},edit: false,
-   				},   
+   				},  */ 
+					   				
 				{field: "create_date", title: "创建时间", align: "center", visible:false, edit:false},
 				{field: "action", title: "操作", align: "center", width: '20%',
 				formatter: function(value, row, rowIndex) {
@@ -115,111 +118,6 @@
 			}
 		}
 	};
-
-	function detail(id) {
-		layer.open({
-			title:"订单详细",
-			type: 2, 
-			area: ['70%', '80%'],
-			content: '${CPATH}/admin/salesOrder/detail/' + id
-		}); 
-	}
-	
-	function pass(id) {
-		$.get('${CPATH}/admin/salesOrder/pass?ucode=${ucode}&orderId=' + id,
-			function(result){
-				if (result.errorCode > 0) {
-					toastr.error(result.message, '操作失败');
-				} else {
-					toastr.success(result.message, '操作成功');
-					$table.bootstrapTable('refresh');
-				}
-			}
-		);
-	}
-	
-	function reject(id) {
-		$.get('${CPATH}/admin/salesOrder/reject?ucode=${ucode}&orderId=' + id,
-			function(result){
-				if (result.errorCode > 0) {
-					toastr.error(result.message, '操作失败');
-				} else {
-					toastr.success(result.message, '操作成功');
-					$table.bootstrapTable('refresh');
-				}
-			}
-		);
-	}
-	
-	function proc(id) {
-	    $.get('${CPATH}/admin/salesOrder/start?ucode=${ucode}&orderId=' + id,
-            function(result){
-                if (result.errorCode > 0) {
-                    toastr.error(result.message, '操作失败');
-                } else {
-                    toastr.success(result.message, '操作成功');
-                    $table.bootstrapTable('refresh');
-                }
-            }
-        );
-	}
-	
-	function cancel(id) {
-	    $.get('${CPATH}/admin/salesOrder/cancel?ucode=${ucode}&orderId=' + id,
-            function(result){
-                if (result.errorCode > 0) {
-                    toastr.error(result.message, '操作失败');
-                } else {
-                    toastr.success(result.message, '操作成功');
-                    $table.bootstrapTable('refresh');
-                }
-            }
-        );
-	}
-	
-	function history(id, proc_inst_id) {
-		layer.open({
-			title:"操作记录",
-			type: 2, 
-			area: ['580px', '530px'],
-			content: '${CPATH}/admin/salesOrder/operateHistory/' + id + '-' + proc_inst_id
-		}); 
-	}
-	
-	function batchAction(){
-			var orderItems = new Array();
-			 var flang = true;
-			 var checklist = $('input[name="dataItem"]:checked').parent().parent();
-			 if(checklist.length == 0){
-				alert("未选中任何数据!");
-				flang=false;
-				return;		 
-			 }
-			 $('input[name="dataItem"]:checked').parent().parent().each(function(idx, item) {
-			  	var obj = {
-									"id": $(this).find('td').eq(0).find("input").val(),
-								};
-								orderItems.push(obj);
-							})
-				if(flang==true){			
-					$.ajax({
-						url:"${CPATH}/admin/salesOrder/passAll",
-						type:"post",
-						dataType:"json",
-						data : {orderItems : JSON.stringify(orderItems)},
-						success:function(data){
-							if(data==true){
-								toastr.success(data.message, '添加成功');
-							}else{
-								toastr.error(data.message, '添加失败');
-							}
-							setTimeout( function(){
-							location.reload();
-									}, 2 * 1000 );
-						}
-					});
-				}
-	}
 	
 	function change(id) {
 		$.ajax({
@@ -293,25 +191,4 @@
 	</form>
 	<!-- /.box -->
 </section>
-
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="padding-top:10%;">
-  <div class="modal-dialog" role="document" style="width:280px;">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="exampleModalLabel">批量审核</h4>
-      </div>
-      <div class="modal-body">
-          <div class="form-group">
-            	<h3>确认批量审核？</h3>
-          </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-        <button type="button" class="btn btn-primary"  onclick="batchAction()">确认</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 </@layout>
