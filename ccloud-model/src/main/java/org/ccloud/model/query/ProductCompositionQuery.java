@@ -118,6 +118,7 @@ public class ProductCompositionQuery extends JBaseQuery {
 		needWhere = appendIfNotEmpty(fromBuilder, "cp.parent_id", id, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "cs.seller_id", sellerId, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cp.name", keyword, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "cp.state", Consts.STATUS_STATE_PUT, params, needWhere);
 		
 		if (StrKit.notBlank(tag)) {
 			appendWhereOrAnd(fromBuilder, needWhere);

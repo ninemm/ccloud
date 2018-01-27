@@ -45,7 +45,7 @@
 	});
 
 	var initParams = function(params) {
-
+		var actId = $("#activityId").find("option:selected").val();
 		var keyword = $('#post-search-input').val();
 		if (keyword) keyword = encodeURIComponent(keyword);
 		var param = {
@@ -53,7 +53,8 @@
 			page: params.offset/params.limit + 1,
 			k: keyword,
 			startDate: $('#startDate').val() + " 00:00:00",
-			endDate: $('#endDate').val() + " 23:59:59"
+			endDate: $('#endDate').val() + " 23:59:59",
+			activity: actId
 		};
 		return param;
 	};
@@ -249,7 +250,11 @@
 				}
 	}
 	function batchDown(){
-		jQuery.mm.down("${CPATH}/admin/salesOrder/downloading?startDate=" + $('#startDate').val() + " 00:00:00" + "&endDate=" + $('#endDate').val() + " 23:59:59" + "&k="+$('#post-search-input').val());
+		var startDate = $('#startDate').val() + " 00:00:00";
+		var endDate = $('#endDate').val() + " 23:59:59";
+		var k = $('#post-search-input').val()
+		var actId = $("#activityId").find("option:selected").val();
+		jQuery.mm.down("${CPATH}/admin/salesOrder/downloading?startDate=" + startDate  + "&endDate=" + endDate + "&k=" + k + "&activity=" + actId);
     }
 </#macro>
 
@@ -283,7 +288,15 @@
 						<input id="endDate" class="form-control" value="${endDate!}" name="endDate" placeholder="结束日期" >&nbsp;
 					</div>
 				</div>
-				
+				<div class="form-group validata-box">
+					<label class="control-label">活动名称:</label>
+					<select class="form-control input-sm" id="activityId">
+						<option value="">--请选择--</option>
+						<#list actList! as act >
+							<option value="${act.id!}">${(act.title)!}</option>
+						</#list>
+					</select>
+				</div>				
 				<input id="post-search-input" class="form-control" type="search" value="${k!}" name="k" placeholder="搜索订单号/客户名称">&nbsp;
 				<input id="search-submit" class="btn btn-sm btn-primary btn-flat" type="button" value="搜索">
 			</div>

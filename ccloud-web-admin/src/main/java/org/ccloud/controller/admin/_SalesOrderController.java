@@ -36,9 +36,11 @@ import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
+import org.ccloud.model.Activity;
 import org.ccloud.model.Message;
 import org.ccloud.model.SalesOrder;
 import org.ccloud.model.User;
+import org.ccloud.model.query.ActivityQuery;
 import org.ccloud.model.query.MessageQuery;
 import org.ccloud.model.query.OptionQuery;
 import org.ccloud.model.query.OutstockPrintQuery;
@@ -81,10 +83,12 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 	@Override
 	public void index() {
 		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		List<Activity> actList = ActivityQuery.me().findBySellerId(sellerId);
 
 		setAttr("startDate", date);
 		setAttr("endDate", date);
-
+		setAttr("actList", actList);
 		render("index.html");
 	}
 
@@ -99,8 +103,9 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		String endDate = getPara("endDate");
 		String sellerId = getSessionAttr("sellerId");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String activityId = getPara("activity");
 
-		Page<Record> page = SalesOrderQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate, sellerId, dataArea);
+		Page<Record> page = SalesOrderQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate, sellerId, dataArea, activityId);
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
@@ -684,9 +689,10 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		String keyword = getPara("k");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerId = getSessionAttr("sellerId");
+		String activityId = getPara("activity");
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\sales_outstock\\"
 				+ "salesOrderInfo.xlsx";
-		Page<Record> page = SalesOrderQuery.me().paginate(1, Integer.MAX_VALUE, keyword, startDate, endDate, sellerId, dataArea);
+		Page<Record> page = SalesOrderQuery.me().paginate(1, Integer.MAX_VALUE, keyword, startDate, endDate, sellerId, dataArea, activityId);
 		List<Record> salesOderList = page.getList();
 		
 		List<SalesOrderExcel> excellist = Lists.newArrayList();

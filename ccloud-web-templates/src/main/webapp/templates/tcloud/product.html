@@ -278,7 +278,6 @@ function initComposition(compositionList){
 	$.each(compositionList, function(index, el) {
 		if(parentId != el.parent_id) {
 			parentId = el.parent_id;
-
 			var $type = $menuRight.find(".type:last");
 			$type.append("<section class='product_detail weui-panel weui-panel_access composition' id='" + el.id  + "' >" + compositionHtml + "</section>");
 			var $newProductDetail = $type.find(".composition:last");
@@ -297,8 +296,10 @@ function initComposition(compositionList){
 
 			$newProductDetail.find("#subProduct").text(el.sub_product_name + ' ' + el.sub_product_count + '件')
 		}else{
+			var $type = $menuRight.find(".type:last");
+			var $newProductDetail = $type.find(".composition:last");
 			$newProductDetail.find("#sub").append("<a class='fr gift-open' >展开</a>");
-			$newProductDetail.find("#subsubProduct").append("el.sub_product_name + ' ' + el.sub_product_count + '件' </br>");
+			$newProductDetail.find("#subsubProduct").append(el.sub_product_name + ' ' + el.sub_product_count + '件');
 		}
 
 	});
