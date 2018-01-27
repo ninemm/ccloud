@@ -81,6 +81,11 @@
    					},
    					edit: false
    				},   
+   				{field: "activityApplyNum", title: "活动进度", align: "center", width: '5%',
+   				formatter: function(value, row, rowIndex) {
+   						return (parseInt(value)/row.total_customer_num*100).toFixed(2)+"%";
+   					},edit: false,
+   				},   
 				{field: "create_date", title: "创建时间", align: "center", visible:false, edit:false},
 				{field: "action", title: "操作", align: "center", width: '20%',
 				formatter: function(value, row, rowIndex) {

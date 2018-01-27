@@ -283,18 +283,23 @@ public class CustomerVisitQuery extends JBaseQuery {
 		return Db.find(sql.toString(), params.toArray());
 	}
 
-	public List<Record> findLngLat(String userId, String startDate, String endDate) {
+	public List<Record> findLngLat(String userId, String startDate, String endDate, String status) {
 
-		StringBuilder sql = new StringBuilder("SELECT ccv.*, cc.customer_name ,u.realname ");
+		StringBuilder sql = new StringBuilder("SELECT ccv.*, cc.customer_name ,u.realname, " +
+				"GROUP_CONCAT(cct.`name`) as customerTypeName, d.name ");
 		sql.append("FROM cc_customer_visit ccv ");
 
 		sql.append("LEFT JOIN cc_seller_customer csc ON ccv.seller_customer_id = csc.id ");
 		sql.append("LEFT JOIN cc_customer cc ON csc.customer_id = cc.id ");
 		sql.append("LEFT JOIN `user` u ON ccv.user_id = u.id ");
+		sql.append("LEFT JOIN cc_customer_join_customer_type ccjct ON ccjct.seller_customer_id = csc.id ");
+		sql.append("LEFT JOIN cc_customer_type cct ON cct.id = ccjct.customer_type_id ");
+		sql.append("LEFT JOIN dict d ON d.`value` = ccv.question_type ");
 
-		sql.append("WHERE ccv.user_id = ? AND ccv.create_date >= ? AND ccv.create_date <= ? AND ccv.lat is not null ");
+		sql.append("WHERE ccv.user_id = ? AND ccv.create_date >= ? AND ccv.create_date <= ? AND ccv.status = ? AND ccv.lat is not null ");
+		sql.append("GROUP BY ccv.id ");
 		sql.append("ORDER BY ccv.create_date");
-		return Db.find(sql.toString(), userId, startDate, endDate);
+		return Db.find(sql.toString(), userId, startDate, endDate, status);
 
 	}
 }

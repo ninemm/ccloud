@@ -83,6 +83,54 @@
 			}
 		});
 	});
+	function agree(url) {
+		layer.open({
+		  type: 1,
+		  title: ['客户审核',
+			'border-bottom: 1px solid #eee;height:2rem;line-height:2rem;margin-top:2.5rem'
+		  ],
+		  content: '<img src="${CTPATH}/images/image_orderpopups.png">' +
+			'<p class="t-c">是否确认通过该拜访审核？</p>' +
+			'<div><textarea id="comment" placeholder="补充说明，可选填"></textarea></div>',
+		  anim: 'scale',
+		  className: 'audit',
+		  btn: ['通过','取消'],
+		  yes: function() {
+			url = url + "&comment=" + $("#comment").val();
+			doSubmit(url);
+		  },
+		  no:function() {
+  
+		  }
+		});
+	}
+
+	function refuse(url) {
+		layer.open({
+		  type: 1,
+		  title: ['客户审核',
+			'border-bottom: 1px solid #eee;height:2rem;line-height:2rem;margin-top:2.5rem'
+		  ],
+		  content: '<img src="${CTPATH}/images/image_orderpopups.png">' +
+			'<p class="t-c">是否确认拒绝该拜访审核？</p>' +
+			  '<div><textarea id="comment" placeholder="补充说明，必填"></textarea></div>',
+		  anim: 'scale',
+		  className: 'audit',
+		  btn: ['确认','取消'],
+		  yes: function() {
+			var comment = $("#comment").val();
+			if (comment == ""){
+				$.toptip('请注明拒绝理由', 'warning');
+				return;
+			}
+			url = url + "&comment=" + comment;
+			doReject(url);
+		  },
+		  no:function() {
+  
+		  }
+		});
+	}
 
 	function doReject(url){
 
@@ -171,8 +219,8 @@
 						</div>
 						<div class="weui-cell">
 							<div class="operate-btn width-100 ft14">
-								<div class="button white-button fl" onclick="doReject('${CPATH}/customerVisit/complete?id=${(bean.id)!}&taskId=${(bean.taskId)}&status=0')">拒绝</div>
-								<div class="button red-button fr" onclick="doSubmit('${CPATH}/customerVisit/complete?id=${(bean.id)!}&taskId=${(bean.taskId)}&status=1')">同意</div>
+								<div class="button white-button fl" onclick="refuse('${CPATH}/customerVisit/complete?id=${(bean.id)!}&taskId=${(bean.taskId)}&status=0')">拒绝</div>
+								<div class="button red-button fr" onclick="agree('${CPATH}/customerVisit/complete?id=${(bean.id)!}&taskId=${(bean.taskId)}&status=1')">同意</div>
 							</div>
 						</div>
 					</div>

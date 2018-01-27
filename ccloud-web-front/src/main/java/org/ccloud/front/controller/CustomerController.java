@@ -614,7 +614,8 @@ public class CustomerController extends BaseFrontController {
 		String taskId = getPara("taskId");
 		Integer status = getParaToInt("status");
 		String sellerCustomerId = getPara("id");
-		String comment = (status == 1) ? "客户审核批准" : "客户审核拒绝";
+		String comment = getPara("comment");
+		if (StrKit.isBlank(comment)) comment = (status == 1) ? "客户审核批准" : "客户审核拒绝";
 
 		boolean updated = true;
 		//审核订单后将message中是否阅读改为是

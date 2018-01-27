@@ -21,6 +21,8 @@ import java.util.List;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Record;
+
+import org.ccloud.Consts;
 import org.ccloud.model.ActivityApply;
 
 import com.jfinal.plugin.activerecord.Page;
@@ -116,7 +118,7 @@ public class ActivityApplyQuery extends JBaseQuery {
 
 	public List<Record> getToDo(String username) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(" SELECT o.*, ca.title, ca.invest_amount, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, t1.customerTypeNames, a.ID_ taskId, a.NAME_ taskName, a.ASSIGNEE_ assignee, a.CREATE_TIME_ createTime ");
+		sb.append(" SELECT o.*,CASE o.status WHEN "+Consts.ACTIVITY_APPLY_STATUS_WAIT+" THEN '待审' WHEN "+Consts.ACTIVITY_APPLY_STATUS_PASS+" THEN '已审' WHEN "+Consts.ACTIVITY_APPLY_STATUS_CANCEL+" THEN '撤回' WHEN "+Consts.ACTIVITY_APPLY_STATUS_REJECT+" THEN '拒绝' ELSE '结束' END AS activityApplyStatus, ca.title, ca.invest_amount, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, t1.customerTypeNames, a.ID_ taskId, a.NAME_ taskName, a.ASSIGNEE_ assignee, a.CREATE_TIME_ createTime ");
 		sb.append(" FROM cc_activity_apply o ");
 		sb.append(" left join cc_activity ca on o.activity_id = ca.id");
 		sb.append(" left join cc_seller_customer cc ON o.seller_customer_id = cc.id ");
@@ -138,7 +140,7 @@ public class ActivityApplyQuery extends JBaseQuery {
 
 	public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procKey, String username) {
 
-		String select = "SELECT o.*, ca.title, ca.invest_amount, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, t1.customerTypeNames, i.TASK_ID_ taskId, i.ACT_NAME_ taskName, i.ASSIGNEE_ assignee, i.END_TIME_ endTime  ";
+		String select = "SELECT o.*,CASE o.status WHEN "+Consts.ACTIVITY_APPLY_STATUS_WAIT+" THEN '待审' WHEN "+Consts.ACTIVITY_APPLY_STATUS_PASS+" THEN '已审' WHEN "+Consts.ACTIVITY_APPLY_STATUS_CANCEL+" THEN '撤回' WHEN "+Consts.ACTIVITY_APPLY_STATUS_REJECT+" THEN '拒绝' ELSE '结束' END AS activityApplyStatus, ca.title, ca.invest_amount, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, t1.customerTypeNames, i.TASK_ID_ taskId, i.ACT_NAME_ taskName, i.ASSIGNEE_ assignee, i.END_TIME_ endTime  ";
 
 		LinkedList<Object> params = new LinkedList<>();
 		StringBuilder sql = new StringBuilder(" FROM cc_activity_apply o ");
@@ -172,7 +174,7 @@ public class ActivityApplyQuery extends JBaseQuery {
 	}
 	
 	public Long findBySellerCustomerIdAndActivityId(String activityId,String sellerCustomerId,String date){
-		String sql = "activity_id = ? and seller_customer_id = ? and create_date > ?";
+		String sql = "activity_id = ? and seller_customer_id = ? and create_date > ? and status not in ("+Consts.ACTIVITY_APPLY_STATUS_REJECT+","+Consts.ACTIVITY_APPLY_STATUS_CANCEL+")";
 		return DAO.doFindCount(sql, activityId, sellerCustomerId, date);
 	}
 }

@@ -27,6 +27,11 @@
     .weui-footer {
         border-top: .05rem solid #f3f5f7;
     }
+
+    .layui-m-layercont p {
+        height: 2rem;
+        line-height: 2rem;
+    }
     
 </#macro>
 
@@ -230,6 +235,56 @@
         };
     }
 
+    function agree() {
+       if($("#review_location").val().length==0) {
+            $.toptip('定位地址不能为空,请刷新定位', 1000, 'error');
+            return false;
+        }
+
+		layer.open({
+		type: 1,
+		title: ['客户审核',
+			'border-bottom: 1px solid #eee;height:2rem;line-height:2rem;margin-top:2.5rem'
+		],
+		content: '<img src="${CTPATH}/images/image_orderpopups.png">' +
+			'<p class="t-c">是否确认通过该客户审核？</p>',
+		anim: 'scale',
+		className: 'audit',
+		btn: ['通过','取消'],
+		yes: function() {
+			doSubmit(1);
+		},
+		no:function() {
+
+		}
+		});
+	}
+
+	function refuse() {
+        if($("#review_location").val().length==0) {
+            $.toptip('定位地址不能为空,请刷新定位', 1000, 'error');
+            return false;
+        }
+
+		layer.open({
+		type: 1,
+		title: ['客户审核',
+			'border-bottom: 1px solid #eee;height:2rem;line-height:2rem;margin-top:2.5rem'
+		],
+		content: '<img src="${CTPATH}/images/image_orderpopups.png">' +
+			'<p class="t-c">是否确认拒绝该客户审核？</p>',
+		anim: 'scale',
+		className: 'audit',
+		btn: ['确认','取消'],
+		yes: function() {
+			doSubmit(0);
+		},
+		no:function() {
+
+		}
+		});
+	}	
+
     function doSubmit(status) {
         $.ajax({
             url: '${CPATH}/customerVisit/complete',
@@ -237,10 +292,6 @@
             dataType: 'json',
             data: paramData(status),
             beforeSend: function() {
-                if($("#review_location").val().length==0) {
-                    $.toptip('定位地址不能为空,请刷新定位', 1000, 'error');
-                    return false;
-                }
                 $('._submit_btn').attr('disabled', true);
                 Utils.openLoadingWin('保存中...');
             },
@@ -515,8 +566,8 @@
     </main>
     <#include "_inc/_goback.html" />
         <footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
-            <button class="white-button-no-border width-50 _submit_btn weui-flex__item border-top-1px" onclick="doSubmit(0)">拒绝</button>
-            <button class="red-button width-50 _submit_btn weui-flex__item" onclick="doSubmit(1)">通过</button>
+            <button class="white-button-no-border width-50 _submit_btn weui-flex__item border-top-1px" onclick="refuse()">拒绝</button>
+            <button class="red-button width-50 _submit_btn weui-flex__item" onclick="agree()">通过</button>
         </footer>
     </div>
 </div>

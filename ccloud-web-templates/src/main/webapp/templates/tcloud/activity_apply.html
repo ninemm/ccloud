@@ -82,7 +82,20 @@ $(function () {
 	}).on("click", "#confirm", function() {
 		confirm();
 	}).on("click", "#apply", function() {
-		doSubmit();
+		if (!flg) {
+            return;
+        }
+		if ($(".activity-item").length == 0) {
+			$.toptip("请添加活动", 'warning');
+			return;
+		}
+		if ($("#sellerCustomerId").val() == "") {
+			$.toptip("请选择客户", 'warning');
+			return;
+		}
+		$.confirm("您确定要申请活动吗？","活动申请", function() {
+			doSubmit();
+		});
 	}).on("click", ".check-box+.weui-flex__item", function() {
 		var $checkbox = $(this).prev().find('input[type=checkbox]')[0];
 		$checkbox.checked = !$checkbox.checked;
@@ -273,18 +286,6 @@ function doChange(key){
     //---------------------------------------------提交表单------------------------------------------------------------------
     var flg = true;
     function doSubmit(){
-        if (!flg) {
-            return;
-        }
-		if ($(".activity-item").length == 0) {
-			$.toptip("请添加活动", 'warning');
-			return;
-		}
-		if ($("#sellerCustomerId").val() == "") {
-			$.toptip("请选择客户", 'warning');
-			return;
-		}
-
         layer.open({
             type: 2,
             content: '保存中...'

@@ -43,7 +43,9 @@ $(function() {
   $(document).on("click", ".choose-customer", function () {
 		window.location.href = '${CPATH}/product/customerChoose';
   }).on("click", "#placeOrder", function () {
+	$.confirm("您确定要提交订单吗？","提交订单", function() {
 		doSubmit();
+	});
   }).on("click",".nearby-customer",function(){
 		window.location.href = '${CPATH}/product/customerNearbyChose';
   }).on("click","#shoppingCart",function(){

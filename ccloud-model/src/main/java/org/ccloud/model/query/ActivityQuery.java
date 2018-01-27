@@ -19,6 +19,8 @@ import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
+
+import org.ccloud.Consts;
 import org.ccloud.model.Activity;
 
 import java.util.LinkedList;
@@ -50,7 +52,7 @@ public class ActivityQuery extends JBaseQuery {
 	}
 
 	public Page<Record> paginate(int pageNumber, int pageSize, String keyword,String startDate, String endDate,String sellerId) {
-		String select = "select ca.*,ct.name as customerTypeName ";
+		String select = "select ca.*,(SELECT COUNT(*) from cc_activity_apply where activity_id = ca.id and `status` not in ("+Consts.ACTIVITY_APPLY_STATUS_REJECT+","+Consts.ACTIVITY_APPLY_STATUS_CANCEL+")) AS activityApplyNum,ct.name as customerTypeName ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_activity` ca ");
 		fromBuilder.append(" LEFT JOIN cc_customer_type ct on ct.id=ca.customer_type");
 		LinkedList<Object> params = new LinkedList<Object>();

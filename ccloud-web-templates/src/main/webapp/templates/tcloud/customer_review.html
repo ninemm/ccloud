@@ -34,7 +34,53 @@
 </#macro>
 
 <#macro script>
-    
+	function agree() {
+		layer.open({
+		type: 1,
+		title: ['客户审核',
+			'border-bottom: 1px solid #eee;height:2rem;line-height:2rem;margin-top:2.5rem'
+		],
+		content: '<img src="${CTPATH}/images/image_orderpopups.png">' +
+			'<p class="t-c">是否确认通过该客户审核？</p>' +
+			'<div><textarea id="comment" placeholder="补充说明，可选填"></textarea></div>',
+		anim: 'scale',
+		className: 'audit',
+		btn: ['通过','取消'],
+		yes: function() {
+			doSubmit(1);
+		},
+		no:function() {
+
+		}
+		});
+	}
+
+	function refuse() {
+		layer.open({
+		type: 1,
+		title: ['客户审核',
+			'border-bottom: 1px solid #eee;height:2rem;line-height:2rem;margin-top:2.5rem'
+		],
+		content: '<img src="${CTPATH}/images/image_orderpopups.png">' +
+			'<p class="t-c">是否确认拒绝该客户审核？</p>' +
+			'<div><textarea id="comment" placeholder="补充说明，必填"></textarea></div>',
+		anim: 'scale',
+		className: 'audit',
+		btn: ['确认','取消'],
+		yes: function() {
+			var comment = $("#comment").val();
+			if (comment == ""){
+				$.toptip('请注明拒绝理由', 'warning');
+				return;
+			}
+			doSubmit(0);
+		},
+		no:function() {
+
+		}
+		});
+	}	
+
     function doSubmit(status) {
 
 		layer.open({
@@ -168,8 +214,8 @@
 </main>
 <#include "_inc/_goback.html" />
 <footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
-    <button class="white-button-no-border width-50 _submit_btn weui-flex__item border-top-1px" onclick="doSubmit(0)">拒绝</button>
-    <button class="red-button width-50 _submit_btn weui-flex__item" onclick="doSubmit(1)">通过</button>
+    <button class="white-button-no-border width-50 _submit_btn weui-flex__item border-top-1px" onclick="refuse()">拒绝</button>
+    <button class="red-button width-50 _submit_btn weui-flex__item" onclick="agree()">通过</button>
 </footer>
 </div>
 </@layout>

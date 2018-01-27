@@ -103,21 +103,26 @@
         
         
 	})
+
+	function submit() {
+		var content = $('#content').val();
+		if (content == null || content == '') {
+			$.toptip('反馈内容不能为空', 2000, 'error');
+			return ;
+		}
+		$.confirm("您确定要新增反馈吗？","新增反馈", function() {
+			doSubmit(content);
+		});
+	}
 	
-	function doSubmit() {
-        var content = $('#content').val();
-        $('#_submit_btn').attr('disabled', true);
+	function doSubmit(content) {
+		$('#_submit_btn').attr('disabled', true);
         $.ajax({
             url: "${CPATH}/feedback/save",
             type: "post",
             dataType: "json",
             data: {'pic': JSON.stringify(imageArr), 'content': content},
-            beforeSend: function() {
-                if (content == null || content == '') {
-                    $.toptip('反馈内容不能为空', 2000, 'error');
-                    return ;
-                }
-                
+            beforeSend: function() {                
                 layer.open({
                     type: 2,
                     content: '保存中...'
@@ -199,7 +204,7 @@
 	    <a class="place-order red-button white width-100 goback">返回</a>
 		<#else> 
 		<#include "_inc/_goback.html" />
-		<button id="_submit_btn" onclick="doSubmit()" class="place-order red-button white width-100" style="border: 0 ;">确定</button>
+		<button id="_submit_btn" onclick="submit()" class="place-order red-button white width-100" style="border: 0 ;">确定</button>
 		</#if>
 	</footer>
 </div>
