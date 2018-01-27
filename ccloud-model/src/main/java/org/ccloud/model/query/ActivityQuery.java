@@ -116,4 +116,8 @@ public class ActivityQuery extends JBaseQuery {
     	String sql = "select * from cc_activity where is_publish = 1";
     	return DAO.find(sql);
     }
+
+	public List<Activity> findBySellerId(String sellerId) {
+		return DAO.doFind("seller_id = ? and is_publish = 1 ", sellerId);
+	}
 }

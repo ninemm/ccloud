@@ -232,6 +232,14 @@ public abstract class BaseSalesOrderDetail<M extends BaseSalesOrderDetail<M>> ex
 
 	public java.lang.Integer getIsComposite() {
 		return getInt("is_composite");
-	}	
+	}
+	
+	public void setCompositeId(java.lang.String compositeId) {
+		set("composite_id", compositeId);
+	}
+
+	public java.lang.String getCompositeId() {
+		return getStr("composite_id");
+	}
 
 }

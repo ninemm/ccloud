@@ -66,7 +66,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 
 	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate,
-			String sellerId, String dataArea) {
+			String sellerId, String dataArea, String activityId) {
 		String select = "select o.*, c.customer_name,c.contact as ccontact, c.mobile as cmobile,ct.`name` as customerTypeName,u.realname ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_sales_order` o ");
 		fromBuilder.append("left join cc_seller_customer cc ON o.customer_id = cc.id ");
@@ -74,9 +74,16 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append("LEFT JOIN cc_customer_type ct on ct.id = o.customer_type_id ");
 		fromBuilder.append("LEFT JOIN user u on u.id = o.biz_user_id ");
 		LinkedList<Object> params = new LinkedList<Object>();
+		if (StrKit.notBlank(activityId)) {
+			fromBuilder.append("LEFT JOIN (SELECT cs.order_id, pc.activity_id FROM cc_sales_order_detail cs ");
+			fromBuilder.append("LEFT JOIN cc_product_composition pc ON cs.composite_id = pc.id ");
+			fromBuilder.append("LEFT JOIN cc_activity ca ON ca.id = pc.activity_id ");
+			fromBuilder.append("GROUP BY cs.order_id) t1 on t1.order_id = o.id ");
+		}
 		boolean needWhere = true;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "t1.activity_id", activityId, params, needWhere);
 
 		if (needWhere) {
 			fromBuilder.append(" where 1 = 1");

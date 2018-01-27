@@ -170,12 +170,12 @@ public class SellerProductQuery extends JBaseQuery {
 	}
 
 	public List<SellerProduct> findByCompositionId(String productId) {
-		StringBuilder stringBuilder = new StringBuilder("SELECT cc.*,cp.sub_product_count as productCount, cd.convert_relate FROM cc_seller_product cc ");
+		StringBuilder stringBuilder = new StringBuilder("SELECT cc.*,cp.sub_product_count as productCount,cp.parent_id as parentId, cd.convert_relate FROM cc_seller_product cc ");
 		stringBuilder.append("RIGHT JOIN cc_product_composition cp ON cp.sub_seller_product_id = cc.id ");
 		stringBuilder.append("LEFT JOIN cc_product cd ON cd.id = cc.product_id ");
 		stringBuilder.append("WHERE parent_id = ? ");
 		stringBuilder.append("UNION ALL ");
-		stringBuilder.append("SELECT cc.*,1 as productCount, cd.convert_relate FROM cc_seller_product cc ");
+		stringBuilder.append("SELECT cc.*,1 as productCount, cp.parent_id as parentId, cd.convert_relate FROM cc_seller_product cc ");
 		stringBuilder.append("RIGHT JOIN cc_product_composition cp ON cp.seller_product_id = cc.id ");
 		stringBuilder.append("LEFT JOIN cc_product cd ON cd.id = cc.product_id ");
 		stringBuilder.append("WHERE parent_id = ? GROUP BY cp.parent_id");

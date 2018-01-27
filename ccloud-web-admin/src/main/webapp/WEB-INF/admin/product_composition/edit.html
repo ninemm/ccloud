@@ -297,6 +297,28 @@ function addTr(tid, productList, optionArr) {
 						<div class="input-group col-md-4 col-sm-10">
 		                 	<input class="form-control input-sm" type="text" name="productComposition.price" value="${(productCompositionPrice)!}">
 		               	</div>
+					</div>
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">活动:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<select class="form-control input-sm" name="productComposition.activityId">
+								<option value="">--请选择--</option>
+								<#list actList! as act >
+									<option value="${act.id!}" <#if (productCompositionAct)! == (act.id)!>selected="selected"</#if>>${(act.title)!}</option>
+								</#list>
+							</select>
+		               	</div>
+					</div>					
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">是否上架:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<label class="radio-inline">
+		                 		<input type="radio" name="productComposition.state" value="1" <#if !productCompositionState?? || productCompositionState == 1>checked</#if>>上架
+		                 	</label>
+		                 	<label class="radio-inline">
+		                 		<input type="radio" name="productComposition.state" value="0" <#if productCompositionState?? && productCompositionState == 0>checked</#if>>下架
+							</label>		                 		
+		               	</div>
 					</div>								
 				<div style="padding: 5px; clear: both;">
 					<table id="dataTable" class="table table-striped table-bordered"
