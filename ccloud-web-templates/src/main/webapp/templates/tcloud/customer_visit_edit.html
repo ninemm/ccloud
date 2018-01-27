@@ -74,6 +74,16 @@
 	        }
 	    });
 	    
+	     $("#activity_title").select({
+             title: "选择活动",
+             multi: true,
+             items: JSON.parse('${activityRecords}'),
+             onClose: function(obj) {
+                 var activityIds = obj.data.values;
+                 $('#activity_id').val(activityIds);
+             }
+         });
+	    
         $("#uploaderInput").on("change",function () {
 
             var files = this.files;;
@@ -215,6 +225,27 @@
 
     });
 
+    function submit() {
+        if($("#problem_id").val().length==0) {
+            $.toptip('问题类型不能为空', 3000, 'error');
+            return false;
+        }
+
+        if($("#question_desc").val().length==0) {
+            $.toptip('备注描述不能为空', 3000, 'error'); 
+            return false;
+        }
+
+        if($("#location").val().length==0) {
+            $.toptip('定位地址不能为空,请刷新定位', 1000, 'error');
+            return false;
+        }
+
+        $.confirm("您确定要新增拜访吗？","新增拜访", function() {
+            doSubmit();
+        });
+    }
+
     function doSubmit() {
         $.ajax({
             url: '${CPATH}/customerVisit/save',
@@ -222,21 +253,6 @@
             dataType: 'json',
             data: $form.serialize(),
             beforeSend: function() {
-                
-                if($("#problem_id").val().length==0) {
-                    $.toptip('问题类型不能为空', 3000, 'error');
-                    return false;
-                }
-                
-                if($("#question_desc").val().length==0) {
-                    $.toptip('备注描述不能为空', 3000, 'error'); 
-                    return false;
-                }
-
-                if($("#location").val().length==0) {
-                    $.toptip('定位地址不能为空,请刷新定位', 1000, 'error');
-                    return false;
-                }
                 
                 $('._submit_btn').attr('disabled', true);
                 Utils.openLoadingWin('保存中...');
@@ -407,6 +423,16 @@
                     </div>
                     <span class="weui-cell__ft"></span>
                 </div>
+                <div class="weui-cell weui-cell_access">
+                    <div class="weui-cell__bd">
+						<div class="order-customer-info-title">
+							活动申请&nbsp;&nbsp;&nbsp;
+						</div>
+						<input id="activity_id"  name="activity_id" type="hidden" />
+						<input id="activity_title" class="weui-input" name="activity_title" type="text" placeholder="请选择" >
+                    </div>
+                    <span class="weui-cell__ft"></span>
+                </div>
                 <!-- <div class="weui-cell weui-cell_access">
                     <div class="weui-cell__bd">
                         <div class="order-customer-info-title">活动名称 <span class="require">*</span></div>
@@ -466,7 +492,7 @@
 
     <#include "_inc/_goback.html" />
     <footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
-        <button class="red-button width-100 _submit_btn" onclick="doSubmit()" href="">提交</button>
+        <button class="red-button width-100 _submit_btn" onclick="submit()" href="">提交</button>
     </footer>
 </div>
 </@layout>

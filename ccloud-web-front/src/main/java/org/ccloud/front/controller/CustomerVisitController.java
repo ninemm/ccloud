@@ -14,13 +14,17 @@ import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
+import org.ccloud.model.Activity;
 import org.ccloud.model.Customer;
 import org.ccloud.model.CustomerType;
 import org.ccloud.model.CustomerVisit;
+import org.ccloud.model.CustomerVisitJoinActivity;
 import org.ccloud.model.Dict;
 import org.ccloud.model.Message;
 import org.ccloud.model.User;
 import org.ccloud.model.WxMessageTemplate;
+import org.ccloud.model.query.ActivityApplyQuery;
+import org.ccloud.model.query.ActivityQuery;
 import org.ccloud.model.query.CustomerJoinCustomerTypeQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.CustomerVisitQuery;
@@ -43,6 +47,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Maps;
 import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.Kv;
 import com.jfinal.kit.StrKit;
@@ -206,7 +211,17 @@ public class CustomerVisitController extends BaseFrontController {
 	@Before(WechatJSSDKInterceptor.class)
 	public void edit() {
 	    List<Map<String, String>> list = getVisitTypeList();
-	    setAttr("problem", JSON.toJSONString(list));
+	    String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		List<Record> activityRecords = ActivityQuery.me().findActivityListForApp(sellerId, "", "");
+		List<Map<String, String>> activityList = Lists.newArrayList();
+	    for (Record record : activityRecords) {
+		    	Map<String, String> map = Maps.newHashMap();
+		    	map.put("title", record.getStr("title"));
+		    	map.put("value", record.getStr("id"));
+		    	activityList.add(map);
+	    }
+		setAttr("activityRecords", JSON.toJSONString(activityList));
+		setAttr("problem", JSON.toJSONString(list));
 		render("customer_visit_edit.html");
 	}
 
@@ -318,12 +333,32 @@ public class CustomerVisitController extends BaseFrontController {
 		 List<ImageJson> list = Lists.newArrayList();
 		 String picJson = getPara("pic");
 
+		 String activityIds = getPara("activity_id");
+
+		List<String> activityIdList = Splitter.on(",").trimResults().omitEmptyStrings().splitToList(activityIds);
+		for (String activityId : activityIdList) {
+			Activity activity = ActivityQuery.me().findById(activityId);
+			long total = ActivityApplyQuery.me().findByActivityId(activityId);
+			if (total >= activity.getTotalCustomerNum()) {
+				renderAjaxResultForError("活动参与的人数已经达到上限");
+				return;
+			}
+			int interval = this.getStartDate(activity.getTimeInterval());
+			DateTime dateTime = new DateTime(new Date());
+			long cnt = ActivityApplyQuery.me().findBySellerCustomerIdAndActivityId(activityId, customerVisit.getSellerCustomerId(), DateUtils.format(dateTime.plusMonths(-interval).toDate()));
+			if (cnt >= activity.getJoinNum()) {
+			renderAjaxResultForError("您参与的次数已经达到上限，每个客户" + interval + "个月中参与次数为：" + activity.getJoinNum());
+				return;
+			}
+		}
+		
 		if (isChecked != null && isChecked) customerVisit.setStatus(Customer.CUSTOMER_AUDIT);
 		else customerVisit.setStatus(Customer.CUSTOMER_NORMAL);
 
 		 customerVisit.setUserId(user.getId());
 		 customerVisit.setDataArea(user.getDataArea());
 		 customerVisit.setDeptId(user.getDepartmentId());
+		 
 		 
 		 if (StrKit.notBlank(picJson)) {
 
@@ -350,7 +385,15 @@ public class CustomerVisitController extends BaseFrontController {
 		 if (list.size()!=0) customerVisit.setPhoto(JSON.toJSONString(list));
 
 		 boolean updated = customerVisit.saveOrUpdate();
-		 
+			
+		for (String activityId : activityIdList) {
+			CustomerVisitJoinActivity customerVisitJoinActivity=new CustomerVisitJoinActivity();
+			customerVisitJoinActivity.setCustomerVisitId(customerVisit.getId());
+			customerVisitJoinActivity.setId(StrKit.getRandomUUID());
+			customerVisitJoinActivity.setActivityId(activityId);
+			customerVisitJoinActivity.save();
+		}
+			
 		 if (!updated) {
 			 renderAjaxResultForError("保存客户拜访信息出错");
 			 return ;
@@ -570,5 +613,47 @@ public class CustomerVisitController extends BaseFrontController {
 		List<Record> visitList = CustomerVisitQuery.me().findLngLat(user.getId(), startDate, endDate);
 		setAttr("visitList", JSON.toJSON(visitList));
 		renderJson(visitList);
+	}
+	
+	private int getStartDate(String timeInterval){
+		if(Consts.TIME_INTERVAL_ONE.equals(timeInterval)){
+			return 1;
+		}
+		if(Consts.TIME_INTERVAL_TWO.equals(timeInterval)){
+			return 2;
+		}
+		if(Consts.TIME_INTERVAL_THREE.equals(timeInterval)){
+			return 3;
+		}
+		if(Consts.TIME_INTERVAL_FOUR.equals(timeInterval)){
+			return 4;
+		}
+		if(Consts.TIME_INTERVAL_FIVE.equals(timeInterval)){
+			return 5;
+		}
+		if(Consts.TIME_INTERVAL_SIX.equals(timeInterval)){
+			return 6;
+		}
+		if(Consts.TIME_INTERVAL_SEVEN.equals(timeInterval)){
+			return 7;
+		}
+		if(Consts.TIME_INTERVAL_EIGHT.equals(timeInterval)){
+			return 8;
+		}
+		if(Consts.TIME_INTERVAL_NINE.equals(timeInterval)){
+			return 9;
+		}
+		if(Consts.TIME_INTERVAL_TEN.equals(timeInterval)){
+			return 10;
+		}
+		if(Consts.TIME_INTERVAL_ELEVEN.equals(timeInterval)){
+			return 11;
+		}
+		if(Consts.TIME_INTERVAL_TWELVE.equals(timeInterval)){
+			return 12;
+		}
+
+
+		return 1;
 	}
 }
