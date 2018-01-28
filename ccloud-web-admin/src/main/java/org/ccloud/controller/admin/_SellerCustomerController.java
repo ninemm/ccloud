@@ -187,7 +187,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		Map<String, Object> map = Maps.newHashMap();
 		boolean updated = true;
 
-		Boolean isCustomerReview = OptionQuery.me().findValueAsBool("web_proc_customer_review_" + getSessionAttr("sellerCode"));
+		Boolean isCustomerReview = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_CUSTOMER_REVIEW + getSessionAttr("sellerCode"));
 		boolean isChecked = (isCustomerReview != null && isCustomerReview) ? true : false;
 		//当是经销商管理员修改时
 		if(isSuperAdmin || isDealerAdmin || !isChecked) {
@@ -257,7 +257,18 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 
 				uCustomer.save();
 			}
+
 			renderAjaxResultForSuccess("操作成功");
+
+			List<Department>  departmentList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
+			String corpSellerId = departmentList.get(departmentList.size()-1).getStr("seller_id");
+
+			CustomerJoinCorpQuery.me().deleteByCustomerIdAndSellerId(customer.getId(), corpSellerId);
+			CustomerJoinCorp customerJoinCorp = new CustomerJoinCorp();
+			customerJoinCorp.setCustomerId(customer.getId());
+			customerJoinCorp.setSellerId(corpSellerId);
+
+			updated = customerJoinCorp.save();
 			return;
 		}
 
@@ -329,6 +340,16 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			userJoinCustomer.setDataArea(user.getDataArea());
 
 			updated = userJoinCustomer.save();
+
+			List<Department>  departmentList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
+			String corpSellerId = departmentList.get(departmentList.size()-1).getStr("seller_id");
+
+			CustomerJoinCorpQuery.me().deleteByCustomerIdAndSellerId(customer.getId(), corpSellerId);
+			CustomerJoinCorp customerJoinCorp = new CustomerJoinCorp();
+			customerJoinCorp.setCustomerId(customer.getId());
+			customerJoinCorp.setSellerId(corpSellerId);
+
+			updated = customerJoinCorp.save();
 		}
 
 		if (!updated) {
@@ -453,6 +474,9 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 
 		List<CustomerExcel> list = ExcelImportUtil.importExcel(file, CustomerExcel.class, params);
 
+		List<Department>  departmentList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
+		String corpSellerId = departmentList.get(departmentList.size()-1).getStr("seller_id");
+
 		for (CustomerExcel excel : list) {
 			String customerId = "";
 			String sellerCustomerId = "";
@@ -499,6 +523,13 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			this.insertUserJoinCustomer(sellerCustomerId, userId);
 			CustomerJoinCustomerTypeQuery.me().deleteBySellerCustomerId(sellerCustomerId);
 			this.insertCustomerJoinCustomerType(sellerCustomerId, excel, user);
+
+			CustomerJoinCorpQuery.me().deleteByCustomerIdAndSellerId(customerId, corpSellerId);
+			CustomerJoinCorp customerJoinCorp = new CustomerJoinCorp();
+			customerJoinCorp.setCustomerId(customer.getId());
+			customerJoinCorp.setSellerId(corpSellerId);
+
+			customerJoinCorp.save();
 
 		}
 
