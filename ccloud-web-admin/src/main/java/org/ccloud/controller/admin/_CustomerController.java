@@ -32,8 +32,10 @@ import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.Customer;
+import org.ccloud.model.Department;
 import org.ccloud.model.User;
 import org.ccloud.model.query.CustomerQuery;
+import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.vo.CustomerExcel;
 import org.ccloud.route.RouterMapping;
@@ -250,5 +252,29 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 		else
 			renderAjaxResultForError("客户修改审核失败");
 
+	}
+
+	@RequiresPermissions(value = { "/admin/customer", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
+	public void corp(){
+		render("corp.html");
+	}
+
+	@RequiresPermissions(value = { "/admin/customer", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
+	public void corpList(){
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		Map<String, String[]> paraMap = getParaMap();
+		String keyword = StringUtils.getArrayFirst(paraMap.get("k"));
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+		}
+
+		List<Department>  departmentList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
+		String corpSellerId = departmentList.get(departmentList.size()-1).getStr("seller_id");
+
+		Page<Record> page = CustomerQuery.me().paginateByCorp(getPageNumber(), getPageSize(), keyword, corpSellerId);
+		List<Record> customerList = page.getList();
+
+		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", customerList);
+		renderJson(map);
 	}
 }

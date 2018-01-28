@@ -44,6 +44,29 @@ public class CustomerQuery extends JBaseQuery {
 
 		LinkedList<Object> params = new LinkedList<Object>();
 
+		boolean needwhere = true;
+		needwhere = appendIfNotEmptyWithLike(fromBuilder, "c.customer_name", keyword, params, needwhere);
+
+		fromBuilder.append(" order by c.create_date ");
+
+		if (params.isEmpty())
+			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+
+		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+
+	public Page<Record> paginateByCorp(int pageNumber, int pageSize, String keyword, String corpSellerId) {
+
+		String select = "select c.* ";
+		StringBuilder fromBuilder = new StringBuilder("from `cc_customer` c ");
+		fromBuilder.append("LEFT JOIN `cc_customer_join_corp` ccjc ON c.id = ccjc.customer_id ");
+
+		LinkedList<Object> params = new LinkedList<Object>();
+
+		boolean needwhere = true;
+		needwhere = appendIfNotEmptyWithLike(fromBuilder, "c.customer_name", keyword, params, needwhere);
+		needwhere = appendIfNotEmpty(fromBuilder, "ccjc.seller_id", corpSellerId, params, needwhere);
+
 		fromBuilder.append(" order by c.create_date ");
 
 		if (params.isEmpty())
