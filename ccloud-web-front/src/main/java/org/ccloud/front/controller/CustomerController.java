@@ -16,29 +16,9 @@ import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
-import org.ccloud.model.Customer;
-import org.ccloud.model.CustomerJoinCustomerType;
-import org.ccloud.model.CustomerType;
-import org.ccloud.model.Department;
-import org.ccloud.model.Dict;
-import org.ccloud.model.Message;
-import org.ccloud.model.SellerCustomer;
-import org.ccloud.model.User;
-import org.ccloud.model.UserJoinCustomer;
-import org.ccloud.model.WxMessageTemplate;
+import org.ccloud.model.*;
 import org.ccloud.model.compare.BeanCompareUtils;
-import org.ccloud.model.query.CustomerJoinCustomerTypeQuery;
-import org.ccloud.model.query.CustomerQuery;
-import org.ccloud.model.query.CustomerTypeQuery;
-import org.ccloud.model.query.DepartmentQuery;
-import org.ccloud.model.query.DictQuery;
-import org.ccloud.model.query.MessageQuery;
-import org.ccloud.model.query.OptionQuery;
-import org.ccloud.model.query.SalesOrderQuery;
-import org.ccloud.model.query.SellerCustomerQuery;
-import org.ccloud.model.query.UserJoinCustomerQuery;
-import org.ccloud.model.query.UserQuery;
-import org.ccloud.model.query.WxMessageTemplateQuery;
+import org.ccloud.model.query.*;
 import org.ccloud.model.vo.CustomerVO;
 import org.ccloud.model.vo.ImageJson;
 import org.ccloud.route.RouterMapping;
@@ -925,6 +905,17 @@ public class CustomerController extends BaseFrontController {
 
 		updated = userJoinCustomer.save();
 
+		List<Department>  departmentList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
+		String corpSellerId = departmentList.get(departmentList.size()-1).getStr("seller_id");
+
+		CustomerJoinCorpQuery.me().deleteByCustomerIdAndSellerId(customer.getId(), corpSellerId);
+		CustomerJoinCorp customerJoinCorp = new CustomerJoinCorp();
+		customerJoinCorp.setCustomerId(customer.getId());
+		customerJoinCorp.setSellerId(corpSellerId);
+
+		updated = customerJoinCorp.save();
+
+
 		return updated;
 	}
 	
@@ -947,12 +938,14 @@ public class CustomerController extends BaseFrontController {
 	}
 
 	public void  getImportCustomerList(){
-		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 		User user = (User) getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String dataArea = user.getDataArea();
 		String customerName = getPara("keyword");
 
-		Page<Record> customerList = SellerCustomerQuery.me().findImportCustomer(getPageNumber(), getPageSize(), dealerDataArea, dataArea, customerName);
+		List<Department>  departmentList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
+		String corpSellerId = departmentList.get(departmentList.size()-1).getStr("seller_id");
+
+		Page<Record> customerList = SellerCustomerQuery.me().findImportCustomer(getPageNumber(), getPageSize(), dataArea, customerName, corpSellerId);
 		Map<String, Object> map = new HashMap<>();
 		map.put("customerList", customerList.getList());
 		renderJson(map);
@@ -973,10 +966,12 @@ public class CustomerController extends BaseFrontController {
 		render("customer_edit.html");
 	}
 
+	@Before(Tx.class)
 	public void receive(){
 		String sellerCustomerId = getPara("id");
 		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(sellerCustomerId);
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		boolean updated = true;
 
 		UserJoinCustomer userJoinCustomer = new UserJoinCustomer();
 
@@ -984,8 +979,24 @@ public class CustomerController extends BaseFrontController {
 		userJoinCustomer.setUserId(user.getId());
 		userJoinCustomer.setDeptId(user.getDepartmentId());
 		userJoinCustomer.setDataArea(user.getDataArea());
+		updated = userJoinCustomer.save();
 
-		if (userJoinCustomer.save()) renderAjaxResultForSuccess("操作成功");
+
+		List<Department>  departmentList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
+		String corpSellerId = departmentList.get(departmentList.size()-1).getStr("seller_id");
+		Customer customer = sellerCustomer.getCustomer();
+
+		CustomerJoinCorpQuery.me().deleteByCustomerIdAndSellerId(customer.getId(), corpSellerId);
+		CustomerJoinCorp customerJoinCorp = new CustomerJoinCorp();
+		customerJoinCorp.setCustomerId(customer.getId());
+		customerJoinCorp.setSellerId(corpSellerId);
+
+		updated = customerJoinCorp.save();
+
+		sellerCustomer.setId(StrKit.getRandomUUID());
+		sellerCustomer.save();
+
+		if (updated) renderAjaxResultForSuccess("操作成功");
 		else renderAjaxResultForError("操作失败");
 
 	}

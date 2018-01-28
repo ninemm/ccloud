@@ -435,7 +435,7 @@
 			                    客户名称
 			                    <span class="require">*</span>
 			                </div>
-			                <input type="text" class="weui-input" id="customer_name" name="customer.customer_name" value="${(sellerCustomer.customer_name)!}"  placeholder="1-25个任意字母数字" required>
+                            <input type="text" class="weui-input" id="customer_name" name="customer.customer_name" value="${(sellerCustomer.customer_name)!}"  placeholder="1-25个任意字母数字" required<#if type??> readonly</#if>>
 			            </div>
 			        </div>
 			        <div class="weui-cell weui-cell_access">
@@ -444,7 +444,7 @@
 			                    客户昵称&nbsp;&nbsp;
 			                    <span class="require"> </span>
 			                </div>
-			                <input type="text" class="weui-input" id="nickname" name="sellerCustomer.nickname" value="${(sellerCustomer.nickname)!}" placeholder="1-25个任意字母数字">
+			                <input type="text" class="weui-input" id="nickname" name="sellerCustomer.nickname" value="${(sellerCustomer.nickname)!}" placeholder="1-25个任意字母数字" <#if type??> readonly</#if>>
 			            </div>
 			        </div>
 			        <div class="weui-cell weui-cell_access">
@@ -453,7 +453,7 @@
 			                    联系人
 			                    <span class="require">*</span>
 			                </div>
-			                <input type="text" class="weui-input" id="contact" name="customer.contact" value="${(sellerCustomer.contact)!}" placeholder="1-15个任意字母数字">
+			                <input type="text" class="weui-input" id="contact" name="customer.contact" value="${(sellerCustomer.contact)!}" placeholder="1-15个任意字母数字" <#if type??> readonly</#if>>
 			            </div>
 			        </div>
 			        <div class="weui-cell weui-cell_access">
@@ -462,7 +462,7 @@
 			                    联系电话
 			                    <span class="require">*</span>
 			                </div>
-			                <input type="text" class="weui-input" id="mobile" name="customer.mobile" value="${(sellerCustomer.mobile)!}" placeholder="11位数字">
+			                <input type="text" class="weui-input" id="mobile" name="customer.mobile" value="${(sellerCustomer.mobile)!}" placeholder="11位数字" <#if type??> readonly</#if>>
 			            </div>
 			        </div>
 			        <div class="weui-cell weui-cell_access">
@@ -472,7 +472,7 @@
 			                    <span class="require">*</span>
 			                </div>
 			                <input type="hidden" name="customerTypeIds" id="customerTypeIds" value="${(sellerCustomer.cTypeList)!}">
-			                <input type="text" id="customer_type" name="customer_type" data-values="${(sellerCustomer.cTypeList)!}" value="${(sellerCustomer.cTypeName)!}" placeholder="请选择" class="weui-input">
+			                <input type="text" id="customer_type" name="customer_type" data-values="${(sellerCustomer.cTypeList)!}" value="${(sellerCustomer.cTypeName)!}" placeholder="请选择" class="weui-input" <#if type??> readonly</#if>>
 			            </div>
 			            <span class="weui-cell__ft"></span>
 			        </div>
@@ -484,13 +484,13 @@
 			                </div>
 			                <input type="hidden" name="areaCode" id="areaCode" value="${(sellerCustomer.prov_code)!''},${(sellerCustomer.city_code)!''},${(sellerCustomer.country_code)!''}">
 			                <input type="hidden" name="areaName" id="areaName" value="${(sellerCustomer.prov_name)!''},${(sellerCustomer.city_name)!''},${(sellerCustomer.country_name)!''}">
-			                <input type="text" placeholder="省市区" class="weui-input" id="delivery-address" name="customer.prov_name" value="${(sellerCustomer.prov_name)!''} ${(sellerCustomer.city_name)!''} ${(sellerCustomer.country_name)!''}" >
+			                <input type="text" placeholder="省市区" class="weui-input" id="delivery-address" name="customer.prov_name" value="${(sellerCustomer.prov_name)!''} ${(sellerCustomer.city_name)!''} ${(sellerCustomer.country_name)!''}" <#if type??> readonly</#if>>
 			            </div>
 			            <span class="weui-cell__ft"></span>
 			        </div>
 			        <div class="weui-cell weui-cell_access">
 			            <div class="weui-cell__bd">
-		                    <textarea class="weui-textarea" rows="3" name="customer.address" id="address" placeholder="地址详情必填">${(sellerCustomer.address)!}</textarea>
+		                    <textarea class="weui-textarea" rows="3" name="customer.address" id="address" placeholder="地址详情必填" <#if type??> readonly</#if>>${(sellerCustomer.address)!}</textarea>
 			                <div class="weui-textarea-counter" id="length"></div>
 			            </div>
 			        </div>

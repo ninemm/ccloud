@@ -380,7 +380,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 		return Db.find(sql.toString(), param.toArray());
 	}
 
-	public Page<Record> findImportCustomer(int pageNumber, int pageSize, String selectDataArea, String userDataArea, String searchKey) {
+	public Page<Record> findImportCustomer(int pageNumber, int pageSize, String userDataArea, String searchKey, String corpSellerId) {
 		boolean needwhere = false;
 		LinkedList<Object> params = new LinkedList<Object>();
 
@@ -392,6 +392,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 		sql.append("LEFT JOIN cc_customer_type cct ON ccjct.customer_type_id = cct.id ");
 		sql.append("LEFT JOIN cc_seller_customer csc ON cujc.seller_customer_id = csc.id ");
 		sql.append("LEFT JOIN cc_customer c ON csc.customer_id = c.id ");
+		sql.append("LEFT JOIN cc_customer_join_corp ccjc on ccjc.customer_id = c.id ");
 		sql.append("LEFT JOIN cc_sales_order cso ON cujc.seller_customer_id = cso.customer_id AND cujc.data_area = cso.data_area ");
 
 		if (StrKit.notBlank(searchKey)) {
@@ -408,7 +409,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 			needwhere = false;
 		}
 
-		needwhere = appendIfNotEmptyWithLike(sql, "cujc.data_area", selectDataArea, params, needwhere);
+		needwhere = appendIfNotEmpty(sql, "ccjc.seller_id", corpSellerId, params, needwhere );
 		sql.append(" AND cct.code != ? ");
 		params.add(Consts.CUSTOMER_TYPE_CODE_SELLER);
 
