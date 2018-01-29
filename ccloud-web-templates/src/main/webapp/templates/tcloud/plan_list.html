@@ -139,14 +139,14 @@
 				<div class="weui-search-bar__box">
 					<i class="weui-icon-search"></i>
 					<input type="search" class="weui-search-bar__input" id="searchInput" placeholder="搜索" required="">
-					<a href="javascript:" class="weui-icon-clear" id="searchClear" ></a>
+					<a href="javascript:" class="weui-icon-clear" id="searchClear"></a>
 				</div>
 				<label class="weui-search-bar__label" id="searchText">
 					<i class="weui-icon-search"></i>
 					<span>请输入业务员名称</span>
 				</label>
 			</form>
-			<a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel" >取消</a>
+			<a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
 		</div>
 	</header>
 	<article id="my-order" class="ft14">
@@ -170,18 +170,24 @@
 		<main>
 			<div class="ft12 planList">
 				<div class="plan-list-box">
-					<div class="weui-panel weui-panel_access">
-						<div class="customer_name">
-							<span id="userName"></span>
-							<span class="fr orange ft12" id="typeName"></span>
-						</div>
-						<div class="weui-flex gray">
-							<div class="weui-flex__item">开始时间：<span id="startDate"></span></div>
-							<span style="width:1rem" class="t-c">-</span>
-							<div class="weui-flex__item t-r">结束时间：<span id="endDate"></span></div>
-						</div>
-					</div>
 					<div class="weui-cells mg-0">
+						<div class="weui-cell">
+							<div class="weui-cell__bd">
+								<div class="customer_name">
+									<span id="userName"></span>
+									<span class="fr orange ft12" id="typeName"></span>
+								</div>
+								<div class="weui-flex gray ft12">
+									<div class="weui-flex__item">开始时间：
+										<span id="startDate"></span>
+									</div>
+									<span style="width:1rem" class="t-c">-</span>
+									<div class="weui-flex__item t-r">结束时间：
+										<span id="endDate"></span>
+									</div>
+								</div>
+							</div>
+						</div>
 						<div class="weui-cell">
 							<div class="weui-cell__bd t-c" id="productName">
 							</div>
@@ -206,11 +212,11 @@
 				</div>
 			</div>
 			<div class="weui-loadmore" id="loading" style="display: none;">
-			  <i class="weui-loading"></i>
-			  <span class="weui-loadmore__tips">正在加载</span>
+				<i class="weui-loading"></i>
+				<span class="weui-loadmore__tips">正在加载</span>
 			</div>
 			<div class="weui-loadmore weui-loadmore_line" id="noMore" style="display: none;">
-			  <span class="weui-loadmore__tips">暂无数据</span>
+				<span class="weui-loadmore__tips">暂无数据</span>
 			</div>
 		</main>
 	</article>
