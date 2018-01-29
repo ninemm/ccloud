@@ -1,5 +1,5 @@
 <#include "_inc/_layout.html"/>
-<#macro title>出库单列表</#macro>
+<#macro title>收款管理列表</#macro>
 <#macro css> 
 	#my-order {
 		top: 44px;
@@ -130,6 +130,7 @@
 
 					$newOrder.find("#amount").text(el.total_amount);
 					$newOrder.find("#date").text('时间：' + el.create_date);
+					$newOrder.find("#balanceAmount").text(el.balanceAmount);
 				});
 				page++;
 				loading = false;
@@ -293,6 +294,11 @@
 							<p>
 								金额：￥<span id="amount"></span>
 								<span class="fr" id="date"></span>
+							</p>
+						</div>
+						<div class="gray">
+							<p>
+								未收金额：￥<span id="balanceAmount"></span>
 							</p>
 						</div>
 					</a>

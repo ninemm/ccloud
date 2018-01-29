@@ -33,12 +33,17 @@
 	            if (length >= 5) {
 	            	descLength = length - 5;
 	            }
+	            
+	            var first = $(".img");
+	            first.html("");
+	            first.append('<img src="'+data[0].avatar+'">');
+	            
 	            for(var i = 0; i < length; i++){
 	            	j = i + 1;
 	            	if (i == 0) {
 	            		$("#firstName").html(data[i].realname);
 						$("#orderCount").html(data[i].orderCount);
-						$("#totalAmount").html(data[i].totalAmount);	            		
+						$("#totalAmount").html("￥："+data[i].totalAmount);	            		
 	            	}
 	            	//${CTPATH}/images/jp.jpg///src="/templates/tcloud/images/avatar.png"
 	            	if(data[i].avatar==null){
@@ -171,8 +176,7 @@
 			<p class="seller ft16">冠军</p>
 			<p class="name" id="firstName"></p>
 		</div>
-		<div class="user-avatar">
-			<img src="${(session._logined_user.avatar)!'${CTPATH}/images/avatar.png'}">
+		<div class="user-avatar img">
 		</div> 
 		<div class="user-statistics">
 			<div class="weui-flex">
