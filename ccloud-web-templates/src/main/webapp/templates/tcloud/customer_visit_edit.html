@@ -74,16 +74,42 @@
 	        }
 	    });
 	    
-	     $("#activity_title").select({
-             title: "选择活动",
-             multi: true,
-             items: JSON.parse('${activityRecords}'),
-             onClose: function(obj) {
-                 var activityIds = obj.data.values;
-                 $('#activity_id').val(activityIds);
-             }
-         });
-	    
+		var customerId = $("#customer_id").val();
+		if(customerId == "" || customerId == null || customerId == undefined){
+			$("#activity_title").select({
+			       title: "选择活动",
+			       multi: true,
+			       items: [{}],
+			});
+		}else{
+			$.ajax({
+		        url: "${CPATH}/customerVisit/activityChoose",
+		        data: {
+		            "customerId": customerId
+		        },
+		        dataType: "json",
+		        success: function(data) {
+		        		if(data.activityRecords=='[]'){
+				        	$("#activity_title").select({
+					       title: "选择活动",
+					       multi: true,
+					       items: [{}],
+						});
+		        		}else{
+						$("#activity_title").select({
+							title: "选择活动",
+							multi: true,
+							items: JSON.parse(data.activityRecords),
+							onClose: function(obj) {
+							    var activityIds = obj.data.values;
+							    $('#activity_id').val(activityIds);
+							}
+						});
+		        		}
+		        }
+	        });
+		}
+		
         $("#uploaderInput").on("change",function () {
 
             var files = this.files;;
@@ -418,7 +444,7 @@
                 <div class="weui-cell weui-cell_access select-area">
                     <div class="weui-cell__bd">
 						<div class="order-customer-info-title">
-							活动申请&nbsp;&nbsp;&nbsp;
+							活动&nbsp;&nbsp;&nbsp;
 						</div>
 						<input id="activity_id"  name="activity_id" type="hidden" />
 						<input id="activity_title" class="weui-input" name="activity_title" type="text" placeholder="请选择" >
