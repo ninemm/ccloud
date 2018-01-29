@@ -969,36 +969,36 @@ public class CustomerController extends BaseFrontController {
 	@Before(Tx.class)
 	public void receive(){
 		String sellerCustomerId = getPara("id");
+		String selllerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(sellerCustomerId);
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		boolean updated = true;
 
-		List<Department>  departmentList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
-		String corpSellerId = departmentList.get(departmentList.size()-1).getStr("seller_id");
-		Customer customer = sellerCustomer.getCustomer();
+		SellerCustomer sellerCustomer1 = SellerCustomerQuery.me().findBySellerId(selllerId, sellerCustomer.getCustomer().getId());
 
-		CustomerJoinCorpQuery.me().deleteByCustomerIdAndSellerId(customer.getId(), corpSellerId);
-		CustomerJoinCorp customerJoinCorp = new CustomerJoinCorp();
-		customerJoinCorp.setCustomerId(customer.getId());
-		customerJoinCorp.setSellerId(corpSellerId);
+		if(sellerCustomer1 == null) {
 
-		updated = customerJoinCorp.save();
+			sellerCustomer.setId(StrKit.getRandomUUID());
+			sellerCustomer.setSellerId(selllerId);
+			sellerCustomer.setDataArea(user.getDataArea());
+			sellerCustomer.setDeptId(user.getDepartmentId());
 
-		sellerCustomer.setId(StrKit.getRandomUUID());
-		sellerCustomer.setDataArea(user.getDataArea());
-		sellerCustomer.setDeptId(user.getDepartmentId());
-		sellerCustomer.setIsChecked(null);
-		sellerCustomer.setIsEnabled(1);
-		sellerCustomer.setIsArchive(1);
-		sellerCustomer.setProcDefKey(null);
-		sellerCustomer.setProcInstId(null);
-		sellerCustomer.setCreateDate(new Date());
-		sellerCustomer.setModifyDate(null);
-		sellerCustomer.save();
+			sellerCustomer.setIsChecked(null);
+			sellerCustomer.setIsEnabled(1);
+			sellerCustomer.setIsArchive(1);
+			sellerCustomer.setProcDefKey(null);
+			sellerCustomer.setProcInstId(null);
+
+			sellerCustomer.setCreateDate(new Date());
+			sellerCustomer.setModifyDate(null);
+
+			updated = sellerCustomer.save();
+			sellerCustomerId = sellerCustomer.getId();
+		} else sellerCustomerId = sellerCustomer1.getId();
 
 		UserJoinCustomer userJoinCustomer = new UserJoinCustomer();
 
-		userJoinCustomer.setSellerCustomerId(sellerCustomer.getId());
+		userJoinCustomer.setSellerCustomerId(sellerCustomerId);
 		userJoinCustomer.setUserId(user.getId());
 		userJoinCustomer.setDeptId(user.getDepartmentId());
 		userJoinCustomer.setDataArea(user.getDataArea());
