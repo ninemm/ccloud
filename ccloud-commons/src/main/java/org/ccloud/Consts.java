@@ -171,6 +171,7 @@ public class Consts {
 	public static final String ROLE_CODE_007 = "007";//财务
 	public static final String ROLE_CODE_020 = "020";//账务
 	public static final String ROLE_CODE_010 = "010";//业务员
+	public static final String ROLE_CODE_011 = "011";//直营总监
 
 	public static final String OPERATE_HISTORY_TITLE_ORDER_REVIEW= "订单审核";
 	public static final String OPERATE_HISTORY_TITLE_ORDER_PRINT= "订单打印";
@@ -242,6 +243,8 @@ public class Consts {
 	public static final String PROC_ORDER_REVIEW_ONE = "_order_review_1";				// 订单1审
 	public static final String PROC_ORDER_REVIEW_TWO = "_order_review_2";				// 订单2审
 	public static final String PROC_ORDER_REVIEW_THREE = "_order_review_3";				// 订单3审
+	public static final String PROC_ORDER_REVIEW_FOUR = "_order_review_4";				// 订单1审（直营总监）
+	public static final String PROC_ORDER_REVIEW_FIVE = "_order_review_5";				// 订单2审（直营总监：财务）
 	public static final String PROC_ACTIVITY_APPLY_REVIEW = "_activity_apply_review";	// 活动审核
 	
 	public static final Integer STATUS_STATE_PUT = 1;// 通用上架

@@ -142,11 +142,15 @@ function showCustomer(activity){
 }
 
 function changeEvent(activity,$obj){
+	console.log(activity);
 	$obj.find("#activityId").val(activity.id);
 	$obj.find("#visitNum").val(activity.visit_num);
 	$obj.find("#startTime").val(new Date(activity.start_time).Format("yyyy-MM-dd"));
 	$obj.find("#endTime").val(new Date(activity.end_time).Format("yyyy-MM-dd"));
-	$obj.find("#investAmount").val(activity.invest_amount);
+	$obj.find("#customerTypeName").val(activity.customerTypeName);
+	$obj.find("#areaType").text(activity.area_type);
+	$obj.find("#joinNum").text("每个客户可以参加" + activity.join_num + "次");
+	$obj.find("#content").text(activity.content);
 	
 }
 
@@ -365,12 +369,43 @@ function doChange(key){
 					<div class="weui-cell weui-cell_access">
 						<div class="weui-cell__bd">
 							<span>
-								预计金额
+								客户类型
 								<span class="require"></span>
 							</span>
 							<div class="fr t-r">
-								<input type="text" class="weui-input" id="investAmount" readonly>&nbsp;&nbsp;元
+								<input type="text" class="weui-input" id="customerTypeName" readonly>&nbsp;&nbsp;
 							</div>
+						</div>
+					</div>
+					<div class="weui-cell weui-cell_access">
+						<div class="weui-cell__bd">
+							<span>
+								区域
+								<span class="require"></span>
+							</span>
+							<div class="fr t-r">
+								<span class="weui-input" id="areaType" readonly>&nbsp;&nbsp;</span>
+							</div>
+						</div>
+					</div>
+					<div class="weui-cell weui-cell_access">
+						<div class="weui-cell__bd">
+							<span>
+								规则
+								<span class="require"></span>
+							</span>
+							<div class="fr t-r">
+								<span class="weui-input" id="joinNum" readonly>&nbsp;&nbsp;</span>
+							</div>
+						</div>
+					</div>
+					<div class="weui-cell weui-cell_access">
+							<span>
+								活动内容
+								<span class="require"></span>
+							</span>
+						<div class="weui-cell__bd" style="margin-left:40px;">
+								<span class="weui-input" id="content" ></span>
 						</div>
 					</div>
 					<div class="weui-cell weui-cell_access">

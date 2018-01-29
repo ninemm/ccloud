@@ -92,7 +92,7 @@ public class ActivityQuery extends JBaseQuery {
     }
 
     public List<Record> findActivityListForApp(String sellerId, String keyword, String tag) {
-        StringBuilder fromBuilder = new StringBuilder(" SELECT DISTINCT a.*, d.name as categoryName, ct.name as customerTypeName, dd.name as timeIntervalName FROM cc_activity a");
+        StringBuilder fromBuilder = new StringBuilder(" SELECT DISTINCT a.*, d.name as categoryName, ct.name as customerTypeName, dd.name as timeIntervalName,a.total_customer_num as surplusNum FROM cc_activity a");
         fromBuilder.append(" left join dict d on a.category = d.value ");
 	    fromBuilder.append(" left join cc_customer_type ct on a.customer_type = ct.id ");
 	    fromBuilder.append(" left join dict dd on a.time_interval = dd.value ");
