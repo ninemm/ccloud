@@ -130,6 +130,14 @@ public abstract class BaseActivityApply<M extends BaseActivityApply<M>> extends 
 		return getInt("num");
 	}
 
+	public void setSurplusNum(Integer surplusNum) {
+		set("surplus_num", surplusNum);
+	}
+	
+	public Integer getSurplusNum() {
+		return getInt("surplus_num");
+	}
+	
 	public void setContent(String content) {
 		set("content", content);
 	}
