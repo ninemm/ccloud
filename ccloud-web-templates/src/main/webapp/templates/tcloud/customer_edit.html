@@ -319,9 +319,9 @@
                     var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
                     var geoc = new BMap.Geocoder();                   // 获取百度地址解析器
 
-                    $("#lng").val(parseFloat(longitude).toFixed(6));
-                    $("#lat").val(parseFloat(latitude).toFixed(6));
                     translateCallback = function (point) {            // 回调函数
+                        $("#lng").val(parseFloat(point.lng).toFixed(6));
+                        $("#lat").val(parseFloat(point.lat).toFixed(6));
                         geoc.getLocation(point, function(rs) {
                             var addComp = rs.addressComponents;
                             var address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
@@ -363,9 +363,9 @@
                 var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
                 var geoc = new BMap.Geocoder();                   // 获取百度地址解析器
 
-                $("#lng").val(parseFloat(longitude).toFixed(6));
-                $("#lat").val(parseFloat(latitude).toFixed(6));
                 translateCallback = function (point) {            // 回调函数
+                    $("#lng").val(parseFloat(point.lng).toFixed(6));
+                    $("#lat").val(parseFloat(point.lat).toFixed(6));
                     geoc.getLocation(point, function(rs) {
                         var addComp = rs.addressComponents;
                         var address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
