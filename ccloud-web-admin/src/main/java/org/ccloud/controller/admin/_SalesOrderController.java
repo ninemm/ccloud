@@ -43,6 +43,8 @@ import org.ccloud.model.User;
 import org.ccloud.model.query.ActivityQuery;
 import org.ccloud.model.query.MessageQuery;
 import org.ccloud.model.query.OptionQuery;
+import org.ccloud.model.query.OrderDetailInfoQuery;
+import org.ccloud.model.query.OrderInfoQuery;
 import org.ccloud.model.query.OutstockPrintQuery;
 import org.ccloud.model.query.SalesOrderDetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
@@ -78,7 +80,7 @@ import cn.afterturn.easypoi.excel.entity.ExportParams;
 @RouterMapping(url = "/admin/salesOrder", viewPath = "/WEB-INF/admin/sales_order")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
-@RequiresPermissions("/admin/salesOrder")
+@RequiresPermissions(value={"/admin/salesOrder","/admin/salesOrder/otherOrder"},logical=Logical.OR)
 public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 	@Override
@@ -91,6 +93,79 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		setAttr("endDate", date);
 		setAttr("actList", actList);
 		render("index.html");
+	}
+	
+	//第三方订单
+	@RequiresPermissions("/admin/salesOrder/otherOrder")
+	public void otherOrder() {
+		render("other_order.html");
+	}
+	
+	//第三方订单统计
+	@RequiresPermissions("/admin/salesOrder/otherOrder")
+	public void getOtherCount() {
+		String keyword = getPara("k");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+		}
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String platformName = getPara("platformName");
+		
+		if (StrKit.notBlank(platformName)) {
+			platformName = StringUtils.urlDecode(platformName);
+		}
+		
+		String status = getPara("status");
+		String receiveType = getPara("receiveType");		
+		Record record = OrderInfoQuery.me().getCountInfo(keyword, startDate, endDate, platformName, status, receiveType);
+		renderJson(record);
+	}
+	
+	//第三方订单列表
+	public void otherList() {
+		
+		String keyword = getPara("k");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+		}
+
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String platformName = getPara("platformName");
+		
+		if (StrKit.notBlank(platformName)) {
+			platformName = StringUtils.urlDecode(platformName);
+		}
+		
+		String status = getPara("status");
+		String receiveType = getPara("receiveType");
+		
+		// 获取排序相关信息
+		String sort = getPara("sortName[sort]");
+		String order = getPara("sortName[order]");
+		Page<Record> page = OrderInfoQuery.me().paginate(getPageNumber(), getPageSize(), keyword, 
+				startDate, endDate, order, sort, platformName, status, receiveType);
+
+		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
+		renderJson(map);
+		
+	}
+	
+	//第三方订单详情
+	@RequiresPermissions("/admin/salesOrder/otherOrder")
+	public void otherDetail() {
+
+		String orderId = getPara(0);
+
+		Record order = OrderInfoQuery.me().findMoreById(orderId);
+		List<Record> orderDetail = OrderDetailInfoQuery.me().findByOrderId(orderId);
+
+		setAttr("order", order);
+		setAttr("orderDetail", orderDetail);
+
+		render("other_detail.html");
+
 	}
 
 	public void list() {

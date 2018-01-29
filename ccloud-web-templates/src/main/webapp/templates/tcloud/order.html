@@ -36,11 +36,27 @@
 		width: 100%;
 		background: #f3f5f7;
 	}
+
+	#gift .icon-tags {
+		color: #ea6f5a;
+		font-size: .8rem;
+		margin-right: .2rem;
+		height: 100%;
+		line-height: 100%;
+	}
 </#macro>
 
 <#macro script>
 $(function() {
-  $(document).on("click", ".choose-customer", function () {
+	$(document).on("click", ".gift-open", function () {
+        if ($(this).text() === "展开") {
+	        $(this).text("收起");
+	        $(this).prev().find('#subsubProduct').show();
+        } else {
+	        $(this).text("展开");
+	        $(this).prev().find('#subsubProduct').hide();
+        }
+    }).on("click", ".choose-customer", function () {
 		window.location.href = '${CPATH}/product/customerChoose';
   }).on("click", "#placeOrder", function () {
 	if (!flg) {
@@ -622,13 +638,18 @@ $(function() {
 							<input type="number" class="street-value"  id="compositionPrice" value="0" name="compositionPrice" readonly>
 						</div>
 						<hr>
-						<div id="gift">
-							<p id="sub">赠品：<span id="subProduct"> </span>
-							</p>
-							<p class="t-r width-50 none" id="subsubProduct">
-							</p>
+						<div id="gift" class="weui-flex">
+							<span>
+								<i class="icon-tags"></i>
+							</span>
+							<div class="weui-flex__item">
+								<p id="sub">
+									<span id="subProduct"> </span>
+								</p>
+								<p id="subsubProduct" class="none">
+								</p>
+							</div>
 						</div>
-
 						<input type="hidden" id="rowTotal" name="rowTotal" value="">
 					</div>
 				</div>
