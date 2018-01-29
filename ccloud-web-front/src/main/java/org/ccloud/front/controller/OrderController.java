@@ -33,6 +33,7 @@ import org.ccloud.model.vo.ImageJson;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
+import org.ccloud.workflow.listener.order.OrderReviewUtil;
 import org.ccloud.workflow.service.WorkFlowService;
 
 import com.alibaba.fastjson.JSON;
@@ -339,7 +340,7 @@ public class OrderController extends BaseFrontController {
 					}
 				} else {
 					SalesOutstockQuery.me().pass(orderId, user.getId(), sellerId, sellerCode);
-					sendOrderMessage(sellerId, StringUtils.getArrayFirst(paraMap.get("customerName")), "订单审核通过", user.getId(), user.getId(),
+					OrderReviewUtil.sendOrderMessage(sellerId, StringUtils.getArrayFirst(paraMap.get("customerName")), "订单审核通过", user.getId(), user.getId(),
 							user.getDepartmentId(), user.getDataArea(),orderId);
 				}
 
@@ -411,31 +412,9 @@ public class OrderController extends BaseFrontController {
 			return "下单失败";
 		}
 
-		sendOrderMessage(sellerId, customerName, "订单审核", user.getId(), toUserId, user.getDepartmentId(), user.getDataArea(),orderId);
+		OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核", user.getId(), toUserId, user.getDepartmentId(), user.getDataArea(),orderId);
 
 		return "";
-	}
-
-	private void sendOrderMessage(String sellerId, String title, String content, String fromUserId, String toUserId, String deptId, String dataArea, String orderId) {
-
-		Message message = new Message();
-		message.setType(Message.ORDER_REVIEW_TYPE_CODE);
-
-		message.setSellerId(sellerId);
-		message.setTitle(title);
-		message.setContent(content);
-
-		message.setObjectId(orderId);
-		message.setIsRead(Consts.NO_READ);
-		message.setObjectType(Consts.OBJECT_TYPE_ORDER);
-
-		message.setFromUserId(fromUserId);
-		message.setToUserId(toUserId);
-		message.setDeptId(deptId);
-		message.setDataArea(dataArea);
-
-		MessageKit.sendMessage(Actions.ProcessMessage.PROCESS_MESSAGE_SAVE, message);
-
 	}
 
 	@Before(Tx.class)
