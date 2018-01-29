@@ -973,15 +973,6 @@ public class CustomerController extends BaseFrontController {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		boolean updated = true;
 
-		UserJoinCustomer userJoinCustomer = new UserJoinCustomer();
-
-		userJoinCustomer.setSellerCustomerId(sellerCustomer.getId());
-		userJoinCustomer.setUserId(user.getId());
-		userJoinCustomer.setDeptId(user.getDepartmentId());
-		userJoinCustomer.setDataArea(user.getDataArea());
-		updated = userJoinCustomer.save();
-
-
 		List<Department>  departmentList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
 		String corpSellerId = departmentList.get(departmentList.size()-1).getStr("seller_id");
 		Customer customer = sellerCustomer.getCustomer();
@@ -994,7 +985,24 @@ public class CustomerController extends BaseFrontController {
 		updated = customerJoinCorp.save();
 
 		sellerCustomer.setId(StrKit.getRandomUUID());
+		sellerCustomer.setDataArea(user.getDataArea());
+		sellerCustomer.setDeptId(user.getDepartmentId());
+		sellerCustomer.setIsChecked(null);
+		sellerCustomer.setIsEnabled(1);
+		sellerCustomer.setIsArchive(1);
+		sellerCustomer.setProcDefKey(null);
+		sellerCustomer.setProcInstId(null);
+		sellerCustomer.setCreateDate(new Date());
+		sellerCustomer.setModifyDate(null);
 		sellerCustomer.save();
+
+		UserJoinCustomer userJoinCustomer = new UserJoinCustomer();
+
+		userJoinCustomer.setSellerCustomerId(sellerCustomer.getId());
+		userJoinCustomer.setUserId(user.getId());
+		userJoinCustomer.setDeptId(user.getDepartmentId());
+		userJoinCustomer.setDataArea(user.getDataArea());
+		updated = userJoinCustomer.save();
 
 		if (updated) renderAjaxResultForSuccess("操作成功");
 		else renderAjaxResultForError("操作失败");
