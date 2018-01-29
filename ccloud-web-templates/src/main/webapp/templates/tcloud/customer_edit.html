@@ -250,15 +250,7 @@
             },
             success: function(res) {
                 if (res.errorCode == 0) {
-                    $.confirm({
-                        title: res.message,
-                        text: '返回列表页？',
-                        onOK: function () {
-                            location.href = '${CPATH}/customer'
-                        },
-                        onCancel: function () {
-                            $.closeModal();
-                        }
+                    location.href = '${CPATH}/customer'
                     });
                 } else {
                     $.alert(res.message);
@@ -275,16 +267,7 @@
         $.get("${CPATH}/customer/enable?id=${(sellerCustomer.id)!""}&isEnabled=0" ,
         function(result){
             if (result.errorCode == 0) {
-                $.confirm({
-                    title: result.message,
-                    text: '返回列表页？',
-                    onOK: function () {
-                        location.href = '${CPATH}/customer'
-                    },
-                    onCancel: function () {
-                        $.closeModal();
-                    }
-                });
+                location.href = '${CPATH}/customer'
             } else {
                 $.alert(result.message);
             }
@@ -401,16 +384,7 @@
         $.get("${CPATH}/customer/receive?id=${(sellerCustomer.id)!""}&isEnabled=0" ,
             function(result){
                 if (result.errorCode == 0) {
-                    $.confirm({
-                        title: result.message,
-                        text: '返回列表页？',
-                        onOK: function () {
-                            location.href = '${CPATH}/customer'
-                        },
-                        onCancel: function () {
-                            $.closeModal();
-                        }
-                    });
+                    location.href = '${CPATH}/customer'
                 } else {
                     $.alert(result.message);
                 }

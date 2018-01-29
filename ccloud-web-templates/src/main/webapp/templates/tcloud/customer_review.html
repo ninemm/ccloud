@@ -90,16 +90,7 @@
 		$.get("${CPATH}/customer/complete?id=${(sellerCustomer.id)!}&taskId=${(taskId)}&status="+status ,
 			function(res){
 				if (res.errorCode == 0) {
-					$.confirm({
-						title: res.message,
-						text: '返回列表页？',
-						onOK: function () {
-							location.href = '${CPATH}/todo/customer'
-						},
-						onCancel: function () {
-							$.closeModal();
-						}
-					});
+					location.href = '${CPATH}/todo/customer'
 				} else {
 					$.alert(res.message);
 				}

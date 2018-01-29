@@ -260,16 +260,7 @@
             success: function(res) {
                 Utils.closeLoadingWin();
                 if (res.errorCode == 0) {
-                    $.confirm({
-                        title: res.message,
-                        text: '返回列表页？',
-                        onOK: function () {
-                            location.href = '${CPATH}/customerVisit';
-                        },
-                        onCancel: function () {
-                            $.closeModal();
-                        }
-                    });
+                    location.href = '${CPATH}/customerVisit';
                 } else {
                     $.alert(res.message);
                 }
