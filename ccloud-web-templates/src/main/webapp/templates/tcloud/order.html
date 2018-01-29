@@ -43,6 +43,20 @@ $(function() {
   $(document).on("click", ".choose-customer", function () {
 		window.location.href = '${CPATH}/product/customerChoose';
   }).on("click", "#placeOrder", function () {
+	if (!flg) {
+		return;
+	}
+	if ($("#sellerCustomerId").val() == "") {
+		$.toptip("请选择客户", 'warning'); 
+		return;
+	}
+	
+	
+//	if (!checkStore()) {
+//		toastr.error('未选择商品或库存不足!','操作失败');
+//		return;
+//	}
+
 	$.confirm("您确定要提交订单吗？","提交订单", function() {
 		doSubmit();
 	});
@@ -301,19 +315,6 @@ $(function() {
 
 	var flg = true;
 	function doSubmit(){
-		if (!flg) {
-			return;
-		}
-		if ($("#sellerCustomerId").val() == "") {
-			$.toptip("请选择客户", 'warning'); 
-			return;
-		}
-		
-		
-	//	if (!checkStore()) {
-	//		toastr.error('未选择商品或库存不足!','操作失败');
-	//		return;
-	//	}
 
 		layer.open({
 			type: 2,

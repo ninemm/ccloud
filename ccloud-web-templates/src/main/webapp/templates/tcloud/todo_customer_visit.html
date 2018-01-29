@@ -141,15 +141,8 @@
 		$.get(url ,
 			function(res){
 				if (res.errorCode == 0) {
-					$.confirm({
-						title: res.message,
-						text: '返回列表页？',
-						onOK: function () {
-							location.href = '${CPATH}/todo/visit'
-						},
-						onCancel: function () {
-							$.closeModal();
-						}
+					$.alert(res.message, "拜访审核", function() {
+						location.href = '${CPATH}/todo/visit'
 					});
 				} else {
 					$.alert(res.message);
@@ -167,15 +160,8 @@
 		$.get(url ,
 			function(res){
 				if (res.errorCode == 0) {
-					$.confirm({
-						title: res.message,
-						text: '返回列表页？',
-						onOK: function () {
-							location.href = '${CPATH}/todo/visit'
-						},
-						onCancel: function () {
-							$.closeModal();
-						}
+					$.alert(res.message, "拜访审核", function() {
+						location.href = '${CPATH}/todo/visit'
 					});
 				} else {
 					$.alert(res.message);
