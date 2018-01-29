@@ -10,6 +10,14 @@
 	#product {
 		bottom: 2.25rem;
 	}
+
+	#gift .icon-tags {
+		color: #ea6f5a;
+		font-size: .8rem;
+		margin-right: .2rem;
+		height: 100%;
+		line-height: 100%;
+	}
 </#macro>
 <#macro script_import>
 	<script type='text/javascript' src="${CTPATH}/js/swiper.min.js"></script>
@@ -21,10 +29,10 @@ $(function() {
     $(document).on("click", ".gift-open", function () {
         if ($(this).text() === "展开") {
 	        $(this).text("收起");
-	        $(this).parent().next().show();
+	        $(this).prev().find('#subsubProduct').show();
         } else {
 	        $(this).text("展开");
-	        $(this).parent().next().hide();
+	        $(this).prev().find('#subsubProduct').hide();
         }
     }).on("click", "#sidebar li", function () {
         $(this).addClass("active").siblings().removeClass("active");
@@ -298,7 +306,7 @@ function initComposition(compositionList){
 		}else{
 			var $type = $menuRight.find(".type:last");
 			var $newProductDetail = $type.find(".composition:last");
-			$newProductDetail.find("#sub").append("<a class='fr gift-open' >展开</a>");
+			$newProductDetail.find("#gift").append("<a class='gift-open' >展开</a>");
 			$newProductDetail.find("#subsubProduct").append(el.sub_product_name + ' ' + el.sub_product_count + '件');
 		}
 
@@ -629,12 +637,17 @@ function order(){
 								<div id="stock"></div>
 							</div>
 							<hr>
-							<div id="gift">
-								<p id="sub">赠品：
-									<span id="subProduct"> </span>
-								</p>
-								<p class="t-r width-50 none" id="subsubProduct">
-								</p>
+							<div id="gift" class="weui-flex">
+								<span>
+									<i class="icon-tags"></i>
+								</span>
+								<div class="weui-flex__item">
+									<p id="sub">
+										<span id="subProduct"> </span>
+									</p>
+									<p id="subsubProduct" class="none">
+									</p>
+								</div>
 							</div>
 						</section>
 					</div>

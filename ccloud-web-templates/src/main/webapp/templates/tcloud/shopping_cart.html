@@ -1,12 +1,28 @@
 <#include "_inc/_layout.html"/>
 <#macro title>购物车</#macro>
-<#macro css> </#macro>
+<#macro css> 
+	#gift .icon-tags {
+		color: #ea6f5a;
+		font-size: .8rem;
+		margin-right: .2rem;
+		height: 100%;
+		line-height: 100%;
+	}
+</#macro>
 <#macro script_import>
 	<script type='text/javascript' src="${CTPATH}/js/shopping-cart.js"></script>
 </#macro>  
 <#macro script>
 $(function() {
-  $(document).on("click", ".icon-trash-o", function() {
+	$(document).on("click", ".gift-open", function () {
+        if ($(this).text() === "展开") {
+	        $(this).text("收起");
+	        $(this).prev().find('#subsubProduct').show();
+        } else {
+	        $(this).text("展开");
+	        $(this).prev().find('#subsubProduct').hide();
+        }
+    }).on("click", ".icon-trash-o", function() {
     var _this = $(this);
     $.confirm("确认删除商品？", function() {
       var $el = _this.parents(".common");
@@ -555,11 +571,17 @@ function order(){
 					<i class="icon-trash-o fr ft30 gray"></i>
 				</div>
 				<hr>
-				<div id="gift">
-					<p id="sub">赠品：<span id="subProduct"> </span>
-					</p>
-					<p class="t-r width-50 none" id="subsubProduct">
-					</p>
+				<div id="gift" class="weui-flex">
+					<span>
+						<i class="icon-tags"></i>
+					</span>
+					<div class="weui-flex__item">
+						<p id="sub">
+							<span id="subProduct"> </span>
+						</p>
+						<p id="subsubProduct" class="none">
+						</p>
+					</div>
 				</div>
 			</div>
 		</main>
