@@ -232,7 +232,7 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		}
 
 		//更新计划
-		BigDecimal bigProductCount = new BigDecimal(bigCount).add(new BigDecimal(smallCount).divide(new BigDecimal(productConvert)));
+		BigDecimal bigProductCount = new BigDecimal(bigCount).add(new BigDecimal(smallCount).divide(new BigDecimal(productConvert), 2, BigDecimal.ROUND_HALF_UP));
 		if (!updatePlans(order_user, sellerProductId, order_date, bigProductCount)) {
 			return false;
 		}
@@ -245,7 +245,7 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		List<Plans> plans = PlansQuery.me().findBySales(order_user, sellerProductId, orderDate.substring(0,10));
 		for (Plans plan : plans) {
 			BigDecimal planNum = plan.getPlanNum();
-			BigDecimal completeNum = (plan.getCompleteNum().subtract(productCount)).setScale(2, BigDecimal.ROUND_HALF_UP);
+			BigDecimal completeNum = plan.getCompleteNum().subtract(productCount);
 			plan.setCompleteNum(completeNum);
 			plan.setCompleteRatio(completeNum.multiply(new BigDecimal(100)).divide(planNum, 2, BigDecimal.ROUND_HALF_UP));
 			plan.setModifyDate(new Date());
