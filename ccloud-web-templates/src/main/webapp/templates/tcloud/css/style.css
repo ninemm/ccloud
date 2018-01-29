@@ -1976,21 +1976,18 @@ input[name=sex] {
 
 #application-record section .weui-cell__ft,
 #fee-audit-list section .weui-cell__ft {
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   color: #fff;
 }
 
 #application-record section i,
 #fee-audit-list section i {
-  font-size: 1.2rem;
   position: relative;
   margin-right: 0.5rem;
 }
 
 #application-record section .weui-cell_access .weui-cell__ft:after,
 #fee-audit-list section .weui-cell_access .weui-cell__ft:after {
-  height: 0.4rem;
-  width: 0.4rem;
   border-color: #fff;
 }
 

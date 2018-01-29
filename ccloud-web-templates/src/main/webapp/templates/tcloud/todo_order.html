@@ -157,19 +157,11 @@
 		Utils.ajax('${CPATH}/order/complete', params, 
 			function(res){
 				if (res.errorCode == 0) {
-					$.confirm({
-						title: '订单审核',
-						text: res.message,
-						onOK: function () {
-							location.href = '${CPATH}/todo/order'
-						},
-						onCancel: function () {
-							$this.parents('.weui-panel').remove();
-							$.closeModal();
-						}
-					});
+					$.alert(res.message, "订单审核", function() {
+						location.href = '${CPATH}/todo/order'
+					  });
 				} else {
-					$.alert(res.message);
+					$.alert(res.message, "订单审核");
 				}
 				layer.closeAll();
 			}
@@ -191,19 +183,11 @@
 		Utils.ajax('${CPATH}/order/complete', params, 
 			function(res){
 				if (res.errorCode == 0) {
-					$.confirm({
-						title: '订单审核',
-						text: res.message,
-						onOK: function () {
-							location.href = '${CPATH}/todo/order'
-						},
-						onCancel: function () {
-							$this.parents('.weui-panel').remove();
-							$.closeModal();
-						}
+					$.alert(res.message, "订单审核", function() {
+						location.href = '${CPATH}/todo/order'
 					});
 				} else {
-					$.alert(res.message);
+					$.alert(res.message, "订单审核");
 				}
 				layer.closeAll();
 			}

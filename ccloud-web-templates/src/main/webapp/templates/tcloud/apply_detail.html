@@ -19,16 +19,7 @@
                         if (result.errorCode > 0) {
                             $.toptip(result.message, 'error');
                         } else {
-                            $.confirm({
-                                title: result.message,
-                                text: '返回列表页？',
-                                onOK: function () {
-                                    location.href = '${CPATH}/activity/applyList?history=' + 1;
-                                },
-                                onCancel: function () {
-                                    $.closeModal();
-                                }
-                            });
+                            location.href = '${CPATH}/activity/applyList?history=' + 1;
                         }
                         Utils.closeLoadingWin();
                     }
@@ -68,9 +59,11 @@
                 <p>活动类型
                     <span>${apply.name}</span>
                 </p>
-                <p>投入类型
-                    <span>商品</span>
-                </p>
+                <#if invesType??>
+	                <p>投入类型
+	                    <span>${invesType}</span>
+	                </p>
+                </#if>
                 <p>客户信息
                     <span>${apply.contact}（${apply.mobile}）</span>
                 </p>
@@ -95,13 +88,15 @@
                 <!--</p>-->
             </div>
         </div>
-        <div class="weui-cell weui-cell_access">
-            <div class="weui-cell__bd">
-                申请总金额
-                <span class="fr">
-            <span class="ft20 orange">${apply.invest_amount?string("0.00")}</span>&nbsp;元</span>
-            </div>
-        </div>
+        <#if invesType??>
+	        <div class="weui-cell weui-cell_access">
+	            <div class="weui-cell__bd">
+	                申请总金额
+	                <span class="fr">
+	            <span class="ft20 orange">${apply.invest_amount?string("0.00")}</span>&nbsp;元</span>
+	            </div>
+	        </div>
+        </#if>
         <!--<div class="weui-cell weui-cell_access">
             <div class="weui-cell__bd">
                 <div>

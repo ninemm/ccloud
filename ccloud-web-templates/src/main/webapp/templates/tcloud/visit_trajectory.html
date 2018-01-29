@@ -9,12 +9,14 @@
 <#macro script_import>
     <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
     <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=Ec4VbDTTjjuEGtVGzSvPwwQtvnvWFeGY"></script>
+    <script type="text/javascript" src="${CTPATH}/js/convertor.js"></script>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
 </#macro>
 <#macro script>
 
     var lng;
     var lat;
+    var center;
     var startDate = $.today();
     var endDate = $.today() + ' 23:59:59';
 
@@ -100,50 +102,55 @@
     function refresh(){
         var url = "${CPATH}/customerVisit/trajectoryRefresh?userId=" + $("#customer")[0].dataset.values + "&startDate=" + startDate + "&endDate=" + endDate;
         $.get(url, function(result){
-            if(result.length>0) var point = new BMap.Point(result[0].lng, result[0].lat);//坐标点
-            else var point = new BMap.Point(lng, lat);
-            map.centerAndZoom(point, 15);
-            map.enableScrollWheelZoom(true);
-            var visitList = result;
-            var pointArray = [];
-            for(var i = 0; i < visitList.length; i++)
-                {
-                    //var point = new BMap.Point(visitList[i].lng + (i)*0.01, visitList[i].lat + (i)*0.01);
-                    var point = new BMap.Point(visitList[i].lng, visitList[i].lat);
-                    pointArray.push(point);
-                    var marker = new BMap.Marker(point);
-
-                    map.addOverlay(marker);
-                    var opts = {
-                        width : 240,     // 信息窗口宽度
-                        height: 110,     // 信息窗口高度
-                        title : '客户名称：' + visitList[i].customer_name
-                    };
-
-                    var content = "拜访时间：" + visitList[i].create_date + "<br>";
-                    content = content + "客户类型：" + visitList[i].customerTypeName + "<br>";
-                    content = content + "拜访类型：" + visitList[i].name;
-
-                    addClickHandler(content,marker,opts);
-
-                    var myCompOverlay = new ComplexCustomOverlay(point,i+1);
-                    map.addOverlay(myCompOverlay);
-                }
-            var polyline = new BMap.Polyline(pointArray,{strokeColor:"#0066ff", strokeWeight:4, strokeOpacity:1});
-            map.addOverlay(polyline);
-
-            var str ="<div class='filter-item'><div class='weui-cell'>共拜访：" + result.length + "家</div>";
-            str = str +"<div id='operate-history'><div class='weui-cells mg-0'>";
-            for(var i = 0; i < visitList.length; i++)
-            {
-                str = str + "<div class='weui-cell weui-cell_access'><div></div><p>" + visitList[i].customer_name
-                    + "<e class='fr'>" + visitList[i].customerTypeName + "</e></p><p>" + visitList[i].create_date
-                    + "<e class='fr'>" + visitList[i].name + "</e></p></div>";
+            if(result.length>0) {
+                center = new BMap.Point(result[0].lng, result[0].lat);//坐标点
+                map.centerAndZoom(center, 15);
+                render(result);
             }
-            str = str + "</div></div> </div>"
-            $("#combin-filter").empty();
-            $("#combin-filter").append(str);
         })
+    }
+
+    function render(result){
+        map.enableScrollWheelZoom(true);
+        var visitList = result;
+        var pointArray = [];
+        for(var i = 0; i < visitList.length; i++)
+        {
+            var point = new BMap.Point(visitList[i].lng, visitList[i].lat);
+            pointArray.push(point);
+            var marker = new BMap.Marker(point);
+
+            map.addOverlay(marker);
+            var opts = {
+                width : 240,     // 信息窗口宽度
+                height: 110,     // 信息窗口高度
+                title : '客户名称：' + visitList[i].customer_name
+            };
+
+            var content = "拜访时间：" + visitList[i].create_date + "<br>";
+            content = content + "客户类型：" + visitList[i].customerTypeName + "<br>";
+            content = content + "拜访类型：" + visitList[i].name;
+
+            addClickHandler(content,marker,opts);
+
+            var myCompOverlay = new ComplexCustomOverlay(point,i+1);
+            map.addOverlay(myCompOverlay);
+        }
+
+        var polyline = new BMap.Polyline(pointArray,{strokeColor:"#0066ff", strokeWeight:4, strokeOpacity:1});
+        map.addOverlay(polyline);
+
+        var str ="<div class='filter-item'><div class='weui-cell'>共拜访：" + result.length + "家</div>";
+        str = str +"<div id='operate-history'><div class='weui-cells mg-0'>";
+        for(var i = 0; i < visitList.length; i++)
+        {
+            str = str + "<div class='weui-cell weui-cell_access'><div></div><p>" + visitList[i].customer_name
+                + "<e class='fr'>" + visitList[i].customerTypeName + "</e></p><p>" + visitList[i].create_date
+                + "<e class='fr'>" + visitList[i].name + "</e></p></div>";
+        }
+        str = str + "</div></div> </div>"
+        $("#combin-filter").empty();
+        $("#combin-filter").append(str);
     }
 
     function addClickHandler(content,marker,opts){
@@ -170,22 +177,22 @@
     });
 
     wx.ready(function() {
-        // 获取定位信息
         wx.getLocation({
             type: 'wgs84',
             success: function (res) {
                 var latitude = res.latitude;                      // 纬度，浮点数，范围为90 ~ -90
                 var longitude = res.longitude;                    // 经度，浮点数，范围为180 ~ -180。
-
                 var speed = res.speed;                            // 速度，以米/每秒计
                 var accuracy = res.accuracy;                      // 位置精度
-
                 var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
                 var geoc = new BMap.Geocoder();                   // 获取百度地址解析器
 
                 translateCallback = function (point) {            // 回调函数
-                    lng = parseFloat(point.lng).toFixed(6));
-                    lat = parseFloat(point.lat).toFixed(6));
+                    lng = parseFloat(point.lng).toFixed(6);
+                    lat = parseFloat(point.lat).toFixed(6);
+                    center = new BMap.Point(lng, lat);
+                    map.centerAndZoom(center, 15);
+                    map.enableScrollWheelZoom(true);
                 };
 
                 setTimeout(function() {
