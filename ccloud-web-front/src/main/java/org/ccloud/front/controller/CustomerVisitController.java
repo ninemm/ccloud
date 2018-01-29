@@ -150,7 +150,7 @@ public class CustomerVisitController extends BaseFrontController {
 					"                <div class=\"weui-cell__bd ft14\">\n" +
 					"                    <p>" + visit.getStr("customer_name") + "</p>\n" +
 					"                    <p class=\"gray ft12\">" + visit.getStr("contact") + "/" + visit.getStr("mobile") + "\n" +
-					"                        <span class=\"fr\">" + visit.get("create_date").toString() + "</span>\n" +
+					"                        <span class=\"fr\">" + DateUtils.dateToStr((Date)visit.get("create_date"), DateUtils.DEFAULT_FORMATTER) + "</span>\n" +
 					"                    </p>\n" +
 					"                    <p>活动类型：\n" +
 					"                        <span class=\"orange\">" + DictQuery.me().findName(visit.getStr("question_type")) + "</span>\n" +
@@ -188,7 +188,7 @@ public class CustomerVisitController extends BaseFrontController {
 					"                <div class=\"weui-cell__bd ft14\">\n" +
 					"                    <p>" + visit.getStr("customer_name") + "</p>\n" +
 					"                    <p class=\"gray ft12\">" + visit.getStr("contact") + "/" + visit.getStr("mobile") + "\n" +
-					"                        <span class=\"fr\">" + visit.get("create_date").toString() + "</span>\n" +
+					"                        <span class=\"fr\">" + DateUtils.dateToStr((Date)visit.get("create_date"), DateUtils.DEFAULT_FORMATTER) + "</span>\n" +
 					"                    </p>\n" +
 					"                    <p>活动类型：\n" +
 					"                        <span class=\"orange\">" + DictQuery.me().findName(visit.getStr("question_type")) + "</span>\n" +

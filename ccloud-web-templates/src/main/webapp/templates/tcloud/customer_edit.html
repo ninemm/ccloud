@@ -1,5 +1,11 @@
 <#include "_inc/_layout.html"/>
-<#macro title>新增客户</#macro>
+<#if type??>
+    <#macro title>导入客户</#macro>
+    <#elseif sellerCustomer??>
+        <#macro title>编辑客户</#macro>
+    <#else>
+        <#macro title>新增客户</#macro>
+</#if>
 
 <#macro script_import>
     <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
@@ -251,7 +257,6 @@
             success: function(res) {
                 if (res.errorCode == 0) {
                     location.href = '${CPATH}/customer'
-                    });
                 } else {
                     $.alert(res.message);
                 }

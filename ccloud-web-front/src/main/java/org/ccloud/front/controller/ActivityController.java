@@ -480,7 +480,7 @@ public class ActivityController extends BaseFrontController {
 
 			html.append("                        <a class=\"weui-cell weui-cell_access\" href=\"/activity/applyDetail?id=" + apply.getStr("id") + "\">\n" +
 					"                            <i class=\"icon-tags\"></i>\n" +
-					"                            <div class=\"weui-cell__bd\">" + apply.getStr("customer_name") + "</div>\n" +
+					"                            <div class=\"weui-cell__bd\">" + apply.getStr("code") + "  " + apply.getStr("customer_name") + "</div>\n" +
 					"                            <span class=\"weui-cell__ft\">\n" );
 			if (apply.getStr("status").equals("0")) html.append("待审核\n");
 			else if (apply.getStr("status").equals("1")) html.append("已通过\n");
