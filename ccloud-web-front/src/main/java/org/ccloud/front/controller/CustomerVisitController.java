@@ -14,7 +14,6 @@ import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
-import org.ccloud.model.Activity;
 import org.ccloud.model.Customer;
 import org.ccloud.model.CustomerType;
 import org.ccloud.model.CustomerVisit;
@@ -23,7 +22,6 @@ import org.ccloud.model.Dict;
 import org.ccloud.model.Message;
 import org.ccloud.model.User;
 import org.ccloud.model.WxMessageTemplate;
-import org.ccloud.model.query.ActivityApplyQuery;
 import org.ccloud.model.query.ActivityQuery;
 import org.ccloud.model.query.CustomerJoinCustomerTypeQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
@@ -211,8 +209,13 @@ public class CustomerVisitController extends BaseFrontController {
 	@Before(WechatJSSDKInterceptor.class)
 	public void edit() {
 	    List<Map<String, String>> list = getVisitTypeList();
-	    String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-		List<Record> activityRecords = ActivityQuery.me().findActivityListForApp(sellerId, "", "");
+		setAttr("problem", JSON.toJSONString(list));
+		render("customer_visit_edit.html");
+	}
+	
+	public void activityChoose(){
+		String customerId = getPara("customerId");
+		List<Record> activityRecords = ActivityQuery.me().findByCustomerId(customerId);
 		List<Map<String, String>> activityList = Lists.newArrayList();
 	    for (Record record : activityRecords) {
 		    	Map<String, String> map = Maps.newHashMap();
@@ -220,11 +223,9 @@ public class CustomerVisitController extends BaseFrontController {
 		    	map.put("value", record.getStr("id"));
 		    	activityList.add(map);
 	    }
-		setAttr("activityRecords", JSON.toJSONString(activityList));
-		setAttr("problem", JSON.toJSONString(list));
-		render("customer_visit_edit.html");
+	    renderJson("activityRecords",JSON.toJSONString(activityList));
 	}
-
+	
 	public void detail() {
 		String id = getPara("id");
 		if(StrKit.notBlank(getPara("one"))) {
@@ -332,26 +333,6 @@ public class CustomerVisitController extends BaseFrontController {
 
 		 List<ImageJson> list = Lists.newArrayList();
 		 String picJson = getPara("pic");
-
-		 //获取选取活动的id
-		 String activityIds = getPara("activity_id");
-		 List<String> activityIdList = Splitter.on(",").trimResults().omitEmptyStrings().splitToList(activityIds);
-	
-//		for (String activityId : activityIdList) {
-//			Activity activity = ActivityQuery.me().findById(activityId);
-//			long total = ActivityApplyQuery.me().findByActivityId(activityId);
-//			if (total >= activity.getTotalCustomerNum()) {
-//				renderAjaxResultForError("活动参与的人数已经达到上限");
-//				return;
-//			}
-//			int interval = this.getStartDate(activity.getTimeInterval());
-//			DateTime dateTime = new DateTime(new Date());
-//			long cnt = ActivityApplyQuery.me().findBySellerCustomerIdAndActivityId(activityId, customerVisit.getSellerCustomerId(), DateUtils.format(dateTime.plusMonths(-interval).toDate()));
-//			if (cnt >= activity.getJoinNum()) {
-//			renderAjaxResultForError("您参与的次数已经达到上限，每个客户" + interval + "个月中参与次数为：" + activity.getJoinNum());
-//				return;
-//			}
-//		}
 		
 		if (isChecked != null && isChecked) customerVisit.setStatus(Customer.CUSTOMER_AUDIT);
 		else customerVisit.setStatus(Customer.CUSTOMER_NORMAL);
@@ -359,7 +340,6 @@ public class CustomerVisitController extends BaseFrontController {
 		 customerVisit.setUserId(user.getId());
 		 customerVisit.setDataArea(user.getDataArea());
 		 customerVisit.setDeptId(user.getDepartmentId());
-		 
 		 
 		 if (StrKit.notBlank(picJson)) {
 
@@ -386,7 +366,10 @@ public class CustomerVisitController extends BaseFrontController {
 		 if (list.size()!=0) customerVisit.setPhoto(JSON.toJSONString(list));
 
 		 boolean updated = customerVisit.saveOrUpdate();
-			
+		
+		//获取选取活动的id
+		String activityIds = getPara("activity_id");
+		List<String> activityIdList = Splitter.on(",").trimResults().omitEmptyStrings().splitToList(activityIds);
 		for (String activityId : activityIdList) {
 			CustomerVisitJoinActivity customerVisitJoinActivity=new CustomerVisitJoinActivity();
 			customerVisitJoinActivity.setCustomerVisitId(customerVisit.getId());
@@ -616,45 +599,4 @@ public class CustomerVisitController extends BaseFrontController {
 		renderJson(visitList);
 	}
 	
-	private int getStartDate(String timeInterval){
-		if(Consts.TIME_INTERVAL_ONE.equals(timeInterval)){
-			return 1;
-		}
-		if(Consts.TIME_INTERVAL_TWO.equals(timeInterval)){
-			return 2;
-		}
-		if(Consts.TIME_INTERVAL_THREE.equals(timeInterval)){
-			return 3;
-		}
-		if(Consts.TIME_INTERVAL_FOUR.equals(timeInterval)){
-			return 4;
-		}
-		if(Consts.TIME_INTERVAL_FIVE.equals(timeInterval)){
-			return 5;
-		}
-		if(Consts.TIME_INTERVAL_SIX.equals(timeInterval)){
-			return 6;
-		}
-		if(Consts.TIME_INTERVAL_SEVEN.equals(timeInterval)){
-			return 7;
-		}
-		if(Consts.TIME_INTERVAL_EIGHT.equals(timeInterval)){
-			return 8;
-		}
-		if(Consts.TIME_INTERVAL_NINE.equals(timeInterval)){
-			return 9;
-		}
-		if(Consts.TIME_INTERVAL_TEN.equals(timeInterval)){
-			return 10;
-		}
-		if(Consts.TIME_INTERVAL_ELEVEN.equals(timeInterval)){
-			return 11;
-		}
-		if(Consts.TIME_INTERVAL_TWELVE.equals(timeInterval)){
-			return 12;
-		}
-
-
-		return 1;
-	}
 }
