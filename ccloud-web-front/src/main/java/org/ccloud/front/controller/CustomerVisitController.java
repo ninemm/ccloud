@@ -333,24 +333,25 @@ public class CustomerVisitController extends BaseFrontController {
 		 List<ImageJson> list = Lists.newArrayList();
 		 String picJson = getPara("pic");
 
+		 //获取选取活动的id
 		 String activityIds = getPara("activity_id");
-
-		List<String> activityIdList = Splitter.on(",").trimResults().omitEmptyStrings().splitToList(activityIds);
-		for (String activityId : activityIdList) {
-			Activity activity = ActivityQuery.me().findById(activityId);
-			long total = ActivityApplyQuery.me().findByActivityId(activityId);
-			if (total >= activity.getTotalCustomerNum()) {
-				renderAjaxResultForError("活动参与的人数已经达到上限");
-				return;
-			}
-			int interval = this.getStartDate(activity.getTimeInterval());
-			DateTime dateTime = new DateTime(new Date());
-			long cnt = ActivityApplyQuery.me().findBySellerCustomerIdAndActivityId(activityId, customerVisit.getSellerCustomerId(), DateUtils.format(dateTime.plusMonths(-interval).toDate()));
-			if (cnt >= activity.getJoinNum()) {
-			renderAjaxResultForError("您参与的次数已经达到上限，每个客户" + interval + "个月中参与次数为：" + activity.getJoinNum());
-				return;
-			}
-		}
+		 List<String> activityIdList = Splitter.on(",").trimResults().omitEmptyStrings().splitToList(activityIds);
+	
+//		for (String activityId : activityIdList) {
+//			Activity activity = ActivityQuery.me().findById(activityId);
+//			long total = ActivityApplyQuery.me().findByActivityId(activityId);
+//			if (total >= activity.getTotalCustomerNum()) {
+//				renderAjaxResultForError("活动参与的人数已经达到上限");
+//				return;
+//			}
+//			int interval = this.getStartDate(activity.getTimeInterval());
+//			DateTime dateTime = new DateTime(new Date());
+//			long cnt = ActivityApplyQuery.me().findBySellerCustomerIdAndActivityId(activityId, customerVisit.getSellerCustomerId(), DateUtils.format(dateTime.plusMonths(-interval).toDate()));
+//			if (cnt >= activity.getJoinNum()) {
+//			renderAjaxResultForError("您参与的次数已经达到上限，每个客户" + interval + "个月中参与次数为：" + activity.getJoinNum());
+//				return;
+//			}
+//		}
 		
 		if (isChecked != null && isChecked) customerVisit.setStatus(Customer.CUSTOMER_AUDIT);
 		else customerVisit.setStatus(Customer.CUSTOMER_NORMAL);
