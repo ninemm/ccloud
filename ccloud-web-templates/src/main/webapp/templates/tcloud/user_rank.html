@@ -40,11 +40,20 @@
 						$("#orderCount").html(data[i].orderCount);
 						$("#totalAmount").html(data[i].totalAmount);	            		
 	            	}
-	            	rank.append("<div class='weui-media-box ft14'><div class='rank-detail'><span class='sequence'>"+j+"</span><img src='${CTPATH}/images/jp.jpg'><div class='rank-box'><div class='good-name'>"+data[i].realname+"</div><div class='good-total'><span class='orange'>￥"+data[i].totalAmount+"</span><span class='gray ft14'>/"+data[i].orderCount+"笔("+(data[i].productCount).toFixed(2)+")件</span></div></div></div></div>");
+	            	//${CTPATH}/images/jp.jpg///src="/templates/tcloud/images/avatar.png"
+	            	if(data[i].avatar==null){
+    		            rank.append("<div class='weui-media-box ft14'><div class='rank-detail'><span class='sequence'>"+j+"</span><img src='${CTPATH}/images/avatar.png' style='border-radius:50%;'><div class='rank-box'><div class='good-name'>"+data[i].realname+"</div><div class='good-total'><span class='orange'>￥"+data[i].totalAmount+"</span><span class='gray ft14'>/"+data[i].orderCount+"笔("+(data[i].productCount).toFixed(2)+")件</span></div></div></div></div>");
+	            	}else{
+		            	rank.append("<div class='weui-media-box ft14'><div class='rank-detail'><span class='sequence'>"+j+"</span><img src='"+data[i].avatar+"' style='border-radius:50%;'><div class='rank-box'><div class='good-name'>"+data[i].realname+"</div><div class='good-total'><span class='orange'>￥"+data[i].totalAmount+"</span><span class='gray ft14'>/"+data[i].orderCount+"笔("+(data[i].productCount).toFixed(2)+")件</span></div></div></div></div>");
+	            	}
 	            }
 	            var index = 1;
 	            for(var i = length-1; i >= descLength; i--){
-	            	descRank.append("<div class='weui-media-box ft14'><div class='rank-detail'><span class='sequence'>"+index+"</span><img src='${CTPATH}/images/jp.jpg'><div class='rank-box'><div class='good-name'>"+data[i].realname+"</div><div class='good-total'><span class='orange'>￥"+data[i].totalAmount+"</span><span class='gray ft14'>/"+data[i].orderCount+"笔("+(data[i].productCount).toFixed(2)+")件</span></div></div></div></div>");
+	            	if(data[i].avatar==null){
+	            		descRank.append("<div class='weui-media-box ft14'><div class='rank-detail'><span class='sequence'>"+index+"</span><img src='${CTPATH}/images/avatar.png' style='border-radius:50%;'><div class='rank-box'><div class='good-name'>"+data[i].realname+"</div><div class='good-total'><span class='orange'>￥"+data[i].totalAmount+"</span><span class='gray ft14'>/"+data[i].orderCount+"笔("+(data[i].productCount).toFixed(2)+")件</span></div></div></div></div>");
+	            	}else{
+		            	descRank.append("<div class='weui-media-box ft14'><div class='rank-detail'><span class='sequence'>"+index+"</span><img src='"+data[i].avatar+"' style='border-radius:50%;'><div class='rank-box'><div class='good-name' >"+data[i].realname+"</div><div class='good-total'><span class='orange'>￥"+data[i].totalAmount+"</span><span class='gray ft14'>/"+data[i].orderCount+"笔("+(data[i].productCount).toFixed(2)+")件</span></div></div></div></div>");
+	            	}
 	            	index++;
 	            }
 	            
