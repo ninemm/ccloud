@@ -103,12 +103,14 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		if(!StrKit.isBlank(id)) {
 			Activity activity = ActivityQuery.me().findById(id);
 			setAttr("activity", activity);
-			String[] imags = activity.getImageListStore().split(",");
-			List<String> imageList = new ArrayList<String>();
-			for(int i=0;i<imags.length;i++) {
-				imageList.add(imags[i]);
+			if(activity.getImageListStore()!=null) {
+				String[] imags = activity.getImageListStore().split(",");
+				List<String> imageList = new ArrayList<String>();
+				for(int i=0;i<imags.length;i++) {
+					imageList.add(imags[i]);
+				}
+				setAttr("imageList", imageList);
 			}
-			setAttr("imageList", imageList);
 			String[] area = activity.getAreaType().split("-");
 			List<String> areaList = new ArrayList<String>();
 			for(int i=0;i<area.length;i++) {
