@@ -41,10 +41,11 @@ public class ActivityController extends BaseFrontController {
 
 	public void index() {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		List<Record> activityRecords = ActivityQuery.me().findActivityListForApp(sellerId, "", "");
 		for(int i = 0; i <activityRecords.size();i++){
 			activityRecords.get(i).set("customerTypeName", ActivityQuery.me().getCustomerTypes(activityRecords.get(i).getStr("customer_type")));
+			activityRecords.get(i).set("surplusNum",Integer.parseInt( activityRecords.get(i).getStr("total_customer_num"))-ActivityApplyQuery.me().findByUserIdAndActivityId(activityRecords.get(i).getStr("id"),user.getId()).size());
 		}
 		List<Map<String, Object>> activityList = new ArrayList<Map<String, Object>>();
 		
@@ -60,7 +61,7 @@ public class ActivityController extends BaseFrontController {
 				}
 			}
 		}
-		
+		//查看每个销售代表已参与的客户数
 		setAttr("activityList", JSON.toJSON(activityList));
 		setAttr("tags", JSON.toJSON(tagSet));
 
@@ -103,7 +104,9 @@ public class ActivityController extends BaseFrontController {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 
 		List<Record> activityList = ActivityQuery.me().findActivityListForApp(sellerId, "", "");
-
+		for(int i = 0; i <activityList.size();i++){
+			activityList.get(i).set("customerTypeName", ActivityQuery.me().getCustomerTypes(activityList.get(i).getStr("customer_type")));
+		}
 		Map<String, Object> activityInfoMap = new HashMap<String, Object>();
 		List<Map<String, Object>> activityItems = new ArrayList<>();
 
@@ -183,7 +186,7 @@ public class ActivityController extends BaseFrontController {
 		for (String sellerCustomerId : sellerCustomerIdArray) {
 			for (int i = 0; i < activity_ids.length; i++) {
 				//活动申请check
-				String result = this.check(activity_ids[i], sellerCustomerId, sellerCustomerNameArray[i]);
+				String result = this.check(activity_ids[i], sellerCustomerId, sellerCustomerNameArray[i],user.getId());
 				
 				if(StrKit.notBlank(result)) {
 					renderAjaxResultForError(result);
@@ -249,11 +252,15 @@ public class ActivityController extends BaseFrontController {
 		return procInstId;
 	}
 
-	private String check(String activityId, String sellerCustomerId, String customerName) {
+	private String check(String activityId, String sellerCustomerId, String customerName,String userId) {
 		Activity activity = ActivityQuery.me().findById(activityId);
-		long total = ActivityApplyQuery.me().findByActivityId(activityId);
-		if (total >= activity.getTotalCustomerNum()) {
+		List<ActivityApply> activityApplies = ActivityApplyQuery.me().findByUserIdAndActivityId(activityId, userId);
+		if (activityApplies.size() >= activity.getTotalCustomerNum()) {
 			return "活动参与的人数已经达到上限";
+		}
+		List<ActivityApply> applys = ActivityApplyQuery.me().findSellerCustomerIdAndActivityIdAndUserId(sellerCustomerId,activityId,userId);
+		if (applys.size() >= activity.getJoinNum()) {
+			return "该客户参与该活动的次数已经达到上限，每个客户参与的活动次数为"+activity.getJoinNum()+"次";
 		}
 		/*int interval = this.getStartDate(activity.getTimeInterval());
 		DateTime dateTime = new DateTime(new Date());
@@ -480,7 +487,7 @@ public class ActivityController extends BaseFrontController {
 
 			html.append("                        <a class=\"weui-cell weui-cell_access\" href=\"/activity/applyDetail?id=" + apply.getStr("id") + "\">\n" +
 					"                            <i class=\"icon-tags\"></i>\n" +
-					"                            <div class=\"weui-cell__bd\">" + apply.getStr("code") + "  " + apply.getStr("customer_name") + "</div>\n" +
+					"                            <div class=\"weui-cell__bd\">" + apply.getStr("customer_name") + "</div>\n" +
 					"                            <span class=\"weui-cell__ft\">\n" );
 			if (apply.getStr("status").equals("0")) html.append("待审核\n");
 			else if (apply.getStr("status").equals("1")) html.append("已通过\n");
@@ -525,7 +532,21 @@ public class ActivityController extends BaseFrontController {
 	public void applyDetail() {
 		String id = getPara("id");
 		ActivityApply activityApply = ActivityApplyQuery.me().findById(id);
-
+		List<Dict> dicts = DictQuery.me().findDictByType(Consts.INVEST_TYPE);
+		if(!activityApply.getStr("invest_type").equals("")) {
+			String[] investTypes = activityApply.getStr("invest_type").split(",");
+			String invesType= "";
+			for(int i=0;i<investTypes.length;i++) {
+				for(int j = 0 ;j<dicts.size();j++) {
+					if(dicts.get(j).getValue().equals(investTypes[i])) {
+						invesType += dicts.get(j).getName()+"、";
+						break;
+					}
+				}
+			}
+			setAttr("invesType", invesType.substring(0, invesType.length()-1));
+		}
+		
 		setAttr("apply", activityApply);
 
 		render("apply_detail.html");
