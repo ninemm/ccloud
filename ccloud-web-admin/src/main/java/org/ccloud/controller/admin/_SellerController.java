@@ -665,6 +665,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		customerType.setCreateDate(new Date());
 		customerType.save();
 	}
+
 	@Before(Tx.class)
 	public void saveOther(Department department,String deptId){
 		List<Group> groupList = GroupQuery.me()._findByDeptId(deptId);

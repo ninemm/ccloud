@@ -25,7 +25,6 @@ import org.ccloud.Consts;
 import org.ccloud.model.Receivables;
 import org.ccloud.model.SalesOrder;
 import org.ccloud.model.SalesOrderDetail;
-import org.ccloud.model.SellerProduct;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
 

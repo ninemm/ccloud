@@ -135,15 +135,8 @@
 		$.get(url ,
 			function(res){
 				if (res.errorCode == 0) {
-					$.confirm({
-						title: res.message,
-						text: '返回列表页？',
-						onOK: function () {
-							location.href = '${CPATH}/todo/customer'
-						},
-						onCancel: function () {
-							$.closeModal();
-						}
+					$.alert(res.message, "客户审核", function() {
+						location.href = '${CPATH}/todo/customer'
 					});
 				} else {
 					$.alert(res.message);
@@ -158,15 +151,8 @@
 		$.get(url ,
 			function(res){
 				if (res.errorCode == 0) {
-					$.confirm({
-						title: res.message,
-						text: '返回列表页？',
-						onOK: function () {
-							location.href = '${CPATH}/todo/customer'
-						},
-						onCancel: function () {
-							$.closeModal();
-						}
+					$.alert(res.message, "客户审核", function() {
+						location.href = '${CPATH}/todo/customer'
 					});
 				} else {
 					$.alert(res.message);

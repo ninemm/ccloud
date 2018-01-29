@@ -249,13 +249,6 @@ public abstract class BaseActivity<M extends BaseActivity<M>> extends JModel<M> 
 		return getInt("total_customer_num");
 	}
 
-	public void setSurplusNum(Integer surplusNum) {
-		set("surplus_num", surplusNum);
-	}
-	
-	public Integer getSurplusNum() {
-		return getInt("surplus_num");
-	}
 	
 	public void setVisitNum(Integer visitNum) {
 		set("visit_num", visitNum);

@@ -25,7 +25,6 @@ import org.ccloud.message.MessageKit;
 import org.ccloud.model.*;
 import org.ccloud.model.query.*;
 import org.ccloud.route.RouterMapping;
-import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
 
 import com.alibaba.fastjson.JSON;
@@ -33,7 +32,6 @@ import com.google.common.collect.ImmutableMap;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Record;
 import org.ccloud.workflow.service.WorkFlowService;
-import org.joda.time.DateTime;
 
 /**
  * Created by WT on 2017/11/30.
@@ -267,7 +265,7 @@ public class ActivityController extends BaseFrontController {
 		return "";
 	}
 
-	private int getStartDate(String timeInterval){
+	/*private int getStartDate(String timeInterval){
 		if(Consts.TIME_INTERVAL_ONE.equals(timeInterval)){
 			return 1;
 		}
@@ -308,7 +306,7 @@ public class ActivityController extends BaseFrontController {
 
 		return 1;
 	}
-
+*/
 	private void sendOrderMessage(String sellerId, String title, String content, String fromUserId, String toUserId, String deptId, String dataArea, String orderId) {
 
 		Message message = new Message();
@@ -537,6 +535,10 @@ public class ActivityController extends BaseFrontController {
 	public void withdraw(){
 		String id = getPara("id");
 		ActivityApply activityApply = ActivityApplyQuery.me().findById(id);
+		String procInstId = activityApply.getProcInstId();
+		WorkFlowService workflow = new WorkFlowService();
+		if (StrKit.notBlank(procInstId))
+			workflow.deleteProcessInstance(activityApply.getProcInstId());
 		activityApply.setStatus(2);
 		if( activityApply.saveOrUpdate()) renderAjaxResultForSuccess("操作成功");
 		else renderAjaxResultForError("操作失败");

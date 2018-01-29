@@ -151,16 +151,8 @@
 		Utils.ajax('${CPATH}/activity/complete', params,
 			function(res){
 				if (res.errorCode == 0) {
-					$.confirm({
-						title: '活动审核',
-						text: res.message,
-						onOK: function () {
-							location.href = '${CPATH}/todo/activityApply'
-						},
-						onCancel: function () {
-							$this.parents('.weui-panel').remove();
-							$.closeModal();
-						}
+					$.alert(res.message, "活动审核", function() {
+						location.href = '${CPATH}/todo/activityApply'
 					});
 				} else {
 					$.alert(res.message);
@@ -185,16 +177,8 @@
 		Utils.ajax('${CPATH}/activity/complete', params,
 			function(res){
 				if (res.errorCode == 0) {
-					$.confirm({
-						title: '活动审核',
-						text: res.message,
-						onOK: function () {
-							location.href = '${CPATH}/todo/activityApply'
-						},
-						onCancel: function () {
-							$this.parents('.weui-panel').remove();
-							$.closeModal();
-						}
+					$.alert(res.message, "活动审核", function() {
+						location.href = '${CPATH}/todo/activityApply'
 					});
 				} else {
 					$.alert(res.message);

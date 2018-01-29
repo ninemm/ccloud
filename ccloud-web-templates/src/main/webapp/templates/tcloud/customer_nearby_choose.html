@@ -75,7 +75,7 @@
 		    "page": page,
 	        "size": size,
 	        "dist": $("#searchArea").data('values'),
-			"lon": $('#lon').val(),
+			"lng": $('#lng').val(),
 			"lat": $('#lat').val()
 	    }
 
@@ -145,19 +145,19 @@
 
 				var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
 				var geoc = new BMap.Geocoder();                   // 获取百度地址解析器
-                $("#lon").val(parseFloat(longitude).toFixed(6));
-                $("#lat").val(parseFloat(latitude).toFixed(6));
 
-				/*translateCallback = function (point) {            // 回调函数
-					geoc.getLocation(point, function(rs) {
+				translateCallback = function (point) {            // 回调函数
+					$("#lng").val(parseFloat(point.lng).toFixed(6));
+					$("#lat").val(parseFloat(point.lat).toFixed(6));
+					/*geoc.getLocation(point, function(rs) {
 						var addComp = rs.addressComponents;
 						var address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
 						$('#location').text(address);
-					});
+					});*/
 				};
 				setTimeout(function() {
 					BMap.Convertor.translate(point, 0, translateCallback);//真实经纬度转成百度坐标
-				}, 100);*/
+				}, 100);
 				
 				combo();
 			},
@@ -181,7 +181,7 @@
                     <input type="text" id="searchArea" class="weui-input" placeholder="附近客户" readonly>
                     <i class="icon-sort-desc"></i>
 				</div>
-				<input type="hidden" name="lon" id="lon">
+				<input type="hidden" name="lng" id="lng">
 				<input type="hidden" name="lat" id="lat">
 			</header>
 				<div id="customerList">
