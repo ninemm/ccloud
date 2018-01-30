@@ -458,6 +458,10 @@ public class CustomerController extends BaseFrontController {
 			temp.setAddress(customer.getAddress());
 			temp.setNickname(sellerCustomer.getNickname());
 			temp.setCustomerName(customer.getCustomerName());
+
+			temp.setLat(sellerCustomer.getLat());
+			temp.setLng(sellerCustomer.getLng());
+			temp.setLocation(sellerCustomer.getLocation());
 			
 			temp.setImageListStore(JSON.toJSONString(list));
 			map.put("customerVO", temp);
@@ -664,6 +668,15 @@ public class CustomerController extends BaseFrontController {
 				if (StrKit.notBlank(customerVO.getImageListStore()) && customerVO.getImageListStore().length() > 2)
 					sellerCustomer.setImageListStore(customerVO.getImageListStore());
 				else sellerCustomer.setImageListStore(null);
+
+				if(customerVO.getLat() != null && StrKit.notBlank(customerVO.getLat().toString()))
+					sellerCustomer.setLat(customerVO.getLat());
+
+				if(customerVO.getLng() != null && StrKit.notBlank(customerVO.getLng().toString()))
+					sellerCustomer.setLng(customerVO.getLng());
+
+				if(StrKit.notBlank(customerVO.getLocation()))
+					sellerCustomer.setLocation(customerVO.getLocation());
 
 				sellerCustomer.setSellerId(sellerId);
 				sellerCustomer.setCustomerId(customer.getId());
