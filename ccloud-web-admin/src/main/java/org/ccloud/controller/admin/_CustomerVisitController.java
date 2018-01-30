@@ -256,30 +256,36 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
         String questionType = getPara("questionType");
         String customerType = getPara("customerType");
         String status = getPara("status");
-        
-        if (StrKit.notBlank(keyword)) {
-            keyword = StringUtils.urlDecode(keyword);
-            setAttr("k", keyword);
-        }
+
+        String filePath = "";
+
+		if (StrKit.notBlank(customerType)) {
+			filePath = filePath + customerType;
+			customerType = StringUtils.urlDecode(customerType);
+			setAttr("customerType", customerType);
+		}
 
         if (StrKit.notBlank(questionType)) {
+			filePath = filePath + DictQuery.me().findName(questionType);
         	questionType = StringUtils.urlDecode(questionType);
             setAttr("questionType", questionType);
         }
 
-        if (StrKit.notBlank(customerType)) {
-        	customerType = StringUtils.urlDecode(customerType);
-            setAttr("customerType", customerType);
-        }
-
         if(StrKit.notBlank(status)) {
+			filePath = filePath + DictQuery.me().findName(status);
         	status = StringUtils.urlDecode(status);
         	setAttr("status", status);
+		}
+
+		if (StrKit.notBlank(keyword)) {
+			filePath = filePath + keyword;
+			keyword = StringUtils.urlDecode(keyword);
+			setAttr("k", keyword);
 		}
         
         List<Record> visitList = CustomerVisitQuery.me().exportVisit(keyword, selectDataArea, customerType, questionType, "id", "cc_v.create_date desc", status);
         try {
-			exportExcel(visitList);
+			exportExcel(visitList, filePath);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -288,10 +294,9 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 	}
 	
 	@SuppressWarnings("deprecation")
-	public void exportExcel(List<Record> dataList) throws IOException {
+	public void exportExcel(List<Record> dataList, String filePath) throws IOException {
 
-		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\customer_visit\\"
-				+ "customerVisitInfo.xls";
+		filePath = filePath +  "客户拜访信息.xls";
 		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		
 		FileOutputStream fileOut = null;
@@ -344,25 +349,29 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 				
 				String picsrc = (String)record.get("photo");
 				List<ImageJson> list = JSON.parseArray(picsrc, ImageJson.class);
-				for(int i =0;i<list.size();i++) {
-					if(list.get(i)==null) {break;}
-					ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream();
-					String domain = OptionQuery.me().findValue("cdn_domain");
+				if(list != null) {
+					for (int i = 0; i < list.size(); i++) {
+						if (list.get(i) == null) {
+							break;
+						}
+						ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream();
+						String domain = OptionQuery.me().findValue("cdn_domain");
 
-					URL url = new URL(domain+"/"+list.get(i).getSavePath());
-					HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-					conn.setRequestMethod("GET");
+						URL url = new URL(domain + "/" + list.get(i).getSavePath());
+						HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+						conn.setRequestMethod("GET");
 
-					conn.setConnectTimeout(5 * 1000);
-					InputStream inStream = conn.getInputStream();
-					byte[] data = readInputStream(inStream);
-					conn.disconnect();
+						conn.setConnectTimeout(5 * 1000);
+						InputStream inStream = conn.getInputStream();
+						byte[] data = readInputStream(inStream);
+						conn.disconnect();
 
-					HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 250, (short) (8+i), rowNum, (short) (9+i), rowNum);
-					anchor.setAnchorType(0);
-					patriarch.createPicture(anchor, wb.addPicture( data, HSSFWorkbook.PICTURE_TYPE_JPEG));
-					byteArrayOut.close();
+						HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 250, (short) (8 + i), rowNum, (short) (9 + i), rowNum);
+						anchor.setAnchorType(0);
+						patriarch.createPicture(anchor, wb.addPicture(data, HSSFWorkbook.PICTURE_TYPE_JPEG));
+						byteArrayOut.close();
 
+					}
 				}
 
 				row.createCell(11).setCellValue((String)record.get("comment"));
@@ -458,7 +467,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 		String zipFileName = "拜访图片.zip";
 
 		if(StrKit.notBlank(customerName)) zipFileName = SellerCustomerQuery.me().findById(customerName).getCustomer().getCustomerName() + zipFileName;
-		if(StrKit.notBlank(customerType)) zipFileName = CustomerTypeQuery.me().findById(customerType).getStr("name") + zipFileName;
+		if(StrKit.notBlank(customerType)) zipFileName = customerType + zipFileName;
 		zipFileName = URLEncoder.encode(zipFileName, "UTF-8");
 
 		ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFileName));

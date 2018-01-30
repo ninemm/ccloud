@@ -139,11 +139,21 @@
     };
 
 	$("#exportVisit").click(function(){
-        var keyword = $('#post-search-input').val();
-        var customerType = $('#customer_type').val();
-        var questionType = $('#question_type').val();
-        var status = $('#status').val();
-        window.open("${CPATH}/admin/customerVisit/exportVisit?k="+keyword+"&questionType="+questionType+"&customerType="+customerType+"&status="+status,"_parent","","");
+
+    layer.confirm('确定导出吗？',{
+        btn : ['确定', '取消']},
+        function() {
+            layer.closeAll();
+            var keyword = $('#post-search-input').val();
+            var customerType = $('#customer_type').val();
+            var questionType = $('#question_type').val();
+            var status = $('#status').val();
+            window.open("${CPATH}/admin/customerVisit/exportVisit?k="+keyword+"&questionType="+questionType+"&customerType="+customerType+"&status="+status,"_parent","","");
+        },
+        function() {
+            layer.close();
+        }
+    );
     });
 
 

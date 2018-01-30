@@ -67,7 +67,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cc.customer_name", keyword, params, needWhere);
 
 		if(StrKit.notBlank(customerType)) {
-			needWhere = appendIfNotEmpty(fromBuilder, "cc_t.`id`", customerType, params, needWhere);
+			needWhere = appendIfNotEmpty(fromBuilder, "cc_t.`name`", customerType, params, needWhere);
 		}
 
 		if(StrKit.notBlank(questionType)) {
@@ -238,7 +238,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 		}
 
 		if(StrKit.notBlank(customerType)) {
-			fromBuilder.append("and cc_t.`id` = '"+customerType+"' ");
+			fromBuilder.append("and cc_t.`name` = '"+customerType+"' ");
 		}
 
 		if(StrKit.notBlank(questionType)) {
