@@ -409,7 +409,8 @@
 
     function doReceive(){
 
-        $.get("${CPATH}/customer/receive?id=${(sellerCustomer.id)!""}&isEnabled=0" ,
+        var url ="${CPATH}/customer/receive?id=${(sellerCustomer.id)!""}&isEnabled=0&customerTypeIds=" + $("#customerTypeIds").val();
+        $.get(url,
             function(result){
                 if (result.errorCode == 0) {
                     $.confirm({

@@ -996,21 +996,23 @@ public class CustomerController extends BaseFrontController {
 
 			sellerCustomerId = sellerCustomer.getId();
 
-			String customerTypeIds = getPara("customerTypeIds", "");
-
-			List<String> custTypeList = Splitter.on(",")
-					.trimResults()
-					.omitEmptyStrings()
-					.splitToList(customerTypeIds);
-
-			for(String customerTypeId : custTypeList) {
-				CustomerJoinCustomerType customerJoinCustomerType = new CustomerJoinCustomerType();
-				customerJoinCustomerType.setSellerCustomerId(sellerCustomerId);
-				customerJoinCustomerType.setCustomerTypeId(customerTypeId);
-				customerJoinCustomerType.save();
-			}
-
 		} else sellerCustomerId = sellerCustomer1.getId();
+
+
+		String customerTypeIds = getPara("customerTypeIds", "");
+
+		List<String> custTypeList = Splitter.on(",")
+				.trimResults()
+				.omitEmptyStrings()
+				.splitToList(customerTypeIds);
+
+		CustomerJoinCustomerTypeQuery.me().deleteBySellerCustomerId(sellerCustomerId);
+		for(String customerTypeId : custTypeList) {
+			CustomerJoinCustomerType customerJoinCustomerType = new CustomerJoinCustomerType();
+			customerJoinCustomerType.setSellerCustomerId(sellerCustomerId);
+			customerJoinCustomerType.setCustomerTypeId(customerTypeId);
+			customerJoinCustomerType.save();
+		}
 
 		UserJoinCustomer userJoinCustomer = new UserJoinCustomer();
 
