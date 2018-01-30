@@ -785,7 +785,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 				if (customerVO.getCustTypeList() != null || customerVO.getCustTypeList().size() != 0) {
 
 					CustomerJoinCustomerTypeQuery.me().deleteBySellerCustomerId(sellerCustomerId);
-					String[] customerTypes = sellerCustomer.getCustomerTypeIds().split(",");
+					List<String> customerTypes = customerVO.getCustTypeList();
 
 					for (String custType : customerTypes) {
 						CustomerJoinCustomerType ccType = new CustomerJoinCustomerType();
