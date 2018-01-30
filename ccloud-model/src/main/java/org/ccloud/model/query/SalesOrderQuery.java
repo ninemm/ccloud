@@ -130,7 +130,9 @@ public class SalesOrderQuery extends JBaseQuery {
 		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
 
 		if (needWhere) {
-			fromBuilder.append(" where 1 = 1");
+			fromBuilder.append(" where o.status not in (1001,1002) ");
+		} else {
+			fromBuilder.append(" and o.status not in (1001,1002) ");
 		}
 		
 		if (StrKit.notBlank(keyword)) {

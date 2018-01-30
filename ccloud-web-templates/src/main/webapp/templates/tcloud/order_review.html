@@ -79,8 +79,11 @@
 	      }
 	
 	      total();
+	  }).on("click", ".operate:first-child", function () { //减少商品数量
+          total();
+	  }).on("click", ".operate:last-child", function () { //增加商品数量
+    	  total();
 	  });
-	    
 	});
 	var comment = '';
 	var refuseReson = '';
