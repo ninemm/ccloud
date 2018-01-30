@@ -206,6 +206,10 @@ public class ActivityController extends BaseFrontController {
 					activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_WAIT);
 					activityApply.setProcInstId(Consts.PROC_ACTIVITY_APPLY_REVIEW);
 					String procInstId = this.start(activityApplyId, sellerCustomerNameArray[i], Consts.PROC_ACTIVITY_APPLY_REVIEW);
+					if(procInstId.equals("error")) {
+						renderAjaxResultForError("你的申请没有对应的人审核，请联系管理员");
+						return;
+					}
 					activityApply.setProcInstId(procInstId);
 				}else {
 					activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_PASS);
@@ -239,7 +243,8 @@ public class ActivityController extends BaseFrontController {
 
 		User manager = UserQuery.me().findManagerByDeptId(user.getDepartmentId());
 		if (manager == null) {
-			renderAjaxResultForError("你的申请没有对应的人审核，请联系管理员");
+			
+			return "error";
 		}
 		param.put("manager", manager.getUsername());
 		toUserId = manager.getId();
@@ -260,7 +265,7 @@ public class ActivityController extends BaseFrontController {
 		}
 		List<ActivityApply> applys = ActivityApplyQuery.me().findSellerCustomerIdAndActivityIdAndUserId(sellerCustomerId,activityId,userId);
 		if (applys.size() >= activity.getJoinNum()) {
-			return "该客户参与该活动的次数已经达到上限，每个客户参与的活动次数为"+activity.getJoinNum()+"次";
+			return "该客户参与该活动的次数已经达到上限";
 		}
 		/*int interval = this.getStartDate(activity.getTimeInterval());
 		DateTime dateTime = new DateTime(new Date());
