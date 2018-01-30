@@ -202,7 +202,7 @@ public class CustomerController extends BaseFrontController {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
 		Double dist = 100d;
-		String lon = getPara("lon");
+		String lon = getPara("lng");
 		String lat = getPara("lat");
 
 		if(StrKit.notBlank(getPara("searchArea"))) {
