@@ -207,7 +207,7 @@ public class ActivityController extends BaseFrontController {
 					activityApply.setProcInstId(Consts.PROC_ACTIVITY_APPLY_REVIEW);
 					String procInstId = this.start(activityApplyId, sellerCustomerNameArray[i], Consts.PROC_ACTIVITY_APPLY_REVIEW);
 					if(procInstId.equals("error")) {
-						renderAjaxResultForError("你的申请没有对应的人审核，请联系管理员");
+						renderAjaxResultForError("您没有配置审核人，请联系管理员");
 						return;
 					}
 					activityApply.setProcInstId(procInstId);
