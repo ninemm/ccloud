@@ -448,6 +448,9 @@ public class CustomerVisitController extends BaseFrontController {
 			customerVisit.setReviewLat(new BigDecimal(lat));
 		if (StrKit.notBlank(lng))
 			customerVisit.setReviewLng(new BigDecimal(lng));
+
+		customerVisit.setReviewId(user.getId());
+		customerVisit.setReviewDate(new Date());
 		
 		if (StrKit.notBlank(commentDesc))
 			customerVisit.setComment(commentDesc);
