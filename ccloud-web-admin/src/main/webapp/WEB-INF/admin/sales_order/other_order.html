@@ -60,7 +60,7 @@
 
 	var initParams = function(params) {
 
-		var keyword = $('#post-search-input').val();
+		var keyword = $('#search').val();
 		var platformName = $("#sellerId").val();
 		if (keyword) keyword = encodeURIComponent(keyword);
 		if (platformName) platformName = encodeURIComponent(platformName);
@@ -91,8 +91,16 @@
 				{field: "customer_name", title: "客户名称", align: "center", width: '12%', edit:false,sortable: true},
 				{field: "seller_name", title: "销售商名称", align: "center", width: '12%', edit:false,sortable: true},
 				{field: "send_user_name", title: "发货人", align: "center", width: '8%', edit:false,sortable: true},
-				{field: "total_amount", title: "订单总额", align: "center", width: '5%', edit:false,sortable: true},
-				{field: "pay_amount", title: "实付总额", align: "center", width: '5%', edit:false,sortable: true},
+				{field: "total_amount", title: "订单总额", align: "center", width: '5%', edit:false,sortable: true,
+				    formatter: function(value, row, rowIndex) {
+				        return formatNumber(value);
+				    }
+				},
+				{field: "pay_amount", title: "实付总额", align: "center", width: '5%', edit:false,sortable: true,
+				    formatter: function(value, row, rowIndex) {
+                        return formatNumber(value);
+                    }
+				},
 				{field: "receive_type", title: "付款方式", align: "center", width: '5%',
 					formatter: function(value, row, rowIndex) {
 						if (value == 0) {
@@ -146,7 +154,7 @@
 	};
 	
 	function countInfo() {
-		var keyword = $('#post-search-input').val();
+		var keyword = $('#search').val();
 		var platformName = $("#sellerId").val();
 		if (keyword) keyword = encodeURIComponent(keyword);
 		if (platformName) platformName = encodeURIComponent(platformName);
@@ -183,7 +191,7 @@
 	}
     
     function batchDown(){
-  		var keyword = $('#post-search-input').val();
+  		var keyword = $('#search').val();
     	jQuery.mm.down("${CPATH}/admin/salesOutstock/downloading?startDate=" + $('#startDate').val() + " 00:00:00" + "&endDate=" + $('#endDate').val() + " 23:59:59" + "&printStatus=" + $("#printStatus").val() + "&stockOutStatus="+$("#stockOutStatus").val() + "&k="+keyword);
     }
     
@@ -211,7 +219,7 @@
 		    <form class="form-horizontal" id="form">
 				<div class="form-group">
 				    <div class="col-sm-4">
-						<label class="control-label col-sm-4">开始时间:</label>
+						<label class="control-label col-sm-4">开始日期:</label>
 						<div class="col-sm-8 input-group input-group-sm">
 							<input id="startDate" class="form-control" value="${startDate!}" name="startDate" placeholder="开始日期" >
 							<div class="input-group-addon">
@@ -220,7 +228,7 @@
 						</div>
 					</div>
 					<div class="col-sm-4">
-					    <label class="control-label col-sm-4">结束时间:</label>
+					    <label class="control-label col-sm-4">结束日期:</label>
 	                    <div class="col-sm-8 input-group input-group-sm">
 	                        <input id="endDate" class="form-control" value="${endDate!}" name="endDate" placeholder="结束日期" >
 	                        <div class="input-group-addon">
@@ -231,7 +239,7 @@
 					<div class="col-sm-4">
                         <label class="control-label col-sm-4">单号/客户:</label>
                         <div class="col-sm-8 input-group input-group-sm">
-                            <input id="post-search-input" class="form-control" type="search" value="${k!}" name="k" placeholder="订单单号/客户名称">
+                            <input id="search" class="form-control" type="search" value="${k!}" name="k" placeholder="订单单号/客户名称">
                         </div>
                     </div>
 				</div>
