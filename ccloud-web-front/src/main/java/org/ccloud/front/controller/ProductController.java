@@ -253,9 +253,9 @@ public class ProductController extends BaseFrontController {
 	public void customerNearbyChose() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		Double dist = 100d;
-		String lon = getPara("lon");
+		String lon = getPara("lng");
 		String lat = getPara("lat");
-		//String lngAndLat = getPara("lngAndLat");
+
 		if(StrKit.isBlank(lon) || StrKit.isBlank(lat)) {
 			List<Dict> areaCoverageList = DictQuery.me().findDictByType("area_coverage");
 			List<Map<String, Object>> areaCoverage = new ArrayList<>();

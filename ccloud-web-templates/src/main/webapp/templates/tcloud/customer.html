@@ -174,7 +174,7 @@
     var paramData2 = function() {
         return  {
             "searchArea": $("#getDate").find(".red-button").data("id"),
-            "lon": $('#lon').val(),
+            "lng": $('#lng').val(),
             "lat": $('#lat').val()
         }
     }
@@ -245,7 +245,7 @@
 
                 var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
                 var geoc = new BMap.Geocoder();                   // 获取百度地址解析器
-                $("#lon").val(parseFloat(longitude).toFixed(6));
+                $("#lng").val(parseFloat(longitude).toFixed(6));
                 $("#lat").val(parseFloat(latitude).toFixed(6));
             },
             cancel: function (res) {
@@ -298,7 +298,7 @@
                     <input type="text" id="if-order" placeholder="是否下单" class="weui-input" readonly>
                     <i class="icon-sort-desc"></i>
                 </div>
-                    <input type="hidden" name="lon" id="lon">
+                    <input type="hidden" name="lng" id="lng">
                     <input type="hidden" name="lat" id="lat">
                 </div>
             </div>
