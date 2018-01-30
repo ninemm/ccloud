@@ -994,7 +994,7 @@ public class CustomerController extends BaseFrontController {
 
 			updated = sellerCustomer.save();
 
-			List<String> customerTypeList =  CustomerJoinCustomerTypeQuery.me().findCustomerTypeIdListBySellerCustomerId(sellerCustomerId, getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
+			List<String> customerTypeList =  CustomerJoinCustomerTypeQuery.me().findCustomerTypeIdListBySellerCustomerId(sellerCustomerId, null);
 
 			sellerCustomerId = sellerCustomer.getId();
 
