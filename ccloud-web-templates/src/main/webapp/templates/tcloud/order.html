@@ -1,4 +1,7 @@
 <#include "_inc/_layout.html"/>
+<#macro script_import>
+	<script src="${CPATH}/static/ccloud/admin/js/common.js"></script>
+</#macro>
 <#macro title>提交订单</#macro>
 <#macro css> 
 	#bigNum,
@@ -326,7 +329,7 @@ $(function() {
 		}
 		$("#total").val(total);
 		$("#totalNum").val(totalNum);
-		$("#totalNumSpan").text("共" + (products.length + compositions.length) + "款,合计:" + total + "元")
+		$("#totalNumSpan").text("共" + (products.length + compositions.length) + "款,合计:" + formatNumber(total) + "元")
 	} 
 
 	var flg = true;

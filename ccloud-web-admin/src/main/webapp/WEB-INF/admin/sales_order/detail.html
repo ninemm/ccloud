@@ -2,6 +2,7 @@
 
 <#macro script_import>
 	<script type="text/javascript" src="${CPATH}/static/plugins/bootstrap-treeview/js/bootstrap-treeview.js"></script>
+	<script src="${CPATH}/static/ccloud/admin/js/common.js"></script>
 	<!-- <script src="${CPATH}/static/plugins/toastr/toastr.js"></script> -->
 </#macro> 
 
@@ -12,6 +13,8 @@
 
 <#macro script>
 	$(document).ready(function() {
+	
+		$("#total_amount").text("￥"+formatNumber(${(order.total_amount)!}));
 	});
 
 </#macro>
@@ -74,7 +77,7 @@
 			<tfoot>
 				<tr>
 					<th colspan="5" style="text-align:right">合计:</th>
-					<th>￥ ${(order.total_amount)!}</th>
+					<th id = "total_amount"></th>
 				</tr>
 			</tfoot>
 		</table>

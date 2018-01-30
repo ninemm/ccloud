@@ -1,4 +1,7 @@
 <#include "_inc/_layout.html"/>
+<#macro script_import>
+	<script src="${CPATH}/static/ccloud/admin/js/common.js"></script>
+</#macro>
 <#macro title>我的订单</#macro>
 <#macro css>
 	#orderSn {
@@ -214,7 +217,7 @@
 						$newOrder.find("#pass").remove();
 					}
 
-					$newOrder.find("#amount").text(el.total_amount);
+					$newOrder.find("#amount").text(formatNumber(el.total_amount));
 					$newOrder.find("#date").text('时间：' + el.create_date);
 					$noMore.hide();
 				});

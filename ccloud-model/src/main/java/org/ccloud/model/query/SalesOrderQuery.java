@@ -471,7 +471,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	public Page<SalesOrder> findByCustomerType(int pageNumber, int pageSize, String startDate, String endDate,
 			String keyword, String userId, boolean ifGift) {
 		String product_count="sd.product_count";
-		if (keyword.equals("sok.create_date")) {
+		if (keyword.equals("sok.biz_date")) {
 			product_count="sd.out_count";
 		}
 		String select = "SELECT ct.`name`,sp.custom_name,TRUNCATE(((IFNULL(sum("+product_count+"),0)-IFNULL(sum(srid.reject_product_count),0)) / p.convert_relate),2) productCountTotal ";
@@ -493,7 +493,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		}else {
 			fromBuilder.append(" and sd.is_gift=0 ");
 		}
-		if (keyword.equals("sok.create_date")) {
+		if (keyword.equals("sok.biz_date")) {
 			fromBuilder.append(" AND sd.out_count != 0");
 		}
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -516,7 +516,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	public Page<SalesOrder> findByProduct(int pageNumber, int pageSize, String startDate, String endDate,
 			String keyword, String userId, boolean ifGift) {
 		String product_count="sd.product_count";
-		if (keyword.equals("sok.create_date")) {
+		if (keyword.equals("sok.biz_date")) {
 			product_count="sd.out_count";
 		}	
 		String select = "SELECT sp.custom_name,TRUNCATE(((IFNULL(sum("+product_count+"),0)-IFNULL(sum(srid.reject_product_count),0))/ p.convert_relate),2) productCountTotal";
@@ -536,7 +536,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		}else {
 			fromBuilder.append(" and sd.is_gift=0 ");
 		}
-		if (keyword.equals("sok.create_date")) {
+		if (keyword.equals("sok.biz_date")) {
 			fromBuilder.append(" AND sd.out_count != 0");
 		}
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -559,7 +559,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	public Page<SalesOrder> findByDepartmentProduct(int pageNumber, int pageSize, String startDate, String endDate,
 			String keyword, String dataArea, boolean ifGift) {
 		String product_count="sd.product_count";
-		if (keyword.equals("sok.create_date")) {
+		if (keyword.equals("sok.biz_date")) {
 			product_count="sd.out_count";
 		}
 		String select = "SELECT sp.custom_name,TRUNCATE(((IFNULL(sum("+product_count+"),0)-IFNULL(sum(srid.reject_product_count),0)) / p.convert_relate),2) productCountTotal";
@@ -578,7 +578,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		}else {
 			fromBuilder.append(" and sd.is_gift=0 ");
 		}
-		if (keyword.equals("sok.create_date")) {
+		if (keyword.equals("sok.biz_date")) {
 			fromBuilder.append(" AND sd.out_count != 0");
 		}
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -603,7 +603,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	public Page<SalesOrder> findByDepartSalesman(int pageNumber, int pageSize, String startDate, String endDate,
 			String keyword, String dataArea, boolean ifGift) {
 		String product_count="sd.product_count";
-		if (keyword.equals("sok.create_date")) {
+		if (keyword.equals("sok.biz_date")) {
 			product_count="sd.out_count";
 		}
 		String select = "SELECT u.realname ,TRUNCATE(((IFNULL(sum("+product_count+"),0)-IFNULL(sum(srid.reject_product_count),0)) / p.convert_relate),2) productCountTotal , sp.custom_name ";
@@ -623,7 +623,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		}else {
 			fromBuilder.append(" and sd.is_gift=0 ");
 		}
-		if (keyword.equals("sok.create_date")) {
+		if (keyword.equals("sok.biz_date")) {
 			fromBuilder.append(" AND sd.out_count != 0");
 		}
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -649,7 +649,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	public Page<SalesOrder> findByManageSeller(int pageNumber, int pageSize, String startDate, String endDate,
 			String keyword, String dataArea, boolean ifGift) {
 		String product_count="sd.product_count";
-		if (keyword.equals("sok.create_date")) {
+		if (keyword.equals("sok.biz_date")) {
 			product_count="sd.out_count";
 		}
 		String select = "SELECT sp.custom_name,s.seller_name,TRUNCATE(((IFNULL(sum("+product_count+"),0)-IFNULL(sum(srid.reject_product_count),0)) / p.convert_relate),2) productCountTotal ";
@@ -671,7 +671,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		}else {
 			fromBuilder.append(" and sd.is_gift=0 ");
 		}
-		if (keyword.equals("sok.create_date")) {
+		if (keyword.equals("sok.biz_date")) {
 			fromBuilder.append(" AND sd.out_count != 0");
 		}
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -696,7 +696,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	public Page<SalesOrder> findBypurSeller(int pageNumber, int pageSize, String startDate, String endDate,
 			String keyword, String dataArea, boolean ifGift) {
 		String product_count="sd.product_count";
-		if (keyword.equals("sok.create_date")) {
+		if (keyword.equals("sok.biz_date")) {
 			product_count="sd.out_count";
 		}
 		String select = "SELECT sp.custom_name spname,c.customer_name cname,TRUNCATE(((IFNULL(sum("+product_count+"),0)-IFNULL(sum(srid.reject_product_count),0)) / p.convert_relate),2) productCountTotal ";
@@ -719,7 +719,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		}else {
 			fromBuilder.append(" and sd.is_gift=0 ");
 		}
-		if (keyword.equals("sok.create_date")) {
+		if (keyword.equals("sok.biz_date")) {
 			fromBuilder.append(" AND sd.out_count != 0");
 		}
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -744,7 +744,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	public List<Record> findByMSellerDetail( String startDate, String endDate,
 			String keyword, String dataArea, String sellerId, boolean ifGift) {
 		String product_count="sd.product_count";
-		if (keyword.equals("sok.create_date")) {
+		if (keyword.equals("sok.biz_date")) {
 			product_count="sd.out_count";
 		}
 		List<Record> records = SellerProductQuery.me().findConvertRelate(sellerId);
@@ -774,7 +774,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" AND so.data_area like '"+ dataArea+"' ");
 		fromBuilder.append(" AND "+ keyword+" >= '"+startDate+"'");
 		fromBuilder.append(" AND "+ keyword+" <= '"+endDate+"'");
-		if (keyword.equals("sok.create_date")) {
+		if (keyword.equals("sok.biz_date")) {
 			fromBuilder.append(" AND sd.out_count != 0");
 		}
 		fromBuilder.append(" GROUP BY s.id");
@@ -785,7 +785,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	public List<Record> findByMSalesmanDetail(String startDate, String endDate,
 			String keyword, String dataArea, String sellerId, boolean ifGift) {
 		String product_count="sd.product_count";
-		if (keyword.equals("sok.create_date")) {
+		if (keyword.equals("sok.biz_date")) {
 			product_count="sd.out_count";
 		}
 		List<Record> records = SellerProductQuery.me().findConvertRelate(sellerId);
@@ -814,7 +814,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" AND so.data_area like '"+ dataArea+"' ");
 		fromBuilder.append(" AND "+ keyword+" >= '"+startDate+"'");
 		fromBuilder.append(" AND "+ keyword+" <= '"+endDate+"'");
-		if (keyword.equals("sok.create_date")) {
+		if (keyword.equals("sok.biz_date")) {
 			fromBuilder.append(" AND sd.out_count != 0");
 		}
 		fromBuilder.append(" GROUP BY u.id");
@@ -825,7 +825,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	public List<Record> findByCustomerDetail(String startDate, String endDate, String keyword, String userId,
 			String sellerId, boolean ifGift) {
 		String product_count="sd.product_count";
-		if (keyword.equals("sok.create_date")) {
+		if (keyword.equals("sok.biz_date")) {
 			product_count="sd.out_count";
 		}
 		List<Record> records = SellerProductQuery.me().findConvertRelate(sellerId);
@@ -855,7 +855,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		}
 		fromBuilder.append(" AND "+ keyword+" >= '"+startDate+"'");
 		fromBuilder.append(" AND "+ keyword+" <= '"+endDate+"'");
-		if (keyword.equals("sok.create_date")) {
+		if (keyword.equals("sok.biz_date")) {
 			fromBuilder.append(" AND sd.out_count != 0");
 		}
 		fromBuilder.append(" GROUP BY sc.id");

@@ -84,7 +84,7 @@ function group(id) {
 							<td>
 								<a href="${CPATH}/admin/productComposition/edit?id=${bean.parent_id}&c=${c!}&p=${p!}">${bean.name!}</a>
 							</td>
-							<td>${bean.price!}</td>
+							<td>${bean.price?string(',###.00')}</td>
 							<td>${bean.valueName!}</td>
 							<td>${bean.store_count!}</td>
 							<td>${bean.type_count+1!}</td>

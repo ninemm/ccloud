@@ -69,7 +69,7 @@
 				<div class="weui-flex">
 					<div class="weui-flex__item flex-grow2">
 						<div class="fl">
-							￥${(orderDetail.product_price)!} <span class="gray">（${(orderDetail.price)!}）</span>
+							￥${(orderDetail.product_price)?string(',###.##')} <span class="gray">（${(orderDetail.price)?string(',###.##')}）</span>
 						</div>
 					</div>
 					<div class="weui-flex__item t-r">${(orderDetail.product_count
@@ -79,8 +79,8 @@
 					<div class="weui-flex__item flex-grow2">
 						<div class="fl">
 							￥${(orderDetail.product_price /
-							orderDetail.convert_relate)?string("0.##")} <span class="gray">（${(orderDetail.price
-								/ orderDetail.convert_relate)?string("0.##")}）</span>
+							orderDetail.convert_relate)?string(',###.##')} <span class="gray">（${(orderDetail.price
+								/ orderDetail.convert_relate)?string(',###.##')}）</span>
 						</div>
 					</div>
 					<div class="weui-flex__item t-r">${(orderDetail.product_count
@@ -106,7 +106,7 @@
 			</#if> </#if> </#list>
 			<hr>
 			<div class="t-r ft14">
-				总计： <span class="red">${(order.total_amount)?string("0.00")}元</span>
+				总计： <span class="red">${(order.total_amount)?string(',###.##')}元</span>
 			</div>
 		</div>
 		<div class="weui-panel weui-panel_access">

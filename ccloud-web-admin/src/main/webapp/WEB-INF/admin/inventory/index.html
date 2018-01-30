@@ -85,13 +85,33 @@
 			{field: "product_name", title: "商品名称", align: "center", edit:false,class:'customName'},
 			{field: "valueName", title: "商品规格", align: "center", edit:false,class:'customName'},
 			{field: "in_count", title: "入库数量", align: "center", edit:false},
-			{field: "in_amount", title: "入库金额", align: "center", edit:false},
-			{field: "in_price", title: "入库单价", align: "center", edit:false},
+			{field: "in_amount", title: "入库金额", align: "center",
+				formatter: function(value,row,rowIndex){
+						return formatNumber(value);
+					},
+			 edit:false},
+			{field: "in_price", title: "入库单价", align: "center", 
+				formatter: function(value,row,rowIndex){
+						return formatNumber(value);
+					},
+			edit:false},
 			{field: "out_count", title: "出库数量", align: "center", edit:false},
-			{field: "out_amount", title: "出库金额", align: "center", edit:false},
-			{field: "out_price", title: "出库单价", align: "center", edit:false},
+			{field: "out_amount", title: "出库金额", align: "center", 
+				formatter: function(value,row,rowIndex){
+						return formatNumber(value);
+					},
+			edit:false},
+			{field: "out_price", title: "出库单价", align: "center", 
+				formatter: function(value,row,rowIndex){
+						return formatNumber(value);
+					},
+			edit:false},
 			{field: "balance_count", title: "剩余数量", align: "center", edit:false},
-			{field: "balance_amount", title: "剩余金额", align: "center", edit:false},
+			{field: "balance_amount", title: "剩余金额", align: "center",
+				formatter: function(value,row,rowIndex){
+						return formatNumber(value);
+					},
+			 edit:false},
 			{field: "modify_date", title: "更新时间", align: "center", edit:false,class:'dateTime'},
 			{field: "action", title: "明细账", align: "center",
 			 formatter: function(value, row, rowIndex){
@@ -136,7 +156,7 @@
 		<form class="form-horizontal" style="float: right" action="${CPATH}/admin/inventory?c=${c!}&p=${p!}" method="post">
 			<div class="input-group input-group-sm">
 				<input id="post-search-input" class="form-control" type="search" value="${product_sn!}" name="product_sn" placeholder="商品编码">&nbsp;
-				<input id="post-search-input" class="form-control" type="search" value="${product_name!}" name="product_name" placeholder="商品名称">&nbsp;
+				<input id="post-search-input" class="form-control" type="search" value="${product_name!}" name="product_name" placeholder="商品名称" style="margin-left:10px;">&nbsp;
 				<input id="search-submit" class="btn btn-sm btn-primary btn-flat" type="button" value="搜索">
 			</div>
 		</form>

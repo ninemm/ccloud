@@ -247,14 +247,6 @@ function saveGroup() {
 <!-- Main content -->
 <section class="content">
 	<div class="row content-row">
-		<form class="form-horizontal" style="float: right" action="${CPATH}/admin/user?c=${c!}&p=${p!}" method="post">
-			<div class="input-group input-group-sm">
-				<input id="post-search-input" class="form-control" type="search" value="${k!}" name="k" placeholder="搜索名称">&nbsp; 
-				<input id="search-submit" class="btn btn-sm btn-primary btn-flat" type="submit" value="搜索">
-			</div>
-		</form>
-	</div>
-	<div class="row content-row">
 		<div class="jp-left">
 		<@shiro.hasPermission name="/admin/user/edit,/admin/all">
 			<a href="${CPATH}/admin/user/edit?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-plus"></i> 新增 </a>
@@ -265,8 +257,13 @@ function saveGroup() {
 			<a href="${CPATH}/admin/user/upload?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-upload"></i> 导入</a>
 			<button onclick="batchDown()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-download"></i> 导出</button>
 		</div>
+		<form class="form-horizontal" style="float: right" action="${CPATH}/admin/user?c=${c!}&p=${p!}" method="post">
+			<div class="input-group input-group-sm">
+				<input id="post-search-input" class="form-control" type="search" value="${k!}" name="k" placeholder="搜索名称">&nbsp; 
+				<input id="search-submit" class="btn btn-sm btn-primary btn-flat" type="submit" value="搜索">
+			</div>
+		</form>
 	</div>
-	
 	<div class="box ">
 		<!-- /.box-header -->
 		<div class="box-body jp-common-pad">

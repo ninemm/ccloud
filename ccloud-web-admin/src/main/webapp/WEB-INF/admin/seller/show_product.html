@@ -86,7 +86,7 @@
       			edit:false},
       			{field: "bigPrice", title: "销售价格(整)", align: "center", width: '7%',
       				formatter: function(value, row, rowIndex) {
-					var strHtml = '￥<input type="text" size="9" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="bigPrice" value="'+row.price.toFixed(2)+'" onblur="changeMoney(this)"/>';
+					var strHtml = '￥<input type="text" size="9" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="bigPrice" value="'+formatNumber(row.price)+'" onblur="changeMoney(this)"/>';
 					strHtml += '/<input type="text" size="1" readonly style="text-align:center;background-color:transparent;border:0px;" name="big_unit" value="'+row.big_unit+'"/>';
 					return strHtml;
 				},
@@ -94,14 +94,14 @@
       			 {field: "convert_relate", title: "换算", align: "center", width: '2%',edit:false},
       			 {field: "samllPrice", title: "销售价格(零)", align: "center", width: '7%',
       				formatter: function(value, row, rowIndex) {
-					var strHtml = '￥<input type="text" size="9" readonly style="text-align:center;background-color:transparent;border:0px;" name="smallPrice" value="'+(row.price/row.convert_relate).toFixed(2)+'"/>';
+					var strHtml = '￥<input type="text" size="9" readonly style="text-align:center;background-color:transparent;border:0px;" name="smallPrice" value="'+formatNumber(row.price/row.convert_relate)+'"/>';
 					strHtml += '/<input type="text" size="1" readonly style="text-align:center;background-color:transparent;border:0px;" name="samll_unit" value="'+row.small_unit+'"/>';
 					return strHtml;
 				},
       			 edit:false},
       			 {field: "cost", title: "成本(整)", align: "center", width: '7%',
       				formatter: function(value, row, rowIndex) {
-					var strHtml = '￥<input type="text" size="9" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="cost" value="'+row.cost.toFixed(2)+'"/>';
+					var strHtml = '￥<input type="text" size="9" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="cost" value="'+formatNumber(row.cost)+'"/>';
 					return strHtml;
 				},
       			 edit:false},
@@ -114,7 +114,7 @@
 				},
 				{field: "", title: "账期价格(整)", align: "center", width: '7%',
       				formatter: function(value, row, rowIndex) {
-					var strHtml = '￥<input type="text" size="9" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="accountPrice" value="'+row.account_price.toFixed(2)+'" onblur="changeAccountPrice(this)"/>';
+					var strHtml = '￥<input type="text" size="9" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="accountPrice" value="'+formatNumber(row.account_price)+'" onblur="changeAccountPrice(this)"/>';
 					return strHtml;
 				},
       			 edit:false},
@@ -441,20 +441,18 @@
 <!-- Main content -->
 <section class="content">
 	<div class="row content-row">
-		<form class="form-horizontal" style="float: right" action="${CPATH}/admin/seller/showProduct?c=${c!}&p=${p!}" method="post">
-			<div class="input-group input-group-sm">
-				<input id="post-search-input" class="form-control" type="search" value="${k!}" name="k" placeholder="搜索名称">&nbsp; 
-				<input id="search-submit" class="btn btn-sm btn-primary btn-flat" type="button" value="搜索">
-			</div>
-		</form>
-	</div>
-	<div class="row content-row">
 		<div class="jp-left">
 			<a onclick="getA()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-plus"></i> 新增 </a>
 			<a onclick="upIsenable()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-check-square-o"></i>批量上架 </a>
 			<a onclick="downIsenable()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-check-square-o"></i>批量下架 </a>
 			<a onclick="saveAll()" class="btn btn-sm bg-olive btn-flat ladda-button" data-style="expand-right"><i class="fa fa-check-square-o"></i>保存 </a>
  		</div>
+		<form class="form-horizontal" style="float: right" action="${CPATH}/admin/seller/showProduct?c=${c!}&p=${p!}" method="post">
+			<div class="input-group input-group-sm">
+				<input id="post-search-input" class="form-control" type="search" value="${k!}" name="k" placeholder="搜索名称">&nbsp; 
+				<input id="search-submit" class="btn btn-sm btn-primary btn-flat" type="button" value="搜索">
+			</div>
+		</form>
 	</div>
 	<div class="box">
 		<table class="table table-striped table-hover table-condensed" id="_seller_product_table" ></table>

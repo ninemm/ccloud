@@ -279,14 +279,14 @@
 		                <div class="p-l-15">
 		                  <div class="weui-flex__item">
 		                    <div class="fl">
-		                      <input type="hidden" name="smallPriceSpan" id="smallPriceSpan" value="${(orderDetail.product_price / orderDetail.convert_relate)?string('0.##')}">
+		                      <input type="hidden" name="smallPriceSpan" id="smallPriceSpan" value="${(orderDetail.product_price / orderDetail.convert_relate)?string(',###.##')}">
 		                      <#if isEdit>
-		                        <input type="number" name="smallPrice" id="smallPrice" value="${(orderDetail.product_price / orderDetail.convert_relate)?string('0.##')}">
+		                        <input type="number" name="smallPrice" id="smallPrice" value="${(orderDetail.product_price / orderDetail.convert_relate)?string(',###.##')}">
 		                      <#else>
 		                        ${(orderDetail.product_price / orderDetail.convert_relate)?string('0.##')}
-		                        <input type="hidden" name="smallPrice" id="smallPrice" value="${(orderDetail.product_price / orderDetail.convert_relate)?string('0.##')}">
+		                        <input type="hidden" name="smallPrice" id="smallPrice" value="${(orderDetail.product_price / orderDetail.convert_relate)?string(',###.##')}">
 		                      </#if>
-		                      <span class="gray">（${(orderDetail.price / orderDetail.convert_relate)?string("0.##")}）</span>
+		                      <span class="gray">（${(orderDetail.price / orderDetail.convert_relate)?string(',###.##')}）</span>
 		                    </div>
 		                  </div>
 		                  <div class="weui-flex__item t-r relative">
@@ -342,8 +342,8 @@
 		                	${(orderDetail.big_unit)!}
 		                </div>
 		                <div class="t-r relative">
-		                	<input type="hidden" name="smallPriceSpan" id="smallPriceSpan" value="${(orderDetail.product_price / orderDetail.convert_relate)?string('0.##')}">
-		                	<input type="hidden" name="smallPrice" id="smallPrice" value="${(orderDetail.product_price / orderDetail.convert_relate)?string('0.##')}">
+		                	<input type="hidden" name="smallPriceSpan" id="smallPriceSpan" value="${(orderDetail.product_price / orderDetail.convert_relate)?string(',###.##')}">
+		                	<input type="hidden" name="smallPrice" id="smallPrice" value="${(orderDetail.product_price / orderDetail.convert_relate)?string(',###.##')}">
 		                	<input type="hidden" name="smallNumSpan" id="smallNumSpan" value="${(orderDetail.product_count % orderDetail.convert_relate)}">
 												<#if isEdit>
 													<div class="spinner">
@@ -368,7 +368,7 @@
 	        </#list>
 	        <hr>
 	        <div class="t-r ft14">
-	          总计：       <span class="red" id="totalSpan">${(order.total_amount)!}元</span>
+	          总计：       <span class="red" id="totalSpan">${(order.total_amount)?string(',###.##')}元</span>
 	        	<input type="hidden" name="totalNum" id="totalNum" value="${(order.total_count)!}">
 				<input type="hidden" name="total" id="total" value="${(order.total_amount)!}">
 	        </div>

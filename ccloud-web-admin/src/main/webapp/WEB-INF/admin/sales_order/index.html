@@ -80,7 +80,11 @@
 					edit: false
 				},
 				{field: "customer_name", title: "客户名称", align: "center", width: '12%', edit:false},
-				{field: "total_amount", title: "订单总额", align: "center", width: '5%', edit:false},
+				{field: "total_amount", title: "订单总额", align: "center", width: '5%',
+					formatter: function(value,row,rowIndex){
+						return formatNumber(value);
+					},
+				 edit:false},
 				{field: "receive_type", title: "付款方式", align: "center", width: '5%',
 					formatter: function(value, row, rowIndex) {
 						return value == 0 ? '应收账款' : '现金';

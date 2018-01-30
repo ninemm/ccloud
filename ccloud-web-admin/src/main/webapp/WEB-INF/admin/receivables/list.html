@@ -65,7 +65,11 @@
 	var initFields = function(){
 		var fields = [
 			{field: "biz_date", title: "收款日期", align: "center", edit:false},
-			{field: "act_amount", title: "收款金额", align: "center", edit:false},
+			{field: "act_amount", title: "收款金额", align: "center",
+				formatter: function(value,row,rowIndex){
+						return formatNumber(value);
+					},
+			 edit:false},
 			{field: "receive_user_name", title: "收款人", align: "center", edit:false},
 			{field: "create_date", title: "录入时间", align: "center", edit:false},
 			{field: "input_user_name",title: "录入人", align:"center",edit:false},
