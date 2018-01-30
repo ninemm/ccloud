@@ -26,6 +26,15 @@
         }).on('click', '#delivery-address', function() {
             $("#customer_type").select('close');
         }).on('click', '#import', function() {
+            if($("#customer_name").val().length==0) {$.toptip('客户名称不能为空', 1000, 'error'); return false;}
+            if($("#contact").val().length==0) {$.toptip('联系人不能为空', 1000, 'error'); return false;}
+            if($("#mobile").val().length==0) {$.toptip('联系电话不能为空', 1000, 'error'); return false;}
+            if(/^1[34578]\d{9}$/.test($("#mobile").val())==false){$.toptip('联系电话不正确', 1000, 'error'); return false;}
+
+            if($("#customer_type").val().length==0) {$.toptip('客户类型不能为空', 1000, 'error'); return false;}
+            if($("#delivery-address").val().length==0) {$.toptip('配送地址不能为空', 1000, 'error'); return false;}
+            if($("#address").val().length==0) {$.toptip('地址详情不能为空', 1000, 'error'); return false;}
+            if($("#location").val().length==0) {$.toptip('定位地址不能为空,请刷新定位', 1000, 'error'); return false;}
             $.confirm("您确定要导入吗？","新增客户", function() {
                 doReceive();
             });
@@ -75,6 +84,7 @@
                 $('#areaName').val(areaName);
             }
         });
+        </#if>
         $("#customer_type").select({
              title: "选择客户类型",
              multi: true,
@@ -84,7 +94,6 @@
                  $('#customerTypeIds').val(custTypeIds);
              }
          });
-        </#if>
 
         $("#uploaderInput").on("change",function () {
 
@@ -472,8 +481,8 @@
 			                    客户类型
 			                    <span class="require">*</span>
 			                </div>
-			                <input type="hidden" name="customerTypeIds" id="customerTypeIds" value="${(sellerCustomer.cTypeList)!}">
-			                <input type="text" id="customer_type" name="customer_type" data-values="${(sellerCustomer.cTypeList)!}" value="${(sellerCustomer.cTypeName)!}" placeholder="请选择" class="weui-input" <#if type??> readonly</#if>>
+                            <input type="hidden" name="customerTypeIds" id="customerTypeIds" <#if !type??>value="${(sellerCustomer.cTypeList)!}"</#if>>
+			                <input type="text" id="customer_type" name="customer_type" <#if !type??>data-values="${(sellerCustomer.cTypeList)!}" value="${(sellerCustomer.cTypeName)!}"</#if> placeholder="请选择" class="weui-input">
 			            </div>
 			            <span class="weui-cell__ft"></span>
 			        </div>

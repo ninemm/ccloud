@@ -994,11 +994,16 @@ public class CustomerController extends BaseFrontController {
 
 			updated = sellerCustomer.save();
 
-			List<String> customerTypeList =  CustomerJoinCustomerTypeQuery.me().findCustomerTypeIdListBySellerCustomerId(sellerCustomerId, null);
-
 			sellerCustomerId = sellerCustomer.getId();
 
-			for(String customerTypeId : customerTypeList) {
+			String customerTypeIds = getPara("customerTypeIds", "");
+
+			List<String> custTypeList = Splitter.on(",")
+					.trimResults()
+					.omitEmptyStrings()
+					.splitToList(customerTypeIds);
+
+			for(String customerTypeId : custTypeList) {
 				CustomerJoinCustomerType customerJoinCustomerType = new CustomerJoinCustomerType();
 				customerJoinCustomerType.setSellerCustomerId(sellerCustomerId);
 				customerJoinCustomerType.setCustomerTypeId(customerTypeId);
