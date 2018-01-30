@@ -27,6 +27,19 @@
 
 <#macro script>
     $(function() {
+		$("#city-picker").cityPicker({
+			title: "请选择物理区域",
+			onClose: function(obj) {
+				var areaName = obj.displayValue.join(",");
+				$('#areaName').val(areaName);
+				$.ajax({     
+					type: "POST",     
+					url: "${CPATH}/user/alterUser",
+					data: {areaName:areaName},      
+					contentType:'application/x-www-form-urlencoded; charset=UTF-8',
+				});
+			}
+		});
         var $iosActionsheet = $('#weui-actionsheet');
         var $iosMask = $('#iosMask');
 
@@ -52,9 +65,6 @@
                 $androidActionSheet.fadeOut(200);
             });
 		});
-		$("#city-picker").cityPicker({
-			title: "请选择收货地址"
-		  });
     });
     
     var callback = function(x) {
