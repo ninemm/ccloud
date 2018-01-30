@@ -2,13 +2,14 @@
 <#macro title>第三方销售报表</#macro>
 <#macro css>
     .report {
-        font-size: 0.7rem;
+			font-size: 0.7rem;
 	    position: absolute;
 	    top: 0;
 	    width: 100%;
-	    bottom: 50px;
+	    margin-bottom: 50px;
 	    overflow: auto;
-        -webkit-overflow-scrolling: touch;
+			-webkit-overflow-scrolling: touch;
+			background: #f7f7f7;
     }
     
     .report .weui-panel__hd:after {
@@ -17,7 +18,11 @@
     }
     p { 
     	margin:0
-    }
+		}
+		
+		.weui-tabbar {
+			position: fixed;
+		}
 </#macro>
 
 <#macro css_import>
@@ -62,7 +67,7 @@
 	            var length = data.length;
 	            var $tbody = $("#product_body tbody");
 	            $tbody.empty();
-	            $tbody.append("<tr><th width='60%' style='text-align:center'>产品</th><th width='20%'>数量(件)</th><th width='20%'>金额(元)</th></tr>");
+	            $tbody.append("<tr><th width='60%' style='text-align:center'>产品</th><th width='20%' style='padding: 8px 0;text-align:center'>数量(件)</th><th width='20%' style='padding: 8px 0;text-align:center'>金额(元)</th></tr>");
 	            for(var i = 0; i < length; i++){
 	                $tbody.append("<tr><td>" + data[i].name + "</td><td class='t-r'>" + data[i].productCount + "</td><td class='t-r'>" + formatNumber(data[i].totalAmount) + "</td></tr>");
 	            }	            
@@ -159,7 +164,6 @@
  	
 </#macro>
 <@layout>
-	<div class="weui-content">
 	<div class="report">
 		<div class="weui-panel weui-panel_access report-header">
 			<div class="weui-panel__hd">
@@ -212,5 +216,4 @@
 		</div>
 		</div>
 		<#include "_inc/_footer_nav.html" />
-	</div>
 </@layout>
