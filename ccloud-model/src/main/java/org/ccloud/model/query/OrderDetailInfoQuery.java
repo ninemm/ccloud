@@ -19,7 +19,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.ccloud.model.OrderDetailInfo;
+import org.ccloud.utils.DateUtils;
 
+import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
@@ -76,6 +78,38 @@ public class OrderDetailInfoQuery extends JBaseQuery {
 		fromBuilder.append("LEFT JOIN cc_product_info cc ON o.sell_product_id = cc.id ");
 		fromBuilder.append("WHERE o.order_id = ? ");
 		return Db.find(fromBuilder.toString(), orderId);
+	}
+
+	public List<Record> getOtherProductCount(String startDate, String endDate, String sellerId, String dayTag) {
+		if (dayTag != null) {
+			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
+			startDate = date[0];
+			endDate = date[1];
+		}
+		StringBuilder fromBuilder = new StringBuilder("SELECT cp.`name` ,IFNULL(SUM(o.product_count),0) as productCount, IFNULL(SUM(o.product_amount),0) as totalAmount ,COUNT(*) as orderCount ");
+		fromBuilder.append("FROM cc_order_detail_info o LEFT JOIN cc_product_info cp on cp.id = o.sell_product_id ");
+		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
+		
+		if (needWhere) {
+			fromBuilder.append("WHERE 1 = 1 ");
+		}
+		
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and o.create_date >= ?");
+			params.add(startDate);
+		}
+
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and o.create_date <= ?");
+			params.add(endDate);
+		}
+		fromBuilder.append("GROUP BY o.sell_product_id ");
+		fromBuilder.append("ORDER BY totalAmount desc ");
+		if (params.isEmpty())
+			return Db.find(fromBuilder.toString());
+
+		return Db.find(fromBuilder.toString(), params.toArray());
 	}
 
 	

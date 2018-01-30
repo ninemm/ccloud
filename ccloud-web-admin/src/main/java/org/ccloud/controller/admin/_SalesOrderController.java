@@ -34,8 +34,6 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
-import org.ccloud.message.Actions;
-import org.ccloud.message.MessageKit;
 import org.ccloud.model.Activity;
 import org.ccloud.model.Message;
 import org.ccloud.model.SalesOrder;
@@ -118,7 +116,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		
 		String status = getPara("status");
 		String receiveType = getPara("receiveType");		
-		Record record = OrderInfoQuery.me().getCountInfo(keyword, startDate, endDate, platformName, status, receiveType);
+		Record record = OrderInfoQuery.me().getCountInfo(keyword, startDate, endDate, platformName, status, receiveType, null, null);
 		renderJson(record);
 	}
 	

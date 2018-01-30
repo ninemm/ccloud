@@ -17,6 +17,7 @@ package org.ccloud.model.query;
 
 import java.util.LinkedList;
 import org.ccloud.model.OrderInfo;
+import org.ccloud.utils.DateUtils;
 
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
@@ -109,12 +110,19 @@ public class OrderInfoQuery extends JBaseQuery {
 		return Db.findFirst(fromBuilder.toString(), orderId);
 	}
 
-	public Record getCountInfo(String keyword, String startDate, String endDate, String platformName, String status, String receiveType) {
-		StringBuilder fromBuilder = new StringBuilder("SELECT SUM(o.total_amount) as total_amount, SUM(o.pay_amount) as pay_amount, COUNT(*) as orderCount FROM cc_order_info o ");
+	public Record getCountInfo(String keyword, String startDate, String endDate, String platformName,
+			String status, String receiveType, String dayTag, String sellerId) {
+		if (dayTag != null) {
+			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
+			startDate = date[0];
+			endDate = date[1];
+		}
+		StringBuilder fromBuilder = new StringBuilder("SELECT IFNULL(SUM(o.total_amount),0) as total_amount, IFNULL(SUM(o.pay_amount),0) as pay_amount, COUNT(*) as orderCount FROM cc_order_info o ");
 		fromBuilder.append("LEFT JOIN cc_customer_info cc ON cc.id = o.customer_info_id ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 		
+		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "o.status", status, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "o.receive_type", receiveType, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "o.platform_name", platformName, params, needWhere);

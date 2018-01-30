@@ -73,6 +73,10 @@ public class ReportController extends BaseFrontController {
 		render("department_report.html");
 	}
 	
+	public void otherOrder() {
+		render("other_order_report.html");
+	}
+	
 	public void sales() {
 		setAttr("deliveryDate", DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
 		render("report_sales.html");
@@ -86,7 +90,7 @@ public class ReportController extends BaseFrontController {
 		} else {
 			orderAmount();
 		}
-	}	
+	}
 
 	//业务员订单总额统计(订单或打印)
 	public void orderAmount() {
@@ -510,6 +514,26 @@ public class ReportController extends BaseFrontController {
 		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 		String orderTag = getPara("orderTag");
 		List<Record> record = SalesOrderQuery.me().getDepartmentCount(startDate, endDate, dayTag, sellerId, dataArea, orderTag);
+		renderJson(record);		
+	}
+	
+	//第三方订单金额统计
+	public void getOtherOrderCount() {
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String dayTag = getPara("dayTag");
+//		String sellerId = getSessionAttr("sellerId");
+		Record record = OrderInfoQuery.me().getCountInfo(null, startDate, endDate, null, null, null, dayTag, null);
+		renderJson(record);
+	}
+	
+	//部门销售单统计
+	public void getOtherProductCount() {
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String dayTag = getPara("dayTag");
+		String sellerId = getSessionAttr("sellerId");
+		List<Record> record = OrderDetailInfoQuery.me().getOtherProductCount(startDate, endDate, sellerId, dayTag);
 		renderJson(record);		
 	}
 	
