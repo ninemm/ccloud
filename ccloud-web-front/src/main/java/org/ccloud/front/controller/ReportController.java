@@ -522,12 +522,12 @@ public class ReportController extends BaseFrontController {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		String dayTag = getPara("dayTag");
-//		String sellerId = getSessionAttr("sellerId");
-		Record record = OrderInfoQuery.me().getCountInfo(null, startDate, endDate, null, null, null, dayTag, null);
+		String sellerId = getSessionAttr("sellerId");
+		Record record = OrderInfoQuery.me().getCountInfo(null, startDate, endDate, null, null, null, dayTag, sellerId);
 		renderJson(record);
 	}
 	
-	//部门销售单统计
+	//第三方产品单统计
 	public void getOtherProductCount() {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");

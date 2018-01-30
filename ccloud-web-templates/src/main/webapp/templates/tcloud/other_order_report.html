@@ -62,7 +62,7 @@
 	            var length = data.length;
 	            var $tbody = $("#product_body tbody");
 	            $tbody.empty();
-	            $tbody.append("<tr><th>产品</th><th>数量(件)</th><th>金额(元)</th></tr>");
+	            $tbody.append("<tr><th width='60%' style='text-align:center'>产品</th><th width='20%'>数量(件)</th><th width='20%'>金额(元)</th></tr>");
 	            for(var i = 0; i < length; i++){
 	                $tbody.append("<tr><td>" + data[i].name + "</td><td class='t-r'>" + data[i].productCount + "</td><td class='t-r'>" + formatNumber(data[i].totalAmount) + "</td></tr>");
 	            }	            

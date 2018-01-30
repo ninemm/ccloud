@@ -46,7 +46,8 @@ public class OrderInfoQuery extends JBaseQuery {
 		});
 	}
 
-	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate, String order, String sort, String platformName, String status, String receiveType) {
+	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate, 
+			String order, String sort, String platformName, String status, String receiveType, String sellerId) {
 		String select = "SELECT o.order_sn, o.id, cc.customer_name, cs.seller_name, o.create_date, o.pay_date, o.delivery_date, o.receive_type, o.`status`, o.send_user_name, o.pay_amount,o.total_amount, o.platform_name ";
 		StringBuilder fromBuilder = new StringBuilder("from cc_order_info o ");
 		fromBuilder.append("LEFT JOIN cc_customer_info cc ON cc.id = o.customer_info_id ");
@@ -55,6 +56,7 @@ public class OrderInfoQuery extends JBaseQuery {
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 		
+		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "o.status", status, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "o.receive_type", receiveType, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "o.platform_name", platformName, params, needWhere);

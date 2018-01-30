@@ -116,8 +116,9 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		}
 		
 		String status = getPara("status");
-		String receiveType = getPara("receiveType");		
-		Record record = OrderInfoQuery.me().getCountInfo(keyword, startDate, endDate, platformName, status, receiveType, null, null);
+		String receiveType = getPara("receiveType");
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		Record record = OrderInfoQuery.me().getCountInfo(keyword, startDate, endDate, platformName, status, receiveType, null, sellerId);
 		renderJson(record);
 	}
 	
@@ -139,12 +140,13 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		
 		String status = getPara("status");
 		String receiveType = getPara("receiveType");
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		
 		// 获取排序相关信息
 		String sort = getPara("sortName[sort]");
 		String order = getPara("sortName[order]");
 		Page<Record> page = OrderInfoQuery.me().paginate(getPageNumber(), getPageSize(), keyword, 
-				startDate, endDate, order, sort, platformName, status, receiveType);
+				startDate, endDate, order, sort, platformName, status, receiveType, sellerId);
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);

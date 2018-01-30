@@ -88,8 +88,10 @@ public class OrderDetailInfoQuery extends JBaseQuery {
 		}
 		StringBuilder fromBuilder = new StringBuilder("SELECT cp.`name` ,IFNULL(SUM(o.product_count),0) as productCount, IFNULL(SUM(o.product_amount),0) as totalAmount ,COUNT(*) as orderCount ");
 		fromBuilder.append("FROM cc_order_detail_info o LEFT JOIN cc_product_info cp on cp.id = o.sell_product_id ");
+		fromBuilder.append("LEFT JOIN cc_order_info co on co.id = o.order_id ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
+		needWhere = appendIfNotEmpty(fromBuilder, "co.seller_id", sellerId, params, needWhere);
 		
 		if (needWhere) {
 			fromBuilder.append("WHERE 1 = 1 ");
