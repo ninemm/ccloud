@@ -140,24 +140,14 @@
 				</a>
 				</@shiro.hasPermission>
 				
-				<@shiro.hasPermission name="/admin/salesOrder">
+				<!-- <@shiro.hasPermission name="/admin/salesOrder">
 				<a href="${CPATH}/order/myOrder" class="weui-grid js_grid">
 					<div class="weui-grid__icon">
 						<i class="icon-file"></i>
 					</div>
 					<p class="weui-grid__label">我的订单</p>
 				</a>
-				</@shiro.hasPermission>	
-				
-				<@shiro.hasPermission name="/admin/customerVisit/add">
-                <a href="${CPATH}/customerVisit/edit" class="weui-grid js_grid">
-					<div class="weui-grid__icon">
-						<i class="icon-plane"></i>
-					</div>
-					<p class="weui-grid__label">新增拜访</p>
-				</a>
-				</@shiro.hasPermission>
-	
+				</@shiro.hasPermission>	 -->
 				<@shiro.hasPermission name="/admin/sellerCustomer/edit">
                 <a href="${CPATH}/customer/edit" class="weui-grid js_grid">
                     <!-- <span class="weui-badge left-top-tag">NEW</span> -->
@@ -167,6 +157,25 @@
 					<p class="weui-grid__label">新增客户</p>
 				</a>
 				</@shiro.hasPermission>
+				
+				<@shiro.hasPermission name="/admin/customerVisit/add">
+                <a href="${CPATH}/customerVisit/edit" class="weui-grid js_grid">
+					<div class="weui-grid__icon">
+						<i class="icon-plane"></i>
+					</div>
+					<p class="weui-grid__label">新增拜访</p>
+				</a>
+				</@shiro.hasPermission>
+				
+				<@shiro.hasPermission name="/admin/activityApply/add">
+				<a href="${CPATH}/activity" class="weui-grid js_grid">
+					<div class="weui-grid__icon">
+						<i class="icon-tasks"></i>
+					</div>
+					<p class="weui-grid__label">活动申请</p>
+				</a>
+				</@shiro.hasPermission>
+				
 			</div>
 		</div>
 		<div>

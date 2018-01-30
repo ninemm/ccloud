@@ -66,7 +66,12 @@ public class SalesOrderQuery extends JBaseQuery {
 
 	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate,
 			String sellerId, String dataArea, String activityId) {
-		String select = "select o.*, c.customer_name,c.contact as ccontact, c.mobile as cmobile,ct.`name` as customerTypeName,u.realname ";
+		String select = "";
+		if(StrKit.notBlank(activityId)) {
+			select = "select o.*, c.customer_name,t1.title, c.prov_name,c.city_name,c.country_name,c.address,c.contact as ccontact, c.mobile as cmobile,ct.`name` as customerTypeName,u.realname ";
+		}else {
+			select = "select o.*, c.customer_name, c.prov_name,c.city_name,c.country_name,c.address,c.contact as ccontact, c.mobile as cmobile,ct.`name` as customerTypeName,u.realname ";
+		}
 		StringBuilder fromBuilder = new StringBuilder("from `cc_sales_order` o ");
 		fromBuilder.append("left join cc_seller_customer cc ON o.customer_id = cc.id ");
 		fromBuilder.append("left join cc_customer c on cc.customer_id = c.id ");
@@ -74,7 +79,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append("LEFT JOIN user u on u.id = o.biz_user_id ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		if (StrKit.notBlank(activityId)) {
-			fromBuilder.append("LEFT JOIN (SELECT cs.order_id, pc.activity_id FROM cc_sales_order_detail cs ");
+			fromBuilder.append("LEFT JOIN (SELECT cs.order_id,ca.title, pc.activity_id FROM cc_sales_order_detail cs ");
 			fromBuilder.append("LEFT JOIN cc_product_composition pc ON cs.composite_id = pc.id ");
 			fromBuilder.append("LEFT JOIN cc_activity ca ON ca.id = pc.activity_id ");
 			fromBuilder.append("GROUP BY cs.order_id) t1 on t1.order_id = o.id ");
