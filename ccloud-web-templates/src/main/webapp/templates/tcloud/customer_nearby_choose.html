@@ -23,6 +23,7 @@
 <#macro script_import>
 	<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
 	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=Ec4VbDTTjjuEGtVGzSvPwwQtvnvWFeGY"></script>
+	<script type="text/javascript" src="${CTPATH}/js/convertor.js"></script>
 </#macro>
 <#macro script>
 
@@ -74,7 +75,7 @@
 	    var params = {
 		    "page": page,
 	        "size": size,
-	        "dist": $("#searchArea").data('values'),
+	        "nearby": $("#searchArea").data('values'),
 			"lng": $('#lng').val(),
 			"lat": $('#lat').val()
 	    }
