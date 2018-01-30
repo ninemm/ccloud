@@ -116,7 +116,6 @@ public class SellerCustomerQuery extends JBaseQuery {
 	public Page<Record> paginateForApp(int pageNumber, int pageSize, String keyword, String dataArea, String userId,
 			String customerTypeId, String isOrdered, String customerKind, String provName, String cityName, String countryName) {
 
-		boolean needWhere = true;
 		LinkedList<Object> params = new LinkedList<Object>();
 
 		String select = "select sc.*, c.customer_code, c.customer_name"
@@ -147,15 +146,12 @@ public class SellerCustomerQuery extends JBaseQuery {
 		appendIfNotEmpty(fromBuilder, "ujc.user_id", userId, params, false);
 		fromBuilder.append(" GROUP BY c2.id) t2 ON sc.id = t2.id ");
 
-		needWhere = appendIfNotEmpty(fromBuilder, "sc.customer_kind", customerKind, params, needWhere);
-		needWhere = appendIfNotEmpty(fromBuilder, "c.prov_name", provName, params, needWhere);
-		needWhere = appendIfNotEmpty(fromBuilder, "c.city_name", cityName, params, needWhere);
-		needWhere = appendIfNotEmpty(fromBuilder, "c.country_name", countryName, params, needWhere);
+		fromBuilder.append(" WHERE sc.is_enabled = 1 ");
 
-		if (needWhere) {
-			fromBuilder.append(" WHERE 1 = 1 ");
-			needWhere = false;
-		}
+		appendIfNotEmpty(fromBuilder, "sc.customer_kind", customerKind, params, false);
+		appendIfNotEmpty(fromBuilder, "c.prov_name", provName, params, false);
+		appendIfNotEmpty(fromBuilder, "c.city_name", cityName, params, false);
+		appendIfNotEmpty(fromBuilder, "c.country_name", countryName, params, false);
 
 		if (StrKit.notBlank(keyword)) {
 			fromBuilder.append(" and (c.customer_name like '%" + keyword + "%' or c.contact like '%" + keyword + "%')");

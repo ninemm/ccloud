@@ -9,16 +9,11 @@ import org.activiti.engine.delegate.TaskListener;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.task.Task;
 import org.ccloud.Consts;
-import org.ccloud.message.Actions;
-import org.ccloud.message.MessageKit;
-import org.ccloud.model.Message;
 import org.ccloud.model.User;
 import org.ccloud.model.query.DepartmentQuery;
-import org.ccloud.model.query.UserGroupRelQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.workflow.plugin.ActivitiPlugin;
 
-import com.google.common.base.Joiner;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Record;
 
@@ -44,22 +39,22 @@ public class OrderReviewTwoTaskListener implements TaskListener {
 		if (taskList != null && taskList.size() == 0) {// 主管
 			String managerName = "";
 			User manager = UserQuery.me().findManagerByDeptId(user.getDepartmentId());
-			if(manager != null) {
+			if (manager != null) {
 				managerName = manager.getUsername();
 			}
 
 			task.setAssignee(managerName);
-			sendOrderMessage(sellerId, customerName, "订单审核", manager.getId(), user.getId(), user.getDepartmentId(),
+			OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核", manager.getId(), user.getId(), user.getDepartmentId(),
 					user.getDataArea(), orderId);
 		} else if (taskList != null && taskList.size() > 0) {
 
 			List<HistoricTaskInstance> list = processEngine.getHistoryService().createHistoricTaskInstanceQuery()
-					.executionId(executeInstanceId).list();
+					                                  .executionId(executeInstanceId).list();
 			int size = list.size();
 
 			if (size == 1) {// 财务
 				String treasurerUserName = "";
-				List<Record> treasurers = getTreasurer(
+				List<Record> treasurers = OrderReviewUtil.getTreasurer(
 						DepartmentQuery.me().findDealerDataArea(user.getDepartmentId()));
 				for (Record record : treasurers) {
 					if (StrKit.notBlank(treasurerUserName)) {
@@ -67,44 +62,12 @@ public class OrderReviewTwoTaskListener implements TaskListener {
 					}
 
 					treasurerUserName += record.getStr("username");
-					sendOrderMessage(sellerId, customerName, "订单审核", record.getStr("id"), user.getId(),
+					OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核", record.getStr("id"), user.getId(),
 							user.getDepartmentId(), user.getDataArea(), orderId);
 				}
 				task.setAssignee(treasurerUserName);
-			} 
+			}
 		}
-	}
-
-	private List<Record> getTreasurer(String dataArea) {
-		List<String> userIdList = UserQuery.me().findUserIdsByDeptDataArea(dataArea);
-		String userIds = Joiner.on(",").join(userIdList);
-		List<Record> userList = UserGroupRelQuery.me().findUsersByRoleCode(Consts.GROUP_CODE_PREFIX_ROLE,
-				Consts.ROLE_CODE_007, userIds);
-
-		return userList;
-	}
-
-	private void sendOrderMessage(String sellerId, String title, String content, String fromUserId, String toUserId,
-			String deptId, String dataArea, String orderId) {
-
-		Message message = new Message();
-		message.setType(Message.ORDER_REVIEW_TYPE_CODE);
-
-		message.setSellerId(sellerId);
-		message.setTitle(title);
-		message.setContent(content);
-		
-		message.setObjectId(orderId);
-		message.setIsRead(Consts.NO_READ);
-		message.setObjectType(Consts.OBJECT_TYPE_ORDER);
-
-		message.setFromUserId(fromUserId);
-		message.setToUserId(toUserId);
-		message.setDeptId(deptId);
-		message.setDataArea(dataArea);
-
-		MessageKit.sendMessage(Actions.ProcessMessage.PROCESS_MESSAGE_SAVE, message);
-
 	}
 
 }

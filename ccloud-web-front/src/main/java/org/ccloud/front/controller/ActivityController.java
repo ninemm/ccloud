@@ -25,7 +25,6 @@ import org.ccloud.message.MessageKit;
 import org.ccloud.model.*;
 import org.ccloud.model.query.*;
 import org.ccloud.route.RouterMapping;
-import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
 
 import com.alibaba.fastjson.JSON;
@@ -33,7 +32,6 @@ import com.google.common.collect.ImmutableMap;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Record;
 import org.ccloud.workflow.service.WorkFlowService;
-import org.joda.time.DateTime;
 
 /**
  * Created by WT on 2017/11/30.
@@ -43,10 +41,11 @@ public class ActivityController extends BaseFrontController {
 
 	public void index() {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		List<Record> activityRecords = ActivityQuery.me().findActivityListForApp(sellerId, "", "");
 		for(int i = 0; i <activityRecords.size();i++){
 			activityRecords.get(i).set("customerTypeName", ActivityQuery.me().getCustomerTypes(activityRecords.get(i).getStr("customer_type")));
+			activityRecords.get(i).set("surplusNum",Integer.parseInt( activityRecords.get(i).getStr("total_customer_num"))-ActivityApplyQuery.me().findByUserIdAndActivityId(activityRecords.get(i).getStr("id"),user.getId()).size());
 		}
 		List<Map<String, Object>> activityList = new ArrayList<Map<String, Object>>();
 		
@@ -62,7 +61,7 @@ public class ActivityController extends BaseFrontController {
 				}
 			}
 		}
-		
+		//查看每个销售代表已参与的客户数
 		setAttr("activityList", JSON.toJSON(activityList));
 		setAttr("tags", JSON.toJSON(tagSet));
 
@@ -105,7 +104,9 @@ public class ActivityController extends BaseFrontController {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 
 		List<Record> activityList = ActivityQuery.me().findActivityListForApp(sellerId, "", "");
-
+		for(int i = 0; i <activityList.size();i++){
+			activityList.get(i).set("customerTypeName", ActivityQuery.me().getCustomerTypes(activityList.get(i).getStr("customer_type")));
+		}
 		Map<String, Object> activityInfoMap = new HashMap<String, Object>();
 		List<Map<String, Object>> activityItems = new ArrayList<>();
 
@@ -185,7 +186,7 @@ public class ActivityController extends BaseFrontController {
 		for (String sellerCustomerId : sellerCustomerIdArray) {
 			for (int i = 0; i < activity_ids.length; i++) {
 				//活动申请check
-				String result = this.check(activity_ids[i], sellerCustomerId, sellerCustomerNameArray[i]);
+				String result = this.check(activity_ids[i], sellerCustomerId, sellerCustomerNameArray[i],user.getId());
 				
 				if(StrKit.notBlank(result)) {
 					renderAjaxResultForError(result);
@@ -205,6 +206,10 @@ public class ActivityController extends BaseFrontController {
 					activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_WAIT);
 					activityApply.setProcInstId(Consts.PROC_ACTIVITY_APPLY_REVIEW);
 					String procInstId = this.start(activityApplyId, sellerCustomerNameArray[i], Consts.PROC_ACTIVITY_APPLY_REVIEW);
+					if(procInstId.equals("error")) {
+						renderAjaxResultForError("您没有配置审核人，请联系管理员");
+						return;
+					}
 					activityApply.setProcInstId(procInstId);
 				}else {
 					activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_PASS);
@@ -238,7 +243,8 @@ public class ActivityController extends BaseFrontController {
 
 		User manager = UserQuery.me().findManagerByDeptId(user.getDepartmentId());
 		if (manager == null) {
-			renderAjaxResultForError("你的申请没有对应的人审核，请联系管理员");
+			
+			return "error";
 		}
 		param.put("manager", manager.getUsername());
 		toUserId = manager.getId();
@@ -246,16 +252,20 @@ public class ActivityController extends BaseFrontController {
 		String procInstId = workflow.startProcess(activityApplyId, proc_def_key, param);
 
 
-		sendOrderMessage(sellerId, customerName, "活动审核", user.getId(), toUserId, user.getDepartmentId(), user.getDataArea(),activityApplyId);
+		sendMessage(sellerId, customerName, "活动审核", user.getId(), toUserId, user.getDepartmentId(), user.getDataArea(),activityApplyId);
 
 		return procInstId;
 	}
 
-	private String check(String activityId, String sellerCustomerId, String customerName) {
+	private String check(String activityId, String sellerCustomerId, String customerName,String userId) {
 		Activity activity = ActivityQuery.me().findById(activityId);
-		long total = ActivityApplyQuery.me().findByActivityId(activityId);
-		if (total >= activity.getTotalCustomerNum()) {
+		List<ActivityApply> activityApplies = ActivityApplyQuery.me().findByUserIdAndActivityId(activityId, userId);
+		if (activityApplies.size() >= activity.getTotalCustomerNum()) {
 			return "活动参与的人数已经达到上限";
+		}
+		List<ActivityApply> applys = ActivityApplyQuery.me().findSellerCustomerIdAndActivityIdAndUserId(sellerCustomerId,activityId,userId);
+		if (applys.size() >= activity.getJoinNum()) {
+			return "该客户参与该活动的次数已经达到上限";
 		}
 		/*int interval = this.getStartDate(activity.getTimeInterval());
 		DateTime dateTime = new DateTime(new Date());
@@ -267,7 +277,7 @@ public class ActivityController extends BaseFrontController {
 		return "";
 	}
 
-	private int getStartDate(String timeInterval){
+	/*private int getStartDate(String timeInterval){
 		if(Consts.TIME_INTERVAL_ONE.equals(timeInterval)){
 			return 1;
 		}
@@ -308,8 +318,8 @@ public class ActivityController extends BaseFrontController {
 
 		return 1;
 	}
-
-	private void sendOrderMessage(String sellerId, String title, String content, String fromUserId, String toUserId, String deptId, String dataArea, String orderId) {
+*/
+	private void sendMessage(String sellerId, String title, String content, String fromUserId, String toUserId, String deptId, String dataArea, String orderId) {
 
 		Message message = new Message();
 		message.setType(Message.ACTIVITY_APPLY_REVIEW_TYPE_CODE);
@@ -355,7 +365,7 @@ public class ActivityController extends BaseFrontController {
 		ActivityApply activityApply = ActivityApplyQuery.me().findById(activityApplyId);
 		String customerName = activityApply.get("customer_name");
 		String toUserId = activityApply.get("biz_user_id");
-		sendOrderMessage(sellerId, customerName, (pass == 1 ? "活动审核通过" : "活动审核拒绝"), user.getId(), toUserId, user.getDepartmentId(), user.getDataArea(), activityApplyId);
+		sendMessage(sellerId, customerName, (pass == 1 ? "活动审核通过" : "活动审核拒绝"), user.getId(), toUserId, user.getDepartmentId(), user.getDataArea(), activityApplyId);
 		activityApply.setStatus(pass == 1 ? Consts.ACTIVITY_APPLY_STATUS_PASS : Consts.ACTIVITY_APPLY_STATUS_REJECT);
 		activityApply.update();
 
@@ -527,7 +537,21 @@ public class ActivityController extends BaseFrontController {
 	public void applyDetail() {
 		String id = getPara("id");
 		ActivityApply activityApply = ActivityApplyQuery.me().findById(id);
-
+		List<Dict> dicts = DictQuery.me().findDictByType(Consts.INVEST_TYPE);
+		if(!activityApply.getStr("invest_type").equals("")) {
+			String[] investTypes = activityApply.getStr("invest_type").split(",");
+			String invesType= "";
+			for(int i=0;i<investTypes.length;i++) {
+				for(int j = 0 ;j<dicts.size();j++) {
+					if(dicts.get(j).getValue().equals(investTypes[i])) {
+						invesType += dicts.get(j).getName()+"、";
+						break;
+					}
+				}
+			}
+			setAttr("invesType", invesType.substring(0, invesType.length()-1));
+		}
+		
 		setAttr("apply", activityApply);
 
 		render("apply_detail.html");
@@ -537,6 +561,10 @@ public class ActivityController extends BaseFrontController {
 	public void withdraw(){
 		String id = getPara("id");
 		ActivityApply activityApply = ActivityApplyQuery.me().findById(id);
+		String procInstId = activityApply.getProcInstId();
+		WorkFlowService workflow = new WorkFlowService();
+		if (StrKit.notBlank(procInstId))
+			workflow.deleteProcessInstance(activityApply.getProcInstId());
 		activityApply.setStatus(2);
 		if( activityApply.saveOrUpdate()) renderAjaxResultForSuccess("操作成功");
 		else renderAjaxResultForError("操作失败");

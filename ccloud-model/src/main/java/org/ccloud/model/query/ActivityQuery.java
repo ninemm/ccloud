@@ -52,7 +52,7 @@ public class ActivityQuery extends JBaseQuery {
 	}
 
 	public Page<Record> paginate(int pageNumber, int pageSize, String keyword,String startDate, String endDate,String sellerId) {
-		String select = "select ca.*,(SELECT COUNT(*) from cc_activity_apply where activity_id = ca.id and `status` not in ("+Consts.ACTIVITY_APPLY_STATUS_REJECT+","+Consts.ACTIVITY_APPLY_STATUS_CANCEL+")) AS activityApplyNum ";
+		String select = "select ca.*,case when ca.category='"+Consts.CATEGORY_NORMAL+"' then '商品销售营销活动' else '投入活动' end as activityCategory ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_activity` ca ");
 		fromBuilder.append(" LEFT JOIN cc_customer_type ct on ct.id=ca.customer_type");
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -92,7 +92,7 @@ public class ActivityQuery extends JBaseQuery {
     }
 
     public List<Record> findActivityListForApp(String sellerId, String keyword, String tag) {
-        StringBuilder fromBuilder = new StringBuilder(" SELECT DISTINCT a.*, d.name as categoryName, ct.name as customerTypeName, dd.name as timeIntervalName FROM cc_activity a");
+        StringBuilder fromBuilder = new StringBuilder(" SELECT DISTINCT a.*, d.name as categoryName, ct.name as customerTypeName, dd.name as timeIntervalName,a.total_customer_num as surplusNum FROM cc_activity a");
         fromBuilder.append(" left join dict d on a.category = d.value ");
 	    fromBuilder.append(" left join cc_customer_type ct on a.customer_type = ct.id ");
 	    fromBuilder.append(" left join dict dd on a.time_interval = dd.value ");
@@ -132,5 +132,13 @@ public class ActivityQuery extends JBaseQuery {
 			typeNames = types.substring(0, types.length()-1);
 		}
 		return typeNames;
+	}
+
+	public List<Record> findByCustomerId(String customerId) {
+		StringBuilder fromBuilder = new StringBuilder("SELECT a.title,a.id FROM cc_activity a ");
+        fromBuilder.append(" LEFT JOIN cc_activity_apply aa ON a.id=aa.activity_id ");
+	    fromBuilder.append(" WHERE aa.seller_customer_id='"+customerId);
+	    fromBuilder.append(" ' GROUP BY a.id");
+        return Db.find(fromBuilder.toString());
 	}
 }

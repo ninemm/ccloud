@@ -182,7 +182,7 @@ public class CustomerController extends BaseFrontController {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
 		Double dist = 100d;
-		String lon = getPara("lon");
+		String lon = getPara("lng");
 		String lat = getPara("lat");
 
 		if(StrKit.notBlank(getPara("searchArea"))) {
@@ -681,7 +681,7 @@ public class CustomerController extends BaseFrontController {
 				if(customerVO.getCustTypeList() != null || customerVO.getCustTypeList().size() != 0) {
 
 					CustomerJoinCustomerTypeQuery.me().deleteBySellerCustomerId(sellerCustomerId);
-					String[] customerTypes = sellerCustomer.getCustomerTypeIds().split(",");
+					List<String> customerTypes = customerVO.getCustTypeList();
 					
 					for (String custType : customerTypes) {
 						CustomerJoinCustomerType ccType = new CustomerJoinCustomerType();

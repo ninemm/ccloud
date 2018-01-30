@@ -88,7 +88,7 @@ public class ActivityApplyQuery extends JBaseQuery {
 
 	public Page<Record> findList(int pageNumber, int pageSize, String dataArea, String category, String status, String startDate, String endDate, String keyword ){
 		String select = "SELECT caa.id, cc.customer_name, caa.`status`, DATE_FORMAT(ca.start_time,'%m-%d') as start_time, " +
-				"DATE_FORMAT(ca.end_time, '%m-%d') as end_time, ca.invest_type, d.`name`, ca.invest_amount ";
+				"DATE_FORMAT(ca.end_time, '%m-%d') as end_time, ca.invest_type, d.`name`, ca.invest_amount,ca.code ";
 		LinkedList<Object> params = new LinkedList<Object>();
 
 		StringBuilder sql = new StringBuilder("FROM cc_activity_apply caa ");
@@ -176,5 +176,14 @@ public class ActivityApplyQuery extends JBaseQuery {
 	public Long findBySellerCustomerIdAndActivityId(String activityId,String sellerCustomerId,String date){
 		String sql = "activity_id = ? and seller_customer_id = ? and create_date > ? and status not in ("+Consts.ACTIVITY_APPLY_STATUS_REJECT+","+Consts.ACTIVITY_APPLY_STATUS_CANCEL+")";
 		return DAO.doFindCount(sql, activityId, sellerCustomerId, date);
+	}
+	
+	public List<ActivityApply> findByUserIdAndActivityId(String activityId,String userId){
+		String sql = "Select * from cc_activity_apply where activity_id = ? and biz_user_id = ? and status not in ("+Consts.ACTIVITY_APPLY_STATUS_REJECT+","+Consts.ACTIVITY_APPLY_STATUS_CANCEL+") GROUP BY seller_customer_id";
+		return DAO.find(sql, activityId,userId);
+	}
+	
+	public List<ActivityApply> findSellerCustomerIdAndActivityIdAndUserId(String sellerCustomerId,String activityId,String userId) {
+		return DAO.doFind(" seller_customer_id = ? and activity_id = ? and biz_user_id = ? and status not in ("+Consts.ACTIVITY_APPLY_STATUS_REJECT+","+Consts.ACTIVITY_APPLY_STATUS_CANCEL+")", sellerCustomerId,activityId,userId);
 	}
 }

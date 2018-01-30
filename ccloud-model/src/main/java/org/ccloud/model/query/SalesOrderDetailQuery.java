@@ -49,7 +49,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 	public List<Record> findByOrderId(String orderId) {
 
 		StringBuilder sqlBuilder = new StringBuilder(
-				" SELECT sod.*, sp.custom_name, sp.price, p.big_unit, p.small_unit, p.convert_relate, p.id as productId, p.product_sn, g.product_image_list_store, w.code as warehouseCode, t1.valueName,w.name as warehouseName ");
+				" SELECT sod.*, sp.custom_name, sp.price,sp.bar_code, p.big_unit, p.small_unit, p.convert_relate, p.id as productId, p.product_sn, g.product_image_list_store, w.code as warehouseCode, t1.valueName,w.name as warehouseName ");
 		sqlBuilder.append(" from `cc_sales_order_detail` sod ");
 		sqlBuilder.append(" LEFT JOIN cc_seller_product sp ON sod.sell_product_id = sp.id ");
 		sqlBuilder.append(" LEFT JOIN cc_product p ON sp.product_id = p.id ");
@@ -502,6 +502,15 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		sqlBuilder.append(" ORDER BY sod.warehouse_id, sod.is_gift ");
 
 		return Db.find(sqlBuilder.toString(), order_sn);
+	}
+	
+	//通过订单详情ID查找活动名
+	public Record getOrderDetailId(String orderDetailId) {
+		String sql = "SELECT cs.order_id,ca.title, pc.activity_id FROM cc_sales_order_detail cs " 
+					+"LEFT JOIN cc_product_composition pc ON cs.composite_id = pc.id "  
+					+"LEFT JOIN cc_activity ca ON ca.id = pc.activity_id "
+					+ "where cs.id = '"+orderDetailId+"'";
+		return Db.findFirst(sql);
 	}
 
 }

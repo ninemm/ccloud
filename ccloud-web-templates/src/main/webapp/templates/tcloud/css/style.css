@@ -968,6 +968,7 @@ i.icon.icon-next {
   width: 2rem;
   text-align: center;
   box-sizing: border-box;
+  height: 100%;
 }
 
 .spinner {
@@ -1171,7 +1172,7 @@ i.icon.icon-next {
 }
 
 #shopping-cart .weui-panel {
-  padding: 0 0.75rem;
+  padding: 0 0.75rem .5rem;
   margin-top: 0.5rem;
 }
 
@@ -1389,7 +1390,7 @@ input.street-value {
 
 .goods-detail {
   display: block;
-  padding: 0 0.75rem;
+  padding: 0 0.75rem .5rem;
   font-size: 0.6rem;
 }
 
@@ -1976,21 +1977,18 @@ input[name=sex] {
 
 #application-record section .weui-cell__ft,
 #fee-audit-list section .weui-cell__ft {
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   color: #fff;
 }
 
 #application-record section i,
 #fee-audit-list section i {
-  font-size: 1.2rem;
   position: relative;
   margin-right: 0.5rem;
 }
 
 #application-record section .weui-cell_access .weui-cell__ft:after,
 #fee-audit-list section .weui-cell_access .weui-cell__ft:after {
-  height: 0.4rem;
-  width: 0.4rem;
   border-color: #fff;
 }
 

@@ -126,9 +126,10 @@ function doPass(pass) {
                 <p>活动类型
                     <span>${activityApply.name}</span>
                 </p>
+                <#if investType??>
                 <p>投入类型
                     <span>${investType}</span>
-                </p>
+                </p></#if>
                 <p>客户信息
                     <span>${activityApply.contact}（${activityApply.mobile}）</span>
                 </p>
@@ -153,13 +154,15 @@ function doPass(pass) {
 				<!--</p>-->
             </div>
         </div>
-        <div class="weui-cell weui-cell_access">
-            <div class="weui-cell__bd">
-                申请总金额
-                <span class="fr">
-            <span class="ft20 orange">${activityApply.invest_amount?string("0.00")}</span>&nbsp;元</span>
-            </div>
-        </div>
+        <#if investType??>
+	        <div class="weui-cell weui-cell_access">
+	            <div class="weui-cell__bd">
+	                申请总金额
+	                <span class="fr">
+	            <span class="ft20 orange">${activityApply.invest_amount?string("0.00")}</span>&nbsp;元</span>
+	            </div>
+	        </div>
+        </#if>
 		<!--<div class="weui-cell weui-cell_access">
 			<div class="weui-cell__bd">
 				<div>

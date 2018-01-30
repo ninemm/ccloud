@@ -1,6 +1,10 @@
 <#include "_inc/_layout.html"/>
-<#macro title>申请列表</#macro>
+<#macro title>活动列表</#macro>
 <#macro css>
+    .customer p {
+        height: auto;
+        line-height: auto;
+    }
 </#macro>
 
 <#macro script>
@@ -35,12 +39,12 @@
         refresh();
 
         $("#apply-type").select({
-            title: "选择申请类型",
+            title: "选择活动类型",
             items: ${activityType!}
         });
 
         $("#status").select({
-            title: "选择申请状态",
+            title: "选择活动状态",
             items: [{
             title: "全部", valut: ''
             },{title: "待审核", value: '0'
@@ -155,7 +159,6 @@
 
     //监听滚动
     $(".infinite").infinite().on("infinite", function() {
-    console.log(111);
         var self = this;
         $endNode = $("section:last");
         $loadmore = $(self).find(".weui-loadmore");
@@ -215,7 +218,7 @@
 </#macro>
 
 <@layout>
-<div id="application-record">
+<div id="application-record" class="weui-content ft14">
     <header>
         <div class="weui-search-bar" id="SearchBar">
             <form class="weui-search-bar__form">
@@ -237,7 +240,7 @@
             <div class="head-search select-area weui-flex__item">
                 <div class="weui-flex">
                     <div class="weui-flex__item">
-                        <input type="text" id="apply-type" placeholder="全部申请" class="weui-input" readonly>
+                        <input type="text" id="apply-type" placeholder="全部活动" class="weui-input" readonly>
                         <i class="icon-sort-desc"></i>
                     </div>
                     <div class="weui-flex__item">

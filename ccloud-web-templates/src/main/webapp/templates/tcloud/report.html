@@ -84,7 +84,11 @@
             <a href="${CPATH}/report/departmentReport" class="weui-grid js_grid">
                 <div class="weui-grid__icon"><i class="icon-line-chart"></i></div>
                 <p class="weui-grid__label">部门报表</p>
-            </a>            
+            </a> 
+            <a href="${CPATH}/report/otherOrder" class="weui-grid js_grid">
+                <div class="weui-grid__icon"><i class="icon-line-chart"></i></div>
+                <p class="weui-grid__label">第三方订单</p>
+            </a>                       
             <a href="${CPATH}/report/userRank" class="weui-grid js_grid">
                 <div class="weui-grid__icon"><i class="icon-bar-chart"></i></div>
                 <p class="weui-grid__label">销售排行</p>
@@ -108,6 +112,19 @@
             </a>
         </div>
         </@shiro.hasPermission>
+        	<@shiro.hasPermission name="/front/inventory">
+		<div class="weui-cells__title">库存详情</div>
+		<div class="weui-grids">
+			<@shiro.hasPermission name="/front/inventory">
+			<a class="weui-grid js_grid" href="${CPATH}/inventory/index">
+				<div class="weui-grid__icon">
+					<i class="icon-database"></i>
+				</div>
+				<p class="weui-grid__label">库存详情</p>
+			</a>
+			</@shiro.hasPermission>		
+		</div>
+		</@shiro.hasPermission>
 	</div>
 	<#include "_inc/_footer_nav.html" />
 </div>

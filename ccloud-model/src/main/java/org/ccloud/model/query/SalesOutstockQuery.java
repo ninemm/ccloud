@@ -104,11 +104,15 @@ public class SalesOutstockQuery extends JBaseQuery {
 				String outstockSn = "";
 				BigDecimal outTotalAmount = new BigDecimal(0);
 				int i = 1;
+				boolean composite = false;
 				for (Record orderDetail : orderDetailList) {
 					if (!warehouseId.equals(orderDetail.getStr("warehouse_id"))) {
 						if (StringUtils.isNotBlank(outstockId)) {
 							SalesOutstockQuery.me().updateTotalAmount(outstockId, outTotalAmount.toString());
 							outTotalAmount = new BigDecimal(0);
+						}
+						if (orderDetail.getInt("is_composite") == 1) {
+							composite = true;
 						}
 						outstockId = StrKit.getRandomUUID();
 						warehouseId = orderDetail.getStr("warehouse_id");
@@ -123,6 +127,9 @@ public class SalesOutstockQuery extends JBaseQuery {
 
 					outTotalAmount = outTotalAmount.add(SalesOutstockDetailQuery.me().insert(outstockId, orderDetail, date, order));
 					if (i == orderDetailList.size()) {
+						if (composite) {
+							outTotalAmount = order.getBigDecimal("total_amount");
+						}
 						SalesOutstockQuery.me().updateTotalAmount(outstockId, outTotalAmount.toString());
 					}
 					i++;
@@ -340,7 +347,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 	
 	public Page<Record> paginateForReceivables(int pageNumber, int pageSize, String keyword, String userId,
 			String customerTypeId, String startDate, String endDate, String sellerId, String dataArea) {
-		String select = "select o.*, c.customer_name, ct.name as customerTypeName ";
+		String select = "select o.*, c.customer_name, ct.name as customerTypeName,o.total_amount as balanceAmount  ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_sales_outstock` o ");
 		fromBuilder.append("left join cc_seller_customer cc ON o.customer_id = cc.id ");
 		fromBuilder.append("left join cc_customer c on cc.customer_id = c.id ");

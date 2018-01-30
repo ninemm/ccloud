@@ -20,6 +20,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -34,8 +35,6 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
-import org.ccloud.message.Actions;
-import org.ccloud.message.MessageKit;
 import org.ccloud.model.Activity;
 import org.ccloud.model.Message;
 import org.ccloud.model.SalesOrder;
@@ -43,6 +42,8 @@ import org.ccloud.model.User;
 import org.ccloud.model.query.ActivityQuery;
 import org.ccloud.model.query.MessageQuery;
 import org.ccloud.model.query.OptionQuery;
+import org.ccloud.model.query.OrderDetailInfoQuery;
+import org.ccloud.model.query.OrderInfoQuery;
 import org.ccloud.model.query.OutstockPrintQuery;
 import org.ccloud.model.query.SalesOrderDetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
@@ -53,6 +54,7 @@ import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
+import org.ccloud.workflow.listener.order.OrderReviewUtil;
 import org.ccloud.workflow.service.WorkFlowService;
 
 import com.alibaba.fastjson.JSON;
@@ -77,7 +79,7 @@ import cn.afterturn.easypoi.excel.entity.ExportParams;
 @RouterMapping(url = "/admin/salesOrder", viewPath = "/WEB-INF/admin/sales_order")
 @Before(ActionCacheClearInterceptor.class)
 @RouterNotAllowConvert
-@RequiresPermissions("/admin/salesOrder")
+@RequiresPermissions(value={"/admin/salesOrder","/admin/salesOrder/otherOrder"},logical=Logical.OR)
 public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 	@Override
@@ -90,6 +92,81 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		setAttr("endDate", date);
 		setAttr("actList", actList);
 		render("index.html");
+	}
+	
+	//第三方订单
+	@RequiresPermissions("/admin/salesOrder/otherOrder")
+	public void otherOrder() {
+		render("other_order.html");
+	}
+	
+	//第三方订单统计
+	@RequiresPermissions("/admin/salesOrder/otherOrder")
+	public void getOtherCount() {
+		String keyword = getPara("k");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+		}
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String platformName = getPara("platformName");
+		
+		if (StrKit.notBlank(platformName)) {
+			platformName = StringUtils.urlDecode(platformName);
+		}
+		
+		String status = getPara("status");
+		String receiveType = getPara("receiveType");
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		Record record = OrderInfoQuery.me().getCountInfo(keyword, startDate, endDate, platformName, status, receiveType, null, sellerId);
+		renderJson(record);
+	}
+	
+	//第三方订单列表
+	public void otherList() {
+		
+		String keyword = getPara("k");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+		}
+
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String platformName = getPara("platformName");
+		
+		if (StrKit.notBlank(platformName)) {
+			platformName = StringUtils.urlDecode(platformName);
+		}
+		
+		String status = getPara("status");
+		String receiveType = getPara("receiveType");
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		
+		// 获取排序相关信息
+		String sort = getPara("sortName[sort]");
+		String order = getPara("sortName[order]");
+		Page<Record> page = OrderInfoQuery.me().paginate(getPageNumber(), getPageSize(), keyword, 
+				startDate, endDate, order, sort, platformName, status, receiveType, sellerId);
+
+		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
+		renderJson(map);
+		
+	}
+	
+	//第三方订单详情
+	@RequiresPermissions("/admin/salesOrder/otherOrder")
+	public void otherDetail() {
+
+		String orderId = getPara(0);
+
+		Record order = OrderInfoQuery.me().findMoreById(orderId);
+		List<Record> orderDetail = OrderDetailInfoQuery.me().findByOrderId(orderId);
+
+		setAttr("order", order);
+		setAttr("orderDetail", orderDetail);
+
+		render("other_detail.html");
+
 	}
 
 	public void list() {
@@ -257,8 +334,8 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 					}
         		} else {
         			SalesOutstockQuery.me().pass(orderId, user.getId(), sellerId, sellerCode);
-        			sendOrderMessage(sellerId, StringUtils.getArrayFirst(paraMap.get("customerName")), "订单审核通过", user.getId(), user.getId(),
-        					user.getDepartmentId(), user.getDataArea());        			
+        			OrderReviewUtil.sendOrderMessage(sellerId, StringUtils.getArrayFirst(paraMap.get("customerName")), "订单审核通过", user.getId(), user.getId(),
+        					user.getDepartmentId(), user.getDataArea(), orderId);
         		}
             	return true;
             }
@@ -357,8 +434,8 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		if(!salesOrder.update()) {
 			return false;
 		}
-		
-		sendOrderMessage(sellerId, customerName, "订单审核", user.getId(), toUserId, user.getDepartmentId(), user.getDataArea());
+
+		OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核", user.getId(), toUserId, user.getDepartmentId(), user.getDataArea(), orderId);
 		
 		return true;
 	}
@@ -438,24 +515,6 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		setAttr("orderDetailList", orderDetailList);
 		render("audit.html");
 	}
-	
-	private void sendOrderMessage(String sellerId, String title, String content, String fromUserId, String toUserId, String deptId, String dataArea) {
-		
-		Message message = new Message();
-		message.setType(Message.ORDER_REVIEW_TYPE_CODE);
-		
-		message.setSellerId(sellerId);
-		message.setTitle(title);
-		message.setContent(content);
-		
-		message.setFromUserId(fromUserId);
-		message.setToUserId(toUserId);
-		message.setDeptId(deptId);
-		message.setDataArea(dataArea);
-		
-		MessageKit.sendMessage(Actions.ProcessMessage.PROCESS_MESSAGE_SAVE, message);
-		
-	}	
 	
 	@Before(Tx.class)
 	public void complete() {
@@ -699,79 +758,43 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		for (Record record : salesOderList) {
 		
 			String orderId = record.get("id");
+			//客户信息
+			String customerInfo = record.getStr("customer_name")+"," + record.get("prov_name")+record.get("city_name")+record.get("country_name")+record.get("address");
+			//下单日期
+			String saveDate =record.getStr("create_date").substring(0, 10); 
+			//下单时间
+			String createDate = record.getStr("create_date");
+			//打印状态
+			
+			//打印时间
+			List<Record> outstockPrints = OutstockPrintQuery.me().findByOrderId(record.getStr("id"));
+			String printDate = "";
+			if(outstockPrints.size()>0) {
+				printDate =(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(outstockPrints.get(0).get("create_date")) ;
+			}
 			List<Record> orderDetail = SalesOrderDetailQuery.me().findByOrderId(orderId);
 			for(Record re : orderDetail){
-				SalesOrderExcel excel = new SalesOrderExcel();
-				BigDecimal creatconverRelate = new BigDecimal(re.get("convert_relate").toString());
-				BigDecimal bigPrice = new BigDecimal(re.get("product_price").toString());
-				BigDecimal count = new BigDecimal(re.get("product_count").toString());
-				int bCount = re.get("out_count");
-				int sCount = re.get("left_count");
-				int bigOutCount = bCount/(creatconverRelate.intValue());
-				int smallOutCount = bCount%(creatconverRelate.intValue());
-				int bigLeftCount = sCount/(creatconverRelate.intValue());
-				int smallLeftCount = sCount%(creatconverRelate.intValue());
-				String bigCount =(count.intValue())/(creatconverRelate.intValue())+"";
-				String smallCount = (count.intValue())%(creatconverRelate.intValue())+"";
+				String activityTitle = "";
+				if(re.getStr("is_composite").equals("1")) {
+					Record r = SalesOrderDetailQuery.me().getOrderDetailId(re.getStr("id"));
+					activityTitle= r.getStr("title");
+				}
+				BigDecimal creatconverRelate = new BigDecimal(re.getStr("convert_relate"));
+				BigDecimal bigPrice = new BigDecimal(re.getStr("product_price"));
+				BigDecimal count = new BigDecimal(re.getStr("product_count"));
+				String bigCount = (count.intValue()) / (creatconverRelate.intValue()) + "";
+				String smallCount = (count.intValue()) % (creatconverRelate.intValue()) + "";
 				BigDecimal smallPrice = bigPrice.divide(creatconverRelate, 2, BigDecimal.ROUND_HALF_UP);
-				excel.setProductName(re.get("custom_name").toString());
-				excel.setValueName(re.get("valueName").toString());
-				excel.setProductCount(bigCount);
-				excel.setCreatconvertRelate(re.get("convert_relate").toString()+re.get("small_unit").toString()+"/"+re.get("big_unit").toString());
-				excel.setProductPrice(re.get("product_price").toString());
-				excel.setSmallCount(smallCount);
-				excel.setSmallPrice(smallPrice.toString());
-				excel.setBigOutCount(bigOutCount);
-				excel.setSmallOutCount(smallOutCount);
-				excel.setBigLeftCount(bigLeftCount);
-				excel.setSmallLeftCount(smallLeftCount);
-				excel.setTotalAmount(re.get("product_amount").toString());
-				excel.setOrderSn(record.get("order_sn").toString());
-				excel.setCustomer(record.get("customer_name").toString());
-				excel.setCustomerType(record.get("customerTypeName").toString());
-				excel.setCcontact(record.get("contact").toString());
-				excel.setCmobile(record.get("mobile").toString());
-				if(record.get("realname")==null){
-					excel.setBizUser("");
-				}else{
-					excel.setBizUser(record.get("realname").toString());
+				if(!bigCount.equals("0")) {
+					SalesOrderExcel excel = new SalesOrderExcel();
+					excel = saveExcel(re,record,bigPrice,bigCount,customerInfo,saveDate,createDate,printDate,re.getStr("big_unit"),activityTitle);
+					excellist.add(excel);
 				}
-				if(record.get("receive_type").toString().equals("0")){
-					excel.setReceiveType("应收账款");
-				}else{
-					excel.setReceiveType("现金");
+				if(!smallCount.equals("0")){
+					SalesOrderExcel excel = new SalesOrderExcel();
+					excel = saveExcel(re,record,smallPrice,smallCount,customerInfo,saveDate,createDate,printDate,re.getStr("small_unit"),activityTitle);
+					excellist.add(excel);
 				}
-				/*
-				 * 状态 0:待审核 1000:已审核 1001:订单取消 2000:部分出库 2001:部分出库-订单关闭 3000:全部出库 30001:全部出库-订单关闭
-				 * */
-				if(record.get("status").toString().equals("0")){
-					excel.setStatus("待审核");
-				}else if(record.get("status").toString().equals("1000")) {
-					excel.setStatus("已审核");
-				}else if(record.get("status").toString().equals("1001")) {
-					excel.setStatus("订单取消");
-				}else if(record.get("status").toString().equals("2000")) {
-					excel.setStatus("部分出库");
-				}else if(record.get("status").toString().equals("2001")) {
-					excel.setStatus("部分出库-订单关闭");
-				}else if(record.get("status").toString().equals("3000")) {
-					excel.setStatus("全部出库");
-				}else{
-					excel.setStatus("全部出库-订单关闭");
-				}
-				if(re.get("is_gift").toString().equals("0")){
-					excel.setIsGift("否");
-				}else{
-					excel.setIsGift("是");
-				}
-				if(re.get("is_composite").toString().equals("0")){
-					excel.setIsComposite("否");
-				}else{
-					excel.setIsComposite("是");
-				}
-				excel.setWarehouse(re.get("warehouseName").toString());
-				excel.setCreateDate(record.get("create_date").toString());
-				excellist.add(excel);
 				
 			}
 		}
@@ -797,5 +820,75 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		ExcelExportUtil.closeExportBigExcel();
 		
 		renderFile(new File(filePath));
+	}
+	
+	public SalesOrderExcel saveExcel(Record re,Record record,BigDecimal price,String count,String customerInfo,String saveDate,String createDate,String printDate,String unit,String activity) {
+		SalesOrderExcel excel = new SalesOrderExcel();
+		excel.setProductName(re.getStr("custom_name"));
+		excel.setValueName(re.getStr("valueName"));
+		excel.setProductCount(count);
+		excel.setProductPrice(price.toString());
+		excel.setPrintDate(printDate);
+		if(printDate.equals("")) {
+			excel.setIsPrint("否");
+		}else {
+			excel.setIsPrint("是");
+		}
+		excel.setCustomer(customerInfo);
+		excel.setUnit(unit);
+		excel.setCreatconvertRelate(re.getStr("convert_relate") + re.getStr("small_unit") + "/"
+				+ re.getStr("big_unit"));
+		excel.setProductPrice(price.toString());
+		excel.setTotalAmount(price.multiply(new BigDecimal(count)).toString());
+		excel.setCreatconvertRelate(re.getStr("convert_relate")+re.getStr("small_unit")+"/"+re.getStr("big_unit"));
+		excel.setTotalAmount(price.multiply(new BigDecimal(count)).toString());
+		excel.setOrderSn(record.getStr("order_sn"));
+		excel.setCustomer(customerInfo);
+		excel.setCustomerType(record.getStr("customerTypeName"));
+		excel.setPrintDate(printDate);
+		if(record.getStr("realname")==null){
+			excel.setBizUser("");
+		}else{
+			excel.setBizUser(record.getStr("realname"));
+		}
+		if(record.getStr("receive_type").equals("0")){
+			excel.setReceiveType("应收账款");
+		}else{
+			excel.setReceiveType("现金");
+		}
+		/*
+		 * 状态 0:待审核 1000:已审核 1001:订单取消 2000:部分出库 2001:部分出库-订单关闭 3000:全部出库 30001:全部出库-订单关闭
+		 * */
+		if(record.get("status").toString().equals("0")){
+			excel.setStatus("待审核");
+		}else if(record.get("status").toString().equals("1000")) {
+			excel.setStatus("已审核");
+		}else if(record.get("status").toString().equals("1001")) {
+			excel.setStatus("订单取消");
+		}else if(record.get("status").toString().equals("2000")) {
+			excel.setStatus("部分出库");
+		}else if(record.get("status").toString().equals("2001")) {
+			excel.setStatus("部分出库-订单关闭");
+		}else if(record.get("status").toString().equals("3000")) {
+			excel.setStatus("全部出库");
+		}else{
+			excel.setStatus("全部出库-订单关闭");
+		}
+		if(re.get("is_gift").toString().equals("0")){
+			excel.setIsGift("否");
+		}else{
+			excel.setIsGift("是");
+		}
+		if(re.get("is_composite").toString().equals("0")){
+			excel.setIsComposite("否");
+		}else{
+			excel.setIsComposite("是");
+		}
+		excel.setBarCode(re.getStr("bar_code"));
+		excel.setWarehouse(re.get("warehouseName").toString());
+		excel.setOrderDate(saveDate);
+		excel.setActivity(activity);
+		excel.setCreateDate(record.get("create_date").toString());
+		return excel;
 	}
 }

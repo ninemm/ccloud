@@ -297,16 +297,7 @@
             },
 			success:function(res){
 				if (res.errorCode == 0) {
-					$.confirm({
-						title: res.message,
-						text: '返回列表页？',
-						onOK: function () {
-							location.href = '${CPATH}/todo/visit'
-						},
-						onCancel: function () {
-							$.closeModal();
-						}
-					});
+                    location.href = '${CPATH}/todo/visit'
 				} else {
 					$.alert(res.message);
 				}
@@ -343,10 +334,9 @@
                 var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
                 var geoc = new BMap.Geocoder();                   // 获取百度地址解析器
 
-                $("#review_lng").val(parseFloat(longitude).toFixed(6));
-                $("#review_lat").val(parseFloat(latitude).toFixed(6));
-
                 translateCallback = function (point) {            // 回调函数
+                    $("#review_lng").val(parseFloat(point.lng).toFixed(6));
+                    $("#review_lat").val(parseFloat(point.lat).toFixed(6));
                     geoc.getLocation(point, function(rs) {
                     var addComp = rs.addressComponents;
                     var address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
@@ -385,9 +375,9 @@
                 var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
                 var geoc = new BMap.Geocoder();                   // 获取百度地址解析器
 
-                $("#review_lng").val(parseFloat(longitude).toFixed(6));
-                $("#review_lat").val(parseFloat(latitude).toFixed(6));
                 translateCallback = function (point) {            // 回调函数
+                    $("#review_lng").val(parseFloat(point.lng).toFixed(6));
+                    $("#review_lat").val(parseFloat(point.lat).toFixed(6));
                     geoc.getLocation(point, function(rs) {
                         var addComp = rs.addressComponents;
                         var address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
@@ -538,7 +528,7 @@
                     <input type="hidden" name="customerVisit.review_lat" id="review_lat">
                     <input type="hidden" name="customerVisit.reviewAddress" id="review_location">
                 </div>
-                <div class="weui-cell__hd" id="refresh"><span class="icon-refresh ft16 gray"></span></div>
+                <div class="weui-cell__hd" id="refresh"><span class="icon-refresh ft16 gray" onclick="refreshLocation()"></span></div>
             </div>
         </section>
         <section>
