@@ -1,4 +1,7 @@
 <#include "_inc/_layout.html"/>
+<#macro script_import>
+	<script src="${CPATH}/static/ccloud/admin/js/common.js"></script>
+</#macro>  
 <#macro title>收款管理</#macro>
 <#macro css> 
 	#my-order {
@@ -128,9 +131,9 @@
  						 window.location.href = "${CPATH}/receivables/detail?sn="+el.outstock_sn
 					}); 
 
-					$newOrder.find("#amount").text(el.total_amount);
+					$newOrder.find("#amount").text(formatNumber(el.total_amount));
 					$newOrder.find("#date").text('时间：' + el.create_date);
-					$newOrder.find("#balanceAmount").text(el.balanceAmount);
+					$newOrder.find("#balanceAmount").text("待收金额：￥"+formatNumber(el.balanceAmount));
 				});
 				page++;
 				loading = false;
@@ -296,14 +299,12 @@
 								<span class="fr" id="date"></span>
 							</p>
 						</div>
-						<div class="gray">
-							<p>
-								代收金额：￥<span id="balanceAmount"></span>
-							</p>
-						</div>
 					</a>
 					<hr>
-					<div id="refund" class="button red-button fr">收款</div>
+					<div class="ft14">
+							<span id="balanceAmount"></span>
+						<div id="refund" class="button red-button fr">收款</div>
+					</div>
 				</div>
 			</div>
 			<div class="weui-loadmore" id="loading" style="display: none;">

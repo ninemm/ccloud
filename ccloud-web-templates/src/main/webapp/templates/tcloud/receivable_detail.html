@@ -125,7 +125,7 @@
 								未收金额
 								<span class="require">*</span>
 							</div>
-							<input type="text" class="weui-input" id="maxMoney" value="${(receivable.count)!}" readonly>
+							<input type="text" class="weui-input" id="maxMoney" value="${(receivable.count)?string(',###.##')}" readonly>
 						</div>
 					</div>
 				</section>
@@ -156,7 +156,7 @@
 						<div class="receivable-detail-title">收款日期：</div>${bean.biz_date!}
 					</div>
 					<div>
-						<div class="receivable-detail-title">收款金额：</div>${bean.act_amount!}
+						<div class="receivable-detail-title">收款金额：</div>${bean.act_amount?string(',###.##')}
 					</div>
 					<div>
 						<div class="receivable-detail-title">收款人：</div>${bean.receive_user_name!}	
