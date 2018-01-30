@@ -75,13 +75,7 @@
 	    });
 	    
 		var customerId = $("#customer_id").val();
-		if(customerId == "" || customerId == null || customerId == undefined){
-			$("#activity_title").select({
-			       title: "选择活动",
-			       multi: true,
-			       items: [{}],
-			});
-		}else{
+		if(!customerId){
 			$.ajax({
 		        url: "${CPATH}/customerVisit/activityChoose",
 		        data: {
