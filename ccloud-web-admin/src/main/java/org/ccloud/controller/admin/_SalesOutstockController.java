@@ -541,7 +541,6 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 				if(outstockPrints.size()>0) {
 					printDate =(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(outstockPrints.get(0).get("create_date")) ;
 				}
-				//条码
 				BigDecimal creatconverRelate = new BigDecimal(re.getStr("convert_relate"));
 				BigDecimal bigPrice = new BigDecimal(re.getStr("product_price"));
 				BigDecimal count = new BigDecimal(re.getStr("product_count"));

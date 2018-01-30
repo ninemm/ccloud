@@ -34,8 +34,6 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
-import org.ccloud.message.Actions;
-import org.ccloud.message.MessageKit;
 import org.ccloud.model.Activity;
 import org.ccloud.model.Message;
 import org.ccloud.model.SalesOrder;
@@ -757,79 +755,30 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		for (Record record : salesOderList) {
 		
 			String orderId = record.get("id");
+			//客户信息
+			String customerInfo = record.getStr("customer_name")+"," + record.get("prov_name")+record.get("city_name")+record.get("country_name")+record.get("address");
+			//下单日期
+			String saveDate =record.getStr("create_date").substring(0, 10); 
+			//下单时间
+			String createDate = record.getStr("create_date");
 			List<Record> orderDetail = SalesOrderDetailQuery.me().findByOrderId(orderId);
 			for(Record re : orderDetail){
-				SalesOrderExcel excel = new SalesOrderExcel();
-				BigDecimal creatconverRelate = new BigDecimal(re.get("convert_relate").toString());
-				BigDecimal bigPrice = new BigDecimal(re.get("product_price").toString());
-				BigDecimal count = new BigDecimal(re.get("product_count").toString());
-				int bCount = re.get("out_count");
-				int sCount = re.get("left_count");
-				int bigOutCount = bCount/(creatconverRelate.intValue());
-				int smallOutCount = bCount%(creatconverRelate.intValue());
-				int bigLeftCount = sCount/(creatconverRelate.intValue());
-				int smallLeftCount = sCount%(creatconverRelate.intValue());
-				String bigCount =(count.intValue())/(creatconverRelate.intValue())+"";
-				String smallCount = (count.intValue())%(creatconverRelate.intValue())+"";
+				BigDecimal creatconverRelate = new BigDecimal(re.getStr("convert_relate"));
+				BigDecimal bigPrice = new BigDecimal(re.getStr("product_price"));
+				BigDecimal count = new BigDecimal(re.getStr("product_count"));
+				String bigCount = (count.intValue()) / (creatconverRelate.intValue()) + "";
+				String smallCount = (count.intValue()) % (creatconverRelate.intValue()) + "";
 				BigDecimal smallPrice = bigPrice.divide(creatconverRelate, 2, BigDecimal.ROUND_HALF_UP);
-				excel.setProductName(re.get("custom_name").toString());
-				excel.setValueName(re.get("valueName").toString());
-				excel.setProductCount(bigCount);
-				excel.setCreatconvertRelate(re.get("convert_relate").toString()+re.get("small_unit").toString()+"/"+re.get("big_unit").toString());
-				excel.setProductPrice(re.get("product_price").toString());
-				excel.setSmallCount(smallCount);
-				excel.setSmallPrice(smallPrice.toString());
-				excel.setBigOutCount(bigOutCount);
-				excel.setSmallOutCount(smallOutCount);
-				excel.setBigLeftCount(bigLeftCount);
-				excel.setSmallLeftCount(smallLeftCount);
-				excel.setTotalAmount(re.get("product_amount").toString());
-				excel.setOrderSn(record.get("order_sn").toString());
-				excel.setCustomer(record.get("customer_name").toString());
-				excel.setCustomerType(record.get("customerTypeName").toString());
-				excel.setCcontact(record.get("contact").toString());
-				excel.setCmobile(record.get("mobile").toString());
-				if(record.get("realname")==null){
-					excel.setBizUser("");
-				}else{
-					excel.setBizUser(record.get("realname").toString());
+				if(!bigCount.equals("0")) {
+					SalesOrderExcel excel = new SalesOrderExcel();
+					excel = saveExcel(re,record,bigPrice,bigCount,customerInfo,saveDate,createDate,"",re.getStr("big_unit"));
+					excellist.add(excel);
 				}
-				if(record.get("receive_type").toString().equals("0")){
-					excel.setReceiveType("应收账款");
-				}else{
-					excel.setReceiveType("现金");
+				if(!smallCount.equals("0")){
+					SalesOrderExcel excel = new SalesOrderExcel();
+					excel = saveExcel(re,record,smallPrice,smallCount,customerInfo,saveDate,createDate,"",re.getStr("small_unit"));
+					excellist.add(excel);
 				}
-				/*
-				 * 状态 0:待审核 1000:已审核 1001:订单取消 2000:部分出库 2001:部分出库-订单关闭 3000:全部出库 30001:全部出库-订单关闭
-				 * */
-				if(record.get("status").toString().equals("0")){
-					excel.setStatus("待审核");
-				}else if(record.get("status").toString().equals("1000")) {
-					excel.setStatus("已审核");
-				}else if(record.get("status").toString().equals("1001")) {
-					excel.setStatus("订单取消");
-				}else if(record.get("status").toString().equals("2000")) {
-					excel.setStatus("部分出库");
-				}else if(record.get("status").toString().equals("2001")) {
-					excel.setStatus("部分出库-订单关闭");
-				}else if(record.get("status").toString().equals("3000")) {
-					excel.setStatus("全部出库");
-				}else{
-					excel.setStatus("全部出库-订单关闭");
-				}
-				if(re.get("is_gift").toString().equals("0")){
-					excel.setIsGift("否");
-				}else{
-					excel.setIsGift("是");
-				}
-				if(re.get("is_composite").toString().equals("0")){
-					excel.setIsComposite("否");
-				}else{
-					excel.setIsComposite("是");
-				}
-				excel.setWarehouse(re.get("warehouseName").toString());
-				excel.setCreateDate(record.get("create_date").toString());
-				excellist.add(excel);
 				
 			}
 		}
@@ -855,5 +804,68 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		ExcelExportUtil.closeExportBigExcel();
 		
 		renderFile(new File(filePath));
+	}
+	
+	public SalesOrderExcel saveExcel(Record re,Record record,BigDecimal price,String count,String customerInfo,String saveDate,String createDate,String printDate,String unit) {
+		SalesOrderExcel excel = new SalesOrderExcel();
+		excel.setProductName(re.getStr("custom_name"));
+		excel.setValueName(re.getStr("valueName"));
+		excel.setProductCount(count);
+		excel.setProductPrice(price.toString());
+		excel.setCustomer(customerInfo);
+		excel.setUnit(unit);
+		excel.setCreatconvertRelate(re.getStr("convert_relate") + re.getStr("small_unit") + "/"
+				+ re.getStr("big_unit"));
+		excel.setProductPrice(price.toString());
+		excel.setTotalAmount(price.multiply(new BigDecimal(count)).toString());
+		excel.setCreatconvertRelate(re.getStr("convert_relate")+re.getStr("small_unit")+"/"+re.getStr("big_unit"));
+		excel.setTotalAmount(price.multiply(new BigDecimal(count)).toString());
+		excel.setOrderSn(record.getStr("order_sn"));
+		excel.setCustomer(customerInfo);
+		excel.setCustomerType(record.getStr("customerTypeName"));
+		excel.setPrintDate(printDate);
+		if(record.getStr("realname")==null){
+			excel.setBizUser("");
+		}else{
+			excel.setBizUser(record.getStr("realname"));
+		}
+		if(record.getStr("receive_type").equals("0")){
+			excel.setReceiveType("应收账款");
+		}else{
+			excel.setReceiveType("现金");
+		}
+		/*
+		 * 状态 0:待审核 1000:已审核 1001:订单取消 2000:部分出库 2001:部分出库-订单关闭 3000:全部出库 30001:全部出库-订单关闭
+		 * */
+		if(record.get("status").toString().equals("0")){
+			excel.setStatus("待审核");
+		}else if(record.get("status").toString().equals("1000")) {
+			excel.setStatus("已审核");
+		}else if(record.get("status").toString().equals("1001")) {
+			excel.setStatus("订单取消");
+		}else if(record.get("status").toString().equals("2000")) {
+			excel.setStatus("部分出库");
+		}else if(record.get("status").toString().equals("2001")) {
+			excel.setStatus("部分出库-订单关闭");
+		}else if(record.get("status").toString().equals("3000")) {
+			excel.setStatus("全部出库");
+		}else{
+			excel.setStatus("全部出库-订单关闭");
+		}
+		if(re.get("is_gift").toString().equals("0")){
+			excel.setIsGift("否");
+		}else{
+			excel.setIsGift("是");
+		}
+		if(re.get("is_composite").toString().equals("0")){
+			excel.setIsComposite("否");
+		}else{
+			excel.setIsComposite("是");
+		}
+		excel.setBarCode(re.getStr("bar_code"));
+		excel.setWarehouse(re.get("warehouseName").toString());
+		excel.setOrderDate(saveDate);
+		excel.setCreateDate(record.get("create_date").toString());
+		return excel;
 	}
 }
