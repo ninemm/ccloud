@@ -75,12 +75,12 @@
 	    var params = {
 		    "page": page,
 	        "size": size,
-	        "nearby": $("#searchArea").data('values'),
+	        "dist": $("#searchArea").data('values'),
 			"lng": $('#lng').val(),
 			"lat": $('#lat').val()
 	    }
 
-		Utils.ajax('${CPATH}/product/customerNearbyChose', params,
+		Utils.ajax('${CPATH}/product/customerNearbyChoseRefresh', params,
 			function(data){
 				$loading.hide();
 				if(data.customerList.length == 0){
@@ -145,16 +145,10 @@
 				var accuracy = res.accuracy;                      // 位置精度
 
 				var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
-				var geoc = new BMap.Geocoder();                   // 获取百度地址解析器
 
 				translateCallback = function (point) {            // 回调函数
 					$("#lng").val(parseFloat(point.lng).toFixed(6));
 					$("#lat").val(parseFloat(point.lat).toFixed(6));
-					/*geoc.getLocation(point, function(rs) {
-						var addComp = rs.addressComponents;
-						var address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
-						$('#location').text(address);
-					});*/
 				};
 				setTimeout(function() {
 					BMap.Convertor.translate(point, 0, translateCallback);//真实经纬度转成百度坐标
