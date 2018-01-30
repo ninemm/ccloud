@@ -14,8 +14,8 @@
 </#macro>
 <#macro script>
 
-    var lng;
-    var lat;
+    var lng = 0;
+    var lat = 0;
     var center;
     var startDate = $.today();
     var endDate = $.today() + ' 23:59:59';
@@ -100,17 +100,32 @@
     }
 
     function refresh(){
+        layer.open({
+            type: 2,
+            content: '加载中...'
+        });
         var url = "${CPATH}/customerVisit/trajectoryRefresh?userId=" + $("#customer")[0].dataset.values + "&startDate=" + startDate + "&endDate=" + endDate;
         $.get(url, function(result){
+            map.clearOverlays();//清除所有标注
             if(result.length>0) {
                 center = new BMap.Point(result[0].lng, result[0].lat);//坐标点
                 map.centerAndZoom(center, 15);
                 render(result);
+            } else {
+                if(lng != 0 && lat != 0) {
+                    map.centerAndZoom(center, 15);
+                    map.enableScrollWheelZoom(true);
+                    layer.closeAll();
+                }
             }
         })
     }
 
     function render(result){
+        layer.open({
+            type: 2,
+            content: '加载中...'
+        });
         map.enableScrollWheelZoom(true);
         var visitList = result;
         var pointArray = [];
@@ -151,6 +166,7 @@
         str = str + "</div></div> </div>"
         $("#combin-filter").empty();
         $("#combin-filter").append(str);
+        layer.closeAll();
     }
 
     function addClickHandler(content,marker,opts){
@@ -193,6 +209,7 @@
                     center = new BMap.Point(lng, lat);
                     map.centerAndZoom(center, 15);
                     map.enableScrollWheelZoom(true);
+                    layer.closeAll();
                 };
 
                 setTimeout(function() {
