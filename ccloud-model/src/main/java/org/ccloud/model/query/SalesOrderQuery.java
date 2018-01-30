@@ -1003,12 +1003,12 @@ public class SalesOrderQuery extends JBaseQuery {
 		}
 		params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
 		if (StrKit.notBlank(startDate)) {
-			fromBuilder.append(" and cc.create_date >= ?");
+			fromBuilder.append(" and cc.biz_date >= ?");
 			params.add(startDate);
 		}
 
 		if (StrKit.notBlank(endDate)) {
-			fromBuilder.append(" and cc.create_date <= ?");
+			fromBuilder.append(" and cc.biz_date <= ?");
 			params.add(endDate);
 		}
 
@@ -1351,12 +1351,12 @@ public class SalesOrderQuery extends JBaseQuery {
 		}
 		params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
 		if (StrKit.notBlank(startDate)) {
-			fromBuilder.append(" and o.create_date >= ? ");
+			fromBuilder.append(" and o.biz_date >= ? ");
 			params.add(startDate);
 		}
 
 		if (StrKit.notBlank(endDate)) {
-			fromBuilder.append(" and o.create_date <= ? ");
+			fromBuilder.append(" and o.biz_date <= ? ");
 			params.add(endDate);
 		}
 		fromBuilder.append("GROUP BY u.id ");
@@ -1522,12 +1522,12 @@ public class SalesOrderQuery extends JBaseQuery {
 		}
 		params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
 		if (StrKit.notBlank(startDate)) {
-			fromBuilder.append(" and o.create_date >= ? ");
+			fromBuilder.append(" and o.biz_date >= ? ");
 			params.add(startDate);
 		}
 
 		if (StrKit.notBlank(endDate)) {
-			fromBuilder.append(" and o.create_date <= ? ");
+			fromBuilder.append(" and o.biz_date <= ? ");
 			params.add(endDate);
 		}
 		fromBuilder.append("GROUP BY u.id ");
@@ -1620,12 +1620,12 @@ public class SalesOrderQuery extends JBaseQuery {
 		}
 		params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
 		if (StrKit.notBlank(startDate)) {
-			fromBuilder.append(" and cc.create_date >= ? ");
+			fromBuilder.append(" and cc.biz_date >= ? ");
 			params.add(startDate);
 		}
 
 		if (StrKit.notBlank(endDate)) {
-			fromBuilder.append(" and cc.create_date <= ? ");
+			fromBuilder.append(" and cc.biz_date <= ? ");
 			params.add(endDate);
 		}
 
@@ -1722,12 +1722,12 @@ public class SalesOrderQuery extends JBaseQuery {
 		params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
 
 		if (StrKit.notBlank(startDate)) {
-			fromBuilder.append(" and cs.create_date >= ? ");
+			fromBuilder.append(" and cs.biz_date >= ? ");
 			params.add(startDate);
 		}
 
 		if (StrKit.notBlank(endDate)) {
-			fromBuilder.append(" and cs.create_date <= ? ");
+			fromBuilder.append(" and cs.biz_date <= ? ");
 			params.add(endDate);
 		}
 		fromBuilder.append("GROUP BY cs.seller_id ");

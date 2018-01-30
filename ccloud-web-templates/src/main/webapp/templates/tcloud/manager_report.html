@@ -387,7 +387,9 @@
     function startDaySelect(obj,type) {
 		var params = {
     		"startDate": $(obj).val(),
-			"endDate": $(obj).parent().find('#endDay').val() + ' 23:59:59'
+			"endDate": $(obj).parent().find('#endDay').val() + ' 23:59:59',
+			"orderTag": $("#orderTag").val(),
+			"typeTag": $("#typeTag").val()			
 		}
 		urlSelect(params,type); 
     }
@@ -395,7 +397,9 @@
     function endDaySelect(obj,type) {
 		var params = {
     		"startDate": $(obj).parent().find('#startDay').val(),
-			"endDate": $(obj).val() + ' 23:59:59'
+			"endDate": $(obj).val() + ' 23:59:59',
+			"orderTag": $("#orderTag").val(),
+			"typeTag": $("#typeTag").val()			
 		}
 		urlSelect(params,type); 
     }
