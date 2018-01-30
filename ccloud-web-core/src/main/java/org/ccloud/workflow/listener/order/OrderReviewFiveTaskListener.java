@@ -1,8 +1,8 @@
 
 package org.ccloud.workflow.listener.order;
 
-import java.util.List;
-
+import com.jfinal.kit.StrKit;
+import com.jfinal.plugin.activerecord.Record;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.delegate.DelegateTask;
 import org.activiti.engine.delegate.TaskListener;
@@ -11,13 +11,11 @@ import org.activiti.engine.task.Task;
 import org.ccloud.Consts;
 import org.ccloud.model.User;
 import org.ccloud.model.query.DepartmentQuery;
-import org.ccloud.model.query.UserQuery;
 import org.ccloud.workflow.plugin.ActivitiPlugin;
 
-import com.jfinal.kit.StrKit;
-import com.jfinal.plugin.activerecord.Record;
+import java.util.List;
 
-public class OrderReviewTwoTaskListener implements TaskListener {
+public class OrderReviewFiveTaskListener implements TaskListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -36,16 +34,20 @@ public class OrderReviewTwoTaskListener implements TaskListener {
 		ProcessEngine processEngine = ActivitiPlugin.buildProcessEngine();
 		List<Task> taskList = processEngine.getTaskService().createTaskQuery().executionId(executeInstanceId).list();
 
-		if (taskList != null && taskList.size() == 0) {// 主管
-			String managerName = "";
-			User manager = UserQuery.me().findManagerByDeptId(user.getDepartmentId());
-			if (manager != null) {
-				managerName = manager.getUsername();
-			}
+		if (taskList != null && taskList.size() == 0) {// 直营总监
+			String directorUserName = "";
+			List<Record> directors = OrderReviewUtil.getDirector(
+					DepartmentQuery.me().findDealerDataArea(user.getDepartmentId()));
+			for (Record record : directors) {
+				if (StrKit.notBlank(directorUserName)) {
+					directorUserName = directorUserName + ",";
+				}
 
-			task.setAssignee(managerName);
-			OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核", manager.getId(), user.getId(), user.getDepartmentId(),
-					user.getDataArea(), orderId);
+				directorUserName += record.getStr("username");
+				OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核", record.getStr("id"), user.getId(),
+						user.getDepartmentId(), user.getDataArea(), orderId);
+			}
+			task.setAssignee(directorUserName);
 		} else if (taskList != null && taskList.size() > 0) {
 
 			List<HistoricTaskInstance> list = processEngine.getHistoryService().createHistoricTaskInstanceQuery()

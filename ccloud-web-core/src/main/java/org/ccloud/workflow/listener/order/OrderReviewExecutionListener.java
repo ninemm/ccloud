@@ -1,14 +1,12 @@
 package org.ccloud.workflow.listener.order;
 
-import java.util.Date;
-import java.util.List;
-
+import com.jfinal.kit.Kv;
+import com.jfinal.plugin.activerecord.Record;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.ccloud.Consts;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
-import org.ccloud.model.Message;
 import org.ccloud.model.User;
 import org.ccloud.model.WxMessageTemplate;
 import org.ccloud.model.query.SalesOrderDetailQuery;
@@ -17,8 +15,8 @@ import org.ccloud.model.query.SalesOutstockQuery;
 import org.ccloud.model.query.WxMessageTemplateQuery;
 import org.joda.time.DateTime;
 
-import com.jfinal.kit.Kv;
-import com.jfinal.plugin.activerecord.Record;
+import java.util.Date;
+import java.util.List;
 
 public class OrderReviewExecutionListener implements ExecutionListener {
 
@@ -46,11 +44,11 @@ public class OrderReviewExecutionListener implements ExecutionListener {
 
 		if (pass == 1) {
 			SalesOutstockQuery.me().pass(orderId, confirm.getId(), sellerId, sellerCode);
-			this.sendOrderMessage(sellerId, customerName, "订单审核通过", confirm.getId(), user.getId(),
+			OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核通过", confirm.getId(), user.getId(),
 					confirm.getDepartmentId(), confirm.getDataArea(), orderId);
 		} else {
 			SalesOrderQuery.me().updateConfirm(orderId, Consts.SALES_ORDER_STATUS_REJECT, confirm.getId(), new Date());// 已审核拒绝
-			this.sendOrderMessage(sellerId, customerName, "订单审核拒绝", confirm.getId(), user.getId(),
+			OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核拒绝", confirm.getId(), user.getId(),
 					confirm.getDepartmentId(), confirm.getDataArea(), orderId);
 
 			Object _comment = execution.getVariable("comment");
@@ -59,29 +57,6 @@ public class OrderReviewExecutionListener implements ExecutionListener {
 		}
 
 		System.err.println("--------------执行完成---------------");
-	}
-
-	private void sendOrderMessage(String sellerId, String title, String content, String fromUserId, String toUserId,
-			String deptId, String dataArea, String orderId) {
-
-		Message message = new Message();
-		message.setType(Message.ORDER_REVIEW_TYPE_CODE);
-
-		message.setSellerId(sellerId);
-		message.setTitle(title);
-		message.setContent(content);
-		
-		message.setObjectId(orderId);
-		message.setIsRead(Consts.NO_READ);
-		message.setObjectType(Consts.OBJECT_TYPE_ORDER);
-
-		message.setFromUserId(fromUserId);
-		message.setToUserId(toUserId);
-		message.setDeptId(deptId);
-		message.setDataArea(dataArea);
-
-		MessageKit.sendMessage(Actions.ProcessMessage.PROCESS_MESSAGE_SAVE, message);
-
 	}
 
 	private void sendOrderWxMesssage(String toWechatOpenId, String orderId, String realname, String comment) {
@@ -95,10 +70,10 @@ public class OrderReviewExecutionListener implements ExecutionListener {
 		StringBuilder builder = new StringBuilder();
 		for (Record record : orderDetailList) {
 			int convert_relate = record.get("convert_relate");
-			builder.append("\n" +record.get("custom_name") + " " + record.getInt("product_count") / convert_relate + " "
-					+ record.get("big_unit") + "\n");
+			builder.append("\n" + record.get("custom_name") + " " + record.getInt("product_count") / convert_relate + " "
+					               + record.get("big_unit") + "\n");
 			builder.append(record.get("custom_name") + " " + record.getInt("product_count") % convert_relate + " "
-					+ record.get("small_unit") + "\n");
+					               + record.get("small_unit") + "\n");
 		}
 
 		kv.set("touser", toWechatOpenId);

@@ -55,6 +55,7 @@ import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
+import org.ccloud.workflow.listener.order.OrderReviewUtil;
 import org.ccloud.workflow.service.WorkFlowService;
 
 import com.alibaba.fastjson.JSON;
@@ -332,8 +333,8 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 					}
         		} else {
         			SalesOutstockQuery.me().pass(orderId, user.getId(), sellerId, sellerCode);
-        			sendOrderMessage(sellerId, StringUtils.getArrayFirst(paraMap.get("customerName")), "订单审核通过", user.getId(), user.getId(),
-        					user.getDepartmentId(), user.getDataArea());        			
+        			OrderReviewUtil.sendOrderMessage(sellerId, StringUtils.getArrayFirst(paraMap.get("customerName")), "订单审核通过", user.getId(), user.getId(),
+        					user.getDepartmentId(), user.getDataArea(), orderId);
         		}
             	return true;
             }
@@ -432,8 +433,8 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		if(!salesOrder.update()) {
 			return false;
 		}
-		
-		sendOrderMessage(sellerId, customerName, "订单审核", user.getId(), toUserId, user.getDepartmentId(), user.getDataArea());
+
+		OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核", user.getId(), toUserId, user.getDepartmentId(), user.getDataArea(), orderId);
 		
 		return true;
 	}
@@ -513,24 +514,6 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		setAttr("orderDetailList", orderDetailList);
 		render("audit.html");
 	}
-	
-	private void sendOrderMessage(String sellerId, String title, String content, String fromUserId, String toUserId, String deptId, String dataArea) {
-		
-		Message message = new Message();
-		message.setType(Message.ORDER_REVIEW_TYPE_CODE);
-		
-		message.setSellerId(sellerId);
-		message.setTitle(title);
-		message.setContent(content);
-		
-		message.setFromUserId(fromUserId);
-		message.setToUserId(toUserId);
-		message.setDeptId(deptId);
-		message.setDataArea(dataArea);
-		
-		MessageKit.sendMessage(Actions.ProcessMessage.PROCESS_MESSAGE_SAVE, message);
-		
-	}	
 	
 	@Before(Tx.class)
 	public void complete() {

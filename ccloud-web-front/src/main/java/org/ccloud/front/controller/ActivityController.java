@@ -247,7 +247,7 @@ public class ActivityController extends BaseFrontController {
 		String procInstId = workflow.startProcess(activityApplyId, proc_def_key, param);
 
 
-		sendOrderMessage(sellerId, customerName, "活动审核", user.getId(), toUserId, user.getDepartmentId(), user.getDataArea(),activityApplyId);
+		sendMessage(sellerId, customerName, "活动审核", user.getId(), toUserId, user.getDepartmentId(), user.getDataArea(),activityApplyId);
 
 		return procInstId;
 	}
@@ -314,7 +314,7 @@ public class ActivityController extends BaseFrontController {
 		return 1;
 	}
 */
-	private void sendOrderMessage(String sellerId, String title, String content, String fromUserId, String toUserId, String deptId, String dataArea, String orderId) {
+	private void sendMessage(String sellerId, String title, String content, String fromUserId, String toUserId, String deptId, String dataArea, String orderId) {
 
 		Message message = new Message();
 		message.setType(Message.ACTIVITY_APPLY_REVIEW_TYPE_CODE);
@@ -360,7 +360,7 @@ public class ActivityController extends BaseFrontController {
 		ActivityApply activityApply = ActivityApplyQuery.me().findById(activityApplyId);
 		String customerName = activityApply.get("customer_name");
 		String toUserId = activityApply.get("biz_user_id");
-		sendOrderMessage(sellerId, customerName, (pass == 1 ? "活动审核通过" : "活动审核拒绝"), user.getId(), toUserId, user.getDepartmentId(), user.getDataArea(), activityApplyId);
+		sendMessage(sellerId, customerName, (pass == 1 ? "活动审核通过" : "活动审核拒绝"), user.getId(), toUserId, user.getDepartmentId(), user.getDataArea(), activityApplyId);
 		activityApply.setStatus(pass == 1 ? Consts.ACTIVITY_APPLY_STATUS_PASS : Consts.ACTIVITY_APPLY_STATUS_REJECT);
 		activityApply.update();
 

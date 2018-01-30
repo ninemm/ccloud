@@ -36,8 +36,9 @@ $(function() {
 			</div>
 			<p class="name">${(session._logined_user.realname)!}</p>
 			<p class="mobile">${(session._logined_user.mobile)!}</p>
-			</div>
+		</div>
 	</header>
+	
 	<div>
 		<@shiro.hasPermission name="/admin/salesOrder/check,/admin/sellerCustomer/audit,/admin/customerVisit/audit,/admin/activityApply/check">
 		<div class="weui-cells__title">我的待办</div>
@@ -52,7 +53,6 @@ $(function() {
 				<p class="weui-grid__label">订单审核</p>
 			</a>
 			</@shiro.hasPermission>
-		
 			<@shiro.hasPermission name="/admin/sellerCustomer/audit">
 			<a href="${CPATH}/todo/customer" class="weui-grid js_grid">
 				<#if (customerTotal??) && (customerTotal != 0)>
@@ -63,7 +63,6 @@ $(function() {
 				<p class="weui-grid__label">客户审核</p>
 			</a>
 			</@shiro.hasPermission>
-			
 			<@shiro.hasPermission name="/admin/customerVisit/audit">
 			<a href="${CPATH}/todo/visit" class="weui-grid js_grid">
 				<#if (customerVisitTotal??) && (customerVisitTotal != 0)>
@@ -74,7 +73,6 @@ $(function() {
 				<p class="weui-grid__label">拜访审核</p>
 			</a>
 			</@shiro.hasPermission>
-
 			<@shiro.hasPermission name="/admin/activityApply/check">
 			 <a href="${CPATH}/todo/activityApply" class="weui-grid js_grid">
 				 <#if (activityApplyTotal??) && (activityApplyTotal !=0)>
@@ -85,17 +83,9 @@ $(function() {
 				<p class="weui-grid__label">活动审核</p>
 			</a>
 			</@shiro.hasPermission>
-
-			<@shiro.hasPermission name="/admin/receivables">
-			<a href="${CPATH}/receivables/index" class="weui-grid js_grid">
-				<div class="weui-grid__icon relative">
-					<i class="icon-cc-visa" style="position: absolute;left: 50%;transform: translateX(-50%);"></i>
-				</div>
-				<p class="weui-grid__label">收款管理</p>
-			</a>
-			</@shiro.hasPermission>			
 		</div>
 		</@shiro.hasPermission>
+		
 		<@shiro.hasPermission name="/admin/salesOrder,/admin/salesRefund,/admin/salesRefund/check,/admin/plans,/admin/report/inventoryDetail">
 		<div class="weui-cells__title">我的订单</div>
 		<div class="weui-grids">
@@ -125,7 +115,12 @@ $(function() {
 				<p class="weui-grid__label">申请退货</p>
 			</a>
 			</@shiro.hasPermission>
-
+		</div>
+		</@shiro.hasPermission>
+		
+		<@shiro.hasPermission name="/admin/plans">
+		<div class="weui-cells__title">工作计划</div>
+		<div class="weui-grids">
 			<@shiro.hasPermission name="/admin/plans">
 			<a href="${CPATH}/plans/myPlans" class="weui-grid js_grid">
 				<div class="weui-grid__icon">
@@ -134,17 +129,9 @@ $(function() {
 				<p class="weui-grid__label">销售计划</p>
 			</a>
 			</@shiro.hasPermission>
-			
-			<@shiro.hasPermission name="/front/inventory">
-			<a class="weui-grid js_grid" href="${CPATH}/inventory/index">
-				<div class="weui-grid__icon">
-					<i class="icon-database"></i>
-				</div>
-				<p class="weui-grid__label">库存详情</p>
-			</a>
-			</@shiro.hasPermission>
 		</div>
 		</@shiro.hasPermission>
+		
 		<@shiro.hasPermission name="/admin/activityApply/add,/admin/activityApply">
 		<div class="weui-cells__title">营销活动</div>
 		<div class="weui-grids">
@@ -186,33 +173,48 @@ $(function() {
 				<p class="weui-grid__label">签到</p>
 			</a>
 		</div> -->
-		<@shiro.hasPermission name="/admin/customerVisit,/admin/customerVisit/add">
+		<@shiro.hasPermission name="/admin/customerVisit,/admin/customerVisit/add,/admin/customerVisit/trajector">
 		<div class="weui-cells__title">客户拜访</div>
 		<div class="weui-grids">
-		<@shiro.hasPermission name="/admin/customerVisit">
-			<a href="${(CPATH)}/customerVisit" class="weui-grid js_grid">
-				<div class="weui-grid__icon">
-					<i class="icon-building"></i>
-				</div>
-				<p class="weui-grid__label">拜访记录</p>
-			</a>
+			<@shiro.hasPermission name="/admin/customerVisit/add">
+				<a href="${CPATH}/customerVisit/edit" class="weui-grid js_grid">
+					<div class="weui-grid__icon">
+						<i class="icon-plane"></i>
+					</div>
+					<p class="weui-grid__label">新增拜访</p>
+				</a>
+			</@shiro.hasPermission>
+			<@shiro.hasPermission name="/admin/customerVisit">
+				<a href="${(CPATH)}/customerVisit" class="weui-grid js_grid">
+					<div class="weui-grid__icon">
+						<i class="icon-building"></i>
+					</div>
+					<p class="weui-grid__label">拜访记录</p>
+				</a>
+			</@shiro.hasPermission>
 			<@shiro.hasPermission name="/admin/customerVisit/trajector">
-			<a href="${CPATH}/customerVisit/trajectory" class="weui-grid js_grid">
-				<div class="weui-grid__icon"><i class="icon-line-chart"></i></div>
-				<p class="weui-grid__label">拜访轨迹</p>
-			</a>
-		</@shiro.hasPermission>
-		</@shiro.hasPermission>
-		<@shiro.hasPermission name="/admin/customerVisit/add">
-			<a href="${CPATH}/customerVisit/edit" class="weui-grid js_grid">
-				<div class="weui-grid__icon">
-					<i class="icon-plane"></i>
-				</div>
-				<p class="weui-grid__label">新增拜访</p>
-			</a>
-		</@shiro.hasPermission>
+				<a href="${CPATH}/customerVisit/trajectory" class="weui-grid js_grid">
+					<div class="weui-grid__icon"><i class="icon-line-chart"></i></div>
+					<p class="weui-grid__label">拜访轨迹</p>
+				</a>
+			</@shiro.hasPermission>
 		</div>		
 		</@shiro.hasPermission>
+		
+		<@shiro.hasPermission name="/admin/receivables">
+		<div class="weui-cells__title">账务管理</div>
+		<div class="weui-grids">
+			<@shiro.hasPermission name="/admin/receivables">
+			<a href="${CPATH}/receivables/index" class="weui-grid js_grid">
+				<div class="weui-grid__icon relative">
+					<i class="icon-cc-visa" style="position: absolute;left: 50%;transform: translateX(-50%);"></i>
+				</div>
+				<p class="weui-grid__label">收款管理</p>
+			</a>
+			</@shiro.hasPermission>			
+		</div>
+		</@shiro.hasPermission>
+		
 		<div class="weui-cells__title">售后服务</div>
 		<div class="weui-grids">
 			<a id="service_btn" class="weui-grid js_grid">
