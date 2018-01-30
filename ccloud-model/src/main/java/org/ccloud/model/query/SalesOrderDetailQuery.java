@@ -503,5 +503,14 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 
 		return Db.find(sqlBuilder.toString(), order_sn);
 	}
+	
+	//通过订单详情ID查找活动名
+	public Record getOrderDetailId(String orderDetailId) {
+		String sql = "SELECT cs.order_id,ca.title, pc.activity_id FROM cc_sales_order_detail cs " 
+					+"LEFT JOIN cc_product_composition pc ON cs.composite_id = pc.id "  
+					+"LEFT JOIN cc_activity ca ON ca.id = pc.activity_id "
+					+ "where cs.id = '"+orderDetailId+"'";
+		return Db.findFirst(sql);
+	}
 
 }

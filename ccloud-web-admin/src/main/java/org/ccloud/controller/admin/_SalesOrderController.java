@@ -20,6 +20,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -761,8 +762,21 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 			String saveDate =record.getStr("create_date").substring(0, 10); 
 			//下单时间
 			String createDate = record.getStr("create_date");
+			//打印状态
+			
+			//打印时间
+			List<Record> outstockPrints = OutstockPrintQuery.me().findByOrderId(record.getStr("id"));
+			String printDate = "";
+			if(outstockPrints.size()>0) {
+				printDate =(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(outstockPrints.get(0).get("create_date")) ;
+			}
 			List<Record> orderDetail = SalesOrderDetailQuery.me().findByOrderId(orderId);
 			for(Record re : orderDetail){
+				String activityTitle = "";
+				if(re.getStr("is_composite").equals("1")) {
+					Record r = SalesOrderDetailQuery.me().getOrderDetailId(re.getStr("id"));
+					activityTitle= r.getStr("title");
+				}
 				BigDecimal creatconverRelate = new BigDecimal(re.getStr("convert_relate"));
 				BigDecimal bigPrice = new BigDecimal(re.getStr("product_price"));
 				BigDecimal count = new BigDecimal(re.getStr("product_count"));
@@ -771,12 +785,12 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 				BigDecimal smallPrice = bigPrice.divide(creatconverRelate, 2, BigDecimal.ROUND_HALF_UP);
 				if(!bigCount.equals("0")) {
 					SalesOrderExcel excel = new SalesOrderExcel();
-					excel = saveExcel(re,record,bigPrice,bigCount,customerInfo,saveDate,createDate,"",re.getStr("big_unit"));
+					excel = saveExcel(re,record,bigPrice,bigCount,customerInfo,saveDate,createDate,printDate,re.getStr("big_unit"),activityTitle);
 					excellist.add(excel);
 				}
 				if(!smallCount.equals("0")){
 					SalesOrderExcel excel = new SalesOrderExcel();
-					excel = saveExcel(re,record,smallPrice,smallCount,customerInfo,saveDate,createDate,"",re.getStr("small_unit"));
+					excel = saveExcel(re,record,smallPrice,smallCount,customerInfo,saveDate,createDate,printDate,re.getStr("small_unit"),activityTitle);
 					excellist.add(excel);
 				}
 				
@@ -806,12 +820,18 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		renderFile(new File(filePath));
 	}
 	
-	public SalesOrderExcel saveExcel(Record re,Record record,BigDecimal price,String count,String customerInfo,String saveDate,String createDate,String printDate,String unit) {
+	public SalesOrderExcel saveExcel(Record re,Record record,BigDecimal price,String count,String customerInfo,String saveDate,String createDate,String printDate,String unit,String activity) {
 		SalesOrderExcel excel = new SalesOrderExcel();
 		excel.setProductName(re.getStr("custom_name"));
 		excel.setValueName(re.getStr("valueName"));
 		excel.setProductCount(count);
 		excel.setProductPrice(price.toString());
+		excel.setPrintDate(printDate);
+		if(printDate.equals("")) {
+			excel.setIsPrint("否");
+		}else {
+			excel.setIsPrint("是");
+		}
 		excel.setCustomer(customerInfo);
 		excel.setUnit(unit);
 		excel.setCreatconvertRelate(re.getStr("convert_relate") + re.getStr("small_unit") + "/"
@@ -865,6 +885,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		excel.setBarCode(re.getStr("bar_code"));
 		excel.setWarehouse(re.get("warehouseName").toString());
 		excel.setOrderDate(saveDate);
+		excel.setActivity(activity);
 		excel.setCreateDate(record.get("create_date").toString());
 		return excel;
 	}

@@ -5,6 +5,8 @@ import cn.afterturn.easypoi.excel.annotation.Excel;
 public class SalesOrderExcel {
 	@Excel(name = "订单号")
 	private String orderSn;
+	@Excel(name = "活动")
+	private String activity;
 	@Excel(name = "下单日期")
 	private String orderDate;
 	@Excel(name = "下单时间")
@@ -171,5 +173,12 @@ public class SalesOrderExcel {
 	public void setBarCode(String barCode) {
 		this.barCode = barCode;
 	}
+	public String getActivity() {
+		return activity;
+	}
+	public void setActivity(String activity) {
+		this.activity = activity;
+	}
+	
 	
 }
