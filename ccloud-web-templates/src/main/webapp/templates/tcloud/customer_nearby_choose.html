@@ -135,6 +135,8 @@
 	});
 
 	wx.ready(function() {
+		$loading.show();
+		$noMore.hide();
 		// 获取定位信息
 		wx.getLocation({
 			type: 'wgs84',
@@ -149,12 +151,11 @@
 				translateCallback = function (point) {            // 回调函数
 					$("#lng").val(parseFloat(point.lng).toFixed(6));
 					$("#lat").val(parseFloat(point.lat).toFixed(6));
+					combo();
 				};
 				setTimeout(function() {
 					BMap.Convertor.translate(point, 0, translateCallback);//真实经纬度转成百度坐标
 				}, 100);
-				
-				combo();
 			},
 			cancel: function (res) {
 				console.log('用户拒绝授权获取地理位置');
