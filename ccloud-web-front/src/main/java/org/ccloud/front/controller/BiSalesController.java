@@ -192,7 +192,7 @@ public class BiSalesController extends BaseFrontController {
 		setAttr("provName", getPara("provName", "").trim());
 		setAttr("cityName", getPara("cityName", "").trim());
 		setAttr("dateType", dateType);
-		render("bi_product_Area.html");
+		render("bi_product_area.html");
 
 	}
 
