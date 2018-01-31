@@ -62,22 +62,22 @@
 			$(".visitNum").show();
 			var list = $("#invest_type").select2("val");
 			if (list != null && list.length > 0) {
-				for(var i =0;i<list.length;i++){
-					if(list[i]==101101 || list[i]==101102 || list[i]==101103 ||list[i]==101104 ||list[i]==101105 ||list[i]==101106 ){
-						result = true;
-						break;
-					}else{
-						result = false;
-					}
-				}
-				if(result == true ){
-					$(".investAmount").show();
+			for(var i =0;i<list.length;i++){
+				if(list[i]==101101 || list[i]==101102 || list[i]==101103 ||list[i]==101104 ||list[i]==101105 ||list[i]==101106 ){
+					result = true;
+					break;
 				}else{
-					$(".investAmount").hide();
+					result = false;
 				}
+			}
+			if(result == true ){
+				$(".investAmount").show();
 			}else{
 				$(".investAmount").hide();
 			}
+		}else{
+			$(".investAmount").hide();
+		}
 		}else{
 			$(".investType").hide();
 			$(".visitNum").hide();
