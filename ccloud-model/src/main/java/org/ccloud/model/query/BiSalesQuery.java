@@ -40,20 +40,23 @@ public class BiSalesQuery extends JBaseQuery {
 	                              String startDate, String endDate) {
 
 		LinkedList<Object> params = new LinkedList<Object>();
-		StringBuilder sqlBuilder = new StringBuilder("SELECT ifnull(SUM(cso.total_amount),0) as totalAmount FROM cc_sales_order so");
-		sqlBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id=so.customer_id ");
-		sqlBuilder.append(" LEFT JOIN cc_customer c ON c.id=sc.customer_id ");
-		sqlBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON sojo.order_id=so.id ");
-		sqlBuilder.append(" LEFT JOIN cc_sales_outstock cso ON cso.id=sojo.outstock_id ");
-		boolean needWhere = true;
-		needWhere = appendIfNotEmpty(sqlBuilder, "so.seller_id", sellerId, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "c.prov_name", provName, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "c.city_name", cityName, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "c.country_name", countryName, params, needWhere);
+		StringBuilder sqlBuilder = new StringBuilder(" SELECT ifnull(SUM(cso.total_amount), 0) - ifnull(SUM(t.totalAmount), 0) AS totalAmount ");
+		sqlBuilder.append(" FROM cc_sales_outstock cso ");
+		sqlBuilder.append(" JOIN cc_seller_customer csc ON cso.customer_id = csc.id ");
+		sqlBuilder.append(" JOIN cc_customer cc ON csc.customer_id = cc.id ");
+		sqlBuilder.append(" LEFT JOIN ");
+		sqlBuilder.append(" (SELECT csri.outstock_id, ifnull(SUM(csri.total_reject_amount),0) AS totalAmount ");
+		sqlBuilder.append(" FROM cc_sales_refund_instock csri ");
+		sqlBuilder.append(" WHERE csri.biz_date IS NOT NULL ");
+		sqlBuilder.append(" GROUP BY csri.outstock_id)t ON cso.id = t.outstock_id ");
 
-		if (needWhere) {
-			sqlBuilder.append(" where 1 = 1");
-		}
+		sqlBuilder.append(" WHERE csc.customer_kind = ? ");
+		params.add(Consts.CUSTOMER_KIND_COMMON);
+
+		appendIfNotEmpty(sqlBuilder, "cso.seller_id", sellerId, params, false);
+		appendIfNotEmpty(sqlBuilder, "cc.prov_name", provName, params, false);
+		appendIfNotEmpty(sqlBuilder, "cc.city_name", cityName, params, false);
+		appendIfNotEmpty(sqlBuilder, "cc.country_name", countryName, params, false);
 
 		if (startDate != null) {
 			sqlBuilder.append(" and cso.biz_date >= ?");
@@ -74,20 +77,18 @@ public class BiSalesQuery extends JBaseQuery {
 	                           String startDate, String endDate) {
 
 		LinkedList<Object> params = new LinkedList<Object>();
-		StringBuilder sqlBuilder = new StringBuilder(" SELECT count(1) FROM cc_sales_order so ");
-		sqlBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id=so.customer_id ");
-		sqlBuilder.append(" LEFT JOIN cc_customer c ON c.id=sc.customer_id ");
-		sqlBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON sojo.order_id=so.id ");
-		sqlBuilder.append(" LEFT JOIN cc_sales_outstock cso ON cso.id=sojo.outstock_id ");
-		boolean needWhere = true;
-		needWhere = appendIfNotEmpty(sqlBuilder, "so.seller_id", sellerId, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "c.prov_name", provName, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "c.city_name", cityName, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "c.country_name", countryName, params, needWhere);
+		StringBuilder sqlBuilder = new StringBuilder(" SELECT count(1) FROM cc_sales_outstock cso ");
+		sqlBuilder.append(" JOIN cc_seller_customer csc ON csc.id = cso.customer_id ");
+		sqlBuilder.append(" JOIN cc_customer cc ON cc.id = csc.customer_id ");
+		sqlBuilder.append(" JOIN cc_sales_order_join_outstock sojo ON sojo.outstock_id = cso.id ");
 
-		if (needWhere) {
-			sqlBuilder.append(" where 1 = 1");
-		}
+		sqlBuilder.append(" WHERE csc.customer_kind = ? ");
+		params.add(Consts.CUSTOMER_KIND_COMMON);
+
+		appendIfNotEmpty(sqlBuilder, "cso.seller_id", sellerId, params, false);
+		appendIfNotEmpty(sqlBuilder, "cc.prov_name", provName, params, false);
+		appendIfNotEmpty(sqlBuilder, "cc.city_name", cityName, params, false);
+		appendIfNotEmpty(sqlBuilder, "cc.country_name", countryName, params, false);
 
 		if (startDate != null) {
 			sqlBuilder.append(" and cso.biz_date >= ?");
@@ -98,6 +99,8 @@ public class BiSalesQuery extends JBaseQuery {
 			sqlBuilder.append(" and cso.biz_date <= ?");
 			params.add(endDate);
 		}
+
+		sqlBuilder.append(" group by sojo.order_id ");
 		return Db.queryLong(sqlBuilder.toString(), params.toArray());
 	}
 
@@ -107,20 +110,19 @@ public class BiSalesQuery extends JBaseQuery {
 
 		LinkedList<Object> params = new LinkedList<Object>();
 		StringBuilder sqlBuilder = new StringBuilder("select count(1) from (");
-		sqlBuilder.append(" SELECT so.customer_id FROM cc_sales_order so ");
-		sqlBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id=so.customer_id ");
-		sqlBuilder.append(" LEFT JOIN cc_customer c ON c.id=sc.customer_id ");
-		sqlBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON sojo.order_id=so.id ");
-		sqlBuilder.append(" LEFT JOIN cc_sales_outstock cso ON cso.id=sojo.outstock_id ");
-		boolean needWhere = true;
-		needWhere = appendIfNotEmpty(sqlBuilder, "so.seller_id", sellerId, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "c.prov_name", provName, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "c.city_name", cityName, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "c.country_name", countryName, params, needWhere);
+		sqlBuilder.append(" SELECT cso.customer_id ");
+		sqlBuilder.append(" FROM cc_sales_outstock cso ");
+		sqlBuilder.append(" JOIN cc_seller_customer csc ON cso.customer_id = csc.id ");
+		sqlBuilder.append(" JOIN cc_customer cc ON csc.customer_id = cc.id ");
 
-		if (needWhere) {
-			sqlBuilder.append(" where 1 = 1");
-		}
+		sqlBuilder.append(" WHERE csc.customer_kind = ? ");
+		params.add(Consts.CUSTOMER_KIND_COMMON);
+		sqlBuilder.append(" and cso.biz_date is not null ");
+
+		appendIfNotEmpty(sqlBuilder, "cso.seller_id", sellerId, params, false);
+		appendIfNotEmpty(sqlBuilder, "cc.prov_name", provName, params, false);
+		appendIfNotEmpty(sqlBuilder, "cc.city_name", cityName, params, false);
+		appendIfNotEmpty(sqlBuilder, "cc.country_name", countryName, params, false);
 
 		if (startDate != null) {
 			sqlBuilder.append(" and cso.biz_date >= ?");
@@ -131,7 +133,7 @@ public class BiSalesQuery extends JBaseQuery {
 			sqlBuilder.append(" and cso.biz_date <= ?");
 			params.add(endDate);
 		}
-		sqlBuilder.append(" GROUP BY so.customer_id ) t1");
+		sqlBuilder.append(" GROUP BY cso.customer_id ) t1");
 		return Db.queryLong(sqlBuilder.toString(), params.toArray());
 
 	}
@@ -143,17 +145,15 @@ public class BiSalesQuery extends JBaseQuery {
 		StringBuilder sqlBuilder = new StringBuilder("SELECT count(1) FROM cc_seller_customer csc");
 		sqlBuilder.append(" LEFT JOIN cc_customer cc ON cc.id = csc.customer_id ");
 
-		boolean needWhere = true;
-		needWhere = appendIfNotEmpty(sqlBuilder, "csc.seller_id", sellerId, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "cc.prov_name", provName, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "cc.city_name", cityName, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "cc.country_name", countryName, params, needWhere);
+		sqlBuilder.append(" where csc.is_enabled = 1 ");
+		sqlBuilder.append(" and csc.customer_kind = ? ");
+		params.add(Consts.CUSTOMER_KIND_COMMON);
 
-		if (needWhere) {
-			sqlBuilder.append(" where 1 = 1");
-		}
+		appendIfNotEmpty(sqlBuilder, "csc.seller_id", sellerId, params, false);
+		appendIfNotEmpty(sqlBuilder, "cc.prov_name", provName, params, false);
+		appendIfNotEmpty(sqlBuilder, "cc.city_name", cityName, params, false);
+		appendIfNotEmpty(sqlBuilder, "cc.country_name", countryName, params, false);
 
-		sqlBuilder.append(" and csc.is_enabled = 1 ");
 		return Db.queryLong(sqlBuilder.toString(), params.toArray());
 
 	}
@@ -164,21 +164,24 @@ public class BiSalesQuery extends JBaseQuery {
 
 		LinkedList<Object> params = new LinkedList<Object>();
 
-		StringBuilder sqlBuilder = new StringBuilder("SELECT CONCAT(YEAR(cso.create_date) ,'-', MONTH(cso.create_date),'-',DAY(cso.create_date)) idate,");
-		sqlBuilder.append(" TRUNCATE((SUM(cso.total_amount)/COUNT(1)),2)as avgAmount FROM cc_sales_order so ");
-		sqlBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id=so.customer_id ");
-		sqlBuilder.append(" LEFT JOIN cc_customer c ON c.id=sc.customer_id ");
-		sqlBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON sojo.order_id=so.id ");
-		sqlBuilder.append(" LEFT JOIN cc_sales_outstock cso ON cso.id=sojo.outstock_id ");
-		boolean needWhere = true;
-		needWhere = appendIfNotEmpty(sqlBuilder, "so.seller_id", sellerId, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "c.prov_name", provName, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "c.city_name", cityName, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "c.country_name", countryName, params, needWhere);
+		StringBuilder sqlBuilder = new StringBuilder(" SELECT CONCAT(YEAR(cso.biz_date) ,'-', MONTH(cso.biz_date),'-',DAY(cso.biz_date)) idate, ");
+		sqlBuilder.append(" TRUNCATE(((ifnull(SUM(cso.total_amount),0)- ifnull(SUM(t.totalAmount),0))/COUNT(1)),2)as avgAmount ");
+		sqlBuilder.append(" FROM cc_sales_outstock cso ");
+		sqlBuilder.append(" JOIN cc_seller_customer csc ON cso.customer_id = csc.id ");
+		sqlBuilder.append(" JOIN cc_customer cc ON csc.customer_id = cc.id ");
+		sqlBuilder.append(" LEFT JOIN ");
+		sqlBuilder.append(" (SELECT csri.outstock_id, ifnull(SUM(csri.total_reject_amount),0) AS totalAmount ");
+		sqlBuilder.append(" FROM cc_sales_refund_instock csri ");
+		sqlBuilder.append(" WHERE csri.biz_date IS NOT NULL ");
+		sqlBuilder.append(" GROUP BY csri.outstock_id)t ON cso.id = t.outstock_id ");
 
-		if (needWhere) {
-			sqlBuilder.append(" where 1 = 1");
-		}
+		sqlBuilder.append(" WHERE csc.customer_kind = ? ");
+		params.add(Consts.CUSTOMER_KIND_COMMON);
+
+		appendIfNotEmpty(sqlBuilder, "cso.seller_id", sellerId, params, false);
+		appendIfNotEmpty(sqlBuilder, "cc.prov_name", provName, params, false);
+		appendIfNotEmpty(sqlBuilder, "cc.city_name", cityName, params, false);
+		appendIfNotEmpty(sqlBuilder, "cc.country_name", countryName, params, false);
 
 		if (startDate != null) {
 			sqlBuilder.append(" and cso.biz_date >= ?");
@@ -189,65 +192,12 @@ public class BiSalesQuery extends JBaseQuery {
 			sqlBuilder.append(" and cso.biz_date <= ?");
 			params.add(endDate);
 		}
-		sqlBuilder.append(" GROUP BY YEAR(cso.create_date) , MONTH(cso.create_date),DAY(cso.create_date) ");
-		return Db.find(sqlBuilder.toString(), params.toArray());
-	}
-
-	public List<Record> findAreaListByCustomerType(String dealerCode, String provName, String cityName,
-	                                               String countryName, String startDate, String endDate, String customerTypeName) {
-
-		LinkedList<Object> params = new LinkedList<Object>();
-
-		StringBuilder sqlBuilder = new StringBuilder("select customerTypeName");
-
-		if (StrKit.notBlank(cityName)) {
-			sqlBuilder.append(", countryName");
-		} else if (StrKit.notBlank(provName)) {
-			sqlBuilder.append(", cityName");
-		} else {
-			sqlBuilder.append(", provName");
-		}
-
-		sqlBuilder.append(", TRUNCATE(SUM(totalSales)/1000000, 2) as totalAmount");
-
-		sqlBuilder.append(" from sales_fact");
-
-		boolean needWhere = true;
-		needWhere = appendIfNotEmpty(sqlBuilder, "dealerCode", dealerCode, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "customerTypeName", customerTypeName, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "provName", provName, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "cityName", cityName, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "countryName", countryName, params, needWhere);
-
-		if (needWhere) {
-			sqlBuilder.append(" where 1 = 1");
-		}
-
-		if (startDate != null) {
-			sqlBuilder.append(" and idate >= ?");
-			params.add(startDate);
-		}
-
-		if (endDate != null) {
-			sqlBuilder.append(" and idate <= ?");
-			params.add(endDate);
-		}
-
-		sqlBuilder.append(" group by provName");
-		if (StrKit.notBlank(provName)) {
-			sqlBuilder.append(", cityName");
-		}
-
-		if (StrKit.notBlank(cityName)) {
-			sqlBuilder.append(", countryName");
-		}
-		sqlBuilder.append(" order by totalAmount desc");
-
+		sqlBuilder.append(" GROUP BY YEAR(cso.biz_date) , MONTH(cso.biz_date),DAY(cso.biz_date) ");
 		return Db.find(sqlBuilder.toString(), params.toArray());
 	}
 
 	//产品区域分布
-	public List<Record> findAreaListByProduct(String dealerCode, String provName, String cityName, String countryName,
+	public List<Record> findAreaListByProduct(String sellerId, String provName, String cityName, String countryName,
 	                                          String startDate, String endDate, String cInvCode) {
 
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -261,23 +211,25 @@ public class BiSalesQuery extends JBaseQuery {
 			sqlBuilder.append(" c.prov_name provName");
 		}
 
-		sqlBuilder.append(", TRUNCATE( SUM(sod.product_count) / p.convert_relate , 2) totalNum , TRUNCATE( sum(sod.product_amount) / 10000 , 2) totalAmount ");
+		sqlBuilder.append(", TRUNCATE( (SUM(sod.product_count) - ifnull(SUM(cs.product_count),0)) / p.convert_relate , 2) totalNum , TRUNCATE( (sum(sod.product_amount) - ifnull(sum(cs.product_amount),0)) / 10000 , 2) totalAmount ");
 
 		sqlBuilder.append(" FROM cc_sales_outstock so ");
-		sqlBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id=so.customer_id ");
-		sqlBuilder.append(" LEFT JOIN cc_customer c ON c.id=sc.customer_id ");
-		sqlBuilder.append(" LEFT JOIN cc_sales_outstock_detail sod ON sod.outstock_id=so.id ");
-		sqlBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sod.sell_product_id ");
-		sqlBuilder.append(" LEFT JOIN cc_product p ON p.id=sp.product_id ");
-		boolean needWhere = true;
-		needWhere = appendIfNotEmpty(sqlBuilder, "c.prov_name", provName, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "c.city_name", cityName, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "c.country_name", countryName, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "sod.sell_product_id", cInvCode, params, needWhere);
+		sqlBuilder.append(" JOIN cc_seller_customer sc ON sc.id = so.customer_id ");
+		sqlBuilder.append(" JOIN cc_customer c ON c.id = sc.customer_id ");
+		sqlBuilder.append(" JOIN cc_sales_outstock_detail sod ON sod.outstock_id = so.id ");
+		sqlBuilder.append(" JOIN cc_seller_product sp ON sp.id = sod.sell_product_id ");
+		sqlBuilder.append(" JOIN cc_product p ON p.id = sp.product_id ");
+		sqlBuilder.append(" LEFT JOIN cc_sales_refund_instock_detail cs ON sod.id = cs.outstock_detail_id ");
 
-		if (needWhere) {
-			sqlBuilder.append(" where 1 = 1");
-		}
+		sqlBuilder.append(" WHERE sc.customer_kind = ? ");
+		params.add(Consts.CUSTOMER_KIND_COMMON);
+
+		appendIfNotEmpty(sqlBuilder, "so.seller_id", sellerId, params, false);
+		appendIfNotEmpty(sqlBuilder, "c.prov_name", provName, params, false);
+		appendIfNotEmpty(sqlBuilder, "c.city_name", cityName, params, false);
+		appendIfNotEmpty(sqlBuilder, "c.country_name", countryName, params, false);
+		appendIfNotEmpty(sqlBuilder, "sod.sell_product_id", cInvCode, params, false);
+
 		if (StrKit.notBlank(startDate)) {
 			sqlBuilder.append(" and so.biz_date >= ?");
 			params.add(startDate);
@@ -313,7 +265,7 @@ public class BiSalesQuery extends JBaseQuery {
 		sqlBuilder.append("LEFT JOIN cc_customer_type ct on ct.id = o.customer_type_id ");
 
 		boolean needWhere = true;
-		needWhere = appendIfNotEmpty(sqlBuilder, "cc.seller_id", sellerId, params, needWhere);
+		needWhere = appendIfNotEmpty(sqlBuilder, "o.seller_id", sellerId, params, needWhere);
 		needWhere = appendIfNotEmpty(sqlBuilder, "cu.prov_name", provName, params, needWhere);
 		needWhere = appendIfNotEmpty(sqlBuilder, "cu.city_name", cityName, params, needWhere);
 		needWhere = appendIfNotEmpty(sqlBuilder, "cu.country_name", countryName, params, needWhere);
@@ -346,23 +298,24 @@ public class BiSalesQuery extends JBaseQuery {
 
 		LinkedList<Object> params = new LinkedList<Object>();
 
-		StringBuilder sqlBuilder = new StringBuilder("SELECT ct.`name` customerTypeName , TRUNCATE( SUM(sod.product_count) / p.convert_relate , 2) totalNum , TRUNCATE( sum(sod.product_amount) / 10000 , 2) totalAmount ");
+		StringBuilder sqlBuilder = new StringBuilder("SELECT ct.`name` customerTypeName , TRUNCATE( (SUM(sod.product_count) - ifnull(SUM(cs.product_count),0)) / p.convert_relate , 2) totalNum , TRUNCATE( (sum(sod.product_amount) - ifnull(SUM(cs.product_amount),0)) / 10000 , 2) totalAmount ");
 		sqlBuilder.append(" FROM cc_sales_outstock so ");
-		sqlBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id=so.customer_id ");
-		sqlBuilder.append(" LEFT JOIN cc_customer c ON c.id=sc.customer_id ");
-		sqlBuilder.append(" LEFT JOIN cc_sales_outstock_detail sod ON sod.outstock_id=so.id ");
-		sqlBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sod.sell_product_id ");
-		sqlBuilder.append(" LEFT JOIN cc_product p ON p.id=sp.product_id ");
-		sqlBuilder.append(" LEFT JOIN cc_customer_type ct ON ct.id = so.customer_type_id ");
-		boolean needWhere = true;
-		needWhere = appendIfNotEmpty(sqlBuilder, "so.seller_id", sellerId, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "c.prov_name", provName, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "c.city_name", cityName, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "c.country_name", countryName, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "sod.sell_product_id", cInvCode, params, needWhere);
-		if (needWhere) {
-			sqlBuilder.append(" where 1 = 1");
-		}
+		sqlBuilder.append(" JOIN cc_seller_customer sc ON sc.id=so.customer_id ");
+		sqlBuilder.append(" JOIN cc_customer c ON c.id=sc.customer_id ");
+		sqlBuilder.append(" JOIN cc_sales_outstock_detail sod ON sod.outstock_id=so.id ");
+		sqlBuilder.append(" JOIN cc_seller_product sp ON sp.id=sod.sell_product_id ");
+		sqlBuilder.append(" JOIN cc_product p ON p.id=sp.product_id ");
+		sqlBuilder.append(" JOIN cc_customer_type ct ON ct.id = so.customer_type_id ");
+		sqlBuilder.append(" LEFT JOIN cc_sales_refund_instock_detail cs ON sod.id = cs.outstock_detail_id ");
+
+		sqlBuilder.append(" WHERE sc.customer_kind = ? ");
+		params.add(Consts.CUSTOMER_KIND_COMMON);
+
+		appendIfNotEmpty(sqlBuilder, "so.seller_id", sellerId, params, false);
+		appendIfNotEmpty(sqlBuilder, "c.prov_name", provName, params, false);
+		appendIfNotEmpty(sqlBuilder, "c.city_name", cityName, params, false);
+		appendIfNotEmpty(sqlBuilder, "c.country_name", countryName, params, false);
+		appendIfNotEmpty(sqlBuilder, "sod.sell_product_id", cInvCode, params, false);
 
 		if (startDate != null) {
 			sqlBuilder.append(" and so.biz_date >= ?");
@@ -382,27 +335,27 @@ public class BiSalesQuery extends JBaseQuery {
 	}
 
 	//产品销售排行
-	public List<Record> findProductList(String dealerCode, String provName, String cityName, String countryName,
+	public List<Record> findProductList(String sellerId, String provName, String cityName, String countryName,
 	                                    String startDate, String endDate) {
 
 		LinkedList<Object> params = new LinkedList<Object>();
 
-		StringBuilder sqlBuilder = new StringBuilder("SELECT sp.custom_name,sp.id, TRUNCATE(SUM(sod.product_count)/p.convert_relate,2) productCount,TRUNCATE(sum(sod.product_amount)/10000,2) totalAmount ");
+		StringBuilder sqlBuilder = new StringBuilder("SELECT sp.custom_name,sp.id, TRUNCATE((SUM(sod.product_count) - ifnull(sum(cs.product_count),0))/p.convert_relate,2) productCount,TRUNCATE((sum(sod.product_amount) - ifnull(sum(cs.product_amount),0))/10000,2) totalAmount ");
 		sqlBuilder.append(" FROM cc_sales_outstock so ");
-		sqlBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id=so.customer_id ");
-		sqlBuilder.append(" LEFT JOIN cc_customer c ON c.id=sc.customer_id ");
-		sqlBuilder.append(" LEFT JOIN cc_sales_outstock_detail sod ON sod.outstock_id=so.id ");
-		sqlBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sod.sell_product_id ");
-		sqlBuilder.append(" LEFT JOIN cc_product p ON p.id=sp.product_id ");
+		sqlBuilder.append(" JOIN cc_seller_customer sc ON sc.id=so.customer_id ");
+		sqlBuilder.append(" JOIN cc_customer c ON c.id=sc.customer_id ");
+		sqlBuilder.append(" JOIN cc_sales_outstock_detail sod ON sod.outstock_id=so.id ");
+		sqlBuilder.append(" JOIN cc_seller_product sp ON sp.id=sod.sell_product_id ");
+		sqlBuilder.append(" JOIN cc_product p ON p.id=sp.product_id ");
+		sqlBuilder.append(" LEFT JOIN cc_sales_refund_instock_detail cs ON sod.id = cs.outstock_detail_id ");
 
-		boolean needWhere = true;
-		needWhere = appendIfNotEmpty(sqlBuilder, "c.prov_name", provName, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "c.city_name", cityName, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "c.country_name", countryName, params, needWhere);
+		sqlBuilder.append(" WHERE sc.customer_kind = ? ");
+		params.add(Consts.CUSTOMER_KIND_COMMON);
 
-		if (needWhere) {
-			sqlBuilder.append(" where 1 = 1");
-		}
+		appendIfNotEmpty(sqlBuilder, "so.seller_id", sellerId, params, false);
+		appendIfNotEmpty(sqlBuilder, "c.prov_name", provName, params, false);
+		appendIfNotEmpty(sqlBuilder, "c.city_name", cityName, params, false);
+		appendIfNotEmpty(sqlBuilder, "c.country_name", countryName, params, false);
 
 		if (startDate != null) {
 			sqlBuilder.append(" and so.biz_date >= ?");
@@ -415,92 +368,6 @@ public class BiSalesQuery extends JBaseQuery {
 		}
 
 		sqlBuilder.append(" GROUP BY sp.id");
-		sqlBuilder.append(" order by totalAmount desc");
-
-		return Db.find(sqlBuilder.toString(), params.toArray());
-	}
-
-	public List<Record> findProductListByArea(String dealerCode, String provName, String cityName, String countryName,
-	                                          String startDate, String endDate) {
-
-		LinkedList<Object> params = new LinkedList<Object>();
-
-		StringBuilder sqlBuilder = new StringBuilder("select cInvName");
-
-		if (StrKit.notBlank(countryName)) {
-			sqlBuilder.append(", countryName");
-		} else if (StrKit.notBlank(cityName)) {
-			sqlBuilder.append(", cityName");
-		} else {
-			sqlBuilder.append(", provName");
-		}
-
-		sqlBuilder.append(", TRUNCATE(SUM(totalSmallAmount/cInvMNum), 2) as totalNum");
-		sqlBuilder.append(", TRUNCATE(SUM(totalSales)/1000000, 2) as totalAmount");
-
-		sqlBuilder.append(" from sales_fact");
-
-		boolean needWhere = true;
-		needWhere = appendIfNotEmpty(sqlBuilder, "dealerCode", dealerCode, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "provName", provName, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "cityName", cityName, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "countryName", countryName, params, needWhere);
-
-		if (needWhere) {
-			sqlBuilder.append(" where 1 = 1");
-		}
-
-		if (startDate != null) {
-			sqlBuilder.append(" and idate >= ?");
-			params.add(startDate);
-		}
-
-		if (endDate != null) {
-			sqlBuilder.append(" and idate <= ?");
-			params.add(endDate);
-		}
-		sqlBuilder.append(" and customerType != 7");
-
-		sqlBuilder.append(" group by cInvCode");
-		sqlBuilder.append(" order by totalAmount desc");
-
-		return Db.find(sqlBuilder.toString(), params.toArray());
-	}
-
-	public List<Record> findProductListByCustomerType(String dealerCode, String provName, String cityName,
-	                                                  String countryName, String startDate, String endDate, String customerTypeName) {
-
-		LinkedList<Object> params = new LinkedList<Object>();
-
-		StringBuilder sqlBuilder = new StringBuilder("select customerTypeName, cInvName");
-
-		sqlBuilder.append(", TRUNCATE(SUM(totalSmallAmount/cInvMNum), 2) as totalNum");
-		sqlBuilder.append(", TRUNCATE(SUM(totalSales)/1000000, 2) as totalAmount");
-
-		sqlBuilder.append(" from sales_fact");
-
-		boolean needWhere = true;
-		needWhere = appendIfNotEmpty(sqlBuilder, "dealerCode", dealerCode, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "customerTypeName", customerTypeName, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "provName", provName, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "cityName", cityName, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "countryName", countryName, params, needWhere);
-
-		if (needWhere) {
-			sqlBuilder.append(" where 1 = 1");
-		}
-
-		if (startDate != null) {
-			sqlBuilder.append(" and idate >= ?");
-			params.add(startDate);
-		}
-
-		if (endDate != null) {
-			sqlBuilder.append(" and idate <= ?");
-			params.add(endDate);
-		}
-
-		sqlBuilder.append(" group by cInvCode");
 		sqlBuilder.append(" order by totalAmount desc");
 
 		return Db.find(sqlBuilder.toString(), params.toArray());
@@ -577,29 +444,34 @@ public class BiSalesQuery extends JBaseQuery {
 
 		LinkedList<Object> params = new LinkedList<Object>();
 
-		StringBuilder sqlBuilder = new StringBuilder("SELECT s.id, d.data_area, TRUNCATE( sum(sod.product_amount) / 10000 , 2) totalAmount, ");
+		StringBuilder sqlBuilder = new StringBuilder("SELECT s.id, d.data_area, TRUNCATE( (sum(so.total_amount) - sum(t.totalAmount)) / 10000 , 2) totalAmount, ");
 		if (isDealer) {
 			sqlBuilder.append(" s.seller_name dealerName,s.id dealerCode ");
 		} else {
 			sqlBuilder.append(" s.seller_name sellerName,s.id dealerCode ");
 		}
 		sqlBuilder.append(" FROM cc_sales_outstock so ");
-		sqlBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id=so.customer_id ");
-		sqlBuilder.append(" LEFT JOIN cc_customer c ON c.id=sc.customer_id ");
-		sqlBuilder.append(" LEFT JOIN cc_sales_outstock_detail sod ON sod.outstock_id=so.id ");
-		sqlBuilder.append(" LEFT JOIN cc_seller s ON so.seller_id=s.id ");
-		sqlBuilder.append(" LEFT JOIN department d ON d.id=s.dept_id ");
+		sqlBuilder.append(" JOIN cc_seller_customer sc ON sc.id=so.customer_id ");
+		sqlBuilder.append(" JOIN cc_customer c ON c.id=sc.customer_id ");
+		sqlBuilder.append(" JOIN cc_seller s ON so.seller_id=s.id ");
+		sqlBuilder.append(" JOIN department d ON d.id=s.dept_id ");
+		sqlBuilder.append(" LEFT JOIN ");
+		sqlBuilder.append(" (SELECT csri.outstock_id, ifnull(SUM(csri.total_reject_amount),0) AS totalAmount ");
+		sqlBuilder.append(" FROM cc_sales_refund_instock csri ");
+		sqlBuilder.append(" WHERE csri.biz_date IS NOT NULL ");
+		sqlBuilder.append(" GROUP BY csri.outstock_id)t ON so.id = t.outstock_id ");
+
 		if (isDealer) {
 			sqlBuilder.append(" where s.seller_type=" + Consts.SELLER_TYPE_DEALER);
 		} else {
 			sqlBuilder.append(" WHERE d.data_area LIKE (SELECT CONCAT('" + dataArea + "','%') FROM cc_seller s LEFT JOIN department d ON d.id=s.dept_id WHERE s.id='" + sellerId + "')");
 		}
+		sqlBuilder.append(" and sc.customer_kind = ?");
+		params.add(Consts.CUSTOMER_KIND_COMMON);
 
-		boolean needWhere = false;
-		needWhere = appendIfNotEmpty(sqlBuilder, "c.prov_name", provName, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "c.city_name", cityName, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "c.country_name", countryName, params, needWhere);
-
+		appendIfNotEmpty(sqlBuilder, "c.prov_name", provName, params, false);
+		appendIfNotEmpty(sqlBuilder, "c.city_name", cityName, params, false);
+		appendIfNotEmpty(sqlBuilder, "c.country_name", countryName, params, false);
 
 		if (startDate != null) {
 			sqlBuilder.append(" and so.biz_date >= ?");
@@ -624,23 +496,22 @@ public class BiSalesQuery extends JBaseQuery {
 
 		LinkedList<Object> params = new LinkedList<Object>();
 
-		StringBuilder sqlBuilder = new StringBuilder("SELECT sp.custom_name cInvName, TRUNCATE(SUM(sod.product_count)/p.convert_relate,2) totalNum,TRUNCATE(sum(sod.product_amount)/10000,2) totalAmount ");
+		StringBuilder sqlBuilder = new StringBuilder("SELECT sp.custom_name cInvName, TRUNCATE((SUM(sod.product_count) - ifnull(SUM(cs.product_count),0))/p.convert_relate,2) totalNum,TRUNCATE((sum(sod.product_amount) - ifnull(SUM(cs.product_amount),0))/10000,2) totalAmount ");
 		sqlBuilder.append(" FROM cc_sales_outstock so ");
-		sqlBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id=so.customer_id ");
-		sqlBuilder.append(" LEFT JOIN cc_customer c ON c.id=sc.customer_id ");
-		sqlBuilder.append(" LEFT JOIN cc_sales_outstock_detail sod ON sod.outstock_id=so.id ");
-		sqlBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sod.sell_product_id ");
-		sqlBuilder.append(" LEFT JOIN cc_product p ON p.id=sp.product_id ");
+		sqlBuilder.append(" JOIN cc_seller_customer sc ON sc.id=so.customer_id ");
+		sqlBuilder.append(" JOIN cc_customer c ON c.id=sc.customer_id ");
+		sqlBuilder.append(" JOIN cc_sales_outstock_detail sod ON sod.outstock_id=so.id ");
+		sqlBuilder.append(" JOIN cc_seller_product sp ON sp.id=sod.sell_product_id ");
+		sqlBuilder.append(" JOIN cc_product p ON p.id=sp.product_id ");
+		sqlBuilder.append(" LEFT JOIN cc_sales_refund_instock_detail cs ON sod.id = cs.outstock_detail_id ");
 
-		boolean needWhere = true;
-		needWhere = appendIfNotEmpty(sqlBuilder, "c.prov_name", provName, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "c.city_name", cityName, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "c.country_name", countryName, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "so.seller_id", sellerId, params, needWhere);
+		sqlBuilder.append(" WHERE sc.customer_kind = ? ");
+		params.add(Consts.CUSTOMER_KIND_COMMON);
 
-		if (needWhere) {
-			sqlBuilder.append(" where 1 = 1");
-		}
+		appendIfNotEmpty(sqlBuilder, "c.prov_name", provName, params, false);
+		appendIfNotEmpty(sqlBuilder, "c.city_name", cityName, params, false);
+		appendIfNotEmpty(sqlBuilder, "c.country_name", countryName, params, false);
+		appendIfNotEmpty(sqlBuilder, "so.seller_id", sellerId, params, false);
 
 		if (startDate != null) {
 			sqlBuilder.append(" and so.biz_date >= ?");
