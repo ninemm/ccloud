@@ -353,8 +353,7 @@ public class BiSalesQuery extends JBaseQuery {
 		sqlBuilder.append(" LEFT JOIN cc_sales_outstock_detail sod ON sod.outstock_id=so.id ");
 		sqlBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sod.sell_product_id ");
 		sqlBuilder.append(" LEFT JOIN cc_product p ON p.id=sp.product_id ");
-		sqlBuilder.append(" LEFT JOIN cc_customer_join_customer_type cjct ON so.customer_id=cjct.seller_customer_id ");
-		sqlBuilder.append(" LEFT JOIN cc_customer_type ct ON ct.id=cjct.customer_type_id ");
+		sqlBuilder.append(" LEFT JOIN cc_customer_type ct ON ct.id = so.customer_type_id ");
 		boolean needWhere = true;
 		needWhere = appendIfNotEmpty(sqlBuilder, "so.seller_id", sellerId, params, needWhere);
 		needWhere = appendIfNotEmpty(sqlBuilder, "c.prov_name", provName, params, needWhere);
