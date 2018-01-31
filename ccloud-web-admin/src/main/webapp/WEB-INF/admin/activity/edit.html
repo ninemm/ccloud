@@ -52,6 +52,7 @@
 	var $form = $("#form");
 	var $city = $('#cityPicker');
 	var data = {url: '', alt: ''};
+	var result = false;
 	$("#invest_type").select2();
 	$("#customer_type_store_option").select2();
 	$("#customerType").select2();
@@ -61,8 +62,15 @@
 			$(".visitNum").show();
 			var list = $("#invest_type").select2("val");
 			if (list != null && list.length > 0) {
-				var type = parseInt(list.toString());
-				if(type==101101 || type==101102 || type==101103 ||type==101104 ||type==101105 ||type==101106 ){
+				for(var i =0;i<list.length;i++){
+					if(list[i]==101101 || list[i]==101102 || list[i]==101103 ||list[i]==101104 ||list[i]==101105 ||list[i]==101106 ){
+						result = true;
+						break;
+					}else{
+						result = false;
+					}
+				}
+				if(result == true ){
 					$(".investAmount").show();
 				}else{
 					$(".investAmount").hide();
@@ -155,9 +163,17 @@
 	
 	$(document).on("change", ".investType", function() {
 		var list = $("#invest_type").select2("val");
+		
 		if (list != null && list.length > 0) {
-			var type = parseInt(list.toString());
-			if(type==101101 || type==101102 || type==101103 ||type==101104 ||type==101105 ||type==101106 ){
+			for(var i =0;i<list.length;i++){
+				if(list[i]==101101 || list[i]==101102 || list[i]==101103 ||list[i]==101104 ||list[i]==101105 ||list[i]==101106 ){
+					result = true;
+					break;
+				}else{
+					result = false;
+				}
+			}
+			if(result == true ){
 				$(".investAmount").show();
 			}else{
 				$(".investAmount").hide();
@@ -310,7 +326,7 @@
 					<div class="col-sm-5 validata-box">
 						<label class="control-label col-sm-4">活动名称:</label>
 						<div class="input-group col-sm-8">
-							<input class="form-control input-sm" type="text" name="activity.title" value="${(activity.title)!}" style="width:261%;">
+							<input class="form-control" type="text" name="activity.title" value="${(activity.title)!}" style="width:261%;">
 						</div>
 					</div>
 				</div>
@@ -318,13 +334,13 @@
 						<div class="col-sm-5 validata-box">
 							<label class="control-label col-sm-4">活动开始时间:</label>
 							<div class="input-group col-sm-8">
-								<input id="startDate" class="form-control input-sm" value="${startDate!}" name="startDate" placeholder="开始日期" >
+								<input id="startDate" class="form-control" value="${startDate!}" name="startDate" placeholder="开始日期" >
 							</div>
 						</div>
 						<div class="col-sm-5 validata-box">
 							<label class="control-label col-sm-4">活动结束时间:</label>
 							<div class="input-group col-sm-8">
-								<input id="endDate" class="form-control input-sm" value="${endDate!}" name="endDate" placeholder="结束日期" >
+								<input id="endDate" class="form-control" value="${endDate!}" name="endDate" placeholder="结束日期" >
 							</div>
 						</div>
 				</div>
@@ -333,14 +349,14 @@
 					<div class="col-sm-5 validata-box">
 						<label class="control-label col-sm-4">活动编号:</label>
 						<div class="input-group col-sm-8">
-							<input class="form-control input-sm" type="text" name="activity.code" value="${(activity.code)!}">
+							<input class="form-control" type="text" name="activity.code" value="${(activity.code)!}">
 						</div>
 					</div>
 					
 					<div class="col-sm-5 validata-box" >
 						<label class="control-label col-sm-4">流程编号:</label>
 						<div class="input-group col-sm-8">
-							<input class="form-control input-sm" type="text" name="activity.proc_code" value="${(activity.proc_code)!}">
+							<input class="form-control" type="text" name="activity.proc_code" value="${(activity.proc_code)!}">
 						</div>
 					</div>
 				</div>
@@ -348,13 +364,13 @@
 					<div class="col-sm-5 validata-box">
 						<label class="control-label col-sm-4">活动方案号:</label>
 						<div class="input-group col-sm-8">
-							<input class="form-control input-sm" type="text" name="activity.plan_code" value="${(activity.plan_code)!}">
+							<input class="form-control" type="text" name="activity.plan_code" value="${(activity.plan_code)!}">
 						</div>
 					</div>
 					<div class="col-sm-5 validata-box">
 						<label class="control-label col-sm-4">活动类型:</label>
 						<div class="input-group col-sm-8">
-							<select class="form-control input-sm category" name="activity.category" id="activity.category">
+							<select class="form-control category" name="activity.category" id="activity.category">
 								${DICT_BOX('activity_category', 'select', (activity.category)!)}
 							</select>
 		               	</div>
@@ -364,7 +380,7 @@
 					<div class="col-sm-5 validata-box">
 						<label class="control-label col-sm-4">客户类型:</label>
 						<div class="input-group col-sm-8">
-							<select id="customerType" class="form-control input-sm" name = "customerTy" multiple="multiple">
+							<select id="customerType" class="form-control" name = "customerTy" multiple="multiple">
 							</select>
                         </select>
 						</div>
@@ -381,13 +397,13 @@
 					<div class="col-sm-5 validata-box">
 						<label class="control-label col-sm-4">活动标签:</label>
 						<div class="input-group col-sm-8">
-							<input class="form-control input-sm" type="text" name="activity.tags" value="${(activity.tags)!}">
+							<input class="form-control" type="text" name="activity.tags" value="${(activity.tags)!}">
 						</div>
 					</div>
 					<div class="col-sm-5 validata-box investType" >
 							<label class="control-label col-sm-4">投入类型:</label>
 							<div class="input-group col-sm-8">
-								<select class="form-control input-sm" name="invest_type" id="invest_type" multiple="multiple" >
+								<select class="form-control" name="invest_type" id="invest_type" multiple="multiple" >
 									<#if activity??>
 										<#list (dicts)! as dict>
 			                                <option value="${dict.key}" <#if dict??&&investTypeList?contains(dict.key)>selected="selected"</#if>>${(dict.name)!}</option>
@@ -404,13 +420,13 @@
 					<!-- <div class="col-sm-5 validata-box">
 						<label class="control-label col-sm-4">每个客户参与次数：</label>
 						<div class="input-group col-sm-8">
-							<input class="form-control input-sm" type="text" name="activity.join_num" value="${(activity.join_num)!}">
+							<input class="form-control" type="text" name="activity.join_num" value="${(activity.join_num)!}">
 						</div>
 					</div> -->
 					<!-- <div class="col-sm-5 validata-box">
 						<label class="control-label col-sm-4">时间限制：</label>
 						<div class="input-group col-sm-8">
-							<select class="form-control input-sm" name="activity.time_interval" id="activity.time_interval">
+							<select class="form-control" name="activity.time_interval" id="activity.time_interval">
 								${DICT_BOX('activity_time_interval', 'select', (activity.time_interval)!)}
 							</select>
 						</div>
@@ -418,14 +434,14 @@
 					<div class="col-sm-5 validata-box">
 						<label class="control-label col-sm-4">名额：</label>
 						<div class="input-group col-sm-8">
-							<input class="form-control input-sm" type="text" name="activity.total_customer_num" value="${(activity.total_customer_num)!}">
+							<input class="form-control" type="text" name="activity.total_customer_num" value="${(activity.total_customer_num)!}">
 						</div>
 					</div>
 					<div class="col-sm-5 validata-box investNum">
 						<label class="control-label col-sm-4">投入数量:</label>
 						<div class="input-group col-sm-8">
-							<input class="form-control input-sm" type="text" name="activity.invest_num" value="${(activity.invest_num)!}" style="width:67%;">
-							&nbsp;<select id="unit" name="unit" class="form-control input-sm" style="width: 30%;float: none;">
+							<input class="form-control" type="text" name="activity.invest_num" value="${(activity.invest_num)!}" style="width:67%;">
+							&nbsp;<select id="unit" name="unit" class="form-control" style="width: 30%;float: none;">
 							</select>
 						</div>
 					</div>
@@ -433,13 +449,13 @@
 					<div class="col-sm-5 validata-box investAmount">
 	                    <label for="_title" class="control-label col-sm-4">投入金额:</label>
 	                    <div class="input-group col-sm-8">
-	                        <input class="form-control input-sm" type="text" name="activity.invest_amount" value="${(activity.invest_amount)!}">
+	                        <input class="form-control" type="text" name="activity.invest_amount" value="${(activity.invest_amount)!}">
 	                    </div>
 	                </div>
 					<div class="col-sm-5 validata-box visitNum">
 						<label class="control-label col-sm-4">拜访次数：</label>
 						<div class="input-group col-sm-8">
-							<input class="form-control input-sm" type="text" name="activity.visit_num" value="${(activity.visit_num)!}">
+							<input class="form-control" type="text" name="activity.visit_num" value="${(activity.visit_num)!}">
 						</div>
 					</div>
 					<div class="form-group">	

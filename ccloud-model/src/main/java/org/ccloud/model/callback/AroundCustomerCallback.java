@@ -31,6 +31,8 @@ public class AroundCustomerCallback implements ICallback {
 	private double longitude;
 	private double latitude;
 	private double dist;
+	private String startDate;
+	private String endDate;
 	private String sellerId;
 
 	@Override
@@ -40,12 +42,14 @@ public class AroundCustomerCallback implements ICallback {
 		List<Map<String, Object>> result = Lists.newArrayList();
 
 		try {
-			proc = conn.prepareCall("{ call around_customer_sales_bi(?, ?, ?, ?) }");
+			proc = conn.prepareCall("{ call around_customer_bi(?, ?, ?, ?, ?, ?) }");
 
 			proc.setDouble(1, getLongitude());
 			proc.setDouble(2, getLatitude());
 			proc.setDouble(3, getDist());
-			proc.setString(4, getSellerId());
+			proc.setString(4, getStartDate());
+			proc.setString(5, getEndDate());
+			proc.setString(6, getSellerId());
 
 			proc.execute();
 
@@ -53,19 +57,18 @@ public class AroundCustomerCallback implements ICallback {
 
 			while (resultSet.next()) {
 				Map<String, Object> map = Maps.newHashMap();
-				map.put("customerId", resultSet.getString("customerId"));
-				map.put("customerName", resultSet.getString("customerName"));
-				map.put("type", resultSet.getInt("type"));
-				map.put("contacts", resultSet.getString("contacts"));
-				map.put("phone", resultSet.getString("phone"));
-				map.put("provName", resultSet.getString("provName"));
-				map.put("cityName", resultSet.getString("cityName"));
-				map.put("countyName", resultSet.getString("countyName"));
+				map.put("customerId", resultSet.getString("id"));
+				map.put("customerName", resultSet.getString("customer_name"));
+				map.put("contacts", resultSet.getString("contact"));
+				map.put("phone", resultSet.getString("mobile"));
+				map.put("provName", resultSet.getString("prov_name"));
+				map.put("cityName", resultSet.getString("city_name"));
+				map.put("countyName", resultSet.getString("country_name"));
 				map.put("address", resultSet.getString("address"));
 				map.put("dist", resultSet.getDouble("dist"));
 				map.put("longitude", resultSet.getDouble("longitude"));
 				map.put("latitude", resultSet.getDouble("latitude"));
-				map.put("totalAmount", resultSet.getLong("realAmount"));
+				map.put("totalAmount", resultSet.getLong("totalAmount"));
 				result.add(map);
 			}
 		} catch (SQLException e) {
@@ -73,6 +76,22 @@ public class AroundCustomerCallback implements ICallback {
 		}
 
 		return result;
+	}
+	
+	public String getStartDate() {
+		return startDate;
+	}
+
+	public void setStartDate(String startDate) {
+		this.startDate = startDate;
+	}
+
+	public String getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(String endDate) {
+		this.endDate = endDate;
 	}
 
 	public String getSellerId() {
