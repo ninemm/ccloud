@@ -52,13 +52,15 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 
 	public Record findMoreById(final String id) {
-		StringBuilder fromBuilder = new StringBuilder(" select o.*,c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as typeCode,ct.proc_def_key, u.realname, u.mobile, cp.factor ,cc.id as sellerCustomerId,cc.customer_kind ");
+		StringBuilder fromBuilder = new StringBuilder(" select o.*,c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as typeCode,ct.proc_def_key, u.realname, u.mobile, cp.factor ,cc.id as sellerCustomerId,cc.customer_kind,s.is_print ");
 		fromBuilder.append(" from `cc_sales_order` o ");
 		fromBuilder.append(" left join cc_seller_customer cc ON o.customer_id = cc.id ");
 		fromBuilder.append(" left join cc_customer c on cc.customer_id = c.id ");
 		fromBuilder.append(" left join cc_customer_type ct on o.customer_type_id = ct.id ");
 		fromBuilder.append(" left join cc_price_system cp on cp.id = ct.price_system_id ");
 		fromBuilder.append(" left join user u on o.biz_user_id = u.id ");
+		fromBuilder.append("LEFT JOIN cc_sales_order_join_outstock so on so.order_id = o.id ");
+		fromBuilder.append("LEFT JOIN cc_sales_outstock s on s.id = so.outstock_id ");
 		fromBuilder.append(" where o.id = ? ");
 
 		return Db.findFirst(fromBuilder.toString(), id);
@@ -113,13 +115,14 @@ public class SalesOrderQuery extends JBaseQuery {
 
 	public Page<Record> paginateForApp(int pageNumber, int pageSize, String keyword, String status,
 			String customerTypeId, String startDate, String endDate, String sellerId, String dataArea) {
-		String select = "select o.*, c.customer_name, c.contact as ccontact, c.mobile as cmobile, ct.name as customerTypeName, a.ID_ taskId, a.NAME_ taskName, a.ASSIGNEE_ assignee ";
+		String select = "select o.*, c.customer_name, c.contact as ccontact, c.mobile as cmobile, ct.name as customerTypeName, a.ID_ taskId, a.NAME_ taskName, a.ASSIGNEE_ assignee,s.is_print ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_sales_order` o ");
 		fromBuilder.append("left join cc_seller_customer cc ON o.customer_id = cc.id ");
 		fromBuilder.append("left join cc_customer c on cc.customer_id = c.id ");
 		fromBuilder.append("left join cc_customer_type ct on o.customer_type_id = ct.id ");
 		fromBuilder.append("left join act_ru_task a on o.proc_inst_id = a.PROC_INST_ID_ ");
-
+		fromBuilder.append("LEFT JOIN cc_sales_order_join_outstock so on so.order_id = o.id ");
+		fromBuilder.append("LEFT JOIN cc_sales_outstock s on s.id = so.outstock_id ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 
@@ -130,9 +133,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
 
 		if (needWhere) {
-			fromBuilder.append(" where o.status not in (1001,1002) ");
-		} else {
-			fromBuilder.append(" and o.status not in (1001,1002) ");
+			fromBuilder.append(" where 1 = 1");
 		}
 		
 		if (StrKit.notBlank(keyword)) {
@@ -1329,7 +1330,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		}
 		LinkedList<Object> params = new LinkedList<Object>();
 		StringBuilder fromBuilder = new StringBuilder("SELECT u.realname, u.avatar, u.id, ");
-		fromBuilder.append("IFNULL(SUM(o.total_amount),0) as totalAmount,IFNULL(SUM(t1.productCount),0) as productCount, COUNT(o.id) as orderCount FROM cc_sales_outstock o ");
+		fromBuilder.append("SUM(o.total_amount) as totalAmount,IFNULL(t1.productCount,0) as productCount, COUNT(o.id) as orderCount FROM cc_sales_outstock o ");
 		fromBuilder.append("LEFT JOIN (SELECT SUM(cd.product_count/cp.convert_relate) as productCount, cd.outstock_id FROM cc_sales_outstock_detail cd ");
 		fromBuilder.append("LEFT JOIN cc_seller_product sp ON sp.id = cd.sell_product_id ");
 		fromBuilder.append("LEFT JOIN cc_product cp on cp.id = sp.product_id ");
@@ -2008,5 +2009,9 @@ public class SalesOrderQuery extends JBaseQuery {
 				+ "where sojo.outstock_id = '"+outStockId+"'";
 		return DAO.findFirst(sql);
 	}
-
+	
+	public List<SalesOrder> findAllByDataArea(String dataArea,String startDate,String endDate){
+		String sql = "select u.id,u.realname from cc_sales_order o LEFT JOIN user u on u.id = o.biz_user_id where o.data_area like '"+dataArea+"' and o.status not in (1001,1002) and o.create_date>'"+startDate+"' and o.create_date< '"+endDate+"'";
+		return DAO.find(sql);
+	}
  }

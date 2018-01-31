@@ -16,6 +16,7 @@ import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.CustomerType;
 import org.ccloud.model.Message;
 import org.ccloud.model.SalesOrder;
+import org.ccloud.model.SalesOutstock;
 import org.ccloud.model.SellerProduct;
 import org.ccloud.model.User;
 import org.ccloud.model.query.CustomerTypeQuery;
@@ -551,16 +552,22 @@ public class OrderController extends BaseFrontController {
 		WorkFlowService workflow = new WorkFlowService();
 
 		String procInstId = salesOrder.getProcInstId();
-		if (StrKit.notBlank(procInstId))
-			workflow.deleteProcessInstance(salesOrder.getProcInstId());
+		if (StrKit.notBlank(procInstId)) {
+			if(salesOrder.getStatus()==0) {
+				workflow.deleteProcessInstance(salesOrder.getProcInstId());
+			}
+		}
 
 		salesOrder.setStatus(Consts.SALES_ORDER_STATUS_CANCEL);
+		
 
 		if (!salesOrder.saveOrUpdate()) {
+			
 			renderAjaxResultForError("取消订单失败");
 			return;
 		}
-
+		SalesOutstock outstock = SalesOutstockQuery.me().findOrderId(salesOrder.getId());
+		if(salesOrder.getStatus()==1000 || outstock.getIsPrint()==0) SalesOutstockQuery.me().batchDelete(outstock.getId());
 		renderAjaxResultForSuccess("订单撤销成功");
 	}
 
