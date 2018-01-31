@@ -93,10 +93,11 @@ public class ReceivablesDetailQuery extends JBaseQuery {
 	}
 
 	public Record findByBalanceCountBySn(String outstock_sn) {
-		StringBuilder sqlBuilder = new StringBuilder("SELECT IFNULL(SUM(cc.balance_amount),0) - IFNULL(t1.act_amount,0) as count,cc.ref_type FROM cc_receivables_detail cc ");
-		sqlBuilder.append("LEFT JOIN (SELECT cr.ref_sn, SUM(cr.act_amount) as act_amount FROM cc_receiving cr GROUP BY cr.ref_sn) t1 ON t1.ref_sn = cc.ref_sn ");
-		sqlBuilder.append("WHERE cc.ref_sn = ? ");
-		sqlBuilder.append("GROUP BY cc.ref_sn ");
+		StringBuilder sqlBuilder = new StringBuilder("SELECT IFNULL(SUM(so.total_amount),0) - IFNULL(t1.act_amount,0) as count,cc.ref_type FROM cc_sales_outstock so ");
+		sqlBuilder.append("LEFT JOIN (SELECT cr.ref_sn, SUM(cr.act_amount) as act_amount FROM cc_receiving cr GROUP BY cr.ref_sn) t1 ON t1.ref_sn = so.outstock_sn ");
+		sqlBuilder.append("LEFT JOIN cc_receivables_detail cc ON cc.ref_sn=so.outstock_sn ");
+		sqlBuilder.append("WHERE so.outstock_sn = ? ");
+		sqlBuilder.append("GROUP BY so.outstock_sn ");
 		return Db.findFirst(sqlBuilder.toString(), outstock_sn);
 	}
 }

@@ -345,6 +345,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 	
+	//应收账款
 	public Page<Record> paginateForReceivables(int pageNumber, int pageSize, String keyword, String userId,
 			String customerTypeId, String startDate, String endDate, String sellerId, String dataArea) {
 		String select = "select o.*, c.customer_name, ct.name as customerTypeName,o.total_amount-COALESCE(SUM(r.act_amount) , 0) AS balanceAmount ";

@@ -277,6 +277,11 @@ public class SellerCustomerQuery extends JBaseQuery {
 		}
 
 		needwhere = appendIfNotEmptyWithLike(sql, "cujc.data_area", selectDataArea, params, needwhere);
+		if (StrKit.notBlank(isOrdered)) {
+			if (isOrdered.equals("0")) {
+				needwhere = appendIfNotEmptyWithLike(sql, "cso.data_area", selectDataArea, params, needwhere);
+			}
+		}
 		needwhere = appendIfNotEmpty(sql, "csc.is_enabled", 1, params, needwhere);
 		needwhere = appendIfNotEmptyWithLike(sql, "t1.customerTypeNames", customerType, params, needwhere);
 
