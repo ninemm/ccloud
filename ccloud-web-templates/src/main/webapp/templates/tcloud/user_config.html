@@ -121,8 +121,8 @@
 				<p>负责区域设置</p>
 			</div>
 			<div class="weui-cell__ft">
-				<input type="hidden" name="areaName" id="areaName" value="${(user.province)!''}${(user.city)!''}${(user.region)!''}" >
-				<input type="text" id="city-picker" class="weui-input" value="${(user.province)!''}${(user.city)!''}${(user.region)!''}" />
+				<input type="hidden" name="areaName" id="areaName" value="${(user.province+' ')!''}${(user.city+' ')!''}${(user.region)!''}" >
+				<input type="text" id="city-picker" class="weui-input" value="${(user.province+' ')!''}${(user.city+' ')!''}${(user.region)!''}" readonly/>
 			</div>
 		</a>
 	</div>
