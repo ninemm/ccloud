@@ -43,6 +43,7 @@ import java.util.zip.ZipOutputStream;
 import javax.swing.ImageIcon;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import com.jfinal.kit.Kv;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -474,16 +475,29 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 
 		List<File> fileList = new ArrayList<>();
 		for(Record record : imageList) {
-			List<ImageJson> list = JSON.parseArray(record.getStr("photo"), ImageJson.class);
-			for (int i = 0; i < list.size(); i++){
-				ImageJson image = list.get(i);
 
-				String fileName = image.getSavePath();
-				String filePath = DateUtils.dateToStr(record.getDate("create_date"), "yyyy-MM-dd" )
-						+ record.getStr("realname") + "拜访" + record.getStr("customer_name")
-						+  "图片" + (i+1) + ".jpg";
-				fileList.add(getImage(domain, fileName, filePath));
+			String photo = record.getStr("photo");
+			List<String> photoList = Splitter.on("_")
+					.trimResults()
+					.omitEmptyStrings()
+					.splitToList(photo);
 
+			int k = 1;
+			for(String savePath : photoList){
+
+				List<ImageJson> list = JSON.parseArray(savePath, ImageJson.class);
+
+				for (int i = 0; i < list.size(); i++){
+					ImageJson image = list.get(i);
+
+					String fileName = image.getSavePath();
+					String filePath = DateUtils.dateToStr(record.getDate("create_date"), "yyyy-MM-dd" )
+							+ record.getStr("realname") + "拜访" + record.getStr("customer_name")
+							+  "图片" + k + ".jpg";
+
+					fileList.add(getImage(domain, fileName, filePath));
+					 k++;
+				}
 			}
 		}
 

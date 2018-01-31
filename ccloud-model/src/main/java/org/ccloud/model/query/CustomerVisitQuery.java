@@ -258,12 +258,11 @@ public class CustomerVisitQuery extends JBaseQuery {
 	public List<Record> findPhoto(String customerType, String customerName, String data_area){
 
 		LinkedList<Object> params = new LinkedList<Object>();
-		StringBuilder sql = new StringBuilder("SELECT DISTINCT(ccv.id), u.realname, ccv.photo, cc.customer_name, ccv.create_date ");
+		StringBuilder sql = new StringBuilder("SELECT ccv.id, u.realname, GROUP_CONCAT(ccv.photo SEPARATOR '_') as photo, cc.customer_name, ccv.create_date ");
 
 		sql.append("FROM cc_customer_visit ccv ");
 		sql.append("LEFT JOIN cc_seller_customer csc ON csc.id = ccv.seller_customer_id ");
 		sql.append("LEFT JOIN cc_customer cc ON cc.id = csc.customer_id ");
-		sql.append("LEFT JOIN cc_customer_join_customer_type ccjct ON ccv.seller_customer_id = ccjct.seller_customer_id ");
 
 		sql.append("LEFT JOIN ( SELECT c1.id,GROUP_CONCAT(ct. NAME) AS customerTypeNames ");
 		sql.append("FROM cc_seller_customer c1 ");
@@ -278,7 +277,8 @@ public class CustomerVisitQuery extends JBaseQuery {
 		appendIfNotEmpty(sql,"t1.customerTypeNames", customerType, params, false);
 		appendIfNotEmptyWithLike(sql, "ccv.data_area", data_area, params, false);
 
-		sql.append("ORDER BY ccv.create_date");
+		sql.append("GROUP BY u.realname, cc.id, DATE_FORMAT(ccv.create_date,'%m-%d-%Y') ");
+		sql.append("ORDER BY ccv.create_date ");
 
 		return Db.find(sql.toString(), params.toArray());
 	}
