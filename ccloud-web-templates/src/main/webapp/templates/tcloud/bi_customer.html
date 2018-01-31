@@ -1,0 +1,491 @@
+<#include "_inc/_bi_layout.html"/>
+<#macro script_import>
+    <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=su3AmHLUcBprpnOLmVHo7r8AljbW8X6t"></script>
+</#macro>
+<#macro css_import>
+
+</#macro>
+<#macro css>
+    .weui-cells {
+        margin-top: 0;
+        background: inherit;
+        font-size: 0.6rem;
+    }
+    table {
+        background: #fff;
+        margin-bottom: 0!important;
+    }
+    table a {
+        text-decoration: underline;
+    }
+    th {
+        vertical-align: middle!important;
+        text-align: center!important;
+    }
+    td {
+        vertical-align: middle!important;
+    }
+    tr {
+        line-height: 1.5rem;
+        height: 1.5rem;
+    }
+    .wy-header {
+        background: #f2f2f2;
+        margin-top: 2.4rem;
+    }
+    .relocation{
+        position: absolute;
+        right: 0;
+        top: 12px;
+        width: 50px;
+    }
+    #allmap{
+        width:100%;
+        height: 18rem;
+    }
+    #customer_rank{
+        width: 100%;
+        height:8rem;
+    }
+    #area_rank{
+        width: 100%;
+        height:8rem;
+    }
+
+</#macro>
+<#macro script>
+    $(function() {
+        lMap(dateType);
+        customer(provName, cityName, '', dateType);
+        
+        initTopHoverTree("gotop", 100, 10, 50);
+        
+        $('#goback').on('click', function() {
+            historyUtils.back();
+        });
+    });
+    var $city = $("#city-name");
+    var provName = $.cookie(Utils.provCacheName);
+    var cityName = $.cookie(Utils.cityCacheName);
+    var countryName = $.cookie(Utils.countryCacheName);
+    var dateType = 0;
+    var customerTypeName = '';
+
+    $city.text(cityName);
+
+    //做时间的切换选择
+    $(".date").click(function(e) {
+        var $a = $(e.currentTarget);
+        $a.parent().find(".date").removeClass("active-date");
+        $a.addClass("active-date");
+    });
+    function setDateType(type){
+        dateType = type;
+        lMap(dateType);
+        customer(provName, cityName, '', dateType);
+    }
+
+    //定位
+    $("#relocation").on('click', function() {
+        wxConfig();
+        var df = wxLocation();
+    
+        df.done(function(){
+            provName = $.cookie(Utils.provCacheName);
+            cityName = $.cookie(Utils.cityCacheName);
+            countryName = $.cookie(Utils.countryCacheName);
+            lMap(dateType)
+            customer(provName, cityName, '', dateType);
+         });
+    
+    });
+    
+    function wxConfig() {
+        wx.config({
+            debug: Utils.devMode, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+            appId: '${appId!}', // 必填，公众号的唯一标识
+            timestamp: '${timestamp!}', // 必填，生成签名的时间戳
+            nonceStr: '${nonceStr!}', // 必填，生成签名的随机串
+            signature: '${signature!}',// 必填，签名，见附录1
+            jsApiList: ['checkJsApi', 'getLocation'] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+        });
+    }
+
+    var map = new BMap.Map("allmap");
+    var myPosition = new BMap.Icon("${CTPATH}/images/position.png", new BMap.Size(20, 20)); 
+    var myIcon = new BMap.Icon("${CTPATH}/images/marker.png", new BMap.Size(20, 20)); 
+
+    //地图
+    function lMap(dateType){
+        Utils.loading();
+
+        var longitude = $.cookie(Utils.longitudeCache);
+        var latitude = $.cookie(Utils.latitudeCache);
+        var position_point = new BMap.Point(longitude,latitude);
+        
+        map.centerAndZoom(position_point,13);
+        map.enableScrollWheelZoom(true);
+        map.clearOverlays();
+        var position = new BMap.Marker(position_point, {icon:myPosition});  //创建标注
+        map.addOverlay(position);              // 将标注添加到地图中
+        
+        $.ajax({
+            url:"${CPATH}/biSales/aroundCustomerSales",
+            type:"post",
+            data:{dateType: dateType, longitude: longitude, latitude: latitude, dist: 10},
+            dataType:"json"
+        }).done(function(data){
+            Utils.close();
+
+            for(var i = 0; i < data.length; i++) {
+                var new_point = new BMap.Point(data[i].longitude,data[i].latitude);
+                var marker = new BMap.Marker(new_point, {icon:myIcon});  //创建标注
+                map.addOverlay(marker);              // 将标注添加到地图中
+                var opts = {
+                    width : 240,     // 信息窗口宽度
+                    height: 80,     // 信息窗口高度
+                    title : '客户名称：' + data[i].customerName , // 信息窗口标题
+                    enableMessage:true,//设置允许信息窗发送短息
+                    customerId: data[i].customerId,
+                    customerName: data[i].customerName
+                };
+                var content = '联系人：' + data[i].contacts + ' ' + data[i].phone;
+                content = content + '<br>' + '金额：' + data[i].totalAmount + '元';
+                content = content + '<br>' + '地址：' + data[i].address;
+                addClickHandler(content,marker,opts);
+            }
+        });
+    }
+    
+    function addClickHandler(content,marker,opts){
+        marker.addEventListener("click",function(e){
+            openInfo(content,e,opts)}
+        );
+    }
+    
+    function openInfo(content,e,opts){
+        var p = e.target;
+        var point = new BMap.Point(p.getPosition().lng, p.getPosition().lat);
+        var infoWindow = new BMap.InfoWindow(content,opts);  // 创建信息窗口对象 
+        map.openInfoWindow(infoWindow,point); //开启信息窗口
+        product_customerId(dateType,opts.customerId,opts.customerName);
+    }
+    
+    //终端产品详细
+    function product_customerId(dateType, customerId, customerName){
+      Utils.loading();
+      $.ajax({
+            url:"${CPATH}/biSales/productByCustomerId",
+            type:"post",
+            data:{dateType: dateType, customerId: customerId},
+            dataType:"json"
+        }).done(function(data){
+            Utils.close();
+
+            var tpTitle = customerName + '销售情况';
+            var $p = $("#p_customerId_product");
+            var $customerName = $("#customer-name");
+            $customerName.empty();
+            $customerName.text(tpTitle);
+            $p.attr('class', 'title');
+            $p.show();
+
+            var $tbody = $("#customerId_product tbody");
+            $tbody.empty();
+            for(var i = 0; i < data.length; i++){
+                if(i == 0 || data[i].idate != data[i-1].idate) {
+                    $tbody.append("<tr><th colspan='3'>日期：" + data[i].idate + "</th></tr>");
+                    $tbody.append("<tr><th>产品</th><th>数量(件)</th><th>金额(元)</th></tr>");
+                }
+                $tbody.append("<tr><td>" + data[i].cInvName + "</td><td class='t-r'>" + data[i].totalNum + "</td><td class='t-r'>" + data[i].totalAmount + "</td></tr>");
+            }
+       });
+    }
+    
+
+    //客户
+    var customer_rank = document.getElementById('customer_rank');
+    var $customer_rank = $(customer_rank);
+    var customerRankChart = echarts.init(customer_rank);
+    
+    function customer(provName, cityName, countryName, dateType){
+        Utils.loading();
+        $.ajax({
+            url:"${CPATH}/biSales/customerType",
+            type:"post",
+            data:{"provName": provName, "cityName": cityName, countryName: countryName, dateType: dateType},
+            dataType:"json"
+        }).done(function(data){
+            
+            if(data.length > 6){
+                var height = 160 + (data.length -6) * 40;
+                $customer_rank.height(height);
+            }else{
+                $customer_rank.height(160);
+            }
+
+
+            var crLegendData = [];
+            var crSeriesData = [];
+
+            for(var i = 0; i < data.length; i++){
+                crLegendData.push(data[i].name + '(' + data[i].realAmount + '万元)');
+                crSeriesData.push({
+                    name: data[i].name + '(' + data[i].realAmount + '万元)',
+                    value: data[i].realAmount
+                });
+            }
+            var crTitle = '客户分布';
+            if((provName + cityName + countryName).trim() != '' ){
+                crTitle = provName + cityName + countryName + crTitle;
+            } else {
+                crTitle = '全国' + crTitle;
+            }
+            var $p = $("#p_customer_rank");
+            $p.empty();
+            $p.text(crTitle);
+
+            var crOption = {
+                 color: ['#4ac7f5', '#f36f8a', '#fd9173', '#AF89D6', '#5f71d2', '#a6c84c', '#ffa022', '#46bee9'],
+                 legend: {
+                     //selectedMode:false,
+                     orient: 'vertical',
+                     x: 'right',
+                     top : '0%',
+                     bottom : '0%',
+                     itemGap : 1,
+                     data:crLegendData
+                 },
+                 series: [
+                     {
+                         name:crTitle,
+                         type:'pie',
+                         selectedMode: 'single',
+                         radius: ['35%', '65%'],
+                         center: ['30%', '50%'],
+                         label: {
+                             normal: {
+                                 show: false
+                             }
+                         },
+                         labelLine: {
+                             normal: {
+                                 show: false
+                             }
+                         },
+                         data:crSeriesData
+                     }
+                 ]
+            };
+            customerRankChart.resize();
+            customerRankChart.setOption(crOption,true);
+            customerRankChart.on('legendselectchanged', customerClick);
+
+            var dataCustomerTypeName = (data[0] != undefined ? data[0].name : '');
+            //调用其他纬度
+            product_rank(provName, cityName, '', dateType, dataCustomerTypeName);
+            area_rank(provName, cityName, '', dateType, dataCustomerTypeName);
+        });
+    }
+    
+    function customerClick(obj){
+        Utils.loading();
+        var selected = obj.selected;
+        var typeName = obj.name;
+
+        // 消除点击图例会消失
+        // 使用 legendToggleSelect Action 会重新触发 legendselectchanged Event，导致本函数重复运行使得 无 selected 对象
+        if (selected != undefined) {
+            var lt = Object.keys(selected);
+            var legend = [];
+        
+            for (var i = 0; i < lt.length; i++) {
+                var name = lt[i];
+                legend.push({
+                    name : name
+                });
+            }
+        
+            customerRankChart.dispatchAction({
+                type: 'legendSelect',
+                batch: legend
+            });
+        }
+        customerTypeName = typeName.slice(0, typeName.lastIndexOf('('));
+        
+        product_rank(provName, cityName, '', dateType, customerTypeName);
+        area_rank(provName, cityName, '', dateType, customerTypeName);
+    }
+    
+    
+    //产品
+    function product_rank(provName, cityName, countryName, dateType, customerTypeName){
+      $.ajax({
+            url:"${CPATH}/biSales/productByCustomerType",
+            type:"post",
+            data:{provName: provName, cityName: cityName, countryName: countryName, dateType: dateType, customerTypeName: customerTypeName},
+            dataType:"json"
+        }).done(function(data){
+            Utils.close();
+
+            var prTitle = customerTypeName + '产品销售排行';
+            if((provName + cityName + countryName).trim() != '' ){
+                prTitle = provName + cityName + countryName + prTitle;
+            } else {
+                prTitle = '全国' + prTitle;
+            }
+            var $p = $("#p_product_rank");
+            $p.empty();
+            $p.text(prTitle);
+
+            var $tbody = $("#product_rank tbody");
+            $tbody.empty();
+            $tbody.append("<tr><th>产品</th><th>数量(件)</th><th>金额(万元)</th></tr>");
+            for(var i = 0; i < data.length; i++){
+                $tbody.append("<tr><td>" + data[i].custom_name + "</td><td class='t-r'>" + data[i].productCount + "</td><td class='t-r'>" + data[i].totalAmount + "</td></tr>");
+            }
+            
+            
+       });
+    }
+    
+    //区域
+    function area_rank(provName, cityName, countryName, dateType, customerTypeName){
+      $.ajax({
+            url:"${CPATH}/biSales/areaByCustomerType",
+            type:"post",
+            data:{provName: provName, cityName: cityName, countryName: countryName, dateType: dateType, customerTypeName: customerTypeName},
+            dataType:"json"
+        }).done(function(data){
+            Utils.close();
+
+            var areaYData = [];
+            var areaSeriesData = [];
+            var area_rank = document.getElementById('area_rank');
+            var $area_rank = $(area_rank);
+            
+            $area_rank.height(80);
+            for(var i = 0; i < data.length; i++){
+                var height = $area_rank.height();
+                $area_rank.height(height += 16);
+            
+                if (cityName.trim() != '') {
+                    areaYData.push(data[i].country_name);
+                }else if(provName.trim() != ''){
+                    areaYData.push(data[i].city_name);
+                }else{
+                    areaYData.push(data[i].prov_name);
+                }
+                areaSeriesData.push(data[i].realAmount);
+            }
+
+            var areaTitle = customerTypeName + '销售分布';
+            if((provName + cityName + countryName).trim() != '' ){
+                areaTitle = provName + cityName + countryName + areaTitle;
+            } else {
+                areaTitle = '全国' + areaTitle;
+            }
+            var $p = $("#p_area_rank");
+            $p.empty();
+            $p.text(areaTitle);
+
+
+            var areaRankChart = echarts.init(area_rank);
+            var option = {
+                color: ['#4ac7f5'],
+                grid: {
+                    left: '2%',
+                    right: '20%',
+                    bottom: 15,
+                    top: 15,
+                    containLabel: true
+                },
+                calculable : true,
+                xAxis : {
+                    show : false,
+                    name : '金额/万元',
+                    type : 'value',
+                    boundaryGap: [0, 0.01]
+                },
+                yAxis : {
+                    type : 'category',
+                    data : areaYData.reverse(),
+                    axisLabel : {
+                        interval : 0,
+                        fontSize : 8
+                    }
+                },
+                series : {
+                    type:'bar',
+                    barWidth:15,
+                    data:areaSeriesData.reverse(),
+                    label:{
+                        normal:{
+                            show:true,
+                            position:'right',
+                            formatter: '{c}万元'
+                        }
+                    }
+                }
+           };
+           areaRankChart.resize();
+           areaRankChart.setOption(option,true);
+           //areaRankChart.on('click', areaClick);
+       });
+    }
+</#macro>
+<@layout>
+<section>
+    <div class="bi-body">
+        <#include "_inc/_bi_search_box.html"/>
+        <header class="wy-header">
+            <div id="goback" class="wy-header-icon-back"><span></span></div>
+            <div class="wy-header-title">我附近的终端分布</div>
+            <div id="relocation" class="relocation"><i class="icon-map-marker txt-color-blue"></i> 定位</div>
+        </header>
+        <div id="allmap"></div>
+        <p id="p_customerId_product" style="display:none;" class="txt-color-red"><span id="customer-name"></span></p>
+        <div class="weui-cells weui-cells_form">
+            <div class="weui-cell" style="padding: 0">
+                <table class="table table-striped table-bordered" id="customerId_product">
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <p class="title" id="p_customer_rank"></p>
+        <div id="customer_rank" id="customer_rank">
+        </div> 
+
+        <p class="title" id="p_product_rank"></p>
+        <div class="weui-cells weui-cells_form">
+            <div class="weui-cell" style="padding: 0">
+                <table class="table table-striped table-bordered" id="product_rank">
+                    <tbody>
+                        <tr>
+                            <th>
+                                产品
+                            </th>
+                            <th>
+                                省份
+                            </th>
+                            <th>
+                                数量(件)
+                            </th>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <p class="title" id="p_area_rank"></p>
+        <div id="area_rank">
+        </div>
+
+    </div>
+</section>
+<#include "_inc/_nav_box.html"/>
+<span id="gotop" title="返回顶部"><i class="icon-arrow-up2"></i></div>
+</@layout>
