@@ -1329,7 +1329,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		}
 		LinkedList<Object> params = new LinkedList<Object>();
 		StringBuilder fromBuilder = new StringBuilder("SELECT u.realname, u.avatar, u.id, ");
-		fromBuilder.append("SUM(o.total_amount) as totalAmount,IFNULL(t1.productCount,0) as productCount, COUNT(o.id) as orderCount FROM cc_sales_outstock o ");
+		fromBuilder.append("IFNULL(SUM(o.total_amount),0) as totalAmount,IFNULL(SUM(t1.productCount),0) as productCount, COUNT(o.id) as orderCount FROM cc_sales_outstock o ");
 		fromBuilder.append("LEFT JOIN (SELECT SUM(cd.product_count/cp.convert_relate) as productCount, cd.outstock_id FROM cc_sales_outstock_detail cd ");
 		fromBuilder.append("LEFT JOIN cc_seller_product sp ON sp.id = cd.sell_product_id ");
 		fromBuilder.append("LEFT JOIN cc_product cp on cp.id = sp.product_id ");
