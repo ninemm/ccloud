@@ -89,13 +89,15 @@
             </div>
         </div>
         <#if invesType??>
+        	<#if apply.invest_amount??>
 	        <div class="weui-cell weui-cell_access">
 	            <div class="weui-cell__bd">
 	                申请总金额
 	                <span class="fr">
-	            <span class="ft20 orange">${apply.invest_amount?string("0.00")}</span>&nbsp;元</span>
+	            <span class="ft20 orange">${(apply.invest_amount?string(',###.##'))!}</span>&nbsp;元</span>
 	            </div>
 	        </div>
+	       </#if>
         </#if>
         <!--<div class="weui-cell weui-cell_access">
             <div class="weui-cell__bd">
