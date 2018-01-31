@@ -347,13 +347,15 @@ public class SalesOutstockQuery extends JBaseQuery {
 	
 	public Page<Record> paginateForReceivables(int pageNumber, int pageSize, String keyword, String userId,
 			String customerTypeId, String startDate, String endDate, String sellerId, String dataArea) {
-		String select = "select o.*, c.customer_name, ct.name as customerTypeName,o.total_amount as balanceAmount  ";
+		String select = "select o.*, c.customer_name, ct.name as customerTypeName,t2.count as balanceAmount  ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_sales_outstock` o ");
 		fromBuilder.append("left join cc_seller_customer cc ON o.customer_id = cc.id ");
 		fromBuilder.append("left join cc_customer c on cc.customer_id = c.id ");
 		fromBuilder.append("left join cc_customer_type ct on o.customer_type_id = ct.id ");
 		fromBuilder.append("LEFT JOIN cc_sales_order_join_outstock cso ON o.id = cso.outstock_id ");
 		fromBuilder.append("LEFT JOIN cc_sales_order cs ON cso.order_id = cs.id ");
+		fromBuilder.append("LEFT JOIN (SELECT cc.ref_sn, IFNULL(SUM(cc.balance_amount),0) - IFNULL(t1.act_amount,0) as count,cc.ref_type FROM cc_receivables_detail cc ");
+		fromBuilder.append("LEFT JOIN (SELECT cr.ref_sn, SUM(cr.act_amount) as act_amount FROM cc_receiving cr GROUP BY cr.ref_sn) t1 ON t1.ref_sn = cc.ref_sn GROUP BY cc.ref_sn) t2 on t2.ref_sn = o.outstock_sn ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 
@@ -384,7 +386,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 			params.add(endDate);
 		}
 
-		fromBuilder.append(" order by o.create_date desc ");
+		fromBuilder.append(" order by t2.count asc, o.create_date desc ");
 
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());

@@ -77,9 +77,6 @@ public class ReceivablesController extends BaseFrontController {
 
 		Page<Record> outStockList = SalesOutstockQuery.me().paginateForReceivables(getPageNumber(), getPageSize(), keyword, userId,
 				customerTypeId, startDate, endDate, sellerId, selectDataArea);
-		for(Record outStock:outStockList.getList()) {
-			outStock.set("balanceAmount", new BigDecimal(ReceivablesDetailQuery.me().findByBalanceCountBySn(outStock.getStr("outstock_sn")).getStr("count")));
-		}
 		Map<String, Object> map = new HashMap<>();
 		map.put("outStockList", outStockList.getList());
 		renderJson(map);
