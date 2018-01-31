@@ -7,9 +7,12 @@
         window.location.href = "${CPATH}/order/getOldOrder?orderId=${order.id}";
     }
 	function getback() {
-		window.location.href = '${CPATH}/order/myOrder?history=' + 1;	
-	}    
-    function cancel() {
+		var oldUrl = document.referrer;
+		var url = oldUrl.split("?history=1");
+		if(url[0].indexOf("myOrder") !=-1 ) window.location.href = url[0] + '?history=1';
+		else window.location.href = url[0];
+	}
+	function cancel() {
     	$.confirm({
 						title: "订单撤销",
 						text: '是否撤销订单？',
