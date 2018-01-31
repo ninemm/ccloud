@@ -99,7 +99,7 @@ public class BiIndexController extends BaseFrontController {
 
 	public void orderAmount() {
 
-		String dealerCode = getSessionAttr("dealerCode");
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
@@ -122,7 +122,7 @@ public class BiIndexController extends BaseFrontController {
 		}
 
 		List<LinkedList<Map<String, Object>>> result = Lists.newLinkedList();
-		List<Record> list = BiSalesQuery.me().findOrderAmount(dealerCode, provName, cityName, null, startDate,
+		List<Record> list = BiSalesQuery.me().findOrderAmount(sellerId, provName, cityName, null, startDate,
 				endDate, devideFlg);
 		for (Record map : list) {
 

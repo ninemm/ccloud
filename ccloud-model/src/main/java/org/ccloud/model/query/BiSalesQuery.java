@@ -506,7 +506,7 @@ public class BiSalesQuery extends JBaseQuery {
 		return Db.find(sqlBuilder.toString(), params.toArray());
 	}
 
-	public List<Record> findOrderAmount(String dealerCode, String provName, String cityName, String countryName,
+	public List<Record> findOrderAmount(String sellerId, String provName, String cityName, String countryName,
 	                                    String startDate, String endDate, int divideFlg) {
 
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -514,53 +514,56 @@ public class BiSalesQuery extends JBaseQuery {
 		StringBuilder sqlBuilder = new StringBuilder("select ");
 
 		if (StrKit.notBlank(cityName)) {
-			sqlBuilder.append(" countryName");
+			sqlBuilder.append(" cc.country_name as countryName");
 		} else if (StrKit.notBlank(provName)) {
-			sqlBuilder.append(" cityName");
+			sqlBuilder.append(" cc.city_name as countryName");
 		} else {
-			sqlBuilder.append(" provName");
+			sqlBuilder.append(" cc.prov_name as countryName");
 		}
 
 		if (divideFlg == 1) {
-			sqlBuilder.append(", TRUNCATE(SUM(totalSales)/1000000, 2) as totalAmount");
+			sqlBuilder.append(", TRUNCATE(SUM(cso.total_amount)/10000, 2) as totalAmount");
 		} else if (divideFlg == 2) {
-			sqlBuilder.append(", TRUNCATE(SUM(totalSales)/10000000, 2) as totalAmount");
+			sqlBuilder.append(", TRUNCATE(SUM(cso.total_amount)/100000, 2) as totalAmount");
 		} else if (divideFlg == 3) {
-			sqlBuilder.append(", TRUNCATE(SUM(totalSales)/4000000, 2) as totalAmount");
+			sqlBuilder.append(", TRUNCATE(SUM(cso.total_amount)/40000, 2) as totalAmount");
 		} else if (divideFlg == 4) {
-			sqlBuilder.append(", TRUNCATE(SUM(totalSales)/2000000, 2) as totalAmount");
+			sqlBuilder.append(", TRUNCATE(SUM(cso.total_amount)/20000, 2) as totalAmount");
 		}
 
-		sqlBuilder.append(" from sales_fact");
+		sqlBuilder.append(" from cc_sales_outstock cso ");
+		sqlBuilder.append(" left join cc_seller_customer csc on cso.customer_id = csc.id");
+		sqlBuilder.append(" left join cc_customer cc on csc.customer_id = cc.id");
 
 		boolean needWhere = true;
-		needWhere = appendIfNotEmpty(sqlBuilder, "dealerCode", dealerCode, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "provName", provName, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "cityName", cityName, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "countryName", countryName, params, needWhere);
+		needWhere = appendIfNotEmpty(sqlBuilder, "cso.seller_id", sellerId, params, needWhere);
+		needWhere = appendIfNotEmpty(sqlBuilder, "cc.prov_name", provName, params, needWhere);
+		needWhere = appendIfNotEmpty(sqlBuilder, "cc.city_name", cityName, params, needWhere);
+		needWhere = appendIfNotEmpty(sqlBuilder, "cc.country_name", countryName, params, needWhere);
 
 		if (needWhere) {
 			sqlBuilder.append(" where 1 = 1");
 		}
 
 		if (StrKit.notBlank(startDate)) {
-			sqlBuilder.append(" and idate >= ?");
+			sqlBuilder.append(" and cso.biz_date >= ?");
 			params.add(startDate);
 		}
 
 		if (StrKit.notBlank(endDate)) {
-			sqlBuilder.append(" and idate <= ?");
+			sqlBuilder.append(" and cso.biz_date <= ?");
 			params.add(endDate);
 		}
-		sqlBuilder.append(" and customerType != 7");
+		sqlBuilder.append(" and csc.customer_kind != ?");
+		params.add(Consts.CUSTOMER_KIND_SELLER);
 
-		sqlBuilder.append(" group by provName");
+		sqlBuilder.append(" group by cc.prov_name");
 		if (StrKit.notBlank(provName)) {
-			sqlBuilder.append(", cityName");
+			sqlBuilder.append(", cc.city_name");
 		}
 
 		if (StrKit.notBlank(cityName)) {
-			sqlBuilder.append(", countryName");
+			sqlBuilder.append(", cc.country_name");
 		}
 		sqlBuilder.append(" order by totalAmount desc");
 
