@@ -181,7 +181,7 @@ public class TodoController extends BaseFrontController {
 			html.append(
 					"                    <div class=\"weui-panel weui-panel_access\">\n" +
 					"                        <div class=\"weui-cell weui-cell_access\">\n" +
-					"							<a href=\""+getRequest().getContextPath()+"/order/orderDetail?orderId="+order.getStr("id")+"\">\n");
+					"							<a href=\""+getRequest().getContextPath()+"/order/orderReview?orderId="+order.getStr("id")+"\">\n");
 					if(order.get("receive_type").equals("0")) {
 					html.append("								<span class=\"tag\">账期</span>");
 					}
@@ -196,7 +196,7 @@ public class TodoController extends BaseFrontController {
 					"							</a>\n"+
 					"                        </div>\n" +
 					"                        <div class=\"weui-cell weui-cell_access\">\n" +
-					"                        	<a class=\"weui-cell__bd\" style=\"color: gray\" href=\""+getRequest().getContextPath()+"/order/orderDetail?orderId="+order.getStr("id")+"\">订单详情</a>\n"+
+					"                        	<a class=\"weui-cell__bd\" style=\"color: gray\" href=\""+getRequest().getContextPath()+"/order/orderReview?orderId="+order.getStr("id")+"\">订单详情</a>\n"+
 					"							<span class=\"weui-cell__ft\"></span>"+
 					"                        </div>\n" +
 					"                    </div>\n");
