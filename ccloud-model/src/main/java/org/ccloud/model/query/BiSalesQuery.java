@@ -747,7 +747,7 @@ public class BiSalesQuery extends JBaseQuery {
 		params.add(Consts.SALES_REFUND_INSTOCK_PART_OUT);
 		params.add(Consts.SALES_REFUND_INSTOCK_ALL_OUT);
 		boolean needWhere = true;
-		needWhere = appendIfNotEmpty(sqlBuilder, "cc.seller_id", sellerId, params, needWhere);
+		needWhere = appendIfNotEmpty(sqlBuilder, "o.seller_id", sellerId, params, needWhere);
 		needWhere = appendIfNotEmpty(sqlBuilder, "cu.prov_name", provName, params, needWhere);
 		needWhere = appendIfNotEmpty(sqlBuilder, "cu.city_name", cityName, params, needWhere);
 		needWhere = appendIfNotEmpty(sqlBuilder, "cu.country_name", countryName, params, needWhere);
@@ -859,7 +859,7 @@ public class BiSalesQuery extends JBaseQuery {
 
 		boolean needWhere = true;
 		needWhere = appendIfNotEmpty(sqlBuilder, "ct.name", customerTypeName, params, needWhere);
-		needWhere = appendIfNotEmpty(sqlBuilder, "cc.seller_id", sellerId, params, needWhere);
+		needWhere = appendIfNotEmpty(sqlBuilder, "o.seller_id", sellerId, params, needWhere);
 		needWhere = appendIfNotEmpty(sqlBuilder, "cu.prov_name", provName, params, needWhere);
 		needWhere = appendIfNotEmpty(sqlBuilder, "cu.city_name", cityName, params, needWhere);
 		needWhere = appendIfNotEmpty(sqlBuilder, "cu.country_name", countryName, params, needWhere);
