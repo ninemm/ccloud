@@ -434,11 +434,11 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 					printAllNeedInfo printAllNeedInfo = SalesOutstockQuery.me().findStockOutForPrint(s);
 					//获取订单明细
 					List<orderProductInfo> orderProductInfos = SalesOutstockDetailQuery.me().findPrintProductInfo(s);
+					
+					SalesOutstock salesOutstock = SalesOutstockQuery.me().findById(s);
 					//订单总金额
-					BigDecimal productAmout=new BigDecimal("0");
-					for (orderProductInfo orderProductInfo : orderProductInfos) {
-						productAmout=productAmout.add(orderProductInfo.getProductAmout());
-					}
+					BigDecimal productAmout=salesOutstock.getTotalAmount();
+					
 					String total=productAmout.toString();
 					if (!SalesOutstockDetailQuery.me().batchOutStock(orderProductInfos, sellerId, date,
 							user.getDepartmentId(), user.getDataArea(), user.getId(),
