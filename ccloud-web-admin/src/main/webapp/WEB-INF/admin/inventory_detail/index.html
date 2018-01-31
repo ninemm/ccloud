@@ -95,12 +95,14 @@ var initParams = function(params) {
       			{field: "in_count", title: "入库数量", align: "center", width: '5%',sortable: true, edit:false},
       			{field: "in_amount", title: "入库金额", align: "center", width: '5%',
       				formatter: function(value,row,rowIndex){
-						return formatNumber(value);
-					},
+						if(value==null) return "";
+						else return formatNumber(value);
+						},
       			sortable: true, edit:false},
       			{field: "in_price", title: "入库单价", align: "center", width: '5%',
       				formatter: function(value,row,rowIndex){
-						return formatNumber(value);
+					if(value==null) return "";
+					else return formatNumber(value);
 					},
       			sortable: true, edit:false},
       			{field: "balance_count", title: "库存", align: "center", width: '5%',sortable: true,	edit:false},
