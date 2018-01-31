@@ -25,11 +25,6 @@
 <link rel="stylesheet" href="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.css">
 
 </#macro>
-<#macro css>
-.bootstrap-table {
-   margin-top:-30px;
-}
-</#macro>
 <#macro script>
 
 	var $table = $("#_inventoryDetail_table");
@@ -113,9 +108,9 @@
 </section>
 <!-- Main content -->
 <section class="content">
-		<div class="row content-row" >
+		<div class="row content-row" style="margin-bottom:-20px;">
 	    	<form class="form-horizontal" role="form" id="form">
-				<div class="form-group" style="margin-bottom:-15px;">
+				<div class="form-group" style="margin-bottom:0px;">
                 	<div class="col-sm-3">
 						<label class="control-label col-sm-5">盘点仓库:</label>
 						<div class="col-sm-7 input-group input-group-sm">
