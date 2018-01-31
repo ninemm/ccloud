@@ -44,7 +44,7 @@ public class BiSalesController extends BaseFrontController {
 		String dateType = getPara("dateType", "0").trim();// 0: 近一天， 1: 近一周， 2: 近一月
 
 		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
 
 		List<Map<String, Object>> result = BiSalesQuery.me().findAreaArray(sellerId, provName, cityName,
 				countryName, startDate, endDate);
@@ -65,7 +65,7 @@ public class BiSalesController extends BaseFrontController {
 		;// 0: 昨天， 1: 最近1周， 2: 最近1月
 
 		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
 
 		List<Record> result = BiSalesQuery.me().findAreaListByCusTypeId(sellerId, provName, cityName,
 				countryName, startDate, endDate, customerTypeName);
@@ -84,7 +84,7 @@ public class BiSalesController extends BaseFrontController {
 		String dateType = getPara("dateType", "0").trim();// 0: 昨天， 1: 最近1周， 2: 最近1月
 
 		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
 
 		List<Record> result = BiSalesQuery.me().findByCusTypeId(sellerId, provName, cityName,
 				countryName, startDate, endDate);
@@ -105,7 +105,7 @@ public class BiSalesController extends BaseFrontController {
 		;// 0: 昨天， 1: 最近1周， 2: 最近1月
 
 		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
 
 		List<Record> result = BiSalesQuery.me().findProductList(sellerId, provName, cityName, countryName,
 				startDate, endDate);
@@ -127,7 +127,7 @@ public class BiSalesController extends BaseFrontController {
 		String dateType = getPara("dateType", "0").trim();// 0: 昨天， 1: 最近1周， 2: 最近1月
 
 		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
 
 		List<Record> result = BiSalesQuery.me().findCustomerTypeListByProduct(sellerId, provName, cityName,
 				countryName, startDate, endDate, cInvCode);
@@ -150,7 +150,7 @@ public class BiSalesController extends BaseFrontController {
 		;// 0: 昨天， 1: 最近1周， 2: 最近1月
 
 		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
 
 		List<Record> result = BiSalesQuery.me().findAreaListByProduct(sellerId, provName, cityName, countryName,
 				startDate, endDate, null);
@@ -169,7 +169,7 @@ public class BiSalesController extends BaseFrontController {
 		String dateType = getPara("dateType", "0").trim();// 0: 昨天， 1: 最近1周， 2: 最近1月
 
 		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
 
 		List<List<Record>> rows = new ArrayList<List<Record>>();
 		List<Record> countryResult = BiSalesQuery.me().findAreaListByCusTypeId(sellerId, provName, cityName,
@@ -206,7 +206,7 @@ public class BiSalesController extends BaseFrontController {
 		String dateType = getPara("dateType", "0").trim(); // 0: 昨天， 1: 最近1周， 2: 最近1月
 
 		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
 
 		List<List<Record>> rows = new ArrayList<List<Record>>();
 		List<Record> typeResult = BiSalesQuery.me().findCustomerTypeList(sellerId, provName, cityName, countryName,
@@ -234,7 +234,7 @@ public class BiSalesController extends BaseFrontController {
 		String dateType = getPara("dateType", "0").trim(); // 0: 昨天， 1: 最近1周， 2: 最近1月
 
 		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
 
 		List<Record> result = BiSalesQuery.me().findProductListByCusType(sellerId, provName, cityName,
 				countryName, startDate, endDate, customerTypeName);
@@ -257,7 +257,7 @@ public class BiSalesController extends BaseFrontController {
 		String dateType = getPara("dateType", "0").trim(); // 0: 昨天， 1: 最近1周， 2: 最近1月
 
 		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
 
 		List<Record> result = BiSalesQuery.me().findsalesList(true, provName, cityName, countryName, sellerId,
 				startDate, endDate, dataArea);
@@ -283,7 +283,7 @@ public class BiSalesController extends BaseFrontController {
 		String dateType = getPara("dateType", "0").trim(); // 0: 昨天， 1: 最近1周， 2: 最近1月
 
 		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
 
 		Map<String, Object> result = new HashMap<String, Object>();
 
@@ -313,7 +313,7 @@ public class BiSalesController extends BaseFrontController {
 		if (StrKit.notBlank(getPara("sellerId"))) sellerId = getPara("sellerId").trim();
 
 		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
 
 		List<Record> result = BiSalesQuery.me().findProductListByDealer(provName, cityName, countryName, sellerId, startDate, endDate);
 
@@ -331,7 +331,7 @@ public class BiSalesController extends BaseFrontController {
 		String dateType = getPara("dateType", "0").trim();
 
 		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
 
 		List<Record> salesFactList = BiSalesQuery.me().findAreaListByCusTypeId(sellerId, provName, cityName,
 				countryName, startDate, endDate, null);
@@ -385,7 +385,7 @@ public class BiSalesController extends BaseFrontController {
 		String dateType = getPara("dateType", "0").trim(); // 0: 昨天， 1: 最近1周， 2: 最近1月
 
 		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
 
 		List<Record> result = BiSalesQuery.me().findProductListByCustomerId(dealerCode, customerId, startDate,
 				endDate);

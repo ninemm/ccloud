@@ -80,7 +80,7 @@ public class BiIndexController extends BaseFrontController {
 		String dateType = getPara("dateType", "0").trim(); // 0: 昨天， 1: 最近1周， 2: 最近1月
 
 		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
 
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("orderAvg", BiSalesQuery.me().findOrderAvgAmountList(sellerId, provName, cityName, countryName,
@@ -107,7 +107,7 @@ public class BiIndexController extends BaseFrontController {
 		String dateType = getPara("dateType", "0").trim(); // 0: 昨天， 1: 最近1周， 2: 最近1月
 
 		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
 
 		String str = "countryName";
 		int devideFlg = 1;
