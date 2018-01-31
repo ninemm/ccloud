@@ -347,15 +347,17 @@ public class BiSalesController extends BaseFrontController {
 		double longitude = Double.parseDouble(getPara("longitude"));
 		double latitude = Double.parseDouble(getPara("latitude"));
 		double dist = Double.parseDouble(getPara("dist"));
-//		String dateType = getPara("dateType", "0").trim();
+		String dateType = getPara("dateType", "0").trim();
 
-//		String startDate = DateUtils.getDateByType(dateType);
-//		String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+		String startDate = DateUtils.getDateByType(dateType);
+		String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
 
 		AroundCustomerCallback callback = new AroundCustomerCallback();
 		callback.setLongitude(longitude);
 		callback.setLatitude(latitude);
 		callback.setDist(dist);
+		callback.setStartDate(startDate);
+		callback.setEndDate(endDate);
 		callback.setSellerId(sellerId);
 
 		Connection conn = null;
