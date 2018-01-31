@@ -9,7 +9,7 @@
 	<meta content="telephone=no" name="format-detection">
 	<meta content="email=no" name="format-detection">
 	<link rel="stylesheet" href="${CTPATH}/css/icomoon.css">
-	<title>系统维护</title>
+	<title>超时</title>
 	<style>
 		html,
 		body {
@@ -45,14 +45,15 @@
 		</p>
 	</main>
 </body>
-<script src="./js/jquery-3.2.1.min.js"></script>
+<script src="${CTPATH}/js/jquery-3.2.1.min.js"></script>
 <script>
 	var time = 5;
 	var clock = setInterval(function () {
 		$('.time').text(--time);
 		if (time == 0) {
 			clearInterval(clock);
-			WeixinJSBridge.call('closeWindow');
+			window.location.href="${CPATH}/user/login"; 
+			/*WeixinJSBridge.call('closeWindow'); */
 		}
 	}, 1000)
 </script>

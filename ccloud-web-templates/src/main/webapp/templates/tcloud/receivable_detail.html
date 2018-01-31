@@ -64,13 +64,13 @@
 	            } else {
 					$.modal({
 						title: result.message,
-						buttons: [
-							{ text: "查看收款单", className: "default", onClick: function(){ 
-								location.reload();
-								} 
-							},
-							{ text: "继续收款", className: "primary", onClick: function(){
+						buttons: [{ 
+							text: "继续收款", className: "default", onClick: function(){
 								location.href = '${CPATH}/receivables/index';
+								}
+							},
+							{ text: "查看收款单", className: "primary", onClick: function(){ 
+								location.reload();
 								} 
 							},
 						]

@@ -158,15 +158,17 @@ public class InventoryQuery extends JBaseQuery {
 	
 	//查询商品所在仓库
 	public List<Record> findProductStoreCount(String sellerId, String productId, String userId) {
-		StringBuilder defaultSqlBuilder = new StringBuilder("(SELECT cu.warehouse_id,IFNULL(t1.balance_count,0) as balance_count,cw.type,cu.user_id ");
+		StringBuilder defaultSqlBuilder = new StringBuilder("SELECT * FROM ( ");
+		defaultSqlBuilder.append("(SELECT cu.warehouse_id,IFNULL(t1.balance_count,0) as balance_count,cw.type,cw.is_default,cu.user_id ");
 		defaultSqlBuilder.append("FROM cc_user_join_warehouse cu LEFT JOIN cc_warehouse cw ON cw.id = cu.warehouse_id LEFT JOIN ( ");
 		defaultSqlBuilder.append("SELECT cc.balance_count, cc.warehouse_id,cc.product_id FROM cc_inventory cc WHERE cc.product_id = ? AND cc.seller_id = ? ");
 		defaultSqlBuilder.append(") t1 on t1.warehouse_id = cu.warehouse_id ");
-		defaultSqlBuilder.append("WHERE cu.user_id = ? ORDER BY cw.type desc) ");
+		defaultSqlBuilder.append("WHERE cu.user_id = ?) ");
 		defaultSqlBuilder.append("UNION ALL ");
-		defaultSqlBuilder.append("(SELECT cc.warehouse_id,cc.balance_count,cw.type,null as user_id FROM cc_inventory cc ");
+		defaultSqlBuilder.append("(SELECT cc.warehouse_id,cc.balance_count,cw.type,cw.is_default,null as user_id FROM cc_inventory cc ");
 		defaultSqlBuilder.append("LEFT JOIN cc_warehouse cw ON cw.id = cc.warehouse_id WHERE cc.product_id = ? AND cc.seller_id = ? ");
-		defaultSqlBuilder.append("AND cw.type != 2 ORDER BY cw.is_default DESC) ");
+		defaultSqlBuilder.append("AND cw.type != 2) ");
+		defaultSqlBuilder.append(") store ORDER BY store.user_id, store.type, store.is_default desc ");
 		return Db.find(defaultSqlBuilder.toString(), productId, sellerId, userId, productId, sellerId);
 	}
 

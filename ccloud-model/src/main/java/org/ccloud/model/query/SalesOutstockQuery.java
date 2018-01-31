@@ -345,15 +345,17 @@ public class SalesOutstockQuery extends JBaseQuery {
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 	
+	//应收账款
 	public Page<Record> paginateForReceivables(int pageNumber, int pageSize, String keyword, String userId,
 			String customerTypeId, String startDate, String endDate, String sellerId, String dataArea) {
-		String select = "select o.*, c.customer_name, ct.name as customerTypeName,o.total_amount as balanceAmount  ";
+		String select = "select o.*, c.customer_name, ct.name as customerTypeName,o.total_amount-COALESCE(SUM(r.act_amount) , 0) AS balanceAmount ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_sales_outstock` o ");
-		fromBuilder.append("left join cc_seller_customer cc ON o.customer_id = cc.id ");
-		fromBuilder.append("left join cc_customer c on cc.customer_id = c.id ");
-		fromBuilder.append("left join cc_customer_type ct on o.customer_type_id = ct.id ");
-		fromBuilder.append("LEFT JOIN cc_sales_order_join_outstock cso ON o.id = cso.outstock_id ");
-		fromBuilder.append("LEFT JOIN cc_sales_order cs ON cso.order_id = cs.id ");
+		fromBuilder.append(" LEFT JOIN cc_seller_customer cc ON o.customer_id = cc.id ");
+		fromBuilder.append(" LEFT JOIN cc_customer c on cc.customer_id = c.id ");
+		fromBuilder.append(" LEFT JOIN cc_customer_type ct on o.customer_type_id = ct.id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock cso ON o.id = cso.outstock_id ");
+		fromBuilder.append(" LEFT JOIN cc_sales_order cs ON cso.order_id = cs.id ");
+		fromBuilder.append(" LEFT JOIN cc_receiving r ON r.ref_sn=o.outstock_sn ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 
@@ -384,7 +386,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 			params.add(endDate);
 		}
 
-		fromBuilder.append(" order by o.create_date desc ");
+		fromBuilder.append("group by o.outstock_sn order by  o.create_date desc ");
 
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());

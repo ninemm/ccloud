@@ -17,6 +17,8 @@ package org.ccloud;
 
 public class Consts {
 
+	public static final String FIRST_URL="/admin";
+	
 	public static final String COOKIE_LOGINED_USER = "user";
 	public static final String COOKIE_SELECTED_SELLER_ID = "_seller_id";
 	public static final String COOKIE_SELECTED_USER_ID = "_user_id";
