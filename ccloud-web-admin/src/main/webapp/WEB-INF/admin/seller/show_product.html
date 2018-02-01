@@ -240,7 +240,7 @@
 					if(data==true){
 						toastr.success(data.message, '修改成功');
 					}else{
-						toastr.error(data.message, '修改失败');
+						toastr.error(data.message, '添加失败,请检查是否添加的产品已经存在！');
 					}
 					setTimeout( function(){
 					location.reload();
