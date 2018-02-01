@@ -31,19 +31,13 @@ datetimepicker.min.css">
 	var urlGift = '${CPATH}/admin/report/customerDetailsGiftReportList';
 
 	$(function() {
-		jQuery.mm.initDatetimepicker('form', '#startDate', 'startDate', 'yyyy-MM-dd', 2, 
-
-4, 2);
-		jQuery.mm.initDatetimepicker('form', '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 
-
-2);
+		jQuery.mm.initDatetimepicker('form', '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
+		jQuery.mm.initDatetimepicker('form', '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initValidator('#form', validatorFields);
-		jQuery.mm.initEditTableExport3('#_customerDetailsReport_table',url, initParams, 
-
-initFields(), null);
+		jQuery.mm.initEditTableExport3('#_customerDetailsReport_table',url, initParams,  initFields(), null);
 		jQuery.mm.initEditTableExport4('#_customerDetailsReportGift_table',urlGift, 
 
-initParams, initFieldsGift(), null);
+	initParams, initFieldsGift(), null);
 		$('button[title^=Export]').html('导出').attr('class','btn btn-sm btn-primary btn-flat');
 		$('button[title^=Export]').html('导出').css('border-radius',0);
 		$('button[title^=Export]').html('导出').css('margin-top','2px');
@@ -98,14 +92,10 @@ initParams, initFieldsGift(), null);
 	
 	var initFields = function() {
 		var fields =
-			[ 	{title: "序号", align: "center", edit:false, formatter: function 
-
-(value, row, index) { return index+1; } },
+			[ 	{title: "序号", align: "center", edit:false, formatter: function  (value, row, index) { return index+1; } },
 				<#if watchHead??>
 					<#list watchHead as bean>
-						{field: "${bean}", title: "${bean}", align: 
-
-"center",  edit:false},
+						{field: "${bean}", title: "${bean}", align: "center",  edit:false},
 	   				</#list>
 				</#if>
    			];
@@ -114,14 +104,12 @@ initParams, initFieldsGift(), null);
 	
 	var initFieldsGift = function() {
 		var fields =
-			[ 	{title: "序号", align: "center", edit:false, formatter: function 
-
-(value, row, index) { return index+1; } },
+			[ 	{title: "序号", align: "center", edit:false, formatter: function (value, row, index) { return index+1; } },
 				<#if watchHead??>
 					<#list watchHead as bean>
-						{field: "${bean}", title: "${bean}", align: 
-
-"center",  edit:false},
+						<#if bean != '销售合计'>
+							{field: "${bean}", title: "${bean}", align: "center",  edit:false},
+						</#if>
 	   				</#list>
 				</#if>
    			];

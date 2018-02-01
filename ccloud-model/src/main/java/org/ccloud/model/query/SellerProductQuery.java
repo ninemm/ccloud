@@ -225,9 +225,9 @@ public class SellerProductQuery extends JBaseQuery {
 		return DAO.find(fromBuilder.toString(), sellerId);
 	}
 
-	//查询出该经销商的所有商品名称 和 换算关系
+	//查询出该经销商的所有商品名称 和 换算关系 和商品id
 	public List<Record> findConvertRelate(String sellerId) {
-		StringBuilder stringBuilder = new StringBuilder("SELECT sp.custom_name,p.convert_relate");
+		StringBuilder stringBuilder = new StringBuilder("SELECT sp.custom_name,p.convert_relate,sp.id");
 		stringBuilder.append(" FROM cc_seller s  ");
 		stringBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.seller_id=s.id ");
 		stringBuilder.append(" LEFT JOIN cc_product p ON sp.product_id =p.id ");

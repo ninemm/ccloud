@@ -558,6 +558,7 @@ public class _ReportController extends JBaseController {
 		//得到表头
 		List<String>watchHead=new ArrayList<>();
 		watchHead.add("客户名称");
+		watchHead.add("销售合计");
 		List<SellerProduct> findBySellerId = SellerProductQuery.me().findBySellerId(sellerId);
 		for (SellerProduct sellerProduct : findBySellerId) {
 			String customName=sellerProduct.getCustomName();
@@ -587,6 +588,17 @@ public class _ReportController extends JBaseController {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
 		//我的客户卖出商品详情
 		List<Record> list = SalesOrderQuery.me().findByCustomerDetail(startDate,endDate,keyword, userId,sellerId,false);
+		List<Record> list1=SalesOrderQuery.me().findMoney(startDate,endDate,keyword, userId);
+		for (Record record : list) {
+			String customerId=record.getStr("id");
+			for (Record record1 : list1) {
+				String customerId1=record1.getStr("customer_id");
+				if (customerId.equals(customerId1)) {
+					record.set("销售合计", record1.get("totalAmount"));
+					break;
+				}
+			}
+		}
 		renderJson(list);
 	}
 	
