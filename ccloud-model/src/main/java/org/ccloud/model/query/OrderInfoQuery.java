@@ -105,7 +105,7 @@ public class OrderInfoQuery extends JBaseQuery {
 	}
 
 	public Record findMoreById(String orderId) {
-		StringBuilder fromBuilder = new StringBuilder("select o.*, cc.customer_name, cs.seller_name, CONCAT(cc.prov_name,IFNULL(cc.city_name,''),IFNULL(cc.country_name,''),IFNULL(cc.address,'')) as address from cc_order_info o ");
+		StringBuilder fromBuilder = new StringBuilder("select o.*, cc.customer_name, cs.seller_name, CONCAT(IFNULL(cc.prov_name,''),IFNULL(cc.city_name,''),IFNULL(cc.country_name,''),IFNULL(cc.address,'')) as address from cc_order_info o ");
 		fromBuilder.append("LEFT JOIN cc_customer_info cc ON cc.id = o.customer_info_id ");
 		fromBuilder.append("LEFT JOIN cc_seller_info cs on cs.id = o.seller_info_id ");
 		fromBuilder.append("WHERE o.id = ? ");
@@ -151,6 +151,15 @@ public class OrderInfoQuery extends JBaseQuery {
 			return Db.findFirst(fromBuilder.toString());
 
 		return Db.findFirst(fromBuilder.toString(), params.toArray());
+	}
+
+	public boolean isExist(String orderSn) {
+		OrderInfo info = DAO.doFindFirst("order_sn = ? ", orderSn);
+		if (info != null) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	

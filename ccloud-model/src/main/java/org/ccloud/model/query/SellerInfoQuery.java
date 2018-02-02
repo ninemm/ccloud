@@ -15,11 +15,13 @@
  */
 package org.ccloud.model.query;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.ccloud.model.SellerInfo;
 
+import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
@@ -76,6 +78,17 @@ public class SellerInfoQuery extends JBaseQuery {
 	public List<SellerInfo> findAll() {
 		String sql = "Select cc.id, cc.seller_name from cc_seller_info cc ";
 		return DAO.find(sql);
+	}
+
+	public String insertSeller(String sellerName) {
+		String id = StrKit.getRandomUUID();
+		SellerInfo sellerInfo = new SellerInfo();
+		sellerInfo.setId(id);
+		sellerInfo.setSellerName(sellerName);
+		sellerInfo.setCreateDate(new Date());
+		sellerInfo.setModifyDate(new Date());
+		sellerInfo.save();
+		return id;
 	}
 
 	

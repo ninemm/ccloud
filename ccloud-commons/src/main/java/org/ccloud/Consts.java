@@ -125,7 +125,8 @@ public class Consts {
 
 	public static final int SALES_REFUND_INSTOCK_DEFUALT = 0;//退货单待审核
 	public static final int SALES_REFUND_INSTOCK_PASS = 1000;//退货单已审核
-	public static final int SALES_REFUND_INSTOCK_CANCEL= 1001;//退货单取消
+	public static final int SALES_REFUND_INSTOCK_CANCEL= 1001;//退货单撤销
+	public static final int SALES_REFUND_INSTOCK_REFUSE= 1002;//退货单拒绝
 	public static final int SALES_REFUND_INSTOCK_PART_OUT= 2000;//退货单部分入库
 	public static final int SALES_REFUND_INSTOCK_ALL_OUT= 3000;//退货单全部入库
 
@@ -251,4 +252,10 @@ public class Consts {
 	
 	public static final Integer STATUS_STATE_PUT = 1;// 通用上架
 	public static final Integer STATUS_STATE_DOWN = 0;// 通用下架
+
+	public static final String TEMPLATE_ALI = "0";//阿里模板
+	public static final String TEMPLATE_DANLU = "1";//丹露模板
+	public static final String TEMPLATE_NAME_ALI = "阿里";//阿里模板
+	public static final String TEMPLATE_NAME_DANLU = "丹露";//丹露模板	
+	
 }
