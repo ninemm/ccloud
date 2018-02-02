@@ -130,7 +130,7 @@ public class DictQuery extends JBaseQuery {
 		}
 
 		else {
-			fromBuilder.append(" ORDER BY `create_time` desc");
+			fromBuilder.append(" ORDER BY `create_date` desc");
 		}
 	}
 

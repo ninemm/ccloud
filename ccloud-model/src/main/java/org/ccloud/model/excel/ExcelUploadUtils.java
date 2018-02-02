@@ -20,12 +20,14 @@ import org.ccloud.model.vo.DanLuExcel;
 
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
+import com.jfinal.log.Log;
 import com.jfinal.plugin.activerecord.tx.Tx;
 
 import cn.afterturn.easypoi.excel.ExcelImportUtil;
 import cn.afterturn.easypoi.excel.entity.ImportParams;
 
 public class ExcelUploadUtils {
+	private static final Log log = Log.getLog(ExcelUploadUtils.class);
 	
 	@Before(Tx.class)
 	public static int[] aliUpload(File file, ImportParams params, String sellerId) {
@@ -61,7 +63,6 @@ public class ExcelUploadUtils {
 				String contact = excel.getContact();
 				String postalcode = excel.getPostalcode();
 				String unit = excel.getUnit();
-				System.out.println("-----------------"+address+"--------------------");
 				
 				order.set("pay_amount",excel.getPay_amount());
 				order.set("total_amount",excel.getTotal_amount());
@@ -78,6 +79,7 @@ public class ExcelUploadUtils {
 					order.set("customer_info_id", info.getId());
 				} else {
 					order.set("customer_info_id", CustomerInfoQuery.me().insertCustomer(customerName, address, contact, postalcode));
+					log.info("-----导入客户名称: " + customerName + "----客户地址: " + address);
 				}
 				SellerInfo sellerInfo = SellerInfoQuery.me().findByName(sellerName);
 				
@@ -85,6 +87,7 @@ public class ExcelUploadUtils {
 					order.set("seller_info_id", sellerInfo.getId());
 				} else {
 					order.set("seller_info_id", SellerInfoQuery.me().insertSeller(sellerName));
+					log.info("-----导入销售商名称: " + sellerName);
 				}
 				
 				if (recevieType == null) {
@@ -119,6 +122,7 @@ public class ExcelUploadUtils {
 				} else {
 					detailInfo.set("sell_product_id", ProductInfoQuery.me().
 							insertProduct(productName, productType, productAmount, unit, null));
+					log.info("-----导入产品名称: " + productName + "----产品单价: " + productAmount);
 				}
 				BigDecimal total_amount = new BigDecimal(productAmount).multiply(new BigDecimal(excel.getTotal_count()));
 				
@@ -128,9 +132,10 @@ public class ExcelUploadUtils {
 				detailInfo.set("product_price", productAmount);
 				detailInfo.set("create_date", excel.getCreate_date());
 				detailInfo.set("modify_date", new Date());
-				System.out.println("-----------------"+excel.getProductName()+"--------------------");
 				order.save();
+				log.info("-----导入订单编号: " + orderSn);
 				detailInfo.save();
+				log.info("-----导入子订单编号: " + orderSn);
 				lastSn = excel.getOrder_sn();
 				lastId = id;
 				lastCreateDate = excel.getCreate_date();
@@ -152,6 +157,7 @@ public class ExcelUploadUtils {
 				} else {
 					detailInfo.set("sell_product_id", ProductInfoQuery.me().
 							insertProduct(productName, productType, productAmount, unit, null));
+					log.info("-----导入产品名称: " + productName + "----产品单价: " + productAmount);
 				}
 				BigDecimal total_amount = new BigDecimal(productAmount).multiply(new BigDecimal(excel.getTotal_count()));
 				
@@ -161,8 +167,8 @@ public class ExcelUploadUtils {
 				detailInfo.set("product_price", productAmount);
 				detailInfo.set("create_date", lastCreateDate);
 				detailInfo.set("modify_date", new Date());
-				System.out.println("-----------------"+excel.getProductName()+"--------------------");
 				detailInfo.save();
+				log.info("-----导入子订单编号: " + orderSn);
 			}
 			
 			inCnt++;
@@ -205,7 +211,6 @@ public class ExcelUploadUtils {
 				String recevieType = excel.getReceive_type();
 				String unit = excel.getUnit();
 				String code = excel.getProduct_code();
-				System.out.println("-----------------"+address+"--------------------");
 				
 				order.set("pay_amount",excel.getPay_amount());
 				order.set("total_amount",excel.getTotal_amount());
@@ -223,6 +228,7 @@ public class ExcelUploadUtils {
 					order.set("customer_info_id", info.getId());
 				} else {
 					order.set("customer_info_id", CustomerInfoQuery.me().insertCustomer(customerName, address, null, null));
+					log.info("-----导入客户名称: " + customerName + "----客户地址: " + address);
 				}
 				SellerInfo sellerInfo = SellerInfoQuery.me().findByName(sellerName);
 				
@@ -230,6 +236,7 @@ public class ExcelUploadUtils {
 					order.set("seller_info_id", sellerInfo.getId());
 				} else {
 					order.set("seller_info_id", SellerInfoQuery.me().insertSeller(sellerName));
+					log.info("-----导入销售商名称: " + sellerName);
 				}
 				
 				if (recevieType == null) {
@@ -266,6 +273,7 @@ public class ExcelUploadUtils {
 				} else {
 					detailInfo.set("sell_product_id", ProductInfoQuery.me().
 							insertProduct(productName, null, productPrice.toString(), unit, code));
+					log.info("-----导入产品名称: " + productName + "----产品单价: " + productPrice);
 				}
 				
 				detailInfo.set("relevance_sn", excel.getOrder_sn());
@@ -274,9 +282,10 @@ public class ExcelUploadUtils {
 				detailInfo.set("product_price", productPrice.toString());
 				detailInfo.set("create_date", excel.getCreate_date());
 				detailInfo.set("modify_date", new Date());
-				System.out.println("-----------------"+excel.getProductName()+"--------------------");
 				order.save();
+				log.info("-----导入订单编号: " + orderSn);
 				detailInfo.save();
+				log.info("-----导入子订单编号: " + orderSn);
 				lastSn = excel.getOrder_sn();
 				lastId = id;
 				lastCreateDate = excel.getCreate_date();
@@ -299,6 +308,7 @@ public class ExcelUploadUtils {
 				} else {
 					detailInfo.set("sell_product_id", ProductInfoQuery.me().
 							insertProduct(productName, null, productPrice.toString(), unit, code));
+					log.info("-----导入产品名称: " + productName + "----产品单价: " + productPrice);
 				}
 				
 				detailInfo.set("relevance_sn", lastSn);
@@ -307,8 +317,8 @@ public class ExcelUploadUtils {
 				detailInfo.set("product_price", productPrice);
 				detailInfo.set("create_date", lastCreateDate);
 				detailInfo.set("modify_date", new Date());
-				System.out.println("-----------------"+excel.getProductName()+"--------------------");
 				detailInfo.save();
+				log.info("-----导入子订单编号: " + orderSn);
 			}
 			
 			inCnt++;

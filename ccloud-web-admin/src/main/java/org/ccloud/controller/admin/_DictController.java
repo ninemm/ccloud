@@ -43,7 +43,7 @@ public class _DictController extends JBaseCRUDController<Dict> {
 		String keyword = getPara("k", "").trim();
 		setAttr("k", keyword);
 		
-		Page<Dict> page = DictQuery.me().paginate(getPageNumber(), getPageSize(), keyword, "value");
+		Page<Dict> page = DictQuery.me().paginate(getPageNumber(), getPageSize(), keyword, "type");
 		setAttr("page", page);
 
 		String templateHtml = "admin_user_index.html";
