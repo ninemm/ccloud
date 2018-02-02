@@ -823,8 +823,9 @@ public class BiSalesQuery extends JBaseQuery {
 		LinkedList<Object> params = new LinkedList<Object>();
 
 		StringBuilder sqlBuilder = new StringBuilder("SELECT cs.custom_name as cInvName, co.create_date as idate, o.product_amount - IFNULL(t1.refundPrice,0) as totalAmount, ");
-		sqlBuilder.append("o.product_count - IFNULL(t1.refundCount,0) as totalNum ");
+		sqlBuilder.append("(o.product_count - IFNULL(t1.refundCount,0))/cp.convert_relate as totalNum ");
 		sqlBuilder.append("FROM cc_sales_outstock_detail o LEFT JOIN cc_seller_product cs ON o.sell_product_id = cs.id ");
+		sqlBuilder.append("LEFT JOIN cc_product cp on cp.id = cs.product_id ");
 		sqlBuilder.append("LEFT JOIN cc_sales_outstock co on co.id = o.outstock_id ");
 		sqlBuilder.append("LEFT JOIN cc_seller_customer cu ON cu.id =  co.customer_id ");
 		sqlBuilder.append("LEFT JOIN (SELECT cr.outstock_detail_id, SUM(cr.reject_product_count) as refundCount, SUM(cr.reject_product_price) as refundPrice FROM cc_sales_refund_instock_detail cr ");
