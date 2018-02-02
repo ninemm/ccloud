@@ -379,15 +379,13 @@ public class BiSalesController extends BaseFrontController {
 
 	public void productByCustomerId() {
 
-		String dealerCode = getSessionAttr("dealerCode");
-
 		String customerId = getPara("customerId", "").trim();
 		String dateType = getPara("dateType", "0").trim(); // 0: 昨天， 1: 最近1周， 2: 最近1月
 
 		String startDate = DateUtils.getDateByType(dateType);
 		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
 
-		List<Record> result = BiSalesQuery.me().findProductListByCustomerId(dealerCode, customerId, startDate,
+		List<Record> result = BiSalesQuery.me().findProductList(customerId, startDate,
 				endDate);
 
 		renderJson(result);
