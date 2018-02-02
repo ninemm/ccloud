@@ -36,10 +36,11 @@ import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.render.Render;
 
 @RouterMapping(url = "/")
-@Clear(SessionInterceptor.class)
+
 public class IndexController extends BaseFrontController {
 
 	@ActionCache
+	@Clear(SessionInterceptor.class)
 	public void index() {
 		try {
 			Render render = onRenderBefore();
@@ -52,7 +53,8 @@ public class IndexController extends BaseFrontController {
 			onRenderAfter();
 		}
 	}
-
+	
+	@Clear(SessionInterceptor.class)
 	private void doRender() {
 		setGlobleAttrs();
 		String para = getPara();
