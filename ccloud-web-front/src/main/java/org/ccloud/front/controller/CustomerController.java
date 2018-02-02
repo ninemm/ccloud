@@ -554,7 +554,11 @@ public class CustomerController extends BaseFrontController {
 			List<String> diffAttrList = new ArrayList<>();
 			diffAttrList.add("新增客户");
 			setAttr("diffAttrList", diffAttrList);
-		}else {
+		} else if(isEnable.equals("2")) {
+			List<String> diffAttrList = new ArrayList<>();
+			diffAttrList.add("导入客户");
+			setAttr("diffAttrList", diffAttrList);
+		} else {
 			List<String> diffAttrList = new ArrayList<>();
 			diffAttrList.add("申请停用");
 			setAttr("diffAttrList", diffAttrList);
@@ -751,7 +755,7 @@ public class CustomerController extends BaseFrontController {
 		else
 			renderAjaxResultForError("操作失败");
 	}
-
+	//isEnable 0:新增或编辑 1:停用 2:导入
 	private boolean startProcess(String customerId, Map<String, Object> param, int isEnable) {
 		
 		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(customerId);
@@ -761,6 +765,13 @@ public class CustomerController extends BaseFrontController {
 		if (sellerCustomer == null) {
 			renderError(404);
 			return false;
+		}
+
+		if(StrKit.notBlank(sellerCustomer.getProcInstId())) {
+			if (SellerCustomerQuery.me().findTotalInstId(sellerCustomer.getProcInstId()) < 3) {
+				renderAjaxResultForError("该客户正在审核中");
+				return false;
+			}
 		}
 		
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
@@ -808,7 +819,9 @@ public class CustomerController extends BaseFrontController {
 			message.setContent("新增待审核");
 		} else if(customerVO == null && isEnable == 1) {
 			message.setContent("停用待审核");
-		}else {
+		} else if( isEnable == 2) {
+			message.setContent("导入待审核");
+		} else {
 			List<String> list = BeanCompareUtils.contrastObj(sellerCustomer, customerVO);
 			if (list != null)
 				message.setContent(JsonKit.toJson(list));
@@ -1034,6 +1047,13 @@ public class CustomerController extends BaseFrontController {
 		userJoinCustomer.setDeptId(user.getDepartmentId());
 		userJoinCustomer.setDataArea(user.getDataArea());
 		updated = userJoinCustomer.save();
+
+
+		Boolean isChecked = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_CUSTOMER_REVIEW + getSessionAttr("sellerCode"));
+		Map<String, Object> map = Maps.newHashMap();
+
+		if (isChecked)
+			updated = startProcess(sellerCustomerId, map, 2);
 
 		if (updated) renderAjaxResultForSuccess("操作成功");
 		else renderAjaxResultForError("操作失败");

@@ -517,4 +517,12 @@ public class SellerCustomerQuery extends JBaseQuery {
 
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
+
+	public Long findTotalInstId(String procInstId) {
+		StringBuilder sql = new StringBuilder("SELECT COUNT(aha.ID_) ");
+		sql.append("FROM cc_seller_customer csc ");
+		sql.append("JOIN  act_hi_actinst aha on csc.proc_inst_id = aha.PROC_INST_ID_ ");
+		sql.append("WHERE csc.proc_inst_id = ?");
+		return Db.queryLong(sql.toString(), procInstId);
+	}
 }
