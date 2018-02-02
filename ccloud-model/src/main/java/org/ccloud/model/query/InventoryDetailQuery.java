@@ -87,7 +87,7 @@ public class InventoryDetailQuery extends JBaseQuery {
 //		return DAO.findFirst(sql);
 //	}
 
-	
+	//入库明细
 	public Page<InventoryDetail> _in_paginate(int pageNumber, int pageSize,String keyword,String sellerId, String startDate, String endDate,String sellerProductId,String sort,String sortOrder) {
 		String select = "SELECT cid.*,cw.`name` as warehouse,csp.custom_name as sellerName ";
 		StringBuilder fromBuilder = new StringBuilder(" from cc_inventory_detail cid ");
@@ -108,6 +108,7 @@ public class InventoryDetailQuery extends JBaseQuery {
 		if(!sellerProductId.equals("")){
 			fromBuilder.append(" and csp.id = '"+sellerProductId+"' ");
 		}
+		fromBuilder.append(" and ( cid.biz_bill_sn like '%"+keyword+"%' or csp.custom_name like '%"+keyword+"%' ) ");	
 		fromBuilder.append("AND (csp.seller_id='"+sellerId+"' OR csp.id IN( SELECT id.sell_product_id FROM cc_inventory_detail id WHERE id.warehouse_id IN( SELECT w.id FROM cc_warehouse w WHERE w.seller_id = '"+sellerId+"') GROUP BY id.sell_product_id))");
 		
 		fromBuilder.append(" GROUP BY cid.id");
@@ -120,6 +121,7 @@ public class InventoryDetailQuery extends JBaseQuery {
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 	
+	//出库明细
 	public Page<InventoryDetail> _out_paginate(int pageNumber, int pageSize,String keyword,String sellerId, String startDate, String endDate,String sellerProductId,String sort,String sortOrder) {
 		String select = "SELECT cid.*,cw.`name` as warehouse,csp.custom_name as sellerName ";
 		StringBuilder fromBuilder = new StringBuilder(" from cc_inventory_detail cid ");
