@@ -369,7 +369,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
         if(sta.equals("1") && sellerProducts.size()>0) {
         	String sPIds = "";
         	for(SellerProduct sellerProduct : sellerProducts) {
-        		SellerProduct sellerP = SellerProductQuery.me().findbyCustomerNameAndSellerIdAndProductId(sellerProduct.getCustomName(), sId, sellerProduct.getProductId());
+        		SellerProduct sellerP = SellerProductQuery.me().findbyCustomerNameAndSellerIdAndProductId(sellerProduct.getCustomName(), sId);
         		sPIds += "'"+sellerP.getId()+"',";
         	}
         	sellerProductIds = sPIds.substring(0, sPIds.length()-1);
@@ -432,7 +432,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			for (SellerProduct sellerProduct : imageList) {
 				  SellerProduct issellerProducts = SellerProductQuery.me().findById(sellerProduct.getId());
 					if(issellerProducts==null){
-						SellerProduct product = SellerProductQuery.me().findbyCustomerNameAndSellerIdAndProductId(sellerProduct.getCustomName(), getSessionAttr(Consts.SESSION_SELLER_ID).toString(),sellerProduct.getProductId());
+						SellerProduct product = SellerProductQuery.me().findbyCustomerNameAndSellerIdAndProductId(sellerProduct.getCustomName(), getSessionAttr(Consts.SESSION_SELLER_ID).toString());
 						if(product!=null) {
 							continue;
 						}else {
@@ -472,8 +472,8 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 							}
 						}
 					}else{
-							SellerProduct product = SellerProductQuery.me().findbyCustomerNameAndSellerIdAndProductId(sellerProduct.getCustomName(), getSessionAttr(Consts.SESSION_SELLER_ID).toString(),sellerProduct.getProductId());
-							if(product!=null ||!sellerProduct.getCustomName().equals(issellerProducts.getCustomName())) {
+							SellerProduct product = SellerProductQuery.me().findbyCustomerNameAndSellerIdAndProductId(sellerProduct.getCustomName(), getSessionAttr(Consts.SESSION_SELLER_ID).toString());
+							if(product!=null && !sellerProduct.getCustomName().equals(issellerProducts.getCustomName())) {
 								break;
 							}
 							if(issellerProducts.getQrcodeUrl()!=null){
@@ -770,7 +770,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		
 		SellerProduct sPro = new SellerProduct();
 		int m = 0;
-		sPro = SellerProductQuery.me().findbyCustomerNameAndSellerIdAndProductId(sellerProduct.getCustomName(),sellerId,sellerProduct.getProductId());
+		sPro = SellerProductQuery.me().findbyCustomerNameAndSellerIdAndProductId(sellerProduct.getCustomName(),sellerId);
 		boolean flang = false;
 		if(sPro == null) {
 			sPro = new SellerProduct();

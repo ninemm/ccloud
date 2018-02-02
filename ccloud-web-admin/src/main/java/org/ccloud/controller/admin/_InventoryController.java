@@ -69,15 +69,10 @@ public class _InventoryController extends JBaseCRUDController<Inventory> {
 	//库存总账
 	public void list() {
 		String warehouse_id = getPara("warehouse_id");
-		String product_sn = getPara("product_sn");
-		String product_name = getPara("product_name");
-		if (StrKit.notBlank(product_sn)) {
-			product_sn = StringUtils.urlDecode(product_sn);
-			setAttr("product_sn", product_sn);
-		}
-		if (StrKit.notBlank(product_name)) {
-			product_name = StringUtils.urlDecode(product_name);
-			setAttr("product_name", product_name);
+		String keyword = getPara("keyword");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+			setAttr("keyword", keyword);
 		}
 		String seller_id= getSessionAttr("sellerId").toString();
 		Map<String, Object> map;
@@ -88,9 +83,9 @@ public class _InventoryController extends JBaseCRUDController<Inventory> {
 			//判断仓库是不是自己的  是自己的的仓库查出此仓库所有商品
 			Page<Inventory> page=new Page<>();
 			if (seller_id.equals(warehouse.getSellerId())) {
-				page = InventoryQuery.me().paginate(getPageNumber(), getPageSize(),product_sn,product_name,warehouse_id,null);
+				page = InventoryQuery.me().paginate(getPageNumber(), getPageSize(),keyword,warehouse_id,null);
 			}else {
-				page = InventoryQuery.me().paginate(getPageNumber(), getPageSize(),product_sn,product_name,warehouse_id,seller_id);
+				page = InventoryQuery.me().paginate(getPageNumber(), getPageSize(),keyword,warehouse_id,seller_id);
 			}
 			map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		}

@@ -130,14 +130,13 @@
 	};
 	
 	var initParams = function(params){
-		var product_sn = encodeURIComponent($("input[name='product_sn']").val());
-		var product_name = encodeURIComponent($("input[name='product_name']").val());
+		var keyword = $('#search').val();
+		if (keyword) keyword = encodeURIComponent(keyword);
 		
 		var param = {
 			'size': params.limit,
 			'page': params.offset/params.limit + 1,
-			'product_sn': product_sn,
-			'product_name': product_name,
+			'keyword': keyword,
 			'warehouse_id': warehouse_id
 		}
 		return param;
@@ -158,11 +157,21 @@
 <!-- Main content -->
 <section class="content">
 	<div class="row content-row">
-		<form class="form-horizontal" style="float: right" action="${CPATH}/admin/inventory?c=${c!}&p=${p!}" method="post">
-			<div class="input-group input-group-sm">
-				<input id="post-search-input" class="form-control" type="search" value="${product_sn!}" name="product_sn" placeholder="商品编码">&nbsp;
-				<input id="post-search-input" class="form-control" type="search" value="${product_name!}" name="product_name" placeholder="商品名称" style="margin-left:10px;">&nbsp;
-				<input id="search-submit" class="btn btn-sm btn-primary btn-flat" type="button" value="搜索">
+		<form class="form-horizontal" action="${CPATH}/admin/inventory?c=${c!}&p=${p!}" method="post">
+			<div class="form-group">
+				<div class="col-sm-4">
+				</div>
+				<div class="col-sm-4">
+				</div>
+				<div class="col-sm-3">
+					<label class="control-label col-sm-5">编码/名称:</label>
+					<div class="col-sm-7 input-group input-group-sm">
+						<input id="search" class="form-control" type="search" value="${k!}" name="k" placeholder="搜索编码/名称">
+					</div>
+				</div>
+				<div class="col-sm-1">
+					<input id="search-submit" class="btn btn-sm btn-primary btn-flat" type="button" value="搜索">
+				</div>
 			</div>
 		</form>
 	</div>

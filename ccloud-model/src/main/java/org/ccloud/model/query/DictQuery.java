@@ -137,4 +137,8 @@ public class DictQuery extends JBaseQuery {
 	public List<Dict> findByCode(String dictUnitCode) {
 		return DAO.doFind("dict.key = ?", dictUnitCode);
 	}
+	
+	public Dict findbyName(String name) {
+		return DAO.doFindFirst("dict.name=?", name);
+	}
 }

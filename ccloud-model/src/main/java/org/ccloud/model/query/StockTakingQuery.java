@@ -49,14 +49,15 @@ public class StockTakingQuery extends JBaseQuery {
 		});
 	}
 
-	public Page<StockTaking> paginate(int pageNumber, int pageSize,String stock_taking_sn,String name,String seller_id, String userId) {
+	public Page<StockTaking> paginate(int pageNumber, int pageSize,String keyword,String seller_id, String userId) {
 		String select = "select s.id, s.stock_taking_sn,w.name,s.biz_date,s.status,s.create_date,u.realname ";
 		StringBuilder fromBuilder = new StringBuilder("from cc_stock_taking s LEFT JOIN cc_warehouse w ON  s.warehouse_id=w.id LEFT JOIN `user`  u ON u.id=s.input_user_id");
 		fromBuilder.append(" WHERE s.seller_id='"+seller_id+"' and w.id in(SELECT u.warehouse_id FROM cc_user_join_warehouse u where u.user_id='");
 		fromBuilder.append(userId+"')");
 		LinkedList<Object> params = new LinkedList<Object>();
-		appendIfNotEmptyWithLike(fromBuilder, "s.stock_taking_sn", stock_taking_sn, params, false);
-		appendIfNotEmptyWithLike(fromBuilder, "w.name", name, params, false);
+		if(!keyword.equals("")) {
+			fromBuilder.append(" and (s.stock_taking_sn like'%"+keyword+"%' or w.name like '%"+keyword+"%') ");
+		}
 		fromBuilder.append("ORDER BY s.create_date DESC");
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
