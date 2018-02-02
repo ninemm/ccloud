@@ -41,7 +41,7 @@
 		<main class="ft14">
 		<div class="weui-panel weui-panel_access">
 			<div class="ft16">
-				订单状态 <span class="fr blue">${(order.statusName)!}</span>
+				订单状态 <a class="fr blue" href="${CPATH}/order/operateHistory?id=${(order.id)!}&proc_inst_id=${(order.proc_inst_id)!}">${(order.statusName)!}</a>
 			</div>
 			<div class="gray">
 				<p>客户名称: ${(order.customer_name)!}</p>
