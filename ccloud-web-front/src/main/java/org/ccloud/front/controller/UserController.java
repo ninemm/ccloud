@@ -10,6 +10,7 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.subject.Subject;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
+import org.ccloud.interceptor.SessionInterceptor;
 import org.ccloud.interceptor.UserInterceptor;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
@@ -69,7 +70,7 @@ public class UserController extends BaseFrontController {
 		}
 	}
 	
-	@Clear(UserInterceptor.class)
+	@Clear({UserInterceptor.class,SessionInterceptor.class})
 	@ActionKey(Consts.ROUTER_USER_LOGIN) // 固定登录的url
 	public void login() {
 		String username = getPara("username");
@@ -193,6 +194,7 @@ public class UserController extends BaseFrontController {
 		render("user_bind.html");
 	}
 	
+	@Clear(SessionInterceptor.class)
 	public void change() {
 		
 		User curUser = initSellerAccount();
@@ -368,4 +370,11 @@ public class UserController extends BaseFrontController {
 		nowUser.update();
 		render("user_config.html");
 	}
+	
+	@Clear({SessionInterceptor.class})
+	public void timeout() {
+		render("timeout.html");
+		return;
+	}
+	
 }

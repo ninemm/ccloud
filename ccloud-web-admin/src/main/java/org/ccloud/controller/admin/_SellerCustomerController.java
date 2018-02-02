@@ -709,6 +709,10 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			List<String> diffAttrList = new ArrayList<>();
 			diffAttrList.add("新增客户");
 			setAttr("diffAttrList", diffAttrList);
+		} else if(isEnable.equals("2")) {
+			List<String> diffAttrList = new ArrayList<>();
+			diffAttrList.add("导入客户");
+			setAttr("diffAttrList", diffAttrList);
 		} else {
 			List<String> diffAttrList = new ArrayList<>();
 			if(sellerCustomer.getIsEnabled() == 1) diffAttrList.add("申请停用");
@@ -882,6 +886,13 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			return false;
 		}
 
+		if(StrKit.notBlank(sellerCustomer.getProcInstId())) {
+			if (SellerCustomerQuery.me().findTotalInstId(sellerCustomer.getProcInstId()) < 3) {
+				renderError(500, "该客户正在审核中");
+				return false;
+			}
+		}
+
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		User manager = UserQuery.me().findManagerByDeptId(user.getDepartmentId());
@@ -923,6 +934,8 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			message.setContent("新增待审核");
 		} else if(customerVO == null && isEnable == 1) {
 			message.setContent("停用待审核");
+		} else if( isEnable == 2) {
+			message.setContent("导入待审核");
 		}else {
 			List<String> list = BeanCompareUtils.contrastObj(sellerCustomer, customerVO);
 			if (list != null)

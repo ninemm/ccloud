@@ -9,6 +9,7 @@ import org.apache.shiro.subject.Subject;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.core.cache.ActionCache;
+import org.ccloud.interceptor.SessionInterceptor;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.Department;
@@ -28,6 +29,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Maps;
 import com.jfinal.aop.Before;
+import com.jfinal.aop.Clear;
 import com.jfinal.kit.LogKit;
 import com.jfinal.kit.StrKit;
 import com.jfinal.weixin.sdk.api.ApiResult;
@@ -38,6 +40,7 @@ public class WxOauthController extends BaseFrontController {
 
 	@ActionCache
 	@Before(WechatUserInterceptor.class)
+	@Clear(SessionInterceptor.class)
 	public void index() {
 		
 		String openId = null;

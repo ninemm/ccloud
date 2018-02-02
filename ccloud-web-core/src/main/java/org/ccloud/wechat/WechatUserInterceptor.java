@@ -18,9 +18,11 @@ package org.ccloud.wechat;
 import javax.servlet.http.HttpServletRequest;
 
 import org.ccloud.Consts;
+import org.ccloud.interceptor.SessionInterceptor;
 import org.ccloud.model.query.OptionQuery;
 import org.ccloud.utils.StringUtils;
 
+import com.jfinal.aop.Clear;
 import com.jfinal.aop.Interceptor;
 import com.jfinal.aop.Invocation;
 import com.jfinal.core.Controller;
@@ -32,6 +34,7 @@ public class WechatUserInterceptor implements Interceptor {
 			+ "&state=wx#wechat_redirect";
 
 	@Override
+	@Clear(SessionInterceptor.class)
 	public void intercept(Invocation inv) {
 
 		Controller controller = inv.getController();

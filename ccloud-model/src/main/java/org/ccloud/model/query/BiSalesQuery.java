@@ -80,7 +80,6 @@ public class BiSalesQuery extends JBaseQuery {
 		StringBuilder sqlBuilder = new StringBuilder(" SELECT count(1) FROM cc_sales_outstock cso ");
 		sqlBuilder.append(" JOIN cc_seller_customer csc ON csc.id = cso.customer_id ");
 		sqlBuilder.append(" JOIN cc_customer cc ON cc.id = csc.customer_id ");
-		sqlBuilder.append(" JOIN cc_sales_order_join_outstock sojo ON sojo.outstock_id = cso.id ");
 
 		sqlBuilder.append(" WHERE csc.customer_kind = ? ");
 		params.add(Consts.CUSTOMER_KIND_COMMON);
@@ -100,7 +99,6 @@ public class BiSalesQuery extends JBaseQuery {
 			params.add(endDate);
 		}
 
-		sqlBuilder.append(" group by sojo.order_id ");
 		return Db.queryLong(sqlBuilder.toString(), params.toArray());
 	}
 
@@ -457,7 +455,7 @@ public class BiSalesQuery extends JBaseQuery {
 
 		LinkedList<Object> params = new LinkedList<Object>();
 
-		StringBuilder sqlBuilder = new StringBuilder("SELECT s.id, d.data_area, TRUNCATE( (sum(so.total_amount) - sum(t.totalAmount)) / 10000 , 2) totalAmount, ");
+		StringBuilder sqlBuilder = new StringBuilder("SELECT s.id, d.data_area, TRUNCATE( (ifnull(sum(so.total_amount),0) - ifnull(sum(t.totalAmount),0)) / 10000 , 2) totalAmount, ");
 		if (isDealer) {
 			sqlBuilder.append(" s.seller_name dealerName,s.id dealerCode ");
 		} else {
@@ -509,14 +507,19 @@ public class BiSalesQuery extends JBaseQuery {
 
 		LinkedList<Object> params = new LinkedList<Object>();
 
-		StringBuilder sqlBuilder = new StringBuilder("SELECT sp.custom_name cInvName, TRUNCATE((SUM(sod.product_count) - ifnull(SUM(cs.product_count),0))/p.convert_relate,2) totalNum,TRUNCATE((sum(sod.product_amount) - ifnull(SUM(cs.product_amount),0))/10000,2) totalAmount ");
-		sqlBuilder.append(" FROM cc_sales_outstock so ");
-		sqlBuilder.append(" JOIN cc_seller_customer sc ON sc.id=so.customer_id ");
-		sqlBuilder.append(" JOIN cc_customer c ON c.id=sc.customer_id ");
-		sqlBuilder.append(" JOIN cc_sales_outstock_detail sod ON sod.outstock_id=so.id ");
-		sqlBuilder.append(" JOIN cc_seller_product sp ON sp.id=sod.sell_product_id ");
-		sqlBuilder.append(" JOIN cc_product p ON p.id=sp.product_id ");
-		sqlBuilder.append(" LEFT JOIN cc_sales_refund_instock_detail cs ON sod.id = cs.outstock_detail_id ");
+		StringBuilder sqlBuilder = new StringBuilder("SELECT sp.custom_name cInvName,");
+		sqlBuilder.append(" TRUNCATE ((SUM(sod.product_count) - ifnull(sum(t.product_count), 0)) / p.convert_relate,2) totalNum, ");
+		sqlBuilder.append(" TRUNCATE ((sum(sod.product_amount) - ifnull(sum(t.product_amount), 0)) / 10000, 2) totalAmount ");
+		sqlBuilder.append(" FROM cc_sales_outstock_detail sod ");
+		sqlBuilder.append(" JOIN cc_sales_outstock so ON sod.outstock_id = so.id ");
+		sqlBuilder.append(" JOIN cc_seller_customer sc ON so.customer_id = sc.id ");
+		sqlBuilder.append(" JOIN cc_customer c ON sc.customer_id = c.id ");
+		sqlBuilder.append(" JOIN cc_seller_product sp ON sod.sell_product_id = sp.id ");
+		sqlBuilder.append(" JOIN cc_product p ON sp.product_id = p.id ");
+		sqlBuilder.append(" LEFT JOIN (SELECT srd.outstock_detail_id, srd.product_count, srd.product_amount ");
+		sqlBuilder.append(" FROM cc_sales_refund_instock_detail srd ");
+		sqlBuilder.append(" JOIN cc_sales_refund_instock sr ON srd.refund_instock_id = sr.id ");
+		sqlBuilder.append(" WHERE sr.biz_date IS NOT NULL)t ON sod.id = t.outstock_detail_id ");
 
 		sqlBuilder.append(" WHERE sc.customer_kind = ? ");
 		params.add(Consts.CUSTOMER_KIND_COMMON);
