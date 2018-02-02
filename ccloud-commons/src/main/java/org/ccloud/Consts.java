@@ -257,5 +257,7 @@ public class Consts {
 	public static final String TEMPLATE_DANLU = "1";//丹露模板
 	public static final String TEMPLATE_NAME_ALI = "阿里";//阿里模板
 	public static final String TEMPLATE_NAME_DANLU = "丹露";//丹露模板	
+	public static final String TEMPLATE_FILE_NAME_ALI = "aliTemplate.xlsx";//阿里模板文件名
+	public static final String TEMPLATE_FILE_NAME_DANLU = "danluTemplate.xls";//丹露模板文件名
 	
 }

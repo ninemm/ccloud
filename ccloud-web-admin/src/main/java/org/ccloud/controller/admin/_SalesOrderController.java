@@ -70,6 +70,7 @@ import com.jfinal.plugin.activerecord.IAtom;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.tx.Tx;
+import com.jfinal.upload.UploadFile;
 
 import cn.afterturn.easypoi.excel.ExcelExportUtil;
 import cn.afterturn.easypoi.excel.entity.ExportParams;
@@ -191,15 +192,23 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 	//第三方订单页面导入
 	public void uploading() {
 		
-		File file = getFile().getFile();
+		UploadFile uploadFile = getFile();
 		String type = getPara("type");
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		ImportParams params = new ImportParams();
 		if (type.equals(Consts.TEMPLATE_ALI)) {
-			int[] num = ExcelUploadUtils.aliUpload(file, params, sellerId);
+			if (!uploadFile.getOriginalFileName().equals(Consts.TEMPLATE_FILE_NAME_ALI)) {
+				renderAjaxResultForError("导入模板文件名错误,请核对后导入");
+				return;
+			}
+			int[] num = ExcelUploadUtils.aliUpload(uploadFile.getFile(), params, sellerId);
 			renderAjaxResultForSuccess("成功导入订单" + num[0] + "单,已存在订单" + num[1] + "个");
 		} else {
-			int[] num = ExcelUploadUtils.danLuUpload(file, params, sellerId);
+			if (!uploadFile.getOriginalFileName().equals(Consts.TEMPLATE_FILE_NAME_DANLU)) {
+				renderAjaxResultForError("导入模板文件名错误,请核对后导入");
+				return;
+			}
+			int[] num = ExcelUploadUtils.danLuUpload(uploadFile.getFile(), params, sellerId);
 			renderAjaxResultForSuccess("成功导入订单" + num[0] + "单,已存在订单" + num[1] + "个");
 		}
 	}
