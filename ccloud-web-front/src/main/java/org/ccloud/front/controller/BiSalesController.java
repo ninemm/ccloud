@@ -153,7 +153,7 @@ public class BiSalesController extends BaseFrontController {
 		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
 
 		List<Record> result = BiSalesQuery.me().findAreaListByProduct(sellerId, provName, cityName, countryName,
-				startDate, endDate, null);
+				startDate, endDate, cInvCode);
 
 		renderJson(result);
 
