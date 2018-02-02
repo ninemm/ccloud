@@ -193,11 +193,13 @@
             var $tbody = $("#customerId_product tbody");
             $tbody.empty();
             for(var i = 0; i < data.length; i++){
-                if(i == 0 || data[i].idate != data[i-1].idate) {
-                    $tbody.append("<tr><th colspan='3'>日期：" + data[i].idate + "</th></tr>");
-                    $tbody.append("<tr><th>产品</th><th>数量(件)</th><th>金额(元)</th></tr>");
-                }
-                $tbody.append("<tr><td>" + data[i].cInvName + "</td><td class='t-r'>" + data[i].totalNum + "</td><td class='t-r'>" + data[i].totalAmount + "</td></tr>");
+            	if (data[i].idate != null) {
+	                if(i == 0 || data[i].idate != data[i-1].idate) {
+	                    $tbody.append("<tr><th colspan='3'>日期：" + data[i].idate + "</th></tr>");
+	                    $tbody.append("<tr><th>产品</th><th>数量(件)</th><th>金额(元)</th></tr>");
+	                }
+	                $tbody.append("<tr><td>" + data[i].cInvName + "</td><td class='t-r'>" + data[i].totalNum + "</td><td class='t-r'>" + data[i].totalAmount + "</td></tr>");            		
+            	}
             }
        });
     }

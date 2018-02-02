@@ -819,4 +819,35 @@ public class BiSalesQuery extends JBaseQuery {
 
 	}
 
+	public List<Record> findProductList(String customerId, String startDate, String endDate) {
+		LinkedList<Object> params = new LinkedList<Object>();
+
+		StringBuilder sqlBuilder = new StringBuilder("SELECT cs.custom_name as cInvName, co.create_date as idate, o.product_amount - IFNULL(t1.refundPrice,0) as totalAmount, ");
+		sqlBuilder.append("o.product_count - IFNULL(t1.refundCount,0) as totalNum ");
+		sqlBuilder.append("FROM cc_sales_outstock_detail o LEFT JOIN cc_seller_product cs ON o.sell_product_id = cs.id ");
+		sqlBuilder.append("LEFT JOIN cc_sales_outstock co on co.id = o.outstock_id ");
+		sqlBuilder.append("LEFT JOIN cc_seller_customer cu ON cu.id =  co.customer_id ");
+		sqlBuilder.append("LEFT JOIN (SELECT cr.outstock_detail_id, SUM(cr.reject_product_count) as refundCount, SUM(cr.reject_product_price) as refundPrice FROM cc_sales_refund_instock_detail cr ");
+		sqlBuilder.append("LEFT JOIN cc_sales_refund_instock cc ON cc.id = cr.refund_instock_id ");
+		sqlBuilder.append("WHERE cc.biz_date is not null GROUP BY cr.outstock_detail_id) t1 ON o.id = t1.outstock_detail_id ");
+		sqlBuilder.append("WHERE co.biz_date is not null ");
+
+		appendIfNotEmpty(sqlBuilder, "cu.customer_kind", Consts.CUSTOMER_KIND_COMMON, params, false);
+		appendIfNotEmpty(sqlBuilder, "co.customer_id", customerId, params, false);
+
+		if (startDate != null) {
+			sqlBuilder.append(" and co.biz_date >= ?");
+			params.add(startDate);
+		}
+
+		if (endDate != null) {
+			sqlBuilder.append(" and co.biz_date <= ?");
+			params.add(endDate);
+		}
+
+		sqlBuilder.append(" order by o.outstock_id ,co.biz_date desc");
+
+		return Db.find(sqlBuilder.toString(), params.toArray());
+	}
+
 }
