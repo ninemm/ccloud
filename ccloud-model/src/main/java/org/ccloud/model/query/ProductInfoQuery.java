@@ -15,6 +15,8 @@
  */
 package org.ccloud.model.query;
 
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.LinkedList;
 import org.ccloud.model.ProductInfo;
 
@@ -74,6 +76,24 @@ public class ProductInfoQuery extends JBaseQuery {
 		} else {
 			return DAO.doFindFirst("name = ? ", productName);
 		}
+	}
+
+	public String insertProduct(String productName, String productType, String productAmount, String unit, String code) {
+		String id = StrKit.getRandomUUID();
+		ProductInfo info = new ProductInfo();
+		info.setId(id);
+		info.setName(productName);
+		info.setBigPrice(new BigDecimal(productAmount));
+		if (StrKit.notBlank(productType)) {
+			info.setGoodsType(Integer.parseInt(productType));
+		}
+		info.setBigUnit(unit);
+		info.setCode(code);
+		info.setState(1);
+		info.setCreateDate(new Date());
+		info.setModifyDate(new Date());
+		info.save();
+		return id;
 	}
 
 	
