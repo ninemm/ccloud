@@ -194,6 +194,7 @@ public class UserController extends BaseFrontController {
 		render("user_bind.html");
 	}
 	
+	@Clear(SessionInterceptor.class)
 	public void change() {
 		
 		User curUser = initSellerAccount();
