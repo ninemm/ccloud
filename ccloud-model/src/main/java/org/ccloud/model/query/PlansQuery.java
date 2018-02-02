@@ -46,13 +46,30 @@ public class PlansQuery extends JBaseQuery {
 			}
 		});
 	}
-
-	public Page<Plans> paginate(int pageNumber, int pageSize, String orderby) {
-		String select = "select * ";
-		StringBuilder fromBuilder = new StringBuilder("from `cc_plans` ");
+	
+	
+	
+	
+	
+	public Page<Plans> paginate(int pageNumber, int pageSize, String keyword, String orderby, String dataArea,String type) {
+		String select = "SELECT cp.*,cs.seller_name,u.realname,csp.custom_name  ";
+		StringBuilder fromBuilder = new StringBuilder("FROM cc_plans cp  ");
+		fromBuilder.append("LEFT JOIN cc_seller cs on cs.dept_id = cp.dept_id ");
+		fromBuilder.append("LEFT JOIN `user` u on u.id = cp.user_id ");
+		fromBuilder.append("LEFT JOIN cc_seller_product csp on csp.id = cp.seller_product_id ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "u.realname", keyword, params, true);
 
+		
+		if(needWhere) {
+			fromBuilder.append("where 1=1 ");
+		}
+		if(!type.equals("")) {
+			fromBuilder.append(" and cp.type = '"+type+"' ");
+		}
+		fromBuilder.append("and cp.data_area like '"+dataArea+"'  order by "+orderby+" ");
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
