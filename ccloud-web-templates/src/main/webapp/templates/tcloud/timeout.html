@@ -52,8 +52,8 @@
 		$('.time').text(--time);
 		if (time == 0) {
 			clearInterval(clock);
-			window.location.href="${CPATH}/user/login"; 
-			/*WeixinJSBridge.call('closeWindow'); */
+			/* window.location.href="${CPATH}/user/login";  */
+			WeixinJSBridge.call('closeWindow'); 
 		}
 	}, 1000)
 </script>
