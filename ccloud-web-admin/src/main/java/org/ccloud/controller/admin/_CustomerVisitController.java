@@ -164,10 +164,43 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 		List<Record> typeList = CustomerTypeQuery.me().findCustomerTypeList(typeDataArea);
 		setAttr("customerType",JSON.toJSON(typeList));
 
-		List<Record> nameList = SellerCustomerQuery.me().findName(getSessionAttr(Consts.SESSION_SELECT_DATAAREA)+ "%");
-		setAttr("customerName", JSON.toJSON(nameList));
+		List<Record> nameList = SellerCustomerQuery.me().findName(getSessionAttr(Consts.SESSION_SELECT_DATAAREA)+ "%", null);
 
+		List<Map<String, Object>> customerList = new ArrayList<>();
+		Map<String, Object> all = new HashMap<>();
+		all.put("text", "全部");
+		all.put("id", "");
+		customerList.add(all);
+
+		for(Record name : nameList) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("id", name.getStr("id"));
+			item.put("text", name.getStr("name"));
+			customerList.add(item);
+		}
+
+		setAttr("customerName", JSON.toJSON(customerList));
 		render("image.html");
+	}
+
+	public void getCustomer(){
+		String customerType = getPara("customerType");
+		List<Record> nameList = SellerCustomerQuery.me().findName(getSessionAttr(Consts.SESSION_SELECT_DATAAREA)+ "%", customerType);
+
+		List<Map<String, Object>> customerList = new ArrayList<>();
+		Map<String, Object> all = new HashMap<>();
+		all.put("text", "全部");
+		all.put("id", "");
+		customerList.add(all);
+
+		for(Record name : nameList) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("id", name.getStr("id"));
+			item.put("text", name.getStr("name"));
+			customerList.add(item);
+		}
+
+		renderJson(JSON.toJSON(customerList));
 	}
 
 	@RequiresPermissions(value = { "/admin/customerVisit/audit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)

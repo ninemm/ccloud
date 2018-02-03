@@ -274,7 +274,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 		sql.append(" WHERE LENGTH(ccv.photo) > 2 ");
 
 		appendIfNotEmpty(sql,"ccv.seller_customer_id", customerName, params, false);
-		appendIfNotEmpty(sql,"t1.customerTypeNames", customerType, params, false);
+		appendIfNotEmptyWithLike(sql,"t1.customerTypeNames", customerType, params, false);
 		appendIfNotEmptyWithLike(sql, "ccv.data_area", data_area, params, false);
 
 		sql.append("GROUP BY u.realname, cc.id, DATE_FORMAT(ccv.create_date,'%m-%d-%Y') ");

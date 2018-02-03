@@ -3,18 +3,29 @@
 <#macro script_import>
 	<!-- bootstrapvalidator -->
 	<script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
+	<script src="${CPATH}/static/plugins/select2/js/select2.js"></script>
 	<!-- bootstrapvalidator -->
 </#macro>
 
 <#macro css_import>
 	<!-- bootstrapvalidator -->
 	<link rel="stylesheet" href="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.css">
+	<link rel="stylesheet" href="${CPATH}/static/plugins/select2/css/select2.css">
 </#macro>
 
 <#macro script>
 
 	var $form = $("#form");
 	$(function(){
+
+	$(document).on("change", "#customer_type", function() {
+		$.get("${CPATH}/admin/customerVisit/getCustomer?customerType=" + $('#customer_type').val(), function(result){
+			$("#customer_name").select2('destroy').empty();
+			$("#customer_name").select2({
+				data: result
+			});
+		})
+	})
 		var customerType = ${(customerType)};
 		strHtml = '<option selected="selected" value="">全部</option>';
 		for(index in customerType){
@@ -24,12 +35,10 @@
 		$("#customer_type").html(strHtml);
 
 		var customerName = ${(customerName)};
-		strHtml = '<option selected="selected" value="">全部</option>';
-		for(index in customerName){
-			var row = customerName[index].columns;
-			strHtml +='<option value="'+row.id+'">'+row.name+'</option>';
-		}
-		$("#customer_name").html(strHtml);
+
+		$("#customer_name").select2({
+			data: customerName
+		});
 	})
 
 	function doSubmit(){
