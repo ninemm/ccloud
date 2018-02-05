@@ -135,6 +135,7 @@ public class SalesRefundInstockDetailQuery extends JBaseQuery {
 		BigDecimal productAmount = new BigDecimal(productCount).divide(new BigDecimal(convert), 2, BigDecimal.ROUND_HALF_UP)
 				.multiply(productPrice);
 		Integer isGift = record.getInt("is_gift");
+		Integer isComposite = record.getInt("is_composite");
 		
 		detail.setProductCount(productCount);
 		detail.setProductPrice(productPrice);
@@ -151,12 +152,24 @@ public class SalesRefundInstockDetailQuery extends JBaseQuery {
 		
 		Map<String, Object> map = new HashMap<>();
 		map.put("status", detail.save());
-		if (isGift == 0) {
+		if (isComposite == 1) {
+			map.put("productAmount", getTotalAmount(record.getStr("sell_product_id"), record.getStr("composite_id")));
+		} else if(isGift == 0) {
 			map.put("productAmount", productAmount);
 		} else {
 			map.put("productAmount", new BigDecimal(0));
 		}
 		return map;
+	}
+	
+	private BigDecimal getTotalAmount(String sellerProductId, String compositeId) {
+		BigDecimal totalAmount = new BigDecimal(0);
+		List<ProductComposition> composition = ProductCompositionQuery.me().findByParentId(compositeId);
+		ProductComposition productComposition = composition.get(0);
+		if (productComposition.getSellerProductId().equals(sellerProductId)) {
+			return productComposition.getPrice();
+		}
+		return totalAmount;
 	}
 
 	
