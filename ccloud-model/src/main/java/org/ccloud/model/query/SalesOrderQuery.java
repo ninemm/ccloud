@@ -743,7 +743,7 @@ public class SalesOrderQuery extends JBaseQuery {
 			String customName=record.getStr("custom_name");
 			String convertRelate = record.getStr("convert_relate");
 			String sellerProductId = record.getStr("id");
-			fromBuilder.append("TRUNCATE((( sum( CASE sp.id WHEN '"+sellerProductId+"' THEN "+product_count+" ELSE 0 END)) -IFNULL((SELECT SUM(srid.product_count) FROM cc_sales_refund_instock sri LEFT JOIN cc_sales_refund_instock_detail srid ON srid.refund_instock_id = sri.id WHERE srid.sell_product_id = '"+sellerProductId+"' AND srid.create_date >= '"+startDate+"' AND srid.create_date <= '"+endDate+"'  and sri.customer_id=sc.id and sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+") GROUP BY srid.sell_product_id),0))/"+convertRelate+" , 2) '"+customName+"' ,");
+			fromBuilder.append("TRUNCATE((( sum( CASE sp.id WHEN '"+sellerProductId+"' THEN "+product_count+" ELSE 0 END)) -IFNULL((SELECT SUM(srid.product_count) FROM cc_sales_refund_instock sri LEFT JOIN cc_sales_refund_instock_detail srid ON srid.refund_instock_id = sri.id WHERE srid.sell_product_id = '"+sellerProductId+"' AND srid.create_date <= '"+endDate+"'  and sri.customer_id=sc.id and sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+") GROUP BY srid.sell_product_id),0))/"+convertRelate+" , 2) '"+customName+"' ,");
 		}
 		fromBuilder.append("s.seller_name '直营商名称'");
 		fromBuilder.append(" FROM cc_sales_order so ");
@@ -783,7 +783,7 @@ public class SalesOrderQuery extends JBaseQuery {
 			String customName=record.getStr("custom_name");
 			String convertRelate = record.getStr("convert_relate");
 			String sellerProductId = record.getStr("id");
-			fromBuilder.append("TRUNCATE((( sum( CASE sp.id WHEN '"+sellerProductId+"' THEN "+product_count+" ELSE 0 END)) -IFNULL((SELECT SUM(srid.product_count) FROM cc_sales_refund_instock sri LEFT JOIN cc_sales_refund_instock_detail srid ON srid.refund_instock_id = sri.id WHERE srid.sell_product_id = '"+sellerProductId+"' AND srid.create_date >= '"+startDate+"' AND srid.create_date <= '"+endDate+"'  and sri.customer_id=sc.id and sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+") GROUP BY srid.sell_product_id),0))/"+convertRelate+" , 2) '"+customName+"' ,");
+			fromBuilder.append("TRUNCATE((( sum( CASE sp.id WHEN '"+sellerProductId+"' THEN "+product_count+" ELSE 0 END)) -IFNULL((SELECT SUM(srid.product_count) FROM cc_sales_refund_instock sri LEFT JOIN cc_sales_refund_instock_detail srid ON srid.refund_instock_id = sri.id WHERE srid.sell_product_id = '"+sellerProductId+"' AND srid.create_date <= '"+endDate+"'  and sri.customer_id=sc.id and sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+") GROUP BY srid.sell_product_id),0))/"+convertRelate+" , 2) '"+customName+"' ,");
 		}
 		fromBuilder.append("u.realname '业务员名称'");
 		fromBuilder.append(" FROM cc_sales_order so ");
@@ -822,7 +822,7 @@ public class SalesOrderQuery extends JBaseQuery {
 			String customName=record.getStr("custom_name");
 			String convertRelate = record.getStr("convert_relate");
 			String sellerProductId = record.getStr("id");
-			fromBuilder.append("TRUNCATE((( sum( CASE sp.id WHEN '"+sellerProductId+"' THEN "+product_count+" ELSE 0 END)) -IFNULL((SELECT SUM(srid.product_count) FROM cc_sales_refund_instock sri LEFT JOIN cc_sales_refund_instock_detail srid ON srid.refund_instock_id = sri.id WHERE srid.sell_product_id = '"+sellerProductId+"' AND srid.create_date >= '"+startDate+"' AND srid.create_date <= '"+endDate+"'  and sri.customer_id=sc.id and sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+") GROUP BY srid.sell_product_id),0))/"+convertRelate+" , 2) '"+customName+"' ,");
+			fromBuilder.append("TRUNCATE((( sum( CASE sp.id WHEN '"+sellerProductId+"' THEN "+product_count+" ELSE 0 END)) -IFNULL((SELECT SUM(srid.product_count) FROM cc_sales_refund_instock sri LEFT JOIN cc_sales_refund_instock_detail srid ON srid.refund_instock_id = sri.id WHERE srid.sell_product_id = '"+sellerProductId+"' AND srid.create_date <= '"+endDate+"'  and sri.customer_id=sc.id and sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+") GROUP BY srid.sell_product_id),0))/"+convertRelate+" , 2) '"+customName+"' ,");
 		}
 		fromBuilder.append("c.customer_name '客户名称',sc.id ");
 		fromBuilder.append(" FROM cc_sales_order so ");
@@ -2002,11 +2002,11 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 
 	public List<Record> findMoney(String startDate, String endDate, String keyword, String userId) {
-		StringBuilder fromBuilder=new StringBuilder("SELECT IFNULL(SUM(so.total_amount),0)-IFNULL(SUM(sri.total_reject_amount),0) totalAmount,so.customer_id ");
+		StringBuilder fromBuilder=new StringBuilder("SELECT IFNULL(SUM(so.total_amount) , 0) - IFNULL(t1.amount , 0) totalAmount,so.customer_id ");
 		fromBuilder.append(" FROM cc_sales_order so ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON sojo.order_id=so.id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_outstock cso ON cso.id=sojo.outstock_id ");
-		fromBuilder.append(" LEFT JOIN cc_sales_refund_instock sri ON sri.outstock_id=cso.id ");
+		fromBuilder.append(" LEFT JOIN( SELECT IFNULL(SUM(sri.total_reject_amount) , 0) amount , sri.outstock_id FROM cc_sales_refund_instock sri WHERE sri. STATUS NOT IN("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+")) t1 ON t1.outstock_id in (cso.id) ");
 		fromBuilder.append(" WHERE so.biz_user_id ='"+userId+"'");
 		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+") ");
 		fromBuilder.append(" AND "+ keyword+" >= '"+startDate+"'");
