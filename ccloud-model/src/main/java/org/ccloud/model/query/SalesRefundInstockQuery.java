@@ -496,7 +496,12 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 			params.add(printStatus);
 		}
 
-		fromBuilder.append(" and r.status not in ('0','1001')  and ( r.instock_sn like '%"+keyword+"%' or c.customer_name like '%"+keyword+"%' ) ");
+		fromBuilder.append(" and r.status not in (?, ?, ?) ");
+		params.add(Consts.SALES_REFUND_INSTOCK_DEFUALT);
+		params.add(Consts.SALES_REFUND_INSTOCK_CANCEL);
+		params.add(Consts.SALES_REFUND_INSTOCK_REFUSE);
+
+		fromBuilder.append(" and ( r.instock_sn like '%"+keyword+"%' or c.customer_name like '%"+keyword+"%' ) ");
 		
 		if (sort==""||null==sort) {
 			fromBuilder.append("order by "+"r.create_date desc");
