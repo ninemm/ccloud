@@ -235,7 +235,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 			params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
 		}		
 
-		fromBuilder.append(" and ( o.outstock_sn like '%"+keyword+"%' or c.customer_name like '%"+keyword+"%' ) ");
+		fromBuilder.append(" and cso.status != "+Consts.SALES_ORDER_STATUS_CANCEL+" and ( o.outstock_sn like '%"+keyword+"%' or c.customer_name like '%"+keyword+"%' ) ");
 
 		if (sort==""||null==sort) {
 			fromBuilder.append("order by "+"o.create_date desc");

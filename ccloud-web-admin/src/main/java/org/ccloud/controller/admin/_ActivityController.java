@@ -150,6 +150,8 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				imagPath +=imagePath[i].replace("\\", "/")+",";
 			}
 			activity.setImageListStore(imagPath.substring(0, (imagPath.length()-1)));
+		}else {
+			activity.setImageListStore(imagPath);
 		}
 		String unit = getPara("unit");
 		String areaNames = getPara("areaNames").replace("/", "-");

@@ -54,7 +54,6 @@ public class ActivityQuery extends JBaseQuery {
 	public Page<Record> paginate(int pageNumber, int pageSize, String keyword,String startDate, String endDate,String sellerId) {
 		String select = "select ca.*,case when ca.category='"+Consts.CATEGORY_NORMAL+"' then '商品销售营销活动' else '投入活动' end as activityCategory ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_activity` ca ");
-		fromBuilder.append(" LEFT JOIN cc_customer_type ct on ct.id=ca.customer_type");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "title", keyword, params, needWhere);
@@ -65,12 +64,12 @@ public class ActivityQuery extends JBaseQuery {
 
 		if (StrKit.notBlank(startDate)) {
 			fromBuilder.append(" and ca.start_time >= ?");
-			params.add(startDate);
+			params.add(startDate+" 00:00:00");
 		}
 
 		if (StrKit.notBlank(endDate)) {
 			fromBuilder.append(" and ca.end_time <= ?");
-			params.add(endDate);
+			params.add(endDate + "23:59:59");
 		}
 		fromBuilder.append(" and ca.seller_id='"+sellerId+"' ORDER BY ca.is_publish desc,ca.create_date desc");
 		if (params.isEmpty())
