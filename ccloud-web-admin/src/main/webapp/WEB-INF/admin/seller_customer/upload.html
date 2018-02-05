@@ -47,9 +47,10 @@
 	function doSubmit(){
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
-			    var index = layer.load(1, {shade: false}); //0代表加载的风格，支持0-2
+			    var index = layer.load(1, {shade: [0.4,'#000']});
 				var validate = $form.data('bootstrapValidator');
 				validate.validate();
+				if (!validate.isValid()) layer.closeAll();
 				return validate.isValid()
 			},
 			type : "post", 

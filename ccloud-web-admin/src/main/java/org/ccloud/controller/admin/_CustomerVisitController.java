@@ -161,15 +161,25 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 	public void image() {
 
 		String typeDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString();
-		List<Record> typeList = CustomerTypeQuery.me().findCustomerTypeList(typeDataArea);
-		setAttr("customerType",JSON.toJSON(typeList));
 
-		List<Record> nameList = SellerCustomerQuery.me().findName(getSessionAttr(Consts.SESSION_SELECT_DATAAREA)+ "%", null);
-
-		List<Map<String, Object>> customerList = new ArrayList<>();
 		Map<String, Object> all = new HashMap<>();
 		all.put("text", "全部");
 		all.put("id", "");
+
+		List<Record> typeList = CustomerTypeQuery.me().findCustomerTypeList(typeDataArea);
+		List<Map<String, Object>> customerTypeList = new ArrayList<>();
+		customerTypeList.add(all);
+
+		for(Record customerType : typeList){
+			Map<String, Object> item = new HashMap<>();
+			item.put("id", customerType.getStr("name"));
+			item.put("text", customerType.getStr("name"));
+			customerTypeList.add(item);
+		}
+		setAttr("customerType", JSON.toJSON(customerTypeList));
+
+		List<Record> nameList = SellerCustomerQuery.me().findName(getSessionAttr(Consts.SESSION_SELECT_DATAAREA)+ "%", null);
+		List<Map<String, Object>> customerList = new ArrayList<>();
 		customerList.add(all);
 
 		for(Record name : nameList) {
