@@ -175,7 +175,7 @@
 					$newOrder.find(".appendOrdeProductDetail").attr('id',"p"+el.id);
 					$newOrder.find("#contact").text(el.ccontact + '/' + el.cmobile);
 					$newOrder.find("#customerType").text(el.customerTypeName);
-					if(el.status == 0 || (el.status == 1000 && el.is_print == 0)) {
+					if(el.biz_user_id == data.user.id && (el.status == 0 || (el.status == 1000 && el.is_print == 0))) {
 						$newOrder.find("#cancel").on('click', function() {
 							$.confirm({
 								title: "订单撤销",
@@ -209,7 +209,7 @@
 					});
 
 					var assignee = el.assignee == null ? '' : el.assignee.split(',');
-					if(el.taskId != null && $.inArray(data.username, assignee) != -1) {
+					if(el.taskId != null && $.inArray(data.user.username, assignee) != -1) {
 						$newOrder.find("#pass").on('click', function() {
 							agree(el.id, el.taskId, 1);
 						});

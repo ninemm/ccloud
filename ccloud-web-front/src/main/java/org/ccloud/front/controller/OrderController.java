@@ -96,7 +96,7 @@ public class OrderController extends BaseFrontController {
 
 		Map<String, Object> map = new HashMap<>();
 		map.put("orderList", orderList.getList());
-		map.put("username", user.getUsername());
+		map.put("user", user);
 		renderJson(map);
 	}
 
