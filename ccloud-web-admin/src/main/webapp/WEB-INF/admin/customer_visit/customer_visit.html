@@ -148,7 +148,13 @@
             var customerType = $('#customer_type').val();
             var questionType = $('#question_type').val();
             var status = $('#status').val();
+            layer.load(1, {
+                shade: [0.4,'#000']
+            });
             window.open("${CPATH}/admin/customerVisit/exportVisit?k="+keyword+"&questionType="+questionType+"&customerType="+customerType+"&status="+status,"_parent","","");
+            setTimeout(function() {
+                layer.closeAll();
+            }, 1000);
         },
         function() {
             layer.close();
