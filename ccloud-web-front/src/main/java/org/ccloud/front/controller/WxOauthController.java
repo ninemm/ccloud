@@ -39,8 +39,8 @@ import com.jfinal.weixin.sdk.api.UserApi;
 public class WxOauthController extends BaseFrontController {
 
 	@ActionCache
-	@Before(WechatUserInterceptor.class)
 	@Clear(SessionInterceptor.class)
+	@Before(WechatUserInterceptor.class)
 	public void index() {
 		
 		String openId = null;
