@@ -222,7 +222,6 @@ public abstract class CCloudConfig extends JFinalConfig {
 	}
 	
 	public QiniuPlugin createQiniuPlugin() {
-		
 		QiniuPlugin qiniuPlugin = new QiniuPlugin("ccloud.properties");
 		return qiniuPlugin;
 	}

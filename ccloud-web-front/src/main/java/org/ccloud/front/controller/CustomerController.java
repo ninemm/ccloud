@@ -658,6 +658,15 @@ public class CustomerController extends BaseFrontController {
 				customer.setAddress(customerVO.getAddress());
 				customer.setCustomerName(customerVO.getCustomerName());
 
+				if(customerVO.getLat() != null && StrKit.notBlank(customerVO.getLat().toString()))
+					customer.setLat(customerVO.getLat());
+
+				if(customerVO.getLng() != null && StrKit.notBlank(customerVO.getLng().toString()))
+					customer.setLng(customerVO.getLng());
+
+				if(StrKit.notBlank(customerVO.getLocation()))
+					customer.setLocation(customerVO.getLocation());
+
 				if (persiste != null) {
 					customer.setId(persiste.getId());
 				} else customer.setId(null);
@@ -672,6 +681,12 @@ public class CustomerController extends BaseFrontController {
 				if (StrKit.notBlank(customerVO.getImageListStore()) && customerVO.getImageListStore().length() > 2)
 					sellerCustomer.setImageListStore(customerVO.getImageListStore());
 				else sellerCustomer.setImageListStore(null);
+
+				if (StrKit.notBlank(customerVO.getSubType()))
+					sellerCustomer.setSubType(customerVO.getSubType());
+
+				if (StrKit.notBlank(customerVO.getCustomerKind()))
+					sellerCustomer.setCustomerKind(customerVO.getCustomerKind());
 
 				if(customerVO.getLat() != null && StrKit.notBlank(customerVO.getLat().toString()))
 					sellerCustomer.setLat(customerVO.getLat());
@@ -877,6 +892,11 @@ public class CustomerController extends BaseFrontController {
 			customer.setCountryCode(areaCodeList.get(2));
 			customer.setCountryName(areaNameList.get(2));
 		}
+		customer.setLat(sellerCustomer.getLat());
+
+		customer.setLng(sellerCustomer.getLng());
+
+		customer.setLocation(sellerCustomer.getLocation());
 
 		if (persist != null) {
 			customer.setId(persist.getId());

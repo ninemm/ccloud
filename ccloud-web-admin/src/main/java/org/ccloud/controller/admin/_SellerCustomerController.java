@@ -783,6 +783,15 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 				customer.setAddress(customerVO.getAddress());
 				customer.setCustomerName(customerVO.getCustomerName());
 
+				if(customerVO.getLat() != null && StrKit.notBlank(customerVO.getLat().toString()))
+					customer.setLat(customerVO.getLat());
+
+				if(customerVO.getLng() != null && StrKit.notBlank(customerVO.getLng().toString()))
+					customer.setLng(customerVO.getLng());
+
+				if(StrKit.notBlank(customerVO.getLocation()))
+					customer.setLocation(customerVO.getLocation());
+
 				if (persiste != null) {
 					customer.setId(persiste.getId());
 				} else customer.setId(null);
@@ -794,14 +803,24 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 				if (customerVO.getCustTypeList() != null || customerVO.getCustTypeList().size() != 0)
 					sellerCustomer.setCustomerTypeIds(Joiner.on(",").join(customerVO.getCustTypeList().iterator()));
 
-				if (StrKit.notBlank(customerVO.getImageListStore()))
+				if (StrKit.notBlank(customerVO.getImageListStore()) && customerVO.getImageListStore().length() > 2)
 					sellerCustomer.setImageListStore(customerVO.getImageListStore());
+				else sellerCustomer.setImageListStore(null);
 
 				if (StrKit.notBlank(customerVO.getSubType()))
 					sellerCustomer.setSubType(customerVO.getSubType());
 
 				if (StrKit.notBlank(customerVO.getCustomerKind()))
 					sellerCustomer.setCustomerKind(customerVO.getCustomerKind());
+
+				if(customerVO.getLat() != null && StrKit.notBlank(customerVO.getLat().toString()))
+					sellerCustomer.setLat(customerVO.getLat());
+
+				if(customerVO.getLng() != null && StrKit.notBlank(customerVO.getLng().toString()))
+					sellerCustomer.setLng(customerVO.getLng());
+
+				if(StrKit.notBlank(customerVO.getLocation()))
+					sellerCustomer.setLocation(customerVO.getLocation());
 
 				sellerCustomer.setSellerId(sellerId);
 				sellerCustomer.setCustomerId(customer.getId());
