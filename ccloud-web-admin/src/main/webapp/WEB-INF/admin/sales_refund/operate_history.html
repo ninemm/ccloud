@@ -97,7 +97,8 @@
 	      	  	<p>操作状态：	<#if salesRefund.status?? && (salesRefund.status==1000)>审核通过</#if>
 	      	  				<#if salesRefund.status?? && (salesRefund.status==2000)>部分入库</#if>
 	      	  				<#if salesRefund.status?? && (salesRefund.status==3000)>全部入库</#if>
-	      	  				<#if salesRefund.status?? && (salesRefund.status==1001)>审核拒绝</#if></p>
+  	      	  				<#if salesRefund.status?? && (salesRefund.status==1002)>审核拒绝</#if>
+	      	  				<#if salesRefund.status?? && (salesRefund.status==1001)>已取消</#if></p>
 	      </div>
 	      <#if salesRefund.status?? && (salesRefund.status>=2000)>
 		      <div class="weui-cell weui-cell_access">
