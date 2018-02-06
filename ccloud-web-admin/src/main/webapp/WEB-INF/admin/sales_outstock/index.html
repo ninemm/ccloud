@@ -135,7 +135,12 @@
 					var url = '${CPATH}/admin/salesOutstock/getDetail?id=' + row.id + '&c=${c}&p=${p}';
 					var strHtml ='<a class="btn btn-xs btn-primary btn-flat" onclick="detail(\''+row.id+'\')" >详细</a> ';
 
-					strHtml = strHtml + '<a class="btn btn-xs btn-warning btn-flat" onclick="print(\''+row.id+'\')" >打印</a> ';
+                    <@shiro.hasPermission name="/admin/salesOutstock/print">
+                      strHtml = strHtml + '<a class="btn btn-xs btn-warning btn-flat" onclick="print(\''+row.id+'\')" >打印</a> ';
+                    </@shiro.hasPermission>
+                     <@shiro.hasPermission name="/admin/salesOutstock/costPrint">
+                     strHtml = strHtml + '<a class="btn btn-xs btn-warning btn-flat" onclick="financePrint(\''+row.id+'\')" >财务打印</a> ';
+                     </@shiro.hasPermission>
 					<@shiro.hasPermission name="/admin/salesOutstock/check">
 						if (row.status == 0) {
 							strHtml = strHtml + '<a class="btn btn-xs btn-info btn-flat" onclick="checkIsPrint(\''+row.is_print+'\',\''+url+'\')">出库</a> ';				
@@ -180,7 +185,20 @@ function orderDetail(id) {
 			title:"出库单打印",
 			type: 2, 
 			area: ['90%', '90%'],
-			content: '${CPATH}/admin/salesOutstock/renderPrintPage/' + id,
+			content: '${CPATH}/admin/salesOutstock/renderPrintPage/?stockOutId='+id + "&isFinancePrint=" + 0,
+			end: function() {
+			$("#search-submit").click();
+    		},
+		}); 
+	}
+	
+	<!-- 财务单个打印或批量打印调用方法 -->
+	function financePrint(id) {
+		layer.open({
+			title:"出库单打印",
+			type: 2, 
+			area: ['90%', '90%'],
+			content: '${CPATH}/admin/salesOutstock/renderPrintPage/?stockOutId='+id + "&isFinancePrint=" + 1,
 			end: function() {
 			$("#search-submit").click();
     		},
@@ -220,6 +238,22 @@ function orderDetail(id) {
 		 layer.alert("请选择要打印的出库单");
 		}else{
 	     print(ids);
+		}
+   }
+   
+     //财务按钮批量打印
+    function batchFinanceAction(){
+   
+   	   ids = new Array();
+		$("[name='dataItem']:checkbox").each(function() {
+			if ($(this).is(":checked")) {
+				ids.push($(this).val());
+			}
+		});
+		if(ids.length == 0){
+		 layer.alert("请选择要打印的出库单");
+		}else{
+	     financePrint(ids);
 		}
    }
    
@@ -532,7 +566,12 @@ function orderDetail(id) {
 			</div>
 		<div class="row content-row">
 			<div class="jp-left">
+			<@shiro.hasPermission name="/admin/salesOutstock/print">
 				<button class="btn btn-sm btn-primary btn-flat" type="button" onclick="batchAction()"><i class="fa fa-gavel"></i> 批量打印 </button>
+				</@shiro.hasPermission>
+				<@shiro.hasPermission name="/admin/salesOutstock/costPrint">
+				<button class="btn btn-sm btn-primary btn-flat" type="button" onclick="batchFinanceAction()"><i class="fa fa-gavel"></i> 财务批量打印 </button>
+				</@shiro.hasPermission>
 				<button class="btn btn-sm btn-primary btn-flat" type="button" onclick="batchOut()"><i class="fa  fa-check-circle"></i> 批量出库</button>
 <!-- 				<button class="btn btn-sm btn-primary btn-flat" type="button" onclick="batchCheckAll()"><i class="fa  fa-circle-o-notch"></i>全选</button> -->
 			</div>
