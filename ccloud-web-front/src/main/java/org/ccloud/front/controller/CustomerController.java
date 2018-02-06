@@ -462,8 +462,9 @@ public class CustomerController extends BaseFrontController {
 			temp.setLat(sellerCustomer.getLat());
 			temp.setLng(sellerCustomer.getLng());
 			temp.setLocation(sellerCustomer.getLocation());
-			
-			temp.setImageListStore(JSON.toJSONString(list));
+
+			if (list.size()!=0) temp.setImageListStore(JSON.toJSONString(list));
+			else temp.setImageListStore(null);
 			map.put("customerVO", temp);
 
 		} else {
