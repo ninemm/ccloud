@@ -182,6 +182,8 @@ public class UserController extends BaseFrontController {
 		render(String.format("user_center_%s.html", action));
 	}
 	
+	//绑定用户信息
+	@Clear({SessionInterceptor.class})
 	public void bind() {
 		
 		String openId = getSessionAttr(Consts.SESSION_WECHAT_OPEN_ID);
@@ -194,6 +196,7 @@ public class UserController extends BaseFrontController {
 		render("user_bind.html");
 	}
 	
+	//选择账套
 	@Clear(SessionInterceptor.class)
 	public void change() {
 		
@@ -258,6 +261,7 @@ public class UserController extends BaseFrontController {
 		return curUser;
 	} 
 	
+	//检测手机号
 	public void checkMobile() {
 		
 		String mobile = getPara("mobile");
@@ -352,6 +356,7 @@ public class UserController extends BaseFrontController {
 		}
 	}
 	
+	//设置页面
 	public void config() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		User nowUser = UserQuery.me().findById(user.getId());
@@ -359,6 +364,7 @@ public class UserController extends BaseFrontController {
 		render("user_config.html");
 	}
 	
+	//业务员负责区域
 	public void alterUser() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		User nowUser = UserQuery.me().findById(user.getId());
