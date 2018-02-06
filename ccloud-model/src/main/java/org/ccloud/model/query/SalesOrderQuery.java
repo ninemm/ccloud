@@ -948,7 +948,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append("LEFT JOIN cc_seller_product sp ON sp.id = cri.sell_product_id ");
 		fromBuilder.append("LEFT JOIN cc_product cp ON cp.id = sp.product_id ");
 		fromBuilder.append("GROUP BY cri.refund_instock_id) t2 ");
-		fromBuilder.append("ON t2.refund_instock_id = cr.id ");
+		fromBuilder.append("ON t2.refund_instock_id = cr.id WHERE cr.biz_date is not null ");
 		fromBuilder.append("GROUP BY cr.outstock_id) t1 ON t1.outstock_id = o.id ");
 		fromBuilder.append("LEFT JOIN cc_sales_order_join_outstock cso on cso.outstock_id = o.id ");
 		fromBuilder.append("GROUP BY cso.order_id) t3 ON t3.order_id = cc.id ");
