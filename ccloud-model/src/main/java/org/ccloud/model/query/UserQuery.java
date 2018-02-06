@@ -366,8 +366,7 @@ public class UserQuery extends JBaseQuery {
 		return DAO.find(sqlBuilder.toString(), mobile);
 	}
 	
-	public User findRealNameAndMobileAndDataArea(String realname,String mobile,String dataArea) {
-		String sql = "select * from `user` where realname = '"+realname+"' and mobile = '"+mobile+"' and data_area like '"+dataArea+"'";
-		return DAO.findFirst(sql);
+	public List<User> findByData(String dataArea){
+		return DAO.doFind("data_area like ?",dataArea);
 	}
 }
