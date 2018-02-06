@@ -2033,7 +2033,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" FROM cc_sales_order so ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON sojo.order_id=so.id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_outstock cso ON cso.id=sojo.outstock_id ");
-		fromBuilder.append(" LEFT JOIN( SELECT IFNULL(SUM(sri.total_reject_amount) , 0) amount , sri.outstock_id FROM cc_sales_refund_instock sri WHERE sri. STATUS NOT IN("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+")) t1 ON t1.outstock_id in (cso.id) ");
+		fromBuilder.append(" LEFT JOIN( SELECT IFNULL(SUM(sri.total_reject_amount) , 0) amount , sri.outstock_id FROM cc_sales_refund_instock sri WHERE sri. STATUS NOT IN("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+") GROUP BY sri.outstock_id) t1 ON t1.outstock_id in (cso.id) ");
 		fromBuilder.append(" WHERE so.biz_user_id ='"+userId+"'");
 		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+") ");
 		fromBuilder.append(" AND "+ keyword+" >= '"+startDate+"'");
