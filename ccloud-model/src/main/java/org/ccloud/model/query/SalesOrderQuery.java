@@ -743,7 +743,16 @@ public class SalesOrderQuery extends JBaseQuery {
 			String customName=record.getStr("custom_name");
 			String convertRelate = record.getStr("convert_relate");
 			String sellerProductId = record.getStr("id");
-			fromBuilder.append("TRUNCATE((( sum( CASE sp.id WHEN '"+sellerProductId+"' THEN "+product_count+" ELSE 0 END)) -IFNULL((SELECT SUM(srid.product_count) FROM cc_sales_refund_instock sri LEFT JOIN cc_sales_refund_instock_detail srid ON srid.refund_instock_id = sri.id LEFT JOIN cc_sales_order_join_outstock sojo ON sri.outstock_id = sojo.outstock_id LEFT JOIN cc_sales_order so1 ON so1.id = sojo.order_id WHERE srid.sell_product_id = '"+sellerProductId+"' AND srid.create_date <= '"+endDate+"'  and sri.customer_id=sc.id and sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+") AND so.id=so1.id GROUP BY srid.sell_product_id),0))/"+convertRelate+" , 2) '"+customName+"' ,");
+			fromBuilder.append(" TRUNCATE((( sum( CASE sp.id WHEN '"+sellerProductId+"' THEN "+product_count+" ELSE 0 END)) -IFNULL((SELECT SUM(srid.product_count) FROM cc_sales_refund_instock sri");
+			fromBuilder.append(" LEFT JOIN cc_sales_refund_instock_detail srid ON srid.refund_instock_id = sri.id LEFT JOIN cc_sales_order_join_outstock sojo ON sri.outstock_id = sojo.outstock_id");
+			fromBuilder.append(" LEFT JOIN cc_sales_order so1 ON so1.id = sojo.order_id LEFT JOIN cc_sales_order_detail sd1 ON sd1.order_id=so1.id and sd1.sell_product_id=srid.sell_product_id WHERE");
+			fromBuilder.append(" srid.sell_product_id = '"+sellerProductId+"' AND srid.create_date <= '"+endDate);
+			if (ifGift) {
+				fromBuilder.append("' and sd.is_gift=1");
+			}else {
+				fromBuilder.append("' and sd.is_gift=0");
+			}
+			fromBuilder.append(" and sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+") AND so.id=so1.id GROUP BY srid.sell_product_id),0))/"+convertRelate+" , 2) '"+customName+"' ,");
 		}
 		fromBuilder.append("s.seller_name '直营商名称'");
 		fromBuilder.append(" FROM cc_sales_order so ");
@@ -783,7 +792,16 @@ public class SalesOrderQuery extends JBaseQuery {
 			String customName=record.getStr("custom_name");
 			String convertRelate = record.getStr("convert_relate");
 			String sellerProductId = record.getStr("id");
-			fromBuilder.append("TRUNCATE((( sum( CASE sp.id WHEN '"+sellerProductId+"' THEN "+product_count+" ELSE 0 END)) -IFNULL((SELECT SUM(srid.product_count) FROM cc_sales_refund_instock sri LEFT JOIN cc_sales_refund_instock_detail srid ON srid.refund_instock_id = sri.id LEFT JOIN cc_sales_order_join_outstock sojo ON sri.outstock_id = sojo.outstock_id LEFT JOIN cc_sales_order so1 ON so1.id = sojo.order_id WHERE srid.sell_product_id = '"+sellerProductId+"' AND srid.create_date <= '"+endDate+"'  and sri.customer_id=sc.id and sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+") AND so.id=so1.id GROUP BY srid.sell_product_id),0))/"+convertRelate+" , 2) '"+customName+"' ,");
+			fromBuilder.append(" TRUNCATE((( sum( CASE sp.id WHEN '"+sellerProductId+"' THEN "+product_count+" ELSE 0 END)) -IFNULL((SELECT SUM(srid.product_count) FROM cc_sales_refund_instock sri");
+			fromBuilder.append(" LEFT JOIN cc_sales_refund_instock_detail srid ON srid.refund_instock_id = sri.id LEFT JOIN cc_sales_order_join_outstock sojo ON sri.outstock_id = sojo.outstock_id");
+			fromBuilder.append(" LEFT JOIN cc_sales_order so1 ON so1.id = sojo.order_id LEFT JOIN cc_sales_order_detail sd1 ON sd1.order_id=so1.id and sd1.sell_product_id=srid.sell_product_id WHERE");
+			fromBuilder.append(" srid.sell_product_id = '"+sellerProductId+"' AND srid.create_date <= '"+endDate);
+			if (ifGift) {
+				fromBuilder.append("' and sd.is_gift=1");
+			}else {
+				fromBuilder.append("' and sd.is_gift=0");
+			}
+			fromBuilder.append(" and sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+") AND so.id=so1.id GROUP BY srid.sell_product_id),0))/"+convertRelate+" , 2) '"+customName+"' ,");
 		}
 		fromBuilder.append("u.realname '业务员名称'");
 		fromBuilder.append(" FROM cc_sales_order so ");
@@ -822,7 +840,16 @@ public class SalesOrderQuery extends JBaseQuery {
 			String customName=record.getStr("custom_name");
 			String convertRelate = record.getStr("convert_relate");
 			String sellerProductId = record.getStr("id");
-			fromBuilder.append("TRUNCATE((( sum( CASE sp.id WHEN '"+sellerProductId+"' THEN "+product_count+" ELSE 0 END)) -IFNULL((SELECT SUM(srid.product_count) FROM cc_sales_refund_instock sri LEFT JOIN cc_sales_refund_instock_detail srid ON srid.refund_instock_id = sri.id LEFT JOIN cc_sales_order_join_outstock sojo ON sri.outstock_id = sojo.outstock_id LEFT JOIN cc_sales_order so1 ON so1.id = sojo.order_id WHERE srid.sell_product_id = '"+sellerProductId+"' AND srid.create_date <= '"+endDate+"'  and sri.customer_id=sc.id and sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+") AND so.id=so1.id GROUP BY srid.sell_product_id),0))/"+convertRelate+" , 2) '"+customName+"' ,");
+			fromBuilder.append(" TRUNCATE((( sum( CASE sp.id WHEN '"+sellerProductId+"' THEN "+product_count+" ELSE 0 END)) -IFNULL((SELECT SUM(srid.product_count) FROM cc_sales_refund_instock sri");
+			fromBuilder.append(" LEFT JOIN cc_sales_refund_instock_detail srid ON srid.refund_instock_id = sri.id LEFT JOIN cc_sales_order_join_outstock sojo ON sri.outstock_id = sojo.outstock_id");
+			fromBuilder.append(" LEFT JOIN cc_sales_order so1 ON so1.id = sojo.order_id LEFT JOIN cc_sales_order_detail sd1 ON sd1.order_id=so1.id and sd1.sell_product_id=srid.sell_product_id WHERE");
+			fromBuilder.append(" srid.sell_product_id = '"+sellerProductId+"' AND srid.create_date <= '"+endDate);
+			if (ifGift) {
+				fromBuilder.append("' and sd.is_gift=1");
+			}else {
+				fromBuilder.append("' and sd.is_gift=0");
+			}
+			fromBuilder.append(" and sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+") AND so.id=so1.id GROUP BY srid.sell_product_id),0))/"+convertRelate+" , 2) '"+customName+"' ,");
 		}
 		fromBuilder.append("c.customer_name '客户名称',sc.id ");
 		fromBuilder.append(" FROM cc_sales_order so ");
