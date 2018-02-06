@@ -371,6 +371,12 @@ public class UserController extends BaseFrontController {
 		render("user_config.html");
 	}
 	
+	
+	@Clear({SessionInterceptor.class})
+	public void choice() {
+		render("user_choice.html");
+	}
+	
 	@Clear({SessionInterceptor.class})
 	public void timeout() {
 		render("timeout.html");
