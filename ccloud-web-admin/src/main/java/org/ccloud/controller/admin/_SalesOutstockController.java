@@ -156,7 +156,9 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 	}
 
 	public void renderPrintPage() {
-		setAttr("outstockId", getPara(0));
+		setAttr("outstockId", getPara("stockOutId"));
+		//是否是打印打印，财务打印的是成本价
+		setAttr("isFinancePrint", getPara("isFinancePrint"));
 		// 获取销售商的配置模板地址
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		List<PrintTemplate> printTemplates = PrintTemplateQuery.me().findPrintTemplateBySellerId(sellerId);
@@ -191,10 +193,16 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 	public void getPrintInfo() {
 		String outstockId = getPara("outstockId");
 		String[] outId = outstockId.split(",");
+		Integer isFinancePrint = getParaToInt("isFinancePrint");
 		List<printAllNeedInfo> printAllNeedInfos = new ArrayList<>();
+		List<orderProductInfo> orderProductInfos = new ArrayList<>();
 		for (String s : outId) {
 			printAllNeedInfo printAllNeedInfo = SalesOutstockQuery.me().findStockOutForPrint(s);
-			List<orderProductInfo> orderProductInfos = SalesOutstockDetailQuery.me().findPrintProductInfo(s);
+			if (isFinancePrint == 0) {
+			orderProductInfos = SalesOutstockDetailQuery.me().findPrintProductInfo(s);	
+			}else {
+			orderProductInfos = SalesOutstockDetailQuery.me().findFinancePrintProductInfo(s);	
+			}
 			printAllNeedInfo.setOrderProductInfos(orderProductInfos);
 			printAllNeedInfos.add(printAllNeedInfo);
 		}
