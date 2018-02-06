@@ -13,6 +13,10 @@
  */
 package org.ccloud.model.callback;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.jfinal.plugin.activerecord.ICallback;
+
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -20,11 +24,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.jfinal.plugin.activerecord.ICallback;
-
-public class AroundCustomerCallback implements ICallback {
+public class AroundCustomerBiVisitCallback implements ICallback {
 
 	private ResultSet resultSet = null;
 
@@ -33,7 +33,8 @@ public class AroundCustomerCallback implements ICallback {
 	private double dist;
 	private String startDate;
 	private String endDate;
-	private String sellerId;
+	private String dataArea;
+	private String customerKind;
 
 	@Override
 	public Object call(Connection conn) {
@@ -42,14 +43,15 @@ public class AroundCustomerCallback implements ICallback {
 		List<Map<String, Object>> result = Lists.newArrayList();
 
 		try {
-			proc = conn.prepareCall("{ call around_customer_bi(?, ?, ?, ?, ?, ?) }");
+			proc = conn.prepareCall("{ call around_customer_bi_visit(?, ?, ?, ?, ?, ?, ?) }");
 
 			proc.setDouble(1, getLongitude());
 			proc.setDouble(2, getLatitude());
 			proc.setDouble(3, getDist());
 			proc.setString(4, getStartDate());
 			proc.setString(5, getEndDate());
-			proc.setString(6, getSellerId());
+			proc.setString(6, getDataArea());
+			proc.setString(7, getCustomerKind());
 
 			proc.execute();
 
@@ -57,7 +59,7 @@ public class AroundCustomerCallback implements ICallback {
 
 			while (resultSet.next()) {
 				Map<String, Object> map = Maps.newHashMap();
-				map.put("customerId", resultSet.getString("id"));
+				map.put("customerId", resultSet.getString("seller_customer_id"));
 				map.put("customerName", resultSet.getString("customer_name"));
 				map.put("contacts", resultSet.getString("contact"));
 				map.put("phone", resultSet.getString("mobile"));
@@ -68,7 +70,7 @@ public class AroundCustomerCallback implements ICallback {
 				map.put("dist", resultSet.getDouble("dist"));
 				map.put("longitude", resultSet.getDouble("longitude"));
 				map.put("latitude", resultSet.getDouble("latitude"));
-				map.put("totalAmount", resultSet.getLong("totalAmount"));
+				map.put("totalNum", resultSet.getLong("cnt"));
 				result.add(map);
 			}
 		} catch (SQLException e) {
@@ -94,12 +96,12 @@ public class AroundCustomerCallback implements ICallback {
 		this.endDate = endDate;
 	}
 
-	public String getSellerId() {
-		return sellerId;
+	public String getDataArea() {
+		return dataArea;
 	}
 
-	public void setSellerId(String sellerId) {
-		this.sellerId = sellerId;
+	public void setDataArea(String dataArea) {
+		this.dataArea = dataArea;
 	}
 
 	public ResultSet getResultSet() {
@@ -134,4 +136,11 @@ public class AroundCustomerCallback implements ICallback {
 		this.dist = dist;
 	}
 
+	public String getCustomerKind() {
+		return customerKind;
+	}
+
+	public void setCustomerKind(String customerKind) {
+		this.customerKind = customerKind;
+	}
 }

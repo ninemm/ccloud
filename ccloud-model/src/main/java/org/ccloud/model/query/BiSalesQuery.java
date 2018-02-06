@@ -822,7 +822,7 @@ public class BiSalesQuery extends JBaseQuery {
 	public List<Record> findProductList(String customerId, String startDate, String endDate) {
 		LinkedList<Object> params = new LinkedList<Object>();
 
-		StringBuilder sqlBuilder = new StringBuilder("SELECT cs.custom_name as cInvName, co.create_date as idate, o.product_amount - IFNULL(t1.refundPrice,0) as totalAmount, ");
+		StringBuilder sqlBuilder = new StringBuilder("SELECT cs.custom_name as cInvName, co.biz_date as idate, o.product_amount - IFNULL(t1.refundPrice,0) as totalAmount, ");
 		sqlBuilder.append("(o.product_count - IFNULL(t1.refundCount,0))/cp.convert_relate as totalNum ");
 		sqlBuilder.append("FROM cc_sales_outstock_detail o LEFT JOIN cc_seller_product cs ON o.sell_product_id = cs.id ");
 		sqlBuilder.append("LEFT JOIN cc_product cp on cp.id = cs.product_id ");
@@ -846,7 +846,33 @@ public class BiSalesQuery extends JBaseQuery {
 			params.add(endDate);
 		}
 
-		sqlBuilder.append(" order by o.outstock_id ,co.biz_date desc");
+		sqlBuilder.append(" order by co.biz_date desc, o.outstock_id ");
+
+		return Db.find(sqlBuilder.toString(), params.toArray());
+	}
+
+	public List<Record> findVistList(String customerId, String startDate, String endDate) {
+		LinkedList<Object> params = new LinkedList<Object>();
+
+		StringBuilder sqlBuilder = new StringBuilder(" SELECT d.name AS typeName, u.realname, cv.create_date  ");
+		sqlBuilder.append("FROM cc_customer_visit cv ");
+		sqlBuilder.append("LEFT JOIN user u ON cv.user_id = u.id ");
+		sqlBuilder.append("LEFT JOIN dict d ON cv.question_type = d.value ");
+		sqlBuilder.append("WHERE cv.lng is not null and cv.lat is not null");
+
+		appendIfNotEmpty(sqlBuilder, "cv.seller_customer_id", customerId, params, false);
+
+		if (startDate != null) {
+			sqlBuilder.append(" and cv.create_date >= ?");
+			params.add(startDate);
+		}
+
+		if (endDate != null) {
+			sqlBuilder.append(" and cv.create_date <= ?");
+			params.add(endDate);
+		}
+
+		sqlBuilder.append(" ORDER BY cv.create_date DESC ");
 
 		return Db.find(sqlBuilder.toString(), params.toArray());
 	}
