@@ -19,7 +19,8 @@
 
    $(function() {
     var ids = '${outstockId!}';
-	queryPrintDetail();
+    var financePrint = '${isFinancePrint!}';
+	queryPrintDetail(financePrint);
 	initEvent();
 });
 
@@ -90,7 +91,7 @@ var headerStr =
 			'</div>';
 
 
-function queryPrintDetail() {
+function queryPrintDetail(financePrint) {
 
     var batchPrintContent = '';
     var headerContent = null;
@@ -99,30 +100,41 @@ function queryPrintDetail() {
     $.ajax({
         url: "${CPATH}/admin/salesOutstock/getPrintInfo",
         data: {
-            "outstockId": '${outstockId!}'
+            "outstockId": '${outstockId!}',
+            "isFinancePrint":'${isFinancePrint!}'
         },
         dataType: "json",
         async: false,
         success: function(data) {
             if (data && data.rows) {
                 var curDate = new Date().Format("yyyy-MM-dd hh:mm");
-
                 $.each(data.rows,
                 function(index, item) {
                     var content = '<tbody>';
+                     let saleMoney = 0;
                     if (item.orderProductInfos) {
                         $.each(item.orderProductInfos,
                         function(idx, subitem) {
                             let barCode = subitem.barCode;
                             if (!barCode) barCode = '无';
+                            let totalMoney = 0;
                             let isGift = subitem.isgift;
                             if (isGift != 0) {
                                 isGift = '(赠品)';
                             } else {
                                 isGift = "";
+                                totalMoney = subitem.bigCount
+										* subitem.bigPrice
+										+ subitem.smallCount
+										* subitem.smallPrice;
+										saleMoney = saleMoney + totalMoney;
                             }
                             var productAmout = subitem.productAmout
+                            if(financePrint == 0){
                             content += $.format(contentStr, (idx + 1), subitem.productName, subitem.bigCount, subitem.bigPrice + '元', subitem.smallCount, subitem.smallPrice + '元', barCode, isGift,productAmout+ '元')
+                            }else{
+                            content += $.format(contentStr, (idx + 1), subitem.productName, subitem.bigCount, subitem.bigPrice + '元', subitem.smallCount, subitem.smallPrice + '元', barCode, isGift,totalMoney+ '元')
+                            }
                         });
 
                         let len = item.orderProductInfos.length;
@@ -144,11 +156,15 @@ function queryPrintDetail() {
 
                     headerContent = $.format(headerStr, item.outstockSn, placeOrderTime, curDate, item.customerName, item.customerContacts, item.customerPhone, item.deliveryAddress, placeOrderMan, placeOrderPhone, item.warehouseName);
 
-                    var salesAmount = DX(item.salesAmount);
-                    
                     let printFootContext = item.printFootContext;
                     if (!printFootContext) printFootContext = '';
+                    if(financePrint == 0){
+                    var salesAmount = DX(item.salesAmount);
                     footerContent = $.format(footerStr, salesAmount, item.salesAmount, warehousePhone, remark,printFootContext);
+                    }else{
+                    var salesAmount = DX(saleMoney);
+                    footerContent = $.format(footerStr, salesAmount, saleMoney, warehousePhone, remark,printFootContext);
+                    }
 
                     batchPrintContent += headerInfoContent + headerContent + content + footerContent;
 

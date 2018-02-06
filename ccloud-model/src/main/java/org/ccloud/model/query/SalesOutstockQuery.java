@@ -190,13 +190,14 @@ public class SalesOutstockQuery extends JBaseQuery {
 		if (StrKit.notBlank(status)) {
 			fromBuilder.append("left join (SELECT cc.id, cc.outstock_id, IFNULL(SUM(cc.product_count),0) as outCount, IFNULL(SUM(t1.count), 0) AS refundCount ");
 			fromBuilder.append("FROM cc_sales_outstock_detail cc LEFT JOIN (SELECT SUM(cr.reject_product_count) AS count, cr.outstock_detail_id FROM cc_sales_refund_instock_detail cr ");
-			fromBuilder.append("LEFT JOIN cc_sales_refund_instock ci ON ci.id = cr.refund_instock_id where ci.`status` != ? ");
+			fromBuilder.append("LEFT JOIN cc_sales_refund_instock ci ON ci.id = cr.refund_instock_id where ci.`status` not in (?,?) ");
 			fromBuilder.append("GROUP BY cr.outstock_detail_id ) t1 ON cc.id = t1.outstock_detail_id GROUP BY cc.outstock_id ) t2 on t2.outstock_id = o.id ");
 		}
 
 		LinkedList<Object> params = new LinkedList<Object>();
 		if (StrKit.notBlank(status)) {
 			params.add(Consts.SALES_REFUND_INSTOCK_CANCEL);
+			params.add(Consts.SALES_REFUND_INSTOCK_REFUSE);
 		}		
 		boolean needWhere = true;
 
@@ -303,10 +304,11 @@ public class SalesOutstockQuery extends JBaseQuery {
 		fromBuilder.append("left join cc_customer_type ct on o.customer_type_id = ct.id ");
 		fromBuilder.append("left join (SELECT cc.id, cc.outstock_id, IFNULL(SUM(cc.product_count),0) as outCount, IFNULL(SUM(t1.count), 0) AS refundCount ");
 		fromBuilder.append("FROM cc_sales_outstock_detail cc LEFT JOIN (SELECT SUM(cr.reject_product_count) AS count, cr.outstock_detail_id FROM cc_sales_refund_instock_detail cr ");
-		fromBuilder.append("LEFT JOIN cc_sales_refund_instock ci ON ci.id = cr.refund_instock_id where ci.`status` != ? ");
+		fromBuilder.append("LEFT JOIN cc_sales_refund_instock ci ON ci.id = cr.refund_instock_id where ci.`status` not in (?,?) ");
 		fromBuilder.append("GROUP BY cr.outstock_detail_id ) t1 ON cc.id = t1.outstock_detail_id GROUP BY cc.outstock_id ) t2 on t2.outstock_id = o.id ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		params.add(Consts.SALES_REFUND_INSTOCK_CANCEL);
+		params.add(Consts.SALES_REFUND_INSTOCK_REFUSE);
 		boolean needWhere = true;
 
 		needWhere = appendIfNotEmpty(fromBuilder, "o.status", status, params, needWhere);
