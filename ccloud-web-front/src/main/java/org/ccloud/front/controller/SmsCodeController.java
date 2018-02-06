@@ -3,16 +3,19 @@ package org.ccloud.front.controller;
 import java.util.Date;
 
 import org.ccloud.core.BaseFrontController;
+import org.ccloud.interceptor.SessionInterceptor;
 import org.ccloud.model.SmsCode;
 import org.ccloud.notify.sms.AlidayuSmsSender;
 import org.ccloud.notify.sms.SmsMessage;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.StringUtils;
 
+import com.jfinal.aop.Clear;
 import com.jfinal.kit.Prop;
 import com.jfinal.kit.PropKit;
 
 @RouterMapping(url = "/smsCode")
+@Clear({SessionInterceptor.class})
 public class SmsCodeController extends BaseFrontController{
 
 	public void index() {

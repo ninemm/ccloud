@@ -262,6 +262,7 @@ public class UserController extends BaseFrontController {
 	} 
 	
 	//检测手机号
+	@Clear(SessionInterceptor.class)
 	public void checkMobile() {
 		
 		String mobile = getPara("mobile");
@@ -272,7 +273,7 @@ public class UserController extends BaseFrontController {
 			renderAjaxResultForError("手机号不存在");
 	}
 	
-	
+	@Clear(SessionInterceptor.class)
 	public void update() {
 		
 		final String mobile = getPara("mobile");
