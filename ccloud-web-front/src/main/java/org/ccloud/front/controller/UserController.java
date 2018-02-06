@@ -41,7 +41,8 @@ import com.jfinal.weixin.sdk.api.UserApi;
  */
 @RouterMapping(url = Consts.ROUTER_USER)
 public class UserController extends BaseFrontController {
-
+	
+	@Clear({SessionInterceptor.class})
 	public void index() {
 		String action = getPara();
 		if (StringUtils.isBlank(action)) {
