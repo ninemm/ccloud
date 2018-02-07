@@ -172,7 +172,8 @@ $(function() {
 						
 						items.push({
 							title : el.name,
-							value : el.id
+							value : el.id,
+							factor : el.factor
 						})
 					});
 
@@ -194,20 +195,19 @@ $(function() {
 			        }else{
 			        	$customerTypeName.select("update", {items : items})
 			        }
-			        
-			        $customerTypeName.val(items[0].title);
-			        $customerTypeName.attr('data-values', items[0].value);
-			        if (items.factor) {
-			        	$discount.val(items.factor*10+"折");
+			        if (items[0].factor) {
+			        	$discount.val(items[0].factor*10+"折");
 			        } else {
 			        	$discount.val('无');
-			        }
+			        }			        
+			        total();
+			        $customerTypeName.val(items[0].title);
+			        $customerTypeName.attr('data-values', items[0].value);
 	
 			        $("#customerType").val(customerTypeInfoMap[items[0].value].id);
 			        $("#customerTypeCode").val(customerTypeInfoMap[items[0].value].code);
 			        $("#factor").val(customerTypeInfoMap[items[0].value].factor);
 			        $("#proc_def_key").val(customerTypeInfoMap[items[0].value].proc_def_key);
-			        total();
 				}
 			);
 		}
