@@ -185,7 +185,13 @@ $(function() {
 					         onChange: function(data) {
 					         	$("#customerType").val(customerTypeInfoMap[data.values].id);
 						        $("#customerTypeCode").val(customerTypeInfoMap[data.values].code);
-						        $("#discount").val(customerTypeInfoMap[data.values].factor*10+"折");
+						        if (customerTypeInfoMap[data.values].factor) {
+						        	$("#pricedis").show();
+						        	$("#discount").val(customerTypeInfoMap[data.values].factor*10+"折");
+						        } else {
+						        	$("#pricedis").hide();
+						        	$("#discount").val('无');
+						        }						        
 						        $("#factor").val(customerTypeInfoMap[data.values].factor);
 						        $("#proc_def_key").val(customerTypeInfoMap[data.values].proc_def_key);
 						        total();
@@ -195,9 +201,11 @@ $(function() {
 			        	$customerTypeName.select("update", {items : items})
 			        }
 			        if (items[0].factor) {
+			        	$("#pricedis").show();
 			        	$discount.val(items[0].factor*10+"折");
 			        	$("#factor").val(items[0].factor);
 			        } else {
+			        	$("#pricedis").hide();
 			        	$discount.val('无');
 			        }			        
 			        total();
@@ -540,7 +548,7 @@ $(function() {
 							<span class="weui-cell__ft"></span>
 						</div>
 					</div>
-					<div class="weui-cell weui-cell_access">
+					<div class="weui-cell weui-cell_access" style="display: none" id="pricedis">
 						<div class="weui-cell__bd select-area">
 							<div class="order-customer-info-title">
 								专享折扣&nbsp;&nbsp;
