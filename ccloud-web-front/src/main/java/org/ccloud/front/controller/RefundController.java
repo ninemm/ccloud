@@ -25,7 +25,6 @@ import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.IAtom;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
-import org.ccloud.workflow.service.WorkFlowService;
 
 @RouterMapping(url = "/refund")
 @RequiresPermissions(value = { "/admin/salesRefund", "/admin/dealer/all" }, logical = Logical.OR)
@@ -234,7 +233,7 @@ public class RefundController extends BaseFrontController{
 
 		String orderId = getPara("orderId");
 		SalesRefundInstock salesRefundInstock = SalesRefundInstockQuery.me().findById(orderId);
-		WorkFlowService workflow = new WorkFlowService();
+//		WorkFlowService workflow = new WorkFlowService();
 
 		//暂时退货没有流程
 //		String procInstId = salesRefundInstock.getProcInstId();
