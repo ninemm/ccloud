@@ -148,7 +148,6 @@ $(function() {
 
 	function initCustomer(){
 		var customerInfo = getItemBykey("customerInfo");
-	
 		if(customerInfo){
 			$("#sellerCustomerId").val(customerInfo.sellerCustomerId);
 			$("#customerName").val(customerInfo.customerName);
@@ -197,6 +196,7 @@ $(function() {
 			        }
 			        if (items[0].factor) {
 			        	$discount.val(items[0].factor*10+"折");
+			        	$("#factor").val(items[0].factor);
 			        } else {
 			        	$discount.val('无');
 			        }			        
