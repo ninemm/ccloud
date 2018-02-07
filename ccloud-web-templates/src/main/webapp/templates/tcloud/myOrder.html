@@ -8,7 +8,7 @@
 		color: #999;
 	}
 	#my-order {
-		top: 44px;
+		top: 153px;
 		position: absolute;
 		bottom: 0;
 	}
@@ -157,6 +157,8 @@
 					loading = true;
 					return;
 				}
+				$("#orderCount").html(data.orderCount+"/单");
+				$("#orderAmount").html(data.orderAmount+"/元");
 
 				$.each(data.orderList, function(index, el) {
 	
@@ -410,6 +412,22 @@
 
 <@layout>
 <div class="weui-content">
+    <div class="report-top weui-flex">
+        <div class="weui-flex__item">
+            <img src="${CTPATH}/images/order.png" alt="">
+            <div class="border-right-1px">
+                <p class="ft16">订单数</p>
+                <p class="ft14" id="orderCount"></p>
+            </div>
+        </div>
+        <div class="weui-flex__item">
+            <img src="${CTPATH}/images/customer.png" alt="">
+            <div>
+                <p class="ft16">订单总额</p>
+                <p class="ft14" id="orderAmount"></p>
+            </div>
+        </div>
+    </div>
 	<header>
 		<div class="weui-search-bar" id="SearchBar">
 			<form class="weui-search-bar__form">
@@ -427,6 +445,7 @@
 		</div>
 	</header>
 	<article id="my-order" class="ft14">
+	
 		<header class="has-th-list weui-flex">
 			<div class="head-search select-area weui-flex__item">
 				<div class="weui-flex">

@@ -92,10 +92,14 @@ public class OrderController extends BaseFrontController {
 
 		Page<Record> orderList = SalesOrderQuery.me().paginateForApp(getPageNumber(), getPageSize(), keyword, status,
 				customerTypeId, startDate, endDate, sellerId, selectDataArea);
+		Record record = SalesOrderQuery.me()
+				.getOrderListCount(keyword, status, customerTypeId, startDate, endDate, sellerId, selectDataArea);
 
 		Map<String, Object> map = new HashMap<>();
 		map.put("orderList", orderList.getList());
 		map.put("user", user);
+		map.put("orderCount", record.getStr("orderCount"));
+		map.put("orderAmount", record.getStr("totalAmount"));
 		renderJson(map);
 	}
 

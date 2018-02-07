@@ -13,7 +13,7 @@
 	#order .gift input::-webkit-input-placeholder {
 		text-align: center;
 	}
-	#deliveryDate, #customerTypeName {
+	#deliveryDate, #customerTypeName, #discount {
 		text-align: right;
 		width: 70%;
 	}
@@ -177,6 +177,7 @@ $(function() {
 					});
 
 					var $customerTypeName = $("#customerTypeName");
+					var $discount = $("#discount");
 					if($customerTypeName.data('values') === undefined){
 						$customerTypeName.select({
 					         title: "客户类型",
@@ -184,8 +185,10 @@ $(function() {
 					         onChange: function(data) {
 					         	$("#customerType").val(customerTypeInfoMap[data.values].id);
 						        $("#customerTypeCode").val(customerTypeInfoMap[data.values].code);
+						        $("#discount").val(customerTypeInfoMap[data.values].factor*10+"折");
 						        $("#factor").val(customerTypeInfoMap[data.values].factor);
 						        $("#proc_def_key").val(customerTypeInfoMap[data.values].proc_def_key);
+						        total();
 					         }
 				        });
 			        }else{
@@ -194,11 +197,17 @@ $(function() {
 			        
 			        $customerTypeName.val(items[0].title);
 			        $customerTypeName.attr('data-values', items[0].value);
+			        if (items.factor) {
+			        	$discount.val(items.factor*10+"折");
+			        } else {
+			        	$discount.val('无');
+			        }
 	
 			        $("#customerType").val(customerTypeInfoMap[items[0].value].id);
 			        $("#customerTypeCode").val(customerTypeInfoMap[items[0].value].code);
 			        $("#factor").val(customerTypeInfoMap[items[0].value].factor);
 			        $("#proc_def_key").val(customerTypeInfoMap[items[0].value].proc_def_key);
+			        total();
 				}
 			);
 		}
@@ -531,6 +540,14 @@ $(function() {
 							<span class="weui-cell__ft"></span>
 						</div>
 					</div>
+					<div class="weui-cell weui-cell_access">
+						<div class="weui-cell__bd select-area">
+							<div class="order-customer-info-title">
+								专享折扣&nbsp;&nbsp;
+							</div>
+							<input type="text" class="weui-input" id="discount" value="无" readonly>
+						</div>
+					</div>					
 				</section>
 				<section class="weui-panel weui-panel_access delivery-info">
 					<div class="weui-cell weui-cell_access">
