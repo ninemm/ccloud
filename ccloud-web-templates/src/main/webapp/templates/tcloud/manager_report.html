@@ -491,7 +491,8 @@
 				"dayTag":  $("#dayTag").val(),
 				"startDate": $("#startDay").val(),
 				"endDate" : $("#endDay").val(),
-				"orderTag": 'productCount'
+				"orderTag": 'productCount',
+				"typeTag": $("#typeTag").val()
 			}
 			urlSelect(params,type); 
 			getUnit("productCount");
@@ -505,7 +506,8 @@
 				"dayTag":  $("#dayTag").val(),
 				"startDate": $("#startDay").val(),
 				"endDate" : $("#endDay").val(),			
-				"orderTag": 'totalAmount'
+				"orderTag": 'totalAmount',
+				"typeTag": $("#typeTag").val()
 			}
           	urlSelect(params,type);
           	getUnit("totalAmount");
@@ -519,7 +521,8 @@
 				"dayTag":  $("#dayTag").val(),
 				"startDate": $("#startDay").val(),
 				"endDate" : $("#endDay").val(),			
-				"orderTag": 'orderCount'
+				"orderTag": 'orderCount',
+				"typeTag": $("#typeTag").val()
 			}
 			urlSelect(params,type);   
 			getUnit("orderCount");

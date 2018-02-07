@@ -13,7 +13,7 @@
 	#order .gift input::-webkit-input-placeholder {
 		text-align: center;
 	}
-	#deliveryDate, #customerTypeName {
+	#deliveryDate, #customerTypeName, #discount {
 		text-align: right;
 		width: 70%;
 	}
@@ -148,7 +148,6 @@ $(function() {
 
 	function initCustomer(){
 		var customerInfo = getItemBykey("customerInfo");
-	
 		if(customerInfo){
 			$("#sellerCustomerId").val(customerInfo.sellerCustomerId);
 			$("#customerName").val(customerInfo.customerName);
@@ -172,11 +171,13 @@ $(function() {
 						
 						items.push({
 							title : el.name,
-							value : el.id
+							value : el.id,
+							factor : el.factor
 						})
 					});
 
 					var $customerTypeName = $("#customerTypeName");
+					var $discount = $("#discount");
 					if($customerTypeName.data('values') === undefined){
 						$customerTypeName.select({
 					         title: "客户类型",
@@ -184,14 +185,30 @@ $(function() {
 					         onChange: function(data) {
 					         	$("#customerType").val(customerTypeInfoMap[data.values].id);
 						        $("#customerTypeCode").val(customerTypeInfoMap[data.values].code);
+						        if (customerTypeInfoMap[data.values].factor) {
+						        	$("#pricedis").show();
+						        	$("#discount").val(customerTypeInfoMap[data.values].factor*10+"折");
+						        } else {
+						        	$("#pricedis").hide();
+						        	$("#discount").val('无');
+						        }						        
 						        $("#factor").val(customerTypeInfoMap[data.values].factor);
 						        $("#proc_def_key").val(customerTypeInfoMap[data.values].proc_def_key);
+						        total();
 					         }
 				        });
 			        }else{
 			        	$customerTypeName.select("update", {items : items})
 			        }
-			        
+			        if (items[0].factor) {
+			        	$("#pricedis").show();
+			        	$discount.val(items[0].factor*10+"折");
+			        	$("#factor").val(items[0].factor);
+			        } else {
+			        	$("#pricedis").hide();
+			        	$discount.val('无');
+			        }			        
+			        total();
 			        $customerTypeName.val(items[0].title);
 			        $customerTypeName.attr('data-values', items[0].value);
 	
@@ -531,6 +548,14 @@ $(function() {
 							<span class="weui-cell__ft"></span>
 						</div>
 					</div>
+					<div class="weui-cell weui-cell_access" style="display: none" id="pricedis">
+						<div class="weui-cell__bd select-area">
+							<div class="order-customer-info-title">
+								专享折扣&nbsp;&nbsp;
+							</div>
+							<input type="text" class="weui-input" id="discount" value="无" readonly>
+						</div>
+					</div>					
 				</section>
 				<section class="weui-panel weui-panel_access delivery-info">
 					<div class="weui-cell weui-cell_access">
