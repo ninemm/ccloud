@@ -321,7 +321,7 @@ public class ReportController extends BaseFrontController {
 		if (StrKit.isBlank(sellerId)) {
 			sellerId = getSessionAttr("sellerId");
 		}
-		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String deptId = getPara("deptId");
 		String orderTag = getPara("orderTag");
 		String print = getPara("print");
@@ -338,7 +338,7 @@ public class ReportController extends BaseFrontController {
 		if (StrKit.isBlank(sellerId)) {
 			sellerId = getSessionAttr("sellerId");
 		}
-		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String deptId = getPara("deptId");
 		String orderTag = getPara("orderTag");
 		List<Record> record = SalesOrderQuery.me().getUserRankByOutStock(startDate, endDate, dayTag, deptId, sellerId, orderTag, dataArea);
@@ -363,7 +363,7 @@ public class ReportController extends BaseFrontController {
 		if (StrKit.isBlank(sellerId)) {
 			sellerId = getSessionAttr("sellerId");
 		}
-		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String deptId = getPara("deptId");
 		String orderTag = getPara("orderTag");
 		String print = getPara("print");
@@ -380,7 +380,7 @@ public class ReportController extends BaseFrontController {
 		if (StrKit.isBlank(sellerId)) {
 			sellerId = getSessionAttr("sellerId");
 		}
-		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String deptId = getPara("deptId");
 		String orderTag = getPara("orderTag");
 		List<Record> record = SalesOrderQuery.me().getGiftCountByUserByOutStock(startDate, endDate, dayTag, deptId, sellerId, dataArea, orderTag);

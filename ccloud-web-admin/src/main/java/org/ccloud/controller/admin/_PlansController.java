@@ -103,7 +103,7 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 	"/admin/all" }, logical = Logical.OR)
 	public void plansTemplate() {
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\plans\\"
-				+ "plansInfo.xlsx";
+				+ "plansTemplate.xlsx";
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		List<Record> productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", ""); 
