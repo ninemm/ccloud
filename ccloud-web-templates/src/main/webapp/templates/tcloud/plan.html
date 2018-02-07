@@ -16,17 +16,10 @@
 <#macro script>
 
 $(function() {
-	$(".startDate").append('开始时间'+'<span class="require">*</span>');
+	$(".startDate").append('开始时间'+' <span class="require">*</span>');
 	$("#datetime-picker").datetimePicker({
 				times: function () {
 		          return [];
-		        },
-		        onChange: function (picker, values, displayValues) {
-		          var date = new Date(values);
-		          if($("#typeId").val()==101202){
-						$("#datetime-picker").val(date.Format("yyyy-MM"));
-		          		console.log(date.Format("yyyy-MM"));
-					}
 		        }
 			});
 	$("#datetime-picker").click(function(){
@@ -42,7 +35,7 @@ $(function() {
 				}
 			});
 	$("#datetime-picker").change(function(){
-		var date3 = new Date($("#datetime-picker").val());	
+		var date3 = new Date($("#datetime-picker").val().replace(/-/g,"/"));	
 		if($("#typeId").val()==101202){
 			$("#datetime-picker").val(date3.Format("yyyy-MM"));
 			date3.setDate(1);
@@ -132,8 +125,12 @@ $("#type").select({
 		$("#typeId").val(this.data['values']);
 		var date2 = new Date();
 		if($("#typeId").val()==101201){
+			$("#start-date").val($.today());
 			date2.setDate((new Date()).getDate()+7);
 			$("#end-date").val(date2.Format("yyyy-MM-dd"));
+			$("#start-date").show();
+			$("#datetime-picker").hide();
+			$(".endDate").show();
 		}
 		else{
 			$(".startDate").html("");
@@ -141,7 +138,7 @@ $("#type").select({
 			$("#datetime-picker").show();
 			$(".endDate").hide();
 			if($("#typeId").val()==101202){
-				$(".startDate").append('计划月份'+'<span class="require">*</span>');
+				$(".startDate").append('计划月份'+' <span class="require">*</span>');
 				$("#datetime-picker").val(date2.Format("yyyy-MM"));
 				date2.setDate(1);
 				$("#start-date").val(date2.Format("yyyy-MM-dd"));
@@ -152,7 +149,7 @@ $("#type").select({
 				 var date4 = new Date(nextMonthFirstDay-oneDay);
 				 $("#end-date").val(date4.Format("yyyy-MM-dd"));
 			}else{
-				$(".startDate").append('计划年份'+'<span class="require">*</span>');
+				$(".startDate").append('计划年份'+' <span class="require">*</span>');
 				$("#datetime-picker").val(date2.Format("yyyy"));
 				date2.setDate(1);
 				date2.setMonth(0);

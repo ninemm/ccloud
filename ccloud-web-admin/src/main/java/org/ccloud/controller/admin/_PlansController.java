@@ -108,9 +108,9 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		List<Record> productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", ""); 
 		List<String> headers = new ArrayList<String>();
-		headers.add("xxxx-xx月x计划");
-		headers.add("开始时间");
-		headers.add("结束时间");
+		headers.add("2018-01月月计划");
+		headers.add("开始时间：");
+		headers.add("结束时间：");
 		headers.add("计划类型(周计划/月计划/年计划)");
 		List<User> users = UserQuery.me().findByData(dataArea);
 	    // 声明一个工作薄
@@ -129,11 +129,27 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 	    // 创建表格标题行 第一行
 	    for(int i = 0 ;i<headers.size();i++ ) {
 	    	if(i<=3) {
-	    		Cell cell = sheet.createRow(i).createCell(1);
+	    		XSSFRow newRow = sheet.createRow(i);
+	    		Cell cell = newRow.createCell(1);
 	    		cell.setCellValue(headers.get(i));
 	    		cell.setCellStyle(ztStyle);
+	    		if(i==1) {
+	    			Cell cell_01 = newRow.createCell(2);
+	    			cell_01.setCellValue("2018/01/01");
+	    		}else if(i==2) {
+	    			Cell cell_02 = newRow.createCell(2);
+	    			cell_02.setCellValue("2018/01/31");
+	    		}else if(i==3) {
+	    			Cell cell_03 = newRow.createCell(2);
+	    			cell_03.setCellValue("月计划");
+	    		}else {
+	    			Cell cell_0 = newRow.createCell(2);
+	    			cell_0.setCellValue("请将时间清空重新填入");
+	    		}
 	    	}
 	    }
+	    //模板例子
+	   
 	    XSSFRow row_0 = sheet.createRow(4);
 	    for(int i = 0 ; i<users.size();i++) {
 	    	row_0.createCell(i+2).setCellValue(users.get(i).getId());
@@ -156,6 +172,9 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 	        Cell cell = rowP.createCell(1);
 	        cell.setCellValue(productRecords.get(i).getStr("custom_name")+" "+productRecords.get(i).getStr("valueName"));
 	        cell.setCellStyle(ztStyle);
+	        for(int j = 0;j<users.size() ; j++) {
+	        	rowP.createCell(j+2).setCellValue(0);
+	        }
 	    }
 	    File  file = new File(filePath);
 	    //文件输出流
