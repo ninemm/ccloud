@@ -72,7 +72,11 @@
 				{field: "custom_name", title: "计划产品", align: "center", width: '15%', edit: false},
 				{field: "plan_num", title: "计划量（件）", align: "center", width: '5%', edit: false},
 				{field: "complete_num", title: "实际量（件）", align: "center", width: '5%', edit: false},
-				{field: "complete_ratio", title: "完成情况", align: "center", width: '5%', edit: false}
+				{field: "complete_ratio", title: "完成情况", align: "center", width: '5%',
+					formatter: function(value, row, rowIndex) {
+						return value+"%";
+					},
+				 edit: false}
 			];
 		return fields;
 	}
