@@ -349,15 +349,15 @@ public class SalesOutstockQuery extends JBaseQuery {
 	
 	//应收账款
 	public Page<Record> paginateForReceivables(int pageNumber, int pageSize, String keyword, String userId,
-			String customerTypeId, String startDate, String endDate, String sellerId, String dataArea) {
-		String select = "select o.*, c.customer_name, ct.name as customerTypeName,o.total_amount-COALESCE(SUM(r.act_amount) , 0) AS balanceAmount ";
+			String customerTypeId, String startDate, String endDate, String isDone, String sellerId, String dataArea) {
+		String select = "select o.*, c.customer_name, ct.name as customerTypeName,o.total_amount - COALESCE(t.actAmount,0) AS balanceAmount ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_sales_outstock` o ");
 		fromBuilder.append(" LEFT JOIN cc_seller_customer cc ON o.customer_id = cc.id ");
 		fromBuilder.append(" LEFT JOIN cc_customer c on cc.customer_id = c.id ");
 		fromBuilder.append(" LEFT JOIN cc_customer_type ct on o.customer_type_id = ct.id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock cso ON o.id = cso.outstock_id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order cs ON cso.order_id = cs.id ");
-		fromBuilder.append(" LEFT JOIN cc_receiving r ON r.ref_sn=o.outstock_sn ");
+		fromBuilder.append(" LEFT JOIN (select r.ref_sn, SUM(r.act_amount) AS actAmount from cc_receiving r group by r.ref_sn)t ON t.ref_sn=o.outstock_sn ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 
@@ -388,7 +388,13 @@ public class SalesOutstockQuery extends JBaseQuery {
 			params.add(endDate);
 		}
 
-		fromBuilder.append("group by o.outstock_sn order by  o.create_date desc ");
+		if("1".equals(isDone)){
+			fromBuilder.append(" and o.total_amount = COALESCE(t.actAmount, 0)  ");
+		}else if("2".equals(isDone)){
+			fromBuilder.append(" and o.total_amount > COALESCE(t.actAmount, 0) ");
+		}
+
+		fromBuilder.append(" order by  o.create_date desc ");
 
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());

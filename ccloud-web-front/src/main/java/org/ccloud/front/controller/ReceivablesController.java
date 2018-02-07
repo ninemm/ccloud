@@ -74,9 +74,10 @@ public class ReceivablesController extends BaseFrontController {
 		String customerTypeId = getPara("customerTypeId");
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
+		String isDone = getPara("isDone","0");
 
 		Page<Record> outStockList = SalesOutstockQuery.me().paginateForReceivables(getPageNumber(), getPageSize(), keyword, userId,
-				customerTypeId, startDate, endDate, sellerId, selectDataArea);
+				customerTypeId, startDate, endDate, isDone, sellerId, selectDataArea);
 		Map<String, Object> map = new HashMap<>();
 		map.put("outStockList", outStockList.getList());
 		renderJson(map);
