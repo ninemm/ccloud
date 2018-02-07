@@ -146,19 +146,17 @@
 		
 		$loading.show();
 		$noMore.hide();
-
 		var params = getParam();
 		Utils.ajax('${CPATH}/order/orderList', params, 
 			function(data) {
 				$loading.hide();
-				
+				$("#orderCount").html(data.orderCount+" 单");
+				$("#orderAmount").html(data.orderAmount+" 元");				
 				if(data.orderList.length == 0) {
 					if($('.weui-panel').length == 0) $noMore.show();
 					loading = true;
 					return;
 				}
-				$("#orderCount").html(data.orderCount+"/单");
-				$("#orderAmount").html(data.orderAmount+"/元");
 
 				$.each(data.orderList, function(index, el) {
 	
@@ -421,7 +419,7 @@
             </div>
         </div>
         <div class="weui-flex__item">
-            <img src="${CTPATH}/images/customer.png" alt="">
+            <img src="${CTPATH}/images/money.png" alt="">
             <div>
                 <p class="ft16">订单总额</p>
                 <p class="ft14" id="orderAmount"></p>
