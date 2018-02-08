@@ -20,6 +20,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -406,5 +407,22 @@ public class _SalesRefundController extends JBaseCRUDController<SalesRefundInsto
 			}
 			
 			return stringBuilder.toString();
+		}
+		
+		public void initUser() {
+			String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);		
+			String startDate = getPara("startDate");
+			String endDate = getPara("endDate");
+			List<Map<String, Object>> userList = new ArrayList<>();
+			List<Record> list = SalesOutstockQuery.me().findUserList(sellerId, startDate, endDate);
+			for (Record record : list) {
+				Map<String, Object> item = new HashMap<>();
+				item.put("title", record.getStr("realname"));
+				item.put("value", record.getStr("id"));
+				userList.add(item);
+			}		
+			Map<String, Object> map = new HashMap<>();
+			map.put("userList", userList);		
+			renderJson(map);
 		}
 }

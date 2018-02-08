@@ -474,7 +474,8 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 					}else{
 							SellerProduct product = SellerProductQuery.me().findbyCustomerNameAndSellerIdAndProductId(sellerProduct.getCustomName(), getSessionAttr(Consts.SESSION_SELLER_ID).toString());
 							if(product!=null && !sellerProduct.getCustomName().equals(issellerProducts.getCustomName())) {
-								break;
+								renderAjaxResultForError("产品名重复");
+								return;
 							}
 							if(issellerProducts.getQrcodeUrl()!=null){
 								File file = new File(issellerProducts.getQrcodeUrl());
