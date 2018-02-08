@@ -261,7 +261,11 @@ public class InventoryQuery extends JBaseQuery {
 		if (StrKit.notBlank(warehouseId)) {
 			needWhere = appendIfNotEmpty(fromBuilder, "cc.warehouse_id", warehouseId, params, needWhere);
 		} else {
-			needWhere = appendIfNotEmpty(fromBuilder, "cc.warehouse_id", warehouseIds, params, needWhere);
+			if (warehouseIds == null) {
+				needWhere = appendIfNotEmpty(fromBuilder, "cc.warehouse_id", Consts.WAREHOUSE_IDS_IS_NULL, params, needWhere);
+			} else {
+				needWhere = appendIfNotEmpty(fromBuilder, "cc.warehouse_id", warehouseIds, params, needWhere);
+			}
 		}
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cs.custom_name", search, params, needWhere);
 		fromBuilder.append("GROUP BY cc.warehouse_id, cc.sell_product_id ORDER BY cc.create_date desc");
