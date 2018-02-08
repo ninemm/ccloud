@@ -602,7 +602,7 @@ public class _ReportController extends JBaseController {
 		renderJson(list);
 	}
 	
-	//我部门的业务员赠品商品详情
+	//我的客户详情
 	public void customerDetailsGiftReportList() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String userId = user.getId();

@@ -494,6 +494,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		}else {
 			fromBuilder.append(" and sd.is_gift=0 ");
 		}
+		fromBuilder.append(" and sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+")");
 		if (keyword.equals("sok.biz_date")) {
 			fromBuilder.append(" AND sd.out_count != 0");
 		}
@@ -533,6 +534,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" GROUP BY srid.sell_product_id,srid.refund_instock_id) t1 ON t1.refund_instock_id = sri.id AND t1.sell_product_id = sd.sell_product_id ");
 		fromBuilder.append(" WHERE so.biz_user_id='"+userId+"'");
 		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+") and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
+		fromBuilder.append(" and sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+")");
 		if (ifGift) {
 			fromBuilder.append(" and sd.is_gift=1 ");
 		}else {
@@ -576,6 +578,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN( SELECT srid.refund_instock_id , sum(srid.product_count) count , srid.sell_product_id FROM cc_sales_refund_instock_detail srid ");
 		fromBuilder.append(" GROUP BY srid.sell_product_id,srid.refund_instock_id) t1 ON t1.refund_instock_id = sri.id AND t1.sell_product_id = sd.sell_product_id ");
 		fromBuilder.append(" WHERE so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+") and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
+		fromBuilder.append(" and sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+")");
 		if (ifGift) {
 			fromBuilder.append(" and sd.is_gift=1 ");
 		}else {
@@ -622,6 +625,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN( SELECT srid.refund_instock_id , sum(srid.product_count) count , srid.sell_product_id FROM cc_sales_refund_instock_detail srid ");
 		fromBuilder.append(" GROUP BY srid.sell_product_id,srid.refund_instock_id) t1 ON t1.refund_instock_id = sri.id AND t1.sell_product_id = sd.sell_product_id ");
 		fromBuilder.append(" WHERE so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+") and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
+		fromBuilder.append(" and sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+")");
 		if (ifGift) {
 			fromBuilder.append(" and sd.is_gift=1 ");
 		}else {
@@ -671,6 +675,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" GROUP BY srid.sell_product_id,srid.refund_instock_id) t1 ON t1.refund_instock_id = sri.id AND t1.sell_product_id = sd.sell_product_id ");
 		fromBuilder.append(" WHERE sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
 		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
+		fromBuilder.append(" and sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+")");
 		if (ifGift) {
 			fromBuilder.append(" and sd.is_gift=1 ");
 		}else {
@@ -720,6 +725,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" GROUP BY srid.sell_product_id,srid.refund_instock_id) t1 ON t1.refund_instock_id = sri.id AND t1.sell_product_id = sd.sell_product_id ");
 		fromBuilder.append(" WHERE sc.customer_kind ="+Consts.CUSTOMER_KIND_SELLER);
 		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
+		fromBuilder.append(" and sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+")");
 		if (ifGift) {
 			fromBuilder.append(" and sd.is_gift=1 ");
 		}else {
@@ -759,16 +765,16 @@ public class SalesOrderQuery extends JBaseQuery {
 			String customName=record.getStr("custom_name");
 			String convertRelate = record.getStr("convert_relate");
 			String sellerProductId = record.getStr("id");
-			fromBuilder.append(" TRUNCATE((( sum( CASE sp.id WHEN '"+sellerProductId+"' THEN "+product_count+" ELSE 0 END)) -IFNULL((SELECT SUM(srid.product_count) FROM cc_sales_refund_instock sri");
-			fromBuilder.append(" LEFT JOIN cc_sales_refund_instock_detail srid ON srid.refund_instock_id = sri.id LEFT JOIN cc_sales_order_join_outstock sojo ON sri.outstock_id = sojo.outstock_id");
-			fromBuilder.append(" LEFT JOIN cc_sales_order so1 ON so1.id = sojo.order_id LEFT JOIN cc_sales_order_detail sd1 ON sd1.order_id=so1.id and sd1.sell_product_id=srid.sell_product_id WHERE");
-			fromBuilder.append(" srid.sell_product_id = '"+sellerProductId+"' AND srid.create_date <= '"+endDate);
+			fromBuilder.append(" TRUNCATE((( sum( CASE sp.id WHEN '"+sellerProductId+"' THEN "+product_count+" ELSE 0 END)) -IFNULL((SELECT sum(srid.product_count) from cc_sales_order so1");
+			fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so1.id = sojo.order_id LEFT JOIN cc_sales_refund_instock sri ON sri.outstock_id=sojo.outstock_id ");
+			fromBuilder.append(" LEFT JOIN cc_sales_order_detail sod ON sod.order_id=so1.id LEFT JOIN cc_sales_refund_instock_detail srid ON srid.refund_instock_id = sri.id AND srid.sell_product_id=sod.sell_product_id");
+			fromBuilder.append(" WHERE srid.sell_product_id ='"+sellerProductId+"' AND so1.create_date >='"+startDate+"' AND so1.create_date <= '"+endDate+"' and so1.seller_id=so.seller_id ");
 			if (ifGift) {
-				fromBuilder.append("' and sd.is_gift=1");
+				fromBuilder.append("and sod.is_gift=1");
 			}else {
-				fromBuilder.append("' and sd.is_gift=0");
+				fromBuilder.append("and sod.is_gift=0");
 			}
-			fromBuilder.append(" and sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+") AND so.id=so1.id GROUP BY srid.sell_product_id),0))/"+convertRelate+" , 2) '"+customName+"' ,");
+			fromBuilder.append(" and sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+")),0))/"+convertRelate+" , 2) '"+customName+"' ,");
 		}
 		fromBuilder.append("s.seller_name '直营商名称'");
 		fromBuilder.append(" FROM cc_sales_order so ");
@@ -808,16 +814,16 @@ public class SalesOrderQuery extends JBaseQuery {
 			String customName=record.getStr("custom_name");
 			String convertRelate = record.getStr("convert_relate");
 			String sellerProductId = record.getStr("id");
-			fromBuilder.append(" TRUNCATE((( sum( CASE sp.id WHEN '"+sellerProductId+"' THEN "+product_count+" ELSE 0 END)) -IFNULL((SELECT SUM(srid.product_count) FROM cc_sales_refund_instock sri");
-			fromBuilder.append(" LEFT JOIN cc_sales_refund_instock_detail srid ON srid.refund_instock_id = sri.id LEFT JOIN cc_sales_order_join_outstock sojo ON sri.outstock_id = sojo.outstock_id");
-			fromBuilder.append(" LEFT JOIN cc_sales_order so1 ON so1.id = sojo.order_id LEFT JOIN cc_sales_order_detail sd1 ON sd1.order_id=so1.id and sd1.sell_product_id=srid.sell_product_id WHERE");
-			fromBuilder.append(" srid.sell_product_id = '"+sellerProductId+"' AND srid.create_date <= '"+endDate);
+			fromBuilder.append(" TRUNCATE((( sum( CASE sp.id WHEN '"+sellerProductId+"' THEN "+product_count+" ELSE 0 END)) -IFNULL((SELECT sum(srid.product_count) from cc_sales_order so1");
+			fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so1.id = sojo.order_id LEFT JOIN cc_sales_refund_instock sri ON sri.outstock_id=sojo.outstock_id ");
+			fromBuilder.append(" LEFT JOIN cc_sales_order_detail sod ON sod.order_id=so1.id LEFT JOIN cc_sales_refund_instock_detail srid ON srid.refund_instock_id = sri.id AND srid.sell_product_id=sod.sell_product_id");
+			fromBuilder.append(" WHERE srid.sell_product_id ='"+sellerProductId+"' AND so1.create_date >='"+startDate+"' AND so1.create_date <= '"+endDate+"' and so1.biz_user_id=so.biz_user_id ");
 			if (ifGift) {
-				fromBuilder.append("' and sd.is_gift=1");
+				fromBuilder.append("and sod.is_gift=1");
 			}else {
-				fromBuilder.append("' and sd.is_gift=0");
+				fromBuilder.append("and sod.is_gift=0");
 			}
-			fromBuilder.append(" and sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+") AND so.id=so1.id GROUP BY srid.sell_product_id),0))/"+convertRelate+" , 2) '"+customName+"' ,");
+			fromBuilder.append(" and sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+")),0))/"+convertRelate+" , 2) '"+customName+"' ,");
 		}
 		fromBuilder.append("u.realname '业务员名称'");
 		fromBuilder.append(" FROM cc_sales_order so ");
@@ -856,16 +862,16 @@ public class SalesOrderQuery extends JBaseQuery {
 			String customName=record.getStr("custom_name");
 			String convertRelate = record.getStr("convert_relate");
 			String sellerProductId = record.getStr("id");
-			fromBuilder.append(" TRUNCATE((( sum( CASE sp.id WHEN '"+sellerProductId+"' THEN "+product_count+" ELSE 0 END)) -IFNULL((SELECT SUM(srid.product_count) FROM cc_sales_refund_instock sri");
-			fromBuilder.append(" LEFT JOIN cc_sales_refund_instock_detail srid ON srid.refund_instock_id = sri.id LEFT JOIN cc_sales_order_join_outstock sojo ON sri.outstock_id = sojo.outstock_id");
-			fromBuilder.append(" LEFT JOIN cc_sales_order so1 ON so1.id = sojo.order_id LEFT JOIN cc_sales_order_detail sd1 ON sd1.order_id=so1.id and sd1.sell_product_id=srid.sell_product_id WHERE");
-			fromBuilder.append(" srid.sell_product_id = '"+sellerProductId+"' AND srid.create_date <= '"+endDate);
+			fromBuilder.append(" TRUNCATE((( sum( CASE sp.id WHEN '"+sellerProductId+"' THEN "+product_count+" ELSE 0 END)) -IFNULL((SELECT sum(srid.product_count) from cc_sales_order so1");
+			fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so1.id = sojo.order_id LEFT JOIN cc_sales_refund_instock sri ON sri.outstock_id=sojo.outstock_id ");
+			fromBuilder.append(" LEFT JOIN cc_sales_order_detail sod ON sod.order_id=so1.id LEFT JOIN cc_sales_refund_instock_detail srid ON srid.refund_instock_id = sri.id AND srid.sell_product_id=sod.sell_product_id");
+			fromBuilder.append(" WHERE srid.sell_product_id ='"+sellerProductId+"' AND so1.create_date >='"+startDate+"' AND so1.create_date <= '"+endDate+"' and so1.customer_id=so.customer_id ");
 			if (ifGift) {
-				fromBuilder.append("' and sd.is_gift=1");
+				fromBuilder.append("and sod.is_gift=1");
 			}else {
-				fromBuilder.append("' and sd.is_gift=0");
+				fromBuilder.append("and sod.is_gift=0");
 			}
-			fromBuilder.append(" and sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+") AND so.id=so1.id GROUP BY srid.sell_product_id),0))/"+convertRelate+" , 2) '"+customName+"' ,");
+			fromBuilder.append(" and sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+")),0))/"+convertRelate+" , 2) '"+customName+"' ,");
 		}
 		fromBuilder.append("c.customer_name '客户名称',sc.id ");
 		fromBuilder.append(" FROM cc_sales_order so ");
