@@ -107,10 +107,15 @@ public class CustomerController extends BaseFrontController {
 		boolean visit = SecurityUtils.getSubject().isPermitted("/admin/customerVisit");
 		
 		Page<Record> customerList = new Page<>();
+		int customerOrderCount = 0;
 		if (StrKit.notBlank(getPara("region"))) {
 			String dataArea = UserQuery.me().findById(getPara("region")).getDataArea();
 			customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), dataArea, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"));
-		} else customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), selectDataArea, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"));
+			customerOrderCount = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), dataArea, getPara("customerType"), "0", getPara("searchKey")).getTotalRow();
+		} else {
+			customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), selectDataArea, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"));
+			customerOrderCount = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), selectDataArea, getPara("customerType"), "0", getPara("searchKey")).getTotalRow();
+		}
 
 		StringBuilder html = new StringBuilder();
 		for (Record customer : customerList.getList())
@@ -175,6 +180,7 @@ public class CustomerController extends BaseFrontController {
 		map.put("html", html.toString());
 		map.put("totalRow", customerList.getTotalRow());
 		map.put("totalPage", customerList.getTotalPage());
+		map.put("orderCount", customerOrderCount);
 		renderJson(map);
 	}
 
