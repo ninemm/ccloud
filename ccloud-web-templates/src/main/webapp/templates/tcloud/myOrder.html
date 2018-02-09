@@ -330,11 +330,14 @@
             success:function(data) {
             $.each(data.orderDetail, function(idx, item) {
                 var productName = "";
-                if(item.is_gift == 0){
-                    productName = item.custom_name;
-                }else{
+                if(item.is_composite == 1){
+                    productName = "<span class='ctag'>组合</span>";
+                    productName = productName + item.custom_name;                
+                }else if (item.is_gift == 1) {
                     productName = "<span class='tag'>赠品</span>";
                     productName = productName + item.custom_name;
+                } else {
+                	productName = item.custom_name;
                 }
                 var bigCount = parseInt(item.product_count/item.convert_relate);//下单大单位数量
                 var smallPrice = (item.product_amount/item.product_count).toFixed(2);//下单小价格

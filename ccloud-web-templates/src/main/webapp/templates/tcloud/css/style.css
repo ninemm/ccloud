@@ -1602,6 +1602,14 @@ input[name=sex] {
   margin-right: 0.25rem;
 }
 
+.ctag {
+  background: #1a9418;
+  color: #fff;
+  font-size: 0.6rem;
+  padding: 0.1rem 0.2rem;
+  margin-right: 0.25rem;
+}
+
 
 /* 订单详情 */
 
