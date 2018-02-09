@@ -141,4 +141,8 @@ public class DictQuery extends JBaseQuery {
 	public Dict findbyName(String name) {
 		return DAO.doFindFirst("dict.name=?", name);
 	}
+	
+	public Dict findByValue(String value) {
+		return DAO.doFindFirst("dict.value=?",value);
+	}
 }

@@ -28,9 +28,6 @@
 
 	$(function() {
 		jQuery.mm.initEditTable('#plans_table', url, initParams, initFields(), null);
-
-		jQuery.mm.initValidator('#form', validatorFields);
-		initCustomerType();
 	});
 
 	$("#search-submit").click(function() {
@@ -70,8 +67,8 @@
 				{field: "seller_name", title: "销售商名称", align: "center", width: '8%', edit: false},
 				{field: "realname", title: "业务员名称", align: "center", width: '5%', edit: false},
 				{field: "custom_name", title: "计划产品", align: "center", width: '15%', edit: false},
-				{field: "plan_num", title: "计划量（件）", align: "center", width: '5%', edit: false},
-				{field: "complete_num", title: "实际量（件）", align: "center", width: '5%', edit: false},
+				{field: "planNum", title: "计划量（件）", align: "center", width: '5%', edit: false},
+				{field: "completeNum", title: "实际量（件）", align: "center", width: '5%', edit: false},
 				{field: "complete_ratio", title: "完成情况", align: "center", width: '5%',
 					formatter: function(value, row, rowIndex) {
 						return value+"%";
@@ -80,9 +77,10 @@
 			];
 		return fields;
 	}
-
-
-	
+	function batchDown(){
+		jQuery.mm.down("${CPATH}/admin/plans/downloading?type="+$("#planType option:selected").val()+"&&k="+$("#search").val());
+		window.event.returnValue=false; 
+	}
 </#macro>
 
 <@layout active_id=p child_active_id=c>
@@ -99,15 +97,12 @@
 <section class="content">
 	<div class="row content-row">
 	    <form class="form-horizontal" role="form" id="form">
-			<div class="validata-box">
-				<input type="hidden" name="userIds" id="userIds" value="">
-			</div>
-
 			 <div class="form-group">
                 <div class="col-sm-4">
 					<@shiro.hasPermission name="/admin/sellerCustomer/uploading, /admin/dealer/all, /admin/all">
 						<a href="${CPATH}/admin/plans/upload?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-upload"></i> 导入</a>
 					</@shiro.hasPermission>
+					<button onclick="batchDown()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-download"></i> 导出</button>
 				</div>
 				<div class="col-sm-4">
 					<label class="control-label col-sm-4">计划类型:</label>

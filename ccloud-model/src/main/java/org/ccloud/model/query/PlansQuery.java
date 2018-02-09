@@ -52,7 +52,7 @@ public class PlansQuery extends JBaseQuery {
 	
 	
 	public Page<Plans> paginate(int pageNumber, int pageSize, String keyword, String orderby, String dataArea,String type) {
-		String select = "SELECT cp.*,cs.seller_name,u.realname,csp.custom_name  ";
+		String select = "SELECT cp.user_id,cp.type,cp.seller_product_id,cp.start_date,cp.end_date,cs.seller_name,u.realname,csp.custom_name ,sum(plan_num) as planNum, sum(complete_num) as completeNum ,cp.complete_ratio  ";
 		StringBuilder fromBuilder = new StringBuilder("FROM cc_plans cp  ");
 		fromBuilder.append("LEFT JOIN cc_seller cs on cs.dept_id = cp.dept_id ");
 		fromBuilder.append("LEFT JOIN `user` u on u.id = cp.user_id ");
@@ -69,7 +69,9 @@ public class PlansQuery extends JBaseQuery {
 		if(!type.equals("")) {
 			fromBuilder.append(" and cp.type = '"+type+"' ");
 		}
-		fromBuilder.append("and cp.data_area like '"+dataArea+"'  order by "+orderby+" ");
+		fromBuilder.append("and cp.data_area like '"+dataArea+"' ");
+		fromBuilder.append("GROUP BY cp.seller_id,cp.user_id, cp.type, cp.seller_product_id ,cp.start_date,cp.end_date ");
+		fromBuilder.append("order by cp.type,cp.start_date desc,cp.end_date desc ,cp.user_id");
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 

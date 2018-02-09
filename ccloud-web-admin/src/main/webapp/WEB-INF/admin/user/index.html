@@ -210,28 +210,10 @@ function saveGroup() {
 		}
 	});
 	function batchDown(){
-		jQuery.mm.down('${CPATH}/admin/user/downloading?k='+$('#search').val());
+		jQuery.mm.down('${CPATH}/admin/user/downloading');
+		window.event.returnValue=false; 
 	}
 	
-	/*function leave(id){
-		$.ajax({
-			url:"${CPATH}/admin/user/send",
-			type:"post",
-			data:{"id":id},
-			dataType:"json",
-			success:function(data) {
-				if(data.errorCode == 0) {
-					toastr.success(data.message, '操作成功');
-					setTimeout( function(){
-						location.reload();
-								}, 2 * 1000 );
-				} else {
-					toastr.error(data.message,'操作失败');
-				}			
-			}
-		});
-	
-	}*/
 </#macro>
 
 <@layout active_id=p child_active_id=c>
