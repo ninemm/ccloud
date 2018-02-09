@@ -345,9 +345,6 @@ public class SalesOrderQuery extends JBaseQuery {
 			outOrderStatus = Consts.SALES_OUT_STOCK_STATUS_PART_OUT;
 		}
 		salesOrder.setModifyDate(date);
-		if (salesOrder.getPrintTime() == null) {
-			salesOrder.setPrintTime(new Date());
-		}
 		if (!SalesOutstockQuery.me().updateStatus(outStockId, userId, outOrderStatus, date, total) || !salesOrder.update()) {
 			return false;
 		}
@@ -2103,6 +2100,14 @@ public class SalesOrderQuery extends JBaseQuery {
 			return Db.findFirst(fromBuilder.toString());
 
 		return Db.findFirst(fromBuilder.toString(), params.toArray());
+	}
+
+	public SalesOrder findByOutstockId(String s) {
+		StringBuilder fromBuilder = new StringBuilder("SELECT * from cc_sales_outstock sok ");
+		fromBuilder.append("LEFT JOIN cc_sales_order_join_outstock sojo ON sojo.outstock_id=sok.id ");
+		fromBuilder.append("LEFT JOIN cc_sales_order so ON so.id=sojo.order_id ");
+		fromBuilder.append("WHERE sok.id= '"+s+"'");
+		return DAO.findFirst(fromBuilder.toString());
 	}
 
  }

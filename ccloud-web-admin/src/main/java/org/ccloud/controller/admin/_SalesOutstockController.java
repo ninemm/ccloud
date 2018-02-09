@@ -271,6 +271,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		}
 	}
 
+	//出库单打印
 	public void recordPrintInfo() {
 		String outstockId = getPara("outstockId");
 		String[] outId = outstockId.split(",");
@@ -279,6 +280,12 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 			printAllNeedInfo printAllNeedInfo = SalesOutstockQuery.me().findStockOutForPrint(s);
 			printAllNeedInfos.add(printAllNeedInfo);
 			updateStockOutPrintStatus(printAllNeedInfo);
+			//更新订单打印时间
+			SalesOrder salesOrder = SalesOrderQuery.me().findByOutstockId(s);
+			if (salesOrder.getPrintTime() == null) {
+				salesOrder.setPrintTime(new Date());
+			}
+			salesOrder.update();
 		}
 		boolean saveOutStockPrint = saveOutStockPrint(printAllNeedInfos);
 		if (saveOutStockPrint) {
@@ -286,7 +293,9 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 			result.put("result", 200);
 			renderJson(result);
 		}
-
+		
+		
+		
 	}
 
 	@Before(Tx.class)
