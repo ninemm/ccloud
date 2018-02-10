@@ -95,13 +95,20 @@
 				}
 		
 				$.each(data.planList, function(index, el) {
-		
 					$planList.append(newHtml);
+					 var old = index-1;
 					var $newPlan = $planList.find(".plan-list-box:last");
-					$newPlan.find("#userName").text(el.realname);
-					$newPlan.find("#typeName").text(el.typeName);
-					$newPlan.find("#startDate").text(el.start_date);
-					$newPlan.find("#endDate").text(el.end_date);
+					var plans = data.planList[old];
+					
+					if((plans==null) || (plans.realname!=el.realname || 
+							plans.typeName !=el.typeName || 
+							plans.start_date!=el.start_date || 
+							plans.end_date != el.end_date)){
+						$newPlan.find("#userName").text(el.realname);
+						$newPlan.find("#typeName").text(el.typeName);
+						$newPlan.find("#startDate").text('开始时间：'+el.start_date);
+						$newPlan.find("#endDate").text('结束时间：'+el.end_date);
+					}
 					$newPlan.find("#productName").text(el.custom_name);
 					$newPlan.find("#planNum").text(el.plan_num);
 					$newPlan.find("#completeNum").text(el.complete_num);
@@ -177,12 +184,12 @@
 									<span id="userName"></span>
 									<span class="fr orange ft12" id="typeName"></span>
 								</div>
-								<div class="weui-flex gray ft12">
-									<div class="weui-flex__item">开始时间：
+								<div class="weui-flex gray ft12 startEnd">
+									<div class="weui-flex__item">
 										<span id="startDate"></span>
 									</div>
 									<span style="width:1rem" class="t-c">-</span>
-									<div class="weui-flex__item t-r">结束时间：
+									<div class="weui-flex__item t-r">
 										<span id="endDate"></span>
 									</div>
 								</div>
