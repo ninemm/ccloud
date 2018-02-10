@@ -10,12 +10,14 @@
 	<meta content="email=no" name="format-detection">
 </head>
 
-<body>
+<body onload="timeOut()">
 	
 </body>
 <script src="${CTPATH}/js/jquery-3.2.1.min.js"></script>
 <script>
-	window.onload=function(WeixinJSBridge.call('closeWindow')); 
+	function timeOut(){
+		WeixinJSBridge.call('closeWindow');
+	}
 </script>
 
 </html>
