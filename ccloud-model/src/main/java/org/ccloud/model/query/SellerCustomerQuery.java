@@ -105,7 +105,12 @@ public class SellerCustomerQuery extends JBaseQuery {
 			}
 
 		fromBuilder.append("  GROUP BY sc.id ");
-		fromBuilder.append(" order by "+sort+" "+ sortOrder);
+		if(!sort.equals("")) {
+			fromBuilder.append(" order by "+sort);
+			if(!sortOrder.equals("")) {
+				fromBuilder.append(" "+ sortOrder);
+			}
+		}
 
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
