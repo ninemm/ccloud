@@ -9,13 +9,17 @@
 	<meta content="telephone=no" name="format-detection">
 	<meta content="email=no" name="format-detection">
 </head>
-
 <body>
-	
 </body>
 <script src="${CTPATH}/js/jquery-3.2.1.min.js"></script>
 <script>
-	window.onload(WeixinJSBridge.call('closeWindow')); 
+	$(function(){
+		timeOut();
+	});
+	
+	function timeOut(){
+		WeixinJSBridge.call('closeWindow');
+	}
 </script>
 
 </html>

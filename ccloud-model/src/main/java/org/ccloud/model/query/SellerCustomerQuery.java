@@ -105,7 +105,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 			}
 
 		fromBuilder.append("  GROUP BY sc.id ");
-		if(!sort.equals("")) {
+		if(StrKit.notBlank(sort)) {
 			fromBuilder.append(" order by "+sort);
 			if(!sortOrder.equals("")) {
 				fromBuilder.append(" "+ sortOrder);

@@ -11,13 +11,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.Maps;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
-import org.ccloud.model.ActivityApply;
 import org.ccloud.model.CustomerType;
 import org.ccloud.model.Dict;
 import org.ccloud.model.User;
