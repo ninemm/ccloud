@@ -12,7 +12,16 @@
 	</p>
 	<form action="${CPATH}/admin/option/save" method="POST" id="form">
 		<input type="hidden" name="ucode" value="${ucode}">
-        <input type="hidden" name="autosave" value="seller_store_check_${(session.sellerCode)!},web_order_price_edit_${(session.sellerCode)!},web_order_mix_gift_${(session.sellerCode)!},web_procedure_review_${(session.sellerCode)!},web_procedure_review_edit_${(session.sellerCode)!},web_proc_customer_review_${(session.sellerCode)!},web_proc_customer_visit_${(session.sellerCode)!},web_proc_activity_apply_${(session.sellerCode)!}">
+		<#assign common = "seller_store_check_${(session.sellerCode)!},web_order_price_edit_${(session.sellerCode)!},web_order_mix_gift_${(session.sellerCode)!},web_procedure_review_${(session.sellerCode)!},web_procedure_review_edit_${(session.sellerCode)!},web_proc_customer_review_${(session.sellerCode)!},web_proc_customer_visit_${(session.sellerCode)!},web_proc_activity_apply_${(session.sellerCode)!}"/>
+		<#assign dataUpload = ""/>
+		<#list customerTypeList as customerType>
+			<#if customerType_index == 0>
+				<#assign dataUpload = "data_upload_customer_type_${(customerType.id)!}">
+			<#else>
+				<#assign dataUpload = dataUpload + "," + "data_upload_customer_type_${(customerType.id)!}">
+			</#if>
+		</#list>
+        <input type="hidden" name="autosave" value="${common + ',' + dataUpload}">
         
 		<div class="row">
 			<div class="col-xs-12">
@@ -133,6 +142,24 @@
 				</ul>
 			</div>
 			<!-- /.box -->
+			<div class="col-xs-12">
+				<h4 class="jp-set-title">数据上传选项</h4>
+				<ul class="list-unstyled">
+					<li class="jp-set-pad">
+						<div class="col-sm-3 ">
+							<div class="  jp-set-title-line jp-set-info ">客户类型</div>
+						</div>
+						<div class="col-sm-9  jp-set-title-line">
+							<div class="col-sm-6 jp-table-distance-top ">
+								<#list customerTypeList as customerType>
+									<label><input type="checkbox" value="true" name="data_upload_customer_type_${(customerType.id)!}" ${OPTION_CHECKED('data_upload_customer_type_${(customerType.id)!}')}> ${(customerType.name)!} </label>
+								</#list>
+							</div>
+						</div>
+						<div class="clr"></div>
+					</li>
+				</ul>
+			</div>
 		</div>
 		<div class="row">
 			<div class="col-xs-12">
