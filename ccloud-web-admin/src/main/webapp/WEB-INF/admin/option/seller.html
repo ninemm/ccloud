@@ -12,7 +12,7 @@
 	</p>
 	<form action="${CPATH}/admin/option/save" method="POST" id="form">
 		<input type="hidden" name="ucode" value="${ucode}">
-        <input type="hidden" name="autosave" value="seller_store_check_${(session.sellerCode)!},web_order_price_edit_${(session.sellerCode)!},web_procedure_review_${(session.sellerCode)!},web_procedure_review_edit_${(session.sellerCode)!},web_proc_customer_review_${(session.sellerCode)!},web_proc_customer_visit_${(session.sellerCode)!},web_proc_activity_apply_${(session.sellerCode)!}">
+        <input type="hidden" name="autosave" value="seller_store_check_${(session.sellerCode)!},web_order_price_edit_${(session.sellerCode)!},web_order_mix_gift_${(session.sellerCode)!},web_procedure_review_${(session.sellerCode)!},web_procedure_review_edit_${(session.sellerCode)!},web_proc_customer_review_${(session.sellerCode)!},web_proc_customer_visit_${(session.sellerCode)!},web_proc_activity_apply_${(session.sellerCode)!}">
         
 		<div class="row">
 			<div class="col-xs-12">
@@ -35,7 +35,18 @@
 						</div>
 						<div class="col-sm-9  jp-set-title-line">
 							<div class="col-sm-6 jp-table-distance-top ">
-								<label><input type="checkbox" value="true" name="web_order_price_edit_${(session.sellerCode)!}" ${OPTION_CHECKED('web_procedure_review_${(session.sellerCode)!}')}> 开启下单修改价格功能 </label>
+								<label><input type="checkbox" value="true" name="web_order_price_edit_${(session.sellerCode)!}" ${OPTION_CHECKED('web_order_price_edit_${(session.sellerCode)!}')}> 开启下单修改价格功能 </label>
+							</div>
+						</div>
+						<div class="clr checkbox"></div>
+					</li>
+					<li class="jp-set-pad">
+						<div class="col-sm-3 ">
+							<div class="  jp-set-title-line jp-set-info ">下单混合赠品</div>
+						</div>
+						<div class="col-sm-9  jp-set-title-line">
+							<div class="col-sm-6 jp-table-distance-top ">
+								<label><input type="checkbox" value="true" name="web_order_mix_gift_${(session.sellerCode)!}" ${OPTION_CHECKED('web_order_mix_gift_${(session.sellerCode)!}')}> 开启下单混合赠品功能 </label>
 							</div>
 						</div>
 						<div class="clr checkbox"></div>

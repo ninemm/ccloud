@@ -51,7 +51,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 
 	public Record findMoreById(final String id) {
 		StringBuilder fromBuilder = new StringBuilder(
-				" select o.*, sa.biz_user_id as order_user, sa.create_date as order_date, cs.customer_kind, c.id as customerId, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as customerTypeCode, u.realname, u.mobile ");
+				" select o.*, sa.biz_user_id as order_user, sa.create_date as order_date, sa.activity_apply_id, cs.customer_kind, c.id as customerId, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as customerTypeCode, u.realname, u.mobile ");
 		fromBuilder.append(" ,w.code as warehouseCode, cp.factor ");
 		fromBuilder.append(" from `cc_sales_outstock` o ");
 		fromBuilder.append(" left join cc_sales_order_join_outstock co ON co.outstock_id = o.id ");
@@ -406,7 +406,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 	
 	public printAllNeedInfo findStockOutForPrint(final String id) {
 		StringBuilder fromBuilder = new StringBuilder("select o.outstock_sn,o.receive_type,o.remark as stockOutRemark,o.delivery_address,o.total_amount, cs.customer_kind, cs.id as customerId, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as customerTypeCode, u.realname, u.mobile, ");
-		fromBuilder.append(" w.code as warehouseCode, cp.factor,w.`name` as warehouseName,w.phone as warehousePhone,o.create_date as placeOrderTime,so.remark,sn.seller_name,so.total_amount,so.id as orderId,so.biz_user_id,o.id as salesOutStockId,sn.id as sellerId,pt.context as printFootContext ");
+		fromBuilder.append(" w.code as warehouseCode, cp.factor,w.`name` as warehouseName,w.phone as warehousePhone,o.create_date as placeOrderTime,so.remark,sn.seller_name,so.total_amount,so.id as orderId,so.biz_user_id, so.activity_apply_id, o.id as salesOutStockId,sn.id as sellerId,pt.context as printFootContext ");
 		fromBuilder.append(" from `cc_sales_outstock` o ");
 		fromBuilder.append(" left join cc_seller_customer cs on o.customer_id = cs.id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sj on sj.outstock_id = o.id ");
@@ -438,6 +438,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 			printAllNeedInfo.setPlaceOrderTime(record.getDate("placeOrderTime"));
 			printAllNeedInfo.setOrderId(record.getStr("orderId"));
 			printAllNeedInfo.setBizUserId(record.getStr("biz_user_id"));
+			printAllNeedInfo.setActivityApplyId(record.getStr("activity_apply_id"));
 			printAllNeedInfo.setCustomerId(record.getStr("customerId"));
 			printAllNeedInfo.setStockOutRemark(record.getStr("stockOutRemark"));
 			printAllNeedInfo.setReceiveType(record.getInt("receive_type"));

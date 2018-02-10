@@ -301,6 +301,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 			public boolean run() throws SQLException {
 				String order_user = StringUtils.getArrayFirst(paraMap.get("order_user"));
 				String order_date = StringUtils.getArrayFirst(paraMap.get("order_date"));
+				String activity_apply_id = StringUtils.getArrayFirst(paraMap.get("activity_apply_id"));
 				String deptId = StringUtils.getArrayFirst(paraMap.get("deptId"));
 				String dataArea = StringUtils.getArrayFirst(paraMap.get("dataArea"));
 				String outStockId = StringUtils.getArrayFirst(paraMap.get("salesStockId"));
@@ -367,6 +368,15 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 
 					}
 
+				}
+
+				//如果有活动关联
+				if (StrKit.notBlank(activity_apply_id) && (!Consts.SALES_ORDER_ACTIVITY_APPLY_ID_OTHER.equals(activity_apply_id))){
+					ActivityApply activityApply = ActivityApplyQuery.me().findById(activity_apply_id);
+					activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_END);
+					if(!activityApply.update()){
+						return false;
+					}
 				}
 
 				return true;
@@ -478,6 +488,15 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 
 						if (!PurchaseInstockDetailQuery.me().insertByBatchSalesOrder(orderProductInfos,
 								purchaseInstockId, seller, date, getRequest())) {
+							return false;
+						}
+					}
+
+					//如果有活动关联
+					if (StrKit.notBlank(printAllNeedInfo.getActivityApplyId()) && (!Consts.SALES_ORDER_ACTIVITY_APPLY_ID_OTHER.equals(printAllNeedInfo.getActivityApplyId()))){
+						ActivityApply activityApply = ActivityApplyQuery.me().findById(printAllNeedInfo.getActivityApplyId());
+						activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_END);
+						if(!activityApply.update()){
 							return false;
 						}
 					}

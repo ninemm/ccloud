@@ -253,6 +253,9 @@ public class SalesOrderQuery extends JBaseQuery {
 		salesOrder.setStatus(Consts.SALES_ORDER_STATUS_DEFAULT);// 待审核
 		String total = StringUtils.getArrayFirst(paraMap.get("total"));
 		String type = StringUtils.getArrayFirst(paraMap.get("receiveType"));
+		String isAllGift = StringUtils.getArrayFirst(paraMap.get("isAllGift"));
+		salesOrder.setIsGift(Integer.valueOf(isAllGift));
+		salesOrder.setActivityApplyId(StringUtils.getArrayFirst(paraMap.get("activityId")));
 		salesOrder.setTotalAmount(new BigDecimal(total));
 		salesOrder.setReceiveType(StringUtils.isNumeric(type) ? Integer.parseInt(type) : 1);
 		salesOrder.setDeliveryAddress(StringUtils.getArrayFirst(paraMap.get("deliveryAddress")));

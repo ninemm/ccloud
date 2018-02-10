@@ -13,7 +13,7 @@
 	#order .gift input::-webkit-input-placeholder {
 		text-align: center;
 	}
-	#deliveryDate, #customerTypeName, #discount {
+	#deliveryDate, #customerTypeName, #discount, #receiveTypeName, #activityName {
 		text-align: right;
 		width: 70%;
 	}
@@ -69,6 +69,21 @@ $(function() {
 		$.toptip("请选择客户", 'warning'); 
 		return;
 	}
+	<#if !isMix>
+		var productList = getItemBykey("productList");
+		var mix = false;
+		var isGift = productList[0].isGift;
+		$.each(productList, function(index, el){
+			if(isGift != el.isGift || (isGift == 0 && el.subProduct[0].sellProductId != "")){
+				mix = true;
+				return;
+			}
+		});
+		if (mix) {
+		  	$.toptip("该帐套未开启赠品混下功能，请单独下赠品", 'warning');
+			return;
+		}
+	</#if>
 	
 	
 //	if (!checkStore()) {
@@ -83,33 +98,48 @@ $(function() {
 		window.location.href = '${CPATH}/product/customerNearbyChose';
   }).on("click","#shoppingCart",function(){
 		window.location.href = '${CPATH}/product/shoppingCart';
-  }).on("change", "#receiveType", function(){
-		var isCheck = $(this).is(':checked');
-		var products = $(".common");
-		var productList = getItemBykey("productList");
-		$.each(productList, function(index, el) {
-			var $productDetail = products.eq(index);
-			if (isCheck) {
-				$productDetail.find("#bigPrice").val(el.bigAccountPrice);
-				$productDetail.find("#smallPrice").val(el.smallAccountPrice);
-			} else {
-				$productDetail.find("#bigPrice").val(el.bigPrice);
-				$productDetail.find("#smallPrice").val(el.smallPrice);
-			}
-		});
-		
-		var $remark = $("#remark");
-		var re = $remark.val();
-		if (isCheck && re.indexOf("账期") == -1) {
-			$remark.val("账期 " + re);
-		} else if ((!isCheck) && re.indexOf("账期") != -1) {
-			$remark.val(re.replace(/账期 /g, ""));
-		}
-
-		total();
   });
-
+  checkIsAllGift();
   initCustomer();
+
+  var $receiveTypeName = $("#receiveTypeName");
+  $receiveTypeName.select({
+		title: "收款方式",
+		items: [{
+			title: "现结", value: "1"
+		},{
+			title: "账期", value: "0"
+		}],
+		onChange: function(data) {
+			$("#receiveType").val(data.values);
+
+			var products = $(".common");
+			var productList = getItemBykey("productList");
+			$.each(productList, function(index, el) {
+				var $productDetail = products.eq(index);
+				if (data.values == '0') {
+					$productDetail.find("#bigPrice").val(el.bigAccountPrice);
+					$productDetail.find("#smallPrice").val(el.smallAccountPrice);
+				} else {
+					$productDetail.find("#bigPrice").val(el.bigPrice);
+					$productDetail.find("#smallPrice").val(el.smallPrice);
+				}
+			});
+			
+			var $remark = $("#remark");
+			var re = $remark.val();
+			if (data.values == '0' && re.indexOf("账期") == -1) {
+				$remark.val("账期 " + re);
+			} else if ((data.values != '0') && re.indexOf("账期") != -1) {
+				$remark.val(re.replace(/账期 /g, ""));
+			}
+			
+			total();
+		}
+  });
+  $receiveTypeName.val("现结");
+  $receiveTypeName.attr('data-values', "1");
+
   $("#deliveryDate").calendar();
 
   $product.empty();
@@ -140,11 +170,27 @@ $(function() {
         closeCombinSearch();
   });
    combo();
-})
+});
 	var $form = $('#form');
 	var newHtml = $(".common").eq(0).html();
 	var $product = $("#productList");
 	var customerTypeInfoMap = [];
+
+	function checkIsAllGift(){
+		var compositionList = getItemBykey("compositionList") == undefined ? [] : getItemBykey("compositionList");
+		if(compositionList.length > 0){
+			$("#isAllGift").val(0)
+			return;
+		}
+
+		var productList = getItemBykey("productList");
+		$.each(productList, function(index, el){
+			if(el.isGift == 0){
+				$("#isAllGift").val(0)
+				return;
+			}
+		});
+	}
 
 	function initCustomer(){
 		var customerInfo = getItemBykey("customerInfo");
@@ -157,72 +203,121 @@ $(function() {
 
 			$("#deliveryAddress").val(customerInfo.address);
 			
-			Utils.ajax('${CPATH}/product/customerTypeById', {"customerId" : customerInfo.sellerCustomerId}, 
+			Utils.ajax('${CPATH}/product/customerTypeById', {"customerId" : customerInfo.sellerCustomerId},
 				function(data){
-					var items = [];
-					$.each(data, function(index, el) {
-						customerTypeInfoMap[el.id] = {
-							id : el.id,
-							name : el.name,
-							code : el.code,
-							factor : el.factor,
-							proc_def_key : el.proc_def_key
-						}
-						
-						items.push({
-							title : el.name,
-							value : el.id,
-							factor : el.factor
-						})
-					});
-
-					var $customerTypeName = $("#customerTypeName");
-					var $discount = $("#discount");
-					if($customerTypeName.data('values') === undefined){
-						$customerTypeName.select({
-					         title: "客户类型",
-					         items: items,
-					         onChange: function(data) {
-					         	$("#customerType").val(customerTypeInfoMap[data.values].id);
-						        $("#customerTypeCode").val(customerTypeInfoMap[data.values].code);
-						        if (customerTypeInfoMap[data.values].factor) {
-						        	$("#pricedis").show();
-						        	$("#discount").val(customerTypeInfoMap[data.values].factor*10+"折");
-						        } else {
-						        	$("#pricedis").hide();
-						        	$("#discount").val('无');
-						        }						        
-						        $("#factor").val(customerTypeInfoMap[data.values].factor);
-						        $("#proc_def_key").val(customerTypeInfoMap[data.values].proc_def_key);
-						        total();
-					         }
-				        });
-			        }else{
-			        	$customerTypeName.select("update", {items : items})
-			        }
-			        if (items[0].factor) {
-			        	$("#pricedis").show();
-			        	$discount.val(items[0].factor*10+"折");
-			        	$("#factor").val(items[0].factor);
-			        } else {
-			        	$("#pricedis").hide();
-			        	$discount.val('无');
-			        }			        
-			        total();
-			        $customerTypeName.val(items[0].title);
-			        $customerTypeName.attr('data-values', items[0].value);
-	
-			        $("#customerType").val(customerTypeInfoMap[items[0].value].id);
-			        $("#customerTypeCode").val(customerTypeInfoMap[items[0].value].code);
-			        $("#factor").val(customerTypeInfoMap[items[0].value].factor);
-			        $("#proc_def_key").val(customerTypeInfoMap[items[0].value].proc_def_key);
+					initCustomerType(data);
 				}
 			);
+
+			if($("#isAllGift").val() == 1){
+				$("#activityApply").show();
+				Utils.ajax('${CPATH}/product/activityApplyById', {"customerId" : customerInfo.sellerCustomerId},
+					function(data){
+						initActivityApply(data);
+					}
+				);
+			}else{
+				$("#activityApply").hide();
+			}
 		}
 	
 	}
 
+	function initCustomerType(customerTypeList){
+		var items = [];
+		$.each(customerTypeList, function(index, el) {
+			customerTypeInfoMap[el.id] = {
+				id : el.id,
+				name : el.name,
+				code : el.code,
+				factor : el.factor,
+				proc_def_key : el.proc_def_key
+			}
+			
+			items.push({
+				title : el.name,
+				value : el.id,
+				factor : el.factor
+			});
+		});
+
+		var $customerTypeName = $("#customerTypeName");
+		var $discount = $("#discount");
+		if($customerTypeName.data('values') === undefined){
+			$customerTypeName.select({
+				 title: "客户类型",
+				 items: items,
+				 onChange: function(data) {
+					$("#customerType").val(customerTypeInfoMap[data.values].id);
+					$("#customerTypeCode").val(customerTypeInfoMap[data.values].code);
+					if (customerTypeInfoMap[data.values].factor) {
+						$("#pricedis").show();
+						$("#discount").val(customerTypeInfoMap[data.values].factor*10+"折");
+					} else {
+						$("#pricedis").hide();
+						$("#discount").val('无');
+					}
+					$("#factor").val(customerTypeInfoMap[data.values].factor);
+					$("#proc_def_key").val(customerTypeInfoMap[data.values].proc_def_key);
+					total();
+				 }
+			});
+		}else{
+			$customerTypeName.select("update", {items : items})
+		}
+		if (items[0].factor) {
+			$("#pricedis").show();
+			$discount.val(items[0].factor*10+"折");
+			$("#factor").val(items[0].factor);
+		} else {
+			$("#pricedis").hide();
+			$discount.val('无');
+		}
+		total();
+		$customerTypeName.val(items[0].title);
+		$customerTypeName.attr('data-values', items[0].value);
+
+		$("#customerType").val(customerTypeInfoMap[items[0].value].id);
+		$("#customerTypeCode").val(customerTypeInfoMap[items[0].value].code);
+		$("#factor").val(customerTypeInfoMap[items[0].value].factor);
+		$("#proc_def_key").val(customerTypeInfoMap[items[0].value].proc_def_key);
+
+	}
+
+	function initActivityApply(activityApplyList){
+		var items = [];
+		$.each(activityApplyList, function(index, el) {
+			items.push({
+				title : el.title,
+				value : el.id
+			});
+		});
+
+		items.push({
+			title : "其他活动",
+			value : "1001"
+		});
+
+		var $activityName =$("#activityName");
+		if($activityName.data('values') === undefined){
+			$activityName.select({
+				title: "参加活动",
+				items: items,
+				onChange: function(data) {
+					$("#activityId").val(data.values);
+				}
+			});
+		}else{
+			$activityName.select("update", {items : items})
+		}
+
+		$activityName.val(items[0].title);
+		$activityName.attr('data-values', items[0].value);
+		$("#activityId").val(items[0].value);
+	}
+
 	function initProduct(){
+		
 		var productList = getItemBykey("productList");
 		$.each(productList, function(index, el) {
 			$product.append("<div class='weui-panel weui-panel_access goods-detail common'>" + newHtml + "</div>");
@@ -555,7 +650,30 @@ $(function() {
 							</div>
 							<input type="text" class="weui-input" id="discount" value="无" readonly>
 						</div>
-					</div>					
+					</div>
+					<div class="weui-cell weui-cell_access" style="display: none" id="activityApply">
+						<div class="weui-cell__bd select-area">
+							<div class="order-customer-info-title">
+								参与活动
+								<span class="require">*</span>
+							</div>
+							<input type="hidden" id="activityId" name="activityId" value="">
+							<input type="text" placeholder="请选择参与活动" class="weui-input" id="activityName" name="activityName" value="" readonly>
+							<span class="weui-cell__ft"></span>
+						</div>
+					</div>
+					<div class="weui-cell weui-cell_access">
+						<div class="weui-cell__bd select-area">
+							<div class="order-customer-info-title">
+								收款方式
+								<span class="require">*</span>
+							</div>
+							<input type="hidden" id="receiveType" name="receiveType" value="1">
+							<input type="text" placeholder="请选择收款方式" class="weui-input" id="receiveTypeName" name="receiveTypeName" value="" readonly>
+							<span class="weui-cell__ft"></span>
+						</div>
+					</div>
+
 				</section>
 				<section class="weui-panel weui-panel_access delivery-info">
 					<div class="weui-cell weui-cell_access">
@@ -565,14 +683,6 @@ $(function() {
 							</div>
 							<input type="text" class="weui-input" data-toggle='date' id="deliveryDate" name="deliveryDate" value="${deliveryDate!}" readonly>
 							<span class="weui-cell__ft"></span>
-						</div>
-					</div>
-				</section>
-				<section class="weui-panel weui-panel_access ft14">
-					<div class="weui-cell weui-cell_access">
-						<div class="weui-cell__bd" style="justify-content:flex-start">
-							<input type="checkbox" id="receiveType" name="receiveType" value="0" style="margin-right:.5rem;margin-top:.7rem" class="weui-agree__checkbox"> 
-							<label for="receiveType">是否账期</label>
 						</div>
 					</div>
 				</section>
@@ -681,6 +791,7 @@ $(function() {
 						<input type="hidden" id="rowTotal" name="rowTotal" value="">
 					</div>
 				</div>
+				<input type="hidden" id="isAllGift" name="isAllGift" value="1">
 				<input type="hidden" id="total" name="total" value="">
 				<input type="hidden" id="totalNum" name="totalNum" value="">
 			</main>

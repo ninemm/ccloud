@@ -119,6 +119,8 @@ public class Consts {
 	public static final int SALES_ORDER_RECEIVE_TYPE_ACCOUNT = 0;//账期
 	public static final int SALES_ORDER_RECEIVE_TYPE_CASH = 1;//现金
 
+	public static final String SALES_ORDER_ACTIVITY_APPLY_ID_OTHER = "1001";//其他活动
+
 	public static final int SALES_OUT_STOCK_STATUS_OUT = 1000;//出库单出库
 	public static final int SALES_OUT_STOCK_STATUS_PART_OUT= 2000;//出库单部分出库
 	public static final int SALES_OUT_STOCK_STATUS_DEFUALT = 0;//出库单待出库
@@ -151,6 +153,7 @@ public class Consts {
 
 	public static final String OPTION_SELLER_STORE_CHECK = "seller_store_check_";//经销商检查库存开关设置
 	public static final String OPTION_WEB_ORDER_PRICE_EDIT = "web_order_price_edit_";//下单修改价格开关设置
+	public static final String OPTION_WEB_ORDER_MIX_GIFT = "web_order_gift_gift_";//下单混合赠品开关设置
 	public static final String OPTION_WEB_PROCEDURE_REVIEW = "web_procedure_review_";//订单审核流程开关设置
 	public static final String OPTION_WEB_PROCEDURE_REVIEW_EDIT = "web_procedure_review_edit_";//订单审核修改开关设置
 	public static final String OPTION_WEB_PROC_CUSTOMER_REVIEW = "web_proc_customer_review_";//客户流程审核开关设置

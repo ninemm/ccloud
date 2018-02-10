@@ -178,6 +178,14 @@ public abstract class BaseSalesOrder<M extends BaseSalesOrder<M>> extends JModel
 		return getInt("is_gift");
 	}
 
+	public void setActivityApplyId(java.lang.String activityApplyId) {
+		set("activity_apply_id", activityApplyId);
+	}
+
+	public java.lang.String getActivityApplyId() {
+		return getStr("activity_apply_id");
+	}
+
 	public void setTotalAmount(java.math.BigDecimal totalAmount) {
 		set("total_amount", totalAmount);
 	}
