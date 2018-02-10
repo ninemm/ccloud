@@ -233,6 +233,13 @@ public class CustomerVisitController extends BaseFrontController {
 		}
 
 		CustomerVisit visit = CustomerVisitQuery.me().findMoreById(id);
+		List<Record> findByActivity = CustomerVisitQuery.me().findByActivity(id);
+		String activity="";
+		for (Record record : findByActivity) {
+			activity=activity+record.getStr("title")+",";
+		}
+		activity = activity.substring(0, activity.length() - 1);  
+		setAttr("activity", activity);
 		setAttr("visit", visit);
 
 		//审核后将message中是否阅读改为是
@@ -342,7 +349,7 @@ public class CustomerVisitController extends BaseFrontController {
 		 customerVisit.setDeptId(user.getDepartmentId());
 		 
 		 if (StrKit.notBlank(picJson)) {
-
+			
 			JSONArray array = JSON.parseArray(picJson);
 			for (int i = 0; i < array.size(); i++) {
 				JSONObject obj = array.getJSONObject(i);
@@ -351,11 +358,13 @@ public class CustomerVisitController extends BaseFrontController {
 
 				ImageJson image = new ImageJson();
 				image.setImgName(picname);
+				//原图
 				String originalPath = qiniuUpload(pic);
 
 				String waterFont1 = customerVisit.getSellerCustomer().getCustomer().getCustomerName();
 				String waterFont2 = user.getRealname() +  DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
 				String waterFont3 =  customerVisit.getLocation();
+				//图片添加水印  上传图片  水印图
 				String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
 
 				image.setSavePath(savePath.replace("\\", "/"));

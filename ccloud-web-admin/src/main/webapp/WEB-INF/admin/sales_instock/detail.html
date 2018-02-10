@@ -39,6 +39,7 @@
 					<th>规格</th>
 					<th>大单位数量</th>
 					<th>小单位数量</th>
+					<th>是否组合</th>
 					<th>是否赠品</th>
 					<th>小计</th>
 				</tr>
@@ -51,6 +52,7 @@
 						<td>${detail.valueName!}</td>
 						<td>${(detail.product_count / detail.convert_relate)?floor} ${detail.big_unit + ' (x' + detail.convert_relate + detail.small_unit + ')' }</td>
 						<td>${detail.product_count % detail.convert_relate} ${detail.small_unit}</td>
+						<td><#if detail.is_composite?? && detail.is_composite == 1>是<#else>否</#if></td>
 						<td><#if detail.is_gift?? && detail.is_gift == 1>是<#else>否</#if></td>
 						<td>￥ <#if detail.is_gift?? && detail.is_gift == 1>0<#else>${detail.product_amount!}</#if></td>
 					</tr>

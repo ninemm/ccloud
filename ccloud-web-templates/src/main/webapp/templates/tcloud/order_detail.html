@@ -59,54 +59,89 @@
 		</div>
 		<div class="weui-panel weui-panel_access">
 			<div class="ft16">订单详情</div>
-			<#list orderDetailList as orderDetail> <#if orderDetail.is_gift??>
-			<#if orderDetail.is_gift = 0>
-			<div class="todo-product-box">
-				<#list images! as list>
-					<#if list.productSn == orderDetail.product_sn>
-						<img src="${list.savePath!}" alt="" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'">
-						<#break>
-					</#if>
-				</#list>
-				<p>${(orderDetail.custom_name)!}</p>
-				<div class="weui-flex">
-					<div class="weui-flex__item flex-grow2">
-						<div class="fl">
-							￥${(orderDetail.product_price)?string(',###.##')} <span class="gray">（${(orderDetail.price)?string(',###.##')}）</span>
+			<#list orderDetailList as orderDetail> 
+			<#if orderDetail.is_gift??>
+				<#if orderDetail.is_composite = 1>
+				<div class="todo-product-box">
+					<#list images! as list>
+						<#if list.productSn == orderDetail.product_sn>
+							<img src="${list.savePath!}" alt="" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'">
+							<#break>
+						</#if>
+					</#list>
+					<p>
+						<span class="ctag">组合</span>${(orderDetail.custom_name)!}
+					</p>
+					<div class="weui-flex">
+						<div class="weui-flex__item flex-grow2">
+							<div class="fl">
+								￥${(orderDetail.product_price)?string(',###.##')} <span class="gray">（${(orderDetail.price)?string(',###.##')}）</span>
+							</div>
 						</div>
+						<div class="weui-flex__item t-r">${(orderDetail.product_count
+							/ orderDetail.convert_relate)?floor}${(orderDetail.big_unit)!}</div>
 					</div>
+					<div class="weui-flex">
+						<div class="weui-flex__item flex-grow2">
+							<div class="fl">
+								￥${(orderDetail.product_price /
+								orderDetail.convert_relate)?string(',###.##')} <span class="gray">（${(orderDetail.price
+									/ orderDetail.convert_relate)?string(',###.##')}）</span>
+							</div>
+						</div>
+						<div class="weui-flex__item t-r">${(orderDetail.product_count
+							% orderDetail.convert_relate)}${(orderDetail.small_unit)!}</div>
+					</div>
+				</div>				
+				<#elseif orderDetail.is_gift = 1>
+				<div class="todo-product-box">
+					<#list images! as list>
+						<#if list.productSn == orderDetail.product_sn>
+							<img src="${list.savePath!}" alt="" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'">
+							<#break>
+						</#if>
+					</#list>
+					<p>
+						<span class="tag">赠品</span>${(orderDetail.custom_name)!}
+					</p>
 					<div class="weui-flex__item t-r">${(orderDetail.product_count
 						/ orderDetail.convert_relate)?floor}${(orderDetail.big_unit)!}</div>
-				</div>
-				<div class="weui-flex">
-					<div class="weui-flex__item flex-grow2">
-						<div class="fl">
-							￥${(orderDetail.product_price /
-							orderDetail.convert_relate)?string(',###.##')} <span class="gray">（${(orderDetail.price
-								/ orderDetail.convert_relate)?string(',###.##')}）</span>
-						</div>
-					</div>
 					<div class="weui-flex__item t-r">${(orderDetail.product_count
 						% orderDetail.convert_relate)}${(orderDetail.small_unit)!}</div>
 				</div>
-			</div>
-			</#if> <#if orderDetail.is_gift = 1>
-			<div class="todo-product-box">
-				<#list images! as list>
-					<#if list.productSn == orderDetail.product_sn>
-						<img src="${list.savePath!}" alt="" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'">
-						<#break>
-					</#if>
-				</#list>
-				<p>
-					<span class="tag">赠品</span>${(orderDetail.custom_name)!}
-				</p>
-				<div class="weui-flex__item t-r">${(orderDetail.product_count
-					/ orderDetail.convert_relate)?floor}${(orderDetail.big_unit)!}</div>
-				<div class="weui-flex__item t-r">${(orderDetail.product_count
-					% orderDetail.convert_relate)}${(orderDetail.small_unit)!}</div>
-			</div>
-			</#if> </#if> </#list>
+				<#else>
+				<div class="todo-product-box">
+					<#list images! as list>
+						<#if list.productSn == orderDetail.product_sn>
+							<img src="${list.savePath!}" alt="" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'">
+							<#break>
+						</#if>
+					</#list>
+					<p>${(orderDetail.custom_name)!}</p>
+					<div class="weui-flex">
+						<div class="weui-flex__item flex-grow2">
+							<div class="fl">
+								￥${(orderDetail.product_price)?string(',###.##')} <span class="gray">（${(orderDetail.price)?string(',###.##')}）</span>
+							</div>
+						</div>
+						<div class="weui-flex__item t-r">${(orderDetail.product_count
+							/ orderDetail.convert_relate)?floor}${(orderDetail.big_unit)!}</div>
+					</div>
+					<div class="weui-flex">
+						<div class="weui-flex__item flex-grow2">
+							<div class="fl">
+								￥${(orderDetail.product_price /
+								orderDetail.convert_relate)?string(',###.##')} <span class="gray">（${(orderDetail.price
+									/ orderDetail.convert_relate)?string(',###.##')}）</span>
+							</div>
+						</div>
+						<div class="weui-flex__item t-r">${(orderDetail.product_count
+							% orderDetail.convert_relate)}${(orderDetail.small_unit)!}</div>
+					</div>
+				</div>				
+				</#if> 
+			</#if> 
+			</#list>
 			<hr>
 			<div class="t-r ft14">
 				总计： <span class="red">${(order.total_amount)?string(',###.##')}元</span>

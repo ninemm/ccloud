@@ -107,7 +107,7 @@ datetimepicker.min.css">
 			[ 	{title: "序号", align: "center", edit:false, formatter: function (value, row, index) { return index+1; } },
 				<#if watchHead??>
 					<#list watchHead as bean>
-						<#if bean != '销售合计'>
+						<#if bean != '销售额(元)'>
 							{field: "${bean}", title: "${bean}", align: "center",  edit:false},
 						</#if>
 	   				</#list>

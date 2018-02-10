@@ -263,4 +263,11 @@ public class Consts {
 	public static final String TEMPLATE_FILE_NAME_ALI = "aliTemplate.xlsx";//阿里模板文件名
 	public static final String TEMPLATE_FILE_NAME_DANLU = "danluTemplate.xls";//丹露模板文件名
 	
+	public static final String WEEK_PLAN = "101201";//周计划
+	public static final String MONTH_PLAN = "101202";//月计划
+	public static final String YEAR_PLAN = "101203";//年计划
+	
+	
+	public static final String WAREHOUSE_IDS_IS_NULL = "1";//当用户没有分配仓库时且不是经管时返回空值的仓库ID
+	
 }

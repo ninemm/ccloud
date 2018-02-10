@@ -302,4 +302,9 @@ public class CustomerVisitQuery extends JBaseQuery {
 		return Db.find(sql.toString(), userId, startDate, endDate, status);
 
 	}
+
+	public List<Record> findByActivity(String id) {
+		String sql="SELECT a.title FROM cc_customer_visit_join_activity cvja LEFT JOIN cc_activity a ON a.id = cvja.activity_id WHERE cvja.customer_visit_id =?";
+		return Db.find(sql.toString(), id);
+	}
 }

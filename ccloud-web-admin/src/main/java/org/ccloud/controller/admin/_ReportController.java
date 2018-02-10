@@ -558,7 +558,7 @@ public class _ReportController extends JBaseController {
 		//得到表头
 		List<String>watchHead=new ArrayList<>();
 		watchHead.add("客户名称");
-		watchHead.add("销售合计");
+		watchHead.add("销售额(元)");
 		List<SellerProduct> findBySellerId = SellerProductQuery.me().findBySellerId(sellerId);
 		for (SellerProduct sellerProduct : findBySellerId) {
 			String customName=sellerProduct.getCustomName();
@@ -594,7 +594,7 @@ public class _ReportController extends JBaseController {
 			for (Record record1 : list1) {
 				String customerId1=record1.getStr("customer_id");
 				if (customerId.equals(customerId1)) {
-					record.set("销售合计", record1.get("totalAmount"));
+					record.set("销售额(元)", record1.get("totalAmount"));
 					break;
 				}
 			}
@@ -602,7 +602,7 @@ public class _ReportController extends JBaseController {
 		renderJson(list);
 	}
 	
-	//我部门的业务员赠品商品详情
+	//我的客户详情
 	public void customerDetailsGiftReportList() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String userId = user.getId();

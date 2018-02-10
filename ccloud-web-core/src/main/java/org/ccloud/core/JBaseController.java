@@ -356,6 +356,7 @@ public class JBaseController extends Controller {
 		return filesMap;
 	}
 	
+	//七牛云上传图片
 	public String qiniuUpload(String blobImage) {
 		
 		if (StrKit.notBlank(blobImage)) {

@@ -112,7 +112,12 @@
 
 			$tr.find("#sellProductId").val(product.sell_product_id);
 			$tr.find("#productId").val(product.product_id);
-			$tr.find("#sellProductName").text(product.custom_name);
+			
+			if (product.is_composite == 1) {
+				$tr.find("#sellProductName").text("(组合)"+product.custom_name);
+			} else {
+				$tr.find("#sellProductName").text(product.custom_name);
+			}
 			$tr.find("#specification").text(product.valueName);
 
 			var convert = product.convert_relate;
