@@ -333,6 +333,7 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 	    font2.setFontHeightInPoints((short) 12);
 	    setBorder.setFont(font2);
 	    HSSFRow  newRow = sheet.createRow(0);
+	    HSSFRow  nRow = sheet.createRow(1);
 	    //合并单元格
 	    Cell sCell = newRow.createCell(1);
 	    sCell.setCellValue("开始时间");
@@ -346,16 +347,25 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 	    for(int i = 0;i < productRecords.size(); i++) {
 	    	CellRangeAddress region = new CellRangeAddress(0,  0, (2*(i+2)+i), (2*(i+2)+i+2));
 	    	Cell pCell = newRow.createCell(2*(i+2)+i);
+	    	Cell cell01 = nRow.createCell(2*(i+2)+i);
+	    	Cell cell02 = nRow.createCell(2*(i+2)+i+1);
+	    	Cell cell03 = nRow.createCell(2*(i+2)+i+2);
 	    	pCell.setCellValue(productRecords.get(i).getStr("custom_name")+" "+productRecords.get(i).getStr("valueName"));
+	    	cell01.setCellValue("计划");
+	    	cell02.setCellValue("完成");
+	    	cell03.setCellValue("完成情况");
 	    	sheet.addMergedRegion(region);
 	    	pCell.setCellStyle(setBorder);
+	    	cell01.setCellStyle(setBorder);
+	    	cell02.setCellStyle(setBorder);
+	    	cell03.setCellStyle(setBorder);
 	    }
 	    for(int i = 0;i < plansItems.size(); i++) {
-	    	HSSFRow  row = sheet.createRow(i+1);
+	    	HSSFRow  row = sheet.createRow(i+2);
 	    	if( i>0 && plansItems.get(i).get("type") .equals(plansItems.get(i-1).get("type")) ) {
 		    	if(!plansItems.get(i).get("startDate").equals(plansItems.get(i-1).get("startDate")) 
 		    			&& !plansItems.get(i).get("endDate").equals(plansItems.get(i-1).get("endDate"))) {
-		    		end = i;
+		    		end = i+1;
 		    		Cell typeCell = row.createCell(0);
 		    		Cell startCell = row.createCell(1);
 		    		Cell endCell = row.createCell(2);
@@ -372,12 +382,14 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 		    			startCell.setCellValue(plansItems.get(i).get("startDate").toString());
 		    			endCell.setCellValue(plansItems.get(i).get("endDate").toString());
 		    		}
-		    		CellRangeAddress region = new CellRangeAddress((end-num),  end, 0, 0);
-		    		CellRangeAddress regionS = new CellRangeAddress((end-num),  end, 1, 1);
-		    		CellRangeAddress regionE = new CellRangeAddress((end-num),  end, 2, 2);
-		    		sheet.addMergedRegion(region);
-		    		sheet.addMergedRegion(regionS);
-		    		sheet.addMergedRegion(regionE);
+		    		if(end>(end-num)) {
+		    			CellRangeAddress region = new CellRangeAddress((end-num),  end, 0, 0);
+		    			CellRangeAddress regionS = new CellRangeAddress((end-num),  end, 1, 1);
+		    			CellRangeAddress regionE = new CellRangeAddress((end-num),  end, 2, 2);
+		    			sheet.addMergedRegion(region);
+		    			sheet.addMergedRegion(regionS);
+		    			sheet.addMergedRegion(regionE);
+		    		}
 		    		typeCell.setCellStyle(setBorder);
 		    		startCell.setCellStyle(setBorder);
 		    		endCell.setCellStyle(setBorder);
@@ -436,7 +448,9 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 		    	 for(int k = 0; k < page.getList().size();k++) {
 	    			 if(page.getList().get(k).getSellerProductId().equals(productRecords.get(j).getStr("sell_product_id")) 
 	    					 && page.getList().get(k).getUserId().equals(plansItems.get(i).get("userId").toString())
-	    					 && page.getList().get(k).getType().equals(plansItems.get(i).get("type").toString())) {
+	    					 && page.getList().get(k).getType().equals(plansItems.get(i).get("type").toString())
+	    					 && page.getList().get(k).getStartDate().toString().equals(plansItems.get(i).get("startDate").toString())
+	    					 && page.getList().get(k).getEndDate().toString().equals(plansItems.get(i).get("endDate").toString())) {
 	    				 p0Cell.setCellValue(page.getList().get(k).getStr("planNum"));
 	    				 p1Cell.setCellValue(page.getList().get(k).getStr("completeNum"));
 	    				 p2Cell.setCellValue(page.getList().get(k).getCompleteRatio()+"%");
