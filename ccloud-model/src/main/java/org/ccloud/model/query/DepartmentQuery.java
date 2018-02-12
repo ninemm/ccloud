@@ -275,7 +275,7 @@ public class DepartmentQuery extends JBaseQuery {
 		for (User user : list) {
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("text", user.getRealname());
-			map.put("tags", Lists.newArrayList(user.getId(), user.getDataArea().subSequence(0, user.getDataArea().length()-4)));
+			map.put("tags", Lists.newArrayList(user.getId(), "user"));
 			childList.add(map);
 
 		}
