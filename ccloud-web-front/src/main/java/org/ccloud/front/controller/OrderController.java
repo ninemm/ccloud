@@ -92,10 +92,14 @@ public class OrderController extends BaseFrontController {
 
 		Page<Record> orderList = SalesOrderQuery.me().paginateForApp(getPageNumber(), getPageSize(), keyword, status,
 				customerTypeId, startDate, endDate, sellerId, selectDataArea);
+		Record record = SalesOrderQuery.me()
+				.getOrderListCount(keyword, status, customerTypeId, startDate, endDate, sellerId, selectDataArea);
 
 		Map<String, Object> map = new HashMap<>();
 		map.put("orderList", orderList.getList());
-		map.put("username", user.getUsername());
+		map.put("user", user);
+		map.put("orderCount", record.getStr("orderCount"));
+		map.put("orderAmount", record.getStr("totalAmount"));
 		renderJson(map);
 	}
 
@@ -551,16 +555,16 @@ public class OrderController extends BaseFrontController {
 		WorkFlowService workflow = new WorkFlowService();
 
 		String procInstId = salesOrder.getProcInstId();
-		if (StrKit.notBlank(procInstId))
-			workflow.deleteProcessInstance(salesOrder.getProcInstId());
-
+		if (StrKit.notBlank(procInstId)) {
+			if(salesOrder.getStatus()==Consts.SALES_ORDER_STATUS_DEFAULT) {
+				workflow.deleteProcessInstance(salesOrder.getProcInstId());
+			}
+		}
 		salesOrder.setStatus(Consts.SALES_ORDER_STATUS_CANCEL);
-
 		if (!salesOrder.saveOrUpdate()) {
 			renderAjaxResultForError("取消订单失败");
 			return;
 		}
-
 		renderAjaxResultForSuccess("订单撤销成功");
 	}
 

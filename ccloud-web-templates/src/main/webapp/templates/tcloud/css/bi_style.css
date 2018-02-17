@@ -722,3 +722,21 @@ img {
 	padding: 0 15px;
 }
 
+.left-back {
+	position: fixed;
+	bottom: 4.5rem;
+	left: 0;
+	background: rgba(0,0,0,0.7);
+	color: #FFF;
+	font-size: 0.68rem;
+	z-index: 9;
+	text-align: center;
+	padding: .2rem .6rem .2rem .2rem;
+	letter-spacing: 1px;
+	border-bottom-right-radius: 50%;
+	border-top-right-radius: 50%;
+}
+
+.left-back img {
+	width: 1rem;
+}

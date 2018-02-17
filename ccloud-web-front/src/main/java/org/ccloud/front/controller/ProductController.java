@@ -19,14 +19,7 @@ import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.CustomerType;
 import org.ccloud.model.Dict;
 import org.ccloud.model.User;
-import org.ccloud.model.query.CustomerTypeQuery;
-import org.ccloud.model.query.DictQuery;
-import org.ccloud.model.query.OptionQuery;
-import org.ccloud.model.query.ProductCompositionQuery;
-import org.ccloud.model.query.SalesOrderQuery;
-import org.ccloud.model.query.SellerCustomerQuery;
-import org.ccloud.model.query.SellerProductQuery;
-import org.ccloud.model.query.UserQuery;
+import org.ccloud.model.query.*;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.wechat.WechatJSSDKInterceptor;
 
@@ -141,6 +134,7 @@ public class ProductController extends BaseFrontController {
 	public void order() {
 
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
 
 		Map<String, Object> all = new HashMap<>();
 		all.put("title", "全部");
@@ -171,6 +165,12 @@ public class ProductController extends BaseFrontController {
 		setAttr("userIds", JSON.toJSON(userIds));
 		setAttr("customerTypes", JSON.toJSON(customerTypes));
 		setAttr("deliveryDate", DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
+
+		Boolean isMix = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_ORDER_MIX_GIFT + sellerCode);
+		isMix = (isMix != null && isMix) ? true : false;
+
+		setAttr("isMix", isMix);
+
 		render("order.html");
 	}
 
@@ -247,6 +247,14 @@ public class ProductController extends BaseFrontController {
 				getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
 
 		renderJson(customerTypeList);
+	}
+
+	public void activityApplyById() {
+		String customerId = getPara("customerId");
+
+		List<Record> activityApplyList = ActivityApplyQuery.me().findBySellerCustomerId(customerId);
+
+		renderJson(activityApplyList);
 	}
 
 	@Before(WechatJSSDKInterceptor.class)

@@ -15,9 +15,11 @@
  */
 package org.ccloud.model.query;
 
+import java.util.Date;
 import java.util.LinkedList;
 import org.ccloud.model.CustomerInfo;
 
+import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
@@ -73,6 +75,24 @@ public class CustomerInfoQuery extends JBaseQuery {
 		} else {
 			return DAO.doFindFirst("customer_name = ? and address = ? ", name , address);
 		}
+	}
+
+	public CustomerInfo findByAddress(String customerName, String address) {
+		return DAO.doFindFirst("customer_name = ? and address = ? ", customerName , address);
+	}
+
+	public String insertCustomer(String customerName, String address, String contact, String postalcode) {
+		String id = StrKit.getRandomUUID();
+		CustomerInfo customerInfo = new CustomerInfo();
+		customerInfo.setId(id);
+		customerInfo.setCustomerName(customerName);
+		customerInfo.setAddress(address);
+		customerInfo.setContact(contact);
+		customerInfo.setPostalcode(postalcode);
+		customerInfo.setCreateDate(new Date());
+		customerInfo.setModifyDate(new Date());
+		customerInfo.save();
+		return id;
 	}
 
 	

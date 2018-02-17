@@ -317,14 +317,16 @@
                     var geoc = new BMap.Geocoder();                   // 获取百度地址解析器
 
                     translateCallback = function (point) {            // 回调函数
-                        $("#lng").val(parseFloat(point.lng).toFixed(6));
-                        $("#lat").val(parseFloat(point.lat).toFixed(6));
                         geoc.getLocation(point, function(rs) {
                             var addComp = rs.addressComponents;
                             var address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
-                            //$("#delivery-address")[0].value = addComp.province + " " + addComp.city + " " + addComp.district;
-                            //$('#areaCode').val(addComp.provinceNumber + "," + addComp.cityNumber + "," + addComp.districtNumber);
-                            //$('#areaName').val(addComp.province + "," + addComp.city + "," + addComp.district);
+                            <#if !type?? && !sellerCustomer??>
+                                $("#lng").val(parseFloat(point.lng).toFixed(6));
+                                $("#lat").val(parseFloat(point.lat).toFixed(6));
+                                $("#delivery-address")[0].value = addComp.province + " " + addComp.city + " " + addComp.district;
+                                $('#areaCode').val(addComp.provinceNumber + "," + addComp.cityNumber + "," + addComp.districtNumber);
+                                $('#areaName').val(addComp.province + "," + addComp.city + "," + addComp.district);
+                            </#if>
                             $('#location-span').text(address);
                             $('#location').val(address);
                         });

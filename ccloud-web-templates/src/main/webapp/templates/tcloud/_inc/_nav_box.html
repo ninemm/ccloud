@@ -1,7 +1,7 @@
 <div class="foot-black"></div>
 <div class="weui-tab">
     <div class="weui-tabbar">
-        <a href="${CPATH}/biIndex" class="weui-tabbar__item <#if '/' == REQUEST.requestURI!>weui-bar__item--on</#if>">
+        <a href="${CPATH}/biIndex" class="weui-tabbar__item <#if '/biIndex' == REQUEST.requestURI!>weui-bar__item--on</#if>">
             <div class="weui-tabbar__icon foot-menu-home"></div>
             <p class="weui-tabbar__label">首页</p>
         </a>
@@ -23,3 +23,6 @@
         </a>
     </div>
 </div>
+<a class="left-back" href="${CPATH}/report">
+    <img src="${CTPATH}/favicon.ico" alt="">
+</a>

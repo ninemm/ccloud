@@ -13,12 +13,15 @@
  */
 package org.ccloud.front.controller;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.DbKit;
 import com.jfinal.plugin.activerecord.Record;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
-import org.ccloud.model.callback.AroundCustomerCallback;
+import org.ccloud.model.callback.AroundCustomerBiSalesCallback;
+import org.ccloud.model.callback.AroundCustomerBiVisitCallback;
 import org.ccloud.model.query.BiSalesQuery;
 import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.route.RouterMapping;
@@ -153,7 +156,7 @@ public class BiSalesController extends BaseFrontController {
 		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
 
 		List<Record> result = BiSalesQuery.me().findAreaListByProduct(sellerId, provName, cityName, countryName,
-				startDate, endDate, null);
+				startDate, endDate, cInvCode);
 
 		renderJson(result);
 
@@ -340,9 +343,9 @@ public class BiSalesController extends BaseFrontController {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void aroundCustomerSales() throws SQLException {
+	public void aroundCustomer() throws SQLException {
 
-		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 
 		double longitude = Double.parseDouble(getPara("longitude"));
 		double latitude = Double.parseDouble(getPara("latitude"));
@@ -350,22 +353,37 @@ public class BiSalesController extends BaseFrontController {
 		String dateType = getPara("dateType", "0").trim();
 
 		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
 
-		AroundCustomerCallback callback = new AroundCustomerCallback();
-		callback.setLongitude(longitude);
-		callback.setLatitude(latitude);
-		callback.setDist(dist);
-		callback.setStartDate(startDate);
-		callback.setEndDate(endDate);
-		callback.setSellerId(sellerId);
+		AroundCustomerBiSalesCallback salesCallback = new AroundCustomerBiSalesCallback();
+		salesCallback.setLongitude(longitude);
+		salesCallback.setLatitude(latitude);
+		salesCallback.setDist(dist);
+		salesCallback.setStartDate(startDate);
+		salesCallback.setEndDate(endDate);
+		salesCallback.setDataArea(dealerDataArea + '%');
+		salesCallback.setCustomerKind(Consts.CUSTOMER_KIND_COMMON);
+
+		AroundCustomerBiVisitCallback visitCallback = new AroundCustomerBiVisitCallback();
+		visitCallback.setLongitude(longitude);
+		visitCallback.setLatitude(latitude);
+		visitCallback.setDist(dist);
+		visitCallback.setStartDate(startDate);
+		visitCallback.setEndDate(endDate);
+		visitCallback.setDataArea(dealerDataArea + '%');
+		visitCallback.setCustomerKind(Consts.CUSTOMER_KIND_COMMON);
 
 		Connection conn = null;
-		List<Map<String, Object>> result = null;
+		Map<String, Object> result = Maps.newHashMap();
+
+		List<Map<String, Object>> allList = Lists.newArrayList();
+		List<Map<String, Object>> salesList = null;
+		List<Map<String, Object>> visitList = null;
 
 		try {
 			conn = DbKit.getConfig().getConnection();
-			result = (List<Map<String, Object>>) callback.call(conn);
+			salesList = (List<Map<String, Object>>) salesCallback.call(conn);
+			visitList = (List<Map<String, Object>>) visitCallback.call(conn);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -374,12 +392,27 @@ public class BiSalesController extends BaseFrontController {
 			}
 		}
 
+		for (int i = 0; i < salesList.size(); i++) {
+			String customerId = salesList.get(i).get("customerId").toString();
+			for (int j = 0; j < visitList.size(); j++) {
+				if(customerId.equals(visitList.get(j).get("customerId"))){
+					Map<String, Object> allMap = salesList.get(i);
+					allMap.put("totalNum",visitList.get(j).get("totalNum"));
+					allList.add(allMap);
+					salesList.remove(i);
+					visitList.remove(j);
+				}
+			}
+
+		}
+
+		result.put("allList", allList);
+		result.put("salesList", salesList);
+		result.put("visitList", visitList);
 		renderJson(result);
 	}
 
 	public void productByCustomerId() {
-
-		String dealerCode = getSessionAttr("dealerCode");
 
 		String customerId = getPara("customerId", "").trim();
 		String dateType = getPara("dateType", "0").trim(); // 0: 昨天， 1: 最近1周， 2: 最近1月
@@ -387,7 +420,22 @@ public class BiSalesController extends BaseFrontController {
 		String startDate = DateUtils.getDateByType(dateType);
 		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
 
-		List<Record> result = BiSalesQuery.me().findProductListByCustomerId(dealerCode, customerId, startDate,
+		List<Record> result = BiSalesQuery.me().findProductList(customerId, startDate,
+				endDate);
+
+		renderJson(result);
+
+	}
+
+	public void visitByCustomerId() {
+
+		String customerId = getPara("customerId", "").trim();
+		String dateType = getPara("dateType", "0").trim(); // 0: 昨天， 1: 最近1周， 2: 最近1月
+
+		String startDate = DateUtils.getDateByType(dateType);
+		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
+
+		List<Record> result = BiSalesQuery.me().findVistList(customerId, startDate,
 				endDate);
 
 		renderJson(result);

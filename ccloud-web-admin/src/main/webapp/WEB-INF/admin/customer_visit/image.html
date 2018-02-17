@@ -3,33 +3,56 @@
 <#macro script_import>
 	<!-- bootstrapvalidator -->
 	<script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
+	<script src="${CPATH}/static/plugins/select2/js/select2.js"></script>
 	<!-- bootstrapvalidator -->
 </#macro>
 
 <#macro css_import>
 	<!-- bootstrapvalidator -->
 	<link rel="stylesheet" href="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.css">
+	<link rel="stylesheet" href="${CPATH}/static/plugins/select2/css/select2.css">
+</#macro>
+<#macro css>
+	.select2-container {
+		box-sizing: border-box;
+		display: inline-block;
+		margin: 0;
+		position: relative;
+		vertical-align: middle;
+		margin-bottom: 4px;
+	}
 </#macro>
 
 <#macro script>
 
 	var $form = $("#form");
 	$(function(){
+
+	$(document).on("change", "#customer_type", function() {
+		$.get("${CPATH}/admin/customerVisit/getCustomer?customerType=" + $('#customer_type').val(), function(result){
+			$("#customer_name").select2('destroy').empty();
+			$("#customer_name").select2({
+				data: result
+			});
+		})
+	})
 		var customerType = ${(customerType)};
-		strHtml = '<option selected="selected" value="">全部</option>';
+		/*strHtml = '<option selected="selected" value="">全部</option>';
 		for(index in customerType){
 			var row = customerType[index].columns;
 			strHtml +='<option value="'+row.name+'">'+row.name+'</option>';
 		}
-		$("#customer_type").html(strHtml);
+		$("#customer_type").html(strHtml);*/
+		$("#customer_type").select2({
+			minimumResultsForSearch: -1,
+			data:customerType
+		})
 
 		var customerName = ${(customerName)};
-		strHtml = '<option selected="selected" value="">全部</option>';
-		for(index in customerName){
-			var row = customerName[index].columns;
-			strHtml +='<option value="'+row.id+'">'+row.name+'</option>';
-		}
-		$("#customer_name").html(strHtml);
+
+		$("#customer_name").select2({
+			data: customerName
+		});
 	})
 
 	function doSubmit(){
@@ -42,7 +65,13 @@
 					if (result.errorCode > 0) {
 						toastr.error(result.message, '没有图片');
 					} else {
-						window.open('${CPATH}/admin/customerVisit/exportImage?customer_type=' + $('#customer_type').val() + '&customer_name=' + $('#customer_name').val());
+						layer.load(1, {
+							shade: [0.4,'#000']
+						});
+						window.open('${CPATH}/admin/customerVisit/exportImage?customer_type=' + $('#customer_type').val() + '&customer_name=' + $('#customer_name').val(),"_parent","","");
+						setTimeout(function() {
+							layer.closeAll();
+						}, 1000);
 					}
 				})
 			},
@@ -80,12 +109,12 @@
 				<div class="form-group col-sm-12">
 					<label class="control-label col-sm-2">客户类型:</label>
 					<div class="input-group col-md-4 col-sm-2">
-						<select class="form-control input-sm"  style="float: left;padding-right:5px;margin-right:5px;margin-bottom:5px;" type="text" id="customer_type" name="customer_type" value="" readonly>
+						<select class="form-control input-sm" type="text" id="customer_type" name="customer_type" value="" readonly>
 						</select>
 					</div>
 					<label class="control-label col-sm-2">客户名称:</label>
 					<div class="input-group col-md-4 col-sm-2">
-						<select class="form-control input-sm"  style="float: left;padding-right:5px;margin-right:5px;margin-bottom:5px;" type="text" id="customer_name" name="customer_name" value="" readonly>
+						<select class="form-control input-sm" type="text" id="customer_name" name="customer_name" value="" readonly>
 						</select>
 					</div>
 				</div>

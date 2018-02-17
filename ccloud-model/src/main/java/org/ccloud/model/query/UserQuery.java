@@ -365,4 +365,13 @@ public class UserQuery extends JBaseQuery {
 		sqlBuilder.append("where mobile = ?");
 		return DAO.find(sqlBuilder.toString(), mobile);
 	}
+	
+	public List<User> findByData(String dataArea){
+		String sql  = "SELECT u.* FROM `user` u "
+				+ "LEFT JOIN user_group_rel ugr on u.id = ugr.user_id "  
+				+"LEFT JOIN `group` g on g.id = ugr.group_id "  
+				+"where u.data_area like ? and g.group_code in ('role05','role06','role10') "  
+				+"GROUP BY u.id";
+		return DAO.find(sql, dataArea);
+	}
 }

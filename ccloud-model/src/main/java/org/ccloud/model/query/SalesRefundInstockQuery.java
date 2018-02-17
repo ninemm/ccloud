@@ -335,6 +335,7 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 	}
 
 	public List<Record> findByOutstockId(String outstockId) {
+		LinkedList<Object> params = new LinkedList<Object>();
 		StringBuilder sqlBuilder = new StringBuilder(
 				" SELECT sod.*, sp.custom_name, p.big_unit, p.small_unit, p.convert_relate, sp.seller_id, sp.product_id, t1.valueName ");
 		sqlBuilder.append(" from `cc_sales_refund_instock_detail` sod ");
@@ -345,9 +346,11 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		sqlBuilder.append(" LEFT JOIN cc_product p ON sp.product_id = p.id ");
 		sqlBuilder.append("LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
 		sqlBuilder.append("RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = p.id ");
-		sqlBuilder.append(" WHERE co.id = ? and cri.status != 1001");
-
-		return Db.find(sqlBuilder.toString(), outstockId);
+		sqlBuilder.append(" WHERE co.id = ? and cri.status not in (?,?) ");
+		params.add(outstockId);
+		params.add(Consts.SALES_REFUND_INSTOCK_CANCEL);
+		params.add(Consts.SALES_REFUND_INSTOCK_REFUSE);
+		return Db.find(sqlBuilder.toString(), params.toArray());
 	}
 
 	public Page<Record> paginateForApp(int pageNumber, int pageSize, String keyword, String status,
@@ -496,7 +499,12 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 			params.add(printStatus);
 		}
 
-		fromBuilder.append(" and r.status not in ('0','1001')  and ( r.instock_sn like '%"+keyword+"%' or c.customer_name like '%"+keyword+"%' ) ");
+		fromBuilder.append(" and r.status not in (?, ?, ?) ");
+		params.add(Consts.SALES_REFUND_INSTOCK_DEFUALT);
+		params.add(Consts.SALES_REFUND_INSTOCK_CANCEL);
+		params.add(Consts.SALES_REFUND_INSTOCK_REFUSE);
+
+		fromBuilder.append(" and ( r.instock_sn like '%"+keyword+"%' or c.customer_name like '%"+keyword+"%' ) ");
 		
 		if (sort==""||null==sort) {
 			fromBuilder.append("order by "+"r.create_date desc");

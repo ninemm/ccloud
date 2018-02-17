@@ -113,8 +113,10 @@
     }
 
     var map = new BMap.Map("allmap");
-    var myPosition = new BMap.Icon("${CTPATH}/images/position.png", new BMap.Size(20, 20)); 
-    var myIcon = new BMap.Icon("${CTPATH}/images/marker.png", new BMap.Size(20, 20)); 
+    var myPosition = new BMap.Icon("${CTPATH}/images/marker_blue.png", new BMap.Size(20, 20));
+    var allIcon = new BMap.Icon("${CTPATH}/images/marker.png", new BMap.Size(20, 20));
+    var salesIcon = new BMap.Icon("${CTPATH}/images/marker_orange.png", new BMap.Size(20, 20));
+    var visitIcon = new BMap.Icon("${CTPATH}/images/marker_gray.png", new BMap.Size(20, 20));
 
     //地图
     function lMap(dateType){
@@ -131,44 +133,91 @@
         map.addOverlay(position);              // 将标注添加到地图中
         
         $.ajax({
-            url:"${CPATH}/biSales/aroundCustomerSales",
+            url:"${CPATH}/biSales/aroundCustomer",
             type:"post",
             data:{dateType: dateType, longitude: longitude, latitude: latitude, dist: 10},
             dataType:"json"
         }).done(function(data){
             Utils.close();
-            for(var i = 0; i < data.length; i++) {
-                var new_point = new BMap.Point(data[i].longitude,data[i].latitude);
-                var marker = new BMap.Marker(new_point, {icon:myIcon});  //创建标注
+
+            for(var i = 0; i < data.salesList.length; i++) {
+                var new_point = new BMap.Point(data.salesList[i].longitude,data.salesList[i].latitude);
+                var marker = new BMap.Marker(new_point, {icon:salesIcon});  //创建标注
                 map.addOverlay(marker);              // 将标注添加到地图中
                 var opts = {
                     width : 240,     // 信息窗口宽度
                     height: 80,     // 信息窗口高度
-                    title : '客户名称：' + data[i].customerName , // 信息窗口标题
+                    title : '客户名称：' + data.salesList[i].customerName , // 信息窗口标题
                     enableMessage:true,//设置允许信息窗发送短息
-                    customerId: data[i].customerId,
-                    customerName: data[i].customerName
+                    customerId: data.salesList[i].customerId,
+                    customerName: data.salesList[i].customerName
                 };
-                var content = '联系人：' + data[i].contacts + ' ' + data[i].phone;
-                content = content + '<br>' + '金额：' + data[i].totalAmount + '元';
-                content = content + '<br>' + '地址：' + data[i].address;
-                addClickHandler(content,marker,opts);
+                var content = '联系人：' + data.salesList[i].contacts + ' ' + data.salesList[i].phone;
+                content = content + '<br>' + '地址：' + data.salesList[i].address;
+                content = content + '<br>' + '销售金额：' + data.salesList[i].totalAmount + '元';
+                addClickHandler(content,marker,opts, 1);
+            }
+
+            for(var i = 0; i < data.visitList.length; i++) {
+                var new_point = new BMap.Point(data.visitList[i].longitude,data.visitList[i].latitude);
+                var marker = new BMap.Marker(new_point, {icon:visitIcon});  //创建标注
+                map.addOverlay(marker);              // 将标注添加到地图中
+                var opts = {
+                    width : 240,     // 信息窗口宽度
+                    height: 80,     // 信息窗口高度
+                    title : '客户名称：' + data.visitList[i].customerName , // 信息窗口标题
+                    enableMessage:true,//设置允许信息窗发送短息
+                    customerId: data.visitList[i].customerId,
+                    customerName: data.visitList[i].customerName
+                };
+                var content = '联系人：' + data.visitList[i].contacts + ' ' + data.visitList[i].phone;
+                content = content + '<br>' + '地址：' + data.visitList[i].address;
+                content = content + '<br>' + '拜访次数：' + data.visitList[i].totalNum + '次';
+                addClickHandler(content,marker,opts, 2);
+            }
+
+            for(var i = 0; i < data.allList.length; i++) {
+                var new_point = new BMap.Point(data.allList[i].longitude,data.allList[i].latitude);
+                var marker = new BMap.Marker(new_point, {icon:allIcon});  //创建标注
+                map.addOverlay(marker);              // 将标注添加到地图中
+                var opts = {
+                    width : 240,     // 信息窗口宽度
+                    height: 100,     // 信息窗口高度
+                    title : '客户名称：' + data.allList[i].customerName , // 信息窗口标题
+                    enableMessage:true,//设置允许信息窗发送短息
+                    customerId: data.allList[i].customerId,
+                    customerName: data.allList[i].customerName
+                };
+                var content = '联系人：' + data.allList[i].contacts + ' ' + data.allList[i].phone;
+                content = content + '<br>' + '地址：' + data.allList[i].address;
+                content = content + '<br>' + '销售金额：' + data.allList[i].totalAmount + '元';
+                content = content + '<br>' + '拜访次数：' + data.allList[i].totalNum + '次';
+                addClickHandler(content,marker,opts, 0);
             }
         });
     }
     
-    function addClickHandler(content,marker,opts){
+    function addClickHandler(content,marker,opts, flg){
         marker.addEventListener("click",function(e){
-            openInfo(content,e,opts)}
-        );
-    }
-    
-    function openInfo(content,e,opts){
-        var p = e.target;
-        var point = new BMap.Point(p.getPosition().lng, p.getPosition().lat);
-        var infoWindow = new BMap.InfoWindow(content,opts);  // 创建信息窗口对象 
-        map.openInfoWindow(infoWindow,point); //开启信息窗口
-        product_customerId(dateType,opts.customerId,opts.customerName);
+            var p = e.target;
+            var point = new BMap.Point(p.getPosition().lng, p.getPosition().lat);
+            var infoWindow = new BMap.InfoWindow(content,opts);  // 创建信息窗口对象
+            map.openInfoWindow(infoWindow,point); //开启信息窗口
+
+            $("#product_customerId").hide();
+            $("#visit_customerId").hide();
+
+            if(flg == 0){
+                product_customerId(dateType,opts.customerId,opts.customerName);
+                visit_customerId(dateType,opts.customerId,opts.customerName);
+            }else if(flg == 1){
+                product_customerId(dateType,opts.customerId,opts.customerName);
+            }else if(flg == 2){
+                visit_customerId(dateType,opts.customerId,opts.customerName);
+            }
+
+
+        });
     }
     
     //终端产品详细
@@ -184,22 +233,54 @@
 
             var tpTitle = customerName + '销售情况';
             var $p = $("#p_customerId_product");
-            var $customerName = $("#customer-name");
+            var $customerName = $("#product_customer-name");
             $customerName.empty();
             $customerName.text(tpTitle);
             $p.attr('class', 'title');
-            $p.show();
+            $("#product_customerId").show();
 
             var $tbody = $("#customerId_product tbody");
             $tbody.empty();
             for(var i = 0; i < data.length; i++){
-                if(i == 0 || data[i].idate != data[i-1].idate) {
-                    $tbody.append("<tr><th colspan='3'>日期：" + data[i].idate + "</th></tr>");
-                    $tbody.append("<tr><th>产品</th><th>数量(件)</th><th>金额(元)</th></tr>");
-                }
-                $tbody.append("<tr><td>" + data[i].cInvName + "</td><td class='t-r'>" + data[i].totalNum + "</td><td class='t-r'>" + data[i].totalAmount + "</td></tr>");
+            	if (data[i].idate != null) {
+	                if(i == 0 || data[i].idate != data[i-1].idate) {
+	                    $tbody.append("<tr><th colspan='3'>时间：" + data[i].idate + "</th></tr>");
+	                    $tbody.append("<tr><th>产品</th><th>数量(件)</th><th>金额(元)</th></tr>");
+	                }
+	                $tbody.append("<tr><td>" + data[i].cInvName + "</td><td class='t-r'>" + data[i].totalNum + "</td><td class='t-r'>" + data[i].totalAmount + "</td></tr>");            		
+            	}
             }
        });
+    }
+
+    //终端拜访详细
+    function visit_customerId(dateType, customerId, customerName){
+        Utils.loading();
+        $.ajax({
+            url:"${CPATH}/biSales/visitByCustomerId",
+            type:"post",
+            data:{dateType: dateType, customerId: customerId},
+            dataType:"json"
+        }).done(function(data){
+            Utils.close();
+            
+            var tpTitle = customerName + '拜访情况';
+            var $p = $("#p_customerId_visit");
+            var $customerName = $("#visit_customer-name");
+            $customerName.empty();
+            $customerName.text(tpTitle);
+            $p.attr('class', 'title');
+            $("#visit_customerId").show();
+            
+            var $tbody = $("#customerId_visit tbody");
+            $tbody.empty();
+            for(var i = 0; i < data.length; i++){
+                if(i == 0) {
+                    $tbody.append("<tr><th>拜访类型</th><th>业务员</th><th>时间</th></tr>");
+                 }
+                $tbody.append("<tr><td>" + data[i].typeName + "</td><td>" + data[i].realname + "</td><td>" + data[i].create_date + "</td></tr>");
+             }
+        });
     }
     
 
@@ -444,14 +525,28 @@
             <div id="relocation" class="relocation"><i class="icon-map-marker txt-color-blue"></i> 定位</div>
         </header>
         <div id="allmap"></div>
-        <p id="p_customerId_product" style="display:none;" class="txt-color-red"><span id="customer-name"></span></p>
-        <div class="weui-cells weui-cells_form">
-            <div class="weui-cell" style="padding: 0">
-                <table class="table table-striped table-bordered" id="customerId_product">
-                    <tbody>
-
-                    </tbody>
-                </table>
+        <div id="product_customerId" style="display:none;">
+            <p id="p_customerId_product"  class="txt-color-red"><span id="product_customer-name"></span></p>
+            <div class="weui-cells weui-cells_form">
+                <div class="weui-cell" style="padding: 0">
+                    <table class="table table-striped table-bordered" id="customerId_product">
+                        <tbody>
+        
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div id="visit_customerId" style="display:none;">
+            <p id="p_customerId_visit" class="txt-color-red"><span id="visit_customer-name"></span></p>
+            <div class="weui-cells weui-cells_form">
+                <div class="weui-cell" style="padding: 0">
+                    <table class="table table-striped table-bordered" id="customerId_visit">
+                        <tbody align="center">
+    
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 

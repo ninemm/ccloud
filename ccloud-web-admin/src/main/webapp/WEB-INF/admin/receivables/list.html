@@ -114,15 +114,15 @@
 		}
 	});
 }
-	$('input[name="act_amount"]').on("blur",function(){
+	function changeMoney(){
 		var act_amount = $('input[name="act_amount"]').val();
 		$('input[name="balance_amount"]').val(balance_amount-act_amount);
-		if(act_amount>balance_amount){
+		if(parseInt(act_amount)>parseInt(balance_amount)){
 			$("#save").attr("disabled",true);
 		}else{
 			$("#save").attr("disabled",false);
 		}
-	});
+	}
 </#macro>
 
 
@@ -169,7 +169,7 @@
 				<div class="col-sm-5 validata-box">
 					<label class="control-label col-sm-3">*收款金额:</label>
 					<div class="input-group  col-sm-7">
-						<input class="form-control input-sm" type="text" name="act_amount" value="${(act_amount)!}" placeholder="收款金额">
+						<input class="form-control input-sm" type="text" name="act_amount" value="${(act_amount)!}" onblur="changeMoney()" placeholder="收款金额">
 					</div>
 				</div>
 				</div>

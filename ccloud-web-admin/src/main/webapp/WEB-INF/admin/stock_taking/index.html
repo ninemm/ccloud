@@ -29,14 +29,12 @@
 	});
 
 	var initParams = function(params) {
-
-		var stock_taking_sn = encodeURIComponent($("input[name='stock_taking_sn']").val());
-		var name = encodeURIComponent($("input[name='name']").val());
+		var keyword = $('#search').val();
+		if (keyword) keyword = encodeURIComponent(keyword);
 		var param = {
 			size: params.limit,
 			page: params.offset/params.limit + 1,
-			stock_taking_sn: stock_taking_sn,
-			name: name
+			keyword: keyword
 		};
 		return param;
 	};
@@ -105,14 +103,22 @@
 <!-- Main content -->
 <section class="content">
 	<div class="row content-row">
-		<div class="jp-left">
-			<a href="${CPATH}/admin/stockTaking/edit?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-plus"></i> 新增 </a>
-		</div>
-		<form class="form-horizontal" style="float: right" action="${CPATH}/admin/stockTaking?c=${c!}&p=${p!}" method="post">
-			<div class="input-group input-group-sm">
-				<input id="post-search-input" class="form-control" type="search" value="${stock_taking_sn!}" name="stock_taking_sn" placeholder="搜索单号">
-				<input id="post-search-input" class="form-control" type="search" value="${name!}" name="name" placeholder="搜索仓库" style="margin-left:10px;">&nbsp;&nbsp;
-				<input id="search-submit" class="btn btn-sm btn-primary btn-flat" type="button" value="搜索">
+		<form class="form-horizontal" action="${CPATH}/admin/stockTaking?c=${c!}&p=${p!}" method="post">
+			<div class="form-group">
+				<div class="col-sm-4">
+					<a href="${CPATH}/admin/stockTaking/edit?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-plus"></i> 新增 </a>
+				</div>
+				<div class="col-sm-4">
+				</div>
+				<div class="col-sm-3">
+					<label class="control-label col-sm-5">单号/仓库:</label>
+					<div class="col-sm-7 input-group input-group-sm">
+						<input id="search" class="form-control" type="search" value="${k!}" name="k" placeholder="搜索单号/仓库">
+					</div>
+				</div>
+				<div class="col-sm-1">
+					<input id="search-submit" class="btn btn-sm btn-primary btn-flat" type="button" value="搜索">
+				</div>
 			</div>
 		</form>
 	</div>

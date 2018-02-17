@@ -43,8 +43,10 @@
 	.on("click", "#combin-filter .confirm-search-btn", function() {
 		startDate = $('#start-date').val();
 		endDate = $('#end-date').val() + ' 23:59:59';
+		isDone = $('#isDone').find('.red-button').data('id');
 		setItemBykey("startDate", startDate);
 		setItemBykey("endDate", endDate);	
+		setItemBykey("isDone", isDone);
 		combo();
 		initUser();
 	});
@@ -91,6 +93,7 @@
 	var keyword = '';
 	var startDate = $.today();
 	var endDate = $.today() + ' 23:59:59';
+	var isDone = 0;
 	var page = 1;
 	var size = 10;
 
@@ -150,7 +153,8 @@
 			"status": $("#status").data('values'),
 			"customerTypeId": $("#customerTypeId").data('values'),
 			"startDate": startDate,
-			"endDate" : endDate
+			"endDate" : endDate,
+			"isDone" : isDone
 		}
 		<#else>
 		var keywordSession = getItemBykey("keyword");
@@ -158,6 +162,7 @@
 		var customerTypeIdSession = getItemBykey("customerTypeId");
 		var startDateSession = getItemBykey("startDate");
 		var endDateSession = getItemBykey("endDate");
+		var isDoneSession = getItemBykey("isDone");
 		var params = {
 			"page": page,
 			"size": size,
@@ -165,7 +170,8 @@
 			"status": statusSession,
 			"customerTypeId": customerTypeIdSession,
 			"startDate": startDateSession,
-			"endDate" : endDateSession
+			"endDate" : endDateSession,
+			"isDone" : isDoneSession
 		}		
 		</#if>		
 		return params;
@@ -199,7 +205,7 @@
 		if (value == 1000) {
 			return '全部出库';
 		} else {
-			return '部分出库'
+			return '部分出库';
 		}
 	}
 	
@@ -324,6 +330,12 @@
 				<input type="text" id="start-date" class="weui-input weui-flex__item" readonly>
 				<div style="width:1rem" class="t-c">—</div>
 				<input type="text" id="end-date" class="weui-input weui-flex__item" readonly>
+			</div>
+			<h4 class="ft14">是否完成收款</h4>
+			<div class="relative ft12" id="isDone">
+				<span class="red-button" data-id="0">全部</span>
+				<span data-id="1">已完成</span>
+				<span data-id="2">未完成</span>
 			</div>
 		</div>
 		<footer class="weui-footer weui-footer_fixed-bottom ft16">

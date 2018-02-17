@@ -274,7 +274,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 		sql.append(" WHERE LENGTH(ccv.photo) > 2 ");
 
 		appendIfNotEmpty(sql,"ccv.seller_customer_id", customerName, params, false);
-		appendIfNotEmpty(sql,"t1.customerTypeNames", customerType, params, false);
+		appendIfNotEmptyWithLike(sql,"t1.customerTypeNames", customerType, params, false);
 		appendIfNotEmptyWithLike(sql, "ccv.data_area", data_area, params, false);
 
 		sql.append("GROUP BY u.realname, cc.id, DATE_FORMAT(ccv.create_date,'%m-%d-%Y') ");
@@ -301,5 +301,10 @@ public class CustomerVisitQuery extends JBaseQuery {
 		sql.append("ORDER BY ccv.create_date");
 		return Db.find(sql.toString(), userId, startDate, endDate, status);
 
+	}
+
+	public List<Record> findByActivity(String id) {
+		String sql="SELECT a.title FROM cc_customer_visit_join_activity cvja LEFT JOIN cc_activity a ON a.id = cvja.activity_id WHERE cvja.customer_visit_id =?";
+		return Db.find(sql.toString(), id);
 	}
 }

@@ -9,18 +9,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.jfinal.aop.Before;
+import com.jfinal.plugin.activerecord.tx.Tx;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
-import org.ccloud.model.CustomerType;
-import org.ccloud.model.SalesRefundInstock;
-import org.ccloud.model.User;
-import org.ccloud.model.query.CustomerTypeQuery;
-import org.ccloud.model.query.SalesOutstockDetailQuery;
-import org.ccloud.model.query.SalesOutstockQuery;
-import org.ccloud.model.query.SalesRefundInstockDetailQuery;
-import org.ccloud.model.query.SalesRefundInstockQuery;
+import org.ccloud.model.*;
+import org.ccloud.model.query.*;
 import org.ccloud.route.RouterMapping;
 
 import com.alibaba.fastjson.JSON;
@@ -117,6 +113,7 @@ public class RefundController extends BaseFrontController{
 	}
 	
 	public void list() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 
@@ -132,6 +129,7 @@ public class RefundController extends BaseFrontController{
 
 		Map<String, Object> map = new HashMap<>();
 		map.put("refundList", refundList.getList());
+		map.put("user", user);
 		renderJson(map);
 	}
 	
@@ -230,4 +228,42 @@ public class RefundController extends BaseFrontController{
 		
 		return stringBuilder.toString();
 	}
+
+	public void cancel() {
+
+		String orderId = getPara("orderId");
+		SalesRefundInstock salesRefundInstock = SalesRefundInstockQuery.me().findById(orderId);
+//		WorkFlowService workflow = new WorkFlowService();
+
+		//暂时退货没有流程
+//		String procInstId = salesRefundInstock.getProcInstId();
+//		if (StrKit.notBlank(procInstId)) {
+//			if(salesRefundInstock.getStatus()==0) {
+//				workflow.deleteProcessInstance(salesRefundInstock.getProcInstId());
+//			}
+//		}
+
+		salesRefundInstock.setStatus(Consts.SALES_REFUND_INSTOCK_CANCEL);
+
+		if (!salesRefundInstock.saveOrUpdate()) {
+
+			renderAjaxResultForError("取消订单失败");
+			return;
+		}
+
+		renderAjaxResultForSuccess("订单撤销成功");
+	}
+
+	@Before(Tx.class)
+	public void complete() {
+
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+
+		String orderId = getPara("id");
+		Integer pass = getParaToInt("pass", 1);
+		SalesRefundInstockQuery.me().updateConfirm(orderId, pass == 1 ? Consts.SALES_REFUND_INSTOCK_PASS : Consts.SALES_REFUND_INSTOCK_REFUSE, new Date(), user.getId());
+
+		renderAjaxResultForSuccess("订单审核成功");
+	}
+
 }

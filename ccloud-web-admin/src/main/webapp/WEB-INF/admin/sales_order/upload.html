@@ -1,0 +1,131 @@
+<#include "../_inc/_layout.html"/>
+
+<#macro script_import>
+	<!-- bootstrapvalidator -->
+	<script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
+	<!-- bootstrapvalidator -->
+</#macro>
+
+<#macro css_import>
+	<!-- bootstrapvalidator -->
+	<link rel="stylesheet" href="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.css">
+</#macro>
+
+<#macro script>
+
+	var $form = $("#form");
+
+	$(function() {
+
+		jQuery.mm.initValidator('#form', validatorFields)
+		
+		$("#platform").change(function() {
+			var type = $("#platform").val();
+			$("#type").val(type);
+		});
+	});
+
+	var validatorFields = {
+		'file': {
+			validators: {
+				notEmpty: { message: '请选择文件' },
+			}
+		}
+	};
+	
+	function downT() {
+		var type = $("#platform").val();
+		window.location.href = "${CPATH}/admin/salesOrder/otherOrderTemplate?type=" + type;
+	}
+
+	function doSubmit(){
+		var type = $("#type").val();
+		$form.ajaxSubmit({
+			beforeSubmit: function() {
+			    var index = layer.load(1, {shade: false}); //0代表加载的风格，支持0-2
+				var validate = $form.data('bootstrapValidator');
+				validate.validate();
+				return validate.isValid()
+			},
+			type : "post", 
+			dataType:"json",
+			success : function(data) { 
+			    layer.closeAll();
+				if(data.errorCode == 0) {
+					//location.reload();
+					toastr.success(data.message, '操作成功');
+				} else {
+					toastr.error(data.message,'操作失败');
+				}
+			},
+			error : function() {
+			    layer.closeAll();
+				alert("信息提交错误");
+			}
+		});
+	}
+</#macro>
+
+<@layout active_id=p child_active_id=c>
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+	<h1>导入第三方订单</h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+	<li>订单管理</li>
+		<li class="active">导入第三方订单</li>
+	</ol>
+</section>
+<!-- Main content -->
+<section class="content">
+	<div class="box box-default">
+		<div class="box-header with-border">
+			<h3 class="box-title">导入</h3>
+			<div class="box-tools">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse">
+					<i class="fa fa-minus"></i>
+				</button>
+			</div>
+		</div>
+		<form action="${CPATH}/admin/salesOrder/uploading" enctype="multipart/form-data" method="post" id="form" class="form-horizontal" >
+			<input type="hidden" name="type" id="type" value="0">
+			<div class="box-body">
+				<div class="form-group col-sm-12 validata-box">
+					<label class="control-label col-sm-2">*模板:</label>
+					<div class="input-group col-md-4 col-sm-10">
+						<select class="form-control input-sm" name="platform" id="platform">
+							<option value="0">阿里</option>
+							<option value="1">丹露</option>
+						</select>
+					</div>
+				</div>			
+				<div class="form-group col-sm-12 validata-box">
+					<label class="control-label col-sm-2">下载模版:</label>
+					<div class="input-group col-md-4 col-sm-4-offset-2">
+						<a href="javascript:void(0)" onclick="downT();" target="_black">请点击下载模板</a>
+					</div>
+				</div>
+				<div class="form-group col-sm-12 validata-box">
+					<label class="control-label col-sm-2">*上传文件:</label>
+					<div class="input-group col-md-4 col-sm-10">
+						<input type="file" id="file" name="file" value="">
+					</div>
+				</div>
+				<div class="form-group col-sm-12 validata-box">
+					<label class="control-label col-sm-2">*注意事项:</label>
+					<div class="input-group col-md-4 col-sm-10">
+						<p>1.订单号为必填项(同一订单多个产品的记录,订单号填写相同)</p>
+						<p>2.每行订单数据产品信息为必填项</p>
+					</div>					
+				</div>				
+			</div>
+		</form>
+		<div class="box-footer"> 
+			<button type="button" onclick="doSubmit()" class="btn btn-sm bg-olive btn-flat">导入</button>
+			<input type="button" class="btn btn-sm btn-primary btn-flat" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
+		</div>
+	</div>
+</section>
+
+</@layout>

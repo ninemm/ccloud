@@ -8,7 +8,7 @@
 		color: #999;
 	}
 	#my-order {
-		top: 44px;
+		top: 153px;
 		position: absolute;
 		bottom: 0;
 	}
@@ -146,12 +146,12 @@
 		
 		$loading.show();
 		$noMore.hide();
-
 		var params = getParam();
 		Utils.ajax('${CPATH}/order/orderList', params, 
 			function(data) {
 				$loading.hide();
-				
+				$("#orderCount").html(data.orderCount+" 单");
+				$("#orderAmount").html(data.orderAmount+" 元");				
 				if(data.orderList.length == 0) {
 					if($('.weui-panel').length == 0) $noMore.show();
 					loading = true;
@@ -175,7 +175,7 @@
 					$newOrder.find(".appendOrdeProductDetail").attr('id',"p"+el.id);
 					$newOrder.find("#contact").text(el.ccontact + '/' + el.cmobile);
 					$newOrder.find("#customerType").text(el.customerTypeName);
-					if(el.status == 0) {
+					if(el.biz_user_id == data.user.id && (el.status == 0 || (el.status == 1000 && el.is_print == 0))) {
 						$newOrder.find("#cancel").on('click', function() {
 							$.confirm({
 								title: "订单撤销",
@@ -209,7 +209,7 @@
 					});
 
 					var assignee = el.assignee == null ? '' : el.assignee.split(',');
-					if(el.taskId != null && $.inArray(data.username, assignee) != -1) {
+					if(el.taskId != null && $.inArray(data.user.username, assignee) != -1) {
 						$newOrder.find("#pass").on('click', function() {
 							agree(el.id, el.taskId, 1);
 						});
@@ -330,11 +330,14 @@
             success:function(data) {
             $.each(data.orderDetail, function(idx, item) {
                 var productName = "";
-                if(item.is_gift == 0){
-                    productName = item.custom_name;
-                }else{
+                if(item.is_composite == 1){
+                    productName = "<span class='ctag'>组合</span>";
+                    productName = productName + item.custom_name;                
+                }else if (item.is_gift == 1) {
                     productName = "<span class='tag'>赠品</span>";
                     productName = productName + item.custom_name;
+                } else {
+                	productName = item.custom_name;
                 }
                 var bigCount = parseInt(item.product_count/item.convert_relate);//下单大单位数量
                 var smallPrice = (item.product_amount/item.product_count).toFixed(2);//下单小价格
@@ -410,6 +413,22 @@
 
 <@layout>
 <div class="weui-content">
+    <div class="report-top weui-flex">
+        <div class="weui-flex__item">
+            <img src="${CTPATH}/images/order.png" alt="">
+            <div class="border-right-1px">
+                <p class="ft16">订单数</p>
+                <p class="ft14" id="orderCount"></p>
+            </div>
+        </div>
+        <div class="weui-flex__item">
+            <img src="${CTPATH}/images/money.png" alt="">
+            <div>
+                <p class="ft16">订单总额</p>
+                <p class="ft14" id="orderAmount"></p>
+            </div>
+        </div>
+    </div>
 	<header>
 		<div class="weui-search-bar" id="SearchBar">
 			<form class="weui-search-bar__form">
@@ -427,6 +446,7 @@
 		</div>
 	</header>
 	<article id="my-order" class="ft14">
+	
 		<header class="has-th-list weui-flex">
 			<div class="head-search select-area weui-flex__item">
 				<div class="weui-flex">

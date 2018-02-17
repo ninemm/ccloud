@@ -135,24 +135,23 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		String [] imagePath = getParaValues("imageUrl[]");
 		String investTypes = getPara("investType");
 		String customerTypes = getPara("customerType");
-		if(imagePath.length>3) {
-			renderAjaxResultForError("图片保存不能超过三张");
-			return;
-		}
-		if(customerTypes.length()>180) {
+		if(customerTypes !=null && customerTypes.length()>180) {
 			renderAjaxResultForError("客户类型不能超过5个");
 			return;
 		}
 		//存储路径
 		String imagPath = "";
 		if (imagePath != null) {
+			if(imagePath.length>3) {
+				renderAjaxResultForError("图片保存不能超过三张");
+				return;
+			}
 			for (int i = 0;i < imagePath.length;i++) {
 				imagPath +=imagePath[i].replace("\\", "/")+",";
 			}
-		}
-		
-		if(imagPath.length()>0) {
 			activity.setImageListStore(imagPath.substring(0, (imagPath.length()-1)));
+		}else {
+			activity.setImageListStore(imagPath);
 		}
 		String unit = getPara("unit");
 		String areaNames = getPara("areaNames").replace("/", "-");

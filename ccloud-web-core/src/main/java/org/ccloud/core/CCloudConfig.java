@@ -30,6 +30,7 @@ import org.ccloud.core.render.CCloudRenderFactory;
 import org.ccloud.interceptor.AdminInterceptor;
 import org.ccloud.interceptor.GlobelInterceptor;
 import org.ccloud.interceptor.PublicInterceptor;
+import org.ccloud.interceptor.SessionInterceptor;
 import org.ccloud.log.SystemLogThread;
 import org.ccloud.message.plugin.MessagePlugin;
 import org.ccloud.model.core.JModelMapping;
@@ -221,7 +222,6 @@ public abstract class CCloudConfig extends JFinalConfig {
 	}
 	
 	public QiniuPlugin createQiniuPlugin() {
-		
 		QiniuPlugin qiniuPlugin = new QiniuPlugin("ccloud.properties");
 		return qiniuPlugin;
 	}
@@ -233,6 +233,7 @@ public abstract class CCloudConfig extends JFinalConfig {
 		interceptors.add(new HookInterceptor());
 		interceptors.add(new ShiroInterceptor());
 		interceptors.add(new PublicInterceptor());
+		interceptors.add(new SessionInterceptor());
 	}
 
 	public void configHandler(Handlers handlers) {

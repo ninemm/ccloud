@@ -72,8 +72,10 @@
     }
     
     function productCount(params) {
+    	$.showLoading();
 		Utils.ajax('${CPATH}/report/getOtherProductCount', params, 
 			function(data){
+				$.hideLoading();
 	            var length = data.length;
 	            var $tbody = $("#product_body tbody");
 	            $tbody.empty();

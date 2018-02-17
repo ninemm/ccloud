@@ -46,13 +46,32 @@ public class PlansQuery extends JBaseQuery {
 			}
 		});
 	}
-
-	public Page<Plans> paginate(int pageNumber, int pageSize, String orderby) {
-		String select = "select * ";
-		StringBuilder fromBuilder = new StringBuilder("from `cc_plans` ");
+	
+	
+	
+	
+	
+	public Page<Plans> paginate(int pageNumber, int pageSize, String keyword, String orderby, String dataArea,String type) {
+		String select = "SELECT cp.user_id,cp.type,cp.seller_product_id,cp.start_date,cp.end_date,cs.seller_name,u.realname,csp.custom_name ,sum(plan_num) as planNum, sum(complete_num) as completeNum ,cp.complete_ratio  ";
+		StringBuilder fromBuilder = new StringBuilder("FROM cc_plans cp  ");
+		fromBuilder.append("LEFT JOIN cc_seller cs on cs.dept_id = cp.dept_id ");
+		fromBuilder.append("LEFT JOIN `user` u on u.id = cp.user_id ");
+		fromBuilder.append("LEFT JOIN cc_seller_product csp on csp.id = cp.seller_product_id ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "u.realname", keyword, params, true);
 
+		
+		if(needWhere) {
+			fromBuilder.append("where 1=1 ");
+		}
+		if(!type.equals("")) {
+			fromBuilder.append(" and cp.type = '"+type+"' ");
+		}
+		fromBuilder.append("and cp.data_area like '"+dataArea+"' ");
+		fromBuilder.append("GROUP BY cp.seller_id,cp.user_id, cp.type, cp.seller_product_id ,cp.start_date,cp.end_date ");
+		fromBuilder.append("order by cp.type,cp.start_date desc,cp.end_date desc ,cp.user_id");
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
@@ -90,7 +109,7 @@ public class PlansQuery extends JBaseQuery {
 			params.add(endDate);
 		}
 
-		fromBuilder.append(" order by o.start_date desc,o.complete_ratio desc, o.create_date desc ");
+		fromBuilder.append(" GROUP BY o.seller_id,o.user_id, o.type, o.seller_product_id ,o.start_date,o.end_date order by o.start_date desc,o.complete_ratio desc, o.create_date desc ");
 
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());

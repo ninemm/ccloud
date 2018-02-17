@@ -200,6 +200,11 @@
 				notEmpty: { message: '活动编码不能为空' }
 			}
 		},
+		'customerTy':{
+			validators: {
+				notEmpty: { message: '客户类型不能为空' }
+			}
+		},
 		'startDate': {
 			validators: {
 				notEmpty: { message: '活动开始时间不能为空' }
@@ -215,14 +220,14 @@
 				notEmpty: { message: '活动方案号不能为空' }
 			}
 		},
-		'activity。category': {
+		'activity.category': {
 			validators: {
 				notEmpty: { message: '活动类型不能为空' }
 			}
 		},
-		'customerType': {
+		'activity.visit_num': {
 			validators: {
-				notEmpty: { message: '客户类型不能为空' }
+				notEmpty: { message: '拜访次数不能为空' }
 			}
 		},
 		'activity.area_type': {
@@ -382,7 +387,6 @@
 						<div class="input-group col-sm-8">
 							<select id="customerType" class="form-control" name = "customerTy" multiple="multiple">
 							</select>
-                        </select>
 						</div>
 					</div>
 					<div class="col-sm-5 validata-box">

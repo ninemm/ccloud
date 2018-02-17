@@ -156,7 +156,8 @@
             success:function(data) {
                 $(".weui-loadmore").hide();
                 $(".infinite").destroyInfinite();
-
+				$("#customerCount1").html(data.totalRow+" 个");
+				$("#orderCount1").html(data.orderCount+" 个");
                 if (data.totalPage > pageNumber) {
                     loading = false;
                     $(".infinite").infinite();
@@ -267,6 +268,22 @@
 <@layout>
 <div id="customer">
     <header>
+	    <div class="report-top weui-flex">
+	        <div class="weui-flex__item">
+	            <img src="${CTPATH}/images/order.png" alt="">
+	            <div class="border-right-1px">
+	                <p class="ft16">客户总数</p>
+	                <p class="ft14" id="customerCount1"></p>
+	            </div>
+	        </div>
+	        <div class="weui-flex__item">
+	            <img src="${CTPATH}/images/customer.png" alt="">
+	            <div>
+	                <p class="ft16">下单客户数</p>
+	                <p class="ft14" id="orderCount1"></p>
+	            </div>
+	        </div>
+	    </div>
         <div class="weui-search-bar" id="SearchBar">
             <form class="weui-search-bar__form">
                 <div class="weui-search-bar__box">
@@ -282,7 +299,7 @@
             <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel" onclick="searchCancel()">取消</a>
         </div>
     </header>
-    <article class="customer">
+    <article class="customer" style="top:153px;">
         <header class="has-th-list weui-flex">
             <div class="head-search select-area weui-flex__item">
                 <div class="weui-flex">

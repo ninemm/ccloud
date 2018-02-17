@@ -49,7 +49,7 @@ public class SellerJoinTemplateQuery extends JBaseQuery {
 
 		LinkedList<Object> params = new LinkedList<Object>();
 		
-		appendIfNotEmptyWithLike(fromBuilder, "name", keyword, params, true);
+		appendIfNotEmptyWithLike(fromBuilder, "seller_name", keyword, params, true);
 		if(keyword.equals("")){
 			fromBuilder.append("where seller_id = '"+sellerId+"'");
 		}else {

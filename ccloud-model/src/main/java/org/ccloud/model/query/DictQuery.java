@@ -130,11 +130,19 @@ public class DictQuery extends JBaseQuery {
 		}
 
 		else {
-			fromBuilder.append(" ORDER BY `create_time` desc");
+			fromBuilder.append(" ORDER BY `create_date` desc");
 		}
 	}
 
 	public List<Dict> findByCode(String dictUnitCode) {
 		return DAO.doFind("dict.key = ?", dictUnitCode);
+	}
+	
+	public Dict findbyName(String name) {
+		return DAO.doFindFirst("dict.name=?", name);
+	}
+	
+	public Dict findByValue(String value) {
+		return DAO.doFindFirst("dict.value=?",value);
 	}
 }

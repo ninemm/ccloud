@@ -25,6 +25,7 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.CustomerType;
+import org.ccloud.model.SalesOrder;
 import org.ccloud.model.query.*;
 import org.ccloud.route.RouterMapping;
 
@@ -39,14 +40,11 @@ public class ReportController extends BaseFrontController {
 	public void index() {
 		
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
 		String startDate = date + " 00:00:00";
 		String endDate =  date + " 23:59:59";
-
-		Page<Record> orderList = SalesOrderQuery.me().paginateForApp(1, Integer.MAX_VALUE, "", null,
-				"", startDate, endDate, sellerId, selectDataArea);
-		setAttr("orderNum", orderList.getTotalRow());
+		List<SalesOrder> salesOrders = SalesOrderQuery.me().findAllByDataArea(selectDataArea,startDate,endDate);
+		setAttr("orderNum", salesOrders.size());
 		Page<Record> customerList = new Page<>();
 		customerList = SellerCustomerQuery.me().findByUserTypeForApp(1, Integer.MAX_VALUE, selectDataArea, "", "", "");
 		setAttr("customerNum", customerList.getTotalRow());
@@ -323,7 +321,7 @@ public class ReportController extends BaseFrontController {
 		if (StrKit.isBlank(sellerId)) {
 			sellerId = getSessionAttr("sellerId");
 		}
-		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String deptId = getPara("deptId");
 		String orderTag = getPara("orderTag");
 		String print = getPara("print");
@@ -340,7 +338,7 @@ public class ReportController extends BaseFrontController {
 		if (StrKit.isBlank(sellerId)) {
 			sellerId = getSessionAttr("sellerId");
 		}
-		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String deptId = getPara("deptId");
 		String orderTag = getPara("orderTag");
 		List<Record> record = SalesOrderQuery.me().getUserRankByOutStock(startDate, endDate, dayTag, deptId, sellerId, orderTag, dataArea);
@@ -365,7 +363,7 @@ public class ReportController extends BaseFrontController {
 		if (StrKit.isBlank(sellerId)) {
 			sellerId = getSessionAttr("sellerId");
 		}
-		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String deptId = getPara("deptId");
 		String orderTag = getPara("orderTag");
 		String print = getPara("print");
@@ -382,7 +380,7 @@ public class ReportController extends BaseFrontController {
 		if (StrKit.isBlank(sellerId)) {
 			sellerId = getSessionAttr("sellerId");
 		}
-		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String deptId = getPara("deptId");
 		String orderTag = getPara("orderTag");
 		List<Record> record = SalesOrderQuery.me().getGiftCountByUserByOutStock(startDate, endDate, dayTag, deptId, sellerId, dataArea, orderTag);

@@ -119,13 +119,16 @@ public class Consts {
 	public static final int SALES_ORDER_RECEIVE_TYPE_ACCOUNT = 0;//账期
 	public static final int SALES_ORDER_RECEIVE_TYPE_CASH = 1;//现金
 
+	public static final String SALES_ORDER_ACTIVITY_APPLY_ID_OTHER = "1001";//其他活动
+
 	public static final int SALES_OUT_STOCK_STATUS_OUT = 1000;//出库单出库
 	public static final int SALES_OUT_STOCK_STATUS_PART_OUT= 2000;//出库单部分出库
 	public static final int SALES_OUT_STOCK_STATUS_DEFUALT = 0;//出库单待出库
 
 	public static final int SALES_REFUND_INSTOCK_DEFUALT = 0;//退货单待审核
 	public static final int SALES_REFUND_INSTOCK_PASS = 1000;//退货单已审核
-	public static final int SALES_REFUND_INSTOCK_CANCEL= 1001;//退货单取消
+	public static final int SALES_REFUND_INSTOCK_CANCEL= 1001;//退货单撤销
+	public static final int SALES_REFUND_INSTOCK_REFUSE= 1002;//退货单拒绝
 	public static final int SALES_REFUND_INSTOCK_PART_OUT= 2000;//退货单部分入库
 	public static final int SALES_REFUND_INSTOCK_ALL_OUT= 3000;//退货单全部入库
 
@@ -150,6 +153,7 @@ public class Consts {
 
 	public static final String OPTION_SELLER_STORE_CHECK = "seller_store_check_";//经销商检查库存开关设置
 	public static final String OPTION_WEB_ORDER_PRICE_EDIT = "web_order_price_edit_";//下单修改价格开关设置
+	public static final String OPTION_WEB_ORDER_MIX_GIFT = "web_order_mix_gift_";//下单混合赠品开关设置
 	public static final String OPTION_WEB_PROCEDURE_REVIEW = "web_procedure_review_";//订单审核流程开关设置
 	public static final String OPTION_WEB_PROCEDURE_REVIEW_EDIT = "web_procedure_review_edit_";//订单审核修改开关设置
 	public static final String OPTION_WEB_PROC_CUSTOMER_REVIEW = "web_proc_customer_review_";//客户流程审核开关设置
@@ -157,6 +161,7 @@ public class Consts {
 	public static final String OPTION_WEB_PROC_PRICE_LIMIT = "web_proc_price_limit_";//商品价格审核开关设置
 	public static final String OPTION_WEB_PROC_CUSTOMER_VISIT = "web_proc_customer_visit_";//新增拜访审核开关设置
 	public static final String OPTION_WEB_PROC_ACTIVITY_APPLY = "web_proc_activity_apply_";//申请活动审核开关设置
+	public static final String OPTION_DATA_UPLOAD_CUSTOMER_TYPE = "data_upload_customer_type_";//数据上传类型配置
 	public static final String OPTION_FILE_ROOT_PATH = "web_file_root_path";
 
 	public static final String OPTION_ON = "true";
@@ -251,4 +256,19 @@ public class Consts {
 	
 	public static final Integer STATUS_STATE_PUT = 1;// 通用上架
 	public static final Integer STATUS_STATE_DOWN = 0;// 通用下架
+
+	public static final String TEMPLATE_ALI = "0";//阿里模板
+	public static final String TEMPLATE_DANLU = "1";//丹露模板
+	public static final String TEMPLATE_NAME_ALI = "阿里";//阿里模板
+	public static final String TEMPLATE_NAME_DANLU = "丹露";//丹露模板	
+	public static final String TEMPLATE_FILE_NAME_ALI = "aliTemplate.xlsx";//阿里模板文件名
+	public static final String TEMPLATE_FILE_NAME_DANLU = "danluTemplate.xls";//丹露模板文件名
+	
+	public static final String WEEK_PLAN = "101201";//周计划
+	public static final String MONTH_PLAN = "101202";//月计划
+	public static final String YEAR_PLAN = "101203";//年计划
+	
+	
+	public static final String WAREHOUSE_IDS_IS_NULL = "1";//当用户没有分配仓库时且不是经管时返回空值的仓库ID
+	
 }

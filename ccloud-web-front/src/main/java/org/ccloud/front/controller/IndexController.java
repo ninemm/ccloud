@@ -21,6 +21,7 @@ import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.core.addon.HookInvoker;
 import org.ccloud.core.cache.ActionCache;
+import org.ccloud.interceptor.SessionInterceptor;
 import org.ccloud.model.Dict;
 import org.ccloud.model.User;
 import org.ccloud.model.query.*;
@@ -28,15 +29,18 @@ import org.ccloud.route.RouterMapping;
 import org.ccloud.ui.freemarker.tag.IndexPageTag;
 import org.ccloud.utils.StringUtils;
 
+import com.jfinal.aop.Clear;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.render.Render;
 
 @RouterMapping(url = "/")
+
 public class IndexController extends BaseFrontController {
 
 	@ActionCache
+	@Clear(SessionInterceptor.class)
 	public void index() {
 		try {
 			Render render = onRenderBefore();
@@ -49,7 +53,8 @@ public class IndexController extends BaseFrontController {
 			onRenderAfter();
 		}
 	}
-
+	
+	@Clear(SessionInterceptor.class)
 	private void doRender() {
 		setGlobleAttrs();
 		String para = getPara();

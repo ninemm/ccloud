@@ -25,6 +25,7 @@ public class printAllNeedInfo {
 	private String sellerName;//销售商名字
 	private String orderId;//订单ID
 	private String bizUserId;//业务员ID
+	private String activityApplyId;//活动关联id
 	private String salesOutStockId;//出库单ID
 	private String stockOutRemark;//出库单备注
 	private Integer receiveType;//出库单收款方式 0:应收账款 1:现金'
@@ -132,6 +133,14 @@ public class printAllNeedInfo {
 	}
 	public void setOrderId(String orderId) {
 		this.orderId = orderId;
+	}
+
+	public String getActivityApplyId() {
+		return activityApplyId;
+	}
+
+	public void setActivityApplyId(String activityApplyId) {
+		this.activityApplyId = activityApplyId;
 	}
 	public String getBizUserId() {
 		return bizUserId;

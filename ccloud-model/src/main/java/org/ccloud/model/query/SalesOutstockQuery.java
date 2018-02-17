@@ -51,7 +51,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 
 	public Record findMoreById(final String id) {
 		StringBuilder fromBuilder = new StringBuilder(
-				" select o.*, sa.biz_user_id as order_user, sa.create_date as order_date, cs.customer_kind, c.id as customerId, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as customerTypeCode, u.realname, u.mobile ");
+				" select o.*, sa.biz_user_id as order_user, sa.create_date as order_date, sa.activity_apply_id, cs.customer_kind, c.id as customerId, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as customerTypeCode, u.realname, u.mobile ");
 		fromBuilder.append(" ,w.code as warehouseCode, cp.factor ");
 		fromBuilder.append(" from `cc_sales_outstock` o ");
 		fromBuilder.append(" left join cc_sales_order_join_outstock co ON co.outstock_id = o.id ");
@@ -190,13 +190,14 @@ public class SalesOutstockQuery extends JBaseQuery {
 		if (StrKit.notBlank(status)) {
 			fromBuilder.append("left join (SELECT cc.id, cc.outstock_id, IFNULL(SUM(cc.product_count),0) as outCount, IFNULL(SUM(t1.count), 0) AS refundCount ");
 			fromBuilder.append("FROM cc_sales_outstock_detail cc LEFT JOIN (SELECT SUM(cr.reject_product_count) AS count, cr.outstock_detail_id FROM cc_sales_refund_instock_detail cr ");
-			fromBuilder.append("LEFT JOIN cc_sales_refund_instock ci ON ci.id = cr.refund_instock_id where ci.`status` != ? ");
+			fromBuilder.append("LEFT JOIN cc_sales_refund_instock ci ON ci.id = cr.refund_instock_id where ci.`status` not in (?,?) ");
 			fromBuilder.append("GROUP BY cr.outstock_detail_id ) t1 ON cc.id = t1.outstock_detail_id GROUP BY cc.outstock_id ) t2 on t2.outstock_id = o.id ");
 		}
 
 		LinkedList<Object> params = new LinkedList<Object>();
 		if (StrKit.notBlank(status)) {
 			params.add(Consts.SALES_REFUND_INSTOCK_CANCEL);
+			params.add(Consts.SALES_REFUND_INSTOCK_REFUSE);
 		}		
 		boolean needWhere = true;
 
@@ -235,7 +236,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 			params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
 		}		
 
-		fromBuilder.append(" and ( o.outstock_sn like '%"+keyword+"%' or c.customer_name like '%"+keyword+"%' ) ");
+		fromBuilder.append(" and cso.status != "+Consts.SALES_ORDER_STATUS_CANCEL+" and ( o.outstock_sn like '%"+keyword+"%' or c.customer_name like '%"+keyword+"%' ) ");
 
 		if (sort==""||null==sort) {
 			fromBuilder.append("order by "+"o.create_date desc");
@@ -303,10 +304,11 @@ public class SalesOutstockQuery extends JBaseQuery {
 		fromBuilder.append("left join cc_customer_type ct on o.customer_type_id = ct.id ");
 		fromBuilder.append("left join (SELECT cc.id, cc.outstock_id, IFNULL(SUM(cc.product_count),0) as outCount, IFNULL(SUM(t1.count), 0) AS refundCount ");
 		fromBuilder.append("FROM cc_sales_outstock_detail cc LEFT JOIN (SELECT SUM(cr.reject_product_count) AS count, cr.outstock_detail_id FROM cc_sales_refund_instock_detail cr ");
-		fromBuilder.append("LEFT JOIN cc_sales_refund_instock ci ON ci.id = cr.refund_instock_id where ci.`status` != ? ");
+		fromBuilder.append("LEFT JOIN cc_sales_refund_instock ci ON ci.id = cr.refund_instock_id where ci.`status` not in (?,?) ");
 		fromBuilder.append("GROUP BY cr.outstock_detail_id ) t1 ON cc.id = t1.outstock_detail_id GROUP BY cc.outstock_id ) t2 on t2.outstock_id = o.id ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		params.add(Consts.SALES_REFUND_INSTOCK_CANCEL);
+		params.add(Consts.SALES_REFUND_INSTOCK_REFUSE);
 		boolean needWhere = true;
 
 		needWhere = appendIfNotEmpty(fromBuilder, "o.status", status, params, needWhere);
@@ -345,16 +347,17 @@ public class SalesOutstockQuery extends JBaseQuery {
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 	
+	//应收账款
 	public Page<Record> paginateForReceivables(int pageNumber, int pageSize, String keyword, String userId,
-			String customerTypeId, String startDate, String endDate, String sellerId, String dataArea) {
-		String select = "select o.*, c.customer_name, ct.name as customerTypeName,o.total_amount-COALESCE(SUM(r.act_amount) , 0) AS balanceAmount ";
+			String customerTypeId, String startDate, String endDate, String isDone, String sellerId, String dataArea) {
+		String select = "select o.*, c.customer_name, ct.name as customerTypeName,o.total_amount - COALESCE(t.actAmount,0) AS balanceAmount ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_sales_outstock` o ");
 		fromBuilder.append(" LEFT JOIN cc_seller_customer cc ON o.customer_id = cc.id ");
 		fromBuilder.append(" LEFT JOIN cc_customer c on cc.customer_id = c.id ");
 		fromBuilder.append(" LEFT JOIN cc_customer_type ct on o.customer_type_id = ct.id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock cso ON o.id = cso.outstock_id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order cs ON cso.order_id = cs.id ");
-		fromBuilder.append(" LEFT JOIN cc_receiving r ON r.ref_sn=o.outstock_sn ");
+		fromBuilder.append(" LEFT JOIN (select r.ref_sn, SUM(r.act_amount) AS actAmount from cc_receiving r group by r.ref_sn)t ON t.ref_sn=o.outstock_sn ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 
@@ -385,7 +388,13 @@ public class SalesOutstockQuery extends JBaseQuery {
 			params.add(endDate);
 		}
 
-		fromBuilder.append("group by o.outstock_sn order by  o.create_date desc ");
+		if("1".equals(isDone)){
+			fromBuilder.append(" and o.total_amount = COALESCE(t.actAmount, 0)  ");
+		}else if("2".equals(isDone)){
+			fromBuilder.append(" and o.total_amount > COALESCE(t.actAmount, 0) ");
+		}
+
+		fromBuilder.append(" order by  o.create_date desc ");
 
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
@@ -393,10 +402,11 @@ public class SalesOutstockQuery extends JBaseQuery {
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}	
 
+
 	
 	public printAllNeedInfo findStockOutForPrint(final String id) {
 		StringBuilder fromBuilder = new StringBuilder("select o.outstock_sn,o.receive_type,o.remark as stockOutRemark,o.delivery_address,o.total_amount, cs.customer_kind, cs.id as customerId, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as customerTypeCode, u.realname, u.mobile, ");
-		fromBuilder.append(" w.code as warehouseCode, cp.factor,w.`name` as warehouseName,w.phone as warehousePhone,o.create_date as placeOrderTime,so.remark,sn.seller_name,so.total_amount,so.id as orderId,so.biz_user_id,o.id as salesOutStockId,sn.id as sellerId,pt.context as printFootContext ");
+		fromBuilder.append(" w.code as warehouseCode, cp.factor,w.`name` as warehouseName,w.phone as warehousePhone,o.create_date as placeOrderTime,so.remark,sn.seller_name,so.total_amount,so.id as orderId,so.biz_user_id, so.activity_apply_id, o.id as salesOutStockId,sn.id as sellerId,pt.context as printFootContext ");
 		fromBuilder.append(" from `cc_sales_outstock` o ");
 		fromBuilder.append(" left join cc_seller_customer cs on o.customer_id = cs.id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sj on sj.outstock_id = o.id ");
@@ -428,6 +438,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 			printAllNeedInfo.setPlaceOrderTime(record.getDate("placeOrderTime"));
 			printAllNeedInfo.setOrderId(record.getStr("orderId"));
 			printAllNeedInfo.setBizUserId(record.getStr("biz_user_id"));
+			printAllNeedInfo.setActivityApplyId(record.getStr("activity_apply_id"));
 			printAllNeedInfo.setCustomerId(record.getStr("customerId"));
 			printAllNeedInfo.setStockOutRemark(record.getStr("stockOutRemark"));
 			printAllNeedInfo.setReceiveType(record.getInt("receive_type"));
@@ -543,6 +554,38 @@ public class SalesOutstockQuery extends JBaseQuery {
 		
 		return Db.find(stringBuilder.toString(), params.toArray());
 
+	}
+	
+	public SalesOutstock findOrderId(String orderId) {
+		String sql = "select co.* from cc_sales_outstock co LEFT JOIN cc_sales_order_join_outstock coo on coo.outstock_id = co.id where coo.order_id = ?";
+		return DAO.findFirst(sql, orderId);
+	}
+	
+	public List<Record> findUserList(String sellerId,String startDate,String endDate){
+		StringBuilder fromBuilder = new StringBuilder("SELECT u.realname, u.id FROM cc_sales_outstock o ");
+		fromBuilder.append("LEFT JOIN cc_sales_order_join_outstock cj on cj.outstock_id = o.id ");
+		fromBuilder.append("LEFT JOIN cc_sales_order cs on cs.id = cj.order_id ");
+		fromBuilder.append("LEFT JOIN `user` u on u.id = cs.biz_user_id ");
+		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
+
+		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
+
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and o.create_date >= ?");
+			params.add(startDate);
+		}
+
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and o.create_date <= ?");
+			params.add(endDate);
+		}
+		fromBuilder.append("GROUP BY u.id ");
+
+		if (params.isEmpty())
+			return Db.find(fromBuilder.toString());
+
+		return Db.find(fromBuilder.toString(), params.toArray());
 	}
 	
 }

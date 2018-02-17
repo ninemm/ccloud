@@ -16,22 +16,69 @@
 <#macro script>
 
 $(function() {
-
+	$(".startDate").append('开始时间'+' <span class="require">*</span>');
+	$("#datetime-picker").datetimePicker({
+				times: function () {
+		          return [];
+		        }
+			});
+	$("#datetime-picker").click(function(){
+				var date2 = new Date();
+				if($("#typeId").val()==101202){
+					$(".picker-items-col:nth-child(5)").hide();
+					$(".picker-items-col:nth-child(4)").hide();
+				}else if($("#typeId").val()==101203){
+					$(".picker-items-col:nth-child(5)").hide();
+					$(".picker-items-col:nth-child(4)").hide();
+					$(".picker-items-col:nth-child(3)").hide();
+					$(".picker-items-col:nth-child(2)").hide();
+				}
+			});
+	$("#datetime-picker").change(function(){
+		var date3 = new Date($("#datetime-picker").val().replace(/-/g,"/"));	
+		if($("#typeId").val()==101202){
+			$("#datetime-picker").val(date3.Format("yyyy-MM"));
+			date3.setDate(1);
+			$("#start-date").val(date3.Format("yyyy-MM-dd"));
+			 var currentMonth=date3.getMonth();
+			 var nextMonth=++currentMonth;
+			 var nextMonthFirstDay=new Date(date3.getFullYear(),nextMonth,1);
+			 var oneDay=1000*60*60*24;
+			 var date4 = new Date(nextMonthFirstDay-oneDay);
+			 $("#end-date").val(date4.Format("yyyy-MM-dd"));
+		}
+		if($("#typeId").val()==101203){
+			$("#datetime-picker").val(date3.Format("yyyy"));
+			date3.setDate(1);
+			date3.setMonth(0);
+			$("#start-date").val(date3.Format("yyyy-MM-dd"));
+			date3.setDate(31);
+			date3.setMonth(11);
+			$("#end-date").val(date3.Format("yyyy-MM-dd"));
+		}
+	});
 	$("#start-date").calendar({
 		maxDate: function() {
 			return $('#end-date').val()
+		},
+		onChange:function(p, values, displayValues){
+			var date = new Date(values);
+			if($("#typeId").val()==101201){
+				date.setDate(date.getDate()+7);
+				$("#end-date").val(date.Format("yyyy-MM-dd"));
+			}
 		}
 	});
+	
 	$("#start-date").val($.today());
 	$("#end-date").calendar({
 		minDate: function() {
 			var date = new Date($('#start-date').val().replace(/-/g,"/"));
-			date.setDate(date.getDate() - 1);
+			date.setDate(date.getDate() -1);
 			return date.Format("yyyy-MM-dd")
 		}
 	});
 	$("#end-date").val($.today());
-	
 	$(document).on("click", "#plans", function() {
 		if($("#typeId").val() == '') {
 			$.toptip("请选择计划类型!", 'warning');
@@ -51,7 +98,10 @@ $(function() {
 			doSubmit();
 		});
 	})
-
+	
+	/*var date2 = new Date();
+	date2.setDate((new Date()).getDate()+7);
+	$("#end-date").val(date2.Format("yyyy-MM-dd"));*/
 	$productList.empty();
 	addProduct();
  })
@@ -73,6 +123,42 @@ $("#type").select({
 	onChange: function(obj){
 		var $product = $(this)[0].$input.parents(".productInfo");
 		$("#typeId").val(this.data['values']);
+		var date2 = new Date();
+		if($("#typeId").val()==101201){
+			$("#start-date").val($.today());
+			date2.setDate((new Date()).getDate()+7);
+			$("#end-date").val(date2.Format("yyyy-MM-dd"));
+			$("#start-date").show();
+			$("#datetime-picker").hide();
+			$(".endDate").show();
+		}
+		else{
+			$(".startDate").html("");
+			$("#start-date").hide();
+			$("#datetime-picker").show();
+			$(".endDate").hide();
+			if($("#typeId").val()==101202){
+				$(".startDate").append('计划月份'+' <span class="require">*</span>');
+				$("#datetime-picker").val(date2.Format("yyyy-MM"));
+				date2.setDate(1);
+				$("#start-date").val(date2.Format("yyyy-MM-dd"));
+				 var currentMonth=date2.getMonth();
+				 var nextMonth=++currentMonth;
+				 var nextMonthFirstDay=new Date(date2.getFullYear(),nextMonth,1);
+				 var oneDay=1000*60*60*24;
+				 var date4 = new Date(nextMonthFirstDay-oneDay);
+				 $("#end-date").val(date4.Format("yyyy-MM-dd"));
+			}else{
+				$(".startDate").append('计划年份'+' <span class="require">*</span>');
+				$("#datetime-picker").val(date2.Format("yyyy"));
+				date2.setDate(1);
+				date2.setMonth(0);
+				$("#start-date").val(date2.Format("yyyy-MM-dd"));
+				date2.setDate(31);
+				date2.setMonth(11);
+				$("#end-date").val(date2.Format("yyyy-MM-dd"));
+			}
+		}
 	}
 });
 
@@ -136,14 +222,14 @@ function doSubmit(){
 				</div>
 				<div class="weui-cell">
 					<div class="weui-cell__bd">
-						<div class="order-customer-info-title">开始时间
-							<span class="require">*</span>
+						<div class="order-customer-info-title startDate">
 						</div>
 						<i class="icon-sort-desc fr"></i>
 						<input type="text" class="weui-input fr" id="start-date" name="start-date" readonly="">
+						<input type="text" class="weui-input fr" id='datetime-picker' style="display:none;" readonly=""/>
 					</div>
 				</div>
-				<div class="weui-cell">
+				<div class="weui-cell endDate">
 					<div class="weui-cell__bd">
 						<div class="order-customer-info-title">结束时间
 							<span class="require">*</span>
@@ -174,12 +260,12 @@ function doSubmit(){
 				</div>
 			</div>
 		</div>
-		<!--		<section class="weui-panel weui-panel_access">
+		<section class="weui-panel weui-panel_access">
 			<div class="weui-cell weui-cell_access t-c ft14">
 				<p class="width-100 blue" onclick="addProduct()">
 					<i class="icon-plus-circle"></i>新增产品</p>
 			</div>
-		</section>-->
+		</section>
 		<#include "_inc/_goback.html" />
 		<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
 			<button id="plans" type="button" class="red-button width-100">提交</button>

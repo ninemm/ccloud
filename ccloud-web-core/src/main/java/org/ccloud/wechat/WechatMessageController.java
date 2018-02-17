@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.ccloud.Consts;
 import org.ccloud.core.JSession;
+import org.ccloud.interceptor.SessionInterceptor;
 import org.ccloud.model.Content;
 import org.ccloud.model.query.ContentQuery;
 import org.ccloud.model.query.OptionQuery;
@@ -28,6 +29,7 @@ import org.ccloud.template.TplModule;
 import org.ccloud.utils.StringUtils;
 
 import com.jfinal.aop.Before;
+import com.jfinal.aop.Clear;
 import com.jfinal.core.Controller;
 import com.jfinal.plugin.ehcache.CacheKit;
 import com.jfinal.weixin.iot.msg.InEquDataMsg;
@@ -77,7 +79,8 @@ public class WechatMessageController extends MsgController {
 	public ApiConfig getApiConfig() {
 		return WechatApi.getApiConfig();
 	}
-
+	
+	@Clear(SessionInterceptor.class)
 	@Before(WechatApiConfigInterceptor.class)
 	public void callback() {
 		String gotoUrl = getPara("goto") + "?state=" + getPara("state");

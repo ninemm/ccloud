@@ -107,10 +107,15 @@ public class CustomerController extends BaseFrontController {
 		boolean visit = SecurityUtils.getSubject().isPermitted("/admin/customerVisit");
 		
 		Page<Record> customerList = new Page<>();
+		int customerOrderCount = 0;
 		if (StrKit.notBlank(getPara("region"))) {
 			String dataArea = UserQuery.me().findById(getPara("region")).getDataArea();
 			customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), dataArea, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"));
-		} else customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), selectDataArea, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"));
+			customerOrderCount = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), dataArea, getPara("customerType"), "0", getPara("searchKey")).getTotalRow();
+		} else {
+			customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), selectDataArea, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"));
+			customerOrderCount = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), selectDataArea, getPara("customerType"), "0", getPara("searchKey")).getTotalRow();
+		}
 
 		StringBuilder html = new StringBuilder();
 		for (Record customer : customerList.getList())
@@ -175,6 +180,7 @@ public class CustomerController extends BaseFrontController {
 		map.put("html", html.toString());
 		map.put("totalRow", customerList.getTotalRow());
 		map.put("totalPage", customerList.getTotalPage());
+		map.put("orderCount", customerOrderCount);
 		renderJson(map);
 	}
 
@@ -462,8 +468,9 @@ public class CustomerController extends BaseFrontController {
 			temp.setLat(sellerCustomer.getLat());
 			temp.setLng(sellerCustomer.getLng());
 			temp.setLocation(sellerCustomer.getLocation());
-			
-			temp.setImageListStore(JSON.toJSONString(list));
+
+			if (list.size()!=0) temp.setImageListStore(JSON.toJSONString(list));
+			else temp.setImageListStore(null);
 			map.put("customerVO", temp);
 
 		} else {
@@ -554,7 +561,11 @@ public class CustomerController extends BaseFrontController {
 			List<String> diffAttrList = new ArrayList<>();
 			diffAttrList.add("新增客户");
 			setAttr("diffAttrList", diffAttrList);
-		}else {
+		} else if(isEnable.equals("2")) {
+			List<String> diffAttrList = new ArrayList<>();
+			diffAttrList.add("导入客户");
+			setAttr("diffAttrList", diffAttrList);
+		} else {
 			List<String> diffAttrList = new ArrayList<>();
 			diffAttrList.add("申请停用");
 			setAttr("diffAttrList", diffAttrList);
@@ -654,6 +665,15 @@ public class CustomerController extends BaseFrontController {
 				customer.setAddress(customerVO.getAddress());
 				customer.setCustomerName(customerVO.getCustomerName());
 
+				if(customerVO.getLat() != null && StrKit.notBlank(customerVO.getLat().toString()))
+					customer.setLat(customerVO.getLat());
+
+				if(customerVO.getLng() != null && StrKit.notBlank(customerVO.getLng().toString()))
+					customer.setLng(customerVO.getLng());
+
+				if(StrKit.notBlank(customerVO.getLocation()))
+					customer.setLocation(customerVO.getLocation());
+
 				if (persiste != null) {
 					customer.setId(persiste.getId());
 				} else customer.setId(null);
@@ -668,6 +688,12 @@ public class CustomerController extends BaseFrontController {
 				if (StrKit.notBlank(customerVO.getImageListStore()) && customerVO.getImageListStore().length() > 2)
 					sellerCustomer.setImageListStore(customerVO.getImageListStore());
 				else sellerCustomer.setImageListStore(null);
+
+				if (StrKit.notBlank(customerVO.getSubType()))
+					sellerCustomer.setSubType(customerVO.getSubType());
+
+				if (StrKit.notBlank(customerVO.getCustomerKind()))
+					sellerCustomer.setCustomerKind(customerVO.getCustomerKind());
 
 				if(customerVO.getLat() != null && StrKit.notBlank(customerVO.getLat().toString()))
 					sellerCustomer.setLat(customerVO.getLat());
@@ -751,7 +777,7 @@ public class CustomerController extends BaseFrontController {
 		else
 			renderAjaxResultForError("操作失败");
 	}
-
+	//isEnable 0:新增或编辑 1:停用 2:导入
 	private boolean startProcess(String customerId, Map<String, Object> param, int isEnable) {
 		
 		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(customerId);
@@ -761,6 +787,13 @@ public class CustomerController extends BaseFrontController {
 		if (sellerCustomer == null) {
 			renderError(404);
 			return false;
+		}
+
+		if(StrKit.notBlank(sellerCustomer.getProcInstId())) {
+			if (SellerCustomerQuery.me().findTotalInstId(sellerCustomer.getProcInstId()) < 3) {
+				renderAjaxResultForError("该客户正在审核中");
+				return false;
+			}
 		}
 		
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
@@ -808,7 +841,9 @@ public class CustomerController extends BaseFrontController {
 			message.setContent("新增待审核");
 		} else if(customerVO == null && isEnable == 1) {
 			message.setContent("停用待审核");
-		}else {
+		} else if( isEnable == 2) {
+			message.setContent("导入待审核");
+		} else {
 			List<String> list = BeanCompareUtils.contrastObj(sellerCustomer, customerVO);
 			if (list != null)
 				message.setContent(JsonKit.toJson(list));
@@ -864,6 +899,11 @@ public class CustomerController extends BaseFrontController {
 			customer.setCountryCode(areaCodeList.get(2));
 			customer.setCountryName(areaNameList.get(2));
 		}
+		customer.setLat(sellerCustomer.getLat());
+
+		customer.setLng(sellerCustomer.getLng());
+
+		customer.setLocation(sellerCustomer.getLocation());
 
 		if (persist != null) {
 			customer.setId(persist.getId());
@@ -1034,6 +1074,13 @@ public class CustomerController extends BaseFrontController {
 		userJoinCustomer.setDeptId(user.getDepartmentId());
 		userJoinCustomer.setDataArea(user.getDataArea());
 		updated = userJoinCustomer.save();
+
+
+		Boolean isChecked = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_CUSTOMER_REVIEW + getSessionAttr("sellerCode"));
+		Map<String, Object> map = Maps.newHashMap();
+
+		if (isChecked)
+			updated = startProcess(sellerCustomerId, map, 2);
 
 		if (updated) renderAjaxResultForSuccess("操作成功");
 		else renderAjaxResultForError("操作失败");

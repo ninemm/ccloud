@@ -46,7 +46,7 @@
 
 	var initParams = function(params) {
 
-		var keyword = $('#post-search-input').val();
+		var keyword = $('#search').val();
 		if (keyword) keyword = encodeURIComponent(keyword);
 		var param = {
 			size: params.limit,
@@ -99,6 +99,8 @@
 							return '已审核'
 						} else if (value == 1001) {
 							return '已取消'
+						} else if (value == 1002) {
+							return '审核拒绝'
 						} else if (value == 2000) {
 							return '部分入库'
 						}else {
@@ -113,7 +115,7 @@
 					if (row.status == 0) {
 						strHtml = strHtml + '<a class="btn btn-xs btn-primary btn-flat" onclick="pass(\''+row.id+'\',1000)" >通过</a> ';
 	
-						strHtml = strHtml + '<a class="btn btn-xs btn-danger btn-flat" onclick="pass(\''+row.id+'\',1001)" >拒绝</a> ';			
+						strHtml = strHtml + '<a class="btn btn-xs btn-danger btn-flat" onclick="pass(\''+row.id+'\',1002)" >拒绝</a> ';
 					}					
 					</@shiro.hasPermission>						
 					strHtml = strHtml + '<a class="btn btn-xs btn-warning btn-flat" onclick="history(\'' + row.id + '\',\'' +row.proc_inst_id + '\')" >操作记录</a> ';
@@ -197,7 +199,7 @@
 				}
 	}
 	function batchDown(){
-		jQuery.mm.down("${CPATH}/admin/salesRefund/downloading?startDate=" + $('#startDate').val() + " 00:00:00" + "&endDate=" + $('#endDate').val() + " 23:59:59" + "&k="+$('#post-search-input').val());
+		jQuery.mm.down("${CPATH}/admin/salesRefund/downloading?startDate=" + $('#startDate').val() + " 00:00:00" + "&endDate=" + $('#endDate').val() + " 23:59:59" + "&k="+$('#search').val());
     }
     
     function history(id, proc_inst_id) {
@@ -241,9 +243,9 @@
                  </div>
              </div>
              <div class="col-sm-5">
-             	 <label class="control-label col-sm-4">单号/客户:</label>
-                 <div class="col-sm-8 input-group input-group-sm">
-            	 	<input id="post-search-input" class="form-control" type="search" value="${k!}" name="k" placeholder="搜索退货单号/客户名称">
+             	 <label class="control-label col-sm-5">单号/客户:</label>
+                 <div class="col-sm-7 input-group input-group-sm">
+            	 	<input id="search" class="form-control" type="search" value="${k!}" name="k" placeholder="搜索退货单号/客户名称">
 	 			</div>
 	 		</div>
 	 		<div class="col-sm-1" style="text-align:center;">

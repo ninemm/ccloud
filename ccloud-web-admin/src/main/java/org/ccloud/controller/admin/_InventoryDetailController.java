@@ -55,6 +55,7 @@ public class _InventoryDetailController extends JBaseCRUDController<InventoryDet
 		render("index.html");
 	}
 	@RequiresPermissions("/admin/salesOrder/check")
+	//入库明细
 	public void list() {
 		String sellerId = getSessionAttr("sellerId");
 		String keyword = getPara("k");

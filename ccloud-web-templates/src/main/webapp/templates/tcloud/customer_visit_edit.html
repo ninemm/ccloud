@@ -380,6 +380,10 @@
             }
         });
     }
+    
+    function entering(){
+    	alert("1");
+    }
 </#macro>
 <@layout>
 <div class="weui-content">
@@ -451,6 +455,9 @@
                         <textarea class="weui-textarea" rows="3" name="customerVisit.question_desc" id="question_desc" placeholder="备注说明"></textarea>
                         <div class="weui-textarea-counter" id="length"></div>
                     </div>
+                </div>
+                <div class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
+                    	<a class="blue-button width-100 _submit_btn" onclick="entering()" href="">（备注）语音录入</a>
                 </div>
             </section>
             <section class="weui-panel weui-panel_access ft14 remark">

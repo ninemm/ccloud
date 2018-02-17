@@ -244,3 +244,16 @@ var MapSet = {
 		},{enableHighAccuracy: true})
 	}
 };
+
+$(function() {
+	var goback = new Headroom($(".left-back")[0], {
+		tolerance: 5,
+		offset: 200,
+		classes: {
+			initial: "animated",
+			pinned: "slideInLeft",
+			unpinned: "slideOutLeft"
+		}
+	});
+	goback.init();
+})

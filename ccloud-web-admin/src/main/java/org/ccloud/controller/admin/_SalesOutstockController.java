@@ -156,7 +156,9 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 	}
 
 	public void renderPrintPage() {
-		setAttr("outstockId", getPara(0));
+		setAttr("outstockId", getPara("stockOutId"));
+		//是否是打印打印，财务打印的是成本价
+		setAttr("isFinancePrint", getPara("isFinancePrint"));
 		// 获取销售商的配置模板地址
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		List<PrintTemplate> printTemplates = PrintTemplateQuery.me().findPrintTemplateBySellerId(sellerId);
@@ -191,10 +193,16 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 	public void getPrintInfo() {
 		String outstockId = getPara("outstockId");
 		String[] outId = outstockId.split(",");
+		Integer isFinancePrint = getParaToInt("isFinancePrint");
 		List<printAllNeedInfo> printAllNeedInfos = new ArrayList<>();
+		List<orderProductInfo> orderProductInfos = new ArrayList<>();
 		for (String s : outId) {
 			printAllNeedInfo printAllNeedInfo = SalesOutstockQuery.me().findStockOutForPrint(s);
-			List<orderProductInfo> orderProductInfos = SalesOutstockDetailQuery.me().findPrintProductInfo(s);
+			if (isFinancePrint == 0) {
+			orderProductInfos = SalesOutstockDetailQuery.me().findPrintProductInfo(s);	
+			}else {
+			orderProductInfos = SalesOutstockDetailQuery.me().findFinancePrintProductInfo(s);	
+			}
 			printAllNeedInfo.setOrderProductInfos(orderProductInfos);
 			printAllNeedInfos.add(printAllNeedInfo);
 		}
@@ -263,6 +271,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		}
 	}
 
+	//出库单打印
 	public void recordPrintInfo() {
 		String outstockId = getPara("outstockId");
 		String[] outId = outstockId.split(",");
@@ -271,6 +280,12 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 			printAllNeedInfo printAllNeedInfo = SalesOutstockQuery.me().findStockOutForPrint(s);
 			printAllNeedInfos.add(printAllNeedInfo);
 			updateStockOutPrintStatus(printAllNeedInfo);
+			//更新订单打印时间
+			SalesOrder salesOrder = SalesOrderQuery.me().findByOutstockId(s);
+			if (salesOrder.getPrintTime() == null) {
+				salesOrder.setPrintTime(new Date());
+			}
+			salesOrder.update();
 		}
 		boolean saveOutStockPrint = saveOutStockPrint(printAllNeedInfos);
 		if (saveOutStockPrint) {
@@ -278,7 +293,9 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 			result.put("result", 200);
 			renderJson(result);
 		}
-
+		
+		
+		
 	}
 
 	@Before(Tx.class)
@@ -293,6 +310,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 			public boolean run() throws SQLException {
 				String order_user = StringUtils.getArrayFirst(paraMap.get("order_user"));
 				String order_date = StringUtils.getArrayFirst(paraMap.get("order_date"));
+				String activity_apply_id = StringUtils.getArrayFirst(paraMap.get("activity_apply_id"));
 				String deptId = StringUtils.getArrayFirst(paraMap.get("deptId"));
 				String dataArea = StringUtils.getArrayFirst(paraMap.get("dataArea"));
 				String outStockId = StringUtils.getArrayFirst(paraMap.get("salesStockId"));
@@ -359,6 +377,15 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 
 					}
 
+				}
+
+				//如果有活动关联
+				if (StrKit.notBlank(activity_apply_id) && (!Consts.SALES_ORDER_ACTIVITY_APPLY_ID_OTHER.equals(activity_apply_id))){
+					ActivityApply activityApply = ActivityApplyQuery.me().findById(activity_apply_id);
+					activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_END);
+					if(!activityApply.update()){
+						return false;
+					}
 				}
 
 				return true;
@@ -434,11 +461,11 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 					printAllNeedInfo printAllNeedInfo = SalesOutstockQuery.me().findStockOutForPrint(s);
 					//获取订单明细
 					List<orderProductInfo> orderProductInfos = SalesOutstockDetailQuery.me().findPrintProductInfo(s);
+					
+					SalesOutstock salesOutstock = SalesOutstockQuery.me().findById(s);
 					//订单总金额
-					BigDecimal productAmout=new BigDecimal("0");
-					for (orderProductInfo orderProductInfo : orderProductInfos) {
-						productAmout=productAmout.add(orderProductInfo.getProductAmout());
-					}
+					BigDecimal productAmout=salesOutstock.getTotalAmount();
+					
 					String total=productAmout.toString();
 					if (!SalesOutstockDetailQuery.me().batchOutStock(orderProductInfos, sellerId, date,
 							user.getDepartmentId(), user.getDataArea(), user.getId(),
@@ -470,6 +497,15 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 
 						if (!PurchaseInstockDetailQuery.me().insertByBatchSalesOrder(orderProductInfos,
 								purchaseInstockId, seller, date, getRequest())) {
+							return false;
+						}
+					}
+
+					//如果有活动关联
+					if (StrKit.notBlank(printAllNeedInfo.getActivityApplyId()) && (!Consts.SALES_ORDER_ACTIVITY_APPLY_ID_OTHER.equals(printAllNeedInfo.getActivityApplyId()))){
+						ActivityApply activityApply = ActivityApplyQuery.me().findById(printAllNeedInfo.getActivityApplyId());
+						activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_END);
+						if(!activityApply.update()){
 							return false;
 						}
 					}

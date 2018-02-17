@@ -105,7 +105,12 @@ public class SellerCustomerQuery extends JBaseQuery {
 			}
 
 		fromBuilder.append("  GROUP BY sc.id ");
-		fromBuilder.append(" order by "+sort+" "+ sortOrder);
+		if(StrKit.notBlank(sort)) {
+			fromBuilder.append(" order by "+sort);
+			if(!sortOrder.equals("")) {
+				fromBuilder.append(" "+ sortOrder);
+			}
+		}
 
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
@@ -372,12 +377,20 @@ public class SellerCustomerQuery extends JBaseQuery {
 		return result;
 	}
 
-	public List<Record> findName(String dataArea) {
+	public List<Record> findName(String dataArea, String customerType) {
 		List<Object> param = new LinkedList<Object>();
-		StringBuilder sql = new StringBuilder("SELECT DISTINCT(csc.id), cc.customer_name as name ");
+		boolean needWhere = true;
+
+		StringBuilder sql = new StringBuilder("SELECT csc.id, cc.customer_name as name ");
 		sql.append("FROM cc_seller_customer csc LEFT JOIN cc_customer cc ON csc.customer_id = cc.id ");
 		sql.append("LEFT JOIN cc_user_join_customer cujc ON cujc.seller_customer_id = csc.id ");
-		appendIfNotEmptyWithLike(sql, "cujc.data_area", dataArea, param, true);
+		sql.append("LEFT JOIN cc_customer_join_customer_type ccjct ON csc.id = ccjct.seller_customer_id ");
+		sql.append("LEFT JOIN cc_customer_type cct ON ccjct.customer_type_id = cct.id ");
+
+		needWhere = appendIfNotEmptyWithLike(sql, "cujc.data_area", dataArea, param, needWhere);
+		needWhere = appendIfNotEmpty(sql, "cct.name", customerType, param, needWhere);
+
+		sql.append("GROUP BY csc.id");
 		return Db.find(sql.toString(), param.toArray());
 	}
 
@@ -516,5 +529,13 @@ public class SellerCustomerQuery extends JBaseQuery {
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+
+	public Long findTotalInstId(String procInstId) {
+		StringBuilder sql = new StringBuilder("SELECT COUNT(aha.ID_) ");
+		sql.append("FROM cc_seller_customer csc ");
+		sql.append("JOIN  act_hi_actinst aha on csc.proc_inst_id = aha.PROC_INST_ID_ ");
+		sql.append("WHERE csc.proc_inst_id = ?");
+		return Db.queryLong(sql.toString(), procInstId);
 	}
 }

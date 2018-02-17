@@ -31,56 +31,69 @@ function openlayer(id){
 <section class="content">
 
 	<div class="row content-row">
-	
-			<form action="${CPATH}/admin/attachment?&p=${p!}&c=${c!}&k=${k!}" method="POST">
-				<div class="jp-left ">
-					<select style="width: 150px" class="form-control input-sm" name="mime" >
-						<option value="">所有附件类型</option>
-						<#if mime??&&mime=='image'>
-						<option value="image" selected="selected">图像</option>
-						<#else>
-						<option value="image">图像</option>
-						</#if>
-						
-						<#if mime??&&mime=='audio'>
-						<option value="audio" selected="selected" >音频</option>
-						<#else>
-						<option value="audio"  >音频</option>
-						</#if>
-						
-						<#if mime??&&mime=='video'>
-						<option value="video" selected="selected">视频</option>
-						<#else>
-						<option value="video" >视频</option>
-						</#if> 
-						
-					</select>
-				</div>
-	
-				<div class="jp-left ">
-					<select style="width: 150px" class="form-control input-sm" name="dm" >
-						<option value="">全部日期</option>
-						<#if archives ??>
-						<#list archives as archive>
-							<#if dm??&&dm==archive.date!>
-							<option value="${archive.date!}" selected="selected" >${archive.date!}</option>
+		<div class="form-group">
+			<form class="form-horizontal" action="${CPATH}/admin/attachment?&p=${p!}&c=${c!}&k=${k!}" method="POST">
+				<div class="col-sm-4 ">
+					<label class="control-label col-sm-4">类型:</label>
+	                <div class="col-sm-8 input-group input-group-sm">
+						<select class="form-control" name="mime" >
+							<option value="">所有附件类型</option>
+							<#if mime??&&mime=='image'>
+							<option value="image" selected="selected">图像</option>
 							<#else>
-							<option value="${archive.date!}"  >${archive.date!}</option>
+							<option value="image">图像</option>
+							</#if>
+							
+							<#if mime??&&mime=='audio'>
+							<option value="audio" selected="selected" >音频</option>
+							<#else>
+							<option value="audio"  >音频</option>
+							</#if>
+							
+							<#if mime??&&mime=='video'>
+							<option value="video" selected="selected">视频</option>
+							<#else>
+							<option value="video" >视频</option>
 							</#if> 
-						</#list>
-						</#if>
-					</select>
+							
+						</select>
+					</div>
 				</div>
-				<div class="jp-left ">
-					<button class="btn  btn-sm btn-default" type="submit">筛选</button>
+	
+				<div class="col-sm-3 ">
+					<label class="control-label col-sm-4">类型:</label>
+	                <div class="col-sm-8 input-group input-group-sm">
+						<select class="form-control" name="dm" >
+							<option value="">全部日期</option>
+							<#if archives ??>
+							<#list archives as archive>
+								<#if dm??&&dm==archive.date!>
+								<option value="${archive.date!}" selected="selected" >${archive.date!}</option>
+								<#else>
+								<option value="${archive.date!}"  >${archive.date!}</option>
+								</#if> 
+							</#list>
+							</#if>
+						</select>
+					</div>
+				</div>
+				<div class="col-sm-1">
+					<button class="btn btn-sm btn-primary btn-flat" type="submit">筛选</button>
 				</div>
 			</form>
 			
-			<form action="${CPATH}/admin/attachment?&p=${p!}&c=${c!}&dm=${dm!}&mime=${mime!}" method="POST">
-				<div class="jp-right ">
-					<input class="form-control jp-inp-width280" name="k" value="${k!}" type="text" placeholder="搜索">
+			<form class="form-horizontal" action="${CPATH}/admin/attachment?&p=${p!}&c=${c!}&dm=${dm!}&mime=${mime!}" method="POST">
+				<div class="col-sm-3 ">
+					<label class="control-label col-sm-4">名称:</label>
+	                <div class="col-sm-8 input-group input-group-sm">
+						<input id="search" class="form-control" name="k" value="${k!}" type="text" placeholder="搜索">
+					</div>
+				</div>
+				<div class="col-sm-1 ">
+					<input id="search-submit" class="btn btn-sm btn-primary btn-flat" type="submit" value="搜索">
 				</div>
 			</form>
+		</div>
 	</div>
 	<div class="col-xs-12  ">
 		<div class="row">

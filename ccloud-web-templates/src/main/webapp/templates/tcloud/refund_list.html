@@ -133,6 +133,9 @@
 					
 					$newOrder.find("#orderSn").text(el.instock_sn);
 					$newOrder.find("#status").text(getStatus(el.status));
+					$newOrder.find("#status").on('click', function(){ 
+ 						 window.location.href = "${CPATH}/refund/operateHistory?id="+el.id
+					}); 
 					$newOrder.find("#customerName").text(el.customer_name);
 					$newOrder.find("#contact").text(el.ccontact + '/' + el.cmobile);
 					
@@ -143,6 +146,44 @@
 
 					$newOrder.find("#amount").text(el.total_reject_amount);
 					$newOrder.find("#date").text('时间：' + el.create_date);
+	
+					if(el.input_user_id == data.user.id && (el.status == 0 || (el.status == 1000 && el.is_print == 0))) {
+						$newOrder.find("#cancel").on('click', function() {
+							$.confirm({
+								title: "订单撤销",
+								text: '是否撤销订单？',
+								onOK: function () {
+									Utils.openLoadingWin('撤销中...');
+									$.get('${CPATH}/refund/cancel?orderId=' + el.id,
+										function(result) {
+											if (result.errorCode > 0) {
+												$.toptip(result.message, 'error');
+											} else {
+												$.toptip(result.message, 'success');
+												combo();
+											}
+											Utils.closeLoadingWin();
+										}
+									);
+								}
+							});
+						});
+					} else {
+						$newOrder.find("#cancel").remove();
+					}
+	
+					if(el.status == 0) {
+						$newOrder.find("#pass").on('click', function() {
+							confirm(el.id, 1)
+						});
+						$newOrder.find("#refuse").on('click', function() {
+							confirm(el.id, 0)
+						});
+					} else {
+						$newOrder.find("#pass").remove();
+						$newOrder.find("#refuse").remove();
+					}
+	
 				});
 				page++;
 				loading = false;
@@ -209,7 +250,9 @@
 		} else if (value == 1000) {
 			return '已审核'
 		} else if (value == 1001) {
-			return '退货单取消'
+			return '已取消'
+		} else if (value == 1002) {
+			return '审核拒绝'
 		} else if (value == 2000) {
 			return '部分入库'
 		} else {
@@ -233,6 +276,49 @@
 		page = 1;
 		initMyOrder();
 	}
+
+	function confirm(id, pass) {
+		var message = pass == 1 ? "通过" : "拒绝"
+		layer.open({
+			type: 1,
+			title: ['退货单审核',
+			'border-bottom: 1px solid #eee;height:2rem;line-height:2rem;margin-top:2.5rem'
+			],
+			content: '<img src="${CTPATH}/images/image_orderpopups.png">' +
+			'<p class="t-c">是否确认' + message + '该订单？</p>' ,
+			anim: 'scale',
+			className: 'audit',
+			btn: ['确认','取消'],
+			yes: function() {
+				doSubmit(id, pass);
+			},
+			no:function() {
+			
+			}
+		});
+	}
+	
+	function doSubmit(id, pass){
+		layer.open({
+			type: 2,
+			content: '保存中...'
+		});
+		var params = {
+			"id": id,
+			'pass' : pass
+		}
+		Utils.ajax('${CPATH}/refund/complete', params,
+			function(res){
+				if (res.errorCode > 0) {
+					$.toptip(res.message, 'error');
+				} else {
+					$.toptip(res.message, 'success');
+					combo();
+				}
+				layer.closeAll();
+			}
+		)
+	};
 </#macro>
 
 <@layout>
@@ -301,7 +387,12 @@
 					</div>
 				</a>
 				<hr>
+				<div id="cancel" class="button white-button fl">撤销</div>
 				<div id="refund" class="button red-button fr">详情</div>
+				<@shiro.hasPermission name="/admin/salesRefund/check">
+				<div id="pass" class="button yellow-button fr m-r-5">审核通过</div>
+				<div id="refuse" class="button white-button fr m-r-5">审核拒绝</div>
+				</@shiro.hasPermission>
 			</div>
 		</div>
 		<div class="weui-loadmore" id="loading" style="display: none;">
