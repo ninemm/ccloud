@@ -238,7 +238,9 @@ public class CustomerVisitController extends BaseFrontController {
 		for (Record record : findByActivity) {
 			activity=activity+record.getStr("title")+",";
 		}
-		activity = activity.substring(0, activity.length() - 1);  
+		if (StrKit.notBlank(activity)) {
+			activity = activity.substring(0, activity.length() - 1);  
+		}
 		setAttr("activity", activity);
 		setAttr("visit", visit);
 
@@ -332,49 +334,49 @@ public class CustomerVisitController extends BaseFrontController {
 
 	@Before(Tx.class)
 	public void save() {
+			
+		CustomerVisit customerVisit = getModel(CustomerVisit.class);
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		
-		 CustomerVisit customerVisit = getModel(CustomerVisit.class);
-		 User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-
-		 Boolean isChecked = OptionQuery.me().findValueAsBool("web_proc_customer_visit_" + getSessionAttr("sellerCode"));
-
-		 List<ImageJson> list = Lists.newArrayList();
-		 String picJson = getPara("pic");
+		Boolean isChecked = OptionQuery.me().findValueAsBool("web_proc_customer_visit_" + getSessionAttr("sellerCode"));
+		
+		List<ImageJson> list = Lists.newArrayList();
+		String picJson = getPara("pic");
 		
 		if (isChecked != null && isChecked) customerVisit.setStatus(Customer.CUSTOMER_AUDIT);
 		else customerVisit.setStatus(Customer.CUSTOMER_NORMAL);
-
-		 customerVisit.setUserId(user.getId());
-		 customerVisit.setDataArea(user.getDataArea());
-		 customerVisit.setDeptId(user.getDepartmentId());
+		
+		customerVisit.setUserId(user.getId());
+		customerVisit.setDataArea(user.getDataArea());
+		customerVisit.setDeptId(user.getDepartmentId());
 		 
-		 if (StrKit.notBlank(picJson)) {
+		if (StrKit.notBlank(picJson)) {
 			
 			JSONArray array = JSON.parseArray(picJson);
 			for (int i = 0; i < array.size(); i++) {
 				JSONObject obj = array.getJSONObject(i);
 				String pic = obj.getString("pic");
 				String picname = obj.getString("picname");
-
+				
 				ImageJson image = new ImageJson();
 				image.setImgName(picname);
 				//原图
 				String originalPath = qiniuUpload(pic);
-
+				//添加的水印内容
 				String waterFont1 = customerVisit.getSellerCustomer().getCustomer().getCustomerName();
 				String waterFont2 = user.getRealname() +  DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
 				String waterFont3 =  customerVisit.getLocation();
 				//图片添加水印  上传图片  水印图
 				String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
-
+				
 				image.setSavePath(savePath.replace("\\", "/"));
 				image.setOriginalPath(originalPath.replace("\\", "/"));
 				list.add(image);
 			}
-		 }
-		 if (list.size()!=0) customerVisit.setPhoto(JSON.toJSONString(list));
-
-		 boolean updated = customerVisit.saveOrUpdate();
+		}
+		if (list.size()!=0) customerVisit.setPhoto(JSON.toJSONString(list));
+		
+		boolean updated = customerVisit.saveOrUpdate();
 		
 		//获取选取活动的id
 		String activityIds = getPara("activity_id");
@@ -387,18 +389,18 @@ public class CustomerVisitController extends BaseFrontController {
 			customerVisitJoinActivity.save();
 		}
 			
-		 if (!updated) {
-			 renderAjaxResultForError("保存客户拜访信息出错");
-			 return ;
-		 }
+		if (!updated) {
+			renderAjaxResultForError("保存客户拜访信息出错");
+			return ;
+		}
 
-		 if (isChecked != null && isChecked)
+		if (isChecked != null && isChecked)
 			updated = startProcess(customerVisit);
 		 
-		 if (updated)
-			 renderAjaxResultForSuccess("操作成功");
-		 else 
-			 renderAjaxResultForError("操作失败");
+		if (updated)
+			renderAjaxResultForSuccess("操作成功");
+		else 
+			renderAjaxResultForError("操作失败");
 	}
 
 	public void visitCustomerInfo() {
