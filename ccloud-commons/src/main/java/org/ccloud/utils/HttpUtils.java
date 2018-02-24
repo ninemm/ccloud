@@ -135,7 +135,7 @@ public class HttpUtils {
 			obs.close();
 			stream.close();
 
-			return new String(obs.toByteArray());
+			return new String(obs.toByteArray(), "utf-8");
 		} finally {
 			if (connection != null) {
 				connection.disconnect();
