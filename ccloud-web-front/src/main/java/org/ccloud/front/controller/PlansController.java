@@ -122,5 +122,14 @@ public class PlansController extends BaseFrontController {
 
 		renderJson(map);
 	}
+	
+	public void getPlans() {
+		String userName = getPara("username");
+		String typeName = getPara("typeName");
+		String startDate = getPara("startDate").substring(5);
+		String endDate = getPara("endDate").substring(5);
+		List<Plans> list = PlansQuery.me().findbyUserNameAndTypeNameAndStartDateAndEndDate(userName,typeName,startDate,endDate);
+		renderJson(list);
+	}
 
 }

@@ -10,6 +10,7 @@
 </#macro>
 <#macro script>	
 	$(function() {
+		$(".plansShow").css('display','none');
 		combo();
 	});
 
@@ -68,7 +69,53 @@
 	var endDate = '';
 	var page = 1;
 	var size = 10;
-
+	//点击计划事件
+	function showPlans(el){
+		var username = $(el).find("#userName").text();
+		var typeName = $(el).find("#typeName").text();
+		var startDate = $(el).find("#startDate").text();
+		var endDate = $(el).find("#endDate").text();
+		if($(el).find(".plansShow").is(":hidden")){
+			$(el).find(".plansShow").html("");
+			$(el).find(".plansShow").show();
+		}else{
+			$(el).find(".plansShow").html("");
+			$(el).find(".plansShow").hide();
+		}
+		$.ajax({
+			url:"${CPATH}/plans/getPlans",
+			type:"post",
+			dataType:"json",
+			data:{"username":username,'typeName':typeName,'startDate':startDate,'endDate':endDate},
+			success:function(data)
+			{	
+				var html = "";
+				for (var i in data) {
+				 	html += '<div class="weui-cell">'
+							+'<div class="weui-cell__bd t-c" id="productName">'+data[i].custom_name
+							+'</div>'
+							+'</div>'
+							+'<div class="weui-cell">'
+							+'<div class="weui-cell__bd weui-flex t-c">'
+							+'<div class="weui-flex__item">'
+							+'<p>计划数量</p>'
+							+'<p id="planNum">'+data[i].plan_num+'</p>'
+							+'</div>'
+							+'<div class="weui-flex__item">'
+							+'<p>完成数量</p>'
+							+'<p id="completeNum">'+data[i].complete_num+'</p>'
+							+'</div>'
+							+'<div class="weui-flex__item">'
+							+'<p>完成比率</p>'
+							+'<p id="completeRatio">'+data[i].complete_ratio+'%</p>'
+							+'</div>'
+							+'</div>'
+							+'</div>';
+				}
+					$(el).find(".plansShow").append(html);
+			}
+		});
+	}
 	function loadPlanData() {
 
 		$loading.show();
@@ -87,7 +134,6 @@
 		Utils.ajax('${CPATH}/plans/planList', params,
 			function(data) {
 				$loading.hide();
-		
 				if(data.planList.length == 0) {
 					if($('.planList').length == 0) $noMore.show();
 					loading = true;
@@ -108,12 +154,10 @@
 						$newPlan.find("#typeName").text(el.typeName);
 						$newPlan.find("#startDate").text('开始时间：'+el.start_date);
 						$newPlan.find("#endDate").text('结束时间：'+el.end_date);
+						$(".plansShow").hide();
+					}else{
+						$newPlan.hide();
 					}
-					$newPlan.find("#productName").text(el.custom_name);
-					$newPlan.find("#planNum").text(el.plan_num);
-					$newPlan.find("#completeNum").text(el.complete_num);
-					$newPlan.find("#completeRatio").text(el.complete_ratio + '%');
-	
 				});
 				page++;
 				loading = false;
@@ -177,7 +221,7 @@
 		<main>
 			<div class="ft12 planList">
 				<div class="plan-list-box">
-					<div class="weui-cells mg-0">
+					<div class="weui-cells mg-0" onclick="showPlans(this)">
 						<div class="weui-cell">
 							<div class="weui-cell__bd">
 								<div class="customer_name">
@@ -195,25 +239,8 @@
 								</div>
 							</div>
 						</div>
-						<div class="weui-cell">
-							<div class="weui-cell__bd t-c" id="productName">
-							</div>
-						</div>
-						<div class="weui-cell">
-							<div class="weui-cell__bd weui-flex t-c">
-								<div class="weui-flex__item">
-									<p>计划数量</p>
-									<p id="planNum"></p>
-								</div>
-								<div class="weui-flex__item">
-									<p>完成数量</p>
-									<p id="completeNum"></p>
-								</div>
-								<div class="weui-flex__item">
-									<p>完成比率</p>
-									<p id="completeRatio"></p>
-								</div>
-							</div>
+						<div class="plansShow">
+							
 						</div>
 					</div>
 				</div>

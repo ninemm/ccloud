@@ -80,7 +80,7 @@ public class PlansQuery extends JBaseQuery {
 
 	public Page<Record> paginateForApp(int pageNumber, int pageSize, String keyword, String userId, String type,
 	                                   String startDate, String endDate, String sellerId, String dataArea) {
-		String select = "select o.*, u.realname, d.name as typeName, sp.custom_name ";
+		String select = "select DISTINCT o.start_date,o.end_date, u.realname, d.name as typeName ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_plans` o ");
 		fromBuilder.append("join user u ON o.user_id = u.id ");
 		fromBuilder.append("left join cc_seller_product sp ON o.seller_product_id = sp.id ");
@@ -134,5 +134,14 @@ public class PlansQuery extends JBaseQuery {
 		return 0;
 	}
 
+	public List<Plans> findbyUserNameAndTypeNameAndStartDateAndEndDate(String userName,String typeName, String startDate,String endDate){
+		String sql  = "select o.*,sp.custom_name "
+				+ "from `cc_plans` o "
+				+ "join user u ON o.user_id = u.id "
+				+ "left join cc_seller_product sp ON o.seller_product_id = sp.id "
+				+ "left join dict d ON o.type = d.value "
+				+ "where u.realname = '"+userName+"' and d.name = '"+typeName+"' and o.start_date >= '"+startDate+"' and o.end_date <= '"+endDate+"'";
+		return DAO.find(sql);
+	}
 	
 }
