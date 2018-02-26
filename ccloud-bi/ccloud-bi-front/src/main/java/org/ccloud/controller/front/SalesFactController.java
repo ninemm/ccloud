@@ -8,7 +8,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.ccloud.core.BaseFrontController;
+import org.ccloud.model.callback.AroundCustomerPositionCallback;
 import org.ccloud.model.callback.AroundCustomerSalesCallback;
+import org.ccloud.model.callback.AroundCustomerUndevelopedCallback;
 import org.ccloud.model.query.SalesFactQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DateUtils;
@@ -374,6 +376,70 @@ public class SalesFactController extends BaseFrontController {
 
 		renderJson(result);
 
+	}
+
+	@SuppressWarnings("unchecked")
+	public void aroundCustomerPosition() throws SQLException {
+
+		String dealerCode = getSessionAttr("dealerCode");
+
+		double longitude = Double.parseDouble(getPara("longitude"));
+		double latitude = Double.parseDouble(getPara("latitude"));
+		double dist = Double.parseDouble(getPara("dist"));
+
+		AroundCustomerPositionCallback callback = new AroundCustomerPositionCallback();
+		callback.setLongitude(longitude);
+		callback.setLatitude(latitude);
+		callback.setDist(dist);
+		callback.setDealerCode(dealerCode);
+
+		Connection conn = null;
+		List<Map<String, Object>> result = null;
+
+		try {
+			conn = DbKit.getConfig().getConnection();
+			result = (List<Map<String, Object>>) callback.call(conn);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if (conn != null) {
+				conn.close();
+			}
+		}
+
+		renderJson(result);
+	}
+
+	@SuppressWarnings("unchecked")
+	public void aroundCustomerUndeveloped() throws SQLException {
+
+		String dealerCode = getSessionAttr("dealerCode");
+
+		double longitude = Double.parseDouble(getPara("longitude"));
+		double latitude = Double.parseDouble(getPara("latitude"));
+		double dist = Double.parseDouble(getPara("dist"));
+
+		AroundCustomerUndevelopedCallback callback = new AroundCustomerUndevelopedCallback();
+		callback.setLongitude(longitude);
+		callback.setLatitude(latitude);
+		callback.setDist(dist);
+		callback.setDealerCode(dealerCode);
+
+		Connection conn = null;
+		List<Map<String, Object>> result = null;
+
+		try {
+			conn = DbKit.getConfig().getConnection();
+			result = (List<Map<String, Object>>) callback.call(conn);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if (conn != null) {
+				conn.close();
+			}
+		}
+
+		renderJson(result);
 	}
 
 }

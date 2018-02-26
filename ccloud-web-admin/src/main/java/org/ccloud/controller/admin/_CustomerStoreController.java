@@ -143,9 +143,9 @@ public class _CustomerStoreController extends JBaseCRUDController<CustomerStore>
 
 		String locationUrl = "http://api.map.baidu.com/geocoder/v2/";
 
-		Map<String, Object> locationParams = Maps.newHashMap();
-		locationParams.put("output", "json");
-		locationParams.put("ak", "IF8oL2gwIMYer9dGwKS102Iu5qAXMPg9");
+//		Map<String, Object> locationParams = Maps.newHashMap();
+//		locationParams.put("output", "json");
+//		locationParams.put("ak", "IF8oL2gwIMYer9dGwKS102Iu5qAXMPg9");
 		// http://api.map.baidu.com/geocoder/v2/?ak=xZmo3i3XbZoV0jqtaz3Fpo1CNAl8psRm&output=json&location=30.596683,114.350924
 
 		do {
@@ -178,13 +178,13 @@ public class _CustomerStoreController extends JBaseCRUDController<CustomerStore>
 					customerStore.setLng(lng);
 					customerStore.setLat(lat);
 
-					locationParams.put("location", lat + "," + lng);
-					String locationData = HttpUtils.get(locationUrl, locationParams);
-					Map<String, Object> locationDataMap = (Map<String, Object>) JSON.parseObject(locationData).get("result");
-					Map<String, Object> addressComponent = (Map<String, Object>) locationDataMap.get("addressComponent");
-					customerStore.setProvName((String) addressComponent.get("province"));
-					customerStore.setCityName((String) addressComponent.get("city"));
-					customerStore.setCountryName((String) addressComponent.get("district"));
+//					locationParams.put("location", lat + "," + lng);
+//					String locationData = HttpUtils.get(locationUrl, locationParams);
+//					Map<String, Object> locationDataMap = (Map<String, Object>) JSON.parseObject(locationData).get("result");
+//					Map<String, Object> addressComponent = (Map<String, Object>) locationDataMap.get("addressComponent");
+					customerStore.setProvName((String) map.get("province"));
+					customerStore.setCityName((String) map.get("city"));
+					customerStore.setCountryName((String) map.get("area"));
 
 					customerStore.setAddress((String) map.get("address"));
 					customerStore.setTelephone((String) map.get("telephone"));
