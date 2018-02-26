@@ -3,6 +3,7 @@ package org.ccloud.utils;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -18,23 +19,27 @@ import com.drew.metadata.Metadata;
 import com.drew.metadata.Tag;
 
 import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
+
+import sun.misc.BASE64Decoder;
 //读取图片信息
 public class ParsingImageUtils {
 	
-	public Map<String, String> parsingImage(String imgUrl) throws Exception, Exception{  
-		byte[] readInputStream = readInputStream(imgUrl);
+	public Map<String, String> parsingImage(String pic) throws Exception, Exception{  
+		byte[] readInputStream = generateImage(pic);
 		InputStream sbs = new ByteArrayInputStream(readInputStream); 
 		Metadata metadata = ImageMetadataReader.readMetadata(sbs);
 		Map<String, String>map=new HashMap<>();
-		for (Directory directory : metadata.getDirectories()) {  
-			for (Tag tag : directory.getTags()) {  
+		for (Directory directory : metadata.getDirectories()) {
+			for (Tag tag : directory.getTags()) {
 				String tagName = tag.getTagName();  //标签名
 				String desc = tag.getDescription(); //标签信息
 				if (tagName.equals("Date/Time Original")) {  
 					map.put("Time", desc);
 				}else if (tagName.equals("GPS Latitude")) {  
+					//纬度
 					map.put("Latitude", pointToLatlong(desc));
 				} else if (tagName.equals("GPS Longitude")) { 
+					//经度
 					map.put("Longitude", pointToLatlong(desc));
 				}
 			}  
@@ -48,6 +53,21 @@ public class ParsingImageUtils {
 		return map;  
 	}  
 	
+	
+	/**
+	 * @Description: 将base64编码字符串转换为图片
+	 * @Author: 
+	 * @CreateTime: 
+	 * @param imgStr base64编码字符串
+	 * @param path 图片路径-具体到文件
+	 * @return
+	 * @throws IOException 
+	*/
+	public static byte[] generateImage(String pic) throws IOException {
+		BASE64Decoder decoder = new BASE64Decoder();
+		byte[] b = decoder.decodeBuffer(pic);
+		return b;
+	}
 	
 	/**
 	 * 读取远程图片
