@@ -127,6 +127,15 @@
 						</p>
 					</#list>
 				</#if>
+				<#if diffAttrImage??>
+					<p class="weui-media-box__desc orange">
+							店招图: 
+					</p>
+					<#list diffAttrImage as Image>
+	                      <li class="weui-uploader__file" style="background-image: url(${Image.savePath})"></li>
+					</#list>
+				</#if>
+				
 			</div>
 		</div>
 	</section>
