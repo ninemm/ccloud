@@ -13,8 +13,6 @@
     <script src="${CPATH}/static/plugins/city-picker/js/city-picker.js"></script>
     <script src="${CPATH}/static/ladda/spin.min.js"></script>
 	<script src="${CPATH}/static/ladda/ladda.min.js"></script>
-	<script src="${CPATH}/static/plugins/jquery/jquery.metadata.js"></script>
- 	<script src="${CPATH}/static/tinymce/tinymce.min.js"></script>
 	
 </#macro>
 
@@ -27,7 +25,6 @@
 	<link rel="stylesheet" href="${CPATH}/static/plugins/select2/css/select2.css">
 	<!-- cityPicker -->
 	<link rel="stylesheet" href="${CPATH}/static/plugins/city-picker/css/city-picker.css">
-	<link rel="stylesheet" href="${CPATH}/static/plugins/goods/goods.css">
 	<link rel="stylesheet" href="${CPATH}/static/ladda/ladda-themeless.min.css">
 	
 </#macro>
@@ -151,21 +148,6 @@
             city: '${(areaList[1])!}',
             district: '${(areaList[2])!}',
         });
-        
-        //编辑时显示执行步骤
-        $.ajax({
-			url:"${CPATH}/admin/activity/getActivityExecute",
-			type:"post",
-			dataType:"json",
-			data:{"activityId":'${(activity.id)!}'},
-			success:function(data)
-			{
-				for (var i = 0; i < data.length; i++) {
-					addActivityExecute(data[i]);
-				}
-			}
-		});
-        
 		
 	});
 	
@@ -218,11 +200,7 @@
 				notEmpty: { message: '活动编码不能为空' }
 			}
 		},
-		'customerTy':{
-			validators: {
-				notEmpty: { message: '客户类型不能为空' }
-			}
-		},
+		
 		'startDate': {
 			validators: {
 				notEmpty: { message: '活动开始时间不能为空' }
@@ -233,19 +211,10 @@
 				notEmpty: { message: '活动结束时间不能为空' }
 			}
 		},
-		'activity.plan_code': {
-			validators: {
-				notEmpty: { message: '活动方案号不能为空' }
-			}
-		},
+		
 		'activity.category': {
 			validators: {
 				notEmpty: { message: '活动类型不能为空' }
-			}
-		},
-		'activity.visit_num': {
-			validators: {
-				notEmpty: { message: '拜访次数不能为空' }
 			}
 		},
 		'activity.area_type': {
@@ -303,10 +272,10 @@
 			success : function(data) { 
 				if(data.errorCode == 0) {
 					toastr.success(data.message, '操作成功');
-					 setTimeout( function(){
+					setTimeout( function(){
 						l.stop();
 						location.href = '${CPATH}/admin/activity/index';
-								}, 1 * 1000 ); 
+								}, 1 * 1000 );
 				} else {
 					l.stop();
 					toastr.error(data.message,'操作失败');
@@ -316,70 +285,6 @@
 				l.stop();
 				alert("信息提交错误");
 			}
-		});
-	}
-	
-	var $addProductButton = $("#addProductButton");
-	
-	// 添加执行
-	$addProductButton.click( function() {
-		loop = loop + 1;
-		$("#loop").val(loop);
-		var $goodsSpecificationTableTr = $("#goodsSpecificationTable tr:eq(1)").clone().removeClass("hidden");
-	});
-	//标志
-	var newTrIdx = 0;
-	function addProduct(){
-		var $tbody = $("#table tbody");
-		var newTrHtml = $tbody.find("tr:first").html();
-		newTrIdx = newTrIdx + 1;
-		$("#num").val(newTrIdx);
-		var newTrId = 'tr' + newTrIdx;
-		$tbody.append("<tr id='" + newTrId + "'>" + newTrHtml + "</tr>");
-		var $newTr = $("#" + newTrId);
-		<!--添加validate -->
-		var remarkName = "remark" + newTrIdx;
-		$newTr.find("#remark").attr("name", remarkName);
-		$newTr.find("#orderList").attr("name","orderList" + newTrIdx);
-		$newTr.find("#activityExecteId").attr("name","activityExecteId"+newTrIdx);
-		orderNum();
-	}
-	
-	function addActivityExecute(el){
-		var $tbody = $("#table tbody");
-		var newTrHtml = $tbody.find("tr:first").html();
-		newTrIdx = newTrIdx + 1;
-		$("#num").val(newTrIdx);
-		var newTrId = 'tr' + newTrIdx;
-		$tbody.append("<tr id='" + newTrId + "'>" + newTrHtml + "</tr>");
-		var $newTr = $("#" + newTrId);
-		<!--添加validate -->
-		var remarkName = "remark" + newTrIdx;
-		$newTr.find("#activityExecteId").attr("name","activityExecteId"+newTrIdx);
-		$newTr.find("#activityExecteId").val(el.id);
-		$newTr.find("#orderList").attr("name","orderList" + newTrIdx);
-		$newTr.find("#orderList").val(el.order_list);
-		$newTr.find("#remark").attr("name", remarkName);
-		$newTr.find("#remark").val(el.remark);
-		console.log($newTr.find("#activityExecteId").val());
-		orderNum();
-	}
-	
-	//删除
-	function deleteTr(obj){
-		var $tr = $(obj).parent().parent();
-		var trIndex = $tr.attr("id").replace("tr", "");
-		$form.bootstrapValidator('removeField', 'orderList' + trIndex);
-		$form.bootstrapValidator('removeField', 'remark' + trIndex);
-		$tr.remove();
-		orderNum();
-	}
-	
-	function orderNum(){
-		var $rowNum = $(".rowNum");
-		
-		$rowNum.each(function(index, el){
-			$(el).text(index);
 		});
 	}
 </#macro>
@@ -406,241 +311,190 @@
 				</button>
 			</div>
 		</div>
-		<ul id="myTab" class="nav nav-tabs">  
-	        <li class="active"><a href="#A" data-toggle="tab">活动基本信息</a></li>  
-	        <li><a href="#B" data-toggle="tab">活动执行步骤</a></li>
-	    </ul>
 		<form action="${CPATH}/admin/activity/save" method="post" id="form" class="form-horizontal" >
 			<input type="hidden" name="activity.id" value="${(activity.id)!}">
-			<input type="hidden" name="loop" id="loop">   
-			<div id="myTabContent" class="tab-content">  
-	        	<div class="tab-pane fade in active" id="A">  
-					<div class="box-body">
-						<div class="form-group">
-							<div class="col-sm-5 validata-box">
-								<label class="control-label col-sm-4">活动名称:</label>
-								<div class="input-group col-sm-8">
-									<input class="form-control" type="text" name="activity.title" value="${(activity.title)!}" style="width:261%;">
-								</div>
+				<div class="box-body">
+				<div class="form-group">
+					<div class="col-sm-5 validata-box">
+						<label class="control-label col-sm-4">活动名称:</label>
+						<div class="input-group col-sm-8">
+							<input class="form-control" type="text" name="activity.title" value="${(activity.title)!}" style="width:261%;">
+						</div>
+					</div>
+				</div>
+					<div class="form-group">
+						<div class="col-sm-5 validata-box">
+							<label class="control-label col-sm-4">活动开始时间:</label>
+							<div class="input-group col-sm-8">
+								<input id="startDate" class="form-control" value="${startDate!}" name="startDate" placeholder="开始日期" >
 							</div>
 						</div>
-							<div class="form-group">
-								<div class="col-sm-5 validata-box">
-									<label class="control-label col-sm-4">活动开始时间:</label>
-									<div class="input-group col-sm-8">
-										<input id="startDate" class="form-control" value="${startDate!}" name="startDate" placeholder="开始日期" >
-									</div>
-								</div>
-								<div class="col-sm-5 validata-box">
-									<label class="control-label col-sm-4">活动结束时间:</label>
-									<div class="input-group col-sm-8">
-										<input id="endDate" class="form-control" value="${endDate!}" name="endDate" placeholder="结束日期" >
-									</div>
-								</div>
-						</div>
-
-						<div class="form-group">
-							<div class="col-sm-5 validata-box">
-								<label class="control-label col-sm-4">活动编号:</label>
-								<div class="input-group col-sm-8">
-									<input class="form-control" type="text" name="activity.code" value="${(activity.code)!}">
-								</div>
-							</div>
-
-							<div class="col-sm-5 validata-box" >
-								<label class="control-label col-sm-4">流程编号:</label>
-								<div class="input-group col-sm-8">
-									<input class="form-control" type="text" name="activity.proc_code" value="${(activity.proc_code)!}">
-								</div>
-							</div>
-						</div>
-						<div class="form-group">
-							<div class="col-sm-5 validata-box">
-								<label class="control-label col-sm-4">活动方案号:</label>
-								<div class="input-group col-sm-8">
-									<input class="form-control" type="text" name="activity.plan_code" value="${(activity.plan_code)!}">
-								</div>
-							</div>
-							<div class="col-sm-5 validata-box">
-								<label class="control-label col-sm-4">活动类型:</label>
-								<div class="input-group col-sm-8">
-									<select class="form-control category" name="activity.category" id="activity.category">
-										${DICT_BOX('activity_category', 'select', (activity.category)!)}
-									</select>
-								</div>
-							</div>
-						</div>
-						<div class="form-group">
-							<div class="col-sm-5 validata-box">
-								<label class="control-label col-sm-4">客户类型:</label>
-								<div class="input-group col-sm-8">
-									<select id="customerType" class="form-control" name = "customerTy" multiple="multiple">
-									</select>
-								</div>
-							</div>
-							<div class="col-sm-5 validata-box">
-								<label for="_title" class="control-label col-sm-4">客户区域:</label>
-								<div class="input-group col-sm-8">
-									<input readonly type="text" id="cityPicker" data-toggle="cityPicker" style="width:100%;">
-									<input type="hidden" id="areaNames" name="areaNames">
-									<input type="hidden" id="areaCodes" name="areaCodes">
-								</div>
-							</div>
-						</div><div class="form-group">
-							<div class="col-sm-5 validata-box">
-								<label class="control-label col-sm-4">活动标签:</label>
-								<div class="input-group col-sm-8">
-									<input class="form-control" type="text" name="activity.tags" value="${(activity.tags)!}">
-								</div>
-							</div>
-							<div class="col-sm-5 validata-box investType" >
-									<label class="control-label col-sm-4">投入类型:</label>
-									<div class="input-group col-sm-8">
-										<select class="form-control" name="invest_type" id="invest_type" multiple="multiple" >
-											<#if activity??>
-												<#list (dicts)! as dict>
-													<option value="${dict.key}" <#if dict??&&investTypeList?contains(dict.key)>selected="selected"</#if>>${(dict.name)!}</option>
-												</#list>
-											<#else>
-												<#list (dicts)! as dict>
-													<option value="${dict.key}">${(dict.name)!}</option>
-												</#list>
-											</#if>
-										</select>
-									</div>
-								</div>
-						</div><div class="form-group">
-							<!-- <div class="col-sm-5 validata-box">
-								<label class="control-label col-sm-4">每个客户参与次数：</label>
-								<div class="input-group col-sm-8">
-									<input class="form-control" type="text" name="activity.join_num" value="${(activity.join_num)!}">
-								</div>
-							</div> -->
-							<!-- <div class="col-sm-5 validata-box">
-								<label class="control-label col-sm-4">时间限制：</label>
-								<div class="input-group col-sm-8">
-									<select class="form-control" name="activity.time_interval" id="activity.time_interval">
-										${DICT_BOX('activity_time_interval', 'select', (activity.time_interval)!)}
-									</select>
-								</div>
-							</div> -->
-							<div class="col-sm-5 validata-box">
-								<label class="control-label col-sm-4">名额：</label>
-								<div class="input-group col-sm-8">
-									<input class="form-control" type="text" name="activity.total_customer_num" value="${(activity.total_customer_num)!}">
-								</div>
-							</div>
-							<div class="col-sm-5 validata-box investNum">
-								<label class="control-label col-sm-4">投入数量:</label>
-								<div class="input-group col-sm-8">
-									<input class="form-control" type="text" name="activity.invest_num" value="${(activity.invest_num)!}" style="width:67%;">
-									&nbsp;<select id="unit" name="unit" class="form-control" style="width: 30%;float: none;">
-									</select>
-								</div>
-							</div>
-						</div><div class="form-group">
-							<div class="col-sm-5 validata-box investAmount">
-								<label for="_title" class="control-label col-sm-4">投入金额:</label>
-								<div class="input-group col-sm-8">
-									<input class="form-control" type="text" name="activity.invest_amount" value="${(activity.invest_amount)!}">
-								</div>
-							</div>
-							<div class="col-sm-5 validata-box visitNum">
-								<label class="control-label col-sm-4">拜访次数：</label>
-								<div class="input-group col-sm-8">
-									<input class="form-control" type="text" name="activity.visit_num" value="${(activity.visit_num)!}">
-								</div>
-							</div>
-							<div class="form-group">
-								<div class="col-sm-5 validata-box">
-									<label class="control-label col-sm-4">是否上架:</label>
-									<div class="input-group col-sm-8">
-										<label class="radio-inline">
-											<input type="radio" name="activity.is_publish" value="1" <#if !activity?? || (activity.is_publish)! == 1>checked</#if> />是
-										</label>
-										<label class="radio-inline">
-											<input type="radio" name="activity.is_publish" value="0" <#if activity?? && (activity.is_publish)! == 0>checked</#if> />否
-										</label>
-									</div>
-								</div>
-							</div>
-						</div><div class="form-group">
-							<div class="col-sm-5 validata-box">
-								<label class="control-label col-sm-4">活动内容:</label>
-								<div class="input-group col-sm-8">
-									<textarea class="form-control" rows="3" name="activity.content" value="${(activity.content)!}" style="width:261%;">${(activity.content)!}</textarea>
-								</div>
-							</div>
-						</div><div class="form-group">
-							<div class="col-sm-5 validata-box">
-									<label class="control-label col-sm-4">活动海报:</label>
-									<div class="input-group col-sm-8">
-										<span class="btn btn-default" id="chooseImg" onClick="imgChoose()">选择图片</span>
-									</div>
-							</div><br>
-							<div class="col-sm-5 validata-box" style="margin-left:-20%;">
-								<label class="control-label col-sm-4"></label>
-								<div class="input-group col-md-10 col-sm-10">
-									<ul class="list-inline list-unstyled" id="imageDiv">
-										<#list (imageList)! as img>
-											<li>
-												<div class="imgDiv">
-													<img src="${img}" class='jp-grids-photos img-responsive' >
-													<input type='hidden' name='imageUrl[]' value="${img}">
-													<div class="delete"></div>
-												</div>
-											</li>
-										</#list>
-									</ul>
-								</div>
+						<div class="col-sm-5 validata-box">
+							<label class="control-label col-sm-4">活动结束时间:</label>
+							<div class="input-group col-sm-8">
+								<input id="endDate" class="form-control" value="${endDate!}" name="endDate" placeholder="结束日期" >
 							</div>
 						</div>
 				</div>
+				
+				<div class="form-group">
+					<div class="col-sm-5 validata-box">
+						<label class="control-label col-sm-4">活动编号:</label>
+						<div class="input-group col-sm-8">
+							<input class="form-control" type="text" name="activity.code" value="${(activity.code)!}">
+						</div>
+					</div>
+					
+					<div class="col-sm-5 validata-box" >
+						<label class="control-label col-sm-4">流程编号:</label>
+						<div class="input-group col-sm-8">
+							<input class="form-control" type="text" name="activity.proc_code" value="${(activity.proc_code)!}">
+						</div>
+					</div>
 				</div>
-				<div class="tab-pane fade" id="B">
-					<table id="table" class="table table-bordered table-hover text-center" width="100%" name="row">
-					<thead>
-						<tr>
-							<th width="2%"></th>
-							<th width="5%">行号</th>
-							<th width="10%">步骤</th>
-							<th width="50%">执行说明</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr class="hide">
-							<td>
-								<a class="btn btn-danger btn-xs" onclick="deleteTr(this)"><span class="glyphicon glyphicon-remove"></span></a>
-							</td>
-							<td>
-								<span class="rowNum">0</span>
-								<input type="hidden" name = "activityExecteId" id="activityExecteId"/>
-							</td>
-							<td>
-								<div class = "validata-box" style="padding-left:35%;">
-									<input class="form-control input-sm" type="text" id="orderList" style="width:40%;text-align:center;" name="orderList" >
-								</div>
-							</td>
-							</td>
-							<td>
-								<div class = "validata-box">
-									<input type="text" id="remark" name="remark"  style="width: 50%;"value=""/>
-								</div>
-							</td>
-						</tr>
-					</tbody>
-					<tfoot>
-						<tr>
-							<td>
-								<button class="btn btn-xs btn-info" onclick="addProduct()" ><span class="glyphicon glyphicon-plus"></span></button>
-								<input type="hidden" name = "num" id="num"/>
-							</td>
-						</tr>
-					</tfoot>
-				</table>
+				<div class="form-group">
+					<div class="col-sm-5 validata-box">
+						<label class="control-label col-sm-4">活动方案号:</label>
+						<div class="input-group col-sm-8">
+							<input class="form-control" type="text" name="activity.plan_code" value="${(activity.plan_code)!}">
+						</div>
+					</div>
+					<div class="col-sm-5 validata-box">
+						<label class="control-label col-sm-4">活动类型:</label>
+						<div class="input-group col-sm-8">
+							<select class="form-control category" name="activity.category" id="activity.category">
+								${DICT_BOX('activity_category', 'select', (activity.category)!)}
+							</select>
+		               	</div>
+					</div>
 				</div>
-			</div>
-		<div class="box-footer">
+				<div class="form-group">
+					<div class="col-sm-5 validata-box">
+						<label class="control-label col-sm-4">客户类型:</label>
+						<div class="input-group col-sm-8">
+							<select id="customerType" class="form-control" name = "customerTy" multiple="multiple">
+							</select>
+						</div>
+					</div>
+					<div class="col-sm-5 validata-box">
+	                    <label for="_title" class="control-label col-sm-4">客户区域:</label>
+	                    <div class="input-group col-sm-8">
+	                        <input readonly type="text" id="cityPicker" data-toggle="cityPicker" style="width:100%;">
+	                        <input type="hidden" id="areaNames" name="areaNames">
+	                        <input type="hidden" id="areaCodes" name="areaCodes">
+	                    </div>
+					</div>
+				</div><div class="form-group">
+					<div class="col-sm-5 validata-box">
+						<label class="control-label col-sm-4">活动标签:</label>
+						<div class="input-group col-sm-8">
+							<input class="form-control" type="text" name="activity.tags" value="${(activity.tags)!}">
+						</div>
+					</div>
+					<div class="col-sm-5 validata-box investType" >
+							<label class="control-label col-sm-4">投入类型:</label>
+							<div class="input-group col-sm-8">
+								<select class="form-control" name="invest_type" id="invest_type" multiple="multiple" >
+									<#if activity??>
+										<#list (dicts)! as dict>
+			                                <option value="${dict.key}" <#if dict??&&investTypeList?contains(dict.key)>selected="selected"</#if>>${(dict.name)!}</option>
+			                            </#list>
+		                            <#else>
+			                            <#list (dicts)! as dict>
+			                                <option value="${dict.key}">${(dict.name)!}</option>
+			                            </#list>
+		                            </#if>
+								</select>
+							</div>
+						</div>
+				</div><div class="form-group">		
+					<!-- <div class="col-sm-5 validata-box">
+						<label class="control-label col-sm-4">每个客户参与次数：</label>
+						<div class="input-group col-sm-8">
+							<input class="form-control" type="text" name="activity.join_num" value="${(activity.join_num)!}">
+						</div>
+					</div> -->
+					<!-- <div class="col-sm-5 validata-box">
+						<label class="control-label col-sm-4">时间限制：</label>
+						<div class="input-group col-sm-8">
+							<select class="form-control" name="activity.time_interval" id="activity.time_interval">
+								${DICT_BOX('activity_time_interval', 'select', (activity.time_interval)!)}
+							</select>
+						</div>
+					</div> -->
+					<div class="col-sm-5 validata-box">
+						<label class="control-label col-sm-4">名额：</label>
+						<div class="input-group col-sm-8">
+							<input class="form-control" type="text" name="activity.total_customer_num" value="${(activity.total_customer_num)!}">
+						</div>
+					</div>
+					<div class="col-sm-5 validata-box investNum">
+						<label class="control-label col-sm-4">投入数量:</label>
+						<div class="input-group col-sm-8">
+							<input class="form-control" type="text" name="activity.invest_num" value="${(activity.invest_num)!}" style="width:67%;">
+							&nbsp;<select id="unit" name="unit" class="form-control" style="width: 30%;float: none;">
+							</select>
+						</div>
+					</div>
+				</div><div class="form-group">
+					<div class="col-sm-5 validata-box investAmount">
+	                    <label for="_title" class="control-label col-sm-4">投入金额:</label>
+	                    <div class="input-group col-sm-8">
+	                        <input class="form-control" type="text" name="activity.invest_amount" value="${(activity.invest_amount)!}">
+	                    </div>
+	                </div>
+					<div class="col-sm-5 validata-box visitNum">
+						<label class="control-label col-sm-4">拜访次数：</label>
+						<div class="input-group col-sm-8">
+							<input class="form-control" type="text" name="activity.visit_num" value="${(activity.visit_num)!}">
+						</div>
+					</div>
+					<div class="form-group">	
+						<div class="col-sm-5 validata-box">
+							<label class="control-label col-sm-4">是否上架:</label>
+							<div class="input-group col-sm-8">
+								<label class="radio-inline">
+			                 		<input type="radio" name="activity.is_publish" value="1" <#if !activity?? || (activity.is_publish)! == 1>checked</#if> />是
+			                 	</label>
+			                 	<label class="radio-inline">
+			                 		<input type="radio" name="activity.is_publish" value="0" <#if activity?? && (activity.is_publish)! == 0>checked</#if> />否
+								</label>		                 		
+			               	</div>
+						</div>
+					</div>
+				</div><div class="form-group">
+					<div class="col-sm-5 validata-box">
+						<label class="control-label col-sm-4">活动内容:</label>
+						<div class="input-group col-sm-8">
+		                 	<textarea class="form-control" rows="3" name="activity.content" value="${(activity.content)!}" style="width:261%;">${(activity.content)!}</textarea>
+		               	</div>
+					</div>
+				</div><div class="form-group">
+					<div class="col-sm-5 validata-box">
+							<label class="control-label col-sm-4">活动海报:</label>
+							<div class="input-group col-sm-8">
+			                 	<span class="btn btn-default" id="chooseImg" onClick="imgChoose()">选择图片</span>
+			               	</div>
+					</div><br>
+					<div class="col-sm-5 validata-box" style="margin-left:-20%;">
+						<label class="control-label col-sm-4"></label>
+						<div class="input-group col-md-10 col-sm-10">
+							<ul class="list-inline list-unstyled" id="imageDiv">
+								<#list (imageList)! as img>
+									<li>
+										<div class="imgDiv">
+											<img src="${img}" class='jp-grids-photos img-responsive' >
+											<input type='hidden' name='imageUrl[]' value="${img}">
+											<div class="delete"></div>
+										</div>											
+									</li>
+								</#list>
+							</ul>									
+		               	</div>
+					</div>
+				</div>
+		</div>
+		<div class="box-footer"> 
 			<button type="button" id="do_submit" onclick="doSubmit()" class="btn btn-sm bg-olive btn-flat ladda-button" data-style="expand-right">提交</button>
 			<input type="button" class="btn btn-sm btn-primary btn-flat" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
 		</div>
