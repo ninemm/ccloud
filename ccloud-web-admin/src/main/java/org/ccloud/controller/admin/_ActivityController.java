@@ -199,7 +199,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		}
 		if(num>0) {
 			for(int i = 0; i <num ; i++) {
-				if(getPara("orderList"+(i+1))==null){
+				if(getPara("orderList"+(i+1))==""){
 					continue;
 				}
 				ActivityExecute activityExecute = new ActivityExecute();
