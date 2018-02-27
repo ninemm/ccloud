@@ -557,6 +557,20 @@ public class CustomerController extends BaseFrontController {
 
 			List<String> diffAttrList = BeanCompareUtils.contrastObj(src, dest);
 			setAttr("diffAttrList", diffAttrList);
+			for (int i = 0; i < diffAttrList.size(); i++) {
+				if (diffAttrList.get(i).startsWith("店招图")) {
+					String imageListStore=diffAttrList.get(i).substring(4);
+					String domain = OptionQuery.me().findValue("cdn_domain");
+					List<ImageJson> list = JSON.parseArray(imageListStore, ImageJson.class);
+					for (ImageJson image : list) {
+						image.setSavePath(domain + "/" + image.getSavePath());
+						image.setOriginalPath(domain + "/" +image.getOriginalPath());
+					}
+					setAttr("diffAttrImage", list);
+					diffAttrList.remove(i);
+					break;
+				}
+			}
 		} else if(isEnable.equals("0")) {
 			List<String> diffAttrList = new ArrayList<>();
 			diffAttrList.add("新增客户");
