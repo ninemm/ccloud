@@ -18,16 +18,15 @@
    var $pagesize = $("#pagesize");
 
    $(function() {
-    var ids = '${outstockId!}';
-    var financePrint = '${isFinancePrint!}';
-	queryPrintDetail(financePrint);
+    var ids = '${inStockId!}';
+	queryPrintDetail();
 	initEvent();
 });
 
 var headerInfo =
 	'<div class="header clear clearheader">' +
-	    '<div class="titleArea">' +
-			'<h1>{0}发货单</h1>' +
+	    '<div class="titleArea" style="margin-top: 4rem;">' +
+			'<h1>{0}退货单</h1>' +
 		'</div>' +
 	'</div>';
 
@@ -35,9 +34,9 @@ var headerStr =
 	'<table class="printContent clearcontent">' +
 		'<thead>' +
 		'<tr>' +
-			'<td class="text-center width8">发货单号</td>' +
+			'<td class="text-center width8">退货单号</td>' +
 			'<td class="width8">{0}</td>' +
-			'<td class="text-center width8">下单时间</td>' +
+			'<td class="text-center width8">退货时间</td>' +
 			'<td colspan="2" class="width8">{1}</td>' +
 			'<td class="text-center width8">制单时间</td>' +
 			'<td colspan="2">{2}</td>' +
@@ -61,7 +60,7 @@ var headerStr =
 			'<td>瓶数</td>' +
 			'<td style="width:10%">件单价</td>' +
 			'<td style="width:10%">瓶单价</td>' +
-			'<td style="width:10%">购货价格</td>' +
+			'<td style="width:10%">退货价格</td>' +
 			'<td colspan="3" class="center2">条码</td>' +
 		'</tr>' +
 	'</thead>';
@@ -80,7 +79,7 @@ var headerStr =
 		var footerStr =
 			'<div class="signatureArea clearfooter">' +
 				'<div class="stat">' + 
-					'<span class="">应收合计：{0} ({1} 元)</span><span class="pageNum floatRight">1/1</span>' + 
+					'<span class="">应付合计：{0} ({1} 元)</span><span class="pageNum floatRight">1/1</span>' + 
 				'</div>' + 
 				'<div class="stat">' +
 					'<div><span>联系电话：{2}</span><span class="sign" >收货单位签字盖章</span></div>' +
@@ -91,84 +90,76 @@ var headerStr =
 			'</div>';
 
 
-function queryPrintDetail(financePrint) {
+function queryPrintDetail() {
 
     var batchPrintContent = '';
     var headerContent = null;
     var footerContent = null;
     var headerInfoContent = null;
     $.ajax({
-        url: "${CPATH}/admin/salesOutstock/getPrintInfo",
+        url: "${CPATH}/admin/salesInstock/getPrintInfo",
         data: {
-            "outstockId": '${outstockId!}',
-            "isFinancePrint":'${isFinancePrint!}'
+            "inStockId": '${inStockId!}'
         },
         dataType: "json",
         async: false,
         success: function(data) {
             if (data && data.rows) {
                 var curDate = new Date().Format("yyyy-MM-dd hh:mm");
-                $.each(data.rows,
-                function(index, item) {
+
+                $.each(data.rows, function(index, stockInPrintInfo) {
+                 item =  stockInPrintInfo.printInfo
                     var content = '<tbody>';
-                     let saleMoney = 0;
-                    if (item.orderProductInfos) {
-                        $.each(item.orderProductInfos,
-                        function(idx, subitem) {
-                            let barCode = subitem.barCode;
+                    if (stockInPrintInfo.ProductInfos) {
+                        $.each(stockInPrintInfo.ProductInfos,function(idx, subitem) {
+                            let barCode = subitem.bar_code;
                             if (!barCode) barCode = '无';
-                            let totalMoney = 0;
-                            let isGift = subitem.isgift;
+                            let isGift = subitem.is_gift;
                             if (isGift != 0) {
                                 isGift = '(赠品)';
                             } else {
                                 isGift = "";
-                                totalMoney = subitem.bigCount
-										* subitem.bigPrice
-										+ subitem.smallCount
-										* subitem.smallPrice;
-										saleMoney = saleMoney + totalMoney;
                             }
-                            var productAmout = subitem.productAmout
-                            if(financePrint == 0){
-                            content += $.format(contentStr, (idx + 1), subitem.productName, subitem.bigCount, subitem.bigPrice + '元', subitem.smallCount, subitem.smallPrice + '元', barCode, isGift,productAmout+ '元')
+                            var productAmout = subitem.reject_amount
+                            if(item.customer_kind == 100402){
+                            content += $.format(contentStr, (idx + 1), subitem.custom_name, subitem.bigCount, "", subitem.smallCount, "", barCode, isGift,"")
                             }else{
-                            content += $.format(contentStr, (idx + 1), subitem.productName, subitem.bigCount, subitem.bigPrice + '元', subitem.smallCount, subitem.smallPrice + '元', barCode, isGift,totalMoney+ '元')
+                            content += $.format(contentStr, (idx + 1), subitem.custom_name, subitem.bigCount, subitem.big_Price + '元', subitem.smallCount, subitem.small_price + '元', barCode, isGift,productAmout+ '元')
                             }
                         });
 
-                        let len = item.orderProductInfos.length;
-                        for (let i = len; i < 6; i++) {
+                        let len = stockInPrintInfo.ProductInfos.length;
+                        for (let i = len; i < 5; i++) {
                             content += $.format(contentStr, (i + 1), '', '', '', '', '', '', '', '', '');
                         }
                     }
                     content += '</tbody></table>';
 
-                    headerInfoContent = $.format(headerInfo, (item.sellerName != null) ? item.sellerName: "", '送');
+                    headerInfoContent = $.format(headerInfo, (item.sellerName != null) ? item.sellerName: "", '退');
 
-                    let placeOrderMan = item.placeOrderMan;
-                    let placeOrderPhone = item.placeOrderPhone;
+                    let placeOrderMan = item.realname;
+                    let placeOrderPhone = item.mobile ;
                     let warehousePhone = item.warehousePhone;
                     let remark = item.remark;
                     if (!warehousePhone) warehousePhone = '无';
                     if (!remark) remark = '';
-                    let placeOrderTime = new Date(item.placeOrderTime).Format("yyyy-MM-dd hh:mm");;
+                    let placeOrderTime = new Date(item.returnOrderTime).Format("yyyy-MM-dd hh:mm");;
 
-                    headerContent = $.format(headerStr, item.outstockSn, placeOrderTime, curDate, item.customerName, item.customerContacts, item.customerPhone, item.deliveryAddress, placeOrderMan, placeOrderPhone, item.warehouseName);
+                    headerContent = $.format(headerStr, item.instock_sn, placeOrderTime, curDate, item.customer_name, item.ccontact, item.cmobile, item.delivery_address, placeOrderMan, placeOrderPhone, item.warehouseName);
 
+                    var salesAmount = DX(item.total_reject_amount);
+                    
                     let printFootContext = item.printFootContext;
                     if (!printFootContext) printFootContext = '';
-                    if(financePrint == 0){
-                    var salesAmount = DX(item.salesAmount);
-                    footerContent = $.format(footerStr, salesAmount, item.salesAmount, warehousePhone, remark,printFootContext);
+                    
+                    if(item.customer_kind == 100402){
+                    footerContent = $.format(footerStr, "", "", warehousePhone, remark,printFootContext);
                     }else{
-                    var salesAmount = DX(saleMoney);
-                    footerContent = $.format(footerStr, salesAmount, saleMoney, warehousePhone, remark,printFootContext);
+                    footerContent = $.format(footerStr, salesAmount, item.total_reject_amount, warehousePhone, remark,printFootContext);
                     }
-
                     batchPrintContent += headerInfoContent + headerContent + content + footerContent;
 
-                    defaultPageSize = 6;
+                    defaultPageSize = 5;
                 });
 
                 $("#print-content").html(batchPrintContent);
@@ -251,9 +242,9 @@ $("#print").click(function() {
 
     if (window.confirm('确认打印吗(订单状态会变为已打印)?')) {
     $.ajax({
-      url: "${CPATH}/admin/salesOutstock/recordPrintInfo",
+      url: "${CPATH}/admin/salesInstock/recordPrintInfo",
         data: {
-            "outstockId": '${outstockId!}'
+            "inStockId": '${inStockId!}'
         },
         dataType: "json",
         async: false,
@@ -285,16 +276,6 @@ Date.prototype.Format = function (fmt) { //author: meizz
     return fmt;
 }
 
-
-function getStockIdArray() {
-
-    var stockIdList = new Array();
-    var stockIds = ids.split(",");
-    for (index in stockIds) {
-        stockIdList.push(Number(stockIds[index]));
-    }
-    return stockIdList;
-}
 
 </#macro>
 
