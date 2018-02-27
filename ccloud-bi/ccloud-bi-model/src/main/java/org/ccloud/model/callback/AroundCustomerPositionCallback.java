@@ -31,6 +31,8 @@ public class AroundCustomerPositionCallback implements ICallback {
 	private double longitude;
 	private double latitude;
 	private double dist;
+	private String startDate;
+	private String endDate;
 	private String dealerCode;
 
 	@Override
@@ -40,12 +42,14 @@ public class AroundCustomerPositionCallback implements ICallback {
 		List<Map<String, Object>> result = Lists.newArrayList();
 
 		try {
-			proc = conn.prepareCall("{ call around_customer_position(?, ?, ?, ?) }");
+			proc = conn.prepareCall("{ call around_customer_position(?, ?, ?, ?, ?, ?) }");
 
 			proc.setDouble(1, getLongitude());
 			proc.setDouble(2, getLatitude());
 			proc.setDouble(3, getDist());
-			proc.setString(4, getDealerCode());
+			proc.setString(4, getStartDate());
+			proc.setString(5, getEndDate());
+			proc.setString(6, getDealerCode());
 
 			proc.execute();
 
@@ -105,6 +109,22 @@ public class AroundCustomerPositionCallback implements ICallback {
 
 	public void setDist(double dist) {
 		this.dist = dist;
+	}
+
+	public String getStartDate() {
+		return startDate;
+	}
+
+	public void setStartDate(String startDate) {
+		this.startDate = startDate;
+	}
+
+	public String getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(String endDate) {
+		this.endDate = endDate;
 	}
 
 	public String getDealerCode() {

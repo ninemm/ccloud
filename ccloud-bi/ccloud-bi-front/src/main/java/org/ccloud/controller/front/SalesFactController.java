@@ -386,11 +386,17 @@ public class SalesFactController extends BaseFrontController {
 		double longitude = Double.parseDouble(getPara("longitude"));
 		double latitude = Double.parseDouble(getPara("latitude"));
 		double dist = Double.parseDouble(getPara("dist"));
+		String dateType = getPara("dateType", "0").trim();
+
+		String startDate = DateUtils.getDateByType(dateType);
+		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
 
 		AroundCustomerPositionCallback callback = new AroundCustomerPositionCallback();
 		callback.setLongitude(longitude);
 		callback.setLatitude(latitude);
 		callback.setDist(dist);
+		callback.setStartDate(startDate);
+		callback.setEndDate(endDate);
 		callback.setDealerCode(dealerCode);
 
 		Connection conn = null;
@@ -440,6 +446,44 @@ public class SalesFactController extends BaseFrontController {
 		}
 
 		renderJson(result);
+	}
+
+	public void salesHotMap() {
+
+		String dealerCode = getSessionAttr("dealerCode");
+
+		String provName = getPara("provName", "").trim();
+		String cityName = getPara("cityName", "").trim();
+		String countryName = getPara("countryName", "").trim();
+		String dateType = getPara("dateType", "0").trim();// 0: 近一天， 1: 近一周， 2: 近一月
+
+		String startDate = DateUtils.getDateByType(dateType);
+		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
+
+		List<Record> result = SalesFactQuery.me().findAreaSales(dealerCode, provName, cityName,
+				countryName, startDate, endDate);
+
+		renderJson(result);
+
+	}
+
+	public void customerHotMap() {
+
+		String dealerCode = getSessionAttr("dealerCode");
+
+		String provName = getPara("provName", "").trim();
+		String cityName = getPara("cityName", "").trim();
+		String countryName = getPara("countryName", "").trim();
+		String dateType = getPara("dateType", "0").trim();// 0: 近一天， 1: 近一周， 2: 近一月
+
+		String startDate = DateUtils.getDateByType(dateType);
+		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
+
+		List<Record> result = SalesFactQuery.me().findAreaCustomer(dealerCode, provName, cityName,
+				countryName, startDate, endDate);
+
+		renderJson(result);
+
 	}
 
 }

@@ -1,11 +1,12 @@
 <#include "_inc/_layout.html"/>
 <#macro script_import>
 
-    <script src="${CPATH}/templates/datacenter/js/echarts.min.js"></script>
+    <script type="text/javascript" src="${CPATH}/templates/datacenter/js/echarts.min.js"></script>
     <script type="text/javascript" src="${CPATH}/templates/datacenter/js/topHovertree.js"></script>
     <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
     <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=su3AmHLUcBprpnOLmVHo7r8AljbW8X6t"></script>
     <script type="text/javascript" src="${CTPATH}/js/convertor.js"></script>
+    <script type="text/javascript" src="${CTPATH}/js/heatmap.min.js"></script>
 </#macro>
 <#macro css_import>
 
@@ -46,7 +47,7 @@
         top: 12px;
         width: 50px;
     }
-    #allmap{
+    #allmap,#hot_map{
         width:100%;
         height: 18rem;
     }
@@ -63,6 +64,7 @@
 <#macro script>
     $(function() {
         lMap(dateType);
+        hMap(dateType);
         customer(provName, cityName, '', dateType);
         
         initTopHoverTree("gotop", 100, 10, 50);
@@ -77,6 +79,7 @@
     var countryName = $.cookie(Utils.countryCacheName);
     var dateType = 0;
     var mapType = 0 ;
+    var hotMapType = 0 ;
     var customerTypeName = '';
 
     $city.text(cityName);
@@ -89,9 +92,8 @@
     });
     function setDateType(type){
         dateType = type;
-        if(mapType == 0){
-            lMap(dateType);
-        }
+        lMap(dateType);
+        hMap(dateType);
         customer(provName, cityName, '', dateType);
     }
     //做地图类型的切换选择
@@ -100,9 +102,15 @@
         $a.parent().find(".mapType").removeClass("active-mapType");
         $a.addClass("active-mapType");
     });
+
     function setMapType(type){
         mapType = type;
         lMap(dateType);
+    }
+
+    function setHotMapType(type){
+        hotMapType = type;
+        hMap(dateType);
     }
 
     //定位
@@ -115,6 +123,7 @@
             cityName = $.cookie(Utils.cityCacheName);
             countryName = $.cookie(Utils.countryCacheName);
             lMap(dateType)
+            hMap(dateType);
             customer(provName, cityName, '', dateType);
         });
 
@@ -154,7 +163,7 @@
         if(mapType == 0){
             salesMap(dateType,longitude,latitude);
         } else {
-            positionMap(longitude,latitude);
+            positionMap(dateType,longitude,latitude);
             undevelopedMap(longitude,latitude);
         }
     
@@ -191,19 +200,19 @@
 
     }
 
-    function positionMap(longitude,latitude){
+    function positionMap(dateType,longitude,latitude){
     
         $.ajax({
             url:"${CPATH}/sales/aroundCustomerPosition",
             type:"post",
-            data:{longitude: longitude, latitude: latitude, dist: 5},
+            data:{dateType: dateType, longitude: longitude, latitude: latitude, dist: 5},
             dataType:"json"
         }).done(function(data){
             Utils.close();
             
             for(var i = 0; i < data.length; i++) {
                 var new_point = new BMap.Point(data[i].longitude,data[i].latitude);
-                var marker = data[i].dist < 0.5 ? new BMap.Marker(new_point, {icon:redIcon}) : new BMap.Marker(new_point, {icon:orangeIcon});  //创建标注
+                var marker = data[i].baiduDist < 0.5 ? new BMap.Marker(new_point, {icon:redIcon}) : new BMap.Marker(new_point, {icon:orangeIcon});  //创建标注
                 map.addOverlay(marker);              // 将标注添加到地图中
                 var opts = {
                     width : 240,     // 信息窗口宽度
@@ -214,7 +223,7 @@
                     customerName: data[i].customerName
                 };
                 var content = '联系人：' + data[i].contacts + ' ' + data[i].phone;
-                content = content + '<br>' + '开发情况：' + (data[i].dist < 0.5 ? '定位准确' : '定位存疑');
+                content = content + '<br>' + '开发情况：' + (data[i].baiduDist < 0.5 ? '定位准确' : '定位存疑');
                 content = content + '<br>' + '地址：' + data[i].address;
                 addClickHandler(content,marker,opts);
             }
@@ -230,7 +239,6 @@
             data:{longitude: longitude, latitude: latitude, dist: 1},
             dataType:"json"
         }).done(function(data){
-            Utils.close();
             
             for(var i = 0; i < data.length; i++) {
                 var new_point = new BMap.Point(data[i].longitude,data[i].latitude);
@@ -296,6 +304,69 @@
                 $tbody.append("<tr><td>" + data[i].cInvName + "</td><td class='t-r'>" + data[i].totalNum + "</td><td class='t-r'>" + data[i].totalAmount + "</td></tr>");
             }
        });
+    }
+
+    //热力图
+    var hotMap = new BMap.Map("hot_map");
+    function hMap(dateType){
+        Utils.loading();
+        
+        var hmTitle = '热力图';
+        if((provName + cityName + countryName).trim() != '' ){
+        hmTitle = provName + cityName  + hmTitle;
+        } else {
+        hmTitle = '全国' + hmTitle;
+        }
+        $("#p_hot_map").text(hmTitle);
+
+        var longitude = $.cookie(Utils.longitudeCache);
+        var latitude = $.cookie(Utils.latitudeCache);
+        var point = new BMap.Point(longitude,latitude);
+        hotMap.centerAndZoom(point, 11);             // 初始化地图，设置中心点坐标和地图级别
+
+        if(cityName.trim() != '' ){
+            hotMap.centerAndZoom(cityName,11);
+        } else if(provName.trim() != '' ) {
+            hotMap.centerAndZoom(provName,7);
+        } else {
+            hotMap.centerAndZoom("兰州",4);
+        }
+
+        hotMap.enableScrollWheelZoom(true);
+        hotMap.clearOverlays();
+        if(hotMapType == 0){
+            hotMapData(dateType,"${CPATH}/sales/salesHotMap");
+        } else {
+            hotMapData(dateType,"${CPATH}/sales/customerHotMap");
+        }
+
+    }
+
+    function hotMapData(dateType, url){
+
+        $.ajax({
+            url:url,
+            type:"post",
+            data:{provName: provName, cityName: cityName, countryName: '', dateType: dateType},
+            dataType:"json"
+        }).done(function(data){
+            Utils.close();
+            
+            if(!isSupportCanvas()){
+                alert('热力图目前只支持有canvas支持的浏览器,您所使用的浏览器不能使用热力图功能~')
+            }
+    
+            heatmapOverlay = new BMapLib.HeatmapOverlay({"radius":20});
+            hotMap.addOverlay(heatmapOverlay);
+            heatmapOverlay.setDataSet({data:data,max:100});
+
+        });
+    }
+
+    //判断浏览区是否支持canvas
+    function isSupportCanvas(){
+        var elem = document.createElement('canvas');
+        return !!(elem.getContext && elem.getContext('2d'));
     }
     
 
@@ -556,6 +627,12 @@
                 </div>
             </div>
         </div>
+        <p class="title" id="p_hot_map"></p>
+        <div class="mapType-div">
+            <a class="mapType active-mapType" onclick="setHotMapType(0)">销售分布</a>
+            <a class="mapType" onclick="setHotMapType(1)">开发分布</a>
+        </div>
+        <div id="hot_map"></div>
 
         <p class="title" id="p_customer_rank"></p>
         <div id="customer_rank" id="customer_rank">

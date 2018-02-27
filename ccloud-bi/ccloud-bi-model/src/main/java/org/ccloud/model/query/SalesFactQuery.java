@@ -878,4 +878,72 @@ public class SalesFactQuery extends JBaseQuery {
 		return Db.find(sqlBuilder.toString(), params.toArray());
 	}
 
+	public List<Record> findAreaSales(String dealerCode, String provName, String cityName,
+	                                               String countryName, String startDate, String endDate) {
+
+		LinkedList<Object> params = new LinkedList<Object>();
+
+		StringBuilder sqlBuilder = new StringBuilder(" select x(ci.location) as lng, y(ci.location) as lat ");
+
+		//sqlBuilder.append(", TRUNCATE(SUM(sf.totalSales)/100, 2) as count");
+		sqlBuilder.append(", 150 as count");
+
+		sqlBuilder.append(" from sales_fact sf join customer_info ci on sf.customerId = ci.customerId ");
+		sqlBuilder.append(" where AsText(ci.location) != '' AND AsText(ci.location) != 'POINT(0 0)' ");
+
+		appendIfNotEmpty(sqlBuilder, "sf.dealerCode", dealerCode, params, false);
+		appendIfNotEmpty(sqlBuilder, "sf.provName", provName, params, false);
+		appendIfNotEmpty(sqlBuilder, "sf.cityName", cityName, params, false);
+		appendIfNotEmpty(sqlBuilder, "sf.countryName", countryName, params, false);
+
+		if (startDate != null) {
+			sqlBuilder.append(" and sf.idate >= ?");
+			params.add(startDate);
+		}
+
+		if (endDate != null) {
+			sqlBuilder.append(" and sf.idate <= ?");
+			params.add(endDate);
+		}
+		sqlBuilder.append(" and sf.customerType != 7");
+
+		sqlBuilder.append(" group by sf.customerId");
+		sqlBuilder.append(" order by count desc");
+
+		return Db.find(sqlBuilder.toString(), params.toArray());
+
+	}
+
+	public List<Record> findAreaCustomer(String dealerCode, String provName, String cityName,
+	                                  String countryName, String startDate, String endDate) {
+
+		LinkedList<Object> params = new LinkedList<Object>();
+
+		StringBuilder sqlBuilder = new StringBuilder(" select x(ci.location) as lng, y(ci.location) as lat ");
+
+		sqlBuilder.append(", 150 as count");
+
+		sqlBuilder.append(" from customer_info ci ");
+		sqlBuilder.append(" where AsText(ci.location) != '' AND AsText(ci.location) != 'POINT(0 0)' ");
+
+		appendIfNotEmpty(sqlBuilder, "ci.dealerCode", dealerCode, params, false);
+		appendIfNotEmpty(sqlBuilder, "ci.provName", provName, params, false);
+		appendIfNotEmpty(sqlBuilder, "ci.cityName", cityName, params, false);
+		appendIfNotEmpty(sqlBuilder, "ci.countryName", countryName, params, false);
+
+		if (startDate != null) {
+			sqlBuilder.append(" and ci.cTime >= ?");
+			params.add(startDate);
+		}
+
+		if (endDate != null) {
+			sqlBuilder.append(" and ci.cTime <= ?");
+			params.add(endDate);
+		}
+		sqlBuilder.append(" and ci.type != 7");
+
+		return Db.find(sqlBuilder.toString(), params.toArray());
+
+	}
+
 }
