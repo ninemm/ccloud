@@ -33,13 +33,16 @@ import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Activity;
 import org.ccloud.model.Dict;
+import org.ccloud.model.QyExpense;
 import org.ccloud.model.query.ActivityQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.DictQuery;
+import org.ccloud.model.query.QyExpenseQuery;
 
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
+import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.tx.Tx;
@@ -226,5 +229,49 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		renderJson(flang);
 	}
 	
+	//中间库同步数据
+	@Before(Tx.class)
+	public void getMidData() {
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		List<QyExpense> expenseList = QyExpenseQuery.me().findTextData();
+		List<Activity> acList = new ArrayList<>();
+		for (QyExpense qyExpense : expenseList) {
+			if (!ActivityQuery.me().isExist(qyExpense.getFlowNo())) {
+				Activity activity = new Activity();
+				activity.setId(StrKit.getRandomUUID());
+				activity.setSellerId(sellerId);
+				activity.setCode(qyExpense.getActivityNo());
+				activity.setTitle(qyExpense.getExpenseName());
+				activity.setStartTime(qyExpense.getExpenseBeginDate());
+				activity.setEndTime(qyExpense.getExpenseEndDate());
+				activity.setCategory(Consts.ACTIVITY_CATEGORY_CODE);
+				activity.setAreaType(getAreaType(qyExpense.getExpenseName()));
+				activity.setInvestAmount(new BigDecimal(qyExpense.getApplyAmount()));
+				activity.setProcCode(qyExpense.getFlowNo());
+				activity.setPlanCode(qyExpense.getActivityNo());
+				activity.setContent(qyExpense.getMemo());
+				activity.setTimeInterval(qyExpense.getInputDay().toString());
+				activity.setIsPublish(0);
+				activity.setCreateDate(new Date());
+				acList.add(activity);
+			}
+		}
+		Db.batchSave(acList, acList.size());
+		renderAjaxResultForSuccess("同步成功");
+	}
+	
+	private String getAreaType(String data) {
+		String[] areaFirst = data.split(":");
+		String[] areaSecond = areaFirst[1].split("_");
+		int a = 0;
+		for (int i = 0; i < areaSecond.length; i++) {
+			if (areaSecond[i].contains("省")) {
+				a = i;
+				break;
+			}
+		}
+		String areaType = areaSecond[a] + "-" + areaSecond[a+1];
+		return areaType;
+	}
 
 }

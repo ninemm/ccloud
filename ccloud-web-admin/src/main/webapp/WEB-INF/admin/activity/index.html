@@ -63,10 +63,28 @@
 			[
 				{field: "id", title: "ID", align: "center", visible:false, edit:false},
       			{field: "code", title: "活动编号", align: "center", visible:false, edit:false},
-      			{field: "title", title: "活动标题", align: "center", width: '10%', edit:false},
+      			{field: "title", title: "活动标题", align: "center", width: '20%', edit:false},
       			{field: "activityCategory", title: "活动类型", align: "center", width: '3%', edit:false},
-      			{field: "customer_type", title: "客户类型", align: "center", width: '20%',edit:false},
-      			{field: "area_type", title: "区域类型", align: "center", width: '10%',edit:false},
+      			{field: "customer_type", title: "客户类型", align: "center", width: '20%',
+   					formatter: function(value, row, rowIndex) {
+   						if (value == null) {
+   							return '不限';
+   						} else {
+   							return value;
+   						}
+   					},      			
+      				edit:false
+      			},
+      			{field: "area_type", title: "区域类型", align: "center", width: '10%',
+   					formatter: function(value, row, rowIndex) {
+   						if (value == null) {
+   							return '不限';
+   						} else {
+   							return value;
+   						}
+   					},       			
+      				edit:false
+      			},
       			{field: "start_time", title: "活动时间", align: "center", width: '10%',
       				formatter: function(value, row, rowIndex) {
 						var str = value +"-<br>"+ row.end_time;
@@ -81,8 +99,26 @@
    					},
    					edit: false
    				},  
-   				{field: "join_num", title: "每个客户参与数", align: "center", width: '3%',edit:false},
-   				{field: "total_customer_num", title: "名额", align: "center", width: '3%',edit:false}, 
+   				{field: "join_num", title: "每个客户参与数", align: "center", width: '3%',
+   					formatter: function(value, row, rowIndex) {
+   						if (value == null) {
+   							return '不限';
+   						} else {
+   							return value;
+   						}
+   					},    				
+   					edit:false
+   				},
+   				{field: "total_customer_num", title: "名额", align: "center", width: '3%',
+   					formatter: function(value, row, rowIndex) {
+   						if (value == null) {
+   							return '不限';
+   						} else {
+   							return value;
+   						}
+   					},   				
+   					edit:false
+   				}, 
    				/*{field: "activityApplyNum", title: "活动进度", align: "center", width: '5%',
    				formatter: function(value, row, rowIndex) {
    						return (parseInt(value)/row.total_customer_num*100).toFixed(2)+"%";
@@ -90,7 +126,7 @@
    				},  */ 
 					   				
 				{field: "create_date", title: "创建时间", align: "center", visible:false, edit:false},
-				{field: "action", title: "操作", align: "center", width: '20%',
+				{field: "action", title: "操作", align: "center", width: '10%',
 				formatter: function(value, row, rowIndex) {
 					var url1 = '${CPATH}/admin/activity/edit?id=' + row.id;
 					if(row.is_publish==0){
@@ -142,6 +178,22 @@
 			}
 		});
 	}
+	
+	function syn() {
+		$.ajax({
+			url:"${CPATH}/admin/activity/getMidData",
+			type:"post",
+			dataType:"json",
+			success:function(data) {
+				if(data.errorCode == 0) {
+					toastr.success(data.message, '操作成功');
+					$table.bootstrapTable('refresh');
+				} else {
+					toastr.error(data.message,'操作失败');
+				}				
+			}
+		});	
+	}
 </#macro>
 
 <@layout active_id=p child_active_id=c>
@@ -186,6 +238,7 @@
              </div>
 			<div class="jp-left">
 				<a href="${CPATH}/admin/activity/edit?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-plus"></i> 新建活动 </a>
+				<a href="javascript:void(0);" onclick="syn();" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-refresh"></i> 同步数据 </a>
 			</div>
 		</div>
 		<div class="box">

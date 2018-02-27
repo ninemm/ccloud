@@ -268,6 +268,8 @@ public class Consts {
 	public static final String MONTH_PLAN = "101202";//月计划
 	public static final String YEAR_PLAN = "101203";//年计划
 	
+	public static final String ACTIVITY_CATEGORY_CODE = "101002";//活动类型(费用投入)
+	
 	
 	public static final String WAREHOUSE_IDS_IS_NULL = "1";//当用户没有分配仓库时且不是经管时返回空值的仓库ID
 	

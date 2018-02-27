@@ -121,6 +121,9 @@ public class ActivityQuery extends JBaseQuery {
 	}
     
 	public String getCustomerTypes(String customerTypeIds){
+		if (StrKit.isBlank(customerTypeIds)) {
+			return null;
+		}
 		String[] customerTypes = customerTypeIds.split(",");
 		String types = "";
 		String typeNames = "";
@@ -139,5 +142,14 @@ public class ActivityQuery extends JBaseQuery {
 	    fromBuilder.append(" WHERE aa.seller_customer_id='"+customerId+"' and a.category='"+Consts.CATEGORY_INVEST);
 	    fromBuilder.append(" ' GROUP BY a.id");
         return Db.find(fromBuilder.toString());
+	}
+
+	public boolean isExist(String flowNo) {
+		boolean exist = false;
+		Activity activity = DAO.doFindFirst("proc_code = ?", flowNo);
+		if (activity != null) {
+			exist = true;
+		}
+		return exist;
 	}
 }

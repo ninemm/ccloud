@@ -16,6 +16,8 @@
 package org.ccloud.model.query;
 
 import java.util.LinkedList;
+import java.util.List;
+
 import org.ccloud.model.QyExpense;
 
 import com.jfinal.plugin.activerecord.Page;
@@ -65,6 +67,10 @@ public class QyExpenseQuery extends JBaseQuery {
 			return deleteCount;
 		}
 		return 0;
+	}
+
+	public List<QyExpense> findTextData() {
+		return DAO.doFind("ExpenseBeginDate >= '2018-03-22 00:00:00'");
 	}
 
 	
