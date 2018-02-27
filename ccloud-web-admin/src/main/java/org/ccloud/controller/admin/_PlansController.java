@@ -31,6 +31,7 @@ import java.util.Map;
 
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFDataFormat;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -44,11 +45,6 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.xssf.usermodel.XSSFCellStyle;
-import org.apache.poi.xssf.usermodel.XSSFFont;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
@@ -122,48 +118,73 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 		headers.add("计划类型(周计划/月计划/年计划)");
 		List<User> users = UserQuery.me().findByData(dataArea);
 	    // 声明一个工作薄
-	    XSSFWorkbook workBook = new XSSFWorkbook();
-	    XSSFSheet sheet = workBook.createSheet();
-	   //导出excel样式
-	    XSSFCellStyle ztStyle = (XSSFCellStyle) workBook.createCellStyle();   
-	    Font ztFont = workBook.createFont();  
-	    ztFont.setBoldweight(XSSFFont.BOLDWEIGHT_BOLD);
-        ztStyle.setFont(ztFont); 
-	    ztStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER); 
-	    ztStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
+		HSSFWorkbook wb = new HSSFWorkbook();
+		HSSFSheet sheet = wb.createSheet("table");
+		sheet.setColumnWidth(0, 5000); 
+//	    XSSFWorkbook workBook = new XSSFWorkbook();
+//	    XSSFSheet sheet = workBook.createSheet();
+	   //导出excel样式1
+	    HSSFCellStyle ztStyle = (HSSFCellStyle) wb.createCellStyle();   
+	    Font ztFont = wb.createFont();  
+	    ztFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+	    ztFont.setFontHeightInPoints((short) 12);
+        ztStyle.setFont(ztFont);
+        //水平居中
+	    ztStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER); 
+	    //上下居中
+	    ztStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);;
+	    //自动换行
 	    ztStyle.setWrapText(true);
+	    
+	    //导出excel样式2
+	    HSSFCellStyle ztStyle2 = (HSSFCellStyle) wb.createCellStyle();   
+	    Font ztFont2 = wb.createFont();  
+	    ztFont2.setFontHeightInPoints((short) 10);
+        ztStyle2.setFont(ztFont2);
+	    //上下居中
+	    ztStyle2.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);;
+	    
+	    //导出excel样式3
+	    HSSFCellStyle ztStyle3 = (HSSFCellStyle) wb.createCellStyle(); 
+	    HSSFDataFormat format= wb.createDataFormat();
+	    ztStyle3.setDataFormat(format.getFormat("yyyy/m/d"));
+	    
 	    // 生成一个表格
-	    workBook.setSheetName(0,"销售计划");
+	    wb.setSheetName(0,"销售计划");
 	    // 创建表格标题行
 	    for(int i = 0 ;i<headers.size();i++ ) {
 	    	if(i<=3) {
-	    		XSSFRow newRow = sheet.createRow(i);
+	    		HSSFRow newRow = sheet.createRow(i);
 	    		Cell cell = newRow.createCell(1);
 	    		cell.setCellValue(headers.get(i));
 	    		cell.setCellStyle(ztStyle);
 	    		if(i==1) {
 	    			Cell cell_01 = newRow.createCell(2);
-	    			cell_01.setCellValue("2018/01/01");
+	    			cell_01.setCellValue(new Date(118,01,01));
+	    			cell_01.setCellStyle(ztStyle3);
 	    		}else if(i==2) {
 	    			Cell cell_02 = newRow.createCell(2);
-	    			cell_02.setCellValue("2018/01/31");
+	    			cell_02.setCellValue(new Date(118,01,31));
+	    			cell_02.setCellStyle(ztStyle3);
 	    		}else if(i==3) {
 	    			Cell cell_03 = newRow.createCell(2);
 	    			cell_03.setCellValue("月计划");
+	    			cell_03.setCellStyle(ztStyle2);
 	    		}else {
 	    			Cell cell_0 = newRow.createCell(2);
 	    			cell_0.setCellValue("请将时间清空重新填入");
+	    			cell_0.setCellStyle(ztStyle2);
 	    		}
 	    	}
 	    }
 	    //模板例子
 	   
-	    XSSFRow row_0 = sheet.createRow(4);
+	    HSSFRow row_0 = sheet.createRow(4);
 	    for(int i = 0 ; i<users.size();i++) {
 	    	row_0.createCell(i+2).setCellValue(users.get(i).getId());
 	    	row_0.setZeroHeight(true);
 	    }
-	    XSSFRow row = sheet.createRow(5);
+	    HSSFRow row = sheet.createRow(5);
 	    Cell ce = row.createCell(1);
 	    ce.setCellValue("产品");
 	    ce.setCellStyle(ztStyle);
@@ -175,20 +196,22 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 	   sheet.setColumnHidden((short)0,true);
 	    //插入需导出的数据
 	    for(int i=0;i<productRecords.size();i++){
-	        XSSFRow rowP = sheet.createRow(i+6);
+	    	HSSFRow rowP = sheet.createRow(i+6);
 	        rowP.createCell(0).setCellValue(productRecords.get(i).getStr("sell_product_id"));
 	        Cell cell = rowP.createCell(1);
 	        cell.setCellValue(productRecords.get(i).getStr("custom_name")+" "+productRecords.get(i).getStr("valueName"));
 	        cell.setCellStyle(ztStyle);
 	        for(int j = 0;j<users.size() ; j++) {
-	        	rowP.createCell(j+2).setCellValue(0);
+	        	Cell cellP = rowP.createCell(j+2);
+	        	cellP.setCellValue(0);
+	        	cellP.setCellStyle(ztStyle2);
 	        }
 	    }
 	    File  file = new File(filePath);
 	    //文件输出流
 	    try {
 			FileOutputStream outStream = new FileOutputStream(file);
-			workBook.write(outStream);
+			wb.write(outStream);
 			outStream.flush();
 			outStream.close();
 		} catch (FileNotFoundException e) {
