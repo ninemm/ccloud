@@ -32,7 +32,9 @@ import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Activity;
+import org.ccloud.model.ActivityExecute;
 import org.ccloud.model.Dict;
+import org.ccloud.model.query.ActivityExecuteQuery;
 import org.ccloud.model.query.ActivityQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.DictQuery;
@@ -125,6 +127,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			setAttr("investTypeList",investTypeList);
 			setAttr("startDate",  DateFormatUtils.format(activity.getStartTime(), "yyyy-MM-dd"));
 			setAttr("endDate", DateFormatUtils.format(activity.getEndTime(), "yyyy-MM-dd"));
+			
 		}
 	}
 	
@@ -181,6 +184,26 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		activity.setEndTime(edate);
 		activity.setCustomerType(customerTypes);
 		activity.saveOrUpdate();
+		int num = Integer.valueOf(getPara("num"));
+		List<ActivityExecute> activityExecutes = ActivityExecuteQuery.me().findbyActivityId(activity.getId());
+		if(activityExecutes.size()>0) {
+			for(ActivityExecute ae : activityExecutes) {
+				ActivityExecuteQuery.me().batchDelete(ae.getId());
+			}
+		}
+		if(num>0) {
+			for(int i = 0; i <num ; i++) {
+				if(getPara("orderList"+(i+1))==null){
+					continue;
+				}
+				ActivityExecute activityExecute = new ActivityExecute();
+				activityExecute.setId(StrKit.getRandomUUID());
+				activityExecute.setActivityId(activity.getId());
+				activityExecute.setOrderList(Integer.valueOf(getPara("orderList"+(i+1))));
+				activityExecute.setRemark(getPara("remark"+(i+1)));
+				activityExecute.save();
+			}
+		}
 		renderAjaxResultForSuccess();
 	}
 	public void getCustomerTypeOptions() {
@@ -226,5 +249,9 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		renderJson(flang);
 	}
 	
-
+	public void getActivityExecute() {
+		String activityId = getPara("activityId");
+		List<ActivityExecute> activityExecuteList = ActivityExecuteQuery.me().findbyActivityId(activityId);
+		renderJson(activityExecuteList);
+	}
 }
