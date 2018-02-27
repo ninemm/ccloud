@@ -125,11 +125,13 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			}
 			setAttr("areaList",areaList);
 			String[] investType = activity.getInvestType().split(",");
-			List<String> investTypeList = new ArrayList<String>();
-			for(int i=0;i<investType.length;i++) {
-				investTypeList.add(investType[i]);
+			if (!StrKit.isBlank(activity.getInvestType())) {
+				List<String> investTypeList = new ArrayList<String>();
+				for(int i=0;i<investType.length;i++) {
+					investTypeList.add(investType[i]);
+				}
+				setAttr("investTypeList",investTypeList);
 			}
-			setAttr("investTypeList",investTypeList);
 			setAttr("startDate",  DateFormatUtils.format(activity.getStartTime(), "yyyy-MM-dd"));
 			setAttr("endDate", DateFormatUtils.format(activity.getEndTime(), "yyyy-MM-dd"));
 		}
