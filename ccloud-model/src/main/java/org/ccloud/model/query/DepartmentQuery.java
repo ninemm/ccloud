@@ -630,4 +630,60 @@ public class DepartmentQuery extends JBaseQuery {
 		}
 		return dealerId;
 	}
+	
+	//客户数
+	public List<Map<String, Object>> _findDeptListAsTree(String dataArea, boolean hasUser) {
+
+		Map<String, Object> map = new HashMap<String, Object>();
+		List<Department> list = findDeptList(dataArea, "order_list asc");
+		List<Map<String, Object>> deptTreeList = new ArrayList<Map<String, Object>>();
+		Department department = list.get(0);
+		map.put("text", department.getDeptName());// 父子表第一级名称,以后可以存储在字典表或字典类
+		map.put("tags", Lists.newArrayList(0));
+		list.remove(0);
+		ModelSorter.tree(list);
+		List<Map<String, Object>> childList = _doBuild(list, hasUser);
+		childList = _addDeptUser(department.getId(), childList);
+		map.put("nodes", childList);		
+		
+		deptTreeList.add(map);
+		
+		return deptTreeList;
+	}
+	
+	private List<Map<String, Object>> _doBuild(List<Department> list, boolean addUserFlg) {
+		List<Map<String, Object>> resTreeList = new ArrayList<Map<String, Object>>();
+		for (Department dept : list) {
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("text", dept.getDeptName());
+			map.put("tags", Lists.newArrayList(dept.getId(), dept.getDataArea()));
+
+			List<Map<String, Object>> childList = new ArrayList<Map<String, Object>>();
+
+			if (dept.getChildList() != null && dept.getChildList().size() > 0) {
+				childList = _doBuild(dept.getChildList(), addUserFlg);
+			}
+
+			if (addUserFlg) {
+				childList = _addDeptUser(dept.getId(), childList);
+			}
+
+			map.put("nodes", childList);
+
+			resTreeList.add(map);
+		}
+		return resTreeList;
+	}
+	
+	private List<Map<String, Object>> _addDeptUser(String deptId, List<Map<String, Object>> childList) {
+		List<User> list = UserQuery.me().findByDeptId(deptId);
+		for (User user : list) {
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("text", user.getRealname());
+			map.put("tags", Lists.newArrayList(user.getId(), user.getDataArea()));
+			childList.add(map);
+
+		}
+		return childList;
+	}
 }
