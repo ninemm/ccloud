@@ -192,14 +192,14 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		activity.saveOrUpdate();
 		int num = Integer.valueOf(getPara("num"));
 		List<ActivityExecute> activityExecutes = ActivityExecuteQuery.me().findbyActivityId(activity.getId());
-		if(activityExecutes.size()>0) {
+		if(activityExecutes.size() > 0) {
 			for(ActivityExecute ae : activityExecutes) {
 				ActivityExecuteQuery.me().batchDelete(ae.getId());
 			}
 		}
-		if(num>0) {
-			for(int i = 0; i <num ; i++) {
-				if(getPara("orderList"+(i+1))==""){
+		if(num > 0) {
+			for(int i = 0; i < num ; i++) {
+				if(getPara("orderList" + (i + 1)) == ""){
 					continue;
 				}
 				ActivityExecute activityExecute = new ActivityExecute();
@@ -272,7 +272,9 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				activity.setStartTime(qyExpense.getExpenseBeginDate());
 				activity.setEndTime(qyExpense.getExpenseEndDate());
 				activity.setCategory(Consts.ACTIVITY_CATEGORY_CODE);
-				activity.setAreaType(getAreaType(qyExpense.getExpenseName()));
+				String[] value = getAreaType(qyExpense.getExpenseName());
+				activity.setInvestType(DictQuery.me().findbyName(value[0]).getValue());
+				activity.setAreaType(value[1]);
 				activity.setInvestAmount(new BigDecimal(qyExpense.getApplyAmount()));
 				activity.setProcCode(qyExpense.getFlowNo());
 				activity.setPlanCode(qyExpense.getActivityNo());
@@ -287,8 +289,11 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		renderAjaxResultForSuccess("同步成功");
 	}
 	
-	private String getAreaType(String data) {
+	private String[] getAreaType(String data) {
+		String[] value = new String[2];
 		String[] areaFirst = data.split(":");
+		String[] flowType = areaFirst[0].split("申请");
+		value[0] = flowType[0];
 		String[] areaSecond = areaFirst[1].split("_");
 		int a = 0;
 		for (int i = 0; i < areaSecond.length; i++) {
@@ -298,7 +303,8 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			}
 		}
 		String areaType = areaSecond[a] + "-" + areaSecond[a+1];
-		return areaType;
+		value[1] = areaType;
+		return value;
 	}
 
 	public void getActivityExecute() {
@@ -308,11 +314,14 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 	}
 	
 	public void put() {
+		List<Dict> invest = DictQuery.me().findDictByType(Consts.INVEST_TYPE);
+		setAttr("ilist", invest);
 		render("activityPut.html");
 	}
 	
 	public void putList() {
 		String keyword = getPara("k");
+		String invest_type = getPara("invest_type");
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
 			setAttr("k", keyword);
@@ -320,8 +329,11 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		String sellerId = getSessionAttr("sellerId");
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
-		Page<Record> page = ActivityQuery.me().activityPutPaginate(getPageNumber(), getPageSize(), keyword, startDate, endDate,sellerId);
+		Page<Record> page = ActivityQuery.me().activityPutPaginate(getPageNumber(), getPageSize(), keyword, startDate, endDate,sellerId,invest_type);
 		for(int i = 0; i <page.getList().size();i++){
+			if(page.getList().get(i).getStr("time_interval")!="") {
+				page.getList().get(i).set("time_interval", ActivityQuery.me().getTimeInterval(page.getList().get(i).getStr("time_interval")));
+			}
 			if(page.getList().get(i).getStr("invest_type")!="") {
 				page.getList().get(i).set("invest_type", ActivityQuery.me().getInvestType(page.getList().get(i).getStr("invest_type")));
 			}

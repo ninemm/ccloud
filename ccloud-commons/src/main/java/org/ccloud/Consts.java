@@ -230,6 +230,7 @@ public class Consts {
 	public static final String INVEST_PERSONAL_SELLING="101108" ; //人员推广
 	
 	//客户参与活动的时间区间
+	public static final String ACTIVE_TIME_INTERVAL="activity_time_interval";
 	public static final String TIME_INTERVAL_ONE="100801";//1个月
 	public static final String TIME_INTERVAL_TWO="100802";//2个月
 	public static final String TIME_INTERVAL_THREE="100803";//3个月

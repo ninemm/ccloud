@@ -170,20 +170,22 @@ public class ActivityQuery extends JBaseQuery {
 	}
 	
 	
-	public Page<Record> activityPutPaginate(int pageNumber, int pageSize, String keyword,String startDate, String endDate,String sellerId) {
-		String select = "select select IFNULL(t1.putNum , 0) putNum, IFNULL(t2.executeNum , 0) executeNum,ca.*, IFNULL(ca.invest_num , 0) invest_num,IFNULL(ca.invest_amount , 0) invest_amount,case when ca.category='"+Consts.CATEGORY_NORMAL+"' then '商品销售' else '投入活动' end as activityCategory ";
+	public Page<Record> activityPutPaginate(int pageNumber, int pageSize, String keyword,String startDate, String endDate,String sellerId, String invest_type) {
+		String select = "select IFNULL(t1.putNum , 0) putNum, IFNULL(t2.executeNum , 0) executeNum, IFNULL(ca.invest_num , 0) invest_num,IFNULL(ca.invest_amount , 0) invest_amount,ca.*,case when ca.category='"+Consts.CATEGORY_NORMAL+"' then '商品销售' else '投入活动' end as activityCategory ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_activity` ca ");
 		fromBuilder.append(" LEFT JOIN( SELECT aa.activity_id , COUNT(1) putNum FROM cc_activity_apply aa WHERE aa.`status` IN(1 , 4) GROUP BY aa.activity_id) t1 ON t1.activity_id = ca.id");
 		fromBuilder.append(" LEFT JOIN( SELECT COUNT(*) executeNum , cvja.activity_id FROM cc_customer_visit_join_activity cvja LEFT JOIN cc_customer_visit cv ");
 		fromBuilder.append(" ON cv.id = cvja.customer_visit_id GROUP BY cv.seller_customer_id , cv.active_apply_id) t2 ON t2.activity_id = ca.id");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "title", keyword, params, needWhere);
-		
+		if (StrKit.notBlank(keyword)) {
+			fromBuilder.append(" where (ca.title like '%"+keyword+"%' or ca.proc_code like '%"+keyword+"%')");
+			needWhere=false;
+		}
 		if (needWhere) {
 			fromBuilder.append(" where 1 = 1");
 		}
-
+		
 		if (StrKit.notBlank(startDate)) {
 			fromBuilder.append(" and ca.start_time >= ?");
 			params.add(startDate+" 00:00:00");
@@ -193,9 +195,20 @@ public class ActivityQuery extends JBaseQuery {
 			fromBuilder.append(" and ca.end_time <= ?");
 			params.add(endDate + "23:59:59");
 		}
+		if (StrKit.notBlank(invest_type)) {
+			fromBuilder.append(" and ca.invest_type = "+invest_type);
+		}
 		fromBuilder.append(" and ca.seller_id='"+sellerId+"' ORDER BY ca.is_publish desc,ca.create_date desc");
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
         return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
     }
+
+	public Object getTimeInterval(String timeIntervalId) {
+		if (StrKit.isBlank(timeIntervalId)) {
+			return null;
+		}
+		timeIntervalId= DictQuery.me().findByKey(Consts.ACTIVE_TIME_INTERVAL, timeIntervalId).getName();
+		return timeIntervalId;
+	}
 }
