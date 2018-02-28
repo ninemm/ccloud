@@ -52,7 +52,7 @@ public class ActivityQuery extends JBaseQuery {
 	}
 
 	public Page<Record> paginate(int pageNumber, int pageSize, String keyword,String startDate, String endDate,String sellerId) {
-		String select = "select ca.*,case when ca.category='"+Consts.CATEGORY_NORMAL+"' then '商品销售营销活动' else '投入活动' end as activityCategory ";
+		String select = "select ca.*,case when ca.category='"+Consts.CATEGORY_NORMAL+"' then '商品销售' else '投入活动' end as activityCategory ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_activity` ca ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
@@ -152,4 +152,50 @@ public class ActivityQuery extends JBaseQuery {
 		}
 		return exist;
 	}
+
+	public String getInvestType(String investTypeIds) {
+		if (StrKit.isBlank(investTypeIds)) {
+			return null;
+		}
+		String[] investTypes = investTypeIds.split(",");
+		String types = "";
+		String typeNames = "";
+		if(investTypes!=null){
+			for(int i = 0;i<investTypes.length;i++){
+				types += DictQuery.me().findByKey(Consts.INVEST_TYPE, investTypes[i]).getName()+",";
+			}
+			typeNames = types.substring(0, types.length()-1);
+		}
+		return typeNames;
+	}
+	
+	
+	public Page<Record> activityPutPaginate(int pageNumber, int pageSize, String keyword,String startDate, String endDate,String sellerId) {
+		String select = "select select IFNULL(t1.putNum , 0) putNum, IFNULL(t2.executeNum , 0) executeNum,ca.*, IFNULL(ca.invest_num , 0) invest_num,IFNULL(ca.invest_amount , 0) invest_amount,case when ca.category='"+Consts.CATEGORY_NORMAL+"' then '商品销售' else '投入活动' end as activityCategory ";
+		StringBuilder fromBuilder = new StringBuilder("from `cc_activity` ca ");
+		fromBuilder.append(" LEFT JOIN( SELECT aa.activity_id , COUNT(1) putNum FROM cc_activity_apply aa WHERE aa.`status` IN(1 , 4) GROUP BY aa.activity_id) t1 ON t1.activity_id = ca.id");
+		fromBuilder.append(" LEFT JOIN( SELECT COUNT(*) executeNum , cvja.activity_id FROM cc_customer_visit_join_activity cvja LEFT JOIN cc_customer_visit cv ");
+		fromBuilder.append(" ON cv.id = cvja.customer_visit_id GROUP BY cv.seller_customer_id , cv.active_apply_id) t2 ON t2.activity_id = ca.id");
+		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "title", keyword, params, needWhere);
+		
+		if (needWhere) {
+			fromBuilder.append(" where 1 = 1");
+		}
+
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and ca.start_time >= ?");
+			params.add(startDate+" 00:00:00");
+		}
+
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and ca.end_time <= ?");
+			params.add(endDate + "23:59:59");
+		}
+		fromBuilder.append(" and ca.seller_id='"+sellerId+"' ORDER BY ca.is_publish desc,ca.create_date desc");
+		if (params.isEmpty())
+			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+        return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+    }
 }
