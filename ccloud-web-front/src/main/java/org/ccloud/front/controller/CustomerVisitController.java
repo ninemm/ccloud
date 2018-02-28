@@ -22,6 +22,7 @@ import org.ccloud.model.Dict;
 import org.ccloud.model.Message;
 import org.ccloud.model.User;
 import org.ccloud.model.WxMessageTemplate;
+import org.ccloud.model.query.ActivityExecuteQuery;
 import org.ccloud.model.query.ActivityQuery;
 import org.ccloud.model.query.CustomerJoinCustomerTypeQuery;
 import org.ccloud.model.query.CustomerTypeQuery;

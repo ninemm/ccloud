@@ -312,4 +312,27 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		List<ActivityExecute> activityExecuteList = ActivityExecuteQuery.me().findbyActivityId(activityId);
 		renderJson(activityExecuteList);
 	}
+	
+	public void put() {
+		render("activityPut.html");
+	}
+	
+	public void putList() {
+		String keyword = getPara("k");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+			setAttr("k", keyword);
+		}
+		String sellerId = getSessionAttr("sellerId");
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		Page<Record> page = ActivityQuery.me().activityPutPaginate(getPageNumber(), getPageSize(), keyword, startDate, endDate,sellerId);
+		for(int i = 0; i <page.getList().size();i++){
+			if(page.getList().get(i).getStr("invest_type")!="") {
+				page.getList().get(i).set("invest_type", ActivityQuery.me().getInvestType(page.getList().get(i).getStr("invest_type")));
+			}
+		}
+		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
+		renderJson(map);
+	}
 }

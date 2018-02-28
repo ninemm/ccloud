@@ -215,7 +215,7 @@ public class Consts {
 	public static final String WAREHOUSE_TYPE_CAR = "2";// 车销仓库
 	
 	//活动类型
-	public static final String CATEGORY_NORMAL="101001" ; //商品销售营销活动
+	public static final String CATEGORY_NORMAL="101001" ; //商品销售
 	public static final String CATEGORY_INVEST="101002" ; //投入活动
 	
 	//投入类型
