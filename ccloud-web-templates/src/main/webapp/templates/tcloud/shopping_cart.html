@@ -8,6 +8,9 @@
 		height: 100%;
 		line-height: 100%;
 	}
+	#valueName {
+		max-width: 7.5rem;
+	}
 </#macro>
 <#macro script_import>
 	<script type='text/javascript' src="${CTPATH}/js/shopping-cart.js"></script>
@@ -467,7 +470,8 @@ function order(){
 					</p>
 				</nobr>
 				<div class="product_unit">
-					规格：<span id="valueName"></span>
+					<p>规格：</p>
+					<span id="valueName"></span>
 					<div class="fr">
 						<span class="no-bg">是否赠品</span>
 						<input type="checkbox" name="isGift" id="isGift" value="1" class="weui-agree__checkbox">
@@ -550,7 +554,8 @@ function order(){
 					<p class="product_name" id="compositionName"></p>
 				</nobr>
 				<div class="product_unit">
-					规格：<span id="compositionValueName"></span>
+					<p>规格：</p>
+					<span id="compositionValueName"></span>
 				</div>
 				<div class="product_bUnit">
 					<span class="price" id="compositionPriceSpan"></span>

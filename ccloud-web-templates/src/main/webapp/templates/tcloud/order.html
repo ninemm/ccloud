@@ -47,6 +47,9 @@
 		height: 100%;
 		line-height: 100%;
 	}
+	#valueName {
+		max-width: 7.5rem;
+	}
 </#macro>
 
 <#macro script>
@@ -706,7 +709,8 @@ $(function() {
 							</p>
 						</nobr>
 						<div class="product_unit">
-							规格：<span id="valueName"></span>
+							<p>规格：</p>
+							<span id="valueName"></span>
 							<div class="fr">
 								<span class="no-bg">是否赠品</span>
 								<input type="checkbox" name="isGiftCheckBox" id="isGiftCheckBox" value="1" class="weui-agree__checkbox" disabled>
