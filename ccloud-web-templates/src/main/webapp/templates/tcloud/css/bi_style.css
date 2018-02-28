@@ -577,6 +577,41 @@ header {
 	color: #fff;
 }
 
+/*地图显示类型*/
+
+.mapType-div {
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+	line-height: 2.4rem;
+	height: 2.4rem;
+	background: #fff;
+	z-index: 1000;
+	border-bottom: 1px solid #f0f0f0;
+	opacity: 0.9;
+}
+
+.mapType-div .mapType {
+	display: inline;
+	font-size: .7rem;
+	width: 50%;
+	text-align: center;
+	height: 1.4rem;
+	line-height: 1.4rem;
+	border-radius: 0px;
+	border: 1px solid #f2f2f2;
+	color: #666;
+	background: #f2f2f2;
+	margin: .5rem .3rem;
+}
+
+.mapType-div .active-mapType {
+	border: 1px solid #ea6f5a;
+	background: #ea6f5a;
+	font-weight: 600;
+	color: #fff;
+}
+
 /*位置*/
 .location-wrapper {
 	height: 2rem;

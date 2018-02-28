@@ -442,4 +442,42 @@ public class BiSalesController extends BaseFrontController {
 
 	}
 
+	public void salesHotMap() {
+
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+
+		String provName = getPara("provName", "").trim();
+		String cityName = getPara("cityName", "").trim();
+		String countryName = getPara("countryName", "").trim();
+		String dateType = getPara("dateType", "0").trim();// 0: 近一天， 1: 近一周， 2: 近一月
+
+		String startDate = DateUtils.getDateByType(dateType);
+		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
+
+		List<Record> result = BiSalesQuery.me().findAreaSales(sellerId, provName, cityName,
+				countryName, startDate, endDate);
+
+		renderJson(result);
+
+	}
+
+	public void customerHotMap() {
+
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+
+		String provName = getPara("provName", "").trim();
+		String cityName = getPara("cityName", "").trim();
+		String countryName = getPara("countryName", "").trim();
+		String dateType = getPara("dateType", "0").trim();// 0: 近一天， 1: 近一周， 2: 近一月
+
+		String startDate = DateUtils.getDateByType(dateType);
+		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
+
+		List<Record> result = BiSalesQuery.me().findAreaCustomer(sellerId, provName, cityName,
+				countryName, startDate, endDate);
+
+		renderJson(result);
+
+	}
+
 }
