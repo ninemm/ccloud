@@ -260,6 +260,11 @@
 	
 	function doSubmit(){
 		var l = Ladda.create( document.querySelector( '#do_submit' ) );
+		var list = $("#invest_type").select2("val");
+		if($(".category").val()==101002 && list==""){
+			alert("投入类型不能为空！");
+			return;
+		}
 		$("#areaCodes").val($city.data('citypicker').getCode());
 		$("#areaNames").val($city.data('citypicker').getVal());
 		var listc = $("#customerType").select2("val");
@@ -304,17 +309,9 @@
 		});
 	}
 	
-	var $addProductButton = $("#addProductButton");
-	
-	// 添加执行
-	$addProductButton.click( function() {
-		loop = loop + 1;
-		$("#loop").val(loop);
-		var $goodsSpecificationTableTr = $("#goodsSpecificationTable tr:eq(1)").clone().removeClass("hidden");
-	});
 	//标志
 	var newTrIdx = 0;
-	function addProduct(){
+	function addActivityEx(){
 		var $tbody = $("#table tbody");
 		var newTrHtml = $tbody.find("tr:first").html();
 		newTrIdx = newTrIdx + 1;
@@ -617,7 +614,7 @@
 					<tfoot>
 						<tr>
 							<td>
-								<button class="btn btn-xs btn-info" onclick="addProduct()" ><span class="glyphicon glyphicon-plus"></span></button>
+								<button class="btn btn-xs btn-info" onclick="addActivityEx()" ><span class="glyphicon glyphicon-plus"></span></button>
 								<input type="hidden" name = "num" id="num"/>
 							</td>
 						</tr>
