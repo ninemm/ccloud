@@ -125,7 +125,7 @@ public class _UserController extends JBaseCRUDController<User> {
 			 }
 		 }else{
 			 User ur = UserQuery.me().findById(user.getId());
-			 if(!ur.getUsername().equals(user.getUsername())) {
+			 if(ur.getUsername().equals(user.getUsername())) {
 				renderAjaxResultForError("用户名已存在！");
 				return;
 			 }

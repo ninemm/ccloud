@@ -131,9 +131,11 @@
 					<p class="weui-media-box__desc orange">
 							店招图: 
 					</p>
+					 <ul class="weui-uploader__files" id="uploaderFiles">
 					<#list diffAttrImage as Image>
 	                      <li class="weui-uploader__file" style="background-image: url(${Image.savePath})"></li>
 					</#list>
+					</ul>
 				</#if>
 				
 			</div>

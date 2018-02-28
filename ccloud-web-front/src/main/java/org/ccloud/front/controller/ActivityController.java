@@ -32,6 +32,7 @@ import com.google.common.collect.ImmutableMap;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Record;
 import org.ccloud.workflow.service.WorkFlowService;
+import org.hamcrest.CustomTypeSafeMatcher;
 
 /**
  * Created by WT on 2017/11/30.
@@ -44,7 +45,8 @@ public class ActivityController extends BaseFrontController {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		List<Record> activityRecords = ActivityQuery.me().findActivityListForApp(sellerId, "", "");
 		for(int i = 0; i <activityRecords.size();i++){
-			activityRecords.get(i).set("customerTypeName", ActivityQuery.me().getCustomerTypes(activityRecords.get(i).getStr("customer_type")));
+			if(activityRecords.get(i).getStr("customer_type")!="") {
+				activityRecords.get(i).set("customerTypeName", ActivityQuery.me().getCustomerTypes(activityRecords.get(i).getStr("customer_type")));}
 			activityRecords.get(i).set("surplusNum",Integer.parseInt( activityRecords.get(i).getStr("total_customer_num"))-ActivityApplyQuery.me().findByUserIdAndActivityId(activityRecords.get(i).getStr("id"),user.getId()).size());
 		}
 		List<Map<String, Object>> activityList = new ArrayList<Map<String, Object>>();
@@ -76,6 +78,7 @@ public class ActivityController extends BaseFrontController {
 
 		List<Record> activityList = ActivityQuery.me().findActivityListForApp(sellerId, keyword, tag);
 		for(int i = 0; i <activityList.size();i++){
+			if(activityList.get(i).getStr("customer_type")!="") 
 			activityList.get(i).set("customerTypeName", ActivityQuery.me().getCustomerTypes(activityList.get(i).getStr("customer_type")));
 		}
 		Set<String> tagSet = new LinkedHashSet<String>();
@@ -105,6 +108,7 @@ public class ActivityController extends BaseFrontController {
 
 		List<Record> activityList = ActivityQuery.me().findActivityListForApp(sellerId, "", "");
 		for(int i = 0; i <activityList.size();i++){
+			if(activityList.get(i).getStr("customer_type")!="") 
 			activityList.get(i).set("customerTypeName", ActivityQuery.me().getCustomerTypes(activityList.get(i).getStr("customer_type")));
 		}
 		Map<String, Object> activityInfoMap = new HashMap<String, Object>();
@@ -575,18 +579,30 @@ public class ActivityController extends BaseFrontController {
 	
 	public void customerList(){
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String keyword = getPara("keyword");
 		String userId = getPara("userId");
-		String[] customerTypeIds = getPara("customerTypeId").split(",");
+		List<CustomerType> customerTypes = new ArrayList<CustomerType>();
 		String customerType = "'";
 		String customerTypeId = "";
-		for(int i = 0;i<customerTypeIds.length;i++){
-			customerType += customerTypeIds[i]+"','";
+		if(getPara("customerTypeId")!=null) {
+			String[] customerTypeIds= getPara("customerTypeId").split(",");
+			for(int i = 0;i<customerTypeIds.length;i++){
+				customerType += customerTypeIds[i]+"','";
+			}
+			if(customerTypeIds!=null){
+				customerTypeId = customerType.substring(0, customerType.length()-2);
+			}
+		}else {
+			customerTypes=CustomerTypeQuery.me().findByDept(user.getDepartmentId());
+			for(int i = 0;i<customerTypes.size();i++){
+				customerType += customerTypes.get(i).getId()+"','";
+			}
+			if(customerTypes!=null){
+				customerTypeId = customerType.substring(0, customerType.length()-2);
+			}
 		}
-		if(customerTypeIds!=null){
-			customerTypeId = customerType.substring(0, customerType.length()-2);
-		}
+		
 		String isOrdered = getPara("isOrdered");
 		String provName = getPara("provName", "");
 		String cityName = getPara("cityName", "");

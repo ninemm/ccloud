@@ -67,7 +67,9 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		String endDate = getPara("endDate");
 		Page<Record> page = ActivityQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate,sellerId);
 		for(int i = 0; i <page.getList().size();i++){
-			page.getList().get(i).set("customer_type", ActivityQuery.me().getCustomerTypes(page.getList().get(i).getStr("customer_type")));
+			if(!StringUtils.isBlank(page.getList().get(i).getStr("customer_type"))) {
+				page.getList().get(i).set("customer_type", ActivityQuery.me().getCustomerTypes(page.getList().get(i).getStr("customer_type")));
+			}
 		}
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
