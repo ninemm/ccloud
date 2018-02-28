@@ -124,8 +124,8 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				areaList.add(area[i]);
 			}
 			setAttr("areaList",areaList);
-			String[] investType = activity.getInvestType().split(",");
 			if (!StrKit.isBlank(activity.getInvestType())) {
+				String[] investType = activity.getInvestType().split(",");
 				List<String> investTypeList = new ArrayList<String>();
 				for(int i=0;i<investType.length;i++) {
 					investTypeList.add(investType[i]);
