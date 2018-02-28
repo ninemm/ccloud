@@ -52,7 +52,7 @@ public class ActivityQuery extends JBaseQuery {
 	}
 
 	public Page<Record> paginate(int pageNumber, int pageSize, String keyword,String startDate, String endDate,String sellerId) {
-		String select = "select ca.*,case when ca.category='"+Consts.CATEGORY_NORMAL+"' then '商品销售营销活动' else '投入活动' end as activityCategory ";
+		String select = "select ca.*,case when ca.category='"+Consts.CATEGORY_NORMAL+"' then '商品销售' else '投入活动' end as activityCategory ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_activity` ca ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
