@@ -1,12 +1,8 @@
 package org.ccloud.controller.front;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.jfinal.kit.StrKit;
+import com.jfinal.plugin.activerecord.DbKit;
+import com.jfinal.plugin.activerecord.Record;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.callback.AroundCustomerPositionCallback;
 import org.ccloud.model.callback.AroundCustomerSalesCallback;
@@ -16,9 +12,12 @@ import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DateUtils;
 import org.joda.time.DateTime;
 
-import com.jfinal.kit.StrKit;
-import com.jfinal.plugin.activerecord.DbKit;
-import com.jfinal.plugin.activerecord.Record;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RouterMapping(url = "/sales")
 public class SalesFactController extends BaseFrontController {

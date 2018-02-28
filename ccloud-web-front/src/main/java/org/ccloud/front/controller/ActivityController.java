@@ -32,7 +32,6 @@ import com.google.common.collect.ImmutableMap;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Record;
 import org.ccloud.workflow.service.WorkFlowService;
-import org.hamcrest.CustomTypeSafeMatcher;
 
 /**
  * Created by WT on 2017/11/30.
