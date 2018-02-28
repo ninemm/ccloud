@@ -20,6 +20,7 @@ import com.jfinal.plugin.activerecord.DbKit;
 import com.jfinal.plugin.activerecord.Record;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
+import org.ccloud.model.callback.AroundCustomerBiPositionCallback;
 import org.ccloud.model.callback.AroundCustomerBiSalesCallback;
 import org.ccloud.model.callback.AroundCustomerBiVisitCallback;
 import org.ccloud.model.query.BiSalesQuery;
@@ -441,6 +442,78 @@ public class BiSalesController extends BaseFrontController {
 		renderJson(result);
 
 	}
+
+	@SuppressWarnings("unchecked")
+	public void aroundCustomerPosition() throws SQLException {
+
+		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+
+		double longitude = Double.parseDouble(getPara("longitude"));
+		double latitude = Double.parseDouble(getPara("latitude"));
+		double dist = Double.parseDouble(getPara("dist"));
+		String dateType = getPara("dateType", "0").trim();
+
+		String startDate = DateUtils.getDateByType(dateType);
+		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
+
+		AroundCustomerBiPositionCallback callback = new AroundCustomerBiPositionCallback();
+		callback.setLongitude(longitude);
+		callback.setLatitude(latitude);
+		callback.setDist(dist);
+		callback.setStartDate(startDate);
+		callback.setEndDate(endDate);
+		callback.setDataArea(dealerDataArea + '%');
+		callback.setCustomerKind(Consts.CUSTOMER_KIND_COMMON);
+
+		Connection conn = null;
+		List<Map<String, Object>> result = null;
+
+		try {
+			conn = DbKit.getConfig().getConnection();
+			result = (List<Map<String, Object>>) callback.call(conn);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if (conn != null) {
+				conn.close();
+			}
+		}
+
+		renderJson(result);
+	}
+
+//	@SuppressWarnings("unchecked")
+//	public void aroundCustomerUndeveloped() throws SQLException {
+//
+//		String dealerCode = getSessionAttr("dealerCode");
+//
+//		double longitude = Double.parseDouble(getPara("longitude"));
+//		double latitude = Double.parseDouble(getPara("latitude"));
+//		double dist = Double.parseDouble(getPara("dist"));
+//
+//		AroundCustomerBiUndevelopedCallback callback = new AroundCustomerBiUndevelopedCallback();
+//		callback.setLongitude(longitude);
+//		callback.setLatitude(latitude);
+//		callback.setDist(dist);
+//		callback.setDataArea(dealerDataArea + '%');
+//		callback.setCustomerKind(Consts.CUSTOMER_KIND_COMMON);
+//
+//		Connection conn = null;
+//		List<Map<String, Object>> result = null;
+//
+//		try {
+//			conn = DbKit.getConfig().getConnection();
+//			result = (List<Map<String, Object>>) callback.call(conn);
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		} finally {
+//			if (conn != null) {
+//				conn.close();
+//			}
+//		}
+//
+//		renderJson(result);
+//	}
 
 	public void salesHotMap() {
 

@@ -70,6 +70,7 @@
     var cityName = $.cookie(Utils.cityCacheName);
     var countryName = $.cookie(Utils.countryCacheName);
     var dateType = 0;
+    var mapType = 0 ;
     var customerTypeName = '';
 
     $city.text(cityName);
@@ -86,19 +87,31 @@
         customer(provName, cityName, '', dateType);
     }
 
+    //做地图类型的切换选择
+    $(".mapType").click(function(e) {
+        var $a = $(e.currentTarget);
+        $a.parent().find(".mapType").removeClass("active-mapType");
+        $a.addClass("active-mapType");
+    });
+
+    function setMapType(type){
+        mapType = type;
+        lMap(dateType);
+    }
+
     //定位
     $("#relocation").on('click', function() {
         wxConfig();
         var df = wxLocation();
-    
+
         df.done(function(){
             provName = $.cookie(Utils.provCacheName);
             cityName = $.cookie(Utils.cityCacheName);
             countryName = $.cookie(Utils.countryCacheName);
             lMap(dateType)
             customer(provName, cityName, '', dateType);
-         });
-    
+        });
+
     });
     
     function wxConfig() {
@@ -114,9 +127,9 @@
 
     var map = new BMap.Map("allmap");
     var myPosition = new BMap.Icon("${CTPATH}/images/marker_blue.png", new BMap.Size(20, 20));
-    var allIcon = new BMap.Icon("${CTPATH}/images/marker.png", new BMap.Size(20, 20));
-    var salesIcon = new BMap.Icon("${CTPATH}/images/marker_orange.png", new BMap.Size(20, 20));
-    var visitIcon = new BMap.Icon("${CTPATH}/images/marker_gray.png", new BMap.Size(20, 20));
+    var redIcon = new BMap.Icon("${CTPATH}/images/marker.png", new BMap.Size(20, 20));
+    var orangeIcon = new BMap.Icon("${CTPATH}/images/marker_orange.png", new BMap.Size(20, 20));
+    var grayIcon = new BMap.Icon("${CTPATH}/images/marker_gray.png", new BMap.Size(20, 20));
 
     //地图
     function lMap(dateType){
@@ -132,6 +145,17 @@
         var position = new BMap.Marker(position_point, {icon:myPosition});  //创建标注
         map.addOverlay(position);              // 将标注添加到地图中
         
+        if(mapType == 0){
+            salesMap(dateType,longitude,latitude);
+        } else {
+            positionMap(dateType,longitude,latitude);
+            undevelopedMap(longitude,latitude);
+        }
+    
+    }
+
+    function salesMap(dateType,longitude,latitude){
+        
         $.ajax({
             url:"${CPATH}/biSales/aroundCustomer",
             type:"post",
@@ -142,7 +166,7 @@
 
             for(var i = 0; i < data.salesList.length; i++) {
                 var new_point = new BMap.Point(data.salesList[i].longitude,data.salesList[i].latitude);
-                var marker = new BMap.Marker(new_point, {icon:salesIcon});  //创建标注
+                var marker = new BMap.Marker(new_point, {icon:redIcon});  //创建标注
                 map.addOverlay(marker);              // 将标注添加到地图中
                 var opts = {
                     width : 240,     // 信息窗口宽度
@@ -160,7 +184,7 @@
 
             for(var i = 0; i < data.visitList.length; i++) {
                 var new_point = new BMap.Point(data.visitList[i].longitude,data.visitList[i].latitude);
-                var marker = new BMap.Marker(new_point, {icon:visitIcon});  //创建标注
+                var marker = new BMap.Marker(new_point, {icon:grayIcon});  //创建标注
                 map.addOverlay(marker);              // 将标注添加到地图中
                 var opts = {
                     width : 240,     // 信息窗口宽度
@@ -178,7 +202,7 @@
 
             for(var i = 0; i < data.allList.length; i++) {
                 var new_point = new BMap.Point(data.allList[i].longitude,data.allList[i].latitude);
-                var marker = new BMap.Marker(new_point, {icon:allIcon});  //创建标注
+                var marker = new BMap.Marker(new_point, {icon:redIcon});  //创建标注
                 map.addOverlay(marker);              // 将标注添加到地图中
                 var opts = {
                     width : 240,     // 信息窗口宽度
@@ -196,6 +220,67 @@
             }
         });
     }
+
+    function positionMap(dateType,longitude,latitude){
+    
+        $.ajax({
+            url:"${CPATH}/biSales/aroundCustomerPosition",
+            type:"post",
+            data:{dateType: dateType, longitude: longitude, latitude: latitude, dist: 5},
+            dataType:"json"
+        }).done(function(data){
+            Utils.close();
+            
+            for(var i = 0; i < data.length; i++) {
+                var new_point = new BMap.Point(data[i].longitude,data[i].latitude);
+                var marker = data[i].baiduDist < 0.5 ? new BMap.Marker(new_point, {icon:redIcon}) : new BMap.Marker(new_point, {icon:orangeIcon});  //创建标注
+                map.addOverlay(marker);              // 将标注添加到地图中
+                var opts = {
+                    width : 240,     // 信息窗口宽度
+                    height: 80,     // 信息窗口高度
+                    title : '客户名称：' + data[i].customerName , // 信息窗口标题
+                    enableMessage:true,//设置允许信息窗发送短息
+                    customerId: data[i].customerId,
+                    customerName: data[i].customerName
+                };
+                var content = '联系人：' + data[i].contacts + ' ' + data[i].phone;
+                content = content + '<br>' + '开发情况：' + (data[i].baiduDist < 0.5 ? '定位准确' : '定位存疑');
+                content = content + '<br>' + '地址：' + data[i].address;
+                addClickHandler(content,marker,opts);
+            }
+        });
+        
+    }
+
+    function undevelopedMap(longitude,latitude){
+        
+        $.ajax({
+            url:"${CPATH}/biSales/aroundCustomerUndeveloped",
+            type:"post",
+            data:{longitude: longitude, latitude: latitude, dist: 1},
+            dataType:"json"
+        }).done(function(data){
+            
+            for(var i = 0; i < data.length; i++) {
+                var new_point = new BMap.Point(data[i].longitude,data[i].latitude);
+                var marker = new BMap.Marker(new_point, {icon:grayIcon});  //创建标注
+                map.addOverlay(marker);              // 将标注添加到地图中
+                var opts = {
+                    width : 250,     // 信息窗口宽度
+                    height: 120,     // 信息窗口高度
+                    title : '客户名称：' + data[i].customerName , // 信息窗口标题
+                    enableMessage:true,//设置允许信息窗发送短息
+                    customerId: data[i].customerId,
+                    customerName: data[i].customerName
+                };
+                var content = '电话：'  + (data[i].phone == null ? '无' : data[i].phone);
+                content = content + '<br>' + '开发情况：' + '未开发客户';
+                content = content + '<br>' + '地址：' + data[i].address;
+                addClickHandler(content,marker,opts);
+             }
+        });
+        
+    }
     
     function addClickHandler(content,marker,opts, flg){
         marker.addEventListener("click",function(e){
@@ -206,16 +291,16 @@
 
             $("#product_customerId").hide();
             $("#visit_customerId").hide();
-
-            if(flg == 0){
-                product_customerId(dateType,opts.customerId,opts.customerName);
-                visit_customerId(dateType,opts.customerId,opts.customerName);
-            }else if(flg == 1){
-                product_customerId(dateType,opts.customerId,opts.customerName);
-            }else if(flg == 2){
-                visit_customerId(dateType,opts.customerId,opts.customerName);
-            }
-
+			if(mapType == 0){
+				if(flg == 0){
+					product_customerId(dateType,opts.customerId,opts.customerName);
+					visit_customerId(dateType,opts.customerId,opts.customerName);
+				}else if(flg == 1){
+					product_customerId(dateType,opts.customerId,opts.customerName);
+				}else if(flg == 2){
+					visit_customerId(dateType,opts.customerId,opts.customerName);
+				}
+			}
 
         });
     }
@@ -524,6 +609,10 @@
             <div class="wy-header-title">我附近的终端分布</div>
             <div id="relocation" class="relocation"><i class="icon-map-marker txt-color-blue"></i> 定位</div>
         </header>
+        <div class="mapType-div">
+            <a class="mapType active-mapType" onclick="setMapType(0)">销售情况</a>
+            <a class="mapType" onclick="setMapType(1)">开发情况</a>
+        </div>
         <div id="allmap"></div>
         <div id="product_customerId" style="display:none;">
             <p id="p_customerId_product"  class="txt-color-red"><span id="product_customer-name"></span></p>
