@@ -16,6 +16,7 @@
 package org.ccloud.model.query;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import org.ccloud.model.CustomerStore;
 
@@ -82,5 +83,9 @@ public class CustomerStoreQuery extends JBaseQuery {
 		customerStore.set("is_enabled", isEnabled);
 
 		return customerStore.saveOrUpdate();
+	}
+
+	public List<CustomerStore> findCountryIsNull() {
+		return DAO.find("select * from cc_customer_store where country_name is null");
 	}
 }

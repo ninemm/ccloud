@@ -192,7 +192,7 @@ public class _CustomerStoreController extends JBaseCRUDController<CustomerStore>
 						Map<String, Object> addressComponent = (Map<String, Object>) locationDataMap.get("addressComponent");
 						customerStore.setProvName((String) addressComponent.get("province"));
 						customerStore.setCityName((String) addressComponent.get("city"));
-						customerStore.setCountryName((String) addressComponent.get("area"));
+						customerStore.setCountryName((String) addressComponent.get("district"));
 					}
 
 					customerStore.setAddress((String) map.get("address"));
@@ -268,4 +268,25 @@ public class _CustomerStoreController extends JBaseCRUDController<CustomerStore>
 		return resultMap;
 	}
 
+	//修复没有省市区
+	public void fixProv() throws Exception {
+		String locationUrl = "http://api.map.baidu.com/geocoder/v2/";
+		List<CustomerStore> aNull = CustomerStoreQuery.me().findCountryIsNull();
+		Map<String, Object> locationParams = Maps.newHashMap();
+		locationParams.put("output", "json");
+		locationParams.put("ak", "IF8oL2gwIMYer9dGwKS102Iu5qAXMPg9");
+
+		for(CustomerStore customerStore :aNull) {
+			locationParams.put("location", customerStore.getLat() + "," + customerStore.getLng());
+			String locationData = HttpUtils.get(locationUrl, locationParams);
+			Map<String, Object> locationDataMap = (Map<String, Object>) JSON.parseObject(locationData).get("result");
+			Map<String, Object> addressComponent = (Map<String, Object>) locationDataMap.get("addressComponent");
+			customerStore.setProvName((String) addressComponent.get("province"));
+			customerStore.setCityName((String) addressComponent.get("city"));
+			customerStore.setCountryName((String) addressComponent.get("district"));
+			customerStore.update();
+		}
+
+		renderAjaxResultForSuccess("修复省市区成功");
+	}
 }
