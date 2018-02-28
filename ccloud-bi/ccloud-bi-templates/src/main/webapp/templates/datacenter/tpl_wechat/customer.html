@@ -6,7 +6,6 @@
     <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
     <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=su3AmHLUcBprpnOLmVHo7r8AljbW8X6t"></script>
     <script type="text/javascript" src="${CTPATH}/js/convertor.js"></script>
-    <script type="text/javascript" src="${CTPATH}/js/heatmap.min.js"></script>
 </#macro>
 <#macro css_import>
 
@@ -47,7 +46,7 @@
         top: 12px;
         width: 50px;
     }
-    #allmap,#hot_map{
+    #allmap{
         width:100%;
         height: 18rem;
     }
@@ -64,7 +63,6 @@
 <#macro script>
     $(function() {
         lMap(dateType);
-        hMap(dateType);
         customer(provName, cityName, '', dateType);
         
         initTopHoverTree("gotop", 100, 10, 50);
@@ -79,7 +77,6 @@
     var countryName = $.cookie(Utils.countryCacheName);
     var dateType = 0;
     var mapType = 0 ;
-    var hotMapType = 0 ;
     var customerTypeName = '';
 
     $city.text(cityName);
@@ -93,9 +90,9 @@
     function setDateType(type){
         dateType = type;
         lMap(dateType);
-        hMap(dateType);
         customer(provName, cityName, '', dateType);
     }
+
     //做地图类型的切换选择
     $(".mapType").click(function(e) {
         var $a = $(e.currentTarget);
@@ -108,11 +105,6 @@
         lMap(dateType);
     }
 
-    function setHotMapType(type){
-        hotMapType = type;
-        hMap(dateType);
-    }
-
     //定位
     $("#relocation").on('click', function() {
         wxConfig();
@@ -123,7 +115,6 @@
             cityName = $.cookie(Utils.cityCacheName);
             countryName = $.cookie(Utils.countryCacheName);
             lMap(dateType)
-            hMap(dateType);
             customer(provName, cityName, '', dateType);
         });
 
@@ -293,6 +284,7 @@
             $customerName.text(tpTitle);
             $p.attr('class', 'title');
             $p.show();
+            $("#product_customerId").show();
 
             var $tbody = $("#customerId_product tbody");
             $tbody.empty();
@@ -305,70 +297,6 @@
             }
        });
     }
-
-    //热力图
-    var hotMap = new BMap.Map("hot_map");
-    function hMap(dateType){
-        Utils.loading();
-        
-        var hmTitle = '热力图';
-        if((provName + cityName + countryName).trim() != '' ){
-        hmTitle = provName + cityName  + hmTitle;
-        } else {
-        hmTitle = '全国' + hmTitle;
-        }
-        $("#p_hot_map").text(hmTitle);
-
-        var longitude = $.cookie(Utils.longitudeCache);
-        var latitude = $.cookie(Utils.latitudeCache);
-        var point = new BMap.Point(longitude,latitude);
-        hotMap.centerAndZoom(point, 11);             // 初始化地图，设置中心点坐标和地图级别
-
-        if(cityName.trim() != '' ){
-            hotMap.centerAndZoom(cityName,11);
-        } else if(provName.trim() != '' ) {
-            hotMap.centerAndZoom(provName,7);
-        } else {
-            hotMap.centerAndZoom("兰州",4);
-        }
-
-        hotMap.enableScrollWheelZoom(true);
-        hotMap.clearOverlays();
-        if(hotMapType == 0){
-            hotMapData(dateType,"${CPATH}/sales/salesHotMap");
-        } else {
-            hotMapData(dateType,"${CPATH}/sales/customerHotMap");
-        }
-
-    }
-
-    function hotMapData(dateType, url){
-
-        $.ajax({
-            url:url,
-            type:"post",
-            data:{provName: provName, cityName: cityName, countryName: '', dateType: dateType},
-            dataType:"json"
-        }).done(function(data){
-            Utils.close();
-            
-            if(!isSupportCanvas()){
-                alert('热力图目前只支持有canvas支持的浏览器,您所使用的浏览器不能使用热力图功能~')
-            }
-    
-            heatmapOverlay = new BMapLib.HeatmapOverlay({"radius":20});
-            hotMap.addOverlay(heatmapOverlay);
-            heatmapOverlay.setDataSet({data:data,max:100});
-
-        });
-    }
-
-    //判断浏览区是否支持canvas
-    function isSupportCanvas(){
-        var elem = document.createElement('canvas');
-        return !!(elem.getContext && elem.getContext('2d'));
-    }
-    
 
     //客户
     var customer_rank = document.getElementById('customer_rank');
@@ -627,12 +555,6 @@
                 </div>
             </div>
         </div>
-        <p class="title" id="p_hot_map"></p>
-        <div class="mapType-div">
-            <a class="mapType active-mapType" onclick="setHotMapType(0)">销售分布</a>
-            <a class="mapType" onclick="setHotMapType(1)">开发分布</a>
-        </div>
-        <div id="hot_map"></div>
 
         <p class="title" id="p_customer_rank"></p>
         <div id="customer_rank" id="customer_rank">
