@@ -121,7 +121,9 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				String[] imags = activity.getImageListStore().split(",");
 				List<String> imageList = new ArrayList<String>();
 				for(int i=0;i<imags.length;i++) {
-					imageList.add(imags[i]);
+					if(!imags[i].equals("")) {
+						imageList.add(imags[i]);
+					}
 				}
 				setAttr("imageList", imageList);
 			}
