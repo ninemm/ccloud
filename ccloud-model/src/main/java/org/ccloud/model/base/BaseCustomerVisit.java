@@ -298,4 +298,12 @@ public abstract class BaseCustomerVisit<M extends BaseCustomerVisit<M>> extends 
 	public java.lang.String getImageListStore() {
 		return getStr("image_list_store");
 	}
+	
+	public void setActivityApplyId(java.lang.String activityApplyId) {
+		set("activityApplyId", activityApplyId);
+	}
+
+	public java.lang.String getActivityApplyId() {
+		return getStr("activityApplyId");
+	}
 }

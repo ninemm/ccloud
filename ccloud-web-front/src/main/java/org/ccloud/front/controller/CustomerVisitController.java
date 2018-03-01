@@ -232,7 +232,9 @@ public class CustomerVisitController extends BaseFrontController {
 		if(StrKit.notBlank(getPara("one"))) {
 			setAttr("one", getPara("one"));
 		}
-
+		CustomerVisit customerVisit = CustomerVisitQuery.me().findById(id);
+		String imageListStore = customerVisit.getPhoto();
+		List<ImageJson> list = JSON.parseArray(imageListStore, ImageJson.class);
 		CustomerVisit visit = CustomerVisitQuery.me().findMoreById(id);
 		List<Record> findByActivity = CustomerVisitQuery.me().findByActivity(id);
 		String activity="";
@@ -244,6 +246,7 @@ public class CustomerVisitController extends BaseFrontController {
 		}
 		setAttr("activity", activity);
 		setAttr("visit", visit);
+		setAttr("list",list);
 
 		//审核后将message中是否阅读改为是
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
@@ -358,7 +361,7 @@ public class CustomerVisitController extends BaseFrontController {
 				JSONObject obj = array.getJSONObject(i);
 				String pic = obj.getString("pic");
 				String picname = obj.getString("picname");
-				
+				String orderList = obj.getString("orderList");
 				ImageJson image = new ImageJson();
 				image.setImgName(picname);
 				//原图
@@ -366,12 +369,14 @@ public class CustomerVisitController extends BaseFrontController {
 				//添加的水印内容
 				String waterFont1 = customerVisit.getSellerCustomer().getCustomer().getCustomerName();
 				String waterFont2 = user.getRealname() +  DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
-				String waterFont3 =  customerVisit.getLocation();
+//				String waterFont3 =  customerVisit.getLocation();
+				String waterFont3 = "湖北省-武汉市-洪山区";
 				//图片添加水印  上传图片  水印图
 				String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
 				
 				image.setSavePath(savePath.replace("\\", "/"));
 				image.setOriginalPath(originalPath.replace("\\", "/"));
+				image.setOrderList(orderList);
 				list.add(image);
 			}
 		}
@@ -614,4 +619,8 @@ public class CustomerVisitController extends BaseFrontController {
 		renderJson(visitList);
 	}
 	
+	public void getActivityExecute() {
+		String activityId = getPara("activityId");
+    	renderJson(ActivityExecuteQuery.me().findbyActivityId(activityId));
+	}
 }

@@ -23,7 +23,7 @@
     var count = 3;
     var $form = $("#form");
     var $picNum = $('.weui-uploader__info');
-    var $uploaderFiles = $("#uploaderFiles");
+    var $uploaderFiles = $(".uploaderFiles");
     var $gallery = $("#gallery"), $galleryImg = $("#galleryImg");
 
     var Orientation = null;
@@ -52,7 +52,6 @@
     }
 
     $(function() {
-
         $("#length").text($("#question_desc").val().length + '/' + 70);
         $(document).on("input", "#question_desc", function() {
             $("#length").text($("#question_desc").val().length + '/' + 70);
@@ -90,8 +89,32 @@
 							items: JSON.parse(data.activityRecords),
 							onClose: function(obj) {
 							    var activityIds = obj.data.values;
-							    $('#activity_id').val(activityIds);
-							    console.log(JSON.parse(data.activityExecute));
+							    $('#activity_apply_id').val(activityIds);
+							   var activityId = $('#activity_apply_id').val();
+								if(activityId){
+									$.ajax({
+								        url: "${CPATH}/customerVisit/getActivityExecute",
+								        data: {
+								            "activityId": activityId
+								        },
+								        dataType: "json",
+								        success: function(data) {
+								        		if(data!=null){
+									        		var html = "";
+								        			$(".imageActivityExecute").hide();
+								        			for(var i = 0 ; i < data.length ; i++){
+								        				html +='<div><input id="orderList" type="hidden" value="'+data[i].order_list+'"/>'+data[i].remark+'<div class="weui-uploader__bd">'
+						                                	+'<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles"></ul>'
+						                                	+'<div class="weui-uploader__input-box">'
+						                                   	+'<input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/*" multiple="">'
+						                                    +'<input type="hidden" name="pic" id="pic" class="pic">'
+						                                	+'</div></div></div>'
+								        			}
+								        			$(".imgeActivity").append(html);
+								        		}
+								        }
+							        });
+								}
 							}
 						});
 		        		}
@@ -99,8 +122,8 @@
 	        });
 		}
 		
-        $("#uploaderInput").on("change",function () {
-
+        $(document).on("change", ".uploaderInput", function () {
+			var $this = $(this);
             var files = this.files;;
             var arrNum = imageArr.length;
             var num = arrNum + files.length;
@@ -162,10 +185,14 @@
                                 }
                             }
                             blob = canvas.toDataURL("image/jpeg", 0.5);
-                            imageArr.push({"pic":blob, "pic_name":x});
-                            $("#pic").val(JSON.stringify(imageArr));
+                           if($("#activity_title").val()!=null){
+                           		imageArr.push({"pic":blob, "picname":x,"orderList":$this.parent().parent().parent().find("#orderList").val()});
+                           }else{
+                            imageArr.push({"pic":blob, "picname":x,"orderList":0});
+                           }
+                            $(".pic").val(JSON.stringify(imageArr));
                             var str = '<li class="weui-uploader__file " style="background-image:url('+blob+')"></li>';
-                            $uploaderFiles.append(str);
+                            $this.parent().prev().append(str);
                         };
                     };
                 })(file.name)
@@ -177,6 +204,7 @@
         //最小与最大旋转方向，图片旋转4次后回到原方向
         var min_step = 0;
         var max_step = 3;
+        var $uploaderFiles = "";
         if (img == null) return;
 
         var step = 2;
@@ -222,8 +250,9 @@
         }
 
         var index; //第几张图片
-        $uploaderFiles.on("click", "li", function() {
+        $(document).on("click", ".uploaderFiles li", function() {
             index = $(this).index();
+            $uploaderFiles = $(this).parent();
             $galleryImg.attr("style", this.getAttribute("style"));
             $gallery.fadeIn(100);
         });
@@ -233,7 +262,7 @@
         });
 
         //删除图片  删除图片的代码也贴出来。
-        $(".weui-gallery__del").click(function() { //这部分刚才放错地方了，放到$(function(){})外面去了
+        $(document).on("click",".weui-gallery__del",function() { //这部分刚才放错地方了，放到$(function(){})外面去了
             $uploaderFiles.find("li").eq(index).remove();
             imageArr = imageArr.splice(index, 1);
         });
@@ -251,10 +280,10 @@
             return false;
         }
 
-        if($("#location").val().length==0) {
+       /* if($("#location").val().length==0) {
             $.toptip('定位地址不能为空,请刷新定位', 1000, 'error');
             return false;
-        }
+        }*/
 
         $.confirm("您确定要新增拜访吗？","新增拜访", function() {
             doSubmit();
@@ -435,7 +464,7 @@
 						<div class="order-customer-info-title">
 							活动&nbsp;&nbsp;&nbsp;
 						</div>
-						<input id="activity_id"  name="activity_id" type="hidden" />
+						<input id="activity_apply_id"  name="activity_apply_id" type="hidden" />
 						<input id="activity_title" class="weui-input" name="activity_title" type="text" placeholder="请选择" readonly>
                     </div>
                     <span class="weui-cell__ft"></span>
@@ -469,16 +498,16 @@
             <section class="weui-cells weui-cells_form">
                 <div class="weui-cell">
                     <div class="weui-cell__bd">
-                        <div class="weui-uploader">
+                        <div class="weui-uploader imgeActivity">
                             <div class="weui-uploader__hd">
                                 <p class="weui-uploader__title">附件图片</p>
                                 <div class="weui-uploader__info">0/3</div>
                             </div>
-                            <div class="weui-uploader__bd">
-                                <ul class="weui-uploader__files" id="uploaderFiles"></ul>
+                            <div class="weui-uploader__bd imageActivityExecute">
+                                <ul class="weui-uploader__files uploaderFiles" id="uploaderFiles"></ul>
                                 <div class="weui-uploader__input-box">
-                                    <input id="uploaderInput" class="weui-uploader__input" type="file" accept="image/*" multiple="">
-                                    <input type="hidden" name="pic" id="pic">
+                                    <input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/*" multiple="">
+                                    <input type="hidden" name="pic" id="pic" class="pic">
                                 </div>
                             </div>
                         </div>

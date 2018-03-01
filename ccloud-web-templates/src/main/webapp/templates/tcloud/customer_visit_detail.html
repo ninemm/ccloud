@@ -109,7 +109,7 @@
 		                        <ul class="weui-uploader__files" id="uploaderFiles">
 		                            <#if (visit.imageList) ??>
 		                                <#list visit.imageList as bean>
-		                                    <li class="weui-uploader__file" style="background-image: url(${bean.savePath})"></li>
+		                                    ${bean.orderList}<li class="weui-uploader__file" style="background-image: url(${bean.savePath})"></li>
 		                                </#list>
 		                            </#if>
 		                        </ul>
