@@ -14,6 +14,7 @@ import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
+import org.ccloud.model.ActivityExecute;
 import org.ccloud.model.Customer;
 import org.ccloud.model.CustomerType;
 import org.ccloud.model.CustomerVisit;
@@ -22,6 +23,7 @@ import org.ccloud.model.Dict;
 import org.ccloud.model.Message;
 import org.ccloud.model.User;
 import org.ccloud.model.WxMessageTemplate;
+import org.ccloud.model.query.ActivityApplyQuery;
 import org.ccloud.model.query.ActivityExecuteQuery;
 import org.ccloud.model.query.ActivityQuery;
 import org.ccloud.model.query.CustomerJoinCustomerTypeQuery;
@@ -221,7 +223,7 @@ public class CustomerVisitController extends BaseFrontController {
 	    for (Record record : activityRecords) {
 		    	Map<String, String> map = Maps.newHashMap();
 		    	map.put("title", record.getStr("title"));
-		    	map.put("value", record.getStr("id"));
+		    	map.put("value", record.getStr("activityApplyId"));
 		    	activityList.add(map);
 	    }
 	    renderJson("activityRecords",JSON.toJSONString(activityList));
@@ -237,6 +239,7 @@ public class CustomerVisitController extends BaseFrontController {
 		List<ImageJson> list = JSON.parseArray(imageListStore, ImageJson.class);
 		CustomerVisit visit = CustomerVisitQuery.me().findMoreById(id);
 		List<Record> findByActivity = CustomerVisitQuery.me().findByActivity(id);
+		List<ActivityExecute> activityExecutes = ActivityExecuteQuery.me().findByCustomerVisitId(id);
 		String activity="";
 		for (Record record : findByActivity) {
 			activity=activity+record.getStr("title")+",";
@@ -247,6 +250,7 @@ public class CustomerVisitController extends BaseFrontController {
 		setAttr("activity", activity);
 		setAttr("visit", visit);
 		setAttr("list",list);
+		setAttr("activityExecutes",activityExecutes);
 
 		//审核后将message中是否阅读改为是
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
@@ -342,6 +346,7 @@ public class CustomerVisitController extends BaseFrontController {
 		CustomerVisit customerVisit = getModel(CustomerVisit.class);
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		
+		String activityApplyId = getPara("activity_apply_id");
 		Boolean isChecked = OptionQuery.me().findValueAsBool("web_proc_customer_visit_" + getSessionAttr("sellerCode"));
 		
 		List<ImageJson> list = Lists.newArrayList();
@@ -353,7 +358,7 @@ public class CustomerVisitController extends BaseFrontController {
 		customerVisit.setUserId(user.getId());
 		customerVisit.setDataArea(user.getDataArea());
 		customerVisit.setDeptId(user.getDepartmentId());
-		 
+		customerVisit.setActiveApplyId(activityApplyId);
 		if (StrKit.notBlank(picJson)) {
 			
 			JSONArray array = JSON.parseArray(picJson);
@@ -369,8 +374,8 @@ public class CustomerVisitController extends BaseFrontController {
 				//添加的水印内容
 				String waterFont1 = customerVisit.getSellerCustomer().getCustomer().getCustomerName();
 				String waterFont2 = user.getRealname() +  DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
-//				String waterFont3 =  customerVisit.getLocation();
-				String waterFont3 = "湖北省-武汉市-洪山区";
+				String waterFont3 =  customerVisit.getLocation();
+//				String waterFont3 = "湖北省-武汉市-洪山区";
 				//图片添加水印  上传图片  水印图
 				String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
 				
@@ -385,14 +390,15 @@ public class CustomerVisitController extends BaseFrontController {
 		boolean updated = customerVisit.saveOrUpdate();
 		
 		//获取选取活动的id
-		String activityIds = getPara("activity_id");
-		List<String> activityIdList = Splitter.on(",").trimResults().omitEmptyStrings().splitToList(activityIds);
-		for (String activityId : activityIdList) {
-			CustomerVisitJoinActivity customerVisitJoinActivity=new CustomerVisitJoinActivity();
-			customerVisitJoinActivity.setCustomerVisitId(customerVisit.getId());
-			customerVisitJoinActivity.setId(StrKit.getRandomUUID());
-			customerVisitJoinActivity.setActivityId(activityId);
-			customerVisitJoinActivity.save();
+		if(StrKit.notBlank(activityApplyId)) {
+			List<String> activityIdList = Splitter.on(",").trimResults().omitEmptyStrings().splitToList(ActivityApplyQuery.me().findById(activityApplyId).getActivityId());
+			for (String activityId : activityIdList) {
+				CustomerVisitJoinActivity customerVisitJoinActivity=new CustomerVisitJoinActivity();
+				customerVisitJoinActivity.setCustomerVisitId(customerVisit.getId());
+				customerVisitJoinActivity.setId(StrKit.getRandomUUID());
+				customerVisitJoinActivity.setActivityId(activityId);
+				customerVisitJoinActivity.save();
+			}
 		}
 			
 		if (!updated) {
@@ -620,7 +626,7 @@ public class CustomerVisitController extends BaseFrontController {
 	}
 	
 	public void getActivityExecute() {
-		String activityId = getPara("activityId");
-    	renderJson(ActivityExecuteQuery.me().findbyActivityId(activityId));
+		String activityApplyId = getPara("activityApplyId");
+    	renderJson(ActivityExecuteQuery.me().findbyActivityId(ActivityApplyQuery.me().findById(activityApplyId).getActivityId()));
 	}
 }

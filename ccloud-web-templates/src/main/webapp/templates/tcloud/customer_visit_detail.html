@@ -2,11 +2,10 @@
 <#macro title>拜访详情</#macro>
 <#macro script>
 	var $gallery = $("#gallery"), $galleryImg = $("#galleryImg");
-	var $uploaderFiles = $('#uploaderFiles');
 
 	$(function(){
 		var index;
-		$uploaderFiles.on("click", "li", function() {
+		$(document).on("click", ".uploaderFiles li", function() {
 			index = $(this).index();
 			$galleryImg.attr("style", this.getAttribute("style"));
 			$gallery.fadeIn(100);
@@ -103,21 +102,38 @@
 		                <div class="weui-uploader">
 		                    <div class="weui-uploader__hd">
 		                        <p class="weui-uploader__title">附件图片</p>
-		                        <div class="weui-uploader__info">${(visit.imageList?size)!0}/3</div>
+		                        <!-- <div class="weui-uploader__info">${(visit.imageList?size)!0}/3</div> -->
 		                    </div>
-		                    <div class="weui-uploader__bd">
-		                        <ul class="weui-uploader__files" id="uploaderFiles">
-		                            <#if (visit.imageList) ??>
-		                                <#list visit.imageList as bean>
-		                                    ${bean.orderList}<li class="weui-uploader__file" style="background-image: url(${bean.savePath})"></li>
-		                                </#list>
-		                            </#if>
-		                        </ul>
+		                            	<#if activityExecutes?size gt 0>
+		                            		<#list activityExecutes as list>
+		                            			<span class="weui-uploader__info">${list.remark}</span>
+		                            			<hr style="border:1px dashed #0000fff"/>
+		                   						 <div class="weui-uploader__bd">
+			                       					<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles">
+							                            <#if (visit.imageList) ??>
+						                                <#list visit.imageList as bean>
+					                            			<#if (list.order_list == bean.orderList)>
+						                                   		<li class="weui-uploader__file" style="background-image: url(${bean.savePath})"></li>
+					                            			</#if>
+						                                </#list>
+							                            </#if>
+			                      					</ul>
+		                   						 </div>
+		                   						 <hr style="border:1px dashed #0000fff"/>
+		                            		</#list>
+	                            		<#else> 
+                            				<div class="weui-uploader__bd">
+		                       					<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles">
+				                            		<#list visit.imageList as bean>
+					                                   	<li class="weui-uploader__file" style="background-image: url(${bean.savePath})"></li>
+					                                </#list>
+				                                </ul>
+	                   						 </div>
+		                            	</#if>
 		                        <!--<div class="weui-uploader__input-box">-->
 		                        <!--&lt;!&ndash;<input id="uploaderInput" name="customer.img_path" class="weui-uploader__input" type="file" accept="image/*" multiple="">&ndash;&gt;-->
 		                        <!--<input type="hidden" name="pic" id="pic">-->
 		                        <!--</div>-->
-		                    </div>
 		                </div>
 		            </div>
 		        </div>
