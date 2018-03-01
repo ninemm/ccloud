@@ -908,7 +908,6 @@ public class SalesFactQuery extends JBaseQuery {
 		sqlBuilder.append(" and sf.customerType != 7");
 
 		sqlBuilder.append(" group by sf.customerId");
-		sqlBuilder.append(" order by count desc");
 
 		return Db.find(sqlBuilder.toString(), params.toArray());
 
