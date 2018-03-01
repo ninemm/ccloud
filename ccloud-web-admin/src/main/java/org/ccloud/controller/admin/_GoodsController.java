@@ -545,7 +545,7 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
 		List<ProductInfo> productList = ProductQuery.me().getAllProductInforStockTaking(sellerId,warehouseId);
         List<Map<String, Object>> list = new ArrayList<>();
         for (ProductInfo productInfo : productList) {
-           Map<String, Object> map = new HashMap<>();
+        		Map<String, Object> map = new HashMap<>();
             map.put("productList", productInfo);
             list.add(map);
 		}
@@ -566,7 +566,7 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
 		}
         List<Map<String, Object>> list = new ArrayList<>();
         for (ProductInfo productInfo : productList) {
-           Map<String, Object> map = new HashMap<>();
+        		Map<String, Object> map = new HashMap<>();
             map.put("productList", productInfo);
             list.add(map);
 		}
