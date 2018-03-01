@@ -57,6 +57,8 @@
 	$("#customer_type_store_option").select2();
 	$("#customerType").select2();
 	$(function() {
+		//if(${(imageList)}==null)delete
+		console.log(${(imageList)});
 		if($(".category").val()==101002){
 			$(".investType").show();
 			$(".visitNum").show();
@@ -480,15 +482,17 @@
 						<label class="control-label col-sm-4"></label>
 						<div class="input-group col-md-10 col-sm-10">
 							<ul class="list-inline list-unstyled" id="imageDiv">
-								<#list (imageList)! as img>
-									<li>
-										<div class="imgDiv">
-											<img src="${img}" class='jp-grids-photos img-responsive' >
-											<input type='hidden' name='imageUrl[]' value="${img}">
-											<div class="delete"></div>
-										</div>											
-									</li>
-								</#list>
+									<#if imageList??>
+									<#list (imageList)! as img>
+										<li>
+											<div class="imgDiv">
+												<img src="${img}" class='jp-grids-photos img-responsive' >
+												<input type='hidden' name='imageUrl[]' value="${img}">
+												<div class="delete"></div>
+											</div>											
+										</li>
+									</#list>
+									</#if>
 							</ul>									
 		               	</div>
 					</div>
