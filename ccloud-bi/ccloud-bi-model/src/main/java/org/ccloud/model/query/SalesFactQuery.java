@@ -885,8 +885,8 @@ public class SalesFactQuery extends JBaseQuery {
 
 		StringBuilder sqlBuilder = new StringBuilder(" select x(ci.location) as lng, y(ci.location) as lat ");
 
-		//sqlBuilder.append(", TRUNCATE(SUM(sf.totalSales)/100, 2) as count");
-		sqlBuilder.append(", 150 as count");
+		sqlBuilder.append(", TRUNCATE(SUM(sf.totalSales)/200, 2) as count");
+		//sqlBuilder.append(", 150 as count");
 
 		sqlBuilder.append(" from sales_fact sf join customer_info ci on sf.customerId = ci.customerId ");
 		sqlBuilder.append(" where AsText(ci.location) != '' AND AsText(ci.location) != 'POINT(0 0)' ");
@@ -921,7 +921,7 @@ public class SalesFactQuery extends JBaseQuery {
 
 		StringBuilder sqlBuilder = new StringBuilder(" select x(ci.location) as lng, y(ci.location) as lat ");
 
-		sqlBuilder.append(", 150 as count");
+		sqlBuilder.append(", 105 as count");
 
 		sqlBuilder.append(" from customer_info ci ");
 		sqlBuilder.append(" where AsText(ci.location) != '' AND AsText(ci.location) != 'POINT(0 0)' ");
