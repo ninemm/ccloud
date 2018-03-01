@@ -16,6 +16,8 @@
 package org.ccloud.model.query;
 
 import java.util.LinkedList;
+import java.util.List;
+
 import org.ccloud.model.YxBasicchannelinfo;
 
 import com.jfinal.plugin.activerecord.Page;
@@ -65,6 +67,10 @@ public class YxBasicchannelinfoQuery extends JBaseQuery {
 			return deleteCount;
 		}
 		return 0;
+	}
+
+	public List<YxBasicchannelinfo> findAll() {
+		return DAO.doFind("flag = 1");
 	}
 
 	

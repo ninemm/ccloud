@@ -34,13 +34,17 @@ import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Activity;
 import org.ccloud.model.ActivityExecute;
 import org.ccloud.model.Dict;
+import org.ccloud.model.ExpenseDetail;
 import org.ccloud.model.QyExpense;
 import org.ccloud.model.query.ActivityExecuteQuery;
 import org.ccloud.model.query.ActivityQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.DictQuery;
+import org.ccloud.model.query.ExpenseDetailQuery;
 import org.ccloud.model.query.QyExpenseQuery;
+import org.ccloud.model.query.SalesOrderQuery;
 
+import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
@@ -105,7 +109,10 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 	}
 	public void edit() {
 		String id = getPara("id");
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		List<Dict> dicts = DictQuery.me().findDictByType(Consts.INVEST_TYPE);
+		List<ExpenseDetail> expenseList = ExpenseDetailQuery.me().findByActivityId(id);
+		setAttr("expenseList", expenseList);
 		setAttr("dicts",dicts);
 		if(!StrKit.isBlank(id)) {
 			Activity activity = ActivityQuery.me().findById(id);
@@ -135,6 +142,22 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			setAttr("startDate",  DateFormatUtils.format(activity.getStartTime(), "yyyy-MM-dd"));
 			setAttr("endDate", DateFormatUtils.format(activity.getEndTime(), "yyyy-MM-dd"));
 		}
+		
+		List<Record> productlist = SalesOrderQuery.me().findProductListBySeller(sellerId);
+		List<Map<String, String>> productOptionList = new ArrayList<Map<String, String>>();
+		for (Record record : productlist) {
+			Map<String, String> productOptionMap = new HashMap<String, String>();
+
+			String sellProductId = record.getStr("id");
+			String customName = record.getStr("custom_name");
+			String speName = record.getStr("valueName");
+
+			productOptionMap.put("id", sellProductId);
+			productOptionMap.put("text", customName + "/" + speName);
+
+			productOptionList.add(productOptionMap);
+		}
+		setAttr("productOptionList", JSON.toJSON(productOptionList));
 	}
 	
 	@Before(Tx.class)
@@ -142,7 +165,11 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		final Activity activity = getModel(Activity.class);
 		String sellerId = getSessionAttr("sellerId");
 		String [] imagePath = getParaValues("imageUrl[]");
-		String investTypes = getPara("investType");
+		String [] item1 = getParaValues("item1[]");
+		String [] item2 = getParaValues("item2[]");
+		String [] item3 = getParaValues("item3[]");
+		String [] item4 = getParaValues("item4[]");			
+		String investTypes = getPara("invest_type");
 		String customerTypes = getPara("customerType");
 		if(customerTypes !=null && customerTypes.length()>180) {
 			renderAjaxResultForError("客户类型不能超过5个");
@@ -166,8 +193,8 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		String areaNames = getPara("areaNames").replace("/", "-");
 		String startDate = getPara("startDate")+" 00:00:00";
 		String endDate = getPara("endDate")+" 23:59:59";
-		 Date sdate=null; 
-		 Date edate = null;
+		Date sdate = null; 
+		Date edate = null;
 	    SimpleDateFormat formatter=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  
 	    try {
 			sdate=formatter.parse(startDate);
@@ -210,7 +237,69 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				activityExecute.save();
 			}
 		}
+		
+		for(int i = 0; i < item1.length; i++) {
+			ExpenseDetail detail = new ExpenseDetail();
+			detail.setId(StrKit.getRandomUUID());
+			detail.setActivityId(activity.getId());
+			detail.setCreateDate(new Date());
+			detail.setFlowNo(activity.getProcCode());
+			String typeID = findFlowDictType(activity.getInvestType());
+			detail.setFlowDictType(typeID);
+			if (typeID.equals("feeType_name_display")) {
+				detail.setDisplayDictType(findDisplayType(item1[i]));
+			}
+			detail.setItem1(item1[i]);
+			detail.setItem2(item2[i]);
+			if (item3 != null) {
+				detail.setItem3(item3[i]);
+			}
+			if (item4 != null) {
+				detail.setItem4(item4[i]);
+			}
+			detail.setState(true);
+			detail.save();
+		}
+		
 		renderAjaxResultForSuccess();
+	}
+	
+	private String findFlowDictType(String code) {
+		String type = null;
+		if (code.equals("101101")) {
+			return "feeType_name_PR";
+		} else if (code.equals("101102")) {
+			return "feeType_name_raise";
+		} else if (code.equals("101103")) {
+			return "feeType_name_AD";
+		} else if (code.equals("101104")) {
+			return "feeType_name_display";
+		} else if (code.equals("101105")) {
+			return "channel_define";
+		} else if (code.equals("101106")) {
+			return "feeType_name_gift";
+		} else if (code.equals("101107")) {
+			return "feeType_name_SA";
+		}
+		return type;
+	}
+	
+	private String findDisplayType(String code) {
+		if (code.equals("102032")) {
+			return "display_publish";
+		} else if(code.equals("102033")) {
+			return "display_shop";
+		} else if(code.equals("102034")) {
+			return "display_retail";
+		} else if(code.equals("102035")) {
+			return "display_sell";
+		} else if(code.equals("102036")) {
+			return "display_catering";
+		} else if(code.equals("102037")) {
+			return "display_dm";
+		} else {
+			return "display_CER";
+		}
 	}
 	
 	public void getCustomerTypeOptions() {
@@ -341,4 +430,5 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
 	}
+	
 }

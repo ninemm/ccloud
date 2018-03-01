@@ -57,9 +57,9 @@ public abstract class BaseExpenseDetail<M extends BaseExpenseDetail<M>> extends 
 		if(!(o instanceof BaseExpenseDetail<?>)){return false;}
 
 		BaseExpenseDetail<?> m = (BaseExpenseDetail<?>) o;
-		if(m.getId() == null){return false;}
+		if(m.getFlowDictType() == null){return false;}
 
-		return m.getId().compareTo(this.getId()) == 0;
+		return m.getFlowDictType().compareTo(this.getFlowDictType()) == 0;
 	}
 
 	@Override
@@ -90,14 +90,30 @@ public abstract class BaseExpenseDetail<M extends BaseExpenseDetail<M>> extends 
 		return update;
 	}
 
-	public void setId(java.math.BigInteger id) {
+	public void setId(java.lang.String id) {
 		set("id", id);
 	}
 
-	public java.math.BigInteger getId() {
+	public java.lang.String getId() {
 		return get("id");
 	}
-
+	
+	public java.lang.String getFlowDictType() {
+		return get("flow_dict_type");
+	}
+	
+	public void setFlowDictType(java.lang.String flowDictType) {
+		set("flow_dict_type", flowDictType);
+	}
+	
+	public java.lang.String getDisplayDictType() {
+		return get("display_dict_type");
+	}
+	
+	public void setDisplayDictType(java.lang.String displayDictType) {
+		set("display_dict_type", displayDictType);
+	}	
+	
 	public void setActivityId(java.lang.String activityId) {
 		set("activity_id", activityId);
 	}
