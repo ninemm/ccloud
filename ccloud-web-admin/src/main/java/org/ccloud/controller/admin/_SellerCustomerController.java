@@ -369,7 +369,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 	public void user_tree() {
 
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		List<Map<String, Object>> treeData = DepartmentQuery.me()._findDeptListAsTree(dataArea, true);
+		List<Map<String, Object>> treeData = DepartmentQuery.me().findDeptListAsTree(dataArea, true);
 		setAttr("treeData", JSON.toJSON(treeData));
 
 	}
