@@ -19,6 +19,7 @@ import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.CustomerType;
 import org.ccloud.model.Dict;
 import org.ccloud.model.User;
+import org.ccloud.model.Warehouse;
 import org.ccloud.model.query.*;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.wechat.WechatJSSDKInterceptor;
@@ -38,8 +39,14 @@ public class ProductController extends BaseFrontController {
 
 	public void index() {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-		
-		List<Record> productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", "");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		List<Warehouse> wlist = WarehouseQuery.me().findWarehouseByUserId(user.getId());
+		List<Record> productRecords = new ArrayList<>();
+		if (wlist.size() > 0 && wlist.get(0).getType().equals(Consts.WAREHOUSE_TYPE_CAR)) {
+			productRecords = SellerProductQuery.me().findProductListForAppByCar(sellerId, "", "", wlist.get(0).getId());
+		} else {
+			productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", "");
+		}
 		List<Record> compositionRecords = ProductCompositionQuery.me().findDetailByProductId("", sellerId, "", "");
 
 		List<Map<String, Object>> productList = new ArrayList<Map<String, Object>>();

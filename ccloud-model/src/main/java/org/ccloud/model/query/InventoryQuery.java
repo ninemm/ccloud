@@ -169,7 +169,7 @@ public class InventoryQuery extends JBaseQuery {
 		defaultSqlBuilder.append("(SELECT cc.warehouse_id,cc.balance_count,cw.type,cw.is_default,null as user_id FROM cc_inventory cc ");
 		defaultSqlBuilder.append("LEFT JOIN cc_warehouse cw ON cw.id = cc.warehouse_id WHERE cc.product_id = ? AND cc.seller_id = ? ");
 		defaultSqlBuilder.append("AND cw.type != 2) ");
-		defaultSqlBuilder.append(") store ORDER BY store.user_id, store.type, store.is_default desc ");
+		defaultSqlBuilder.append(") store ORDER BY store.user_id desc, store.type desc, store.is_default desc ");
 		return Db.find(defaultSqlBuilder.toString(), productId, sellerId, userId, productId, sellerId);
 	}
 
