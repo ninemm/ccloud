@@ -51,42 +51,26 @@
 }
 </#macro>
 <#macro script>
-	
+	var MaxInputs       = 15; //maximum input boxes allowed  
+	var InputsWrapper   = $("#InputsWrapper"); //Input boxes wrapper ID  
+	var AddButton       = $("#AddMoreFileBox"); //Add button ID  
+	var x = InputsWrapper.length; //initlal text box count 
+		
 	var $form = $("#form");
 	var $city = $('#cityPicker');
 	var data = {url: '', alt: ''};
 	var result = false;
-	$("#invest_type").select2();
 	$("#customer_type_store_option").select2();
 	$("#customerType").select2();
 	$(function() {
 		if($(".category").val()==101002){
 			$(".investType").show();
 			$(".visitNum").show();
-			var list = $("#invest_type").select2("val");
-			if (list != null && list.length > 0) {
-			for(var i =0;i<list.length;i++){
-				if(list[i]==101101 || list[i]==101102 || list[i]==101103 ||list[i]==101104 ||list[i]==101105 ||list[i]==101106 ){
-					result = true;
-					break;
-				}else{
-					result = false;
-				}
-			}
-			if(result == true ){
-				$(".investAmount").show();
-			}else{
-				$(".investAmount").hide();
-			}
-		}else{
-			$(".investAmount").hide();
-		}
 		}else{
 			$(".investType").hide();
 			$(".visitNum").hide();
 			$(".investAmount").hide();
 		}
-		
 		jQuery.mm.initValidator('#form', validatorFields)
 		jQuery.mm.initDatetimepicker(null, '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initDatetimepicker(null, '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
@@ -170,9 +154,10 @@
 	});
 	
 	$(document).on("change", ".category", function() {
-		if($(".category").val()==101002){
+		if($(".category").val() == 101002){
 			$(".investType").show();
 			$(".visitNum").show();
+			$("#expendDetail").show();
 		}else{
 			$(".investType").hide();
 			$(".visitNum").hide();
@@ -180,25 +165,31 @@
 	});
 	
 	$(document).on("change", ".investType", function() {
-		var list = $("#invest_type").select2("val");
+		var choose = $("#invest_type").val();
 		
-		if (list != null && list.length > 0) {
-			for(var i =0;i<list.length;i++){
-				if(list[i]==101101 || list[i]==101102 || list[i]==101103 ||list[i]==101104 ||list[i]==101105 ||list[i]==101106 ){
-					result = true;
-					break;
-				}else{
-					result = false;
-				}
-			}
-			if(result == true ){
-				$(".investAmount").show();
-			}else{
-				$(".investAmount").hide();
-			}
-		}else{
-			$(".investAmount").hide();
-		}
+<!-- 		if(choose == 101101 || choose==101102 || choose==101103 ||choose==101104 ||choose==101105 ||choose==101106 ){ -->
+<!-- 			$(".investAmount").show(); -->
+<!-- 		}else{ -->
+<!-- 			$(".investAmount").hide(); -->
+<!-- 		} -->
+		$("#InputsWrapper").empty();
+		$("#expendHead").empty();
+		if (choose == 101101) {
+			$("#expendHead").append('<th id="name1">费用类型</th><th id="name2">申请金额</th><th>操作</th>');
+			$(InputsWrapper).append('<tr><td class="col-xs-3"><select class="form-control input-sm" name=item1[]">${DICT_BOX('feeType_name_PR', 'select')}</select></td><td class="col-xs-2"><input class="form-control input-sm" type="text" name="item2[]" id="item2_1"></td><td><a href="#" class="removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><tr>');
+		} else if (choose == 101102) {
+			$("#expendHead").append('<th id="name1">费用类型</th><th id="name2">申请金额</th><th>操作</th>');
+			$(InputsWrapper).append('<tr><td class="col-xs-3"><select class="form-control input-sm" name=item1[]">${DICT_BOX('feeType_name_raise', 'select')}</select></td><td class="col-xs-2"><input class="form-control input-sm" type="text" name="item2[]" id="item2_1"></td><td><a href="#" class="removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><tr>');			
+		} else if (choose == 101103) {
+			$("#expendHead").append('<th id="name1">费用类型</th><th id="name2">申请金额</th><th>操作</th>');
+			$(InputsWrapper).append('<tr><td class="col-xs-3"><select class="form-control input-sm" name=item1[]">${DICT_BOX('feeType_name_AD', 'select')}</select></td><td class="col-xs-2"><input class="form-control input-sm" type="text" name="item2[]" id="item2_1"></td><td><a href="#" class="removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><tr>');		
+		} else if (choose == 101104) {
+			$("#expendHead").append('<th id="name1">费用类型</th><th id="name2">展示形式</th><th id="name3">投入数量</th><th id="name4">申请金额</th><th>操作</th>');
+			$(InputsWrapper).append('<tr><td class="col-xs-3"><select class="form-control input-sm" name=item1[]" onChange="showType(this)" id="feeTypeId">${DICT_BOX('feeType_name_display', 'select')}</select></td><td class="col-xs-3"><select class="form-control input-sm" name=item2[]">${DICT_BOX('display_publish', 'select')}</select></td><td class="col-xs-2"><input class="form-control input-sm" type="text" name="item3[]" id="item3_1"></td><td class="col-xs-2"><input class="form-control input-sm" type="text" name="item4[]" id="item4_1"></td><td><a href="#" class="removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><tr>');		
+		} else if (choose == 101105) {
+			$("#expendHead").append('<th id="name1">渠道</th><th id="name2">赠送产品</th><th id="name3">投入数量</th><th id="name4">申请金额</th><th>操作</th>');
+			$(InputsWrapper).append('<tr><td class="col-xs-3"><select class="form-control input-sm" name=item1[]" onChange="showType(this)" id="feeTypeId">${DICT_BOX('feeType_name_display', 'select')}</select></td><td class="col-xs-3"><select class="form-control input-sm" name=item2[]">${DICT_BOX('display_publish', 'select')}</select></td><td class="col-xs-2"><input class="form-control input-sm" type="text" name="item3[]" id="item3_1"></td><td class="col-xs-2"><input class="form-control input-sm" type="text" name="item4[]" id="item4_1"></td><td><a href="#" class="removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><tr>');
+		} 
 	});
 	
 	$("body").on("click", ".delete", function(){
@@ -256,6 +247,32 @@
 	    		}
 		    }
 		});
+	}
+	
+	function showType(el){
+		var typeCode = $("#feeTypeId").val();
+		if (typeCode == 102032) {
+			$(el).parent().parent().find("td:eq(1)").find("select").empty();
+			$(el).parent().parent().find("td:eq(1)").find("select").append('${DICT_BOX('display_publish', 'select')}');
+		} else if(typeCode == 102033) {
+			$(el).parent().parent().find("td:eq(1)").find("select").empty();
+			$(el).parent().parent().find("td:eq(1)").find("select").append('${DICT_BOX('display_shop', 'select')}');
+		} else if(typeCode == 102034) {
+			$(el).parent().parent().find("td:eq(1)").find("select").empty();
+			$(el).parent().parent().find("td:eq(1)").find("select").append('${DICT_BOX('display_retail', 'select')}');
+		} else if(typeCode == 102035) {
+			$(el).parent().parent().find("td:eq(1)").find("select").empty();
+			$(el).parent().parent().find("td:eq(1)").find("select").append('${DICT_BOX('display_sell', 'select')}');
+		} else if(typeCode == 102036) {
+			$(el).parent().parent().find("td:eq(1)").find("select").empty();
+			$(el).parent().parent().find("td:eq(1)").find("select").append('${DICT_BOX('display_catering', 'select')}');
+		} else if(typeCode == 102037) {
+			$(el).parent().parent().find("td:eq(1)").find("select").empty();
+			$(el).parent().parent().find("td:eq(1)").find("select").append('${DICT_BOX('display_dm', 'select')}');
+		} else {
+			$(el).parent().parent().find("td:eq(1)").find("select").empty();
+			$(el).parent().parent().find("td:eq(1)").find("select").append('${DICT_BOX('display_CER', 'select')}');
+		}
 	}
 	
 	function doSubmit(){
@@ -364,6 +381,34 @@
 			$(el).text(index);
 		});
 	}
+	
+	var FieldCount=1; //to keep track of text box added  
+	$(AddButton).click(function (e)  //on add input button click  
+	{
+	        if(x <= MaxInputs) //max input box allowed  
+	        {  
+	            FieldCount++; //text box added increment  
+	            //add input box
+	            var select =  $("#showType").val();
+	            var child = ${(childList?size)!0}
+	            if (select == 1) {
+	            	if (child > 0) {
+	            		$(InputsWrapper).append('<tr><td class="col-xs-4"><input class="form-control input-sm" type="text" name="mytext[]" id="field_'+ FieldCount +'"/><input type="hidden" name="childId[]" id="child_'+ FieldCount +'"/></td><td class="image"><input type="file" name="file[]" onChange="checkValue(this)"/></td><td class="preview"><input type="hidden" name="imageUrl[]"/></td><td class="col-xs-2"><input class="form-control input-sm" type="text" name="order[]" id="order_'+ FieldCount +'"></td><td><a href="#" class="removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><tr>');
+	            	} else {
+	            		$(InputsWrapper).append('<tr><td class="col-xs-4"><input class="form-control input-sm" type="text" name="mytext[]" id="field_'+ FieldCount +'"/><input type="hidden" name="childId[]" id="child_'+ FieldCount +'"/></td><td class="image"><input type="file" name="file[]" onChange="checkValue(this)"/></td><td class="col-xs-2"><input class="form-control input-sm" type="text" name="order[]" id="order_'+ FieldCount +'"></td><td><a href="#" class="removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><tr>');
+	            	}
+	            } else {
+	            	$(InputsWrapper).append('<tr><td class="col-xs-4"><input class="form-control input-sm" type="text" name="mytext[]" id="field_'+ FieldCount +'"/><input type="hidden" name="childId[]" id="child_'+ FieldCount +'"/></td><td class="image" style="display:none"></td><td class="col-xs-2"><input class="form-control input-sm" type="text" name="order[]" id="order_'+ FieldCount +'"></td><td><a href="#" class="removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><tr>');
+	            }
+	            x++; //text box increment  
+	        }  
+	return false;  
+	});
+	$("body").on("click",".removeclass", function(e){ //user click on remove text 
+          $(this).parent('td').parent('tr').remove(); //remove text box  
+          x--; //decrement textbox  
+	return false;
+	})	
 </#macro>
 
 <@layout active_id=p child_active_id=c>
@@ -478,16 +523,10 @@
 							<div class="col-sm-5 validata-box investType" >
 									<label class="control-label col-sm-4">投入类型:</label>
 									<div class="input-group col-sm-8">
-										<select class="form-control" name="invest_type" id="invest_type" multiple="multiple" >
-											<#if activity?? && investTypeList??>
-												<#list (dicts)! as dict>
-													<option value="${dict.key}" <#if dict??&&investTypeList?contains(dict.key)>selected="selected"</#if>>${(dict.name)!}</option>
-												</#list>
-											<#else>
-												<#list (dicts)! as dict>
-													<option value="${dict.key}">${(dict.name)!}</option>
-												</#list>
-											</#if>
+										<select class="form-control" name="invest_type" id="invest_type">
+											<#list (dicts)! as dict>
+												<option value="${dict.key}">${(dict.name)!}</option>
+											</#list>
 										</select>
 									</div>
 								</div>
@@ -577,6 +616,39 @@
 								</div>
 							</div>
 						</div>
+						<div id="expendDetail" style="display:none">
+							<div class="form-group">
+								<div class="col-sm-5 validata-box">
+									<label class="control-label col-sm-4">费用明细:</label>
+									<div class="input-group col-md-2 col-sm-8">
+										<span id='AddMoreFileBox' class="btn btn-default">添加明细</span>
+					               	</div>
+				               	</div>
+							</div>
+							<div class="form-group col-sm-12 validata-box">
+								<label class="control-label col-sm-2"></label>
+								<div class="input-group col-md-6 col-sm-12">
+								<table class="table table-bordered" id="valueTable">
+									<thead id="expendHead">
+									<th id="name1">费用类型</th>
+									<th id="name2">申请金额</th>
+									<th>操作</th>
+									</thead>
+									<tbody id="InputsWrapper">
+									<tr>
+										<td class="col-xs-3">
+											<select class="form-control input-sm" name=item1[]">
+												${DICT_BOX('feeType_name_PR', 'select')}
+											</select>
+										</td>
+										<td class="col-xs-2"><input class="form-control input-sm" type="text" name="item2[]" id="item2_1"></td>
+										<td><a href="#" class="removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td>
+									<tr>								
+									</tbody>						
+								</table>						
+				               	</div>
+							</div>
+						</div>						
 				</div>
 				</div>
 				<div class="tab-pane fade" id="B">
