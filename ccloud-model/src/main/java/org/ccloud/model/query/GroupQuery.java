@@ -86,7 +86,11 @@ public class GroupQuery extends JBaseQuery {
 		sqlBuilder.append("LEFT JOIN (SELECT u.group_id,u.user_id FROM user_group_rel u where u.user_id = ?) t1 on t1.group_id = g.id ");
 		final List<Object> params = new LinkedList<Object>();
 		params.add(userId);
-		sqlBuilder.append(" where g.data_area like '"+dataArea+"' ");
+		if(dataArea.equals("001%"))
+			sqlBuilder.append(" where g.data_area like '"+dataArea.substring(0, (dataArea.length()-1))+"' ");
+		else {
+			sqlBuilder.append(" where g.data_area like '"+dataArea+"' ");
+		}
 		if (params.isEmpty()) {
 			return DAO.find(sqlBuilder.toString());
 		}
