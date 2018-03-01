@@ -314,11 +314,14 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 	}
 	
 	public void put() {
+		List<Dict> invest = DictQuery.me().findDictByType(Consts.INVEST_TYPE);
+		setAttr("ilist", invest);
 		render("activityPut.html");
 	}
 	
 	public void putList() {
 		String keyword = getPara("k");
+		String invest_type = getPara("invest_type");
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
 			setAttr("k", keyword);
@@ -326,8 +329,11 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		String sellerId = getSessionAttr("sellerId");
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
-		Page<Record> page = ActivityQuery.me().activityPutPaginate(getPageNumber(), getPageSize(), keyword, startDate, endDate,sellerId);
+		Page<Record> page = ActivityQuery.me().activityPutPaginate(getPageNumber(), getPageSize(), keyword, startDate, endDate,sellerId,invest_type);
 		for(int i = 0; i <page.getList().size();i++){
+			if(page.getList().get(i).getStr("time_interval")!="") {
+				page.getList().get(i).set("time_interval", ActivityQuery.me().getTimeInterval(page.getList().get(i).getStr("time_interval")));
+			}
 			if(page.getList().get(i).getStr("invest_type")!="") {
 				page.getList().get(i).set("invest_type", ActivityQuery.me().getInvestType(page.getList().get(i).getStr("invest_type")));
 			}
