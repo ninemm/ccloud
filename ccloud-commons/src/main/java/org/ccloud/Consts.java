@@ -167,6 +167,11 @@ public class Consts {
 	public static final String OPTION_ON = "true";
 	public static final String OPTION_OFF= "false";
 
+	public static final String CUSTOMER_SUB_TYPE_A = "100301";//A类
+	public static final String CUSTOMER_SUB_TYPE_B = "100302";//B类
+	public static final String CUSTOMER_SUB_TYPE_C = "100303";//c类
+
+
 	public static final String CUSTOMER_KIND_COMMON = "100401";//普通客户
 	public static final String CUSTOMER_KIND_SELLER = "100402";//销售商客户
 
