@@ -61,7 +61,10 @@
 				data: ${productOptionList},
 				width: "100%",
 				language: "zh-CN"
-			});			
+			});	
+			<#list expenseList! as list>
+			$('#product_${list_index}').val(['${list.item2}']).trigger('change');
+			</#list>	
 	</#if>
 	var $form = $("#form");
 	var $city = $('#cityPicker');
@@ -677,14 +680,14 @@
 												<td class="col-xs-2"><input class="form-control input-sm" type="text" name="item2[]" value="${list.item2}"></td>
 												<#elseif list.flowDictType == 'channel_define'>
 													<td class="col-xs-3">
-														<select class="form-control input-sm product" name="item2[]">
+														<select class="form-control input-sm product" name="item2[]" id="product_${list_index}">
 														</select>
 													</td>
 													<td class="col-xs-2"><input class="form-control input-sm" type="text" name="item3[]" value="${list.item3}"></td>
 													<td class="col-xs-2"><input class="form-control input-sm" type="text" name="item4[]" value="${list.item4}"></td>
 												<#elseif list.flowDictType == 'feeType_name_SA'>
 													<td class="col-xs-3">
-														<select class="form-control input-sm product" name="item2[]">
+														<select class="form-control input-sm product" name="item2[]" id="product_${list_index}">
 														</select>
 													</td>
 													<td class="col-xs-2"><input class="form-control input-sm" type="text" name="item3[]" value="${list.item3}"></td>
