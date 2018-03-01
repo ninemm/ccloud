@@ -2,10 +2,11 @@
 <#macro title>拜访详情</#macro>
 <#macro script>
 	var $gallery = $("#gallery"), $galleryImg = $("#galleryImg");
+	var $uploaderFiles = $('#uploaderFiles');
 
 	$(function(){
 		var index;
-		$(document).on("click", ".uploaderFiles li", function() {
+		$uploaderFiles.on("click", "li", function() {
 			index = $(this).index();
 			$galleryImg.attr("style", this.getAttribute("style"));
 			$gallery.fadeIn(100);
@@ -102,33 +103,40 @@
 		                <div class="weui-uploader">
 		                    <div class="weui-uploader__hd">
 		                        <p class="weui-uploader__title">附件图片</p>
-		                        <!-- <div class="weui-uploader__info">${(visit.imageList?size)!0}/3</div> -->
+		                        <div class="weui-uploader__info">${(visit.imageList?size)!0}/3</div>
 		                    </div>
-		                            	<#if activityExecutes?size gt 0>
-		                            		<#list activityExecutes as list>
-		                            			<span class="weui-uploader__info">${list.remark}</span>
-		                            			<hr style="border:1px dashed #0000fff"/>
-		                   						 <div class="weui-uploader__bd">
-			                       					<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles">
-							                            <#if (visit.imageList) ??>
-						                                <#list visit.imageList as bean>
-					                            			<#if (list.order_list == bean.orderList)>
-						                                   		<li class="weui-uploader__file" style="background-image: url(${bean.savePath})"></li>
-					                            			</#if>
-						                                </#list>
-							                            </#if>
-			                      					</ul>
-		                   						 </div>
-		                   						 <hr style="border:1px dashed #0000fff"/>
-		                            		</#list>
-	                            		<#else> 
-                            				<div class="weui-uploader__bd">
-		                       					<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles">
-				                            		<#list visit.imageList as bean>
-					                                   	<li class="weui-uploader__file" style="background-image: url(${bean.savePath})"></li>
-					                                </#list>
-				                                </ul>
-	                   						 </div>
+		                    <div class="weui-uploader__bd">
+		                        <ul class="weui-uploader__files" id="uploaderFiles">
+		                            <#if (visit.imageList) ??>
+		                                <#list visit.imageList as bean>
+		                                    <li class="weui-uploader__file" style="background-image: url(${bean.savePath})"></li>
+		                                </#list>
+		                            </#if>
+		                        </ul>
+		                        <!--<div class="weui-uploader__input-box">-->
+		                        <!--&lt;!&ndash;<input id="uploaderInput" name="customer.img_path" class="weui-uploader__input" type="file" accept="image/*" multiple="">&ndash;&gt;-->
+		                        <!--<input type="hidden" name="pic" id="pic">-->
+		                        <!--</div>-->
+		                    </div>
+		                </div>
+		            </div>
+		        </div>
+		    </section>
+		    <section class="weui-panel weui-panel_access ft14 remark">
+		        <div class="weui-cell weui-cell_access">
+		            <div class="weui-cell__bd">
+		                <i class="icon-map-pin ft16 green"></i> ${(visit.location)!}
+		            </div>
+		        </div>
+		    </section>
+		</main>
+		<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
+		    <button class="white-button-no-border weui-flex__item _submit_btn border-top-1px return_index">首页</button>
+		    <button class="red-button weui-flex__item _submit_btn"onclick="getback()">返回</button>
+		</footer>
+	</div>
+</div>
+</@layout> 						 </div>
 		                            	</#if>
 		                        <!--<div class="weui-uploader__input-box">-->
 		                        <!--&lt;!&ndash;<input id="uploaderInput" name="customer.img_path" class="weui-uploader__input" type="file" accept="image/*" multiple="">&ndash;&gt;-->

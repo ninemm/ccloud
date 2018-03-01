@@ -289,9 +289,14 @@ public class CustomerVisitController extends BaseFrontController {
 		
 		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 		List<String> typeList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeNameListBySellerCustomerId(customerVisit.getSellerCustomerId(), dataArea);
-
+		String imageListStore = customerVisit.getPhoto();
+		List<ImageJson> list = JSON.parseArray(imageListStore, ImageJson.class);
+		List<ActivityExecute> activityExecutes = ActivityExecuteQuery.me().findByCustomerVisitId(id);
+		
 		setAttr("customerVisit", customerVisit);
 		setAttr("cTypeName", Joiner.on(",").join(typeList.iterator()));
+		setAttr("list",list);
+		setAttr("activityExecutes",activityExecutes);
 		
 		//审核后将message中是否阅读改为是
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);

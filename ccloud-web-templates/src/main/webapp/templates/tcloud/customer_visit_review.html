@@ -470,17 +470,34 @@
                     <div class="weui-uploader">
                         <div class="weui-uploader__hd">
                             <p class="weui-uploader__title">拜访实景图</p>
-                            <div class="weui-uploader__info">${(customerVisit.imageList?size)!0}/3</div>
-                        </div>
-                        <div class="weui-uploader__bd">
-                            <ul class="weui-uploader__files" id ="uploaderFiles1">
-                                <#if (customerVisit.imageList) ??>
-                                    <#list customerVisit.imageList as bean>
-                                        <li class="weui-uploader__file" style="background-image: url(${bean.savePath})"></li>
-                                    </#list>
-                                </#if>
-                            </ul>
-                        </div>
+                            <!-- <div class="weui-uploader__info">${(visit.imageList?size)!0}/3</div> -->
+		                </div>
+                           	<#if activityExecutes?size gt 0>
+                           		<#list activityExecutes as list>
+                           			<span class="weui-uploader__info">${list.remark}</span>
+                           			<hr style="border:1px dashed #0000fff"/>
+                  						 <div class="weui-uploader__bd">
+                       					<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles">
+				                            <#if (customerVisit.imageList) ??>
+			                                <#list customerVisit.imageList as bean>
+		                            			<#if (list.order_list == bean.orderList)>
+			                                   		<li class="weui-uploader__file" style="background-image: url(${bean.savePath})"></li>
+		                            			</#if>
+			                                </#list>
+				                            </#if>
+                      					</ul>
+                  						 </div>
+                  						 <hr style="border:1px dashed #0000fff"/>
+                           		</#list>
+                          		<#else> 
+                         				<div class="weui-uploader__bd">
+                      					<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles">
+	                            		<#list customerVisit.imageList as bean>
+		                                   	<li class="weui-uploader__file" style="background-image: url(${bean.savePath})"></li>
+		                                </#list>
+	                                </ul>
+                 						 </div>
+                           	</#if>
                     </div>
                 </div>
             </div>
