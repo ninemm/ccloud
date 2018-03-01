@@ -55,7 +55,14 @@
 	var InputsWrapper   = $("#InputsWrapper"); //Input boxes wrapper ID  
 	var AddButton       = $("#AddMoreFileBox"); //Add button ID  
 	var x = InputsWrapper.length; //initlal text box count 
-		
+	
+	<#if activity.investType?? && (activity.investType == '101105' || activity.investType == '101107')>
+			$(".product").select2({
+				data: ${productOptionList},
+				width: "100%",
+				language: "zh-CN"
+			});			
+	</#if>
 	var $form = $("#form");
 	var $city = $('#cityPicker');
 	var data = {url: '', alt: ''};
@@ -263,7 +270,7 @@
 	}
 	
 	function showType(el){
-		var typeCode = $("#feeTypeId").val();
+		var typeCode = $(el).val();
 		if (typeCode == 102032) {
 			$(el).parent().parent().find("td:eq(1)").find("select").empty();
 			$(el).parent().parent().find("td:eq(1)").find("select").append('${DICT_BOX('display_publish', 'select')}');
