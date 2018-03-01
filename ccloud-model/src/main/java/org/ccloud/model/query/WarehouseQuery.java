@@ -156,11 +156,9 @@ public class WarehouseQuery extends JBaseQuery {
 	}
 
 	public List<Record> findBySeller(String toWarehouseId) {
-		StringBuilder fromBuilder = new StringBuilder(" select s.seller_name,w.id warehouseId,s.id sellerId");
-		fromBuilder.append(" FROM cc_warehouse w ");
-		fromBuilder.append(" LEFT JOIN cc_inventory i ON i.warehouse_id=w.id ");
-		fromBuilder.append(" LEFT JOIN cc_seller s ON s.id=i.seller_id  ");
-		fromBuilder.append(" where w.id='"+toWarehouseId+"' GROUP BY s.id,w.id ");
+		StringBuilder fromBuilder = new StringBuilder(" SELECT cs.seller_name,cs.id sellerId ");
+		fromBuilder.append(" FROM cc_seller cs ");
+		fromBuilder.append(" WHERE cs.id in(SELECT i.seller_id FROM cc_inventory i WHERE i.warehouse_id='"+toWarehouseId+"' GROUP BY i.seller_id)");
 		return Db.find(fromBuilder.toString());
 	}	
 	
