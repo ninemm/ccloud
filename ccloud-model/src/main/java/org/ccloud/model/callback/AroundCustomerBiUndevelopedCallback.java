@@ -65,8 +65,8 @@ public class AroundCustomerBiUndevelopedCallback implements ICallback {
 				map.put("city_name", resultSet.getString("city_name"));
 				map.put("country_name", resultSet.getString("country_name"));
 				map.put("address", resultSet.getString("address"));
-				map.put("lng", resultSet.getLong("lng"));
-				map.put("lat", resultSet.getLong("lat"));
+				map.put("lng", resultSet.getDouble("lng"));
+				map.put("lat", resultSet.getDouble("lat"));
 				map.put("dist", resultSet.getLong("dist"));
 				result.add(map);
 			}
