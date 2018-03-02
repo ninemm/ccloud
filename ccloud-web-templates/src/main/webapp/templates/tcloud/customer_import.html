@@ -26,7 +26,7 @@
     $(function() {
         $(document).on("input", "#searchInput", function() {
             clearTimeout(time);
-            time = setTimeout(function(){combo();},500)
+            time = setTimeout(function(){combo();},500);
         }).on("click", ".nearby-customer", function(){
             sign = 1;
             combo();
