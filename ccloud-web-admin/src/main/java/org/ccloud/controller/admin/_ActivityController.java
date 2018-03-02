@@ -42,12 +42,17 @@ import org.ccloud.model.query.ActivityQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.DictQuery;
 import org.ccloud.model.query.ExpenseDetailQuery;
+import org.ccloud.model.query.OptionQuery;
 import org.ccloud.model.query.QyBasicfeetypeQuery;
 import org.ccloud.model.query.QyExpenseQuery;
 import org.ccloud.model.query.QyExpensedetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
+import org.ccloud.model.vo.ImageJson;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
@@ -532,6 +537,23 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			}
 			if(page.getList().get(i).getStr("invest_type")!="") {
 				page.getList().get(i).set("invest_type", ActivityQuery.me().getInvestType(page.getList().get(i).getStr("invest_type")));
+			}
+			if(page.getList().get(i).getStr("photo")!="") {
+				List<ImageJson> list = Lists.newArrayList();
+				JSONArray picList = JSON.parseArray(page.getList().get(i).getStr("photo"));
+
+				for (int  a= 0; a <picList.size(); a++) {
+
+					JSONObject obj = picList.getJSONObject(a);
+					String savePath = obj.getString("savePath");
+					String originalPath = obj.getString("originalPath");
+
+					ImageJson image = new ImageJson();
+					image.setOriginalPath(originalPath);
+					image.setSavePath(savePath);
+					list.add(image);
+				}
+				page.getList().get(i).set("photo", list);
 			}
 		}
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
