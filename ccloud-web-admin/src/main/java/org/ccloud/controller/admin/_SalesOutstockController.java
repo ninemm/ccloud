@@ -431,7 +431,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 					OutstockPrint outstockPrint = new OutstockPrint();
 					outstockPrint.setId(StrKit.getRandomUUID());
 					outstockPrint.setOrderId(printAllNeedInfo.getOrderId());
-					outstockPrint.setBizUserId(printAllNeedInfo.getBizUserId());
+					outstockPrint.setBizUserId(user.getId());
 					outstockPrint.setDeptId(user.getDepartmentId());
 					outstockPrint.setDataArea(user.getDataArea());
 					outstockPrint.setCreateDate(new Date());
