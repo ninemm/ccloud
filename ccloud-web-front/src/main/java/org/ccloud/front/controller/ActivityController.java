@@ -41,12 +41,11 @@ public class ActivityController extends BaseFrontController {
 
 	public void index() {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		List<Record> activityRecords = ActivityQuery.me().findActivityListForApp(sellerId, "", "");
 		for(int i = 0; i <activityRecords.size();i++){
 			if(activityRecords.get(i).getStr("customer_type")!="") {
 				activityRecords.get(i).set("customerTypeName", ActivityQuery.me().getCustomerTypes(activityRecords.get(i).getStr("customer_type")));}
-			activityRecords.get(i).set("surplusNum",Integer.parseInt( activityRecords.get(i).getStr("total_customer_num"))-ActivityApplyQuery.me().findByUserIdAndActivityId(activityRecords.get(i).getStr("id"),user.getId()).size());
+			//activityRecords.get(i).set("surplusNum",Integer.parseInt( activityRecords.get(i).getStr("total_customer_num"))-ActivityApplyQuery.me().findByUserIdAndActivityId(activityRecords.get(i).getStr("id"),user.getId()).size());
 		}
 		List<Map<String, Object>> activityList = new ArrayList<Map<String, Object>>();
 		
@@ -163,12 +162,20 @@ public class ActivityController extends BaseFrontController {
 			item.put("value", customer_type);
 			customerTypes.add(item);
 		}
+		List<ExpenseDetail> expenseDetails = ExpenseDetailQuery.me().findByActivityId(activity_id);
+		List<Map<String, Object>> details = new ArrayList<>();
+		for(ExpenseDetail detail:expenseDetails) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", DictQuery.me().findByKey(detail.getFlowDictType(), detail.getItem1()).getName());
+			item.put("value", detail.getId());
+			details.add(item);
+		}
 
 		setAttr("userIds", JSON.toJSON(userIds));
 		setAttr("customerTypes", JSON.toJSON(customerTypes));
 		setAttr("customerTypeId", customer_type);
 		setAttr("areaType", activity.getStr("area_type"));
-
+		setAttr("details",JSON.toJSON(details));
 		render("activity_apply.html");
 	}
 
