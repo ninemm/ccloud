@@ -1043,6 +1043,10 @@ public class CustomerController extends BaseFrontController {
 		String lat = getPara("lat");
 		String searchKey = getPara("keyword");
 
+		if(StrKit.isBlank(lng)) {
+			renderAjaxResultForError("没有定位信息");
+			return;
+		}
 		BigDecimal latitude = new BigDecimal(lat);
 		BigDecimal longitude = new BigDecimal(lng);
 

@@ -16,6 +16,7 @@
 
 <#macro script_import>
     <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=Ec4VbDTTjjuEGtVGzSvPwwQtvnvWFeGY"></script>
 </#macro>
 
 <#macro script>
@@ -158,9 +159,9 @@
 
                 var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
                 var geoc = new BMap.Geocoder();                   // 获取百度地址解析器
-                    $("#lng").val(parseFloat(longitude).toFixed(6));
-                    $("#lat").val(parseFloat(latitude).toFixed(6));
-                },
+                $("#lng").val(parseFloat(longitude).toFixed(6));
+                $("#lat").val(parseFloat(latitude).toFixed(6));
+            },
             cancel: function (res) {
                 console.log('用户拒绝授权获取地理位置');
             },
@@ -196,10 +197,12 @@
                 <span><i class="icon-user"></i></span>
                 公司客户
             </div>
+            <@shiro.hasPermission name="/admin/sellerCustomer/import">
             <div class="weui-flex__item nearby-customer">
                 <span><i class="icon-map-marker"></i></span>
                 附近客户
             </div>
+            </@shiro.hasPermission>
             <input type="hidden" name="lng" id="lng">
             <input type="hidden" name="lat" id="lat">
         </div>
