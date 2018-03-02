@@ -543,7 +543,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				JSONArray picList = JSON.parseArray(page.getList().get(i).getStr("photo"));
 
 				for (int  a= 0; a <picList.size(); a++) {
-
+					
 					JSONObject obj = picList.getJSONObject(a);
 					String domain = OptionQuery.me().findValue("cdn_domain");
 					String savePath = obj.getString("savePath");
