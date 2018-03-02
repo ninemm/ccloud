@@ -10,7 +10,7 @@
 	<script src="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.zh-CN.js"></script>
 	<!-- bootstrapvalidator -->
 	<script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
-
+	
 </#macro>
 
 <#macro css_import>
@@ -63,7 +63,7 @@
 		};
 		return param;
 	};
-
+	
 	var initFields = function() {
 		var fields =
 			[	
@@ -74,12 +74,11 @@
 				{field: "customer_type", title: "终端类型", align: "center", width: '10%', edit:false},
 				{field: "realname", title: "投放/补录人", align: "center", width: '10%', edit:false},
       			{field: "putDate", title: "投放/补录时间", align: "center", width: '10%', edit:false},
-      			{field: "photo", title: "执行照片", align: "center", width: '10%',
+      			{field: "photo", title: "执行照片", align: "center", width: '30%',
       			formatter: function(value, row, rowIndex) {
-      				var strHtml='<ul class="weui-uploader__files">';
-      				for(var  i= 0; i <row.photo.length; i++){
-      				
-      					strHtml+='<li class="weui-uploader__file" style="width: 80px;height: 80px;background-image:url('+ row.photo[i].savePath +')"></li>';
+      				var strHtml='<ul class="weui-uploader__files" id="uploaderFiles">';
+      				for(var i= 0; i <row.photo.length; i++){
+      					strHtml+='<li onclick="img()" value='+row.photo[i].savePath+' class="weui-uploader__file" style="display: inline-block;background-size: cover;width: 80px;height: 80px;background-image:url('+ row.photo[i].savePath +')"></li>';
       				}
       				strHtml+='</ul>';
 					return strHtml;
@@ -101,7 +100,7 @@
 			}
 		}
 	};
-	
+
 </#macro>
 
 <@layout active_id=p child_active_id=c>
