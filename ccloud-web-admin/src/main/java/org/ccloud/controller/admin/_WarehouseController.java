@@ -27,6 +27,7 @@ import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
+import org.ccloud.model.Department;
 import org.ccloud.model.User;
 import org.ccloud.model.UserJoinWarehouse;
 import org.ccloud.model.Warehouse;
@@ -168,7 +169,7 @@ public class _WarehouseController extends JBaseCRUDController<Warehouse> {
 				String warehouse_id=getPara("id");
 				String userIds = getPara("userIds");
 				User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-				String user_id = user.getId();
+				String user_id = WarehouseQuery.me().findWarehouseIdByUserId(warehouse_id);
 				int i=UserJoinWarehouseQuery.me().deleteWarehouseId(warehouse_id);
 				if (i==0) {
 					renderAjaxResultForError("删除失败");
@@ -199,14 +200,17 @@ public class _WarehouseController extends JBaseCRUDController<Warehouse> {
 	public void getSeller() {
 		 String toWarehouseId = getPara("toWarehouseId");
 		 List<Record> findBySeller = WarehouseQuery.me().findBySeller(toWarehouseId);
-
 		 List<Map<String, Object>> list = new ArrayList<>();
 		 for (Record record : findBySeller) {
-			Map<String, Object> map = new HashMap<>();
-			map.put("seller_name", record.get("seller_name"));
-			map.put("sellerId", record.get("sellerId"));
-			list.add(map);
-		 }
+			 if (record.getStr("department_id")!=null) {
+				List<Department> Department = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(record.getStr("department_id"));
+				Department dept = Department.get(0);
+				Map<String, Object> map = new HashMap<>();
+				map.put("seller_name", dept.getStr("seller_name"));
+				map.put("sellerId", dept.getStr("seller_id"));
+				list.add(map);
+			 }
+		}
 		 renderJson(list);
 	}
 }

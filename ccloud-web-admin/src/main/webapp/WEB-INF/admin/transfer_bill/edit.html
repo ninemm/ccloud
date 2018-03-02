@@ -155,6 +155,11 @@ function deleteTr(obj){
 $("#from_warehouse_id").change(function(){
     var fromWarehouseId = $("#from_warehouse_id").val();
     initProduct(fromWarehouseId);
+    var $tbody = $("#dataTable tbody");
+    var $tr = $tbody.find("tr");
+    for(var i = 1; i < $tr.length; i ++) {
+    		$tr[i].remove();
+    }
 })
 
 
