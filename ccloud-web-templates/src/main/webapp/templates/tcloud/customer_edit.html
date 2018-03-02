@@ -84,7 +84,7 @@
         
         if($("#delivery-address").val().length == 2) $("#delivery-address").val('');
 
-        <#if type!="company">
+        <#if type!="company" && type!="add">
         $("#delivery-address").cityPicker({
             title: "请选择配送地址",
             onClose: function(obj) {
@@ -332,6 +332,15 @@
                                 $("#delivery-address")[0].value = addComp.province + " " + addComp.city + " " + addComp.district;
                                 $('#areaCode').val(addComp.provinceNumber + "," + addComp.cityNumber + "," + addComp.districtNumber);
                                 $('#areaName').val(addComp.province + "," + addComp.city + "," + addComp.district);
+                                $("#delivery-address").cityPicker({
+                                    title: "请选择配送地址",
+                                    onClose: function(obj) {
+                                        var areaCode = obj.value.join(",");
+                                        var areaName = obj.displayValue.join(",");
+                                        $('#areaCode').val(areaCode);
+                                        $('#areaName').val(areaName);
+                                    }
+                                });
                             </#if>
                             $('#location-span').text(address);
                             $('#location').val(address);
