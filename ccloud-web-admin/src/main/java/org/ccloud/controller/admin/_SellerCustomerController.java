@@ -715,7 +715,11 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			setAttr("diffAttrList", diffAttrList);
 		} else if(isEnable.equals("2")) {
 			List<String> diffAttrList = new ArrayList<>();
-			diffAttrList.add("导入客户");
+			diffAttrList.add("导入公司客户");
+			setAttr("diffAttrList", diffAttrList);
+		} else if(isEnable.equals("3")) {
+			List<String> diffAttrList = new ArrayList<>();
+			diffAttrList.add("导入附近客户");
 			setAttr("diffAttrList", diffAttrList);
 		} else {
 			List<String> diffAttrList = new ArrayList<>();
@@ -770,14 +774,15 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 							.trimResults()
 							.splitToList(customerVO.getAreaName());
 
-					if (areaCodeList.size() == 3 && areaNameList.size() == 3) {
-
+					if (areaCodeList.size() == 3){
 						customer.setProvCode(areaCodeList.get(0));
-						customer.setProvName(areaNameList.get(0));
 						customer.setCityCode(areaCodeList.get(1));
-						customer.setCityName(areaNameList.get(1));
-
 						customer.setCountryCode(areaCodeList.get(2));
+					}
+
+					if (areaNameList.size() == 3) {
+						customer.setProvName(areaNameList.get(0));
+						customer.setCityName(areaNameList.get(1));
 						customer.setCountryName(areaNameList.get(2));
 					}
 				}

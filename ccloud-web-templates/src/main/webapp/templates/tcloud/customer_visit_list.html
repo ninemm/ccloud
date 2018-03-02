@@ -32,11 +32,13 @@
   			var nature = getItemBykey("nature");
   			var level = getItemBykey("level");
   			var status = getItemBykey("status");
+  			var user = getItemBykey("user");
   			var keywordName = getItemBykey("keyword");
   			$("#customer-type").val(type);
   			$("#customer-nature").val(nature);
   			$("#customer-level").val(level);
   			$("#customer-status").val(status);
+  			$("#bizUser").val(user);  
             if(keywordName !=null && keywordName.length!=0) {
                 $('.weui-search-bar').addClass('weui-search-bar_focusing');
                 $("#searchInput").val(keywordName);
@@ -56,6 +58,10 @@
 			setItemBykey("natureId", $("#customer-nature").data('values'));
 			setItemBykey("nature", $("#customer-nature").val());
 			refresh();
+		}).on("change", "#bizUser", function() {
+			setItemBykey("userId", $("#bizUser").data('values'));
+			setItemBykey("user", $("#bizUser").val());
+			refresh();
 		}).on("change", "#customer-level", function() {
 			setItemBykey("levelId", $("#customer-level").data('values'));
 			setItemBykey("level", $("#customer-level").val());
@@ -73,6 +79,10 @@
         $("#customer-nature").select({
             title: "选择客户性质",
             items: ${nature!}
+        });
+        $("#bizUser").select({
+            title: "选择拜访人",
+            items: ${bizUserList!}
         });
         $("#customer-level").select({
             title: "选择客户级别",
@@ -93,12 +103,14 @@
             "pageSize": pageSize,
             "type": $("#customer-type")[0].dataset.values,
             "nature": $("#customer-nature")[0].dataset.values,
+            "user": $("#bizUser")[0].dataset.values,
             "level": $("#customer-level")[0].dataset.values,
             "status": $("#customer-status")[0].dataset.values
         };
         <#else>
 			var type = getItemBykey("typeId");
   			var nature = getItemBykey("natureId");
+  			var user = getItemBykey("userId");
   			var level = getItemBykey("levelId");
   			var status = getItemBykey("statusId");
   			var searchKey = getItemBykey("keyword");
@@ -108,6 +120,7 @@
 	            "pageSize": pageSize,
 	            "type": type,
 	            "nature": nature,
+	             "user": user,
 	            "level": level,
 	            "status": status
 			};
@@ -200,6 +213,10 @@
                     </div>
                     <div class="weui-flex__item" style="display:none; ">
                         <input type="text" id="customer-nature" placeholder="客户性质" class="weui-input" readonly >
+                        <i class="icon-sort-desc"></i>
+                    </div>
+                    <div class="weui-flex__item">
+                        <input type="text" id="bizUser" placeholder="拜访人" class="weui-input" readonly >
                         <i class="icon-sort-desc"></i>
                     </div>
                     <div class="weui-flex__item">

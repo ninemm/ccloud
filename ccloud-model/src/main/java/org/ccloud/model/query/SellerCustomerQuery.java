@@ -23,6 +23,7 @@ import com.jfinal.plugin.ehcache.IDataLoader;
 import org.ccloud.Consts;
 import org.ccloud.model.SellerCustomer;
 import org.ccloud.model.callback.CustomerNearbyCallback;
+import org.ccloud.model.callback.AroundCustomerBiUndevelopedCallback;
 import org.ccloud.utils.DateUtils;
 import org.joda.time.DateTime;
 
@@ -442,6 +443,20 @@ public class SellerCustomerQuery extends JBaseQuery {
 		sql.append(") AS c");
 		return Db.paginate(pageNumber, pageSize, select, sql.toString(), params.toArray());
 
+	}
+
+	public List<Map<String, Object>> findImportAroundCustomer(double dist, BigDecimal lng,BigDecimal lat,String searchKey, String sellerId){
+
+		AroundCustomerBiUndevelopedCallback callback = new AroundCustomerBiUndevelopedCallback();
+		callback.setLon(lng);
+		callback.setLat(lat);
+		callback.setSearchKey(searchKey);
+		callback.setDist(dist);
+		callback.setSellerId(sellerId);
+
+		@SuppressWarnings("unchecked")
+		List<Map<String, Object>> result = (List<Map<String, Object>>) Db.execute(callback);
+		return result;
 	}
 	
 	public Page<Record> _paginateForApp(int pageNumber, int pageSize, String keyword, String dataArea, String userId,

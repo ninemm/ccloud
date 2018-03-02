@@ -328,15 +328,16 @@ public class ProductQuery extends JBaseQuery {
 	 */
 	public List<ProductInfo> getProductInfoByInventory(String sellerId,String warehouseId) {
 		StringBuilder fromBuilder = new StringBuilder("SELECT p.create_date as createDate,sp.id as sellerProductId, p.cost, p.is_marketable as isMarketable, p.market_price as marketPrice, p.`name`, p.price, sp.store_count,p.id as productId, ");
-		fromBuilder.append("p.product_sn as productSn,sp.custom_name as customName, p.store, p.store_place,p.big_unit as bigUnit, p.weight, p.weight_unit as weightUnit, g.`code`, b.`name` as brandName, c.`name` as categoryName, t1.valueName,t2.balance_count ");
-		fromBuilder.append("FROM cc_product p ");
-		fromBuilder.append("LEFT JOIN cc_seller_product sp ON sp.product_id = p.id ");
+		fromBuilder.append("p.product_sn as productSn,sp.custom_name as customName, p.store, p.store_place,p.big_unit as bigUnit, p.weight, p.weight_unit as weightUnit, g.`code`, b.`name` as brandName, c.`name` as categoryName, t1.valueName,IFNULL(t2.balance_count,0) balance_count ");
+		fromBuilder.append("FROM ( SELECT( IFNULL(SUM(c.in_count) , 0) - IFNULL(SUM(c.out_count) , 0)) balance_count , c.sell_product_id FROM cc_inventory_detail c WHERE c.warehouse_id =? GROUP BY c.sell_product_id , c.warehouse_id) t2 ");
+		fromBuilder.append("LEFT JOIN cc_seller_product sp ON t2.sell_product_id = sp.id ");
+		fromBuilder.append("LEFT JOIN cc_product p  ON sp.product_id = p.id ");
 		fromBuilder.append("LEFT JOIN cc_goods g ON p.goods_id = g.id ");
 		fromBuilder.append("LEFT JOIN cc_brand b ON g.brand_id = b.id ");
 		fromBuilder.append("LEFT JOIN cc_goods_category c ON g.goods_category_id = c.id ");
 		fromBuilder.append("LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
 		fromBuilder.append("RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = sp.product_id ");
-		fromBuilder.append("LEFT JOIN( SELECT( IFNULL(SUM(c.in_count) , 0) - IFNULL(SUM(c.out_count) , 0)) balance_count , c.sell_product_id FROM cc_inventory_detail c WHERE c.warehouse_id =? GROUP BY c.sell_product_id , c.warehouse_id) t2 ON t2.sell_product_id = sp.id ");
+		
 		if (null!=sellerId) {
 			fromBuilder.append(" WHERE sp.seller_id ='"+sellerId+"'");
 		}

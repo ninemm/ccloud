@@ -54,7 +54,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 		});
 	}
 
-	public Page<CustomerVisit> paginate(int pageNumber, int pageSize, String keyword, String dataArea,String customerType,String questionType,String groupBy, String orderby, String status) {
+	public Page<CustomerVisit> paginate(int pageNumber, int pageSize, String keyword, String dataArea,String customerType,String questionType,String groupBy, String orderby, String status,String bizUserId) {
 		
 		String select = "select cc_v.*,cc.customer_name,(select realname from `user` where id = cc_v.user_id) visit_user,u.realname review_user,GROUP_CONCAT(cc_t.`name`) customer_type, d.name questionName, art.ID_ taskId ";
 		boolean needWhere = true;
@@ -77,6 +77,10 @@ public class CustomerVisitQuery extends JBaseQuery {
 		if(StrKit.notBlank(status)) {
 			needWhere = appendIfNotEmpty(fromBuilder, "cc_v.status", status, params, needWhere);
 		}
+		
+		if(StrKit.notBlank(bizUserId)) {
+			needWhere = appendIfNotEmpty(fromBuilder, "cc_v.user_id", bizUserId, params, needWhere);
+		}
 
 		fromBuilder.append(" GROUP BY cc_v.id ");
 		fromBuilder.append(" ORDER BY " + orderby);
@@ -86,7 +90,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
-	public Page<Record> paginateForApp(int pageNumber, int pageSize, String id, String type, String nature, String subType, String status, String dataArea, String searchKey) {
+	public Page<Record> paginateForApp(int pageNumber, int pageSize, String id, String type, String nature,String user, String subType, String status, String dataArea, String searchKey) {
 
 		boolean needwhere = false;
 		List<Object> params = new LinkedList<Object>();
@@ -122,9 +126,9 @@ public class CustomerVisitQuery extends JBaseQuery {
 		needwhere = appendIfNotEmptyWithLike(sql, "t1.customerTypeNames", type, params, needwhere);
 		needwhere = appendIfNotEmpty(sql, "csc.sub_type", subType, params, needwhere);
 		needwhere = appendIfNotEmpty(sql,"csc.id", id, params, needwhere);
-
+		
 		needwhere = appendIfNotEmpty(sql, "ccv.status", status, params, needwhere);
-
+		needwhere = appendIfNotEmpty(sql, "ccv.user_id", user, params, needwhere);
 		sql.append("ORDER BY  ccv.create_date desc, ccv.`status` ");
 		sql.append(") AS c");
 		return Db.paginate(pageNumber, pageSize,select ,sql.toString(), params.toArray());
@@ -224,7 +228,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 		return Db.findFirst(fromBuilder.toString(), visitId);
 	}
 	
-	public List<Record> exportVisit(String keyword, String dataArea,String customerType,String questionType,String groupBy, String orderby, String status){
+	public List<Record> exportVisit(String keyword, String dataArea,String customerType,String questionType,String groupBy, String orderby, String status,String bizUserId){
 
 		StringBuilder fromBuilder = new StringBuilder("select cc_v.*,(select `name` from dict where type='customer_audit' and `value`=cc_v.`status`) visitStatus,cc.customer_name,(select realname from `user` where id = cc_v.user_id) visit_user,u.realname review_user,GROUP_CONCAT(cc_t.`name`) customer_type, d.name questionName, art.ID_ taskId,cc.mobile customerMobile ");
 		fromBuilder.append("from cc_customer_visit cc_v left join cc_seller_customer cc_s on cc_v.seller_customer_id = cc_s.id left join cc_customer cc on cc_s.customer_id = cc.id ");
@@ -247,6 +251,10 @@ public class CustomerVisitQuery extends JBaseQuery {
 
 		if(StrKit.notBlank(status)) {
 			fromBuilder.append("and cc_v.status = '"+status+"' ");
+		}
+		
+		if(StrKit.notBlank(bizUserId)) {
+			fromBuilder.append("and cc_v.user_id = '"+bizUserId+"' ");
 		}
 
 		fromBuilder.append(" GROUP BY cc_v.id ");
@@ -306,5 +314,10 @@ public class CustomerVisitQuery extends JBaseQuery {
 	public List<Record> findByActivity(String id) {
 		String sql="SELECT a.title FROM cc_customer_visit_join_activity cvja LEFT JOIN cc_activity a ON a.id = cvja.activity_id WHERE cvja.customer_visit_id =?";
 		return Db.find(sql.toString(), id);
+	}
+	
+	public List<CustomerVisit> findByDataArea(String dataArea){
+		String sql = "select v.* ,u.realname from cc_customer_visit v LEFT JOIN `user` u on u.id = v.user_id where v.data_area like '"+dataArea+"' GROUP BY v.user_id";
+		return DAO.find(sql);
 	}
 }

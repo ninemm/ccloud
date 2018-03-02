@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.jfinal.kit.Ret;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -340,6 +341,8 @@ public class CustomerController extends BaseFrontController {
 		String history = getPara("history");
 		setAttr("history", history);	
 		setAttr("customerType", JSON.toJSONString(getCustomerType()));
+		if(StrKit.notBlank(id)) setAttr("type", "edit");
+		else setAttr("type", "add");
 		
 		render("customer_edit.html");
 	}
@@ -482,8 +485,15 @@ public class CustomerController extends BaseFrontController {
 			}
 		}
 
-		if (isChecked)
-			updated = startProcess(sellerCustomer.getId(), map, 0);
+		if (isChecked) {
+			String type = getPara("type");
+
+			int isEnable = 0;
+			if(StrKit.notBlank(type))
+				if(type.equals("around")) isEnable = 3;
+
+			updated = startProcess(sellerCustomer.getId(), map, isEnable);
+		}
 
 		if (updated)
 			renderAjaxResultForSuccess("操作成功");
@@ -575,13 +585,17 @@ public class CustomerController extends BaseFrontController {
 			List<String> diffAttrList = new ArrayList<>();
 			diffAttrList.add("新增客户");
 			setAttr("diffAttrList", diffAttrList);
-		} else if(isEnable.equals("2")) {
-			List<String> diffAttrList = new ArrayList<>();
-			diffAttrList.add("导入客户");
-			setAttr("diffAttrList", diffAttrList);
-		} else {
+		} else if(isEnable.equals("1")) {
 			List<String> diffAttrList = new ArrayList<>();
 			diffAttrList.add("申请停用");
+			setAttr("diffAttrList", diffAttrList);
+		} else if(isEnable.equals("2")) {
+			List<String> diffAttrList = new ArrayList<>();
+			diffAttrList.add("导入公司客户");
+			setAttr("diffAttrList", diffAttrList);
+		}else if(isEnable.equals("3")) {
+			List<String> diffAttrList = new ArrayList<>();
+			diffAttrList.add("导入附近客户");
 			setAttr("diffAttrList", diffAttrList);
 		}
 		
@@ -662,14 +676,15 @@ public class CustomerController extends BaseFrontController {
 							.trimResults()
 							.splitToList(customerVO.getAreaName());
 
-					if (areaCodeList.size() == 3 && areaNameList.size() == 3) {
-
+					if (areaCodeList.size() == 3){
 						customer.setProvCode(areaCodeList.get(0));
-						customer.setProvName(areaNameList.get(0));
 						customer.setCityCode(areaCodeList.get(1));
-						customer.setCityName(areaNameList.get(1));
-
 						customer.setCountryCode(areaCodeList.get(2));
+					}
+
+					if (areaNameList.size() == 3) {
+						customer.setProvName(areaNameList.get(0));
+						customer.setCityName(areaNameList.get(1));
 						customer.setCountryName(areaNameList.get(2));
 					}
 				}
@@ -791,7 +806,7 @@ public class CustomerController extends BaseFrontController {
 		else
 			renderAjaxResultForError("操作失败");
 	}
-	//isEnable 0:新增或编辑 1:停用 2:导入
+	//isEnable 0:新增或编辑 1:停用 2:导入公司客户 3:导入附件客户
 	private boolean startProcess(String customerId, Map<String, Object> param, int isEnable) {
 		
 		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(customerId);
@@ -903,14 +918,15 @@ public class CustomerController extends BaseFrontController {
 				.trimResults()
 				.splitToList(areaName);
 
-		if (areaCodeList.size() == 3 && areaNameList.size() == 3) {
-
+		if (areaCodeList.size() == 3){
 			customer.setProvCode(areaCodeList.get(0));
-			customer.setProvName(areaNameList.get(0));
 			customer.setCityCode(areaCodeList.get(1));
-			customer.setCityName(areaNameList.get(1));
-
 			customer.setCountryCode(areaCodeList.get(2));
+		}
+
+		if (areaNameList.size() == 3) {
+			customer.setProvName(areaNameList.get(0));
+			customer.setCityName(areaNameList.get(1));
 			customer.setCountryName(areaNameList.get(2));
 		}
 		customer.setLat(sellerCustomer.getLat());
@@ -1000,6 +1016,7 @@ public class CustomerController extends BaseFrontController {
 		render("customer_detail.html");
 	}
 
+	@Before(WechatJSSDKInterceptor.class)
 	public void importCustomer() {
 		render("customer_import.html");
 	}
@@ -1018,6 +1035,26 @@ public class CustomerController extends BaseFrontController {
 		renderJson(map);
 	}
 
+	public void getImportAroundCustomerList(){
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+
+		Double dist = 2d;
+		String lng = getPara("lng");
+		String lat = getPara("lat");
+		String searchKey = getPara("keyword");
+
+		BigDecimal latitude = new BigDecimal(lat);
+		BigDecimal longitude = new BigDecimal(lng);
+
+		List<Department>  departmentList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
+		String corpSellerId = departmentList.get(departmentList.size()-1).getStr("seller_id");
+
+		List<Map<String, Object>> customerList = SellerCustomerQuery.me().findImportAroundCustomer(dist, longitude, latitude, searchKey, corpSellerId);
+		Map<String, Object> map = new HashMap<>();
+		map.put("customerList", customerList);
+		renderJson(map);
+	}
+
 	@Before(WechatJSSDKInterceptor.class)
 	public void gotoEdit() {
 		String id = getPara("id");
@@ -1028,7 +1065,28 @@ public class CustomerController extends BaseFrontController {
 			setAttr("sellerCustomer", sellerCustomer);
 
 		}
-		setAttr("type", "save");
+		setAttr("type", "company");
+		setAttr("customerType", JSON.toJSONString(getCustomerType()));
+		render("customer_edit.html");
+	}
+
+	@Before(WechatJSSDKInterceptor.class)
+	public void gotoAroundEdit() {
+		String id = getPara("id");
+		if (StrKit.notBlank(id)) {
+			CustomerStore customerStore = CustomerStoreQuery.me().findById(id);
+			Ret sellerCustomer = Ret.create();
+			sellerCustomer.set("customer_name", customerStore.getName());
+			sellerCustomer.set("mobile", customerStore.getTelephone());
+			sellerCustomer.set("prov_name", customerStore.getProvName());
+			sellerCustomer.set("city_name", customerStore.getCityName());
+			sellerCustomer.set("country_name", customerStore.getCountryName());
+			sellerCustomer.set("address", customerStore.getAddress());
+			sellerCustomer.set("lng", customerStore.getLng());
+			sellerCustomer.set("lat", customerStore.getLat());
+			setAttr("sellerCustomer", sellerCustomer);
+		}
+		setAttr("type", "around");
 		setAttr("customerType", JSON.toJSONString(getCustomerType()));
 		render("customer_edit.html");
 	}

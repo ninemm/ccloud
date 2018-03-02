@@ -93,7 +93,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 
 	@RequiresPermissions(value = { "/admin/customerVisit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void list() {
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
         String keyword = getPara("k");
         if (StrKit.notBlank(keyword)) {
             keyword = StringUtils.urlDecode(keyword);
@@ -118,7 +118,12 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
         	status = StringUtils.urlDecode(status);
         	setAttr("status", status);
 		}
-        Page<CustomerVisit> page = CustomerVisitQuery.me().paginate(getPageNumber(), getPageSize(), keyword, selectDataArea, customerType, questionType, "id", "cc_v.create_date desc", status);
+        String bizUser = getPara("bizUser");
+        if(StrKit.notBlank(bizUser)) {
+        	bizUser = StringUtils.urlDecode(bizUser);
+        	setAttr("bizUser", bizUser);
+		}
+        Page<CustomerVisit> page = CustomerVisitQuery.me().paginate(getPageNumber(), getPageSize(), keyword, selectDataArea, customerType, questionType, "id", "cc_v.create_date desc", status,bizUser);
         Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);
 	}
@@ -300,7 +305,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
         String questionType = getPara("questionType");
         String customerType = getPara("customerType");
         String status = getPara("status");
-
+        String bizUser = getPara("bizUser");
         String filePath = "";
 
 		if (StrKit.notBlank(customerType)) {
@@ -320,6 +325,13 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
         	status = StringUtils.urlDecode(status);
         	setAttr("status", status);
 		}
+        
+        if(StrKit.notBlank(bizUser)) {
+			filePath = filePath + UserQuery.me().findById(bizUser).getRealname();
+			bizUser = StringUtils.urlDecode(bizUser);
+        	setAttr("bizUser", bizUser);
+		}
+
 
 		if (StrKit.notBlank(keyword)) {
 			filePath = filePath + keyword;
@@ -327,7 +339,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 			setAttr("k", keyword);
 		}
         
-        List<Record> visitList = CustomerVisitQuery.me().exportVisit(keyword, selectDataArea, customerType, questionType, "id", "cc_v.create_date desc", status);
+        List<Record> visitList = CustomerVisitQuery.me().exportVisit(keyword, selectDataArea, customerType, questionType, "id", "cc_v.create_date desc", status,bizUser);
         try {
 			exportExcel(visitList, filePath);
 		} catch (Exception e) {
@@ -596,4 +608,17 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 		}
 	}
 
+	public void queryBizUser() {
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		List<CustomerVisit> customerVisits = CustomerVisitQuery.me().findByDataArea(selectDataArea);
+		List<Map<String, Object>> customerVisitList = new ArrayList<>();
+		for(CustomerVisit customerVisit:customerVisits) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("userId", customerVisit.getStr("user_id"));
+			item.put("bizUser", customerVisit.getStr("realname"));
+			customerVisitList.add(item);
+		}
+		
+		renderJson(customerVisitList);
+	}
 }
