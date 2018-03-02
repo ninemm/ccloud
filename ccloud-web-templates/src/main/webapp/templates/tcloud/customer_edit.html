@@ -1,9 +1,17 @@
 <#include "_inc/_layout.html"/>
-<#if type??>
-    <#macro title>导入客户</#macro>
-    <#elseif sellerCustomer??>
+<!--该页面做导入公司客户、导入附近客户、编辑客户、新增客户
+    type==company为导入公司客户
+    type==around为导入附件客户
+    type==edit为编辑客户
+    type==add为新增客户
+-->
+<#if type=="company">
+    <#macro title>导入公司客户</#macro>
+    <#elseif type=="around">
+        <#macro title>导入附近客户</#macro>
+    <#elseif type=="edit">
         <#macro title>编辑客户</#macro>
-    <#else>
+    <#elseif type=="add">
         <#macro title>新增客户</#macro>
 </#if>
 
@@ -24,7 +32,21 @@
     var $picNum = $('.weui-uploader__info');
     var $uploaderFiles = $('#uploaderFiles');
     var $gallery = $("#gallery"), $galleryImg = $("#galleryImg");
-    
+
+    function isValid(){
+        if($("#customer_name").val().length==0) {$.toptip('客户名称不能为空', 1000, 'error'); return false;}
+        if($("#contact").val().length==0) {$.toptip('联系人不能为空', 1000, 'error'); return false;}
+        if($("#mobile").val().length==0) {$.toptip('联系电话不能为空', 1000, 'error'); return false;}
+        //if(/^1[34578]\d{9}$/.test($("#mobile").val())==false){$.toptip('联系电话不正确', 1000, 'error'); return false;}
+        if(/^[0-9]*$/.test($("#mobile").val())==false){$.toptip('联系电话存在非数字', 1000, 'error'); return false;}
+
+        if($("#customer_type").val().length==0) {$.toptip('客户类型不能为空', 1000, 'error'); return false;}
+        if($("#delivery-address").val().length==0) {$.toptip('配送地址不能为空', 1000, 'error'); return false;}
+        if($("#address").val().length==0) {$.toptip('地址详情不能为空', 1000, 'error'); return false;}
+        //if($("#location").val().length==0) {$.toptip('定位地址不能为空,请刷新定位', 1000, 'error'); return false;}
+        return true;
+    }
+
     $(function() {
         $("#length").text($("#address").val().length + '/' + 50);
         $(document).on("input", "#address", function() {
@@ -32,45 +54,28 @@
         }).on('click', '#delivery-address', function() {
             $("#customer_type").select('close');
         }).on('click', '#import', function() {
-            if($("#customer_name").val().length==0) {$.toptip('客户名称不能为空', 1000, 'error'); return false;}
-            if($("#contact").val().length==0) {$.toptip('联系人不能为空', 1000, 'error'); return false;}
-            if($("#mobile").val().length==0) {$.toptip('联系电话不能为空', 1000, 'error'); return false;}
-            //if(/^1[34578]\d{9}$/.test($("#mobile").val())==false){$.toptip('联系电话不正确', 1000, 'error'); return false;}
+            var valid = isValid();
+            if(!valid) return false;
 
-            if($("#customer_type").val().length==0) {$.toptip('客户类型不能为空', 1000, 'error'); return false;}
-            if($("#delivery-address").val().length==0) {$.toptip('配送地址不能为空', 1000, 'error'); return false;}
-            if($("#address").val().length==0) {$.toptip('地址详情不能为空', 1000, 'error'); return false;}
-            if($("#location").val().length==0) {$.toptip('定位地址不能为空,请刷新定位', 1000, 'error'); return false;}
-            $.confirm("您确定要导入吗？","新增客户", function() {
-                doReceive();
+            $.confirm("您确定要导入吗？","导入客户", function() {
+                <#if type=="company">doReceive();
+                <#else>doSubmit();
+                </#if>
             });
-        }).on('click', '#update', function() {         
-            if($("#customer_name").val().length==0) {$.toptip('客户名称不能为空', 1000, 'error'); return false;}
-            if($("#contact").val().length==0) {$.toptip('联系人不能为空', 1000, 'error'); return false;}
-            if($("#mobile").val().length==0) {$.toptip('联系电话不能为空', 1000, 'error'); return false;}
-            //if(/^1[34578]\d{9}$/.test($("#mobile").val())==false && /^0\d{2,3}-?[2-9][0-9]\d{6,7}$/.test($("#mobile").val()) == false) {$.toptip('联系电话不正确', 1000, 'error'); return false;}
-            
-            if($("#customer_type").val().length==0) {$.toptip('客户类型不能为空', 1000, 'error'); return false;}
-            if($("#delivery-address").val().length==0) {$.toptip('配送地址不能为空', 1000, 'error'); return false;}
-            if($("#address").val().length==0) {$.toptip('地址详情不能为空', 1000, 'error'); return false;}
-            if($("#location").val().length==0) {$.toptip('定位地址不能为空,请刷新定位', 1000, 'error'); return false;}
+        }).on('click', '#update', function() {
+            var valid = isValid();
+            if(!valid) return false;
 
             $.confirm("您确定要更新客户信息吗？","修改客户", function() {
                 doSubmit();
             });
         }).on('click', '#enable', function() {
-            $.confirm("您确定要停用客户吗？","修改客户", function() {
+            $.confirm("您确定要停用客户吗？","停用客户", function() {
                 doEnabled();
             });
-        }).on('click', '#add', function() {                
-            if($("#customer_name").val().length==0) {$.toptip('客户名称不能为空', 1000, 'error'); return false;}
-            if($("#contact").val().length==0) {$.toptip('联系人不能为空', 1000, 'error'); return false;}
-            if($("#mobile").val().length==0) {$.toptip('联系电话不能为空', 1000, 'error'); return false;}
-            //if(/^1[34578]\d{9}$/.test($("#mobile").val())==false && /^0\d{2,3}-?[2-9][0-9]\d{6,7}$/.test($("#mobile").val()) == false) {$.toptip('联系电话不正确', 1000, 'error'); return false;}
-            if($("#customer_type").val().length==0) {$.toptip('客户类型不能为空', 1000, 'error'); return false;}
-            if($("#delivery-address").val().length==0) {$.toptip('配送地址不能为空', 1000, 'error'); return false;}
-            if($("#address").val().length==0) {$.toptip('地址详情不能为空', 1000, 'error'); return false;}
-            if($("#location").val().length==0) {$.toptip('定位地址不能为空,请刷新定位', 1000, 'error'); return false;}
+        }).on('click', '#add', function() {
+            var valid = isValid();
+            if(!valid) return false;
 
             $.confirm("您确定要新增客户吗？","新增客户", function() {
                 doSubmit();
@@ -79,7 +84,7 @@
         
         if($("#delivery-address").val().length == 2) $("#delivery-address").val('');
 
-        <#if !type??>
+        <#if type!="company">
         $("#delivery-address").cityPicker({
             title: "请选择配送地址",
             onClose: function(obj) {
@@ -90,6 +95,7 @@
             }
         });
         </#if>
+
         $("#customer_type").select({
              title: "选择客户类型",
              multi: true,
@@ -304,7 +310,7 @@
 
     wx.ready(function() {
         // 获取定位信息
-        <#if !type?? || type?? && !sellerCustomer.location?? >
+        <#if !sellerCustomer?? || !sellerCustomer.lat?? >
             wx.getLocation({
                 type: 'wgs84',
                 success: function (res) {
@@ -320,7 +326,7 @@
                         geoc.getLocation(point, function(rs) {
                             var addComp = rs.addressComponents;
                             var address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
-                            <#if !type?? && !sellerCustomer??>
+                            <#if type=="add">
                                 $("#lng").val(parseFloat(point.lng).toFixed(6));
                                 $("#lat").val(parseFloat(point.lat).toFixed(6));
                                 $("#delivery-address")[0].value = addComp.province + " " + addComp.city + " " + addComp.district;
@@ -420,13 +426,14 @@
 			    <section class="weui-panel weui-panel_access order-customer-info select-area">
 			        <input type="hidden" name="sellerCustomer.id" value="${(sellerCustomer.id)!}">
                     <input type="hidden" id="oldPic" name="oldPic">
+                    <input type="hidden" id="type" name="type" value="${(type)!}">
 			        <div class="weui-cell weui-cell_access">
 			            <div class="weui-cell__bd">
 			                <div class="order-customer-info-title">
 			                    客户名称
 			                    <span class="require">*</span>
 			                </div>
-                            <input type="text" class="weui-input" id="customer_name" name="customer.customer_name" value="${(sellerCustomer.customer_name)!}"  placeholder="1-25个任意字母数字" required<#if type??> readonly</#if>>
+                            <input type="text" class="weui-input" id="customer_name" name="customer.customer_name" value="${(sellerCustomer.customer_name)!}"  placeholder="1-25个任意字母数字" required<#if type == "company"> readonly</#if>>
 			            </div>
 			        </div>
 			        <div class="weui-cell weui-cell_access">
@@ -435,7 +442,7 @@
 			                    客户昵称&nbsp;&nbsp;
 			                    <span class="require"> </span>
 			                </div>
-			                <input type="text" class="weui-input" id="nickname" name="sellerCustomer.nickname" value="${(sellerCustomer.nickname)!}" placeholder="1-25个任意字母数字" <#if type??> readonly</#if>>
+			                <input type="text" class="weui-input" id="nickname" name="sellerCustomer.nickname" value="${(sellerCustomer.nickname)!}" placeholder="1-25个任意字母数字" <#if type == "company"> readonly</#if>>
 			            </div>
 			        </div>
 			        <div class="weui-cell weui-cell_access">
@@ -444,7 +451,7 @@
 			                    联系人
 			                    <span class="require">*</span>
 			                </div>
-			                <input type="text" class="weui-input" id="contact" name="customer.contact" value="${(sellerCustomer.contact)!}" placeholder="1-15个任意字母数字" <#if type??> readonly</#if>>
+			                <input type="text" class="weui-input" id="contact" name="customer.contact" value="${(sellerCustomer.contact)!}" placeholder="1-15个任意字母数字" <#if type == "company"> readonly</#if>>
 			            </div>
 			        </div>
 			        <div class="weui-cell weui-cell_access">
@@ -453,7 +460,7 @@
 			                    联系电话
 			                    <span class="require">*</span>
 			                </div>
-			                <input type="text" class="weui-input" id="mobile" name="customer.mobile" value="${(sellerCustomer.mobile)!}" placeholder="11位数字" <#if type??> readonly</#if>>
+			                <input type="text" class="weui-input" id="mobile" name="customer.mobile" value="${(sellerCustomer.mobile)!}" placeholder="11位数字" <#if type == "company"> readonly</#if>>
 			            </div>
 			        </div>
 			        <div class="weui-cell weui-cell_access">
@@ -462,8 +469,8 @@
 			                    客户类型
 			                    <span class="require">*</span>
 			                </div>
-                            <input type="hidden" name="customerTypeIds" id="customerTypeIds" <#if !type??>value="${(sellerCustomer.cTypeList)!}"</#if>>
-			                <input type="text" id="customer_type" name="customer_type" <#if !type??>data-values="${(sellerCustomer.cTypeList)!}" value="${(sellerCustomer.cTypeName)!}"</#if> placeholder="请选择" class="weui-input">
+                            <input type="hidden" name="customerTypeIds" id="customerTypeIds" <#if type=="edit">value="${(sellerCustomer.cTypeList)!}"</#if>>
+			                <input type="text" id="customer_type" name="customer_type" <#if type=="edit">data-values="${(sellerCustomer.cTypeList)!}" value="${(sellerCustomer.cTypeName)!}"</#if> placeholder="请选择" class="weui-input">
 			            </div>
 			            <span class="weui-cell__ft"></span>
 			        </div>
@@ -475,13 +482,13 @@
 			                </div>
 			                <input type="hidden" name="areaCode" id="areaCode" value="${(sellerCustomer.prov_code)!''},${(sellerCustomer.city_code)!''},${(sellerCustomer.country_code)!''}">
 			                <input type="hidden" name="areaName" id="areaName" value="${(sellerCustomer.prov_name)!''},${(sellerCustomer.city_name)!''},${(sellerCustomer.country_name)!''}">
-			                <input type="text" placeholder="省市区" class="weui-input" id="delivery-address" name="customer.prov_name" value="${(sellerCustomer.prov_name)!''} ${(sellerCustomer.city_name)!''} ${(sellerCustomer.country_name)!''}" <#if type??> readonly</#if>>
+			                <input type="text" placeholder="省市区" class="weui-input" id="delivery-address" name="customer.prov_name" value="${(sellerCustomer.prov_name)!''} ${(sellerCustomer.city_name)!''} ${(sellerCustomer.country_name)!''}" <#if type == "company"> readonly</#if>>
 			            </div>
 			            <span class="weui-cell__ft"></span>
 			        </div>
 			        <div class="weui-cell weui-cell_access">
 			            <div class="weui-cell__bd">
-		                    <textarea class="weui-textarea" rows="3" name="customer.address" id="address" placeholder="地址详情必填" <#if type??> readonly</#if>>${(sellerCustomer.address)!}</textarea>
+		                    <textarea class="weui-textarea" rows="3" name="customer.address" id="address" placeholder="地址详情必填" <#if type == "company"> readonly</#if>>${(sellerCustomer.address)!}</textarea>
 			                <div class="weui-textarea-counter" id="length"></div>
 			            </div>
 			        </div>
@@ -514,7 +521,7 @@
 			                        </#list>
 			                        </#if>
 			                        </ul>
-                                    <#if !type??>
+                                    <#if type!="company">
                                         <div class="weui-uploader__input-box">
                                             <input id="uploaderInput" name="customer.img_path" class="weui-uploader__input" type="file" accept="image/*" multiple="">
                                             <input type="hidden" name="pic" id="pic">
@@ -529,7 +536,7 @@
         </main>
         <div class="weui-gallery" id="gallery">
                 <span class="weui-gallery__img" id="galleryImg"></span>
-            <#if !type??>
+            <#if type!="company">
                 <div class="weui-gallery__opr">
                     <a href="javascript:" rel="nofollow" target="_blank"  class="weui-gallery__del">
                         <i class="weui-icon-delete weui-icon_gallery-delete"></i>
@@ -538,10 +545,10 @@
             </#if>
             </div>
 		<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
-		    <#if type??>
+		    <#if type=="company" || type=="around">
                 <button class="white-button-no-border weui-flex__item _submit_btn border-top-1px" onclick="window.location.href='${CPATH}/customer/importCustomer'">重新导入</button>
                 <button class="red-button weui-flex__item _submit_btn" id="import">确定</button>
-            <#elseif sellerCustomer??>
+            <#elseif type=="edit">
 		        <button class="white-button-no-border weui-flex__item _submit_btn border-top-1px" id="enable">停用</button>
 		        <button class="red-button weui-flex__item _submit_btn" id="update">更新</button>
 		    <#else>

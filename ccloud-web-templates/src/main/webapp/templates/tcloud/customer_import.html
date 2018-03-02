@@ -14,13 +14,34 @@
     }
 </#macro>
 
+<#macro script_import>
+    <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+</#macro>
+
 <#macro script>
+
+    var sign = 0;//0表示公司客户，1表示附近客户
+    var time;
 
     $(function() {
         $(document).on("input", "#searchInput", function() {
+            clearTimeout(time);
+            time = setTimeout(function(){combo();},500)
+        }).on("click", ".nearby-customer", function(){
+            sign = 1;
+            combo();
+        }).on("click", "#searchCancel", function(){
+            $("#searchInput")[0].value = "";
+            combo();
+        }).on("click", "#searchClear", function(){
+            $("#searchInput")[0].value = "";
+            combo();
+        }).on("click", ".choose-customer", function(){
+            sign = 0;
             combo();
         }).on("click", "#customerInfo", function() {
-            window.location.href = "${CPATH}/customer/gotoEdit?id=" + $(this).find("#sellerCustomerId").val();
+            if (sign == 0) window.location.href = "${CPATH}/customer/gotoEdit?id=" + $(this).find("#sellerCustomerId").val();
+            else window.location.href = "${CPATH}/customer/gotoAroundEdit?id=" + $(this).find("#sellerCustomerId").val();
         });
 
         combo();
@@ -43,12 +64,30 @@
         $loading.show();
         $noMore.hide();
 
-        var params = {
-            "page": page,
-            "size": size,
-            "keyword": $("#searchInput").val()
+        var params;
+        var url;
+
+        if (sign == 0) {
+
+            params = {
+                "page": page,
+                "size": size,
+                "keyword": $("#searchInput").val()
+            };
+            url = "${CPATH}/customer/getImportCustomerList";
+
+        } else {
+
+            params = {
+                "keyword": $("#searchInput").val(),
+                "lng": $('#lng').val(),
+                "lat": $('#lat').val()
+            };
+
+            url = "${CPATH}/customer/getImportAroundCustomerList";
         }
-        Utils.ajax('${CPATH}/customer/getImportCustomerList', params,
+
+        Utils.ajax(url, params,
         function(data){
             $loading.hide();
             if(data.customerList.length == 0){
@@ -60,8 +99,13 @@
                 $customerList.append( "<div class='weui-panel weui-panel_access'>" + newHtml + "</div>");
                 var $newCustomer = $customerList.find(".weui-panel:last");
                 $newCustomer.find("#customerName").text(el.customer_name);
-                $newCustomer.find("#contactP").text(el.contact + "/" + el.mobile);
-                $newCustomer.find("#addressSpan").text(el.prov_name + " " + el.city_name + " " + el.country_name + " " + el.address);
+
+                if (el.contact != undefined) $newCustomer.find("#contactP").text(el.contact + "/" + el.mobile);
+                else if (el.mobile == null || el.mobile == '') $newCustomer.find("#contactP").text("无");
+                else $newCustomer.find("#contactP").text(el.mobile);
+
+                $newCustomer.find("#addressSpan").text(el.prov_name + " " + el.city_name + " " + el.country_name);
+                $newCustomer.find("#showAddress").text(el.address);
 
                 $newCustomer.find("#sellerCustomerId").val(el.sellerCustomerId);
                 $newCustomer.find("#contact").val(el.contact);
@@ -69,7 +113,8 @@
                 $newCustomer.find("#address").val(el.prov_name + " " + el.city_name + " " + el.country_name + " " + el.address);
             });
             page++;
-            loading = false;
+            if (sign == 0) loading = false;
+            else loading = true;
         });
     }
 
@@ -89,6 +134,42 @@
         initCustomer();
     }
 
+    wx.config({
+        debug: false,
+        appId: '${appId!}',
+        timestamp: ${timestamp},
+        nonceStr: '${nonceStr!}',
+        signature: '${signature!}',
+        jsApiList: [
+            'checkJsApi',
+            'getLocation'
+        ]
+    });
+
+    wx.ready(function() {
+        // 获取定位信息
+        wx.getLocation({
+            type: 'wgs84',
+            success: function (res) {
+                var latitude = res.latitude;                      // 纬度，浮点数，范围为90 ~ -90
+                var longitude = res.longitude;                    // 经度，浮点数，范围为180 ~ -180。
+                var speed = res.speed;                            // 速度，以米/每秒计
+                var accuracy = res.accuracy;                      // 位置精度
+
+                var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
+                var geoc = new BMap.Geocoder();                   // 获取百度地址解析器
+                    $("#lng").val(parseFloat(longitude).toFixed(6));
+                    $("#lat").val(parseFloat(latitude).toFixed(6));
+                },
+            cancel: function (res) {
+                console.log('用户拒绝授权获取地理位置');
+            },
+            fail: function (res) {
+                console.log(JSON.stringify(res));
+            }
+        });
+    });
+
 </#macro>
 
 <@layout>
@@ -100,7 +181,7 @@
                     <div class="weui-search-bar__box">
                         <i class="weui-icon-search"></i>
                         <input type="search" class="weui-search-bar__input" id="searchInput" placeholder="搜索" required="">
-                        <a href="javascript:" class="weui-icon-clear" id="searchClear" ></a>
+                        <a href="javascript:" class="weui-icon-clear" id="searchClear"></a>
                     </div>
                     <label class="weui-search-bar__label" id="searchText">
                         <i class="weui-icon-search"></i>
@@ -119,10 +200,12 @@
                 <span><i class="icon-map-marker"></i></span>
                 附近客户
             </div>
+            <input type="hidden" name="lng" id="lng">
+            <input type="hidden" name="lat" id="lat">
         </div>
-        <article class="customer" style="width:100%;">
+        <article class="customer" style="width:100%; top: 4rem">
 
-            <div id="infinite">
+            <div id="infinite" style="top:0">
                 <div id="customerList">
                     <div class="weui-panel weui-panel_access" style="display: none">
                         <div class="weui-flex">
@@ -134,29 +217,12 @@
                                 <input type="hidden" id="mobile" value="">
                                 <input type="hidden" id="address" value="">
                             </div>
-                            <!--<div class="weui-flex__item customer-href">
-                                <div class="weui-flex">
-                                    <a href="tel:${(customer.mobile)!}"class="weui-flex__item">
-                                        <p>
-                                            <i class="icon-phone green"></i>
-                                        </p>
-                                        <p>电话</p>
-                                    </a>
-                                    <a class="weui-flex__item" href="./customer_historyOrder.html?customer_id=${(customer.id)!}&customer_name=${(customer.customer_name)!}">
-                                        <p>
-                                            <i class="icon-file-text-o blue"></i>
-                                        </p>
-                                        <p>订单</p>
-                                    </a>
-                                    <a class="weui-flex__item relative" href="./customerDetail.html">
-                                        <i class="icon-chevron-right gray"></i>
-                                    </a>
-                                </div>
-                            </div>-->
                         </div>
-                        <p class="gray">
+                        <p class="gray" style="height: 1.5rem;">
                             <span class="icon-map-marker ft16 green"></span>
-                            <span id="addressSpan">湖北省 武汉市 江汉区 德盛街</span>
+                            <span id="addressSpan">湖北省 武汉市 江汉区</span>
+                            <br>
+                            <span id="showAddress">德盛街</span>
                         </p>
                     </div>
                 </div>

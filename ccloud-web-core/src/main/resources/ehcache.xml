@@ -588,6 +588,15 @@
            memoryStoreEvictionPolicy="LFU"
            transactionalMode="off"
     />
+	<cache name="cc_customer_store"
+		   maxEntriesLocalHeap="10000"
+		   eternal="false"
+		   overflowToDisk="true"
+		   timeToIdleSeconds="300"
+		   timeToLiveSeconds="300"
+		   memoryStoreEvictionPolicy="LFU"
+		   transactionalMode="off"
+	/>
     
     
 	
