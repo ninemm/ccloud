@@ -1,6 +1,12 @@
 <#include "_inc/_layout.html"/>
 <#macro title>业务员拜访轨迹</#macro>
 <#macro css>
+#container {
+    position: absolute;
+    top:2rem;
+    bottom:2.25rem;
+    width:100%
+}
 </#macro>
 
 <#macro css_import>
@@ -228,7 +234,7 @@
 <@layout>
 <div class="weui-content">
     <article class="ft14">
-        <header class=" weui-flex">
+        <header class="weui-flex">
             <div class="head-search select-area weui-flex__item">
                 <div class="weui-flex__item">
                     <input type="text" id="customer" data-values="${(userId)!}" value="${(userName)!}" placeholder="业务员" class="weui-input" readonly >
@@ -244,7 +250,7 @@
             </div>
         </header>
     </article>
-    <div id="container" style="height: 100%">
+    <div id="container">
     </div>
 </div>
 
