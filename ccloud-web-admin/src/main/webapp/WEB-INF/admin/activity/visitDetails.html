@@ -48,6 +48,8 @@
 
 		var keyword = $('#post-search-input').val();
 		var id = '${id}';
+		var userId = '${userId}';
+		var customerId = '${customerId}';
 		if (keyword) keyword = encodeURIComponent(keyword);
 		var param = {
 			size: params.limit,
@@ -65,6 +67,14 @@
 	var initFields = function() {
 		var fields =
 			[	
+				{field: "proc_code", title: "流程编号", align: "center", width: '10%', edit:false},
+				{field: "invest_type", title: "投入类型", align: "center", width: '10%', edit:false},
+				{field: "customer_name", title: "终端名称", align: "center", width: '10%', edit:false},
+				{field: "address", title: "终端地址", align: "center", width: '10%', edit:false},
+				{field: "customer_type", title: "终端类型", align: "center", width: '10%', edit:false},
+				{field: "realname", title: "投放/补录人", align: "center", width: '10%', edit:false},
+      			{field: "putDate", title: "投放/补录时间", align: "center", width: '10%', edit:false},
+      			{field: "photo", title: "执行照片", align: "center", width: '10%', edit:false},
 			];
 		return fields;
 	};

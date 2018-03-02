@@ -213,16 +213,15 @@ public class ActivityQuery extends JBaseQuery {
 	}
 
 	public Page<Record> putDetailsPaginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate,String id) {
-		String select = "SELECT u.id userId,csc.id customerId,cc.customer_name,CONCAT(cc.prov_name,cc.city_name,cc.country_name,cc.address) address,csc.customer_type_ids customer_type,caa.create_date putDate,u.realname,IFNULL(t1.executeNum,0) executeNum,ca.* ";	
-		StringBuilder fromBuilder = new StringBuilder(" FROM cc_seller_customer csc ");
-		fromBuilder.append(" LEFT JOIN cc_activity_apply caa ON caa.seller_customer_id=csc.id");
-		fromBuilder.append(" LEFT JOIN cc_activity ca ON caa.activity_id = ca.id");
-		fromBuilder.append(" LEFT JOIN cc_customer_visit cv ON cv.active_apply_id=caa.id");
-		fromBuilder.append(" LEFT JOIN cc_customer cc ON cc.id=csc.customer_id");
-		fromBuilder.append(" LEFT JOIN `user` u ON u.id=caa.biz_user_id ");
+		String select = "SELECT u.id userId , u.realname , csc.id customerId , cc.customer_name , CONCAT( cc.prov_name , cc.city_name , cc.country_name , cc.address) address , csc.customer_type_ids customer_type , caa.create_date putDate , IFNULL(t1.executeNum , 0) executeNum , ca.* ";	
+		StringBuilder fromBuilder = new StringBuilder(" FROM cc_activity_apply caa ");
+		fromBuilder.append(" LEFT JOIN cc_activity ca ON ca.id=caa.activity_id");
+		fromBuilder.append(" LEFT JOIN `user` u ON u.id=caa.biz_user_id");
+		fromBuilder.append(" LEFT JOIN cc_seller_customer csc ON csc.id=caa.seller_customer_id");
+		fromBuilder.append(" LEFT JOIN cc_customer cc ON cc.id = csc.customer_id");
 		fromBuilder.append(" LEFT JOIN(  SELECT ccv.seller_customer_id ,ccv.user_id ,COUNT(1) executeNum FROM cc_activity_apply aa LEFT JOIN cc_customer_visit ccv ON aa.id = ccv.active_apply_id   WHERE aa.activity_id = '");
 		fromBuilder.append(id+"' GROUP BY ccv.seller_customer_id,ccv.user_id) t1 ON t1.seller_customer_id = csc.id and t1.user_id=caa.biz_user_id");
-		fromBuilder.append(" WHERE ca.id='"+id+"' ");
+		fromBuilder.append(" WHERE ca.id='"+id+"' AND caa.`status` in(1,4)");
 		if (StrKit.notBlank(keyword)) {
 			fromBuilder.append(" and (cc.customer_name like '%"+keyword+"%' or u.realname like '%"+keyword+"%')");
 		}
@@ -231,12 +230,10 @@ public class ActivityQuery extends JBaseQuery {
 			fromBuilder.append(" and ca.start_time >= ?");
 			params.add(startDate+" 00:00:00");
 		}
-
 		if (StrKit.notBlank(endDate)) {
 			fromBuilder.append(" and ca.end_time <= ?");
 			params.add(endDate + "23:59:59");
 		}
-		fromBuilder.append(" GROUP BY cv.active_apply_id");
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
         return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
@@ -256,5 +253,18 @@ public class ActivityQuery extends JBaseQuery {
 			typeNames = types.substring(0, types.length()-1);
 		}
 		return typeNames;
+	}
+
+	public Page<Record> visitDetailsPaginate(int pageNumber, int pageSize, String keyword, String startDate,
+			String endDate, String id, String customerId, String userId) {
+		String select = "SELECT u.realname ,ca.proc_code,ca.invest_type,cc.customer_name , CONCAT( cc.prov_name , cc.city_name , cc.country_name , cc.address) address , csc.customer_type_ids customer_type , caa.create_date putDate ,ccv.photo";
+		StringBuilder fromBuilder = new StringBuilder(" FROM cc_customer_visit ccv ");
+		fromBuilder.append(" LEFT JOIN cc_activity_apply caa ON caa.id=ccv.active_apply_id ");
+		fromBuilder.append(" LEFT JOIN cc_activity ca ON ca.id=caa.activity_id ");
+		fromBuilder.append(" LEFT JOIN cc_seller_customer csc ON csc.id=ccv.seller_customer_id");
+		fromBuilder.append(" LEFT JOIN cc_customer cc ON cc.id=csc.customer_id");
+		fromBuilder.append(" LEFT JOIN `user` u ON u.id=ccv.user_id");
+		fromBuilder.append(" WHERE ccv.user_id='"+userId+"' AND ca.id='"+id+"' AND ccv.seller_customer_id='"+customerId+"' ");
+		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 	}
 }
