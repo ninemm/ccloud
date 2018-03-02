@@ -196,6 +196,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		String type = getPara("type");
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		ImportParams params = new ImportParams();
+		params.setReadRows(99);//一次读100条
 		if (type.equals(Consts.TEMPLATE_ALI)) {
 			if (!uploadFile.getOriginalFileName().equals(Consts.TEMPLATE_FILE_NAME_ALI)) {
 				renderAjaxResultForError("导入模板文件名错误,请核对后导入");
