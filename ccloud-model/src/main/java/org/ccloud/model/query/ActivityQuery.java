@@ -22,6 +22,7 @@ import com.jfinal.plugin.activerecord.Record;
 
 import org.ccloud.Consts;
 import org.ccloud.model.Activity;
+import org.ccloud.model.Dict;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -173,9 +174,8 @@ public class ActivityQuery extends JBaseQuery {
 	public Page<Record> activityPutPaginate(int pageNumber, int pageSize, String keyword,String startDate, String endDate,String sellerId, String invest_type) {
 		String select = "select IFNULL(t1.putNum , 0) putNum, IFNULL(t2.executeNum , 0) executeNum, IFNULL(ca.invest_num , 0) invest_num,IFNULL(ca.invest_amount , 0) invest_amount,ca.*,case when ca.category='"+Consts.CATEGORY_NORMAL+"' then '商品销售' else '投入活动' end as activityCategory ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_activity` ca ");
-		fromBuilder.append(" LEFT JOIN( SELECT aa.activity_id , COUNT(1) putNum FROM cc_activity_apply aa WHERE aa.`status` IN(1 , 4) GROUP BY aa.activity_id) t1 ON t1.activity_id = ca.id");
-		fromBuilder.append(" LEFT JOIN( SELECT COUNT(*) executeNum , cvja.activity_id FROM cc_customer_visit_join_activity cvja LEFT JOIN cc_customer_visit cv ");
-		fromBuilder.append(" ON cv.id = cvja.customer_visit_id GROUP BY cv.seller_customer_id , cv.active_apply_id) t2 ON t2.activity_id = ca.id");
+		fromBuilder.append(" LEFT JOIN (SELECT caa.activity_id,COUNT(1) putNum FROM cc_activity_apply caa WHERE caa.`status`in(1,4) GROUP BY caa.activity_id)t1 ON ca.id=t1.activity_id");
+		fromBuilder.append(" LEFT JOIN (SELECT caa.activity_id,COUNT(1) executeNum FROM cc_customer_visit ccv LEFT JOIN cc_activity_apply caa ON ccv.active_apply_id=caa.id GROUP BY caa.activity_id)t2 ON ca.id=t2.activity_id");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 		if (StrKit.notBlank(keyword)) {
@@ -208,7 +208,10 @@ public class ActivityQuery extends JBaseQuery {
 		if (StrKit.isBlank(timeIntervalId)) {
 			return null;
 		}
-		timeIntervalId= DictQuery.me().findByKey(Consts.ACTIVE_TIME_INTERVAL, timeIntervalId).getName();
+		Dict findByKey = DictQuery.me().findByKey(Consts.ACTIVE_TIME_INTERVAL, timeIntervalId);
+		if (findByKey!=null) {
+			timeIntervalId= findByKey.getName();
+		}
 		return timeIntervalId;
 	}
 
@@ -265,6 +268,20 @@ public class ActivityQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_customer cc ON cc.id=csc.customer_id");
 		fromBuilder.append(" LEFT JOIN `user` u ON u.id=ccv.user_id");
 		fromBuilder.append(" WHERE ccv.user_id='"+userId+"' AND ca.id='"+id+"' AND ccv.seller_customer_id='"+customerId+"' ");
-		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+		if (StrKit.notBlank(keyword)) {
+			fromBuilder.append(" and (cc.customer_name like '%"+keyword+"%' or u.realname like '%"+keyword+"%')");
+		}
+		LinkedList<Object> params = new LinkedList<Object>();
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and ccv.create_date >= ?");
+			params.add(startDate+" 00:00:00");
+		}
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and ccv.create_date <= ?");
+			params.add(endDate + "23:59:59");
+		}
+		if (params.isEmpty())
+			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+        return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 }
