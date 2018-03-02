@@ -545,12 +545,12 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				for (int  a= 0; a <picList.size(); a++) {
 
 					JSONObject obj = picList.getJSONObject(a);
+					String domain = OptionQuery.me().findValue("cdn_domain");
 					String savePath = obj.getString("savePath");
 					String originalPath = obj.getString("originalPath");
-
 					ImageJson image = new ImageJson();
-					image.setOriginalPath(originalPath);
-					image.setSavePath(savePath);
+					image.setOriginalPath(domain + "/" +originalPath);
+					image.setSavePath(domain + "/" +savePath);
 					list.add(image);
 				}
 				page.getList().get(i).set("photo", list);
