@@ -87,10 +87,19 @@ public class CustomerVisitController extends BaseFrontController {
 			item.put("value", subType.getValue());
 			customerLevel.add(item);
 		}
-
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		List<CustomerVisit> customerVisits = CustomerVisitQuery.me().findByDataArea(selectDataArea);
+		List<Map<String, Object>> bizUserList = new ArrayList<>();
+		for(CustomerVisit customerVisit:customerVisits) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("value", customerVisit.getStr("user_id"));
+			item.put("title", customerVisit.getStr("realname"));
+			bizUserList.add(item);
+		}
+		
 		List<Map<String, Object>> nature = new ArrayList<>();
 		nature.add(all);
-
+		
 		List<Dict> statusList = DictQuery.me().findDictByType("customer_audit");
 		List<Map<String, Object>> statusList1 = new ArrayList<>();
 		statusList1.add(all);
@@ -103,6 +112,7 @@ public class CustomerVisitController extends BaseFrontController {
 		}
 
 		setAttr("type", JSON.toJSON(customerTypeList2));
+		setAttr("bizUserList", JSON.toJSON(bizUserList));
 		setAttr("nature", JSON.toJSON(nature));
 		setAttr("level", JSON.toJSON(customerLevel));
 		setAttr("status", JSON.toJSON(statusList1));
@@ -117,7 +127,7 @@ public class CustomerVisitController extends BaseFrontController {
 
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
 
-		Page<Record> visitList = CustomerVisitQuery.me().paginateForApp(getPageNumber(), getPageSize(), getPara("id"), null, null, null, null, selectDataArea, null);
+		Page<Record> visitList = CustomerVisitQuery.me().paginateForApp(getPageNumber(), getPageSize(), getPara("id"), null, null,null, null, null, selectDataArea, null);
 
 		if(StrKit.notBlank(getPara("id"))) {
 			setAttr("id", getPara("id"));
@@ -136,7 +146,7 @@ public class CustomerVisitController extends BaseFrontController {
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
 
 		Page<Record> visitList = new Page<>();
-		visitList = CustomerVisitQuery.me().paginateForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("id"), null, null, null, null, selectDataArea, null);
+		visitList = CustomerVisitQuery.me().paginateForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("id"), null,null, null, null, null, selectDataArea, null);
 
 		if(StrKit.notBlank(getPara("id"))) {
 			setAttr("id", getPara("id"));
@@ -174,7 +184,7 @@ public class CustomerVisitController extends BaseFrontController {
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
 		
 		Page<Record> visitList = new Page<>();
-		visitList = CustomerVisitQuery.me().paginateForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("id"), getPara("type"), getPara("nature"), getPara("level"), getPara("status"), selectDataArea, getPara("searchKey"));
+		visitList = CustomerVisitQuery.me().paginateForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("id"), getPara("type"), getPara("nature"),getPara("user"), getPara("level"), getPara("status"), selectDataArea, getPara("searchKey"));
 
 		if(StrKit.notBlank(getPara("id"))) {
 			setAttr("id", getPara("id"));
