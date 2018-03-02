@@ -135,11 +135,10 @@
 		$.get(url ,
 			function(res){
 				if (res.errorCode == 0) {
-					$.alert(res.message, "客户审核", function() {
-						location.href = '${CPATH}/todo/customer'
-					});
+					$.toptip(res.message, 1000, 'success');
+					setTimeout(function(){location.href = '${CPATH}/todo/customer';},1000);
 				} else {
-					$.alert(res.message, "客户审核");
+					$.toptip(res.message, 1000, 'error');
 				}
 				Utils.closeLoadingWin();
 			}
@@ -151,11 +150,10 @@
 		$.get(url ,
 			function(res){
 				if (res.errorCode == 0) {
-					$.alert(res.message, "客户审核", function() {
-						location.href = '${CPATH}/todo/customer'
-					});
+					$.toptip(res.message, 1000, 'success');
+					setTimeout(function(){location.href = '${CPATH}/todo/customer';},1000);
 				} else {
-					$.alert(res.message, "客户审核");
+					$.toptip(res.message, 1000, 'error');
 				}
 				layer.closeAll();
 			}

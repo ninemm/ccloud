@@ -141,11 +141,10 @@
 		$.get(url ,
 			function(res){
 				if (res.errorCode == 0) {
-					$.alert(res.message, "拜访审核", function() {
-						location.href = '${CPATH}/todo/visit'
-					});
+					$.toptip(res.message, 1000, 'success');
+					setTimeout(function(){location.href = '${CPATH}/todo/visit';},1000);
 				} else {
-					$.alert(res.message, "拜访审核");
+					$.toptip(res.message, 1000, 'error');
 				}
 				layer.closeAll();
 			}
@@ -160,11 +159,10 @@
 		$.get(url ,
 			function(res){
 				if (res.errorCode == 0) {
-					$.alert(res.message, "拜访审核", function() {
-						location.href = '${CPATH}/todo/visit'
-					});
+					$.toptip(res.message, 1000, 'success');
+					setTimeout(function(){location.href = '${CPATH}/todo/visit';},1000);
 				} else {
-					$.alert(res.message, "拜访审核");
+					$.toptip(res.message, 1000, 'error');
 				}
 				layer.closeAll();
 			}

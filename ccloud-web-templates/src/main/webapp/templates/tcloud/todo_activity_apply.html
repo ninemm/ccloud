@@ -151,11 +151,10 @@
 		Utils.ajax('${CPATH}/activity/complete', params,
 			function(res){
 				if (res.errorCode == 0) {
-					$.alert(res.message, "活动审核", function() {
-						location.href = '${CPATH}/todo/activityApply'
-					});
+					$.toptip(res.message, 1000, 'success');
+					setTimeout(function(){location.href = '${CPATH}/todo/activityApply';},1000);
 				} else {
-					$.alert(res.message, "活动审核");
+					$.toptip(res.message, 1000, 'error');
 				}
 				layer.closeAll();
 			}
@@ -177,11 +176,10 @@
 		Utils.ajax('${CPATH}/activity/complete', params,
 			function(res){
 				if (res.errorCode == 0) {
-					$.alert(res.message, "活动审核", function() {
-						location.href = '${CPATH}/todo/activityApply'
-					});
+					$.toptip(res.message, 1000, 'success');
+					setTimeout(function(){location.href = '${CPATH}/todo/activityApply';},1000);
 				} else {
-					$.alert(res.message, "活动审核");
+					$.toptip(res.message, 1000, 'error');
 				}
 				layer.closeAll();
 			}

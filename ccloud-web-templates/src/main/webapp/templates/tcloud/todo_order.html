@@ -157,11 +157,10 @@
 		Utils.ajax('${CPATH}/order/complete', params, 
 			function(res){
 				if (res.errorCode == 0) {
-					$.alert(res.message, "订单审核", function() {
-						location.href = '${CPATH}/todo/order'
-					  });
+					$.toptip(res.message, 1000, 'success');
+					setTimeout(function(){location.href = '${CPATH}/todo/order';},1000);
 				} else {
-					$.alert(res.message, "订单审核");
+					$.toptip(res.message, 1000, 'error');
 				}
 				layer.closeAll();
 			}
@@ -183,11 +182,10 @@
 		Utils.ajax('${CPATH}/order/complete', params, 
 			function(res){
 				if (res.errorCode == 0) {
-					$.alert(res.message, "订单审核", function() {
-						location.href = '${CPATH}/todo/order'
-					});
+					$.toptip(res.message, 1000, 'success');
+					setTimeout(function(){location.href = '${CPATH}/todo/order';},1000);
 				} else {
-					$.alert(res.message, "订单审核");
+					$.toptip(res.message, 1000, 'error');
 				}
 				layer.closeAll();
 			}
