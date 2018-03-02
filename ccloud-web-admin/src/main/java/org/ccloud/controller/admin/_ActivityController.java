@@ -43,6 +43,7 @@ import org.ccloud.model.query.ActivityQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.DictQuery;
 import org.ccloud.model.query.ExpenseDetailQuery;
+import org.ccloud.model.query.OptionQuery;
 import org.ccloud.model.query.QyBasicfeetypeQuery;
 import org.ccloud.model.query.QyExpenseQuery;
 import org.ccloud.model.query.QyExpensedetailQuery;
