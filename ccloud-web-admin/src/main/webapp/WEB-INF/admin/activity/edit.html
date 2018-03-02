@@ -56,7 +56,14 @@
 	var AddButton       = $("#AddMoreFileBox"); //Add button ID  
 	var x = InputsWrapper.length; //initlal text box count 
 	
-	<#if activity?? && (activity.investType == '101105' || activity.investType == '101107')>
+	<#if activity??>
+		$("#expendHead").empty();
+		<#if activity.investType == "101101" || activity.investType == "101102" || activity.investType == "101103" || activity.investType == "101106">
+			$("#expendHead").append('<th id="name1">费用类型</th><th id="name2">申请金额</th><th>操作</th>');
+		<#elseif activity.investType == "101104">
+			$("#expendHead").append('<th id="name1">费用类型</th><th id="name2">展示形式</th><th id="name3">投入数量</th><th id="name4">申请金额</th><th>操作</th>');
+		<#elseif activity.investType == "101105">
+			$("#expendHead").append('<th id="name1">渠道</th><th id="name2">赠送产品</th><th id="name3">投入数量</th><th id="name4">申请金额</th><th>操作</th>');
 			$(".needs").select2({
 				width: "100%",
 				language: "zh-CN"
@@ -65,11 +72,20 @@
 				data: ${productOptionList},
 				width: "100%",
 				language: "zh-CN"
-			});	
-			<#list expenseList! as list>
-			$('#product_${list_index}').val(['${list.item2}']).trigger('change');
-			</#list>	
+			});			
+		<#elseif activity.investType == "101107">
+			$("#expendHead").append('<th id="name1">费用类型</th><th id="name2">产品</th><th id="name3">申请金额</th><th>操作</th>');
+			$(".product").select2({
+				data: ${productOptionList},
+				width: "100%",
+				language: "zh-CN"
+			});						
+		</#if>	
+		<#list expenseList! as list>
+		$('#product_${list_index}').val(['${list.item2}']).trigger('change');
+		</#list>	
 	</#if>
+	
 	var $form = $("#form");
 	var $city = $('#cityPicker');
 	var data = {url: '', alt: ''};

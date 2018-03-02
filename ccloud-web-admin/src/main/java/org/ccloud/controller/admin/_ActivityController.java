@@ -36,12 +36,15 @@ import org.ccloud.model.ActivityExecute;
 import org.ccloud.model.Dict;
 import org.ccloud.model.ExpenseDetail;
 import org.ccloud.model.QyExpense;
+import org.ccloud.model.QyExpensedetail;
 import org.ccloud.model.query.ActivityExecuteQuery;
 import org.ccloud.model.query.ActivityQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.DictQuery;
 import org.ccloud.model.query.ExpenseDetailQuery;
+import org.ccloud.model.query.QyBasicfeetypeQuery;
 import org.ccloud.model.query.QyExpenseQuery;
+import org.ccloud.model.query.QyExpensedetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 
 import com.alibaba.fastjson.JSON;
@@ -353,6 +356,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		List<QyExpense> expenseList = QyExpenseQuery.me().findTextData();
 		List<Activity> acList = new ArrayList<>();
+		List<ExpenseDetail> dlist = new ArrayList<>();
 		for (QyExpense qyExpense : expenseList) {
 			if (!ActivityQuery.me().isExist(qyExpense.getFlowNo())) {
 				Activity activity = new Activity();
@@ -374,12 +378,46 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				activity.setIsPublish(0);
 				activity.setCreateDate(new Date());
 				acList.add(activity);
+				dlist = getExpenseDetailList(qyExpense.getExpenseID(), activity.getId(), activity.getInvestType());
 			}
 		}
 		Db.batchSave(acList, acList.size());
+		Db.batchSave(dlist, dlist.size());
 		renderAjaxResultForSuccess("同步成功");
 	}
 	
+	private List<ExpenseDetail> getExpenseDetailList(String expenseId, String actId, String typeId) {
+		List<ExpenseDetail> expenseDetails = new ArrayList<>();
+		List<QyExpensedetail> midDatas = QyExpensedetailQuery.me().findByActivityId(expenseId);
+		for (QyExpensedetail qyExpensedetail : midDatas) {
+			ExpenseDetail expenseDetail = new ExpenseDetail();
+			expenseDetail.setId(StrKit.getRandomUUID());
+			expenseDetail.setActivityId(actId);
+			expenseDetail.setFlowNo(qyExpensedetail.getFlowNo());
+			expenseDetail.setFlowTypeId(qyExpensedetail.getFlowTypeID());
+			String dict = findFlowDictType(typeId);
+			expenseDetail.setFlowDictType(dict);
+			if (dict.equals("feeType_name_display")) {
+				String name = QyBasicfeetypeQuery.me().findNameById(qyExpensedetail.getItem1());
+				Dict code = DictQuery.me().findbyName(name);
+				expenseDetail.setDisplayDictType(findDisplayType(code.getValue()));
+			}
+			expenseDetail.setItem1(qyExpensedetail.getItem1());
+			expenseDetail.setItem2(qyExpensedetail.getItem2());
+			expenseDetail.setItem3(qyExpensedetail.getItem3());
+			expenseDetail.setItem4(qyExpensedetail.getItem4());
+			expenseDetail.setCreateDate(qyExpensedetail.getCreateTime());
+			expenseDetail.setModifyDate(qyExpensedetail.getModifyTime());
+			if (qyExpensedetail.getFlag() == 0) {
+				expenseDetail.setState(false);
+			} else {
+				expenseDetail.setState(true);
+			}
+			expenseDetails.add(expenseDetail);
+		}
+		return expenseDetails;
+	}
+
 	private String[] getAreaType(String data) {
 		String[] value = new String[2];
 		String[] areaFirst = data.split(":");

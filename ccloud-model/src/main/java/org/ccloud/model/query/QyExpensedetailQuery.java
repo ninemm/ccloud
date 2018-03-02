@@ -16,6 +16,8 @@
 package org.ccloud.model.query;
 
 import java.util.LinkedList;
+import java.util.List;
+
 import org.ccloud.model.QyExpensedetail;
 
 import com.jfinal.plugin.activerecord.Page;
@@ -65,6 +67,10 @@ public class QyExpensedetailQuery extends JBaseQuery {
 			return deleteCount;
 		}
 		return 0;
+	}
+
+	public List<QyExpensedetail> findByActivityId(String expenseID) {
+		return DAO.doFind("ExpenseID = ?", expenseID);
 	}
 
 	

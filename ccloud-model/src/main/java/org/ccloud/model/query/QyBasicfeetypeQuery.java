@@ -67,5 +67,14 @@ public class QyBasicfeetypeQuery extends JBaseQuery {
 		return 0;
 	}
 
+	public String findNameById(String item1) {
+		QyBasicfeetype basicfeetype = DAO.doFindFirst("FeeTypeID = ?", item1);
+		if (basicfeetype != null) {
+			return basicfeetype.getFeeTypeName();
+		} else {
+			return null;
+		}
+	}
+
 	
 }
