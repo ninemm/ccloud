@@ -156,10 +156,19 @@ public class WarehouseQuery extends JBaseQuery {
 	}
 
 	public List<Record> findBySeller(String toWarehouseId) {
-		StringBuilder fromBuilder = new StringBuilder(" SELECT cs.seller_name,cs.id sellerId ");
-		fromBuilder.append(" FROM cc_seller cs ");
-		fromBuilder.append(" WHERE cs.id in(SELECT i.seller_id FROM cc_inventory i WHERE i.warehouse_id='"+toWarehouseId+"' GROUP BY i.seller_id)");
+		StringBuilder fromBuilder = new StringBuilder(" SELECT u.department_id   ");
+		fromBuilder.append(" FROM cc_user_join_warehouse ujw LEFT JOIN `user` u ON u.id=ujw.user_id ");
+		fromBuilder.append(" WHERE ujw.warehouse_id='"+toWarehouseId+"' GROUP BY u.department_id");
 		return Db.find(fromBuilder.toString());
+	}
+
+	//根据仓库找到创建仓库的人
+	public String findWarehouseIdByUserId(String warehouse_id) {
+		StringBuilder fromBuilder = new StringBuilder("SELECT u.id ");
+		fromBuilder.append(" FROM cc_warehouse w LEFT JOIN cc_seller cs ON cs.id=w.seller_id LEFT JOIN `group` g ON g.dept_id=cs.dept_id");
+		fromBuilder.append(" LEFT JOIN `user` u ON u.department_id=g.dept_id WHERE w.id='"+warehouse_id+"' AND g.group_code='role02'");
+		Record findFirst = Db.findFirst(fromBuilder.toString());
+		return findFirst.getStr("id");
 	}	
 	
  }

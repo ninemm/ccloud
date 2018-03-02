@@ -96,11 +96,16 @@ a {
   height: 2.25rem;
   line-height: 2.25rem;
   bottom: 0;
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
-  justify-content: space-between;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
   z-index: 500;
   position: absolute;
-  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
 }
 
 .weui-cell_access:active {
@@ -334,7 +339,9 @@ i.icon.icon-next {
 }
 
 .space-between {
-  justify-content: space-between;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
 }
 
 .width-100 {
@@ -354,7 +361,9 @@ i.icon.icon-next {
 }
 
 .flex-grow2 {
-  flex-grow: 2;
+  -webkit-box-flex: 2;
+      -ms-flex-positive: 2;
+          flex-grow: 2;
 }
 
 .p-l-15 {
@@ -507,12 +516,15 @@ i.icon.icon-next {
 }
 
 #button {
-  transform: rotate(0deg);
+  -webkit-transform: rotate(0deg);
+          transform: rotate(0deg);
+  -webkit-transition: all .3s;
   transition: all .3s;
 }
 
 .close-button {
-  transform: rotate(45deg)!important;
+  -webkit-transform: rotate(45deg)!important;
+          transform: rotate(45deg)!important;
 }
 
 .layer {
@@ -564,12 +576,15 @@ i.icon.icon-next {
   position: absolute;
   bottom: 0;
   width: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
   text-align: center;
   height: 2rem;
   line-height: 2rem;
   border-top: .05rem solid #efeff4;
-  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
 }
 
 .pop-button .white-button {
@@ -657,6 +672,7 @@ i.icon.icon-next {
   font-size: .7rem;
   opacity: 0;
   visibility: hidden;
+  -webkit-transition: all .3s;
   transition: all .3s;
 }
 
@@ -718,7 +734,8 @@ i.icon.icon-next {
   bottom: 50px;
   position: absolute;
   width: 100%;
-  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
   color: #999
 }
 
@@ -796,13 +813,17 @@ i.icon.icon-next {
 }
 
 .check-pass {
-  flex: 1;
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
   color: #8bc34a;
   text-align: center;
 }
 
 .check-refuse {
-  flex: 1;
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
   color: #e51c23;
   text-align: center;
 }
@@ -967,7 +988,8 @@ i.icon.icon-next {
   border-radius: 4px;
   width: 2rem;
   text-align: center;
-  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
   height: 100%;
 }
 
@@ -1012,7 +1034,8 @@ i.icon.icon-next {
 .product_unit p {
   position: absolute;
   top: 50%;
-  transform: translateY(-50%);
+  -webkit-transform: translateY(-50%);
+          transform: translateY(-50%);
 }
 
 .product_unit>span {
@@ -1082,7 +1105,8 @@ i.icon.icon-next {
 .product-top img {
   position: absolute;
   top: 50%;
-  transform: translateY(-50%);
+  -webkit-transform: translateY(-50%);
+          transform: translateY(-50%);
 }
 
 .product-top .product_name {
@@ -1166,7 +1190,8 @@ i.icon.icon-next {
   background: #f3f3f3;
   border-radius: 5px;
   padding: .4rem .5rem;
-  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
 }
 
 
@@ -1193,7 +1218,8 @@ i.icon.icon-next {
   width: 72.222222%;
   height: 100%;
   border-top: 1px solid #efeff4;
-  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
 }
 
 .place-order {
@@ -1340,8 +1366,12 @@ input.street-value {
 #order .weui-cell__bd {
   height: 2.25rem;
   line-height: 2.25rem;
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
-  justify-content: space-between;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
 }
 
 #order .spinner {
@@ -1382,7 +1412,8 @@ input.street-value {
   line-height: 2rem;
   border-bottom: 1px solid #f3f5f7;
   background: #fff;
-  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
 }
 
 #order input::-webkit-input-placeholder {
@@ -1419,12 +1450,15 @@ input.street-value {
 
 .head-search {
   height: 2rem;
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
   background: #fff;
   font-size: 0.7rem;
   color: #9b9b9b;
   border-bottom: 1px solid #efeff4;
-  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
 }
 
 .head-search div {
@@ -1465,7 +1499,8 @@ input.street-value {
   position: relative;
   background: #fff;
   border-bottom: 1px solid #efeff4;
-  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
 }
 
 #combin-filter-btn i {
@@ -1592,7 +1627,8 @@ input[name=sex] {
   height: 1.25rem;
   line-height: 1.25rem;
   width: 19.444444%;
-  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
   display: table;
 }
 
@@ -1682,7 +1718,8 @@ input[name=sex] {
 #operate-history .weui-cell:last-child::after {
   background: #ea6f5a;
   border: 1px solid #ea6f5a;
-  box-shadow: 0 0.15rem 0.3rem rgba(34, 34, 34, 0.21), 0 0.3rem 0.3rem rgba(34, 34, 34, 0.26);
+  -webkit-box-shadow: 0 0.15rem 0.3rem rgba(34, 34, 34, 0.21), 0 0.3rem 0.3rem rgba(34, 34, 34, 0.26);
+          box-shadow: 0 0.15rem 0.3rem rgba(34, 34, 34, 0.21), 0 0.3rem 0.3rem rgba(34, 34, 34, 0.26);
 }
 
 #operate-history .weui-cell:first-child div {
@@ -1749,7 +1786,8 @@ input[name=sex] {
   position: relative;
   background: #fff;
   width: 100%;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
 }
 
 .user-info {
@@ -1757,7 +1795,8 @@ input[name=sex] {
   background: #ea6f5a;
   color: #fff;
   font-size: .7rem;
-  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
 }
 
 .user-rank .user-info {
@@ -1823,7 +1862,8 @@ input[name=sex] {
   background: #fff;
   height: 4rem;
   padding-top: 1rem;
-  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
   text-align: center;
   font-size: .8rem;
   color: #999;
@@ -1882,8 +1922,11 @@ input[name=sex] {
 }
 
 .filter-item .weui-flex{
-  justify-content: space-between;
-  flex-wrap: wrap;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
 }
 .filter-item span {
   display: block;
@@ -2015,7 +2058,9 @@ input[name=sex] {
 
 #application-record .weui-flex,
 #fee-audit-list .weui-flex {
-  justify-content: space-between;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
 }
 
 #application-record .weui-flex__item p:first-child,
@@ -2099,7 +2144,8 @@ input[name=input-type] {
 /* 费用申请查询 */
 
 #fee-application-detail header {
-  box-shadow: 0 1px 0.1rem rgba(194, 194, 194, 0.15), 0 0.1rem 0.1rem rgba(194, 194, 194, 0.24);
+  -webkit-box-shadow: 0 1px 0.1rem rgba(194, 194, 194, 0.15), 0 0.1rem 0.1rem rgba(194, 194, 194, 0.24);
+          box-shadow: 0 1px 0.1rem rgba(194, 194, 194, 0.15), 0 0.1rem 0.1rem rgba(194, 194, 194, 0.24);
 }
 
 #fee-application-detail main {
@@ -2260,7 +2306,8 @@ input[name=input-type] {
   left: 1rem;
   width: 2rem;
   top: 50%;
-  transform: translateY(-50%);
+  -webkit-transform: translateY(-50%);
+          transform: translateY(-50%);
 }
 
 .report-top .weui-flex__item>div {
@@ -2290,7 +2337,8 @@ input[name=input-type] {
   display: inline-block;
   border-radius: .5rem;
   padding: 0 .5rem;
-  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
   font-size: .7rem;
   position: relative;
   margin-right: .5rem;
@@ -2370,7 +2418,8 @@ input[name=input-type] {
 
 .rank-detail .sequence{
   top: 50%;
-  transform: translateY(-50%);
+  -webkit-transform: translateY(-50%);
+          transform: translateY(-50%);
   position: absolute;
 }
 
@@ -2383,7 +2432,8 @@ input[name=input-type] {
   width: 3rem;
   margin-left: 1rem;
   top: 50%;
-  transform: translateY(-50%);
+  -webkit-transform: translateY(-50%);
+          transform: translateY(-50%);
   position: absolute;
 
 }
@@ -2410,7 +2460,8 @@ input[name=input-type] {
 .customerMulti input[type=checkbox] {
   position: absolute;
   top: 50%;
-  transform:translateY(-50%);
+  -webkit-transform:translateY(-50%);
+          transform:translateY(-50%);
   left: 0;
   border-radius: 50%;
   width: .8rem;
@@ -2437,7 +2488,8 @@ input[name=input-type] {
   position: absolute;
   left: 0;
   top: 50%;
-  transform: translateY(-50%);
+  -webkit-transform: translateY(-50%);
+          transform: translateY(-50%);
 }
 
 .todo-product-box>.weui-flex {
