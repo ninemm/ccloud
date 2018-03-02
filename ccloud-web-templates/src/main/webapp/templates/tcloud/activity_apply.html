@@ -50,7 +50,15 @@ $(function () {
 	$activity.empty();
 	addActivity();
 	doChange(activityId);
-
+	 $("#expense_detail").select({
+   		title: "选择明细",
+		multi: true,
+		items: ${details},
+		onClose: function(obj) {
+			var expenseDetailIds = obj.data.values;
+			$('#expense_detail_id').val(expenseDetailIds);
+		}
+    });
 	//客户选择部分
 	$(document).on("click", "#addActivity", function () {
 		addActivity();
@@ -142,7 +150,6 @@ function showCustomer(activity){
 }
 
 function changeEvent(activity,$obj){
-	console.log(activity);
 	$obj.find("#activityId").val(activity.id);
 	$obj.find("#visitNum").val(activity.visit_num);
 	$obj.find("#startTime").val(new Date(activity.start_time).Format("yyyy-MM-dd"));
@@ -261,11 +268,6 @@ function doChange(key){
         page = 1;
         initCustomerSelect();
     }
-	 $("#expense_detail").select({
-   		title: "选择明细",
-		multi: true,
-		items: ${details}
-    });
 	var $section = $(".order-customer-info");
 	var customerInfoHtml = $section.html();
 	function confirm(){
@@ -419,7 +421,7 @@ function doChange(key){
 						</span>
 						<div class="weui-cell__bd">
 							<input id="expense_detail_id"  name="expense_detail_id" type="hidden" />
-							<input id="expense_detail" class="weui-input" name="expense_detail" type="text">
+							<input id="expense_detail" class="weui-input" name="expense_detail" style="width:100%;" type="text">
 	                    </div>
 	                    <span class="weui-cell__ft"></span>
 	                </div>

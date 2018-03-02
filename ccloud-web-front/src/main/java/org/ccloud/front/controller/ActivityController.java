@@ -187,47 +187,50 @@ public class ActivityController extends BaseFrontController {
 
 		String[] sellerCustomerIdArray = getParaValues("sellerCustomerId");
 		String[] sellerCustomerNameArray = getParaValues("sellerCustomerName");
-
+		String[] expenseDetailIds = getParaValues("expense_detail_id");
 
 		Boolean startProc = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_ACTIVITY_APPLY + sellerCode);
 
 		String[] activity_ids = getParaValues("activity_id");
 		Integer[] visit_nums = getParaValuesToInt("visit_num");
-		for (String sellerCustomerId : sellerCustomerIdArray) {
-			for (int i = 0; i < activity_ids.length; i++) {
-				//活动申请check
-				String result = this.check(activity_ids[i], sellerCustomerId, sellerCustomerNameArray[i],user.getId());
-				
-				if(StrKit.notBlank(result)) {
-					renderAjaxResultForError(result);
-					return;
-				}
-
-				ActivityApply activityApply = new ActivityApply();
-				String activityApplyId = StringUtils.getUUID();
-				activityApply.setId(activityApplyId);
-				activityApply.setActivityId(activity_ids[i]);
-				activityApply.setSellerCustomerId(sellerCustomerId);
-				activityApply.setBizUserId(user.getId());
-				activityApply.setNum(visit_nums[i]);
-				activityApply.setContent(content);
-
-				if (startProc != null && startProc) {
-					activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_WAIT);
-					activityApply.setProcInstId(Consts.PROC_ACTIVITY_APPLY_REVIEW);
-					String procInstId = this.start(activityApplyId, sellerCustomerNameArray[i], Consts.PROC_ACTIVITY_APPLY_REVIEW);
-					if(procInstId.equals("error")) {
-						renderAjaxResultForError("您没有配置审核人，请联系管理员");
+		for(String expenseDetailId: expenseDetailIds ) {
+			for (String sellerCustomerId : sellerCustomerIdArray) {
+				for (int i = 0; i < activity_ids.length; i++) {
+					//活动申请check
+					String result = this.check(activity_ids[i], sellerCustomerId, sellerCustomerNameArray[i],user.getId());
+					
+					if(StrKit.notBlank(result)) {
+						renderAjaxResultForError(result);
 						return;
 					}
-					activityApply.setProcInstId(procInstId);
-				}else {
-					activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_PASS);
+	
+					ActivityApply activityApply = new ActivityApply();
+					String activityApplyId = StringUtils.getUUID();
+					activityApply.setId(activityApplyId);
+					activityApply.setActivityId(activity_ids[i]);
+					activityApply.setSellerCustomerId(sellerCustomerId);
+					activityApply.setBizUserId(user.getId());
+					activityApply.setNum(visit_nums[i]);
+					activityApply.setContent(content);
+					
+					if (startProc != null && startProc) {
+						activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_WAIT);
+						activityApply.setProcInstId(Consts.PROC_ACTIVITY_APPLY_REVIEW);
+						String procInstId = this.start(activityApplyId, sellerCustomerNameArray[i], Consts.PROC_ACTIVITY_APPLY_REVIEW);
+						if(procInstId.equals("error")) {
+							renderAjaxResultForError("您没有配置审核人，请联系管理员");
+							return;
+						}
+						activityApply.setProcInstId(procInstId);
+					}else {
+						activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_PASS);
+					}
+	
+					activityApply.setDataArea(user.getDataArea());
+					activityApply.setCreateDate(createDate);
+					activityApply.setExpenseDetailId(expenseDetailId);
+					activityApply.save();
 				}
-
-				activityApply.setDataArea(user.getDataArea());
-				activityApply.setCreateDate(createDate);
-				activityApply.save();
 			}
 		}
 		renderAjaxResultForSuccess("申请成功");

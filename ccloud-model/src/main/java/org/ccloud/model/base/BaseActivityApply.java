@@ -193,5 +193,11 @@ public abstract class BaseActivityApply<M extends BaseActivityApply<M>> extends 
 	public String getDataArea() {
 		return getStr("data_area");
 	}
+	public void setExpenseDetailId(String expenseDetailId) {
+		set("expense_detail_id", expenseDetailId);
+	}
 
+	public String getExpenseDetailId() {
+		return getStr("expense_detail_id");
+	}
 }
