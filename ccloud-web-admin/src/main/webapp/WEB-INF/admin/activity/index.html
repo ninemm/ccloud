@@ -67,7 +67,7 @@
       			{field: "activityCategory", title: "活动类型", align: "center", width: '3%', edit:false},
       			{field: "customer_type", title: "客户类型", align: "center", width: '20%',
    					formatter: function(value, row, rowIndex) {
-   						if (value == null) {
+   						if (value == null || value == '') {
    							return '不限';
    						} else {
    							return value;
@@ -77,7 +77,7 @@
       			},
       			{field: "area_type", title: "区域类型", align: "center", width: '10%',
    					formatter: function(value, row, rowIndex) {
-   						if (value == null) {
+   						if (value == null || value == '') {
    							return '不限';
    						} else {
    							return value;
