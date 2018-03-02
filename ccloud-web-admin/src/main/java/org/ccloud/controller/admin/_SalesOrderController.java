@@ -461,12 +461,12 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 		if(Consts.PROC_ORDER_REVIEW_ONE.equals(proc_def_key)) {
 			
-			User manager = UserQuery.me().findManagerByDeptId(user.getDepartmentId());
-			if (manager == null) {
+			User orderReviewer = UserQuery.me().findOrderReviewerByDeptId(user.getDepartmentId());
+			if (orderReviewer == null) {
 				return false;
 			}
-			param.put("manager", manager.getUsername());
-			toUserId = manager.getId();
+			param.put("manager", orderReviewer.getUsername());
+			toUserId = orderReviewer.getId();
 		}
 
 		String procInstId = workflow.startProcess(orderId, proc_def_key, param);

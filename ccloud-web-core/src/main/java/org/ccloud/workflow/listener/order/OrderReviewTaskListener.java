@@ -61,10 +61,10 @@ public class OrderReviewTaskListener implements TaskListener {
 					                                  .executionId(executeInstanceId).list();
 			int size = list.size();
 
-			if (size == 1) {// 业务主管
-				User manager = UserQuery.me().findManagerByDeptId(user.getDepartmentId());
-				task.setAssignee(manager.getUsername());
-				OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核", manager.getId(), user.getId(), user.getDepartmentId(),
+			if (size == 1) {// 订单审核人
+				User orderReviewer = UserQuery.me().findOrderReviewerByDeptId(user.getDepartmentId());
+				task.setAssignee(orderReviewer.getUsername());
+				OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核", orderReviewer.getId(), user.getId(), user.getDepartmentId(),
 						user.getDataArea(), orderId);
 			} else if (size == 2) {// 财务
 				String treasurerUserName = "";

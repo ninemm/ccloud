@@ -55,10 +55,11 @@ public class DepartmentQuery extends JBaseQuery {
 			@Override
 			public Object load() {
 				
-				StringBuilder sqlBuilder = new StringBuilder("select d.*,a.dept_name as parent_name,b.realname as user_realname ");
+				StringBuilder sqlBuilder = new StringBuilder("select d.*,a.dept_name as parent_name,b.realname as user_realname, c.realname as order_reviewer ");
 				sqlBuilder.append("from `department` d  ");
 				sqlBuilder.append("left join (select id,dept_name from department) a on d.parent_id = a.id ");
 				sqlBuilder.append("left join `user` b on b.id = d.principal_user_id ");
+				sqlBuilder.append("left join `user` c on c.id = d.order_reviewer_id ");
 				sqlBuilder.append("where d.id = ?");
 				return DAO.findFirst(sqlBuilder.toString(), id);
 			}

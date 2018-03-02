@@ -36,15 +36,15 @@ public class OrderReviewTwoTaskListener implements TaskListener {
 		ProcessEngine processEngine = ActivitiPlugin.buildProcessEngine();
 		List<Task> taskList = processEngine.getTaskService().createTaskQuery().executionId(executeInstanceId).list();
 
-		if (taskList != null && taskList.size() == 0) {// 主管
+		if (taskList != null && taskList.size() == 0) {// 订单审核人
 			String managerName = "";
-			User manager = UserQuery.me().findManagerByDeptId(user.getDepartmentId());
-			if (manager != null) {
-				managerName = manager.getUsername();
+			User orderReviewer = UserQuery.me().findOrderReviewerByDeptId(user.getDepartmentId());
+			if (orderReviewer != null) {
+				managerName = orderReviewer.getUsername();
 			}
 
 			task.setAssignee(managerName);
-			OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核", manager.getId(), user.getId(), user.getDepartmentId(),
+			OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核", orderReviewer.getId(), user.getId(), user.getDepartmentId(),
 					user.getDataArea(), orderId);
 		} else if (taskList != null && taskList.size() > 0) {
 

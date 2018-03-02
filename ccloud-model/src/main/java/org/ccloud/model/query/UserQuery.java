@@ -235,8 +235,13 @@ public class UserQuery extends JBaseQuery {
 	public User findManagerByDeptId(String deptId) {
 		String sql = "select u.* from user u left join department d on u.id = d.principal_user_id where d.id = ?";
 		return DAO.findFirst(sql, deptId);
-	}	
-	
+	}
+
+	public User findOrderReviewerByDeptId(String deptId) {
+		String sql = "select u.* from user u left join department d on u.id = d.principal_user_id where d.id = ?";
+		return DAO.findFirst(sql, deptId);
+	}
+
 	public List<Record> findByUserCheck(String id, String dataArea) {
 		StringBuilder stringBuilder = new StringBuilder("SELECT u.id,u.realname,a.id as check_status FROM user u LEFT JOIN ");
 		stringBuilder.append("(SELECT * FROM user_group_rel gr WHERE gr.group_id = ?) a ");

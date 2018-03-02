@@ -131,6 +131,14 @@ public abstract class BaseDepartment<M extends BaseDepartment<M>> extends JModel
 		return get("is_parent");
 	}
 
+	public void setOrderReviewerId(java.lang.String orderReviewerId) {
+		set("order_reviewer_id", orderReviewerId);
+	}
+
+	public java.lang.String getOrderReviewerId() {
+		return get("order_reviewer_id");
+	}
+
 	public void setPrincipalUserId(java.lang.String principalUserId) {
 		set("principal_user_id", principalUserId);
 	}
