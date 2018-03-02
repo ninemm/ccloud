@@ -7,6 +7,17 @@
     bottom:2.25rem;
     width:100%
 }
+    #combin-filter>.filter-item {
+        margin: 1rem 0;
+    }
+    #list {
+        position: absolute;
+        top: 3rem;
+        bottom: 2.25rem;
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+    }
 </#macro>
 
 <#macro css_import>
@@ -69,7 +80,33 @@
             refresh();
         }).on("change", "#date", function() {
             getDateOrder();
+        }).off("click", "#combin-filter .confirm-search-btn")
+        .on("click", "#combin-filter .confirm-search-btn", function() {
+            startDate = $('#start-date').val();
+            endDate = $('#end-date').val() + ' 23:59:59';
+            setItemBykey("startDate", startDate);
+            setItemBykey("endDate", endDate);
+            refresh();
         })
+
+        $("#start-date").calendar({
+            maxDate: function() {
+                return $('#end-date').val()
+            }
+        });
+
+        $("#start-date").val($.today());
+
+        $("#end-date").calendar({
+            minDate: function() {
+                var date = new Date($('#start-date').val().replace(/-/g,"/"));
+                date.setDate(date.getDate() - 1);
+                return date.Format("yyyy-MM-dd")
+            }
+        });
+
+        $("#end-date").val($.today());
+
         $('#date').select({
             title: '选择时间',
             items: [{
@@ -95,13 +132,16 @@
             startDate = date.Format("yyyy-MM-dd");
         }else if(dateType == 2){
             date.setDate(date.getDate() - 7);
-            startDate = date.Formaft("yyyy-MM-dd");
+            startDate = date.Format("yyyy-MM-dd");
         }else if(dateType == 3){
             date.setDate(date.getDate() - 30);
             startDate = date.Format("yyyy-MM-dd");
         }
 
         endDate = $.today() + ' 23:59:59';
+
+        $("#start-date").val(startDate);
+        $("#end-date").val($.today());
         refresh();
     }
 
@@ -170,8 +210,8 @@
                 + "<e class='fr'>" + visitList[i].name + "</e></p></div>";
         }
         str = str + "</div></div> </div>"
-        $("#combin-filter").empty();
-        $("#combin-filter").append(str);
+        $("#list").empty();
+        $("#list").append(str);
         layer.closeAll();
     }
 
@@ -255,32 +295,18 @@
 </div>
 
 <article id="combin-filter">
-    <!--<div class="filter-item">
-        <div class="weui-cell">
-            今日拜访：20家
+    <div class="filter-item">
+        <div class="relative weui-flex" id="getDate">
+            <input type="text" id="start-date" class="weui-input weui-flex__item" readonly>
+            <div style="width:1rem" class="t-c">—</div>
+            <input type="text" id="end-date" class="weui-input weui-flex__item" readonly>
         </div>
-        <div id="operate-history">
-            <div class="weui-cells mg-0">
-                <div class="weui-cell weui-cell_access">
-                    <div></div>
-                    <p>华润万家
-                        <e class="fr">商超</e>
-                    </p>
-                    <p>2018-02-02</p>
-                </div>
-                <div class="weui-cell weui-cell_access">
-                    <p>老王</p>
-                    <p>2018-02-02</p>
-                    <div></div>
-                </div>
-                <div class="weui-cell weui-cell_access">
-                    <p>小张</p>
-                    <p>2018-02-02</p>
-                    <div></div>
-                </div>
-            </div>
-        </div>
-    </div>-->
+    </div>
+    <div id="list"></div>
+    <footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
+        <button class="white-button-no-border  cancel-search-btn weui-flex__item border-top-1px">取消</button>
+        <button class="red-button confirm-search-btn weui-flex__item">确定</button>
+    </footer>
 </article>
 <div class="layer"></div>
 
