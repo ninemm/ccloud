@@ -319,7 +319,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 
 		sb.append(" JOIN act_ru_task a on sc.proc_inst_id = a.PROC_INST_ID_");
 		sb.append(" JOIN act_ru_identitylink u on sc.proc_inst_id = u.PROC_INST_ID_");
-		sb.append(" where locate(?, u.USER_ID_) > 0 and c.is_enabled = 1");
+		sb.append(" where FIND_IN_SET(?, u.USER_ID_) and c.is_enabled = 1");
 		sb.append(" GROUP BY sc.id");
 		return DAO.find(sb.toString(), username);
 	}
@@ -338,7 +338,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 
 		sql.append("LEFT JOIN act_hi_actinst i on c.proc_inst_id = i.PROC_INST_ID_ ");
 		sql.append("LEFT JOIN act_re_procdef p on p.ID_ = i.PROC_DEF_ID_ ");
-		sql.append("WHERE p.KEY_ = ? and locate(?, ASSIGNEE_) > 0 AND i.DURATION_ is not null ");
+		sql.append("WHERE p.KEY_ = ? and FIND_IN_SET(?, ASSIGNEE_) AND i.DURATION_ is not null ");
 		sql.append("group by c.id ");
 
 

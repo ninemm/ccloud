@@ -169,7 +169,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 		fromBuilder.append(" JOIN cc_customer c on sc.customer_id = c.id");
 		fromBuilder.append(" JOIN act_ru_task a on cv.proc_inst_id = a.PROC_INST_ID_");
 		fromBuilder.append(" JOIN act_ru_identitylink u on cv.proc_inst_id = u.PROC_INST_ID_");
-		fromBuilder.append(" where c.is_enabled = 1 and locate(?, u.USER_ID_) > 0");
+		fromBuilder.append(" where c.is_enabled = 1 and FIND_IN_SET(?, u.USER_ID_) ");
 		
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), username);
 	}
@@ -184,7 +184,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 		sql.append(" JOIN cc_customer c on sc.customer_id = c.id");
 		sql.append(" JOIN act_ru_task a on cv.proc_inst_id = a.PROC_INST_ID_");
 		sql.append(" JOIN act_ru_identitylink u on cv.proc_inst_id = u.PROC_INST_ID_");
-		sql.append(" where c.is_enabled = 1 and locate(?, u.USER_ID_) > 0");
+		sql.append(" where c.is_enabled = 1 and FIND_IN_SET(?, u.USER_ID_) ");
 		
 		return DAO.find(sql.toString(), username);
 	}

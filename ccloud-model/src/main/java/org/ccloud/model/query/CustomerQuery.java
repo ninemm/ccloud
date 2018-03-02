@@ -149,7 +149,7 @@ public class CustomerQuery extends JBaseQuery {
 		sb.append(" FROM cc_customer c");
 		sb.append(" JOIN act_ru_task a on c.proc_inst_id = a.PROC_INST_ID_");
 		sb.append(" JOIN act_ru_identitylink u on c.proc_inst_id = u.PROC_INST_ID_");
-		sb.append(" where locate(?, u.USER_ID_) > 0");
+		sb.append(" where FIND_IN_SET(?, u.USER_ID_) ");
 		return DAO.find(sb.toString(), username);
 	}
 
