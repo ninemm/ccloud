@@ -19,6 +19,7 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +36,7 @@ import org.ccloud.model.Activity;
 import org.ccloud.model.ActivityExecute;
 import org.ccloud.model.Dict;
 import org.ccloud.model.ExpenseDetail;
+import org.ccloud.model.GoodsSpecificationValue;
 import org.ccloud.model.QyExpense;
 import org.ccloud.model.QyExpensedetail;
 import org.ccloud.model.query.ActivityExecuteQuery;
@@ -168,12 +170,14 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 	@Before(Tx.class)
 	public void save() {
 		final Activity activity = getModel(Activity.class);
+		List<ExpenseDetail> expenseOldList = ExpenseDetailQuery.me().findByActivityId(activity.getId());
 		String sellerId = getSessionAttr("sellerId");
 		String [] imagePath = getParaValues("imageUrl[]");
 		String [] item1 = getParaValues("item1[]");
 		String [] item2 = getParaValues("item2[]");
 		String [] item3 = getParaValues("item3[]");
-		String [] item4 = getParaValues("item4[]");			
+		String [] item4 = getParaValues("item4[]");
+		String [] expenseIds = getParaValues("expenseIds[]");
 		String investTypes = getPara("invest_type");
 		String customerTypes = getPara("customerType");
 		if(customerTypes !=null && customerTypes.length()>180) {
@@ -245,9 +249,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		
 		for(int i = 0; i < item1.length; i++) {
 			ExpenseDetail detail = new ExpenseDetail();
-			detail.setId(StrKit.getRandomUUID());
 			detail.setActivityId(activity.getId());
-			detail.setCreateDate(new Date());
 			detail.setFlowNo(activity.getProcCode());
 			String typeID = findFlowDictType(activity.getInvestType());
 			detail.setFlowDictType(typeID);
@@ -262,11 +264,58 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			if (item4 != null) {
 				detail.setItem4(item4[i]);
 			}
-			detail.setState(true);
-			detail.save();
+			detail.setState(true);			
+			if (StrKit.notBlank(expenseIds[i])) {
+				detail.setId(expenseIds[i]);
+				detail.setModifyDate(new Date());
+				detail.update();
+			} else {
+				detail.setId(StrKit.getRandomUUID());
+				detail.setCreateDate(new Date());
+				detail.save();
+			}
 		}
-		
+		List<String> ids = getDiffrent(expenseOldList, expenseIds);
+		ExpenseDetailQuery.me().batchDelete(ids);
 		renderAjaxResultForSuccess();
+	}
+	
+	/** 
+	 * 获取两个List的不同元素(耗时最低)
+	 * @param list1 
+	 * @param list2 
+	 * @return 
+	 */  
+	private static List<String> getDiffrent(List<ExpenseDetail> eList, String[] newIds) {
+		List<String> list1 = new ArrayList<String>();
+		List<String> list2 = Arrays.asList(newIds);
+		for (ExpenseDetail expenseDetail : eList) {
+			list1.add(expenseDetail.getId());
+		}
+		List<String> diff = new ArrayList<String>();  
+	    List<String> maxList = list1;  
+	    List<String> minList = list2;  
+	    if(list2.size()>list1.size()) {  
+	         maxList = list2;  
+	         minList = list1;  
+	    }  
+	    Map<String,Integer> map = new HashMap<String,Integer>(maxList.size());  
+	    for (String string : maxList) {  
+	        map.put(string, 1);  
+	    }  
+	    for (String string : minList) {  
+	        if(map.get(string)!=null) {  
+	            map.put(string, 2);  
+	            continue;  
+	        }  
+	        diff.add(string);  
+	    }  
+	    for(Map.Entry<String, Integer> entry:map.entrySet()) {  
+	        if(entry.getValue()==1) {  
+	            diff.add(entry.getKey());  
+	        }  
+	    }  
+	    return diff;  
 	}
 	
 	private String findFlowDictType(String code) {
