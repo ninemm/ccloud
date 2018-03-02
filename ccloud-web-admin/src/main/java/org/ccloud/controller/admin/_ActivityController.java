@@ -432,5 +432,74 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
 	}
+
+	//活动投放明细
+	public void putDetails() {
+		String id = getPara("id");
+		setAttr("id", id);
+		render("putDetails.html");
+	}
 	
+	
+	public void putDetailsList() {
+		String id = getPara("id");
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String keyword = getPara("k");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+			setAttr("k", keyword);
+		}
+		Page<Record> page = ActivityQuery.me().putDetailsPaginate(getPageNumber(), getPageSize(), keyword,startDate, endDate,id);
+		for(int i = 0; i <page.getList().size();i++){
+			if(page.getList().get(i).getStr("customer_type")!="") {
+				page.getList().get(i).set("customer_type", ActivityQuery.me().getCustomerType(page.getList().get(i).getStr("customer_type")));
+			}
+			if(page.getList().get(i).getStr("time_interval")!="") {
+				page.getList().get(i).set("time_interval", ActivityQuery.me().getTimeInterval(page.getList().get(i).getStr("time_interval")));
+			}
+			if(page.getList().get(i).getStr("invest_type")!="") {
+				page.getList().get(i).set("invest_type", ActivityQuery.me().getInvestType(page.getList().get(i).getStr("invest_type")));
+			}
+		}
+		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
+		renderJson(map);
+	}
+	
+	public void visitDetails() {
+		String id = getPara("id");
+		String customerId = getPara("customerId");
+		String userId = getPara("userId");
+		setAttr("id", id);
+		setAttr("customerId", customerId);
+		setAttr("userId", userId);
+		render("visitDetails.html");
+	}
+	
+	public void visitDetailsList() {
+		String id = getPara("id");
+		String customerId = getPara("customerId");
+		String userId = getPara("userId");
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String keyword = getPara("k");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+			setAttr("k", keyword);
+		}
+		Page<Record> page = ActivityQuery.me().putDetailsPaginate(getPageNumber(), getPageSize(), keyword,startDate, endDate,id);
+		for(int i = 0; i <page.getList().size();i++){
+			if(page.getList().get(i).getStr("customer_type")!="") {
+				page.getList().get(i).set("customer_type", ActivityQuery.me().getCustomerType(page.getList().get(i).getStr("customer_type")));
+			}
+			if(page.getList().get(i).getStr("time_interval")!="") {
+				page.getList().get(i).set("time_interval", ActivityQuery.me().getTimeInterval(page.getList().get(i).getStr("time_interval")));
+			}
+			if(page.getList().get(i).getStr("invest_type")!="") {
+				page.getList().get(i).set("invest_type", ActivityQuery.me().getInvestType(page.getList().get(i).getStr("invest_type")));
+			}
+		}
+		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
+		renderJson(map);
+	}
 }

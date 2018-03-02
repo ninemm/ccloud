@@ -18,6 +18,7 @@ package org.ccloud.model.query;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.ccloud.model.Activity;
 import org.ccloud.model.CustomerType;
 
 import com.jfinal.plugin.activerecord.Db;
@@ -35,7 +36,13 @@ public class CustomerTypeQuery extends JBaseQuery {
 	public static CustomerTypeQuery me() {
 		return QUERY;
 	}
-
+	
+	public CustomerType findByCustomerTypeId(final String id) {
+		StringBuilder fromBuilder = new StringBuilder(" select * ");
+		fromBuilder.append(" from cc_customer_type where id='"+id+"'");
+		return DAO.findFirst(fromBuilder.toString());
+	}
+	
 	public Record findById(final String id) {
 		StringBuilder fromBuilder = new StringBuilder(" select ");
 		fromBuilder.append(" c.id, c.name, c.code, c.price_system_id, c.proc_def_key, p.name as price_system_name");

@@ -204,11 +204,57 @@ public class ActivityQuery extends JBaseQuery {
         return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
     }
 
-	public Object getTimeInterval(String timeIntervalId) {
+	public String getTimeInterval(String timeIntervalId) {
 		if (StrKit.isBlank(timeIntervalId)) {
 			return null;
 		}
 		timeIntervalId= DictQuery.me().findByKey(Consts.ACTIVE_TIME_INTERVAL, timeIntervalId).getName();
 		return timeIntervalId;
+	}
+
+	public Page<Record> putDetailsPaginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate,String id) {
+		String select = "SELECT u.id userId,csc.id customerId,cc.customer_name,CONCAT(cc.prov_name,cc.city_name,cc.country_name,cc.address) address,csc.customer_type_ids customer_type,caa.create_date putDate,u.realname,IFNULL(t1.executeNum,0) executeNum,ca.* ";	
+		StringBuilder fromBuilder = new StringBuilder(" FROM cc_seller_customer csc ");
+		fromBuilder.append(" LEFT JOIN cc_activity_apply caa ON caa.seller_customer_id=csc.id");
+		fromBuilder.append(" LEFT JOIN cc_activity ca ON caa.activity_id = ca.id");
+		fromBuilder.append(" LEFT JOIN cc_customer_visit cv ON cv.active_apply_id=caa.id");
+		fromBuilder.append(" LEFT JOIN cc_customer cc ON cc.id=csc.customer_id");
+		fromBuilder.append(" LEFT JOIN `user` u ON u.id=caa.biz_user_id ");
+		fromBuilder.append(" LEFT JOIN(  SELECT ccv.seller_customer_id ,ccv.user_id ,COUNT(1) executeNum FROM cc_activity_apply aa LEFT JOIN cc_customer_visit ccv ON aa.id = ccv.active_apply_id   WHERE aa.activity_id = '");
+		fromBuilder.append(id+"' GROUP BY ccv.seller_customer_id,ccv.user_id) t1 ON t1.seller_customer_id = csc.id and t1.user_id=caa.biz_user_id");
+		fromBuilder.append(" WHERE ca.id='"+id+"' ");
+		if (StrKit.notBlank(keyword)) {
+			fromBuilder.append(" and (cc.customer_name like '%"+keyword+"%' or u.realname like '%"+keyword+"%')");
+		}
+		LinkedList<Object> params = new LinkedList<Object>();
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and ca.start_time >= ?");
+			params.add(startDate+" 00:00:00");
+		}
+
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and ca.end_time <= ?");
+			params.add(endDate + "23:59:59");
+		}
+		fromBuilder.append(" GROUP BY cv.active_apply_id");
+		if (params.isEmpty())
+			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+        return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+
+	public String getCustomerType(String customer_type_ids) {
+		if (StrKit.isBlank(customer_type_ids)) {
+			return null;
+		}
+		String[] customerTypeId = customer_type_ids.split(",");
+		String types = "";
+		String typeNames = "";
+		if(customerTypeId!=null){
+			for(int i = 0;i<customerTypeId.length;i++){
+				types += CustomerTypeQuery.me().findByCustomerTypeId(customerTypeId[i]).getName()+",";
+			}
+			typeNames = types.substring(0, types.length()-1);
+		}
+		return typeNames;
 	}
 }
