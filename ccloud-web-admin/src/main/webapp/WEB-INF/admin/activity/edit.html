@@ -56,7 +56,11 @@
 	var AddButton       = $("#AddMoreFileBox"); //Add button ID  
 	var x = InputsWrapper.length; //initlal text box count 
 	
-	<#if activity.investType?? && (activity.investType == '101105' || activity.investType == '101107')>
+	<#if activity?? && (activity.investType == '101105' || activity.investType == '101107')>
+			$(".needs").select2({
+				width: "100%",
+				language: "zh-CN"
+			});	
 			$(".product").select2({
 				data: ${productOptionList},
 				width: "100%",
@@ -119,23 +123,6 @@
 					}
 				}
 				$("#unit").html(optionsHtml);
-			}
-		});
-		
-		
-		$.ajax({
-			url:"${CPATH}/admin/activity/getInvestType",
-			type:"post",
-			dataType:"json",
-			success:function(data)
-			{
-				for (var i = 0; i < data.length; i++) {
-					if (data[i].isvalid == 0 ) {
-						$("#invest_type").append("<option value=" + data[i].id + ">" + data[i].name + "</option>");
-					} else {
-						$("#invest_type").append("<option value=" + data[i].id + " selected >" + data[i].name + "</option>");
-					}
-				}
 			}
 		});
 		
@@ -557,7 +544,7 @@
 									<div class="input-group col-sm-8">
 										<select class="form-control" name="invest_type" id="invest_type">
 											<#list (dicts)! as dict>
-												<option value="${dict.key}">${(dict.name)!}</option>
+												<option value="${dict.value}" <#if activity?? && activity.investType == dict.value>selected</#if>>${(dict.name)!}</option>
 											</#list>
 										</select>
 									</div>
@@ -671,7 +658,7 @@
 										<#list expenseList as list>
 											<tr>
 												<td class="col-xs-3">
-													<select class="form-control input-sm" name="item1[]">
+													<select class="form-control input-sm needs" name="item1[]">
 														${DICT_BOX('${list.flowDictType}', 'select', '${list.item1}')}
 													</select>
 												</td>
