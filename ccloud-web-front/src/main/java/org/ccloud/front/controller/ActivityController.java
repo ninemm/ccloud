@@ -187,17 +187,16 @@ public class ActivityController extends BaseFrontController {
 
 		String[] sellerCustomerIdArray = getParaValues("sellerCustomerId");
 		String[] sellerCustomerNameArray = getParaValues("sellerCustomerName");
-		String[] expenseDetailIds = getParaValues("expense_detail_id");
+		String[] expenseDetailIds = getParaValues("expense_detail_id")[0].split(",");
 
 		Boolean startProc = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_ACTIVITY_APPLY + sellerCode);
 
 		String[] activity_ids = getParaValues("activity_id");
-		Integer[] visit_nums = getParaValuesToInt("visit_num");
 		for(String expenseDetailId: expenseDetailIds ) {
 			for (String sellerCustomerId : sellerCustomerIdArray) {
 				for (int i = 0; i < activity_ids.length; i++) {
 					//活动申请check
-					String result = this.check(activity_ids[i], sellerCustomerId, sellerCustomerNameArray[i],user.getId());
+					String result = this.check(activity_ids[i], sellerCustomerId, sellerCustomerNameArray[i],user.getId(),expenseDetailId);
 					
 					if(StrKit.notBlank(result)) {
 						renderAjaxResultForError(result);
@@ -210,7 +209,7 @@ public class ActivityController extends BaseFrontController {
 					activityApply.setActivityId(activity_ids[i]);
 					activityApply.setSellerCustomerId(sellerCustomerId);
 					activityApply.setBizUserId(user.getId());
-					activityApply.setNum(visit_nums[i]);
+					activityApply.setNum(0);
 					activityApply.setContent(content);
 					
 					if (startProc != null && startProc) {
@@ -270,19 +269,19 @@ public class ActivityController extends BaseFrontController {
 		return procInstId;
 	}
 
-	private String check(String activityId, String sellerCustomerId, String customerName,String userId) {
+	private String check(String activityId, String sellerCustomerId, String customerName,String userId,String expenseDetailId) {
 		Activity activity = ActivityQuery.me().findById(activityId);
-		List<ActivityApply> activityApplies = ActivityApplyQuery.me().findByUserIdAndActivityId(activityId, userId);
+		//List<ActivityApply> activityApplies = ActivityApplyQuery.me().findByUserIdAndActivityId(activityId, userId);
 		if(activity.getStartTime().after(new Date())) {
 			return "活动还没有开始";
 		}
-		if (activityApplies.size() >= activity.getTotalCustomerNum()) {
+		/*if (activityApplies.size() >= activity.getTotalCustomerNum()) {
 			return "活动参与的人数已经达到上限";
-		}
-		List<ActivityApply> applys = ActivityApplyQuery.me().findSellerCustomerIdAndActivityIdAndUserId(sellerCustomerId,activityId,userId);
+		}*/
+		/*List<ActivityApply> applys = ActivityApplyQuery.me().findSellerCustomerIdAndActivityIdAndUserId(sellerCustomerId,activityId,userId,expenseDetailId);
 		if (applys.size() >= activity.getJoinNum()) {
 			return "该客户参与该活动的次数已经达到上限";
-		}
+		}*/
 		/*int interval = this.getStartDate(activity.getTimeInterval());
 		DateTime dateTime = new DateTime(new Date());
 		long cnt = ActivityApplyQuery.me().findBySellerCustomerIdAndActivityId(activityId, sellerCustomerId, DateUtils.format(dateTime.plusMonths(-interval).toDate()));
@@ -401,7 +400,7 @@ public class ActivityController extends BaseFrontController {
 		String activityApplyId = getPara("activityApplyId");
 		String taskId = getPara("taskId");
 		ActivityApply activityApply = ActivityApplyQuery.me().findById(activityApplyId);
-
+		ExpenseDetail expenseDetail = ExpenseDetailQuery.me().findById(activityApply.getExpenseDetailId());
 		boolean isCheck = false;
 		if (user != null && getPara("assignee", "").contains(user.getUsername())) {
 			isCheck = true;
@@ -440,6 +439,7 @@ public class ActivityController extends BaseFrontController {
 		}
 		setAttr("taskId", taskId);
 		setAttr("activityApply", activityApply);
+		setAttr("expenseDetail",expenseDetail);
 		setAttr("statusName", getStatusName(activityApply.getInt("status")));
 		render("activity_apply_review.html");
 	}
@@ -554,6 +554,7 @@ public class ActivityController extends BaseFrontController {
 		String id = getPara("id");
 		ActivityApply activityApply = ActivityApplyQuery.me().findById(id);
 		List<Dict> dicts = DictQuery.me().findDictByType(Consts.INVEST_TYPE);
+		ExpenseDetail expenseDetail = ExpenseDetailQuery.me().findById(activityApply.getExpenseDetailId());
 		if(!activityApply.getStr("invest_type").equals("")) {
 			String[] investTypes = activityApply.getStr("invest_type").split(",");
 			String invesType= "";
@@ -569,7 +570,7 @@ public class ActivityController extends BaseFrontController {
 		}
 		
 		setAttr("apply", activityApply);
-
+		setAttr("expenseDetail",expenseDetail);
 		render("apply_detail.html");
 
 	}

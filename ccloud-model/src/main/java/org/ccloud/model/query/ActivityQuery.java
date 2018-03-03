@@ -138,8 +138,9 @@ public class ActivityQuery extends JBaseQuery {
 	}
 
 	public List<Record> findByCustomerId(String customerId) {
-		StringBuilder fromBuilder = new StringBuilder("SELECT caa.id as activityApplyId, a.title,a.id FROM cc_activity a ");
+		StringBuilder fromBuilder = new StringBuilder("SELECT caa.id as activityApplyId, a.title,a.id,cea.* FROM cc_activity a ");
         fromBuilder.append(" LEFT JOIN cc_activity_apply caa on caa.activity_id = a.id ");
+        fromBuilder.append(" LEFT JOIN cc_expense_detail cea on caa.expense_detail_id = cea.id ");
 	    fromBuilder.append(" where caa.seller_customer_id ='"+customerId+"' and a.is_publish = 1");
 	    fromBuilder.append(" GROUP BY a.id");
         return Db.find(fromBuilder.toString());

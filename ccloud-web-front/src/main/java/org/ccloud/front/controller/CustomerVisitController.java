@@ -20,6 +20,7 @@ import org.ccloud.model.CustomerType;
 import org.ccloud.model.CustomerVisit;
 import org.ccloud.model.CustomerVisitJoinActivity;
 import org.ccloud.model.Dict;
+import org.ccloud.model.ExpenseDetail;
 import org.ccloud.model.Message;
 import org.ccloud.model.User;
 import org.ccloud.model.WxMessageTemplate;
@@ -30,6 +31,7 @@ import org.ccloud.model.query.CustomerJoinCustomerTypeQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.CustomerVisitQuery;
 import org.ccloud.model.query.DictQuery;
+import org.ccloud.model.query.ExpenseDetailQuery;
 import org.ccloud.model.query.MessageQuery;
 import org.ccloud.model.query.OptionQuery;
 import org.ccloud.model.query.UserQuery;
@@ -222,7 +224,7 @@ public class CustomerVisitController extends BaseFrontController {
 		List<Map<String, String>> activityList = Lists.newArrayList();
 	    for (Record record : activityRecords) {
 		    	Map<String, String> map = Maps.newHashMap();
-		    	map.put("title", record.getStr("title"));
+		    	map.put("title", record.getStr("title")+"--"+DictQuery.me().findByKey(record.getStr("flow_dict_type"), record.getStr("item1")).getName());
 		    	map.put("value", record.getStr("activityApplyId"));
 		    	activityList.add(map);
 	    }
@@ -236,6 +238,7 @@ public class CustomerVisitController extends BaseFrontController {
 		}
 		CustomerVisit customerVisit = CustomerVisitQuery.me().findById(id);
 		String imageListStore = customerVisit.getPhoto();
+		ExpenseDetail expenseDetail = ExpenseDetailQuery.me().findById(ActivityApplyQuery.me().findById(customerVisit.getActiveApplyId()).getExpenseDetailId());
 		List<ImageJson> list = JSON.parseArray(imageListStore, ImageJson.class);
 		CustomerVisit visit = CustomerVisitQuery.me().findMoreById(id);
 		List<Record> findByActivity = CustomerVisitQuery.me().findByActivity(id);
@@ -248,6 +251,7 @@ public class CustomerVisitController extends BaseFrontController {
 			activity = activity.substring(0, activity.length() - 1);  
 		}
 		setAttr("activity", activity);
+		setAttr("expenseDetail",expenseDetail);
 		setAttr("visit", visit);
 		setAttr("list",list);
 		setAttr("activityExecutes",activityExecutes);
@@ -286,7 +290,7 @@ public class CustomerVisitController extends BaseFrontController {
 			renderError(404);
 			return ;
 		}
-		
+		ExpenseDetail expenseDetail = ExpenseDetailQuery.me().findById(ActivityApplyQuery.me().findById(CustomerVisitQuery.me().findById(id).getActiveApplyId()).getExpenseDetailId());
 		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 		List<String> typeList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeNameListBySellerCustomerId(customerVisit.getSellerCustomerId(), dataArea);
 		String imageListStore = customerVisit.getPhoto();
@@ -296,6 +300,7 @@ public class CustomerVisitController extends BaseFrontController {
 		setAttr("customerVisit", customerVisit);
 		setAttr("cTypeName", Joiner.on(",").join(typeList.iterator()));
 		setAttr("list",list);
+		setAttr("expenseDetail",expenseDetail);
 		setAttr("activityExecutes",activityExecutes);
 		
 		//审核后将message中是否阅读改为是
@@ -379,8 +384,8 @@ public class CustomerVisitController extends BaseFrontController {
 				//添加的水印内容
 				String waterFont1 = customerVisit.getSellerCustomer().getCustomer().getCustomerName();
 				String waterFont2 = user.getRealname() +  DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
-				String waterFont3 =  customerVisit.getLocation();
-//				String waterFont3 = "湖北省-武汉市-洪山区";
+//				String waterFont3 =  customerVisit.getLocation();
+				String waterFont3 = "湖北省-武汉市-洪山区";
 				//图片添加水印  上传图片  水印图
 				String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
 				

@@ -328,7 +328,7 @@
 			    <div class="weui-cells none">
 				    <#if activityPage ??><#list activityPage.list as bean>
 				    
-				    		<#if (bean.taskId) ??>							
+				    		<#if (bean.taskId) ??>					
 							<a href="${CPATH}/activity/activityApplyReview?activityApplyId=${bean.object_id!}&taskId=${bean.taskId!}&assignee=${bean.assignee}">
 						<#else>
 							<a href="${CPATH}/activity/activityApplyReview?activityApplyId=${bean.object_id!}">

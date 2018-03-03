@@ -454,6 +454,14 @@
                     <input type="text" class="weui-input" value="${(customerVisit.create_date?string('yyyy-MM-dd HH:mm'))!}" readonly>
                 </div>
             </div>
+            <#if expenseDetail??>
+            <div class="weui-cell">
+                <div class="weui-cell__bd">
+                    <div class="order-customer-info-title">费用明细: </div>
+                    <input type="text" class="weui-input" value="${(expenseDetail)!}" readonly>
+                </div>
+            </div>
+            </#if>
             <div class="weui-cell">
                 <div class="weui-cell__bd">
                     <div class="order-customer-info-title">描述: </div>

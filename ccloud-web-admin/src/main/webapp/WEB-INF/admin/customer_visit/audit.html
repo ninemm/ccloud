@@ -180,7 +180,16 @@
 						</div>
 					</div>
 				</div>
-
+				<#if expenseDetail??>
+					<div class="form-group">
+	                    <div class="col-sm-5">
+	                        <label class="control-label col-sm-4">费用明细：</label>
+	                        <div class="input-group col-sm-8">
+	                            <p class="form-control-static">${(expenseDetail)!}</p>
+	                        </div>
+	                    </div>
+	                </div>
+                </#if>
                 <div class="form-group">
                     <div class="col-sm-5">
                         <label class="control-label col-sm-4">描述：</label>

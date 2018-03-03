@@ -143,6 +143,20 @@ function doPass(pass) {
                 <p>备注
                     <span>${(activityApply.content)!}</span>
                 </p>
+                <#if expenseDetail??>
+        			<p>item1
+	                    <span>${(expenseDetail.item1)!}</span>
+	                </p>
+	                <p>item2
+	                    <span>${(expenseDetail.item2)!}</span>
+	                </p>
+	                <p>item3
+	                    <span>${(expenseDetail.item3)!}</span>
+	                </p>
+	                <p>item4
+	                    <span>${(expenseDetail.item4)!}</span>
+	                </p>
+      			</#if>
 				<!--<p>-->
 				<!--附件图片-->
 				<!--<span>-->
@@ -154,7 +168,8 @@ function doPass(pass) {
 				<!--</p>-->
             </div>
         </div>
-        <#if investType??>
+        
+        <#if investType.invest_amount??>
 	        <div class="weui-cell weui-cell_access">
 	            <div class="weui-cell__bd">
 	                申请总金额
