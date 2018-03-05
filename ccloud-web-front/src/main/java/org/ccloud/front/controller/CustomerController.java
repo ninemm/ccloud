@@ -374,6 +374,16 @@ public class CustomerController extends BaseFrontController {
 		
 		Customer customer = getModel(Customer.class);
 		SellerCustomer sellerCustomer = getModel(SellerCustomer.class);
+
+		String storeId = getPara("storeId");
+		if(StrKit.notBlank(storeId)) {
+			CustomerStore customerStore = CustomerStoreQuery.me().findById(storeId);
+			customerStore.setReceiveNum(customerStore.getReceiveNum().intValue()+1);
+			if(!customerStore.saveOrUpdate()) {
+				renderAjaxResultForError("操作失败");
+				return;
+			}
+		}
 		
 		String picJson = getPara("pic");
 		String oldPic = getPara("oldPic");
@@ -1023,13 +1033,14 @@ public class CustomerController extends BaseFrontController {
 
 	public void  getImportCustomerList(){
 		User user = (User) getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 		String dataArea = user.getDataArea();
 		String customerName = getPara("keyword");
 
 		List<Department>  departmentList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
 		String corpSellerId = departmentList.get(departmentList.size()-1).getStr("seller_id");
 
-		Page<Record> customerList = SellerCustomerQuery.me().findImportCustomer(getPageNumber(), getPageSize(), dataArea, customerName, corpSellerId);
+		Page<Record> customerList = SellerCustomerQuery.me().findImportCustomer(getPageNumber(), getPageSize(), dataArea, customerName, corpSellerId, dealerDataArea);
 		Map<String, Object> map = new HashMap<>();
 		map.put("customerList", customerList.getList());
 		renderJson(map);
@@ -1089,6 +1100,7 @@ public class CustomerController extends BaseFrontController {
 			sellerCustomer.set("lng", customerStore.getLng());
 			sellerCustomer.set("lat", customerStore.getLat());
 			setAttr("sellerCustomer", sellerCustomer);
+			setAttr("storeId", id);
 		}
 		setAttr("type", "around");
 		setAttr("customerType", JSON.toJSONString(getCustomerType()));

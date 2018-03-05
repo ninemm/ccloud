@@ -12,6 +12,9 @@
         -webkit-overflow-scrolling: touch;
         width: 100%;
     }
+    .red-class {
+        color: #ea6f5a!important;
+    }
 </#macro>
 
 <#macro script_import>
@@ -41,6 +44,8 @@
             }
         }).on("click", ".nearby-customer", function(){
             sign = 1;
+            var $this = $(this);
+            $this.addClass('red-class').siblings().removeClass('red-class');
             combo();
         }).on("click", "#searchCancel", function(){
             $("#searchInput")[0].value = "";
@@ -50,6 +55,8 @@
             combo();
         }).on("click", ".choose-customer", function(){
             sign = 0;
+            var $this = $(this);
+            $this.addClass('red-class').siblings().removeClass('red-class');
             combo();
         }).on("click", "#customerInfo", function() {
             if (sign == 0) window.location.href = "${CPATH}/customer/gotoEdit?id=" + $(this).find("#sellerCustomerId").val();
@@ -112,9 +119,13 @@
                 var $newCustomer = $customerList.find(".weui-panel:last");
                 $newCustomer.find("#customerName").text(el.customer_name);
 
-                if (el.contact != undefined) $newCustomer.find("#contactP").text(el.contact + "/" + el.mobile);
-                else if (el.mobile == null || el.mobile == '') $newCustomer.find("#contactP").text("无");
-                else $newCustomer.find("#contactP").text(el.mobile);
+                var contactP  = "";
+                if (el.contact != undefined) {
+                    contactP = el.contact + "/" + el.mobile;
+                    if(el.getted != null) contactP = contactP + "<span style='float: right;color:  red;'>" + el.getted + "</span>";
+                }else if (el.mobile == null || el.mobile == '') contactP = "无";
+                else contactP = el.mobile;
+                $newCustomer.find("#contactP").html(contactP);
 
                 $newCustomer.find("#addressSpan").text(el.prov_name + " " + el.city_name + " " + el.country_name);
                 $newCustomer.find("#showAddress").text(el.address);
@@ -204,7 +215,7 @@
             </div>
         </header>
         <div class="weui-flex order-top-btns t-c ft14">
-            <div class="weui-flex__item border-right-1px choose-customer">
+            <div class="weui-flex__item border-right-1px choose-customer red-class">
                 <span><i class="icon-user"></i></span>
                 公司客户
             </div>
