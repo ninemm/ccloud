@@ -916,7 +916,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 
 		if(StrKit.notBlank(sellerCustomer.getProcInstId())) {
 			if (SellerCustomerQuery.me().findTotalInstId(sellerCustomer.getProcInstId()) < 3) {
-				renderError(500, "该客户正在审核中");
+				renderError(500);
 				return false;
 			}
 		}
