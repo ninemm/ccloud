@@ -456,6 +456,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				Dict code = DictQuery.me().findbyName(name);
 				expenseDetail.setDisplayDictType(findDisplayType(code.getValue()));
 			}
+			expenseDetail.setItem1(qyExpensedetail.getItem1());
 			getItem(expenseDetail, qyExpensedetail, 5);
 			expenseDetail.setCreateDate(qyExpensedetail.getCreateTime());
 			expenseDetail.setModifyDate(qyExpensedetail.getModifyTime());
@@ -470,8 +471,8 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 	}
 	
 	private void getItem(ExpenseDetail expenseDetail, QyExpensedetail qyExpensedetail, int num) {
-		int j = 1;
-		for (int i = 1; i < num; i++) {
+		int j = 2;
+		for (int i = 2; i < num; i++) {
 			String item = "Item" + String.valueOf(i);
 			if (StrKit.notBlank(qyExpensedetail.get(item).toString())) {
 				expenseDetail.set("item" + String.valueOf(j), qyExpensedetail.get(item));
