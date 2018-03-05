@@ -418,20 +418,18 @@ public class ActivityController extends BaseFrontController {
 		for(int i=0;i<investTypes.length;i++){
 			if(investTypes[i].equals(Consts.INVES_PUBLICK)){
 				investType +="公关赞助";
-			}else if (investTypes[i].equals(Consts.INVEST_MATTER)){
-				investType +="宣传物料、";
-			}else if (investTypes[i].equals(Consts.INVEST_SHOP)){
+			}else if (investTypes[i].equals(Consts.INVEST_CONSUMPTION_CULTIVATION)){
 				investType +="消费培育、";
 			}else if (investTypes[i].equals(Consts.INVEST_TERMINSL_ADVERTISWMENT)){
 				investType +="终端广告、";
 			}else if (investTypes[i].equals(Consts.INVEST_TERMINSL_DISPLAY)){
 				investType +="终端陈列、";
-			}else if (investTypes[i].equals(Consts.INVEST_TERMINSL_CUSTOMER_VISITE)){
+			}else if (investTypes[i].equals(Consts.INVEST_CUSTOMER_VISITE)){
 				investType +="终端客情、";
-			}else if (investTypes[i].equals(Consts.INVEST_VEHICLE_COST)){
-				investType +="车辆费用、";
-			}else if (investTypes[i].equals(Consts.INVEST_PERSONAL_SELLING)){
-				investType +="人员推广、";
+			}else if (investTypes[i].equals(Consts.INVEST_SUPERMARKET_GIFT)){
+				investType +="商超赠品、";
+			}else if (investTypes[i].equals(Consts.INVEST_SLOTTING_FEE)){
+				investType +="进场费、";
 			}
 		}
 		if(!investType.equals("")) {
