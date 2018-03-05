@@ -456,10 +456,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				Dict code = DictQuery.me().findbyName(name);
 				expenseDetail.setDisplayDictType(findDisplayType(code.getValue()));
 			}
-			expenseDetail.setItem1(qyExpensedetail.getItem1());
-			expenseDetail.setItem2(qyExpensedetail.getItem2());
-			expenseDetail.setItem3(qyExpensedetail.getItem3());
-			expenseDetail.setItem4(qyExpensedetail.getItem4());
+			getItem(expenseDetail, qyExpensedetail, 5);
 			expenseDetail.setCreateDate(qyExpensedetail.getCreateTime());
 			expenseDetail.setModifyDate(qyExpensedetail.getModifyTime());
 			if (qyExpensedetail.getFlag() == 0) {
@@ -473,25 +470,12 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 	}
 	
 	private void getItem(ExpenseDetail expenseDetail, QyExpensedetail qyExpensedetail, int num) {
-		for (int i = 0; i < num; i++) {
-			String item = "item" + String.valueOf(num);
-			if (qyExpensedetail.get(item) != null) {
-				expenseDetail.set(item, qyExpensedetail.get(item));
-			} else {
-				 
-			}
-		}
-		if (qyExpensedetail.getItem2() != null) {
-			expenseDetail.setItem2(qyExpensedetail.getItem2());
-		} else {
-			if (qyExpensedetail.getItem3() != null) {
-				expenseDetail.setItem2(qyExpensedetail.getItem3());
-				qyExpensedetail.setItem3(null);
-			} else {
-				if (qyExpensedetail.getItem4() != null) {
-					expenseDetail.setItem2(qyExpensedetail.getItem4());
-					expenseDetail.setItem4(null);
-				}
+		int j = 1;
+		for (int i = 1; i < num; i++) {
+			String item = "Item" + String.valueOf(i);
+			if (StrKit.notBlank(qyExpensedetail.get(item).toString())) {
+				expenseDetail.set("item" + String.valueOf(j), qyExpensedetail.get(item));
+				j++;
 			}
 		}
 	}
