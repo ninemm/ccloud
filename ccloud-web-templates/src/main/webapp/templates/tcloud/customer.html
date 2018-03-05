@@ -35,11 +35,31 @@
   		<#else>
   			clearStorage();
   		</#if>
-  		refresh();
-    		$(document).on("input", "#searchInput", function() {
-			setItemBykey("keyword", $("#searchInput").val());
-			refresh();
-		}).on("change", "#region", function() {
+        refresh();
+        
+        var cpLock = true;
+        var time;
+
+        $(document).on("compositionstart", "#searchInput", function() {
+            cpLock = false;
+        }).on("compositionend", "#searchInput", function() {
+            cpLock = true;
+            if(cpLock) {
+                clearTimeout(time);
+                time = setTimeout(function(){ 
+                    setItemBykey("keyword", $("#searchInput").val());
+                    refresh();
+                },500);
+            }
+        }).on("input", "#searchInput", function() {
+            if(cpLock) {
+                clearTimeout(time);
+                time = setTimeout(function(){ 
+                    setItemBykey("keyword", $("#searchInput").val());
+                    refresh();
+                },500);
+            }
+        }).on("change", "#region", function() {
 			setItemBykey("regionId", $("#region").data('values'));
 			setItemBykey("region", $("#region").val());
 			refresh();

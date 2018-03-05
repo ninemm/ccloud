@@ -47,9 +47,29 @@
   			clearStorage();
   		</#if>
         refresh();
-        $(document).on("input", "#searchInput", function() {
-			setItemBykey("keyword", $("#searchInput").val());
-			refresh();
+
+        var cpLock = true;
+		var time;
+
+        $(document).on("compositionstart", "#searchInput", function() {
+            cpLock = false;
+		}).on("compositionend", "#searchInput", function() {
+			cpLock = true;
+			if(cpLock) {
+				clearTimeout(time);
+				time = setTimeout(function(){ 
+					setItemBykey("keyword", $("#searchInput").val());
+                    refresh();
+				},500);
+			}
+		}).on("input", "#searchInput", function() {
+			if(cpLock) {
+				clearTimeout(time);
+				time = setTimeout(function(){ 
+                    setItemBykey("keyword", $("#searchInput").val());
+                    refresh();
+                },500);
+			}
 		}).on("change", "#customer-type", function() {
 			setItemBykey("typeId", $("#customer-type").data('values'));
 			setItemBykey("type", $("#customer-type").val());

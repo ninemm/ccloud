@@ -139,41 +139,59 @@ $(function() {
 			
 			total();
 		}
-  });
-  $receiveTypeName.val("现结");
-  $receiveTypeName.attr('data-values', "1");
+	});
+	$receiveTypeName.val("现结");
+	$receiveTypeName.attr('data-values', "1");
 
-  $("#deliveryDate").calendar();
+	$("#deliveryDate").calendar();
 
-  $product.empty();
-  initProduct();
-  initProductComposition();
-  total();
-  
-  //客户选择部分
-  $(document).on("input", "#searchInput", function() {
-        combo();
-  }).on("click", "#searchCancel", function() {
-        combo();
-  }).on("change", "#userId", function() {
-        combo();
-  }).on("change", "#customerTypeId", function() {
-        combo();
-  }).on("click", "#customerInfo", function() {
-		var el = $(this);
-        var customerInfo = {
-        	customerName : el.find("#customerName").text(),
-        	sellerCustomerId : el.find("#sellerCustomerId").val(),
-        	contact : el.find("#contact").val(),
-        	mobile : el.find("#mobile").val(),
-        	address : el.find("#address").val()
-        }
-        setItemBykey("customerInfo", customerInfo);
-        initCustomer();
-        closeCombinSearch();
-  });
-   combo();
-});
+	$product.empty();
+	initProduct();
+	initProductComposition();
+	total();
+	
+	//客户选择部分
+	var cpLock = true;
+	var time;
+
+	$(document).on("compositionstart", "#searchInput", function() {
+		cpLock = false;
+	}).on("compositionend", "#searchInput", function() {
+		cpLock = true;
+		if(cpLock) {
+			clearTimeout(time);
+			time = setTimeout(function(){ 
+				combo();
+			},500);
+		}
+	}).on("input", "#searchInput", function() {
+		if(cpLock) {
+			clearTimeout(time);
+			time = setTimeout(function(){ 
+				combo();
+			},500);
+		}
+	}).on("click", "#searchCancel", function() {
+			combo();
+	}).on("change", "#userId", function() {
+			combo();
+	}).on("change", "#customerTypeId", function() {
+			combo();
+	}).on("click", "#customerInfo", function() {
+			var el = $(this);
+			var customerInfo = {
+				customerName : el.find("#customerName").text(),
+				sellerCustomerId : el.find("#sellerCustomerId").val(),
+				contact : el.find("#contact").val(),
+				mobile : el.find("#mobile").val(),
+				address : el.find("#address").val()
+			}
+			setItemBykey("customerInfo", customerInfo);
+			initCustomer();
+			closeCombinSearch();
+	});
+	combo();
+	});
 	var $form = $('#form');
 	var newHtml = $(".common").eq(0).html();
 	var $product = $("#productList");

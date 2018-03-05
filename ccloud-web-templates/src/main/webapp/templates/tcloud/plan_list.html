@@ -14,8 +14,26 @@
 		combo();
 	});
 
-	$(document).on("input", "#searchInput", function() {
-		combo();
+	var cpLock = true;
+	var time;
+
+	$(document).on("compositionstart", "#searchInput", function() {
+		cpLock = false;
+	}).on("compositionend", "#searchInput", function() {
+		cpLock = true;
+		if(cpLock) {
+			clearTimeout(time);
+			time = setTimeout(function(){ 
+				combo();
+			},500);
+		}
+	}).on("input", "#searchInput", function() {
+		if(cpLock) {
+			clearTimeout(time);
+			time = setTimeout(function(){ 
+				combo();
+			},500);
+		}
 	}).on("click", "#searchCancel", function() {
 		combo();
 	}).on("change", "#type", function() {

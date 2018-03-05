@@ -23,11 +23,22 @@
 
     var sign = 0;//0表示公司客户，1表示附近客户
     var time;
+    var cpLock = true;
 
     $(function() {
-        $(document).on("input", "#searchInput", function() {
-            clearTimeout(time);
-            time = setTimeout(function(){combo();},500);
+        $(document).on("compositionstart", "#searchInput", function() {
+            cpLock = false;
+        }).on("compositionend", "#searchInput", function() {
+            cpLock = true;
+            if(cpLock) {
+                clearTimeout(time);
+                time = setTimeout(function(){combo();},500);
+            }
+        }).on("input", "#searchInput", function() {
+            if(cpLock) {
+                clearTimeout(time);
+                time = setTimeout(function(){combo();},500);
+            }
         }).on("click", ".nearby-customer", function(){
             sign = 1;
             combo();

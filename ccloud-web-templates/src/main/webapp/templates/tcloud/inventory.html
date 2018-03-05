@@ -51,7 +51,7 @@
     $(function () {
         initMenuData();
         var data = $(".weui-flex__item");
-        for(var i = 0 ;i<data.length;i++){
+        for(var i = 0 ;i < data.length;i++){
             $($(data[i])[0]).find("span").text(toMoney($($(data[i])[0]).find("span").text()),2);
         }
         $("#startDate").calendar({
@@ -98,10 +98,31 @@
     }
 
     //搜索框监听
-    $(document).on("input", "#searchInput", function() {
-        page = 1;
-        $main.empty();
-        loadInventoryDetail();
+
+    var cpLock = true;
+    var time;
+
+    $(document).on("compositionstart", "#searchInput", function() {
+        cpLock = false;
+    }).on("compositionend", "#searchInput", function() {
+        cpLock = true;
+        if(cpLock) {
+            clearTimeout(time);
+            time = setTimeout(function(){ 
+                page = 1;
+                $main.empty();
+                loadInventoryDetail();
+            },500);
+        }
+    }).on("input", "#searchInput", function() {
+        if(cpLock) {
+            clearTimeout(time);
+            time = setTimeout(function(){ 
+                page = 1;
+                $main.empty();
+                loadInventoryDetail();
+            },500);
+        }
     });
     //监听滚动
     $(".infinite").infinite().on("infinite", function() {

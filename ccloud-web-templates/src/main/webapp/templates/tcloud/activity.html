@@ -20,6 +20,9 @@
 
 <#macro script>
 $(function() {
+	var cpLock = true;
+	var time;
+
     $(document).on("click", "#sidebar li", function () {
         $(this).addClass("active").siblings().removeClass("active");
         var index = $(this).index();
@@ -33,11 +36,24 @@ $(function() {
 		}
 		changeInit();
 
-    }).on("input", "#searchInput", function () {
-    	keyword = $(this).val();
-		changeInit();
-		
-    }).on("click", "#searchCancel", function () {
+    }).on("compositionstart", "#searchInput", function() {
+		cpLock = false;
+	}).on("compositionend", "#searchInput", function() {
+		cpLock = true;
+		if(cpLock) {
+			clearTimeout(time);
+			time = setTimeout(function(){ 
+				keyword = $(this).val();
+				changeInit();},500);
+		}
+	}).on("input", "#searchInput", function() {
+		if(cpLock) {
+			clearTimeout(time);
+			time = setTimeout(function(){ 
+				keyword = $(this).val();
+				changeInit();},500);
+		}
+	}).on("click", "#searchCancel", function () {
     	keyword = $(this).val();
 		changeInit();
 		
