@@ -395,13 +395,13 @@ public class SellerCustomerQuery extends JBaseQuery {
 		return Db.find(sql.toString(), param.toArray());
 	}
 
-	public Page<Record> findImportCustomer(int pageNumber, int pageSize, String userDataArea, String searchKey, String corpSellerId) {
+	public Page<Record> findImportCustomer(int pageNumber, int pageSize, String userDataArea, String searchKey, String corpSellerId, String dealerDataArea) {
 		boolean needwhere = false;
 		LinkedList<Object> params = new LinkedList<Object>();
 
-		String select = "SELECT c.id,c.customer_name,c.contact,c.mobile,c.prov_name,c.city_name,c.country_name,c.address,c.sellerCustomerId ";
+		String select = "SELECT c.id,c.customer_name,c.contact,c.mobile,c.prov_name,c.city_name,c.country_name,c.address,c.sellerCustomerId, c.getted ";
 		StringBuilder sql = new StringBuilder(
-				"FROM (SELECT c.id,c.customer_name,c.contact,c.mobile,c.prov_name,c.city_name,c.country_name,c.address,csc.id as sellerCustomerId ");
+				"FROM (SELECT c.id,c.customer_name,c.contact,c.mobile,c.prov_name,c.city_name,c.country_name,c.address,csc.id as sellerCustomerId, a.getted ");
 		sql.append("FROM cc_user_join_customer cujc ");
 		sql.append("LEFT JOIN cc_customer_join_customer_type ccjct ON cujc.seller_customer_id = ccjct.seller_customer_id ");
 		sql.append("LEFT JOIN cc_customer_type cct ON ccjct.customer_type_id = cct.id ");
@@ -409,6 +409,11 @@ public class SellerCustomerQuery extends JBaseQuery {
 		sql.append("LEFT JOIN cc_customer c ON csc.customer_id = c.id ");
 		sql.append("LEFT JOIN cc_customer_join_corp ccjc on ccjc.customer_id = c.id ");
 		sql.append("LEFT JOIN cc_sales_order cso ON cujc.seller_customer_id = cso.customer_id AND cujc.data_area = cso.data_area ");
+		sql.append("LEFT JOIN( SELECT cujc.seller_customer_id, GROUP_CONCAT(u.realname) AS getted ");
+		sql.append("FROM cc_user_join_customer cujc LEFT JOIN `user` u ON cujc.user_id = u.id ");
+		sql.append("WHERE u.data_area LIKE ? ");
+		params.add(dealerDataArea);
+		sql.append("GROUP BY cujc.seller_customer_id ) AS a ON a.seller_customer_id = csc.id ");
 
 		if (StrKit.notBlank(searchKey)) {
 			sql.append("WHERE ( c.customer_name LIKE ? OR c.contact LIKE ? ) ");

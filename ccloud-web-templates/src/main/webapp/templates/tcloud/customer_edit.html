@@ -434,6 +434,9 @@
 		<main>
 		    <form action="${CPATH}/customer/save" method="post" id="form">
 			    <section class="weui-panel weui-panel_access order-customer-info select-area">
+                    <#if storeId??>
+                        <input type="hidden" id="storeId" name="storeId" value="${(storeId)!}">
+                    </#if>
 			        <input type="hidden" name="sellerCustomer.id" value="${(sellerCustomer.id)!}">
                     <input type="hidden" id="oldPic" name="oldPic">
                     <input type="hidden" id="type" name="type" value="${(type)!}">
