@@ -244,7 +244,8 @@
         $(".weui-gallery__del").click(function() { //这部分刚才放错地方了，放到$(function(){})外面去了
             $uploaderFiles.find("li").eq(index).remove();
             $picNum.text($("#uploaderFiles")[0].children.length + '/' + count);
-            imageArr = imageArr.splice(index, 1);
+            imageArr.splice(index, 1);
+            $("#pic").val(JSON.stringify(imageArr));
         });
 
     })
