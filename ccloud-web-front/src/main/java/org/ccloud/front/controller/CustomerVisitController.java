@@ -224,7 +224,8 @@ public class CustomerVisitController extends BaseFrontController {
 		List<Map<String, String>> activityList = Lists.newArrayList();
 	    for (Record record : activityRecords) {
 		    	Map<String, String> map = Maps.newHashMap();
-		    	map.put("title", record.getStr("title")+"--"+DictQuery.me().findByKey(record.getStr("flow_dict_type"), record.getStr("item1")).getName());
+//		    	map.put("title", record.getStr("title")+"--"+DictQuery.me().findByKey(record.getStr("flow_dict_type"), record.getStr("item1")).getName());
+		    	map.put("title", record.getStr("title"));
 		    	map.put("value", record.getStr("activityApplyId"));
 		    	activityList.add(map);
 	    }
@@ -238,7 +239,11 @@ public class CustomerVisitController extends BaseFrontController {
 		}
 		CustomerVisit customerVisit = CustomerVisitQuery.me().findById(id);
 		String imageListStore = customerVisit.getPhoto();
-		ExpenseDetail expenseDetail = ExpenseDetailQuery.me().findById(ActivityApplyQuery.me().findById(customerVisit.getActiveApplyId()).getExpenseDetailId());
+		ExpenseDetail expenseDetail = new ExpenseDetail();
+		if(customerVisit.getActiveApplyId()!="") {
+			expenseDetail = ExpenseDetailQuery.me().findById(ActivityApplyQuery.me().findById(customerVisit.getActiveApplyId()).getExpenseDetailId());
+			setAttr("expenseDetail",expenseDetail);
+		}
 		List<ImageJson> list = JSON.parseArray(imageListStore, ImageJson.class);
 		CustomerVisit visit = CustomerVisitQuery.me().findMoreById(id);
 		List<Record> findByActivity = CustomerVisitQuery.me().findByActivity(id);
@@ -251,7 +256,6 @@ public class CustomerVisitController extends BaseFrontController {
 			activity = activity.substring(0, activity.length() - 1);  
 		}
 		setAttr("activity", activity);
-		setAttr("expenseDetail",expenseDetail);
 		setAttr("visit", visit);
 		setAttr("list",list);
 		setAttr("activityExecutes",activityExecutes);

@@ -48,7 +48,7 @@
 
     $(function(){
         var index;
-        $uploaderFiles.on("click", "li", function() {
+        $(document).on("click", ".uploaderFiles li", function() {
             var src = $(this).children("img").attr("src");
             var img = " <img src=" + src + " class=' img-responsive' style='height:400px' >" ;
             index = $(this).index();
@@ -185,7 +185,10 @@
 	                    <div class="col-sm-5">
 	                        <label class="control-label col-sm-4">费用明细：</label>
 	                        <div class="input-group col-sm-8">
-	                            <p class="form-control-static">${(expenseDetail)!}</p>
+	                            <p class="form-control-static">${(expenseDetail.item1)!}</p>
+	                            <p class="form-control-static">${(expenseDetail.item2)!}</p>
+	                            <p class="form-control-static">${(expenseDetail.item3)!}</p>
+	                            <p class="form-control-static">${(expenseDetail.item4)!}</p>
 	                        </div>
 	                    </div>
 	                </div>
@@ -207,7 +210,7 @@
 	                           		<#list activityExecutes as list>
 	                           			<div class="col-sm-10">
 	                           			<span class="weui-uploader__info">${list.remark}</span>
-		                                <ul id="uploaderFiles">
+		                                <ul id="uploaderFiles" class="uploaderFiles">
 		                                 <#if (customerVisit.imageList) ??>
 			                                <#list customerVisit.imageList as bean>
 		                            			<#if (list.order_list == bean.orderList)>
@@ -219,7 +222,7 @@
 		                       		 </#list>
 		                       	<#else>
 		                       		<div class="col-sm-10">
-		                                <ul id="uploaderFiles">
+		                                <ul id="uploaderFiles" class="uploaderFiles">
 		                                 <#if (customerVisit.imageList) ??>
 			                                <#list customerVisit.imageList as bean>
 			                                   		<li class="thumbnail col-sm-3"><img src="${(bean.savePath)}" class=" img-responsive" style="width: 100%; height: 200px "> </li>

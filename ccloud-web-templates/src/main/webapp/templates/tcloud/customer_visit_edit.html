@@ -18,7 +18,7 @@
     var orgCustomerList = {};
     var customerSelect = [];
     var problemSelect = [];
-
+	var count = 3;
     var imageArr = [];
     var $form = $("#form");
     var $picNum = $('.weui-uploader__info');
@@ -124,7 +124,7 @@
 		}
 		
         $(document).on("change", ".uploaderInput", function () {
-        	var count = 3;
+        	
 			var $this = $(this);
             var files = this.files;
             var arrNum = imageArr.length;
@@ -251,6 +251,7 @@
         }
 
         var index; //第几张图片
+        var $uploaderFiles ;
         $(document).on("click", ".uploaderFiles li", function() {
             index = $(this).index();
             $uploaderFiles = $(this).parent();
@@ -265,7 +266,9 @@
         //删除图片  删除图片的代码也贴出来。
         $(document).on("click",".weui-gallery__del",function() { //这部分刚才放错地方了，放到$(function(){})外面去了
             $uploaderFiles.find("li").eq(index).remove();
-            imageArr = imageArr.splice(index, 1);
+            $uploaderFiles.parent().parent().find('.weui-uploader__info').text($uploaderFiles.children.length + '/' + count);
+            imageArr.splice(index, 1);
+            $(".pic").val(JSON.stringify(imageArr));
         });
 
     });

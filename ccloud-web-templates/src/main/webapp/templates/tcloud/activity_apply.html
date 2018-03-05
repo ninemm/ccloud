@@ -414,17 +414,19 @@ function doChange(key){
 								<span class="weui-input" id="content" ></span>
 						</div>
 					</div>
-					<div class="weui-cell weui-cell_access">
-	                    <span>
-							费用明细
-							<span class="require"></span>
-						</span>
-						<div class="weui-cell__bd">
-							<input id="expense_detail_id"  name="expense_detail_id" type="hidden" />
-							<input id="expense_detail" class="weui-input" name="expense_detail" style="width:100%;" type="text">
-	                    </div>
-	                    <span class="weui-cell__ft"></span>
-	                </div>
+					<#if details?size gt 0>
+						<div class="weui-cell weui-cell_access">
+		                    <span>
+								费用明细
+								<span class="require"></span>
+							</span>
+							<div class="weui-cell__bd">
+								<input id="expense_detail_id"  name="expense_detail_id" type="hidden" />
+								<input id="expense_detail" class="weui-input" name="expense_detail" style="width:100%;" type="text">
+		                    </div>
+		                    <span class="weui-cell__ft"></span>
+		                </div>
+	                </#if>
 					<div class="weui-cell weui-cell_access">
 						<div class="weui-cell__bd">
 							<textarea placeholder="备注说明（70字以内）" name="content" class="width-100"></textarea>
