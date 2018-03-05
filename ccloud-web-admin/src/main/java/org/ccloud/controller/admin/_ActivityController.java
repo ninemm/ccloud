@@ -250,37 +250,38 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				activityExecute.save();
 			}
 		}
-		
-		for(int i = 0; i < item1.length; i++) {
-			ExpenseDetail detail = new ExpenseDetail();
-			detail.setActivityId(activity.getId());
-			detail.setFlowNo(activity.getProcCode());
-			String typeID = findFlowDictType(activity.getInvestType());
-			detail.setFlowDictType(typeID);
-			if (typeID.equals("feeType_name_display")) {
-				detail.setDisplayDictType(findDisplayType(item1[i]));
+		if (item1 != null) {
+			for(int i = 0; i < item1.length; i++) {
+				ExpenseDetail detail = new ExpenseDetail();
+				detail.setActivityId(activity.getId());
+				detail.setFlowNo(activity.getProcCode());
+				String typeID = findFlowDictType(activity.getInvestType());
+				detail.setFlowDictType(typeID);
+				if (typeID.equals("feeType_name_display")) {
+					detail.setDisplayDictType(findDisplayType(item1[i]));
+				}
+				detail.setItem1(item1[i]);
+				detail.setItem2(item2[i]);
+				if (item3 != null) {
+					detail.setItem3(item3[i]);
+				}
+				if (item4 != null) {
+					detail.setItem4(item4[i]);
+				}
+				detail.setState(true);			
+				if (StrKit.notBlank(expenseIds[i])) {
+					detail.setId(expenseIds[i]);
+					detail.setModifyDate(new Date());
+					detail.update();
+				} else {
+					detail.setId(StrKit.getRandomUUID());
+					detail.setCreateDate(new Date());
+					detail.save();
+				}
 			}
-			detail.setItem1(item1[i]);
-			detail.setItem2(item2[i]);
-			if (item3 != null) {
-				detail.setItem3(item3[i]);
-			}
-			if (item4 != null) {
-				detail.setItem4(item4[i]);
-			}
-			detail.setState(true);			
-			if (StrKit.notBlank(expenseIds[i])) {
-				detail.setId(expenseIds[i]);
-				detail.setModifyDate(new Date());
-				detail.update();
-			} else {
-				detail.setId(StrKit.getRandomUUID());
-				detail.setCreateDate(new Date());
-				detail.save();
-			}
+			List<String> ids = getDiffrent(expenseOldList, expenseIds);
+			ExpenseDetailQuery.me().batchDelete(ids);
 		}
-		List<String> ids = getDiffrent(expenseOldList, expenseIds);
-		ExpenseDetailQuery.me().batchDelete(ids);
 		renderAjaxResultForSuccess();
 	}
 	
@@ -469,6 +470,30 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			expenseDetails.add(expenseDetail);
 		}
 		return expenseDetails;
+	}
+	
+	private void getItem(ExpenseDetail expenseDetail, QyExpensedetail qyExpensedetail, int num) {
+		for (int i = 0; i < num; i++) {
+			String item = "item" + String.valueOf(num);
+			if (qyExpensedetail.get(item) != null) {
+				expenseDetail.set(item, qyExpensedetail.get(item));
+			} else {
+				 
+			}
+		}
+		if (qyExpensedetail.getItem2() != null) {
+			expenseDetail.setItem2(qyExpensedetail.getItem2());
+		} else {
+			if (qyExpensedetail.getItem3() != null) {
+				expenseDetail.setItem2(qyExpensedetail.getItem3());
+				qyExpensedetail.setItem3(null);
+			} else {
+				if (qyExpensedetail.getItem4() != null) {
+					expenseDetail.setItem2(qyExpensedetail.getItem4());
+					expenseDetail.setItem4(null);
+				}
+			}
+		}
 	}
 
 	private String[] getAreaType(String data) {
