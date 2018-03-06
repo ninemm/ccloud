@@ -175,7 +175,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 	public void save() {
 		final Activity activity = getModel(Activity.class);
 		List<ExpenseDetail> expenseOldList = ExpenseDetailQuery.me().findByActivityId(activity.getId());
-		String sellerId = getSessionAttr("sellerId");
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String [] imagePath = getParaValues("imageUrl[]");
 		String [] item1 = getParaValues("item1[]");
 		String [] item2 = getParaValues("item2[]");

@@ -458,7 +458,7 @@ public class ActivityController extends BaseFrontController {
 		String investType = "";
 		for(int i=0;i<investTypes.length;i++){
 			if(investTypes[i].equals(Consts.INVES_PUBLICK)){
-				investType +="公关赞助";
+				investType +="公关赞助、";
 			}else if (investTypes[i].equals(Consts.INVEST_CONSUMPTION_CULTIVATION)){
 				investType +="消费培育、";
 			}else if (investTypes[i].equals(Consts.INVEST_TERMINSL_ADVERTISWMENT)){
