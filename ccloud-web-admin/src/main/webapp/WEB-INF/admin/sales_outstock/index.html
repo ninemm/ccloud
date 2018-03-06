@@ -487,7 +487,13 @@ function orderDetail(id) {
     
     function batchDown(){
   		var keyword = $('#post-search-input').val();
-    	jQuery.mm.down("${CPATH}/admin/salesOutstock/downloading?startDate=" + $('#startDate').val() + " 00:00:00" + "&endDate=" + $('#endDate').val() + " 23:59:59" + "&printStatus=" + $("#printStatus").val() + "&stockOutStatus="+$("#stockOutStatus").val() + "&k="+keyword);
+  		<@shiro.hasRole name="021">  
+			jQuery.mm.down("${CPATH}/admin/salesOutstock/downloading?startDate=" + $('#startDate').val() + " 00:00:00" + "&endDate=" + $('#endDate').val() + " 23:59:59" + "&printStatus=" + $("#printStatus").val() + "&stockOutStatus="+$("#stockOutStatus").val() + "&k="+keyword+ "&tax=0");
+		</@shiro.hasRole>	
+		<@shiro.lacksRole name="021">  
+			jQuery.mm.down("${CPATH}/admin/salesOutstock/downloading?startDate=" + $('#startDate').val() + " 00:00:00" + "&endDate=" + $('#endDate').val() + " 23:59:59" + "&printStatus=" + $("#printStatus").val() + "&stockOutStatus="+$("#stockOutStatus").val() + "&k="+keyword+ "&tax=1");
+		</@shiro.lacksRole>	
+    		
     }
     
 </#macro>

@@ -545,6 +545,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 	@RequiresPermissions(value = { "/admin/salesOutstock/downloading", "/admin/dealer/all",
 			"/admin/all" }, logical = Logical.OR)
 	public void downloading() throws UnsupportedEncodingException {
+		String tax = getPara("tax");
 		String keyword = new String(getPara("k").getBytes("ISO8859-1"), "UTF-8");
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
@@ -579,7 +580,13 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 					printDate =(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(outstockPrints.get(0).get("create_date")) ;
 				}
 				BigDecimal creatconverRelate = new BigDecimal(re.getStr("convert_relate"));
-				BigDecimal bigPrice = new BigDecimal(re.getStr("product_price"));
+				BigDecimal bigPrice;
+				//0 税务人员   1  非税务人员
+				if (tax.equals("0")) {
+					 bigPrice = new BigDecimal(re.getStr("tax_price"));
+				}else {
+					 bigPrice = new BigDecimal(re.getStr("product_price"));
+				}
 				BigDecimal count = new BigDecimal(re.getStr("product_count"));
 				String bigCount = (count.intValue()) / (creatconverRelate.intValue()) + "";
 				String smallCount = (count.intValue()) % (creatconverRelate.intValue()) + "";

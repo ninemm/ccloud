@@ -201,7 +201,12 @@
 				}
 	}
 	function batchDown(){
-		jQuery.mm.down("${CPATH}/admin/salesRefund/downloading?startDate=" + $('#startDate').val() + " 00:00:00" + "&endDate=" + $('#endDate').val() + " 23:59:59" + "&k="+$('#search').val());
+		<@shiro.hasRole name="021">  
+			jQuery.mm.down("${CPATH}/admin/salesRefund/downloading?startDate=" + $('#startDate').val() + " 00:00:00" + "&endDate=" + $('#endDate').val() + " 23:59:59" + "&k="+$('#search').val()+ "&tax=0");
+		</@shiro.hasRole>	
+		<@shiro.lacksRole name="021">  
+			jQuery.mm.down("${CPATH}/admin/salesRefund/downloading?startDate=" + $('#startDate').val() + " 00:00:00" + "&endDate=" + $('#endDate').val() + " 23:59:59" + "&k="+$('#search').val()+ "&tax=1");
+		</@shiro.lacksRole>	
     }
     
     function history(id, proc_inst_id) {
