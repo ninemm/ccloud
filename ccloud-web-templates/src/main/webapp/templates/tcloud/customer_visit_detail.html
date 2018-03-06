@@ -21,7 +21,10 @@
 	<#if one??>
 		window.location.href = '${CPATH}/customerVisit/one?id=${visit.seller_customer_id}&name=${visit.customer_name}';
 	<#else>
-		window.location.href = '${CPATH}/customerVisit?history=' + 1;
+		var url = document.referrer;
+		var index = url.indexOf('?');
+		if(index!=-1) url = url.substring(0,index);
+		window.location.href = url + '?history=1';
 	</#if>
 	} 
 </#macro>
