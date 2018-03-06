@@ -161,8 +161,9 @@ public class PurchaseOrderQuery extends JBaseQuery {
 		return DAO.findFirst(sql, orderId);
 	}
 	
-	public String getNewSn() {
-		String sql = "SELECT p.porder_sn FROM cc_purchase_order p WHERE date(p.create_date) = curdate() ORDER BY p.create_date desc";
+	public String getNewSn(String sellerId) {
+		String sql = "SELECT p.porder_sn FROM cc_purchase_order p LEFT JOIN cc_seller s on s.dept_id = p.dept_id WHERE date(p.create_date) = curdate() "
+					+" and s.id= '"+sellerId+"' ORDER BY p.create_date desc";
 		PurchaseOrder order = DAO.findFirst(sql);
 		String SN = "";
 		if (order == null || StringUtils.isBlank(order.getPorderSn())) {

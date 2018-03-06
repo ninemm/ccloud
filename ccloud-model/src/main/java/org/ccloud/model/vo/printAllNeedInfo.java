@@ -184,6 +184,9 @@ public class printAllNeedInfo {
 	public void setReceiveType(Integer receiveType) {
 		this.receiveType = receiveType;
 	}
+	public String get(String string) {
+		return string;
+	}
 	
 	
 }

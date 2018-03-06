@@ -106,8 +106,9 @@ public class PurchaseRefundOutstockQuery extends JBaseQuery {
 		return DAO.find(sql);
 	}
 	
-	public String getNewSn() {
-		String sql = "SELECT p.outstock_sn FROM cc_purchase_refund_outStock p WHERE date(p.create_date) = curdate() ORDER BY p.create_date desc";
+	public String getNewSn(String sellerId) {
+		String sql = "SELECT p.outstock_sn FROM cc_purchase_refund_outStock p LEFT JOIN cc_seller s on s.dept_id = p.dept_id WHERE date(p.create_date) = curdate()"
+				+ " and s.id = '"+sellerId+"' ORDER BY p.create_date desc";
 		PurchaseRefundOutstock purchaseRefundOutstock = DAO.findFirst(sql);
 		String SN = "";
 		if (purchaseRefundOutstock == null || StringUtils.isBlank(purchaseRefundOutstock.getOutstockSn())) {
