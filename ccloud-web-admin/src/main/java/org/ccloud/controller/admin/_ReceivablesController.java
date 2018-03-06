@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -40,6 +41,7 @@ import org.ccloud.model.ReceivablesDetail;
 import org.ccloud.model.query.ReceivablesDetailQuery;
 import org.ccloud.model.Receiving;
 import org.ccloud.model.query.ReceivingQuery;
+import org.ccloud.model.query.SalesOutstockQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.vo.receivablesExcel;
 import org.ccloud.model.User;
@@ -120,7 +122,16 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 		String ref_type = getPara("ref_type");
 		String object_id = getPara("object_id");
 		String balance_amount = getPara("balance_amount");
+		Record salesOutstock = SalesOutstockQuery.me().findMoreBySn(ref_sn);
 		Receivables receivables = new Receivables();
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String deptDataArea = DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea());
+		Page<Receiving> page = ReceivingQuery.me().paginate(1, Integer.MAX_VALUE, ref_sn,deptDataArea);
+		BigDecimal actAmount = new BigDecimal(0);
+		for(int i = 0; i < page.getList().size(); i++) {
+			actAmount = actAmount.add(page.getList().get(i).getActAmount());
+		}
+		balance_amount = (new BigDecimal(salesOutstock.getStr("total_amount")).subtract(actAmount)).toString();
 		//通过客户Id找到应收账款主表ID
 //		if("1".equals(type)) {
 		receivables = ReceivablesQuery.me().findByObjId(object_id, Consts.RECEIVABLES_OBJECT_TYPE_CUSTOMER);
@@ -146,7 +157,6 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 		String deptDataArea = DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea());
 		Page<Receiving> page = ReceivingQuery.me().paginate(getPageNumber(), getPageSize(), ref_sn,deptDataArea);
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(),"ref_sn",ref_sn,"rows", page.getList());
-		
 		renderJson(map);
 	}
 		
