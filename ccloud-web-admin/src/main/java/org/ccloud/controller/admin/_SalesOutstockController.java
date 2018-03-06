@@ -91,6 +91,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		String endDate = getPara("endDate");
 		String printStatus = getPara("printStatus");
 		String stockOutStatus = getPara("stockOutStatus");
+		String carWarehouseId = getPara("carWarehouseId");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String status = getPara("status");
@@ -100,7 +101,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		String order = getPara("sortName[order]");
 
 		Page<Record> page = SalesOutstockQuery.me().paginate(getPageNumber(), getPageSize(), sellerId, keyword, startDate,
-				endDate, printStatus, stockOutStatus, status, dataArea, order, sort,salesmanId);
+				endDate, printStatus, stockOutStatus, status, dataArea, order, sort,salesmanId,carWarehouseId);
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
@@ -199,9 +200,9 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		for (String s : outId) {
 			printAllNeedInfo printAllNeedInfo = SalesOutstockQuery.me().findStockOutForPrint(s);
 			if (isFinancePrint == 0) {
-			orderProductInfos = SalesOutstockDetailQuery.me().findPrintProductInfo(s);	
+				orderProductInfos = SalesOutstockDetailQuery.me().findPrintProductInfo(s);	
 			}else {
-			orderProductInfos = SalesOutstockDetailQuery.me().findFinancePrintProductInfo(s);	
+				orderProductInfos = SalesOutstockDetailQuery.me().findFinancePrintProductInfo(s);	
 			}
 			printAllNeedInfo.setOrderProductInfos(orderProductInfos);
 			printAllNeedInfos.add(printAllNeedInfo);
@@ -556,7 +557,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 				+ "salesOutstockInfo.xlsx";
 
 		Page<Record> page = SalesOutstockQuery.me().paginate(1, Integer.MAX_VALUE, sellerId, keyword, startDate, endDate,
-				printStatus, stockOutStatus, null, dataArea, null, null,null);
+				printStatus, stockOutStatus, null, dataArea, null, null,null,null);
 		List<Record> salesOutstckList = page.getList();
 
 		List<SalesOutstockExcel> excellist = Lists.newArrayList();

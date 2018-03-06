@@ -451,10 +451,10 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		return true;
 	}
 	
-     	//财务成本价打印
+     	//财务税务价打印
 		public List<orderProductInfo> findFinancePrintProductInfo(String outstockId) {
 			StringBuilder sqlBuilder = new StringBuilder(
-					" SELECT sod.outstock_id,sod.is_gift, sod.sell_product_id,sp.custom_name, p.big_unit, p.small_unit, p.convert_relate, sp.seller_id, sp.product_id, t1.valueName, cs.is_composite,sp.bar_code,sp.cost as product_price,CONVERT( sp.cost/p.convert_relate,decimal(18,2)) as small_price, ");
+					" SELECT sod.outstock_id,sod.is_gift, sod.sell_product_id,sp.custom_name, p.big_unit, p.small_unit, p.convert_relate, sp.seller_id, sp.product_id, t1.valueName, cs.is_composite,sp.bar_code,sp.tax_price as product_price,CONVERT( sp.tax_price/p.convert_relate,decimal(18,2)) as small_price, ");
 			sqlBuilder.append(" floor(sod.product_count/p.convert_relate) as bigCount,MOD(sod.product_count,p.convert_relate) as smallCount,sod.product_amount,sod.product_count,sod.id as salesOutDetaliId,cso.warehouse_id,sp.product_id as productId ");
 			sqlBuilder.append(" from `cc_sales_outstock_detail` sod ");
 			sqlBuilder.append(" LEFT JOIN cc_sales_outstock cso on cso.id = sod.outstock_id ");

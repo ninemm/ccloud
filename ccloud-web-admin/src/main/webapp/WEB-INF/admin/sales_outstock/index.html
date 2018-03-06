@@ -61,6 +61,7 @@
 			size: params.limit,
 			page: params.offset/params.limit + 1,
 			k: keyword,
+			carWarehouseId: $('#carWarehouse').val(),
 			startDate: $('#startDate').val() + " 00:00:00",
 			endDate: $('#endDate').val() + " 23:59:59",
 			printStatus:$("#printStatus").val(),
@@ -138,7 +139,9 @@
 					var strHtml ='<a class="btn btn-xs btn-primary btn-flat" onclick="detail(\''+row.id+'\')" >详细</a> ';
 
                     <@shiro.hasPermission name="/admin/salesOutstock/print">
+                    <@shiro.lacksRole name="021">  
                       strHtml = strHtml + '<a class="btn btn-xs btn-warning btn-flat" onclick="print(\''+row.id+'\')" >打印</a> ';
+					</@shiro.lacksRole>	
                     </@shiro.hasPermission>
                      <@shiro.hasPermission name="/admin/salesOutstock/costPrint">
                      strHtml = strHtml + '<a class="btn btn-xs btn-warning btn-flat" onclick="financePrint(\''+row.id+'\')" >财务打印</a> ';
@@ -568,8 +571,10 @@ function orderDetail(id) {
 			</div>
 		<div class="row content-row">
 			<div class="jp-left">
-			<@shiro.hasPermission name="/admin/salesOutstock/print">
+				<@shiro.hasPermission name="/admin/salesOutstock/print">
+				<@shiro.lacksRole name="021">  
 				<button class="btn btn-sm btn-primary btn-flat" type="button" onclick="batchAction()"><i class="fa fa-gavel"></i> 批量打印 </button>
+				</@shiro.lacksRole>	
 				</@shiro.hasPermission>
 				<@shiro.hasPermission name="/admin/salesOutstock/costPrint">
 				<button class="btn btn-sm btn-primary btn-flat" type="button" onclick="batchFinanceAction()"><i class="fa fa-gavel"></i> 财务批量打印 </button>
