@@ -130,6 +130,14 @@ public abstract class BaseSellerProduct<M extends BaseSellerProduct<M>> extends 
 		return get("store_count");
 	}
 
+	public void setTaxPrice(java.math.BigDecimal taxPrice) {
+		set("tax_price", taxPrice);
+	}
+
+	public java.math.BigDecimal getTaxPrice() {
+		return get("tax_price");
+	}
+	
 	public void setPrice(java.math.BigDecimal price) {
 		set("price", price);
 	}

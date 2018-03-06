@@ -12,7 +12,26 @@
 
 <#macro script>
 	$(document).ready(function() {
-		var detailList = ${(outstockDetail)!};
+		var detailList = '${(outstockDetail)!}';
+	
+		<@shiro.hasRole name="021"> 
+			var total_amount=0;
+    			<#list outstockDetail as detail>
+				<#if detail.is_gift?? && detail.is_gift == 1>
+					total_amount=total_amount;
+				<#else>
+					total_amount=total_amount+${(detail.tax_price*detail.product_count / detail.convert_relate)}
+				</#if>
+			</#list>
+			$("#total_amount").text("￥"+total_amount.toFixed(2));
+    		</@shiro.hasRole>	
+    	
+    		<@shiro.lacksRole name="021"> 
+			$("#total_amount").text("￥"+formatNumber(${(order.total_amount)!}));
+    		</@shiro.lacksRole>	
+		$(".subtotal").each(function(){
+    			$(this).text($(this).data("value").toFixed(2));
+    		});
 	});
 	
 function doSubmit(){
@@ -82,14 +101,20 @@ function doSubmit(){
 						<td>${detail.product_count % detail.convert_relate} ${detail.small_unit}</td>
 						<td><#if detail.is_composite?? && detail.is_composite == 1>是<#else>否</#if></td>
 						<td><#if detail.is_gift?? && detail.is_gift == 1>是<#else>否</#if></td>
-						<td>￥ <#if detail.is_gift?? && detail.is_gift == 1>0<#else>${detail.product_amount!}</#if></td>
+						
+						<@shiro.hasRole name="021"> 
+							<td>￥ <#if detail.is_gift?? && detail.is_gift == 1>0<#else><span class="subtotal" data-value="${(detail.tax_price*detail.product_count / detail.convert_relate)}"></span></#if></td>
+						</@shiro.hasRole>	
+    						<@shiro.lacksRole name="021"> 
+							<td>￥ <#if detail.is_gift?? && detail.is_gift == 1>0<#else>${detail.product_amount!}</#if></td>
+    						</@shiro.lacksRole>	
 					</tr>
 				</#list>
 			</tbody>
 			<tfoot>
 				<tr>
 					<th colspan="5" style="text-align:right">合计:</th>
-					<th>￥ ${(outstock.total_amount)!}</th>
+					<th id = "total_amount"></th>
 				</tr>
 			</tfoot>
 		</table>
