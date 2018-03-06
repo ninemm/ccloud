@@ -552,9 +552,9 @@ public class SellerCustomerQuery extends JBaseQuery {
 	}
 
 	public Long findTotalInstId(String procInstId) {
-		StringBuilder sql = new StringBuilder("SELECT COUNT(aha.ID_) ");
+		StringBuilder sql = new StringBuilder("SELECT COUNT(art.ID_) ");
 		sql.append("FROM cc_seller_customer csc ");
-		sql.append("JOIN  act_hi_actinst aha on csc.proc_inst_id = aha.PROC_INST_ID_ ");
+		sql.append("JOIN  act_ru_task art on csc.proc_inst_id = art.PROC_INST_ID_ ");
 		sql.append("WHERE csc.proc_inst_id = ?");
 		return Db.queryLong(sql.toString(), procInstId);
 	}
