@@ -176,7 +176,7 @@ public class ActivityQuery extends JBaseQuery {
 		String select = "select IFNULL(t1.putNum , 0) putNum, IFNULL(t2.executeNum , 0) executeNum, IFNULL(ca.invest_num , 0) invest_num,IFNULL(ca.invest_amount , 0) invest_amount,ca.*,case when ca.category='"+Consts.CATEGORY_NORMAL+"' then '商品销售' else '投入活动' end as activityCategory ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_activity` ca ");
 		fromBuilder.append(" LEFT JOIN (SELECT caa.activity_id,COUNT(1) putNum FROM cc_activity_apply caa WHERE caa.`status`in(1,4) GROUP BY caa.activity_id)t1 ON ca.id=t1.activity_id");
-		fromBuilder.append(" LEFT JOIN (SELECT caa.activity_id,COUNT(1) executeNum FROM cc_customer_visit ccv LEFT JOIN cc_activity_apply caa ON ccv.active_apply_id=caa.id GROUP BY caa.activity_id)t2 ON ca.id=t2.activity_id");
+		fromBuilder.append(" LEFT JOIN (SELECT caa.activity_id,COUNT(1) executeNum FROM cc_customer_visit ccv LEFT JOIN cc_activity_apply caa ON ccv.active_apply_id=caa.id WHERE caa.`status`in(1,4) GROUP BY caa.activity_id)t2 ON ca.id=t2.activity_id");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 		if (StrKit.notBlank(keyword)) {
@@ -224,8 +224,8 @@ public class ActivityQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller_customer csc ON csc.id=caa.seller_customer_id");
 		fromBuilder.append(" LEFT JOIN cc_customer cc ON cc.id = csc.customer_id");
 		fromBuilder.append(" LEFT JOIN(  SELECT ccv.seller_customer_id ,ccv.user_id ,COUNT(1) executeNum FROM cc_activity_apply aa LEFT JOIN cc_customer_visit ccv ON aa.id = ccv.active_apply_id   WHERE aa.activity_id = '");
-		fromBuilder.append(id+"' GROUP BY ccv.seller_customer_id,ccv.user_id) t1 ON t1.seller_customer_id = csc.id and t1.user_id=caa.biz_user_id");
-		fromBuilder.append(" WHERE ca.id='"+id+"' AND caa.`status` in(1,4)");
+		fromBuilder.append(id+"' AND aa.`status` in(1,4) GROUP BY ccv.seller_customer_id,ccv.user_id) t1 ON t1.seller_customer_id = csc.id and t1.user_id=caa.biz_user_id");
+		fromBuilder.append(" WHERE ca.id='"+id+"' AND caa.`status` in(1,4) ");
 		if (StrKit.notBlank(keyword)) {
 			fromBuilder.append(" and (cc.customer_name like '%"+keyword+"%' or u.realname like '%"+keyword+"%')");
 		}
