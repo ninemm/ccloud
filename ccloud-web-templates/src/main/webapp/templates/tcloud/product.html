@@ -44,7 +44,7 @@ $(function() {
 		if(cpLock) {
 			clearTimeout(time);
 			time = setTimeout(function(){ 
-				keyword = $(this).val();
+				keyword = $("#searchInput").val();
 				changeInit();
 			},500);
 		}
@@ -72,6 +72,9 @@ $(function() {
     }).on("click", "#searchCancel", function () {
     	keyword = $(this).val();
 		changeInit();
+	}).on("click", "#searchClear", function () {
+	keyword = $(this).val();
+	changeInit();
 		
     }).on("click", "#shoppingCart", function () {
     	shoppingCart();
