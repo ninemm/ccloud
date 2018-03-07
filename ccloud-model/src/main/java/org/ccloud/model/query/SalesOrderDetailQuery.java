@@ -134,7 +134,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 			return result;
 		}
 
-		List<Record> list = InventoryQuery.me().findProductStoreCount(sellerId, productId, userId);
+		List<Record> list = InventoryQuery.me().findProductStoreCountByDetail(sellerProductId, userId);
 		if (list.size() == 0) {
 			result.put("status", "notEnough");
 			result.put("countList", countList);
