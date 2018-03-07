@@ -57,9 +57,9 @@ public abstract class BaseMemberSalesOrder<M extends BaseMemberSalesOrder<M>> ex
 		if(!(o instanceof BaseMemberSalesOrder<?>)){return false;}
 
 		BaseMemberSalesOrder<?> m = (BaseMemberSalesOrder<?>) o;
-		if(m.getId() == null){return false;}
+		if(m.getMemberId() == null){return false;}
 
-		return m.getId().compareTo(this.getId()) == 0;
+		return m.getMemberId().compareTo(this.getMemberId()) == 0;
 	}
 
 	@Override
