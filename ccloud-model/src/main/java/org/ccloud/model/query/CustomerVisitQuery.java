@@ -320,4 +320,10 @@ public class CustomerVisitQuery extends JBaseQuery {
 		String sql = "select v.* ,u.realname from cc_customer_visit v LEFT JOIN `user` u on u.id = v.user_id where v.data_area like '"+dataArea+"' GROUP BY v.user_id";
 		return DAO.find(sql);
 	}
+	
+	//查询被拜访的客户数
+	public int findByUserId(String userId) {
+		String sql = "SELECT * from cc_customer_visit cv where user_id = '"+userId+"' GROUP BY seller_customer_id";
+		return DAO.find(sql).size();
+	}
 }

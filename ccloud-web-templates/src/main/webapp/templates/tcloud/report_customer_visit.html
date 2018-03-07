@@ -1,0 +1,506 @@
+<#include "_inc/_layout.html"/>
+<#macro title>业务员销售报表</#macro>
+<#macro css>
+    .report {
+        font-size: 0.7rem;
+	    position: absolute;
+	    top: 0;
+	    width: 100%;
+	    bottom: 50px;
+	    overflow: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .report .weui-panel__hd:after {
+        left: 0;
+        height: 0;
+    }
+</#macro>
+
+<#macro css_import>
+<link rel="stylesheet" href="${CTPATH}/css/normalize.css">
+</#macro>
+<#macro script_import>
+<script type='text/javascript' src="${CTPATH}/js/echarts.min.js"></script>
+</#macro>  
+<#macro script>
+  $(function () {
+  
+    $(".end-date").calendar();
+    $(".end-date").val($.today());
+    $(".begin-date").calendar();
+    $(".begin-date").val($.today());
+    $("#dayTag").val("today");
+    $("#orderTag").val("productCount");
+    var startDate = $.today();
+	var endDate = $.today() + ' 23:59:59';  
+	var params = {
+		"dayTag":  'today',
+		"startDate": startDate,
+		"endDate" : endDate
+	}  
+ 	customerVisitCount(params);
+ 	orderStatus(params);
+ 	customerCount(params);
+ 	productCount(params);
+  })
+  
+    function customerVisitCount(params) {
+		Utils.ajax('${CPATH}/report/customerInfoCount', params, 
+			function(data){
+				$("#productCount").html(data[0].customerVisitCount+"次");
+				$("#totalAmount").html(data[0].customerCount);
+			}
+		);    	
+    }
+    
+    function orderStatus(params) {
+        var orderStatus = document.getElementById('orderStatus');
+        var orderStatusChart = echarts.init(orderStatus);
+        orderStatusChart.showLoading();
+		Utils.ajax('${CPATH}/report/orderTypeCount', params, 
+			function(data){
+				orderStatusChart.hideLoading();
+	            var crSeriesData = [];
+	            var legendData = [];
+	            var length = data.length;
+	            if (length == 0) {
+	                crSeriesData.push({
+	                    name: '暂无数据',
+	                    value: 0
+	                });	            	
+	            }	
+	            for(var i = 0; i < length; i++){
+	            	legendData.push(data[i].status)
+	                crSeriesData.push({
+	                    name: data[i].status,
+	                    value: data[i].count
+	                });
+	            }
+				option = {
+				    tooltip: {
+				        trigger: 'item',
+				        formatter: "{a} <br/>{b}: {c}笔 ({d}%)"
+				    },
+				    legend: {
+				        orient: 'horizontal',
+				        data:legendData,
+				    },
+				    series: [
+				        {
+				            name:'数据来源',
+				            type:'pie',
+				            radius: ['40%', '60%'],
+				            avoidLabelOverlap: false,
+				            label: {
+				                normal: {
+				                    show: false,
+				                    position: 'center'
+				                },
+				                emphasis: {
+				                    show: true,
+				                    textStyle: {
+				                        fontSize: '15',
+				                        fontWeight: 'bold'
+				                    }
+				                }
+				            },
+				            labelLine: {
+				                normal: {
+				                    show: false
+				                }
+				            },
+				            data:crSeriesData
+				        }
+				    ]
+				};
+	            orderStatusChart.resize();
+	            orderStatusChart.setOption(option,true);
+			}
+		);    	
+    }
+    
+    var unit = '件';
+    function customerCount(params) {
+        var customerCount = document.getElementById('customerCount');
+        var customerCountChart = echarts.init(customerCount);
+        customerCountChart.showLoading();    
+		Utils.ajax('${CPATH}/report/customerVisitCount', params, 
+			function(data){
+				customerCountChart.hideLoading();
+				var orderTag = $("#orderTag").val();
+	            var crSeriesData = [];
+	            var legendData = [];
+	            var length = data.length;
+	            var high = 40 * length + 100;
+	            if (high < 300) {
+	            	$("#customerCount").height(300);
+	            } else {
+	            	$("#customerCount").height(high);
+	            }
+	            if (length == 0) {
+	                crSeriesData.push({
+	                    name: '暂无数据',
+	                    value: 0
+	                });	            	
+	            }	
+	            for(var i = 0; i < length; i++){
+	            	legendData.push(data[i].customer_name)
+	                crSeriesData.push({
+	                    name: data[i].name,
+	                    value: data[i].value
+	                });
+	            }
+				option = {
+				    tooltip: {
+				        trigger: 'item',
+				        formatter: "{a} <br/>{b}: {c}"+unit+"({d}%)"
+				    },
+				    legend: {
+				        orient: 'horizontal',
+				        data:legendData,
+				    },
+				    series: [
+				        {
+				            name:'数据来源',
+				            type:'pie',
+				            radius: ['40%', '60%'],
+				            avoidLabelOverlap: false,
+				            label: {
+				                normal: {
+				                    show: false,
+				                    position: 'center'
+				                },
+				                emphasis: {
+				                    show: true,
+				                    textStyle: {
+				                        fontSize: '15',
+				                        fontWeight: 'bold'
+				                    }
+				                }
+				            },
+				            labelLine: {
+				                normal: {
+				                    show: false
+				                }
+				            },
+				            data:crSeriesData
+				        }
+				    ]
+				};
+	            customerCountChart.resize();
+	            customerCountChart.setOption(option,true);
+			}
+		);     
+    }
+    
+    function productCount(params) {
+        var productCount = document.getElementById('visitCanve');
+        var productCountChart = echarts.init(visitCanve);
+    	productCountChart.showLoading(); 
+		Utils.ajax('${CPATH}/report/visitMoreInfo', params, 
+			function(data){
+				productCountChart.hideLoading(); 
+				var orderTag = $("#orderTag").val();
+	            var crSeriesData = [];
+	            var legendData = [];
+	            var length = data.length;
+	            var high = 65 * length + 100;
+	            if (high < 300) {
+	            	$("#visitCanve").height(300);
+	            } else {
+	            	$("#visitCanve").height(high);
+	            }	            
+	            if (length == 0) {
+	            	$("#visitCanve").height(300);
+	                crSeriesData.push({
+	                    name: '暂无数据',
+	                    value: 0
+	                });	            	
+	            }
+	            for(var i = 0; i < length; i++){
+	            	legendData.push(data[i].custom_name)
+				     crSeriesData.push({
+				         name: data[i].custom_name,
+				         value: data[i].productCount
+				     });
+	            }
+				option = {
+				    tooltip: {
+				        trigger: 'item',
+				        formatter: "{a} <br/>{b}: {c}"+unit+"({d}%)"
+				    },
+				    legend: {
+				        orient: 'horizontal',
+				        x: 'left',
+				        data:legendData
+				    },
+				    series: [
+				        {
+				            name:'数据来源',
+				            type:'pie',
+				            radius: ['40%', '60%'],
+				            avoidLabelOverlap: false,
+				            label: {
+				                normal: {
+				                    show: false,
+				                    position: 'center'
+				                },
+				                emphasis: {
+				                    show: true,
+				                    textStyle: {
+				                        fontSize: '10',
+				                        fontWeight: 'bold'
+				                    }
+				                }
+				            },
+				            labelLine: {
+				                normal: {
+				                    show: false
+				                }
+				            },
+				            data:crSeriesData
+				        }
+				    ]
+				};
+	            productCountChart.resize();
+	            productCountChart.setOption(option,true);
+			}
+		);    	
+    }
+    
+    function urlSelect(params, type){
+    	if (type == 'day') {
+		 	orderAmount(params);
+		 	orderStatus(params);
+		 	customerCount(params);
+		 	productCount(params);
+		} else {
+		 	customerCount(params);
+		 	productCount(params);
+		}
+    }
+    
+    function getUnit(orderTag) {
+	    if (orderTag == 'productCount') {
+	   		unit = '件';
+	    } else if (orderTag == 'totalAmount') {
+	   		unit = '元';
+	    } else {
+	   		unit = '笔';
+	    }
+    }    
+    
+    function startDaySelect(obj,type) {
+		var params = {
+    		"startDate": $(obj).val(),
+			"endDate": $(obj).parent().find('#endDay').val() + ' 23:59:59'
+		}
+		urlSelect(params,type); 
+    }
+    
+    function endDaySelect(obj,type) {
+		var params = {
+    		"startDate": $(obj).parent().find('#startDay').val(),
+			"endDate": $(obj).val() + ' 23:59:59'
+		}
+		urlSelect(params,type); 
+    }    
+    
+ 	function dayTagSelect(obj,type) {
+      $.actions({
+        actions: [{
+          text: "今日",
+          onClick: function () {
+			var params = {
+				"dayTag": 'today',
+				"orderTag": $("#orderTag").val()
+			}
+			urlSelect(params,type); 
+            $(obj).find(".dayTagText").text('今日')
+            $("#dayTag").val("today");
+          }
+        }, {
+          text: "昨日",
+          onClick: function () {
+			var params = {
+				"dayTag": 'yesterday',
+				"orderTag": $("#orderTag").val()
+			}
+          	urlSelect(params,type);
+            $(obj).find(".dayTagText").text('昨日')
+            $("#dayTag").val("yesterday");
+          }
+        }, {
+          text: "本周",
+          onClick: function () {
+			var params = {
+				"dayTag": 'week',
+				"orderTag": $("#orderTag").val()
+			}
+			urlSelect(params,type);   
+          	$(obj).find(".dayTagText").text('本周')
+          	$("#dayTag").val("week");
+          }
+        }, {
+          text: "上周",
+          onClick: function () {
+			var params = {
+				"dayTag": 'lastweek',
+				"orderTag": $("#orderTag").val()
+			}
+          urlSelect(params,type);
+          $(obj).find(".dayTagText").text('上周')
+          $("#dayTag").val("lastweek");
+          }
+        }, {
+          text: "本月",
+          onClick: function () {
+			var params = {
+				"dayTag": 'month',
+				"orderTag": $("#orderTag").val()
+			}     
+			urlSelect(params,type);    
+         	$(obj).find(".dayTagText").text('本月')
+         	$("#dayTag").val("month");
+          }
+        }, {
+          text: "上月",
+          onClick: function () {
+			var params = {
+				"dayTag": 'lastmonth',
+				"orderTag": $("#orderTag").val()
+			}         
+			urlSelect(params,type);
+          	$(obj).find(".dayTagText").text('上月')
+          	$("#dayTag").val("lastmonth");
+          }
+        }]
+      }); 	
+ 	}
+ 	
+ 	function orderTagSelect(obj,type) {
+      $.actions({
+        actions: [{
+          text: "件数",
+          onClick: function () {
+			var params = {
+				"dayTag":  $("#dayTag").val(),
+				"startDate": $("#startDay").val(),
+				"endDate" : $("#endDay").val(),
+				"orderTag": 'productCount'
+			}
+			urlSelect(params,type); 
+			getUnit("productCount");
+            $(obj).find(".orderTagText").text('件数')
+            $("#orderTag").val("productCount");
+          }
+        }, {
+          text: "金额",
+          onClick: function () {
+			var params = {
+				"dayTag":  $("#dayTag").val(),
+				"startDate": $("#startDay").val(),
+				"endDate" : $("#endDay").val(),			
+				"orderTag": 'totalAmount'
+			}
+          	urlSelect(params,type);
+          	getUnit("totalAmount");
+            $(obj).find(".orderTagText").text('金额')
+            $("#orderTag").val("totalAmount");
+          }
+        }, {
+          text: "笔数",
+          onClick: function () {
+			var params = {
+				"dayTag":  $("#dayTag").val(),
+				"startDate": $("#startDay").val(),
+				"endDate" : $("#endDay").val(),			
+				"orderTag": 'orderCount'
+			}
+			urlSelect(params,type);   
+			getUnit("orderCount");
+          	$(obj).find(".orderTagText").text('笔数')
+          	$("#orderTag").val("orderCount");
+          }
+        }]
+      }); 	
+ 	} 	
+</#macro>
+<@layout>
+	<div class="weui-content">
+	<div class="report">
+		<div class="weui-panel weui-panel_access report-header">
+			<div class="weui-panel__hd">
+				<span class="overview-hd-title">拜访简报</span> 
+				<div>
+					<span class="briefly" onclick="dayTagSelect(this,'day')">
+						<p class="dayTagText">本月</p>
+						<i class="icon-angle-down"></i>
+					</span>
+					<span class="briefly" onclick="orderTagSelect(this,'order')">
+						<p class="orderTagText">次数</p>
+						<i class="icon-angle-down"></i>
+					</span>
+					<input type="hidden" id="dayTag">
+					<input type="hidden" id="orderTag">
+					<input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'day')" readonly="">
+					<span class="overview-hd-segmenting fr"> — </span> 
+					<input class="weui-input begin-date fr t-r" type="text" id="startDay" onchange="startDaySelect(this,'day')" readonly="">
+				</div>
+			</div>
+			<div class="weui-panel__bd">
+				<div class="weui-flex overview-block">
+					<div class="weui-flex__item border-right-1px">
+						<div class="overview-title">
+							<img src="${CTPATH}/images/order.png"> <span>拜访总数</span>
+						</div>
+						<div class="t-c">
+							<strong id="productCount">
+						</div>
+					</div>
+					<div class="weui-flex__item">
+						<div class="overview-title">
+							<img src="${CTPATH}/images/money.png"> <span>拜访客户数</span>
+						</div>
+						<div class="t-c">
+							<strong id="totalAmount"></strong>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="weui-panel weui-panel_access">
+			<div class="weui-panel__hd">
+				<span class="overview-hd-title">客户拜访统计</span> 
+			</div>
+			<div class="weui-panel__bd report-area">
+				<div class="weui-media-box ft14">
+					<div id="customerCount" style="height: 300px;">
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="weui-panel weui-panel_access">
+			<div class="weui-panel__hd">
+				<span class="overview-hd-title">拜访次数统计</span> 
+			</div>
+			<div class="weui-panel__bd report-area">
+				<div class="weui-media-box ft14">
+					<div id="visitCanve" style="height: 300px;">
+						
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="weui-panel weui-panel_access margin-0">
+			<div class="weui-panel__hd"><span class="overview-hd-title">订单完成统计</span></div>
+			<div class="weui-panel__bd report-area">
+				<div class="weui-media-box ft14">
+					<div id="orderStatus" style="height: 300px;"></div>
+				</div>
+			</div>
+		</div>	</div>	
+		<#include "_inc/_footer_nav.html" />
+	</div>
+</@layout>
