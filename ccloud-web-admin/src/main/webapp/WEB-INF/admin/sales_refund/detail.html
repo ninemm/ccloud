@@ -25,7 +25,7 @@
 			$("#total_amount").text("￥"+total_amount.toFixed(2));
     		</@shiro.hasRole>	
     		<@shiro.lacksRole name="021"> 
-			$("#total_amount").text("￥"+formatNumber(${(order.total_amount)!}));
+			$("#total_amount").text("￥"+formatNumber(${(refund.total_reject_amount)!}));
     		</@shiro.lacksRole>	
     		
     		

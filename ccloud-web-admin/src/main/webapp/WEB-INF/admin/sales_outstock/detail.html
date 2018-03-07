@@ -27,7 +27,7 @@
     		</@shiro.hasRole>	
     	
     		<@shiro.lacksRole name="021"> 
-			$("#total_amount").text("￥"+formatNumber(${(order.total_amount)!}));
+			$("#total_amount").text("￥"+formatNumber(${(outstock.total_amount)!}));
     		</@shiro.lacksRole>	
 		$(".subtotal").each(function(){
     			$(this).text($(this).data("value").toFixed(2));
