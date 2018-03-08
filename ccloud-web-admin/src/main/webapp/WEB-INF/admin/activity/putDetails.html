@@ -66,15 +66,15 @@
 				{field: "id", title: "ID", align: "center", visible:false, edit:false},
 				{field: "checkbox", title: '<input class="jp-common-pad " id="dataItem" onclick="checkAll(this)" title="全选" type="checkbox">', align: "center", width: '2%', 
 					formatter: function(value, row, rowIndex) {
-						return '<input class="jp-common-pad" name="dataItem" type="checkbox" value="' + row.id + '">';
+						return '<input class="jp-common-pad" name="dataItem" type="checkbox" value="' + row.activityApplyId +'">';
 					},
 					edit:false
 				},
+				{field: "customer_name", title: "终端名称", align: "center", width: '10%', edit:false},
 				{field: "proc_code", title: "流程编号", align: "center", width: '9%', edit:false},
 				{field: "invest_type", title: "投入类型", align: "center", width: '9%', edit:false},
-				{field: "customer_name", title: "终端名称", align: "center", width: '10%', edit:false},
 				{field: "address", title: "终端地址", align: "center", width: '10%', edit:false},
-				{field: "customer_type", title: "终端类型", align: "center", width: '10%', edit:false},
+				{field: "customer_type_ids", title: "终端类型", align: "center", width: '10%', edit:false},
 				{field: "executeNum", title: "执行次数", align: "center", width: '10%', 
 				formatter: function(value, row, rowIndex) {
 					var url1 = '${CPATH}/admin/activity/visitDetails?id=' + row.id+'&customerId='+row.customerId+'&userId=' +row.userId;
@@ -82,9 +82,11 @@
 					return strHtml;
 				},
 				edit:false},
+				/*
 				{field: "start_time", title: "投入日期", align: "center", width: '10%', edit:false},
       			{field: "time_interval", title: "投放周期", align: "center", width: '10%', edit:false},
-      			{field: "end_time", title: "结束日期", align: "center", width: '10%', edit:false},
+      			{field: "end_time", title: "结束日期", align: "center", width: '10%', edit:false}, 
+      			*/
       			{field: "realname", title: "投放/补录人", align: "center", width: '10%', edit:false},
       			{field: "putDate", title: "投放/补录时间", align: "center", width: '10%', edit:false},
 			];
@@ -104,6 +106,26 @@
 		}
 	};
 	
+	//核销
+    function auditReimbursement(){
+   	   	ids = new Array();
+		$("[name='dataItem']:checkbox").each(function() {
+			if ($(this).is(":checked")) {
+				ids.push($(this).val());
+			}
+		});
+		$.get('${CPATH}/admin/activity/auditReimbursement?ids='+ids,
+			function(result){
+				if (result.errorCode > 0) {
+					toastr.error(result.message, '加入核销失败');
+				} else {
+					toastr.success(result.message, '加入核销成功');
+					$table.bootstrapTable('refresh');
+				}
+			}
+		);
+		
+   }
 </#macro>
 
 <@layout active_id=p child_active_id=c>
@@ -146,6 +168,9 @@
                 	<input id="search-submit" class="btn btn-sm btn-primary btn-flat" type="button" value="搜索">
                 </div>
              </div>
+             <div class="jp-left">
+				<button class="btn btn-sm btn-primary btn-flat" type="button" onclick="auditReimbursement()"><i class="fa fa-plus"></i>加入核销</button>
+			</div>
 		</div>
 		<div class="box">
 			<table class="table table-striped table-hover table-condensed" id="_activityPutDetails_table" ></table>

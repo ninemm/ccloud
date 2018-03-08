@@ -38,6 +38,7 @@ import org.ccloud.model.Dict;
 import org.ccloud.model.ExpenseDetail;
 import org.ccloud.model.QyExpense;
 import org.ccloud.model.QyExpensedetail;
+import org.ccloud.model.YxActivityshopadinfo;
 import org.ccloud.model.query.ActivityExecuteQuery;
 import org.ccloud.model.query.ActivityQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
@@ -553,8 +554,8 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		}
 		Page<Record> page = ActivityQuery.me().putDetailsPaginate(getPageNumber(), getPageSize(), keyword,startDate, endDate,id);
 		for(int i = 0; i <page.getList().size();i++){
-			if(page.getList().get(i).getStr("customer_type")!="") {
-				page.getList().get(i).set("customer_type", ActivityQuery.me().getCustomerType(page.getList().get(i).getStr("customer_type")));
+			if(page.getList().get(i).getStr("customer_type_ids")!="") {
+				page.getList().get(i).set("customer_type_ids", ActivityQuery.me().getCustomerType(page.getList().get(i).getStr("customer_type_ids")));
 			}
 			if(page.getList().get(i).getStr("time_interval")!="") {
 				page.getList().get(i).set("time_interval", ActivityQuery.me().getTimeInterval(page.getList().get(i).getStr("time_interval")));
@@ -616,5 +617,18 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		}
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
+	}
+	
+	public void auditReimbursement() {
+		String ids = getPara("ids");
+		String[] activityApplyIds = ids.split(",");
+		for (String activityApplyId : activityApplyIds) {
+			Record YxActivity = ActivityQuery.me().findYxActivity(activityApplyId);
+			if (YxActivity.getStr("invest_type").equals("101103")) {
+				YxActivityshopadinfo yxActivityshopadinfo=new YxActivityshopadinfo();
+				yxActivityshopadinfo.setFlowIDNO(YxActivity.getLong("proc_code"));
+			}
+			System.out.println(activityApplyId);
+		}
 	}
 }

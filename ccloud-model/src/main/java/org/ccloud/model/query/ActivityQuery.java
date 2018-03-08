@@ -173,7 +173,7 @@ public class ActivityQuery extends JBaseQuery {
 	
 	
 	public Page<Record> activityPutPaginate(int pageNumber, int pageSize, String keyword,String startDate, String endDate,String sellerId, String invest_type) {
-		String select = "select IFNULL(t1.putNum , 0) putNum, IFNULL(t2.executeNum , 0) executeNum, IFNULL(ca.invest_num , 0) invest_num,IFNULL(ca.invest_amount , 0) invest_amount,ca.*,case when ca.category='"+Consts.CATEGORY_NORMAL+"' then '商品销售' else '投入活动' end as activityCategory ";
+		String select = "select DATE(ca.start_time) start_time1,DATE(ca.end_time) end_time1,IFNULL(t1.putNum , 0) putNum, IFNULL(t2.executeNum , 0) executeNum, IFNULL(ca.invest_num , 0) invest_num,IFNULL(ca.invest_amount , 0) invest_amount,ca.*,case when ca.category='"+Consts.CATEGORY_NORMAL+"' then '商品销售' else '投入活动' end as activityCategory ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_activity` ca ");
 		fromBuilder.append(" LEFT JOIN (SELECT caa.activity_id,COUNT(1) putNum FROM cc_activity_apply caa WHERE caa.`status`in(1,4) GROUP BY caa.activity_id)t1 ON ca.id=t1.activity_id");
 		fromBuilder.append(" LEFT JOIN (SELECT caa.activity_id,COUNT(1) executeNum FROM cc_customer_visit ccv LEFT JOIN cc_activity_apply caa ON ccv.active_apply_id=caa.id WHERE caa.`status`in(1,4) GROUP BY caa.activity_id)t2 ON ca.id=t2.activity_id");
@@ -217,7 +217,7 @@ public class ActivityQuery extends JBaseQuery {
 	}
 
 	public Page<Record> putDetailsPaginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate,String id) {
-		String select = "SELECT u.id userId , u.realname , csc.id customerId , cc.customer_name , CONCAT( cc.prov_name , cc.city_name , cc.country_name , cc.address) address , csc.customer_type_ids customer_type , caa.create_date putDate , IFNULL(t1.executeNum , 0) executeNum , ca.* ";	
+		String select = "SELECT caa.id activityApplyId,u.id userId , u.realname , csc.id customerId , cc.customer_name , CONCAT( cc.prov_name , cc.city_name , cc.country_name , cc.address) address , csc.customer_type_ids, caa.create_date putDate , IFNULL(t1.executeNum , 0) executeNum , ca.* ";	
 		StringBuilder fromBuilder = new StringBuilder(" FROM cc_activity_apply caa ");
 		fromBuilder.append(" LEFT JOIN cc_activity ca ON ca.id=caa.activity_id");
 		fromBuilder.append(" LEFT JOIN `user` u ON u.id=caa.biz_user_id");
@@ -284,5 +284,17 @@ public class ActivityQuery extends JBaseQuery {
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
         return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+
+	public Record findYxActivity(String activityApplyId) {
+		StringBuilder fromBuilder = new StringBuilder("SELECT ca.proc_code , cc.prov_name , cc.city_name , cc.country_name , cc.customer_name , cc.customer_code , csc.create_date , u.realname , u.mobile");
+		fromBuilder.append(" FROM cc_activity_apply caa ");
+		fromBuilder.append(" LEFT JOIN cc_activity ca ON ca.id = caa.activity_id");
+		fromBuilder.append(" LEFT JOIN cc_seller_customer csc ON csc.id = caa.seller_customer_id");
+		fromBuilder.append(" LEFT JOIN cc_customer cc ON cc.id = csc.customer_id");
+		fromBuilder.append(" LEFT JOIN `user` u ON u.id=caa.biz_user_id");
+		fromBuilder.append(" LEFT JOIN cc_expense_detail ced ON ced.id=caa.expense_detail_id");
+		fromBuilder.append(" caa.id ="+activityApplyId);
+		return Db.findFirst(fromBuilder.toString());
 	}
 }

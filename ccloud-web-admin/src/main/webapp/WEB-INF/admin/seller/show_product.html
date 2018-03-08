@@ -84,41 +84,20 @@
       					return strHtml;
       				},
       			edit:false},
-      			
       			{field: "bigPrice", title: "销售价格(整)", align: "center", width: '7%',
-	      			<@shiro.hasRole name="021"> 	
-	      				formatter: function(value, row, rowIndex) {
-						var strHtml = '￥<input type="text" size="9" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="bigPrice" value="'+formatNumber(row.tax_price)+'" onblur="changeMoney(this)"/>';
-						strHtml += '/<input type="text" size="1" readonly style="text-align:center;background-color:transparent;border:0px;" name="big_unit" value="'+row.big_unit+'"/>';
-						return strHtml;
-					},
-					</@shiro.hasRole>	
-    					<@shiro.lacksRole name="021"> 
-						formatter: function(value, row, rowIndex) {
-						var strHtml = '￥<input type="text" size="9" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="bigPrice" value="'+formatNumber(row.price)+'" onblur="changeMoney(this)"/>';
-						strHtml += '/<input type="text" size="1" readonly style="text-align:center;background-color:transparent;border:0px;" name="big_unit" value="'+row.big_unit+'"/>';
-						return strHtml;
-					},
-					</@shiro.lacksRole>	
-      			 edit:false},
-      			
-      			 {field: "convert_relate", title: "换算", align: "center", width: '2%',edit:false},
-      			
-      			 {field: "samllPrice", title: "销售价格(零)", align: "center", width: '7%',
-      				<@shiro.hasRole name="021"> 	
       				formatter: function(value, row, rowIndex) {
-						var strHtml = '￥<input type="text" size="9" readonly style="text-align:center;background-color:transparent;border:0px;" name="smallPrice" value="'+(row.tax_price/row.convert_relate).toFixed(2)+'"/>';
-						strHtml += '/<input type="text" size="1" readonly style="text-align:center;background-color:transparent;border:0px;" name="samll_unit" value="'+row.small_unit+'"/>';
-						return strHtml;
-					},
-					</@shiro.hasRole>	
-    					<@shiro.lacksRole name="021"> 
-	    					formatter: function(value, row, rowIndex) {
-						var strHtml = '￥<input type="text" size="9" readonly style="text-align:center;background-color:transparent;border:0px;" name="smallPrice" value="'+(row.price/row.convert_relate).toFixed(2)+'"/>';
-						strHtml += '/<input type="text" size="1" readonly style="text-align:center;background-color:transparent;border:0px;" name="samll_unit" value="'+row.small_unit+'"/>';
-						return strHtml;
-					},
-					</@shiro.lacksRole>	
+					var strHtml = '￥<input type="text" size="9" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="bigPrice" value="'+formatNumber(row.price)+'" onblur="changeMoney(this)"/>';
+					strHtml += '/<input type="text" size="1" readonly style="text-align:center;background-color:transparent;border:0px;" name="big_unit" value="'+row.big_unit+'"/>';
+					return strHtml;
+				},
+      			 edit:false},
+      			 {field: "convert_relate", title: "换算", align: "center", width: '2%',edit:false},
+      			 {field: "samllPrice", title: "销售价格(零)", align: "center", width: '7%',
+      				formatter: function(value, row, rowIndex) {
+					var strHtml = '￥<input type="text" size="9" readonly style="text-align:center;background-color:transparent;border:0px;" name="smallPrice" value="'+(row.price/row.convert_relate).toFixed(2)+'"/>';
+					strHtml += '/<input type="text" size="1" readonly style="text-align:center;background-color:transparent;border:0px;" name="samll_unit" value="'+row.small_unit+'"/>';
+					return strHtml;
+				},
       			 edit:false},
       			 {field: "cost", title: "成本(整)", align: "center", width: '7%',
       				formatter: function(value, row, rowIndex) {
@@ -136,6 +115,13 @@
 				{field: "", title: "账期价格(整)", align: "center", width: '7%',
       				formatter: function(value, row, rowIndex) {
 					var strHtml = '￥<input type="text" size="9" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="accountPrice" value="'+formatNumber(row.account_price)+'" onblur="changeAccountPrice(this)"/>';
+					return strHtml;
+				},
+      			 edit:false},
+      			 {field: "", title: "税务价格(整)", align: "center", width: '7%',
+      				formatter: function(value, row, rowIndex) {
+					var strHtml = '￥<input type="text" size="9" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="taxPrice" value="'+formatNumber(row.tax_price)+'"/>';
+					strHtml += '/<input type="text" size="1" readonly style="text-align:center;background-color:transparent;border:0px;" name="big_unit" value="'+row.big_unit+'"/>';
 					return strHtml;
 				},
       			 edit:false},
@@ -246,8 +232,9 @@
 								"price": $(this).find('td').eq(7).find("input[name='bigPrice']").val(),
 								"cost": $(this).find('td').eq(10).find("input").val(),
 								"account_price": $(this).find('td').eq(12).find("input").val(),
-								"bar_code": $(this).find('td').eq(13).find("input").val(),
-								"tags": $(this).find('td').eq(14).find("input").val(),
+								"tax_price":$(this).find('td').eq(13).find("input").val(),
+								"bar_code": $(this).find('td').eq(14).find("input").val(),
+								"tags": $(this).find('td').eq(15).find("input").val(),
 							};
 							orderItems.push(obj);
 		})
