@@ -44,7 +44,7 @@ $(function() {
 		if(cpLock) {
 			clearTimeout(time);
 			time = setTimeout(function(){ 
-				keyword = $(this).val();
+				keyword = $("#searchInput").val();
 				changeInit();
 			},500);
 		}
@@ -72,7 +72,9 @@ $(function() {
     }).on("click", "#searchCancel", function () {
     	keyword = $(this).val();
 		changeInit();
-		
+	}).on("click", "#searchClear", function () {
+	keyword = $(this).val();
+	changeInit();
     }).on("click", "#shoppingCart", function () {
     	shoppingCart();
     	
@@ -130,45 +132,6 @@ $(function() {
 			imgSwiper.destroy();
 		  }
 		});
-
-	}).on("click", ".composition .product-top .weui-cell__ft, #compositionName", function () {
-    	var $this = $(this).parents(".composition");
-    	var compositionName = $this.find("#compositionName").text();
-    	var compositionValueName = $this.find("#compositionValueName").text();
-    	var subProduct = $this.find("#subProduct").text();
-    	var subsubProduct = $this.find("#subsubProduct").text();
-    	var product_image_list_store = $this.find("#product_image_list_store").val();
-    	var product_sn = $this.find("#product_sn").val();
-    	var imageS = getImageS(product_image_list_store, product_sn);
-		var imgSwiper;
-		
-		layer.open({
-		  type: 1,
-		  title: ['商品详情',
-			'border-bottom: 1px solid #eee;height:2rem;line-height:2rem'
-		  ],
-		  content: '<div class="swiper-container">' +
-			'<div class="swiper-wrapper">' + imageS + '</div>' +
-			'<div class="swiper-pagination"></div>' +
-			'</div>' +
-			'<p>名称：' + compositionName + '</p>' +
-			'<p>规格：' + compositionValueName + '</p>' +
-			'<p>赠品：' + subProduct + '</br>' + subsubProduct + '</p>',
-		  anim: 'scale',
-		  className: 'product-detail',
-		  success: function () {
-			imgSwiper = new Swiper('.product-detail .swiper-container', {
-				pagination: {
-					el: '.swiper-pagination',
-				},
-			})
-		  },
-		  btn: '关闭',
-		  end: function () {
-			imgSwiper.destroy();
-		  }
-		});
-
 	});
 
     firstInit();
@@ -183,11 +146,12 @@ var $sidebar = $("#sidebar ul");
 var $menuRight = $(".menu-right");
 
 function firstInit(){
-	var tags = ${tags!};
-	initTags(tags);
-	var productList = ${productList!};
-	var compositionList = ${compositionList!};
-	combo(productList, compositionList);
+	Utils.ajax('${CPATH}/member/product/productList', {'tag' : tag, 'keyword' : keyword},
+		function(data){
+			initTags(data.tags);
+			combo(data.productList);
+		}
+	);
 }
 
 function changeInit(){
@@ -198,19 +162,17 @@ function changeInit(){
 
 	$sidebar.empty();
 	$menuRight.empty();
-	Utils.ajax('${CPATH}/product/productList', {'tag' : tag, 'keyword' : keyword}, 
+	Utils.ajax('${CPATH}/member/product/productList', {'tag' : tag, 'keyword' : keyword},
 		function(data){
 			layer.closeAll();
-			combo(data.productList, data.compositionList);
+			combo(data.productList);
 		}
 	);
 }
 
-function combo(productList, compositionList){
+function combo(productList){
 	initProduct(productList);
-	initComposition(compositionList);
 	productNum();
-	compositionNum();
 	calTotal();
 }
 
@@ -293,52 +255,6 @@ function productNum(){
 		});
 }
 
-var compositionHtml = $(".composition").eq(0).html();
-function initComposition(compositionList){
-	if(compositionList.length > 0) {
-		$sidebar.append("<li id='composition'> 组合商品 <span class='goods-num'>8</span> </li>");
-		$menuRight.append("<div class='type' id='composition' style='display:none'> </div>");
-	}
-	
-	var parentId = '';
-	$.each(compositionList, function(index, el) {
-		if(parentId != el.parent_id) {
-			parentId = el.parent_id;
-			var $type = $menuRight.find(".type:last");
-			$type.append("<section class='product_detail weui-panel weui-panel_access composition' id='" + el.id  + "' >" + compositionHtml + "</section>");
-			var $newProductDetail = $type.find(".composition:last");
-			$newProductDetail.find("#compositionName").text(el.name);
-			
-			$newProductDetail.find("#compositionPriceSpan").text('￥' + el.price);
-
-			$newProductDetail.find("#compositionPrice").val(el.price);
-			$newProductDetail.find("#compositionId").val(el.parent_id);
-			
-			$newProductDetail.find("#compositionValueName").text(el.product_sp);
-
-			$newProductDetail.find("#compositionImage").attr("src", getImageUrl(el.product_image_list_store, el.product_sn));
-			$newProductDetail.find("#product_image_list_store").val(el.product_image_list_store);
-			$newProductDetail.find("#product_sn").val(el.product_sn);
-
-			$newProductDetail.find("#subProduct").text(el.sub_product_name + ' ' + el.sub_product_count + '件')
-		}else{
-			var $type = $menuRight.find(".type:last");
-			var $newProductDetail = $type.find(".composition:last");
-			$newProductDetail.find("#gift").append("<a class='gift-open' >展开</a>");
-			$newProductDetail.find("#subsubProduct").append(el.sub_product_name + ' ' + el.sub_product_count + '件');
-		}
-
-	});
-}
-
-function compositionNum(){
-	var compositionList = getItemBykey("compositionList") == undefined ? [] : getItemBykey("compositionList");
-		$.each(compositionList, function(index, el){
-			var $newProductDetail =$("#" + el.compositionId);
-			$newProductDetail.find("#compositionNum").val(el.compositionNum);
-		});
-}
-
 function getImageUrl(product_image_list_store, product_sn) {
 	var imageUrl = "${CTPATH}/images/jp.jpg";
 	$.each(JSON.parse(product_image_list_store), function(index, el) {
@@ -384,11 +300,7 @@ function calTotal() {
 		var products = $typeEl.find('.product_detail')
 		$.each(products, function(index, el) {
 			var $el = $(el);
-			if(id == 'composition'){
-				total += Number($el.find("#compositionNum").val());
-			}else{
-				total += Number($el.find("#bigNum").val()) + Number($el.find("#smallNum").val());
-			}
+			total += Number($el.find("#bigNum").val()) + Number($el.find("#smallNum").val());
 		});
 
 		var $total = $sidebar.find("#" + id + " .goods-num");
@@ -405,12 +317,6 @@ function productChange(obj){
       if($el.length > 0){
       	var product = getProduct($el);
       	cart.changeProduct(product);
-      }else{
-        var $co = obj.parents(".composition");
-        if($co.length > 0){
-          var composition = getComposition($co);
-          cart.changeComposition(composition);
-        }
       }
       calTotal();
       total();
@@ -469,23 +375,6 @@ function getProduct($el){
 	}
 }
 
-function getComposition($el){
-	return composition = {
-		compositionName : $el.find("#compositionName").text(),
-		
-		compositionPriceSpan : $el.find("#compositionPriceSpan").text(),
-		stock : $el.find("#stock").text(),
-		
-		compositionPrice : $el.find("#compositionPrice").val(),
-		compositionId : $el.find("#compositionId").val(),
-
-		compositionNum : $el.find("#compositionNum").val(),
-		
-		compositionValueName : $el.find("#compositionValueName").text(),
-		compositionSub : $el.find("#gift").html()
-	}
-}
-
 function total(){
 	var productList = getItemBykey("productList") == undefined ? [] : getItemBykey("productList");;
 	var total = 0;
@@ -495,35 +384,29 @@ function total(){
 			total += el.smallNum * el.smallPrice;
 		}
 	});
-	
-	var compositionList = getItemBykey("compositionList") == undefined ? [] : getItemBykey("compositionList");
-	$.each(compositionList, function(index, el) {
-		total += el.compositionNum * el.compositionPrice;
-	});
-	$("#totalNum").text("共" + (productList.length + compositionList.length) + "款,合计:" + total + "元")
+
+	$("#totalNum").text("共" + (productList.length) + "款,合计:" + total + "元")
 
 } 
 
 function shoppingCart(){	
 	var productList = getItemBykey("productList") == undefined ? [] : getItemBykey("productList");
-	var compositionList = getItemBykey("compositionList") == undefined ? [] : getItemBykey("compositionList");
 	
-	if(productList.length == 0 && compositionList.length == 0) {
+	if(productList.length == 0) {
 		$.toptip("你还没有选择商品!", 'warning'); 
 		return;
 	}
-	window.location.href = '${CPATH}/product/shoppingCart';
+	window.location.href = '${CPATH}/member/product/shoppingCart';
 }
 
 function order(){
 	var productList = getItemBykey("productList") == undefined ? [] : getItemBykey("productList");
-	var compositionList = getItemBykey("compositionList") == undefined ? [] : getItemBykey("compositionList");
 
-	if(productList.length == 0 && compositionList.length == 0) {
+	if(productList.length == 0) {
 		$.toptip("你的购物车内没有商品!", 'warning'); 
 		return;
 	}
-	window.location.href = '${CPATH}/product/order';
+	window.location.href = '${CPATH}/member/product/order';
 }
 
 </#macro>
@@ -619,53 +502,6 @@ function order(){
 									</div>
 								</div>
 								<div id="stock"></div>
-							</div>
-						</section>
-					</div>
-					<div class="" style="display: none">
-						<section class="product_detail weui-panel weui-panel_access composition">
-							<div>
-								<input type="hidden" id="compositionId" value="">
-								<input type="hidden" id="compositionPrice" value="">
-								<input type="hidden" id="product_image_list_store" value="">
-								<input type="hidden" id="product_sn" value="">
-								<div class="product-top">
-									<img src="" id="compositionImage" style="width:2rem;" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'" onClick="imageClick(this)">
-									<div class="weui-cell_access product-top-right">
-										<p class="product_name" id="compositionName"></p>
-										<div class="product_unit">
-											<p>规格：</p>
-											<span id="compositionValueName"></span>
-										</div>
-										<span class="weui-cell__ft"></span>
-									</div>
-								</div>
-								<div class="product_bUnit">
-									<span class="price" id="compositionPriceSpan"></span>
-									<div class="spinner">
-										<div class="operate fl">
-											<i class="icon-minus2"></i>
-										</div>
-										<input type="number" min="0" value="0" class="fl" id="compositionNum">
-										<div class="operate fl">
-											<i class="icon-plus2"></i>
-										</div>
-									</div>
-								</div>
-								<div id="stock"></div>
-							</div>
-							<hr>
-							<div id="gift" class="weui-flex">
-								<span>
-									<i class="icon-tags"></i>
-								</span>
-								<div class="weui-flex__item">
-									<p id="sub">
-										<span id="subProduct"> </span>
-									</p>
-									<p id="subsubProduct" class="none">
-									</p>
-								</div>
 							</div>
 						</section>
 					</div>

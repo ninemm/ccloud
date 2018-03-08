@@ -1,0 +1,243 @@
+<#include "_inc/_layout.html"/>
+<#macro title>购物车</#macro>
+<#macro css>
+	#valueName {
+		max-width: 7.5rem;
+	}
+</#macro>
+<#macro script_import>
+	<script type='text/javascript' src="${CTPATH}/js/shopping-cart.js"></script>
+</#macro>  
+<#macro script>
+$(function() {
+	$(document).on("click", function () {
+        if ($(this).text() === "展开") {
+	        $(this).text("收起");
+	        $(this).prev().find('#subsubProduct').show();
+        } else {
+	        $(this).text("展开");
+	        $(this).prev().find('#subsubProduct').hide();
+        }
+    }).on("click", ".icon-trash-o", function() {
+    var _this = $(this);
+    $.confirm("确认删除商品？", function() {
+      var $el = _this.parents(".common");
+      if($el.length > 0){
+        $el.find("#bigNum").val(0);
+        $el.find("#smallNum").val(0);
+      	var product = getProduct($el);
+      	cart.changeProduct(product);
+      }
+      _this.parents(".weui-panel").remove();
+      total();
+    }, function() {
+    })
+  }).on("click", "#placeOrder", function () {
+      order();
+  }).on("click", "#addGoods", function () {
+       window.location.href = '${CPATH}/member/product';
+  }).on("click", ".operate:first-child", function () { //减少商品数量
+      productChange($(this));
+  }).on("click", ".operate:last-child", function () { //增加商品数量
+      productChange($(this));
+  }).on('click', '#confirm-input', function () {
+      var val = parseFloat($currentInput.val());
+      if(val < 0 || val == ""){
+        $currentInput.val(0);
+      }else{
+        $currentInput.val(val);
+      }
+  
+      var $productDetail = $currentInput.parent().parent();
+      var convert = $productDetail.find("#convert").val();
+      var id = $currentInput.attr('id');
+ 
+      if(id == 'bigPrice'){
+        var bPrice = parseFloat($productDetail.find("#bigCost").val());
+        var bigPrice = $currentInput.val();
+		if(bigPrice < bPrice){
+			$currentInput.val(bPrice);
+			$.toptip("价格不能小于成本价!", 'warning');
+			return;
+		}
+		$productDetail.find("#smallPrice").val((bigPrice/convert).toFixed(2));
+      } else if(id == 'smallPrice'){
+        var sPrice = parseFloat($productDetail.find("#smallCost").val());
+        var smallPrice = $currentInput.val();
+		if(smallPrice < sPrice){
+			$currentInput.val(sPrice);
+			$.toptip("价格不能小于成本价!", 'warning');
+			return;
+		}
+		$productDetail.find("#bigPrice").val((smallPrice*convert).toFixed(2));
+      }
+      productChange($currentInput);
+  });
+  
+  $main.empty();
+  initProduct();
+  total();
+  
+});
+
+var sellerProductInfoMap = ${sellerProductInfoMap!};
+var sellerProductItems = ${sellerProductItems!};
+var newHtml = $(".common").eq(0).html();
+var $main = $("main");
+
+function initProduct(){
+	var productList = getItemBykey("productList");
+
+	$.each(productList, function(index, el) {
+			$main.append("<div class='weui-panel weui-panel_access common'>" + newHtml + "</div>");
+			var $newProductDetail = $main.find(".common:last");
+			$newProductDetail.find("#productName").text(el.productName);
+			$newProductDetail.find("#valueName").text(el.valueName);
+	
+			$newProductDetail.find("#bigPriceSpan").text(el.bigPriceSpan);
+			$newProductDetail.find("#smallPriceSpan").text(el.smallPriceSpan);
+			$newProductDetail.find("#bigUnitSpan").text(el.bigUnitSpan);
+			$newProductDetail.find("#smallUnitSpan").text(el.smallUnitSpan);
+
+			$newProductDetail.find("#bigCost").val(el.bigCost);
+			$newProductDetail.find("#smallCost").val(el.smallCost);
+			$newProductDetail.find("#bigAccountPrice").val(el.bigAccountPrice);
+			$newProductDetail.find("#smallAccountPrice").val(el.smallAccountPrice);
+
+			$newProductDetail.find("#bigPrice").val(el.bigPrice);
+			$newProductDetail.find("#smallPrice").val(el.smallPrice);
+			$newProductDetail.find("#bigUnit").val(el.bigUnit);
+			$newProductDetail.find("#smallUnit").val(el.smallUnit);
+			$newProductDetail.find("#sellProductId").val(el.sellProductId);
+			$newProductDetail.find("#productId").val(el.productId);
+			$newProductDetail.find("#convert").val(el.convert);
+			
+			$newProductDetail.find("#bigNum").val(el.bigNum);
+			$newProductDetail.find("#smallNum").val(el.smallNum);
+	});
+}
+
+function total(){
+	var products = $(".common");
+	var total = 0;
+	$.each(products, function(index, el) {
+		var $el = $(el);
+		total += $el.find("#bigNum").val() * $el.find("#bigPrice").val();
+		total += $el.find("#smallNum").val() * $el.find("#smallPrice").val();
+	});
+
+	$("#totalNum").text("共" + (products.length) + "款,合计:" + total + "元")
+
+} 
+
+function productChange(obj){
+      var $el = obj.parents(".common");
+      if($el.length > 0){
+      	var product = getProduct($el);
+      	cart.changeProduct(product);
+      }
+      total();
+}
+
+function getProduct($el){
+	
+	return product = {
+		productName : $el.find("#productName").text(),
+		valueName : $el.find("#valueName").text(),
+		
+		bigPriceSpan : $el.find("#bigPriceSpan").text(),
+		smallPriceSpan : $el.find("#smallPriceSpan").text(),
+		bigUnitSpan : $el.find("#bigUnitSpan").text(),
+		smallUnitSpan : $el.find("#smallUnitSpan").text(),
+		stock : $el.find("#stock").text(),
+
+		bigCost : $el.find("#bigCost").val(),
+		smallCost : $el.find("#smallCost").val(),
+		bigAccountPrice : $el.find("#bigAccountPrice").val(),
+		smallAccountPrice : $el.find("#smallAccountPrice").val(),
+		
+		bigPrice : $el.find("#bigPrice").val(),
+		smallPrice : $el.find("#smallPrice").val(),
+		bigUnit : $el.find("#bigUnit").val(),
+		smallUnit : $el.find("#smallUnit").val(),
+		sellProductId : $el.find("#sellProductId").val(),
+		productId : $el.find("#productId").val(),
+		convert : $el.find("#convert").val(),
+
+		bigNum : $el.find("#bigNum").val(),
+		smallNum : $el.find("#smallNum").val(),
+		isGift : 0,
+	}
+}
+
+function order(){
+	var productList = getItemBykey("productList") == undefined ? [] : getItemBykey("productList");
+
+	if(productList.length == 0) {
+		$.toptip("你的购物车内没有商品!", 'warning'); 
+		return;
+	}
+	window.location.href = '${CPATH}/member/product/order';
+}
+</#macro>
+
+<@layout>
+<div class="weui-content">
+	<div id="shopping-cart">
+		<main>
+			<div class="weui-panel weui-panel_access common" style="display: none">
+				<input type="hidden" id="sellProductId" value="">
+				<input type="hidden" id="productId" value="">
+				<input type="hidden" id="convert" value="">
+				<input type="hidden" id="bigCost" value="">
+				<input type="hidden" id="smallCost" value="">
+				<input type="hidden" id="bigAccountPrice" value="">
+				<input type="hidden" id="smallAccountPrice" value="">
+				<nobr>
+					<p class="product_name" id="productName">
+					</p>
+				</nobr>
+				<div class="product_unit">
+					<p>规格：</p>
+					<span id="valueName"></span>
+				</div>
+				<div class="product_bUnit">
+					<span class="price" id="bigPriceSpan"></span>
+					<span class="unit" id="bigUnitSpan"></span>
+					<div class="spinner">
+						<div class="operate fl">
+							<i class="icon-minus2"></i>
+						</div>
+						<input type="number" min="0" value="0" class="fl" id="bigNum" >
+						<div class="operate fl">
+							<i class="icon-plus2"></i>
+						</div>
+					</div>
+					<input type="number" class="street-value bigPrice" id="bigPrice" value="0" readonly>
+				</div>
+				<div class="product_mUnit">
+					<span class="price" id="smallPriceSpan" ></span>
+					<span class="unit" id="smallUnitSpan" ></span>
+					<div class="spinner">
+						<div class="operate fl">
+							<i class="icon-minus2"></i>
+						</div>
+						<input type="number" min="0" value="0" class="fl" id="smallNum" >
+						<div class="operate fl">
+							<i class="icon-plus2"></i>
+						</div>
+					</div>
+					<input type="number" class="street-value smallPrice" id="smallPrice" value="0" readonly>
+					<i class="icon-trash-o fr ft30 gray"></i>
+				</div>
+			</div>
+		</main>
+		<#include "_inc/_goback.html" />
+		<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
+			<p class="total bg-white weui-flex__item" id="totalNum"></p>
+			<button id="addGoods" class="place-order yellow-button white">添加商品</button>
+			<button id="placeOrder" class="place-order red-button white">下单</button>
+		</footer>
+	</div>
+</div>
+</@layout>
