@@ -16,6 +16,7 @@
 package org.ccloud.controller.admin;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -620,15 +621,32 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 	}
 	
 	public void auditReimbursement() {
+		boolean save=true;
 		String ids = getPara("ids");
 		String[] activityApplyIds = ids.split(",");
 		for (String activityApplyId : activityApplyIds) {
 			Record YxActivity = ActivityQuery.me().findYxActivity(activityApplyId);
 			if (YxActivity.getStr("invest_type").equals("101103")) {
 				YxActivityshopadinfo yxActivityshopadinfo=new YxActivityshopadinfo();
-				yxActivityshopadinfo.setFlowIDNO(YxActivity.getLong("proc_code"));
+				BigInteger proc_code=new BigInteger(YxActivity.getStr("proc_code"));
+				yxActivityshopadinfo.setFlowIDNO(proc_code);
+				yxActivityshopadinfo.setProvinceName(YxActivity.getStr("prov_name"));
+				yxActivityshopadinfo.setCityName(YxActivity.getStr("city_name"));
+				yxActivityshopadinfo.setCountyName(YxActivity.getStr("country_name"));
+				yxActivityshopadinfo.setCustomerName(YxActivity.getStr("customer_name"));
+				yxActivityshopadinfo.setCustomerCode(YxActivity.getStr("customer_code"));
+				yxActivityshopadinfo.setShopCreateTime(YxActivity.getDate("create_date"));
+				yxActivityshopadinfo.setShopLinkMan(YxActivity.getStr("realname"));
+				yxActivityshopadinfo.setShopPhone(YxActivity.getStr("mobile"));
+				yxActivityshopadinfo.setExecuteTime(YxActivity.getDate("CreateTime"));
+				yxActivityshopadinfo.setCreateTime(new Date());
+				save=yxActivityshopadinfo.save();
+				if (!save) {
+					renderAjaxResultForError("加入核销失败!");
+					return;
+				}
 			}
-			System.out.println(activityApplyId);
 		}
+		renderAjaxResultForSuccess("加入核销成功");
 	}
 }

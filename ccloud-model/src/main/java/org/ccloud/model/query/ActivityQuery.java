@@ -287,14 +287,15 @@ public class ActivityQuery extends JBaseQuery {
 	}
 
 	public Record findYxActivity(String activityApplyId) {
-		StringBuilder fromBuilder = new StringBuilder("SELECT ca.proc_code , cc.prov_name , cc.city_name , cc.country_name , cc.customer_name , cc.customer_code , csc.create_date , u.realname , u.mobile");
-		fromBuilder.append(" FROM cc_activity_apply caa ");
+		StringBuilder fromBuilder = new StringBuilder("SELECT ca.proc_code , cc.prov_name , cc.city_name , cc.country_name , cc.customer_name , cc.customer_code , csc.create_date , u.realname , u.mobile,");
+		fromBuilder.append(" ca.invest_type,ccv.modify_date ExecuteTime ,ccv.create_date CreateTime FROM cc_activity_apply caa ");
 		fromBuilder.append(" LEFT JOIN cc_activity ca ON ca.id = caa.activity_id");
 		fromBuilder.append(" LEFT JOIN cc_seller_customer csc ON csc.id = caa.seller_customer_id");
 		fromBuilder.append(" LEFT JOIN cc_customer cc ON cc.id = csc.customer_id");
 		fromBuilder.append(" LEFT JOIN `user` u ON u.id=caa.biz_user_id");
 		fromBuilder.append(" LEFT JOIN cc_expense_detail ced ON ced.id=caa.expense_detail_id");
-		fromBuilder.append(" caa.id ="+activityApplyId);
+		fromBuilder.append(" LEFT JOIN cc_customer_visit ccv ON ccv.active_apply_id=caa.id");
+		fromBuilder.append(" where caa.id ='"+activityApplyId+"' GROUP BY caa.id ");
 		return Db.findFirst(fromBuilder.toString());
 	}
 }
