@@ -1,6 +1,7 @@
 package org.ccloud.front.controller;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -190,6 +191,8 @@ public class ActivityController extends BaseFrontController {
 		Boolean startProc = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_ACTIVITY_APPLY + sellerCode);
 		String[] expenseDetailIds = getParaValues("expense_detail_id");
 		String[] activity_ids = getParaValues("activity_id");
+		String applyNum = getPara("apply_num");
+		String applyAmount = getPara("apply_amount");
 		if(expenseDetailIds!=null) {
 			expenseDetailIds = getParaValues("expense_detail_id")[0].split(",");
 			for(String expenseDetailId: expenseDetailIds ) {
@@ -209,6 +212,8 @@ public class ActivityController extends BaseFrontController {
 						activityApply.setActivityId(activity_ids[i]);
 						activityApply.setSellerCustomerId(sellerCustomerId);
 						activityApply.setBizUserId(user.getId());
+						activityApply.setApplyNum(new BigDecimal(applyNum));
+						activityApply.setApplyAmount(new BigDecimal(applyAmount));
 						activityApply.setNum(0);
 						activityApply.setContent(content);
 						
@@ -251,6 +256,8 @@ public class ActivityController extends BaseFrontController {
 					activityApply.setBizUserId(user.getId());
 					activityApply.setNum(0);
 					activityApply.setContent(content);
+					activityApply.setApplyNum(new BigDecimal(applyNum));
+					activityApply.setApplyAmount(new BigDecimal(applyAmount));
 					
 					if (startProc != null && startProc) {
 						activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_WAIT);

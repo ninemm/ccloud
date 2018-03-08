@@ -2066,7 +2066,7 @@ input[name=input-type] {
   top: 0.2rem;
 }
 
-.activity-detail-item .weui-cell:first-child input {
+.activity-detail-item>.weui-cell:first-child input {
   text-align: left!important;
   width: 40%;
   color: #3c8dbc;
