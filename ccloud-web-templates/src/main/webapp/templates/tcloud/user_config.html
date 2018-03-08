@@ -87,6 +87,27 @@
 		    }]
 	    });
     }
+	
+	$("#myQR").click(function() {
+		Utils.ajax('${CPATH}/user/getQrcode', '',
+			function(data){
+
+			layer.open({
+				type: 1,
+				title: ['消息提示',
+				'border-bottom: 1px solid #eee;height:2rem;line-height:2rem'
+				],
+				content: '<img src=\'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=' + data.ticket +  '\' />' +
+				'<p class="t-c ft16">服务电话：<a href="tel:027-8888888" class="blue">027-8888888</a></p>',
+				anim: 'scale',
+				className: 'service',
+				btn: '关闭'
+			});
+	
+		}
+	);
+
+	});
 </#macro>
 
 <@layout>
@@ -97,6 +118,14 @@
 				<p>账号</p>
 			</div>
 			<div class="weui-cell__ft">${(user.username)!}</div>
+		</a>
+	</div>
+	<div class="weui-cells">
+		<a class="weui-cell weui-cell_access" id ="myQR">
+			<div class="weui-cell__bd">
+				<p>我的二维码</p>
+			</div>
+			<div class="weui-cell__ft"></div>
 		</a>
 	</div>
 	<div class="weui-cells">

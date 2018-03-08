@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+import com.jfinal.weixin.sdk.api.QrcodeApi;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.subject.Subject;
@@ -389,6 +390,13 @@ public class UserController extends BaseFrontController {
 	public void timeout() {
 		render("timeout.html");
 		return;
+	}
+
+	public void getQrcode()
+	{
+		String str = "{\"expire_seconds\": 604800, \"action_name\": \"QR_SCENE\", \"action_info\": {\"scene\": {\"scene_id\": 123}}}";
+		ApiResult apiResult = QrcodeApi.create(str);
+		renderText(apiResult.getJson());
 	}
 	
 }
