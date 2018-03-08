@@ -559,7 +559,8 @@ public class ReportController extends BaseFrontController {
 	//统计已拜访客户数、未拜访的客户数
 	public void customerVisitCount() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		int customerVisitNum = CustomerVisitQuery.me().findByUserId(user.getId());
+		String dayTag = getPara("dayTag");
+		int customerVisitNum = CustomerVisitQuery.me().findByUserId(user.getId(),dayTag);
 		int customerNum = CustomerVisitQuery.me().getToDo(user.getUsername()).size();
 		List<Map<String, Object>> customeVisitList = new ArrayList<>();
 		for(int i = 0 ; i < 2 ; i++) {
@@ -578,6 +579,17 @@ public class ReportController extends BaseFrontController {
 	//统计多次拜访
 	public void visitMoreInfo() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		
+		String dayTag = getPara("dayTag");
+		List<Record> lists = CustomerVisitQuery.me().getByUserId(user.getId(),dayTag);
+		renderJson(lists);
+	}
+	
+	//统计不同拜访订单金额的平均值 统计已经出库的订单
+	public void getSales() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String dayTag = getPara("dayTag");
+		List<Record> lists = CustomerVisitQuery.me().getAmountByUserId(user.getId(),dayTag);
+		renderJson(lists);
 	}
 }
+
