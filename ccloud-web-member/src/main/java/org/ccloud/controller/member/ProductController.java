@@ -27,7 +27,7 @@ import java.util.*;
 public class ProductController extends BaseFrontController {
 
 	public void index() {
-		render("product.html");
+		render("member_product.html");
 	}
 
 	public void productList() {
@@ -77,7 +77,7 @@ public class ProductController extends BaseFrontController {
 		setAttr("sellerProductInfoMap", JSON.toJSON(sellerProductInfoMap));
 		setAttr("sellerProductItems", JSON.toJSON(sellerProductItems));
 
-		render("shopping_cart.html");
+		render("member_shopping_cart.html");
 	}
 
 

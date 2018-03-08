@@ -73,6 +73,7 @@ import com.jfinal.weixin.sdk.msg.out.OutMsg;
 import com.jfinal.weixin.sdk.msg.out.OutNewsMsg;
 import com.jfinal.weixin.sdk.msg.out.OutTextMsg;
 
+@Clear(SessionInterceptor.class)
 @RouterMapping(url = "/wechat")
 public class WechatMessageController extends MsgController {
 
@@ -80,7 +81,6 @@ public class WechatMessageController extends MsgController {
 		return WechatApi.getApiConfig();
 	}
 	
-	@Clear(SessionInterceptor.class)
 	@Before(WechatApiConfigInterceptor.class)
 	public void callback() {
 		String gotoUrl = getPara("goto") + "?state=" + getPara("state");

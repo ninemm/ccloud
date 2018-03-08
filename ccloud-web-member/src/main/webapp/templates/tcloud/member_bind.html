@@ -150,23 +150,23 @@
 	    }
 	    
 	    function sendSms() {
-	        var url = "${CPATH}/smsCode/send";
+	        var url = "${CPATH}/member/smsCode/send";
 	        Utils.ajax(url, param(), null);
 	    }
 	    
 	    function checkMobile(mobile) {
-	    	var url = "${CPATH}/user/checkMobile";
+	    	var url = "${CPATH}/member/member/checkMobile";
 	    	Utils.ajax(url, {'mobile': mobile}, mobileCallback);
 	    }
 	    
 	    $('#bind').on('click', function() {
-            var url = '${CPATH}/user/update';
+            var url = '${CPATH}/member/member/update';
             Utils.ajax(url, param(), callback);
         });
         
 	    var callback = function(res) {
 	        if (res.errorCode == 0) {
-	        	location.href = "/";
+	        	location.href = "/member/product/index";
 	        }
 	    }
 	    

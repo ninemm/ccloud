@@ -171,4 +171,9 @@ public class SellerQuery extends JBaseQuery {
 		String sql="SELECT * from cc_seller where dept_id= ?";
 		return DAO.findFirst(sql,deptId);
 	}
+
+	public Seller _findByDataArea(String dataArea){
+		String sql="SELECT * from cc_seller where dataArea= ?";
+		return DAO.findFirst(sql,dataArea);
+	}
 }
