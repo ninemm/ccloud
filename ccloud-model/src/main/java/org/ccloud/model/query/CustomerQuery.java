@@ -163,4 +163,9 @@ public class CustomerQuery extends JBaseQuery {
 		String sql = "select c.* from cc_customer c LEFT JOIN cc_seller_customer s on s.customer_id = c.id where s.id = ?";
 		return DAO.findFirst(sql, sellerCustomerId);
 	}
+
+//	public Customer findByMemberId(String memberId) {
+//		String sql = "SELECT cc.* FROM cc_customer cc LEFT JOIN cc_member cm ON cc.id = cm.customer_id WHERE cm.id = ? ";
+//		return DAO.findFirst(sql, memberId);
+//	}
 }

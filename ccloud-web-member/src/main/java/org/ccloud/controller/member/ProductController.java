@@ -16,6 +16,7 @@ package org.ccloud.controller.member;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.plugin.activerecord.Record;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.query.*;
 import org.ccloud.route.RouterMapping;
@@ -56,7 +57,6 @@ public class ProductController extends BaseFrontController {
 
 	public void shoppingCart() {
 		String memberId = "98ef315d484d435fa2845d1ed9762912";
-//		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
 
 		List<Record> productList = MemberJoinSellerQuery.me().findProductListForApp(memberId, "", "");
 
@@ -80,6 +80,13 @@ public class ProductController extends BaseFrontController {
 		render("member_shopping_cart.html");
 	}
 
+	public void order() {
+		String memberId = "98ef315d484d435fa2845d1ed9762912";
+		String customerId = "33bdc967c98f42c18f43339023fa7141";
 
+		setAttr("customerInfo", JSON.toJSONString(CustomerQuery.me().findById(customerId)));
+		setAttr("deliveryDate", DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
 
+		render("member_order.html");
+	}
 }

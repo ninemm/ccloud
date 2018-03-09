@@ -5,20 +5,16 @@
 <#macro title>提交订单</#macro>
 <#macro css> 
 	#bigNum,
-	#smallNum,
-	#compositionNum {
-		border: 1px solid #bbb;
+	#smallNum {
+	border: 1px solid #bbb;
 	}
 
-	#order .gift input::-webkit-input-placeholder {
+	#order input::-webkit-input-placeholder {
 		text-align: center;
 	}
 	#deliveryDate, #customerTypeName, #discount, #receiveTypeName, #activityName {
 		text-align: right;
 		width: 70%;
-	}
-	main {
-		top: 2rem!important;
 	}
 	.order-customer-info input {
 		text-align: left;
@@ -30,17 +26,8 @@
 	#customer {
 		bottom: 0;
 	}
-	#infinite {
-		position: absolute;
-		top: 2rem;
-		bottom: 0;
-		overflow: auto;
-		-webkit-overflow-scrolling: touch;
-		width: 100%;
-		background: #f3f5f7;
-	}
 
-	#gift .icon-tags {
+	.icon-tags {
 		color: #ea6f5a;
 		font-size: .8rem;
 		margin-right: .2rem;
@@ -54,59 +41,22 @@
 
 <#macro script>
 $(function() {
-	$(document).on("click", ".gift-open", function () {
-        if ($(this).text() === "展开") {
-	        $(this).text("收起");
-	        $(this).prev().find('#subsubProduct').show();
-        } else {
-	        $(this).text("展开");
-	        $(this).prev().find('#subsubProduct').hide();
-        }
-    }).on("click", ".choose-customer", function () {
-		window.location.href = '${CPATH}/product/customerChoose';
-  }).on("click", "#placeOrder", function () {
-	if (!flg) {
-		return;
-	}
-	if ($("#sellerCustomerId").val() == "") {
-		$.toptip("请选择客户", 'warning'); 
-		return;
-	}
-	<#if !isMix>
-		var productList = getItemBykey("productList");
-		var mix = false;
-		var isGift = productList[0].isGift;
-		$.each(productList, function(index, el){
-			if(isGift != el.isGift || (isGift == 0 && el.subProduct[0].sellProductId != "")){
-				mix = true;
-				return;
-			}
-		});
-		if (mix) {
-		  	$.toptip("该帐套未开启赠品混下功能，请单独下赠品", 'warning');
+	$(document).on("click", "#placeOrder", function () {
+		if (!flg) {
 			return;
 		}
-	</#if>
-	
-	
-//	if (!checkStore()) {
-//		toastr.error('未选择商品或库存不足!','操作失败');
-//		return;
-//	}
+		var productList = getItemBykey("productList");
+		$.confirm("您确定要提交订单吗？","提交订单", function() {
+			doSubmit();
+		});
+  	}).on("click","#shoppingCart",function(){
+		window.location.href = '${CPATH}/member/product/shoppingCart';
+  	});
 
-	$.confirm("您确定要提交订单吗？","提交订单", function() {
-		doSubmit();
-	});
-  }).on("click",".nearby-customer",function(){
-		window.location.href = '${CPATH}/product/customerNearbyChose';
-  }).on("click","#shoppingCart",function(){
-		window.location.href = '${CPATH}/product/shoppingCart';
-  });
-  checkIsAllGift();
-  initCustomer();
+  	initCustomer();
 
-  var $receiveTypeName = $("#receiveTypeName");
-  $receiveTypeName.select({
+	var $receiveTypeName = $("#receiveTypeName");
+	$receiveTypeName.select({
 		title: "收款方式",
 		items: [{
 			title: "现结", value: "1"
@@ -147,194 +97,24 @@ $(function() {
 
 	$product.empty();
 	initProduct();
-	initProductComposition();
 	total();
-	
-	//客户选择部分
-	var cpLock = true;
-	var time;
-
-	$(document).on("compositionstart", "#searchInput", function() {
-		cpLock = false;
-	}).on("compositionend", "#searchInput", function() {
-		cpLock = true;
-		if(cpLock) {
-			clearTimeout(time);
-			time = setTimeout(function(){ 
-				combo();
-			},500);
-		}
-	}).on("input", "#searchInput", function() {
-		if(cpLock) {
-			clearTimeout(time);
-			time = setTimeout(function(){ 
-				combo();
-			},500);
-		}
-	}).on("click", "#searchCancel", function() {
-			combo();
-	}).on("change", "#userId", function() {
-			combo();
-	}).on("change", "#customerTypeId", function() {
-			combo();
-	}).on("click", "#customerInfo", function() {
-			var el = $(this);
-			var customerInfo = {
-				customerName : el.find("#customerName").text(),
-				sellerCustomerId : el.find("#sellerCustomerId").val(),
-				contact : el.find("#contact").val(),
-				mobile : el.find("#mobile").val(),
-				address : el.find("#address").val()
-			}
-			setItemBykey("customerInfo", customerInfo);
-			initCustomer();
-			closeCombinSearch();
-	});
-	combo();
 	});
 	var $form = $('#form');
 	var newHtml = $(".common").eq(0).html();
 	var $product = $("#productList");
 	var customerTypeInfoMap = [];
 
-	function checkIsAllGift(){
-		var compositionList = getItemBykey("compositionList") == undefined ? [] : getItemBykey("compositionList");
-		if(compositionList.length > 0){
-			$("#isAllGift").val(0)
-			return;
-		}
-
-		var productList = getItemBykey("productList");
-		$.each(productList, function(index, el){
-			if(el.isGift == 0){
-				$("#isAllGift").val(0)
-				return;
-			}
-		});
-	}
-
 	function initCustomer(){
-		var customerInfo = getItemBykey("customerInfo");
+		var customerInfo = JSON.parse('${customerInfo}');
 		if(customerInfo){
-			$("#sellerCustomerId").val(customerInfo.sellerCustomerId);
+			$("#customerId").val(customerInfo.id);
 			$("#customerName").val(customerInfo.customerName);
 			$("#contact").val(customerInfo.contact);
 			$("#mobile").val(customerInfo.mobile);
-			$("#address").val(customerInfo.address);
-
-			$("#deliveryAddress").val(customerInfo.address);
-			
-			Utils.ajax('${CPATH}/product/customerTypeById', {"customerId" : customerInfo.sellerCustomerId},
-				function(data){
-					initCustomerType(data);
-				}
-			);
-
-			if($("#isAllGift").val() == 1){
-				$("#activityApply").show();
-				Utils.ajax('${CPATH}/product/activityApplyById', {"customerId" : customerInfo.sellerCustomerId},
-					function(data){
-						initActivityApply(data);
-					}
-				);
-			}else{
-				$("#activityApply").hide();
-			}
+			$("#address").val(customerInfo.provName + ' ' + customerInfo.cityName + ' ' + customerInfo.countryName + ' ' + customerInfo.address);
+			$("#deliveryAddress").val(customerInfo.provName + ' ' + customerInfo.cityName + ' ' + customerInfo.countryName + ' ' + customerInfo.address);
 		}
 	
-	}
-
-	function initCustomerType(customerTypeList){
-		var items = [];
-		$.each(customerTypeList, function(index, el) {
-			customerTypeInfoMap[el.id] = {
-				id : el.id,
-				name : el.name,
-				code : el.code,
-				factor : el.factor,
-				proc_def_key : el.proc_def_key
-			}
-			
-			items.push({
-				title : el.name,
-				value : el.id,
-				factor : el.factor
-			});
-		});
-
-		var $customerTypeName = $("#customerTypeName");
-		var $discount = $("#discount");
-		if($customerTypeName.data('values') === undefined){
-			$customerTypeName.select({
-				 title: "客户类型",
-				 items: items,
-				 onChange: function(data) {
-					$("#customerType").val(customerTypeInfoMap[data.values].id);
-					$("#customerTypeCode").val(customerTypeInfoMap[data.values].code);
-					if (customerTypeInfoMap[data.values].factor) {
-						$("#pricedis").show();
-						$("#discount").val(customerTypeInfoMap[data.values].factor*10+"折");
-					} else {
-						$("#pricedis").hide();
-						$("#discount").val('无');
-					}
-					$("#factor").val(customerTypeInfoMap[data.values].factor);
-					$("#proc_def_key").val(customerTypeInfoMap[data.values].proc_def_key);
-					total();
-				 }
-			});
-		}else{
-			$customerTypeName.select("update", {items : items})
-		}
-		if (items[0].factor) {
-			$("#pricedis").show();
-			$discount.val(items[0].factor*10+"折");
-			$("#factor").val(items[0].factor);
-		} else {
-			$("#pricedis").hide();
-			$discount.val('无');
-		}
-		total();
-		$customerTypeName.val(items[0].title);
-		$customerTypeName.attr('data-values', items[0].value);
-
-		$("#customerType").val(customerTypeInfoMap[items[0].value].id);
-		$("#customerTypeCode").val(customerTypeInfoMap[items[0].value].code);
-		$("#factor").val(customerTypeInfoMap[items[0].value].factor);
-		$("#proc_def_key").val(customerTypeInfoMap[items[0].value].proc_def_key);
-
-	}
-
-	function initActivityApply(activityApplyList){
-		var items = [];
-		$.each(activityApplyList, function(index, el) {
-			items.push({
-				title : el.title,
-				value : el.id
-			});
-		});
-
-		items.push({
-			title : "其他活动",
-			value : "1001"
-		});
-
-		var $activityName =$("#activityName");
-		if($activityName.data('values') === undefined){
-			$activityName.select({
-				title: "参加活动",
-				items: items,
-				onChange: function(data) {
-					$("#activityId").val(data.values);
-				}
-			});
-		}else{
-			$activityName.select("update", {items : items})
-		}
-
-		$activityName.val(items[0].title);
-		$activityName.attr('data-values', items[0].value);
-		$("#activityId").val(items[0].value);
 	}
 
 	function initProduct(){
@@ -356,71 +136,13 @@ $(function() {
 			$newProductDetail.find("#bigUnit").val(el.bigUnit);
 			$newProductDetail.find("#smallUnit").val(el.smallUnit);
 			$newProductDetail.find("#sellProductId").val(el.sellProductId);
+			$newProductDetail.find("#sellerId").val(el.sellerId);
 			$newProductDetail.find("#productId").val(el.productId);
 			$newProductDetail.find("#convert").val(el.convert);
 			
 			$newProductDetail.find("#bigNum").val(el.bigNum);
 			$newProductDetail.find("#smallNum").val(el.smallNum);
 
-			$newProductDetail.find("#isGift").val(el.smallNum);
-
-			$newProductDetail.find("#isGift").val(el.isGift);
-			if(el.isGift == 1) {
-				$newProductDetail.find("#isGiftCheckBox").attr('checked','checked');
-			}
-
-			//赠品
-			var sub = el.subProduct[0];
-			if(sub.sellProductId != ""){
-				var $newProductDetail = $product.find(".common:last");
-				$newProductDetail.find("#addGift").attr("checked",'true').trigger("change");
-
-				//默认
-				if($newProductDetail.find("#sellProductId").val() == sub.sellProductId){
-					$newProductDetail.find("#isDefault").attr("checked","true");
-				}
-
-				$newProductDetail.find("#giftProduct").val(sub.productName);
-				$newProductDetail.find("#giftSellProductId").val(sub.sellProductId);
-				$newProductDetail.find("#giftProductId").val(sub.productId);
-				$newProductDetail.find("#giftConvert").val(sub.convert);
-				$newProductDetail.find("#giftBigPrice").val(sub.bigPrice);
-
-				//数量
-				if(sub.bigNum > 0 && sub.bigUnit){
-					$newProductDetail.find("#giftNum").val(sub.bigNum);
-					$newProductDetail.find("#giftUnitName").val(sub.bigUnitSpan);
-					$newProductDetail.find("#giftUnitName").attr('data-values', "bigUnit");
-					$newProductDetail.find("#giftUnit").val("bigUnit");
-				}else{
-					$newProductDetail.find("#giftNum").val(sub.smallNum);
-					$newProductDetail.find("#giftUnitName").val(sub.smallUnitSpan);
-					$newProductDetail.find("#giftUnitName").attr('data-values', "smallUnit");
-					$newProductDetail.find("#giftUnit").val("smallUnit");
-				}
-			}
-
-		});
-	}
-	
-	var compositionHtml = $(".composition").eq(0).html();
-	function initProductComposition(){
-		var compositionList = getItemBykey("compositionList");
-	
-		$.each(compositionList, function(index, el) {
-			$product.append("<div class='weui-panel weui-panel_access goods-detail composition'>" + compositionHtml + "</div>");
-			var $newProductDetail = $product.find(".composition:last");
-			$newProductDetail.find("#compositionName").text(el.compositionName);
-	
-			$newProductDetail.find("#compositionPriceSpan").text(el.compositionPriceSpan);
-	
-			$newProductDetail.find("#compositionPrice").val(el.compositionPrice);
-			$newProductDetail.find("#compositionId").val(el.compositionId);
-			
-			$newProductDetail.find("#compositionNum").val(el.compositionNum);
-			
-			$newProductDetail.find("#compositionValueName").text(el.compositionValueName);
-			$newProductDetail.find("#gift").html(el.compositionSub);
 		});
 	}
 
@@ -432,9 +154,7 @@ $(function() {
 		$.each(products, function(index, el) {
 			var $el = $(el);
 			rowTotal = $el.find("#bigNum").val() * $el.find("#bigPrice").val() + $el.find("#smallNum").val() * $el.find("#smallPrice").val();
-			if($el.find("#isGift").val() == 0) {
-				total += rowTotal;
-			}
+			total += rowTotal;
 			var bigNum = parseInt($el.find("#bigNum").val());
 			var convert = parseInt($el.find("#convert").val());
 			var smallNum = parseInt($el.find("#smallNum").val());
@@ -443,26 +163,9 @@ $(function() {
 			$el.find("#rowTotal").val(rowTotal);
 		});
 
-		var compositions = $(".composition");
-		$.each(compositions, function(index, el) {
-			var $el = $(el);
-			var comNum = $el.find("#compositionNum").val();
-			rowTotal = $el.find("#compositionNum").val() * $el.find("#compositionPrice").val();
-			$el.find("#rowTotal").val(rowTotal);
-			total += rowTotal;
-			if (!comNum) {
-				comNum = 0;
-			}
-			totalNum = totalNum + comNum*1;
-		});
-
-		var factor = $("#factor").val();
-		if (factor != '') {
-			total = total * factor;
-		}
 		$("#total").val(total);
 		$("#totalNum").val(totalNum);
-		$("#totalNumSpan").text("共" + (products.length + compositions.length) + "款,合计:" + formatNumber(total) + "元")
+		$("#totalNumSpan").text("共" + products.length + "款,合计:" + formatNumber(total) + "元")
 	} 
 
 	var flg = true;
@@ -481,21 +184,21 @@ $(function() {
 			type : "post", 
 			dataType : "json", 
 			success : function(data) {
+	console.log(data);
 				layer.closeAll();
 				if (data.errorCode == 0) {
 					removeItemBykey("productList");
-					removeItemBykey("compositionList");
 					removeItemBykey("customerInfo");
 					
 					$.modal({
 						title: data.message,
 						buttons: [
 							{ text: "查看订单", className: "default", onClick: function(){ 
-								location.href = "${CPATH}/order/myOrder";
+								//location.href = "${CPATH}/order/myOrder";
 								} 
 							},
 							{ text: "继续下单", className: "primary", onClick: function(){
-								location.href = '${CPATH}/product';
+								location.href = '${CPATH}/member/product';
 								} 
 							},
 						]
@@ -514,101 +217,13 @@ $(function() {
 		});
 	}
 	
-	//---------------------------------------------------------客户选择部分----------------------------------------------------------
-	$("#userId").select({
-     title: "选择业务员",
-     items: ${userIds!}
-    });
-
-	$("#customerTypeId").select({
-     title: "选择客户类型",
-     items: ${customerTypes!}
-    });
-    
-	var customerHtml = $(".customerSelect").eq(0).html();
-	var $loading = $("#loading");
-	var $noMore = $("#noMore");
-	var loading = false;
-    
-    var keyword = '';
-    var page = 1;
-	var size = 10;
-
-	var $customerList = $("#customerList");
-	$customerList.empty();
-
-	function initCustomerSelect() {
-
-		$loading.show();
-		$noMore.hide();
-
-	    var params = {
-		    "page": page,
-	        "size": size,
-	        "keyword": $("#searchInput").val(),
-	        "userId": $("#userId").data('values'),
-	        "customerTypeId": $("#customerTypeId").data('values'),
-	        "isOrdered": $("#isOrdered").data('values')
-	    }
-
-		Utils.ajax('${CPATH}/product/customerList', params, 
-			function(data){
-				$loading.hide();
-				if(data.customerList.length == 0){
-					if($('.customerSelect').length == 0) $noMore.show();
-					loading = true;
-					return;
-				}
-				$.each(data.customerList, function(index, el) {
-					$customerList.append("<div class='weui-panel weui-panel_access customerSelect'>" + customerHtml + "</div>");
-					var $newCustomer = $customerList.find(".weui-panel:last");
-					$newCustomer.find("#customerName").text(el.customer_name);
-					$newCustomer.find("#contactP").text(el.contact + "/" + el.mobile);
-					$newCustomer.find("#addressSpan").text(el.prov_name + " " + el.city_name + " " + el.country_name + " " + el.address);
-
-					$newCustomer.find("#sellerCustomerId").val(el.id);
-					$newCustomer.find("#contact").val(el.contact);
-					$newCustomer.find("#mobile").val(el.mobile);
-					$newCustomer.find("#address").val(el.prov_name + " " + el.city_name + " " + el.country_name + " " + el.address);
-				});
-				page++;
-				loading = false;
-			}
-		);
-    }
-
-	//滑动方法
-	$("#infinite").infinite().on("infinite", function() {
-		if(loading) {
-			return;
-		}
-		loading = true;
-		initCustomerSelect();
-	});
-	
-	function combo() {
-		$customerList.empty();
-		loading = false;
-		page = 1;
-		initCustomerSelect();
-	}
-	
 	
 </#macro>
 
 <@layout>
 <div class="weui-content">
 	<div id="order">
-		<form action="${CPATH}/order/salesOrder" method="post" id="form">
-			<div class="weui-flex order-top-btns t-c ft14">
-				<div class="weui-flex__item border-right-1px choose-customer">
-					<span><i class="icon-user"></i></span>
-					选择客户
-				</div>
-				<div class="weui-flex__item nearby-customer">
-					<span><i class="icon-map-marker"></i></span>
-					附近客户</div>
-			</div>
+		<form action="${CPATH}/member/order/salesOrder" method="post" id="form">
 			<main>
 				<section class="weui-panel weui-panel_access order-customer-info">
 					<div class="weui-cell weui-cell_access">
@@ -617,9 +232,8 @@ $(function() {
 								客户名称
 								<span class="require">*</span>
 							</div> -->
-							<input type="hidden" id="sellerCustomerId" name="customerId" value="" >
+							<input type="hidden" id="customerId" name="customerId" value="" >
 							<input type="text" class="weui-input select-customer" id="customerName" name="customerName" value="" readonly>
-							<span class="weui-cell__ft"></span>
 						</div>
 					</div>
 					<div class="weui-cell weui-cell_access">
@@ -651,18 +265,6 @@ $(function() {
 						</div>
 					</div>
 					<div class="weui-cell weui-cell_access">
-						<div class="weui-cell__bd select-area">
-							<div class="order-customer-info-title">
-								客户类型
-								<span class="require">*</span>
-							</div>
-							<input type="hidden" id="customerType" name="customerType" value="">
-							<input type="hidden" id="customerTypeCode" name="customerTypeCode" value="">
-							<input type="hidden" id="factor" name="factor" value="">
-							<input type="hidden" id="proc_def_key" name="proc_def_key" value="">
-							<input type="text" placeholder="请选择客户类型" class="weui-input" id="customerTypeName" name="customerTypeName" value="" readonly>
-							<span class="weui-cell__ft"></span>
-						</div>
 					</div>
 					<div class="weui-cell weui-cell_access" style="display: none" id="pricedis">
 						<div class="weui-cell__bd select-area">
@@ -670,17 +272,6 @@ $(function() {
 								专享折扣&nbsp;&nbsp;
 							</div>
 							<input type="text" class="weui-input" id="discount" value="无" readonly>
-						</div>
-					</div>
-					<div class="weui-cell weui-cell_access" style="display: none" id="activityApply">
-						<div class="weui-cell__bd select-area">
-							<div class="order-customer-info-title">
-								参与活动
-								<span class="require">*</span>
-							</div>
-							<input type="hidden" id="activityId" name="activityId" value="">
-							<input type="text" placeholder="请选择参与活动" class="weui-input" id="activityName" name="activityName" value="" readonly>
-							<span class="weui-cell__ft"></span>
 						</div>
 					</div>
 					<div class="weui-cell weui-cell_access">
@@ -718,21 +309,16 @@ $(function() {
 				<div id="productList">
 					<div class="weui-panel weui-panel_access goods-detail common" style="display: none">
 						<input type="hidden" name="sellProductId" id="sellProductId" value="">
+						<input type="hidden" name="sellerId" id="sellerId" value="">
 						<input type="hidden" name="productId" id="productId" value="">
 						<input type="hidden" name="convert" id="convert" value="">
-						<input type="hidden" name="isGift" id="isGift" value="">
 						<nobr>
 							<p class="product_name" id="productName">
-				<!-- 				<span class="gift-tag">赠品</span> -->
 							</p>
 						</nobr>
 						<div class="product_unit">
 							<p>规格：</p>
 							<span id="valueName"></span>
-							<div class="fr">
-								<span class="no-bg">是否赠品</span>
-								<input type="checkbox" name="isGiftCheckBox" id="isGiftCheckBox" value="1" class="weui-agree__checkbox" disabled>
-							</div>
 						</div>
 						<div class="product_bUnit">
 							<span class="price" id="bigPriceSpan"></span>
@@ -751,69 +337,8 @@ $(function() {
 							<input type="number" class="street-value" value="0" id="smallPrice" name="smallPrice" readonly>
 						</div>
 						<input type="hidden" id="rowTotal" name="rowTotal" value="">
-						<hr />
-						<div class="gift" id="gift">
-							<input type="hidden" name="giftSellProductId" id="giftSellProductId" value="">
-							<input type="hidden" name="giftProductId" id="giftProductId" value="">
-							<input type="hidden" name="giftConvert" id="giftConvert" value="">
-							<input type="hidden" name="giftBigPrice" id="giftBigPrice" value="" >
-							<div>
-								<input type="checkbox" name="add-gift" id="addGift" disabled class="weui-agree__checkbox">
-								<span>赠品</span>
-							</div>
-							<div style="display:none" class="select-area">
-								<div class="goods">
-									<span>商品</span>
-									<input type="text" class="choose-good weui-input" placeholder="选择商品" id="giftProduct" readonly>
-									<i class="icon-sort-desc"></i>
-								</div>
-								<div class="number">
-									<span>数量</span>
-									<div class="spinner">
-										<div class="operate fl">
-											<i class="icon-minus2"></i>
-										</div>
-										<input type="number" min="0" value="0" class="fl" name="giftNum" id="giftNum" readonly>
-										<div class="operate fl">
-											<i class="icon-plus2"></i>
-										</div>
-									</div>
-									<input type="hidden" name="giftUnit" id="giftUnit">
-									<input type="text" class="choose-unit weui-input" placeholder="单位" name="giftUnitName" id="giftUnitName" readonly>
-									<i class="icon-sort-desc"></i>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="weui-panel weui-panel_access goods-detail composition" style="display: none">
-						<input type="hidden" id="compositionId" name="compositionId" value="">
-						<nobr>
-							<p class="product_name" id="compositionName"></p>
-						</nobr>
-						<div class="product_bUnit">
-							<span class="price" id="compositionPriceSpan"></span>
-							<div class="spinner">
-								<input type="number" min="0" value="0" class="fl" id="compositionNum" name="compositionNum" readonly>
-							</div>
-							<input type="number" class="street-value"  id="compositionPrice" value="0" name="compositionPrice" readonly>
-						</div>
-						<hr>
-						<div id="gift" class="weui-flex">
-							<span>
-								<i class="icon-tags"></i>
-							</span>
-							<div class="weui-flex__item">
-								<p id="sub">
-									<span id="subProduct"> </span>
-								</p>
-								<p id="subsubProduct" class="none">
-								</p>
-							</div>
-						</div>
-						<input type="hidden" id="rowTotal" name="rowTotal" value="">
 					</div>
 				</div>
-				<input type="hidden" id="isAllGift" name="isAllGift" value="1">
 				<input type="hidden" id="total" name="total" value="">
 				<input type="hidden" id="totalNum" name="totalNum" value="">
 			</main>
@@ -825,68 +350,5 @@ $(function() {
 			</footer>
 		</form>
 	</div>
-	<article id="combin-filter" >
-		<div id="customer">
-			<header>
-				<div class="weui-search-bar" id="searchBar">
-					<form class="weui-search-bar__form">
-						<div class="weui-search-bar__box">
-							<i class="weui-icon-search"></i>
-							<input type="search" class="weui-search-bar__input" id="searchInput" placeholder="搜索" required="">
-							<a href="javascript:" class="weui-icon-clear" id="searchClear"></a>
-						</div>
-						<label class="weui-search-bar__label" id="searchText">
-							<i class="weui-icon-search"></i>
-							<span>请输入客户名或联系人</span>
-						</label>
-					</form>
-					<a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
-				</div>
-			</header>
-			<article class="customer">
-				<header>
-					<div class="head-search select-area">
-						<div class="weui-flex">
-							<div class="weui-flex__item">
-								<input type="text" id="userId" placeholder="业务员" class="weui-input" readonly>
-								<i class="icon-sort-desc"></i>
-							</div>
-							<div class="weui-flex__item">
-								<input type="text" id="customerTypeId" placeholder="客户类型" class="weui-input" readonly>
-								<i class="icon-sort-desc"></i>
-							</div>
-						</div>
-					</div>
-				</header>
-				<article id="infinite">
-					<div id="customerList">
-						<div class="weui-panel weui-panel_access customerSelect" style="display: none">
-							<div class="weui-flex">
-								<div class="weui-flex__item customer-info" id="customerInfo">
-									<p class="ft14" id="customerName"></p>
-									<p class="gray" id="contactP"></p>
-									<input type="hidden" id="sellerCustomerId" value="">
-									<input type="hidden" id="contact" value="">
-									<input type="hidden" id="mobile" value="">
-									<input type="hidden" id="address" value="">
-								</div>
-							</div>
-							<p class="gray">
-								<span class="icon-map-marker ft16 green"></span>
-								<span id="addressSpan"></span>
-							</p>
-						</div>
-					</div>
-					<div class="weui-loadmore" id="loading" style="display: none;">
-						<i class="weui-loading"></i>
-						<span class="weui-loadmore__tips">正在加载</span>
-					</div>
-					<div class="weui-loadmore weui-loadmore_line" id="noMore" style="display: none;">
-						<span class="weui-loadmore__tips">暂无数据</span>
-					</div>
-				</article>
-			</article>
-		</div>
-	</article>
 </div>
 </@layout>

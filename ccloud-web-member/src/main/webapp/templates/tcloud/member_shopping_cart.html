@@ -109,6 +109,7 @@ function initProduct(){
 			$newProductDetail.find("#bigUnit").val(el.bigUnit);
 			$newProductDetail.find("#smallUnit").val(el.smallUnit);
 			$newProductDetail.find("#sellProductId").val(el.sellProductId);
+			$newProductDetail.find("#sellerId").val(el.sellerId);
 			$newProductDetail.find("#productId").val(el.productId);
 			$newProductDetail.find("#convert").val(el.convert);
 			
@@ -161,12 +162,13 @@ function getProduct($el){
 		bigUnit : $el.find("#bigUnit").val(),
 		smallUnit : $el.find("#smallUnit").val(),
 		sellProductId : $el.find("#sellProductId").val(),
+		sellerId : $el.find("#sellerId").val(),
 		productId : $el.find("#productId").val(),
 		convert : $el.find("#convert").val(),
 
 		bigNum : $el.find("#bigNum").val(),
 		smallNum : $el.find("#smallNum").val(),
-		isGift : 0,
+		isGift : 0
 	}
 }
 
@@ -187,6 +189,7 @@ function order(){
 		<main>
 			<div class="weui-panel weui-panel_access common" style="display: none">
 				<input type="hidden" id="sellProductId" value="">
+				<input type="hidden" id="sellerId" value="">
 				<input type="hidden" id="productId" value="">
 				<input type="hidden" id="convert" value="">
 				<input type="hidden" id="bigCost" value="">

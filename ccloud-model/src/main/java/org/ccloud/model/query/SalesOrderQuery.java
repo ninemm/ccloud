@@ -2113,4 +2113,41 @@ public class SalesOrderQuery extends JBaseQuery {
 		return DAO.findFirst(fromBuilder.toString());
 	}
 
+	public String memberInsert(Map<String, String> moreInfo,String customerType, String orderId, String orderSn, String sellerId,
+								String userId, Date date, String deptId, String dataArea) {
+		SalesOrder salesOrder = new SalesOrder();
+		salesOrder.setId(orderId);
+		salesOrder.setOrderSn(orderSn);
+		salesOrder.setSellerId(sellerId);
+		salesOrder.setBizUserId(userId);
+		salesOrder.setCustomerTypeId(customerType);
+		salesOrder.setCustomerId(moreInfo.get("customerId"));
+		salesOrder.setContact(moreInfo.get("contact"));
+		salesOrder.setMobile(moreInfo.get("mobile"));
+		salesOrder.setAddress(moreInfo.get("address"));
+		salesOrder.setStatus(Consts.SALES_ORDER_STATUS_DEFAULT);// 待审核
+		String total = moreInfo.get("total");
+		String type = moreInfo.get("receiveType");
+		salesOrder.setIsGift(0);
+		salesOrder.setActivityApplyId("0");
+		salesOrder.setTotalAmount(new BigDecimal(total));
+		salesOrder.setReceiveType(StringUtils.isNumeric(type) ? Integer.parseInt(type) : 1);
+		salesOrder.setDeliveryAddress(moreInfo.get("deliveryAddress"));
+		Date deliveryDate = DateUtils.strToDate(moreInfo.get("deliveryDate"),
+				DateUtils.DEFAULT_NORMAL_FORMATTER);
+		String totalNumStr = moreInfo.get("totalNum");
+		BigDecimal totalNum = new BigDecimal(0);
+		if (StringUtils.isNotBlank(totalNumStr)) {
+			totalNum = new BigDecimal(totalNumStr);
+		}
+		salesOrder.setTotalCount(totalNum);
+		salesOrder.setDeliveryDate(deliveryDate);
+		salesOrder.setRemark(moreInfo.get("remark"));
+		salesOrder.setCreateDate(date);
+		salesOrder.setDeptId(deptId);
+		salesOrder.setDataArea(dataArea);
+		if(salesOrder.save()) return salesOrder.getId();
+		else return "";
+	}
+
  }

@@ -513,4 +513,59 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		return Db.findFirst(sql);
 	}
 
+	@SuppressWarnings("unchecked")
+	public String memberInsert(Map<String, String> paraMap, String orderId, String sellerId, String sellerCode, String userId, Date date,
+							   String deptId, String dataArea) {
+		List<SalesOrderDetail> detailList = new ArrayList<>();
+		String sellerProductId = paraMap.get("sellProductId");
+		String convert = paraMap.get("convert");
+		String bigNum = paraMap.get("bigNum");
+		String smallNum = paraMap.get("smallNum");
+		Integer productCount = Integer.valueOf(bigNum) * Integer.valueOf(convert) + Integer.valueOf(smallNum);
+		String productId = paraMap.get("productId");
+		Map<String, Object> result = this.getWarehouseId(productId, sellerId, sellerCode, productCount, Integer.parseInt(convert), userId, sellerProductId);
+		String status = result.get("status").toString();
+		List<Map<String, String>> list = (List<Map<String, String>>) result.get("countList");
+
+		if (!status.equals("enough")) {
+			return "库存不足";
+		}
+		for (Map<String, String> map : list) {
+			SalesOrderDetail detail = new SalesOrderDetail();
+			detail.setProductCount(new BigDecimal(map.get("productCount").toString()).intValue());
+			detail.setLeftCount(detail.getProductCount());
+			detail.setOutCount(0);
+			detail.setWarehouseId(map.get("warehouse_id").toString());
+
+			detail.setId(StrKit.getRandomUUID());
+			detail.setOrderId(orderId);
+			detail.setSellProductId(sellerProductId);
+
+			String productPrice = paraMap.get("bigPrice");
+
+			BigDecimal bigAmount = new BigDecimal(detail.getProductCount()).divide(new BigDecimal(convert), 0 , RoundingMode.DOWN)
+					.multiply(new BigDecimal(productPrice));
+			BigDecimal smallPrice = new BigDecimal(productPrice).divide(new BigDecimal(convert), 2, BigDecimal.ROUND_HALF_UP);
+			BigDecimal smallAmount = new BigDecimal(detail.getProductCount()).divideAndRemainder(new BigDecimal(convert))[1].multiply(smallPrice);
+			BigDecimal productAmount = bigAmount.add(smallAmount);
+
+			detail.setProductPrice(new BigDecimal(productPrice));
+			detail.setProductAmount(productAmount);
+			detail.setIsGift(0);
+			detail.setCreateDate(date);
+			detail.setDeptId(deptId);
+			detail.setDataArea(dataArea);
+			detailList.add(detail);
+		}
+		int[] i = Db.batchSave(detailList, detailList.size());
+		int count = 0;
+		for (int j : i) {
+			count = count + j;
+		}
+		if (count != detailList.size()) {
+			return "下单失败";
+		}
+		return "";
+	}
+
 }

@@ -11,7 +11,7 @@
 		bottom: 2.25rem;
 	}
 
-	#gift .icon-tags {
+	.icon-tags {
 		color: #ea6f5a;
 		font-size: .8rem;
 		margin-right: .2rem;
@@ -48,14 +48,6 @@ $(function() {
 				changeInit();
 			},500);
 		}
-	}).on("click", ".gift-open", function () {
-        if ($(this).text() === "展开") {
-	        $(this).text("收起");
-	        $(this).prev().find('#subsubProduct').show();
-        } else {
-	        $(this).text("展开");
-	        $(this).prev().find('#subsubProduct').hide();
-        }
     }).on("click", "#sidebar li", function () {
         $(this).addClass("active").siblings().removeClass("active");
         var index = $(this).index();
@@ -237,6 +229,8 @@ function initProduct(productList){
 		$newProductDetail.find("#productId").val(el.product_id);
 		$newProductDetail.find("#convert").val(el.convert_relate);
 
+		$newProductDetail.find("#sellerId").val(el.seller_id);
+
 		$newProductDetail.find("#description").val(el.description);
 
 		$newProductDetail.find("#image").attr("src", getImageUrl(el.product_image_list_store, el.product_sn));
@@ -251,7 +245,6 @@ function productNum(){
 			var $newProductDetail =$("#" + el.sellProductId);
 			$newProductDetail.find("#bigNum").val(el.bigNum);
 			$newProductDetail.find("#smallNum").val(el.smallNum);
-			$newProductDetail.find("#isGift").val(el.isGift);
 		});
 }
 
@@ -343,35 +336,13 @@ function getProduct($el){
 		bigUnit : $el.find("#bigUnit").val(),
 		smallUnit : $el.find("#smallUnit").val(),
 		sellProductId : $el.find("#sellProductId").val(),
+		sellerId : $el.find("#sellerId").val(),
 		productId : $el.find("#productId").val(),
 		convert : $el.find("#convert").val(),
 
 		bigNum : $el.find("#bigNum").val(),
 		smallNum : $el.find("#smallNum").val(),
-		isGift : $el.find("#isGift").val(),
-		
-		subProduct : [{
-			productName : "",
-			valueName : "",
-					
-			bigPriceSpan : "",
-			smallPriceSpan : "",
-			bigUnitSpan : "",
-			smallUnitSpan : "",
-			stock : "",
-			
-			bigPrice : "",
-			smallPrice : "",
-			bigUnit : "",
-			smallUnit : "",
-			sellProductId : "",
-			productId : "",
-			convert : "",
-	
-			bigNum : "",
-			smallNum : "",
-			isGift : 1
-		}]
+		isGift : 0
 	}
 }
 
@@ -449,6 +420,7 @@ function order(){
 					<div class="" style="display: none">
 						<section class="product_detail weui-panel weui-panel_access common">
 							<div>
+								<input type="hidden" id="sellerId" value="">
 								<input type="hidden" id="sellProductId" value="">
 								<input type="hidden" id="productId" value="">
 								<input type="hidden" id="convert" value="">

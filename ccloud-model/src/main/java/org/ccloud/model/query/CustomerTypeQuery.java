@@ -154,5 +154,42 @@ public class CustomerTypeQuery extends JBaseQuery {
 		String sql = "select * from cc_customer_type where data_area = '"+dataArea+"' and code = ?";
 		return DAO.findFirst(sql, code);
 	}
-	
+
+	public List<Record> findByMember(String customerId, List<String> productList) {
+		LinkedList<Object> params = new LinkedList<Object>();
+
+		StringBuilder sql = new StringBuilder( "SELECT GROUP_CONCAT(cct.id) AS id , GROUP_CONCAT(cct. name) AS name ");
+		sql.append("FROM cc_seller_customer csc ");
+		sql.append("LEFT JOIN cc_customer_join_customer_type ccjct ON csc.id = ccjct.seller_customer_id ");
+		sql.append("LEFT JOIN cc_customer_type cct ON ccjct.customer_type_id = cct.id ");
+		sql.append("WHERE csc.seller_id IN( ");
+		sql.append("SELECT DISTINCT(csp.seller_id) FROM cc_seller_product csp ");
+		sql.append("WHERE csp.id IN( ? ");
+
+		for(int i = 1; i < productList.size(); i++)
+			sql.append(", ? ");
+
+		params.addAll(productList);
+
+		sql.append(")) " );
+		sql.append("AND csc.customer_id = ? ");
+
+		params.add(customerId);
+		sql.append("GROUP BY csc.id");
+
+
+		return Db.find(sql.toString(), params.toArray());
+	}
+
+	public CustomerType findBySellerCustomer(String sellerId, String customerId) {
+
+		StringBuilder sql = new StringBuilder( "SELECT cct.* ");
+		sql.append("FROM cc_seller_customer csc ");
+		sql.append("LEFT JOIN cc_customer_join_customer_type ccjct ON csc.id = ccjct.seller_customer_id ");
+		sql.append("LEFT JOIN cc_customer_type cct ON ccjct.customer_type_id = cct.id ");
+		sql.append("WHERE csc.seller_id = ? ");
+		sql.append("AND csc.customer_id = ? ");
+
+		return DAO.findFirst(sql.toString(), sellerId, customerId);
+	}
 }
