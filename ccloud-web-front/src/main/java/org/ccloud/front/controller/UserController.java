@@ -394,7 +394,8 @@ public class UserController extends BaseFrontController {
 
 	public void getQrcode()
 	{
-		String str = "{\"expire_seconds\": 604800, \"action_name\": \"QR_SCENE\", \"action_info\": {\"scene\": {\"scene_id\": 123}}}";
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String str = "{\"expire_seconds\": 604800, \"action_name\": \"QR_SCENE\", \"action_info\": {\"scene\": {\"scene_id\":" + user.getMobile() + "}}}";
 		ApiResult apiResult = QrcodeApi.create(str);
 		renderText(apiResult.getJson());
 	}

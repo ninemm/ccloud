@@ -73,6 +73,8 @@ import com.jfinal.weixin.sdk.msg.out.OutMsg;
 import com.jfinal.weixin.sdk.msg.out.OutNewsMsg;
 import com.jfinal.weixin.sdk.msg.out.OutTextMsg;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Clear(SessionInterceptor.class)
 @RouterMapping(url = "/wechat")
 public class WechatMessageController extends MsgController {
@@ -182,7 +184,13 @@ public class WechatMessageController extends MsgController {
 
 	// 处理接收到的扫描带参数二维码事件
 	protected void processInQrCodeEvent(InQrCodeEvent inQrCodeEvent) {
-		processDefaultReplay("wechat_processInQrCodeEvent", inQrCodeEvent);
+//		String replyContent = OptionQuery.me().findValue("wechat_processInQrCodeEvent");
+		String scene_id = inQrCodeEvent.getEventKey().replace("qrscene_", "");
+
+		HttpServletRequest request = getRequest();
+		String redirectUrl = request.getScheme() + "://" + request.getServerName() + "/member/member/bind?scene_id=" + scene_id;
+		redirectUrl = StringUtils.urlEncode(redirectUrl);
+		redirect(redirectUrl);
 	}
 
 	// 处理接收到的上报地理位置事件
