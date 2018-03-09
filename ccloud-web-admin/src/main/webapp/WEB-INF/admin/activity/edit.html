@@ -514,7 +514,7 @@
 							<div class="col-sm-5 validata-box" >
 								<label class="control-label col-sm-4">流程编号:</label>
 								<div class="input-group col-sm-8">
-									<input class="form-control" type="text" name="activity.proc_code" value="${(activity.proc_code)!}">
+									<input class="form-control" readonly type="text" name="activity.proc_code" value="${(activity.proc_code)!}">
 								</div>
 							</div>
 						</div>
@@ -522,7 +522,7 @@
 							<div class="col-sm-5 validata-box">
 								<label class="control-label col-sm-4">活动方案号:</label>
 								<div class="input-group col-sm-8">
-									<input class="form-control" type="text" name="activity.plan_code" value="${(activity.plan_code)!}">
+									<input class="form-control" readonly type="text" name="activity.plan_code" value="${(activity.plan_code)!}">
 								</div>
 							</div>
 							<div class="col-sm-5 validata-box">
@@ -588,6 +588,7 @@
 									<input class="form-control" type="text" name="activity.total_customer_num" value="${(activity.total_customer_num)!}">
 								</div>
 							</div>
+							<!-- 
 							<div class="col-sm-5 validata-box investNum">
 								<label class="control-label col-sm-4">投入数量:</label>
 								<div class="input-group col-sm-8">
@@ -596,6 +597,7 @@
 									</select>
 								</div>
 							</div>
+							-->
 						</div><div class="form-group">
 							<div class="col-sm-5 validata-box investAmount">
 								<label for="_title" class="control-label col-sm-4">投入金额:</label>
@@ -603,12 +605,14 @@
 									<input class="form-control" type="text" name="activity.invest_amount" value="${(activity.invest_amount)!}">
 								</div>
 							</div>
-							<div class="col-sm-5 validata-box visitNum">
+							<!-- 
+							<div class="col-sm-5 validata-box visitNum"> 
 								<label class="control-label col-sm-4">拜访次数：</label>
 								<div class="input-group col-sm-8">
 									<input class="form-control" type="text" name="activity.visit_num" value="${(activity.visit_num)!}">
 								</div>
 							</div>
+							-->
 							<div class="form-group">
 								<div class="col-sm-5 validata-box">
 									<label class="control-label col-sm-4">是否上架:</label>
@@ -621,6 +625,17 @@
 										</label>
 									</div>
 								</div>
+								<!-- <div class="col-sm-5 validata-box">
+									<label class="control-label col-sm-4">是否可超出申请金额:</label>
+									<div class="input-group col-sm-8">
+										<label class="radio-inline">
+											<input type="radio" name="activity.is_limit" value="0"/>否
+										</label>
+										<label class="radio-inline">
+											<input type="radio" name="activity.is_limit" value="1"/>是
+										</label>
+									</div>
+								</div>	 -->							
 							</div>
 						</div><div class="form-group">
 							<div class="col-sm-5 validata-box">

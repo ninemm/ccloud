@@ -507,6 +507,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		renderJson(activityExecuteList);
 	}
 	
+	//投入列表
 	public void put() {
 		List<Dict> invest = DictQuery.me().findDictByType(Consts.INVEST_TYPE);
 		setAttr("ilist", invest);
@@ -524,14 +525,6 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		Page<Record> page = ActivityQuery.me().activityPutPaginate(getPageNumber(), getPageSize(), keyword, startDate, endDate,sellerId,invest_type);
-		for(int i = 0; i <page.getList().size();i++){
-			if(page.getList().get(i).getStr("time_interval")!="") {
-				page.getList().get(i).set("time_interval", ActivityQuery.me().getTimeInterval(page.getList().get(i).getStr("time_interval")));
-			}
-			if(page.getList().get(i).getStr("invest_type")!="") {
-				page.getList().get(i).set("invest_type", ActivityQuery.me().getInvestType(page.getList().get(i).getStr("invest_type")));
-			}
-		}
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
 	}
@@ -543,7 +536,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		render("putDetails.html");
 	}
 	
-	
+	//活动投放明细
 	public void putDetailsList() {
 		String id = getPara("id");
 		String startDate = getPara("startDate");
@@ -554,21 +547,11 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			setAttr("k", keyword);
 		}
 		Page<Record> page = ActivityQuery.me().putDetailsPaginate(getPageNumber(), getPageSize(), keyword,startDate, endDate,id);
-		for(int i = 0; i <page.getList().size();i++){
-			if(page.getList().get(i).getStr("customer_type_ids")!="") {
-				page.getList().get(i).set("customer_type_ids", ActivityQuery.me().getCustomerType(page.getList().get(i).getStr("customer_type_ids")));
-			}
-			if(page.getList().get(i).getStr("time_interval")!="") {
-				page.getList().get(i).set("time_interval", ActivityQuery.me().getTimeInterval(page.getList().get(i).getStr("time_interval")));
-			}
-			if(page.getList().get(i).getStr("invest_type")!="") {
-				page.getList().get(i).set("invest_type", ActivityQuery.me().getInvestType(page.getList().get(i).getStr("invest_type")));
-			}
-		}
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
 	}
 	
+	//活动拜访详情
 	public void visitDetails() {
 		String id = getPara("id");
 		String customerId = getPara("customerId");
@@ -579,6 +562,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		render("visitDetails.html");
 	}
 	
+	//活动拜访详情
 	public void visitDetailsList() {
 		String id = getPara("id");
 		String customerId = getPara("customerId");
@@ -592,12 +576,6 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		}
 		Page<Record> page = ActivityQuery.me().visitDetailsPaginate(getPageNumber(), getPageSize(), keyword,startDate, endDate,id,customerId,userId);
 		for(int i = 0; i <page.getList().size();i++){
-			if(page.getList().get(i).getStr("customer_type")!="") {
-				page.getList().get(i).set("customer_type", ActivityQuery.me().getCustomerType(page.getList().get(i).getStr("customer_type")));
-			}
-			if(page.getList().get(i).getStr("invest_type")!="") {
-				page.getList().get(i).set("invest_type", ActivityQuery.me().getInvestType(page.getList().get(i).getStr("invest_type")));
-			}
 			if(page.getList().get(i).getStr("photo")!="") {
 				List<ImageJson> list = Lists.newArrayList();
 				JSONArray picList = JSON.parseArray(page.getList().get(i).getStr("photo"));
@@ -620,6 +598,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		renderJson(map);
 	}
 	
+	//加入核销
 	public void auditReimbursement() {
 		boolean save=true;
 		String ids = getPara("ids");
