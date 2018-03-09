@@ -86,7 +86,7 @@
       			edit:false},
       			{field: "bigPrice", title: "销售价格(整)", align: "center", width: '7%',
       				formatter: function(value, row, rowIndex) {
-					var strHtml = '￥<input type="text" size="9" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="bigPrice" value="'+formatNumber(row.price)+'" onblur="changeMoney(this)"/>';
+					var strHtml = '￥<input type="text" size="9" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="bigPrice" value="'+formatNumber(row.price)+'" onblur="changeMoney(this)"/><input type="hidden" size="9"  name="_bigPrice" value="'+row.price+'"/>';
 					strHtml += '/<input type="text" size="1" readonly style="text-align:center;background-color:transparent;border:0px;" name="big_unit" value="'+row.big_unit+'"/>';
 					return strHtml;
 				},
@@ -101,7 +101,7 @@
       			 edit:false},
       			 {field: "cost", title: "成本(整)", align: "center", width: '7%',
       				formatter: function(value, row, rowIndex) {
-					var strHtml = '￥<input type="text" size="9" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="cost" value="'+formatNumber(row.cost)+'"/>';
+					var strHtml = '￥<input type="text" size="9" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="cost" value="'+formatNumber(row.cost)+'" onblur="changeCostPrice(this)"/><input type="hidden"  name="_cost" value="'+row.cost+'"/>';
 					return strHtml;
 				},
       			 edit:false},
@@ -114,7 +114,7 @@
 				},
 				{field: "", title: "账期价格(整)", align: "center", width: '7%',
       				formatter: function(value, row, rowIndex) {
-					var strHtml = '￥<input type="text" size="9" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="accountPrice" value="'+formatNumber(row.account_price)+'" onblur="changeAccountPrice(this)"/>';
+					var strHtml = '￥<input type="text" size="9" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="accountPrice" value="'+formatNumber(row.account_price)+'" onblur="changeAccountPrice(this)"/><input type="hidden" name="_accountPrice" value="'+row.account_price+'"/>';
 					return strHtml;
 				},
       			 edit:false},
@@ -191,8 +191,8 @@
 		var orderItems = new Array();
 		var flang=true;
 		 $('input[name="custom_name"]').parent().parent().each(function(idx, item) {
-		 	var price = parseInt($(this).find('td').eq(7).find("input[name='bigPrice']").val());
-		 	var accountPrice = parseInt($(this).find('td').eq(12).find("input").val());
+		 	var price = parseInt($(this).find('td').eq(7).find("input[name='_bigPrice']").val());
+		 	var accountPrice = parseInt($(this).find('td').eq(12).find("input").eq(1).val());
 		 	if($(this).find('td').eq(4).find("input").val()==""){
 		 		toastr.error('产品名不能为空!');
 				setTimeout( function(){
@@ -201,7 +201,7 @@
 			 	flang=false;
 			 	l.stop();
 				return;
-		 	}else if($(this).find('td').eq(7).find("input[name='bigPrice']").val() =="" || isNaN($(this).find('td').eq(7).find("input[name='bigPrice']").val())){
+		 	}else if($(this).find('td').eq(7).find("input[name='_bigPrice']").val() =="" || isNaN($(this).find('td').eq(7).find("input[name='_bigPrice']").val())){
 		 		toastr.error('销售价不能为空，且销售价为数字!');
 				setTimeout( function(){
 						location.reload();
@@ -218,13 +218,14 @@
 				l.stop();
 				return;
 		 	}
+		 	
 		  	var obj = {
 								"Id":  $(this).find('td').eq(0).find("input").val(),
 								"order_list": $(this).find('td').eq(1).find("input").val(),
 								"custom_name": $(this).find('td').eq(4).find("input").val(),
-								"price": $(this).find('td').eq(7).find("input[name='bigPrice']").val(),
-								"cost": $(this).find('td').eq(10).find("input").val(),
-								"account_price": $(this).find('td').eq(12).find("input").val(),
+								"price": $(this).find('td').eq(7).find("input[name='_bigPrice']").val(),
+								"cost": $(this).find('td').eq(10).find("input").eq(1).val(),
+								"account_price": $(this).find('td').eq(12).find("input").eq(1).val(),
 								"bar_code": $(this).find('td').eq(13).find("input").val(),
 								"tags": $(this).find('td').eq(14).find("input").val(),
 							};
@@ -275,27 +276,64 @@
 	}
 	
 	function changeMoney(obj){
-		var price = parseInt($(obj).val());
-		var accountPrice = parseInt($(obj).parent().parent().find("td").eq(12).find("input").val());
+		var price = $(obj).val();
+		if(price.indexOf(",") != -1){
+			price = parseInt($(obj).parent().parent().find('td').eq(7).find("input[name='_bigPrice']").val());
+		}else{
+			price = parseInt($(obj).val());
+		}
+		
+		var accountPrice = parseInt($(obj).parent().parent().find("td").eq(12).find("input").eq(1).val());
+		var cost = parseInt($(obj).parent().parent().find("td").eq(10).find("input").eq(1).val());
 		if(price>accountPrice){
 			toastr.error('销售价格不可大于账期价格！');
 			setTimeout( function(){
 						location.reload();
 								}, 2 * 1000 );
 		}
-		var smallprice=($(obj).val()/$(obj).parent().parent().find("td").eq(8).html()).toFixed(2);
+		if(price < cost){
+			toastr.error('销售价格不可小于成本价格！');
+			setTimeout( function(){
+						location.reload();
+								}, 2 * 1000 );
+		}
+		var smallprice=(price/$(obj).parent().parent().find("td").eq(8).html()).toFixed(2);
 		$(obj).parent().parent().find("td").eq(9).find("input[name='smallPrice']").val(smallprice);
+		$(obj).parent().parent().find('td').eq(7).find("input[name='_bigPrice']").val($(obj).val());
+	}
+	
+	function changeCostPrice(obj){
+		var cost = $(obj).val();
+		if(cost.indexOf(",") != -1){
+			cost = parseInt($(obj).parent().parent().find("td").eq(10).find("input").eq(1).val());
+		}else{
+			cost = parseInt($(obj).val());
+		}
+		var price = parseInt($(obj).parent().parent().find('td').eq(7).find("input[name='_bigPrice']").val());
+		if(cost>price){
+			toastr.error('销售价格不可小于成本价格！');
+			setTimeout( function(){
+						location.reload();
+								}, 2 * 1000 );
+		}
+		$(obj).parent().parent().find("td").eq(10).find("input").eq(1).val(cost);
 	}
 	
 	function changeAccountPrice(obj){
-		var accountPrice = parseInt($(obj).val());
-		var price =parseInt($(obj).parent().parent().find('td').eq(7).find("input[name='bigPrice']").val());
+		var accountPrice = $(obj).val();
+		if(accountPrice.indexOf(",") != -1){
+			accountPrice = $(obj).parent().parent().find('td').eq(12).find("input").eq(1).val()
+		}else{
+			accountPrice = parseInt($(obj).val());
+		}
+		var price =parseInt($(obj).parent().parent().find('td').eq(7).find("input[name='_bigPrice']").val());
 		if(price>accountPrice){
 			toastr.error('销售价格不可大于账期价格！');
 			setTimeout( function(){
 						location.reload();
 								}, 2 * 1000 );
 		}
+		$(obj).parent().parent().find('td').eq(12).find("input").eq(1).val($(obj).val());
 	}
 	
 	/*function changeHot(obj){
@@ -335,7 +373,9 @@
 		 var flang = true;
 		 var checklist = $('input[name="dataItem"]:checked').parent().parent();
 		 if(checklist.length == 0){
-			alert("未选中任何数据!");
+			
+
+("未选中任何数据!");
 			flang=false;
 			return;		 
 		 }
