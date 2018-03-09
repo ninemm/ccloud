@@ -68,7 +68,7 @@
 		var fields =
 			[	
 				{field: "proc_code", title: "流程编号", align: "center", width: '10%', edit:false},
-				{field: "invest_type", title: "投入类型", align: "center", width: '10%', edit:false},
+				{field: "investType", title: "投入类型", align: "center", width: '10%', edit:false},
 				{field: "customer_name", title: "终端名称", align: "center", width: '10%', edit:false},
 				{field: "address", title: "终端地址", align: "center", width: '10%', edit:false},
 				{field: "customer_type", title: "终端类型", align: "center", width: '10%', edit:false},
@@ -78,7 +78,7 @@
       			formatter: function(value, row, rowIndex) {
       				var strHtml='<ul class="weui-uploader__files" id="uploaderFiles">';
       				for(var i= 0; i <row.photo.length; i++){
-      					strHtml+='<li onclick="img()" value='+row.photo[i].savePath+' class="weui-uploader__file" style="display: inline-block;background-size: cover;width: 80px;height: 80px;background-image:url('+ row.photo[i].savePath +')"></li>';
+      					strHtml+='<li value='+row.photo[i].savePath+' class="weui-uploader__file" style="display: inline-block;background-size: cover;width: 80px;height: 80px;background-image:url('+ row.photo[i].savePath +')"></li>';
       				}
       				strHtml+='</ul>';
 					return strHtml;

@@ -22,7 +22,6 @@ import com.jfinal.plugin.activerecord.Record;
 
 import org.ccloud.Consts;
 import org.ccloud.model.Activity;
-import org.ccloud.model.Dict;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -155,25 +154,9 @@ public class ActivityQuery extends JBaseQuery {
 		return exist;
 	}
 
-	public String getInvestType(String investTypeIds) {
-		if (StrKit.isBlank(investTypeIds)) {
-			return null;
-		}
-		String[] investTypes = investTypeIds.split(",");
-		String types = "";
-		String typeNames = "";
-		if(investTypes!=null){
-			for(int i = 0;i<investTypes.length;i++){
-				types += DictQuery.me().findByKey(Consts.INVEST_TYPE, investTypes[i]).getName()+",";
-			}
-			typeNames = types.substring(0, types.length()-1);
-		}
-		return typeNames;
-	}
-	
-	
 	public Page<Record> activityPutPaginate(int pageNumber, int pageSize, String keyword,String startDate, String endDate,String sellerId, String invest_type) {
-		String select = "select DATE(ca.start_time) start_time1,DATE(ca.end_time) end_time1,IFNULL(t1.putNum , 0) putNum, IFNULL(t2.executeNum , 0) executeNum, IFNULL(ca.invest_num , 0) invest_num,IFNULL(ca.invest_amount , 0) invest_amount,ca.*,case when ca.category='"+Consts.CATEGORY_NORMAL+"' then '商品销售' else '投入活动' end as activityCategory ";
+		String select = "select DATE(ca.start_time) start_time1,DATE(ca.end_time) end_time1,IFNULL(t1.putNum , 0) putNum, IFNULL(t2.executeNum , 0) executeNum, IFNULL(ca.invest_num , 0) invest_num,IFNULL(ca.invest_amount , 0) invest_amount,ca.* ,";
+		select=select+"( SELECT d.`name` FROM dict d WHERE d.`key` = ca.invest_type AND d.type = '"+Consts.INVEST_TYPE+"') investType ,( SELECT d.`name` FROM dict d WHERE d.`key` = ca.time_interval AND d.type = '"+Consts.ACTIVE_TIME_INTERVAL+"') timeInterval ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_activity` ca ");
 		fromBuilder.append(" LEFT JOIN (SELECT caa.activity_id,COUNT(1) putNum FROM cc_activity_apply caa WHERE caa.`status`in(1,4) GROUP BY caa.activity_id)t1 ON ca.id=t1.activity_id");
 		fromBuilder.append(" LEFT JOIN (SELECT caa.activity_id,COUNT(1) executeNum FROM cc_customer_visit ccv LEFT JOIN cc_activity_apply caa ON ccv.active_apply_id=caa.id WHERE caa.`status`in(1,4) GROUP BY caa.activity_id)t2 ON ca.id=t2.activity_id");
@@ -205,19 +188,9 @@ public class ActivityQuery extends JBaseQuery {
         return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
     }
 
-	public String getTimeInterval(String timeIntervalId) {
-		if (StrKit.isBlank(timeIntervalId)) {
-			return null;
-		}
-		Dict findByKey = DictQuery.me().findByKey(Consts.ACTIVE_TIME_INTERVAL, timeIntervalId);
-		if (findByKey!=null) {
-			timeIntervalId= findByKey.getName();
-		}
-		return timeIntervalId;
-	}
-
 	public Page<Record> putDetailsPaginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate,String id) {
-		String select = "SELECT caa.`status`,caa.id activityApplyId,u.id userId , u.realname , csc.id customerId , cc.customer_name , CONCAT( cc.prov_name , cc.city_name , cc.country_name , cc.address) address , csc.customer_type_ids, caa.create_date putDate , IFNULL(t1.executeNum , 0) executeNum , ca.* ";	
+		String select = "SELECT caa.`status`,caa.id activityApplyId,u.id userId,u.realname,csc.id customerId,cc.customer_name,CONCAT(cc.prov_name,cc.city_name,cc.country_name,cc.address) address,caa.create_date putDate,IFNULL(t1.executeNum , 0) executeNum,ca.*,( SELECT d.`name` FROM dict d WHERE d.`key` = ca.invest_type AND d.type='";	
+		select=select+Consts.INVEST_TYPE+"') investType ,( SELECT d.`name` FROM dict d WHERE d.`key` = ca.time_interval AND d.type = '"+Consts.ACTIVE_TIME_INTERVAL+"') timeInterval,( SELECT group_concat(cct.`name`) FROM cc_customer_type cct WHERE LOCATE(cct.id , csc.customer_type_ids) > 0 GROUP BY csc.customer_type_ids) customer_type_ids";
 		StringBuilder fromBuilder = new StringBuilder(" FROM cc_activity_apply caa ");
 		fromBuilder.append(" LEFT JOIN cc_activity ca ON ca.id=caa.activity_id");
 		fromBuilder.append(" LEFT JOIN `user` u ON u.id=caa.biz_user_id");
@@ -243,25 +216,10 @@ public class ActivityQuery extends JBaseQuery {
         return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
-	public String getCustomerType(String customer_type_ids) {
-		if (StrKit.isBlank(customer_type_ids)) {
-			return null;
-		}
-		String[] customerTypeId = customer_type_ids.split(",");
-		String types = "";
-		String typeNames = "";
-		if(customerTypeId!=null){
-			for(int i = 0;i<customerTypeId.length;i++){
-				types += CustomerTypeQuery.me().findByCustomerTypeId(customerTypeId[i]).getName()+",";
-			}
-			typeNames = types.substring(0, types.length()-1);
-		}
-		return typeNames;
-	}
-
 	public Page<Record> visitDetailsPaginate(int pageNumber, int pageSize, String keyword, String startDate,
 			String endDate, String id, String customerId, String userId) {
-		String select = "SELECT u.realname ,ca.proc_code,ca.invest_type,cc.customer_name , CONCAT( cc.prov_name , cc.city_name , cc.country_name , cc.address) address , csc.customer_type_ids customer_type , caa.create_date putDate ,ccv.photo";
+		String select = "SELECT u.realname,ca.proc_code,(SELECT d.`name` FROM dict d WHERE d.`key` = ca.invest_type AND d.type = '"+Consts.INVEST_TYPE+"') invest_type,cc.customer_name,CONCAT(cc.prov_name,cc.city_name,cc.country_name,cc.address) address";
+		select = select+",caa.create_date putDate ,ccv.photo,( SELECT group_concat(cct.`name`) FROM cc_customer_type cct WHERE LOCATE(cct.id , csc.customer_type_ids) > 0 GROUP BY csc.customer_type_ids) customer_type";
 		StringBuilder fromBuilder = new StringBuilder(" FROM cc_customer_visit ccv ");
 		fromBuilder.append(" LEFT JOIN cc_activity_apply caa ON caa.id=ccv.active_apply_id ");
 		fromBuilder.append(" LEFT JOIN cc_activity ca ON ca.id=caa.activity_id ");
