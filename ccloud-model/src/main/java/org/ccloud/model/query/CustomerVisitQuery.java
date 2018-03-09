@@ -131,12 +131,14 @@ public class CustomerVisitQuery extends JBaseQuery {
 	}
 
 	public CustomerVisit findMoreById(String id) {
-		StringBuilder sql = new StringBuilder("SELECT ccv.*, cc.customer_name, cc.contact, cc.mobile, u.realname, u.mobile as userMobile, d.name as typeName ");
+		StringBuilder sql = new StringBuilder("SELECT ccv.*,cc.prov_name,cc.city_name,cc.country_name ,cc.customer_name, cc.contact, cc.mobile, u.realname, u.mobile as userMobile, d.name as typeName, t1.title, t1.name as expenseDetailName,t1.activitApplyId ");
 		sql.append("FROM cc_customer_visit ccv ");
 		sql.append("LEFT JOIN user u ON ccv.user_id = u.id ");
 		sql.append("LEFT JOIN cc_seller_customer csc ON ccv.seller_customer_id = csc.id ");
 		sql.append("LEFT JOIN cc_customer cc ON csc.customer_id = cc.id ");
 		sql.append("LEFT JOIN dict d ON ccv.question_type = d.value ");
+		sql.append("LEFT JOIN (SELECT a.id as activitApplyId,ca.title,d.name from cc_activity_apply a LEFT JOIN cc_activity ca on ca.id = a.activity_id LEFT JOIN cc_expense_detail ce on ce.id = a.expense_detail_id LEFT JOIN dict d on d.type = ce.flow_dict_type and d.`value` = ce.item1) t1"
+				+ " on t1.activitApplyId = ccv.active_apply_id ");
 //		sql.append("LEFT JOIN cc_customer_join_customer_type ccjct ON csc.id = ccjct.seller_customer_id ");
 		sql.append("WHERE ccv.id = ? limit 1");
 

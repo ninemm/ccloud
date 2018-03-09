@@ -32,6 +32,7 @@ public class Customer extends BaseCustomer<Customer> {
 	public static final String CUSTOMER_NORMAL = "100101";
 	public static final String CUSTOMER_AUDIT = "100102";
 	public static final String CUSTOMER_REJECT = "100103";
+	public static final String CUSTOMER_BULU = "100104"; // 待补录
 
 	@Override
 	public boolean saveOrUpdate() {
