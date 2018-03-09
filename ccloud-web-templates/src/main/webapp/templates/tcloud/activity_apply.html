@@ -56,7 +56,9 @@ $(function () {
 		items: ${details},
 		onClose: function(obj) {
 			var expenseDetailIds = obj.data.values;
+			var expenseTitle = obj.data.titles;
 			$('#expense_detail_id').val(expenseDetailIds);
+			getSurplusInfo(expenseDetailIds,expenseTitle);
 		}
     });
 	//客户选择部分
@@ -101,6 +103,10 @@ $(function () {
 			$.toptip("请选择客户", 'warning');
 			return;
 		}
+		if (!checkApply()) {
+			$.toptip("申请量大于剩余量或申请量为空", 'warning');
+			return;			
+		}
 		$.confirm("您确定要申请活动吗？","活动申请", function() {
 			doSubmit();
 		});
@@ -123,6 +129,69 @@ var activityInfoMap = ${activityInfoMap!};
 var activityItems = ${activityItems!};
 var newHtml = $(".activity-detail-item").eq(0).html();
 var $activity = $("#activityList");
+var applyHtml = $(".applyInfo").eq(0).html();
+
+function checkApply() {
+	var store = $(".applyInfo");
+	var check = false;
+	store.each(function(index,obj){
+		var applyNum = parseInt($(obj).find("#apply_num").val());
+		var applyAmount = parseInt($(obj).find("#apply_amount").val());
+		var numMax = parseInt($(obj).find("#maxNum").val());
+		var amountMax = parseInt($(obj).find("#maxAmount").val());
+		if (!isNaN(numMax)) {
+			if (isNaN(applyNum)) {
+				check = false;
+				return false;
+			}
+			if (applyNum > numMax) {
+				check = false;
+				return false;
+			}		
+		}
+		if (isNaN(applyAmount)) {
+			check = false;
+			return false;
+		}
+		if (applyAmount > amountMax) {
+			check = false;
+			return false;
+		}
+    	if (index == store.length-1) {
+    		check = true;
+    	}		
+	});
+	return check;		
+}
+
+function getSurplusInfo(ids,titles) {
+	defaultInfo();
+	var titles = titles.split(",");
+	$.get('${CPATH}/activity/getSurplusInfo?ids=' + ids,
+		function(data){
+            $.each(data, function(index, el) {
+            	if(index != 0) {
+	                $(".detailInfo").append("<div class='applyInfo'>" + applyHtml + "</div>");
+            	}
+            	var $newApply = $(".detailInfo").find(".applyInfo:last");
+            	$newApply.find("#detailName").html(titles[index]); 
+				if (el.num == null) {
+					$newApply.find(".num").hide();
+				}else {
+					$newApply.find("#maxNum").val(el.num);
+					$newApply.find("#ableNum").html("("+el.num+")");
+				}
+				$newApply.find("#maxAmount").val(el.amount);
+				$newApply.find("#ableMoney").html("("+el.amount+")");
+            });			
+		}
+	);
+}
+
+function defaultInfo() {
+ 	$(".detailInfo").empty();
+ 	$(".detailInfo").append("<div class='applyInfo'>" + applyHtml + "</div>");
+}
 
 function addActivity(){
 
@@ -352,7 +421,6 @@ function doChange(key){
 						<input type="hidden" name="activity_id" id="activityId">
 						<input type="hidden" name="visit_num" id="visitNum">
 						<i class="icon-sort-desc"></i>
-						<!-- <p class="orange ft14" id="delActivity">删除</p> -->
 					</div>
 					<div class="weui-cell weui-cell_access">
 						<div class="weui-cell__bd">
@@ -415,7 +483,7 @@ function doChange(key){
 						</div>
 					</div>
 					<#if details?size gt 0>
-						<div class="weui-cell weui-cell_access">
+						<div class="weui-cell weui-cell_access select-area">
 		                    <span>
 								费用明细
 								<span class="require"></span>
@@ -427,56 +495,35 @@ function doChange(key){
 		                    <span class="weui-cell__ft"></span>
 		                </div>
 	                </#if>
-	                <div id="applyInfo">
-						<div class="weui-cells__title gray">收款明细</div>                
-						<div class="weui-cell weui-cell_access">
-							<div class="weui-cell__bd">
-								<span>
-									申请数量
-									<span class="require"></span>
-								</span>
-								<div class="fr t-r">
-									<input type="text" class="weui-input" id="apply_num" name="apply_num" value="0"  placeholder="请填写数量">
+	                <div class="detailInfo">
+		                <div class="applyInfo">
+							<div class="weui-cells__title gray" id="detailName"></div>                
+							<div class="weui-cell weui-cell_access num">
+								<div class="weui-cell__bd">
+									<span>
+										申请数量<span id="ableNum"></span>
+										<span class="require"></span>
+									</span>
+									<div class="fr t-r">
+										<input type="tel" class="weui-input" id="apply_num" name="apply_num" value="0"  placeholder="请填写数量" required>
+										<input type="hidden" id="maxNum">
+									</div>
 								</div>
 							</div>
-						</div>
-						<div class="weui-cell weui-cell_access">
-							<div class="weui-cell__bd">
-								<span>
-									申请金额
-									<span class="require"></span>
-								</span>
-								<div class="fr t-r">
-									<input type="text" class="weui-input" id="apply_amount" name="apply_amount" value="0"  placeholder="请填写金额">
+							<div class="weui-cell weui-cell_access amount">
+								<div class="weui-cell__bd">
+									<span>
+										申请金额<span id="ableMoney"></span>
+										<span class="require"></span>
+									</span>
+									<div class="fr t-r">
+										<input type="tel" class="weui-input" id="apply_amount" name="apply_amount" value="0"  placeholder="请填写金额" required>
+										<input type="hidden" id="maxAmount">
+									</div>
 								</div>
 							</div>
 						</div>
 					</div>
-	                <div id="applyInfo">
-						<div class="weui-cells__title gray">收款明细</div>                
-						<div class="weui-cell weui-cell_access">
-							<div class="weui-cell__bd">
-								<span>
-									申请数量
-									<span class="require"></span>
-								</span>
-								<div class="fr t-r">
-									<input type="text" class="weui-input" id="apply_num" name="apply_num" value="0"  placeholder="请填写数量">
-								</div>
-							</div>
-						</div>
-						<div class="weui-cell weui-cell_access">
-							<div class="weui-cell__bd">
-								<span>
-									申请金额
-									<span class="require"></span>
-								</span>
-								<div class="fr t-r">
-									<input type="text" class="weui-input" id="apply_amount" name="apply_amount" value="0"  placeholder="请填写金额">
-								</div>
-							</div>
-						</div>
-					</div>					
 					<div class="weui-cell weui-cell_access">
 						<div class="weui-cell__bd">
 							<textarea placeholder="备注说明（70字以内）" name="content" class="width-100"></textarea>
@@ -484,12 +531,6 @@ function doChange(key){
 					</div>
 				</section>
 			</div>
-			<!-- <section class="weui-panel weui-panel_access" id="addActivity">
-					<div class="weui-cell weui-cell_access t-c ft14">
-						<p class="width-100 blue">
-							<i class="icon-plus-circle"></i>添加活动</p>
-					</div>
-				</section> -->
 			<div class="weui-cells__title">客户信息</div>
 			<div class="relative">
 				<section class="weui-panel weui-panel_access order-customer-info">
@@ -509,33 +550,6 @@ function doChange(key){
 					<div class="weui-cell__ft"></div>
 				</div>
 			</div>
-			<!--    <section class="weui-cells weui-cells_form">
-			<div class="weui-cell">
-			  <div class="weui-cell__bd">
-				<div class="weui-uploader">
-				  <div class="weui-uploader__hd">
-					<p class="weui-uploader__title">附件图片</p>
-					<div class="weui-uploader__info">0/2</div>
-				  </div>
-				  <div class="weui-uploader__bd">
-					<ul class="weui-uploader__files" id="uploaderFiles">
-					  <li class="weui-uploader__file weui-uploader__file_status" style="background-image:url(./images/pic_160.png)">
-						<div class="weui-uploader__file-content">
-						  <i class="weui-icon-warn"></i>
-						</div>
-					  </li>
-					  <li class="weui-uploader__file weui-uploader__file_status" style="background-image:url(./images/pic_160.png)">
-						<div class="weui-uploader__file-content">50%</div>
-					  </li>
-					</ul>
-					<div class="weui-uploader__input-box">
-					  <input id="uploaderInput" class="weui-uploader__input" type="file" accept="image/*" multiple="">
-					</div>
-				  </div>
-				</div>
-			  </div>
-			</div>
-		  </section>-->
 		</main>
 		<article id="combin-filter" class="customerMulti">
 			<div id="customer">

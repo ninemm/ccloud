@@ -80,5 +80,13 @@ public class ExpenseDetailQuery extends JBaseQuery {
 		return 0;
 	}
 
+	public ExpenseDetail findSurplusById(String id) {
+		StringBuilder builder = new StringBuilder("SELECT ce.*, IFNULL(t1.num,0) as num, IFNULL(t1.amount,0) as amount FROM cc_expense_detail ce ");
+		builder.append("LEFT JOIN (SELECT ca.expense_detail_id,SUM(ca.apply_amount) as amount, SUM(ca.apply_num) as num FROM cc_activity_apply ca ");
+		builder.append("GROUP BY ca.expense_detail_id) t1 ON t1.expense_detail_id = ce.id ");
+		builder.append("where id = ? ");
+		return DAO.findFirst(builder.toString(), id);
+	}
+
 	
 }
