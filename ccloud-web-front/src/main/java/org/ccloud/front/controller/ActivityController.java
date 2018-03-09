@@ -584,29 +584,19 @@ public class ActivityController extends BaseFrontController {
 			if(apply.get("invest_amount")!=null) html.append(df.format(Double.parseDouble(apply.get("invest_amount").toString())));
 			else html.append("0.00");
 			if(activityExecutes.size()>0) {
-				html.append("						</div>\n"+
+				html.append( "						</p>\n" +
 						"						</div>\n"+
-						"                        <div class=\"weui-flex\">\n" +
-						"                            <div class=\"weui-flex__item\">\n" +
-						"                                <p>开始日期</p>\n" +
-						"                                <p>" + apply.getStr("start_time") + "</p>\n" +
-						"                            </div>\n" +
-						"                            <div class=\"weui-flex__item\">\n" +
-						"                                <p>结束日期</p>\n" +
-						"                                <p>" + apply.getStr("end_time") + "</p>\n" +
-						"                            </div>\n" +
-						"                            <div class=\"weui-flex__item\">\n" +
-						"                                <p>活动类型</p>\n" +
-						"                                <p>" + apply.getStr("name") + "</p>\n" +
-						"                            </div>\n" +
-						"                            <div class=\"weui-flex__item\">\n" +
-						"                                <p>预计费用</p>\n" +
-						"                                <p>");
-			}
+						"						</div>\n"+
+						"                        <div class=\"weui-flex\">\n");
+				for(ActivityExecute activityExecute : activityExecutes) {
+					html.append("<a class=\"weui-cell weui-cell_access\" href=\"/customerVisit/addActivityApplyVisit?id=" + activityExecute.getStr("id") + "&activeApplyId="+apply.getStr("id")+"\">\n" +
+							"                       <div class=\"weui-flex__item\">\n" +
+							"                                <p>" + activityExecute.getOrderList() + "</p>\n" +
+							"                            </div></a>\n");
+					}
+				}
 			
-			html.append( "</p>\n" +
-					"                            </div>\n" +
-					"                        </div>\n" +
+			html.append( "                        </div>\n" +
 					"                    </div>\n" +
 					"                </section>");
 		}

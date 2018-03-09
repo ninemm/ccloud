@@ -87,7 +87,7 @@ public class ActivityApplyQuery extends JBaseQuery {
 	}
 
 	public Page<Record> findList(int pageNumber, int pageSize, String dataArea, String category, String status, String startDate, String endDate, String keyword ){
-		String select = "SELECT caa.id, cc.customer_name, caa.`status`, DATE_FORMAT(ca.start_time,'%m-%d') as start_time, " +
+		String select = "SELECT caa.id,caa.activity_id, cc.customer_name, caa.`status`, DATE_FORMAT(ca.start_time,'%m-%d') as start_time, " +
 				"DATE_FORMAT(ca.end_time, '%m-%d') as end_time, ca.invest_type, d.`name`, ca.invest_amount,ca.code ";
 		LinkedList<Object> params = new LinkedList<Object>();
 

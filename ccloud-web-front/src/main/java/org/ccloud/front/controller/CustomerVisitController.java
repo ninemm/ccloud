@@ -824,4 +824,11 @@ public class CustomerVisitController extends BaseFrontController {
 		}
 	}
 
+	public void addActivityApplyVisit() {
+		String activityExecuteId = getPara("id");
+		String activityApplyId = getPara("activeApplyId");
+		Record record = ActivityQuery.me().findByApplyId(activityApplyId);
+		setAttr("record",record);
+		render("customer_visit_activity.html");
+	}
 }
