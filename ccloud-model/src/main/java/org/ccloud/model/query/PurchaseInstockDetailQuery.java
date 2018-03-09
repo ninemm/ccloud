@@ -180,7 +180,7 @@ public class PurchaseInstockDetailQuery extends JBaseQuery {
 		return true;
 	}
 	
-	public boolean insertByBatchSalesOrder(List<orderProductInfo> orderProductInfos, String purchaseInstockId, Record seller, Date date, HttpServletRequest request) {
+	public boolean insertByBatchSalesOrder(List<orderProductInfo> orderProductInfos, String purchaseInstockId, Record seller, Date date, HttpServletRequest request,String pwarehouseSn,SellerCustomer sellerCustomer,BigDecimal productAmout) {
 		for (orderProductInfo orderProductInfo : orderProductInfos) {
 			String sellerId = seller.getStr("id");
 			List<ProductInfo> productInfos = ProductQuery.me().getProductBySellerProId(orderProductInfo.getSellerProductId());
@@ -193,28 +193,41 @@ public class PurchaseInstockDetailQuery extends JBaseQuery {
 			}
              
 			for (int i = 0; i < sellerProducts.size(); i++) {
-			PurchaseInstockDetail purchaseInstockDetail = new PurchaseInstockDetail();
-			purchaseInstockDetail.setId(StrKit.getRandomUUID());
-			purchaseInstockDetail.setPurchaseInstockId(purchaseInstockId);
-
-			purchaseInstockDetail.set("seller_product_id", sellerProducts.get(i).getId());
-			purchaseInstockDetail.setProductCount(orderProductInfo.getProductCount());
-			purchaseInstockDetail.setProductAmount(orderProductInfo.getProductAmout());
-			purchaseInstockDetail.setProductPrice(orderProductInfo.getBigPrice());
-			purchaseInstockDetail
-					.setPurchaseOrderDetailId(orderProductInfo.getSalesOutDetaliId());
-
-			purchaseInstockDetail.setDeptId(seller.getStr("dept_id"));
-			purchaseInstockDetail.setDataArea(seller.getStr("data_area"));
-			purchaseInstockDetail.setCreateDate(date);
-
-			if (!purchaseInstockDetail.save()) {
-				return false;
-			}
+				PurchaseInstockDetail purchaseInstockDetail = new PurchaseInstockDetail();
+				purchaseInstockDetail.setId(StrKit.getRandomUUID());
+				purchaseInstockDetail.setPurchaseInstockId(purchaseInstockId);
+	
+				purchaseInstockDetail.set("seller_product_id", sellerProducts.get(i).getId());
+				purchaseInstockDetail.setProductCount(orderProductInfo.getProductCount());
+				purchaseInstockDetail.setProductAmount(orderProductInfo.getProductAmout());
+				purchaseInstockDetail.setProductPrice(orderProductInfo.getBigPrice());
+				purchaseInstockDetail
+						.setPurchaseOrderDetailId(orderProductInfo.getSalesOutDetaliId());
+	
+				purchaseInstockDetail.setDeptId(seller.getStr("dept_id"));
+				purchaseInstockDetail.setDataArea(seller.getStr("data_area"));
+				purchaseInstockDetail.setCreateDate(date);
+	
+				if (!purchaseInstockDetail.save()) {
+					return false;
+				}
 			
+			}
 		}
-	}
-		
+		PayablesDetail payablesDetail = new PayablesDetail();
+		payablesDetail.setId(StrKit.getRandomUUID());
+		payablesDetail.setObjectId(sellerCustomer.getSellerId());
+		payablesDetail.setObjectType(Consts.RECEIVABLES_OBJECT_TYPE_SUPPLIER);
+		payablesDetail.setPayAmount(productAmout);
+		payablesDetail.setActAmount(new BigDecimal(0));
+		payablesDetail.setBalanceAmount(productAmout);
+		payablesDetail.setRefSn(pwarehouseSn);
+		payablesDetail.setBizDate(date);
+		payablesDetail.setRefType(Consts.BIZ_TYPE_INSTOCK);
+		payablesDetail.setDeptId(seller.getStr("dept_id"));
+		payablesDetail.setDataArea(seller.getStr("data_area"));
+		payablesDetail.setCreateDate(date);
+		payablesDetail.save();
 		return true;
 	}
 }

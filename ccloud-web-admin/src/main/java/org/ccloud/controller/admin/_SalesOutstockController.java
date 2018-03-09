@@ -352,7 +352,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 					SellerCustomer sellerCustomer = SellerCustomerQuery.me().findBySellerId(sellerId, customerId);
 					// PS + 100000(机构编号或企业编号6位) + 20171108(时间) + 000001(流水号)
 					String pwarehouseSn = "PS" + seller.getStr("seller_code") + DateUtils.format("yyyyMMdd", date)
-							+ PurchaseInstockQuery.me().getNewSn();
+							+ PurchaseInstockQuery.me().getNewSn(seller.getStr("id"));
 
 					Warehouse warehouse = WarehouseQuery.me().findBySellerId(seller.getStr("id"));
 					if (!PurchaseInstockQuery.me().insertBySalesOutStock(paraMap, seller, purchaseInstockId,
@@ -486,9 +486,13 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 						String purchaseInstockId = StrKit.getRandomUUID();
 
 						// PS + 100000(机构编号或企业编号6位) + 20171108(时间) + 000001(流水号)
-						String pwarehouseSn = "PS" + seller.getStr("seller_code") + DateUtils.format("yyMMdd", date)
-								+ PurchaseInstockQuery.me().getNewSn();
-
+						String pwarehouseSn = "PS" + seller.getStr("seller_code") + DateUtils.format("yyyyMMdd", date)
+								+ PurchaseInstockQuery.me().getNewSn(seller.getStr("id"));
+						// 直营商的应付账款
+						SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(printAllNeedInfo.getCustomerId());
+						String countTotal = productAmout.toString();
+						createPayables(sellerCustomer, countTotal,seller);
+						
 						Warehouse warehouse = WarehouseQuery.me().findBySellerId(seller.getStr("id"));
 						if (!PurchaseInstockQuery.me().insertByBatchSalesOutStock(printAllNeedInfo, seller,
 								purchaseInstockId, pwarehouseSn, warehouse.getId(), user.getId(), date, sellerId)) {
@@ -496,7 +500,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 						}
 
 						if (!PurchaseInstockDetailQuery.me().insertByBatchSalesOrder(orderProductInfos,
-								purchaseInstockId, seller, date, getRequest())) {
+								purchaseInstockId, seller, date, getRequest(),pwarehouseSn,sellerCustomer,productAmout)) {
 							return false;
 						}
 					}

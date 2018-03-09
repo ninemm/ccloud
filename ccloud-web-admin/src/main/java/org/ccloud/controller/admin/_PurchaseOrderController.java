@@ -145,7 +145,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		Date date = new Date();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
 		String fomatDate = sdf.format(date);
-		String pwarehouseSn="PS"+seller.getSellerCode()+fomatDate.substring(0,8)+PurchaseInstockQuery.me().getNewSn();
+		String pwarehouseSn="PS"+seller.getSellerCode().substring(0, 6)+fomatDate.substring(0,8)+PurchaseInstockQuery.me().getNewSn(seller.getId());
 		purchaseInstock.set("id", purchaseInstockId);
 		purchaseInstock.set("pwarehouse_sn", pwarehouseSn);
 		purchaseInstock.set("supplier_id", purchaseOrder.getSupplierId());
@@ -263,7 +263,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
 		String fomatDate = sdf.format(date);
 		String purchaseOrderId=StringUtils.getArrayFirst(paraMap.get("purchaseOrderId"));
-		String pwarehouseSn="PO"+seller.getSellerCode()+fomatDate.substring(0,8)+PurchaseInstockQuery.me().getNewSn();
+		String pwarehouseSn="PO"+seller.getSellerCode()+fomatDate.substring(0,8)+PurchaseInstockQuery.me().getNewSn(seller.getId());
 		purchaseInstock.set("id", purchaseInstockId);
 		purchaseInstock.set("pwarehouse_sn", pwarehouseSn);
 		purchaseInstock.set("supplier_id", StringUtils.getArrayFirst(paraMap.get("supplierId")));

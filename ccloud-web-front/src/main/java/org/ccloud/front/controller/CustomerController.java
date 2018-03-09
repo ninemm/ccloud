@@ -367,7 +367,7 @@ public class CustomerController extends BaseFrontController {
 	@Before(Tx.class)
 	public void save() {
 		
-		boolean updated = true;
+		String updated = "";
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		Map<String, Object> map = Maps.newHashMap();
 		List<ImageJson> list = Lists.newArrayList();
@@ -387,8 +387,10 @@ public class CustomerController extends BaseFrontController {
 		
 		String picJson = getPara("pic");
 		String oldPic = getPara("oldPic");
-		String areaCode = getPara("areaCode");
 		String areaName = getPara("areaName");
+
+		String areaCode = getPara("areaCode");
+		if(areaCode.equals(",,")) areaCode = "";
 
 		String customerTypeIds = getPara("customerTypeIds", "");
 		String custTypeNames = getPara("customer_type");
@@ -414,13 +416,6 @@ public class CustomerController extends BaseFrontController {
 				ImageJson image = new ImageJson();
 				image.setImgName(picname);
 				String originalPath = qiniuUpload(pic);
-				/*Boolean isEnable = OptionQuery.me().findValueAsBool("cdn_enable");
-				
-				if (isEnable != null && isEnable) {
-					newPath = qiniuUpload(pic);
-				} else {
-					newPath = upload(pic);
-				}*/
 
 				String waterFont1 = customer.getCustomerName();
 				String waterFont2 = user.getRealname() + DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
@@ -456,10 +451,10 @@ public class CustomerController extends BaseFrontController {
 			//如果不走流程直接做操作
 			updated = doSave(sellerCustomer, customer, areaCode, areaName, customerTypeIds, list, custTypeList, SellerCustomer.CUSTOMER_NORMAL);
 
-			if (updated)
+			if (StrKit.isBlank(updated))
 				renderAjaxResultForSuccess("操作成功");
 			else
-				renderAjaxResultForError("操作失败");
+				renderAjaxResultForError(updated);
 
 			return;
 		}
@@ -489,8 +484,8 @@ public class CustomerController extends BaseFrontController {
 		} else {
 
 			updated = doSave(sellerCustomer, customer, areaCode, areaName, customerTypeIds, list, custTypeList, SellerCustomer.CUSTOMER_AUDIT);
-			if (!updated) {
-				renderError(404);
+			if (StrKit.notBlank(updated)) {
+				renderAjaxResultForError(updated);
 				return;
 			}
 		}
@@ -503,12 +498,11 @@ public class CustomerController extends BaseFrontController {
 				if(type.equals("around")) isEnable = 3;
 
 			updated = startProcess(sellerCustomer.getId(), map, isEnable);
+			if (StrKit.isBlank(updated))
+				renderAjaxResultForSuccess("操作成功");
+			else
+				renderAjaxResultForError(updated);
 		}
-
-		if (updated)
-			renderAjaxResultForSuccess("操作成功");
-		else
-			renderAjaxResultForError("操作失败");
 	}
 
 	public void review() {
@@ -626,15 +620,15 @@ public class CustomerController extends BaseFrontController {
 		//int isEnabled = getParaToInt("isEnabled");
 		if(StrKit.notBlank(id)) {
 
-			boolean updated = startProcess(id, new HashMap<String, Object>(), 1);
+			String updated = startProcess(id, new HashMap<String, Object>(), 1);
 
-			if (updated) {
+			if (StrKit.isBlank(updated)) {
 				renderAjaxResultForSuccess("操作成功");
 			} else {
-				renderAjaxResultForError("操作失败");
+				renderAjaxResultForError(updated);
 			}
 		}else {
-			renderError(500);
+			renderAjaxResultForError("该客户不存在");
 		}
 	}
 
@@ -817,21 +811,19 @@ public class CustomerController extends BaseFrontController {
 			renderAjaxResultForError("操作失败");
 	}
 	//isEnable 0:新增或编辑 1:停用 2:导入公司客户 3:导入附件客户
-	private boolean startProcess(String customerId, Map<String, Object> param, int isEnable) {
+	private String startProcess(String customerId, Map<String, Object> param, int isEnable) {
 		
 		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(customerId);
 		boolean isUpdated = true;
 		Boolean isCustomerAudit = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_CUSTOMER_REVIEW + getSessionAttr("sellerCode"));
 		
 		if (sellerCustomer == null) {
-			renderError(404);
-			return false;
+			return "该客户不存在";
 		}
 
 		if(StrKit.notBlank(sellerCustomer.getProcInstId())) {
-			if (SellerCustomerQuery.me().findTotalInstId(sellerCustomer.getProcInstId()) < 3) {
-				renderAjaxResultForError("该客户正在审核中");
-				return false;
+			if (SellerCustomerQuery.me().findTotalInstId(sellerCustomer.getProcInstId()) != 0) {
+				return "该客户正在审核中";
 			}
 		}
 		
@@ -842,7 +834,7 @@ public class CustomerController extends BaseFrontController {
 		if (isCustomerAudit != null && isCustomerAudit.booleanValue()) {
 			
 			if (manager == null) {
-				return false;
+				return "没有设置审核主管";
 			}
 			
 			String defKey = Consts.PROC_CUSTOMER_REVIEW;
@@ -861,7 +853,7 @@ public class CustomerController extends BaseFrontController {
 		isUpdated = sellerCustomer.update();
 		
 		if (!isUpdated)
-			return false;
+			return "操作失败";
 		
 		Message message = new Message();
 		message.setFromUserId(user.getId());
@@ -889,7 +881,7 @@ public class CustomerController extends BaseFrontController {
 		}
 		MessageKit.sendMessage(Actions.ProcessMessage.PROCESS_MESSAGE_SAVE, message);
 		
-		return isUpdated;
+		return "";
 	}
 
 	private String getStatusName (int statusCode) {
@@ -910,7 +902,7 @@ public class CustomerController extends BaseFrontController {
 		return "";
 	}
 
-	private boolean doSave(SellerCustomer sellerCustomer, Customer customer, String areaCode, String areaName, String customerTypeIds,
+	private String doSave(SellerCustomer sellerCustomer, Customer customer, String areaCode, String areaName, String customerTypeIds,
 						   List<ImageJson>  list, List<String>  custTypeList, String status  ) {
 
 		boolean updated;
@@ -952,7 +944,7 @@ public class CustomerController extends BaseFrontController {
 		updated = customer.saveOrUpdate();
 
 		if (!updated) {
-			return false;
+			return "操作失败";
 		}
 
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
@@ -977,7 +969,7 @@ public class CustomerController extends BaseFrontController {
 
 		updated = sellerCustomer.saveOrUpdate();
 		if (!updated) {
-			return false;
+			return "操作失败";
 		}
 
 		CustomerJoinCustomerTypeQuery.me().deleteBySellerCustomerId(sellerCustomer.getId());
@@ -998,6 +990,10 @@ public class CustomerController extends BaseFrontController {
 
 		updated = userJoinCustomer.save();
 
+		if (!updated) {
+			return "操作失败";
+		}
+
 		List<Department>  departmentList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
 		String corpSellerId = departmentList.get(departmentList.size()-1).getStr("seller_id");
 
@@ -1008,8 +1004,11 @@ public class CustomerController extends BaseFrontController {
 
 		updated = customerJoinCorp.save();
 
-
-		return updated;
+		if (!updated) {
+			return "操作失败";
+		} else {
+			return "";
+		}
 	}
 	
 	public void detail() {
@@ -1113,7 +1112,7 @@ public class CustomerController extends BaseFrontController {
 		String selllerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(sellerCustomerId);
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		boolean updated = true;
+		boolean updated;
 
 		SellerCustomer sellerCustomer1 = SellerCustomerQuery.me().findBySellerId(selllerId, sellerCustomer.getCustomer().getId());
 
@@ -1135,6 +1134,11 @@ public class CustomerController extends BaseFrontController {
 
 			updated = sellerCustomer.save();
 
+			if (!updated) {
+				renderAjaxResultForError("操作失败");
+				return;
+			}
+
 			sellerCustomerId = sellerCustomer.getId();
 
 		} else sellerCustomerId = sellerCustomer1.getId();
@@ -1152,7 +1156,11 @@ public class CustomerController extends BaseFrontController {
 			CustomerJoinCustomerType customerJoinCustomerType = new CustomerJoinCustomerType();
 			customerJoinCustomerType.setSellerCustomerId(sellerCustomerId);
 			customerJoinCustomerType.setCustomerTypeId(customerTypeId);
-			customerJoinCustomerType.save();
+			updated = customerJoinCustomerType.save();
+			if (!updated){
+				renderAjaxResultForError("操作失败");
+				return;
+			}
 		}
 
 		UserJoinCustomer userJoinCustomer = new UserJoinCustomer();
@@ -1162,16 +1170,21 @@ public class CustomerController extends BaseFrontController {
 		userJoinCustomer.setDeptId(user.getDepartmentId());
 		userJoinCustomer.setDataArea(user.getDataArea());
 		updated = userJoinCustomer.save();
+		if (!updated){
+			renderAjaxResultForError("操作失败");
+			return;
+		}
 
 
 		Boolean isChecked = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_CUSTOMER_REVIEW + getSessionAttr("sellerCode"));
 		Map<String, Object> map = Maps.newHashMap();
 
+		String isUpdate = "";
 		if (isChecked)
-			updated = startProcess(sellerCustomerId, map, 2);
+			 isUpdate = startProcess(sellerCustomerId, map, 2);
 
-		if (updated) renderAjaxResultForSuccess("操作成功");
-		else renderAjaxResultForError("操作失败");
+		if (StrKit.isBlank(isUpdate)) renderAjaxResultForSuccess("操作成功");
+		else renderAjaxResultForError(isUpdate);
 
 	}
 }

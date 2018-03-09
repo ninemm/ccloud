@@ -95,7 +95,7 @@ public class SupplierQuery extends JBaseQuery {
 		String sql = "SELECT cs.* from cc_supplier cs "
 				+ " LEFT JOIN cc_brand cb on cb.supplier_id = cs.id "
 				+ " LEFT JOIN cc_seller_brand csb on csb.brand_id = cb.id "
-				+ "where csb.seller_id = ?";
+				+ "where csb.seller_id = ? GROUP BY cs.id";
 		return  DAO.find(sql, sellerId);
 	}
 }

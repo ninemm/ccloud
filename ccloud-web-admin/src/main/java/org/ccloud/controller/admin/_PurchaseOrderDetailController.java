@@ -104,7 +104,6 @@ public class _PurchaseOrderDetailController extends JBaseCRUDController<Purchase
 	}
 	
 	//采购订单生成
-	@Override
 	@Before(Tx.class)
 	public void save() {
 		final PurchaseOrder purchaseOrder =getModel(PurchaseOrder.class);
@@ -116,7 +115,7 @@ public class _PurchaseOrderDetailController extends JBaseCRUDController<Purchase
 		Date date = new Date();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
 		String str = sdf.format(date);
-		String porderSn = "PO"+seller.getSellerCode().substring(0, 6)+str.substring(0,8)+PurchaseOrderQuery.me().getNewSn();
+		String porderSn = "PO"+seller.getSellerCode().substring(0, 6)+str.substring(0,8)+PurchaseOrderQuery.me().getNewSn(seller.getId());
 		Date date1 = new Date();
 		String Id = StrKit.getRandomUUID();
 		purchaseOrder.set("id", Id);
@@ -134,7 +133,6 @@ public class _PurchaseOrderDetailController extends JBaseCRUDController<Purchase
 		purchaseOrder.set("data_area", user.getDataArea());
 		purchaseOrder.set("deal_date",StringUtils.getArrayFirst(paraMap.get("dealDate")));
 		purchaseOrder.set("create_date", date1);
-		purchaseOrder.save();
 		
 		String productNumStr = StringUtils.getArrayFirst(paraMap.get("productNum"));
 		Integer productNum = Integer.valueOf(productNumStr);
@@ -151,6 +149,7 @@ public class _PurchaseOrderDetailController extends JBaseCRUDController<Purchase
 			return;
 		}
 		
+		purchaseOrder.save();
 		Integer index = 0;
 		
 		for ( int count = 0 ;count<productNum;count++) {

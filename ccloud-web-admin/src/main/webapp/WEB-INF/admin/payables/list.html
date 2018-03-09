@@ -12,7 +12,8 @@
  	<script src="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.zh-CN.js"></script>
  	<!-- select2 -->
 	<script src="${CPATH}/static/plugins/select2/js/select2.js"></script>
-
+	<script src="${CPATH}/static/ladda/spin.min.js"></script>
+	<script src="${CPATH}/static/ladda/ladda.min.js"></script>
 </#macro>
 
 <#macro css_import>
@@ -24,7 +25,7 @@
 	<!-- bootstrap-table-->	
     <link rel="stylesheet" href="${CPATH}/static/plugins/bootstrap-table/bootstrap-table.css">
     <link rel="stylesheet" href="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.min.css">
-
+	<link rel="stylesheet" href="${CPATH}/static/ladda/ladda-themeless.min.css">
 </#macro>
 
 <#macro script>
@@ -38,6 +39,9 @@
 	var balance_amount = ${(balance_amount)!}; 
 
 	$(function(){
+		if($('.balance_amount').val()==0){
+	    	$("#save").attr("disabled",true);
+	    }
 		var url = '${CPATH}/admin/payables/list?ref_sn='+ref_sn;
 		jQuery.mm.initEditTable('#_payment_table', url, initParams, initFields(), null);
 		jQuery.mm.initDatetimepicker('form', '#biz_date', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
@@ -91,30 +95,41 @@
 	
 	
 	function doSubmit(){
-	$form.ajaxSubmit({
-		beforeSubmit: function() {
-			var validate = $form.data('bootstrapValidator');
-			validate.validate();
-			return validate.isValid()
-		},
-		type : "post", 
-		dataType : "json", 
-		success : function(data) {
-			if(data.errorCode == 0) {
-				//location.reload();
-				toastr.success(data.message, '操作成功');
-				var act_amount = $('input[name="act_amount"]').val();
-				balance_amount = balance_amount-act_amount;
-			    $('#_payment_table').bootstrapTable('refresh');
-			} else {
-				toastr.error(data.message,'操作失败');
+		var l = Ladda.create( document.querySelector( '#save' ) );	
+		$form.ajaxSubmit({
+			beforeSubmit: function() {
+				var validate = $form.data('bootstrapValidator');
+				validate.validate();
+				return validate.isValid();
+				if (validate.isValid()) {
+					l.start();
+				}
+			},
+			type : "post", 
+			dataType : "json", 
+			success : function(data) {
+				if(data.errorCode == 0) {
+					//location.reload();
+					l.stop();
+					toastr.success(data.message, '操作成功');
+					var act_amount = $('input[name="act_amount"]').val();
+					balance_amount = balance_amount-act_amount;
+				    $('#_payment_table').bootstrapTable('refresh');
+				     $('.act_amount').val(0);
+				    if($('.balance_amount').val()==0){
+				    	$("#save").attr("disabled",true);
+				    }
+				} else {
+					l.stop();
+					toastr.error(data.message,'操作失败');
+				}
+			},
+			error : function() {
+				l.stop();
+				alert("信息提交错误");
 			}
-		},
-		error : function() {
-			alert("信息提交错误");
-		}
-	});
-}
+		});
+	}
 
 $('input[name="act_amount"]').on("blur",function(){
 		var act_amount = $('input[name="act_amount"]').val();
@@ -172,7 +187,7 @@ $('input[name="act_amount"]').on("blur",function(){
 				<div class="col-sm-5  validata-box">
 					<label class="control-label col-sm-3">*付款金额:</label>
 					<div class="input-group  col-sm-7">
-						<input class="form-control input-sm" type="text" name="act_amount" value="${(act_amount)!}" placeholder="付款金额">
+						<input class="form-control input-sm act_amount" type="text" name="act_amount" value="${(act_amount)!}" placeholder="付款金额">
 					</div>
 				</div>
 			 </div>
@@ -186,7 +201,7 @@ $('input[name="act_amount"]').on("blur",function(){
 				<div class="col-sm-5 validata-box">
 					<label class="control-label col-sm-3">未付金额:</label>
 					<div class="input-group  col-sm-7">
-						<input class="form-control input-sm" type="text" name="balance_amount" value="${(balance_amount)!}" placeholder="未付金额" readonly>
+						<input class="form-control input-sm balance_amount" type="text" name="balance_amount" value="${(balance_amount)!}" placeholder="未付金额" readonly>
 					</div>
 				</div>
 			</div>

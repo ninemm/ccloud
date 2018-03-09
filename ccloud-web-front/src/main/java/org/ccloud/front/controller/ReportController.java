@@ -25,7 +25,10 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.CustomerType;
+import org.ccloud.model.CustomerVisit;
 import org.ccloud.model.SalesOrder;
+import org.ccloud.model.User;
+import org.ccloud.model.UserJoinCustomer;
 import org.ccloud.model.query.*;
 import org.ccloud.route.RouterMapping;
 
@@ -62,6 +65,11 @@ public class ReportController extends BaseFrontController {
 	public void mySeller() {
 		render("mySeller.html");
 	}	
+	
+	public void customerVisitReport() {
+		setAttr("deliveryDate", DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
+		render("report_customer_visit.html");
+	}
 	
 	public void managerReport() {
 		render("manager_report.html");
@@ -535,4 +543,53 @@ public class ReportController extends BaseFrontController {
 		renderJson(record);		
 	}
 	
+	//业务员统计客户数、客户总拜访数
+	public void customerInfoCount() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		List<UserJoinCustomer> userJoinCustomers = UserJoinCustomerQuery.me().findbyUserId(user.getId()); 
+		List<CustomerVisit> customerVisits =  CustomerVisitQuery.me().getToDo(user.getUsername());
+		
+		List<Map<String, Object>> customeVisitList = new ArrayList<>();
+		Map<String, Object> item = new HashMap<>();
+		item.put("customerCount", userJoinCustomers.size());
+		item.put("customerVisitCount", customerVisits.size());
+		customeVisitList.add(item);
+		renderJson(customeVisitList);
+	}
+	//统计已拜访客户数、未拜访的客户数
+	public void customerVisitCount() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String dayTag = getPara("dayTag");
+		int customerVisitNum = CustomerVisitQuery.me().findByUserId(user.getId(),dayTag);
+		int customerNum = CustomerVisitQuery.me().getToDo(user.getUsername()).size();
+		List<Map<String, Object>> customeVisitList = new ArrayList<>();
+		for(int i = 0 ; i < 2 ; i++) {
+			Map<String, Object> item = new HashMap<>();
+			if(i == 0) {
+				item.put("name", "已拜访数");
+				item.put("value", customerVisitNum);
+			}else {
+				item.put("name", "未拜访数");
+				item.put("value", customerNum-customerVisitNum);
+			}
+			customeVisitList.add(item);
+		}
+		renderJson(customeVisitList);
+	}
+	//统计多次拜访
+	public void visitMoreInfo() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String dayTag = getPara("dayTag");
+		List<Record> lists = CustomerVisitQuery.me().getByUserId(user.getId(),dayTag);
+		renderJson(lists);
+	}
+	
+	//统计不同拜访订单金额的平均值 统计已经出库的订单
+	public void getSales() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String dayTag = getPara("dayTag");
+		List<Record> lists = CustomerVisitQuery.me().getAmountByUserId(user.getId(),dayTag);
+		renderJson(lists);
+	}
 }
+

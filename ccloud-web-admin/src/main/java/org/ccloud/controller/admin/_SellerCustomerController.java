@@ -146,21 +146,21 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 				sellerCustomer.setIsEnabled(isEnabled);
 				if (sellerCustomer.saveOrUpdate()) renderAjaxResultForSuccess("操作成功");
 				else renderAjaxResultForError("操作失败");
-			}
+			} else renderAjaxResultForError("该客户不存在");
 			return;
 		}
 
 		if(StrKit.notBlank(id)) {
 
-			boolean updated = startProcess(id, new HashMap<String, Object>(), 1);
+			String updated = startProcess(id, new HashMap<String, Object>(), 1);
 
-			if (updated) {
+			if (StrKit.isBlank(updated)) {
 				renderAjaxResultForSuccess("操作成功");
 			} else {
-				renderAjaxResultForError("操作失败");
+				renderAjaxResultForError(updated);
 			}
 		}else {
-			renderError(500);
+			renderAjaxResultForError("该客户不存在");
 		}
 	}
 
@@ -183,7 +183,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			custTypeNameList.add(CustomerTypeQuery.me().findById(customerType).getStr("name"));
 
 		Map<String, Object> map = Maps.newHashMap();
-		boolean updated = true;
+		String updated = "";
 
 		Boolean isCustomerReview = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_CUSTOMER_REVIEW + getSessionAttr("sellerCode"));
 		boolean isChecked = (isCustomerReview != null && isCustomerReview) ? true : false;
@@ -194,10 +194,9 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			if (persiste != null) {
 				customer.setId(persiste.getId());
 			}
-			updated = customer.saveOrUpdate();
 
-			if (!updated) {
-				renderError(500);
+			if (!customer.saveOrUpdate()) {
+				renderAjaxResultForError("操作失败");
 				return;
 			}
 
@@ -214,10 +213,8 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			sellerCustomer.setDataArea(deptDataArea);
 			sellerCustomer.setDeptId(department.getId());
 
-			updated = sellerCustomer.saveOrUpdate();
-
-			if (!updated) {
-				renderError(500);
+			if (!sellerCustomer.saveOrUpdate()) {
+				renderAjaxResultForError("操作失败");
 				return;
 			}
 
@@ -228,7 +225,10 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 				CustomerJoinCustomerType ccType = new CustomerJoinCustomerType();
 				ccType.setSellerCustomerId(sellerCustomerId);
 				ccType.setCustomerTypeId(custType);
-				ccType.save();
+				if(!ccType.save()) {
+					renderAjaxResultForError("操作失败");
+					return;
+				}
 			}
 
 			String _userIds = getPara("userIds");
@@ -253,10 +253,11 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 				uCustomer.setDeptId(persist.getDepartmentId());
 				uCustomer.setDataArea(persist.getDataArea());
 
-				uCustomer.save();
+				if (!uCustomer.save()){
+					renderAjaxResultForError("操作失败");
+					return;
+				}
 			}
-
-			renderAjaxResultForSuccess("操作成功");
 
 			List<Department>  departmentList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
 			String corpSellerId = departmentList.get(departmentList.size()-1).getStr("seller_id");
@@ -266,7 +267,8 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			customerJoinCorp.setCustomerId(customer.getId());
 			customerJoinCorp.setSellerId(corpSellerId);
 
-			updated = customerJoinCorp.save();
+			if (customerJoinCorp.save()) renderAjaxResultForSuccess("操作成功");
+			else renderAjaxResultForError("操作失败");
 			return;
 		}
 
@@ -274,6 +276,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 
 			CustomerVO temp = new CustomerVO();
 			temp.setAreaCode(customer.getProvCode() + "," + customer.getCityCode() + "," + customer.getCountryCode());
+			if(temp.getAreaCode().equals(",,")) temp.setAreaCode("");
 			temp.setAreaName(customer.getProvName() + "," + customer.getCityName() + "," + customer.getCountryName());
 			temp.setCustTypeList(Arrays.asList(customerTypes));
 
@@ -297,10 +300,9 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			if (persiste != null) {
 				customer.setId(persiste.getId());
 			}
-			updated = customer.saveOrUpdate();
 
-			if (!updated) {
-				renderError(500);
+			if (!customer.saveOrUpdate()) {
+				renderAjaxResultForError("操作失败");
 				return;
 			}
 
@@ -316,10 +318,8 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			sellerCustomer.setDataArea(deptDataArea);
 			sellerCustomer.setDeptId(department.getId());
 
-			updated = sellerCustomer.saveOrUpdate();
-
-			if (!updated) {
-				renderError(500);
+			if (!sellerCustomer.saveOrUpdate()) {
+				renderAjaxResultForError("操作失败");
 				return;
 			}
 
@@ -327,7 +327,10 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 				CustomerJoinCustomerType ccType = new CustomerJoinCustomerType();
 				ccType.setSellerCustomerId(sellerCustomer.getId());
 				ccType.setCustomerTypeId(custType);
-				ccType.save();
+				if (!ccType.save()){
+					renderAjaxResultForError("操作失败");
+					return;
+				}
 			}
 
 			UserJoinCustomer userJoinCustomer = new UserJoinCustomer();
@@ -337,7 +340,10 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			userJoinCustomer.setDeptId(user.getDepartmentId());
 			userJoinCustomer.setDataArea(user.getDataArea());
 
-			updated = userJoinCustomer.save();
+			if(!userJoinCustomer.save()){
+				renderAjaxResultForError("操作失败");
+				return;
+			}
 
 			List<Department>  departmentList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
 			String corpSellerId = departmentList.get(departmentList.size()-1).getStr("seller_id");
@@ -347,21 +353,19 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			customerJoinCorp.setCustomerId(customer.getId());
 			customerJoinCorp.setSellerId(corpSellerId);
 
-			updated = customerJoinCorp.save();
-		}
-
-		if (!updated) {
-			renderError(404);
-			return ;
+			if (!customerJoinCorp.save()){
+				renderAjaxResultForError("操作失败");
+				return;
+			}
 		}
 
 		if(isChecked)
 		updated = startProcess(sellerCustomer.getId(), map, 0);
 
-		if (updated)
+		if (StrKit.isBlank(updated))
 			renderAjaxResultForSuccess("操作成功");
 		else
-			renderAjaxResultForError("操作失败");
+			renderAjaxResultForError(updated);
 	}
 
 	public void user_tree() {
@@ -706,6 +710,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 				.join(sellerCustomer.getStr("prov_code")
 					, sellerCustomer.getStr("city_code")
 					, sellerCustomer.getStr("country_code"));
+			if(areaCode.equals(",,")) areaCode = "";
 			src.setAreaCode(areaCode);
 			List<String> diffAttrList = BeanCompareUtils.contrastObj(src, dest);
 			setAttr("diffAttrList", diffAttrList);
@@ -902,22 +907,19 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			renderAjaxResultForError("操作失败");
 	}
 
-	private boolean startProcess(String customerId, Map<String, Object> param, int isEnable) {
+	private String startProcess(String customerId, Map<String, Object> param, int isEnable) {
 
 		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(customerId);
 		boolean isUpdated = true;
-//		Boolean isCustomerAudit = OptionQuery.me().findValueAsBool("isCustomerAudit");
 		Boolean isCustomerAudit = true;
 
 		if (sellerCustomer == null) {
-			renderError(404);
-			return false;
+			return "该客户不存在";
 		}
 
 		if(StrKit.notBlank(sellerCustomer.getProcInstId())) {
-			if (SellerCustomerQuery.me().findTotalInstId(sellerCustomer.getProcInstId()) < 3) {
-				renderError(500);
-				return false;
+			if (SellerCustomerQuery.me().findTotalInstId(sellerCustomer.getProcInstId()) != 0) {
+				return "该客户正在审核中";
 			}
 		}
 
@@ -928,7 +930,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		if (isCustomerAudit != null && isCustomerAudit.booleanValue()) {
 
 			if (manager == null) {
-				return false;
+				return "没有设置审核主管";
 			}
 
 			String defKey = Consts.PROC_CUSTOMER_REVIEW;
@@ -946,7 +948,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		isUpdated = sellerCustomer.update();
 
 		if (!isUpdated)
-			return false;
+			return "操作失败";
 
 		Message message = new Message();
 		message.setFromUserId(user.getId());
@@ -971,7 +973,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		}
 		MessageKit.sendMessage(Actions.ProcessMessage.PROCESS_MESSAGE_SAVE, message);
 
-		return isUpdated;
+		return "";
 	}
 
 }

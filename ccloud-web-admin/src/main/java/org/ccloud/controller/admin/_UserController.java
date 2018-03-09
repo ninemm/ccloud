@@ -472,48 +472,52 @@ public class _UserController extends JBaseCRUDController<User> {
 		Department dept = DepartmentQuery.me().findById(deptId);
 		
 		ImportParams params = new ImportParams();
-
+		params.setReadRows(99);//一次读100条
 		List<UserExecel> list = ExcelImportUtil.importExcel(file, UserExecel.class, params);
 		String  username = "";
-		for (UserExecel excel : list) {
-			String userId = "";
-			User us = null;
-			UserGroupRel userGroupRel = null;
-			User user = UserQuery.me()._findUserByUsername(excel.getUsername());
-			if(user !=null) {
-				username +=excel.getUsername()+"、";
-				errorCnt++;
-				continue;
-			}
-			// 检查用户是否存在
-			us = UserQuery.me().findByMobileAndDeptId(excel.getMobile(),deptId);
-			Group group = GroupQuery.me().findDataAreaAndGroupName(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString(), excel.getUserGroup());
-			if (us == null) {
-				us = new User();
-				userId = StrKit.getRandomUUID();
-				us.set("id", userId);
-				this.setUser(us, excel);
-				us.set("create_date", new Date());
-				us.set("group_name",excel.getUserGroup());
-				us.set("username", excel.getUsername());
-				String dataArea = DataAreaUtil.dataAreaSetByUser(dept.getDataArea());
-				us.set("data_area", dataArea);
-				us.set("salt", EncryptUtils.salt());
-				us.set("password", EncryptUtils.encryptPassword("123456", us.getSalt()));
-				us.set("department_id", deptId);
-				us.set("department_name", dept.getDeptName());
-				us.save();
+		while(list.size()>0) {
+			for (UserExecel excel : list) {
+				String userId = "";
+				User us = null;
+				UserGroupRel userGroupRel = null;
+				User user = UserQuery.me()._findUserByUsername(excel.getUsername());
+				if(user !=null) {
+					username +=excel.getUsername()+"、";
+					errorCnt++;
+					continue;
+				}
+				// 检查用户是否存在
+				us = UserQuery.me().findByMobileAndDeptId(excel.getMobile(),deptId);
+				Group group = GroupQuery.me().findDataAreaAndGroupName(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString(), excel.getUserGroup());
+				if (us == null) {
+					us = new User();
+					userId = StrKit.getRandomUUID();
+					us.set("id", userId);
+					this.setUser(us, excel);
+					us.set("create_date", new Date());
+					us.set("group_name",excel.getUserGroup());
+					us.set("username", excel.getUsername());
+					String dataArea = DataAreaUtil.dataAreaSetByUser(dept.getDataArea());
+					us.set("data_area", dataArea);
+					us.set("salt", EncryptUtils.salt());
+					us.set("password", EncryptUtils.encryptPassword("123456", us.getSalt()));
+					us.set("department_id", deptId);
+					us.set("department_name", dept.getDeptName());
+					us.save();
+					
+					userGroupRel = new UserGroupRel();
+					userGroupRel.set("id",StrKit.getRandomUUID());
+					userGroupRel.set("user_id", userId);
+					userGroupRel.set("group_id", group.getId());
+					userGroupRel.save();
+					inCnt++;
+				} else {
+					existCnt++;
+				}
 				
-				userGroupRel = new UserGroupRel();
-				userGroupRel.set("id",StrKit.getRandomUUID());
-				userGroupRel.set("user_id", userId);
-				userGroupRel.set("group_id", group.getId());
-				userGroupRel.save();
-				inCnt++;
-			} else {
-				existCnt++;
 			}
-
+			params.setStartRows(params.getStartRows() + list.size());
+			list = ExcelImportUtil.importExcel(file, UserExecel.class, params);
 		}
 		Map<String, Object> map = new HashMap<>();
 		map.put("inCnt", inCnt);

@@ -68,6 +68,17 @@
                 <div class="weui-grid__icon"><i class="icon-bar-chart"></i></div>
                 <p class="weui-grid__label">销售排行</p>
             </a>
+        </div>    
+        <div class="weui-cells__title">
+            <div class="weui-flex">
+                <div class="weui-flex__item"><b>客户拜访</b></div>
+            </div>
+        </div>
+        <div class="weui-grids">
+            <a href="${CPATH}/report/customerVisitReport" class="weui-grid js_grid">
+                <div class="weui-grid__icon"><i class="icon-line-chart"></i></div>
+                <p class="weui-grid__label">拜访报表</p>
+            </a>
         </div>         
         </@shiro.hasPermission>
         <@shiro.hasPermission name="/report/userManager">

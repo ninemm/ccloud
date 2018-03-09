@@ -63,7 +63,7 @@
 
     var imageArr = [];
     var count = 3;
-    var $picNum = $('.weui-uploader__info');
+    var $picNum = $('#weui-uploader__info');
     var $uploaderFiles = $('#uploaderFiles');
     var $gallery = $("#gallery"), $galleryImg = $("#galleryImg");
 
@@ -86,12 +86,12 @@
             var arrNum = imageArr.length;
             var num = arrNum + files.length;
 
-            if (num > count) {
+            if ($("#uploaderFiles")[0].children.length + 1 > count) {
                 $.alert("最多上传三张图片");
                 return false;
             }
 
-            $picNum.text(num + '/' + count);
+            $picNum.text($("#uploaderFiles")[0].children.length + 1 + '/' + count);
 
             for (var i = 0; i < files.length; i ++) {
                 var file = files[i];
@@ -218,7 +218,9 @@
         //删除图片  删除图片的代码也贴出来。
         $(".weui-gallery__del").click(function() { //这部分刚才放错地方了，放到$(function(){})外面去了
             $uploaderFiles.find("li").eq(index).remove();
-            imageArr = imageArr.splice(index, 1);
+            $picNum.text($("#uploaderFiles")[0].children.length + '/' + count);
+            imageArr.splice(index, 1);
+            $("#pic").val(JSON.stringify(imageArr));
         });
     });
 
@@ -538,7 +540,7 @@
                         <div class="weui-uploader">
                             <div class="weui-uploader__hd">
                                 <p class="weui-uploader__title">附件图片</p>
-                                <div class="weui-uploader__info">0/3</div>
+                                <div class="weui-uploader__info" id="weui-uploader__info">0/3</div>
                             </div>
                             <div class="weui-uploader__bd">
                                 <ul class="weui-uploader__files" id="uploaderFiles"></ul>
