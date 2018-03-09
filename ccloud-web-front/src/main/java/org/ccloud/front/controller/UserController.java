@@ -194,7 +194,7 @@ public class UserController extends BaseFrontController {
 			setAttr("avatar", wxUserResult.getStr("headimgurl"));
 			setAttr("nickname", wxUserResult.getStr("nickname"));
 		}
-		
+
 		render("user_bind.html");
 	}
 	
@@ -395,7 +395,7 @@ public class UserController extends BaseFrontController {
 	public void getQrcode()
 	{
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String str = "{\"expire_seconds\": 604800, \"action_name\": \"QR_SCENE\", \"action_info\": {\"scene\": {\"scene_id\":" + user.getMobile() + "}}}";
+		String str = "{\"expire_seconds\": 604800, \"action_name\": \"QR_STR_SCENE\", \"action_info\": {\"scene\": {\"scene_str\":\"" + user.getId() + "\"}}}";
 		ApiResult apiResult = QrcodeApi.create(str);
 		renderText(apiResult.getJson());
 	}

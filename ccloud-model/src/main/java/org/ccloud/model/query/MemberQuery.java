@@ -81,7 +81,7 @@ public class MemberQuery extends JBaseQuery {
 		sqlBuilder.append("from `cc_customer` c ");
 		sqlBuilder.append("join cc_seller_customer sc on c.id = sc.customer_id ");
 		sqlBuilder.append("join cc_user_join_customer ujc on sc.id = ujc.seller_customer_id ");
-		sqlBuilder.append("where c.mobile = ? AND sc.status = 1 AND ujc.user_id = ?");
+		sqlBuilder.append("where c.mobile = ? AND sc.is_enabled = 1 AND ujc.user_id = ?");
 		return Db.find(sqlBuilder.toString(), mobile, sales_id);
 	}
 }

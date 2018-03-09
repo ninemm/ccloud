@@ -15,6 +15,7 @@ package org.ccloud.controller.member;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.jfinal.aop.Before;
 import com.jfinal.aop.Clear;
 import com.jfinal.core.ActionKey;
 import com.jfinal.kit.LogKit;
@@ -35,6 +36,7 @@ import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.CookieUtils;
 import org.ccloud.utils.EncryptUtils;
 import org.ccloud.utils.StringUtils;
+import org.ccloud.wechat.WechatUserInterceptor;
 
 import java.math.BigInteger;
 import java.sql.SQLException;
@@ -44,6 +46,7 @@ import java.util.List;
 @RouterMapping(url = "/member/member")
 public class MemberController extends BaseFrontController {
 
+	@Before(WechatUserInterceptor.class)
 	public void auth() {
 
 		String openId = null;
@@ -82,7 +85,7 @@ public class MemberController extends BaseFrontController {
 						renderError(500);
 						return;
 					}
-					setSessionAttr(Consts.SESSION_LOGINED_USER, member);
+					setSessionAttr(Consts.SESSION_LOGINED_MEMBER, member);
 				} else {
 					LogKit.warn("user info get failure");
 				}
@@ -158,15 +161,20 @@ public class MemberController extends BaseFrontController {
 						member.setWechatOpenId(openId);
 						member.setStatus(1);
 						member.setCreateDate(createDate);
-						if (!member.saveOrUpdate()) {
+						if (!member.save()) {
 							ret.set("message", "手机号绑定失败，请联系管理员");
 							return false;
 						}
 					}else {
+						member.setNickname(wxUserResult.getStr("nickname"));
+						member.setAvatar(wxUserResult.getStr("headimgurl"));
+						member.setWechatOpenId(openId);
+						member.update();
 						memberId = member.getId();
 					}
 
-					List<Department> deptList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(sales_id);
+					User sales = UserQuery.me().findById(sales_id);
+					List<Department> deptList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(sales.getDepartmentId());
 					String dealerDataArea = DepartmentQuery.me().getDealerDataArea(deptList);
 					Seller seller = SellerQuery.me()._findByDataArea(dealerDataArea);
 					MemberJoinSeller memberJoinSeller = new MemberJoinSeller();
@@ -175,11 +183,11 @@ public class MemberController extends BaseFrontController {
 					memberJoinSeller.setUserId(sales_id);
 					memberJoinSeller.setStatus(1);
 					memberJoinSeller.setCreateDate(createDate);
-					if (!memberJoinSeller.saveOrUpdate()) {
+					if (!memberJoinSeller.save()) {
 						ret.set("message", "手机号绑定失败，请联系管理员");
 						return false;
 					}
-					setSessionAttr(Consts.SESSION_LOGINED_USER, member);
+					setSessionAttr(Consts.SESSION_LOGINED_MEMBER, member);
 				}
 				return true;
 			}
@@ -202,7 +210,7 @@ public class MemberController extends BaseFrontController {
 			setAttr("avatar", wxUserResult.getStr("headimgurl"));
 			setAttr("nickname", wxUserResult.getStr("nickname"));
 		}
-
+		setAttr("scene_str", getPara("scene_str"));
 		render("member_bind.html");
 	}
 

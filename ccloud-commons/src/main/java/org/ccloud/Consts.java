@@ -276,4 +276,5 @@ public class Consts {
 	
 	public static final String WAREHOUSE_IDS_IS_NULL = "1";//当用户没有分配仓库时且不是经管时返回空值的仓库ID
 
+	public static final String SESSION_LOGINED_MEMBER = "_logined_member";
 }
