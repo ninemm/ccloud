@@ -167,7 +167,7 @@ public class ActivityController extends BaseFrontController {
 		List<Map<String, Object>> details = new ArrayList<>();
 		for(ExpenseDetail detail:expenseDetails) {
 			Map<String, Object> item = new HashMap<>();
-			item.put("title", DictQuery.me().findByKey(detail.getFlowDictType(), detail.getItem1()).getName());
+			item.put("title", getExpenseTitle(detail));
 			item.put("value", detail.getId());
 			details.add(item);
 		}
@@ -178,6 +178,18 @@ public class ActivityController extends BaseFrontController {
 		setAttr("areaType", activity.getStr("area_type"));
 		setAttr("details",JSON.toJSON(details));
 		render("activity_apply.html");
+	}
+	
+	private String getExpenseTitle(ExpenseDetail detail) {
+		String type = DictQuery.me().findByKey(detail.getFlowDictType(), detail.getItem1()).getName();
+		if (detail.getFlowDictType().equals(Consts.FLOW_DICT_TYPE_NAME_DISPLAY)) {
+			String disType = DictQuery.me().findByKey(detail.getDisplayDictType(), detail.getItem2()).getName();
+			type = type + ":" + disType;
+		} else if(detail.getFlowDictType().equals(Consts.FLOW_DICT_TYPE_NAME_CHANNEL) || detail.getFlowDictType().equals(Consts.FLOW_DICT_TYPE_NAME_SA)) {
+			String productName = SellerProductQuery.me().findById(detail.getItem2()).getCustomName();
+			type = type + ":" + productName;
+		}
+		return type;
 	}
 
 	public void apply() {
@@ -191,15 +203,15 @@ public class ActivityController extends BaseFrontController {
 		Boolean startProc = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_ACTIVITY_APPLY + sellerCode);
 		String[] expenseDetailIds = getParaValues("expense_detail_id");
 		String[] activity_ids = getParaValues("activity_id");
-		String applyNum = getPara("apply_num");
-		String applyAmount = getPara("apply_amount");
+		String[] applyNum = getParaValues("apply_num");
+		String[] applyAmount = getParaValues("apply_amount");
 		if(expenseDetailIds!=null) {
 			expenseDetailIds = getParaValues("expense_detail_id")[0].split(",");
-			for(String expenseDetailId: expenseDetailIds ) {
+			for(int j = 0; j < expenseDetailIds.length; j++) {
 				for (String sellerCustomerId : sellerCustomerIdArray) {
 					for (int i = 0; i < activity_ids.length; i++) {
 						//活动申请check
-						String result = this.check(activity_ids[i], sellerCustomerId, sellerCustomerNameArray[i],user.getId(),expenseDetailId);
+						String result = this.check(activity_ids[i], sellerCustomerId, sellerCustomerNameArray[i],user.getId(),expenseDetailIds[j]);
 						
 						if(StrKit.notBlank(result)) {
 							renderAjaxResultForError(result);
@@ -212,8 +224,8 @@ public class ActivityController extends BaseFrontController {
 						activityApply.setActivityId(activity_ids[i]);
 						activityApply.setSellerCustomerId(sellerCustomerId);
 						activityApply.setBizUserId(user.getId());
-						activityApply.setApplyNum(new BigDecimal(applyNum));
-						activityApply.setApplyAmount(new BigDecimal(applyAmount));
+						activityApply.setApplyNum(new BigDecimal(applyNum[j]));
+						activityApply.setApplyAmount(new BigDecimal(applyAmount[j]));
 						activityApply.setNum(0);
 						activityApply.setContent(content);
 						
@@ -232,7 +244,7 @@ public class ActivityController extends BaseFrontController {
 						
 						activityApply.setDataArea(user.getDataArea());
 						activityApply.setCreateDate(createDate);
-						activityApply.setExpenseDetailId(expenseDetailId);
+						activityApply.setExpenseDetailId(expenseDetailIds[j]);
 						activityApply.save();
 					}
 				}
@@ -256,8 +268,8 @@ public class ActivityController extends BaseFrontController {
 					activityApply.setBizUserId(user.getId());
 					activityApply.setNum(0);
 					activityApply.setContent(content);
-					activityApply.setApplyNum(new BigDecimal(applyNum));
-					activityApply.setApplyAmount(new BigDecimal(applyAmount));
+					activityApply.setApplyNum(new BigDecimal(applyNum[0]));
+					activityApply.setApplyAmount(new BigDecimal(applyAmount[0]));
 					
 					if (startProc != null && startProc) {
 						activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_WAIT);
@@ -692,5 +704,39 @@ public class ActivityController extends BaseFrontController {
 		Map<String, Object> map = new HashMap<>();
 		map.put("customerList", customerList.getList());
 		renderJson(map);
+	}
+	
+	//获取活动明细剩余可申请金额与数量
+	public void getSurplusInfo() {
+		String id = getPara("ids");
+		String[] ids = new String [] {};
+		if (id != null) {
+			ids = id.split(",");
+		}
+		List<Map<String, String>> list = new ArrayList<>();
+		for (int i = 0; i < ids.length; i++) {
+			if (StrKit.isBlank(ids[i])) {
+				continue;
+			}
+			ExpenseDetail detail = ExpenseDetailQuery.me().findSurplusById(ids[i]);
+			Map<String, String> map = new HashMap<>();
+			if (detail.getFlowDictType().equals(Consts.FLOW_DICT_TYPE_NAME_PR) || detail.getFlowDictType().equals(Consts.FLOW_DICT_TYPE_NAME_RAISE)
+					||detail.getFlowDictType().equals(Consts.FLOW_DICT_TYPE_NAME_AD) || detail.getFlowDictType().equals(Consts.FLOW_DICT_TYPE_NAME_GIFT)) {
+				map.put("num", null);
+				BigDecimal surplusMoney = new BigDecimal(detail.getItem2()).subtract(new BigDecimal(detail.get("amount").toString()));
+				map.put("amount", surplusMoney.toString());
+			} else if(detail.getFlowDictType().equals(Consts.FLOW_DICT_TYPE_NAME_DISPLAY) || detail.getFlowDictType().equals(Consts.FLOW_DICT_TYPE_NAME_CHANNEL)) {
+				BigDecimal surplusMoney = new BigDecimal(detail.getItem4()).subtract(new BigDecimal(detail.get("amount").toString()));
+				BigDecimal surplusNum = new BigDecimal(detail.getItem3()).subtract(new BigDecimal(detail.get("num").toString()));
+				map.put("num", surplusNum.toString());
+				map.put("amount", surplusMoney.toString());
+			} else {
+				BigDecimal surplusMoney = new BigDecimal(detail.getItem3()).subtract(new BigDecimal(detail.get("amount").toString()));
+				map.put("num", null);
+				map.put("amount", surplusMoney.toString());
+			}
+			list.add(map);
+		}
+		renderJson(list);
 	}
 }
