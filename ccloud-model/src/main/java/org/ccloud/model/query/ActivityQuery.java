@@ -258,7 +258,7 @@ public class ActivityQuery extends JBaseQuery {
 	}
 	
 	public Record findByApplyId(String applyId) {
-		String sql = "SELECT cc.customer_name,cc.contact,cc.mobile,cc.prov_name,cc.city_name,cc.country_name,ca.title,t1.`name` from cc_activity_apply caa " + 
+		String sql = "SELECT cc.customer_name,cc.contact,cc.mobile,cc.prov_name,cc.city_name,cc.country_name,ca.title,t1.`name` as expenseDetailName from cc_activity_apply caa " + 
 				"LEFT JOIN cc_activity ca on ca.id = caa.activity_id " + 
 				"LEFT JOIN cc_seller_customer csc on csc.id = caa.seller_customer_id " + 
 				"LEFT JOIN cc_customer cc on cc.id = csc.customer_id " + 
