@@ -2121,7 +2121,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		salesOrder.setSellerId(sellerId);
 		salesOrder.setBizUserId(userId);
 		salesOrder.setCustomerTypeId(customerType);
-		salesOrder.setCustomerId(moreInfo.get("customerId"));
+		salesOrder.setCustomerId(SellerCustomerQuery.me().findBySellerId(sellerId, moreInfo.get("customerId")).getId());
 		salesOrder.setContact(moreInfo.get("contact"));
 		salesOrder.setMobile(moreInfo.get("mobile"));
 		salesOrder.setAddress(moreInfo.get("address"));

@@ -31,7 +31,7 @@ public class OrderController extends BaseFrontController {
 
 	public void getCustomerType() {
 		String memberId = "98ef315d484d435fa2845d1ed9762912";
-		String customerId = "33bdc967c98f42c18f43339023fa7141";
+		String customerId = "6e399783ede44d7fb18e81969bc71add";
 
 		JSONArray productList = JSON.parseArray(getPara("productList"));
 		List<String> sellProductIdList = new ArrayList<>();
@@ -78,10 +78,10 @@ public class OrderController extends BaseFrontController {
 			@Override
 			public boolean run() throws SQLException {
 				String memberId = "98ef315d484d435fa2845d1ed9762912";
-				String customerId = "33bdc967c98f42c18f43339023fa7141";
 
 				Map<String, String[]> paraMap = getParaMap();
 
+				//存储通用的数据
 				Map<String, String> moreInfo = new HashMap<>();
 				moreInfo.put("remark", StringUtils.getArrayFirst(paraMap.get("remark")));
 				moreInfo.put("customerId", StringUtils.getArrayFirst(paraMap.get("customerId")));
@@ -136,6 +136,8 @@ public class OrderController extends BaseFrontController {
 					moreInfo.remove("totalNum");
 					moreInfo.put("total", Double.valueOf(total).toString());
 					moreInfo.put("totalNum", Double.valueOf(totalNum).toString());
+
+					//一个sellerId去生产一个订单
 					String result = saveOrder(paraList, moreInfo, user, sellerId, sellerCode, memberId);
 
 					if (StrKit.notBlank(result)) {

@@ -82,7 +82,7 @@ public class ProductController extends BaseFrontController {
 
 	public void order() {
 		String memberId = "98ef315d484d435fa2845d1ed9762912";
-		String customerId = "33bdc967c98f42c18f43339023fa7141";
+		String customerId = "6e399783ede44d7fb18e81969bc71add";
 
 		setAttr("customerInfo", JSON.toJSONString(CustomerQuery.me().findById(customerId)));
 		setAttr("deliveryDate", DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
