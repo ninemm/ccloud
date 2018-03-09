@@ -247,7 +247,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				ActivityExecute activityExecute = new ActivityExecute();
 				activityExecute.setId(StrKit.getRandomUUID());
 				activityExecute.setActivityId(activity.getId());
-				activityExecute.setOrderList(Integer.valueOf(getPara("orderList"+(i+1))));
+				activityExecute.setOrderList(getPara("orderList"+(i+1)));
 				activityExecute.setRemark(getPara("remark"+(i+1)));
 				activityExecute.save();
 			}

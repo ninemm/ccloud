@@ -106,12 +106,12 @@ public abstract class BaseActivityExecute<M extends BaseActivityExecute<M>> exte
 		return getStr("activity_id");
 	}
 
-	public void setOrderList(java.lang.Integer orderList) {
+	public void setOrderList(java.lang.String orderList) {
 		set("order_list", orderList);
 	}
 
-	public java.lang.Integer getOrderList() {
-		return getInt("order_list");
+	public java.lang.String getOrderList() {
+		return getStr("order_list");
 	}
 
 	public void setRemark(java.lang.String remark) {
