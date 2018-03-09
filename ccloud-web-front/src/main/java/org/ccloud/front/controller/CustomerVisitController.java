@@ -753,7 +753,8 @@ public class CustomerVisitController extends BaseFrontController {
 		String imageListStore = customerVisit.getStr("photo");
 		List<ImageJson> list = JSON.parseArray(imageListStore, ImageJson.class);
 		if(!customerVisit.getStr("active_apply_id").equals("")) {
-			setAttr("activityExecute",JSON.toJSON(ActivityExecuteQuery.me().findbyActivityId(ActivityApplyQuery.me().findById(customerVisit.getStr("active_apply_id")).getActivityId())));
+			List<ActivityExecute> activityExecutes = ActivityExecuteQuery.me().findbyActivityId(ActivityApplyQuery.me().findById(customerVisit.getStr("active_apply_id")).getActivityId());
+			setAttr("activityExecute",activityExecutes);
 		}
 		setAttr("list",JSON.toJSON(list));
 		setAttr("domain",OptionQuery.me().findValue("cdn_domain"));

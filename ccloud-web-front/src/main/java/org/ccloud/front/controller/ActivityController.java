@@ -543,6 +543,7 @@ public class ActivityController extends BaseFrontController {
 		DecimalFormat df   = new DecimalFormat("######0.00");
 		StringBuilder html = new StringBuilder();
 		for (Record apply : applyList.getList()) {
+			List<ActivityExecute> activityExecutes = ActivityExecuteQuery.me().findbyActivityId(apply.getStr("activity_id"));
 			html.append("<section>\n");
 			html.append("<div class=\"weui-cells__title\"></div>");
 
@@ -582,6 +583,27 @@ public class ActivityController extends BaseFrontController {
 					"                                <p>");
 			if(apply.get("invest_amount")!=null) html.append(df.format(Double.parseDouble(apply.get("invest_amount").toString())));
 			else html.append("0.00");
+			if(activityExecutes.size()>0) {
+				html.append("						</div>\n"+
+						"						</div>\n"+
+						"                        <div class=\"weui-flex\">\n" +
+						"                            <div class=\"weui-flex__item\">\n" +
+						"                                <p>开始日期</p>\n" +
+						"                                <p>" + apply.getStr("start_time") + "</p>\n" +
+						"                            </div>\n" +
+						"                            <div class=\"weui-flex__item\">\n" +
+						"                                <p>结束日期</p>\n" +
+						"                                <p>" + apply.getStr("end_time") + "</p>\n" +
+						"                            </div>\n" +
+						"                            <div class=\"weui-flex__item\">\n" +
+						"                                <p>活动类型</p>\n" +
+						"                                <p>" + apply.getStr("name") + "</p>\n" +
+						"                            </div>\n" +
+						"                            <div class=\"weui-flex__item\">\n" +
+						"                                <p>预计费用</p>\n" +
+						"                                <p>");
+			}
+			
 			html.append( "</p>\n" +
 					"                            </div>\n" +
 					"                        </div>\n" +
