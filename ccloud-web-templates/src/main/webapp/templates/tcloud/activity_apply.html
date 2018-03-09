@@ -223,7 +223,11 @@ function changeEvent(activity,$obj){
 	$obj.find("#visitNum").val(activity.visit_num);
 	$obj.find("#startTime").val(new Date(activity.start_time).Format("yyyy-MM-dd"));
 	$obj.find("#endTime").val(new Date(activity.end_time).Format("yyyy-MM-dd"));
-	$obj.find("#customerTypeName").val(activity.customerTypeName);
+	if (activity.customerTypeName != null && activity.customerTypeName != "") {
+		$obj.find("#customerTypeName").val(activity.customerTypeName);
+	} else {
+		$obj.find("#customerTypeName").val("不限");
+	}
 	$obj.find("#areaType").text(activity.area_type);
 	$obj.find("#joinNum").text("每个客户可以参加" + activity.join_num + "次");
 	$obj.find("#content").text(activity.content);
