@@ -217,7 +217,7 @@ public class ActivityQuery extends JBaseQuery {
 	}
 
 	public Page<Record> putDetailsPaginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate,String id) {
-		String select = "SELECT caa.id activityApplyId,u.id userId , u.realname , csc.id customerId , cc.customer_name , CONCAT( cc.prov_name , cc.city_name , cc.country_name , cc.address) address , csc.customer_type_ids, caa.create_date putDate , IFNULL(t1.executeNum , 0) executeNum , ca.* ";	
+		String select = "SELECT caa.`status`,caa.id activityApplyId,u.id userId , u.realname , csc.id customerId , cc.customer_name , CONCAT( cc.prov_name , cc.city_name , cc.country_name , cc.address) address , csc.customer_type_ids, caa.create_date putDate , IFNULL(t1.executeNum , 0) executeNum , ca.* ";	
 		StringBuilder fromBuilder = new StringBuilder(" FROM cc_activity_apply caa ");
 		fromBuilder.append(" LEFT JOIN cc_activity ca ON ca.id=caa.activity_id");
 		fromBuilder.append(" LEFT JOIN `user` u ON u.id=caa.biz_user_id");

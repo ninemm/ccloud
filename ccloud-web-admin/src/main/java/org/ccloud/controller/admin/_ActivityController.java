@@ -569,6 +569,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		renderJson(map);
 	}
 	
+	//活动拜访详情
 	public void visitDetails() {
 		String id = getPara("id");
 		String customerId = getPara("customerId");
@@ -620,6 +621,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		renderJson(map);
 	}
 	
+	//加入核销
 	public void auditReimbursement() {
 		boolean save=true;
 		String ids = getPara("ids");
