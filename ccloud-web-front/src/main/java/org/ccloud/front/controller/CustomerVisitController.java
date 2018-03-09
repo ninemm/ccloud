@@ -151,19 +151,35 @@ public class CustomerVisitController extends BaseFrontController {
 		StringBuilder html = new StringBuilder();
 		for (Record visit : visitList.getList())
 		{
-			html.append("<a class=\"weui-cell weui-cell_access\" href=\"/customerVisit/detail?id=" + visit.getStr("id") + "&one=1\">\n" +
-					"                <div class=\"weui-cell__bd ft14\">\n" +
-					"                    <p>" + visit.getStr("customer_name") + "</p>\n" +
-					"                    <p class=\"gray ft12\">" + visit.getStr("contact") + "/" + visit.getStr("mobile") + "\n" +
-					"                        <span class=\"fr\">" + DateUtils.dateToStr((Date)visit.get("create_date"), DateUtils.DEFAULT_FORMATTER) + "</span>\n" +
-					"                    </p>\n" +
-					"                    <p>活动类型：\n" +
-					"                        <span class=\"orange\">" + DictQuery.me().findName(visit.getStr("question_type")) + "</span>\n" +
-					"                        <span class=\"green fr\">" + DictQuery.me().findName(visit.getStr("status")) + "</span>\n" +
-					"                    </p>\n" +
-					"                </div>\n" +
-					"                <span class=\"weui-cell__ft\"></span>\n" +
-					"            </a>");
+/*			if(visit.getStr("status").equals(Customer.CUSTOMER_BULU)) {
+				html.append("<a class=\"weui-cell weui-cell_access\" href=\"/customerVisit/review?id=" + visit.getStr("id") + "&one=1\">\n" +
+						"                <div class=\"weui-cell__bd ft14\">\n" +
+						"                    <p>" + visit.getStr("customer_name") + "</p>\n" +
+						"                    <p class=\"gray ft12\">" + visit.getStr("contact") + "/" + visit.getStr("mobile") + "\n" +
+						"                        <span class=\"fr\">" + DateUtils.dateToStr((Date)visit.get("create_date"), DateUtils.DEFAULT_FORMATTER) + "</span>\n" +
+						"                    </p>\n" +
+						"                    <p>活动类型：\n" +
+						"                        <span class=\"orange\">" + DictQuery.me().findName(visit.getStr("question_type")) + "</span>\n" +
+						"                        <span class=\"green fr\">" + DictQuery.me().findName(visit.getStr("status")) + "</span>\n" +
+						"                    </p>\n" +
+						"                </div>\n" +
+						"                <span class=\"weui-cell__ft\"></span>\n" +
+						"            </a>");
+			}else {
+*/				html.append("<a class=\"weui-cell weui-cell_access\" href=\"/customerVisit/detail?id=" + visit.getStr("id") + "&one=1\">\n" +
+						"                <div class=\"weui-cell__bd ft14\">\n" +
+						"                    <p>" + visit.getStr("customer_name") + "</p>\n" +
+						"                    <p class=\"gray ft12\">" + visit.getStr("contact") + "/" + visit.getStr("mobile") + "\n" +
+						"                        <span class=\"fr\">" + DateUtils.dateToStr((Date)visit.get("create_date"), DateUtils.DEFAULT_FORMATTER) + "</span>\n" +
+						"                    </p>\n" +
+						"                    <p>活动类型：\n" +
+						"                        <span class=\"orange\">" + DictQuery.me().findName(visit.getStr("question_type")) + "</span>\n" +
+						"                        <span class=\"green fr\">" + DictQuery.me().findName(visit.getStr("status")) + "</span>\n" +
+						"                    </p>\n" +
+						"                </div>\n" +
+						"                <span class=\"weui-cell__ft\"></span>\n" +
+						"            </a>");
+//			}
 		}
 
 		Map<String, Object> map = new HashMap<>();
@@ -189,8 +205,11 @@ public class CustomerVisitController extends BaseFrontController {
 		StringBuilder html = new StringBuilder();
 		for (Record visit : visitList.getList())
 		{
-			html.append("<a class=\"weui-cell weui-cell_access\" href=\"/customerVisit/detail?id=" + visit.getStr("id") + "\">\n" +
-					"                <div class=\"weui-cell__bd ft14\">\n" +
+			if(visit.getStr("status").equals(Customer.CUSTOMER_BULU)) {
+				html.append("<a class=\"weui-cell weui-cell_access\" href=\"/customerVisit/customerVisitWaiting?id=" + visit.getStr("id") + "&one=1\">\n");
+			}else {
+				html.append("<a class=\"weui-cell weui-cell_access\" href=\"/customerVisit/detail?id=" + visit.getStr("id") + "\">\n" );}
+			html.append(	"                <div class=\"weui-cell__bd ft14\">\n" +
 					"                    <p>" + visit.getStr("customer_name") + "</p>\n" +
 					"                    <p class=\"gray ft12\">" + visit.getStr("contact") + "/" + visit.getStr("mobile") + "\n" +
 					"                        <span class=\"fr\">" + DateUtils.dateToStr((Date)visit.get("create_date"), DateUtils.DEFAULT_FORMATTER) + "</span>\n" +
@@ -294,7 +313,12 @@ public class CustomerVisitController extends BaseFrontController {
 			renderError(404);
 			return ;
 		}
-		ExpenseDetail expenseDetail = ExpenseDetailQuery.me().findById(ActivityApplyQuery.me().findById(CustomerVisitQuery.me().findById(id).getActiveApplyId()).getExpenseDetailId());
+		ExpenseDetail expenseDetail = new ExpenseDetail();
+		if(CustomerVisitQuery.me().findById(id).getActiveApplyId().equals("")) {
+			
+		}else {
+			expenseDetail = ExpenseDetailQuery.me().findById(ActivityApplyQuery.me().findById(CustomerVisitQuery.me().findById(id).getActiveApplyId()).getExpenseDetailId());
+		}
 		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 		List<String> typeList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeNameListBySellerCustomerId(customerVisit.getSellerCustomerId(), dataArea);
 		String imageListStore = customerVisit.getPhoto();
@@ -643,4 +667,160 @@ public class CustomerVisitController extends BaseFrontController {
 		String activityApplyId = getPara("activityApplyId");
     	renderJson(ActivityExecuteQuery.me().findbyActivityId(ActivityApplyQuery.me().findById(activityApplyId).getActivityId()));
 	}
+	
+	
+	@Before(Tx.class)
+	public void saveB() {
+			
+		CustomerVisit customerVisit = getModel(CustomerVisit.class);
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		
+		String activityApplyId = getPara("activity_apply_id");
+		//Boolean isChecked = OptionQuery.me().findValueAsBool("web_proc_customer_visit_" + getSessionAttr("sellerCode"));
+		
+		List<ImageJson> list = Lists.newArrayList();
+		String picJson = getPara("pic");
+		
+		//if (isChecked != null && isChecked) customerVisit.setStatus(Customer.CUSTOMER_AUDIT);
+		//else customerVisit.setStatus(Customer.CUSTOMER_NORMAL);
+		customerVisit.setStatus(Customer.CUSTOMER_BULU);
+		customerVisit.setUserId(user.getId());
+		customerVisit.setDataArea(user.getDataArea());
+		customerVisit.setDeptId(user.getDepartmentId());
+		customerVisit.setActiveApplyId(activityApplyId);
+		if (StrKit.notBlank(picJson)) {
+			
+			JSONArray array = JSON.parseArray(picJson);
+			for (int i = 0; i < array.size(); i++) {
+				JSONObject obj = array.getJSONObject(i);
+				String pic = obj.getString("pic");
+				String picname = obj.getString("picname");
+				String orderList = obj.getString("orderList");
+				ImageJson image = new ImageJson();
+				image.setImgName(picname);
+				//原图
+				String originalPath = qiniuUpload(pic);
+				//添加的水印内容
+				String waterFont1 = customerVisit.getSellerCustomer().getCustomer().getCustomerName();
+				String waterFont2 = user.getRealname() +  DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
+//				String waterFont3 =  customerVisit.getLocation();
+				String waterFont3 = "湖北省-武汉市-洪山区";
+				//图片添加水印  上传图片  水印图
+				String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
+				
+				image.setSavePath(savePath.replace("\\", "/"));
+				image.setOriginalPath(originalPath.replace("\\", "/"));
+				image.setOrderList(orderList);
+				list.add(image);
+			}
+		}
+		if (list.size()!=0) customerVisit.setPhoto(JSON.toJSONString(list));
+		
+		boolean updated = customerVisit.saveOrUpdate();
+		
+		//获取选取活动的id
+		if(StrKit.notBlank(activityApplyId)) {
+			List<String> activityIdList = Splitter.on(",").trimResults().omitEmptyStrings().splitToList(ActivityApplyQuery.me().findById(activityApplyId).getActivityId());
+			for (String activityId : activityIdList) {
+				CustomerVisitJoinActivity customerVisitJoinActivity=new CustomerVisitJoinActivity();
+				customerVisitJoinActivity.setCustomerVisitId(customerVisit.getId());
+				customerVisitJoinActivity.setId(StrKit.getRandomUUID());
+				customerVisitJoinActivity.setActivityId(activityId);
+				customerVisitJoinActivity.save();
+			}
+		}
+			
+		if (!updated) {
+			renderAjaxResultForError("保存客户拜访信息出错");
+			return ;
+		}
+
+		/*if (isChecked != null && isChecked)
+			updated = startProcess(customerVisit);
+		 */
+		if (updated)
+			renderAjaxResultForSuccess("操作成功");
+		else 
+			renderAjaxResultForError("操作失败");
+	}
+	
+	public void customerVisitWaiting() {
+		
+		keepPara();
+		
+		String id = getPara("id");
+		CustomerVisit customerVisit = CustomerVisitQuery.me().findMoreById(id);
+		String imageListStore = customerVisit.getStr("photo");
+		List<ImageJson> list = JSON.parseArray(imageListStore, ImageJson.class);
+		if(!customerVisit.getStr("active_apply_id").equals("")) {
+			setAttr("activityExecute",JSON.toJSON(ActivityExecuteQuery.me().findbyActivityId(ActivityApplyQuery.me().findById(customerVisit.getStr("active_apply_id")).getActivityId())));
+		}
+		setAttr("list",JSON.toJSON(list));
+		setAttr("domain",OptionQuery.me().findValue("cdn_domain"));
+		setAttr("customerVisit", customerVisit);		
+		render("customer_visit_waiting.html");
+	}
+	
+	public void saveWaiting() {
+		String customerVisitId = getPara("customerVisitId");
+		CustomerVisit customerVisit = CustomerVisitQuery.me().findById(customerVisitId);
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		
+		Boolean isChecked = OptionQuery.me().findValueAsBool("web_proc_customer_visit_" + getSessionAttr("sellerCode"));
+		
+		List<ImageJson> list = Lists.newArrayList();
+		String picJson = getPara("pic");
+		
+		if (isChecked != null && isChecked) customerVisit.setStatus(Customer.CUSTOMER_AUDIT);
+		else customerVisit.setStatus(Customer.CUSTOMER_NORMAL);
+		
+		if (StrKit.notBlank(picJson)) {
+			
+			JSONArray array = JSON.parseArray(picJson);
+			for (int i = 0; i < array.size(); i++) {
+				JSONObject obj = array.getJSONObject(i);
+				String pic = obj.getString("pic");
+				String picname = obj.getString("picname");
+				String orderList = obj.getString("orderList");
+				ImageJson image = new ImageJson();
+				image.setImgName(picname);
+				image.setOrderList(orderList);
+				if(pic.length() == 32) {
+					image.setSavePath(obj.getString("savepath"));
+					image.setOriginalPath(pic);
+				}else {
+					//原图
+					String originalPath = qiniuUpload(pic);
+					//添加的水印内容
+					String waterFont1 = customerVisit.getSellerCustomer().getCustomer().getCustomerName();
+					String waterFont2 = user.getRealname() +  DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
+//					String waterFont3 =  customerVisit.getLocation();
+					String waterFont3 = "湖北省-武汉市-洪山区";
+					//图片添加水印  上传图片  水印图
+					String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
+					
+					image.setSavePath(savePath.replace("\\", "/"));
+					image.setOriginalPath(originalPath.replace("\\", "/"));
+				}
+				list.add(image);
+			}
+			if (list.size()!=0) customerVisit.setPhoto(JSON.toJSONString(list));
+			
+			boolean updated = customerVisit.saveOrUpdate();
+			
+			if (!updated) {
+				renderAjaxResultForError("保存客户拜访信息出错");
+				return ;
+			}
+
+			if (isChecked != null && isChecked)
+				updated = startProcess(customerVisit);
+			 
+			if (updated)
+				renderAjaxResultForSuccess("操作成功");
+			else 
+				renderAjaxResultForError("操作失败");
+		}
+	}
+
 }
