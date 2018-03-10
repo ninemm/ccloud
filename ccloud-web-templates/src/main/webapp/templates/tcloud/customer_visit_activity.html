@@ -25,18 +25,14 @@
     var MAX_HEIGHT = 1000;
 
     $(function() {
-    	$("#customerVisitId").val("${(customerVisit.id)!}");
-        $("#customer_name").val("${(customerVisit.customer_name)!}");
-        $("#contact").val("${(customerVisit.contact)!}");
-        $("#mobile").val("${(customerVisit.mobile)!}");
-        $("#address").val("${(customerVisit.prov_name)!}"+"-"+"${(customerVisit.city_name)!}"+"-"+"${(customerVisit.country_name)!}"+"-"+"${(customerVisit.address)!}");
-        $("#question_type").val("${(customerVisit.typeName)!}");
-        $("#question_desc").val("${(customerVisit.question_desc)!}")
-        $("#location").val("${(customerVisit.location)!}");
+        $("#customer_name").val("${(record.customer_name)!}");
+        $("#contact").val("${(record.contact)!}");
+        $("#mobile").val("${(record.mobile)!}");
+        $("#address").val("${(record.prov_name)!}"+"-"+"${(record.city_name)!}"+"-"+"${(record.country_name)!}"+"-"+"${(record.address)!}");
         if("${(customerVisit.title)!}"==""){
         	$(".activity_title").hide();
         }else{
-	        $("#activity_title").val("${(customerVisit.title)!}"+"/"+"${(customerVisit.expenseDetailName)!}")
+	        $("#activity_title").val("${(record.title)!}"+"/"+"${(record.expenseDetailName)!}")
         }
         $("#length").text($("#question_desc").val().length + '/' + 70);
         $(document).on("input", "#question_desc", function() {

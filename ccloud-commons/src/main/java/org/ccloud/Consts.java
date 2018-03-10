@@ -273,4 +273,12 @@ public class Consts {
 	
 	public static final String WAREHOUSE_IDS_IS_NULL = "1";//当用户没有分配仓库时且不是经管时返回空值的仓库ID
 	
+	public static final String FLOW_DICT_TYPE_NAME_SA = "feeType_name_SA"; //流程字典名: 进场费
+	public static final String FLOW_DICT_TYPE_NAME_RAISE = "feeType_name_raise";//消费培育
+	public static final String FLOW_DICT_TYPE_NAME_PR = "feeType_name_PR";//公关赞助
+	public static final String FLOW_DICT_TYPE_NAME_GIFT = "feeType_name_gift";//商超赠品
+	public static final String FLOW_DICT_TYPE_NAME_DISPLAY = "feeType_name_display";//终端陈列
+	public static final String FLOW_DICT_TYPE_NAME_AD = "feeType_name_AD";//终端广告
+	public static final String FLOW_DICT_TYPE_NAME_CHANNEL = "channel_define";//终端客情
+	
 }
