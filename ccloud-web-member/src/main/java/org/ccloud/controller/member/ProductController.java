@@ -17,7 +17,9 @@ import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.plugin.activerecord.Record;
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
+import org.ccloud.model.Member;
 import org.ccloud.model.query.*;
 import org.ccloud.route.RouterMapping;
 
@@ -32,12 +34,12 @@ public class ProductController extends BaseFrontController {
 	}
 
 	public void productList() {
-		String memberId = "98ef315d484d435fa2845d1ed9762912";
+		Member member = getSessionAttr(Consts.SESSION_LOGINED_MEMBER);
 
 		String keyword = getPara("keyword");
 		String tag = getPara("tag");
 
-		List<Record> productList = MemberJoinSellerQuery.me().findProductListForApp(memberId, keyword, tag);
+		List<Record> productList = MemberJoinSellerQuery.me().findProductListForApp(member.getId(), keyword, tag);
 
 		Set<String> tagSet = new LinkedHashSet<String>();
 
@@ -56,9 +58,9 @@ public class ProductController extends BaseFrontController {
 	}
 
 	public void shoppingCart() {
-		String memberId = "98ef315d484d435fa2845d1ed9762912";
+		Member member = getSessionAttr(Consts.SESSION_LOGINED_MEMBER);
 
-		List<Record> productList = MemberJoinSellerQuery.me().findProductListForApp(memberId, "", "");
+		List<Record> productList = MemberJoinSellerQuery.me().findProductListForApp(member.getId(), "", "");
 
 		Map<String, Object> sellerProductInfoMap = new HashMap<String, Object>();
 		List<Map<String, Object>> sellerProductItems = new ArrayList<>();
@@ -81,10 +83,9 @@ public class ProductController extends BaseFrontController {
 	}
 
 	public void order() {
-		String memberId = "98ef315d484d435fa2845d1ed9762912";
-		String customerId = "6e399783ede44d7fb18e81969bc71add";
+		Member member = getSessionAttr(Consts.SESSION_LOGINED_MEMBER);
 
-		setAttr("customerInfo", JSON.toJSONString(CustomerQuery.me().findById(customerId)));
+		setAttr("customerInfo", JSON.toJSONString(CustomerQuery.me().findById(member.getCustomerId())));
 		setAttr("deliveryDate", DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
 
 		render("member_order.html");

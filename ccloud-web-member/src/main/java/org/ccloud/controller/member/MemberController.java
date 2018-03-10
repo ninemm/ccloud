@@ -30,6 +30,8 @@ import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.interceptor.SessionInterceptor;
 import org.ccloud.interceptor.UserInterceptor;
+import org.ccloud.message.Actions;
+import org.ccloud.message.MessageKit;
 import org.ccloud.model.*;
 import org.ccloud.model.query.*;
 import org.ccloud.route.RouterMapping;
@@ -87,7 +89,7 @@ public class MemberController extends BaseFrontController {
 					}
 					setSessionAttr(Consts.SESSION_LOGINED_MEMBER, member);
 				} else {
-					LogKit.warn("user info get failure");
+					LogKit.warn("member info get failure");
 				}
 			}
 
@@ -101,7 +103,7 @@ public class MemberController extends BaseFrontController {
 
 		String mobile = getPara("mobile");
 		String sales_id = getPara("sales_id");
-		List<Record> list = MemberQuery.me().checkCustomerExist(mobile,sales_id);
+		List<Record> list = MemberQuery.me().checkCustomerExist(mobile, sales_id);
 		if (list != null && list.size() > 0)
 			renderAjaxResultForSuccess();
 		else
@@ -132,7 +134,7 @@ public class MemberController extends BaseFrontController {
 				ApiResult wxUserResult = UserApi.getUserInfo(openId);
 				if (wxUserResult != null) {
 
-					List<Record> list = MemberQuery.me().checkCustomerExist(mobile,sales_id);
+					List<Record> list = MemberQuery.me().checkCustomerExist(mobile, sales_id);
 					if (list == null || list.size() == 0) {
 						ret.set("message", "您还不是该业务员客户,请业务员确认");
 						return false;
@@ -141,7 +143,7 @@ public class MemberController extends BaseFrontController {
 					Member member = MemberQuery.me().findByWechatOpenid(openId);
 					Date createDate = new Date();
 					String memberId = "";
-					if(member == null) {
+					if (member == null) {
 						Record record = list.get(0);
 						memberId = StrKit.getRandomUUID();
 						member = new Member();
@@ -165,7 +167,7 @@ public class MemberController extends BaseFrontController {
 							ret.set("message", "手机号绑定失败，请联系管理员");
 							return false;
 						}
-					}else {
+					} else {
 						member.setNickname(wxUserResult.getStr("nickname"));
 						member.setAvatar(wxUserResult.getStr("headimgurl"));
 						member.setWechatOpenId(openId);
@@ -238,71 +240,56 @@ public class MemberController extends BaseFrontController {
 //			}
 //		}
 
-//	@Clear({UserInterceptor.class, SessionInterceptor.class})
-//	@ActionKey(Consts.ROUTER_USER_LOGIN) // 固定登录的url
-//	public void login() {
-//		String username = getPara("username");
-//		String password = getPara("password");
-//
-//		if (username == null || password == null) {
-//			render("user_login.html");
-//			return;
-//		}
-//
-//		List<User> userList = UserQuery.me().findByMobile(username);
-//		if (null == userList || userList.size() == 0) {
-//			if (isAjaxRequest()) {
-//				renderAjaxResultForError("没有该用户");
-//			} else {
-//				setAttr("errorMsg", "没有该用户");
-//				render("user_login.html");
-//			}
-//			return;
-//		}
-//
-//
-//
-//		User user = userList.get(0);
-//
-//		if (EncryptUtils.verlifyUser(user.getPassword(), user.getSalt(), password)) {
-//			MessageKit.sendMessage(Actions.USER_LOGINED, user);
-//			CookieUtils.put(this, Consts.COOKIE_LOGINED_USER, user.getId());
-//
-//			if (!user.isAdministrator()) {
-//				Department dept = tmpList.get(0);
-//				if (dept == null) {
-//					renderError(404);
-//					return ;
-//				}
-//				String dealerDataArea = DepartmentQuery.me().getDealerDataArea(tmpList);
-//				setSessionAttr(Consts.SESSION_DEALER_DATA_AREA, dealerDataArea);
-//				setSessionAttr(Consts.SESSION_SELLER_ID, dept.get("seller_id"));
-//				setSessionAttr(Consts.SESSION_SELLER_NAME, dept.get("seller_name"));
-//				setSessionAttr(Consts.SESSION_SELLER_CODE, dept.get("seller_code"));
-////				setSessionAttr("cont", dept.get("seller_code"));
-//			}
-//
-//			if (this.isAjaxRequest()) {
-//				renderAjaxResultForSuccess("登录成功");
-//			} else {
-//				String gotoUrl = getPara("goto");
-//				if (StringUtils.isNotEmpty(gotoUrl)) {
-//					gotoUrl = StringUtils.urlDecode(gotoUrl);
-//					gotoUrl = StringUtils.urlRedirect(gotoUrl);
-//					redirect(gotoUrl);
-//				} else {
-//					redirect(Consts.ROUTER_USER_CENTER);
-//				}
-//			}
-//		} else {
-//			if (isAjaxRequest()) {
-//				renderAjaxResultForError("密码错误");
-//			} else {
-//				setAttr("errorMsg", "密码错误");
-//				render("user_login.html");
-//			}
-//		}
-//		}
+	@Clear({UserInterceptor.class, SessionInterceptor.class})
+	public void login() {
+		String username = getPara("username");
+		String password = getPara("password");
+
+		if (username == null || password == null) {
+			render("member_login.html");
+			return;
+		}
+
+		List<Member> memberList = MemberQuery.me().findByMobile(username);
+		if (null == memberList || memberList.size() == 0) {
+			if (isAjaxRequest()) {
+				renderAjaxResultForError("没有该用户");
+			} else {
+				setAttr("errorMsg", "没有该用户");
+				render("member_login.html");
+			}
+			return;
+		}
+
+
+		Member member = memberList.get(0);
+
+		if (EncryptUtils.verlifyUser(member.getPassword(), member.getSalt(), password)) {
+//			MessageKit.sendMessage(Actions.USER_LOGINED, member);
+			setSessionAttr(Consts.SESSION_LOGINED_MEMBER, member);
+			CookieUtils.put(this, Consts.COOKIE_LOGINED_MEMBER, member.getId());
+
+			if (this.isAjaxRequest()) {
+				renderAjaxResultForSuccess("登录成功");
+			} else {
+				String gotoUrl = getPara("goto");
+				if (StringUtils.isNotEmpty(gotoUrl)) {
+					gotoUrl = StringUtils.urlDecode(gotoUrl);
+					gotoUrl = StringUtils.urlRedirect(gotoUrl);
+					redirect(gotoUrl);
+				} else {
+					redirect("/member/product/index");
+				}
+			}
+		} else {
+			if (isAjaxRequest()) {
+				renderAjaxResultForError("密码错误");
+			} else {
+				setAttr("errorMsg", "密码错误");
+				render("member_login.html");
+			}
+		}
+	}
 
 
 //

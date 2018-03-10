@@ -30,8 +30,7 @@ import java.util.*;
 public class OrderController extends BaseFrontController {
 
 	public void getCustomerType() {
-		String memberId = "98ef315d484d435fa2845d1ed9762912";
-		String customerId = "6e399783ede44d7fb18e81969bc71add";
+		Member member = getSessionAttr(Consts.SESSION_LOGINED_MEMBER);
 
 		JSONArray productList = JSON.parseArray(getPara("productList"));
 		List<String> sellProductIdList = new ArrayList<>();
@@ -40,7 +39,7 @@ public class OrderController extends BaseFrontController {
 			sellProductIdList.add(obj.getString("sellProductId"));
 		}
 
-		List<Record> customerTypes = CustomerTypeQuery.me().findByMember(customerId, sellProductIdList);
+		List<Record> customerTypes = CustomerTypeQuery.me().findByMember(member.getCustomerId(), sellProductIdList);
 
 		List<List<Map<String, Object>>> customerTypeList = new ArrayList<>();
 
@@ -77,7 +76,7 @@ public class OrderController extends BaseFrontController {
 		boolean isSave = Db.tx(new IAtom() {
 			@Override
 			public boolean run() throws SQLException {
-				String memberId = "98ef315d484d435fa2845d1ed9762912";
+				Member member = getSessionAttr(Consts.SESSION_LOGINED_MEMBER);
 
 				Map<String, String[]> paraMap = getParaMap();
 
@@ -104,7 +103,7 @@ public class OrderController extends BaseFrontController {
 				for (int i = 0; i < sellerIdList.size(); i++) {
 					String sellerId = sellerIdList.get(i);
 					String sellerCode = SellerQuery.me().findById(sellerId).getSellerCode();
-					String userId = MemberJoinSellerQuery.me().findUserId(memberId, sellerId).getUserId();
+					String userId = MemberJoinSellerQuery.me().findUserId(member.getId(), sellerId).getUserId();
 					User user = UserQuery.me().findById(userId);
 
 					List<Map<String, String>> paraList = new ArrayList<>();
@@ -138,7 +137,7 @@ public class OrderController extends BaseFrontController {
 					moreInfo.put("totalNum", Double.valueOf(totalNum).toString());
 
 					//一个sellerId去生产一个订单
-					String result = saveOrder(paraList, moreInfo, user, sellerId, sellerCode, memberId);
+					String result = saveOrder(paraList, moreInfo, user, sellerId, sellerCode, member.getId());
 
 					if (StrKit.notBlank(result)) {
 						renderAjaxResultForError(result);

@@ -84,4 +84,11 @@ public class MemberQuery extends JBaseQuery {
 		sqlBuilder.append("where c.mobile = ? AND sc.is_enabled = 1 AND ujc.user_id = ?");
 		return Db.find(sqlBuilder.toString(), mobile, sales_id);
 	}
+
+	public List<Member> findByMobile(String mobile) {
+		StringBuilder sqlBuilder = new StringBuilder("select * ");
+		sqlBuilder.append("from `cc_member` ");
+		sqlBuilder.append("where mobile = ? AND status = 1");
+		return DAO.find(sqlBuilder.toString(), mobile);
+	}
 }

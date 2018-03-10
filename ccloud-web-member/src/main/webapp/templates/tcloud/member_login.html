@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" name="viewport">
+	<meta content="yes" name="apple-mobile-web-app-capable">
+	<meta content="black" name="apple-mobile-web-app-status-bar-style">
+	<meta content="telephone=no" name="format-detection">
+	<meta content="email=no" name="format-detection">
+	<link type='text/css' rel="stylesheet" href="${CTPATH}/css/normalize.css">
+	<link type='text/css' rel="stylesheet" href="${CTPATH}/css/weui.min.css">
+	<link type='text/css' rel="stylesheet" href="${CTPATH}/css/jquery-weui.min.css">
+	<link type='text/css' rel="stylesheet" href="${CTPATH}/css/icomoon.css">
+	<link type='text/css' rel="stylesheet" href="${CTPATH}/css/unlock.css">
+    <title>用户登录</title>
+    <style>
+
+    input {
+        left: 0;
+        position: relative;
+		margin-left: 1.5rem;
+		margin-right: 1rem;
+    }
+    
+    input:focus {
+        color: #999
+    }
+    
+    ::-webkit-input-placeholder { /* WebKit browsers */
+　　      color: #eee;
+　　  }
+
+    input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
+　　      color: #eee!important;
+　　  }
+
+    #bind {
+        color: #fff;
+        border-radius: 4px;
+    }
+
+    .input-area i:first-child {
+        height: 2rem;
+        line-height: 2rem;
+        font-size: 1rem;
+        position: absolute;
+        left: 0;
+        bottom: 0;
+    }
+
+    #phone, #code {
+        width: 10rem;
+        font-size: .8rem;
+    }
+
+    .input-area {
+        color: #afb8c1;
+    }
+
+    header {
+        text-align: center;
+        padding-top: 25%;
+        height: 25%;
+        font-family: '宋体';
+        color: #ea6f5a;
+	}
+	
+	#login {
+		max-width: 600px;
+		margin: 0 auto;
+	}
+
+	.icon-times-circle {
+      position: absolute!important;
+      right: 0!important;
+      font-size: 1rem!important;
+	  top: 0.5rem;
+    }
+
+	input:-webkit-autofill {
+      box-shadow: 0 0 0px 1000px white inset !important;
+    }
+    </style>
+</head>
+
+<body>
+	<div id="login">
+		<header>
+			<h1>协同云平台</h1>
+	        <h3>会员登录</h3>
+		</header>
+		
+		<main>
+		    <form action="${CPATH}/member/member/login" method="post" id="form" autocomplete="off">
+				<div class="input-area">
+					<div>
+						<i class="icon-mobile"></i>
+						<input type="text" name="username" id="phone" maxlength="11" placeholder="手机号">
+						<i class="icon-times-circle"></i>
+					</div>
+					<div>
+						<i class="icon-lock"></i>
+						<input type="password" name="password" id="code" placeholder="密码" maxlength="20">
+						<i class="icon-times-circle"></i>
+					</div>
+					<button id="bind" class="can-bind">登录</button> 
+				</div>
+		    </form>
+		</main>
+	</div>
+</body>
+<script type='text/javascript' src="${CTPATH}/js/jquery-3.2.1.min.js"></script>
+<script type='text/javascript' src="${CPATH}/static/plugins/jquery/jquery.form.min.js"></script>
+<script type='text/javascript' src="${CTPATH}/js/jquery-weui.js"></script>
+<script type='text/javascript' src="${CTPATH}/js/fastclick.js"></script>
+<script type='text/javascript' src="${CTPATH}/js/comm.js"></script>
+<script type='text/javascript' >
+
+	var $bind = $('#bind');
+	var $form = $('#form');
+	var $mobile = $('#phone');
+	var $code = $('#code');
+	
+	var $errorMsg = '${(errorMsg)!}';
+	if ($errorMsg != null) {
+		$.toptip($errorMsg, 3000, 'error');
+	}
+	
+
+	$(function() { 
+		
+		var isSend = false;
+		FastClick.attach(document.body);
+		
+		$(document).on("input", "#phone", function () {
+		    var $this = $(this);
+		    $this.next().show();
+		    if (($mobile.val().length === 0)) {
+		      $this.next().hide();
+		    }
+		}).on('focus', '#phone', function() {
+			var $this = $(this);
+			$this.val()?$this.next().show():'';
+		}).on("input", "#code", function () {
+		    var $this = $(this);
+		    if($this.is(':focus')){
+		    	$this.next().show();
+			    if (($code.val().length === 0)) {
+			      $this.next().hide();
+			    }
+		    }
+		}).on("click", ".icon-times-circle", function () {
+		    var $this = $(this);
+		    if ($(this).prev().is($mobile)) {
+				$('.icon-times-circle').hide();
+				$('input').val("");
+		    } else {
+			    $this.prev().val("");
+			    $this.hide();
+		    }
+		});
+		
+		var param = function() {
+	        return {
+	            mobile: $mobile.val(),
+	            code: $code.val()
+	        }
+	    }
+		
+	    function sendSms() {
+	        var url = "${CPATH}/smsCode/send";
+	        Utils.ajax(url, param(), null);
+	    }
+	    
+	    function checkMobile(mobile) {
+	    	var url = "${CPATH}/member/member/checkMobile";
+	    	Utils.ajax(url, {'mobile': mobile}, mobileCallback);
+	    }
+	    
+	    var mobileCallback = function(res) {
+	    	if (res.errorCode != 0) {
+	    		$.toptip(res.message, 'error');
+	    	}
+	    }
+	})
+	
+	function doSubmit() {
+		//$bind.attr('disabled', 'disabled');
+        $form.ajaxSubmit({ 
+            type: 'post',
+            dataType: 'json',
+            success: function(res) {
+                if (res.errorCode == 0) {
+                    location.href = "${CPATH}/member/product/index";
+                } else {
+                    $.toptip(res.message, 3000, 'error');
+                    //$bind.removeAttr('disabled');
+                }
+            },
+            error: function(res) {
+                $.toptip(res.message, 'error');
+            }
+        });
+    }
+</script>
+
+</html>
