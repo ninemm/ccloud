@@ -34,12 +34,14 @@ import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Activity;
+import org.ccloud.model.ActivityApply;
 import org.ccloud.model.ActivityExecute;
 import org.ccloud.model.Dict;
 import org.ccloud.model.ExpenseDetail;
 import org.ccloud.model.QyExpense;
 import org.ccloud.model.QyExpensedetail;
 import org.ccloud.model.YxActivityshopadinfo;
+import org.ccloud.model.query.ActivityApplyQuery;
 import org.ccloud.model.query.ActivityExecuteQuery;
 import org.ccloud.model.query.ActivityQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
@@ -604,6 +606,9 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		String ids = getPara("ids");
 		String[] activityApplyIds = ids.split(",");
 		for (String activityApplyId : activityApplyIds) {
+			ActivityApply activityApply = ActivityApplyQuery.me().findById(activityApplyId);
+			activityApply.setStatus(5);
+			activityApply.update();
 			Record YxActivity = ActivityQuery.me().findYxActivity(activityApplyId);
 			if (YxActivity.getStr("invest_type").equals("101103")) {
 				YxActivityshopadinfo yxActivityshopadinfo=new YxActivityshopadinfo();
