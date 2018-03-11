@@ -64,19 +64,21 @@
                 }else{
                 	var imgeList = ${(imageList)!'1'};
                 	if(imgeList!=1){
+                		html +='<div><input id="orderList" type="hidden" value="'+activityExecutesList[i].orderList+'"/>'+activityExecutesList[i].remark+'<div class="weui-uploader__bd">'
+		                     +'<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles" >';
                        for(var j = 0 ; j < imgeList.length ; j++){
-                       	if(imgeList[j].orderList == activityExecutesList[i].orderList){
-		                    html +='<div><input id="orderList" type="hidden" value="'+activityExecutesList[i].orderList+'"/>'+activityExecutesList[i].remark+'<div class="weui-uploader__bd">'
-		                                +'<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles" >'
-		                           		 +'<li class="weui-uploader__file " style="background-image:url('+domain+'/'+imgeList[j].savePath+')"></li>';
-		                        imageArr.push({"pic":imgeList[j].originalPath, "picname":imgeList[j].imgName,"orderList":imgeList[i].orderList,"savepath":imgeList[j].savePath});
+		                       	if(imgeList[j].orderList == activityExecutesList[i].orderList){
+				                        html +='<li class="weui-uploader__file " style="background-image:url('+domain+'/'+imgeList[j].savePath+')"></li>';
+				                        imageArr.push({"pic":imgeList[j].originalPath, "picname":imgeList[j].imgName,"orderList":imgeList[i].orderList,"savepath":imgeList[j].savePath});
 		                        }
-		                     html +='</ul></div>'
-		                                +'</div>';
-			                if(flang == 1 && imgeList[j].orderList == _orderList){
-			                	$('._submit_btn').hide();
-			                	break;}
+			                
 		                 }
+		                 html +='</ul></div>'
+		                           +'</div>';
+                       	if(flang == 1 && activityExecutesList[i].orderList == _orderList){
+		                	$('._submit_btn').hide();
+		                	break;
+			                }
                 	}
                 	
                }

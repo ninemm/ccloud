@@ -245,13 +245,13 @@
 
 			</div>
 		</form>
-		<div class="box-footer">
-			<@shiro.hasPermission name="/admin/customerVisit/audit,/admin/all">
-			<button  id="do_submit" onclick="doSubmit(1)" class="btn btn-sm bg-olive btn-flat ladda-button" data-style="expand-right">通过</button >
-			<button id="do_submit" onclick="doSubmit(0)" class="btn btn-sm btn-danger btn-flat ladda-button" data-style="expand-right">拒绝</button>
-			</@shiro.hasPermission>
-			<input type="button" class="btn btn-sm btn-primary btn-flat" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
-		</div>
+	</div>
+	<div class="box-footer">
+		<@shiro.hasPermission name="/admin/customerVisit/audit,/admin/all">
+		<button  id="do_submit" onclick="doSubmit(1)" class="btn btn-sm bg-olive btn-flat ladda-button" data-style="expand-right">通过</button >
+		<button id="do_submit" onclick="doSubmit(0)" class="btn btn-sm btn-danger btn-flat ladda-button" data-style="expand-right">拒绝</button>
+		</@shiro.hasPermission>
+		<input type="button" class="btn btn-sm btn-primary btn-flat" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
 	</div>
 </section>
 
