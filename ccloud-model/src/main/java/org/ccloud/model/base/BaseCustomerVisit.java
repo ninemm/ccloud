@@ -306,4 +306,12 @@ public abstract class BaseCustomerVisit<M extends BaseCustomerVisit<M>> extends 
 	public java.lang.String getActiveApplyId() {
 		return getStr("active_apply_id");
 	}
+	
+	public void setComeFrom(java.lang.Integer comeFrom) {
+		set("come_from", comeFrom);
+	}
+
+	public java.lang.Integer getComeFrom() {
+		return getInt("come_from");
+	}
 }

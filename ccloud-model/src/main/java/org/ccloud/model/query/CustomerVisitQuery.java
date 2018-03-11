@@ -309,4 +309,9 @@ public class CustomerVisitQuery extends JBaseQuery {
 		String sql="SELECT a.title FROM cc_customer_visit_join_activity cvja LEFT JOIN cc_activity a ON a.id = cvja.activity_id WHERE cvja.customer_visit_id =?";
 		return Db.find(sql.toString(), id);
 	}
+	
+	public CustomerVisit findByActivityApplyIdAndComeFrom(String activityApplyId){
+		String sql = "select * from cc_customer_visit where active_apply_id = '"+activityApplyId+"' and come_from = 1";
+		return DAO.findFirst(sql);
+	}
 }

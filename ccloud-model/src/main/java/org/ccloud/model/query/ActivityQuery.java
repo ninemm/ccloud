@@ -258,12 +258,11 @@ public class ActivityQuery extends JBaseQuery {
 	}
 	
 	public Record findByApplyId(String applyId) {
-		String sql = "SELECT cc.customer_name,cc.contact,cc.mobile,cc.prov_name,cc.city_name,cc.country_name,ca.title,t1.`name` as expenseDetailName from cc_activity_apply caa " + 
+		String sql = "SELECT cc.customer_name,cc.contact,caa.activity_id,caa.seller_customer_id,caa.id,cc.mobile,cc.prov_name,cc.city_name,cc.country_name,ca.title,t1.`name` as expenseDetailName from cc_activity_apply caa " + 
 				"LEFT JOIN cc_activity ca on ca.id = caa.activity_id " + 
 				"LEFT JOIN cc_seller_customer csc on csc.id = caa.seller_customer_id " + 
 				"LEFT JOIN cc_customer cc on cc.id = csc.customer_id " + 
 				"LEFT JOIN (SELECT ced.id,d.`name` from cc_expense_detail ced LEFT JOIN dict d on d.type = ced.flow_dict_type and ced.item1 = d.`value`) t1 on t1.id = caa.expense_detail_id " + 
-				"LEFT JOIN cc_activity_execute cae on cae.activity_id = caa.activity_id " + 
 				"where caa.id = '"+applyId+"' " + 
 				"GROUP BY caa.id";
 		return Db.findFirst(sql);

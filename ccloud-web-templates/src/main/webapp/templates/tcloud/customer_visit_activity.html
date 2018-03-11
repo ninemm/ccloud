@@ -23,78 +23,107 @@
 
     var Orientation = null;
     var MAX_HEIGHT = 1000;
-
+	var html = "";
     $(function() {
-        $("#customer_name").val("${(record.customer_name)!}");
-        $("#contact").val("${(record.contact)!}");
-        $("#mobile").val("${(record.mobile)!}");
-        $("#address").val("${(record.prov_name)!}"+"-"+"${(record.city_name)!}"+"-"+"${(record.country_name)!}"+"-"+"${(record.address)!}");
-        if("${(customerVisit.title)!}"==""){
-        	$(".activity_title").hide();
-        }else{
-	        $("#activity_title").val("${(record.title)!}"+"/"+"${(record.expenseDetailName)!}")
-        }
-        $("#length").text($("#question_desc").val().length + '/' + 70);
-        $(document).on("input", "#question_desc", function() {
-            $("#length").text($("#question_desc").val().length + '/' + 70);
-        });
-        var activityApplyId = "${(customerVisit.activitApplyId)!}";
+    	var customerVisitId = "${(customerVisit.id)!}";
+    	var activityExecutesList = ${(activityExecutes)!};
         var imgeList = ${(list)!'1'};
         var domain = "${(domain)!}";
-        	var html = "";
-        	if(activityApplyId!=""){
-				$.ajax({
-			        url: "${CPATH}/customerVisit/getActivityExecute",
-			        data: {
-			            "activityApplyId": "${(customerVisit.activitApplyId)!}"
-			        },
-			        dataType: "json",
-			        success: function(data) {
-			        		if(data!=null){
-				        		
-			        			$(".imageActivityExecute").hide();
-			        			$(".imgeInfo").hide();
-			        			if(data.length>0){
-				        			for(var i = 0 ; i < data.length ; i++){
-					        				html +='<div><input id="orderList" type="hidden" value="'+data[i].order_list+'"/>'+data[i].remark+'<div class="weui-uploader__info">0/3</div><div class="weui-uploader__bd">'
-				                               	+'<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles" >';
-				                          if(imgeList != 1){
-					                           for(var j = 0 ; j < imgeList.length ; j++){
-					                            	if(imgeList[j].orderList == data[i].order_list){
-						                            	html += '<li class="weui-uploader__file " style="background-image:url('+domain+'/'+imgeList[j].savePath+')"></li>';
-					                           			imageArr.push({"pic":imgeList[j].originalPath, "picname":imgeList[j].imgName,"orderList":data[i].order_list,"savepath":imgeList[j].savePath});
-					                            	}
-					                            }
-				                          }
-				                          	html +='</ul><div class="weui-uploader__input-box">'
-				                               	+'<input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/*" multiple="">'
-				                               	+'</div></div></div>';
-				        			}
-			        			}else{
-			        				html +='<div class="weui-uploader__hd">'
-					                       +'<p class="weui-uploader__title">附件图片</p>'
-					                       +'<div class="weui-uploader__info imgeInfo">0/3</div>'
-					                       +'</div>'
-					                       +'<div class="weui-uploader__bd imageActivityExecute">'
-					                       +'<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles">';
-						            if(imgeList != 1){
-						                for(var i = 0 ; i < imgeList.length ; i++){
-						                	html += '<li class="weui-uploader__file " style="background-image:url('+domain+'/'+imgeList[i].savePath+')"></li>';
-								            imageArr.push({"pic":imgeList[i].originalPath, "picname":imgeList[i].imgName,"orderList":"0","savepath":imgeList[i].savePath});
-						                }
-						            }
-					                html +='</ul>'
-					                       +'<div class="weui-uploader__input-box">'
-					                       +'<input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/*" multiple="">'
-					                       +'</div>'
-					                       +'</div>';
-			        			}
-			        			$(".imgeActivity").html("");
-			        			$(".imgeActivity").append(html);
-			        		}
-			        }
-		        });
-        }
+        var flang = "${(flang)!}";
+        var _orderList = "${(orderList)!}";//点击的是第几执行步骤
+    	if(customerVisitId!=""){
+    		$("#customerVisitId").val("${(customerVisit.id)!}");
+	        $("#customer_name").val("${(customerVisit.customer_name)!}");
+	        $("#customer_id").val("${(customerVisit.seller_customer_id)!}");
+	        $("#contact").val("${(customerVisit.contact)!}");
+	        $("#mobile").val("${(customerVisit.mobile)!}");
+	        $("#address").val("${(customerVisit.prov_name)!}"+"-"+"${(customerVisit.city_name)!}"+"-"+"${(customerVisit.country_name)!}"+"-"+"${(customerVisit.address)!}");
+	        $("#question_type").val("${(customerVisit.typeName)!}");
+	        $("#question_desc").val("${(customerVisit.question_desc)!}")
+	        $("#location").val("${(customerVisit.location)!}");
+	        $("#problem_id").val("${(customerVisit.question_type)!}");
+	        $("#activity_apply_id").val("${(customerVisit.active_apply_id)!}");
+	        $("#length").text($("#question_desc").val().length + '/' + 70);
+	        $(document).on("input", "#question_desc", function() {
+	            $("#length").text($("#question_desc").val().length + '/' + 70);
+	        });
+	        if("${(customerVisit.title)!}"==""){
+	        	$(".activity_title").hide();
+	        }else{
+		        $("#activity_title").val("${(customerVisit.title)!}"+"/"+"${(customerVisit.expenseDetailName)!}")
+	        }
+			for(var i = 0 ; i < activityExecutesList.length ; i++){
+				$(".imgeActivity").html("");
+                if(_orderList == activityExecutesList[i].orderList && flang == 0){
+                   		 html +='<div><input id="orderList" type="hidden" value="'+activityExecutesList[i].orderList+'"/>'+activityExecutesList[i].remark+'<div class="weui-uploader__bd">'
+                                +'<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles" >';
+                        html +='</ul><div class="weui-uploader__input-box">'
+                                +'<input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/*" multiple="">'
+                                +'</div></div></div>';
+                       break;
+                }else{
+                	var imgeList = ${(imageList)!'1'};
+                	if(imgeList!=1){
+                       for(var j = 0 ; j < imgeList.length ; j++){
+                       	if(imgeList[j].orderList == activityExecutesList[i].orderList){
+		                    html +='<div><input id="orderList" type="hidden" value="'+activityExecutesList[i].orderList+'"/>'+activityExecutesList[i].remark+'<div class="weui-uploader__bd">'
+		                                +'<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles" >'
+		                           		 +'<li class="weui-uploader__file " style="background-image:url('+domain+'/'+imgeList[j].savePath+')"></li>';
+		                        imageArr.push({"pic":imgeList[j].originalPath, "picname":imgeList[j].imgName,"orderList":imgeList[i].orderList,"savepath":imgeList[j].savePath});
+		                        }
+		                     html +='</ul></div>'
+		                                +'</div>';
+			                if(flang == 1 && imgeList[j].orderList == _orderList){
+			                	$('._submit_btn').hide();
+			                	break;}
+		                 }
+                	}
+                	
+               }
+            }
+		    $(".imgeActivity").html("");
+		   $(".imgeActivity").append(html);
+        }else{
+	    	$("#customer_id").val("${(record.seller_customer_id)!}");
+    	    $("#customer_name").val("${(record.customer_name)!}");
+        	$("#contact").val("${(record.contact)!}");
+        	$("#mobile").val("${(record.mobile)!}");
+        	$("#address").val("${(record.prov_name)!}"+"-"+"${(record.city_name)!}"+"-"+"${(record.country_name)!}"+"-"+"${(record.address)!}");
+	    	$("#activity_title").val("${(record.title)!}"+"/"+"${(record.expenseDetailName)!}")
+	    	$("#activity_apply_id").val("${(record.id)!}");
+	        $("#length").text($("#question_desc").val().length + '/' + 70);
+	        $(document).on("input", "#question_desc", function() {
+	            $("#length").text($("#question_desc").val().length + '/' + 70);
+	        });
+	        var activityApplyId = "${(customerVisit.activitApplyId)!}";
+	        $(".imageActivityExecute").hide();
+	        $(".weui-cell__ft").hide();
+			$(".imgeInfo").hide();
+	        var _orderList = "${(orderList)!}";
+	        for(var i = 0 ; i < activityExecutesList.length ; i++){
+	        	if(_orderList == activityExecutesList[i].orderList){
+	        		html +='<div><input id="orderList" type="hidden" value="'+activityExecutesList[i].orderList+'"/>'+activityExecutesList[i].remark+'<div class="weui-uploader__info">0/3</div><div class="weui-uploader__bd">'
+	                        	+'<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles" >';
+	                   	html +='</ul><div class="weui-uploader__input-box">'
+	                        	+'<input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/*" multiple="">'
+	                        	+'</div></div></div>';
+	            }
+	        }
+	        $(".imgeActivity").html("");
+			$(".imgeActivity").append(html);
+	        $("#question_type").select({
+		        title: "请选择问题类型",
+		        multi: false,
+		        items: JSON.parse('${problem}'),
+		        onClose: function(obj) {
+		            var problemId = obj.data.values;
+		            if(problemId){
+		                $("#problem_id").val(problemId);
+		            }
+		        }
+		    });
+    	}
+        
         $(document).on("change", ".uploaderInput", function () {
         	
 			var $this = $(this);
@@ -247,10 +276,20 @@
 
     function submit() {
 
+        if($("#problem_id").val().length==0) {
+            $.toptip('问题类型不能为空', 3000, 'error');
+            return false;
+        }
+
         if($("#question_desc").val().length==0) {
             $.toptip('备注描述不能为空', 3000, 'error'); 
             return false;
         }
+        
+        /* if($("#location").val().length==0) {
+            $.toptip('定位地址不能为空,请刷新定位', 1000, 'error');
+            return false;
+        }*/
 
         if(imageArr.length == 0){
         	 $.toptip('照片不能为空', 3000, 'error'); 
@@ -266,7 +305,7 @@
     function doSubmit() {
     	$(".pic").val(JSON.stringify(imageArr));
         $.ajax({
-            url: '${CPATH}/customerVisit/saveWaiting',
+            url: '${CPATH}/customerVisit/saveActivityVisit',
             method: 'post',
             dataType: 'json',
             data: $form.serialize(),
@@ -387,25 +426,22 @@
     }
     
      function getback() {
-		<#if one??>
-			window.location.href = '${CPATH}/customerVisit/one?id=${customerVisit.seller_customer_id}&name=${customerVisit.customer_name}';
-		<#else>
-			window.location.href = '${CPATH}/customerVisit?history=' + 1;
-		</#if>
+			window.location.href = '${CPATH}/activity/applyList';
 		} 
 </#macro>
 <@layout>
 <div class="weui-content">
     <div id="visit-add">
         <main>
-        <form action="${CPATH}/customerVisit/saveWaiting" method="post" id="form">
+        <form action="${CPATH}/customerVisit/saveActivityVisit" method="post" id="form">
             <section class="weui-panel weui-panel_access order-customer-info">
                 <div class="weui-cell weui-cell_access">
                     <div class="weui-cell__bd">
-                        <input type="hidden" id="customerVisitId" name="customerVisitId" />
+                        <input type="hidden" id="customerVisitId" name="customerVisit.id" />
                         <div class="order-customer-info-title">客户名称
                             <span class="require">*</span>
                         </div>
+                        <input type="hidden" id="customer_id" name="customerVisit.seller_customer_id" />
                         <input type="text" class="weui-input" id="customer_name" name="customer_name" placeholder="选择客户" required readonly>
                     </div>
                 </div>
@@ -439,12 +475,14 @@
                         <input id="problem_id" name="customerVisit.question_type" type="hidden" />
                         <input id="question_type" class="weui-input" name="question_type" type="text" placeholder="请选择" >
                     </div>
+                    <span class="weui-cell__ft"></span>
                 </div>
                 <div class="weui-cell weui-cell_access select-area activity_title">
                     <div class="weui-cell__bd">
 						<div class="order-customer-info-title">
 							活动&nbsp;&nbsp;&nbsp;
 						</div>
+						<input id="activity_apply_id"  name="activity_apply_id" type="hidden" />
 						<input id="activity_title" class="weui-input" name="activity_title" type="text" placeholder="请选择" readonly>
                     </div>
                 </div>
@@ -505,7 +543,7 @@
     <#include "_inc/_goback.html" />
     <footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
         <button class="red-button width-100 _submit_btn" onclick="submit()" href="">提交</button>
-		<button class="white-button width-100 _submit_btn" onclick="getback()">返回</button>
+		<button class="white-button width-100 submit_btn" onclick="getback()">返回</button>
     </footer>
 </div>
 </@layout>

@@ -25,6 +25,7 @@ import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.*;
 import org.ccloud.model.query.*;
+import org.ccloud.model.vo.ImageJson;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.StringUtils;
 
@@ -549,13 +550,25 @@ public class ActivityController extends BaseFrontController {
 		String endDate = getPara("endDate");
 		String keyword = getPara("keyword");
 
-
+		
 		Page<Record> applyList = ActivityApplyQuery.me().findList(getParaToInt("pageNumber"), getParaToInt("pageSize"), selectDataArea, category, status, startDate, endDate, keyword);
 
 		DecimalFormat df   = new DecimalFormat("######0.00");
 		StringBuilder html = new StringBuilder();
 		for (Record apply : applyList.getList()) {
+			int num = 0;
 			List<ActivityExecute> activityExecutes = ActivityExecuteQuery.me().findbyActivityId(apply.getStr("activity_id"));
+			//comeFrom = 1 来源于活动列表
+			CustomerVisit customerV = CustomerVisitQuery.me().findByActivityApplyIdAndComeFrom(apply.getStr("id"));
+			if(customerV != null){
+				List<ImageJson> listImages = JSON.parseArray(customerV.getPhoto(), ImageJson.class);
+				List<String> listS = new ArrayList<>();
+				for(ImageJson listImag:listImages){
+					if(!listS.contains(listImag.getOrderList())){
+						num++;
+					}
+				}
+			}
 			html.append("<section>\n");
 			html.append("<div class=\"weui-cells__title\"></div>");
 
@@ -564,7 +577,6 @@ public class ActivityController extends BaseFrontController {
 			else if (apply.getStr("status").equals("2")) html.append("<div class=\"widthdraw\">\n");
 			else if (apply.getStr("status").equals("3")) html.append("<div class=\"failed\">\n");
 			else html.append("<div class=\"checking\">\n");
-
 			html.append("                        <a class=\"weui-cell weui-cell_access\" href=\"/activity/applyDetail?id=" + apply.getStr("id") + "\">\n" +
 					"                            <i class=\"icon-tags\"></i>\n" +
 					"                            <div class=\"weui-cell__bd\">" + apply.getStr("customer_name") + "</div>\n" +
@@ -600,12 +612,22 @@ public class ActivityController extends BaseFrontController {
 						"						</div>\n"+
 						"						</div>\n"+
 						"                        <div class=\"weui-flex\">\n");
-				for(ActivityExecute activityExecute : activityExecutes) {
-					html.append("<a class=\"weui-cell weui-cell_access\" href=\"/customerVisit/addActivityApplyVisit?id=" + activityExecute.getStr("id") + "&activeApplyId="+apply.getStr("id")+"\">\n" +
-							"                       <div class=\"weui-flex__item\">\n" +
-							"                                <p>" + activityExecute.getOrderList() + "</p>\n" +
-							"                            </div></a>\n");
+				
+				for(int i  = 0 ; i < activityExecutes.size() ; i++) {
+					if(i>num){
+						html.append("<a class=\"weui-cell weui-btn_disabled weui-btn_primary\">\n" +
+								"                       <div class=\"weui-flex__item\">\n" +
+								"                                <p>" + activityExecutes.get(i).getOrderList() + "</p>\n" +
+								"                            </div></a>\n");
+						
+					}else{
+						html.append("<a class=\"weui-cell weui-cell_access\" href=\"/customerVisit/addActivityApplyVisit?id=" + activityExecutes.get(i).getStr("id") + "&orderList="+activityExecutes.get(i).getOrderList()+"&activeApplyId="+apply.getStr("id")+"\">\n" +
+								"                       <div class=\"weui-flex__item\">\n" +
+								"                                <p>" + activityExecutes.get(i).getOrderList() + "</p>\n" +
+								"                            </div></a>\n");
+						
 					}
+				}
 				}
 			
 			html.append( "                        </div>\n" +
