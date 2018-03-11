@@ -37,6 +37,7 @@
 	#valueName {
 		max-width: 7.5rem;
 	}
+
 </#macro>
 
 <#macro script>
@@ -193,11 +194,11 @@ $(function() {
 						title: data.message,
 						buttons: [
 							{ text: "查看订单", className: "default", onClick: function(){ 
-								//location.href = "${CPATH}/order/myOrder";
+								location.href = "${CPATH}/member/order/myOrder";
 								} 
 							},
 							{ text: "继续下单", className: "primary", onClick: function(){
-								location.href = '${CPATH}/member/product';
+								location.href = '${CPATH}/member/product/index';
 								} 
 							},
 						]
@@ -341,7 +342,7 @@ $(function() {
 				<input type="hidden" id="total" name="total" value="">
 				<input type="hidden" id="totalNum" name="totalNum" value="">
 			</main>
-			<#include "_inc/_goback.html" />
+			<#include "_inc/_member_goback.html" />
 			<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
 				<p class="total bg-gray weui-flex__item" id="totalNumSpan"></p>
 				<button type="button" id="shoppingCart" class="place-order yellow-button white">购物车</button>

@@ -291,6 +291,14 @@ public class MemberController extends BaseFrontController {
 		}
 	}
 
+	public void center() {
+		Member member = getSessionAttr(Consts.SESSION_LOGINED_MEMBER);
+		Customer customer = CustomerQuery.me().findById(member.getCustomerId());
+		setAttr("member", member);
+		setAttr("customer", customer);
+		render("member_center_index.html");
+	}
+
 
 //
 

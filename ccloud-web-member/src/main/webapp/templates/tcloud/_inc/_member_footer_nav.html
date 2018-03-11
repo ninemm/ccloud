@@ -1,0 +1,23 @@
+<div class="weui-tabbar wy-foot-menu">
+	<a href="${CPATH}/member/product/index" class="weui-tabbar__item <#if ('/member/product/index' == REQUEST.requestURI!) || ('/wxoauth' == REQUEST.requestURI!)>weui-bar__item--on</#if>">
+		<div class="weui-tabbar__icon foot-menu-home">
+		    <i class="icon-home"></i> 
+		</div>
+        <p class="weui-tabbar__label">首页</p>
+	</a>
+
+    <a href="${CPATH}/member/product/shoppingCart" class="weui-tabbar__item <#if ('/member/product/shoppingCart' == REQUEST.requestURI!) >weui-bar__item--on</#if>">
+        <div class="weui-tabbar__icon">
+            <i class="icon-shopping-cart"></i>
+        </div>
+        <p class="weui-tabbar__label">购物车</p>
+    </a>
+	
+	<a href="${CPATH}/member/member/center" class="weui-tabbar__item <#if ('/member/member/center' == REQUEST.requestURI!) >weui-bar__item--on</#if>">
+        <div class="weui-tabbar__icon">
+            <i class="icon-user"></i>
+        </div>
+        <p class="weui-tabbar__label">我的</p>
+    </a>
+
+</div>

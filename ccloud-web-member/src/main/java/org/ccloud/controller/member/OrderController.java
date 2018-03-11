@@ -8,11 +8,15 @@ import com.google.common.collect.Maps;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.IAtom;
+import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.*;
 import org.ccloud.model.query.*;
+import org.ccloud.model.vo.ImageJson;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
@@ -264,5 +268,122 @@ public class OrderController extends BaseFrontController {
 		OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核", user.getId(), toUserId, user.getDepartmentId(), user.getDataArea(),orderId);
 
 		return "";
+	}
+
+	//我的订单
+	public void myOrder() {
+		Member member = getSessionAttr(Consts.SESSION_LOGINED_MEMBER);
+
+		Map<String, Object> all = new HashMap<>();
+		all.put("title", "全部");
+		all.put("value", "");
+
+		List<Map<String, Object>> customerTypes = new ArrayList<>();
+		customerTypes.add(all);
+
+		List<Record> customerTypeList = MemberSalesOrderQuery.me()
+				                                      .findOrderCustomerTypeByCustomer(member.getCustomerId());
+		for (Record record : customerTypeList) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", record.getStr("name"));
+			item.put("value", record.getStr("name"));
+			customerTypes.add(item);
+		}
+
+		String history = getPara("history");
+		setAttr("history", history);
+		setAttr("customerTypes", JSON.toJSON(customerTypes));
+		render("member_order_list.html");
+	}
+
+	public void orderList() {
+		Member member = getSessionAttr(Consts.SESSION_LOGINED_MEMBER);
+
+		String keyword = getPara("keyword");
+
+		String status = getPara("status");
+		String customerTypeId = getPara("customerTypeId");
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+
+		Page<Record> orderList = MemberSalesOrderQuery.me().paginateForApp(getPageNumber(), getPageSize(), keyword, status,
+				customerTypeId, startDate, endDate, member.getCustomerId());
+		Record record = MemberSalesOrderQuery.me()
+				                .getOrderListCount(keyword, status, customerTypeId, startDate, endDate, member.getCustomerId());
+
+		Map<String, Object> map = new HashMap<>();
+		map.put("orderList", orderList.getList());
+		map.put("orderCount", record.getStr("orderCount"));
+		map.put("orderAmount", record.getStr("totalAmount"));
+		renderJson(map);
+	}
+
+	public void getOrderProductDetail() {
+		String orderId = getPara("orderId");
+
+		List<Record> orderDetail = SalesOrderDetailQuery.me().findByOrderId(orderId);
+		Map<String, Object> map = new HashMap<>();
+		map.put("orderDetail", orderDetail);
+		renderJson(map);
+	}
+
+	public void orderDetail() {
+
+		String orderId = getPara("orderId");
+		Record order = SalesOrderQuery.me().findMoreById(orderId);
+		List<Record> orderDetailList = SalesOrderDetailQuery.me().findByOrderId(orderId);
+		List<Map<String, String>> images = getImageSrc(orderDetailList);
+		order.set("statusName", getStatusName(order.getInt("status")));
+
+		setAttr("order", order);
+		setAttr("orderDetailList", orderDetailList);
+		setAttr("images", images);
+		render("member_order_detail.html");
+	}
+
+	private List<Map<String, String>> getImageSrc(List<Record> orderDetailList) {
+		List<Map<String, String>> imagePaths = new ArrayList<>();
+		for (Record record : orderDetailList) {
+			JSONArray jsonArray = JSONArray.parseArray(record.getStr("product_image_list_store"));
+			List<ImageJson> imageList = jsonArray.toJavaList(ImageJson.class);
+			Map<String, String> map = new HashMap<>();
+			map.put("productSn", record.getStr("product_sn"));
+			if (imageList.size() == 0) {
+				map.put("savePath", null);
+				imagePaths.add(map);
+			}
+			for (int i = 0; i < imageList.size(); i++) {
+				if (imageList.get(i).getImgName().indexOf(record.getStr("product_sn") + "_1") != -1) {
+					map.put("savePath", imageList.get(i).getSavePath());
+					imagePaths.add(map);
+					break;
+				}
+				if (i == imageList.size() - 1) {
+					map.put("savePath", null);
+					imagePaths.add(map);
+				}
+			}
+		}
+		return imagePaths;
+	}
+
+	private String getStatusName(int statusCode) {
+		if (statusCode == Consts.SALES_ORDER_STATUS_PASS)
+			return "已审核";
+		if (statusCode == Consts.SALES_ORDER_STATUS_DEFAULT)
+			return "待审核";
+		if (statusCode == Consts.SALES_ORDER_STATUS_CANCEL)
+			return "订单取消";
+		if (statusCode == Consts.SALES_ORDER_STATUS_REJECT)
+			return "订单拒绝";
+		if (statusCode == Consts.SALES_ORDER_STATUS_PART_OUT)
+			return "部分出库";
+		if (statusCode == Consts.SALES_ORDER_STATUS_PART_OUT_CLOSE)
+			return "部分出库-订单关闭";
+		if (statusCode == Consts.SALES_ORDER_STATUS_ALL_OUT)
+			return "全部出库";
+		if (statusCode == Consts.SALES_ORDER_STATUS_ALL_OUT_CLOSE)
+			return "全部出库-订单关闭";
+		return "无";
 	}
 }

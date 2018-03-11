@@ -16,6 +16,12 @@
 package org.ccloud.model.query;
 
 import java.util.LinkedList;
+import java.util.List;
+
+import com.jfinal.kit.StrKit;
+import com.jfinal.plugin.activerecord.Db;
+import com.jfinal.plugin.activerecord.Record;
+import org.ccloud.model.Member;
 import org.ccloud.model.MemberSalesOrder;
 
 import com.jfinal.plugin.activerecord.Page;
@@ -42,17 +48,81 @@ public class MemberSalesOrderQuery extends JBaseQuery {
 		});
 	}
 
-	public Page<MemberSalesOrder> paginate(int pageNumber, int pageSize, String orderby) {
-		String select = "select * ";
-		StringBuilder fromBuilder = new StringBuilder("from `cc_member_sales_order` ");
-
+	public Page<Record> paginateForApp(int pageNumber, int pageSize, String keyword, String status,
+	                                   String customerTypeId, String startDate, String endDate, String customerId) {
 		LinkedList<Object> params = new LinkedList<Object>();
+		String select = "select o.*, c.customer_name, c.contact as ccontact, c.mobile as cmobile, ct.name as customerTypeName,s.is_print ";
+		StringBuilder fromBuilder = new StringBuilder("from `cc_sales_order` o ");
+		fromBuilder.append("left join cc_seller_customer cc ON o.customer_id = cc.id ");
+		fromBuilder.append("left join cc_customer c on cc.customer_id = c.id ");
+		fromBuilder.append("left join cc_customer_type ct on o.customer_type_id = ct.id ");
+		fromBuilder.append("LEFT JOIN cc_sales_order_join_outstock so on so.order_id = o.id ");
+		fromBuilder.append("LEFT JOIN cc_sales_outstock s on s.id = so.outstock_id ");
+		fromBuilder.append("where c.id = ? ");
+		params.add(customerId);
+
+		appendIfNotEmpty(fromBuilder, "o.status", status, params, false);
+		appendIfNotEmptyWithLike(fromBuilder, "ct.name", customerTypeId, params, false);
+//		needWhere = appendIfNotEmpty(fromBuilder, "o.customer_type_id", customerTypeId, params, needWhere);
+
+		if (StrKit.notBlank(keyword)) {
+			fromBuilder.append(" and o.order_sn like '%" + keyword + "%' ");
+		}
+
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and o.create_date >= ?");
+			params.add(startDate);
+		}
+
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and o.create_date <= ?");
+			params.add(endDate);
+		}
+
+		fromBuilder.append(" order by o.create_date desc ");
 
 		if (params.isEmpty())
-			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
-		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
+
+	public Record getOrderListCount(String keyword, String status, String customerTypeId, String startDate,
+	                                String endDate, String customerId) {
+		LinkedList<Object> params = new LinkedList<Object>();
+		StringBuilder fromBuilder = new StringBuilder("select IFNULL(SUM(o.total_amount),0) as totalAmount, count(*) as orderCount from `cc_sales_order` o ");
+		fromBuilder.append("left join cc_seller_customer cc ON o.customer_id = cc.id ");
+		fromBuilder.append("left join cc_customer c on cc.customer_id = c.id ");
+		fromBuilder.append("left join cc_customer_type ct on o.customer_type_id = ct.id ");
+		fromBuilder.append("left join act_ru_task a on o.proc_inst_id = a.PROC_INST_ID_ ");
+		fromBuilder.append("LEFT JOIN cc_sales_order_join_outstock so on so.order_id = o.id ");
+		fromBuilder.append("LEFT JOIN cc_sales_outstock s on s.id = so.outstock_id ");
+		fromBuilder.append("where c.id = ? ");
+		params.add(customerId);
+
+		appendIfNotEmpty(fromBuilder, "o.status", status, params, false);
+		appendIfNotEmptyWithLike(fromBuilder, "ct.name", customerTypeId, params, false);
+
+		if (StrKit.notBlank(keyword)) {
+			fromBuilder.append(" and o.order_sn like '%" + keyword + "%' ");
+		}
+
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and o.create_date >= ?");
+			params.add(startDate);
+		}
+
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and o.create_date <= ?");
+			params.add(endDate);
+		}
+
+		if (params.isEmpty())
+			return Db.findFirst(fromBuilder.toString());
+
+		return Db.findFirst(fromBuilder.toString(), params.toArray());
+	}
+
 
 	public int batchDelete(String... ids) {
 		if (ids != null && ids.length > 0) {
@@ -65,6 +135,16 @@ public class MemberSalesOrderQuery extends JBaseQuery {
 			return deleteCount;
 		}
 		return 0;
+	}
+
+	public List<Record> findOrderCustomerTypeByCustomer(String customerId) {
+		StringBuilder sqlBuilder = new StringBuilder(" select ct.`name` ");
+		sqlBuilder.append(" from cc_sales_order so ");
+		sqlBuilder.append(" JOIN cc_seller_customer sc ON so.customer_id = sc.id ");
+		sqlBuilder.append(" JOIN cc_customer_type ct ON so.customer_type_id = ct.id ");
+		sqlBuilder.append(" WHERE sc.customer_id = ? ");
+		sqlBuilder.append(" GROUP BY ct.`name` ");
+		return Db.find(sqlBuilder.toString(), customerId);
 	}
 
 	

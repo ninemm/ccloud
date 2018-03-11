@@ -1,0 +1,192 @@
+<#include "_inc/_layout.html"/>
+<#macro title>订单详细</#macro>
+<#macro css> </#macro>
+
+<#macro script>
+    function orderAgain() {
+        //window.location.href = "${CPATH}/order/getOldOrder?orderId=${order.id}";
+    }
+	function getback() {
+		var oldUrl = document.referrer;
+		var url = oldUrl.split("?history=1");
+		if(url[0].indexOf("myOrder") !=-1 ) window.location.href = url[0] + '?history=1';
+		else window.location.href = url[0];
+	}
+	function cancel() {
+    	$.confirm({
+						title: "订单撤销",
+						text: '是否撤销订单？',
+						onOK: function () {
+							Utils.openLoadingWin('撤销中...');
+							$.get('${CPATH}/order/cancel?orderId=' + '${(order.id)!}',
+								function(result) {
+									if (result.errorCode > 0) {
+									    $.toptip(result.message, 'error');
+									} else {
+										location.reload();
+										$.toptip(result.message, 'success');
+									}
+									Utils.closeLoadingWin();
+								}
+							);
+						}
+					});
+    	
+    }
+</#macro>
+
+<@layout>
+<div class="weui-content">
+	<div id="order-detail">
+		<main class="ft14">
+		<div class="weui-panel weui-panel_access">
+			<div class="ft16">
+				订单状态 <!--<a class="fr blue" href="${CPATH}/order/operateHistory?id=${(order.id)!}&proc_inst_id=${(order.proc_inst_id)!}">${(order.statusName)!}</a>-->
+				<a class="fr blue" href="">${(order.statusName)!}</a>
+			</div>
+			<div class="gray">
+				<p>客户名称: ${(order.customer_name)!}</p>
+				<p>订货单号: ${(order.order_sn)!}</p>
+				<p>下单时间: ${(order.create_date)!}</p>
+				<p>业务员: ${(order.realname)!}</p>
+			</div>
+			<hr>
+			<div class="ft14">
+				<#if order.receive_type = 0> <input type="checkbox"
+					name="if-account" checked disabled="disabled" class="weui-agree__checkbox"> <#else> <input
+					type="checkbox" name="if-account" disabled="disabled" class="weui-agree__checkbox">
+				</#if>是否账期
+			</div>
+		</div>
+		<div class="weui-panel weui-panel_access">
+			<div class="ft16">订单详情</div>
+			<#list orderDetailList as orderDetail> 
+			<#if orderDetail.is_gift??>
+				<#if orderDetail.is_composite = 1>
+				<div class="todo-product-box">
+					<#list images! as list>
+						<#if list.productSn == orderDetail.product_sn>
+							<img src="${list.savePath!}" alt="" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'">
+							<#break>
+						</#if>
+					</#list>
+					<p>
+						<span class="ctag">组合</span>${(orderDetail.custom_name)!}
+					</p>
+					<div class="weui-flex">
+						<div class="weui-flex__item flex-grow2">
+							<div class="fl">
+								￥${(orderDetail.product_price)?string(',###.##')} <span class="gray">（${(orderDetail.price)?string(',###.##')}）</span>
+							</div>
+						</div>
+						<div class="weui-flex__item t-r">${(orderDetail.product_count
+							/ orderDetail.convert_relate)?floor}${(orderDetail.big_unit)!}</div>
+					</div>
+					<div class="weui-flex">
+						<div class="weui-flex__item flex-grow2">
+							<div class="fl">
+								￥${(orderDetail.product_price /
+								orderDetail.convert_relate)?string(',###.##')} <span class="gray">（${(orderDetail.price
+									/ orderDetail.convert_relate)?string(',###.##')}）</span>
+							</div>
+						</div>
+						<div class="weui-flex__item t-r">${(orderDetail.product_count
+							% orderDetail.convert_relate)}${(orderDetail.small_unit)!}</div>
+					</div>
+				</div>				
+				<#elseif orderDetail.is_gift = 1>
+				<div class="todo-product-box">
+					<#list images! as list>
+						<#if list.productSn == orderDetail.product_sn>
+							<img src="${list.savePath!}" alt="" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'">
+							<#break>
+						</#if>
+					</#list>
+					<p>
+						<span class="tag">赠品</span>${(orderDetail.custom_name)!}
+					</p>
+					<div class="weui-flex__item t-r">${(orderDetail.product_count
+						/ orderDetail.convert_relate)?floor}${(orderDetail.big_unit)!}</div>
+					<div class="weui-flex__item t-r">${(orderDetail.product_count
+						% orderDetail.convert_relate)}${(orderDetail.small_unit)!}</div>
+				</div>
+				<#else>
+				<div class="todo-product-box">
+					<#list images! as list>
+						<#if list.productSn == orderDetail.product_sn>
+							<img src="${list.savePath!}" alt="" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'">
+							<#break>
+						</#if>
+					</#list>
+					<p>${(orderDetail.custom_name)!}</p>
+					<div class="weui-flex">
+						<div class="weui-flex__item flex-grow2">
+							<div class="fl">
+								￥${(orderDetail.product_price)?string(',###.##')} <span class="gray">（${(orderDetail.price)?string(',###.##')}）</span>
+							</div>
+						</div>
+						<div class="weui-flex__item t-r">${(orderDetail.product_count
+							/ orderDetail.convert_relate)?floor}${(orderDetail.big_unit)!}</div>
+					</div>
+					<div class="weui-flex">
+						<div class="weui-flex__item flex-grow2">
+							<div class="fl">
+								￥${(orderDetail.product_price /
+								orderDetail.convert_relate)?string(',###.##')} <span class="gray">（${(orderDetail.price
+									/ orderDetail.convert_relate)?string(',###.##')}）</span>
+							</div>
+						</div>
+						<div class="weui-flex__item t-r">${(orderDetail.product_count
+							% orderDetail.convert_relate)}${(orderDetail.small_unit)!}</div>
+					</div>
+				</div>				
+				</#if> 
+			</#if> 
+			</#list>
+			<hr>
+			<div class="t-r ft14">
+				总计： <span class="red">${(order.total_amount)?string(',###.##')}元</span>
+			</div>
+		</div>
+		<div class="weui-panel weui-panel_access">
+			<div class="ft16">收货信息</div>
+			<div class="gray">
+				<p>
+					收货人：${(order.customer_name)!} <span class="fr">
+						${(order.cmobile)!}</span>
+				</p>
+				<p>地址详情：${(order.delivery_address)!}</p>
+			</div>
+			<hr>
+			<div class="ft16">
+				备注信息： <span class="ft14"> <#if order.remark??>
+					${(order.remark)!} <#else>无 </#if> </span>
+			</div>
+		</div>
+<!--		<a class="weui-panel weui-panel_access block"
+			href="${CPATH}/order/operateHistory?id=${(order.id)!}&proc_inst_id=${(order.proc_inst_id)!}">
+			<div class="weui-cell weui-cell_access">
+				<div class="weui-cell__bd ft16">操作记录</div>
+				<span class="weui-cell__ft"></span>
+			</div>
+		</a> -->
+		</main>
+		<div class="hidden-menu">
+			<ul>
+				<li><a href="${CPATH}/member/product/index">首页<img src="${CTPATH}/images/home.png" alt=""></a></li>
+				<li><a onclick="getback()">返回<img src="${CTPATH}/images/goback.png" alt=""></a></li>
+			</ul>
+			<img src="${CTPATH}/images/add.png" alt="" id="button" class="fr">
+		</div>
+		<div class="layer"></div>
+		<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
+			<#if order.status == 0 || (order.status == 1000 && order.is_print == 0)>
+			<button onclick="cancel()" class="white-button-no-border weui-flex__item border-top-1px">撤销</button>
+			<#else>
+			<button onclick="getback()" class="white-button-no-border weui-flex__item">返回</button>
+			</#if>
+			<button onclick="orderAgain()" class="red-button weui-flex__item">再次购买</button>
+		</footer>
+	</div>
+</div>
+</@layout>

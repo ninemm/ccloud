@@ -4,6 +4,10 @@
 	#valueName {
 		max-width: 7.5rem;
 	}
+
+	.weui-footer_fixed-bottom {
+		bottom: 2.5rem;
+	}
 </#macro>
 <#macro script_import>
 	<script type='text/javascript' src="${CTPATH}/js/shopping-cart.js"></script>
@@ -86,8 +90,10 @@ var newHtml = $(".common").eq(0).html();
 var $main = $("main");
 
 function initProduct(){
-	var productList = getItemBykey("productList");
-
+	var productList = getItemBykey("productList") == undefined ? [] : getItemBykey("productList");
+	if(productList.length == 0){
+		$main.append("<p style='text-align: center'>购物车空空的，快挑选商品吧</p>");
+	}
 	$.each(productList, function(index, el) {
 			$main.append("<div class='weui-panel weui-panel_access common'>" + newHtml + "</div>");
 			var $newProductDetail = $main.find(".common:last");
@@ -235,12 +241,13 @@ function order(){
 				</div>
 			</div>
 		</main>
-		<#include "_inc/_goback.html" />
+<!--		<#include "_inc/_member_goback.html" />-->
 		<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
 			<p class="total bg-white weui-flex__item" id="totalNum"></p>
-			<button id="addGoods" class="place-order yellow-button white">添加商品</button>
+<!--			<button id="addGoods" class="place-order yellow-button white">添加商品</button>-->
 			<button id="placeOrder" class="place-order red-button white">下单</button>
 		</footer>
 	</div>
 </div>
+<#include "_inc/_member_footer_nav.html" />
 </@layout>
