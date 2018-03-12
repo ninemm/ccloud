@@ -10,8 +10,6 @@ import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.IAtom;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
-import org.apache.shiro.authz.annotation.Logical;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.*;
@@ -159,7 +157,18 @@ public class OrderController extends BaseFrontController {
 
 		String orderId = StrKit.getRandomUUID();
 		Date date = new Date();
-		CustomerType customerType = CustomerTypeQuery.me().findBySellerCustomer(sellerId, moreInfo.get("customerId"));
+
+		String dealerSellerId = sellerId;
+		String deptId = DepartmentQuery.me().findBySellerId(sellerId).getId();
+		List<Department> departmentList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(deptId);
+		//根据sellerId查出他的经销商sellerId
+		for(Department department :departmentList)
+			if(department.getStr("seller_type").equals("0")) {
+				dealerSellerId = department.getStr("seller_id");
+				break;
+			}
+
+		CustomerType customerType = CustomerTypeQuery.me().findBySellerCustomer(dealerSellerId, moreInfo.get("customerId"));
 		String customerTypeName = customerType.getName();
 		String customerTypeProcDefKey = customerType.getProcDefKey();
 
@@ -168,7 +177,7 @@ public class OrderController extends BaseFrontController {
 		String orderSn = "SO" + sellerCode + customerType.getCode() + DateUtils.format("yyMMdd", date) + OrderSO;
 
 		String salesOrderId = SalesOrderQuery.me().memberInsert(moreInfo, customerType.getId(), orderId, orderSn, sellerId, user.getId(), date,
-				user.getDepartmentId(), user.getDataArea());
+				user.getDepartmentId(), user.getDataArea(), dealerSellerId);
 		if(StrKit.isBlank(salesOrderId)) return  "下单失败";
 
 		//做关联

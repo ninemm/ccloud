@@ -2114,14 +2114,14 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 
 	public String memberInsert(Map<String, String> moreInfo,String customerType, String orderId, String orderSn, String sellerId,
-								String userId, Date date, String deptId, String dataArea) {
+								String userId, Date date, String deptId, String dataArea, String dealerSellerId) {
 		SalesOrder salesOrder = new SalesOrder();
 		salesOrder.setId(orderId);
 		salesOrder.setOrderSn(orderSn);
 		salesOrder.setSellerId(sellerId);
 		salesOrder.setBizUserId(userId);
 		salesOrder.setCustomerTypeId(customerType);
-		salesOrder.setCustomerId(SellerCustomerQuery.me().findBySellerId(sellerId, moreInfo.get("customerId")).getId());
+		salesOrder.setCustomerId(SellerCustomerQuery.me().findBySellerId(dealerSellerId, moreInfo.get("customerId")).getId());
 		salesOrder.setContact(moreInfo.get("contact"));
 		salesOrder.setMobile(moreInfo.get("mobile"));
 		salesOrder.setAddress(moreInfo.get("address"));
