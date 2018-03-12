@@ -100,9 +100,9 @@ public class MemberJoinSellerQuery extends JBaseQuery {
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}
 
-	public MemberJoinSeller findUserId(String memberId, String sellerId) {
-		String sql = "SELECT user_id FROM cc_member_join_seller WHERE member_id = ? AND seller_id = ? ";
+	public MemberJoinSeller findUser(String memberId, String sellerId) {
+		String sql = "SELECT * FROM cc_member_join_seller WHERE member_id = ? AND seller_id = ? ";
 		return DAO.findFirst(sql, memberId, sellerId);
 	}
-	
+
 }

@@ -105,7 +105,7 @@ public class OrderController extends BaseFrontController {
 				for (int i = 0; i < sellerIdList.size(); i++) {
 					String sellerId = sellerIdList.get(i);
 					String sellerCode = SellerQuery.me().findById(sellerId).getSellerCode();
-					String userId = MemberJoinSellerQuery.me().findUserId(member.getId(), sellerId).getUserId();
+					String userId = MemberJoinSellerQuery.me().findUser(member.getId(), sellerId).getUserId();
 					User user = UserQuery.me().findById(userId);
 
 					List<Map<String, String>> paraList = new ArrayList<>();

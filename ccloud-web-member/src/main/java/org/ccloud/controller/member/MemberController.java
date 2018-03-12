@@ -177,18 +177,24 @@ public class MemberController extends BaseFrontController {
 
 					User sales = UserQuery.me().findById(sales_id);
 					List<Department> deptList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(sales.getDepartmentId());
-					String dealerDataArea = DepartmentQuery.me().getDealerDataArea(deptList);
-					Seller seller = SellerQuery.me()._findByDataArea(dealerDataArea);
-					MemberJoinSeller memberJoinSeller = new MemberJoinSeller();
-					memberJoinSeller.setMemberId(memberId);
-					memberJoinSeller.setSellerId(seller.getId());
-					memberJoinSeller.setUserId(sales_id);
-					memberJoinSeller.setStatus(1);
-					memberJoinSeller.setCreateDate(createDate);
-					if (!memberJoinSeller.save()) {
-						ret.set("message", "手机号绑定失败，请联系管理员");
+					Seller seller = SellerQuery.me()._findByDataArea(deptList.get(0).getDataArea());
+					MemberJoinSeller memberJoinSeller = MemberJoinSellerQuery.me().findUser(memberId, seller.getId());
+					if(memberJoinSeller == null) {
+						memberJoinSeller = new MemberJoinSeller();
+						memberJoinSeller.setMemberId(memberId);
+						memberJoinSeller.setSellerId(seller.getId());
+						memberJoinSeller.setUserId(sales_id);
+						memberJoinSeller.setStatus(1);
+						memberJoinSeller.setCreateDate(createDate);
+						if (!memberJoinSeller.save()) {
+							ret.set("message", "手机号绑定失败，请联系管理员");
+							return false;
+						}
+					}else if(!sales_id.equals(memberJoinSeller.getUserId())){
+						ret.set("message", "您已经与该帐套其他业务员绑定");
 						return false;
 					}
+
 					setSessionAttr(Consts.SESSION_LOGINED_MEMBER, member);
 				}
 				return true;
@@ -204,6 +210,7 @@ public class MemberController extends BaseFrontController {
 
 	//绑定用户信息
 	@Clear({SessionInterceptor.class})
+	@Before(WechatUserInterceptor.class)
 	public void bind() {
 
 		String openId = getSessionAttr(Consts.SESSION_WECHAT_OPEN_ID);
