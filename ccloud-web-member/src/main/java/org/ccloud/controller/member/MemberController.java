@@ -48,6 +48,7 @@ import java.util.List;
 @RouterMapping(url = "/member/member")
 public class MemberController extends BaseFrontController {
 
+	@Clear(SessionInterceptor.class)
 	@Before(WechatUserInterceptor.class)
 	public void auth() {
 
