@@ -311,7 +311,16 @@ public class CustomerVisitQuery extends JBaseQuery {
 	}
 	
 	public CustomerVisit findByActivityApplyIdAndComeFrom(String activityApplyId){
-		String sql = "select * from cc_customer_visit where active_apply_id = '"+activityApplyId+"' and come_from = 1";
+		String sql = "select * from cc_customer_visit where active_apply_id = '"+activityApplyId+"'";
 		return DAO.findFirst(sql);
+	}
+	
+	public List<CustomerVisit> findByActivityApplyId(String activityApplyId){
+		String sql = "select * from cc_customer_visit where active_apply_id = '"+activityApplyId+"' ORDER BY create_date desc";
+		return DAO.find(sql);
+	}
+	
+	public CustomerVisit findByApplyIdAndExecteIdAndSellerCustomerId(String applyId,String activityExecuteId,String sellerCustomerId) {
+		return DAO.doFindFirst("active_apply_id = ? and activity_execute_id = ? and seller_customer_id = ?", applyId, activityExecuteId, sellerCustomerId);
 	}
 }

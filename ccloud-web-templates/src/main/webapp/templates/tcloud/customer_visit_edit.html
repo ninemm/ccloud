@@ -98,20 +98,41 @@
 								        },
 								        dataType: "json",
 								        success: function(data) {
-								        		if(data!=""){
-									        		var html = "";
+								        		var activityExecute = data.activityExecute;
+								        		if(activityExecute.length>0){
+									        		
 								        			$(".imageActivityExecute").hide();
 								        			$(".imgeInfo").hide();
-								        			for(var i = 0 ; i < data.length ; i++){
-								        				html +='<div><input id="orderList" type="hidden" value="'+data[i].order_list+'"/>'+data[i].remark+'<div class="weui-uploader__info">0/3</div><div class="weui-uploader__bd">'
-						                                	+'<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles"></ul>'
-						                                	+'<div class="weui-uploader__input-box">'
-						                                   	+'<input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/*" multiple="">'
-						                                    +'<input type="hidden" name="pic" id="pic" class="pic">'
-						                                	+'</div></div></div>'
-								        			}
+								        			var imageLists = data.imgeLists;
+								        			var domain = data.domain;
 								        			$(".imgeActivity").html("");
-								        			$(".imgeActivity").append(html);
+								        			for(var i = 0 ; i < activityExecute.length ; i++){
+								        				var html = "";
+								        				html +='<div><input id="orderList" type="hidden" value="'+activityExecute[i].orderList+'"/>'+activityExecute[i].remark+'<div class="weui-uploader__info">0/3</div><div class="weui-uploader__bd">'
+						                                	+'<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles">';
+							                           for(var j = 0 ; j < imageLists.length ; j++){
+							                            	if(imageLists[j].orderList == activityExecute[i].orderList){
+								                            	html += '<li class="weui-uploader__file " style="background-image:url('+domain+'/'+imageLists[j].savePath+')"></li>';
+							                           			imageArr.push({"pic":imageLists[j].originalPath, "picname":imageLists[j].imgName,"orderList":activityExecute[i].orderList,"savepath":imageLists[j].savePath});
+							                            	}
+							                            }
+														 
+								                        if(imageLists[imageLists.length-1].orderList != activityExecute[i].orderList && i == (activityExecute.length-1)){
+						                                	html +='</ul>'
+							                                	+'<div class="weui-uploader__input-box">'
+							                                   	+'<input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/*" multiple="">'
+							                                    +'<input type="hidden" name="pic" id="pic" class="pic">'
+							                                	+'</div></div></div>';
+								                          }else{
+								                          	html +='</ul></div></div>';
+								                          }
+														 $(".imgeActivity").append(html);
+								        				
+								        			}
+								        			var maxOrderList = data.maxOrderList;
+								        			if(imageLists.length>0 && activityExecute.length == maxOrderList){
+								        				$("._submit_btn").hide();
+								        			}
 								        		}
 								        }
 							        });

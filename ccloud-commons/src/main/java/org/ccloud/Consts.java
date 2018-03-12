@@ -281,4 +281,14 @@ public class Consts {
 	public static final String FLOW_DICT_TYPE_NAME_AD = "feeType_name_AD";//终端广告
 	public static final String FLOW_DICT_TYPE_NAME_CHANNEL = "channel_define";//终端客情
 	
+	//客户拜访状态
+	public static final String CUSTOMER_VISIT_STATUS_PASS = "100101"; //正常
+	public static final String CUSTOMER_VISIT_STATUS_DEFAULT = "100102"; //待审核
+	public static final String CUSTOMER_VISIT_STATUS_REJECT = "100103"; //拒绝
+	
+	
+	
+	
+	
+	
 }

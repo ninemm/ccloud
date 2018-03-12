@@ -25,105 +25,67 @@
     var MAX_HEIGHT = 1000;
 	var html = "";
     $(function() {
-    	var customerVisitId = "${(customerVisit.id)!}";
     	var activityExecutesList = ${(activityExecutes)!};
         var imgeList = ${(list)!'1'};
         var domain = "${(domain)!}";
-        var flang = "${(flang)!}";
+        var flang = false;
         var _orderList = "${(orderList)!}";//点击的是第几执行步骤
-    	if(customerVisitId!=""){
-    		$("#customerVisitId").val("${(customerVisit.id)!}");
-	        $("#customer_name").val("${(customerVisit.customer_name)!}");
-	        $("#customer_id").val("${(customerVisit.seller_customer_id)!}");
-	        $("#contact").val("${(customerVisit.contact)!}");
-	        $("#mobile").val("${(customerVisit.mobile)!}");
-	        $("#address").val("${(customerVisit.prov_name)!}"+"-"+"${(customerVisit.city_name)!}"+"-"+"${(customerVisit.country_name)!}"+"-"+"${(customerVisit.address)!}");
-	        $("#question_type").val("${(customerVisit.typeName)!}");
-	        $("#question_desc").val("${(customerVisit.question_desc)!}")
-	        $("#location").val("${(customerVisit.location)!}");
-	        $("#problem_id").val("${(customerVisit.question_type)!}");
-	        $("#activity_apply_id").val("${(customerVisit.active_apply_id)!}");
-	        $("#length").text($("#question_desc").val().length + '/' + 70);
-	        $(document).on("input", "#question_desc", function() {
-	            $("#length").text($("#question_desc").val().length + '/' + 70);
-	        });
-	        if("${(customerVisit.title)!}"==""){
-	        	$(".activity_title").hide();
-	        }else{
-		        $("#activity_title").val("${(customerVisit.title)!}"+"/"+"${(customerVisit.expenseDetailName)!}")
-	        }
-			for(var i = 0 ; i < activityExecutesList.length ; i++){
-				$(".imgeActivity").html("");
-                if(_orderList == activityExecutesList[i].orderList && flang == 0){
-                   		 html +='<div><input id="orderList" type="hidden" value="'+activityExecutesList[i].orderList+'"/>'+activityExecutesList[i].remark+'<div class="weui-uploader__bd">'
-                                +'<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles" >';
-                        html +='</ul><div class="weui-uploader__input-box">'
-                                +'<input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/*" multiple="">'
-                                +'</div></div></div>';
-                       break;
-                }else{
-                	var imgeList = ${(imageList)!'1'};
-                	if(imgeList!=1){
-                		html +='<div><input id="orderList" type="hidden" value="'+activityExecutesList[i].orderList+'"/>'+activityExecutesList[i].remark+'<div class="weui-uploader__bd">'
-		                     +'<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles" >';
-                       for(var j = 0 ; j < imgeList.length ; j++){
-		                       	if(imgeList[j].orderList == activityExecutesList[i].orderList){
-				                        html +='<li class="weui-uploader__file " style="background-image:url('+domain+'/'+imgeList[j].savePath+')"></li>';
-				                        imageArr.push({"pic":imgeList[j].originalPath, "picname":imgeList[j].imgName,"orderList":imgeList[i].orderList,"savepath":imgeList[j].savePath});
-		                        }
-			                
-		                 }
-		                 html +='</ul></div>'
-		                           +'</div>';
-                       	if(flang == 1 && activityExecutesList[i].orderList == _orderList){
-		                	$('._submit_btn').hide();
-		                	break;
-			                }
-                	}
-                	
-               }
-            }
-		    $(".imgeActivity").html("");
-		   $(".imgeActivity").append(html);
-        }else{
-	    	$("#customer_id").val("${(record.seller_customer_id)!}");
-    	    $("#customer_name").val("${(record.customer_name)!}");
-        	$("#contact").val("${(record.contact)!}");
-        	$("#mobile").val("${(record.mobile)!}");
-        	$("#address").val("${(record.prov_name)!}"+"-"+"${(record.city_name)!}"+"-"+"${(record.country_name)!}"+"-"+"${(record.address)!}");
-	    	$("#activity_title").val("${(record.title)!}"+"/"+"${(record.expenseDetailName)!}")
-	    	$("#activity_apply_id").val("${(record.id)!}");
-	        $("#length").text($("#question_desc").val().length + '/' + 70);
-	        $(document).on("input", "#question_desc", function() {
-	            $("#length").text($("#question_desc").val().length + '/' + 70);
-	        });
-	        var activityApplyId = "${(customerVisit.activitApplyId)!}";
-	        $(".imageActivityExecute").hide();
-	        $(".weui-cell__ft").hide();
-			$(".imgeInfo").hide();
-	        var _orderList = "${(orderList)!}";
-	        for(var i = 0 ; i < activityExecutesList.length ; i++){
-	        	if(_orderList == activityExecutesList[i].orderList){
-	        		html +='<div><input id="orderList" type="hidden" value="'+activityExecutesList[i].orderList+'"/>'+activityExecutesList[i].remark+'<div class="weui-uploader__info">0/3</div><div class="weui-uploader__bd">'
-	                        	+'<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles" >';
-	                   	html +='</ul><div class="weui-uploader__input-box">'
+    	$("#customer_id").val("${(record.seller_customer_id)!}");
+   	    $("#customer_name").val("${(record.customer_name)!}");
+       	$("#contact").val("${(record.contact)!}");
+       	$("#mobile").val("${(record.mobile)!}");
+       	$("#address").val("${(record.prov_name)!}"+"-"+"${(record.city_name)!}"+"-"+"${(record.country_name)!}"+"-"+"${(record.address)!}");
+    	$("#activity_title").val("${(record.title)!}"+"/"+"${(record.expenseDetailName)!}")
+    	$("#activity_apply_id").val("${(record.id)!}");
+    	$("#activity_execute_id").val(${(activityExecuteId)!});
+        $("#length").text($("#question_desc").val().length + '/' + 70);
+        $(document).on("input", "#question_desc", function() {
+            $("#length").text($("#question_desc").val().length + '/' + 70);
+        });
+        var activityApplyId = "${(customerVisit.activitApplyId)!}";
+        $(".imageActivityExecute").hide();
+        $(".weui-cell__ft").hide();
+		$(".imgeInfo").hide();
+        var _orderList = "${(orderList)!}";
+       	var imgeList = ${(imgeLists)!'1'};
+        for(var i = 0 ; i < activityExecutesList.length ; i++){
+              		html +='<div><input id="orderList" type="hidden" value="'+activityExecutesList[i].orderList+'"/>'+activityExecutesList[i].remark+'<div class="weui-uploader__bd">'
+                     +'<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles" >';
+	                     for(var j = 0 ; j < imgeList.length ; j++){
+	                       	if(imgeList[j].orderList == activityExecutesList[i].orderList){
+			                        html +='<li class="weui-uploader__file " style="background-image:url('+domain+'/'+imgeList[j].savePath+')"></li>';
+			                        imageArr.push({"pic":imgeList[j].originalPath, "picname":imgeList[j].imgName,"orderList":imgeList[i].orderList,"savepath":imgeList[j].savePath});
+	                        }
+	                        if(imgeList[j].orderList == _orderList){
+	                        	$("#question_type").val("${(customerVisit.typeName)!}");
+						        $("#question_desc").val("${(customerVisit.question_desc)!}")
+						        $("#location").val("${(customerVisit.location)!}");
+						        $("#problem_id").val("${(customerVisit.question_type)!}");
+	        					$('._submit_btn').hide();
+	        					flang = true;
+	                        }
+		                }
+	                     if(flang == false && i == (activityExecutesList.length-1)){
+	                		html +='</ul><div class="weui-uploader__input-box">'
 	                        	+'<input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/*" multiple="">'
 	                        	+'</div></div></div>';
-	            }
-	        }
+					        $("#question_type").select({
+						        title: "请选择问题类型",
+						        multi: false,
+						        items: JSON.parse('${problem}'),
+						        onClose: function(obj) {
+						            var problemId = obj.data.values;
+						            if(problemId){
+						                $("#problem_id").val(problemId);
+						            }
+						        }
+						    });
+	                     }else{
+	                     	html +='</ul></div>'
+	                          	 +'</div>';
+	                     }
 	        $(".imgeActivity").html("");
 			$(".imgeActivity").append(html);
-	        $("#question_type").select({
-		        title: "请选择问题类型",
-		        multi: false,
-		        items: JSON.parse('${problem}'),
-		        onClose: function(obj) {
-		            var problemId = obj.data.values;
-		            if(problemId){
-		                $("#problem_id").val(problemId);
-		            }
-		        }
-		    });
     	}
         
         $(document).on("change", ".uploaderInput", function () {
@@ -189,11 +151,8 @@
                                 }
                             }
                             blob = canvas.toDataURL("image/jpeg", 0.5);
-                           if($("#activity_title").val()!=null){
-                           		imageArr.push({"pic":blob, "picname":x,"orderList":$this.parent().parent().parent().find("#orderList").val()});
-                           }else{
-                            	imageArr.push({"pic":blob, "picname":x,"orderList":"0"});
-                           }
+                            console.log($this.parent().parent().find("#orderList").val());
+                      		imageArr.push({"pic":blob, "picname":x,"orderList":$this.parent().parent().parent().find("#orderList").val()});
                            $(".pic").val(JSON.stringify(imageArr));
                             var str = '<li class="weui-uploader__file " style="background-image:url('+blob+')"></li>';
                             $this.parent().prev().append(str);
@@ -485,6 +444,7 @@
 							活动&nbsp;&nbsp;&nbsp;
 						</div>
 						<input id="activity_apply_id"  name="activity_apply_id" type="hidden" />
+						<input id="activity_execute_id"  name="activity_execute_id" type="hidden" />
 						<input id="activity_title" class="weui-input" name="activity_title" type="text" placeholder="请选择" readonly>
                     </div>
                 </div>

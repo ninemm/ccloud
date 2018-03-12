@@ -166,7 +166,7 @@ public class CustomerVisitController extends BaseFrontController {
 						"                <span class=\"weui-cell__ft\"></span>\n" +
 						"            </a>");
 			}else {
-*/				html.append("<a class=\"weui-cell weui-cell_access\" href=\"${CPATH}/customerVisit/detail?id=" + visit.getStr("id") + "&one=1\">\n" +
+*/				html.append("<a class=\"weui-cell weui-cell_access\" href=\"/customerVisit/detail?id=" + visit.getStr("id") + "&one=1\">\n" +
 						"                <div class=\"weui-cell__bd ft14\">\n" +
 						"                    <p>" + visit.getStr("customer_name") + "</p>\n" +
 						"                    <p class=\"gray ft12\">" + visit.getStr("contact") + "/" + visit.getStr("mobile") + "\n" +
@@ -206,9 +206,9 @@ public class CustomerVisitController extends BaseFrontController {
 		for (Record visit : visitList.getList())
 		{
 			if(visit.getStr("status").equals(Customer.CUSTOMER_BULU)) {
-				html.append("<a class=\"weui-cell weui-cell_access\" href=\"${CPATH}/customerVisit/customerVisitWaiting?id=" + visit.getStr("id") + "&one=1\">\n");
+				html.append("<a class=\"weui-cell weui-cell_access\" href=\"/customerVisit/customerVisitWaiting?id=" + visit.getStr("id") + "&one=1\">\n");
 			}else {
-				html.append("<a class=\"weui-cell weui-cell_access\" href=\"${CPATH}/customerVisit/detail?id=" + visit.getStr("id") + "\">\n" );}
+				html.append("<a class=\"weui-cell weui-cell_access\" href=\"/customerVisit/detail?id=" + visit.getStr("id") + "\">\n" );}
 			html.append(	"                <div class=\"weui-cell__bd ft14\">\n" +
 					"                    <p>" + visit.getStr("customer_name") + "</p>\n" +
 					"                    <p class=\"gray ft12\">" + visit.getStr("contact") + "/" + visit.getStr("mobile") + "\n" +
@@ -397,7 +397,6 @@ public class CustomerVisitController extends BaseFrontController {
 		customerVisit.setDataArea(user.getDataArea());
 		customerVisit.setDeptId(user.getDepartmentId());
 		customerVisit.setActiveApplyId(activityApplyId);
-		customerVisit.setComeFrom(0);
 		if (StrKit.notBlank(picJson)) {
 			
 			JSONArray array = JSON.parseArray(picJson);
@@ -407,20 +406,25 @@ public class CustomerVisitController extends BaseFrontController {
 				String picname = obj.getString("picname");
 				String orderList = obj.getString("orderList");
 				ImageJson image = new ImageJson();
-				image.setImgName(picname);
-				//原图
-				String originalPath = qiniuUpload(pic);
-				//添加的水印内容
-				String waterFont1 = customerVisit.getSellerCustomer().getCustomer().getCustomerName();
-				String waterFont2 = user.getRealname() +  DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
-//				String waterFont3 =  customerVisit.getLocation();
-				String waterFont3 = "湖北省-武汉市-洪山区";
-				//图片添加水印  上传图片  水印图
-				String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
-				
-				image.setSavePath(savePath.replace("\\", "/"));
-				image.setOriginalPath(originalPath.replace("\\", "/"));
 				image.setOrderList(orderList);
+				image.setImgName(picname);
+				if(pic.length() == 32) {
+					image.setSavePath(obj.getString("savepath"));
+					image.setOriginalPath(pic);
+				}else {
+					//原图
+					String originalPath = qiniuUpload(pic);
+					//添加的水印内容
+					String waterFont1 = customerVisit.getSellerCustomer().getCustomer().getCustomerName();
+					String waterFont2 = user.getRealname() +  DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
+	//				String waterFont3 =  customerVisit.getLocation();
+					String waterFont3 = "湖北省-武汉市-洪山区";
+					//图片添加水印  上传图片  水印图
+					String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
+					
+					image.setSavePath(savePath.replace("\\", "/"));
+					image.setOriginalPath(originalPath.replace("\\", "/"));
+				}
 				list.add(image);
 			}
 		}
@@ -666,7 +670,22 @@ public class CustomerVisitController extends BaseFrontController {
 	
 	public void getActivityExecute() {
 		String activityApplyId = getPara("activityApplyId");
-    	renderJson(ActivityExecuteQuery.me().findbyActivityId(ActivityApplyQuery.me().findById(activityApplyId).getActivityId()));
+		Map<String, Object> map = new HashMap<>();
+		map.put("activityExecute", JSON.toJSON(ActivityExecuteQuery.me().findbyActivityId(ActivityApplyQuery.me().findById(activityApplyId).getActivityId())));
+		List<CustomerVisit> customerVisits = CustomerVisitQuery.me().findByActivityApplyId(activityApplyId);
+		if(customerVisits.size()>0) {
+			map.put("imgeLists",JSON.parseArray(customerVisits.get(0).getPhoto(), ImageJson.class));
+			List<ImageJson> imageJsons = JSON.parseArray(customerVisits.get(0).getPhoto(), ImageJson.class);
+			List<String> lists = new ArrayList<>();
+			for(ImageJson imageJson : imageJsons) {
+				if(!lists.contains(imageJson.getOrderList())) {
+					lists.add(imageJson.getOrderList());
+				}
+			}
+			map.put("maxOrderList", lists.size());
+		}
+		map.put("domain",OptionQuery.me().findValue("cdn_domain"));
+		renderJson(map);
 	}
 	
 	
@@ -689,7 +708,6 @@ public class CustomerVisitController extends BaseFrontController {
 		customerVisit.setDataArea(user.getDataArea());
 		customerVisit.setDeptId(user.getDepartmentId());
 		customerVisit.setActiveApplyId(activityApplyId);
-		customerVisit.setComeFrom(0);
 		if (StrKit.notBlank(picJson)) {
 			
 			JSONArray array = JSON.parseArray(picJson);
@@ -700,19 +718,25 @@ public class CustomerVisitController extends BaseFrontController {
 				String orderList = obj.getString("orderList");
 				ImageJson image = new ImageJson();
 				image.setImgName(picname);
-				//原图
-				String originalPath = qiniuUpload(pic);
-				//添加的水印内容
-				String waterFont1 = customerVisit.getSellerCustomer().getCustomer().getCustomerName();
-				String waterFont2 = user.getRealname() +  DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
-//				String waterFont3 =  customerVisit.getLocation();
-				String waterFont3 = "湖北省-武汉市-洪山区";
-				//图片添加水印  上传图片  水印图
-				String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
-				
-				image.setSavePath(savePath.replace("\\", "/"));
-				image.setOriginalPath(originalPath.replace("\\", "/"));
 				image.setOrderList(orderList);
+				if(pic.length() == 32) {
+					image.setSavePath(obj.getString("savepath"));
+					image.setOriginalPath(pic);
+				}else {
+					//原图
+					String originalPath = qiniuUpload(pic);
+					//添加的水印内容
+					String waterFont1 = customerVisit.getSellerCustomer().getCustomer().getCustomerName();
+					String waterFont2 = user.getRealname() +  DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
+	//				String waterFont3 =  customerVisit.getLocation();
+					String waterFont3 = "湖北省-武汉市-洪山区";
+					//图片添加水印  上传图片  水印图
+					String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
+					
+					image.setSavePath(savePath.replace("\\", "/"));
+					image.setOriginalPath(originalPath.replace("\\", "/"));
+					image.setOrderList(orderList);
+				}
 				list.add(image);
 			}
 		}
@@ -744,24 +768,6 @@ public class CustomerVisitController extends BaseFrontController {
 			renderAjaxResultForSuccess("操作成功");
 		else 
 			renderAjaxResultForError("操作失败");
-	}
-	
-	public void customerVisitWaiting() {
-		
-		keepPara();
-		
-		String id = getPara("id");
-		CustomerVisit customerVisit = CustomerVisitQuery.me().findMoreById(id);
-		String imageListStore = customerVisit.getStr("photo");
-		List<ImageJson> list = JSON.parseArray(imageListStore, ImageJson.class);
-		if(!customerVisit.getStr("active_apply_id").equals("")) {
-			List<ActivityExecute> activityExecutes = ActivityExecuteQuery.me().findbyActivityId(ActivityApplyQuery.me().findById(customerVisit.getStr("active_apply_id")).getActivityId());
-			setAttr("activityExecute",activityExecutes);
-		}
-		setAttr("list",JSON.toJSON(list));
-		setAttr("domain",OptionQuery.me().findValue("cdn_domain"));
-		setAttr("customerVisit", customerVisit);		
-		render("customer_visit_waiting.html");
 	}
 	
 	@Before(Tx.class)
@@ -827,32 +833,41 @@ public class CustomerVisitController extends BaseFrontController {
 		}
 	}
 
+	public void customerVisitWaiting() {
+		
+		keepPara();
+		
+		String id = getPara("id");
+		CustomerVisit customerVisit = CustomerVisitQuery.me().findMoreById(id);
+		String imageListStore = customerVisit.getStr("photo");
+		List<ImageJson> list = JSON.parseArray(imageListStore, ImageJson.class);
+		if(!customerVisit.getStr("active_apply_id").equals("")) {
+			List<ActivityExecute> activityExecutes = ActivityExecuteQuery.me().findbyActivityId(ActivityApplyQuery.me().findById(customerVisit.getStr("active_apply_id")).getActivityId());
+			setAttr("activityExecute",activityExecutes);
+		}
+		setAttr("list",JSON.toJSON(list));
+		setAttr("domain",OptionQuery.me().findValue("cdn_domain"));
+		setAttr("customerVisit", customerVisit);		
+		render("customer_visit_waiting.html");
+	}
+
 	public void addActivityApplyVisit() {
-		String  flang = "0";
 		String activityApplyId = getPara("activeApplyId");
-		//comeFrom = 1 来源于活动列表
-		CustomerVisit customerV = CustomerVisitQuery.me().findByActivityApplyIdAndComeFrom(activityApplyId);
+		String activityExecuteId = getPara("activityExecuteId");
+		List<CustomerVisit> customerVisits = CustomerVisitQuery.me().findByActivityApplyId(activityApplyId);
+		if(customerVisits.size()>0) {
+			setAttr("imgeLists",JSON.toJSON(JSON.parseArray(customerVisits.get(0).getPhoto(), ImageJson.class)));
+			setAttr("customerVisit",CustomerVisitQuery.me().findMoreById(customerVisits.get(0).getId()));
+		}
 		Record record = ActivityQuery.me().findByApplyId(activityApplyId);
 		String orderList = getPara("orderList");
-		List<ActivityExecute> activityExecutes = ActivityExecuteQuery.me().findbyActivityId(record.getStr("activity_id"));
+		List<ActivityExecute> activityExecutes = ActivityExecuteQuery.me().findbyActivityIdAndOrderList(record.getStr("activity_id"),orderList);
 		
 		List<Map<String, String>> list = getVisitTypeList();
 		setAttr("problem", JSON.toJSONString(list));
 		setAttr("activityExecutes",JSON.toJSONString(activityExecutes));
+		setAttr("activityExecuteId",JSON.toJSONString(activityExecuteId));
 		setAttr("record",record);
-		if(customerV!=null){
-			setAttr("imageList",customerV.getPhoto());
-			CustomerVisit customerVisit = CustomerVisitQuery.me().findMoreById(customerV.getId());
-			setAttr("customerVisit",customerVisit);
-			List<ImageJson> listImages = JSON.parseArray(customerVisit.getPhoto(), ImageJson.class);
-			for(ImageJson image : listImages){
-				if(image.getOrderList().equals(orderList)){
-					flang ="1";
-					break;
-				}
-			}
-		}
-		setAttr("flang",flang);
 		setAttr("domain",OptionQuery.me().findValue("cdn_domain"));
 		setAttr("orderList",orderList);
 		render("customer_visit_activity.html");
@@ -863,6 +878,7 @@ public class CustomerVisitController extends BaseFrontController {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		
 		String activityApplyId = getPara("activity_apply_id");
+		String activityExecuteId = getPara("activity_execute_id");
 		Boolean isChecked = OptionQuery.me().findValueAsBool("web_proc_customer_visit_" + getSessionAttr("sellerCode"));
 		
 		List<ImageJson> list = Lists.newArrayList();
@@ -875,7 +891,7 @@ public class CustomerVisitController extends BaseFrontController {
 		customerVisit.setDataArea(user.getDataArea());
 		customerVisit.setDeptId(user.getDepartmentId());
 		customerVisit.setActiveApplyId(activityApplyId);
-		customerVisit.setComeFrom(1);
+		customerVisit.setActivityExecuteId(activityExecuteId);
 		if (StrKit.notBlank(picJson)) {
 			
 			JSONArray array = JSON.parseArray(picJson);

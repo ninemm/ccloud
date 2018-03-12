@@ -1,5 +1,5 @@
 <#include "_inc/_layout.html"/>
-<#macro title>新增拜访</#macro>
+<#macro title>拜访补录</#macro>
 
 <#macro script_import>
     <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
@@ -43,8 +43,6 @@
             $("#length").text($("#question_desc").val().length + '/' + 70);
         });
         var activityApplyId = "${(customerVisit.activitApplyId)!}";
-        var imgeList = ${(list)!'1'};
-        var domain = "${(domain)!}";
         	var html = "";
         	if(activityApplyId!=""){
 				$.ajax({
@@ -55,18 +53,20 @@
 			        dataType: "json",
 			        success: function(data) {
 			        		if(data!=null){
-				        		
+				        		var imgeList = data.imgeLists;
+				        		var domain = data.domain;
+				        		var activityExecute = data.activityExecute;
 			        			$(".imageActivityExecute").hide();
 			        			$(".imgeInfo").hide();
-			        			if(data.length>0){
-				        			for(var i = 0 ; i < data.length ; i++){
-					        				html +='<div><input id="orderList" type="hidden" value="'+data[i].order_list+'"/>'+data[i].remark+'<div class="weui-uploader__info">0/3</div><div class="weui-uploader__bd">'
+			        			if(activityExecute.length>0){
+				        			for(var i = 0 ; i < activityExecute.length ; i++){
+					        				html +='<div><input id="orderList" type="hidden" value="'+activityExecute[i].orderList+'"/>'+activityExecute[i].remark+'<div class="weui-uploader__info">0/3</div><div class="weui-uploader__bd">'
 				                               	+'<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles" >';
 				                          if(imgeList != 1){
 					                           for(var j = 0 ; j < imgeList.length ; j++){
-					                            	if(imgeList[j].orderList == data[i].order_list){
+					                            	if(imgeList[j].orderList == activityExecute[i].orderList){
 						                            	html += '<li class="weui-uploader__file " style="background-image:url('+domain+'/'+imgeList[j].savePath+')"></li>';
-					                           			imageArr.push({"pic":imgeList[j].originalPath, "picname":imgeList[j].imgName,"orderList":data[i].order_list,"savepath":imgeList[j].savePath});
+					                           			imageArr.push({"pic":imgeList[j].originalPath, "picname":imgeList[j].imgName,"orderList":activityExecute[i].orderList,"savepath":imgeList[j].savePath});
 					                            	}
 					                            }
 				                          }

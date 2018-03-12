@@ -613,31 +613,30 @@ public class ActivityController extends BaseFrontController {
 						"						</div>\n"+
 						"                        <div class=\"weui-flex\">\n");
 //				html.append("  <div class=\"stepCont stepCont2\">\n" + 
-//						"      <!-- <div class=\"ystep\"></div> -->\n" + 
-//						"      <div class='ystep-container ystep-lg ystep-blue'></div>\n" + 
-//						"  </div>");				
-				for(int i  = 0 ; i < activityExecutes.size() ; i++) {
-					if(i>num){
-						html.append("<a class=\"weui-cell weui-btn_disabled weui-btn_primary\">\n" +
-								"                       <div class=\"weui-flex__item\">\n" +
-								"                                <p>" + activityExecutes.get(i).getOrderList() + "</p>\n" +
-								"                            </div></a>\n");
-						
-					}else{
-						html.append("<a class=\"weui-cell weui-cell_access\" href=\"/customerVisit/addActivityApplyVisit?id=" + activityExecutes.get(i).getStr("id") + "&orderList="+activityExecutes.get(i).getOrderList()+"&activeApplyId="+apply.getStr("id")+"\">\n" +
-								"                       <div class=\"weui-flex__item\">\n" +
-								"                                <p>" + activityExecutes.get(i).getOrderList() + "</p>\n" +
-								"                            </div></a>\n");
-						
+//				"      <!-- <div class=\"ystep\"></div> -->\n" + 
+//				"      <div class='ystep-container ystep-lg ystep-blue'></div>\n" + 
+//				"  </div>");	
+					for(int i  = 0 ; i < activityExecutes.size() ; i++) {
+						CustomerVisit customerVist = CustomerVisitQuery.me().findByApplyIdAndExecteIdAndSellerCustomerId(apply.getStr("id"),activityExecutes.get(i).getStr("id"),apply.getStr("seller_customer_id"));
+						if((i==num || (customerVist!=null && i<num)) && apply.getStr("status").equals("1")){
+							html.append("<a class=\"weui-cell weui-cell_access\" href=\"/customerVisit/addActivityApplyVisit?activityExecuteId=" + activityExecutes.get(i).getStr("id") + "&orderList="+activityExecutes.get(i).getOrderList()+"&activeApplyId="+apply.getStr("id")+"\">\n" +
+									"                       <div class=\"weui-flex__item\">\n" +
+									"                                <p>" + activityExecutes.get(i).getOrderList() + "</p>\n" +
+									"                            </div></a>\n");
+							
+						}else {
+							html.append("<a onclick=\"warning()\" class=\"weui-cell weui-btn_disabled weui-btn_primary\">\n" +
+									"                       <div class=\"weui-flex__item\">\n" +
+									"                                <p>" + activityExecutes.get(i).getOrderList() + "</p>\n" +
+									"                            </div></a>\n");
+						}
 					}
-				}
-			}
 			
 			html.append( "                        </div>\n" +
 					"                    </div>\n" +
 					"                </section>");
 		}
-
+		}
 		Map<String, Object> map = new HashMap<>();
 		map.put("html", html.toString());
 		map.put("totalRow", applyList.getTotalRow());
