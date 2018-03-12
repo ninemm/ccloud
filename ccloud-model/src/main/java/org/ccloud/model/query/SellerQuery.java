@@ -173,7 +173,7 @@ public class SellerQuery extends JBaseQuery {
 	}
 
 	public Seller _findByDataArea(String dataArea){
-		String sql="SELECT s.* from cc_seller s join department d on s.dept_id where data_area = ?";
+		String sql="SELECT s.* from cc_seller s join department d on s.dept_id = d.id where data_area = ?";
 		return DAO.findFirst(sql,dataArea);
 	}
 }
