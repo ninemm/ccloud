@@ -74,15 +74,21 @@ public class MemberJoinSellerQuery extends JBaseQuery {
 
 	public List<Record> findProductListForApp(String memberId, String keyword, String tag) {
 		StringBuilder fromBuilder = new StringBuilder(
-				" SELECT sp.seller_id, sp.id AS sell_product_id, sp.product_id, sp.custom_name, sp.store_count, sp.price, sp.cost, sp.account_price, sp.tags,"
-						+ " p.convert_relate, p.product_sn, p.big_unit, p.small_unit, p.description, t1.valueName,"
-						+ " g.`name` AS goodsName, g.product_image_list_store, gc.`id` AS categoryId, gc.`name` AS categoryName, gt.`id` as typeId, gt.`name` as typeName ");
+				" SELECT sp.seller_id, sp.id AS sell_product_id, sp.product_id, sp.custom_name, sp.store_count, "
+						+ "sp.price, sp.cost, sp.account_price, sp.tags, p.convert_relate, p.product_sn, p.big_unit, "
+						+ "p.small_unit, p.description, t1.valueName, g.`name` AS goodsName, g.product_image_list_store, "
+						+ "gc.`id` AS categoryId, gc.`name` AS categoryName, gt.`id` as typeId, gt.`name` as typeName, "
+						+ "cs.seller_name, u.realname ");
 		fromBuilder.append(" FROM cc_seller_product sp JOIN cc_product p ON sp.product_id = p.id ");
 		fromBuilder.append(" LEFT JOIN (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv.`name`) AS valueName FROM cc_goods_specification_value sv RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id ) t1 ON t1.product_set_id = p.id ");
 		fromBuilder.append(" JOIN cc_goods g ON p.goods_id = g.id JOIN cc_goods_category gc ON g.goods_category_id = gc.id JOIN cc_goods_type gt on g.goods_type_id = gt.id ");
-		fromBuilder.append(" WHERE sp.is_enable = 1 AND sp.is_gift = 0");
+		fromBuilder.append(" LEFT JOIN cc_seller cs ON cs.id = sp.seller_id ");
+		fromBuilder.append(" LEFT JOIN cc_member_join_seller cmjs ON cmjs.seller_id = sp.seller_id ");
+		fromBuilder.append(" LEFT JOIN `user` u ON u.id = cmjs.user_id");
+		fromBuilder.append(" WHERE sp.is_enable = 1 AND sp.is_gift = 0 AND cmjs.member_id = ? ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
+		params.add(memberId);
 
 		fromBuilder.append(" AND sp.seller_id IN (SELECT cmjs.seller_id FROM cc_member_join_seller cmjs WHERE cmjs.member_id = ? AND cmjs.status = ? ) ");
 		params.add(memberId);
