@@ -103,9 +103,11 @@ $(function () {
 			$.toptip("请选择客户", 'warning');
 			return;
 		}
-		if (!checkApply()) {
-			$.toptip("申请量大于剩余量或申请量为空", 'warning');
-			return;			
+		if ($("#isLimit").val() == "1") {
+			if (!checkApply()) {
+				$.toptip("申请量大于剩余量或申请量为空", 'warning');
+				return;			
+			}		
 		}
 		$.confirm("您确定要申请活动吗？","活动申请", function() {
 			doSubmit();
@@ -221,6 +223,7 @@ function showCustomer(activity){
 function changeEvent(activity,$obj){
 	$obj.find("#activityId").val(activity.id);
 	$obj.find("#visitNum").val(activity.visit_num);
+	$obj.find("#isLimit").val(activity.is_limit);
 	$obj.find("#startTime").val(new Date(activity.start_time).Format("yyyy-MM-dd"));
 	$obj.find("#endTime").val(new Date(activity.end_time).Format("yyyy-MM-dd"));
 	if (activity.customerTypeName != null && activity.customerTypeName != "") {
@@ -424,6 +427,7 @@ function doChange(key){
 						<input type="text" class="weui-input activity-item" id="title" readonly placeholder="请选择活动项目">
 						<input type="hidden" name="activity_id" id="activityId">
 						<input type="hidden" name="visit_num" id="visitNum">
+						<input type="hidden" name="li_limit" id="isLimit">
 						<i class="icon-sort-desc"></i>
 					</div>
 					<div class="weui-cell weui-cell_access">
