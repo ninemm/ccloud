@@ -196,9 +196,9 @@ public class ActivityQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN `user` u ON u.id=caa.biz_user_id");
 		fromBuilder.append(" LEFT JOIN cc_seller_customer csc ON csc.id=caa.seller_customer_id");
 		fromBuilder.append(" LEFT JOIN cc_customer cc ON cc.id = csc.customer_id");
-		fromBuilder.append(" LEFT JOIN(  SELECT ccv.seller_customer_id ,ccv.user_id ,COUNT(1) executeNum FROM cc_activity_apply aa LEFT JOIN cc_customer_visit ccv ON aa.id = ccv.active_apply_id   WHERE aa.activity_id = '");
+		fromBuilder.append(" LEFT JOIN(  SELECT ccv.seller_customer_id ,ccv.user_id ,COUNT(1) executeNum,aa.id FROM cc_customer_visit ccv LEFT JOIN cc_activity_apply aa ON aa.id = ccv.active_apply_id   WHERE aa.activity_id = '");
 		fromBuilder.append(id+"' AND aa.`status` in(1,4) GROUP BY ccv.seller_customer_id,ccv.user_id) t1 ON t1.seller_customer_id = csc.id and t1.user_id=caa.biz_user_id");
-		fromBuilder.append(" WHERE ca.id='"+id+"' AND caa.`status` in(1,4) ");
+		fromBuilder.append(" WHERE caa.id=t1.id and ca.id='"+id+"' AND caa.`status` in(1,4) ");
 		if (StrKit.notBlank(keyword)) {
 			fromBuilder.append(" and (cc.customer_name like '%"+keyword+"%' or u.realname like '%"+keyword+"%')");
 		}
@@ -218,7 +218,7 @@ public class ActivityQuery extends JBaseQuery {
 
 	public Page<Record> visitDetailsPaginate(int pageNumber, int pageSize, String keyword, String startDate,
 			String endDate, String id, String customerId, String userId) {
-		String select = "SELECT u.realname,ca.proc_code,(SELECT d.`name` FROM dict d WHERE d.`key` = ca.invest_type AND d.type = '"+Consts.INVEST_TYPE+"') invest_type,cc.customer_name,CONCAT(cc.prov_name,cc.city_name,cc.country_name,cc.address) address";
+		String select = "SELECT u.realname,ca.proc_code,(SELECT d.`name` FROM dict d WHERE d.`key` = ca.invest_type AND d.type = '"+Consts.INVEST_TYPE+"') investType,cc.customer_name,CONCAT(cc.prov_name,cc.city_name,cc.country_name,cc.address) address";
 		select = select+",caa.create_date putDate ,ccv.photo,( SELECT group_concat(cct.`name`) FROM cc_customer_type cct WHERE LOCATE(cct.id , csc.customer_type_ids) > 0 GROUP BY csc.customer_type_ids) customer_type";
 		StringBuilder fromBuilder = new StringBuilder(" FROM cc_customer_visit ccv ");
 		fromBuilder.append(" LEFT JOIN cc_activity_apply caa ON caa.id=ccv.active_apply_id ");
