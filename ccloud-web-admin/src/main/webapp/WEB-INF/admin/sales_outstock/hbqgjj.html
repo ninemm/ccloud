@@ -31,6 +31,13 @@ var headerInfo =
 			'<img id="imgName"  src={2} style="width: 80px;position: absolute;top: -52px;left: 0 "   class="imgStyle"  />'+ 
 		'</div>' +
 	'</div>';
+	
+var jjheaderInfo =
+	'<div class="header clear clearheader">' +
+	    '<div class="titleArea">' +
+			'<h1>{0}发货单</h1>' +
+		'</div>' +
+	'</div>';
 
 var headerStr =
 	'<table class="printContent clearcontent">' +
@@ -154,7 +161,7 @@ function queryPrintDetail(financePrint) {
                       src = "${CPATH}/"+item.orderQrcodeUrl;
                       headerInfoContent = $.format(headerInfo, (item.sellerName != null) ? item.sellerName: "", '送',src);
                 	 }else{
-                	 headerInfoContent = $.format(headerInfo, (item.sellerName != null) ? item.sellerName: "", '送');
+                	 headerInfoContent = $.format(jjheaderInfo, (item.sellerName != null) ? item.sellerName: "", '送');
                 	 }
                     let placeOrderMan = item.placeOrderMan;
                     let placeOrderPhone = item.placeOrderPhone;
