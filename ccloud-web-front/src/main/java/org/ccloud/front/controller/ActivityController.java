@@ -612,7 +612,10 @@ public class ActivityController extends BaseFrontController {
 						"						</div>\n"+
 						"						</div>\n"+
 						"                        <div class=\"weui-flex\">\n");
-				
+//				html.append("  <div class=\"stepCont stepCont2\">\n" + 
+//						"      <!-- <div class=\"ystep\"></div> -->\n" + 
+//						"      <div class='ystep-container ystep-lg ystep-blue'></div>\n" + 
+//						"  </div>");				
 				for(int i  = 0 ; i < activityExecutes.size() ; i++) {
 					if(i>num){
 						html.append("<a class=\"weui-cell weui-btn_disabled weui-btn_primary\">\n" +
@@ -628,7 +631,7 @@ public class ActivityController extends BaseFrontController {
 						
 					}
 				}
-				}
+			}
 			
 			html.append( "                        </div>\n" +
 					"                    </div>\n" +
