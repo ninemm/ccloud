@@ -624,7 +624,7 @@ public class ActivityController extends BaseFrontController {
 								"                            </div></a>\n");
 						
 					}else{
-						html.append("<a class=\"weui-cell weui-cell_access\" href=\"${CPATH}/customerVisit/addActivityApplyVisit?id=" + activityExecutes.get(i).getStr("id") + "&orderList="+activityExecutes.get(i).getOrderList()+"&activeApplyId="+apply.getStr("id")+"\">\n" +
+						html.append("<a class=\"weui-cell weui-cell_access\" href=\"/customerVisit/addActivityApplyVisit?id=" + activityExecutes.get(i).getStr("id") + "&orderList="+activityExecutes.get(i).getOrderList()+"&activeApplyId="+apply.getStr("id")+"\">\n" +
 								"                       <div class=\"weui-flex__item\">\n" +
 								"                                <p>" + activityExecutes.get(i).getOrderList() + "</p>\n" +
 								"                            </div></a>\n");

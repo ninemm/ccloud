@@ -15,23 +15,31 @@
  */
 package org.ccloud.mid;
 
+import java.io.UnsupportedEncodingException;
 import java.rmi.RemoteException;
+import java.util.Base64;
+import java.util.List;
 
 import org.ccloud.middledb.ArrayOfAnyType;
+import org.ccloud.middledb.ArrayOfQYBasicFlowType;
 import org.ccloud.middledb.MiddleWebService;
 import org.ccloud.middledb.MiddleWebServiceSoap;
 import org.ccloud.middledb.MySoapHeader;
+import org.ccloud.middledb.ObjectFactory;
+import org.ccloud.middledb.QYBasicFlowType;
+
+import com.jfinal.kit.StrKit;
 
 public class MidDataUtil {
 
 	public static void main(String[] args) throws RemoteException {
-		// // 创建一个MiddleWS工厂
-		// MiddleWebService factory = new MiddleWebService();
-		// // 根据工厂创建一个MiddleWSSoap对象
-		// MiddleWebServiceSoap middleWSSoap = factory.getMiddleWebServiceSoap();
-		// // 调用WebService提供的getQYBasicFeeTypeFromMidDB方法获取分类基础信息
-		// ArrayOfAnyType anyType = new ArrayOfAnyType();
-		// byte[] x = middleWSSoap.getQYBasicFeeTypeFromMidDB(anyType);
+//		 // 创建一个MiddleWS工厂
+//		 MiddleWebService factory = new MiddleWebService();
+//		 // 根据工厂创建一个MiddleWSSoap对象
+//		 MiddleWebServiceSoap middleWSSoap = factory.getMiddleWebServiceSoap();
+//		 // 调用WebService提供的getQYBasicFeeTypeFromMidDB方法获取分类基础信息
+//		 ArrayOfAnyType anyType = new ArrayOfAnyType();
+//		 byte[] x = middleWSSoap.getQYBasicFeeTypeFromMidDB(anyType);
 
 		// MiddleWebServiceLocator Locator = null;
 		// MiddleWebServiceSoapStub stub = null;
@@ -46,7 +54,43 @@ public class MidDataUtil {
 		// }
 		//
 		// byte[] result = stub.getQY_BasicFeeTypeFromMidDB(null);
-		// System.out.println(result);
+//		MiddleWebService webservice = new MiddleWebService();
+//		MiddleWebServiceSoap middleWebServiceSoap = webservice.getMiddleWebServiceSoap();
+//		byte[] x = middleWebServiceSoap.getQYActivityFromMidDB(null);
+//		if (x != null) {
+//			Base64.Decoder decoder = Base64.getDecoder();
+//			Base64.Encoder encoder = Base64.getEncoder();
+//			String encodedText = encoder.encodeToString(x);
+//			System.out.println(encodedText);
+//			//解码
+//			try {
+//				System.out.println(new String(decoder.decode(encodedText), "UTF-8"));
+//			} catch (UnsupportedEncodingException e) {
+//				e.printStackTrace();
+//			}
+//		}
+		
+//		MiddleWebService middleWebService = new MiddleWebService();
+//		MiddleWebServiceSoap middleWebServiceSoap = middleWebService.getMiddleWebServiceSoap();	
+//	 
+//		ArrayOfQYBasicFlowType flowTypeList = new ArrayOfQYBasicFlowType();		
+//		List<QYBasicFlowType> qyFlowTypeList = flowTypeList.getQYBasicFlowType();
+//
+//		ObjectFactory objectFactory=new ObjectFactory();
+//		QYBasicFlowType qyFlowType = objectFactory.createQYBasicFlowType();
+//		qyFlowType.setFlowTypeID(StrKit.getRandomUUID());
+//		qyFlowType.setFlowTypeName("测试终端流程");
+//		qyFlowType.setParentID("");
+//		qyFlowType.setMemo("测试数据");
+//        qyFlowType.setCreateTime("2018-3-12 14:25:00");
+//        qyFlowType.setModifyTime("2018-3-12 14:25:00");
+//        qyFlowType.setFlag(1);
+//        
+//		String userName="JPHD";
+//		String passWord="JPHD2017";		
+//		qyFlowTypeList.add(qyFlowType);	
+//		int account = middleWebServiceSoap.syncQYBasicFlowTypeToMidDB(userName, passWord, flowTypeList);
+//		System.out.println(account);
 	}
 
 	public static byte[] getFeeType() {
@@ -70,6 +114,31 @@ public class MidDataUtil {
 		System.out.println(result);
 		return result;
 
+	}
+	
+	//写入接口示例
+	public static int Syn() {
+		MiddleWebService middleWebService = new MiddleWebService();
+		MiddleWebServiceSoap middleWebServiceSoap = middleWebService.getMiddleWebServiceSoap();	
+	 
+		ArrayOfQYBasicFlowType flowTypeList = new ArrayOfQYBasicFlowType();		
+		List<QYBasicFlowType> qyFlowTypeList = flowTypeList.getQYBasicFlowType();
+
+		ObjectFactory objectFactory=new ObjectFactory();
+		QYBasicFlowType qyFlowType = objectFactory.createQYBasicFlowType();
+		qyFlowType.setFlowTypeID(StrKit.getRandomUUID());
+		qyFlowType.setFlowTypeName("测试终端流程");
+		qyFlowType.setParentID("");
+		qyFlowType.setMemo("测试数据");
+        qyFlowType.setCreateTime("2018-3-12 14:25:00");
+        qyFlowType.setModifyTime("2018-3-12 14:25:00");
+        qyFlowType.setFlag(1);
+        
+		String userName="JPHD";
+		String passWord="JPHD2017";		
+		qyFlowTypeList.add(qyFlowType);	
+		int account = middleWebServiceSoap.syncQYBasicFlowTypeToMidDB(userName, passWord, flowTypeList);
+		return account;
 	}
 
 }
