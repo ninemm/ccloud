@@ -293,14 +293,11 @@
                                 <span>${(bean.title)!}</span>
                             </div>
                             <div class="check-pass">
-	                           <c:choose>
-								   <c:when ${(bean.content)!}=="" || ${(bean.content)!}==null>  
-								   		客户审核
-								   </c:when>
-								   <c:otherwise> 
-										${(bean.content)!}
-								   </c:otherwise>
-								</c:choose>
+	                            <#if bean.content??>
+	                           		 ${(bean.content)!}
+	                           		 <#else> 客户审核
+	                            </#if>
+	                           		 
                             </div>
                             <div class="weui-cell__ft">${(bean.create_date?string('yyyy-MM-dd HH:mm'))!}</div>
                         </div>

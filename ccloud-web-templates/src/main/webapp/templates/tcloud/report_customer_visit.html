@@ -1,0 +1,414 @@
+<#include "_inc/_layout.html"/>
+<#macro title>业务员销售报表</#macro>
+<#macro css>
+    .report {
+        font-size: 0.7rem;
+	    position: absolute;
+	    top: 0;
+	    width: 100%;
+	    bottom: 50px;
+	    overflow: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .report .weui-panel__hd:after {
+        left: 0;
+        height: 0;
+    }
+</#macro>
+
+<#macro css_import>
+<link rel="stylesheet" href="${CTPATH}/css/normalize.css">
+</#macro>
+<#macro script_import>
+<script type='text/javascript' src="${CTPATH}/js/echarts.min.js"></script>
+</#macro>  
+<#macro script>
+  $(function () {
+  
+    $("#dayTag").val("today");
+	var params = {
+		"dayTag":  'month'
+	}  
+ 	customerVisitCount(params);
+ 	customerCount(params);
+ 	visitCount(params);
+ 	orderStatus(params);
+  })
+  
+    function customerVisitCount(params) {
+		Utils.ajax('${CPATH}/report/customerInfoCount', params, 
+			function(data){
+				$("#visitCount").html(data[0].customerVisitCount+"次");
+				$("#totalAmount").html(data[0].customerCount);
+			}
+		);    	
+    }
+    
+    var unit = '名';
+    function customerCount(params) {
+        var customerCount = document.getElementById('customerCount');
+        var customerCountChart = echarts.init(customerCount);
+        customerCountChart.showLoading();    
+		Utils.ajax('${CPATH}/report/customerVisitCount', params, 
+			function(data){
+				customerCountChart.hideLoading();
+	            var crSeriesData = [];
+	            var legendData = [];
+	            var length = data.length;
+	            var high = 40 * length + 100;
+	            if (high < 300) {
+	            	$("#customerCount").height(300);
+	            } else {
+	            	$("#customerCount").height(high);
+	            }
+	            if (length == 0) {
+	                crSeriesData.push({
+	                    name: '暂无数据',
+	                    value: 0
+	                });	            	
+	            }	
+	            for(var i = 0; i < length; i++){
+	            	legendData.push(data[i].customer_name)
+	                crSeriesData.push({
+	                    name: data[i].name,
+	                    value: data[i].value
+	                });
+	            }
+				option = {
+				    tooltip: {
+				        trigger: 'item',
+				        formatter: "{a} <br/>{b}: {c}"+unit+"({d}%)"
+				    },
+				    legend: {
+				        orient: 'horizontal',
+				        data:legendData,
+				    },
+				    series: [
+				        {
+				            name:'数据来源',
+				            type:'pie',
+				            radius: ['40%', '60%'],
+				            avoidLabelOverlap: false,
+				            label: {
+				                normal: {
+				                    show: false,
+				                    position: 'center'
+				                },
+				                emphasis: {
+				                    show: true,
+				                    textStyle: {
+				                        fontSize: '15',
+				                        fontWeight: 'bold'
+				                    }
+				                }
+				            },
+				            labelLine: {
+				                normal: {
+				                    show: false
+				                }
+				            },
+				            data:crSeriesData
+				        }
+				    ]
+				};
+	            customerCountChart.resize();
+	            customerCountChart.setOption(option,true);
+			}
+		);     
+    }
+    
+    /*function visitCount(params) {
+        var visitCount = document.getElementById('visitCanve');
+        var visitCountChart = echarts.init(visitCanve);
+    	visitCountChart.showLoading(); 
+		Utils.ajax('${CPATH}/report/visitMoreInfo', params, 
+			function(data){
+				visitCountChart.hideLoading(); 
+	            var crSeriesData = [];
+	            var legendData = [];
+	            var length = data.length;
+	            var high = 65 * length + 100;
+	            if (high < 300) {
+	            	$("#visitCanve").height(300);
+	            } else {
+	            	$("#visitCanve").height(high);
+	            }	            
+	            if (length == 0) {
+	            	$("#visitCanve").height(300);
+	                crSeriesData.push({
+	                    name: '暂无数据',
+	                    value: 0
+	                });	            	
+	            }
+	            for(var i = 0; i < length; i++){
+	            	legendData.push("拜访"+data[i].count+"次")
+				     crSeriesData.push({
+				         name: "拜访"+data[i].count+"次",
+				         value: data[i].CountNum
+				     });
+	            }
+				option = {
+				    tooltip: {
+				        trigger: 'item',
+				        formatter: "{a} <br/>{b}: {c}"+unit+"({d}%)"
+				    },
+				    legend: {
+				        orient: 'horizontal',
+				        x: 'left',
+				        data:legendData
+				    },
+				    series: [
+				        {
+				            name:'数据来源',
+				            type:'pie',
+				            radius: ['40%', '60%'],
+				            avoidLabelOverlap: false,
+				            label: {
+				                normal: {
+				                    show: false,
+				                    position: 'center'
+				                },
+				                emphasis: {
+				                    show: true,
+				                    textStyle: {
+				                        fontSize: '10',
+				                        fontWeight: 'bold'
+				                    }
+				                }
+				            },
+				            labelLine: {
+				                normal: {
+				                    show: false
+				                }
+				            },
+				            data:crSeriesData
+				        }
+				    ]
+				};
+	            visitCountChart.resize();
+	            visitCountChart.setOption(option,true);
+			}
+		);    	
+    }*/
+    
+    function visitCount(params) {
+        var visitCount = document.getElementById('visitCanve');
+    	var visitCountChart = echarts.init(visitCanve);
+    	//visitCountChart.showLoading();    
+		Utils.ajax('${CPATH}/report/visitMoreInfo', params, 
+			function(data){
+				//visitCountChart.showLoading(); 
+		        var yData = [];
+		        var seriesData = [];
+	            var length = data.length;
+		        for (var i = 0; i < data.length; i++) {
+		           yData.push("拜访"+data[i].count+"次");
+           		   seriesData.push(data[i].CountNum);
+		       	}
+		
+				option = {
+				    title: {
+				        text: '拜访次数',
+				    },				
+				    tooltip: {
+				        trigger: 'axis',
+				        axisPointer: {
+				            type: 'shadow'
+				        }
+				    },
+				    legend: {
+				        data: yData.reverse(),
+				        x: 'left'
+				    },
+				    grid: {
+				        bottom: '3%',
+				        containLabel: true
+				    },
+				    xAxis: {
+				    	show : false,
+				        type: 'value',
+				        boundaryGap: [0, 0.01]
+				    },
+				    yAxis: {
+				        type: 'category',
+				        data: yData
+				    },
+				    series: [
+		            {
+		                type:'bar',
+		                barWidth: 15,
+		                data:seriesData.reverse(),
+		                label:{
+		                    normal:{
+		                        show:true,
+		                        position:'right',
+		                        formatter: '{c}' + '名'
+		                    }
+		                }
+		
+		            }
+				    ]
+				};
+		
+		        visitCountChart.resize();
+	            visitCountChart.setOption(option,true);
+		    }    		
+		);    	
+    }
+    
+    function urlSelect(params, type){
+    	if (type == 'day') {
+		 	customerCount(params);
+		 	visitCount(params);
+		 	orderStatus(params);
+		} else {
+		 	customerCount(params);
+		 	visitCount(params);
+		 	orderStatus(params);
+		}
+    }
+    
+ 	function dayTagSelect(obj,type) {
+      $.actions({
+        actions: [{
+          text: "本月",
+          onClick: function () {
+			var params = {
+				"dayTag": 'month',
+			}
+			urlSelect(params,type); 
+            $(obj).find(".dayTagText").text('本月')
+            $("#dayTag").val("month");
+          }
+        },{
+          text: "上月",
+          onClick: function () {
+			var params = {
+				"dayTag": 'lastmonth',
+			}         
+			urlSelect(params,type);
+          	$(obj).find(".dayTagText").text('上月')
+          	$("#dayTag").val("lastmonth");
+          }
+        }]
+      }); 	
+ 	}
+ 	
+    function orderStatus(params) {
+    	var salesIndent = document.getElementById('orderStatus');
+    	var salesIndentChart = echarts.init(salesIndent);
+    	salesIndentChart.showLoading();    
+		Utils.ajax('${CPATH}/report/getSales', params, 
+			function(data){
+				salesIndentChart.hideLoading();
+		        var yData = [];
+		        var seriesData = [];
+	            var length = data.length;
+		        for (var i = 0; i < data.length; i++) {
+		           yData.push("拜访"+data[i].count+"次");
+           		   seriesData.push(data[i].amountNum);
+		       	}
+		
+				option = {
+				    title: {
+				        text: '拜访次数',
+				    },				
+				    tooltip: {
+				        trigger: 'axis',
+				        axisPointer: {
+				            type: 'shadow'
+				        }
+				    },
+				    legend: {
+				        data: yData.reverse(),
+				        x: 'left'
+				    },
+				    grid: {
+				        bottom: '3%',
+				        containLabel: true
+				    },
+				    calculable : true,
+				    xAxis: {
+				    	show : false,
+				        type: 'value',
+				        boundaryGap: [0, 0.01]
+				    },
+				    yAxis: {
+				        type: 'category',
+				        data: yData
+				    },
+				    series: [
+		            {
+		                type:'bar',
+		                barWidth: 15,
+		                data:seriesData.reverse(),
+		                label:{
+		                    normal:{
+		                        show:true,
+		                        position:'right',
+		                        formatter: '{c}' + '元'
+		                    }
+		                }
+		
+		            }
+				    ]
+				};
+		
+		        salesIndentChart.resize();
+		        salesIndentChart.setOption(option, false);
+		    }    		
+		);    	
+    }
+ 	
+</#macro>
+<@layout>
+	<div class="weui-content">
+	<div class="report">
+		<div class="weui-panel weui-panel_access report-header">
+			<div class="weui-panel__hd">
+				<span class="overview-hd-title">拜访简报</span> 
+				<div>
+					<span class="briefly" onclick="dayTagSelect(this,'day')">
+						<p class="dayTagText">本月</p>
+						<i class="icon-angle-down"></i>
+					</span>
+					<input type="hidden" id="dayTag">
+				</div>
+			</div>
+		</div>
+		<div class="weui-panel weui-panel_access">
+			<div class="weui-panel__hd">
+				<span class="overview-hd-title">客户拜访统计</span> 
+			</div>
+			<div class="weui-panel__bd report-area">
+				<div class="weui-media-box ft14">
+					<div id="customerCount" style="height: 300px;">
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="weui-panel weui-panel_access">
+			<div class="weui-panel__hd">
+				<span class="overview-hd-title">根据拜访次数对客户数统计</span> 
+			</div>
+			<div class="weui-panel__bd report-area">
+				<div class="weui-media-box ft14">
+					<div id="visitCanve" style="height: 300px;">
+						
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="weui-panel weui-panel_access margin-0">
+			<div class="weui-panel__hd"><span class="overview-hd-title">订单完成统计(平均每家订单的金额)</span></div>
+			<div class="weui-panel__bd report-area">
+				<div class="weui-media-box ft14">
+					<div id="orderStatus" style="height: 300px;"></div>
+				</div>
+			</div>
+		</div>	
+		</div>	
+		<#include "_inc/_footer_nav.html" />
+	</div>
+</@layout>
