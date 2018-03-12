@@ -6,7 +6,11 @@
 	}
 
 	.weui-footer_fixed-bottom {
-		bottom: 2.5rem;
+		bottom: 53px;
+	}
+
+	#shopping-cart main{
+		bottom: 98px;
 	}
 </#macro>
 <#macro script_import>
@@ -92,7 +96,7 @@ var $main = $("main");
 function initProduct(){
 	var productList = getItemBykey("productList") == undefined ? [] : getItemBykey("productList");
 	if(productList.length == 0){
-		$main.append("<p style='text-align: center'>购物车空空的，快挑选商品吧</p>");
+		$main.append("<p style='text-align: center; margin-top:50px;'>购物车空空的，快挑选商品吧</p>");
 	}
 	$.each(productList, function(index, el) {
 			$main.append("<div class='weui-panel weui-panel_access common'>" + newHtml + "</div>");
