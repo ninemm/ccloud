@@ -2112,5 +2112,12 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append("WHERE sok.id= '"+s+"'");
 		return DAO.findFirst(fromBuilder.toString());
 	}
+	
+	public int updateQrcodeImgUrl(String qrcodeImgUrl,String orderId,Date date) {
+
+		return Db.update("update cc_sales_order set order_qrcode_url = ?, confirm_date = ? where id = ?",qrcodeImgUrl,
+				date, orderId);
+
+	}
 
  }
