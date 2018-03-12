@@ -103,6 +103,8 @@ $(function() {
     	var product_image_list_store = $this.find("#product_image_list_store").val();
     	var product_sn = $this.find("#product_sn").val();
     	var imageS = getImageS(product_image_list_store, product_sn);
+		var seller_name = $this.find("#seller_name").val();
+		var realname = $this.find("#realname").val();
 		var imgSwiper;
 		
 		layer.open({
@@ -116,6 +118,8 @@ $(function() {
 			'</div>' +
 			'<p>名称：' + productName + '</p>' +
 			'<p>规格：' + valueName + '</p>' +
+			'<p>经销商：' + seller_name + '</p>' +
+			'<p>业务员：' + realname + '</p>' +
 			'<p>描述：' + description + '</p>',
 		  anim: 'scale',
 		  className: 'product-detail',
@@ -243,6 +247,8 @@ function initProduct(productList){
 		$newProductDetail.find("#image").attr("src", getImageUrl(el.product_image_list_store, el.product_sn));
 		$newProductDetail.find("#product_image_list_store").val(el.product_image_list_store);
 		$newProductDetail.find("#product_sn").val(el.product_sn);
+		$newProductDetail.find("#seller_name").val(el.seller_name);
+		$newProductDetail.find("#realname").val(el.realname);
 	});
 }
 
@@ -443,6 +449,8 @@ function order(){
 								<input type="hidden" id="description" value="0">
 								<input type="hidden" id="product_image_list_store" value="">
 								<input type="hidden" id="product_sn" value="">
+								<input type="hidden" id="seller_name" value="">
+								<input type="hidden" id="realname" value="">
 								<div class="product-top">
 									<img src="" id="image" style="width:2rem;" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'" onClick="imageClick(this)">
 									<div class="weui-cell_access product-top-right">
