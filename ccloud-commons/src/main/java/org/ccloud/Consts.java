@@ -15,6 +15,10 @@
  */
 package org.ccloud;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class Consts {
 
 	public static final String FIRST_URL="/admin";
@@ -36,7 +40,8 @@ public class Consts {
 	public static final String WORKFLOW_APPLY_USERNAME = "applyUsername";
 	public static final String WORKFLOW_APPLY_SELLER_ID = "sellerId";
 	public static final String WORKFLOW_APPLY_SELLER_CODE = "sellerCode";
-
+    public static final List<String> QRDEALERCODE = new ArrayList<>(Arrays.asList("02701015"));
+	
 	public static final String CHARTSET_UTF8 = "UTF-8";
 
 	public static final String INDEX_URL = "/";
@@ -91,6 +96,7 @@ public class Consts {
 	public static final String TAXONOMY_TEMPLATE_PREFIX = "for$";
 
 	public static final String QRCODE_PATH = "/qrcode/";// 二维码生成路径
+	public static final String ORDER_QRCODE_PATH = "orderQrcode/";// 二维码生成路径
 
 	public static final String DICT_UNIT_CODE = "unit";//单位类型字典编码
 
