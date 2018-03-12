@@ -28,9 +28,13 @@ import org.ccloud.middledb.MySoapHeader;
 import org.ccloud.middledb.ObjectFactory;
 import org.ccloud.middledb.QYBasicFlowType;
 
+import com.jfinal.kit.PropKit;
 import com.jfinal.kit.StrKit;
 
 public class MidDataUtil {
+	
+	private static String userName = PropKit.use("midData.properties").get("middata_soap_username");
+	private static String passWord = PropKit.use("midData.properties").get("middata_soap_password");
 
 	public static void main(String[] args) throws RemoteException {
 //		 // 创建一个MiddleWS工厂
@@ -134,8 +138,6 @@ public class MidDataUtil {
         qyFlowType.setModifyTime("2018-3-12 14:25:00");
         qyFlowType.setFlag(1);
         
-		String userName="JPHD";
-		String passWord="JPHD2017";		
 		qyFlowTypeList.add(qyFlowType);	
 		int account = middleWebServiceSoap.syncQYBasicFlowTypeToMidDB(userName, passWord, flowTypeList);
 		return account;
