@@ -166,7 +166,7 @@ public class CustomerVisitController extends BaseFrontController {
 						"                <span class=\"weui-cell__ft\"></span>\n" +
 						"            </a>");
 			}else {
-*/				html.append("<a class=\"weui-cell weui-cell_access\" href=\"/customerVisit/detail?id=" + visit.getStr("id") + "&one=1\">\n" +
+*/				html.append("<a class=\"weui-cell weui-cell_access\" href=\"${CPATH}/customerVisit/detail?id=" + visit.getStr("id") + "&one=1\">\n" +
 						"                <div class=\"weui-cell__bd ft14\">\n" +
 						"                    <p>" + visit.getStr("customer_name") + "</p>\n" +
 						"                    <p class=\"gray ft12\">" + visit.getStr("contact") + "/" + visit.getStr("mobile") + "\n" +
@@ -206,9 +206,9 @@ public class CustomerVisitController extends BaseFrontController {
 		for (Record visit : visitList.getList())
 		{
 			if(visit.getStr("status").equals(Customer.CUSTOMER_BULU)) {
-				html.append("<a class=\"weui-cell weui-cell_access\" href=\"/customerVisit/customerVisitWaiting?id=" + visit.getStr("id") + "&one=1\">\n");
+				html.append("<a class=\"weui-cell weui-cell_access\" href=\"${CPATH}/customerVisit/customerVisitWaiting?id=" + visit.getStr("id") + "&one=1\">\n");
 			}else {
-				html.append("<a class=\"weui-cell weui-cell_access\" href=\"/customerVisit/detail?id=" + visit.getStr("id") + "\">\n" );}
+				html.append("<a class=\"weui-cell weui-cell_access\" href=\"${CPATH}/customerVisit/detail?id=" + visit.getStr("id") + "\">\n" );}
 			html.append(	"                <div class=\"weui-cell__bd ft14\">\n" +
 					"                    <p>" + visit.getStr("customer_name") + "</p>\n" +
 					"                    <p class=\"gray ft12\">" + visit.getStr("contact") + "/" + visit.getStr("mobile") + "\n" +
