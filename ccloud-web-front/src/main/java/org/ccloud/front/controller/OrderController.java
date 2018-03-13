@@ -424,6 +424,7 @@ public class OrderController extends BaseFrontController {
 			}
 			param.put("manager", orderReviewer.getUsername());
 			toUserId = orderReviewer.getId();
+			OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核", user.getId(), toUserId, user.getDepartmentId(), user.getDataArea(),orderId);
 		}
 
 		String procInstId = workflow.startProcess(orderId, proc_def_key, param);
@@ -435,8 +436,6 @@ public class OrderController extends BaseFrontController {
 		if(!salesOrder.update()) {
 			return "下单失败";
 		}
-
-		OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核", user.getId(), toUserId, user.getDepartmentId(), user.getDataArea(),orderId);
 
 		return "";
 	}

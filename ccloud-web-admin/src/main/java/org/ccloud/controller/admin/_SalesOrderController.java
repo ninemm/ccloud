@@ -468,6 +468,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 			}
 			param.put("manager", orderReviewer.getUsername());
 			toUserId = orderReviewer.getId();
+			OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核", user.getId(), toUserId, user.getDepartmentId(), user.getDataArea(), orderId);
 		}
 
 		String procInstId = workflow.startProcess(orderId, proc_def_key, param);
@@ -475,13 +476,11 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		salesOrder.setProcKey(proc_def_key);
 		salesOrder.setStatus(Consts.SALES_ORDER_STATUS_DEFAULT);
 		salesOrder.setProcInstId(procInstId);
-		
+
 		if(!salesOrder.update()) {
 			return false;
 		}
 
-		OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核", user.getId(), toUserId, user.getDepartmentId(), user.getDataArea(), orderId);
-		
 		return true;
 	}
 

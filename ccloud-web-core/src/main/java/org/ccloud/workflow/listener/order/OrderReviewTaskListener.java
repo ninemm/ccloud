@@ -44,7 +44,7 @@ public class OrderReviewTaskListener implements TaskListener {
 					acountUserName = acountUserName + ",";
 				}
 				acountUserName += record.getStr("username");
-				OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核", record.getStr("id"), user.getId(),
+				OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核", user.getId(), record.getStr("id"),
 						user.getDepartmentId(), user.getDataArea(), orderId);
 			}
 			task.setAssignee(acountUserName);
@@ -64,7 +64,7 @@ public class OrderReviewTaskListener implements TaskListener {
 			if (size == 1) {// 订单审核人
 				User orderReviewer = UserQuery.me().findOrderReviewerByDeptId(user.getDepartmentId());
 				task.setAssignee(orderReviewer.getUsername());
-				OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核", orderReviewer.getId(), user.getId(), user.getDepartmentId(),
+				OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核", user.getId(), orderReviewer.getId(), user.getDepartmentId(),
 						user.getDataArea(), orderId);
 			} else if (size == 2) {// 财务
 				String treasurerUserName = "";
@@ -76,7 +76,7 @@ public class OrderReviewTaskListener implements TaskListener {
 					}
 
 					treasurerUserName += record.getStr("username");
-					OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核", record.getStr("id"), user.getId(),
+					OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核",  user.getId(), record.getStr("id"),
 							user.getDepartmentId(), user.getDataArea(), orderId);
 				}
 				task.setAssignee(treasurerUserName);
