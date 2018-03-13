@@ -37,7 +37,7 @@
        	$("#address").val("${(record.prov_name)!}"+"-"+"${(record.city_name)!}"+"-"+"${(record.country_name)!}"+"-"+"${(record.address)!}");
     	$("#activity_title").val("${(record.title)!}"+"/"+"${(record.expenseDetailName)!}")
     	$("#activity_apply_id").val("${(record.id)!}");
-    	$("#activity_execute_id").val(${(activityExecuteId)!});
+    	$("#activity_execute_id").val("${(activityExecuteId)!}");
         $("#length").text($("#question_desc").val().length + '/' + 70);
         $(document).on("input", "#question_desc", function() {
             $("#length").text($("#question_desc").val().length + '/' + 70);
@@ -476,7 +476,6 @@
                         <div class="weui-uploader imgeActivity">
                             <div class="weui-uploader__hd">
                                 <p class="weui-uploader__title">附件图片</p>
-                                <div class="weui-uploader__info imgeInfo">0/3</div>
                             </div>
                             <div class="weui-uploader__bd imageActivityExecute">
                                 <ul class="weui-uploader__files uploaderFiles" id="uploaderFiles"></ul>

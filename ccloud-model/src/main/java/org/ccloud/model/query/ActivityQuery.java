@@ -267,4 +267,16 @@ public class ActivityQuery extends JBaseQuery {
 				"GROUP BY caa.id";
 		return Db.findFirst(sql);
 	}
+	
+	
+	public List<Record> _findByCustomerId(String customerId) {
+		StringBuilder fromBuilder = new StringBuilder("SELECT a.id as activityApplyId, ca.title,d.`name`,a.create_date from cc_activity_apply a  ");
+		fromBuilder.append(" LEFT JOIN cc_activity ca on ca.id = a.activity_id ");
+		fromBuilder.append(" LEFT JOIN cc_expense_detail cea on a.expense_detail_id = cea.id ");
+		fromBuilder.append(" LEFT JOIN dict d on d.type=cea.flow_dict_type and d.`value` = cea.item1 ");
+		fromBuilder.append(" where a.seller_customer_id ='"+customerId+"' and a.`status` = '"+Consts.ACTIVITY_APPLY_STATUS_PASS+"'");
+		fromBuilder.append(" GROUP BY a.id");
+		return Db.find(fromBuilder.toString());
+	}
+
 }

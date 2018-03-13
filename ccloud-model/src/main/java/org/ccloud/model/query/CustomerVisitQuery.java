@@ -323,4 +323,18 @@ public class CustomerVisitQuery extends JBaseQuery {
 	public CustomerVisit findByApplyIdAndExecteIdAndSellerCustomerId(String applyId,String activityExecuteId,String sellerCustomerId) {
 		return DAO.doFindFirst("active_apply_id = ? and activity_execute_id = ? and seller_customer_id = ?", applyId, activityExecuteId, sellerCustomerId);
 	}
+	
+	public CustomerVisit findByActivityApplyIdAndOrderList(String activityApplyId, String orderList) {
+		String sql = "SELECT * from cc_customer_visit "
+				+ "where activity_execute_id in ( SELECT e.id from cc_activity_execute e where e.activity_id in "
+				+ "(SELECT activity_id from cc_activity_apply where id = '"+activityApplyId+"') "
+				+ "and e.order_list = '"+orderList+"') "
+				+ "and active_apply_id = '"+activityApplyId+"'";
+		return DAO.findFirst(sql);
+	}
+	
+	public List<CustomerVisit> findByApplyIdAndSellerCustomerId(String activityApplyId , String sellerCustomerId) {
+		String sql = "select * from cc_customer_visit where seller_customer_id = '"+sellerCustomerId+"' and active_apply_id = '"+activityApplyId+"'";
+		return DAO.find(sql);
+	}
 }

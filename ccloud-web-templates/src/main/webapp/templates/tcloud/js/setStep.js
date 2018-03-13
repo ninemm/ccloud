@@ -33,6 +33,7 @@ function SetStep(arg){
 SetStep.prototype.init=function(arg){
     var _that=this;
     extend(this.opt,arg);
+    _that.opt.curStep = this.opt.stepCounts;
     this.opt.stepCounts=this.opt.steps.length;
     this.content=$(this.opt.content);
     this.pageCont=this.content.find(this.opt.pageCont)
@@ -90,8 +91,24 @@ SetStep.prototype.init=function(arg){
     //判断时候可点击进度条 并绑定点击事件
     if(this.opt.clickAble){
         stepsHtml.find('li').on('click',function(){
-            _that.opt.curStep=$(this).index()+1;
-            _that.setProgress(_that.stepContainer,_that.opt.curStep,_that.opt.stepCounts)
+        	var orderList = $(this).index()+1;
+        	var applyId = $(this).parent().parent().parent().find(".orderList").val();
+        	$.ajax({
+    			url:"/customerVisit/checkCustomerVisit",
+    			type:"post",
+    			dataType:"json",
+    			data:{"orderList":orderList,"applyId":applyId},
+    			success:function(data)
+    			{
+    				if(data.message == ""){
+    					location.href = "/customerVisit/addActivityApplyVisit?orderList="+orderList+"&applyId="+applyId;
+    					_that.opt.curStep=$(this).index()+1;
+    					_that.setProgress(_that.stepContainer,_that.opt.curStep,_that.opt.stepCounts)
+    				}else{
+    					alert(data.message);
+    				}
+    			}
+    		});
         })
     }
      $(window).resize(function(){

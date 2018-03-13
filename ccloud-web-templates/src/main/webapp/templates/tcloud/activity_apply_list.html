@@ -212,11 +212,16 @@
                 $("#applyList").empty();
                 if(data.html.length == 0) data.html = data.html +'<div class="weui-loadmore weui-loadmore_line"><span class="weui-loadmore__tips">暂无数据</span></div>';
                 $("#applyList").html(data.html);
-                /*var step2=new SetStep({
-			        content:'.stepCont2',
-			        clickAble:false
-			    })*/
                 pageNumber = 2;
+                for(var i = 0 ; i < data.applyL.length; i++){
+                	var step2=new SetStep({
+			        content:'#'+data.applyL[i].activityApply.id,
+			        steps: data.applyL[i].strings,
+			        stepCounts:data.applyL[i].num,
+			        showBtn : false,
+			        clickAble:true
+			    })
+             }
             }
         });
     }
