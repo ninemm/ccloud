@@ -285,6 +285,7 @@
 		
 		var accountPrice = parseInt($(obj).parent().parent().find("td").eq(12).find("input").eq(1).val());
 		var cost = parseInt($(obj).parent().parent().find("td").eq(10).find("input").eq(1).val());
+		
 		if(price>accountPrice){
 			toastr.error('销售价格不可大于账期价格！');
 			setTimeout( function(){
@@ -299,7 +300,7 @@
 		}
 		var smallprice=(price/$(obj).parent().parent().find("td").eq(8).html()).toFixed(2);
 		$(obj).parent().parent().find("td").eq(9).find("input[name='smallPrice']").val(smallprice);
-		$(obj).parent().parent().find('td').eq(7).find("input[name='_bigPrice']").val($(obj).val());
+		$(obj).parent().parent().find('td').eq(7).find("input[name='_bigPrice']").val(price);
 	}
 	
 	function changeCostPrice(obj){
@@ -333,7 +334,7 @@
 						location.reload();
 								}, 2 * 1000 );
 		}
-		$(obj).parent().parent().find('td').eq(12).find("input").eq(1).val($(obj).val());
+		$(obj).parent().parent().find('td').eq(12).find("input").eq(1).val(accountPrice);
 	}
 	
 	/*function changeHot(obj){
