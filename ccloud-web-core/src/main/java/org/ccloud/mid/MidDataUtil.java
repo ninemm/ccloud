@@ -17,7 +17,7 @@ package org.ccloud.mid;
 
 import java.io.UnsupportedEncodingException;
 import java.rmi.RemoteException;
-import java.util.Base64;
+//import java.util.Base64;
 import java.util.List;
 
 import org.ccloud.middledb.ArrayOfAnyType;
