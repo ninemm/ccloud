@@ -250,6 +250,14 @@ public class OrderController extends BaseFrontController {
 		param.put("customerName", customerName);
 		param.put("orderId", orderId);
 
+
+		if(Consts.PROC_MEMBER_ORDER_REVIEW_ZERO.equals(proc_def_key)) {
+
+			param.put("orderReviewer", user.getUsername());
+
+			OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核", user.getId(), user.getId(), user.getDepartmentId(), user.getDataArea(),orderId);
+		}
+
 		String procInstId = workflow.startProcess(orderId, proc_def_key, param);
 
 		salesOrder.setProcKey(proc_def_key);
