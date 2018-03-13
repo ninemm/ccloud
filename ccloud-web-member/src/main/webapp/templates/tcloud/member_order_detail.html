@@ -4,7 +4,7 @@
 
 <#macro script>
     function orderAgain() {
-        //window.location.href = "${CPATH}/order/getOldOrder?orderId=${order.id}";
+        window.location.href = "${CPATH}/member/order/getOldOrder?orderId=${order.id}";
     }
 	function getback() {
 		var oldUrl = document.referrer;

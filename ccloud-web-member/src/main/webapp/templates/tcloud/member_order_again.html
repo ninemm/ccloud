@@ -1,0 +1,254 @@
+<#include "_inc/_layout.html"/>
+<#macro script_import>
+	<script src="${CPATH}/static/ccloud/admin/js/common.js"></script>
+</#macro>
+<#macro title>再来一单</#macro>
+<#macro css> 
+	#bigNum,#smallNum {
+		border: 1px solid #bbb;
+	}
+
+	#order .gift input::-webkit-input-placeholder {
+		text-align: center;
+	}
+</#macro>
+
+<#macro script>
+$(function() {
+	if(${order.receive_type!} == 0 ){
+		$("#receive_type").attr("checked",'true');
+	}
+	$("body").on("click","#confirm-input" ,function(){
+		total();
+	}).on("click", "#placeOrder", function () {
+		$.confirm("您确定要提交订单吗？","提交订单", function() {
+			doSubmit();
+		});
+  	});
+
+	$("#deliveryDate").calendar();
+	var id = "${id}";
+	$product.empty();
+	initProduct(id);
+})
+	var $form = $('#form');
+	var newHtml = $(".common").eq(0).html();
+	var $product = $("#productList");
+
+	function initProduct(id){
+		$.get('${CPATH}/member/order/orderAgain?orderId=' + id,
+			function(result){
+				var productList = result.orderDetail;
+				$.each(productList, function(index, el) {
+					$product.append("<div class='weui-panel weui-panel_access goods-detail common'>" + newHtml + "</div>");
+					var $newProductDetail = $product.find(".common:last");
+					$newProductDetail.find("#productName").text(el.custom_name);
+					$newProductDetail.find("#valueName").text(el.valueName);
+
+					$newProductDetail.find("#bigPriceSpan").text("￥"+(el.product_price).toFixed(2));
+					$newProductDetail.find("#smallPriceSpan").text("￥"+(el.product_price/el.convert_relate).toFixed(2));
+					$newProductDetail.find("#bigUnitSpan").text("/"+el.big_unit);
+					$newProductDetail.find("#smallUnitSpan").text("/"+el.small_unit);
+
+					$newProductDetail.find("#bigPrice").val(el.product_price);
+					$newProductDetail.find("#smallPrice").val((el.product_price/el.convert_relate).toFixed(2));
+					$newProductDetail.find("#bigUnit").val(el.big_unit);
+					$newProductDetail.find("#smallUnit").val(el.small_unit);
+					$newProductDetail.find("#sellProductId").val(el.sell_product_id);
+					$newProductDetail.find("#sellerId").val(el.seller_id);
+					$newProductDetail.find("#productId").val(el.productId);
+					$newProductDetail.find("#convert").val(el.convert_relate);
+
+					$newProductDetail.find("#bigNum").val(parseInt(el.product_count/el.convert_relate));
+					$newProductDetail.find("#smallNum").val((el.product_count%el.convert_relate));
+					$newProductDetail.find("#bigNum").removeAttr("readonly");
+					$newProductDetail.find("#smallNum").removeAttr("readonly");
+					$newProductDetail.find("#isGift").val(0);
+				});	
+				total();		
+			}
+		);
+	}
+	
+	function total() {
+		var products = $(".common");
+		var rowTotal = 0;
+		var total = 0;
+		var count = 0;
+		$.each(products, function(index, el) {
+			var $el = $(el);
+			rowTotal = $el.find("#bigNum").val() * $el.find("#bigPrice").val() + $el.find("#smallNum").val() * $el.find("#smallPrice").val();
+			count = parseInt($el.find("#bigNum").val()) + (parseInt($el.find("#smallNum").val())/parseInt($el.find("#convert").val())).toFixed(2)*1;
+			$("#totalCount").val(count);
+			$el.find("#rowTotal").val(rowTotal);
+			total += rowTotal;
+		});
+
+		$("#total").val(total);
+		$("#totalNum").text("共" + (products.length) + "款,合计:" + formatNumber(total) + "元")
+	
+	}
+
+	function doSubmit(){
+		layer.open({
+			type: 2,
+			content: '保存中...'
+		});
+		$form.ajaxSubmit({
+			beforeSubmit: function() {
+				$("#placeOrder").attr('diabled', 'disabled');
+				return true
+			},
+			type : "post", 
+			dataType : "json", 
+			success : function(data) { 
+				if (data.errorCode == 0) {
+					toastr.success(data.message);
+					window.location.href = "${CPATH}/member/order/myOrder";
+					
+				} else {
+					$("#placeOrder").removeAttr('diabled');
+					toastr.error(data.message);
+				}
+			},
+			error : function() {
+				$("#placeOrder").removeAttr('diabled');
+				alert("信息提交错误");
+			}
+		});
+	}
+
+	function getback() {
+		var oldUrl = document.referrer;
+		var url = oldUrl.split("?history=1");
+		if(url[0].indexOf("myOrder") !=-1 ) window.location.href = url[0] + '?history=1';
+		else window.location.href = url[0];
+	}
+</#macro>
+
+<@layout>
+<body id="order">
+	<div class="weui-content">
+		<form action="${CPATH}/member/order/salesOrder" method="post" id="form">
+			<main>
+				<section class="weui-panel weui-panel_access order-customer-info">
+					<div class="weui-cell weui-cell_access">
+						<div class="weui-cell__bd">
+							<div class="order-customer-info-title">
+								店名
+								<span class="require">*</span>
+							</div>
+							<input type="hidden" id="customerId" name="customerId" value="${customerInfo.id!}" >
+							<input type="text" class="weui-input select-customer" placeholder="请输入店名信息" id="customerName" name="customerName" value="${customerInfo.customerName!}" readonly>
+						</div>
+					</div>
+					<div class="weui-cell weui-cell_access">
+						<div class="weui-cell__bd">
+							<div class="order-customer-info-title">
+								联系人
+								<span class="require">*</span>
+							</div>
+							<input type="text" placeholder="请输入客户信息" class="weui-input" id="contact" name="contact" value="${customerInfo.contact!}" readonly>
+						</div>
+					</div>
+					<div class="weui-cell weui-cell_access">
+						<div class="weui-cell__bd">
+							<div class="order-customer-info-title">
+								电话号码
+								<span class="require">*</span>
+							</div>
+							<input type="text" placeholder="请输入电话号码" class="weui-input" id="mobile" name="mobile" value="${customerInfo.mobile!}" readonly>
+						</div>
+					</div>
+					<div class="weui-cell weui-cell_access">
+						<div class="weui-cell__bd">
+							<div class="order-customer-info-title">
+								详细地址
+								<span class="require">*</span>
+							</div>
+							<input type="hidden" id="address" name="address" value="${customerInfo.address!}">
+							<input type="text" placeholder="请输入详细地址" class="weui-input" id="deliveryAddress" name="deliveryAddress" value="${customerInfo.address!}" readonly>
+						</div>
+					</div>
+				</section>
+				<section class="weui-panel weui-panel_access delivery-info">
+					<div class="weui-cell weui-cell_access">
+						<div class="weui-cell__bd">
+							配送时间
+							<input type="text" placeholder="请选择配送时间" class="weui-input" data-toggle='date' id="deliveryDate" name="deliveryDate" value="${deliveryDate!}" readonly>
+							<span class="weui-cell__ft"></span>
+						</div>
+					</div>
+				</section>
+				<section class="weui-panel weui-panel_access ft14">
+					<div class="weui-cell weui-cell_access">
+						<div class="weui-cell__bd">
+							<div>
+								<input type = "hidden" id = "receiveType" name = "receiveType"value="${order.receive_type!}">
+								<input type="checkbox" id = "receive_type" name="receive_type" value="${order.receive_type!}" class="weui-agree__checkbox" disabled> 是否账期
+							</div>
+						</div>
+					</div>
+				</section>
+				<section class="weui-panel weui-panel_access ft14 remark">
+					<div class="weui-cell weui-cell_access">
+						<div class="weui-cell__bd">
+							<textarea name="remark" placeholder="备注说明（70字以内）"></textarea>
+						</div>
+					</div>
+				</section>
+				<div class="weui-cells__title black">商品明细</div>
+				<div id="productList">
+					<div class="weui-panel weui-panel_access goods-detail common" style="display: none">
+						<input type="hidden" name="sellProductId" id="sellProductId" value="">
+						<input type="hidden" name="sellerId" id="sellerId" value="">
+						<input type="hidden" name="productId" id="productId" value="">
+						<input type="hidden" name="convert" id="convert" value="">
+						<input type="hidden" name="isGift" id="isGift" value="">
+						<input type="hidden" name="totalNum" id="totalCount" value="">
+						<nobr>
+							<p class="product_name" id="productName">
+								35度中国劲酒_125ml_1*24
+							</p>
+						</nobr>
+						<div class="product_unit">
+							<p>规格：</p>
+							<span id="valueName">125ml</span>
+						</div>
+						<div class="product_bUnit">
+							<span class="price" id="bigPriceSpan">￥725</span>
+							<span class="unit" id="bigUnitSpan">&nbsp;/&nbsp;件</span>
+							<div class="spinner">
+								<input type="number" min="0" value="0" class="fl" id="bigNum" name="bigNum" readonly>
+							</div>
+							<input type="number" class="street-value"  id="bigPrice" value="720" name="bigPrice" readonly>
+						</div>
+						<div class="product_mUnit">
+							<span class="price" id="smallPriceSpan">￥30</span>
+							<span class="unit" id="smallUnitSpan">&nbsp;/&nbsp;瓶</span>
+							<div class="spinner">
+								<input type="number" min="0" value="0" class="fl" id="smallNum" name="smallNum" readonly>
+							</div>
+							<input type="number" class="street-value" value="30" id="smallPrice" name="smallPrice" readonly>
+						</div>
+						<input type="hidden" id="rowTotal" name="rowTotal" value="">
+					</div>
+				</div>
+				<input type="hidden" id="total" name="total" value="">
+			</main>
+			<div class="hidden-menu">
+				<ul>
+					<li><a href="${CPATH}/">首页<img src="${CTPATH}/images/home.png" alt=""></a></li>
+					<li><a onclick="getback()">返回<img src="${CTPATH}/images/goback.png" alt=""></a></li>
+				</ul>
+				<img src="${CTPATH}/images/add.png" alt="" id="button" class="fr">
+			</div>
+			<div class="layer"></div>
+			<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
+				<p class="total bg-gray weui-flex__item" id="totalNum">共2款，总数10件&nbsp;总额：2600元</p>
+				<button type="button" id="placeOrder" class="place-order red-button">提交订单</button>
+			</footer>
+		</form>
+	</div>
+</body>
+</@layout>

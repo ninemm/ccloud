@@ -10,6 +10,7 @@ import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.IAtom;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.*;
@@ -348,6 +349,27 @@ public class OrderController extends BaseFrontController {
 		setAttr("orderDetailList", orderDetailList);
 		setAttr("images", images);
 		render("member_order_detail.html");
+	}
+
+	public void getOldOrder() {
+		Member member = getSessionAttr(Consts.SESSION_LOGINED_MEMBER);
+		String orderId = getPara("orderId");
+
+		Record order = SalesOrderQuery.me().findMoreById(orderId);
+		setAttr("deliveryDate", DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
+		setAttr("id", orderId);
+		setAttr("order", order);
+		setAttr("customerInfo", CustomerQuery.me().findById(member.getCustomerId()));
+		render("member_order_again.html");
+	}
+
+	public void orderAgain() {
+		String orderId = getPara("orderId");
+
+		List<Record> orderDetail = SalesOrderDetailQuery.me().findByOrderId(orderId);
+		Map<String, Object> map = new HashMap<>();
+		map.put("orderDetail", orderDetail);
+		renderJson(map);
 	}
 
 	private List<Map<String, String>> getImageSrc(List<Record> orderDetailList) {
