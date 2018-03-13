@@ -105,7 +105,7 @@ SetStep.prototype.init=function(arg){
     					_that.opt.curStep=$(this).index()+1;
     					_that.setProgress(_that.stepContainer,_that.opt.curStep,_that.opt.stepCounts)
     				}else{
-    					alert(data.message);
+    					toastr.error(data.message,'操作失败');
     				}
     			}
     		});
