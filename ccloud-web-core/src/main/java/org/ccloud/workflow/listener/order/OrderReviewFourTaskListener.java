@@ -43,7 +43,7 @@ public class OrderReviewFourTaskListener implements TaskListener {
 				}
 
 				directorUserName += record.getStr("username");
-				OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核", record.getStr("id"), user.getId(),
+				OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核",  user.getId(), record.getStr("id"),
 						user.getDepartmentId(), user.getDataArea(), orderId);
 			}
 			task.setAssignee(directorUserName);

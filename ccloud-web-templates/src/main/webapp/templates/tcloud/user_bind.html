@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 	<meta charset="UTF-8">
 	<meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" name="viewport">
@@ -12,7 +13,12 @@
 	<link rel="stylesheet" href="${CTPATH}/css/jquery-weui.min.css">
 	<link rel="stylesheet" href="${CTPATH}/css/icomoon.css">
 	<link rel="stylesheet" href="${CTPATH}/css/unlock.css">
-    <title>绑定用户信息</title>
+	<title>绑定用户信息</title>
+	<style>
+		#phone {
+			padding-right: 4rem;
+		}
+	</style>
 </head>
 
 <body>
@@ -35,7 +41,7 @@
 			</div>
 		</div>
 		<div class="wrapper">
-            <div class="bar"></div>
+			<div class="bar"></div>
 		</div>
 		<button id="bind">绑定手机号</button>
 	</main>
@@ -47,21 +53,21 @@
 <script src="${CTPATH}/js/comm.js"></script>
 <!-- <script src="${CTPATH}/js/vconsole.min.js"></script> -->
 <script>
-	$(function() { 
-		
+	$(function () {
+
 		var isSend = false;
 		var $bar = $('.bar');
 		var $bind = $('#bind');
 		var $code = $('#code');
-		
+
 		var $mobile = $('#phone');
 		var $wrapper = $('.wrapper');
 		var $getCode = $('#get-code');
-		
+
 		FastClick.attach(document.body);
-		
-		$(document).on("input", "#phone", function() {
-			
+
+		$(document).on("input", "#phone", function () {
+
 			if ($mobile.val().length === 11) {
 				$getCode.addClass("can-get");
 				checkMobile($mobile.val());
@@ -70,112 +76,114 @@
 					$getCode.removeClass("can-get");
 				}
 			}
-			
+
 			$(this).next().show();
 			if (($mobile.val().length === 0)) {
 				$(this).next().hide();
 			}
-			
-		}).on("click", ".can-get", function() {
+
+		}).on("click", ".can-get", function () {
 			if (/^1[34578]\d{9}$/.test($mobile.val())) {
 				$getCode.removeClass("can-get");
 				$wrapper.show();
 			} else {
 				$.toast("请输入正确的手机号", "text");
 			}
-		}).on("input", "#code", function() {
+		}).on("input", "#code", function () {
 			if ($code.val().length === 6 && isSend) {
 				$bind.addClass("can-bind");
 			} else {
 				$bind.removeClass("can-bind");
 			}
-			
+
 			$(this).next().show();
 			if (($code.val().length === 0)) {
 				$(this).next().hide();
 			}
-			
-		}).on("click", ".icon-times-circle", function() {
+
+		}).on("click", ".icon-times-circle", function () {
 			$(this).prev().val("");
 			$(this).hide();
-			
+
 			if ($(this).prev().is($mobile)) {
 				$wrapper.hide();
 				$getCode.removeClass("can-get");
-		    } else {
-		    	$bind.removeClass("can-bind");
-		    }
+			} else {
+				$bind.removeClass("can-bind");
+			}
 		});
-		
+
 		$('.bar').slideToUnlock({
-		    text: '滑动获取验证码',
-		    succText: '解锁成功',
-		    successFunc: function() {
-		    	countdown();
-		    }
-	    });
-		
+			text: '滑动获取验证码',
+			succText: '解锁成功',
+			successFunc: function () {
+				countdown();
+			}
+		});
+
 		function countdown() {
-		    
+
 			sendSms();
-			
+
 			setTimeout(function () {
 				isSend = true;
-			    $(".wrapper").hide();
-			    $code.focus();
-		    }, 1000);
-		    
-		    var time = 60;
-		    var interval = setInterval(function () {
-		        time --;
-		        $getCode.text(time + "s");
-		        
-		        if (time == 0) {
-		            $getCode.text("获取验证码");
-		            if (/^1[34578]\d{9}$/.test($("#phone").val())) {
-		                $getCode.addClass("can-get");
-		            };
-		            
-		            $('.bar').resetUnlock();
-		            clearInterval(interval);
-		        }
-		    }, 1000);
+				$(".wrapper").hide();
+				$code.focus();
+			}, 1000);
+
+			var time = 60;
+			var interval = setInterval(function () {
+				time--;
+				$getCode.text(time + "s");
+
+				if (time == 0) {
+					$getCode.text("获取验证码");
+					if (/^1[34578]\d{9}$/.test($("#phone").val())) {
+						$getCode.addClass("can-get");
+					};
+
+					$('.bar').resetUnlock();
+					clearInterval(interval);
+				}
+			}, 1000);
 		}
-		
-		var param = function() {
-	        return {
-	            mobile: $mobile.val(),
-	            code: $code.val()
-	        }
-	    }
-	    
-	    function sendSms() {
-	        var url = "${CPATH}/smsCode/send";
-	        Utils.ajax(url, param(), null);
-	    }
-	    
-	    function checkMobile(mobile) {
-	    	var url = "${CPATH}/user/checkMobile";
-	    	Utils.ajax(url, {'mobile': mobile}, mobileCallback);
-	    }
-	    
-	    $('#bind').on('click', function() {
-            var url = '${CPATH}/user/update';
-            Utils.ajax(url, param(), callback);
-        });
-        
-	    var callback = function(res) {
-	        if (res.errorCode == 0) {
-	        	location.href = "/";
-	        }
-	    }
-	    
-	    var mobileCallback = function(res) {
-	    	if (res.errorCode != 0) {
-	    		$.toptip(res.message, 'error');
-	    	}
-	    }
-		
+
+		var param = function () {
+			return {
+				mobile: $mobile.val(),
+				code: $code.val()
+			}
+		}
+
+		function sendSms() {
+			var url = "${CPATH}/smsCode/send";
+			Utils.ajax(url, param(), null);
+		}
+
+		function checkMobile(mobile) {
+			var url = "${CPATH}/user/checkMobile";
+			Utils.ajax(url, {
+				'mobile': mobile
+			}, mobileCallback);
+		}
+
+		$('#bind').on('click', function () {
+			var url = '${CPATH}/user/update';
+			Utils.ajax(url, param(), callback);
+		});
+
+		var callback = function (res) {
+			if (res.errorCode == 0) {
+				location.href = "/";
+			}
+		}
+
+		var mobileCallback = function (res) {
+			if (res.errorCode != 0) {
+				$.toptip(res.message, 'error');
+			}
+		}
+
 	})
 </script>
 

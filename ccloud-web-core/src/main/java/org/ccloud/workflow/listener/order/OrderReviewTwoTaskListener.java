@@ -44,7 +44,7 @@ public class OrderReviewTwoTaskListener implements TaskListener {
 			}
 
 			task.setAssignee(managerName);
-			OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核", orderReviewer.getId(), user.getId(), user.getDepartmentId(),
+			OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核", user.getId(), orderReviewer.getId(), user.getDepartmentId(),
 					user.getDataArea(), orderId);
 		} else if (taskList != null && taskList.size() > 0) {
 
@@ -62,7 +62,7 @@ public class OrderReviewTwoTaskListener implements TaskListener {
 					}
 
 					treasurerUserName += record.getStr("username");
-					OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核", record.getStr("id"), user.getId(),
+					OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核", user.getId(), record.getStr("id"),
 							user.getDepartmentId(), user.getDataArea(), orderId);
 				}
 				task.setAssignee(treasurerUserName);

@@ -31,6 +31,7 @@ public class printAllNeedInfo {
 	private Integer receiveType;//出库单收款方式 0:应收账款 1:现金'
 	private String printFootContext;//打印的页脚内容
 	private List<orderProductInfo> orderProductInfos;//订单明细信息
+	private String orderQrcodeUrl;//订单二维码
 	public String getOutstockSn() {
 		return outstockSn;
 	}
@@ -186,6 +187,12 @@ public class printAllNeedInfo {
 	}
 	public String get(String string) {
 		return string;
+	}
+	public String getOrderQrcodeUrl() {
+		return orderQrcodeUrl;
+	}
+	public void setOrderQrcodeUrl(String orderQrcodeUrl) {
+		this.orderQrcodeUrl = orderQrcodeUrl;
 	}
 	
 	

@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.ccloud.Consts;
+import org.ccloud.model.Product;
 import org.ccloud.model.SalesOrderDetail;
 import org.ccloud.model.SellerProduct;
 import org.ccloud.utils.StringUtils;
@@ -203,12 +204,15 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 	public String insertForApp(Map<String, String[]> paraMap, String orderId, String sellerId, String sellerCode, String userId, Date date,
 	                            String deptId, String dataArea, int index) {
 		List<SalesOrderDetail> detailList = new ArrayList<>();
+		StringBuilder stringBuilder = new StringBuilder();
 		String sellerProductId = paraMap.get("sellProductId")[index];
 		String convert = paraMap.get("convert")[index];
 		String bigNum = paraMap.get("bigNum")[index];
 		String smallNum = paraMap.get("smallNum")[index];
 		Integer productCount = Integer.valueOf(bigNum) * Integer.valueOf(convert) + Integer.valueOf(smallNum);
 		String productId = paraMap.get("productId")[index];
+		Product product = ProductQuery.me().findByPId(productId);
+		String productSn = product.getProductSn();
 		Map<String, Object> result = this.getWarehouseId(productId, sellerId, sellerCode, productCount, Integer.parseInt(convert), userId, sellerProductId);
 		String status = result.get("status").toString();
 		List<Map<String, String>> list = (List<Map<String, String>>) result.get("countList");
@@ -244,6 +248,8 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 			detail.setDeptId(deptId);
 			detail.setDataArea(dataArea);
 			detailList.add(detail);
+			String bAmount =  String.valueOf(bigAmount);
+	     	stringBuilder.append("(" +productSn + "," + bAmount +")" + "|");
 		}
 		int[] i = Db.batchSave(detailList, detailList.size());
 		int count = 0;
@@ -253,7 +259,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		if (count != detailList.size()) {
 			return "下单失败";
 		}
-		return "";
+		return stringBuilder.toString();
 	}
 
 	@SuppressWarnings("unchecked")

@@ -337,5 +337,13 @@ public abstract class BaseSalesOrder<M extends BaseSalesOrder<M>> extends JModel
 	public java.math.BigDecimal getTotalCount() {
 		return get("total_count");
 	}
+	
+	public void setOrderQrcodeUrl(java.lang.String orderQrcodeUrl) {
+		set("order_qrcode_url", orderQrcodeUrl);
+	}
+
+	public java.lang.String getOrderQrcodeUrl() {
+		return getStr("order_qrcode_url");
+	}
 
 }
