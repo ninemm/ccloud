@@ -30,6 +30,7 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
+import org.ccloud.mid.MidDataUtil;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
@@ -410,7 +411,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 	
 	//中间库同步数据
 	@Before(Tx.class)
-	public void getMidData() {
+	public void getMidDataTest() {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		List<QyExpense> expenseList = QyExpenseQuery.me().findTextData();
 		List<Activity> acList = new ArrayList<>();
@@ -442,6 +443,10 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		Db.batchSave(acList, acList.size());
 		Db.batchSave(dlist, dlist.size());
 		renderAjaxResultForSuccess("同步成功");
+	}
+	
+	public void getMidData() {
+		MidDataUtil.getActivityInfo("2018-03-02", "2018-03-12", "1", "10");
 	}
 	
 	private List<ExpenseDetail> getExpenseDetailList(String expenseId, String actId, String typeId) {
@@ -633,4 +638,5 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		}
 		renderAjaxResultForSuccess("加入核销成功");
 	}
+	
 }
