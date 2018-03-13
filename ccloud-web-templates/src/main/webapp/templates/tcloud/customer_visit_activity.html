@@ -151,7 +151,6 @@
                                 }
                             }
                             blob = canvas.toDataURL("image/jpeg", 0.5);
-                            console.log($this.parent().parent().find("#orderList").val());
                       		imageArr.push({"pic":blob, "picname":x,"orderList":$this.parent().parent().parent().find("#orderList").val()});
                            $(".pic").val(JSON.stringify(imageArr));
                             var str = '<li class="weui-uploader__file " style="background-image:url('+blob+')"></li>';
