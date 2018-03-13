@@ -536,6 +536,7 @@ public class CustomerVisitController extends BaseFrontController {
 		if (isCustomerVisit != null && isCustomerVisit.booleanValue()) {
 
 			String defKey = Consts.PROC_CUSTOMER_VISIT_REVIEW;
+			param.put(Consts.WORKFLOW_APPLY_USERNAME, user.getUsername());
 			param.put("manager", manager.getUsername());
 
 			WorkFlowService workflow = new WorkFlowService();

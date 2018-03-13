@@ -170,7 +170,6 @@ public class OrderController extends BaseFrontController {
 			}
 
 		CustomerType customerType = CustomerTypeQuery.me().findBySellerCustomer(dealerSellerId, moreInfo.get("customerId"));
-		String customerTypeName = customerType.getName();
 		String customerTypeProcDefKey = customerType.getProcDefKey();
 
 		String OrderSO = SalesOrderQuery.me().getNewSn(sellerId);
@@ -200,21 +199,20 @@ public class OrderController extends BaseFrontController {
 		}
 
 		//是否开启
-//		boolean isStartProc = isStart(sellerCode, moreInfo);
-		boolean isStartProc = false;
+		boolean isStartProc = isStart(sellerCode, moreInfo);
 		String proc_def_key = customerTypeProcDefKey;
 
+		String message = "";
+
 		if (isStartProc && StrKit.notBlank(proc_def_key)) {
-			String message = start(orderId, customerTypeName, proc_def_key, user, sellerId, sellerCode);
-			if (StrKit.notBlank(message)) {
-				return message;
-			}
+			proc_def_key = Consts.PROC_MEMBER + proc_def_key ;
 		} else {
-			SalesOutstockQuery.me().pass(orderId, user.getId(), sellerId, sellerCode);
-			OrderReviewUtil.sendOrderMessage(sellerId, customerTypeName, "订单审核通过", user.getId(), user.getId(),
-					user.getDepartmentId(), user.getDataArea(),orderId);
+			proc_def_key = Consts.PROC_MEMBER_ORDER_REVIEW_ZERO;
 		}
-		return "";
+
+		message = start(orderId, moreInfo.get("customerName"), proc_def_key, user, sellerId, sellerCode);
+
+		return message;
 	}
 
 	private boolean isStart(String sellerCode, Map<String, String> moreInfo) {
@@ -252,19 +250,6 @@ public class OrderController extends BaseFrontController {
 		param.put("customerName", customerName);
 		param.put("orderId", orderId);
 
-
-		String toUserId = "";
-
-		if(Consts.PROC_ORDER_REVIEW_ONE.equals(proc_def_key)) {
-
-			User orderReviewer = UserQuery.me().findOrderReviewerByDeptId(user.getDepartmentId());
-			if (orderReviewer == null) {
-				return "您没有配置审核人,请联系管理员";
-			}
-			param.put("manager", orderReviewer.getUsername());
-			toUserId = orderReviewer.getId();
-		}
-
 		String procInstId = workflow.startProcess(orderId, proc_def_key, param);
 
 		salesOrder.setProcKey(proc_def_key);
@@ -274,8 +259,6 @@ public class OrderController extends BaseFrontController {
 		if(!salesOrder.update()) {
 			return "下单失败";
 		}
-
-		OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核", user.getId(), toUserId, user.getDepartmentId(), user.getDataArea(),orderId);
 
 		return "";
 	}

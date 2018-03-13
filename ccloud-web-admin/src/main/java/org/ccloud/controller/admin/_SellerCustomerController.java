@@ -934,6 +934,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			}
 
 			String defKey = Consts.PROC_CUSTOMER_REVIEW;
+			param.put(Consts.WORKFLOW_APPLY_USERNAME, user.getUsername());
 			param.put("manager", manager.getUsername());
 			param.put("isEnable", isEnable);
 

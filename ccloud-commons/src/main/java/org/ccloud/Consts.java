@@ -257,14 +257,27 @@ public class Consts {
 	
 	public static final String PROC_CUSTOMER_REVIEW = "_customer_review";				// 客户审核
 	public static final String PROC_CUSTOMER_VISIT_REVIEW = "_customer_visit_review";	// 拜访审核
-	public static final String PROC_ORDER_REVIEW = "_order_review";						// 餐饮直供
-	public static final String PROC_ORDER_REVIEW_ONE = "_order_review_1";				// 订单1审
-	public static final String PROC_ORDER_REVIEW_TWO = "_order_review_2";				// 订单2审
-	public static final String PROC_ORDER_REVIEW_THREE = "_order_review_3";				// 订单3审
-	public static final String PROC_ORDER_REVIEW_FOUR = "_order_review_4";				// 订单1审（直营总监）
-	public static final String PROC_ORDER_REVIEW_FIVE = "_order_review_5";				// 订单2审（直营总监：财务）
 	public static final String PROC_ACTIVITY_APPLY_REVIEW = "_activity_apply_review";	// 活动审核
-	
+
+	//业务员下单
+	public static final String PROC_ORDER_REVIEW = "_order_review";						// 订单3审(账务→订单审核人→财务)
+	public static final String PROC_ORDER_REVIEW_ONE = "_order_review_1";				// 订单1审(订单审核人)
+	public static final String PROC_ORDER_REVIEW_TWO = "_order_review_2";				// 订单2审(订单审核人→财务)
+	public static final String PROC_ORDER_REVIEW_THREE = "_order_review_3";				//(暂未使用(准备做驳回流程))
+	public static final String PROC_ORDER_REVIEW_FOUR = "_order_review_4";				// 订单1审(直营总监)
+	public static final String PROC_ORDER_REVIEW_FIVE = "_order_review_5";				// 订单2审(直营总监→财务)
+
+	//终端下单(跟业务员下单对应,加一个业务员审核)
+	public static final String PROC_MEMBER = "_member";
+	public static final String PROC_MEMBER_ORDER_REVIEW = "_member_order_review";					// 终端订单4审(业务员→账务→订单审核人→财务)
+	public static final String PROC_MEMBER_ORDER_REVIEW_ZERO = "_member_order_review_0";			// 终端订单1审(业务员)
+	public static final String PROC_MEMBER_ORDER_REVIEW_ONE = "_member_order_review_1";				// 终端订单2审(业务员→订单审核人)
+	public static final String PROC_MEMBER_ORDER_REVIEW_TWO = "_member_order_review_2";				// 终端订单3审(业务员→订单审核人→财务)
+	public static final String PROC_MEMBER_ORDER_REVIEW_THREE = "_member_order_review_3";			//(暂未使用(准备做驳回流程))
+	public static final String PROC_MEMBER_ORDER_REVIEW_FOUR = "_member_order_review_4";		    // 终端订单2审(业务员→直营总监)
+	public static final String PROC_MEMBER_ORDER_REVIEW_FIVE = "_member_order_review_5";			// 终端订单3审(业务员→直营总监→财务)
+
+
 	public static final Integer STATUS_STATE_PUT = 1;// 通用上架
 	public static final Integer STATUS_STATE_DOWN = 0;// 通用下架
 
