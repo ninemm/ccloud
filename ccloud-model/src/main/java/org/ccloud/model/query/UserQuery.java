@@ -141,14 +141,6 @@ public class UserQuery extends JBaseQuery {
 		return DAO.doFind("group_id = ?", id);
 	}
 
-	public List<User> findByRoleId(String id) {
-		StringBuilder sqlBuilder = new StringBuilder("select * ");
-		sqlBuilder.append("from `user` u ");
-		sqlBuilder.append("where u.group_id in ");
-		sqlBuilder.append("(SELECT gr.group_id FROM group_role_rel gr where gr.role_id= ?)");
-		return DAO.find(sqlBuilder.toString(), id);
-	}
-
 	public List<User> findByStation(String id) {
 		StringBuilder sqlBuilder = new StringBuilder("select * ");
 
@@ -211,8 +203,8 @@ public class UserQuery extends JBaseQuery {
 	}
 
 	public List<User> findByRole(String id) {
-		StringBuilder sql = new StringBuilder("SELECT u.* FROM user_group_rel a ");
-		sql.append("LEFT JOIN `user` u ON a.user_id = u.id ");
+		StringBuilder sql = new StringBuilder("SELECT u.* FROM `user` u ");
+		sql.append("LEFT JOIN user_group_rel a ON a.user_id = u.id ");
 		sql.append("where a.group_id in (SELECT b.group_id from group_role_rel b where b.role_id = ?) ");
 		return DAO.find(sql.toString(), id);
 	}

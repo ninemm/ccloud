@@ -34,7 +34,7 @@
 		var id = "${id}";
 		refund(id);
 	});
-	
+	var totalAmount=0;
 	var discount = 1;
 	var $form = $("#form");
 	//标志
@@ -124,11 +124,17 @@
 			$tr.find("#convert").val(convert);
 			var productCount = product.reject_product_count;
 
-			var smallPrice = (product.product_price/convert).toFixed(2);
-			var smallUnit = product.small_unit;
-
-			var bigPrice = product.product_price;
+			<@shiro.hasRole name="021">   
+				var bigPrice = product.tax_price;
+				var smallPrice = (product.tax_price/convert).toFixed(2);
+				totalAmount=totalAmount+(product.tax_price/convert*productCount)
+			</@shiro.hasRole>	
+			<@shiro.lacksRole name="021"> 
+				var smallPrice = (product.product_price/convert).toFixed(2);
+				var bigPrice = product.product_price;
+			</@shiro.lacksRole>	
 	
+			var smallUnit = product.small_unit;
 			$tr.find("#product_totalCount").val(productCount);
 			$tr.find("#bigPrice").val(bigPrice);
 			$tr.find("#bigPrice-span").text(bigPrice);
@@ -308,12 +314,16 @@
 				} else {
 					$("#discount").val(discount);
 				}				
-				
 
 				$.each(outstockDetail, function(index,element){
 					addProduct(element);
 				});
-				var totalAmount = outstock.total_reject_amount;
+				<@shiro.hasRole name="021">   
+					totalAmount=totalAmount;
+				</@shiro.hasRole>	
+				<@shiro.lacksRole name="021">   
+					totalAmount = outstock.total_amount;
+				</@shiro.lacksRole>	
 				totalC(totalAmount);				
 			}
 		);

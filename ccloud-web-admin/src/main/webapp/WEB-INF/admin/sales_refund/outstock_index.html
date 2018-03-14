@@ -71,7 +71,11 @@
 					edit: false
 				},
 				{field: "customer_name", title: "客户名称", align: "center", width: '8%', edit:false},
-				{field: "total_amount", title: "订单总额", align: "center", width: '5%', edit:false},
+				
+				<@shiro.lacksRole name="021">   
+					{field: "total_amount", title: "订单总额", align: "center", width: '5%', edit:false},
+				</@shiro.lacksRole>	
+				
 				{field: "payment_type", title: "付款方式", align: "center", width: '5%',
 					formatter: function(value, row, rowIndex) {
 						return value == 0 ? '应付账款' : '现金';
