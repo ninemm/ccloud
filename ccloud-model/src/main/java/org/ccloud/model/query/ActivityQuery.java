@@ -158,8 +158,8 @@ public class ActivityQuery extends JBaseQuery {
 		String select = "select DATE(ca.start_time) start_time1,DATE(ca.end_time) end_time1,IFNULL(t1.putNum , 0) putNum, IFNULL(t2.executeNum , 0) executeNum, IFNULL(ca.invest_num , 0) invest_num,IFNULL(ca.invest_amount , 0) invest_amount,ca.* ,";
 		select=select+"( SELECT d.`name` FROM dict d WHERE d.`key` = ca.invest_type AND d.type = '"+Consts.INVEST_TYPE+"') investType ,( SELECT d.`name` FROM dict d WHERE d.`key` = ca.time_interval AND d.type = '"+Consts.ACTIVE_TIME_INTERVAL+"') timeInterval ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_activity` ca ");
-		fromBuilder.append(" LEFT JOIN (SELECT caa.activity_id,COUNT(1) putNum FROM cc_activity_apply caa WHERE caa.`status`in(1,4) GROUP BY caa.activity_id)t1 ON ca.id=t1.activity_id");
-		fromBuilder.append(" LEFT JOIN (SELECT caa.activity_id,COUNT(1) executeNum FROM cc_customer_visit ccv LEFT JOIN cc_activity_apply caa ON ccv.active_apply_id=caa.id WHERE caa.`status`in(1,4) GROUP BY caa.activity_id)t2 ON ca.id=t2.activity_id");
+		fromBuilder.append(" LEFT JOIN (SELECT caa.activity_id,COUNT(1) putNum FROM cc_activity_apply caa GROUP BY caa.activity_id)t1 ON ca.id=t1.activity_id");
+		fromBuilder.append(" LEFT JOIN (SELECT caa.activity_id,COUNT(1) executeNum FROM cc_customer_visit ccv LEFT JOIN cc_activity_apply caa ON ccv.active_apply_id=caa.id GROUP BY caa.activity_id)t2 ON ca.id=t2.activity_id");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 		if (StrKit.notBlank(keyword)) {
@@ -188,21 +188,26 @@ public class ActivityQuery extends JBaseQuery {
         return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
     }
 
-	public Page<Record> putDetailsPaginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate,String id) {
-		String select = "SELECT caa.`status`,caa.id activityApplyId,u.id userId,u.realname,csc.id customerId,cc.customer_name,CONCAT(cc.prov_name,cc.city_name,cc.country_name,cc.address) address,caa.create_date putDate,IFNULL(t1.executeNum , 0) executeNum,ca.*,( SELECT d.`name` FROM dict d WHERE d.`key` = ca.invest_type AND d.type='";	
-		select=select+Consts.INVEST_TYPE+"') investType ,( SELECT d.`name` FROM dict d WHERE d.`key` = ca.time_interval AND d.type = '"+Consts.ACTIVE_TIME_INTERVAL+"') timeInterval,( SELECT group_concat(cct.`name`) FROM cc_customer_type cct WHERE LOCATE(cct.id , csc.customer_type_ids) > 0 GROUP BY csc.customer_type_ids) customer_type_ids";
+	public Page<Record> putDetailsPaginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate,String id, String status) {
+		String select = "SELECT caa.`status`,caa.id activityApplyId,u.id userId,u.realname,csc.id customerId,cc.customer_name,CONCAT(cc.prov_name,cc.city_name,cc.country_name,cc.address) address,caa.create_date putDate,IFNULL(t1.executeNum , 0) executeNum,";	
+		select=select+"(SELECT d.`name` FROM dict d WHERE d.`key`= ca.invest_type AND d.type='"+Consts.INVEST_TYPE+"') investType,( SELECT d.`name` FROM dict d WHERE d.`key` = ca.time_interval AND d.type = '"+Consts.ACTIVE_TIME_INTERVAL;
+		select=select+"') timeInterval,( SELECT group_concat(cct.`name`) FROM cc_customer_type cct WHERE LOCATE(cct.id,csc.customer_type_ids) > 0 GROUP BY csc.customer_type_ids) customer_type_ids,ca.*";
 		StringBuilder fromBuilder = new StringBuilder(" FROM cc_activity_apply caa ");
 		fromBuilder.append(" LEFT JOIN cc_activity ca ON ca.id=caa.activity_id");
 		fromBuilder.append(" LEFT JOIN `user` u ON u.id=caa.biz_user_id");
 		fromBuilder.append(" LEFT JOIN cc_seller_customer csc ON csc.id=caa.seller_customer_id");
 		fromBuilder.append(" LEFT JOIN cc_customer cc ON cc.id = csc.customer_id");
-		fromBuilder.append(" LEFT JOIN(  SELECT ccv.seller_customer_id ,ccv.user_id ,COUNT(1) executeNum FROM cc_activity_apply aa LEFT JOIN cc_customer_visit ccv ON aa.id = ccv.active_apply_id   WHERE aa.activity_id = '");
-		fromBuilder.append(id+"' AND aa.`status` in(1,4) GROUP BY ccv.seller_customer_id,ccv.user_id) t1 ON t1.seller_customer_id = csc.id and t1.user_id=caa.biz_user_id");
-		fromBuilder.append(" WHERE ca.id='"+id+"' AND caa.`status` in(1,4) ");
+		fromBuilder.append(" LEFT JOIN(  SELECT ccv.active_apply_id,COUNT(1) executeNum FROM cc_activity_apply aa LEFT JOIN cc_customer_visit ccv ON aa.id = ccv.active_apply_id WHERE aa.activity_id = '");
+		fromBuilder.append(id+"' GROUP BY ccv.active_apply_id) t1 ON t1.active_apply_id=caa.id");
+		fromBuilder.append(" WHERE ca.id='"+id+"' ");
 		if (StrKit.notBlank(keyword)) {
 			fromBuilder.append(" and (cc.customer_name like '%"+keyword+"%' or u.realname like '%"+keyword+"%')");
 		}
 		LinkedList<Object> params = new LinkedList<Object>();
+		if (StrKit.notBlank(status)) {
+			fromBuilder.append(" and caa.status=?");
+			params.add(status);
+		}
 		if (StrKit.notBlank(startDate)) {
 			fromBuilder.append(" and ca.start_time >= ?");
 			params.add(startDate+" 00:00:00");
@@ -217,7 +222,7 @@ public class ActivityQuery extends JBaseQuery {
 	}
 
 	public Page<Record> visitDetailsPaginate(int pageNumber, int pageSize, String keyword, String startDate,
-			String endDate, String id, String customerId, String userId) {
+			String endDate, String activityApplyId) {
 		String select = "SELECT u.realname,ca.proc_code,(SELECT d.`name` FROM dict d WHERE d.`key` = ca.invest_type AND d.type = '"+Consts.INVEST_TYPE+"') investType,cc.customer_name,CONCAT(cc.prov_name,cc.city_name,cc.country_name,cc.address) address";
 		select = select+",caa.create_date putDate ,ccv.photo,( SELECT group_concat(cct.`name`) FROM cc_customer_type cct WHERE LOCATE(cct.id , csc.customer_type_ids) > 0 GROUP BY csc.customer_type_ids) customer_type";
 		StringBuilder fromBuilder = new StringBuilder(" FROM cc_customer_visit ccv ");
@@ -226,7 +231,7 @@ public class ActivityQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller_customer csc ON csc.id=ccv.seller_customer_id");
 		fromBuilder.append(" LEFT JOIN cc_customer cc ON cc.id=csc.customer_id");
 		fromBuilder.append(" LEFT JOIN `user` u ON u.id=ccv.user_id");
-		fromBuilder.append(" WHERE ccv.user_id='"+userId+"' AND ca.id='"+id+"' AND ccv.seller_customer_id='"+customerId+"' ");
+		fromBuilder.append(" WHERE ccv.active_apply_id='"+activityApplyId+"'");
 		if (StrKit.notBlank(keyword)) {
 			fromBuilder.append(" and (cc.customer_name like '%"+keyword+"%' or u.realname like '%"+keyword+"%')");
 		}
@@ -245,14 +250,18 @@ public class ActivityQuery extends JBaseQuery {
 	}
 
 	public Record findYxActivity(String activityApplyId) {
-		StringBuilder fromBuilder = new StringBuilder("SELECT ca.proc_code , cc.prov_name , cc.city_name , cc.country_name , cc.customer_name , cc.customer_code , csc.create_date , u.realname , u.mobile,");
-		fromBuilder.append(" ca.invest_type,ccv.modify_date ExecuteTime ,ccv.create_date CreateTime FROM cc_activity_apply caa ");
+		StringBuilder fromBuilder = new StringBuilder("SELECT ca.invest_type , ca.proc_code 'FlowIDNO' ,( SELECT qb.YX_FeeTypeID FROM dict d LEFT JOIN qy_basicfeetype qb ON d.`name` = qb.FeeTypeName WHERE d.`key` = ced.item1 ");
+		fromBuilder.append("AND qb.IsEnable = 1) CostType ,caa.create_date ActivityTime , cc.customer_name CustomerName , CONCAT( cc.prov_name , cc.city_name , cc.country_name , cc.address) ActivityAddress , cc.mobile Telephone ,");
+		fromBuilder.append("ccv.review_address Position , caa.apply_amount WriteOffAmount , u.realname CreateManName , caa.create_date CreateTime , u.realname ModifyManName , caa.create_date ModifyTime , ");
+		fromBuilder.append("cc.prov_name ProvinceName , cc.city_name CityName , cc.country_name CountyName , cc.customer_code CustomerCode , cc.create_date ShopCreateTime , cc.contact ShopLinkMan , cc.mobile ShopPhone ,");
+		fromBuilder.append("caa.num Num , u.realname ExecuteManName , caa.create_date ExecuteTime , ca.time_interval , caa.apply_amount GrantAmount ");
+		fromBuilder.append(" FROM cc_activity_apply caa");
+		fromBuilder.append(" LEFT JOIN cc_expense_detail ced ON caa.expense_detail_id = ced.id");
 		fromBuilder.append(" LEFT JOIN cc_activity ca ON ca.id = caa.activity_id");
 		fromBuilder.append(" LEFT JOIN cc_seller_customer csc ON csc.id = caa.seller_customer_id");
 		fromBuilder.append(" LEFT JOIN cc_customer cc ON cc.id = csc.customer_id");
-		fromBuilder.append(" LEFT JOIN `user` u ON u.id=caa.biz_user_id");
-		fromBuilder.append(" LEFT JOIN cc_expense_detail ced ON ced.id=caa.expense_detail_id");
-		fromBuilder.append(" LEFT JOIN cc_customer_visit ccv ON ccv.active_apply_id=caa.id");
+		fromBuilder.append(" LEFT JOIN `user` u ON u.id = caa.biz_user_id");
+		fromBuilder.append(" LEFT JOIN cc_customer_visit ccv ON ccv.active_apply_id = caa.id");
 		fromBuilder.append(" where caa.id ='"+activityApplyId+"' GROUP BY caa.id ");
 		return Db.findFirst(fromBuilder.toString());
 	}
@@ -267,4 +276,16 @@ public class ActivityQuery extends JBaseQuery {
 				"GROUP BY caa.id";
 		return Db.findFirst(sql);
 	}
+	
+	
+	public List<Record> _findByCustomerId(String customerId) {
+		StringBuilder fromBuilder = new StringBuilder("SELECT a.id as activityApplyId, ca.title,d.`name`,a.create_date from cc_activity_apply a  ");
+		fromBuilder.append(" LEFT JOIN cc_activity ca on ca.id = a.activity_id ");
+		fromBuilder.append(" LEFT JOIN cc_expense_detail cea on a.expense_detail_id = cea.id ");
+		fromBuilder.append(" LEFT JOIN dict d on d.type=cea.flow_dict_type and d.`value` = cea.item1 ");
+		fromBuilder.append(" where a.seller_customer_id ='"+customerId+"' and a.`status` = '"+Consts.ACTIVITY_APPLY_STATUS_PASS+"'");
+		fromBuilder.append(" GROUP BY a.id");
+		return Db.find(fromBuilder.toString());
+	}
+
 }

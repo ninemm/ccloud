@@ -10,7 +10,7 @@
 	<script src="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.zh-CN.js"></script>
 	<!-- bootstrapvalidator -->
 	<script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
-	<script src="${CPATH}/static/plugins/unslider/unslider.min.js"></script>
+	<!-- <script src="${CPATH}/static/plugins/unslider/unslider.min.js"></script>-->
 </#macro>
 
 <#macro css_import>
@@ -47,16 +47,12 @@
 	var initParams = function(params) {
 
 		var keyword = $('#post-search-input').val();
-		var id = '${id}';
-		var userId = '${userId}';
-		var customerId = '${customerId}';
+		var activityApplyId = '${activityApplyId}';
 		if (keyword) keyword = encodeURIComponent(keyword);
 		var param = {
 			size: params.limit,
 			page: params.offset/params.limit + 1,
-			id: id,
-			userId : userId,
-			customerId : customerId,
+			activityApplyId: activityApplyId,
 			k: keyword,
 			startDate: $('#startDate').val(),
 			endDate: $('#endDate').val()
@@ -77,8 +73,10 @@
       			{field: "photo", title: "执行照片", align: "center", width: '30%',
       			formatter: function(value, row, rowIndex) {
       				var strHtml='<ul class="weui-uploader__files" id="uploaderFiles">';
+      				if(row.photo!=null){
       				for(var i= 0; i <row.photo.length; i++){
       					strHtml+='<li value='+row.photo[i].savePath+' class="weui-uploader__file" style="display: inline-block;background-size: cover;width: 80px;height: 80px;background-image:url('+ row.photo[i].savePath +')"></li>';
+      				}
       				}
       				strHtml+='</ul>';
 					return strHtml;
