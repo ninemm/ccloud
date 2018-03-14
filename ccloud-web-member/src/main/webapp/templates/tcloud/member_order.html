@@ -115,7 +115,24 @@ $(function() {
 			$("#address").val(customerInfo.provName + ' ' + customerInfo.cityName + ' ' + customerInfo.countryName + ' ' + customerInfo.address);
 			$("#deliveryAddress").val(customerInfo.provName + ' ' + customerInfo.cityName + ' ' + customerInfo.countryName + ' ' + customerInfo.address);
 		}
-	
+
+		var productList = getItemBykey("productList");
+
+		Utils.ajax('${CPATH}/member/order/getCustomerType', {"productList" : JSON.stringify(productList)},
+			function(data){
+				var $customerTypeName = $("#customerTypeName");
+				$customerTypeName.select({
+					title: "客户类型",
+					items: data,
+					onChange: function(data) {
+						$("#customerType").val(data.values);
+					}
+				})
+				$("#customerType").val(data[0].value);
+				$customerTypeName.val(data[0].title);
+				$customerTypeName.attr('data-values', data[0].value);
+			}
+		);
 	}
 
 	function initProduct(){
@@ -272,6 +289,17 @@ $(function() {
 								专享折扣&nbsp;&nbsp;
 							</div>
 							<input type="text" class="weui-input" id="discount" value="无" readonly>
+						</div>
+					</div>
+					<div class="weui-cell weui-cell_access">
+						<div class="weui-cell__bd select-area">
+							<div class="order-customer-info-title">
+								客户类型
+								<span class="require">*</span>
+							</div>
+							<input type="hidden" id="customerType" name="customerType" value="">
+							<input type="text" placeholder="请选择客户类型" class="weui-input" id="customerTypeName" name="customerTypeName" value="" readonly>
+							<span class="weui-cell__ft"></span>
 						</div>
 					</div>
 					<div class="weui-cell weui-cell_access">
