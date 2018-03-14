@@ -145,7 +145,7 @@
 					</@shiro.lacksRole>	
                     </@shiro.hasPermission>
                      <@shiro.hasPermission name="/admin/salesOutstock/costPrint">
-                     strHtml = strHtml + '<a class="btn btn-xs btn-warning btn-flat" onclick="financePrint(\''+row.id+'\')" >c打印</a> ';
+                     strHtml = strHtml + '<a class="btn btn-xs btn-warning btn-flat" onclick="financePrint(\''+row.id+'\')" >财务打印</a> ';
                      </@shiro.hasPermission>
 					<@shiro.hasPermission name="/admin/salesOutstock/check">
 						if (row.status == 0) {
@@ -584,7 +584,7 @@ function orderDetail(id) {
 				</@shiro.lacksRole>	
 				</@shiro.hasPermission>
 				<@shiro.hasPermission name="/admin/salesOutstock/costPrint">
-				<button class="btn btn-sm btn-primary btn-flat" type="button" onclick="batchFinanceAction()"><i class="fa fa-gavel"></i> c批量打印 </button>
+				<button class="btn btn-sm btn-primary btn-flat" type="button" onclick="batchFinanceAction()"><i class="fa fa-gavel"></i> 财务批量打印 </button>
 				</@shiro.hasPermission>
 				<button class="btn btn-sm btn-primary btn-flat" type="button" onclick="batchOut()"><i class="fa  fa-check-circle"></i> 批量出库</button>
 <!-- 				<button class="btn btn-sm btn-primary btn-flat" type="button" onclick="batchCheckAll()"><i class="fa  fa-circle-o-notch"></i>全选</button> -->
