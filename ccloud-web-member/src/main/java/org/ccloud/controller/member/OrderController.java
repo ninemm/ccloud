@@ -99,6 +99,7 @@ public class OrderController extends BaseFrontController {
 					List<Map<String, String>> paraList = new ArrayList<>();
 					Double totalNum = 0.00;
 					double total = 0;
+					Integer memberProcNumber = OptionQuery.me().findValueAsInteger(Consts.OPTION_WEB_MEMBER_NUMBER_LIMIT + sellerCode);
 
 					for (int j = 0; j < sellerIds.length; j++) {
 						//根据sellerId筛选产品
@@ -113,9 +114,19 @@ public class OrderController extends BaseFrontController {
 							para.put("smallPrice", paraMap.get("smallPrice")[j]);
 							para.put("rowTotal", paraMap.get("rowTotal")[j]);
 							total = total + Double.parseDouble(paraMap.get("rowTotal")[j]);
-							totalNum = totalNum + Double.parseDouble(paraMap.get("bigNum")[j]) +
+
+							Double prodTotalNum = Double.parseDouble(paraMap.get("bigNum")[j]) +
 									Double.parseDouble(paraMap.get("smallNum")[j]) / Double.parseDouble(paraMap.get("convert")[j]);
+
+							totalNum = totalNum + prodTotalNum;
 							paraList.add(para);
+
+							if(memberProcNumber != null) {
+								if(prodTotalNum > memberProcNumber) {
+									renderAjaxResultForError(SellerProductQuery.me().findById(paraMap.get("sellProductId")[j]).getCustomName() + "数量超过上限" + memberProcNumber.toString());
+									return false;
+								}
+							}
 						}
 					}
 					total = new BigDecimal(total).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();

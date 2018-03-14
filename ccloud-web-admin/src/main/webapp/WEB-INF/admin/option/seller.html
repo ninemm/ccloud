@@ -12,7 +12,7 @@
 	</p>
 	<form action="${CPATH}/admin/option/save" method="POST" id="form">
 		<input type="hidden" name="ucode" value="${ucode}">
-		<#assign common = "seller_store_check_${(session.sellerCode)!},web_order_price_edit_${(session.sellerCode)!},web_order_mix_gift_${(session.sellerCode)!},web_procedure_review_${(session.sellerCode)!},web_procedure_review_edit_${(session.sellerCode)!},web_proc_customer_review_${(session.sellerCode)!},web_proc_customer_visit_${(session.sellerCode)!},web_proc_activity_apply_${(session.sellerCode)!}"/>
+		<#assign common = "seller_store_check_${(session.sellerCode)!},web_order_price_edit_${(session.sellerCode)!},web_order_mix_gift_${(session.sellerCode)!},web_procedure_review_${(session.sellerCode)!},web_procedure_review_edit_${(session.sellerCode)!},web_proc_customer_review_${(session.sellerCode)!},web_proc_customer_visit_${(session.sellerCode)!},web_proc_activity_apply_${(session.sellerCode)!}, web_member_number_limit_${(session.sellerCode)!}"/>
 		<#assign dataUpload = ""/>
 		<#list customerTypeList as customerType>
 			<#if customerType_index == 0>
@@ -136,6 +136,19 @@
 								<input class="form-control input-md" type="text" name="web_proc_price_limit_${(session.sellerCode)!}" value="${OPTION('web_proc_price_limit_${(session.sellerCode)!}')!}">
 							</div>
 							<p>如：超过5000元开启审核流程</p>
+						</div>
+						<div class="clr"></div>
+					</li>
+
+					<li class="jp-set-pad">
+						<div class="col-sm-3 ">
+							<div class="  jp-set-title-line jp-set-info ">终端下单数量限制</div>
+						</div>
+						<div class="col-sm-9  jp-set-title-line">
+							<div class="col-sm-6 jp-table-distance-top ">
+								<input class="form-control input-md" type="text" name="web_member_number_limit_${(session.sellerCode)!}" value="${OPTION('web_member_number_limit_${(session.sellerCode)!}')!}">
+							</div>
+							<p>如：单个产品数量超过10件不能下单</p>
 						</div>
 						<div class="clr"></div>
 					</li>
