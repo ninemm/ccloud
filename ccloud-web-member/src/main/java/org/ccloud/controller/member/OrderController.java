@@ -342,6 +342,26 @@ public class OrderController extends BaseFrontController {
 		render("member_order_detail.html");
 	}
 
+	public void cancel() {
+
+		String orderId = getPara("orderId");
+		SalesOrder salesOrder = SalesOrderQuery.me().findById(orderId);
+		WorkFlowService workflow = new WorkFlowService();
+
+		String procInstId = salesOrder.getProcInstId();
+		if (StrKit.notBlank(procInstId)) {
+			if(salesOrder.getStatus()==Consts.SALES_ORDER_STATUS_DEFAULT) {
+				workflow.deleteProcessInstance(salesOrder.getProcInstId());
+			}
+		}
+		salesOrder.setStatus(Consts.SALES_ORDER_STATUS_CANCEL);
+		if (!salesOrder.saveOrUpdate()) {
+			renderAjaxResultForError("取消订单失败");
+			return;
+		}
+		renderAjaxResultForSuccess("订单撤销成功");
+	}
+
 	public void getOldOrder() {
 		Member member = getSessionAttr(Consts.SESSION_LOGINED_MEMBER);
 		String orderId = getPara("orderId");
