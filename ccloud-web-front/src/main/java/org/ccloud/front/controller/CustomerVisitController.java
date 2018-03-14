@@ -393,7 +393,7 @@ public class CustomerVisitController extends BaseFrontController {
 			List<CustomerVisit> customerVisits = CustomerVisitQuery.me().findByActivityApplyId(activityApplyId);
 			if(customerVisits.size()>0) {
 				for(CustomerVisit visit:customerVisits) {
-					if(visit.getStatus() != Consts.CUSTOMER_VISIT_STATUS_PASS) {
+					if(!visit.getStatus() .equals(Consts.CUSTOMER_VISIT_STATUS_PASS)) {
 						renderAjaxResultForError("您的拜访未审核通过！");
 						return;
 					}
@@ -690,7 +690,11 @@ public class CustomerVisitController extends BaseFrontController {
 		String orderList = String.valueOf(customerVisits.size()+1);
 		map.put("activityExecute", JSON.toJSON(ActivityExecuteQuery.me().findbyActivityIdAndOrderList(ActivityApplyQuery.me().findById(activityApplyId).getActivityId(),orderList)));
 		if(customerVisits.size()>0) {
-			map.put("imgeLists",JSON.parseArray(customerVisits.get(0).getPhoto(), ImageJson.class));
+			if(customerVisits.get(0).getPhoto() == null && customerVisits.size()>1) {
+				map.put("imgeLists",JSON.parseArray(customerVisits.get(1).getPhoto(), ImageJson.class));
+			}else {
+				map.put("imgeLists",JSON.parseArray(customerVisits.get(0).getPhoto(), ImageJson.class));
+			}
 			map.put("maxOrderList", customerVisits.size());
 		}
 		map.put("domain",OptionQuery.me().findValue("cdn_domain"));
@@ -709,7 +713,7 @@ public class CustomerVisitController extends BaseFrontController {
 			List<CustomerVisit> customerVisits = CustomerVisitQuery.me().findByActivityApplyId(activityApplyId);
 			if(customerVisits.size()>0) {
 				for(CustomerVisit visit:customerVisits) {
-					if(visit.getStatus() != Consts.CUSTOMER_VISIT_STATUS_PASS) {
+					if(!visit.getStatus() .equals(Consts.CUSTOMER_VISIT_STATUS_PASS)) {
 						renderAjaxResultForError("您的拜访未审核通过！");
 						return;
 					}
@@ -860,6 +864,8 @@ public class CustomerVisitController extends BaseFrontController {
 		if(!customerVisit.getStr("active_apply_id").equals("")) {
 			List<ActivityExecute> activityExecutes = ActivityExecuteQuery.me().findbyActivityId(ActivityApplyQuery.me().findById(customerVisit.getStr("active_apply_id")).getActivityId());
 			setAttr("activityExecute",activityExecutes);
+			List<CustomerVisit> customerVisits = CustomerVisitQuery.me()._findByActivityApplyId(customerVisit.getActiveApplyId());
+			setAttr("orderListNum",customerVisits.size());
 		}
 		setAttr("list",JSON.toJSON(list));
 		setAttr("domain",OptionQuery.me().findValue("cdn_domain"));

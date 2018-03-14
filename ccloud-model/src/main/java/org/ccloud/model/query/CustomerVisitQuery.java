@@ -21,6 +21,8 @@ import java.util.List;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Record;
+
+import org.ccloud.Consts;
 import org.ccloud.model.CustomerVisit;
 
 import com.jfinal.plugin.activerecord.Page;
@@ -335,6 +337,11 @@ public class CustomerVisitQuery extends JBaseQuery {
 	
 	public List<CustomerVisit> findByApplyIdAndSellerCustomerId(String activityApplyId , String sellerCustomerId) {
 		String sql = "select * from cc_customer_visit where seller_customer_id = '"+sellerCustomerId+"' and active_apply_id = '"+activityApplyId+"'";
+		return DAO.find(sql);
+	}
+	
+	public List<CustomerVisit> _findByActivityApplyId(String activityApplyId){
+		String sql = "select * from cc_customer_visit where active_apply_id = '"+activityApplyId+"' and status = '"+Consts.CUSTOMER_VISIT_STATUS_PASS+"' ORDER BY create_date desc";
 		return DAO.find(sql);
 	}
 }

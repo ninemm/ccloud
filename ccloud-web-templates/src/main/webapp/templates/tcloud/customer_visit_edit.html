@@ -24,7 +24,7 @@
     var $picNum = $('.weui-uploader__info');
     var $uploaderFiles = $(".uploaderFiles");
     var $gallery = $("#gallery"), $galleryImg = $("#galleryImg");
-
+	var numImage = 0;
     var Orientation = null;
     var MAX_HEIGHT = 1000;
 
@@ -106,6 +106,7 @@
 								        			var imageLists = data.imgeLists;
 								        			var domain = data.domain;
 								        			$(".imgeActivity").html("");
+								        			numImage = imageLists.length;
 								        			for(var i = 0 ; i < activityExecute.length ; i++){
 								        				var html = "";
 								        				html +='<div><input id="orderList" type="hidden" value="'+activityExecute[i].orderList+'"/>'+activityExecute[i].remark+'<div class="weui-uploader__bd">'
@@ -274,6 +275,7 @@
         var index; //第几张图片
         var $uploaderFiles ;
         $(document).on("click", ".uploaderFiles li", function() {
+            _index = $(this).index()+numImage;
             index = $(this).index();
             $uploaderFiles = $(this).parent();
             $galleryImg.attr("style", this.getAttribute("style"));
@@ -288,7 +290,7 @@
         $(document).on("click",".weui-gallery__del",function() { //这部分刚才放错地方了，放到$(function(){})外面去了
             $uploaderFiles.find("li").eq(index).remove();
             $uploaderFiles.parent().parent().find('.weui-uploader__info').text($uploaderFiles.children.length + '/' + count);
-            imageArr.splice(index, 1);
+            imageArr.splice(_index, 1);
             $(".pic").val(JSON.stringify(imageArr));
         });
 
@@ -309,10 +311,10 @@
             $.toptip('定位地址不能为空,请刷新定位', 1000, 'error');
             return false;
         }*/
-        if(imageArr.length == 0){
+        /*if(imageArr.length == 0){
         	 $.toptip('照片不能为空', 3000, 'error'); 
             return false;
-        }
+        }*/
 
         $.confirm("您确定要新增拜访吗？","新增拜访", function() {
             doSubmit();

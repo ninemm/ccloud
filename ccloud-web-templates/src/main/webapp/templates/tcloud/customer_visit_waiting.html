@@ -20,7 +20,7 @@
     var $picNum = $('.weui-uploader__info');
     var $uploaderFiles = $(".uploaderFiles");
     var $gallery = $("#gallery"), $galleryImg = $("#galleryImg");
-
+	var numImage = 0;
     var Orientation = null;
     var MAX_HEIGHT = 1000;
 
@@ -42,6 +42,7 @@
         $(document).on("input", "#question_desc", function() {
             $("#length").text($("#question_desc").val().length + '/' + 70);
         });
+        var orderListNum = parseInt(${(orderListNum)!});
         var activityApplyId = "${(customerVisit.activitApplyId)!}";
         	var html = "";
         	if(activityApplyId!=""){
@@ -58,8 +59,9 @@
 				        		var activityExecute = data.activityExecute;
 			        			$(".imageActivityExecute").hide();
 			        			$(".imgeInfo").hide();
+			        			numImage = imgeList.length;
 			        			if(activityExecute.length>0){
-				        			for(var i = 0 ; i < activityExecute.length ; i++){
+				        			for(var i = 0 ; i < (orderListNum+1) ; i++){
 					        				html +='<div><input id="orderList" type="hidden" value="'+activityExecute[i].orderList+'"/>'+activityExecute[i].remark+'<div class="weui-uploader__bd">'
 				                               	+'<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles" >';
 				                          if(imgeList != 1){
@@ -70,9 +72,13 @@
 					                            	}
 					                            }
 				                          }
+				                          if((i+1)>orderListNum){
 				                          	html +='</ul><div class="weui-uploader__input-box">'
 				                               	+'<input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/*" multiple="">'
 				                               	+'</div></div></div>';
+				                          }else{
+				                          	html +='</ul></div></div>';
+				                          }
 				        			}
 			        			}else{
 			        				html +='<div class="weui-uploader__hd">'
@@ -228,6 +234,7 @@
         var index; //第几张图片
         var $uploaderFiles ;
         $(document).on("click", ".uploaderFiles li", function() {
+            _index = $(this).index()+numImage;
             index = $(this).index();
             $uploaderFiles = $(this).parent();
             $galleryImg.attr("style", this.getAttribute("style"));
@@ -242,7 +249,7 @@
         $(document).on("click",".weui-gallery__del",function() { //这部分刚才放错地方了，放到$(function(){})外面去了
             $uploaderFiles.find("li").eq(index).remove();
             $uploaderFiles.parent().parent().find('.weui-uploader__info').text($uploaderFiles.children.length + '/' + count);
-            imageArr.splice(index, 1);
+            imageArr.splice(_index, 1);
             $(".pic").val(JSON.stringify(imageArr));
         });
 
