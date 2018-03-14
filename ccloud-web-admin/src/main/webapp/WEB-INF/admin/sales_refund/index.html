@@ -80,11 +80,13 @@
 					edit: false,sortable: true
 				},
 				{field: "customer_name", title: "客户名称", align: "center", width: '8%', edit:false,sortable: true},
+				<@shiro.lacksRole name="021"> 
 				{field: "total_reject_amount", title: "订单总额", align: "center", width: '5%',
 					formatter: function(value,row,rowIndex){
 						return formatNumber(value);
 					},
 				 edit:false,sortable: true},
+				 </@shiro.lacksRole>	
 				{field: "payment_type", title: "付款方式", align: "center", width: '5%',
 					formatter: function(value, row, rowIndex) {
 						return value == 0 ? '应收账款' : '现金';
@@ -199,7 +201,12 @@
 				}
 	}
 	function batchDown(){
-		jQuery.mm.down("${CPATH}/admin/salesRefund/downloading?startDate=" + $('#startDate').val() + " 00:00:00" + "&endDate=" + $('#endDate').val() + " 23:59:59" + "&k="+$('#search').val());
+		<@shiro.hasRole name="021">  
+			jQuery.mm.down("${CPATH}/admin/salesRefund/downloading?startDate=" + $('#startDate').val() + " 00:00:00" + "&endDate=" + $('#endDate').val() + " 23:59:59" + "&k="+$('#search').val()+ "&tax=0");
+		</@shiro.hasRole>	
+		<@shiro.lacksRole name="021">  
+			jQuery.mm.down("${CPATH}/admin/salesRefund/downloading?startDate=" + $('#startDate').val() + " 00:00:00" + "&endDate=" + $('#endDate').val() + " 23:59:59" + "&k="+$('#search').val()+ "&tax=1");
+		</@shiro.lacksRole>	
     }
     
     function history(id, proc_inst_id) {

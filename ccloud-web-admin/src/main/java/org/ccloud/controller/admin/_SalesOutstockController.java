@@ -91,6 +91,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		String endDate = getPara("endDate");
 		String printStatus = getPara("printStatus");
 		String stockOutStatus = getPara("stockOutStatus");
+		String carWarehouseId = getPara("carWarehouseId");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String status = getPara("status");
@@ -100,7 +101,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		String order = getPara("sortName[order]");
 
 		Page<Record> page = SalesOutstockQuery.me().paginate(getPageNumber(), getPageSize(), sellerId, keyword, startDate,
-				endDate, printStatus, stockOutStatus, status, dataArea, order, sort,salesmanId);
+				endDate, printStatus, stockOutStatus, status, dataArea, order, sort,salesmanId,carWarehouseId);
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
@@ -199,9 +200,9 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		for (String s : outId) {
 			printAllNeedInfo printAllNeedInfo = SalesOutstockQuery.me().findStockOutForPrint(s);
 			if (isFinancePrint == 0) {
-			orderProductInfos = SalesOutstockDetailQuery.me().findPrintProductInfo(s);	
+				orderProductInfos = SalesOutstockDetailQuery.me().findPrintProductInfo(s);	
 			}else {
-			orderProductInfos = SalesOutstockDetailQuery.me().findFinancePrintProductInfo(s);	
+				orderProductInfos = SalesOutstockDetailQuery.me().findFinancePrintProductInfo(s);	
 			}
 			printAllNeedInfo.setOrderProductInfos(orderProductInfos);
 			printAllNeedInfos.add(printAllNeedInfo);
@@ -548,6 +549,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 	@RequiresPermissions(value = { "/admin/salesOutstock/downloading", "/admin/dealer/all",
 			"/admin/all" }, logical = Logical.OR)
 	public void downloading() throws UnsupportedEncodingException {
+		String tax = getPara("tax");
 		String keyword = new String(getPara("k").getBytes("ISO8859-1"), "UTF-8");
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
@@ -560,7 +562,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 				+ "salesOutstockInfo.xlsx";
 
 		Page<Record> page = SalesOutstockQuery.me().paginate(1, Integer.MAX_VALUE, sellerId, keyword, startDate, endDate,
-				printStatus, stockOutStatus, null, dataArea, null, null,null);
+				printStatus, stockOutStatus, null, dataArea, null, null,null,null);
 		List<Record> salesOutstckList = page.getList();
 
 		List<SalesOutstockExcel> excellist = Lists.newArrayList();
@@ -582,7 +584,13 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 					printDate =(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(outstockPrints.get(0).get("create_date")) ;
 				}
 				BigDecimal creatconverRelate = new BigDecimal(re.getStr("convert_relate"));
-				BigDecimal bigPrice = new BigDecimal(re.getStr("product_price"));
+				BigDecimal bigPrice;
+				//0 税务人员   1  非税务人员
+				if (tax.equals("0")) {
+					 bigPrice = new BigDecimal(re.getStr("tax_price"));
+				}else {
+					 bigPrice = new BigDecimal(re.getStr("product_price"));
+				}
 				BigDecimal count = new BigDecimal(re.getStr("product_count"));
 				String bigCount = (count.intValue()) / (creatconverRelate.intValue()) + "";
 				String smallCount = (count.intValue()) % (creatconverRelate.intValue()) + "";

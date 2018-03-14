@@ -50,8 +50,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 	}
 
 	public Record findMoreById(final String id) {
-		StringBuilder fromBuilder = new StringBuilder(
-				" select o.*, sa.biz_user_id as order_user, sa.create_date as order_date, sa.activity_apply_id, cs.customer_kind, c.id as customerId, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as customerTypeCode, u.realname, u.mobile ");
+		StringBuilder fromBuilder = new StringBuilder(" select o.*, sa.biz_user_id as order_user, sa.create_date as order_date, sa.activity_apply_id, cs.customer_kind, c.id as customerId, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as customerTypeCode, u.realname, u.mobile ");
 		fromBuilder.append(" ,w.code as warehouseCode, cp.factor ");
 		fromBuilder.append(" from `cc_sales_outstock` o ");
 		fromBuilder.append(" left join cc_sales_order_join_outstock co ON co.outstock_id = o.id ");
@@ -66,10 +65,9 @@ public class SalesOutstockQuery extends JBaseQuery {
 
 		return Db.findFirst(fromBuilder.toString(), id);
 	}
-	
+
 	public Record findMoreBySn(final String sn) {
-		StringBuilder fromBuilder = new StringBuilder(
-				" select o.*, sa.biz_user_id as order_user , cs.customer_kind, c.id as customerId, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as customerTypeCode, u.realname, u.mobile ");
+		StringBuilder fromBuilder = new StringBuilder("select o.*, sa.biz_user_id as order_user , cs.customer_kind, c.id as customerId, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as customerTypeCode, u.realname, u.mobile ");
 		fromBuilder.append(" ,w.code as warehouseCode, cp.factor ");
 		fromBuilder.append(" from `cc_sales_outstock` o ");
 		fromBuilder.append(" left join cc_sales_order_join_outstock co ON co.outstock_id = o.id ");
@@ -83,8 +81,8 @@ public class SalesOutstockQuery extends JBaseQuery {
 		fromBuilder.append(" where o.outstock_sn = ? ");
 
 		return Db.findFirst(fromBuilder.toString(), sn);
-	}	
-	
+	}
+
 	public boolean pass(final String orderId, final String userId, final String sellerId, final String sellerCode) {
 		boolean isSave = Db.tx(new IAtom() {
 
@@ -93,10 +91,9 @@ public class SalesOutstockQuery extends JBaseQuery {
 
 				Record order = SalesOrderQuery.me().findMoreById(orderId);
 				List<Record> orderDetailList = SalesOrderDetailQuery.me().findByOrderId(orderId);
-//				//应收账款
-//				createReceivables(order);
-				
-				
+				// //应收账款
+				// createReceivables(order);
+
 				Date date = new Date();
 
 				String outstockId = "";
@@ -125,7 +122,8 @@ public class SalesOutstockQuery extends JBaseQuery {
 						SalesOrderJoinOutstockQuery.me().insert(orderId, outstockId);
 					}
 
-					outTotalAmount = outTotalAmount.add(SalesOutstockDetailQuery.me().insert(outstockId, orderDetail, date, order));
+					outTotalAmount = outTotalAmount
+							.add(SalesOutstockDetailQuery.me().insert(outstockId, orderDetail, date, order));
 					if (i == orderDetailList.size()) {
 						if (composite) {
 							outTotalAmount = order.getBigDecimal("total_amount");
@@ -143,9 +141,10 @@ public class SalesOutstockQuery extends JBaseQuery {
 
 		return isSave;
 	}
-	
+
 	public int updateTotalAmount(String outstockId, String outTotalAmount) {
-		StringBuilder fromBuilder = new StringBuilder("update cc_sales_outstock cc set cc.total_amount = ? where cc.id = ? ");
+		StringBuilder fromBuilder = new StringBuilder(
+				"update cc_sales_outstock cc set cc.total_amount = ? where cc.id = ? ");
 		return Db.update(fromBuilder.toString(), outTotalAmount, outstockId);
 	}
 
@@ -169,13 +168,13 @@ public class SalesOutstockQuery extends JBaseQuery {
 		outstock.setCreateDate(date);
 		outstock.setDeptId(order.getStr("dept_id"));
 		outstock.setDataArea(order.getStr("data_area"));
-		
+
 		return outstock.save();
 	}
 
 	public Page<Record> paginate(int pageNumber, int pageSize, String sellerId, String keyword, String startDate, 
-			String endDate, String printStatus, String stockOutStatus, String status, String dataArea,String order,String sort,String salesmanId) {
-		String select = "select o.*,  c.prov_name,c.city_name,c.country_name,c.address, c.customer_name,u.realname,ct.name as customerName,cso.id as orderId,cso.order_sn,cso.create_date as orderDate ";
+			String endDate, String printStatus, String stockOutStatus, String status, String dataArea,String order,String sort,String salesmanId, String carWarehouseId) {
+		String select = "select o.*,  c.prov_name,c.city_name,c.country_name,c.address, c.customer_name,u.realname,ct.name as customerName,t0.id as orderId,t0.order_sn,t0.create_date as orderDate ,t0.realname as bizName ";
 		if (StrKit.notBlank(status)) {
 			select = select + ",t2.refundCount, t2.outCount ";
 		}
@@ -185,7 +184,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 		fromBuilder.append("left join user u on u.id = o.biz_user_id ");
 		fromBuilder.append("left join cc_customer_type ct on ct.id = o.customer_type_id ");
 		fromBuilder.append("left join cc_sales_order_join_outstock sojo on sojo.outstock_id = o.id ");
-		fromBuilder.append("left join cc_sales_order cso on sojo.order_id = cso.id ");
+		fromBuilder.append("LEFT JOIN (SELECT cso.id ,cso.order_sn,cso.create_date,cso.`status`,u.realname,cso.biz_user_id from cc_sales_order cso LEFT JOIN `user` u on u.id = cso.biz_user_id ) t0 on t0.id = sojo.order_id ");
 		
 		if (StrKit.notBlank(status)) {
 			fromBuilder.append("left join (SELECT cc.id, cc.outstock_id, IFNULL(SUM(cc.product_count),0) as outCount, IFNULL(SUM(t1.count), 0) AS refundCount ");
@@ -207,11 +206,16 @@ public class SalesOutstockQuery extends JBaseQuery {
 			fromBuilder.append(" where 1 = 1");
 		}
 
+		if (StrKit.notBlank(carWarehouseId)) {
+			fromBuilder.append(" and o.warehouse_id= ?");
+			params.add(carWarehouseId);
+		}
+
 		if (StrKit.notBlank(startDate)) {
 			fromBuilder.append(" and o.create_date >= ?");
 			params.add(startDate);
 		}
-
+		
 		if (StrKit.notBlank(endDate)) {
 			fromBuilder.append(" and o.create_date <= ?");
 			params.add(endDate);
@@ -227,7 +231,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 			params.add(stockOutStatus);
 		}
 		if (StrKit.notBlank(salesmanId)) {
-			fromBuilder.append(" and cso.biz_user_id = ?");
+			fromBuilder.append(" and t0.biz_user_id = ?");
 			params.add(salesmanId);
 		}
 		
@@ -236,7 +240,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 			params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
 		}		
 
-		fromBuilder.append(" and cso.status != "+Consts.SALES_ORDER_STATUS_CANCEL+" and ( o.outstock_sn like '%"+keyword+"%' or c.customer_name like '%"+keyword+"%' ) ");
+		fromBuilder.append(" and t0.status != "+Consts.SALES_ORDER_STATUS_CANCEL+" and ( o.outstock_sn like '%"+keyword+"%' or c.customer_name like '%"+keyword+"%' ) ");
 
 		if (sort==""||null==sort) {
 			fromBuilder.append("order by "+"o.create_date desc");
@@ -277,7 +281,8 @@ public class SalesOutstockQuery extends JBaseQuery {
 	}
 
 	public boolean updateStatus(String id, String userId, int salesOutStockStatusOut, Date date, String total) {
-		StringBuilder fromBuilder = new StringBuilder("update cc_sales_outstock cc set cc.biz_user_id=? , cc.biz_date=? , cc.status = ? , cc.modify_date = ? ");
+		StringBuilder fromBuilder = new StringBuilder(
+				"update cc_sales_outstock cc set cc.biz_user_id=? , cc.biz_date=? , cc.status = ? , cc.modify_date = ? ");
 		if (total != null) {
 			fromBuilder.append(", cc.total_amount = ? ");
 		}
@@ -313,7 +318,8 @@ public class SalesOutstockQuery extends JBaseQuery {
 
 		needWhere = appendIfNotEmpty(fromBuilder, "o.status", status, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "ct.name", customerTypeId, params, needWhere);
-//		needWhere = appendIfNotEmpty(fromBuilder, "o.customer_type_id", customerTypeId, params, needWhere);
+		// needWhere = appendIfNotEmpty(fromBuilder, "o.customer_type_id",
+		// customerTypeId, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
 
@@ -324,9 +330,10 @@ public class SalesOutstockQuery extends JBaseQuery {
 			fromBuilder.append(" AND refundCount < outCount AND o.status != ? ");
 			params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
 		}
-		
+
 		if (StrKit.notBlank(keyword)) {
-			fromBuilder.append(" and (o.outstock_sn like '%" + keyword + "%' or c.customer_name like '%" + keyword + "%')");
+			fromBuilder.append(
+					" and (o.outstock_sn like '%" + keyword + "%' or c.customer_name like '%" + keyword + "%')");
 		}
 
 		if (StrKit.notBlank(startDate)) {
@@ -346,8 +353,8 @@ public class SalesOutstockQuery extends JBaseQuery {
 
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
-	
-	//应收账款
+
+	// 应收账款
 	public Page<Record> paginateForReceivables(int pageNumber, int pageSize, String keyword, String userId,
 			String customerTypeId, String startDate, String endDate, String isDone, String sellerId, String dataArea) {
 		String select = "select o.*, c.customer_name, ct.name as customerTypeName,o.total_amount - COALESCE(t.actAmount,0) AS balanceAmount ";
@@ -373,9 +380,10 @@ public class SalesOutstockQuery extends JBaseQuery {
 			fromBuilder.append(" AND o.status != ? ");
 			params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
 		}
-		
+
 		if (StrKit.notBlank(keyword)) {
-			fromBuilder.append(" and (o.outstock_sn like '%" + keyword + "%' or c.customer_name like '%" + keyword + "%')");
+			fromBuilder.append(
+					" and (o.outstock_sn like '%" + keyword + "%' or c.customer_name like '%" + keyword + "%')");
 		}
 
 		if (StrKit.notBlank(startDate)) {
@@ -388,9 +396,9 @@ public class SalesOutstockQuery extends JBaseQuery {
 			params.add(endDate);
 		}
 
-		if("1".equals(isDone)){
+		if ("1".equals(isDone)) {
 			fromBuilder.append(" and o.total_amount = COALESCE(t.actAmount, 0)  ");
-		}else if("2".equals(isDone)){
+		} else if ("2".equals(isDone)) {
 			fromBuilder.append(" and o.total_amount > COALESCE(t.actAmount, 0) ");
 		}
 
@@ -400,10 +408,8 @@ public class SalesOutstockQuery extends JBaseQuery {
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
-	}	
+	}
 
-
-	
 	public printAllNeedInfo findStockOutForPrint(final String id) {
 		StringBuilder fromBuilder = new StringBuilder("select o.outstock_sn,o.receive_type,o.remark as stockOutRemark,o.delivery_address,o.total_amount, cs.customer_kind, cs.id as customerId, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as customerTypeCode, u.realname, u.mobile, ");
 		fromBuilder.append(" w.code as warehouseCode, cp.factor,w.`name` as warehouseName,w.phone as warehousePhone,o.create_date as placeOrderTime,so.remark,sn.seller_name,so.total_amount,so.id as orderId,so.biz_user_id, so.activity_apply_id,so.order_qrcode_url, o.id as salesOutStockId,sn.id as sellerId,pt.context as printFootContext ");
@@ -421,7 +427,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_print_template pt on pt.id = cjt.print_template_id ");
 		fromBuilder.append(" where o.id = ? ");
 		printAllNeedInfo printAllNeedInfo = new printAllNeedInfo();
-		 Record record = Db.findFirst(fromBuilder.toString(), id);	 
+		Record record = Db.findFirst(fromBuilder.toString(), id);	 
 			printAllNeedInfo.setOutstockSn(record.getStr("outstock_sn"));
 			printAllNeedInfo.setDeliveryAddress(record.getStr("delivery_address"));
 			printAllNeedInfo.setCustomerName(record.getStr("customer_name"));
@@ -445,17 +451,19 @@ public class SalesOutstockQuery extends JBaseQuery {
 			printAllNeedInfo.setSalesOutStockId(record.getStr("salesOutStockId"));
 			printAllNeedInfo.setPrintFootContext(record.getStr("printFootContext"));
 			printAllNeedInfo.setOrderQrcodeUrl(record.getStr("order_qrcode_url"));
-		    return printAllNeedInfo;
+			return printAllNeedInfo;
 	}
-	
+
 	public void updatePrintStatus(String id) {
-		String sql = "update cc_sales_outstock cc set is_print = 1,print_count=print_count+ "+ 1 +" where cc.id = '"+id+"'";
+		String sql = "update cc_sales_outstock cc set is_print = 1,print_count=print_count+ " + 1 + " where cc.id = '"
+				+ id + "'";
 		Db.update(sql);
 	}
-	
-	public boolean updateStockOutStatus(String id, String userId, Date stockOutDate,int salesOutStockStatusOut,Date modafyDate, String remark) {
+
+	public boolean updateStockOutStatus(String id, String userId, Date stockOutDate, int salesOutStockStatusOut,
+			Date modafyDate, String remark) {
 		String sql = "update cc_sales_outstock cc set cc.biz_user_id=? , cc.biz_date=? , cc.status = ? , cc.modify_date = ?,cc.remark = ? where cc.id = ?";
-		int i = Db.update(sql, userId, stockOutDate, salesOutStockStatusOut, modafyDate,remark, id);
+		int i = Db.update(sql, userId, stockOutDate, salesOutStockStatusOut, modafyDate, remark, id);
 		if (i > 0) {
 			return true;
 		} else {
@@ -463,7 +471,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 		}
 	}
 
-	public List<carSalesPrintNeedInfo> getCarSalesPrintInfo(String wareHouseId,String beginDate,String endDate){
+	public List<carSalesPrintNeedInfo> getCarSalesPrintInfo(String wareHouseId, String beginDate, String endDate) {
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append(" SELECT so1.convert_relate, so1.custom_name, w.`name` as wareHouseName, SUM(so1.bigCount)as bigCount, so1.smallCount, so1.is_gift, ");
 		stringBuilder.append(" SUM(so1.product_amount)as product_amount, so1.sell_product_id, so1.bar_code, w.phone as wareHousePhone,so1.big_unit,so1.small_unit  FROM cc_sales_outstock c LEFT JOIN cc_warehouse w  ");
@@ -471,22 +479,22 @@ public class SalesOutstockQuery extends JBaseQuery {
 		stringBuilder.append(" cs.custom_name,p.big_unit,p.small_unit, floor(co.product_count/p.convert_relate) as bigCount, MOD(co.product_count,p.convert_relate) as ");
 		stringBuilder.append(" smallCount, cs.bar_code, case when co.is_gift = 0  THEN product_amount ELSE 0 END as product_amount FROM ");
 		stringBuilder.append(" cc_sales_outstock_detail co LEFT JOIN cc_seller_product cs on cs.id = co.sell_product_id LEFT JOIN cc_product p ");
-		stringBuilder.append(" on p.id = cs.product_id ) so1 on so1.outstock_id = c.id WHERE c.warehouse_id =? AND c.biz_date >= ? AND c.biz_date <=? and c.`status` ='1000' GROUP BY so1.sell_product_id,so1.is_gift" );
-		List<Record> records = Db.find(stringBuilder.toString(), wareHouseId,beginDate,endDate);
+		stringBuilder.append(" on p.id = cs.product_id ) so1 on so1.outstock_id = c.id WHERE c.warehouse_id =? AND c.biz_date >= ? AND c.biz_date <=? and c.`status` ='1000' GROUP BY so1.sell_product_id,so1.is_gift");
+		List<Record> records = Db.find(stringBuilder.toString(), wareHouseId, beginDate, endDate);
 		List<carSalesPrintNeedInfo> carSalesPrintNeedInfos = new ArrayList<>();
 		for (Record record : records) {
-		  carSalesPrintNeedInfo carSalesPrintNeedInfo = new carSalesPrintNeedInfo();
-		  carSalesPrintNeedInfo.setWareHouseName(record.getStr("wareHouseName"));
-		  carSalesPrintNeedInfo.setBarCode(record.getStr("bar_code"));
-		  carSalesPrintNeedInfo.setProductName(record.getStr("custom_name"));
-		  carSalesPrintNeedInfo.setBigCount(record.getInt("bigCount"));
-		  carSalesPrintNeedInfo.setIsGift(record.getInt("is_gift"));
-		  carSalesPrintNeedInfo.setSmallCount(record.getInt("smallCount"));
-		  carSalesPrintNeedInfo.setWareHousePhone(record.getStr("wareHousePhone"));
-		  carSalesPrintNeedInfo.setBigUnit(record.getStr("big_unit"));
-		  carSalesPrintNeedInfo.setSmallUnit(record.getStr("small_unit"));
-		  carSalesPrintNeedInfo.setProductAmout(record.getBigDecimal("product_amount"));
-		  carSalesPrintNeedInfos.add(carSalesPrintNeedInfo);
+			carSalesPrintNeedInfo carSalesPrintNeedInfo = new carSalesPrintNeedInfo();
+			carSalesPrintNeedInfo.setWareHouseName(record.getStr("wareHouseName"));
+			carSalesPrintNeedInfo.setBarCode(record.getStr("bar_code"));
+			carSalesPrintNeedInfo.setProductName(record.getStr("custom_name"));
+			carSalesPrintNeedInfo.setBigCount(record.getInt("bigCount"));
+			carSalesPrintNeedInfo.setIsGift(record.getInt("is_gift"));
+			carSalesPrintNeedInfo.setSmallCount(record.getInt("smallCount"));
+			carSalesPrintNeedInfo.setWareHousePhone(record.getStr("wareHousePhone"));
+			carSalesPrintNeedInfo.setBigUnit(record.getStr("big_unit"));
+			carSalesPrintNeedInfo.setSmallUnit(record.getStr("small_unit"));
+			carSalesPrintNeedInfo.setProductAmout(record.getBigDecimal("product_amount"));
+			carSalesPrintNeedInfos.add(carSalesPrintNeedInfo);
 		}
 		return carSalesPrintNeedInfos;
 	}
@@ -515,10 +523,10 @@ public class SalesOutstockQuery extends JBaseQuery {
 				params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
 			} else {
 				fromBuilder.append("  AND o.status != ? ");
-				params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);				
+				params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
 			}
 		}
-		
+
 		if (StrKit.notBlank(startDate)) {
 			fromBuilder.append(" and o.create_date >= ?");
 			params.add(startDate);
@@ -535,34 +543,34 @@ public class SalesOutstockQuery extends JBaseQuery {
 
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}
-	
-	public List<Record> getUserPrintInfo(String[] stockOutId,String userId) {
+
+	public List<Record> getUserPrintInfo(String[] stockOutId, String userId) {
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append(" SELECT SUM(sod.bigCount) as bigCount, SUM(sod.smallCount) as smallCount, sod.bar_code, SUM(sod.product_amount) as productAmout, sod.is_gift, u.realname, sod.custom_name,u.mobile ");
+		stringBuilder.append(" SELECT SUM(sod.tax_amount) AS taxAmount,SUM(sod.bigCount) as bigCount, SUM(sod.smallCount) as smallCount, sod.bar_code, SUM(sod.product_amount) as productAmout, sod.is_gift, u.realname, sod.custom_name,u.mobile ");
 		stringBuilder.append(" FROM cc_sales_outstock c JOIN (SELECT floor(d.product_count / p.convert_relate ) AS bigCount, MOD (d.product_count, p.convert_relate ) ");
-		stringBuilder.append(" AS smallCount, d.product_amount, sp.bar_code, d.outstock_id, d.is_gift, sp.custom_name ");
+		stringBuilder.append(" AS smallCount, d.product_amount, sp.bar_code, d.outstock_id, d.is_gift, sp.custom_name,(sp.tax_price*d.product_count/ p.convert_relate) AS tax_amount ");
 		stringBuilder.append(" FROM cc_sales_outstock_detail d INNER JOIN cc_seller_product sp ON d.sell_product_id = sp.id INNER ");
 		stringBuilder.append(" JOIN cc_product p ON p.id = sp.product_id ) sod ON sod.outstock_id = c.id INNER JOIN cc_sales_order_join_outstock ");
 		stringBuilder.append(" cj on cj.outstock_id = c.id INNER JOIN cc_sales_order s on s.id = cj.order_id INNER JOIN `user` u on u.id = s.biz_user_id ");
 		stringBuilder.append(" where 1 = 1 ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		appendIfNotEmpty(stringBuilder, "c.id", stockOutId, params, false);
-		
+
 		if (StrKit.notBlank(userId)) {
 			stringBuilder.append(" and s.biz_user_id= ? GROUP BY sod.custom_name,sod.is_gift ");
 			params.add(userId);
 		}
-		
+
 		return Db.find(stringBuilder.toString(), params.toArray());
 
 	}
-	
+
 	public SalesOutstock findOrderId(String orderId) {
 		String sql = "select co.* from cc_sales_outstock co LEFT JOIN cc_sales_order_join_outstock coo on coo.outstock_id = co.id where coo.order_id = ?";
 		return DAO.findFirst(sql, orderId);
 	}
-	
-	public List<Record> findUserList(String sellerId,String startDate,String endDate){
+
+	public List<Record> findUserList(String sellerId, String startDate, String endDate) {
 		StringBuilder fromBuilder = new StringBuilder("SELECT u.realname, u.id FROM cc_sales_outstock o ");
 		fromBuilder.append("LEFT JOIN cc_sales_order_join_outstock cj on cj.outstock_id = o.id ");
 		fromBuilder.append("LEFT JOIN cc_sales_order cs on cs.id = cj.order_id ");
@@ -588,5 +596,5 @@ public class SalesOutstockQuery extends JBaseQuery {
 
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}
-	
+
 }
