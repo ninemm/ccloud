@@ -267,6 +267,7 @@ public class _SalesRefundController extends JBaseCRUDController<SalesRefundInsto
 		@RequiresPermissions(value = { "/admin/salesRefund/downloading", "/admin/dealer/all",
 		"/admin/all" }, logical = Logical.OR)
 		public void downloading() {
+			String tax = getPara("tax");
 			String startDate = getPara("startDate");
 			String endDate = getPara("endDate");
 			String keyword = getPara("k");
@@ -286,8 +287,6 @@ public class _SalesRefundController extends JBaseCRUDController<SalesRefundInsto
 					SalesRefundExcel excel = new SalesRefundExcel();
 					//单位换算
 					BigDecimal creatconverRelate = new BigDecimal(re.get("convert_relate").toString());
-					//销售单价（大）
-					BigDecimal bigPrice = new BigDecimal(re.get("product_price").toString());
 					//销售数量
 					int count = re.get("product_count");
 					//退货数量
@@ -296,10 +295,21 @@ public class _SalesRefundController extends JBaseCRUDController<SalesRefundInsto
 					int smallCount = count%(creatconverRelate.intValue());
 					int bigRefundCount = rCount/(creatconverRelate.intValue());
 					int smallRefundCount = rCount%(creatconverRelate.intValue());
+					//销售单价（大）
+					BigDecimal bigPrice;
+					//退货单价
+					BigDecimal refundBigPrice;
+					//0 税务人员   1  非税务人员
+					if (tax.equals("0")) {
+						 bigPrice = new BigDecimal(re.getStr("tax_price"));
+						 refundBigPrice=new BigDecimal(re.getStr("tax_price"));
+					}else {
+						 bigPrice = new BigDecimal(re.get("product_price").toString());
+						 refundBigPrice = re.get("reject_product_price");
+					}
 					//销售单价（小）
 					BigDecimal smallPrice = bigPrice.divide(creatconverRelate, 2, BigDecimal.ROUND_HALF_UP);
-					//退货单价
-					BigDecimal refundBigPrice = re.get("reject_product_price");
+					//退货单价（小）
 					BigDecimal refundSmallPrice = refundBigPrice.divide(creatconverRelate, 2, BigDecimal.ROUND_HALF_UP);
 					excel.setProductName(re.get("custom_name").toString());
 					excel.setValueName(re.get("valueName").toString());
@@ -310,13 +320,16 @@ public class _SalesRefundController extends JBaseCRUDController<SalesRefundInsto
 					excel.setBigRejectProductCount(bigRefundCount);
 					excel.setSmallRejectProductCount(smallRefundCount);
 					excel.setCreatconvertRelate(re.get("convert_relate").toString()+re.get("small_unit").toString()+"/"+re.get("big_unit").toString());
-					excel.setBigPrice(re.get("product_price").toString());
-					excel.setSmallCount(smallCount);
-					excel.setSmallPrice(smallPrice.toString());
 					excel.setBigRejectProductPrice(refundBigPrice.toString());
 					excel.setSmallRejectProductPrice(refundSmallPrice.toString());
-					excel.setProductAmount(re.get("product_amount").toString());
-					excel.setRejectAmount(re.get("reject_amount").toString());
+					if (tax.equals("0")) {
+						excel.setProductAmount((bigPrice.multiply(new BigDecimal(count)).divide(creatconverRelate,2)).toString());
+						excel.setRejectAmount((refundBigPrice.multiply(new BigDecimal(rCount)).divide(creatconverRelate,2)).toString());
+					}else {
+						excel.setProductAmount(re.get("product_amount").toString());
+						excel.setRejectAmount(re.get("reject_amount").toString());
+					}
+					
 					excel.setInstockSn(record.get("instock_sn").toString());
 					excel.setCustomer(record.get("customer_name").toString());
 					excel.setCustomerType(record.get("customerTypeName").toString());

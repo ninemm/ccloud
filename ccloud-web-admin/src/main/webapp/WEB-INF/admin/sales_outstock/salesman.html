@@ -111,16 +111,22 @@ function queryUsertockDetail() {
 				if (!barCode) barCode = '无';
 				var isGift = val.is_gift;
 				var productAmout =  val.productAmout;
+				var taxAmount =  val.taxAmount;
 				if (isGift != 0){
 					isGift = '(赠品)';
 					productAmout = 0;
 				}else{
 					isGift="";
 				}
-				content += $.format(contentStr, (index + 1), val.custom_name, isGift, val.bigCount, 
-					 val.smallCount,  productAmout + '元', barCode);
-
-				total += productAmout;
+				<@shiro.hasRole name="021">  
+					total += taxAmount
+					taxAmount =  val.taxAmount.toFixed(2);
+					content += $.format(contentStr, (index + 1), val.custom_name, isGift, val.bigCount,val.smallCount,  taxAmount + '元', barCode);
+				</@shiro.hasRole>	
+				<@shiro.lacksRole name="021">  
+					content += $.format(contentStr, (index + 1), val.custom_name, isGift, val.bigCount, val.smallCount,  productAmout + '元', barCode);
+					total += productAmout;
+				</@shiro.lacksRole>	
 		
 			 });
 			var len = data.length;

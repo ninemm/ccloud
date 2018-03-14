@@ -158,46 +158,46 @@ public class _RoleController extends JBaseCRUDController<Role> {
             String[] operationId = record.get("operation_code").toString().split(",");
             String[] operationName = record.get("operation_name").toString().split(",");
             String[] stationIds = record.get("station_id").toString().split(",");
-        	ModuleInfo moduleInfo = new ModuleInfo();
-        	moduleInfo.setModuleId(record.getStr("id"));
-        	moduleInfo.setModuleName(record.getStr("module_name"));
-        	if (!system.contains(record.getStr("sys_name"))) {
-        		moduleInfo.setSystemName(record.getStr("sys_name"));
-        		if (loop > 0) {
-        			this.checkSystemRowSpan(moduleList, system, sysRowSpan);
-        			sysRowSpan = 1;
-        		}
-        		system.add(moduleInfo.getSystemName());
-        	} else {
-        		sysRowSpan++;
-        		if (loop == list.size()-1) {
-        			this.checkSystemRowSpan(moduleList, system, sysRowSpan);
-        		}        		
-        	}
-        	if (!parentModule.contains(record.getStr("parent_name"))) {
-        		moduleInfo.setParentModuleName(record.getStr("parent_name"));
-        		if (loop > 0) {
-        			this.checkRowSpan(moduleList, parentModule, rowSpan);
-        			rowSpan = 1;
-        		}
-        		parentModule.add(moduleInfo.getParentModuleName());
-        	} else {
-        		rowSpan++;
-        		if (loop == list.size()-1) {
-        			this.checkRowSpan(moduleList, parentModule, rowSpan);
-        		}
-        	}
-        	List<OperationInfo> operationInfos = new ArrayList<>();
+        		ModuleInfo moduleInfo = new ModuleInfo();
+        		moduleInfo.setModuleId(record.getStr("id"));
+        		moduleInfo.setModuleName(record.getStr("module_name"));
+        		if (!system.contains(record.getStr("sys_name"))) {
+        			moduleInfo.setSystemName(record.getStr("sys_name"));
+        			if (loop > 0) {
+        				this.checkSystemRowSpan(moduleList, system, sysRowSpan);
+        				sysRowSpan = 1;
+        			}
+        			system.add(moduleInfo.getSystemName());
+        		} else {
+	        		sysRowSpan++;
+	        		if (loop == list.size()-1) {
+	        			this.checkSystemRowSpan(moduleList, system, sysRowSpan);
+	        		}        		
+	        	}
+	        	if (!parentModule.contains(record.getStr("parent_name"))) {
+	        		moduleInfo.setParentModuleName(record.getStr("parent_name"));
+	        		if (loop > 0) {
+	        			this.checkRowSpan(moduleList, parentModule, rowSpan);
+	        			rowSpan = 1;
+	        		}
+	        		parentModule.add(moduleInfo.getParentModuleName());
+	        	} else {
+	        		rowSpan++;
+	        		if (loop == list.size()-1) {
+	        			this.checkRowSpan(moduleList, parentModule, rowSpan);
+	        		}
+	        	}
+	        	List<OperationInfo> operationInfos = new ArrayList<>();
             for (int i = 0; i < operationId.length; i++) {
-            	OperationInfo info = new OperationInfo();
-            	info.setOperationCode(operationId[i]);
-            	info.setOperationName(operationName[i]);
-            	if (!stationIds[i].equals("0")) {
-            		info.setIsChecked(1);
-            	} else {
-            		info.setIsChecked(0);
-            	}
-            	operationInfos.add(info);
+	            	OperationInfo info = new OperationInfo();
+	            	info.setOperationCode(operationId[i]);
+	            	info.setOperationName(operationName[i]);
+	            	if (!stationIds[i].equals("0")) {
+	            		info.setIsChecked(1);
+	            	} else {
+	            		info.setIsChecked(0);
+	            	}
+	            	operationInfos.add(info);
             }
             moduleInfo.setList(operationInfos);
             moduleList.add(moduleInfo);

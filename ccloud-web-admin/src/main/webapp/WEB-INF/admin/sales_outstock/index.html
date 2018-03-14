@@ -61,6 +61,7 @@
 			size: params.limit,
 			page: params.offset/params.limit + 1,
 			k: keyword,
+			carWarehouseId: $('#carWarehouse').val(),
 			startDate: $('#startDate').val() + " 00:00:00",
 			endDate: $('#endDate').val() + " 23:59:59",
 			printStatus:$("#printStatus").val(),
@@ -99,11 +100,13 @@
 					edit: false,
 				sortable: true},
 				{field: "customer_name", title: "客户名称", align: "center", width: '8%', edit:false,sortable: true},
+				<@shiro.lacksRole name="021"> 
 				{field: "total_amount", title: "订单总额", align: "center", width: '5%',
 					formatter: function(value,row,rowIndex){
 						return formatNumber(value);
 					},
-				 edit:false,sortable: true},
+				edit:false,sortable: true},
+				</@shiro.lacksRole>	
 				{field: "receive_type", title: "付款方式", align: "center", width: '5%',
 					formatter: function(value, row, rowIndex) {
 						return value == 0 ? '账期' : '现金';
@@ -137,7 +140,9 @@
 					var strHtml ='<a class="btn btn-xs btn-primary btn-flat" onclick="detail(\''+row.id+'\')" >详细</a> ';
 
                     <@shiro.hasPermission name="/admin/salesOutstock/print">
+                    <@shiro.lacksRole name="021">  
                       strHtml = strHtml + '<a class="btn btn-xs btn-warning btn-flat" onclick="print(\''+row.id+'\')" >打印</a> ';
+					</@shiro.lacksRole>	
                     </@shiro.hasPermission>
                      <@shiro.hasPermission name="/admin/salesOutstock/costPrint">
                      strHtml = strHtml + '<a class="btn btn-xs btn-warning btn-flat" onclick="financePrint(\''+row.id+'\')" >c打印</a> ';
@@ -483,7 +488,13 @@ function orderDetail(id) {
     
     function batchDown(){
   		var keyword = $('#post-search-input').val();
-    	jQuery.mm.down("${CPATH}/admin/salesOutstock/downloading?startDate=" + $('#startDate').val() + " 00:00:00" + "&endDate=" + $('#endDate').val() + " 23:59:59" + "&printStatus=" + $("#printStatus").val() + "&stockOutStatus="+$("#stockOutStatus").val() + "&k="+keyword);
+  		<@shiro.hasRole name="021">  
+			jQuery.mm.down("${CPATH}/admin/salesOutstock/downloading?startDate=" + $('#startDate').val() + " 00:00:00" + "&endDate=" + $('#endDate').val() + " 23:59:59" + "&printStatus=" + $("#printStatus").val() + "&stockOutStatus="+$("#stockOutStatus").val() + "&k="+keyword+ "&tax=0");
+		</@shiro.hasRole>	
+		<@shiro.lacksRole name="021">  
+			jQuery.mm.down("${CPATH}/admin/salesOutstock/downloading?startDate=" + $('#startDate').val() + " 00:00:00" + "&endDate=" + $('#endDate').val() + " 23:59:59" + "&printStatus=" + $("#printStatus").val() + "&stockOutStatus="+$("#stockOutStatus").val() + "&k="+keyword+ "&tax=1");
+		</@shiro.lacksRole>	
+    		
     }
     
 </#macro>
@@ -567,8 +578,10 @@ function orderDetail(id) {
 			</div>
 		<div class="row content-row">
 			<div class="jp-left">
-			<@shiro.hasPermission name="/admin/salesOutstock/print">
+				<@shiro.hasPermission name="/admin/salesOutstock/print">
+				<@shiro.lacksRole name="021">  
 				<button class="btn btn-sm btn-primary btn-flat" type="button" onclick="batchAction()"><i class="fa fa-gavel"></i> 批量打印 </button>
+				</@shiro.lacksRole>	
 				</@shiro.hasPermission>
 				<@shiro.hasPermission name="/admin/salesOutstock/costPrint">
 				<button class="btn btn-sm btn-primary btn-flat" type="button" onclick="batchFinanceAction()"><i class="fa fa-gavel"></i> c批量打印 </button>

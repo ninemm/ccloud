@@ -106,7 +106,7 @@ function queryPrintDetail() {
         success: function(data) {
             if (data && data.rows) {
                 var curDate = new Date().Format("yyyy-MM-dd hh:mm");
-
+				var totalRejectAmount=0;
                 $.each(data.rows, function(index, stockInPrintInfo) {
                  item =  stockInPrintInfo.printInfo
                     var content = '<tbody>';
@@ -120,8 +120,17 @@ function queryPrintDetail() {
                             } else {
                                 isGift = "";
                             }
-                            var productAmout = subitem.reject_amount
-                            content += $.format(contentStr, (idx + 1), subitem.custom_name, subitem.bigCount, subitem.big_Price + '元', subitem.smallCount, subitem.small_price + '元', barCode, isGift,productAmout+ '元')
+                            <@shiro.hasRole name="021">  
+                            		var productAmout = (subitem.tax_price* subitem.bigCount+subitem.tax_price* subitem.smallCount/subitem.convert_relate)
+                            		totalRejectAmount=totalRejectAmount+productAmout
+                            		productAmout=productAmout.toFixed(2)
+                            		var small_price=(subitem.tax_price/subitem.convert_relate).toFixed(2)
+	                            content += $.format(contentStr, (idx + 1), subitem.custom_name, subitem.bigCount, subitem.tax_price + '元', subitem.smallCount, small_price + '元', barCode, isGift,productAmout+ '元')
+					    		</@shiro.hasRole>	
+					    		<@shiro.lacksRole name="021">  
+	                            var productAmout = subitem.reject_amount
+	                            content += $.format(contentStr, (idx + 1), subitem.custom_name, subitem.bigCount, subitem.big_Price + '元', subitem.smallCount, subitem.small_price + '元', barCode, isGift,productAmout+ '元')
+					    		</@shiro.lacksRole>	
                         });
 
                         let len = stockInPrintInfo.ProductInfos.length;
@@ -143,11 +152,16 @@ function queryPrintDetail() {
 
                     headerContent = $.format(headerStr, item.instock_sn, placeOrderTime, curDate, item.customer_name, item.ccontact, item.cmobile, item.delivery_address, placeOrderMan, placeOrderPhone, item.warehouseName);
 
-                    var salesAmount = DX(item.total_reject_amount);
-                    
                     let printFootContext = item.printFootContext;
                     if (!printFootContext) printFootContext = '';
-                    footerContent = $.format(footerStr, salesAmount, item.total_reject_amount, warehousePhone, remark,printFootContext);
+                     <@shiro.hasRole name="021">   
+                    		var salesAmount = DX(totalRejectAmount.toFixed(2));
+			    		 	footerContent = $.format(footerStr, salesAmount, totalRejectAmount.toFixed(2), warehousePhone, remark,printFootContext);
+			    		</@shiro.hasRole>	
+			    		<@shiro.lacksRole name="021">   
+			    		  	var salesAmount = DX(item.total_reject_amount);
+	                    footerContent = $.format(footerStr, salesAmount, item.total_reject_amount, warehousePhone, remark,printFootContext);
+			    		</@shiro.lacksRole>	
 
                     batchPrintContent += headerInfoContent + headerContent + content + footerContent;
 

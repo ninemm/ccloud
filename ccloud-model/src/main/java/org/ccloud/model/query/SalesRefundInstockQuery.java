@@ -420,7 +420,7 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 	
 	public List<Record> findPrintProductInfo(String inStockId) {
 	   StringBuilder stringBuilder = new StringBuilder();
-	   stringBuilder.append(" SELECT sod.id as refundInstockDetailId, sod.refund_instock_id, sod.is_gift, sod.sell_product_id, sp.custom_name, p.big_unit, p.small_unit, ");
+	   stringBuilder.append(" SELECT sp.tax_price,sod.id as refundInstockDetailId, sod.refund_instock_id, sod.is_gift, sod.sell_product_id, sp.custom_name, p.big_unit, p.small_unit, ");
 	   stringBuilder.append(" p.convert_relate, sp.seller_id, sp.product_id, t1.valueName, sp.bar_code, sod.reject_product_price as big_Price, CONVERT ( ");
 	   stringBuilder.append(" sod.reject_product_price / p.convert_relate, DECIMAL (18, 2) ) AS small_price, floor(sod.reject_product_count / ");
 	   stringBuilder.append(" p.convert_relate ) AS bigCount, MOD (sod.reject_product_count, p.convert_relate ) AS smallCount, sod.reject_amount, sod.reject_product_count, cso.warehouse_id ");

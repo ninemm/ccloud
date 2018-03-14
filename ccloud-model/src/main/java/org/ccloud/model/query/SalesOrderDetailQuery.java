@@ -50,7 +50,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 	public List<Record> findByOrderId(String orderId) {
 
 		StringBuilder sqlBuilder = new StringBuilder(
-				" SELECT sod.*, sp.custom_name, sp.price,sp.bar_code, p.big_unit, p.small_unit, p.convert_relate, p.id as productId, p.product_sn, g.product_image_list_store, w.code as warehouseCode, t1.valueName,w.name as warehouseName ");
+				" SELECT sod.*, sp.custom_name,sp.tax_price, sp.price,sp.bar_code, p.big_unit, p.small_unit, p.convert_relate, p.id as productId, p.product_sn, g.product_image_list_store, w.code as warehouseCode, t1.valueName,w.name as warehouseName ");
 		sqlBuilder.append(" from `cc_sales_order_detail` sod ");
 		sqlBuilder.append(" LEFT JOIN cc_seller_product sp ON sod.sell_product_id = sp.id ");
 		sqlBuilder.append(" LEFT JOIN cc_product p ON sp.product_id = p.id ");
