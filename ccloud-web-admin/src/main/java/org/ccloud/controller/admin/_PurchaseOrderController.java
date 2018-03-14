@@ -39,6 +39,7 @@ import org.ccloud.model.PurchaseOrderDetail;
 import org.ccloud.model.PurchaseOrderJoinInstock;
 import org.ccloud.model.Seller;
 import org.ccloud.model.SellerProduct;
+import org.ccloud.model.Supplier;
 import org.ccloud.model.User;
 import org.ccloud.model.Warehouse;
 import org.ccloud.model.query.DepartmentQuery;
@@ -49,6 +50,7 @@ import org.ccloud.model.query.PurchaseOrderDetailQuery;
 import org.ccloud.model.query.PurchaseOrderQuery;
 import org.ccloud.model.query.SellerProductQuery;
 import org.ccloud.model.query.SellerQuery;
+import org.ccloud.model.query.SupplierQuery;
 import org.ccloud.model.query.WarehouseQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
@@ -97,8 +99,10 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 	}
 	
 	public void detail(){
-		String orderId = getPara(0);
+		String orderId = getPara("purchaseOrderId");
+		String warehouseId = getPara("warehouseId");
 		setAttr("orderId", orderId);
+		setAttr("warehouseId", warehouseId);
 		render("detail.html");
 	}
 	
@@ -121,12 +125,13 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 	@Before(Tx.class)
 	public void pass(){
 		String orderId = getPara("id");
+		String warehouseId = getPara("warehouseId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		Seller seller = SellerQuery.me().findById(getSessionAttr("sellerId").toString());
 		PurchaseOrder purchaseOrder=PurchaseOrderQuery.me().findById(orderId);
 		purchaseOrder.set("status", 1000);
 		
-		//默认仓库
+		/*//默认仓库
 		Warehouse warehouse = new Warehouse();
 		List<Department> tmpList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
 		for(Department dept : tmpList) {
@@ -137,7 +142,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 			}else {
 				continue;
 			}
-		}
+		}*/
 		final PurchaseInstock purchaseInstock = getModel(PurchaseInstock.class);
 		PurchaseInstockDetail purchaseInstockDetail = getModel(PurchaseInstockDetail.class);
 		String purchaseInstockId = StrKit.getRandomUUID();
@@ -149,7 +154,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		purchaseInstock.set("id", purchaseInstockId);
 		purchaseInstock.set("pwarehouse_sn", pwarehouseSn);
 		purchaseInstock.set("supplier_id", purchaseOrder.getSupplierId());
-		purchaseInstock.set("warehouse_id", warehouse.getId());
+		purchaseInstock.set("warehouse_id", warehouseId);
 		purchaseInstock.set("biz_user_id", user.getId());
 		purchaseInstock.set("biz_date", new Date());
 		purchaseInstock.set("input_user_id", user.getId());
@@ -230,7 +235,12 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 			payablesDetail.setCreateDate(new Date());
 			payablesDetail.save();
 		}
-		
+		//生成采购订单与入库订单的中间表
+		PurchaseOrderJoinInstock purchaseOrderJoinInstock = new PurchaseOrderJoinInstock();
+		purchaseOrderJoinInstock.setId(StrKit.getRandomUUID());
+		purchaseOrderJoinInstock.setPurchaseOrderId(orderId);
+		purchaseOrderJoinInstock.setPurchaseInstockId(purchaseInstockId);
+		purchaseOrderJoinInstock.save();
 		
 		renderAjaxResultForSuccess("OK");
 	}
@@ -245,7 +255,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		Seller seller = SellerQuery.me().findById(getSessionAttr("sellerId").toString());
 		//默认仓库
-		Warehouse warehouse = new Warehouse();
+		/*Warehouse warehouse = new Warehouse();
 		List<Department> tmpList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
 		for(Department dept : tmpList) {
 			Seller sr = SellerQuery.me().findById(dept.getStr("seller_id"));
@@ -255,19 +265,21 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 			}else {
 				continue;
 			}
-		}
+		}*/
+		//仓库ID
+		String warehouseId = getPara("warehouseId");
 		String purchaseInstockId = StrKit.getRandomUUID();
 
-		//采购入库单： PO + 100000(机构编号或企业编号6位) + 20171108(时间) + 100001(流水号)
+		//采购入库单： PS + 100000(机构编号或企业编号6位) + 20171108(时间) + 100001(流水号)
 		Date date = new Date();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
 		String fomatDate = sdf.format(date);
 		String purchaseOrderId=StringUtils.getArrayFirst(paraMap.get("purchaseOrderId"));
-		String pwarehouseSn="PO"+seller.getSellerCode()+fomatDate.substring(0,8)+PurchaseInstockQuery.me().getNewSn(seller.getId());
+		String pwarehouseSn="PS"+seller.getSellerCode().substring(0, 6)+fomatDate.substring(0,8)+PurchaseInstockQuery.me().getNewSn(seller.getId());
 		purchaseInstock.set("id", purchaseInstockId);
 		purchaseInstock.set("pwarehouse_sn", pwarehouseSn);
 		purchaseInstock.set("supplier_id", StringUtils.getArrayFirst(paraMap.get("supplierId")));
-		purchaseInstock.set("warehouse_id", warehouse.getId());
+		purchaseInstock.set("warehouse_id", warehouseId);
 		purchaseInstock.set("biz_user_id", user.getId());
 		purchaseInstock.set("biz_date", new Date());
 		purchaseInstock.set("input_user_id", user.getId());
@@ -380,4 +392,11 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		
 		renderAjaxResultForSuccess("OK");
 	} 
+	
+	public void show_warehouse(){
+		//查询账号所拥有的仓库
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		List<Warehouse> wares = WarehouseQuery.me()._findByUserId(user.getId());
+		renderJson(wares);
+	}
 }

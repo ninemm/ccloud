@@ -37,12 +37,10 @@ import org.ccloud.model.PurchaseOrderDetail;
 import org.ccloud.model.Seller;
 import org.ccloud.model.Supplier;
 import org.ccloud.model.User;
-import org.ccloud.model.Warehouse;
 import org.ccloud.model.query.ProductQuery;
 import org.ccloud.model.query.PurchaseOrderQuery;
 import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.SupplierQuery;
-import org.ccloud.model.query.WarehouseQuery;
 
 import com.alibaba.fastjson.JSON;
 import com.jfinal.aop.Before;
@@ -181,16 +179,10 @@ public class _PurchaseOrderDetailController extends JBaseCRUDController<Purchase
 		renderAjaxResultForSuccess();
 
 	}
-	public void show_supplier_warehouse(){
+	public void show_supplier(){
 		//查询供应商
 		String sellerId = getSessionAttr("sellerId");
 		List<Supplier> suppliers = SupplierQuery.me().findBySellerId(sellerId);
-		//查询账号所拥有的仓库
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		List<Warehouse> wares = WarehouseQuery.me()._findByUserId(user.getId());
-		Map<String, Object> map = new HashMap<>();
-		map.put("supplier", suppliers);
-		map.put("warehouse", wares);
-		renderJson(map);
+		renderJson(suppliers);
 	}
 }

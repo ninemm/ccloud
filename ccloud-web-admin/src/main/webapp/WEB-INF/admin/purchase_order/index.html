@@ -101,9 +101,12 @@
 				},
 				{field: "action", title: "操作", align: "center", width: '15%',
 				formatter: function(value, row, rowIndex) {
-					var strHtml = '<a class="btn btn-xs bg-olive btn-flat" onclick="detail(\''+row.id+'\')" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">详情</a> ';
+					var strHtml = '';
 					if(row.status==0){
-						strHtml += '<a class="btn btn-xs btn-primary btn-flat" onclick="pass(\''+row.id+'\')" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">通过</a> ';
+						strHtml += '<a class="btn btn-xs bg-olive btn-flat" onclick="detail(\''+row.id+'\',\''+row.status+'\',\''+0+'\')" data-toggle="modal" data-target="#exampleModal2" data-whatever="@mdo">详情</a> ';
+						strHtml += '<a class="btn btn-xs btn-primary btn-flat" onclick="detail(\''+row.id+'\',\''+row.status+'\',\''+1+'\')" data-toggle="modal" data-target="#exampleModal2" data-whatever="@mdo">通过</a> ';
+					}else{
+						strHtml += '<a class="btn btn-xs bg-olive btn-flat" onclick="detail(\''+row.id+'\',\''+row.status+'\')">详情</a> ';
 					}
 					/*else{
 						strHtml += '<a class="btn btn-xs bg-olive btn-flat" onclick="instockDetail(\''+row.id+'\')" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">入库明细</a> ';
@@ -125,16 +128,41 @@
 		}); 
 	} */
 	
-	function detail(id){
-		layer.open({
-			title:"采购订单详细",
-			type: 2, 
-			area: ['70%', '80%'],
-			content: '${CPATH}/admin/purchaseOrder/detail/' + id
-		}); 
+	function detail(id,status,butStatus){
+		if(status == 0 ){
+				$("#modal-body").html("");
+				$.ajax({
+						url:"${CPATH}/admin/purchaseOrder/show_warehouse",
+						type:"post",
+						dataType:"json",
+						success:function(data){
+							var Html = '<div class="control-label" style="margin-top:20px;">'
+									+'<label class="control-label col-sm-2" style="font-size:18px;"><strong>仓库:</strong>&nbsp;</label>'
+									+'<div class="input-group col-md-4 col-sm-10">'
+									+'<select class="form-control" style="padding-right:5px;margin-right:55px;" name="id" id="warehouseId" >'
+									+'<option value="">----请选择入货仓库----</option>'
+									+'</select></div>';
+							$("#modal-body").append(Html);
+							$.each(data,function(index, item) {
+									var HTML ='<option value="'+item.id+'">'+item.name+'</option>';
+									$("#warehouseId").append(HTML);
+							});
+						}
+					});
+			$("#purchaseOrderId").val(id);
+			$("#purchaseOrderStatus").val(status);
+			$("#buttonStatus").val(butStatus);
+		}else{
+			layer.open({
+				title:"采购订单详细",
+				type: 2, 
+				area: ['70%', '80%'],
+				content: '${CPATH}/admin/purchaseOrder/detail?purchaseOrderId=' + id
+			});
+		}
 	} 
 	
-	function pass(id){
+	/*function pass(id){
 		$.ajax({
 			url:"${CPATH}/admin/purchaseOrder/pass",
 			type:"post",
@@ -153,7 +181,7 @@
 				alert("信息提交错误");
 			}
 		});
-	}
+	}*/
 	
 	var validatorFields = {
 	};
@@ -161,7 +189,7 @@
 	$('#exampleModal1').on('show.bs.modal', function (event) {
 		$(".modal-body").html("");
 		$.ajax({
-				url:"${CPATH}/admin/purchaseOrderDetail/show_supplier_warehouse",
+				url:"${CPATH}/admin/purchaseOrderDetail/show_supplier",
 				type:"post",
 				dataType:"json",
 				success:function(data){
@@ -170,21 +198,11 @@
 							+'<div class="input-group col-md-4 col-sm-10">'
 							+'<select class="form-control" style="padding-right:5px;margin-right:55px;" name="id" id="supplierId" >'
 							+'<option value="">----请选择供应商----</option>'
-							+'</select></div>'
-							+'<div class="control-label" style="margin-top:20px;">'
-							+'<label class="control-label col-sm-2" style="font-size:18px;"><strong>仓库:</strong>&nbsp;</label>'
-							+'<div class="input-group col-md-4 col-sm-10">'
-							+'<select class="form-control" style="padding-right:5px;margin-right:55px;" name="id" id="warehouseId" >'
-							+'<option value="">----请选择入货仓库----</option>'
 							+'</select></div>';
 					$(".modal-body").append(Html);
-					$.each(data.supplier,function(index, item) {
+					$.each(data,function(index, item) {
 							var html ='<option value="'+item.id+'">'+item.name+'</option>';
 							$("#supplierId").append(html);
-					});
-					$.each(data.warehouse,function(index, item) {
-							var HTML ='<option value="'+item.id+'">'+item.name+'</option>';
-							$("#warehouseId").append(HTML);
 					});
 				}
 			});
@@ -192,13 +210,46 @@
 	
 	function addProduct(){
 		 var supplierId=$("#supplierId").find("option:selected").val();
-		 var warehouseId=$("#warehouseId").find("option:selected").val();
-		 location.href="${CPATH}/admin/purchaseOrderDetail/index?supplierId="+supplierId+"&warehouseId="+warehouseId;
+		 location.href="${CPATH}/admin/purchaseOrderDetail/index?supplierId="+supplierId;
 	}
 	
 	function refresh(){
 		layer.closeAll();
 		location.reload();
+	}
+	
+	function passWarehouse(){
+		var status = $("#purchaseOrderStatus").val();
+		var id = $("#purchaseOrderId").val();
+		var butStatus = $("#buttonStatus").val();
+		var warehouseId=$("#warehouseId").find("option:selected").val();
+		if(butStatus == 0){
+			layer.open({
+					title:"采购订单详细",
+					type: 2, 
+					area: ['70%', '80%'],
+					content: '${CPATH}/admin/purchaseOrder/detail?purchaseOrderId=' + id+'&warehouseId='+warehouseId
+				});
+		}else{
+			$.ajax({
+			url:"${CPATH}/admin/purchaseOrder/pass",
+			type:"post",
+			dataType:"json",
+			data:{"id":id,"warehouseId":warehouseId},
+			success : function(data) { 
+				if (data.errorCode == 0) {
+					toastr.success(data.message, '操作成功');
+					setTimeout( function(){location.reload();}, 2 * 1000 );
+				} else {
+					toastr.error(data.message,'操作失败');
+					setTimeout( function(){location.reload();}, 2 * 1000 );
+				}
+			},
+			error : function() {
+				alert("信息提交错误");
+			}
+		});
+		}
 	}
 </#macro>
 
@@ -261,7 +312,7 @@
 	    <div class="modal-content">
 	      <div class="modal-header">
 	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-	        <h4 class="modal-title" id="exampleModalLabel">选择供应商和入货仓库</h4>
+	        <h4 class="modal-title" id="exampleModalLabel">选择供应商</h4>
 	      </div>
 	      <div class="modal-body">
 	      </div>
@@ -272,4 +323,24 @@
 	    </div>
 	  </div>
 	</div>
+	<div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	        <h4 class="modal-title" id="exampleModalLabel">选择入库仓库</h4>
+	        <input type = "hidden" id = "purchaseOrderId" value="">
+	        <input type = "hidden" id = "purchaseOrderStatus" value="">
+	        <input type = "hidden" id = "buttonStatus" value="">
+	      </div>
+	      <div class="modal-body" id = "modal-body">
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" onclick="passWarehouse()" class="btn btn-sm btn-primary btn-flat">确认</button>
+	        <button type="button" class="btn btn-sm btn-primary btn-flat btn-flat" data-dismiss="modal">关闭</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+</section>
 </@layout>

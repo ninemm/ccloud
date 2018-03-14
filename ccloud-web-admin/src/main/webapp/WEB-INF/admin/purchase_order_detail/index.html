@@ -28,7 +28,6 @@
 	var productInfoMap = ${productInfoMap!};
 	var productOptionList = ${productOptionList!};
 	var supplierInfoMap = ${supplierInfoMap!};
-	var warehouseId = ${warehouseId!};
 	//标志
 	var newTrIdx = 0;
 	
@@ -133,7 +132,7 @@
 			var convert = product.convertRelate;
 			$tr.find("#convert").val(convert);
 
-			var bigPrice = product.price;
+			var bigPrice = product.cost;
 			var smallUnit = product.smallUnit;
 			var smallPrice = bigPrice/convert;
 			
