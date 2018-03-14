@@ -168,6 +168,7 @@ public class Consts {
 	public static final String OPTION_WEB_PROC_CUSTOMER_VISIT = "web_proc_customer_visit_";//新增拜访审核开关设置
 	public static final String OPTION_WEB_PROC_ACTIVITY_APPLY = "web_proc_activity_apply_";//申请活动审核开关设置
 	public static final String OPTION_DATA_UPLOAD_CUSTOMER_TYPE = "data_upload_customer_type_";//数据上传类型配置
+	public static final String OPTION_WEB_MEMBER_NUMBER_LIMIT = "web_member_number_limit_";//数据上传类型配置
 	public static final String OPTION_FILE_ROOT_PATH = "web_file_root_path";
 
 	public static final String OPTION_ON = "true";

@@ -36,40 +36,26 @@ public class OrderController extends BaseFrontController {
 		Member member = getSessionAttr(Consts.SESSION_LOGINED_MEMBER);
 
 		JSONArray productList = JSON.parseArray(getPara("productList"));
-		List<String> sellProductIdList = new ArrayList<>();
+		List<String> sellerIdList = new ArrayList<>();
 		for (int i = 0; i < productList.size(); i++) {
 			JSONObject obj = productList.getJSONObject(i);
-			sellProductIdList.add(obj.getString("sellProductId"));
+			String dealerSellerId = getDealerSellerId(obj.getString("sellerId"));
+			if(StrKit.notBlank(dealerSellerId)) sellerIdList.add(dealerSellerId);
 		}
 
-		List<Record> customerTypes = CustomerTypeQuery.me().findByMember(member.getCustomerId(), sellProductIdList);
+		List<Record> customerTypes = CustomerTypeQuery.me().findByMember(member.getCustomerId(), sellerIdList);
 
-		List<List<Map<String, Object>>> customerTypeList = new ArrayList<>();
+		List<Map<String, Object>> customerTypeList = new ArrayList<>();
 
 		for(int i = 0; i < customerTypes.size(); i++) {
 
-			String ids = customerTypes.get(i).get("id");
-			String names = customerTypes.get(i).get("name");
+			String id = customerTypes.get(i).get("id");
+			String name = customerTypes.get(i).get("name");
 
-			List<String> idList = Splitter.on(",")
-					.trimResults()
-					.omitEmptyStrings()
-					.splitToList(ids);
-
-			List<String> nameList = Splitter.on(",")
-					.trimResults()
-					.omitEmptyStrings()
-					.splitToList(names);
-			if (idList.size() > 1) {
-				List<Map<String, Object>> customerType = new ArrayList<>();
-				for (int j = 0; j < idList.size(); j++) {
-					Map<String, Object> item = new HashMap<>();
-					item.put("title", nameList.get(j));
-					item.put("value", idList.get(j));
-					customerType.add(item);
-				}
-				customerTypeList.add(customerType);
-			}
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", name);
+			item.put("value", name);
+			customerTypeList.add(item);
 		}
 
 		renderJson(customerTypeList);
@@ -95,6 +81,7 @@ public class OrderController extends BaseFrontController {
 				moreInfo.put("receiveType", StringUtils.getArrayFirst(paraMap.get("receiveType")));
 				moreInfo.put("receiveTypeName", StringUtils.getArrayFirst(paraMap.get("receiveTypeName")));
 				moreInfo.put("deliveryDate", StringUtils.getArrayFirst(paraMap.get("deliveryDate")));
+				moreInfo.put("customerType", StringUtils.getArrayFirst(paraMap.get("customerType")));
 
 				String[] sellerIds = paraMap.get("sellerId");
 
@@ -112,6 +99,7 @@ public class OrderController extends BaseFrontController {
 					List<Map<String, String>> paraList = new ArrayList<>();
 					Double totalNum = 0.00;
 					double total = 0;
+					Integer memberProcNumber = OptionQuery.me().findValueAsInteger(Consts.OPTION_WEB_MEMBER_NUMBER_LIMIT + sellerCode);
 
 					for (int j = 0; j < sellerIds.length; j++) {
 						//根据sellerId筛选产品
@@ -126,9 +114,19 @@ public class OrderController extends BaseFrontController {
 							para.put("smallPrice", paraMap.get("smallPrice")[j]);
 							para.put("rowTotal", paraMap.get("rowTotal")[j]);
 							total = total + Double.parseDouble(paraMap.get("rowTotal")[j]);
-							totalNum = totalNum + Double.parseDouble(paraMap.get("bigNum")[j]) +
+
+							Double prodTotalNum = Double.parseDouble(paraMap.get("bigNum")[j]) +
 									Double.parseDouble(paraMap.get("smallNum")[j]) / Double.parseDouble(paraMap.get("convert")[j]);
+
+							totalNum = totalNum + prodTotalNum;
 							paraList.add(para);
+
+							if(memberProcNumber != null) {
+								if(prodTotalNum > memberProcNumber) {
+									renderAjaxResultForError(SellerProductQuery.me().findById(paraMap.get("sellProductId")[j]).getCustomName() + "数量超过上限" + memberProcNumber.toString());
+									return false;
+								}
+							}
 						}
 					}
 					total = new BigDecimal(total).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
@@ -159,17 +157,12 @@ public class OrderController extends BaseFrontController {
 		String orderId = StrKit.getRandomUUID();
 		Date date = new Date();
 
-		String dealerSellerId = sellerId;
-		String deptId = DepartmentQuery.me().findBySellerId(sellerId).getId();
-		List<Department> departmentList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(deptId);
-		//根据sellerId查出他的经销商sellerId
-		for(Department department :departmentList)
-			if(department.getStr("seller_type").equals("0")) {
-				dealerSellerId = department.getStr("seller_id");
-				break;
-			}
+		String dealerSellerId = getDealerSellerId(sellerId);
+		String dataArea = DepartmentQuery.me().findBySellerId(dealerSellerId).getDataArea();
 
-		CustomerType customerType = CustomerTypeQuery.me().findBySellerCustomer(dealerSellerId, moreInfo.get("customerId"));
+		CustomerType customerType = CustomerTypeQuery.me().findByName(moreInfo.get("customerType"), dataArea);
+		if (customerType == null) customerType = CustomerTypeQuery.me().findBySellerCustomer(dealerSellerId, moreInfo.get("customerId"));
+
 		String customerTypeProcDefKey = customerType.getProcDefKey();
 
 		String OrderSO = SalesOrderQuery.me().getNewSn(sellerId);
@@ -371,6 +364,7 @@ public class OrderController extends BaseFrontController {
 		setAttr("id", orderId);
 		setAttr("order", order);
 		setAttr("customerInfo", CustomerQuery.me().findById(member.getCustomerId()));
+		setAttr("customerType", CustomerTypeQuery.me().findById(order.getStr("customer_type_id")).getStr("name"));
 		render("member_order_again.html");
 	}
 
@@ -427,5 +421,16 @@ public class OrderController extends BaseFrontController {
 		if (statusCode == Consts.SALES_ORDER_STATUS_ALL_OUT_CLOSE)
 			return "全部出库-订单关闭";
 		return "无";
+	}
+
+	private String getDealerSellerId(String sellerId) {
+		String deptId = DepartmentQuery.me().findBySellerId(sellerId).getId();
+		List<Department> departmentList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(deptId);
+		//根据sellerId查出他的经销商sellerId
+		for(Department department :departmentList)
+			if(department.getStr("seller_type").equals("0")) {
+				return department.getStr("seller_id");
+			}
+		return "";
 	}
 }
