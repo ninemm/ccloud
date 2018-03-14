@@ -60,7 +60,7 @@
 			        			$(".imgeInfo").hide();
 			        			if(activityExecute.length>0){
 				        			for(var i = 0 ; i < activityExecute.length ; i++){
-					        				html +='<div><input id="orderList" type="hidden" value="'+activityExecute[i].orderList+'"/>'+activityExecute[i].remark+'<div class="weui-uploader__info">0/3</div><div class="weui-uploader__bd">'
+					        				html +='<div><input id="orderList" type="hidden" value="'+activityExecute[i].orderList+'"/>'+activityExecute[i].remark+'<div class="weui-uploader__bd">'
 				                               	+'<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles" >';
 				                          if(imgeList != 1){
 					                           for(var j = 0 ; j < imgeList.length ; j++){
@@ -77,7 +77,6 @@
 			        			}else{
 			        				html +='<div class="weui-uploader__hd">'
 					                       +'<p class="weui-uploader__title">附件图片</p>'
-					                       +'<div class="weui-uploader__info imgeInfo">0/3</div>'
 					                       +'</div>'
 					                       +'<div class="weui-uploader__bd imageActivityExecute">'
 					                       +'<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles">';
@@ -481,7 +480,6 @@
                         <div class="weui-uploader imgeActivity">
                             <div class="weui-uploader__hd">
                                 <p class="weui-uploader__title">附件图片</p>
-                                <div class="weui-uploader__info imgeInfo">0/3</div>
                             </div>
                             <div class="weui-uploader__bd imageActivityExecute">
                                 <ul class="weui-uploader__files uploaderFiles" id="uploaderFiles"></ul>

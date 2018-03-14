@@ -86,4 +86,9 @@ public class ActivityExecuteQuery extends JBaseQuery {
 		String sql = "select * from cc_activity_execute where activity_id = '"+acitiviyId+"' and order_list <= '"+orderList+"' ORDER By order_list";
 		return DAO.find(sql);
 	}
+	
+	public ActivityExecute _findbyActivityIdAndOrderList(String acitiviyId,String orderList){
+		String sql = "select * from cc_activity_execute where activity_id = '"+acitiviyId+"' and order_list = '"+orderList+"'";
+		return DAO.findFirst(sql);
+	}
 }

@@ -14,6 +14,7 @@ import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
+import org.ccloud.model.ActivityApply;
 import org.ccloud.model.ActivityExecute;
 import org.ccloud.model.Customer;
 import org.ccloud.model.CustomerType;
@@ -239,12 +240,15 @@ public class CustomerVisitController extends BaseFrontController {
 	
 	public void activityChoose(){
 		String customerId = getPara("customerId");
-		List<Record> activityRecords = ActivityQuery.me().findByCustomerId(customerId);
+		List<Record> activityRecords = ActivityQuery.me()._findByCustomerId(customerId);
 		List<Map<String, String>> activityList = Lists.newArrayList();
 	    for (Record record : activityRecords) {
 		    	Map<String, String> map = Maps.newHashMap();
-//		    	map.put("title", record.getStr("title")+"--"+DictQuery.me().findByKey(record.getStr("flow_dict_type"), record.getStr("item1")).getName());
-		    	map.put("title", record.getStr("title"));
+		    	if(record.getStr("name")==null) {
+		    		map.put("title", record.getStr("title")+" "+record.getStr("create_date"));
+		    	}else {
+		    		map.put("title", record.getStr("title")+" "+record.getStr("name")+" "+record.getStr("create_date"));
+		    	}
 		    	map.put("value", record.getStr("activityApplyId"));
 		    	activityList.add(map);
 	    }
@@ -385,6 +389,17 @@ public class CustomerVisitController extends BaseFrontController {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		
 		String activityApplyId = getPara("activity_apply_id");
+		if(!activityApplyId.equals("")) {
+			List<CustomerVisit> customerVisits = CustomerVisitQuery.me().findByActivityApplyId(activityApplyId);
+			if(customerVisits.size()>0) {
+				for(CustomerVisit visit:customerVisits) {
+					if(visit.getStatus() != Consts.CUSTOMER_VISIT_STATUS_PASS) {
+						renderAjaxResultForError("您的拜访未审核通过！");
+						return;
+					}
+				}
+			}
+		}
 		Boolean isChecked = OptionQuery.me().findValueAsBool("web_proc_customer_visit_" + getSessionAttr("sellerCode"));
 		
 		List<ImageJson> list = Lists.newArrayList();
@@ -671,18 +686,12 @@ public class CustomerVisitController extends BaseFrontController {
 	public void getActivityExecute() {
 		String activityApplyId = getPara("activityApplyId");
 		Map<String, Object> map = new HashMap<>();
-		map.put("activityExecute", JSON.toJSON(ActivityExecuteQuery.me().findbyActivityId(ActivityApplyQuery.me().findById(activityApplyId).getActivityId())));
 		List<CustomerVisit> customerVisits = CustomerVisitQuery.me().findByActivityApplyId(activityApplyId);
+		String orderList = String.valueOf(customerVisits.size()+1);
+		map.put("activityExecute", JSON.toJSON(ActivityExecuteQuery.me().findbyActivityIdAndOrderList(ActivityApplyQuery.me().findById(activityApplyId).getActivityId(),orderList)));
 		if(customerVisits.size()>0) {
 			map.put("imgeLists",JSON.parseArray(customerVisits.get(0).getPhoto(), ImageJson.class));
-			List<ImageJson> imageJsons = JSON.parseArray(customerVisits.get(0).getPhoto(), ImageJson.class);
-			List<String> lists = new ArrayList<>();
-			for(ImageJson imageJson : imageJsons) {
-				if(!lists.contains(imageJson.getOrderList())) {
-					lists.add(imageJson.getOrderList());
-				}
-			}
-			map.put("maxOrderList", lists.size());
+			map.put("maxOrderList", customerVisits.size());
 		}
 		map.put("domain",OptionQuery.me().findValue("cdn_domain"));
 		renderJson(map);
@@ -696,13 +705,20 @@ public class CustomerVisitController extends BaseFrontController {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		
 		String activityApplyId = getPara("activity_apply_id");
-		//Boolean isChecked = OptionQuery.me().findValueAsBool("web_proc_customer_visit_" + getSessionAttr("sellerCode"));
-		
+		if(!activityApplyId.equals("")) {
+			List<CustomerVisit> customerVisits = CustomerVisitQuery.me().findByActivityApplyId(activityApplyId);
+			if(customerVisits.size()>0) {
+				for(CustomerVisit visit:customerVisits) {
+					if(visit.getStatus() != Consts.CUSTOMER_VISIT_STATUS_PASS) {
+						renderAjaxResultForError("您的拜访未审核通过！");
+						return;
+					}
+				}
+			}
+		}
 		List<ImageJson> list = Lists.newArrayList();
 		String picJson = getPara("pic");
 		
-		//if (isChecked != null && isChecked) customerVisit.setStatus(Customer.CUSTOMER_AUDIT);
-		//else customerVisit.setStatus(Customer.CUSTOMER_NORMAL);
 		customerVisit.setStatus(Customer.CUSTOMER_BULU);
 		customerVisit.setUserId(user.getId());
 		customerVisit.setDataArea(user.getDataArea());
@@ -852,21 +868,20 @@ public class CustomerVisitController extends BaseFrontController {
 	}
 
 	public void addActivityApplyVisit() {
-		String activityApplyId = getPara("activeApplyId");
-		String activityExecuteId = getPara("activityExecuteId");
+		String activityApplyId = getPara("applyId");
+		String orderList = getPara("orderList");
 		List<CustomerVisit> customerVisits = CustomerVisitQuery.me().findByActivityApplyId(activityApplyId);
 		if(customerVisits.size()>0) {
 			setAttr("imgeLists",JSON.toJSON(JSON.parseArray(customerVisits.get(0).getPhoto(), ImageJson.class)));
 			setAttr("customerVisit",CustomerVisitQuery.me().findMoreById(customerVisits.get(0).getId()));
 		}
 		Record record = ActivityQuery.me().findByApplyId(activityApplyId);
-		String orderList = getPara("orderList");
 		List<ActivityExecute> activityExecutes = ActivityExecuteQuery.me().findbyActivityIdAndOrderList(record.getStr("activity_id"),orderList);
-		
+		ActivityExecute activityExecute = ActivityExecuteQuery.me()._findbyActivityIdAndOrderList(record.getStr("activity_id"), orderList);
 		List<Map<String, String>> list = getVisitTypeList();
 		setAttr("problem", JSON.toJSONString(list));
 		setAttr("activityExecutes",JSON.toJSONString(activityExecutes));
-		setAttr("activityExecuteId",JSON.toJSONString(activityExecuteId));
+		setAttr("activityExecuteId",activityExecute.getId());
 		setAttr("record",record);
 		setAttr("domain",OptionQuery.me().findValue("cdn_domain"));
 		setAttr("orderList",orderList);
@@ -951,6 +966,30 @@ public class CustomerVisitController extends BaseFrontController {
 			renderAjaxResultForSuccess("操作成功");
 		else 
 			renderAjaxResultForError("操作失败");
+	}
+	
+	public void checkCustomerVisit() {
+		String activityApplyId = getPara("applyId");
+		String orderList = getPara("orderList");
+		String message = "";
+		ActivityApply activityApply = ActivityApplyQuery.me().findById(activityApplyId);
+		if(activityApply.getStatus()== Consts.ACTIVITY_APPLY_STATUS_PASS) {
+			
+			if(!orderList.equals("1")) {
+				orderList = String.valueOf(Integer.parseInt(orderList)-1);
+				CustomerVisit customerVisit = CustomerVisitQuery.me().findByActivityApplyIdAndOrderList(activityApplyId,orderList);
+				if(customerVisit==null) {
+					message = "上一执行步骤还未开始执行";
+				}else if(!customerVisit.getStatus().equals(Consts.CUSTOMER_VISIT_STATUS_PASS)) {
+					message = "上一执行步骤未审核通过";
+				}
+			}
+		}else {
+			message = "活动申请尚未通过";
+		}
+		Map<String, Object> map = new HashMap<>();
+		map.put("message", message);
+		renderJson(map);
 	}
 	
 }

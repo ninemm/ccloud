@@ -25,7 +25,6 @@ import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.*;
 import org.ccloud.model.query.*;
-import org.ccloud.model.vo.ImageJson;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.StringUtils;
 
@@ -554,21 +553,25 @@ public class ActivityController extends BaseFrontController {
 		Page<Record> applyList = ActivityApplyQuery.me().findList(getParaToInt("pageNumber"), getParaToInt("pageSize"), selectDataArea, category, status, startDate, endDate, keyword);
 
 		DecimalFormat df   = new DecimalFormat("######0.00");
+		List<Map<String, Object>> applyL = new ArrayList<>();
 		StringBuilder html = new StringBuilder();
 		for (Record apply : applyList.getList()) {
-			int num = 0;
+//			int num = 0;
 			List<ActivityExecute> activityExecutes = ActivityExecuteQuery.me().findbyActivityId(apply.getStr("activity_id"));
+			List<String> strings = new ArrayList<>();
+			String sellerCustomerId = apply.getStr("seller_customer_id");
+			List<CustomerVisit> customerVisits = CustomerVisitQuery.me().findByApplyIdAndSellerCustomerId(apply.getStr("id"), sellerCustomerId);
 			//comeFrom = 1 来源于活动列表
-			CustomerVisit customerV = CustomerVisitQuery.me().findByActivityApplyIdAndComeFrom(apply.getStr("id"));
-			if(customerV != null){
-				List<ImageJson> listImages = JSON.parseArray(customerV.getPhoto(), ImageJson.class);
-				List<String> listS = new ArrayList<>();
-				for(ImageJson listImag:listImages){
-					if(!listS.contains(listImag.getOrderList())){
-						num++;
-					}
-				}
-			}
+//			CustomerVisit customerV = CustomerVisitQuery.me().findByActivityApplyIdAndComeFrom(apply.getStr("id"));
+//			if(customerV != null){
+//				List<ImageJson> listImages = JSON.parseArray(customerV.getPhoto(), ImageJson.class);
+//				List<String> listS = new ArrayList<>();
+//				for(ImageJson listImag:listImages){
+//					if(!listS.contains(listImag.getOrderList())){
+//						num++;
+//					}
+//				}
+//			}
 			html.append("<section>\n");
 			html.append("<div class=\"weui-cells__title\"></div>");
 
@@ -612,13 +615,14 @@ public class ActivityController extends BaseFrontController {
 						"						</div>\n"+
 						"						</div>\n"+
 						"                        <div class=\"weui-flex\">\n");
-//				html.append("  <div class=\"stepCont stepCont2\">\n" + 
-//						"      <!-- <div class=\"ystep\"></div> -->\n" + 
-//						"      <div class='ystep-container ystep-lg ystep-blue'></div>\n" + 
-//						"  </div>");				
-				for(int i  = 0 ; i < activityExecutes.size() ; i++) {
+				html.append("  <div class=\"stepCont stepCont2\" id =\""+apply.getStr("id")+"\">\n" + 
+						"      <!-- <div class=\"ystep\"></div> -->\n" + 
+						"      <input type = \"hidden\" class = \"orderList\" value = \""+apply.getStr("id")+"\">\n" + 
+						"      <div class='ystep-container ystep-lg ystep-blue'></div>\n" + 
+						"  </div>");				
+			/*	for(int i  = 0 ; i < activityExecutes.size() ; i++) {
 					if(i>num){
-						html.append("<a class=\"weui-cell weui-btn_disabled weui-btn_primary\">\n" +
+						html.append("<a onclick = \"warning()\" class=\"weui-cell weui-btn_disabled weui-btn_primary\">\n" +
 								"                       <div class=\"weui-flex__item\">\n" +
 								"                                <p>" + activityExecutes.get(i).getOrderList() + "</p>\n" +
 								"                            </div></a>\n");
@@ -630,18 +634,26 @@ public class ActivityController extends BaseFrontController {
 								"                            </div></a>\n");
 						
 					}
+				}*/
+				for(ActivityExecute activityExecute:activityExecutes) {
+					strings.add(activityExecute.getOrderList());
 				}
 			}
 			
 			html.append( "                        </div>\n" +
 					"                    </div>\n" +
 					"                </section>");
+			Map<String, Object> map1 = new HashMap<>();
+			map1.put("activityApply", apply);
+			map1.put("strings", strings);
+			map1.put("num", customerVisits.size());
+			applyL.add(map1);
 		}
-
 		Map<String, Object> map = new HashMap<>();
 		map.put("html", html.toString());
 		map.put("totalRow", applyList.getTotalRow());
 		map.put("totalPage", applyList.getTotalPage());
+		map.put("applyL", applyL);
 		renderJson(map);
 	}
 
