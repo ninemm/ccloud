@@ -485,7 +485,9 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 				String customerId = "";
 				String sellerCustomerId = "";
 				SellerCustomer sellerCustomer = null;
-
+				if(excel.getCustomerName() == null && excel.getMobile()==null) {
+					break;
+				}
 				// 检查客户是否存在
 				Customer customer = CustomerQuery.me().findByCustomerNameAndMobile(excel.getCustomerName(),
 						excel.getMobile());

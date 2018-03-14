@@ -486,6 +486,10 @@ public class _UserController extends JBaseCRUDController<User> {
 					errorCnt++;
 					continue;
 				}
+				
+				if(excel.getMobile()==null) {
+					break;
+				}
 				// 检查用户是否存在
 				us = UserQuery.me().findByMobileAndDeptId(excel.getMobile(),deptId);
 				Group group = GroupQuery.me().findDataAreaAndGroupName(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString(), excel.getUserGroup());
