@@ -99,7 +99,7 @@ public class _RoleController extends JBaseCRUDController<Role> {
 	public void delete() {
 		String id = getPara("id");
 		final Role r = RoleQuery.me().findById(id);
-		List<User> list = UserQuery.me().findByRoleId(id);
+		List<User> list = UserQuery.me().findByRole(id);
 		if (list.size() > 0) {
 			renderAjaxResultForError("已有用户拥有此角色");
 			return;

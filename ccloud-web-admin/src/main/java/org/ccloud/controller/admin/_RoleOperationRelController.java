@@ -15,13 +15,20 @@
  */
 package org.ccloud.controller.admin;
 
+import java.util.List;
+
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.mgt.RealmSecurityManager;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.menu.MenuManager;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
+import org.ccloud.shiro.ShiroDbRealm;
 import org.ccloud.model.RoleOperationRel;
+import org.ccloud.model.User;
 import org.ccloud.model.query.RoleOperationRelQuery;
+import org.ccloud.model.query.UserQuery;
 
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
@@ -46,6 +53,7 @@ public class _RoleOperationRelController extends JBaseCRUDController<RoleOperati
 
         if (roleOperationRel.save()) {
         	MenuManager.clearAllList();
+        	cleanUserRole(roleId);
         	renderAjaxResultForSuccess();
         } else {
         	renderAjaxResultForError();
@@ -53,13 +61,23 @@ public class _RoleOperationRelController extends JBaseCRUDController<RoleOperati
 
     }
 
-    @Override
+    private void cleanUserRole(String roleId) {
+    	List<User> userList = UserQuery.me().findByRole(roleId);
+		RealmSecurityManager rsm = (RealmSecurityManager)SecurityUtils.getSecurityManager();    
+        ShiroDbRealm realm = (ShiroDbRealm)rsm.getRealms().iterator().next();   
+        for (User user : userList) {
+        	realm.clearCachedAuthorizationInfo(user);
+		}
+	}
+
+	@Override
     public void delete(){
         String roleId = getPara("role_id");
         String operationId = getPara("operation_id");
 
         if (RoleOperationRelQuery.me().delete(roleId, operationId) != 0) {
         	MenuManager.clearAllList();
+        	cleanUserRole(roleId);
         	renderAjaxResultForSuccess();
         } else {
         	renderAjaxResultForError();
