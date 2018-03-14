@@ -52,7 +52,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 
 	public Record findMoreById(final String id) {
-		StringBuilder fromBuilder = new StringBuilder(" select o.*,c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as typeCode,ct.proc_def_key, u.realname, u.mobile as umobile, cp.factor ,cc.id as sellerCustomerId,cc.customer_kind,s.is_print ");
+		StringBuilder fromBuilder = new StringBuilder(" select o.*,c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as typeCode,ct.proc_def_key, u.realname, u.mobile as umobile, cp.factor ,cc.id as sellerCustomerId,cc.customer_kind,s.is_print, mso.member_id  ");
 		fromBuilder.append(" from `cc_sales_order` o ");
 		fromBuilder.append(" left join cc_seller_customer cc ON o.customer_id = cc.id ");
 		fromBuilder.append(" left join cc_customer c on cc.customer_id = c.id ");
@@ -61,6 +61,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" left join user u on o.biz_user_id = u.id ");
 		fromBuilder.append("LEFT JOIN cc_sales_order_join_outstock so on so.order_id = o.id ");
 		fromBuilder.append("LEFT JOIN cc_sales_outstock s on s.id = so.outstock_id ");
+		fromBuilder.append("LEFT JOIN cc_member_sales_order mso on mso.order_id = o.id ");
 		fromBuilder.append(" where o.id = ? ");
 
 		return Db.findFirst(fromBuilder.toString(), id);
@@ -115,7 +116,7 @@ public class SalesOrderQuery extends JBaseQuery {
 
 	public Page<Record> paginateForApp(int pageNumber, int pageSize, String keyword, String status,
 			String customerTypeId, String startDate, String endDate, String sellerId, String dataArea) {
-		String select = "select o.*, c.customer_name, c.contact as ccontact, c.mobile as cmobile, ct.name as customerTypeName, a.ID_ taskId, a.NAME_ taskName, a.ASSIGNEE_ assignee,s.is_print ";
+		String select = "select o.*, c.customer_name, c.contact as ccontact, c.mobile as cmobile, ct.name as customerTypeName, a.ID_ taskId, a.NAME_ taskName, a.ASSIGNEE_ assignee,s.is_print, mso.member_id ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_sales_order` o ");
 		fromBuilder.append("left join cc_seller_customer cc ON o.customer_id = cc.id ");
 		fromBuilder.append("left join cc_customer c on cc.customer_id = c.id ");
@@ -123,6 +124,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append("left join act_ru_task a on o.proc_inst_id = a.PROC_INST_ID_ ");
 		fromBuilder.append("LEFT JOIN cc_sales_order_join_outstock so on so.order_id = o.id ");
 		fromBuilder.append("LEFT JOIN cc_sales_outstock s on s.id = so.outstock_id ");
+		fromBuilder.append("LEFT JOIN cc_member_sales_order mso on mso.order_id = o.id ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 
@@ -430,11 +432,13 @@ public class SalesOrderQuery extends JBaseQuery {
 	
 	public List<SalesOrder> getToDo(String username) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(" SELECT o.*, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, a.ID_ taskId, a.NAME_ taskName, a.ASSIGNEE_ assignee, a.CREATE_TIME_ createTime ");
+		sb.append(" SELECT o.*, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, a.ID_ taskId, a.NAME_ taskName, a.ASSIGNEE_ assignee, a.CREATE_TIME_ createTime, mso.member_id  ");
 		sb.append(" FROM cc_sales_order o ");
 		sb.append(" left join cc_seller_customer cc ON o.customer_id = cc.id ");
 		sb.append(" left join cc_customer c on cc.customer_id = c.id ");
 		sb.append(" left join cc_customer_type ct on o.customer_type_id = ct.id ");
+		sb.append(" LEFT JOIN cc_member_sales_order mso on mso.order_id = o.id ");
+
 		sb.append(" JOIN act_ru_task a on o.proc_inst_id = a.PROC_INST_ID_ ");
 		sb.append(" where FIND_IN_SET(?, a.ASSIGNEE_) ");
 		sb.append(" order by o.create_date DESC");
@@ -443,14 +447,15 @@ public class SalesOrderQuery extends JBaseQuery {
 	
 	public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procKey, String username) {
 		
-		String select = "SELECT o.*, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName,i.TASK_ID_ taskId, i.ACT_NAME_ taskName, i.ASSIGNEE_ assignee, i.END_TIME_ endTime  ";
+		String select = "SELECT o.*, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName,i.TASK_ID_ taskId, i.ACT_NAME_ taskName, i.ASSIGNEE_ assignee, i.END_TIME_ endTime, mso.member_id  ";
 		
 		LinkedList<Object> params = new LinkedList<>();
 		StringBuilder sql = new StringBuilder(" FROM cc_sales_order o ");
 		sql.append(" left join cc_seller_customer cc ON o.customer_id = cc.id ");
 		sql.append(" left join cc_customer c on cc.customer_id = c.id ");
-		
 		sql.append(" left join cc_customer_type ct on o.customer_type_id = ct.id ");
+		sql.append(" LEFT JOIN cc_member_sales_order mso on mso.order_id = o.id ");
+
 		sql.append(" JOIN act_hi_actinst i on o.proc_inst_id = i.PROC_INST_ID_ ");
 		sql.append(" JOIN act_re_procdef p on p.ID_ = i.PROC_DEF_ID_ ");
 		sql.append(" WHERE i.DURATION_ is not null AND p.KEY_ not in (?,?,?) ");

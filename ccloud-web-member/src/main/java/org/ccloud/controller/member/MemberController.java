@@ -104,6 +104,12 @@ public class MemberController extends BaseFrontController {
 
 		String mobile = getPara("mobile");
 		String sales_id = getPara("sales_id");
+
+		if(StrKit.isBlank(sales_id)){
+			renderAjaxResultForError("请扫业务员的二维码绑定");
+			return;
+		}
+
 		List<Record> list = MemberQuery.me().checkCustomerExist(mobile, sales_id);
 		if (list != null && list.size() > 0)
 			renderAjaxResultForSuccess();

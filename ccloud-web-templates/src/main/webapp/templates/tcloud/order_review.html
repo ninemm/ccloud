@@ -211,13 +211,10 @@
 	          <p>业务员&nbsp;${(order.realname)!}</p>
 	        </div>
 	        <hr>
-	        <div class="ft14">
-	          <#if order.receive_type = 0>
-	            <input type="checkbox" name="if-account" checked disabled="disabled" class="weui-agree__checkbox">
-	            <#else>
-	              <input type="checkbox" name="if-account" disabled="disabled" class="weui-agree__checkbox">
-	          </#if>是否账期
-	        </div>
+			<div class="ft14">
+				<#if order.receive_type = 0> <span class="tag" >账期</span> </#if>
+				<#if order.member_id ??><span class="tag" >终端下单</span> </#if>
+			</div>
 	      </div>
 	      <div class="weui-panel weui-panel_access">
 	        <div class="ft14">

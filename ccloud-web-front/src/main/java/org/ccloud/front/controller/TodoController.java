@@ -182,13 +182,17 @@ public class TodoController extends BaseFrontController {
 					"                    <div class=\"weui-panel weui-panel_access\">\n" +
 					"                        <div class=\"weui-cell weui-cell_access\">\n" +
 					"							<a href=\""+getRequest().getContextPath()+"/order/orderReview?orderId="+order.getStr("id")+"\">\n");
-					if(order.get("receive_type").equals("0")) {
-					html.append("								<span class=\"tag\">账期</span>");
+					if(StrKit.notBlank(order.getStr("member_id"))) {
+					html.append("								<span class=\"tag\">终端下单</span>");
 					}
 					html.append("                            	<div class=\"weui-cell__bd ft16\">\n" +
 					"                                	<p class=\"customer_name\">" + order.getStr("customer_name") + "</p>\n" +
 					"                                	<div class=\"ft14 gray\">\n" +
-					"                                    	<p>订单号：" + order.getStr("order_sn")+"</p>\n" +
+					"                                    	<p>");
+					if("0".equals(order.get("receive_type"))) {
+						html.append("								<span class=\"tag\">账期</span>");
+					}
+					html.append(order.getStr("order_sn")+"</p>\n" +
 					"                                    	<p>联系人：<span>"+order.getStr("ccontact")+" / "+order.getStr("cmobile")+"</span><span class=\"fr\">"+order.getStr("customerTypeName")+"</span></p>\n" +
 					"                                    	<p>金额：￥<span>"+order.getStr("total_amount")+"</span><span class=\"fr\" id=\"date\">时间："+ DateUtils.format(order.getDate("endTime"))+"</span></p>\n");
 					html.append("                    				</div>\n" +

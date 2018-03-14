@@ -186,6 +186,10 @@
 					if(el.receive_type == 1) {
 						$newOrder.find("#receiveType").remove();
 					}
+	
+					if(el.member_id == undefined) {
+						$newOrder.find("#customerOrder").remove();
+					}
 					
 					$newOrder.find("#salesOrderId").attr('href', '${CPATH}/member/order/orderDetail?orderId=' + el.id);
 					$newOrder.find("#orderSn").text(el.order_sn);
@@ -501,6 +505,7 @@
 						<span class="fr orange" id="status"></span>
 					</div>
 					<div class="customer_name gray">
+						<span class="tag" id="customerOrder">终端下单</span>
 						<span id="customerName" class=""></span>
 						<span class="fr show-more-btn" id="showOrderProductDetail">
 							显示详情 <i class="icon-angle-down"></i>

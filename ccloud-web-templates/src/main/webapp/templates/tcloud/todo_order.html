@@ -211,13 +211,18 @@
 									<a href="${CPATH}/order/orderReview?orderId=${order.id!}&taskId=${order.taskId!}&assignee=${order.assignee!}" style="display:block;width:100%;">
 										<div class="weui-cell__bd ft16">
 											<p class="customer_name">
-												<#if order.receive_type == 0>
-													<span class="tag">账期</span>
+												<#if order.member_id ??>
+													<span class="tag">终端下单</span>
 												</#if>
 												${(order.customer_name)!}
 											</p>
 											<div class="ft14 gray">
-												<p>订单号：${(order.order_sn)!}</p>
+												<p>
+													<#if order.receive_type == 0>
+														<span class="tag">账期</span>
+													</#if>
+													${(order.order_sn)!}
+												</p>
 												<p>
 													联系人：<span>${(order.ccontact)!} / ${(order.cmobile)!}</span>
 													<span class="fr">${(order.customerTypeName)!}</span>
@@ -260,13 +265,18 @@
 									<a href="${CPATH}/order/orderReview?orderId=${orderInfo.id!}" style="display:block;width:100%;">
 										<div class="weui-cell__bd ft16">
 											<p class="customer_name">
-												<#if orderInfo.receive_type == 0>
-													<span class="tag">账期</span>
+												<#if orderInfo.member_id?? >
+													<span class="tag">终端下单</span>
 												</#if>
 												${(orderInfo.customer_name)!}
 											</p>
 											<div class="ft14 gray">
-												<p>订单号：${(orderInfo.order_sn)!}</p>
+												<p>
+													<#if orderInfo.receive_type == 0>
+														<span class="tag">账期</span>
+													</#if>
+													${(orderInfo.order_sn)!}
+												</p>
 												<p>
 													联系人：<span>${(orderInfo.ccontact)!} / ${(orderInfo.cmobile)!}</span>
 													<span class="fr">${(orderInfo.customerTypeName)!}</span>
