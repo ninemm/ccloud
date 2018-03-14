@@ -80,16 +80,16 @@
 
 /*blue css*/
 .ystep-blue .ystep-step-done {
-  background-image: url("../images/pointes_blue.png");
+  background-image: url("../images/pointes_red.png");
   background-repeat: no-repeat;
 }
 .ystep-blue .ystep-step-undone {
-  background-image: url("../images/pointes_blue.png");
+  background-image: url("../images/pointes_red.png");
   background-repeat: no-repeat;
   color: #9c9a9b;
 }
 .ystep-blue .ystep-step-active {
-  background-image: url("../images/pointes_blue.png");
+  background-image: url("../images/pointes_red.png");
   background-repeat: no-repeat;
   color: #3276b1;
 }
