@@ -171,4 +171,8 @@ public class WarehouseQuery extends JBaseQuery {
 		return findFirst.getStr("id");
 	}	
 	
+	public List<Warehouse> _findByUserId(String userId){
+		String sql = "SELECT cw.* from cc_warehouse cw LEFT JOIN cc_user_join_warehouse cujw on cujw.warehouse_id = cw.id where cujw.user_id = ?";
+		return DAO.find(sql, userId);
+	}
  }

@@ -174,13 +174,17 @@
 							+'<div class="control-label" style="margin-top:20px;">'
 							+'<label class="control-label col-sm-2" style="font-size:18px;"><strong>仓库:</strong>&nbsp;</label>'
 							+'<div class="input-group col-md-4 col-sm-10">'
-							+'<select class="form-control" style="padding-right:5px;margin-right:55px;" name="id" id="supplierId" >'
+							+'<select class="form-control" style="padding-right:5px;margin-right:55px;" name="id" id="warehouseId" >'
 							+'<option value="">----请选择入货仓库----</option>'
 							+'</select></div>';
 					$(".modal-body").append(Html);
-					$.each(data,function(index, item) {
+					$.each(data.supplier,function(index, item) {
 							var html ='<option value="'+item.id+'">'+item.name+'</option>';
 							$("#supplierId").append(html);
+					});
+					$.each(data.warehouse,function(index, item) {
+							var HTML ='<option value="'+item.id+'">'+item.name+'</option>';
+							$("#warehouseId").append(HTML);
 					});
 				}
 			});
@@ -188,7 +192,8 @@
 	
 	function addProduct(){
 		 var supplierId=$("#supplierId").find("option:selected").val();
-		 location.href="${CPATH}/admin/purchaseOrderDetail/index?supplierId="+supplierId;
+		 var warehouseId=$("#warehouseId").find("option:selected").val();
+		 location.href="${CPATH}/admin/purchaseOrderDetail/index?supplierId="+supplierId+"&warehouseId="+warehouseId;
 	}
 	
 	function refresh(){

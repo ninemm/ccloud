@@ -23,20 +23,22 @@
 </#macro>
 
 <#macro script>
-	$(function() {
-		jQuery.mm.initValidator('#form', validatorFields);
-		jQuery.mm.initDatetimepicker('form', '#dealDate', 'dealDate', 'yyyy-MM-dd', 2, 4, 2);
-		addProduct();
-		initsupplier();
-	});
 	
 	var $form = $("#form");
 	var productInfoMap = ${productInfoMap!};
 	var productOptionList = ${productOptionList!};
 	var supplierInfoMap = ${supplierInfoMap!};
+	var warehouseId = ${warehouseId!};
 	//标志
 	var newTrIdx = 0;
 	
+	$(function() {
+		jQuery.mm.initValidator('#form', validatorFields);
+		jQuery.mm.initDatetimepicker('form', '#dealDate', 'dealDate', 'yyyy-MM-dd', 2, 4, 2);
+		addProduct();
+		initsupplier();
+		$("#warehouseId").val(warehouseId);
+	});
 	var validatorFields = {
 		'deliveryAddress': {
 			validators: {
@@ -372,6 +374,7 @@
 						<div class="input-group col-md-4 col-sm-10">
 							<input class="form-control input-sm" type="text" id="contact" name="contact" value="" readonly>
 							<input class="form-control input-sm" type="hidden" id="supplierId" name="supplierId" value="" >
+							<input class="form-control input-sm" type="hidden" id="warehouseId" name="warehouseId" value="" >
 						</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">

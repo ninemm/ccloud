@@ -37,10 +37,12 @@ import org.ccloud.model.PurchaseOrderDetail;
 import org.ccloud.model.Seller;
 import org.ccloud.model.Supplier;
 import org.ccloud.model.User;
+import org.ccloud.model.Warehouse;
 import org.ccloud.model.query.ProductQuery;
 import org.ccloud.model.query.PurchaseOrderQuery;
 import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.SupplierQuery;
+import org.ccloud.model.query.WarehouseQuery;
 
 import com.alibaba.fastjson.JSON;
 import com.jfinal.aop.Before;
@@ -58,6 +60,7 @@ public class _PurchaseOrderDetailController extends JBaseCRUDController<Purchase
 	public void index() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String supplierId = getPara("supplierId");
+		String warehouseId = getPara("warehouseId");
 		List<Product> productlist = ProductQuery.me().findAllByUser(user.getId(),user.getDataArea(),supplierId);
 		
 		Map<String, Object> productInfoMap = new HashMap<String, Object>();
@@ -85,7 +88,7 @@ public class _PurchaseOrderDetailController extends JBaseCRUDController<Purchase
 		setAttr("productOptionList", JSON.toJSON(productOptionList));
 		
 		setAttr("supplierInfoMap", JSON.toJSON(supplier));
-		
+		setAttr("warehouseId",warehouseId);
 		setAttr("deliveryDate", DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
 		
 		render("index.html");
@@ -182,22 +185,12 @@ public class _PurchaseOrderDetailController extends JBaseCRUDController<Purchase
 		//查询供应商
 		String sellerId = getSessionAttr("sellerId");
 		List<Supplier> suppliers = SupplierQuery.me().findBySellerId(sellerId);
-		/*//查询账号所拥有的仓库
+		//查询账号所拥有的仓库
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		List<Department> tmpList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
-		List<Warehouse> wares = new ArrayList<Warehouse>();
-		for(Department dept : tmpList) {
-			Seller seller = SellerQuery.me().findById(dept.getStr("seller_id"));
-			if(seller.getHasStore()==1) {
-				wares = WarehouseQuery.me().findAllBySellerId(dept.getStr("seller_id"));
-				break;
-			}else {
-				continue;
-			}
-		}
+		List<Warehouse> wares = WarehouseQuery.me()._findByUserId(user.getId());
 		Map<String, Object> map = new HashMap<>();
 		map.put("supplier", suppliers);
-		map.put("warehouse", wares);*/
-		renderJson(suppliers);
+		map.put("warehouse", wares);
+		renderJson(map);
 	}
 }
