@@ -2136,7 +2136,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		String total = moreInfo.get("total");
 		String type = moreInfo.get("receiveType");
 		salesOrder.setIsGift(0);
-		salesOrder.setActivityApplyId("0");
+		salesOrder.setActivityApplyId(null);
 		salesOrder.setTotalAmount(new BigDecimal(total));
 		salesOrder.setReceiveType(StringUtils.isNumeric(type) ? Integer.parseInt(type) : 1);
 		salesOrder.setDeliveryAddress(moreInfo.get("deliveryAddress"));
