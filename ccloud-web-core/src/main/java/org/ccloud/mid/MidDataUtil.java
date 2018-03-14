@@ -15,11 +15,15 @@
  */
 package org.ccloud.mid;
 
-import java.io.UnsupportedEncodingException;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.rmi.RemoteException;
 //import java.util.Base64;
 import java.util.List;
 
+//import org.apache.axis.message.MessageElement;
+//import org.apache.axis.types.Schema;
 import org.ccloud.middledb.ArrayOfAnyType;
 import org.ccloud.middledb.ArrayOfQYBasicFlowType;
 import org.ccloud.middledb.MiddleWebService;
@@ -38,42 +42,6 @@ public class MidDataUtil {
 	private static MiddleWebServiceSoap middleWebServiceSoap = middleWebService.getMiddleWebServiceSoap();	
 
 	public static void main(String[] args) throws RemoteException {
-//		 // 创建一个MiddleWS工厂
-//		 MiddleWebService factory = new MiddleWebService();
-//		 // 根据工厂创建一个MiddleWSSoap对象
-//		 MiddleWebServiceSoap middleWSSoap = factory.getMiddleWebServiceSoap();
-//		 // 调用WebService提供的getQYBasicFeeTypeFromMidDB方法获取分类基础信息
-//		 ArrayOfAnyType anyType = new ArrayOfAnyType();
-//		 byte[] x = middleWSSoap.getQYBasicFeeTypeFromMidDB(anyType);
-
-		// MiddleWebServiceLocator Locator = null;
-		// MiddleWebServiceSoapStub stub = null;
-		// try {
-		// // 先new一个xxLocator对象
-		// Locator = new MiddleWebServiceLocator();
-		// // 调用xxLocator对象的getXXPort()方法生成xxBindingStub对象
-		// stub = (MiddleWebServiceSoapStub)
-		// Locator.getPort(MiddleWebServiceSoap.class);
-		// } catch (javax.xml.rpc.ServiceException e) {
-		// e.printStackTrace();
-		// }
-		//
-		// byte[] result = stub.getQY_BasicFeeTypeFromMidDB(null);
-//		MiddleWebService webservice = new MiddleWebService();
-//		MiddleWebServiceSoap middleWebServiceSoap = webservice.getMiddleWebServiceSoap();
-//		byte[] x = middleWebServiceSoap.getQYActivityFromMidDB(null);
-//		if (x != null) {
-//			Base64.Decoder decoder = Base64.getDecoder();
-//			Base64.Encoder encoder = Base64.getEncoder();
-//			String encodedText = encoder.encodeToString(x);
-//			System.out.println(encodedText);
-//			//解码
-//			try {
-//				System.out.println(new String(decoder.decode(encodedText), "UTF-8"));
-//			} catch (UnsupportedEncodingException e) {
-//				e.printStackTrace();
-//			}
-//		}
 		MidDataUtil.getActivityInfo("2018-03-02", "2018-03-12", "1", "10");
 	}
 
@@ -109,7 +77,47 @@ public class MidDataUtil {
 		param.add(2, pageNum);
 		param.add(3, pageCount);
 		byte[] result = middleWebServiceSoap.getQYActivityFromMidDB(anyType);
+//		Base64.Decoder decoder = Base64.getDecoder();
+//		Base64.Encoder encoder = Base64.getEncoder();
+//		String encodedText = encoder.encodeToString(result);
+//		System.out.println(encodedText);
+//		//解码
+//		try {
+//			System.out.println(new String(decoder.decode(encodedText), "UTF-8"));
+//		} catch (UnsupportedEncodingException e) {
+//			e.printStackTrace();
+//		}
+//        Schema schema = (Schema)result;
+//        MessageElement[] msgele = schema.get_any();
+//        List FOCElementHead = msgele[0].getChildren();//消息头,DataSet对象
+//        List FOCElementBody = msgele[1].getChildren();//消息体信息,DataSet对象
+//       
+//        if (FOCElementBody.size() <= 0){
+//         System.out.println("无消息体");
+//        }
+//       
+//        String nn = FOCElementBody.get(0).toString();//消息体的字符串形式
+//        try {
+//            saveXMLString(nn,"c://test.xml");//保存为XML形式
+////            this.parserXml("c://test.xml");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 		System.out.println(result);
 	}
+	
+	@SuppressWarnings("unused")
+	 private static void saveXMLString(String XMLString, String fileName)throws IOException {   
+	        File file = new File(fileName);   
+	        if (file.exists()) {   
+	            file.delete();   
+	        }   
+	        file.createNewFile();   
+	        if (file.canWrite()) {   
+	            FileWriter fileOut = new FileWriter(file);   
+	            fileOut.write(XMLString);   
+	            fileOut.close();   
+	        }   
+	 }
 	
 }
