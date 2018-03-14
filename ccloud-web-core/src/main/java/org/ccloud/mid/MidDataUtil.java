@@ -15,13 +15,18 @@
  */
 package org.ccloud.mid;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.net.DatagramPacket;
 import java.rmi.RemoteException;
 //import java.util.Base64;
 import java.util.List;
 
+import org.apache.axis.message.MessageElement;
+import org.apache.axis.types.Schema;
 //import org.apache.axis.message.MessageElement;
 //import org.apache.axis.types.Schema;
 import org.ccloud.middledb.ArrayOfAnyType;
@@ -87,22 +92,34 @@ public class MidDataUtil {
 //		} catch (UnsupportedEncodingException e) {
 //			e.printStackTrace();
 //		}
-//        Schema schema = (Schema)result;
-//        MessageElement[] msgele = schema.get_any();
-//        List FOCElementHead = msgele[0].getChildren();//消息头,DataSet对象
-//        List FOCElementBody = msgele[1].getChildren();//消息体信息,DataSet对象
-//       
-//        if (FOCElementBody.size() <= 0){
-//         System.out.println("无消息体");
-//        }
-//       
-//        String nn = FOCElementBody.get(0).toString();//消息体的字符串形式
-//        try {
-//            saveXMLString(nn,"c://test.xml");//保存为XML形式
-////            this.parserXml("c://test.xml");
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+		DatagramPacket packet = new DatagramPacket(result, result.length);
+		Object obj = null;
+        try {
+            ByteArrayInputStream bi = new ByteArrayInputStream(packet.getData());
+            ObjectInputStream oi = new ObjectInputStream(bi);
+
+            obj = oi.readObject();
+            bi.close();
+            oi.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Schema schema = (Schema)obj;
+        MessageElement[] msgele = schema.get_any();
+        List FOCElementHead = msgele[0].getChildren();//消息头,DataSet对象
+        List FOCElementBody = msgele[1].getChildren();//消息体信息,DataSet对象
+       
+        if (FOCElementBody.size() <= 0){
+         System.out.println("无消息体");
+        }
+       
+        String nn = FOCElementBody.get(0).toString();//消息体的字符串形式
+        try {
+            saveXMLString(nn,"f://test.xml");//保存为XML形式
+//            this.parserXml("c://test.xml");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 		System.out.println(result);
 	}
 	
