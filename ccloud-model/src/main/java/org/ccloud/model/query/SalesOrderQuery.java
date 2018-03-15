@@ -247,6 +247,12 @@ public class SalesOrderQuery extends JBaseQuery {
 		salesOrder.setContact(StringUtils.getArrayFirst(paraMap.get("contact")));
 		salesOrder.setMobile(StringUtils.getArrayFirst(paraMap.get("mobile")));
 		salesOrder.setAddress(StringUtils.getArrayFirst(paraMap.get("address")));
+		if (StrKit.notBlank(StringUtils.getArrayFirst(paraMap.get("lat"))))
+			salesOrder.setLat(new BigDecimal(StringUtils.getArrayFirst(paraMap.get("lat"))));
+		if (StrKit.notBlank(StringUtils.getArrayFirst(paraMap.get("lng"))))
+			salesOrder.setLng(new BigDecimal(StringUtils.getArrayFirst(paraMap.get("lng"))));
+		if (StrKit.notBlank(StringUtils.getArrayFirst(paraMap.get("location"))))
+			salesOrder.setLocation(StringUtils.getArrayFirst(paraMap.get("location")));
 		salesOrder.setStatus(Consts.SALES_ORDER_STATUS_DEFAULT);// 待审核
 		String total = StringUtils.getArrayFirst(paraMap.get("total"));
 		String type = StringUtils.getArrayFirst(paraMap.get("receiveType"));

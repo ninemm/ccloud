@@ -116,7 +116,7 @@ public class _PurchaseOrderDetailController extends JBaseCRUDController<Purchase
 		Date date = new Date();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
 		String str = sdf.format(date);
-		String porderSn = "PO"+seller.getSellerCode().substring(0, 6)+str.substring(0,8)+PurchaseOrderQuery.me().getNewSn(seller.getId());
+		String porderSn = "PO"+seller.getSellerCode()+str.substring(0,8)+PurchaseOrderQuery.me().getNewSn(seller.getId());
 		Date date1 = new Date();
 		String Id = StrKit.getRandomUUID();
 		purchaseOrder.set("id", Id);

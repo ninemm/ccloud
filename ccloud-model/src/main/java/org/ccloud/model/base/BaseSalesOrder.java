@@ -346,4 +346,27 @@ public abstract class BaseSalesOrder<M extends BaseSalesOrder<M>> extends JModel
 		return getStr("order_qrcode_url");
 	}
 
+	public void setLng(java.math.BigDecimal lng) {
+		set("lng", lng);
+	}
+
+	public java.math.BigDecimal getLng() {
+		return get("lng");
+	}
+
+	public void setLat(java.math.BigDecimal lat) {
+		set("lat", lat);
+	}
+
+	public java.math.BigDecimal getLat() {
+		return get("lat");
+	}
+
+	public void setLocation(java.lang.String location) {
+		set("location", location);
+	}
+
+	public java.lang.String getLocation() {
+		return getStr("location");
+	}
 }

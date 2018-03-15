@@ -18,6 +18,7 @@ package org.ccloud.model.query;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.ccloud.Consts;
@@ -218,4 +219,25 @@ public class PurchaseInstockQuery extends JBaseQuery {
 				+ "GROUP BY cpi.id";
 		return DAO.findFirst(sql, orderSn);
 	}
+	
+	public  Record findPurchaseInstockForPrint(String inStockId) {
+	StringBuilder stringBuilder = new StringBuilder();
+	stringBuilder.append(" SELECT cs.contact as customerContacts, cs.`name` as customerName, p.create_date, cs.mobile as customerPhone, u.realname as placeOrderMan, u.mobile AS placeOrderPhone,p.total_amount, p.remark,d.dept_name,cp.pwarehouse_sn ");
+	stringBuilder.append(" FROM cc_purchase_order p INNER JOIN cc_supplier cs ON p.supplier_id = cs.id INNER JOIN `user` u ON u.id = p.biz_user_id ");
+	stringBuilder.append(" INNER JOIN department d ON d.id = p.dept_id INNER JOIN cc_purchase_order_join_instock cj on p.id = cj.purchase_order_id INNER JOIN cc_purchase_instock  cp on cp.id = cj.purchase_instock_id ");
+	stringBuilder.append(" WHERE cp.id = ? ");
+	return Db.findFirst(stringBuilder.toString(), inStockId);
+	}
+	
+	public List<Record> findPrintProductInfo(String inStockId) {
+		   StringBuilder stringBuilder = new StringBuilder();
+		   stringBuilder.append(" SELECT sod.seller_product_id, sp.custom_name as productName, p.big_unit, p.small_unit, p.convert_relate, sp.seller_id,sp.product_id, sp.bar_code, sod.product_price AS big_Price, ");
+		   stringBuilder.append(" CONVERT (sod.product_price / p.convert_relate, DECIMAL (18, 2) ) AS small_price, floor(sod.product_count / p.convert_relate ) AS bigCount, ");
+		   stringBuilder.append(" MOD (sod.product_count, p.convert_relate ) AS smallCount, sod.product_amount as productAmout, sod.product_count ");
+		   stringBuilder.append(" FROM `cc_purchase_instock_detail` sod LEFT JOIN cc_purchase_instock cso ON cso.id = sod.purchase_instock_id ");
+		   stringBuilder.append(" LEFT JOIN cc_seller_product sp ON sod.seller_product_id = sp.id LEFT JOIN cc_product p ON sp.product_id = p.id ");
+		   stringBuilder.append(" WHERE sod.purchase_instock_id = ? ");
+			
+		   return Db.find(stringBuilder.toString(),inStockId);
+		}
 }

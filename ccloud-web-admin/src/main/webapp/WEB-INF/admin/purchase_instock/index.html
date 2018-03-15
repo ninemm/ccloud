@@ -74,6 +74,12 @@
 		var fields =
 			[
 				{field: "id", title: "ID", align: "center", visible:false, edit:false},
+				{field: "checkbox", title: '<input class="jp-common-pad " id="dataItem" onclick="checkAll(this)" title="全选" type="checkbox">', align: "center", width: '2%', 
+				formatter: function(value, row, rowIndex) {
+				return '<input class="jp-common-pad" name="dataItem" type="checkbox" value="' + row.id + '">';
+					},
+					edit:false
+				},
 				{field: "", title: '', align: "center", width: '2%', 
 					formatter: function(value, row, rowIndex) {
 						return '<input class="jp-common-pad" name="dataItem" type="hidden" value="' + row.id + '">';
@@ -118,8 +124,14 @@
 					var strHtml = "";
 					if(row.status ==0){
 					 	strHtml +='<a class="btn btn-xs btn-primary btn-flat" onclick="detail(\''+row.id+'\')" >入库</a> ';
+					 	<@shiro.hasPermission name="/admin/purchaseInstock/print">
+					 	strHtml = strHtml + '<a class="btn btn-xs btn-warning btn-flat" onclick="print(\''+row.id+'\')" >打印</a> ';
+					 	</@shiro.hasPermission>
 					}else{
 						strHtml +='<a class="btn btn-xs bg-olive btn-flat" onclick="instockDetail(\''+row.id+'\')" >详情</a> '
+						<@shiro.hasPermission name="/admin/purchaseInstock/print">
+						strHtml = strHtml + '<a class="btn btn-xs btn-warning btn-flat" onclick="print(\''+row.id+'\')" >打印</a> ';
+						</@shiro.hasPermission>
 					}
 					return strHtml;
 				},
@@ -179,6 +191,34 @@
 			}
 		});
 	}
+		    //批量打印
+    function batchAction(){
+   
+   	   ids = new Array();
+		$("[name='dataItem']:checkbox").each(function() {
+			if ($(this).is(":checked")) {
+				ids.push($(this).val());
+			}
+		});
+		if(ids.length == 0){
+		 layer.alert("请选择要打印的入库单");
+		}else{
+	     print(ids);
+		}
+   }
+	
+	<!-- 单个打印或批量打印调用方法 -->
+	function print(id) {
+		layer.open({
+			title:"入库单打印",
+			type: 2, 
+			area: ['90%', '90%'],
+			content: '${CPATH}/admin/purchaseInstock/renderPrintPage/?instockId='+id,
+			end: function() {
+			$("#search-submit").click();
+    		},
+		}); 
+	}
 	
 	function refresh(){
 		layer.closeAll();
@@ -229,6 +269,13 @@
 			</div>
 		</div>
 
+        <div class="row content-row">
+			<div class="jp-left">
+				<@shiro.hasPermission name="/admin/purchaseInstock/print">
+				<button class="btn btn-sm btn-primary btn-flat" type="button" onclick="batchAction()"><i class="fa fa-gavel"></i> 批量打印 </button>
+				</@shiro.hasPermission>
+			</div>
+		</div>
 		<div class="box">
 			<table class="table table-striped table-hover table-condensed" id="_purchaseRefund_table" ></table>
 		</div>
