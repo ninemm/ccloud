@@ -49,7 +49,7 @@ public class ReportController extends BaseFrontController {
 		List<SalesOrder> salesOrders = SalesOrderQuery.me().findAllByDataArea(selectDataArea,startDate,endDate);
 		setAttr("orderNum", salesOrders.size());
 		Page<Record> customerList = new Page<>();
-		customerList = SellerCustomerQuery.me().findByUserTypeForApp(1, Integer.MAX_VALUE, selectDataArea, "", "", "");
+		customerList = SellerCustomerQuery.me().findByUserTypeForApp(1, Integer.MAX_VALUE, selectDataArea, "", "", "", "", "");
 		setAttr("customerNum", customerList.getTotalRow());
 		render("report.html");
 	}

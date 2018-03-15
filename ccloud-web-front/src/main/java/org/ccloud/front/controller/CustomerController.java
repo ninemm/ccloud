@@ -102,6 +102,9 @@ public class CustomerController extends BaseFrontController {
 
 	public void refresh() {
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String dealerArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		Seller seller = SellerQuery.me()._findByDataArea(dealerArea);
 		boolean visitAdd = SecurityUtils.getSubject().isPermitted("/admin/customerVisit/add");
 		boolean salesOrderAdd = SecurityUtils.getSubject().isPermitted("/admin/salesOrder/add");
 		boolean salesOrder = SecurityUtils.getSubject().isPermitted("/admin/salesOrder");
@@ -111,11 +114,11 @@ public class CustomerController extends BaseFrontController {
 		int customerOrderCount = 0;
 		if (StrKit.notBlank(getPara("region"))) {
 			String dataArea = UserQuery.me().findById(getPara("region")).getDataArea();
-			customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), dataArea, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"));
-			customerOrderCount = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), dataArea, getPara("customerType"), "0", getPara("searchKey")).getTotalRow();
+			customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), dataArea, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"), user.getId(), seller.getId());
+			customerOrderCount = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), dataArea, getPara("customerType"), "0", getPara("searchKey"), user.getId(), seller.getId()).getTotalRow();
 		} else {
-			customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), selectDataArea, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"));
-			customerOrderCount = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), selectDataArea, getPara("customerType"), "0", getPara("searchKey")).getTotalRow();
+			customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), selectDataArea, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"), user.getId(), seller.getId());
+			customerOrderCount = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), selectDataArea, getPara("customerType"), "0", getPara("searchKey"), user.getId(), seller.getId()).getTotalRow();
 		}
 
 		StringBuilder html = new StringBuilder();
@@ -129,6 +132,14 @@ public class CustomerController extends BaseFrontController {
 			html.append("		</div>\n");
 			html.append("		<div class=\"weui-flex__item customer-href\">\n");
 			html.append("			<div class=\"weui-flex\">\n");
+
+			if (StrKit.notBlank(customer.getStr("member_id"))) {
+				html.append("				<a onClick=\"memberOrderStop('" + customer.getStr("member_id") + "')\" class=\"weui-flex__item\">\n");
+				html.append("					<p><i class=\"icon-ben red\"></i></p>\n");
+				html.append("					<p>会员</p>\n");
+				html.append("				</a>\n");
+			}
+
 			html.append("				<a href=\"tel:" + customer.getStr("mobile") + "\" class=\"weui-flex__item\">\n");
 			html.append("					<p><i class=\"icon-phone green\"></i></p>\n");
 			html.append("					<p>电话</p>\n");
@@ -1188,4 +1199,19 @@ public class CustomerController extends BaseFrontController {
 		else renderAjaxResultForError(isUpdate);
 
 	}
+
+	public void stopMemberOrder() {
+		String member_id = getPara("member_id");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String dealerArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		Seller seller = SellerQuery.me()._findByDataArea(dealerArea);
+
+		MemberJoinSeller memberJoinSeller = MemberJoinSellerQuery.me().checkExists(member_id, seller.getId(), user.getId());
+
+		memberJoinSeller.delete();
+
+		renderAjaxResultForSuccess("停用终端下单");
+	}
+
+
 }

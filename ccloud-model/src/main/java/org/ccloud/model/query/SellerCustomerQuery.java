@@ -238,17 +238,21 @@ public class SellerCustomerQuery extends JBaseQuery {
 	}
 
 	public Page<Record> findByUserTypeForApp(int pageNumber, int pageSize, String selectDataArea, String customerType,
-			String isOrdered, String searchKey) {
+			String isOrdered, String searchKey, String userId, String dealerId) {
 		boolean needwhere = false;
 		LinkedList<Object> params = new LinkedList<Object>();
 
-		String select = "SELECT c.id,c.customer_name,c.contact,c.mobile,c.prov_name,c.city_name,c.country_name,c.address,c.sellerCustomerId,c.image_list_store,c.customer_kind ";
+		String select = "SELECT c.id,c.customer_name,c.contact,c.mobile,c.prov_name,c.city_name,c.country_name,c.address,c.sellerCustomerId,c.image_list_store,c.customer_kind, c.member_id ";
 		StringBuilder sql = new StringBuilder(
-				"FROM (SELECT c.id,c.customer_name,c.contact,c.mobile,c.prov_name,c.city_name,c.country_name,c.address,csc.id as sellerCustomerId,csc.image_list_store,csc.customer_kind  FROM cc_user_join_customer cujc ");
+				"FROM (SELECT c.id,c.customer_name,c.contact,c.mobile,c.prov_name,c.city_name,c.country_name,c.address,csc.id as sellerCustomerId,csc.image_list_store,csc.customer_kind, mjs.member_id  FROM cc_user_join_customer cujc ");
 		sql.append(
 				"LEFT JOIN cc_customer_join_customer_type ccjct ON cujc.seller_customer_id = ccjct.seller_customer_id ");
 		sql.append("LEFT JOIN cc_seller_customer csc ON cujc.seller_customer_id = csc.id ");
 		sql.append("LEFT JOIN cc_customer c ON csc.customer_id = c.id ");
+
+		sql.append("LEFT JOIN cc_member m on m.customer_id = c.id ");
+		sql.append("LEFT JOIN cc_member_join_seller mjs on m.id = mjs.member_id AND mjs.user_id = '" + userId + "' AND mjs.seller_id = '" +  dealerId + "'");
+
 		sql.append("LEFT JOIN cc_sales_outstock cso ON cujc.seller_customer_id = cso.customer_id ");
 
 		sql.append("LEFT JOIN (SELECT c1.id,GROUP_CONCAT(ct. NAME) AS customerTypeNames ");

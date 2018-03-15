@@ -283,6 +283,28 @@
         $("#searchInput")[0].value = "";
         refresh();
     }
+	
+	function memberOrderStop(member_id){
+		$.confirm({
+			title: "停用终端下单",
+			text: '是否停用终端下单？',
+			onOK: function () {
+				Utils.openLoadingWin('停用中...');
+				$.get('${CPATH}/customer/stopMemberOrder?member_id=' + member_id,
+					function(result) {
+							if (result.errorCode > 0) {
+							$.toptip(result.message, 'error');
+						} else {
+							location.reload();
+							$.toptip(result.message, 'success');
+						}
+							Utils.closeLoadingWin();
+						}
+					);
+			}
+		});
+	}
+
 </#macro>
 
 <@layout>
