@@ -13,7 +13,7 @@
 	}
 
 	#order input::-webkit-input-placeholder {
-		text-align: center;
+		text-align: right;
 	}
 	#deliveryDate, #customerTypeName, #discount, #receiveTypeName, #activityName {
 		text-align: right;
@@ -364,7 +364,6 @@ $(function() {
 							<span class="weui-cell__ft"></span>
 						</div>
 					</div>
-
 				</section>
 				<section class="weui-panel weui-panel_access delivery-info">
 					<div class="weui-cell weui-cell_access">
@@ -384,40 +383,66 @@ $(function() {
 						</div>
 					</div>
 				</section>
-				<div class="weui-cells__title black">商品明细</div>
-				<div id="productList">
-					<div class="weui-panel weui-panel_access goods-detail common" style="display: none">
-						<input type="hidden" name="sellProductId" id="sellProductId" value="">
-						<input type="hidden" name="sellerId" id="sellerId" value="">
-						<input type="hidden" name="productId" id="productId" value="">
-						<input type="hidden" name="convert" id="convert" value="">
-						<nobr>
-							<p class="product_name" id="productName">
-							</p>
-						</nobr>
-						<div class="product_unit">
-							<p>规格：</p>
-							<span id="valueName"></span>
-						</div>
-						<div class="product_bUnit">
-							<span class="price" id="bigPriceSpan"></span>
-							<span class="unit" id="bigUnitSpan"></span>
-							<div class="spinner">
-								<input type="number" min="0" value="0" class="fl" id="bigNum" name="bigNum" readonly>
+				<section>
+					<div class="weui-cells__title black">经销商名称</div>
+					<div id="productList">
+						<div class="weui-panel weui-panel_access goods-detail common" style="display: none">
+							<input type="hidden" name="sellProductId" id="sellProductId" value="">
+							<input type="hidden" name="sellerId" id="sellerId" value="">
+							<input type="hidden" name="productId" id="productId" value="">
+							<input type="hidden" name="convert" id="convert" value="">
+							<nobr>
+								<p class="product_name" id="productName">
+								</p>
+							</nobr>
+							<div class="product_unit">
+								<p>规格：</p>
+								<span id="valueName"></span>
 							</div>
-							<input type="number" class="street-value"  id="bigPrice" value="0" name="bigPrice" readonly>
-						</div>
-						<div class="product_mUnit">
-							<span class="price" id="smallPriceSpan"></span>
-							<span class="unit" id="smallUnitSpan"></span>
-							<div class="spinner">
-								<input type="number" min="0" value="0" class="fl" id="smallNum" name="smallNum" readonly>
+							<div class="product_bUnit">
+								<span class="price" id="bigPriceSpan"></span>
+								<span class="unit" id="bigUnitSpan"></span>
+								<div class="spinner">
+									<input type="number" min="0" value="0" class="fl" id="bigNum" name="bigNum" readonly>
+								</div>
+								<input type="number" class="street-value"  id="bigPrice" value="0" name="bigPrice" readonly>
 							</div>
-							<input type="number" class="street-value" value="0" id="smallPrice" name="smallPrice" readonly>
+							<div class="product_mUnit">
+								<span class="price" id="smallPriceSpan"></span>
+								<span class="unit" id="smallUnitSpan"></span>
+								<div class="spinner">
+									<input type="number" min="0" value="0" class="fl" id="smallNum" name="smallNum" readonly>
+								</div>
+								<input type="number" class="street-value" value="0" id="smallPrice" name="smallPrice" readonly>
+							</div>
+							<input type="hidden" id="rowTotal" name="rowTotal" value="">
 						</div>
-						<input type="hidden" id="rowTotal" name="rowTotal" value="">
 					</div>
-				</div>
+					<div class="order-customer-info bg-white" style="margin-top: .5rem!important;">
+						<div class="weui-cell weui-cell_access">
+							<div class="weui-cell__bd select-area">
+								<div class="order-customer-info-title">
+									客户类型
+									<span class="require">*</span>
+								</div>
+								<input type="hidden" id="customerType" name="customerType" value="">
+								<input type="text" placeholder="请选择客户类型" class="weui-input" id="customerTypeName" name="customerTypeName" value="" readonly>
+								<span class="weui-cell__ft"></span>
+							</div>
+						</div>
+						<div class="weui-cell weui-cell_access">
+							<div class="weui-cell__bd select-area">
+								<div class="order-customer-info-title">
+									收款方式
+									<span class="require">*</span>
+								</div>
+								<input type="hidden" id="receiveType" name="receiveType" value="1">
+								<input type="text" placeholder="请选择收款方式" class="weui-input" id="receiveTypeName" name="receiveTypeName" value="" readonly>
+								<span class="weui-cell__ft"></span>
+							</div>
+						</div>
+					</div>
+				</section>
 				<input type="hidden" id="total" name="total" value="">
 				<input type="hidden" id="totalNum" name="totalNum" value="">
 			</main>
