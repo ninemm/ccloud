@@ -31,6 +31,7 @@ import org.ccloud.model.vo.ImageJson;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
+import org.ccloud.wechat.WechatJSSDKInterceptor;
 import org.ccloud.workflow.listener.order.OrderReviewUtil;
 import org.ccloud.workflow.service.WorkFlowService;
 import com.alibaba.fastjson.JSON;
@@ -589,6 +590,7 @@ public class OrderController extends BaseFrontController {
 		renderAjaxResultForSuccess("订单撤销成功");
 	}
 
+	@Before(WechatJSSDKInterceptor.class)
 	public void getOldOrder() {
 		String orderId = getPara("orderId");
 
