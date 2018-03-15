@@ -136,5 +136,39 @@ public class MidDataUtil {
 	            fileOut.close();   
 	        }   
 	 }
+
+	public static int syncYXBrandInfoToMidDB(String string) {
+		// TODO Auto-generated method stub
+		return 1;
+	}
 	
+	public static int syncYXDisplayInfoToMidDB(byte[] objectToByte) {
+		int syncYXDisplayInfoToMidDB = middleWebServiceSoap.syncYXDisplayInfoToMidDB(objectToByte);
+		return syncYXDisplayInfoToMidDB;
+	}
+
+	public static int syncYXEnterCostInfoToMidDB(String xMLString) {
+		// TODO Auto-generated method stub
+		return 1;
+	}
+
+	public static int syncYXMarketGiftInfoToMidDB(String xMLString) {
+		// TODO Auto-generated method stub
+		return 1;
+	}
+
+	public static int syncYXProductJudgeInfoToMidDB(String xMLString) {
+		// TODO Auto-generated method stub
+		return 1;
+	}
+
+	public static int syncYXShopAdInfoToMidDB(String xMLString) {
+		// TODO Auto-generated method stub
+		return 1;
+	}
+	
+	public static int syncYXShopShowGiftInfoToMidDB(String xMLString) {
+		// TODO Auto-generated method stub
+		return 1;
+	}
 }

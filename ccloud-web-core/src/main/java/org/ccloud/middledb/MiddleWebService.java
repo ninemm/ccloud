@@ -17,7 +17,7 @@ import javax.xml.ws.WebServiceFeature;
  * Generated source version: 2.2
  * 
  */
-@WebServiceClient(name = "MiddleWebService", targetNamespace = "http://MiddleDBJPFeiYong.com/", wsdlLocation = "file:/C:/Users/zcjj6/wsdl/MiddleWebService.wsdl")
+@WebServiceClient(name = "MiddleWebService", targetNamespace = "http://MiddleDBJPFeiYong.com/", wsdlLocation = "http://yxmiddb.jingpai.com/MiddleWebService.asmx?WSDL")
 public class MiddleWebService
     extends Service
 {
@@ -30,7 +30,7 @@ public class MiddleWebService
         URL url = null;
         WebServiceException e = null;
         try {
-            url = new URL("file:/C:/Users/zcjj6/wsdl/MiddleWebService.wsdl");
+            url = new URL("http://yxmiddb.jingpai.com/MiddleWebService.asmx?WSDL");
         } catch (MalformedURLException ex) {
             e = new WebServiceException(ex);
         }
