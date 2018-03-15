@@ -136,7 +136,7 @@ public abstract class CCloudConfig extends JFinalConfig {
 
 			plugins.add(new MessagePlugin());
 			
-			//plugins.add(new ActivitiPlugin());
+			plugins.add(new ActivitiPlugin());
 			
 			//plugins.add(createQiniuPlugin());
 			
@@ -226,7 +226,7 @@ public abstract class CCloudConfig extends JFinalConfig {
 		interceptors.add(new HookInterceptor());
 //		interceptors.add(new ShiroInterceptor());
 		interceptors.add(new PublicInterceptor());
-//		interceptors.add(new SessionInterceptor());
+		interceptors.add(new SessionInterceptor());
 	}
 
 	public void configHandler(Handlers handlers) {
