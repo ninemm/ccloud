@@ -3,8 +3,8 @@ package org.ccloud.controller.member;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
+import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.IAtom;
@@ -20,6 +20,7 @@ import org.ccloud.model.vo.ImageJson;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
+import org.ccloud.wechat.WechatJSSDKInterceptor;
 import org.ccloud.workflow.listener.order.OrderReviewUtil;
 import org.ccloud.workflow.service.WorkFlowService;
 
@@ -83,6 +84,9 @@ public class OrderController extends BaseFrontController {
 				moreInfo.put("receiveTypeName", StringUtils.getArrayFirst(paraMap.get("receiveTypeName")));
 				moreInfo.put("deliveryDate", StringUtils.getArrayFirst(paraMap.get("deliveryDate")));
 				moreInfo.put("customerType", StringUtils.getArrayFirst(paraMap.get("customerType")));
+				moreInfo.put("lat", StringUtils.getArrayFirst(paraMap.get("lat")));
+				moreInfo.put("lng", StringUtils.getArrayFirst(paraMap.get("lng")));
+				moreInfo.put("location", StringUtils.getArrayFirst(paraMap.get("location")));
 
 				String[] sellerIds = paraMap.get("sellerId");
 
@@ -356,6 +360,7 @@ public class OrderController extends BaseFrontController {
 		renderAjaxResultForSuccess("订单撤销成功");
 	}
 
+	@Before(WechatJSSDKInterceptor.class)
 	public void getOldOrder() {
 		Member member = getSessionAttr(Consts.SESSION_LOGINED_MEMBER);
 		String orderId = getPara("orderId");

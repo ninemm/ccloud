@@ -2143,6 +2143,12 @@ public class SalesOrderQuery extends JBaseQuery {
 		salesOrder.setContact(moreInfo.get("contact"));
 		salesOrder.setMobile(moreInfo.get("mobile"));
 		salesOrder.setAddress(moreInfo.get("address"));
+		if (StrKit.notBlank(moreInfo.get("lat")))
+			salesOrder.setLat(new BigDecimal(moreInfo.get("lat")));
+		if (StrKit.notBlank(moreInfo.get("lng")))
+			salesOrder.setLng(new BigDecimal(moreInfo.get("lng")));
+		if (StrKit.notBlank(moreInfo.get("location")))
+			salesOrder.setLocation(moreInfo.get("location"));
 		salesOrder.setStatus(Consts.SALES_ORDER_STATUS_DEFAULT);// 待审核
 		String total = moreInfo.get("total");
 		String type = moreInfo.get("receiveType");

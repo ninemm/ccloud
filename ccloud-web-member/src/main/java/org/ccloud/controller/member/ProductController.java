@@ -15,6 +15,7 @@ package org.ccloud.controller.member;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
+import com.jfinal.aop.Before;
 import com.jfinal.plugin.activerecord.Record;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.ccloud.Consts;
@@ -22,6 +23,7 @@ import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.Member;
 import org.ccloud.model.query.*;
 import org.ccloud.route.RouterMapping;
+import org.ccloud.wechat.WechatJSSDKInterceptor;
 
 import java.io.Serializable;
 import java.util.*;
@@ -82,6 +84,7 @@ public class ProductController extends BaseFrontController {
 		render("member_shopping_cart.html");
 	}
 
+	@Before(WechatJSSDKInterceptor.class)
 	public void order() {
 		Member member = getSessionAttr(Consts.SESSION_LOGINED_MEMBER);
 
