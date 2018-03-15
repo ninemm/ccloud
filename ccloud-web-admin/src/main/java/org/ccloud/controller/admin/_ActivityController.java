@@ -33,6 +33,7 @@ import org.ccloud.mid.MidDataUtil;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
+import org.ccloud.utils.XmlUtils;
 import org.ccloud.model.Activity;
 import org.ccloud.model.ActivityExecute;
 import org.ccloud.model.Dict;
@@ -603,13 +604,14 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		for (String activityApplyId : activityApplyIds) {
 			Record YxActivity = ActivityQuery.me().findYxActivity(activityApplyId);
+			Map<String, Object>map=new HashMap<>();
+			map.put("FlowIDNO",YxActivity.getBigInteger("FlowIDNO") );
+			map.put("SysCreateTime", new Date());
+			map.put("SysModifyTime", new Date());
 			if (YxActivity.getStr("invest_type").equals("101101")) {
-				//公关赞助
-				Map<String, Object>map=new HashMap<>();
-				map.put("FlowIDNO",YxActivity.getBigInteger("FlowIDNO") );
 				map.put("ResourceID","");
 				map.put("CostType", YxActivity.getInt("CostType"));
-				map.put("ActivityTime", YxActivity.getTime("ActivityTime"));
+				map.put("ActivityTime", YxActivity.getStr("ActivityTime"));
 				map.put("CustomerName", YxActivity.getStr("CustomerName"));
 				map.put("ActivityAddress", YxActivity.getStr("ActivityAddress"));
 				map.put("Telephone", YxActivity.getStr("Telephone"));
@@ -619,20 +621,16 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				map.put("WriteOffAmount", YxActivity.getBigDecimal("WriteOffAmount"));
 				map.put("SignPhoto", "");
 				map.put("CreateManName", YxActivity.getStr("CreateManName"));
-				map.put("CreateTime", YxActivity.getTime("CreateTime"));
+				map.put("CreateTime", YxActivity.getStr("CreateTime"));
 				map.put("ModifyManName", YxActivity.getStr("ModifyManName"));
-				map.put("ModifyTime", YxActivity.getTime("ModifyTime"));
+				map.put("ModifyTime", YxActivity.getStr("ModifyTime"));
 				map.put("Flag", 1);
 				map.put("ShopOrderID","");
 				map.put("GiftPhoto", YxActivity.getStr("Telephone"));
-				map.put("SysCreateTime", new Date());
-				map.put("SysModifyTime", new Date());
 			}else if(YxActivity.getStr("invest_type").equals("101102")) {
 				//消费培育
-				Map<String, Object>map=new HashMap<>();
-				map.put("FlowIDNO", YxActivity.getBigInteger("FlowIDNO"));
 				map.put("CostType", YxActivity.getInt("CostType"));
-				map.put("ActivityTime", YxActivity.getTime("ActivityTime"));
+				map.put("ActivityTime", YxActivity.getStr("ActivityTime"));
 				map.put("CustomerName", YxActivity.getStr("CustomerName"));
 				map.put("ActivityAddress", YxActivity.getStr("ActivityAddress"));
 				map.put("TableNum", "");
@@ -649,18 +647,14 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				map.put("IntroducerTel", "");
 				map.put("SignPhoto", "");
 				map.put("CreateManName", YxActivity.getStr("CreateManName"));
-				map.put("CreateTime", YxActivity.getTime("CreateTime"));
+				map.put("CreateTime", YxActivity.getStr("CreateTime"));
 				map.put("ModifyManName", YxActivity.getStr("ModifyManName"));
-				map.put("ModifyTime", YxActivity.getTime("ModifyTime"));
+				map.put("ModifyTime", YxActivity.getStr("ModifyTime"));
 				map.put("Flag", 1);
 				map.put("GiftPhoto", "");
 				map.put("ResourceID", "");
-				map.put("SysCreateTime",new Date());
-				map.put("SysModifyTime",new Date());
 			}else if(YxActivity.getStr("invest_type").equals("101103")) {
 				//终端广告
-				Map<String, Object>map=new HashMap<>();
-				map.put("FlowIDNO", YxActivity.getBigInteger("FlowIDNO"));
 				map.put("ResourceID", "");
 				map.put("ProvinceName", YxActivity.getStr("ProvinceName"));
 				map.put("CityName", YxActivity.getStr("CityName"));
@@ -668,33 +662,29 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				map.put("CustomerName", YxActivity.getStr("CustomerName"));
 				map.put("CustomerCode", YxActivity.getStr("CustomerCode"));
 				map.put("ShopID", "");
-				map.put("ShopCreateTime", YxActivity.getTime("ShopCreateTime"));
+				map.put("ShopCreateTime", YxActivity.getStr("ShopCreateTime"));
 				map.put("ShopLinkMan", YxActivity.getStr("ShopLinkMan"));
 				map.put("ShopPhone", YxActivity.getStr("ShopPhone"));
-				map.put("ChannelID", "");
+				map.put("ChannelID", YxActivity.getInt("ChannelID"));
 				map.put("CostType", YxActivity.getInt("CostType"));
 				map.put("Num", YxActivity.getInt("Num"));
 				map.put("InvestAmount", YxActivity.getBigDecimal("WriteOffAmount"));
 				map.put("InvestState", 2);
 				map.put("ResourceFlag", 1);
 				map.put("ExecuteManName", YxActivity.getStr("ExecuteManName"));
-				map.put("ExecuteTime", YxActivity.getTime("ExecuteTime"));
+				map.put("ExecuteTime", YxActivity.getStr("ExecuteTime"));
 				map.put("ExecuteState", 1);
 				map.put("ExecuteNum", "");
 				map.put("ExecuteSize", "");
 				map.put("ExecutePhotoIds", "");
 				map.put("ExecuteRemark", "");
-				map.put("WriteOffNum", "");
+				map.put("WriteOffNum", YxActivity.getInt("Num"));
 				map.put("WriteOffSize", "");
 				map.put("WriteOffAmount", YxActivity.getBigDecimal("WriteOffAmount"));
 				map.put("CreateManName", user.getRealname());
 				map.put("CreateTime", new Date());
-				map.put("SysCreateTime", new Date());
-				map.put("SysModifyTime", new Date());
 			}else if(YxActivity.getStr("invest_type").equals("101104")) {
 				//终端陈列
-				Map<String, Object>map=new HashMap<>();
-				map.put("FlowIDNO", YxActivity.getBigInteger("FlowIDNO"));
 				map.put("ResourceID", "");
 				map.put("ProvinceName", YxActivity.getStr("ProvinceName"));
 				map.put("CityName", YxActivity.getStr("CityName"));
@@ -702,69 +692,61 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				map.put("CustomerName", YxActivity.getStr("CustomerName"));
 				map.put("CustomerCode", YxActivity.getStr("CustomerCode"));
 				map.put("ShopID", "");
-				map.put("ChannelID", "");
-				map.put("ShopVisitCount", "");
-				map.put("ShopXCJHCount", "");
+				map.put("ChannelID", YxActivity.getInt("ChannelID"));
+				map.put("ShopVisitCount", YxActivity.getInt("ShopVisitCount"));
+				map.put("ShopXCJHCount", YxActivity.getInt("ShopXCJHCount"));
 				map.put("ResourceFlag", 0);
 				map.put("SignPhotoId", "");
 				map.put("GiftPhotoId", "");
 				map.put("CostType", YxActivity.getInt("CostType"));
-				map.put("ShowType", "");
-				map.put("BeginTime", "");
-				map.put("EndTime", "");
-				map.put("InvestDay", "");
+				map.put("ShowType", YxActivity.getInt("ShowType"));
+				map.put("BeginTime", YxActivity.getStr("BeginTime"));
+				map.put("EndTime", YxActivity.getStr("EndTime"));
+				map.put("InvestDay", YxActivity.getInt("InvestDay"));
 				map.put("InvestType", "");
 				map.put("Remark", "");
 				map.put("GrantAmount", YxActivity.getBigDecimal("GrantAmount"));
-				map.put("CreateTime", YxActivity.getTime("CreateTime"));
-				map.put("ModifyTime", YxActivity.getTime("ModifyTime"));
+				map.put("CreateTime", YxActivity.getStr("CreateTime"));
+				map.put("ModifyTime", YxActivity.getStr("ModifyTime"));
 				map.put("Flag", 1);
 				map.put("InvestState", 2);
-				map.put("ShopCreateTime", YxActivity.getTime("ShopCreateTime"));
+				map.put("ShopCreateTime", YxActivity.getStr("ShopCreateTime"));
 				map.put("ShopLinkMan", YxActivity.getStr("ShopLinkMan"));
 				map.put("ShopPhone", YxActivity.getStr("ShopPhone"));
 				map.put("GrantTime", "");
 				map.put("AuditResult", "");
 				map.put("CreateManName", user.getRealname());
-				map.put("SysCreateTime", new Date());
-				map.put("SysModifyTime", new Date());
 			}else if(YxActivity.getStr("invest_type").equals("101105")) {
 				//终端客情
-				Map<String, Object>map=new HashMap<>();
-				map.put("FlowIDNO",YxActivity.getBigInteger("FlowIDNO") );
 				map.put("CustomerName", YxActivity.getStr("CustomerName"));
 				map.put("CustomerCode", YxActivity.getStr("CustomerCode"));
 				map.put("ShopID", "");
-				map.put("ChannelID", "");
+				map.put("ChannelID", YxActivity.getInt("ChannelID"));
 				map.put("InvestState", 2);
 				map.put("CancleReason", "");
 				map.put("ResourceFlag", 1);
 				map.put("CreateManID", "");
-				map.put("CreateTime", YxActivity.getTime("CreateTime"));
+				map.put("CreateTime", YxActivity.getStr("CreateTime"));
 				map.put("ShopOrderID", "");
 				map.put("ActivityPhotos", "");
 				map.put("SignPhotos", "");
 				map.put("ModifyManID", "");
-				map.put("ModifyTime", YxActivity.getTime("ModifyTime"));
+				map.put("ModifyTime", YxActivity.getStr("ModifyTime"));
 				map.put("Flag", 1);
-				map.put("ChannelTypeID", "");
+				map.put("ChannelTypeID",YxActivity.getInt("ChannelID"));
 				map.put("WriteOffAmount", YxActivity.getBigDecimal("WriteOffAmount"));
-				map.put("ShopCreateTime", YxActivity.getTime("ShopCreateTime"));
+				map.put("ShopCreateTime", YxActivity.getStr("ShopCreateTime"));
 				map.put("ShopLinkMan", YxActivity.getStr("ShopLinkMan"));
 				map.put("ShopPhone", YxActivity.getStr("ShopPhone"));
-				map.put("ShopVisitCount", "");
-				map.put("ShopXCJHCount", "");
-				map.put("OrderMan", "");
+				map.put("ShopVisitCount", YxActivity.getInt("ShopVisitCount"));
+				map.put("ShopXCJHCount", YxActivity.getInt("ShopXCJHCount"));
+				map.put("OrderMan", user.getRealname());
 				map.put("ResourceID", "");
 				map.put("ProvinceName", YxActivity.getStr("ProvinceName"));
 				map.put("CityName", YxActivity.getStr("CityName"));
 				map.put("CountyName", YxActivity.getStr("CountyName"));
-				map.put("SysCreateTime", new Date());
-				map.put("SysModifyTime", new Date());
 			}else if(YxActivity.getStr("invest_type").equals("101106")) {
 				//商超赠品
-				Map<String, Object>map=new HashMap<>();
-				map.put("FlowIDNO",YxActivity.getBigInteger("FlowIDNO") );
 				map.put("ResourceID", "");
 				map.put("ProvinceName", YxActivity.getStr("ProvinceName"));
 				map.put("CityName", YxActivity.getStr("CityName"));
@@ -772,26 +754,22 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				map.put("CustomerName", YxActivity.getStr("CustomerName"));
 				map.put("CustomerCode", YxActivity.getStr("CustomerCode"));
 				map.put("ShopID", "");
-				map.put("ShopCreateTime", YxActivity.getTime("ShopCreateTime"));
+				map.put("ShopCreateTime", YxActivity.getStr("ShopCreateTime"));
 				map.put("ShopLinkMan", YxActivity.getStr("ShopLinkMan"));
 				map.put("ShopPhone", YxActivity.getStr("ShopPhone"));
-				map.put("ChannelID", "");
+				map.put("ChannelID", YxActivity.getInt("ChannelID"));
 				map.put("InvestAmount", YxActivity.getBigDecimal("WriteOffAmount"));
 				map.put("InvestState", 2);
 				map.put("ResourceFlag", 1);
 				map.put("CostType", YxActivity.getInt("CostType"));
 				map.put("WriteOffAmount", YxActivity.getBigDecimal("WriteOffAmount"));
 				map.put("CreateManName", YxActivity.getStr("CreateManName"));
-				map.put("CreateTime", YxActivity.getTime("CreateTime"));
+				map.put("CreateTime", YxActivity.getStr("CreateTime"));
 				map.put("ModifyManName", YxActivity.getStr("ModifyManName"));
-				map.put("ModifyTime", YxActivity.getTime("ModifyTime"));
+				map.put("ModifyTime", YxActivity.getStr("ModifyTime"));
 				map.put("Flag", 1);
-				map.put("SysCreateTime", new Date());
-				map.put("SysModifyTime", new Date());
 			}else {
 				//进场费
-				Map<String, Object>map=new HashMap<>();
-				map.put("FlowIDNO",YxActivity.getBigInteger("FlowIDNO") );
 				map.put("ResourceID", "");
 				map.put("ProvinceName", YxActivity.getStr("ProvinceName"));
 				map.put("CityName", YxActivity.getStr("CityName"));
@@ -799,10 +777,10 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				map.put("CustomerName", YxActivity.getStr("CustomerName"));
 				map.put("CustomerCode", YxActivity.getStr("CustomerCode"));
 				map.put("ShopID", "");
-				map.put("ShopCreateTime", YxActivity.getTime("ShopCreateTime"));
+				map.put("ShopCreateTime", YxActivity.getStr("ShopCreateTime"));
 				map.put("ShopLinkMan", YxActivity.getStr("ShopLinkMan"));
 				map.put("ShopPhone", YxActivity.getStr("ShopPhone"));
-				map.put("ChannelID", "");
+				map.put("ChannelID", YxActivity.getInt("ChannelID"));
 				map.put("InvestType", "");
 				map.put("InvestAmount", YxActivity.getBigDecimal("WriteOffAmount"));
 				map.put("InvestState", 2);
@@ -813,40 +791,16 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				map.put("ExecuteRemark", "");
 				map.put("WriteOffAmount", YxActivity.getBigDecimal("WriteOffAmount"));
 				map.put("CreateManName", YxActivity.getStr("CreateManName"));
-				map.put("CreateTime", YxActivity.getTime("CreateTime"));
+				map.put("CreateTime", YxActivity.getStr("CreateTime"));
 				map.put("ModifyManName", YxActivity.getStr("ModifyManName"));
-				map.put("ModifyTime", YxActivity.getTime("ModifyTime"));
+				map.put("ModifyTime", YxActivity.getStr("ModifyTime"));
 				map.put("Flag", 1);
 				map.put("ExecuteManName", YxActivity.getStr("ExecuteManName"));
-				map.put("ExecuteTime", YxActivity.getTime("ExecuteTime"));
+				map.put("ExecuteTime", YxActivity.getStr("ExecuteTime"));
 				map.put("ExecuteState", 1);
-				map.put("SysCreateTime", new Date());
-				map.put("SysModifyTime", new Date());
 			}
-			
+			String map2Xmlstring = XmlUtils.map2Xmlstring(map);
 		}
 		renderAjaxResultForSuccess("加入核销成功");
 	}
-//	ActivityApply activityApply = ActivityApplyQuery.me().findById(activityApplyId);
-//	activityApply.setStatus(5);
-//	activityApply.update();
-//	YxActivityshopadinfo yxActivityshopadinfo=new YxActivityshopadinfo();
-//	BigInteger proc_code=new BigInteger(YxActivity.getStr("proc_code"));
-//	yxActivityshopadinfo.setFlowIDNO(proc_code);
-//	yxActivityshopadinfo.setProvinceName(YxActivity.getStr("prov_name"));
-//	yxActivityshopadinfo.setCityName(YxActivity.getStr("city_name"));
-//	yxActivityshopadinfo.setCountyName(YxActivity.getStr("country_name"));
-//	yxActivityshopadinfo.setCustomerName(YxActivity.getStr("customer_name"));
-//	yxActivityshopadinfo.setCustomerCode(YxActivity.getStr("customer_code"));
-//	yxActivityshopadinfo.setShopCreateTime(YxActivity.getDate("create_date"));
-//	yxActivityshopadinfo.setShopLinkMan(YxActivity.getStr("realname"));
-//	yxActivityshopadinfo.setShopPhone(YxActivity.getStr("mobile"));
-//	yxActivityshopadinfo.setExecuteTime(YxActivity.getDate("CreateTime"));
-//	yxActivityshopadinfo.setCreateTime(new Date());
-//	save=yxActivityshopadinfo.save();
-//	if (!save) {
-//		renderAjaxResultForError("加入核销失败!");
-//		return;
-//	}
-	
 }
