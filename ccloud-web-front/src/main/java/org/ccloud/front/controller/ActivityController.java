@@ -625,8 +625,7 @@ public class ActivityController extends BaseFrontController {
 	public void applyDetail() {
 		String id = getPara("id");
 		ActivityApply activityApply = ActivityApplyQuery.me().findById(id);
-		List<Dict> dicts = DictQuery.me().findDictByType(Consts.INVEST_TYPE);
-		ExpenseDetail expenseDetail = ExpenseDetailQuery.me().findById(activityApply.getExpenseDetailId());
+		ExpenseDetail expenseDetail = new ExpenseDetail();
 		String invesType= "";
 		String investTypes = activityApply.getStr("invest_type");
 		if(!investTypes.equals("")) {

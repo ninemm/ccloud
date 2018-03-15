@@ -318,9 +318,7 @@ public class CustomerVisitController extends BaseFrontController {
 			return ;
 		}
 		ExpenseDetail expenseDetail = new ExpenseDetail();
-		if(CustomerVisitQuery.me().findById(id).getActiveApplyId().equals("")) {
-			
-		}else {
+		if(!CustomerVisitQuery.me().findById(id).getActiveApplyId().equals("")) {
 			expenseDetail = ExpenseDetailQuery.me().findById(ActivityApplyQuery.me().findById(CustomerVisitQuery.me().findById(id).getActiveApplyId()).getExpenseDetailId());
 		}
 		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
