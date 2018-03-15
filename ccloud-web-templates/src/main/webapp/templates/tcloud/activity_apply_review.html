@@ -144,18 +144,14 @@ function doPass(pass) {
                     <span>${(activityApply.content)!}</span>
                 </p>
                 <#if expenseDetail??>
-        			<p>item1
-	                    <span>${(expenseDetail.item1)!}</span>
+        			<p>费用类型
+	                    <span>${(expenseDetail.expenseDetailName)!}</span>
 	                </p>
-	                <p>item2
-	                    <span>${(expenseDetail.item2)!}</span>
-	                </p>
-	                <p>item3
-	                    <span>${(expenseDetail.item3)!}</span>
-	                </p>
-	                <p>item4
-	                    <span>${(expenseDetail.item4)!}</span>
-	                </p>
+	                <#if expenseDetail.expenseDetailName1??>
+		                <p>品项
+		                    <span>${(expenseDetail.expenseDetailName1)!}</span>
+		                </p>
+	                </#if>
       			</#if>
 				<!--<p>-->
 				<!--附件图片-->
@@ -169,12 +165,21 @@ function doPass(pass) {
             </div>
         </div>
         
-        <#if investType??>
+        <#if activityApply.apply_amount??>
 	        <div class="weui-cell weui-cell_access">
 	            <div class="weui-cell__bd">
 	                申请总金额
 	                <span class="fr">
-	            <span class="ft20 orange">${activityApply.invest_amount?string("0.00")}</span>&nbsp;元</span>
+	            <span class="ft20 orange">${activityApply.apply_amount?string("0.00")}</span>&nbsp;元</span>
+	            </div>
+	        </div>
+        </#if>
+        <#if activityApply.apply_num??>
+	        <div class="weui-cell weui-cell_access">
+	            <div class="weui-cell__bd">
+	                申请数量
+	                <span class="fr">
+	            	<span class="ft20 orange">${activityApply.apply_num}</span></span>
 	            </div>
 	        </div>
         </#if>

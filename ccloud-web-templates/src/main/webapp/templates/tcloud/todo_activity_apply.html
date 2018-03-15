@@ -211,13 +211,21 @@
 											</p>
 											<div class="ft14 gray">
 												<p>活动名称：${(activityApply.title)!}</p>
+												<#if activityApply.expenseDetailName??>
+													<p>费用类型：${(activityApply.expenseDetailName)!}</p>
+												</#if>
 												<p>
 													联系人：<span>${(activityApply.ccontact)!} / ${(activityApply.cmobile)!}</span>
 													<span class="fr">${(activityApply.customerTypeNames)!}</span>
 												</p>
 												<p>
-													投入金额：￥<span>${(activityApply.invest_amount)!}</span>
+													<#if activityApply.apply_amount??>
+													投入金额：￥<span>${(activityApply.apply_amount)!}</span></#if>
 													<span class="fr" id="date">时间：${(activityApply.create_date)!}</span>
+												</p>
+												<p>
+													<#if activityApply.apply_num??>
+													投入数量：<span>${(activityApply.apply_num)!}</span></#if>
 												</p>
 											</div>
 										</div>
@@ -258,13 +266,21 @@
 											</p>
 											<div class="ft14 gray">
 												<p>活动名称：${(activityApplyInfo.title)!}</p>
+												<#if activityApplyInfo.expenseDetailName??>
+													<p>费用类型：${(activityApplyInfo.expenseDetailName)!}</p>
+												</#if>
 												<p>
 													联系人：<span>${(activityApplyInfo.ccontact)!} / ${(activityApplyInfo.cmobile)!}</span>
 													<span class="fr">${(activityApplyInfo.customerTypeNames)!}</span>
 												</p>
 												<p>
-													投入金额：￥<span>${(activityApplyInfo.invest_amount)!}</span>
+													<#if activityApplyInfo.apply_amount??>
+													投入金额：￥<span>${(activityApplyInfo.apply_amount)!}</span></#if>
 													<span class="fr" id="date">时间：${(activityApplyInfo.endTime)!}</span>
+												</p>
+												<p>
+													<#if activityApplyInfo.apply_num??>
+													投入数量：<span>${(activityApplyInfo.apply_num)!}</span></#if>
 												</p>
 											</div>
 										</div>

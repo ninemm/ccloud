@@ -25,8 +25,8 @@ import java.rmi.RemoteException;
 //import java.util.Base64;
 import java.util.List;
 
-import org.apache.axis.message.MessageElement;
-import org.apache.axis.types.Schema;
+//import org.apache.axis.message.MessageElement;
+//import org.apache.axis.types.Schema;
 //import org.apache.axis.message.MessageElement;
 //import org.apache.axis.types.Schema;
 import org.ccloud.middledb.ArrayOfAnyType;
@@ -104,7 +104,7 @@ public class MidDataUtil {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Schema schema = (Schema)obj;
+       /* Schema schema = (Schema)obj;
         MessageElement[] msgele = schema.get_any();
         List FOCElementHead = msgele[0].getChildren();//消息头,DataSet对象
         List FOCElementBody = msgele[1].getChildren();//消息体信息,DataSet对象
@@ -120,7 +120,7 @@ public class MidDataUtil {
         } catch (IOException e) {
             e.printStackTrace();
         }
-		System.out.println(result);
+		System.out.println(result);*/
 	}
 	
 	@SuppressWarnings("unused")

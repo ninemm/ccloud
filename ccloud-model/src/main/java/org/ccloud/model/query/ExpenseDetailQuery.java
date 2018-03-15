@@ -35,7 +35,8 @@ public class ExpenseDetailQuery extends JBaseQuery {
 	}
 
 	public ExpenseDetail findById(final String id) {
-				return DAO.findById(id);
+		String sql = "select c.*,d.`name` as expenseDetailName from cc_expense_detail c LEFT JOIN dict d on d.`value` = c.item1 where c.id = '"+id+"'";
+				return DAO.findFirst(sql);
 	}
 
 	public Page<ExpenseDetail> paginate(int pageNumber, int pageSize, String orderby) {
@@ -88,5 +89,13 @@ public class ExpenseDetailQuery extends JBaseQuery {
 		return DAO.findFirst(builder.toString(), id);
 	}
 
+	public ExpenseDetail _findById(String id) {
+		String sql = "select c.*,d.`name` as expenseDetailName,cs.custom_name,CASE WHEN cs.custom_name IS NOT NULL THEN cs.custom_name ELSE t1.name END AS expenseDetailName1 from cc_expense_detail c "
+				+ "LEFT JOIN dict d on d.`value` = c.item1 "
+				+ "LEFT JOIN cc_seller_product cs on cs.id = c.item2 "
+				+ "LEFT JOIN (select ce.id,d.`name` from cc_expense_detail ce LEFT JOIN dict di on di.`value` = ce.item2) t1 on t1.id = c.id "
+				+ " where c.id = '"+id+"'";
+		return DAO.findFirst(sql);
+	}
 	
 }

@@ -460,7 +460,7 @@ public class ActivityController extends BaseFrontController {
 		String activityApplyId = getPara("activityApplyId");
 		String taskId = getPara("taskId");
 		ActivityApply activityApply = ActivityApplyQuery.me().findById(activityApplyId);
-		ExpenseDetail expenseDetail = ExpenseDetailQuery.me().findById(activityApply.getExpenseDetailId());
+		ExpenseDetail expenseDetail = new ExpenseDetail();
 		boolean isCheck = false;
 		if (user != null && getPara("assignee", "").contains(user.getUsername())) {
 			isCheck = true;
@@ -473,27 +473,18 @@ public class ActivityController extends BaseFrontController {
 			message.setIsRead(Consts.IS_READ);
 			message.update();
 		}
-		String[] investTypes = activityApply.getStr("invest_type").split(",");
+		String investTypes = activityApply.getStr("invest_type");
 		String investType = "";
-		for(int i=0;i<investTypes.length;i++){
-			if(investTypes[i].equals(Consts.INVES_PUBLICK)){
-				investType +="公关赞助、";
-			}else if (investTypes[i].equals(Consts.INVEST_CONSUMPTION_CULTIVATION)){
-				investType +="消费培育、";
-			}else if (investTypes[i].equals(Consts.INVEST_TERMINSL_ADVERTISWMENT)){
-				investType +="终端广告、";
-			}else if (investTypes[i].equals(Consts.INVEST_TERMINSL_DISPLAY)){
-				investType +="终端陈列、";
-			}else if (investTypes[i].equals(Consts.INVEST_CUSTOMER_VISITE)){
-				investType +="终端客情、";
-			}else if (investTypes[i].equals(Consts.INVEST_SUPERMARKET_GIFT)){
-				investType +="商超赠品、";
-			}else if (investTypes[i].equals(Consts.INVEST_SLOTTING_FEE)){
-				investType +="进场费、";
-			}
+		if(!investTypes.equals("")) {
+			investType = DictQuery.me().findByValue(investTypes).getName();
+		}
+		if(investTypes.equals(Consts.INVES_PUBLICK) || investTypes.equals(Consts.INVEST_CONSUMPTION_CULTIVATION) || investTypes.equals(Consts.INVEST_TERMINSL_ADVERTISWMENT) || investTypes.equals(Consts.INVEST_SUPERMARKET_GIFT)){
+			expenseDetail = ExpenseDetailQuery.me().findById(activityApply.getExpenseDetailId());
+		}else if (investTypes.equals(Consts.INVEST_TERMINSL_DISPLAY) || investTypes.equals(Consts.INVEST_CUSTOMER_VISITE) || investTypes.equals(Consts.INVEST_SLOTTING_FEE)){
+			expenseDetail = ExpenseDetailQuery.me()._findById(activityApply.getExpenseDetailId());
 		}
 		if(!investType.equals("")) {
-			setAttr("investType",investType.substring(0, investType.length()-1));
+			setAttr("investType",investType);
 		}
 		setAttr("taskId", taskId);
 		setAttr("activityApply", activityApply);
@@ -556,22 +547,10 @@ public class ActivityController extends BaseFrontController {
 		List<Map<String, Object>> applyL = new ArrayList<>();
 		StringBuilder html = new StringBuilder();
 		for (Record apply : applyList.getList()) {
-//			int num = 0;
 			List<ActivityExecute> activityExecutes = ActivityExecuteQuery.me().findbyActivityId(apply.getStr("activity_id"));
 			List<String> strings = new ArrayList<>();
 			String sellerCustomerId = apply.getStr("seller_customer_id");
 			List<CustomerVisit> customerVisits = CustomerVisitQuery.me().findByApplyIdAndSellerCustomerId(apply.getStr("id"), sellerCustomerId);
-			//comeFrom = 1 来源于活动列表
-//			CustomerVisit customerV = CustomerVisitQuery.me().findByActivityApplyIdAndComeFrom(apply.getStr("id"));
-//			if(customerV != null){
-//				List<ImageJson> listImages = JSON.parseArray(customerV.getPhoto(), ImageJson.class);
-//				List<String> listS = new ArrayList<>();
-//				for(ImageJson listImag:listImages){
-//					if(!listS.contains(listImag.getOrderList())){
-//						num++;
-//					}
-//				}
-//			}
 			html.append("<section>\n");
 			html.append("<div class=\"weui-cells__title\"></div>");
 
@@ -592,6 +571,7 @@ public class ActivityController extends BaseFrontController {
 
 			html.append("                            </span>\n" +
 					"                        </a>\n" +
+					"                       <div class=\"weui-cell__bd\" style=\"text-align:center;\">" + apply.getStr("title")+"  "+apply.getStr("ExpenseDetailName") + "</div>\n" +
 					"                        <div class=\"weui-flex\">\n" +
 					"                            <div class=\"weui-flex__item\">\n" +
 					"                                <p>开始日期</p>\n" +
@@ -608,7 +588,7 @@ public class ActivityController extends BaseFrontController {
 					"                            <div class=\"weui-flex__item\">\n" +
 					"                                <p>预计费用</p>\n" +
 					"                                <p>");
-			if(apply.get("invest_amount")!=null) html.append(df.format(Double.parseDouble(apply.get("invest_amount").toString())));
+			if(apply.get("apply_amount")!=null) html.append(df.format(Double.parseDouble(apply.getStr("apply_amount"))));
 			else html.append("0.00");
 			if(activityExecutes.size()>0) {
 				html.append( "						</p>\n" +
@@ -620,21 +600,6 @@ public class ActivityController extends BaseFrontController {
 						"      <input type = \"hidden\" class = \"orderList\" value = \""+apply.getStr("id")+"\">\n" + 
 						"      <div class='ystep-container ystep-lg ystep-blue'></div>\n" + 
 						"  </div>");				
-			/*	for(int i  = 0 ; i < activityExecutes.size() ; i++) {
-					if(i>num){
-						html.append("<a onclick = \"warning()\" class=\"weui-cell weui-btn_disabled weui-btn_primary\">\n" +
-								"                       <div class=\"weui-flex__item\">\n" +
-								"                                <p>" + activityExecutes.get(i).getOrderList() + "</p>\n" +
-								"                            </div></a>\n");
-						
-					}else{
-						html.append("<a class=\"weui-cell weui-cell_access\" href=\"/customerVisit/addActivityApplyVisit?id=" + activityExecutes.get(i).getStr("id") + "&orderList="+activityExecutes.get(i).getOrderList()+"&activeApplyId="+apply.getStr("id")+"\">\n" +
-								"                       <div class=\"weui-flex__item\">\n" +
-								"                                <p>" + activityExecutes.get(i).getOrderList() + "</p>\n" +
-								"                            </div></a>\n");
-						
-					}
-				}*/
 				for(ActivityExecute activityExecute:activityExecutes) {
 					strings.add(activityExecute.getOrderList());
 				}
@@ -662,20 +627,17 @@ public class ActivityController extends BaseFrontController {
 		ActivityApply activityApply = ActivityApplyQuery.me().findById(id);
 		List<Dict> dicts = DictQuery.me().findDictByType(Consts.INVEST_TYPE);
 		ExpenseDetail expenseDetail = ExpenseDetailQuery.me().findById(activityApply.getExpenseDetailId());
-		if(!activityApply.getStr("invest_type").equals("")) {
-			String[] investTypes = activityApply.getStr("invest_type").split(",");
-			String invesType= "";
-			for(int i=0;i<investTypes.length;i++) {
-				for(int j = 0 ;j<dicts.size();j++) {
-					if(dicts.get(j).getValue().equals(investTypes[i])) {
-						invesType += dicts.get(j).getName()+"、";
-						break;
-					}
-				}
-			}
-			setAttr("invesType", invesType.substring(0, invesType.length()-1));
+		String invesType= "";
+		String investTypes = activityApply.getStr("invest_type");
+		if(!investTypes.equals("")) {
+			invesType = DictQuery.me().findByValue(investTypes).getName();
 		}
-		
+		if(investTypes.equals(Consts.INVES_PUBLICK) || investTypes.equals(Consts.INVEST_CONSUMPTION_CULTIVATION) || investTypes.equals(Consts.INVEST_TERMINSL_ADVERTISWMENT) || investTypes.equals(Consts.INVEST_SUPERMARKET_GIFT)){
+			expenseDetail = ExpenseDetailQuery.me().findById(activityApply.getExpenseDetailId());
+		}else if (investTypes.equals(Consts.INVEST_TERMINSL_DISPLAY) || investTypes.equals(Consts.INVEST_CUSTOMER_VISITE) || investTypes.equals(Consts.INVEST_SLOTTING_FEE)){
+			expenseDetail = ExpenseDetailQuery.me()._findById(activityApply.getExpenseDetailId());
+		}
+		setAttr("invesType", invesType);
 		setAttr("apply", activityApply);
 		setAttr("expenseDetail",expenseDetail);
 		render("apply_detail.html");
