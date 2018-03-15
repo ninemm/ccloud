@@ -185,7 +185,7 @@ public class MemberController extends BaseFrontController {
 					User sales = UserQuery.me().findById(sales_id);
 					List<Department> deptList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(sales.getDepartmentId());
 					Seller seller = SellerQuery.me()._findByDataArea(deptList.get(0).getDataArea());
-					MemberJoinSeller memberJoinSeller = MemberJoinSellerQuery.me().findUser(memberId, seller.getId());
+					MemberJoinSeller memberJoinSeller = MemberJoinSellerQuery.me().checkExists(memberId, seller.getId(), sales_id);
 					if(memberJoinSeller == null) {
 						memberJoinSeller = new MemberJoinSeller();
 						memberJoinSeller.setMemberId(memberId);
@@ -197,8 +197,8 @@ public class MemberController extends BaseFrontController {
 							ret.set("message", "手机号绑定失败，请联系管理员");
 							return false;
 						}
-					}else if(!sales_id.equals(memberJoinSeller.getUserId())){
-						ret.set("message", "您已经与该帐套其他业务员绑定");
+					}else{
+						ret.set("message", "您已经与该业务员绑定,不可再次绑定");
 						return false;
 					}
 
