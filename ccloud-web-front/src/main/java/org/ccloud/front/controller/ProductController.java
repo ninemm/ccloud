@@ -138,6 +138,7 @@ public class ProductController extends BaseFrontController {
 		render("shopping_cart.html");
 	}
 
+	@Before(WechatJSSDKInterceptor.class)
 	public void order() {
 
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
