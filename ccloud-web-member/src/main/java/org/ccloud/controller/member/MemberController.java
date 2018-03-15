@@ -147,7 +147,7 @@ public class MemberController extends BaseFrontController {
 						return false;
 					}
 
-					Member member = MemberQuery.me().findByWechatOpenid(openId);
+					Member member = MemberQuery.me().checkMemberExist(mobile, sales_id);
 					Date createDate = new Date();
 					String memberId = "";
 					if (member == null) {

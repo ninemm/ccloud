@@ -85,6 +85,16 @@ public class MemberQuery extends JBaseQuery {
 		return Db.find(sqlBuilder.toString(), mobile, sales_id);
 	}
 
+	public Member checkMemberExist(String mobile,String sales_id) {
+		StringBuilder sqlBuilder = new StringBuilder("select m.*");
+		sqlBuilder.append("from cc_member m ");
+		sqlBuilder.append("JOIN cc_customer c ON m.customer_id = c.id ");
+		sqlBuilder.append("join cc_seller_customer sc on c.id = sc.customer_id ");
+		sqlBuilder.append("join cc_user_join_customer ujc on sc.id = ujc.seller_customer_id ");
+		sqlBuilder.append("where c.mobile = ? AND sc.is_enabled = 1 AND ujc.user_id = ?");
+		return DAO.findFirst(sqlBuilder.toString(), mobile, sales_id);
+	}
+
 	public List<Member> findByMobile(String mobile) {
 		StringBuilder sqlBuilder = new StringBuilder("select * ");
 		sqlBuilder.append("from `cc_member` ");
