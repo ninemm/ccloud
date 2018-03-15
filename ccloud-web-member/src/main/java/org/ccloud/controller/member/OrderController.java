@@ -10,6 +10,7 @@ import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.IAtom;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
+import org.activiti.engine.task.Comment;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
@@ -432,5 +433,69 @@ public class OrderController extends BaseFrontController {
 				return department.getStr("seller_id");
 			}
 		return "";
+	}
+
+	public void operateHistory() {
+		keepPara();
+
+		String id = getPara("id");
+
+		Record salesOrder = SalesOrderQuery.me().findRecordById(id);
+		setAttr("salesOrder", salesOrder);
+
+		String proc_inst_id = getPara("proc_inst_id");
+		List<Comment> comments = WorkFlowService.me().getProcessComments(proc_inst_id);
+		setAttr("comments", comments);
+
+		StringBuilder printComments = new StringBuilder();
+		List<Record> printRecord = OutstockPrintQuery.me().findByOrderId(id);
+		for (int i = 0; i < printRecord.size(); i++) {
+			Record record = printRecord.get(i);
+			int status = record.getInt("status");
+			printComments.append(buildComments(Consts.OPERATE_HISTORY_TITLE_ORDER_PRINT + " 第" + (i+1) + "次", record.get("create_date").toString(), record.getStr("realname"),
+					status == 1 ? "打印失败" : "打印成功"));
+		}
+		setAttr("printComment", printComments.toString());
+
+		String outstockInfo = buildOutstockInfo(id);
+		setAttr("outstockInfo", outstockInfo);
+
+		render("member_operate_history.html");
+	}
+
+	private String buildOutstockInfo(String ordedId) {
+		List<Record> orderDetails = SalesOrderDetailQuery.me().findByOrderId(ordedId);
+
+		StringBuilder stringBuilder = new StringBuilder();
+
+		for (Record record : orderDetails) { // 若修改了产品价格或数量，则写入相关日志信息
+			if (!record.getInt("out_count").equals(record.getInt("product_count"))) {
+				stringBuilder.append("●" + record.getStr("custom_name") + "<br>");
+				int convert = record.getInt("convert_relate");
+				stringBuilder.append("-" + record.getStr("big_unit") + "数量修改为"+ Math.round(record.getInt("out_count")/convert) + "(" + Math.round(record.getInt("product_count")/convert) + ")<br>");
+				stringBuilder.append("-" + record.getStr("small_unit") + "数量修改为"+ Math.round(record.getInt("out_count")%convert) + "(" + Math.round(record.getInt("product_count")%convert) + ")<br>");
+			}
+		}
+
+		return stringBuilder.toString();
+	}
+
+	private String buildComments(String title, String date, String realname, String comment) {
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("      <div class=\"weui-cell weui-cell_access\">\n");
+		stringBuilder.append("        <p>");
+		stringBuilder.append(title);
+		stringBuilder.append("<span class=\"fr\">");
+		stringBuilder.append(date);
+		stringBuilder.append("</span></p>\n");
+		stringBuilder.append("        <p>操作人：");
+		stringBuilder.append(realname);
+		stringBuilder.append("</p>\n");
+		stringBuilder.append("        <p>备注：");
+		stringBuilder.append(comment);
+		stringBuilder.append("</p>\n");
+		stringBuilder.append("      </div>\n");
+
+		return stringBuilder.toString();
 	}
 }

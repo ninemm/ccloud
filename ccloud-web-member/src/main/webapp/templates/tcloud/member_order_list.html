@@ -227,12 +227,12 @@
  						 window.location.href = "${CPATH}/member/order/getOldOrder?orderId="+el.id;
 					});
 
-/*<!--					$newOrder.find("#status").on('click', function(){
- 						 window.location.href = "${CPATH}/order/operateHistory?id=" + el.id + "&proc_inst_id=" + el.proc_inst_id;
+					$newOrder.find("#status").on('click', function(){
+ 						 window.location.href = "${CPATH}/member/order/operateHistory?id=" + el.id + "&proc_inst_id=" + el.proc_inst_id;
  						 event.stopPropagation();
-					});-->
+					});
 
-<!--					var assignee = el.assignee == null ? '' : el.assignee.split(',');
+/*<!--					var assignee = el.assignee == null ? '' : el.assignee.split(',');
 					if(el.taskId != null && $.inArray(data.user.username, assignee) != -1) {
 						$newOrder.find("#pass").on('click', function() {
 							agree(el.id, el.taskId, 1);

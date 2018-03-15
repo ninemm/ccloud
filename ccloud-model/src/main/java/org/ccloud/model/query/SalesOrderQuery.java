@@ -1880,12 +1880,15 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 	
 	public Record findRecordById(final String id) {
-		StringBuilder fromBuilder = new StringBuilder(" select so.order_sn, so.create_date AS createDate, u.realname AS salesName, sos.outstock_sn, sos.create_date AS passDate, uu.realname AS outName, sos.biz_date AS outDate ");
+		StringBuilder fromBuilder = new StringBuilder(" select so.order_sn, so.create_date AS createDate, u.realname AS salesName, sos.outstock_sn, sos.create_date AS passDate, uu.realname AS outName, sos.biz_date AS outDate, c.customer_name ");
 		fromBuilder.append(" from `cc_sales_order` so ");
 		fromBuilder.append(" LEFT JOIN USER u ON so.biz_user_id = u.id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id = sojo.order_id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_outstock sos ON sojo.outstock_id = sos.id ");
 		fromBuilder.append(" LEFT JOIN USER uu ON sos.biz_user_id = uu.id ");
+		fromBuilder.append(" LEFT JOIN cc_member_sales_order mso on mso.order_id = so.id ");
+		fromBuilder.append(" LEFT JOIN cc_member m on m.id = mso.member_id ");
+		fromBuilder.append(" LEFT JOIN cc_customer c on c.id = m.customer_id ");
 		fromBuilder.append(" where so.id = ? ");
 
 		return Db.findFirst(fromBuilder.toString(), id);
