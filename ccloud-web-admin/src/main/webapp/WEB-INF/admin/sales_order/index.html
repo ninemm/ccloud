@@ -80,11 +80,15 @@
 					edit: false
 				},
 				{field: "customer_name", title: "客户名称", align: "center", width: '12%', edit:false},
+				
+				<@shiro.lacksRole name="021"> 
 				{field: "total_amount", title: "订单总额", align: "center", width: '5%',
 					formatter: function(value,row,rowIndex){
 						return formatNumber(value);
 					},
 				 edit:false},
+				</@shiro.lacksRole>	
+				
 				{field: "receive_type", title: "付款方式", align: "center", width: '5%',
 					formatter: function(value, row, rowIndex) {
 						return value == 0 ? '账期' : '现金';
@@ -258,7 +262,12 @@
 		var endDate = $('#endDate').val() + " 23:59:59";
 		var k = $('#search').val()
 		var actId = $("#activityId").find("option:selected").val();
-		jQuery.mm.down("${CPATH}/admin/salesOrder/downloading?startDate=" + startDate  + "&endDate=" + endDate + "&k=" + k + "&activity=" + actId);
+		<@shiro.hasRole name="021">  
+			jQuery.mm.down("${CPATH}/admin/salesOrder/downloading?startDate=" + startDate  + "&endDate=" + endDate + "&k=" + k + "&activity=" + actId+ "&tax=0");
+		</@shiro.hasRole>	
+		<@shiro.lacksRole name="021">  
+			jQuery.mm.down("${CPATH}/admin/salesOrder/downloading?startDate=" + startDate  + "&endDate=" + endDate + "&k=" + k + "&activity=" + actId+ "&tax=1");
+		</@shiro.lacksRole>	
     }
 </#macro>
 

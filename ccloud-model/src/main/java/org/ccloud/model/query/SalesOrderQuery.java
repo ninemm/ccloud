@@ -159,14 +159,11 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 
 	public List<Record> findProductListBySeller(String sellerId) {
-		StringBuilder fromBuilder = new StringBuilder(
-				" SELECT sg.id, sg.product_id, sg.custom_name, sg.store_count,sg.account_price, sg.price, sg.warehouse_id, t1.valueName, p.big_unit, p.small_unit, p.convert_relate ");
+		StringBuilder fromBuilder = new StringBuilder( " SELECT sg.tax_price, sg.id, sg.product_id, sg.custom_name, sg.store_count,sg.account_price, sg.price, sg.warehouse_id, t1.valueName, p.big_unit, p.small_unit, p.convert_relate ");
 		fromBuilder.append("FROM cc_seller_product sg ");
 		fromBuilder.append("LEFT JOIN cc_product p ON sg.product_id = p.id ");
-		fromBuilder.append(
-				"LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
-		fromBuilder.append(
-				"RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = sg.product_id ");
+		fromBuilder.append("LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
+		fromBuilder.append("RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = sg.product_id ");
 		fromBuilder.append("WHERE sg.is_enable = 1 and sg.is_gift = 0");
 
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -250,6 +247,12 @@ public class SalesOrderQuery extends JBaseQuery {
 		salesOrder.setContact(StringUtils.getArrayFirst(paraMap.get("contact")));
 		salesOrder.setMobile(StringUtils.getArrayFirst(paraMap.get("mobile")));
 		salesOrder.setAddress(StringUtils.getArrayFirst(paraMap.get("address")));
+		if (StrKit.notBlank(StringUtils.getArrayFirst(paraMap.get("lat"))))
+			salesOrder.setLat(new BigDecimal(StringUtils.getArrayFirst(paraMap.get("lat"))));
+		if (StrKit.notBlank(StringUtils.getArrayFirst(paraMap.get("lng"))))
+			salesOrder.setLng(new BigDecimal(StringUtils.getArrayFirst(paraMap.get("lng"))));
+		if (StrKit.notBlank(StringUtils.getArrayFirst(paraMap.get("location"))))
+			salesOrder.setLocation(StringUtils.getArrayFirst(paraMap.get("location")));
 		salesOrder.setStatus(Consts.SALES_ORDER_STATUS_DEFAULT);// 待审核
 		String total = StringUtils.getArrayFirst(paraMap.get("total"));
 		String type = StringUtils.getArrayFirst(paraMap.get("receiveType"));

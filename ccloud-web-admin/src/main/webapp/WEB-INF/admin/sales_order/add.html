@@ -150,13 +150,19 @@
 			var convert = product.convert_relate;
 			$tr.find("#convert").val(convert);
 			var smallUnit = product.small_unit;
-			if(type == 1){
-				var smallPrice = (product.price/convert).toFixed(2);
-				var bigPrice = product.price;
-			}else{
-				var smallPrice = (product.account_price/convert).toFixed(2);
-				var bigPrice = product.account_price;
-			}
+			<@shiro.hasRole name="021">   
+				var smallPrice = (product.tax_price/convert).toFixed(2);
+				var bigPrice = product.tax_price;
+			</@shiro.hasRole>	
+			<@shiro.lacksRole name="021">   
+				if(type == 1){
+					var smallPrice = (product.price/convert).toFixed(2);
+					var bigPrice = product.price;
+				}else{
+					var smallPrice = (product.account_price/convert).toFixed(2);
+					var bigPrice = product.account_price;
+				}
+			</@shiro.lacksRole>	
 			$tr.find("#bigPrice").val(bigPrice);
 			$tr.find("#accountPrice").val(product.account_price);
 			$tr.find("#price").val(product.price);

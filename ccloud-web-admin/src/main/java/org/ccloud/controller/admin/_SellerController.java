@@ -445,6 +445,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 							sellerProducts.setPrice(sellerProduct.getPrice());
 							sellerProducts.setAccountPrice(sellerProduct.getPrice());
 							sellerProducts.setCost(sellerProduct.getPrice());
+							sellerProducts.setTaxPrice(sellerProduct.getPrice());
 							Seller seller = SellerQuery.me().findById(getSessionAttr(Consts.SESSION_SELLER_ID).toString());
 							if(seller.getSellerType()==Integer.parseInt(Consts.SELLER_TYPE_SELLER)) {
 								sellerProducts.setIsSource(1);
@@ -483,6 +484,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 							}
 							issellerProducts.setCustomName(sellerProduct.getCustomName());
 							issellerProducts.setOrderList(sellerProduct.getOrderList());
+							issellerProducts.setTaxPrice(sellerProduct.getTaxPrice());
 							issellerProducts.setPrice(sellerProduct.getPrice());
 							issellerProducts.setCost(sellerProduct.getCost());
 							issellerProducts.setAccountPrice(sellerProduct.getAccountPrice());

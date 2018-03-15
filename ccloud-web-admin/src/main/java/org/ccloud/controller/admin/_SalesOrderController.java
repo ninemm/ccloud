@@ -787,6 +787,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 	@RequiresPermissions(value = { "/admin/salesOrder/downloading", "/admin/dealer/all",
 	"/admin/all" }, logical = Logical.OR)
 	public void downloading() {
+		String tax = getPara("tax");
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		String keyword = getPara("k");
@@ -824,7 +825,13 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 					activityTitle= r.getStr("title");
 				}
 				BigDecimal creatconverRelate = new BigDecimal(re.getStr("convert_relate"));
-				BigDecimal bigPrice = new BigDecimal(re.getStr("product_price"));
+				BigDecimal bigPrice;
+				//0 税务人员   1  非税务人员
+				if (tax.equals("0")) {
+					 bigPrice = new BigDecimal(re.getStr("tax_price"));
+				}else {
+					 bigPrice = new BigDecimal(re.getStr("product_price"));
+				}
 				BigDecimal count = new BigDecimal(re.getStr("product_count"));
 				String bigCount = (count.intValue()) / (creatconverRelate.intValue()) + "";
 				String smallCount = (count.intValue()) % (creatconverRelate.intValue()) + "";
@@ -871,7 +878,6 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		excel.setProductName(re.getStr("custom_name"));
 		excel.setValueName(re.getStr("valueName"));
 		excel.setProductCount(count);
-		excel.setProductPrice(price.toString());
 		excel.setPrintDate(printDate);
 		if(printDate.equals("")) {
 			excel.setIsPrint("否");
@@ -880,16 +886,11 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		}
 		excel.setCustomer(customerInfo);
 		excel.setUnit(unit);
-		excel.setCreatconvertRelate(re.getStr("convert_relate") + re.getStr("small_unit") + "/"
-				+ re.getStr("big_unit"));
 		excel.setProductPrice(price.toString());
 		excel.setTotalAmount(price.multiply(new BigDecimal(count)).toString());
 		excel.setCreatconvertRelate(re.getStr("convert_relate")+re.getStr("small_unit")+"/"+re.getStr("big_unit"));
-		excel.setTotalAmount(price.multiply(new BigDecimal(count)).toString());
 		excel.setOrderSn(record.getStr("order_sn"));
-		excel.setCustomer(customerInfo);
 		excel.setCustomerType(record.getStr("customerTypeName"));
-		excel.setPrintDate(printDate);
 		if(record.getStr("realname")==null){
 			excel.setBizUser("");
 		}else{
