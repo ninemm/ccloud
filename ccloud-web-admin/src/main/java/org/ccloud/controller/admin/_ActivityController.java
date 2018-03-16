@@ -225,7 +225,6 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			e.printStackTrace();
 		}  
 	    if(activity.getCategory().equals(Consts.CATEGORY_NORMAL)){
-	    	activity.setInvestAmount(new BigDecimal(0));
 	    	activity.setVisitNum(0);
 	    	activity.setInvestType("");
 	    }else{
@@ -259,6 +258,8 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				activityExecute.save();
 			}
 		}
+		BigDecimal totalMoney = new BigDecimal(0);
+		Integer totalNum = 0;
 		if (item1 != null) {
 			for(int i = 0; i < item1.length; i++) {
 				ExpenseDetail detail = new ExpenseDetail();
@@ -277,6 +278,9 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				if (item4 != null) {
 					detail.setItem4(item4[i]);
 				}
+				BigDecimal[] result = calculationTotalInfo(totalMoney, totalNum, detail);
+				totalMoney = result[0];
+				totalNum = result[1].intValue();
 				detail.setState(true);			
 				if (StrKit.notBlank(expenseIds[i])) {
 					detail.setId(expenseIds[i]);
@@ -288,12 +292,35 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 					detail.save();
 				}
 			}
+			if (activity.getInvestAmount() == null) {
+				activity.setInvestAmount(totalMoney);
+			}
+			if (activity.getInvestNum() == null) {
+				activity.setInvestNum(totalNum);
+			}
+			activity.update();
 			List<String> ids = getDiffrent(expenseOldList, expenseIds);
 			ExpenseDetailQuery.me().batchDelete(ids);
 		}
 		renderAjaxResultForSuccess();
 	}
 	
+	private BigDecimal[] calculationTotalInfo(BigDecimal totalMoney, Integer totalNum, ExpenseDetail detail) {
+		BigDecimal[] result = new BigDecimal[2];
+		if (detail.getFlowDictType().equals(Consts.FLOW_DICT_TYPE_NAME_DISPLAY) 
+				|| detail.getFlowDictType().equals(Consts.FLOW_DICT_TYPE_NAME_CHANNEL)) {
+			result[0] = totalMoney.add(new BigDecimal(detail.getItem4()));
+			result[1] = new BigDecimal(totalNum).add(new BigDecimal(detail.getItem3()));
+		} else if(detail.getFlowDictType().equals(Consts.FLOW_DICT_TYPE_NAME_SA)) {
+			result[0] = totalMoney.add(new BigDecimal(detail.getItem4()));
+			result[1] = new BigDecimal(0);
+		} else {
+			result[0] = totalMoney.add(new BigDecimal(detail.getItem4()));
+			result[1] = new BigDecimal(0);
+		}
+		return result;
+	}
+
 	/** 
 	 * 获取两个List的不同元素(耗时最低)
 	 * @param list1 
