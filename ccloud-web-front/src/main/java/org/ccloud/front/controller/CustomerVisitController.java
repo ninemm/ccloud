@@ -310,7 +310,7 @@ public class CustomerVisitController extends BaseFrontController {
 
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
 
-		Map<String, Object> all = new HashMap<>();
+ 		Map<String, Object> all = new HashMap<>();
 		all.put("title", "全部");
 		all.put("value", "");
 
@@ -328,7 +328,7 @@ public class CustomerVisitController extends BaseFrontController {
 		List<Map<String, Object>> customerTypes = new ArrayList<>();
 		customerTypes.add(all);
 
-		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString() + "%";
+		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString();
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(dealerDataArea);
 		for (CustomerType customerType : customerTypeList) {
 			Map<String, Object> item = new HashMap<>();

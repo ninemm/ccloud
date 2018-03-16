@@ -489,4 +489,29 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 		setAttr("instockId", purchaseInstock.getId());
 		render("getDetail.html");
 	}
+	
+	public void renderPrintPage () {
+		setAttr("instockId", getPara("instockId"));
+		render("print.html");
+	}
+	
+	
+	       //获取采购入库单打印的信息
+			public void getPrintInfo() {
+				String getPrintInfo = getPara("instockId");
+				String[] outId = getPrintInfo.split(",");
+		        List<Map<String, Object>> printAllNeedInfos = new ArrayList<>();
+
+				for (String s : outId) {
+					Record printInfo = PurchaseInstockQuery.me().findPurchaseInstockForPrint(s);
+					List<Record> ProductInfos = PurchaseInstockQuery.me().findPrintProductInfo(s);
+					Map<String, Object> map = new HashMap<>();
+					map.put("printInfo", printInfo);
+					map.put("ProductInfos", ProductInfos);
+					printAllNeedInfos.add(map);
+				}
+				renderJson("rows",printAllNeedInfos);
+			}
+	
+	
 }
