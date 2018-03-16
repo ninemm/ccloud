@@ -125,9 +125,4 @@ public class UserJoinCustomerQuery extends JBaseQuery {
 		fromBuilder.append(" GROUP BY csc.customer_id ) t1");
 		return Db.queryLong(fromBuilder.toString());
 	}
-	
-	public List<UserJoinCustomer> findbyUserId(String userId){
-		String sql = "select * from cc_user_join_customer where user_id = '"+userId+"'";
-		return DAO.find(sql);
-	}
 }

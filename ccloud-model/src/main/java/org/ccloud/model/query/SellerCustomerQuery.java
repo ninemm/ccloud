@@ -558,4 +558,9 @@ public class SellerCustomerQuery extends JBaseQuery {
 		sql.append("WHERE csc.proc_inst_id = ?");
 		return Db.queryLong(sql.toString(), procInstId);
 	}
+	
+	public List<SellerCustomer> _findBySellerId(String sellerId){
+		String sql = "select * from cc_seller_customer where seller_id = '"+sellerId+"' and is_enabled = 1";
+		return DAO.find(sql);
+	}
 }

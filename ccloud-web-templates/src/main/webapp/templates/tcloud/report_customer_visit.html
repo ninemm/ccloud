@@ -39,8 +39,8 @@
     function customerVisitCount(params) {
 		Utils.ajax('${CPATH}/report/customerInfoCount', params, 
 			function(data){
-				$("#visitCount").html(data[0].customerVisitCount+"次");
-				$("#totalAmount").html(data[0].customerCount);
+				$("#customerVisitNum").text(data.customerVisitCount+"次");
+				$("#customerNum").text(data.customerCount);
 			}
 		);    	
     }
@@ -377,6 +377,22 @@
 				</div>
 			</div>
 		</div>
+		<div class="report-top weui-flex">
+            <div class="weui-flex__item">
+                <img src="${CTPATH}/images/order.png" alt="">
+                <div class="border-right-1px">
+                    <p class="ft16">总拜访数</p>
+                    <p class="ft14" id = "customerVisitNum"></p>
+                </div>
+            </div>
+            <div class="weui-flex__item">
+                <img src="${CTPATH}/images/customer.png" alt="">
+                <div>
+                    <p class="ft16">总客户数</p>
+                    <p class="ft14" id="customerNum"></p>
+                </div>
+            </div>
+        </div>
 		<div class="weui-panel weui-panel_access">
 			<div class="weui-panel__hd">
 				<span class="overview-hd-title">客户拜访统计</span> 

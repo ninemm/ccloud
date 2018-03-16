@@ -325,51 +325,64 @@ public class CustomerVisitQuery extends JBaseQuery {
 	}
 	
 	//查询被拜访的客户数
-	public int findByUserId(String userId,String dayTag) {
-		String startDate = "";
-		String endDate = "";
-		if (dayTag != null) {
-			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
-			startDate = date[0];
-			endDate = date[1];
+		public int findBySellerId(String sellerId,String dayTag) {
+			String startDate = "";
+			String endDate = "";
+			if (dayTag != null) {
+				String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
+				startDate = date[0];
+				endDate = date[1];
+			}
+			String sql = "SELECT cv.* from cc_customer_visit cv where cv.seller_customer_id in (select id from cc_seller_customer where seller_id = '"+sellerId+"') "
+					+ " and cv.create_date >= '"+startDate+"' and cv.create_date <= '"+endDate+"' and cv.status in (100101) GROUP BY seller_customer_id";
+			return DAO.find(sql).size();
 		}
-		String sql = "SELECT cv.* from cc_customer_visit cv where user_id = '"+userId+"' "
-				+ " and cv.create_date >= '"+startDate+"' and cv.create_date <= '"+endDate+"' and cv.status in (100101) GROUP BY seller_customer_id";
-		return DAO.find(sql).size();
-	}
 	
-	//查询拜访客户次数相同
-	public List<Record> getByUserId(String userId ,String dayTag) {
-		String startDate = "";
-		String endDate = "";
-		if (dayTag != null) {
-			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
-			startDate = date[0];
-			endDate = date[1];
+		//查询被拜访的客户数
+				public int _findBySellerId(String sellerId,String dayTag) {
+					String startDate = "";
+					String endDate = "";
+					if (dayTag != null) {
+						String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
+						startDate = date[0];
+						endDate = date[1];
+					}
+					String sql = "SELECT cv.* from cc_customer_visit cv where cv.seller_customer_id in (select id from cc_seller_customer where seller_id = '"+sellerId+"') "
+							+ " and cv.create_date >= '"+startDate+"' and cv.create_date <= '"+endDate+"' and cv.status in (100101) GROUP BY cv.id";
+					return DAO.find(sql).size();
+				}
+		//查询拜访客户次数相同
+		public List<Record> getBySellerId(String sellerId ,String dayTag) {
+			String startDate = "";
+			String endDate = "";
+			if (dayTag != null) {
+				String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
+				startDate = date[0];
+				endDate = date[1];
+			}
+			String sql = "SELECT count(t.count) as CountNum,t.count from (SELECT COUNT(cv.seller_customer_id) as count from cc_customer_visit cv where cv. seller_customer_id in (select id from cc_seller_customer where seller_id = '"+sellerId+"') and cv.create_date >= '"+startDate+"' and cv.create_date <= '"+endDate+"' and cv.status in (100101) GROUP BY cv.seller_customer_id ORDER BY count) t GROUP BY t.count;";
+			return Db.find(sql);
 		}
-		String sql = "SELECT count(t.count) as CountNum,t.count from (SELECT COUNT(cv.seller_customer_id) as count from cc_customer_visit cv where cv.user_id = '"+userId+"' and cv.create_date >= '"+startDate+"' and cv.create_date <= '"+endDate+"' and cv.status in (100101) GROUP BY cv.seller_customer_id ORDER BY count) t GROUP BY t.count;";
-		return Db.find(sql);
-	}
-	//查询拜访次数对应的订单金额总数
-	public List<Record> getAmountByUserId(String userId,String dayTag){
-		String startDate = "";
-		String endDate = "";
-		if (dayTag != null) {
-			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
-			startDate = date[0];
-			endDate = date[1];
-		}
-		String sql = "SELECT count(t2.count) as CountNum,t2.count,CASE when TRUNCATE(SUM(t2.sum)/count(t2.count),2) IS NOT NULL THEN TRUNCATE(SUM(t2.sum)/count(t2.count),2) ELSE 0 END as amountNum from " 
-					+"(SELECT cv.seller_customer_id as sellerCustomerId, COUNT(cv.seller_customer_id) as count ,t1.amount as sum " 
-					+"from cc_customer_visit cv " 
-					+"LEFT JOIN (SELECT so.customer_id as sellerCustomerId, SUM(so.total_amount) as amount " 
-					+"from cc_sales_outstock so " 
-					+"LEFT JOIN cc_sales_order_join_outstock jo on jo.outstock_id = so.id " 
-					+"LEFT JOIN cc_sales_order cso on cso.id = jo.order_id " 
-					+"where cso.biz_user_id = '"+userId+"' and so.`status` in ("+Consts.SALES_OUT_STOCK_STATUS_OUT+","+Consts.SALES_OUT_STOCK_STATUS_PART_OUT+") and so.create_date >= '"+startDate+"' and so.create_date <= '"+endDate+"' " 
-					+"GROUP BY so.customer_id) t1 on t1.sellerCustomerId = cv.seller_customer_id "
-					+ "where  cv.create_date >= '"+startDate+"' and cv.create_date <= '"+endDate+"' and cv.user_id = '"+userId+"' and cv.status in (100101) " 
-					+"GROUP BY cv.seller_customer_id ORDER BY count) t2  GROUP BY t2.count";
-		return Db.find(sql);
-	}
+		//查询拜访次数对应的订单金额总数
+		public List<Record> getAmountBySellerId(String sellerId,String dayTag){
+			String startDate = "";
+			String endDate = "";
+			if (dayTag != null) {
+				String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
+				startDate = date[0];
+				endDate = date[1];
+			}
+			String sql = "SELECT count(t2.count) as CountNum,t2.count,CASE when TRUNCATE(SUM(t2.sum)/count(t2.count),2) IS NOT NULL THEN TRUNCATE(SUM(t2.sum)/count(t2.count),2) ELSE 0 END as amountNum from " 
+						+"(SELECT cv.seller_customer_id as sellerCustomerId, COUNT(cv.seller_customer_id) as count ,t1.amount as sum " 
+						+"from cc_customer_visit cv " 
+						+"LEFT JOIN (SELECT so.customer_id as sellerCustomerId, SUM(so.total_amount) as amount " 
+						+"from cc_sales_outstock so " 
+						+"LEFT JOIN cc_sales_order_join_outstock jo on jo.outstock_id = so.id " 
+						+"LEFT JOIN cc_sales_order cso on cso.id = jo.order_id " 
+						+"where cso.seller_id = '"+sellerId+"' and so.`status` in ("+Consts.SALES_OUT_STOCK_STATUS_OUT+","+Consts.SALES_OUT_STOCK_STATUS_PART_OUT+") and so.create_date >= '"+startDate+"' and so.create_date <= '"+endDate+"' " 
+						+"GROUP BY so.customer_id) t1 on t1.sellerCustomerId = cv.seller_customer_id "
+						+ "where  cv.create_date >= '"+startDate+"' and cv.create_date <= '"+endDate+"' and cv.seller_customer_id in (select id from cc_seller_customer where seller_id = '"+sellerId+"') and cv.status in (100101) " 
+						+"GROUP BY cv.seller_customer_id ORDER BY count) t2  GROUP BY t2.count";
+			return Db.find(sql);
+		}	
 }

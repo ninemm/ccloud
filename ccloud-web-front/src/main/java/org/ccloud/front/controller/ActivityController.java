@@ -40,13 +40,15 @@ import org.ccloud.workflow.service.WorkFlowService;
 public class ActivityController extends BaseFrontController {
 
 	public void index() {
-		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		List<Record> activityRecords = ActivityQuery.me().findActivityListForApp(sellerId, "", "");
 		for(int i = 0; i <activityRecords.size();i++){
 			if(activityRecords.get(i).getStr("customer_type")!="") {
 				activityRecords.get(i).set("customerTypeName", ActivityQuery.me().getCustomerTypes(activityRecords.get(i).getStr("customer_type")));}
-			activityRecords.get(i).set("surplusNum",Integer.parseInt( activityRecords.get(i).getStr("total_customer_num"))-ActivityApplyQuery.me().findByUserIdAndActivityId(activityRecords.get(i).getStr("id"),user.getId()).size());
+			if(StrKit.notBlank(activityRecords.get(i).getStr("total_customer_num"))) {
+				activityRecords.get(i).set("surplusNum",Integer.parseInt( activityRecords.get(i).getStr("total_customer_num"))-ActivityApplyQuery.me().findByUserIdAndActivityId(activityRecords.get(i).getStr("id"),user.getId()).size());
+			}
 		}
 		List<Map<String, Object>> activityList = new ArrayList<Map<String, Object>>();
 		
@@ -172,6 +174,7 @@ public class ActivityController extends BaseFrontController {
 		render("activity_apply.html");
 	}
 
+	@Before(Tx.class)
 	public void apply() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
@@ -179,49 +182,45 @@ public class ActivityController extends BaseFrontController {
 		final Date createDate = new Date();
 
 		String[] sellerCustomerIdArray = getParaValues("sellerCustomerId");
-		String[] sellerCustomerNameArray = getParaValues("sellerCustomerName");
-
-
 		Boolean startProc = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_ACTIVITY_APPLY + sellerCode);
-
-		String[] activity_ids = getParaValues("activity_id");
-		Integer[] visit_nums = getParaValuesToInt("visit_num");
+		String activity_id = getPara("activity_id");
+		Integer visit_nums = 0;
+		if(StrKit.notBlank(getPara("visit_num"))) {
+			visit_nums = getParaToInt("visit_num");
+		}
 		for (String sellerCustomerId : sellerCustomerIdArray) {
-			for (int i = 0; i < activity_ids.length; i++) {
-				//活动申请check
-				String result = this.check(activity_ids[i], sellerCustomerId, sellerCustomerNameArray[i],user.getId());
-				
-				if(StrKit.notBlank(result)) {
-					renderAjaxResultForError(result);
+			//活动申请check
+			String result = this.check(activity_id, sellerCustomerId,user.getId());
+			
+			if(StrKit.notBlank(result)) {
+				renderAjaxResultForError(result);
+				return;
+			}
+			ActivityApply activityApply = new ActivityApply();
+			String activityApplyId = StringUtils.getUUID();
+			activityApply.setId(activityApplyId);
+			activityApply.setActivityId(activity_id);
+			activityApply.setSellerCustomerId(sellerCustomerId);
+			activityApply.setBizUserId(user.getId());
+			activityApply.setNum(visit_nums);
+			activityApply.setContent(content);
+			
+			if (startProc != null && startProc) {
+				activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_WAIT);
+				activityApply.setProcInstId(Consts.PROC_ACTIVITY_APPLY_REVIEW);
+				String procInstId = this.start(activityApplyId, sellerCustomerId, Consts.PROC_ACTIVITY_APPLY_REVIEW);
+				if(procInstId.equals("error")) {
+					renderAjaxResultForError("您没有配置审核人，请联系管理员");
 					return;
 				}
-
-				ActivityApply activityApply = new ActivityApply();
-				String activityApplyId = StringUtils.getUUID();
-				activityApply.setId(activityApplyId);
-				activityApply.setActivityId(activity_ids[i]);
-				activityApply.setSellerCustomerId(sellerCustomerId);
-				activityApply.setBizUserId(user.getId());
-				activityApply.setNum(visit_nums[i]);
-				activityApply.setContent(content);
-
-				if (startProc != null && startProc) {
-					activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_WAIT);
-					activityApply.setProcInstId(Consts.PROC_ACTIVITY_APPLY_REVIEW);
-					String procInstId = this.start(activityApplyId, sellerCustomerNameArray[i], Consts.PROC_ACTIVITY_APPLY_REVIEW);
-					if(procInstId.equals("error")) {
-						renderAjaxResultForError("您没有配置审核人，请联系管理员");
-						return;
-					}
-					activityApply.setProcInstId(procInstId);
-				}else {
-					activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_PASS);
-				}
-
-				activityApply.setDataArea(user.getDataArea());
-				activityApply.setCreateDate(createDate);
-				activityApply.save();
+				activityApply.setProcInstId(procInstId);
+			}else {
+				activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_PASS);
 			}
+			
+			activityApply.setDataArea(user.getDataArea());
+			activityApply.setCreateDate(createDate);
+			activityApply.save();
 		}
 		renderAjaxResultForSuccess("申请成功");
 	}
@@ -260,18 +259,19 @@ public class ActivityController extends BaseFrontController {
 		return procInstId;
 	}
 
-	private String check(String activityId, String sellerCustomerId, String customerName,String userId) {
+	private String check(String activityId, String sellerCustomerId,String userId) {
 		Activity activity = ActivityQuery.me().findById(activityId);
-		List<ActivityApply> activityApplies = ActivityApplyQuery.me().findByUserIdAndActivityId(activityId, userId);
+//		List<ActivityApply> activityApplies = ActivityApplyQuery.me().findByUserIdAndActivityId(activityId, userId);
 		if(activity.getStartTime().after(new Date())) {
 			return "活动还没有开始";
 		}
-		if (activityApplies.size() >= activity.getTotalCustomerNum()) {
+		/*if (activityApplies.size() >= activity.getTotalCustomerNum()) {
 			return "活动参与的人数已经达到上限";
-		}
-		List<ActivityApply> applys = ActivityApplyQuery.me().findSellerCustomerIdAndActivityIdAndUserId(sellerCustomerId,activityId,userId);
+		}*/
+		Customer customer = CustomerQuery.me().findSellerCustomerId(sellerCustomerId);
+		List<ActivityApply> applys = ActivityApplyQuery.me().findSellerCustomerIdAndActivityId(sellerCustomerId,activityId);
 		if (applys.size() >= activity.getJoinNum()) {
-			return "该客户参与该活动的次数已经达到上限";
+			return "客户 "+customer.getCustomerName()+" 参与该活动的次数已经达到上限";
 		}
 		/*int interval = this.getStartDate(activity.getTimeInterval());
 		DateTime dateTime = new DateTime(new Date());
@@ -408,7 +408,7 @@ public class ActivityController extends BaseFrontController {
 		String investType = "";
 		for(int i=0;i<investTypes.length;i++){
 			if(investTypes[i].equals(Consts.INVES_PUBLICK)){
-				investType +="公关赞助";
+				investType +="公关赞助、";
 			}else if (investTypes[i].equals(Consts.INVEST_MATTER)){
 				investType +="宣传物料、";
 			}else if (investTypes[i].equals(Consts.INVEST_SHOP)){
