@@ -45,6 +45,7 @@ $(function() {
 				$.each(productList, function(index, el) {
 					$product.append("<div class='weui-panel weui-panel_access goods-detail common'>" + newHtml + "</div>");
 					var $newProductDetail = $product.find(".common:last");
+					$newProductDetail.find("#index").val(0);
 					$newProductDetail.find("#productName").text(el.custom_name);
 					$newProductDetail.find("#valueName").text(el.valueName);
 
@@ -209,7 +210,8 @@ $(function() {
 								客户类型
 								<span class="require">*</span>
 							</div>
-							<input type="text" placeholder="请选择客户类型" class="weui-input" id="customerType" name="customerType" value="${customerType!}" readonly>
+							<input type="hidden" id="customerType" name="customerType" value="${customerTypeId!}">
+							<input type="text" placeholder="请选择客户类型" class="weui-input" id="customerTypeName" name="customerTypeName" value="${customerTypeName!}" readonly>
 						</div>
 					</div>
 					<div class="weui-cell weui-cell_access">
@@ -229,6 +231,16 @@ $(function() {
 							</div>
 							<input type="hidden" id="address" name="address" value="${customerInfo.address!}">
 							<input type="text" placeholder="请输入详细地址" class="weui-input" id="deliveryAddress" name="deliveryAddress" value="${customerInfo.address!}" readonly>
+						</div>
+					</div>
+					<div class="weui-cell weui-cell_access">
+						<div class="weui-cell__bd select-area">
+							<div class="order-customer-info-title">
+								业务员
+								<span class="require">*</span>
+							</div>
+							<input type="hidden" id="user" name="user" value="${userId!}">
+							<input type="text" placeholder="请选择客户类型" class="weui-input" id="userList" name="userList" value="${userName!}" readonly>
 						</div>
 					</div>
 				</section>
@@ -261,6 +273,7 @@ $(function() {
 				<div class="weui-cells__title black">商品明细</div>
 				<div id="productList">
 					<div class="weui-panel weui-panel_access goods-detail common" style="display: none">
+						<input type="hidden" name="index" id="index" value="">
 						<input type="hidden" name="sellProductId" id="sellProductId" value="">
 						<input type="hidden" name="sellerId" id="sellerId" value="">
 						<input type="hidden" name="productId" id="productId" value="">
