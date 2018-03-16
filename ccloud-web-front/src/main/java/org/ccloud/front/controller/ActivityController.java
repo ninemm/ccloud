@@ -191,7 +191,7 @@ public class ActivityController extends BaseFrontController {
 		for (String sellerCustomerId : sellerCustomerIdArray) {
 			//活动申请check
 			String result = this.check(activity_id, sellerCustomerId,user.getId());
-			
+			Customer customer = CustomerQuery.me().findSellerCustomerId(sellerCustomerId);
 			if(StrKit.notBlank(result)) {
 				renderAjaxResultForError(result);
 				return;
@@ -208,7 +208,7 @@ public class ActivityController extends BaseFrontController {
 			if (startProc != null && startProc) {
 				activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_WAIT);
 				activityApply.setProcInstId(Consts.PROC_ACTIVITY_APPLY_REVIEW);
-				String procInstId = this.start(activityApplyId, sellerCustomerId, Consts.PROC_ACTIVITY_APPLY_REVIEW);
+				String procInstId = this.start(activityApplyId, customer.getCustomerName(), Consts.PROC_ACTIVITY_APPLY_REVIEW);
 				if(procInstId.equals("error")) {
 					renderAjaxResultForError("您没有配置审核人，请联系管理员");
 					return;
