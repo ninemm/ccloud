@@ -15,9 +15,7 @@
  */
 package org.ccloud.controller.admin;
 
-import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -39,16 +37,17 @@ import org.ccloud.utils.XmlUtils;
 import org.ccloud.model.Activity;
 import org.ccloud.model.ActivityApply;
 import org.ccloud.model.ActivityExecute;
+import org.ccloud.model.CustomerVisit;
 import org.ccloud.model.Dict;
 import org.ccloud.model.ExpenseDetail;
 import org.ccloud.model.QyExpense;
 import org.ccloud.model.QyExpensedetail;
 import org.ccloud.model.User;
-import org.ccloud.model.YxActivityshopadinfo;
 import org.ccloud.model.query.ActivityApplyQuery;
 import org.ccloud.model.query.ActivityExecuteQuery;
 import org.ccloud.model.query.ActivityQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
+import org.ccloud.model.query.CustomerVisitQuery;
 import org.ccloud.model.query.DictQuery;
 import org.ccloud.model.query.ExpenseDetailQuery;
 import org.ccloud.model.query.OptionQuery;
@@ -601,6 +600,65 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		}
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
+	}
+	
+	//活动的所有拜访详情
+	public void visitAllDetails() {
+		String id = getPara("id");
+		setAttr("id", id);
+		render("visitAllDetails.html");
+	}
+	
+	//活动的所有拜访详情
+	public void visitAllDetailsList() {
+		String activityId = getPara("id");
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String keyword = getPara("k");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+			setAttr("k", keyword);
+		}
+		Page<Record> page = ActivityQuery.me().visitAllDetailsPaginate(getPageNumber(), getPageSize(), keyword,startDate, endDate,activityId);
+		for(int i = 0; i <page.getList().size();i++){
+			if(StrKit.notBlank(page.getList().get(i).getStr("photo"))) {
+				List<ImageJson> list = Lists.newArrayList();
+				JSONArray picList = JSON.parseArray(page.getList().get(i).getStr("photo"));
+				for (int  a= 0; a <picList.size(); a++) {
+					JSONObject obj = picList.getJSONObject(a);
+					String domain = OptionQuery.me().findValue("cdn_domain");
+					String savePath = obj.getString("savePath");
+					String originalPath = obj.getString("originalPath");
+					ImageJson image = new ImageJson();
+					image.setOriginalPath(domain + "/" +originalPath);
+					image.setSavePath(domain + "/" +savePath);
+					list.add(image);
+				}
+				page.getList().get(i).set("photo", list);
+			}
+		}
+		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
+		renderJson(map);
+	}
+	
+	//相册js
+	public void img() {
+		String customerVisitId = getPara(0);
+		CustomerVisit CustomerVisit = CustomerVisitQuery.me().findById(customerVisitId);
+		List<ImageJson> list = Lists.newArrayList();
+		JSONArray picList = JSON.parseArray(CustomerVisit.getPhoto());
+		for (int  a= 0; a <picList.size(); a++) {
+			JSONObject obj = picList.getJSONObject(a);
+			String domain = OptionQuery.me().findValue("cdn_domain");
+			String savePath = obj.getString("savePath");
+			String originalPath = obj.getString("originalPath");
+			ImageJson image = new ImageJson();
+			image.setOriginalPath(domain + "/" +originalPath);
+			image.setSavePath(domain + "/" +savePath);
+			list.add(image);
+		}
+		setAttr("list", list);
+		render("img.html");
 	}
 	
 	//加入核销

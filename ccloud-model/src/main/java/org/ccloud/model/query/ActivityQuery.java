@@ -223,7 +223,7 @@ public class ActivityQuery extends JBaseQuery {
 
 	public Page<Record> visitDetailsPaginate(int pageNumber, int pageSize, String keyword, String startDate,
 			String endDate, String activityApplyId) {
-		String select = "SELECT u.realname,ca.proc_code,(SELECT d.`name` FROM dict d WHERE d.`key` = ca.invest_type AND d.type = '"+Consts.INVEST_TYPE+"') investType,cc.customer_name,CONCAT(cc.prov_name,cc.city_name,cc.country_name,cc.address) address";
+		String select = "SELECT ccv.id customerVisitId,u.realname,ca.proc_code,(SELECT d.`name` FROM dict d WHERE d.`key` = ca.invest_type AND d.type = '"+Consts.INVEST_TYPE+"') investType,cc.customer_name,CONCAT(cc.prov_name,cc.city_name,cc.country_name,cc.address) address";
 		select = select+",caa.create_date putDate ,ccv.photo,( SELECT group_concat(cct.`name`) FROM cc_customer_type cct WHERE LOCATE(cct.id , csc.customer_type_ids) > 0 GROUP BY csc.customer_type_ids) customer_type";
 		StringBuilder fromBuilder = new StringBuilder(" FROM cc_customer_visit ccv ");
 		fromBuilder.append(" LEFT JOIN cc_activity_apply caa ON caa.id=ccv.active_apply_id ");
@@ -288,6 +288,34 @@ public class ActivityQuery extends JBaseQuery {
 		fromBuilder.append(" where a.seller_customer_id ='"+customerId+"' and a.`status` = '"+Consts.ACTIVITY_APPLY_STATUS_PASS+"'");
 		fromBuilder.append(" GROUP BY a.id");
 		return Db.find(fromBuilder.toString());
+	}
+
+	public Page<Record> visitAllDetailsPaginate(int pageNumber, int pageSize, String keyword, String startDate,
+			String endDate, String activityId) {
+		String select = "SELECT ccv.id customerVisitId,u.realname,ca.proc_code,(SELECT d.`name` FROM dict d WHERE d.`key` = ca.invest_type AND d.type = '"+Consts.INVEST_TYPE+"') investType,cc.customer_name,CONCAT(cc.prov_name,cc.city_name,cc.country_name,cc.address) address";
+		select = select+",caa.create_date putDate ,ccv.photo,( SELECT group_concat(cct.`name`) FROM cc_customer_type cct WHERE LOCATE(cct.id , csc.customer_type_ids) > 0 GROUP BY csc.customer_type_ids) customer_type";
+		StringBuilder fromBuilder = new StringBuilder(" FROM cc_customer_visit ccv ");
+		fromBuilder.append(" LEFT JOIN cc_activity_apply caa ON caa.id=ccv.active_apply_id ");
+		fromBuilder.append(" LEFT JOIN cc_activity ca ON ca.id=caa.activity_id ");
+		fromBuilder.append(" LEFT JOIN cc_seller_customer csc ON csc.id=ccv.seller_customer_id");
+		fromBuilder.append(" LEFT JOIN cc_customer cc ON cc.id=csc.customer_id");
+		fromBuilder.append(" LEFT JOIN `user` u ON u.id=ccv.user_id");
+		fromBuilder.append(" WHERE ca.id='"+activityId+"'");
+		if (StrKit.notBlank(keyword)) {
+			fromBuilder.append(" and (cc.customer_name like '%"+keyword+"%' or u.realname like '%"+keyword+"%')");
+		}
+		LinkedList<Object> params = new LinkedList<Object>();
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and ccv.create_date >= ?");
+			params.add(startDate+" 00:00:00");
+		}
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and ccv.create_date <= ?");
+			params.add(endDate + "23:59:59");
+		}
+		if (params.isEmpty())
+			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+        return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
 }

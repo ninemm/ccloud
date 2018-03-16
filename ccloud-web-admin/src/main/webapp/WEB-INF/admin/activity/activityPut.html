@@ -75,6 +75,11 @@
 				},
       			edit:false},
       			{field: "executeNum", title: "执行数量", align: "center", width: '5%', 
+      			formatter: function(value, row, rowIndex) {
+					var url1 = '${CPATH}/admin/activity/visitAllDetails?id=' + row.id;
+					var strHtml = '<a href="' + url1 + '">'+row.executeNum+'</a>';
+					return strHtml;
+				},
       			edit:false},
       			{field: "start_time1", title: "开始时间", align: "center", width: '10%', edit:false},
       			{field: "end_time1", title: "结束时间", align: "center", width: '10%', edit:false},
