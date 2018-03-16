@@ -135,7 +135,7 @@ public class CustomerController extends BaseFrontController {
 
 			if (StrKit.notBlank(customer.getStr("member_id"))) {
 				html.append("				<a onClick=\"memberOrderStop('" + customer.getStr("member_id") + "')\" class=\"weui-flex__item\">\n");
-				html.append("					<p><i class=\"icon-ben red\"></i></p>\n");
+				html.append("					<p><i class=\"icon-cart-arrow-down red\"></i></p>\n");
 				html.append("					<p>会员</p>\n");
 				html.append("				</a>\n");
 			}
