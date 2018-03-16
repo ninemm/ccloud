@@ -27,7 +27,7 @@
 <#macro script>
 
 	var $table = $("#_activityVisitDetails_table");
-	var url = '${CPATH}/admin/activity/visitDetailsList';
+	var url = '${CPATH}/admin/activity/visitAllDetailsList';
 	var $form = $("#form");
 	$(function() {
 		jQuery.mm.initDatetimepicker('form', '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
@@ -47,12 +47,12 @@
 	var initParams = function(params) {
 
 		var keyword = $('#post-search-input').val();
-		var activityApplyId = '${activityApplyId}';
+		var id = '${id}';
 		if (keyword) keyword = encodeURIComponent(keyword);
 		var param = {
 			size: params.limit,
 			page: params.offset/params.limit + 1,
-			activityApplyId: activityApplyId,
+			id: id,
 			k: keyword,
 			startDate: $('#startDate').val(),
 			endDate: $('#endDate').val()
