@@ -213,10 +213,12 @@
 													联系人：<span>${(activityApply.ccontact)!} / ${(activityApply.cmobile)!}</span>
 													<span class="fr">${(activityApply.customerTypeNames)!}</span>
 												</p>
-												<p>
-													投入金额：￥<span>${(activityApply.invest_amount)!}</span>
-													<span class="fr" id="date">时间：${(activityApply.create_date)!}</span>
-												</p>
+													<p>
+												<#if activityApply.invest_amount??>
+														投入金额：￥<span>${(activityApply.invest_amount)!}</span>
+												</#if>
+														<span class="fr" id="date">时间：${(activityApply.create_date)!}</span>
+													</p>
 											</div>
 										</div>
 									</a>
