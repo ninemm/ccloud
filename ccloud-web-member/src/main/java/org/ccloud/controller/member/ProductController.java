@@ -17,7 +17,6 @@ import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Before;
 import com.jfinal.plugin.activerecord.Record;
-import org.apache.commons.lang.time.DateFormatUtils;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.Member;
@@ -86,10 +85,6 @@ public class ProductController extends BaseFrontController {
 
 	@Before(WechatJSSDKInterceptor.class)
 	public void order() {
-		Member member = getSessionAttr(Consts.SESSION_LOGINED_MEMBER);
-
-		setAttr("customerInfo", JSON.toJSONString(CustomerQuery.me().findById(member.getCustomerId())));
-		setAttr("deliveryDate", DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
 
 		render("member_order.html");
 	}

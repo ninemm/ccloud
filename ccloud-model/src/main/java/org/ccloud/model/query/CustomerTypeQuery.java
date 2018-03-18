@@ -155,23 +155,16 @@ public class CustomerTypeQuery extends JBaseQuery {
 		return DAO.findFirst(sql, code);
 	}
 
-	public List<Record> findByMember(String customerId, List<String> sellerId) {
+	public List<Record> findByMember(String customerId, String sellerId) {
 		LinkedList<Object> params = new LinkedList<Object>();
 
 		StringBuilder sql = new StringBuilder( "SELECT cct.id AS id , cct. name AS name ");
 		sql.append("FROM cc_seller_customer csc ");
 		sql.append("LEFT JOIN cc_customer_join_customer_type ccjct ON csc.id = ccjct.seller_customer_id ");
 		sql.append("LEFT JOIN cc_customer_type cct ON ccjct.customer_type_id = cct.id ");
-		sql.append("WHERE csc.seller_id IN( ? ");
+		sql.append("WHERE csc.seller_id = ? AND csc.customer_id = ? ");
 
-		for(int i = 1; i < sellerId.size(); i++)
-			sql.append(", ? ");
-		sql.append(") " );
-
-		params.addAll(sellerId);
-
-		sql.append("AND csc.customer_id = ? ");
-
+		params.add(sellerId);
 		params.add(customerId);
 
 		return Db.find(sql.toString(), params.toArray());

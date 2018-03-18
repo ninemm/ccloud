@@ -111,6 +111,13 @@ public class MemberJoinSellerQuery extends JBaseQuery {
 		return DAO.findFirst(sql, memberId, sellerId);
 	}
 
+	public List<Record> findUsers(String memberId, String sellerId) {
+		String sql = "SELECT u.id, u.realname FROM cc_member_join_seller cmjs " +
+				"LEFT JOIN user u ON cmjs.user_id = u.id " +
+				"WHERE cmjs.member_id = ? AND cmjs.seller_id = ? ";
+		return Db.find(sql, memberId, sellerId);
+	}
+
 	public MemberJoinSeller checkExists(String memberId, String sellerId, String userId) {
 		String sql = "SELECT * FROM cc_member_join_seller WHERE member_id = ? AND seller_id = ? AND user_id = ? ";
 		return DAO.findFirst(sql, memberId, sellerId, userId);

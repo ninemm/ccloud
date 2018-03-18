@@ -34,33 +34,74 @@ import java.util.*;
 @RouterMapping(url = "/member/order")
 public class OrderController extends BaseFrontController {
 
-	public void getCustomerType() {
+	public void init() {
 		Member member = getSessionAttr(Consts.SESSION_LOGINED_MEMBER);
+
+		List<Map<String, Object>> dataList = new ArrayList<>();
 
 		JSONArray productList = JSON.parseArray(getPara("productList"));
 		List<String> sellerIdList = new ArrayList<>();
+
+		//抽sellerId
 		for (int i = 0; i < productList.size(); i++) {
 			JSONObject obj = productList.getJSONObject(i);
-			String dealerSellerId = getDealerSellerId(obj.getString("sellerId"));
-			if(StrKit.notBlank(dealerSellerId)) sellerIdList.add(dealerSellerId);
+			String sellerId = obj.getString("sellerId");
+			if(!sellerIdList.contains(sellerId)) sellerIdList.add(sellerId);
 		}
 
-		List<Record> customerTypes = CustomerTypeQuery.me().findByMember(member.getCustomerId(), sellerIdList);
+		for(int i = 0; i < sellerIdList.size(); i++)
+		{
+			List<Object> prodList = new ArrayList<>();
+			for(int j = 0 ; j < productList.size(); j++){
+				JSONObject obj = productList.getJSONObject(j);
+				if(obj.getString("sellerId").equals(sellerIdList.get(i))) prodList.add(productList.get(j));
+			}
+			String dealerSellerId = getDealerSellerId(sellerIdList.get(i));
+			List<Record> customerTypes =  CustomerTypeQuery.me().findByMember(member.getCustomerId(), dealerSellerId);
 
-		List<Map<String, Object>> customerTypeList = new ArrayList<>();
+			List<Map<String, Object>> customerTypeList = new ArrayList<>();
 
-		for(int i = 0; i < customerTypes.size(); i++) {
+			for(int k = 0; k < customerTypes.size(); k++) {
 
-			String id = customerTypes.get(i).get("id");
-			String name = customerTypes.get(i).get("name");
+				String id = customerTypes.get(k).get("id");
+				String name = customerTypes.get(k).get("name");
 
-			Map<String, Object> item = new HashMap<>();
-			item.put("title", name);
-			item.put("value", name);
-			customerTypeList.add(item);
+				Map<String, Object> item = new HashMap<>();
+				item.put("title", name);
+				item.put("value", id);
+				customerTypeList.add(item);
+			}
+
+			Map<String, Object> map = new HashMap<>();
+			map.put("productList", prodList);
+			map.put("customerTypeList", customerTypeList);
+
+			Seller seller = SellerQuery.me().findById(sellerIdList.get(i));
+			map.put("seller", seller.getSellerName());
+
+			List<Record> users = MemberJoinSellerQuery.me().findUsers(member.getId(), sellerIdList.get(i));
+			List<Map<String, Object>> userList = new ArrayList<>();
+
+			for(int k = 0; k < users.size(); k++) {
+
+				String id = users.get(k).get("id");
+				String name = users.get(k).get("realname");
+
+				Map<String, Object> item = new HashMap<>();
+				item.put("title", name);
+				item.put("value", id);
+				userList.add(item);
+			}
+
+			map.put("userList", userList);
+			dataList.add(map);
 		}
 
-		renderJson(customerTypeList);
+		Map<String, Object> data = new HashMap<>();
+		data.put("customerInfo", JSON.toJSONString(CustomerQuery.me().findById(member.getCustomerId())));
+		data.put("deliverDate", DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
+		data.put("data", dataList);
+		renderJson(data);
 	}
 
 	public synchronized void salesOrder() {
@@ -73,17 +114,13 @@ public class OrderController extends BaseFrontController {
 
 				//存储通用的数据
 				Map<String, String> moreInfo = new HashMap<>();
-				moreInfo.put("remark", StringUtils.getArrayFirst(paraMap.get("remark")));
 				moreInfo.put("customerId", StringUtils.getArrayFirst(paraMap.get("customerId")));
 				moreInfo.put("customerName", StringUtils.getArrayFirst(paraMap.get("customerName")));
 				moreInfo.put("contact", StringUtils.getArrayFirst(paraMap.get("contact")));
 				moreInfo.put("mobile", StringUtils.getArrayFirst(paraMap.get("mobile")));
 				moreInfo.put("address", StringUtils.getArrayFirst(paraMap.get("address")));
 				moreInfo.put("deliveryAddress", StringUtils.getArrayFirst(paraMap.get("deliveryAddress")));
-				moreInfo.put("receiveType", StringUtils.getArrayFirst(paraMap.get("receiveType")));
-				moreInfo.put("receiveTypeName", StringUtils.getArrayFirst(paraMap.get("receiveTypeName")));
 				moreInfo.put("deliveryDate", StringUtils.getArrayFirst(paraMap.get("deliveryDate")));
-				moreInfo.put("customerType", StringUtils.getArrayFirst(paraMap.get("customerType")));
 				moreInfo.put("lat", StringUtils.getArrayFirst(paraMap.get("lat")));
 				moreInfo.put("lng", StringUtils.getArrayFirst(paraMap.get("lng")));
 				moreInfo.put("location", StringUtils.getArrayFirst(paraMap.get("location")));
@@ -98,17 +135,17 @@ public class OrderController extends BaseFrontController {
 				for (int i = 0; i < sellerIdList.size(); i++) {
 					String sellerId = sellerIdList.get(i);
 					String sellerCode = SellerQuery.me().findById(sellerId).getSellerCode();
-					String userId = MemberJoinSellerQuery.me().findUser(member.getId(), sellerId).getUserId();
-					User user = UserQuery.me().findById(userId);
 
 					List<Map<String, String>> paraList = new ArrayList<>();
 					Double totalNum = 0.00;
 					double total = 0;
 					Integer memberProcNumber = OptionQuery.me().findValueAsInteger(Consts.OPTION_WEB_MEMBER_NUMBER_LIMIT + sellerCode);
+					int index = 0;
 
 					for (int j = 0; j < sellerIds.length; j++) {
 						//根据sellerId筛选产品
 						if (sellerIds[j].equals(sellerId)) {
+							index = Integer.valueOf(paraMap.get("index")[j]);
 							Map<String, String> para = new HashMap<>();
 							para.put("sellProductId", paraMap.get("sellProductId")[j]);
 							para.put("productId", paraMap.get("productId")[j]);
@@ -142,6 +179,18 @@ public class OrderController extends BaseFrontController {
 					moreInfo.put("total", Double.valueOf(total).toString());
 					moreInfo.put("totalNum", Double.valueOf(totalNum).toString());
 
+					moreInfo.remove("receiveType");
+					moreInfo.remove("customerType");
+					moreInfo.remove("userId");
+					moreInfo.remove("remark");
+
+					moreInfo.put("receiveType", paraMap.get("receiveType")[index]);
+					moreInfo.put("customerType", paraMap.get("customerType")[index]);
+					moreInfo.put("userId", paraMap.get("user")[index]);
+					moreInfo.put("remark", paraMap.get("remark")[index]);
+
+					String userId = paraMap.get("user")[index];
+					User user = UserQuery.me().findById(userId);
 					//一个sellerId去生产一个订单
 					String result = saveOrder(paraList, moreInfo, user, sellerId, sellerCode, member.getId());
 
@@ -163,18 +212,16 @@ public class OrderController extends BaseFrontController {
 		Date date = new Date();
 
 		String dealerSellerId = getDealerSellerId(sellerId);
-		String dataArea = DepartmentQuery.me().findBySellerId(dealerSellerId).getDataArea();
 
-		CustomerType customerType = CustomerTypeQuery.me().findByName(moreInfo.get("customerType"), dataArea);
-		if (customerType == null) customerType = CustomerTypeQuery.me().findBySellerCustomer(dealerSellerId, moreInfo.get("customerId"));
+		Record customerType = CustomerTypeQuery.me().findById(moreInfo.get("customerType"));
 
-		String customerTypeProcDefKey = customerType.getProcDefKey();
+		String customerTypeProcDefKey = customerType.getStr("proc_def_key");
 
 		String OrderSO = SalesOrderQuery.me().getNewSn(sellerId);
 		// 销售订单：SO + 100000(机构编号或企业编号6位) + A(客户类型) + 171108(时间) + 100001(流水号)
-		String orderSn = "SO" + sellerCode + customerType.getCode() + DateUtils.format("yyMMdd", date) + OrderSO;
+		String orderSn = "SO" + sellerCode + customerType.getStr("code") + DateUtils.format("yyMMdd", date) + OrderSO;
 
-		String salesOrderId = SalesOrderQuery.me().memberInsert(moreInfo, customerType.getId(), orderId, orderSn, sellerId, user.getId(), date,
+		String salesOrderId = SalesOrderQuery.me().memberInsert(moreInfo, customerType.getStr("id"), orderId, orderSn, sellerId, user.getId(), date,
 				user.getDepartmentId(), user.getDataArea(), dealerSellerId);
 		if(StrKit.isBlank(salesOrderId)) return  "下单失败";
 
@@ -370,7 +417,15 @@ public class OrderController extends BaseFrontController {
 		setAttr("id", orderId);
 		setAttr("order", order);
 		setAttr("customerInfo", CustomerQuery.me().findById(member.getCustomerId()));
-		setAttr("customerType", CustomerTypeQuery.me().findById(order.getStr("customer_type_id")).getStr("name"));
+
+		Record customerType = CustomerTypeQuery.me().findById(order.getStr("customer_type_id"));
+		setAttr("customerTypeId", customerType.getStr("id"));
+		setAttr("customerTypeName", customerType.getStr("name"));
+
+		User user = UserQuery.me().findById(order.getStr("biz_user_id"));
+		setAttr("userId", user.getId());
+		setAttr("userName", user.getRealname());
+
 		render("member_order_again.html");
 	}
 
