@@ -407,6 +407,63 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		return detail.update();
 	}
 
+	public String addForApp(Map<String, String[]> paraMap, String orderId, String sellerId, String sellerCode, String userId, Date date,
+	                           String deptId, String dataArea, int index) {
+		List<SalesOrderDetail> detailList = new ArrayList<>();
+		String sellerProductId = paraMap.get("addSellProductId")[index];
+		String convert = paraMap.get("addConvert")[index];
+		String bigNum = paraMap.get("addBigNum")[index];
+		String smallNum = paraMap.get("addSmallNum")[index];
+		Integer productCount = Integer.valueOf(bigNum) * Integer.valueOf(convert) + Integer.valueOf(smallNum);
+		String productId = paraMap.get("addProductId")[index];
+
+		Map<String, Object> result = this.getWarehouseId(productId, sellerId, sellerCode, productCount, Integer.parseInt(convert), userId, sellerProductId);
+		String status = result.get("status").toString();
+		List<Map<String, String>> list = (List<Map<String, String>>) result.get("countList");
+
+		if (!status.equals("enough")) {
+			return "添加商品失败，库存不足";
+		}
+		for (Map<String, String> map : list) {
+			SalesOrderDetail detail = new SalesOrderDetail();
+			detail.setProductCount(new BigDecimal(map.get("productCount").toString()).intValue());
+			detail.setLeftCount(detail.getProductCount());
+			detail.setOutCount(0);
+			detail.setWarehouseId(map.get("warehouse_id").toString());
+
+			detail.setId(StrKit.getRandomUUID());
+			detail.setOrderId(orderId);
+			detail.setSellProductId(sellerProductId);
+
+			String productPrice = paraMap.get("addBigPrice")[index];
+
+			BigDecimal bigAmount = new BigDecimal(detail.getProductCount()).divide(new BigDecimal(convert), 0 , RoundingMode.DOWN)
+					                       .multiply(new BigDecimal(productPrice));
+			BigDecimal smallPrice = new BigDecimal(productPrice).divide(new BigDecimal(convert), 2, BigDecimal.ROUND_HALF_UP);
+			BigDecimal smallAmount = new BigDecimal(detail.getProductCount()).divideAndRemainder(new BigDecimal(convert))[1].multiply(smallPrice);
+			BigDecimal productAmount = bigAmount.add(smallAmount);
+
+			detail.setProductPrice(new BigDecimal(productPrice));
+			String isGiftStr = paraMap.get("addIsGift")[index];
+			Integer isGift = isGiftStr != null ? Integer.valueOf(isGiftStr) : 0;
+			detail.setProductAmount(isGift == 0 ? productAmount : new BigDecimal(0));
+			detail.setIsGift(isGift);
+			detail.setCreateDate(date);
+			detail.setDeptId(deptId);
+			detail.setDataArea(dataArea);
+			detailList.add(detail);
+		}
+		int[] i = Db.batchSave(detailList, detailList.size());
+		int count = 0;
+		for (int j : i) {
+			count = count + j;
+		}
+		if (count != detailList.size()) {
+			return "下单失败";
+		}
+		return "";
+	}
+
 
 	public SalesOrderDetail findById(final String id) {
 		return DAO.findById(id);
