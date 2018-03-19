@@ -313,6 +313,7 @@ public class ActivityQuery extends JBaseQuery {
 			fromBuilder.append(" and ccv.create_date <= ?");
 			params.add(endDate + "23:59:59");
 		}
+		fromBuilder.append(" ORDER BY putDate DESC");
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
         return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
