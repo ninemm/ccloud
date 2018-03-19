@@ -133,9 +133,14 @@ public class CustomerController extends BaseFrontController {
 			html.append("		<div class=\"weui-flex__item customer-href\">\n");
 			html.append("			<div class=\"weui-flex\">\n");
 
-			if (StrKit.notBlank(customer.getStr("member_id"))) {
-				html.append("				<a onClick=\"memberOrderStop('" + customer.getStr("member_id") + "')\" class=\"weui-flex__item\">\n");
+			if (StrKit.notBlank(customer.getStr("member_id")) && customer.getInt("memberOrderStatus") == 1) {
+				html.append("				<a onClick=\"memberOrderClose('" + customer.getStr("member_id") + "', '" + customer.getStr("customer_name") + "')\" class=\"weui-flex__item\">\n");
 				html.append("					<p><i class=\"icon-cart-arrow-down red\"></i></p>\n");
+				html.append("					<p>会员</p>\n");
+				html.append("				</a>\n");
+			}else if (StrKit.notBlank(customer.getStr("member_id")) && customer.getInt("memberOrderStatus") == 0) {
+				html.append("				<a onClick=\"memberOrderOpen('" + customer.getStr("member_id") + "', '" + customer.getStr("customer_name") + "')\" class=\"weui-flex__item\">\n");
+				html.append("					<p><i class=\"icon-cart-arrow-down gray\"></i></p>\n");
 				html.append("					<p>会员</p>\n");
 				html.append("				</a>\n");
 			}
@@ -1200,7 +1205,7 @@ public class CustomerController extends BaseFrontController {
 
 	}
 
-	public void stopMemberOrder() {
+	public void memberOrderClose() {
 		String member_id = getPara("member_id");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String dealerArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
@@ -1208,9 +1213,29 @@ public class CustomerController extends BaseFrontController {
 
 		MemberJoinSeller memberJoinSeller = MemberJoinSellerQuery.me().checkExists(member_id, seller.getId(), user.getId());
 
-		memberJoinSeller.delete();
+		Date date = new Date();
+		memberJoinSeller.setStatus(0);
+		memberJoinSeller.setUnableDate(date);
+		memberJoinSeller.setModifyDate(date);
+		memberJoinSeller.update();
 
-		renderAjaxResultForSuccess("停用终端下单");
+		renderAjaxResultForSuccess("停用终端下单成功");
+	}
+
+	public void memberOrderOpen() {
+		String member_id = getPara("member_id");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String dealerArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		Seller seller = SellerQuery.me()._findByDataArea(dealerArea);
+
+		MemberJoinSeller memberJoinSeller = MemberJoinSellerQuery.me().checkExists(member_id, seller.getId(), user.getId());
+
+		Date date = new Date();
+		memberJoinSeller.setStatus(1);
+		memberJoinSeller.setModifyDate(date);
+		memberJoinSeller.update();
+
+		renderAjaxResultForSuccess("启用终端下单成功");
 	}
 
 
