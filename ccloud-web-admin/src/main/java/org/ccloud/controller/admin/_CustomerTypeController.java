@@ -158,4 +158,17 @@ public class _CustomerTypeController extends JBaseCRUDController<CustomerType> {
         renderJson(priceSystemList);
 
     }
+    
+    public void checkCode() {
+    	String code = getPara("code");
+    	String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+    	List<CustomerType> customerTypes = CustomerTypeQuery.me().findByDataArea(dealerDataArea);
+    	for(CustomerType customerType : customerTypes) {
+    		if(code.equals(customerType.getCode())) {
+    			renderAjaxResultForError("客户类型编码重复！");
+    			return;
+    		}
+    	}
+    	renderJson(true);
+    }
 }

@@ -130,15 +130,17 @@ public class _AdminController extends JBaseController {
 		
 		String mobile = user.getMobile();
 		//将手机号作为键和值存到cookie 第一次登录没有修改密码 弹框提示
+		String changePassword="false";
 		String change=CookieUtils.get(this, user.getMobile());
 		if (!mobile.equals(change)) {
 			//判断登录用户是不是使用的初始密码
 			if (user.getPassword().equals(EncryptUtils.encryptPassword(Consts.USER_DEFAULT_PASSWORD, user.getSalt()))) {
 				CookieUtils.put(this, mobile,mobile);
-				setAttr("changePassword",true);
+				changePassword="true";
+				setAttr("changePassword",changePassword);
 			}
 		}else {
-			setAttr("changePassword",false);
+			setAttr("changePassword",changePassword);
 		}
 		
 		render("index.html");

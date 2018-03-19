@@ -16,7 +16,7 @@
 <#macro script>
 
 	var $form = $("#form");
-
+	var flang = true;
 	$(function() {
 		jQuery.mm.initValidator('#form', validatorFields)
 
@@ -32,7 +32,8 @@
 		'customerType.code': {
 			validators: {
 				notEmpty: { message: '类型编码不能为空' },
-				stringLength: { max: 15, message: '类型名称最大长度是15字符，请重新输入' }
+				stringLength: { max: 1, message: '类型名称最大长度是1字符，请重新输入' },
+				regexp:{regexp:/^[A-Z]+$/,message:'类型编码为大写字母'}
 			}
 		},
 		'parent_name': {
@@ -66,6 +67,10 @@
 	}
 
 	function doSubmit(){
+		if(flang == false){
+			toastr.error('编码不可重复');
+			return;
+		}
 		var l = Ladda.create( document.querySelector( '#do_submit' ) );
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
@@ -94,6 +99,30 @@
 				alert("信息提交错误");
 			}
 		});
+	}
+	
+	function checkCode(el){
+		var code = $(el).val();
+		var checkCode = $("#code").val();
+		if(code!=checkCode){
+			$.ajax({
+				url:"${CPATH}/admin/customerType/checkCode",
+				type:"post",
+				dataType:"json",
+				data:{"code":code},
+				success:function(data)
+				{
+					if(data!=true){
+						toastr.error(data.message,'操作失败');
+						flang = false;
+					}else{
+						flang = true;
+					}
+				}
+			});
+		}else{
+			flang = true;
+		}
 	}
 </#macro>
 
@@ -131,7 +160,8 @@
 				<div class="form-group col-sm-12 validata-box">
 					<label class="control-label col-sm-2">*编码:</label>
 					<div class="input-group col-md-4 col-sm-10">
-						<input class="form-control input-sm" type="text" name="customerType.code" value="${(customerType.code)!}" placeholder="1-15个任意字符">
+						<input class="form-control input-sm" type="text" name="customerType.code" onblur = "checkCode(this)" value="${(customerType.code)!}" placeholder="1-15个任意字符">
+						<input class="form-control input-sm" type="hidden" name="code" id = "code" value="${(customerType.code)!}">
 					</div>
 				</div>
 				
