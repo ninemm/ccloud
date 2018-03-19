@@ -87,14 +87,18 @@
 			[
       			{field: "id", title: "ID", align: "center", visible:false, edit:false},
       			{field: "biz_bill_sn", title: "业务单号", align: "center", width: '7%',sortable: true,
+      			<@shiro.lacksRole name="021"> 
       			formatter: function(value, row, rowIndex) {
 	      				var strHtml = '<a href="#" name="order_sn" onclick="orderInfo(\''+row.biz_bill_sn+'\')">'+row.biz_bill_sn+'</a>';
 						return strHtml;
 					},
+      			</@shiro.lacksRole>	
       			edit:false},
       			{field: "cc_warehouse", title: "仓库", align: "center", width: '8%',sortable: true, edit:false},
       			{field: "sellerName", title: "产品名", align: "center", width: '10%', edit:false},
       			{field: "out_count", title: "出库数量", align: "center", width: '5%',sortable: true, edit:false},
+      			
+      			<@shiro.lacksRole name="021"> 
       			{field: "out_amount", title: "出库金额", align: "center", width: '5%',
       				formatter: function(value,row,rowIndex){
 					if(value==null) return "";
@@ -107,6 +111,8 @@
 					else return formatNumber(value);
 					},
       			sortable: true, edit:false},
+      			</@shiro.lacksRole>	
+      			
       			{field: "balance_count", title: "库存", align: "center", width: '5%',sortable: true,	edit:false},
       					
       			{field: "biz_type", title: "出库类型", align: "center", width: '3%', sortable: true,
