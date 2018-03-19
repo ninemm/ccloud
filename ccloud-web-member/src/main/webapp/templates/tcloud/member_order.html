@@ -45,7 +45,14 @@
 
 <#macro script>
 $(function() {
+
+	layer.open({
+		type: 2,
+		content: '加载中...'
+	});
+
 	Utils.ajax('${CPATH}/member/order/init', {"productList" : JSON.stringify(getItemBykey("productList"))}, function(data){
+		layer.closeAll();
 		initCustomer(data.customerInfo);
 		$("#deliveryDate").val(data.deliverDate);
 		$("#detail").empty();
