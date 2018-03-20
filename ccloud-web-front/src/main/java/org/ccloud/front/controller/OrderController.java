@@ -265,8 +265,7 @@ public class OrderController extends BaseFrontController {
 		boolean isSave = Db.tx(new IAtom() {
 			@Override
 			public boolean run() throws SQLException {
-				StringBuilder stringBuilder = new StringBuilder();
-				String QRcontent="";
+				
 				String orderId = StrKit.getRandomUUID();
 				Date date = new Date();
 				String OrderSO = SalesOrderQuery.me().getNewSn(sellerId);
@@ -279,24 +278,15 @@ public class OrderController extends BaseFrontController {
 					result[0] = "下单失败";
 					return false;
 				}
-
-				String orcodeFileName = orderSn + ".png";
-				String childFileName = DateUtils.dateString();
-				String imagePath = getRequest().getSession().getServletContext().getRealPath("/");
-				String newStr = imagePath.substring(0, imagePath.length()-6) + "admin/" + Consts.ORDER_QRCODE_PATH + childFileName ;
-
-				String orcodeImgUrl = Consts.ORDER_QRCODE_PATH + childFileName +"/" +  orcodeFileName;
+				
 				String[] sellProductIds = paraMap.get("sellProductId");
 				// 常规商品
 				if (sellProductIds != null && sellProductIds.length > 0) {
 					
-					stringBuilder.append(StringUtils.getArrayFirst(paraMap.get("customerId"))).append("||" + orderSn).append("||" + StringUtils.getArrayFirst(paraMap.get("contact")) + "||");					
 					for (int index = 0; index < sellProductIds.length; index++) {
 						if (StrKit.notBlank(sellProductIds[index])) {
 							String message = SalesOrderDetailQuery.me().insertForApp(paraMap, orderId, sellerId, sellerCode, user.getId(), date,
 									user.getDepartmentId(), user.getDataArea(), index);
-							stringBuilder.append(message);
-							message="";
 							if (StrKit.notBlank(message)) {
 								result[0] = message;
 								return false;
@@ -307,16 +297,6 @@ public class OrderController extends BaseFrontController {
 					}
 				}
 				
-				QRcontent = stringBuilder.toString().substring(0, stringBuilder.length() -1);
-				if (Consts.QRDEALERCODE.contains(sellerCode)) {
-					org.ccloud.utils.QRCodeUtils.genQRCode(QRcontent, newStr, orcodeFileName);
-	           		int i = SalesOrderQuery.me().updateQrcodeImgUrl(orcodeImgUrl, orderId, date);
-	           		if (i < 0) {
-						return false;
-					}
-				}
-           		
-                
 				String[] giftSellProductIds = paraMap.get("giftSellProductId");
 				// 赠品
 				if (giftSellProductIds != null && giftSellProductIds.length > 0) {
@@ -482,6 +462,7 @@ public class OrderController extends BaseFrontController {
 			message.update();
 		}
 
+		
 		renderAjaxResultForSuccess("订单审核成功");
 	}
 

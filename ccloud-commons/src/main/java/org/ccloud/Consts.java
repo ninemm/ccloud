@@ -41,7 +41,7 @@ public class Consts {
 	public static final String WORKFLOW_APPLY_SELLER_ID = "sellerId";
 	public static final String WORKFLOW_APPLY_SELLER_CODE = "sellerCode";
     public static final List<String> QRDEALERCODE = new ArrayList<>(Arrays.asList("02701015"));
-	
+
 	public static final String CHARTSET_UTF8 = "UTF-8";
 
 	public static final String INDEX_URL = "/";

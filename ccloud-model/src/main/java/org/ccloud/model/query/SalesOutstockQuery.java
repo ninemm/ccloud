@@ -21,12 +21,17 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.ccloud.Consts;
+import org.ccloud.model.Product;
 import org.ccloud.model.SalesOutstock;
+import org.ccloud.model.SellerProduct;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.model.vo.carSalesPrintNeedInfo;
 import org.ccloud.model.vo.printAllNeedInfo;
 import org.ccloud.utils.StringUtils;
+
+import com.jfinal.kit.PathKit;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.IAtom;
@@ -132,6 +137,9 @@ public class SalesOutstockQuery extends JBaseQuery {
 					}
 					i++;
 				}
+				
+				//生成出库单时候生成二维码
+				generateQrcode(orderId,order,orderDetailList, sellerCode);
 
 				SalesOrderQuery.me().updateConfirm(orderId, Consts.SALES_ORDER_AUDIT_STATUS_PASS, userId, date);// 已审核通过
 
@@ -597,4 +605,45 @@ public class SalesOutstockQuery extends JBaseQuery {
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}
 
+	protected boolean generateQrcode(final String orderId,final Record order,final List<Record> orderDetailList, final String sellerCode) {
+        boolean isSave =  Db.tx(new IAtom() {
+			
+			@Override
+			public boolean run() throws SQLException {
+				StringBuilder stringBuilder = new StringBuilder();
+				String QRcontent="";
+				String orderSn = order.getStr("order_sn");
+				String orcodeFileName = orderSn + ".png";
+				String childFileName = DateUtils.dateString();
+				PathKit.getWebRootPath();
+				String imagePath = PathKit.getWebRootPath() + "/";
+				String newStr = imagePath.substring(0, imagePath.length()-6) + "admin/" + Consts.ORDER_QRCODE_PATH + childFileName ;
+
+				String orcodeImgUrl = Consts.ORDER_QRCODE_PATH + childFileName +"/" +  orcodeFileName;
+				stringBuilder.append(order.getStr("customer_id")).append("||" + orderSn).append("||" + order.getStr("contact") + "||");					
+
+				
+               for (Record orderDetail : orderDetailList) {
+               	SellerProduct sellerProduct = SellerProductQuery.me().findById(orderDetail.getStr("sell_product_id"));
+               	Product product = ProductQuery.me().findById(sellerProduct.getProductId());
+               	BigDecimal[] bigCount = orderDetail.getBigDecimal("product_amount").divideAndRemainder(orderDetail.getBigDecimal("product_price"));
+       	     	stringBuilder.append("(" +product.getProductSn() + "," + bigCount[0] +")" + "|");
+				}
+               QRcontent = stringBuilder.toString().substring(0, stringBuilder.length() -1);
+				Date date = new Date();
+				if (Consts.QRDEALERCODE.contains(sellerCode)) {
+					org.ccloud.utils.QRCodeUtils.genQRCode(QRcontent, newStr, orcodeFileName);
+	           		int i = SalesOrderQuery.me().updateQrcodeImgUrl(orcodeImgUrl, orderId, date);
+	           		if (i < 0) {
+						return false;
+					}
+				}
+				
+				return true;
+			}
+		});
+		return isSave;  
+		
+	}
+	
 }
