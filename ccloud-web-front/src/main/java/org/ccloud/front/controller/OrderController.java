@@ -78,12 +78,13 @@ public class OrderController extends BaseFrontController {
 		List<SalesOrder> orders = SalesOrderQuery.me()._findByDataArea(selectDataArea);
 		for (SalesOrder order : orders) {
 			Map<String, Object> items = new HashMap<>();
-			items.put("title", order.getBizUserId());
-			items.put("value", order.getStr("realname"));
+			items.put("title", order.getStr("realname"));
+			items.put("value", order.getBizUserId());
 			bizUsers.add(items);
 		}
 		String history = getPara("history");
 		setAttr("history", history);
+		setAttr("bizUsers",JSON.toJSON(bizUsers));
 		setAttr("customerTypes", JSON.toJSON(customerTypes));
 		render("myOrder.html");
 	}
@@ -99,9 +100,10 @@ public class OrderController extends BaseFrontController {
 		String customerTypeId = getPara("customerTypeId");
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
+		String bizUserId = getPara("bizUserId");
 
 		Page<Record> orderList = SalesOrderQuery.me().paginateForApp(getPageNumber(), getPageSize(), keyword, status,
-				customerTypeId, startDate, endDate, sellerId, selectDataArea);
+				customerTypeId, startDate, endDate, sellerId, selectDataArea,bizUserId);
 		Record record = SalesOrderQuery.me()
 				.getOrderListCount(keyword, status, customerTypeId, startDate, endDate, sellerId, selectDataArea);
 

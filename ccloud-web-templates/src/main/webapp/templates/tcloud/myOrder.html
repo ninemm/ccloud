@@ -26,10 +26,12 @@
   		<#if history??>
   			var statusName = getItemBykey("statusName");
   			var customerTypeName = getItemBykey("customerTypeName");
+  			var bizUserName = getItemBykey("bizUserName");
   			var dayName = getItemBykey("dayName");
   			var keywordName = getItemBykey("keyword");
   			$("#status").val(statusName);
   			$("#customerTypeId").val(customerTypeName);
+  			$("#bizUserId").val(bizUserName);
   			$("#date").val(dayName);
   			$("#searchInput").val(keywordName);
   		<#else>
@@ -72,7 +74,7 @@
 			combo();
 		}).on("change", "#bizUserId", function() {
 			setItemBykey("bizUserId", $("#bizUserId").data('values'));
-			setItemBykey("bizUser", $("#bizUserId").val());		
+			setItemBykey("bizUserName", $("#bizUserId").val());		
 			combo();
 		}).on("change", "#date", function() {
 			getDateOrder();
@@ -139,8 +141,12 @@
 		});
 	
 		$("#customerTypeId").select({
-		  title: "择客户类型",
+		  title: "选择客户类型",
 		  items: ${customerTypes!}
+		});
+		$("#bizUserId").select({
+		  title: "选择业务员",
+		  items: ${bizUsers!}
 		});
 		$('#date').select({
 			title: '选择时间',
@@ -259,6 +265,7 @@
 			"keyword": $("#searchInput").val(),
 			"status": $("#status").data('values'),
 			"customerTypeId": $("#customerTypeId").data('values'),
+			"bizUserId": $("#bizUserId").data('values'),
 			"startDate": startDate,
 			"endDate" : endDate
 		}
@@ -268,12 +275,14 @@
 		var customerTypeIdSession = getItemBykey("customerTypeId");
 		var startDateSession = getItemBykey("startDate");
 		var endDateSession = getItemBykey("endDate");
+		var bizUserSession = getItemBykey("bizUserId");
 		var params = {
 			"page": page,
 			"size": size,
 			"keyword": keywordSession,
 			"status": statusSession,
 			"customerTypeId": customerTypeIdSession,
+			"bizUserId":bizUserSession,
 			"startDate": startDateSession,
 			"endDate" : endDateSession
 		}		

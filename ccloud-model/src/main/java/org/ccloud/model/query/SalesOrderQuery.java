@@ -114,7 +114,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 
 	public Page<Record> paginateForApp(int pageNumber, int pageSize, String keyword, String status,
-			String customerTypeId, String startDate, String endDate, String sellerId, String dataArea) {
+			String customerTypeId, String startDate, String endDate, String sellerId, String dataArea,String bizUserId) {
 		String select = "select o.*, c.customer_name, c.contact as ccontact, c.mobile as cmobile, ct.name as customerTypeName, a.ID_ taskId, a.NAME_ taskName, a.ASSIGNEE_ assignee,s.is_print ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_sales_order` o ");
 		fromBuilder.append("left join cc_seller_customer cc ON o.customer_id = cc.id ");
@@ -131,6 +131,7 @@ public class SalesOrderQuery extends JBaseQuery {
 //		needWhere = appendIfNotEmpty(fromBuilder, "o.customer_type_id", customerTypeId, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "o.biz_user_id", bizUserId, params, needWhere);
 
 		if (needWhere) {
 			fromBuilder.append(" where 1 = 1");
@@ -2126,7 +2127,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 //查找已下订单的业务员
 	public List<SalesOrder> _findByDataArea(String dataArea){
-		String sql = "select cs.* u.realname from cc_sales_order cs LEFT JOIN user u on u.id = cs.biz_user_id where cs.data_area  like '"+dataArea+"'";
+		String sql = "select cs.biz_user_id, u.realname from cc_sales_order cs LEFT JOIN user u on u.id = cs.biz_user_id where cs.data_area  like '"+dataArea+"%' GROUP BY cs.biz_user_id";
 		return DAO.find(sql);
 	}
  }
