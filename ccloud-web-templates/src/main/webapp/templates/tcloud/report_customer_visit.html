@@ -39,8 +39,8 @@
     function customerVisitCount(params) {
 		Utils.ajax('${CPATH}/report/customerInfoCount', params, 
 			function(data){
-				$("#customerVisitNum").text(data.customerVisitCount+"次");
-				$("#customerNum").text(data.customerCount);
+				$("#customerVisitNum").text(data[0].customerVisitCount+"次");
+				$("#customerNum").text(data[0].customerCount);
 			}
 		);    	
     }

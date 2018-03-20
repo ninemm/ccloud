@@ -57,6 +57,7 @@ public class OrderController extends BaseFrontController {
 	@RequiresPermissions(value = { "/admin/salesOrder", "/admin/dealer/all" }, logical = Logical.OR)
 	public void myOrder() {
 		String selectDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		Map<String, Object> all = new HashMap<>();
 		all.put("title", "全部");
 		all.put("value", "");
@@ -75,7 +76,7 @@ public class OrderController extends BaseFrontController {
 
 		List<Map<String, Object>> bizUsers = new ArrayList<>();
 		bizUsers.add(all);
-		List<SalesOrder> orders = SalesOrderQuery.me()._findByDataArea(selectDataArea);
+		List<SalesOrder> orders = SalesOrderQuery.me().findBySellerId(sellerId);
 		for (SalesOrder order : orders) {
 			Map<String, Object> items = new HashMap<>();
 			items.put("title", order.getStr("realname"));

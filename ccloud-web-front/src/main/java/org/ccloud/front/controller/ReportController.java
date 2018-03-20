@@ -26,7 +26,6 @@ import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.CustomerType;
 import org.ccloud.model.SalesOrder;
-import org.ccloud.model.Seller;
 import org.ccloud.model.SellerCustomer;
 import org.ccloud.model.query.*;
 import org.ccloud.route.RouterMapping;
