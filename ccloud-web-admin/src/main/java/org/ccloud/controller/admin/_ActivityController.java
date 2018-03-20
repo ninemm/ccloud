@@ -40,6 +40,7 @@ import org.ccloud.model.Dict;
 import org.ccloud.model.ExpenseDetail;
 import org.ccloud.model.QyExpense;
 import org.ccloud.model.QyExpensedetail;
+import org.ccloud.model.User;
 import org.ccloud.model.query.ActivityExecuteQuery;
 import org.ccloud.model.query.ActivityQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
@@ -306,10 +307,10 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			result[0] = totalMoney.add(new BigDecimal(detail.getItem4()));
 			result[1] = new BigDecimal(totalNum).add(new BigDecimal(detail.getItem3()));
 		} else if(detail.getFlowDictType().equals(Consts.FLOW_DICT_TYPE_NAME_SA)) {
-			result[0] = totalMoney.add(new BigDecimal(detail.getItem4()));
+			result[0] = totalMoney.add(new BigDecimal(detail.getItem3()));
 			result[1] = new BigDecimal(0);
 		} else {
-			result[0] = totalMoney.add(new BigDecimal(detail.getItem4()));
+			result[0] = totalMoney.add(new BigDecimal(detail.getItem2()));
 			result[1] = new BigDecimal(0);
 		}
 		return result;
@@ -683,4 +684,53 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		render("img.html");
 	}
 	
+	//加入核销
+	public void auditReimbursement() throws Exception {
+		String ids = getPara("ids");
+		String[] activityApplyIds = ids.split(",");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		for (String activityApplyId : activityApplyIds) {
+			Record YxActivity = ActivityQuery.me().findYxActivity(activityApplyId);
+			Map<String, Object>map=new HashMap<>();
+			String[] FlowIDNO = YxActivity.getStr("FlowIDNO").split("\\.");
+			map.put("IDNO",199);
+			map.put("FlowIDNO",Integer.getInteger(FlowIDNO[FlowIDNO.length-1]) );
+//			map.put("ResourceID", "");
+			map.put("CostType",YxActivity.getInt("CostType"));
+			if (YxActivity.getStr("invest_type").equals("101101")) {
+				//公关赞助
+				map.put("ActivityTime",YxActivity.getStr("ActivityTime"));
+				map.put("CustomerName",YxActivity.getStr("CustomerName"));
+				map.put("ActivityAddress",YxActivity.getStr("ActivityAddress"));
+				map.put("Telephone",YxActivity.getStr("Telephone"));
+				map.put("ScenePhoto","123");
+				map.put("ResourceFlag",1);
+				map.put("WriteOffAmount",YxActivity.getBigDecimal("WriteOffAmount"));
+				map.put("Telephone",YxActivity.getStr("Telephone"));
+				map.put("CreateManName",YxActivity.getStr("CreateManName"));
+				map.put("CreateTime",YxActivity.getStr("CreateTime"));
+				map.put("ModifyManName",YxActivity.getStr("ModifyManName"));
+				map.put("ModifyTime",YxActivity.getStr("ModifyTime"));
+				map.put("Flag",1);
+				map.put("ShopOrderID",19);
+				map.put("GiftPhoto","123");
+				
+			}else if(YxActivity.getStr("invest_type").equals("101102")) {
+				//消费培育
+			}else if(YxActivity.getStr("invest_type").equals("101103")) {
+				//终端广告
+			}else if(YxActivity.getStr("invest_type").equals("101104")) {
+				//终端陈列 
+			}else if(YxActivity.getStr("invest_type").equals("101105")) {
+				//终端客情
+	
+			}else if(YxActivity.getStr("invest_type").equals("101106")) {
+				//商超赠品
+			}else {
+				//进场费
+				
+			}
+		}
+		renderAjaxResultForSuccess("加入核销成功");
+	}
 }
