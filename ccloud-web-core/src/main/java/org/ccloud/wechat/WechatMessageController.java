@@ -16,7 +16,9 @@
 package org.ccloud.wechat;
 
 import java.util.List;
+import java.util.Map;
 
+import com.alibaba.fastjson.JSON;
 import com.jfinal.weixin.sdk.api.ShorturlApi;
 import org.ccloud.Consts;
 import org.ccloud.core.JSession;
@@ -191,7 +193,9 @@ public class WechatMessageController extends MsgController {
 
 		HttpServletRequest request = getRequest();
 		String redirectUrl = request.getScheme() + "://" + request.getServerName() + "/member/member/bind?scene_str=" + scene_str;
-		renderOutTextMsg(replyContent + ":" + ShorturlApi.getShortUrl(redirectUrl));
+		String json = ShorturlApi.getShortUrl(redirectUrl).getJson();
+		Map<String,Object> parse = JSON.parseObject(json);
+		renderOutTextMsg(replyContent + ":" + parse.get("short_url"));
 	}
 
 	// 处理接收到的上报地理位置事件
