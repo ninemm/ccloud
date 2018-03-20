@@ -137,11 +137,9 @@ public class _AdminController extends JBaseController {
 			if (user.getPassword().equals(EncryptUtils.encryptPassword(Consts.USER_DEFAULT_PASSWORD, user.getSalt()))) {
 				CookieUtils.put(this, mobile,mobile);
 				changePassword="true";
-				setAttr("changePassword",changePassword);
 			}
-		}else {
-			setAttr("changePassword",changePassword);
 		}
+		setAttr("changePassword",changePassword);
 		
 		render("index.html");
 	}
