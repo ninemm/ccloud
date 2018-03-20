@@ -92,16 +92,16 @@ public class _AdminController extends JBaseController {
 			count = SalesOrderQuery.me().queryCountToDayOrders(user.getId(), selDataArea);
 		}
 		Map<String, List<Record>> salesManAmount = Maps.newHashMap();
-		salesManAmount.put("sales_day", SalesOrderQuery.me().querysalesManAmountBy(selDataArea,"day","asc"));
-		salesManAmount.put("sales_month", SalesOrderQuery.me().querysalesManAmountBy(selDataArea,"month","asc"));
+		salesManAmount.put("sales_day", SalesOrderQuery.me().querysalesManAmountBy(selDataArea,"day","desc"));
+		salesManAmount.put("sales_month", SalesOrderQuery.me().querysalesManAmountBy(selDataArea,"month","desc"));
 		
 		Map<String, List<Record>> goodsSales = Maps.newHashMap();
-		goodsSales.put("goodsSalesToDay", SalesOrderQuery.me().queryGoodsSales(selDataArea, true,"asc"));
-		goodsSales.put("goodsSalesAll", SalesOrderQuery.me().queryGoodsSales(selDataArea, false,"asc"));
+		goodsSales.put("goodsSalesToDay", SalesOrderQuery.me().queryGoodsSales(selDataArea, true,"desc"));
+		goodsSales.put("goodsSalesAll", SalesOrderQuery.me().queryGoodsSales(selDataArea, false,"desc"));
 		
 		Map<String, List<Record>> directBusinessAmount = Maps.newHashMap();
-		directBusinessAmount.put("directs_day", SalesOrderQuery.me().querySellerSales(selDataArea, "day","asc"));
-		directBusinessAmount.put("directs_month", SalesOrderQuery.me().querySellerSales(selDataArea, "month","asc"));
+		directBusinessAmount.put("directs_day", SalesOrderQuery.me().querySellerSales(selDataArea, "day","desc"));
+		directBusinessAmount.put("directs_month", SalesOrderQuery.me().querySellerSales(selDataArea, "month","desc"));
 		
 		Map<String, List<Record>> amountCollect = Maps.newHashMap();
 		amountCollect.put("amount_weeks", SalesOrderQuery.me().queryAmountBy(selDataArea, "weeks"));
