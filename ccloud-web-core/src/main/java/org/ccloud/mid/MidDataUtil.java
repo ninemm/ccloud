@@ -15,160 +15,63 @@
  */
 package org.ccloud.mid;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.net.DatagramPacket;
 import java.rmi.RemoteException;
-//import java.util.Base64;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-//import org.apache.axis.message.MessageElement;
-//import org.apache.axis.types.Schema;
-//import org.apache.axis.message.MessageElement;
-//import org.apache.axis.types.Schema;
-import org.ccloud.middledb.ArrayOfAnyType;
-import org.ccloud.middledb.ArrayOfQYBasicFlowType;
-import org.ccloud.middledb.MiddleWebService;
-import org.ccloud.middledb.MiddleWebServiceSoap;
-import org.ccloud.middledb.ObjectFactory;
-import org.ccloud.middledb.QYBasicFlowType;
+import org.ccloud.model.vo.Mid_ActivityInfo;
+import org.ccloud.model.vo.Mid_FlowTypeInfo;
+import org.ccloud.utils.HttpUtils;
 
+import com.alibaba.fastjson.JSONArray;
 import com.jfinal.kit.PropKit;
-import com.jfinal.kit.StrKit;
 
 public class MidDataUtil {
 	
 	private static String userName = PropKit.use("midData.properties").get("middata_soap_username");
 	private static String passWord = PropKit.use("midData.properties").get("middata_soap_password");
-	private static MiddleWebService middleWebService = new MiddleWebService();
-	private static MiddleWebServiceSoap middleWebServiceSoap = middleWebService.getMiddleWebServiceSoap();	
+    private static final String GET_JINGPAI_ACTIVITYS = "http://yxmiddb.jingpai.com/WebAPI/api/Activitys";
 
 	public static void main(String[] args) throws RemoteException {
-		MidDataUtil.getActivityInfo("2018-03-02", "2018-03-12", "1", "10");
+		
 	}
 
-	//写入数据接口示例
-	public static int Syn() {
-		MiddleWebService middleWebService = new MiddleWebService();
-		MiddleWebServiceSoap middleWebServiceSoap = middleWebService.getMiddleWebServiceSoap();	
-	 
-		ArrayOfQYBasicFlowType flowTypeList = new ArrayOfQYBasicFlowType();		
-		List<QYBasicFlowType> qyFlowTypeList = flowTypeList.getQYBasicFlowType();
-
-		ObjectFactory objectFactory=new ObjectFactory();
-		QYBasicFlowType qyFlowType = objectFactory.createQYBasicFlowType();
-		qyFlowType.setFlowTypeID(StrKit.getRandomUUID());
-		qyFlowType.setFlowTypeName("测试终端流程");
-		qyFlowType.setParentID("");
-		qyFlowType.setMemo("测试数据");
-        qyFlowType.setCreateTime("2018-3-12 14:25:00");
-        qyFlowType.setModifyTime("2018-3-12 14:25:00");
-        qyFlowType.setFlag(1);
-        
-		qyFlowTypeList.add(qyFlowType);	
-		int account = middleWebServiceSoap.syncQYBasicFlowTypeToMidDB(userName, passWord, flowTypeList);
-		return account;
-	}
-
-	//读取数据接口示例
-	public static void getActivityInfo(String startDate, String endDate, String pageNum, String pageCount) {
-		ArrayOfAnyType anyType = new ArrayOfAnyType();
-		List<Object> param = anyType.getAnyType();
-		param.add(0, startDate);
-		param.add(1, endDate);
-		param.add(2, pageNum);
-		param.add(3, pageCount);
-		byte[] result = middleWebServiceSoap.getQYActivityFromMidDB(anyType);
-//		Base64.Decoder decoder = Base64.getDecoder();
-//		Base64.Encoder encoder = Base64.getEncoder();
-//		String encodedText = encoder.encodeToString(result);
-//		System.out.println(encodedText);
-//		//解码
-//		try {
-//			System.out.println(new String(decoder.decode(encodedText), "UTF-8"));
-//		} catch (UnsupportedEncodingException e) {
-//			e.printStackTrace();
-//		}
-		DatagramPacket packet = new DatagramPacket(result, result.length);
-		Object obj = null;
-        try {
-            ByteArrayInputStream bi = new ByteArrayInputStream(packet.getData());
-            ObjectInputStream oi = new ObjectInputStream(bi);
-
-            obj = oi.readObject();
-            bi.close();
-            oi.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-       /* Schema schema = (Schema)obj;
-        MessageElement[] msgele = schema.get_any();
-        List FOCElementHead = msgele[0].getChildren();//消息头,DataSet对象
-        List FOCElementBody = msgele[1].getChildren();//消息体信息,DataSet对象
-       
-        if (FOCElementBody.size() <= 0){
-         System.out.println("无消息体");
-        }
-       
-        String nn = FOCElementBody.get(0).toString();//消息体的字符串形式
-        try {
-            saveXMLString(nn,"f://test.xml");//保存为XML形式
-//            this.parserXml("c://test.xml");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-		System.out.println(result);*/
+	public static List<Mid_ActivityInfo> getActivityInfo(String startTime, String endTime, String pageIndex, String pageSize) {
+        Map<String, String> map = new HashMap<>();
+        map.put("BegTime", "2018-02-01");
+        map.put("EndTime", "2018-03-12");
+        map.put("PageIndex", "1");
+        map.put("PageSize", "10");
+        List<Mid_ActivityInfo> list = new ArrayList<>();
+		try {
+			String result = HttpUtils.post(GET_JINGPAI_ACTIVITYS, map);
+			JSONArray jsonArray = JSONArray.parseArray(result);
+			list = jsonArray.toJavaList(Mid_ActivityInfo.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return list;
 	}
 	
-	@SuppressWarnings("unused")
-	 private static void saveXMLString(String XMLString, String fileName)throws IOException {   
-	        File file = new File(fileName);   
-	        if (file.exists()) {   
-	            file.delete();   
-	        }   
-	        file.createNewFile();   
-	        if (file.canWrite()) {   
-	            FileWriter fileOut = new FileWriter(file);   
-	            fileOut.write(XMLString);   
-	            fileOut.close();   
-	        }   
-	 }
-
-	public static int syncYXBrandInfoToMidDB(String string) {
-		// TODO Auto-generated method stub
-		return 1;
+	public static List<Mid_FlowTypeInfo> getFlowTypeInfo(String startTime, String endTime, String pageIndex, String pageSize) {
+        Map<String, String> map = new HashMap<>();
+        map.put("BegTime", "2018-02-01");
+        map.put("EndTime", "2018-03-12");
+        map.put("PageIndex", "1");
+        map.put("PageSize", "10");
+        List<Mid_FlowTypeInfo> list = new ArrayList<>();
+		try {
+			String result = HttpUtils.post(GET_JINGPAI_ACTIVITYS, map);
+			JSONArray jsonArray = JSONArray.parseArray(result);
+			list = jsonArray.toJavaList(Mid_FlowTypeInfo.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return list;
 	}
 	
-	public static int syncYXDisplayInfoToMidDB(byte[] objectToByte) {
-		int syncYXDisplayInfoToMidDB = middleWebServiceSoap.syncYXDisplayInfoToMidDB(objectToByte);
-		return syncYXDisplayInfoToMidDB;
-	}
-
-	public static int syncYXEnterCostInfoToMidDB(String xMLString) {
-		// TODO Auto-generated method stub
-		return 1;
-	}
-
-	public static int syncYXMarketGiftInfoToMidDB(String xMLString) {
-		// TODO Auto-generated method stub
-		return 1;
-	}
-
-	public static int syncYXProductJudgeInfoToMidDB(String xMLString) {
-		// TODO Auto-generated method stub
-		return 1;
-	}
-
-	public static int syncYXShopAdInfoToMidDB(String xMLString) {
-		// TODO Auto-generated method stub
-		return 1;
-	}
 	
-	public static int syncYXShopShowGiftInfoToMidDB(String xMLString) {
-		// TODO Auto-generated method stub
-		return 1;
-	}
+
 }
