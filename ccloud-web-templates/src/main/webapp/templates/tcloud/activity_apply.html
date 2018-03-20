@@ -41,7 +41,25 @@
 		text-align: right;
 		float: right;
 	}
-
+	.applyInfo .weui-cell:first-child:after {
+		content: " ";
+		position: absolute;
+		left: 0;
+		top: 0;
+		right: 0;
+		height: 1px;
+		border-top: 1px solid #e5e5e5;
+		color: #e5e5e5;
+		-webkit-transform-origin: 0 0;
+		transform-origin: 0 0;
+		-webkit-transform: scaleY(.5);
+		transform: scaleY(.5);
+		left: 15px;
+		z-index: 2;
+	}
+	.applyInfo input {
+		width:65%;
+	}
 </#macro>
 <#macro script_import>
 </#macro>
@@ -482,52 +500,50 @@ function doChange(key){
 						</div>
 					</div>
 					<div class="weui-cell weui-cell_access">
-							<span>
-								活动内容
-								<span class="require"></span>
-							</span>
+						<span>
+							活动内容
+							<span class="require"></span>
+						</span>
 						<div class="weui-cell__bd" style="margin-left:40px;">
-								<span class="weui-input" id="content" ></span>
+							<span class="weui-input" id="content"></span>
 						</div>
 					</div>
 					<#if details?size gt 0>
 						<div class="weui-cell weui-cell_access select-area">
-		                    <span>
+							<span>
 								费用明细
 								<span class="require"></span>
 							</span>
 							<div class="weui-cell__bd">
-								<input id="expense_detail_id"  name="expense_detail_id" type="hidden" />
+								<input id="expense_detail_id" name="expense_detail_id" type="hidden" />
 								<input id="expense_detail" class="weui-input" name="expense_detail" style="width:100%;" type="text">
-		                    </div>
-		                    <span class="weui-cell__ft"></span>
-		                </div>
-	                </#if>
-	                <div class="detailInfo">
-		                <div class="applyInfo">
-							<div class="weui-cells__title gray" id="detailName"></div>                
+							</div>
+							<span class="weui-cell__ft"></span>
+						</div>
+					</#if>
+					<div class="detailInfo">
+						<div class="applyInfo">
+							<!-- <div class="weui-cells__title gray" id="detailName"></div> -->
 							<div class="weui-cell weui-cell_access num">
 								<div class="weui-cell__bd">
 									<span>
-										申请数量<span id="ableNum"></span>
+										申请数量
+										<span id="ableNum"></span>
 										<span class="require"></span>
 									</span>
-									<div class="fr t-r">
-										<input type="tel" class="weui-input" id="apply_num" name="apply_num" value="0"  placeholder="请填写数量" required>
-										<input type="hidden" id="maxNum">
-									</div>
+									<input type="tel" class="weui-input fr" id="apply_num" name="apply_num" value="0" placeholder="请填写数量" required>
+									<input type="hidden" id="maxNum">
 								</div>
 							</div>
 							<div class="weui-cell weui-cell_access amount">
 								<div class="weui-cell__bd">
 									<span>
-										申请金额<span id="ableMoney"></span>
+										申请金额
+										<span id="ableMoney"></span>
 										<span class="require"></span>
 									</span>
-									<div class="fr t-r">
-										<input type="tel" class="weui-input" id="apply_amount" name="apply_amount" value="0"  placeholder="请填写金额" required>
-										<input type="hidden" id="maxAmount">
-									</div>
+									<input type="tel" class="weui-input fr" id="apply_amount" name="apply_amount" value="0" placeholder="请填写金额" required>
+									<input type="hidden" id="maxAmount">
 								</div>
 							</div>
 						</div>

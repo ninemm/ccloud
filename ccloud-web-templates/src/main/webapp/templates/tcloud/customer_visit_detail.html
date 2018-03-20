@@ -117,18 +117,19 @@
 		                   <#if activityExecutes?size gt 0>
 		                            		<#list activityExecutes as list>
 		                            			<span class="weui-uploader__info">${list.remark}</span>
-		                            			<hr style="border:1px dotted #036" />
-		                   						 <div class="weui-uploader__bd" style="border:1px dotted #036" >
+		                            			<hr style="border:1px dashed #0000fff"/>
+		                   						 <div class="weui-uploader__bd" >
 			                       					<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles">
 							                            <#if (visit.imageList) ??>
 						                                <#list visit.imageList as bean>
-					                            			<#if (list.order_list == bean.orderList)>
+					                            			<#if (list.orderList == bean.orderList)>
 						                                   		<li class="weui-uploader__file" style="background-image: url(${bean.savePath})"></li>
 					                            			</#if>
 						                                </#list>
 							                            </#if>
 			                      					</ul>
 		                   						 </div>
+		                   						<hr style="border:1px dashed #0000fff"/>
 		                            		</#list>
 	                            		<#else> 
                             				<div class="weui-uploader__bd">

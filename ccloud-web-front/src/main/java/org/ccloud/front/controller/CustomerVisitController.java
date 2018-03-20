@@ -93,10 +93,19 @@ public class CustomerVisitController extends BaseFrontController {
 			item.put("value", subType.getValue());
 			customerLevel.add(item);
 		}
-
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		List<CustomerVisit> customerVisits = CustomerVisitQuery.me().findByDataArea(selectDataArea);
+		List<Map<String, Object>> bizUserList = new ArrayList<>();
+		for(CustomerVisit customerVisit:customerVisits) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("value", customerVisit.getStr("user_id"));
+			item.put("title", customerVisit.getStr("realname"));
+			bizUserList.add(item);
+		}
+		
 		List<Map<String, Object>> nature = new ArrayList<>();
 		nature.add(all);
-
+		
 		List<Dict> statusList = DictQuery.me().findDictByType("customer_audit");
 		List<Map<String, Object>> statusList1 = new ArrayList<>();
 		statusList1.add(all);
@@ -109,6 +118,7 @@ public class CustomerVisitController extends BaseFrontController {
 		}
 
 		setAttr("type", JSON.toJSON(customerTypeList2));
+		setAttr("bizUserList", JSON.toJSON(bizUserList));
 		setAttr("nature", JSON.toJSON(nature));
 		setAttr("level", JSON.toJSON(customerLevel));
 		setAttr("status", JSON.toJSON(statusList1));
@@ -123,7 +133,7 @@ public class CustomerVisitController extends BaseFrontController {
 
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
 
-		Page<Record> visitList = CustomerVisitQuery.me().paginateForApp(getPageNumber(), getPageSize(), getPara("id"), null, null, null, null, selectDataArea, null);
+		Page<Record> visitList = CustomerVisitQuery.me().paginateForApp(getPageNumber(), getPageSize(), getPara("id"), null, null,null, null, null, selectDataArea, null);
 
 		if(StrKit.notBlank(getPara("id"))) {
 			setAttr("id", getPara("id"));
@@ -142,7 +152,7 @@ public class CustomerVisitController extends BaseFrontController {
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
 
 		Page<Record> visitList = new Page<>();
-		visitList = CustomerVisitQuery.me().paginateForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("id"), null, null, null, null, selectDataArea, null);
+		visitList = CustomerVisitQuery.me().paginateForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("id"), null,null, null, null, null, selectDataArea, null);
 
 		if(StrKit.notBlank(getPara("id"))) {
 			setAttr("id", getPara("id"));
@@ -196,7 +206,7 @@ public class CustomerVisitController extends BaseFrontController {
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
 		
 		Page<Record> visitList = new Page<>();
-		visitList = CustomerVisitQuery.me().paginateForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("id"), getPara("type"), getPara("nature"), getPara("level"), getPara("status"), selectDataArea, getPara("searchKey"));
+		visitList = CustomerVisitQuery.me().paginateForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("id"), getPara("type"), getPara("nature"),getPara("user"), getPara("level"), getPara("status"), selectDataArea, getPara("searchKey"));
 
 		if(StrKit.notBlank(getPara("id"))) {
 			setAttr("id", getPara("id"));
@@ -263,9 +273,11 @@ public class CustomerVisitController extends BaseFrontController {
 		CustomerVisit customerVisit = CustomerVisitQuery.me().findById(id);
 		String imageListStore = customerVisit.getPhoto();
 		ExpenseDetail expenseDetail = new ExpenseDetail();
-		if(customerVisit.getActiveApplyId()!="") {
-			expenseDetail = ExpenseDetailQuery.me().findById(ActivityApplyQuery.me().findById(customerVisit.getActiveApplyId()).getExpenseDetailId());
-			setAttr("expenseDetail",expenseDetail);
+		if(StrKit.notBlank(customerVisit.getActiveApplyId())) {
+			if(StrKit.notBlank(ActivityApplyQuery.me().findById(customerVisit.getActiveApplyId()).getExpenseDetailId())) {
+				expenseDetail = ExpenseDetailQuery.me().findById(ActivityApplyQuery.me().findById(customerVisit.getActiveApplyId()).getExpenseDetailId());
+				setAttr("expenseDetail",expenseDetail);
+			}
 		}
 		List<ImageJson> list = JSON.parseArray(imageListStore, ImageJson.class);
 		CustomerVisit visit = CustomerVisitQuery.me().findMoreById(id);
@@ -318,8 +330,11 @@ public class CustomerVisitController extends BaseFrontController {
 			return ;
 		}
 		ExpenseDetail expenseDetail = new ExpenseDetail();
-		if(!CustomerVisitQuery.me().findById(id).getActiveApplyId().equals("")) {
-			expenseDetail = ExpenseDetailQuery.me().findById(ActivityApplyQuery.me().findById(CustomerVisitQuery.me().findById(id).getActiveApplyId()).getExpenseDetailId());
+		if(StrKit.notBlank(CustomerVisitQuery.me().findById(id).getActiveApplyId())) {
+			
+			if(StrKit.notBlank(ActivityApplyQuery.me().findById(CustomerVisitQuery.me().findById(id).getActiveApplyId()).getExpenseDetailId())) {
+				expenseDetail = ExpenseDetailQuery.me().findById(ActivityApplyQuery.me().findById(CustomerVisitQuery.me().findById(id).getActiveApplyId()).getExpenseDetailId());
+			}
 		}
 		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 		List<String> typeList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeNameListBySellerCustomerId(customerVisit.getSellerCustomerId(), dataArea);
@@ -367,7 +382,7 @@ public class CustomerVisitController extends BaseFrontController {
 		customerTypes.add(all);
 
 		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString() + "%";
-		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(dealerDataArea);
+		List<CustomerType> customerTypeList = CustomerTypeQuery.me()._findByDataArea(dealerDataArea);
 		for (CustomerType customerType : customerTypeList) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", customerType.getName());
@@ -430,8 +445,8 @@ public class CustomerVisitController extends BaseFrontController {
 					//添加的水印内容
 					String waterFont1 = customerVisit.getSellerCustomer().getCustomer().getCustomerName();
 					String waterFont2 = user.getRealname() +  DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
-	//				String waterFont3 =  customerVisit.getLocation();
-					String waterFont3 = "湖北省-武汉市-洪山区";
+					String waterFont3 =  customerVisit.getLocation();
+//					String waterFont3 = "湖北省-武汉市-洪山区";
 					//图片添加水印  上传图片  水印图
 					String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
 					
@@ -594,6 +609,7 @@ public class CustomerVisitController extends BaseFrontController {
 		if (isCustomerVisit != null && isCustomerVisit.booleanValue()) {
 
 			String defKey = Consts.PROC_CUSTOMER_VISIT_REVIEW;
+			param.put(Consts.WORKFLOW_APPLY_USERNAME, user.getUsername());
 			param.put("manager", manager.getUsername());
 
 			WorkFlowService workflow = new WorkFlowService();
@@ -746,8 +762,8 @@ public class CustomerVisitController extends BaseFrontController {
 					//添加的水印内容
 					String waterFont1 = customerVisit.getSellerCustomer().getCustomer().getCustomerName();
 					String waterFont2 = user.getRealname() +  DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
-	//				String waterFont3 =  customerVisit.getLocation();
-					String waterFont3 = "湖北省-武汉市-洪山区";
+					String waterFont3 =  customerVisit.getLocation();
+//					String waterFont3 = "湖北省-武汉市-洪山区";
 					//图片添加水印  上传图片  水印图
 					String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
 					
@@ -870,7 +886,7 @@ public class CustomerVisitController extends BaseFrontController {
 		setAttr("customerVisit", customerVisit);		
 		render("customer_visit_waiting.html");
 	}
-
+	@Before(WechatJSSDKInterceptor.class)
 	public void addActivityApplyVisit() {
 		String activityApplyId = getPara("applyId");
 		String orderList = getPara("orderList");
@@ -931,8 +947,8 @@ public class CustomerVisitController extends BaseFrontController {
 					//添加的水印内容
 					String waterFont1 = customerVisit.getSellerCustomer().getCustomer().getCustomerName();
 					String waterFont2 = user.getRealname() +  DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
-	//				String waterFont3 =  customerVisit.getLocation();
-					String waterFont3 = "湖北省-武汉市-洪山区";
+					String waterFont3 =  customerVisit.getLocation();
+//					String waterFont3 = "湖北省-武汉市-洪山区";
 					//图片添加水印  上传图片  水印图
 					String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
 					

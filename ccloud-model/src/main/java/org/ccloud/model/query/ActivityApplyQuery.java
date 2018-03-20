@@ -88,7 +88,7 @@ public class ActivityApplyQuery extends JBaseQuery {
 
 	public Page<Record> findList(int pageNumber, int pageSize, String dataArea, String category, String status, String startDate, String endDate, String keyword ){
 		String select = "SELECT caa.id,caa.activity_id, cc.customer_name, caa.`status`,caa.seller_customer_id,caa.apply_num,caa.apply_amount, DATE_FORMAT(ca.start_time,'%m-%d') as start_time, " +
-				"DATE_FORMAT(ca.end_time, '%m-%d') as end_time, ca.invest_type,ca.title, d.`name`, ca.invest_amount,ca.code,t1.name as ExpenseDetailName ";
+				"DATE_FORMAT(ca.end_time, '%m-%d') as end_time, ca.invest_type,ca.title, d.`name`, ca.invest_amount,ca.code,t1.name as expenseDetailName ";
 		LinkedList<Object> params = new LinkedList<Object>();
 
 		StringBuilder sql = new StringBuilder("FROM cc_activity_apply caa ");
@@ -116,6 +116,7 @@ public class ActivityApplyQuery extends JBaseQuery {
 		sql.append(" order by caa.create_date desc ");
 		return Db.paginate(pageNumber, pageSize, select, sql.toString(), params.toArray());
 	}
+
 
 	public List<Record> getToDo(String username) {
 		StringBuilder sb = new StringBuilder();
@@ -188,8 +189,9 @@ public class ActivityApplyQuery extends JBaseQuery {
 		return DAO.find(sql, activityId,userId);
 	}
 	
-	public List<ActivityApply> findSellerCustomerIdAndActivityIdAndUserId(String sellerCustomerId,String activityId,String userId,String expenseDetailId) {
-		return DAO.doFind(" seller_customer_id = ? and activity_id = ? and biz_user_id = ? and expense_detail_id = ? and status not in ("+Consts.ACTIVITY_APPLY_STATUS_REJECT+","+Consts.ACTIVITY_APPLY_STATUS_CANCEL+")", sellerCustomerId,activityId,userId,expenseDetailId);
+	public List<ActivityApply> findSellerCustomerIdAndActivityIdAndUserId(String sellerCustomerId,String activityId) {
+		String sql = "select * from cc_activity_apply where seller_customer_id = '"+sellerCustomerId+"' and activity_id = '"+activityId+"' and status not in ("+Consts.ACTIVITY_APPLY_STATUS_REJECT+","+Consts.ACTIVITY_APPLY_STATUS_CANCEL+") GROUP BY create_date";
+		return DAO.find(sql);
 	}
 
 	public List<Record> findBySellerCustomerId(String sellerCustomerId) {

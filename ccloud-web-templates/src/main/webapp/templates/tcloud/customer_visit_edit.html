@@ -99,6 +99,7 @@
 								        dataType: "json",
 								        success: function(data) {
 								        		var activityExecute = data.activityExecute;
+								        		
 								        		if(activityExecute.length>0){
 									        		
 								        			$(".imageActivityExecute").hide();
@@ -106,19 +107,21 @@
 								        			var imageLists = data.imgeLists;
 								        			var domain = data.domain;
 								        			$(".imgeActivity").html("");
-								        			numImage = imageLists.length;
+								        			if(imageLists!=null){
+									        			numImage = imageLists.length;
+								        			}
 								        			for(var i = 0 ; i < activityExecute.length ; i++){
 								        				var html = "";
 								        				html +='<div><input id="orderList" type="hidden" value="'+activityExecute[i].orderList+'"/>'+activityExecute[i].remark+'<div class="weui-uploader__bd">'
 						                                	+'<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles">';
-							                           for(var j = 0 ; j < imageLists.length ; j++){
+							                           for(var j = 0 ; j < numImage ; j++){
+							                           		console.log(imageLists[j].orderList +"--"+ activityExecute[i].orderList)
 							                            	if(imageLists[j].orderList == activityExecute[i].orderList){
 								                            	html += '<li class="weui-uploader__file " style="background-image:url('+domain+'/'+imageLists[j].savePath+')"></li>';
 							                           			imageArr.push({"pic":imageLists[j].originalPath, "picname":imageLists[j].imgName,"orderList":activityExecute[i].orderList,"savepath":imageLists[j].savePath});
 							                            	}
 							                            }
-														 
-								                        if(imageLists[imageLists.length-1].orderList != activityExecute[i].orderList && i == (activityExecute.length-1)){
+								                        if(numImage==0 || (imageLists[imageLists.length-1].orderList != activityExecute[i].orderList && i == (activityExecute.length-1))){
 						                                	html +='</ul>'
 							                                	+'<div class="weui-uploader__input-box">'
 							                                   	+'<input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/*" multiple="">'
@@ -131,8 +134,10 @@
 								        				
 								        			}
 								        			var maxOrderList = data.maxOrderList;
-								        			if(imageLists.length>0 && activityExecute.length == maxOrderList){
-								        				$("._submit_btn").hide();
+								        			if(numImage != null && imageLists!=null){
+									        			if(imageLists.length>0 && activityExecute.length == maxOrderList){
+									        				$("._submit_btn").hide();
+									        			}
 								        			}
 								        		}
 								        }
@@ -302,12 +307,12 @@
             return false;
         }
 
-        if($("#question_desc").val().length==0) {
-            $.toptip('备注描述不能为空', 3000, 'error'); 
-            return false;
-        }
+        //if($("#question_desc").val().length==0) {
+        //    $.toptip('备注描述不能为空', 3000, 'error');
+        //    return false;
+        //}
 
-        if($("#location").val().length==0) {
+       if($("#location").val().length==0) {
             $.toptip('定位地址不能为空,请刷新定位', 1000, 'error');
             return false;
         }
@@ -578,7 +583,6 @@
                         <div class="weui-uploader imgeActivity">
                             <div class="weui-uploader__hd">
                                 <p class="weui-uploader__title">附件图片</p>
-                                <div class="weui-uploader__info imgeInfo">0/3</div>
                             </div>
                             <div class="weui-uploader__bd imageActivityExecute">
                                 <ul class="weui-uploader__files uploaderFiles" id="uploaderFiles"></ul>
@@ -606,7 +610,7 @@
     <#include "_inc/_goback.html" />
     <footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
         <button class="red-button width-100 _submit_btn" onclick="submit()" href="">提交</button>
-        <button class="blue-button width-100 _submit_btn" onclick="noSubmit()" href="">稍后补录</button>
+        <button class="white-button width-100 _submit_btn" onclick="noSubmit()" href="" style = "color:#666;">稍后补录</button>
     </footer>
 </div>
 </@layout>

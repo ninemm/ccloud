@@ -59,11 +59,11 @@
 	<#if activity??>
 		$("#expendHead").empty();
 		<#if activity.investType == "101101" || activity.investType == "101102" || activity.investType == "101103" || activity.investType == "101106">
-			$("#expendHead").append('<th id="name1">费用类型</th><th id="name2">申请金额</th><th>操作</th>');
+			$("#expendHead").append('<tr><th width="2%"></th><th id="name1">费用类型</th><th id="name2">申请金额</th></tr>');
 		<#elseif activity.investType == "101104">
-			$("#expendHead").append('<th id="name1">费用类型</th><th id="name2">展示形式</th><th id="name3">投入数量</th><th id="name4">申请金额</th><th>操作</th>');
+			$("#expendHead").append('<tr><th width="2%"></th><th id="name1">费用类型</th><th id="name2">展示形式</th><th id="name3">投入数量</th><th id="name4">申请金额</th></tr>');
 		<#elseif activity.investType == "101105">
-			$("#expendHead").append('<th id="name1">渠道</th><th id="name2">赠送产品</th><th id="name3">投入数量</th><th id="name4">申请金额</th><th>操作</th>');
+			$("#expendHead").append('<tr><th width="2%"></th><th id="name1">渠道</th><th id="name2">赠送产品</th><th id="name3">投入数量</th><th id="name4">申请金额</th></tr>');
 			$(".needs").select2({
 				width: "100%",
 				language: "zh-CN"
@@ -74,7 +74,7 @@
 				language: "zh-CN"
 			});			
 		<#elseif activity.investType == "101107">
-			$("#expendHead").append('<th id="name1">费用类型</th><th id="name2">产品</th><th id="name3">申请金额</th><th>操作</th>');
+			$("#expendHead").append('<tr><th width="2%"></th><th id="name1">费用类型</th><th id="name2">产品</th><th id="name3">申请金额</th></tr>');
 			$(".product").select2({
 				data: ${productOptionList},
 				width: "100%",
@@ -91,7 +91,7 @@
 	var data = {url: '', alt: ''};
 	var result = false;
 	$("#customer_type_store_option").select2();
-	$("#customerType").select2();
+	$("#customerType").select2({width: "100%"});
 	$(function() {
 		if($(".category").val() == 101002){
 			$(".investType").show();
@@ -188,20 +188,20 @@
 		$("#InputsWrapper").empty();
 		$("#expendHead").empty();
 		if (choose == 101101) {
-			$("#expendHead").append('<th id="name1">费用类型</th><th id="name2">申请金额</th><th>操作</th>');
-			$(InputsWrapper).append('<tr><td class="col-xs-3"><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]">${DICT_BOX('feeType_name_PR', 'select')}</select></td><td class="col-xs-2"><input class="form-control input-sm" type="text" name="item2[]" id="item2_1"></td><td><a href="#" class="removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><tr>');
+			$("#expendHead").append('<tr><th width="2%"></th><th id="name1">费用类型</th><th id="name2">申请金额</th></tr></data.length>');
+			$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]">${DICT_BOX('feeType_name_PR', 'select')}</select></td><td><input class="form-control input-sm" type="text" name="item2[]" id="item2_1"></td><tr>');
 		} else if (choose == 101102) {
-			$("#expendHead").append('<th id="name1">费用类型</th><th id="name2">申请金额</th><th>操作</th>');
-			$(InputsWrapper).append('<tr><td class="col-xs-3"><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]">${DICT_BOX('feeType_name_raise', 'select')}</select></td><td class="col-xs-2"><input class="form-control input-sm" type="text" name="item2[]" id="item2_1"></td><td><a href="#" class="removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><tr>');			
+			$("#expendHead").append('<tr><th width="2%"></th><th id="name1">费用类型</th><th id="name2">申请金额</th></tr>');
+			$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]">${DICT_BOX('feeType_name_raise', 'select')}</select></td><td><input class="form-control input-sm" type="text" name="item2[]" id="item2_1"></td><tr>');			
 		} else if (choose == 101103) {
-			$("#expendHead").append('<th id="name1">费用类型</th><th id="name2">申请金额</th><th>操作</th>');
-			$(InputsWrapper).append('<tr><td class="col-xs-3"><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]">${DICT_BOX('feeType_name_AD', 'select')}</select></td><td class="col-xs-2"><input class="form-control input-sm" type="text" name="item2[]" id="item2_1"></td><td><a href="#" class="removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><tr>');		
+			$("#expendHead").append('<tr><th width="2%"></th><th id="name1">费用类型</th><th id="name2">申请金额</th></tr>');
+			$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]">${DICT_BOX('feeType_name_AD', 'select')}</select></td><td><input class="form-control input-sm" type="text" name="item2[]" id="item2_1"></td><tr>');		
 		} else if (choose == 101104) {
-			$("#expendHead").append('<th id="name1">费用类型</th><th id="name2">展示形式</th><th id="name3">投入数量</th><th id="name4">申请金额</th><th>操作</th>');
-			$(InputsWrapper).append('<tr><td class="col-xs-3"><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]" onChange="showType(this)" id="feeTypeId">${DICT_BOX('feeType_name_display', 'select')}</select></td><td class="col-xs-3"><select class="form-control input-sm" name="item2[]">${DICT_BOX('display_publish', 'select')}</select></td><td class="col-xs-2"><input class="form-control input-sm" type="text" name="item3[]" id="item3_1"></td><td class="col-xs-2"><input class="form-control input-sm" type="text" name="item4[]" id="item4_1"></td><td><a href="#" class="removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><tr>');		
+			$("#expendHead").append('<tr><th width="2%"></th><th id="name1">费用类型</th><th id="name2">展示形式</th><th id="name3">投入数量</th><th id="name4">申请金额</th>');
+			$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]" onChange="showType(this)" id="feeTypeId">${DICT_BOX('feeType_name_display', 'select')}</select></td><td><select class="form-control input-sm" name="item2[]">${DICT_BOX('display_publish', 'select')}</select></td><td><input class="form-control input-sm" type="text" name="item3[]" id="item3_1"></td><td><input class="form-control input-sm" type="text" name="item4[]" id="item4_1"></td><tr>');		
 		} else if (choose == 101105) {
-			$("#expendHead").append('<th id="name1">渠道</th><th id="name2">赠送产品</th><th id="name3">投入数量</th><th id="name4">申请金额</th><th>操作</th>');
-			$(InputsWrapper).append('<tr><td class="col-xs-3"><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm needs" name="item1[]">${DICT_BOX('channel_define', 'select')}</select></td><td class="col-xs-3"><select class="form-control input-sm product" name="item2[]"></select></td><td class="col-xs-2"><input class="form-control input-sm" type="text" name="item3[]" id="item3_1"></td><td class="col-xs-2"><input class="form-control input-sm" type="text" name="item4[]" id="item4_1"></td><td><a href="#" class="removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><tr>');
+			$("#expendHead").append('<tr><th width="2%"></th><th id="name1">费用类型</th><th id="name2">展示形式</th><th id="name3">投入数量</th><th id="name4">申请金额</th>');
+			$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm needs" name="item1[]">${DICT_BOX('channel_define', 'select')}</select></td><td><select class="form-control input-sm product" name="item2[]"></select></td><td><input class="form-control input-sm" type="text" name="item3[]" id="item3_1"></td><td><input class="form-control input-sm" type="text" name="item4[]" id="item4_1"></td><tr>');
 			$(".needs").select2();
 			$(".product").select2({
 				data: ${productOptionList},
@@ -209,11 +209,11 @@
 				language: "zh-CN"
 			});			
 		} else if (choose == 101106) {
-			$("#expendHead").append('<th id="name1">费用类型</th><th id="name2">申请金额</th><th>操作</th>');
-			$(InputsWrapper).append('<tr><td class="col-xs-3"><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]">${DICT_BOX('feeType_name_gift', 'select')}</select></td><td class="col-xs-2"><input class="form-control input-sm" type="text" name="item2[]" id="item2_1"></td><td><a href="#" class="removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><tr>');			
+			$("#expendHead").append('<tr><th width="2%"></th><th id="name1">费用类型</th><th id="name2">申请金额</th></tr>');
+			$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]">${DICT_BOX('feeType_name_gift', 'select')}</select></td><td><input class="form-control input-sm" type="text" name="item2[]" id="item2_1"></td><tr>');			
 		} else if (choose == 101107) {
-			$("#expendHead").append('<th id="name1">费用类型</th><th id="name2">产品</th><th id="name3">申请金额</th><th>操作</th>');
-			$(InputsWrapper).append('<tr><td class="col-xs-3"><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]">${DICT_BOX('feeType_name_SA', 'select')}</select></td><td class="col-xs-3"><select class="form-control input-sm product" name="item2[]"></select></td><td class="col-xs-2"><input class="form-control input-sm" type="text" name="item3[]" id="item3_1"></td><td><a href="#" class="removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><tr>');
+			$("#expendHead").append('<tr><th width="2%"></th><th id="name1">费用类型</th><th id="name2">产品</th><th id="name3">申请金额</th></tr>');
+			$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]">${DICT_BOX('feeType_name_SA', 'select')}</select></td><td><select class="form-control input-sm product" name="item2[]"></select></td><td><input class="form-control input-sm" type="text" name="item3[]" id="item3_1"></td><tr>');
 			$(".product").select2({
 				data: ${productOptionList},
 				width: "100%",
@@ -414,15 +414,15 @@
 	            //add input box
 				var choose = $("#invest_type").val();
 				if (choose == 101101) {
-					$(InputsWrapper).append('<tr><td class="col-xs-3"><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]">${DICT_BOX('feeType_name_PR', 'select')}</select></td><td class="col-xs-2"><input class="form-control input-sm" type="text" name="item2[]" id="item2_1"></td><td><a href="#" class="removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><tr>');
+					$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]">${DICT_BOX('feeType_name_PR', 'select')}</select></td><td><input class="form-control input-sm" type="text" name="item2[]" id="item2_1"></td><tr>');
 				} else if (choose == 101102) {
-					$(InputsWrapper).append('<tr><td class="col-xs-3"><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]">${DICT_BOX('feeType_name_raise', 'select')}</select></td><td class="col-xs-2"><input class="form-control input-sm" type="text" name="item2[]" id="item2_1"></td><td><a href="#" class="removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><tr>');			
+					$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]">${DICT_BOX('feeType_name_raise', 'select')}</select></td><td><input class="form-control input-sm" type="text" name="item2[]" id="item2_1"></td><tr>');			
 				} else if (choose == 101103) {
-					$(InputsWrapper).append('<tr><td class="col-xs-3"><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]">${DICT_BOX('feeType_name_AD', 'select')}</select></td><td class="col-xs-2"><input class="form-control input-sm" type="text" name="item2[]" id="item2_1"></td><td><a href="#" class="removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><tr>');		
+					$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]">${DICT_BOX('feeType_name_AD', 'select')}</select></td><td><input class="form-control input-sm" type="text" name="item2[]" id="item2_1"></td><tr>');		
 				} else if (choose == 101104) {
-					$(InputsWrapper).append('<tr><td class="col-xs-3"><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]" onChange="showType(this)" id="feeTypeId">${DICT_BOX('feeType_name_display', 'select')}</select></td><td class="col-xs-3"><select class="form-control input-sm" name="item2[]">${DICT_BOX('display_publish', 'select')}</select></td><td class="col-xs-2"><input class="form-control input-sm" type="text" name="item3[]" id="item3_1"></td><td class="col-xs-2"><input class="form-control input-sm" type="text" name="item4[]" id="item4_1"></td><td><a href="#" class="removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><tr>');		
+					$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]" onChange="showType(this)" id="feeTypeId">${DICT_BOX('feeType_name_display', 'select')}</select></td><td><select class="form-control input-sm" name="item2[]">${DICT_BOX('display_publish', 'select')}</select></td><td><input class="form-control input-sm" type="text" name="item3[]" id="item3_1"></td><td><input class="form-control input-sm" type="text" name="item4[]" id="item4_1"></td><tr>');		
 				} else if (choose == 101105) {
-					$(InputsWrapper).append('<tr><td class="col-xs-3"><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm needs" name="item1[]">${DICT_BOX('channel_define', 'select')}</select></td><td class="col-xs-3"><select class="form-control input-sm product" name="item2[]"></select></td><td class="col-xs-2"><input class="form-control input-sm" type="text" name="item3[]" id="item3_1"></td><td class="col-xs-2"><input class="form-control input-sm" type="text" name="item4[]" id="item4_1"></td><td><a href="#" class="removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><tr>');
+					$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm needs" name="item1[]">${DICT_BOX('channel_define', 'select')}</select></td><td><select class="form-control input-sm product" name="item2[]"></select></td><td><input class="form-control input-sm" type="text" name="item3[]" id="item3_1"></td><td><input class="form-control input-sm" type="text" name="item4[]" id="item4_1"></td><tr>');
 					$(".needs").select2();
 					$(".product").select2({
 						data: ${productOptionList},
@@ -430,9 +430,9 @@
 						language: "zh-CN"
 					});			
 				} else if (choose == 101106) {
-					$(InputsWrapper).append('<tr><td class="col-xs-3"><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]">${DICT_BOX('feeType_name_gift', 'select')}</select></td><td class="col-xs-2"><input class="form-control input-sm" type="text" name="item2[]" id="item2_1"></td><td><a href="#" class="removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><tr>');			
+					$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]">${DICT_BOX('feeType_name_gift', 'select')}</select></td><td><input class="form-control input-sm" type="text" name="item2[]" id="item2_1"></td><tr>');			
 				} else if (choose == 101107) {
-					$(InputsWrapper).append('<tr><td class="col-xs-3"><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]">${DICT_BOX('feeType_name_SA', 'select')}</select></td><td class="col-xs-3"><select class="form-control input-sm product" name="item2[]"></select></td><td class="col-xs-2"><input class="form-control input-sm" type="text" name="item3[]" id="item3_1"></td><td><a href="#" class="removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><tr>');
+					$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]">${DICT_BOX('feeType_name_SA', 'select')}</select></td><td><select class="form-control input-sm product" name="item2[]"></select></td><td><input class="form-control input-sm" type="text" name="item3[]" id="item3_1"></td><tr>');
 					$(".product").select2({
 						data: ${productOptionList},
 						width: "100%",
@@ -537,9 +537,9 @@
 							</div>
 						</div>
 						<div class="form-group">
-							<div class="col-sm-5 validata-box investType" >
+							<div class="col-sm-5 validata-box" >
 								<label class="control-label col-sm-4">客户类型:</label>
-								<div class="input-group col-sm-7">
+								<div class="input-group col-sm-8">
 									<select id="customerType" class="form-control" name = "customerTy" multiple="multiple">
 									</select>
 								</div>
@@ -679,60 +679,78 @@
 									<label class="control-label col-sm-4">费用明细:</label>
 									<div class="input-group col-md-2 col-sm-8">
 										<span id='AddMoreFileBox' class="btn btn-default">添加明细</span>
-					               	</div>
-				               	</div>
+									</div>
+								</div>
 							</div>
 							<div class="form-group col-sm-12 validata-box">
 								<label class="control-label col-sm-2"></label>
-								<div class="input-group col-md-6 col-sm-12">
-								<table class="table table-bordered" id="valueTable">
-									<thead id="expendHead">
-									<th id="name1">费用类型</th>
-									<th id="name2">申请金额</th>
-									<th>操作</th>
-									</thead>
-									<tbody id="InputsWrapper">
-									<#if expenseList?size gt 0>
-										<#list expenseList as list>
+								<div class="input-group col-md-7 col-sm-12">
+									<table class="table table-bordered text-center" id="valueTable">
+										<thead id="expendHead">
 											<tr>
-												<td class="col-xs-3">
-													<input type="hidden" name="expenseIds[]" value="${list.id}">
-													<select class="form-control input-sm needs" name="item1[]">
-														${DICT_BOX('${list.flowDictType}', 'select', '${list.item1}')}
-													</select>
-												</td>
-												<#if list.flowDictType == 'feeType_name_AD' ||  list.flowDictType == 'feeType_name_raise'
-												|| list.flowDictType == 'feeType_name_PR' || list.flowDictType == 'feeType_name_gift'>
-												<td class="col-xs-2"><input class="form-control input-sm" type="text" name="item2[]" value="${list.item2}"></td>
-												<#elseif list.flowDictType == 'channel_define'>
-													<td class="col-xs-3">
-														<select class="form-control input-sm product" name="item2[]" id="product_${list_index}">
-														</select>
-													</td>
-													<td class="col-xs-2"><input class="form-control input-sm" type="text" name="item3[]" value="${list.item3}"></td>
-													<td class="col-xs-2"><input class="form-control input-sm" type="text" name="item4[]" value="${list.item4}"></td>
-												<#elseif list.flowDictType == 'feeType_name_SA'>
-													<td class="col-xs-3">
-														<select class="form-control input-sm product" name="item2[]" id="product_${list_index}">
-														</select>
-													</td>
-													<td class="col-xs-2"><input class="form-control input-sm" type="text" name="item3[]" value="${list.item3}"></td>
-												<#else>
-													<td class="col-xs-3">
-														<select class="form-control input-sm" name="item2[]">
-															${DICT_BOX('${list.displayDictType}', 'select', '${list.item2}')}
-														</select>
-													</td>
-													<td class="col-xs-2"><input class="form-control input-sm" type="text" name="item3[]" value="${list.item3}"></td>
-													<td class="col-xs-2"><input class="form-control input-sm" type="text" name="item4[]" value="${list.item4}"></td>
-												</#if>
-												<td><a href="#" class="removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td>
+												<th width="2%"></th>
+												<th id="name1">费用类型</th>
+												<th id="name2">申请金额</th>
 											</tr>
-										</#list>
-									</#if>
-									</tbody>
-								</table>
-				               	</div>
+										</thead>
+										<tbody id="InputsWrapper">
+											<#if expenseList?size gt 0>
+												<#list expenseList as list>
+													<tr>
+														<td>
+															<a href="#" class="btn btn-danger btn-xs removeclass">
+																<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+															</a>
+														</td>
+														<td>
+															<input type="hidden" name="expenseIds[]" value="${list.id}">
+															<select class="form-control input-sm needs" name="item1[]">
+																${DICT_BOX('${list.flowDictType}', 'select', '${list.item1}')}
+															</select>
+														</td>
+														<#if list.flowDictType=='feeType_name_AD' || list.flowDictType=='feeType_name_raise' || list.flowDictType=='feeType_name_PR'
+															|| list.flowDictType=='feeType_name_gift'>
+														<td>
+															<input class="form-control input-sm" type="text" name="item2[]" value="${list.item2}">
+														</td>
+														<#elseif list.flowDictType=='channel_define'>
+														<td>
+															<select class="form-control input-sm product" name="item2[]" id="product_${list_index}">
+															</select>
+														</td>
+														<td>
+															<input class="form-control input-sm" type="text" name="item3[]" value="${list.item3}">
+														</td>
+														<td>
+															<input class="form-control input-sm" type="text" name="item4[]" value="${list.item4}">
+														</td>
+														<#elseif list.flowDictType=='feeType_name_SA'>
+														<td>
+															<select class="form-control input-sm product" name="item2[]" id="product_${list_index}">
+															</select>
+														</td>
+														<td>
+															<input class="form-control input-sm" type="text" name="item3[]" value="${list.item3}">
+														</td>
+														<#else>
+														<td>
+															<select class="form-control input-sm" name="item2[]">
+																${DICT_BOX('${list.displayDictType}', 'select', '${list.item2}')}
+															</select>
+														</td>
+														<td>
+															<input class="form-control input-sm" type="text" name="item3[]" value="${list.item3}">
+														</td>
+														<td>
+															<input class="form-control input-sm" type="text" name="item4[]" value="${list.item4}">
+														</td>
+														</#if>
+													</tr>
+												</#list>
+											</#if>
+										</tbody>
+									</table>
+								</div>
 							</div>
 						</div>
 					</div>
