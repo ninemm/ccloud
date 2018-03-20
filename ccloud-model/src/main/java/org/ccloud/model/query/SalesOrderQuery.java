@@ -2124,5 +2124,9 @@ public class SalesOrderQuery extends JBaseQuery {
 				date, orderId);
 
 	}
-
+//查找已下订单的业务员
+	public List<SalesOrder> _findByDataArea(String dataArea){
+		String sql = "select cs.* u.realname from cc_sales_order cs LEFT JOIN user u on u.id = cs.biz_user_id where cs.data_area  like '"+dataArea+"'";
+		return DAO.find(sql);
+	}
  }

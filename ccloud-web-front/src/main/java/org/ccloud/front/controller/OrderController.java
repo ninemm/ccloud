@@ -56,7 +56,7 @@ public class OrderController extends BaseFrontController {
 	//我的订单
 	@RequiresPermissions(value = { "/admin/salesOrder", "/admin/dealer/all" }, logical = Logical.OR)
 	public void myOrder() {
-
+		String selectDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 		Map<String, Object> all = new HashMap<>();
 		all.put("title", "全部");
 		all.put("value", "");
@@ -65,7 +65,7 @@ public class OrderController extends BaseFrontController {
 		customerTypes.add(all);
 
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
-				                                      .findByDataArea(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
+				                                      .findByDataArea(selectDataArea);
 		for (CustomerType customerType : customerTypeList) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", customerType.getName());
@@ -73,6 +73,15 @@ public class OrderController extends BaseFrontController {
 			customerTypes.add(item);
 		}
 
+		List<Map<String, Object>> bizUsers = new ArrayList<>();
+		bizUsers.add(all);
+		List<SalesOrder> orders = SalesOrderQuery.me()._findByDataArea(selectDataArea);
+		for (SalesOrder order : orders) {
+			Map<String, Object> items = new HashMap<>();
+			items.put("title", order.getBizUserId());
+			items.put("value", order.getStr("realname"));
+			bizUsers.add(items);
+		}
 		String history = getPara("history");
 		setAttr("history", history);
 		setAttr("customerTypes", JSON.toJSON(customerTypes));

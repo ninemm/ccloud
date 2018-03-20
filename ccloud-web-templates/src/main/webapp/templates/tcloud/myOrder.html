@@ -70,6 +70,10 @@
 			setItemBykey("customerTypeId", $("#customerTypeId").data('values'));
 			setItemBykey("customerTypeName", $("#customerTypeId").val());		
 			combo();
+		}).on("change", "#bizUserId", function() {
+			setItemBykey("bizUserId", $("#bizUserId").data('values'));
+			setItemBykey("bizUser", $("#bizUserId").val());		
+			combo();
 		}).on("change", "#date", function() {
 			getDateOrder();
 		}).off("click", "#combin-filter .confirm-search-btn")
@@ -476,6 +480,10 @@
 					</div>
 					<div class="weui-flex__item">
 						<input type="text" id="customerTypeId" placeholder="客户类型" class="weui-input" readonly>
+						<i class="icon-sort-desc"></i>
+					</div>
+					<div class="weui-flex__item">
+						<input type="text" id="bizUserId" placeholder="业务员" class="weui-input" readonly>
 						<i class="icon-sort-desc"></i>
 					</div>
 					<div class="weui-flex__item">
