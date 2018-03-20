@@ -2,30 +2,30 @@ package org.ccloud.model.vo;
 
 public class Mid_ActivityInfo {
 	
-	private String activityID;// 活动ID
-	private String activityNo;// 活动编号
-	private String activityName;// 活动名字
+	private String ActivityID;// 活动ID
+	private String ActivityNo;// 活动编号
+	private String ActivityName;// 活动名字
 	private String CreateTime;// 活动开始时间
 	private String ModifyTime;// 活动修改时间
 	private String Flag;// 有效性
 	
 	public String getActivityID() {
-		return activityID;
+		return ActivityID;
 	}
 	public void setActivityID(String activityID) {
-		this.activityID = activityID;
+		ActivityID = activityID;
 	}
 	public String getActivityNo() {
-		return activityNo;
+		return ActivityNo;
 	}
 	public void setActivityNo(String activityNo) {
-		this.activityNo = activityNo;
+		ActivityNo = activityNo;
 	}
 	public String getActivityName() {
-		return activityName;
+		return ActivityName;
 	}
 	public void setActivityName(String activityName) {
-		this.activityName = activityName;
+		ActivityName = activityName;
 	}
 	public String getCreateTime() {
 		return CreateTime;

@@ -22,10 +22,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.ccloud.model.vo.Mid_ActivityInfo;
+import org.ccloud.model.vo.Mid_ExpensesInfo;
 import org.ccloud.model.vo.Mid_FlowTypeInfo;
 import org.ccloud.utils.HttpUtils;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.jfinal.kit.PropKit;
 
 public class MidDataUtil {
@@ -40,14 +42,14 @@ public class MidDataUtil {
 
 	public static List<Mid_ActivityInfo> getActivityInfo(String startTime, String endTime, String pageIndex, String pageSize) {
         Map<String, String> map = new HashMap<>();
-        map.put("BegTime", "2018-02-01");
-        map.put("EndTime", "2018-03-12");
-        map.put("PageIndex", "1");
-        map.put("PageSize", "10");
+        map.put("BegTime", startTime);
+        map.put("EndTime", endTime);
+        map.put("PageIndex", pageIndex);
+        map.put("PageSize", pageSize);
         List<Mid_ActivityInfo> list = new ArrayList<>();
 		try {
 			String result = HttpUtils.post(GET_JINGPAI_ACTIVITYS, map);
-			JSONArray jsonArray = JSONArray.parseArray(result);
+			JSONArray jsonArray = JSONObject.parseObject(result).getJSONArray("Activitys");
 			list = jsonArray.toJavaList(Mid_ActivityInfo.class);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -57,14 +59,14 @@ public class MidDataUtil {
 	
 	public static List<Mid_FlowTypeInfo> getFlowTypeInfo(String startTime, String endTime, String pageIndex, String pageSize) {
         Map<String, String> map = new HashMap<>();
-        map.put("BegTime", "2018-02-01");
-        map.put("EndTime", "2018-03-12");
-        map.put("PageIndex", "1");
-        map.put("PageSize", "10");
+        map.put("BegTime", startTime);
+        map.put("EndTime", endTime);
+        map.put("PageIndex", pageIndex);
+        map.put("PageSize", pageSize);
         List<Mid_FlowTypeInfo> list = new ArrayList<>();
 		try {
 			String result = HttpUtils.post(GET_JINGPAI_ACTIVITYS, map);
-			JSONArray jsonArray = JSONArray.parseArray(result);
+			JSONArray jsonArray = JSONObject.parseObject(result).getJSONArray("BasicFlowTypes");
 			list = jsonArray.toJavaList(Mid_FlowTypeInfo.class);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -72,6 +74,21 @@ public class MidDataUtil {
 		return list;
 	}
 	
-	
+	public static List<Mid_ExpensesInfo> getExpensesInfo(String startTime, String endTime, String pageIndex, String pageSize) {
+        Map<String, String> map = new HashMap<>();
+        map.put("BegTime", startTime);
+        map.put("EndTime", endTime);
+        map.put("PageIndex", pageIndex);
+        map.put("PageSize", pageSize);
+        List<Mid_ExpensesInfo> list = new ArrayList<>();
+		try {
+			String result = HttpUtils.post(GET_JINGPAI_ACTIVITYS, map);
+			JSONArray jsonArray = JSONObject.parseObject(result).getJSONArray("Expenses");
+			list = jsonArray.toJavaList(Mid_ExpensesInfo.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return list;
+	}
 
 }

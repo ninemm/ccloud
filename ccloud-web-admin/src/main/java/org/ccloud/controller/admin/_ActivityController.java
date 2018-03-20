@@ -472,7 +472,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 	}
 	
 	public void getMidData() {
-		MidDataUtil.getActivityInfo("2018-03-02", "2018-03-12", "1", "10");
+		MidDataUtil.getActivityInfo("2018-02-01", "2018-03-12", "1", "10");
 	}
 	
 	private List<ExpenseDetail> getExpenseDetailList(String expenseId, String actId, String typeId) {
