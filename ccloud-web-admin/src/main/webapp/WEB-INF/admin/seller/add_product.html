@@ -59,7 +59,7 @@
       			{field: "cps_name", title: "规格", align: "center", width: '8%',edit:false},
       			{field: "price", title: "销售价格(整)", align: "center", width: '8%',
       				formatter: function(value, row, rowIndex) {
-					var strHtml = '￥<input type="text" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="price" id="price" value="'+row.price.toFixed(2)+'" onblur="changeMoney(this)" size = "10"/>';
+					var strHtml = '￥<input type="text" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="price" id="price" value="'+row.price.toFixed(2)+'" onblur="changeMoney(this)" size = "10"/><input type="hidden" size="9"  name="_price" value="'+row.price+'"/>';
 						strHtml += '/<input type="text" readonly style="text-align:center;background-color:transparent;border:0px;" name="big_unit" id="big_unit" value="'+row.big_unit+'" size = "2"/>'
 					return strHtml;
 				},
@@ -112,7 +112,7 @@
 		  	var obj = {
 								"productId": $(this).find('td').eq(0).find("input").val(),
 								"custom_name": $(this).find('td').eq(1).find("input").val(),
-								"price": $(this).find('td').eq(3).find("input").val(),
+								"price": $(this).find('td').eq(3).find("input").eq(1).val(),
 								"is_enable": $(this).find('td').eq(6).find("select").val(),
 								"order_list": $(this).find('td').eq(7).find("input").val(),
 							};
@@ -139,7 +139,14 @@
 	}
 	
 	function changeMoney(obj){
-		var smallprice=($(obj).val()/$(obj).parent().parent().find("td").eq(4).html()).toFixed(2);
+		var price = $(obj).val();
+		if(price.indexOf(",") != -1){
+			price = parseInt($(obj).parent().parent().find('td').eq(3).find("input[name='_rice']").val());
+		}else{
+			price = parseInt($(obj).val());
+		}
+		$(obj).parent().parent().find('td').eq(3).find("input").eq(1).val(price);
+		var smallprice=(price/$(obj).parent().parent().find("td").eq(4).html()).toFixed(2);
 		$(obj).parent().parent().find("td").eq(5).find("input[name='smallPrice']").val(smallprice);
 	}
 	
