@@ -31,9 +31,9 @@ import org.ccloud.model.vo.ImageJson;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
+import org.ccloud.wechat.WechatJSSDKInterceptor;
 import org.ccloud.workflow.listener.order.OrderReviewUtil;
 import org.ccloud.workflow.service.WorkFlowService;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.google.common.collect.Maps;
@@ -44,6 +44,7 @@ import com.jfinal.plugin.activerecord.IAtom;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.tx.Tx;
+
 
 /**
  * Created by chen.xuebing on 2017/12/08.
@@ -59,12 +60,12 @@ public class OrderController extends BaseFrontController {
 		Map<String, Object> all = new HashMap<>();
 		all.put("title", "全部");
 		all.put("value", "");
-
+		String selectDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 		List<Map<String, Object>> customerTypes = new ArrayList<>();
 		customerTypes.add(all);
 
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
-				                                      .findByDataArea(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
+				                                      .findByDataArea(selectDataArea);
 		for (CustomerType customerType : customerTypeList) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", customerType.getName());
@@ -72,8 +73,13 @@ public class OrderController extends BaseFrontController {
 			customerTypes.add(item);
 		}
 
+		List<Map<String, Object>> bizUsers = new ArrayList<>();
+		bizUsers.add(all);
+		List<Sales>
+		
 		String history = getPara("history");
 		setAttr("history", history);
+		setAttr("bizUsers",JSON.toJSON(bizUsers));
 		setAttr("customerTypes", JSON.toJSON(customerTypes));
 		render("myOrder.html");
 	}
@@ -248,7 +254,7 @@ public class OrderController extends BaseFrontController {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
-
+       
 		Map<String, String[]> paraMap = getParaMap();
 		String result = this.saveOrder(paraMap, user, sellerId, sellerCode);
 		if (StrKit.isBlank(result)) {
@@ -264,7 +270,8 @@ public class OrderController extends BaseFrontController {
 		boolean isSave = Db.tx(new IAtom() {
 			@Override
 			public boolean run() throws SQLException {
-
+				StringBuilder stringBuilder = new StringBuilder();
+				String QRcontent="";
 				String orderId = StrKit.getRandomUUID();
 				Date date = new Date();
 				String OrderSO = SalesOrderQuery.me().getNewSn(sellerId);
@@ -278,22 +285,43 @@ public class OrderController extends BaseFrontController {
 					return false;
 				}
 
+				String orcodeFileName = orderSn + ".png";
+				String childFileName = DateUtils.dateString();
+				String imagePath = getRequest().getSession().getServletContext().getRealPath("/");
+				String newStr = imagePath.substring(0, imagePath.length()-6) + "admin/" + Consts.ORDER_QRCODE_PATH + childFileName ;
+
+				String orcodeImgUrl = Consts.ORDER_QRCODE_PATH + childFileName +"/" +  orcodeFileName;
 				String[] sellProductIds = paraMap.get("sellProductId");
 				// 常规商品
 				if (sellProductIds != null && sellProductIds.length > 0) {
+					
+					stringBuilder.append(StringUtils.getArrayFirst(paraMap.get("customerId"))).append("||" + orderSn).append("||" + StringUtils.getArrayFirst(paraMap.get("contact")) + "||");					
 					for (int index = 0; index < sellProductIds.length; index++) {
 						if (StrKit.notBlank(sellProductIds[index])) {
 							String message = SalesOrderDetailQuery.me().insertForApp(paraMap, orderId, sellerId, sellerCode, user.getId(), date,
 									user.getDepartmentId(), user.getDataArea(), index);
+							stringBuilder.append(message);
+							message="";
 							if (StrKit.notBlank(message)) {
 								result[0] = message;
 								return false;
 							}
+							
 						}
 
 					}
 				}
-
+				
+				QRcontent = stringBuilder.toString().substring(0, stringBuilder.length() -1);
+				if (Consts.QRDEALERCODE.contains(sellerCode)) {
+					org.ccloud.utils.QRCodeUtils.genQRCode(QRcontent, newStr, orcodeFileName);
+	           		int i = SalesOrderQuery.me().updateQrcodeImgUrl(orcodeImgUrl, orderId, date);
+	           		if (i < 0) {
+						return false;
+					}
+				}
+           		
+                
 				String[] giftSellProductIds = paraMap.get("giftSellProductId");
 				// 赠品
 				if (giftSellProductIds != null && giftSellProductIds.length > 0) {
@@ -396,12 +424,13 @@ public class OrderController extends BaseFrontController {
 
 		if(Consts.PROC_ORDER_REVIEW_ONE.equals(proc_def_key)) {
 
-			User manager = UserQuery.me().findManagerByDeptId(user.getDepartmentId());
-			if (manager == null) {
+			User orderReviewer = UserQuery.me().findOrderReviewerByDeptId(user.getDepartmentId());
+			if (orderReviewer == null) {
 				return "您没有配置审核人,请联系管理员";
 			}
-			param.put("manager", manager.getUsername());
-			toUserId = manager.getId();
+			param.put("manager", orderReviewer.getUsername());
+			toUserId = orderReviewer.getId();
+			OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核", user.getId(), toUserId, user.getDepartmentId(), user.getDataArea(),orderId);
 		}
 
 		String procInstId = workflow.startProcess(orderId, proc_def_key, param);
@@ -413,8 +442,6 @@ public class OrderController extends BaseFrontController {
 		if(!salesOrder.update()) {
 			return "下单失败";
 		}
-
-		OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核", user.getId(), toUserId, user.getDepartmentId(), user.getDataArea(),orderId);
 
 		return "";
 	}
@@ -568,6 +595,7 @@ public class OrderController extends BaseFrontController {
 		renderAjaxResultForSuccess("订单撤销成功");
 	}
 
+	@Before(WechatJSSDKInterceptor.class)
 	public void getOldOrder() {
 		String orderId = getPara("orderId");
 
@@ -595,4 +623,5 @@ public class OrderController extends BaseFrontController {
 		map.put("orderDetail", orderDetail);
 		renderJson(map);
 	}
+	  
 }
