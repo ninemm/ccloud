@@ -170,7 +170,9 @@
 	    var callback = function(res) {
 	        if (res.errorCode == 0) {
 	        	location.href = "/member/product/index";
-	        }
+	        } else {
+		        alert(res.message);
+			}
 	    }
 	    
 	    var mobileCallback = function(res) {
