@@ -90,12 +90,8 @@
 	var $city = $('#cityPicker');
 	var data = {url: '', alt: ''};
 	var result = false;
-	$("#customer_type_store_option").select2({
-		width: "100%"
-	});
-	$("#customerType").select2({
-		width: "100%"
-	});
+	$("#customer_type_store_option").select2();
+	$("#customerType").select2({width: "100%"});
 	$(function() {
 		if($(".category").val() == 101002){
 			$(".investType").show();
@@ -541,7 +537,7 @@
 							</div>
 						</div>
 						<div class="form-group">
-							<div class="col-sm-5 validata-box investType" >
+							<div class="col-sm-5 validata-box" >
 								<label class="control-label col-sm-4">客户类型:</label>
 								<div class="input-group col-sm-8">
 									<select id="customerType" class="form-control" name = "customerTy" multiple="multiple">
