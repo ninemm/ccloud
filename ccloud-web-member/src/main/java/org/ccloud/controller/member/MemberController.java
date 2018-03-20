@@ -198,7 +198,7 @@ public class MemberController extends BaseFrontController {
 							return false;
 						}
 					}else{
-						ret.set("message", "您已经与该业务员绑定,不可再次绑定");
+						ret.set("message", "您已经与该业务员绑定,若不能下单,请联系业务员");
 						return false;
 					}
 

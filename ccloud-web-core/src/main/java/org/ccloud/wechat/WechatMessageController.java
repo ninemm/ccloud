@@ -17,6 +17,7 @@ package org.ccloud.wechat;
 
 import java.util.List;
 
+import com.jfinal.weixin.sdk.api.ShorturlApi;
 import org.ccloud.Consts;
 import org.ccloud.core.JSession;
 import org.ccloud.interceptor.SessionInterceptor;
@@ -190,7 +191,7 @@ public class WechatMessageController extends MsgController {
 
 		HttpServletRequest request = getRequest();
 		String redirectUrl = request.getScheme() + "://" + request.getServerName() + "/member/member/bind?scene_str=" + scene_str;
-		renderOutTextMsg(replyContent + ":" + redirectUrl);
+		renderOutTextMsg(replyContent + ":" + ShorturlApi.getShortUrl(redirectUrl));
 	}
 
 	// 处理接收到的上报地理位置事件
