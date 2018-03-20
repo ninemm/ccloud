@@ -80,7 +80,7 @@
             $("#length").text($("#comment").val().length + '/' + 50);
         });
 
-        $("#uploaderInput").on("change",function () {
+        $(document).on("change", ".uploaderInput", function () {
 
             var files = this.files;;
             var arrNum = imageArr.length;
@@ -205,7 +205,7 @@
         }
 
         var index; //第几张图片
-        $uploaderFiles.on("click", "li", function() {
+        $(document).on("click", ".uploaderFiles li", function() {
             index = $(this).index();
             $galleryImg.attr("style", this.getAttribute("style"));
             $gallery.fadeIn(100);
@@ -216,7 +216,7 @@
         });
 
         //删除图片  删除图片的代码也贴出来。
-        $(".weui-gallery__del").click(function() { //这部分刚才放错地方了，放到$(function(){})外面去了
+         $(document).on("click",".weui-gallery__del",function() { //这部分刚才放错地方了，放到$(function(){})外面去了
             $uploaderFiles.find("li").eq(index).remove();
             imageArr = imageArr.splice(index, 1);
         });
@@ -488,7 +488,7 @@
                        					<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles">
 				                            <#if (customerVisit.imageList) ??>
 			                                <#list customerVisit.imageList as bean>
-		                            			<#if (list.order_list == bean.orderList)>
+		                            			<#if (list.orderList == bean.orderList)>
 			                                   		<li class="weui-uploader__file" style="background-image: url(${bean.savePath})"></li>
 		                            			</#if>
 			                                </#list>
@@ -563,7 +563,6 @@
                         <div class="weui-uploader">
                             <div class="weui-uploader__hd">
                                 <p class="weui-uploader__title">附件图片</p>
-                                <div class="weui-uploader__info">0/3</div>
                             </div>
                             <div class="weui-uploader__bd">
                                 <ul class="weui-uploader__files" id="uploaderFiles"></ul>

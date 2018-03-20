@@ -191,7 +191,8 @@ public class ActivityController extends BaseFrontController {
 		}
 		return type;
 	}
-
+	
+	@Before(Tx.class)
 	public void apply() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
@@ -203,20 +204,20 @@ public class ActivityController extends BaseFrontController {
 		Boolean startProc = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_ACTIVITY_APPLY + sellerCode);
 		String[] expenseDetailIds = getParaValues("expense_detail_id");
 		String[] activity_ids = getParaValues("activity_id");
-		String[] applyNum = getParaValues("apply_num");
+ 		String[] applyNum = getParaValues("apply_num");
 		String[] applyAmount = getParaValues("apply_amount");
 		if(expenseDetailIds!=null) {
 			expenseDetailIds = getParaValues("expense_detail_id")[0].split(",");
-			for(int j = 0; j < expenseDetailIds.length; j++) {
-				for (String sellerCustomerId : sellerCustomerIdArray) {
+			for (String sellerCustomerId : sellerCustomerIdArray) {
+				//活动申请check
+				String result = this.check(activity_ids[0], sellerCustomerId);
+				
+				if(StrKit.notBlank(result)) {
+					renderAjaxResultForError(result);
+					return;
+				}
+				for(int j = 0; j < expenseDetailIds.length; j++) {
 					for (int i = 0; i < activity_ids.length; i++) {
-						//活动申请check
-						String result = this.check(activity_ids[i], sellerCustomerId, sellerCustomerNameArray[i],user.getId(),expenseDetailIds[j]);
-						
-						if(StrKit.notBlank(result)) {
-							renderAjaxResultForError(result);
-							return;
-						}
 						
 						ActivityApply activityApply = new ActivityApply();
 						String activityApplyId = StringUtils.getUUID();
@@ -251,14 +252,14 @@ public class ActivityController extends BaseFrontController {
 			}
 		}else {
 			for (String sellerCustomerId : sellerCustomerIdArray) {
+				//活动申请check
+				String result = this.check(activity_ids[0], sellerCustomerId);
+				
+				if(StrKit.notBlank(result)) {
+					renderAjaxResultForError(result);
+					return;
+				}
 				for (int i = 0; i < activity_ids.length; i++) {
-					//活动申请check
-					String result = this.check(activity_ids[i], sellerCustomerId, sellerCustomerNameArray[i],user.getId(),"");
-					
-					if(StrKit.notBlank(result)) {
-						renderAjaxResultForError(result);
-						return;
-					}
 					
 					ActivityApply activityApply = new ActivityApply();
 					String activityApplyId = StringUtils.getUUID();
@@ -329,7 +330,7 @@ public class ActivityController extends BaseFrontController {
 		return procInstId;
 	}
 
-	private String check(String activityId, String sellerCustomerId, String customerName,String userId,String expenseDetailId) {
+	private String check(String activityId, String sellerCustomerId) {
 		Activity activity = ActivityQuery.me().findById(activityId);
 		//List<ActivityApply> activityApplies = ActivityApplyQuery.me().findByUserIdAndActivityId(activityId, userId);
 		if(activity.getStartTime().after(new Date())) {
@@ -338,6 +339,11 @@ public class ActivityController extends BaseFrontController {
 		/*if (activityApplies.size() >= activity.getTotalCustomerNum()) {
 			return "活动参与的人数已经达到上限";
 		}*/
+		Customer customer = CustomerQuery.me().findSellerCustomerId(sellerCustomerId);
+		List<ActivityApply> applys = ActivityApplyQuery.me().findSellerCustomerIdAndActivityIdAndUserId(sellerCustomerId,activityId);
+		if (applys.size() >= activity.getJoinNum()) {
+			return customer.getCustomerName()+"--该客户参与该活动的次数已经达到上限";
+		}
 		/*List<ActivityApply> applys = ActivityApplyQuery.me().findSellerCustomerIdAndActivityIdAndUserId(sellerCustomerId,activityId,userId,expenseDetailId);
 		if (applys.size() >= activity.getJoinNum()) {
 			return "该客户参与该活动的次数已经达到上限";
@@ -568,10 +574,17 @@ public class ActivityController extends BaseFrontController {
 			else if (apply.getStr("status").equals("2")) html.append("已撤回\n");
 			else if (apply.getStr("status").equals("3")) html.append("已拒绝\n");
 			else html.append("结束\n");
-
+			String expenseDetailName = "";
+			if(StrKit.notBlank(apply.getStr("expenseDetailName"))) {
+				expenseDetailName = apply.getStr("expenseDetailName");
+			}
+			String applyTitle = "";
+			if(StrKit.notBlank(apply.getStr("title"))) {
+				applyTitle = apply.getStr("title");
+			}
 			html.append("                            </span>\n" +
 					"                        </a>\n" +
-					"                       <div class=\"weui-cell__bd\" style=\"text-align:center;\">" + apply.getStr("title")+"  "+apply.getStr("ExpenseDetailName") + "</div>\n" +
+					"                       <div class=\"weui-cell__bd\" style=\"text-align:center;\">" +applyTitle+"  "+ expenseDetailName+ "</div>\n" +
 					"                        <div class=\"weui-flex\">\n" +
 					"                            <div class=\"weui-flex__item\">\n" +
 					"                                <p>开始日期</p>\n" +

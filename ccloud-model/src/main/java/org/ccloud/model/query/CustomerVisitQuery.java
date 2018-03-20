@@ -24,6 +24,7 @@ import com.jfinal.plugin.activerecord.Record;
 
 import org.ccloud.Consts;
 import org.ccloud.model.CustomerVisit;
+import org.ccloud.utils.DateUtils;
 
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.ehcache.IDataLoader;
@@ -56,7 +57,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 		});
 	}
 
-	public Page<CustomerVisit> paginate(int pageNumber, int pageSize, String keyword, String dataArea,String customerType,String questionType,String groupBy, String orderby, String status) {
+	public Page<CustomerVisit> paginate(int pageNumber, int pageSize, String keyword, String dataArea,String customerType,String questionType,String groupBy, String orderby, String status,String bizUserId) {
 		
 		String select = "select cc_v.*,cc.customer_name,(select realname from `user` where id = cc_v.user_id) visit_user,u.realname review_user,GROUP_CONCAT(cc_t.`name`) customer_type, d.name questionName, art.ID_ taskId ";
 		boolean needWhere = true;
@@ -79,6 +80,10 @@ public class CustomerVisitQuery extends JBaseQuery {
 		if(StrKit.notBlank(status)) {
 			needWhere = appendIfNotEmpty(fromBuilder, "cc_v.status", status, params, needWhere);
 		}
+		
+		if(StrKit.notBlank(bizUserId)) {
+			needWhere = appendIfNotEmpty(fromBuilder, "cc_v.user_id", bizUserId, params, needWhere);
+		}
 
 		fromBuilder.append(" GROUP BY cc_v.id ");
 		fromBuilder.append(" ORDER BY " + orderby);
@@ -88,7 +93,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
-	public Page<Record> paginateForApp(int pageNumber, int pageSize, String id, String type, String nature, String subType, String status, String dataArea, String searchKey) {
+	public Page<Record> paginateForApp(int pageNumber, int pageSize, String id, String type, String nature,String user, String subType, String status, String dataArea, String searchKey) {
 
 		boolean needwhere = false;
 		List<Object> params = new LinkedList<Object>();
@@ -124,16 +129,16 @@ public class CustomerVisitQuery extends JBaseQuery {
 		needwhere = appendIfNotEmptyWithLike(sql, "t1.customerTypeNames", type, params, needwhere);
 		needwhere = appendIfNotEmpty(sql, "csc.sub_type", subType, params, needwhere);
 		needwhere = appendIfNotEmpty(sql,"csc.id", id, params, needwhere);
-
+		
 		needwhere = appendIfNotEmpty(sql, "ccv.status", status, params, needwhere);
-
+		needwhere = appendIfNotEmpty(sql, "ccv.user_id", user, params, needwhere);
 		sql.append("ORDER BY  ccv.create_date desc, ccv.`status` ");
 		sql.append(") AS c");
 		return Db.paginate(pageNumber, pageSize,select ,sql.toString(), params.toArray());
 	}
 
 	public CustomerVisit findMoreById(String id) {
-		StringBuilder sql = new StringBuilder("SELECT ccv.*,cc.prov_name,cc.city_name,cc.country_name ,cc.customer_name, cc.contact, cc.mobile, u.realname, u.mobile as userMobile, d.name as typeName, t1.title, t1.name as expenseDetailName,t1.activitApplyId ");
+		StringBuilder sql = new StringBuilder("SELECT ccv.*,cc.prov_name,cc.city_name,cc.country_name,cc.address ,cc.customer_name, cc.contact, cc.mobile, u.realname, u.mobile as userMobile, d.name as typeName, t1.title, t1.name as expenseDetailName,t1.activitApplyId ");
 		sql.append("FROM cc_customer_visit ccv ");
 		sql.append("LEFT JOIN user u ON ccv.user_id = u.id ");
 		sql.append("LEFT JOIN cc_seller_customer csc ON ccv.seller_customer_id = csc.id ");
@@ -169,7 +174,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 		fromBuilder.append(" JOIN cc_customer c on sc.customer_id = c.id");
 		fromBuilder.append(" JOIN act_ru_task a on cv.proc_inst_id = a.PROC_INST_ID_");
 		fromBuilder.append(" JOIN act_ru_identitylink u on cv.proc_inst_id = u.PROC_INST_ID_");
-		fromBuilder.append(" where c.is_enabled = 1 and locate(?, u.USER_ID_) > 0");
+		fromBuilder.append(" where c.is_enabled = 1 and FIND_IN_SET(?, u.USER_ID_) ");
 		
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), username);
 	}
@@ -184,7 +189,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 		sql.append(" JOIN cc_customer c on sc.customer_id = c.id");
 		sql.append(" JOIN act_ru_task a on cv.proc_inst_id = a.PROC_INST_ID_");
 		sql.append(" JOIN act_ru_identitylink u on cv.proc_inst_id = u.PROC_INST_ID_");
-		sql.append(" where c.is_enabled = 1 and locate(?, u.USER_ID_) > 0");
+		sql.append(" where c.is_enabled = 1 and FIND_IN_SET(?, u.USER_ID_) ");
 		
 		return DAO.find(sql.toString(), username);
 	}
@@ -228,7 +233,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 		return Db.findFirst(fromBuilder.toString(), visitId);
 	}
 	
-	public List<Record> exportVisit(String keyword, String dataArea,String customerType,String questionType,String groupBy, String orderby, String status){
+	public List<Record> exportVisit(String keyword, String dataArea,String customerType,String questionType,String groupBy, String orderby, String status,String bizUserId){
 
 		StringBuilder fromBuilder = new StringBuilder("select cc_v.*,(select `name` from dict where type='customer_audit' and `value`=cc_v.`status`) visitStatus,cc.customer_name,(select realname from `user` where id = cc_v.user_id) visit_user,u.realname review_user,GROUP_CONCAT(cc_t.`name`) customer_type, d.name questionName, art.ID_ taskId,cc.mobile customerMobile ");
 		fromBuilder.append("from cc_customer_visit cc_v left join cc_seller_customer cc_s on cc_v.seller_customer_id = cc_s.id left join cc_customer cc on cc_s.customer_id = cc.id ");
@@ -251,6 +256,10 @@ public class CustomerVisitQuery extends JBaseQuery {
 
 		if(StrKit.notBlank(status)) {
 			fromBuilder.append("and cc_v.status = '"+status+"' ");
+		}
+		
+		if(StrKit.notBlank(bizUserId)) {
+			fromBuilder.append("and cc_v.user_id = '"+bizUserId+"' ");
 		}
 
 		fromBuilder.append(" GROUP BY cc_v.id ");
@@ -312,13 +321,67 @@ public class CustomerVisitQuery extends JBaseQuery {
 		return Db.find(sql.toString(), id);
 	}
 	
+	public List<CustomerVisit> findByDataArea(String dataArea){
+		String sql = "select v.* ,u.realname from cc_customer_visit v LEFT JOIN `user` u on u.id = v.user_id where v.data_area like '"+dataArea+"' GROUP BY v.user_id";
+		return DAO.find(sql);
+	}
+	
+	//查询被拜访的客户数
+	public int findBySellerId(String sellerId,String dayTag) {
+		String startDate = "";
+		String endDate = "";
+		if (dayTag != null) {
+			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
+			startDate = date[0];
+			endDate = date[1];
+		}
+		String sql = "SELECT cv.* from cc_customer_visit cv where cv.seller_customer_id in (select id from cc_seller_customer where seller_id = '"+sellerId+"') "
+				+ " and cv.create_date >= '"+startDate+"' and cv.create_date <= '"+endDate+"' and cv.status in (100101) GROUP BY seller_customer_id";
+		return DAO.find(sql).size();
+	}
+	
+	//查询拜访客户次数相同
+	public List<Record> getBySellerId(String sellerId ,String dayTag) {
+		String startDate = "";
+		String endDate = "";
+		if (dayTag != null) {
+			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
+			startDate = date[0];
+			endDate = date[1];
+		}
+		String sql = "SELECT count(t.count) as CountNum,t.count from (SELECT COUNT(cv.seller_customer_id) as count from cc_customer_visit cv where cv. seller_customer_id in (select id from cc_seller_customer where seller_id = '"+sellerId+"') and cv.create_date >= '"+startDate+"' and cv.create_date <= '"+endDate+"' and cv.status in (100101) GROUP BY cv.seller_customer_id ORDER BY count) t GROUP BY t.count;";
+		return Db.find(sql);
+	}
+	//查询拜访次数对应的订单金额总数
+	public List<Record> getAmountBySellerId(String sellerId,String dayTag){
+		String startDate = "";
+		String endDate = "";
+		if (dayTag != null) {
+			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
+			startDate = date[0];
+			endDate = date[1];
+		}
+		String sql = "SELECT count(t2.count) as CountNum,t2.count,CASE when TRUNCATE(SUM(t2.sum)/count(t2.count),2) IS NOT NULL THEN TRUNCATE(SUM(t2.sum)/count(t2.count),2) ELSE 0 END as amountNum from " 
+					+"(SELECT cv.seller_customer_id as sellerCustomerId, COUNT(cv.seller_customer_id) as count ,t1.amount as sum " 
+					+"from cc_customer_visit cv " 
+					+"LEFT JOIN (SELECT so.customer_id as sellerCustomerId, SUM(so.total_amount) as amount " 
+					+"from cc_sales_outstock so " 
+					+"LEFT JOIN cc_sales_order_join_outstock jo on jo.outstock_id = so.id " 
+					+"LEFT JOIN cc_sales_order cso on cso.id = jo.order_id " 
+					+"where cso.seller_id = '"+sellerId+"' and so.`status` in ("+Consts.SALES_OUT_STOCK_STATUS_OUT+","+Consts.SALES_OUT_STOCK_STATUS_PART_OUT+") and so.create_date >= '"+startDate+"' and so.create_date <= '"+endDate+"' " 
+					+"GROUP BY so.customer_id) t1 on t1.sellerCustomerId = cv.seller_customer_id "
+					+ "where  cv.create_date >= '"+startDate+"' and cv.create_date <= '"+endDate+"' and cv.seller_customer_id in (select id from cc_seller_customer where seller_id = '"+sellerId+"') and cv.status in (100101) " 
+					+"GROUP BY cv.seller_customer_id ORDER BY count) t2  GROUP BY t2.count";
+		return Db.find(sql);
+	}	
+		
 	public CustomerVisit findByActivityApplyIdAndComeFrom(String activityApplyId){
 		String sql = "select * from cc_customer_visit where active_apply_id = '"+activityApplyId+"'";
 		return DAO.findFirst(sql);
 	}
 	
 	public List<CustomerVisit> findByActivityApplyId(String activityApplyId){
-		String sql = "select * from cc_customer_visit where active_apply_id = '"+activityApplyId+"' ORDER BY create_date desc";
+		String sql = "select * from cc_customer_visit where active_apply_id = '"+activityApplyId+"' and status not in (100103) ORDER BY create_date desc";
 		return DAO.find(sql);
 	}
 	
@@ -336,7 +399,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 	}
 	
 	public List<CustomerVisit> findByApplyIdAndSellerCustomerId(String activityApplyId , String sellerCustomerId) {
-		String sql = "select * from cc_customer_visit where seller_customer_id = '"+sellerCustomerId+"' and active_apply_id = '"+activityApplyId+"'";
+		String sql = "select * from cc_customer_visit where seller_customer_id = '"+sellerCustomerId+"' and active_apply_id = '"+activityApplyId+"' and status not in (100103)";
 		return DAO.find(sql);
 	}
 	
@@ -344,4 +407,5 @@ public class CustomerVisitQuery extends JBaseQuery {
 		String sql = "select * from cc_customer_visit where active_apply_id = '"+activityApplyId+"' and status = '"+Consts.CUSTOMER_VISIT_STATUS_PASS+"' ORDER BY create_date desc";
 		return DAO.find(sql);
 	}
+	
 }

@@ -14,6 +14,20 @@
     }
 </#macro>
 <#macro script>
+	var customerList = [];
+    var orgCustomerList = {};
+    var customerSelect = [];
+    var problemSelect = [];
+
+    var imageArr = [];
+    var count = 3;
+    var $form = $("#form");
+    var $picNum = $('.weui-uploader__info');
+    var $uploaderFiles = $("#uploaderFiles");
+    var $gallery = $("#gallery"), $galleryImg = $("#galleryImg");
+
+    var Orientation = null;
+    var MAX_HEIGHT = 1000;
 	var count = 3;
     var imageArr = [];
     var $form = $("#form");
@@ -34,7 +48,7 @@
    	    $("#customer_name").val("${(record.customer_name)!}");
        	$("#contact").val("${(record.contact)!}");
        	$("#mobile").val("${(record.mobile)!}");
-       	$("#address").val("${(record.prov_name)!}"+"-"+"${(record.city_name)!}"+"-"+"${(record.country_name)!}"+"-"+"${(record.address)!}");
+       	$("#address").val("${(record.prov_name)!}"+" "+"${(record.city_name)!}"+" "+"${(record.country_name)!}"+" "+"${(record.address)!}");
     	$("#activity_title").val("${(record.title)!}"+"/"+"${(record.expenseDetailName)!}")
     	$("#activity_apply_id").val("${(record.id)!}");
     	$("#activity_execute_id").val("${(activityExecuteId)!}");
@@ -60,7 +74,7 @@
 	                        if(imgeList[j].orderList == _orderList){
 	                        	$("#question_type").val("${(customerVisit.typeName)!}");
 						        $("#question_desc").val("${(customerVisit.question_desc)!}")
-						        $("#location").val("${(customerVisit.location)!}");
+						        //$("#location").val("${(customerVisit.location)!}");
 						        $("#problem_id").val("${(customerVisit.question_type)!}");
 	        					$('._submit_btn').hide();
 	        					flang = true;
@@ -249,10 +263,10 @@
             return false;
         }
         
-        /* if($("#location").val().length==0) {
+         if($("#location").val().length==0) {
             $.toptip('定位地址不能为空,请刷新定位', 1000, 'error');
             return false;
-        }*/
+        }
 
         if(imageArr.length == 0){
         	 $.toptip('照片不能为空', 3000, 'error'); 
@@ -464,11 +478,14 @@
                     </div>
                 </div>
             </section>
-            <section class="weui-panel weui-panel_access ft14 remark">
+           	<section class="weui-panel weui-panel_access ft14 remark">
                 <div class="weui-cell weui-cell_access">
                     <div class="weui-cell__hd"><span class="icon-map-pin ft16 green"></span></div>
                     <div class="weui-cell__bd">
-                        <input type="text" class="weui-input" id="location" name="customerVisit.location" readonly="readonly" placeholder="地址" required>
+                        <div id="location-span" class="location">${(customerVisit.location)!'正在定位...'}</div>
+                        <input type="hidden" name="customerVisit.lng" id="lng">
+                        <input type="hidden" name="customerVisit.lat" id="lat">
+                        <input type="hidden" name="customerVisit.location" id="location">
                     </div>
                     <div class="weui-cell__hd" id="refresh"><span class="icon-refresh ft16 gray" onclick="refreshLocation()"></span></div>
                 </div>

@@ -80,21 +80,22 @@
 
 /*blue css*/
 .ystep-blue .ystep-step-done {
-  background-image: url("../images/pointes_red.png");
+  background-image: url("../images/pointes_green.png");
   background-repeat: no-repeat;
+  color:#84c965;
 }
 .ystep-blue .ystep-step-undone {
-  background-image: url("../images/pointes_red.png");
+  background-image: url("../images/pointes_green.png");
   background-repeat: no-repeat;
   color: #9c9a9b;
 }
 .ystep-blue .ystep-step-active {
-  background-image: url("../images/pointes_red.png");
+  background-image: url("../images/pointes_green.png");
   background-repeat: no-repeat;
-  color: #3276b1;
+  color: #579f24;
 }
 .ystep-blue .ystep-progress-highlight {
-  background: #60baff;
+  background: #84c965;
 }
 /*按钮样式*/
 .ystep {
