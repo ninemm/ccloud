@@ -402,6 +402,7 @@ public class CustomerVisitController extends BaseFrontController {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		
 		String activityApplyId = getPara("activity_apply_id");
+		String activityExceuteId = getPara("activity_execute_id");
 		if(!activityApplyId.equals("")) {
 			List<CustomerVisit> customerVisits = CustomerVisitQuery.me().findByActivityApplyId(activityApplyId);
 			if(customerVisits.size()>0) {
@@ -425,6 +426,7 @@ public class CustomerVisitController extends BaseFrontController {
 		customerVisit.setDataArea(user.getDataArea());
 		customerVisit.setDeptId(user.getDepartmentId());
 		customerVisit.setActiveApplyId(activityApplyId);
+		customerVisit.setActivityExecuteId(activityExceuteId);
 		if (StrKit.notBlank(picJson)) {
 			
 			JSONArray array = JSON.parseArray(picJson);
@@ -723,6 +725,7 @@ public class CustomerVisitController extends BaseFrontController {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		
 		String activityApplyId = getPara("activity_apply_id");
+		String activityExceuteId = getPara("activity_execute_id");
 		if(!activityApplyId.equals("")) {
 			List<CustomerVisit> customerVisits = CustomerVisitQuery.me().findByActivityApplyId(activityApplyId);
 			if(customerVisits.size()>0) {
@@ -742,6 +745,7 @@ public class CustomerVisitController extends BaseFrontController {
 		customerVisit.setDataArea(user.getDataArea());
 		customerVisit.setDeptId(user.getDepartmentId());
 		customerVisit.setActiveApplyId(activityApplyId);
+		customerVisit.setActivityExecuteId(activityExceuteId);
 		if (StrKit.notBlank(picJson)) {
 			
 			JSONArray array = JSON.parseArray(picJson);

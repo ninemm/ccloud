@@ -127,6 +127,7 @@
 							                                   	+'<input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/*" multiple="">'
 							                                    +'<input type="hidden" name="pic" id="pic" class="pic">'
 							                                	+'</div></div></div>';
+							                                	$("#activity_execute_id").val(activityExecute[i].id);
 								                          }else{
 								                          	html +='</ul></div></div>';
 								                          }
@@ -547,6 +548,7 @@
 							活动&nbsp;&nbsp;&nbsp;
 						</div>
 						<input id="activity_apply_id"  name="activity_apply_id" type="hidden" />
+						<input id="activity_execute_id"  name="activity_execute_id" type="hidden" />
 						<input id="activity_title" class="weui-input" name="activity_title" type="text" placeholder="请选择" readonly>
                     </div>
                     <span class="weui-cell__ft"></span>

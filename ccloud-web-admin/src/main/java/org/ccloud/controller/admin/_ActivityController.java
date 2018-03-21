@@ -33,8 +33,10 @@ import org.ccloud.mid.MidDataUtil;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.DateUtils;
+import org.ccloud.utils.HttpUtils;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Activity;
+import org.ccloud.model.ActivityApply;
 import org.ccloud.model.ActivityExecute;
 import org.ccloud.model.CustomerVisit;
 import org.ccloud.model.Dict;
@@ -44,7 +46,7 @@ import org.ccloud.model.QyBasicflowtype;
 import org.ccloud.model.QyBasicshowtype;
 import org.ccloud.model.QyExpense;
 import org.ccloud.model.QyExpensedetail;
-import org.ccloud.model.User;
+import org.ccloud.model.query.ActivityApplyQuery;
 import org.ccloud.model.query.ActivityExecuteQuery;
 import org.ccloud.model.query.ActivityQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
@@ -709,22 +711,23 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 	public void auditReimbursement() throws Exception {
 		String ids = getPara("ids");
 		String[] activityApplyIds = ids.split(",");
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		for (String activityApplyId : activityApplyIds) {
 			Record YxActivity = ActivityQuery.me().findYxActivity(activityApplyId);
+			ActivityApply activityApply = ActivityApplyQuery.me().findById(activityApplyId);
 			Map<String, Object>map=new HashMap<>();
 			String[] FlowIDNO = YxActivity.getStr("FlowIDNO").split("\\.");
 			map.put("IDNO",199);
 			map.put("FlowIDNO",Integer.getInteger(FlowIDNO[FlowIDNO.length-1]) );
 //			map.put("ResourceID", "");
-			map.put("CostType",YxActivity.getInt("CostType"));
 			if (YxActivity.getStr("invest_type").equals("101101")) {
 				//公关赞助
+				map.put("CostType",YxActivity.getInt("CostType"));
 				map.put("ActivityTime",YxActivity.getStr("ActivityTime"));
 				map.put("CustomerName",YxActivity.getStr("CustomerName"));
 				map.put("ActivityAddress",YxActivity.getStr("ActivityAddress"));
 				map.put("Telephone",YxActivity.getStr("Telephone"));
 				map.put("ScenePhoto","123");
+				map.put("Position",YxActivity.getStr("Position"));
 				map.put("ResourceFlag",1);
 				map.put("WriteOffAmount",YxActivity.getBigDecimal("WriteOffAmount"));
 				map.put("Telephone",YxActivity.getStr("Telephone"));
@@ -735,21 +738,182 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				map.put("Flag",1);
 				map.put("ShopOrderID",19);
 				map.put("GiftPhoto","123");
-				
+				try {
+					HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/ActivityBrandInfo", map);
+					activityApply.setStatus(5);
+					activityApply.update();
+				} catch (Exception e) {
+					e.printStackTrace();
+					renderAjaxResultForError("加入核销失败!");
+					return;
+				}
 			}else if(YxActivity.getStr("invest_type").equals("101102")) {
 				//消费培育
+				map.put("CostType",YxActivity.getInt("CostType"));
+				map.put("ActivityTime",YxActivity.getStr("ActivityTime"));
+				map.put("CustomerName",YxActivity.getStr("CustomerName"));
+				map.put("ActivityAddress",YxActivity.getStr("ActivityAddress"));
+//				map.put("TableNum","");
+//				map.put("DinnerType","");
+				map.put("Telephone",YxActivity.getStr("Telephone"));
+				map.put("ScenePhoto","123");
+				map.put("Position",YxActivity.getStr("Position"));
+				map.put("ResourceFlag",1);
+				map.put("InvestState",2);
+				map.put("WriteOffAmount",YxActivity.getBigDecimal("WriteOffAmount"));
+//				map.put("ShopOrderID","");
+//				map.put("IntroducerOrderID","");
+//				map.put("IntroducerName","");
+//				map.put("IntroducerTel","");
+//				map.put("SignPhotos","");
+				map.put("CreateManName",YxActivity.getStr("CreateManName"));
+				map.put("CreateTime",YxActivity.getStr("CreateTime"));
+				map.put("ModifyManName",YxActivity.getStr("ModifyManName"));
+				map.put("ModifyTime",YxActivity.getStr("ModifyTime"));		
+				map.put("Flag",1);
+//				map.put("GiftPhoto","");
+//				map.put("ResourceID","");
 			}else if(YxActivity.getStr("invest_type").equals("101103")) {
 				//终端广告
+				map.put("ProvinceName",YxActivity.getStr("ProvinceName"));
+				map.put("CityName",YxActivity.getStr("CityName"));
+				map.put("CountyName",YxActivity.getStr("CountyName"));
+				map.put("CustomerName",YxActivity.getStr("CustomerName"));
+//				map.put("CustomerCode","");
+//				map.put("ShopID","");
+				map.put("ShopCreateTime",YxActivity.getStr("ShopCreateTime"));
+				map.put("ShopLinkMan",YxActivity.getStr("ShopLinkMan"));
+				map.put("ShopPhone",YxActivity.getStr("ShopPhone"));
+//				map.put("ChannelID","");
+				map.put("CostType",YxActivity.getInt("CostType"));
+				map.put("Num",YxActivity.getInt("Num"));
+				map.put("InvestAmount",YxActivity.getBigDecimal("WriteOffAmount"));
+				map.put("InvestState",2);
+				map.put("ResourceFlag",1);
+				map.put("ExecuteManName",YxActivity.getStr("ExecuteManName"));
+				map.put("ExecuteTime",YxActivity.getStr("ExecuteTime"));		
+				map.put("ExecuteState",1);
+//				map.put("ExecuteNum","");
+//				map.put("ExecuteSize","");
+//				map.put("ExecutePhotoIds","");
+//				map.put("ExecuteRemark","");
+				map.put("WriteOffNum",YxActivity.getInt("Num"));
+//				map.put("WriteOffSize","");
+				map.put("WriteOffAmount",YxActivity.getBigDecimal("WriteOffAmount"));
+				map.put("CreateManName",YxActivity.getStr("CreateManName"));
+				map.put("CreateTime",YxActivity.getStr("CreateTime"));
 			}else if(YxActivity.getStr("invest_type").equals("101104")) {
 				//终端陈列 
+				map.put("ProvinceName",YxActivity.getStr("ProvinceName"));
+				map.put("CityName",YxActivity.getStr("CityName"));
+				map.put("CountyName",YxActivity.getStr("CountyName"));
+				map.put("CustomerName",YxActivity.getStr("CustomerName"));
+//				map.put("CustomerCode","");
+//				map.put("ShopID","");
+//				map.put("ChannelID","");
+				map.put("ShopVisitCount",YxActivity.getInt("ShopVisitCount"));
+				map.put("ShopXCJHCount",YxActivity.getInt("ShopVisitCount"));
+				map.put("ResourceFlag",1);
+//				map.put("SignPhotoId","");
+//				map.put("GiftPhotoId","");
+				map.put("CostType",YxActivity.getInt("CostType"));
+				map.put("ShowType",YxActivity.getInt("ShowType"));
+				map.put("BeginTime",YxActivity.getStr("BeginTime"));
+				map.put("EndTime",YxActivity.getStr("EndTime"));
+				map.put("InvestDay",YxActivity.getInt("InvestDay"));
+//				map.put("InvestType","");
+//				map.put("Remark","");
+				map.put("GrantAmount",YxActivity.getBigDecimal("GrantAmount"));
+				map.put("CreateTime",YxActivity.getStr("CreateTime"));
+				map.put("ModifyTime",YxActivity.getStr("ModifyTime"));		
+				map.put("Flag",1);
+				map.put("InvestState",2);
+				map.put("ShopCreateTime",YxActivity.getStr("ShopCreateTime"));
+				map.put("ShopLinkMan",YxActivity.getStr("ShopLinkMan"));
+				map.put("ShopPhone",YxActivity.getStr("ShopPhone"));
+//				map.put("GrantTime","");
+//				map.put("AuditResult","");
+				map.put("CreateManName",YxActivity.getStr("CreateManName"));
 			}else if(YxActivity.getStr("invest_type").equals("101105")) {
 				//终端客情
-	
+				map.put("CustomerName",YxActivity.getStr("CustomerName"));
+//				map.put("CustomerCode","");
+//				map.put("ShopID","");
+				map.put("ChannelID",YxActivity.getInt("ChannelID"));
+				map.put("InvestState",2);
+//				map.put("CancleReason","");
+				map.put("ResourceFlag",1);
+//				map.put("CreateManID","");
+				map.put("CreateTime",YxActivity.getStr("CreateTime"));
+//				map.put("ShopOrderID","");
+//				map.put("ActivityPhotos","");
+//				map.put("SignPhotos","");
+//				map.put("ModifyManID","");
+				map.put("ModifyTime",YxActivity.getStr("ModifyTime"));
+				map.put("Flag",1);
+//				map.put("ChannelTypeID",1);
+				map.put("WriteOffAmount",YxActivity.getBigDecimal("WriteOffAmount"));
+				map.put("ShopCreateTime",YxActivity.getStr("ShopCreateTime"));
+				map.put("ShopLinkMan",YxActivity.getStr("ShopLinkMan"));
+				map.put("ShopPhone",YxActivity.getStr("ShopPhone"));
+				map.put("ShopVisitCount",YxActivity.getInt("ShopVisitCount"));
+				map.put("ShopXCJHCount",YxActivity.getInt("ShopVisitCount"));
+//				map.put("OrderMan","");
+//				map.put("ResourceID","");
+				map.put("ProvinceName",YxActivity.getStr("ProvinceName"));
+				map.put("CityName",YxActivity.getStr("CityName"));
+				map.put("CountyName",YxActivity.getStr("CountyName"));
 			}else if(YxActivity.getStr("invest_type").equals("101106")) {
 				//商超赠品
+				map.put("ProvinceName",YxActivity.getStr("ProvinceName"));
+				map.put("CityName",YxActivity.getStr("CityName"));
+				map.put("CountyName",YxActivity.getStr("CountyName"));
+				map.put("CustomerName",YxActivity.getStr("CustomerName"));
+//				map.put("CustomerCode","");
+//				map.put("ShopID","");
+				map.put("ShopCreateTime",YxActivity.getStr("ShopCreateTime"));
+				map.put("ShopLinkMan",YxActivity.getStr("ShopLinkMan"));
+				map.put("ShopPhone",YxActivity.getStr("ShopPhone"));
+//				map.put("ChannelID","");
+				map.put("InvestAmount",YxActivity.getBigDecimal("WriteOffAmount"));
+				map.put("InvestState",2);
+				map.put("ResourceFlag",1);
+				map.put("CostType",YxActivity.getInt("CostType"));
+				map.put("WriteOffAmount",YxActivity.getBigDecimal("WriteOffAmount"));
+				map.put("CreateManName",YxActivity.getStr("CreateManName"));
+				map.put("CreateTime",YxActivity.getStr("CreateTime"));
+				map.put("ModifyManName",YxActivity.getStr("ModifyManName"));
+				map.put("ModifyTime",YxActivity.getStr("ModifyTime"));		
+				map.put("Flag",1);
 			}else {
 				//进场费
-				
+				map.put("ProvinceName",YxActivity.getStr("ProvinceName"));
+				map.put("CityName",YxActivity.getStr("CityName"));
+				map.put("CountyName",YxActivity.getStr("CountyName"));
+				map.put("CustomerName",YxActivity.getStr("CustomerName"));
+//				map.put("CustomerCode","");
+//				map.put("ShopID","");
+				map.put("ShopCreateTime",YxActivity.getStr("ShopCreateTime"));
+				map.put("ShopLinkMan",YxActivity.getStr("ShopLinkMan"));
+				map.put("ShopPhone",YxActivity.getStr("ShopPhone"));
+//				map.put("ChannelID","");
+//				map.put("InvestType","");
+				map.put("InvestAmount",YxActivity.getBigDecimal("WriteOffAmount"));
+				map.put("InvestState",2);
+				map.put("ResourceFlag",1);
+//				map.put("CommodityID","");
+				map.put("CostType",YxActivity.getInt("CostType"));
+//				map.put("ExecutePhotoIds","");
+//				map.put("ExecuteRemark","");
+				map.put("WriteOffAmount",YxActivity.getBigDecimal("WriteOffAmount"));
+				map.put("CreateManName",YxActivity.getStr("CreateManName"));
+				map.put("CreateTime",YxActivity.getStr("CreateTime"));
+				map.put("ModifyManName",YxActivity.getStr("ModifyManName"));
+				map.put("ModifyTime",YxActivity.getStr("ModifyTime"));		
+				map.put("Flag",1);
+				map.put("ExecuteManName",YxActivity.getStr("ExecuteManName"));
+				map.put("ExecuteTime",YxActivity.getStr("ExecuteTime"));		
+				map.put("ExecuteState",1);
 			}
 		}
 		renderAjaxResultForSuccess("加入核销成功");
