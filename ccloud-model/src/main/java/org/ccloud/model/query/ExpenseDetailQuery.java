@@ -18,6 +18,7 @@ package org.ccloud.model.query;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.ccloud.Consts;
 import org.ccloud.model.ExpenseDetail;
 
 import com.jfinal.plugin.activerecord.Page;
@@ -82,11 +83,15 @@ public class ExpenseDetailQuery extends JBaseQuery {
 	}
 
 	public ExpenseDetail findSurplusById(String id) {
+		LinkedList<Object> params = new LinkedList<Object>();
 		StringBuilder builder = new StringBuilder("SELECT ce.*, IFNULL(t1.num,0) as num, IFNULL(t1.amount,0) as amount FROM cc_expense_detail ce ");
 		builder.append("LEFT JOIN (SELECT ca.expense_detail_id,SUM(ca.apply_amount) as amount, SUM(ca.apply_num) as num FROM cc_activity_apply ca ");
+		builder.append("WHERE ca.status != ? ");
+		params.add(Consts.ACTIVITY_APPLY_STATUS_REJECT);
 		builder.append("GROUP BY ca.expense_detail_id) t1 ON t1.expense_detail_id = ce.id ");
 		builder.append("where id = ? ");
-		return DAO.findFirst(builder.toString(), id);
+		params.add(id);
+		return DAO.findFirst(builder.toString(), params.toArray());
 	}
 
 	public ExpenseDetail _findById(String id) {

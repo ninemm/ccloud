@@ -2,69 +2,55 @@ package org.ccloud.model.vo;
 
 public class Mid_FlowTypeInfo {
 
-	private String flowTypeID;// 流程类型ID
-	private String flowTypeName;// 流程类型名字
-	private String parentID;// 父ID
-	private String memo;// 描述
-	private String createTime;// 创建时间
-	private String modifyTime;// 修改时间
-	private String flag;// 有效性
-	private String YX_FlowTypeID;
-	private String YX_ParentID;
+	private String FlowTypeID;// 流程类型ID
+	private String FlowTypeName;// 流程类型名字
+	private String ParentID;// 父ID
+	private String Memo;// 描述
+	private String CreateTime;// 创建时间
+	private String ModifyTime;// 修改时间
+	private String Flag;// 有效性
 	
 	public String getFlowTypeID() {
-		return flowTypeID;
+		return FlowTypeID;
 	}
 	public void setFlowTypeID(String flowTypeID) {
-		this.flowTypeID = flowTypeID;
+		FlowTypeID = flowTypeID;
 	}
 	public String getFlowTypeName() {
-		return flowTypeName;
+		return FlowTypeName;
 	}
 	public void setFlowTypeName(String flowTypeName) {
-		this.flowTypeName = flowTypeName;
+		FlowTypeName = flowTypeName;
 	}
 	public String getParentID() {
-		return parentID;
+		return ParentID;
 	}
 	public void setParentID(String parentID) {
-		this.parentID = parentID;
+		ParentID = parentID;
 	}
 	public String getMemo() {
-		return memo;
+		return Memo;
 	}
 	public void setMemo(String memo) {
-		this.memo = memo;
+		Memo = memo;
 	}
 	public String getCreateTime() {
-		return createTime;
+		return CreateTime;
 	}
 	public void setCreateTime(String createTime) {
-		this.createTime = createTime;
+		CreateTime = createTime;
 	}
 	public String getModifyTime() {
-		return modifyTime;
+		return ModifyTime;
 	}
 	public void setModifyTime(String modifyTime) {
-		this.modifyTime = modifyTime;
+		ModifyTime = modifyTime;
 	}
 	public String getFlag() {
-		return flag;
+		return Flag;
 	}
 	public void setFlag(String flag) {
-		this.flag = flag;
-	}
-	public String getYX_FlowTypeID() {
-		return YX_FlowTypeID;
-	}
-	public void setYX_FlowTypeID(String yX_FlowTypeID) {
-		YX_FlowTypeID = yX_FlowTypeID;
-	}
-	public String getYX_ParentID() {
-		return YX_ParentID;
-	}
-	public void setYX_ParentID(String yX_ParentID) {
-		YX_ParentID = yX_ParentID;
+		Flag = flag;
 	}
 	
 }
