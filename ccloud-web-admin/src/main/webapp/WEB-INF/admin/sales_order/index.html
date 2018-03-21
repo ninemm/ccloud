@@ -46,6 +46,7 @@
 
 	var initParams = function(params) {
 		var actId = $("#activityId").find("option:selected").val();
+		var ssId = $("#sellerId").find("option:selected").val();
 		var keyword = $('#search').val();
 		if (keyword) keyword = encodeURIComponent(keyword);
 		var param = {
@@ -54,7 +55,8 @@
 			k: keyword,
 			startDate: $('#startDate').val() + " 00:00:00",
 			endDate: $('#endDate').val() + " 23:59:59",
-			activity: actId
+			activity: actId,
+			sellerId: ssId
 		};
 		return param;
 	};
@@ -262,11 +264,12 @@
 		var endDate = $('#endDate').val() + " 23:59:59";
 		var k = $('#search').val()
 		var actId = $("#activityId").find("option:selected").val();
+		var ssId = $("#sellerId").find("option:selected").val();
 		<@shiro.hasRole name="021">  
-			jQuery.mm.down("${CPATH}/admin/salesOrder/downloading?startDate=" + startDate  + "&endDate=" + endDate + "&k=" + k + "&activity=" + actId+ "&tax=0");
+			jQuery.mm.down("${CPATH}/admin/salesOrder/downloading?startDate=" + startDate  + "&endDate=" + endDate + "&k=" + k + "&activity=" + actId+"&sellerId="+ssId+ "&tax=0");
 		</@shiro.hasRole>	
 		<@shiro.lacksRole name="021">  
-			jQuery.mm.down("${CPATH}/admin/salesOrder/downloading?startDate=" + startDate  + "&endDate=" + endDate + "&k=" + k + "&activity=" + actId+ "&tax=1");
+			jQuery.mm.down("${CPATH}/admin/salesOrder/downloading?startDate=" + startDate  + "&endDate=" + endDate + "&k=" + k + "&activity=" + actId+"&sellerId="+ssId+ "&tax=1");
 		</@shiro.lacksRole>	
     }
 </#macro>
@@ -320,6 +323,17 @@
                     <div class="col-sm-8 input-group input-group-sm">
                         <input id="search" class="form-control" type="text" value="${k!}" name="k" placeholder="订单单号/客户名称">
                     </div>
+                </div>
+                <div class="col-sm-4">
+                    <label class="control-label col-sm-4">账套:</label>
+                    <div class="col-sm-8 input-group input-group-sm">
+		                <select class="form-control" id="sellerId">
+		                    <option value="">--请选择--</option>
+		                    <#list sellers! as ss >
+		                        <option value="${ss.id!}">${(ss.seller_name)!}</option>
+		                    </#list>
+		                </select>
+	                </div>
                 </div>
                 <div class="col-sm-4" style="text-align:center;">
                     <input id="search-submit" class="btn btn-sm btn-primary btn-flat" type="button" value="搜索">

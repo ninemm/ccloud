@@ -38,6 +38,7 @@ import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.Activity;
 import org.ccloud.model.Message;
 import org.ccloud.model.SalesOrder;
+import org.ccloud.model.Seller;
 import org.ccloud.model.User;
 import org.ccloud.model.excel.ExcelUploadUtils;
 import org.ccloud.model.query.ActivityQuery;
@@ -49,6 +50,7 @@ import org.ccloud.model.query.OutstockPrintQuery;
 import org.ccloud.model.query.SalesOrderDetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SalesOutstockQuery;
+import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.vo.SalesOrderExcel;
 import org.ccloud.route.RouterMapping;
@@ -88,12 +90,20 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 	@Override
 	public void index() {
 		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
-		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-		List<Activity> actList = ActivityQuery.me().findBySellerId(sellerId);
-
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		List<Seller> sellers = SellerQuery.me().findByDataArea(dataArea);
+		String sellerId = "";
+		for(Seller seller:sellers) {
+			sellerId += "'"+seller.getId()+"',";
+		}
+//		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+//		List<Activity> actList = ActivityQuery.me().findBySellerId(sellerId);
+		List<Activity> actList = ActivityQuery.me().findBySellerId(sellerId.substring(0, (sellerId.length()-1)));
+		
 		setAttr("startDate", date);
 		setAttr("endDate", date);
 		setAttr("actList", actList);
+		setAttr("sellers", sellers);
 		render("index.html");
 	}
 	
@@ -223,7 +233,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
-		String sellerId = getSessionAttr("sellerId");
+		String sellerId = getPara("sellerId");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String activityId = getPara("activity");
 
@@ -792,7 +802,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		String endDate = getPara("endDate");
 		String keyword = getPara("k");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		String sellerId = getSessionAttr("sellerId");
+		String sellerId = getPara("sellerId");
 		String activityId = getPara("activity");
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\sales_outstock\\"
 				+ "salesOrderInfo.xlsx";
