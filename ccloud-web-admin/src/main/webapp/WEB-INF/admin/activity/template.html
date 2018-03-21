@@ -1,0 +1,117 @@
+<#include "../_inc/_layer_layout.html"/>
+
+<#macro script_import>
+	<script type="text/javascript" src="${CPATH}/static/plugins/bootstrap-treeview/js/bootstrap-treeview.js"></script>
+	<script src="${CPATH}/static/ccloud/admin/js/common.js"></script>
+</#macro> 
+
+<#macro css_import>
+	<link rel="stylesheet" href="${CPATH}/static/plugins/bootstrap-treeview/css/bootstrap-treeview.css">
+	<!-- <link rel="stylesheet" href="${CPATH}/static/plugins/toastr/toastr.css"> -->
+</#macro>
+
+<#macro script>
+	var newTrIdx = 0;
+	var orderList = "";
+	var num = 0;
+	$(document).ready(function() {
+		orderList = ${(orderList)!};
+		$("#orderList").val(orderList);
+		addActivityExT();
+	});
+	var $tbody = $("#table tbody");
+	var templateList = new Array();
+	function addActivityExT(){
+		var newTrHtml = $tbody.find("tr:first").html();
+		newTrIdx = newTrIdx + 1;
+		var newTrId = 'tr' + newTrIdx;
+		$tbody.append("<tr id='" + newTrId + "'>" + newTrHtml + "</tr>");
+		var $newTr = $("#" + newTrId);
+		<!--添加validate -->
+		var remarkName = "templateValue" + newTrIdx;
+		$newTr.find("#templateValue").attr("name", "templateValue" + newTrIdx);
+		$newTr.find("#templateValueType").attr("name","templateValueType" + newTrIdx);
+		$newTr.find("#templateValueTypeValue").attr("name","templateValueTypeValue" + newTrIdx);
+		num++;
+	}
+	
+	//删除
+	function deleteTr(obj){
+		var $tr = $(obj).parent().parent();
+		var trIndex = $tr.attr("id").replace("tr", "");
+		$tr.remove();
+	}
+	function addTemplate(){
+		
+	}
+	function doSubmit(){
+	
+		for(var i = 0 ; i < num ; i++){
+			var pdid = 'tr' + i;
+			alert( $("#"+pdid+"").children("td").eq(1).val());
+			template = {
+				orderList : $("#orderList").val(),
+				templateValue : $("#tr"+i).find("td").eq(1).val(),
+				templateValueType : $("#tr"+i).find("td").eq(2).find("option:selected").val(),
+				templateValueTypeValue : $("#tr"+i).find("td").eq(3).val()
+			}
+			templateList.push(template);		
+		}
+		console.log(templateList);
+		localStorage.setItem("template", templateList);
+		parent.setTemplate();
+	}
+	
+</#macro>
+
+<@layout>
+<div style="padding: 10px;">
+	 <table id="table" class="table table-bordered table-hover text-center" width="100%" name="row">
+			<thead>
+				<tr>
+					<th width="2%"></th>
+					<th width="18%">内容</th>
+					<th width="30%">展现形式</th>
+					<th width="50%">选项</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="hide">
+					<td>
+						<a class="btn btn-danger btn-xs" onclick="deleteTr(this)"><span class="glyphicon glyphicon-remove"></span></a>
+					</td>
+					<td>
+						<input type="text" name = "templateValue" id="templateValue" value="" placeholder="例子：长/宽/高"/>
+						<input type="hidden" name = "orderList" id="orderList" value=""/>
+					</td>
+					<td>
+						<div class = "validata-box" style="padding-left:35%;">
+							<select name = "templateValueType" >
+								<option value="1" selected>输入框</option>
+								<option value="2">单选</option>
+								<option value="3">多选</option>
+							</select>
+						</div>
+					</td>
+					<td>
+						<div class = "validata-box">
+							<input type="text" id="templateValueTypeValue" name="templateValueTypeValue" value="" placeholder="多个选项值用逗号表示"/>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+			<tfoot>
+				<tr>
+					<td>
+						<button class="btn btn-xs btn-info" onclick="addActivityExT()" ><span class="glyphicon glyphicon-plus"></span></button>
+					</td>
+				</tr>
+			</tfoot>
+		</table>
+</div>
+		<div class="box-footer"> 
+			<input type = "hidden" id = "num" value = ""/>
+			<button type="button" onclick="doSubmit()" class="btn btn-sm bg-olive btn-flat ladda-button" data-style="expand-right"><span class="ladda-label">提交</span></button>
+			<!-- <input type="button" class="btn btn-sm btn-primary btn-flat" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" /> -->
+		</div>
+</@layout>

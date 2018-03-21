@@ -55,7 +55,6 @@
 	var InputsWrapper   = $("#InputsWrapper"); //Input boxes wrapper ID  
 	var AddButton       = $("#AddMoreFileBox"); //Add button ID  
 	var x = InputsWrapper.length; //initlal text box count 
-	
 	<#if activity??>
 		$("#expendHead").empty();
 		<#if activity.investType == "101101" || activity.investType == "101102" || activity.investType == "101103" || activity.investType == "101106">
@@ -366,7 +365,7 @@
 		$newTr.find("#activityExecteId").attr("name","activityExecteId"+newTrIdx);
 		orderNum();
 	}
-	
+
 	function addActivityExecute(el){
 		var $tbody = $("#table tbody");
 		var newTrHtml = $tbody.find("tr:first").html();
@@ -448,6 +447,20 @@
           x--; //decrement textbox  
 	return false;
 	})	
+	
+	function editTemplate(obj){
+		var orderList = $(obj).parent().parent().parent().find("#orderList").val();
+		layer.open({
+			title:"模板配置",
+			type: 2, 
+			area: ['70%', '80%'],
+			content: '${CPATH}/admin/activity/editTemplate?orderList=' + orderList
+		}); 
+	}
+	function setTemplate(){
+		var template = localStorage.getItem("template");
+		console.log(template);
+	}
 </#macro>
 
 <@layout active_id=p child_active_id=c>
@@ -763,6 +776,7 @@
 							<th width="5%">行号</th>
 							<th width="10%">步骤</th>
 							<th width="50%">执行说明</th>
+							<th width="30%">模板配置</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -785,6 +799,12 @@
 									<input type="text" id="remark" name="remark"  style="width: 50%;"value=""/>
 								</div>
 							</td>
+							<td>
+								<div class = "validata-box">
+									<a class="btn btn-danger btn-xs">查看</a>
+									<a class="btn btn-danger btn-xs" onclick = "editTemplate(this)">编辑</a>
+								</div>
+							</td>
 						</tr>
 					</tbody>
 					<tfoot>
@@ -805,5 +825,4 @@
 		</form>
 	</div>
 </section>
-
 </@layout>

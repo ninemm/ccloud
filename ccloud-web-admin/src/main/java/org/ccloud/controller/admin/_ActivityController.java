@@ -897,4 +897,10 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		}
 		renderAjaxResultForSuccess("加入核销成功");
 	}
+	
+	public void editTemplate() {
+		String orderList = getPara("orderList");
+		setAttr("orderList",orderList);
+		render("template.html");
+	}
 }
