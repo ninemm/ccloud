@@ -120,7 +120,7 @@
       			 edit:false},
       			 {field: "", title: "税务价格(整)", align: "center", width: '7%',
       				formatter: function(value, row, rowIndex) {
-					var strHtml = '￥<input type="text" size="9" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="taxPrice" value="'+formatNumber(row.tax_price)+'"/><input type="hidden"  name="_taxPrice" value="'+row.tax_price+'"/>';
+					var strHtml = '￥<input type="text" size="9" onblur = "changeTaxPrice(this)" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="taxPrice" value="'+formatNumber(row.tax_price)+'"/><input type="hidden"  name="_taxPrice" value="'+row.tax_price+'"/>';
 					strHtml += '/<input type="text" size="1" readonly style="text-align:center;background-color:transparent;border:0px;" name="big_unit" value="'+row.big_unit+'"/>';
 					return strHtml;
 				},
@@ -343,6 +343,16 @@
 								}, 2 * 1000 );
 		}
 		$(obj).parent().parent().find('td').eq(12).find("input").eq(1).val(accountPrice);
+	}
+	
+	function changeTaxPrice(obj){
+		var taxPrice = $(obj).val();
+		if(taxPrice.indexOf(",") != -1){
+			taxPrice = $(obj).parent().parent().find('td').eq(13).find("input").eq(1).val()
+		}else{
+			taxPrice = parseInt($(obj).val());
+		}
+		$(obj).parent().parent().find('td').eq(13).find("input").eq(1).val(taxPrice);
 	}
 	
 	/*function changeHot(obj){
