@@ -134,13 +134,14 @@ public class PlansQuery extends JBaseQuery {
 		return 0;
 	}
 
-	public List<Plans> findbyUserNameAndTypeNameAndStartDateAndEndDate(String userName,String typeName, String startDate,String endDate){
+	public List<Plans> findbyUserNameAndTypeNameAndStartDateAndEndDate(String userName,String typeName, String startDate,String endDate,String sellerId){
 		String sql  = "select o.*,sp.custom_name "
 				+ "from `cc_plans` o "
 				+ "join user u ON o.user_id = u.id "
 				+ "left join cc_seller_product sp ON o.seller_product_id = sp.id "
 				+ "left join dict d ON o.type = d.value "
-				+ "where u.realname = '"+userName+"' and d.name = '"+typeName+"' and o.start_date >= '"+startDate+"' and o.end_date <= '"+endDate+"'";
+				+ "where u.realname = '"+userName+"' and d.name = '"+typeName+"' and o.start_date >= '"+startDate+"' and o.end_date <= '"+endDate+"' "
+				+ "and o.seller_id = '"+sellerId+"'";
 		return DAO.find(sql);
 	}
 	
