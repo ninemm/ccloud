@@ -46,16 +46,18 @@
 	}
 	function doSubmit(){
 	
-		for(var i = 0 ; i < num ; i++){
-			var pdid = 'tr' + i;
-			alert( $("#"+pdid+"").children("td").eq(1).val());
-			template = {
-				orderList : $("#orderList").val(),
-				templateValue : $("#tr"+i).find("td").eq(1).val(),
-				templateValueType : $("#tr"+i).find("td").eq(2).find("option:selected").val(),
-				templateValueTypeValue : $("#tr"+i).find("td").eq(3).val()
+		for(var i = 1 ; i <= num ; i++){
+			var tr = 'tr' + i;
+			var trId = document.getElementById(""+tr+"");
+			if(trId){
+				template = {
+					orderList : $("#orderList").val(),
+					templateValue : $("#"+tr+"").find("#templateValue").val(),
+					templateValueType : $("#"+tr+"").find("#templateValueType").find("option:selected").val(),
+					templateValueTypeValue : $("#"+tr+"").find("#templateValueTypeValue").val()
+				}
+				templateList.push(template);		
 			}
-			templateList.push(template);		
 		}
 		console.log(templateList);
 		localStorage.setItem("template", templateList);
@@ -86,7 +88,7 @@
 					</td>
 					<td>
 						<div class = "validata-box" style="padding-left:35%;">
-							<select name = "templateValueType" >
+							<select name = "templateValueType" id = "templateValueType" >
 								<option value="1" selected>输入框</option>
 								<option value="2">单选</option>
 								<option value="3">多选</option>
