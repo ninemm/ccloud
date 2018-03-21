@@ -21,9 +21,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.ccloud.model.QyBasicfeetype;
+import org.ccloud.model.QyBasicflowtype;
+import org.ccloud.model.QyBasicshowtype;
+import org.ccloud.model.QyExpense;
 import org.ccloud.model.vo.Mid_ActivityInfo;
-import org.ccloud.model.vo.Mid_ExpensesInfo;
-import org.ccloud.model.vo.Mid_FlowTypeInfo;
 import org.ccloud.utils.HttpUtils;
 
 import com.alibaba.fastjson.JSONArray;
@@ -35,9 +37,15 @@ public class MidDataUtil {
 	private static String userName = PropKit.use("midData.properties").get("middata_soap_username");
 	private static String passWord = PropKit.use("midData.properties").get("middata_soap_password");
     private static final String GET_JINGPAI_ACTIVITYS = "http://yxmiddb.jingpai.com/WebAPI/api/Activitys";
+    private static final String GET_JINGPAI_FLOWTYPE = "http://yxmiddb.jingpai.com/WebAPI/api/BasicFlowTypes";
+    private static final String GET_JINGPAI_FEETYPE = "http://yxmiddb.jingpai.com/WebAPI/api/BasicFeeTypes";
+    private static final String GET_JINGPAI_SHOWTYPE = "http://yxmiddb.jingpai.com/WebAPI/api/BasicShowTypes";
+    private static final String GET_JINGPAI_EXPENSES = "http://yxmiddb.jingpai.com/WebAPI/api/Expenses";
+    
 
 	public static void main(String[] args) throws RemoteException {
-		
+		List<QyBasicflowtype> list = MidDataUtil.getFlowTypeInfo("2000-01-01", "2018-03-21", "2", "10");
+		System.out.println(list.size());
 	}
 
 	public static List<Mid_ActivityInfo> getActivityInfo(String startTime, String endTime, String pageIndex, String pageSize) {
@@ -57,34 +65,68 @@ public class MidDataUtil {
 		return list;
 	}
 	
-	public static List<Mid_FlowTypeInfo> getFlowTypeInfo(String startTime, String endTime, String pageIndex, String pageSize) {
+	public static List<QyBasicflowtype> getFlowTypeInfo(String startTime, String endTime, String pageIndex, String pageSize) {
         Map<String, String> map = new HashMap<>();
         map.put("BegTime", startTime);
         map.put("EndTime", endTime);
         map.put("PageIndex", pageIndex);
         map.put("PageSize", pageSize);
-        List<Mid_FlowTypeInfo> list = new ArrayList<>();
+        List<QyBasicflowtype > list = new ArrayList<>();
 		try {
-			String result = HttpUtils.post(GET_JINGPAI_ACTIVITYS, map);
+			String result = HttpUtils.post(GET_JINGPAI_FLOWTYPE, map);
 			JSONArray jsonArray = JSONObject.parseObject(result).getJSONArray("BasicFlowTypes");
-			list = jsonArray.toJavaList(Mid_FlowTypeInfo.class);
+			list = jsonArray.toJavaList(QyBasicflowtype.class);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return list;
 	}
 	
-	public static List<Mid_ExpensesInfo> getExpensesInfo(String startTime, String endTime, String pageIndex, String pageSize) {
+	public static List<QyBasicfeetype> getFeeTypeInfo(String startTime, String endTime, String pageIndex, String pageSize) {
         Map<String, String> map = new HashMap<>();
         map.put("BegTime", startTime);
         map.put("EndTime", endTime);
         map.put("PageIndex", pageIndex);
         map.put("PageSize", pageSize);
-        List<Mid_ExpensesInfo> list = new ArrayList<>();
+        List<QyBasicfeetype> list = new ArrayList<>();
 		try {
-			String result = HttpUtils.post(GET_JINGPAI_ACTIVITYS, map);
+			String result = HttpUtils.post(GET_JINGPAI_FEETYPE, map);
+			JSONArray jsonArray = JSONObject.parseObject(result).getJSONArray("BasicFeeTypes");
+			list = jsonArray.toJavaList(QyBasicfeetype.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return list;
+	}
+	
+	public static List<QyBasicshowtype> getShowTypeInfo(String startTime, String endTime, String pageIndex, String pageSize) {
+        Map<String, String> map = new HashMap<>();
+        map.put("BegTime", startTime);
+        map.put("EndTime", endTime);
+        map.put("PageIndex", pageIndex);
+        map.put("PageSize", pageSize);
+        List<QyBasicshowtype> list = new ArrayList<>();
+		try {
+			String result = HttpUtils.post(GET_JINGPAI_SHOWTYPE, map);
+			JSONArray jsonArray = JSONObject.parseObject(result).getJSONArray("BasicShowTypes");
+			list = jsonArray.toJavaList(QyBasicshowtype.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return list;
+	}
+	
+	public static List<QyExpense> getExpensesInfo(String startTime, String endTime, String pageIndex, String pageSize) {
+        Map<String, String> map = new HashMap<>();
+        map.put("BegTime", startTime);
+        map.put("EndTime", endTime);
+        map.put("PageIndex", pageIndex);
+        map.put("PageSize", pageSize);
+        List<QyExpense> list = new ArrayList<>();
+		try {
+			String result = HttpUtils.post(GET_JINGPAI_EXPENSES, map);
 			JSONArray jsonArray = JSONObject.parseObject(result).getJSONArray("Expenses");
-			list = jsonArray.toJavaList(Mid_ExpensesInfo.class);
+			list = jsonArray.toJavaList(QyExpense.class);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

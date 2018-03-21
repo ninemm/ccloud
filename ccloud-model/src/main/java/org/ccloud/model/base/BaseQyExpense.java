@@ -170,19 +170,19 @@ public abstract class BaseQyExpense<M extends BaseQyExpense<M>> extends JModel<M
 		return getStr("CityCode");
 	}
 
-	public void setExpenseBeginDate(java.util.Date ExpenseBeginDate) {
+	public void setExpenseBeginDate(java.lang.String ExpenseBeginDate) {
 		set("ExpenseBeginDate", ExpenseBeginDate);
 	}
 
-	public java.util.Date getExpenseBeginDate() {
+	public java.lang.String getExpenseBeginDate() {
 		return get("ExpenseBeginDate");
 	}
 
-	public void setExpenseEndDate(java.util.Date ExpenseEndDate) {
+	public void setExpenseEndDate(java.lang.String ExpenseEndDate) {
 		set("ExpenseEndDate", ExpenseEndDate);
 	}
 
-	public java.util.Date getExpenseEndDate() {
+	public java.lang.String getExpenseEndDate() {
 		return get("ExpenseEndDate");
 	}
 
@@ -250,27 +250,27 @@ public abstract class BaseQyExpense<M extends BaseQyExpense<M>> extends JModel<M
 		return getStr("ApplyPersonName");
 	}
 
-	public void setApplyTime(java.util.Date ApplyTime) {
+	public void setApplyTime(java.lang.String ApplyTime) {
 		set("ApplyTime", ApplyTime);
 	}
 
-	public java.util.Date getApplyTime() {
+	public java.lang.String getApplyTime() {
 		return get("ApplyTime");
 	}
 
-	public void setCreateTime(java.util.Date CreateTime) {
+	public void setCreateTime(java.lang.String CreateTime) {
 		set("CreateTime", CreateTime);
 	}
 
-	public java.util.Date getCreateTime() {
+	public java.lang.String getCreateTime() {
 		return get("CreateTime");
 	}
 
-	public void setModifyTime(java.util.Date ModifyTime) {
+	public void setModifyTime(java.lang.String ModifyTime) {
 		set("ModifyTime", ModifyTime);
 	}
 
-	public java.util.Date getModifyTime() {
+	public java.lang.String getModifyTime() {
 		return get("ModifyTime");
 	}
 
