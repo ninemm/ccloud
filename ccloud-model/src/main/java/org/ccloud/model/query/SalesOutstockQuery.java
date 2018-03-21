@@ -115,8 +115,8 @@ public class SalesOutstockQuery extends JBaseQuery {
 						warehouseId = orderDetail.getStr("warehouse_id");
 						String OrderSO = SalesOutstockQuery.me().getNewSn(sellerId);
 						// 销售出库单：SS + 100000(机构编号或企业编号6位) + A(客户类型) + W(仓库编号) + 171108(时间) + 100001(流水号)
-						outstockSn = "SS" + sellerCode + order.getStr("typeCode") + orderDetail.getStr("warehouseCode")
-								+ DateUtils.format("yyMMdd", date) + OrderSO;
+						outstockSn = "SS" + sellerCode + order.getStr("typeCode") 
+								+ DateUtils.format("yyMMdd", date) + OrderSO.substring(2);
 
 						SalesOutstockQuery.me().insert(outstockId, outstockSn, warehouseId, sellerId, order, date);
 						SalesOrderJoinOutstockQuery.me().insert(orderId, outstockId);
