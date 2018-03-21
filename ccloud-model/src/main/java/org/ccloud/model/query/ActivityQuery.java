@@ -254,7 +254,7 @@ public class ActivityQuery extends JBaseQuery {
 		fromBuilder.append("ON d.`name` = qb.FeeTypeName WHERE d.`key` = ced.item1 AND qb.IsEnable = 1) CostType , caa.create_date ActivityTime , cc.customer_name CustomerName , ");
 		fromBuilder.append("CONCAT( cc.prov_name , cc.city_name , cc.country_name , cc.address) ActivityAddress , cc.mobile Telephone , ccv.review_address Position , caa.apply_amount WriteOffAmount ,");
 		fromBuilder.append("u.realname CreateManName , caa.create_date CreateTime , u.realname ModifyManName , caa.create_date ModifyTime , cc.prov_name ProvinceName , cc.city_name CityName ,");
-		fromBuilder.append("cc.country_name CountyName , cc.customer_code CustomerCode , cc.create_date ShopCreateTime , cc.contact ShopLinkMan , cc.mobile ShopPhone , caa.num Num ,");
+		fromBuilder.append("cc.country_name CountyName , cc.create_date ShopCreateTime , cc.contact ShopLinkMan , cc.mobile ShopPhone , caa.num Num ,");
 		fromBuilder.append("u.realname ExecuteManName , caa.create_date ExecuteTime , ca.time_interval InvestDay , caa.create_date BeginTime , ca.end_time EndTime , caa.apply_amount GrantAmount ,");
 		fromBuilder.append("IFNULL(( SELECT COUNT(*) FROM cc_customer_visit cv WHERE cv.active_apply_id = caa.id GROUP BY caa.id) , 0) ShopVisitCount , IFNULL(( SELECT COUNT(*) FROM cc_customer_visit cv WHERE cv.active_apply_id = caa.id GROUP BY caa.id) , 0) ShopXCJHCount");
 		fromBuilder.append(" FROM cc_activity_apply caa");
