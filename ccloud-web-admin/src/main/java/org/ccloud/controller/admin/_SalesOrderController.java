@@ -192,7 +192,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		String type = getPara("type");
 		String realPath = "";
 		if (type.equals(Consts.TEMPLATE_ALI)) {
-			realPath = getSession().getServletContext().getRealPath("\\")+ "\\WEB-INF\\admin\\sales_order\\aliTemplate.xlsx";
+			realPath = getSession().getServletContext().getRealPath("\\")+ "\\WEB-INF\\admin\\sales_order\\aliTemplate.xls";
 		} else {
 			realPath = getSession().getServletContext().getRealPath("\\")+ "\\WEB-INF\\admin\\sales_order\\danluTemplate.xls";
 		}
@@ -805,7 +805,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		String sellerId = getPara("sellerId");
 		String activityId = getPara("activity");
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\sales_outstock\\"
-				+ "salesOrderInfo.xlsx";
+				+ "salesOrderInfo.xls";
 		Page<Record> page = SalesOrderQuery.me().paginate(1, Integer.MAX_VALUE, keyword, startDate, endDate, sellerId, dataArea, activityId);
 		List<Record> salesOderList = page.getList();
 		

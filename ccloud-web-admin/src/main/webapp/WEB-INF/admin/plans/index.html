@@ -99,19 +99,22 @@
 	    <form class="form-horizontal" role="form" id="form">
 			 <div class="form-group">
                 <div class="col-sm-4">
-					<@shiro.hasPermission name="/admin/sellerCustomer/uploading, /admin/dealer/all, /admin/all">
+					<@shiro.hasPermission name="/admin/plans/uploading, /admin/dealer/all, /admin/all">
 						<a href="${CPATH}/admin/plans/upload?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-upload"></i> 导入</a>
 					</@shiro.hasPermission>
 					<button onclick="batchDown()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-download"></i> 导出</button>
+					<a href="${CPATH}/admin/plans/edit?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-plus"></i> 新增计划 </a>
 				</div>
 				<div class="col-sm-4">
 					<label class="control-label col-sm-4">计划类型:</label>
                     <div class="col-sm-8 input-group input-group-sm">
                     	<select  class="form-control" name="planType" id="planType" style="float: left;padding-right:5px;margin-right:5px;">
 							<option value="">请选择</option>
-							<option value="101201">周计划</option>
-							<option value="101202">月计划</option>
-							<option value="101203">年计划</option>
+							<#if dicts??>
+								<#list dicts as dict>
+									<option value="${(dict.value)}">${(dict.name)}</option>
+								</#list>
+							</#if>
 						</select>
                     </div>
 				</div>

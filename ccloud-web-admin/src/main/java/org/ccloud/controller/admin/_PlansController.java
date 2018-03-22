@@ -26,6 +26,7 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -59,6 +60,7 @@ import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Dict;
 import org.ccloud.model.Plans;
 import org.ccloud.model.Seller;
+import org.ccloud.model.SellerProduct;
 import org.ccloud.model.User;
 import org.ccloud.model.query.DictQuery;
 import org.ccloud.model.query.PlansQuery;
@@ -87,6 +89,8 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 	
 	@Override
 	public void index() {
+		List<Dict> dicts = DictQuery.me().findDictByType(Consts.PLAN);
+		setAttr("dicts",dicts);
 		render("index.html");
 	}
 	
@@ -114,7 +118,7 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 	"/admin/all" }, logical = Logical.OR)
 	public void plansTemplate() {
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\plans\\"
-				+ "plansTemplate.xlsx";
+				+ "plansTemplate.xls";
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		List<Record> productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", ""); 
@@ -330,7 +334,7 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet("table");
 	    String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\plans\\"
-				+ "plansInfo.xlsx";
+				+ "plansInfo.xls";
 	    //以开始时间、结束时间、计划类型、业务员ID组成一个集合
 	    List<Map<String, Object>> plansItems = new ArrayList<>();
 	    for(int i = 0; i < page.getList().size();i++) {
@@ -517,4 +521,94 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 		renderFile(new File(filePath));
 	}
 	
+	public void edit() {
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		List<Record> productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", ""); 
+		List<User> users = UserQuery.me().findByData(dataArea);
+		List<Dict> dicts = DictQuery.me().findDictByType(Consts.PLAN);
+		//获取当前月份，在后面再加10个月
+		Calendar calendar=Calendar.getInstance();
+		//获得当前时间的月份，月份从0开始所以结果要加1
+		int month=calendar.get(Calendar.MONTH)+1;
+		//获取当前年份
+		int year = calendar.get(Calendar.YEAR); 
+		List<String> months = new ArrayList<>();
+		List<String> years = new ArrayList<>();
+		for(int i = 0 ; i < 11 ; i++) {
+			if((month+i)>12) {
+				months.add((year+1)+"-"+(month+i-12));
+			}else {
+				months.add(year+"-"+(month+i));
+			}
+			years.add(year+i+"");
+		}
+		setAttr("dicts",dicts);
+		setAttr("sellerProducts",productRecords);
+		setAttr("users",users);
+		setAttr("months",months);
+		setAttr("years",years);
+		render("edit.html");
+	}
+	
+	@Before(Tx.class)
+	public void save() {
+		String userId = getPara("userId");
+		String planType = getPara("planType");
+		String startDate = "";
+		String endDate = "";
+		if(planType.equals(Consts.MONTH_PLAN)) {
+			String month = getPara("month");
+			int index = month.indexOf("-");
+			startDate = month + "-01";
+			Calendar cal = Calendar.getInstance();  
+			//设置年份  
+			cal.set(Calendar.YEAR,Integer.parseInt(month.substring(0,index)));  
+			//设置月份  
+			cal.set(Calendar.MONTH, Integer.parseInt(month.substring(index,month.length()))-1); 
+			//获取某月最大天数  
+			int lastDay = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+			endDate = month + "-"+(lastDay-1);
+		}else if(planType.equals(Consts.YEAR_PLAN)) {
+			String year = getPara("year");
+			startDate = year + "-01-01";
+			endDate = year + "-12-31";
+		}else {
+			startDate = getPara("startDate");
+			endDate = getPara("endDate");
+		}
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		User us = UserQuery.me().findById(userId);
+		Seller seller = SellerQuery.me()._findByDeptId(us.getDepartmentId());
+		int num = Integer.parseInt(getPara("productNum"));
+		int inCnt = 0;
+		
+		for(int i = 1 ; i <= num ; i++) {
+			if(StrKit.isBlank(getPara("sellerProduct" + i))){
+				continue;
+			}
+			Plans plans = new Plans();
+			plans.setId(StrKit.getRandomUUID());
+			plans.setSellerId(seller.getId());
+			plans.setUserId(us.getId());
+			plans.setType(planType);
+			plans.setSellerProductId(getPara("sellerProduct"+i));
+			plans.setPlanNum(new BigDecimal(getPara("planNum"+i)));
+			plans.setCompleteNum(new BigDecimal(0));
+			plans.setCompleteRatio(new BigDecimal(0));
+			try {
+				plans.setStartDate(sdf.parse(startDate));
+				plans.setEndDate(sdf.parse(endDate));
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			plans.setDeptId(us.getDepartmentId());
+			plans.setDataArea(us.getDataArea());
+			plans.setCreateDate(new Date());
+			plans.save();
+			inCnt++;
+		}
+		renderAjaxResultForSuccess("成功导入计划" + inCnt + "条数据");
+	}
 }

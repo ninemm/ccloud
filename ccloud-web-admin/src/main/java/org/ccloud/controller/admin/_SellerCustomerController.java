@@ -397,7 +397,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		String dataArea = getPara("data_area");
 
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\seller_customer\\"
-				+ "customerInfo.xlsx";
+				+ "customerInfo.xls";
 
 		Page<Record> page = SellerCustomerQuery.me().paginate(1, Integer.MAX_VALUE, "", dataArea + "%","","", "");
 		List<Record> customerList = page.getList();
@@ -453,7 +453,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 	@RequiresPermissions(value = { "/admin/sellerCustomer/uploading", "/admin/dealer/all",
 			"/admin/all" }, logical = Logical.OR)
 	public void customerTemplate() {
-		String realPath = getSession().getServletContext().getRealPath("\\")+ "\\WEB-INF\\admin\\seller_customer\\customerTemplate.xlsx";
+		String realPath = getSession().getServletContext().getRealPath("\\")+ "\\WEB-INF\\admin\\seller_customer\\customerTemplate.xls";
 		renderFile(new File(realPath.replace("\\", "/")));
 	}
 
