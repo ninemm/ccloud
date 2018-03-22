@@ -131,7 +131,9 @@ public class InventoryDetailQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller_product csp on csp.id = cid.sell_product_id ");
 		fromBuilder.append(" LEFT JOIN cc_user_join_warehouse cujw on cujw.warehouse_id=cid.warehouse_id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_outstock cso ON cid.biz_bill_sn = cso.outstock_sn");
-		fromBuilder.append(" LEFT JOIN `user` u ON u.id = cso.biz_user_id");
+		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock co ON co.outstock_id = cso.id");
+		fromBuilder.append(" LEFT JOIN cc_sales_order sa on sa.id = co.order_id");
+		fromBuilder.append(" LEFT JOIN `user` u ON u.id = sa.biz_user_id");
 		fromBuilder.append(" LEFT JOIN cc_seller_customer csc ON csc.id = cso.customer_id");
 		fromBuilder.append(" LEFT JOIN cc_customer cc ON cc.id = csc.customer_id");
 		fromBuilder.append(" where cid.biz_type in ('"+Consts.BIZ_TYPE_P_OUTSTOCK+"','"+Consts.BIZ_TYPE_SALES_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_OUTSTOCK+"','"+Consts.BIZ_TYPE_TRANSFER_REDUCE_OUTSTOCK+"') ");
