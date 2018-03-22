@@ -306,6 +306,9 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 			 Dict dict = DictQuery.me().findbyName(type);
 			 for(int i = 0;i<users.size() ; i++) {
 				 Cell cell = sheet.getRow(4).getCell(i+2);
+				 if(cell==null) {
+					 continue;
+				 }
 				 User us = UserQuery.me().findById(cell.getStringCellValue());
 				 for(int j = 0;j<productRecords.size();j++) {
 					String sellerProductId = sheet.getRow(j+6).getCell(0).getStringCellValue();
