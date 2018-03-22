@@ -32,6 +32,7 @@ import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.mid.MidDataUtil;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
+import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.HttpUtils;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Activity;
@@ -40,6 +41,9 @@ import org.ccloud.model.ActivityExecute;
 import org.ccloud.model.CustomerVisit;
 import org.ccloud.model.Dict;
 import org.ccloud.model.ExpenseDetail;
+import org.ccloud.model.QyBasicfeetype;
+import org.ccloud.model.QyBasicflowtype;
+import org.ccloud.model.QyBasicshowtype;
 import org.ccloud.model.QyExpense;
 import org.ccloud.model.QyExpensedetail;
 import org.ccloud.model.query.ActivityApplyQuery;
@@ -51,6 +55,8 @@ import org.ccloud.model.query.DictQuery;
 import org.ccloud.model.query.ExpenseDetailQuery;
 import org.ccloud.model.query.OptionQuery;
 import org.ccloud.model.query.QyBasicfeetypeQuery;
+import org.ccloud.model.query.QyBasicflowtypeQuery;
+import org.ccloud.model.query.QyBasicshowtypeQuery;
 import org.ccloud.model.query.QyExpenseQuery;
 import org.ccloud.model.query.QyExpensedetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
@@ -439,9 +445,10 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 	
 	//中间库同步数据
 	@Before(Tx.class)
-	public void getMidDataTest() {
+	public void getMidData() {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-		List<QyExpense> expenseList = QyExpenseQuery.me().findTextData();
+//		List<QyExpense> expenseList = QyExpenseQuery.me().findTextData();//测试数据
+		List<QyExpense> expenseList = MidDataUtil.getExpensesInfo("2018-02-15", "2018-03-01", "1", "5");
 		List<Activity> acList = new ArrayList<>();
 		List<ExpenseDetail> dlist = new ArrayList<>();
 		for (QyExpense qyExpense : expenseList) {
@@ -451,8 +458,8 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				activity.setSellerId(sellerId);
 				activity.setCode(qyExpense.getActivityNo());
 				activity.setTitle(qyExpense.getExpenseName());
-				activity.setStartTime(qyExpense.getExpenseBeginDate());
-				activity.setEndTime(qyExpense.getExpenseEndDate());
+				activity.setStartTime(DateUtils.strToDate(qyExpense.getExpenseBeginDate(), DateUtils.DEFAULT_MID_FORMATTER));
+				activity.setEndTime(DateUtils.strToDate(qyExpense.getExpenseEndDate(), DateUtils.DEFAULT_MID_FORMATTER));
 				activity.setCategory(Consts.ACTIVITY_CATEGORY_CODE);
 				String[] value = getAreaType(qyExpense.getExpenseName());
 				activity.setInvestType(DictQuery.me().findbyName(value[0]).getValue());
@@ -473,8 +480,22 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		renderAjaxResultForSuccess("同步成功");
 	}
 	
-	public void getMidData() {
-		MidDataUtil.getActivityInfo("2018-02-01", "2018-03-12", "1", "10");
+	@Before(Tx.class)
+	public void getMidDataBasic() {
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String page = getPara("page");
+		String pageCount = getPara("pageCount");	
+		List<QyBasicflowtype> flowList = MidDataUtil.getFlowTypeInfo(startDate, endDate, page, pageCount);
+		List<QyBasicfeetype> feeList = MidDataUtil.getFeeTypeInfo(startDate, endDate, page, pageCount);
+		List<QyBasicshowtype> showList = MidDataUtil.getShowTypeInfo(startDate, endDate, page, pageCount);
+		QyBasicflowtypeQuery.me().deleteAll();
+		QyBasicfeetypeQuery.me().deleteAll();
+		QyBasicshowtypeQuery.me().deleteAll();
+		Db.batchSave(flowList, flowList.size());
+		Db.batchSave(feeList, feeList.size());
+		Db.batchSave(showList, showList.size());
+		renderAjaxResultForSuccess("同步成功");
 	}
 	
 	private List<ExpenseDetail> getExpenseDetailList(String expenseId, String actId, String typeId) {
