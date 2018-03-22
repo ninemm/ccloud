@@ -267,7 +267,7 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 	public void uploading() {
 		int inCnt = 0;
 
-		String sellerId = getSessionAttr("sellerId");
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		List<Record> productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", ""); 
 		List<User> users = UserQuery.me().findByData(dataArea);
@@ -307,7 +307,6 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 			 for(int i = 0;i<users.size() ; i++) {
 				 Cell cell = sheet.getRow(4).getCell(i+2);
 				 User us = UserQuery.me().findById(cell.getStringCellValue());
-				 Seller seller = SellerQuery.me()._findByDeptId(us.getDepartmentId());
 				 for(int j = 0;j<productRecords.size();j++) {
 					String sellerProductId = sheet.getRow(j+6).getCell(0).getStringCellValue();
 					Cell cl = sheet.getRow(j+6).getCell(i+2);
@@ -320,7 +319,7 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 					cl.setCellType(CellType.STRING);
 					Plans plans = new Plans();
 					plans.setId(StrKit.getRandomUUID());
-					plans.setSellerId(seller.getId());
+					plans.setSellerId(sellerId);
 					plans.setUserId(us.getId());
 					plans.setType(dict.getValue());
 					plans.setSellerProductId(sellerProductId);
@@ -604,6 +603,7 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 		String planType = getPara("planType");
 		String startDate = "";
 		String endDate = "";
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		if(planType.equals(Consts.MONTH_PLAN)) {
 			String month = getPara("month");
 			int index = month.indexOf("-");
@@ -626,7 +626,6 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 		}
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		User us = UserQuery.me().findById(userId);
-		Seller seller = SellerQuery.me()._findByDeptId(us.getDepartmentId());
 		int num = Integer.parseInt(getPara("productNum"));
 		int inCnt = 0;
 		
@@ -636,7 +635,7 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 			}
 			Plans plans = new Plans();
 			plans.setId(StrKit.getRandomUUID());
-			plans.setSellerId(seller.getId());
+			plans.setSellerId(sellerId);
 			plans.setUserId(us.getId());
 			plans.setType(planType);
 			plans.setSellerProductId(getPara("sellerProduct"+i));
