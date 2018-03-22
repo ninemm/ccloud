@@ -1,7 +1,11 @@
 <#include "_inc/_layout.html"/>
 <#macro title>订单审核</#macro>
 
-<#macro css></#macro>
+<#macro css>
+	.p-l-15 {
+		overflow: hidden;
+	}
+</#macro>
 <#macro script>
 	$(function() {
 	    $(document).on('click', '.refuse', function() {
@@ -257,7 +261,7 @@
 		                      <span class="gray">（${(orderDetail.price)!}）</span>
 		                    </div>
 		                  </div>
-		                  <div class="weui-flex__item t-r relative">
+		                  <div class="weui-flex__item t-r relative fr">
 		                    <input type="hidden" name="bigNumSpan" id="bigNumSpan" value="${(orderDetail.product_count / orderDetail.convert_relate)?floor}">
 													<#if isEdit>
 														<div class="spinner">
@@ -289,7 +293,7 @@
 		                      <span class="gray">（${(orderDetail.price / orderDetail.convert_relate)?string(',###.##')}）</span>
 		                    </div>
 		                  </div>
-		                  <div class="weui-flex__item t-r relative">
+		                  <div class="weui-flex__item t-r relative fr">
 		                    <input type="hidden" name="smallNumSpan" id="smallNumSpan" value="${(orderDetail.product_count % orderDetail.convert_relate)}">
 												<#if isEdit>
 													<div class="spinner">
