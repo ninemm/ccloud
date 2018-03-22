@@ -24,11 +24,24 @@
 	<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
 	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=Ec4VbDTTjjuEGtVGzSvPwwQtvnvWFeGY"></script>
 	<script type="text/javascript" src="${CTPATH}/js/convertor.js"></script>
+	<script type="text/javascript" src="${CTPATH}/js/comm.js"></script>
 </#macro>
 <#macro script>
 
 
     $(function() {
+
+		initWxConfig('${appId!}', ${timestamp}, '${nonceStr!}', '${signature!}');
+
+		wxReadyGetLocation(
+			function(lng, lat, addComp, address) {
+				$loading.show();
+				$noMore.hide();
+				$("#lng").val(lng.toFixed(6));
+				$("#lat").val(lat.toFixed(6));
+				combo();
+			}
+		)
         //搜索框监听
         $(document).on("change", "#searchArea", function() {
             combo();
@@ -121,50 +134,6 @@
 		page = 1;
 		initCustomer();
 	}
-
-	wx.config({
-		debug: false,
-		appId: '${appId!}',
-		timestamp: ${timestamp},
-		nonceStr: '${nonceStr!}',
-		signature: '${signature!}',
-		jsApiList: [
-			'checkJsApi',
-			'getLocation'
-		]
-	});
-
-	wx.ready(function() {
-		$loading.show();
-		$noMore.hide();
-		// 获取定位信息
-		wx.getLocation({
-			type: 'wgs84',
-			success: function (res) {
-				var latitude = res.latitude;                      // 纬度，浮点数，范围为90 ~ -90
-				var longitude = res.longitude;                    // 经度，浮点数，范围为180 ~ -180。
-				var speed = res.speed;                            // 速度，以米/每秒计
-				var accuracy = res.accuracy;                      // 位置精度
-
-				var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
-
-				translateCallback = function (point) {            // 回调函数
-					$("#lng").val(parseFloat(point.lng).toFixed(6));
-					$("#lat").val(parseFloat(point.lat).toFixed(6));
-					combo();
-				};
-				setTimeout(function() {
-					BMap.Convertor.translate(point, 0, translateCallback);//真实经纬度转成百度坐标
-				}, 100);
-			},
-			cancel: function (res) {
-				console.log('用户拒绝授权获取地理位置');
-			},
-			fail: function (res) {
-				console.log(JSON.stringify(res));
-			}
-		});
-	});
 
 </#macro>
 
