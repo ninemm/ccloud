@@ -443,7 +443,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		String sellerProductId = product.getId();
 		Integer convert = product.getInt("convert_relate");
 		double compositionCount = Double.valueOf(product.getStr("productCount"));
-		Integer productCount = (int) Math.round(compositionCount * convert * number);
+		Integer productCount = (int) Math.round(compositionCount * number);
 		String productId = product.getProductId();
 		Map<String, Object> result = this.getWarehouseId(productId, sellerId, sellerCode, productCount, convert, userId, sellerProductId);
 		String status = result.get("status").toString();
@@ -469,7 +469,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 					                           .multiply(product.getPrice());
 //			BigDecimal amount = new BigDecimal(product.getInt("productCount")).multiply(product.getPrice());
 			detail.setProductAmount(productAmount);
-			detail.setIsGift(product.getIsGift());
+			detail.setIsGift(product.getInt("isGift"));
 			detail.setIsComposite(1);
 			detail.setCompositeId(product.getStr("parentId"));
 			detail.setCreateDate(date);
