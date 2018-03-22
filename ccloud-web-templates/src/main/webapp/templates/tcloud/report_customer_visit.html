@@ -39,8 +39,8 @@
     function customerVisitCount(params) {
 		Utils.ajax('${CPATH}/report/customerInfoCount', params, 
 			function(data){
-				$("#customerVisitNum").text(data[0].customerVisitCount+"次");
-				$("#customerNum").text(data[0].customerCount);
+				$("#customerVisitNum").text(data.customerVisitCount+"次");
+				$("#customerNum").text(data.customerCount);
 			}
 		);    	
     }
@@ -258,11 +258,13 @@
     }
     
     function urlSelect(params, type){
-    	if (type == 'day') {
+    	if (type == 'month') {
+    		customerVisitCount(params)
 		 	customerCount(params);
 		 	visitCount(params);
 		 	orderStatus(params);
 		} else {
+			customerVisitCount(params)
 		 	customerCount(params);
 		 	visitCount(params);
 		 	orderStatus(params);
