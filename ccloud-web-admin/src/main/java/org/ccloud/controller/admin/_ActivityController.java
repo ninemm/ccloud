@@ -811,6 +811,15 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				map.put("WriteOffAmount",YxActivity.getBigDecimal("WriteOffAmount"));
 				map.put("CreateManName",YxActivity.getStr("CreateManName"));
 				map.put("CreateTime",YxActivity.getStr("CreateTime"));
+				try {
+					HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/ActivityShopAdInfo", map);
+					activityApply.setStatus(5);
+					activityApply.update();
+				} catch (Exception e) {
+					e.printStackTrace();
+					renderAjaxResultForError("加入核销失败!");
+					return;
+				}
 			}else if(YxActivity.getStr("invest_type").equals("101104")) {
 				//终端陈列 
 				map.put("ProvinceName",YxActivity.getStr("ProvinceName"));
@@ -843,6 +852,15 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 //				map.put("GrantTime","");
 //				map.put("AuditResult","");
 				map.put("CreateManName",YxActivity.getStr("CreateManName"));
+				try {
+					HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/ActivityShopShowInfo", map);
+					activityApply.setStatus(5);
+					activityApply.update();
+				} catch (Exception e) {
+					e.printStackTrace();
+					renderAjaxResultForError("加入核销失败!");
+					return;
+				}
 			}else if(YxActivity.getStr("invest_type").equals("101105")) {
 				//终端客情
 				map.put("CustomerName",YxActivity.getStr("CustomerName"));
@@ -872,6 +890,15 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				map.put("ProvinceName",YxActivity.getStr("ProvinceName"));
 				map.put("CityName",YxActivity.getStr("CityName"));
 				map.put("CountyName",YxActivity.getStr("CountyName"));
+				try {
+					HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/ActivityDisplayInfo", map);
+					activityApply.setStatus(5);
+					activityApply.update();
+				} catch (Exception e) {
+					e.printStackTrace();
+					renderAjaxResultForError("加入核销失败!");
+					return;
+				}
 			}else if(YxActivity.getStr("invest_type").equals("101106")) {
 				//商超赠品
 				map.put("ProvinceName",YxActivity.getStr("ProvinceName"));
@@ -894,6 +921,15 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				map.put("ModifyManName",YxActivity.getStr("ModifyManName"));
 				map.put("ModifyTime",YxActivity.getStr("ModifyTime"));		
 				map.put("Flag",1);
+				try {
+					HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/ActivityMarketGiftInfo", map);
+					activityApply.setStatus(5);
+					activityApply.update();
+				} catch (Exception e) {
+					e.printStackTrace();
+					renderAjaxResultForError("加入核销失败!");
+					return;
+				}
 			}else {
 				//进场费
 				map.put("ProvinceName",YxActivity.getStr("ProvinceName"));
@@ -901,18 +937,18 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				map.put("CountyName",YxActivity.getStr("CountyName"));
 				map.put("CustomerName",YxActivity.getStr("CustomerName"));
 //				map.put("CustomerCode","");
-//				map.put("ShopID","");
+				map.put("ShopID",12);
 				map.put("ShopCreateTime",YxActivity.getStr("ShopCreateTime"));
 				map.put("ShopLinkMan",YxActivity.getStr("ShopLinkMan"));
 				map.put("ShopPhone",YxActivity.getStr("ShopPhone"));
-//				map.put("ChannelID","");
-//				map.put("InvestType","");
+				map.put("ChannelID",1);
+				map.put("InvestType",2);
 				map.put("InvestAmount",YxActivity.getBigDecimal("WriteOffAmount"));
 				map.put("InvestState",2);
 				map.put("ResourceFlag",1);
-//				map.put("CommodityID","");
+				map.put("CommodityID",111);
 				map.put("CostType",YxActivity.getInt("CostType"));
-//				map.put("ExecutePhotoIds","");
+				map.put("ExecutePhotoIds","123");
 //				map.put("ExecuteRemark","");
 				map.put("WriteOffAmount",YxActivity.getBigDecimal("WriteOffAmount"));
 				map.put("CreateManName",YxActivity.getStr("CreateManName"));
