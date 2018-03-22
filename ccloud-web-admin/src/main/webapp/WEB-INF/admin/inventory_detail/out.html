@@ -144,6 +144,13 @@
 				area: ['70%', '80%'],
 				content: '${CPATH}/admin/transferBill/_detail/' + sn
 			})
+		}else if (sn.substring(0,2)=="ST"){
+			layer.open({
+				title:"盘亏",
+				type: 2,
+				area: ['70%', '80%'],
+				content: '${CPATH}/admin/inventoryDetail/detailBySn/' + sn
+			})
 		}else{
 			layer.open({
 				title:"退货详细",

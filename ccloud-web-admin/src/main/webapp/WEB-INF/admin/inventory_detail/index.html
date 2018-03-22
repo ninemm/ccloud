@@ -130,6 +130,14 @@
 			url = '${CPATH}/admin/salesInstock/detailBySn/' + orderSn;
 		}else if(orderSn.indexOf("PS")==0){
 			url = '${CPATH}/admin/purchaseInstock/detailBySn/' + orderSn;
+		}else if(orderSn.substring(0,2)=="TB"){
+			layer.open({
+				title:"调拨入库",
+				type: 2,
+				area: ['70%', '80%'],
+				content: '${CPATH}/admin/transferBill/_detail/' + orderSn
+			});
+			return;
 		}else{
 			url = '${CPATH}/admin/inventoryDetail/detailBySn/' + orderSn;
 		}
