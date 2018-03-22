@@ -133,7 +133,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "ct.name", customerTypeId, params, needWhere);
 //		needWhere = appendIfNotEmpty(fromBuilder, "o.customer_type_id", customerTypeId, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
-//		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "o.biz_user_id", bizUserId, params, needWhere);
 
 		if (needWhere) {
@@ -2132,8 +2132,8 @@ public class SalesOrderQuery extends JBaseQuery {
 	public List<SalesOrder> findBySellerId(String sellerId,String dataArea){
 		StringBuilder fromBuilder = new StringBuilder("select cs.biz_user_id, u.realname from cc_sales_order cs ");
 		fromBuilder.append("LEFT JOIN user u on u.id = cs.biz_user_id ");
-//		fromBuilder.append("where cs.seller_id  ='"+sellerId+"' ");
-		fromBuilder.append("where cs.data_area  like '"+dataArea+"' ");
+		fromBuilder.append("where cs.seller_id  ='"+sellerId+"' ");
+		fromBuilder.append("and cs.data_area  like '"+dataArea+"' ");
 		fromBuilder.append(" GROUP BY cs.biz_user_id");
 		return DAO.find(fromBuilder.toString());
 	}

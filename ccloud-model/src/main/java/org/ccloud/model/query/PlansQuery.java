@@ -56,7 +56,7 @@ public class PlansQuery extends JBaseQuery {
 	public Page<Plans> paginate(int pageNumber, int pageSize, String keyword, String orderby, String dataArea,String type,String startDate,String endDate,String dateType) {
 		String select = "SELECT cp.user_id,cp.type,cp.seller_product_id,cp.start_date,cp.end_date,cs.seller_name,u.realname,csp.custom_name ,sum(plan_num) as planNum, sum(complete_num) as completeNum ,cp.complete_ratio  ";
 		StringBuilder fromBuilder = new StringBuilder("FROM cc_plans cp  ");
-		fromBuilder.append("LEFT JOIN cc_seller cs on cs.dept_id = cp.dept_id ");
+		fromBuilder.append("LEFT JOIN cc_seller cs on cs.id = cp.seller_id ");
 		fromBuilder.append("LEFT JOIN `user` u on u.id = cp.user_id ");
 		fromBuilder.append("LEFT JOIN cc_seller_product csp on csp.id = cp.seller_product_id ");
 
