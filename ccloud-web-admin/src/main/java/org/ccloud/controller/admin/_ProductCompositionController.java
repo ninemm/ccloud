@@ -101,6 +101,14 @@ public class _ProductCompositionController extends JBaseCRUDController<ProductCo
 					String[] factIndex = map.get("factIndex");
 					String productId = StringUtils
 							.getArrayFirst(map.get("productComposition[0].id"));
+					String bigCount = StringUtils
+							.getArrayFirst(map.get("productComposition[0].product_bigcount"));
+					String smallCount = StringUtils
+							.getArrayFirst(map.get("productComposition[0].product_smallcount"));
+					String convert_relate = StringUtils
+							.getArrayFirst(map.get("productComposition[0].convert_relate"));
+					BigDecimal totalCount = new BigDecimal(bigCount).multiply(new BigDecimal(convert_relate))
+							.add(new BigDecimal(smallCount));
 					String name = StringUtils
 							.getArrayFirst(map.get("productComposition.name"));
 					String price = StringUtils
@@ -118,16 +126,30 @@ public class _ProductCompositionController extends JBaseCRUDController<ProductCo
 								.getArrayFirst(map.get("composition[" + factIndex[i] + "].id"));
 						String subProductId = StringUtils
 								.getArrayFirst(map.get("productComposition[" + factIndex[i] + "].id"));
-						String subProductCount = StringUtils
-								.getArrayFirst(map.get("productComposition[" + factIndex[i] + "].product_count"));						
+						String bigProductCount = StringUtils
+								.getArrayFirst(map.get("productComposition[" + factIndex[i] + "].product_bigcount"));
+						String smallProductCount = StringUtils
+								.getArrayFirst(map.get("productComposition[" + factIndex[i] + "].product_smallcount"));
+						String convertRelate = StringUtils
+								.getArrayFirst(map.get("productComposition[" + factIndex[i] + "].convert_relate"));
+						String isGift = StringUtils
+								.getArrayFirst(map.get("productComposition[" + factIndex[i] + "].is_gift"));						
+						BigDecimal subProductCount = new BigDecimal(bigProductCount).multiply(new BigDecimal(convertRelate))
+								.add(new BigDecimal(smallProductCount));
 						ProductComposition composition = new ProductComposition();
 						composition.setName(name);
 						composition.setPrice(new BigDecimal(price));
 						composition.setSellerProductId(productId);
-						composition.setSubProductCount(subProductCount);
+						composition.setMainProductCount(totalCount.toString());
+						composition.setSubProductCount(subProductCount.toString());
 						composition.setSubSellerProductId(subProductId);
 						composition.setState(Integer.parseInt(state));
 						composition.setActivityId(activityId);
+						if (isGift.equals("on")) {
+							composition.setIsGift(Consts.STATUS_NO);
+						} else {
+							composition.setIsGift(Consts.STATUS_YES);
+						}
 						if (compositionId != null) {
 							composition.setId(compositionId);
 							composition.setParentId(mainId);
@@ -254,9 +276,15 @@ public class _ProductCompositionController extends JBaseCRUDController<ProductCo
 				
 				String sellProductId = sellerProduct.getId();
 				String customName = sellerProduct.getCustomName();
-				String speName = sellerProduct.getStr("valueName");				
+				String speName = sellerProduct.getStr("valueName");		
+				String bigUnit = sellerProduct.getStr("big_unit");
+				String smallUnit = sellerProduct.getStr("small_unit");
+				String convertRelate = sellerProduct.getStr("convert_relate");
 				productOptionMap.put("id", sellProductId);
 				productOptionMap.put("custom_name", customName + "/" + speName);
+				productOptionMap.put("big_unit", bigUnit);
+				productOptionMap.put("small_unit", smallUnit);
+				productOptionMap.put("convert_relate", convertRelate);
 
 				productOptionList.add(productOptionMap);				
 			}

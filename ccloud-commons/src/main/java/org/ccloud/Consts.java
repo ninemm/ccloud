@@ -267,6 +267,9 @@ public class Consts {
 	
 	public static final Integer STATUS_STATE_PUT = 1;// 通用上架
 	public static final Integer STATUS_STATE_DOWN = 0;// 通用下架
+	
+	public static final Integer STATUS_YES = 1;// 通用是
+	public static final Integer STATUS_NO = 0;// 通用否
 
 	public static final String TEMPLATE_ALI = "0";//阿里模板
 	public static final String TEMPLATE_DANLU = "1";//丹露模板

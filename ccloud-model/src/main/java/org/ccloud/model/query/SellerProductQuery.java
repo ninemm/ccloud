@@ -109,7 +109,8 @@ public class SellerProductQuery extends JBaseQuery {
 	
 	//查询这个销售商的所有商品  如果销售商是仓库创建者  可以看见所有仓库
 	public List<SellerProduct> findBySellerId(String sellerId) {
- 		StringBuilder fromBuilder = new StringBuilder("select cg.*,t1.valueName from cc_seller_product cg ");
+ 		StringBuilder fromBuilder = new StringBuilder("select cg.*,t1.valueName,ct.big_unit,ct.small_unit,ct.convert_relate from cc_seller_product cg ");
+ 		fromBuilder.append(" LEFT JOIN cc_product ct on ct.id = cg.product_id ");
 		fromBuilder.append(" LEFT JOIN( SELECT sv.id , cv.product_set_id , GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
 		fromBuilder.append(" RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 ON ");
 		fromBuilder.append(" t1.product_set_id = cg.product_id WHERE cg.seller_id = ? OR cg.id IN( SELECT id.sell_product_id FROM cc_inventory_detail id ");
@@ -170,12 +171,12 @@ public class SellerProductQuery extends JBaseQuery {
 	}
 
 	public List<SellerProduct> findByCompositionId(String productId) {
-		StringBuilder stringBuilder = new StringBuilder("SELECT cc.*,cp.sub_product_count as productCount,cp.parent_id as parentId, cd.convert_relate FROM cc_seller_product cc ");
+		StringBuilder stringBuilder = new StringBuilder("SELECT cc.*,cp.sub_product_count as productCount, cp.is_gift as isGift, cp.parent_id as parentId, cd.convert_relate FROM cc_seller_product cc ");
 		stringBuilder.append("RIGHT JOIN cc_product_composition cp ON cp.sub_seller_product_id = cc.id ");
 		stringBuilder.append("LEFT JOIN cc_product cd ON cd.id = cc.product_id ");
 		stringBuilder.append("WHERE parent_id = ? ");
 		stringBuilder.append("UNION ALL ");
-		stringBuilder.append("SELECT cc.*,1 as productCount, cp.parent_id as parentId, cd.convert_relate FROM cc_seller_product cc ");
+		stringBuilder.append("SELECT cc.*,cp.main_product_count as productCount, 0 as isGift, cp.parent_id as parentId, cd.convert_relate FROM cc_seller_product cc ");
 		stringBuilder.append("RIGHT JOIN cc_product_composition cp ON cp.seller_product_id = cc.id ");
 		stringBuilder.append("LEFT JOIN cc_product cd ON cd.id = cc.product_id ");
 		stringBuilder.append("WHERE parent_id = ? GROUP BY cp.parent_id");

@@ -44,7 +44,7 @@ $(function() {
 		addNew();
 		addNew();
 	</#if>
-	
+
 	var $tbody = $("#dataTable" + " tbody");
 	<#list (list)! as list>
 		<#if list_index = 0>
@@ -55,15 +55,37 @@ $(function() {
 		    });	
 		$("#select_${list_index}").val(['${list.seller_product_id}']).trigger('change');
 	    $tbody.find("#tr1>.text-left>.pro-slc2").change(function(){
-	     var result = productMap[$(this).val()];   
-	     var cgoodsCode = result.id;
-	     var cgoodsName = result.customName;
-	     var cspecification = result.valueName;
-	     var $tr = $(this).parent().parent();
-	     $tr.find("td>#goodsCode").val(cgoodsCode);
-	     $tr.find("td>#goodsName").html(cgoodsName); 
-		 $tr.find("td>#specification").text(cspecification);
-	     });		
+		     var result = productMap[$(this).val()];   
+		     var cgoodsCode = result.id;
+		     var cgoodsName = result.customName;
+		     var cspecification = result.valueName;
+		     var bigunit = result.big_unit;
+		     var smallunit = result.small_unit;
+		     var convert_relate = result.convert_relate;	     
+		     var $tr = $(this).parent().parent();
+		     $tr.find("td>#goodsCode").val(cgoodsCode);
+		     $tr.find("td>#goodsName").html(cgoodsName); 
+			 $tr.find("td>#specification").text(cspecification);
+		     $tr.find("td>#big").html(bigunit);
+		     $tr.find("td>#small").html(smallunit);
+		     $tr.find("td>#convert_relate").val(convert_relate);
+	     });
+		 var bigcount = "productComposition[${list_index}].product_bigcount";
+		 var smallcount = "productComposition[${list_index}].product_smallcount";
+        $('#form').data('bootstrapValidator').addField(bigcount,{
+               validators: {  
+                   notEmpty: {  
+                       message: '请输入商品数量'
+                   }  
+               }  
+        });
+        $('#form').data('bootstrapValidator').addField(smallcount,{
+               validators: {  
+                   notEmpty: {  
+                       message: '请输入商品数量'
+                   }  
+               }  
+        });        	     		
 		</#if>
 	</#list>
 	
@@ -75,23 +97,37 @@ $(function() {
 	    });	
 	    $("#select_${list_index+1}").val(['${list.sub_seller_product_id}']).trigger('change');
 	    $tbody.find("#tr${list_index+2}>.text-left>.pro-slc2").change(function(){
-	     var result = productMap[$(this).val()];   
-	     var cgoodsCode = result.id;
-	     var cgoodsName = result.customName;
-	     var cspecification = result.valueName;
-	     var $tr = $(this).parent().parent();
-	     $tr.find("td>#goodsCode").val(cgoodsCode);
-	     $tr.find("td>#goodsName").html(cgoodsName); 
-		 $tr.find("td>#specification").text(cspecification);
+		     var result = productMap[$(this).val()];   
+		     var cgoodsCode = result.id;
+		     var cgoodsName = result.customName;
+		     var cspecification = result.valueName;
+		     var bigunit = result.big_unit;
+		     var smallunit = result.small_unit;
+		     var convert_relate = result.convert_relate;
+		     var $tr = $(this).parent().parent();
+		     $tr.find("td>#goodsCode").val(cgoodsCode);
+		     $tr.find("td>#goodsName").html(cgoodsName); 
+			 $tr.find("td>#specification").text(cspecification);
+		     $tr.find("td>#big").html(bigunit);
+		     $tr.find("td>#small").html(smallunit);
+		     $tr.find("td>#convert_relate").val(convert_relate);		 
 	     });
-		 var count = "productComposition[${list_index+1}].product_count";
-        $('#form').data('bootstrapValidator').addField(count,{
+	     var bigcount = "productComposition[${list_index+1}].product_bigcount";
+	     var smallcount = "productComposition[${list_index+1}].product_smallcount";
+		$('#form').data('bootstrapValidator').addField(bigcount,{
+		       validators: {  
+		           notEmpty: {  
+		               message: '请输入商品数量'
+		           }  
+		       }  
+		}); 
+        $('#form').data('bootstrapValidator').addField(smallcount,{
                validators: {  
                    notEmpty: {  
                        message: '请输入商品数量'
                    }  
                }  
-        }); 	         
+        });	 		 
 	</#list>	
 	
 });
@@ -189,7 +225,10 @@ var index = 1;
 function addTr(tid, productList, optionArr) {
 	var firstProduct = productList[0];
 	var goodsCode = firstProduct.id;
-	var goodsName = firstProduct.customName;
+	var goodsName = firstProduct.custom_name;
+	var bigUnit = firstProduct.big_unit;
+	var smallUnit = firstProduct.small_unit;
+	var convert_relate = firstProduct.convert_relate;
 
 	var $tbody = $(tid + " tbody"),
 	$tr = $tbody.find("tr:eq(0)"),
@@ -203,7 +242,14 @@ function addTr(tid, productList, optionArr) {
 
 	$tbody.append("<tr id='tr" + newTrIdx + "'>" +trHtml+ "</tr>");
     $tbody.find("tr:last>td>#goodsCode").attr("name","productComposition["+ lastTrIdx +"].id");
-    $tbody.find("tr:last>td>div>div>#stock").attr("name","productComposition["+ lastTrIdx +"].product_count");
+    $tbody.find("tr:last>td>#gift").attr("name","productComposition["+ lastTrIdx +"].is_gift");
+    $tbody.find("tr:last>td>#gift_hidden").attr("name","productComposition["+ lastTrIdx +"].is_gift");
+    $tbody.find("tr:last>td>#convert_relate").attr("name","productComposition["+ lastTrIdx +"].convert_relate");
+    $tbody.find("tr:last>td>div>div>#b_stock").attr("name","productComposition["+ lastTrIdx +"].product_bigcount");
+    $tbody.find("tr:last>td>div>div>#s_stock").attr("name","productComposition["+ lastTrIdx +"].product_smallcount");
+    $tbody.find("tr:last>td>div>div>#big").html(" " + bigUnit);
+    $tbody.find("tr:last>td>div>div>#small").html(" " + smallUnit);
+    $tbody.find("tr:last>td>#convert_relate").val(convert_relate);
     $tbody.find("tr:last>td>#compositionId").attr("name","composition["+ lastTrIdx +"].id");
     $tbody.find("tr:last>td>#goodsCode").val(goodsCode);
     $tbody.find("tr:last>td>#factIndex").attr("value",lastTrIdx);
@@ -219,19 +265,27 @@ function addTr(tid, productList, optionArr) {
     $tbody.find("tr:last>td>select>pro-slc2").focus();
     
     if (lastTrIdx == 0) {
-    	$tbody.find("#tr1>.text-right:first-child").prepend("主商品&nbsp;");
-    	$tbody.find("#tr1>.text-center:last-child>div>div>input").attr("disabled","disabled");
     	$tbody.find("#tr1>.text-right>a").remove();
-    } else {
-		var count = "productComposition["+ lastTrIdx +"].product_count";
-        $('#form').data('bootstrapValidator').addField(count,{
-               validators: {  
-                   notEmpty: {  
-                       message: '请输入商品数量'
-                   }  
-               }  
-        });    
+    	$tbody.find("#tr1>td>#gift").attr("checked","checked");
+    	$tbody.find("#tr1>td>#gift").attr("disabled","disabled");
+    	$tbody.find("#tr1>td>#gift_hidden").val("true");
     }
+	var bigcount = "productComposition["+ lastTrIdx +"].product_bigcount";
+	var smallcount = "productComposition["+ lastTrIdx +"].product_smallcount";
+    $('#form').data('bootstrapValidator').addField(bigcount,{
+           validators: {  
+               notEmpty: {  
+                   message: '请输入商品数量'
+               }  
+           }
+    });
+    $('#form').data('bootstrapValidator').addField(smallcount,{
+           validators: {  
+               notEmpty: {  
+                   message: '请输入商品数量'
+               }  
+           }
+    });            
     
     if (lastTrIdx == 1) {
     	$tbody.find("#tr2>.text-right>a").remove();
@@ -240,8 +294,10 @@ function addTr(tid, productList, optionArr) {
     <!--添加商品的移除-->
     $tbody.find("tr:last>td>.removeTr").click(function(){
       var delIndex = newTrIdx - 1;
-      var countName = "productComposition["+ delIndex +"].product_count";
-      $('#form').data('bootstrapValidator').enableFieldValidators(countName, false);
+      var bigcountName = "productComposition["+ delIndex +"].product_bigcount";
+      var smallcountName = "productComposition["+ delIndex +"].product_smallcount";
+      $('#form').data('bootstrapValidator').enableFieldValidators(bigcountName, false);
+       $('#form').data('bootstrapValidator').enableFieldValidators(smallcountName, false);
 	  $("#tr" + newTrIdx).remove();
 	});
     
@@ -250,9 +306,15 @@ function addTr(tid, productList, optionArr) {
      var result = productMap[$(this).val()];   
      var cgoodsCode = result.id;
      var cgoodsName = result.customName;
+     var bigunit = result.big_unit;
+     var smallunit = result.small_unit;
+     var convert_relate = result.convert_relate;
      var $tr = $(this).parent().parent();
      $tr.find("td>#goodsCode").val(cgoodsCode);
-     $tr.find("td>#goodsName").html(cgoodsName); 
+     $tr.find("td>#goodsName").html(cgoodsName);
+     $tr.find("td>#big").html(bigunit);
+     $tr.find("td>#small").html(smallunit);
+     $tr.find("td>#convert_relate").val(convert_relate);
      });  
 }
 
@@ -325,9 +387,10 @@ function addTr(tid, productList, optionArr) {
 						width="100%">
 						<thead>
 							<tr>
-								<th class="col-sm-1 center zr">操作</th>
-								<th class="col-sm-2 center zh">商品名称</th>
-								<th class="col-sm-1 center">子商品数量</th>
+								<th class="center zr">操作</th>
+								<th class="center zh">是否主商品</th>
+								<th class="center zh">商品名称</th>
+								<th class="center zh">商品数量</th>
 							</tr>
 						</thead>
 						<tbody id="sProdBody">
@@ -336,6 +399,11 @@ function addTr(tid, productList, optionArr) {
 									class="btn btn-danger btn-xs removeTr" data-toggle="modal"
 									data-target="#deleteBackProModal"><span
 										class="glyphicon glyphicon-remove"></span></a></td>
+								<td class="center text-center">
+									<input type="checkbox" name="productComposition[-1].is_gift" id="gift">
+									<input type="hidden" name="productComposition[-1].is_gift" value="false" id="gift_hidden"/>
+									<input type="hidden" name="productComposition[-1].convert_relate" id="convert_relate">
+								</td>										
 								<td class="text-left tz"><input type="hidden" id="goodsCode"
 									name="productComposition[-1].id" disabled="true" />
 									<input type="hidden" id="compositionId"
@@ -345,17 +413,25 @@ function addTr(tid, productList, optionArr) {
 								</select></td>
 								<td class="text-center">
 								<div class="form-group validata-box" style="margin: 0;">
-								<div class="input-group col-md-4 col-sm-10">
-									<input type="text" id="stock"
-									class="stock" name="productComposition[-1].product_count"
-									value="1" disabled="disabled" />									
+								<div class="input-group" style="text-align:center;width:100%">
+									<input type="text" id="b_stock"
+									class="stock" name="productComposition[-1].product_bigcount"
+									value="1" style="width:60px"/><span id="big"> 件</span>&nbsp;&nbsp;&nbsp;     
+									<input type="text" id="s_stock"
+									class="stock" name="productComposition[-1].product_smallcount"
+									value="0" style="width:60px"/><span id="small"> 瓶</span> 																
 								</div>								
 								</td>									
 							</tr>
 							<#list (list)! as list>
 							<#if list_index = 0>
 							<tr id="tr${list_index+1}">
-								<td class="center text-right">主商品&nbsp;</td>
+								<td class="center text-right"></td>
+								<td class="center text-center">
+									<input type="checkbox" name="productComposition[${list_index}].is_gift" id="gift" checked="checked" disabled="disabled">
+									<input type="hidden" name="productComposition[${list_index}].is_gift" value="true" id="gift_hidden"/>
+									<input type="hidden" name="productComposition[${list_index}].convert_relate" id="convert_relate" value="${list.main_convert}">
+								</td>								
 								<td class="text-left tz"><input type="hidden" id="goodsCode"
 									name="productComposition[${list_index}].id"
 									value="${list.seller_product_id}" /> <input type="hidden" id="compositionId"
@@ -365,12 +441,15 @@ function addTr(tid, productList, optionArr) {
 									class="pro-slc2" id="select_${list_index}">
 								</select></td>
 								<td class="text-center">
-								<div class="form-group validata-box" style="margin: 0;">
-								<div class="input-group col-md-4 col-sm-10">								
-								<input type="text" id="stock"
-									class="stock"
-									name="productComposition[${list_index}].product_count"
-									value="1" disabled="true"/></div></td>										
+									<div class="form-group validata-box" style="margin: 0;">
+									<div class="input-group" style="text-align:center;width:100%">
+									<input type="text" id="b_stock"
+									class="stock" name="productComposition[${list_index}].product_bigcount"
+									value="${((list.main_product_count?number)/list.main_convert)?floor}" style="width:60px"/><span id="big"> 件</span>&nbsp;&nbsp;&nbsp;     
+									<input type="text" id="s_stock"
+									class="stock" name="productComposition[${list_index}].product_smallcount"
+									value="${((list.main_product_count?number)%list.main_convert)?floor}" style="width:60px"/><span id="small"> 瓶</span> 																
+								</td>										
 							</tr>
 							</#if>
 							</#list>
@@ -384,6 +463,11 @@ function addTr(tid, productList, optionArr) {
 									data-target="#deleteBackProModal" onclick="deleteTr(this)"><span
 										class="glyphicon glyphicon-remove"></span></a></td>								
 								</#if>
+								<td class="center text-center">
+									<input type="checkbox" name="productComposition[${list_index+1}].is_gift" id="gift" <#if list.is_gift == 0>checked="checked"</#if>/>
+									<input type="hidden" name="productComposition[${list_index+1}].is_gift" value="false" id="gift_hidden"/>
+									<input type="hidden" name="productComposition[${list_index+1}].convert_relate" id="convert_relate" value="${list.sub_convert}">
+								</td>
 								<td class="text-left tz"><input type="hidden" id="goodsCode"
 									name="productComposition[${list_index+1}].id"
 									value="${list.sub_seller_product_id}" /> <input type="hidden" id="compositionId"
@@ -392,13 +476,15 @@ function addTr(tid, productList, optionArr) {
 									value="${list_index+1}" /> <select
 									class="pro-slc2" id="select_${list_index+1}">
 								</select></td>
-								<td class="text-center zh">
+								<td class="text-center">
 								<div class="form-group validata-box" style="margin: 0;">
-								<div class="input-group col-md-4 col-sm-10">								
-								<input type="text" id="stock"
-									class="stock"
-									name="productComposition[${list_index+1}].product_count"
-									value="${list.sub_product_count}" />
+								<div class="input-group" style="text-align:center;width:100%">								
+									<input type="text" id="b_stock"
+									class="stock" name="productComposition[${list_index+1}].product_bigcount"
+									value="${((list.sub_product_count?number)/list.sub_convert)?floor}" style="width:60px"/><span id="big"> 件</span>&nbsp;&nbsp;&nbsp;     
+									<input type="text" id="s_stock"
+									class="stock" name="productComposition[${list_index+1}].product_smallcount"
+									value="${((list.sub_product_count?number)%list.sub_convert)?floor}" style="width:60px"/><span id="small"> 瓶</span> 	
 								</div>
 								</td>
 							</tr>															
