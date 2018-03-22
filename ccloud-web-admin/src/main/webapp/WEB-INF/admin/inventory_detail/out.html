@@ -129,20 +129,28 @@
    		return fields;
 	}
 	function orderInfo(sn){
-	if(sn.substring(0,2)!="SS"){
-			layer.open({
-				title:"退货详细",
-				type: 2, 
-				area: ['70%', '80%'],
-				content: '${CPATH}/admin/purchaseRefundOutstock/_detail/' + sn
-			}); 
-		}else{
+	if(sn.substring(0,2)=="SS"){
+			
 			layer.open({
 				title:"销售出库订单详细",
 				type: 2,
 				area: ['70%', '80%'],
 				content: '${CPATH}/admin/salesOutstock/stockdetailBySn/' + sn
 			});
+		}else if (sn.substring(0,2)=="TB"){
+			layer.open({
+				title:"调拨出库",
+				type: 2,
+				area: ['70%', '80%'],
+				content: '${CPATH}/admin/transferBill/_detail/' + sn
+			})
+		}else{
+			layer.open({
+				title:"退货详细",
+				type: 2, 
+				area: ['70%', '80%'],
+				content: '${CPATH}/admin/purchaseRefundOutstock/_detail/' + sn
+			}); 
 		}
 	}
 	
