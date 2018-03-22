@@ -79,7 +79,7 @@ public class _AdminController extends JBaseController {
 		 * null); if (commentPage != null) { setAttr("comments", commentPage.getList());
 		 * }
 		 */
-
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		if (user == null) {
 			redirect("/admin/login");
@@ -138,11 +138,13 @@ public class _AdminController extends JBaseController {
 			CookieUtils.put(this, mobile,mobile);
 			changePassword="true";
 		}
+		String sellerID=CookieUtils.get(this, "_seller"+mobile);
+		if(StrKit.isBlank(sellerID)) {
+			CookieUtils.put(this, "_seller"+mobile,sellerId);
+		}
 		setAttr("changePassword",changePassword);
-
 		render("index.html");
 	}
-	
 	@Clear(AdminInterceptor.class)
 	public void login() {
 		
@@ -189,7 +191,6 @@ public class _AdminController extends JBaseController {
 				List<User> userList = UserQuery.me().findByMobile(mobile);
 				List<Map<String, String>> sellerList = Lists.newArrayList();
 				List<Department> tmpList = Lists.newArrayList();
-				
 				for (User temp : userList) {
 					tmpList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(temp.getDepartmentId());
 					if (tmpList.size() > 0) {
@@ -201,22 +202,29 @@ public class _AdminController extends JBaseController {
 						sellerList.add(seller);
 					}
 				}
-				
-				if (sellerList.size() == 0 && !user.isAdministrator()) {
-					renderError(404);
-					return ;
-				} else if (sellerList.size() > 1) {
-					setAttr("mobile", mobile);
-					setAttr("sellerList", sellerList);
+				String sellerID = CookieUtils.get(this, "_seller"+mobile);
+				if(StrKit.notBlank(sellerID)) {
+					setSessionAttr("isUserID",user.getId());
 					setSessionAttr("sellerList", sellerList);
-					forwardAction("/admin/choice");
-					Map<String, Object> map = new HashMap<>();
-					map.put("mobile", mobile);
-					map.put("sellerList", sellerList);
-					map.put("size", sellerList.size());
-					renderJson(map);
-					return ;
+					change();
+				}else {
+					if (sellerList.size() == 0 && !user.isAdministrator()) {
+						renderError(404);
+						return ;
+					} else if (sellerList.size() > 1) {
+						setAttr("mobile", mobile);
+						setAttr("sellerList", sellerList);
+						setSessionAttr("sellerList", sellerList);
+						forwardAction("/admin/choice");
+						Map<String, Object> map = new HashMap<>();
+						map.put("mobile", mobile);
+						map.put("sellerList", sellerList);
+						map.put("size", sellerList.size());
+						renderJson(map);
+						return ;
+					}
 				}
+				
 				
 				if (!user.isAdministrator() && tmpList != null) {
 					Department dept = tmpList.get(0);
@@ -286,9 +294,13 @@ public class _AdminController extends JBaseController {
 	
 	@Clear(AdminInterceptor.class)
 	public void change() {
-		
 		String mobile = getPara("mobile");
 		String sellerId = getPara("sellerId");
+		if(StrKit.isBlank(sellerId)) {
+			String userId = getSessionAttr("isUserID");
+			mobile = UserQuery.me().findById(userId).getMobile();
+			sellerId = CookieUtils.get(this, "_seller"+mobile);
+		}
 		User curUser = null;
 		
 		List<User> userList = UserQuery.me().findByMobile(mobile);
