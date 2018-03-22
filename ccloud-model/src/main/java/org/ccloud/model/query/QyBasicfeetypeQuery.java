@@ -76,5 +76,9 @@ public class QyBasicfeetypeQuery extends JBaseQuery {
 		}
 	}
 
+	public void deleteAll() {
+		DAO.doDelete("FeeTypeID is not null");
+	}
+
 	
 }

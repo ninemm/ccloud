@@ -67,5 +67,9 @@ public class QyBasicshowtypeQuery extends JBaseQuery {
 		return 0;
 	}
 
+	public void deleteAll() {
+		DAO.doDelete("ShowTypeID is not null");
+	}
+
 	
 }

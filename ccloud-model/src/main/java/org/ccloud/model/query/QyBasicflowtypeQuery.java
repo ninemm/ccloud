@@ -67,5 +67,9 @@ public class QyBasicflowtypeQuery extends JBaseQuery {
 		return 0;
 	}
 
+	public void deleteAll() {
+		DAO.doDelete("FlowTypeID is not null");
+	}
+
 	
 }

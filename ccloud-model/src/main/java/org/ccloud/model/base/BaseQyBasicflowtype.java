@@ -122,19 +122,19 @@ public abstract class BaseQyBasicflowtype<M extends BaseQyBasicflowtype<M>> exte
 		return getStr("Memo");
 	}
 
-	public void setCreateTime(java.util.Date CreateTime) {
+	public void setCreateTime(java.lang.String CreateTime) {
 		set("CreateTime", CreateTime);
 	}
 
-	public java.util.Date getCreateTime() {
+	public java.lang.String getCreateTime() {
 		return get("CreateTime");
 	}
 
-	public void setModifyTime(java.util.Date ModifyTime) {
+	public void setModifyTime(java.lang.String ModifyTime) {
 		set("ModifyTime", ModifyTime);
 	}
 
-	public java.util.Date getModifyTime() {
+	public java.lang.String getModifyTime() {
 		return get("ModifyTime");
 	}
 
