@@ -57,7 +57,6 @@ import org.ccloud.model.query.OptionQuery;
 import org.ccloud.model.query.QyBasicfeetypeQuery;
 import org.ccloud.model.query.QyBasicflowtypeQuery;
 import org.ccloud.model.query.QyBasicshowtypeQuery;
-import org.ccloud.model.query.QyExpenseQuery;
 import org.ccloud.model.query.QyExpensedetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.vo.ImageJson;
@@ -187,6 +186,8 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 	public void save() {
 		final Activity activity = getModel(Activity.class);
 		List<ExpenseDetail> expenseOldList = ExpenseDetailQuery.me().findByActivityId(activity.getId());
+		Map<String, String[]> map = getParaMap();
+		String templateInfo = getPara("templateInfo");
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String [] imagePath = getParaValues("imageUrl[]");
 		String [] item1 = getParaValues("item1[]");
@@ -920,8 +921,8 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 	}
 	
 	public void editTemplate() {
-		String orderList = getPara("orderList");
-		setAttr("orderList",orderList);
+		String dateTime = getPara("dateTime");
+		setAttr("dateTime",dateTime);
 		render("template.html");
 	}
 }

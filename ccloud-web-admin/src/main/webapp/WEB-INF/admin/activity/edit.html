@@ -317,6 +317,7 @@
 		if (listc != null && listc.length > 0) {
 			cIds = listc.toString();
 		}
+		var templateInfo = localStorage.getItem("template");
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
 				var validate = $form.data('bootstrapValidator');
@@ -327,7 +328,7 @@
 				return validate.isValid()
 			},
 			type : "post", 
-			data : {"customerType":cIds},
+			data : {"customerType":cIds,"templateInfo":JSON.stringify(templateInfo)},
 			dataType : "json", 
 			success : function(data) { 
 				if(data.errorCode == 0) {
@@ -363,6 +364,8 @@
 		$newTr.find("#remark").attr("name", remarkName);
 		$newTr.find("#orderList").attr("name","orderList" + newTrIdx);
 		$newTr.find("#activityExecteId").attr("name","activityExecteId"+newTrIdx);
+		$newTr.find("#templateInfo").attr("name","templateInfo"+newTrIdx);
+		$newTr.find("#dateTime").attr("name","dateTime"+newTrIdx);
 		orderNum();
 	}
 
@@ -449,17 +452,22 @@
 	})	
 	
 	function editTemplate(obj){
-		var orderList = $(obj).parent().parent().parent().find("#orderList").val();
+		localStorage.clear();
+		var timestamp = (new Date()).valueOf();
+		$(obj).parent().parent().parent().find("#dateTime").val(dateTime);
 		layer.open({
 			title:"模板配置",
 			type: 2, 
 			area: ['70%', '80%'],
-			content: '${CPATH}/admin/activity/editTemplate?orderList=' + orderList
+			content: '${CPATH}/admin/activity/editTemplate?dateTime=' + timestamp
 		}); 
 	}
 	function setTemplate(){
-		var template = localStorage.getItem("template");
+		/* var template = localStorage.getItem("template");
 		console.log(template);
+		$("#templateInfo").val(template);
+		localStorage.clear(); */
+		layer.closeAll();
 	}
 </#macro>
 
@@ -787,6 +795,8 @@
 							<td>
 								<span class="rowNum">0</span>
 								<input type="hidden" name = "activityExecteId" id="activityExecteId"/>
+								<input type="hidden" name = "dateTime" id="dateTime" value =""/>
+								<input type="hidden" name = "templateInfo" id="templateInfo" value = ""/>
 							</td>
 							<td>
 								<div class = "validata-box" style="padding-left:35%;">

@@ -12,11 +12,11 @@
 
 <#macro script>
 	var newTrIdx = 0;
-	var orderList = "";
+	var dateTime = "";
 	var num = 0;
 	$(document).ready(function() {
-		orderList = ${(orderList)!};
-		$("#orderList").val(orderList);
+		dateTime = ${(dateTime)!};
+		$("#dateTime").val(dateTime);
 		addActivityExT();
 	});
 	var $tbody = $("#table tbody");
@@ -51,7 +51,7 @@
 			var trId = document.getElementById(""+tr+"");
 			if(trId){
 				template = {
-					orderList : $("#orderList").val(),
+					dateTime : $("#dateTime").val(),
 					templateValue : $("#"+tr+"").find("#templateValue").val(),
 					templateValueType : $("#"+tr+"").find("#templateValueType").find("option:selected").val(),
 					templateValueTypeValue : $("#"+tr+"").find("#templateValueTypeValue").val()
@@ -59,8 +59,7 @@
 				templateList.push(template);		
 			}
 		}
-		console.log(templateList);
-		localStorage.setItem("template", templateList);
+		localStorage.setItem("template", JSON.stringify(templateList));
 		parent.setTemplate();
 	}
 	
@@ -84,7 +83,7 @@
 					</td>
 					<td>
 						<input type="text" name = "templateValue" id="templateValue" value="" placeholder="例子：长/宽/高"/>
-						<input type="hidden" name = "orderList" id="orderList" value=""/>
+						<input type="hidden" name = "dateTime" id="dateTime" value=""/>
 					</td>
 					<td>
 						<div class = "validata-box" style="padding-left:35%;">
